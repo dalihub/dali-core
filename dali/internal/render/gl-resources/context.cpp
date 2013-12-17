@@ -307,9 +307,11 @@ void Context::ResetGlState()
   LOG_GL("BindBuffer GL_ELEMENT_ARRAY_BUFFER 0\n");
   mGlAbstraction.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBoundElementArrayBufferId);
 
+#ifndef EMSCRIPTEN // not in WebGL
   mBoundTransformFeedbackBufferId = 0;
   LOG_GL("BindBuffer GL_TRANSFORM_FEEDBACK_BUFFER 0\n");
   mGlAbstraction.BindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, mBoundTransformFeedbackBufferId);
+#endif
 
   mActiveTextureUnit = UNINITIALIZED_TEXTURE_UNIT;
 

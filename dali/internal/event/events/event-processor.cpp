@@ -53,9 +53,8 @@ static const std::size_t INITIAL_BUFFER_SIZE = MAX_MESSAGE_SIZE * INITIAL_MIN_CA
 
 } // unnamed namespace
 
-EventProcessor::EventProcessor(Stage& stage, NotificationManager& notificationManager, GestureEventProcessor& gestureEventProcessor)
-: mNotificationManager(notificationManager),
-  mTouchEventProcessor(stage),
+EventProcessor::EventProcessor(Stage& stage, NotificationManager& /* notificationManager */, GestureEventProcessor& gestureEventProcessor)
+: mTouchEventProcessor(stage),
   mGestureEventProcessor(gestureEventProcessor),
   mKeyEventProcessor(stage),
   mMouseWheelEventProcessor(stage),

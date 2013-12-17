@@ -248,11 +248,10 @@ private:
   ClippingBox mClippingBox;                     ///< The clipping box, in window coordinates
   Dali::Layer::SortFunctionType mSortFunction;  ///< Used to sort semi-transparent geometry
 
-  bool mRenderOffscreen:1;                      ///< true when rendering to a FBO
   bool mIsClipping:1;                           ///< True when clipping is enabled
   bool mDepthTestDisabled:1;                    ///< Whether depth test is disabled.
 
-  static bool mFirstInstance ;
+  static bool mFirstInstance;
   static DefaultPropertyLookup* mDefaultLayerPropertyLookup; ///< Default properties
 };
 

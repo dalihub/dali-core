@@ -18,8 +18,6 @@
 #include <dali/internal/event/common/type-registry-impl.h>
 
 // EXTERNAL INCLUDES
-#include <execinfo.h>
-#include <cxxabi.h>
 #include <string.h>
 #include <sstream>
 
@@ -28,6 +26,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/internal/event/actors/custom-actor-internal.h>
+#include <dali/internal/event/common/demangler.h>
 
 #include <dali/integration-api/debug.h>
 
@@ -37,51 +36,6 @@ namespace
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TYPE_REGISTRY");
 #endif
-
-std::vector<std::string> SplitString(const std::string &s, char delim, std::vector<std::string> &elems)
-{
-  std::stringstream ss(s);
-  std::string item;
-  while(std::getline(ss, item, delim))
-  {
-    elems.push_back(item);
-  }
-  return elems;
-}
-
-const int Demangle(const char* symbol, std::vector<std::string> &resolved)
-{
-  int status = -4;
-
-  char* res = abi::__cxa_demangle(symbol, NULL, NULL, &status);
-
-  const char* const demangled_name = (status==0)?res:symbol;
-
-  std::string sDemangled(demangled_name);
-
-  free(res);
-
-  SplitString(sDemangled, ':', resolved);
-
-  return resolved.size();
-}
-
-const std::string DemangleShortName(const char *symbol)
-{
-  std::vector<std::string> resolved;
-
-  Demangle(symbol, resolved);
-
-  if(resolved.size() > 0)
-  {
-    return resolved[ resolved.size() - 1 ];
-  }
-  else
-  {
-    return std::string(symbol);
-  }
-
-}
 
 } // namespace anon
 
@@ -132,7 +86,7 @@ Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::type_info& registerType )
 {
   Dali::TypeInfo ret;
 
-  std::string typeName = DemangleShortName(registerType.name());
+  std::string typeName = DemangleClassName(registerType.name());
 
   RegistryMap::iterator iter = mRegistryLut.find(typeName);
 
@@ -161,9 +115,9 @@ Dali::TypeRegistry::NameContainer TypeRegistry::GetTypeNames() const
 }
 
 bool TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
-                               Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit )
+                             Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit )
 {
-  std::string uniqueTypeName  = DemangleShortName(theTypeInfo.name());
+  std::string uniqueTypeName  = DemangleClassName(theTypeInfo.name());
 
   return Register( uniqueTypeName, baseTypeInfo, createInstance, callCreateOnInit );
 }
@@ -173,7 +127,7 @@ bool TypeRegistry::Register( const std::string& uniqueTypeName, const std::type_
 {
   bool ret = false;
 
-  std::string baseTypeName    = DemangleShortName(baseTypeInfo.name());
+  std::string baseTypeName    = DemangleClassName(baseTypeInfo.name());
 
   RegistryMap::iterator iter = mRegistryLut.find(uniqueTypeName);
 
@@ -207,7 +161,7 @@ void TypeRegistry::CallInitFunctions(void) const
 
 std::string TypeRegistry::RegistrationName( const std::type_info& registerType )
 {
-  return DemangleShortName( registerType.name() );
+  return DemangleClassName( registerType.name() );
 }
 
 void TypeRegistry::RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunctionV2 func )

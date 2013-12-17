@@ -33,8 +33,7 @@ namespace SceneGraph
 {
 
 DynamicsDebugRenderer::DynamicsDebugRenderer(const Shader& debugShader)
-: mBufferName(0),
-  mShader(const_cast<Shader&>(debugShader)),
+: mShader(const_cast<Shader&>(debugShader)),
   mContext(NULL),
   mBufferIndex(0),
   mViewMatrix(Matrix::IDENTITY),

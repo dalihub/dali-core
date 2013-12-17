@@ -29,16 +29,6 @@ namespace Dali
 namespace
 {
 
-Vector3 CalculateNormal(const Vector3& v0, const Vector3& v1, const Vector3& v2)
-{
-  // Calculate normal...
-  const Vector3 e0 = v1 - v0;
-  const Vector3 e1 = v2 - v1;
-  Vector3 normal = e0.Cross(e1);
-  normal.Normalize();
-  return normal;
-}
-
 } // namespace
 
 Mesh::Mesh()

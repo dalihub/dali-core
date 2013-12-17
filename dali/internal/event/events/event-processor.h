@@ -85,7 +85,6 @@ private:
 
 private:
 
-  NotificationManager&     mNotificationManager;        ///< Processes notification events.
   TouchEventProcessor      mTouchEventProcessor;        ///< Processes touch events.
   GestureEventProcessor&   mGestureEventProcessor;      ///< Processes gesture events.
   KeyEventProcessor        mKeyEventProcessor;          ///< Processes key events.

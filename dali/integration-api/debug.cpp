@@ -23,7 +23,10 @@
 #include <string.h>
 #include <sstream>
 #include <iomanip>
-#include <boost/thread/tss.hpp>
+
+#ifndef EMSCRIPTEN
+# include <boost/thread/tss.hpp>
+#endif
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
@@ -100,7 +103,11 @@ struct ThreadLocalLogging
   unsigned int logOptions;
 };
 
+#ifndef EMSCRIPTEN // single threaded
 boost::thread_specific_ptr<ThreadLocalLogging> threadLocal;
+#else
+std::auto_ptr<ThreadLocalLogging> threadLocal;
+#endif
 
 /* Forward declarations */
 std::string FormatToString(const char *format, ...);
@@ -178,7 +185,6 @@ void LogMessage(DebugPriority priority, const char* format, ...)
   {
     return;
   }
-
   va_list arg;
   va_start(arg, format);
   std::string message = ArgListToString(format, arg);

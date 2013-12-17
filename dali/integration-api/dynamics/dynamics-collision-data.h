@@ -23,7 +23,7 @@
 namespace Dali
 {
 
-class Vector3;
+struct Vector3;
 
 namespace Integration
 {

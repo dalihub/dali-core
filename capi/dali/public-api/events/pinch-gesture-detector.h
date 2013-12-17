@@ -34,7 +34,7 @@ namespace Internal DALI_INTERNAL
 class PinchGestureDetector;
 }
 
-class PinchGesture;
+struct PinchGesture;
 
 /**
  * This class looks for pinching gestures involving two touches.  It tries to detect when the user moves two

@@ -46,7 +46,7 @@ namespace Internal
 
 // Forward declarations.
 
-class TextFormat;
+struct TextFormat;
 class ResourceClient;
 class FontFactory;
 

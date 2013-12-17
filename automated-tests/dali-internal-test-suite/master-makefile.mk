@@ -27,7 +27,7 @@ include ../../coverage.mk
 all: $(TARGETS)
 
 %: %.cpp
-	$(CC) -o $@ $< $(CXXFLAGS) $(LDFLAGS)
+	$(CC) -o $@ $< ../../dali-test-suite-utils/test-application.cpp $(CXXFLAGS) $(LDFLAGS)
 
 clean:
 	@rm -f $(notdir $(TARGETS))

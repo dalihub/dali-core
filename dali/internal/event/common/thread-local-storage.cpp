@@ -19,6 +19,7 @@
 
 // EXTERNAL INCLUDES
 #include <boost/thread/tss.hpp>
+#include <memory>
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/core-impl.h>
@@ -36,7 +37,11 @@ namespace Internal
 
 namespace
 {
-boost::thread_specific_ptr<ThreadLocalStorage> threadLocal;
+#ifdef EMSCRIPTEN
+  std::auto_ptr<ThreadLocalStorage> threadLocal;
+#else
+  boost::thread_specific_ptr<ThreadLocalStorage> threadLocal;
+#endif
 }
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)

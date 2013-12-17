@@ -57,8 +57,6 @@ public:
   void UpdateBuffer( const Integration::DynamicsDebugVertexContainer& vertices );
 
 private:
-
-  int mBufferName;
   Shader& mShader;
   Context* mContext;
   BufferIndex mBufferIndex;

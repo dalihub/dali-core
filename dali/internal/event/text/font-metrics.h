@@ -317,7 +317,6 @@ private:
   unsigned int          mFontCount;             ///< How many font objects are using this font, used to know when it should be deleted from font factory
   bool                  mMetricsLoaded;         ///< Whether the metrics cache has been loaded
   Integration::PlatformAbstraction& mPlatform;  ///< platform abstraction
-  ResourceClient&       mResourceClient;        ///< resource client
 };
 
 } // namespace Internal

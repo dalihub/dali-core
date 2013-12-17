@@ -60,6 +60,21 @@
 // C++0x not supported
 #endif
 
+#ifdef EMSCRIPTEN
+
+#ifndef __clang__
+# error not clang?
+#endif
+
+// clang cpp11 check is per feature
+#if !__has_feature(cxx_constexpr)
+# error constexpr needed for compile-time-math. Use --std=c11
+#endif
+
+#define _CPP11
+
+#endif
+
 namespace Dali
 {
 

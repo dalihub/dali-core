@@ -281,7 +281,7 @@ bool TextRenderer::CheckResources()
   {
     mTexture = mTextureCache->GetTexture( mTextureId );
 
-    if( ( mTexture == NULL ) )
+    if( mTexture == NULL )
     {
       // texture atlas hasn't been created yet
       return false;

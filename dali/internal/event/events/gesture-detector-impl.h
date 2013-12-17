@@ -30,7 +30,7 @@ namespace Dali
 
 namespace Integration
 {
-class GestureEvent;
+struct GestureEvent;
 }
 
 namespace Internal

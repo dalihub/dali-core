@@ -18,7 +18,14 @@
 #include <dali/internal/update/queue/update-message-queue.h>
 
 // EXTERNAL INCLUDES
+#ifdef __clang__
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wall"
 #include <boost/thread/mutex.hpp>
+#pragma clang diagnostic pop
+#else
+#include <boost/thread/mutex.hpp>
+#endif // ifdef __clang
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>

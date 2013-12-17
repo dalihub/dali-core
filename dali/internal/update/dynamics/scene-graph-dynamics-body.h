@@ -36,7 +36,7 @@ namespace Integration
 {
 
 class DynamicsBody;
-class DynamicsBodySettings;
+struct DynamicsBodySettings;
 
 } // namespace Integration
 

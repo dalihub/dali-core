@@ -176,7 +176,7 @@ CLEANFILES = dali-shaders.cpp \
 
 noinst_PROGRAMS = linker.test
 
-linker_test_SOURCES = linker-test.cpp
+linker_test_SOURCES = linker-test.cpp ../../../automated-tests/dali-test-suite-utils/test-application.cpp
 
 linker_test_CXXFLAGS = \
   -Werror -Wall -Wfloat-equal \

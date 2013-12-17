@@ -22,7 +22,11 @@
 #include <string>
 #include <cstdio>
 #include <execinfo.h>
-#include <cxxabi.h>
+
+#ifndef EMSCRIPTEN // cxxabi not supported
+# include <cxxabi.h>
+#endif
+
 #include <cstring>
 
 // INTERNAL INCLUDES
@@ -36,6 +40,8 @@ const size_t C_SYMBOL_LENGTH = 4096;
 
 namespace Dali
 {
+
+#ifndef EMSCRIPTEN
 
 std::string Demangle(const char* symbol)
 {
@@ -87,6 +93,10 @@ std::string Demangle(const char* symbol)
   return result;
 }
 
+#endif // EMSCRIPTEN
+
+#ifndef EMSCRIPTEN
+
 DALI_EXPORT_API DaliException::DaliException(const char *location, const char* condition)
 : mLocation(location), mCondition(condition)
 {
@@ -109,6 +119,16 @@ DALI_EXPORT_API DaliException::DaliException(const char *location, const char* c
   }
   free(symbols);
 }
+
+#else
+
+DALI_EXPORT_API DaliException::DaliException(const char *location, const char* condition)
+: mLocation(location), mCondition(condition)
+{
+  printf("Exception: \n%s\n thrown at %s\nSee dlog for backtrace\n", mCondition.c_str(), mLocation.c_str());
+}
+
+#endif // EMSCRIPTEN
 
 DALI_EXPORT_API void DaliAssertMessage(const char* condition, const char* file, int line)
 {

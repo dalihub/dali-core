@@ -31,6 +31,7 @@ internal_src_files = \
   $(internal_src_dir)/event/animation/animation-playlist.cpp \
   $(internal_src_dir)/event/animation/constraint-impl.cpp \
   $(internal_src_dir)/event/animation/key-frames-impl.cpp \
+  $(internal_src_dir)/event/common/demangler.cpp \
   $(internal_src_dir)/event/common/notification-manager.cpp \
   $(internal_src_dir)/event/common/object-registry-impl.cpp \
   $(internal_src_dir)/event/common/projection.cpp \

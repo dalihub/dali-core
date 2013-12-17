@@ -34,7 +34,7 @@ namespace Internal DALI_INTERNAL
 class TapGestureDetector;
 }
 
-class TapGesture;
+struct TapGesture;
 
 /**
  * This class emits a signal when a tap gesture occurs that meets the requirements set by the

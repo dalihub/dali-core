@@ -36,7 +36,7 @@ namespace Internal DALI_INTERNAL
 class PanGestureDetector;
 }
 
-class PanGesture;
+struct PanGesture;
 
 /**
  * This class looks for panning (or dragging) gestures.  The user will be pressing one or more fingers on

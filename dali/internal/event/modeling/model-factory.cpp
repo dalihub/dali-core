@@ -40,7 +40,8 @@ ModelFactory::~ModelFactory()
 ResourceTicketPtr ModelFactory::Load( const std::string& filename )
 {
   ResourceTicketPtr ticket;
-  ResourceTypePath typePath(ModelResourceType(), filename);
+  ModelResourceType modelResourceType; // construct first as no copy ctor (needed to bind ref to object)
+  ResourceTypePath typePath(modelResourceType, filename);
 
   // Search for a matching resource
   ResourceTypePathIdIter iter = mResourceTypePathIdMap.end();
@@ -67,7 +68,8 @@ ResourceTicketPtr ModelFactory::Load( const std::string& filename )
   // Request a new model resource, if necessary
   if ( !ticket )
   {
-    ticket = mResourceClient.RequestResource(ModelResourceType(), filename);
+    ModelResourceType modelResourceType; // construct first as no copy ctor (needed to bind ref to object)
+    ticket = mResourceClient.RequestResource(modelResourceType, filename);
 
     mResourceTypePathIdMap.insert( ResourceTypePathIdPair( typePath, ticket->GetId() ) );
   }

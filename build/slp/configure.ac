@@ -46,12 +46,22 @@ AC_ARG_ENABLE([debug],
               [enable_debug=$enableval],
               [enable_debug=no])
 
+AC_ARG_ENABLE([emscripten],
+              [AC_HELP_STRING([--enable-emscripten],
+                              [Emscripten builds])],
+              [enable_emscripten=$enableval],
+              [enable_emscripten=no])
+
 if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED -DDEBUG_BACKTRACE"
 fi
 
 if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
   DALI_CFLAGS="$DALI_CFLAGS -fvisibility=hidden -DHIDE_DALI_INTERNALS"
+fi
+
+if test "x$enable_emscripten" = "xyes"; then
+  DALI_CFLAGS="$DALI_CFLAGS -DEMSCRIPTEN -std=c++11"
 fi
 
 AC_ARG_ENABLE([performance-monitor],
@@ -102,4 +112,5 @@ Configuration
   Performance Monitor:              $enable_performance_monitor
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
+  Emscripten:                       $enable_emscripten
 "

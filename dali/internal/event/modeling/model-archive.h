@@ -50,7 +50,7 @@ enum VertexElementType
 namespace Internal
 {
 class Material;
-class MaterialProperties;
+struct MaterialProperties;
 class ModelData;
 
 namespace Serialize

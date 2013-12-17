@@ -28,7 +28,7 @@ namespace Dali
 namespace Internal
 {
 
-class Source;
+struct Source;
 typedef std::vector<Source> SourceContainer;
 typedef SourceContainer::iterator SourceIter;
 

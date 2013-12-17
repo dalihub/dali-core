@@ -26,7 +26,7 @@ namespace Dali DALI_IMPORT_API
 
 class Matrix;
 
-struct Bone;
+class Bone;
 typedef std::vector< Bone >           BoneContainer;
 typedef BoneContainer::iterator       BoneIter;
 typedef BoneContainer::const_iterator BoneConstIter;

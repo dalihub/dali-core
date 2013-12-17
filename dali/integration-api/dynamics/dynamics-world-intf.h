@@ -29,11 +29,11 @@ struct Vector3;
 namespace Integration
 {
 
-class DynamicsCollisionData;
+struct DynamicsCollisionData;
 class DynamicsBody;
 class DynamicsJoint;
 class DynamicsWorld;
-class DynamicsWorldSettings;
+struct DynamicsWorldSettings;
 typedef std::map<void*, DynamicsCollisionData> CollisionDataContainer;
 
 DynamicsWorld* InitializeDynamics( DynamicsWorldSettings* settings );

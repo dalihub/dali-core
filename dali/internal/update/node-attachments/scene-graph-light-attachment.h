@@ -268,6 +268,14 @@ public:
     }
   }
 
+  virtual void Update( BufferIndex /*updateBufferIndex*/, const Node& /*owningNode*/, int /*nodeDirtyFlags*/ )
+  {
+    if (mUpdateRequired)
+    {
+      mUpdateRequired = false;
+    }
+  }
+
 protected:
 
   /**
@@ -282,14 +290,6 @@ private:
 
   // Undefined
   LightAttachment& operator=(const LightAttachment& rhs);
-
-  void Update()
-  {
-    if (mUpdateRequired)
-    {
-      mUpdateRequired = false;
-    }
-  }
 
 private:
   Internal::LightPtr mLight;

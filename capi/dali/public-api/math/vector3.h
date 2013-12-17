@@ -35,7 +35,7 @@ namespace Dali DALI_IMPORT_API
 
 struct Vector2;
 struct Vector4;
-struct Quaternion;
+class Quaternion;
 
 /**
  * 3d Vector

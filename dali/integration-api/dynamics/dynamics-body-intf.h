@@ -30,7 +30,7 @@ struct Vector3;
 namespace Integration
 {
 
-class DynamicsBodySettings;
+struct DynamicsBodySettings;
 class DynamicsShape;
 class DynamicsWorld;
 

@@ -34,9 +34,9 @@ namespace Dali
 struct Vector2;
 struct Vector3;
 struct Vector4;
-struct Matrix3;
-struct Matrix;
-struct Quaternion;
+class Matrix3;
+class Matrix;
+class Quaternion;
 
 namespace Integration
 {

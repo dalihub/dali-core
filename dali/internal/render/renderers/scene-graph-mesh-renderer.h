@@ -35,7 +35,7 @@ namespace SceneGraph
 {
 
 class RenderDataProvider;
-class BoneTransforms;
+struct BoneTransforms;
 class LightController;
 class RenderMaterial;
 class Mesh;

@@ -17,8 +17,6 @@
 // CLASS HEADER
 #include <dali/internal/update/common/scene-graph-buffers.h>
 
-using namespace std;
-
 namespace Dali
 {
 

@@ -139,7 +139,12 @@ void Model::Write()
   }
   else
   {
+#ifndef EMSCRIPTEN
     fprintf(stderr, "%s: Model not loaded yet\n", __PRETTY_FUNCTION__);
+#else
+    // printf to stderr doesnt always show in browser console window
+    printf("%s: Model not loaded yet\n", __PRETTY_FUNCTION__);
+#endif
   }
 }
 

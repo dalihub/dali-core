@@ -260,7 +260,7 @@ public:
         {
           bitmapData = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true);
           bitmapData->GetPackedPixelsProfile()->ReserveBuffer(Pixel::A8, 64, 64);
-          PixelBuffer* pixelBuffer = bitmapData->GetBuffer();
+          Integration::PixelBuffer* pixelBuffer = bitmapData->GetBuffer();
           memset( pixelBuffer, it->character, 64*64 );
         }
 
@@ -301,7 +301,7 @@ public:
 
         bitmapData = Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true);
         bitmapData->GetPackedPixelsProfile()->ReserveBuffer(Pixel::A8, 64, 64);
-        PixelBuffer* pixelBuffer = bitmapData->GetBuffer();
+        Integration::PixelBuffer* pixelBuffer = bitmapData->GetBuffer();
         memset( pixelBuffer, it->character, 64*64 );
         set->AddCharacter(bitmapData, character);
       }

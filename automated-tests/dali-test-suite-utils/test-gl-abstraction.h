@@ -359,11 +359,11 @@ public:
   void DeleteTextures(GLsizei n, const GLuint* textures)
   {
     std::stringstream out;
-    out << n << ", " << textures << " = [" ;
+    out << n << ", " << textures << " = [";
 
     for(GLsizei i=0; i<n; i++)
     {
-      out << textures[i] << ", " ;
+      out << textures[i] << ", ";
       mDeletedTextureIds.push_back(textures[i]);
     }
     out << "]";
@@ -1808,65 +1808,51 @@ private:
 };
 
 template <>
-int TestGlAbstraction::ProgramUniformValue<int>::GetZero() const
+inline int TestGlAbstraction::ProgramUniformValue<int>::GetZero() const
 {
   return 0;
 }
 
 template <>
-float TestGlAbstraction::ProgramUniformValue<float>::GetZero() const
+inline float TestGlAbstraction::ProgramUniformValue<float>::GetZero() const
 {
   return 0.0f;
 }
 
 template <>
-Vector2 TestGlAbstraction::ProgramUniformValue<Vector2>::GetZero() const
+inline Vector2 TestGlAbstraction::ProgramUniformValue<Vector2>::GetZero() const
 {
   return Vector2::ZERO;
 }
 
 template <>
-Vector3 TestGlAbstraction::ProgramUniformValue<Vector3>::GetZero() const
+inline Vector3 TestGlAbstraction::ProgramUniformValue<Vector3>::GetZero() const
 {
   return Vector3::ZERO;
 }
 
 template <>
-Vector4 TestGlAbstraction::ProgramUniformValue<Vector4>::GetZero() const
+inline Vector4 TestGlAbstraction::ProgramUniformValue<Vector4>::GetZero() const
 {
   return Vector4::ZERO;
 }
 
 template <>
-Matrix TestGlAbstraction::ProgramUniformValue<Matrix>::GetZero() const
+inline Matrix TestGlAbstraction::ProgramUniformValue<Matrix>::GetZero() const
 {
   return Matrix();
 }
 
 template <>
-Matrix3 TestGlAbstraction::ProgramUniformValue<Matrix3>::GetZero() const
+inline Matrix3 TestGlAbstraction::ProgramUniformValue<Matrix3>::GetZero() const
 {
   return Matrix3( Matrix() );
 }
 
 } // namespace Dali
 
-bool BlendEnabled(const TraceCallStack& callStack)
-{
-  std::stringstream out;
-  out << GL_BLEND;
-  bool blendEnabled = callStack.FindMethodAndParams("Enable", out.str());
-  return blendEnabled;
-}
-
-bool BlendDisabled(const TraceCallStack& callStack)
-{
-  std::stringstream out;
-  out << GL_BLEND;
-  bool blendEnabled = callStack.FindMethodAndParams("Disable", out.str());
-  return blendEnabled;
-}
+extern bool BlendEnabled(const TraceCallStack& callStack);
+extern bool BlendDisabled(const TraceCallStack& callStack);
 
 
-
-#endif // __TEST_GL_ES_H__
+#endif // header

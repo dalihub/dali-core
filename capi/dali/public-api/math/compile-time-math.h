@@ -100,6 +100,7 @@ struct Log< 0, base >
   enum { value = 0 };
 };
 
+
 /**
  * Compile time template to calculate the machine epsilon for a given floating point number
  * Note! value needs to be compile time constant

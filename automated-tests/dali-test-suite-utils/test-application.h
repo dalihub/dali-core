@@ -41,8 +41,8 @@ public:
   static constexpr float DEFAULT_HORIZONTAL_DPI = 220.0f;
   static constexpr float DEFAULT_VERTICAL_DPI   = 217.0f;
 #else
-  static const float DEFAULT_HORIZONTAL_DPI = 220.0f;
-  static const float DEFAULT_VERTICAL_DPI   = 217.0f;
+  static const float DEFAULT_HORIZONTAL_DPI     = 220.0f;
+  static const float DEFAULT_VERTICAL_DPI       = 217.0f;
 #endif
 
   static const unsigned int DEFAULT_RENDER_INTERVAL = 1;

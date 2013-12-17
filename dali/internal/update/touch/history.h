@@ -81,7 +81,7 @@ class History
 {
   typedef HistoryPairType<Vector2> HistoryPair;
   typedef std::set<HistoryPair> HistoryContainer;
-  typedef typename HistoryContainer::iterator HistoryContainerIter;
+  typedef HistoryContainer::iterator HistoryContainerIter;
 
 public:
 

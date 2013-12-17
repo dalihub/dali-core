@@ -52,7 +52,7 @@ class PropertyInputImpl;
 namespace SceneGraph
 {
 class RenderInstruction;
-class RenderList;
+struct RenderList;
 class RenderItem;
 }
 

@@ -97,7 +97,7 @@ Vector3 FontMetrics::MeasureText( const TextArray& text )
   TextArray  utfCodes = GetUniqueCharacters( text );
 
   // ensure all the metrics are loaded for the characters
-  LoadMetricsSynchronously( utfCodes ) ;
+  LoadMetricsSynchronously( utfCodes );
 
   // Measure text
   // Calculate the natural size of text for the font
@@ -303,7 +303,7 @@ void FontMetrics::GetMetrics( const Dali::Character& character, Dali::Font::Metr
   TextArray utfCodes;
   utfCodes.push_back( character.GetImplementation().GetCharacter() );
 
-  LoadMetricsSynchronously( utfCodes ) ;
+  LoadMetricsSynchronously( utfCodes );
 
   const GlyphMetric* glyph;
 
@@ -428,8 +428,7 @@ FontMetrics::FontMetrics(const Vector2& dpi,
   mFontId(fontId),
   mFontCount( 0 ),
   mMetricsLoaded( false ),
-  mPlatform( ThreadLocalStorage::Get().GetPlatformAbstraction() ),
-  mResourceClient( resourceClient )
+  mPlatform( ThreadLocalStorage::Get().GetPlatformAbstraction() )
 {
 }
 
