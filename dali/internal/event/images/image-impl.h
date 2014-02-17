@@ -158,7 +158,7 @@ public:
   ResourceId GetResourceId() const;
 
   /**
-   * Get the attributes of an image.
+   * Get the attributes of the image.
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
    * Reflects the last cached values after a LoadComplete.
@@ -168,7 +168,7 @@ public:
   const Dali::ImageAttributes& GetAttributes() const;
 
   /**
-   * Get the width of an image.
+   * Get the width of the image.
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
    * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
@@ -178,7 +178,7 @@ public:
   unsigned int GetWidth() const;
 
   /**
-   * Get the height of an image.
+   * Get the height of the image.
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
    * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
@@ -246,6 +246,8 @@ private:
   void SetTicket( ResourceTicket* ticket );
 
 protected:
+  unsigned int mWidth;
+  unsigned int mHeight;
 
   ResourceTicketPtr mTicket;
   ImageFactoryCache::RequestPtr mRequest;         ///< contains the initially requested attributes for image. Request is reissued when memory was released.
@@ -288,4 +290,3 @@ inline const Internal::Image& GetImplementation(const Dali::Image& image)
 
 } // namespace Dali
 #endif // __DALI_INTERNAL_IMAGE_H__
-

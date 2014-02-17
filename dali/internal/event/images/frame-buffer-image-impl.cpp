@@ -32,31 +32,29 @@ FrameBufferImage::~FrameBufferImage()
 }
 
 FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy)
-  : Image(Dali::Image::Immediate, releasePolicy)
-  , mWidth(width)
-  , mHeight(height)
-  , mPixelFormat(pixelFormat)
-{}
+: Image(Dali::Image::Immediate, releasePolicy),
+  mPixelFormat(pixelFormat)
+{
+  mWidth  = width;
+  mHeight = height;
+}
 
 FrameBufferImage::FrameBufferImage( NativeImage& nativeImage )
-  : Image(Dali::Image::Immediate)
-  , mNativeImage(&nativeImage)
-  , mWidth(nativeImage.GetWidth())
-  , mHeight(nativeImage.GetHeight())
-  , mPixelFormat(nativeImage.GetPixelFormat())
+: Image(Dali::Image::Immediate),
+  mNativeImage(&nativeImage),
+  mPixelFormat(nativeImage.GetPixelFormat())
 {
-
+  mWidth = nativeImage.GetWidth();
+  mHeight = nativeImage.GetHeight();
 }
 
 FrameBufferImage::FrameBufferImage( NativeImage& nativeImage, ReleasePolicy releasePolicy )
-  : Image(Dali::Image::Immediate, releasePolicy)
-  , mNativeImage(&nativeImage)
-  , mWidth(nativeImage.GetWidth())
-  , mHeight(nativeImage.GetHeight())
-  , mPixelFormat(nativeImage.GetPixelFormat())
+: Image(Dali::Image::Immediate, releasePolicy),
+  mNativeImage(&nativeImage),
+  mPixelFormat(nativeImage.GetPixelFormat())
 {
-
-
+  mWidth = nativeImage.GetWidth();
+  mHeight = nativeImage.GetHeight();
 }
 
 void FrameBufferImage::Connect()
@@ -103,4 +101,3 @@ void FrameBufferImage::Disconnect()
 } // namespace Internal
 
 } // namespace Dali
-

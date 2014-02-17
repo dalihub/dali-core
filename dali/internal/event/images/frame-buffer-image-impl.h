@@ -49,7 +49,6 @@ public:
   FrameBufferImage(NativeImage& image, ReleasePolicy releasePolicy);
 
 public: // From Image
-
   /**
    * @copydoc Dali::Internal::Image::Connect()
    */
@@ -69,8 +68,6 @@ protected:
 private:
   // cached values for the size / pixel format we were created with. Needed to recreate us when we Connect() to stage and mTicket was reset from a previous call to Disconnect().
   NativeImagePtr mNativeImage;
-  unsigned int mWidth;
-  unsigned int mHeight;
   Pixel::Format mPixelFormat;
 }; // class FrameBufferImage
 

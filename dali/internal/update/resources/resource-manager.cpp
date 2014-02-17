@@ -309,16 +309,9 @@ void ResourceManager::HandleAddBitmapImageRequest( ResourceId id, Bitmap* bitmap
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddBitmapImageRequest(id:%u)\n", id);
 
-  mImpl->newCompleteRequests.insert(id);
-
-  ImageAttributes imageAttributes = ImageAttributes::New();
-  ImageAttributes attrs = ImageAttributes::New(bitmap->GetImageWidth(), bitmap->GetImageHeight(), bitmap->GetPixelFormat());
-
+  mImpl->oldCompleteRequests.insert(id);
   mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New(bitmap)));
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForBitmap( id, bitmap );
-
-  UpdateImageTicket( id, attrs );
-  NotifyTickets();
 }
 
 void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImagePtr nativeImage)
@@ -326,13 +319,10 @@ void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImagePtr 
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddNativeImageRequest(id:%u)\n", id);
 
-  ImageAttributes attrs = ImageAttributes::New(nativeImage->GetWidth(), nativeImage->GetHeight(), nativeImage->GetPixelFormat());
-  mImpl->newCompleteRequests.insert(id);
+  mImpl->oldCompleteRequests.insert(id);
 
   mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New(nativeImage)));
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForNativeImage( id, nativeImage );
-  UpdateImageTicket( id, attrs );
-  NotifyTickets();
 }
 
 void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat )
@@ -340,16 +330,13 @@ void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned 
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddFrameBufferImageRequest(id:%u)\n", id);
 
-  // get values for dimensions and pixelformat
-  ImageAttributes attrs = ImageAttributes::New(width, height, pixelFormat);
-  mImpl->newCompleteRequests.insert(id);
+  mImpl->oldCompleteRequests.insert(id);
+
   BitmapMetadata bitmapMetadata = BitmapMetadata::New(width, height, pixelFormat);
   bitmapMetadata.SetIsFramebuffer(true);
-
   mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, bitmapMetadata));
+
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, width, height, pixelFormat );
-  UpdateImageTicket( id, attrs );
-  NotifyTickets();
 }
 
 void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, NativeImagePtr nativeImage )
@@ -357,28 +344,22 @@ void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, NativeIma
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddFrameBufferImageRequest(id:%u)\n", id);
 
-  // get values for dimensions and pixelformat
-  ImageAttributes attrs = ImageAttributes::New(nativeImage->GetWidth(), nativeImage->GetHeight(), nativeImage->GetPixelFormat());
-  mImpl->newCompleteRequests.insert(id);
+  mImpl->oldCompleteRequests.insert(id);
 
   BitmapMetadata bitmapMetadata = BitmapMetadata::New(nativeImage->GetWidth(), nativeImage->GetHeight(), nativeImage->GetPixelFormat());
   bitmapMetadata.SetIsNativeImage(true);
   bitmapMetadata.SetIsFramebuffer(true);
   mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, bitmapMetadata));
+
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, nativeImage );
-  UpdateImageTicket( id, attrs );
-  NotifyTickets();
 }
 
 void ResourceManager::HandleAllocateTextureRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat )
 {
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAllocateTextureRequest(id:%u)\n", id);
 
-  mImpl->newCompleteRequests.insert(id);
-
+  mImpl->oldCompleteRequests.insert(id);
   mImpl->mTextureCacheDispatcher.DispatchCreateTexture( id, width, height, pixelFormat, true /* true = clear the texture */ );
-
-  NotifyTickets();
 }
 
 void ResourceManager::HandleUpdateTextureRequest( ResourceId id,  const BitmapUploadArray& uploadArray )

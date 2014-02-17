@@ -188,7 +188,7 @@ void RenderableAttachment::DoGetScaleForSize( const Vector3& nodeSize, Vector3& 
 void RenderableAttachment::GetReadyAndComplete(bool& ready, bool& complete) const
 {
   ready = false;
-  complete = true; // If attachment doesn't have size or color, this should be marked as complete.
+  complete = false;
 
   CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
 

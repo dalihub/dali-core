@@ -295,7 +295,10 @@ ImageTicketPtr ResourceClient::AddBitmapImage(Bitmap* bitmap)
 
   Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New(bitmap->GetImageWidth(), bitmap->GetImageHeight(), bitmap->GetPixelFormat());
   ResourceTypePath typePath(BitmapResourceType(imageAttributes), "");
+
   newTicket = new ImageTicket(*this, newId, typePath);
+  newTicket->mAttributes = imageAttributes;
+  newTicket->LoadingSucceeded();
 
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
 
@@ -305,7 +308,6 @@ ImageTicketPtr ResourceClient::AddBitmapImage(Bitmap* bitmap)
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddBitmapImage() New id = %u\n", newId);
   RequestAddBitmapImageMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, bitmap );
 
-  // Ticket attributes will be updated via message
   return newTicket;
 }
 
@@ -317,6 +319,10 @@ ResourceTicketPtr ResourceClient::AddNativeImage ( NativeImage& resourceData )
 
   ResourceTypePath typePath(NativeImageResourceType(), "");
   newTicket = new ImageTicket(*this, newId, typePath);
+  newTicket->mAttributes = ImageAttributes::New(resourceData.GetWidth(),
+                                                resourceData.GetHeight(),
+                                                resourceData.GetPixelFormat());
+  newTicket->LoadingSucceeded();
 
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
 
@@ -324,7 +330,6 @@ ResourceTicketPtr ResourceClient::AddNativeImage ( NativeImage& resourceData )
 
   RequestAddNativeImageMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, &resourceData );
 
-  // Ticket attributes will be updated via message
   return newTicket;
 }
 
@@ -337,13 +342,14 @@ ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigne
   Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New(width, height, pixelFormat );
   ResourceTypePath typePath(RenderTargetResourceType(imageAttributes), "");
   newTicket = new ImageTicket(*this, newId, typePath);
+  newTicket->mAttributes = imageAttributes;
+  newTicket->LoadingSucceeded();
 
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddFrameBufferImage() New id = %u\n", newId);
   RequestAddFrameBufferImageMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, width, height, pixelFormat );
 
-  // Ticket attributes will be updated via message
   return newTicket;
 }
 
@@ -356,13 +362,14 @@ ImageTicketPtr ResourceClient::AddFrameBufferImage ( NativeImage& nativeImage )
   Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New(nativeImage.GetWidth(), nativeImage.GetHeight(), nativeImage.GetPixelFormat() );
   ResourceTypePath typePath(RenderTargetResourceType(imageAttributes), "");
   newTicket = new ImageTicket(*this, newId, typePath);
+  newTicket->mAttributes = imageAttributes;
+  newTicket->LoadingSucceeded();
 
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddFrameBufferImage() New id = %u\n", newId);
   RequestAddFrameBufferImageMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, &nativeImage );
 
-  // Ticket attributes will be updated via message
   return newTicket;
 }
 
@@ -371,7 +378,7 @@ ResourceTicketPtr ResourceClient::AllocateTexture( unsigned int width,
                                                    unsigned int height,
                                                    Pixel::Format pixelformat )
 {
-  ResourceTicketPtr newTicket;
+  ImageTicketPtr newTicket;
   const ResourceId newId = ++(mImpl->mNextId);
 
   Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New( width, height, pixelformat);
@@ -379,13 +386,13 @@ ResourceTicketPtr ResourceClient::AllocateTexture( unsigned int width,
   newTicket = new ImageTicket(*this, newId, typePath);
 
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
-
+  newTicket->mAttributes = imageAttributes;
+  newTicket->LoadingSucceeded();
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AllocateTexture() New id = %u\n", newId);
 
   RequestAllocateTextureMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, width, height, pixelformat );
 
-  // Ticket attributes will be updated via message
   return newTicket;
 }
 

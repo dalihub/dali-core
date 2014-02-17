@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
+#include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -36,7 +37,9 @@ namespace Internal
 {
 
 Image::Image( LoadPolicy loadPol, ReleasePolicy releasePol )
-: mLoadPolicy(loadPol),
+: mWidth(0),
+  mHeight(0),
+  mLoadPolicy(loadPol),
   mReleasePolicy(releasePol),
   mConnectionCount(0),
   mImageFactory(ThreadLocalStorage::Get().GetImageFactory())
@@ -50,13 +53,51 @@ Image* Image::New()
 
 Image* Image::New( const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
-  Image* image = Image::New( filename, *static_cast<ImageAttributes*>(NULL), loadPol, releasePol );
+  Image* image = new Image( loadPol, releasePol );
+
+  image->mRequest = image->mImageFactory.RegisterRequest( filename, NULL );
+
+  if( ! filename.empty() )
+  {
+    Vector2 size;
+    Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().LoadImageMetadata( filename, size );
+    image->mWidth = (int)size.width;
+    image->mHeight = (int)size.height;
+  }
+
+  if( Dali::Image::OnDemand == loadPol )
+  {
+    // load image on demand,
+    // ask for ticket on connect
+  }
+  else
+  {
+    // load image immediately
+    image->mTicket = image->mImageFactory.Load( image->mRequest.Get() );
+    image->mTicket->AddObserver( *image );
+  }
+
+  DALI_LOG_SET_OBJECT_STRING( image, filename );
+
   return image;
 }
 
 Image* Image::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
   Image* image = new Image( loadPol, releasePol );
+
+  if( ! filename.empty() )
+  {
+    if( attributes.GetWidth() == 0 && attributes.GetHeight() == 0 )
+    {
+      // Only get actual file size if a requested size is not present.
+      Vector2 size;
+      Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().LoadImageMetadata( filename, size );
+      image->mWidth = (int)size.width;
+      image->mHeight = (int)size.height;
+    }
+    // @TODO: else, determine closest size to requested size
+  }
 
   image->mRequest = image->mImageFactory.RegisterRequest( filename, &attributes );
 
@@ -83,7 +124,9 @@ Image* Image::New( NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy rel
   Image* image = new Image;
   ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
 
-  /// @todo check policy and ref with intrusive pointer if needed
+
+  image->mWidth  = nativeImg.GetWidth();
+  image->mHeight = nativeImg.GetHeight();
 
   const ResourceTicketPtr& ticket = resourceClient.AddNativeImage( nativeImg );
   DALI_ASSERT_DEBUG( dynamic_cast<ImageTicket*>( ticket.Get() ) && "Resource ticket not ImageTicket subclass for image resource.\n" );
@@ -168,6 +211,10 @@ void Image::ResourceLoadingFailed(const ResourceTicket& ticket)
 
 void Image::ResourceLoadingSucceeded(const ResourceTicket& ticket)
 {
+  // Update size with actual loaded size
+  const ImageTicket* imageTicket = static_cast<const ImageTicket*>(&ticket);
+  mWidth = imageTicket->GetWidth();
+  mHeight = imageTicket->GetHeight();
   mLoadingFinishedV2.Emit( Dali::Image( this ) );
 }
 
@@ -193,10 +240,14 @@ unsigned int Image::GetWidth() const
     const ImageAttributes& attr = mImageFactory.GetActualAttributes( mTicket->GetId() );
     return attr.GetWidth();
   }
-  else
+  else if( mRequest )
   {
     const ImageAttributes& attr = mImageFactory.GetRequestAttributes( mRequest.Get() );
     return attr.GetWidth();
+  }
+  else
+  {
+    return mWidth;
   }
 }
 
@@ -207,10 +258,14 @@ unsigned int Image::GetHeight() const
     const ImageAttributes& attr = mImageFactory.GetActualAttributes( mTicket->GetId() );
     return attr.GetHeight();
   }
-  else
+  else if( mRequest )
   {
     const ImageAttributes& attr = mImageFactory.GetRequestAttributes( mRequest.Get() );
     return attr.GetHeight();
+  }
+  else
+  {
+    return mHeight;
   }
 }
 

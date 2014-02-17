@@ -2510,6 +2510,9 @@ static void UtcDaliActorSetDrawModeOverlayRender()
   TestApplication app;
   tet_infoline(" UtcDaliActorSetDrawModeOverlayRender");
 
+  app.SendNotification();
+  app.Render(1);
+
   std::vector<GLuint> ids;
   ids.push_back( 8 );   // first rendered actor
   ids.push_back( 9 );   // second rendered actor
@@ -2531,8 +2534,6 @@ static void UtcDaliActorSetDrawModeOverlayRender()
   Stage::GetCurrent().Add(b);
   Stage::GetCurrent().Add(c);
 
-  app.SendNotification();
-  app.Render(0);
   app.SendNotification();
   app.Render(1);
 

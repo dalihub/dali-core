@@ -52,6 +52,9 @@ BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format 
 {
   Initialize();
 
+  mWidth  = width;
+  mHeight = height;
+
   const ImageTicketPtr& t = mResourceClient->AllocateBitmapImage(width, height, width, height, pixelformat);
   mTicket = t.Get();
 
@@ -63,7 +66,8 @@ BitmapImage::BitmapImage(PixelBuffer* pixBuf, unsigned int width, unsigned int h
   mIsDataExternal(true)
 {
   Initialize();
-
+  mWidth  = width;
+  mHeight = height;
   Integration::Bitmap* bitmap = new BitmapExternal(pixBuf, width, height, pixelformat, stride);
   const ImageTicketPtr& t = mResourceClient->AddBitmapImage(bitmap);
   mTicket = t.Get();
@@ -212,4 +216,3 @@ Integration::Bitmap * BitmapImage::GetBitmap() const
 } // namespace Internal
 
 } // namespace Dali
-

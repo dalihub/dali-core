@@ -92,7 +92,6 @@ std::string StyleString(const ImageActor::Style style)
     return "STYLE_QUAD";
   }
 }
-
 }
 
 ImageActorPtr ImageActor::New( Image* image )
@@ -274,14 +273,14 @@ ImageActor::~ImageActor()
 void ImageActor::OnImageSet( Image& image )
 {
   // observe image loaded
-  if( Dali::ResourceLoadingSucceeded == image.GetLoadingState() )
+  if( Dali::ResourceLoading == image.GetLoadingState() && ! image.GetFilename().empty() )
   {
-    //image already loaded
-    ImageLoaded( Dali::Image(&image) );
+    image.LoadingFinishedSignal().Connect( mLoadedConnection, &ImageActor::ImageLoaded );
   }
   else
   {
-    image.LoadingFinishedSignal().Connect( mLoadedConnection, &ImageActor::ImageLoaded );
+    // image already loaded, or generated
+    ImageLoaded( Dali::Image(&image) );
   }
 }
 

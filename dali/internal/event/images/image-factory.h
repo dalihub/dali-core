@@ -27,17 +27,19 @@ namespace Dali
 
 namespace Internal
 {
-
 class ResourceType;
 
-using namespace Dali::Internal::ImageFactoryCache;
+namespace ImageFactoryCache
+{
+class Request;
+}
 
 /**
  * ImageFactory is an object that manages Image resource load requests.
  * It utilises an internal caching system where previous requests and associated
  * resources are stored to avoid accessing the file system when not neccessary.
  */
-class ImageFactory : public RequestLifetimeObserver
+class ImageFactory : public ImageFactoryCache::RequestLifetimeObserver
 {
 public:
 
@@ -59,7 +61,7 @@ public:
    * @param [in] attributes pointer to the ImageAttributes of the request. If NULL, default attributes are used.
    * @return     request pointer
    */
-  Dali::Internal::ImageFactoryCache::Request* RegisterRequest( const std::string& filename, const ImageAttributes *attributes );
+  ImageFactoryCache::Request* RegisterRequest( const std::string& filename, const ImageAttributes *attributes );
 
   /**
    * Issue a request which has already been registered with ImageFactory.
@@ -67,7 +69,7 @@ public:
    * @param [in] req pointer to request
    * @return     intrusive pointer to image ticket. If Load fails, returned pointer is invalid. (!ret)
    */
-  ResourceTicketPtr Load( Request* req );
+  ResourceTicketPtr Load( ImageFactoryCache::Request* req );
 
   /**
    * Tells ResourceManager to reload image from filesystem.
@@ -78,14 +80,14 @@ public:
    * @param [in]  req Request pointer
    * @return[out] the ResourceTicket mapped to the request
    */
-  ResourceTicketPtr Reload( Request* req );
+  ResourceTicketPtr Reload( ImageFactoryCache::Request* req );
 
   /**
    * Get resource path used in request.
    * @param [in] req request pointer
    * @return     resource path
    */
-  const std::string& GetRequestPath( const Request* req ) const;
+  const std::string& GetRequestPath( const ImageFactoryCache::Request* req ) const;
 
   /**
    * Get ImageAttributes for an already requested image resource.
@@ -102,7 +104,7 @@ public:
    * @param [in] req request pointer
    * @return     ImageAttributes used for request.
    */
-  const ImageAttributes& GetRequestAttributes( const Request* req ) const;
+  const ImageAttributes& GetRequestAttributes( const ImageFactoryCache::Request* req ) const;
 
   /**
    * Prevents releasing and reloading image resources in the same frame
@@ -123,7 +125,7 @@ public: // From RequestLifetimeObserver
    * Finds request by id in mRequestCache and mUrlCache and removes relevant entries.
    * @param [in] id request id
    */
-  virtual void RequestDiscarded( const Request& request );
+  virtual void RequestDiscarded( const ImageFactoryCache::Request& request );
 
 private:
 
@@ -151,7 +153,7 @@ private:
    * @param [in] attr       Pointer to the requested attributes, NULL if default values are used.
    * @return pointer to Request
    */
-  Request* InsertNewRequest( ResourceId resourceId, const std::string& url, std::size_t urlHash, const ImageAttributes* attr );
+  ImageFactoryCache::Request* InsertNewRequest( ResourceId resourceId, const std::string& url, std::size_t urlHash, const ImageAttributes* attr );
 
   /**
    * Searches request cache for exact match.
@@ -160,7 +162,7 @@ private:
    * @param [in] attributes  Pointer to ImageAttributes used for the request or NULL if default attributes were used.
    * @return pointer to the found request or NULL if no exact match is found.
    */
-  Request* FindRequest( const std::string& filename, size_t hash, const ImageAttributes *attributes );
+  ImageFactoryCache::Request* FindRequest( const std::string& filename, size_t hash, const ImageAttributes *attributes );
 
   /**
    * Searches through tickets to find a compatible resource.
@@ -180,14 +182,12 @@ private:
   ResourceTicketPtr IssueLoadRequest( const std::string& filename, const ImageAttributes* attributes );
 
 private:
-  ResourceClient&         mResourceClient;
-
-  ImageFactoryCache::RequestPathHashMap      mUrlCache;     ///< A multimap of url hashes and request IDs
-  ImageFactoryCache::RequestIdMap            mRequestCache; ///< A map of request IDs and request information.
-
-  ResourceTicketContainer mTicketsToRelease; ///< List of ticket handles
-  float                   mMaxScale;         ///< Defines maximum size difference between compatible resources
-  RequestId               mReqIdCurrent;     ///< Internal counter for Request IDs
+  ResourceClient&                        mResourceClient;
+  ImageFactoryCache::RequestPathHashMap  mUrlCache;         ///< A multimap of url hashes and request IDs
+  ImageFactoryCache::RequestIdMap        mRequestCache;     ///< A map of request IDs and request information.
+  ResourceTicketContainer                mTicketsToRelease; ///< List of ticket handles
+  float                                  mMaxScale;         ///< Defines maximum size difference between compatible resources
+  ImageFactoryCache::RequestId           mReqIdCurrent;     ///< Internal counter for Request IDs
 };
 
 } // namespace Internal
