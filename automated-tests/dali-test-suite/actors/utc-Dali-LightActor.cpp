@@ -35,38 +35,28 @@ extern "C" {
   void (*tet_cleanup)() = Cleanup;
 }
 
-static void UtcDaliLightActorConstructorVoid();
-static void UtcDaliLightActorConstructorRefObject();
-static void UtcDaliLightActorDestructor();
-static void UtcDaliLightActorNew();
-static void UtcDaliLightActorDownCast();
-static void UtcDaliLightActorDownCast2();
-static void UtcDaliLightActorSetGetLight();
-static void UtcDaliLightActorSetGetActive();
-static void UtcDaliLightActorMeshTest();
-static void UtcDaliLightActorDefaultProperties();
-
 enum {
   POSITIVE_TC_IDX = 0x01,
   NEGATIVE_TC_IDX,
 };
 
-// Add test functionality for all APIs in the class (Positive and Negative)
+#define MAX_NUMBER_OF_TESTS 10000
 extern "C" {
-  struct tet_testlist tet_testlist[] = {
-    { UtcDaliLightActorConstructorVoid,           POSITIVE_TC_IDX },
-    { UtcDaliLightActorConstructorRefObject,      POSITIVE_TC_IDX },
-    { UtcDaliLightActorDestructor,                POSITIVE_TC_IDX },
-    { UtcDaliLightActorNew,                       POSITIVE_TC_IDX },
-    { UtcDaliLightActorDownCast,                  POSITIVE_TC_IDX },
-    { UtcDaliLightActorDownCast2,                 NEGATIVE_TC_IDX },
-    { UtcDaliLightActorSetGetLight,               POSITIVE_TC_IDX },
-    { UtcDaliLightActorSetGetActive,              POSITIVE_TC_IDX },
-    { UtcDaliLightActorMeshTest,                  POSITIVE_TC_IDX },
-    { UtcDaliLightActorDefaultProperties,         POSITIVE_TC_IDX },
-    { NULL, 0 }
-  };
+  struct tet_testlist tet_testlist[MAX_NUMBER_OF_TESTS];
 }
+
+// Add test functionality for all APIs in the class (Positive and Negative)
+TEST_FUNCTION( UtcDaliLightActorConstructorVoid,           POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorConstructorRefObject,      POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorDestructor,                POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorNew,                       POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorDownCast,                  POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorDownCast2,                 NEGATIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorSetGetLight,               POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorSetGetActive,              POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorMeshTest,                  POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorDefaultProperties,         POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLightActorPropertyIndices,           POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -341,4 +331,16 @@ static void UtcDaliLightActorDefaultProperties()
 
   DALI_TEST_CHECK(v.Get<Vector3>() == col);
 
+}
+
+void UtcDaliLightActorPropertyIndices()
+{
+  TestApplication application;
+  Actor basicActor = Actor::New();
+  LightActor light = LightActor::New();
+
+  Property::IndexContainer indices;
+  light.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.size(), light.GetPropertyCount(), TEST_LOCATION );
 }

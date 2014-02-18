@@ -64,6 +64,7 @@ TEST_FUNCTION( UtcDaliLayerMoveAbove, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliLayerMoveBelow, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliLayerDefaultProperties, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliLayerSetDepthTestDisabled, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliLayerPropertyIndices, POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -517,4 +518,16 @@ static void UtcDaliLayerCreateDestroy()
   Layer* layer = new Layer;
   DALI_TEST_CHECK( layer );
   delete layer;
+}
+
+void UtcDaliLayerPropertyIndices()
+{
+  TestApplication application;
+  Actor basicActor = Actor::New();
+  Layer layer = Layer::New();
+
+  Property::IndexContainer indices;
+  layer.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.size(), layer.GetPropertyCount(), TEST_LOCATION );
 }

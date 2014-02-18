@@ -79,6 +79,7 @@ TEST_FUNCTION( UtcDaliMeshActorBlend07,                   POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMeshActorBlend08,                   POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMeshActorBlend09,                   POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMeshActorBoneUpdate01,              POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliMeshActorIndices,                   POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -912,4 +913,17 @@ static void UtcDaliMeshActorBoneUpdate01()
   calcWorldMatrix = bug.GetCurrentWorldMatrix();
   DALI_TEST_CHECK( bugWorldMatrix != calcWorldMatrix );
 
+}
+
+void UtcDaliMeshActorIndices()
+{
+  TestApplication application;
+  Actor basicActor = Actor::New();
+  Mesh mesh = NewMesh();
+  MeshActor meshActor = MeshActor::New(mesh);
+
+  Property::IndexContainer indices;
+  meshActor.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( indices.size() == basicActor.GetPropertyCount() ); // Mesh Actor does not have any properties
+  DALI_TEST_EQUALS( indices.size(), meshActor.GetPropertyCount(), TEST_LOCATION );
 }

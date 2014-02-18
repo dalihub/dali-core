@@ -63,6 +63,8 @@ TEST_FUNCTION( UtcDaliAnimatableMeshOperatorArray01, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliAnimatableMeshOperatorArray02, NEGATIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliAnimatableMeshAnimateVertex01, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliAnimatableVertexSettersAndGetters, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliAnimatableMeshProperties, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliAnimatableMeshExceedVertices, NEGATIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -443,4 +445,33 @@ static void UtcDaliAnimatableVertexSettersAndGetters()
   DALI_TEST_EQUALS(mesh[1].GetCurrentPosition(), v2Pos, TEST_LOCATION);
   DALI_TEST_EQUALS(mesh[2].GetCurrentColor(), Color::BLACK, TEST_LOCATION);
   DALI_TEST_EQUALS(mesh[3].GetCurrentTextureCoords(), uvs, TEST_LOCATION);
+}
+
+void UtcDaliAnimatableMeshProperties()
+{
+  TestApplication application;
+  AnimatableMesh mesh = CreateMesh();
+
+  Property::IndexContainer indices;
+  mesh.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( ! indices.empty() );
+  DALI_TEST_EQUALS( indices.size(), mesh.GetPropertyCount(), TEST_LOCATION );
+}
+
+void UtcDaliAnimatableMeshExceedVertices()
+{
+  TestApplication application;
+
+  AnimatableMesh::Faces faces;
+  CreateFaces(faces, 10);
+
+  try
+  {
+    AnimatableMesh mesh = AnimatableMesh::New(3333334, faces);
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "( numVertices * 3 ) < DEFAULT_PROPERTY_MAX_COUNT", TEST_LOCATION );
+  }
 }

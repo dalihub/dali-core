@@ -58,6 +58,22 @@ public:
    */
   typedef bool (*SignalConnectorFunctionV2)(BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor);
 
+  /**
+   * Callback to set an event-thread only property @see PropertyRegistration
+   * @param[in] object The object whose property should be set.
+   * @param[in] index The index of the property being set.
+   * @param[in] value The new value of the property for the object specified.
+   */
+  typedef void (*SetPropertyFunction)( BaseObject* object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Callback to get the value of an event-thread only property @see PropertyRegistration
+   * @param[in] object The object whose property value is required.
+   * @param[in] index The index of the property required.
+   * @return The current value of the property for the object specified.
+   */
+  typedef Property::Value (*GetPropertyFunction)( BaseObject* object, Property::Index index );
+
   typedef std::vector<std::string> NameContainer;
 
   /**
@@ -110,6 +126,22 @@ public:
    * @return Container of signal names
    */
   NameContainer GetSignals();
+
+  // Properties
+
+  /**
+   * Retrieve all the property indices for this type
+   * @param[out] indices Container of property indices
+   * @note The container will be cleared
+   */
+  void GetPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
+   * Given a property index, retrieve the property name associated with it.
+   * @param[in] index The property index.
+   * @return The name of the property at the given index.
+   */
+  const std::string& GetPropertyName( Property::Index index ) const;
 
 public: // Not intended for application developers
   /**

@@ -206,6 +206,19 @@ unsigned int LightActor::GetDefaultPropertyCount() const
   return Actor::GetDefaultPropertyCount() + DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT;
 }
 
+void LightActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
+
+  indices.reserve( indices.size() + DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT );
+
+  int index = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+  for ( int i = 0; i < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT; ++i, ++index )
+  {
+    indices.push_back( index );
+  }
+}
+
 bool LightActor::IsDefaultPropertyWritable( Property::Index index ) const
 {
   if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
@@ -238,8 +251,17 @@ Property::Type LightActor::GetDefaultPropertyType( Property::Index index ) const
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_LIGHT_ACTOR_PROPERTY_TYPES[index - DEFAULT_ACTOR_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_LIGHT_ACTOR_PROPERTY_TYPES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      return Property::NONE;
+    }
   }
 }
 
@@ -251,8 +273,18 @@ const std::string& LightActor::GetDefaultPropertyName( Property::Index index ) c
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_LIGHT_ACTOR_PROPERTY_NAMES[index - DEFAULT_ACTOR_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_LIGHT_ACTOR_PROPERTY_NAMES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      static const std::string INVALID_PROPERTY_NAME;
+      return INVALID_PROPERTY_NAME;
+    }
   }
 }
 
@@ -279,8 +311,6 @@ Property::Index LightActor::GetDefaultPropertyIndex(const std::string& name) con
 
 void LightActor::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  // ProxyObject guarantees the property is writable and index is in range
-
   if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
     Actor::SetDefaultProperty(index, propertyValue) ;

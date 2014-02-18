@@ -47,14 +47,15 @@ class TypeRegistry;
  * @code
  * // Note: object construction in namespace scope is defined in a translation unit as being
  * //       in appearance order (C++ standard 3.6/2). So TypeRegistration is declared first in
- * //       the cpp file below. Signal and action declarations follow in any order.
+ * //       the cpp file below. Signal, action and property declarations follow in any order.
  * namespace
  * {
  *   TypeRegistration myActorType(typeid(MyActor), typeid(Actor), CreateMyActor );
  *
- *   TypeSignalConnector( myActorType, "highlighted", ConnectSignalForMyActor );
+ *   SignalConnectorType( myActorType, "highlighted", ConnectSignalForMyActor );
  *   TypeAction( myActorType, "open", DoMyActorAction );
  *   TypeAction( myActorType, "close", DoMyActorAction );
+ *   PropertyRegistration( myActorType, "status", PropertyRegistration::START_INDEX, Property::BOOLEAN, SetPropertyFunction, GetPropertyFunction );
  * }
  * @endcode
  *
@@ -221,6 +222,47 @@ public:
   TypeAction( TypeRegistration &registered, const std::string &name, TypeInfo::ActionFunction f);
 };
 
+/**
+ * Register a property for the given type.
+ */
+class PropertyRegistration
+{
+public:
+
+  // Enumerations are being used here rather than static constants so that switch statements can be used to compare property indices
+  enum
+  {
+    START_INDEX = 10000000,   ///< The index for this type should start from this number
+    MAX_INDEX   = 19999999    ///< The maximum index supported for this type
+  };
+
+  /**
+   * This constructor registers the property with the registered type. This constructor is for event-thread
+   * only properties where the value of the property can be retrieved and set via specified functions.
+   *
+   * Functions of the following type may be used for setFunc and getFunc respectively:
+   * @code
+   *   void SetProperty( BaseObject* object, Property::Index index, const Property::Value& value );
+   *   Property::Value GetProperty( BaseObject* object, Property::Index index );
+   * @endcode
+   *
+   * @param [in] registered The TypeRegistration object
+   * @param [in] name The name of the property
+   * @param [in] index The property index. Must be a value between START_INDEX and MAX_INDEX inclusive.
+   * @param [in] type The property value type.
+   * @param [in] setFunc The function to call when setting the property. If NULL, then the property becomes read-only.
+   * @param [in] getFunc The function to call to retrieve the current value of the property. MUST be provided.
+   *
+   * @note The "index" value must be between START_INDEX and MAX_INDEX inclusive.
+   * @note If "setFunc" is NULL, then the property becomes a read-only property.
+   * @note "getFunc" MUST be provided
+   *
+   * @pre "registered" must be registered with the TypeRegistry.
+   */
+  PropertyRegistration( TypeRegistration& registered,
+                        const std::string& name, Property::Index index, Property::Type type,
+                        TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc );
+};
 
 } // namespace Dali
 

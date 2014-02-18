@@ -115,6 +115,11 @@ Property::Value Handle::GetProperty(Property::Index index) const
   return GetImplementation(*this).GetProperty( index );
 }
 
+void Handle::GetPropertyIndices( Property::IndexContainer& indices ) const
+{
+  GetImplementation(*this).GetPropertyIndices( indices );
+}
+
 Dali::PropertyNotification Handle::AddPropertyNotification(Property::Index index,
                                                            const PropertyCondition& condition)
 {

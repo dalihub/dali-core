@@ -103,6 +103,8 @@ TEST_FUNCTION( UtcDaliShaderEffectFromProperties01, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliShaderEffectFromProperties02, NEGATIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliShaderEffectFromProperties03, NEGATIVE_TC_IDX );
 
+TEST_FUNCTION( UtcDaliShaderEffectPropertyIndices, POSITIVE_TC_IDX );
+
 // Called only once before first test is run.
 static void Startup()
 {
@@ -1173,4 +1175,15 @@ static void UtcDaliShaderEffectFromProperties03()
   {
     tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
   }
+}
+
+void UtcDaliShaderEffectPropertyIndices()
+{
+  TestApplication application;
+  ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
+
+  Property::IndexContainer indices;
+  effect.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( ! indices.empty() );
+  DALI_TEST_EQUALS( indices.size(), effect.GetPropertyCount(), TEST_LOCATION );
 }

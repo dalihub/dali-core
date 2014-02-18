@@ -25,6 +25,7 @@
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/animation/active-constraint-base.h>
@@ -328,6 +329,9 @@ private:
     for ( SourceIter iter = mSources.begin(); mSources.end() != iter; ++iter )
     {
       Source& source = *iter;
+
+      // Type registry properties cannot be used as inputs
+      DALI_ASSERT_ALWAYS( ( source.propertyIndex < DEFAULT_PROPERTY_MAX_COUNT ) || ( source.propertyIndex >= CUSTOM_PROPERTY_START ) );
 
       PropertyInputImpl* inputProperty( NULL );
       int componentIndex( INVALID_PROPERTY_COMPONENT_INDEX );

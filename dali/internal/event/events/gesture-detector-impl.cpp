@@ -197,6 +197,10 @@ unsigned int GestureDetector::GetDefaultPropertyCount() const
   return 0;
 }
 
+void GestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& ) const
+{
+}
+
 const std::string& GestureDetector::GetDefaultPropertyName( Property::Index index ) const
 {
   return INVALID_PROPERTY;

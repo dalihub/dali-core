@@ -224,6 +224,13 @@ public:
   }
 
   /**
+   * Retrieve all the property indices for this object (including custom properties).
+   * @param[out] indices A container of property indices for this object.
+   * @note the added container is cleared
+   */
+  void GetPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
    * Add a property notification to this object.
    * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @param [in] index The index of the property.

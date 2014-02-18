@@ -102,6 +102,8 @@ TEST_FUNCTION( UtcDaliTextActorSynchronousGlyphLoading,   POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextActorAutomaticSizeSet,          POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTextActorAutomaticSizeSetAnimation, POSITIVE_TC_IDX );
 
+TEST_FUNCTION( UtcDaliTextActorPropertyIndices,           POSITIVE_TC_IDX );
+
 // Called only once before first test is run.
 static void Startup()
 {
@@ -839,4 +841,16 @@ static void UtcDaliTextActorAutomaticSizeSetAnimation()
   Font defaultFont = Font::New();
   Vector3 naturalSize = defaultFont.MeasureText( moreText );
   DALI_TEST_EQUALS( naturalSize.GetVectorXY(), actor.GetCurrentSize().GetVectorXY(), TEST_LOCATION );
+}
+
+void UtcDaliTextActorPropertyIndices()
+{
+  TestApplication application;
+  Actor basicActor = Actor::New();
+  TextActor textActor = TextActor::New("Text");
+
+  Property::IndexContainer indices;
+  textActor.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.size(), textActor.GetPropertyCount(), TEST_LOCATION );
 }

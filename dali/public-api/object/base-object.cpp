@@ -66,10 +66,8 @@ bool BaseObject::DoAction(const std::string& actionName, const std::vector<Prope
   return false;
 }
 
-std::string BaseObject::GetTypeName()
+const std::string& BaseObject::GetTypeName() const
 {
-  std::string name;
-
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 
   if( registry )
@@ -77,11 +75,14 @@ std::string BaseObject::GetTypeName()
     Dali::TypeInfo typeInfo = registry->GetTypeInfo(this);
     if( typeInfo )
     {
-      name = typeInfo.GetName();
+      return typeInfo.GetName();
     }
   }
 
-  return name;
+  // We should not reach here
+  static const std::string INVALID_NAME;
+  DALI_LOG_ERROR( "TypeName Not Found\n" );
+  return INVALID_NAME;
 }
 
 bool BaseObject::DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor )

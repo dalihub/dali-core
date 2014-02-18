@@ -57,6 +57,7 @@ TEST_FUNCTION( UtcDaliConstraintGetCurrentWeight,           POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliConstraintSignalApplied,              POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliConstraintRemove,                     POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliConstraintCallback,                   POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliConstraintProperties,                 POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -330,4 +331,78 @@ static void UtcDaliConstraintCallback()
   application.SendNotification();
 
   DALI_TEST_CHECK( constraintSignalled );
+}
+
+void UtcDaliConstraintProperties()
+{
+  TestApplication application;
+
+  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE, TestConstraintVector3() );
+  Actor actor = Actor::New();
+  ActiveConstraint active = actor.ApplyConstraint( constraint );
+
+  Property::IndexContainer indices;
+  active.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( ! indices.empty() );
+  DALI_TEST_EQUALS( indices.size(), active.GetPropertyCount(), TEST_LOCATION );
+
+  // Valid property
+  DALI_TEST_EQUALS( active.GetPropertyName( 0 ), "weight", TEST_LOCATION );
+  DALI_TEST_EQUALS( active.GetPropertyIndex( "weight" ), 0, TEST_LOCATION );
+  DALI_TEST_CHECK( active.IsPropertyWritable( 0 ) );
+  DALI_TEST_CHECK( active.IsPropertyAnimatable( 0 ) );
+  DALI_TEST_EQUALS( active.GetPropertyType( 0 ), Property::FLOAT, TEST_LOCATION );
+  DALI_TEST_CHECK( active.GetCurrentWeight() != 21312.0f );
+  active.SetProperty( 0, 21312.0f );
+  DALI_TEST_EQUALS( active.GetCurrentWeight(), 21312.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( active.GetProperty< float >( 0 ), 21312.0f, TEST_LOCATION );
+
+  // Invalid Property
+  try
+  {
+    active.GetPropertyName( PropertyRegistration::START_INDEX );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Property index is invalid", TEST_LOCATION );
+  }
+  DALI_TEST_EQUALS( active.GetPropertyIndex( "invalid-property-name"), Property::INVALID_INDEX, TEST_LOCATION );
+  try
+  {
+    active.IsPropertyWritable( PropertyRegistration::START_INDEX );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
+  }
+  DALI_TEST_CHECK( ! active.IsPropertyAnimatable( PropertyRegistration::START_INDEX ) );
+  try
+  {
+    active.GetPropertyType( PropertyRegistration::START_INDEX );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
+  }
+  try
+  {
+    active.SetProperty( PropertyRegistration::START_INDEX, true );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
+  }
+  try
+  {
+    active.GetProperty< bool >( PropertyRegistration::START_INDEX );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
+  }
 }

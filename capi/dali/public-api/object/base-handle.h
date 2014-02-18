@@ -137,7 +137,7 @@ public:
    * Returns the type name for the Handle.
    * @return The type name.
    */
-  std::string GetTypeName();
+  const std::string& GetTypeName() const;
 
 public:
 

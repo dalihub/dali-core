@@ -513,10 +513,28 @@ unsigned int ShaderEffect::GetDefaultPropertyCount() const
   return DEFAULT_PROPERTY_COUNT;
 }
 
+void ShaderEffect::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.reserve( DEFAULT_PROPERTY_COUNT );
+
+  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  {
+    indices.push_back( i );
+  }
+}
+
 const std::string& ShaderEffect::GetDefaultPropertyName(Property::Index index) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_NAMES[index];
+  if( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return DEFAULT_PROPERTY_NAMES[index];
+  }
+  else
+  {
+    // index out of range..return empty string
+    static const std::string INVALID_PROPERTY_NAME;
+    return INVALID_PROPERTY_NAME;
+  }
 }
 
 Property::Index ShaderEffect::GetDefaultPropertyIndex(const std::string& name) const
@@ -557,13 +575,19 @@ bool ShaderEffect::IsDefaultPropertyAnimatable(Property::Index index) const
 
 Property::Type ShaderEffect::GetDefaultPropertyType(Property::Index index) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_TYPES[index];
+  if( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return DEFAULT_PROPERTY_TYPES[index];
+  }
+  else
+  {
+    // index out of range...return Property::NONE
+    return Property::NONE;
+  }
 }
 
 void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  // ProxyObject guarantees the property is writable and index is in range
   switch ( index )
   {
     case Dali::ShaderEffect::GRID_DENSITY:
@@ -770,13 +794,8 @@ void ShaderEffect::SetCustomProperty( Property::Index /* index */, const CustomP
 
 Property::Value ShaderEffect::GetDefaultProperty(Property::Index /*index*/) const
 {
-  Property::Value value;
-
-  // ProxyObject guarantees the property is writable and index is in range
-
   // none of our properties are readable so return empty
-
-  return value;
+  return Property::Value();
 }
 
 void ShaderEffect::InstallSceneObjectProperty( PropertyBase& newProperty, const std::string& name, unsigned int index )

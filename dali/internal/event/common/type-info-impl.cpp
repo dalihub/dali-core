@@ -20,10 +20,10 @@
 // EXTERNAL INCLUDES
 #include <algorithm> // std::find_if
 #include <string>
-#include <dali/public-api/object/type-registry.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/common/type-registry-impl.h>
 
 using std::find_if;
 
@@ -31,19 +31,40 @@ namespace
 {
 
 /*
- * Functor to find by name for vector of pairs
+ * Functor to find by given type for vector of pairs
  */
-template <typename T>
-struct PairNameListFinder
+template <typename S, typename T>
+struct PairFinder
 {
-  PairNameListFinder(const std::string &find)
+  PairFinder(const S& find)
   : mFind(find)
   {
   }
 
-  bool operator()(T &p)
+  bool operator()(const T& p) const
   {
     return p.first == mFind;
+  }
+
+private:
+
+  const S& mFind;
+};
+
+/**
+ * Functor to find a matching property name
+ */
+template <typename T>
+struct PropertyNameFinder
+{
+  PropertyNameFinder( const std::string& find )
+  : mFind( find )
+  {
+  }
+
+  bool operator()(const T &p) const
+  {
+    return p.second.name == mFind;
   }
 
 private:
@@ -85,7 +106,7 @@ bool TypeInfo::DoActionTo(BaseObject *object, const std::string &actionName, con
 {
   bool done = false;
 
-  ActionContainer::iterator iter = find_if(mActions.begin(), mActions.end(), PairNameListFinder<ActionPair>(actionName));
+  ActionContainer::iterator iter = find_if(mActions.begin(), mActions.end(), PairFinder<std::string, ActionPair>(actionName));
 
   if( iter != mActions.end() )
   {
@@ -118,7 +139,7 @@ bool TypeInfo::ConnectSignal( BaseObject* object, ConnectionTrackerInterface* co
   bool connected( false );
 
   ConnectorContainerV2::iterator iter = find_if( mSignalConnectors.begin(), mSignalConnectors.end(),
-                                                 PairNameListFinder<ConnectionPairV2>(signalName) );
+                                                 PairFinder<std::string, ConnectionPairV2>(signalName) );
 
   if( iter != mSignalConnectors.end() )
   {
@@ -191,6 +212,49 @@ Dali::TypeInfo::NameContainer TypeInfo::GetSignals()
   return ret;
 }
 
+void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
+{
+  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+  if ( base )
+  {
+    const TypeInfo& baseImpl( GetImplementation( base ) );
+    baseImpl.GetPropertyIndices( indices );
+  }
+
+  if ( ! mRegisteredProperties.empty() )
+  {
+    indices.reserve( indices.size() + mRegisteredProperties.size() );
+
+    const RegisteredPropertyContainer::const_iterator endIter = mRegisteredProperties.end();
+    for ( RegisteredPropertyContainer::const_iterator iter = mRegisteredProperties.begin(); iter != endIter; ++iter )
+    {
+      indices.push_back( iter->first );
+    }
+  }
+}
+
+const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
+{
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+
+  if ( iter != mRegisteredProperties.end() )
+  {
+    return iter->second.name;
+  }
+
+  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+  if ( base )
+  {
+    return GetImplementation(base).GetPropertyName( index );
+  }
+
+  // Property not found, return reference to invalid property string.
+  static const std::string EMPTY_PROPERTY_NAME;
+  DALI_LOG_WARNING( "Property index (%d) invalid", index );
+  return EMPTY_PROPERTY_NAME;
+}
+
 void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo::ActionFunction function )
 {
   if( NULL == function)
@@ -200,7 +264,7 @@ void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo:
   else
   {
     ActionContainer::iterator iter = std::find_if(mActions.begin(), mActions.end(),
-                                                  PairNameListFinder<ActionPair>(actionName));
+                                                  PairFinder<std::string, ActionPair>(actionName));
 
     if( iter == mActions.end() )
     {
@@ -222,7 +286,7 @@ void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeIn
   else
   {
     ConnectorContainerV2::iterator iter = find_if( mSignalConnectors.begin(), mSignalConnectors.end(),
-                                                   PairNameListFinder<ConnectionPairV2>(signalName) );
+                                                   PairFinder<std::string, ConnectionPairV2>(signalName) );
 
     if( iter == mSignalConnectors.end() )
     {
@@ -233,6 +297,203 @@ void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeIn
       DALI_LOG_WARNING("Signal name already exists in TypeRegistry Type for signal connector function", signalName.c_str());
     }
   }
+}
+
+void TypeInfo::AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc )
+{
+  // The setter can be empty as a property can be read-only.
+
+  if ( NULL == getFunc )
+  {
+    DALI_ASSERT_ALWAYS( ! "GetProperty Function is empty" );
+  }
+  else
+  {
+    RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair>(index) );
+
+    if ( iter == mRegisteredProperties.end() )
+    {
+      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, setFunc, getFunc, name ) ) );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Property index already added to Type" );
+    }
+  }
+}
+
+unsigned int TypeInfo::GetPropertyCount() const
+{
+  unsigned int count( mRegisteredProperties.size() );
+
+  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+  while ( base )
+  {
+    const TypeInfo& baseImpl( GetImplementation(base) );
+    count += baseImpl.mRegisteredProperties.size();
+    base = TypeRegistry::Get()->GetTypeInfo( baseImpl.mBaseTypeName );
+  }
+
+  return count;
+}
+
+Property::Index TypeInfo::GetPropertyIndex( const std::string& name ) const
+{
+  Property::Index index = Property::INVALID_INDEX;
+
+  // Slow but should not be done that often
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PropertyNameFinder< RegisteredPropertyPair >( name ) );
+
+  if ( iter != mRegisteredProperties.end() )
+  {
+    index = iter->first;
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      index = GetImplementation(base).GetPropertyIndex( name );
+    }
+  }
+
+  return index;
+}
+
+bool TypeInfo::IsPropertyWritable( Property::Index index ) const
+{
+  bool writable( false );
+
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+
+  if ( iter != mRegisteredProperties.end() )
+  {
+    writable = iter->second.setFunc ? true : false;
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      writable = GetImplementation(base).IsPropertyWritable( index );
+    }
+  }
+
+  return writable;
+}
+
+Property::Type TypeInfo::GetPropertyType( Property::Index index ) const
+{
+  Property::Type type( Property::NONE );
+
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+
+  if ( iter != mRegisteredProperties.end() )
+  {
+    type = iter->second.type;
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      type = GetImplementation(base).GetPropertyType( index );
+    }
+  }
+
+  return type;
+}
+
+void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Property::Value& value )
+{
+  RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                    PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+  if ( iter != mRegisteredProperties.end() )
+  {
+    DALI_ASSERT_ALWAYS( iter->second.setFunc && "Trying to write to a read-only property" );
+    iter->second.setFunc( object, index, value );
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      GetImplementation(base).SetProperty( object, index, value );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( false && "Property index not found" );
+    }
+  }
+}
+
+void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const Property::Value& value )
+{
+  RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                    PropertyNameFinder< RegisteredPropertyPair >( name ) );
+  if ( iter != mRegisteredProperties.end() )
+  {
+    DALI_ASSERT_ALWAYS( iter->second.setFunc && "Trying to write to a read-only property" );
+    iter->second.setFunc( object, iter->first, value );
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      GetImplementation(base).SetProperty( object, name, value );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( false && "Property name not found" );
+    }
+  }
+}
+
+Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index index )
+{
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+  if( iter != mRegisteredProperties.end() )
+  {
+    // Need to remove the constness here as CustomActor will not be able to call Downcast with a const pointer to the object
+    return iter->second.getFunc( const_cast< BaseObject* >( object ), index );
+  }
+
+  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+  if ( base )
+  {
+    return GetImplementation( base ).GetProperty( object, index );
+  }
+
+  DALI_ASSERT_ALWAYS( false && "Property index not found" );
+
+  return Property::Value();
+}
+
+Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::string& name )
+{
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PropertyNameFinder< RegisteredPropertyPair >( name ) );
+  if( iter != mRegisteredProperties.end() )
+  {
+    // Need to remove the constness here as CustomActor will not be able to call Downcast with a const pointer to the object
+    return iter->second.getFunc( const_cast< BaseObject* >( object ), iter->first );
+  }
+
+  Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+  if ( base )
+  {
+    return GetImplementation( base ).GetProperty( object, name );
+  }
+
+  DALI_ASSERT_ALWAYS( false && "Property name not found" );
+
+  return Property::Value();
 }
 
 } // namespace Internal

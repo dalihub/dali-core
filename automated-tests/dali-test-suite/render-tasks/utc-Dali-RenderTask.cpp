@@ -96,6 +96,7 @@ TEST_FUNCTION( UtcDaliRenderTaskOnceNoSync06,                       POSITIVE_TC_
 TEST_FUNCTION( UtcDaliRenderTaskOnceNoSync07,                       POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliRenderTaskOnceNoSync08,                       POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliRenderTaskOnceChain01,                        POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliRenderTaskProperties,                         POSITIVE_TC_IDX );
 
 // TODO - work out how to reload images in test harness
 
@@ -2755,4 +2756,16 @@ static void UtcDaliRenderTaskOnceChain01()
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   firstFinished, false ) );
   DALI_TEST_CHECK( secondFinished == false );
 
+}
+
+void UtcDaliRenderTaskProperties()
+{
+  TestApplication application;
+
+  RenderTask task = Stage::GetCurrent().GetRenderTaskList().CreateTask();
+
+  Property::IndexContainer indices;
+  task.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( ! indices.empty() );
+  DALI_TEST_EQUALS( indices.size(), task.GetPropertyCount(), TEST_LOCATION );
 }

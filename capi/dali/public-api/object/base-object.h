@@ -62,7 +62,7 @@ public:
   /**
    * @copydoc Dali::BaseHandle::GetTypeName
    */
-  std::string GetTypeName();
+  const std::string& GetTypeName() const;
 
 public: // Not intended for application developers
 

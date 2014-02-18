@@ -62,6 +62,7 @@ TEST_FUNCTION( UtcDaliHandleGetProperty,              POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliHandleDownCast,                 POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliHandleCreateProperty,           POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliHandleGetPropertyGet,           POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliHandleGetPropertyIndices,       POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -293,6 +294,11 @@ void UtcDaliHandleIsPropertyAnimatable()
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::WORLD_POSITION_X ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::WORLD_POSITION_Y ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::WORLD_POSITION_Z ) );
+
+  // Type registered properties are not animatable
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PropertyRegistration::START_INDEX ) ); // START
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PropertyRegistration::START_INDEX + ( ( PropertyRegistration::MAX_INDEX - PropertyRegistration::START_INDEX ) * 0.5 ) ) ); // MIDDLE
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PropertyRegistration::MAX_INDEX ) ); // MAX
 }
 
 void UtcDaliHandleGetPropertyType()
@@ -908,4 +914,16 @@ void UtcDaliHandleGetPropertyGet()
   value.Get(map);
   DALI_TEST_CHECK( map[0].first == "key" );
 
+}
+
+void UtcDaliHandleGetPropertyIndices()
+{
+  TestApplication application;
+  Property::IndexContainer indices;
+
+  // Actor
+  Actor actor = Actor::New();
+  actor.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( ! indices.empty() );
+  DALI_TEST_EQUALS( indices.size(), actor.GetPropertyCount(), TEST_LOCATION );
 }

@@ -26,12 +26,12 @@
 namespace Dali
 {
 
-const Property::Index ImageActor::PIXEL_AREA           = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT;
-const Property::Index ImageActor::FADE_IN              = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 1;
-const Property::Index ImageActor::FADE_IN_DURATION     = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 2;
-const Property::Index ImageActor::STYLE                = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 3;
-const Property::Index ImageActor::BORDER               = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 4;
-const Property::Index ImageActor::IMAGE                = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 5;
+const Property::Index ImageActor::PIXEL_AREA           = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+const Property::Index ImageActor::FADE_IN              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index ImageActor::FADE_IN_DURATION     = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index ImageActor::STYLE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index ImageActor::BORDER               = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 4;
+const Property::Index ImageActor::IMAGE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 5;
 
 namespace Internal
 {
@@ -130,7 +130,7 @@ void ImageActor::OnInitialize()
   if(ImageActor::mFirstInstance)
   {
     mDefaultImageActorPropertyLookup = new DefaultPropertyLookup();
-    const int start = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT;
+    const int start = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
     for ( int i = 0; i < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT; ++i )
     {
       (*mDefaultImageActorPropertyLookup)[DEFAULT_IMAGE_ACTOR_PROPERTY_NAMES[i]] = i + start;
@@ -427,9 +427,22 @@ unsigned int ImageActor::GetDefaultPropertyCount() const
   return RenderableActor::GetDefaultPropertyCount() + DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT;
 }
 
+void ImageActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  RenderableActor::GetDefaultPropertyIndices( indices ); // RenderableActor class properties
+
+  indices.reserve( indices.size() + DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT );
+
+  int index = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+  for ( int i = 0; i < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT; ++i, ++index )
+  {
+    indices.push_back( index );
+  }
+}
+
 bool ImageActor::IsDefaultPropertyWritable( Property::Index index ) const
 {
-  if(static_cast<unsigned int>(index) < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     return RenderableActor::IsDefaultPropertyWritable(index);
   }
@@ -441,7 +454,7 @@ bool ImageActor::IsDefaultPropertyWritable( Property::Index index ) const
 
 bool ImageActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 {
-  if(static_cast<unsigned int>(index) < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     return RenderableActor::IsDefaultPropertyAnimatable(index);
   }
@@ -453,27 +466,46 @@ bool ImageActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 
 Property::Type ImageActor::GetDefaultPropertyType( Property::Index index ) const
 {
-  if(static_cast<unsigned int>(index) < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     return RenderableActor::GetDefaultPropertyType(index);
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_IMAGE_ACTOR_PROPERTY_TYPES[index - RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_IMAGE_ACTOR_PROPERTY_TYPES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      return Property::NONE;
+    }
   }
 }
 
 const std::string& ImageActor::GetDefaultPropertyName( Property::Index index ) const
 {
-  if(static_cast<unsigned int>(index) < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     return RenderableActor::GetDefaultPropertyName(index);
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_IMAGE_ACTOR_PROPERTY_NAMES[index - RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_IMAGE_ACTOR_PROPERTY_NAMES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      static const std::string INVALID_PROPERTY_NAME;
+      return INVALID_PROPERTY_NAME;
+    }
   }
 }
 
@@ -500,9 +532,7 @@ Property::Index ImageActor::GetDefaultPropertyIndex(const std::string& name) con
 
 void ImageActor::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  // ProxyObject guarantees the property is writable and index is in range
-
-  if(index < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     RenderableActor::SetDefaultProperty(index, propertyValue);
   }
@@ -561,7 +591,7 @@ void ImageActor::SetDefaultProperty( Property::Index index, const Property::Valu
 Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value ret;
-  if(index < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     ret = RenderableActor::GetDefaultProperty(index);
   }

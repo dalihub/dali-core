@@ -82,6 +82,7 @@ TEST_FUNCTION( UtcDaliPanGestureDirectionHandling, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliPanGestureDirectionProcessing, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliPanGestureSetProperties, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliPanGestureSetPropertiesAlreadyPanning, NEGATIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPanGesturePropertyIndices, POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -2064,4 +2065,15 @@ void UtcDaliPanGestureSetPropertiesAlreadyPanning()
   DALI_TEST_EQUALS( constraintData.screenPosition, currentPosition, 0.1, TEST_LOCATION );
   DALI_TEST_EQUALS( constraintData.localPosition,  currentPosition, 0.1f, TEST_LOCATION );
   constraintData.Reset();
+}
+
+void UtcDaliPanGesturePropertyIndices()
+{
+  TestApplication application;
+  PanGestureDetector detector = PanGestureDetector::New();
+
+  Property::IndexContainer indices;
+  detector.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( ! indices.empty() );
+  DALI_TEST_EQUALS( indices.size(), detector.GetPropertyCount(), TEST_LOCATION );
 }

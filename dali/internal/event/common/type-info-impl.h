@@ -84,6 +84,17 @@ public:
    */
   Dali::TypeInfo::NameContainer GetSignals();
 
+  /**
+   * Adds the property indices to the container specified.
+   * @param[in/out] indices The container where the property indices are added.
+   */
+  void GetPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
+   * @copydoc Dali::TypeInfo::GetPropertyName() const
+   */
+  const std::string& GetPropertyName( Property::Index index ) const;
+
   /*
    * Add an action function
    */
@@ -95,6 +106,16 @@ public:
    * @param[in] function The function used for connecting to the signal.
    */
   void AddConnectorFunction( const std::string& signalName, Dali::TypeInfo::SignalConnectorFunctionV2 function );
+
+  /**
+   * Adds an event-thread only property to the type.
+   * @param[in] name The name of the property.
+   * @param[in] index The index of the property.
+   * @param[in] type The Property::Type.
+   * @param[in] setFunc The function to call to set the property (Can be NULL).
+   * @param[in] getFunc The function to call to retrieve the value of the property.
+   */
+  void AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc );
 
   /**
    * Do an action on base object
@@ -116,19 +137,105 @@ public:
    */
   bool ConnectSignal( BaseObject* object, ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor );
 
+  /**
+   * Retrieve the property count for this type.
+   * @return The total number of properties.
+   */
+  unsigned int GetPropertyCount() const;
+
+  /**
+   * Given a property name, retrieve the index.
+   * @param[in] name The name of the property.
+   * @return The index associated with that name.
+   */
+  Property::Index GetPropertyIndex( const std::string& name ) const;
+
+  /**
+   * Checks if there is a setter for the property. If there is then it is writable.
+   * @param[in] index The property index.
+   * @return True, if writable, false otherwise.
+   */
+  bool IsPropertyWritable( Property::Index index ) const;
+
+  /**
+   * Retrieve the Property::Type of the property at the given index.
+   * @param[in] index The property index.
+   * @return The Property::Type at that index.
+   */
+  Property::Type GetPropertyType( Property::Index index ) const;
+
+  /**
+   * Sets the value of a property at the index specified for the given object.
+   * @param[in] object The object whose property is to be set.
+   * @param[in] index The property index.
+   * @param[in] value The value to set.
+   */
+  void SetProperty( BaseObject *object, Property::Index index, const Property::Value& value );
+
+  /**
+   * Sets the value of a property with the name specified for the given object.
+   * @param[in] object The object whose property is to be set.
+   * @param[in] name The property name.
+   * @param[in] value The value to set.
+   */
+  void SetProperty( BaseObject *object, const std::string& name, const Property::Value& value );
+
+  /**
+   * Retrieves the value of a property at the index specified for the given object.
+   * @param[in] object The object whose property is to be queried.
+   * @param[in] index The property index.
+   * @return The current value of the property.
+   */
+  Property::Value GetProperty( const BaseObject *object, Property::Index index );
+
+  /**
+   * Retrieves the value of a property with the name specified for the given object.
+   * @param[in] object The object whose property is to be queried.
+   * @param[in] name The property name.
+   * @return The current value of the property.
+   */
+  Property::Value GetProperty( const BaseObject *object, const std::string& name );
+
 private:
+
+  struct RegisteredProperty
+  {
+    RegisteredProperty()
+    : type( Property::NONE ),
+      setFunc( NULL ),
+      getFunc( NULL ),
+      name()
+    {
+    }
+
+    RegisteredProperty( Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, const std::string& propName )
+    : type( propType ),
+      setFunc( set ),
+      getFunc( get ),
+      name( propName )
+    {
+    }
+
+    Property::Type type;
+    Dali::TypeInfo::SetPropertyFunction setFunc;
+    Dali::TypeInfo::GetPropertyFunction getFunc;
+    std::string name;
+  };
 
   typedef std::pair<std::string, Dali::TypeInfo::SignalConnectorFunctionV2 > ConnectionPairV2;
   typedef std::pair<std::string, Dali::TypeInfo::ActionFunction > ActionPair;
+  typedef std::pair<Property::Index, RegisteredProperty> RegisteredPropertyPair;
 
   typedef std::vector< ActionPair > ActionContainer;
   typedef std::vector< ConnectionPairV2 > ConnectorContainerV2;
+  typedef std::vector< RegisteredPropertyPair > RegisteredPropertyContainer;
 
   std::string mTypeName;
   std::string mBaseTypeName;
   Dali::TypeInfo::CreateFunction mCreate;
   ActionContainer mActions;
   ConnectorContainerV2 mSignalConnectors;
+  RegisteredPropertyContainer mRegisteredProperties;
 };
 
 } // namespace Internal

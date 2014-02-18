@@ -98,6 +98,18 @@ public:
    */
   bool RegisterAction( TypeRegistration &registered, const std::string &name, Dali::TypeInfo::ActionFunction f);
 
+  /**
+   * Register an event-thread only property with a type
+   * @param [in] registered TypeRegistration object used to register the type
+   * @param [in] name Property name
+   * @param [in] index Property index
+   * @param [in] type Property type
+   * @param [in] setFunc The function to set the property (Can be NULL).
+   * @param [in] getFunc The function to get the value of a property.
+   * @return true if registered
+   */
+  bool RegisterProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc );
+
   /*
    * @copydoc Dali::Internal::TypeInfo::DoActionTo
    * Walks all base types until it finds a doer.
@@ -114,7 +126,7 @@ public:
    * @param [in] pBaseObject Pointer to a BaseObject
    * @return TypeInfo for the BaseObject.
    */
-  Dali::TypeInfo GetTypeInfo(Dali::BaseObject * const pBaseObject);
+  Dali::TypeInfo GetTypeInfo(const Dali::BaseObject * const pBaseObject);
 
   /*
    * Calls any type creation functions that have been flagged as initialization functions

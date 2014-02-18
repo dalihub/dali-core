@@ -70,6 +70,7 @@ TEST_FUNCTION( UtcDaliCameraActorSetOrthographicProjection02, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliCameraActorSetOrthographicProjection03, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliCameraActorReadProjectionMatrix,        POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliCameraActorAnimatedProperties,          POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliCameraActorPropertyIndices,             POSITIVE_TC_IDX );
 
 
 namespace
@@ -845,4 +846,16 @@ static void UtcDaliCameraActorAnimatedProperties()
   application.Render();
 
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3(100.0f, 200.0f, 300.0f), TEST_LOCATION);
+}
+
+void UtcDaliCameraActorPropertyIndices()
+{
+  TestApplication application;
+  CameraActor camera = Stage::GetCurrent().GetRenderTaskList().GetTask(0u).GetCameraActor();
+
+  Actor basicActor = Actor::New();
+  Property::IndexContainer indices;
+  camera.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.size(), camera.GetPropertyCount(), TEST_LOCATION );
 }

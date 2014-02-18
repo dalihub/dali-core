@@ -14,6 +14,7 @@
 // limitations under the License.
 //
 
+#include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/modeling/animatable-mesh-impl.h>
@@ -94,6 +95,7 @@ AnimatableMeshPtr AnimatableMesh::New(
   bool useVertexColor )
 {
   DALI_ASSERT_ALWAYS( numVertices > 0 && "Mesh has no vertices" );
+  DALI_ASSERT_ALWAYS( ( numVertices * 3 ) < DEFAULT_PROPERTY_MAX_COUNT && "Mesh exceeds maximum supported vertices" );
   DALI_ASSERT_ALWAYS( faceIndices.size() > 0 && "Mesh has no faces" );
   for( Dali::AnimatableMesh::FacesConstIter faceIter=faceIndices.begin() ;
        faceIter != faceIndices.end() ;
@@ -220,10 +222,28 @@ unsigned int AnimatableMesh::GetDefaultPropertyCount() const
   return mPropertyCount;
 }
 
+void AnimatableMesh::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.reserve( mPropertyCount );
+
+  for ( int i = 0; i < mPropertyCount; ++i )
+  {
+    indices.push_back( i );
+  }
+}
+
 const std::string& AnimatableMesh::GetDefaultPropertyName( Property::Index index ) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_NAMES[index % VERTEX_PROPERTY_COUNT];
+  if ( ( index >= 0 ) && ( index < mPropertyCount ) )
+  {
+    return DEFAULT_PROPERTY_NAMES[index % VERTEX_PROPERTY_COUNT];
+  }
+  else
+  {
+    // Index out-of-range... return empty string.
+    static const std::string INVALID_PROPERTY_NAME;
+    return INVALID_PROPERTY_NAME;
+  }
 }
 
 Property::Index AnimatableMesh::GetDefaultPropertyIndex(const std::string& name) const
@@ -247,13 +267,21 @@ bool AnimatableMesh::IsDefaultPropertyAnimatable(Property::Index index) const
 
 Property::Type AnimatableMesh::GetDefaultPropertyType(Property::Index index) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_TYPES[index % VERTEX_PROPERTY_COUNT ];
+  if ( ( index >= 0 ) && ( index < mPropertyCount ) )
+  {
+    return DEFAULT_PROPERTY_TYPES[index % VERTEX_PROPERTY_COUNT ];
+  }
+  else
+  {
+    // Index out-of-bounds
+    return Property::NONE;
+  }
 }
 
 void AnimatableMesh::SetDefaultProperty( Property::Index index, const Property::Value& property )
 {
-  // ProxyObject guarantees the property is writable and index is in range
+  DALI_ASSERT_ALWAYS( ( index >= 0 ) && ( index < mPropertyCount ) );
+
   int vertexProperty = index % VERTEX_PROPERTY_COUNT;
   int vertexIndex    = index / VERTEX_PROPERTY_COUNT;
   switch ( vertexProperty )
@@ -292,7 +320,6 @@ Property::Value AnimatableMesh::GetDefaultProperty(Property::Index index) const
   int vertexProperty = index % VERTEX_PROPERTY_COUNT;
   int vertexIndex    = index / VERTEX_PROPERTY_COUNT;
 
-  // ProxyObject guarantees that index is within range
   switch ( vertexProperty )
   {
     case Dali::AnimatableVertex::POSITION:

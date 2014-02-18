@@ -2323,9 +2323,19 @@ unsigned int Actor::GetDefaultPropertyCount() const
   return DEFAULT_PROPERTY_COUNT;
 }
 
+void Actor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.reserve( DEFAULT_PROPERTY_COUNT );
+
+  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  {
+    indices.push_back( i );
+  }
+}
+
 const std::string& Actor::GetDefaultPropertyName( Property::Index index ) const
 {
-  if( static_cast< unsigned int >( index ) < GetDefaultPropertyCount() )
+  if( index < DEFAULT_PROPERTY_COUNT )
   {
     return DEFAULT_PROPERTY_NAMES[index];
   }
@@ -2388,7 +2398,7 @@ bool Actor::IsDefaultPropertyAnimatable(Property::Index index) const
 
 Property::Type Actor::GetDefaultPropertyType(Property::Index index) const
 {
-  if( static_cast< unsigned int >( index ) < GetDefaultPropertyCount() )
+  if( index < DEFAULT_PROPERTY_COUNT )
   {
     return DEFAULT_PROPERTY_TYPES[index];
   }
@@ -2401,7 +2411,6 @@ Property::Type Actor::GetDefaultPropertyType(Property::Index index) const
 
 void Actor::SetDefaultProperty( Property::Index index, const Property::Value& property )
 {
-  // ProxyObject guarantees the property is writable and index is in range
   switch ( index )
   {
     case Dali::Actor::PARENT_ORIGIN:
@@ -2582,8 +2591,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
 void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
 {
-  // ProxyObject guarantees the index is in range
-
+  // TODO: This should be deprecated
   OnPropertySet(index, value);
 
   if(entry.IsAnimatable())
@@ -2671,7 +2679,6 @@ Property::Value Actor::GetDefaultProperty(Property::Index index) const
 {
   Property::Value value;
 
-  // ProxyObject guarantees that index is within range
   switch ( index )
   {
     case Dali::Actor::PARENT_ORIGIN:
@@ -3033,7 +3040,7 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
     return property;
   }
 
-  if ( static_cast<unsigned int>(index) >= DEFAULT_PROPERTY_MAX_COUNT )
+  if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
     CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
 

@@ -51,6 +51,13 @@ TEST_FUNCTION( UtcDaliTypeRegistryCustomActor, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTypeRegistryCustomSignalFailure, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTypeRegistryInitFunctions, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliTypeRegistryNameInitFunctions, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyRegistration, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyRegistrationIndexOutOfBounds, NEGATIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyRegistrationFunctions, NEGATIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyRegistrationAddSameIndex, NEGATIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyRegistrationPropertyWritable, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyRegistrationPropertyAnimatable, NEGATIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyRegistrationInvalidGetAndSet, NEGATIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -620,4 +627,233 @@ static void UtcDaliTypeRegistryNameInitFunctions()
   DALI_TEST_CHECK( true == CreateCustomNamedInitCalled );
   TypeInfo type = TypeRegistry::Get().GetTypeInfo( scriptedName );
   DALI_TEST_CHECK( type );
+}
+
+// Property Registration
+bool setPropertyCalled = false;
+bool getPropertyCalled = false;
+void SetProperty( BaseObject* object, Property::Index propertyIndex, const Property::Value& value )
+{
+  setPropertyCalled = true;
+}
+Property::Value GetProperty( BaseObject* object, Property::Index propertyIndex )
+{
+  getPropertyCalled = true;
+  return Property::Value( true );
+}
+
+void UtcDaliPropertyRegistration()
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+  unsigned int initialPropertyCount( customActor.GetPropertyCount() );
+
+  std::string propertyName( "prop-1" );
+  int propertyIndex( PropertyRegistration::START_INDEX );
+  Property::Type propertyType( Property::BOOLEAN );
+  PropertyRegistration property1( customType1, propertyName, propertyIndex, propertyType, &SetProperty, &GetProperty );
+
+  // Check property count after registration
+  unsigned int postRegistrationPropertyCount( customActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( initialPropertyCount + 1u, postRegistrationPropertyCount, TEST_LOCATION );
+
+  // Add custom property and check property count
+  customActor.RegisterProperty( "custom-prop-1", true );
+  unsigned int customPropertyCount( customActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( postRegistrationPropertyCount + 1u, customPropertyCount, TEST_LOCATION );
+
+  // Set the property, ensure SetProperty called
+  DALI_TEST_CHECK( !setPropertyCalled );
+  customActor.SetProperty( propertyIndex, false );
+  DALI_TEST_CHECK( setPropertyCalled );
+
+  // Get the property, ensure GetProperty called
+  DALI_TEST_CHECK( !getPropertyCalled );
+  (void)customActor.GetProperty< bool >( propertyIndex );
+  DALI_TEST_CHECK( getPropertyCalled );
+
+  // Check the property name
+  DALI_TEST_EQUALS( customActor.GetPropertyName( propertyIndex ), propertyName, TEST_LOCATION );
+  DALI_TEST_EQUALS( typeInfo.GetPropertyName( propertyIndex ), propertyName, TEST_LOCATION );
+
+  // Check the property index
+  DALI_TEST_EQUALS( customActor.GetPropertyIndex( propertyName ), propertyIndex, TEST_LOCATION );
+
+  // Check the property type
+  DALI_TEST_EQUALS( customActor.GetPropertyType( propertyIndex ), propertyType, TEST_LOCATION );
+
+  // Check property count of type-info is 1
+  Property::IndexContainer indices;
+  typeInfo.GetPropertyIndices( indices );
+  DALI_TEST_EQUALS( indices.size(), 1u, TEST_LOCATION );
+
+  // Ensure indices returned from actor and customActor differ by two
+  Actor actor = Actor::New();
+  actor.GetPropertyIndices( indices );
+  unsigned int actorIndices = indices.size();
+  customActor.GetPropertyIndices( indices );
+  unsigned int customActorIndices = indices.size();
+  DALI_TEST_EQUALS( actorIndices + 2u, customActorIndices, TEST_LOCATION ); // Custom property + registered property
+}
+
+void UtcDaliPropertyRegistrationIndexOutOfBounds()
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  // Attempt to register a property type out-of-bounds index (less than)
+  try
+  {
+    PropertyRegistration property1( customType1, "prop-name", PropertyRegistration::START_INDEX - 1, Property::BOOLEAN, &SetProperty, &GetProperty );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "( index >= START_INDEX ) && ( index <= MAX_INDEX )", TEST_LOCATION );
+  }
+
+  // Attempt to register a property type out-of-bounds index (greater than)
+  try
+  {
+    PropertyRegistration property1( customType1, "prop-name", PropertyRegistration::MAX_INDEX + 1, Property::BOOLEAN, &SetProperty, &GetProperty );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "( index >= START_INDEX ) && ( index <= MAX_INDEX )", TEST_LOCATION );
+  }
+}
+
+void UtcDaliPropertyRegistrationFunctions()
+{
+  TestApplication application;
+  int propertyIndex = PropertyRegistration::START_INDEX + 10;
+
+  // Attempt to register a property without a setter
+  try
+  {
+    PropertyRegistration property1( customType1, "prop-name", propertyIndex++, Property::BOOLEAN, NULL, &GetProperty );
+    tet_result( TET_PASS );
+  }
+  catch ( DaliException& e )
+  {
+    tet_result( TET_FAIL );
+  }
+
+  // Attempt to register a property without a getter
+  try
+  {
+    PropertyRegistration property1( customType1, "prop-name", propertyIndex++, Property::BOOLEAN, NULL, NULL );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"GetProperty", TEST_LOCATION );
+  }
+}
+
+void UtcDaliPropertyRegistrationAddSameIndex()
+{
+  TestApplication application;
+  int propertyIndex = PropertyRegistration::START_INDEX + 100;
+
+  // Add one property with a valid property index
+  PropertyRegistration property1( customType1, "prop-name", propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
+
+  // Attempt to add another property with the same index
+  try
+  {
+    PropertyRegistration property2( customType1, "prop-name-2", propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Property index already added", TEST_LOCATION );
+  }
+}
+
+void UtcDaliPropertyRegistrationPropertyWritable()
+{
+  TestApplication application;
+  int propertyIndex1 = PropertyRegistration::START_INDEX + 200;
+  int propertyIndex2 = PropertyRegistration::START_INDEX + 201;
+
+  // Add two properties, one with SetProperty, one without
+  PropertyRegistration property1( customType1, "prop-name-readwrite", propertyIndex1, Property::BOOLEAN, &SetProperty, &GetProperty );
+  PropertyRegistration property2( customType1, "prop-name-readonly",  propertyIndex2, Property::BOOLEAN, NULL, &GetProperty );
+
+  // Create custom-actor
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+
+  // Check whether properties are writable
+  DALI_TEST_CHECK(   customActor.IsPropertyWritable( propertyIndex1 ) );
+  DALI_TEST_CHECK( ! customActor.IsPropertyWritable( propertyIndex2 ) );
+}
+
+void UtcDaliPropertyRegistrationPropertyAnimatable()
+{
+  TestApplication application;
+  int propertyIndex = PropertyRegistration::START_INDEX + 400;
+
+  // These properties are not animatable
+  PropertyRegistration property1( customType1, "prop-name", propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
+
+  // Create custom-actor
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+
+  // Check if animatable
+  DALI_TEST_CHECK( ! customActor.IsPropertyAnimatable( propertyIndex ) );
+}
+
+void UtcDaliPropertyRegistrationInvalidGetAndSet()
+{
+  TestApplication application;
+  int propertyIndex = PropertyRegistration::START_INDEX + 2000;
+
+  // Create custom-actor
+  TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+
+  // Try to set an index that hasn't been added
+  try
+  {
+    customActor.SetProperty( propertyIndex, true );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "false && \"Property index not found", TEST_LOCATION );
+  }
+
+  // Try to get an index that hasn't been added
+  try
+  {
+    (void) customActor.GetProperty< bool >( propertyIndex );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "false && \"Property index not found", TEST_LOCATION );
+  }
 }

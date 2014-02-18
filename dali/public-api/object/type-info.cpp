@@ -63,6 +63,17 @@ TypeInfo::NameContainer TypeInfo::GetSignals()
   return GetImplementation(*this).GetSignals();
 }
 
+void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.clear(); // We do not want to clear the container if called internally, so only clear here
+  GetImplementation(*this).GetPropertyIndices( indices );
+}
+
+const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
+{
+  return GetImplementation(*this).GetPropertyName( index );
+}
+
 TypeInfo::TypeInfo(Internal::TypeInfo* internal)
 : BaseHandle(internal)
 {

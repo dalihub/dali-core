@@ -316,6 +316,18 @@ unsigned int Layer::GetDefaultPropertyCount() const
   return Actor::GetDefaultPropertyCount() + DEFAULT_LAYER_PROPERTY_COUNT;
 }
 
+void Layer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
+  indices.reserve( indices.size() + DEFAULT_LAYER_PROPERTY_COUNT );
+
+  int index = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+  for ( int i = 0; i < DEFAULT_LAYER_PROPERTY_COUNT; ++i, ++index )
+  {
+    indices.push_back( index );
+  }
+}
+
 bool Layer::IsDefaultPropertyWritable( Property::Index index ) const
 {
   if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
@@ -348,8 +360,17 @@ Property::Type Layer::GetDefaultPropertyType( Property::Index index ) const
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_LAYER_PROPERTY_TYPES[index - DEFAULT_ACTOR_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_LAYER_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_LAYER_PROPERTY_TYPES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      return Property::NONE;
+    }
   }
 }
 
@@ -362,8 +383,18 @@ const std::string& Layer::GetDefaultPropertyName( Property::Index index ) const
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_LAYER_PROPERTY_NAMES[index - DEFAULT_ACTOR_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_LAYER_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_LAYER_PROPERTY_NAMES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      static const std::string INVALID_PROPERTY_NAME;
+      return INVALID_PROPERTY_NAME;
+    }
   }
 }
 
@@ -390,8 +421,6 @@ Property::Index Layer::GetDefaultPropertyIndex(const std::string& name) const
 
 void Layer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  // ProxyObject guarantees the property is writable and index is in range
-
   if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
     Actor::SetDefaultProperty(index, propertyValue);

@@ -187,6 +187,11 @@ public: // properties
   virtual unsigned int GetDefaultPropertyCount() const;
 
   /**
+   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndices()
+   */
+  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
    * copydoc Dali::Internal::ProxyObject
    */
   virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;

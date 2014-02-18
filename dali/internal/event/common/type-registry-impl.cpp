@@ -240,6 +240,22 @@ bool TypeRegistry::RegisterAction( TypeRegistration &registered, const std::stri
   }
 }
 
+bool TypeRegistry::RegisterProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc )
+{
+  RegistryMap::iterator iter = mRegistryLut.find( registered.RegisteredName() );
+
+  if( iter != mRegistryLut.end() )
+  {
+    DALI_ASSERT_DEBUG(iter->second);
+
+    GetImplementation(iter->second).AddProperty( name, index, type, setFunc, getFunc );
+
+    return true;
+  }
+
+  return false;
+}
+
 bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string &actionName, const std::vector<Property::Value> &properties)
 {
   bool done = false;
@@ -284,12 +300,12 @@ bool TypeRegistry::ConnectSignal( BaseObject* object, ConnectionTrackerInterface
   return connected;
 }
 
-Dali::TypeInfo TypeRegistry::GetTypeInfo(Dali::BaseObject * const pBaseObject)
+Dali::TypeInfo TypeRegistry::GetTypeInfo(const Dali::BaseObject * const pBaseObject)
 {
   Dali::TypeInfo type;
 
   // test for custom actor which has another indirection to get to the type hiearchy we're after
-  Dali::Internal::CustomActor * const pCustom = dynamic_cast<Dali::Internal::CustomActor*>(pBaseObject);
+  const Dali::Internal::CustomActor * const pCustom = dynamic_cast<const Dali::Internal::CustomActor*>(pBaseObject);
 
   if(pCustom)
   {

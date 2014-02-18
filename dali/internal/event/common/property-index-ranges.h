@@ -17,6 +17,8 @@
 // limitations under the License.
 //
 
+#include <dali/public-api/object/type-registry.h>
+
 namespace Dali
 {
 
@@ -27,12 +29,14 @@ namespace Internal
  * Specifies the allowed ranges for different class types to cater for future allocation
  */
 
-#define DEFAULT_PROPERTY_MAX_COUNT                  10000 ///< Default Property Range:    0 to 9999
+#define DEFAULT_PROPERTY_MAX_COUNT                  PropertyRegistration::START_INDEX ///< Default Property Range:     0 to 9999999
 
-#define DEFAULT_ACTOR_PROPERTY_MAX_COUNT            1000  ///< Actor Range:               0 to 999
-#define RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT 2000  ///< Renderable Actor Range: 1000 to 1999
+#define DEFAULT_ACTOR_PROPERTY_MAX_COUNT            10000                             ///< Actor Range:                0 to    9999
+#define DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT 20000                             ///< Renderable Actor Range: 10000 to   19999
 
-#define DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT 1000  ///< GestureDetector Range:     0 to 999
+#define DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT 10000                             ///< GestureDetector Range:      0 to    9999
+
+#define CUSTOM_PROPERTY_START                       50000000                          ///< Custom Property Range: 50000000 onwards
 
 } // namespace Internal
 

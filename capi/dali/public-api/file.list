@@ -96,9 +96,7 @@ capi_devel_object_header_files =  \
   $(capi_devel_src_dir)/object/property-types.h \
   $(capi_devel_src_dir)/object/property-value.h \
   $(capi_devel_src_dir)/object/property.h \
-  $(capi_devel_src_dir)/object/ref-object.h \
-  $(capi_devel_src_dir)/object/type-info.h \
-  $(capi_devel_src_dir)/object/type-registry.h
+  $(capi_devel_src_dir)/object/ref-object.h
 
 capi_devel_render_tasks_header_files = \
   $(capi_devel_src_dir)/render-tasks/render-task.h \

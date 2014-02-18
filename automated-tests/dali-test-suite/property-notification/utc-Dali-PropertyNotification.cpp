@@ -48,56 +48,37 @@ extern "C" {
   void (*tet_cleanup)() = Cleanup;
 }
 
-static void UtcDaliPropertyNotificationDownCast();
-static void UtcDaliPropertyNotificationDownCastNegative();
-static void UtcDaliAddPropertyNotification();
-static void UtcDaliAddPropertyNotificationCallback();
-static void UtcDaliPropertyNotificationGetCondition();
-static void UtcDaliPropertyNotificationGetConditionConst();
-static void UtcDaliPropertyNotificationGetTarget();
-static void UtcDaliPropertyNotificationGetProperty();
-static void UtcDaliPropertyNotificationGetNotifyMode();
-static void UtcDaliPropertyNotificationGreaterThan();
-static void UtcDaliPropertyNotificationLessThan();
-static void UtcDaliPropertyNotificationInside();
-static void UtcDaliPropertyNotificationOutside();
-static void UtcDaliPropertyNotificationVectorComponentGreaterThan();
-static void UtcDaliPropertyNotificationVectorComponentLessThan();
-static void UtcDaliPropertyNotificationVectorComponentInside();
-static void UtcDaliPropertyNotificationVectorComponentOutside();
-static void UtcDaliPropertyConditionGetArguments();
-static void UtcDaliPropertyConditionGetArgumentsConst();
-
 enum {
   POSITIVE_TC_IDX = 0x01,
   NEGATIVE_TC_IDX,
 };
 
-// Add test functionality for all APIs in the class (Positive and Negative)
+#define MAX_NUMBER_OF_TESTS 10000
 extern "C" {
-  struct tet_testlist tet_testlist[] = {
-    { UtcDaliPropertyNotificationDownCast, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationDownCastNegative, POSITIVE_TC_IDX },
-    { UtcDaliAddPropertyNotification, POSITIVE_TC_IDX },
-    { UtcDaliAddPropertyNotificationCallback, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationGetCondition, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationGetConditionConst, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationGetTarget, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationGetProperty, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationGetNotifyMode, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationGreaterThan, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationLessThan, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationInside, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationOutside, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationVectorComponentGreaterThan, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationVectorComponentLessThan, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationVectorComponentInside, POSITIVE_TC_IDX },
-    { UtcDaliPropertyNotificationVectorComponentOutside, POSITIVE_TC_IDX },
-    { UtcDaliPropertyConditionGetArguments, POSITIVE_TC_IDX },
-    { UtcDaliPropertyConditionGetArgumentsConst, POSITIVE_TC_IDX },
-    { NULL, 0 }
-  };
+  struct tet_testlist tet_testlist[MAX_NUMBER_OF_TESTS];
 }
+
+// Add test functionality for all APIs in the class (Positive and Negative)
+TEST_FUNCTION( UtcDaliPropertyNotificationDownCast, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationDownCastNegative, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliAddPropertyNotification, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliAddPropertyNotificationCallback, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliAddPropertyNotificationTypeProperty, NEGATIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationGetCondition, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationGetConditionConst, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationGetTarget, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationGetProperty, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationGetNotifyMode, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationGreaterThan, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationLessThan, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationInside, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationOutside, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationVectorComponentGreaterThan, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationVectorComponentLessThan, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationVectorComponentInside, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationVectorComponentOutside, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyConditionGetArguments, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyConditionGetArgumentsConst, POSITIVE_TC_IDX );
 
 class TestClass : public ConnectionTracker
 {
@@ -300,6 +281,23 @@ static void UtcDaliAddPropertyNotificationCallback()
 
 
   delete object;
+}
+
+void UtcDaliAddPropertyNotificationTypeProperty()
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Currently, Type registry properties cannot be animated
+  try
+  {
+    actor.AddPropertyNotification( PropertyRegistration::START_INDEX, GreaterThanCondition( 100.0f ) );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "false && \"Property notification added to non animatable property", TEST_LOCATION );
+  }
 }
 
 static void UtcDaliPropertyNotificationGetCondition()

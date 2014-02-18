@@ -332,6 +332,11 @@ private: // ProxyObject default non-animatable properties
   virtual unsigned int GetDefaultPropertyCount() const ;
 
   /**
+   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndices()
+   */
+  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
    * copydoc Dali::Internal::ProxyObject
    */
   virtual const std::string& GetDefaultPropertyName( Property::Index index ) const ;

@@ -85,6 +85,7 @@ TEST_FUNCTION( UtcDaliConstraintInputWorldPosition,            POSITIVE_TC_IDX )
 TEST_FUNCTION( UtcDaliConstraintInputWorldRotation,            POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliConstraintInputWorldScale,               POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliConstraintInputWorldColor,               POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliConstraintInvalidInputProperty,          POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliBuiltinConstraintParentSize,             POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliBuiltinConstraintParentSizeRelative,     POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliBuiltinConstraintScaleToFitConstraint,   POSITIVE_TC_IDX );
@@ -97,7 +98,7 @@ TEST_FUNCTION( UtcDaliBuiltinConstraintDivideConstraint,       POSITIVE_TC_IDX )
 TEST_FUNCTION( UtcDaliBuiltinConstraintEqualToConstraint,      POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliBuiltinConstraintRelativeToConstraint,   POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliBuiltinConstraintInverseOfConstraint,    POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliBuiltinConstraintFunctions, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliBuiltinConstraintFunctions,              POSITIVE_TC_IDX );
 
 struct EqualToQuaternion
 {
@@ -3254,6 +3255,26 @@ static void UtcDaliConstraintInputWorldColor()
   DALI_TEST_EQUALS( trackingActor.GetCurrentColor(), previousColor, TEST_LOCATION );
   DALI_TEST_EQUALS( parent.GetCurrentWorldColor(), parentColor, TEST_LOCATION );
   DALI_TEST_EQUALS( child.GetCurrentWorldColor(), previousColor, TEST_LOCATION );
+}
+
+void UtcDaliConstraintInvalidInputProperty()
+{
+  TestApplication application;
+  Actor actor = Actor::New();
+  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, LocalSource( PropertyRegistration::START_INDEX ), MultiplyConstraint() );
+
+  Stage::GetCurrent().Add( actor );
+
+  // Cannot use type registered properties as input to constraints
+  try
+  {
+    actor.ApplyConstraint( constraint );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "( source.propertyIndex < DEFAULT_PROPERTY_MAX_COUNT ) || ( source.propertyIndex >= CUSTOM_PROPERTY_START )", TEST_LOCATION );
+  }
 }
 
 static void UtcDaliBuiltinConstraintParentSize()

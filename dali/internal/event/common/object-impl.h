@@ -90,6 +90,11 @@ public:
   virtual Property::Value GetProperty(Property::Index index) const = 0;
 
   /**
+   * @copydoc Dali::Handle::GetPropertyIndices()
+   */
+  virtual void GetPropertyIndices( Property::IndexContainer& indices ) const = 0;
+
+  /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
   virtual Property::Index RegisterProperty(std::string name, const Property::Value& propertyValue) = 0;

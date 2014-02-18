@@ -31,28 +31,28 @@
 namespace Dali
 {
 
-const Property::Index TextActor::TEXT                       = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT;
-const Property::Index TextActor::FONT                       = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 1;
-const Property::Index TextActor::FONT_STYLE                 = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 2;
-const Property::Index TextActor::OUTLINE_ENABLE             = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 3;
-const Property::Index TextActor::OUTLINE_COLOR              = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 4;
-const Property::Index TextActor::OUTLINE_THICKNESS_WIDTH    = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 5;
-const Property::Index TextActor::SMOOTH_EDGE                = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 6;
-const Property::Index TextActor::GLOW_ENABLE                = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 7;
-const Property::Index TextActor::GLOW_COLOR                 = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 8;
-const Property::Index TextActor::GLOW_INTENSITY             = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 9;
-const Property::Index TextActor::SHADOW_ENABLE              = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 10;
-const Property::Index TextActor::SHADOW_COLOR               = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 11;
-const Property::Index TextActor::SHADOW_OFFSET              = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 12;
-const Property::Index TextActor::ITALICS_ANGLE              = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 13;
-const Property::Index TextActor::UNDERLINE                  = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 14;
-const Property::Index TextActor::WEIGHT                     = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 15;
-const Property::Index TextActor::FONT_DETECTION_AUTOMATIC   = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 16;
-const Property::Index TextActor::GRADIENT_COLOR             = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 17;
-const Property::Index TextActor::GRADIENT_START_POINT       = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 18;
-const Property::Index TextActor::GRADIENT_END_POINT         = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 19;
-const Property::Index TextActor::SHADOW_SIZE                = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 20;
-const Property::Index TextActor::TEXT_COLOR                 = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT + 21;
+const Property::Index TextActor::TEXT                       = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+const Property::Index TextActor::FONT                       = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index TextActor::FONT_STYLE                 = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index TextActor::OUTLINE_ENABLE             = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index TextActor::OUTLINE_COLOR              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 4;
+const Property::Index TextActor::OUTLINE_THICKNESS_WIDTH    = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 5;
+const Property::Index TextActor::SMOOTH_EDGE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 6;
+const Property::Index TextActor::GLOW_ENABLE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 7;
+const Property::Index TextActor::GLOW_COLOR                 = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 8;
+const Property::Index TextActor::GLOW_INTENSITY             = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 9;
+const Property::Index TextActor::SHADOW_ENABLE              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 10;
+const Property::Index TextActor::SHADOW_COLOR               = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 11;
+const Property::Index TextActor::SHADOW_OFFSET              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 12;
+const Property::Index TextActor::ITALICS_ANGLE              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 13;
+const Property::Index TextActor::UNDERLINE                  = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 14;
+const Property::Index TextActor::WEIGHT                     = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 15;
+const Property::Index TextActor::FONT_DETECTION_AUTOMATIC   = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 16;
+const Property::Index TextActor::GRADIENT_COLOR             = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 17;
+const Property::Index TextActor::GRADIENT_START_POINT       = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 18;
+const Property::Index TextActor::GRADIENT_END_POINT         = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 19;
+const Property::Index TextActor::SHADOW_SIZE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 20;
+const Property::Index TextActor::TEXT_COLOR                 = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 21;
 
 namespace
 {
@@ -194,7 +194,7 @@ void TextActor::OnInitialize()
   if(TextActor::mFirstInstance)
   {
     mDefaultTextActorPropertyLookup = new DefaultPropertyLookup();
-    const int start = RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT;
+    const int start = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
     for ( int i = 0; i < DEFAULT_TEXT_ACTOR_PROPERTY_COUNT; ++i )
     {
       (*mDefaultTextActorPropertyLookup)[DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[i]] = i + start;
@@ -654,16 +654,39 @@ unsigned int TextActor::GetDefaultPropertyCount() const
   return RenderableActor::GetDefaultPropertyCount() + DEFAULT_TEXT_ACTOR_PROPERTY_COUNT;
 }
 
+void TextActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  RenderableActor::GetDefaultPropertyIndices( indices ); // RenderableActor class properties
+
+  indices.reserve( indices.size() + DEFAULT_TEXT_ACTOR_PROPERTY_COUNT );
+
+  int index = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+  for ( int i = 0; i < DEFAULT_TEXT_ACTOR_PROPERTY_COUNT; ++i, ++index )
+  {
+    indices.push_back( index );
+  }
+}
+
 const std::string& TextActor::GetDefaultPropertyName( Property::Index index ) const
 {
-  if(index < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     return RenderableActor::GetDefaultPropertyName(index) ;
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[index - RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_TEXT_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      static const std::string INVALID_PROPERTY_NAME;
+      return INVALID_PROPERTY_NAME;
+    }
   }
 }
 
@@ -690,7 +713,7 @@ Property::Index TextActor::GetDefaultPropertyIndex(const std::string& name) cons
 
 bool TextActor::IsDefaultPropertyWritable( Property::Index index ) const
 {
-  if(index < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     return RenderableActor::IsDefaultPropertyWritable(index) ;
   }
@@ -702,7 +725,7 @@ bool TextActor::IsDefaultPropertyWritable( Property::Index index ) const
 
 bool TextActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 {
-  if(index < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     return RenderableActor::IsDefaultPropertyAnimatable(index) ;
   }
@@ -714,22 +737,29 @@ bool TextActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 
 Property::Type TextActor::GetDefaultPropertyType( Property::Index index ) const
 {
-  if(index < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     return RenderableActor::GetDefaultPropertyType(index) ;
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_TEXT_ACTOR_PROPERTY_TYPES[index - RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_TEXT_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_TEXT_ACTOR_PROPERTY_TYPES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      return Property::NONE;
+    }
   }
 }
 
 void TextActor::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  // ProxyObject guarantees the property is writable and index is in range
-
-  if(index < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     RenderableActor::SetDefaultProperty(index, propertyValue) ;
   }
@@ -898,7 +928,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
 Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value ret ;
-  if(index < RENDERABLE_ACTOR_DEFAULT_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
     ret = RenderableActor::GetDefaultProperty(index) ;
   }

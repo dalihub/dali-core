@@ -47,6 +47,8 @@ struct Property
 
   static const int INVALID_INDEX; ///< -1 is not a valid property index
 
+  typedef std::vector< Index > IndexContainer; ///< A vector of property indices
+
   /**
    * A value-type representing a property value.
    */

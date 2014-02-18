@@ -76,7 +76,7 @@ TEST_FUNCTION( UtcDaliImageSetFadeInDuration,         POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliImageActorNewNull,              POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliImageActorNewNullWithArea,      POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliImageActorSetImage,             POSITIVE_TC_IDX );
-
+TEST_FUNCTION( UtcDaliImageActorPropertyIndices,      POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -959,4 +959,16 @@ static void UtcDaliImageActorSetImage()
   actor.SetImage( Image() );
 
   DALI_TEST_CHECK(!actor.GetImage());
+}
+
+void UtcDaliImageActorPropertyIndices()
+{
+  TestApplication application;
+  Actor basicActor = Actor::New();
+  ImageActor imageActor = ImageActor::New();
+
+  Property::IndexContainer indices;
+  imageActor.GetPropertyIndices( indices );
+  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.size(), imageActor.GetPropertyCount(), TEST_LOCATION );
 }

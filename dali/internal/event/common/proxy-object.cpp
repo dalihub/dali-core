@@ -21,6 +21,7 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
@@ -29,6 +30,7 @@
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-index-ranges.h>
+#include <dali/internal/event/common/type-registry-impl.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
@@ -46,12 +48,17 @@ typedef Dali::Vector<ProxyObject::Observer*>::Iterator ObserverIter;
 typedef Dali::Vector<ProxyObject::Observer*>::ConstIterator ConstObserverIter;
 
 static std::string EMPTY_PROPERTY_NAME;
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PROXY_OBJECT" );
+#endif
 } // unnamed namespace
 
 const int INVALID_PROPERTY_COMPONENT_INDEX = -1;
 
 ProxyObject::ProxyObject()
-: mNextCustomPropertyIndex( 0u ),
+: mTypeInfo( NULL ),
+  mNextCustomPropertyIndex( 0u ),
   mCustomProperties( NULL ),
   mConstraints( NULL ),
   mRemovedConstraints( NULL ),
@@ -120,10 +127,28 @@ bool ProxyObject::Supports( Capability capability ) const
 unsigned int ProxyObject::GetPropertyCount() const
 {
   unsigned int count = GetDefaultPropertyCount();
+
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Default Properties: %d\n", count );
+
+  TypeInfo* typeInfo( GetTypeInfo() );
+  if ( typeInfo )
+  {
+    unsigned int manual( typeInfo->GetPropertyCount() );
+    count += manual;
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Manual Properties:  %d\n", manual );
+  }
+
   if( mCustomProperties )
   {
-    count += mCustomProperties->size();
+    unsigned int custom( mCustomProperties->size() );
+    count += custom;
+
+    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Custom Properties:  %d\n", custom );
   }
+
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Total Properties:   %d\n", count );
+
   return count;
 }
 
@@ -134,6 +159,19 @@ const std::string& ProxyObject::GetPropertyName( Property::Index index ) const
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
     return GetDefaultPropertyName( index );
+  }
+
+  if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  {
+    TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
+    {
+      return typeInfo->GetPropertyName( index );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Property index is invalid" );
+    }
   }
 
   if( mCustomProperties )
@@ -152,18 +190,24 @@ Property::Index ProxyObject::GetPropertyIndex(const std::string& name) const
 
   index = GetDefaultPropertyIndex( name );
 
-  if (Property::INVALID_INDEX == index)
+  if ( index == Property::INVALID_INDEX )
   {
-    if( mCustomProperties )
+    TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
     {
-      // This is slow, but we're not (supposed to be) using property names frequently
-      for ( CustomPropertyLookup::const_iterator iter = mCustomProperties->begin(); mCustomProperties->end() != iter; ++iter )
+      index = typeInfo->GetPropertyIndex( name );
+    }
+  }
+
+  if( index == Property::INVALID_INDEX && mCustomProperties )
+  {
+    // This is slow, but we're not (supposed to be) using property names frequently
+    for ( CustomPropertyLookup::const_iterator iter = mCustomProperties->begin(); mCustomProperties->end() != iter; ++iter )
+    {
+      if (iter->second.name == name)
       {
-        if (iter->second.name == name)
-        {
-          index = iter->first;
-          break;
-        }
+        index = iter->first;
+        break;
       }
     }
   }
@@ -178,6 +222,19 @@ bool ProxyObject::IsPropertyWritable( Property::Index index ) const
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
     return IsDefaultPropertyWritable( index );
+  }
+
+  if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  {
+    TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
+    {
+      return typeInfo->IsPropertyWritable( index );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" );
+    }
   }
 
   if( mCustomProperties)
@@ -200,6 +257,12 @@ bool ProxyObject::IsPropertyAnimatable( Property::Index index ) const
     return IsDefaultPropertyAnimatable( index );
   }
 
+  if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  {
+    // Type Registry event-thread only properties are not animatable.
+    return false;
+  }
+
   if( mCustomProperties )
   {
     // Check custom property
@@ -218,6 +281,19 @@ Property::Type ProxyObject::GetPropertyType( Property::Index index ) const
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
     return GetDefaultPropertyType( index );
+  }
+
+  if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  {
+    TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
+    {
+      return typeInfo->GetPropertyType( index );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" );
+    }
   }
 
   if( mCustomProperties )
@@ -239,6 +315,18 @@ void ProxyObject::SetProperty( Property::Index index, const Property::Value& pro
     DALI_ASSERT_ALWAYS( IsDefaultPropertyWritable(index) && "Property is read-only" );
 
     SetDefaultProperty( index, propertyValue );
+  }
+  else if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  {
+    TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
+    {
+      typeInfo->SetProperty( this, index, propertyValue );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" );
+    }
   }
   else if( mCustomProperties )
   {
@@ -265,6 +353,18 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
     value = GetDefaultProperty( index );
+  }
+  else if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  {
+    TypeInfo* typeInfo( GetTypeInfo() );
+    if ( typeInfo )
+    {
+      value = typeInfo->GetProperty( this, index );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" );
+    }
   }
   else if( mCustomProperties )
   {
@@ -366,6 +466,33 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
   return value;
 }
 
+void ProxyObject::GetPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.clear();
+
+  // Default Properties
+  GetDefaultPropertyIndices( indices );
+
+  // Manual Properties
+  TypeInfo* typeInfo( GetTypeInfo() );
+  if ( typeInfo )
+  {
+    typeInfo->GetPropertyIndices( indices );
+  }
+
+  // Custom Properties
+  if ( mCustomProperties )
+  {
+    indices.reserve( indices.size() + mCustomProperties->size() );
+
+    const CustomPropertyLookup::const_iterator endIter = mCustomProperties->end();
+    for ( CustomPropertyLookup::const_iterator iter = mCustomProperties->begin(); iter != endIter; ++iter )
+    {
+      indices.push_back( iter->first );
+    }
+  }
+}
+
 Property::Index ProxyObject::RegisterProperty( std::string name, const Property::Value& propertyValue)
 {
   // Assert that property name is unused
@@ -435,7 +562,7 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
   // Default properties start from index zero
   if ( 0u == mNextCustomPropertyIndex )
   {
-    mNextCustomPropertyIndex = DEFAULT_PROPERTY_MAX_COUNT;
+    mNextCustomPropertyIndex = CUSTOM_PROPERTY_START;
   }
 
   // Add entry to the property lookup
@@ -465,7 +592,7 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
     // Default properties start from index zero
     if ( 0u == mNextCustomPropertyIndex )
     {
-      mNextCustomPropertyIndex = DEFAULT_PROPERTY_MAX_COUNT;
+      mNextCustomPropertyIndex = CUSTOM_PROPERTY_START;
     }
 
     // Add entry to the property lookup
@@ -480,12 +607,19 @@ Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index 
                                                                 int componentIndex,
                                                                 const Dali::PropertyCondition& condition)
 {
-  if ( ( index >= DEFAULT_PROPERTY_MAX_COUNT )&&( mCustomProperties ) )
+  if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
-    CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
-    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
+    if ( index <= PropertyRegistration::MAX_INDEX )
+    {
+      DALI_ASSERT_ALWAYS( false && "Property notification added to non animatable property." );
+    }
+    else if ( mCustomProperties )
+    {
+      CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
+      DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
 
-    DALI_ASSERT_ALWAYS( entry->second.IsAnimatable() && "Property notification added to non animatable property (currently not suppported )");
+      DALI_ASSERT_ALWAYS( entry->second.IsAnimatable() && "Property notification added to non animatable property (currently not suppported )");
+    }
   }
 
   Dali::Handle self(this);
@@ -625,6 +759,23 @@ CustomPropertyLookup& ProxyObject::GetCustomPropertyLookup() const
     mCustomProperties = new CustomPropertyLookup;
   }
   return *mCustomProperties;
+}
+
+TypeInfo* ProxyObject::GetTypeInfo() const
+{
+  if ( !mTypeInfo )
+  {
+    // This uses a dynamic_cast so can be quite expensive so we only really want to do it once
+    // especially as the type-info does not change during the life-time of an application
+
+    Dali::TypeInfo typeInfoHandle = TypeRegistry::Get()->GetTypeInfo( this );
+    if ( typeInfoHandle )
+    {
+      mTypeInfo = &GetImplementation( typeInfoHandle );
+    }
+  }
+
+  return mTypeInfo;
 }
 
 void ProxyObject::RemoveConstraint( Dali::ActiveConstraint activeConstraint )

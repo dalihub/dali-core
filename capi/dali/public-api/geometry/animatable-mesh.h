@@ -65,6 +65,7 @@ public:
    * @param[in] numVertices The number of vertices in the mesh
    * @param[in] faceIndices A set of vertex indices, 3 per face.
    * @return an initialized handle to the animatable mesh
+   * @note The maximum number of supported vertices is 3333333.
    */
   static AnimatableMesh New( unsigned int numVertices,
                              const Faces& faceIndices );
@@ -78,6 +79,7 @@ public:
    * @param[in] faceIndices A set of vertex indices, 3 per face.
    * @param[in] material Material used to render mesh
    * @return an initialized handle to the animatable mesh
+   * @note The maximum number of supported vertices is 3333333.
    */
   static AnimatableMesh New( unsigned int numVertices,
                              const Faces& faceIndices,

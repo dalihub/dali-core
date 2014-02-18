@@ -68,7 +68,7 @@ bool BaseHandle::DoAction(const std::string& command, const std::vector<Property
   return GetImplementation(*this).DoAction( command, attributes );
 }
 
-std::string BaseHandle::GetTypeName()
+const std::string& BaseHandle::GetTypeName() const
 {
   return GetImplementation(*this).GetTypeName();
 }

@@ -447,10 +447,28 @@ unsigned int RenderTask::GetDefaultPropertyCount() const
   return DEFAULT_PROPERTY_COUNT;
 }
 
+void RenderTask::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.reserve( DEFAULT_PROPERTY_COUNT );
+
+  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  {
+    indices.push_back( i );
+  }
+}
+
 const std::string& RenderTask::GetDefaultPropertyName( Property::Index index ) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_NAMES[index];
+  if( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return DEFAULT_PROPERTY_NAMES[index];
+  }
+  else
+  {
+    // index out of range..return empty string
+    static const std::string INVALID_PROPERTY_NAME;
+    return INVALID_PROPERTY_NAME;
+  }
 }
 
 Property::Index RenderTask::GetDefaultPropertyIndex(const std::string& name) const
@@ -491,13 +509,19 @@ bool RenderTask::IsDefaultPropertyAnimatable(Property::Index index) const
 
 Property::Type RenderTask::GetDefaultPropertyType(Property::Index index) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_TYPES[index];
+  if( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return DEFAULT_PROPERTY_TYPES[index];
+  }
+  else
+  {
+    // index out of range...return Property::NONE
+    return Property::NONE;
+  }
 }
 
 void RenderTask::SetDefaultProperty( Property::Index index, const Property::Value& property )
 {
-  // ProxyObject guarantees the property is writable and index is in range
   switch ( index )
   {
     case Dali::RenderTask::VIEWPORT_POSITION:
@@ -534,7 +558,6 @@ Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
 {
   Property::Value value;
 
-  // ProxyObject guarantees that index is within range
   switch ( index )
   {
 

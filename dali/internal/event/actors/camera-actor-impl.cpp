@@ -419,9 +419,22 @@ unsigned int CameraActor::GetDefaultPropertyCount() const
   return Actor::GetDefaultPropertyCount() + DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT;
 }
 
+void CameraActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
+
+  indices.reserve( indices.size() + DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT );
+
+  int index = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+  for ( int i = 0; i < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT; ++i, ++index )
+  {
+    indices.push_back( index );
+  }
+}
+
 bool CameraActor::IsDefaultPropertyWritable( Property::Index index ) const
 {
-  if(static_cast<unsigned int>(index) < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
     return Actor::IsDefaultPropertyWritable(index);
   }
@@ -442,7 +455,7 @@ bool CameraActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 {
   bool animatable = false; // Our properties are not animatable.
 
-  if(static_cast<unsigned int>(index) < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
     animatable = Actor::IsDefaultPropertyAnimatable(index);
   }
@@ -451,27 +464,46 @@ bool CameraActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 
 Property::Type CameraActor::GetDefaultPropertyType( Property::Index index ) const
 {
-  if(static_cast<unsigned int>(index) < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
     return Actor::GetDefaultPropertyType(index);
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_CAMERA_ACTOR_PROPERTY_TYPES[index - DEFAULT_ACTOR_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_CAMERA_ACTOR_PROPERTY_TYPES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      return Property::NONE;
+    }
   }
 }
 
 const std::string& CameraActor::GetDefaultPropertyName( Property::Index index ) const
 {
-  if(static_cast<unsigned int>(index) < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
     return Actor::GetDefaultPropertyName(index);
   }
   else
   {
-    // ProxyObject guarantees that index is within range
-    return DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[index - DEFAULT_ACTOR_PROPERTY_MAX_COUNT];
+    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+
+    if ( ( index >= 0 ) && ( index < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[index];
+    }
+    else
+    {
+      // index out-of-bounds
+      static const std::string INVALID_PROPERTY_NAME;
+      return INVALID_PROPERTY_NAME;
+    }
   }
 }
 
@@ -498,9 +530,7 @@ Property::Index CameraActor::GetDefaultPropertyIndex(const std::string& name) co
 
 void CameraActor::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  // ProxyObject guarantees the property is writable and index is in range
-
-  if(static_cast<unsigned int>(index) < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
     Actor::SetDefaultProperty(index, propertyValue);
   }
@@ -616,7 +646,7 @@ void CameraActor::SetDefaultProperty( Property::Index index, const Property::Val
 Property::Value CameraActor::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value ret;
-  if(static_cast<unsigned int>(index) < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
     ret = Actor::GetDefaultProperty(index);
   }
@@ -746,7 +776,7 @@ const SceneGraph::PropertyBase* CameraActor::GetSceneObjectAnimatableProperty( P
   }
 
   // let actor handle animatable properties, we have no animatable properties
-  if( static_cast<unsigned int>(index) < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
     property = Actor::GetSceneObjectAnimatableProperty(index);
   }

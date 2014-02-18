@@ -273,10 +273,28 @@ unsigned int ActiveConstraintBase::GetDefaultPropertyCount() const
   return DEFAULT_PROPERTY_COUNT;
 }
 
+void ActiveConstraintBase::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.reserve( DEFAULT_PROPERTY_COUNT );
+
+  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
+  {
+    indices.push_back( i );
+  }
+}
+
 const std::string& ActiveConstraintBase::GetDefaultPropertyName( Property::Index index ) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_NAMES[index];
+  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
+  {
+    return DEFAULT_PROPERTY_NAMES[index];
+  }
+  else
+  {
+    // index out of range..return empty string
+    static const std::string INVALID_PROPERTY_NAME;
+    return INVALID_PROPERTY_NAME;
+  }
 }
 
 Property::Index ActiveConstraintBase::GetDefaultPropertyIndex( const std::string& name ) const
@@ -304,13 +322,19 @@ bool ActiveConstraintBase::IsDefaultPropertyAnimatable( Property::Index index ) 
 
 Property::Type ActiveConstraintBase::GetDefaultPropertyType( Property::Index index ) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_TYPES[index];
+  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
+  {
+    return DEFAULT_PROPERTY_TYPES[index];
+  }
+  else
+  {
+    // Index out-of-range
+    return Property::NONE;
+  }
 }
 
 void ActiveConstraintBase::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  // ProxyObject guarantees the property is writable and index is in range
   switch ( index )
   {
     case Dali::ActiveConstraint::WEIGHT:
@@ -336,7 +360,6 @@ Property::Value ActiveConstraintBase::GetDefaultProperty( Property::Index index 
 {
   Property::Value value;
 
-  // ProxyObject guarantees that index is within range
   switch ( index )
   {
     case Dali::ActiveConstraint::WEIGHT:

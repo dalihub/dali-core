@@ -21,6 +21,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/type-registry-impl.h>
+#include <dali/internal/event/common/property-index-ranges.h>
 
 namespace Dali
 {
@@ -108,6 +109,13 @@ SignalConnectorType::SignalConnectorType( TypeRegistration& typeRegistration, co
 TypeAction::TypeAction( TypeRegistration &registered, const std::string &name, TypeInfo::ActionFunction f)
 {
   Internal::TypeRegistry::Get()->RegisterAction( registered, name, f );
+}
+
+PropertyRegistration::PropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type, TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc )
+{
+  DALI_ASSERT_ALWAYS( ( index >= START_INDEX ) && ( index <= MAX_INDEX ) );
+
+  Internal::TypeRegistry::Get()->RegisterProperty( registered, name, index, type, setFunc, getFunc );
 }
 
 } // namespace Dali

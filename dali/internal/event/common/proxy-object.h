@@ -44,6 +44,7 @@ class Stage;
 class PropertyInputImpl;
 class ProxyObject;
 class Constraint;
+class TypeInfo;
 
 namespace SceneGraph
 {
@@ -204,6 +205,11 @@ public: // Property system interface from Internal::Object
   virtual Property::Value GetProperty(Property::Index index) const;
 
   /**
+   * @copydoc Dali::Handle::GetPropertyIndices()
+   */
+  virtual void GetPropertyIndices( Property::IndexContainer& indices ) const;
+
+  /**
    * @copydoc Dali::Internal::Object::RegisterProperty()
    */
   virtual Property::Index RegisterProperty(std::string name, const Property::Value& propertyValue);
@@ -312,6 +318,13 @@ private: // Default property extensions for derived classes
   virtual unsigned int GetDefaultPropertyCount() const = 0;
 
   /**
+   * Retrieve all the indices that are associated with the default properties supported by the derived class.
+   * @return A container of default property indices.
+   * @note The deriving class must not modify the existing elements in the container.
+   */
+  virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const = 0;
+
+  /**
    * Query how many default properties the derived class supports.
    * @pre Property::INVALID_INDEX < index < GetDefaultPropertyCount().
    * @return The number of default properties.
@@ -392,7 +405,16 @@ protected:
    */
   CustomPropertyLookup& GetCustomPropertyLookup() const;
 
+  /**
+   * Retrieves the TypeInfo for this object. Only retrieves it from the type-registry once and then stores a pointer
+   * to it locally there-after. The type info will not change during the life-time of the application.
+   * @return The type-info for this object (Can be NULL)
+   */
+  TypeInfo* GetTypeInfo() const;
+
 private:
+
+  mutable TypeInfo* mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
 
   Property::Index mNextCustomPropertyIndex; ///< The ID of the next custom property to be registered
 

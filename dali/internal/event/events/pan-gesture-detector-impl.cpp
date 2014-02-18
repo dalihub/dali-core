@@ -345,16 +345,35 @@ unsigned int PanGestureDetector::GetDefaultPropertyCount() const
   return DEFAULT_PROPERTY_COUNT;
 }
 
+void PanGestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
+{
+  indices.reserve( DEFAULT_PROPERTY_COUNT );
+
+  int index = DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
+  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
+  {
+    indices.push_back( index );
+  }
+}
+
 const std::string& PanGestureDetector::GetDefaultPropertyName( Property::Index index ) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_NAMES[index];
+  index -= DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
+  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
+  {
+    return DEFAULT_PROPERTY_NAMES[ index ];
+  }
+  else
+  {
+    // Index out-of-range... return empty string.
+    static const std::string INVALID_PROPERTY_NAME;
+    return INVALID_PROPERTY_NAME;
+  }
 }
 
 Property::Index PanGestureDetector::GetDefaultPropertyIndex(const std::string& name) const
 {
-  //Property::Index index = Property::INVALID_INDEX;
-  Property::Index index = 0;
+  Property::Index index = Property::INVALID_INDEX;
 
   DALI_ASSERT_DEBUG( NULL != mDefaultPropertyLookup );
 
@@ -382,8 +401,16 @@ bool PanGestureDetector::IsDefaultPropertyAnimatable(Property::Index index) cons
 
 Property::Type PanGestureDetector::GetDefaultPropertyType(Property::Index index) const
 {
-  // ProxyObject guarantees that index is within range
-  return DEFAULT_PROPERTY_TYPES[index];
+  index -= DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
+  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
+  {
+    return DEFAULT_PROPERTY_TYPES[ index ];
+  }
+  else
+  {
+    // Index out-of-range
+    return Property::NONE;
+  }
 }
 
 void PanGestureDetector::SetDefaultProperty( Property::Index index, const Property::Value& property )
@@ -400,7 +427,6 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
 {
   Property::Value value;
 
-  // ProxyObject guarantees that index is within range
   switch ( index )
   {
     case Dali::PanGestureDetector::SCREEN_POSITION:
