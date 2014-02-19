@@ -51,68 +51,29 @@ Image* Image::New()
   return new Image;
 }
 
-Image* Image::New( const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol )
-{
-  Image* image = new Image( loadPol, releasePol );
-
-  image->mRequest = image->mImageFactory.RegisterRequest( filename, NULL );
-
-  if( ! filename.empty() )
-  {
-    Vector2 size;
-    Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().LoadImageMetadata( filename, size );
-    image->mWidth = (int)size.width;
-    image->mHeight = (int)size.height;
-  }
-
-  if( Dali::Image::OnDemand == loadPol )
-  {
-    // load image on demand,
-    // ask for ticket on connect
-  }
-  else
-  {
-    // load image immediately
-    image->mTicket = image->mImageFactory.Load( image->mRequest.Get() );
-    image->mTicket->AddObserver( *image );
-  }
-
-  DALI_LOG_SET_OBJECT_STRING( image, filename );
-
-  return image;
-}
-
 Image* Image::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
   Image* image = new Image( loadPol, releasePol );
 
   if( ! filename.empty() )
   {
-    if( attributes.GetWidth() == 0 && attributes.GetHeight() == 0 )
-    {
-      // Only get actual file size if a requested size is not present.
-      Vector2 size;
-      Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().LoadImageMetadata( filename, size );
-      image->mWidth = (int)size.width;
-      image->mHeight = (int)size.height;
-    }
-    // @TODO: else, determine closest size to requested size
+    Vector2 closestSize;
+
+    Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( filename, attributes, closestSize );
+    image->mWidth = closestSize.width;
+    image->mHeight = closestSize.height;
   }
 
   image->mRequest = image->mImageFactory.RegisterRequest( filename, &attributes );
 
-  // Lazily load image data later, only when it is needed to draw something:
-  if( Dali::Image::OnDemand == loadPol )
+  if( Dali::Image::Immediate == loadPol )
   {
-    // Ask for ticket later, only on connect.
-  }
-  else
-  {
-    // Trigger loading of the image over on a resource thread eagerly as soon as it
+    // Trigger loading of the image on a seperate resource thread as soon as it
     // can be scheduled:
     image->mTicket = image->mImageFactory.Load( image->mRequest.Get() );
     image->mTicket->AddObserver( *image );
   }
+  // else lazily load image data later, only when it is needed to draw something:
 
   DALI_LOG_SET_OBJECT_STRING( image, filename );
 

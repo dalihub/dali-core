@@ -161,10 +161,11 @@ ResourceTicketPtr ImageFactory::Reload( Request* request )
       return ticket;
     }
 
-    /// @todo should obtain all attributes information from filesystem and check for compatibility (additional change in PlatformAbstraction)
     Vector2 size;
-    Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().LoadImageMetadata( request->url, size );
+    Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( request->url, *request->attributes, size );
+
     const ImageAttributes& attrib = static_cast<ImageTicket*>(ticket.Get())->GetAttributes();
+
     if( size == attrib.GetSize() )
     {
       mResourceClient.ReloadResource( ticket->GetId() );

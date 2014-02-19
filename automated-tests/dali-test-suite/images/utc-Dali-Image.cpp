@@ -754,7 +754,7 @@ static void UtcDaliImageGetImageSize()
 
   Vector2 size = Image::GetImageSize(gTestImageFilename);
 
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadImageMetadataFunc) );
+  DALI_TEST_CHECK( application.GetPlatform().GetTrace().FindMethod("GetClosestImageSize"));
   DALI_TEST_EQUALS( size, testSize, TEST_LOCATION);
 }
 

@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/resources/resource-client.h>
+#include <dali/integration-api/platform-abstraction.h>
 
 namespace Dali
 {
@@ -50,6 +51,13 @@ Dali::EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedI
   DALI_ASSERT_ALWAYS( buffer->GetVector().Size() >= encodedImageByteCount );
 
   memcpy( &(buffer->GetVector()[0]), encodedImage, encodedImageByteCount );
+
+  // Get image size from buffer
+  Vector2 size;
+  Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( buffer, attributes, size );
+  image->mWidth = (unsigned int) size.width;
+  image->mHeight = (unsigned int) size.height;
+
   ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
   ResourceTicketPtr ticket = resourceClient.DecodeResource( resourceType, buffer );
   if( ticket )
@@ -65,5 +73,4 @@ Dali::EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedI
 }
 
 } // namespace Internal
-
 } // namespace Dali

@@ -33,8 +33,7 @@ const char* const Image::SIGNAL_IMAGE_UPLOADED = "uploaded";
 Vector2 Image::GetImageSize(const std::string fileName)
 {
   Vector2 size;
-  Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().LoadImageMetadata(fileName, size);
-
+  Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize(fileName, ImageAttributes::DEFAULT_ATTRIBUTES, size);
   return size;
 }
 
@@ -58,7 +57,9 @@ Image Image::New(const std::string& filename)
 
 Image Image::New(const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol)
 {
-  Internal::Image* internal = Internal::Image::New(filename, loadPol, releasePol);
+  Internal::Image* internal = Internal::Image::New(filename,
+                                                   Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
+                                                   loadPol, releasePol);
   return Image(internal);
 }
 

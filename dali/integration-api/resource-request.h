@@ -77,12 +77,12 @@ public:
   }
 
   /**
-   * Used to save a resource in the native filesystem.
+   * Used to request or save a resource from/to the native filesystem.
    * @param[in] newId         A unique ID for this request.
-   * @param[in] resourceType  The type of resource to save.
-   * @param[in] resourcePath  The location where the resource should be saved.
-   * @param[in] resourcePtr   The resource itself.
-   * @param[in] savePriority  The priority of the save request.
+   * @param[in] resourceType  The type of resource.
+   * @param[in] resourcePath  The location of the resource / where the resource should be saved.
+   * @param[in] resourcePtr   The resource to decode / save.
+   * @param[in] savePriority  The priority of the request.
    */
   ResourceRequest(ResourceId newId,
                   const ResourceType& resourceType,

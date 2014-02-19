@@ -77,12 +77,30 @@ public:
   // Resource Loading
 
   /**
-   * Load metadata from an image on the native filesystem. This is a synchronous request.
-   * This function is used when the size of an image needs to be determined before it has loaded.
-   * @param[in] filename name of the string to load.
-   * @param[out] size Size of the image.
+   * Determine the size of an image the resource loaders will provide when given the same
+   * image attributes.
+   * This is a synchronous request.
+   * This function is used to determine the size of an image before it has loaded.
+   * @param[in] filename name of the image.
+   * @param[in] attributes The attributes used to load the image
+   * @param[out] closestSize Size of the image that will be loaded.
    */
-  virtual void LoadImageMetadata(const std::string filename, Vector2 &size) = 0;
+  virtual void GetClosestImageSize( const std::string& filename,
+                                    const ImageAttributes& attributes,
+                                    Vector2& closestSize ) = 0;
+
+  /**
+   * Determine the size of an image the resource loaders will provide when given the same
+   * image attributes.
+   * This is a synchronous request.
+   * This function is used to determine the size of an image before it has loaded.
+   * @param[in] resourceBuffer A pointer to an encoded image buffer
+   * @param[in] attributes The attributes used to load the image
+   * @param[out] closestSize Size of the image that will be loaded.
+   */
+  virtual void GetClosestImageSize( ResourcePointer resourceBuffer,
+                                    const ImageAttributes& attributes,
+                                    Vector2& closestSize ) = 0;
 
   /**
    * Request a resource from the native filesystem. This is an asynchronous request.

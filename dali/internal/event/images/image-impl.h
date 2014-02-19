@@ -77,18 +77,6 @@ public:
   /**
    * Creates object and loads image from filesystem
    * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
-   * @param [in] filename the path of the image on the filesystem
-   * @param [in] loadPol controls time of loading a resource from the filesystem (default: load when Image is created).
-   * @param [in] releasePol optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
-   * @return a pointer to a newly created object.
-   */
-  static Image* New(const std::string& filename,
-                    LoadPolicy loadPol=ImageLoadPolicyDefault,
-                    ReleasePolicy releasePol=ImageReleasePolicyDefault);
-
-  /**
-   * Creates object and loads image from filesystem
-   * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @param [in] filename   the path of the image on the filesystem
    * @param [in] attributes requested parameters for loading (size, cropping etc.)
    *                        if width or height is specified as 0, the natural size will be used.
@@ -97,9 +85,13 @@ public:
    * @return a pointer to a newly created object.
    */
   static Image* New(const std::string& filename,
-                    const Dali::ImageAttributes& attributes,
+                    const Dali::ImageAttributes& attributes=Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
                     LoadPolicy loadPol=ImageLoadPolicyDefault,
                     ReleasePolicy releasePol=ImageReleasePolicyDefault);
+
+
+
+public:
 
   /**
    * Creates object with already loaded NativeImage

@@ -113,15 +113,22 @@ public:
     mTrace.PushCall("Resume", "");
   }
 
-  /**
-   * @copydoc PlatformAbstraction::LoadImageMetadata()
-   */
-  virtual void LoadImageMetadata(const std::string fileName, Vector2 &size)
+  virtual void GetClosestImageSize( const std::string& filename,
+                                    const ImageAttributes& attributes,
+                                    Vector2& closestSize)
   {
-    size = mSize;
-
-    mTrace.PushCall("LoadImageMetadata", "");
+    closestSize = mSize;
+    mTrace.PushCall("GetClosestImageSize", "");
   }
+
+  virtual void GetClosestImageSize( Integration::ResourcePointer resourceBuffer,
+                                    const ImageAttributes& attributes,
+                                    Vector2& closestSize)
+  {
+    closestSize = mSize;
+    mTrace.PushCall("GetClosestImageSize", "");
+  }
+
 
   /**
    * @copydoc PlatformAbstraction::LoadResource()
@@ -476,7 +483,6 @@ public: // TEST FUNCTIONS
     GetTimeMicrosecondsFunc,
     SuspendFunc,
     ResumeFunc,
-    LoadImageMetadataFunc,
     LoadResourceFunc,
     SaveResourceFunc,
     SaveFileFunc,
@@ -538,7 +544,6 @@ public: // TEST FUNCTIONS
       case GetTimeMicrosecondsFunc:             return mTrace.FindMethod("GetTimeMicroseconds");
       case SuspendFunc:                         return mTrace.FindMethod("Suspend");
       case ResumeFunc:                          return mTrace.FindMethod("Resume");
-      case LoadImageMetadataFunc:               return mTrace.FindMethod("LoadImageMetadata");
       case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource");
       case SaveResourceFunc:                    return mTrace.FindMethod("SaveResource");
       case LoadFileFunc:                        return mTrace.FindMethod("LoadFile");
