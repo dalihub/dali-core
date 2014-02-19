@@ -29,6 +29,30 @@
 namespace Dali DALI_IMPORT_API
 {
 
+/**
+ * DALI_COMPOSE_SHADER macro provides convenient way to write shader source code.
+ * We normally use double quotation marks to write a string such as "Hello World".
+ * However many symbols are needed to add multiple lines of string.
+ * We don't need to write quotation marks using this macro at every line.
+ *
+ * [An example of double quotation marks usage]
+ * const string FRAGMENT_SHADER_SOURCE = \
+ * "  void main()\n"
+ * "  {\n"
+ * "    gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
+ * "  }\n";
+ *
+ * [An example of DALI_COMPOSE_SHADER usage]
+ * const string FRAGMENT_SHADER_SOURCE = DALI_COMPOSE_SHADER (
+ *   void main()
+ *   {
+ *     gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);
+ *     vTexCoord = aTexCoord;
+ *   }
+ * );
+ */
+#define DALI_COMPOSE_SHADER(STR) #STR
+
 class Constraint;
 class Image;
 struct Vector2;
