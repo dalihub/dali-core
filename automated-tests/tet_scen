@@ -108,6 +108,6 @@ image-factory
 # If you just want to compile/execute only certain TET cases, then you can do as shown below.
 # Try not to check in your changes to the debug section.
 debug
-        /dali-test-suite/actors/utc-Dali-Handle
+        /dali-test-suite/actors/utc-Dali-ImageActor
 
 # EOF

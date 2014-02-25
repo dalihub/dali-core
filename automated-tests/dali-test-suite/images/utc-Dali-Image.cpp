@@ -750,7 +750,7 @@ static void UtcDaliImageGetImageSize()
   tet_infoline("UtcDaliImageGetImageSize - Image::GetImageSize()");
 
   Vector2 testSize(8.0f, 16.0f);
-  platform.SetImageMetaDataSize(testSize);
+  platform.SetClosestImageSize(testSize);
 
   Vector2 size = Image::GetImageSize(gTestImageFilename);
 
@@ -919,7 +919,7 @@ static void UtcDaliImageSignalUploaded()
 
   // set up image in fake platform abstraction
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   Image image = Image::New(gTestImageFilename);
   image.LoadingFinishedSignal().Connect( SignalLoadHandler );

@@ -263,7 +263,7 @@ void TextActor::SetText(const Dali::Text& text)
   SetText( utfCodes );
 }
 
-void TextActor::SetNaturalSize()
+void TextActor::SetToNaturalSize()
 {
   // ignore size set by application
   mUsingNaturalSize = true;

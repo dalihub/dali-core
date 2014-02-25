@@ -180,6 +180,12 @@ public:
   unsigned int GetHeight() const;
 
   /**
+   * Return the natural size of the image.
+   * This is the size that the loaded image will take
+   */
+  Vector2 GetNaturalSize() const;
+
+  /**
    * @copydoc Dali::Image::GetFilename()
    */
   const std::string& GetFilename() const;

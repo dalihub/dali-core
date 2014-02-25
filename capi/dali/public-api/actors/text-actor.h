@@ -233,7 +233,7 @@ public:
    * After this method the text actor always uses the natural size of the text
    * when SetText is called unless SetSize is called to override the size.
    */
-  void SetNaturalSize();
+  void SetToNaturalSize();
 
   /**
    * Get the font used to display the text label displayed by the actor

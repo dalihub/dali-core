@@ -332,7 +332,7 @@ void ReloadImage(TestApplication& application, Image image)
   application.GetPlatform().ClearReadyResources();
   application.GetPlatform().DiscardRequest();
   application.GetPlatform().ResetTrace();
-  application.GetPlatform().SetImageMetaDataSize(Vector2(80.0f, 80.0f)); // Ensure reload is called.
+  application.GetPlatform().SetClosestImageSize(Vector2(80.0f, 80.0f)); // Ensure reload is called.
   image.Reload();
 }
 

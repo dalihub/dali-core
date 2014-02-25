@@ -110,6 +110,7 @@ ImageActorPtr ImageActor::New( Image* image )
   {
     actor->mImageNext.Set( image, false );
     actor->OnImageSet( *image );
+    actor->SetNaturalSize( *image );
   }
 
   return actor;
@@ -167,9 +168,27 @@ Dali::Image ImageActor::GetImage()
   return mImageAttachment->GetImage();
 }
 
+void ImageActor::SetToNaturalSize()
+{
+  mUsingNaturalSize = true;
+  Dali::Image image = mImageAttachment->GetImage();
+
+  if( image )
+  {
+    SetNaturalSize( GetImplementation(image) );
+  }
+}
+
 void ImageActor::SetPixelArea( const PixelArea& pixelArea )
 {
   mImageAttachment->SetPixelArea( pixelArea );
+
+  if( mUsingNaturalSize )
+  {
+    mInternalSetSize = true;
+    SetSize(pixelArea.width, pixelArea.height);
+    mInternalSetSize = false;
+  }
 }
 
 const ImageActor::PixelArea& ImageActor::GetPixelArea() const
@@ -185,6 +204,17 @@ bool ImageActor::IsPixelAreaSet() const
 void ImageActor::ClearPixelArea()
 {
   mImageAttachment->ClearPixelArea();
+
+  if( mUsingNaturalSize )
+  {
+    Dali::Image image = mImageAttachment->GetImage();
+    if( image )
+    {
+      mInternalSetSize = true;
+      SetSize(GetImplementation(image).GetNaturalSize());
+      mInternalSetSize = false;
+    }
+  }
 }
 
 void ImageActor::SetStyle( Style style )
@@ -238,7 +268,7 @@ Vector2 ImageActor::GetCurrentImageSize() const
   Vector3 currentSize;
 
   // get the texture size / pixel area if only a subset of it is displayed
-  if (IsPixelAreaSet())
+  if( IsPixelAreaSet() )
   {
     PixelArea area(GetPixelArea());
     return Vector2(area.width, area.height );
@@ -257,7 +287,8 @@ RenderableAttachment& ImageActor::GetRenderableAttachment() const
 
 ImageActor::ImageActor()
 : RenderableActor(),
-  mCustomSizeSet( false ),
+  mUsingNaturalSize(true),
+  mInternalSetSize(false),
   mFadeIn( false ),
   mFadeInitial( true ),
   mLoadedConnection( this ),
@@ -284,10 +315,39 @@ void ImageActor::OnImageSet( Image& image )
   }
 }
 
+void ImageActor::SetNaturalSize( Image& image )
+{
+  if( mUsingNaturalSize )
+  {
+    Vector2 size;
+    if( IsPixelAreaSet() )
+    {
+      PixelArea area(GetPixelArea());
+      size.width = area.width;
+      size.height = area.height;
+    }
+    else
+    {
+      size = image.GetNaturalSize();
+    }
+
+    mInternalSetSize = true;
+    SetSize( size );
+    mInternalSetSize = false;
+  }
+}
+
 void ImageActor::OnSizeSet( const Vector3& targetSize )
 {
-  // True if SizeSet() has ever been called
-  mCustomSizeSet = true;
+  if( !mInternalSetSize )
+  {
+    mUsingNaturalSize = false;
+  }
+}
+
+void ImageActor::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
+{
+  mUsingNaturalSize = false;
 }
 
 void ImageActor::OnStageConnectionInternal()
@@ -315,18 +375,22 @@ void ImageActor::ImageLoaded( Dali::Image image )
   // blank frames during load / reload.
   mImageAttachment->SetImage( &GetImplementation( image ) );
 
-  // If size has never been set
-  if( !mCustomSizeSet )
+  // If size has never been set by application
+  if( mUsingNaturalSize )
   {
     // If a pixel area has been set, use this size
-    if (mImageAttachment->IsPixelAreaSet())
+    if( IsPixelAreaSet() )
     {
-      const PixelArea& area = mImageAttachment->GetPixelArea();
+      const PixelArea& area = GetPixelArea();
+      mInternalSetSize = true;
       SetSize(area.width, area.height);
+      mInternalSetSize = false;
     }
     else
     {
-      SetSize(image.GetWidth(), image.GetHeight());
+      mInternalSetSize = true;
+      SetSize( GetImplementation(image).GetNaturalSize() );
+      mInternalSetSize = false;
     }
   }
 

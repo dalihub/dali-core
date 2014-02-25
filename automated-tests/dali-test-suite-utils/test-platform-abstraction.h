@@ -117,7 +117,7 @@ public:
                                     const ImageAttributes& attributes,
                                     Vector2& closestSize)
   {
-    closestSize = mSize;
+    closestSize = mClosestSize;
     mTrace.PushCall("GetClosestImageSize", "");
   }
 
@@ -125,7 +125,7 @@ public:
                                     const ImageAttributes& attributes,
                                     Vector2& closestSize)
   {
-    closestSize = mSize;
+    closestSize = mClosestSize;
     mTrace.PushCall("GetClosestImageSize", "");
   }
 
@@ -658,9 +658,9 @@ public: // TEST FUNCTIONS
     mRequest = NULL;
   }
 
-  void SetImageMetaDataSize(const Vector2& size)
+  void SetClosestImageSize(const Vector2& size)
   {
-    mSize = size;
+    mClosestSize = size;
   }
 
   void SetLoadFileResult( bool result, std::vector< unsigned char >& buffer )
@@ -705,6 +705,7 @@ private:
   Resources                     mResources;
   Integration::ResourceRequest* mRequest;
   Vector2                       mSize;
+  Vector2                       mClosestSize;
   bool                          mReadGlobalMetricsResult;
   bool                          mReadMetricsResult;
   Integration::GlobalMetrics mReadGlobalMetrics;

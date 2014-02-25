@@ -97,9 +97,9 @@ public:
   void SetText(const TextArray& utfCodes);
 
   /**
-   * @copydoc Dali::TextActor::SetNaturalSize()
+   * @copydoc Dali::TextActor::SetToNaturalSize()
    */
-  void SetNaturalSize();
+  void SetToNaturalSize();
 
   /**
    * @copydoc Dali::TextActor::GetFont()

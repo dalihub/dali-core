@@ -234,7 +234,7 @@ static void UtcDaliImageFactoryCompatibleResource01()
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   // request with default attributes ( size is 0,0 )
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
@@ -266,7 +266,7 @@ static void UtcDaliImageFactoryCompatibleResource02()
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   // request with default attributes ( size is 0,0 )
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
@@ -303,7 +303,7 @@ static void UtcDaliImageFactoryCompatibleResource03()
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   // this time use defined attributes, nut just NULL
   ImageAttributes attr = ImageAttributes::New();
@@ -337,7 +337,7 @@ static void UtcDaliImageFactoryReload01()
   tet_infoline( "UtcDaliImageFactoryReload01 - Reload unchanged image" );
 
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
@@ -360,7 +360,7 @@ static void UtcDaliImageFactoryReload02()
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
   ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
@@ -417,7 +417,7 @@ static void UtcDaliImageFactoryReload03()
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   Vector2 testSize( 80.0f, 80.0f );
-  application.GetPlatform().SetImageMetaDataSize( testSize );
+  application.GetPlatform().SetClosestImageSize( testSize );
 
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
   ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
@@ -429,7 +429,7 @@ static void UtcDaliImageFactoryReload03()
   EmulateImageLoaded( application, 80, 80 );
 
   Vector2 newSize( 192.0f, 192.0f );
-  application.GetPlatform().SetImageMetaDataSize( newSize );
+  application.GetPlatform().SetClosestImageSize( newSize );
 
   // Image file changed size, new resource request should be issued
   ResourceTicketPtr ticket2 = imageFactory.Reload( req.Get() );
@@ -448,7 +448,7 @@ static void UtcDaliImageFactoryReload04()
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
   ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
@@ -506,7 +506,7 @@ static void UtcDaliImageFactoryReload05()
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   RequestPtr req;
   ImageAttributes attr = ImageAttributes::New();
@@ -568,7 +568,7 @@ static void UtcDaliImageFactoryReload06()
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetImageMetaDataSize(testSize);
+  application.GetPlatform().SetClosestImageSize(testSize);
 
   // request with default attributes ( size is 0,0 )
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
@@ -595,7 +595,7 @@ static void UtcDaliImageFactoryReload06()
   DALI_TEST_EQUALS( ticket->GetId(), ticket2->GetId(), TEST_LOCATION ); // same resource
 
   Vector2 newSize(512.0f, 512.0f);
-  application.GetPlatform().SetImageMetaDataSize(newSize);
+  application.GetPlatform().SetClosestImageSize(newSize);
 
   // reload fixed size (192,192) request
   ticket2 = imageFactory.Reload( req2.Get() );

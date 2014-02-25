@@ -44,6 +44,23 @@ class ImageActor;
  * Allows the developer to add an actor to stage which displays the content of an Image object.
  *
  * By default CullFaceMode is set to CullNone to enable the ImageActor to be viewed from all angles.
+ *
+ * If an ImageActor is created without setting size, then the actor takes the size of the image -
+ * this is the natural size.
+ * Setting a size on the ImageActor, e.g through the SetSize api or through an animation will
+ * stop the natural size being used.
+ *
+ * Such a set size can be changed back to the image's size by calling SetToNaturalSize().
+ *
+ * If a pixel area is set on an ImageActor with natural size, the actor size will change
+ * to match the pixel area. If a pixel area is set on an ImageActor that has had it's size set,
+ * then the size doesn't change, and the partial image will be stretched to fill the set size.
+ *
+ * Clearing the pixel area on an Image actor with natural size will cause the actor to show the
+ * whole image again, and will change size back to that of the image.
+ *
+ * Clearing the pixel area on an Image actor with a set size will cause the actor to show the
+ * whole image again, but will not change the image size.
  */
 class DALI_IMPORT_API ImageActor : public RenderableActor
 {
@@ -139,9 +156,8 @@ public:
   static ImageActor New();
 
   /**
-   * Create a image actor object.
-   * When the image is loaded the actors size will reset to the image size,
-   * unless a custom size chosen via Actor:SetSize().
+   * Create a image actor object.  The actor will take the image's
+   * natural size unless a custom size is chosen, e.g. via Actor:SetSize()
    * @pre image must be initialized.
    * @param[in] image The image to display.
    * @return A handle to a newly allocated actor.
@@ -150,8 +166,8 @@ public:
 
   /**
    * Create a image actor object.
-   * When the image is loaded the actors size will reset to the pixelArea,
-   * unless a custom size was chosen via Actor:SetSize().
+   * When the image is loaded the actor's size will reset to the pixelArea,
+   * unless a custom size was chosen, e.g. via Actor:SetSize().
    * @pre image must be initialized.
    * @param [in] image The image to display.
    * @param [in] pixelArea The area of the image to display.
@@ -181,8 +197,9 @@ public:
 
   /**
    * Set the image rendered by the actor.
-   * When the image is loaded the actors size will be reset to the image size,
-   * unless a custom size was chosen via Actor:SetSize().
+   * When the image is loaded the actor's size will be reset to the image size,
+   * unless a custom size was chosen, e.g. via Actor:SetSize() or a pixel area
+   * was set.
    * @note The old image will continue to be displayed until the given image has loaded.
    * @pre image must be initialized.
    * @param [in] image The image to display.
@@ -196,9 +213,19 @@ public:
   Image GetImage();
 
   /**
+   * Tell the image actor to use the natural size of the current image
+   * or future images. Calling SetSize on this actor or animating the size
+   * of the actor overrides this behaviour.
+   * @post The image actor uses the natural image size after an image
+   * has been loaded.
+   * @note Actor::SetSizeSignal() will be triggered if there is a current image.
+   */
+  void SetToNaturalSize();
+
+  /**
    * Set a region of the image to display, in pixels.
-   * When the image is loaded the actors size will be reset to the pixelArea,
-   * unless a custom size chosen via Actor:SetSize().
+   * When the image is loaded the actor's size will be reset to the pixelArea,
+   * unless a custom size was chosen, e.g. via Actor:SetSize().
    * Note! PixelArea should be inside the image data size. It gets clamped by GL
    * @pre image must be initialized.
    * @param [in] pixelArea The area of the image to display.
@@ -222,6 +249,8 @@ public:
 
   /**
    * Remove any pixel areas specified with SetPixelArea; the entire image will be displayed.
+   * The actor size will change to that of the Image unless a custom size was set, e.g. via
+   * Actor::SetSize().
    * @pre image must be initialized.
    */
   void ClearPixelArea();

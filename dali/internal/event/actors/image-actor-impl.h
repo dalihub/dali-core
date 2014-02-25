@@ -81,7 +81,7 @@ public:
   /**
    * Set the image rendered by the actor's attachment.
    * When the image is loaded the actors size will be reset to the image size,
-   * unless a custom size chosen via Actor:SetSize().
+   * unless a custom size is chosen via Actor:SetSize().
    * The old image will continue to be displayed until the new image has loaded
    * @param [in] image A pointer to the image to display or NULL not to display anything.
    */
@@ -92,6 +92,11 @@ public:
    * @return The image (uninitialized Image object in case the ImageActor does not display anything).
    */
   Dali::Image GetImage();
+
+  /**
+   * @copydoc Dali::ImageActor::SetToNaturalSize()
+   */
+  void SetToNaturalSize();
 
   /**
    * Set a region of the image to display, in pixels.
@@ -240,11 +245,20 @@ private:
   // Helper for overloads of SetImage().
   void OnImageSet( Image& image );
 
+  // Helper to set the actor to the image's natural size
+  void SetNaturalSize( Image& image );
+
+
   /**
    * From Actor.
    * This is called after SizeSet() has been called.
    */
   virtual void OnSizeSet( const Vector3& targetSize );
+
+  /**
+   * @copydoc Actor::OnSizeAnimation( Animation& animation, const Vector3& targetSize )
+   */
+  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
 
   /**
    * From Actor; used to trigger fade-in animations.
@@ -273,9 +287,10 @@ private:
   ImageConnector     mImageNext;       ///< Manages the Image this ImageActor will show (used when changing displayed image)
 
   // flags, compressed to bitfield (uses only 4 bytes)
-  bool mCustomSizeSet:1; ///< True if SizeSet() has ever been called
-  bool mFadeIn:1;        ///< True if fade in animation is enabled
-  bool mFadeInitial:1;   ///< True if fading in for the first time
+  bool mUsingNaturalSize:1; ///< True only when the actor is using
+  bool mInternalSetSize:1;  ///< True whilst setting size internally, false at all other times
+  bool mFadeIn:1;           ///< True if fade in animation is enabled
+  bool mFadeInitial:1;      ///< True if fading in for the first time
 
   SlotDelegate<ImageActor> mLoadedConnection; ///< Tracks the connection to the "loading finished" signal
 

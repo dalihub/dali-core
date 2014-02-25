@@ -132,9 +132,9 @@ void TextActor::SetText(const Text& text)
   GetImplementation(*this).SetText(text);
 }
 
-void TextActor::SetNaturalSize()
+void TextActor::SetToNaturalSize()
 {
-  GetImplementation(*this).SetNaturalSize();
+  GetImplementation(*this).SetToNaturalSize();
 }
 
 Font TextActor::GetFont() const

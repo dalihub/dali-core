@@ -773,7 +773,7 @@ static void UtcDaliTextActorAutomaticSizeSet()
   DALI_TEST_EQUALS( Vector2( 10.0f, 11.0f ), actor.GetCurrentSize().GetVectorXY(), TEST_LOCATION );
 
   // set text to its natural size
-  actor.SetNaturalSize();
+  actor.SetToNaturalSize();
   // render a frame
   application.SendNotification();
   application.Render();
@@ -831,7 +831,7 @@ static void UtcDaliTextActorAutomaticSizeSetAnimation()
   DALI_TEST_EQUALS( animationTargetSize, actor.GetCurrentSize(), TEST_LOCATION );
 
   // set text to its natural size
-  actor.SetNaturalSize();
+  actor.SetToNaturalSize();
   // render a frame
   application.SendNotification();
   application.Render();

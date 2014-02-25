@@ -94,6 +94,11 @@ Image ImageActor::GetImage()
   return GetImplementation(*this).GetImage();
 }
 
+void ImageActor::SetToNaturalSize()
+{
+  GetImplementation(*this).SetToNaturalSize();
+}
+
 void ImageActor::SetPixelArea(const PixelArea& pixelArea)
 {
   GetImplementation(*this).SetPixelArea(pixelArea);

@@ -230,6 +230,11 @@ unsigned int Image::GetHeight() const
   }
 }
 
+Vector2 Image::GetNaturalSize() const
+{
+  return Vector2( mWidth, mHeight );
+}
+
 void Image::Connect()
 {
   ++mConnectionCount;
