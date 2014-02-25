@@ -477,6 +477,7 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
 }
 
 Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index index,
+                                                                int componentIndex,
                                                                 const Dali::PropertyCondition& condition)
 {
   if ( ( index >= DEFAULT_PROPERTY_MAX_COUNT )&&( mCustomProperties ) )
@@ -490,7 +491,7 @@ Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index 
   Dali::Handle self(this);
   Property target( self, index );
 
-  PropertyNotificationPtr internal = PropertyNotification::New( target, condition );
+  PropertyNotificationPtr internal = PropertyNotification::New( target, componentIndex, condition );
   Dali::PropertyNotification propertyNotification(internal.Get());
 
   if( !mPropertyNotifications )
@@ -500,14 +501,6 @@ Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index 
   mPropertyNotifications->push_back(propertyNotification);
 
   return propertyNotification;
-}
-
-// deprecated
-Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index index,
-                                                                const Dali::PropertyCondition& condition,
-                                                                PropertyNotifyCallbackType callback)
-{
-  return AddPropertyNotification(index, condition);
 }
 
 void ProxyObject::RemovePropertyNotification(Dali::PropertyNotification propertyNotification)

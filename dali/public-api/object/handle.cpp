@@ -118,7 +118,14 @@ Property::Value Handle::GetProperty(Property::Index index) const
 Dali::PropertyNotification Handle::AddPropertyNotification(Property::Index index,
                                                            const PropertyCondition& condition)
 {
-  return GetImplementation(*this).AddPropertyNotification( index, condition );
+  return GetImplementation(*this).AddPropertyNotification( index, -1, condition );
+}
+
+Dali::PropertyNotification Handle::AddPropertyNotification(Property::Index index,
+                                                           int componentIndex,
+                                                           const PropertyCondition& condition)
+{
+  return GetImplementation(*this).AddPropertyNotification( index, componentIndex, condition );
 }
 
 void Handle::RemovePropertyNotification(Dali::PropertyNotification propertyNotification)

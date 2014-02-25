@@ -103,14 +103,8 @@ public:
    * @copydoc Dali::Handle::AddPropertyNotification()
    */
   virtual Dali::PropertyNotification AddPropertyNotification(Property::Index index,
+                                                             int componentIndex,
                                                              const Dali::PropertyCondition& condition) = 0;
-
-  /**
-   * @copydoc Dali::Handle::AddPropertyNotification(Property::Index index, const PropertyCondition& condition, PropertyNotifyCallbackType callback)
-   */
-  virtual Dali::PropertyNotification AddPropertyNotification(Property::Index index,
-                                                             const Dali::PropertyCondition& condition,
-                                                             PropertyNotifyCallbackType callback) = 0;
 
   /**
    * @copydoc Dali::Handle::RemovePropertyNotification()

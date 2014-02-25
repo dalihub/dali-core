@@ -65,10 +65,12 @@ public:
   /**
    * Create a new PropertyNotification object.
    * @param[in] target The target object to inspect
+   * @param[in] componentIndex Index to the component of a complex property such as a Vector
    * @param[in] condition The condition for this notification.
    * @return A smart-pointer to the newly allocated PropertyNotification.
    */
   static PropertyNotificationPtr New(Property& target,
+                                     int componentIndex,
                                      const Dali::PropertyCondition& condition);
 
 public:
@@ -144,11 +146,13 @@ protected:
    * @param[in] updateManager The UpdateManager associated with this PropertyNotification.
    * @param[in] propertyNotificationManager The property notification manager object.
    * @param[in] target The target property.
+   * @param[in] componentIndex Index to the component of a complex property such as a Vector
    * @param[in] condition The condition for this notification.
    */
   PropertyNotification(SceneGraph::UpdateManager& updateManager,
                        PropertyNotificationManager& propertyNotificationManager,
                        Property& target,
+                       int componentIndex,
                        const Dali::PropertyCondition& condition);
 
   /**
@@ -184,12 +188,14 @@ protected:
 private:
 
   PropertyNotificationManager& mPropertyNotificationManager;  ///< Reference to the property notification manager
-  ProxyObject* mProxy;                                        ///< Target object, not owned by PropertyNotification.
-  Property::Index mProxyPropertyIndex;                        ///< Target object's property index of interest.
-  Dali::PropertyCondition mCondition;                         ///< The PropertyCondition handle.
-  RawArgumentContainer mRawConditionArgs;                     ///< The Raw Condition args. (float type)
-  NotifyMode mNotifyMode;                                     ///< The current notification mode.
-  bool       mNotifyResult;                                   ///< The result of the last condition check that caused a signal emit
+  ProxyObject*                 mProxy;                        ///< Target object, not owned by PropertyNotification.
+  Property::Index              mProxyPropertyIndex;           ///< Target object's property index of interest.
+  Property::Type               mPropertyType;                 ///< The type of property to evaluate
+  int                          mComponentIndex;               ///< Index to a specific component of a complex property such as a Vector
+  Dali::PropertyCondition      mCondition;                    ///< The PropertyCondition handle.
+  RawArgumentContainer         mRawConditionArgs;             ///< The Raw Condition args. (float type)
+  NotifyMode                   mNotifyMode;                   ///< The current notification mode.
+  bool                         mNotifyResult;                 ///< The result of the last condition check that caused a signal emit
 };
 
 } // namespace Internal

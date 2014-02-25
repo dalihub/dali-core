@@ -37,17 +37,19 @@ namespace SceneGraph
 PropertyNotification* PropertyNotification::New(ProxyObject& proxy,
                                                 Property::Index propertyIndex,
                                                 Property::Type propertyType,
+                                                int componentIndex,
                                                 ConditionType condition,
                                                 const RawArgumentContainer& arguments,
                                                 NotifyMode notifyMode)
 {
-  return new PropertyNotification( proxy, propertyIndex, propertyType, condition, arguments, notifyMode );
+  return new PropertyNotification( proxy, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode );
 }
 
 
 PropertyNotification::PropertyNotification(ProxyObject& proxy,
                                            Property::Index propertyIndex,
                                            Property::Type propertyType,
+                                           int componentIndex,
                                            ConditionType condition,
                                            const RawArgumentContainer& arguments,
                                            NotifyMode notifyMode)
@@ -55,7 +57,7 @@ PropertyNotification::PropertyNotification(ProxyObject& proxy,
   mPropertyIndex(propertyIndex),
   mPropertyType(propertyType),
   mProperty(NULL),
-  mComponentIndex(INVALID_PROPERTY_COMPONENT_INDEX),
+  mComponentIndex(componentIndex),
   mConditionType(condition),
   mArguments(arguments),
   mValid(false)
@@ -97,7 +99,12 @@ PropertyNotification::PropertyNotification(ProxyObject& proxy,
   }
 
   mProperty = mProxy->GetSceneObjectInputProperty( mPropertyIndex );
-  mComponentIndex = mProxy->GetPropertyComponentIndex( mPropertyIndex );
+  int internalComponentIndex = mProxy->GetPropertyComponentIndex(mPropertyIndex);
+  if( internalComponentIndex != INVALID_PROPERTY_COMPONENT_INDEX )
+  {
+    // override the one passed in
+    mComponentIndex = internalComponentIndex;
+  }
 }
 
 PropertyNotification::~PropertyNotification()

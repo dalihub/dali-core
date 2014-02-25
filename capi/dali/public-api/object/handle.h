@@ -228,8 +228,23 @@ public:
    * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @param [in] index The index of the property.
    * @param [in] condition The notification will be triggered when this condition is satisfied.
+   *
+   * @return A handle to the newly created PropertyNotification
    */
   PropertyNotification AddPropertyNotification(Property::Index index,
+                                               const PropertyCondition& condition);
+
+  /**
+   * Add a property notification to this object.
+   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
+   * @param [in] index The index of the property.
+   * @param [in] componentIndex Index to the component of a complex property such as a Vector
+   * @param [in] condition The notification will be triggered when this condition is satisfied.
+   *
+   * @return A handle to the newly created PropertyNotification
+   */
+  PropertyNotification AddPropertyNotification(Property::Index index,
+                                               int componentIndex,
                                                const PropertyCondition& condition);
 
   /**

@@ -217,14 +217,8 @@ public: // Property system interface from Internal::Object
    * @copydoc Dali::Handle::AddPropertyNotification()
    */
   virtual Dali::PropertyNotification AddPropertyNotification(Property::Index index,
+                                                             int componentIndex,
                                                              const Dali::PropertyCondition& condition);
-
-  /**
-   * @copydoc Dali::Handle::AddPropertyNotification(Property::Index index, const PropertyCondition& condition, PropertyNotifyCallbackType callback)
-   */
-  virtual Dali::PropertyNotification AddPropertyNotification(Property::Index index,
-                                                             const Dali::PropertyCondition& condition,
-                                                             PropertyNotifyCallbackType callback);
 
   /**
    * @copydoc Dali::Handle::RemovePropertyNotification()

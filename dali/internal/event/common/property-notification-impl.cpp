@@ -40,6 +40,7 @@ namespace Internal
 {
 
 PropertyNotificationPtr PropertyNotification::New(Property& target,
+                                                  int componentIndex,
                                                   const Dali::PropertyCondition& condition)
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
@@ -51,6 +52,7 @@ PropertyNotificationPtr PropertyNotification::New(Property& target,
   PropertyNotificationPtr propertyNotification = new PropertyNotification(updateManager,
                                                                           propertyNotificationManager,
                                                                           target,
+                                                                          componentIndex,
                                                                           condition);
 
   return propertyNotification;
@@ -59,11 +61,14 @@ PropertyNotificationPtr PropertyNotification::New(Property& target,
 PropertyNotification::PropertyNotification(UpdateManager& updateManager,
                                            PropertyNotificationManager& propertyNotificationManager,
                                            Property& target,
+                                           int componentIndex,
                                            const Dali::PropertyCondition& condition)
 : mUpdateManager(updateManager),
   mPropertyNotification(NULL),
   mPropertyNotificationManager(propertyNotificationManager),
   mProxyPropertyIndex(target.propertyIndex),
+  mPropertyType(Property::NONE),
+  mComponentIndex(componentIndex),
   mCondition(condition),
   mNotifyMode(Dali::PropertyNotification::NotifyOnTrue),
   mNotifyResult(false)
@@ -84,6 +89,24 @@ PropertyNotification::PropertyNotification(UpdateManager& updateManager,
 
   // Observe target proxy and create/destroy notification scene object accordingly.
   mProxy = dynamic_cast<ProxyObject*>( &GetImplementation(target.object) );
+  mPropertyType = mProxy->GetPropertyType(mProxyPropertyIndex);
+
+  int internalComponentIndex = mProxy->GetPropertyComponentIndex(mProxyPropertyIndex);
+  if( internalComponentIndex != INVALID_PROPERTY_COMPONENT_INDEX )
+  {
+    // override the one passed in
+    mComponentIndex = internalComponentIndex;
+  }
+  if(mComponentIndex != INVALID_PROPERTY_COMPONENT_INDEX)
+  {
+    Property::Type type = mProxy->GetPropertyType(mProxyPropertyIndex);
+    if( type == Property::VECTOR2
+        || type == Property::VECTOR3
+        || type == Property::VECTOR4 )
+    {
+      mPropertyType = Property::FLOAT;
+    }
+  }
 
   // Check if target scene-object already present, and if so create our notification
   // scene-object
@@ -187,12 +210,11 @@ void PropertyNotification::CreateSceneObject()
 {
   DALI_ASSERT_DEBUG( mPropertyNotification == NULL );
 
-  Property::Type propertyType = mProxy->GetPropertyType(mProxyPropertyIndex);
-
   // Create a new PropertyNotification, temporarily owned
   SceneGraph::PropertyNotification* propertyNotification = SceneGraph::PropertyNotification::New( *mProxy,
                                                                                                   mProxyPropertyIndex,
-                                                                                                  propertyType,
+                                                                                                  mPropertyType,
+                                                                                                  mComponentIndex,
                                                                                                   GetImplementation(mCondition).type,
                                                                                                   mRawConditionArgs,
                                                                                                   mNotifyMode );

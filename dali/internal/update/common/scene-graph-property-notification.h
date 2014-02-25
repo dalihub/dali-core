@@ -62,6 +62,7 @@ public:
    * @param[in] proxy The proxy for a scene-graph object to inspect.
    * @param[in] propertyIndex The index of a property provided by the object.
    * @param[in] propertyType The type of property we're inspecting.
+   * @param[in] componentIndex Index to the component of a complex property such as a Vector
    * @param[in] condition The condition type (e.g. LessThan, GreaterThan...)
    * @param[in] arguments The arguments which accompany the condition.
    * @param[in] notifyMode The notification mode setting
@@ -70,6 +71,7 @@ public:
   static PropertyNotification* New(ProxyObject& proxy,
                                    Property::Index propertyIndex,
                                    Property::Type propertyType,
+                                   int componentIndex,
                                    ConditionType condition,
                                    const RawArgumentContainer& arguments,
                                    NotifyMode notifyMode);
@@ -105,11 +107,19 @@ public:
 protected:
 
   /**
-   * Protected constructor. See New()
+   * Construct the PropertyNotification
+   * @param[in] proxy The proxy for a scene-graph object to inspect.
+   * @param[in] propertyIndex The index of a property provided by the object.
+   * @param[in] propertyType The type of property we're inspecting.
+   * @param[in] componentIndex Index to the component of a complex property such as a Vector
+   * @param[in] condition The condition type (e.g. LessThan, GreaterThan...)
+   * @param[in] arguments The arguments which accompany the condition.
+   * @param[in] notifyMode The notification mode setting
    */
   PropertyNotification(ProxyObject& proxy,
                        Property::Index propertyIndex,
                        Property::Type propertyType,
+                       int componentIndex,
                        ConditionType condition,
                        const RawArgumentContainer& arguments,
                        NotifyMode notifyMode);
