@@ -243,24 +243,6 @@ public:
   // Sorting
 
   /**
-   * This sort function sorts according to the sum of the displacement (x,y,z) from camera.
-   */
-  static float SumOfDisplacements( const Vector3& position, float sortModifier )
-  {
-    return fabsf(position.x) + fabsf(position.y) + fabsf(position.z) + sortModifier;
-  }
-
-  /**
-   * This sort function sorts according to the distance from camera.
-   *
-   * Distance = Length of position vector, + modifier (to help order transparent objects that are very close)
-   */
-  static float DistanceFromOrigin(const Vector3& position, float sortModifier)
-  {
-    return position.Length() + sortModifier;
-  }
-
-  /**
    * This sort function sorts actors according to the Z-value in the camera coordinate system.
    *
    * This is useful for 2D user interfaces.
@@ -270,10 +252,7 @@ public:
    * We return a negative z value as in our translation, a low z means that it should
    * be sorted further away and a high z means that it should be closer.
    */
-  static float ZValue(const Vector3& position, float sortModifier)
-  {
-    return -position.z + sortModifier;
-  }
+  static float ZValue(const Vector3& position, float sortModifier);
 
   /**
    * This allows the user to specify the sort function that the layer should use.
