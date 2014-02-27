@@ -17,12 +17,47 @@
 // CLASS HEADER
 #include <dali/internal/render/shaders/program.h>
 
+// EXTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
+#include <iomanip>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/shader-data.h>
+
+namespace
+{
+void LogWithLineNumbers( const char * source )
+{
+  unsigned int lineNumber = 0u;
+  const char *prev = source;
+  const char *ptr = prev;
+
+  while( true )
+  {
+    if(lineNumber > 200u)
+    {
+      break;
+    }
+    // seek the next end of line or end of text
+    while( *ptr!='\n' && *ptr != '\0' ) ++ptr;
+
+    std::string line( prev, ptr-prev );
+    Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, "%4d %s\n", lineNumber, line.c_str());
+
+    if( *ptr == '\0' )
+    {
+      break;
+    }
+    prev = ++ptr;
+    ++lineNumber;
+  }
+}
+
+} //namespace
 
 namespace Dali
 {
@@ -546,7 +581,9 @@ bool Program::CompileShader( GLenum shaderType, GLuint& shaderId, const char* sr
 
   if (compiled == GL_FALSE)
   {
-    DALI_LOG_ERROR("Failed to compiler shader \n%s\n", src);
+    DALI_LOG_ERROR("Failed to compile shader\n");
+    LogWithLineNumbers(src);
+
     std::vector< char > szLog;
     GLint nLength;
     mGlAbstraction.GetShaderiv( shaderId, GL_INFO_LOG_LENGTH, &nLength);
