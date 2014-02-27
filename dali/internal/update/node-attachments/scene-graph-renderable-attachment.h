@@ -156,6 +156,15 @@ public: // For use during in the update algorithm only
   }
 
   /**
+   * if this renderable actor has visible size and color
+   * @return true if you can potentially see this actor
+   */
+  bool HasVisibleSizeAndColor() const
+  {
+    return mHasSizeAndColorFlag;
+  }
+
+  /**
    * Check whether the attachment has been marked as ready to render
    * @param[out] ready TRUE if the attachment has resources to render
    * @param[out] complete TRUE if the attachment's resources are complete

@@ -192,33 +192,30 @@ void RenderableAttachment::GetReadyAndComplete(bool& ready, bool& complete) cons
 
   CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
 
-  if( mHasSizeAndColorFlag )
+  std::size_t numTrackedResources = mTrackedResources.Count();
+  if( mHasUntrackedResources || numTrackedResources == 0 )
   {
-    std::size_t numTrackedResources = mTrackedResources.Count();
-    if( mHasUntrackedResources || numTrackedResources == 0 )
+    ready = mResourcesReady;
+    complete = mFinishedResourceAcquisition;
+  }
+  else
+  {
+    // If there are tracked resources and no untracked resources, test the trackers
+    ready = true;
+    for( size_t i=0; i < numTrackedResources; ++i )
     {
-      ready = mResourcesReady;
-      complete = mFinishedResourceAcquisition;
+      ResourceTracker* tracker = completeStatusManager.FindResourceTracker(mTrackedResources[i]);
+      if( tracker && ! tracker->IsComplete() )
+      {
+        ready = false;
+        break;
+      }
     }
-    else
-    {
-      // If there are tracked resources and no untracked resources, test the trackers
-      ready = true;
-      for( size_t i=0; i < numTrackedResources; ++i )
-      {
-        ResourceTracker* tracker = completeStatusManager.FindResourceTracker(mTrackedResources[i]);
-        if( tracker && ! tracker->IsComplete() )
-        {
-          ready = false;
-          break;
-        }
-      }
 
-      complete = mFinishedResourceAcquisition;
-      if( ! complete )
-      {
-        complete = ready;
-      }
+    complete = mFinishedResourceAcquisition;
+    if( ! complete )
+    {
+      complete = ready;
     }
   }
 }

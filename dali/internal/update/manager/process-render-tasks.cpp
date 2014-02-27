@@ -139,31 +139,38 @@ static bool AddRenderablesForTask( BufferIndex updateBufferIndex,
     RenderableAttachment* renderable = node.GetAttachment().GetRenderable(); // not all attachments render
     if ( renderable )
     {
-      bool ready = false;
-      bool complete = false;
-      renderable->GetReadyAndComplete(ready, complete);
-
-      DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Testing renderable:%p ready:%s complete:%s\n", renderable, ready?"T":"F", complete?"T":"F");
-
-      resourcesFinished = !complete ? complete : resourcesFinished;
-
-      if( ready ) // i.e. some resources are ready
+      bool visible = renderable->HasVisibleSizeAndColor();
+      // if its not potentially visible, then don't consider this renderable for render complete checking
+      // note that whilst visibility is inherited (if parent is insible, skip the sub-tree),
+      // size and color may not be so this needs to be done per renderable
+      if( visible ) // i.e. some resources are ready
       {
-        if( DrawMode::STENCIL == inheritedDrawMode )
+        bool ready = false;
+        bool complete = false;
+        renderable->GetReadyAndComplete(ready, complete);
+
+        DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Testing renderable:%p ready:%s complete:%s\n", renderable, ready?"T":"F", complete?"T":"F");
+
+        resourcesFinished = !complete ? complete : resourcesFinished;
+
+        if( ready ) // i.e. some resources are ready
         {
-          layer->stencilRenderables.push_back( renderable );
-        }
-        else if( DrawMode::OVERLAY == inheritedDrawMode )
-        {
-          layer->overlayRenderables.push_back( renderable );
-        }
-        else if ( ! renderable->IsBlendingOn( updateBufferIndex ) )
-        {
-          layer->opaqueRenderables.push_back( renderable );
-        }
-        else
-        {
-          layer->transparentRenderables.push_back( renderable );
+          if( DrawMode::STENCIL == inheritedDrawMode )
+          {
+            layer->stencilRenderables.push_back( renderable );
+          }
+          else if( DrawMode::OVERLAY == inheritedDrawMode )
+          {
+            layer->overlayRenderables.push_back( renderable );
+          }
+          else if ( ! renderable->IsBlendingOn( updateBufferIndex ) )
+          {
+            layer->opaqueRenderables.push_back( renderable );
+          }
+          else
+          {
+            layer->transparentRenderables.push_back( renderable );
+          }
         }
       }
     }
