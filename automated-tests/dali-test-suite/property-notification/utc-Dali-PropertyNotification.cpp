@@ -542,9 +542,12 @@ static void UtcDaliPropertyNotificationVectorComponentGreaterThan()
   Stage::GetCurrent().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, GreaterThanCondition(100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 1, GreaterThanCondition(100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 2, GreaterThanCondition(100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::COLOR, 3, GreaterThanCondition(0.5f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::POSITION, 1, GreaterThanCondition(100.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::POSITION, 2, GreaterThanCondition(100.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::COLOR, 3, GreaterThanCondition(0.5f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
@@ -573,7 +576,7 @@ static void UtcDaliPropertyNotificationVectorComponentGreaterThan()
   // Change alpha Colour to satisfy w/alpha component condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetColor(Vector3(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 }
@@ -587,9 +590,12 @@ static void UtcDaliPropertyNotificationVectorComponentLessThan()
   Stage::GetCurrent().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, LessThanCondition(-100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 1, LessThanCondition(-100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 2, LessThanCondition(-100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::COLOR, 3, LessThanCondition(0.5f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::POSITION, 1, LessThanCondition(-100.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::POSITION, 2, LessThanCondition(-100.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::COLOR, 3, LessThanCondition(0.5f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
@@ -618,7 +624,7 @@ static void UtcDaliPropertyNotificationVectorComponentLessThan()
   // Change alpha Colour to satisfy w/alpha component condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetColor(Vector3(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 }
@@ -632,9 +638,12 @@ static void UtcDaliPropertyNotificationVectorComponentInside()
   Stage::GetCurrent().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, InsideCondition(-100.0f, 100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 1, InsideCondition(-100.0f, 100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 2, InsideCondition(-100.0f, 100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::COLOR, 3, InsideCondition(0.25f, 0.75f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::POSITION, 1, InsideCondition(-100.0f, 100.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::POSITION, 2, InsideCondition(-100.0f, 100.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::COLOR, 3, InsideCondition(0.25f, 0.75f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   // set outside all conditions
@@ -664,7 +673,7 @@ static void UtcDaliPropertyNotificationVectorComponentInside()
   // change alpha to inside condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetColor(Vector3(0.0f, 0.0f, 0.0f, 0.5f));
+  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 0.5f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 }
@@ -678,9 +687,12 @@ static void UtcDaliPropertyNotificationVectorComponentOutside()
   Stage::GetCurrent().Add(actor);
 
   PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, OutsideCondition(-100.0f, 100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 1, OutsideCondition(-100.0f, 100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 2, OutsideCondition(-100.0f, 100.0f) );
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::COLOR, 3, InsideCondition(0.25f, 0.75f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::POSITION, 1, OutsideCondition(-100.0f, 100.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::POSITION, 2, OutsideCondition(-100.0f, 100.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+  notification = actor.AddPropertyNotification( Actor::COLOR, 3, OutsideCondition(0.25f, 0.75f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   // set inside all conditions
@@ -710,7 +722,7 @@ static void UtcDaliPropertyNotificationVectorComponentOutside()
   // change alpha to outside condition
   gCallBackCalled = false;
   Wait(application, DEFAULT_WAIT_PERIOD);
-  actor.SetColor(Vector3(0.0f, 0.0f, 0.0f, 1.0f));
+  actor.SetColor(Vector4(0.0f, 0.0f, 0.0f, 1.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
   DALI_TEST_CHECK( gCallBackCalled );
 }
