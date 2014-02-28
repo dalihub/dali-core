@@ -148,6 +148,14 @@ public:
     return mAllChildTransformsClean[ 0 ] && mAllChildTransformsClean[ 1 ];
   }
 
+  /**
+   * @return True if default sort function is used
+   */
+  bool UsesDefaultSortFunction()
+  {
+    return mIsDefaultSortFunction;
+  }
+
 private:
 
   /**
@@ -179,6 +187,8 @@ private:
                                       /// this allows us to cache render items when layer is "static"
   bool mIsClipping:1;                 ///< True when clipping is enabled
   bool mDepthTestDisabled:1;          ///< Whether depth test is disabled.
+  bool mIsDefaultSortFunction:1;      ///< whether the default depth sort function is used
+
 };
 
 // Messages for Layer

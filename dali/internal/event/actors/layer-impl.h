@@ -44,6 +44,15 @@ class Layer : public Actor
 public:
 
   /**
+   * @copydoc Dali::Layer::ZValue(const Vector3&, float)
+   */
+  static float ZValue(const Vector3& position, float sortModifier)
+  {
+    // inlined so we avoid a function call when sorting renderers
+    return -position.z + sortModifier;
+  }
+
+  /**
    * Create a new Layer.
    * @return A smart-pointer to the newly allocated Layer.
    */

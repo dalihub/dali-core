@@ -50,11 +50,6 @@ void RenderableAttachment::SetSortModifier(float modifier)
   mSortModifier = modifier;
 }
 
-float RenderableAttachment::GetSortModifier() const
-{
-  return mSortModifier;
-}
-
 void RenderableAttachment::SetBlendingMode( BlendingMode::Type mode )
 {
   mBlendingMode = mode;

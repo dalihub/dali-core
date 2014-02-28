@@ -41,7 +41,8 @@ Layer::Layer()
 : mSortFunction( Dali::Layer::ZValue ),
   mClippingBox( 0,0,0,0 ),
   mIsClipping( false ),
-  mDepthTestDisabled( false )
+  mDepthTestDisabled( false ),
+  mIsDefaultSortFunction( true )
 {
   // layer starts off dirty
   mAllChildTransformsClean[ 0 ] = false;
@@ -56,6 +57,16 @@ void Layer::SetSortFunction( Dali::Layer::SortFunctionType function )
 {
   if( mSortFunction != function )
   {
+    // is a custom sort function used
+    if( function != Dali::Layer::ZValue )
+    {
+      mIsDefaultSortFunction = false;
+    }
+    else
+    {
+      mIsDefaultSortFunction = true;
+    }
+
     // changing the sort function makes the layer dirty
     mAllChildTransformsClean[ 0 ] = false;
     mAllChildTransformsClean[ 1 ] = false;

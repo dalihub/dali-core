@@ -60,7 +60,11 @@ public: // API
    * Retrieve the sort-modifier for the attachment.
    * @return The sort-modifier.
    */
-  float GetSortModifier() const;
+  float GetSortModifier() const
+  {
+    // inlined as its called a lot when sorting transparent renderers
+    return mSortModifier;
+  }
 
   /**
    * @See Dali::RenderableActor::SetBlendMode().

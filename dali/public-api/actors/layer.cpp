@@ -134,7 +134,7 @@ bool Layer::IsDepthTestDisabled() const
 
 float Layer::ZValue(const Vector3& position, float sortModifier)
 {
-  return -position.z + sortModifier;
+  return Internal::Layer::ZValue( position, sortModifier );
 }
 
 void Layer::SetSortFunction(SortFunctionType function)

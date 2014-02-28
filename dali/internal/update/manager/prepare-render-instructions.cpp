@@ -18,6 +18,7 @@
 #include <dali/internal/update/manager/prepare-render-instructions.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/actors/layer-impl.h> // for the default sorting function
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
@@ -278,22 +279,29 @@ inline void SortTransparentRenderItems( RenderList& transparentRenderList, Layer
     // clear extra elements from helper, does not decrease capability
     sortingHelper.resize( renderableCount );
   }
-  float sortingValue = 0;
-
-  // calculate sorting values
-  const Dali::Layer::SortFunctionType sortFunction = layer.GetSortFunction();
-  for( size_t index = 0; index < renderableCount; ++index )
+  // calculate the sorting value, once per item by calling the layers sort function
+  // Using an if and two for-loops rather than if inside for as its better for branch prediction
+  if( layer.UsesDefaultSortFunction() )
   {
-    RenderableAttachment& attachment = *layer.transparentRenderables[ index ];
-    RenderItem& item = transparentRenderList.GetItem( index );
-
-    // calculate the sorting value, once per item by calling the layers sort function
-    const Matrix& modelViewMatrix = item.GetModelViewMatrix();
-    sortingValue = (*sortFunction)( modelViewMatrix.GetTranslation3(), attachment.GetSortModifier() );
-
-    // keep the renderitem pointer in the helper so we can quickly reorder items after sort
-    sortingHelper[ index ].first = sortingValue;
-    sortingHelper[ index ].second = &item;
+    for( size_t index = 0; index < renderableCount; ++index )
+    {
+      RenderItem& item = transparentRenderList.GetItem( index );
+      // the default sorting function should get inlined here
+      sortingHelper[ index ].first = Internal::Layer::ZValue( item.GetModelViewMatrix().GetTranslation3(), layer.transparentRenderables[ index ]->GetSortModifier() );
+      // keep the renderitem pointer in the helper so we can quickly reorder items after sort
+      sortingHelper[ index ].second = &item;
+    }
+  }
+  else
+  {
+    const Dali::Layer::SortFunctionType sortFunction = layer.GetSortFunction();
+    for( size_t index = 0; index < renderableCount; ++index )
+    {
+      RenderItem& item = transparentRenderList.GetItem( index );
+      sortingHelper[ index ].first = (*sortFunction)( item.GetModelViewMatrix().GetTranslation3(), layer.transparentRenderables[ index ]->GetSortModifier() );
+      // keep the renderitem pointer in the helper so we can quickly reorder items after sort
+      sortingHelper[ index ].second = &item;
+    }
   }
 
   // sort the values
