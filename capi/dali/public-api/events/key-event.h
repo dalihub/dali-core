@@ -58,44 +58,15 @@ struct KeyEvent
   KeyEvent();
 
   /**
-   * @deprecated Use KeyEvent(std::string keyName, std::string keyString, int keyCode, int keyModifier, int cursorOffset, int numberOfChars) constructor instead.
-   *
-   * Constructor
-   * @param[in]  keyName    The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
-   * @param[in]  keyString  A string of input characters or key pressed
-   * @param[in]  keyModifier  The key modifier for special keys like shift and alt
-   * @param[in]  cursorOffset  Used by the IMF keyboard and predictive text to specify a start position from the current cursor position to start deleting characters.
-   * @param[in]  numberOfChars Used by the IMF keyboard and predictive text to specify how many characters to delete from the cursorOffset.
-   * @param[in]  keyState The state of the key event.
-   */
-  KeyEvent(const std::string& keyName, const std::string& keyString, const int& keyModifier, const int& cursorOffset, const int& numberOfChars, const State& keyState);
-
-  /**
-   * @deprecated Use KeyEvent(std::string keyName, std::string keyString, int keyCode, int keyModifier, int cursorOffset, unsigned long timeStamp, int numberOfChars) constructor instead.
-   *
    * Constructor
    * @param[in]  keyName       The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
    * @param[in]  keyString     A string of input characters or key pressed
    * @param[in]  keyCode       The unique key code for the key pressed.
    * @param[in]  keyModifier   The key modifier for special keys like shift and alt
-   * @param[in]  cursorOffset  Used by the IMF keyboard and predictive text to specify a start position from the current cursor position to start deleting characters.
-   * @param[in]  numberOfChars Used by the IMF keyboard and predictive text to specify how many characters to delete from the cursorOffset.
-   * @param[in]  keyState The state of the key event.
-   */
-  KeyEvent(const std::string& keyName, const std::string& keyString, const int& keyCode, const int& keyModifier, const int& cursorOffset, const int& numberOfChars, const State& keyState);
-
-  /**
-   * Constructor
-   * @param[in]  keyName       The name of the key pressed or command from the IMF, if later then the some following parameters will be needed.
-   * @param[in]  keyString     A string of input characters or key pressed
-   * @param[in]  keyCode       The unique key code for the key pressed.
-   * @param[in]  keyModifier   The key modifier for special keys like shift and alt
-   * @param[in]  cursorOffset  Used by the IMF keyboard and predictive text to specify a start position from the current cursor position to start deleting characters.
-   * @param[in]  numberOfChars Used by the IMF keyboard and predictive text to specify how many characters to delete from the cursorOffset.
    * @param[in]  timeStamp The time (in ms) that the key event occurred.
    * @param[in]  keyState The state of the key event.
    */
-  KeyEvent(const std::string& keyName, const std::string& keyString, const int& keyCode, const int& keyModifier, const int& cursorOffset, const int& numberOfChars, const unsigned long& timeStamp, const State& keyState);
+  KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier, unsigned long timeStamp, const State& keyState);
 
   /**
    * Destructor
@@ -141,16 +112,6 @@ struct KeyEvent
    * special keys like shift, alt and control which modify the next key pressed.
    */
   int  keyModifier;
-
-  /**
-   * offset from current cursor position as provided by input framework
-   */
-  int cursorOffset;
-
-  /**
-   * number of characters from offset position to operate on as provided by input framework, usually to delete the given range.
-   */
-  int numberOfChars;
 
   /**
    * The time (in ms) that the key event occurred.

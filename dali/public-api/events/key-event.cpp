@@ -34,43 +34,15 @@ KeyEvent::KeyEvent()
   keyPressed(""),
   keyCode(KEY_INVALID_CODE),
   keyModifier(0),
-  cursorOffset(0),
-  numberOfChars(0),
   state(KeyEvent::Down)
 {
 }
 
-KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyPressed, const int& keyModifier, const int& offset, const int& characters, const State& keyState)
-: keyPressedName(keyName),
-  keyPressed(keyPressed),
-  keyCode(KEY_INVALID_CODE),
-  keyModifier(keyModifier),
-  cursorOffset(offset),
-  numberOfChars(characters),
-  time(0),
-  state(keyState)
-{
-}
-
-KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, const int& keyCode, const int& keyModifier, const int& cursorOffset, const int& numberOfChars, const State& keyState)
+KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier,unsigned long timeStamp, const State& keyState)
 : keyPressedName(keyName),
   keyPressed(keyString),
   keyCode(keyCode),
   keyModifier(keyModifier),
-  cursorOffset(cursorOffset),
-  numberOfChars(numberOfChars),
-  time(0),
-  state(keyState)
-{
-}
-
-KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, const int& keyCode, const int& keyModifier, const int& cursorOffset, const int& numberOfChars, const unsigned long& timeStamp, const State& keyState)
-: keyPressedName(keyName),
-  keyPressed(keyString),
-  keyCode(keyCode),
-  keyModifier(keyModifier),
-  cursorOffset(cursorOffset),
-  numberOfChars(numberOfChars),
   time(timeStamp),
   state(keyState)
 {

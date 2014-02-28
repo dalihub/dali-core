@@ -40,7 +40,7 @@ KeyEventProcessor::~KeyEventProcessor()
 
 void KeyEventProcessor::ProcessKeyEvent(const Integration::KeyEvent& event)
 {
-  KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.cursorOffset, event.numberOfChars, static_cast<KeyEvent::State>(event.state));
+  KeyEvent keyEvent(event.keyName, event.keyString, event.keyCode, event.keyModifier, event.time, static_cast<KeyEvent::State>(event.state));
 
   // Emit the key event signal from stage.
   mStage.EmitKeyEventSignal(keyEvent);

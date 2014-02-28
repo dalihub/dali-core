@@ -29,47 +29,17 @@ KeyEvent::KeyEvent()
   keyString(),
   keyCode(-1),
   keyModifier(0),
-  cursorOffset(0),
-  numberOfChars(0),
   time(0),
   state(KeyEvent::Down)
 {
 }
 
-KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, const int& keyModifier, const int& offset, const int& characters, const State& keyState)
-: Event(Key),
-  keyName(keyName),
-  keyString(keyString),
-  keyCode(-1),
-  keyModifier(keyModifier),
-  cursorOffset(offset),
-  numberOfChars(characters),
-  time(0),
-  state(keyState)
-{
-}
-
-KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, const int& keyCode, const int& keyModifier, const int& offset, const int& characters, const State& keyState)
+KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, int keyCode, int keyModifier, unsigned long timeStamp, const State& keyState)
 : Event(Key),
   keyName(keyName),
   keyString(keyString),
   keyCode(keyCode),
   keyModifier(keyModifier),
-  cursorOffset(offset),
-  numberOfChars(characters),
-  time(0),
-  state(keyState)
-{
-}
-
-KeyEvent::KeyEvent(const std::string& keyName, const std::string& keyString, const int& keyCode, const int& keyModifier, const int& offset, const int& characters, const unsigned long& timeStamp, const State& keyState)
-: Event(Key),
-  keyName(keyName),
-  keyString(keyString),
-  keyCode(keyCode),
-  keyModifier(keyModifier),
-  cursorOffset(offset),
-  numberOfChars(characters),
   time(timeStamp),
   state(keyState)
 {
