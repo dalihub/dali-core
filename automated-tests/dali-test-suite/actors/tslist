@@ -1,0 +1,13 @@
+/dali-test-suite/actors/utc-Dali-Actor
+/dali-test-suite/actors/utc-Dali-CameraActor
+/dali-test-suite/actors/utc-Dali-ImageActor
+/dali-test-suite/actors/utc-Dali-Layer
+/dali-test-suite/actors/utc-Dali-LightActor
+/dali-test-suite/actors/utc-Dali-Model
+/dali-test-suite/actors/utc-Dali-MeshActor
+/dali-test-suite/actors/utc-Dali-Stage
+/dali-test-suite/actors/utc-Dali-TextActor
+/dali-test-suite/actors/utc-Dali-CustomActor
+/dali-test-suite/actors/utc-Dali-RenderableActor
+/dali-test-suite/actors/utc-Dali-BaseHandle
+/dali-test-suite/actors/utc-Dali-Handle

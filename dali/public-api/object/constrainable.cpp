@@ -1,0 +1,69 @@
+//
+// Copyright (c) 2014 Samsung Electronics Co., Ltd.
+//
+// Licensed under the Flora License, Version 1.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://floralicense.org/license/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an AS IS BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/animation/constraint-impl.h>
+
+namespace Dali
+{
+
+Constrainable::Constrainable(Dali::Internal::Object* handle)
+: Handle(handle)
+{
+}
+
+Constrainable::Constrainable()
+{
+}
+
+Constrainable::~Constrainable()
+{
+}
+
+Constrainable::Constrainable(const Constrainable& handle)
+: Handle(handle)
+{
+}
+
+Constrainable& Constrainable::operator=(const Handle& rhs)
+{
+  if( this != &rhs )
+  {
+    Handle::operator=(rhs);
+  }
+
+  return *this;
+}
+
+ActiveConstraint Constrainable::ApplyConstraint( Constraint constraint )
+{
+  return GetImplementation(*this).ApplyConstraint(GetImplementation(constraint));
+}
+
+void Constrainable::RemoveConstraint(ActiveConstraint activeConstraint)
+{
+  GetImplementation(*this).RemoveConstraint( activeConstraint );
+}
+
+void Constrainable::RemoveConstraints()
+{
+  GetImplementation(*this).RemoveConstraints();
+}
+
+} // Dali

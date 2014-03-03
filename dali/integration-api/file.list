@@ -1,0 +1,65 @@
+# Add platform abstraction headers here
+
+platform_abstraction_src_files = \
+   $(platform_abstraction_src_dir)/bitmap.cpp \
+   $(platform_abstraction_src_dir)/core.cpp \
+   $(platform_abstraction_src_dir)/glyph-set.cpp \
+   $(platform_abstraction_src_dir)/debug.cpp \
+   $(platform_abstraction_src_dir)/shader-data.cpp \
+   $(platform_abstraction_src_dir)/system-overlay.cpp \
+   $(platform_abstraction_src_dir)/common/lockless-buffer.cpp \
+   $(platform_abstraction_src_dir)/events/event.cpp \
+   $(platform_abstraction_src_dir)/events/gesture-event.cpp \
+   $(platform_abstraction_src_dir)/events/key-event-integ.cpp \
+   $(platform_abstraction_src_dir)/events/long-press-gesture-event.cpp \
+   $(platform_abstraction_src_dir)/events/mouse-wheel-event-integ.cpp \
+   $(platform_abstraction_src_dir)/events/notification-event.cpp \
+   $(platform_abstraction_src_dir)/events/pan-gesture-event.cpp \
+   $(platform_abstraction_src_dir)/events/pinch-gesture-event.cpp \
+   $(platform_abstraction_src_dir)/events/tap-gesture-event.cpp \
+   $(platform_abstraction_src_dir)/events/touch-event-combiner.cpp \
+   $(platform_abstraction_src_dir)/events/touch-event-integ.cpp
+
+platform_abstraction_header_files = \
+   $(platform_abstraction_src_dir)/core.h \
+   $(platform_abstraction_src_dir)/glyph-set.h \
+   $(platform_abstraction_src_dir)/debug.h \
+   $(platform_abstraction_src_dir)/bitmap.h \
+   $(platform_abstraction_src_dir)/resource-types.h \
+   $(platform_abstraction_src_dir)/resource-request.h \
+   $(platform_abstraction_src_dir)/resource-cache.h \
+   $(platform_abstraction_src_dir)/resource-declarations.h \
+   $(platform_abstraction_src_dir)/gl-abstraction.h \
+   $(platform_abstraction_src_dir)/gl-sync-abstraction.h \
+   $(platform_abstraction_src_dir)/gesture-manager.h \
+   $(platform_abstraction_src_dir)/render-controller.h \
+   $(platform_abstraction_src_dir)/platform-abstraction.h \
+   $(platform_abstraction_src_dir)/shader-data.h \
+   $(platform_abstraction_src_dir)/system-overlay.h \
+   $(platform_abstraction_src_dir)/common/lockless-buffer.h
+
+platform_abstraction_dynamics_header_files = \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-body-intf.h \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-body-settings.h \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-collision-data.h \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-debug-vertex.h \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-factory-intf.h \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-joint-intf.h \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-shape-intf.h \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-world-intf.h \
+   $(platform_abstraction_src_dir)/dynamics/dynamics-world-settings.h
+
+platform_abstraction_events_header_files = \
+   $(platform_abstraction_src_dir)/events/event.h \
+   $(platform_abstraction_src_dir)/events/gesture-event.h \
+   $(platform_abstraction_src_dir)/events/gesture-requests.h \
+   $(platform_abstraction_src_dir)/events/key-event-integ.h \
+   $(platform_abstraction_src_dir)/events/long-press-gesture-event.h \
+   $(platform_abstraction_src_dir)/events/mouse-wheel-event-integ.h \
+   $(platform_abstraction_src_dir)/events/notification-event.h \
+   $(platform_abstraction_src_dir)/events/pan-gesture-event.h \
+   $(platform_abstraction_src_dir)/events/pinch-gesture-event.h \
+   $(platform_abstraction_src_dir)/events/tap-gesture-event.h \
+   $(platform_abstraction_src_dir)/events/touch-data.h \
+   $(platform_abstraction_src_dir)/events/touch-event-combiner.h \
+   $(platform_abstraction_src_dir)/events/touch-event-integ.h

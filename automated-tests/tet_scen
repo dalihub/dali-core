@@ -1,0 +1,113 @@
+all
+    "Starting Full Test Suite"
+        ^TEST
+    "Completed Full Test Suite"
+
+##### All PUBLIC and INTERNAL Tests #####
+
+# Test scenario
+TEST
+    ^PUBLIC
+    ^INTERNAL
+
+##### PUBLIC Tests #####
+
+PUBLIC
+    ^actors
+    ^animation
+    ^common
+    ^context
+    ^effects
+    ^events
+    ^geometry
+    ^images
+    ^material
+    ^math
+    ^object-registry
+    ^property-notification
+    ^render-tasks
+    ^signals
+    ^text
+    ^type-registry
+
+actors
+    :include:/dali-test-suite/actors/tslist
+
+renderables
+    :include:/dali-test-suite/actors/tslist-renderables
+
+text-actor
+    :include:/dali-test-suite/actors/tslist-text-actor
+
+animation
+    :include:/dali-test-suite/animation/tslist
+
+effects
+    :include:/dali-test-suite/effects/tslist
+
+events
+    :include:/dali-test-suite/events/tslist
+
+geometry
+    :include:/dali-test-suite/geometry/tslist
+
+images
+    :include:/dali-test-suite/images/tslist
+
+material
+    :include:/dali-test-suite/material/tslist
+
+math
+    :include:/dali-test-suite/math/tslist
+
+text
+    :include:/dali-test-suite/text/tslist
+
+render-tasks
+    :include:/dali-test-suite/render-tasks/tslist
+
+signals
+    :include:/dali-test-suite/signals/tslist
+
+object-registry
+    :include:/dali-test-suite/object-registry/tslist
+
+type-registry
+    :include:/dali-test-suite/type-registry/tslist
+
+property-notification
+    :include:/dali-test-suite/property-notification/tslist
+
+context
+    :include:/dali-test-suite/context/tslist
+
+common
+    :include:/dali-test-suite/common/tslist
+
+##### INTERNAL Tests #####
+
+INTERNAL
+    :include:/dali-internal-test-suite/resource-manager/tslist
+    :include:/dali-internal-test-suite/text/tslist
+    :include:/dali-internal-test-suite/material/tslist
+    :include:/dali-internal-test-suite/image-factory/tslist
+
+resource-manager
+    :include:/dali-internal-test-suite/resource-manager/tslist
+
+internal-text
+    :include:/dali-internal-test-suite/text/tslist
+
+internal-material
+    :include:/dali-internal-test-suite/material/tslist
+
+image-factory
+    :include:/dali-internal-test-suite/image-factory/tslist
+
+##### DEBUG #####
+# If you just want to compile/execute only certain TET cases, then you can do as shown below.
+# Try not to check in your changes to the debug section.
+debug
+        /dali-test-suite/actors/utc-Dali-Handle
+
+# EOF

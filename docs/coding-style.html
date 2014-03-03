@@ -1,0 +1,947 @@
+<HTML>
+<HEAD>
+<TITLE>Dali C++ Coding Style</TITLE>
+<!-- 
+green code for good examples, same formatting as <pre> tag
+red code for bad examples, same formatting as <pre> tag
+details hidden by default 
+-->
+<style type="text/css">
+code.good { color:green; white-space:pre; }
+code.bad { color:red; white-space:pre; }
+article.detail { display:block; }
+</style>
+
+<script type="text/javascript">
+function toggleVisibility( button, obj )
+{
+  // must have button and object
+  if( !button || !obj )
+    return;
+  var e=document.getElementById( obj );
+  if( !e )
+    return;
+
+  // initially display property seems to be empty, then none
+  if( e.style.display == "" || e.style.display == "none" )
+  {
+    // paragraph shown
+    button.value="Hide";
+    e.style.display="block";
+  }
+  else
+  {
+    // paragraph hidden
+    button.value="Show";
+    e.style.display="none";
+  }
+}
+</script>
+
+</HEAD>
+<BODY>
+
+<H1>Naming</H1>
+  <P>
+    The most important consistency rules are those that govern
+    naming. The style of a name immediately informs us what sort of
+    thing the named entity is: a type, a variable, a function, a
+    constant, a macro, etc., without requiring us to search for the
+    declaration of that entity. The pattern-matching engine in our
+    brains relies a great deal on these naming rules.
+  </P>
+  <P>
+    Consistency is more important than individual preferences so regardless of 
+    whether you find them sensible or not, the rules are the rules.
+  </P>
+
+  <ARTICLE>
+    <H2>General Naming Rules</H2>
+      <SUMMARY>
+        Function names, variable names, and filenames should be
+        descriptive; eschew abbreviation.  Types and variables should be
+        nouns, while functions should be "command" verbs.
+      </SUMMARY>
+      <H3>How to Name <input type="button" value="Hide" onclick="toggleVisibility( this, 'how_to_name' );"/></H3>
+      <ARTICLE class="detail" id="how_to_name">
+        <P>
+          Give as descriptive a name as possible, within reason. Do
+          not worry about saving horizontal space as it is far more
+          important to make your code immediately understandable by a
+          new reader. Examples of well-chosen names:
+        </P>
+        <CODE class="good">
+          int numberOfErrors;              // Good.
+          int countCompletedConnections;   // Good.
+        </CODE>
+        <P>
+          Poorly-chosen names use ambiguous abbreviations or arbitrary
+          characters that do not convey meaning:
+        </P>
+        <CODE class="bad">
+          int n;                           // Bad - meaningless.
+          int nerr;                        // Bad - ambiguous abbreviation.
+          int n_comp_conns;                // Bad - ambiguous abbreviation.
+        </CODE>
+        <P>
+          Type and variable names should typically be nouns: e.g.,
+          <code>FileOpener</code>,
+          <code>NumErrors</code>.
+        </P>
+        <P>
+          Function names should typically be imperative (that is they should be commands): 
+		  e.g., <code>OpenFile()</code>, <code>set_num_errors()</code>.  There is an exception for
+          accessors, which should be named the same as the variable they access.
+        </P>
+      </ARTICLE>
+
+      <H3>Abbreviations <input type="button" value="Hide" onclick="toggleVisibility( this, 'abbreviations' );"/></H3>
+      <ARTICLE class="detail" id="abbreviations">
+        <P>
+          Do not use abbreviations unless they are extremely well
+          known outside your project. For example:
+        </P>
+        <CODE class="good">
+          // Good
+          // These show proper names with no abbreviations.
+          int numberOfDnsConnections;  // Most people know what "DNS" stands for.
+          int priceCountReader;   // OK, price count. Makes sense.
+        </CODE>
+        <CODE class="bad">
+          // Bad!
+          // Abbreviations can be confusing or ambiguous outside a small group.
+          int wgcconnections;  // Only your group knows what this stands for.
+          int pcreader;        // Lots of things can be abbreviated "pc".
+        </CODE>
+        <P>
+          Never abbreviate by leaving out letters:
+        </P>
+        <CODE class="good">
+          int error_count;  // Good.
+        </CODE>
+        <CODE class="bad">
+          int error_cnt;    // Bad.
+        </CODE>
+      </ARTICLE>
+  </ARTICLE>
+
+  <ARTICLE>
+    <H2>File Names</H2>
+    <SUMMARY>
+      Filenames should be all lowercase and can include underscores dashes (<code>-</code>).
+      Do not use underscores in filenames (<code>_</code>).
+    </SUMMARY>
+    <H3>Examples <input type="button" value="Hide" onclick="toggleVisibility( this, 'file_name_examples' );"/></H3>
+    <ARTICLE class="detail" id="file_name_examples">
+      <P>
+        Examples of acceptable file names:
+      </P>
+      <P>
+        <CODE class="good">
+          my-useful-class.cpp
+          myusefulclass.cpp
+          myusefulclass-test.cpp
+        </CODE>
+      </P>
+      <P>
+        C++ files should end in <code>.cpp</code> and header files
+        should end in <code>.h</code>.
+      </P>
+      <P>
+        Do not use filenames that already exist
+        in <code>/usr/include</code>, such as <code>db.h</code>.
+      </P>
+      <P>
+        In general, make your filenames very specific.  For example,
+        use <code>http-server-logs.h</code> rather than <code>logs.h</code>.
+		A class called <code>FooBar</code> should be declared in file 
+		called <code>foobar.h</code> and defined in <code>foobar.cpp</code>.
+      </P>
+      <P>
+        Inline functions must be in a <code>.h</code> file. If your
+        inline functions are very short, they should go directly into your
+        <code>.h</code> file. However, if your inline functions
+        include a lot of code, they may go into a third file that
+        ends in <code>-inl.h</code>.  In a class with a lot of inline
+        code, your class could have three files:
+      </P>
+      <CODE class="good">
+        foobar.h      // The class declaration.
+        foobar.cpp     // The class definition.
+        foobar-inl.h  // Inline functions that include lots of code.
+      </CODE>
+    </ARTICLE>
+  </ARTICLE>
+
+  <ARTICLE>
+    <H2>Type Names</H2>
+    <SUMMARY>
+      Type names start with a capital letter and have a capital
+      letter for each new word, with no underscores:
+      <code>MyExcitingClass</code>, <code>MyExcitingEnum</code>.
+      All type names are declared inside namespace so no prefixing is used.
+    </SUMMARY>
+    <H3>Examples <input type="button" value="Hide" onclick="toggleVisibility( this, 'type_name_examples' );"/></H3>
+    <ARTICLE class="detail" id="type_name_examples">
+      <p>
+        The names of all types; classes, structs, typedefs have the same naming convention.
+        Type names start with a capital letter and have a capital letter for each new word (CamelCase). 
+        No underscores. Enumerated types use same convention as Constants> all capitals.
+        For example:
+      </p>
+      <CODE class="good">
+        // classes and structs
+        class UrlTable { ...
+        class UrlTableTester { ...
+        struct UrlTableProperties { ...
+
+        // typedefs
+        typedef hash_map<UrlTableProperties *, string> PropertiesMap;
+
+        // enums
+        enum UrlTableErrors
+        {
+          OK = 0,
+          OUT_OF_MEMORY = 1,
+          MALFORMED_INPUT = 2,
+        }
+      </CODE>
+    </ARTICLE>
+  </ARTICLE>
+
+  <ARTICLE>
+    <H2>Variable Names</H2>
+    <SUMMARY>
+      Local variable names start with a lowercase. For example: <code>myExcitingLocalVariable</code>,
+      Class member variables have prefix m. For example: <code>mMember</code>.
+      The only exception to this rule is for public member variables in public structs where the prefix m is not required.
+      Such member variables should also start with a lowercase letter.
+      Constants should be all capitals.
+      Avoid underscore characters in names because it can be hard to spot.
+      Global variables should be avoided, if one is needed, prefix it with <code>g</code>.
+    </SUMMARY>
+    <H3>Examples <input type="button" value="Hide" onclick="toggleVisibility( this, 'variable_name_examples' );"/></H3>
+    <ARTICLE class="detail" id="variable_name_examples">
+      <p>
+        For example:
+      </p>
+      <CODE class="good">
+        string tableName;  // OK - starts lowercase
+        string tablename;   // OK - all lowercase.
+      </CODE>
+      <CODE class="bad">
+        string TableName;   // Bad - starts with capital.
+      </CODE>
+      <CODE class="good">
+        struct Foo
+        {
+        string mTable;  // OK
+        string mTableName;   // OK.
+        }
+      </CODE>
+      <CODE class="good">
+        const int DAYSINAWEEK = 7;
+      </CODE>
+    </ARTICLE>
+  </ARTICLE>
+
+  <ARTICLE>
+    <H2>Function Names</H2>
+    <SUMMARY>
+      Regular functions have camel case starting with uppercase; accessors and mutators match
+      the name of the variable with Get or Set as prefix. No underscores
+    </SUMMARY>
+    <H3>Examples <input type="button" value="Hide" onclick="toggleVisibility( this, 'function_name_examples' );"/></H3>
+    <ARTICLE class="detail" id="function_name_examples">
+      <CODE class="good">
+        MyExcitingFunction();
+        MyExcitingMethod();
+
+        class MyClass
+        {
+        public:
+          ...
+          int GetNumEntries() const { return mNumEntries; }
+          void SetNumEntries(int numEntries) { mNumEntries = numEntries; }
+
+        private:
+          int mNumEntries;
+        };
+      </CODE>
+    </ARTICLE>
+  </ARTICLE>
+
+  <ARTICLE>
+    <H2>Macro Names</H2>
+    <SUMMARY>
+      Macros should not be used for programming, code should always be readable without preprocessor.
+      Only allowed cases for macros are include guards, debug tracing and compile time feature flags 
+      <b>inside</b> .cpp files when no other variation mechanism is not possible. Always prefer variation 
+      through design and template mechanisms rather than <i>#define</i>.
+      If you need to use macros, they're like this: <code>MY_MACRO_THAT_SCARES_SMALL_CHILDREN</code>.
+    </SUMMARY>
+    <H3>Examples <input type="button" value="Hide" onclick="toggleVisibility( this, 'macro_name_examples' );"/></H3>
+    <ARTICLE class="detail" id="macro_name_examples">
+      <CODE class="good">
+        #define DEBUG_TRACE( __FILE__, __LINE__ ) ...
+        #ifndef __ACTOR_H__
+        #define __ACTOR_H__
+        ...
+        #endif // __ACTOR_H__
+      </CODE>
+    </ARTICLE>
+  </ARTICLE>
+
+<H1>Comments</H1>
+  <SUMMARY>
+    Comments are absolutely vital to keeping our code readable. 
+    The following rules describe what you should comment and where. 
+    But remember: while comments are very important, the best code is self-documenting.
+    Giving sensible names to types and variables is much better than using obscure
+    names that you must then explain through comments.
+    When writing your comments, write for your audience: the next
+    contributor who will need to understand your code.
+  </SUMMARY>
+  <H2>Comment Rules <input type="button" value="Hide" onclick="toggleVisibility( this, 'comments_details' );"/></H2>
+  <ARTICLE class="detail" id="comments_details">
+    <H3>Comment Style</H3>
+      <SUMMARY>
+        API documentation must use doxygen comments:   /** */ or /// <BR>
+        Internal comments can use <CODE>//</CODE> or <CODE>/* */</CODE> syntax, as long
+        as you are consistent.
+      </SUMMARY>
+    <H3>File Comments</H3>
+      <SUMMARY>
+        Start each header file with a guard macro.<BR>
+        This should match the name of the class which is defined in the file,
+        including the namespace.<BR>
+        For example, a class in the Dali namespace called Actor would have the guard:<BR><BR> __DALI_ACTOR_H__<BR><BR>
+        An Actor class in the Dali::Internal namespace would have the guard:<BR><BR> __DALI_INTERNAL_ACTOR_H__<BR><BR>
+        The copyright & legal notice should follow the guard macro (inside the #ifdef), since this will improve build times.<BR><BR>
+        Start each source file with the copyright & legal notice.
+      </SUMMARY>
+    <H3>Class Comments</H3>
+      <SUMMARY>
+        Every class definition should have an accompanying comment that
+        describes what it is for and how it should be used.
+      </SUMMARY>
+      <CODE class="good">
+        /**
+         * Iterates over the contents of a GargantuanTable.  
+         * Example usage:
+         *    GargantuanTableIterator* iter = table-&gt;NewIterator();
+         *    for (iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next()) {
+         *      process(iter-&gt;key(), iter-&gt;value());
+         *    }
+         *    delete iter;
+         */
+        class GargantuanTableIterator
+        {
+          ...
+        };
+      </CODE>
+      <P>
+        Document the synchronization assumptions the class makes, if
+        any. If an instance of the class can be accessed by multiple
+        threads, take extra care to document the rules and invariants
+        surrounding multithreaded use.
+      </P>
+    <H3>Function Comments</H3>
+      <SUMMARY>
+        Every function declaration (typically in a header file) must have comments immediately
+        preceding it that describe what the function does and how to use it.  These comments
+        should be descriptive ("Opens the file") rather than imperative ("Open the file"); the
+        comment describes the function, it does not tell the function what to do.
+      </SUMMARY>
+      <P>
+        Types of things to mention in comments at the function
+        declaration:
+      </P>
+      <UL>
+        <LI> What the inputs and outputs are.</LI>
+        <LI> For class member functions:  whether the object
+              remembers reference arguments beyond the
+              duration of the method call, and whether it will
+              free them or not. </LI>
+        <LI> If the function allocates memory that the caller
+              must free. </LI>
+        <LI> Whether any of the arguments can be <CODE>NULL</CODE> </LI>
+        <LI> If there are any performance implications of how a function is used.</LI>
+        <LI> If the function is re-entrant.  What are its synchronization assumptions? </LI>
+      </UL>
+        <CODE class="good">
+          /**
+           * Get the iterator for this data table. Client's responsibility is to delete the iterator,
+           * and it must not use the iterator once the GargantuanTable object
+           * on which the iterator was created has been deleted.
+           *
+           * The iterator is initially positioned at the beginning of the table.
+           *
+           * This method is equivalent to:
+           *    Iterator* iter = table->NewIterator();
+           *    iter->Seek("");
+           *    return iter;
+           * If you are going to immediately seek to another place in the
+           * returned iterator, it will be faster to use NewIterator()
+           * and avoid the extra seek.
+           * @return an iterator for this table.  
+           */
+          Iterator* GetIterator() const;
+        </CODE>
+        <P>
+          When commenting constructors and destructors, remember that
+          the person reading your code knows what constructors and
+          destructors are for, so comments that just say something like
+          "destroys this object" are not useful.
+        </P>
+    <H3>Variable Comments</H3>
+      <SUMMARY>
+        In general the actual name of the variable should be descriptive
+        enough to give a good idea of what the variable is used for. In
+        certain cases, more comments are required.
+      </SUMMARY>
+      <CODE class="good">
+        private:
+        // Keeps track of the total number of entries in the table.
+        // Used to ensure we do not go over the limit. -1 means
+        // that we don't yet know how many entries the table has.
+        int mNumTotalEntries;
+      </CODE>
+    <H3> Duplicate documentation</H3>
+    <SUMMARY>
+        Try to avoid duplicate documentation by using the @copydoc command.
+    </SUMMARY>
+    <P>
+       @copydoc copies a documentation block from the object specified by
+       link-object and pastes it at the location of the command.
+       This command can be useful to avoid cases where a documentation block
+       would otherwise have to be duplicated or it can be used to extend the
+       documentation of an inherited member.
+    </P>
+    <CODE class="good">
+     /*! @copydoc MyClass::myfunction()
+      *  More documentation.
+      */
+    </CODE>
+     <P>
+       if the member is overloaded, you should specify the argument types
+      explicitly (without spaces!), like in the following:
+     </P>
+     <CODE class="good">
+      /*! @copydoc MyClass::myfunction(type1,type2) */
+     </CODE>
+    <H3>Punctuation, Spelling and Grammar</H3>
+      <SUMMARY>
+        Pay attention to punctuation, spelling, and grammar; it is
+        easier to read well-written comments than badly written ones.
+      </SUMMARY>
+      <P>
+        Comments should usually be written as complete
+        sentences with proper capitalization and periods at the end.
+        Shorter comments, such as comments at the end of a line of
+        code, can sometimes be less formal, but you should be
+        consistent with your style.  Complete sentences are more
+        readable, and they provide some assurance that the comment is
+        complete and not an unfinished thought.
+      </P>
+    <H3>TODO Comments</H3>
+      <SUMMARY>
+        Use <code>TODO</code> comments for code that is temporary, a
+        short-term solution, or good-enough but not perfect.
+      </SUMMARY>
+    <H3>Deprecation Comments</H3>
+      <SUMMARY>
+        Mark deprecated interface points with <code>DEPRECATED</code> comments.
+      </SUMMARY>
+  </ARTICLE>
+
+<H1>Formatting</H1>
+
+  <SUMMARY>
+    A project is much easier to follow if everyone uses the same style.
+    It is important that all contributors follow the style rules so that
+    they can all read and understand everyone's code easily.
+  </SUMMARY>
+
+  <H2>Formatting Rules <input type="button" value="Hide" onclick="toggleVisibility( this, 'formatting_rules' );"/></H2>
+  <ARTICLE class="detail" id="formatting_rules">
+    <H3>Basic Rules</H3>
+    <UL>
+      <LI>Use only spaces, and indent 2 spaces at a time</LI>
+      <LI>Avoid unnecessary trailing whitescape</LI>
+      <LI>Avoid overly long lines, modern screens and editors can handle upto 120 characters</LI>
+      <LI>Use UTF-8 formatting for non-ASCII characters</LI>
+    </UL>
+    <P>
+    Hex encoding is also OK, and encouraged where it enhances
+    readability &#8212; for example, <code>"\xEF\xBB\xBF"</code> is the
+    Unicode zero-width no-break space character, which would be
+    invisible if included in the source as straight UTF-8.
+    </P>
+
+    <H3>Class Format</H3>
+      <SUMMARY>
+        Sections in <code>public</code>, <code>protected</code> and
+        <code>private</code> order.
+        Typedefs and Enums first, Constructor(s) & Destructors & public API next, then virtual methods and implementation details last.
+      </SUMMARY>
+      <CODE class="good">
+      
+        /**
+          * Class documentation
+          */ 
+        class MyClass : public Base
+        {
+        public: // API
+
+          /**
+           * Documentation
+           */ 
+          MyClass();  // 2 space indent.
+
+          /**
+           * Documentation
+           */ 
+          explicit MyClass( int var );
+
+          /**
+           * Documentation
+           */ 
+          virtual ~MyClass() {}
+
+          /**
+           * Documentation
+           */ 
+          void SomeFunction();
+
+          /**
+           * Documentation
+           */ 
+          void SomeFunctionThatDoesNothing();
+
+          /**
+           * Documentation
+           */ 
+          void SetSomeVar( int var )
+
+          /**
+           * Documentation
+           */ 
+          int GetSomeVar() const
+
+        private: // Implementation
+
+          MyClass( MyClass& aRHs ); // no copying
+          MyClass& operator=( const MyClass& aRHs );  // no copying.
+          bool SomeInternalFunction();
+
+          int mSomeVar;
+          int mSomeOtherVar;
+        };
+      </CODE>
+
+    <H3>Constructor Initializer Lists</H3>
+      <SUMMARY>
+        Constructor initializer lists can be all on one line or with subsequent lines indented.
+        Always initialize things in declaration order, base class first!!
+      </SUMMARY>
+      <CODE class="good">
+        // When it all fits on one line:
+        MyClass::MyClass( int var ) : Base( var), mSomeVar( var ), mSomeOtherVar( var + 1 ) {}
+
+        // When it requires multiple lines, indent, putting the colon on
+        // the first initializer line:
+        MyClass::MyClass( int var )
+        : Base( var )
+          mSomeVar( var ),
+          mSomeOtherVar( var + 1 )
+        {
+          DoSomething();
+        }
+      </CODE>
+
+    <H3>Namespace Formatting</H3>
+      <SUMMARY>
+        The contents of namespaces are not indented.
+      </SUMMARY>
+      <CODE class="good">
+        namespace
+        {
+        void foo()
+        {  // Correct.  No extra indentation within namespace.
+          ...
+        }
+        }  // namespace
+      </CODE>
+      <P>
+        When declaring nested namespaces, put each namespace on its own line.
+      </P>
+      <CODE class="good">
+        namespace foo
+        {
+        namespace bar
+        {
+      </CODE>
+
+    <H3>Function Declarations and Definitions</H3>
+      <SUMMARY>
+        Return type on the same line as function name, parameters on the same line if they fit.
+        All parameters should be named, with identical names in the declaration and definition.
+      </SUMMARY>
+      <CODE class="good">
+        ReturnType ClassName::FunctionName( Type par_name1, Type par_name2 )
+        {
+          DoSomething();
+        }
+      </CODE>
+      <P>
+        If you have too much text to fit on one line:
+      </P>
+      <CODE class="good">
+        ReturnType ClassName::ReallyLongFunctionName( Type par_name1, Type par_name2,
+                                                      Type par_name3 )
+        {
+          DoSomething();
+        }
+      </CODE>
+      <P>
+        or if you cannot fit even the first parameter:
+      </P>
+      <CODE class="good">
+        ReturnType LongClassName::ReallyReallyReallyLongFunctionName(
+          Type par_name1,  // indent
+          Type par_name2,
+          Type par_name3 )
+        {
+          DoSomething();  // 2 space indent
+          ...
+        }
+      </CODE>
+      <P>
+        <code>const</code> keyword should be on the same line as the last parameter:
+      </P>
+      <CODE class="good">
+        // Everything in this function signature fits on a single line
+        ReturnType FunctionName( Type par ) const
+        {
+          ...
+        }
+
+        // This function signature requires multiple lines, but
+        // the const keyword is on the line with the last parameter.
+        ReturnType ReallyLongFunctionName( Type par1,
+                                           Type par2 ) const
+        {
+          ...
+        }
+      </CODE>
+      <P>
+        If some parameters are unused, comment out the variable name in the function definition:
+      </P>
+      <CODE class="good">
+        // Always have named parameters in interfaces.
+        class Shape
+        {
+        public:
+          virtual void Rotate( double radians ) = 0;
+        }
+
+        // Always have named parameters in the declaration.
+        class Circle : public Shape
+        {
+        public:
+          virtual void Rotate( double radians );
+        }
+
+        // Comment out unused named parameters in definitions.
+        void Circle::Rotate(double /*radians*/) {}
+      </CODE>
+      <CODE class="bad">
+        // Bad - if someone wants to implement later, it's not clear what the
+        // variable means.
+        void Circle::Rotate( double ) {}
+      </CODE>
+
+    <H3>Function Calls</H3>
+      <SUMMARY>
+        On one line if it fits; otherwise, wrap arguments at the parenthesis. Put one space inside the parentheses, none outside.
+      </SUMMARY>
+      <BODY>
+        <CODE class="good">
+          bool retval = DoSomething( argument1, argument2, argument3 );
+        </CODE>
+        <P>
+          If the arguments do not all fit on one line, they should be
+          broken up onto multiple lines, with each subsequent line
+          aligned with the first argument:
+        </P>
+        <CODE class="good">
+          bool retval = DoSomething( averyveryveryverylongargument1,
+                                     argument2, argument3 );
+        </CODE>
+        <P>
+          If the function has many arguments, consider having one per
+          line if this makes the code more readable:
+        </P>
+        <CODE class="good">
+          bool retval = DoSomething( argument1,
+                                     argument2,
+                                     argument3,
+                                     argument4 );
+        </CODE>
+        <P>
+          If the function signature is so long that it cannot fit, 
+          place all arguments on subsequent lines:
+        </P>
+        <CODE class="good">
+          if( ... )
+          {
+            DoSomethingThatRequiresALongFunctionName(
+              very_long_argument1,  // indent
+              argument2,
+              argument3,
+              argument4);
+          }
+        </CODE>
+
+    <H3>Conditionals</H3>
+      <SUMMARY>
+        <code>else</code> keyword belongs on its own line. Put one space inside the parentheses, none outside.
+      </SUMMARY>
+      <CODE class="good">
+        if( condition ) // space inside
+        {
+          ...
+        }
+        else
+        {
+          ...
+        }
+      </CODE>
+      <CODE class="bad">
+        if(condition)     // Bad - space missing after IF.
+        if(condition){    // Doubly bad.
+      </CODE>
+      <P>
+        Short conditional statements may be written on one line if
+        this enhances readability.  You may use this only when the
+        line is brief and the statement does not use the
+        <code>else</code> clause.
+      </P>
+      <CODE class="good">
+        if( x == kFoo ) return new Foo();
+        if( x == kBar ) return new Bar();
+      </CODE>
+      <P>
+        This is not allowed when the if statement has an
+        <code>else</code>:
+      </P>
+      <CODE class="bad">
+        // Not allowed - IF statement on one line when there is an ELSE clause
+        if (x) DoThis();
+        else DoThat();
+      </CODE>
+      <P>
+        In general, prefer curly braces for conditional 
+      </P>
+      <CODE class="good">
+        if( condition )
+        {
+          DoSomething();  // 2 space indent.
+        }
+      </CODE>
+      <P>
+        If one part of an <code>if</code>-<code>else</code>
+        statement uses curly braces, the other part must too:
+      </P>
+        <CODE class="bad">
+          // Not allowed - curly on IF but not ELSE
+          if (condition) // space outside, not inside
+          {
+            foo;
+          }
+          else
+            bar;
+
+          // Not allowed - curly on ELSE but not IF
+          if (condition)
+            foo;
+          else
+          {
+            bar;
+          }
+        </CODE>
+
+    <H3>Loops and Switch Statements</H3>
+      <SUMMARY>
+        Switch statements use braces for blocks. Empty loop bodies must use
+        <code>{}</code> or <code>continue</code>.
+        Switch statements should always have a <code>default</code> case
+        unless they switch on an <code>enum</code> type,
+        for which the compiler will ensure all values are handled.
+
+        If the default case should never execute, simply <code>assert</code>.
+        Put one space inside the parentheses, none outside.
+      </SUMMARY>
+      <P>
+        <code>case</code> blocks in <code>switch</code> statements must have
+        curly braces.
+        They should be placed as shown below.
+      </P>
+
+      <CODE class="good">
+        switch( var )
+        {
+          case 0: // 2 space indent
+          {
+            ...      // 2 space indent
+            break;
+          }
+          case 1:
+          {
+            ...
+            break;
+          }
+          default:
+          {
+            DALI_ASSERT_ALWAYS( false );
+          }
+        }
+      </CODE>
+      <P>
+        Empty loop bodies should use <code>{}</code> or
+        <code>continue</code>, but not a single semicolon.
+      </P>
+      <CODE class="good">
+        while( condition )
+        {
+          // Repeat test until it returns false.
+        }
+        for( int i = 0; i < someNumber; ++i )
+          {}  // Good - empty body, clearly on its own line
+        while( condition )
+          continue;  // Good - continue indicates no logic.
+      </CODE>
+      <CODE class="bad">
+        while (condition);  // Bad - looks like part of do/while loop.
+      </CODE>
+    <H3>Pointer and Reference Expressions</H3>
+      <SUMMARY>
+        No spaces around period or arrow.  Pointer operators do not have trailing spaces.
+      </SUMMARY>
+      <P>
+        The following are examples of correctly-formatted pointer and
+        reference expressions:
+      </P>
+      <CODE class="good">
+        x = *p;
+        p = &amp;x;
+        x = r.y;
+        x = r-&gt;y;
+      </CODE>
+      <P>
+        When declaring a pointer variable or argument, you may place
+        the asterisk adjacent to either the type or to the variable
+        name:
+      </P>
+      <CODE class="good">
+        // These are fine, space preceding.
+        char *c;
+        const string &amp;str;
+
+        // These are fine, space following.
+        char* c;    // but remember to do each variable on its own line or "char* c, *d, *e, ...;"!
+        const string&amp; str;
+      </CODE>
+      <CODE class="bad">
+        char * c;  // Bad - spaces on both sides of *
+        const string &amp; str;  // Bad - spaces on both sides of &amp;
+      </CODE>
+      <P>
+        You should do this consistently within a single file,
+        so, when modifying an existing file, use the style in that file.
+      </P>
+
+    <H3>Boolean Expressions</H3>
+      <SUMMARY>
+        When you have a boolean expression that is long, be consistent in
+        how you break up the lines.
+      </SUMMARY>
+      <P>
+        In this example, the logical AND operator is always at the end
+        of the lines:
+      </P>
+      <CODE class="good">
+        if( this_one_thing &gt; this_other_thing &amp;&amp;
+            a_third_thing == a_fourth_thing &amp;&amp;
+            yet_another &amp;&amp; last_one )
+        {
+          ...
+        }
+      </CODE>
+
+    <H3>Return Values</H3>
+      <SUMMARY>
+        Do not needlessly surround the <code>return</code> expression with parentheses.
+      </SUMMARY>
+      <CODE class="good">
+        return result;                  // No parentheses in the simple case.
+        return ( some_long_condition &amp;&amp;  // Parentheses ok to make a complex
+                 another_condition );     //     expression more readable.
+      </CODE>
+      <CODE class="bad">
+        return (value);                // You wouldn't write var = (value);
+        return(result);                // return is not a function!
+      </CODE>
+    <H3>Variable and Array Initialization</H3>
+      <SUMMARY>
+        Your choice of <code>=</code> or <code>()</code>.
+      </SUMMARY>
+      <P>
+        You may choose between <code>=</code> and <code>()</code>; the
+        following are all correct:
+      </P>
+      <CODE class="good">
+        int x = 3;
+        int x( 3 );
+        string name( "Some Name" );
+        string name = "Some Name";
+      </CODE>
+
+    <H3>Preprocessor Directives</H3>
+      <SUMMARY>
+        Preprocessor directives should not be indented but should
+        instead start at the beginning of the line.
+      </SUMMARY>
+      <P>
+        Even when pre-processor directives are within the body of
+        indented code, the directives should start at the beginning of
+        the line.
+      </P>
+      <CODE class="good">
+        // Good - directives at beginning of line
+          if( lopsided_score )
+          {
+        #if DISASTER_PENDING      // Correct -- Starts at beginning of line
+            DropEverything();
+        #endif
+            BackToNormal();
+          }
+      </CODE>
+      <CODE class="bad">
+        // Bad - indented directives
+          if( lopsided_score )
+          {
+            #if DISASTER_PENDING  // Wrong!  The "#if" should be at beginning of line
+            DropEverything();
+            #endif                // Wrong!  Do not indent "#endif"
+            BackToNormal();
+          }
+      </CODE>
+
+  </ARTICLE>
+
+  <P>Thats all folks, if you read this far you are now all equipped to write good code :) !! </P>
+
+</BODY>
+</HTML>

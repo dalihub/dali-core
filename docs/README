@@ -1,0 +1,4 @@
+To build the documentation type doxygen docs/dali_internal.doxy
+To view the output: firefox docs/generated/html/index.html
+
+Refer to dali-demo repository for public API and programming guide documentation.

@@ -1,0 +1,9 @@
+TARGETS += \
+        utc-Dali-EncodedBufferImage \
+        utc-Dali-BitmapImage \
+        utc-Dali-DistanceField \
+        utc-Dali-FrameBufferImage \
+        utc-Dali-Image \
+        utc-Dali-ImageAttributes \
+        utc-Dali-Pixel
+

@@ -1,0 +1,36 @@
+<VertexShader>
+  precision mediump float;
+
+  attribute vec3  aPosition;
+  attribute vec2  aTexCoord;
+
+  uniform   mat4  uModelView;
+  uniform   mat4  uProjection;
+  uniform   mat4  uMvpMatrix;
+  uniform   mat3  uNormalMatrix;
+  uniform   mat4  uModelMatrix;
+  uniform   mat4  uViewMatrix;
+
+  uniform   vec4  uColor;
+
+  varying   vec2  vTexCoord;
+
+  uniform   vec4  sTextureRect;
+  uniform   vec4  sEffectRect;
+
+</VertexShader>
+
+<FragmentShader>
+  precision mediump float;
+
+  uniform sampler2D sTexture;
+  uniform sampler2D sEffect;
+
+  uniform vec4      sTextureRect;
+  uniform vec4      sEffectRect;
+
+  uniform vec4      uColor;
+
+  varying vec2      vTexCoord;
+
+</FragmentShader>

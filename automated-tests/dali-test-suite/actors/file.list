@@ -1,0 +1,14 @@
+TARGETS += \
+	utc-Dali-Actor \
+	utc-Dali-CameraActor \
+	utc-Dali-ImageActor \
+	utc-Dali-Layer \
+	utc-Dali-LightActor \
+	utc-Dali-Model \
+	utc-Dali-MeshActor \
+	utc-Dali-RenderableActor \
+	utc-Dali-Stage \
+	utc-Dali-TextActor \
+	utc-Dali-CustomActor \
+	utc-Dali-BaseHandle \
+	utc-Dali-Handle \

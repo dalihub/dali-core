@@ -1,0 +1,8 @@
+!Makefile
+tet_captured
+results-desktop
+results-target
+results
+/dali-test-suite-utils.pc
+rules.mk
+dali.info

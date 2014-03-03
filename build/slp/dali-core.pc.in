@@ -1,0 +1,12 @@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+apiversion=@DALI_VERSION@
+libdir=${exec_prefix}/lib
+includedir=@devincludepath@
+
+Name: Samsung OpenGLES Toolkit
+Description: 3D Canvas Toolkit using OpenGLES
+Version: ${apiversion}
+Requires: opengl-es-20
+Libs: -L${libdir} -ldali-core
+Cflags: -I${includedir}

@@ -1,0 +1,7 @@
+TARGETS += \
+	utc-Dali-Font \
+	utc-Dali-FontParameters \
+        utc-Dali-Text \
+        utc-Dali-Character \
+        utc-Dali-TextStyle \
+        utc-Dali-Utf8 \

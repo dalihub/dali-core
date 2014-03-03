@@ -1,0 +1,17 @@
+TARGETS += \
+        utc-Dali-PanGesture \
+        utc-Dali-Gesture \
+        utc-Dali-PanGestureDetector \
+        utc-Dali-KeyEvent \
+        utc-Dali-GestureDetector \
+        utc-Dali-PinchGesture \
+        utc-Dali-PinchGestureDetector \
+        utc-Dali-TapGesture \
+        utc-Dali-TapGestureDetector \
+        utc-Dali-LongPressGesture \
+        utc-Dali-LongPressGestureDetector \
+        utc-Dali-EventProcessing \
+        utc-Dali-TouchProcessing \
+        utc-Dali-TouchEventCombiner \
+        utc-Dali-HitTestAlgorithm \
+        utc-Dali-MouseWheelEvent \

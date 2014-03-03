@@ -1,0 +1,1007 @@
+//
+// Copyright (c) 2014 Samsung Electronics Co., Ltd.
+//
+// Licensed under the Flora License, Version 1.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://floralicense.org/license/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an AS IS BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+// CLASS HEADER
+#include <dali/public-api/object/property-value.h>
+
+// EXTERNAL INCLUDES
+#include <boost/any.hpp>
+
+// INTERNAL INCLUDES
+#include <dali/public-api/math/angle-axis.h>
+#include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/math/matrix3.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/rect.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/object/property-types.h>
+#include <dali/integration-api/debug.h>
+
+namespace Dali
+{
+
+struct Property::Value::Impl
+{
+  Impl()
+  : mType( Property::NONE )
+  {
+  }
+
+  Impl(bool boolValue)
+  : mType( PropertyTypes::Get<bool>() ),
+    mValue( boolValue )
+  {
+  }
+
+  Impl(float floatValue)
+  : mType( PropertyTypes::Get<float>() ),
+    mValue( floatValue )
+  {
+  }
+
+  Impl(int integerValue)
+  : mType( PropertyTypes::Get<int>() ),
+    mValue( integerValue )
+  {
+  }
+
+  Impl(unsigned int unsignedIntegerValue)
+  : mType( PropertyTypes::Get<unsigned int>() ),
+    mValue( unsignedIntegerValue )
+  {
+  }
+
+  Impl(const Vector2& vectorValue)
+  : mType( PropertyTypes::Get<Vector2>() ),
+    mValue( vectorValue )
+  {
+  }
+
+  Impl(const Vector3& vectorValue)
+  : mType( PropertyTypes::Get<Vector3>() ),
+    mValue( vectorValue )
+  {
+  }
+
+  Impl(const Vector4& vectorValue)
+  : mType( PropertyTypes::Get<Vector4>() ),
+    mValue( vectorValue )
+  {
+  }
+
+  Impl(const Matrix3& matrixValue)
+  : mType(PropertyTypes::Get<Matrix3>()),
+    mValue(matrixValue)
+  {
+  }
+
+  Impl(const Matrix& matrixValue)
+  : mType(PropertyTypes::Get<Matrix>()),
+    mValue(matrixValue)
+  {
+  }
+
+  Impl(const AngleAxis& angleAxisValue)
+  : mType( PropertyTypes::Get<AngleAxis>() ),
+    mValue( angleAxisValue )
+  {
+  }
+
+  Impl(const Quaternion& quaternionValue)
+  : mType( PropertyTypes::Get<Quaternion>() ),
+    mValue( quaternionValue )
+  {
+  }
+
+  Impl(const std::string& stringValue)
+    : mType( PropertyTypes::Get<std::string>() ),
+      mValue( stringValue )
+  {
+  }
+
+  Impl(const Rect<int>& rect)
+    : mType( PropertyTypes::Get<Rect<int> >() ),
+      mValue( rect )
+  {
+  }
+
+  Impl(Property::Map container)
+    : mType( PropertyTypes::Get<Property::Map >() ),
+      mValue( container )
+  {
+  }
+
+  Impl(Property::Array container)
+    : mType( PropertyTypes::Get<Property::Array >() ),
+      mValue( container )
+  {
+  }
+
+  Type mType;
+
+  typedef boost::any AnyValue;
+  AnyValue mValue;
+};
+
+Property::Value::Value()
+: mImpl( NULL )
+{
+  mImpl = new Impl();
+}
+
+Property::Value::Value(bool boolValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( boolValue );
+}
+
+Property::Value::Value(float floatValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( floatValue );
+}
+
+Property::Value::Value(int integerValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( integerValue );
+}
+
+Property::Value::Value(unsigned int unsignedIntegerValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( unsignedIntegerValue );
+}
+
+Property::Value::Value(const Vector2& vectorValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( vectorValue );
+}
+
+Property::Value::Value(const Vector3& vectorValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( vectorValue );
+}
+
+Property::Value::Value(const Vector4& vectorValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( vectorValue );
+}
+
+Property::Value::Value(const Matrix3& matrixValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( matrixValue );
+}
+
+Property::Value::Value(const Matrix& matrixValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( matrixValue );
+}
+
+Property::Value::Value(const Rect<int>& rect)
+: mImpl( NULL )
+{
+  mImpl = new Impl( rect );
+}
+
+Property::Value::Value(const AngleAxis& angleAxisValue)
+: mImpl( NULL )
+{
+  mImpl = new Impl( angleAxisValue );
+}
+
+Property::Value::Value(const Quaternion& quaternionValue)
+{
+  mImpl = new Impl( quaternionValue );
+}
+
+Property::Value::Value(const std::string& stringValue)
+{
+  mImpl = new Impl( stringValue );
+}
+
+Property::Value::Value(const char *stringValue)
+{
+  mImpl = new Impl( std::string(stringValue) );
+}
+
+Property::Value::Value(Property::Array &arrayValue)
+{
+  mImpl = new Impl( arrayValue );
+}
+
+Property::Value::Value(Property::Map &mapValue)
+{
+  mImpl = new Impl( mapValue );
+}
+
+
+Property::Value::~Value()
+{
+  delete mImpl;
+}
+
+Property::Value::Value(const Value& value)
+{
+  switch (value.GetType())
+  {
+    case Property::BOOLEAN:
+    {
+      mImpl = new Impl( value.Get<bool>() );
+      break;
+    }
+
+    case Property::FLOAT:
+    {
+      mImpl = new Impl( value.Get<float>() );
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      mImpl = new Impl( value.Get<int>() );
+      break;
+    }
+
+    case Property::UNSIGNED_INTEGER:
+    {
+      mImpl = new Impl( value.Get<unsigned int>() );
+      break;
+    }
+
+    case Property::VECTOR2:
+    {
+      mImpl = new Impl( value.Get<Vector2>() );
+      break;
+    }
+
+    case Property::VECTOR3:
+    {
+      mImpl = new Impl( value.Get<Vector3>() );
+      break;
+    }
+
+    case Property::VECTOR4:
+    {
+      mImpl = new Impl( value.Get<Vector4>() );
+      break;
+    }
+
+    case Property::RECTANGLE:
+    {
+      mImpl = new Impl( value.Get<Rect<int> >() );
+      break;
+    }
+
+    case Property::ROTATION:
+    {
+      mImpl = new Impl( value.Get<Quaternion>() );
+      break;
+    }
+
+    case Property::MATRIX3:
+    {
+      mImpl = new Impl( value.Get<Matrix3>());
+      break;
+    }
+
+    case Property::MATRIX:
+    {
+      mImpl = new Impl( value.Get<Matrix>());
+      break;
+    }
+
+    case Property::STRING:
+    {
+      mImpl = new Impl( value.Get<std::string>() );
+      break;
+    }
+
+    case Property::MAP:
+    {
+      mImpl = new Impl( value.Get<Property::Map>() );
+      break;
+    }
+
+    case Property::ARRAY:
+    {
+      mImpl = new Impl( value.Get<Property::Array>() );
+      break;
+    }
+
+    case Property::NONE: // fall
+    default:
+    {
+      mImpl = new Impl();
+      break;
+    }
+  }
+}
+
+Property::Value::Value(Type type)
+{
+  switch (type)
+  {
+    case Property::BOOLEAN:
+    {
+      mImpl = new Impl( false );
+      break;
+    }
+
+    case Property::FLOAT:
+    {
+      mImpl = new Impl( 0.f );
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      mImpl = new Impl( 0 );
+      break;
+    }
+
+    case Property::UNSIGNED_INTEGER:
+    {
+      mImpl = new Impl( 0U );
+      break;
+    }
+
+    case Property::VECTOR2:
+    {
+      mImpl = new Impl( Vector2::ZERO );
+      break;
+    }
+
+    case Property::VECTOR3:
+    {
+      mImpl = new Impl( Vector3::ZERO );
+      break;
+    }
+
+    case Property::VECTOR4:
+    {
+      mImpl = new Impl( Vector4::ZERO );
+      break;
+    }
+
+    case Property::RECTANGLE:
+    {
+      mImpl = new Impl( Rect<int>(0,0,0,0) );
+      break;
+    }
+
+    case Property::ROTATION:
+    {
+      mImpl = new Impl( Quaternion(0.f, Vector4::YAXIS) );
+      break;
+    }
+
+    case Property::STRING:
+    {
+      mImpl = new Impl( std::string() );
+      break;
+    }
+
+    case Property::MAP:
+    {
+      mImpl = new Impl( Property::Map() );
+      break;
+    }
+
+    case Property::MATRIX:
+    {
+      mImpl = new Impl( Matrix() );
+      break;
+    }
+
+    case Property::MATRIX3:
+    {
+      mImpl = new Impl( Matrix3() );
+      break;
+    }
+
+    case Property::ARRAY:
+    {
+      mImpl = new Impl( Property::Array() );
+      break;
+    }
+
+    case Property::NONE: // fall
+    default:
+    {
+      mImpl = new Impl();
+      break;
+    }
+  }
+}
+
+Property::Value& Property::Value::operator=(const Property::Value& value)
+{
+  if (this == &value)
+  {
+    // skip self assignment
+    return *this;
+  }
+
+  mImpl->mType = value.GetType();
+
+  switch (mImpl->mType)
+  {
+    case Property::BOOLEAN:
+    {
+      mImpl->mValue = value.Get<bool>();
+      break;
+    }
+
+    case Property::FLOAT:
+    {
+      mImpl->mValue = value.Get<float>();
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      mImpl->mValue = value.Get<int>();
+      break;
+    }
+
+    case Property::UNSIGNED_INTEGER:
+    {
+      mImpl->mValue = value.Get<unsigned int>();
+      break;
+    }
+
+    case Property::VECTOR2:
+    {
+      mImpl->mValue = value.Get<Vector2>();
+      break;
+    }
+
+    case Property::VECTOR3:
+    {
+      mImpl->mValue = value.Get<Vector3>();
+      break;
+    }
+
+    case Property::VECTOR4:
+    {
+      mImpl->mValue = value.Get<Vector4>();
+      break;
+    }
+
+    case Property::RECTANGLE:
+    {
+      mImpl->mValue = value.Get<Rect<int> >();
+      break;
+    }
+
+    case Property::ROTATION:
+    {
+      mImpl->mValue = value.Get<Quaternion>();
+      break;
+    }
+
+    case Property::STRING:
+    {
+      mImpl->mValue = value.Get<std::string>();
+      break;
+    }
+
+    case Property::MATRIX:
+    {
+      mImpl->mValue = value.Get<Matrix>();
+      break;
+    }
+
+    case Property::MATRIX3:
+    {
+      mImpl->mValue = value.Get<Matrix3>();
+      break;
+    }
+
+    case Property::MAP:
+    {
+      mImpl->mValue = value.Get<Property::Map>();
+      break;
+    }
+
+    case Property::ARRAY:
+    {
+      mImpl->mValue = value.Get<Property::Array>();
+      break;
+    }
+
+    case Property::NONE: // fall
+    default:
+    {
+      mImpl->mValue = Impl::AnyValue(0);
+      break;
+    }
+  }
+
+  return *this;
+}
+
+Property::Type Property::Value::GetType() const
+{
+  return mImpl->mType;
+}
+
+void Property::Value::Get(bool& boolValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::BOOLEAN == GetType() && "Property type invalid" );
+
+  boolValue = boost::any_cast<bool>(mImpl->mValue);
+}
+
+void Property::Value::Get(float& floatValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::FLOAT == GetType() && "Property type invalid" );
+
+  floatValue = boost::any_cast<float>(mImpl->mValue);
+}
+
+void Property::Value::Get(int& integerValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::INTEGER == GetType() && "Property type invalid" );
+
+  integerValue = boost::any_cast<int>(mImpl->mValue);
+}
+
+void Property::Value::Get(unsigned int& unsignedIntegerValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::UNSIGNED_INTEGER == GetType() && "Property type invalid" );
+
+  unsignedIntegerValue = boost::any_cast<unsigned int>(mImpl->mValue);
+}
+
+void Property::Value::Get(Vector2& vectorValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::VECTOR2 == GetType() && "Property type invalid" );
+
+  vectorValue = boost::any_cast<Vector2>(mImpl->mValue);
+}
+
+void Property::Value::Get(Vector3& vectorValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::VECTOR3 == GetType() && "Property type invalid" );
+
+  vectorValue = boost::any_cast<Vector3>(mImpl->mValue);
+}
+
+void Property::Value::Get(Vector4& vectorValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::VECTOR4 == GetType() && "Property type invalid" );
+
+  vectorValue = boost::any_cast<Vector4>(mImpl->mValue);
+}
+
+void Property::Value::Get(Matrix3& matrixValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::MATRIX3 == GetType() && "Property type invalid" );
+  matrixValue = boost::any_cast<Matrix3>(mImpl->mValue);
+}
+
+void Property::Value::Get(Matrix& matrixValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::MATRIX == GetType() && "Property type invalid" );
+  matrixValue = boost::any_cast<Matrix>(mImpl->mValue);
+}
+
+void Property::Value::Get(Rect<int>& rect) const
+{
+  DALI_ASSERT_ALWAYS( Property::RECTANGLE == GetType() && "Property type invalid" );
+
+  rect = boost::any_cast<Rect<int> >(mImpl->mValue);
+}
+
+void Property::Value::Get(AngleAxis& angleAxisValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::ROTATION == GetType() && "Property type invalid" );
+
+  // Rotations have two representations
+  DALI_ASSERT_DEBUG( typeid(Quaternion) == mImpl->mValue.type() ||
+                     typeid(AngleAxis)  == mImpl->mValue.type() );
+
+  if ( typeid(Quaternion) == mImpl->mValue.type() )
+  {
+    Quaternion quaternion = boost::any_cast<Quaternion>(mImpl->mValue);
+
+    Radian angleRadians(0.0f);
+    quaternion.ToAxisAngle( angleAxisValue.axis, angleRadians );
+    angleAxisValue.angle = angleRadians;
+  }
+  else
+  {
+    angleAxisValue = boost::any_cast<AngleAxis>(mImpl->mValue);
+  }
+}
+
+void Property::Value::Get(Quaternion& quaternionValue) const
+{
+  DALI_ASSERT_ALWAYS( Property::ROTATION == GetType() && "Property type invalid" );
+
+  // Rotations have two representations
+  DALI_ASSERT_DEBUG( typeid(Quaternion) == mImpl->mValue.type() ||
+               typeid(AngleAxis)  == mImpl->mValue.type() );
+
+  if ( typeid(Quaternion) == mImpl->mValue.type() )
+  {
+    quaternionValue = boost::any_cast<Quaternion>(mImpl->mValue);
+  }
+  else
+  {
+    AngleAxis angleAxis = boost::any_cast<AngleAxis>(mImpl->mValue);
+
+    quaternionValue = Quaternion( Radian(angleAxis.angle), angleAxis.axis );
+  }
+}
+
+void Property::Value::Get(std::string &out) const
+{
+  DALI_ASSERT_ALWAYS(Property::STRING == GetType() && "Property type invalid");
+
+  out = boost::any_cast<std::string>(mImpl->mValue);
+}
+
+void Property::Value::Get(Property::Array &out) const
+{
+  DALI_ASSERT_ALWAYS(Property::ARRAY == GetType() && "Property type invalid");
+
+  out = boost::any_cast<Property::Array>(mImpl->mValue);
+}
+
+void Property::Value::Get(Property::Map &out) const
+{
+  DALI_ASSERT_ALWAYS(Property::MAP == GetType() && "Property type invalid");
+
+  out = boost::any_cast<Property::Map>(mImpl->mValue);
+}
+
+Property::Value& Property::Value::GetValue(const std::string& key) const
+{
+  DALI_ASSERT_ALWAYS(Property::MAP == GetType() && "Property type invalid");
+
+  Property::Map *container = boost::any_cast<Property::Map>(&(mImpl->mValue));
+
+  DALI_ASSERT_DEBUG(container);
+
+  if(container)
+  {
+    for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
+    {
+      if(iter->first == key)
+      {
+        return iter->second;
+      }
+    }
+  }
+
+  DALI_LOG_WARNING("Cannot find property map key %s", key.c_str());
+  DALI_ASSERT_ALWAYS(!"Cannot find property map key");
+
+  // should never return this
+  static Property::Value null;
+  return null;
+}
+
+bool Property::Value::HasKey(const std::string& key) const
+{
+  bool has = false;
+
+  if( Property::MAP == GetType() )
+  {
+    Property::Map *container = boost::any_cast<Property::Map>(&(mImpl->mValue));
+
+    DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
+
+    if(container)
+    {
+      for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
+      {
+        if(iter->first == key)
+        {
+          has = true;
+        }
+      }
+    }
+  }
+
+  return has;
+}
+
+
+const std::string& Property::Value::GetKey(const int index) const
+{
+  switch( GetType() )
+  {
+    case Property::MAP:
+    {
+      int i = 0;
+      Property::Map *container = boost::any_cast<Property::Map>(&(mImpl->mValue));
+      DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
+      if(container)
+      {
+        if(0 <= index && index < static_cast<int>(container->size()))
+        {
+          for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
+          {
+            if(i++ == index)
+            {
+              return iter->first;
+            }
+          }
+        }
+      }
+    }
+    break;
+    case Property::NONE:
+    case Property::ARRAY:
+    case Property::BOOLEAN:
+    case Property::FLOAT:
+    case Property::UNSIGNED_INTEGER:
+    case Property::INTEGER:
+    case Property::VECTOR2:
+    case Property::VECTOR3:
+    case Property::VECTOR4:
+    case Property::MATRIX:
+    case Property::MATRIX3:
+    case Property::RECTANGLE:
+    case Property::ROTATION:
+    case Property::STRING:
+    case Property::TYPE_COUNT:
+    {
+      break;
+    }
+  }
+
+
+  // should never return this
+  static std::string null;
+  return null;
+}
+
+
+void Property::Value::SetValue(const std::string& key, const Property::Value &value)
+{
+  DALI_ASSERT_ALWAYS(Property::MAP == GetType() && "Property type invalid");
+
+  Property::Map *container = boost::any_cast<Property::Map>(&(mImpl->mValue));
+
+  if(container)
+  {
+    for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
+    {
+      if(iter->first == key)
+      {
+        iter->second = value;
+        return;
+      }
+    }
+
+    // if we get here its a new key
+    container->push_back(Property::StringValuePair(key, value));
+
+  }
+}
+
+Property::Value& Property::Value::GetItem(const int index) const
+{
+  switch( GetType() )
+  {
+    case Property::MAP:
+    {
+      int i = 0;
+      Property::Map *container = boost::any_cast<Property::Map>(&(mImpl->mValue));
+
+      DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
+      if(container)
+      {
+        DALI_ASSERT_ALWAYS(index < static_cast<int>(container->size()) && "Property array index invalid");
+        DALI_ASSERT_ALWAYS(index >= 0 && "Property array index invalid");
+
+        for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
+        {
+          if(i++ == index)
+          {
+            return iter->second;
+          }
+        }
+      }
+    }
+    break;
+
+    case Property::ARRAY:
+    {
+      int i = 0;
+      Property::Array *container = boost::any_cast<Property::Array>(&(mImpl->mValue));
+
+      DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
+      if(container)
+      {
+        DALI_ASSERT_ALWAYS(index < static_cast<int>(container->size()) && "Property array index invalid");
+        DALI_ASSERT_ALWAYS(index >= 0 && "Property array index invalid");
+
+        for(Property::Array::iterator iter = container->begin(); iter != container->end(); ++iter)
+        {
+          if(i++ == index)
+          {
+            return *iter;
+          }
+        }
+      }
+    }
+    break;
+
+    case Property::NONE:
+    case Property::BOOLEAN:
+    case Property::FLOAT:
+    case Property::INTEGER:
+    case Property::UNSIGNED_INTEGER:
+    case Property::VECTOR2:
+    case Property::VECTOR3:
+    case Property::VECTOR4:
+    case Property::MATRIX3:
+    case Property::MATRIX:
+    case Property::RECTANGLE:
+    case Property::ROTATION:
+    case Property::STRING:
+    case Property::TYPE_COUNT:
+    {
+      DALI_ASSERT_ALWAYS(!"Cannot GetItem on property Type; not a container");
+      break;
+    }
+
+  } // switch GetType()
+
+
+  DALI_ASSERT_ALWAYS(!"Property value index not valid");
+
+  // should never return this
+  static Property::Value null;
+  return null;
+}
+
+void Property::Value::SetItem(const int index, const Property::Value &value)
+{
+  switch( GetType() )
+  {
+    case Property::MAP:
+    {
+      Property::Map *container = boost::any_cast<Property::Map>(&(mImpl->mValue));
+      if( container && index < static_cast<int>(container->size()) )
+      {
+        int i = 0;
+        for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
+        {
+          if(i++ == index)
+          {
+            iter->second = value;
+            break;
+          }
+        }
+      }
+    }
+    break;
+
+    case Property::ARRAY:
+    {
+      Property::Array *container = boost::any_cast<Property::Array>(&(mImpl->mValue));
+      if( container && index < static_cast<int>(container->size()) )
+      {
+        (*container)[index] = value;
+      }
+    }
+    break;
+
+    case Property::NONE:
+    case Property::BOOLEAN:
+    case Property::FLOAT:
+    case Property::INTEGER:
+    case Property::UNSIGNED_INTEGER:
+    case Property::VECTOR2:
+    case Property::VECTOR3:
+    case Property::VECTOR4:
+    case Property::MATRIX3:
+    case Property::MATRIX:
+    case Property::RECTANGLE:
+    case Property::ROTATION:
+    case Property::STRING:
+    case Property::TYPE_COUNT:
+    {
+      DALI_ASSERT_ALWAYS(!"Cannot SetItem on property Type; not a container");
+      break;
+    }
+  }
+}
+
+int Property::Value::AppendItem(const Property::Value &value)
+{
+  DALI_ASSERT_ALWAYS(Property::ARRAY == GetType() && "Property type invalid");
+
+  Property::Array *container = boost::any_cast<Property::Array>(&(mImpl->mValue));
+
+  if(container)
+  {
+    container->push_back(value);
+    return container->size() - 1;
+  }
+  else
+  {
+    return -1;
+  }
+
+}
+
+int Property::Value::GetSize() const
+{
+  int ret = 0;
+
+  switch(GetType())
+  {
+    case Property::MAP:
+    {
+      Property::Map *container = boost::any_cast<Property::Map>(&(mImpl->mValue));
+      if(container)
+      {
+        ret = container->size();
+      }
+    }
+    break;
+
+    case Property::ARRAY:
+    {
+      Property::Array *container = boost::any_cast<Property::Array>(&(mImpl->mValue));
+      if(container)
+      {
+        ret = container->size();
+      }
+    }
+    break;
+
+    case Property::NONE:
+    case Property::BOOLEAN:
+    case Property::FLOAT:
+    case Property::INTEGER:
+    case Property::UNSIGNED_INTEGER:
+    case Property::VECTOR2:
+    case Property::VECTOR3:
+    case Property::VECTOR4:
+    case Property::MATRIX3:
+    case Property::MATRIX:
+    case Property::RECTANGLE:
+    case Property::ROTATION:
+    case Property::STRING:
+    case Property::TYPE_COUNT:
+    {
+      break;
+    }
+
+  }
+
+  return ret;
+}
+
+
+} // namespace Dali

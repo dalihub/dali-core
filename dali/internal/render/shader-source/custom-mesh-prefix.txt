@@ -1,0 +1,47 @@
+<VertexShader>
+  precision mediump float;
+
+  uniform   mat4    uProjection;
+  uniform   mat4    uModelView;
+  uniform   mat4    uMvpMatrix;
+
+  uniform   bool    uTextureMapped;
+  uniform   vec4    uCustomTextureCoords;
+  attribute vec2    aTexCoord;
+  varying   vec2    vTexCoord;
+
+  uniform   mat3    uModelViewIT;
+  attribute vec3    aNormal;
+  varying   vec3    vNormal;
+
+  attribute vec3    aPosition;
+  varying   vec4    vVertex;
+
+</VertexShader>
+
+<FragmentShader>
+  precision mediump float;
+
+  struct Material
+  {
+    float      mOpacity;
+    float      mShininess;
+    lowp vec4  mAmbient;
+    lowp vec4  mDiffuse;
+    lowp vec4  mSpecular;
+    lowp vec4  mEmissive;
+  };
+
+  uniform sampler2D     sTexture;
+  uniform sampler2D     sOpacityTexture;
+  uniform sampler2D     sNormalMapTexture;
+  uniform sampler2D     sEffect;
+  varying vec2          vTexCoord;
+
+  uniform Material      uMaterial;
+
+  uniform lowp  vec4    uColor;
+  varying vec4          vVertex;
+  varying highp vec3    vNormal;
+
+</FragmentShader>

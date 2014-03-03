@@ -1,0 +1,332 @@
+<HTML>
+<HEAD>
+<TITLE>Dali C++ Coding Conventions</TITLE>
+<!--
+green code for good examples, same formatting as <pre> tag
+red code for bad examples, same formatting as <pre> tag
+details hidden by default
+-->
+<style type="text/css">
+code.good { color:green; white-space:pre; }
+code.bad { color:red; white-space:pre; }
+article.detail { display:block; }
+</style>
+
+<script type="text/javascript">
+function toggleVisibility( button, obj )
+{
+  // must have button and object
+  if( !button || !obj )
+    return;
+  var e=document.getElementById( obj );
+  if( !e )
+    return;
+
+  // initially display property seems to be empty, then none
+  if( e.style.display == "" || e.style.display == "none" )
+  {
+    // paragraph shown
+    button.value="Hide";
+    e.style.display="block";
+  }
+  else
+  {
+    // paragraph hidden
+    button.value="Show";
+    e.style.display="none";
+  }
+}
+</script>
+
+</HEAD>
+<BODY>
+
+<H1>General</H1>
+  <P>
+    Here's a few pragmatic programmer guidelines to follow (<A HREF="http://www.codinghorror.com/blog/files/Pragmatic%20Quick%20Reference.htm">Web version</A>)
+    <H3>Details <input type="button" value="Hide" onclick="toggleVisibility( this, 'general_details' );"/></H3>
+    <ARTICLE class="detail" id="general_details">
+      <UL>
+      <LI><B>Care About the Software, Care about your API users and end users</B><BR>
+            Why spend your life developing software unless you care about doing it well?
+            Turn off the autopilot and take control. Constantly critique and appraise your work.
+      <LI><B>Don't Live with Broken Windows</B><BR>
+            Fix bad designs, wrong decisions, and poor code when you see them.
+            You can't force change on people. Instead, show them how the future might be and help them participate in creating it.
+      <LI><B>Remember the Big Picture</B><BR>
+            Don't get so engrossed in the details that you forget to check what's happening around you.
+      <LI><B>DRY - Don't Repeat Yourself</B><BR>
+            Every piece of knowledge must have a single, unambiguous, authoritative representation within a system.
+      <LI><B>Eliminate Effects Between Unrelated Things</B><BR>
+            Design components that are self-contained. independent, and have a single, well-defined purpose.
+      <LI><B>There Are No Final Decisions</B><BR>
+            No decision is cast in stone. Instead, consider each as being written in the sand at the beach, and plan for change.
+      <LI><B>Fix the Problem, Not the Blame</B><BR>
+            It doesn't really matter whether the bug is your fault or someone else's—it is still your problem, and it still needs to be fixed.
+      <LI><B>You Can't Write Perfect Software</B><BR>
+            Software can't be perfect. Protect your code and users from the inevitable errors.
+      <LI><B>Design with Contracts</B><BR>
+            Use contracts to document and verify that code does no more and no less than it claims to do.
+      <LI><B>Crash Early</B><BR>
+            A dead program normally does a lot less damage than a crippled one.
+      <LI><B>Use Assertions to Prevent the Impossible</B><BR>
+            Assertions validate your assumptions. Use them to protect your code from an uncertain world.
+      <LI><B>Use Exceptions for Exceptional Problems</B><BR>
+            Exceptions can suffer from all the readability and maintainability problems of classic spaghetti code. Reserve exceptions for exceptional things.
+      <LI><B>Minimize Coupling Between Modules</B><BR>
+            Avoid coupling by writing "shy" code and applying the Law of Demeter.
+      <LI><B>Put Abstractions in Code, Details in Metadata</B><BR>
+            Program for the general case, and put the specifics outside the compiled code base.
+      <LI><B>Always Design for Concurrency</B><BR>
+            Allow for concurrency, and you'll design cleaner interfaces with fewer assumptions.
+      <LI><B>Don't Program by Coincidence</B><BR>
+            Rely only on reliable things. Beware of accidental complexity, and don't confuse a happy coincidence with a purposeful plan.
+      <LI><B>Test Your Estimates</B><BR>
+            Mathematical analysis of algorithms doesn't tell you everything. Try timing your code in its target environment.
+      <LI><B>Refactor Early, Refactor Often</B><BR>
+            Just as you might weed and rearrange a garden, rewrite, rework, and re-architect code when it needs it. Fix the root of the problem.
+      <LI><B>Design to Test</B><BR>
+            Start thinking about testing before you write a line of code.
+      <LI><B>Abstractions Live Longer than Details</B><BR>
+            Invest in the abstraction, not the implementation. Abstractions can survive the barrage of changes from different implementations and new technologies.
+      <LI><B>Coding Ain't Done 'Til All the Tests Run</B><BR>
+            'Nuff said.
+      <LI><B>Use Saboteurs to Test Your Testing</B><BR>
+            Introduce bugs on purpose in a separate copy of the source to verify that testing will catch them.
+      <LI><B>Find Bugs Once</B><BR>
+            Once a human tester finds a bug, it should be the last time a human tester finds that bug. Automatic tests should check for it from then on.
+      <LI><B>Sign Your Work</B><BR>
+            Craftsmen of an earlier age were proud to sign their work. You should be, too.
+      </UL>
+    </ARTICLE>
+  </P>
+
+  <H2>Avoid Tight Coupling</H2>
+    <P>
+      Always choose the loosest possible coupling between entities. In C++ the tightest coupling is Friend, second is Inheritance,
+      then Containment and last is Usage through reference, pointer or handle.
+    <H3>Details <input type="button" value="Hide" onclick="toggleVisibility( this, 'coupling_details' );"/></H3>
+    <ARTICLE class="detail" id="coupling_details">
+      <UL>
+        <LI>Friend defines a "must-know" about details of implementation, don't use it unless your happy stating that Xxx really <B>must</B> know about Yyy implementation. and Yyy can never change without informing Xxx.
+        <LI>Inheritance defines a "is-a" relationship, don't use it unless you really can naturally say Xxx is-a Yyy. Most of the cases containment through interface is what you
+        <LI>Containment defines a "owns-a" relationship, use it when you have a natural Xxx owns-a Yyy relationship.
+      </UL>
+      Most of the time containment through interface and normal usage is what you should go for.
+      Strong ownership always beats sharing through reference counting. Reference counting means "part owns".
+      You would not want to part own anything in real life, so why do that in software? sooner or later it will leak,
+    </ARTICLE>
+    </P>
+
+  Two key principles to follow:
+  <H2>Open Closed Principle</H2>
+    <P>
+      Software entities (classes, modules, functions, etc.) should be open for extension, but closed for modification.
+      That is, such an entity can allow its behaviour to be modified without altering its source code. Techniqu
+    </P>
+
+  <H2>Dependency Inversion Principle</H2>
+    <P>
+      High-level modules should not depend on low-level modules. Both should depend on abstractions.
+      Abstractions should not depend upon details. Details should depend upon abstractions.
+    </P>
+
+<H1>General conventions</H1>
+  <H2>Type casting <input type="button" value="Hide" onclick="toggleVisibility( this, 'ccasts_details' );"/></H2>
+    <ARTICLE class="detail" id="ccasts_details">
+      <SUMMARY>
+        <B>Never use C-Style Casts</B><BR>
+        The C-style cast - "(type) expr" used to convert one fundamental type to another is subject to implementation-defined effects.
+        For scalar types it can result in silent truncation of the value. For pointers and references, it does not check the
+        compatibility of the value with the target type.<BR>
+        <B>Don't cast away const, use mutable keyword instead</B><BR>
+        <B>Don't reinterpret_cast, fix the design instead</B><BR>
+        <B>Remember that reference cast will throw an error if cast fails</B><BR>
+        <B>Avoid using pointer or reference casts. They have been referred to as the goto of OO programming, fix the design instead</B><BR>
+      </SUMMARY>
+      <CODE class="good">
+        X* ptr = static_cast<X*>( y_ptr ); // ok, compiler checks whether types are compatible
+      </CODE>
+      <CODE class="bad">
+        (Foo*) ptr; // bad! C-cast is not guaranteed to check and never complains
+      </CODE>
+    </ARTICLE>
+
+<H1>Classes</H1>
+  <SUMMARY>
+    A class interface should be complete and minimal. Class should encapsulate one thing and one thing only.
+    A complete interface allows clients to do anything they may reasonably want to do.
+    On the other hand, a minimal interface will contain as few functions as possible.
+    Class methods must be defined in the same order as they are declared. This helps navigating through code.
+  </SUMMARY>
+  <H2>Compulsory member functions <input type="button" value="Hide" onclick="toggleVisibility( this, 'implicit_method_details' );"/></H2>
+    <ARTICLE class="detail" id="implicit_method_details">
+      <SUMMARY>
+        Every class must define default constructor, copy constructor, assignment operator and destructor.
+        If you dont declare them, compiler will and the compiler generated versions are usually not good or safe enough.
+        If your class does not support copying, then declare copy constructor and assignment operator as private and don't define them.
+      </SUMMARY>
+      <P>
+        If for example the assignment operator is not needed for a particular class, then it
+        must be declared private and not defined. Any attempt to invoke the operator will result
+        in a compile-time error. On the contrary, if the assignment operator is not declared, then
+        when it is invoked, a compiler-generated form will be created and subsequently executed.
+        This could lead to unexpected results. The same goes with default constructor and copy constructor.
+      </P>
+      <CODE class="good">
+        class X
+        {
+          X();                      // default constructor
+          X( const X& );            // copy constructor
+          X& operator=( const X& ); // copy assignment operator
+          ~X();                     // destructor
+        };
+      </CODE>
+    </ARTICLE>
+  <H2>Class types <input type="button" value="Hide" onclick="toggleVisibility( this, 'class_types_details' );"/></H2>
+    <ARTICLE class="detail" id="class_types_details">
+      <SUMMARY>
+        Classes can have either <B>Value</B> semantics or <B>Pointer</B> semantics. Not both.
+        It must be clearly documented whether a class follows value or pointer semantics and this also
+        sets requirements on the class interface.
+      </SUMMARY>
+      <P>
+        Classes with <B>Value</B> semantics are passed as value types. These classes provide a copy constructor,
+        a default constructor and assignment operator so that they can be copied and also stored on STL containers.
+      </P>
+      <P>
+        Classes with <B>Pointer</B> semantics are always passed through pointers, references or smart pointers.
+        These classes are ususally compound types that cannot be easily copied and thus prevent copy constructor,
+        and assignment operator. That can be only stored on STL containers through smart pointers.
+      </P>
+    </ARTICLE>
+  <H2>Access Rights <input type="button" value="Hide" onclick="toggleVisibility( this, 'access_details' );"/></H2>
+    <ARTICLE class="detail" id="access_details">
+      <P>
+        Public and protected data should only be used in structs, not classes.
+        Roughly two types of classes exist: those that essentially aggregate data and those that provide
+        an abstraction while maintaining a well-defined state or invariant.
+      </P>
+      <P>
+        A structure should be used to model an entity that does not require an invariant (Plain Old Data)
+        A class should be used to model an entity that maintains an invariant.
+        <B>Rationale:</B> A class is able to maintain its invariant by controlling access to its data. However,
+        a class cannot control access to its members if those members non-private.
+        Hence all data in a class should be private.
+      </P>
+    </ARTICLE>
+  <H2>Constructors <input type="button" value="Hide" onclick="toggleVisibility( this, 'constructor_details' );"/></H2>
+    <ARTICLE class="detail" id="constructor_details">
+      <P>
+        Virtual function calls are not allowed from constructor
+        Rationale: Virtual functions are resolved statically (not dynamically) in constructor
+      </P>
+      <P>
+        Member initialization order must be the same in which they are declared in the class.
+        Note: Since base class members are initialized before derived class members, base class
+              initializers should appear at the beginning of the member initialization list.
+        <B>Rationale:</B> Members of a class are initialized in the order in which they are declared—not
+        the order in which they appear in the initialization list.
+      </P>
+      <P>
+        Constructor body should not throw an exception, keep constructor simple and trivial.
+        If constructor fails, objects lifecycle never started, destructor will not be called.
+      </P>
+      <P>
+        Declare all single argument constructors as explicit thus preventing their use as implicit type convertors.
+        <CODE class="good">
+          class C
+          {
+          public:
+            explicit C( int );         // good, explicit
+            C( int, int );             // ok more than one non-default argument
+          };
+        </CODE>
+        <CODE class="bad">
+          class C
+          {
+          public:
+            C( double );               // bad, can be used in implicit conversion
+            C( float f, int i=0 );     // bad, implicit conversion constructor
+            C( int i=0, float f=0.0 ); // bad, default constructor, but also a conversion constructor
+          };
+        </CODE>
+      </P>
+    </ARTICLE>
+  <H2>Destructor <input type="button" value="Hide" onclick="toggleVisibility( this, 'destructor_details' );"/></H2>
+    <ARTICLE class="detail" id="destructor_details">
+      <P>
+        All classes should define a destructor, either:
+        <UL>
+          <LI>public for value types
+          <LI>public and virtual for base classes with virtual methods
+          <LI>protected and virtual for base classes to prevent deletion (and ownership) through base class
+        </UL>
+        This prevents undefined behavior. If an application attempts to delete a derived class object
+        through a base class pointer, the result is undefined if the base class destructor is non-virtual.
+      </P>
+      <P>
+        Virtual function calls are not allowed from inside the destructor.
+        Rationale: A class's virtual functions are resolved statically (not dynamically) in its destructor
+      </P>
+      <P>
+        All resources acquired by a class shall be released by the class's destructor.
+      </P>
+      <P>
+        Destructor is not allowed to throw an exception, avoid doing complicated things in destructor.
+      </P>
+    </ARTICLE>
+  <H2>Methods <input type="button" value="Hide" onclick="toggleVisibility( this, 'method_details' );"/></H2>
+    <ARTICLE class="detail" id="method_details">
+      <P>
+        Don't shortcut, like use the returned reference of getter to assign a new value. If a Setter is missing, add it!
+        <CODE class="bad">
+            initial.GetPosition() = Position(10, 10); // bad!, If GetPosition is one day changed to return copy
+                                                      // of Position this code silently changes to a no-op.
+        </CODE>
+        <CODE class="good">
+            initial.SetPosition( Position( 10, 10 ) );
+        </CODE>
+      </P>
+      <P>
+        Code that is not used (commented out) should be deleted.
+        Rationale: No dead code should be left to confuse other people.
+        Exception: Code that is simply part of an explanation may appear in comments.
+      </P>
+      <P>
+      </P>
+    </ARTICLE>
+
+  <H2>Inline member functions <input type="button" value="Hide" onclick="toggleVisibility( this, 'inline_details' );"/></H2>
+    <ARTICLE class="detail" id="inline_details">
+      <P>
+
+        GCC automatically inlines member functions defined within the class body of C++ programs even if they are not explicitly declared inline.
+        <CODE class="bad">
+		class Color
+		{
+ 			inline float& GetRed()  { return mRed;   }		// inline keyword not needed
+			inline float& GetGreen(){ return mGreen; }
+		};
+        </CODE>
+        <CODE class="good">
+		class Color
+		{
+ 			float& GetRed()   { return mRed;   }
+			float& GetGreen(){ return mGreen; }
+		};
+        </CODE>
+      </P>
+      <P>
+      	If there are a lot of inlines, they should be in a .inl file.
+      	Remember the inline keyword is just a hint to the compiler. Whether
+      	a function will be inlined or not is down to the compiler and its flags.
+      </P>
+      <P>
+      </P>
+    </ARTICLE>
+
+  <P>Thats all folks, if you read this far you are now all equipped to write good code :) !! </P>
+
+</BODY>
+</HTML>

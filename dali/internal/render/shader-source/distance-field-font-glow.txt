@@ -1,0 +1,62 @@
+<VertexShader>
+
+  attribute mediump vec3  aPosition;
+  attribute mediump vec2  aTexCoord;
+
+  uniform   mediump mat4  uMvpMatrix;
+  uniform   lowp    vec4  uColor;
+  uniform   lowp    vec4  uTextColor;
+  uniform   lowp    vec4  uGradientColor;
+  uniform   mediump vec4  uGradientLine;
+  uniform   mediump vec2  uInvTextSize;
+
+  varying   mediump vec2  vTexCoord;
+  varying   lowp    vec4  vColor;
+
+  void main()
+  {
+    gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+    vTexCoord = aTexCoord;
+
+    lowp float f = dot( aPosition.xy * uInvTextSize - uGradientLine.xy, uGradientLine.zw );
+
+    vColor = mix(uTextColor, uGradientColor, f);
+  }
+
+</VertexShader>
+
+<FragmentShader>
+
+#extension GL_OES_standard_derivatives : enable
+
+  uniform mediump sampler2D sTexture;
+  uniform lowp    vec4      uColor;
+  uniform mediump float     uSmoothing;
+  uniform mediump float     uGlow;
+  uniform lowp    vec4      uGlowColor;
+
+  varying mediump vec2      vTexCoord;
+  varying lowp vec4         vColor;
+
+  void main()
+  {
+    // sample distance field
+    mediump float distance = texture2D(sTexture, vTexCoord).a;
+
+    mediump float smoothWidth = fwidth(distance) * 0.8;
+
+    mediump float glowBlend = smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);
+
+    // blend fragment color between glow color and text color
+    lowp vec4 clampedColor = clamp( vColor, 0.0, 1.0 );
+    lowp vec4 glowColor = vec4( uGlowColor.rgb, uGlowColor.a * clampedColor.a );
+    lowp vec4 color = mix(glowColor, clampedColor, glowBlend);
+
+    // fade out glow between uSmoothing and uGlow
+    color.a *= smoothstep(uGlow, uSmoothing, distance);
+
+    // final color multiplied by Actor color
+    gl_FragColor = uColor * color;
+  }
+
+</FragmentShader>

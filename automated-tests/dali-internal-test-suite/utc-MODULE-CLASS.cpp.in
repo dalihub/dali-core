@@ -1,0 +1,94 @@
+//
+// Copyright (c) 2014 Samsung Electronics Co., Ltd.
+//
+// Licensed under the Flora License, Version 1.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://floralicense.org/license/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an AS IS BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+#include <iostream>
+
+#include <stdlib.h>
+#include <tet_api.h>
+
+#include <dali/public-api/dali-core.h>
+
+#include <dali-test-suite-utils.h>
+
+using namespace Dali;
+
+static void Startup();
+static void Cleanup();
+
+extern "C" {
+  void (*tet_startup)() = Startup;
+  void (*tet_cleanup)() = Cleanup;
+}
+
+static void Utc@MODULE@@CLASS@Method01();
+static void Utc@MODULE@@CLASS@Method02();
+
+enum {
+  POSITIVE_TC_IDX = 0x01,
+  NEGATIVE_TC_IDX,
+};
+
+// Add test functionality for all APIs in the class (Positive and Negative)
+extern "C" {
+  struct tet_testlist tet_testlist[] = {
+    { Utc@MODULE@@CLASS@Method01, POSITIVE_TC_IDX },
+    { Utc@MODULE@@CLASS@Method02, NEGATIVE_TC_IDX },
+    { NULL, 0 }
+  };
+}
+
+// Called only once before first test is run.
+static void Startup()
+{
+}
+
+// Called only once after last test is run
+static void Cleanup()
+{
+}
+
+
+// Positive test case for a method
+static void Utc@MODULE@@CLASS@Method01()
+{
+  TestApplication application;
+
+  tet_infoline("Journaled printf Output");
+  tet_result(TET_FAIL);
+#if 0
+  tet_result(TET_PASS);
+#endif
+}
+
+
+// Negative test case for a method
+static void Utc@MODULE@@CLASS@Method02()
+{
+  TestApplication application;  // Exceptions require TestApplication
+
+  try
+  {
+    /* My test code and results */
+    DALI_TEST_EQUALS(myVar, expectedValue, TEST_LOCATION);
+  }
+  catch (Dali::DaliException& e)
+  {
+    // Tests that a negative test of an assertion succeeds
+    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_ASSERT(e, "assert conditional", TEST_LOCATION);
+  }
+}
+

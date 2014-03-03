@@ -1,0 +1,3 @@
+TARGETS += \
+	DaliInternal/utc-DaliInternal-Font
+

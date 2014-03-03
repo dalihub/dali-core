@@ -1,0 +1,3 @@
+autoreconf --install
+./configure --prefix=$DESKTOP_PREFIX
+make install -j3

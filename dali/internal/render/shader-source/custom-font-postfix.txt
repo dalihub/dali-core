@@ -1,0 +1,29 @@
+<VertexShader>
+
+  void main()
+  {
+    gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);
+    vTexCoord = aTexCoord;
+  }
+
+</VertexShader>
+
+<FragmentShader>
+
+  void main()
+  {
+    // sample distance field
+    mediump float distance = texture2D(sTexture, vTexCoord).a;
+
+    mediump float smoothWidth = fwidth(distance);
+
+    // set fragment color
+    lowp vec4 color = uTextColor;
+
+    // adjust fragment alpha by sampled distance
+    color.a *= smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);
+
+    gl_FragColor = uColor * color;
+  }
+
+</FragmentShader>

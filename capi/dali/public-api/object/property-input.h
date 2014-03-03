@@ -1,0 +1,118 @@
+#ifndef __DALI_PROPERTY_INPUT_H__
+#define __DALI_PROPERTY_INPUT_H__
+
+//
+// Copyright (c) 2014 Samsung Electronics Co., Ltd.
+//
+// Licensed under the Flora License, Version 1.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://floralicense.org/license/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an AS IS BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+/**
+ * @addtogroup CAPI_DALI_FRAMEWORK
+ * @{
+ */
+
+// INTERNAL INCLUDES
+#include <dali/public-api/object/property.h>
+
+namespace Dali DALI_IMPORT_API
+{
+
+struct Vector2;
+struct Vector3;
+struct Vector4;
+class Matrix3;
+class Matrix;
+class Quaternion;
+
+/**
+ * An abstract interface for receiving property values.
+ */
+class PropertyInput
+{
+public:
+
+  /**
+   * Virtual destructor.
+   */
+  virtual ~PropertyInput() = 0;
+
+  /**
+   * Query the type of property input.
+   * @return The property type.
+   */
+  virtual Property::Type GetType() const = 0;
+
+  /**
+   * Retrieve a boolean value.
+   * @pre GetType() returns Property::BOOLEAN.
+   * @return The boolean value.
+   */
+  virtual const bool& GetBoolean() const = 0;
+
+  /**
+   * Retrieve a float value.
+   * @pre GetType() returns Property::FLOAT.
+   * @return The float value.
+   */
+  virtual const float& GetFloat() const = 0;
+
+  /**
+   * Retrieve a Vector2 value.
+   * @pre GetType() returns Property::VECTOR2.
+   * @return The Vector2 value.
+   */
+  virtual const Vector2& GetVector2() const = 0;
+
+  /**
+   * Retrieve a Vector3 value.
+   * @pre GetType() returns Property::VECTOR3.
+   * @return The Vector3 value.
+   */
+  virtual const Vector3& GetVector3() const = 0;
+
+  /**
+   * Retrieve a Vector4 value.
+   * @pre GetType() returns Property::VECTOR4.
+   * @return The Vector4 value.
+   */
+  virtual const Vector4& GetVector4() const = 0;
+
+  /**
+   * Retrieve a Matrix (3x3) value.
+   * @pre GetType() returns Property::Matrix3.
+   * @return The Matrix value.
+   */
+  virtual const Matrix3& GetMatrix3() const = 0;
+
+  /**
+   * Retrieve a Matrix (4x4) value.
+   * @pre GetType() returns Property::Matrix4.
+   * @return The Matrix value.
+   */
+  virtual const Matrix& GetMatrix() const = 0;
+
+  /**
+   * Retrieve a Quaternion value.
+   * @pre GetType() returns Property::Quaternion.
+   * @return The Quaternion value.
+   */
+  virtual const Quaternion& GetQuaternion() const = 0;
+};
+
+} // namespace Dali
+
+/**
+ * @}
+ */
+#endif // __DALI_PROPERTY_INPUT_H__

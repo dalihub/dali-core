@@ -1,0 +1,5 @@
+TARGETS += \
+        utc-Dali-ActiveConstraint \
+        utc-Dali-AlphaFunctions \
+        utc-Dali-Animation        \
+        utc-Dali-Constraint       \

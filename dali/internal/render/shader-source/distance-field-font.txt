@@ -1,0 +1,69 @@
+<VertexShader>
+
+  attribute mediump vec3  aPosition;
+  attribute mediump vec2  aTexCoord;
+
+  uniform   mediump mat4  uMvpMatrix;
+  uniform   lowp    vec4  uColor;
+  uniform   lowp    vec4  uTextColor;
+
+  varying   mediump vec2  vTexCoord;
+
+#ifdef USE_GRADIENT
+  uniform   lowp    vec4  uGradientColor;
+  uniform   mediump vec4  uGradientLine;
+  uniform   mediump vec2  uInvTextSize;
+
+  varying   lowp    vec4  vColor;
+#endif
+
+  void main()
+  {
+    gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+    vTexCoord = aTexCoord;
+
+#ifdef USE_GRADIENT
+    lowp float f = dot( aPosition.xy * uInvTextSize - uGradientLine.xy, uGradientLine.zw );
+    vColor = mix(uTextColor, uGradientColor, f);
+#endif
+  }
+
+</VertexShader>
+
+<FragmentShader>
+
+#extension GL_OES_standard_derivatives : enable
+
+  uniform mediump sampler2D sTexture;
+  uniform lowp    vec4      uColor;
+  uniform mediump float     uSmoothing;
+
+  varying mediump vec2      vTexCoord;
+
+#ifdef USE_GRADIENT
+  varying lowp    vec4      vColor;
+#else
+  uniform lowp    vec4      uTextColor;
+#endif
+
+  void main()
+  {
+    // sample distance field
+    mediump float distance = texture2D(sTexture, vTexCoord).a;
+
+    mediump float smoothWidth = fwidth(distance) * 0.8;
+
+#ifdef USE_GRADIENT
+    lowp vec4 color = clamp(vColor, 0.0, 1.0);
+#else
+    lowp vec4 color = uTextColor;
+#endif
+
+    // adjust fragment alpha by sampled distance
+    color.a *= smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);
+
+    // final color multiplied by Actor color
+    gl_FragColor = uColor * color;
+  }
+
+</FragmentShader>
