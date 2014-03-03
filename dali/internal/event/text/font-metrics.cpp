@@ -62,10 +62,9 @@ FontMetricsIntrusivePtr FontMetrics::New( const Vector2& dpi,
                                           const std::size_t hashValue,
                                           const FontId fontId,
                                           const std::string& fontFamily,
-                                          const std::string& fontStyle,
-                                          ResourceClient& resourceClient )
+                                          const std::string& fontStyle )
 {
-  return new FontMetrics( dpi, hashValue, fontId, fontFamily, fontStyle, resourceClient);
+  return new FontMetrics( dpi, hashValue, fontId, fontFamily, fontStyle );
 }
 
 void FontMetrics::LoadGlobalMetrics()
@@ -417,8 +416,7 @@ FontMetrics::FontMetrics(const Vector2& dpi,
                          const std::size_t hashValue,
                          const FontId fontId,
                          const std::string& fontFamily,
-                         const std::string& fontStyle,
-                         ResourceClient& resourceClient )
+                         const std::string& fontStyle )
 :
   mFontFamily(fontFamily),
   mFontStyle(fontStyle),

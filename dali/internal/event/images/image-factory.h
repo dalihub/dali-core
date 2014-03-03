@@ -31,7 +31,7 @@ class ResourceType;
 
 namespace ImageFactoryCache
 {
-class Request;
+struct Request;
 }
 
 /**

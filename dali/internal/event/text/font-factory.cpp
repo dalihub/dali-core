@@ -62,7 +62,7 @@ FontMetricsIntrusivePtr FontFactory::GetFontMetrics( const std::string& fontFami
   FontMetricsIter iter = mMetricsCache.find( hashValue );
   if ( iter == mMetricsCache.end() )
   {
-    metrics = FontMetrics::New( Vector2(mHorizontalDpi, mVerticalDpi), hashValue, mFontCount, fontFamily, fontStyle, mResourceClient );
+    metrics = FontMetrics::New( Vector2(mHorizontalDpi, mVerticalDpi), hashValue, mFontCount, fontFamily, fontStyle );
     mFontCount++;
 
     // load the global metrics
@@ -113,7 +113,7 @@ void FontFactory::GetFontInformation( FontId fontId,
 
   for( FontMetricsMap::const_iterator iter =  mMetricsCache.begin(); iter != endIter; ++iter)
   {
-    const FontMetrics* metric( (*iter).second.Get() ) ;
+    const FontMetrics* metric( (*iter).second.Get() );
 
     if( metric->GetFontId() == fontId)
     {

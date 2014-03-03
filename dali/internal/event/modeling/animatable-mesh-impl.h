@@ -87,8 +87,7 @@ public:
   /**
    * Get the property index from the vertex index and the vertex property enumeration
    */
-  using ProxyObject::GetPropertyIndex;
-  Property::Index GetPropertyIndex( unsigned int vertex, Property::Index property ) const;
+  Property::Index GetVertexPropertyIndex( unsigned int vertex, Property::Index property ) const;
 
   /**
    * Set the given vertex position

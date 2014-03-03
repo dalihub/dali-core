@@ -97,8 +97,8 @@ AnimatableMeshPtr AnimatableMesh::New(
   DALI_ASSERT_ALWAYS( numVertices > 0 && "Mesh has no vertices" );
   DALI_ASSERT_ALWAYS( ( numVertices * 3 ) < DEFAULT_PROPERTY_MAX_COUNT && "Mesh exceeds maximum supported vertices" );
   DALI_ASSERT_ALWAYS( faceIndices.size() > 0 && "Mesh has no faces" );
-  for( Dali::AnimatableMesh::FacesConstIter faceIter=faceIndices.begin() ;
-       faceIter != faceIndices.end() ;
+  for( Dali::AnimatableMesh::FacesConstIter faceIter=faceIndices.begin();
+       faceIter != faceIndices.end();
        ++faceIter )
   {
     unsigned int faceIndex = *faceIter;
@@ -152,7 +152,7 @@ unsigned int AnimatableMesh::GetNumberOfVertices() const
   return mNumberOfVertices;
 }
 
-Property::Index AnimatableMesh::GetPropertyIndex(
+Property::Index AnimatableMesh::GetVertexPropertyIndex(
   unsigned int vertex,
   Property::Index property ) const
 {
@@ -378,7 +378,7 @@ const SceneGraph::PropertyBase* AnimatableMesh::GetSceneObjectAnimatableProperty
         property = &mSceneObject->mVertices[vertexIndex].color;
         break;
       case Dali::AnimatableVertex::TEXTURE_COORDS:
-        property = &mSceneObject->mVertices[vertexIndex].textureCoords ;
+        property = &mSceneObject->mVertices[vertexIndex].textureCoords;
         break;
 
       default:

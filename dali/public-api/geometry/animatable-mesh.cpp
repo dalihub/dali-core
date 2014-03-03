@@ -71,7 +71,7 @@ Property::Index AnimatableMesh::GetPropertyIndex(
 {
   DALI_ASSERT_ALWAYS( index < GetNumberOfVertices() && "Index out of bounds" );
 
-  return GetImplementation(*this).GetPropertyIndex( index, property );
+  return GetImplementation(*this).GetVertexPropertyIndex( index, property );
 }
 
 Property AnimatableMesh::GetVertexProperty( unsigned int vertex, Property::Index property)

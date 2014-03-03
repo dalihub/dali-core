@@ -249,9 +249,10 @@ const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
     return GetImplementation(base).GetPropertyName( index );
   }
 
+  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
+
   // Property not found, return reference to invalid property string.
   static const std::string EMPTY_PROPERTY_NAME;
-  DALI_LOG_WARNING( "Property index (%d) invalid", index );
   return EMPTY_PROPERTY_NAME;
 }
 
@@ -380,6 +381,10 @@ bool TypeInfo::IsPropertyWritable( Property::Index index ) const
     {
       writable = GetImplementation(base).IsPropertyWritable( index );
     }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
+    }
   }
 
   return writable;
@@ -402,6 +407,10 @@ Property::Type TypeInfo::GetPropertyType( Property::Index index ) const
     if ( base )
     {
       type = GetImplementation(base).GetPropertyType( index );
+    }
+    else
+    {
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
     }
   }
 
@@ -426,7 +435,7 @@ void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Pro
     }
     else
     {
-      DALI_ASSERT_ALWAYS( false && "Property index not found" );
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
     }
   }
 }
@@ -449,7 +458,7 @@ void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const P
     }
     else
     {
-      DALI_ASSERT_ALWAYS( false && "Property name not found" );
+      DALI_ASSERT_ALWAYS( ! "Cannot find property name" );
     }
   }
 }
@@ -470,7 +479,7 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
     return GetImplementation( base ).GetProperty( object, index );
   }
 
-  DALI_ASSERT_ALWAYS( false && "Property index not found" );
+  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
 
   return Property::Value();
 }
@@ -491,7 +500,7 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::stri
     return GetImplementation( base ).GetProperty( object, name );
   }
 
-  DALI_ASSERT_ALWAYS( false && "Property name not found" );
+  DALI_ASSERT_ALWAYS( ! "Cannot find property name" );
 
   return Property::Value();
 }

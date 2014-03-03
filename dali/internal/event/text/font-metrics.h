@@ -65,7 +65,6 @@ namespace Internal
 // Forward declarations.
 
 class FontMetrics;
-class ResourceClient;
 
 typedef IntrusivePtr<FontMetrics> FontMetricsIntrusivePtr;
 
@@ -88,15 +87,13 @@ public:
    * @param [in] fontId font id.
    * @param [in] fontFamily the font family
    * @param [in] fontStyle the font style
-   * @param [in] resourceClient resource client
    * @return An intrusive-pointer to the new instance.
    */
   static FontMetricsIntrusivePtr New( const Vector2& dpi,
                                       const std::size_t hashValue,
                                       const FontId fontId,
                                       const std::string& fontFamily,
-                                      const std::string& fontStyle,
-                                      ResourceClient& resourceClient );
+                                      const std::string& fontStyle );
 
 
   /**
@@ -291,8 +288,7 @@ private:
                const std::size_t hashValue,
                const FontId fontId,
                const std::string& fontFamily,
-               const std::string& fontStyle,
-               ResourceClient& resourceClient );
+               const std::string& fontStyle );
 
   /**
    * Virtual destructor.

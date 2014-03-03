@@ -365,7 +365,7 @@ void UtcDaliConstraintProperties()
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Property index is invalid", TEST_LOCATION );
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
   }
   DALI_TEST_EQUALS( active.GetPropertyIndex( "invalid-property-name"), Property::INVALID_INDEX, TEST_LOCATION );
   try

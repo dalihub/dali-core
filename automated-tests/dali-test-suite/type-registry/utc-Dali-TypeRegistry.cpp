@@ -843,7 +843,7 @@ void UtcDaliPropertyRegistrationInvalidGetAndSet()
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "false && \"Property index not found", TEST_LOCATION );
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
   }
 
   // Try to get an index that hasn't been added
@@ -854,6 +854,6 @@ void UtcDaliPropertyRegistrationInvalidGetAndSet()
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "false && \"Property index not found", TEST_LOCATION );
+    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
   }
 }
