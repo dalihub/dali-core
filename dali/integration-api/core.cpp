@@ -99,12 +99,6 @@ void Core::Resume()
   mImpl->Resume();
 }
 
-void Core::SendEvent(const Event& event)
-{
-  mImpl->QueueEvent(event);
-  mImpl->ProcessEvents();
-}
-
 void Core::QueueEvent(const Event& event)
 {
   mImpl->QueueEvent(event);

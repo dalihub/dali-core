@@ -191,11 +191,11 @@ unsigned int* MessageQueue::ReserveMessageSlot( std::size_t requestedSize, bool 
     }
   }
 
-  // If we are inside core event processing, core will automatically flush the queue.
-  // If we are outside, then we have to request an idle update to flush the queue
+  // If we are inside Core::ProcessEvents(), core will automatically flush the queue.
+  // If we are outside, then we have to request a call to Core::ProcessEvents() on idle.
   if ( false == mImpl->processingEvents )
   {
-    mImpl->renderController.RequestNotificationEventOnIdle();
+    mImpl->renderController.RequestProcessEventsOnIdle();
   }
 
   return mImpl->currentMessageBuffer->ReserveMessageSlot( requestedSize );

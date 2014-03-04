@@ -230,7 +230,7 @@ static void UtcDaliTapGestureDetectorNew()
   Integration::TouchEvent touchEvent(1);
   TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
   touchEvent.AddPoint(point);
-  application.GetCore().SendEvent(touchEvent);
+  application.ProcessEvent(touchEvent);
 
   // Render and notify
   application.SendNotification();
@@ -390,7 +390,6 @@ static void UtcDaliTapGestureGetTouchesRequired()
 static void UtcDaliTapGestureSignalReceptionNegative()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -409,14 +408,13 @@ static void UtcDaliTapGestureSignalReceptionNegative()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Do a tap outside actor's area
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(112.0f, 112.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(112.0f, 112.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(112.0f, 112.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(112.0f, 112.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 static void UtcDaliTapGestureSignalReceptionPositive()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -435,8 +433,8 @@ static void UtcDaliTapGestureSignalReceptionPositive()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Do a tap inside actor's area
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 50.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -446,7 +444,6 @@ static void UtcDaliTapGestureSignalReceptionPositive()
 static void UtcDaliTapGestureSignalReceptionDetach()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -465,8 +462,8 @@ static void UtcDaliTapGestureSignalReceptionDetach()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start tap within the actor's area
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 20.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 20.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -474,8 +471,8 @@ static void UtcDaliTapGestureSignalReceptionDetach()
 
   // repeat the tap within the actor's area - we should still receive the signal
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 50.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -486,17 +483,16 @@ static void UtcDaliTapGestureSignalReceptionDetach()
 
   // Ensure we are no longer signalled
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 20.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 20.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 50.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 static void UtcDaliTapGestureSignalReceptionActorDestroyedWhileTapping()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   SignalData data;
   GestureReceivedFunctor functor(data);
@@ -518,8 +514,8 @@ static void UtcDaliTapGestureSignalReceptionActorDestroyedWhileTapping()
     detector.Attach(actor);
 
     // Start tap within the actor's area
-    core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 20.0f)));
-    core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 20.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 20.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 20.0f)));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
     // Remove the actor from stage and reset the data
@@ -533,14 +529,13 @@ static void UtcDaliTapGestureSignalReceptionActorDestroyedWhileTapping()
   // Actor should now have been destroyed
 
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 20.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 20.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 static void UtcDaliTapGestureSignalReceptionRotatedActor()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -559,8 +554,8 @@ static void UtcDaliTapGestureSignalReceptionRotatedActor()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do tap, only check finished value
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(5.0f, 5.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(5.0f, 5.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -573,8 +568,8 @@ static void UtcDaliTapGestureSignalReceptionRotatedActor()
 
   // Do tap, should still receive event
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(5.0f, 5.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(5.0f, 5.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTaps, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -587,14 +582,13 @@ static void UtcDaliTapGestureSignalReceptionRotatedActor()
 
   // Do tap, inside the actor's area (area if it is not rotated), Should not receive the event
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(70.0f, 70.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(70.0f, 70.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(70.0f, 70.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(70.0f, 70.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 static void UtcDaliTapGestureSignalReceptionChildHit()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor parent = Actor::New();
   parent.SetSize(100.0f, 100.0f);
@@ -626,8 +620,8 @@ static void UtcDaliTapGestureSignalReceptionChildHit()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do tap - hits child area but parent should still receive it
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 50.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.tappedActor, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.screenPoint, 0.01f, TEST_LOCATION);
@@ -639,8 +633,8 @@ static void UtcDaliTapGestureSignalReceptionChildHit()
 
   // Do an entire tap, only check finished value
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(51.0f, 51.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(51.0f, 51.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(51.0f, 51.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(51.0f, 51.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.tappedActor, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(51.0f, 51.0f), data.receivedGesture.screenPoint, 0.01f, TEST_LOCATION);
@@ -648,7 +642,6 @@ static void UtcDaliTapGestureSignalReceptionChildHit()
 static void UtcDaliTapGestureSignalReceptionAttachDetachMany()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor first = Actor::New();
   first.SetSize(100.0f, 100.0f);
@@ -674,15 +667,15 @@ static void UtcDaliTapGestureSignalReceptionAttachDetachMany()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Tap within second actor's area
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(120.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(120.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, second == data.tappedActor, TEST_LOCATION);
 
   // Tap within first actor's area
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, first == data.tappedActor, TEST_LOCATION);
 
@@ -691,20 +684,19 @@ static void UtcDaliTapGestureSignalReceptionAttachDetachMany()
 
   // second actor shouldn't receive event
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(120.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(120.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // first actor should continue receiving event
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(20.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 }
 static void UtcDaliTapGestureSignalReceptionActorBecomesUntouchable()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -723,8 +715,8 @@ static void UtcDaliTapGestureSignalReceptionActorBecomesUntouchable()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Tap in actor's area
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Actor become invisible - actor should not receive the next pan
@@ -736,15 +728,14 @@ static void UtcDaliTapGestureSignalReceptionActorBecomesUntouchable()
 
   // Tap in the same area, shouldn't receive event
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliTapGestureSignalReceptionMultipleGestureDetectors()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
   Dali::TestGestureManager& gestureManager = application.GetGestureManager();
 
   Actor first = Actor::New();
@@ -785,28 +776,28 @@ static void UtcDaliTapGestureSignalReceptionMultipleGestureDetectors()
     DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
 
     // Tap within second actor's area
-    core.SendEvent(GenerateTap(Gesture::Possible, 2u, 2u, Vector2(150.0f, 10.0f)));
-    core.SendEvent(GenerateTap(Gesture::Started, 2u, 2u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Possible, 2u, 2u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Started, 2u, 2u, Vector2(150.0f, 10.0f)));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(true, second == data.tappedActor, TEST_LOCATION);
 
     // Tap continues as single touch gesture - we should not receive any gesture
     data.Reset();
-    core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(150.0f, 10.0f)));
-    core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(150.0f, 10.0f)));
     DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
     // Single touch tap starts - first actor should be panned
     data.Reset();
-    core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-    core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(true, first == data.tappedActor, TEST_LOCATION);
 
     // Pan changes to double-touch - we shouldn't receive event
     data.Reset();
-    core.SendEvent(GenerateTap(Gesture::Possible, 2u, 2u, Vector2(50.0f, 10.0f)));
-    core.SendEvent(GenerateTap(Gesture::Started, 2u, 2u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Possible, 2u, 2u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Started, 2u, 2u, Vector2(50.0f, 10.0f)));
     DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
     // Reset gesture manager statistics
@@ -822,7 +813,6 @@ static void UtcDaliTapGestureSignalReceptionMultipleGestureDetectors()
 void UtcDaliTapGestureSignalReceptionMultipleDetectorsOnActor()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -848,8 +838,8 @@ void UtcDaliTapGestureSignalReceptionMultipleDetectorsOnActor()
   secondDetector.DetectedSignal().Connect(&application, secondFunctor);
 
   // Tap in actor's area - both detector's functors should be called
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 }
@@ -857,7 +847,6 @@ void UtcDaliTapGestureSignalReceptionMultipleDetectorsOnActor()
 void UtcDaliTapGestureSignalReceptionDifferentPossible()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -876,7 +865,7 @@ void UtcDaliTapGestureSignalReceptionDifferentPossible()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Gesture possible in actor's area.
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor somewhere else
@@ -887,11 +876,11 @@ void UtcDaliTapGestureSignalReceptionDifferentPossible()
   application.Render();
 
   // Emit Started event, we should not receive the long press.
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // LongPress possible in empty area.
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor in to the long press position.
@@ -902,19 +891,18 @@ void UtcDaliTapGestureSignalReceptionDifferentPossible()
   application.Render();
 
   // Emit Started event, we should not receive the long press.
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Normal long press in actor's area for completeness.
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliTapGestureEmitIncorrectStateClear()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -935,7 +923,7 @@ void UtcDaliTapGestureEmitIncorrectStateClear()
   // Try a Clear state
   try
   {
-    core.SendEvent(GenerateTap(Gesture::Clear, 1u, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Clear, 1u, 1u, Vector2(50.0f, 10.0f)));
     tet_result(TET_FAIL);
   }
   catch ( Dali::DaliException& e )
@@ -947,7 +935,6 @@ void UtcDaliTapGestureEmitIncorrectStateClear()
 void UtcDaliTapGestureEmitIncorrectStateContinuing()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -968,7 +955,7 @@ void UtcDaliTapGestureEmitIncorrectStateContinuing()
   // Try a Continuing state
   try
   {
-    core.SendEvent(GenerateTap(Gesture::Continuing, 1u, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Continuing, 1u, 1u, Vector2(50.0f, 10.0f)));
     tet_result(TET_FAIL);
   }
   catch ( Dali::DaliException& e )
@@ -980,7 +967,6 @@ void UtcDaliTapGestureEmitIncorrectStateContinuing()
 void UtcDaliTapGestureEmitIncorrectStateFinished()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1001,7 +987,7 @@ void UtcDaliTapGestureEmitIncorrectStateFinished()
   // Try a Finished state
   try
   {
-    core.SendEvent(GenerateTap(Gesture::Finished, 1u, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Finished, 1u, 1u, Vector2(50.0f, 10.0f)));
     tet_result(TET_FAIL);
   }
   catch ( Dali::DaliException& e )
@@ -1013,7 +999,6 @@ void UtcDaliTapGestureEmitIncorrectStateFinished()
 void UtcDaliTapGestureDetectorTypeRegistry()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1042,15 +1027,14 @@ void UtcDaliTapGestureDetectorTypeRegistry()
   application.Render();
 
   // Emit gesture
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
 }
 
 void UtcDaliTapGestureActorUnstaged()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1069,8 +1053,8 @@ void UtcDaliTapGestureActorUnstaged()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Tap in Actor's area, actor removed in signal handler, should be handled gracefully.
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   tet_result( TET_PASS ); // If we get here, then the actor removal on signal handler was handled gracefully.
 }
@@ -1078,7 +1062,6 @@ void UtcDaliTapGestureActorUnstaged()
 void UtcDaliTapGestureRepeatedState()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1097,27 +1080,26 @@ void UtcDaliTapGestureRepeatedState()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Emit two possibles
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Send a couple of Started states, only first one should be received.
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Send a couple of cancelled states, no reception
-  core.SendEvent(GenerateTap(Gesture::Cancelled, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Cancelled, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Cancelled, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Cancelled, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliTapGesturePossibleCancelled()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1136,15 +1118,14 @@ void UtcDaliTapGesturePossibleCancelled()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Emit a possible and then a cancelled, no reception
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateTap(Gesture::Cancelled, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Cancelled, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliTapGestureDetectorRemovedWhilePossible()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1163,18 +1144,17 @@ void UtcDaliTapGestureDetectorRemovedWhilePossible()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Emit a possible
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
 
   // Detach actor and send a Started state, no signal.
   detector.DetachAll();
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliTapGestureActorRemovedWhilePossible()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1193,7 +1173,7 @@ void UtcDaliTapGestureActorRemovedWhilePossible()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Emit a possible
-  core.SendEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
 
   // Remove, render and delete actor
   Stage::GetCurrent().Remove(actor);
@@ -1202,15 +1182,14 @@ void UtcDaliTapGestureActorRemovedWhilePossible()
   actor = NULL;
 
   // Send a Started state, no signal.
-  core.SendEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliTapGestureSystemOverlay()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
-  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  Dali::Integration::SystemOverlay& systemOverlay( application.GetCore().GetSystemOverlay() );
   systemOverlay.GetOverlayRenderTasks().CreateTask();
 
   Actor actor = Actor::New();
@@ -1232,7 +1211,7 @@ void UtcDaliTapGestureSystemOverlay()
   Vector2 screenCoords( 50.0f, 50.0f );
 
   // Do a tap inside actor's area
-  core.SendEvent( GenerateTap( Gesture::Possible, 1u, 1u, screenCoords ) );
-  core.SendEvent( GenerateTap( Gesture::Started, 1u, 1u, screenCoords ) );
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, screenCoords ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, screenCoords ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
 }

@@ -431,7 +431,7 @@ static void UtcDaliBaseHandleConnectSignal()
   Dali::TouchPoint point( 0, TouchPoint::Down, 240, 400  );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   application.SendNotification();
   application.Render(1000);
@@ -445,7 +445,7 @@ static void UtcDaliBaseHandleConnectSignal()
   application.DisconnectAll();
 
   // simulate another touch event
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gTouchCallBackCalled == false );
 }

@@ -40,9 +40,9 @@ public:
     mRequestUpdateCalled = true;
   }
 
-  virtual void RequestNotificationEventOnIdle()
+  virtual void RequestProcessEventsOnIdle()
   {
-    mRequestNotificationEventOnIdleCalled = true;
+    mRequestProcessEventsOnIdle = true;
   }
 
   typedef enum
@@ -56,7 +56,7 @@ public:
     switch(func)
     {
       case RequestUpdateFunc: return mRequestUpdateCalled;
-      case RequestNotificationEventOnIdleFunc: return mRequestNotificationEventOnIdleCalled;
+      case RequestNotificationEventOnIdleFunc: return mRequestProcessEventsOnIdle;
     }
 
     return false;
@@ -65,12 +65,12 @@ public:
   void Initialize()
   {
     mRequestUpdateCalled = false;
-    mRequestNotificationEventOnIdleCalled = false;
+    mRequestProcessEventsOnIdle = false;
   }
 
 private:
   bool mRequestUpdateCalled;
-  bool mRequestNotificationEventOnIdleCalled;
+  bool mRequestProcessEventsOnIdle;
 };
 
 } // Dali

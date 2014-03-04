@@ -307,7 +307,7 @@ static void UtcDaliPanGestureDetectorNew()
   Integration::TouchEvent touchEvent(1);
   TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
   touchEvent.AddPoint(point);
-  application.GetCore().SendEvent(touchEvent);
+  application.ProcessEvent(touchEvent);
 }
 
 static void UtcDaliPanGestureDetectorDownCast()
@@ -464,7 +464,6 @@ static void UtcDaliPanGestureGetMaximumTouchesRequired()
 static void UtcDaliPanGestureSignalReceptionNegative()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -483,25 +482,24 @@ static void UtcDaliPanGestureSignalReceptionNegative()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do a pan outside actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(110.0f, 110.0f), Vector2(112.0f, 112.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(110.0f, 110.0f), Vector2(112.0f, 112.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(110.0f, 110.0f), Vector2(112.0f, 112.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(110.0f, 110.0f), Vector2(112.0f, 112.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Continue pan into actor's area - we should still not receive the signal
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(112.0f, 112.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(112.0f, 112.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Stop panning - we should still not receive the signal
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 20.0f), Vector2(12.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 20.0f), Vector2(12.0f, 12.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliPanGestureSignalReceptionDownMotionLeave()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -520,8 +518,8 @@ static void UtcDaliPanGestureSignalReceptionDownMotionLeave()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pan within the actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -532,7 +530,7 @@ static void UtcDaliPanGestureSignalReceptionDownMotionLeave()
 
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -543,7 +541,7 @@ static void UtcDaliPanGestureSignalReceptionDownMotionLeave()
 
   // Pan Gesture leaves actor's area - we should still receive the signal
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 10.0f), Vector2(320.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 10.0f), Vector2(320.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -554,7 +552,7 @@ static void UtcDaliPanGestureSignalReceptionDownMotionLeave()
 
   // Gesture ends - we would receive a finished state
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(320.0f, 10.0f), Vector2(310.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(320.0f, 10.0f), Vector2(310.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -567,7 +565,6 @@ static void UtcDaliPanGestureSignalReceptionDownMotionLeave()
 static void UtcDaliPanGestureSignalReceptionDownMotionUp()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -586,8 +583,8 @@ static void UtcDaliPanGestureSignalReceptionDownMotionUp()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pan within the actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -598,7 +595,7 @@ static void UtcDaliPanGestureSignalReceptionDownMotionUp()
 
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -609,7 +606,7 @@ static void UtcDaliPanGestureSignalReceptionDownMotionUp()
 
   // Gesture ends within actor's area - we would receive a finished state
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
@@ -622,7 +619,6 @@ static void UtcDaliPanGestureSignalReceptionDownMotionUp()
 static void UtcDaliPanGestureSignalReceptionCancelled()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -641,20 +637,20 @@ static void UtcDaliPanGestureSignalReceptionCancelled()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pan within the actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Started, data.receivedGesture.state, TEST_LOCATION);
 
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Continuing, data.receivedGesture.state, TEST_LOCATION);
 
   // The gesture is cancelled
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Cancelled, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Cancelled, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Cancelled, data.receivedGesture.state, TEST_LOCATION);
 }
@@ -662,7 +658,6 @@ static void UtcDaliPanGestureSignalReceptionCancelled()
 static void UtcDaliPanGestureSignalReceptionDetach()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -681,18 +676,18 @@ static void UtcDaliPanGestureSignalReceptionDetach()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pan within the actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Gesture ends within actor's area
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Detach actor
@@ -700,17 +695,16 @@ static void UtcDaliPanGestureSignalReceptionDetach()
 
   // Ensure we are no longer signalled
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliPanGestureSignalReceptionDetachWhilePanning()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -729,13 +723,13 @@ static void UtcDaliPanGestureSignalReceptionDetachWhilePanning()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pan within the actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Continue the pan within the actor's area - we should still receive the signal
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Detach actor during the pan, we should not receive the next event
@@ -743,14 +737,13 @@ static void UtcDaliPanGestureSignalReceptionDetachWhilePanning()
 
   // Gesture ends within actor's area
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   SignalData data;
   GestureReceivedFunctor functor(data);
@@ -780,13 +773,13 @@ static void UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning()
     detector.Attach(actor);
 
     // Start pan within the actor's area
-    core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-    core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
     // Continue the pan within the actor's area - we should still receive the signal
     data.Reset();
-    core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
     // Remove the actor from stage and reset the data
@@ -801,14 +794,13 @@ static void UtcDaliPanGestureSignalReceptionActorDestroyedWhilePanning()
 
   // Gesture ends within the area where the actor used to be
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliPanGestureSignalReceptionRotatedActor()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -827,10 +819,10 @@ static void UtcDaliPanGestureSignalReceptionRotatedActor()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do an entire pan, only check finished value
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(8.0f, -5.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
 
@@ -840,10 +832,10 @@ static void UtcDaliPanGestureSignalReceptionRotatedActor()
   application.Render();
 
   // Do an entire pan, only check finished value
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(-5.0f, -8.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
 
@@ -853,10 +845,10 @@ static void UtcDaliPanGestureSignalReceptionRotatedActor()
   application.Render();
 
   // Do an entire pan, only check finished value
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(-8.0f, 5.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
 }
@@ -864,7 +856,6 @@ static void UtcDaliPanGestureSignalReceptionRotatedActor()
 static void UtcDaliPanGestureSignalReceptionChildHit()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor parent = Actor::New();
   parent.SetSize(100.0f, 100.0f);
@@ -896,10 +887,10 @@ static void UtcDaliPanGestureSignalReceptionChildHit()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do an entire pan, only check finished value - hits child area but parent should still receive it
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.pannedActor, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(5.0f, 8.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
@@ -910,10 +901,10 @@ static void UtcDaliPanGestureSignalReceptionChildHit()
   detector.Detach(parent);
 
   // Do an entire pan, only check finished value
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(11.0f, 12.0f), Vector2(22.0f, 12.0f), 10));
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(22.0f, 12.0f), Vector2(27.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.pannedActor, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(8.0f, -5.0f), data.receivedGesture.displacement, 0.01f, TEST_LOCATION); // Actor relative
@@ -922,7 +913,6 @@ static void UtcDaliPanGestureSignalReceptionChildHit()
 static void UtcDaliPanGestureSignalReceptionAttachDetachMany()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor first = Actor::New();
   first.SetSize(100.0f, 100.0f);
@@ -948,14 +938,14 @@ static void UtcDaliPanGestureSignalReceptionAttachDetachMany()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pan within second actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(110.0f, 20.0f), Vector2(120.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(110.0f, 20.0f), Vector2(120.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(110.0f, 20.0f), Vector2(120.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(110.0f, 20.0f), Vector2(120.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, second == data.pannedActor, TEST_LOCATION);
 
   // Pan moves into first actor's area - second actor should receive the pan
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(120.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(120.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, second == data.pannedActor, TEST_LOCATION);
 
@@ -964,14 +954,13 @@ static void UtcDaliPanGestureSignalReceptionAttachDetachMany()
 
   // Gesture ends within actor's area
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliPanGestureSignalReceptionActorBecomesUntouchable()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -990,13 +979,13 @@ static void UtcDaliPanGestureSignalReceptionActorBecomesUntouchable()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start pan in actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Pan continues within actor's area
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Actor become invisible - actor should not receive the next pan
@@ -1008,14 +997,13 @@ static void UtcDaliPanGestureSignalReceptionActorBecomesUntouchable()
 
   // Gesture ends within actor's area
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 10.0f), Vector2(10.0f, 10.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliPanGestureSignalReceptionMultipleGestureDetectors()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
   Dali::TestGestureManager& gestureManager = application.GetGestureManager();
 
   Actor first = Actor::New();
@@ -1055,50 +1043,50 @@ static void UtcDaliPanGestureSignalReceptionMultipleGestureDetectors()
     DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
 
     // Start pan within second actor's area
-    core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10, 2));
-    core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10, 2));
+    application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10, 2));
+    application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10, 2));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(true, second == data.pannedActor, TEST_LOCATION);
 
     // Two touch pan changes to single touch - we should receive a finished state
     data.Reset();
-    core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
     DALI_TEST_EQUALS(true, second == data.pannedActor, TEST_LOCATION);
 
     // Pan continues as single touch gesture - we should not receive any gesture
     data.Reset();
-    core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 10.0f), Vector2(30.0f, 10.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 10.0f), Vector2(30.0f, 10.0f), 10));
     DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
     // Pan ends - still no signal
     data.Reset();
-    core.SendEvent(GeneratePan(Gesture::Finished, Vector2(30.0f, 10.0f), Vector2(30.0f, 20.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(30.0f, 10.0f), Vector2(30.0f, 20.0f), 10));
     DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
     // Single touch pan starts - first actor should be panned
     data.Reset();
-    core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-    core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(true, first == data.pannedActor, TEST_LOCATION);
 
     // Pan changes to double-touch - we should receive a finished state
     data.Reset();
-    core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10, 2));
+    application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10, 2));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(Gesture::Finished, data.receivedGesture.state, TEST_LOCATION);
     DALI_TEST_EQUALS(true, first == data.pannedActor, TEST_LOCATION);
 
     // Pan continues as double touch gesture - we should not receive any gesture
     data.Reset();
-    core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 10.0f), Vector2(30.0f, 10.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 10.0f), Vector2(30.0f, 10.0f), 10));
     DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
     // Pan ends - still no signal
     data.Reset();
-    core.SendEvent(GeneratePan(Gesture::Finished, Vector2(30.0f, 10.0f), Vector2(30.0f, 20.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(30.0f, 10.0f), Vector2(30.0f, 20.0f), 10));
     DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
     // Reset gesture manager statistics
@@ -1114,7 +1102,6 @@ static void UtcDaliPanGestureSignalReceptionMultipleGestureDetectors()
 void UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1150,15 +1137,15 @@ void UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor()
   secondDetector.Attach(actor2);
 
   // Pan in actor's area - both detector's functors should be called
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 
   // Pan continues in actor's area - both detector's functors should be called
   firstData.Reset();
   secondData.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 
@@ -1166,15 +1153,15 @@ void UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor()
   firstDetector.Detach(actor);
   firstData.Reset();
   secondData.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 
   // New pan on actor, only secondDetector has actor attached
   firstData.Reset();
   secondData.Reset();
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 
@@ -1182,7 +1169,7 @@ void UtcDaliPanGestureSignalReceptionMultipleDetectorsOnActor()
   secondDetector.Detach(actor);
   firstData.Reset();
   secondData.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, secondData.functorCalled, TEST_LOCATION);
 }
@@ -1192,7 +1179,6 @@ void UtcDaliPanGestureSignalReceptionMultipleStarted()
   // Should handle two started events gracefully.
 
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1211,13 +1197,13 @@ void UtcDaliPanGestureSignalReceptionMultipleStarted()
   application.Render();
 
   // Start pan in actor's area
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Send another start in actor's area
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Add a child actor to overlap actor and send another start in actor's area
@@ -1236,21 +1222,20 @@ void UtcDaliPanGestureSignalReceptionMultipleStarted()
 
   // Send another possible and start in actor's area
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Send another start in actor's area
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor1 = Actor::New();
   actor1.SetSize(100.0f, 100.0f);
@@ -1278,8 +1263,8 @@ void UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling()
   application.Render();
 
   // Start pan in actor1's area, only data1 should be set
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data1.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(false, data2.functorCalled, TEST_LOCATION);
 }
@@ -1287,7 +1272,6 @@ void UtcDaliPanGestureSignalReceptionEnsureCorrectSignalling()
 void UtcDaliPanGestureSignalReceptionDifferentPossible()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1306,7 +1290,7 @@ void UtcDaliPanGestureSignalReceptionDifferentPossible()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Gesture possible in actor's area.
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor somewhere else
@@ -1317,12 +1301,12 @@ void UtcDaliPanGestureSignalReceptionDifferentPossible()
   application.Render();
 
   // Emit Started event, we should not receive the long press.
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // LongPress possible in empty area.
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor in to the long press position.
@@ -1333,21 +1317,20 @@ void UtcDaliPanGestureSignalReceptionDifferentPossible()
   application.Render();
 
   // Emit Started event, we should not receive the long press.
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Normal long press in actor's area for completeness.
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliPanGestureEmitIncorrectState()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1368,7 +1351,7 @@ void UtcDaliPanGestureEmitIncorrectState()
   // Try a Clear state
   try
   {
-    core.SendEvent(GeneratePan(Gesture::Clear, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+    application.ProcessEvent(GeneratePan(Gesture::Clear, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
     tet_result(TET_FAIL);
   }
   catch ( Dali::DaliException& e )
@@ -1380,7 +1363,6 @@ void UtcDaliPanGestureEmitIncorrectState()
 void UtcDaliPanGestureDetectorTypeRegistry()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1409,16 +1391,15 @@ void UtcDaliPanGestureDetectorTypeRegistry()
   application.Render();
 
   // Emit gesture
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
 }
 
 void UtcDaliPanGestureActorUnstaged()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1440,11 +1421,11 @@ void UtcDaliPanGestureActorUnstaged()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Emit signals
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1463,14 +1444,14 @@ void UtcDaliPanGestureActorUnstaged()
   stateToUnstage = Gesture::Continuing;
 
   // Emit signals
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1489,14 +1470,14 @@ void UtcDaliPanGestureActorUnstaged()
   stateToUnstage = Gesture::Finished;
 
   // Emit signals
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   tet_result( TET_PASS ); // If we get here then we have handled actor stage removal gracefully.
 }
@@ -1504,7 +1485,6 @@ void UtcDaliPanGestureActorUnstaged()
 void UtcDaliPanGestureActorStagedAndDestroyed()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1538,8 +1518,8 @@ void UtcDaliPanGestureActorStagedAndDestroyed()
   // position, we should still not be signalled.
 
   // Emit signals
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1555,18 +1535,18 @@ void UtcDaliPanGestureActorStagedAndDestroyed()
   application.Render();
 
   // Continue signal emission
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
   // Here we delete an actor in started, we should not receive any subsequent signalling.
 
   // Emit signals
-  core.SendEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
-  core.SendEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1582,18 +1562,17 @@ void UtcDaliPanGestureActorStagedAndDestroyed()
   application.Render();
 
   // Continue signal emission
-  core.SendEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Continuing, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliPanGestureSystemOverlay()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
-  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  Dali::Integration::SystemOverlay& systemOverlay( application.GetCore().GetSystemOverlay() );
   systemOverlay.GetOverlayRenderTasks().CreateTask();
 
   Actor actor = Actor::New();
@@ -1616,8 +1595,8 @@ void UtcDaliPanGestureSystemOverlay()
   Vector2 screenCoordsEnd( 20.0f, 20.0f );
 
   // Start pan within the actor's area
-  core.SendEvent( GeneratePan( Gesture::Possible, screenCoordsStart, screenCoordsEnd, 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started, screenCoordsStart, screenCoordsEnd, 10 ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
 }
 
@@ -1738,7 +1717,6 @@ void UtcDaliPanGestureAngleOutOfRange()
 void UtcDaliPanGestureAngleProcessing()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor parent = Actor::New();
   parent.SetSize(100.0f, 100.0f);
@@ -1771,38 +1749,38 @@ void UtcDaliPanGestureAngleProcessing()
   childDetector.DetectedSignal().Connect(&application, childFunctor);
 
   // Generate an Up pan gesture, only parent should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10 ) );
   DALI_TEST_EQUALS( true,  parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a Right pan gesture, only child should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(30.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(30.0f, 20.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true,  childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a Down pan gesture, no one should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(20.0f, 30.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(20.0f, 30.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a Left pan gesture, no one should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 }
@@ -1858,7 +1836,6 @@ void UtcDaliPanGestureDirectionHandling()
 void UtcDaliPanGestureDirectionProcessing()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor parent = Actor::New();
   parent.SetSize(100.0f, 100.0f);
@@ -1891,74 +1868,74 @@ void UtcDaliPanGestureDirectionProcessing()
   childDetector.DetectedSignal().Connect(&application, childFunctor);
 
   // Generate an Up pan gesture, only parent should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(20.0f, 10.0f), 10 ) );
   DALI_TEST_EQUALS( true,  parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a Right pan gesture, only child should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(30.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(30.0f, 20.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true,  childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a Down pan gesture, only parent should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(20.0f, 30.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(20.0f, 30.0f), 10 ) );
   DALI_TEST_EQUALS( true,  parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a Left pan gesture, only child should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 20.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true,  childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a pan at -45 degrees, no one should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 30.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 30.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a pan at 45 degrees, no one should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(30.0f, 30.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(30.0f, 30.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a pan at 135 degrees, no one should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 30.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 30.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 
   // Generate a pan at -135 degrees, no one should receive it.
-  core.SendEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 10.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, Vector2(20.0f, 20.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  Vector2(20.0f, 20.0f), Vector2(10.0f, 10.0f), 10 ) );
   DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( false, childData.functorCalled,  TEST_LOCATION );
-  core.SendEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished,  Vector2(20.0f, 30.0f), Vector2(20.0f, 20.0f), 10 ) );
   parentData.Reset();
   childData.Reset();
 }
@@ -2019,7 +1996,6 @@ void UtcDaliPanGestureSetProperties()
 void UtcDaliPanGestureSetPropertiesAlreadyPanning()
 {
   TestApplication application;
-  Integration::Core& core( application.GetCore() );
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -2048,8 +2024,8 @@ void UtcDaliPanGestureSetPropertiesAlreadyPanning()
 
   Vector2 previousPosition( 20.0f, 20.0f );
   Vector2 currentPosition( 20.0f, 10.0f );
-  core.SendEvent( GeneratePan( Gesture::Possible, previousPosition, previousPosition, 10 ) );
-  core.SendEvent( GeneratePan( Gesture::Started,  previousPosition, currentPosition, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Possible, previousPosition, previousPosition, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started,  previousPosition, currentPosition, 10 ) );
   DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
 
   Vector2 screenPosition( 100.0f, 20.0f );

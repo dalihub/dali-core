@@ -243,7 +243,7 @@ static void UtcDaliLongPressGestureDetectorNew()
   Integration::TouchEvent touchEvent(1);
   TouchPoint point(1, TouchPoint::Down, 20.0f, 20.0f);
   touchEvent.AddPoint(point);
-  application.GetCore().SendEvent(touchEvent);
+  application.ProcessEvent(touchEvent);
 
   // Render and notify
   application.SendNotification();
@@ -412,7 +412,6 @@ static void UtcDaliLongPressGestureGetMaximumTouchesRequired()
 static void UtcDaliLongPressGestureSignalReceptionNegative()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -431,16 +430,15 @@ static void UtcDaliLongPressGestureSignalReceptionNegative()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do a long press outside actor's area
-  core.SendEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2(112.0f, 112.0f ) ) );
-  core.SendEvent( GenerateLongPress( Gesture::Started,  1u, Vector2(112.0f, 112.0f ) ) );
-  core.SendEvent( GenerateLongPress( Gesture::Finished, 1u, Vector2(112.0f, 112.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, Vector2(112.0f, 112.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started,  1u, Vector2(112.0f, 112.0f ) ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Finished, 1u, Vector2(112.0f, 112.0f ) ) );
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliLongPressGestureSignalReceptionPositive()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -459,18 +457,17 @@ static void UtcDaliLongPressGestureSignalReceptionPositive()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do a long press inside actor's area
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 50.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Finished,  1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished,  1u, Vector2(50.0f, 50.0f)));
 }
 
 static void UtcDaliLongPressGestureSignalReceptionDetach()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -489,38 +486,37 @@ static void UtcDaliLongPressGestureSignalReceptionDetach()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Start long press within the actor's area
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 20.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 20.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS( Vector2(20.0f, 20.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(20.0f, 20.0f)));
 
   // repeat the long press within the actor's area - we should still receive the signal
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 50.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS( Vector2(50.0f, 50.0f), data.receivedGesture.localPoint, 0.1, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 50.0f)));
 
   // Detach actor
   detector.DetachAll();
 
   // Ensure we are no longer signalled
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 20.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 20.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliLongPressGestureSignalReceptionActorDestroyedDuringLongPress()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   SignalData data;
   GestureReceivedFunctor functor(data);
@@ -542,8 +538,8 @@ static void UtcDaliLongPressGestureSignalReceptionActorDestroyedDuringLongPress(
     detector.Attach(actor);
 
     // Start long press within the actor's area
-    core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 20.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 20.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 20.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 20.0f)));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
     // Remove the actor from stage and reset the data
@@ -557,14 +553,13 @@ static void UtcDaliLongPressGestureSignalReceptionActorDestroyedDuringLongPress(
   // Actor should now have been destroyed
 
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(20.0f, 20.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(20.0f, 20.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliLongPressGestureSignalReceptionRotatedActor()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -583,9 +578,9 @@ static void UtcDaliLongPressGestureSignalReceptionRotatedActor()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do a long press
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(5.0f, 5.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(5.0f, 5.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(5.0f, 5.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.screenPoint, 0.1, TEST_LOCATION);
@@ -597,9 +592,9 @@ static void UtcDaliLongPressGestureSignalReceptionRotatedActor()
 
   // Do another long press, should still receive event
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(5.0f, 5.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(5.0f, 5.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(5.0f, 5.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(5.0f, 5.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, data.receivedGesture.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.screenPoint, 0.1, TEST_LOCATION);
@@ -611,16 +606,15 @@ static void UtcDaliLongPressGestureSignalReceptionRotatedActor()
 
   // Do a long press, inside where the actor used to be, Should not receive the event
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(70.0f, 70.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(70.0f, 70.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(70.0f, 70.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(70.0f, 70.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(70.0f, 70.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(70.0f, 70.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliLongPressGestureSignalReceptionChildHit()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor parent = Actor::New();
   parent.SetSize(100.0f, 100.0f);
@@ -652,9 +646,9 @@ static void UtcDaliLongPressGestureSignalReceptionChildHit()
   detector.DetectedSignal().Connect(&application, functor);
 
   // Do long press - hits child area but parent should still receive it
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 50.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 50.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 50.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, parent == data.pressedActor, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(50.0f, 50.0f), data.receivedGesture.screenPoint, 0.01f, TEST_LOCATION);
@@ -666,9 +660,9 @@ static void UtcDaliLongPressGestureSignalReceptionChildHit()
 
   // Do an entire long press, only check finished value
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(51.0f, 51.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(51.0f, 51.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(51.0f, 51.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(51.0f, 51.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(51.0f, 51.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(51.0f, 51.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, child == data.pressedActor, TEST_LOCATION);
   DALI_TEST_EQUALS(Vector2(51.0f, 51.0f), data.receivedGesture.screenPoint, 0.01f, TEST_LOCATION);
@@ -677,7 +671,6 @@ static void UtcDaliLongPressGestureSignalReceptionChildHit()
 static void UtcDaliLongPressGestureSignalReceptionAttachDetachMany()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor first = Actor::New();
   first.SetSize(100.0f, 100.0f);
@@ -703,17 +696,17 @@ static void UtcDaliLongPressGestureSignalReceptionAttachDetachMany()
   detector.DetectedSignal().Connect(&application, functor);
 
   // LongPress within second actor's area
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(120.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(120.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(120.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, second == data.pressedActor, TEST_LOCATION);
 
   // LongPress within first actor's area
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(20.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, first == data.pressedActor, TEST_LOCATION);
 
@@ -722,23 +715,22 @@ static void UtcDaliLongPressGestureSignalReceptionAttachDetachMany()
 
   // second actor shouldn't receive event
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(120.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(120.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(120.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(120.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // first actor should continue receiving event
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(20.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(20.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliLongPressGestureSignalReceptionActorBecomesUntouchable()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -757,9 +749,9 @@ static void UtcDaliLongPressGestureSignalReceptionActorBecomesUntouchable()
   detector.DetectedSignal().Connect(&application, functor);
 
   // LongPress in actor's area
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 
   // Actor becomes invisible - actor should not receive the next long press
@@ -771,16 +763,15 @@ static void UtcDaliLongPressGestureSignalReceptionActorBecomesUntouchable()
 
   // LongPress in the same area, shouldn't receive event
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 static void UtcDaliLongPressGestureSignalReceptionMultipleGestureDetectors()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
   Dali::TestGestureManager& gestureManager = application.GetGestureManager();
 
   Actor first = Actor::New();
@@ -820,32 +811,32 @@ static void UtcDaliLongPressGestureSignalReceptionMultipleGestureDetectors()
     DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
 
     // LongPress within second actor's area
-    core.SendEvent(GenerateLongPress(Gesture::Possible, 2u, Vector2(150.0f, 10.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Started,  2u, Vector2(150.0f, 10.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Finished, 2u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Possible, 2u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Started,  2u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Finished, 2u, Vector2(150.0f, 10.0f)));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(true, second == data.pressedActor, TEST_LOCATION);
 
     // LongPress continues as single touch gesture - we should not receive any gesture
     data.Reset();
-    core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(150.0f, 10.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(150.0f, 10.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(150.0f, 10.0f)));
     DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
     // Single touch long press starts - first actor should receive gesture
     data.Reset();
-    core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 10.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Started,  1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(true, first == data.pressedActor, TEST_LOCATION);
 
     // long press changes to double-touch - we shouldn't receive event
     data.Reset();
-    core.SendEvent(GenerateLongPress(Gesture::Possible, 2u, Vector2(50.0f, 10.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Started, 2u, Vector2(50.0f, 10.0f)));
-    core.SendEvent(GenerateLongPress(Gesture::Finished, 2u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Possible, 2u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Started, 2u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Finished, 2u, Vector2(50.0f, 10.0f)));
     DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
     // Reset gesture manager statistics
@@ -861,7 +852,6 @@ static void UtcDaliLongPressGestureSignalReceptionMultipleGestureDetectors()
 void UtcDaliLongPressGestureSignalReceptionMultipleDetectorsOnActor()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -887,8 +877,8 @@ void UtcDaliLongPressGestureSignalReceptionMultipleDetectorsOnActor()
   secondDetector.DetectedSignal().Connect(&application, secondFunctor);
 
   // LongPress in actor's area - both detector's functors should be called
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, firstData.functorCalled, TEST_LOCATION);
   DALI_TEST_EQUALS(true, secondData.functorCalled, TEST_LOCATION);
 }
@@ -896,7 +886,6 @@ void UtcDaliLongPressGestureSignalReceptionMultipleDetectorsOnActor()
 void UtcDaliLongPressGestureSignalReceptionDifferentPossible()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -915,7 +904,7 @@ void UtcDaliLongPressGestureSignalReceptionDifferentPossible()
   detector.DetectedSignal().Connect( &application, functor );
 
   // LongPress possible in actor's area.
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor somewhere else
@@ -926,12 +915,12 @@ void UtcDaliLongPressGestureSignalReceptionDifferentPossible()
   application.Render();
 
   // Emit Started event, we should not receive the long press.
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // LongPress possible in empty area.
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Move actor in to the long press position.
@@ -942,21 +931,20 @@ void UtcDaliLongPressGestureSignalReceptionDifferentPossible()
   application.Render();
 
   // Emit Started event, we should not receive the long press.
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Normal long press in actor's area for completeness.
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliLongPressGestureEmitIncorrectStateClear()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -977,7 +965,7 @@ void UtcDaliLongPressGestureEmitIncorrectStateClear()
   // Try a Clear state
   try
   {
-    core.SendEvent(GenerateLongPress(Gesture::Clear, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Clear, 1u, Vector2(50.0f, 10.0f)));
     tet_result(TET_FAIL);
   }
   catch ( Dali::DaliException& e )
@@ -989,7 +977,6 @@ void UtcDaliLongPressGestureEmitIncorrectStateClear()
 void UtcDaliLongPressGestureEmitIncorrectStateContinuing()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1010,7 +997,7 @@ void UtcDaliLongPressGestureEmitIncorrectStateContinuing()
   // Try a Continuing state
   try
   {
-    core.SendEvent(GenerateLongPress(Gesture::Continuing, 1u, Vector2(50.0f, 10.0f)));
+    application.ProcessEvent(GenerateLongPress(Gesture::Continuing, 1u, Vector2(50.0f, 10.0f)));
     tet_result(TET_FAIL);
   }
   catch ( Dali::DaliException& e )
@@ -1022,7 +1009,6 @@ void UtcDaliLongPressGestureEmitIncorrectStateContinuing()
 void UtcDaliLongPressGestureDetectorTypeRegistry()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1051,16 +1037,15 @@ void UtcDaliLongPressGestureDetectorTypeRegistry()
   application.Render();
 
   // Emit gesture
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
 }
 
 void UtcDaliLongPressGestureRepeatedState()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1079,41 +1064,40 @@ void UtcDaliLongPressGestureRepeatedState()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Two possibles
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // ... Send some finished states, still no signal
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Send two Started states, should be signalled
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
   // Send two cancelled states, should not be signalled
-  core.SendEvent(GenerateLongPress(Gesture::Cancelled, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Cancelled, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Cancelled, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Cancelled, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliLongPressGesturePossibleCancelled()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1132,16 +1116,15 @@ void UtcDaliLongPressGesturePossibleCancelled()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Send a possible followed by a cancel, we should not be signalled
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
-  core.SendEvent(GenerateLongPress(Gesture::Cancelled, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Cancelled, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliLongPressGestureDetachAfterStarted()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1160,8 +1143,8 @@ void UtcDaliLongPressGestureDetachAfterStarted()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Emit initial signal
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1169,14 +1152,13 @@ void UtcDaliLongPressGestureDetachAfterStarted()
   detector.Detach(actor);
 
   // Emit Finished, no signal
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliLongPressGestureActorUnstaged()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1198,11 +1180,11 @@ void UtcDaliLongPressGestureActorUnstaged()
   detector.DetectedSignal().Connect( &application, functor );
 
   // Emit signals
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
   // Render and notify
@@ -1220,11 +1202,11 @@ void UtcDaliLongPressGestureActorUnstaged()
   stateToUnstage = Gesture::Finished;
 
   // Emit signals
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   tet_result( TET_PASS ); // If we get here then we have handled actor stage removal gracefully.
 }
@@ -1232,7 +1214,6 @@ void UtcDaliLongPressGestureActorUnstaged()
 void UtcDaliLongPressGestureActorStagedAndDestroyed()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1266,8 +1247,8 @@ void UtcDaliLongPressGestureActorStagedAndDestroyed()
   // position, we should still not be signalled.
 
   // Emit signals
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1283,15 +1264,15 @@ void UtcDaliLongPressGestureActorStagedAndDestroyed()
   application.Render();
 
   // Continue signal emission
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
   // Here we delete an actor in started, we should not receive any subsequent signalling.
 
   // Emit signals
-  core.SendEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
-  core.SendEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Possible, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Started, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
   data.Reset();
 
@@ -1307,15 +1288,14 @@ void UtcDaliLongPressGestureActorStagedAndDestroyed()
   application.Render();
 
   // Continue signal emission
-  core.SendEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
+  application.ProcessEvent(GenerateLongPress(Gesture::Finished, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 }
 
 void UtcDaliLongPressGestureSystemOverlay()
 {
   TestApplication application;
-  Dali::Integration::Core& core = application.GetCore();
-  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  Dali::Integration::SystemOverlay& systemOverlay( application.GetCore().GetSystemOverlay() );
   systemOverlay.GetOverlayRenderTasks().CreateTask();
 
   Actor actor = Actor::New();
@@ -1336,7 +1316,7 @@ void UtcDaliLongPressGestureSystemOverlay()
 
   // Do a long press inside actor's area
   Vector2 screenCoords( 50.0f, 50.0f );
-  core.SendEvent( GenerateLongPress( Gesture::Possible, 1u, screenCoords ) );
-  core.SendEvent( GenerateLongPress( Gesture::Started, 1u, screenCoords ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, screenCoords ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started, 1u, screenCoords ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
 }

@@ -295,15 +295,6 @@ public:
   void Resume();
 
   /**
-   * @deprecated - This is equivalent to:
-   * @code
-   *  Core::QueueEvent(event);
-   *  Core::ProcessEvents();
-   * @endcode
-   */
-  void SendEvent(const Event& event);
-
-  /**
    * Queue an event with Core.
    * Pre-processing of events may be benificial e.g. a series of motion events could be throttled, so that only the last event is queued.
    * Multi-threading note: this method should be called from the main thread.

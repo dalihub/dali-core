@@ -47,10 +47,9 @@ public:
 
   /**
    * Requests a future call to Dali::Integration::Core::ProcessEvents(), when the application is idle.
-   * TODO - Rename to RequestProcessEventsOnIdle()
    * Multi-threading note: this method will be called from the main thread only.
    */
-  virtual void RequestNotificationEventOnIdle() = 0;
+  virtual void RequestProcessEventsOnIdle() = 0;
 
 };
 

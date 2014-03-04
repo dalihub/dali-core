@@ -23,7 +23,6 @@
 #include "test-gl-sync-abstraction.h"
 #include "test-gl-abstraction.h"
 #include "test-render-controller.h"
-#include <dali/integration-api/events/notification-event.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
@@ -153,10 +152,15 @@ public:
     return mGestureManager;
   }
 
+  void ProcessEvent(const Integration::Event& event)
+  {
+    mCore->QueueEvent(event);
+    mCore->ProcessEvents();
+  }
+
   void SendNotification()
   {
-    Integration::NotificationEvent event;
-    mCore->SendEvent(event);
+    mCore->ProcessEvents();
   }
 
   void SetSurfaceWidth( unsigned int width, unsigned height )

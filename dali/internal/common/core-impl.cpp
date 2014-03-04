@@ -329,7 +329,7 @@ void Core::ProcessEvents()
   if( mProcessingEvent )
   {
     DALI_LOG_ERROR( "ProcessEvents should not be called from within ProcessEvents!" );
-    mRenderController.RequestNotificationEventOnIdle();
+    mRenderController.RequestProcessEventsOnIdle();
     return;
   }
 
@@ -370,7 +370,7 @@ void Core::ProcessEvents()
     }
   }
 
-  // SendEvent() may now be called again
+  // ProcessEvents() may now be called again
   mProcessingEvent = false;
 }
 

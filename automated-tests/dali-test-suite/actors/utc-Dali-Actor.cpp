@@ -2158,7 +2158,7 @@ static void UtcDaliActorTouchedSignal()
   Dali::TouchPoint point( 1, TouchPoint::Down, touchPoint.x, touchPoint.y );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_CHECK( gTouchCallBackCalled == true );
 }
@@ -2456,7 +2456,7 @@ static void UtcDaliActorHitTest()
     // flush the queue and render once
     application.SendNotification();
     application.Render();
-    application.GetCore().SendEvent( event );
+    application.ProcessEvent( event );
 
     DALI_TEST_CHECK( gTouchCallBackCalled == hitTestData[index]->mResult );
 
@@ -2587,7 +2587,7 @@ static void SimulateTouchForSetOverlayHitTest(TestApplication& app)
   Dali::TouchPoint point( 0, TouchPoint::Down, 25.0f, 25.0f );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
-  app.GetCore().SendEvent( event );
+  app.ProcessEvent( event );
 
   app.SendNotification();
   app.Render(1);

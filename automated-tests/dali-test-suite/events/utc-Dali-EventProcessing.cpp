@@ -73,12 +73,11 @@ struct InvalidGesture : public Integration::GestureEvent
 void UtcDaliInvalidEvent()
 {
   TestApplication application;
-  Dali::Integration::Core& core ( application.GetCore() );
 
   try
   {
     InvalidEvent event;
-    core.SendEvent( event );
+    application.ProcessEvent( event );
     tet_result( TET_FAIL );
   }
   catch ( Dali::DaliException& e )
@@ -90,12 +89,11 @@ void UtcDaliInvalidEvent()
 void UtcDaliInvalidGesture()
 {
   TestApplication application;
-  Dali::Integration::Core& core ( application.GetCore() );
 
   try
   {
     InvalidGesture event;
-    core.SendEvent( event );
+    application.ProcessEvent( event );
     tet_result( TET_FAIL );
   }
   catch ( Dali::DaliException& e )

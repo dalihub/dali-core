@@ -238,7 +238,6 @@ static void UtcDaliMouseWheelEventORModifer()
 void UtcDaliMouseWheelEventSignalling()
 {
   TestApplication application; // Reset all test adapter return codes
-  Dali::Integration::Core& core ( application.GetCore() );
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -258,7 +257,7 @@ void UtcDaliMouseWheelEventSignalling()
   Integration::MouseWheelEvent event(0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
 
   // Emit a mouse wheel signal
-  core.SendEvent( event );
+  application.ProcessEvent( event );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( actor == data.mouseWheeledActor );
   DALI_TEST_EQUALS(0, data.receivedMouseWheelEvent.direction, TEST_LOCATION); // check direction
@@ -278,7 +277,7 @@ void UtcDaliMouseWheelEventSignalling()
 
   screenCoordinates.x = screenCoordinates.y = 300.0f;
   Integration::MouseWheelEvent newEvent(0, SHIFT_MODIFIER, screenCoordinates, 1, 1000u);
-  core.SendEvent( newEvent );
+  application.ProcessEvent( newEvent );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( true, rootData.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( rootActor == rootData.mouseWheeledActor );
@@ -296,7 +295,7 @@ void UtcDaliMouseWheelEventSignalling()
   application.Render();
 
   // Emit a move at the same point, we should not be signalled.
-  core.SendEvent( event );
+  application.ProcessEvent( event );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
   data.Reset();
 }

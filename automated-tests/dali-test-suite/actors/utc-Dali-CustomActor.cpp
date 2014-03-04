@@ -1517,7 +1517,7 @@ static void UtcDaliCustomActorOnTouchEvent()
   Dali::TouchPoint point( 0, TouchPoint::Down, 1, 1 );
   Dali::Integration::TouchEvent event;
   event.AddPoint( point );
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnTouchEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
@@ -1546,7 +1546,7 @@ static void UtcDaliCustomActorOnMouseWheelEvent()
   // simulate a mouse wheel event
   Vector2 screenCoordinates( 10.0f, 10.0f );
   Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
-  application.GetCore().SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnMouseWheelEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );

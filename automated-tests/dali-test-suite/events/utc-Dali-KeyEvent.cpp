@@ -271,8 +271,6 @@ static void UtcDaliIntegrationKeyEvent()
     const std::string keyString("keyString");
     const int keyCode(333);
     const int keyModifier(312);
-    const int offset(29);
-    const int characters(80);
     const unsigned long timeStamp(132);
     const Integration::KeyEvent::State keyState(Integration::KeyEvent::Up);
 

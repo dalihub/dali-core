@@ -451,14 +451,13 @@ static void UtcDaliStageSignalKeyEvent()
 {
   TestApplication application;
   Stage stage = Stage::GetCurrent();
-  Dali::Integration::Core& core ( application.GetCore() );
 
   KeyEventSignalData data;
   KeyEventReceivedFunctor functor( data );
   stage.KeyEventSignal().Connect( &application, functor );
 
   Integration::KeyEvent event( "i","i", 0, 0, 0, Integration::KeyEvent::Down );
-  core.SendEvent( event );
+  application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( event.keyModifier == data.receivedKeyEvent.keyModifier );
@@ -469,7 +468,7 @@ static void UtcDaliStageSignalKeyEvent()
   data.Reset();
 
   Integration::KeyEvent event2( "i","i", 0, 0, 0, Integration::KeyEvent::Up );
-  core.SendEvent( event2 );
+  application.ProcessEvent( event2 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( event2.keyModifier == data.receivedKeyEvent.keyModifier );
@@ -480,7 +479,7 @@ static void UtcDaliStageSignalKeyEvent()
   data.Reset();
 
   Integration::KeyEvent event3( "a","a", 0, 0, 0, Integration::KeyEvent::Down );
-  core.SendEvent( event3 );
+  application.ProcessEvent( event3 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( event3.keyModifier == data.receivedKeyEvent.keyModifier );
@@ -491,7 +490,7 @@ static void UtcDaliStageSignalKeyEvent()
   data.Reset();
 
   Integration::KeyEvent event4( "a","a", 0, 0, 0, Integration::KeyEvent::Up );
-  core.SendEvent( event4 );
+  application.ProcessEvent( event4 );
 
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( event4.keyModifier == data.receivedKeyEvent.keyModifier );
@@ -504,7 +503,6 @@ void UtcDaliStageTouchedSignal()
 {
   TestApplication application;
   Stage stage = Stage::GetCurrent();
-  Dali::Integration::Core& core ( application.GetCore() );
 
   TouchedSignalData data;
   TouchedFunctor functor( data );
@@ -518,7 +516,7 @@ void UtcDaliStageTouchedSignal()
   {
     Integration::TouchEvent touchEvent;
     touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Down, 10.0f, 10.0f ) );
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0 );
@@ -527,13 +525,13 @@ void UtcDaliStageTouchedSignal()
 
     touchEvent.points[0].state = TouchPoint::Motion;
     touchEvent.points[0].screen.x = 12.0f; // Some motion
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     data.Reset();
 
     touchEvent.points[0].state = TouchPoint::Up;
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0 );
@@ -558,7 +556,7 @@ void UtcDaliStageTouchedSignal()
   {
     Integration::TouchEvent touchEvent;
     touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Down, 10.0f, 10.0f ) );
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0 );
@@ -567,13 +565,13 @@ void UtcDaliStageTouchedSignal()
 
     touchEvent.points[0].state = TouchPoint::Motion;
     touchEvent.points[0].screen.x = 150.0f; // Some motion
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     data.Reset();
 
     touchEvent.points[0].state = TouchPoint::Up;
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0 );
@@ -585,7 +583,7 @@ void UtcDaliStageTouchedSignal()
   {
     Integration::TouchEvent touchEvent;
     touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Interrupted, 10.0f, 10.0f ) );
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0 );
@@ -594,7 +592,7 @@ void UtcDaliStageTouchedSignal()
     data.Reset();
 
     touchEvent.points[0].state = TouchPoint::Down;
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0 );
@@ -603,7 +601,7 @@ void UtcDaliStageTouchedSignal()
     data.Reset();
 
     touchEvent.points[0].state = TouchPoint::Interrupted;
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
 
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     DALI_TEST_CHECK( data.receivedTouchEvent.GetPointCount() != 0 );
@@ -618,21 +616,21 @@ void UtcDaliStageTouchedSignal()
 
     // 1st point
     touchEvent.points.push_back( TouchPoint( 0, TouchPoint::Down, 10.0f, 10.0f ) );
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     data.Reset();
 
     // 2nd point
     touchEvent.points[0].state = TouchPoint::Stationary;
     touchEvent.points.push_back( TouchPoint( 1, TouchPoint::Down, 50.0f, 50.0f ) );
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     data.Reset();
 
     // Primary point is up
     touchEvent.points[0].state = TouchPoint::Up;
     touchEvent.points[1].state = TouchPoint::Stationary;
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     data.Reset();
 
@@ -640,13 +638,13 @@ void UtcDaliStageTouchedSignal()
     touchEvent.points.erase( touchEvent.points.begin() );
     touchEvent.points[0].state = TouchPoint::Motion;
     touchEvent.points[0].screen.x = 150.0f;
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
     data.Reset();
 
     // Final point Up
     touchEvent.points[0].state = TouchPoint::Up;
-    core.SendEvent( touchEvent );
+    application.ProcessEvent( touchEvent );
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     data.Reset();
   }
