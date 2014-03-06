@@ -416,10 +416,10 @@ void Matrix::Multiply( Matrix& result, const Matrix& lhs, const Quaternion& rhs 
                  : "r"(temp), "r"(lhsPtr), "r" (rhsPtr)
                  : "%r0", "%q0", "%q1", "%q2", "%q4", "%q5", "%q6", "%q7", "memory" );
 
-  rhsPtr[ 12 ] = 0.0f;
-  rhsPtr[ 13 ] = 0.0f;
-  rhsPtr[ 14 ] = 0.0f;
-  rhsPtr[ 15 ] = 1.0f;
+  temp[ 12 ] = 0.0f;
+  temp[ 13 ] = 0.0f;
+  temp[ 14 ] = 0.0f;
+  temp[ 15 ] = 1.0f;
 #endif
 }
 
