@@ -291,11 +291,15 @@ void TextAttachment::SetShadow(bool enable, const Vector4& color, const Vector2&
 
     const float unitPointSize( 64.0f );
     const float unitsToPixels( mFont->GetUnitsToPixels());
+    const float fontPointSize( mFont->GetPointSize() );
 
     float shadowSize( (size * 0.25f) / unitsToPixels );
 
-    Vector2 shadowOffset( offset * ( unitPointSize / mFont->GetPointSize() ) );
-
+    Vector2 shadowOffset( offset );
+    Vector2 maxOffset( fontPointSize / 4.5f, fontPointSize / 4.5f );
+    shadowOffset = Min( shadowOffset, maxOffset );
+    shadowOffset = Max( shadowOffset, -maxOffset );
+    shadowOffset *= unitPointSize / fontPointSize;
     SetDropShadowMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, shadowOffset, shadowSize );
   }
 }
