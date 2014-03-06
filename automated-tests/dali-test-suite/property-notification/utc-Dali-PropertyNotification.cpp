@@ -292,7 +292,7 @@ void UtcDaliAddPropertyNotificationTypeProperty()
   // Currently, Type registry properties cannot be animated
   try
   {
-    actor.AddPropertyNotification( PropertyRegistration::START_INDEX, GreaterThanCondition( 100.0f ) );
+    actor.AddPropertyNotification( PROPERTY_REGISTRATION_START_INDEX, GreaterThanCondition( 100.0f ) );
   }
   catch ( DaliException& e )
   {

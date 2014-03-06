@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/property-index.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 #include <dali/internal/event/common/property-index-ranges.h>
 
@@ -113,7 +114,7 @@ TypeAction::TypeAction( TypeRegistration &registered, const std::string &name, T
 
 PropertyRegistration::PropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type, TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc )
 {
-  DALI_ASSERT_ALWAYS( ( index >= START_INDEX ) && ( index <= MAX_INDEX ) );
+  DALI_ASSERT_ALWAYS( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) );
 
   Internal::TypeRegistry::Get()->RegisterProperty( registered, name, index, type, setFunc, getFunc );
 }

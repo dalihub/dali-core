@@ -17,11 +17,6 @@
 // limitations under the License.
 //
 
-/**
- * @addtogroup CAPI_DALI_FRAMEWORK
- * @{
- */
-
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
@@ -144,6 +139,7 @@ public:
   const std::string& GetPropertyName( Property::Index index ) const;
 
 public: // Not intended for application developers
+
   /**
    * This constructor is used by Dali Get() method
    * @param [in] typeInfo A pointer to a Dali resource
@@ -154,7 +150,4 @@ public: // Not intended for application developers
 
 } // namespace Dali
 
-/**
- * @}
- */
 #endif // __DALI_TYPE_INFO_H__

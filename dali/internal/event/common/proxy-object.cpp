@@ -21,6 +21,7 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/property-index.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/common/animatable-property.h>
@@ -161,7 +162,7 @@ const std::string& ProxyObject::GetPropertyName( Property::Index index ) const
     return GetDefaultPropertyName( index );
   }
 
-  if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
@@ -224,7 +225,7 @@ bool ProxyObject::IsPropertyWritable( Property::Index index ) const
     return IsDefaultPropertyWritable( index );
   }
 
-  if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
@@ -257,7 +258,7 @@ bool ProxyObject::IsPropertyAnimatable( Property::Index index ) const
     return IsDefaultPropertyAnimatable( index );
   }
 
-  if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     // Type Registry event-thread only properties are not animatable.
     return false;
@@ -283,7 +284,7 @@ Property::Type ProxyObject::GetPropertyType( Property::Index index ) const
     return GetDefaultPropertyType( index );
   }
 
-  if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
@@ -316,7 +317,7 @@ void ProxyObject::SetProperty( Property::Index index, const Property::Value& pro
 
     SetDefaultProperty( index, propertyValue );
   }
-  else if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
@@ -354,7 +355,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
   {
     value = GetDefaultProperty( index );
   }
-  else if ( ( index >= PropertyRegistration::START_INDEX ) && ( index <= PropertyRegistration::MAX_INDEX ) )
+  else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
@@ -609,7 +610,7 @@ Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index 
 {
   if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
-    if ( index <= PropertyRegistration::MAX_INDEX )
+    if ( index <= PROPERTY_REGISTRATION_MAX_INDEX )
     {
       DALI_ASSERT_ALWAYS( false && "Property notification added to non animatable property." );
     }

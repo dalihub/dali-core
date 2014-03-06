@@ -3261,7 +3261,7 @@ void UtcDaliConstraintInvalidInputProperty()
 {
   TestApplication application;
   Actor actor = Actor::New();
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, LocalSource( PropertyRegistration::START_INDEX ), MultiplyConstraint() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, LocalSource( PROPERTY_REGISTRATION_START_INDEX ), MultiplyConstraint() );
 
   Stage::GetCurrent().Add( actor );
 

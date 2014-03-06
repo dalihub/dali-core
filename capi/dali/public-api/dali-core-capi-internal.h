@@ -94,6 +94,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/property-conditions.h>
+#include <dali/public-api/object/property-index.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification-declarations.h>
 #include <dali/public-api/object/property-notification.h>

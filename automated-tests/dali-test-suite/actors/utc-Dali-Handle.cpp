@@ -296,9 +296,9 @@ void UtcDaliHandleIsPropertyAnimatable()
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::WORLD_POSITION_Z ) );
 
   // Type registered properties are not animatable
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PropertyRegistration::START_INDEX ) ); // START
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PropertyRegistration::START_INDEX + ( ( PropertyRegistration::MAX_INDEX - PropertyRegistration::START_INDEX ) * 0.5 ) ) ); // MIDDLE
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PropertyRegistration::MAX_INDEX ) ); // MAX
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PROPERTY_REGISTRATION_START_INDEX ) ); // START
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PROPERTY_REGISTRATION_START_INDEX + ( ( PROPERTY_REGISTRATION_MAX_INDEX - PROPERTY_REGISTRATION_START_INDEX ) * 0.5 ) ) ); // MIDDLE
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( PROPERTY_REGISTRATION_MAX_INDEX ) ); // MAX
 }
 
 void UtcDaliHandleGetPropertyType()

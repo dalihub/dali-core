@@ -17,7 +17,7 @@
 // limitations under the License.
 //
 
-#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/property-index.h>
 
 namespace Dali
 {
@@ -29,7 +29,7 @@ namespace Internal
  * Specifies the allowed ranges for different class types to cater for future allocation
  */
 
-#define DEFAULT_PROPERTY_MAX_COUNT                  PropertyRegistration::START_INDEX ///< Default Property Range:     0 to 9999999
+#define DEFAULT_PROPERTY_MAX_COUNT                  PROPERTY_REGISTRATION_START_INDEX ///< Default Property Range:     0 to 9999999
 
 #define DEFAULT_ACTOR_PROPERTY_MAX_COUNT            10000                             ///< Actor Range:                0 to    9999
 #define DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT 20000                             ///< Renderable Actor Range: 10000 to   19999

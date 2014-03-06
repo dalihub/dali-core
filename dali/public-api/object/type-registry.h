@@ -17,11 +17,6 @@
 // limitations under the License.
 //
 
-/**
- * @addtogroup CAPI_DALI_FRAMEWORK
- * @{
- */
-
 // EXTERNAL INCLUDES
 #include <typeinfo>
 
@@ -229,13 +224,6 @@ class PropertyRegistration
 {
 public:
 
-  // Enumerations are being used here rather than static constants so that switch statements can be used to compare property indices
-  enum
-  {
-    START_INDEX = 10000000,   ///< The index for this type should start from this number
-    MAX_INDEX   = 19999999    ///< The maximum index supported for this type
-  };
-
   /**
    * This constructor registers the property with the registered type. This constructor is for event-thread
    * only properties where the value of the property can be retrieved and set via specified functions.
@@ -248,7 +236,7 @@ public:
    *
    * @param [in] registered The TypeRegistration object
    * @param [in] name The name of the property
-   * @param [in] index The property index. Must be a value between START_INDEX and MAX_INDEX inclusive.
+   * @param [in] index The property index. Must be a value between PROPERTY_REGISTRATION_START_INDEX and PROPERTY_REGISTRATION_MAX_INDEX inclusive.
    * @param [in] type The property value type.
    * @param [in] setFunc The function to call when setting the property. If NULL, then the property becomes read-only.
    * @param [in] getFunc The function to call to retrieve the current value of the property. MUST be provided.
@@ -266,7 +254,4 @@ public:
 
 } // namespace Dali
 
-/**
- * @}
- */
 #endif // header

@@ -657,7 +657,7 @@ void UtcDaliPropertyRegistration()
   unsigned int initialPropertyCount( customActor.GetPropertyCount() );
 
   std::string propertyName( "prop-1" );
-  int propertyIndex( PropertyRegistration::START_INDEX );
+  int propertyIndex( PROPERTY_REGISTRATION_START_INDEX );
   Property::Type propertyType( Property::BOOLEAN );
   PropertyRegistration property1( customType1, propertyName, propertyIndex, propertyType, &SetProperty, &GetProperty );
 
@@ -712,30 +712,30 @@ void UtcDaliPropertyRegistrationIndexOutOfBounds()
   // Attempt to register a property type out-of-bounds index (less than)
   try
   {
-    PropertyRegistration property1( customType1, "prop-name", PropertyRegistration::START_INDEX - 1, Property::BOOLEAN, &SetProperty, &GetProperty );
+    PropertyRegistration property1( customType1, "prop-name", PROPERTY_REGISTRATION_START_INDEX - 1, Property::BOOLEAN, &SetProperty, &GetProperty );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "( index >= START_INDEX ) && ( index <= MAX_INDEX )", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX )", TEST_LOCATION );
   }
 
   // Attempt to register a property type out-of-bounds index (greater than)
   try
   {
-    PropertyRegistration property1( customType1, "prop-name", PropertyRegistration::MAX_INDEX + 1, Property::BOOLEAN, &SetProperty, &GetProperty );
+    PropertyRegistration property1( customType1, "prop-name", PROPERTY_REGISTRATION_MAX_INDEX + 1, Property::BOOLEAN, &SetProperty, &GetProperty );
     tet_result( TET_FAIL );
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "( index >= START_INDEX ) && ( index <= MAX_INDEX )", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX )", TEST_LOCATION );
   }
 }
 
 void UtcDaliPropertyRegistrationFunctions()
 {
   TestApplication application;
-  int propertyIndex = PropertyRegistration::START_INDEX + 10;
+  int propertyIndex = PROPERTY_REGISTRATION_START_INDEX + 10;
 
   // Attempt to register a property without a setter
   try
@@ -756,14 +756,14 @@ void UtcDaliPropertyRegistrationFunctions()
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"GetProperty", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "! \"GetProperty", TEST_LOCATION );
   }
 }
 
 void UtcDaliPropertyRegistrationAddSameIndex()
 {
   TestApplication application;
-  int propertyIndex = PropertyRegistration::START_INDEX + 100;
+  int propertyIndex = PROPERTY_REGISTRATION_START_INDEX + 100;
 
   // Add one property with a valid property index
   PropertyRegistration property1( customType1, "prop-name", propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
@@ -775,15 +775,15 @@ void UtcDaliPropertyRegistrationAddSameIndex()
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Property index already added", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "! \"Property index already added", TEST_LOCATION );
   }
 }
 
 void UtcDaliPropertyRegistrationPropertyWritable()
 {
   TestApplication application;
-  int propertyIndex1 = PropertyRegistration::START_INDEX + 200;
-  int propertyIndex2 = PropertyRegistration::START_INDEX + 201;
+  int propertyIndex1 = PROPERTY_REGISTRATION_START_INDEX + 200;
+  int propertyIndex2 = PROPERTY_REGISTRATION_START_INDEX + 201;
 
   // Add two properties, one with SetProperty, one without
   PropertyRegistration property1( customType1, "prop-name-readwrite", propertyIndex1, Property::BOOLEAN, &SetProperty, &GetProperty );
@@ -805,7 +805,7 @@ void UtcDaliPropertyRegistrationPropertyWritable()
 void UtcDaliPropertyRegistrationPropertyAnimatable()
 {
   TestApplication application;
-  int propertyIndex = PropertyRegistration::START_INDEX + 400;
+  int propertyIndex = PROPERTY_REGISTRATION_START_INDEX + 400;
 
   // These properties are not animatable
   PropertyRegistration property1( customType1, "prop-name", propertyIndex, Property::BOOLEAN, &SetProperty, &GetProperty );
@@ -825,7 +825,7 @@ void UtcDaliPropertyRegistrationPropertyAnimatable()
 void UtcDaliPropertyRegistrationInvalidGetAndSet()
 {
   TestApplication application;
-  int propertyIndex = PropertyRegistration::START_INDEX + 2000;
+  int propertyIndex = PROPERTY_REGISTRATION_START_INDEX + 2000;
 
   // Create custom-actor
   TypeInfo typeInfo = TypeRegistry::Get().GetTypeInfo( typeid(MyTestCustomActor) );
@@ -843,7 +843,7 @@ void UtcDaliPropertyRegistrationInvalidGetAndSet()
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "! \"Cannot find property index", TEST_LOCATION );
   }
 
   // Try to get an index that hasn't been added
@@ -854,6 +854,6 @@ void UtcDaliPropertyRegistrationInvalidGetAndSet()
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "! \"Cannot find property index", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "! \"Cannot find property index", TEST_LOCATION );
   }
 }
