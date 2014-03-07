@@ -46,6 +46,12 @@ class Constrainable : public Handle
 public:
 
   /**
+   * Create a constrainable object.
+   * @return A handle to a newly allocated object.
+   */
+  static Constrainable New();
+
+  /**
    * This constructor provides an uninitialized Dali::Constrainable.
    * This should be initialized with a Dali New() method before use.
    * Methods called on an uninitialized Dali::Constrainable will assert.
@@ -58,6 +64,13 @@ public:
    * @endcode
    */
   Constrainable();
+
+  /**
+   * Downcast a handle to a custom object.
+   * @param[in] handle The handle to cast.
+   * @return A handle to a custom object or an empty handle.
+   */
+  static Constrainable DownCast( BaseHandle handle );
 
   /**
    * Dali::Handle is intended as a base class
@@ -105,7 +118,6 @@ public:
   void RemoveConstraints();
 
 public:
-
 
   /**
    * This constructor is used by Dali New() methods.

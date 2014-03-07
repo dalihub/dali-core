@@ -378,7 +378,7 @@ private: // Default property extensions for derived classes
    * @param [in] entry An entry from the CustomPropertyLookup.
    * @param [in] value The new value of the property.
    */
-  virtual void SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value ) = 0;
+  virtual void SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
 
   /**
    * Retrieve a default property value.

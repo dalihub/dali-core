@@ -750,7 +750,99 @@ void ProxyObject::DeleteRemovedConstraints()
       ++iter;
     }
   }
- }
+}
+
+void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
+{
+  switch ( entry.type )
+  {
+    case Property::BOOLEAN:
+    {
+      AnimatableProperty<bool>* property = dynamic_cast< AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<bool>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<bool>() );
+      break;
+    }
+
+    case Property::FLOAT:
+    {
+      AnimatableProperty<float>* property = dynamic_cast< AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<float>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<float>() );
+      break;
+    }
+
+    case Property::VECTOR2:
+    {
+      AnimatableProperty<Vector2>* property = dynamic_cast< AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Vector2>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector2>() );
+      break;
+    }
+
+    case Property::VECTOR3:
+    {
+      AnimatableProperty<Vector3>* property = dynamic_cast< AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Vector3>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector3>() );
+      break;
+    }
+
+    case Property::VECTOR4:
+    {
+      AnimatableProperty<Vector4>* property = dynamic_cast< AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Vector4>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector4>() );
+      break;
+    }
+
+    case Property::ROTATION:
+    {
+      AnimatableProperty<Quaternion>* property = dynamic_cast< AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Quaternion>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Quaternion>() );
+      break;
+    }
+
+    case Property::MATRIX:
+    {
+      AnimatableProperty<Matrix>* property = dynamic_cast< AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Matrix>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Matrix>() );
+      break;
+    }
+
+    case Property::MATRIX3:
+    {
+      AnimatableProperty<Matrix3>* property = dynamic_cast< AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Matrix3>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Matrix3>() );
+      break;
+    }
+
+    default:
+    {
+      DALI_ASSERT_ALWAYS(false && "Property type enumeration out of bounds"); // should not come here
+      break;
+    }
+  }
+}
 
 CustomPropertyLookup& ProxyObject::GetCustomPropertyLookup() const
 {

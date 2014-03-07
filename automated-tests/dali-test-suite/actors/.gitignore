@@ -13,6 +13,7 @@ utc-Dali-LightActor
 utc-Dali-Layer
 utc-Dali-Stage
 utc-Dali-CustomActor
+utc-Dali-Constrainable
 utc-Dali-RenderableActor
 utc-Dali-BaseHandle
 utc-Dali-Handle

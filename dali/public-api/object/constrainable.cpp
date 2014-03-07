@@ -19,9 +19,15 @@
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/internal/event/common/proxy-object.h>
 #include <dali/internal/event/animation/constraint-impl.h>
+#include <dali/internal/event/object/custom-object-internal.h>
 
 namespace Dali
 {
+
+Constrainable Constrainable::New()
+{
+  return Constrainable( Internal::CustomObject::New() );
+}
 
 Constrainable::Constrainable(Dali::Internal::Object* handle)
 : Handle(handle)
@@ -30,6 +36,11 @@ Constrainable::Constrainable(Dali::Internal::Object* handle)
 
 Constrainable::Constrainable()
 {
+}
+
+Constrainable Constrainable::DownCast( BaseHandle handle )
+{
+  return Constrainable( dynamic_cast<Dali::Internal::ProxyObject*>(handle.GetObjectPtr()) );
 }
 
 Constrainable::~Constrainable()

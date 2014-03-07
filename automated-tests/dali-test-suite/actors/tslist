@@ -8,6 +8,7 @@
 /dali-test-suite/actors/utc-Dali-Stage
 /dali-test-suite/actors/utc-Dali-TextActor
 /dali-test-suite/actors/utc-Dali-CustomActor
+/dali-test-suite/actors/utc-Dali-Constrainable
 /dali-test-suite/actors/utc-Dali-RenderableActor
 /dali-test-suite/actors/utc-Dali-BaseHandle
 /dali-test-suite/actors/utc-Dali-Handle

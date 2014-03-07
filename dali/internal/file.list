@@ -96,6 +96,7 @@ internal_src_files = \
   $(internal_src_dir)/event/modeling/model-factory.cpp \
   $(internal_src_dir)/event/modeling/model-impl.cpp \
   $(internal_src_dir)/event/modeling/model-logger.cpp \
+  $(internal_src_dir)/event/object/custom-object-internal.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-impl.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-list-impl.cpp \
   $(internal_src_dir)/event/resources/archive.cpp \

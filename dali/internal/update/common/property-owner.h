@@ -46,7 +46,7 @@ typedef OwnerContainer< PropertyBase* > OwnedPropertyContainer;
 typedef OwnedPropertyContainer::Iterator  OwnedPropertyIter;
 
 /**
- * Base for scene-graph objects which own properties.
+ * An update-thread object which own properties.
  * This allows observers to track the lifetime of the object & its properties.
  */
 class PropertyOwner
@@ -62,6 +62,12 @@ public:
      */
     virtual void PropertyOwnerDestroyed( PropertyOwner& owner ) = 0;
   };
+
+  /**
+   * Create a property owner.
+   * @return A newly allocated object.
+   */
+  static PropertyOwner* New();
 
   /**
    * Virtual destructor; this is intended as a base class.
@@ -166,7 +172,7 @@ private:
    * Called after ResetToBaseValues; derived classes should reset any default properties.
    * @param[in] currentBufferIndex The buffer to reset.
    */
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex ) = 0;
+  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex ) {}
 
 protected:
 

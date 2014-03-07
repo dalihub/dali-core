@@ -33,6 +33,11 @@ namespace Internal
 namespace SceneGraph
 {
 
+PropertyOwner* PropertyOwner::New()
+{
+  return new PropertyOwner();
+}
+
 PropertyOwner::~PropertyOwner()
 {
   DisconnectFromSceneGraph();

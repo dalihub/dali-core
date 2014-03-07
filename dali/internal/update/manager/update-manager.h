@@ -211,6 +211,19 @@ public:
    */
   void AttachToNode( Node* node, NodeAttachment* attachment );
 
+  /**
+   * Add a newly created object.
+   * @param[in] object The object to add.
+   * @post The object is owned by UpdateManager.
+   */
+  void AddObject( PropertyOwner* object );
+
+  /**
+   * Remove an object.
+   * @param[in] object The object to remove.
+   */
+  void RemoveObject( PropertyOwner* object );
+
   // Animations
 
   /**
@@ -552,6 +565,28 @@ inline void AttachToNodeMessage( UpdateManager& manager, const Node& constParent
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AttachToNode, &parent, attachment );
+}
+
+inline void AddObjectMessage( UpdateManager& manager, PropertyOwner* object )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer<PropertyOwner> > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddObject, object );
+}
+
+inline void RemoveObjectMessage( UpdateManager& manager, PropertyOwner* object )
+{
+  typedef MessageValue1< UpdateManager, PropertyOwner* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveObject, object );
 }
 
 inline void AddAnimationMessage( UpdateManager& manager, Animation* animation )

@@ -10,5 +10,6 @@ TARGETS += \
 	utc-Dali-Stage \
 	utc-Dali-TextActor \
 	utc-Dali-CustomActor \
+	utc-Dali-Constrainable \
 	utc-Dali-BaseHandle \
 	utc-Dali-Handle \
