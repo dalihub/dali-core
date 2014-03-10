@@ -322,7 +322,11 @@ bool HitTestRenderTask( LayerList& layers,
         const unsigned int sourceActorDepth( layer.GetDepth() );
 
         CameraActor* cameraActor = renderTask.GetCameraActor();
-        bool pickingPossible = cameraActor->BuildPickingRay( screenCoordinates, viewport, results.rayOrigin, results.rayDirection );
+        bool pickingPossible = cameraActor->BuildPickingRay(
+            screenCoordinates,
+            viewport,
+            results.rayOrigin,
+            results.rayDirection );
         if( !pickingPossible )
         {
           return false;

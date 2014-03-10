@@ -535,6 +535,7 @@ static void UtcDaliShaderEffectMethodSetUniformViewport()
   Stage::GetCurrent().Add(actor);
 
   effect.SetUniform( "uVec2", Vector2( 0.0f, 0.0f ), ShaderEffect::COORDINATE_TYPE_VIEWPORT_POSITION );
+  effect.SetUniform( "uVec2Dir", Vector2( 1.0f, 2.0f ), ShaderEffect::COORDINATE_TYPE_VIEWPORT_DIRECTION );
 
   application.SendNotification();
   application.Render();
@@ -543,7 +544,10 @@ static void UtcDaliShaderEffectMethodSetUniformViewport()
 
   DALI_TEST_CHECK(
       application.GetGlAbstraction().CheckUniformValue(
-          "uVec2", Vector2( -stageSize.x/2, stageSize.y/2 ) ) );
+          "uVec2", Vector2( stageSize.x/2, -stageSize.y/2 ) ) );
+  DALI_TEST_CHECK(
+      application.GetGlAbstraction().CheckUniformValue(
+          "uVec2Dir", Vector2( -1.0f, 2.0f ) ) );
 }
 
 static void UtcDaliShaderEffectMethodSetEffectImage()

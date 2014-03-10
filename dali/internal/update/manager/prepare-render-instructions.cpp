@@ -245,14 +245,14 @@ inline void AddOpaqueRenderers( BufferIndex updateBufferIndex,
 }
 
 /**
- * Function which sorts based on the calculated depth values
+ * Function which sorts based on the calculated depth values ordering them back to front
  * @param lhs item
  * @param rhs item
- * @return true if right item is greater than left
+ * @return true if left item is greater than right
  */
 bool SortByDepthSortValue( const RendererWithSortValue& lhs, const RendererWithSortValue& rhs )
 {
-  return rhs.first < lhs.first;
+  return lhs.first > rhs.first;
 }
 
 /**
@@ -287,7 +287,9 @@ inline void SortTransparentRenderItems( RenderList& transparentRenderList, Layer
     {
       RenderItem& item = transparentRenderList.GetItem( index );
       // the default sorting function should get inlined here
-      sortingHelper[ index ].first = Internal::Layer::ZValue( item.GetModelViewMatrix().GetTranslation3(), layer.transparentRenderables[ index ]->GetSortModifier() );
+      sortingHelper[ index ].first = Internal::Layer::ZValue(
+          item.GetModelViewMatrix().GetTranslation3(),
+          layer.transparentRenderables[ index ]->GetSortModifier() );
       // keep the renderitem pointer in the helper so we can quickly reorder items after sort
       sortingHelper[ index ].second = &item;
     }
@@ -298,13 +300,15 @@ inline void SortTransparentRenderItems( RenderList& transparentRenderList, Layer
     for( size_t index = 0; index < renderableCount; ++index )
     {
       RenderItem& item = transparentRenderList.GetItem( index );
-      sortingHelper[ index ].first = (*sortFunction)( item.GetModelViewMatrix().GetTranslation3(), layer.transparentRenderables[ index ]->GetSortModifier() );
+      sortingHelper[ index ].first = (*sortFunction)(
+          item.GetModelViewMatrix().GetTranslation3(),
+          layer.transparentRenderables[ index ]->GetSortModifier() );
       // keep the renderitem pointer in the helper so we can quickly reorder items after sort
       sortingHelper[ index ].second = &item;
     }
   }
 
-  // sort the values
+  // sort the renderers back to front, Z Axis point from near plane to far plane
   std::sort( sortingHelper.begin(), sortingHelper.end(), SortByDepthSortValue );
 
   // reorder/repopulate the renderitems in renderlist to correct order based on sortinghelper

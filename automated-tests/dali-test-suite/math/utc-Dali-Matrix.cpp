@@ -67,7 +67,8 @@ TEST_FUNCTION( UtcDaliMatrixSetTranslation3,     POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixTranspose,           POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixOStreamOperator,     POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixMultiply,            POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliMatrixOperatorMultiply,    POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliMatrixOperatorMultiply01,  POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliMatrixOperatorMultiply02,  POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixOperatorEquals,      POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixOperatorNotEquals,   POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixGetTransformComponents01, POSITIVE_TC_IDX );
@@ -75,6 +76,7 @@ TEST_FUNCTION( UtcDaliMatrixGetTransformComponents02, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixSetTransformComponents01, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixSetInverseTransformComponent01, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliMatrixSetInverseTransformComponent02, POSITIVE_TC_IDX );
+
 
 
 // Called only once before first test  is run.
@@ -528,8 +530,9 @@ static void UtcDaliMatrixMultiply()
   DALI_TEST_EQUALS(m2, r1, 0.01f, TEST_LOCATION);
 }
 
-static void UtcDaliMatrixOperatorMultiply()
+static void UtcDaliMatrixOperatorMultiply01()
 {
+  TestApplication application;
   Vector4 v1(2.0f, 5.0f, 4.0f, 0.0f);
 
   float els[] = {2.0f, 0.0f, 0.0f, 0.0f,
@@ -542,6 +545,25 @@ static void UtcDaliMatrixOperatorMultiply()
   Vector4 r1(4.0f, 15.0f, 16.0f, 0.0f);
   DALI_TEST_EQUALS(v2, r1, 0.01f, TEST_LOCATION);
 }
+
+static void UtcDaliMatrixOperatorMultiply02()
+{
+  TestApplication application;
+
+  Vector3 position ( 30.f, 40.f, 50.f);
+
+  Matrix m1(false);
+  m1.SetIdentity();
+  m1.SetTranslation(-position);
+
+  Vector4 positionV4(position);
+  positionV4.w=1.0f;
+  Vector4 output = m1 * positionV4;
+
+  output.w = 0.0f;
+  DALI_TEST_EQUALS(output, Vector4::ZERO, 0.01f, TEST_LOCATION);
+}
+
 
 static void UtcDaliMatrixOperatorEquals()
 {

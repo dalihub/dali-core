@@ -49,7 +49,7 @@ public:
   static float ZValue(const Vector3& position, float sortModifier)
   {
     // inlined so we avoid a function call when sorting renderers
-    return -position.z + sortModifier;
+    return position.z + sortModifier;
   }
 
   /**

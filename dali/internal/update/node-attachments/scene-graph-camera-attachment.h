@@ -229,7 +229,6 @@ private:
   void UpdateInverseViewProjection( BufferIndex updateBufferIndex );
 
 private:
-  Matrix                        mLookAtMatrix;         ///< This is used during the view-matrix calculation.
   unsigned int                  mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   unsigned int                  mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
 

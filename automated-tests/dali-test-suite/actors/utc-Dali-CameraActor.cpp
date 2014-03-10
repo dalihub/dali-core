@@ -71,6 +71,9 @@ TEST_FUNCTION( UtcDaliCameraActorSetOrthographicProjection03, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliCameraActorReadProjectionMatrix,        POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliCameraActorAnimatedProperties,          POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliCameraActorPropertyIndices,             POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliCameraActorCheckLookAtAndFreeLookViews01, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliCameraActorCheckLookAtAndFreeLookViews02, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliCameraActorCheckLookAtAndFreeLookViews03, POSITIVE_TC_IDX );
 
 
 namespace
@@ -317,7 +320,7 @@ static void UtcDaliCameraActorDefaultProperties()
   application.SendNotification();
   bool bValue;
   actor.GetProperty(CameraActor::INVERT_Y_AXIS).Get(bValue);
-  DALI_TEST_EQUALS(true, bValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(false, bValue, TEST_LOCATION);
 
   std::vector<Property::Index> indices ;
   indices.push_back(CameraActor::TYPE);
@@ -532,15 +535,15 @@ static void UtcDaliCameraActorSetInvertYAxis()
   tet_infoline("Testing Dali::CameraActor Get/Set InvertYAxis");
 
   CameraActor actor = CameraActor::New();
-  DALI_TEST_EQUALS( actor.GetInvertYAxis(), true, TEST_LOCATION );
-
-  actor.SetInvertYAxis(false);
-
   DALI_TEST_EQUALS( actor.GetInvertYAxis(), false, TEST_LOCATION );
+
+  actor.SetInvertYAxis(true);
+
+  DALI_TEST_EQUALS( actor.GetInvertYAxis(), true, TEST_LOCATION );
 
   bool bValue;
   actor.GetProperty(CameraActor::INVERT_Y_AXIS).Get(bValue);
-  DALI_TEST_EQUALS(false, bValue, TEST_LOCATION);
+  DALI_TEST_EQUALS(true, bValue, TEST_LOCATION);
 }
 
 static void UtcDaliCameraActorModelView()
@@ -859,3 +862,184 @@ void UtcDaliCameraActorPropertyIndices()
   DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
   DALI_TEST_EQUALS( indices.size(), camera.GetPropertyCount(), TEST_LOCATION );
 }
+
+static void UtcDaliCameraActorCheckLookAtAndFreeLookViews01()
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+  Vector2 stageSize = stage.GetSize();
+
+  CameraActor freeLookCameraActor = CameraActor::New(stageSize);
+  freeLookCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+  freeLookCameraActor.SetType(Camera::FREE_LOOK);
+
+  Vector3 targetPosition(30.0f, 240.0f, -256.0f);
+  Actor target = Actor::New();
+  target.SetParentOrigin(ParentOrigin::CENTER);
+  target.SetPosition(targetPosition);
+
+  Constraint cameraOrientationConstraint =
+    Constraint::New<Quaternion> ( Actor::ROTATION,
+                                  Source( target, Actor::WORLD_POSITION ),
+                                  Source( freeLookCameraActor,  Actor::WORLD_POSITION ),
+                                  Source( target, Actor::WORLD_ROTATION ),
+                                  &LookAt );
+  freeLookCameraActor.ApplyConstraint( cameraOrientationConstraint );
+
+  CameraActor lookAtCameraActor = CameraActor::New(stageSize);
+  lookAtCameraActor.SetType(Camera::LOOK_AT_TARGET);
+  lookAtCameraActor.SetTargetPosition(targetPosition);
+  lookAtCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+
+  stage.Add(target);
+  stage.Add(freeLookCameraActor);
+  stage.Add(lookAtCameraActor);
+
+  // Create an arbitrary vector
+  for( float x=-1.0f; x<=1.0f; x+=0.1f )
+  {
+    for( float y=-1.0f; y<1.0f; y+=0.1f )
+    {
+      for( float z=-1.0f; z<1.0f; z+=0.1f )
+      {
+        Vector3 position(x, y, z);
+        position.Normalize();
+        position *= 200.0f;
+
+        freeLookCameraActor.SetPosition(position);
+        lookAtCameraActor.SetPosition(position);
+
+        application.SendNotification();
+        application.Render();
+        application.SendNotification();
+        application.Render();
+        Matrix freeLookViewMatrix;
+        Matrix lookAtViewMatrix;
+        freeLookCameraActor.GetProperty(CameraActor::CameraActor::VIEW_MATRIX).Get(freeLookViewMatrix);
+        lookAtCameraActor.GetProperty(CameraActor::CameraActor::VIEW_MATRIX).Get(lookAtViewMatrix);
+
+        DALI_TEST_EQUALS( freeLookViewMatrix, lookAtViewMatrix, 0.01, TEST_LOCATION );
+      }
+    }
+  }
+}
+
+static void UtcDaliCameraActorCheckLookAtAndFreeLookViews02()
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+  Vector2 stageSize = stage.GetSize();
+
+  CameraActor freeLookCameraActor = CameraActor::New(stageSize);
+  freeLookCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+  freeLookCameraActor.SetType(Camera::FREE_LOOK);
+
+  Vector3 targetPosition(30.0f, 240.0f, -256.0f);
+  Actor target = Actor::New();
+  target.SetParentOrigin(ParentOrigin::CENTER);
+  target.SetPosition(targetPosition);
+
+  Constraint cameraOrientationConstraint =
+    Constraint::New<Quaternion> ( Actor::ROTATION,
+                                  Source( target, Actor::WORLD_POSITION ),
+                                  Source( freeLookCameraActor,  Actor::WORLD_POSITION ),
+                                  Source( target, Actor::WORLD_ROTATION ),
+                                  &LookAt );
+  freeLookCameraActor.ApplyConstraint( cameraOrientationConstraint );
+
+  CameraActor lookAtCameraActor = CameraActor::New(stageSize);
+  lookAtCameraActor.SetType(Camera::LOOK_AT_TARGET);
+  lookAtCameraActor.SetTargetPosition(targetPosition);
+  lookAtCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+
+  stage.Add(target);
+  stage.Add(freeLookCameraActor);
+  stage.Add(lookAtCameraActor);
+
+  // Create an arbitrary vector
+  for( float x=-1.0f; x<=1.0f; x+=0.1f )
+  {
+    for( float y=-1.0f; y<1.0f; y+=0.1f )
+    {
+      for( float z=-1.0f; z<1.0f; z+=0.1f )
+      {
+        Vector3 position(x, y, z);
+        position.Normalize();
+        position *= 200.0f;
+
+        freeLookCameraActor.SetPosition(position);
+        lookAtCameraActor.SetPosition(position);
+
+        application.SendNotification();
+        application.Render();
+        application.SendNotification();
+        application.Render();
+        Matrix freeLookViewMatrix;
+        Matrix lookAtViewMatrix;
+        freeLookCameraActor.GetProperty(CameraActor::CameraActor::VIEW_MATRIX).Get(freeLookViewMatrix);
+        lookAtCameraActor.GetProperty(CameraActor::CameraActor::VIEW_MATRIX).Get(lookAtViewMatrix);
+
+        Matrix freeLookWorld = freeLookCameraActor.GetCurrentWorldMatrix();
+
+        Matrix freeLookTest(false);
+        Matrix::Multiply(freeLookTest, freeLookViewMatrix, freeLookWorld);
+        DALI_TEST_EQUALS( freeLookTest, Matrix::IDENTITY, 0.01f, TEST_LOCATION);
+
+        DALI_TEST_EQUALS( freeLookViewMatrix, lookAtViewMatrix, 0.01, TEST_LOCATION );
+      }
+    }
+  }
+}
+
+static void UtcDaliCameraActorCheckLookAtAndFreeLookViews03()
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+  Vector2 stageSize = stage.GetSize();
+
+  Vector3 targetPosition(Vector3::ZERO);
+
+  CameraActor lookAtCameraActor = CameraActor::New(stageSize);
+  lookAtCameraActor.SetType(Camera::LOOK_AT_TARGET);
+  lookAtCameraActor.SetTargetPosition(targetPosition);
+  lookAtCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+  stage.Add(lookAtCameraActor);
+
+  Vector3 cameraOffset( 0.f, 0.f, 100.f );
+
+  CameraActor freeLookCameraActor = CameraActor::New(stageSize);
+  freeLookCameraActor.SetType(Camera::FREE_LOOK);
+  freeLookCameraActor.SetParentOrigin(ParentOrigin::CENTER);
+
+  Quaternion cameraOrientation( Radian(Degree(180.f)), Vector3::YAXIS );
+  freeLookCameraActor.SetPosition(cameraOffset);
+  freeLookCameraActor.SetRotation(cameraOrientation);
+
+  Actor cameraAnchor = Actor::New();
+  cameraAnchor.Add(lookAtCameraActor);
+  stage.Add(cameraAnchor);
+
+
+  for( float angle = 1.f; angle <= 180.f; angle += 1.f )
+  {
+    Quaternion rotation(Radian(Degree(angle)), Vector3::YAXIS);
+
+    lookAtCameraActor.SetPosition( rotation.Rotate( cameraOffset ) );
+    cameraAnchor.SetRotation( rotation );
+
+    application.SendNotification();
+    application.Render();
+    application.SendNotification();
+    application.Render();
+
+    Matrix freeLookViewMatrix;
+    freeLookCameraActor.GetProperty(CameraActor::CameraActor::VIEW_MATRIX).Get(freeLookViewMatrix);
+
+    Matrix freeLookWorld = freeLookCameraActor.GetCurrentWorldMatrix();
+
+    Matrix freeLookTest(false);
+    Matrix::Multiply( freeLookTest,  freeLookViewMatrix,  freeLookWorld);
+    DALI_TEST_EQUALS( freeLookTest, Matrix::IDENTITY, 0.01f, TEST_LOCATION);
+  }
+}
+

@@ -271,23 +271,20 @@ Vector3 SourceHeightFixedWidth::operator()( const Vector3& current, const Proper
 // LookAt
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-static Quaternion LookAtTarget( const Vector3& vForward, const Quaternion& targetRotation )
+static Quaternion LookAtTarget( const Vector3& vZ, const Quaternion& targetRotation )
 {
-  Vector3 vRight;
-  Vector3 vUp;
-
-  Vector3 targetUp(targetRotation.Rotate(-Vector3::YAXIS));
-  targetUp.Normalize();
+  Vector3 targetY(targetRotation.Rotate(Vector3::YAXIS));
+  targetY.Normalize();
 
   // Camera Right vector is perpendicular to forward & target up
-  vRight = vForward.Cross(targetUp);
-  vRight.Normalize();
+  Vector3 vX = targetY.Cross(vZ);
+  vX.Normalize();
 
   // Camera Up vector is perpendicular to forward and right
-  vUp = vForward.Cross(vRight);
-  vUp.Normalize();
+  Vector3 vY = vZ.Cross(vX);
+  vY.Normalize();
 
-  return Quaternion( vRight, vUp, vForward );
+  return Quaternion( vX, vY, vZ );
 }
 
 Dali::Quaternion LookAt( const Dali::Quaternion& current,

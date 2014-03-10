@@ -430,33 +430,34 @@ Program& Shader::Apply( Context& context,
               case Dali::ShaderEffect::COORDINATE_TYPE_VIEWPORT_POSITION :
               {
                 /**
-                 * Convert from viewport coordinates to GL view
+                 * Convert coordinates from viewport to GL view space
                  *
-                 *     Viewport
-                 * (x,y)
+                 * Viewport coordinate
+                 * (0,0)
                  *      +-----+
                  *      |     |
                  *      |     |
                  *      +-----+
-                 *             (x+width,y+height)
+                 *             (width,height)
                  *
-                 * GL View Coordinates
-                 * (-width/2,height/2)
+                 * GL view space coordinates
+                 * (width/2,-height/2)
                  *      +-----+
                  *      |     |
                  *      |     |
                  *      +-----+
-                 *             (width/2,-height/2)
+                 *             (-width/2,height/2)
                  **/
                 const Rect< int >& viewport = context.GetViewport();
-                value.x = value.x - viewport.width * 0.5f;
-                value.y = viewport.height * 0.5f - value.y;
+                value.x = viewport.width * 0.5f - value.x;
+                value.y = value.y - viewport.height * 0.5f;
 
                 break;
               }
               case Dali::ShaderEffect::COORDINATE_TYPE_VIEWPORT_DIRECTION :
               {
-                value.y *= -1.0f;
+                // Check diagram in COORDINATE_TYPE_VIEWPORT_POSITION
+                value.x *= -1.0f;
                 break;
               }
               case Dali::ShaderEffect::COORDINATE_TYPE_TEXTURE_POSITION :

@@ -46,16 +46,16 @@ namespace
 
 void LookAt(Matrix& result, const Vector3& eye, const Vector3& target, const Vector3& up)
 {
-  Vector3 vForward = target - eye;
-  vForward.Normalize();
+  Vector3 vZ = target - eye;
+  vZ.Normalize();
 
-  Vector3 vSide = vForward.Cross(up);
-  vSide.Normalize();
+  Vector3 vX = up.Cross(vZ);
+  vX.Normalize();
 
-  Vector3 vUp = vSide.Cross(vForward);
-  vUp.Normalize();
+  Vector3 vY = vZ.Cross(vX);
+  vY.Normalize();
 
-  result.SetInverseTransformComponents(vSide, vUp, -vForward, eye);
+  result.SetInverseTransformComponents(vX, vY, vZ, eye);
 }
 
 
@@ -69,20 +69,21 @@ void Frustum(Matrix& result, float left, float right, float bottom, float top, f
 
   if ((near <= 0.0f) || (far <= 0.0f) || (deltaX <= 0.0f) || (deltaY <= 0.0f) || (deltaZ <= 0.0f))
   {
+    DALI_ASSERT_DEBUG("Invalid parameters passed into Frustum!");
     return;
   }
 
   float* m = result.AsFloat();
-  m[0] = 2.0f * near / deltaX;
+  m[0] = -2.0f * near / deltaX;
   m[1] = m[2] = m[3] = 0.0f;
 
-  m[5] = 2.0f * near / deltaY;
+  m[5] = -2.0f * near / deltaY;
   m[4] = m[6] = m[7] = 0.0f;
 
   m[8] = (right + left) / deltaX;
   m[9] = (top + bottom) / deltaY;
-  m[10] = -(near + far) / deltaZ;
-  m[11] = -1.0f;
+  m[10] = (near + far) / deltaZ;
+  m[11] = 1.0f;
 
   m[14] = -2.0f * near * far / deltaZ;
   m[12] = m[13] = m[15] = 0.0f;
@@ -107,19 +108,19 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
                       !Equals(far, near) && "Cannot create orthographic projection with a zero edge" );
 
   float *m = result.AsFloat();
-  m[0] = 2.0f / deltaX;
+  m[0] = -2.0f / deltaX;
   m[1] = 0.0f;
   m[2] = 0.0f;
   m[3] = 0.0f;
 
   m[4] = 0.0f;
-  m[5] = 2.0f / deltaY;
+  m[5] = -2.0f / deltaY;
   m[6] = 0.0f;
   m[7] = 0.0f;
 
   m[8] = 0.0f;
   m[9] = 0.0f;
-  m[10] = -2.0f / deltaZ;
+  m[10] = 2.0f / deltaZ;
   m[11] = 0.0f;
   m[12] = -(right + left) / deltaX;
   m[13] = -(top + bottom) / deltaY;
@@ -131,7 +132,7 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
 
 const Dali::Camera::Type CameraAttachment::DEFAULT_TYPE( Dali::Camera::LOOK_AT_TARGET );
 const Dali::Camera::ProjectionMode CameraAttachment::DEFAULT_MODE( Dali::Camera::PERSPECTIVE_PROJECTION );
-const bool  CameraAttachment::DEFAULT_INVERT_Y_AXIS( true );
+const bool  CameraAttachment::DEFAULT_INVERT_Y_AXIS( false );
 const float CameraAttachment::DEFAULT_FIELD_OF_VIEW( 45.0f*(M_PI/180.0f) );
 const float CameraAttachment::DEFAULT_ASPECT_RATIO( 4.0f/3.0f );
 const float CameraAttachment::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
@@ -139,13 +140,12 @@ const float CameraAttachment::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
 const float CameraAttachment::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
 const float CameraAttachment::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
 const float CameraAttachment::DEFAULT_NEAR_CLIPPING_PLANE( 800.0f ); // default height of the screen
-const float CameraAttachment::DEFAULT_FAR_CLIPPING_PLANE( DEFAULT_NEAR_CLIPPING_PLANE + 0xFFF ); // for a 16bit screen 4 bits per unit in depth buffer
+const float CameraAttachment::DEFAULT_FAR_CLIPPING_PLANE( DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE );
 const Vector3 CameraAttachment::DEFAULT_TARGET_POSITION( 0.0f, 0.0f, 0.0f );
 
 
 CameraAttachment::CameraAttachment()
 : NodeAttachment(),
-  mLookAtMatrix(false),
   mUpdateViewFlag( UPDATE_COUNT ),
   mUpdateProjectionFlag( UPDATE_COUNT ),
   mType( DEFAULT_TYPE ),
@@ -204,6 +204,7 @@ void CameraAttachment::SetProjectionMode( Dali::Camera::ProjectionMode mode )
 void CameraAttachment::SetInvertYAxis( bool invertYAxis )
 {
   mInvertYAxis = invertYAxis;
+  mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
 void CameraAttachment::SetFieldOfView( float fieldOfView )
@@ -308,28 +309,11 @@ void CameraAttachment::Update( BufferIndex updateBufferIndex, const Node& owning
       // camera orientation taken from node - i.e. look in abitrary, unconstrained direction
       case Dali::Camera::FREE_LOOK:
       {
-        Matrix view(false);
-        Quaternion cameraRotation(owningNode.GetWorldRotation(updateBufferIndex));
-        if( ! cameraRotation.IsIdentity())
-        {
-          cameraRotation = cameraRotation*Quaternion(M_PI, Vector3::YAXIS);
-        }
-        view.SetInverseTransformComponents( Vector3::ONE,
-                                            cameraRotation,
-                                            owningNode.GetWorldPosition(updateBufferIndex) );
-
         Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
-
-        if(mInvertYAxis)
-        {
-          viewMatrix.SetIdentityAndScale( Vector3(1.0f, -1.0f, 1.0f) );
-        }
-        else
-        {
-          viewMatrix.SetIdentity();
-        }
-
-        Matrix::Multiply( viewMatrix, viewMatrix, view );
+        viewMatrix.SetInverseTransformComponents(
+            Vector3::ONE,
+            owningNode.GetWorldRotation(updateBufferIndex),
+            owningNode.GetWorldPosition(updateBufferIndex) );
 
         mViewMatrix.SetDirty(updateBufferIndex);
         break;
@@ -338,24 +322,11 @@ void CameraAttachment::Update( BufferIndex updateBufferIndex, const Node& owning
       // camera orientation constrained to look at a target
       case Dali::Camera::LOOK_AT_TARGET:
       {
-        mLookAtMatrix = Matrix::IDENTITY;
-
-        LookAt( mLookAtMatrix,
+        Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
+        LookAt( viewMatrix,
                 owningNode.GetWorldPosition(updateBufferIndex),
                 mTargetPosition,
                 owningNode.GetWorldRotation(updateBufferIndex).Rotate(Vector3::YAXIS) );
-
-        Matrix& viewMatrix = mViewMatrix.Get(updateBufferIndex);
-
-        if(mInvertYAxis)
-        {
-          viewMatrix.SetIdentityAndScale( Vector3(1.0f, -1.0f, 1.0f) );
-        }
-        else
-        {
-          viewMatrix.SetIdentity();
-        }
-        Matrix::Multiply( viewMatrix, viewMatrix, mLookAtMatrix );
 
         mViewMatrix.SetDirty(updateBufferIndex);
         break;
@@ -387,7 +358,8 @@ void CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
       {
         case Dali::Camera::PERSPECTIVE_PROJECTION:
         {
-          Perspective( mProjectionMatrix.Get(updateBufferIndex),
+          Matrix &projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
+          Perspective( projectionMatrix,
                        mFieldOfView,
                        mAspectRatio,
                        mNearClippingPlane,
@@ -396,7 +368,8 @@ void CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
         }
         case Dali::Camera::ORTHOGRAPHIC_PROJECTION:
         {
-          Orthographic( mProjectionMatrix.Get(updateBufferIndex),
+          Matrix &projectionMatrix = mProjectionMatrix.Get(updateBufferIndex);
+          Orthographic( projectionMatrix,
                         mLeftClippingPlane,   mRightClippingPlane,
                         mBottomClippingPlane, mTopClippingPlane,
                         mNearClippingPlane,   mFarClippingPlane );

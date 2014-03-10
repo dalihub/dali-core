@@ -184,16 +184,16 @@ public:
 
   /**
    * Coordinate type of the shader uniform
-   * Viewport coordinates will be centered and inverted on the Y axis. Use this coordinate type
-   * if your are doing a transformation in view space.
+   * Viewport coordinate types will convert from viewport to view space.
+   * Use this coordinate type if your are doing a transformation in view space.
    * The texture coordinate type converts a value in actor local space to texture coodinates.
    * This is useful for pixel shaders and accounts for texture atlas.
    */
   enum UniformCoordinateType
   {
     COORDINATE_TYPE_DEFAULT,            ///< Default, No transformation to be applied
-    COORDINATE_TYPE_VIEWPORT_POSITION,  ///< The uniform is a position vector in viewport coordinates, Needs to be converted to GL coordinates
-    COORDINATE_TYPE_VIEWPORT_DIRECTION, ///< The uniform is a directional vector in viewport coordinates, Needs to be converted to GL coordinates
+    COORDINATE_TYPE_VIEWPORT_POSITION,  ///< The uniform is a position vector in viewport coordinates that needs to be converted to GL view space coordinates.
+    COORDINATE_TYPE_VIEWPORT_DIRECTION, ///< The uniform is a directional vector in viewport coordinates that needs to be converted to GL view space coordinates.
     COORDINATE_TYPE_TEXTURE_POSITION    ///< The uniform is a position in texture coordinates.
   };
 

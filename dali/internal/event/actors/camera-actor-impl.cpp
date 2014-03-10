@@ -152,7 +152,8 @@ void BuildOrthoPickingRay( const Matrix& viewMatrix,
   Vector4 cameraOrigin = invView * Vector4( 0.f, 0.f, 0.f, 1.f );
   Vector4 nearPlaneOrigin = invView * Vector4( 0.0f, 0.0f, -nearPlaneDistance, 1.0f);
 
-  rayDir = (nearPlaneOrigin - cameraOrigin);
+  // Vector pointing from the camera to the near plane
+  rayDir = cameraOrigin - nearPlaneOrigin;
   rayOrigin -= rayDir;
   rayDir.Normalize();
   rayDir.w = 1.0f;
@@ -355,7 +356,10 @@ void CameraActor::SetOrthographicProjection( float left, float right, float top,
   SetProjectionMode(Dali::Camera::ORTHOGRAPHIC_PROJECTION);
 }
 
-bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates, const Viewport& viewport, Vector4& rayOrigin, Vector4& rayDirection )
+bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates,
+                                   const Viewport& viewport,
+                                   Vector4& rayOrigin,
+                                   Vector4& rayDirection )
 {
   bool success = true;
   if( GetProjectionMode() == Dali::Camera::PERSPECTIVE_PROJECTION )
@@ -382,9 +386,14 @@ bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates, const Viewp
   }
   else
   {
-    // TODO someone who understands the math needs to optimise this version as well
     float nearPlaneDistance = GetNearClippingPlane();
-    BuildOrthoPickingRay( GetViewMatrix(), GetProjectionMatrix(), viewport, screenCoordinates.x, screenCoordinates.y, rayOrigin, rayDirection, nearPlaneDistance );
+    BuildOrthoPickingRay( GetViewMatrix(),
+                          GetProjectionMatrix(),
+                          viewport, screenCoordinates.x,
+                          screenCoordinates.y,
+                          rayOrigin,
+                          rayDirection,
+                          nearPlaneDistance );
   }
 
   return success;
