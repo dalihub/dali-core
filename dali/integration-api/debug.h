@@ -43,17 +43,6 @@ namespace Integration
 namespace Log
 {
 
-// environment variable for enabling/disabling logging in different threads
-#define DALI_ENV_ENABLE_LOG "DALI_ENABLE_LOG"
-// values of the environment variable
-#define DALI_LOG_OFF               "FALSE"            ///< disable log messages from all threads. Do not log resource creation / destruction
-#define DALI_LOG_EVENT_THREAD      "EVENT"            ///< enable log messages from event thread. Do not log resource creation / destruction
-#define DALI_LOG_UPDATE_THREAD     "UPDATE"           ///< enable log messages from update thread. Do not log resource creation / destruction
-#define DALI_LOG_RENDER_THREAD     "RENDER"           ///< enable log messages from render thread. Do not log resource creation / destruction
-#define DALI_LOG_RESOURCE_THREADS  "RESOURCE_LOADER"  ///< enable log messages from render thread. Do not log resource creation / destruction
-#define DALI_LOG_ALL_THREADS       "ALL"              ///< enable log messages from all threads. Do not log resource creation / destruction
-#define DALI_LOG_RESOURCE_LIFETIME "RESOURCE_LOG"     ///< log resource creation / destruction. Enables logging on all threads.
-
 // environment variable for enabling/disabling fps tracking
 #define DALI_ENV_FPS_TRACKING "DALI_FPS_TRACKING"
 
@@ -64,30 +53,8 @@ enum DebugPriority
 {
   DebugInfo,
   DebugWarning,
-  DebugError,
-  DebugResources
+  DebugError
 };
-
-/**
- * Control logging in separate threads.
- * If DEBUG_ENABLED macro is not defined, only errors and resource lifetime messages are logged.
- */
-enum LoggingOptions
-{
-  LogNone              = 0,
-  LogEventThread       = 1 << 0,
-  LogUpdateThread      = 1 << 1,
-  LogRenderThread      = 1 << 2,
-  LogResourceThreads   = 1 << 3,
-  LogResourceLifetime  = 1 << 4
-};
-
-/**
- * Return log settings (bitfield) based on the value set in environment
- * @param[in] setting the string contained in DALI_ENABLE_LOG env. variable (or NULL if not set)
- * @return a bitfield with all the relevant LoggingOptions values set
- */
-DALI_IMPORT_API unsigned int ParseLogOptions (const char* setting);
 
 /**
  * Used by logging macros to log a message along with function/class name
@@ -108,7 +75,7 @@ typedef void (*LogFunction)(DebugPriority priority, std::string& message);
  * @param logFunction the log function to install
  * @param logOpts the log options to save in thread
  */
-DALI_IMPORT_API void InstallLogFunction(const LogFunction& logFunction, unsigned int logOpts);
+DALI_IMPORT_API void InstallLogFunction(const LogFunction& logFunction);
 
 /**
  * A log function has to be uninstalled for every thread that wants to use logging.
@@ -126,11 +93,6 @@ DALI_IMPORT_API void UninstallLogFunction();
 #define DALI_LOG_ERROR(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError,   "%s " format, __PRETTY_FUNCTION__, ## args)
 
 #define DALI_LOG_ERROR_NOFN(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, format, ## args)
-
-/**
- * Provides unfiltered logging for resource usage
- */
-#define DALI_LOG_RESOURCE(format, args...)     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugResources, format, ## args)
 
 /**
  * Provides unfiltered logging for fps monitor

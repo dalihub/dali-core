@@ -93,14 +93,12 @@ typedef LogFunction* LogFunctionPtr; ///< LogFunction pointer
  */
 struct ThreadLocalLogging
 {
-  ThreadLocalLogging(LogFunction func, unsigned int opts)
-  :function(func),
-   logOptions(opts)
+  ThreadLocalLogging(LogFunction func)
+  :function(func)
   {
   }
 
   LogFunction function;
-  unsigned int logOptions;
 };
 
 #ifndef EMSCRIPTEN // single threaded
@@ -112,59 +110,6 @@ std::auto_ptr<ThreadLocalLogging> threadLocal;
 /* Forward declarations */
 std::string FormatToString(const char *format, ...);
 std::string ArgListToString(const char *format, va_list args);
-
-unsigned int ParseLogOptions (const char* logOptString)
-{
-  unsigned int ret = LogNone;
-  if (logOptString == NULL)
-  {
-    // environment variable was not set, turn on logging for all threads by default
-    ret |= LogEventThread;
-    ret |= LogUpdateThread;
-    ret |= LogRenderThread;
-    ret |= LogResourceThreads;
-  }
-  else
-  {
-    std::string setting(logOptString);
-    if (!setting.compare(DALI_LOG_OFF))
-    {
-      // leave as "LogNone"
-    }
-    else if (!setting.compare(DALI_LOG_EVENT_THREAD))
-    {
-      ret |= LogEventThread;
-    }
-    else if (!setting.compare(DALI_LOG_UPDATE_THREAD))
-    {
-      ret |= LogUpdateThread;
-    }
-    else if (!setting.compare(DALI_LOG_RENDER_THREAD))
-    {
-      ret |= LogRenderThread;
-    }
-    else if (!setting.compare(DALI_LOG_RESOURCE_THREADS))
-    {
-      ret |= LogResourceThreads;
-    }
-    else if (!setting.compare(DALI_LOG_ALL_THREADS))
-    {
-      ret |= LogEventThread;
-      ret |= LogUpdateThread;
-      ret |= LogRenderThread;
-      ret |= LogResourceThreads;
-    }
-    else if (!setting.compare(DALI_LOG_RESOURCE_LIFETIME))
-    {
-      ret |= LogEventThread;
-      ret |= LogUpdateThread;
-      ret |= LogRenderThread;
-      ret |= LogResourceThreads;
-      ret |= LogResourceLifetime;
-    }
-  }
-  return ret;
-}
 
 void LogMessage(DebugPriority priority, const char* format, ...)
 {
@@ -180,11 +125,6 @@ void LogMessage(DebugPriority priority, const char* format, ...)
     return;
   }
 
-  // avoid string operations and function call if trying to log resources when not requested
-  if (priority == DebugResources && !(threadLogging->logOptions & LogResourceLifetime))
-  {
-    return;
-  }
   va_list arg;
   va_start(arg, format);
   std::string message = ArgListToString(format, arg);
@@ -193,12 +133,12 @@ void LogMessage(DebugPriority priority, const char* format, ...)
   logfunction(priority,message);
 }
 
-void InstallLogFunction(const LogFunction& logFunction, unsigned int logOpts)
+void InstallLogFunction(const LogFunction& logFunction)
 {
   // TLS stores a pointer to an object.
   // It needs to be allocated on the heap, because TLS will destroy it when the thread exits.
 
-  ThreadLocalLogging* logStruct = new ThreadLocalLogging(logFunction, logOpts);
+  ThreadLocalLogging* logStruct = new ThreadLocalLogging(logFunction);
 
   threadLocal.reset(logStruct);
 }

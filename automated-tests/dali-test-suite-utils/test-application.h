@@ -90,8 +90,7 @@ public:
     mCore->SetDpi( mDpi.x, mDpi.y );
 
     Dali::Integration::Log::LogFunction logFunction(&TestApplication::LogMessage);
-    unsigned int logOpts = Dali::Integration::Log::ParseLogOptions("");
-    Dali::Integration::Log::InstallLogFunction(logFunction, logOpts);
+    Dali::Integration::Log::InstallLogFunction(logFunction);
   }
 
   virtual ~TestApplication()
@@ -112,9 +111,6 @@ public:
         break;
       case Dali::Integration::Log::DebugError:
         tet_printf("ERROR: %s", message.c_str());
-        break;
-      case Dali::Integration::Log::DebugResources:
-        tet_printf("INFO: %s", message.c_str());
         break;
       default:
         tet_printf("DEFAULT: %s", message.c_str());

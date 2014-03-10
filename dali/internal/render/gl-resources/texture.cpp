@@ -109,8 +109,6 @@ void Texture::GlCleanup()
   if (mId != 0)
   {
     mContext.DeleteTextures(1,&mId);
-    DALI_LOG_RESOURCE("[DELTEXTURE] Freed image data memory for Texture %u - (%dx%d)\n",
-                      mId, mWidth, mHeight);
     mId = 0;
   }
 }

@@ -223,8 +223,6 @@ void BitmapTexture::AssignBitmap( bool generateTexture, const unsigned char* pix
   mContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
   mContext.TexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-  DALI_LOG_RESOURCE("[UPLOAD] Uploaded image data from Bitmap %p to Texture %d - size %d bytes (%dx%d)\n",
-                    mBitmap.Get(), mId, Pixel::GetBytesPerPixel(mPixelFormat)*mWidth*mHeight, mWidth, mHeight);
   INCREASE_BY( PerformanceMonitor::TEXTURE_DATA_UPLOADED, GetBytesPerPixel(mPixelFormat) * mWidth * mHeight );
 }
 
