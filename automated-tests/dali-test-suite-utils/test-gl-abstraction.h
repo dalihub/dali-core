@@ -1572,7 +1572,9 @@ public: // TEST FUNCTIONS
       }
     }
 
-    tet_infoline( "Not found, printing possible values:" );
+    std::stringstream notFound;
+    notFound << "Not found " << value << " printing possible values:";
+    tet_printf( "%s", notFound.str().c_str() );
     for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
           program_it != mUniforms.end();
           ++program_it )
