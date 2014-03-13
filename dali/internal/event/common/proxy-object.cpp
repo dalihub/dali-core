@@ -55,8 +55,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PRO
 #endif
 } // unnamed namespace
 
-const int INVALID_PROPERTY_COMPONENT_INDEX = -1;
-
 ProxyObject::ProxyObject()
 : mTypeInfo( NULL ),
   mNextCustomPropertyIndex( 0u ),
@@ -117,7 +115,7 @@ void ProxyObject::OnSceneObjectRemove()
 
 int ProxyObject::GetPropertyComponentIndex( Property::Index index ) const
 {
-  return INVALID_PROPERTY_COMPONENT_INDEX;
+  return Property::INVALID_COMPONENT_INDEX;
 }
 
 bool ProxyObject::Supports( Capability capability ) const

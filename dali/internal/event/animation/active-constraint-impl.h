@@ -334,7 +334,7 @@ private:
       DALI_ASSERT_ALWAYS( ( source.propertyIndex < DEFAULT_PROPERTY_MAX_COUNT ) || ( source.propertyIndex >= CUSTOM_PROPERTY_START ) );
 
       PropertyInputImpl* inputProperty( NULL );
-      int componentIndex( INVALID_PROPERTY_COMPONENT_INDEX );
+      int componentIndex( Property::INVALID_COMPONENT_INDEX );
 
       if ( OBJECT_PROPERTY == source.sourceType )
       {
@@ -391,7 +391,7 @@ private:
         // Exit if a scene-graph object is not available from one of the sources
         break;
       }
-      else if ( INVALID_PROPERTY_COMPONENT_INDEX != componentIndex )
+      else if ( Property::INVALID_COMPONENT_INDEX != componentIndex )
       {
         // Special case where component indices are required
         if ( !usingComponentFunc )
@@ -674,7 +674,7 @@ private:
 
       SceneGraph::ConstraintBase* sceneGraphConstraint( NULL );
 
-      if ( INVALID_PROPERTY_COMPONENT_INDEX == componentIndex )
+      if ( Property::INVALID_COMPONENT_INDEX == componentIndex )
       {
         // Not a Vector3 or Vector4 component, expecting float type
         DALI_ASSERT_DEBUG( PropertyTypes::Get< float >() == targetProperty->GetType() );
@@ -768,7 +768,7 @@ private:
       Source& source = *iter;
 
       PropertyInputImpl* inputProperty( NULL );
-      int componentIndex( INVALID_PROPERTY_COMPONENT_INDEX );
+      int componentIndex( Property::INVALID_COMPONENT_INDEX );
 
       if ( OBJECT_PROPERTY == source.sourceType )
       {
@@ -825,7 +825,7 @@ private:
         // Exit if a scene-graph object is not available from one of the sources
         break;
       }
-      else if ( INVALID_PROPERTY_COMPONENT_INDEX != componentIndex )
+      else if ( Property::INVALID_COMPONENT_INDEX != componentIndex )
       {
         // Special case where component indices are required
         if ( !usingComponentFunc )

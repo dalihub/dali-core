@@ -100,7 +100,7 @@ PropertyNotification::PropertyNotification(ProxyObject& proxy,
 
   mProperty = mProxy->GetSceneObjectInputProperty( mPropertyIndex );
   int internalComponentIndex = mProxy->GetPropertyComponentIndex(mPropertyIndex);
-  if( internalComponentIndex != INVALID_PROPERTY_COMPONENT_INDEX )
+  if( internalComponentIndex != Property::INVALID_COMPONENT_INDEX )
   {
     // override the one passed in
     mComponentIndex = internalComponentIndex;
@@ -152,7 +152,7 @@ bool PropertyNotification::Check( BufferIndex bufferIndex )
   bool validityChanged = false;
   bool currentValid = false;
 
-  if ( INVALID_PROPERTY_COMPONENT_INDEX != mComponentIndex )
+  if ( Property::INVALID_COMPONENT_INDEX != mComponentIndex )
   {
     // Evaluate Condition
     const PropertyInputComponentAccessor component( mProperty, mComponentIndex );

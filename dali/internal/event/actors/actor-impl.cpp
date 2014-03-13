@@ -3202,7 +3202,7 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
 
 int Actor::GetPropertyComponentIndex( Property::Index index ) const
 {
-  int componentIndex( INVALID_PROPERTY_COMPONENT_INDEX );
+  int componentIndex( Property::INVALID_COMPONENT_INDEX );
 
   switch ( index )
   {

@@ -24,16 +24,34 @@ namespace Dali
 {
 
 const int Property::INVALID_INDEX = -1;
+const int Property::INVALID_COMPONENT_INDEX = -1;
 
 Property::Property(Handle& obj, Property::Index propIndex)
 : object(obj),
-  propertyIndex(propIndex)
+  propertyIndex(propIndex),
+  componentIndex(Property::INVALID_COMPONENT_INDEX)
+{
+}
+
+Property::Property(Handle& obj, Property::Index propIndex, int compIndex)
+: object(obj),
+  propertyIndex(propIndex),
+  componentIndex(compIndex)
 {
 }
 
 Property::Property(Handle& obj, const std::string& propertyName)
 : object(obj),
-  propertyIndex(Property::INVALID_INDEX)
+  propertyIndex(Property::INVALID_INDEX),
+  componentIndex(Property::INVALID_COMPONENT_INDEX)
+{
+  propertyIndex = object.GetPropertyIndex( propertyName );
+}
+
+Property::Property(Handle& obj, const std::string& propertyName, int compIndex)
+: object(obj),
+  propertyIndex(Property::INVALID_INDEX),
+  componentIndex(compIndex)
 {
   propertyIndex = object.GetPropertyIndex( propertyName );
 }

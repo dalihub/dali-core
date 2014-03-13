@@ -56,8 +56,6 @@ typedef std::vector< Dali::ActiveConstraint >     ActiveConstraintContainer;
 typedef ActiveConstraintContainer::iterator       ActiveConstraintIter;
 typedef ActiveConstraintContainer::const_iterator ActiveConstraintConstIter;
 
-extern const int INVALID_PROPERTY_COMPONENT_INDEX;
-
 /**
  * A proxy for a property-owning object in the scene-graph.
  * This provides an interface for observing the addition/removal of scene-objects.
@@ -153,7 +151,7 @@ public:
    * Query whether the property is a component of a scene-graph property.
    * @pre -1 < index < GetPropertyCount().
    * @param[in] index The index of the property.
-   * @return The index or INVALID_PROPERTY_COMPONENT_INDEX.
+   * @return The index or Property::INVALID_COMPONENT_INDEX.
    */
   virtual int GetPropertyComponentIndex( Property::Index index ) const;
 

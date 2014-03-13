@@ -264,11 +264,12 @@ public:
    * Animate a property to a destination value.
    * @param [in] targetObject The target object to animate.
    * @param [in] targetPropertyIndex The index of the target property.
+   * @param [in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4
    * @param [in] destinationValue The destination value.
    * @param [in] alpha The alpha function to apply.
    * @param [in] period The effect will occur during this time period.
    */
-  void AnimateTo(ProxyObject& targetObject, Property::Index targetPropertyIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period);
+  void AnimateTo(ProxyObject& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period);
 
 
   /**

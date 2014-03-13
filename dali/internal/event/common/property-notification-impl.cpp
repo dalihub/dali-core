@@ -92,12 +92,12 @@ PropertyNotification::PropertyNotification(UpdateManager& updateManager,
   mPropertyType = mProxy->GetPropertyType(mProxyPropertyIndex);
 
   int internalComponentIndex = mProxy->GetPropertyComponentIndex(mProxyPropertyIndex);
-  if( internalComponentIndex != INVALID_PROPERTY_COMPONENT_INDEX )
+  if( internalComponentIndex != Property::INVALID_COMPONENT_INDEX )
   {
     // override the one passed in
     mComponentIndex = internalComponentIndex;
   }
-  if(mComponentIndex != INVALID_PROPERTY_COMPONENT_INDEX)
+  if(mComponentIndex != Property::INVALID_COMPONENT_INDEX)
   {
     Property::Type type = mProxy->GetPropertyType(mProxyPropertyIndex);
     if( type == Property::VECTOR2

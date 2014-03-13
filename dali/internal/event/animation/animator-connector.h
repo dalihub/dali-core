@@ -58,6 +58,7 @@ public:
    * Construct a new animator connector.
    * @param[in] proxy The proxy for a scene-graph object to animate.
    * @param[in] propertyIndex The index of a property provided by the object.
+   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4 (INVALID_PROPERTY_COMPONENTINDEX to use the whole property)
    * @param[in] animatorFunction A function used to animate the property.
    * @param[in] alpha The alpha function to apply.
    * @param[in] period The time period of the animator.
@@ -65,12 +66,14 @@ public:
    */
   static AnimatorConnectorBase* New( ProxyObject& proxy,
                                      Property::Index propertyIndex,
+                                     int componentIndex,
                                      const AnimatorFunction& animatorFunction,
                                      AlphaFunction alpha,
                                      const TimePeriod& period )
   {
     return new AnimatorConnector< PropertyType >( proxy,
                                                   propertyIndex,
+                                                  componentIndex,
                                                   animatorFunction,
                                                   alpha,
                                                   period );
@@ -117,12 +120,14 @@ private:
    */
   AnimatorConnector( ProxyObject& proxy,
                      Property::Index propertyIndex,
+                     int componentIndex,
                      const AnimatorFunction& animatorFunction,
                      AlphaFunction alpha,
                      const TimePeriod& period )
   : AnimatorConnectorBase( alpha, period ),
     mProxy( &proxy ),
     mPropertyIndex( propertyIndex ),
+    mComponentIndex( componentIndex ),
     mAnimatorFunction( animatorFunction ),
     mConnected( false )
   {
@@ -195,6 +200,8 @@ protected:
 
   Property::Index mPropertyIndex;
 
+  int mComponentIndex;
+
   AnimatorFunction mAnimatorFunction;
 
   bool mConnected; ///< Used to guard against double connections
@@ -215,6 +222,7 @@ public:
    * Construct a new animator connector.
    * @param[in] proxy The proxy for a scene-graph object to animate.
    * @param[in] propertyIndex The index of a property provided by the object.
+   * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4
    * @param[in] animatorFunction A function used to animate the property.
    * @param[in] alpha The alpha function to apply.
    * @param[in] period The time period of the animator.
@@ -222,12 +230,14 @@ public:
    */
   static AnimatorConnectorBase* New( ProxyObject& proxy,
                                      Property::Index propertyIndex,
+                                     int componentIndex,
                                      const AnimatorFunction& animatorFunction,
                                      AlphaFunction alpha,
                                      const TimePeriod& period )
   {
     return new AnimatorConnector<float>( proxy,
                                          propertyIndex,
+                                         componentIndex,
                                          animatorFunction,
                                          alpha,
                                          period );
@@ -274,12 +284,14 @@ private:
    */
   AnimatorConnector( ProxyObject& proxy,
                      Property::Index propertyIndex,
+                     int componentIndex,
                      const AnimatorFunction& animatorFunction,
                      AlphaFunction alpha,
                      const TimePeriod& period )
   : AnimatorConnectorBase( alpha, period ),
     mProxy( &proxy ),
     mPropertyIndex( propertyIndex ),
+    mComponentIndex( componentIndex ),
     mAnimatorFunction( animatorFunction ),
     mConnected( false )
   {
@@ -336,8 +348,12 @@ private:
     SceneGraph::AnimatorBase* animator( NULL );
 
     const int componentIndex = mProxy->GetPropertyComponentIndex( mPropertyIndex );
+    if( componentIndex != Property::INVALID_COMPONENT_INDEX )
+    {
+      mComponentIndex = componentIndex;
+    }
 
-    if ( INVALID_PROPERTY_COMPONENT_INDEX == componentIndex )
+    if ( Property::INVALID_COMPONENT_INDEX == mComponentIndex )
     {
       // Not a Vector3 or Vector4 component, expecting float type
       DALI_ASSERT_DEBUG( PropertyTypes::Get< float >() == base->GetType() );
@@ -361,17 +377,17 @@ private:
         const PropertyInterfaceType* sceneProperty = dynamic_cast< const PropertyInterfaceType* >( base );
         DALI_ASSERT_DEBUG( NULL != sceneProperty );
 
-        if ( 0 == componentIndex )
+        if ( 0 == mComponentIndex )
         {
           typedef SceneGraph::Animator< float, PropertyComponentAccessorX<Vector3> > Vector3AnimatorType;
           animator = Vector3AnimatorType::New( *sceneProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
         }
-        else if ( 1 == componentIndex )
+        else if ( 1 == mComponentIndex )
         {
           typedef SceneGraph::Animator< float, PropertyComponentAccessorY<Vector3> > Vector3AnimatorType;
           animator = Vector3AnimatorType::New( *sceneProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
         }
-        else if ( 2 == componentIndex )
+        else if ( 2 == mComponentIndex )
         {
           typedef SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector3> > Vector3AnimatorType;
           animator = Vector3AnimatorType::New( *sceneProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
@@ -385,22 +401,22 @@ private:
         const PropertyInterfaceType* sceneProperty = dynamic_cast< const PropertyInterfaceType* >( base );
         DALI_ASSERT_DEBUG( NULL != sceneProperty );
 
-        if ( 0 == componentIndex )
+        if ( 0 == mComponentIndex )
         {
           typedef SceneGraph::Animator< float, PropertyComponentAccessorX<Vector4> > Vector4AnimatorType;
           animator = Vector4AnimatorType::New( *sceneProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
         }
-        else if ( 1 == componentIndex )
+        else if ( 1 == mComponentIndex )
         {
           typedef SceneGraph::Animator< float, PropertyComponentAccessorY<Vector4> > Vector4AnimatorType;
           animator = Vector4AnimatorType::New( *sceneProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
         }
-        else if ( 2 == componentIndex )
+        else if ( 2 == mComponentIndex )
         {
           typedef SceneGraph::Animator< float, PropertyComponentAccessorZ<Vector4> > Vector4AnimatorType;
           animator = Vector4AnimatorType::New( *sceneProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
         }
-        else if ( 3 == componentIndex )
+        else if ( 3 == mComponentIndex )
         {
           typedef SceneGraph::Animator< float, PropertyComponentAccessorW<Vector4> > Vector4AnimatorType;
           animator = Vector4AnimatorType::New( *sceneProperty, mAnimatorFunction, mAlphaFunction, mTimePeriod );
@@ -423,6 +439,8 @@ protected:
   ProxyObject* mProxy; ///< Not owned by the animator connector. Valid until ProxyDestroyed() is called.
 
   Property::Index mPropertyIndex;
+
+  int mComponentIndex;
 
   AnimatorFunction mAnimatorFunction;
 
