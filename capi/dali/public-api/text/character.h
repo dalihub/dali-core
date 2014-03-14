@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TEXT_MODULE
  * @{
  */
 
@@ -34,7 +34,8 @@ namespace Internal DALI_INTERNAL
 }
 
 /**
- * Character class encapsulates a character implementation to support multiple languages.
+ * @brief The Character class encapsulates a character implementation to support multiple languages.
+ *
  * This class is provided for convenience. A user can't instantiate Characters directly.
  * However, by instantiating a Text object, Characters are returned by Text::operator[].
  */
@@ -43,7 +44,7 @@ class Character
 public:
 
   /**
-   * CharacterDirection
+   * @brief CharacterDirection
    *
    * Characters can be classified under one of five direction types, which determines the
    * direction in which they are displayed.
@@ -64,50 +65,60 @@ public:
 public:
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
+   *
    * @param [in] character Character to be copied.
    */
   Character( const Character& character );
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   *
    * @param [in] character Character to be assigned.
+   * @return a reference to this
    */
   Character& operator=( const Character& character );
 
   /**
-   * Non virtual destructor.
+   * @brief Non virtual destructor.
    */
   ~Character();
 
   /**
-   * Equality operator.
+   * @brief Equality operator.
+   *
    * @param [in] character The character to be compared.
+   * @return true if the character is identical
    */
   bool operator==( const Character& character ) const;
 
   /**
-   * Inequality operator.
+   * @brief Inequality operator.
+   *
    * @param [in] character The character to be compared.
+   * @return true if the character is not identical
    */
   bool operator!=( const Character& character ) const;
 
   /**
-   * Returns direction of this character
+   * @brief Returns direction of this character.
+   *
    * @return The character's direction is returned see CharacterDirection
    */
   CharacterDirection GetCharacterDirection() const;
 
   /**
-   * Returns whether this character is white space (true)
-   * or not (false)
+   * @brief Returns whether this character is white space (true)
+   * or not (false).
+   *
    * @return true if a whitespace character, false otherwise.
    */
   bool IsWhiteSpace() const;
 
   /**
-   * Returns whether this character is a new line character (true)
-   * or not (false)
+   * @brief Returns whether this character is a new line character (true).
+   *
+   * or not (false).
    * @return true if a new line character, false otherwise.
    */
   bool IsNewLine() const;
@@ -116,7 +127,9 @@ private:
   Internal::Character* mImpl;
 
   /**
-   * Default constructor. Not defined.
+   * @brief Default constructor.
+   *
+   * Not defined.
    */
   DALI_INTERNAL Character();
 

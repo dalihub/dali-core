@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_IMAGES_MODULE
  * @{
  */
 
@@ -30,14 +30,17 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Abstract interface. Platform specific native support for handling image data. (EGL, GLX etc.)
+ * @brief Abstract interface to provide platform-specific support for handling image data.
+ *
+ * For example, an implementation could use EGL extensions, etc.
  */
 class NativeImage : public Dali::RefObject
 {
 public:
 
   /**
-   * Create the GL resource for the NativeImage.
+   * @brief Create the GL resource for the NativeImage.
+   *
    * e.g. For the EglImageKHR extension, this corresponds to calling eglCreateImageKHR()
    * @pre There is a GL context for the current thread.
    * @return false If the initialization fails.
@@ -45,40 +48,46 @@ public:
   virtual bool GlExtensionCreate() = 0;
 
   /**
-   * Destroy the GL resource for the NativeImage.
+   * @brief Destroy the GL resource for the NativeImage.
+   *
    * e.g. For the EglImageKHR extension, this corresponds to calling eglDestroyImageKHR()
    * @pre There is a GL context for the current thread.
    */
   virtual void GlExtensionDestroy() = 0;
 
   /**
-   * Use the NativeImage as a texture for rendering
+   * @brief Use the NativeImage as a texture for rendering.
+   *
    * @pre There is a GL context for the current thread.
    * @return A GL error code
    */
   virtual unsigned int TargetTexture() = 0;
 
   /**
-   * Called in each NativeTexture::Bind() call to allow implementation specific operations.
+   * @brief Called in each NativeTexture::Bind() call to allow implementation specific operations.
+   *
    * The correct texture sampler has already been bound before the function gets called.
    * @pre glAbstraction is being used by context in current thread
    */
   virtual void PrepareTexture() = 0;
 
   /**
-   * Returns the width of the NativeImage
+   * @brief Returns the width of the NativeImage.
+   *
    * @return width
    */
   virtual unsigned int GetWidth() const = 0;
 
   /**
-   * Returns the height of the NativeImage
+   * @brief Returns the height of the NativeImage.
+   *
    * @return height
    */
   virtual unsigned int GetHeight() const = 0;
 
   /**
-   * Returns the internal pixel NativeImage::PixelFormat of the NativeImage
+   * @brief Returns the internal pixel NativeImage::PixelFormat of the NativeImage.
+   *
    * @return pixel format
    */
   virtual Pixel::Format GetPixelFormat() const = 0;
@@ -86,7 +95,8 @@ public:
 protected:
 
   /**
-   * A reference counted object may only be deleted by calling Unreference().
+   * @brief A reference counted object may only be deleted by calling Unreference().
+   *
    * The implementation should destroy the NativeImage resources.
    */
   virtual ~NativeImage()
@@ -94,6 +104,9 @@ protected:
   }
 };
 
+/**
+ * @brief Pointer to Dali::NativeImage
+ */
 typedef IntrusivePtr<NativeImage>  NativeImagePtr;
 
 } // namespace Dali

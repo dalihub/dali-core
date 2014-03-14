@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SIGNALS_MODULE
  * @{
  */
 
@@ -31,7 +31,7 @@ namespace Dali DALI_IMPORT_API
 class CallbackBase;
 
 /**
- * Slot connection is the connection information held by a connection tracker.
+ * @brief Slot connection is the connection information held by a connection tracker.
  *
  * A slot can have zero to many connection objects, depending
  * on how many signals it is connected to.
@@ -48,25 +48,28 @@ class SlotConnection
 public:
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param[in] slotObserver The slot observer.
    * @param[in] callback Ownership of this callback object is taken.
    */
   SlotConnection(SlotObserver* slotObserver, CallbackBase* callback);
 
   /**
-   * Non-virtual destructor, not intended as a base class.
+   * @brief Non-virtual destructor, not intended as a base class.
    */
   ~SlotConnection();
 
   /**
-   * Retrieve the callback.
+   * @brief Retrieve the callback.
+   *
    * @return A pointer to the callback.
    */
   CallbackBase* GetCallback();
 
   /**
-   * Retrieve the slot observer.
+   * @brief Retrieve the slot observer.
+   *
    * @return A pointer to the slot observer.
    */
   SlotObserver* GetSlotObserver();
@@ -83,7 +86,7 @@ private:
 };
 
 /**
- * SignalConnection is the connection information held by the signal.
+ * @brief SignalConnection is the connection information held by the signal.
  *
  * A signal can have zero to many connections, depending on how
  * many slots are connected to this signal.
@@ -100,31 +103,35 @@ class SignalConnection
 public:
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param[in] callback The callback which should be a C function.
    */
   SignalConnection( CallbackBase* callback );
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param[in] signalObserver The signal observer.
    * @param[in] callback The callback which should be a member function of the signalObserver.
    */
   SignalConnection( SignalObserver* signalObserver, CallbackBase* callback );
 
   /**
-   * Non-virtual destructor, not intended as a base class.
+   * @brief Non-virtual destructor, not intended as a base class.
    */
   ~SignalConnection();
 
   /**
-   * Disconnect the signal from the slot.
+   * @brief Disconnect the signal from the slot.
+   *
    * @param[in] slotObserver The signal disconnecting from the slot.
    */
   void Disconnect( SlotObserver* slotObserver );
 
   /**
-   * Retrieve the callback.
+   * @brief Retrieve the callback.
+   *
    * @return A pointer to the callback.
    */
   CallbackBase* GetCallback();

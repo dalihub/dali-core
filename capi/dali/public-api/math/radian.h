@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -31,60 +31,73 @@ namespace Dali DALI_IMPORT_API
 struct Degree;
 
 /**
- * An angle in radians.
+ * @brief An angle in radians.
+ *
  * This reduces ambiguity when using methods which accept angles in degrees or radians.
  */
 struct DALI_IMPORT_API Radian
 {
   /**
-   * Create an angle in radians.
+   * @brief Create an angle in radians.
+   *
    * @param[in] value The initial value in radians.
    */
   explicit Radian( float value );
 
   /**
-   * Create an angle in radians from an angle in degrees.
+   * @brief Create an angle in radians from an angle in degrees.
+   *
    * @param[in] value The initial value in degrees.
    */
   Radian( const Degree& value );
 
   /**
-   * Compare equality between two radians
+   * @brief Compare equality between two radians.
+   *
    * @param[in] rhs Radian to compare to
+   * @return true if the value is identical
    */
   bool operator==( const Radian& rhs ) const;
 
   /**
-   * Compare inequality between two radians
+   * @brief Compare inequality between two radians.
+   *
    * @param[in] rhs Radian to compare to
+   * @return true if the value is not identical
    */
   bool operator!=( const Radian& rhs ) const;
 
   /**
-   * Compare two radians
+   * @brief Compare two radians.
+   *
    * @param[in] rhs Radian to compare to
+   * @return true if this is less than the value
    */
   bool operator<( const Radian& rhs ) const;
 
   /**
-   * Assign an angle from a float value
+   * @brief Assign an angle from a float value.
+   *
    * @param[in] value Float value in radians
+   * @return a reference to this object
    */
   Radian& operator=( const float value );
 
   /**
-   * Assign an angle in degrees to a Radian
+   * @brief Assign an angle in degrees to a Radian.
+   *
    * @param[in] rhs Degree to get the value from
+   * @return a reference to this object
    */
   Radian& operator=( const Degree& rhs );
 
   /**
-   * Cast operator to const float reference
+   * @brief Cast operator to const float reference.
    */
   operator const float&() const;
 
   /**
-   * Cast operator to float reference
+   * @brief Cast operator to float reference.
    */
   operator float&();
 

@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_IMAGES_MODULE
  * @{
  */
 
@@ -38,7 +38,7 @@ class EncodedBufferImage;
 
 
 /**
- * EncodedBufferImage represents an image resource that can be added to
+ * @brief EncodedBufferImage represents an image resource that can be added to
  * ImageActors.
  *
  * A memory buffer of encoded image data is provided by the application and
@@ -66,13 +66,15 @@ class EncodedBufferImage : public Image
 {
 public:
   /**
-   * Constructor which creates an uninitialized EncodedBufferImage object.
+   * @brief Constructor which creates an uninitialized EncodedBufferImage object.
+   *
    * Use Image::New(...) to create an initialised object.
    */
   EncodedBufferImage();
 
   /**
-   * Create an initialised image object from an encoded image buffer in memory.
+   * @brief Create an initialised image object from an encoded image buffer in memory.
+   *
    * The image will be created eagerly using LoadPolicy::Immediate.
    * The function is non-blocking and returns immediately while the image
    * decoding happens on a background thread.
@@ -92,7 +94,8 @@ public:
   static EncodedBufferImage New(const uint8_t * const encodedImage, std::size_t encodedImageByteCount, const ImageAttributes& attributes, ReleasePolicy releasePol = Image::Never);
 
   /**
-   * Create an initialised image object from an encoded image buffer in memory.
+   * @brief Create an initialised image object from an encoded image buffer in memory.
+   *
    * The image will be created eagerly using LoadPolicy::Immediate.
    * The function is non-blocking and returns immediately while the image
    * decoding happens on a background thread.
@@ -108,7 +111,9 @@ public:
   static EncodedBufferImage New(const uint8_t * const encodedImage, std::size_t encodedImageByteCount);
 
   /**
-   * Downcast an Object handle to EncodedBufferImage. If handle points to a EncodedBufferImage the
+   * @brief Downcast an Object handle to EncodedBufferImage.
+   *
+   * If handle points to a EncodedBufferImage the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a EncodedBufferImage or an uninitialized handle
@@ -116,7 +121,7 @@ public:
   static EncodedBufferImage DownCast( BaseHandle handle );
 
   /**
-   * Destructor.
+   * @brief Destructor.
    */
   ~EncodedBufferImage();
 

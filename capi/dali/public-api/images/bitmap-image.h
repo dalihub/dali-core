@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_IMAGES_MODULE
  * @{
  */
 
@@ -40,7 +40,7 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h)
 
 
 /**
- * BitmapImage represents an image resource that can be added to ImageActors.
+ * @brief BitmapImage represents an image resource that can be added to ImageActors.
  * Its pixel buffer data is provided by the application developer.
  *
  * Care should be taken with pixel data allocated by the application,
@@ -70,13 +70,15 @@ class BitmapImage : public Image
 {
 public:
   /**
-   * Constructor which creates an uninitialized BitmapImage object.
+   * @brief Constructor which creates an uninitialized BitmapImage object.
+   *
    * Use Image::New(...) to create an initialised object.
    */
   BitmapImage();
 
   /**
-   * Create a new BitmapImage.
+   * @brief Create a new BitmapImage.
+   *
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
    * For better performance and portability use power of two dimensions.
@@ -87,13 +89,15 @@ public:
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
+   * @return a handle to a new instance of BitmapImage
    */
   static BitmapImage New(unsigned int width,
                          unsigned int height,
                          Pixel::Format pixelformat=Pixel::RGBA8888);
 
   /**
-   * Create a new BitmapImage.
+   * @brief Create a new BitmapImage.
+   *
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
    * For better performance and portability use power of two dimensions.
@@ -105,6 +109,7 @@ public:
    * @param [in] pixelFormat    The pixel format
    * @param [in] loadPolicy     Controls time of loading a resource from the filesystem.
    * @param [in] releasePolicy  Optionally release memory when image is not visible on screen.
+   * @return a handle to a new instance of BitmapImage
    */
   static BitmapImage New(unsigned int  width,
                          unsigned int  height,
@@ -113,7 +118,8 @@ public:
                          ReleasePolicy releasePolicy);
 
   /**
-   * Create a new BitmapImage, which uses an external data source.
+   * @brief Create a new BitmapImage, which uses an external data source.
+   *
    * The PixelBuffer has to be allocated by application.
    *
    * The application holds ownership of the buffer. It must not
@@ -130,6 +136,7 @@ public:
    * @param [in] height       image height in pixels
    * @param [in] pixelFormat  the pixel format (rgba 32 bit by default)
    * @param [in] stride       the internal stride of the pixelbuffer in pixels
+   * @return a handle to a new instance of BitmapImage
    */
   static BitmapImage New(PixelBuffer*  pixelBuffer,
                          unsigned int  width,
@@ -138,7 +145,8 @@ public:
                          unsigned int  stride=0);
 
   /**
-   * Create a new BitmapImage, which uses an external data source.
+   * @brief Create a new BitmapImage, which uses an external data source.
+   *
    * The PixelBuffer has to be allocated by application.
    *
    * The application holds ownership of the buffer. It must not
@@ -159,6 +167,7 @@ public:
    * @param [in] pixelFormat   the pixel format
    * @param [in] stride        the internal stride of the pixelbuffer in pixels
    * @param [in] releasePolicy optionally relase memory when image is not visible on screen.
+   * @return a handle to a new instance of BitmapImage
    */
   static BitmapImage New(PixelBuffer*  pixelBuffer,
                          unsigned int  width,
@@ -168,15 +177,18 @@ public:
                          ReleasePolicy releasePolicy);
 
   /**
-   * Downcast an Object handle to BitmapImage. If handle points to a BitmapImage the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to BitmapImage.
+   *
+   * If handle points to a BitmapImage the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to a BitmapImage or an uninitialized handle
    */
   static BitmapImage DownCast( BaseHandle handle );
 
   /**
-   * Destructor.
+   * @brief Destructor.
    */
   virtual ~BitmapImage();
 
@@ -186,15 +198,18 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * White pixel as image data. Can be used to create solid color actors.
+   * @brief White pixel as image data.
+   *
+   * Can be used to create solid color actors.
    * @return 1 white pixel with 32 bit colordepth
    */
   static const BitmapImage WHITE();
 
 public:
   /**
-   * Returns the pixel buffer of the Image. The application can write
-   * to the buffer to modify its contents.
+   * @brief Returns the pixel buffer of the Image.
+   *
+   * The application can write to the buffer to modify its contents.
    *
    * Whilst the image is on stage, after writing to the buffer the
    * application should call Update() and wait for the
@@ -205,19 +220,22 @@ public:
   PixelBuffer* GetBuffer();
 
   /**
-   * Returns buffer size in bytes.
+   * @brief Returns buffer size in bytes.
+   *
    * @return the buffer size in bytes
    */
   unsigned int GetBufferSize() const;
 
   /**
-   * Returns buffer stride (in bytes).
+   * @brief Returns buffer stride (in bytes).
+   *
    * @return the buffer stride
    */
   unsigned int GetBufferStride() const;
 
   /**
-   * Inform Dali that the contents of the buffer have changed.
+   * @brief Inform Dali that the contents of the buffer have changed.
+   *
    * SignalUploaded will be sent in response if the image is on stage
    * and the image data has been successfully copied to graphics
    * memory. To avoid visual tearing, the application should wait for
@@ -227,7 +245,7 @@ public:
    * image after calling this method until the SignalUploaded has been
    * successfully received.
    *
-   * @note: BitmapImage::BufferUpdated might not work with BGR/BGRA formats!
+   * @note: BitmapImage::Update might not work with BGR/BGRA formats!
    * @note: Some GPUs may not support Non power of two buffer updates (for
    * example C110/SGX540)
    */
@@ -240,7 +258,8 @@ public:
   void Update( RectArea updateArea );
 
   /**
-   * Returns whether BitmapImage uses external data source or not.
+   * @brief Returns whether BitmapImage uses external data source or not.
+   *
    * If not, dali holds ownership of the PixelBuffer, otherwise the application
    * is responsible for freeing it.
    *

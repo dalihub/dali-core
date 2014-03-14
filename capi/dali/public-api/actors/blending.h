@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -30,19 +30,26 @@ namespace Dali DALI_IMPORT_API
 
 namespace BlendingMode
 {
-
-  enum Type
-  {
-    OFF,  ///< Blending is disabled.
-    AUTO, ///< Blending is enabled if there is alpha channel.
-    ON    ///< Blending is enabled.
-  };
+/**
+ * @brief Blending mode.
+ * @see Dali::RenderableActor::SetBlendMode() and Dali::RenderableActor::GetBlendMode()
+ */
+enum Type
+{
+  OFF,  ///< Blending is disabled.
+  AUTO, ///< Blending is enabled if there is alpha channel.
+  ON    ///< Blending is enabled.
+};
 
 } //namespace BlendingMode
 
 namespace BlendingFactor
 {
-
+/**
+ * @brief Blending Factor.
+ *
+ * @see Dali::RenderableActor::SetBlendFunc() and Dali::RenderableActor::GetBlendFunc()
+ */
 enum Type
 {
   ZERO                     = 0,
@@ -66,7 +73,11 @@ enum Type
 
 namespace BlendingEquation
 {
-
+/**
+ * @brief Blending Equation.
+ *
+ * @see Dali::RenderableActor::SetBlendEquation() and Dali::RenderableActor::GetBlendEquation()
+ */
 enum Type
 {
   ADD              = 0x8006,
@@ -76,13 +87,13 @@ enum Type
 
 } // namespace BlendingEquation
 
-extern const BlendingFactor::Type   DEFAULT_BLENDING_SRC_FACTOR_RGB;    // BlendingFactor::SRC_ALPHA
-extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR_RGB;   // BlendingFactor::ONE_MINUS_SRC_ALPHA
-extern const BlendingFactor::Type   DEFAULT_BLENDING_SRC_FACTOR_ALPHA;  // BlendingFactor::ONE
-extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR_ALPHA; // BlendingFactor::ONE_MINUS_SRC_ALPHA
+extern const BlendingFactor::Type   DEFAULT_BLENDING_SRC_FACTOR_RGB;    ///< BlendingFactor::SRC_ALPHA
+extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR_RGB;   ///< BlendingFactor::ONE_MINUS_SRC_ALPHA
+extern const BlendingFactor::Type   DEFAULT_BLENDING_SRC_FACTOR_ALPHA;  ///< BlendingFactor::ONE
+extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR_ALPHA; ///< BlendingFactor::ONE_MINUS_SRC_ALPHA
 
-extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_RGB;     // BlendingEquation::ADD
-extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_ALPHA;   // BlendingEquation::ADD
+extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_RGB;     ///< BlendingEquation::ADD
+extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_ALPHA;   ///< BlendingEquation::ADD
 
 } // namespace Dali
 

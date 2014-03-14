@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -31,13 +31,14 @@
 namespace Dali DALI_IMPORT_API
 {
 
-template <bool x> struct CompileTimeAssertBool;
-template <> struct CompileTimeAssertBool<true> {};
+template <bool x> struct CompileTimeAssertBool;    ///< Bool Template to test condition
+template <> struct CompileTimeAssertBool<true> {}; ///< Specialize for true, but not for false
 
-template<int x> struct CompileTimeAssertInt {};
+template<int x> struct CompileTimeAssertInt {};    ///< Template to wrap conditional template CompileTimeAsserBool
 
 /**
- * Use DALI_COMPILE_TIME_ASSERT to test expressions at compile time.
+ * @brief Use DALI_COMPILE_TIME_ASSERT to test expressions at compile time.
+ *
  * If x is false, then 'sizeof' will be attempted with incomplete type.
  */
 #define DALI_COMPILE_TIME_ASSERT( x ) typedef CompileTimeAssertInt< sizeof( CompileTimeAssertBool< ( x ) > ) > CompileTimeAssertType

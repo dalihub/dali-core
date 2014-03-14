@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -36,30 +36,28 @@ class PropertyCondition;
 }
 
 /**
- * PropertyCondition class represents a condition that
- * can be evaluated on a Property::Value.
+ * @brief This represents a condition that can be evaluated on a Property::Value.
  */
 class PropertyCondition : public BaseHandle
 {
 public:
 
   /**
-   * Argument container, represents the arguments to be supplied
-   * to the condition function.
+   * @brief Argument container, represents the arguments to be supplied to the condition function.
    */
-  typedef std::vector<Property::Value> ArgumentContainer;
-  typedef ArgumentContainer::iterator ArgumentIter;
-  typedef ArgumentContainer::const_iterator ArgumentConstIter;
+  typedef std::vector<Property::Value>      ArgumentContainer;
+  typedef ArgumentContainer::iterator       ArgumentIter;     ///< Iterator for Dali::PropertyCondition::ArgumentContainer
+  typedef ArgumentContainer::const_iterator ArgumentConstIter;///< Const Iterator for Dali::PropertyCondition::ArgumentContainer
 
 public:
 
   /**
-   * Constructor for condition clause
+   * @brief Constructor for condition clause.
    */
   PropertyCondition();
 
   /**
-   * Destructor
+   * @brief Destructor.
    */
   ~PropertyCondition();
 
@@ -71,13 +69,15 @@ public:
 public:
 
   /**
-   * Retrieve the arguments that this condition uses.
+   * @brief Retrieve the arguments that this condition uses.
+   *
    * @return The arguments used for this condition
    */
   ArgumentContainer GetArguments();
 
   /**
-   * Retrieve the arguments that this condition uses.
+   * @brief Retrieve the arguments that this condition uses.
+   *
    * @return The arguments used for this condition
    * @note The container will only be valid as long PropertyCondition is valid.
    */
@@ -86,8 +86,8 @@ public:
 };
 
 /**
- * LessThanCondition compares
- * whether property is less than arg:
+ * @brief LessThanCondition compares whether property is less than arg.
+ *
  * property type:
  * bool (false = 0.0f, true = 1.0f)
  * float (float)
@@ -95,12 +95,13 @@ public:
  * vector3 (the 3D length)
  * vector4 (the 4D length)
  * @param[in] arg The argument for the condition
+ * @return A property condition function object
  */
 PropertyCondition LessThanCondition(float arg);
 
 /**
- * GreaterThanCondition compares
- * whether property is greater than arg:
+ * @brief GreaterThanCondition compares whether property is greater than arg.
+ *
  * property type:
  * bool (false = 0.0f, true = 1.0f)
  * float (float)
@@ -108,12 +109,13 @@ PropertyCondition LessThanCondition(float arg);
  * vector3 (the 3D length)
  * vector4 (the 4D length)
  * @param[in] arg The argument for the condition
+ * @return A property condition function object
  */
 PropertyCondition GreaterThanCondition(float arg);
 
 /**
- * InsideCondition compares
- * whether property is greater than arg0 and less than arg1:
+ * @brief InsideCondition compares whether property is greater than arg0 and less than arg1.
+ *
  * property type:
  * bool (false = 0.0f, true = 1.0f)
  * float (float)
@@ -122,12 +124,13 @@ PropertyCondition GreaterThanCondition(float arg);
  * vector4 (the 4D length)
  * @param[in] arg0 The first argument for the condition
  * @param[in] arg1 The second argument for the condition
+ * @return A property condition function object
  */
 PropertyCondition InsideCondition(float arg0, float arg1);
 
 /**
- * OutsideCondition compares
- * whether property is less than arg0 or greater than arg1:
+ * @brief OutsideCondition compares whether property is less than arg0 or greater than arg1.
+ *
  * property type:
  * bool (false = 0.0f, true = 1.0f)
  * float (float)
@@ -136,6 +139,7 @@ PropertyCondition InsideCondition(float arg0, float arg1);
  * vector4 (the 4D length)
  * @param[in] arg0 The first argument for the condition
  * @param[in] arg1 The second argument for the condition
+ * @return A property condition function object
  */
 PropertyCondition OutsideCondition(float arg0, float arg1);
 

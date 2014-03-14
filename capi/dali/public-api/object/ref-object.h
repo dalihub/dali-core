@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -32,7 +32,8 @@ namespace Dali DALI_IMPORT_API
 class Value;
 
 /**
- * Base class for reference counted objects.
+ * @brief Base class for reference counted objects.
+ *
  * Typically this should be used with a Boost instrusive pointer,
  * instead of calling Reference() and Unreference() methods directly.
  */
@@ -41,18 +42,20 @@ class RefObject
 public:
 
   /**
-   * Increment the object's reference count.
+   * @brief Increment the object's reference count.
    */
   void Reference();
 
   /**
-   * Decrement the object's reference count.
+   * @brief Decrement the object's reference count.
+   *
    * When the reference count drops to zero, the object will self-destruct.
    */
   void Unreference();
 
   /**
-   * Retrieve the object's reference count.
+   * @brief Retrieve the object's reference count.
+   *
    * @return The reference count
    */
   int ReferenceCount();
@@ -60,31 +63,37 @@ public:
 protected:
 
   /**
-   * Default constructor
+   * @brief Default constructor.
    */
   RefObject();
 
   /**
-   * RefObject is intended as a base class.
+   * @brief RefObject is intended as a base class.
+   *
    * A RefObject may only be deleted when its reference count is zero.
    */
   virtual ~RefObject();
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
+   *
    * The newly copied object will have a reference count of zero.
+   * @param[in] rhs The object to copy
    */
   RefObject(const RefObject& rhs);
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   *
    * The newly copied object will have a reference count of zero.
+   * @param[in] rhs The object to copy
+   * @return a reference to this
    */
   RefObject& operator=(const RefObject& rhs);
 
 private:
 
-  volatile int mCount;
+  volatile int mCount; ///< Reference count
 };
 
 } // namespace Dali

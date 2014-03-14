@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -37,14 +37,17 @@ class PropertyNotification;
 }
 
 /**
- * PropertyNotification is used to issue a notification upon
- * a condition of the property being met. For example checking
- * if Actor::POSITION_X > 100.0
+ * @brief This is used to issue a notification upon a condition of the property being met.
+ *
+ * For example checking if Actor::POSITION_X > 100.0.
+ * @see Dali::PropertyCondition
  */
 class DALI_IMPORT_API PropertyNotification : public BaseHandle
 {
 public:
-
+  /**
+   * @brief Enumeration to describe how to check condition
+   */
   enum NotifyMode
   {
     Disabled,                             ///< Don't notify, regardless of result of Condition
@@ -56,21 +59,26 @@ public:
 public:
 
   /**
-   * Create an uninitialized PropertyNotification; this can be initialized with PropertyNotification::New()
+   * @brief Create an uninitialized PropertyNotification; this can be initialized with PropertyNotification::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   PropertyNotification();
 
   /**
-   * Downcast an Object handle to PropertyNotification. If handle points to an PropertyNotification object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to PropertyNotification.
+   *
+   * If handle points to an PropertyNotification object the downcast
+   * produces valid handle. If not the returned handle is left
+   * uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to a PropertyNotification object or an uninitialized handle
    */
   static PropertyNotification DownCast( BaseHandle handle );
 
   /**
-   * Destructor
+   * @brief Destructor.
    */
   virtual ~PropertyNotification();
 
@@ -80,28 +88,26 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Get the condition of this notification
+   * @brief Get the condition of this notification
    *
    * @return The condition is returned
    */
   PropertyCondition GetCondition();
 
   /**
-   * Get the condition of this notification
+   * @brief Get the condition of this notification
    *
    * @return The condition is returned
    */
   const PropertyCondition& GetCondition() const;
 
   /**
-   * Get the target handle that this notification
-   * is observing.
-   *
+   * @brief Get the target handle that this notification is observing.
    */
   Dali::Handle GetTarget() const;
 
   /**
-   * Get the target handle's property index that this notification
+   * @brief Get the target handle's property index that this notification
    * is observing.
    *
    * @return The target property.
@@ -109,7 +115,7 @@ public:
   Property::Index GetTargetProperty() const;
 
   /**
-   * Sets the Notification mode. This determines how the property
+   * @brief Sets the Notification mode. This determines how the property
    * notification should respond to the result of a condition.
    *
    * @param[in] mode Notification mode
@@ -117,14 +123,14 @@ public:
   void SetNotifyMode( NotifyMode mode );
 
   /**
-   * Retrieves the current Notification mode.
+   * @brief Retrieves the current Notification mode.
    *
    * @return Notification mode.
    */
   NotifyMode GetNotifyMode();
 
   /**
-   * Gets the result of the last condition check that caused a signal emit,
+   * @brief Gets the result of the last condition check that caused a signal emit,
    * useful when using NotifyOnChanged mode and need to know what it changed to.
    *
    * @return whether condition result that triggered last emit was true or false
@@ -132,7 +138,8 @@ public:
   bool GetNotifyResult() const;
 
   /**
-   * Connect to this signal to be notified when the notification has occurred.
+   * @brief Connect to this signal to be notified when the notification has occurred.
+   *
    * @return A signal object to Connect() with.
    */
   PropertyNotifySignalV2& NotifySignal();
@@ -140,7 +147,8 @@ public:
 public: // Not intended for use by Application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] propertyNotification A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL PropertyNotification(Internal::PropertyNotification* propertyNotification);

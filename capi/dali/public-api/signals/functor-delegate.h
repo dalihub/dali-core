@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SIGNALS_MODULE
  * @{
  */
 
@@ -29,13 +29,14 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Dispatcher to call a functor
+ * @brief Dispatcher to call a functor
  */
 template< class T >
 struct FunctorDispatcher
 {
   /**
-   * Call a function object.
+   * @brief Call a function object.
+   *
    * @param[in] objectPtr The object to call.
    */
   static void Dispatch( void* objectPtr )
@@ -47,13 +48,13 @@ struct FunctorDispatcher
 };
 
 /**
- * Dispatcher to delete an object
+ * @brief Dispatcher to delete an object
  */
 template< class T >
 struct FunctorDestroyer
 {
   /**
-   * Dispatcher to delete an object
+   * @brief Dispatcher to delete an object
    */
   static void Delete( void* object )
   {
@@ -64,15 +65,17 @@ struct FunctorDestroyer
 };
 
 /**
- * Used to connect a void() functor to a signal via BaseObject::SignalConnect()
+ * @brief Used to connect a void() functor to a signal via BaseObject::SignalConnect()
  */
 class FunctorDelegate
 {
 public:
 
   /**
-   * Constructor which copies a function object.
+   * @brief Constructor which copies a function object.
+   *
    * @param[in] object The object to copy.
+   * @return A pointer to the new function object
    */
   template< class T >
   static FunctorDelegate* New( const T& object )
@@ -83,29 +86,40 @@ public:
   }
 
   /**
-   * Non-virtual destructor; not intended as a base class.
+   * @brief Non-virtual destructor; not intended as a base class.
    */
   ~FunctorDelegate();
 
   /**
-   * Function to call the function or member function dispatcher
+   * @brief Function to call the function or member function dispatcher
    */
   void Execute();
 
 private:
 
-  /// Used to call the correct member function
+  /**
+   * @brief Used to call the correct member function.
+   */
   typedef void (*Dispatcher)( void* objectPtr );
 
-  /// Used to destroy mObjectPointer (NULL if not mObjectPointer is not owned)
+  /**
+   * @brief Used to destroy mObjectPointer (NULL if not mObjectPointer is not owned).
+   */
   typedef void(*Destructor)( void* objectPtr );
 
-  // Not defined
+  /**
+   * @brief Not defined
+   */
   FunctorDelegate( const FunctorDelegate& rhs );
+
+  /**
+   * @brief Not defined
+   */
   const FunctorDelegate& operator=( const FunctorDelegate& rhs );
 
   /**
-   * Private constructor.
+   * @brief Private constructor.
+   *
    * @param[in] objectPtr A newly allocated object (takes ownership)
    * @param dispatcher Used to call the actual object.
    * @param destructor Used to delete the owned object.

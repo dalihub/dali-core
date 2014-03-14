@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SIGNALS_MODULE
  * @{
  */
 
@@ -30,7 +30,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * SlotDelegates can be used to connect member functions to signals, without inheriting from SlotDelegateInterface.
+ * @brief SlotDelegates can be used to connect member functions to signals, without inheriting from SlotDelegateInterface.
+ *
  * Note that the object providing the member function is expected to own the SlotDelegate; therefore when the object
  * is destroyed, the SlotDelegate destructor will automatically disconnect.
  *
@@ -70,17 +71,14 @@ namespace Dali DALI_IMPORT_API
  *
  * @endcode
  */
-
-/**
- * A template for SlotDelegates with no parameters or return value.
- */
 template <typename Slot>
 class SlotDelegate
 {
 public:
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param[in] slot The object with a callback.
    */
   SlotDelegate( Slot* slot )
@@ -89,14 +87,16 @@ public:
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
+   *
    */
   ~SlotDelegate()
   {
   }
 
   /**
-   * Disconnect all signals from this object
+   * @brief Disconnect all signals from this object.
+   *
    */
   void DisconnectAll()
   {
@@ -112,7 +112,8 @@ public:
   }
 
   /**
-   * Retrieve the slot object.
+   * @brief Retrieve the slot object.
+   *
    * @return The object with a callback.
    */
   Slot* GetSlot()
@@ -121,7 +122,8 @@ public:
   }
 
   /**
-   * Retrieve the connection tracker component.
+   * @brief Retrieve the connection tracker component.
+   *
    * @return The connection tracker component.
    */
   ConnectionTracker* GetConnectionTracker()
@@ -136,10 +138,10 @@ private:
 
 private:
 
-  Slot* mSlot;
+  Slot* mSlot; ///< The slot object
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  ConnectionTracker mConnectionTracker;
+  ConnectionTracker mConnectionTracker; ///< A connection tracker
 };
 
 } // namespace Dali

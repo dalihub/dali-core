@@ -19,7 +19,7 @@
 
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -45,7 +45,7 @@ class TextActor;
 }
 
 /**
- * TextActor is a basic actor for displaying a text label
+ * @brief TextActor is a basic actor for displaying a text label
  *
  * By default the text actor always uses the natural size of the text when SetText is called,
  * unless SetSize is called to override the size or size is animated to some other size.
@@ -58,10 +58,10 @@ class DALI_IMPORT_API TextActor : public RenderableActor
 {
 public:
 
-  typedef SignalV2< void (TextActor) > TextSignalV2;
+  typedef SignalV2< void (TextActor) > TextSignalV2;     ///< Text available signal type
 
   //Signal Names
-  static const char* const SIGNAL_TEXT_LOADING_FINISHED;
+  static const char* const SIGNAL_TEXT_LOADING_FINISHED; ///< name "text-loading-finished"
 
   // Default Properties; additional to RenderableActor properties
   static const Property::Index TEXT;                              ///< name "text"                     type STRING
@@ -88,19 +88,23 @@ public:
   static const Property::Index TEXT_COLOR;                        ///< name "text-color"               type VECTOR4
 
   /**
-   * Create an uninitialized TextActor handle. This can be initialised with TextActor::New().
+   * @brief Create an uninitialized TextActor handle.
+   *
+   * This can be initialised with TextActor::New().
    * Calling member functions with an uninitialized handle is not allowed.
    */
   TextActor();
 
   /**
-   * Create a TextActor object with no text
+   * @brief Create a TextActor object with no text.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static TextActor New();
 
   /**
-   * Create a TextActor object with LeftToRight text and font detection
+   * @brief Create a TextActor object with LeftToRight text and font detection
+   *
    * @param [in] text          The text which will be displayed
    * @return A handle to a newly allocated Dali resource.
    */
@@ -112,7 +116,8 @@ public:
   static TextActor New(const Text& text);
 
   /**
-   * Create a TextActor object with LeftToRight text
+   * @brief Create a TextActor object with LeftToRight text.
+   *
    * @param [in] text          The text which will be displayed
    * @param [in] fontDetection Try to detect font in case text is not supported with current one.
    * @return A handle to a newly allocated Dali resource.
@@ -125,7 +130,8 @@ public:
   static TextActor New(const Text& text, bool fontDetection);
 
   /**
-   * Create a TextActor object
+   * @brief Create a TextActor object.
+   *
    * @param [in] text          The text which will be displayed
    * @param [in] fontDetection Try to detect font in case text is not supported with current one.
    * @param [in] isLeftToRight Text is displayed from left to right if true, otherwise from right to left.
@@ -139,7 +145,8 @@ public:
   static TextActor New(const Text& text, bool fontDetection, bool isLeftToRight);
 
   /**
-   * Create a TextActor object with LeftToRight text and font detection
+   * @brief Create a TextActor object with LeftToRight text and font detection.
+   *
    * @param [in] text          The text which will be displayed
    * @param [in] font          The font which will be used for the text
    * @return A handle to a newly allocated Dali resource.
@@ -152,7 +159,8 @@ public:
   static TextActor New(const Text& text, Font font);
 
   /**
-   * Create a TextActor object with LeftToRight text
+   * @brief Create a TextActor object with LeftToRight text.
+   *
    * @param [in] text          The text which will be displayed
    * @param [in] font          The font which will be used for the text
    * @param [in] fontDetection Try to detect font in case text is not supported with current one.
@@ -166,7 +174,8 @@ public:
   static TextActor New(const Text& text, Font font, bool fontDetection);
 
   /**
-   * Create a TextActor object
+   * @brief Create a TextActor object.
+   *
    * @param [in] text          The text which will be displayed
    * @param [in] font          The font which will be used for the text
    * @param [in] fontDetection Try to detect font in case text is not supported with current one.
@@ -181,7 +190,8 @@ public:
   static TextActor New(const Text& text, Font font, bool fontDetection, bool isLeftToRight);
 
   /**
-   * Create a TextActor object
+   * @brief Create a TextActor object.
+   *
    * @param [in] text          The text which will be displayed
    * @param [in] style         The style which will be used for the text
    * @param [in] fontDetection Try to detect font in case text is not supported with current one.
@@ -191,15 +201,18 @@ public:
   static TextActor New(const Text& text, const TextStyle& style, bool fontDetection, bool isLeftToRight);
 
   /**
-   * Downcast an Object handle to TextActor. If handle points to a TextActor the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to TextActor.
+   *
+   * If handle points to a TextActor the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a TextActor or an uninitialized handle
    */
   static TextActor DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~TextActor();
@@ -210,14 +223,16 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Get the text label displayed by the actor
+   * @brief Get the text label displayed by the actor.
+   *
    * @pre The text actor has been initialized.
    * @return The text label
    */
   std::string GetText() const;
 
   /**
-   * Set the text label displayed by the actor
+   * @brief Set the text label displayed by the actor.
+   *
    * @pre The text actor has been initialized.
    * @param [in] text The new text label
    */
@@ -229,21 +244,24 @@ public:
   void SetText(const Text& text);
 
   /**
-   * Set text to the natural size of the text string
+   * @brief Set text to the natural size of the text string.
+   *
    * After this method the text actor always uses the natural size of the text
    * when SetText is called unless SetSize is called to override the size.
    */
   void SetToNaturalSize();
 
   /**
-   * Get the font used to display the text label displayed by the actor
+   * @brief Get the font used to display the text label displayed by the actor.
+   *
    * @pre The text actor has been initialized.
    * @return The font currently in use
    */
   Font GetFont() const;
 
   /**
-   * Set the font used to display the text label displayed by the actor
+   * @brief Set the font used to display the text label displayed by the actor.
+   *
    * @pre The text actor has been initialized.
    * @param [in] font The new font
    */
@@ -252,21 +270,24 @@ public:
   // styling and effects
 
   /**
-   * Set the gradient color
+   * @brief Set the gradient color.
+   *
    * This is the color associated with the gradient end point.
    * @param[in] color The gradient color (end-point color)
    */
   void SetGradientColor( const Vector4& color );
 
   /**
-   * Get the gradient color
+   * @brief Get the gradient color.
+   *
    * This is the color associated with the gradient end point.
    * @return The gradient color (end-point color)
    */
   Vector4 GetGradientColor() const;
 
   /**
-   * Set the gradient start point.
+   * @brief Set the gradient start point.
+   *
    * This is a 2D position between the coordinate range:
    * 0.0,0.0 (Left,Top) to 1.0,1.0 (Right,Bottom) within
    * the outputted Text. Actor::COLOR will represent this point
@@ -276,13 +297,15 @@ public:
   void SetGradientStartPoint( const Vector2& position );
 
   /**
-   * Get the gradient start point.
+   * @brief Get the gradient start point.
+   *
    * @return The relative position of the gradient start point.
    */
   Vector2 GetGradientStartPoint() const;
 
   /**
-   * Set the gradient end point.
+   * @brief Set the gradient end point.
+   *
    * This is a 2D position between the coordinate range:
    * 0.0,0.0 (Left,Top) to 1.0,1.0 (Right,Bottom) within
    * the outputted Text. TextActor::GRADIENT_COLOR will represent
@@ -292,44 +315,52 @@ public:
   void SetGradientEndPoint( const Vector2& position );
 
   /**
-   * Get the gradient end point.
+   * @brief Get the gradient end point.
+   *
    * @return The relative position of the gradient end point.
    */
   Vector2 GetGradientEndPoint() const;
 
   /**
-   * Sets text style.
+   * @brief Sets text style.
+   *
    * @param[in] style The text style.
    */
   void SetTextStyle( const TextStyle& style );
 
   /**
-   * Retrieves a copy of the text style.
+   * @brief Retrieves a copy of the text style.
+   *
    * @return The text style.
    */
   TextStyle GetTextStyle() const;
 
   /**
-   * Set the text color. This is blended with the Actor color
+   * @brief Set the text color.
+   *
+   * This is blended with the Actor color
    * @param[in] color The text color (Default: WHITE)
    */
   void SetTextColor( const Vector4& color );
 
   /**
-   * Get the text color.
+   * @brief Get the text color.
+   *
    * @return The text color.
    */
   Vector4 GetTextColor() const;
 
   /**
-   * Set soft edge smoothing
+   * @brief Set soft edge smoothing.
+   *
    * @param[in] smoothEdge Specify the distance field value for the center of the text edge.
    *                   0 <= smoothEdge <= 1
    */
   void SetSmoothEdge(const float smoothEdge = TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD);
 
   /**
-   * Set text outlining
+   * @brief Set text outlining.
+   *
    * @param[in] enable  Set to true to enable text outlining.
    * @param[in] color   Outline color.
    * @param[in] thickness Thickness of outline. The outline thickness is determined by two parameters.
@@ -342,7 +373,8 @@ public:
   void SetOutline(const bool enable, const Vector4& color, const Vector2& thickness = TextStyle::DEFAULT_OUTLINE_THICKNESS);
 
   /**
-   * Set text glow
+   * @brief Set text glow.
+   *
    * @param[in] enable  Set to true to enable text outer glow.
    * @param[in] color   Glow color.
    * @param[in] intensity Determines the amount of glow around text.
@@ -352,7 +384,8 @@ public:
   void SetGlow(const bool enable, const Vector4& color, const float intensity = TextStyle::DEFAULT_GLOW_INTENSITY);
 
   /**
-   * Set text shadow
+   * @brief Set text shadow.
+   *
    * @param[in] enable  Set to true to enable text drop shadow.
    * @param[in] color   Shadow color
    * @param[in] offset  Offset in pixels. To avoid cropping of the drop shadow limit the offset to PointSize / 3.5
@@ -362,76 +395,89 @@ public:
                  const float size = TextStyle::DEFAULT_SHADOW_SIZE );
 
   /**
-   * Enable italics on the text actor, the text will be sheared by the given angle.
+   * @brief Enable italics on the text actor, the text will be sheared by the given angle.
+   *
    * @param[in] enabled True will enable italics, false disable it.
    * @param[in] angle Italics angle in degrees.
    */
   void SetItalics( const bool enabled, const Degree& angle = TextStyle::DEFAULT_ITALICS_ANGLE );
 
   /**
-   * Enable italics on the text actor, the text will be sheared by the given angle.
+   * @brief Enable italics on the text actor, the text will be sheared by the given angle.
+   *
    * @param[in] enabled True will enable italics, false disable it.
    * @param[in] angle Italics angle in radians.
    */
   void SetItalics( const bool enabled, const Radian& angle );
 
   /**
-   * Get text italics for the actor.
+   * @brief Get text italics for the actor.
+   *
    * @returns True if italics is enabled.
    */
   bool GetItalics() const;
 
   /**
-   * Get text italics angle.
+   * @brief Get text italics angle.
+   *
    * @returns Angle as a Radian.
    */
   const Radian& GetItalicsAngle() const;
 
   /**
-   * Set text underline.
+   * @brief Set text underline.
+   *
    * @param[in] enable Boolean indicating if the text should be underlined or not.
    */
   void SetUnderline( bool enable );
 
   /**
-   * Get text underline.
+   * @brief Get text underline.
+   *
    * @return  Boolean indicating if the text should be underlined or not.
    */
   bool GetUnderline() const;
 
   /**
-   * Set text weight.
+   * @brief Set text weight.
+   *
    * @param weight Text weight.
    */
   void SetWeight( TextStyle::Weight weight );
 
   /**
-   * Get text weight.
+   * @brief Get text weight.
+   *
    * @return Text weight.
    */
   TextStyle::Weight GetWeight() const;
 
   /**
-   * Try to detect font in case text is not supported with current one.
+   * @brief Try to detect font in case text is not supported with current one.
+   *
    * @param [in] value true or false
    */
   void SetFontDetectionAutomatic(bool value);
 
   /**
-   * Query whether TextActor is using automatic font detection.
+   * @brief Query whether TextActor is using automatic font detection.
+   *
    * @return true or false
    */
   bool IsFontDetectionAutomatic() const;
 
   /**
-   * Query whether the font has been loaded and built. Should be used by the application to determine whether the
-   * font is ready to be queried for metrics
+   * @brief Query whether the font has been loaded and built.
+   *
+   * Should be used by the application to determine whether the font
+   * is ready to be queried for metrics
    * @return The loading state, either Loading, Success or Failed.
    */
   LoadingState GetLoadingState() const;
 
   /**
-   * Emitted when text loads successfully and is available for displaying, or when the loading fails.
+   * @brief Emitted when text loads successfully and is available for displaying, or when the loading fails.
+   *
    * @return A signal object to Connect() with.
    */
   TextSignalV2& TextAvailableSignal();
@@ -439,7 +485,8 @@ public:
 public: // Not intended for use by Application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods
+   * e
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL TextActor(Internal::TextActor* actor);

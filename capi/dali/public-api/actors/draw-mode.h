@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -30,7 +30,11 @@ namespace Dali DALI_IMPORT_API
 namespace DrawMode
 {
 
-// Used with Actor::SetDrawMode()
+/**
+ * @brief How the actor and it's children will be drawn.
+ *
+ * @see Dali::Actor::SetDrawMode()
+ */
 enum Type
 {
   NORMAL  = 0, ///< binary 00. The default draw-mode

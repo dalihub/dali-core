@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -60,14 +60,18 @@ struct Vector2;
 struct Vector3;
 struct Vector4;
 
+/**
+ * @brief Actor container.
+ */
 typedef std::vector<Actor> ActorContainer;
-typedef ActorContainer::iterator ActorIter;
-typedef ActorContainer::const_iterator ActorConstIter;
+typedef ActorContainer::iterator ActorIter; ///< Iterator for Dali::ActorContainer
+typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for Dali::ActorContainer
 
 
 
 /**
- * Actor is the primary object which Dali applications interact with.
+ * @brief Actor is the primary object with which Dali applications interact.
+ *
  * UI controls can be built by combining multiple actors.
  *
  * <h3>Multi-Touch Events:</h3>
@@ -207,11 +211,11 @@ public:
 
   // Typedefs
 
-  typedef SignalV2< bool (Actor, const TouchEvent&)> TouchSignalV2;
-  typedef SignalV2< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalV2;
-  typedef SignalV2< void (Actor, const Vector3&) > SetSizeSignalV2;
-  typedef SignalV2< void (Actor) > OnStageSignalV2;
-  typedef SignalV2< void (Actor) > OffStageSignalV2;
+  typedef SignalV2< bool (Actor, const TouchEvent&)> TouchSignalV2;                ///< Touch signal type
+  typedef SignalV2< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalV2;///< Mousewheel signal type
+  typedef SignalV2< void (Actor, const Vector3&) > SetSizeSignalV2; ///< SetSize signal type
+  typedef SignalV2< void (Actor) > OnStageSignalV2;  ///< Stage connection signal type
+  typedef SignalV2< void (Actor) > OffStageSignalV2; ///< Stage disconnection signal type
 
   // Default Properties
   static const Property::Index PARENT_ORIGIN;       ///< name "parent-origin",      type VECTOR3
@@ -252,42 +256,48 @@ public:
   static const Property::Index NAME;                ///< name "name",               type STRING
 
   // Signal Names
-  static const char* const SIGNAL_TOUCHED;
-  static const char* const SIGNAL_MOUSE_WHEEL_EVENT;
-  static const char* const SIGNAL_SET_SIZE;
-  static const char* const SIGNAL_ON_STAGE;
-  static const char* const SIGNAL_OFF_STAGE;
+  static const char* const SIGNAL_TOUCHED;          ///< Touched signal name
+  static const char* const SIGNAL_MOUSE_WHEEL_EVENT;///< Mouse wheel signal name
+  static const char* const SIGNAL_SET_SIZE;         ///< SetSize signal name
+  static const char* const SIGNAL_ON_STAGE;         ///< Stage connection signal name
+  static const char* const SIGNAL_OFF_STAGE;        ///< Stage disconnection signal name
 
 
   //Action Names
-  static const char* const ACTION_SHOW;
-  static const char* const ACTION_HIDE;
+  static const char* const ACTION_SHOW;             ///< Show action name
+  static const char* const ACTION_HIDE;             ///< Hide action name
 
 
   // Creation
 
   /**
-   * Create an uninitialized Actor; this can be initialized with Actor::New()
+   * @brief Create an uninitialized Actor; this can be initialized with Actor::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   Actor();
 
   /**
-   * Create an initialized Actor.
+   * @brief Create an initialized Actor.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static Actor New();
 
   /**
-   * Downcast an Object handle to Actor handle. If handle points to a Actor object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Actor handle.
+   *
+   * If handle points to a Actor object the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to a Actor object or an uninitialized handle
    */
   static Actor DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Actor();
@@ -298,21 +308,24 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Retrieve the Actor's name.
+   * @brief Retrieve the Actor's name.
+   *
    * @pre The Actor has been initialized.
    * @return The Actor's name.
    */
   const std::string& GetName() const;
 
   /**
-   * Sets the Actor's name.
+   * @brief Sets the Actor's name.
+   *
    * @pre The Actor has been initialized.
    * @param [in] name The new name.
    */
   void SetName(const std::string& name);
 
   /**
-   * Retrieve the unique ID of the actor.
+   * @brief Retrieve the unique ID of the actor.
+   *
    * @pre The Actor has been initialized.
    * @return The ID.
    */
@@ -321,14 +334,16 @@ public:
   // Containment
 
   /**
-   * Query whether an actor is the root actor, which is owned by the Stage.
+   * @brief Query whether an actor is the root actor, which is owned by the Stage.
+   *
    * @pre The Actor has been initialized.
    * @return True if the actor is the root actor.
    */
   bool IsRoot() const;
 
   /**
-   * Query whether the actor is connected to the Stage.
+   * @brief Query whether the actor is connected to the Stage.
+   *
    * When an actor is connected, it will be directly or indirectly parented to the root Actor.
    * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
    * @pre The Actor has been initialized.
@@ -337,21 +352,24 @@ public:
   bool OnStage() const;
 
   /**
-   * Query whether the actor is of class Dali::Layer
+   * @brief Query whether the actor is of class Dali::Layer.
+   *
    * @pre The Actor has been initialized.
    * @return True if the actor is a layer.
    */
   bool IsLayer() const;
 
   /**
-   * Gets the layer in which the actor is present.
+   * @brief Gets the layer in which the actor is present.
+   *
    * @pre The Actor has been initialized.
    * @return The layer, which will be uninitialized if the actor is off-stage.
    */
   Layer GetLayer();
 
   /**
-   * Adds a child Actor to this Actor.
+   * @brief Adds a child Actor to this Actor.
+   *
    * NOTE! if the child already has a parent, it will be removed from old parent
    * and reparented to this actor. This may change childs position, color, shader effect,
    * scale etc as it now inherits them from this actor
@@ -367,7 +385,8 @@ public:
   void Add(Actor child);
 
   /**
-   * Removes a child Actor from this Actor.
+   * @brief Removes a child Actor from this Actor.
+   *
    * If the actor was not a child of this actor, this is a no-op.
    * @pre This Actor (the parent) has been initialized.
    * @pre The child actor is not the same as the parent actor.
@@ -377,21 +396,25 @@ public:
   void Remove(Actor child);
 
   /**
-   * Removes an actor from its parent. If the actor has no parent, this method does nothing.
+   * @brief Removes an actor from its parent.
+   *
+   * If the actor has no parent, this method does nothing.
    * @pre The (child) actor has been initialized.
    * @post This may invalidate ActorContainer iterators.
    */
   void Unparent();
 
   /**
-   * Retrieve the number of children held by the actor.
+   * @brief Retrieve the number of children held by the actor.
+   *
    * @pre The Actor has been initialized.
    * @return The number of children
    */
   unsigned int GetChildCount() const;
 
   /**
-   * Retrieve and child actor by index
+   * @brief Retrieve and child actor by index.
+   *
    * @pre The Actor has been initialized.
    * @param[in] index The index of the child to retrieve
    * @return The actor for the given index or empty handle if children not initialised
@@ -399,7 +422,8 @@ public:
   Actor GetChildAt(unsigned int index) const;
 
   /**
-   * Search through this actor's hierarchy for an actor with the given name.
+   * @brief Search through this actor's hierarchy for an actor with the given name.
+   *
    * The actor itself is also considered in the search
    * @pre The Actor has been initialized.
    * @param[in] actorName the name of the actor to find
@@ -408,7 +432,8 @@ public:
   Actor FindChildByName(const std::string& actorName);
 
   /**
-   * Search through this actor's hierarchy for an actor with the given name or alias.
+   * @brief Search through this actor's hierarchy for an actor with the given name or alias.
+   *
    * Actors can customize this function to provide actors with preferred alias'
    * For example 'previous' could return the last selected child.
    * If no aliased actor is found then FindChildByName() is called.
@@ -419,7 +444,8 @@ public:
   Actor FindChildByAlias(const std::string& actorAlias);
 
   /**
-   * Search through this actor's hierarchy for an actor with the given unique ID.
+   * @brief Search through this actor's hierarchy for an actor with the given unique ID.
+   *
    * The actor itself is also considered in the search
    * @pre The Actor has been initialized.
    * @param[in] id the ID of the actor to find
@@ -428,7 +454,8 @@ public:
   Actor FindChildById(const unsigned int id);
 
   /**
-   * Retrieve the actor's parent.
+   * @brief Retrieve the actor's parent.
+   *
    * @pre The actor has been initialized.
    * @return A handle to the actor's parent. If the actor has no parent, this handle will be invalid.
    */
@@ -437,7 +464,8 @@ public:
   // Positioning
 
   /**
-   * Set the origin of an actor, within its parent's area.
+   * @brief Set the origin of an actor, within its parent's area.
+   *
    * This is expressed in unit coordinates, such that (0.0, 0.0, 0.5) is the top-left corner of the parent,
    * and (1.0, 1.0, 0.5) is the bottom-right corner.
    * The default parent-origin is Dali::ParentOrigin::TOP_LEFT (0.0, 0.0, 0.5).
@@ -450,7 +478,8 @@ public:
   void SetParentOrigin(const Vector3& origin);
 
   /**
-   * Retrieve the parent-origin of an actor.
+   * @brief Retrieve the parent-origin of an actor.
+   *
    * @pre The Actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetParentOrigin().
    * @return The current parent-origin.
@@ -458,9 +487,12 @@ public:
   Vector3 GetCurrentParentOrigin() const;
 
   /**
-   * Set the anchor-point of an actor. This is expressed in unit coordinates, such that
-   * (0.0, 0.0, 0.5) is the top-left corner of the actor, and (1.0, 1.0, 0.5) is the bottom-right corner.
-   * The default anchor point is Dali::AnchorPoint::CENTER (0.5, 0.5, 0.5).
+   * @brief Set the anchor-point of an actor.
+   *
+   * This is expressed in unit coordinates, such that (0.0, 0.0, 0.5)
+   * is the top-left corner of the actor, and (1.0, 1.0, 0.5) is the
+   * bottom-right corner.  The default anchor point is
+   * Dali::AnchorPoint::CENTER (0.5, 0.5, 0.5).
    * An actor position is the distance between its parent-origin, and this anchor-point.
    * An actor's rotation is centered around its anchor-point.
    * @see Dali::AnchorPoint for predefined anchor point values
@@ -471,7 +503,8 @@ public:
   void SetAnchorPoint(const Vector3& anchorPoint);
 
   /**
-   * Retrieve the anchor-point of an actor.
+   * @brief Retrieve the anchor-point of an actor.
+   *
    * @pre The Actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetAnchorPoint().
    * @return The current anchor-point.
@@ -479,7 +512,8 @@ public:
   Vector3 GetCurrentAnchorPoint() const;
 
   /**
-   * Sets the size of an actor.
+   * @brief Sets the size of an actor.
+   *
    * Geometry can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * The actors default depth is the minimum of width & height.
@@ -491,7 +525,8 @@ public:
   void SetSize(float width, float height);
 
   /**
-   * Sets the size of an actor.
+   * @brief Sets the size of an actor.
+   *
    * Geometry can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * @pre The actor has been initialized.
@@ -503,7 +538,8 @@ public:
   void SetSize(float width, float height, float depth);
 
   /**
-   * Sets the size of an actor.
+   * @brief Sets the size of an actor.
+   *
    * Geometry can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * The actors default depth is the minimum of width & height.
@@ -514,7 +550,8 @@ public:
   void SetSize(const Vector2& size);
 
   /**
-   * Sets the size of an actor.
+   * @brief Sets the size of an actor.
+   *
    * Geometry can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * @pre The actor has been initialized.
@@ -524,7 +561,8 @@ public:
   void SetSize(const Vector3& size);
 
   /**
-   * Retrieve the actor's size.
+   * @brief Retrieve the actor's size.
+   *
    * @pre The actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetSize().
    * @return The actor's current size.
@@ -532,7 +570,8 @@ public:
   Vector3 GetCurrentSize() const;
 
   /**
-   * Sets the position of the actor.
+   * @brief Sets the position of the actor.
+   *
    * The Actor's z position will be set to 0.0f.
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
@@ -542,7 +581,8 @@ public:
   void SetPosition(float x, float y);
 
   /**
-   * Sets the position of the Actor.
+   * @brief Sets the position of the Actor.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    * @param [in] x The new x position
@@ -552,7 +592,8 @@ public:
   void SetPosition(float x, float y, float z);
 
   /**
-   * Sets the position of the Actor.
+   * @brief Sets the position of the Actor.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    * @param [in] position The new position
@@ -560,7 +601,8 @@ public:
   void SetPosition(const Vector3& position);
 
   /**
-   * Set the position of an actor along the X-axis.
+   * @brief Set the position of an actor along the X-axis.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    * @param [in] x The new x position
@@ -568,7 +610,8 @@ public:
   void SetX(float x);
 
   /**
-   * Set the position of an actor along the Y-axis.
+   * @brief Set the position of an actor along the Y-axis.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    * @param [in] y The new y position.
@@ -576,7 +619,8 @@ public:
   void SetY(float y);
 
   /**
-   * Set the position of an actor along the Z-axis.
+   * @brief Set the position of an actor along the Z-axis.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentPosition().
    * @param [in] z The new z position
@@ -584,14 +628,16 @@ public:
   void SetZ(float z);
 
   /**
-   * Move an actor relative to its existing position.
+   * @brief Move an actor relative to its existing position.
+   *
    * @pre The actor has been initialized.
    * @param[in] distance The actor will move by this distance.
    */
   void MoveBy(const Vector3& distance);
 
   /**
-   * Retrieve the position of the Actor.
+   * @brief Retrieve the position of the Actor.
+   *
    * @pre The Actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetPosition().
    * @return the Actor's current position.
@@ -599,7 +645,8 @@ public:
   Vector3 GetCurrentPosition() const;
 
   /**
-   * Retrieve the world-position of the Actor.
+   * @brief Retrieve the world-position of the Actor.
+   *
    * @note The actor will not have a world-position, unless it has previously been added to the stage.
    * @pre The Actor has been initialized.
    * @return The Actor's current position in world coordinates.
@@ -607,7 +654,9 @@ public:
   Vector3 GetCurrentWorldPosition() const;
 
   /**
-   * Set the actors position inheritance mode. Default is to inherit.
+   * @brief Set the actors position inheritance mode.
+   *
+   * The default is to inherit.
    * Switching this off means that using SetPosition() sets the actor's world position.
    * @see PositionInheritanceMode
    * @pre The Actor has been initialized.
@@ -616,14 +665,16 @@ public:
   void SetPositionInheritanceMode( PositionInheritanceMode mode );
 
   /**
-   * Returns the actors position inheritance mode
+   * @brief Returns the actors position inheritance mode.
+   *
    * @pre The Actor has been initialized.
    * @return true if the actor inherit's it's parent orientation, false if it uses world orientation.
    */
   PositionInheritanceMode GetPositionInheritanceMode() const;
 
   /**
-   * Sets the rotation of the Actor.
+   * @brief Sets the rotation of the Actor.
+   *
    * An actor's rotation is centered around its anchor point.
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
@@ -633,7 +684,8 @@ public:
   void SetRotation(const Degree& angle, const Vector3& axis);
 
   /**
-   * Sets the rotation of the Actor.
+   * @brief Sets the rotation of the Actor.
+   *
    * An actor's rotation is centered around its anchor point.
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
@@ -643,7 +695,8 @@ public:
   void SetRotation(const Radian& angle, const Vector3& axis);
 
   /**
-   * Sets the rotation of the Actor.
+   * @brief Sets the rotation of the Actor.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
    * @param [in] rotation The new rotation.
@@ -651,7 +704,8 @@ public:
   void SetRotation(const Quaternion& rotation);
 
   /**
-   * Apply a relative rotation to an actor.
+   * @brief Apply a relative rotation to an actor.
+   *
    * @pre The actor has been initialized.
    * @param[in] angle The angle to the rotation to combine with the existing rotation.
    * @param[in] axis The axis of the rotation to combine with the existing rotation.
@@ -659,7 +713,8 @@ public:
   void RotateBy(const Degree& angle, const Vector3& axis);
 
   /**
-   * Apply a relative rotation to an actor.
+   * @brief Apply a relative rotation to an actor.
+   *
    * @pre The actor has been initialized.
    * @param[in] angle The angle to the rotation to combine with the existing rotation.
    * @param[in] axis The axis of the rotation to combine with the existing rotation.
@@ -667,14 +722,16 @@ public:
   void RotateBy(const Radian& angle, const Vector3& axis);
 
   /**
-   * Apply a relative rotation to an actor.
+   * @brief Apply a relative rotation to an actor.
+   *
    * @pre The actor has been initialized.
    * @param[in] relativeRotation The rotation to combine with the existing rotation.
    */
   void RotateBy(const Quaternion& relativeRotation);
 
   /**
-   * Retreive the Actor's rotation.
+   * @brief Retreive the Actor's rotation.
+   *
    * @pre The Actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetRotation().
    * @return The current rotation.
@@ -682,7 +739,9 @@ public:
   Quaternion GetCurrentRotation() const;
 
   /**
-   * Set whether a child actor inherits it's parent's orientation. Default is to inherit.
+   * @brief Set whether a child actor inherits it's parent's orientation.
+   *
+   * Default is to inherit.
    * Switching this off means that using SetRotation() sets the actor's world orientation.
    * @pre The Actor has been initialized.
    * @param[in] inherit - true if the actor should inherit orientation, false otherwise.
@@ -690,14 +749,16 @@ public:
   void SetInheritRotation(bool inherit);
 
   /**
-   * Returns whether the actor inherit's it's parent's orientation.
+   * @brief Returns whether the actor inherit's it's parent's orientation.
+   *
    * @pre The Actor has been initialized.
    * @return true if the actor inherit's it's parent orientation, false if it uses world orientation.
    */
   bool IsRotationInherited() const;
 
   /**
-   * Retrieve the world-rotation of the Actor.
+   * @brief Retrieve the world-rotation of the Actor.
+   *
    * @note The actor will not have a world-rotation, unless it has previously been added to the stage.
    * @pre The Actor has been initialized.
    * @return The Actor's current rotation in the world.
@@ -705,7 +766,8 @@ public:
   Quaternion GetCurrentWorldRotation() const;
 
   /**
-   * Set the scale factor applied to an actor.
+   * @brief Set the scale factor applied to an actor.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentScale().
    * @param [in] scale The scale factor applied on all axes.
@@ -713,7 +775,8 @@ public:
   void SetScale(float scale);
 
   /**
-   * Set the scale factor applied to an actor.
+   * @brief Set the scale factor applied to an actor.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentScale().
    * @param [in] scaleX The scale factor applied along the x-axis.
@@ -723,7 +786,8 @@ public:
   void SetScale(float scaleX, float scaleY, float scaleZ);
 
   /**
-   * Set the scale factor applied to an actor.
+   * @brief Set the scale factor applied to an actor.
+   *
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentScale().
    * @param [in] scale A vector representing the scale factor for each axis.
@@ -731,14 +795,16 @@ public:
   void SetScale(const Vector3& scale);
 
   /**
-   * Apply a relative scale to an actor.
+   * @brief Apply a relative scale to an actor.
+   *
    * @pre The actor has been initialized.
    * @param[in] relativeScale The scale to combine with the actors existing scale.
    */
   void ScaleBy(const Vector3& relativeScale);
 
   /**
-   * Retrieve the scale factor applied to an actor.
+   * @brief Retrieve the scale factor applied to an actor.
+   *
    * @pre The Actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetScale().
    * @return A vector representing the scale factor for each axis.
@@ -746,7 +812,8 @@ public:
   Vector3 GetCurrentScale() const;
 
   /**
-   * Retrieve the world-scale of the Actor.
+   * @brief Retrieve the world-scale of the Actor.
+   *
    * @note The actor will not have a world-scale, unless it has previously been added to the stage.
    * @pre The Actor has been initialized.
    * @return The Actor's current scale in the world.
@@ -754,7 +821,9 @@ public:
   Vector3 GetCurrentWorldScale() const;
 
   /**
-   * Set whether a child actor inherits it's parent's scale. Default is to inherit.
+   * @brief Set whether a child actor inherits it's parent's scale.
+   *
+   * Default is to inherit.
    * Switching this off means that using SetScale() sets the actor's world scale.
    * @pre The Actor has been initialized.
    * @param[in] inherit - true if the actor should inherit scale, false otherwise.
@@ -762,14 +831,16 @@ public:
   void SetInheritScale( bool inherit );
 
   /**
-   * Returns whether the actor inherit's it's parent's scale.
+   * @brief Returns whether the actor inherit's it's parent's scale.
+   *
    * @pre The Actor has been initialized.
    * @return true if the actor inherit's it's parent scale, false if it uses world scale.
    */
   bool IsScaleInherited() const;
 
   /**
-   * Retrieves the world-matrix of the actor
+   * @brief Retrieves the world-matrix of the actor.
+   *
    * @note The actor will not have a world-matrix, unless it has previously been added to the stage.
    * @pre The Actor has been initialized.
    * @return The Actor's current world matrix
@@ -779,7 +850,8 @@ public:
   // Visibility & Color
 
   /**
-   * Sets the visibility flag of an actor.
+   * @brief Sets the visibility flag of an actor.
+   *
    * @pre The actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with IsVisible().
    * @note If an actor's visibility flag is set to false, then the actor and its children will not be rendered.
@@ -790,7 +862,8 @@ public:
   void SetVisible(bool visible);
 
   /**
-   * Retrieve the visibility flag of an actor.
+   * @brief Retrieve the visibility flag of an actor.
+   *
    * @pre The actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetVisible().
    * @note If an actor is not visible, then the actor and its children will not be rendered.
@@ -801,7 +874,8 @@ public:
   bool IsVisible() const;
 
   /**
-   * Sets the opacity of an actor.
+   * @brief Sets the opacity of an actor.
+   *
    * @pre The actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOpacity().
    * @param [in] opacity The new opacity.
@@ -809,14 +883,16 @@ public:
   void SetOpacity(float opacity);
 
   /**
-   * Apply a relative opacity change to an actor.
+   * @brief Apply a relative opacity change to an actor.
+   *
    * @pre The actor has been initialized.
    * @param[in] relativeOpacity The opacity to combine with the actors existing opacity.
    */
   void OpacityBy(float relativeOpacity);
 
   /**
-   * Retrieve the actor's opacity.
+   * @brief Retrieve the actor's opacity.
+   *
    * @pre The actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetOpacity().
    * @return The actor's opacity.
@@ -824,7 +900,8 @@ public:
   float GetCurrentOpacity() const;
 
   /**
-   * Sets the actor's color; this is an RGBA value
+   * @brief Sets the actor's color; this is an RGBA value.
+   *
    * The final color of the actor depends on its color mode.
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentColor().
@@ -833,14 +910,17 @@ public:
   void SetColor(const Vector4& color);
 
   /**
-   * Apply a relative color change to an actor.
+   * @brief Apply a relative color change to an actor.
+   *
    * @pre The actor has been initialized.
    * @param[in] relativeColor The color to combine with the actors existing color.
    */
   void ColorBy(const Vector4& relativeColor);
 
   /**
-   * Retrieve the actor's color. Actors own color is not clamped.
+   * @brief Retrieve the actor's color.
+   *
+   * Actor's own color is not clamped.
    * @pre The Actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetColor().
    * @return The color.
@@ -848,22 +928,26 @@ public:
   Vector4 GetCurrentColor() const;
 
   /**
-   * Sets the actor's color mode. This specifies whether the Actor uses its own color,
-   * or inherits its parent color. The default is USE_OWN_MULTIPLY_PARENT_ALPHA.
+   * @brief Sets the actor's color mode.
+   *
+   * This specifies whether the Actor uses its own color, or inherits
+   * its parent color. The default is USE_OWN_MULTIPLY_PARENT_ALPHA.
    * @pre The Actor has been initialized.
    * @param [in] colorMode to use.
    */
   void SetColorMode( ColorMode colorMode );
 
   /**
-   * Returns the actor's color mode.
+   * @brief Returns the actor's color mode.
+   *
    * @pre The Actor has been initialized.
    * @return currently used colorMode.
    */
   ColorMode GetColorMode() const;
 
   /**
-   * Retrieve the world-color of the Actor, where each component is clamped within the 0->1 range.
+   * @brief Retrieve the world-color of the Actor, where each component is clamped within the 0->1 range.
+   *
    * @note The actor will not have a world-color, unless it has previously been added to the stage.
    * @pre The Actor has been initialized.
    * @return The Actor's current color in the world.
@@ -873,7 +957,8 @@ public:
   // Shader Effects
 
   /**
-   * Set whether the actor inherits a shader effect from its parent; it does inherit by default.
+   * @brief Set whether the actor inherits a shader effect from its parent; it does inherit by default.
+   *
    * The inherited effect can still be overriden using SetShaderEffect().
    * @pre The Actor has been initialized.
    * @param [in] inherit True if the parent effect is inherited.
@@ -881,14 +966,16 @@ public:
   void SetInheritShaderEffect(bool inherit);
 
   /**
-   * Query whether the actor inherits a shader effect from its parent.
+   * @brief Query whether the actor inherits a shader effect from its parent.
+   *
    * @pre The Actor has been initialized.
    * @return True if the parent effect is inherited.
    */
   bool GetInheritShaderEffect() const;
 
   /**
-   * Sets the shader effect for the Actor.
+   * @brief Sets the shader effect for the Actor.
+   *
    * Shader effects provide special effects like rippling and bending.
    * Setting a shader effect removes any shader effect previously set by SetShaderEffect.
    * @pre The actor has been initialized.
@@ -898,20 +985,23 @@ public:
   void SetShaderEffect(ShaderEffect effect);
 
   /**
-   * Retrieve the shader effect for the Actor.
+   * @brief Retrieve the shader effect for the Actor.
+   *
    * @pre The Actor has been initialized.
    * @return The shader effect
    */
   ShaderEffect GetShaderEffect() const;
 
   /**
-   * Removes the current shader effect.
+   * @brief Removes the current shader effect.
+   *
    * @pre The Actor has been initialized.
    */
   void RemoveShaderEffect();
 
   /**
-   * Set how the actor and its children should be drawn.
+   * @brief Set how the actor and its children should be drawn.
+   *
    * Not all actors are renderable, but DrawMode can be inherited from any actor.
    * By default a renderable actor will be drawn as a 3D object. It will be depth-tested against
    * other objects in the world i.e. it may be obscured if other objects are in front.
@@ -932,7 +1022,8 @@ public:
   void SetDrawMode( DrawMode::Type drawMode );
 
   /**
-   * Query how the actor and its children will be drawn.
+   * @brief Query how the actor and its children will be drawn.
+   *
    * @return True if the Actor is an overlay.
    */
   DrawMode::Type GetDrawMode() const;
@@ -940,7 +1031,8 @@ public:
   // Input Handling
 
   /**
-   * Sets whether an actor should emit touch event signals; see SignalTouched().
+   * @brief Sets whether an actor should emit touch event signals; @see SignalTouched().
+   *
    * An actor is sensitive by default, which means that as soon as an application connects to the SignalTouched(),
    * the touch event signal will be emitted.
    *
@@ -964,7 +1056,8 @@ public:
   void SetSensitive(bool sensitive);
 
   /**
-   * Query whether an actor emits touch event signals.
+   * @brief Query whether an actor emits touch event signals.
+   *
    * @note If an actor is not sensitive, then it's children will not be hittable either.
    *       This is regardless of the individual sensitivity values of the children i.e. an actor will only be
    *       hittable if all of its parents have sensitivity set to true.
@@ -974,7 +1067,8 @@ public:
   bool IsSensitive() const;
 
   /**
-   * Converts screen coordinates into the actor's coordinate system using the default camera.
+   * @brief Converts screen coordinates into the actor's coordinate system using the default camera.
+   *
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
    * @pre The Actor has been initialized.
    * @param[out] localX On return, the X-coordinate relative to the actor.
@@ -986,7 +1080,7 @@ public:
   bool ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const;
 
   /**
-   * Sets whether the actor should receive a notification when touch motion events leave
+   * @brief Sets whether the actor should receive a notification when touch motion events leave
    * the boundary of the actor.
    *
    * @note By default, this is set to false as most actors do not require this.
@@ -998,15 +1092,18 @@ public:
   void SetLeaveRequired(bool required);
 
   /**
-   * This returns whether the actor requires touch events whenever touch motion events leave
+   * @brief This returns whether the actor requires touch events whenever touch motion events leave
    * the boundary of the actor.
+   *
    * @pre The Actor has been initialized.
    * @return true if a Leave event is required, false otherwise.
    */
   bool GetLeaveRequired() const;
 
   /**
-   * Sets whether the actor should be focusable by keyboard navigation. Default is true.
+   * @brief Sets whether the actor should be focusable by keyboard navigation.
+   *
+   * The default is true.
    * @pre The Actor has been initialized.
    * @param[in] focusable - true if the actor should be focusable by keyboard navigation,
    * false otherwise.
@@ -1014,7 +1111,8 @@ public:
   void SetKeyboardFocusable( bool focusable );
 
   /**
-   * Returns whether the actor is focusable by keyboard navigation.
+   * @brief Returns whether the actor is focusable by keyboard navigation.
+   *
    * @pre The Actor has been initialized.
    * @return true if the actor is focusable by keyboard navigation, false if not.
    */
@@ -1023,7 +1121,8 @@ public:
 public: // Signals
 
   /**
-   * This signal is emitted when touch input is received.
+   * @brief This signal is emitted when touch input is received.
+   *
    * A callback of the following type may be connected:
    * @code
    *   bool YourCallbackName(Actor actor, const TouchEvent& event);
@@ -1036,7 +1135,8 @@ public: // Signals
   TouchSignalV2& TouchedSignal();
 
   /**
-   * This signal is emitted when mouse wheel event is received
+   * @brief This signal is emitted when mouse wheel event is received.
+   *
    * A callback of the following type may be connected:
    * @code
    *   bool YourCallbackName(Actor actor, const MouseWheelEvent& event);
@@ -1049,7 +1149,9 @@ public: // Signals
   MouseWheelEventSignalV2& MouseWheelEventSignal();
 
   /**
-   * This signal is emitted when actors size is being <b>set</b> by application code
+   * @brief Signal to indicate when the actor's size is set by application code.
+   *
+   * This signal is emitted when actors size is being <b>set</b> by application code.
    * This signal is <b>not</b> emitted when size is animated
    * Note! GetCurrentSize might not return this same size as the set size message may still be queued
    * A callback of the following type may be connected:
@@ -1062,7 +1164,8 @@ public: // Signals
   SetSizeSignalV2& SetSizeSignal();
 
   /**
-   * This signal is emitted after the actor has been connected to the stage.
+   * @brief This signal is emitted after the actor has been connected to the stage.
+   *
    * When an actor is connected, it will be directly or indirectly parented to the root Actor.
    * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
    *
@@ -1076,11 +1179,14 @@ public: // Signals
    *     B   C
    *    / \   \
    *   D   E   F
+   *
+   * @return The signal
    */
   OnStageSignalV2& OnStageSignal();
 
   /**
-   * This signal is emitted after the actor has been disconnected from the stage.
+   * @brief This signal is emitted after the actor has been disconnected from the stage.
+   *
    * If an actor is disconnected it either has no parent, or is parented to a disconnected actor.
    *
    * @note When the parent of a set of actors is disconnected to the stage, then all of the children
@@ -1093,13 +1199,16 @@ public: // Signals
    *     B   C
    *    / \   \
    *   D   E   F
+   *
+   * @return The signal
    */
   OffStageSignalV2& OffStageSignal();
 
 public: // Dynamics
 
   /**
-   * Enable dynamics for this actor.
+   * @brief Enable dynamics for this actor.
+   *
    * The actor will behave as a rigid/soft body in the simulation
    * @pre The actor is not already acting as a DynamicsBody and IsDynamicsRoot() returns false
    *
@@ -1109,7 +1218,8 @@ public: // Dynamics
   DynamicsBody EnableDynamics(DynamicsBodyConfig bodyConfig);
 
   /**
-   * Add a joint constraint to this actor
+   * @brief Add a joint constraint to this actor.
+   *
    * @param[in] attachedActor The other actor in the joint
    * @param[in] offset        The offset (relative to this actor) of the origin of the joint
    * @return                  The new joint
@@ -1120,7 +1230,8 @@ public: // Dynamics
   DynamicsJoint AddDynamicsJoint( Actor attachedActor, const Vector3& offset );
 
   /**
-   * Add a joint constraint to this actor
+   * @brief Add a joint constraint to this actor.
+   *
    * @param[in] attachedActor The other actor in the joint
    * @param[in] offsetA       The offset (relative to this actor) of the origin of the joint
    * @param[in] offsetB       The offset (relative to attachedActor) of the origin of the joint
@@ -1132,13 +1243,15 @@ public: // Dynamics
   DynamicsJoint AddDynamicsJoint( Actor attachedActor, const Vector3& offsetA, const Vector3& offsetB );
 
   /**
-   * Get the number of DynamicsJoint objects added to this actor
+   * @brief Get the number of DynamicsJoint objects added to this actor.
+   *
    * @return The number of DynamicsJoint objects added to this actor
    */
   const int GetNumberOfJoints() const;
 
   /**
-   * Get a joint by index.
+   * @brief Get a joint by index.
+   *
    * @param[in] index The index of the joint.
    *                  Use GetNumberOfJoints to get the valid range of indices.
    * @return The joint.
@@ -1146,26 +1259,30 @@ public: // Dynamics
   DynamicsJoint GetDynamicsJointByIndex( const int index );
 
   /**
-   * Get the joint between this actor and attachedActor
+   * @brief Get the joint between this actor and attachedActor.
+   *
    * @param[in] attachedActor The other actor in the joint
    * @return The joint.
    */
   DynamicsJoint GetDynamicsJoint( Actor attachedActor );
 
   /**
-   * Remove a joint from this actor
+   * @brief Remove a joint from this actor
+   *
    * @param[in] joint The joint to be removed
    */
   void RemoveDynamicsJoint( DynamicsJoint joint );
 
   /**
-   * Disable dynamics for this actor.
+   * @brief Disable dynamics for this actor.
+   *
    * The actor will be detached from the DynamicsBody/DynamicsJoint associated with it through EnableDynamics
    */
   void DisableDynamics();
 
   /**
-   * Get the associated DynamicsBody
+   * @brief Get the associated DynamicsBody.
+   *
    * @return A DynamicsBody
    */
   DynamicsBody GetDynamicsBody();
@@ -1173,15 +1290,18 @@ public: // Dynamics
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Actor(Internal::Actor* actor);
 };
 
 /**
- * Helper for discarding an actor handle. If the handle is empty, this method does nothing.
- * Otherwise actor.Unparent() will be called, followed by actor.Reset().
+ * @brief Helper for discarding an actor handle.
+ *
+ * If the handle is empty, this method does nothing.  Otherwise
+ * actor.Unparent() will be called, followed by actor.Reset().
  * @param[in,out] actor A handle to an actor, or an empty handle.
  */
 void UnparentAndReset( Actor& actor );

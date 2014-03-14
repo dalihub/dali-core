@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -36,18 +36,18 @@ struct Vector3;
 struct Vector4;
 
 /**
- * 2D vector
+ * @brief A two dimensional vector.
  */
-  // NOTE
-  // (x width) and (y height) must be consecutive in memory.
-  // No other data must be added before (x width) member.
-  // No virtual methods must be added to this struct.
 struct DALI_IMPORT_API Vector2
 {
+// (x width) and (y height) must be consecutive in memory.
+// No other data must be added before (x width) member.
+// No virtual methods must be added to this struct.
+
 public:
 
   /**
-   * Constructor
+   * @brief Constructor.
    */
   Vector2()
   : x(0.0f),
@@ -56,7 +56,8 @@ public:
   }
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param[in] x x or width component
    * @param[in] y y or height component
    */
@@ -66,7 +67,8 @@ public:
   }
 
   /**
-   * Conversion constructor from an array of two floats
+   * @brief Conversion constructor from an array of two floats.
+   *
    * @param [in] array of xy
    */
   explicit Vector2(const float* array)
@@ -76,13 +78,15 @@ public:
   }
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param [in] vec3 Vector3 to create this vector from
    */
   explicit Vector2(const Vector3& vec3);
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param [in] vec4 Vector4 to create this vector from
    */
   explicit Vector2(const Vector4& vec4);
@@ -99,7 +103,8 @@ public:
 // API
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
+   *
    * @param[in] array of floats
    * @return itself
    */
@@ -112,21 +117,24 @@ public:
   }
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
+   *
    * @param[in] rhs vector to assign.
    * @return itself
    */
   Vector2& operator=(const Vector3& rhs);
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
+   *
    * @param[in] rhs vector to assign.
    * @return itself
    */
   Vector2& operator=(const Vector4& rhs);
 
   /**
-   * Addition operator
+   * @brief Addition operator.
+   *
    * @param[in] rhs vector to add.
    * @return A vector containing the result of the addition
    */
@@ -138,7 +146,8 @@ public:
   }
 
   /**
-   * Addition assignment operator
+   * @brief Addition assignment operator.
+   *
    * @param[in] rhs vector to add.
    * @return itself
    */
@@ -151,7 +160,8 @@ public:
   }
 
   /**
-   * Subtraction operator
+   * @brief Subtraction operator.
+   *
    * @param[in] rhs  the vector to subtract
    * @return A vector containing the result of the subtraction
    */
@@ -163,7 +173,8 @@ public:
   }
 
   /**
-   * Subtraction assignment operator
+   * @brief Subtraction assignment operator.
+   *
    * @param[in] rhs the vector to subtract
    * @return itself
    */
@@ -176,7 +187,8 @@ public:
   }
 
   /**
-   * Multiplication operator
+   * @brief Multiplication operator.
+   *
    * @param[in] rhs the vector to multiply
    * @return A vector containing the result of the multiplication
    */
@@ -186,7 +198,8 @@ public:
   }
 
   /**
-   * Multiplication operator
+   * @brief Multiplication operator.
+   *
    * @param[in] rhs the float value to scale the vector
    * @return A vector containing the result of the scaling
    */
@@ -196,7 +209,8 @@ public:
   }
 
   /**
-   * Multiplication assignment operator
+   * @brief Multiplication assignment operator.
+   *
    * @param[in] rhs the vector to multiply
    * @return itself
    */
@@ -209,7 +223,8 @@ public:
   }
 
   /**
-   * Multiplication assignment operator
+   * @brief Multiplication assignment operator.
+   *
    * @param[in] rhs the float value to scale the vector
    * @return itself
    */
@@ -222,7 +237,8 @@ public:
   }
 
   /**
-   * Division operator
+   * @brief Division operator.
+   *
    * @param[in] rhs the vector to divide
    * @return A vector containing the result of the division
    */
@@ -232,7 +248,8 @@ public:
   }
 
   /**
-   * Division operator
+   * @brief Division operator.
+   *
    * @param[in] rhs The float value to scale the vector by
    * @return A vector containing the result of the scaling
    */
@@ -243,7 +260,8 @@ public:
 
 
   /**
-   * Division assignment operator
+   * @brief Division assignment operator.
+   *
    * @param[in] rhs the vector to divide
    * @return itself
    */
@@ -256,7 +274,8 @@ public:
   }
 
   /**
-   * Division assignment operator
+   * @brief Division assignment operator.
+   *
    * @param[in] rhs the float value to scale the vector by
    * @return itself
    */
@@ -269,7 +288,8 @@ public:
   }
 
   /**
-   * Unary negation operator
+   * @brief Unary negation operator.
+   *
    * @return A vector containg the negation
    */
   Vector2 operator-() const
@@ -280,7 +300,8 @@ public:
   }
 
   /**
-   * Equality operator
+   * @brief Equality operator.
+   *
    * utilises appropriate machine epsilon values;
    *
    * @param[in] rhs The vector to test against
@@ -289,7 +310,8 @@ public:
   bool operator==(const Vector2& rhs) const;
 
   /**
-   * Inequality operator
+   * @brief Inequality operator.
+   *
    * utilises appropriate machine epsilon values;
    *
    * @param[in] rhs The vector to test against
@@ -301,7 +323,8 @@ public:
   }
 
   /**
-   * Const array subscript operator overload
+   * @brief Const array subscript operator overload.
+   *
    * Asserts if index is out of range. Should be 0 or 1
    * @param[in] index Subscript
    * @return    The float at the given index
@@ -314,7 +337,8 @@ public:
   }
 
   /**
-   * Mutable array subscript operator overload
+   * @brief Mutable array subscript operator overload.
+   *
    * Asserts if index is out of range. Should be 0 or 1
    * @param[in] index Subscript index
    * @return    The float at the given index.
@@ -327,32 +351,38 @@ public:
   }
 
   /**
-   * Returns the length of the vector.
+   * @brief Returns the length of the vector.
+   *
    * @return the length of the vector
    */
   float Length() const;
 
   /**
-   * Returns the length of the vector squared. This is more efficient than Length() for threshold
+   * @brief Returns the length of the vector squared.
+   *
+   * This is more efficient than Length() for threshold
    * testing as it avoids the use of a square root.
    * @return the length of the vector squared.
    */
   float LengthSquared() const;
 
   /**
-   * Sets the vector to be unit length, whilst maintaining its direction.
+   * @brief Sets the vector to be unit length, whilst maintaining its direction.
+   *
    */
   void Normalize();
 
   /**
-    * Clamps the vector between minimum and maximum vectors
+    * @brief Clamps the vector between minimum and maximum vectors.
+    *
     * @param [in] min the minimum vector
     * @param [in] max the maximum vector
    */
   void Clamp( const Vector2& min, const Vector2& max );
 
   /**
-   * Returns the contents of the vector as an array of 2 floats.
+   * @brief Returns the contents of the vector as an array of 2 floats.
+   *
    * The order of the values in this array are as follows:
    * 0: x (or width)
    * 1: y (or height)
@@ -362,7 +392,8 @@ public:
   const float* AsFloat() const {return &x;}
 
   /**
-   * Returns the contents of the vector as an array of 2 floats.
+   * @brief Returns the contents of the vector as an array of 2 floats.
+   *
    * The order of the values in this array are as follows:
    * 0: x (or width)
    * 1: y (or height)
@@ -391,10 +422,14 @@ public: // Data
 
 };
 
+/**
+ * @brief Size is an alias of Dali::Vector2
+ */
 typedef Vector2 Size;
 
 /**
- * Print a Vector2.
+ * @brief Print a Vector2.
+ *
  * @param [in] o The output stream operator.
  * @param [in] vector The vector to print.
  * @return The output stream operator.
@@ -402,7 +437,8 @@ typedef Vector2 Size;
 DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Vector2& vector);
 
 /**
- * Returns a vector with components set to the minimum of the corresponding component in a and b.
+ * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
+ *
  * If a=0,1 and b=1,0  returns a vector of 0,0.
  * @param [in] a     a vector
  * @param [in] b     a vector
@@ -414,7 +450,8 @@ inline Vector2 Min( const Vector2& a, const Vector2& b )
 }
 
 /**
- * Returns a vector with components set to the maximum of the corresponding component in a and b.
+ * @brief Returns a vector with components set to the maximum of the corresponding component in a and b.
+ *
  * If a=0,1 and b=1,0  returns a vector of 1,1
  * @param [in] a     a vector
  * @param [in] b     a vector
@@ -426,7 +463,8 @@ inline Vector2 Max( const Vector2& a, const Vector2& b )
 }
 
 /**
- * Clamps each of vector v's components between minimum and maximum values
+ * @brief Clamps each of vector v's components between minimum and maximum values.
+ *
  * @param [in] v     a vector
  * @param [in] min the minimum value
  * @param [in] max the maximum value
@@ -435,7 +473,8 @@ inline Vector2 Max( const Vector2& a, const Vector2& b )
 DALI_IMPORT_API Vector2 Clamp( const Vector2& v, const float& min, const float& max );
 
 /**
- * Fits source size inside the target size maintaining aspect ratio
+ * @brief Fits source size inside the target size maintaining aspect ratio.
+ *
  * @pre source width and height > 0
  * @param [in] target size
  * @param [in] source size
@@ -444,7 +483,8 @@ DALI_IMPORT_API Vector2 Clamp( const Vector2& v, const float& min, const float& 
 DALI_IMPORT_API Size FitInside( const Size& target, const Size& source );
 
 /**
- * This function does two functions
+ * @brief Fits or scales to fill.
+ *
  * a) If target width and height are non-zero
  *    Fits source size into target aspect ratio
  *    If source is bigger, simply returns target.
@@ -460,8 +500,9 @@ DALI_IMPORT_API Size FitInside( const Size& target, const Size& source );
 DALI_IMPORT_API Size FitScaleToFill( const Size& target, const Size& source );
 
 /**
- * Shrinks source size inside the target size maintaining aspect ratio of source
- * If source is smaller than target it returns source
+ * @brief Shrinks source size inside the target size maintaining aspect ratio of source.
+ *
+ * If source is smaller than target it returns source.
  * @pre source width and height > 0
  * @param [in] target size
  * @param [in] source size

@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -38,19 +38,20 @@ namespace Dali DALI_IMPORT_API
 class Matrix;
 
 /**
- * The Quaternion class encapsulates the mathematics of the quaternion.
+ * @brief The Quaternion class encapsulates the mathematics of the quaternion.
  */
 class DALI_IMPORT_API Quaternion
 {
 public:
 
   /**
-   * Default Constructor
+   * @brief Default Constructor
    */
   Quaternion();
 
   /**
-   * Construct from a quaternion represented by floats
+   * @brief Construct from a quaternion represented by floats.
+   *
    * @param[in] cosThetaBy2
    * @param[in] iBySineTheta
    * @param[in] jBySineTheta
@@ -59,27 +60,31 @@ public:
   Quaternion(float cosThetaBy2, float iBySineTheta, float jBySineTheta, float kBySineTheta);
 
   /**
-   * Construct from a quaternion represented by a vector
+   * @brief Construct from a quaternion represented by a vector.
+   *
    * @param[in] vector - x,y,z fields represent i,j,k coefficients, w represents cos(theta/2)
    */
   explicit Quaternion(const Vector4& vector);
 
   /**
-   * Constructor from an axis and angle
+   * @brief Constructor from an axis and angle.
+   *
    * @param[in] angle - the angle around the axis
    * @param[in] axis  - the vector of the axis
    */
   Quaternion(float angle, const Vector3 &axis);
 
   /**
-   * Constructor from an axis and angle
+   * @brief Constructor from an axis and angle.
+   *
    * @param[in] theta - the angle of the axis
    * @param[in] axis  - the unit vector of the axis
    */
   Quaternion(float theta, const Vector4 &axis);
 
   /**
-   * Construct from Euler angles
+   * @brief Construct from Euler angles.
+   *
    * @param[in] x - the X axis euler angle (pitch)
    * @param[in] y - the Y axis euler angle (yaw)
    * @param[in] z - the Z axis euler angle (roll)
@@ -87,13 +92,15 @@ public:
   Quaternion(float x, float y, float z);
 
   /**
-   * Construct from a matrix
+   * @brief Construct from a matrix.
+   *
    * @param[in] matrix
    */
   explicit Quaternion(const Matrix& matrix);
 
   /**
-   * Construct from 3 orthonormal axes
+   * @brief Construct from 3 orthonormal axes.
+   *
    * @param[in] xAxis The X axis
    * @param[in] yAxis The Y axis
    * @param[in] zAxis The Z axis
@@ -101,7 +108,8 @@ public:
   explicit Quaternion( const Vector3& xAxis, const Vector3& yAxis, const Vector3& zAxis );
 
   /**
-   * converts an axis + angle pair rotation to a Quaternion
+   * @brief Converts an axis + angle pair rotation to a Quaternion.
+   *
    * @param[in] axis
    * @param[in] angle
    * @return the represented quaternion
@@ -109,7 +117,8 @@ public:
   static Quaternion FromAxisAngle(const Vector4 &axis, float angle);
 
   /**
-   * Destructor, nonvirtual as this is not a base class
+   * @brief Destructor, nonvirtual as this is not a base class.
+   *
    */
   ~Quaternion();
 
@@ -118,7 +127,8 @@ public:
   static const Quaternion IDENTITY; ///< (0.0f,0.0f,0.0f,1.0f)
 
   /**
-   * Helper to check if this is an identity quaternion
+   * @brief Helper to check if this is an identity quaternion
+   *
    * @return true if this is identity quaternion
    */
   bool IsIdentity() const
@@ -132,7 +142,8 @@ public:
   }
 
   /**
-   * Convert the quaternion to an axis/angle pair
+   * @brief Convert the quaternion to an axis/angle pair.
+   *
    * @param[out] axis
    * @param[out] angle
    * @return true if converted correctly
@@ -140,7 +151,8 @@ public:
   bool ToAxisAngle(Vector3 &axis, float &angle) const;
 
   /**
-   * Convert the quaternion to an axis/angle pair
+   * @brief Convert the quaternion to an axis/angle pair.
+   *
    * @param[out] axis
    * @param[out] angle
    * @return true if converted correctly
@@ -148,13 +160,15 @@ public:
   bool ToAxisAngle(Vector4 &axis, float &angle) const;
 
   /**
-   * Return the quaternion as a vector
+   * @brief Return the quaternion as a vector.
+   *
    * @return the vector representation of the quaternion
    */
   const Vector4& AsVector() const;
 
   /**
-   * SetEuler sets the quaternion from the Euler angles applied in x, y, z order.
+   * @brief SetEuler sets the quaternion from the Euler angles applied in x, y, z order.
+   *
    * @param[in] x - the X axis euler angle (pitch)
    * @param[in] y - the Y axis euler angle (yaw)
    * @param[in] z - the Z axis euler angle (roll)
@@ -162,162 +176,187 @@ public:
   void SetEuler(float x, float y, float z);
 
   /**
-   * returns the Euler angles from a rotation Quaternion
+   * @brief returns the Euler angles from a rotation Quaternion.
+   *
    * @return a vector of Euler angles (x == pitch, y == yaw, z == roll)
    */
   Vector4 EulerAngles() const;
 
   /**
-   * Addition operator
+   * @brief Addition operator.
+   *
    * @param[in] other The quaternion to add
    * @return A quaternion containing the result of the addition
    */
   const Quaternion operator +(const Quaternion &other) const;
 
   /**
-   * Subtraction operator
+   * @brief Subtraction operator.
+   *
    * @param[in] other The quaternion to subtract
    * @return A quaternion containing the result of the subtract
    */
   const Quaternion operator -(const Quaternion &other) const;
 
   /**
-   * Multiplication operator
+   * @brief Multiplication operator.
+   *
    * @param[in] other The quaternion to multiply
    * @return A quaternion containing the result
    */
   const Quaternion operator *(const Quaternion &other) const;
 
   /**
-   * Multiplication operator
+   * @brief Multiplication operator.
+   *
    * @param[in] v The vector to multiply
    * @return A vector containing the result of the multiplication
    */
   Vector3 operator *(const Vector3& v) const;
 
   /**
-   * Division operator
+   * @brief Division operator.
+   *
    * @param[in] other a quaternion to divide by
    * @return A quaternion containing the result
    */
   const Quaternion operator /(const Quaternion &other) const;
 
   /**
-   * Scale operator
+   * @brief Scale operator.
+   *
    * @param[in] scale A value to scale by
    * @return A quaternion containing the result
    */
   const Quaternion operator *(float scale) const;
 
   /**
-   * Scale operator
+   * @brief Scale operator.
+   *
    * @param[in] scale A value to scale by
    * @return A quaternion containing the result
    */
   const Quaternion operator /(float scale) const;
 
   /**
-   * Unary Negation operator
+   * @brief Unary Negation operator.
+   *
    * @return A quaternion containing the negated result
    */
   Quaternion operator -() const;
 
   /**
-   * Addition with Assignment operator
+   * @brief Addition with Assignment operator.
+   *
    * @param[in] other The quaternion to add
    * @return itself
    */
   const Quaternion &operator +=(const Quaternion &other);
 
   /**
-   * Subtraction with Assignment operator
+   * @brief Subtraction with Assignment operator.
+   *
    * @param[in] other The quaternion to subtract
    * @return itself
    */
   const Quaternion &operator -=(const Quaternion &other);
 
   /**
-   * Multiplication with Assignment operator
+   * @brief Multiplication with Assignment operator.
+   *
    * @param[in] other The quaternion to multiply
    * @return itself
    */
   const Quaternion &operator *=(const Quaternion &other);
 
   /**
-   * Scale with Assignment operator
+   * @brief Scale with Assignment operator.
+   *
    * @param[in] scale the value to scale by
    * @return itself
    */
   const Quaternion &operator *= (float scale);
 
   /**
-   * Scale with Assignment operator
+   * @brief Scale with Assignment operator.
+   *
    * @param[in] scale the value to scale by
    * @return itself
    */
   const Quaternion &operator /= (float scale);
 
   /**
-   * Equality operator.
+   * @brief Equality operator.
+   *
    * @param[in] rhs The quaterion to compare with.
    * @return True if the quaternions are equal.
    */
   bool operator== (const Quaternion& rhs) const;
 
   /**
-   * Inequality operator.
+   * @brief Inequality operator.
+   *
    * @param[in] rhs The quaterion to compare with.
    * @return True if the quaternions are not equal.
    */
   bool operator!= (const Quaternion& rhs) const;
 
   /**
-   * Return the length of the quaternion
+   * @brief Return the length of the quaternion.
+   *
    * @return the length of the quaternion
    */
   float Length() const;
 
   /**
-   * Return the squared length of the quaternion
+   * @brief Return the squared length of the quaternion.
+   *
    * @return the squared length of the quaternion
    */
   float LengthSquared() const;
 
   /**
-   * Normalize this to unit length
+   * @brief Normalize this to unit length.
+   *
    */
   void Normalize();
 
   /**
-   * Normalized
+   * @brief Normalized.
+   *
    * @return a normalized version of this quaternion
    */
   Quaternion Normalized() const;
 
   /**
-   * Conjugate this quaternion
+   * @brief Conjugate this quaternion.
+   *
    */
   void Conjugate();
 
   /**
-   * Invert this quaternion
+   * @brief Invert this quaternion.
+   *
    */
   void Invert();
 
   /**
-   * Performs the logarithm of a Quaternion = v*a where q = (cos(a),v*sin(a))
+   * @brief Performs the logarithm of a Quaternion = v*a where q = (cos(a),v*sin(a)).
+   *
    * @return a quaternion representing the logarithm
    */
   Quaternion Log() const;
 
   /**
-   * Performs an exponent e^Quaternion = Exp(v*a) = (cos(a),vsin(a))
+   * @brief Performs an exponent e^Quaternion = Exp(v*a) = (cos(a),vsin(a)).
+   *
    * @return a quaternion representing the exponent
    */
   Quaternion Exp() const;
 
   /**
-   * Return the dot product of two quaternions
+   * @brief Return the dot product of two quaternions.
+   *
    * @param[in] q1 - the first quaternion
    * @param[in] q2 - the second quaternion
    * @return the dot product of the two quaternions
@@ -325,7 +364,8 @@ public:
   static float Dot(const Quaternion &q1, const Quaternion &q2);
 
   /**
-   * Linear Interpolation (using a straight line between the two quaternions)
+   * @brief Linear Interpolation (using a straight line between the two quaternions).
+   *
    * @param[in] q1 - the start quaternion
    * @param[in] q2 - the end quaternion
    * @param[in] t  - a progress value between 0 and 1
@@ -334,8 +374,9 @@ public:
   static Quaternion Lerp(const Quaternion &q1, const Quaternion &q2, float t);
 
   /**
-   * Spherical Linear Interpolation (using the shortest arc of a great circle between
+   * @brief Spherical Linear Interpolation (using the shortest arc of a great circle between
    * the two quaternions).
+   *
    * @param[in] q1 - the start quaternion
    * @param[in] q2 - the end quaternion
    * @param[in] progress  - a progress value between 0 and 1
@@ -344,7 +385,8 @@ public:
   static Quaternion Slerp(const Quaternion &q1, const Quaternion &q2, float progress);
 
   /**
-   * This version of Slerp, used by Squad, does not check for theta > 90.
+   * @brief This version of Slerp, used by Squad, does not check for theta > 90.
+   *
    * @param[in] q1 - the start quaternion
    * @param[in] q2 - the end quaternion
    * @param[in] t  - a progress value between 0 and 1
@@ -353,7 +395,8 @@ public:
   static Quaternion SlerpNoInvert(const Quaternion &q1, const Quaternion &q2, float t);
 
   /**
-   * Spherical Cubic Interpolation
+   * @brief Spherical Cubic Interpolation.
+   *
    * @param[in] q1 - the start quaternion
    * @param[in] q2 - the end quaternion
    * @param[in] a  - the control quaternion for q1
@@ -364,7 +407,8 @@ public:
   static Quaternion Squad(const Quaternion &q1,const Quaternion &q2,const Quaternion &a,const Quaternion &b,float t);
 
   /**
-   * Returns the shortest angle between two quaternions in Radians.
+   * @brief Returns the shortest angle between two quaternions in Radians.
+   *
    * @param[in] q1 - the first quaternion
    * @param[in] q2 - the second quaternion
    * @return the angle between the two quaternions.
@@ -372,14 +416,16 @@ public:
   static float AngleBetween(const Quaternion &q1, const Quaternion &q2);
 
   /**
-   * Rotate v by this Quaternion (Quaternion must be unit)
+   * @brief Rotate v by this Quaternion (Quaternion must be unit).
+   *
    * @param[in] v - a vector to rotate
    * @return the rotated vector
    */
   Vector4 Rotate(const Vector4 &v) const;
 
   /**
-   * Rotate v by this Quaternion (Quaternion must be unit)
+   * @brief Rotate v by this Quaternion (Quaternion must be unit).
+   *
    * @param[in] v - a vector to rotate
    * @return the rotated vector
    */
@@ -388,7 +434,8 @@ public:
 private:
 
   /**
-   * Set the quaternion from 3 orthonormal axes
+   * @brief Set the quaternion from 3 orthonormal axes.
+   *
    * @param[in] xAxis The X axis
    * @param[in] yAxis The Y axis
    * @param[in] zAxis The Z axis
@@ -397,11 +444,12 @@ private:
 
 public:
 
-  Vector4 mVector;   // w component is s ( = cos(theta/2.0) )
+  Vector4 mVector;   ///< w component is s ( = cos(theta/2.0) )
 };
 
 /**
- * Print a Quaternion.
+ * @brief Print a Quaternion.
+ *
  * @param [in] o The output stream operator.
  * @param [in] quaternion The quaternion to print.
  * @return The output stream operator.

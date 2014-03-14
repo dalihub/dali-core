@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_IMAGES_MODULE
  * @{
  */
 
@@ -45,7 +45,8 @@ class ImageAttributes;
 
 
 /**
- * Image object represents an image resource that can be added to ImageActors.
+ * @brief An Image object represents an image resource that can be added to ImageActors.
+ *
  * Image objects can also handle custom requests for image loading and are responsible for
  * the underlying resource's lifetime.
  *
@@ -102,11 +103,11 @@ class Image : public BaseHandle
 {
 public:
   /**
-   * Resource management options.
+   * @brief Resource management options.
    */
 
   /**
-   * LoadPolicy controls the way images are loaded into memory.
+   * @brief LoadPolicy controls the way images are loaded into memory.
    */
   enum LoadPolicy
   {
@@ -115,7 +116,7 @@ public:
   };
 
   /**
-   * ReleasePolicy controls the way images are deleted from memory.
+   * @brief ReleasePolicy controls the way images are deleted from memory.
    */
   enum ReleasePolicy
   {
@@ -123,30 +124,39 @@ public:
     Never   ///< keep image data for the lifetime of the object. (default)
   };
 
+  /**
+   * @brief Type of signal for LoadingFinished and Uploaded.
+   */
   typedef SignalV2< void (Image) > ImageSignalV2;
 
   // Signal Names
-  static const char* const SIGNAL_IMAGE_LOADING_FINISHED;
-  static const char* const SIGNAL_IMAGE_UPLOADED;
+  static const char* const SIGNAL_IMAGE_LOADING_FINISHED; ///< Name of LoadingFinished signal
+  static const char* const SIGNAL_IMAGE_UPLOADED; ///< Name of Uploaded signal
 
 public:
 
   /**
-   * Get the size of an image from disc.  This function will read the header info from
-   * file on disc and is synchronous, so it should not be used repeatedly or in tight loops.
+   * @brief Get the size of an image from disk.
+   *
+   * This function will read the header info from file on disk and is
+   * synchronous, so it should not be used repeatedly or in tight
+   * loops.
+   *
    * @param [in] filename of the image file to use.
    * @return The width and height in pixels of the image.
    */
   static Vector2 GetImageSize(const std::string filename);
 
   /**
-   * Constructor which creates an empty Image object.
+   * @brief Constructor which creates an empty Image object.
+   *
    * Use Image::New(...) to create an initialised object.
    */
   Image();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Image();
@@ -157,14 +167,16 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Create an initialised image object
+   * @brief Create an initialised image object.
+   *
    * @param [in] filename The filename of the image file to use.
    * @return A handle to a newly allocated object
    */
   static Image New(const std::string& filename);
 
   /**
-   * Create an initialised image object
+   * @brief Create an initialised image object.
+   *
    * @param [in] filename The filename of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
    * @param [in] releasePol The ReleasePolicy to apply to Image.
@@ -173,7 +185,8 @@ public:
   static Image New(const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol);
 
   /**
-   * Create an initialised image object
+   * @brief Create an initialised image object.
+   *
    * @param [in] filename   The filename of the image file to use.
    * @param [in] attributes Requested parameters for loading (size, cropping etc.).
    * @return A handle to a newly allocated object
@@ -181,7 +194,8 @@ public:
   static Image New(const std::string& filename, const ImageAttributes& attributes);
 
   /**
-   * Create an initialised image object
+   * @brief Create an initialised image object.
+   *
    * @param [in] filename   The filename of the image file to use.
    * @param [in] attributes Requested parameters for loading (size, cropping etc.).
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
@@ -191,14 +205,16 @@ public:
   static Image New(const std::string& filename, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol);
 
   /**
-   * Create an initialised image object
+   * @brief Create an initialised image object.
+   *
    * @param [in] filename The filename of the image file to use.
    * @return A handle to a newly allocated object
    */
   static Image NewDistanceField(const std::string& filename);
 
   /**
-   * Create an initialised  image object
+   * @brief Create an initialised image object.
+   *
    * @param [in] filename   The filename of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
    * @param [in] releasePol The ReleasePolicy to apply to Image.
@@ -207,7 +223,8 @@ public:
   static Image NewDistanceField(const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol);
 
   /**
-   * Create an initialised image object
+   * @brief Create an initialised image object.
+   *
    * @param [in] filename   The filename of the image file to use.
    * @param [in] attributes The minimum search radius to check for differing pixels
    * @return A handle to a newly allocated object
@@ -215,7 +232,8 @@ public:
   static Image NewDistanceField(const std::string& filename, const ImageAttributes& attributes );
 
   /**
-   * Create an initialised image object
+   * @brief Create an initialised image object.
+   *
    * @param [in] filename   The filename of the image file to use.
    * @param [in] attributes The minimum search radius to check for differing pixels
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
@@ -225,8 +243,9 @@ public:
   static Image NewDistanceField(const std::string& filename, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol);
 
   /**
-   * Creates object with already loaded NativeImage
-   * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
+   * @brief Creates object with already loaded NativeImage.
+   *
+   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @pre nativeImg should be initialised
    * @param [in] nativeImg already initialised NativeImage
    * @return A handle to a newly allocated object
@@ -234,8 +253,9 @@ public:
   static Image New(NativeImage& nativeImg);
 
   /**
-   * Creates object with already loaded NativeImage
-   * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
+   * @brief Creates object with already loaded NativeImage.
+   *
+   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @pre nativeImg should be initialised
    * @param [in] nativeImg already initialised NativeImage
    * @param [in] loadPol    The LoadPolicy to apply when allocating the GL resource.
@@ -245,7 +265,9 @@ public:
   static Image New(NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy releasePol);
 
   /**
-   * Downcast an Object handle to Image handle. If handle points to a Image object the
+   * @brief Downcast an Object handle to Image handle.
+   *
+   * If handle points to a Image object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a Image object or an uninitialized handle
@@ -253,7 +275,8 @@ public:
   static Image DownCast( BaseHandle handle );
 
   /**
-   * Query whether the image data has loaded.
+   * @brief Query whether the image data has loaded.
+   *
    * The asynchronous loading begins when the Image object is created.
    * After the Image object is discarded, the image data will be released from memory.
    * @return The loading state, either Loading, Success or Failed.
@@ -261,32 +284,36 @@ public:
   LoadingState GetLoadingState() const;
 
   /**
-   * Returns the filename of the image if the image is created from a file
+   * @brief Returns the filename of the image if the image is created from a file.
+   *
    * @return the image filename or empty string
    */
   std::string GetFilename() const;
 
   /**
-   * Return load policy
+   * @brief Return load policy.
+   *
    * @return resource load policy
    */
   LoadPolicy GetLoadPolicy () const;
 
   /**
-   * Return resource release policy
+   * @brief Return resource release policy.
+   *
    * @return resource release policy
    */
   ReleasePolicy GetReleasePolicy () const;
 
   /**
-   * Reload image from filesystem.
+   * @brief Reload image from filesystem.
+   *
    * The set ImageAttributes are used when requesting the image again.
    * @note if Image is offstage and OnDemand policy is set, reload request is ignored.
    */
   void Reload();
 
   /**
-   * Returns the width of the image.
+   * @brief Returns the width of the image.
    *
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
@@ -298,7 +325,7 @@ public:
   unsigned int GetWidth() const;
 
   /**
-   * Returns the height of the image.
+   * @brief Returns the height of the image.
    *
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
@@ -310,7 +337,8 @@ public:
   unsigned int GetHeight() const;
 
   /**
-   * Get the attributes of an image.
+   * @brief Get the attributes of an image.
+   *
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
    * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
@@ -323,14 +351,16 @@ public:
 public: // Signals
 
   /**
-   * Emitted when the image data loads successfully, or when the loading fails.
+   * @brief Emitted when the image data loads successfully, or when the loading fails.
+   *
    * @return A signal object to Connect() with.
    */
   ImageSignalV2& LoadingFinishedSignal();
 
   /**
-   * This signal is emitted when the image data gets uploaded to
-   * GL. It Will be sent after an actor using the image is added to
+   * @brief This signal is emitted when the image data gets uploaded to GL.
+   *
+   * It Will be sent after an actor using the image is added to
    * the stage, when such a staged image is reloaded, or when a staged
    * BitmapImage calls Update().
    * @return A signal object to Connect() with.

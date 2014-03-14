@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -44,10 +44,14 @@ struct TouchEvent;
 struct MouseWheelEvent;
 struct Vector3;
 
+/**
+ * @brief Pointer to Dali::CustomActorImpl object.
+ */
 typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
 
 /**
- * CustomActorImpl is an abstract base class for custom control implementations.
+ * @brief CustomActorImpl is an abstract base class for custom control implementations.
+ *
  * This provides a series of pure virtual methods, which are called when actor-specific events occur.
  * An CustomActorImpl is typically owned by a single CustomActor instance; see also CustomActor::New(CustomActorImplPtr).
  */
@@ -56,18 +60,20 @@ class DALI_IMPORT_API CustomActorImpl : public Dali::RefObject
 public:
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~CustomActorImpl();
 
   /**
-   * Used by derived CustomActorImpl instances, to access the public Actor interface.
+   * @brief Used by derived CustomActorImpl instances, to access the public Actor interface.
+   *
    * @return A pointer to self, or an uninitialized pointer if the CustomActorImpl is not owned.
    */
   CustomActor Self() const;
 
   /**
-   * Called after the actor has been connected to the stage.
+   * @brief Called after the actor has been connected to the stage.
+   *
    * When an actor is connected, it will be directly or indirectly parented to the root Actor.
    * @note The root Actor is provided automatically by Dali::Stage, and is always considered to be connected.
    *
@@ -85,7 +91,8 @@ public:
   virtual void OnStageConnection() = 0;
 
   /**
-   * Called after the actor has been disconnected from the stage.
+   * @brief Called after the actor has been disconnected from the stage.
+   *
    * If an actor is disconnected it either has no parent, or is parented to a disconnected actor.
    *
    * @note When the parent of a set of actors is disconnected to the stage, then all of the children
@@ -102,39 +109,45 @@ public:
   virtual void OnStageDisconnection() = 0;
 
   /**
-   * Called after a child has been added to the owning actor.
+   * @brief Called after a child has been added to the owning actor.
+   *
    * @param[in] child The child which has been added.
    */
   virtual void OnChildAdd(Actor& child) = 0;
 
   /**
-   * Called after a child has been removed from the owning actor.
+   * @brief Called after a child has been removed from the owning actor.
+   *
    * @param[in] child The child being removed.
    */
   virtual void OnChildRemove(Actor& child) = 0;
 
   /**
-   * Called when the owning actor property is set.
+   * @brief Called when the owning actor property is set.
+   *
    * @param[in] index The Property index that was set.
    * @param[in] propertyValue The value to set.
    */
   virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) ;
 
   /**
-   * Called when the owning actor's size is set e.g. using Actor::SetSize().
+   * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().
+   *
    * @param[in] targetSize The target size. Note that this target size may not match the size returned via Actor::GetSize().
    */
   virtual void OnSizeSet(const Vector3& targetSize) = 0;
 
   /**
-   * Called when the owning actor's size is animated e.g. using Animation::Resize().
+   * @brief Called when the owning actor's size is animated e.g. using Animation::Resize().
+   *
    * @param[in] animation The object which is animating the owning actor.
    * @param[in] targetSize The target size. Note that this target size may not match the size returned via Actor::GetSize().
    */
   virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) = 0;
 
   /**
-   * Called after a touch-event is received by the owning actor.
+   * @brief Called after a touch-event is received by the owning actor.
+   *
    * @note This must be enabled during construction; see CustomActorImpl::CustomActorImpl(bool)
    * @param[in] event The touch event.
    * @return True if the event should be consumed.
@@ -142,14 +155,16 @@ public:
   virtual bool OnTouchEvent(const TouchEvent& event) = 0;
 
   /**
-   * Called after a key-event is received by the actor that has had its focus set.
+   * @brief Called after a key-event is received by the actor that has had its focus set.
+   *
    * @param[in] event the Key Event
    * @return True if the event should be consumed.
    */
   virtual bool OnKeyEvent(const KeyEvent& event) = 0;
 
   /**
-   * Called after a mouse-wheel-event is received by the owning actor.
+   * @brief Called after a mouse-wheel-event is received by the owning actor.
+   *
    * @note This must be enabled during construction; see CustomActorImpl::SetRequiresMouseWheelEvents(bool)
    * @param[in] event The mouse wheel event.
    * @return True if the event should be consumed.
@@ -157,17 +172,19 @@ public:
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event) = 0;
 
   /**
-   * Called when this actor gains keyboard focus.
+   * @brief Called when this actor gains keyboard focus.
+   *
    */
   virtual void OnKeyInputFocusGained() = 0;
 
   /**
-   * Called when this actor loses keyboard focus.
+   * @brief Called when this actor loses keyboard focus.
    */
   virtual void OnKeyInputFocusLost() = 0;
 
   /**
-   * Called to find a child by an alias.
+   * @brief Called to find a child by an alias.
+   *
    * If an alias for a child exists, return the child otherwise return an empty handle.
    * For example 'previous' could return the last selected child.
    * @pre The Actor has been initialized.
@@ -179,13 +196,13 @@ public:
 protected: // For derived classes
 
   /**
-   * Create a CustomActorImpl.
+   * @brief Create a CustomActorImpl.
    * @param[in] requiresTouchEvents True if the OnTouchEvent() callback is required.
    */
   CustomActorImpl(bool requiresTouchEvents);
 
   /**
-   * Set whether the custom actor requires mouse wheel events.
+   * @brief Set whether the custom actor requires mouse wheel events.
    * @param[in] requiresMouseWheelEvents True if the OnMouseWheelEvent() callback is required.
    */
   void SetRequiresMouseWheelEvents(bool requiresMouseWheelEvents);
@@ -193,13 +210,15 @@ protected: // For derived classes
 public: // Not intended for application developers
 
   /**
-   * Called when ownership of the CustomActorImpl passed to a CustomActor.
+   * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
    * @pre The CustomActorImpl is not already owned.
    * @param[in] owner The owning object.
    */
   void Initialize(Internal::CustomActor& owner);
 
   /**
+   * @brief Get the owner.
+   *
    * This method is needed when creating additional handle objects to existing objects.
    * Owner is the Dali::Internal::CustomActor that owns the implementation of the custom actor
    * inside core. Creation of a handle to Dali public API Actor requires this pointer.
@@ -208,22 +227,22 @@ public: // Not intended for application developers
   Internal::CustomActor* GetOwner() const;
 
   /**
-   * Called when ownership of the CustomActorImpl passed to a CustomActor.
+   * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
    * @return True if the OnTouchEvent() callback is required.
    */
   bool RequiresTouchEvents() const;
 
   /**
-   * Called when ownership of the CustomActorImpl passed to a CustomActor.
+   * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
    * @return True if the OnMouseWheelEvent() callback is required.
    */
   bool RequiresMouseWheelEvents() const;
 
 private:
 
-  Internal::CustomActor* mOwner;
-  bool mRequiresTouchEvents;
-  bool mRequiresMouseWheelEvents;
+  Internal::CustomActor* mOwner;  ///< Internal owner of this custom actor implementation
+  bool mRequiresTouchEvents;      ///< Whether the OnTouchEvent() callback is required
+  bool mRequiresMouseWheelEvents; ///< Whether the OnMouseWheelEvent() callback is required
 };
 
 } // namespace Dali

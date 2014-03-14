@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_COMMON_MODULE
  * @{
  */
 
@@ -34,21 +34,20 @@
 namespace Dali DALI_IMPORT_API
 {
 
+/**
+ * @brief ParentOrigin constants
+ *
+ * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f)
+ */
 namespace ParentOrigin
 {
+extern const Vector3 DEFAULT; ///< TOP_LEFT
 
-/**
- * ParentOrigin constants
- * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f)
- */
-
-extern const Vector3 DEFAULT; // TOP_LEFT
-
-extern const float TOP;    // 0.0f
-extern const float BOTTOM; // 1.0f
-extern const float LEFT;   // 0.0f
-extern const float RIGHT;  // 1.0f
-extern const float MIDDLE; // 0.5f
+extern const float TOP;    ///< 0.0f
+extern const float BOTTOM; ///< 1.0f
+extern const float LEFT;   ///< 0.0f
+extern const float RIGHT;  ///< 1.0f
+extern const float MIDDLE; ///< 0.5f
 
 extern const Vector3 BACK_TOP_LEFT;      ///< 0.0f, 0.0f, 0.0f
 extern const Vector3 BACK_TOP_CENTER;    ///< 0.5f, 0.0f, 0.0f
@@ -82,21 +81,20 @@ extern const Vector3 FRONT_BOTTOM_RIGHT; ///< 1.0f, 1.0f, 1.0f
 
 }
 
+/**
+ * @brief AnchorPoint constants
+ *
+ * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f)
+ */
 namespace AnchorPoint
 {
+extern const float TOP;    ///< 0.0f
+extern const float BOTTOM; ///< 1.0f
+extern const float LEFT;   ///< 0.0f
+extern const float RIGHT;  ///< 1.0f
+extern const float MIDDLE; ///< 0.5f
 
-/**
- * AnchorPoint constants
- * Note that for 2D layouting, the typical Z position is 0.5f (not 0.0f)
- */
-
-extern const float TOP;    // 0.0f
-extern const float BOTTOM; // 1.0f
-extern const float LEFT;   // 0.0f
-extern const float RIGHT;  // 1.0f
-extern const float MIDDLE; // 0.5f
-
-extern const Vector3 DEFAULT; // CENTER
+extern const Vector3 DEFAULT; ///< CENTER
 
 extern const Vector3 BACK_TOP_LEFT;      ///< 0.0f, 0.0f, 0.0f
 extern const Vector3 BACK_TOP_CENTER;    ///< 0.5f, 0.0f, 0.0f
@@ -127,17 +125,16 @@ extern const Vector3 FRONT_CENTER_RIGHT; ///< 1.0f, 0.5f, 1.0f
 extern const Vector3 FRONT_BOTTOM_LEFT;  ///< 0.0f, 1.0f, 1.0f
 extern const Vector3 FRONT_BOTTOM_CENTER;///< 0.5f, 1.0f, 1.0f
 extern const Vector3 FRONT_BOTTOM_RIGHT; ///< 1.0f, 1.0f, 1.0f
-
 }
 
-namespace Color
-{
 
 /**
- * Color Constants.
+ * @brief Color Constants.
+ *
  * Color is represented by the Vector4 class (see vector4.h).
  */
-
+namespace Color
+{
 extern const Vector4 BLACK;       ///< Pure black (0.0f, 0.0f, 0.0f, 1.0f);
 extern const Vector4 WHITE;       ///< Pure white (1.0f, 1.0f, 1.0f, 1.0f);
 
@@ -153,30 +150,32 @@ extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 0.0f, 0.0f, 0.0f
 
 } // namespace Color
 
+/**
+ * @brief Math constants
+ */
 namespace Math
 {
-
-extern const float MACHINE_EPSILON_0;
-extern const float MACHINE_EPSILON_1;
-extern const float MACHINE_EPSILON_10;
-extern const float MACHINE_EPSILON_100;
-extern const float MACHINE_EPSILON_1000;
-extern const float MACHINE_EPSILON_10000;
+extern const float MACHINE_EPSILON_0;      ///< Epsilon for values near zero
+extern const float MACHINE_EPSILON_1;      ///< Epsilon for values near 1
+extern const float MACHINE_EPSILON_10;     ///< Epsilon for values near 10
+extern const float MACHINE_EPSILON_100;    ///< Epsilon for values near 100
+extern const float MACHINE_EPSILON_1000;   ///< Epsilon for values near 1000
+extern const float MACHINE_EPSILON_10000;  ///< Epsilon for values near 10000
 
 // float is preferred to double for performance on ARM targets
-const float PI   = static_cast<float>(M_PI);
-const float PI_2 = static_cast<float>(M_PI_2);
-const float PI_4 = static_cast<float>(M_PI_4);
+const float PI   = static_cast<float>(M_PI);   ///< Constant representing PI
+const float PI_2 = static_cast<float>(M_PI_2); ///< Constant representing PI/2
+const float PI_4 = static_cast<float>(M_PI_4); ///< Constant representing PI/4
 
 } // namespace Math
 
+/**
+ * @brief String Constants
+ */
 namespace String
 {
-
-extern const std::string EMPTY;
-
+extern const std::string EMPTY; ///< The empty string
 }
-
 
 } // namespace Dali
 

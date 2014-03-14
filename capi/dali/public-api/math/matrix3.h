@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -33,7 +33,8 @@ class Matrix;
 struct Vector2;
 
 /**
- * A 3x3 matrix.
+ * @brief A 3x3 matrix.
+ *
  */
 class DALI_IMPORT_API Matrix3
 {
@@ -42,34 +43,61 @@ public:
   friend std::ostream& operator<< (std::ostream& o, const Matrix3& matrix);
 
   /**
-   * The identity matrix
+   * @brief The identity matrix
    */
   static const Matrix3 IDENTITY;
 
   /**
-   * Constructors
+   * @brief Constructor.
    */
   Matrix3();
+
+  /**
+   * @brief Copy Constructor.
+   *
+   * @param[in] m Another 3x3 matrix
+   */
   Matrix3(const Matrix3& m);
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] m A 4x4 matrix. The translation and shear components are ignored.
+   */
   Matrix3(const Matrix& m);
+
+  /**
+   * @brief Constructor.
+   *
+   * @param[in] s00 First element
+   * @param[in] s01 Second element
+   * @param[in] s02 Third element
+   * @param[in] s10 Fourth element
+   * @param[in] s11 Fifth element
+   * @param[in] s12 Sixth element
+   * @param[in] s20 Seventh element
+   * @param[in] s21 Eighth element
+   * @param[in] s22 Ninth element
+   */
   Matrix3(float s00, float s01, float s02, float s10, float s11, float s12, float s20, float s21, float s22);
 
   /**
-   * Assignment Operator
+   * @brief Assignment Operator
    * @param matrix from which to copy values
    * @return reference to this object
    */
   Matrix3& operator=( const Matrix3& matrix );
 
   /**
-   * Assignment Operator
+   * @brief Assignment Operator
    * @param matrix from which to copy values
    * @return reference to this object
    */
   Matrix3& operator=( const Matrix& matrix );
 
   /**
-   * The equality operator.
+   * @brief The equality operator.
+   *
    * Utilises appropriate machine epsilon values.
    *
    * @param [in] rhs    the Matrix to compare this to
@@ -78,7 +106,8 @@ public:
   bool operator==(const Matrix3 & rhs) const;
 
   /**
-   * The inequality operator.
+   * @brief The inequality operator.
+   *
    * Utilises appropriate machine epsilon values.
    *
    * @param [in] rhs    the Matrix to compare this to
@@ -87,19 +116,20 @@ public:
   bool operator!=(const Matrix3 & rhs) const;
 
   /**
-   * Destructor
+   * @brief Destructor.
    */
   ~Matrix3()
   {
   }
 
   /**
-   * Sets the matrix to the identity matrix.
+   * @brief Sets the matrix to the identity matrix.
    */
   void SetIdentity();
 
   /**
-   * Returns the contents of the matrix as an array of 9 floats.
+   * @brief Returns the contents of the matrix as an array of 9 floats.
+   *
    * The order of the values for a matrix is:
    *   xAxis.x yAxis.x zAxis.x
    *   xAxis.y yAxis.y zAxis.y
@@ -109,7 +139,8 @@ public:
   const float* AsFloat() const {return &mElements[0];}
 
   /**
-   * Returns the contents of the matrix as an array of 9 floats.
+   * @brief Returns the contents of the matrix as an array of 9 floats.
+   *
    * The order of the values for a matrix is:
    *   xAxis.x yAxis.x zAxis.x
    *   xAxis.y yAxis.y zAxis.y
@@ -119,34 +150,40 @@ public:
   float* AsFloat() {return &mElements[0];}
 
   /**
-   * Inverts the matrix.
+   * @brief Inverts the matrix.
+   *
    * @return true if successful
    */
   bool Invert();
 
   /**
-   * Swaps the rows to columns
+   * @brief Swaps the rows to columns
    * @return true
    */
   bool Transpose();
 
   /**
-   * Multiplies all elements of the matrix by the scale value
+   * @brief Multiplies all elements of the matrix by the scale value.
+   *
    * @param scale - the value by which to scale the whole matrix.
+
    */
   void Scale(float scale);
 
   /**
-   * Magnitude returns the average of the absolute values of the
-   * elements * 3. (The Magnitude of the unit matrix is therefore 1)
+   * @brief Magnitude returns the average of the absolute values of the
+   * elements * 3.
+   *
+   * (The Magnitude of the unit matrix is therefore 1)
    * @return the magnitude - always positive.
    */
   float Magnitude() const;
 
   /**
-   * If the matrix is invertible, then this method inverts, transposes
+   * @brief If the matrix is invertible, then this method inverts, transposes
    * and scales the matrix such that the resultant element values
    * average 1.
+   *
    * If the matrix is not invertible, then the matrix is left unchanged.
 
    * @return true if the matrix is invertible, otherwise false
@@ -154,7 +191,8 @@ public:
   bool ScaledInverseTranspose();
 
   /**
-   * Function to multiply two matrices and store the result onto third
+   * @brief Function to multiply two matrices and store the result onto third.
+   *
    * Use this method in time critical path as it does not require temporaries
    * @param result of the multiplication
    * @param lhs matrix, this can be same matrix as result
@@ -164,11 +202,12 @@ public:
 
 private:
 
-  float mElements[9];
+  float mElements[9]; ///< The elements of the matrix
 };
 
 /**
- * Print a 3x3 matrix.
+ * @brief Print a 3x3 matrix.
+ *
  * @param [in] o The output stream operator.
  * @param [in] matrix The matrix to print.
  * @return The output stream operator.

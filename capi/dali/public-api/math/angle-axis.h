@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -32,31 +32,37 @@ namespace Dali DALI_IMPORT_API
 struct Radian;
 
 /**
- * An angle & axis pair.
+ * @brief An angle & axis pair.
+ *
+ * This is slightly easier to understand than quaternions for handling rotations
+ * of objects. Both elements should be non-zero to correctly describe a rotation.
  */
 struct DALI_IMPORT_API AngleAxis
 {
   /**
-   * Create an angle-axis pair.
+   * @brief Create an angle-axis pair.
+   *
    */
   AngleAxis();
 
   /**
-   * Create an angle-axis pair.
+   * @brief Create an angle-axis pair.
+   *
    * @param[in] initialAngle The initial angle in degrees.
    * @param[in] initialAxis The initial axis.
    */
   AngleAxis( Degree initialAngle, Vector3 initialAxis );
 
   /**
-   * Create an angle-axis pair.
+   * @brief Create an angle-axis pair.
+   *
    * @param[in] initialAngle The initial angle in radians.
    * @param[in] initialAxis The initial axis.
    */
   AngleAxis( Radian initialAngle, Vector3 initialAxis );
 
-  Degree angle;
-  Vector3 axis;
+  Degree angle; ///< The angle in degrees
+  Vector3 axis; ///< The axis
 };
 
 } // namespace Dali

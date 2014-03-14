@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -35,7 +35,8 @@ class CustomActor;
 }
 
 /**
- * CustomActor is a base class for custom UI controls.
+ * @brief CustomActor is a base class for custom UI controls.
+ *
  * The implementation of the control must be supplied; see CustomActorImpl for more details.
  */
 class DALI_IMPORT_API CustomActor : public Actor
@@ -43,39 +44,48 @@ class DALI_IMPORT_API CustomActor : public Actor
 public:
 
   /**
-   * Create an uninitialized CustomActor handle. Only derived versions can be instantiated.
+   * @brief Create an uninitialized CustomActor handle.
+   *
+   * Only derived versions can be instantiated.
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   CustomActor();
 
   /**
-   * Downcast an Object handle to CustomActor. If handle points to a CustomActor the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to CustomActor.
+   *
+   * If handle points to a CustomActor the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to a CustomActor or an uninitialized handle
    */
   static CustomActor DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes do not contain member data.
    */
   virtual ~CustomActor();
 
   /**
-   * Retrieve the custom actor implementation.
+   * @brief Retrieve the custom actor implementation.
+   *
    * @return The implementation.
    */
   CustomActorImpl& GetImplementation();
 
   /**
-   * Retrieve the custom actor implementation.
+   * @brief Retrieve the custom actor implementation.
+   *
    * @return The implementation.
    */
   const CustomActorImpl& GetImplementation() const;
 
   /**
-   * Create an initialised CustomActor.
+   * @brief Create an initialised CustomActor.
+   *
    * @param[in] implementation The implementation for this custom actor.
    * @return A handle to a newly allocated Dali resource.
    */
@@ -89,7 +99,8 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used internally to create additional CustomActor handles.
+   * @brief This constructor is used internally to create additional CustomActor handles.
+   *
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   CustomActor(Internal::CustomActor* actor);

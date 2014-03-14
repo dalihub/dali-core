@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -34,8 +34,14 @@ namespace Dali DALI_IMPORT_API
 
 class PropertyNotification;
 
+/**
+ * @brief Signal type for Dali::PropertyNotification::NotifySignal().
+ */
 typedef SignalV2< void (PropertyNotification& source) > PropertyNotifySignalV2;
 
+/**
+ * @brief Function signature for Dali::PropertyNotification::NotifySignal() signal callbacks.
+ */
 typedef boost::function<void (PropertyNotification& source)> PropertyNotifyCallbackType;
 
 } // namespace Dali

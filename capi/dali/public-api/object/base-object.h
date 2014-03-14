@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -34,14 +34,15 @@ namespace Dali DALI_IMPORT_API
 class BaseHandle;
 
 /**
- * A base class for objects.
+ * @brief A base class for objects.
  */
 class BaseObject : public Dali::RefObject
 {
 public:
 
   /**
-   * Connects a void() functor to a specified signal.
+   * @brief Connects a void() functor to a specified signal.
+   *
    * @pre The signal must be available in this object.
    * @param [in] connectionTracker A connection tracker which can be used to disconnect.
    * @param [in] signalName Name of the signal to connect to.
@@ -74,22 +75,22 @@ public: // Not intended for application developers
 protected:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
    */
   BaseObject();
 
   /**
-   * A reference counted object may only be deleted by calling Unreference()
+   * @brief A reference counted object may only be deleted by calling Unreference().
    */
   virtual ~BaseObject();
 
   /**
-   * Registers the object as created with the Object registry
+   * @brief Registers the object as created with the Object registry.
    */
   void RegisterObject();
 
   /**
-   * Unregisters the object from Object registry.
+   * @brief Unregisters the object from Object registry.
    */
   void UnregisterObject();
 
@@ -104,18 +105,30 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline BaseObject& GetImplementation(Dali::BaseHandle& object)
+/**
+ * @brief Get the implementation of a handle.
+ *
+ * @param[in] handle The handle
+ * @return A reference to the object the handle points at.
+ */
+inline BaseObject& GetImplementation(Dali::BaseHandle& handle)
 {
-  DALI_ASSERT_ALWAYS( object && "BaseObject handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "BaseObject handle is empty" );
 
-  return object.GetBaseObject();
+  return handle.GetBaseObject();
 }
 
-inline const BaseObject& GetImplementation(const Dali::BaseHandle& object)
+/**
+ * @brief Get the implementation of a handle.
+ *
+ * @param[in] handle The handle
+ * @return A reference to the object the handle points at.
+ */
+inline const BaseObject& GetImplementation(const Dali::BaseHandle& handle)
 {
-  DALI_ASSERT_ALWAYS( object && "BaseObject handle is empty" );
+  DALI_ASSERT_ALWAYS( handle && "BaseObject handle is empty" );
 
-  return object.GetBaseObject();
+  return handle.GetBaseObject();
 }
 
 } // namespace Dali
@@ -123,4 +136,4 @@ inline const BaseObject& GetImplementation(const Dali::BaseHandle& object)
 /**
  * @}
  */
-#endif // __DALI_BASE_OBJECT_H__
+# endif // __DALI_BASE_OBJECT_H__

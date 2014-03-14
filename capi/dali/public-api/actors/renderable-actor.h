@@ -19,7 +19,7 @@
 
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -35,7 +35,7 @@ class RenderableActor;
 }
 
 /**
- * Face culling modes
+ * @brief Face culling modes.
  */
 enum CullFaceMode
 {
@@ -47,7 +47,7 @@ enum CullFaceMode
 
 
 /**
- * An base class for renderable actors
+ * @brief A base class for renderable actors.
  */
 class DALI_IMPORT_API RenderableActor : public Actor
 {
@@ -56,13 +56,16 @@ public:
   static const BlendingMode::Type DEFAULT_BLENDING_MODE; ///< default value is BlendingMode::AUTO
 
   /**
-   * Create an uninitialized actor.
+   * @brief Create an uninitialized actor.
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   RenderableActor();
 
   /**
-   * Downcast an Object handle to RenderableActor. If handle points to a RenderableActor the
+   * @brief Downcast an Object handle to RenderableActor.
+   *
+   * If handle points to a RenderableActor the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a RenderableActor or an uninitialized handle
@@ -70,7 +73,8 @@ public:
   static RenderableActor DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~RenderableActor();
@@ -81,7 +85,8 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Allows modification of an actors position in the depth sort algorithm.
+   * @brief Allows modification of an actors position in the depth sort algorithm.
+   *
    * The offset can be altered for each coplanar actor hence allowing an order of painting.
    * @pre The Actor has been initialized.
    * @param [in] depthOffset the offset to be given to the actor. Positive values pushing it further back.
@@ -89,7 +94,8 @@ public:
   void SetSortModifier(float depthOffset);
 
   /**
-   * Retrieves the offset used to modify an actors position in the depth sort algorithm.
+   * @brief Retrieves the offset used to modify an actors position in the depth sort algorithm.
+   *
    * The offset can be altered for each coplanar actor hence allowing an order of painting.
    * @pre The Actor has been initialized.
    * @return  the offset that has been given to the actor. Positive values pushing it further back.
@@ -97,19 +103,21 @@ public:
   float GetSortModifier() const;
 
   /**
-   * Set the face-culling mode for this actor.
+   * @brief Set the face-culling mode for this actor.
+   *
    * @param[in] mode The culling mode.
    */
   void SetCullFace(CullFaceMode mode);
 
   /**
-   * Retrieve the face-culling mode for this actor.
+   * @brief Retrieve the face-culling mode for this actor.
+   *
    * @return mode The culling mode.
    */
   CullFaceMode GetCullFace() const;
 
   /**
-   * Sets the blending mode.
+   * @brief Sets the blending mode.
    *
    * Possible values are: BlendingMode::OFF, BlendingMode::AUTO and BlendingMode::ON. Default is BlendingMode::AUTO.
    *
@@ -126,14 +134,14 @@ public:
   void SetBlendMode( BlendingMode::Type mode );
 
   /**
-   * Retrieves the blending mode.
+   * @brief Retrieves the blending mode.
    *
    * @return The blending mode, one of BlendingMode::OFF, BlendingMode::AUTO or BlendingMode::ON.
    */
   BlendingMode::Type GetBlendMode() const;
 
   /**
-   * Specify the pixel arithmetic used when the actor is blended.
+   * @brief Specify the pixel arithmetic used when the actor is blended.
    *
    * @param[in] srcFactorRgba Specifies how the red, green, blue, and alpha source blending factors are computed.
    * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
@@ -148,7 +156,7 @@ public:
   void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
 
   /**
-   * Specify the pixel arithmetic used when the actor is blended.
+   * @brief Specify the pixel arithmetic used when the actor is blended.
    *
    * @param[in] srcFactorRgb Specifies how the red, green, and blue source blending factors are computed.
    * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
@@ -170,7 +178,8 @@ public:
                      BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
 
   /**
-   * Query the pixel arithmetic used when the actor is blended.
+   * @brief Query the pixel arithmetic used when the actor is blended.
+   *
    * @param[out] srcFactorRgb Specifies how the red, green, blue, and alpha source blending factors are computed.
    * @param[out] destFactorRgb Specifies how the red, green, blue, and alpha destination blending factors are computed.
    * @param[out] srcFactorAlpha Specifies how the red, green, blue, and alpha source blending factors are computed.
@@ -180,14 +189,16 @@ public:
                      BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
 
   /**
-   * Specify the equation used when the actor is blended.
-   * @param[in] equationRgba The equation used for combining red, green, blue, and alpha components.
+   * @brief Specify the equation used when the actor is blended.
+   *
    * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
+   * @param[in] equationRgba The equation used for combining red, green, blue, and alpha components.
    */
   void SetBlendEquation( BlendingEquation::Type equationRgba );
 
   /**
-   * Specify the equation used when the actor is blended.
+   * @brief Specify the equation used when the actor is blended.
+   *
    * @param[in] equationRgb The equation used for combining red, green, and blue components.
    * @param[in] equationAlpha The equation used for combining the alpha component.
    * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
@@ -195,20 +206,23 @@ public:
   void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
 
   /**
-   * Query the equation used when the actor is blended.
+   * @brief Query the equation used when the actor is blended.
+   *
    * @param[out] equationRgb The equation used for combining red, green, and blue components.
    * @param[out] equationAlpha The equation used for combining the alpha component.
    */
   void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
 
   /**
-   * Specify the color used when the actor is blended; the default is Vector4::ZERO.
+   * @brief Specify the color used when the actor is blended; the default is Vector4::ZERO.
+   *
    * @param[in] color The blend color.
    */
   void SetBlendColor( const Vector4& color );
 
   /**
-   * Query the color used when the actor is blended.
+   * @brief Query the color used when the actor is blended.
+   *
    * @return The blend color.
    */
   const Vector4& GetBlendColor() const;
@@ -216,7 +230,8 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods
+   *
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL RenderableActor(Internal::RenderableActor* actor);

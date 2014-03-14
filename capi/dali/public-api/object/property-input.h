@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -36,74 +36,83 @@ class Matrix;
 class Quaternion;
 
 /**
- * An abstract interface for receiving property values.
+ * @brief An abstract interface for receiving property values.
  */
 class PropertyInput
 {
 public:
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~PropertyInput() = 0;
 
   /**
-   * Query the type of property input.
+   * @brief Query the type of property input.
+   *
    * @return The property type.
    */
   virtual Property::Type GetType() const = 0;
 
   /**
-   * Retrieve a boolean value.
+   * @brief Retrieve a boolean value.
+   *
    * @pre GetType() returns Property::BOOLEAN.
    * @return The boolean value.
    */
   virtual const bool& GetBoolean() const = 0;
 
   /**
-   * Retrieve a float value.
+   * @brief Retrieve a float value.
+   *
    * @pre GetType() returns Property::FLOAT.
    * @return The float value.
    */
   virtual const float& GetFloat() const = 0;
 
   /**
-   * Retrieve a Vector2 value.
+   * @brief Retrieve a Vector2 value.
+   *
    * @pre GetType() returns Property::VECTOR2.
    * @return The Vector2 value.
    */
   virtual const Vector2& GetVector2() const = 0;
 
   /**
-   * Retrieve a Vector3 value.
+   * @brief Retrieve a Vector3 value.
+   *
    * @pre GetType() returns Property::VECTOR3.
    * @return The Vector3 value.
    */
   virtual const Vector3& GetVector3() const = 0;
 
   /**
-   * Retrieve a Vector4 value.
+   * @brief Retrieve a Vector4 value.
+   *
    * @pre GetType() returns Property::VECTOR4.
    * @return The Vector4 value.
    */
   virtual const Vector4& GetVector4() const = 0;
 
   /**
-   * Retrieve a Matrix (3x3) value.
+   * @brief Retrieve a Matrix (3x3) value.
+   *
    * @pre GetType() returns Property::Matrix3.
    * @return The Matrix value.
    */
   virtual const Matrix3& GetMatrix3() const = 0;
 
   /**
-   * Retrieve a Matrix (4x4) value.
+   * @brief Retrieve a Matrix (4x4) value.
+   *
    * @pre GetType() returns Property::Matrix4.
    * @return The Matrix value.
    */
   virtual const Matrix& GetMatrix() const = 0;
 
   /**
-   * Retrieve a Quaternion value.
+   * @brief Retrieve a Quaternion value.
+   *
    * @pre GetType() returns Property::Quaternion.
    * @return The Quaternion value.
    */

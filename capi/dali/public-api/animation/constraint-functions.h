@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ANIMATION_MODULE
  * @{
  */
 
@@ -33,14 +33,16 @@ struct Vector4;
 class Quaternion;
 
 /**
- * Constraints can be used to adjust an Actor property, after animations have been applied.
+ * @brief Constraints can be used to adjust an Actor property, after animations have been applied.
+ *
  * A local-constraint function is based on local properties of the Actor.
  */
 namespace LocalConstraint DALI_IMPORT_API
 {
 
 /**
- * A function which constrains a Vector3 property, based on the local properties of an Actor.
+ * @brief A function which constrains a Vector3 property, based on the local properties of an Actor.
+ *
  * @param[in] size     The actor's current size.
  * @param[in] position The actor's current position.
  * @param[in] scale    The actor's current rotation.
@@ -55,7 +57,8 @@ typedef boost::function<Vector3 (const Vector3&    size,
                                  const Vector4&    color)> Vector3Function;
 
 /**
- * A function which constrains a Vector4 property, based on the local properties of an Actor.
+ * @brief A function which constrains a Vector4 property, based on the local properties of an Actor.
+ *
  * @param[in] size     The actor's current size.
  * @param[in] position The actor's current position.
  * @param[in] scale    The actor's current rotation.
@@ -70,7 +73,8 @@ typedef boost::function<Vector4 (const Vector3&    size,
                                  const Vector4&    color)> Vector4Function;
 
 /**
- * A function which constrains a Quaternion property, based on the local properties of an Actor.
+ * @brief A function which constrains a Quaternion property, based on the local properties of an Actor.
+ *
  * @param[in] size     The actor's current size.
  * @param[in] position The actor's current position.
  * @param[in] scale    The actor's current rotation.
@@ -85,7 +89,8 @@ typedef boost::function<Quaternion (const Vector3&    size,
                                     const Vector4&    color)> QuaternionFunction;
 
 /**
- * A function which constrains a boolean property, based on the local properties of an Actor.
+ * @brief A function which constrains a boolean property, based on the local properties of an Actor.
+ *
  * @param[in] size     The actor's current size.
  * @param[in] position The actor's current position.
  * @param[in] scale    The actor's current rotation.
@@ -102,13 +107,14 @@ typedef boost::function<bool (const Vector3&    size,
 } // LocalConstraint
 
 /**
- * A parent-constraint function is based on properties related to the Actor's parent.
+ * @brief A parent-constraint function is based on properties related to the Actor's parent.
  */
 namespace ParentConstraint DALI_IMPORT_API
 {
 
 /**
- * A function which constrains a Vector3 property, based on properties related to the Actor's parent.
+ * @brief A function which constrains a Vector3 property, based on properties related to the Actor's parent.
+ *
  * @param[in] current The current value of the property to be constrained.
  * @param[in] parentOrigin The actor's current parent-origin.
  * @param[in] anchorPoint The actor's current anchor-point.
@@ -127,7 +133,8 @@ typedef boost::function<Vector3 (const Vector3&    current,
                                  const Vector3&    parentScale)> Vector3Function;
 
 /**
- * A function which constrains a Vector4 property, based on properties related to the Actor's parent.
+ * @brief A function which constrains a Vector4 property, based on properties related to the Actor's parent.
+ *
  * @param[in] current The current value of the property to be constrained.
  * @param[in] parentOrigin The actor's current parent-origin.
  * @param[in] anchorPoint The actor's current anchor-point.
@@ -146,7 +153,8 @@ typedef boost::function<Vector4 (const Vector4&    current,
                                  const Vector3&    parentScale)> Vector4Function;
 
 /**
- * A function which constrains a Quaternion property, based on properties related to the Actor's parent.
+ * @brief A function which constrains a Quaternion property, based on properties related to the Actor's parent.
+ *
  * @param[in] parentOrigin The actor's current parent-origin.
  * @param[in] anchorPoint The actor's current anchor-point.
  * @param[in] parentSize The parent's current size.
@@ -164,7 +172,8 @@ typedef boost::function<Quaternion (const Quaternion& current,
                                     const Vector3&    parentScale)> QuaternionFunction;
 
 /**
- * A function which constrains a boolean property, based on properties related to the Actor's parent.
+ * @brief A function which constrains a boolean property, based on properties related to the Actor's parent.
+ *
  * @param[in] progress A progress value in the range 0->1, where 1 means that the constraint is fully applied.
  * @param[in] parentOrigin The actor's current parent-origin.
  * @param[in] anchorPoint The actor's current anchor-point.

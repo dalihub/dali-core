@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TEXT_MODULE
  * @{
  */
 
@@ -38,7 +38,7 @@ class Font;
 }
 
 /**
- * Class to encapsulate a font.
+ * @brief Encapsulates a font resource.
  * Fonts are managed by the font manager, which loads any new fonts requested by applications. The font
  * manager keeps a cache of the most recently used fonts, and if a new font is requested when the cache
  * is full it will delete an old one (if there is one not in use).
@@ -47,12 +47,12 @@ class Font;
  *
  * Fonts will be created from a font name (like courier or comic) and font size (specified in points).
  */
-
 class Font : public BaseHandle
 {
 public:
   /**
-   * Stores glyph's metrics.
+   * @brief Stores glyph's metrics.
+   *
    * <ul>
    *   <li>\e Advance. The distance between the glyph's current pen position and the pen's position of the next glyph.
    *   <li>\e Bearing. The horizontal top side bearing. Is the distance between the baseline and the top of the glyph.
@@ -64,49 +64,58 @@ public:
   {
   public:
     /**
-     * Default constructor.
+     * @brief Default constructor.
+     *
      * Creates the implentation instance.
      */
     Metrics();
 
     /**
-     * Destructor.
+     * @brief Destructor.
+     *
      * Destroyes the implementaiton instance.
      */
     virtual ~Metrics();
 
     /**
-     * Copy constructor.
+     * @brief Copy constructor.
+     *
      * @param [in] metrics Metrics to be copied.
      */
     Metrics( const Metrics& metrics );
 
     /**
-     * Assignment operator.
+     * @brief Assignment operator.
+     *
      * @param [in] metrics Metrics to be assigned.
+     * @return a reference to this
      */
     Metrics& operator=( const Metrics& metrics );
 
     /**
-     * Retrieves the advance metric.
+     * @brief Retrieves the advance metric.
+     *
      * @return the advance metric.
      */
     float GetAdvance() const;
 
     /**
-     * Retrieves the bearing metric.
+     * @brief Retrieves the bearing metric.
+     *
      * @return the bearing metric.
      */
     float GetBearing() const;
 
     /**
-     * Retrieves the width metric.
+     * @brief Retrieves the width metric.
+     *
      * @return the width metric.
      */
     float GetWidth() const;
 
     /**
-     * Retrieves the height metric.
+     * @brief Retrieves the height metric.
+     *
      * @return the height metric.
      */
     float GetHeight() const;
@@ -115,7 +124,9 @@ public:
     struct Impl;
 
     /**
-     * Constructor. Initialization with metrics data.
+     * @brief Constructor.
+     *
+     * Initialization with metrics data.
      * @param implementation Glyph's metrics.
      */
     Metrics( const Impl& implementation );
@@ -126,28 +137,36 @@ public:
 
 public:
   /**
-   * Create an empty Font. This can be initialised with Font::New(...)
+   * @brief Create an empty Font.
+   *
+   * This can be initialised with Font::New(...)
    */
   Font();
 
   /**
-   * Create an initialised Font with the given parameters. If no parameters are given, system defaults are used.
+   * @brief Create an initialised Font with the given parameters. If no parameters are given, system defaults are used.
+   *
    * @param [in] fontParameters The font parameters.
    * @return A handle to a newly allocated font.
    */
   static Font New( const FontParameters& fontParameters = DEFAULT_FONT_PARAMETERS );
 
   /**
-   * Downcast an Object handle to Font handle. If handle points to a Font object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Font handle.
+   *
+   * If handle points to a Font object the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to a Font object or an uninitialized handle
    */
   static Font DownCast( BaseHandle handle );
 
   /**
-   * Try to detect font for text.
+   * @brief Try to detect font for text.
+   *
    * @param [in] text displayed text
+   * @return string containing a font name, or an empty string.
    */
   static const std::string GetFamilyForText(const std::string& text);
 
@@ -157,13 +176,16 @@ public:
   static const std::string GetFamilyForText(const Text& text);
 
   /**
-   * Try to detect font for character.
+   * @brief Try to detect font for character.
+   *
    * @param [in] character displayed character
+   * @return string containing a font name, or an empty string.
    */
   static const std::string GetFamilyForText(const Character& character);
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Font();
@@ -174,7 +196,8 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Convert a PixelSize from CapsHeight to it's equivalent LineHeight.
+   * @brief Convert a PixelSize from CapsHeight to it's equivalent LineHeight.
+   *
    * @param [in] fontFamily   The family's name of the font requested
    * @param [in] fontStyle The style of the font requested.
    * @param [in] capsHeight The size of the font ascenders required in pixels
@@ -183,7 +206,7 @@ public:
   static PixelSize GetLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight);
 
   /**
-   * The mode for GetInstalledFonts()
+   * @brief The mode for GetInstalledFonts()
    */
   enum FontListMode
   {
@@ -193,14 +216,16 @@ public:
   };
 
   /**
-   * Gets the list of available fonts.
+   * @brief Gets the list of available fonts.
+   *
    * @param mode which fonts to include in the list, default is LIST_SYSTEM_FONTS
    * @return a list of font family names
    */
   static std::vector<std::string> GetInstalledFonts( FontListMode mode = LIST_SYSTEM_FONTS );
 
   /**
-   * Returns the width of the area needed to display some text if the text is textHeightPx pixels high.
+   * @brief Returns the width of the area needed to display some text if the text is textHeightPx pixels high.
+   *
    * Note that the text is not processed in any way before this calculation is performed (no stretching/scaling)
    * @param [in] text           The text to measure
    * @param [in] textHeightPx   The text height required
@@ -214,7 +239,8 @@ public:
   float MeasureTextWidth(const Text& text, float textHeightPx) const;
 
   /**
-   * Returns the width of the area needed to display the character if the text is textHeightPx pixels high.
+   * @brief Returns the width of the area needed to display the character if the text is textHeightPx pixels high.
+   *
    * Note that the character is not processed in any way before this calculation is performed (no stretching/scaling)
    * @param [in] character      The character to measure
    * @param [in] textHeightPx   The text height required
@@ -223,7 +249,8 @@ public:
   float MeasureTextWidth(const Character& character, float textHeightPx) const;
 
   /**
-   * Returns the height of the area needed to display the text if the text is textWidthPx pixels wide.
+   * @brief Returns the height of the area needed to display the text if the text is textWidthPx pixels wide.
+   *
    * Note that the text is not processed in any way before this calculation is performed (no stretching/scaling)
    * @param [in] text           The text to measure
    * @param [in] textWidthPx    The text width required
@@ -237,7 +264,8 @@ public:
   float MeasureTextHeight(const Text& text, float textWidthPx) const;
 
   /**
-   * Returns the height of the area needed to display the character if the text is textWidthPx pixels wide.
+   * @brief Returns the height of the area needed to display the character if the text is textWidthPx pixels wide.
+   *
    * Note that the character is not processed in any way before this calculation is performed (no stretching/scaling)
    * @param [in] character      The character to measure
    * @param [in] textWidthPx    The text width required
@@ -246,7 +274,8 @@ public:
   float MeasureTextHeight(const Character& character, float textWidthPx) const;
 
   /**
-   * Measure the natural size of a text string, as displayed in this font.
+   * @brief Measure the natural size of a text string, as displayed in this font.
+   *
    * @param[in] text The text string to measure.
    * @return The natural size of the text.
    */
@@ -258,45 +287,55 @@ public:
   Vector3 MeasureText(const Text& text) const;
 
   /**
-   * Measure the natural size of a character, as displayed in this font.
+   * @brief Measure the natural size of a character, as displayed in this font.
+   *
    * @param[in] character The character to measure.
    * @return The natural size of the character.
    */
   Vector3 MeasureText(const Character& character) const;
 
   /**
-   * Tells whether text is supported with font.
-   * @param [in] text displayed text
+   * @brief Tells whether text is supported with font.
+   *
+   * @param [in] text glyphs to test
+   * @return true if the glyphs are all supported by the font
    */
   bool AllGlyphsSupported(const std::string& text) const;
 
   /**
    * @copydoc AllGlyphsSupported(const std::string& text) const
+   * @param [in] text glyphs to test
+   * @return true if the glyphs are all supported by the font
    */
   bool AllGlyphsSupported(const Text& text) const;
 
   /**
-   * Tells whether character is supported with font.
-   * @param [in] character displayed character.
+   * @brief Tells whether character is supported with font.
+   *
+   * @param [in] character The character to test
+   * @return true if the glyph is supported by the font
    */
   bool AllGlyphsSupported(const Character& character) const;
 
   /**
-   * Retrieves the line height.
+   * @brief Retrieves the line height.
+   *
    * The line height is the distance between two consecutive base lines.
    * @return The line height.
    */
   float GetLineHeight() const;
 
   /**
-   * Retrieves the ascender metric.
+   * @brief Retrieves the ascender metric.
+   *
    * The ascender metric is the distance between the base line and the top of the highest character in the font.
    * @return The ascender metric.
    */
   float GetAscender() const;
 
   /**
-   * Retrieves the underline's thickness.
+   * @brief Retrieves the underline's thickness.
+   *
    *
    * It includes the vertical pad adjust used to add effects like glow or shadow.
    *
@@ -305,7 +344,8 @@ public:
   float GetUnderlineThickness() const;
 
   /**
-   * Retrieves the underline's position.
+   * @brief Retrieves the underline's position.
+   *
    *
    * It includes the vertical pad adjust used to add effects like glow or shadow.
    *
@@ -314,7 +354,8 @@ public:
   float GetUnderlinePosition() const;
 
   /**
-   * Retrieves glyph metrics.
+   * @brief Retrieves glyph metrics.
+   *
    * @see Font::Metrics.
    * @param [in] character The character which its metrics are going to be retrieved.
    * @return The glyph metrics.
@@ -322,51 +363,59 @@ public:
   Metrics GetMetrics(const Character& character) const;
 
   /**
-   * Retrieves whether this font was created with a default system font.
+   * @brief Retrieves whether this font was created with a default system font.
+   *
    * @return \e true if this font was created as a default system font.
    */
   bool IsDefaultSystemFont() const;
 
   /**
-   * Retrieves whether this font was created with a default system size.
+   * @brief Retrieves whether this font was created with a default system size.
+   *
    * @return \e true if this font was created as a default system size.
    */
   bool IsDefaultSystemSize() const;
 
   /**
-   * Gets the name of the font's family.
+   * @brief Gets the name of the font's family.
+   *
    * @return The name of the font's family.
    */
   const std::string& GetName() const;
 
   /**
-   * Gets the font's style.
+   * @brief Gets the font's style.
+   *
    * @return The font's style.
    */
   const std::string& GetStyle() const;
 
   /**
-   * Return font size in points.
+   * @brief Return font size in points.
+   *
    * @return size in points
    */
   float GetPointSize() const;
 
   /**
-   * Return font size in pixels.
+   * @brief Return font size in pixels.
+   *
    * @return size in pixels
    */
   unsigned int GetPixelSize() const;
 
   /**
-   * Retrieves the size of the font in pixels from a given size in points.
+   * @brief Retrieves the size of the font in pixels from a given size in points.
+   *
    * @param[in] pointSize Size of the font in points.
    * @return size of the font in pixels.
    */
   static unsigned int PointsToPixels( float pointSize );
 
   /**
-   * Retrieves the size of the font in points from a given size in pixels
+   * @brief Retrieves the size of the font in points from a given size in pixels
    * @param[in] pixelsSize Size of the font in pixels.
+   *
    * @return size of the font in points.
    */
   static float PixelsToPoints( unsigned int pixelsSize );
@@ -374,7 +423,8 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods
+   *
    * @param [in] font A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Font(Internal::Font* font);

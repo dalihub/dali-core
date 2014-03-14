@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_GEOMETRY_MODULE
  * @{
  */
 
@@ -39,8 +39,10 @@ class AnimatableMesh;
 }
 
 /**
- * Represents a vertex in an AnimatableMesh. It is used by AnimatableMesh
- * to offer an array interface for setting properties:
+ * @brief Represents a vertex in an AnimatableMesh.
+ *
+ * It is used by AnimatableMesh to offer an array interface for
+ * setting properties:
  *
  * @code
  * AnimatableMesh mesh = AnimatableMesh(numVerts, faces);
@@ -57,42 +59,47 @@ public:
   static const Property::Index TEXTURE_COORDS;  ///< Property 2, name prefix "texture-coords-",  type VECTOR2
 
   /**
-   * Destructor
+   * @brief Destructor
    */
   ~AnimatableVertex();
 
   /**
-   * Set the position of the vertex.
+   * @brief Set the position of the vertex.
+   *
    * @param[in] position (note, -0.5 - +0.5 are inside the actor's boundaries)
    */
   void SetPosition(const Vector3& position);
 
   /**
-   * Set the vertex color
+   * @brief Set the vertex color.
    * @param[in] color The vertex color
    */
   void SetColor(const Vector4& color);
 
   /**
-   * Set the texture coordinates
+   * @brief Set the texture coordinates.
+   *
    * @param[in] textureCoords The texture coordinates
    */
   void SetTextureCoords(const Vector2& textureCoords);
 
   /**
-   * Get the current position of the vertex.
+   * @brief Get the current position of the vertex.
+   *
    * @return position
    */
   Vector3 GetCurrentPosition();
 
   /**
-   * Get the current vertex color
+   * @brief Get the current vertex color.
+   *
    * @return The vertex color
    */
   Vector4 GetCurrentColor();
 
   /**
-   * Get the current texture coordinates
+   * @brief Get the current texture coordinates.
+   *
    * @return textureCoords The texture coordinates
    */
   Vector2 GetCurrentTextureCoords();
@@ -102,18 +109,19 @@ private:
   friend class Dali::AnimatableMesh;
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param[in] vertex The index of the vertex in the parent mesh
    * @param[in] mesh   The parent mesh
    */
   AnimatableVertex( unsigned int vertex, AnimatableMesh mesh );
 
   /**
-   * Undefined Copy Constructor
+   * @brief Undefined Copy Constructor
    */
   AnimatableVertex(const AnimatableVertex& vertex);
 
-  int mVertex; //< The index of this vertex in the parent mesh
+  int mVertex; ///< The index of this vertex in the parent mesh
   Internal::AnimatableMesh& mMesh;  ///< The parent mesh
 };
 

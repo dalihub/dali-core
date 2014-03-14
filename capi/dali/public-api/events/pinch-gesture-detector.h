@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_EVENTS_MODULE
  * @{
  */
 
@@ -37,8 +37,11 @@ class PinchGestureDetector;
 struct PinchGesture;
 
 /**
- * This class looks for pinching gestures involving two touches.  It tries to detect when the user moves two
- * touch points towards or away from each other.  Please see PinchGesture for more information.
+ * @brief This class looks for pinching gestures involving two touches.
+ *
+ * It tries to detect when the user moves two touch points towards or
+ * away from each other.  Please see PinchGesture for more
+ * information.
  *
  * The application programmer can use this gesture detector as follows:
  * @code
@@ -53,27 +56,34 @@ class PinchGestureDetector : public GestureDetector
 {
 public: // Typedefs
 
+  /**
+   * @brief Signal type.
+   */
   typedef SignalV2< void (Actor, PinchGesture) > DetectedSignalV2;
 
   //Signal Names
-  static const char* const SIGNAL_PINCH_DETECTED;
+  static const char* const SIGNAL_PINCH_DETECTED; ///< name "pinch-detected"
 
 public: // Creation & Destruction
 
   /**
-   * Create an uninitialized PinchGestureDetector; this can be initialized with PinchGestureDetector::New()
+   * @brief Create an uninitialized PinchGestureDetector; this can be initialized with PinchGestureDetector::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   PinchGestureDetector();
 
-  /*
-   * Create an initialized PinchGestureDetector.
+  /**
+   * @brief Create an initialized PinchGestureDetector.
+   *
    * @return A handle to a newly allocated Dali resource.
    */
   static PinchGestureDetector New();
 
   /**
-   * Downcast an Object handle to PinchGestureDetector handle. If handle points to a PinchGestureDetector object the
+   * @brief Downcast an Object handle to PinchGestureDetector handle.
+   *
+   * If handle points to a PinchGestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a PinchGestureDetector object or an uninitialized handle
@@ -81,7 +91,8 @@ public: // Creation & Destruction
   static PinchGestureDetector DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~PinchGestureDetector();
@@ -94,7 +105,8 @@ public: // Creation & Destruction
 public: // Signals
 
   /**
-   * This signal is emitted when the pinch gesture is detected on the attached actor.
+   * @brief This signal is emitted when the pinch gesture is detected on the attached actor.
+   *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName(Actor actor, PinchGesture gesture);
@@ -107,7 +119,8 @@ public: // Signals
 public: // Not intended for Application developers
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in]  internal  A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL PinchGestureDetector(Internal::PinchGestureDetector* internal);

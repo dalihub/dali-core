@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_COMMON_MODULE
  * @{
  */
 
@@ -27,7 +27,7 @@
 #include <cstdio>
 
 
-/**
+/*
  * Definitions for shared library support
  *
  * If a library is configured with --enable-exportall or --enable-debug
@@ -48,8 +48,11 @@
 #    define DALI_INTERNAL   __attribute__ ((visibility ("hidden")))
 #  endif
 #else
+/** Visibility attribute to show method definitions */
 #  define DALI_EXPORT_API
+/** Visibility attribute to show declarations */
 #  define DALI_IMPORT_API
+/** Visibility attribute to hide declarations */
 #  define DALI_INTERNAL
 #endif
 
@@ -75,11 +78,15 @@
 
 #endif
 
+/**
+ * @brief The DALi namespace
+ */
 namespace Dali
 {
 
 /**
- * Method to log assertion message in DALI_ASSERT_ALWAYS macro below
+ * @brief Method to log assertion message in DALI_ASSERT_ALWAYS macro below.
+ *
  * @param[in] condition The assertion condition
  * @param[in] file The file in which the assertion occurred
  * @param[in] line The line number at which the assertion occured
@@ -87,27 +94,30 @@ namespace Dali
 DALI_IMPORT_API void DaliAssertMessage(const char* condition, const char* file, int line);
 
 /**
- * Exception class for Dali Core library - Raised by assertions in codebase.
+ * @brief Exception class for Dali Core library - Raised by assertions in codebase.
  */
 class DALI_IMPORT_API DaliException
 {
 public:
   /**
-   * Constructor. Will always display a backtrace when raised in a debug build.
+   * @brief Constructor.
+   *
+   * Will always display a backtrace when raised in a debug build.
    *
    * @param[in] location  - the location of the assertion
    * @param[in] condition - The assertion condition
    */
   DALI_IMPORT_API DaliException(const char *location, const char* condition);
 
-  std::string mLocation;
-  std::string mCondition;
+  std::string mLocation;  ///< Location in code of the assertion
+  std::string mCondition; ///< The assertion string
 };
 
 }// Dali
 
 /**
- * An invariant concurrent assertion to ensure its argument always evaluates TRUE
+ * @brief An invariant concurrent assertion to ensure its argument always evaluates TRUE.
+ *
  * Use this for rules that must always be true regardless of build options.
  * For example, Actor must only ever have one parent.
  * To be clear, this test remains compiled into release builds that are deployed
@@ -133,7 +143,8 @@ public:
   }\
 
 /**
- * An invariant concurrent assertion to ensure its argument evaluates TRUE in debug builds
+ * @brief An invariant concurrent assertion to ensure its argument evaluates TRUE in debug builds.
+ *
  * Use this to sanity check algorithms and prevent internal programming errors
  */
 #if defined(DEBUG_ENABLED)

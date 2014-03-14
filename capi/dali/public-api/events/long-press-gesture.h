@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_EVENTS_MODULE
  * @{
  */
 
@@ -30,8 +30,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * A LongPressGesture is emitted when the user touches and holds the screen with the stated number of
- * fingers.
+ * @brief A LongPressGesture is emitted when the user touches and holds the screen with the stated number of fingers.
+ *
  * This gesture can be in one of two states, when the long-press gesture is first detected: "Started";
  * and when the long-press gesture ends: "Finished".
  *
@@ -44,42 +44,45 @@ struct LongPressGesture : public Gesture
   // Construction & Destruction
 
   /**
-   * Constructor
+   * @brief Constructor
+   *
    * @param[in] state  The state of the gesture
    */
   LongPressGesture(Gesture::State state);
 
   /**
-   * Copy constructor
+   * @brief Copy constructor
    */
   LongPressGesture( const LongPressGesture& rhs );
 
   /**
-   * Assignment operator
+   * @brief Assignment operator
    */
   LongPressGesture& operator=( const LongPressGesture& rhs );
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor
    */
   virtual ~LongPressGesture();
 
   // Data
 
   /**
-   * The number of touch points in this long press gesture, i.e. the number of fingers the user had
+   * @brief The number of touch points in this long press gesture, i.e. the number of fingers the user had
    * on the screen to generate the long press gesture.
    */
   unsigned int numberOfTouches;
 
   /**
-   * This is the point, in screen coordinates, where the long press occurred.
+   * @brief This is the point, in screen coordinates, where the long press occurred.
+   *
    * If a multi-touch long press, then this is the centroid of all the touch points.
    */
   Vector2 screenPoint;
 
   /**
-   * This is the point, in local actor coordinates, where the long press occurred.
+   * @brief This is the point, in local actor coordinates, where the long press occurred.
+   *
    * If a multi-touch long press, then this is the centroid of all the touch points.
    * @return The point where tap has occurred (in local actor coordinates).
    */

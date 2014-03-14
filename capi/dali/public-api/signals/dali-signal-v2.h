@@ -18,8 +18,39 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SIGNALS_MODULE
  * @{
+ *
+ * @section CAPI_DALI_SIGNALS_MODULE_CONNECTION Connecting signals to C++ member functions
+ * The class should implement Dali::ConnectionTrackerInterface, or inherit from Dali::ConnectionTracker.
+ * This enforces automatic disconnection when an object is destroyed, so you don't have
+ * to manually disconnect from signals.
+ *
+ * Alternatively, you can use a Dali::SlotDelegate if you don't want to inherit.
+ *
+ * E.g:
+ * @code
+ * class MyClass : public ConnectionTracker
+ * {
+ *
+ *   void Callback( Actor actor, const TouchEvent& event )
+ *   {
+ *     ...
+ *   }
+ *
+ *   void Init()
+ *   {
+ *     Actor actor = Actor::New();
+ *
+ *     actor.TouchedSignal().Connect( this, &MyClass::Callback );
+ *   }
+ *
+ *   ~MyClass()
+ *   {
+ *     // ConnectionTracker base class automatically disconnects
+ *   }
+ * }
+ * @endcode
  */
 
 // INTERNAL INCLUDES
@@ -32,14 +63,16 @@
 namespace Dali DALI_IMPORT_API
 {
 
-// This is to allow Signal<void()> style syntax
+/**
+ * @brief Base Template class to provide signals.
+ */
 template< typename _Signature >
 class SignalV2
 {
 };
 
 /**
- * A template for Signals with no parameters or return value.
+ * @brief A template for Signals with no parameters or return value.
  */
 template <>
 class SignalV2< void () >
@@ -47,21 +80,22 @@ class SignalV2< void () >
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
    */
   SignalV2()
   {
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
    */
   ~SignalV2()
   {
   }
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -70,7 +104,8 @@ public:
   }
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -79,7 +114,8 @@ public:
   }
 
   /**
-   * Connect a function.
+   * @brief Connect a function.
+   *
    * @param[in] func The function to connect.
    */
   void Connect( void (*func)() )
@@ -88,7 +124,8 @@ public:
   }
 
   /**
-   * Disconnect a function.
+   * @brief Disconnect a function.
+   *
    * @param[in] func The function to disconnect.
    */
   void Disconnect( void (*func)() )
@@ -97,7 +134,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -108,7 +146,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -119,7 +158,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -130,7 +170,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -141,7 +182,8 @@ public:
   }
 
   /**
-   * Connect a function object.
+   * @brief Connect a function object.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -152,7 +194,8 @@ public:
   }
 
   /**
-   * Connect a function object using FunctorDelegate.
+   * @brief Connect a function object using FunctorDelegate.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -162,7 +205,7 @@ public:
   }
 
   /**
-   * Emit the signal.
+   * @brief Emit the signal.
    */
   void Emit()
   {
@@ -177,11 +220,11 @@ private:
 private:
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  BaseSignal mImpl;
+  BaseSignal mImpl; ///< The base signal implementation
 };
 
 /**
- * A template for Signals with no parameters and a return value.
+ * @brief A template for Signals with no parameters and a return value.
  */
 template < typename Ret >
 class SignalV2< Ret() >
@@ -189,21 +232,22 @@ class SignalV2< Ret() >
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
    */
   SignalV2()
   {
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
    */
   ~SignalV2()
   {
   }
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -212,7 +256,8 @@ public:
   }
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -220,7 +265,8 @@ public:
     return mImpl.GetConnectionCount();
   }
   /**
-   * Connect a function.
+   * @brief Connect a function.
+   *
    * @param[in] func The function to connect.
    */
   void Connect( Ret (*func)() )
@@ -229,7 +275,8 @@ public:
   }
 
   /**
-   * Disconnect a function.
+   * @brief Disconnect a function.
+   *
    * @param[in] func The function to disconnect.
    */
   void Disconnect( Ret (*func)() )
@@ -238,7 +285,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -249,7 +297,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -260,7 +309,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -271,7 +321,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -282,7 +333,8 @@ public:
   }
 
   /**
-   * Connect a function object.
+   * @brief Connect a function object.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -293,7 +345,8 @@ public:
   }
 
   /**
-   * Connect a function object using FunctorDelegate.
+   * @brief Connect a function object using FunctorDelegate.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -303,7 +356,8 @@ public:
   }
 
   /**
-   * Emit the signal.
+   * @brief Emit the signal.
+   *
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
    */
   Ret Emit()
@@ -319,11 +373,11 @@ private:
 private:
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  BaseSignal mImpl;
+  BaseSignal mImpl; ///< Implementation
 };
 
 /**
- * A template for Signals with 1 parameter.
+ * @brief A template for Signals with 1 parameter.
  */
 template < typename Arg0 >
 class SignalV2< void ( Arg0 ) >
@@ -331,21 +385,22 @@ class SignalV2< void ( Arg0 ) >
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
    */
   SignalV2()
   {
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
    */
   ~SignalV2()
   {
   }
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -354,7 +409,8 @@ public:
   }
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -362,7 +418,8 @@ public:
     return mImpl.GetConnectionCount();
   }
   /**
-   * Connect a function.
+   * @brief Connect a function.
+   *
    * @param[in] func The function to connect.
    */
   void Connect( void (*func)( Arg0 arg0 ) )
@@ -371,7 +428,8 @@ public:
   }
 
   /**
-   * Disconnect a function.
+   * @brief Disconnect a function.
+   *
    * @param[in] func The function to disconnect.
    */
   void Disconnect( void (*func)( Arg0 arg0 ) )
@@ -380,7 +438,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -391,7 +450,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -402,7 +462,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -413,7 +474,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -424,7 +486,8 @@ public:
   }
 
   /**
-   * Connect a function object.
+   * @brief Connect a function object.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -435,7 +498,8 @@ public:
   }
 
   /**
-   * Connect a function object using FunctorDelegate.
+   * @brief Connect a function object using FunctorDelegate.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -445,7 +509,8 @@ public:
   }
 
   /**
-   * Emit the signal.
+   * @brief Emit the signal.
+   *
    * @param[in] arg0 The first value to pass to callbacks.
    */
   void Emit( Arg0 arg0 )
@@ -461,11 +526,11 @@ private:
 private:
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  BaseSignal mImpl;
+  BaseSignal mImpl; ///< Implementation
 };
 
 /**
- * A template for Signals with 1 parameter and a return value.
+ * @brief A template for Signals with 1 parameter and a return value.
  */
 template < typename Ret, typename Arg0 >
 class SignalV2< Ret( Arg0 ) >
@@ -473,21 +538,22 @@ class SignalV2< Ret( Arg0 ) >
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
    */
   SignalV2()
   {
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
    */
   ~SignalV2()
   {
   }
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -496,7 +562,8 @@ public:
   }
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -504,7 +571,8 @@ public:
     return mImpl.GetConnectionCount();
   }
   /**
-   * Connect a function.
+   * @brief Connect a function.
+   *
    * @param[in] func The function to connect.
    */
   void Connect( Ret (*func)( Arg0 arg0 ) )
@@ -513,7 +581,8 @@ public:
   }
 
   /**
-   * Disconnect a function.
+   * @brief Disconnect a function.
+   *
    * @param[in] func The function to disconnect.
    */
   void Disconnect( Ret (*func)( Arg0 arg0 ) )
@@ -522,7 +591,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -533,7 +603,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -544,7 +615,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -555,7 +627,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -566,7 +639,8 @@ public:
   }
 
   /**
-   * Connect a function object.
+   * @brief Connect a function object.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -577,7 +651,8 @@ public:
   }
 
   /**
-   * Connect a function object using FunctorDelegate.
+   * @brief Connect a function object using FunctorDelegate.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -587,7 +662,8 @@ public:
   }
 
   /**
-   * Emit the signal.
+   * @brief Emit the signal.
+   *
    * @param[in] arg0 The first value to pass to callbacks.
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
    */
@@ -604,11 +680,12 @@ private:
 private:
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  BaseSignal mImpl;
+  BaseSignal mImpl; ///< Implementation
 };
 
 /**
- * A template for Signals with 2 parameters.
+ * @brief A template for Signals with 2 parameters.
+ *
  */
 template < typename Arg0, typename Arg1 >
 class SignalV2< void ( Arg0, Arg1 ) >
@@ -616,21 +693,24 @@ class SignalV2< void ( Arg0, Arg1 ) >
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
+   *
    */
   SignalV2()
   {
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
+   *
    */
   ~SignalV2()
   {
   }
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -639,7 +719,8 @@ public:
   }
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -647,7 +728,8 @@ public:
     return mImpl.GetConnectionCount();
   }
   /**
-   * Connect a function.
+   * @brief Connect a function.
+   *
    * @param[in] func The function to connect.
    */
   void Connect( void (*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -656,7 +738,8 @@ public:
   }
 
   /**
-   * Disconnect a function.
+   * @brief Disconnect a function.
+   *
    * @param[in] func The function to disconnect.
    */
   void Disconnect( void (*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -665,7 +748,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -676,7 +760,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -687,7 +772,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -698,7 +784,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -709,7 +796,8 @@ public:
   }
 
   /**
-   * Connect a function object.
+   * @brief Connect a function object.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -720,7 +808,8 @@ public:
   }
 
   /**
-   * Connect a function object using FunctorDelegate.
+   * @brief Connect a function object using FunctorDelegate.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -730,7 +819,8 @@ public:
   }
 
   /**
-   * Emit the signal.
+   * @brief Emit the signal.
+   *
    * @param[in] arg0 The first value to pass to callbacks.
    * @param[in] arg1 The second value to pass to callbacks.
    */
@@ -747,11 +837,11 @@ private:
 private:
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  BaseSignal mImpl;
+  BaseSignal mImpl; ///< Implementation
 };
 
 /**
- * A template for Signals with 2 parameters and a return value.
+ * @brief A template for Signals with 2 parameters and a return value.
  */
 template < typename Ret, typename Arg0, typename Arg1 >
 class SignalV2< Ret( Arg0, Arg1 ) >
@@ -759,21 +849,22 @@ class SignalV2< Ret( Arg0, Arg1 ) >
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
    */
   SignalV2()
   {
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
    */
   ~SignalV2()
   {
   }
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -782,7 +873,8 @@ public:
   }
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -790,7 +882,7 @@ public:
     return mImpl.GetConnectionCount();
   }
   /**
-   * Connect a function.
+   * @brief Connect a function.
    * @param[in] func The function to connect.
    */
   void Connect( Ret (*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -799,7 +891,8 @@ public:
   }
 
   /**
-   * Disconnect a function.
+   * @brief Disconnect a function.
+   *
    * @param[in] func The function to disconnect.
    */
   void Disconnect( Ret (*func)( Arg0 arg0, Arg1 arg1 ) )
@@ -808,7 +901,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -819,7 +913,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -830,7 +925,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -841,7 +937,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -852,7 +949,8 @@ public:
   }
 
   /**
-   * Connect a function object.
+   * @brief Connect a function object.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -863,7 +961,8 @@ public:
   }
 
   /**
-   * Connect a function object using FunctorDelegate.
+   * @brief Connect a function object using FunctorDelegate.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -873,7 +972,8 @@ public:
   }
 
   /**
-   * Emit the signal.
+   * @brief Emit the signal.
+   *
    * @param[in] arg0 The first value to pass to callbacks.
    * @param[in] arg1 The second value to pass to callbacks.
    * @return The value returned by the last callback, or a default constructed value if no callbacks are connected.
@@ -891,11 +991,11 @@ private:
 private:
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  BaseSignal mImpl;
+  BaseSignal mImpl; ///< Implementation
 };
 
 /**
- * A template for Signals with 3 parameters.
+ * @brief A template for Signals with 3 parameters.
  */
 template < typename Arg0, typename Arg1, typename Arg2 >
 class SignalV2< void ( Arg0, Arg1, Arg2 ) >
@@ -903,21 +1003,22 @@ class SignalV2< void ( Arg0, Arg1, Arg2 ) >
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
    */
   SignalV2()
   {
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
    */
   ~SignalV2()
   {
   }
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -926,7 +1027,8 @@ public:
   }
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -934,7 +1036,8 @@ public:
     return mImpl.GetConnectionCount();
   }
   /**
-   * Connect a function.
+   * @brief Connect a function.
+   *
    * @param[in] func The function to connect.
    */
   void Connect( void (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -943,7 +1046,8 @@ public:
   }
 
   /**
-   * Disconnect a function.
+   * @brief Disconnect a function.
+   *
    * @param[in] func The function to disconnect.
    */
   void Disconnect( void (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -952,7 +1056,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -963,7 +1068,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -974,7 +1080,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -985,7 +1092,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -996,7 +1104,8 @@ public:
   }
 
   /**
-   * Connect a function object.
+   * @brief Connect a function object.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -1007,7 +1116,8 @@ public:
   }
 
   /**
-   * Connect a function object using FunctorDelegate.
+   * @brief Connect a function object using FunctorDelegate.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -1017,7 +1127,8 @@ public:
   }
 
   /**
-   * Emit the signal.
+   * @brief Emit the signal.
+   *
    * @param[in] arg0 The first value to pass to callbacks.
    * @param[in] arg1 The second value to pass to callbacks.
    * @param[in] arg2 The third value to pass to callbacks.
@@ -1035,11 +1146,11 @@ private:
 private:
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  BaseSignal mImpl;
+  BaseSignal mImpl; ///< Implementation
 };
 
 /**
- * A template for Signals with 2 parameters and a return value.
+ * @brief A template for Signals with 2 parameters and a return value.
  */
 template < typename Ret, typename Arg0, typename Arg1, typename Arg2 >
 class SignalV2< Ret( Arg0, Arg1, Arg2 ) >
@@ -1047,21 +1158,22 @@ class SignalV2< Ret( Arg0, Arg1, Arg2 ) >
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
    */
   SignalV2()
   {
   }
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
    */
   ~SignalV2()
   {
   }
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const
@@ -1070,7 +1182,8 @@ public:
   }
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const
@@ -1079,7 +1192,8 @@ public:
   }
 
   /**
-   * Connect a function.
+   * @brief Connect a function.
+   *
    * @param[in] func The function to connect.
    */
   void Connect( Ret (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1088,7 +1202,8 @@ public:
   }
 
   /**
-   * Disconnect a function.
+   * @brief Disconnect a function.
+   *
    * @param[in] func The function to disconnect.
    */
   void Disconnect( Ret (*func)( Arg0 arg0, Arg1 arg1, Arg2 arg2 ) )
@@ -1097,7 +1212,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to connect.
    */
@@ -1108,7 +1224,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] obj An object which must implement the ConnectionTrackerInterface.
    * @param[in] func The member function to disconnect.
    */
@@ -1119,7 +1236,8 @@ public:
   }
 
   /**
-   * Connect a member function.
+   * @brief Connect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to connect.
    */
@@ -1130,7 +1248,8 @@ public:
   }
 
   /**
-   * Disconnect a member function.
+   * @brief Disconnect a member function.
+   *
    * @param[in] delegate A slot delegate.
    * @param[in] func The member function to disconnect.
    */
@@ -1141,7 +1260,8 @@ public:
   }
 
   /**
-   * Connect a function object.
+   * @brief Connect a function object.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] func The function object to copy.
    */
@@ -1152,7 +1272,8 @@ public:
   }
 
   /**
-   * Connect a function object using FunctorDelegate.
+   * @brief Connect a function object using FunctorDelegate.
+   *
    * @param[in] connectionTracker A connection tracker which can be used to disconnect.
    * @param[in] delegate A newly allocated FunctorDelegate (ownership is taken).
    */
@@ -1162,7 +1283,8 @@ public:
   }
 
   /**
-   * Emit the signal.
+   * @brief Emit the signal.
+   *
    * @param[in] arg0 The first value to pass to callbacks.
    * @param[in] arg1 The second value to pass to callbacks.
    * @param[in] arg2 The third value to pass to callbacks.
@@ -1181,7 +1303,7 @@ private:
 private:
 
   // Use composition instead of inheritance (virtual methods don't mix well with templates)
-  BaseSignal mImpl;
+  BaseSignal mImpl; ///< Implementation
 };
 
 } // namespace Dali

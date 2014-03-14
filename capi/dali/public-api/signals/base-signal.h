@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SIGNALS_MODULE
  * @{
  */
 
@@ -33,23 +33,27 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
+ * @brief Implementation class for Dali::SignalV2%s.
+ *
  * A slot can be connected to many signals
  * A signal can be connected to many slots
  *
  * To provide automatic disconnection when either a signal or the object owning the slot dies,
  * observers are used.
  *
- * A signal is an object with state. It holds a list of SignalConnections.
+ * A signal is an object with state. It holds a list of SignalConnection%s.
  *
  * E.g.
- *  Signal OnTouch. mSignalConnections
- * | Callback 0 | Signal Observer 0  |
- * | Callback 1 | Signal Observer 1  |
- * | Callback 2 | Signal Observer 2  |
+ *  Signal OnTouch. mSignalConnections contains
+ * <table>
+ * <tr><td> %Callback 0 </td><td> Signal Observer 0  </td></tr>
+ * <tr><td> %Callback 1 </td><td> Signal Observer 1  </td></tr>
+ * <tr><td> %Callback 2 </td><td> Signal Observer 2  </td></tr>
+ * </table>
  *
- * OnTouch.Emit( ..), will run callbacks 0,1,2.
+ * OnTouch.Emit() will run callbacks 0, 1 and 2.
  *
- * When the signal is destroyed. SignalDisconnected(...) is called on each Signal Observer.
+ * When the signal is destroyed. SignalDisconnected() is called on each Signal Observer.
  *
  * Slots are just static or member functions, so have no state. E.g. they can't keep
  * track of how many signals they are connected to.
@@ -59,9 +63,11 @@ namespace Dali DALI_IMPORT_API
  * To keep track of connections between slots and signals, a Connection tracker is used.
  * It holds a list of SlotConnections.
  *
- * | Callback 0 | Slot Observer 0  |
- * | Callback 1 | Slot Observer 1  |
- * | Callback 2 | Slot Observer 2  |
+ * <table>
+ * <tr><td> %Callback 0 </td><td> Slot Observer 0  </td></tr>
+ * <tr><td> %Callback 1 </td><td> Slot Observer 1  </td></tr>
+ * <tr><td> %Callback 2 </td><td> Slot Observer 2  </td></tr>
+ * </table>
  *
  * When the connection tracker is destroyed, SlotDisconnected() is called on every slot observer ( signal )
  * Signals implement the Slot Observer interface, to be told when a slot has disconnected
@@ -73,59 +79,69 @@ class BaseSignal : public SlotObserver
 public:
 
   /**
-   * Constructor.
+   * @brief Constructor.
    */
   BaseSignal();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~BaseSignal();
 
   /**
-   * Query whether there are any connected slots.
+   * @brief Query whether there are any connected slots.
+   *
    * @return True if there are any slots connected to the signal.
    */
   bool Empty() const;
 
   /**
-   * Query the number of slots.
+   * @brief Query the number of slots.
+   *
    * @return The number of slots connected to this signal.
    */
   std::size_t GetConnectionCount() const;
 
   // Templated Emit functions for the Signal implementations
 
-  // Used to guard against nested Emit() calls
+  /**
+   * @brief Used to guard against nested Emit() calls.
+   */
   struct EmitGuard
   {
     /**
-     * Create the guard.
+     * @brief Create the guard.
+     *
      * @param[in,out] flag This flag will be set to true during Emit() calls.
      */
     EmitGuard( bool& flag );
 
     /**
-     * Non-virtual destructor.
+     * @brief Non-virtual destructor.
+     *
      */
     ~EmitGuard();
 
     /**
+     * @brief  Determine if an error occured.
+     *
      * @return True if an error occurred i.e. if Emit() was called during Emit()
      */
     bool ErrorOccurred();
 
-    bool* mFlag;
+    bool* mFlag; ///< Pointer to the emit guard flag.
   };
 
   /**
-   * Emit a signal with no parameters.
+   * @brief Emit a signal with no parameters.
+   *
    * @pre Cannot be called from inside the same Signal's Emit methods.
    */
   void Emit();
 
   /**
-   * Emit a signal with no parameters.
+   * @brief Emit a signal with no parameters.
+   *
    * @pre Cannot be called from inside the same Signal's Emit methods.
    * @return The value returned by the last callback.
    */
@@ -164,7 +180,8 @@ public:
   }
 
   /**
-   * Emit a signal with 1 parameter.
+   * @brief Emit a signal with 1 parameter.
+   *
    * @pre Cannot be called from inside the same Signal's Emit methods.
    * @param[in] arg0 The first parameter.
    */
@@ -199,7 +216,8 @@ public:
   }
 
   /**
-   * Emit a signal with 1 parameter.
+   * @brief Emit a signal with 1 parameter.
+   *
    * @pre Cannot be called from inside the same Signal's Emit methods.
    * @param[in] arg0 The first parameter.
    * @return The value returned by the last callback.
@@ -239,7 +257,8 @@ public:
   }
 
   /**
-   * Emit a signal with 2 parameters.
+   * @brief Emit a signal with 2 parameters.
+   *
    * @pre Cannot be called from inside the same Signal's Emit methods.
    * @param[in] arg0 The first parameter.
    * @param[in] arg1 The second parameter.
@@ -275,7 +294,8 @@ public:
   }
 
   /**
-   * Emit a signal with 2 parameters.
+   * @brief Emit a signal with 2 parameters.
+   *
    * @pre Cannot be called from inside the same Signal's Emit methods.
    * @param[in] arg0 The first parameter.
    * @param[in] arg1 The second parameter.
@@ -316,7 +336,8 @@ public:
   }
 
   /**
-   * Emit a signal with 3 parameters.
+   * @brief Emit a signal with 3 parameters.
+   *
    * @pre Cannot be called from inside the same Signal's Emit methods.
    * @param[in] arg0 The first parameter.
    * @param[in] arg1 The second parameter.
@@ -353,7 +374,8 @@ public:
   }
 
   /**
-   * Emit a signal with 3 parameters.
+   * @brief Emit a signal with 3 parameters.
+   *
    * @pre Cannot be called from inside the same Signal's Emit methods.
    * @param[in] arg0 The first parameter.
    * @param[in] arg1 The second parameter.
@@ -397,26 +419,30 @@ public:
   // Connect / Disconnect function for use by Signal implementations
 
   /**
-   * Called by Signal implementations, when the user calls Signal.Connect( ... )
+   * @brief Called by Signal implementations, when the user calls Signal.Connect( ... )
+   *
    * @param[in] callback A newly allocated callback object (takes ownership).
    */
   void OnConnect( CallbackBase* callback );
 
   /**
-   * Called by Signal implementations, when the user calls Signal.Disconnect( ... )
+   * @brief Called by Signal implementations, when the user calls Signal.Disconnect( ... )
+   *
    * @param[in] callback A newly allocated callback object (takes ownership).
    */
   void OnDisconnect( CallbackBase* callback );
 
   /**
-   * Called by Signal implementations, when the user calls Signal.Connect( ... )
+   * @brief Called by Signal implementations, when the user calls Signal.Connect( ... )
+   *
    * @param[in] tracker The connection tracker.
    * @param[in] callback A newly allocated callback object (takes ownership).
    */
   void OnConnect( ConnectionTrackerInterface* tracker, CallbackBase* callback );
 
   /**
-   * Called by Signal implementations, when the user calls Signal.Disconnect( ... )
+   * @brief Called by Signal implementations, when the user calls Signal.Disconnect( ... )
+   *
    * @param[in] tracker The connection tracker.
    * @param[in] callback A newly allocated callback object (takes ownership).
    */
@@ -432,27 +458,30 @@ private: // SlotObserver interface, to be told when a slot disconnects
 private:
 
   /**
-   * Returns a callback given an index in to the connection array.
+   * @brief Returns a callback given an index in to the connection array.
+   *
    * @param[in] connectionIndex The index of the callback.
    * @return The callback, or NULL if the connection has been deleted.
    */
   CallbackBase* GetCallback( std::size_t connectionIndex ) const;
 
   /**
-   * Helper to find whether a callback is connected.
+   * @brief Helper to find whether a callback is connected.
+   *
    * @param[in] callback The call back object.
    * @return A valid index if the callback is connected.
    */
   int FindCallback( CallbackBase* callback );
 
   /**
-   * Deletes a connection object from the list of connections.
+   * @brief Deletes a connection object from the list of connections.
+   *
    * @param[in] connectionIndex The index of the callback.
    */
   void DeleteConnection( std::size_t connectionIndex );
 
   /**
-   * Helper to remove NULL items from mSignalConnections, which is only safe at the end of Emit()
+   * @brief Helper to remove NULL items from mSignalConnections, which is only safe at the end of Emit()
    * i.e. not from methods which can be called during a signal Emit(), such as Disconnect().
    */
   void CleanupConnections();

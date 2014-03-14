@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_EVENTS_MODULE
  * @{
  */
 
@@ -30,7 +30,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * A PinchGesture is emitted when the user moves two fingers towards or away from each other.
+ * @brief A PinchGesture is emitted when the user moves two fingers towards or away from each other.
+ *
  * This gesture can be in one of three states; when the pinch gesture is first detected, its
  * state is set to "Started".  After this, if there is change in the gesture, the state will
  * be "Continuing".  Finally, when the gesture ends, the state of the gesture changes to
@@ -44,47 +45,52 @@ struct PinchGesture: public Gesture
   // Construction & Destruction
 
   /**
-   * Default Constructor
+   * @brief Default Constructor.
+   *
    * @param[in]  state  The state of the gesture
    */
   PinchGesture(Gesture::State state);
 
   /**
-   * Copy constructor
+   * @brief Copy constructor.
    */
   PinchGesture( const PinchGesture& rhs );
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
    */
   PinchGesture& operator=( const PinchGesture& rhs );
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor.
    */
   virtual ~PinchGesture();
 
   // Data
 
   /**
-   * The scale factor from the start of the pinch gesture till the latest pinch gesture. If the user
-   * is moving their fingers away from each other, then this value increases.  Conversely, if the
-   * user is moving their fingers towards each other, this value will decrease.
+   * @brief The scale factor from the start of the pinch gesture till the latest pinch gesture.
+   *
+   * If the user is moving their fingers away from each other, then
+   * this value increases.  Conversely, if the user is moving their
+   * fingers towards each other, this value will decrease.
    */
   float scale;
 
   /**
-   * The speed at which the user is moving their fingers.  This is the pixel movement per second.
+   * @brief The speed at which the user is moving their fingers.
+   *
+   * This is the pixel movement per second.
    */
   float speed;
 
   /**
-   * The center point of the two points that caused the pinch gesture in screen coordinates.
+   * @brief The center point of the two points that caused the pinch gesture in screen coordinates.
    */
   Vector2 screenCenterPoint;
 
   /**
-   * The center point of the two points that caused the pinch gesture in local actor coordinates.
+   * @brief The center point of the two points that caused the pinch gesture in local actor coordinates.
    */
   Vector2 localCenterPoint;
 };

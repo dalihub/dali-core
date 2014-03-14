@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SIGNALS_MODULE
  * @{
  */
 
@@ -32,27 +32,27 @@ class SlotObserver;
 class CallbackBase;
 
 /**
+ * @brief Abstract interface used by a signal to inform a slot it is disconnecting.
  *
- * Abstract interface used by a signal to inform a slot it is disconnecting.
  * This will happen if the object owning the signal is destroyed.
- *
  */
 class SignalObserver
 {
 public:
 
   /**
-   * Constructor
+   * @brief Constructor.
    */
   SignalObserver();
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor.
    */
   virtual ~SignalObserver();
 
   /**
-   * This method is called when the signal is disconnecting.
+   * @brief This method is called when the signal is disconnecting.
+   *
    * @param[in] slotObserver The signal that has disconnected.
    * @param[in] callback The callback attached to the signal disconnected.
    */
@@ -60,7 +60,8 @@ public:
 };
 
 /**
- * Interface used by a slot to inform a signal it is disconnecting.
+ * @brief Abstract Interface used by a slot to inform a signal it is disconnecting.
+ *
  * This is used by the slot if wants to disconnect or is deleted.
  */
 class SlotObserver
@@ -68,17 +69,18 @@ class SlotObserver
 public:
 
   /**
-   * Constructor
+   * @brief Constructor.
    */
   SlotObserver();
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor.
    */
   virtual ~SlotObserver();
 
   /**
-   * This method is called when the slot is disconnecting.
+   * @brief This method is called when the slot is disconnecting.
+   *
    * @param[in] callback The callback attached to the signal disconnected.
    */
   virtual void SlotDisconnected( CallbackBase* callback ) = 0;

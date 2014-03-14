@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ANIMATION_MODULE
  * @{
  */
 
@@ -44,7 +44,7 @@ class Constraint;
 }
 
 /**
- * An abstract base class for Constraints.
+ * @brief An abstract base class for Constraints.
  * This can be used to constrain a property of an actor, after animations have been applied.
  * Constraints are applied in the following order:
  *   - Constraints are applied to on-stage actors in a depth-first traversal.
@@ -55,9 +55,11 @@ class DALI_IMPORT_API Constraint : public BaseHandle
 {
 public:
 
-  typedef boost::any AnyFunction;
+  typedef boost::any AnyFunction; ///< Generic function pointer for constraint and interpolator functions
 
   /**
+   * @brief The action that will happen when the constraint is removed.
+   *
    * Constraints can be applied gradually; see SetApplyTime() for more details.
    * When a constraint is fully-applied the final value may be "baked" i.e. saved permanently.
    * Alternatively the constrained value may be discarded when the constraint is removed.
@@ -68,17 +70,19 @@ public:
     Discard ///< When the constraint is removed, the constrained value is discarded.
   };
 
-  static const AlphaFunction DEFAULT_ALPHA_FUNCTION; // AlphaFunctions::Linear
-  static const RemoveAction  DEFAULT_REMOVE_ACTION;  // Bake
+  static const AlphaFunction DEFAULT_ALPHA_FUNCTION; ///< AlphaFunctions::Linear
+  static const RemoveAction  DEFAULT_REMOVE_ACTION;  ///< Bake
 
   /**
-   * Create an uninitialized Constraint; this can be initialized with Constraint::New()
+   * @brief Create an uninitialized Constraint; this can be initialized with Constraint::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   Constraint();
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
@@ -96,7 +100,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * @param [in] target The index of the property to constrain.
    * @param [in] func A function which returns the constrained property value.
@@ -115,7 +120,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
@@ -136,7 +142,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -158,7 +165,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
@@ -182,7 +190,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -207,7 +216,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
@@ -234,7 +244,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -262,7 +273,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
@@ -296,7 +308,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -331,7 +344,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
@@ -369,7 +383,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -408,7 +423,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
@@ -450,7 +466,8 @@ public:
   }
 
   /**
-   * Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property.
+   *
    * The templated parameter P, is the type of the property to constrain.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -493,7 +510,9 @@ public:
   }
 
   /**
-   * Downcast an Object handle to Constraint handle. If handle points to a Constraint object the
+   * @brief Downcast an Object handle to Constraint handle.
+   *
+   * If handle points to a Constraint object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a Constraint object or an uninitialized handle
@@ -501,7 +520,8 @@ public:
   static Constraint DownCast( BaseHandle handle );
 
   /**
-   * Destructor
+   * @brief Destructor.
+   *
    */
   virtual ~Constraint();
 
@@ -511,45 +531,52 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Set the time taken for the constraint to be fully applied.
+   * @brief Set the time taken for the constraint to be fully applied.
+   *
    * The default is zero, meaning that the constraint is applied immediately.
    * @param [in] timePeriod The constraint will be applied during this time period.
    */
   void SetApplyTime( TimePeriod timePeriod );
 
   /**
-   * Retrieve the time taken for the constraint to be fully applied.
+   * @brief Retrieve the time taken for the constraint to be fully applied.
+   *
    * @return The apply time.
    */
   TimePeriod GetApplyTime() const;
 
   /**
-   * Set the time taken for the constraint to be fully removed.
+   * @brief Set the time taken for the constraint to be fully removed.
+   *
    * The default is zero, meaning that the constraint is removed immediately.
    * @param [in] timePeriod The constraint will be removed during this time period.
    */
   void SetRemoveTime( TimePeriod timePeriod );
 
   /**
-   * Retrieve the time taken for the constraint to be fully removed.
+   * @brief Retrieve the time taken for the constraint to be fully removed.
+   *
    * @return The remove time.
    */
   TimePeriod GetRemoveTime() const;
 
   /**
-   * Set the alpha function for a constraint; the default is AlphaFunctions::Linear.
+   * @brief Set the alpha function for a constraint; the default is AlphaFunctions::Linear.
+   *
    * @param [in] func The alpha function to use when applying/removing the constraint.
    */
   void SetAlphaFunction( AlphaFunction func );
 
   /**
-   * Retrieve the alpha function of a constraint.
+   * @brief Retrieve the alpha function of a constraint.
+   *
    * @return The function.
    */
   AlphaFunction GetAlphaFunction();
 
   /**
-   * Set whether the constraint will "bake" a value when fully-applied.
+   * @brief Set whether the constraint will "bake" a value when fully-applied.
+   *
    * Otherwise the constrained value will be discarded, when the constraint is removed.
    * The default value is Constraint::Bake.
    * @param[in] action The remove-action.
@@ -557,7 +584,8 @@ public:
   void SetRemoveAction( RemoveAction action );
 
   /**
-   * Query whether the constraint will "bake" a value when fully-applied.
+   * @brief Query whether the constraint will "bake" a value when fully-applied.
+   *
    * Otherwise the constrained value will be discarded, when the constraint is removed.
    * @return The apply-action.
    */
@@ -566,7 +594,7 @@ public:
 public: // Not intended for use by Application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods
    * @param [in] constraint A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Constraint( Internal::Constraint* constraint );
@@ -574,11 +602,13 @@ public: // Not intended for use by Application developers
 private: // Not intended for use by Application developers
 
   /**
-   * Construct a new constraint which targets a property.
+   * @brief Construct a new constraint which targets a property.
+   *
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
    * @param [in] func The constraint function.
    * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
+   * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
@@ -586,12 +616,14 @@ private: // Not intended for use by Application developers
                          AnyFunction interpolator );
 
   /**
-   * Construct a new constraint which targets a property.
+   * @brief Construct a new constraint which targets a property.
+   *
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] func The constraint function.
    * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
+   * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
@@ -600,13 +632,15 @@ private: // Not intended for use by Application developers
                          AnyFunction interpolator );
 
   /**
-   * Construct a new constraint which targets a property.
+   * @brief Construct a new constraint which targets a property.
+   *
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
    * @param [in] func The constraint function.
    * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
+   * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
@@ -616,7 +650,8 @@ private: // Not intended for use by Application developers
                          AnyFunction interpolator );
 
   /**
-   * Construct a new constraint which targets a property.
+   * @brief Construct a new constraint which targets a property.
+   *
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -624,6 +659,7 @@ private: // Not intended for use by Application developers
    * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
    * @param [in] func The constraint function.
    * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
+   * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
@@ -634,7 +670,8 @@ private: // Not intended for use by Application developers
                          AnyFunction interpolator );
 
   /**
-   * Construct a new constraint which targets a property.
+   * @brief Construct a new constraint which targets a property.
+   *
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -643,6 +680,7 @@ private: // Not intended for use by Application developers
    * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
    * @param [in] func The constraint function.
    * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
+   * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
@@ -654,7 +692,8 @@ private: // Not intended for use by Application developers
                          AnyFunction interpolator );
 
   /**
-   * Construct a new constraint which targets a property.
+   * @brief Construct a new constraint which targets a property.
+   *
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -664,6 +703,7 @@ private: // Not intended for use by Application developers
    * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
    * @param [in] func The constraint function.
    * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
+   * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
@@ -676,7 +716,8 @@ private: // Not intended for use by Application developers
                          AnyFunction interpolator );
 
   /**
-   * Construct a new constraint which targets a property.
+   * @brief Construct a new constraint which targets a property.
+   *
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
@@ -687,6 +728,7 @@ private: // Not intended for use by Application developers
    * @param [in] source6 The source of a property; the current value will be passed as the 7th parameter of func.
    * @param [in] func The constraint function.
    * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
+   * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,

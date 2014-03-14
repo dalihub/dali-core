@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -36,19 +36,22 @@ struct Vector2;
 struct Vector3;
 
 /**
- * 4 Dimensional Vector
+ * @brief A four dimensional vector.
+ *
  * Components can be used as position or offset (x,y,z,w); color (r,g,b,a) or texture coords(s,t,p,q)
  */
+struct DALI_IMPORT_API Vector4
+{
 // NOTE
 // xrs, ygt, zbp and waq must be consecutive in memory.
 // No other data must be added before xrs member.
 // No virtual methods must be added to this struct.
-struct DALI_IMPORT_API Vector4
-{
+
 // Construction
 
   /**
-   * Default constructor, initializes the vector to 0
+   * @brief Default constructor, initializes the vector to 0.
+   *
    */
   Vector4()
   : x(0.0f),
@@ -59,7 +62,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Conversion constructor from four floats
+   * @brief Conversion constructor from four floats.
+   *
    * @param [in] x (or r/s) component
    * @param [in] y (or g/t) component
    * @param [in] z (or b/p) component
@@ -75,7 +79,8 @@ struct DALI_IMPORT_API Vector4
 
 
   /**
-   * Conversion constructor from an array of four floats
+   * @brief Conversion constructor from an array of four floats.
+   *
    * @param [in] array of either xyzw/rgba/stpq
    */
   explicit Vector4(const float* array)
@@ -87,28 +92,31 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Conversion constructor from Vector2
+   * @brief Conversion constructor from Vector2.
+   *
    * @param [in] vec2 to copy from, z and w are initialized to 0
    */
   explicit Vector4( const Vector2& vec2 );
 
   /**
-   * Conversion constructor from Vector3
+   * @brief Conversion constructor from Vector3.
+   *
    * @param [in] vec3 to copy from, w is initialized to 0
    */
   explicit Vector4( const Vector3& vec3 );
 
 // Constants
-  static const Vector4 ONE;  // (1.0f,1.0f,1.0f,1.0f)
-  static const Vector4 XAXIS;
-  static const Vector4 YAXIS;
-  static const Vector4 ZAXIS;
-  static const Vector4 ZERO; // (0.0f, 0.0f, 0.0f, 0.0f)
+  static const Vector4 ONE;   ///< (1.0f,1.0f,1.0f,1.0f)
+  static const Vector4 XAXIS; ///< (1.0f,0.0f,0.0f,0.0f)
+  static const Vector4 YAXIS; ///< (0.0f,1.0f,0.0f,0.0f)
+  static const Vector4 ZAXIS; ///< (0.0f,0.0f,1.0f,0.0f)
+  static const Vector4 ZERO;  ///< (0.0f, 0.0f, 0.0f, 0.0f)
 
 // API
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
+   *
    * @param [in] array of floats
    * @return itself
    */
@@ -123,7 +131,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
+   *
    * Only sets x and y. z and w are left as they were
    * @param [in] vec2 to assign from.
    * @return itself
@@ -131,7 +140,8 @@ struct DALI_IMPORT_API Vector4
   Vector4& operator=(const Vector2& vec2 );
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
+   *
    * Only sets x and y and z. w is left as it was
    * @param [in] vec3 to assign from
    * @return itself
@@ -139,7 +149,8 @@ struct DALI_IMPORT_API Vector4
   Vector4& operator=(const Vector3& vec3 );
 
   /**
-   * Addition operator
+   * @brief Addition operator.
+   *
    * @param[in] rhs vector to add.
    * @return A vector containing the result of the addition
    */
@@ -151,7 +162,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Addition assignment operator
+   * @brief Addition assignment operator.
+   *
    * @param[in] rhs vector to add.
    * @return itself
    */
@@ -166,7 +178,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Subtraction operator
+   * @brief Subtraction operator.
+   *
    * @param[in] rhs  the vector to subtract
    * @return A vector containing the result of the subtraction
    */
@@ -180,7 +193,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Subtraction assignment operator
+   * @brief Subtraction assignment operator.
+   *
    * @param[in] rhs the vector to subtract
    * @return itself
    */
@@ -195,7 +209,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Multiplication operator
+   * @brief Multiplication operator.
+   *
    * @param[in] rhs the vector to multiply
    * @return A vector containing the result of the multiplication
    */
@@ -207,7 +222,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Multiplication operator
+   * @brief Multiplication operator.
+   *
    * @param[in] rhs the float value to scale the vector
    * @return A vector containing the result of the scaling
    */
@@ -217,7 +233,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Multiplication assignment operator
+   * @brief Multiplication assignment operator.
+   *
    * @param[in] rhs the vector to multiply
    * @return itself
    */
@@ -232,7 +249,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Multiplication assignment operator
+   * @brief Multiplication assignment operator.
+   *
    * @param[in] rhs the float value to scale the vector
    * @return itself
    */
@@ -247,7 +265,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Division operator
+   * @brief Division operator.
+   *
    * @param[in] rhs the vector to divide
    * @return A vector containing the result of the division
    */
@@ -259,7 +278,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Division operator
+   * @brief Division operator.
+   *
    * @param[in] rhs The float value to scale the vector by
    * @return A vector containing the result of the scaling
    */
@@ -270,7 +290,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Division assignment operator
+   * @brief Division assignment operator.
+   *
    * @param[in] rhs the vector to divide
    * @return itself
    */
@@ -285,7 +306,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Division assignment operator
+   * @brief Division assignment operator.
+   *
    * @param[in] rhs the float value to scale the vector by
    * @return itself
    */
@@ -301,7 +323,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Unary negation operator
+   * @brief Unary negation operator.
+   *
    * @return the negative value
    */
   Vector4 operator-() const
@@ -312,7 +335,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Equality operator
+   * @brief Equality operator.
+   *
    * Utilises appropriate machine epsilon values.
    *
    * @param[in] rhs The vector to test against
@@ -321,7 +345,8 @@ struct DALI_IMPORT_API Vector4
   bool operator==(const Vector4 &rhs) const;
 
   /**
-   * Inequality operator
+   * @brief Inequality operator.
+   *
    * Utilises appropriate machine epsilon values.
    *
    * @param[in] rhs The vector to test against
@@ -333,7 +358,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Const array subscript operator overload
+   * @brief Const array subscript operator overload.
+   *
    * Asserts if index is out of range. Should be 0, 1, 2 or 3
    * @param[in] index Subscript
    * @return    The float at the given index
@@ -346,7 +372,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Mutable array subscript operator overload
+   * @brief Mutable array subscript operator overload.
+   *
    * Asserts if index is out of range. Should be 0, 1, 2 or 3
    * @param[in] index Subscript index
    * @return    The float at the given index
@@ -359,7 +386,8 @@ struct DALI_IMPORT_API Vector4
   }
 
   /**
-   * Returns the dot product of this vector (4d) and another vector (3d).
+   * @brief Returns the dot product of this vector (4d) and another vector (3d).
+   *
    * The dot product is the length of one vector in the direction of another vector.
    * This is great for lighting, threshold testing the angle between two unit vectors,
    * calculating the distance between two points in a particular direction.
@@ -369,7 +397,8 @@ struct DALI_IMPORT_API Vector4
   float Dot(const Vector3& other) const;
 
   /**
-   * Returns the dot product of this vector and another vector.
+   * @brief Returns the dot product of this vector and another vector.
+   *
    * The dot product is the length of one vector in the direction of another vector.
    * This is great for lighting, threshold testing the angle between two unit vectors,
    * calculating the distance between two points in a particular direction.
@@ -379,14 +408,16 @@ struct DALI_IMPORT_API Vector4
   float Dot(const Vector4& other) const;
 
   /**
-   * Returns the 4d dot product of this vector and another vector.
+   * @brief Returns the 4d dot product of this vector and another vector.
+   *
    * @param [in] other     the other vector
    * @return          the dot product
    */
   float Dot4(const Vector4& other) const;
 
   /**
-   * Returns the cross produce of this vector and another vector.
+   * @brief Returns the cross produce of this vector and another vector.
+   *
    * The cross produce of two vectors is a vector which is perpendicular to the plane of the
    * two vectors. This is great for calculating normals and making matrices orthogonal.
    *
@@ -396,31 +427,39 @@ struct DALI_IMPORT_API Vector4
   Vector4 Cross(const Vector4& other) const;
 
   /**
-   * Returns the length of the vector.
+   * @brief Returns the length of the vector.
+   *
    * @return the length.
    */
   float Length() const;
 
   /**
-   * Returns the length of the vector squared. This is faster than using Length() when performing
+   * @brief Returns the length of the vector squared.
+   *
+   * This is faster than using Length() when performing
    * threshold checks as it avoids use of the square root.
+   * @return the length of the vector squared.
    */
   float LengthSquared() const;
 
   /**
-   * Normalizes the vector. Sets the vector to unit length whilst maintaining its direction.
+   * @brief Normalizes the vector.
+   *
+   * Sets the vector to unit length whilst maintaining its direction.
    */
   void Normalize();
 
   /**
-   * Clamps the vector between minimum and maximum vectors
+   * @brief Clamps the vector between minimum and maximum vectors.
+   *
    * @param [in] min the minimum vector
    * @param [in] max the maximum vector
    */
   void Clamp( const Vector4& min, const Vector4& max );
 
   /**
-   * Returns the contents of the vector as an array of 4 floats.
+   * @brief Returns the contents of the vector as an array of 4 floats.
+   *
    * The order of the values in this array are as follows:
    * 0: x (or r, or s)
    * 1: y (or g, or t)
@@ -432,7 +471,8 @@ struct DALI_IMPORT_API Vector4
   const float* AsFloat() const {return &x;}
 
   /**
-   * Returns the contents of the vector as an array of 4 floats.
+   * @brief Returns the contents of the vector as an array of 4 floats.
+   *
    * The order of the values in this array are as follows:
    * 0: x (or r, or s)
    * 1: y (or g, or t)
@@ -477,7 +517,8 @@ struct DALI_IMPORT_API Vector4
 };
 
 /**
- * Print a Vector4.
+ * @brief Print a Vector4.
+ *
  * @param [in] o The output stream operator.
  * @param [in] vector The vector to print.
  * @return The output stream operator.
@@ -485,7 +526,8 @@ struct DALI_IMPORT_API Vector4
 DALI_IMPORT_API std::ostream& operator<<(std::ostream& o, const Vector4& vector);
 
 /**
- * Returns a vector with components set to the minimum of the corresponding component in a and b.
+ * @brief Returns a vector with components set to the minimum of the corresponding component in a and b.
+ *
  * If a=0,1,2,3 and b=4,0,1,2  returns a vector of 0,0,1,2
  * @param [in] a     a vector
  * @param [in] b     a vector
@@ -497,7 +539,8 @@ inline Vector4 Min( const Vector4& a, const Vector4& b )
 }
 
 /**
- * Returns a vector with components set to the maximum of the corresponding component in a and b.
+ * @brief Returns a vector with components set to the maximum of the corresponding component in a and b.
+ *
  * If a=0,1,2,3 and b=4,0,1,2  returns a vector of 4,1,2,3
  * @param [in] a     a vector
  * @param [in] b     a vector
@@ -509,7 +552,8 @@ inline Vector4 Max( const Vector4& a, const Vector4& b )
 }
 
 /**
- * Clamps each of vector v's components between minimum and maximum values
+ * @brief Clamps each of vector v's components between minimum and maximum values.
+ *
  * @param [in] v     a vector
  * @param [in] min the minimum value
  * @param [in] max the maximum value

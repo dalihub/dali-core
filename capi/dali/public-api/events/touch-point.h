@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_EVENTS_MODULE
  * @{
  */
 
@@ -30,13 +30,16 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * A TouchPoint represents a point on the screen that is currently being touched or where touch
- * has stopped.
+ * @brief A TouchPoint represents a point on the screen that is currently being touched
+ * or where touch has stopped.
  */
 struct TouchPoint
 {
   // Enumerations
 
+  /**
+   * @brief Touch state
+   */
   enum State
   {
     Down,        /**< Screen touched */
@@ -47,13 +50,14 @@ struct TouchPoint
                       all points are sent but indicates that this particular point has not changed
                       since the last time */
     Interrupted, /**< A system event has occurred which has interrupted the touch event sequence. */
-    Last
+    Last         /**< Number of states. */
   };
 
   // Construction & Destruction
 
   /**
-   * Constructor
+   * @brief Constructor
+   *
    * @param[in]  id       The touch device ID.
    * @param[in]  state    The state.
    * @param[in]  screenX  The X co-ordinate relative to the screen's origin.
@@ -62,7 +66,8 @@ struct TouchPoint
   TouchPoint(int id, State state, float screenX, float screenY);
 
   /**
-   * Constructor
+   * @brief Constructor
+   *
    * @param[in]  id       The touch device ID.
    * @param[in]  state    The state.
    * @param[in]  screenX  The X co-ordinate relative to the screen's origin.
@@ -73,30 +78,32 @@ struct TouchPoint
   TouchPoint(int id, State state, float screenX, float screenY, float localX, float localY);
 
   /**
-   * Destructor
+   * @brief Destructor
    */
   ~TouchPoint();
 
   // Data
 
   /**
-   * Each touch point has a unique device ID which specifies the touch device for that point.
+   * @brief Each touch point has a unique device ID which specifies the touch device for that point.
    */
   int deviceId;
 
   /**
-   * State of the point.
+   * @brief State of the point.
+   *
    * @see State
    */
   State state;
 
   /**
-   * The actor that was underneath the touch point.
+   * @brief The actor that was underneath the touch point.
    */
   Actor hitActor;
 
   /**
-   * The co-ordinates relative to the top-left of the hit-actor
+   * @brief The co-ordinates relative to the top-left of the hit-actor.
+   *
    * @note The top-left of an actor is (0.0, 0.0, 0.5).
    * @note If you require the local coordinates of another actor (e.g the parent of the hit actor),
    * then you should use Actor::ScreenToLocal().
@@ -104,7 +111,7 @@ struct TouchPoint
   Vector2 local;
 
   /**
-   * The co-ordinates relative to the top-left of the screen.
+   * @brief The co-ordinates relative to the top-left of the screen.
    */
   Vector2 screen;
 };

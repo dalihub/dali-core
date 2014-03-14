@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_EVENTS_MODULE
  * @{
  */
 
@@ -29,9 +29,11 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Base structure for different gestures that an application can receive.  A gesture is an event
- * that is produced from a combination of several touch events in a particular order or within a
- * certain time frame (e.g pinch).
+ * @brief Base structure for different gestures that an application can receive.
+ *
+ * A gesture is an event that is produced from a combination of
+ * several touch events in a particular order or within a certain time
+ * frame (e.g pinch).
  *
  * To receive a particular gesture, the application has to create and connect to the appropriate
  * GestureDetector.
@@ -43,24 +45,25 @@ namespace Dali DALI_IMPORT_API
 struct Gesture
 {
   /**
-   * Copy constructor
+   * @brief Copy constructor.
    */
   Gesture( const Gesture& rhs );
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
    */
   Gesture& operator=( const Gesture& rhs );
 
   // Destruction
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~Gesture();
 
-  // Types
-
+  /**
+   * @brief Type of gesture.
+   */
   enum Type
   {
     Pinch      = 1 << 0, ///< When two touch points move away or towards each other.
@@ -69,6 +72,9 @@ struct Gesture
     LongPress  = 1 << 3  ///< When the user continues to touch the same area on the screen for the device configured time.
   };
 
+  /**
+   * @brief State of the gesture.
+   */
   enum State
   {
     Clear,      ///< There is no state associated with this gesture.
@@ -82,25 +88,28 @@ struct Gesture
   // Data
 
   /**
-   * The gesture type.
+   * @brief The gesture type.
    */
   Type type;
 
   /**
-   * The gesture state.  Please see the description in the sub-classes to see the states used by the
-   * actual gesture.
+   * @brief The gesture state.
+   *
+   * Please see the description in the sub-classes to see the states
+   * used by the actual gesture.
    */
   State state;
 
   /**
-   * The time the gesture took place.
+   * @brief The time the gesture took place.
    */
   unsigned int time;
 
 protected: // Creation
 
   /**
-   * This constructor is only used by derived classes.
+   * @brief This constructor is only used by derived classes.
+   *
    * @param[in] gestureType   The type of gesture event.
    * @param[in] gestureState  The state of the gesture event.
    */

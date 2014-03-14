@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -31,7 +31,8 @@
 namespace Dali DALI_IMPORT_API
 {
 /**
- * Compile time template to calculate base to the power of N
+ * @brief Compile time template to calculate base to the power of N.
+ *
  * Note! values need to be compile time constants
  * Usage: <code>Power< 10, 2 >::value; // value=100</code>
  * @param mantissa to raise to exponent
@@ -44,7 +45,8 @@ struct Power
 };
 
 /**
- * Compile time template to calculate base to the power of N
+ * @brief Compile time template to calculate base to the power of N.
+ *
  * Specialisation for power of 1
  * @param mantissa to raise to exponent
  */
@@ -55,7 +57,8 @@ struct Power< mantissa, 1 >
 };
 
 /**
- * Compile time template to calculate base to the power of N
+ * @brief Compile time template to calculate base to the power of N.
+ *
  * Specialisation for power of 0
  * @param mantissa to raise to exponent
  */
@@ -66,7 +69,8 @@ struct Power< mantissa, 0 >
 };
 
 /**
- * Compile time template to calculate base logarithm of N
+ * @brief Compile time template to calculate base logarithm of N.
+ *
  * Note! values need to be compile time constants
  * Usage: <code>Log< 100, 10 >::value; value equals 2</code>
  * @param number for which to calculate the logarithm
@@ -79,7 +83,8 @@ struct Log
 };
 
 /**
- * Compile time template to calculate base logarithm of N
+ * @brief Compile time template to calculate base logarithm of N.
+ *
  * Specialisation for logarithm of 1
  * @param base logarithm to calculate
  */
@@ -90,7 +95,8 @@ struct Log< 1, base >
 };
 
 /**
- * Compile time template to calculate base logarithm of N
+ * @brief Compile time template to calculate base logarithm of N.
+ *
  * Specialisation for logarithm of 0
  * @param base logarithm to calculate
  */
@@ -102,7 +108,8 @@ struct Log< 0, base >
 
 
 /**
- * Compile time template to calculate the machine epsilon for a given floating point number
+ * @brief Compile time template to calculate the machine epsilon for a given floating point number.
+ *
  * Note! value needs to be compile time constant
  * Usage: <code>Epsilon<1000>::value; value equals 0.000119209</code>
  * @param N the number for which to calculate the machine epsilon
@@ -120,7 +127,8 @@ struct Epsilon
 };
 
 /**
- * Compile time template to calculate the machine epsilon for a given floating point number
+ * @brief Compile time template to calculate the machine epsilon for a given floating point number.
+ *
  * Specialisation for epsilon of 1
  * predefined value calculated on ARM Cortex A9 target
  */
@@ -135,7 +143,8 @@ struct Epsilon< 1 >
 };
 
 /**
- * Compile time template to calculate the machine epsilon for a given floating point number
+ * @brief Compile time template to calculate the machine epsilon for a given floating point number.
+ *
  * Specialisation for epsilon of 0
  * predefined value calculated on ARM Cortex A9 target
  */

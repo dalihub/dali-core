@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -38,7 +38,8 @@ class ObjectRegistry;
 }
 
 /**
- * The ObjectRegistry notifies it's observers when an object is created.
+ * @brief The ObjectRegistry notifies it's observers when an object is created.
+ *
  * Handle to the created Object is passed in the call back function.
  * The Handle is passed as Dali::Object handle, which can be DownCast
  * to the appropriate type.
@@ -57,25 +58,32 @@ class ObjectRegistry : public BaseHandle
 public:
 
   //Signal Names
-  static const char* const SIGNAL_OBJECT_CREATED;
-  static const char* const SIGNAL_OBJECT_DESTROYED;
+  static const char* const SIGNAL_OBJECT_CREATED;   ///< Created signal name
+  static const char* const SIGNAL_OBJECT_DESTROYED; ///< Destroyed signal name
 
   // Typedefs
 
-  //Object created signal
+  /**
+   * @brief Object created signal
+   */
   typedef SignalV2<  void (BaseHandle) > ObjectCreatedSignalV2;
 
-  //Object destroyed signal
+  /**
+   * @brief Object destroyed signal
+   */
   typedef SignalV2<  void (const Dali::RefObject*) > ObjectDestroyedSignalV2;
 
   /**
-   * Allows the creation of an empty objectRegistry handle.  To retrieve the current objectRegistry,
+   * @brief Allows the creation of an empty objectRegistry handle.
+   *
+   * To retrieve the current objectRegistry,
    * this handle can be set using Stage::GetCurrent().GetObjectRegistry().
    */
   ObjectRegistry();
 
   /**
-   * destructor.
+   * @brief Destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   ~ObjectRegistry();
@@ -88,7 +96,8 @@ public:
 public: // Signals
 
   /**
-   * This signal is emitted when an object is created.
+   * @brief This signal is emitted when an object is created.
+   *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName(BaseHandle object);
@@ -99,7 +108,7 @@ public: // Signals
   ObjectCreatedSignalV2& ObjectCreatedSignal();
 
   /**
-   * This signal is emitted when an object is destroyed.
+   * @brief This signal is emitted when an object is destroyed.
    *
    * WARNING: Since this signal is emitted when the object is
    * in the process of being destroyed, the RefObject pointer
@@ -124,7 +133,8 @@ public: // Signals
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali Get() method
+   * @brief This constructor is used by Dali Get() method.
+   *
    * @param [in] objectRegistry A pointer to a Dali resource
    */
   explicit DALI_INTERNAL ObjectRegistry(Internal::ObjectRegistry* objectRegistry);

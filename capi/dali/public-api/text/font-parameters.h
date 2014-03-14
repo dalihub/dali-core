@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TEXT_MODULE
  * @{
  */
 
@@ -30,28 +30,35 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Font size in points.
+ * @brief Font size in points.
+ *
  * This reduces ambiguity when using methods which accept size in pixels or points.
  */
 struct PointSize
 {
   /**
-   * Create size in points.
+   * @brief Create size in points.
+   *
    * @param[in] value The value in points.
    */
   explicit PointSize(float value);
 
+  /**
+   * @brief Float cast operator.
+   */
   operator float() const;
 
   /**
-   * Equality operator.
+   * @brief Equality operator.
+   *
    * @param pointSize The point size to be compared.
    * @return \e true if \e pointSize is equal to the point size stored in this object.
    */
   bool operator==( PointSize pointSize );
 
   /**
-   * Inequality operator.
+   * @brief Inequality operator.
+   *
    * @param pointSize The point size to be compared.
    * @return \e true if \e pointSize is not equal to the point size stored in this object.
    */
@@ -61,44 +68,62 @@ struct PointSize
 };
 
 /**
- * Font size in pixels.
+ * @brief Font size in pixels.
+ *
  * This reduces ambiguity when using methods which accept size in pixels or points.
  */
 struct PixelSize
 {
   /**
-   * Create size in pixels.
+   * @brief Create size in pixels.
+   *
    * @param[in] value The value in pixels.
    */
   explicit PixelSize(unsigned int value);
 
+  /**
+   * @brief Cast operator
+   */
   operator unsigned int() const;
 
   unsigned int value; ///< The value in pixels
 };
 
+/**
+ * @brief Font size in Caps height
+ */
 struct CapsHeight
 {
+  /**
+   * @brief Size in CapsHeight
+   */
   explicit CapsHeight( unsigned int value);
 
+  /**
+   * @brief Cast operator
+   */
   operator unsigned int() const;
 
-  unsigned int value;
+  unsigned int value; ///< The value in pixels
 };
 
 /**
- * Encapsulates all font parameters.
+ * @brief Encapsulates all font parameters.
  */
 struct FontParameters
 {
   /**
-   * Default constructor. Default system font family name, default system font style and default system size
+   * @brief Default constructor.
+   *
+   * Default system font family name, default system font style and default system size
    * will be used to build the font.
    */
   FontParameters();
 
   /**
-   * Contructor. Creates font parameters with the given family's name, style and size in points from the font requested.
+   * @brief Constructor.
+   *
+   * Creates font parameters with the given family's name, style and size in points from the font requested.
    * @param[in] familyName The family's name of the font requested.
    * @param[in] style The style of the font requested.
    * @param[in] size The size of the font requested in points.
@@ -106,7 +131,9 @@ struct FontParameters
   FontParameters( const std::string& familyName, const std::string& style, PointSize size );
 
   /**
-   * Contructor. Creates font parameters with the given family's name, style and size in pixels from the font requested.
+   * @brief Constructor.
+   *
+   * Creates font parameters with the given family's name, style and size in pixels from the font requested.
    * @param[in] familyName The family's name of the font requested.
    * @param[in] style The style of the font requested.
    * @param[in] size The size of the font requested in pixels.
@@ -114,7 +141,9 @@ struct FontParameters
   FontParameters( const std::string& familyName, const std::string& style, PixelSize size );
 
   /**
-   * Contructor. Creates font parameters with the given family's name, style and the caps-height size in pixels from the font requested.
+   * @brief Constructor.
+   *
+   * Creates font parameters with the given family's name, style and the caps-height size in pixels from the font requested.
    * @param[in] familyName The family's name of the font requested.
    * @param[in] style The style of the font requested.
    * @param[in] size The caps-height of the font requested in pixels.
@@ -122,38 +151,45 @@ struct FontParameters
   FontParameters( const std::string& familyName, const std::string& style, CapsHeight size );
 
   /**
-   * Destructor.
+   * @brief Destructor.
+   *
    * Destroys the internal implementation.
    */
   ~FontParameters();
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
+   *
    * Reset the internal implementation with new given values.
    * @param[in] parameters The new font parameters.
    */
   FontParameters( const FontParameters& parameters );
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   *
    * @param[in] parameters The new font parameters.
+   * @return A reference to this
    */
   FontParameters& operator=( const FontParameters& parameters );
 
   /**
-   * Retrieves the name of the font's family.
+   * @brief Retrieves the name of the font's family.
+   *
    * @return The name of the font's family.
    */
   const std::string& GetFamilyName() const;
 
   /**
-   * Retrieves the style of the font.
+   * @brief Retrieves the style of the font.
+   *
    * @return The style of the font.
    */
   const std::string& GetStyle() const;
 
   /**
-   * Retrieves the size of the font.
+   * @brief Retrieves the size of the font.
+   *
    * @return The size of the font in Points.
    */
   PointSize GetSize() const;
@@ -164,7 +200,7 @@ private:
 
 };
 
-extern FontParameters DEFAULT_FONT_PARAMETERS;
+extern FontParameters DEFAULT_FONT_PARAMETERS; ///< Used to choose the platform's font parameters
 
 } // namespace Dali
 

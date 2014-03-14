@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_EVENTS_MODULE
  * @{
  */
 
@@ -30,7 +30,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * A PanGesture is emitted when the user moves one or more fingers in a particular direction.
+ * @brief A PanGesture is emitted when the user moves one or more fingers in a particular direction.
+ *
  * This gesture can be in one of three states, when the pan gesture is first detected: "Started";
  * when the pan gesture is continuing: "Continuing"; and finally, when the pan gesture ends:
  * "Finished".
@@ -48,30 +49,32 @@ struct PanGesture: public Gesture
   // Construction & Destruction
 
   /**
-   * Default Constructor
+   * @brief Default Constructor.
+   *
    * @param[in]  state  The state of the gesture
    */
   PanGesture(Gesture::State state);
 
   /**
-   * Copy constructor
+   * @brief Copy constructor.
    */
   PanGesture( const PanGesture& rhs );
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
    */
   PanGesture& operator=( const PanGesture& rhs );
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor.
    */
   virtual ~PanGesture();
 
   // Data
 
   /**
-   * The velocity at which the user is moving their fingers.
+   * @brief The velocity at which the user is moving their fingers.
+   *
    * This is represented as a Vector2 and is the pixel movement per millisecond.
    * A positive x value shows that the user is panning to the right, a negative x value means the opposite.
    * A positive y value shows that the user is panning downwards, a negative y values means upwards.
@@ -80,8 +83,9 @@ struct PanGesture: public Gesture
   Vector2 velocity;
 
   /**
-   * This is a Vector2 showing how much the user has panned (dragged) since the last pan gesture or,
+   * @brief This is a Vector2 showing how much the user has panned (dragged) since the last pan gesture or,
    * if the gesture has just started, then the amount panned since the user touched the screen.
+   *
    * A positive x value shows that the user is panning to the right, a negative x value means the opposite.
    * A positive y value shows that the user is panning downwards, a negative y value means upwards.
    * This value is in local actor coordinates, the actor being the one attached to the
@@ -90,12 +94,13 @@ struct PanGesture: public Gesture
   Vector2 displacement;
 
   /**
-   * This current touch position of the primary touch point in local actor coordinates.
+   * @brief This current touch position of the primary touch point in local actor coordinates.
    */
   Vector2 position;
 
   /**
-   * The velocity at which the user is moving their fingers.
+   * @brief The velocity at which the user is moving their fingers.
+   *
    * This is represented as a Vector2 and is the pixel movement per millisecond.
    * A positive x value shows that the user is panning to the right, a negative x value means the opposite.
    * A positive y value shows that the user is panning downwards, a negative y values means upwards.
@@ -104,8 +109,9 @@ struct PanGesture: public Gesture
   Vector2 screenVelocity;
 
   /**
-   * This is a Vector2 showing how much the user has panned (dragged) since the last pan gesture or,
+   * @brief This is a Vector2 showing how much the user has panned (dragged) since the last pan gesture or,
    * if the gesture has just started, then the amount panned since the user touched the screen.
+   *
    * A positive x value shows that the user is panning to the right, a negative x value means the opposite.
    * A positive y value shows that the user is panning downwards, a negative y value means upwards.
    * This value is in screen coordinates.
@@ -113,43 +119,47 @@ struct PanGesture: public Gesture
   Vector2 screenDisplacement;
 
   /**
-   * This current touch position of the primary touch point in screen coordinates.
+   * @brief This current touch position of the primary touch point in screen coordinates.
    */
   Vector2 screenPosition;
 
   /**
-   * The total number of fingers touching the screen in a pan gesture.
+   * @brief The total number of fingers touching the screen in a pan gesture.
    */
   unsigned int numberOfTouches;
 
   // Convenience Methods
 
   /**
-   * Returns the speed at which the user is moving their fingers.
+   * @brief Returns the speed at which the user is moving their fingers.
+   *
    * This is the pixel movement per millisecond.
    * @return The speed of the pan (in pixels per millisecond).
    */
   float GetSpeed() const;
 
   /**
-   * This returns the distance the user has panned (dragged) since the last pan gesture or,
+   * @brief This returns the distance the user has panned (dragged) since the last pan gesture or,
    * if the gesture has just started, then the distance moved since the user touched the screen.
+   *
    * This is always a positive value.
    * @return The distance, as a float, a user's finger has panned.
    */
   float GetDistance() const;
 
   /**
-   * Returns the speed at which the user is moving their fingers relative to screen coordinates.
+   * @brief Returns the speed at which the user is moving their fingers relative to screen coordinates.
+   *
    * This is the pixel movement per millisecond.
    * @return The speed of the pan (in pixels per millisecond).
    */
   float GetScreenSpeed() const;
 
   /**
-   * This returns the distance the user has panned (dragged) since the last pan gesture in screen
+   * @brief This returns the distance the user has panned (dragged) since the last pan gesture in screen
    * coordinates or, if the gesture has just started, then the distance in screen coordinates moved
    * since the user touched the screen.
+   *
    * This is always a positive value.
    * @return The distance, as a float, a user's finger has panned.
    */

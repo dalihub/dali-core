@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -38,7 +38,7 @@ class Object;
 class Constraint;
 
 /**
- * Dali::Constrainable is a handle to an internal property owning Dali object that
+ * @brief Dali::Constrainable is a handle to an internal property owning Dali object that
  * can have constraints applied to it.
  */
 class Constrainable : public Handle
@@ -46,13 +46,15 @@ class Constrainable : public Handle
 public:
 
   /**
-   * Create a constrainable object.
+   * @brief Create a constrainable object.
+   *
    * @return A handle to a newly allocated object.
    */
   static Constrainable New();
 
   /**
-   * This constructor provides an uninitialized Dali::Constrainable.
+   * @brief This constructor provides an uninitialized Dali::Constrainable.
+   *
    * This should be initialized with a Dali New() method before use.
    * Methods called on an uninitialized Dali::Constrainable will assert.
    * @code
@@ -66,26 +68,30 @@ public:
   Constrainable();
 
   /**
-   * Downcast a handle to a custom object.
+   * @brief Downcast a handle to a custom object.
+   *
    * @param[in] handle The handle to cast.
    * @return A handle to a custom object or an empty handle.
    */
   static Constrainable DownCast( BaseHandle handle );
 
   /**
-   * Dali::Handle is intended as a base class
+   * @brief Dali::Handle is intended as a base class.
    */
   virtual ~Constrainable();
 
   /**
-   * This copy constructor is required for (smart) pointer semantics
+   * @brief This copy constructor is required for (smart) pointer semantics.
+   *
    * @param [in] handle A reference to the copied handle
    */
   Constrainable(const Constrainable& handle);
 
   /**
-   * This assignment operator is required for (smart) pointer semantics
+   * @brief This assignment operator is required for (smart) pointer semantics.
+   *
    * @param [in] rhs  A reference to the copied handle
+   * @return A reference to this
    */
   Constrainable& operator=(const Handle& rhs);
 
@@ -95,7 +101,8 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Constrain one of the properties of an Actor.
+   * @brief Constrain one of the properties of an Actor.
+   *
    * @note The constraint will be copied by the Actor. This means that modifying the apply-time etc.
    * of the constraint, will not affect actors which are already being constrained.
    * @pre The Actor has been initialized.
@@ -105,22 +112,26 @@ public:
   ActiveConstraint ApplyConstraint( Constraint constraint );
 
   /**
-   * Remove one constraint from an Object.
+   * @brief Remove one constraint from an Object.
+   *
    * @pre The Object has been intialized.
    * @param[in] activeConstraint The active-constraint to remove.
    */
   void RemoveConstraint(ActiveConstraint activeConstraint);
 
   /**
-   * Remove all constraints from an Object.
+   * @brief Remove all constraints from an Object.
+   *
    * @pre The object has been initialized.
    */
   void RemoveConstraints();
 
 public:
 
+
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] handle A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Constrainable(Dali::Internal::Object* handle);

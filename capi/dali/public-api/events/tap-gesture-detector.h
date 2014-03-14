@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_EVENTS_MODULE
  * @{
  */
 
@@ -37,8 +37,10 @@ class TapGestureDetector;
 struct TapGesture;
 
 /**
- * This class emits a signal when a tap gesture occurs that meets the requirements set by the
- * application. See TapGestureDetector::SetTapsRequired and TapGestureDetector::SetTouchesRequired.
+ * @brief This class emits a signal when a tap gesture occurs that meets the requirements set by the
+ * application.
+ *
+ * See TapGestureDetector::SetTapsRequired and TapGestureDetector::SetTouchesRequired.
  *
  * A Tap Gesture is a discrete gesture, which means it does not have any state information attached
  * to it.  Please see TapGesture for more information.
@@ -56,28 +58,34 @@ class TapGestureDetector : public GestureDetector
 {
 public: // Typedefs
 
+  /**
+   * @brief Signal type for detected signal.
+   */
   typedef SignalV2< void (Actor, TapGesture) > DetectedSignalV2;
 
   //Signal Names
-  static const char* const SIGNAL_TAP_DETECTED;
+  static const char* const SIGNAL_TAP_DETECTED; ///< name "tap-detected"
 
 public: // Creation & Destruction
 
   /**
-   * Create an uninitialized TapGestureDetector; this can be initialized with TapGestureDetector::New()
+   * @brief Create an uninitialized TapGestureDetector; this can be initialized with TapGestureDetector::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   TapGestureDetector();
 
   /**
-   * Create an initialized TapGestureDetector.
+   * @brief Create an initialized TapGestureDetector.
+   *
    * By default, this would create a gesture detector which requires one tap with one touch.
    * @return A handle to a newly allocated Dali resource.
    */
   static TapGestureDetector New();
 
   /**
-   * Create an initialized TapGestureDetector with the specified parameters.
+   * @brief Create an initialized TapGestureDetector with the specified parameters.
+   *
    * @param[in]  tapsRequired     The number of taps required.
    * @param[in]  touchesRequired  The number of touches required.
    * @return A handle to a newly allocated Dali resource.
@@ -85,7 +93,9 @@ public: // Creation & Destruction
   static TapGestureDetector New(unsigned int tapsRequired, unsigned int touchesRequired);
 
   /**
-   * Downcast an Object handle to TapGestureDetector handle. If handle points to a TapGestureDetector object the
+   * @brief Downcast an Object handle to TapGestureDetector handle.
+   *
+   * If handle points to a TapGestureDetector object the
    * downcast produces valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a TapGestureDetector object or an uninitialized handle
@@ -93,7 +103,8 @@ public: // Creation & Destruction
   static TapGestureDetector DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~TapGestureDetector();
@@ -106,8 +117,9 @@ public: // Creation & Destruction
 public: // Setters
 
   /**
-   * Set the number of taps required.  The tap count is the number of times a user should "tap" the
-   * screen.
+   * @brief Set the number of taps required.
+   *
+   * The tap count is the number of times a user should "tap" the screen.
    * @param[in]  taps  Taps required.
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
@@ -115,8 +127,9 @@ public: // Setters
   void SetTapsRequired(unsigned int taps);
 
   /**
-   * Set the number of touches required. The number of touches corresponds to the number of fingers
-   * a user has on the screen.
+   * @brief Set the number of touches required.
+   *
+   * The number of touches corresponds to the number of fingers a user has on the screen.
    * @param[in]  touches  Touches required.
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
@@ -126,14 +139,16 @@ public: // Setters
 public: // Getters
 
   /**
-   * Retrieves the number of taps required.
+   * @brief Retrieves the number of taps required.
+   *
    * @return The taps required.
    * @pre The gesture detector has been initialized.
    */
   unsigned int GetTapsRequired() const;
 
   /**
-   * Retrieves the number of touches required.
+   * @brief Retrieves the number of touches required.
+   *
    * @return The number of touches required.
    * @pre The gesture detector has been initialized.
    */
@@ -142,7 +157,8 @@ public: // Getters
 public: // Signals
 
   /**
-   * This signal is emitted when the specified tap is detected on the attached actor.
+   * @brief This signal is emitted when the specified tap is detected on the attached actor.
+   *
    * A callback of the following type may be connected:
    * @code
    *   void YourCallbackName(Actor actor, TapGesture gesture);
@@ -155,7 +171,8 @@ public: // Signals
 public: // Not intended for Application developers
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in]  internal  A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL TapGestureDetector(Internal::TapGestureDetector* internal);

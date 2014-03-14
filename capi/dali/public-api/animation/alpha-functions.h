@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ANIMATION_MODULE
  * @{
  */
 
@@ -30,6 +30,9 @@ namespace Dali DALI_IMPORT_API
 
 typedef float (*AlphaFunction)(float progress); ///< Definition of an alpha function
 
+/**
+ * @brief Namespace containing a set of alpha functions.
+ */
 namespace AlphaFunctions
 {
 

@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TEXT_MODULE
  * @{
  */
 
@@ -32,13 +32,13 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Class to encapsulate a text style.
+ * @brief Encapsulates style properties for text, such as weight, italics, underline, shadow, etc.
  */
 class TextStyle
 {
 public:
   /**
-   * Mask used to set text styles.
+   * @brief Mask used to set text styles.
    */
   enum Mask
   {
@@ -55,6 +55,9 @@ public:
     ALL =      -1       ///< Sets all given style parameters.
   };
 
+  /**
+   * @brief Enumeration of various text weights.
+   */
   enum Weight
   {
     THIN = 0,
@@ -90,42 +93,51 @@ public:
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
+   *
    * The style created used a default font @see Dali::Font, color is white, and is neither underlined nor italics.
    */
   TextStyle();
 
   /**
-   * Copy constructor.
+   * @brief Copy constructor.
+   *
    * @param[in] textStyle The text style to be copied.
    */
   TextStyle( const TextStyle& textStyle );
 
   /**
-   * Destructor.
+   * @brief Destructor.
    */
   virtual ~TextStyle();
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   *
    * @param[in] textStyle The text style to be assigned.
+   * @return A reference to this
    */
   TextStyle& operator=( const TextStyle& textStyle );
 
   /**
-   * Equality operator.
+   * @brief Equality operator.
+   *
    * @param [in] textStyle The text style to be compared.
+   * @return true if the style is identical
    */
   bool operator==( const TextStyle& textStyle ) const;
 
   /**
-   * Inequality operator.
+   * @brief Inequality operator.
+   *
    * @param [in] textStyle The text style to be compared.
+   * @return true if the text style is not identical
    */
   bool operator!=( const TextStyle& textStyle ) const;
 
   /**
-   * Copies from the given text style those parameters specified in the given mask.
+   * @brief Copies from the given text style those parameters specified in the given mask.
+   *
    *
    * @param[in] textStyle The given text style.
    * @param[in] mask Specifies which text style parameters are going to be copied. By default all parateres are copied.
@@ -133,153 +145,176 @@ public:
   void Copy( const TextStyle& textStyle, const Mask mask = ALL );
 
   /**
-   * Retrieves the font name.
+   * @brief Retrieves the font name.
+   *
    * @return The font name.
    */
   const std::string& GetFontName() const;
 
   /**
-   * Sets the font name.
+   * @brief Sets the font name.
+   *
    * @param[in] fontName
    */
   void SetFontName( const std::string& fontName );
 
   /**
-   * Retrieves the font style.
+   * @brief Retrieves the font style.
+   *
    * @return The font style.
    */
   const std::string& GetFontStyle() const;
 
   /**
-   * Sets the font style.
+   * @brief Sets the font style.
+   *
    * @param[in] fontStyle
    */
   void SetFontStyle( const std::string& fontStyle );
 
   /**
-   * Retrieves the font point size.
+   * @brief Retrieves the font point size.
+   *
    * @return the point size.
    */
   PointSize GetFontPointSize() const;
 
   /**
-   * Sets the font point size.
+   * @brief Sets the font point size.
+   *
    * @param[in] fontPointSize The font point size.
    */
   void SetFontPointSize( PointSize fontPointSize );
 
   /**
-   * Retrieves the style weight.
+   * @brief Retrieves the style weight.
+   *
    * @return The style weight.
    */
   Weight GetWeight() const;
 
   /**
-   * Sets the style weight.
+   * @brief Sets the style weight.
+   *
    * @param[in] weight The style weight
    */
   void SetWeight( Weight weight );
 
   /**
-   * Retrieves the text color.
+   * @brief Retrieves the text color.
+   *
    * @return The text color.
    */
   const Vector4& GetTextColor() const;
 
   /**
-   * Sets the text color.
+   * @brief Sets the text color.
+   *
    * @param[in] textColor The text color
    */
   void SetTextColor( const Vector4& textColor );
 
   /**
-   * Whether the style italics option is enabled or not.
+   * @brief Whether the style italics option is enabled or not.
+   *
    * @return \e true if italics is enabled.
    */
   bool GetItalics() const;
 
   /**
-   * Sets the italics option.
+   * @brief Sets the italics option.
+   *
    * @param[in] italics The italics option.
    */
   void SetItalics( bool italics );
 
   /**
-   * Retrieves the italics angle.
+   * @brief Retrieves the italics angle.
+   *
    * @return \e The italics angle in degree.
    */
   Degree GetItalicsAngle() const;
 
   /**
-   * Sets the italics angle.
+   * @brief Sets the italics angle.
+   *
    * @param[in] angle The italics angle in degree.
    */
   void SetItalicsAngle( Degree angle );
 
   /**
-   * Whether the style underline option is enabled or not.
+   * @brief Whether the style underline option is enabled or not.
+   *
    * @return \e true if underline is enabled.
    */
   bool GetUnderline() const;
 
   /**
-   * Sets the underline option.
+   * @brief Sets the underline option.
+   *
    * @param[in] underline The underline option.
    */
   void SetUnderline( bool underline );
 
   /**
-   * Retrieves the underline thickness.
+   * @brief Retrieves the underline thickness.
+   *
    * @return The underline thickness.
    */
   float GetUnderlineThickness() const;
 
   /**
-   * Sets the underline thickness.
+   * @brief Sets the underline thickness.
    *
    * @param[in] thickness The underline thickness.
    */
   void SetUnderlineThickness( float thickness );
 
   /**
-   * Retrieves the underline position.
+   * @brief Retrieves the underline position.
+   *
    * @return The underline position.
    */
   float GetUnderlinePosition() const;
 
   /**
-   * Sets the underline position.
+   * @brief Sets the underline position.
    *
    * @param[in] position The underline position.
    */
   void SetUnderlinePosition( float position );
 
   /**
-   * Whether the style shadow option is enabled or not.
+   * @brief Whether the style shadow option is enabled or not.
+   *
    * @return \e true if shadow is enabled.
    */
   bool GetShadow() const;
 
   /**
-   * Retrieves the shadow color.
+   * @brief Retrieves the shadow color.
+   *
    * @return The shadow color.
    */
   const Vector4& GetShadowColor() const;
 
   /**
-   * Retrieves the shadow offset
+   * @brief Retrieves the shadow offset
    * @return The shadow offset.
+   *
    */
   const Vector2& GetShadowOffset() const;
 
   /**
-   * Retrieves the shadow size
+   * @brief Retrieves the shadow size
    * @return The shadow size.
+   *
    */
   float GetShadowSize() const;
 
   /**
-   * Sets the shadow option.
+   * @brief Sets the shadow option.
+   *
    * @param[in] shadow        The shadow option.
    * @param[in] shadowColor   The color of the shadow
    * @param[in] shadowOffset  Offset in pixels.
@@ -291,25 +326,29 @@ public:
                   const float shadowSize = DEFAULT_SHADOW_SIZE );
 
   /**
-   * Whether the glow option is enabled or not.
+   * @brief Whether the glow option is enabled or not.
+   *
    * @return \e true if glow is enabled.
    */
   bool GetGlow() const;
 
   /**
-   * Retrieves the glow color.
+   * @brief Retrieves the glow color.
+   *
    * @return The glow color.
    */
   const Vector4& GetGlowColor() const;
 
   /**
-   * Retrieve the glow intensity.
+   * @brief Retrieve the glow intensity.
+   *
    * @return The glow intensity.
    */
   float GetGlowIntensity() const;
 
   /**
-   * Sets the glow option and color.
+   * @brief Sets the glow option and color.
+   *
    * @param[in] glow The glow option.
    * @param[in] glowColor The color of the glow.
    * @param[in] glowIntensity Determines the amount of glow around text.
@@ -319,38 +358,44 @@ public:
   void SetGlow( bool glow, const Vector4& glowColor = DEFAULT_GLOW_COLOR, float glowIntensity = DEFAULT_GLOW_INTENSITY );
 
   /**
-   * Retrieves the soft smooth edge.
+   * @brief Retrieves the soft smooth edge.
+   *
    * @return The soft smooth edge.
    */
   float GetSmoothEdge() const;
 
   /**
-   * Set soft edge smoothing
+   * @brief Set soft edge smoothing.
+   *
    * @param[in] smoothEdge Specify the distance field value for the center of the text edge.
    *            0 <= smoothEdge <= 1
    */
   void SetSmoothEdge( float smoothEdge = DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD );
 
   /**
-   * Whether the outline option is enabled or not.
+   * @brief Whether the outline option is enabled or not.
+   *
    * @return \e true if outline is enabled.
    */
   bool GetOutline() const;
 
   /**
-   * Retrieves the outline color.
+   * @brief Retrieves the outline color.
+   *
    * @return The outline color.
    */
   const Vector4& GetOutlineColor() const;
 
   /**
-   * Retrieves the outline thickness.
+   * @brief Retrieves the outline thickness.
+   *
    * @return The outline thickness.
    */
   const Vector2& GetOutlineThickness() const;
 
   /**
-   * Sets the outline option and color.
+   * @brief Sets the outline option and color.
+   *
    * @param[in] outline The outline option.
    * @param[in] outlineColor The color of the outline.
    * @param[in] outlineThickness Thickness of outline. The outline thickness is determined by two parameters.
@@ -364,7 +409,7 @@ public:
 
 private:
   struct Impl;
-  Impl* mImpl;
+  Impl* mImpl; ///< Implementation pointer
 };
 
 } // namespace Dali

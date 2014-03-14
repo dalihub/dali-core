@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -32,7 +32,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Returns the next power of two.
+ * @brief Returns the next power of two.
+ *
  * In case of numbers which are already a power of two this function returns the original number.
  * If i is zero returns 1
  * @param[in] i input number
@@ -41,14 +42,16 @@ namespace Dali DALI_IMPORT_API
 DALI_IMPORT_API unsigned int NextPowerOfTwo( unsigned int i );
 
 /**
- * Whether a number is power of two.
+ * @brief Whether a number is power of two.
+ *
  * @param[in] i input number
  * @return    true if i is power of two
  */
 DALI_IMPORT_API bool IsPowerOfTwo( unsigned int i );
 
 /**
- * Clamp a value.
+ * @brief Clamp a value.
+ *
  * @param[in] value The value to clamp.
  * @param[in] min The minimum allowed value.
  * @param[in] max The maximum allowed value.
@@ -61,7 +64,8 @@ const T& Clamp( const T& value, const T& min, const T& max )
 }
 
 /**
- * Clamp a value directly.
+ * @brief Clamp a value directly.
+ *
  * @param[in,out] value The value that will be clamped.
  * @param[in] min The minimum allowed value.
  * @param[in] max The maximum allowed value.
@@ -74,7 +78,8 @@ void ClampInPlace( T& value, const T& min, const T& max )
 
 
 /**
- * Linear interpolation between two values
+ * @brief Linear interpolation between two values.
+ *
  * @param[in] offset The offset through the range @p low to @p high.
  *                   This value is clamped between 0 and 1
  * @param[in] low    Lowest value in range
@@ -88,7 +93,8 @@ inline const T Lerp( const float offset, const T& low, const T& high )
 }
 
 /**
- * Get an epsilon that is valid for the given range.
+ * @brief Get an epsilon that is valid for the given range.
+ *
  * @param[in] a the first value in the range
  * @param[in] b the second value in the range.
  * @return a suitable epsilon
@@ -96,14 +102,16 @@ inline const T Lerp( const float offset, const T& low, const T& high )
 DALI_IMPORT_API float GetRangedEpsilon(float a, float b);
 
 /**
- * Helper function to compare equality of a floating point value with zero
+ * @brief Helper function to compare equality of a floating point value with zero.
+ *
  * @param[in] value the value to compare
  * @return true if the value is equal to zero
  */
 DALI_IMPORT_API bool EqualsZero( float value );
 
 /**
- * Helper function to compare equality of two floating point values
+ * @brief Helper function to compare equality of two floating point values.
+ *
  * @param[in] a the first value to compare
  * @param[in] b the second value to compare
  * @return true if the values are equal within a minimal epsilon for their values
@@ -111,7 +119,8 @@ DALI_IMPORT_API bool EqualsZero( float value );
 DALI_IMPORT_API bool Equals( float a, float b );
 
 /**
- * Helper function to compare equality of two floating point values
+ * @brief Helper function to compare equality of two floating point values.
+ *
  * @param[in] a the first value to compare
  * @param[in] b the second value to compare
  * @param[in] epsilon the minimum epsilon value that will be used to consider the values different
@@ -120,7 +129,8 @@ DALI_IMPORT_API bool Equals( float a, float b );
 DALI_IMPORT_API bool Equals( float a, float b, float epsilon );
 
 /**
- * Get an float that is rounded at specified place of decimals
+ * @brief Get an float that is rounded at specified place of decimals.
+ *
  * @param[in] value float value
  * @param[in] pos decimal place
  * @return a rounded float
@@ -128,7 +138,7 @@ DALI_IMPORT_API bool Equals( float a, float b, float epsilon );
 DALI_IMPORT_API float Round( float value, int pos );
 
 /**
- * Wrap x in domain (start) to (end)
+ * @brief Wrap x in domain (start) to (end).
  *
  * This works like a floating point version
  * of the % modulo operation. But with an offset (start).
@@ -162,8 +172,9 @@ DALI_IMPORT_API float Round( float value, int pos );
 DALI_IMPORT_API float WrapInDomain(float x, float start, float end);
 
 /**
- * Find the shortest distance (magnitude) and direction (sign)
- * from (a) to (b) in domain (start) to (end)
+ * @brief Find the shortest distance (magnitude) and direction (sign)
+ * from (a) to (b) in domain (start) to (end).
+ *
  * (\ / start)               (\ / end)
  *   |-a                 b<----|
  *

@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SIGNALS_MODULE
  * @{
  */
 
@@ -35,24 +35,24 @@ class SlotObserver;
 class SlotConnection;
 
 /**
- * Connection tracker concrete implementation
+ * @brief Connection tracker concrete implementation
  */
 class ConnectionTracker : public ConnectionTrackerInterface
 {
 public:
 
   /**
-   * Constructor
+   * @brief Constructor.
    */
   ConnectionTracker();
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor.
    */
   virtual ~ConnectionTracker();
 
   /**
-   * Disconnect all signals from this object
+   * @brief Disconnect all signals from this object.
    */
   void DisconnectAll();
 

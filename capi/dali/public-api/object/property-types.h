@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -38,18 +38,23 @@
 namespace Dali DALI_IMPORT_API
 {
 
+/**
+ * @brief Template function instances for property getters.
+ */
 namespace PropertyTypes
 {
 
 /**
- * Retrieve the name of a property type.
+ * @brief Retrieve the name of a property type.
+ *
  * @param [in] type The property type.
  * @return The name of this type.
  */
 const char* GetName(Property::Type type);
 
 /**
- * Retrieve an enumerated property type.
+ * @brief Retrieve an enumerated property type.
+ *
  * New versions of this templated function must be defined for future types.
  * @return The property type.
  */

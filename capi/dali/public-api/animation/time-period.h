@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ANIMATION_MODULE
  * @{
  */
 
@@ -29,25 +29,27 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * A value-type representing a period of time within an animation.
+ * @brief A value-type representing a period of time within an animation.
  */
 struct DALI_IMPORT_API TimePeriod
 {
   /**
-   * Create a time period.
+   * @brief Create a time period.
+   *
    * @param [in] durationSeconds The duration of the time period in seconds.
    */
   TimePeriod(float durationSeconds);
 
   /**
-   * Create a time period.
+   * @brief Create a time period.
+   *
    * @param [in] delaySeconds A delay before the time period in seconds.
    * @param [in] durationSeconds The duration of the time period in seconds.
    */
   TimePeriod(float delaySeconds, float durationSeconds);
 
   /**
-   * Non-virtual destructor; TimePeriod is not intended as a base class.
+   * @brief Non-virtual destructor; TimePeriod is not intended as a base class.
    */
   ~TimePeriod();
 

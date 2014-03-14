@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -37,10 +37,15 @@ namespace Internal DALI_INTERNAL
 class Layer;
 }
 
+/**
+ * @brief Rectangle describing area on screen that a layer can draw to.
+ *
+ * @see Dali::Layer::SetClippingBox()
+ */
 typedef Rect<int> ClippingBox;
 
 /**
- * Layers provide a mechanism for overlaying groups of actors on-top of each other.
+ * @brief Layers provide a mechanism for overlaying groups of actors on top of each other.
  *
  * When added to the stage, a layer can be ordered relative to other layers. The bottom
  * layer is at depth zero. The stage provides a default layer for it's children.
@@ -61,13 +66,13 @@ public:
   static const Property::Index CLIPPING_BOX;    ///< name "clipping-box",     type RECTANGLE
 
   // Action Names
-  static const char* const ACTION_RAISE;
-  static const char* const ACTION_LOWER;
-  static const char* const ACTION_RAISE_TO_TOP;
-  static const char* const ACTION_LOWER_TO_BOTTOM;
+  static const char* const ACTION_RAISE;           ///< name "raise"
+  static const char* const ACTION_LOWER;           ///< name "lower"
+  static const char* const ACTION_RAISE_TO_TOP;    ///< name "raise-to-top"
+  static const char* const ACTION_LOWER_TO_BOTTOM; ///< name "lower-to-bottom"
 
   /**
-   * The sort function type
+   * @brief The sort function type.
    *
    * The position value is the actor translation from camera.
    * The sortModifier is the user value that can be used to sort coplanar actors/nodes. This value is
@@ -79,26 +84,32 @@ public:
   typedef float (*SortFunctionType)(const Vector3& position, float sortModifier);
 
   /**
-   * Create an empty Layer handle. This can be initialised with Layer::New(...)
+   * @brief Create an empty Layer handle.
+   *
+   * This can be initialised with Layer::New(...)
    */
   Layer();
 
   /**
-   * Create a Layer object
+   * @brief Create a Layer object.
+   *
    * @return A handle to a newly allocated Layer
    */
   static Layer New();
 
   /**
-   * Downcast an Object handle to Layer. If handle points to a Layer the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Layer.
+   *
+   * If handle points to a Layer the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a Layer or an uninitialized handle
    */
   static Layer DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Layer();
@@ -109,7 +120,8 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Query the depth of the layer
+   * @brief Query the depth of the layer
+   *
    * 0 is bottom most layer, higher number is on top
    * @pre layer is on the stage
    * If layer is not added to the stage, returns 0.
@@ -118,19 +130,22 @@ public:
   unsigned int GetDepth() const;
 
   /**
-   * Increment the depth of the layer.
+   * @brief Increment the depth of the layer.
+   *
    * @pre layer is on the stage
    */
   void Raise();
 
   /**
-   * Decrement the depth of the layer.
+   * @brief Decrement the depth of the layer.
+   *
    * @pre layer is on the stage
    */
   void Lower();
 
   /**
-   * Ensures the layers depth is greater than the target layer
+   * @brief Ensures the layers depth is greater than the target layer.
+   *
    * If the layer already is above target layer its depth is not changed
    * If the layer was below target, its new depth will be immediately above target
    * Note! All layers between this layer and target get new depth values
@@ -141,7 +156,8 @@ public:
   void RaiseAbove( Layer target );
 
   /**
-   * Ensures the layers depth is less than the target layer
+   * @brief Ensures the layers depth is less than the target layer.
+   *
    * If the layer already is below the layer its depth is not changed
    * If the layer was above target, its new depth will be immediately below target
    * Note! All layers between this layer and target get new depth values
@@ -152,19 +168,20 @@ public:
   void LowerBelow( Layer target );
 
   /**
-   * Raises the layer to the top.
+   * @brief Raises the layer to the top.
    * @pre layer is on the stage
    */
   void RaiseToTop();
 
   /**
-   * Lowers the layer to the bottom.
+   * @brief Lowers the layer to the bottom.
    * @pre layer is on the stage
    */
   void LowerToBottom();
 
   /**
-   * Moves the layer directly above the given layer
+   * @brief Moves the layer directly above the given layer.
+   *
    * After the call this layers depth will be immediately above target
    * Note! All layers between this layer and target get new depth values
    * @pre layer is on the stage
@@ -174,7 +191,8 @@ public:
   void MoveAbove( Layer target );
 
   /**
-   * Moves the layer directly below the given layer
+   * @brief Moves the layer directly below the given layer.
+   *
    * After the call this layers depth will be immediately below target
    * Note! All layers between this layer and target get new depth values
    * @pre layer is on the stage
@@ -184,22 +202,26 @@ public:
   void MoveBelow( Layer target );
 
   /**
-   * Sets whether clipping is enabled for a layer.
+   * @brief Sets whether clipping is enabled for a layer.
+   *
    * Clipping is initially disabled; see also SetClippingBox().
    * @param [in] enabled True if clipping is enabled.
    */
   void SetClipping(bool enabled);
 
   /**
-   * Query whether clipping is enabled for a layer.
+   * @brief Query whether clipping is enabled for a layer.
    * @return True if clipping is enabled.
    */
   bool IsClipping() const;
 
   /**
-   * Sets the clipping box of a layer, in window coordinates.
+   * @brief Sets the clipping box of a layer, in window coordinates.
+   *
    * The contents of the layer will not be visible outside this box, when clipping is
    * enabled. The default clipping box is empty (0,0,0,0).
+   * This has the limitation that it only applies to rectangles on a window.
+   * For other kinds of clipping, @see Dali::Actor::SetDrawMode().
    * @param [in] x The X-coordinate of the lower-left corner.
    * @param [in] y The Y-coordinate of the lower-left corner.
    * @param [in] width  The width of the box.
@@ -208,7 +230,8 @@ public:
   void SetClippingBox(int x, int y, int width, int height);
 
   /**
-   * Sets the clipping box of a layer, in window coordinates.
+   * @brief Sets the clipping box of a layer, in window coordinates.
+   *
    * The contents of the layer will not be visible outside this box, when clipping is
    * enabled. The default clipping box is empty (0,0,0,0).
    * @param [in] box The clipping box
@@ -216,7 +239,8 @@ public:
   void SetClippingBox(ClippingBox box);
 
   /**
-   * Retrieves the clipping box of a layer, in window coordinates.
+   * @brief Retrieves the clipping box of a layer, in window coordinates.
+   *
    * @return The clipping box
    */
   ClippingBox GetClippingBox() const;
@@ -224,7 +248,7 @@ public:
   // Depth test
 
   /**
-   * Whether to disable the depth test.
+   * @brief Whether to disable the depth test.
    *
    * By default a layer enables depth test if there is more than one opaque actor or if there is one opaque actor and one, or more, transparent actors.
    * However, it's possible to disable the depth test by calling this method.
@@ -234,7 +258,7 @@ public:
   void SetDepthTestDisabled( bool disable );
 
   /**
-   * Retrieves whether depth test is disabled.
+   * @brief Retrieves whether depth test is disabled.
    *
    * @return \e true if depth test is disabled.
    */
@@ -243,7 +267,7 @@ public:
   // Sorting
 
   /**
-   * This sort function sorts actors according to the Z-value in the camera coordinate system.
+   * @brief This sort function sorts translucent actors according to the Z-value in view space.
    *
    * This is useful for 2D user interfaces.
    *
@@ -251,11 +275,15 @@ public:
    *
    * We return a negative z value as in our translation, a low z means that it should
    * be sorted further away and a high z means that it should be closer.
+   * @param[in] position     position of actor in view space
+   * @param[in] sortModifier additional sort modifer
+   * @return depth
    */
   static float ZValue(const Vector3& position, float sortModifier);
 
   /**
-   * This allows the user to specify the sort function that the layer should use.
+   * @brief This allows the user to specify the sort function that the layer should use.
+   *
    * The sort function is used to determine the order in which the actors are drawn
    * and input is processed on the actors in the layer.
    *
@@ -277,7 +305,8 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] Layer A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Layer(Internal::Layer* Layer);

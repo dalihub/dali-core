@@ -19,7 +19,7 @@
 
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -39,9 +39,9 @@ class MeshActor;
 }
 
 /**
- * This actor is used to draw one or more mesh geometries, passed in on creation. It allows
- * for a custom material to be drawn on the mesh.
+ * @brief This actor is used to draw a mesh geometry with a material.
  *
+ * It allows for a custom material to be drawn on the mesh.
  * By default CullFaceMode is set to CullBack to enable back face culling.
  */
 class DALI_IMPORT_API MeshActor : public RenderableActor
@@ -49,41 +49,48 @@ class DALI_IMPORT_API MeshActor : public RenderableActor
 public:
 
   /**
-   * Create an uninitialized MeshActor handle. This can be initialised with MeshActor::New().
+   * @brief Create an uninitialized MeshActor handle.
+   *
+   * This can be initialised with MeshActor::New().
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   MeshActor();
 
   /**
-   * Create a MeshActor object.
+   * @brief Create a MeshActor object.
    * @return the newly allocated MeshActor object
    */
   static MeshActor New();
 
   /**
-   * Create a MeshActor object.
+   * @brief Create a MeshActor object.
+   *
    * @param[in] mesh the Mesh the actor will use.
    * @return the newly allocated MeshActor object
    */
   static MeshActor New( Mesh mesh );
 
   /**
-   * Create a MeshActor object
+   * @brief Create a MeshActor object
+   *
    * @param[in] mesh the Animated Mesh the actor will use.
    * @return the newly allocated MeshActor object
    */
   static MeshActor New( AnimatableMesh mesh );
 
   /**
-   * Downcast an Object handle to MeshActor. If handle points to a MeshActor the
-   * downcast produces a valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to MeshActor.
+   *
+   * If handle points to a MeshActor the downcast produces a valid
+   * handle. If not the returned handle is left uninitialized.
    * @param[in] handle to an object
    * @return handle to a MeshActor or an uninitialized handle
    */
   static MeshActor DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~MeshActor();
@@ -94,7 +101,8 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Set a custom material on the given actor or one of it's children.
+   * @brief Set a custom material on the given actor or one of it's children.
+   *
    * @pre the mesh is loaded
    * @param[in] actor      The first actor in the tree of model actors
    * @param[in] actorName  The name of the actor to search for.
@@ -104,7 +112,8 @@ public:
   static void SetMaterial(Actor actor, const std::string& actorName, Material material);
 
   /**
-   * Set a custom material on this actor
+   * @brief Set a custom material on this actor.
+   *
    * @pre the mesh is loaded
    * @param[in] material   The custom material.@n
    *                       Pass an uninitialised Material to revert to the original material.
@@ -112,15 +121,17 @@ public:
   void SetMaterial(Material material);
 
   /**
-   * Get the material for this mesh actor
+   * @brief Get the material for this mesh actor.
+   *
    * @pre the mesh is loaded
    * @return The material
    */
   Material GetMaterial() const;
 
   /**
-   * Set whether this mesh actor should be affected by lights in the
-   * scene.  If it set to false, then the mesh will be unaffected by
+   * @brief Set whether this mesh actor should be affected by lights in the scene.
+   *
+   * If it is set to false, then the mesh will be unaffected by
    * lighting, and will be drawn with flat lighting, applying
    * the material's diffuse & ambient colors and the actor's color to the
    * material texture. If it is set to true, and there are no lights in the
@@ -133,13 +144,15 @@ public:
   void SetAffectedByLighting(bool affectedByLighting);
 
   /**
-   * Get the lighting status
+   * @brief Get the lighting status.
+   *
    * @return true if the actor is affected by the scene lighting, or false if its evenly lit.
    */
   bool IsAffectedByLighting();
 
   /**
-   * Search the actor tree for all named bones in the mesh and connect them.
+   * @brief Search the actor tree for all named bones in the mesh and connect them.
+   *
    * @param[in] rootActor The root actor of the actor tree.
    */
   void BindBonesToMesh(Actor rootActor);
@@ -147,7 +160,8 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods
+   *
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL MeshActor(Internal::MeshActor* actor);

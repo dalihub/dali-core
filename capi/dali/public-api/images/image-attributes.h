@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_IMAGES_MODULE
  * @{
  */
 
@@ -33,7 +33,7 @@ namespace Dali DALI_IMPORT_API
 class ImageAttributes;
 
 /**
- * Describes Image properties like width or pixel format.
+ * @brief Describes Image properties like width or pixel format.
  * ImageAttributes are used to request specific details when loading an image.
  * Loading a scaled-down version of a JPEG image can be done by requesting width and height values that are
  * smaller than the image's natural size. The requested values are taken into consideration but
@@ -45,7 +45,7 @@ class ImageAttributes
 public:
 
   /**
-   * Scaling options, meant for thumbnail loading.
+   * @brief Scaling options, meant for thumbnail loading.
    */
   enum ScalingMode
   {
@@ -55,39 +55,43 @@ public:
     FitHeight     ///< thumbnail fills whole height, width is scaled to maintain aspect ratio
   };
 
-  static const ImageAttributes DEFAULT_ATTRIBUTES;
+  static const ImageAttributes DEFAULT_ATTRIBUTES; ///< Default attributes have no size
 
   /**
-   * Default constructor, initializes to default values.
+   * @brief Default constructor, initializes to default values.
    */
   ImageAttributes();
 
   /**
-   * This copy constructor is required for correctly copying internal implementation
+   * @brief This copy constructor is required for correctly copying internal implementation.
+   *
    * @param [in] rhs A reference to the copied handle
    */
   ImageAttributes(const ImageAttributes& rhs);
 
   /**
-   * This assignment operator is required for correctly handling the internal implementation
+   * @brief This assignment operator is required for correctly handling the internal implementation.
+   *
    * @param [in] rhs  A reference to the copied handle
+   * @return a reference to this object
    */
   ImageAttributes& operator=(const ImageAttributes& rhs);
 
   /**
-   * Default destructor,
+   * @brief Default destructor.
    */
   ~ImageAttributes();
 
   /**
-   * Create an initialised image attributes object
+   * @brief Create an initialised image attributes object.
    *
    * @return A handle to a newly allocated object
    */
   static ImageAttributes New();
 
   /**
-   * Create an initialised image attributes object
+   * @brief Create an initialised image attributes object.
+   *
    * @param [in] width         desired width.
    * @param [in] height        desired height
    * @param [in] format        desired pixelformat
@@ -96,15 +100,15 @@ public:
   static ImageAttributes New(unsigned int width, unsigned int height, Pixel::Format format);
 
   /**
-   * Create an initialised image attributes object for distance field generation
-   * Using default parameters.
+   * @brief Create an initialised image attributes object for distance field generation
+   * using default parameters.
    *
    * @return A handle to a newly allocated object
    */
   static ImageAttributes NewDistanceField();
 
   /**
-   * Create an initialised image attributes object for distance field generation
+   * @brief Create an initialised image attributes object for distance field generation.
    *
    * @param [in] fieldRadius The minimum search radius to check for differing pixels
    * @param [in] fieldBorder The amount of distancefield cells to add around the data (for glow/shadow effects)
@@ -113,7 +117,8 @@ public:
   static ImageAttributes NewDistanceField(float fieldRadius, int fieldBorder);
 
   /**
-   * Set the size properties
+   * @brief Set the size properties.
+   *
    * By default width and height are set to zero which means the image loaded has the original size.
    * @param [in] width  desired width.
    * @param [in] height desired height
@@ -121,28 +126,31 @@ public:
   void SetSize(unsigned int width, unsigned int height);
 
   /**
-   * Set the size properties
+   * @brief Set the size properties.
+   *
    * By default width and height are set to zero which means the image loaded has the original size.
    * @param [in] size  desired size.
    */
   void SetSize( const Size& size );
 
   /**
-   * Set the pixelformat field of the image attributes
+   * @brief Set the pixelformat field of the image attributes.
+   *
    * By default is set to Pixel::RGBA8888.
    * @param [in] format desired pixelformat
    */
   void SetPixelFormat(Pixel::Format format);
 
   /**
-   * Set the scale field of the image attributes.
+   * @brief Set the scale field of the image attributes.
+   *
    * By default, ShrinkToFit is set.
    * @param [in] scalingMode The desired scaling mode
    */
   void SetScalingMode(ScalingMode scalingMode);
 
   /**
-   * Set the desired cropping for the attribute
+   * @brief Set the desired cropping for the attribute.
    *
    * Cropping options, relative to image actual size.
    * (0.0, 0.0) is top left corner, (1.0, 1.0) is the full width and height
@@ -154,8 +162,9 @@ public:
   void SetCrop(const Rect<float>& cropRect);
 
   /**
-   * Set whether the image will be rotated/flipped back into portrait
-   * orientation. This will only be necessary if metadata indicates that the
+   * @brief Set whether the image will be rotated/flipped back into portrait orientation.
+   *
+   * This will only be necessary if metadata indicates that the
    * image has a different viewing orientation.
    *
    * This metadata, optionally present in formats that use exif for example,
@@ -173,118 +182,132 @@ public:
 
 
   /**
-   * Return the width currently represented by the attribute
+   * @brief Return the width currently represented by the attribute.
    *
    * @return width
    */
   unsigned int GetWidth() const;
 
   /**
-   * Return the height currently represented by the attribute
+   * @brief Return the height currently represented by the attribute.
    *
    * @return height
    */
   unsigned int GetHeight() const;
 
   /**
-   * Return the size currently represented by the attribute
+   * @brief Return the size currently represented by the attribute.
    *
    * @return size
    */
   Size GetSize() const;
 
   /**
-   * Return the pixel format currently represented by the attribute
+   * @brief Return the pixel format currently represented by the attribute.
    *
    * @return pixel format
    */
   Pixel::Format GetPixelFormat() const;
 
   /**
-   * Return the scale currently represented by the attribute
+   * @brief Return the scale currently represented by the attribute.
    *
    * @return scale
    */
   ScalingMode GetScalingMode() const;
 
   /**
-   * Return if the attribute set up as a distance field
+   * @brief Return if the attribute set up as a distance field.
    *
    * @return true, if the attribute is a distance field.
    */
   bool IsDistanceField() const;
 
   /**
-   * Return the field border currently represented by the attribute
+   * @brief Return the field border currently represented by the attribute.
    *
    * @return field border
    */
   int GetFieldBorder() const;
 
   /**
-   * Return the field search radius currently represented by the attribute
+   * @brief Return the field search radius currently represented by the attribute.
    *
    * @return field radius
    */
   float GetFieldRadius() const;
 
   /**
-   * Return the crop currently represented by the attribute
+   * @brief Return the crop currently represented by the attribute.
    *
    * @return crop
    */
   const Rect<float>& GetCrop() const;
 
   /**
+   * @brief Whether to correct for physical orientation of an image.
+   *
    * @return Whether image pixels should be transformed according to the
    *         orientation metadata, if any.
    */
   bool GetOrientationCorrection() const;
 
   /**
-   * Less then comparison operator.
+   * @brief Less then comparison operator.
+   *
    * @param [in] a parameter tested
    * @param [in] b parameter tested
+   * @return true if a is less than b
    */
   friend bool operator<(const ImageAttributes& a, const ImageAttributes& b);
 
   /**
-   * Equal to comparison operator.
+   * @brief Equal to comparison operator.
+   *
    * @param [in] a parameter tested for equality
    * @param [in] b parameter tested for equality
+   * @return true if a is equal to b
    */
   friend bool operator==(const ImageAttributes& a, const ImageAttributes& b);
 
   /**
-   * Not equal to comparison operator.
+   * @brief Not equal to comparison operator.
+   *
    * @param [in] a parameter tested for equality
    * @param [in] b parameter tested for equality
+   * @return true if a is not equal to b
    */
   friend bool operator!=(const ImageAttributes& a, const ImageAttributes& b);
 
 private:
   struct ImageAttributesImpl;
-  ImageAttributesImpl* impl;
+  ImageAttributesImpl* impl; ///< Implementation pointer
 };
 
 /**
- * Less then comparison operator.
+ * @brief Less then comparison operator.
+ *
  * @param [in] a parameter tested
  * @param [in] b parameter tested
+ * @return true if a is less than b
  */
 bool operator<(const ImageAttributes& a, const ImageAttributes& b);
 
 /**
- * Equal to comparison operator.
+ * @brief Equal to comparison operator.
+ *
  * @param [in] a parameter tested for equality
  * @param [in] b parameter tested for equality
+ * @return true if a is equal to b
  */
 bool operator==(const ImageAttributes& a, const ImageAttributes& b);
 
 /**
- * Not equal to comparison operator.
+ * @brief Not equal to comparison operator.
+ *
  * @param [in] a parameter tested for equality
  * @param [in] b parameter tested for equality
+ * @return true if a is not equal to b
  */
 bool operator!=(const ImageAttributes& a, const ImageAttributes& b);
 

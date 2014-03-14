@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_IMAGES_MODULE
  * @{
  */
 
@@ -29,12 +29,15 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Pixel format types and their properties.
+ * @brief Pixel format types and their properties.
  */
 namespace Pixel
 {
-
-/// @note: BitmapImage::BufferUpdated might not work with BGR/BGRA formats!
+/**
+ * @brief Pixel formats
+ *
+ * @note: BitmapImage::Update might not work with BGR/BGRA formats!
+ */
 enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
 {
   // Start at > 0 to distinguish null data:
@@ -69,31 +72,40 @@ enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
   ///! Update LAST_VALID_PIXEL_FORMAT below if you add an enum value here.
 };
 
-/** For asserting that a variable has a valid pixel format.
- *  Sync it to the first value above. */
+/**
+ * @brief For asserting that a variable has a valid pixel format.
+ *
+ * Sync it to the first value above.
+ */
 const Format FIRST_VALID_PIXEL_FORMAT = A8;
 
-/** For asserting that a variable has a valid pixel format.
- *  Sync it to the last value above. */
+/**
+ * @brief For asserting that a variable has a valid pixel format.
+ *
+ * Sync it to the last value above.
+ */
 const Format LAST_VALID_PIXEL_FORMAT = COMPRESSED_RGB_PVRTC_4BPPV1;
 
 /**
- * Whether specified pixel format contains an alpha value
+ * @brief Whether specified pixel format contains an alpha value.
+ *
  * @param [in] pixelformat pixel format
  * @return true if format has alpha, false otherwise
  */
 bool HasAlpha(Format pixelformat);
 
 /**
- * Returns The number of bytes per pixel for the specified pixel format
+ * @brief Returns The number of bytes per pixel for the specified pixel format.
+ *
  * @param [in] pixelFormat The pixel format
  * @return The number of bytes per pixel
  */
 unsigned int GetBytesPerPixel(Format pixelFormat);
 
 /**
- * Returns the offset of the byte containing the alpha mask from the start of the pixel data
+ * @brief Returns the offset of the byte containing the alpha mask from the start of the pixel data
  * and the bitmask of that byte to get the alpha value.
+ *
  * Bitmask is zero if the pixelFormat does not support alpha
  * @param[in]  pixelFormat
  * @param[out] byteOffset the byte offset

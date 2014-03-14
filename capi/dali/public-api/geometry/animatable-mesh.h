@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_GEOMETRY_MODULE
  * @{
  */
 
@@ -38,28 +38,34 @@ class AnimatableMesh;
 }
 
 /**
- * An animatable mesh can have any of its vertices animated using Dali's animation and
+ * @brief An animatable mesh can have any of its vertices animated using Dali's animation and
  * constraint systems.
+ *
  * It is recommended that the vertices of the mesh remain in the bounds -0.5 - 0.5, which
  * will match the actor size boundaries. The origin of the mesh matches the actor's position.
  */
 class AnimatableMesh : public Constrainable
 {
 public:
+  /**
+   * @brief Vector of face indices.
+   */
   typedef std::vector<unsigned short> Faces;
-  typedef Faces::iterator             FacesIter;
-  typedef Faces::const_iterator       FacesConstIter;
+  typedef Faces::iterator             FacesIter;      ///< Iterator for Dali::AnimatableMesh::Faces
+  typedef Faces::const_iterator       FacesConstIter; ///< Const Iterator for Dali::AnimatableMesh::Faces
 
   /**
-   * Create an uninitialized handle, this can be initialized with New().
+   * @brief Create an uninitialized handle, this can be initialized with New().
+   *
    * Calling member functions on an uninitialized handle will result
    * in an assertion
    */
   AnimatableMesh();
 
   /**
-   * Create a new animatable mesh with a given number of vertices
-   * and triangles. This will assert if any index is out of range.
+   * @brief Create a new animatable mesh with a given number of vertices and triangles.
+   *
+   * This will assert if any index is out of range.
    * Using this constructor enables the vertex color property.
    * AnimatableMesh does not take ownership of the faceIndices.
    * @param[in] numVertices The number of vertices in the mesh
@@ -71,8 +77,9 @@ public:
                              const Faces& faceIndices );
 
   /**
-   * Create a new animatable mesh with a given number of vertices
-   * and triangles. This will assert if any index is out of range.
+   * @brief Create a new animatable mesh with a given number of vertices and triangles.
+   *
+   * This will assert if any index is out of range.
    * Using this constructor disables the vertex color property.
    * AnimatableMesh does not take ownership of the faceIndices.
    * @param[in] numVertices The number of vertices in the mesh
@@ -86,9 +93,11 @@ public:
                              Dali::Material material );
 
   /**
-   * Downcast an Object handle to AnimatableMesh. If the handle points
-   * to an AnimatableMesh objec, the downcast produces a valid
-   * handle. If not, the handle is left uninitialized.
+   * @brief Downcast an Object handle to AnimatableMesh.
+   *
+   * If the handle points to an AnimatableMesh objec, the downcast
+   * produces a valid handle. If not, the handle is left
+   * uninitialized.
    *
    * @param[in] handle to an Object
    * @return handle to an AnimatableMesh or an uninitialized handle
@@ -96,12 +105,13 @@ public:
   static AnimatableMesh DownCast( BaseHandle handle );
 
   /**
-   * Destructor
+   * @brief Destructor
    */
   virtual ~AnimatableMesh();
 
   /**
-   * Get the number of vertices with which this mesh was created.
+   * @brief Get the number of vertices with which this mesh was created.
+   *
    * @return number of vertices in this mesh
    */
   unsigned int GetNumberOfVertices() const;
@@ -112,7 +122,7 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Array subscript operator overload.
+   * @brief Array subscript operator overload.
    *
    * @pre The vertex index is in range
    * @param[in] index subscript
@@ -121,7 +131,8 @@ public:
   AnimatableVertex operator[]( unsigned int index ) const;
 
   /**
-   * Get a property index for a given vertex
+   * @brief Get a property index for a given vertex.
+   *
    * @pre The vertex index and property is in range
    * @param[in] vertex The vertex
    * @param[in] property The vertex attribute
@@ -130,7 +141,7 @@ public:
   Property::Index GetPropertyIndex( unsigned int vertex, Property::Index property) const;
 
   /**
-   * Get the property for a given vertex.
+   * @brief Get the property for a given vertex.
    *
    * @pre The vertex index and property is in range
    * @param[in] vertex The vertex
@@ -142,7 +153,8 @@ public:
 public: // Not for use by application developer
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods
+   *
    * @param [in] mesh A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL AnimatableMesh(Internal::AnimatableMesh* mesh);

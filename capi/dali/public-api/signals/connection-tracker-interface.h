@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SIGNALS_MODULE
  * @{
  */
 
@@ -30,7 +30,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Interface used to track connections between signals and slots.
+ * @brief Interface used to track connections between signals and slots.
+ *
  * Performs automatic connection and disconnection when either the slot or signal dies.
  *
  * @code
@@ -54,24 +55,26 @@ class ConnectionTrackerInterface : public SignalObserver
 public:
 
   /**
-   * Constructor
+   * @brief Constructor.
    */
   ConnectionTrackerInterface();
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor.
    */
   virtual ~ConnectionTrackerInterface();
 
   /**
-   * Called when a signal is connected.
+   * @brief Called when a signal is connected.
+   *
    * @param[in] slotObserver The slot observer i.e. a signal.
    * @param[in] callback The call back.
    */
   virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) = 0;
 
   /**
-   * Query the connection count.
+   * @brief Query the connection count.
+   *
    * @return The number of signal/slot connections know by the connection tracker.
    */
   virtual std::size_t GetConnectionCount() const = 0;

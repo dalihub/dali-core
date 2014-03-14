@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -29,11 +29,12 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * PropertyRegistration indices should be between this range.
+ * @brief PropertyRegistration indices should be between this range.
+ *
  * Enumerations are being used here rather than static constants so that switch statements can be
  * used to compare property indices.
  */
-enum
+enum PropertyRegistrationIndices
 {
   PROPERTY_REGISTRATION_START_INDEX = 10000000,   ///< The index when registering a property should start from this number
   PROPERTY_REGISTRATION_MAX_INDEX   = 19999999    ///< The maximum index supported when registering a property

@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_TEXT_MODULE
  * @{
  */
 
@@ -38,63 +38,73 @@ namespace Internal DALI_INTERNAL
 }
 
 /**
- * Text class, encapsulates a string of characters implementation to support multiple languages.
+ * @brief Encapsulates a string of characters implementation to support multiple languages.
  */
 class Text
 {
 public:
 
   /**
-   * Default constructor.
+   * @brief Default constructor.
+   *
    * It creates an empty Text.
    */
   Text();
 
   /**
-   * Constructor.
+   * @brief Constructor.
+   *
    * Creates a Text object with the given string.
    * @param [in] text An ASCII or UTF-8 encoded string.
    */
   Text( const std::string& text );
 
   /**
-   * Constructor.
+   * @brief Constructor.
+   *
    * Creates a Text object with the given character.
    * @param [in] character The character.
    */
   Text( const Character& character );
 
   /**
-   * Copy Constructor.
+   * @brief Copy Constructor.
+   *
    * @param [in] text Text to be copied.
    */
   Text( const Text& text );
 
   /**
-   * Assignment operator.
+   * @brief Assignment operator.
+   *
    * @param [in] text Text to be assigned.
+   * @return A reference to this
    */
   Text& operator=( const Text& text );
 
   /**
-   * Non-virtual destructor.
+   * @brief Non-virtual destructor.
+   *
    */
   ~Text();
 
   /**
-   * Retrieves the stored text.
+   * @brief Retrieves the stored text.
+   *
    * @return An std::string with the stored text.
    */
   std::string GetText() const;
 
   /**
-   * Sets the given text.
+   * @brief Sets the given text.
+   *
    * @param [in] text The text to be set.
    */
   void SetText( const std::string& text );
 
   /**
-   * Sets the given character.
+   * @brief Sets the given character.
+   *
    * @param [in] character The character to be set.
    */
   void SetText( const Character& character );
@@ -105,32 +115,38 @@ public:
   void SetText( const Text& text );
 
   /**
-   * Retrieves the characters stored in the given position.
+   * @brief Retrieves the character stored in the given position.
+   *
    * @pre The given \e position must be a positive value less than the total length of the text.
    * @param [in] position The character position.
+   * @return The character
    */
   Character operator[]( size_t position ) const;
 
   /**
-   * Whether the text is empty or not.
+   * @brief Whether the text is empty or not.
+   *
    * @return \e true if the text is empty.
    */
   bool IsEmpty() const;
 
   /**
-   * Retrieves the number of characters.
+   * @brief Retrieves the number of characters.
+   *
    * @return the number of characters.
    */
   size_t GetLength() const;
 
   /**
-   * Appends the given text.
+   * @brief Appends the given text.
+   *
    * @param [in] text The text to be appended.
    */
   void Append( const std::string& text );
 
   /**
-   * Appends the given character.
+   * @brief Appends the given character.
+   *
    * @param [in] character The character to be appended.
    */
   void Append( const Character& character );
@@ -141,7 +157,7 @@ public:
   void Append( const Text& text );
 
   /**
-   * Removes a number of characters starting from a given position.
+   * @brief Removes a number of characters starting from a given position.
    *
    * @pre The given \e position plus \e numberOfCharacters must be a positive value less or equal than the total length of the text.
    * @param[in] position The position from where characters are going to be removed.
@@ -151,12 +167,12 @@ public:
 
 private:
 
-  Internal::Text* mImpl;
+  Internal::Text* mImpl; ///< Pointer to implementation object
 
 public: // Not intended for application developers
 
   /**
-   * Retrieves the internal implementation.
+   * @brief Retrieves the internal implementation.
    *
    * @note Application developers shouldn't call any GetImplementation() method.
    *
@@ -165,7 +181,7 @@ public: // Not intended for application developers
   DALI_INTERNAL const Internal::Text& GetImplementation() const;
 
   /**
-   * Retrieves the internal implementation.
+   * @brief Retrieves the internal implementation.
    *
    * @note Application developers shouldn't call any GetImplementation() method.
    *

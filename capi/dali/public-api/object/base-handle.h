@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_OBJECT_MODULE
  * @{
  */
 
@@ -39,7 +39,8 @@ class BaseObject;
 class ConnectionTrackerInterface;
 
 /**
- * Dali::BaseHandle is a handle to an internal Dali resource.
+ * @brief Dali::BaseHandle is a handle to an internal Dali resource.
+ *
  * Each Dali handle consists of a single private pointer, and a set of non-virtual forwarding functions.
  * This hides the internal implementation, so it may be modified without affecting the public interface.
  *
@@ -57,20 +58,24 @@ class BaseHandle
 {
 public:
 
-  // Used for null pointer assignment below
+  /**
+   * @brief Used for null pointer assignment below
+   */
   class NullType
   {
     NullType() { }
   };
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] handle A pointer to a newly allocated Dali resource
    */
   BaseHandle(Dali::BaseObject* handle);
 
   /**
-   * This constructor provides an uninitialized Dali::BaseHandle.
+   * @brief This constructor provides an uninitialized Dali::BaseHandle.
+   *
    * This should be initialized with a Dali New() method before use.
    * Methods called on an uninitialized Dali::BaseHandle will assert.
    * @code
@@ -84,18 +89,20 @@ public:
   BaseHandle();
 
   /**
-   * Dali::BaseHandle is intended as a base class
+   * @brief Dali::BaseHandle is intended as a base class.
    */
   virtual ~BaseHandle();
 
   /**
-   * This copy constructor is required for (smart) pointer semantics
+   * @brief This copy constructor is required for (smart) pointer semantics.
+   *
    * @param [in] handle A reference to the copied handle
    */
   BaseHandle(const BaseHandle& handle);
 
   /**
-   * This assignment operator is required for (smart) pointer semantics
+   * @brief This assignment operator is required for (smart) pointer semantics.
+   *
    * It makes this handle use the same BaseObject as the copied handle
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this handle
@@ -103,8 +110,9 @@ public:
   BaseHandle& operator=(const BaseHandle& rhs);
 
   /**
-   * This method is defined to allow assignment of the NULL value,
+   * @brief This method is defined to allow assignment of the NULL value,
    * and will throw an exception if passed any other value.
+   *
    * Assigning to NULL is an alias for Reset().
    * @param [in] rhs  A NULL pointer
    * @return A reference to this handle
@@ -112,7 +120,8 @@ public:
   BaseHandle& operator=(NullType* rhs);
 
   /**
-   * Connects a void() functor to a specified signal.
+   * @brief Connects a void() functor to a specified signal.
+   *
    * @pre The signal must be available in this object.
    * @param [in] connectionTracker A connection tracker which can be used to disconnect.
    * @param [in] signalName Name of the signal to connect to.
@@ -126,7 +135,8 @@ public:
   }
 
   /**
-   * Perform action on this object with the given action name and attributes.
+   * @brief Perform action on this object with the given action name and attributes.
+   *
    * @param [in] actionName The command for the action.
    * @param [in] attributes The list of attributes for the action.
    * @return The action is performed by the object or not.
@@ -134,7 +144,8 @@ public:
   bool DoAction(const std::string& actionName, const std::vector<Property::Value>& attributes);
 
   /**
-   * Returns the type name for the Handle.
+   * @brief Returns the type name for the Handle.
+   *
    * @return The type name.
    */
   const std::string& GetTypeName() const;
@@ -144,7 +155,8 @@ public:
   // BaseHandle accessors
 
   /**
-   * Retrieve the internal Dali resource.
+   * @brief Retrieve the internal Dali resource.
+   *
    * This is useful for checking the reference count of the internal resource.
    * This method will assert, if the Dali::BaseHandle has not been initialized.
    * @return The BaseObject which is referenced by the BaseHandle.
@@ -152,7 +164,8 @@ public:
   BaseObject& GetBaseObject();
 
   /**
-   * Retrieve the internal Dali resource.
+   * @brief Retrieve the internal Dali resource.
+   *
    * This is useful for checking the reference count of the internal resource.
    * This method will assert, if the Dali::BaseHandle has not been initialized.
    * @return The BaseObject which is referenced by the BaseHandle.
@@ -160,7 +173,8 @@ public:
   const BaseObject& GetBaseObject() const;
 
   /**
-   * Resets the handle.
+   * @brief Resets the handle.
+   *
    * If no other handle copies exist, the internal Dali resouce will be deleted.
    * Calling this is not required i.e. it will happen automatically when a Dali::BaseHandle is destroyed.
    */
@@ -169,32 +183,37 @@ public:
   // BaseHandle comparisons - This is a variation of the safe bool idiom
 
   /**
-   * Pointer-to-member type. Objects can be implicitly converted to this for validity checks.
+   * @brief Pointer-to-member type.
+   * Objects can be implicitly converted to this for validity checks.
    */
   typedef void (BaseHandle::*BooleanType)() const;
 
   /**
-   * Converts an handle to a BooleanType.
+   * @brief Converts an handle to a BooleanType.
+   *
    * This is useful for checking whether the handle is empty.
    */
   operator BooleanType() const;
 
   /**
-   * Equality operator overload.
+   * @brief Equality operator overload.
+   *
    * @param [in] rhs A reference to the compared handle.
    * @return true if the handle handles point to the same Dali resource, or if both are NULL.
    */
   bool operator==(const BaseHandle& rhs) const;
 
   /**
-   * Inequality operator overload.
+   * @brief Inequality operator overload.
+   *
    * @param [in] rhs A reference to the compared handle.
    * @return true if the handle handles point to the different Dali resources.
    */
   bool operator!=(const BaseHandle& rhs) const;
 
   /**
-   * Get the reference counted object pointer.
+   * @brief Get the reference counted object pointer.
+   *
    * @return A pointer to the reference counted object.
    */
   Dali::RefObject* GetObjectPtr() const;
@@ -202,7 +221,8 @@ public:
 private:
 
   /**
-   * Not intended for application developers.
+   * @brief Not intended for application developers.
+   *
    * @param [in] connectionTracker A connection tracker which can be used to disconnect.
    * @param [in] signalName Name of the signal to connect to.
    * @param [in] functorDelegate A newly allocatated functor delegate (takes ownership).
@@ -211,17 +231,19 @@ private:
   bool DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate );
 
   /**
-   * Used by the safe bool idiom.
+   * @brief Used by the safe bool idiom.
+   *
    */
   void ThisIsSaferThanReturningVoidStar() const {}
 
 private:
 
-  IntrusivePtr<Dali::RefObject> mObjectHandle;
+  IntrusivePtr<Dali::RefObject> mObjectHandle; ///< Object this handle points at.
 };
 
 /**
- * Template wrapper to downcast an base object handle to derived class handle
+ * @brief Template wrapper to downcast an base object handle to derived class handle.
+ *
  * @pre The BaseHandle has been initialized.
  * @param handle to a base object
  * @return handle pointer to either a valid deriving handle or an uninitialized handle
@@ -234,6 +256,9 @@ T DownCast( BaseHandle handle )
 
 // See also BaseHandle::BooleanType() conversion
 
+/**
+ * @brief Equality operator
+ */
 template <typename T>
 bool operator==(const BaseHandle& lhs, const T& rhs)
 {
@@ -241,6 +266,9 @@ bool operator==(const BaseHandle& lhs, const T& rhs)
   return lhs == static_cast<const BaseHandle&>(rhs);
 }
 
+/**
+ * @brief Equality operator
+ */
 template <typename T>
 bool operator!=(const BaseHandle& lhs, const T& rhs)
 {
@@ -250,6 +278,9 @@ bool operator!=(const BaseHandle& lhs, const T& rhs)
 
 // More Operators
 
+/**
+ * @brief Less than operator
+ */
 bool operator<(const BaseHandle& lhs, const BaseHandle& rhs);
 
 } // namespace Dali

@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -28,6 +28,9 @@
 namespace Dali DALI_IMPORT_API
 {
 
+/**
+ * @brief Typedef for a viewport ( a rectangle representing a screen area ).
+ */
 typedef Rect<int> Viewport;
 
 } // namespace Dali

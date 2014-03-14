@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_EVENTS_MODULE
  * @{
  */
 
@@ -30,8 +30,9 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * A TapGesture is emitted when the user taps the screen with the stated number of fingers a stated
- * number of times.  This is a discrete gesture so does not have any state information.
+ * @brief A TapGesture is emitted when the user taps the screen with the stated number of fingers a stated number of times.
+ *
+ * This is a discrete gesture so does not have any state information.
  * @see TapGestureDetector
  */
 struct TapGesture : public Gesture
@@ -39,46 +40,48 @@ struct TapGesture : public Gesture
   // Construction & Destruction
 
   /**
-   * Default Constructor
+   * @brief Default Constructor
    */
   TapGesture();
 
   /**
-   * Copy constructor
+   * @brief Copy constructor
    */
   TapGesture( const TapGesture& rhs );
 
   /**
-   * Assignment operator
+   * @brief Assignment operator
    */
   TapGesture& operator=( const TapGesture& rhs );
 
   /**
-   * Virtual destructor
+   * @brief Virtual destructor
    */
   virtual ~TapGesture();
 
   // Data
 
   /**
-   * The number of taps in this tap gesture.
+   * @brief The number of taps in this tap gesture.
    */
   unsigned int numberOfTaps;
 
   /**
-   * The number of touch points in this tap gesture, i.e. the number of fingers the user had on the
+   * @brief The number of touch points in this tap gesture, i.e. the number of fingers the user had on the
    * screen to generate the tap gesture.
    */
   unsigned int numberOfTouches;
 
   /**
-   * This is the point, in screen coordinates, where the tap occurred.
+   * @brief This is the point, in screen coordinates, where the tap occurred.
+   *
    * If a multi-touch tap, then this is the centroid of all the touch points.
    */
   Vector2 screenPoint;
 
   /**
-   * This is the point, in local actor coordinates, where the tap occurred.
+   * @brief This is the point, in local actor coordinates, where the tap occurred.
+   *
    * If a multi-touch tap, then this is the centroid of all the touch points.
    * @return The point where tap has occurred (in local actor coordinates).
    */

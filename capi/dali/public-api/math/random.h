@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -28,11 +28,16 @@
 namespace Dali DALI_IMPORT_API
 {
 
+/**
+ * @brief Provides methods to generate and use random values.
+ */
 namespace Random
 {
 
 /**
- * Returns a random number between f0 and f1. Note, uses a limited number of values.
+ * @brief Returns a random number between f0 and f1.
+ *
+ * Note, uses a limited number of values.
  * @param[in] f0 the lower bound
  * @param[in] f1 the upper bound
  * @return a random value between the lower and upper bound
@@ -45,7 +50,8 @@ inline float Range(float f0, float f1)
 }
 
 /**
- * Function to return a normalized axis in a random direction
+ * @brief Function to return a normalized axis in a random direction.
+ *
  * @return the axis
  */
 inline Vector4 Axis()
@@ -65,7 +71,8 @@ inline Vector4 Axis()
 }
 
 /**
- * Returns true if the value given is greater than a random value between 0 and 1.
+ * @brief Returns true if the value given is greater than a random value between 0 and 1.
+ *
  * @param chance  A value between 0 and 1. [Default: 0.5]
  * @return        true if chance greater than the random value, otherwise false.
  */

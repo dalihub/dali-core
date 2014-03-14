@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_SHADER_EFFECTS_MODULE
  * @{
  */
 
@@ -30,7 +30,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * DALI_COMPOSE_SHADER macro provides convenient way to write shader source code.
+ * @brief DALI_COMPOSE_SHADER macro provides a convenient way to write shader source code.
+ *
  * We normally use double quotation marks to write a string such as "Hello World".
  * However many symbols are needed to add multiple lines of string.
  * We don't need to write quotation marks using this macro at every line.
@@ -64,9 +65,8 @@ namespace Internal DALI_INTERNAL
 class ShaderEffect;
 }
 
-
-/*
- * GeometryType determines how geometry is shaped.
+/**
+ * @brief GeometryType determines how geometry is shaped.
  */
 enum GeometryType
 {
@@ -78,7 +78,8 @@ enum GeometryType
 };
 
 /**
- * Shader effects can be added to actors, to provide a visual effect.
+ * @brief Shader effects provide a visual effect for actors.
+ *
  * For a Custom shader you can provide the vertex and fragment shader code as strings.
  * These shader snippets get concatenated with the default attributes and uniforms.
  * For a vertex shader this part contains the following code:
@@ -154,7 +155,7 @@ class ShaderEffect : public Constrainable
 {
 public:
   /**
-   * The Extension class is a base class for objects that can be attached to the
+   * @brief The Extension class is a base class for objects that can be attached to the
    * ShaderEffects as extensions.
    *
    * Extensions are useful to create pimpled implementations of custom shaders.
@@ -164,12 +165,12 @@ public:
   {
   protected:
     /**
-     * Disable default constructor. This a base class is not meant to be initialised on its own.
+     * @brief Disable default constructor. This a base class is not meant to be initialised on its own.
      */
     Extension();
 
     /**
-     * Virtual destructor.
+     * @brief Virtual destructor.
      */
     virtual ~Extension();
   };
@@ -191,10 +192,10 @@ public:
   static const Property::Index PROGRAM;            ///< name "program",        type MAP; {"vertex-filename":"",...}
   static const Property::Index GEOMETRY_HINTS;     ///< name "geometry-hints", type INT (bitfield)
 
-  static const float DEFAULT_GRID_DENSITY;
+  static const float DEFAULT_GRID_DENSITY;         ///< The default density is 40 pixels
 
   /**
-   * Hints for rendering/subdividing geometry
+   * @brief Hints for rendering/subdividing geometry.
    */
   enum GeometryHints
   {
@@ -207,7 +208,8 @@ public:
   };
 
   /**
-   * Coordinate type of the shader uniform
+   * @brief Coordinate type of the shader uniform.
+   *
    * Viewport coordinate types will convert from viewport to view space.
    * Use this coordinate type if your are doing a transformation in view space.
    * The texture coordinate type converts a value in actor local space to texture coodinates.
@@ -222,13 +224,15 @@ public:
   };
 
   /**
-   * Create an empty ShaderEffect.
+   * @brief Create an empty ShaderEffect.
+   *
    * This can be initialised with ShaderEffect::New(...)
    */
   ShaderEffect();
 
   /**
-   * Create ShaderEffect.
+   * @brief Create ShaderEffect.
+   *
    * @param vertexShader code for the effect. If you pass in an empty string, the default version will be used
    * @param fragmentShader code for the effect. If you pass in an empty string, the default version will be used
    * @param type GeometryType to define the shape of the geometry
@@ -241,7 +245,7 @@ public:
                            GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
-   * Create ShaderEffect.
+   * @brief Create ShaderEffect.
    * @param vertexShaderPrefix code for the effect. It will be inserted before the default uniforms (ideal for \#defines)
    * @param vertexShader code for the effect. If you pass in an empty string, the default version will be used
    * @param fragmentShaderPrefix code for the effect. It will be inserted before the default uniforms (ideal for \#defines)
@@ -258,7 +262,7 @@ public:
                                     GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
-   * Create ShaderEffect.
+   * @brief Create ShaderEffect.
    * @param imageVertexShader code for the effect. If you pass in an empty string, the default version will be used
    * @param imageFragmentShader code for the effect. If you pass in an empty string, the default version will be used
    * @param textVertexShader code for the effect. If you pass in an empty string, the default version will be used
@@ -273,7 +277,7 @@ public:
                            GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
-   * Create ShaderEffect.
+   * @brief Create ShaderEffect.
    * @param imageVertexShader code for the effect. If you pass in an empty string, the default version will be used
    * @param imageFragmentShader code for the effect. If you pass in an empty string, the default version will be used
    * @param textVertexShader code for the effect. If you pass in an empty string, the default version will be used
@@ -296,21 +300,26 @@ public:
                            GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
-   * Downcast an Object handle to ShaderEffect. If handle points to a ShaderEffect the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to ShaderEffect.
+   *
+   * If handle points to a ShaderEffect the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to a ShaderEffect object or an uninitialized handle
    */
   static ShaderEffect DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~ShaderEffect();
 
   /**
-   * Copy constructor
+   * @brief Copy constructor
+   *
    * @param object A reference to a ShaderEffect object
    */
   ShaderEffect(const ShaderEffect& object);
@@ -321,14 +330,17 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Sets image for using as effect texture. This image texture will be bound to
-   * the "sEffectTexture" sampler so it can be used in fragment shader for effects
+   * @brief Sets image for using as effect texture.
+   *
+   * This image texture will be bound to the "sEffectTexture" sampler
+   * so it can be used in fragment shader for effects
+   *
    * @param[in] image to use as effect texture
    */
   void SetEffectImage( Image image );
 
   /**
-   * Set a uniform value.
+   * @brief Set a uniform value.
    * This will register a property of type Property::FLOAT; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
    * @pre Either the property name is not in use, or a property exists with the correct name & type.
@@ -341,7 +353,8 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
-   * Set a uniform value.
+   * @brief Set a uniform value.
+   *
    * This will register a property of type Property::VECTOR2; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
    * @pre Either the property name is not in use, or a property exists with the correct name & type.
@@ -354,7 +367,8 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
-   * Set a uniform value.
+   * @brief Set a uniform value.
+   *
    * This will register a property of type Property::VECTOR3; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
    * @pre Either the property name is not in use, or a property exists with the correct name & type.
@@ -367,7 +381,8 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
-   * Set a uniform value.
+   * @brief Set a uniform value.
+   *
    * This will register a property of type Property::VECTOR4; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
    * @pre Either the property name is not in use, or a property exists with the correct name & type.
@@ -380,7 +395,8 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
-   * Set a uniform value.
+   * @brief Set a uniform value.
+   *
    * This will register a property of type Property::MATRIX; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
    * @pre Either the property name is not in use, or a property exists with the correct name & type.
@@ -393,7 +409,8 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
-   * Set a uniform value.
+   * @brief Set a uniform value.
+   *
    * This will register a property of type Property::MATRIX3; see Object::RegisterProperty() for more details.
    * If name matches a uniform in the shader source, this value will be uploaded when rendering.
    * @pre Either the property name is not in use, or a property exists with the correct name & type.
@@ -406,7 +423,9 @@ public:
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
 
   /**
-   * Attach an extension object. This object is reference counted and will be automatically deleted.
+   * @brief Attach an extension object.
+   *
+   * This object is reference counted and will be automatically deleted.
    * This object can be retrieved back with the GetExtension function.
    * @param object Pointer to a Extension.
    * @pre extension is not NULL
@@ -414,7 +433,8 @@ public:
   void AttachExtension( Extension *object );
 
   /**
-   * Retrieve the attached extension object.
+   * @brief Retrieve the attached extension object.
+   *
    * This object can be set with the AttachExtension function.
    * @return implementation Pointer to a Extension.
    * @pre An extension needs to be attached previously.
@@ -422,7 +442,8 @@ public:
   Extension& GetExtension();
 
   /**
-   * Retrieve the attached extension object.
+   * @brief Retrieve the attached extension object.
+   *
    * This object can be set with the AttachExtension function.
    * @return implementation Pointer to a Extension.
    * @pre An extension needs to be attached previously.
@@ -433,7 +454,7 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods.
+   * @brief This constructor is used by Dali New() methods.
    * @param [in] effect A pointer to a newly allocated Dali resource.
    */
   explicit DALI_INTERNAL ShaderEffect(Internal::ShaderEffect* effect);

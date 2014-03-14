@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ANIMATION_MODULE
  * @{
  */
 
@@ -35,16 +35,21 @@ class Matrix;
 class Matrix3;
 
 /**
- * Scale To Fit constraint.
+ * @brief Scale To Fit constraint.
  *
  * Scales an Actor, such that it fits within it's Parent's Size.
  * f(current, size, parentSize) = parentSize / size
  */
 struct DALI_IMPORT_API ScaleToFitConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   ScaleToFitConstraint();
 
   /**
+   * @brief Functor operator
+   *
    * @param[in] current The actor's current scale
    * @param[in] sizeProperty The actor's current size
    * @param[in] parentSizeProperty The parent's current size.
@@ -57,16 +62,21 @@ struct DALI_IMPORT_API ScaleToFitConstraint
 };
 
 /**
- * Scale To Fit Keep Aspect Ratio constraint.
+ * @brief Scale To Fit Keep Aspect Ratio constraint.
  *
  * Scales an Actor, such that it fits within its Parent's Size Keeping the aspect ratio.
  * f(current, size, parentSize) = Vector3( min( parentSizeX / sizeX, min( parentSizeY / sizeY, parentSizeZ / sizeZ ) )
  */
 struct DALI_IMPORT_API ScaleToFitKeepAspectRatioConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   ScaleToFitKeepAspectRatioConstraint();
 
   /**
+   * @brief Functor operator
+   *
    * @param[in] current The actor's current scale
    * @param[in] sizeProperty The actor's current size
    * @param[in] parentSizeProperty The parent's current size.
@@ -78,13 +88,16 @@ struct DALI_IMPORT_API ScaleToFitKeepAspectRatioConstraint
 };
 
 /**
- * Scale To Fill Keep Aspect Ratio constraint.
+ * @brief Scale To Fill Keep Aspect Ratio constraint.
  *
  * Scales an Actor, such that it fill its Parent's Size Keeping the aspect ratio.
  * f(current, size, parentSize) = Vector3( max( parentSizeX / sizeX, max( parentSizeY / sizeY, parentSizeZ / sizeZ ) )
  */
 struct DALI_IMPORT_API ScaleToFillKeepAspectRatioConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   ScaleToFillKeepAspectRatioConstraint();
 
   /**
@@ -99,13 +112,16 @@ struct DALI_IMPORT_API ScaleToFillKeepAspectRatioConstraint
 };
 
 /**
- * Scale To Fill XY Keep Aspect Ratio constraint.
+ * @brief Scale To Fill XY Keep Aspect Ratio constraint.
  *
  * Scales an Actor, such that it fill its Parent's Size in the X and Y coordinates Keeping the aspect ratio.
  * f(current, size, parentSize) = Vector3( max( parentSizeX / sizeX, max( parentSizeY / sizeY, parentSizeZ / sizeZ ) )
  */
 struct DALI_IMPORT_API ScaleToFillXYKeepAspectRatioConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   ScaleToFillXYKeepAspectRatioConstraint();
 
   /**
@@ -120,11 +136,14 @@ struct DALI_IMPORT_API ScaleToFillXYKeepAspectRatioConstraint
 };
 
 /**
- * Shrinks source size inside the target size maintaining aspect ratio of source.
+ * @brief Shrinks source size inside the target size maintaining aspect ratio of source.
  * If source is smaller than target it returns source
  */
 struct ShrinkInsideKeepAspectRatioConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   ShrinkInsideKeepAspectRatioConstraint();
 
   /**
@@ -139,12 +158,15 @@ struct ShrinkInsideKeepAspectRatioConstraint
 };
 
 /**
- * MultiplyConstraint
+ * @brief MultiplyConstraint
  *
  * f(current, property) = current * property
  */
 struct DALI_IMPORT_API MultiplyConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   MultiplyConstraint();
 
   /**
@@ -157,12 +179,15 @@ struct DALI_IMPORT_API MultiplyConstraint
 };
 
 /**
- * DivideConstraint
+ * @brief DivideConstraint
  *
  * f(current, property) = current / property
  */
 struct DALI_IMPORT_API DivideConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   DivideConstraint();
 
   /**
@@ -175,93 +200,187 @@ struct DALI_IMPORT_API DivideConstraint
 };
 
 /**
- * EqualToConstraint
+ * @brief EqualToConstraint
  *
  * f(current, property) = property
  */
 struct DALI_IMPORT_API EqualToConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   EqualToConstraint();
 
+  /**
+   * @brief override functor for float properties
+   *
+   * @param[in] current The current property value
+   * @param[in] property The property to copy
+   * @return The copy of the input property
+   */
   float operator()(const float current, const PropertyInput& property);
+
+  /**
+   * @brief override functor for float properties
+   *
+   * @param[in] current The current property value
+   * @param[in] property The property to copy
+   * @return The copy of the input property
+   */
   Vector3 operator()(const Vector3& current, const PropertyInput& property);
+
+  /**
+   * @brief override functor for float properties
+   *
+   * @param[in] current The current property value
+   * @param[in] property The property to copy
+   * @return The copy of the input property
+   */
   Vector4 operator()(const Vector4& current, const PropertyInput& property);
+
+  /**
+   * @brief override functor for float properties
+   *
+   * @param[in] current The current property value
+   * @param[in] property The property to copy
+   * @return The copy of the input property
+   */
   Quaternion operator()(const Quaternion& current, const PropertyInput& property);
+
+  /**
+   * @brief override functor for float properties
+   *
+   * @param[in] current The current property value
+   * @param[in] property The property to copy
+   * @return The copy of the input property
+   */
   Matrix3 operator()(const Matrix3& current, const PropertyInput& property);
+
+  /**
+   * @brief override functor for float properties
+   *
+   * @param[in] current The current property value
+   * @param[in] property The property to copy
+   * @return The copy of the input property
+   */
   Matrix operator()(const Matrix& current, const PropertyInput& property);
 };
 
 /**
- * RelativeToConstraint
+ * @brief RelativeToConstraint for Vector3 properties
  *
  * f(current, property, scale) = property * scale
  */
 struct DALI_IMPORT_API RelativeToConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   RelativeToConstraint( float scale );
+
+  /**
+   * @brief Constructor.
+   */
   RelativeToConstraint( const Vector3& scale );
 
+  /**
+   * @brief Functor.
+   */
   Vector3 operator()(const Vector3& current, const PropertyInput& property);
 
-  Vector3 mScale;
-};
-
-struct DALI_IMPORT_API RelativeToConstraintFloat
-{
-  RelativeToConstraintFloat( float scale );
-
-  float operator()(const float current, const PropertyInput& property);
-
-  float mScale;
+  Vector3 mScale; ///< Component-wise scale factor
 };
 
 /**
- * InverseOfConstraint
+ * @brief RelativeToConstraint for float properties
+ */
+struct DALI_IMPORT_API RelativeToConstraintFloat
+{
+  /**
+   * @brief Constructor.
+   */
+  RelativeToConstraintFloat( float scale );
+
+  /**
+   * @brief Functor.
+   */
+  float operator()(const float current, const PropertyInput& property);
+
+  float mScale; ///< Scale factor
+};
+
+/**
+ * @brief InverseOfConstraint
  *
  * f(current, property) = 1 / property
  */
 struct DALI_IMPORT_API InverseOfConstraint
 {
+  /**
+   * @brief Constructor.
+   */
   InverseOfConstraint();
 
+  /**
+   * @brief Functor.
+   */
   Vector3 operator()(const Vector3&    current,
                      const PropertyInput& property);
 };
 
 /**
- * Constraint which sets width to be another actor's width,
+ * @brief Constraint which sets width to be another actor's width,
  * and the height to a fixed height.
  */
 struct DALI_IMPORT_API SourceWidthFixedHeight
 {
+  /**
+   * @brief Constructor.
+   */
   SourceWidthFixedHeight( float height );
 
+  /**
+   * @brief Functor.
+   */
   Vector3 operator()(const Vector3& current,
                      const PropertyInput& sourceSize);
 
-  float mFixedHeight;
+  float mFixedHeight; ///< the fixed height
 };
 
 /**
- * Constraint which sets height to be another actor's height,
+ * @brief Constraint which sets height to be another actor's height,
  * and the width to a fixed width.
  */
 struct DALI_IMPORT_API SourceHeightFixedWidth
 {
+  /**
+   * @brief Constructor
+   */
   SourceHeightFixedWidth( float width );
 
+  /**
+   * @brief Functor
+   */
   Vector3 operator()(const Vector3& current,
                      const PropertyInput& sourceSize);
 
-  float mFixedWidth;
+  float mFixedWidth; ///< the fixed width
 };
 
 /**
+ * @brief Constraint function to aim a camera at a target.
+ *
  * Constraint which sets camera's rotation given camera world position
- * and a target world position Uses target's up vector to orient the
+ * and a target world position.  Uses target's up vector to orient the
  * constrained actor along the vector between camera position and
  * target position.
  *
+ * @param[in] current The current rotation property value
+ * @param[in] targetPosition World position of target
+ * @param[in] cameraPosition World position of camera
+ * @param[in] targetRotation World rotation of the target
+ * @return The orientation of the camera
  */
 DALI_IMPORT_API Dali::Quaternion LookAt( const Dali::Quaternion& current,
                                          const PropertyInput& targetPosition,
@@ -270,6 +389,8 @@ DALI_IMPORT_API Dali::Quaternion LookAt( const Dali::Quaternion& current,
 
 
 /**
+ * @brief Constraint functor to aim a camera at a target.
+ *
  * Constraint which sets rotation given camera world position,
  * target world position (usually the looked at actor's world position)
  * and the angle parameter (how much the camera is offset with respect
@@ -278,7 +399,7 @@ DALI_IMPORT_API Dali::Quaternion LookAt( const Dali::Quaternion& current,
 struct DALI_IMPORT_API OrientedLookAt
 {
   /**
-   * Functor constructor
+   * @brief Functor constructor.
    *
    * @param[in] angle The angle of the camera's up vector with regards
    * to the target's up vector in radians. Positive angles rotate the
@@ -286,12 +407,21 @@ struct DALI_IMPORT_API OrientedLookAt
    */
   OrientedLookAt( float angle );
 
+  /**
+   * @brief Functor.
+   *
+   * @param[in] current The current rotation property value
+   * @param[in] targetPosition World position of target
+   * @param[in] cameraPosition World position of camera
+   * @param[in] targetRotation World rotation of the target
+   * @return The orientation of the camera
+   */
   Dali::Quaternion operator()(const Dali::Quaternion& current,
                               const PropertyInput& targetPosition,
                               const PropertyInput& cameraPosition,
                               const PropertyInput& targetRotation );
 
-  float mAngle;
+  float mAngle; ///< camera angle offset
 };
 
 

@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -36,7 +36,7 @@ class CameraActor;
 namespace Camera
 {
 /**
- * Type determines how camera operates
+ * @brief Type determines how camera operates.
  */
 enum Type
 {
@@ -45,7 +45,7 @@ enum Type
 };
 
 /**
- * Projection modes
+ * @brief Projection modes.
  */
 enum ProjectionMode
 {
@@ -56,7 +56,7 @@ enum ProjectionMode
 } // namespace Camera
 
 /**
- * Controls a camera.
+ * @brief Controls a camera.
  *
  * Allows the developer to use actor semantics to control a camera.
  *
@@ -74,53 +74,60 @@ class CameraActor : public Actor
 public:
 
   // Default Properties; additional to Actor properties
-  static const Property::Index TYPE;                         // Property::STRING,   // "type"                 // Not animatable
-  static const Property::Index PROJECTION_MODE;              // Property::STRING,   // "projection-mode"      // Not animatable
-  static const Property::Index FIELD_OF_VIEW;                // Property::FLOAT,    // "field-of-view"        // Not animatable
-  static const Property::Index ASPECT_RATIO;                 // Property::FLOAT,    // "aspect-ratio"         // Not animatable
-  static const Property::Index NEAR_PLANE_DISTANCE;          // Property::FLOAT,    // "near-plane-distance"  // Not animatable
-  static const Property::Index FAR_PLANE_DISTANCE;           // Property::FLOAT,    // "far-plane-distance"   // Not animatable
-  static const Property::Index LEFT_PLANE_DISTANCE;          // Property::FLOAT,    // "left-plane-distance"  // Not animatable
-  static const Property::Index RIGHT_PLANE_DISTANCE;         // Property::FLOAT,    // "right-plane-distance" // Not animatable
-  static const Property::Index TOP_PLANE_DISTANCE;           // Property::FLOAT,    // "top-plane-distance"   // Not animatable
-  static const Property::Index BOTTOM_PLANE_DISTANCE;        // Property::FLOAT,    // "bottom-plane-distance"// Not animatable
-  static const Property::Index TARGET_POSITION;              // Property::VECTOR3,  // "target"               // Not animatable
-  static const Property::Index PROJECTION_MATRIX;            // Property::MATRIX,   // "projection-matrix"    // Constraint input, not animatable
-  static const Property::Index VIEW_MATRIX;                  // Property::MATRIX,   // "view-matrix"          // constraint input, not abimatable
-  static const Property::Index INVERT_Y_AXIS;                // Property::BOOLEAN,  // "invert-y-axis"        // Not animatable
+  static const Property::Index TYPE;                         ///< Property::STRING,   // "type"                 // Not animatable
+  static const Property::Index PROJECTION_MODE;              ///< Property::STRING,   // "projection-mode"      // Not animatable
+  static const Property::Index FIELD_OF_VIEW;                ///< Property::FLOAT,    // "field-of-view"        // Not animatable
+  static const Property::Index ASPECT_RATIO;                 ///< Property::FLOAT,    // "aspect-ratio"         // Not animatable
+  static const Property::Index NEAR_PLANE_DISTANCE;          ///< Property::FLOAT,    // "near-plane-distance"  // Not animatable
+  static const Property::Index FAR_PLANE_DISTANCE;           ///< Property::FLOAT,    // "far-plane-distance"   // Not animatable
+  static const Property::Index LEFT_PLANE_DISTANCE;          ///< Property::FLOAT,    // "left-plane-distance"  // Not animatable
+  static const Property::Index RIGHT_PLANE_DISTANCE;         ///< Property::FLOAT,    // "right-plane-distance" // Not animatable
+  static const Property::Index TOP_PLANE_DISTANCE;           ///< Property::FLOAT,    // "top-plane-distance"   // Not animatable
+  static const Property::Index BOTTOM_PLANE_DISTANCE;        ///< Property::FLOAT,    // "bottom-plane-distance"// Not animatable
+  static const Property::Index TARGET_POSITION;              ///< Property::VECTOR3,  // "target"               // Not animatable
+  static const Property::Index PROJECTION_MATRIX;            ///< Property::MATRIX,   // "projection-matrix"    // Constraint input, not animatable
+  static const Property::Index VIEW_MATRIX;                  ///< Property::MATRIX,   // "view-matrix"          // constraint input, not abimatable
+  static const Property::Index INVERT_Y_AXIS;                ///< Property::BOOLEAN,  // "invert-y-axis"        // Not animatable
 
   /**
-   * Create an uninitialized CameraActor handle; Initialise it using CameraActor::New().
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @brief Create an uninitialized CameraActor handle.
+   *
+   * Initialise it using CameraActor::New().  Calling member functions
+   * with an uninitialized Dali::Object is not allowed.
    */
   CameraActor();
 
   /**
-   * Create a CameraActor object.
+   * @brief Create a CameraActor object.
    *
    * Sets the default camera perspective projection for the stage's size. @see SetPerspectiveProjection().
+   * @return the newly created camera actor.
    */
   static CameraActor New();
 
   /**
-   * Create a CameraActor object.
+   * @brief Create a CameraActor object.
    *
    * Sets the default camera perspective projection for the given canvas size. @see SetPerspectiveProjection().
    *
    * @param[in] size The canvas size.
+   * @return the newly created camera actor.
    */
   static CameraActor New( const Size& size );
 
   /**
-   * Downcast an Object handle to CameraActor. If handle points to a CameraActor the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to CameraActor.
+   *
+   * If handle points to a CameraActor the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a CameraActor or an uninitialized handle
    */
   static CameraActor DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~CameraActor();
@@ -131,60 +138,73 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Set the camera type
+   * @brief Set the camera type.
    * The default type is Dali::Camera::LookAtTarget
    * @param[in] type The camera type
    */
   void SetType( Dali::Camera::Type type );
 
   /**
+   * @brief Get the type of the camera.
+   *
    * @return the type of camera
    */
   Dali::Camera::Type GetType() const;
 
   /**
-   * Set the projection mode
+   * @brief Set the projection mode.
+   *
    * @param[in] mode One of PerspectiveProjection or OrthographicProjection
    */
   void SetProjectionMode( Dali::Camera::ProjectionMode mode );
 
   /**
-   * Get the projection mode
+   * @brief Get the projection mode.
+   *
    * @return One of PerspectiveProjection or OrthographicProjection
    */
   Dali::Camera::ProjectionMode GetProjectionMode() const;
 
   /**
-   * Set the field of view
+   * @brief Set the field of view.
+   *
    * @param[in] fieldOfView The field of view in radians
    */
   void SetFieldOfView( float fieldOfView );
 
   /**
+   * @brief Get the field of view in Radians.
+   *
    * The default field of view is 45 degrees
    * @return The field of view in radians
    */
   float GetFieldOfView( );
 
   /**
-   * Set the aspect ratio
+   * @brief Set the aspect ratio.
+   *
    * @param[in] aspectRatio The aspect ratio
    */
   void SetAspectRatio( float aspectRatio );
 
   /**
+   * @brief Get the aspect ratio of the camera.
+   *
    * The default aspect ratio is 4.0f/3.0f
    * @return the aspect ratio
    */
   float GetAspectRatio( );
 
   /**
-   * Sets the near clipping plane
+   * @brief Sets the near clipping plane distance.
+   *
    * @param[in] nearClippingPlane distance of the near clipping plane
    */
   void SetNearClippingPlane( float nearClippingPlane );
 
   /**
+   * @brief Get the near clipping plane distance.
+   *
    * The default near clipping plane is 800.0f, to match the default screen height
    * Reduce this value to see objects closer to the camera
    * @return the near clipping plane value
@@ -192,26 +212,31 @@ public:
   float GetNearClippingPlane( );
 
   /**
-   * Sets the far clipping plane
+   * @brief Sets the far clipping plane distance.
+   *
    * @param[in] farClippingPlane distance of the far clipping plane
    */
   void SetFarClippingPlane( float farClippingPlane );
 
   /**
+   * @brief Get the far clipping plane distance.
+   *
    * The default value is the default near clipping plane + (0xFFFF>>4)
    * @return the far clipping plane value
    */
   float GetFarClippingPlane( );
 
   /**
-   * Set the target of the camera
+   * @brief Set the target position of the camera.
+   *
    * @pre Camera type is LookAtTarget
    * @param[in] targetPosition The position of the target to look at
    */
   void SetTargetPosition( const Vector3& targetPosition );
 
   /**
-   * Get Camera Target position
+   * @brief Get Camera Target position.
+   *
    * The target position is Vector3::ZERO
    * @pre Camera type is LookAtTarget
    * @return The target position of the camera
@@ -219,7 +244,8 @@ public:
   Vector3 GetTargetPosition() const;
 
   /**
-   * Set whether the Y axis is inverted in the update calculation
+   * @brief Set whether the Y axis is inverted in the update calculation.
+   *
    * Inverting the Y axis allows +ve Y down in main coordinate system
    * The default value is inverted.
    * @param[in] invertYAxis True if the Y axis should be inverted
@@ -227,13 +253,14 @@ public:
   void SetInvertYAxis(bool invertYAxis);
 
   /**
-   * Get whether the Y axis is inverted.
+   * @brief Get whether the Y axis is inverted.
+   *
    * @return True if the Y axis is inverted, false otherwise
    */
   bool GetInvertYAxis();
 
   /**
-   * Sets the default camera perspective projection for the given canvas size.
+   * @brief Sets the default camera perspective projection for the given canvas size.
    *
    * Sets the near and far clipping planes, the field of view, the aspect ratio
    * and the Z position of the actor based on the canvas size so that 1 unit in
@@ -249,9 +276,11 @@ public:
   void SetPerspectiveProjection( const Size& size );
 
   /**
-   * Sets the camera projection to use orthographic projection.  The XY plane is
-   * centered on the camera axis. The units in the X/Y plane directly equate to
-   * pixels on an equivalently sized framebuffer.
+   * @brief Sets the camera projection to use orthographic projection.
+   *
+   * The XY plane is centered on the camera axis. The units in the X/Y
+   * plane directly equate to pixels on an equivalently sized
+   * framebuffer.
    *
    * The Z position of the actor, and the near and far clip planes of the
    * bounding box match those that would be created by using
@@ -262,7 +291,8 @@ public:
   void SetOrthographicProjection( const Size& size );
 
   /**
-   * Sets the camera projection to use orthographic projection with the given clip planes.
+   * @brief Sets the camera projection to use orthographic projection with the given clip planes.
+   *
    * This does not change the Z value of the camera actor.
    *
    * @param[in] left Distance to left clip plane (normal to camera axis)
@@ -274,11 +304,10 @@ public:
    */
   void SetOrthographicProjection( float left, float right, float top, float bottom, float near, float far );
 
-
-
 public: // Not intended for use by Application developers
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL CameraActor(Internal::CameraActor* actor);

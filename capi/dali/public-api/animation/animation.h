@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ANIMATION_MODULE
  * @{
  */
 
@@ -47,12 +47,12 @@ struct Vector2;
 struct Vector3;
 struct Vector4;
 
-typedef boost::function<bool       (float alpha, const bool& current)>       AnimatorFunctionBool;
-typedef boost::function<float      (float alpha, const float& current)>      AnimatorFunctionFloat;
-typedef boost::function<Vector2    (float alpha, const Vector2& current)>    AnimatorFunctionVector2;
-typedef boost::function<Vector3    (float alpha, const Vector3& current)>    AnimatorFunctionVector3;
-typedef boost::function<Vector4    (float alpha, const Vector4& current)>    AnimatorFunctionVector4;
-typedef boost::function<Quaternion (float alpha, const Quaternion& current)> AnimatorFunctionQuaternion;
+typedef boost::function<bool       (float alpha, const bool& current)>       AnimatorFunctionBool;      ///< Animator function signature for boolean properties.
+typedef boost::function<float      (float alpha, const float& current)>      AnimatorFunctionFloat;     ///< Animator function signature for float properties.
+typedef boost::function<Vector2    (float alpha, const Vector2& current)>    AnimatorFunctionVector2;   ///< Animator function signature for Vector2 properties.
+typedef boost::function<Vector3    (float alpha, const Vector3& current)>    AnimatorFunctionVector3;   ///< Animator function signature for Vector3 properties.
+typedef boost::function<Vector4    (float alpha, const Vector4& current)>    AnimatorFunctionVector4;   ///< Animator function signature for Vector4 properties.
+typedef boost::function<Quaternion (float alpha, const Quaternion& current)> AnimatorFunctionQuaternion;///< Animator function signature for Quaternion properties.
 
 namespace Internal DALI_INTERNAL
 {
@@ -60,7 +60,8 @@ class Animation;
 }
 
 /**
- * Dali::Animation can be used to animate the properties of any number of objects, typically Actors.
+ * @brief Dali::Animation can be used to animate the properties of any number of objects, typically Actors.
+ *
  * An example animation setup is shown below:
  *
  * @code
@@ -114,12 +115,15 @@ class DALI_IMPORT_API Animation : public BaseHandle
 {
 public:
 
-  typedef SignalV2< void (Animation&) > AnimationSignalV2;
+  typedef SignalV2< void (Animation&) > AnimationSignalV2; ///< Animation finished signal type
 
-  typedef boost::any AnyFunction;
-  typedef boost::function<Vector3 (float alpha, const Vector3& current)> Vector3AnimatorFunc;
-  typedef boost::function<Quaternion (float alpha, const Quaternion& current)> QuaternionAnimatorFunc;
+  typedef boost::any AnyFunction; ///< Interpolation function
+  typedef boost::function<Vector3 (float alpha, const Vector3& current)> Vector3AnimatorFunc; ///< Interpolation function
+  typedef boost::function<Quaternion (float alpha, const Quaternion& current)> QuaternionAnimatorFunc; ///< Interpolation function
 
+  /**
+   * @brief What to do when the animation ends.
+   */
   enum EndAction
   {
     Bake,   ///< When the animation ends, the animated property values are saved.
@@ -127,21 +131,23 @@ public:
   };
 
   //Signal Names
-  static const char* const SIGNAL_FINISHED;
+  static const char* const SIGNAL_FINISHED; ///< name "finished"
 
   //Action Names
-  static const char* const ACTION_PLAY;
-  static const char* const ACTION_STOP;
-  static const char* const ACTION_PAUSE;
+  static const char* const ACTION_PLAY;     ///< name "play"
+  static const char* const ACTION_STOP;     ///< name "stop"
+  static const char* const ACTION_PAUSE;    ///< name "pause"
 
   /**
-   * Create an uninitialized Animation; this can be initialized with Animation::New()
+   * @brief Create an uninitialized Animation; this can be initialized with Animation::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   Animation();
 
   /**
-   * Create an initialized Animation.
+   * @brief Create an initialized Animation.
+   *
    * The animation will not loop.
    * The default end action is "Bake".
    * The default alpha function is linear.
@@ -152,15 +158,18 @@ public:
   static Animation New(float durationSeconds);
 
   /**
-   * Downcast an Object handle to Animation. If handle points to an Animation object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Animation.
+   *
+   * If handle points to an Animation object the downcast produces
+   * valid handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to a Animation object or an uninitialized handle
    */
   static Animation DownCast( BaseHandle handle );
 
   /**
-   * Destructor
+   * @brief Destructor.
    */
   virtual ~Animation();
 
@@ -170,32 +179,37 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Set the duration of an animation.
+   * @brief Set the duration of an animation.
+   *
    * @pre durationSeconds must be greater than zero.
    * @param[in] seconds The duration in seconds.
    */
   void SetDuration(float seconds);
 
   /**
-   * Retrieve the duration of an animation.
+   * @brief Retrieve the duration of an animation.
+   *
    * @return The duration in seconds.
    */
   float GetDuration() const;
 
   /**
-   * Set whether the animation will loop.
+   * @brief Set whether the animation will loop.
+   *
    * @param[in] looping True if the animation will loop.
    */
   void SetLooping(bool looping);
 
   /**
-   * Query whether the animation will loop.
+   * @brief Query whether the animation will loop.
+   *
    * @return True if the animation will loop.
    */
   bool IsLooping() const;
 
   /**
-   * Set the end action of the animation.
+   * @brief Set the end action of the animation.
+   *
    * This action is performed when the animation ends.
    * Default end action is bake
    * @param[in] action The end action.
@@ -203,13 +217,15 @@ public:
   void SetEndAction(EndAction action);
 
   /**
-   * Returns the end action of the animation.
+   * @brief Returns the end action of the animation.
+   *
    * @return The end action.
    */
   EndAction GetEndAction() const;
 
   /**
-   * Set the destroy action of the animation.
+   * @brief Set the destroy action of the animation.
+   *
    * If the animation is destroyed this action is performed on the following update.
    * Default destroy action is bake
    * @param[in] action The destroy action.
@@ -217,53 +233,59 @@ public:
   void SetDestroyAction(EndAction action);
 
   /**
-   * Returns the destroy action of the animation.
+   * @brief Returns the destroy action of the animation.
+   *
    * @return The destroy action.
    */
   EndAction GetDestroyAction() const;
 
   /**
-   * Set the default alpha function for an animation.
+   * @brief Set the default alpha function for an animation.
+   *
    * This is applied to individual property animations, if no further alpha functions are supplied.
    * @param[in] alpha The default alpha function.
    */
   void SetDefaultAlphaFunction(AlphaFunction alpha);
 
   /**
-   * Retrieve the default alpha function for an animation.
+   * @brief Retrieve the default alpha function for an animation.
+   *
    * @return The default alpha function.
    */
   AlphaFunction GetDefaultAlphaFunction() const;
 
   /**
-   * Play the animation.
+   * @brief Play the animation.
    */
   void Play();
 
   /**
-   * Pause the animation.
+   * @brief Pause the animation.
    */
   void Pause();
 
   /**
-   * Stop the animation.
+   * @brief Stop the animation.
    */
   void Stop();
 
   /**
-   * Clear the animation.
+   * @brief Clear the animation.
+   *
    * This disconnects any objects that were being animated, effectively stopping the animation.
    */
   void Clear();
 
   /**
-   * Connect to this signal to be notified when an Animation's animations have finished.
+   * @brief Connect to this signal to be notified when an Animation's animations have finished.
+   *
    * @return A signal object to Connect() with.
    */
   AnimationSignalV2& FinishedSignal();
 
   /**
-   * Animate a property value by a relative amount.
+   * @brief Animate a property value by a relative amount.
+   *
    * The default alpha function will be used.
    * The effect will start & end when the animation begins & ends.
    * @param [in] target The target object/property to animate.
@@ -272,7 +294,8 @@ public:
   void AnimateBy(Property target, Property::Value relativeValue);
 
   /**
-   * Animate a property value by a relative amount.
+   * @brief Animate a property value by a relative amount.
+   *
    * The effect will start & end when the animation begins & ends.
    * @param [in] target The target object/property to animate.
    * @param [in] relativeValue The property value will change by this amount.
@@ -281,7 +304,8 @@ public:
   void AnimateBy(Property target, Property::Value relativeValue, AlphaFunction alpha);
 
   /**
-   * Animate a property value by a relative amount.
+   * @brief Animate a property value by a relative amount.
+   *
    * The default alpha function will be used.
    * @param [in] target The target object/property to animate.
    * @param [in] relativeValue The property value will increase/decrease by this amount.
@@ -290,7 +314,8 @@ public:
   void AnimateBy(Property target, Property::Value relativeValue, TimePeriod period);
 
   /**
-   * Animate a property value by a relative amount.
+   * @brief Animate a property value by a relative amount.
+   *
    * @param [in] target The target object/property to animate.
    * @param [in] relativeValue The property value will increase/decrease by this amount.
    * @param [in] alpha The alpha function to apply.
@@ -299,7 +324,8 @@ public:
   void AnimateBy(Property target, Property::Value relativeValue, AlphaFunction alpha, TimePeriod period);
 
   /**
-   * Animate a property to a destination value.
+   * @brief Animate a property to a destination value.
+   *
    * The default alpha function will be used.
    * The effect will start & end when the animation begins & ends.
    * @param [in] target The target object/property to animate.
@@ -308,7 +334,8 @@ public:
   void AnimateTo(Property target, Property::Value destinationValue);
 
   /**
-   * Animate a property to a destination value.
+   * @brief Animate a property to a destination value.
+   *
    * The effect will start & end when the animation begins & ends.
    * @param [in] target The target object/property to animate.
    * @param [in] destinationValue The destination value.
@@ -317,7 +344,8 @@ public:
   void AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha);
 
   /**
-   * Animate a property to a destination value.
+   * @brief Animate a property to a destination value.
+   *
    * The default alpha function will be used.
    * @param [in] target The target object/property to animate.
    * @param [in] destinationValue The destination value.
@@ -326,7 +354,8 @@ public:
   void AnimateTo(Property target, Property::Value destinationValue, TimePeriod period);
 
   /**
-   * Animate a property to a destination value.
+   * @brief Animate a property to a destination value.
+   *
    * @param [in] target The target object/property to animate.
    * @param [in] destinationValue The destination value.
    * @param [in] alpha The alpha function to apply.
@@ -335,14 +364,16 @@ public:
   void AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period);
 
   /**
-   * Animate a property between keyframes
+   * @brief Animate a property between keyframes.
+   *
    * @param [in] target The target object/property to animate.
    * @param [in] keyFrames The key frames
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames);
 
   /**
-   * Animate a property between keyframes
+   * @brief Animate a property between keyframes.
+   *
    * @param [in] target The target object/property to animate.
    * @param [in] keyFrames The key frames
    * @param [in] alpha The alpha function to apply.
@@ -350,7 +381,8 @@ public:
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha);
 
   /**
-   * Animate a property between keyframes
+   * @brief Animate a property between keyframes.
+   *
    * @param [in] target The target object/property to animate.
    * @param [in] keyFrames The key frames
    * @param [in] period The effect will occur during this time period.
@@ -358,7 +390,8 @@ public:
   void AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period);
 
   /**
-   * Animate a property between keyframes
+   * @brief Animate a property between keyframes.
+   *
    * @param [in] target The target object/property to animate.
    * @param [in] keyFrames The key frames
    * @param [in] alpha The alpha function to apply.
@@ -367,7 +400,8 @@ public:
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period);
 
   /**
-   * Animate a property using a custom function.
+   * @brief Animate a property using a custom function.
+   *
    * The function will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
    * @pre The property type is equal PropertyTypes::Get<P>().
    * @param [in] target The target object/property to animate.
@@ -380,7 +414,8 @@ public:
   }
 
   /**
-   * Animate a property using a custom function.
+   * @brief Animate a property using a custom function.
+   *
    * The function will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
    * @pre The property type is equal PropertyTypes::Get<P>().
    * @param [in] target The target object/property to animate.
@@ -394,7 +429,8 @@ public:
   }
 
   /**
-   * Animate a property using a custom function.
+   * @brief Animate a property using a custom function.
+   *
    * The function will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
    * @pre The property type is equal PropertyTypes::Get<P>().
    * @param [in] target The target object/property to animate.
@@ -408,7 +444,8 @@ public:
   }
 
   /**
-   * Animate a property using a custom function.
+   * @brief Animate a property using a custom function.
+   *
    * The function will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
    * @pre The property type is equal PropertyTypes::Get<P>().
    * @param [in] target The target object/property to animate.
@@ -425,7 +462,8 @@ public:
   // Actor-specific convenience methods
 
   /**
-   * Move an actor relative to its position
+   * @brief Move an actor relative to its position.
+   *
    * The default alpha function will be used.
    * The move will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -436,7 +474,8 @@ public:
   void MoveBy(Actor actor, float x, float y, float z);
 
   /**
-   * Move an actor relative to its position.
+   * @brief Move an actor relative to its position.
+   *
    * This overload allows the alpha function to be customized.
    * The move will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -446,7 +485,8 @@ public:
   void MoveBy(Actor actor, Vector3 displacement, AlphaFunction alpha);
 
   /**
-   * Move an actor relative to its position.
+   * @brief Move an actor relative to its position.
+   *
    * This overload allows the translation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
@@ -459,7 +499,8 @@ public:
   void MoveBy(Actor actor, Vector3 displacement, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Move an actor to a target position.
+   * @brief Move an actor to a target position.
+   *
    * The default alpha function will be used.
    * The move will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -470,7 +511,9 @@ public:
   void MoveTo(Actor actor, float x, float y, float z);
 
   /**
-   * Move an actor to a target position. This overload allows the alpha function to be customized.
+   * @brief Move an actor to a target position.
+   *
+   * This overload allows the alpha function to be customized.
    * The move will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] position to move to
@@ -479,7 +522,9 @@ public:
   void MoveTo(Actor actor, Vector3 position, AlphaFunction alpha);
 
   /**
-   * Move an actor to a target position. This overload allows the translation start & end time to be customized.
+   * @brief Move an actor to a target position.
+   *
+   * This overload allows the translation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -491,7 +536,8 @@ public:
   void MoveTo(Actor actor, Vector3 position, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Move an actor using a custom function.
+   * @brief Move an actor using a custom function.
+   *
    * The animatorFunc will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
@@ -504,7 +550,8 @@ public:
   void Move(Actor actor, AnimatorFunctionVector3 animatorFunc, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor around an arbitrary axis.
+   * @brief Rotate an actor around an arbitrary axis.
+   *
    * The default alpha function will be used.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -514,7 +561,8 @@ public:
   void RotateBy(Actor actor, Degree angle, Vector3 axis);
 
   /**
-   * Rotate an actor around an arbitrary axis.
+   * @brief Rotate an actor around an arbitrary axis.
+   *
    * The default alpha function will be used.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -524,7 +572,9 @@ public:
   void RotateBy(Actor actor, Radian angle, Vector3 axis);
 
   /**
-   * Rotate an actor around an arbitrary axis. This overload allows the alpha function to be customized.
+   * @brief Rotate an actor around an arbitrary axis.
+   *
+   * This overload allows the alpha function to be customized.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] angle The angle in radians.
@@ -534,7 +584,9 @@ public:
   void RotateBy(Actor actor, Degree angle, Vector3 axis, AlphaFunction alpha);
 
   /**
-   * Rotate an actor around an arbitrary axis. This overload allows the alpha function to be customized.
+   * @brief Rotate an actor around an arbitrary axis.
+   *
+   * This overload allows the alpha function to be customized.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] angle The angle in radians.
@@ -544,7 +596,9 @@ public:
   void RotateBy(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha);
 
   /**
-   * Rotate an actor around an arbitrary axis. This overload allows the rotation start & end time to be customized.
+   * @brief Rotate an actor around an arbitrary axis.
+   *
+   * This overload allows the rotation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -557,7 +611,9 @@ public:
   void RotateBy(Actor actor, Degree angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor around an arbitrary axis. This overload allows the rotation start & end time to be customized.
+   * @brief Rotate an actor around an arbitrary axis.
+   *
+   * This overload allows the rotation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -570,7 +626,8 @@ public:
   void RotateBy(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor to a target orientation.
+   * @brief Rotate an actor to a target orientation.
+   *
    * The default alpha function will be used.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -580,7 +637,8 @@ public:
   void RotateTo(Actor actor, Degree angle, Vector3 axis);
 
   /**
-   * Rotate an actor to a target orientation.
+   * @brief Rotate an actor to a target orientation.
+   *
    * The default alpha function will be used.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -590,7 +648,8 @@ public:
   void RotateTo(Actor actor, Radian angle, Vector3 axis);
 
   /**
-   * Rotate an actor to a target orientation.
+   * @brief Rotate an actor to a target orientation.
+   *
    * The default alpha function will be used.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -599,7 +658,9 @@ public:
   void RotateTo(Actor actor, Quaternion orientation);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the alpha function to be customized.
+   * @brief Rotate an actor to a target orientation.
+   *
+   * This overload allows the alpha function to be customized.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] angle The target rotation angle in degrees.
@@ -609,7 +670,9 @@ public:
   void RotateTo(Actor actor, Degree angle, Vector3 axis, AlphaFunction alpha);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the alpha function to be customized.
+   * @brief Rotate an actor to a target orientation.
+   *
+   * This overload allows the alpha function to be customized.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] angle The target rotation angle in radians.
@@ -619,7 +682,9 @@ public:
   void RotateTo(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the alpha function to be customized.
+   * @brief Rotate an actor to a target orientation.
+   *
+   * This overload allows the alpha function to be customized.
    * The rotation will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] orientation The target orientation.
@@ -628,7 +693,9 @@ public:
   void RotateTo(Actor actor, Quaternion orientation, AlphaFunction alpha);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the rotation start & end time to be customized.
+   * @brief Rotate an actor to a target orientation.
+   *
+   * This overload allows the rotation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -641,7 +708,9 @@ public:
   void RotateTo(Actor actor, Degree angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the rotation start & end time to be customized.
+   * @brief Rotate an actor to a target orientation.
+   *
+   * This overload allows the rotation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -654,7 +723,9 @@ public:
   void RotateTo(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the rotation start & end time to be customized.
+   * @brief Rotate an actor to a target orientation.
+   *
+   * This overload allows the rotation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -666,7 +737,8 @@ public:
   void RotateTo(Actor actor, Quaternion orientation, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor using a custom function.
+   * @brief Rotate an actor using a custom function.
+   *
    * The animatorFunc will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
@@ -679,7 +751,8 @@ public:
   void Rotate(Actor actor, AnimatorFunctionQuaternion animatorFunc, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Scale an actor.
+   * @brief Scale an actor.
+   *
    * The default alpha function will be used.
    * The scaling will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -690,7 +763,9 @@ public:
   void ScaleBy(Actor actor, float x, float y, float z);
 
   /**
-   * Scale an actor. This overload allows the alpha function to be customized.
+   * @brief Scale an actor.
+   *
+   * This overload allows the alpha function to be customized.
    * The scaling will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] scale The scale factor.
@@ -699,7 +774,9 @@ public:
   void ScaleBy(Actor actor, Vector3 scale, AlphaFunction alpha);
 
   /**
-   * Scale an actor. This overload allows the scaling start & end time to be customized.
+   * @brief Scale an actor.
+   *
+   * This overload allows the scaling start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -711,7 +788,8 @@ public:
   void ScaleBy(Actor actor, Vector3 scale, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Scale an actor to a target scale factor.
+   * @brief Scale an actor to a target scale factor.
+   *
    * The default alpha function will be used.
    * The scaling will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -722,7 +800,9 @@ public:
   void ScaleTo(Actor actor, float x, float y, float z);
 
   /**
-   * Scale an actor to a target scale factor. This overload allows the alpha function to be customized.
+   * @brief Scale an actor to a target scale factor.
+   *
+   * This overload allows the alpha function to be customized.
    * The scaling will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] scale The target scale factor.
@@ -731,7 +811,9 @@ public:
   void ScaleTo(Actor actor, Vector3 scale, AlphaFunction alpha);
 
   /**
-   * Scale an actor to a target scale factor. This overload allows the scaling start & end time to be customized.
+   * @brief Scale an actor to a target scale factor.
+   *
+   * This overload allows the scaling start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -743,21 +825,24 @@ public:
   void ScaleTo(Actor actor, Vector3 scale, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Show an actor during the animation.
+   * @brief Show an actor during the animation.
+   *
    * @param [in] actor The actor to animate.
    * @param [in] delaySeconds The initial delay from the start of the animation.
    */
   void Show(Actor actor, float delaySeconds);
 
   /**
-   * Hide an actor during the animation.
+   * @brief Hide an actor during the animation.
+   *
    * @param [in] actor The actor to animate.
    * @param [in] delaySeconds The initial delay from the start of the animation.
    */
   void Hide(Actor actor, float delaySeconds);
 
   /**
-   * Animate the opacity of an actor.
+   * @brief Animate the opacity of an actor.
+   *
    * The default alpha function will be used.
    * The effect will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -766,7 +851,9 @@ public:
   void OpacityBy(Actor actor, float opacity);
 
   /**
-   * Animate the opacity of an actor. This overload allows the alpha function to be customized.
+   * @brief Animate the opacity of an actor.
+   *
+   * This overload allows the alpha function to be customized.
    * The effect will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] opacity The relative change in opacity.
@@ -775,7 +862,9 @@ public:
   void OpacityBy(Actor actor, float opacity, AlphaFunction alpha);
 
   /**
-   * Animate the opacity of an actor. This overload allows the animation start & end time to be customized.
+   * @brief Animate the opacity of an actor.
+   *
+   * This overload allows the animation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -787,7 +876,8 @@ public:
   void OpacityBy(Actor actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Animate an actor to a target opacity.
+   * @brief Animate an actor to a target opacity.
+   *
    * The default alpha function will be used.
    * The effect will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -796,7 +886,9 @@ public:
   void OpacityTo(Actor actor, float opacity);
 
   /**
-   * Animate an actor to a target opacity. This overload allows the alpha function to be customized.
+   * @brief Animate an actor to a target opacity.
+   *
+   * This overload allows the alpha function to be customized.
    * The effect will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] opacity The target opacity.
@@ -805,7 +897,9 @@ public:
   void OpacityTo(Actor actor, float opacity, AlphaFunction alpha);
 
   /**
-   * Animate an actor to a target opacity. This overload allows the animation start & end time to be customized.
+   * @brief Animate an actor to a target opacity.
+   *
+   * This overload allows the animation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -817,7 +911,8 @@ public:
   void OpacityTo(Actor actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Animate the color of an actor.
+   * @brief Animate the color of an actor.
+   *
    * The default alpha function will be used.
    * The effect will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -826,7 +921,9 @@ public:
   void ColorBy(Actor actor, Vector4 color);
 
   /**
-   * Animate the color of an actor. This overload allows the alpha function to be customized.
+   * @brief Animate the color of an actor.
+   *
+   * This overload allows the alpha function to be customized.
    * The effect will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] color The relative change in color.
@@ -835,7 +932,9 @@ public:
   void ColorBy(Actor actor, Vector4 color, AlphaFunction alpha);
 
   /**
-   * Animate the color of an actor. This overload allows the animation start & end time to be customized.
+   * @brief Animate the color of an actor.
+   *
+   * This overload allows the animation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -847,7 +946,8 @@ public:
   void ColorBy(Actor actor, Vector4 color, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Animate an actor to a target color.
+   * @brief Animate an actor to a target color.
+   *
    * The default alpha function will be used.
    * The effect will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -856,7 +956,9 @@ public:
   void ColorTo(Actor actor, Vector4 color);
 
   /**
-   * Animate an actor to a target color. This overload allows the alpha function to be customized.
+   * @brief Animate an actor to a target color.
+   *
+   * This overload allows the alpha function to be customized.
    * The effect will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] color The target color.
@@ -865,7 +967,9 @@ public:
   void ColorTo(Actor actor, Vector4 color, AlphaFunction alpha);
 
   /**
-   * Animate an actor to a target color. This overload allows the animation start & end time to be customized.
+   * @brief Animate an actor to a target color.
+   *
+   * This overload allows the animation start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -877,7 +981,8 @@ public:
   void ColorTo(Actor actor, Vector4 color, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Resize an actor.
+   * @brief Resize an actor.
+   *
    * The default alpha function will be used.
    * The resizing will start & end when the animation begins & ends.
    * The depth defaults to the minimum of width & height.
@@ -888,7 +993,9 @@ public:
   void Resize(Actor actor, float width, float height);
 
   /**
-   * Resize an actor. This overload allows the alpha function to be customized.
+   * @brief Resize an actor.
+   *
+   * This overload allows the alpha function to be customized.
    * The resizing will start & end when the animation begins & ends.
    * The depth defaults to the minimum of width & height.
    * @param [in] actor The actor to animate.
@@ -899,7 +1006,9 @@ public:
   void Resize(Actor actor, float width, float height, AlphaFunction alpha);
 
   /**
-   * Resize an actor. This overload allows the resizing start & end time to be customized.
+   * @brief Resize an actor.
+   *
+   * This overload allows the resizing start & end time to be customized.
    * The depth defaults to the minimum of width & height.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
@@ -913,7 +1022,8 @@ public:
   void Resize(Actor actor, float width, float height, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Resize an actor.
+   * @brief Resize an actor.
+   *
    * The default alpha function will be used.
    * The resizing will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
@@ -922,7 +1032,9 @@ public:
   void Resize(Actor actor, Vector3 size);
 
   /**
-   * Resize an actor. This overload allows the alpha function to be customized.
+   * @brief Resize an actor.
+   *
+   * This overload allows the alpha function to be customized.
    * The resizing will start & end when the animation begins & ends.
    * @param [in] actor The actor to animate.
    * @param [in] size The target size.
@@ -931,7 +1043,9 @@ public:
   void Resize(Actor actor, Vector3 size, AlphaFunction alpha);
 
   /**
-   * Resize an actor. This overload allows the resizing start & end time to be customized.
+   * @brief Resize an actor.
+   *
+   * This overload allows the resizing start & end time to be customized.
    * @pre delaySeconds must be zero or greater.
    * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
    * @param [in] actor The actor to animate.
@@ -945,7 +1059,7 @@ public:
 public: // Not intended for use by Application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods
    * @param [in] animation A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Animation(Internal::Animation* animation);
@@ -953,7 +1067,8 @@ public: // Not intended for use by Application developers
 private:
 
   /**
-   * Animate a property using a custom function.
+   * @brief Animate a property using a custom function.
+   *
    * @pre The property type is equal expectedType.
    * @param [in] target The target object/property to animate.
    * @param [in] targetType The expected type of the property.
@@ -964,7 +1079,8 @@ private:
                 AnyFunction func );
 
   /**
-   * Animate a property using a custom function.
+   * @brief Animate a property using a custom function.
+   *
    * @pre The property type is equal expectedType.
    * @param [in] target The target object/property to animate.
    * @param [in] targetType The expected type of the property.
@@ -977,7 +1093,8 @@ private:
                 AlphaFunction alpha );
 
   /**
-   * Animate a property using a custom function.
+   * @brief Animate a property using a custom function.
+   *
    * @pre The property type is equal expectedType.
    * @param [in] target The target object/property to animate.
    * @param [in] targetType The expected type of the property.
@@ -990,7 +1107,8 @@ private:
                 TimePeriod period );
 
   /**
-   * Animate a property using a custom function.
+   * @brief Animate a property using a custom function.
+   *
    * @pre The property type is equal expectedType.
    * @param [in] target The target object/property to animate.
    * @param [in] targetType The expected type of the property.

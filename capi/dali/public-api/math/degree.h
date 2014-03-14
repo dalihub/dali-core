@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_MATH_MODULE
  * @{
  */
 
@@ -31,60 +31,73 @@ namespace Dali DALI_IMPORT_API
 struct Radian;
 
 /**
- * An angle in degrees.
+ * @brief An angle in degrees.
+ *
  * This reduces ambiguity when using methods which accept angles in degrees or radians.
  */
 struct DALI_IMPORT_API Degree
 {
   /**
-   * Create an angle in degrees.
+   * @brief Create an angle in degrees.
+   *
    * @param[in] value The initial value in degrees.
    */
   explicit Degree( float value );
 
   /**
-   * Create an angle in degrees from an angle in radians.
+   * @brief Create an angle in degrees from an angle in radians.
+   *
    * @param[in] value The initial value in radians.
    */
   Degree( const Radian& value );
 
   /**
-   * Compare equality between two degrees
+   * @brief Compare equality between two degrees.
+   *
    * @param[in] rhs Degree to compare to
+   * @return true if the value is identical
    */
   bool operator==( const Degree& rhs ) const;
 
   /**
-   * Compare inequality between two degrees
+   * @brief Compare inequality between two degrees.
+   *
    * @param[in] rhs Degree to compare to
+   * @return true if the value is not identical
    */
   bool operator!=( const Degree& rhs ) const;
 
   /**
-   * Compare two degrees
+   * @brief Compare two degrees.
+   *
    * @param[in] rhs Degree to compare to
+   * @return true if this is less than the value
    */
   bool operator<( const Degree& rhs ) const;
 
   /**
-   * Assign an angle from a float value
+   * @brief Assign an angle from a float value.
+   *
    * @param[in] value Float value in degrees
+   * @return a reference to this
    */
   Degree& operator=( const float value );
 
   /**
-   * Assign an angle in radians to a Degree
+   * @brief Assign an angle in radians to a Degree.
+   *
    * @param[in] rhs Radian to get the value from
+   * @return a reference to this
    */
   Degree& operator=( const Radian& rhs );
 
   /**
-   * Cast operator to const float reference
+   * @brief Cast operator to const float reference
    */
   operator const float&() const;
 
   /**
-   * Cast operator to float reference
+   * @brief Cast operator to float reference.
    */
   operator float&();
 
@@ -92,7 +105,9 @@ private:
   // member data
   float mValue; ///< The value in degrees
 
-  // disable default constructor
+  /**
+   * @brief Disable the default constructor.
+   */
   Degree();
 };
 

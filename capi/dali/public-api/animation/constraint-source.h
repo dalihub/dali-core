@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ANIMATION_MODULE
  * @{
  */
 
@@ -30,7 +30,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Constraint source types.
+ * @brief Constraint source types.
+ *
  * This specifies the location of a property, which is used as an input for a constraint function.
  */
 enum SourceType
@@ -42,12 +43,13 @@ enum SourceType
 
 
 /**
- * Identifies a property from an object.
+ * @brief Identifies a property from an object.
  */
 struct DALI_IMPORT_API LocalSource
 {
   /**
-   * Create a local constraint source.
+   * @brief Create a local constraint source.
+   *
    * @param [in] index The index of a property provided by the constrained object.
    */
   LocalSource( Property::Index index );
@@ -56,12 +58,13 @@ struct DALI_IMPORT_API LocalSource
 };
 
 /**
- * Identifies a property from the parent of an object.
+ * @brief Identifies a property from the parent of an object.
  */
 struct DALI_IMPORT_API ParentSource
 {
   /**
-   * Create a local constraint source.
+   * @brief Create a local constraint source.
+   *
    * @param [in] index The index of a property, provided by the parent of the constrained object.
    */
   ParentSource( Property::Index index );
@@ -70,12 +73,13 @@ struct DALI_IMPORT_API ParentSource
 };
 
 /**
- * Identifies a property from any object.
+ * @brief Identifies a property from any object.
  */
 struct DALI_IMPORT_API Source
 {
   /**
-   * Create a constraint source.
+   * @brief Create a constraint source.
+   *
    * @param [in] object The object providing the property.
    * @param [in] index The index of a property provided by object.
    */
@@ -87,24 +91,27 @@ struct DALI_IMPORT_API Source
 };
 
 /**
- * The source of an input property for a constraint.
+ * @brief The source of an input property for a constraint.
  */
 struct DALI_IMPORT_API ConstraintSource
 {
   /**
-   * Create a constraint source.
+   * @brief Create a constraint source.
+   *
    * @param [in] source A constraint source from an arbitrary object.
    */
   ConstraintSource( Source source );
 
   /**
-   * Create a constraint source.
+   * @brief Create a constraint source.
+   *
    * @param [in] local A local constraint source.
    */
   ConstraintSource( LocalSource local );
 
   /**
-   * Create a constraint source.
+   * @brief Create a constraint source.
+   *
    * @param [in] parent A parent constraint source.
    */
   ConstraintSource( ParentSource parent );

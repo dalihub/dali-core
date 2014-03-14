@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_ACTORS_MODULE
  * @{
  */
 
@@ -28,7 +28,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Actor color mode
+ * @brief Actor color mode.
+ *
  */
 enum ColorMode
 {
@@ -39,7 +40,7 @@ enum ColorMode
 };
 
 /**
- * Actor position inheritance mode
+ * @brief Actor position inheritance mode.
  */
 enum PositionInheritanceMode
 {

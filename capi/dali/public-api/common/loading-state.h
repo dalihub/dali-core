@@ -18,7 +18,7 @@
 //
 
 /**
- * @addtogroup CAPI_DALI_FRAMEWORK
+ * @addtogroup CAPI_DALI_COMMON_MODULE
  * @{
  */
 
@@ -29,7 +29,7 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * The status during resource loading operations.
+ * @brief The status during resource loading operations.
  */
 enum LoadingState
 {
