@@ -43,7 +43,10 @@ void LogWithLineNumbers( const char * source )
       break;
     }
     // seek the next end of line or end of text
-    while( *ptr!='\n' && *ptr != '\0' ) ++ptr;
+    while( *ptr!='\n' && *ptr != '\0' )
+    {
+      ++ptr;
+    }
 
     std::string line( prev, ptr-prev );
     Dali::Integration::Log::LogMessage(Dali::Integration::Log::DebugError, "%4d %s\n", lineNumber, line.c_str());
