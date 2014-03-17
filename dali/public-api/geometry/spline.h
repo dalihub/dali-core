@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector2.h>
@@ -29,7 +30,7 @@ class Matrix;
 struct Vector3;
 
 /**
- * The Spline class is used to interpolate through a series of points
+ * @brief The Spline class is used to interpolate through a series of points
  * (or knots) which are open (the end points do not connect).
  *
  * In Hermite splines, each knot has an in-tangent and an
@@ -49,58 +50,64 @@ class Spline
 {
 public:
   /**
-   * Constructor
+   * @brief Constructor.
    */
   Spline();
 
   /**
-   * Destructor
+   * @brief Destructor.
    */
   virtual ~Spline();
 
   /**
-   * Add a knot to the spline
+   * @brief Add a knot to the spline.
+   *
    * @param[in] knot - the point or knot to add.
    */
   void AddKnot(Vector3 knot);
 
   /**
-   * Get the knot at the given index
+   * @brief Get the knot at the given index.
+   *
    * @param[in] knotIndex the index of the knot
    * @return the knot vector
    */
   Vector3 GetKnot(size_t knotIndex);
 
   /**
-   * Get the in tangent (or in control point) at the given index
+   * @brief Get the in tangent (or in control point) at the given index.
+   *
    * @param[in] knotIndex the index of the knot
    * @return the in tangent (or in control point)
    */
   Vector3 GetInTangent(size_t knotIndex);
 
   /**
-   * Get the out tangent (or out control point) at the given index
+   * @brief Get the out tangent (or out control point) at the given index.
+   *
    * @param[in] knotIndex the index of the knot
    * @return the out tangent (or out control point)
    */
   Vector3 GetOutTangent(size_t knotIndex);
 
   /**
-   * Set an in-tangent for the given knot.
+   * @brief Set an in-tangent for the given knot.
+   *
    * @param[in] knotIndex - the index of the knot
    * @param[in] inTangent - The in tangent or control point, depending on the spline type
    */
   void SetInTangent(size_t knotIndex, Vector3 inTangent);
 
   /**
-   * Set an out-tangent for the given knot.
+   * @brief Set an out-tangent for the given knot.
+   *
    * @param[in] knotIndex - the index of the knot
    * @param[in] outTangent - The out tangent or control point, depending on the spline type
    */
   void SetOutTangent(size_t knotIndex, Vector3 outTangent);
 
   /**
-   * For the given set of knot points, generate control points which result in a smooth join between the splines of each segment.
+   * @brief For the given set of knot points, generate control points which result in a smooth join between the splines of each segment.
    *
    * The generating algorithm is as follows:
    * For a given knot point K[N], find the vector that bisects K[N-1],[N] and [N],[N+1].
@@ -117,13 +124,18 @@ public:
   void GenerateControlPoints(float curvature=0.25f);
 
   /**
-   * Get the number of segments. This is the number of points - 1, or zero if there are fewer than 2 points.
+   * @brief Get the number of segments.
+   *
+   * This is the number of points - 1, or zero if there are fewer than 2 points.
+   * @return the number of segments
    */
   unsigned int GetNumberOfSegments() const;
 
   /**
-   * Given an alpha value 0.0-1.0, return the associated point on the entire
-   * spline. The alpha value is split into each segment equally, so doesn't give a
+   * @brief Given an alpha value 0.0-1.0, return the associated point on the entire
+   * spline.
+   *
+   * The alpha value is split into each segment equally, so doesn't give a
    * constant speed along the spline.  An alpha value of 0.0 returns the first knot
    * and an alpha value of 1.0 returns the last knot.
    *
@@ -133,10 +145,12 @@ public:
   const Vector3 GetPoint(float alpha) const;
 
   /**
-   * Given a parameter 0.0 - 1.0, return the associated point on the spline given the
-   * relevant segment.  Note, the parameter does not correspond to an axis, neither
-   * is it necessarily equally spaced along the curve.  If the parameter is 0.0 or
-   * 1.0, then the first or second knot point is returned.
+   * @brief Given a parameter 0.0 - 1.0, return the associated point
+   * on the spline given the relevant segment.
+   *
+   * Note, the parameter does not correspond to an axis, neither is it
+   * necessarily equally spaced along the curve.  If the parameter is
+   * 0.0 or 1.0, then the first or second knot point is returned.
    *
    * @param[in] segmentIndex the segment of the spline to interpolation.
    * @param[in] parameter    the parameter to use in the parametric formula
@@ -145,17 +159,22 @@ public:
   const Vector3 GetPoint(unsigned int segmentIndex, float parameter) const;
 
   /**
-   * Given a value X on the spline (between the first and last knot inclusively),
+   * @brief Given a value X on the spline (between the first and last knot inclusively),
    * calculate the corresponding Y value. Requires that there is only 1 Y per X.
+   *
+   * @param[in] x The X
+   * @return the Y value
    */
   const float GetYFromMonotonicX(float x) const;
 
   /**
-   * For a 2 dimensional curve (z=0), given a parameter 0.0 - 1.0, return the
-   * associated Y value on the spline given the relevant segment.  Note, the
-   * parameter does not correspond to an axis, neither is it necessarily equally
-   * spaced along the curve.  If the parameter is 0.0 or 1.0, then the first or
-   * second knot point's Y value is returned.
+   * @brief For a 2 dimensional curve (z=0), given a parameter 0.0 - 1.0, return the
+   * associated Y value on the spline given the relevant segment.
+   *
+   * Note, the parameter does not correspond to an axis, neither is it
+   * necessarily equally spaced along the curve.  If the parameter is
+   * 0.0 or 1.0, then the first or second knot point's Y value is
+   * returned.
    *
    * @param[in] segmentIndex - the segment of the spline to interpolation.
    * @param[in] parameter    - the parameter to use in the parametric formula
@@ -166,8 +185,9 @@ public:
 
 private:
   /**
-   * FindSegment searches through the control points to find the appropriate
+   * @brief FindSegment searches through the control points to find the appropriate
    * segment.
+   *
    * @param[in]  x            - the X value to search for
    * @param[out] segmentIndex - the returned segment index
    * @return True if the segment was found.
@@ -175,8 +195,10 @@ private:
   const bool FindSegment(float x, int& segmentIndex) const;
 
   /**
-   * Given two knots and control points, interpolate to find the
-   * parameter that will give the required X value. Requires that X is monotonic.
+   * @brief Given two knots and control points, interpolate to find the
+   * parameter that will give the required X value.
+   *
+   * Requires that X is monotonic.
    *
    * @param[in] atX  the X value to search for
    * @param[in] P0_X the starting knot's X
@@ -188,17 +210,15 @@ private:
   const float ApproximateCubicBezierParameter (float atX, float P0_X, float C0_X, float C1_X, float P1_X ) const;
 
 private:
-  std::vector<Vector3>   mKnots;
-  std::vector<Vector3>   mOutTangents;
-  std::vector<Vector3>   mInTangents;
+  std::vector<Vector3>   mKnots;          ///< The set of knot points
+  std::vector<Vector3>   mOutTangents;    ///< The set of out tangents (matching to mKnots)
+  std::vector<Vector3>   mInTangents;     ///< The set of in tangents  (matching to mKnots)
 
-  Matrix                 mBasis;
+  Matrix                 mBasis;          ///< The basis matrix to use
 
-  static const float     BezierBasisA[];
+  static const float     BezierBasisA[];  ///< The basis matrix for Bezier splines
 };
 
-
-
-}
+} //namespace Dali
 
 #endif //__DALI_SPLINE_H__

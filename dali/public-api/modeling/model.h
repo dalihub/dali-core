@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+
 // EXTERNAL INCLUDES
 #include <boost/function.hpp>
 #include <string>
@@ -38,7 +39,7 @@ class Model;
 }
 
 /**
- * A handle to 3D model data loaded as a resource.
+ * @brief A handle to 3D model data loaded as a resource.
  *
  * Use ModelActorFactory::BuildActorTree() to create actors from this model.
  * Use ModelActorFactory::BuildAnimation() to create animations on such actors.
@@ -47,38 +48,47 @@ class Model : public BaseHandle
 {
 public:
 
-  typedef SignalV2<void (Model)> ModelSignalV2;
-  typedef SignalV2<void (Model,bool)> ModelSaveSignalV2;
+  typedef SignalV2<void (Model)> ModelSignalV2; ///< Signal type
+  typedef SignalV2<void (Model,bool)> ModelSaveSignalV2; ///< Signal type for saving models
 
   //Signal Names
-  static const char* const SIGNAL_MODEL_LOADING_FINISHED;
-  static const char* const SIGNAL_MODEL_SAVING_FINISHED;
+  static const char* const SIGNAL_MODEL_LOADING_FINISHED; ///< name "model-loading-finished"
+  static const char* const SIGNAL_MODEL_SAVING_FINISHED;  ///< name "model-saving-finished"
 
 public:
   /**
-   * Create an uninitialized Model. This can be initialised with Model::New().
-   * Calling member functions with an uninitialized Dali::Object is not allowed.
+   * @brief Create an uninitialized Model.
+   *
+   * This can be initialised with Model::New().  Calling member
+   * functions with an uninitialized Dali::Object is not allowed.
    */
   Model();
 
   /**
-   * Asynchronously load a model. Connect to SignalLoadingFinished() to determine
-   * when the model has finished loading.
+   * @brief Asynchronously load a model.
+   *
+   * Connect to SignalLoadingFinished() to determine when the model
+   * has finished loading.
+   *
    * @param [in] url The url of the model data.
    * @return A handle to a newly allocated Dali resource.
    */
   static Model New(const std::string& url);
 
   /**
-   * Downcast an Object handle to Model handle. If handle points to a Model object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Model handle.
+   *
+   * If handle points to a Model object the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to an Model object or an uninitialized handle
    */
   static Model DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Model();
@@ -89,7 +99,8 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Query whether the model data has loaded.
+   * @brief Query whether the model data has loaded.
+   *
    * The asynchronous loading begins when the Model object is created.
    * After the Model object is discarded, the model data will be released from memory.
    * @return The loading state, either Loading, Success or Failed.
@@ -97,19 +108,22 @@ public:
   LoadingState GetLoadingState();
 
   /**
-   * Emitted when the model data loads successfully or when the loading fails.
+   * @brief Emitted when the model data loads successfully or when the loading fails.
+   *
    * @return A signal object to Connect() with.
    */
   ModelSignalV2& LoadingFinishedSignal();
 
   /**
-   * Emitted when the model data save request completes.
+   * @brief Emitted when the model data save request completes.
+   *
    * @return A signal object to Connect() with.
    */
   ModelSaveSignalV2& SavingFinishedSignal();
 
   /**
-   * Get number of animations in the model.
+   * @brief Get number of animations in the model.
+   *
    * @pre The model has been loaded.
    * @return The number of animations encoded in the model, or zero if the model
    * hasn't finished loading.
@@ -117,7 +131,8 @@ public:
   size_t NumberOfAnimations() const;
 
   /**
-   * Get the index of a named animation map in the model.
+   * @brief Get the index of a named animation map in the model.
+   *
    * @param[in] animationName The name of the animation to find
    * @param[out] animationIndex The index of the named animation if found
    * @return true if the animation was foud, false if not found.
@@ -125,14 +140,16 @@ public:
   bool FindAnimation(const std::string& animationName, unsigned int& animationIndex);
 
   /**
-   * Write the model data to the standard output in textual format.
+   * @brief Write the model data to the standard output in textual format.
+   *
    * Note - will assert if any part of the model is on the scene graph (i.e. if
    * an actor has been created from this model)
    */
   void Write();
 
   /**
-   * Save a Dali representation of the mode data
+   * @brief Save a Dali representation of the mode data.
+   *
    * Used for faster loading on subsequent uses.
    * @param[in] url The resource url for the data
    */
@@ -141,7 +158,8 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] model A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Model(Internal::Model* model);

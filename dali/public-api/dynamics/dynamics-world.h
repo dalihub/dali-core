@@ -41,8 +41,9 @@ class DynamicsJoint;
 class DynamicsShape;
 
 /**
- * DynamicsWorld gives the application developer an alternative method of moving and rotating
+ * @brief DynamicsWorld gives the application developer an alternative method of moving and rotating.
  * actors in the DALi scene.
+ *
  * Actors are represented by DynamicsBody objects in the dynamics simulation and are moved by
  * forces (eg gravity). Dynamics also allows collisions between objects to be
  * detected and responded to in signal handlers.
@@ -80,13 +81,15 @@ class DynamicsWorld : public BaseHandle
 public:
 
   // Signal Names
-  static const char* const SIGNAL_COLLISION;
+  static const char* const SIGNAL_COLLISION; ///< name "collision"
 
   // signals
-  typedef SignalV2< void (DynamicsWorld, const DynamicsCollision) > CollisionSignalV2;
+  typedef SignalV2< void (DynamicsWorld, const DynamicsCollision) > CollisionSignalV2; ///< Type of collision signal
 
 public:
-  // enums
+  /**
+   * @brief Debug modes
+   */
   enum  DEBUG_MODES
   {
     DEBUG_MODE_NONE               = 0,
@@ -102,12 +105,12 @@ public:
 
 public:
   /**
-   * Create an uninitialized DynamicsWorld handle.
+   * @brief Create an uninitialized DynamicsWorld handle.
    */
   DynamicsWorld();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~DynamicsWorld();
 
@@ -120,38 +123,44 @@ public:
 public:
 
   /**
-   * Set the gravity for the world
+   * @brief Set the gravity for the world.
+   *
    * @param[in] gravity a Vector3 specifying the applicable gravity for the world.
    */
   void SetGravity( const Vector3& gravity );
 
   /**
-   * Get the gravity for the world
+   * @brief Get the gravity for the world.
+   *
    * @return A Vector3 specifying the gravity that will be applied in the world.
    */
   const Vector3& GetGravity() const;
 
   /**
-   * Get the current debug drawmode
+   * @brief Get the current debug drawmode.
+   *
    * @return A combination of the flags in DEBUG_MODES or 0 if debug drawing is currently disabled.
    */
   int GetDebugDrawMode() const;
 
   /**
-   * Set the debug drawmode for the simulation
+   * @brief Set the debug drawmode for the simulation.
+   *
    * @param[in] mode A combination of the flags in DEBUG_MODES or 0 to disable debug drawing
    */
   void SetDebugDrawMode(const int mode);
 
   /**
-   * Set the actor which will represent the dynamics world
+   * @brief Set the actor which will represent the dynamics world.
+   *
    * All actors that will participate in the dynamics simulation must be direct children of this actor
    * @param[in] actor The root actor for the dynamics simulation
    */
   void SetRootActor(Actor actor);
 
   /**
-   * Get the root actor for the simulation
+   * @brief Get the root actor for the simulation.
+   *
    * @return The root actor for the dynamics simulation
    */
   Actor GetRootActor() const;
@@ -159,7 +168,8 @@ public:
 public: // Signals
 
   /**
-   * This signal is emitted when a collision is detected between two DynamicsBodies
+   * @brief This signal is emitted when a collision is detected between two DynamicsBodies.
+   *
    * A callback of the following type may be connected:
    * @code
    *   void YourCollisionHandler(Dali::DynamicsWorld world, const Dali::DynamicsCollision collisionData);
@@ -172,7 +182,8 @@ public: // Signals
 public: // Not intended for application developers
 
   /**
-   * This constructor is used internally by Dali
+   * @brief This constructor is used internally by Dali.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL DynamicsWorld( Internal::DynamicsWorld* internal );

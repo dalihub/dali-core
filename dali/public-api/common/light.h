@@ -23,6 +23,10 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
+
+/**
+ * The top level DALi namespace
+ */
 namespace Dali DALI_IMPORT_API
 {
 
@@ -34,7 +38,7 @@ class Light;
 class Light;
 
 /**
- * Light source types
+ * @brief Light source types.
  */
 enum LightType
 {
@@ -45,28 +49,32 @@ enum LightType
 };
 
 /**
- * Encapsulates the data describing a light source
+ * @brief Encapsulates the data describing a light source.
  */
 class Light : public BaseHandle
 {
 public:
   /**
-   * Create an initialized Light.
+   * @brief Create an initialized Light.
+   *
    * @param[in] name The light's name
    * @return A handle to a newly allocated Dali resource.
    */
   static Light New(const std::string& name);
 
   /**
-   * Downcast an Object handle to Light handle. If handle points to a Light object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Light handle.
+   *
+   * If handle points to a Light object the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a Light object or an uninitialized handle
    */
   static Light DownCast( BaseHandle handle );
 
   /**
-   * Create an uninitialized light; this can be initialized with Light::New()
+   * @brief Create an uninitialized light; this can be initialized with Light::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   Light()
@@ -74,7 +82,7 @@ public:
   }
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~Light();
 
@@ -84,103 +92,119 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Set the light's name
+   * @brief Set the light's name.
+   *
    * @param[in] name The light's name
    */
   void SetName(const std::string& name);
 
   /**
-   * Get the light's name
+   * @brief Get the light's name.
+   *
    * @return The light's name
    */
   const std::string& GetName() const;
 
   /**
-   * Set the light's type
+   * @brief Set the light's type.
+   *
    * @param[in] type The type of light
    */
   void SetType(LightType type);
 
   /**
-   * Get the lights type.
+   * @brief Get the lights type.
+   *
    * @return The light's type
    */
   LightType GetType() const;
 
   /**
-   * Set the distances at which the light's intensity starts to fall off and reaches zero
+   * @brief Set the distances at which the light's intensity starts to fall off and reaches zero.
+   *
    * @param[in] fallOff The fall off start and end. The start is in the x component and end is in the y component.
    */
   void SetFallOff(const Vector2& fallOff);
 
   /**
-   * Get the distances at which the light's intensity starts to fall off and reaches zero.
+   * @brief Get the distances at which the light's intensity starts to fall off and reaches zero.
+   *
    * @return The distances at which the light's intensity starts to fall off, and reaches zero.
    * See @ref SetFallOff
    */
   const Vector2& GetFallOff() const;
 
   /**
-   * Set the spotlight's inner and outer cone angles
+   * @brief Set the spotlight's inner and outer cone angles.
+   *
    * @param[in] angle The spotlight's inner and outer cone angles.
    *                  The inner is in the x component and outer is in the y component.
    */
   void SetSpotAngle(const Vector2& angle);
 
   /**
-   * Get the spotlight's inner and outer cone angles
+   * @brief Get the spotlight's inner and outer cone angles.
+   *
    * @return The spotlight's inner and outer cone angles
    */
   const Vector2& GetSpotAngle() const;
 
   /**
-   * Set the ambient color for the light
+   * @brief Set the ambient color for the light.
+   *
    * The color is composed of rgb
    * @param[in] color The color to set.
    */
   void SetAmbientColor(const Vector3& color);
 
   /**
-   * Get the light's ambient color
+   * @brief Get the light's ambient color.
+   *
    * @return the light's color as rgb
    */
   const Vector3& GetAmbientColor() const;
 
   /**
-   * Set the diffuse color for the light
+   * @brief Set the diffuse color for the light.
+   *
    * The color is composed of rgb
    * @param[in] color The color to set.
    */
   void SetDiffuseColor(const Vector3& color);
 
   /**
-   * Get the light's ambient color
+   * @brief Get the light's ambient color.
+   *
    * @return the light's color as rgb
    */
   const Vector3& GetDiffuseColor() const;
 
   /**
-   * Set the specular color for the light
+   * @brief Set the specular color for the light.
+   *
    * The color is composed of rgb
    * @param[in] color The color to set.
    */
   void SetSpecularColor(const Vector3& color);
 
   /**
-   * Get the light's specular color
+   * @brief Get the light's specular color.
+   *
    * @return the light's specular color as rgb
    */
   const Vector3& GetSpecularColor() const;
 
   /**
-   * Set the direction in which the light's rays are cast.
+   * @brief Set the direction in which the light's rays are cast.
+   *
    * Valid when the light's type is DIRECTIONAL (see @ref Dali::LightType).
    * @param [in] direction The direction in which the light's rays are cast.
    */
   void SetDirection(const Vector3& direction);
 
   /**
-   * Get the direction in which the light's rays are cast.
+   * @brief Get the direction in which the light's rays are cast.
+   *
    * Valid when the light's type is DIRECTIONAL (see @ref LightType).
    * @return The direction in which the light's rays are cast.
    */
@@ -189,7 +213,8 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] light A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Light(Internal::Light* light);

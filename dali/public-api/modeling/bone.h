@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
@@ -27,51 +28,57 @@ namespace Dali DALI_IMPORT_API
 class Matrix;
 
 class Bone;
-typedef std::vector< Bone >           BoneContainer;
-typedef BoneContainer::iterator       BoneIter;
-typedef BoneContainer::const_iterator BoneConstIter;
+typedef std::vector< Bone >           BoneContainer; ///< Container for bones
+typedef BoneContainer::iterator       BoneIter;      ///< @ref Dali::BoneContainer iterator
+typedef BoneContainer::const_iterator BoneConstIter; ///< @ref Dali::BoneContainer const iterator
 
 /**
- * A single bone in a mesh
+ * @brief A single bone in a mesh.
+ *
+ * A Bone is a named actor that can be used to deform a mesh. @see Dali::MeshData for more
+ * information.
  */
 class Bone
 {
 public:
   /**
-   * Default constructor
+   * @brief Default constructor.
    */
   Bone ();
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param name of the bone
    * @param offsetMatrix for the bone
    */
   Bone( const std::string& name, const Matrix& offsetMatrix );
 
   /**
-   * Destructor.
+   * @brief Destructor.
    */
   ~Bone();
 
   /**
-   * Copy constructor
+   * @brief Copy constructor.
    */
   Bone( const Bone& rhs );
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
    */
   Bone& operator=(const Bone& rhs);
 
   /**
-   * Get name
+   * @brief Get name.
+   *
    * @return returns the name of the bone
    */
   const std::string& GetName() const;
 
   /**
-   * Get offset matrix
+   * @brief Get offset matrix.
+   *
    * @return returns the offset matrix for this bone
    */
    const Matrix& GetOffsetMatrix() const;

@@ -37,7 +37,8 @@ class DynamicsBodyConfig;
 } // namespace Internal
 
 /**
- * Describes a DynamicsBody configuration
+ * @brief Describes a DynamicsBody configuration.
+ *
  * Use to create multiple instances of a DynamicsBody
  */
 class DynamicsBodyConfig : public BaseHandle
@@ -45,7 +46,7 @@ class DynamicsBodyConfig : public BaseHandle
 public:
 
   /**
-   * Enumeration of the types of dynamics bodies
+   * @brief Enumeration of the types of dynamics bodies.
    */
   enum BodyType
   {
@@ -54,7 +55,8 @@ public:
   }; // enum BodyType
 
   /**
-   * Collision filtering flags.@n
+   * @brief Collision filtering flags.
+   *
    * A DynamicsBody pair are considered for collision detection if a bitwise AND of
    * the filter group from one DynamicsBody and the filter mask of the other DynamicsBody
    * gives a non-zero result.@n
@@ -70,19 +72,23 @@ public:
 
 public:
   /**
-   * Create a new DynamicsBody configuration object
+   * @brief Create a new DynamicsBody configuration object.
+   *
    * All values are set to default values...
    * @pre Stage::InitializeDynamics() must have been called
+   * @return a handle to the new DynamicsBodyconfig.
    */
   static DynamicsBodyConfig New();
 
   /**
-   * Create an uninitialized handle. Initialize with one of the DynamicsBodyConfig New methods
+   * @brief Create an uninitialized handle.
+   *
+   * Initialize with one of the DynamicsBodyConfig New methods
    */
   DynamicsBodyConfig();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~DynamicsBodyConfig();
 
@@ -93,19 +99,22 @@ public:
 
 public:
   /**
-   * Set the type of DynamicsBody
+   * @brief Set the type of DynamicsBody.
+   *
    * @param[in] type A member of BodyType enumeration.
    */
   void SetType( const BodyType type );
 
   /**
-   * Get the type of DynamicsBody specified by the Configuration
+   * @brief Get the type of DynamicsBody specified by the Configuration.
+   *
    * @return A member of BodyType enumeration.
    */
   BodyType GetType() const;
 
   /**
-   * Define the shape for the body
+   * @brief Define the shape for the body.
+   *
    * @param[in] type        The type of shape
    * @param[in] dimensions  The parameters defining the shape ...
    *                        - DynamicsShape::SPHERE
@@ -131,31 +140,36 @@ public:
   void SetShape(const DynamicsShape::ShapeType type, const Vector3& dimensions);
 
   /**
-   * Set the shape for the body
+   * @brief Set the shape for the body.
+   *
    * @param[in] shape A DynamicsShape.
    */
   void SetShape( DynamicsShape shape );
 
   /**
-   * get the shape for the body
+   * @brief get the shape for the body.
+   *
    * @return A DynamicsShape.
    */
   DynamicsShape GetShape() const;
 
   /**
-   * Set the mass for the body.
+   * @brief Set the mass for the body.
+   *
    * @param[in] mass The mass for the body.
    */
   void SetMass( const float mass);
 
   /**
-   * Get the mass that will be set on bodies created from this config
+   * @brief Get the mass that will be set on bodies created from this config.
+   *
    * @return The mass that will be set on bodies created from this config
    */
   float GetMass() const;
 
   /**
-   * Get the @"elasticity@" of the body.
+   * @brief Get the @"elasticity@" of the body.
+   *
    * @return The @"elasticity@".
    *
    * See @ref SetElasticity
@@ -163,7 +177,8 @@ public:
   float GetElasticity() const;
 
   /**
-   * Affects the @"elasticity@" of the body.
+   * @brief Affects the @"elasticity@" of the body.
+   *
    * This function sets the coefficient of restitution (COR) of an object.@n
    * @param[in] elasticity The elasticity of the body.
    *                       Assuming the other body in a collision has a elasticity factor of 1.
@@ -173,7 +188,8 @@ public:
   void SetElasticity(const float elasticity);
 
   /**
-   * Get the friction coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   * @brief Get the friction coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   *
    * @return The friction coefficient.
    *
    * See @ref SetFriction.
@@ -181,29 +197,32 @@ public:
   float GetFriction() const;
 
   /**
-   * Set the friction coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   * @brief Set the friction coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   *
    * @param[in] friction The friction coefficient.
    *                     This will be clamped between 0 and 1
    */
   void SetFriction(const float friction);
 
   /**
-   * Get the linear damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
-   * @return The linear damping coefficient.
+   * @brief Get the linear damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
    *
+   * @return The linear damping coefficient.
    * See @ref SetLinearDamping.
    */
   float GetLinearDamping() const;
 
   /**
-   * Set the linear damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   * @brief Set the linear damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   *
    * @param[in] damping The linear damping coefficient.
    *                    This will be clamped between 0 and 1
    */
   void SetLinearDamping( const float damping );
 
   /**
-   * Get the angular damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   * @brief Get the angular damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   *
    * @return The angular damping coefficient.
    *
    * See @ref SetAngularDamping.
@@ -211,14 +230,16 @@ public:
   float GetAngularDamping() const;
 
   /**
-   * Set the angular damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   * @brief Set the angular damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
+   *
    * @param[in] damping The angular damping coefficient.
    *                    This will be clamped between 0 and 1
    */
   void SetAngularDamping(const float damping);
 
   /**
-   * Get the linear velocity below which the DynamicsBody can be put to sleep by the simulation.
+   * @brief Get the linear velocity below which the DynamicsBody can be put to sleep by the simulation.
+   *
    * @return The linear sleep velocity.
    *
    * See @ref SetLinearSleepVelocity, DynamicsBody::SetSleepEnabled.
@@ -226,7 +247,8 @@ public:
   float GetLinearSleepVelocity() const;
 
   /**
-   * Set the linear velocity below which the DynamicsBody can be put to sleep by the simulation.
+   * @brief Set the linear velocity below which the DynamicsBody can be put to sleep by the simulation.
+   *
    * @param[in] sleepVelocity The linear sleep velocity.
    *
    * See @ref DynamicsBody::SetSleepEnabled.
@@ -234,7 +256,8 @@ public:
   void SetLinearSleepVelocity(const float sleepVelocity);
 
   /**
-   * Get the angular velocity below which the DynamicsBody can be put to sleep by the simulation.
+   * @brief Get the angular velocity below which the DynamicsBody can be put to sleep by the simulation.
+   *
    * @return The angular sleep velocity.
    *
    * See @ref SetAngularSleepVelocity, DynamicsBody::SetSleepEnabled.
@@ -242,7 +265,8 @@ public:
   float GetAngularSleepVelocity() const;
 
   /**
-   * Set the angular velocity below which the DynamicsBody can be put to sleep by the simulation.
+   * @brief Set the angular velocity below which the DynamicsBody can be put to sleep by the simulation.
+   *
    * @param[in] sleepVelocity The angular sleep velocity.
    *
    * See @ref DynamicsBody::SetSleepEnabled.
@@ -250,82 +274,94 @@ public:
   void SetAngularSleepVelocity(const float sleepVelocity);
 
   /**
-   * Get the collision filter group.@n
+   * @brief Get the collision filter group.@n
+   *
    * See @ref CollisionFilter
    * @return The collision filter group.@n
    */
   short int GetCollisionGroup() const;
 
   /**
-   * Set the collision filter group
+   * @brief Set the collision filter group.
+   *
    * See @ref CollisionFilter
    * @param[in] collisionGroup The collision filter group
    */
   void SetCollisionGroup(const short int collisionGroup);
 
   /**
-   * Get the collision filter mask.@n
+   * @brief Get the collision filter mask.@n
+   *
    * See @ref CollisionFilter
    * @return The collision filter mask.@n
    */
   short int GetCollisionMask() const;
 
   /**
-   * Set the collision filter mask
+   * @brief Set the collision filter mask.
+   *
    * See @ref CollisionFilter
    * @param[in] collisionMask The collision filter mask
    */
   void SetCollisionMask(const short int collisionMask);
 
   /**
-   * Get the stiffness coefficient for the soft body
+   * @brief Get the stiffness coefficient for the soft body.
+   *
    * See @ref SetStiffness
    * @return The stiffness coefficient for the soft body.
    */
   float GetStiffness() const;
 
   /**
-   * Set the stiffness co-efficient for the soft body
+   * @brief Set the stiffness co-efficient for the soft body.
+   *
    * @param[in] stiffness A value clamped between 0 and 1.
    *                      Values closer to 1 make it more stiff.
    */
   void SetStiffness( const float stiffness );
 
   /**
-   * Get the anchor hardness.@n
+   * @brief Get the anchor hardness.@n
+   *
    * See @ref SetAnchorHardness.
    * @return The anchor hardness.
    */
   float GetAnchorHardness() const;
 
   /**
-   * Set the hardness of an anchor, or how much the anchor is allowed to drift
+   * @brief Set the hardness of an anchor, or how much the anchor is allowed to drift.
+   *
    * @param[in] hardness 0 means a soft anchor with no drift correction, 1 mean a hard anchor with full correction
    *                 hardness will be clamped between 0 and 1.
    */
   void SetAnchorHardness( const float hardness );
 
   /**
-   * Get the volume conservation coefficient.
+   * @brief Get the volume conservation coefficient.
+   *
    * @return The volume conservation coefficient.
    */
   float GetVolumeConservation() const;
 
   /**
-   * Set the volume conservation coefficient.
+   * @brief Set the volume conservation coefficient.
+   *
    * Defines the magnitude of the force used to conserve the volume of the body after DynamicsBody::ConserveVolume is invoked
    * @param[in] conservation Range 0 <= conservation < +infinity
    */
   void SetVolumeConservation(const float conservation);
 
   /**
-   * Get the shape conservation factor.
+   * @brief Get the shape conservation factor.
+   *
    * @return The shape conservation factor.
    */
   float GetShapeConservation() const;
 
   /**
-   * Set the shape conservation factor.
+   * @brief Set the shape conservation factor.
+   *
    * Defines the factor used to match the shape of the body when DynamicsBody::ConserveShape. is invoked
    * @param[in] conservation Range 0 <= conservation < 1
    */
@@ -334,7 +370,8 @@ public:
   // Not intended for application developers
 private:
   /**
-   * This constructor is used internally by Dali
+   * @brief This constructor is used internally by Dali.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL DynamicsBodyConfig( Internal::DynamicsBodyConfig* internal );

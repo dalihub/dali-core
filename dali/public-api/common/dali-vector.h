@@ -17,10 +17,6 @@
 // limitations under the License.
 //
 
-/**
- * @addtogroup CAPI_DALI_FRAMEWORK
- * @{
- */
 
 // EXTERNAL INCLUDES
 #include <cstddef>
@@ -29,7 +25,8 @@
 #include <dali/public-api/common/dali-common.h>
 
 /**
- * For DALi internal use asserts are enabled in debug builds.
+ * @brief For DALi internal use asserts are enabled in debug builds.
+ *
  * For Application use asserts can be enabled manually.
  */
 #if defined( DEBUG_ENABLED )
@@ -46,7 +43,8 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Base class to handle the memory of simple vector.
+ * @brief Base class to handle the memory of simple vector.
+ *
  * Memory layout is such that it has two std::size_t to hold the count
  * and capacity of the vector. mData is adjusted so that it points to the
  * beginning of the first real item so that iterating the items is quick.
@@ -60,12 +58,14 @@ public: // Typedefs
 protected: // Construction
 
   /**
-   * Default constructor. Does not allocate space.
+   * @brief Default constructor. Does not allocate space.
    */
   VectorBase();
 
   /**
-   * Destructor. Does not release the space. Derived class needs to call Release.
+   * @brief Destructor.
+   *
+   * Does not release the space. Derived class needs to call Release.
    * Not virtual as should not be called directly and we do not want
    * a vtable for this class as it would unnecessarily increase size.
    */
@@ -74,7 +74,8 @@ protected: // Construction
 public: // API
 
   /**
-   * This method is inlined as its needed frequently for End() iterator.
+   * @brief This method is inlined as its needed frequently for End() iterator.
+   *
    * @return The count of elements in this vector.
    */
   SizeType Count() const
@@ -103,7 +104,8 @@ public: // API
   SizeType Capacity() const;
 
   /**
-   * Release the data.
+   * @brief Release the data.
+   *
    * Does not call destructors on objects held.
    */
   void Release();
@@ -111,33 +113,39 @@ public: // API
 protected: // for Derived classes
 
   /**
-   * Helper to set the count.
+   * @brief Helper to set the count.
+   *
    * @param count Number of elements in the vector.
    */
   void SetCount( SizeType count );
 
   /**
-   * Reserve space in the vector.
+   * @brief Reserve space in the vector.
+   *
    * @param count of elements to reserve.
    * @param elementSize of a single element.
    */
   void Reserve( SizeType count, SizeType elementSize );
 
   /**
-   * Copy a vector.
+   * @brief Copy a vector.
+   *
    * @param vector Vector to copy from.
    * @param elementSize of a single element.
    */
   void Copy( const VectorBase& vector, SizeType elementSize );
 
   /**
-   * Swap the contents of two vectors.
+   * @brief Swap the contents of two vectors.
+   *
    * @param vector Vector to swap with.
    */
   void Swap( VectorBase& vector );
 
   /**
-   * Erase an element. Does not change capacity.
+   * @brief Erase an element.
+   *
+   * Does not change capacity.
    * @pre last element cannot be erased as there is nothing to move.
    * @param address to erase from.
    * @param elementSize to erase.
@@ -147,17 +155,18 @@ protected: // for Derived classes
 private:
 
   // not copiable as it does not know the size of elements
-  VectorBase( const VectorBase& );
-  VectorBase& operator=( const VectorBase& );
+  VectorBase( const VectorBase& ); ///< Undefined
+  VectorBase& operator=( const VectorBase& ); ///< Undefined
 
 protected: // Data
 
-  void* mData;
+  void* mData; ///< Pointer to the data.
 
 };
 
 /**
- * Vector algorithm variant for trivial types.
+ * @brief Vector algorithm variant for trivial types.
+ *
  * Trivial types do not need destructor or copy constructor called.
  */
 template< bool IsTrivial >
@@ -168,19 +177,20 @@ protected: // API for deriving classes
   typedef VectorBase::SizeType SizeType;
 
   /**
-   * Empty constructor.
+   * @brief Empty constructor.
    */
   VectorAlgorithms()
   { }
 
   /**
-   * Empty destructor.
+   * @brief Empty destructor.
    */
   ~VectorAlgorithms()
   { }
 
   /**
-   * Copy vector contents.
+   * @brief Copy vector contents.
+   *
    * @param rhs to copy from.
    * @param elementSize of the content.
    */
@@ -197,7 +207,8 @@ protected: // API for deriving classes
   }
 
   /**
-   * Reserve space in the vector.
+   * @brief Reserve space in the vector.
+   *
    * @param count of elements to reserve.
    * @param elementSize of a single element.
    */
@@ -207,7 +218,8 @@ protected: // API for deriving classes
   }
 
   /**
-   * Resize the vector. Does not change capacity.
+   * @brief Resize the vector. Does not change capacity.
+   *
    * @param count to resize to.
    * @param elementSize of a single element.
    */
@@ -218,7 +230,9 @@ protected: // API for deriving classes
   }
 
   /**
-   * Clear the contents. For simple types nothing to do.
+   * @brief Clear the contents.
+   *
+   * For simple types nothing to do.
    */
   void Clear()
   {
@@ -229,7 +243,7 @@ protected: // API for deriving classes
   }
 
   /**
-   * Release the vector.
+   * @brief Release the vector.
    */
   void Release()
   {
@@ -237,7 +251,8 @@ protected: // API for deriving classes
   }
 
   /**
-   * Erase an element. Does not change capacity.
+   * @brief Erase an element. Does not change capacity.
+   *
    * @param address to erase from.
    * @param elementSize to erase.
    */
@@ -249,7 +264,8 @@ protected: // API for deriving classes
 };
 
 /**
- * Vector algorithm variant for complex types.
+ * @brief Vector algorithm variant for complex types.
+ *
  * Not yet supported so will lead to compile error
  * as constructor and destructor are private.
  * TODO add support for this variant.
@@ -265,7 +281,8 @@ private:
 };
 
 /**
- * Vector class with minimum space allocation when its empty.
+ * @brief Vector class with minimum space allocation when its empty.
+ *
  * @param type of the data that the vector holds.
  */
 template< class T, bool IsTrivialType = __has_trivial_destructor(T) && __has_trivial_copy(T) >
@@ -274,25 +291,26 @@ class Vector : public VectorAlgorithms< IsTrivialType >
 public: // API
 
   /**
-   * Type definitions
+   * @brief Type definitions.
    */
   typedef VectorBase::SizeType SizeType;
-  typedef T* Iterator;  /// Most simple Iterator is a pointer
+  typedef T* Iterator;  ///< Most simple Iterator is a pointer
   typedef const T* ConstIterator;
   typedef T  ItemType;
+
   enum
   {
     BaseType = IsTrivialType
   };
 
   /**
-   * Default constructor. Does not allocate any space.
+   * @brief Default constructor. Does not allocate any space.
    */
   Vector()
   { }
 
   /**
-   * Destructor. Releases the allocated space.
+   * @brief Destructor. Releases the allocated space.
    */
   ~Vector()
   {
@@ -300,7 +318,8 @@ public: // API
   }
 
   /**
-   * Copy constructor
+   * @brief Copy constructor.
+   *
    * @param vector Vector to copy from.
    */
   Vector( const Vector& vector )
@@ -310,7 +329,8 @@ public: // API
   }
 
   /**
-   * Assignment operator
+   * @brief Assignment operator.
+   *
    * @param  vector Vector to assign from.
    * @return reference to self for chaining.
    */
@@ -366,7 +386,8 @@ public: // API
   }
 
   /**
-   * Push back an element to the vector.
+   * @brief Push back an element to the vector.
+   *
    * @param element to be added.
    */
   void PushBack( const ItemType& element )
@@ -385,7 +406,8 @@ public: // API
   }
 
   /**
-   * Reserve space in the vector.
+   * @brief Reserve space in the vector.
+   *
    * Reserving less than current Capacity is a no-op.
    * @param count of elements to reserve.
    */
@@ -395,7 +417,8 @@ public: // API
   }
 
   /**
-   * Resize the vector. Does not change capacity.
+   * @brief Resize the vector. Does not change capacity.
+   *
    * @param count to resize to.
    * @param item to insert to the new indeces.
    */
@@ -420,8 +443,9 @@ public: // API
   }
 
   /**
-   * Erase an element. Does not change capacity.
-   * Other elements get moved.
+   * @brief Erase an element.
+   *
+   * Does not change capacity. Other elements get moved.
    * @param iterator Iterator pointing to item to remove.
    * @return Iterator pointing to next element.
    */
@@ -442,10 +466,12 @@ public: // API
   }
 
   /**
-   * Removes an element. Does not maintain order.
-   * Swaps the element with end and decreases size by one.
-   * This is much faster than Erase so use this in case order
-   * does not matter. Does not change capacity.
+   * @brief Removes an element.
+   *
+   * Does not maintain order.  Swaps the element with end and
+   * decreases size by one.  This is much faster than Erase so use
+   * this in case order does not matter. Does not change capacity.
+   *
    * @param iterator Iterator pointing to item to remove.
    */
   void Remove( Iterator iterator )
@@ -462,7 +488,8 @@ public: // API
   }
 
   /**
-   * Swap the contents of two vectors.
+   * @brief Swap the contents of two vectors.
+   *
    * @param vector Vector to swap with.
    */
   void Swap( Vector& vector )
@@ -471,7 +498,7 @@ public: // API
   }
 
   /**
-   * Clear the contents of the vector. Keeps its capacity.
+   * @brief Clear the contents of the vector. Keeps its capacity.
    */
   void Clear()
   {
@@ -479,7 +506,7 @@ public: // API
   }
 
   /**
-   * Release the memory that the vector holds.
+   * @brief Release the memory that the vector holds.
    */
   void Release()
   {
@@ -490,7 +517,4 @@ public: // API
 
 } // namespace Dali
 
-/**
- * @}
- */
 #endif /* __DALI_VECTOR_H__ */

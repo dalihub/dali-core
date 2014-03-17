@@ -34,13 +34,13 @@ class DynamicsWorldConfig;
 } // namespace Internal
 
 /**
- * Describes the requirements/capabilities of a physics siumlation encapsulated by a DynamicsWorld
+ * @brief Describes the requirements/capabilities of a physics siumlation encapsulated by a DynamicsWorld.
  */
 class DynamicsWorldConfig : public BaseHandle
 {
 public:
   /**
-   * Enumeration specifying the capabilities required by the dynamics simulation
+   * @brief Enumeration specifying the capabilities required by the dynamics simulation.
    */
   enum WorldType
   {
@@ -52,18 +52,20 @@ public:
 public:
 
   /**
-   * Create a new DynamicsWorld configuration object
-   * All values are set to default values...
+   * @brief Create a new DynamicsWorld configuration object.
+   *
+   * All values are set to default values.
+   * @return A handle to the new DynamicsWorld configuration object.
    */
   static DynamicsWorldConfig New();
 
   /**
-   * Default constructor, creates an uninitalized handle
+   * @brief Default constructor, creates an uninitalized handle.
    */
   DynamicsWorldConfig();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~DynamicsWorldConfig();
 
@@ -74,19 +76,22 @@ public:
 
 public:
   /**
-   * Set the type of Dynamics world required for the application
+   * @brief Set the type of Dynamics world required for the application.
+   *
    * @param[in] type A member of WorldType enumeration.
    */
   void SetType( const WorldType type );
 
   /**
-   * Get the type of Dynamics World specified by the Configuration
+   * @brief Get the type of Dynamics World specified by the Configuration.
+   *
    * @return A member of WorldType enumeration.
    */
   WorldType GetType() const;
 
   /**
-   * Set the world unit.
+   * @brief Set the world unit.
+   *
    * The simulation units are in meters
    * The entire simulation can be scaled by changing the world unit
    * EG calling SetUnit(0.01f) will scale to centimeters
@@ -96,14 +101,16 @@ public:
   void SetUnit(const float unit);
 
   /**
-   * Get the current world unit.
+   * @brief Get the current world unit.
+   *
    * @return The current world unit
    * @ref SetUnit
    */
   const float GetUnit() const;
 
   /**
-   * Set the number of simulation steps / DALi update tick.
+   * @brief Set the number of simulation steps / DALi update tick.
+   *
    * Use this to advance the simulation in smaller time steps, thus gaining a more accurate
    * simulation for collision detection.
    * Example: assume DAli is updating at 60Hz (16.667ms / update)
@@ -114,7 +121,8 @@ public:
   void SetSimulationSubSteps( const int subSteps);
 
   /**
-   * Get the number of simulation steps / DALi update tick
+   * @brief Get the number of simulation steps / DALi update tick.
+   *
    * @return The number of simulation steps per update tick
    */
   const int GetSimulationSubSteps() const;
@@ -122,7 +130,8 @@ public:
   // Not intended for application developers
 private:
   /**
-   * This constructor is used internally by Dali
+   * @brief This constructor is used internally by Dali.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL DynamicsWorldConfig( Internal::DynamicsWorldConfig* internal );

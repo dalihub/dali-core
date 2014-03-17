@@ -34,19 +34,20 @@ class DynamicsCollision;
 } // namespace Internal
 
 /**
- * Contains information about a collision between two actors
+ * @brief Contains information about a collision between two actors.
  */
 class DynamicsCollision : public BaseHandle
 {
 public:
   /**
-   * Create an uninitialized handle.
+   * @brief Create an uninitialized handle.
+   *
    * Initialized handles are received in DynamicsWorld::SignalCollision handlers
    */
   DynamicsCollision();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~DynamicsCollision();
 
@@ -57,38 +58,44 @@ public:
 
 public:
   /**
-   * Get the first actor in the collision
+   * @brief Get the first actor in the collision.
+   *
    * @return The first actor in the collision
    */
   Actor GetActorA();
 
   /**
-   * Get the second actor in the collision
+   * @brief Get the second actor in the collision.
+   *
    * @return The second actor in the collision
    */
   Actor GetActorB();
 
   /**
-   * Get the force of the impact
+   * @brief Get the force of the impact.
+   *
    * @return the impact force
    * @note currently returns 0.5f for a new collision and 0.0f for dispersal
    */
   float GetImpactForce() const;
 
   /**
-   * Get the point of contact on the first Actor
+   * @brief Get the point of contact on the first Actor.
+   *
    * @return The point of contact on the first Actor
    */
   Vector3 GetPointOnA() const;
 
   /**
-   * Get the point of contact on the second Actor
+   * @brief Get the point of contact on the second Actor.
+   *
    * @return The point of contact on the second Actor
    */
   Vector3 GetPointOnB() const;
 
   /**
-   * Get the collision normal
+   * @brief Get the collision normal.
+   *
    * @return The collision normal
    */
   Vector3 GetNormal() const;
@@ -96,7 +103,8 @@ public:
   // Not intended for application developers
 public:
   /**
-   * This constructor is used internally by Dali
+   * @brief This constructor is used internally by Dali.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL DynamicsCollision( Internal::DynamicsCollision* internal );

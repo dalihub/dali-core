@@ -42,4 +42,5 @@
 
 #endif //ifndef HIDE_DALI_INTERNALS
 
+
 #endif /* __DALI_MAP_H__ */

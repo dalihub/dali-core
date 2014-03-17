@@ -33,13 +33,14 @@ class DynamicsJoint;
 class Actor;
 
 /**
- * Represents a connection (or constraint) relationship between two dynamic bodies.
+ * @brief Represents a connection (or constraint) relationship between two dynamic bodies.
  */
 class DynamicsJoint : public BaseHandle
 {
 public:
   /**
-   * Enumeration to access springs and motors
+   * @brief Enumeration to access springs and motors.
+   *
    * The fields in the enum can be bitwise ORed to access more than one spring/motor
    */
   enum AxisIndex
@@ -55,13 +56,14 @@ public:
 public:
 
   /**
-   * Constructor which creates an uninitialized DynamicsJoint handle.
+   * @brief Constructor which creates an uninitialized DynamicsJoint handle.
+   *
    * Use DynamicsJoint::New(...) to initialize this handle.
    */
   DynamicsJoint();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~DynamicsJoint();
 
@@ -72,7 +74,8 @@ public:
 
 public:
   /**
-   * Set the limit for one or more linear/translation axis.
+   * @brief Set the limit for one or more linear/translation axis.
+   *
    * @param[in] axisIndex   A bitfield specifying which axis are affected.
    *                        A combination of AxisIndex::LINEAR_X, AxisIndex::LINEAR_Y and AxisIndex::LINEAR_Z
    * @param[in] lowerLimit  The lower limit.
@@ -81,7 +84,8 @@ public:
   void SetLinearLimit( const int axisIndex, const float lowerLimit, const float upperLimit );
 
   /**
-   * Set the limit for one or more angular/rotation axis.
+   * @brief Set the limit for one or more angular/rotation axis.
+   *
    * @param[in] axisIndex   A bitfield specifying which axis are affected.
    *                        A combination of AxisIndex::ANGULAR_X, AxisIndex::ANGULAR_Y and AxisIndex::ANGULAR_Z
    * @param[in] lowerLimit  The lower limit.
@@ -90,7 +94,8 @@ public:
   void SetAngularLimit( const int axisIndex, const Degree& lowerLimit, const Degree& upperLimit );
 
   /**
-   * Enable a spring
+   * @brief Enable a spring.
+   *
    * This will disable the motor on axisIndex if it was enabled
    * @param[in] axisIndex A bitfield specifying which springs are affected.
    * @param[in] flag      Set to true to enable the spring, or false to disable them.
@@ -116,21 +121,24 @@ public:
   void EnableSpring(const int axisIndex, const bool flag);
 
   /**
-   * Set the stiffness of a spring
+   * @brief Set the stiffness of a spring.
+   *
    * @param[in] axisIndex A bitfield specifying which springs are affected.
    * @param[in] stiffness Values > 0, lower values are less stiff and larger values more stiff.
    */
   void SetSpringStiffness(const int axisIndex, const float stiffness);
 
   /**
-   * Set the damping of a spring
+   * @brief Set the damping of a spring.
+   *
    * @param[in] axisIndex A bitfield specifying which springs are affected.
    * @param[in] damping   Values clamped between 0 and 1, with 0 meaning no damping and 1 full damping [default: 0.5].
    */
   void SetSpringDamping(const int axisIndex, const float damping);
 
   /**
-   * Set the Center point or Equilibrium point of the spring
+   * @brief Set the Center point or Equilibrium point of the spring.
+   *
    * @param[in] axisIndex A bitfield specifying which springs are affected.
    * @param[in] ratio     Values clamped between [0..1].
    *                      CentrePoint = lower + ((upper - lower) * ratio)
@@ -141,7 +149,8 @@ public:
   void SetSpringCenterPoint(const int axisIndex, const float ratio);
 
   /**
-   * Enable motor
+   * @brief Enable motor.
+   *
    * This will disable the spring on axisIndex if it was enabled
    * @param[in] axisIndex A bitfield specifying which motors are affected.
    * @param[in] flag      Set to true to enable the motors, or false to disable them.
@@ -150,14 +159,16 @@ public:
   void EnableMotor(const int axisIndex, const bool flag);
 
   /**
-   * Set the velocity of the motor
+   * @brief Set the velocity of the motor.
+   *
    * @param[in] axisIndex A bitfield specifying which motors are affected.
    * @param[in] velocity  Set the target velocity of the motor.
    */
   void SetMotorVelocity(const int axisIndex, const float velocity);
 
   /**
-   * Set the force (or torque) for the motor
+   * @brief Set the force (or torque) for the motor.
+   *
    * @param[in] axisIndex A bitfield specifying which motors are affected.
    * @param[in] force     Values clamped between [0..1].
    *                      0 will apply no force and 1 will apply maximum force.
@@ -165,10 +176,12 @@ public:
   void SetMotorForce(const int axisIndex, const float force);
 
   /**
-   * Get one of the Actors in the joint
+   * @brief Get one of the Actors in the joint.
+   *
    * @param[in] first If true returns the first actor, else the second actor.
    *                  The returned object may be uninitialized if the Actor has
    *                  been destroyed.
+   * @return The actor in the joint
    */
   Actor GetActor( const bool first ) const;
 
@@ -176,7 +189,8 @@ public:
 public:
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] joint A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL DynamicsJoint(Internal::DynamicsJoint* joint);

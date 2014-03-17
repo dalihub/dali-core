@@ -1,10 +1,10 @@
 <HTML>
 <HEAD>
 <TITLE>Dali C++ Coding Style</TITLE>
-<!-- 
+<!--
 green code for good examples, same formatting as <pre> tag
 red code for bad examples, same formatting as <pre> tag
-details hidden by default 
+details hidden by default
 -->
 <style type="text/css">
 code.good { color:green; white-space:pre; }
@@ -51,7 +51,7 @@ function toggleVisibility( button, obj )
     brains relies a great deal on these naming rules.
   </P>
   <P>
-    Consistency is more important than individual preferences so regardless of 
+    Consistency is more important than individual preferences so regardless of
     whether you find them sensible or not, the rules are the rules.
   </P>
 
@@ -89,7 +89,7 @@ function toggleVisibility( button, obj )
           <code>NumErrors</code>.
         </P>
         <P>
-          Function names should typically be imperative (that is they should be commands): 
+          Function names should typically be imperative (that is they should be commands):
 		  e.g., <code>OpenFile()</code>, <code>set_num_errors()</code>.  There is an exception for
           accessors, which should be named the same as the variable they access.
         </P>
@@ -154,7 +154,7 @@ function toggleVisibility( button, obj )
       <P>
         In general, make your filenames very specific.  For example,
         use <code>http-server-logs.h</code> rather than <code>logs.h</code>.
-		A class called <code>FooBar</code> should be declared in file 
+		A class called <code>FooBar</code> should be declared in file
 		called <code>foobar.h</code> and defined in <code>foobar.cpp</code>.
       </P>
       <P>
@@ -179,21 +179,20 @@ function toggleVisibility( button, obj )
       Type names start with a capital letter and have a capital
       letter for each new word, with no underscores:
       <code>MyExcitingClass</code>, <code>MyExcitingEnum</code>.
-      All type names are declared inside namespace so no prefixing is used.
+      All type names are declared inside a namespace so no prefixing is used.
     </SUMMARY>
     <H3>Examples <input type="button" value="Hide" onclick="toggleVisibility( this, 'type_name_examples' );"/></H3>
     <ARTICLE class="detail" id="type_name_examples">
       <p>
-        The names of all types; classes, structs, typedefs have the same naming convention.
-        Type names start with a capital letter and have a capital letter for each new word (CamelCase). 
-        No underscores. Enumerated types use same convention as Constants> all capitals.
+        The names of all types; classes, structs, typedefs have the same naming convention -
+        CamelCase with a leading capital letter, with no underscores. Enumerated type constants use the same convention as class constants, i.e. all uppercase with underscores.
         For example:
       </p>
       <CODE class="good">
         // classes and structs
-        class UrlTable { ...
-        class UrlTableTester { ...
-        struct UrlTableProperties { ...
+        class UrlTable { ... };
+        class UrlTableTester { ... };
+        struct UrlTableProperties { ... };
 
         // typedefs
         typedef hash_map<UrlTableProperties *, string> PropertiesMap;
@@ -212,13 +211,14 @@ function toggleVisibility( button, obj )
   <ARTICLE>
     <H2>Variable Names</H2>
     <SUMMARY>
-      Local variable names start with a lowercase. For example: <code>myExcitingLocalVariable</code>,
+      Variable names should use camel case, with an initial lower case letter.
+      Local variable names start with a lowercase letter. For example: <code>myExcitingLocalVariable</code>,
       Class member variables have prefix m. For example: <code>mMember</code>.
       The only exception to this rule is for public member variables in public structs where the prefix m is not required.
       Such member variables should also start with a lowercase letter.
-      Constants should be all capitals.
-      Avoid underscore characters in names because it can be hard to spot.
-      Global variables should be avoided, if one is needed, prefix it with <code>g</code>.
+      Avoid underscore characters in mixed case names.
+      Constants should be all upper case, with underscores between words.
+      Global variables should be avoided, however, if one is needed, prefix it with <code>g</code>.
     </SUMMARY>
     <H3>Examples <input type="button" value="Hide" onclick="toggleVisibility( this, 'variable_name_examples' );"/></H3>
     <ARTICLE class="detail" id="variable_name_examples">
@@ -226,21 +226,36 @@ function toggleVisibility( button, obj )
         For example:
       </p>
       <CODE class="good">
-        string tableName;  // OK - starts lowercase
-        string tablename;   // OK - all lowercase.
+        void SomeFunction()
+        {
+          string tableName;  // OK - starts lowercase
+          string tablename;  // OK - all lowercase.
+        }
       </CODE>
       <CODE class="bad">
         string TableName;   // Bad - starts with capital.
       </CODE>
       <CODE class="good">
-        struct Foo
+        class Foo
         {
-        string mTable;  // OK
-        string mTableName;   // OK.
-        }
+        public:
+          string mTable;     // OK
+          string mTableName; // OK.
+        };
       </CODE>
       <CODE class="good">
-        const int DAYSINAWEEK = 7;
+        struct Foo
+        {
+          string table;     // OK
+          string tableName; // OK.
+        };
+      </CODE>
+      <CODE class="good">
+        const int DAYS_IN_A_WEEK = 7;
+      </CODE>
+      <CODE class="bad">
+        const int DaysInAWeek = 7; // Bad - constants should not use camel case.
+        const int DAYSINAWEEK = 7; // Bad - without underscore, words run together.
       </CODE>
     </ARTICLE>
   </ARTICLE>
@@ -248,26 +263,32 @@ function toggleVisibility( button, obj )
   <ARTICLE>
     <H2>Function Names</H2>
     <SUMMARY>
-      Regular functions have camel case starting with uppercase; accessors and mutators match
-      the name of the variable with Get or Set as prefix. No underscores
+      Regular function names are written in camel case starting with a
+      capital letter and no underscores; accessors and mutators match
+      the name of the variable with Get or Set as prefix.
     </SUMMARY>
     <H3>Examples <input type="button" value="Hide" onclick="toggleVisibility( this, 'function_name_examples' );"/></H3>
     <ARTICLE class="detail" id="function_name_examples">
       <CODE class="good">
-        MyExcitingFunction();
-        MyExcitingMethod();
+        void MyExcitingFunction();
+        void MyExcitingMethod();
 
         class MyClass
         {
         public:
           ...
           int GetNumEntries() const { return mNumEntries; }
-          void SetNumEntries(int numEntries) { mNumEntries = numEntries; }
+          void SetNumEntries( int numEntries ) { mNumEntries = numEntries; }
 
         private:
           int mNumEntries;
         };
       </CODE>
+
+      <CODE class="bad">
+        void my_boring_function(); // bad - uses underscores and no camel case.
+      </CODE>
+
     </ARTICLE>
   </ARTICLE>
 
@@ -275,8 +296,8 @@ function toggleVisibility( button, obj )
     <H2>Macro Names</H2>
     <SUMMARY>
       Macros should not be used for programming, code should always be readable without preprocessor.
-      Only allowed cases for macros are include guards, debug tracing and compile time feature flags 
-      <b>inside</b> .cpp files when no other variation mechanism is not possible. Always prefer variation 
+      Only allowed cases for macros are include guards, debug tracing and compile time feature flags
+      <b>inside</b> .cpp files when no other variation mechanism is not possible. Always prefer variation
       through design and template mechanisms rather than <i>#define</i>.
       If you need to use macros, they're like this: <code>MY_MACRO_THAT_SCARES_SMALL_CHILDREN</code>.
     </SUMMARY>
@@ -294,8 +315,8 @@ function toggleVisibility( button, obj )
 
 <H1>Comments</H1>
   <SUMMARY>
-    Comments are absolutely vital to keeping our code readable. 
-    The following rules describe what you should comment and where. 
+    Comments are absolutely vital to keeping our code readable.
+    The following rules describe what you should comment and where.
     But remember: while comments are very important, the best code is self-documenting.
     Giving sensible names to types and variables is much better than using obscure
     names that you must then explain through comments.
@@ -323,15 +344,18 @@ function toggleVisibility( button, obj )
     <H3>Class Comments</H3>
       <SUMMARY>
         Every class definition should have an accompanying comment that
-        describes what it is for and how it should be used.
+        describes what it is for and how it should be used. It should have
+        a brief description, followed by a newline and a broader description.
       </SUMMARY>
       <CODE class="good">
         /**
-         * Iterates over the contents of a GargantuanTable.  
+         * @brief Iterates over the contents of a GargantuanTable.
+         *
          * Example usage:
          *    GargantuanTableIterator* iter = table-&gt;NewIterator();
-         *    for (iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next()) {
-         *      process(iter-&gt;key(), iter-&gt;value());
+         *    for( iter-&gt;Seek("foo"); !iter-&gt;done(); iter-&gt;Next() )
+         *    {
+         *      process( iter-&gt;key(), iter-&gt;value() );
          *    }
          *    delete iter;
          */
@@ -348,10 +372,13 @@ function toggleVisibility( button, obj )
       </P>
     <H3>Function Comments</H3>
       <SUMMARY>
-        Every function declaration (typically in a header file) must have comments immediately
-        preceding it that describe what the function does and how to use it.  These comments
-        should be descriptive ("Opens the file") rather than imperative ("Open the file"); the
+        Every function declaration in a header file must have a brief comment
+        that describes what the function does, followed by a newline. It may
+        be followed by a detailed description on how to use it.
+        These comments should be descriptive ("Opens the file") rather than
+        imperative ("Open the file"); the
         comment describes the function, it does not tell the function what to do.
+        Each parameter must be documented, as must any return value.
       </SUMMARY>
       <P>
         Types of things to mention in comments at the function
@@ -371,7 +398,9 @@ function toggleVisibility( button, obj )
       </UL>
         <CODE class="good">
           /**
-           * Get the iterator for this data table. Client's responsibility is to delete the iterator,
+           * @brief Get the iterator for this data table.
+           *
+           * It is the client's responsibility to delete the iterator,
            * and it must not use the iterator once the GargantuanTable object
            * on which the iterator was created has been deleted.
            *
@@ -379,12 +408,12 @@ function toggleVisibility( button, obj )
            *
            * This method is equivalent to:
            *    Iterator* iter = table->NewIterator();
-           *    iter->Seek("");
+           *    iter->Seek( "" );
            *    return iter;
            * If you are going to immediately seek to another place in the
            * returned iterator, it will be faster to use NewIterator()
            * and avoid the extra seek.
-           * @return an iterator for this table.  
+           * @return an iterator for this table.
            */
           Iterator* GetIterator() const;
         </CODE>
@@ -398,15 +427,21 @@ function toggleVisibility( button, obj )
       <SUMMARY>
         In general the actual name of the variable should be descriptive
         enough to give a good idea of what the variable is used for. In
-        certain cases, more comments are required.
+        certain cases, more comments are required - use Doxygen formatting.
       </SUMMARY>
       <CODE class="good">
         private:
-        // Keeps track of the total number of entries in the table.
-        // Used to ensure we do not go over the limit. -1 means
-        // that we don't yet know how many entries the table has.
-        int mNumTotalEntries;
+          /**
+           * @brief Keeps track of the total number of entries in the table.
+           *
+           * Used to ensure we do not go over the limit. -1 means
+           * that we don't yet know how many entries the table has.
+           */
+          int mNumTotalEntries;
+
+          float mDuration; ///< Duration in seconds.
       </CODE>
+
     <H3> Duplicate documentation</H3>
     <SUMMARY>
         Try to avoid duplicate documentation by using the @copydoc command.
@@ -419,16 +454,17 @@ function toggleVisibility( button, obj )
        documentation of an inherited member.
     </P>
     <CODE class="good">
-     /*! @copydoc MyClass::myfunction()
-      *  More documentation.
+     /**
+      * @copydoc MyClass::myfunction()
+      * More documentation.
       */
     </CODE>
      <P>
-       if the member is overloaded, you should specify the argument types
-      explicitly (without spaces!), like in the following:
+       If the member is overloaded, you should specify the argument types
+       explicitly (without spaces!), like in the following:
      </P>
      <CODE class="good">
-      /*! @copydoc MyClass::myfunction(type1,type2) */
+      /** @copydoc MyClass::myfunction(type1,type2) */
      </CODE>
     <H3>Punctuation, Spelling and Grammar</H3>
       <SUMMARY>
@@ -451,7 +487,7 @@ function toggleVisibility( button, obj )
       </SUMMARY>
     <H3>Deprecation Comments</H3>
       <SUMMARY>
-        Mark deprecated interface points with <code>DEPRECATED</code> comments.
+        Mark deprecated interface points with <code>@deprecated</code> comments.
       </SUMMARY>
   </ARTICLE>
 
@@ -471,6 +507,8 @@ function toggleVisibility( button, obj )
       <LI>Avoid unnecessary trailing whitescape</LI>
       <LI>Avoid overly long lines, modern screens and editors can handle upto 120 characters</LI>
       <LI>Use UTF-8 formatting for non-ASCII characters</LI>
+      <LI>Anything enclosed in parentheses should also have a space inside the parentheses. </LI>
+      <LI>Braces must each be in a line on their own.</LI>
     </UL>
     <P>
     Hex encoding is also OK, and encouraged where it enhances
@@ -486,57 +524,74 @@ function toggleVisibility( button, obj )
         Typedefs and Enums first, Constructor(s) & Destructors & public API next, then virtual methods and implementation details last.
       </SUMMARY>
       <CODE class="good">
-      
         /**
-          * Class documentation
-          */ 
+         * @brief Class purpose.
+         *
+         * Long description.
+         */
         class MyClass : public Base
         {
         public: // API
 
           /**
+           * @brief Short description.
+           *
            * Documentation
-           */ 
+           */
           MyClass();  // 2 space indent.
 
           /**
-           * Documentation
-           */ 
+           * @brief Short description.
+           *
+           * @param[in] var Description
+           */
           explicit MyClass( int var );
 
           /**
+           * @brief Short description.
+           *
            * Documentation
-           */ 
-          virtual ~MyClass() {}
+           */
+          virtual ~MyClass();
 
           /**
+           * @brief Short description.
+           *
            * Documentation
-           */ 
+           */
           void SomeFunction();
 
           /**
+           * @brief Short description.
+           *
            * Documentation
-           */ 
+           */
           void SomeFunctionThatDoesNothing();
 
           /**
+           * @brief Short description.
+           *
            * Documentation
-           */ 
+           * @param[in] var Parameter description
+           */
           void SetSomeVar( int var )
 
           /**
-           * Documentation
-           */ 
+           * @brief Short description.
+           *
+           * Documentation.
+           * @return value description.
+           */
           int GetSomeVar() const
 
         private: // Implementation
 
-          MyClass( MyClass& aRHs ); // no copying
-          MyClass& operator=( const MyClass& aRHs );  // no copying.
+          MyClass( MyClass& aRHs ); ///< no copying
+          MyClass& operator=( const MyClass& aRHs );  ///< no copying.
           bool SomeInternalFunction();
 
-          int mSomeVar;
-          int mSomeOtherVar;
+          int mSomeVar;       ///< short description.
+          int mSomeOtherVar;  ///< short description.
         };
       </CODE>
 
@@ -547,12 +602,14 @@ function toggleVisibility( button, obj )
       </SUMMARY>
       <CODE class="good">
         // When it all fits on one line:
-        MyClass::MyClass( int var ) : Base( var), mSomeVar( var ), mSomeOtherVar( var + 1 ) {}
+        MyClass::MyClass( int var ) : Base( var), mSomeVar( var ), mSomeOtherVar( var + 1 )
+        {
+        }
 
         // When it requires multiple lines, indent, putting the colon on
         // the first initializer line:
         MyClass::MyClass( int var )
-        : Base( var )
+        : Base( var ),
           mSomeVar( var ),
           mSomeOtherVar( var + 1 )
         {
@@ -567,19 +624,28 @@ function toggleVisibility( button, obj )
       <CODE class="good">
         namespace
         {
-        void foo()
+
+        void Foo()
         {  // Correct.  No extra indentation within namespace.
           ...
         }
+
         }  // namespace
       </CODE>
       <P>
         When declaring nested namespaces, put each namespace on its own line.
       </P>
       <CODE class="good">
-        namespace foo
+        /**
+         * @brief description of namespace
+         */
+        namespace Foo
         {
-        namespace bar
+
+        /**
+         * @brief description of namespace
+         */
+        namespace Bar
         {
       </CODE>
 
@@ -589,7 +655,7 @@ function toggleVisibility( button, obj )
         All parameters should be named, with identical names in the declaration and definition.
       </SUMMARY>
       <CODE class="good">
-        ReturnType ClassName::FunctionName( Type par_name1, Type par_name2 )
+        ReturnType ClassName::FunctionName( Type parameterName1, Type parameterName2 )
         {
           DoSomething();
         }
@@ -598,8 +664,9 @@ function toggleVisibility( button, obj )
         If you have too much text to fit on one line:
       </P>
       <CODE class="good">
-        ReturnType ClassName::ReallyLongFunctionName( Type par_name1, Type par_name2,
-                                                      Type par_name3 )
+        ReturnType ClassName::ReallyLongFunctionName( Type parameterName1,
+                                                      Type parameterName2,
+                                                      Type parameterName3 )
         {
           DoSomething();
         }
@@ -609,9 +676,9 @@ function toggleVisibility( button, obj )
       </P>
       <CODE class="good">
         ReturnType LongClassName::ReallyReallyReallyLongFunctionName(
-          Type par_name1,  // indent
-          Type par_name2,
-          Type par_name3 )
+          Type parameterName1,  // 2 space indent
+          Type parameterName2,
+          Type parameterName3 )
         {
           DoSomething();  // 2 space indent
           ...
@@ -622,15 +689,15 @@ function toggleVisibility( button, obj )
       </P>
       <CODE class="good">
         // Everything in this function signature fits on a single line
-        ReturnType FunctionName( Type par ) const
+        ReturnType FunctionName( Type parameter ) const
         {
           ...
         }
 
         // This function signature requires multiple lines, but
         // the const keyword is on the line with the last parameter.
-        ReturnType ReallyLongFunctionName( Type par1,
-                                           Type par2 ) const
+        ReturnType ReallyLongFunctionName( Type parameter1,
+                                           Type parameter2 ) const
         {
           ...
         }
@@ -654,12 +721,16 @@ function toggleVisibility( button, obj )
         }
 
         // Comment out unused named parameters in definitions.
-        void Circle::Rotate(double /*radians*/) {}
+        void Circle::Rotate( double /*radians*/ )
+        {
+        }
       </CODE>
       <CODE class="bad">
         // Bad - if someone wants to implement later, it's not clear what the
         // variable means.
-        void Circle::Rotate( double ) {}
+        void Circle::Rotate( double )
+        {
+        }
       </CODE>
 
     <H3>Function Calls</H3>
@@ -676,7 +747,7 @@ function toggleVisibility( button, obj )
           aligned with the first argument:
         </P>
         <CODE class="good">
-          bool retval = DoSomething( averyveryveryverylongargument1,
+          bool retval = DoSomething( aVeryVeryVeryVeryLongArgument1,
                                      argument2, argument3 );
         </CODE>
         <P>
@@ -690,26 +761,28 @@ function toggleVisibility( button, obj )
                                      argument4 );
         </CODE>
         <P>
-          If the function signature is so long that it cannot fit, 
+          If the function signature is so long that it cannot fit,
           place all arguments on subsequent lines:
         </P>
         <CODE class="good">
           if( ... )
           {
             DoSomethingThatRequiresALongFunctionName(
-              very_long_argument1,  // indent
+              aVeryLongArgument1,  // indent
               argument2,
               argument3,
-              argument4);
+              argument4 );
           }
         </CODE>
 
     <H3>Conditionals</H3>
       <SUMMARY>
-        <code>else</code> keyword belongs on its own line. Put one space inside the parentheses, none outside.
+        The <code>if</code> statement should be followed only by the conditional, with a space inside the parentheses, not outside. The following clause must always be surrounded by braces on separate lines.
+        The <code>else</code> keyword belongs on its own line, and the following clause must always be
+        surrounded by braces.
       </SUMMARY>
       <CODE class="good">
-        if( condition ) // space inside
+        if( condition ) // space inside parentheses
         {
           ...
         }
@@ -719,58 +792,23 @@ function toggleVisibility( button, obj )
         }
       </CODE>
       <CODE class="bad">
-        if(condition)     // Bad - space missing after IF.
-        if(condition){    // Doubly bad.
+        if(condition)     // Bad - space missing inside parentheses
+        if(condition){    // Doubly bad. Mis-aligned parentheses are harder to read.
       </CODE>
       <P>
-        Short conditional statements may be written on one line if
-        this enhances readability.  You may use this only when the
-        line is brief and the statement does not use the
-        <code>else</code> clause.
-      </P>
-      <CODE class="good">
-        if( x == kFoo ) return new Foo();
-        if( x == kBar ) return new Bar();
-      </CODE>
-      <P>
-        This is not allowed when the if statement has an
-        <code>else</code>:
-      </P>
-      <CODE class="bad">
-        // Not allowed - IF statement on one line when there is an ELSE clause
-        if (x) DoThis();
-        else DoThat();
-      </CODE>
-      <P>
-        In general, prefer curly braces for conditional 
+        Must always have curly braces for the clauses, and they must always be on a line
+        on their own:
       </P>
       <CODE class="good">
         if( condition )
         {
           DoSomething();  // 2 space indent.
         }
+        else
+        {
+          DoSomethingElse(); // 2 space indent.
+        }
       </CODE>
-      <P>
-        If one part of an <code>if</code>-<code>else</code>
-        statement uses curly braces, the other part must too:
-      </P>
-        <CODE class="bad">
-          // Not allowed - curly on IF but not ELSE
-          if (condition) // space outside, not inside
-          {
-            foo;
-          }
-          else
-            bar;
-
-          // Not allowed - curly on ELSE but not IF
-          if (condition)
-            foo;
-          else
-          {
-            bar;
-          }
-        </CODE>
 
     <H3>Loops and Switch Statements</H3>
       <SUMMARY>
@@ -817,13 +855,17 @@ function toggleVisibility( button, obj )
         {
           // Repeat test until it returns false.
         }
+
         for( int i = 0; i < someNumber; ++i )
-          {}  // Good - empty body, clearly on its own line
+        {
+        }  // Good - empty body, clearly separated.
+
         while( condition )
           continue;  // Good - continue indicates no logic.
+
       </CODE>
       <CODE class="bad">
-        while (condition);  // Bad - looks like part of do/while loop.
+        while( condition );  // Bad - looks like part of do/while loop.
       </CODE>
     <H3>Pointer and Reference Expressions</H3>
       <SUMMARY>
@@ -842,7 +884,7 @@ function toggleVisibility( button, obj )
       <P>
         When declaring a pointer variable or argument, you may place
         the asterisk adjacent to either the type or to the variable
-        name:
+        name, however, placing with the type is preferred.
       </P>
       <CODE class="good">
         // These are fine, space preceding.
@@ -872,9 +914,9 @@ function toggleVisibility( button, obj )
         of the lines:
       </P>
       <CODE class="good">
-        if( this_one_thing &gt; this_other_thing &amp;&amp;
-            a_third_thing == a_fourth_thing &amp;&amp;
-            yet_another &amp;&amp; last_one )
+        if( thisOneThing &gt; thisOtherThing &amp;&amp;
+            aThirdThing == aFourthThing &amp;&amp;
+            yetAnother &amp;&amp; lastOne )
         {
           ...
         }
@@ -885,9 +927,9 @@ function toggleVisibility( button, obj )
         Do not needlessly surround the <code>return</code> expression with parentheses.
       </SUMMARY>
       <CODE class="good">
-        return result;                  // No parentheses in the simple case.
-        return ( some_long_condition &amp;&amp;  // Parentheses ok to make a complex
-                 another_condition );     //     expression more readable.
+        return result;                   // No parentheses in the simple case.
+        return ( someLongCondition &amp;&amp;    // Parentheses ok to make a complex
+                 anotherCondition );     //     expression more readable.
       </CODE>
       <CODE class="bad">
         return (value);                // You wouldn't write var = (value);
@@ -920,7 +962,7 @@ function toggleVisibility( button, obj )
       </P>
       <CODE class="good">
         // Good - directives at beginning of line
-          if( lopsided_score )
+          if( lopsidedScore )
           {
         #if DISASTER_PENDING      // Correct -- Starts at beginning of line
             DropEverything();
@@ -930,7 +972,7 @@ function toggleVisibility( button, obj )
       </CODE>
       <CODE class="bad">
         // Bad - indented directives
-          if( lopsided_score )
+          if( lopsidedScore )
           {
             #if DISASTER_PENDING  // Wrong!  The "#if" should be at beginning of line
             DropEverything();

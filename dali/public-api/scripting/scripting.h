@@ -25,12 +25,15 @@
 namespace Dali DALI_IMPORT_API
 {
 
-// Utilities for scripting support
+/**
+ * @brief Utilities for scripting support.
+ */
 namespace Scripting
 {
 
 /**
- * Permissive comparison for string enums
+ * @brief Permissive comparison for string enums.
+ *
  * Case insensitive and ignores '_', '-' in either string when comparing.
  * If both strings are empty return true; ie like if(a==b) but not like a.compare(b)
  * @param[in] input The input string
@@ -40,7 +43,8 @@ namespace Scripting
 bool CompareEnums(const std::string& input, const std::string& enumString);
 
 /**
- * Set the value if strings pass a permissive compare.
+ * @brief Set the value if strings pass a permissive compare.
+ *
  * @param[in] a The input string
  * @param[in] b The input string
  * @param[in] set The variable to set
@@ -63,7 +67,8 @@ bool SetIfEqual(const std::string& a, const std::string& b, T& set, T value)
 
 
 /**
- * Creates object with data from the property value map
+ * @brief Creates object with data from the property value map.
+ *
  * @param [in] map The property value map with the following valid fields
  *                 "filename":       type STRING
  *                 "load-policy"     type STRING (enum)
@@ -81,7 +86,8 @@ Image NewImage( const Property::Value& map );
 
 
 /**
- * Creates object with data from the property value map
+ * @brief Creates object with data from the property value map.
+ *
  * @param [in] map The property value map with the following valid fields
  *                 // a program can be specified as string or a filename.
  *                 // some fields may be ignored depending on the geometry-type

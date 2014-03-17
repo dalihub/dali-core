@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
@@ -26,7 +27,8 @@ namespace Dali DALI_IMPORT_API
 struct Vector2;
 
 /**
- * Generate a distance field map from a source image.
+ * @brief Generate a distance field map from a source image.
+ *
  * @param[in]  imagePixels     A pointer to a buffer containing the source image
  * @param[in]  imageSize       The size, width and height, of the source image
  * @param[out] distanceMap     A pointer to a buffer to receive the calculated distance field map.

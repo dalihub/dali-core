@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+
 // INTERNAL INCLUDES
 #include <dali/public-api/modeling/entity-animator-map.h>
 
@@ -24,16 +25,16 @@ namespace Dali DALI_IMPORT_API
 {
 
 struct ModelAnimationMap;
-typedef std::vector<ModelAnimationMap> ModelAnimationMapContainer;
+typedef std::vector<ModelAnimationMap> ModelAnimationMapContainer; ///< Container of model animations
 
 /**
- * ModelAnimationMap holds a set of entity animators for a given named animation,
- * along with animation properties such as duration, repeats, etc.
+ * @brief ModelAnimationMap maps an animation name to a set of entity animators and animation
+ * properties such as duration and repeats.
  */
 struct ModelAnimationMap
 {
   /**
-   * Destructor.
+   * @brief Destructor.
    **/
   ModelAnimationMap()
     : duration(0.0f),
@@ -41,13 +42,12 @@ struct ModelAnimationMap
   {
   }
 
-  std::string                   name;
-  EntityAnimatorMapContainer    animators;
-  float                         duration;
-  int                           repeats;
+  std::string                   name;       ///< Name of the animation
+  EntityAnimatorMapContainer    animators;  ///< Set of entity - animation mappings
+  float                         duration;   ///< Duration of the animation
+  int                           repeats;    ///< Number of times the animation should be repeated
 };
 
 } // namespace Dali
 
 #endif // __DALI_MODEL_ANIMATION_MAP_H__
-

@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/modeling/entity.h>
@@ -27,30 +28,30 @@ namespace Dali DALI_IMPORT_API
 class Entity;
 
 class EntityAnimatorMap;
-typedef std::vector<EntityAnimatorMap>             EntityAnimatorMapContainer;
-typedef EntityAnimatorMapContainer::const_iterator EntityAnimatorMapIter;
+typedef std::vector<EntityAnimatorMap>             EntityAnimatorMapContainer; ///< Container of Entity - Animator mappings
+typedef EntityAnimatorMapContainer::const_iterator EntityAnimatorMapIter; ///< Iterator for @ref Dali::EntityAnimatorMapContainer
 
 
 /**
- * The entity animator map class holds the keyframe channels associated
- * with a named entity.
- * (It only holds key frame data, it cannot be used by the animation system)
+ * @brief The entity animator map class is a mapping from an entity name to raw animation
+ * data for that entity, stored in 3 KeyFrames for position, scale and rotation.
  */
 class EntityAnimatorMap
 {
 public:
   /**
-   * Constructor
+   * @brief Constructor.
    */
   EntityAnimatorMap(const std::string& name);
 
   /**
-   * Destructor
+   * @brief Destructor.
    */
   virtual ~EntityAnimatorMap();
 
   /**
-   * Set the entity name
+   * @brief Set the entity name.
+   *
    * @param[in] name - the entity name
    */
   void SetEntityName(const std::string&  name)
@@ -59,7 +60,8 @@ public:
   }
 
   /**
-   * Get the entity name
+   * @brief Get the entity name.
+   *
    * @return the name of the entity to which this animator applies
    */
   const std::string& GetEntityName() const
@@ -68,7 +70,8 @@ public:
   }
 
   /**
-   * Set the animated entity
+   * @brief Set the animated entity.
+   *
    * @param[in] animatedEntity The animated entity
    */
   void SetAnimatedEntity(Entity animatedEntity)
@@ -77,7 +80,8 @@ public:
   }
 
   /**
-   * Get the animated entity.
+   * @brief Get the animated entity.
+   *
    * @return the animated entity
    */
   Entity GetAnimatedEntity(void)
@@ -85,57 +89,88 @@ public:
     return mAnimatedEntity;
   }
 
+  /**
+   * @brief Set the key frames for animating the entity position.
+   *
+   * @param[in] keyFrames The keyframe data
+   */
   void SetPositionKeyFrames(KeyFrames keyFrames)
   {
     mPositionKeyFrames = keyFrames;
   }
 
+  /**
+   * @brief Set the key frames for animating the entity scale.
+   *
+   * @param[in] keyFrames The keyframe data
+   */
   void SetScaleKeyFrames(KeyFrames keyFrames)
   {
     mScaleKeyFrames = keyFrames;
   }
 
+  /**
+   * @brief Set the key frames for animating the entity rotation.
+   *
+   * @param[in] keyFrames The keyframe data
+   */
   void SetRotationKeyFrames(KeyFrames keyFrames)
   {
     mRotationKeyFrames = keyFrames;
   }
 
-
+  /**
+   * @brief Get the keyframes for animating the entity position.
+   *
+   * @return A handle to the keyframes
+   */
   KeyFrames GetPositionKeyFrames() const
   {
     return mPositionKeyFrames;
   }
 
+  /**
+   * @brief Get the keyframes for animating the entity scale.
+   *
+   * @return A handle to the keyframes
+   */
   KeyFrames GetScaleKeyFrames() const
   {
     return mScaleKeyFrames;
   }
 
+  /**
+   * @brief Get the keyframes for animating the entity rotation.
+   *
+   * @return A handle to the keyframes
+   */
   KeyFrames GetRotationKeyFrames() const
   {
     return mRotationKeyFrames;
   }
 
   /**
-   * Set the duration of the animation on this entity.
+   * @brief Set the duration of the animation on this entity.
+   *
    * @param[in] duration - the duration in seconds.
    */
   void SetDuration(float duration) { mDuration = duration; }
 
   /**
-   * Get the duration of the animation on this entity.
+   * @brief Get the duration of the animation on this entity.
+   *
    * @return the duration in seconds
    */
   const float GetDuration() const { return mDuration; }
 
 private:
-  std::string   mEntityName;
-  Entity        mAnimatedEntity;
-  float         mDuration;
+  std::string   mEntityName;          ///< The entity name
+  Entity        mAnimatedEntity;      ///< Unused
+  float         mDuration;            ///< Duration of this animator
 
-  KeyFrames     mPositionKeyFrames;
-  KeyFrames     mScaleKeyFrames;
-  KeyFrames     mRotationKeyFrames;
+  KeyFrames     mPositionKeyFrames;   ///< Position key frames (may be null)
+  KeyFrames     mScaleKeyFrames;      ///< Scale key frames (may be null)
+  KeyFrames     mRotationKeyFrames;   ///< Rotation key frames (may be null)
 };
 
 

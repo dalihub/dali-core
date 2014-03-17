@@ -21,24 +21,27 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector2.h>
 
+
 namespace Dali DALI_IMPORT_API
 {
 
 /**
- * The mouse wheel event structure is used to store a mouse wheel rolling, it facilitates
+ * @brief The mouse wheel event structure is used to store a mouse wheel rolling, it facilitates
  * processing of the mouse wheel rolling and passing to other libraries like Toolkit.
+ *
  * There is a key modifier which relates to keys like alt, shift and control functions are
  * supplied to check if they have been pressed when the mouse wheel is being rolled.
  */
 struct MouseWheelEvent
 {
   /**
-   * Default constructor
+   * @brief Default constructor.
    */
   MouseWheelEvent();
 
   /**
-   * Constructor
+   * @brief Constructor.
+   *
    * @param[in]  direction  The direction of mouse wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
    * @param[in]  modifiers  modifier keys pressed during the event (such as shift, alt and control)
    * @param[in]  point      The co-ordinates of the mouse cursor relative to the top-left of the screen.
@@ -48,24 +51,27 @@ struct MouseWheelEvent
   MouseWheelEvent(int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp);
 
   /**
-   * Destructor
+   * @brief Destructor.
    */
   ~MouseWheelEvent();
 
   /**
-   * Check to see if Shift key modifier has been supplied
+   * @brief Check to see if Shift key modifier has been supplied.
+   *
    * @return bool true if shift modifier
    */
   bool IsShiftModifier() const;
 
   /**
-   * Check to see if Ctrl (control) key modifier has been supplied
+   * @brief Check to see if Ctrl (control) key modifier has been supplied.
+   *
    * @return bool true if ctrl modifier
    */
   bool IsCtrlModifier() const;
 
   /**
-   * Check to see if Alt key modifier has been supplied
+   * @brief Check to see if Alt key modifier has been supplied.
+   *
    * @return bool true if alt modifier
    */
   bool IsAltModifier() const;
@@ -73,30 +79,31 @@ struct MouseWheelEvent
   // Data
 
   /**
-   * The direction in which the mouse wheel is being rolled
+   * @brief The direction in which the mouse wheel is being rolled.
+   *
    * 0 means the default vertical wheel, and 1 means horizontal wheel
    */
   int direction;
 
   /**
-   * Modifier keys pressed during the event (such as shift, alt and control)
+   * @brief Modifier keys pressed during the event (such as shift, alt and control).
    */
   unsigned int modifiers;
 
   /**
-   * The co-ordinates of the mouse cursor relative to the top-left of the screen
+   * @brief The co-ordinates of the mouse cursor relative to the top-left of the screen
    * when the wheel is being rolled.
    */
   Vector2 point;
 
   /**
-   * The offset of the mouse wheel rolling, where positive value means rolling down
-   * and negative value means rolling up
+   * @brief The offset of the mouse wheel rolling, where positive value means rolling down
+   * and negative value means rolling up.
    */
   int z;
 
   /**
-   * The time when the mouse wheel is being rolled.
+   * @brief The time when the mouse wheel is being rolled.
    */
   unsigned int timeStamp;
 

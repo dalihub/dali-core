@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/geometry/mesh-data.h>
@@ -35,28 +36,31 @@ class Mesh;
 }
 
 /**
- * A Mesh holds a MeshData object supplied by the application writer. It is used to
- * tell the Scene Graph if the mesh data has changed.
+ * @brief A Mesh holds a MeshData object supplied by the application writer.
+ *
+ * It is used to tell the Scene Graph if the mesh data has changed.
  */
 class Mesh : public BaseHandle
 {
 public:
 
   /**
-   * Create an initialized Mesh.
+   * @brief Create an initialized Mesh.
+   *
    * @param[in] meshData The mesh data with which to initialize the handle
    * @return A handle to a newly allocated Dali resource.
    */
   static Mesh New( const MeshData& meshData );
 
   /**
-   * Create an uninitialized Mesh; this can be initialized with Mesh::New()
+   * @brief Create an uninitialized Mesh; this can be initialized with Mesh::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   Mesh();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~Mesh();
 
@@ -66,7 +70,8 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Create an initialized plane aligned on the XY axis.
+   * @brief Create an initialized plane aligned on the XY axis.
+   *
    * @param[in] width   The width of the plane
    * @param[in] height  The height of the plane
    * @param[in] xSteps  The number of vertices along the X axis
@@ -81,15 +86,19 @@ public:
                        const Rect<float>& textureCoordinates = Rect<float>(0.0f, 0.0f, 1.0f, 1.0f));
 
   /**
-   * Downcast an Object handle to Mesh handle. If handle points to a Mesh object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Mesh handle.
+   *
+   * If handle points to a Mesh object the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to an Mesh object or an uninitialized handle
    */
   static Mesh DownCast( BaseHandle handle );
 
   /**
-   * Tell Dali to update it's internal meshes from the changed mesh data.
+   * @brief Tell Dali to update it's internal meshes from the changed mesh data.
+   *
    * @param[in] meshData
    */
   void UpdateMeshData( const MeshData& meshData );
@@ -97,12 +106,12 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] mesh A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Mesh(Internal::Mesh* mesh);
 };
-
 
 } // namespace Dali
 

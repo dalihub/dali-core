@@ -21,6 +21,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/light.h>
 
+
 namespace Dali DALI_IMPORT_API
 {
 
@@ -30,7 +31,7 @@ class LightActor;
 }
 
 /**
- * Controls a light source loaded from a file containing a 3D scene.
+ * @brief Controls a light source loaded from a file containing a 3D scene.
  *
  * Allows the developer to use actor semantics to control a light source.
  * see @ref Dali::Model
@@ -50,27 +51,33 @@ public:
   static const Property::Index DIRECTION;                            ///< name "direction",        type VECTOR3
 
   /**
-   * Create an uninitialized LightActor handle. This can be initialised with LightActor::New().
+   * @brief Create an uninitialized LightActor handle.
+   *
+   * This can be initialised with LightActor::New().
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   LightActor();
 
   /**
-   * Create a LightActor object
+   * @brief Create a LightActor object.
+   *
    * @return A handle to a newly allocated LightActor.
    */
   static LightActor New();
 
   /**
-   * Downcast an Object handle to LightActor. If handle points to a LightActor the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to LightActor.
+   *
+   * If handle points to a LightActor the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
    * @return handle to a LightActor or an uninitialized handle
    */
   static LightActor DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~LightActor();
@@ -81,25 +88,29 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Set the light properties for the actor
+   * @brief Set the light properties for the actor.
+   *
    * @param[in] light The light properties
    */
   void SetLight(Light light);
 
   /**
-   * Get the current light properties for the actor
+   * @brief Get the current light properties for the actor.
+   *
    * @return The light properties
    */
   Light GetLight();
 
   /**
-   * Set this light's active state
+   * @brief Set this light's active state.
+   *
    * @param[in] active Set to true to activate this light
    */
   void SetActive( bool active);
 
   /**
-   * Get the active status of this light.
+   * @brief Get the active status of this light.
+   *
    * @return true if this light is active
    */
   bool GetActive();
@@ -108,12 +119,14 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] actor A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL LightActor(Internal::LightActor* actor);
 };
 
 } // namespace Dali
+
 
 #endif // __DALI_LIGHT_ACTOR_H__

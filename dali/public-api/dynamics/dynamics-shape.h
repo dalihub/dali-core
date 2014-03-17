@@ -35,13 +35,13 @@ class Mesh;
 class DynamicsWorld;
 
 /**
- * Defines the shape of an object in the simulation
+ * @brief Defines the shape of an object in the simulation.
  */
 class DynamicsShape : public BaseHandle
 {
 public:
   /**
-   * The types of shape available
+   * @brief The types of shape available.
    */
   enum ShapeType
   {
@@ -55,54 +55,67 @@ public:
 
 public:
   /**
-   * Creates a capsule. (A cylinder capped with half spheres)
+   * @brief Creates a capsule. (A cylinder capped with half spheres)
+   *
    * @param[in] radius The radius of the capsule.
    * @param[in] length The length of the capsule.
+   * @return a handle to the new shape.
    */
   static DynamicsShape NewCapsule(const float radius, const float length);
 
   /**
-   * Creates a cone.
+   * @brief Creates a cone.
+   *
    * @param[in] radius The radius of the cone.
    * @param[in] length The length of the cone.
+   * @return a handle to the new shape.
    */
   static DynamicsShape NewCone(const float radius, const float length);
 
   /**
-   * Creates a cube shape.
+   * @brief Creates a cube shape.
+   *
    * All angles are right angles, and opposite faces are equal.
    * @param[in] dimensions The dimensions of the cuboid ( width, height and depth ).
+   * @return A handle to the new shape
    */
   static DynamicsShape NewCube(const Vector3& dimensions);
 
   /**
-   * Creates a cylinder.
+   * @brief Creates a cylinder.
+   *
    * @param[in] radius The radius of the cylinder.
    * @param[in] length The length of the cylinder.
+   * @return A handle to the new shape
    */
   static DynamicsShape NewCylinder(const float radius, const float length);
 
   /**
-   * Creates a mesh.
+   * @brief Creates a mesh.
+   *
    * @param[in] mesh  A mesh.
+   * @return A handle to the new shape
    */
   static DynamicsShape NewMesh(Mesh mesh);
 
   /**
-   * Creates a sphere.
+   * @brief Creates a sphere.
+   *
    * @param[in] radius The radius of the sphere.
+   * @return A handle to the new shape
    */
   static DynamicsShape NewSphere(const float radius);
 
 public:
   /**
-   * Constructor which creates an uninitialized DynamicsShape handle.
+   * @brief Constructor which creates an uninitialized DynamicsShape handle.
+   *
    * Use one of the DynamicsShape::New methods to initialise the handle.
    */
   DynamicsShape();
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
    */
   virtual ~DynamicsShape();
 
@@ -113,7 +126,8 @@ public:
 
 public:
   /**
-   * Get the type of shape
+   * @brief Get the type of shape.
+   *
    * @return One of the ShapeType enumeration.
    */
   ShapeType GetType() const;
@@ -121,7 +135,8 @@ public:
   // Not intended for application developers
 public:
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
+   *
    * @param [in] internal A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL DynamicsShape(Internal::DynamicsShape* internal);

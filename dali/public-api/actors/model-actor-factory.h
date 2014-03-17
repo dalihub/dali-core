@@ -24,6 +24,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-functions.h>
 
+
+
 namespace Dali DALI_IMPORT_API
 {
 
@@ -32,15 +34,14 @@ class Animation;
 class Model;
 
 /**
- * This factory class is used to generate actors and animations from a model
- * resource.
+ * @brief This factory class is used to generate actors and animations from a model resource.
  */
 class DALI_IMPORT_API ModelActorFactory
 {
 public:
 
   /**
-   * Create an initialized Actor and child actors.
+   * @brief Create an initialized Actor and child actors.
    *
    * This tree of actors is either the entire model
    * (use an empty name), or a specific entity within the model
@@ -62,7 +63,8 @@ public:
   static Actor BuildActorTree(Model& model, const std::string& name);
 
   /**
-   * Create an animation on the actor and child actors using the indexed animation map.
+   * @brief Create an animation on the actor and child actors using the indexed animation map.
+   *
    * If the animation map does not exist in the model, then this returns an uninitialised
    * handle. Uses the duration from the model. Note, changing the duration of the animation
    * will not change the duration of the animators. Instead, use the other variant of this method.
@@ -74,7 +76,8 @@ public:
   static Animation BuildAnimation(Model& model, Actor actor, size_t index);
 
   /**
-   * Create an animation on the actor and child actors using the indexed animation map.
+   * @brief Create an animation on the actor and child actors using the indexed animation map.
+   *
    * If the animation map does not exist in the model, then this returns an uninitialised
    * handle.
    * @param[in] model A model resource handle
@@ -86,7 +89,8 @@ public:
   static Animation BuildAnimation(Model& model, Actor actor, size_t index, float durationSeconds);
 
   /**
-   * Create an animation on the actor and child actors using the indexed animation map.
+   * @brief Create an animation on the actor and child actors using the indexed animation map.
+   *
    * If the animation map does not exist in the model, then this returns an uninitialised
    * handle.
    * @param[in] model A model resource handle
@@ -98,7 +102,8 @@ public:
   static Animation BuildAnimation(Model& model, Actor actor, size_t index, AlphaFunction alpha);
 
   /**
-   * Create an animation on the actor and child actors using the indexed animation map.
+   * @brief Create an animation on the actor and child actors using the indexed animation map.
+   *
    * If the animation map does not exist in the model, then this returns an uninitialised
    * handle.
    * @param[in] model A model resource handle
@@ -113,5 +118,6 @@ public:
 };
 
 } // namespace Dali
+
 
 #endif /* __DALI_MODEL_ACTOR_FACTORY_H__ */

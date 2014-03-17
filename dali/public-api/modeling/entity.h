@@ -17,6 +17,7 @@
 // limitations under the License.
 //
 
+
 // INTERNAL INCLUDES
 #include <dali/public-api/geometry/mesh.h>
 
@@ -37,48 +38,58 @@ class Entity;
 typedef std::vector<Entity>             EntityContainer;    ///< Container of Entity handles
 typedef EntityContainer::iterator       EntityIter;         ///< iterator for Entity container
 typedef EntityContainer::const_iterator EntityConstIter;    ///< const_iterator for Entity container
-typedef std::vector<unsigned int>       EntityMeshIndices;
+typedef std::vector<unsigned int>       EntityMeshIndices;  ///< Container to hold indexes of meshes this entity uses in the associated Dali::Model.
 
 /**
- * A 3D model comprises a tree of named entities. Each entity has a
- * transform, regardless of type. It can contain zero or more meshes.
- * The entity names are used for cross referencing, e.g. from animations
- * or from bone structures.
+ * @brief A 3D model comprises a tree of named entities. Each entity has a
+ * transform, regardless of type.
+ *
+ * It can contain zero or more meshes.  The entity names are used for
+ * cross referencing, e.g. from animations or from bone structures.
  */
 class Entity : public BaseHandle
 {
 public:
 
+  /**
+   * @brief The entity type
+   */
   enum EntityType
   {
-    OBJECT,
-    CAMERA,
-    LIGHT,
+    OBJECT, ///< A generic entity
+    CAMERA, ///< The entity represents a camera
+    LIGHT,  ///< The entity represents a light
   };
 
   /**
-   * Create an uninitialized Entity; this can be initialized with Entity::New().
+   * @brief Create an uninitialized Entity; this can be initialized with Entity::New().
+   *
    * Calling member functions with an uninitialized Dali::Object is not allowed.
    */
   Entity();
 
   /**
-   * Create an initialized handle.
+   * @brief Create an initialized handle.
+   *
    * @param[in] name The name of the entity
    * @return a handle to a newly allocated Dali resource
    */
   static Entity New(const std::string name);
 
   /**
-   * Downcast an Object handle to Entity handle. If handle points to a Entity object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @brief Downcast an Object handle to Entity handle.
+   *
+   * If handle points to a Entity object the downcast produces valid
+   * handle. If not the returned handle is left uninitialized.
+   *
    * @param[in] handle to An object
    * @return handle to a Entity object or an uninitialized handle
    */
   static Entity DownCast( BaseHandle handle );
 
   /**
-   * Virtual destructor.
+   * @brief Virtual destructor.
+   *
    * Dali::Object derived classes typically do not contain member data.
    */
   virtual ~Entity();
@@ -89,14 +100,17 @@ public:
   using BaseHandle::operator=;
 
   /**
-   * Find an entity by name. The search includes this entity and it's children.
+   * @brief Find an entity by name.
+   *
+   * The search includes this entity and it's children.
    * @param[in] name The search name.
    * @return    A handle to the searched entity, or an uninitialized handle if not found.
    */
   Entity Find(const std::string& name) const;
 
   /**
-   * Set the name of the entity.
+   * @brief Set the name of the entity.
+   *
    * @param[in] name The name for the entity.
    */
   void SetName(const char* name);
@@ -107,69 +121,81 @@ public:
   void SetName(const std::string& name);
 
   /**
-   * Get the name of the entity.
+   * @brief Get the name of the entity.
+   *
    * @return The name of the entity.
    */
   const std::string& GetName() const;
 
   /**
-   * Set the entity type.
+   * @brief Set the entity type.
+   *
    * @param[in] type The entity's type, a member of the EntityType enumeration.
    */
   void SetType(const EntityType type);
 
   /**
-   * Get the entity's type.
+   * @brief Get the entity's type.
+   *
    * @return The entity's type, a member of the EntityType enumeration.
    */
   EntityType GetType() const;
 
   /**
-   * Set the transform matrix.
+   * @brief Set the transform matrix.
+   *
    * @param[in] matrix The transform matrix
    */
   void SetTransformMatrix(Matrix& matrix);
 
   /**
-   * Returns a reference to the transform matrix
+   * @brief Returns a reference to the transform matrix.
+   *
    * @return The transform matrix
    */
   const Matrix& GetTransformMatrix() const;
 
   /**
-   * Checks if the entity has children
+   * @brief Checks if the entity has children.
+   *
    * @return true if the entity has children, otherwise false.
    */
   bool HasChildren() const;
 
   /**
-   * Get the number of children.
+   * @brief Get the number of children.
+   *
    * @return The number of children.
    */
   int NumberOfChildren() const;
 
   /**
-   * Get the list of children.
+   * @brief Get the list of children.
+   *
    * @return A reference to the list of children.
    */
   const EntityContainer& GetChildren() const;
 
   /**
-   * Add an entity to the end of the child list. Sets the child's parent.
+   * @brief Add an entity to the end of the child list.
+   *
+   * Sets the child's parent.
    * @param[in] child A handle to a child Entity.
    */
   void Add(Entity child);
 
   /**
-   * Get the entity's parent.
+   * @brief Get the entity's parent.
+   *
    * @return A pointer to the entity's parent.
    */
   Entity GetParent() const;
 
   /**
-   * Change the size of storage allocated to the mesh index list. This
-   * may be greater than the number of indices stored as returned by
-   * NumberOfMeshes.
+   * @brief Change the size of storage allocated to the mesh index list.
+   *
+   * This may be greater than the number of indices stored as returned
+   * by NumberOfMeshes.
    *
    * @param[in] capacity The new size of the storage allocated to the mesh
    * index list.
@@ -177,73 +203,84 @@ public:
   void SetMeshCapacity(unsigned int capacity);
 
   /**
-   * Add a mesh to the entity.
+   * @brief Add a mesh to the entity.
+   *
    * @param[in] meshIdx The mesh index into the model data's list of meshes
    */
   void AddMeshIndex(unsigned int meshIdx);
 
   /**
-   * Checks if the entity references any meshes.
+   * @brief Checks if the entity references any meshes.
+   *
    * @return true if the entity refers to 1 or more meshes, otherwise false.
    */
   bool HasMeshes() const;
 
   /**
-   * Get the number of meshes referenced by this entity.
+   * @brief Get the number of meshes referenced by this entity.
+   *
    * @return The number of meshes referenced by this entity.
    */
   int NumberOfMeshes() const;
 
   /**
-   * Returns a mesh in the model's mesh array.
+   * @brief Returns a mesh in the model's mesh array.
+   *
    * @param[in] meshIndex The index of the mesh within the entity.
    * @return The index of the mesh in the model's mesh array.
    */
   unsigned int GetMeshByIndex(unsigned int meshIndex) const;
 
   /**
-   * Get the entity's list of mesh indices.
+   * @brief Get the entity's list of mesh indices.
+   *
    * @return The entity's list of mesh indices.
    */
   const EntityMeshIndices& GetMeshes() const;
 
   /**
-   * Expand the bounding volume to include the child's bounding volume.
+   * @brief Expand the bounding volume to include the child's bounding volume.
+   *
    * @param[in] child A handle to the child.
    */
   void AddToBounds(Entity child);
 
   /**
-   * Expand the entity bounding box to include the new boundaries.
+   * @brief Expand the entity bounding box to include the new boundaries.
+   *
    * @param[in] lowerBounds to extend the entity bounds
    * @param[in] upperBounds to extend the entity bounds
    */
    void AddToBounds( const Vector3& lowerBounds, const Vector3& upperBounds );
 
   /**
-   * Get the lower bounds of the bounding volume which contains all vertices in all meshes
+   * @brief Get the lower bounds of the bounding volume which contains all vertices in all meshes
    * referenced by this entity.
+   *
    * @return A vector describing the lower bounds.
    */
   const Vector3&  GetLowerBounds() const;
 
   /**
-   * Set the lower bounds of the bounding volume which contains all vertices in all meshes
+   * @brief Set the lower bounds of the bounding volume which contains all vertices in all meshes
    * referenced by this entity.
+   *
    * @param[in] lowerBounds of the entity.
    */
   void SetLowerBounds( const Vector3& lowerBounds );
 
   /**
-   * Get the upper bounds of the bounding volume which contains all vertices in all meshes
+   * @brief Get the upper bounds of the bounding volume which contains all vertices in all meshes
    * referenced by this entity.
+   *
    * @return A vector describing the upper bounds.
    */
   const Vector3&  GetUpperBounds() const;
 
   /**
-   * Set the upper bounds of the bounding volume which contains all vertices in all meshes
+   * @brief Set the upper bounds of the bounding volume which contains all vertices in all meshes
    * referenced by this entity.
+   *
    * @param[in] upperBounds of the entity.
    */
   void SetUpperBounds( const Vector3& upperBounds );
@@ -251,7 +288,7 @@ public:
 public: // Not intended for application developers
 
   /**
-   * This constructor is used by Dali New() methods
+   * @brief This constructor is used by Dali New() methods.
    * @param [in] entity A pointer to a newly allocated Dali resource
    */
   explicit DALI_INTERNAL Entity(Internal::Entity* entity);
