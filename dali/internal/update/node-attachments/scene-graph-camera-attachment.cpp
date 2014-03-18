@@ -59,19 +59,20 @@ void LookAt(Matrix& result, const Vector3& eye, const Vector3& target, const Vec
 }
 
 
-void Frustum(Matrix& result, float left, float right, float bottom, float top, float near, float far)
+void Frustum(Matrix& result, float left, float right, float bottom, float top, float near, float far, bool invertYAxis)
 {
-  float deltaX = right - left;
-  float deltaY = top - bottom;
   float deltaZ = far - near;
-
-  result.SetIdentity();
-
-  if ((near <= 0.0f) || (far <= 0.0f) || (deltaX <= 0.0f) || (deltaY <= 0.0f) || (deltaZ <= 0.0f))
+  if ((near <= 0.0f) || (far <= 0.0f) || Equals(right, left) || Equals(bottom, top) || (deltaZ <= 0.0f))
   {
+    DALI_LOG_ERROR("Invalid parameters passed into Frustum!");
     DALI_ASSERT_DEBUG("Invalid parameters passed into Frustum!");
     return;
   }
+
+  float deltaX = right - left;
+  float deltaY = invertYAxis ? bottom - top : top - bottom;
+
+  result.SetIdentity();
 
   float* m = result.AsFloat();
   m[0] = -2.0f * near / deltaX;
@@ -89,23 +90,26 @@ void Frustum(Matrix& result, float left, float right, float bottom, float top, f
   m[12] = m[13] = m[15] = 0.0f;
 }
 
-void Perspective(Matrix& result, float fovy, float aspect, float near, float far)
+void Perspective(Matrix& result, float fovy, float aspect, float near, float far, bool invertYAxis)
 {
   float frustumH = tanf( fovy / 2 ) * near;
   float frustumW = frustumH * aspect;
 
-  Frustum(result, -frustumW, frustumW, -frustumH, frustumH, near, far);
+  Frustum(result, -frustumW, frustumW, -frustumH, frustumH, near, far, invertYAxis);
 }
 
-void Orthographic(Matrix& result, float left, float right, float bottom, float top, float near, float far)
+void Orthographic(Matrix& result, float left, float right, float bottom, float top, float near, float far, bool invertYAxis)
 {
-  float deltaX = right - left;
-  float deltaY = top - bottom;
-  float deltaZ = far - near;
+  if ( Equals(right, left) || Equals(top, bottom) || Equals(far, near) )
+  {
+    DALI_LOG_ERROR( "Cannot create orthographic projection matrix with a zero dimension." );
+    DALI_ASSERT_DEBUG( "Cannot create orthographic projection matrix with a zero dimension." );
+    return;
+  }
 
-  DALI_ASSERT_ALWAYS( !Equals(right, left) &&
-                      !Equals(top, bottom) &&
-                      !Equals(far, near) && "Cannot create orthographic projection with a zero edge" );
+  float deltaX = right - left;
+  float deltaY = invertYAxis ? bottom - top : top - bottom;
+  float deltaZ = far - near;
 
   float *m = result.AsFloat();
   m[0] = -2.0f / deltaX;
@@ -363,7 +367,8 @@ void CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
                        mFieldOfView,
                        mAspectRatio,
                        mNearClippingPlane,
-                       mFarClippingPlane );
+                       mFarClippingPlane,
+                       mInvertYAxis );
           break;
         }
         case Dali::Camera::ORTHOGRAPHIC_PROJECTION:
@@ -372,7 +377,8 @@ void CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
           Orthographic( projectionMatrix,
                         mLeftClippingPlane,   mRightClippingPlane,
                         mBottomClippingPlane, mTopClippingPlane,
-                        mNearClippingPlane,   mFarClippingPlane );
+                        mNearClippingPlane,   mFarClippingPlane,
+                        mInvertYAxis );
           break;
         }
       }
