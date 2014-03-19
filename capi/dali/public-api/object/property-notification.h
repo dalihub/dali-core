@@ -118,7 +118,7 @@ public:
    * @brief Sets the Notification mode. This determines how the property
    * notification should respond to the result of a condition.
    *
-   * @param[in] mode Notification mode
+   * @param[in] mode Notification mode (Default is PropertyNotification::NotifyOnTrue)
    */
   void SetNotifyMode( NotifyMode mode );
 

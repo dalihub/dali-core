@@ -143,6 +143,33 @@ PropertyCondition InsideCondition(float arg0, float arg1);
  */
 PropertyCondition OutsideCondition(float arg0, float arg1);
 
+/**
+ * @brief Detects when a property changes by stepAmount from initialValue, in both positive and negative directions. This will continue checking for multiples of stepAmount
+ *
+ * property type:
+ * float (float)
+ * vector2 (the 2D length)
+ * vector3 (the 3D length)
+ * vector4 (the 4D length)
+ * @param[in] stepAmount The step size required to trigger condition
+ * @param[in] initialValue The initial value to step from
+ * @return A property condition function object
+ */
+PropertyCondition StepCondition(float stepAmount, float initialValue = 0.0f);
+
+/**
+ * @brief Receive notifications as a property goes above/below the inputted values. Values must be ordered and can be either ascending or descending
+ *
+ * property type:
+ * float (float)
+ * vector2 (the 2D length)
+ * vector3 (the 3D length)
+ * vector4 (the 4D length)
+ * @param[in] steps List of values to receive notifications for as a property crosses them
+ * @return A property condition function object
+ */
+PropertyCondition VariableStepCondition(const std::vector<float>& steps);
+
 } // namespace Dali
 
 /**

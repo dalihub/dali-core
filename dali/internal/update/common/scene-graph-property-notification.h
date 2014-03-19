@@ -42,7 +42,7 @@ class PropertyNotification;
 typedef OwnerContainer< PropertyNotification* > PropertyNotificationContainer;
 typedef PropertyNotificationContainer::Iterator PropertyNotificationIter;
 typedef PropertyNotificationContainer::ConstIterator PropertyNotificationConstIter;
-typedef bool(*ConditionFunction)(const Dali::PropertyInput& value, const Dali::Internal::PropertyNotification::RawArgumentContainer& args);
+typedef bool(*ConditionFunction)(const Dali::PropertyInput& value, Dali::Internal::PropertyNotification::RawArgumentContainer& args);
 
 /**
  * PropertyNotifications are used to inspect properties of scene graph objects, as part of a scene
@@ -73,7 +73,7 @@ public:
                                    Property::Type propertyType,
                                    int componentIndex,
                                    ConditionType condition,
-                                   const RawArgumentContainer& arguments,
+                                   RawArgumentContainer& arguments,
                                    NotifyMode notifyMode);
 
   /**
@@ -121,7 +121,7 @@ protected:
                        Property::Type propertyType,
                        int componentIndex,
                        ConditionType condition,
-                       const RawArgumentContainer& arguments,
+                       RawArgumentContainer& arguments,
                        NotifyMode notifyMode);
 
 private:
@@ -132,7 +132,7 @@ private:
    * @param[in] arg The supplied arguments for the condition.
    * @return Condition result (true if condition met, false if not)
    */
-  static bool EvalFalse( const Dali::PropertyInput& value, const Dali::Internal::PropertyNotification::RawArgumentContainer& arg );
+  static bool EvalFalse( const Dali::PropertyInput& value, Dali::Internal::PropertyNotification::RawArgumentContainer& arg );
 
   // Undefined
   PropertyNotification(const PropertyNotification&);
@@ -148,7 +148,7 @@ protected:
   const PropertyInputImpl* mProperty;           ///< The scene graph property
   int mComponentIndex;                          ///< Used for accessing float components of Vector3/4
   ConditionType mConditionType;                 ///< The ConditionType
-  const RawArgumentContainer mArguments;        ///< The arguments.
+  RawArgumentContainer mArguments;              ///< The arguments.
   bool mValid;                                  ///< Whether this property notification is currently valid or not.
   char mNotifyValidity[2];                      ///< Whether to notify on invalid and/or valid
   ConditionFunction mConditionFunction;         ///< The Condition Function pointer to be evaluated.

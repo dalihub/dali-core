@@ -79,6 +79,8 @@ TEST_FUNCTION( UtcDaliPropertyNotificationVectorComponentInside, POSITIVE_TC_IDX
 TEST_FUNCTION( UtcDaliPropertyNotificationVectorComponentOutside, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliPropertyConditionGetArguments, POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliPropertyConditionGetArgumentsConst, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationStep, POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliPropertyNotificationVariableStep, POSITIVE_TC_IDX );
 
 class TestClass : public ConnectionTracker
 {
@@ -783,4 +785,76 @@ static void UtcDaliPropertyConditionGetArgumentsConst()
   DALI_TEST_EQUALS( argumentsRef1.size(), 1u, TEST_LOCATION );
   Property::Value value = argumentsRef1[0];
   DALI_TEST_EQUALS( value.Get<float>(), 50.0f, TEST_LOCATION );
+}
+
+static void UtcDaliPropertyNotificationStep()
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliPropertyNotificationStep");
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  const float step = 100.0f;
+  // float
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, StepCondition(step, 50.0f) );
+  notification.NotifySignal().Connect( &TestCallback );
+
+  // set initial position
+  actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  // test both directions
+  for( int i = 1 ; i < 10 ; ++i )
+  {
+    // Move x to negative position
+    gCallBackCalled = false;
+    actor.SetPosition(Vector3((i * step), 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
+
+  for( int i = 1 ; i < 10 ; ++i )
+  {
+    // Move x to negative position
+    gCallBackCalled = false;
+    actor.SetPosition(Vector3(-(i * step), 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
+}
+
+static void UtcDaliPropertyNotificationVariableStep()
+{
+  TestApplication application;
+  tet_infoline(" UtcDaliPropertyNotificationStep");
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  std::vector<float> values;
+
+  const float averageStep = 100.0f;
+
+  for( int i = 1 ; i < 10 ; i++ )
+  {
+    values.push_back(i * averageStep + (i % 2 == 0 ? -(averageStep * 0.2f) : (averageStep * 0.2f)));
+  }
+  // float
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, VariableStepCondition(values) );
+  notification.NotifySignal().Connect( &TestCallback );
+
+  // set initial position lower than first position in list
+  actor.SetPosition(Vector3(values[0] - averageStep, 0.0f, 0.0f));
+  Wait(application, DEFAULT_WAIT_PERIOD);
+
+  for( int i = 0 ; i < values.size() - 1 ; ++i )
+  {
+    gCallBackCalled = false;
+    // set position half way between the current values
+    float position = values[i] + (0.5f * (values[i + 1] - values[i]));
+    actor.SetPosition(Vector3(position, 0.0f, 0.0f));
+    Wait(application, DEFAULT_WAIT_PERIOD);
+    DALI_TEST_CHECK( gCallBackCalled );
+  }
 }

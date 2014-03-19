@@ -73,37 +73,37 @@ ConditionFunction LessThan::GetFunction(Property::Type valueType)
   return function;
 }
 
-bool LessThan::EvalBoolean( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool LessThan::EvalBoolean( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetBoolean() < arg0);
 }
 
-bool LessThan::EvalFloat( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool LessThan::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetFloat() < arg0);
 }
 
-bool LessThan::EvalVector2( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool LessThan::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetVector2().LengthSquared() < arg0 * arg0);
 }
 
-bool LessThan::EvalVector3( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool LessThan::EvalVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetVector3().LengthSquared() < arg0 * arg0);
 }
 
-bool LessThan::EvalVector4( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool LessThan::EvalVector4( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetVector4().LengthSquared() < arg0 * arg0);
 }
 
-bool LessThan::EvalDefault( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool LessThan::EvalDefault( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   return false;
 }
@@ -151,37 +151,37 @@ ConditionFunction GreaterThan::GetFunction(Property::Type valueType)
   return function;
 }
 
-bool GreaterThan::EvalBoolean( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool GreaterThan::EvalBoolean( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetBoolean() > arg0);
 }
 
-bool GreaterThan::EvalFloat( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool GreaterThan::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetFloat() > arg0);
 }
 
-bool GreaterThan::EvalVector2( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool GreaterThan::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetVector2().LengthSquared() > arg0 * arg0);
 }
 
-bool GreaterThan::EvalVector3( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool GreaterThan::EvalVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetVector3().LengthSquared() > arg0 * arg0);
 }
 
-bool GreaterThan::EvalVector4( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool GreaterThan::EvalVector4( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float arg0 = arg[0];
   return (value.GetVector4().LengthSquared() > arg0 * arg0);
 }
 
-bool GreaterThan::EvalDefault( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool GreaterThan::EvalDefault( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   return false;
 }
@@ -229,37 +229,37 @@ ConditionFunction Inside::GetFunction(Property::Type valueType)
   return function;
 }
 
-bool Inside::EvalBoolean( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Inside::EvalBoolean( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const bool valueBoolean = value.GetBoolean();
   return ( (valueBoolean > arg[0]) && (valueBoolean < arg[1]) );
 }
 
-bool Inside::EvalFloat( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Inside::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float valueFloat = value.GetFloat();
   return ( (valueFloat > arg[0]) && (valueFloat < arg[1]) );
 }
 
-bool Inside::EvalVector2( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Inside::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float length2 = value.GetVector2().LengthSquared();
   return ( (length2 > arg[0]*arg[0]) && (length2 < arg[1]*arg[1]) );
 }
 
-bool Inside::EvalVector3( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Inside::EvalVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float length2 = value.GetVector3().LengthSquared();
   return ( (length2 > arg[0]*arg[0]) && (length2 < arg[1]*arg[1]) );
 }
 
-bool Inside::EvalVector4( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Inside::EvalVector4( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float length2 = value.GetVector4().LengthSquared();
   return ( (length2 > arg[0]*arg[0]) && (length2 < arg[1]*arg[1]) );
 }
 
-bool Inside::EvalDefault( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Inside::EvalDefault( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   return false;
 }
@@ -307,37 +307,37 @@ ConditionFunction Outside::GetFunction(Property::Type valueType)
   return function;
 }
 
-bool Outside::EvalBoolean( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Outside::EvalBoolean( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const bool valueBoolean = value.GetBoolean();
   return ( (valueBoolean < arg[0]) || (valueBoolean > arg[1]) );
 }
 
-bool Outside::EvalFloat( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Outside::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float valueFloat = value.GetFloat();
   return ( (valueFloat < arg[0]) || (valueFloat > arg[1]) );
 }
 
-bool Outside::EvalVector2( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Outside::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float length2 = value.GetVector2().LengthSquared();
   return ( (length2 < arg[0]*arg[0]) || (length2 > arg[1]*arg[1]) );
 }
 
-bool Outside::EvalVector3( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Outside::EvalVector3( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float length2 = value.GetVector3().LengthSquared();
   return ( (length2 < arg[0]*arg[0]) || (length2 > arg[1]*arg[1]) );
 }
 
-bool Outside::EvalVector4( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Outside::EvalVector4( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float length2 = value.GetVector4().LengthSquared();
   return ( (length2 < arg[0]*arg[0]) || (length2 > arg[1]*arg[1]) );
 }
 
-bool Outside::EvalDefault( const Dali::PropertyInput& value, const PropertyNotification::RawArgumentContainer& arg )
+bool Outside::EvalDefault( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   return false;
 }

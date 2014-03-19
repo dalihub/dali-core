@@ -39,7 +39,7 @@ PropertyNotification* PropertyNotification::New(ProxyObject& proxy,
                                                 Property::Type propertyType,
                                                 int componentIndex,
                                                 ConditionType condition,
-                                                const RawArgumentContainer& arguments,
+                                                RawArgumentContainer& arguments,
                                                 NotifyMode notifyMode)
 {
   return new PropertyNotification( proxy, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode );
@@ -51,7 +51,7 @@ PropertyNotification::PropertyNotification(ProxyObject& proxy,
                                            Property::Type propertyType,
                                            int componentIndex,
                                            ConditionType condition,
-                                           const RawArgumentContainer& arguments,
+                                           RawArgumentContainer& arguments,
                                            NotifyMode notifyMode)
 : mProxy(&proxy),
   mPropertyIndex(propertyIndex),
@@ -86,6 +86,16 @@ PropertyNotification::PropertyNotification(ProxyObject& proxy,
       mConditionFunction = Outside::GetFunction(mPropertyType);
       break;
     }
+    case PropertyCondition::Step:
+    {
+      mConditionFunction = Step::GetFunction(mPropertyType);
+      break;
+    }
+    case PropertyCondition::VariableStep:
+    {
+      mConditionFunction = VariableStep::GetFunction(mPropertyType);
+      break;
+    }
     case PropertyCondition::False:
     {
       mConditionFunction = PropertyNotification::EvalFalse;
@@ -111,7 +121,7 @@ PropertyNotification::~PropertyNotification()
 {
 }
 
-bool PropertyNotification::EvalFalse( const Dali::PropertyInput& value, const RawArgumentContainer& arg )
+bool PropertyNotification::EvalFalse( const Dali::PropertyInput& value, RawArgumentContainer& arg )
 {
   return false;
 }

@@ -48,7 +48,9 @@ public:
     LessThan,             ///< Magnitude of type is less than float value (arg0).
     GreaterThan,          ///< Magnitude of type is greater than float value (arg0).
     Inside,               ///< Magnitude of type is within float values (arg0 & arg1).
-    Outside               ///< Magnitude of type is outside float values (arg0 & arg1).
+    Outside,              ///< Magnitude of type is outside float values (arg0 & arg1).
+    Step,                 ///< Value of type has crossed a step amount
+    VariableStep          ///< Similar to step, except user can define a list of steps from reference value
   };
 
   typedef Dali::PropertyCondition::ArgumentContainer ArgumentContainer;
