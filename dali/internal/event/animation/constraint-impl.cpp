@@ -18,7 +18,6 @@
 #include <dali/internal/event/animation/constraint-impl.h>
 
 // EXTERNAL INCLUDES
-#include <boost/any.hpp>
 #include <boost/function.hpp>
 
 // INTERNAL INCLUDES
@@ -45,20 +44,20 @@ PropertyConstraintBase<P>* CreatePropertyConstraint( Constraint::AnyFunction& fu
   {
     case 0u:
     {
-      propertyConstraint = new PropertyConstraint0<P>( boost::any_cast<boost::function<P (const P&)> >( func ) );
+      propertyConstraint = new PropertyConstraint0<P>( AnyCast<boost::function<P (const P&)> >( func ) );
       break;
     }
 
     case 1u:
     {
-      propertyConstraint = new PropertyConstraint1<P, PropertyInputAccessor>( boost::any_cast< boost::function<P (const P&,
+      propertyConstraint = new PropertyConstraint1<P, PropertyInputAccessor>( AnyCast< boost::function<P (const P&,
                                                                                                                   const PropertyInput&)> >( func ) );
       break;
     }
 
     case 2u:
     {
-      propertyConstraint = new PropertyConstraint2<P, PropertyInputAccessor>( boost::any_cast< boost::function<P (const P&,
+      propertyConstraint = new PropertyConstraint2<P, PropertyInputAccessor>( AnyCast< boost::function<P (const P&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&)> >( func ) );
       break;
@@ -66,7 +65,7 @@ PropertyConstraintBase<P>* CreatePropertyConstraint( Constraint::AnyFunction& fu
 
     case 3u:
     {
-      propertyConstraint = new PropertyConstraint3<P, PropertyInputAccessor>( boost::any_cast< boost::function<P (const P&,
+      propertyConstraint = new PropertyConstraint3<P, PropertyInputAccessor>( AnyCast< boost::function<P (const P&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&)> >( func ) );
@@ -75,7 +74,7 @@ PropertyConstraintBase<P>* CreatePropertyConstraint( Constraint::AnyFunction& fu
 
     case 4u:
     {
-      propertyConstraint = new PropertyConstraint4<P, PropertyInputAccessor>( boost::any_cast< boost::function<P (const P&,
+      propertyConstraint = new PropertyConstraint4<P, PropertyInputAccessor>( AnyCast< boost::function<P (const P&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&,
@@ -85,7 +84,7 @@ PropertyConstraintBase<P>* CreatePropertyConstraint( Constraint::AnyFunction& fu
 
     case 5u:
     {
-      propertyConstraint = new PropertyConstraint5<P, PropertyInputAccessor>( boost::any_cast< boost::function<P (const P&,
+      propertyConstraint = new PropertyConstraint5<P, PropertyInputAccessor>( AnyCast< boost::function<P (const P&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&,
@@ -96,7 +95,7 @@ PropertyConstraintBase<P>* CreatePropertyConstraint( Constraint::AnyFunction& fu
 
     case 6u:
     {
-      propertyConstraint = new PropertyConstraint6<P, PropertyInputAccessor>( boost::any_cast< boost::function<P (const P&,
+      propertyConstraint = new PropertyConstraint6<P, PropertyInputAccessor>( AnyCast< boost::function<P (const P&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&,
                                                                                                                   const PropertyInput&,
@@ -136,7 +135,7 @@ Constraint::Constraint( Property::Index targetIndex,
       mActiveConstraintTemplate = ActiveConstraint<bool>::New( targetIndex,
                                                                sources,
                                                                funcPtr,
-                                                               boost::any_cast< BoolInterpolator >( interpolator ) );
+                                                               AnyCast< BoolInterpolator >( interpolator ) );
       break;
     }
 
@@ -147,7 +146,7 @@ Constraint::Constraint( Property::Index targetIndex,
       mActiveConstraintTemplate = ActiveConstraint<float>::New( targetIndex,
                                                                 sources,
                                                                 funcPtr,
-                                                                boost::any_cast< FloatInterpolator >( interpolator ) );
+                                                                AnyCast< FloatInterpolator >( interpolator ) );
       break;
     }
 
@@ -158,7 +157,7 @@ Constraint::Constraint( Property::Index targetIndex,
       mActiveConstraintTemplate = ActiveConstraint<Vector2>::New( targetIndex,
                                                                   sources,
                                                                   funcPtr,
-                                                                  boost::any_cast< Vector2Interpolator >( interpolator ) );
+                                                                  AnyCast< Vector2Interpolator >( interpolator ) );
       break;
     }
 
@@ -169,7 +168,7 @@ Constraint::Constraint( Property::Index targetIndex,
       mActiveConstraintTemplate = ActiveConstraint<Vector3>::New( targetIndex,
                                                                   sources,
                                                                   funcPtr,
-                                                                  boost::any_cast< Vector3Interpolator >( interpolator ) );
+                                                                  AnyCast< Vector3Interpolator >( interpolator ) );
       break;
     }
 
@@ -180,7 +179,7 @@ Constraint::Constraint( Property::Index targetIndex,
       mActiveConstraintTemplate = ActiveConstraint<Vector4>::New( targetIndex,
                                                                   sources,
                                                                   funcPtr,
-                                                                  boost::any_cast< Vector4Interpolator >( interpolator ) );
+                                                                  AnyCast< Vector4Interpolator >( interpolator ) );
       break;
     }
 
@@ -191,7 +190,7 @@ Constraint::Constraint( Property::Index targetIndex,
       mActiveConstraintTemplate = ActiveConstraint<Quaternion>::New( targetIndex,
                                                                      sources,
                                                                      funcPtr,
-                                                                     boost::any_cast< QuaternionInterpolator >( interpolator ) );
+                                                                     AnyCast< QuaternionInterpolator >( interpolator ) );
       break;
     }
 
@@ -202,7 +201,7 @@ Constraint::Constraint( Property::Index targetIndex,
       mActiveConstraintTemplate = ActiveConstraint<Matrix>::New( targetIndex,
                                                                  sources,
                                                                  funcPtr,
-                                                                 boost::any_cast< MatrixInterpolator >( interpolator ) );
+                                                                 AnyCast< MatrixInterpolator >( interpolator ) );
       break;
     }
 
@@ -213,7 +212,7 @@ Constraint::Constraint( Property::Index targetIndex,
       mActiveConstraintTemplate = ActiveConstraint<Matrix3>::New( targetIndex,
                                                                   sources,
                                                                   funcPtr,
-                                                                  boost::any_cast< Matrix3Interpolator >( interpolator ) );
+                                                                  AnyCast< Matrix3Interpolator >( interpolator ) );
       break;
     }
 

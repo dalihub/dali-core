@@ -33,9 +33,7 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * Stores a value of any type.
- *
- * @note Assignments of values with different types are now allowed to replicate Any behaviour
+ * @brief Stores a value of any type.
  *
  * Examples of use:
  * \code{.cpp}
@@ -106,7 +104,6 @@ public:
   template<typename Type>
   Any& operator=( const Type& value )
   {
-
     // If the container is empty then assign the new value
     if ( NULL == mContainer )
     {
@@ -133,9 +130,9 @@ public:
   /**
    * @brief Assignment operator.
    *
-   * @note Asserts if values of different types are assigned.
+   * @exception DaliException If parameter any is of a different type.
    *
-   * @param [in] any Any to be assigned.
+   * @param [in] any Any to be assigned which contains a value of identical type to current contents.
    */
   Any& operator=( const Any& any );
 
@@ -153,7 +150,8 @@ public:
   /**
    * @brief Returns the type info of the stored value.
    *
-   * @note Returns the info of the void type if there is no value stored.
+   * @return The std::type_info of the stored value or the type info of the void
+   * type if there is no value stored.
    */
   const std::type_info& GetType() const;
 
@@ -202,7 +200,7 @@ public:
   /**
    * @brief Returns whether container holds a value
    *
-   * @return true or false
+   * @return true if the container is empty, else false.
    */
   bool Empty()
   {
@@ -313,13 +311,18 @@ public:
     /**
      * @brief Get the container's stored value
      *
-     * @return value of Type
+     * @return value of type Type
      */
     const Type& GetValue() const
     {
       return mValue;
     }
 
+    /**
+     * @brief Set the container's stored value
+     *
+     * @param value of type Type
+     */
     void SetValue( const Type& value )
     {
       mValue = value;

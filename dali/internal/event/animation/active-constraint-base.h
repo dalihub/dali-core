@@ -49,7 +49,7 @@ class ActiveConstraintBase : public ProxyObject
 public:
 
   typedef Dali::Constraint::RemoveAction RemoveAction;
-  typedef boost::any AnyFunction;
+  typedef Any AnyFunction;
 
   /**
    * Constructor.

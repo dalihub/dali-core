@@ -23,13 +23,13 @@
  */
 
 // EXTERNAL INCLUDES
-#include <boost/any.hpp>
 #include <boost/function.hpp>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/animation/time-period.h>
+#include <dali/public-api/object/any.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
@@ -117,7 +117,7 @@ public:
 
   typedef SignalV2< void (Animation&) > AnimationSignalV2; ///< Animation finished signal type
 
-  typedef boost::any AnyFunction; ///< Interpolation function
+  typedef Any AnyFunction; ///< Interpolation function
   typedef boost::function<Vector3 (float alpha, const Vector3& current)> Vector3AnimatorFunc; ///< Interpolation function
   typedef boost::function<Quaternion (float alpha, const Quaternion& current)> QuaternionAnimatorFunc; ///< Interpolation function
 

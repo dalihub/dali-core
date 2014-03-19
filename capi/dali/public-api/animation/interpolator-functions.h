@@ -22,10 +22,8 @@
  * @{
  */
 
-// EXTERNAL INCLUDES
-#include <boost/any.hpp>
-
 // INTERNAL INCLUDES
+#include <dali/public-api/object/any.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
@@ -181,7 +179,7 @@ typedef boost::function<Matrix (const Matrix& current, const Matrix& target, flo
 /**
  * @brief Any interpolator function.
  */
-typedef boost::any AnyInterpolator;
+typedef Any AnyInterpolator;
 
 /**
  * @brief Retrieve an interpolator function for a property.

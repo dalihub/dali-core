@@ -41,7 +41,7 @@ class Constraint : public BaseObject
 {
 public:
 
-  typedef boost::any AnyFunction;
+  typedef Any AnyFunction;
 
   /**
    * Construct a new constraint which targets a property.

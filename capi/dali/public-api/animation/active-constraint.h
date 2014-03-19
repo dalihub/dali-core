@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/active-constraint-declarations.h>
+#include <dali/public-api/object/any.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
 

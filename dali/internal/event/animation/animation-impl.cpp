@@ -617,7 +617,7 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
       AddAnimatorConnector( AnimatorConnector<bool>::New(proxy,
                                                          target.propertyIndex,
                                                          target.componentIndex,
-                                                         boost::any_cast< AnimatorFunctionBool >( func ),
+                                                         AnyCast< AnimatorFunctionBool >( func ),
                                                          alpha,
                                                          period) );
       break;
@@ -628,7 +628,7 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
       AddAnimatorConnector( AnimatorConnector<float>::New(proxy,
                                                           target.propertyIndex,
                                                           target.componentIndex,
-                                                          boost::any_cast< AnimatorFunctionFloat >( func ),
+                                                          AnyCast< AnimatorFunctionFloat >( func ),
                                                           alpha,
                                                           period) );
       break;
@@ -639,7 +639,7 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
       AddAnimatorConnector( AnimatorConnector<Vector2>::New(proxy,
                                                             target.propertyIndex,
                                                             target.componentIndex,
-                                                            boost::any_cast< AnimatorFunctionVector2 >( func ),
+                                                            AnyCast< AnimatorFunctionVector2 >( func ),
                                                             alpha,
                                                             period) );
       break;
@@ -650,7 +650,7 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
       AddAnimatorConnector( AnimatorConnector<Vector3>::New(proxy,
                                                             target.propertyIndex,
                                                             target.componentIndex,
-                                                            boost::any_cast< AnimatorFunctionVector3 >( func ),
+                                                            AnyCast< AnimatorFunctionVector3 >( func ),
                                                             alpha,
                                                             period) );
       break;
@@ -661,7 +661,7 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
       AddAnimatorConnector( AnimatorConnector<Vector4>::New(proxy,
                                                             target.propertyIndex,
                                                             target.componentIndex,
-                                                            boost::any_cast< AnimatorFunctionVector4 >( func ),
+                                                            AnyCast< AnimatorFunctionVector4 >( func ),
                                                             alpha,
                                                             period) );
       break;
@@ -672,7 +672,7 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
       AddAnimatorConnector( AnimatorConnector<Quaternion>::New(proxy,
                                                                target.propertyIndex,
                                                                target.componentIndex,
-                                                               boost::any_cast< AnimatorFunctionQuaternion >( func ),
+                                                               AnyCast< AnimatorFunctionQuaternion >( func ),
                                                                alpha,
                                                                period) );
       break;
