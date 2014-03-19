@@ -284,7 +284,7 @@ bool CameraActor::GetInvertYAxis() const
   return mCameraAttachment->GetInvertYAxis();
 }
 
-void CameraActor::SetPerspectiveProjection( const Size& size )
+void CameraActor::SetPerspectiveProjection( const Size& size, float stereoBias /* = 0.0f */ )
 {
   float width = size.width;
   float height = size.height;
@@ -329,6 +329,7 @@ void CameraActor::SetPerspectiveProjection( const Size& size )
   SetNearClippingPlane( nearClippingPlane );
   SetFarClippingPlane( farClippingPlane );
   SetAspectRatio( aspectRatio );
+  mCameraAttachment->SetStereoBias( stereoBias );
   SetZ( cameraZ );
 }
 

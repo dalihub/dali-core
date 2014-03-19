@@ -131,7 +131,8 @@ public_api_core_common_header_files = \
   $(public_api_src_dir)/common/map-wrapper.h \
   $(public_api_src_dir)/common/set-wrapper.h \
   $(public_api_src_dir)/common/ref-counted-dali-vector.h \
-  $(public_api_src_dir)/common/light.h
+  $(public_api_src_dir)/common/light.h \
+  $(public_api_src_dir)/common/view-mode.h
 
 public_api_core_dynamics_header_files = \
   $(public_api_src_dir)/dynamics/dynamics-body.h \

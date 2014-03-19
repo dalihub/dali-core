@@ -110,6 +110,18 @@ public:
   float GetAspectRatio() const;
 
   /**
+   * @copydoc Dali::Camera::SetLeftClippingPlane * Set stereo bias. The frustum offset for a 3D camera
+   * @param[in] stereoBias The frustum offset for the 3D camera
+   */
+  void SetStereoBias(float stereoBias);
+
+  /**
+   * Get stereo bias. The frustum offset for a 3D camera
+   * @return The frustum offset for the 3D camera
+   */
+  float GetStereoBias(float stereoBias) const;
+
+  /**
    * @copydoc Dali::Camera::SetLeftClippingPlane
    */
   void SetLeftClippingPlane(float leftClippingPlane);
@@ -268,6 +280,7 @@ private:
   bool               mInvertYAxis;
   float              mFieldOfView;
   float              mAspectRatio;
+  float              mStereoBias;
   float              mLeftClippingPlane;
   float              mRightClippingPlane;
   float              mTopClippingPlane;

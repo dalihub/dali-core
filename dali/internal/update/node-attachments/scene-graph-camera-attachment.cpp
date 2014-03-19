@@ -90,12 +90,13 @@ void Frustum(Matrix& result, float left, float right, float bottom, float top, f
   m[12] = m[13] = m[15] = 0.0f;
 }
 
-void Perspective(Matrix& result, float fovy, float aspect, float near, float far, bool invertYAxis)
+void Perspective(Matrix& result, float fovy, float aspect, float near, float far, bool invertYAxis, float stereoBias )
 {
-  float frustumH = tanf( fovy / 2 ) * near;
+  float frustumH = tanf( fovy * 0.5f ) * near;
   float frustumW = frustumH * aspect;
+  float bias = stereoBias * 0.5f;
 
-  Frustum(result, -frustumW, frustumW, -frustumH, frustumH, near, far, invertYAxis);
+  Frustum(result, -(frustumW + bias), frustumW - bias, -frustumH, frustumH, near, far, invertYAxis);
 }
 
 void Orthographic(Matrix& result, float left, float right, float bottom, float top, float near, float far, bool invertYAxis)
@@ -132,13 +133,14 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
   m[15] = 1.0f;
 }
 
-}
+} // unnamed namespace
 
 const Dali::Camera::Type CameraAttachment::DEFAULT_TYPE( Dali::Camera::LOOK_AT_TARGET );
 const Dali::Camera::ProjectionMode CameraAttachment::DEFAULT_MODE( Dali::Camera::PERSPECTIVE_PROJECTION );
 const bool  CameraAttachment::DEFAULT_INVERT_Y_AXIS( false );
 const float CameraAttachment::DEFAULT_FIELD_OF_VIEW( 45.0f*(M_PI/180.0f) );
 const float CameraAttachment::DEFAULT_ASPECT_RATIO( 4.0f/3.0f );
+const float CameraAttachment::DEFAULT_STEREO_BIAS( 0.0f );
 const float CameraAttachment::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
 const float CameraAttachment::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
 const float CameraAttachment::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
@@ -157,6 +159,7 @@ CameraAttachment::CameraAttachment()
   mInvertYAxis( DEFAULT_INVERT_Y_AXIS ),
   mFieldOfView( DEFAULT_FIELD_OF_VIEW ),
   mAspectRatio( DEFAULT_ASPECT_RATIO ),
+  mStereoBias( DEFAULT_STEREO_BIAS ),
   mLeftClippingPlane( DEFAULT_LEFT_CLIPPING_PLANE ),
   mRightClippingPlane( DEFAULT_RIGHT_CLIPPING_PLANE ),
   mTopClippingPlane( DEFAULT_TOP_CLIPPING_PLANE ),
@@ -220,6 +223,12 @@ void CameraAttachment::SetFieldOfView( float fieldOfView )
 void CameraAttachment::SetAspectRatio( float aspectRatio )
 {
   mAspectRatio = aspectRatio;
+  mUpdateProjectionFlag = UPDATE_COUNT;
+}
+
+void CameraAttachment::SetStereoBias( float stereoBias )
+{
+  mStereoBias = stereoBias;
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
@@ -368,7 +377,8 @@ void CameraAttachment::UpdateProjection( BufferIndex updateBufferIndex )
                        mAspectRatio,
                        mNearClippingPlane,
                        mFarClippingPlane,
-                       mInvertYAxis );
+                       mInvertYAxis,
+                       mStereoBias );
           break;
         }
         case Dali::Camera::ORTHOGRAPHIC_PROJECTION:

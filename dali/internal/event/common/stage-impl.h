@@ -28,9 +28,11 @@
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/public-api/common/view-mode.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/public-api/render-tasks/render-task.h>
 
 namespace Dali
 {
@@ -235,6 +237,28 @@ public:
    */
   SystemOverlay* GetSystemOverlayInternal();
 
+  // Stereoscopy
+
+  /**
+   * @copydoc Dali::Integration::Core::SetViewMode()
+   */
+  void SetViewMode( ViewMode viewMode );
+
+  /**
+   * @copydoc Dali::Integration::Core::GetViewMode()
+   */
+  ViewMode GetViewMode() const;
+
+  /**
+   * @copydoc Dali::Integration::Core::SetStereoBase()
+   */
+  void SetStereoBase( float stereoBase );
+
+  /**
+   * @copydoc Dali::Integration::Core::GetStereoBase()
+   */
+  float GetStereoBase() const;
+
   // Keyboard stuff
 
   /**
@@ -380,6 +404,9 @@ private:
 
   IntrusivePtr<CameraActor> mDefaultCamera;
 
+  ViewMode mViewMode;
+  float mStereoBase;
+
   Vector2 mDpi;
 
   // The object registry
@@ -391,6 +418,11 @@ private:
 
   // The list of render-tasks
   IntrusivePtr<RenderTaskList> mRenderTaskList;
+
+  Dali::RenderTask mRightRenderTask;
+  IntrusivePtr<CameraActor> mRightCamera;
+  Dali::RenderTask mLeftRenderTask;
+  IntrusivePtr<CameraActor> mLeftCamera;
 
   Integration::SystemOverlay* mSystemOverlay; ///< SystemOverlay stage access
 

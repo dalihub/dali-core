@@ -54,6 +54,7 @@ CameraAttachment::CameraAttachment( Stage& stage )
   mInvertYAxis( SceneGraph::CameraAttachment::DEFAULT_INVERT_Y_AXIS ),
   mFieldOfView( SceneGraph::CameraAttachment::DEFAULT_FIELD_OF_VIEW ),
   mAspectRatio( SceneGraph::CameraAttachment::DEFAULT_ASPECT_RATIO ),
+  mStereoBias( SceneGraph::CameraAttachment::DEFAULT_STEREO_BIAS ),
   mLeftClippingPlane( SceneGraph::CameraAttachment::DEFAULT_LEFT_CLIPPING_PLANE ),
   mRightClippingPlane( SceneGraph::CameraAttachment::DEFAULT_RIGHT_CLIPPING_PLANE ),
   mTopClippingPlane( SceneGraph::CameraAttachment::DEFAULT_TOP_CLIPPING_PLANE ),
@@ -135,6 +136,22 @@ void CameraAttachment::SetAspectRatio( float aspectRatio )
 float CameraAttachment::GetAspectRatio() const
 {
   return mAspectRatio;
+}
+
+void CameraAttachment::SetStereoBias(float stereoBias)
+{
+  if( ! Equals(stereoBias, mStereoBias) )
+  {
+    mStereoBias = stereoBias;
+
+    // sceneObject is being used in a separate thread; queue a message to set
+    SetStereoBiasMessage( mStage->GetUpdateInterface(), *mSceneObject, stereoBias );
+  }
+}
+
+float CameraAttachment::GetStereoBias(float stereoBias) const
+{
+  return mStereoBias;
 }
 
 void CameraAttachment::SetLeftClippingPlane( float leftClippingPlane )

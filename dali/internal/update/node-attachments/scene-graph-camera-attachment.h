@@ -56,6 +56,7 @@ public:
   static const bool  DEFAULT_INVERT_Y_AXIS;
   static const float DEFAULT_FIELD_OF_VIEW;
   static const float DEFAULT_ASPECT_RATIO;
+  static const float DEFAULT_STEREO_BIAS;
   static const float DEFAULT_LEFT_CLIPPING_PLANE;
   static const float DEFAULT_RIGHT_CLIPPING_PLANE;
   static const float DEFAULT_TOP_CLIPPING_PLANE;
@@ -117,6 +118,11 @@ public:
   void SetAspectRatio( float aspectRatio );
 
   /**
+   * @copydoc Dali::Internal::CameraAttachment::SetStereoBias
+   */
+  void SetStereoBias(float stereoBias);
+
+   /**
    * @copydoc Dali::Internal::CameraAttachment::SetLeftClippingPlane
    */
   void SetLeftClippingPlane( float leftClippingPlane );
@@ -239,6 +245,7 @@ public:  // PROPERTIES
 
   float                         mFieldOfView;
   float                         mAspectRatio;
+  float                         mStereoBias;
   float                         mLeftClippingPlane;
   float                         mRightClippingPlane;
   float                         mTopClippingPlane;
@@ -299,6 +306,17 @@ inline void SetAspectRatioMessage( EventToUpdate& eventToUpdate, const CameraAtt
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetAspectRatio, parameter );
+}
+
+inline void SetStereoBiasMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+{
+  typedef MessageValue1< CameraAttachment, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &CameraAttachment::SetStereoBias, parameter );
 }
 
 inline void SetLeftClippingPlaneMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )

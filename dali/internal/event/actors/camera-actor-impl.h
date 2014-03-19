@@ -144,8 +144,9 @@ public:
 
   /**
    * @copydoc Dali::CameraActor::SetPerspectiveProjection()
+   * @param[in] stereoBias The frustum horizontal offset for stereoscopic cameras
    */
-  void SetPerspectiveProjection( const Size& size );
+  void SetPerspectiveProjection( const Size& size, float stereoBias = 0.0f );
 
   /**
    * @copydoc Dali::CameraActor::SetOrthographicProjection(const Vector2& size);
