@@ -45,7 +45,7 @@ namespace
 }
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
-:mCore(core)
+: mCore(core)
 {
   DALI_ASSERT_ALWAYS( threadLocal.get() == NULL && "Cannot create more than one ThreadLocalStorage object" );
 
@@ -136,6 +136,11 @@ EventToUpdate& ThreadLocalStorage::GetEventToUpdate()
 GestureEventProcessor& ThreadLocalStorage::GetGestureEventProcessor()
 {
   return mCore->GetGestureEventProcessor();
+}
+
+EmojiFactory& ThreadLocalStorage::GetEmojiFactory()
+{
+  return mCore->GetEmojiFactory();
 }
 
 } // namespace Internal

@@ -19,6 +19,8 @@
 # These files define <module>_src_files & <module>_header_files,
 # where <module> is the subdirectory from core_src_dir
 
+emoticons_dir = /usr/share/emoticons/
+
 internal_src_dir = ../../../dali/internal
 include ../../../dali/internal/file.list
 
@@ -68,6 +70,7 @@ libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
                            -DDALI_SHADERBIN_DIR="\"${daliShaderbinDir}\"" \
                            -DDALI_GLYPH_CACHE_DIR="\"${daliGlyphCacheDir}\"" \
+                           -DDALI_EMOTICON_DIR="\"${emoticons_dir}\"" \
                            -Werror -Wall -Wfloat-equal \
                            $(dali_core_includes) \
                            $(DALI_CFLAGS) \

@@ -72,6 +72,7 @@
 #include <dali/public-api/images/image-attributes.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/pixel.h>
+#include <dali/public-api/images/glyph-image.h>
 
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/compile-time-assert.h>

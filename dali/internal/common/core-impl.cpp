@@ -41,6 +41,7 @@
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/event/text/font-factory.h>
 #include <dali/internal/event/images/image-factory.h>
+#include <dali/internal/event/images/emoji-factory.h>
 #include <dali/internal/event/modeling/model-factory.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
@@ -91,6 +92,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mImageFactory(NULL),
   mModelFactory(NULL),
   mShaderFactory(NULL),
+  mEmojiFactory(NULL),
   mIsActive(true),
   mProcessingEvent(false)
 {
@@ -156,6 +158,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mModelFactory = new ModelFactory(*mResourceClient);
   mShaderFactory = new ShaderFactory(*mResourceClient);
   mShaderFactory->LoadDefaultShaders();
+  mEmojiFactory = new EmojiFactory();
 
   GetImplementation(Dali::TypeRegistry::Get()).CallInitFunctions();
 }
@@ -194,6 +197,7 @@ Core::~Core()
   delete mResourceManager;
   delete mUpdateManager;
   delete mTouchResampler;
+  delete mEmojiFactory;
   delete mRenderManager;
   delete mDiscardQueue;
   delete mResourcePostProcessQueue;
@@ -447,6 +451,11 @@ ShaderFactory& Core::GetShaderFactory()
 GestureEventProcessor& Core::GetGestureEventProcessor()
 {
   return *(mGestureEventProcessor);
+}
+
+EmojiFactory& Core::GetEmojiFactory()
+{
+  return *mEmojiFactory;
 }
 
 void Core::CreateThreadLocalStorage()

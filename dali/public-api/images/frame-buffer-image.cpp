@@ -67,7 +67,6 @@ FrameBufferImage FrameBufferImage::New( NativeImage& image )
   return FrameBufferImage(new Internal::FrameBufferImage( image ));
 }
 
-
 FrameBufferImage FrameBufferImage::DownCast( BaseHandle handle )
 {
   return FrameBufferImage( dynamic_cast<Dali::Internal::FrameBufferImage*>(handle.GetObjectPtr()) );

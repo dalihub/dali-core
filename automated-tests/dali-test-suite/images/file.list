@@ -3,7 +3,7 @@ TARGETS += \
         utc-Dali-BitmapImage \
         utc-Dali-DistanceField \
         utc-Dali-FrameBufferImage \
+        utc-Dali-GlyphImage \
         utc-Dali-Image \
         utc-Dali-ImageAttributes \
         utc-Dali-Pixel
-

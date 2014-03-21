@@ -386,7 +386,7 @@ float Font::PixelsToPoints(int pixelSize)
   return (pixelSize * INCH_TO_POINTS) / meanDpi;
 }
 
-void Font::ValidateFontRequest(std::string& fontFamily, std::string& fontStyle, float &fontPointSize, bool& fontFamilyDefault, bool &fontPointSizeDefault )
+void Font::ValidateFontRequest(std::string& fontFamily, std::string& fontStyle, float& fontPointSize, bool& fontFamilyDefault, bool& fontPointSizeDefault )
 {
   Internal::ThreadLocalStorage& tls = Internal::ThreadLocalStorage::Get();
   Integration::PlatformAbstraction& platform = tls.GetPlatformAbstraction();

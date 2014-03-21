@@ -54,7 +54,7 @@ public:
    * @param[out] seconds The time in seconds since the reference point.
    * @param[out] microSeconds The remainder in microseconds.
    */
-  virtual void GetTimeMicroseconds(unsigned int &seconds, unsigned int &microSeconds) = 0;
+  virtual void GetTimeMicroseconds(unsigned int& seconds, unsigned int& microSeconds) = 0;
 
   /**
    * Tell the platform abstraction that Dali is ready to pause, such as when the
@@ -186,7 +186,7 @@ public:
    * @param[in] fontStyle  The style of the font
    * @param[in] capsHeight The caps-height in pixels
    */
-  virtual const PixelSize GetFontLineHeightFromCapsHeight(const std::string fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight) const = 0;
+  virtual const PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight) const = 0;
 
   /**
    * Called by Font objects to synchronously query glyph data.
@@ -341,6 +341,27 @@ public:
   virtual void WriteMetricsToCache( const std::string& fontFamily,
                                     const std::string& fontStyle,
                                     const Integration::GlyphSet& glyphSet ) = 0;
+
+  /**
+   * Retrieves file names from the given directory.
+   *
+   * @param[in] directoryName The directory name.
+   * @param[out] fileNames The file names in the given directory.
+   */
+  virtual void GetFileNamesFromDirectory( const std::string& directoryName,
+                                          std::vector<std::string>& fileNames ) = 0;
+
+  /**
+   * Retrieves the glyph image which represents the character.
+   *
+   * @param[in] fontFamily The font's family name.
+   * @param[in] fontStyle The font's style.
+   * @param[in] fontSize The font's size (in points).
+   * @param[in] character The given character.
+   *
+   * @return A bitmap representing the character.
+   */
+  virtual Integration::BitmapPtr GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const = 0;
 
 }; // class PlatformAbstraction
 

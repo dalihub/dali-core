@@ -63,6 +63,7 @@ public_api_src_files = \
   $(public_api_src_dir)/images/frame-buffer-image.cpp \
   $(public_api_src_dir)/images/encoded-buffer-image.cpp \
   $(public_api_src_dir)/images/nine-patch-image.cpp \
+  $(public_api_src_dir)/images/glyph-image.cpp \
   $(public_api_src_dir)/math/angle-axis.cpp \
   $(public_api_src_dir)/math/compile-time-math.cpp \
   $(public_api_src_dir)/math/degree.cpp \
@@ -152,7 +153,8 @@ public_api_core_geometry_header_files = \
 
 public_api_core_images_header_files = \
   $(public_api_src_dir)/images/distance-field.h \
-  $(public_api_src_dir)/images/nine-patch-image.h
+  $(public_api_src_dir)/images/nine-patch-image.h \
+  $(public_api_src_dir)/images/glyph-image.h
 
 public_api_core_math_header_files =
 

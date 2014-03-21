@@ -1,0 +1,108 @@
+#ifndef __DALI_GLYPH_IMAGE_H__
+#define __DALI_GLYPH_IMAGE_H__
+
+//
+// Copyright (c) 2014 Samsung Electronics Co., Ltd.
+//
+// Licensed under the Flora License, Version 1.0 (the License);
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://floralicense.org/license/
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an AS IS BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+// INTERNAL INCLUDES
+#include <dali/public-api/images/image.h>
+#include <dali/public-api/text/font.h>
+
+namespace Dali DALI_IMPORT_API
+{
+
+class Character;
+class TextStyle;
+
+/**
+ * @brief A GlyphImage object is an image resource which represents a character.
+ */
+class GlyphImage : public Image
+{
+public:
+  /**
+   * @brief Constructor which creates an uninitialized GlyphImage object.
+   *
+   * Use GlyphImage::New(...) to create an initialised object.
+   */
+  GlyphImage();
+
+  /**
+   * @brief Create a new GlyphImage representing the given character.
+   *
+   * It uses a default TextStyle to create the glyph image.
+   * @see GlyphImage::New( const Character& character, const TextStyle& style )
+   *
+   * @param[in] character The character to get the glyph image.
+   *
+   * @return A handle to a new instance of a GlyphImage.
+   */
+  static GlyphImage New( const Character& character );
+
+  /**
+   * @brief Create a new GlyphImage representing the given character.
+   *
+   * If the given character is a color glyph, no style is used to create the image.
+   *
+   * If it's not, it uses the font family name, font style and font size defined in the text-style
+   * to create a font. The text color is also retrieved from the text style to create the glyph image.
+   *
+   * @note current implementation ignores any other text style parameter.
+   *
+   * @param[in] character The character to get the glyph image.
+   * @param[in] style TextStyle to be used to create the glyph image.
+   *
+   * @return A handle to a new instance of a GlyphImage.
+   */
+  static GlyphImage New( const Character& character, const TextStyle& style );
+
+  /**
+   * @brief Downcast an Object handle to GlyphImage handle.
+   *
+   * If handle points to a GlyphImage object the
+   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @param[in] handle to An object
+   * @return handle to a GlyphImage object or an uninitialized handle
+   */
+  static GlyphImage DownCast( BaseHandle handle );
+
+  /**
+   * @brief Whether the given characters is a color glyph.
+   *
+   * @param[in] character The given character.
+   *
+   * @return \e true if \e character is a color glyph.
+   */
+  static bool IsColorGlyph( const Character& character );
+
+  /**
+   * @brief Destructor.
+   */
+  virtual ~GlyphImage();
+
+  /**
+   * @copydoc Dali::BaseHandle::operator=
+   */
+  using BaseHandle::operator=;
+
+public: // Not intended for application developers
+
+  explicit DALI_INTERNAL GlyphImage( Internal::Image* );
+}; //class GlyphImage
+
+} // namespace Dali
+
+#endif // __DALI_GLYPH_IMAGE_H__

@@ -92,7 +92,7 @@ public:
   /**
    * @copydoc PlatformAbstraction::GetTimeMicroseconds()
    */
-  virtual void GetTimeMicroseconds(unsigned int &seconds, unsigned int &microSeconds)
+  virtual void GetTimeMicroseconds(unsigned int& seconds, unsigned int& microSeconds)
   {
     seconds = mSeconds;
     microSeconds = mMicroSeconds;
@@ -226,7 +226,7 @@ public:
     return mGetDefaultFontSizeResult;
   }
 
-  virtual const PixelSize GetFontLineHeightFromCapsHeight(const std::string fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight) const
+  virtual const PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight) const
   {
     mTrace.PushCall("GetFontLineHeightFromCapsHeight", "");
     // LineHeight will be bigger than CapsHeight, so return capsHeight + 1
@@ -483,6 +483,25 @@ public:
     mTrace.PushCall("WriteMetricsToCacheFile", "");
   }
 
+  virtual void GetFileNamesFromDirectory( const std::string& directoryName,
+                                          std::vector<std::string>& fileNames )
+  {
+    fileNames.push_back( std::string( "u1f004.png" ) );
+    fileNames.push_back( std::string( "u1f0cf.png" ) );
+    fileNames.push_back( std::string( "u1f170.png" ) );
+    fileNames.push_back( std::string( "u1f601.png" ) );
+  }
+
+  virtual Integration::BitmapPtr GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const
+  {
+    Integration::BitmapPtr image = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
+    image->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888, 1, 1 );
+
+    mTrace.PushCall("GetGlyphImage", "");
+
+    return image;
+  }
+
 public: // TEST FUNCTIONS
 
   // Enumeration of Platform Abstraction methods
@@ -516,6 +535,7 @@ public: // TEST FUNCTIONS
     WriteGlobalMetricsToCacheFileFunc,
     ReadMetricsFromCacheFileFunc,
     WriteMetricsToCacheFileFunc,
+    GetGlyphImageFunc
   } TestFuncEnum;
 
   /** Call this every test */
@@ -577,6 +597,7 @@ public: // TEST FUNCTIONS
       case WriteGlobalMetricsToCacheFileFunc:   return mTrace.FindMethod("WriteGlobalMetricsToCacheFile");
       case ReadMetricsFromCacheFileFunc:        return mTrace.FindMethod("ReadMetricsFromCacheFile");
       case WriteMetricsToCacheFileFunc:         return mTrace.FindMethod("WriteMetricsToCacheFile");
+      case GetGlyphImageFunc:                   return mTrace.FindMethod("GetGlyphImage");
     }
     return false;
   }

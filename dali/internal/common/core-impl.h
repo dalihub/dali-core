@@ -59,6 +59,7 @@ class ImageFactory;
 class ModelFactory;
 class ShaderFactory;
 class TouchResampler;
+class EmojiFactory;
 
 namespace SceneGraph
 {
@@ -247,6 +248,12 @@ private:  // for use by ThreadLocalStorage
    */
   GestureEventProcessor& GetGestureEventProcessor();
 
+  /**
+   * Returns the Emoji factory.
+   * @return a reference to the Emoji factory.
+   */
+  EmojiFactory& GetEmojiFactory();
+
 private:
 
   /**
@@ -284,6 +291,7 @@ private:
   ResourceClient*                           mResourceClient;              ///< Asynchronous Resource Loading
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   TouchResampler*                           mTouchResampler;              ///< Resamples touches to correct frame rate.
+  EmojiFactory*                             mEmojiFactory;                ///< Emoji resource factory.
 
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()
