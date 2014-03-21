@@ -79,6 +79,7 @@ public_api_src_files = \
   $(public_api_src_dir)/modeling/material.cpp \
   $(public_api_src_dir)/modeling/model.cpp \
   $(public_api_src_dir)/modeling/model-data.cpp \
+  $(public_api_src_dir)/object/any.cpp \
   $(public_api_src_dir)/object/base-handle.cpp \
   $(public_api_src_dir)/object/constrainable.cpp \
   $(public_api_src_dir)/object/handle.cpp \

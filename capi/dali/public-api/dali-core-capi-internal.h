@@ -88,6 +88,7 @@
 
 #include <dali/public-api/modeling/material.h>
 
+#include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/constrainable.h>

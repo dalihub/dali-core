@@ -253,6 +253,7 @@ Dali::ShortestDistanceInDomain()
  * <tr><td>@ref Dali::Property::Value </td><td>A value-type representing a property value.</td></tr>a
  * <tr><td>@ref Dali::RefObject </td><td>Base class for reference counted objects.</td></tr>
  * <tr><td>@ref Dali::IntrusivePtr </td><td>Template class used to point at Dali::RefObjects</td></tr>
+ * <tr><td>@ref Dali::Any </td><td>Class for objects that contain values of different types</td></tr>
  * </table>
  */
 

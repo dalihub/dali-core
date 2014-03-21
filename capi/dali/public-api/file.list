@@ -84,6 +84,7 @@ capi_devel_modeling_header_files =  \
   $(capi_devel_src_dir)/modeling/material.h
 
 capi_devel_object_header_files =  \
+  $(capi_devel_src_dir)/object/any.h \
   $(capi_devel_src_dir)/object/base-handle.h \
   $(capi_devel_src_dir)/object/base-object.h \
   $(capi_devel_src_dir)/object/constrainable.h \
