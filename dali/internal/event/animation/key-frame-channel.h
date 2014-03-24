@@ -90,9 +90,8 @@ bool KeyFrameChannel<V>::IsActive (float progress)
   if(!mValues.empty())
   {
     ProgressValue<V>& first = mValues.front();
-    ProgressValue<V>& last  = mValues.back();
 
-    if (progress >= first.GetProgress() && progress <= last.GetProgress() )
+    if( progress >= first.GetProgress() )
     {
       active = true;
     }
@@ -146,20 +145,16 @@ V KeyFrameChannel<V>::GetValue (float progress) const
   typename std::vector<ProgressValue<V> >::iterator start;
   typename std::vector<ProgressValue<V> >::iterator end;
 
-  V interpolatedV;
-  if(FindInterval(start, end, progress))
+  V interpolatedV = firstPV.GetValue();
+  if(progress >= mValues.back().GetProgress() )
+  {
+    interpolatedV = mValues.back().GetValue(); // This should probably be last value...
+  }
+  else if(FindInterval(start, end, progress))
   {
     float frameProgress = (progress - start->GetProgress()) / (end->GetProgress() - start->GetProgress());
 
     interpolatedV = Interpolate(*start, *end, frameProgress);
-  }
-  else if(progress <= firstPV.GetProgress())
-  {
-    interpolatedV = firstPV.GetValue(); // This should probably be initial value...
-  }
-  else
-  {
-    interpolatedV = mValues.back().GetValue(); // Sticks at end value
   }
 
   return interpolatedV;
