@@ -2690,7 +2690,6 @@ static void UtcDaliRenderTaskOnceNoSync08()
 }
 
 
-
 static void UtcDaliRenderTaskOnceChain01()
 {
   TestApplication application;
@@ -2727,6 +2726,7 @@ static void UtcDaliRenderTaskOnceChain01()
   FrameBufferImage fbo = firstTask.GetTargetFrameBuffer();
   ImageActor secondRootActor = ImageActor::New( fbo );
   Stage::GetCurrent().Add(secondRootActor);
+
   RenderTask secondTask = CreateRenderTask(application, offscreenCameraActor, defaultRootActor, secondRootActor, RenderTask::REFRESH_ONCE, offscreenFramebufferId, false);
   bool secondFinished = false;
   RenderTaskFinished renderTask2Finished( secondFinished );
@@ -2735,14 +2735,16 @@ static void UtcDaliRenderTaskOnceChain01()
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,  firstFinished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false ) );
   DALI_TEST_CHECK( secondFinished == false );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,  firstFinished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false ) );
   DALI_TEST_CHECK( secondFinished == false );
 
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false ) );
   DALI_TEST_CHECK( secondFinished == false );
+  application.GetPlatform().ClearReadyResources();
+
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,  firstFinished, true ) );
   DALI_TEST_CHECK( secondFinished == true );
 
@@ -2755,7 +2757,6 @@ static void UtcDaliRenderTaskOnceChain01()
   DALI_TEST_CHECK( secondFinished == false );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   firstFinished, false ) );
   DALI_TEST_CHECK( secondFinished == false );
-
 }
 
 void UtcDaliRenderTaskProperties()
