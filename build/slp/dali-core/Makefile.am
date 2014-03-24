@@ -179,11 +179,11 @@ CLEANFILES = dali-shaders.cpp \
 
 noinst_PROGRAMS = linker.test
 
-linker_test_SOURCES = linker-test.cpp ../../../automated-tests/dali-test-suite-utils/test-application.cpp
+linker_test_SOURCES = linker-test.cpp ../../../automated-tests/TET/dali-test-suite-utils/test-application.cpp
 
 linker_test_CXXFLAGS = \
   -Werror -Wall -Wfloat-equal \
-  -I../../../automated-tests/dali-test-suite-utils \
+  -I../../../automated-tests/TET/dali-test-suite-utils \
   $(dali_core_includes) \
   $(DALI_CFLAGS) \
   $(OPENGLES20_CFLAGS)

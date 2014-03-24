@@ -1,42 +1,27 @@
 #!/bin/bash
 
-TEMP=`getopt -o ds: --long desktop,scenario: \
-     -n 'build_out.sh' -- "$@"`
+function execute
+{
+    scripts/tctestsgen.sh $1 `pwd` desktop
+    testkit-lite -f `pwd`/tests.xml -o tct-${1}-core-tests.xml  -A --comm localhost
+    scripts/add_style.pl $1
+}
 
-if [ $? != 0 ] ; then echo "Terminating..." >&2 ; exit 1 ; fi
+# Clean up old test results
+rm -f tct*core-tests.xml
 
-# Note the quotes around `$TEMP': they are essential!
-eval set -- "$TEMP"
+if [ -n "$1" ] ; then
+  echo EXECUTING ONLY $1
+  execute $1
 
-scenario=all
-env=./_export_env.sh
+else
+  for mod in `ls -1 src/ | grep -v CMakeList `
+  do
+    if [ $mod != 'common' ] && [ $mod != 'manual' ]; then
+        echo EXECUTING $mod
+        execute $mod
+    fi
+  done
+fi
 
-while true ; do
-    case "$1" in
-	-d|--desktop)   env=./_export_desktop.sh ; shift ;;
-	-s|--scenario)  scenario="$2" ; shift 2 ;;
-	--) shift ; break ;;
-	*) echo "Internal error!" ; exit 1 ;;
-	esac
-done
-
-
-# Source correct environment
-. $env
-
-
-echo PATH=$PATH
-echo LD_LIBRARY_PATH=$LD_LIBRARY_PATH
-echo TET_ROOT=$TET_ROOT
-echo TET_SUITE_ROOT=$TET_SUITE_ROOT
-echo ARCH=$ARCH
-
-RESULT_DIR=results-$ARCH
-HTML_RESULT=$RESULT_DIR/exec-tar-result-$FILE_NAME_EXTENSION.html
-JOURNAL_RESULT=$RESULT_DIR/exec-tar-result-$FILE_NAME_EXTENSION.journal
-
-mkdir -p $RESULT_DIR
-
-tcc -e -j $JOURNAL_RESULT -p ./ $scenario
-./tbp.pl $JOURNAL_RESULT
-
+scripts/summarize.pl

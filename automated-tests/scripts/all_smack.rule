@@ -1,0 +1,28 @@
+# calendar-service
+_ calendar-service::svc rwx
+
+# capi-appfw-application
+_ alarm-server::alarm rw
+_ aul::launch x
+_ aul::terminate x
+
+# capi-network-bluetooth
+_ bt-service::admin w
+_ bt-service::manager w
+_ bt-service::gap w
+_ bt-service::spp w
+_ bt:service::opp w
+
+# capi-network-nfc
+_ nfc-manager rwx
+_ nfc-manager::tag rwx
+_ nfc-manager::p2p rwx
+_ nfc-manager::admin rwx
+_ nfc-manager::common rwx
+
+# capi-location-*
+_ location::maps rw
+_ location::client rw
+
+# libmdm
+_ mdm-server::eas rw
