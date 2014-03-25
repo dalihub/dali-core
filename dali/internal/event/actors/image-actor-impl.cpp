@@ -562,7 +562,7 @@ void ImageActor::SetDefaultProperty( Property::Index index, const Property::Valu
       }
       case Dali::ImageActor::BORDER:
       {
-        SetNinePatchBorder(propertyValue.Get<Vector4>());
+        SetNinePatchBorder( propertyValue.Get<Vector4>(), true /*in pixels*/ );
         break;
       }
       case Dali::ImageActor::IMAGE:

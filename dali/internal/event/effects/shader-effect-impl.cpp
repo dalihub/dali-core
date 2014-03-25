@@ -617,9 +617,10 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
       std::string vertex         = GetShader("vertex", propertyValue);
       std::string fragment       = GetShader("fragment", propertyValue);
 
+      GeometryType geometryType      = GEOMETRY_TYPE_IMAGE;
+
       if( propertyValue.HasKey("geometry-type") )
       {
-        GeometryType geometryType      = GEOMETRY_TYPE_IMAGE;
         Property::Value geometryValue  = propertyValue.GetValue("geometry-type");
         DALI_ASSERT_ALWAYS(geometryValue.GetType() == Property::STRING && "Geometry type is not a string" );
 
@@ -644,9 +645,8 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
         {
           DALI_ASSERT_ALWAYS(!"Geometry type unknown" );
         }
-
-        SetShaderProgram( vertexPrefix, vertex, fragmentPrefix, fragment, geometryType, ShaderEffectPtr(this) );
       }
+      SetShaderProgram( vertexPrefix, vertex, fragmentPrefix, fragment, geometryType, ShaderEffectPtr(this) );
       break;
     }
 
