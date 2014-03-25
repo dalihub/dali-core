@@ -1119,6 +1119,11 @@ public: // Default property extensions from ProxyObject
   virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
 
   /**
+   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAConstraintInput()
+   */
+  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
+
+  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyType()
    */
   virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
@@ -1338,6 +1343,18 @@ private:
   // Default properties
 
   static DefaultPropertyLookup* mDefaultPropertyLookup;
+};
+
+/**
+ * @brief Structure for setting up default properties and their details.
+ */
+struct PropertyDetails
+{
+  std::string name;         ///< The name of the property.
+  Property::Type type;      ///< The property type.
+  bool writable:1;          ///< Whether the property is writable
+  bool animatable:1;        ///< Whether the property is animatable.
+  bool constraintInput:1;   ///< Whether the property can be used as an input to a constraint.
 };
 
 } // namespace Internal

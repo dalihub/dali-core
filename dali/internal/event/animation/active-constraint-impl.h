@@ -25,7 +25,6 @@
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/proxy-object.h>
-#include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/animation/active-constraint-base.h>
@@ -330,14 +329,13 @@ private:
     {
       Source& source = *iter;
 
-      // Type registry properties cannot be used as inputs
-      DALI_ASSERT_ALWAYS( ( source.propertyIndex < DEFAULT_PROPERTY_MAX_COUNT ) || ( source.propertyIndex >= CUSTOM_PROPERTY_START ) );
-
       PropertyInputImpl* inputProperty( NULL );
       int componentIndex( Property::INVALID_COMPONENT_INDEX );
 
       if ( OBJECT_PROPERTY == source.sourceType )
       {
+        DALI_ASSERT_ALWAYS( source.object->IsPropertyAConstraintInput( source.propertyIndex ) );
+
         SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( source.object->GetSceneObject() );
 
         // The property owner will not exist, if the target proxy-object is off-stage
@@ -353,6 +351,8 @@ private:
       }
       else if ( LOCAL_PROPERTY == source.sourceType )
       {
+        DALI_ASSERT_ALWAYS( mTargetProxy->IsPropertyAConstraintInput( source.propertyIndex ) );
+
         inputProperty = const_cast< PropertyInputImpl* >( mTargetProxy->GetSceneObjectInputProperty( source.propertyIndex ) );
         componentIndex = mTargetProxy->GetPropertyComponentIndex( source.propertyIndex );
 
@@ -368,6 +368,8 @@ private:
         // This will not exist, if the target proxy-object is off-stage
         if ( NULL != proxyParent )
         {
+          DALI_ASSERT_ALWAYS( proxyParent->IsPropertyAConstraintInput( source.propertyIndex ) );
+
           SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( proxyParent->GetSceneObject() );
 
           // The property owner will not exist, if the parent proxy-object is off-stage
@@ -772,6 +774,8 @@ private:
 
       if ( OBJECT_PROPERTY == source.sourceType )
       {
+        DALI_ASSERT_ALWAYS( source.object->IsPropertyAConstraintInput( source.propertyIndex ) );
+
         SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( source.object->GetSceneObject() );
 
         // The property owner will not exist, if the target proxy-object is off-stage
@@ -787,6 +791,8 @@ private:
       }
       else if ( LOCAL_PROPERTY == source.sourceType )
       {
+        DALI_ASSERT_ALWAYS( mTargetProxy->IsPropertyAConstraintInput( source.propertyIndex ) );
+
         inputProperty = const_cast< PropertyInputImpl* >( mTargetProxy->GetSceneObjectInputProperty( source.propertyIndex ) );
         componentIndex = mTargetProxy->GetPropertyComponentIndex( source.propertyIndex );
 
@@ -802,6 +808,8 @@ private:
         // This will not exist, if the target proxy-object is off-stage
         if ( NULL != proxyParent )
         {
+          DALI_ASSERT_ALWAYS( proxyParent->IsPropertyAConstraintInput( source.propertyIndex ) );
+
           SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( proxyParent->GetSceneObject() );
 
           // The property owner will not exist, if the parent proxy-object is off-stage

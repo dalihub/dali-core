@@ -265,6 +265,11 @@ bool AnimatableMesh::IsDefaultPropertyAnimatable(Property::Index index) const
   return true;
 }
 
+bool AnimatableMesh::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  return true;
+}
+
 Property::Type AnimatableMesh::GetDefaultPropertyType(Property::Index index) const
 {
   if ( ( index >= 0 ) && ( index < mPropertyCount ) )

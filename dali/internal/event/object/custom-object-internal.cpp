@@ -103,6 +103,11 @@ bool CustomObject::IsDefaultPropertyAnimatable(Property::Index index) const
   return false;
 }
 
+bool CustomObject::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  return false;
+}
+
 Property::Type CustomObject::GetDefaultPropertyType(Property::Index index) const
 {
   return Property::NONE;

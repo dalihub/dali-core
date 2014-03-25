@@ -31,20 +31,20 @@
 namespace Dali
 {
 
-const Property::Index CameraActor::TYPE                    = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-const Property::Index CameraActor::PROJECTION_MODE         = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 1;
-const Property::Index CameraActor::FIELD_OF_VIEW           = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 2;
-const Property::Index CameraActor::ASPECT_RATIO            = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 3;
-const Property::Index CameraActor::NEAR_PLANE_DISTANCE     = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 4;
-const Property::Index CameraActor::FAR_PLANE_DISTANCE      = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 5;
-const Property::Index CameraActor::LEFT_PLANE_DISTANCE     = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 6;
-const Property::Index CameraActor::RIGHT_PLANE_DISTANCE    = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 7;
-const Property::Index CameraActor::TOP_PLANE_DISTANCE      = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 8;
-const Property::Index CameraActor::BOTTOM_PLANE_DISTANCE   = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 9;
-const Property::Index CameraActor::TARGET_POSITION         = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 10;
-const Property::Index CameraActor::PROJECTION_MATRIX       = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 11;
-const Property::Index CameraActor::VIEW_MATRIX             = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 12;
-const Property::Index CameraActor::INVERT_Y_AXIS           = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 13;
+const Property::Index CameraActor::TYPE                    = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+const Property::Index CameraActor::PROJECTION_MODE         = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index CameraActor::FIELD_OF_VIEW           = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index CameraActor::ASPECT_RATIO            = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index CameraActor::NEAR_PLANE_DISTANCE     = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 4;
+const Property::Index CameraActor::FAR_PLANE_DISTANCE      = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 5;
+const Property::Index CameraActor::LEFT_PLANE_DISTANCE     = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 6;
+const Property::Index CameraActor::RIGHT_PLANE_DISTANCE    = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 7;
+const Property::Index CameraActor::TOP_PLANE_DISTANCE      = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 8;
+const Property::Index CameraActor::BOTTOM_PLANE_DISTANCE   = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 9;
+const Property::Index CameraActor::TARGET_POSITION         = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 10;
+const Property::Index CameraActor::PROJECTION_MATRIX       = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 11;
+const Property::Index CameraActor::VIEW_MATRIX             = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 12;
+const Property::Index CameraActor::INVERT_Y_AXIS           = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 13;
 
 namespace Internal
 {
@@ -467,6 +467,17 @@ bool CameraActor::IsDefaultPropertyAnimatable( Property::Index index ) const
   if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
     animatable = Actor::IsDefaultPropertyAnimatable(index);
+  }
+  return animatable;
+}
+
+bool CameraActor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  bool animatable = true; // Our properties can be used as inputs to constraints.
+
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  {
+    animatable = Actor::IsDefaultPropertyAConstraintInput(index);
   }
   return animatable;
 }

@@ -75,6 +75,11 @@ public:
   virtual bool IsPropertyAnimatable(Property::Index index) const = 0;
 
   /**
+   * @copydoc Dali::Handle::IsPropertyAConstraintInput()
+   */
+  virtual bool IsPropertyAConstraintInput(Property::Index index) const = 0;
+
+  /**
    * @copydoc Dali::Handle::GetPropertyType()
    */
   virtual Property::Type GetPropertyType(Property::Index index) const = 0;

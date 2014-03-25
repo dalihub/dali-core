@@ -56,9 +56,9 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PRO
 } // unnamed namespace
 
 ProxyObject::ProxyObject()
-: mTypeInfo( NULL ),
-  mNextCustomPropertyIndex( 0u ),
+: mNextCustomPropertyIndex( 0u ),
   mCustomProperties( NULL ),
+  mTypeInfo( NULL ),
   mConstraints( NULL ),
   mRemovedConstraints( NULL ),
   mPropertyNotifications( NULL )
@@ -269,6 +269,33 @@ bool ProxyObject::IsPropertyAnimatable( Property::Index index ) const
     DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
 
     return entry->second.IsAnimatable();
+  }
+  return false;
+}
+
+bool ProxyObject::IsPropertyAConstraintInput(Property::Index index) const
+{
+  DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds");
+
+  if ( index < DEFAULT_PROPERTY_MAX_COUNT )
+  {
+    return IsDefaultPropertyAConstraintInput( index );
+  }
+
+  if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
+  {
+    // Type Registry event-thread only properties cannot be used as an input to a constraint.
+    return false;
+  }
+
+  if( mCustomProperties )
+  {
+    // Check custom property
+    CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
+    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
+
+    // ... custom properties can be used as input to a constraint.
+    return true;
   }
   return false;
 }
@@ -561,7 +588,7 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
   // Default properties start from index zero
   if ( 0u == mNextCustomPropertyIndex )
   {
-    mNextCustomPropertyIndex = CUSTOM_PROPERTY_START;
+    mNextCustomPropertyIndex = PROPERTY_CUSTOM_START_INDEX;
   }
 
   // Add entry to the property lookup
@@ -591,7 +618,7 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
     // Default properties start from index zero
     if ( 0u == mNextCustomPropertyIndex )
     {
-      mNextCustomPropertyIndex = CUSTOM_PROPERTY_START;
+      mNextCustomPropertyIndex = PROPERTY_CUSTOM_START_INDEX;
     }
 
     // Add entry to the property lookup

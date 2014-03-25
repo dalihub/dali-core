@@ -144,7 +144,6 @@ public:
   /**
    * @brief Query the name of a property.
    *
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @param [in] index The index of the property.
    * @return The name of the property.
    */
@@ -161,7 +160,7 @@ public:
   /**
    * @brief Query whether a property can be set using SetProperty().
    *
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
+   * @pre Property::INVALID_INDEX < index.
    * @param [in] index The index of the property.
    * @return True if the property is writable.
    */
@@ -170,16 +169,22 @@ public:
   /**
    * @brief Query whether a writable property can be the target of an animation or constraint.
    *
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @param [in] index The index of the property.
    * @return True if the property is animatable.
    */
   bool IsPropertyAnimatable(Property::Index index) const;
 
   /**
+   * @brief Query whether a property can be used as in input to a constraint.
+   *
+   * @param [in] index The index of the property.
+   * @return True if the property can be used as a constraint input.
+   */
+  bool IsPropertyAConstraintInput(Property::Index index) const;
+
+  /**
    * @brief Query the type of a property.
    *
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @param [in] index The index of the property.
    * @return The type of the property.
    */
@@ -189,7 +194,6 @@ public:
    * @brief Set the value of an existing property.
    *
    * @pre Handle::IsPropertyWritable(index) returns true.
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @pre The property types match i.e. propertyValue.GetType() is equal to GetPropertyType(index).
    * @param [in] index The index of the property.
    * @param [in] propertyValue The new value of the property.
@@ -223,7 +227,6 @@ public:
   /**
    * @brief Retrieve a property value.
    *
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @param [in] index The index of the property.
    * @return The property value.
    */
@@ -232,7 +235,6 @@ public:
   /**
    * @brief Convenience function for obtaining a property of a known type.
    *
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @pre The property types match i.e. PropertyTypes::Get<T>() is equal to GetPropertyType(index).
    * @param [in] index The index of the property.
    * @return The property value.
@@ -256,7 +258,6 @@ public:
   /**
    * @brief Add a property notification to this object.
    *
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @param [in] index The index of the property.
    * @param [in] condition The notification will be triggered when this condition is satisfied.
    *
@@ -268,7 +269,6 @@ public:
   /**
    * @brief Add a property notification to this object.
    *
-   * @pre Property::INVALID_INDEX < index < GetPropertyCount().
    * @param [in] index The index of the property.
    * @param [in] componentIndex Index to the component of a complex property such as a Vector
    * @param [in] condition The notification will be triggered when this condition is satisfied.

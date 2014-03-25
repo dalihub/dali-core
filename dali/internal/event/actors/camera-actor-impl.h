@@ -197,6 +197,11 @@ public: // properties
   virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;
 
   /**
+   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAConstraintInput()
+   */
+  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
+
+  /**
    * copydoc Dali::Internal::ProxyObject
    */
   virtual Property::Type GetDefaultPropertyType( Property::Index index ) const;

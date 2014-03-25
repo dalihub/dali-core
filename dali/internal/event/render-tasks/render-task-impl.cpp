@@ -503,6 +503,11 @@ bool RenderTask::IsDefaultPropertyAnimatable(Property::Index index) const
   return true;
 }
 
+bool RenderTask::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  return true;
+}
+
 Property::Type RenderTask::GetDefaultPropertyType(Property::Index index) const
 {
   if( index < DEFAULT_PROPERTY_COUNT )

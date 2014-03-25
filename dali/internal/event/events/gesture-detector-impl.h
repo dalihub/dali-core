@@ -206,6 +206,11 @@ private: // Default property extensions from ProxyObject
   virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
 
   /**
+   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAConstraintInput()
+   */
+  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
+
+  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyType()
    */
   virtual Property::Type GetDefaultPropertyType(Property::Index index) const;

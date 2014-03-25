@@ -25,14 +25,14 @@
 namespace Dali
 {
 
-const Property::Index LightActor::LIGHT_TYPE              = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-const Property::Index LightActor::ENABLE                  = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 1;
-const Property::Index LightActor::FALL_OFF                = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 2;
-const Property::Index LightActor::SPOT_ANGLE              = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 3;
-const Property::Index LightActor::AMBIENT_COLOR           = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 4;
-const Property::Index LightActor::DIFFUSE_COLOR           = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 5;
-const Property::Index LightActor::SPECULAR_COLOR          = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 6;
-const Property::Index LightActor::DIRECTION               = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 7;
+const Property::Index LightActor::LIGHT_TYPE              = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+const Property::Index LightActor::ENABLE                  = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index LightActor::FALL_OFF                = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index LightActor::SPOT_ANGLE              = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index LightActor::AMBIENT_COLOR           = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 4;
+const Property::Index LightActor::DIFFUSE_COLOR           = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 5;
+const Property::Index LightActor::SPECULAR_COLOR          = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 6;
+const Property::Index LightActor::DIRECTION               = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 7;
 
 namespace Internal
 {
@@ -241,6 +241,15 @@ bool LightActor::IsDefaultPropertyAnimatable( Property::Index index ) const
   {
     return false ;
   }
+}
+
+bool LightActor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  {
+    return Actor::IsDefaultPropertyAConstraintInput(index);
+  }
+  return true; // Our properties can be used as input to constraints.
 }
 
 Property::Type LightActor::GetDefaultPropertyType( Property::Index index ) const

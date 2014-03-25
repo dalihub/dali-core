@@ -573,6 +573,11 @@ bool ShaderEffect::IsDefaultPropertyAnimatable(Property::Index index) const
   return false;
 }
 
+bool ShaderEffect::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  return false;
+}
+
 Property::Type ShaderEffect::GetDefaultPropertyType(Property::Index index) const
 {
   if( index < DEFAULT_PROPERTY_COUNT )

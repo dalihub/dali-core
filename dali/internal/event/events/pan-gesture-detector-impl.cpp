@@ -31,10 +31,10 @@
 namespace Dali
 {
 
-const Property::Index PanGestureDetector::SCREEN_POSITION      = DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
-const Property::Index PanGestureDetector::SCREEN_DISPLACEMENT  = DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 1;
-const Property::Index PanGestureDetector::LOCAL_POSITION       = DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 2;
-const Property::Index PanGestureDetector::LOCAL_DISPLACEMENT   = DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index PanGestureDetector::SCREEN_POSITION      = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
+const Property::Index PanGestureDetector::SCREEN_DISPLACEMENT  = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index PanGestureDetector::LOCAL_POSITION       = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index PanGestureDetector::LOCAL_DISPLACEMENT   = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 3;
 
 namespace Internal
 {
@@ -397,6 +397,12 @@ bool PanGestureDetector::IsDefaultPropertyAnimatable(Property::Index index) cons
 {
   // None of our properties are animatable
   return false;
+}
+
+bool PanGestureDetector::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  // All our properties can be used as an input to a constraint.
+  return true;
 }
 
 Property::Type PanGestureDetector::GetDefaultPropertyType(Property::Index index) const

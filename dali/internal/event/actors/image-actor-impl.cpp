@@ -26,12 +26,12 @@
 namespace Dali
 {
 
-const Property::Index ImageActor::PIXEL_AREA           = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
-const Property::Index ImageActor::FADE_IN              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 1;
-const Property::Index ImageActor::FADE_IN_DURATION     = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 2;
-const Property::Index ImageActor::STYLE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 3;
-const Property::Index ImageActor::BORDER               = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 4;
-const Property::Index ImageActor::IMAGE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 5;
+const Property::Index ImageActor::PIXEL_AREA           = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+const Property::Index ImageActor::FADE_IN              = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index ImageActor::FADE_IN_DURATION     = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index ImageActor::STYLE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index ImageActor::BORDER               = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 4;
+const Property::Index ImageActor::IMAGE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 5;
 
 namespace Internal
 {
@@ -71,7 +71,7 @@ const Property::Type DEFAULT_IMAGE_ACTOR_PROPERTY_TYPES[DEFAULT_IMAGE_ACTOR_PROP
 
 ImageActor::Style StyleEnum(const std::string &s)
 {
-  if(s == "NINE_PATCH")
+  if(s == "STYLE_NINE_PATCH")
   {
     return Dali::ImageActor::STYLE_NINE_PATCH;
   }
@@ -85,7 +85,7 @@ std::string StyleString(const ImageActor::Style style)
 {
   if(style == Dali::ImageActor::STYLE_NINE_PATCH)
   {
-    return "NINE_PATCH";
+    return "STYLE_NINE_PATCH";
   }
   else // if(s == "QUAD")
   {
@@ -464,6 +464,15 @@ bool ImageActor::IsDefaultPropertyAnimatable( Property::Index index ) const
   }
 }
 
+bool ImageActor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  if( index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT )
+  {
+    return RenderableActor::IsDefaultPropertyAConstraintInput(index);
+  }
+  return true; // Our properties can be used as input to constraints.
+}
+
 Property::Type ImageActor::GetDefaultPropertyType( Property::Index index ) const
 {
   if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
@@ -627,7 +636,9 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
       }
       case Dali::ImageActor::IMAGE:
       {
-        ret = Property::Value(Property::MAP);
+        Property::Map map;
+        Scripting::CreatePropertyMap( mImageAttachment->GetImage(), map );
+        ret = Property::Value( map );
         break;
       }
       default:

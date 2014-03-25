@@ -77,6 +77,7 @@ TEST_FUNCTION( UtcDaliImageActorNewNull,              POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliImageActorNewNullWithArea,      POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliImageActorSetImage,             POSITIVE_TC_IDX );
 TEST_FUNCTION( UtcDaliImageActorPropertyIndices,      POSITIVE_TC_IDX );
+TEST_FUNCTION( UtcDaliImageActorImageProperty,        POSITIVE_TC_IDX );
 
 // Called only once before first test is run.
 static void Startup()
@@ -971,4 +972,19 @@ void UtcDaliImageActorPropertyIndices()
   imageActor.GetPropertyIndices( indices );
   DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
   DALI_TEST_EQUALS( indices.size(), imageActor.GetPropertyCount(), TEST_LOCATION );
+}
+
+void UtcDaliImageActorImageProperty()
+{
+  TestApplication application;
+  Image image = Image::New( "MY_PATH" );
+  ImageActor imageActor = ImageActor::New( image );
+
+  Stage::GetCurrent().Add( imageActor );
+  application.SendNotification();
+  application.Render();
+
+  Property::Value imageMap = imageActor.GetProperty( ImageActor::IMAGE );
+  DALI_TEST_CHECK( imageMap.HasKey( "filename" ) );
+  DALI_TEST_EQUALS( imageMap.GetValue( "filename" ).Get< std::string >(), "MY_PATH", TEST_LOCATION );
 }

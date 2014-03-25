@@ -29,15 +29,16 @@ namespace Dali DALI_IMPORT_API
 {
 
 /**
- * @brief PropertyRegistration indices should be between this range.
+ * @brief These are the property index ranges.
  *
  * Enumerations are being used here rather than static constants so that switch statements can be
  * used to compare property indices.
  */
-enum PropertyRegistrationIndices
+enum
 {
   PROPERTY_REGISTRATION_START_INDEX = 10000000,   ///< The index when registering a property should start from this number
-  PROPERTY_REGISTRATION_MAX_INDEX   = 19999999    ///< The maximum index supported when registering a property
+  PROPERTY_REGISTRATION_MAX_INDEX   = 19999999,   ///< The maximum index supported when registering a property
+  PROPERTY_CUSTOM_START_INDEX       = 50000000,   ///< The index at which custom properties start
 };
 
 } // namespace Dali

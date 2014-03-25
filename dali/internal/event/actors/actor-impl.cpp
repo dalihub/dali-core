@@ -29,6 +29,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/scripting/scripting.h>
 
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -64,133 +65,107 @@ using namespace std;
 namespace Dali
 {
 
-const Property::Index Actor::PARENT_ORIGIN     = 0;
-const Property::Index Actor::PARENT_ORIGIN_X   = 1;
-const Property::Index Actor::PARENT_ORIGIN_Y   = 2;
-const Property::Index Actor::PARENT_ORIGIN_Z   = 3;
-const Property::Index Actor::ANCHOR_POINT      = 4;
-const Property::Index Actor::ANCHOR_POINT_X    = 5;
-const Property::Index Actor::ANCHOR_POINT_Y    = 6;
-const Property::Index Actor::ANCHOR_POINT_Z    = 7;
-const Property::Index Actor::SIZE              = 8;
-const Property::Index Actor::SIZE_WIDTH        = 9;
-const Property::Index Actor::SIZE_HEIGHT       = 10;
-const Property::Index Actor::SIZE_DEPTH        = 11;
-const Property::Index Actor::POSITION          = 12;
-const Property::Index Actor::POSITION_X        = 13;
-const Property::Index Actor::POSITION_Y        = 14;
-const Property::Index Actor::POSITION_Z        = 15;
-const Property::Index Actor::WORLD_POSITION    = 16;
-const Property::Index Actor::WORLD_POSITION_X  = 17;
-const Property::Index Actor::WORLD_POSITION_Y  = 18;
-const Property::Index Actor::WORLD_POSITION_Z  = 19;
-const Property::Index Actor::ROTATION          = 20;
-const Property::Index Actor::WORLD_ROTATION    = 21;
-const Property::Index Actor::SCALE             = 22;
-const Property::Index Actor::SCALE_X           = 23;
-const Property::Index Actor::SCALE_Y           = 24;
-const Property::Index Actor::SCALE_Z           = 25;
-const Property::Index Actor::WORLD_SCALE       = 26;
-const Property::Index Actor::VISIBLE           = 27;
-const Property::Index Actor::COLOR             = 28;
-const Property::Index Actor::COLOR_RED         = 29;
-const Property::Index Actor::COLOR_GREEN       = 30;
-const Property::Index Actor::COLOR_BLUE        = 31;
-const Property::Index Actor::COLOR_ALPHA       = 32;
-const Property::Index Actor::WORLD_COLOR       = 33;
-const Property::Index Actor::WORLD_MATRIX      = 34;
-const Property::Index Actor::NAME              = 35;
+const Property::Index Actor::PARENT_ORIGIN              = 0;
+const Property::Index Actor::PARENT_ORIGIN_X            = 1;
+const Property::Index Actor::PARENT_ORIGIN_Y            = 2;
+const Property::Index Actor::PARENT_ORIGIN_Z            = 3;
+const Property::Index Actor::ANCHOR_POINT               = 4;
+const Property::Index Actor::ANCHOR_POINT_X             = 5;
+const Property::Index Actor::ANCHOR_POINT_Y             = 6;
+const Property::Index Actor::ANCHOR_POINT_Z             = 7;
+const Property::Index Actor::SIZE                       = 8;
+const Property::Index Actor::SIZE_WIDTH                 = 9;
+const Property::Index Actor::SIZE_HEIGHT                = 10;
+const Property::Index Actor::SIZE_DEPTH                 = 11;
+const Property::Index Actor::POSITION                   = 12;
+const Property::Index Actor::POSITION_X                 = 13;
+const Property::Index Actor::POSITION_Y                 = 14;
+const Property::Index Actor::POSITION_Z                 = 15;
+const Property::Index Actor::WORLD_POSITION             = 16;
+const Property::Index Actor::WORLD_POSITION_X           = 17;
+const Property::Index Actor::WORLD_POSITION_Y           = 18;
+const Property::Index Actor::WORLD_POSITION_Z           = 19;
+const Property::Index Actor::ROTATION                   = 20;
+const Property::Index Actor::WORLD_ROTATION             = 21;
+const Property::Index Actor::SCALE                      = 22;
+const Property::Index Actor::SCALE_X                    = 23;
+const Property::Index Actor::SCALE_Y                    = 24;
+const Property::Index Actor::SCALE_Z                    = 25;
+const Property::Index Actor::WORLD_SCALE                = 26;
+const Property::Index Actor::VISIBLE                    = 27;
+const Property::Index Actor::COLOR                      = 28;
+const Property::Index Actor::COLOR_RED                  = 29;
+const Property::Index Actor::COLOR_GREEN                = 30;
+const Property::Index Actor::COLOR_BLUE                 = 31;
+const Property::Index Actor::COLOR_ALPHA                = 32;
+const Property::Index Actor::WORLD_COLOR                = 33;
+const Property::Index Actor::WORLD_MATRIX               = 34;
+const Property::Index Actor::NAME                       = 35;
+const Property::Index Actor::SENSITIVE                  = 36;
+const Property::Index Actor::LEAVE_REQUIRED             = 37;
+const Property::Index Actor::INHERIT_SHADER_EFFECT      = 38;
+const Property::Index Actor::INHERIT_ROTATION           = 39;
+const Property::Index Actor::INHERIT_SCALE              = 40;
+const Property::Index Actor::COLOR_MODE                 = 41;
+const Property::Index Actor::POSITION_INHERITANCE       = 42;
+const Property::Index Actor::DRAW_MODE                  = 43;
 
 namespace // unnamed namespace
 {
-
-/// An empty string returned for invalid property name lookups
-const std::string INVALID_PROPERTY_NAME;
 
 /**
  * We want to discourage the use of property strings (minimize string comparisons),
  * particularly for the default properties.
  */
-const std::string DEFAULT_PROPERTY_NAMES[] =
+const Internal::PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
 {
-  "parent-origin",
-  "parent-origin-x",
-  "parent-origin-y",
-  "parent-origin-z",
-  "anchor-point",
-  "anchor-point-x",
-  "anchor-point-y",
-  "anchor-point-z",
-  "size",
-  "size-width",
-  "size-height",
-  "size-depth",
-  "position",
-  "position-x",
-  "position-y",
-  "position-z",
-  "world-position",
-  "world-position-x",
-  "world-position-y",
-  "world-position-z",
-  "rotation",
-  "world-rotation",
-  "scale",
-  "scale-x",
-  "scale-y",
-  "scale-z",
-  "world-scale",
-  "visible",
-  "color",
-  "color-red",
-  "color-green",
-  "color-blue",
-  "color-alpha",
-  "world-color",
-  "world-matrix",
-  "name"
+  // Name                     Type              writable animatable constraint-input
+  { "parent-origin",          Property::VECTOR3,  true,    false,   true  },  // PARENT_ORIGIN
+  { "parent-origin-x",        Property::FLOAT,    true,    false,   true  },  // PARENT_ORIGIN_X
+  { "parent-origin-y",        Property::FLOAT,    true,    false,   true  },  // PARENT_ORIGIN_Y
+  { "parent-origin-z",        Property::FLOAT,    true,    false,   true  },  // PARENT_ORIGIN_Z
+  { "anchor-point",           Property::VECTOR3,  true,    false,   true  },  // ANCHOR_POINT
+  { "anchor-point-x",         Property::FLOAT,    true,    false,   true  },  // ANCHOR_POINT_X
+  { "anchor-point-y",         Property::FLOAT,    true,    false,   true  },  // ANCHOR_POINT_Y
+  { "anchor-point-z",         Property::FLOAT,    true,    false,   true  },  // ANCHOR_POINT_Z
+  { "size",                   Property::VECTOR3,  true,    true,    true  },  // SIZE
+  { "size-width",             Property::FLOAT,    true,    true,    true  },  // SIZE_WIDTH
+  { "size-height",            Property::FLOAT,    true,    true,    true  },  // SIZE_HEIGHT
+  { "size-depth",             Property::FLOAT,    true,    true,    true  },  // SIZE_DEPTH
+  { "position",               Property::VECTOR3,  true,    true,    true  },  // POSITION
+  { "position-x",             Property::FLOAT,    true,    true,    true  },  // POSITION_X
+  { "position-y",             Property::FLOAT,    true,    true,    true  },  // POSITION_Y
+  { "position-z",             Property::FLOAT,    true,    true,    true  },  // POSITION_Z
+  { "world-position",         Property::VECTOR3,  false,   false,   true  },  // WORLD_POSITION
+  { "world-position-x",       Property::FLOAT,    false,   false,   true  },  // WORLD_POSITION_X
+  { "world-position-y",       Property::FLOAT,    false,   false,   true  },  // WORLD_POSITION_Y
+  { "world-position-z",       Property::FLOAT,    false,   false,   true  },  // WORLD_POSITION_Z
+  { "rotation",               Property::ROTATION, true,    true,    true  },  // ROTATION
+  { "world-rotation",         Property::ROTATION, false,   false,   true  },  // WORLD_ROTATION
+  { "scale",                  Property::VECTOR3,  true,    true,    true  },  // SCALE
+  { "scale-x",                Property::FLOAT,    true,    true,    true  },  // SCALE_X
+  { "scale-y",                Property::FLOAT,    true,    true,    true  },  // SCALE_Y
+  { "scale-z",                Property::FLOAT,    true,    true,    true  },  // SCALE_Z
+  { "world-scale",            Property::VECTOR3,  false,   false,   true  },  // WORLD_SCALE
+  { "visible",                Property::BOOLEAN,  true,    true,    true  },  // VISIBLE
+  { "color",                  Property::VECTOR4,  true,    true,    true  },  // COLOR
+  { "color-red",              Property::FLOAT,    true,    true,    true  },  // COLOR_RED
+  { "color-green",            Property::FLOAT,    true,    true,    true  },  // COLOR_GREEN
+  { "color-blue",             Property::FLOAT,    true,    true,    true  },  // COLOR_BLUE
+  { "color-alpha",            Property::FLOAT,    true,    true,    true  },  // COLOR_ALPHA
+  { "world-color",            Property::VECTOR4,  false,   false,   true  },  // WORLD_COLOR
+  { "world-matrix",           Property::MATRIX,   false,   false,   true  },  // WORLD_MATRIX
+  { "name",                   Property::STRING,   true,    false,   false },  // NAME
+  { "sensitive",              Property::BOOLEAN,  true,    false,   false },  // SENSITIVE
+  { "leave-required",         Property::BOOLEAN,  true,    false,   false },  // LEAVE_REQUIRED
+  { "inherit-shader-effect",  Property::BOOLEAN,  true,    false,   false },  // INHERIT_SHADER_EFFECT
+  { "inherit-rotation",       Property::BOOLEAN,  true,    false,   false },  // INHERIT_ROTATION
+  { "inherit-scale",          Property::BOOLEAN,  true,    false,   false },  // INHERIT_SCALE
+  { "color-mode",             Property::STRING,   true,    false,   false },  // COLOR_MODE
+  { "position-inheritance",   Property::STRING,   true,    false,   false },  // POSITION_INHERITANCE
+  { "draw-mode",              Property::STRING,   true,    false,   false },  // DRAW_MODE
 };
-const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_NAMES ) / sizeof( std::string );
-
-const Property::Type DEFAULT_PROPERTY_TYPES[DEFAULT_PROPERTY_COUNT] =
-{
-  Property::VECTOR3,  // PARENT_ORIGIN
-  Property::FLOAT,    // PARENT_ORIGIN_X
-  Property::FLOAT,    // PARENT_ORIGIN_Y
-  Property::FLOAT,    // PARENT_ORIGIN_Z
-  Property::VECTOR3,  // ANCHOR_POINT
-  Property::FLOAT,    // ANCHOR_POINT_X
-  Property::FLOAT,    // ANCHOR_POINT_Y
-  Property::FLOAT,    // ANCHOR_POINT_Z
-  Property::VECTOR3,  // SIZE
-  Property::FLOAT,    // SIZE_WIDTH
-  Property::FLOAT,    // SIZE_HEIGHT
-  Property::FLOAT,    // SIZE_DEPTH
-  Property::VECTOR3,  // POSITION
-  Property::FLOAT,    // POSITION_X
-  Property::FLOAT,    // POSITION_Y
-  Property::FLOAT,    // POSITION_Z
-  Property::VECTOR3,  // WORLD_POSITION
-  Property::FLOAT,    // WORLD_POSITION_X
-  Property::FLOAT,    // WORLD_POSITION_Y
-  Property::FLOAT,    // WORLD_POSITION_Z
-  Property::ROTATION, // ROTATION
-  Property::ROTATION, // WORLD_ROTATION
-  Property::VECTOR3,  // SCALE
-  Property::FLOAT,    // SCALE_X
-  Property::FLOAT,    // SCALE_Y
-  Property::FLOAT,    // SCALE_Z
-  Property::VECTOR3,  // WORLD_SCALE
-  Property::BOOLEAN,  // VISIBLE
-  Property::VECTOR4,  // COLOR
-  Property::FLOAT,    // COLOR_RED
-  Property::FLOAT,    // COLOR_GREEN
-  Property::FLOAT,    // COLOR_BLUE
-  Property::FLOAT,    // COLOR_ALPHA
-  Property::VECTOR4,  // WORLD_COLOR
-  Property::MATRIX,   // WORLD_MATRIX
-  Property::STRING,   // NAME
-};
+const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails );
 
 } // unnamed namespace
 
@@ -2043,7 +2018,7 @@ void Actor::Initialize()
 
     for (int i=0; i<DEFAULT_PROPERTY_COUNT; ++i)
     {
-      (*mDefaultPropertyLookup)[DEFAULT_PROPERTY_NAMES[i]] = i;
+      (*mDefaultPropertyLookup)[DEFAULT_PROPERTY_DETAILS[i].name] = i;
     }
   }
 
@@ -2337,12 +2312,12 @@ const std::string& Actor::GetDefaultPropertyName( Property::Index index ) const
 {
   if( index < DEFAULT_PROPERTY_COUNT )
   {
-    return DEFAULT_PROPERTY_NAMES[index];
+    return DEFAULT_PROPERTY_DETAILS[index].name;
   }
   else
   {
     // index out of range..return empty string
-    return INVALID_PROPERTY_NAME;
+    return String::EMPTY;
   }
 }
 
@@ -2364,43 +2339,45 @@ Property::Index Actor::GetDefaultPropertyIndex(const std::string& name) const
 
 bool Actor::IsDefaultPropertyWritable(Property::Index index) const
 {
-  // World-properties are not writable
-  return ( Dali::Actor::WORLD_POSITION   != index &&
-           Dali::Actor::WORLD_POSITION_X != index &&
-           Dali::Actor::WORLD_POSITION_Y != index &&
-           Dali::Actor::WORLD_POSITION_Z != index &&
-           Dali::Actor::WORLD_ROTATION   != index &&
-           Dali::Actor::WORLD_SCALE      != index &&
-           Dali::Actor::WORLD_COLOR      != index &&
-           Dali::Actor::WORLD_MATRIX     != index);
+  if( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return DEFAULT_PROPERTY_DETAILS[index].writable;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 bool Actor::IsDefaultPropertyAnimatable(Property::Index index) const
 {
-  // ParentOrigin, AnchorPoint & World-properties are not animatable
-  return ( Dali::Actor::PARENT_ORIGIN    != index &&
-           Dali::Actor::PARENT_ORIGIN_X  != index &&
-           Dali::Actor::PARENT_ORIGIN_Y  != index &&
-           Dali::Actor::PARENT_ORIGIN_Z  != index &&
-           Dali::Actor::ANCHOR_POINT     != index &&
-           Dali::Actor::ANCHOR_POINT_X   != index &&
-           Dali::Actor::ANCHOR_POINT_Y   != index &&
-           Dali::Actor::ANCHOR_POINT_Z   != index &&
-           Dali::Actor::WORLD_POSITION   != index &&
-           Dali::Actor::WORLD_POSITION_X != index &&
-           Dali::Actor::WORLD_POSITION_Y != index &&
-           Dali::Actor::WORLD_POSITION_Z != index &&
-           Dali::Actor::WORLD_ROTATION   != index &&
-           Dali::Actor::WORLD_SCALE      != index &&
-           Dali::Actor::WORLD_COLOR      != index &&
-           Dali::Actor::WORLD_MATRIX     != index);
+  if( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return DEFAULT_PROPERTY_DETAILS[index].animatable;
+  }
+  else
+  {
+    return false;
+  }
+}
+
+bool Actor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  if( index < DEFAULT_PROPERTY_COUNT )
+  {
+    return DEFAULT_PROPERTY_DETAILS[index].constraintInput;
+  }
+  else
+  {
+    return false;
+  }
 }
 
 Property::Type Actor::GetDefaultPropertyType(Property::Index index) const
 {
   if( index < DEFAULT_PROPERTY_COUNT )
   {
-    return DEFAULT_PROPERTY_TYPES[index];
+    return DEFAULT_PROPERTY_DETAILS[index].type;
   }
   else
   {
@@ -2578,6 +2555,54 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::Actor::NAME:
     {
       SetName( property.Get<std::string>() );
+      break;
+    }
+
+    case Dali::Actor::SENSITIVE:
+    {
+      SetSensitive( property.Get<bool>() );
+      break;
+    }
+
+    case Dali::Actor::LEAVE_REQUIRED:
+    {
+      SetLeaveRequired( property.Get<bool>() );
+      break;
+    }
+
+    case Dali::Actor::INHERIT_SHADER_EFFECT:
+    {
+      SetInheritShaderEffect( property.Get<bool>() );
+      break;
+    }
+
+    case Dali::Actor::INHERIT_ROTATION:
+    {
+      SetInheritRotation( property.Get<bool>() );
+      break;
+    }
+
+    case Dali::Actor::INHERIT_SCALE:
+    {
+      SetInheritScale( property.Get<bool>() );
+      break;
+    }
+
+    case Dali::Actor::COLOR_MODE:
+    {
+      SetColorMode( Scripting::GetColorMode( property.Get<std::string>() ) );
+      break;
+    }
+
+    case Dali::Actor::POSITION_INHERITANCE:
+    {
+      SetPositionInheritanceMode( Scripting::GetPositionInheritanceMode( property.Get<std::string>() ) );
+      break;
+    }
+
+    case Dali::Actor::DRAW_MODE:
+    {
+      SetDrawMode( Scripting::GetDrawMode( property.Get<std::string>() ) );
       break;
     }
 
@@ -2894,6 +2919,54 @@ Property::Value Actor::GetDefaultProperty(Property::Index index) const
     case Dali::Actor::NAME:
     {
       value = GetName();
+      break;
+    }
+
+    case Dali::Actor::SENSITIVE:
+    {
+      value = IsSensitive();
+      break;
+    }
+
+    case Dali::Actor::LEAVE_REQUIRED:
+    {
+      value = GetLeaveRequired();
+      break;
+    }
+
+    case Dali::Actor::INHERIT_SHADER_EFFECT:
+    {
+      value = GetInheritShaderEffect();
+      break;
+    }
+
+    case Dali::Actor::INHERIT_ROTATION:
+    {
+      value = IsRotationInherited();
+      break;
+    }
+
+    case Dali::Actor::INHERIT_SCALE:
+    {
+      value = IsScaleInherited();
+      break;
+    }
+
+    case Dali::Actor::COLOR_MODE:
+    {
+      value = Scripting::GetColorMode( GetColorMode() );
+      break;
+    }
+
+    case Dali::Actor::POSITION_INHERITANCE:
+    {
+      value = Scripting::GetPositionInheritanceMode( GetPositionInheritanceMode() );
+      break;
+    }
+
+    case Dali::Actor::DRAW_MODE:
+    {
+      value = Scripting::GetDrawMode( GetDrawMode() );
       break;
     }
 

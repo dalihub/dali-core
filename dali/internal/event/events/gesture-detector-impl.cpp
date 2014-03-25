@@ -221,6 +221,11 @@ bool GestureDetector::IsDefaultPropertyAnimatable(Property::Index index) const
   return false;
 }
 
+bool GestureDetector::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  return false;
+}
+
 Property::Type GestureDetector::GetDefaultPropertyType(Property::Index index) const
 {
   return Property::NONE;

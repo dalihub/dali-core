@@ -90,6 +90,11 @@ bool Handle::IsPropertyAnimatable(Property::Index index) const
   return GetImplementation(*this).IsPropertyAnimatable( index );
 }
 
+bool Handle::IsPropertyAConstraintInput(Property::Index index) const
+{
+  return GetImplementation(*this).IsPropertyAConstraintInput( index );
+}
+
 Property::Type Handle::GetPropertyType(Property::Index index) const
 {
   return GetImplementation(*this).GetPropertyType( index );

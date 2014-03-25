@@ -29,6 +29,7 @@ PUBLIC
     ^signals
     ^text
     ^type-registry
+    ^scripting
 
 actors
     :include:/dali-test-suite/actors/tslist
@@ -84,13 +85,16 @@ context
 common
     :include:/dali-test-suite/common/tslist
 
+scripting
+    :include:/dali-test-suite/scripting/tslist
+
 ##### INTERNAL Tests #####
 
 INTERNAL
-    :include:/dali-internal-test-suite/resource-manager/tslist
-    :include:/dali-internal-test-suite/text/tslist
-    :include:/dali-internal-test-suite/material/tslist
-    :include:/dali-internal-test-suite/image-factory/tslist
+    ^resource-manager
+    ^internal-text
+    ^internal-material
+    ^image-factory
 
 resource-manager
     :include:/dali-internal-test-suite/resource-manager/tslist

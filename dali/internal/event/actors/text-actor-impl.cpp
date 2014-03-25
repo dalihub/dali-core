@@ -31,28 +31,28 @@
 namespace Dali
 {
 
-const Property::Index TextActor::TEXT                       = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
-const Property::Index TextActor::FONT                       = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 1;
-const Property::Index TextActor::FONT_STYLE                 = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 2;
-const Property::Index TextActor::OUTLINE_ENABLE             = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 3;
-const Property::Index TextActor::OUTLINE_COLOR              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 4;
-const Property::Index TextActor::OUTLINE_THICKNESS_WIDTH    = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 5;
-const Property::Index TextActor::SMOOTH_EDGE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 6;
-const Property::Index TextActor::GLOW_ENABLE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 7;
-const Property::Index TextActor::GLOW_COLOR                 = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 8;
-const Property::Index TextActor::GLOW_INTENSITY             = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 9;
-const Property::Index TextActor::SHADOW_ENABLE              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 10;
-const Property::Index TextActor::SHADOW_COLOR               = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 11;
-const Property::Index TextActor::SHADOW_OFFSET              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 12;
-const Property::Index TextActor::ITALICS_ANGLE              = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 13;
-const Property::Index TextActor::UNDERLINE                  = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 14;
-const Property::Index TextActor::WEIGHT                     = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 15;
-const Property::Index TextActor::FONT_DETECTION_AUTOMATIC   = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 16;
-const Property::Index TextActor::GRADIENT_COLOR             = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 17;
-const Property::Index TextActor::GRADIENT_START_POINT       = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 18;
-const Property::Index TextActor::GRADIENT_END_POINT         = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 19;
-const Property::Index TextActor::SHADOW_SIZE                = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 20;
-const Property::Index TextActor::TEXT_COLOR                 = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 21;
+const Property::Index TextActor::TEXT                       = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+const Property::Index TextActor::FONT                       = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index TextActor::FONT_STYLE                 = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index TextActor::OUTLINE_ENABLE             = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index TextActor::OUTLINE_COLOR              = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 4;
+const Property::Index TextActor::OUTLINE_THICKNESS_WIDTH    = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 5;
+const Property::Index TextActor::SMOOTH_EDGE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 6;
+const Property::Index TextActor::GLOW_ENABLE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 7;
+const Property::Index TextActor::GLOW_COLOR                 = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 8;
+const Property::Index TextActor::GLOW_INTENSITY             = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 9;
+const Property::Index TextActor::SHADOW_ENABLE              = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 10;
+const Property::Index TextActor::SHADOW_COLOR               = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 11;
+const Property::Index TextActor::SHADOW_OFFSET              = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 12;
+const Property::Index TextActor::ITALICS_ANGLE              = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 13;
+const Property::Index TextActor::UNDERLINE                  = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 14;
+const Property::Index TextActor::WEIGHT                     = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 15;
+const Property::Index TextActor::FONT_DETECTION_AUTOMATIC   = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 16;
+const Property::Index TextActor::GRADIENT_COLOR             = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 17;
+const Property::Index TextActor::GRADIENT_START_POINT       = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 18;
+const Property::Index TextActor::GRADIENT_END_POINT         = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 19;
+const Property::Index TextActor::SHADOW_SIZE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 20;
+const Property::Index TextActor::TEXT_COLOR                 = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 21;
 
 namespace
 {
@@ -733,6 +733,15 @@ bool TextActor::IsDefaultPropertyAnimatable( Property::Index index ) const
   {
     return false ;
   }
+}
+
+bool TextActor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  if( index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT )
+  {
+    return RenderableActor::IsDefaultPropertyAConstraintInput(index);
+  }
+  return true; // Our properties can be used as input to constraints.
 }
 
 Property::Type TextActor::GetDefaultPropertyType( Property::Index index ) const

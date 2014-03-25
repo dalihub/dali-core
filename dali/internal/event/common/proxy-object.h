@@ -188,6 +188,11 @@ public: // Property system interface from Internal::Object
   virtual bool IsPropertyAnimatable(Property::Index index) const;
 
   /**
+   * @copydoc Dali::Internal::Object::IsPropertyAConstraintInput()
+   */
+  virtual bool IsPropertyAConstraintInput(Property::Index index) const;
+
+  /**
    * @copydoc Dali::Internal::Object::GetPropertyType()
    */
   virtual Property::Type GetPropertyType(Property::Index index) const;
@@ -324,7 +329,6 @@ private: // Default property extensions for derived classes
 
   /**
    * Query how many default properties the derived class supports.
-   * @pre Property::INVALID_INDEX < index < GetDefaultPropertyCount().
    * @return The number of default properties.
    */
   virtual const std::string& GetDefaultPropertyName( Property::Index index ) const = 0;
@@ -338,7 +342,6 @@ private: // Default property extensions for derived classes
 
   /**
    * Query whether a default property is writable.
-   * @pre Property::INVALID_INDEX < index < GetDefaultPropertyCount().
    * @param [in] index The index of the property.
    * @return True if the property is animatable.
    */
@@ -347,15 +350,21 @@ private: // Default property extensions for derived classes
   /**
    * Query whether a default property is animatable.
    * This determines whether the property can be the target of an animation or constraint.
-   * @pre Property::INVALID_INDEX < index < GetDefaultPropertyCount().
    * @param [in] index The index of the property.
    * @return True if the property is animatable.
    */
   virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const = 0;
 
   /**
+   * @brief Query whether a default property can be used as an input to a constraint.
+   *
+   * @param [in] index The index of the property.
+   * @return True if the property can be used as an input to a constraint.
+   */
+  virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const = 0;
+
+  /**
    * Query the type of a default property.
-   * @pre Property::INVALID_INDEX < index < GetDefaultPropertyCount().
    * @param [in] index The index of the property.
    * @return The type of the property.
    */
@@ -363,7 +372,6 @@ private: // Default property extensions for derived classes
 
   /**
    * Set the value of a default property.
-   * @pre Property::INVALID_INDEX < index < GetDefaultPropertyCount().
    * @pre The property types match i.e. propertyValue.GetType() is equal to GetPropertyType(index).
    * @param [in] index The index of the property.
    * @param [in] propertyValue The new value of the property.
@@ -380,7 +388,6 @@ private: // Default property extensions for derived classes
 
   /**
    * Retrieve a default property value.
-   * @pre Property::INVALID_INDEX < index < GetDefaultPropertyCount().
    * @param [in] index The index of the property.
    * @return The property value.
    */
@@ -412,11 +419,10 @@ protected:
 
 private:
 
-  mutable TypeInfo* mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
-
   Property::Index mNextCustomPropertyIndex; ///< The ID of the next custom property to be registered
 
   mutable CustomPropertyLookup* mCustomProperties; ///< Used for accessing custom Node properties, mutable so it can be lazy initialized from const function
+  mutable TypeInfo* mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
 
   Dali::Vector<Observer*> mObservers;
 

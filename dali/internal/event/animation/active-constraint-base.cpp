@@ -320,6 +320,11 @@ bool ActiveConstraintBase::IsDefaultPropertyAnimatable( Property::Index index ) 
   return true; // All default properties are currently animatable
 }
 
+bool ActiveConstraintBase::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  return true; // All default properties can currently be used as a constraint input
+}
+
 Property::Type ActiveConstraintBase::GetDefaultPropertyType( Property::Index index ) const
 {
   if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )

@@ -29,8 +29,8 @@ using Dali::Internal::SceneGraph::UpdateManager;
 namespace Dali
 {
 
-const Property::Index Layer::CLIPPING_ENABLE = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-const Property::Index Layer::CLIPPING_BOX    = DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index Layer::CLIPPING_ENABLE = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+const Property::Index Layer::CLIPPING_BOX    = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 1;
 
 namespace Internal
 {
@@ -349,6 +349,15 @@ bool Layer::IsDefaultPropertyAnimatable( Property::Index index ) const
   {
     return false;
   }
+}
+
+bool Layer::IsDefaultPropertyAConstraintInput( Property::Index index ) const
+{
+  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  {
+    return Actor::IsDefaultPropertyAConstraintInput(index);
+  }
+  return true; // our properties can be used as an input to a constraint
 }
 
 Property::Type Layer::GetDefaultPropertyType( Property::Index index ) const

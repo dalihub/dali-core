@@ -2925,6 +2925,14 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "world-color",              Actor::WORLD_COLOR,             Property::VECTOR4     },
   { "world-matrix",             Actor::WORLD_MATRIX,            Property::MATRIX      },
   { "name",                     Actor::NAME,                    Property::STRING      },
+  { "sensitive",                Actor::SENSITIVE,               Property::BOOLEAN     },
+  { "leave-required",           Actor::LEAVE_REQUIRED,          Property::BOOLEAN     },
+  { "inherit-shader-effect",    Actor::INHERIT_SHADER_EFFECT,   Property::BOOLEAN     },
+  { "inherit-rotation",         Actor::INHERIT_ROTATION,        Property::BOOLEAN     },
+  { "inherit-scale",            Actor::INHERIT_SCALE,           Property::BOOLEAN     },
+  { "color-mode",               Actor::COLOR_MODE,              Property::STRING      },
+  { "position-inheritance",     Actor::POSITION_INHERITANCE,    Property::STRING      },
+  { "draw-mode",                Actor::DRAW_MODE,               Property::STRING      },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
 
