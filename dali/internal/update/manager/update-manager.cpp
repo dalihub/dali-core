@@ -785,8 +785,14 @@ void UpdateManager::ResetProperties()
     (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
-  // Reset animatable animatable mesh properties to base values
+  // Reset animatable mesh properties to base values
   for ( AnimatableMeshIter iter = mImpl->animatableMeshes.Begin(); iter != mImpl->animatableMeshes.End(); ++iter )
+  {
+    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+  }
+
+  // Reset gesture properties to base values
+  for ( GestureIter iter = mImpl->gestures.Begin(); iter != mImpl->gestures.End(); ++iter )
   {
     (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
   }

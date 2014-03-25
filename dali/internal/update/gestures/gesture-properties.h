@@ -100,6 +100,14 @@ public:
   }
 
   /**
+   * @brief Resets mInputChanged back to false
+   */
+  void Reset()
+  {
+    mInputChanged = false;
+  }
+
+  /**
    * Set the property value.
    * @param[in] value The new property value.
    */

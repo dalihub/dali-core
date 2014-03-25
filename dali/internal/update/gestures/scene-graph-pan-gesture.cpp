@@ -123,7 +123,10 @@ const GesturePropertyVector2& PanGesture::GetLocalDisplacementProperty() const
 
 void PanGesture::ResetDefaultProperties( BufferIndex updateBufferIndex )
 {
-  // Nothing to do
+  mScreenPosition.Reset();
+  mScreenDisplacement.Reset();
+  mLocalPosition.Reset();
+  mLocalDisplacement.Reset();
 }
 
 PanGesture::PanGesture()
