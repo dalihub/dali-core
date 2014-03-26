@@ -94,12 +94,13 @@ ResourceTicketPtr ResourceClient::RequestResource(
 
   switch (type.id)
   {
-    case ResourceBitmap:
+    case ResourceImageData:
+    case ResourceTexture:
     {
-      const BitmapResourceType& bitmapResource = static_cast <const BitmapResourceType&> (type);
+      const ImageResourceType& ImageResource = static_cast <const ImageResourceType&> (type);
       // image tickets will cache the requested parameters, which are updated on successful loading
       ImageTicket* imageTicket = new ImageTicket(*this, newId, typePath);
-      imageTicket->mAttributes = bitmapResource.imageAttributes;
+      imageTicket->mAttributes = ImageResource.imageAttributes;
       newTicket = imageTicket;
       break;
     }
@@ -118,6 +119,7 @@ ResourceTicketPtr ResourceClient::RequestResource(
     case ResourceShader:
     case ResourceMesh:
     case ResourceText:
+    case ResourceAppBitmap:
     {
       newTicket = new ResourceTicket(*this, newId, typePath);
       break;
@@ -128,6 +130,7 @@ ResourceTicketPtr ResourceClient::RequestResource(
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: RequestResource(path:%s type.id:%d) newId:%u\n", path.c_str(), type.id, newId);
 
+  ///@ToDo: only call this in some cases. E.g., ResourceNativeImage will not "load".
   RequestLoadResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, typePath, priority );
   return newTicket;
 }
@@ -137,7 +140,7 @@ ResourceTicketPtr ResourceClient::DecodeResource(
   RequestBufferPtr buffer,
   LoadResourcePriority priority )
 {
-  DALI_ASSERT_DEBUG( type.id == ResourceBitmap && "Only bitmap resources are currently decoded from memory buffers. It should be easy to expand to other resource types though. The public API function at the front and the resource thread at the back end are all that should need to be changed. The code in the middle should be agnostic to the the resource type it is conveying.\n" );
+  DALI_ASSERT_DEBUG( type.id == ResourceImageData && "Only bitmap resources are currently decoded from memory buffers. It should be easy to expand to other resource types though. The public API function at the front and the resource thread at the back end are all that should need to be changed. The code in the middle should be agnostic to the the resource type it is conveying.\n" );
   DALI_ASSERT_DEBUG( buffer.Get() && "Null resource buffer passed for decoding." );
   ResourceTicketPtr newTicket;
   if( buffer.Get() ) //< Check to avoid SEGV on a null pointer.
@@ -148,14 +151,14 @@ ResourceTicketPtr ResourceClient::DecodeResource(
     // Create the correct ticket type for the resource:
     switch (type.id)
     {
-      case ResourceBitmap:
+      case ResourceImageData:
       {
         // NOTE: pre-increment, otherwise we get 0 for first one.
         newId = ++(mImpl->mNextId);
-        const BitmapResourceType& bitmapResource = static_cast <const BitmapResourceType&> ( type );
+        const ImageResourceType& imageDataResource = static_cast <const ImageResourceType&> ( type );
         // Image tickets will cache the requested parameters, which are updated on successful loading
         ImageTicket* imageTicket = new ImageTicket( *this, newId, typePath );
-        imageTicket->mAttributes = bitmapResource.imageAttributes;
+        imageTicket->mAttributes = imageDataResource.imageAttributes;
         newTicket = imageTicket;
         break;
       }
@@ -167,6 +170,8 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       case ResourceShader:
       case ResourceMesh:
       case ResourceText:
+      case ResourceTexture:
+      case ResourceAppBitmap:
       {
         DALI_LOG_ERROR( "Unsupported resource type passed for decoding from a memory buffer." );
       }
@@ -291,11 +296,11 @@ ImageTicketPtr ResourceClient::AddBitmapImage(Bitmap* bitmap)
 
   ImageTicketPtr newTicket;
 
-  const ResourceId newId = ++(mImpl->mNextId);
+  const ResourceId newId = ++( mImpl->mNextId );
 
-  Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New(bitmap->GetImageWidth(), bitmap->GetImageHeight(), bitmap->GetPixelFormat());
-  BitmapResourceType bitmapResourceType(imageAttributes); // construct first as no copy ctor (needed to bind ref to object)
-  ResourceTypePath typePath(bitmapResourceType, "");
+  Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New( bitmap->GetImageWidth(), bitmap->GetImageHeight(), bitmap->GetPixelFormat() );
+  ImageResourceType bitmapResourceType( ResourceAppBitmap, imageAttributes ); // construct first as no copy ctor (needed to bind ref to object)
+  ResourceTypePath typePath( bitmapResourceType, "" );
   newTicket = new ImageTicket(*this, newId, typePath);
   newTicket->mAttributes = imageAttributes;
   newTicket->LoadingSucceeded();
@@ -384,7 +389,7 @@ ResourceTicketPtr ResourceClient::AllocateTexture( unsigned int width,
   const ResourceId newId = ++(mImpl->mNextId);
 
   Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New( width, height, pixelformat);
-  BitmapResourceType bitmapResourceType(imageAttributes); // construct first as no copy ctor (needed to bind ref to object)
+  ImageResourceType bitmapResourceType( ResourceTexture, imageAttributes );
   ResourceTypePath typePath(bitmapResourceType, "");
   newTicket = new ImageTicket(*this, newId, typePath);
 
@@ -471,10 +476,10 @@ void ResourceClient::ResourceTicketDiscarded(const ResourceTicket& ticket)
   const ResourceTypePath& typePath = ticket.GetTypePath();
 
   // Ensure associated event owned resources are also removed
-  mImpl->mBitmaps.erase(ticket.GetId());
+  mImpl->mBitmaps.erase( deadId );
 
   // The ticket object is dead, remove from tickets container
-  TicketContainerSize erased = mImpl->mTickets.erase(deadId);
+  TicketContainerSize erased = mImpl->mTickets.erase( deadId );
   DALI_ASSERT_DEBUG(erased != 0);
   (void)erased; // Avoid "unused variable erased" in release builds
 

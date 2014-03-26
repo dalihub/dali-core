@@ -274,23 +274,15 @@ void GlyphResourceManager::UploadGlyphsToTexture( GlyphResourceObserver* observe
       // if it's no longer used, don't upload
       continue;
     }
-    // grab a pointer to the bitmap
-    Integration::Bitmap* bitmap( charList[ i ].first.Get() );
-    unsigned int bitmapWidth  = bitmap->GetImageWidth();
-    unsigned int bitmapHeight = bitmap->GetImageHeight();
-    Bitmap::PackedPixelsProfile* packedBitmap = bitmap->GetPackedPixelsProfile();
-    if( NULL != packedBitmap )
-    {
-      bitmapWidth  = packedBitmap->GetBufferWidth();
-      bitmapHeight = packedBitmap->GetBufferHeight();
-    }
+    // grab a pointer to the image data:
+    Integration::ImageData* bitmap( charList[ i ].first.Get() );
 
     // create a bitmap upload object, then add it to the array
-    BitmapUpload upload( bitmap->ReleaseBuffer(), // Inform the bitmap we're taking ownership of it's pixel buffer.
+    BitmapUpload upload( bitmap->ReleaseImageBuffer(), // Inform the bitmap we're taking ownership of it's pixel buffer.
                          xPos,          // x position in the texture to upload the bitmap to
                          yPos,          // y position in the texture to upload the bitmap to
-                         bitmapWidth,   // bitmap width
-                         bitmapHeight,  // bitmap height
+                         bitmap->imageWidth,
+                         bitmap->imageHeight,
                          BitmapUpload::DISCARD_PIXEL_DATA ); // tell the the texture to delete the bitmap pixel buffer when it's done
     uploadArray.push_back( upload );
   }

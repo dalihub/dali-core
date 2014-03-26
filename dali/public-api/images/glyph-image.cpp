@@ -87,10 +87,10 @@ GlyphImage GlyphImage::New( const Character& character, const TextStyle& style )
 
     Integration::PlatformAbstraction& platform = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
 
-    Integration::BitmapPtr bitmapPtr = platform.GetGlyphImage( font.GetName(),
+    Integration::BitmapPtr bitmapPtr = ConvertToBitmap( *(platform.GetGlyphImage( font.GetName(),
                                                                font.GetStyle(),
                                                                font.GetPointSize(),
-                                                               character.GetImplementation().GetCharacter() );
+                                                               character.GetImplementation().GetCharacter() ) ) );
 
     if( bitmapPtr )
     {

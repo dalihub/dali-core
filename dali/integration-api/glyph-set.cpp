@@ -39,9 +39,9 @@ GlyphSet::~GlyphSet()
   mCharacterList.clear();
 }
 
-void GlyphSet::AddCharacter(BitmapPtr bitmapData, const GlyphMetrics& glyphMetrics)
+void GlyphSet::AddCharacter(ImageDataPtr imageData, const GlyphMetrics& glyphMetrics)
 {
-  mCharacterList.push_back(Character(bitmapData, glyphMetrics));
+  mCharacterList.push_back(Character(imageData, glyphMetrics));
 }
 
 void GlyphSet::AddCharacter(const Character& character)

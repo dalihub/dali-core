@@ -18,13 +18,16 @@
 #include <dali/integration-api/bitmap.h>
 
 // EXTERNAL INCLUDES
+#include <cstring>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/image-data.h>
 #include <dali/internal/event/images/bitmap-packed-pixel.h>
 #include <dali/internal/event/images/bitmap-compressed.h>
 #include <dali/internal/event/images/bitmap-external.h>
 #include <dali/integration-api/gl-abstraction.h>
+#include <dali/public-api/images/pixel-extras.h>
 
 namespace Dali
 {
@@ -252,8 +255,7 @@ Bitmap* Bitmap::New(const Profile profile = BITMAP_2D_PACKED_PIXELS, const bool 
      * scanlines past the bottom of the image in the buffer if requested.*/
     case BITMAP_2D_PACKED_PIXELS:
     {
-      Bitmap * const bitmap = new Dali::Internal::BitmapPackedPixel(managePixelBuffer);
-      return bitmap;
+      return new Dali::Internal::BitmapPackedPixel(managePixelBuffer);
     }
 
     /** The data for the bitmap is buffered in an opaque form.*/
@@ -263,6 +265,18 @@ Bitmap* Bitmap::New(const Profile profile = BITMAP_2D_PACKED_PIXELS, const bool 
     }
   }
   return 0;
+}
+
+Bitmap* Bitmap::New(const Pixel::Format format)
+{
+  if( Pixel::IsEncoded( format ) )
+  {
+    return new Dali::Internal::BitmapCompressed(true);
+  }
+  else
+  {
+    return new Dali::Internal::BitmapPackedPixel(true);
+  }
 }
 
 Bitmap::Bitmap( bool discardable, Dali::Integration::PixelBuffer* pixBuf)
@@ -315,7 +329,7 @@ void Bitmap::DeletePixelBuffer()
 
 void Bitmap::Initialize( Pixel::Format pixelFormat,
                           unsigned int width,
-                          unsigned int height)
+                          unsigned int height )
 {
   DALI_ASSERT_DEBUG(width * height < (32 * 1024) * (32 * 1024) && "The total area of the bitmap is too great.\n");
   mImageWidth   = width;
@@ -323,6 +337,35 @@ void Bitmap::Initialize( Pixel::Format pixelFormat,
   mPixelFormat  = pixelFormat;
 
   mHasAlphaChannel = Pixel::HasAlpha(pixelFormat);
+}
+
+BitmapPtr ConvertToBitmap( ImageData& imageData )
+{
+  BitmapPtr bitmap = Bitmap::New( imageData.pixelFormat );
+  Bitmap::PackedPixelsProfile* packedBitmap = bitmap->GetPackedPixelsProfile();
+  if( packedBitmap )
+  {
+    // Pass the buffer of pixels into the new Bitmap:
+    packedBitmap->AssignBuffer( imageData.pixelFormat, imageData.ReleaseImageBuffer(), imageData.dataSize, imageData.imageWidth, imageData.imageHeight, imageData.imageWidth, imageData.imageHeight );
+
+    // Convert the info about the alpha channel:
+    bitmap->SetAlphaChannelUsed( imageData.GetAlphaUsage() == ImageData::ALPHA_USAGE_SOME_TRANSLUCENT );
+  }
+  else
+  {
+    ///@Todo: In one of the follow-on patches, the copy here will be replaced with a buffer ownership assignment, after the Bitmap classes are refactored, rather than enhancing BitmapCompressed in this one.
+    Bitmap::CompressedProfile * compressedBitmap = bitmap->GetCompressedProfile();
+    if( compressedBitmap )
+    {
+      compressedBitmap->ReserveBufferOfSize( imageData.pixelFormat, imageData.imageWidth, imageData.imageHeight, imageData.dataSize );
+      memcpy( bitmap->GetBuffer(), imageData.GetBuffer(), imageData.dataSize );
+    }
+    else
+    {
+      DALI_ASSERT_DEBUG( 0 == "Unknown bitmap profile." );
+    }
+  }
+  return bitmap;
 }
 
 } //namespace Integration

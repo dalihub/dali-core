@@ -130,9 +130,8 @@ int UtcDaliImageNewWithPolicies01(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -186,9 +185,8 @@ int UtcDaliImageNewWithPolicies02(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -240,9 +238,8 @@ int UtcDaliImageNewWithPolicies03(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -306,9 +303,8 @@ int UtcDaliImageNewWithPolicies04(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -393,9 +389,8 @@ int UtcDaliImageNewDistanceFieldWithPolicies01(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -449,9 +444,8 @@ int UtcDaliImageNewDistanceFieldWithPolicies02(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -503,9 +497,8 @@ int UtcDaliImageNewDistanceFieldWithPolicies03(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -569,9 +562,8 @@ int UtcDaliImageNewDistanceFieldWithPolicies04(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -658,9 +650,8 @@ int UtcDaliImageNewDistanceFieldWithAttrandPol(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -756,9 +747,8 @@ int UtcDaliImageGetLoadingState01(void)
 
   // simulate load success
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
 
   if(request)
   {
@@ -873,7 +863,12 @@ int UtcDaliImageSignalLoadingFinished(void)
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
   if(request)
   {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, Integration::ResourcePointer(Integration::Bitmap::New(Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true)));
+    Integration::ImageDataPtr loadedImageData = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+    application.GetPlatform().SetResourceLoaded(
+      request->GetId(),
+      request->GetType()->id,
+      Integration::ResourcePointer( loadedImageData.Get() )
+    );
   }
 
   application.Render(16);
@@ -881,6 +876,14 @@ int UtcDaliImageSignalLoadingFinished(void)
 
   DALI_TEST_CHECK( SignalLoadFlag == true );
   END_TEST;
+}
+
+Integration::ResourcePointer BuildImageResource( TestApplication& application )
+{
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource( bitmap.Get() );
+  DALI_ASSERT_DEBUG( bitmap->GetBuffer() && "Image buffer should not be null." );
+  return resource;
 }
 
 // 1.23
@@ -903,10 +906,8 @@ int UtcDaliImageSignalUploaded(void)
   ids.push_back( 23 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-  if(request)
+  Integration::ResourcePointer resource( BuildImageResource( application ) );
+  if( request )
   {
     application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
   }
@@ -937,7 +938,13 @@ int UtcDaliImageSignalUploaded(void)
   SignalUploadedFlag = false;
 
   image.Reload();
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 160, 160, 160, 160);
+
+  // Give the fake platform abstraction a ne ImageData object to return as the result of the reload:
+  Integration::ResourcePointer reloaded_resource( BuildImageResource( application ) );
+  if( request )
+  {
+    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, reloaded_resource);
+  }
 
   application.SendNotification();
   application.Render(16);
@@ -970,9 +977,8 @@ int UtcDaliImageDiscard01(void)
     ids.push_back( 23 );
     application.GetGlAbstraction().SetNextTextureIds( ids );
     Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-    Integration::ResourcePointer resource(bitmap);
-    bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+    Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+    Integration::ResourcePointer resource(bitmap.Get());
     if(request)
     {
     application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
@@ -1015,9 +1021,8 @@ int UtcDaliImageDiscard02(void)
         application.GetGlAbstraction().SetNextTextureIds( ids );
 
         Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-        Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-        Integration::ResourcePointer resource(bitmap);
-        bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+        Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+        Integration::ResourcePointer resource(bitmap.Get());
         if(request)
         {
           application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
@@ -1065,9 +1070,8 @@ int UtcDaliImageDiscard03(void)
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
   Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
+  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( 80, 80, Pixel::RGBA8888 );
+  Integration::ResourcePointer resource(bitmap.Get());
   if(request)
   {
     application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);

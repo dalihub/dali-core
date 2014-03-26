@@ -150,11 +150,11 @@ NinePatchImage::NinePatchImage( const std::string& filename, const Dali::ImageAt
   loadedAttrs.SetSize( closestSize );
   mWidth = closestSize.width;
   mHeight = closestSize.height;
-  Integration::BitmapResourceType resourceType( loadedAttrs );
+  Integration::ImageResourceType resourceType( Integration::ResourceImageData, loadedAttrs );
 
   // Note, bitmap is only destroyed when the image is destroyed.
-  Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously(resourceType, filename);
-  mBitmap = static_cast<Integration::Bitmap*>( resource.Get());
+  Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously( resourceType, filename );
+  mBitmap = ConvertToBitmap( * static_cast<Integration::ImageData*>( resource.Get() ) );
 }
 
 NinePatchImage* NinePatchImage::GetNinePatchImage( Image* image)

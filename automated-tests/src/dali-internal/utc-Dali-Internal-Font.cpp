@@ -62,7 +62,7 @@ Integration::GlyphMetrics characters[] =
 static Integration::GlyphSet* BuildGlyphSet()
 {
   Integration::GlyphSet* set = new Integration::GlyphSet();
-  Integration::BitmapPtr bitmapData;
+  Integration::ImageDataPtr bitmapData;
 
   for (unsigned int index = 0; index < sizeof(characters)/sizeof(characters[0]); index++)
   {

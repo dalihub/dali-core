@@ -48,15 +48,17 @@ int ResourceTypeCompare(const ResourceType& lhs, const ResourceType& rhs)
 
     switch (lhs.id)
     {
-      case ResourceBitmap:
+      case ResourceAppBitmap:
+      case ResourceImageData:
+      case ResourceTexture:
       {
         // compare bitmap widths & heights
-        const BitmapResourceType& lhsBitmap = static_cast<const BitmapResourceType&>(lhs);
-        const BitmapResourceType& rhsBitmap = static_cast<const BitmapResourceType&>(rhs);
+        const ImageResourceType& lhsImage = static_cast<const ImageResourceType&>(lhs);
+        const ImageResourceType& rhsImage = static_cast<const ImageResourceType&>(rhs);
 
-        if (lhsBitmap.imageAttributes != rhsBitmap.imageAttributes)
+        if (lhsImage.imageAttributes != rhsImage.imageAttributes)
         {
-          result = lhsBitmap.imageAttributes < rhsBitmap.imageAttributes ? -1 : 1;
+          result = lhsImage.imageAttributes < rhsImage.imageAttributes ? -1 : 1;
         }
         // else result = 0
         break;

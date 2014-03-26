@@ -32,7 +32,6 @@ typedef std::vector<uint32_t> TextArray;
 namespace Integration
 {
 
-class Bitmap;
 class DynamicsFactory;
 
 /**
@@ -64,7 +63,7 @@ public:
    * to cooperate with other apps and reduce the chance of this one being
    * force-killed in a low memory situation.
    */
-  virtual void Suspend() {} ///!ToDo: Make pure virtual once dali-adaptor patch is in place = 0;
+  virtual void Suspend() = 0;
 
   /**
    * Tell the platform abstraction that Dali is resuming from a pause, such as
@@ -72,7 +71,7 @@ public:
    * It is time to wake up sleeping background threads and recreate memory
    * caches and other temporary data.
    */
-  virtual void Resume() {} ///!ToDo: Make pure virtual once dali-adaptor patch is in place = 0;
+  virtual void Resume() = 0;
 
   // Resource Loading
 
@@ -104,7 +103,7 @@ public:
 
   /**
    * Request a resource from the native filesystem. This is an asynchronous request.
-   * After this method returns, FillResourceCache() will be called to retrieve the result(s) of the
+   * After this method returns, GetResources() can be polled to retrieve the result(s) of the
    * resource loading operation. Loading resources in separate worker thread is recommended.
    * Multi-threading note: this method will be called from the main thread only i.e. not
    * from within the Core::Render() method.
@@ -193,12 +192,12 @@ public:
    * @note Font's style goes inside the textRequest parameter
    * @param[in] textRequest  Resource request. Includes font's style.
    * @param[in] fontFamily   The name of the font's family
-   * @param[in] getBitmap    Whether to load bitmaps for the symbols as well
+   * @param[in] getImageData Whether to load bitmaps for the symbols as well
    * @return A GlyphSet pointer with a list of the requested glyph metrics.
    */
   virtual Integration::GlyphSet* GetGlyphData ( const Integration::TextResourceType& textRequest,
                                                 const std::string& fontFamily,
-                                                bool getBitmap) const = 0;
+                                                bool getImageData) const = 0;
 
   /**
    * Called by GlyphResourceManager to synchronously load glyph data.
@@ -361,7 +360,7 @@ public:
    *
    * @return A bitmap representing the character.
    */
-  virtual Integration::BitmapPtr GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const = 0;
+  virtual Integration::ImageDataPtr GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const = 0;
 
 }; // class PlatformAbstraction
 
