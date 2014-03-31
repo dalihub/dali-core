@@ -410,6 +410,12 @@ public:
 private:
   struct Impl;
   Impl* mImpl; ///< Implementation pointer
+
+  /**
+   * @brief Creates A TextStyle::Impl object when needed
+   */
+  void CreateImplementationJustInTime();
+
 };
 
 } // namespace Dali

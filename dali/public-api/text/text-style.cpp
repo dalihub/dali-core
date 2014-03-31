@@ -42,6 +42,8 @@ const Vector4 TextStyle::DEFAULT_GRADIENT_COLOR( 1.0f, 1.0f, 1.0f, 1.0f );      
 const Vector2 TextStyle::DEFAULT_GRADIENT_START_POINT( 0.0f, 0.0f );
 const Vector2 TextStyle::DEFAULT_GRADIENT_END_POINT( 0.0f, 0.0f );
 
+const std::string DEFAULT_NAME;
+
 struct TextStyle::Impl
 {
   Impl()
@@ -137,34 +139,40 @@ struct TextStyle::Impl
   Vector2     mOutlineThickness;     ///< The outline's thickness.
 };
 
+
 TextStyle::TextStyle()
-: mImpl( new TextStyle::Impl() )
+: mImpl( NULL )
 {
 }
 
 TextStyle::TextStyle( const TextStyle& textStyle )
-: mImpl( new TextStyle::Impl( textStyle.mImpl->mFontName,
-                              textStyle.mImpl->mFontStyle,
-                              textStyle.mImpl->mFontPointSize,
-                              textStyle.mImpl->mWeight,
-                              textStyle.mImpl->mTextColor,
-                              textStyle.mImpl->mItalics,
-                              textStyle.mImpl->mUnderline,
-                              textStyle.mImpl->mShadow,
-                              textStyle.mImpl->mGlow,
-                              textStyle.mImpl->mOutline,
-                              textStyle.mImpl->mItalicsAngle,
-                              textStyle.mImpl->mUnderlineThickness,
-                              textStyle.mImpl->mUnderlinePosition,
-                              textStyle.mImpl->mShadowColor,
-                              textStyle.mImpl->mShadowOffset,
-                              textStyle.mImpl->mShadowSize,
-                              textStyle.mImpl->mGlowColor,
-                              textStyle.mImpl->mGlowIntensity,
-                              textStyle.mImpl->mSmoothEdge,
-                              textStyle.mImpl->mOutlineColor,
-                              textStyle.mImpl->mOutlineThickness ) )
+: mImpl( NULL )
 {
+
+  if ( textStyle.mImpl )
+  {
+    mImpl = new TextStyle::Impl( textStyle.mImpl->mFontName,
+                                 textStyle.mImpl->mFontStyle,
+                                 textStyle.mImpl->mFontPointSize,
+                                 textStyle.mImpl->mWeight,
+                                 textStyle.mImpl->mTextColor,
+                                 textStyle.mImpl->mItalics,
+                                 textStyle.mImpl->mUnderline,
+                                 textStyle.mImpl->mShadow,
+                                 textStyle.mImpl->mGlow,
+                                 textStyle.mImpl->mOutline,
+                                 textStyle.mImpl->mItalicsAngle,
+                                 textStyle.mImpl->mUnderlineThickness,
+                                 textStyle.mImpl->mUnderlinePosition,
+                                 textStyle.mImpl->mShadowColor,
+                                 textStyle.mImpl->mShadowOffset,
+                                 textStyle.mImpl->mShadowSize,
+                                 textStyle.mImpl->mGlowColor,
+                                 textStyle.mImpl->mGlowIntensity,
+                                 textStyle.mImpl->mSmoothEdge,
+                                 textStyle.mImpl->mOutlineColor,
+                                 textStyle.mImpl->mOutlineThickness );
+  }
 }
 TextStyle::~TextStyle()
 {
@@ -175,6 +183,16 @@ TextStyle& TextStyle::operator=( const TextStyle& textStyle )
 {
   if( &textStyle != this )
   {
+    // Is the source object current set to defaults?
+    if ( textStyle.mImpl == NULL )
+    {
+      // Yes, so delete our current implementation and set to defaults (ie/ no implementation)
+      delete mImpl;
+      mImpl = NULL;
+      return *this;
+    }
+
+    CreateImplementationJustInTime();
     mImpl->mFontName = textStyle.mImpl->mFontName;
     mImpl->mFontStyle = textStyle.mImpl->mFontStyle;
     mImpl->mFontPointSize = textStyle.mImpl->mFontPointSize;
@@ -203,6 +221,16 @@ TextStyle& TextStyle::operator=( const TextStyle& textStyle )
 
 bool TextStyle::operator==( const TextStyle& textStyle ) const
 {
+  // If both Implementations are uninitialized then return equal
+  if ( mImpl == NULL && textStyle.mImpl == NULL )
+  {
+    return true;
+  }
+  // Otherwise if either one of the Implemetations are uninitialized then return not equal
+  else if ( mImpl == NULL || textStyle.mImpl == NULL )
+  {
+    return false;
+  }
   return ( ( mImpl->mFontName == textStyle.mImpl->mFontName ) &&
            ( mImpl->mFontStyle == textStyle.mImpl->mFontStyle ) &&
            ( fabsf( mImpl->mFontPointSize - textStyle.mImpl->mFontPointSize ) < GetRangedEpsilon( mImpl->mFontPointSize, textStyle.mImpl->mFontPointSize ) ) &&
@@ -233,12 +261,83 @@ bool TextStyle::operator!=( const TextStyle& textStyle ) const
 
 void TextStyle::Copy( const TextStyle& textStyle, const Mask mask )
 {
-  if( this == &textStyle )
+  // If we're attemping to copy ourselves then just return
+  if ( this == &textStyle )
   {
-    // Nothing to do if same text style is being copied.
     return;
   }
 
+  // Check to see if we're copying a default style ?
+  if ( textStyle.mImpl == NULL )
+  {
+    // Yes, so if we're coping entirely then re-create a default style, else the mask resets attributes to defaults
+    if ( mImpl && mask == ALL )
+    {
+      delete mImpl;
+      mImpl = NULL;
+    }
+    else
+    {
+      if ( mImpl )
+      {
+        if( mask & FONT )
+        {
+          mImpl->mFontName = DEFAULT_NAME;
+        }
+        if( mask & STYLE )
+        {
+          mImpl->mFontStyle = DEFAULT_NAME;
+        }
+        if( mask & SIZE )
+        {
+          mImpl->mFontPointSize = static_cast<PointSize>( 0.f );
+        }
+        if( mask & WEIGHT )
+        {
+          mImpl->mWeight = REGULAR;
+          mImpl->mSmoothEdge = DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD;
+        }
+        if( mask & COLOR )
+        {
+          mImpl->mTextColor = DEFAULT_TEXT_COLOR;
+        }
+        if( mask & ITALICS )
+        {
+          mImpl->mItalics = false;
+          mImpl->mItalicsAngle = DEFAULT_ITALICS_ANGLE;
+        }
+        if( mask & UNDERLINE )
+        {
+          mImpl->mUnderline = false;
+          mImpl->mUnderlineThickness = DEFAULT_UNDERLINE_THICKNESS;
+          mImpl->mUnderlinePosition = DEFAULT_UNDERLINE_POSITION;
+        }
+        if ( mask & SHADOW )
+        {
+          mImpl->mShadow = false;
+          mImpl->mShadowColor = DEFAULT_SHADOW_COLOR;
+          mImpl->mShadowOffset = DEFAULT_SHADOW_OFFSET;
+          mImpl->mShadowSize = DEFAULT_SHADOW_SIZE;
+        }
+        if ( mask & GLOW )
+        {
+          mImpl->mGlow = false;
+          mImpl->mGlowColor = DEFAULT_GLOW_COLOR;
+          mImpl->mGlowIntensity = DEFAULT_GLOW_INTENSITY;
+        }
+        if ( mask & OUTLINE )
+        {
+          mImpl->mOutline = false;
+          mImpl->mOutlineColor = DEFAULT_OUTLINE_COLOR;
+          mImpl->mOutlineThickness = DEFAULT_OUTLINE_THICKNESS;
+        }
+      }
+    }
+    return;
+  }
+
+  // Source has an implementation and so the target also needs one
+  CreateImplementationJustInTime();
   if( mask == ALL )
   {
     *this = textStyle;
@@ -301,126 +400,226 @@ void TextStyle::Copy( const TextStyle& textStyle, const Mask mask )
 
 const std::string& TextStyle::GetFontName() const
 {
-  return mImpl->mFontName;
+  if ( !mImpl )
+  {
+    return DEFAULT_NAME;
+  }
+  else
+  {
+    return mImpl->mFontName;
+  }
 }
 
 void TextStyle::SetFontName( const std::string& fontName )
 {
+  CreateImplementationJustInTime();
   mImpl->mFontName = fontName;
 }
 
 const std::string& TextStyle::GetFontStyle() const
 {
-  return mImpl->mFontStyle;
+  if ( !mImpl )
+  {
+    return DEFAULT_NAME;
+  }
+  else
+  {
+    return mImpl->mFontStyle;
+  }
 }
 
 void TextStyle::SetFontStyle( const std::string& fontStyle )
 {
+  CreateImplementationJustInTime();
   mImpl->mFontStyle = fontStyle;
 }
 
 PointSize TextStyle::GetFontPointSize() const
 {
-  return mImpl->mFontPointSize;
+  if ( !mImpl )
+  {
+    return static_cast<PointSize>( 0.f );
+  }
+  else
+  {
+    return mImpl->mFontPointSize;
+  }
 }
 
 void TextStyle::SetFontPointSize( PointSize fontPointSize )
 {
+  CreateImplementationJustInTime();
   mImpl->mFontPointSize = fontPointSize;
 }
 
 TextStyle::Weight TextStyle::GetWeight() const
 {
-  return mImpl->mWeight ;
+  if ( !mImpl )
+  {
+    return REGULAR;
+  }
+  else
+  {
+    return mImpl->mWeight ;
+  }
 }
 
 void TextStyle::SetWeight( TextStyle::Weight weight )
 {
+  CreateImplementationJustInTime();
   mImpl->mWeight = weight;
 }
 
 const Vector4& TextStyle::GetTextColor() const
 {
-  return mImpl->mTextColor;
+  if ( !mImpl )
+  {
+    return DEFAULT_TEXT_COLOR;
+  }
+  else
+  {
+    return mImpl->mTextColor;
+  }
 }
 
 void TextStyle::SetTextColor( const Vector4& textColor )
 {
+  CreateImplementationJustInTime();
   mImpl->mTextColor = textColor;
 }
 
 bool TextStyle::GetItalics() const
 {
+  if ( !mImpl )
+  {
+    return false;
+  }
   return mImpl->mItalics;
 }
 
 void TextStyle::SetItalics( bool italics )
 {
+  CreateImplementationJustInTime();
   mImpl->mItalics = italics;
 }
 
 Degree TextStyle::GetItalicsAngle() const
 {
-  return mImpl->mItalicsAngle;
+  if ( !mImpl )
+  {
+    return DEFAULT_ITALICS_ANGLE;
+  }
+  else
+  {
+    return mImpl->mItalicsAngle;
+  }
 }
 
 void TextStyle::SetItalicsAngle( Degree angle )
 {
+  CreateImplementationJustInTime();
   mImpl->mItalicsAngle = angle;
 }
 
 bool TextStyle::GetUnderline() const
 {
-  return mImpl->mUnderline;
+  if ( !mImpl )
+  {
+    return false;
+  }
+  else
+  {
+    return mImpl->mUnderline;
+  }
 }
 
 void TextStyle::SetUnderline( bool underline )
 {
+  CreateImplementationJustInTime();
   mImpl->mUnderline = underline;
 }
 
 float TextStyle::GetUnderlineThickness() const
 {
-  return mImpl->mUnderlineThickness;
+  if ( !mImpl )
+  {
+    return DEFAULT_UNDERLINE_THICKNESS;
+  }
+  else
+  {
+    return mImpl->mUnderlineThickness;
+  }
 }
 
 void TextStyle::SetUnderlineThickness( float thickness )
 {
+  CreateImplementationJustInTime();
   mImpl->mUnderlineThickness = thickness;
 }
 
 float TextStyle::GetUnderlinePosition() const
 {
-  return mImpl->mUnderlinePosition;
+  if ( !mImpl )
+  {
+    return DEFAULT_UNDERLINE_POSITION;
+  }
+  else
+  {
+    return mImpl->mUnderlinePosition;
+  }
 }
 
 void TextStyle::SetUnderlinePosition( float position )
 {
+  CreateImplementationJustInTime();
   mImpl->mUnderlinePosition = position;
 }
 
 bool TextStyle::GetShadow() const
 {
-  return mImpl->mShadow;
+  if ( !mImpl )
+  {
+    return false;
+  }
+  else
+  {
+    return mImpl->mShadow;
+  }
 }
 
 const Vector4& TextStyle::GetShadowColor() const
 {
+  if ( !mImpl )
+  {
+    return DEFAULT_SHADOW_COLOR;
+  }
   return mImpl->mShadowColor;
 }
 
 const Vector2& TextStyle::GetShadowOffset() const
 {
+  if ( !mImpl )
+  {
+    return DEFAULT_SHADOW_OFFSET;
+  }
   return mImpl->mShadowOffset;
 }
 
 float TextStyle::GetShadowSize() const
 {
-  return mImpl->mShadowSize;
+  if ( !mImpl )
+  {
+    return DEFAULT_SHADOW_SIZE;
+  }
+  else
+  {
+    return mImpl->mShadowSize;
+  }
 }
 
 void TextStyle::SetShadow( bool shadow, const Vector4& shadowColor, const Vector2& shadowOffset, const float shadowSize )
 {
+  CreateImplementationJustInTime();
   mImpl->mShadow = shadow;
   mImpl->mShadowColor = shadowColor;
   mImpl->mShadowOffset = shadowOffset;
@@ -429,21 +628,40 @@ void TextStyle::SetShadow( bool shadow, const Vector4& shadowColor, const Vector
 
 bool TextStyle::GetGlow() const
 {
+  if ( !mImpl )
+  {
+    return false;
+  }
   return mImpl->mGlow;
 }
 
 const Vector4& TextStyle::GetGlowColor() const
 {
-  return mImpl->mGlowColor;
+  if ( !mImpl )
+  {
+    return DEFAULT_GLOW_COLOR;
+  }
+  else
+  {
+    return mImpl->mGlowColor;
+  }
 }
 
 float TextStyle::GetGlowIntensity() const
 {
-  return mImpl->mGlowIntensity;
+  if ( !mImpl )
+  {
+    return DEFAULT_GLOW_INTENSITY;
+  }
+  else
+  {
+    return mImpl->mGlowIntensity;
+  }
 }
 
 void TextStyle::SetGlow( bool glow, const Vector4& glowColor, float glowIntensity )
 {
+  CreateImplementationJustInTime();
   mImpl->mGlow = glow;
   mImpl->mGlowColor = glowColor;
   mImpl->mGlowIntensity = glowIntensity;
@@ -451,34 +669,73 @@ void TextStyle::SetGlow( bool glow, const Vector4& glowColor, float glowIntensit
 
 float TextStyle::GetSmoothEdge() const
 {
-  return mImpl->mSmoothEdge;
+  if ( !mImpl )
+  {
+    return DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD;
+  }
+  else
+  {
+    return mImpl->mSmoothEdge;
+  }
 }
 
 void TextStyle::SetSmoothEdge( float smoothEdge )
 {
+  CreateImplementationJustInTime();
   mImpl->mSmoothEdge = smoothEdge;
 }
 
 bool TextStyle::GetOutline() const
 {
-  return mImpl->mOutline;
+  if ( !mImpl )
+  {
+    return false;
+  }
+  else
+  {
+    return mImpl->mOutline;
+  }
 }
 
 const Vector4& TextStyle::GetOutlineColor() const
 {
-  return mImpl->mOutlineColor;
+  if ( !mImpl )
+  {
+    return DEFAULT_OUTLINE_COLOR;
+  }
+  else
+  {
+    return mImpl->mOutlineColor;
+  }
 }
 
 const Vector2& TextStyle::GetOutlineThickness() const
 {
-  return mImpl->mOutlineThickness;
+  if ( !mImpl )
+  {
+    return DEFAULT_OUTLINE_THICKNESS;
+  }
+  else
+  {
+    return mImpl->mOutlineThickness;
+  }
 }
 
 void TextStyle::SetOutline( bool outline, const Vector4& outlineColor, const Vector2& outlineThickness )
 {
+  CreateImplementationJustInTime();
   mImpl->mOutline = outline;
   mImpl->mOutlineColor = outlineColor;
   mImpl->mOutlineThickness = outlineThickness;
 }
+
+void TextStyle::CreateImplementationJustInTime()
+{
+  if ( mImpl == NULL )
+  {
+    mImpl = new TextStyle::Impl();
+  }
+}
+
 
 } // namespace Dali
