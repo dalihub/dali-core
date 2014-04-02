@@ -477,7 +477,13 @@ void PanGestureProcessor::EmitPanSignal( Dali::Actor actorHandle,
     actor.ScreenToLocal( renderTaskImpl, localPrevious.x, localPrevious.y, panEvent.previousPosition.x, panEvent.previousPosition.y );
 
     pan.displacement = localCurrent - localPrevious;
-    pan.screenDisplacement = panEvent.currentPosition - panEvent.previousPosition;
+    Vector2 previousPos( panEvent.previousPosition );
+    if ( state == Gesture::Started )
+    {
+      previousPos = mPossiblePanPosition;
+    }
+
+    pan.screenDisplacement = panEvent.currentPosition - previousPos;
 
     pan.velocity.x = pan.displacement.x / panEvent.timeDelta;
     pan.velocity.y = pan.displacement.y / panEvent.timeDelta;

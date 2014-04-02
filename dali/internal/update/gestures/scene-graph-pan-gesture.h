@@ -161,7 +161,7 @@ private:
      */
     PanInfo()
     : time( 0u ),
-      read( true )
+      state( Gesture::Clear )
     {
     }
 
@@ -170,9 +170,9 @@ private:
      */
     PanInfo( const PanInfo& rhs )
     : time( rhs.time ),
+      state( rhs.state ),
       local( rhs.local ),
-      screen( rhs.screen ),
-      read( true )
+      screen( rhs.screen )
     {
     }
 
@@ -182,6 +182,7 @@ private:
     PanInfo& operator=( const PanInfo& rhs )
     {
       time = rhs.time;
+      state = rhs.state;
       local = rhs.local;
       screen = rhs.screen;
 
@@ -195,6 +196,7 @@ private:
     PanInfo& operator=( const Dali::PanGesture& rhs )
     {
       time = rhs.time;
+      state = rhs.state;
 
       local.velocity = rhs.velocity;
       local.displacement = rhs.displacement;
@@ -210,14 +212,18 @@ private:
     // Data
 
     unsigned int time;
+    Gesture::State state;
     Info local;
     Info screen;
-    volatile bool read;
   };
 
-  std::vector< PanInfo > mGestures; ///< Array storing the most recent gestures.
-  unsigned int mWritePosition;      ///< The last buffer that was written to.
-  unsigned int mReadPosition;       ///< The last buffer that was read.
+  PanInfo mGestures[4];         ///< Circular buffer storing the 4 most recent gestures.
+  unsigned int mWritePosition;  ///< The next PanInfo buffer to write to. (starts at 0)
+  unsigned int mReadPosition;   ///< The next PanInfo buffer to read. (starts at 0)
+
+  PanInfo mLatestGesture;       ///< The latest gesture. (this update frame)
+  PanInfo mPreviousGesture;     ///< The previous gesture. (one update frame ago)
+  bool mInGesture;              ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled
 };
 
 } // namespace SceneGraph

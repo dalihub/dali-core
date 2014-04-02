@@ -18,7 +18,6 @@
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 
 // EXTERNAL INCLUDES
-#include <cstring>
 
 // INTERNAL INCLUDES
 
@@ -49,11 +48,8 @@ void PanGesture::AddGesture( const Dali::PanGesture& gesture )
 {
   mGestures[ mWritePosition ] = gesture;
 
-  // Set the read flag to false for the gesture we have just written.
-  // Ignore return value, we want to overwrite oldest gesture information even if it hasn't been read.
-  (void) __sync_val_compare_and_swap( &mGestures[ mWritePosition ].read, true, false );
-
-  // Update our write position.
+  // Update our write position (so now this new value can be read)
+  // Note: we want to overwrite oldest gesture information even if it hasn't been read.
   ++mWritePosition;
   mWritePosition %= ARRAY_SIZE;
 }
@@ -61,44 +57,70 @@ void PanGesture::AddGesture( const Dali::PanGesture& gesture )
 void PanGesture::UpdateProperties( unsigned int nextRenderTime )
 {
   unsigned int time( 0u );
-  PanInfo latest;
-  bool set( false );
+  bool justStarted ( false );
+  bool justFinished ( false );
 
-  // Not going through array from the beginning, using it as a circular buffer and only using unread
-  // values.
-  for ( unsigned int i = 0; ( i < ARRAY_SIZE ); ++i )
+  // If our read position is not same as write position, then there
+  // must be new values on circular buffer to read.
+  while(mReadPosition != mWritePosition)
   {
-    // Copy the gesture first
-    PanInfo currentGesture;
-    currentGesture = mGestures[mReadPosition];
+    const PanInfo& currentGesture = mGestures[mReadPosition];
 
-    // If we have already read this member, then exit out of loop
-    if ( ! __sync_bool_compare_and_swap( &mGestures[mReadPosition].read, false, true ) )
+    if ( currentGesture.time > time )
     {
-      break;
+      justStarted |= (currentGesture.state == Gesture::Started);
+      justFinished |= (currentGesture.state == Gesture::Finished || currentGesture.state == Gesture::Cancelled);
+
+      // use position values direct from gesture.
+      mLatestGesture.screen.position = currentGesture.screen.position;
+      mLatestGesture.local.position = currentGesture.local.position;
+
+      // change displacement to be relative to initial touch, instead of relative to last touch-frame.
+      if(currentGesture.state == Gesture::Started)
+      {
+        mLatestGesture.screen.displacement = currentGesture.screen.displacement;
+        mLatestGesture.local.displacement = currentGesture.local.displacement;
+      }
+      else
+      {
+        mLatestGesture.screen.displacement += currentGesture.screen.displacement;
+        mLatestGesture.local.displacement += currentGesture.local.displacement;
+      }
+
+      time = currentGesture.time;
     }
 
-    if ( currentGesture.time < time )
-    {
-      break;
-    }
-
-    latest = currentGesture;
-    time = currentGesture.time;
-    set = true;
-
-    // Update our read position.
     ++mReadPosition;
     mReadPosition %= ARRAY_SIZE;
   }
 
-  if ( set )
+  mInGesture |= justStarted;
+
+  if ( mInGesture )
   {
-    mScreenPosition.Set( latest.screen.position );
-    mScreenDisplacement.Set( latest.screen.displacement );
-    mLocalPosition.Set( latest.local.position );
-    mLocalDisplacement.Set( latest.local.displacement );
+    PanInfo gesture(mLatestGesture);
+
+    if( !justStarted ) // only use previous frame if this is the continuing.
+    {
+      // If previous gesture exists, then produce position as 50/50 interpolated blend of these two points.
+      gesture.screen.position += mPreviousGesture.screen.position;
+      gesture.local.position += mPreviousGesture.local.position;
+      gesture.screen.position *= 0.5f;
+      gesture.local.position *= 0.5f;
+      // make current displacement relative to previous update-frame now.
+      gesture.screen.displacement -= mPreviousGesture.screen.displacement;
+      gesture.local.displacement -= mPreviousGesture.local.displacement;
+    }
+
+    mPreviousGesture = mLatestGesture;
+
+    mScreenPosition.Set( gesture.screen.position );
+    mScreenDisplacement.Set( gesture.screen.displacement );
+    mLocalPosition.Set( gesture.local.position );
+    mLocalDisplacement.Set( gesture.local.displacement );
   }
+
+  mInGesture &= ~justFinished;
 }
 
 const GesturePropertyVector2& PanGesture::GetScreenPositionProperty() const
@@ -132,9 +154,9 @@ void PanGesture::ResetDefaultProperties( BufferIndex updateBufferIndex )
 PanGesture::PanGesture()
 : mGestures(),
   mWritePosition( 0 ),
-  mReadPosition( 0 )
+  mReadPosition( 0 ),
+  mInGesture( false )
 {
-  mGestures.resize( ARRAY_SIZE );
 }
 
 } // namespace SceneGraph
