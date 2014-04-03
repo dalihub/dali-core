@@ -27,8 +27,6 @@ namespace Dali
 
 namespace Integration
 {
-typedef IntrusivePtr<Dali::RefObject> ResourcePointer;
-
 /**
  * Used to determine why a resource IO operation has failed.
  */

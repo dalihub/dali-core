@@ -30,19 +30,17 @@ namespace Dali
 namespace Internal
 {
 
-
-BitmapImagePtr BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol )
+BitmapImage* BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
-  Internal::BitmapImagePtr internal( new BitmapImage( width, height, pixelformat, loadPol, releasePol ) );
+  BitmapImage* internal = new BitmapImage( width, height, pixelformat, loadPol, releasePol );
   internal->Initialize();
-
   return internal;
 }
 
-BitmapImagePtr BitmapImage::New( PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol )
+BitmapImage* BitmapImage::New( PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol )
 {
-  Internal::BitmapImagePtr internal( new BitmapImage( pixBuf, width, height, pixelformat, stride, releasePol ) );
-
+  BitmapImage* internal = new BitmapImage( pixBuf, width, height, pixelformat, stride, releasePol );
+  internal->Initialize();
   return internal;
 }
 
@@ -151,7 +149,6 @@ unsigned int BitmapImage::GetBufferStride() const
 void BitmapImage::Initialize()
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  mUpdateManager   = &tls.GetUpdateManager();
   mResourceClient = &tls.GetResourceClient();
 }
 

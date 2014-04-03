@@ -18,6 +18,7 @@
 #include <dali/internal/event/actors/image-actor-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/images/nine-patch-image-impl.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/images/image-connector.h>
@@ -94,27 +95,45 @@ std::string StyleString(const ImageActor::Style style)
 }
 }
 
-ImageActorPtr ImageActor::New( Image* image )
+ImageActorPtr ImageActor::New( Image* anImage )
 {
   ImageActorPtr actor( new ImageActor() );
+  ImagePtr theImage( anImage );
 
   // Second-phase construction
   actor->Initialize();
+  NinePatchImage* ninePatchImage = NULL;
+
+  // Automatically convert upcasted nine-patch images to cropped bitmap
+  ninePatchImage = NinePatchImage::GetNinePatchImage( anImage );
+
+  if( ninePatchImage != NULL )
+  {
+    theImage = ninePatchImage->CreateCroppedBitmapImage();
+  }
 
   // Create the attachment
-  actor->mImageAttachment = ImageAttachment::New( *actor->mNode, image );
+  actor->mImageAttachment = ImageAttachment::New( *actor->mNode, theImage.Get() );
   actor->Attach( *actor->mImageAttachment );
 
   // Adjust the actor's size
-  if( image )
+  if( theImage )
   {
-    actor->mImageNext.Set( image, false );
-    actor->OnImageSet( *image );
-    actor->SetNaturalSize( *image );
+    actor->mImageNext.Set( theImage.Get(), false );
+    actor->OnImageSet( *theImage );
+    actor->SetNaturalSize( *theImage );
+  }
+
+  if( ninePatchImage != NULL )
+  {
+    actor->SetStyle( Dali::ImageActor::STYLE_NINE_PATCH );
+    Vector4 border = ninePatchImage->GetStretchBorders();
+    actor->SetNinePatchBorder( border, true );
   }
 
   return actor;
 }
+
 
 ImageActorPtr ImageActor::New( Image* image, const PixelArea& pixelArea )
 {

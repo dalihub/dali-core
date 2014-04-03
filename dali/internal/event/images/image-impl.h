@@ -243,6 +243,14 @@ private:
    */
   void SetTicket( ResourceTicket* ticket );
 
+  /**
+   * Helper method to determine if the filename indicates that the image has a 9 patch border.
+   * @param[in] filename The filename to check
+   * @return true if it is a 9 patch image
+   */
+  static bool IsNinePatchFileName( std::string filename );
+
+
 protected:
   unsigned int mWidth;
   unsigned int mHeight;

@@ -26,6 +26,8 @@
 #include <dali/integration-api/platform-abstraction.h>
 
 #include <dali/integration-api/glyph-set.h>
+#include <dali/integration-api/resource-cache.h>
+#include <dali/integration-api/resource-types.h>
 #include <test-trace-call-stack.h>
 
 namespace Dali
@@ -142,6 +144,12 @@ public:
       tet_infoline ("Warning: multiple resource requests not handled by Test Suite. You may see unexpected errors");
     }
     mRequest = new Integration::ResourceRequest(request);
+  }
+
+  virtual Integration::ResourcePointer LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath)
+  {
+    mTrace.PushCall("LoadResourceSynchronously", "");
+    return mResources.loadedResource;
   }
 
   /**

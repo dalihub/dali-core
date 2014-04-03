@@ -45,6 +45,7 @@
 #include <dali/public-api/geometry/spline.h>
 
 #include <dali/public-api/images/distance-field.h>
+#include <dali/public-api/images/nine-patch-image.h>
 
 #include <dali/public-api/modeling/bone.h>
 #include <dali/public-api/modeling/entity-animator-map.h>

@@ -86,6 +86,7 @@ internal_src_files = \
   $(internal_src_dir)/event/images/image-connector.cpp \
   $(internal_src_dir)/event/images/image-factory.cpp \
   $(internal_src_dir)/event/images/image-factory-cache.cpp \
+  $(internal_src_dir)/event/images/nine-patch-image-impl.cpp \
   $(internal_src_dir)/event/modeling/animatable-mesh-impl.cpp \
   $(internal_src_dir)/event/modeling/entity-impl.cpp \
   $(internal_src_dir)/event/modeling/light-impl.cpp \

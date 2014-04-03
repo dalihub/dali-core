@@ -28,14 +28,10 @@
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/common/bitmap-upload.h>
 #include <dali/integration-api/resource-declarations.h>
+#include <dali/integration-api/bitmap.h>
 
 namespace Dali
 {
-
-namespace Integration
-{
-class Bitmap;
-}
 
 namespace Internal
 {

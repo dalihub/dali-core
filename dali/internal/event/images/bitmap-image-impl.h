@@ -35,10 +35,6 @@ typedef IntrusivePtr<BitmapImage> BitmapImagePtr;
 class ResourceClient;
 class ResourceManager;
 
-namespace SceneGraph
-{
-class UpdateManager;
-}
 /**
  * BitmapImage represents an image resource that can be added to actors etc.
  * Its pixel buffer data is provided by the application developer.
@@ -59,11 +55,11 @@ public:
    * @param [in] loadPol     controls time of loading a resource from the filesystem (default: load when Image is created).
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  static BitmapImagePtr New(unsigned int width,
-                            unsigned int height,
-                            Pixel::Format pixelformat,
-                            LoadPolicy loadPol=ImageLoadPolicyDefault,
-                            ReleasePolicy releasePol=ImageReleasePolicyDefault);
+  static BitmapImage* New( unsigned int width,
+                           unsigned int height,
+                           Pixel::Format pixelformat,
+                           LoadPolicy loadPol=ImageLoadPolicyDefault,
+                           ReleasePolicy releasePol=ImageReleasePolicyDefault);
 
   /**
    * Create a new BitmapImage, which uses external data source.
@@ -79,13 +75,12 @@ public:
    * @param [in] stride      the internal stride of the pixelbuffer in pixels
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  static BitmapImagePtr New(PixelBuffer* pixBuf,
-                            unsigned int width,
-                            unsigned int height,
-                            Pixel::Format pixelformat,
-                            unsigned int stride,
-                            ReleasePolicy releasePol=ImageReleasePolicyDefault);
-
+  static BitmapImage* New( PixelBuffer* pixBuf,
+                           unsigned int width,
+                           unsigned int height,
+                           Pixel::Format pixelformat,
+                           unsigned int stride,
+                           ReleasePolicy releasePol=ImageReleasePolicyDefault );
 
   /**
    * Create a new BitmapImage.
@@ -188,11 +183,11 @@ protected: // From Resource
   Integration::Bitmap * GetBitmap() const;
 
 private:
-
   bool mIsDataExternal; ///< whether application holds ownership of pixel buffer or not
 
   ResourceClient*            mResourceClient;
-  SceneGraph::UpdateManager* mUpdateManager;
+
+protected:
   Integration::BitmapPtr     mBitmapCached;
 };
 

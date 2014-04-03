@@ -24,6 +24,7 @@
 #include <dali/internal/event/actors/renderable-actor-impl.h>
 #include <dali/internal/event/actor-attachments/image-attachment-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
+#include <dali/internal/event/images/nine-patch-image-impl.h>
 
 namespace Dali
 {
@@ -54,16 +55,16 @@ public:
   typedef Dali::ImageActor::PixelArea PixelArea;
 
   /**
-   * Create an initialised image actor.
+   * @brief Create an initialised image actor.
    * When the image is loaded the actors size will reset to the image size,
    * unless a custom size chosen via Actor:SetSize().
-   * @param  [in] image A pointer to the image object to display or NULL not to display anything.
+   * @param[in] image A pointer to the image object to display or NULL not to display anything.
    * @return A smart-pointer to a newly allocated image actor.
    */
   static ImageActorPtr New( Image* image );
 
   /**
-   * Create an initialised image actor
+   * @brief Create an initialised image actor.
    * When the image is loaded the actors size will reset to the image size,
    * unless a custom size chosen via Actor:SetSize().
    * @param [in] image A pointer to the image object to display or NULL not to display anything.

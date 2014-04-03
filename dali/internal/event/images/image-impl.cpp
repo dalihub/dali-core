@@ -26,6 +26,7 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/images/image-factory.h>
+#include <dali/internal/event/images/nine-patch-image-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 
 using namespace Dali::Integration;
@@ -53,31 +54,39 @@ Image* Image::New()
 
 Image* Image::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
-  Image* image = new Image( loadPol, releasePol );
-
-  if( ! filename.empty() )
+  if( IsNinePatchFileName(filename) )
   {
-    Vector2 closestSize;
-
-    Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( filename, attributes, closestSize );
-    image->mWidth = closestSize.width;
-    image->mHeight = closestSize.height;
+    NinePatchImage* image = new NinePatchImage( filename, attributes, loadPol, releasePol );
+    return image;
   }
-
-  image->mRequest = image->mImageFactory.RegisterRequest( filename, &attributes );
-
-  if( Dali::Image::Immediate == loadPol )
+  else
   {
-    // Trigger loading of the image on a seperate resource thread as soon as it
-    // can be scheduled:
-    image->mTicket = image->mImageFactory.Load( image->mRequest.Get() );
-    image->mTicket->AddObserver( *image );
+    Image* image = new Image( loadPol, releasePol );
+
+    if( ! filename.empty() )
+    {
+      Vector2 closestSize;
+
+      Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( filename, attributes, closestSize );
+      image->mWidth = closestSize.width;
+      image->mHeight = closestSize.height;
+    }
+
+    image->mRequest = image->mImageFactory.RegisterRequest( filename, &attributes );
+
+    if( Dali::Image::Immediate == loadPol )
+    {
+      // Trigger loading of the image on a seperate resource thread as soon as it
+      // can be scheduled:
+      image->mTicket = image->mImageFactory.Load( image->mRequest.Get() );
+      image->mTicket->AddObserver( *image );
+    }
+    // else lazily load image data later, only when it is needed to draw something:
+
+    DALI_LOG_SET_OBJECT_STRING( image, filename );
+
+    return image;
   }
-  // else lazily load image data later, only when it is needed to draw something:
-
-  DALI_LOG_SET_OBJECT_STRING( image, filename );
-
-  return image;
 }
 
 Image* Image::New( NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy releasePol )
@@ -289,6 +298,61 @@ void Image::SetTicket( ResourceTicket* ticket )
     mTicket.Reset();
   }
 }
+
+bool Image::IsNinePatchFileName( std::string filename )
+{
+  bool match = false;
+
+  std::string::const_iterator iter = filename.end();
+  iter--;
+  enum { SUFFIX, HASH, HASH_DOT, DONE } state = SUFFIX;
+  while(iter >= filename.begin() && state != DONE)
+  {
+    switch(state)
+    {
+      case SUFFIX:
+      {
+        if(*iter == '.')
+        {
+          state = HASH;
+        }
+        else if(!isalnum(*iter))
+        {
+          state = DONE;
+        }
+      }
+      break;
+      case HASH:
+      {
+        if( *iter == '#' || *iter == '9' )
+        {
+          state = HASH_DOT;
+        }
+        else
+        {
+          state = DONE;
+        }
+      }
+      break;
+      case HASH_DOT:
+      {
+        if(*iter == '.')
+        {
+          state = DONE;
+          match = true;
+        }
+      }
+      break;
+      case DONE:
+      {
+      }
+      break;
+    }
+    iter--;
+  }
+  return match;
+}
+
 
 } // namespace Internal
 

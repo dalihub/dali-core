@@ -125,8 +125,14 @@ void Pixel::GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitM
 {
   switch (pixelFormat)
   {
-    case L8:
     case A8:
+    {
+      byteOffset = 0;
+      bitMask    = 0xFF;
+    }
+    break;
+
+    case L8:
     case RGB888:
     case RGB565:
     case RGB8888:

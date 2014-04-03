@@ -114,6 +114,18 @@ public:
   virtual void LoadResource(const ResourceRequest& request) = 0;
 
   /**
+   * Request a resource from the native filesystem. This is a synchronous request, i.e.
+   * it will block the main loop whilst executing. It should therefore be used sparingly.
+   *
+   * Multi-threading note: this method will be called from the main thread only i.e. not
+   * from within the Core::Render() method.
+   * @param[in] resourceType The type of resource to load
+   * @param[in] resourcePath The path to the resource
+   * @return A pointer to a ref-counted resource
+   */
+  virtual ResourcePointer LoadResourceSynchronously( const ResourceType& resourceType, const std::string& resourcePath ) = 0;
+
+  /**
    * Request that a resource be saved to the native filesystem.
    * This is an asynchronous request.
    */
