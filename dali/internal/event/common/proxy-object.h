@@ -281,6 +281,14 @@ public: // Constraints
    */
   void RemoveConstraints( unsigned int tag );
 
+public: // Called by TypeInfo
+
+  /**
+   * Called by TypeInfo to set the type-info that this proxy-object is created by.
+   * @param[in] typeInfo The TypeInfo that creates this proxy-object.
+   */
+  void SetTypeInfo( TypeInfo* typeInfo );
+
 protected:
 
   /**

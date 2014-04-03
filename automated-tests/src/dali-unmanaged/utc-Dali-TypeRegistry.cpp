@@ -467,6 +467,16 @@ public:
   }
 };
 
+BaseHandle CreateNamedActorType()
+{
+  Actor actor = Actor::New();
+  actor.SetName( "NamedActor" );
+  return actor;
+}
+
+TypeRegistration namedActorType( "MyNamedActor", typeid(Dali::Actor), CreateNamedActorType );
+PropertyRegistration namedActorPropertyOne( namedActorType, "prop-name", PROPERTY_REGISTRATION_START_INDEX, Property::BOOLEAN, &SetProperty, &GetProperty );
+
 } // Anonymous namespace
 
 
@@ -1109,3 +1119,27 @@ int UtcDaliTapGestureDetectorTypeRegistry(void)
   DALI_TEST_EQUALS(true, data.voidFunctorCalled, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliTypeRegistryNamedType(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  // Create a normal actor
+  BaseHandle actorHandle = typeRegistry.GetTypeInfo( "Actor" ).CreateInstance();
+  DALI_TEST_CHECK( actorHandle );
+  Actor actor( Actor::DownCast( actorHandle ) );
+  DALI_TEST_CHECK( actor );
+  unsigned int actorPropertyCount( actor.GetPropertyCount() );
+
+  // Create Named Actor Type
+  BaseHandle namedHandle = typeRegistry.GetTypeInfo( "MyNamedActor" ).CreateInstance();
+  DALI_TEST_CHECK( namedHandle );
+  Actor namedActor( Actor::DownCast( namedHandle ) );
+  DALI_TEST_CHECK( namedActor );
+  unsigned int namedActorPropertyCount( namedActor.GetPropertyCount() );
+
+  DALI_TEST_CHECK( namedActorPropertyCount > actorPropertyCount );
+  END_TEST;
+}
+

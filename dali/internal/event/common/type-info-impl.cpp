@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/type-registry-impl.h>
+#include <dali/internal/event/common/proxy-object.h>
 
 using std::find_if;
 
@@ -98,6 +99,17 @@ BaseHandle TypeInfo::CreateInstance()
   if(mCreate)
   {
     ret = mCreate();
+
+    if ( ret )
+    {
+      BaseObject& handle = ret.GetBaseObject();
+      ProxyObject *proxyObject = dynamic_cast<Internal::ProxyObject*>(&handle);
+
+      if ( proxyObject )
+      {
+        proxyObject->SetTypeInfo( this );
+      }
+    }
   }
   return ret;
 }

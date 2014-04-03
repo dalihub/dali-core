@@ -1006,7 +1006,10 @@ void ProxyObject::RemoveConstraints()
   }
 }
 
-
+void ProxyObject::SetTypeInfo( TypeInfo* typeInfo )
+{
+  mTypeInfo = typeInfo;
+}
 
 ProxyObject::~ProxyObject()
 {
