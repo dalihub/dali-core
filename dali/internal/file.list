@@ -184,6 +184,7 @@ internal_src_files = \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-world.cpp \
   $(internal_src_dir)/update/modeling/internal-mesh-data.cpp \
   $(internal_src_dir)/update/modeling/scene-graph-animatable-mesh.cpp \
+  $(internal_src_dir)/update/gestures/pan-gesture-profiling.cpp \
   $(internal_src_dir)/update/gestures/scene-graph-pan-gesture.cpp \
   $(internal_src_dir)/update/modeling/scene-graph-material.cpp \
   $(internal_src_dir)/update/modeling/scene-graph-mesh.cpp \

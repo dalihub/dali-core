@@ -417,6 +417,11 @@ void PanGestureProcessor::SetPanGestureProperties( const PanGesture& pan )
   }
 }
 
+void PanGestureProcessor::EnableProfiling()
+{
+  mSceneObject->EnableProfiling();
+}
+
 void PanGestureProcessor::UpdateDetection()
 {
   DALI_ASSERT_DEBUG(!mGestureDetectors.empty());

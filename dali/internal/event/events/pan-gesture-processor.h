@@ -107,6 +107,11 @@ public: // To be called by GestureEventProcessor
    */
   void SetPanGestureProperties( const PanGesture& pan );
 
+  /**
+   * Called to provide pan-gesture profiling information.
+   */
+  void EnableProfiling();
+
 private:
 
   // Undefined

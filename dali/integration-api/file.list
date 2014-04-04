@@ -5,6 +5,7 @@ platform_abstraction_src_files = \
    $(platform_abstraction_src_dir)/core.cpp \
    $(platform_abstraction_src_dir)/glyph-set.cpp \
    $(platform_abstraction_src_dir)/debug.cpp \
+   $(platform_abstraction_src_dir)/profiling.cpp \
    $(platform_abstraction_src_dir)/shader-data.cpp \
    $(platform_abstraction_src_dir)/system-overlay.cpp \
    $(platform_abstraction_src_dir)/common/lockless-buffer.cpp \
@@ -23,6 +24,7 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/core.h \
    $(platform_abstraction_src_dir)/glyph-set.h \
    $(platform_abstraction_src_dir)/debug.h \
+   $(platform_abstraction_src_dir)/profiling.h \
    $(platform_abstraction_src_dir)/bitmap.h \
    $(platform_abstraction_src_dir)/resource-types.h \
    $(platform_abstraction_src_dir)/resource-request.h \

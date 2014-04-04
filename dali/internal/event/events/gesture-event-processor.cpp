@@ -239,6 +239,11 @@ bool GestureEventProcessor::NeedsUpdate()
   return updateRequired;
 }
 
+void GestureEventProcessor::EnablePanGestureProfiling()
+{
+  mPanGestureProcessor.EnableProfiling();
+}
+
 } // namespace Internal
 
 } // namespace Dali

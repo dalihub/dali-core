@@ -139,7 +139,7 @@ void FrameTime::WakeUp()
   mRunning = true;
 }
 
-void FrameTime::PredictNextRenderTime( float& lastFrameDeltaSeconds, unsigned int& lastRenderTimeMilliseconds, unsigned int& nextRenderTimeMilliseconds )
+void FrameTime::PredictNextVSyncTime( float& lastFrameDeltaSeconds, unsigned int& lastVSyncTimeMilliseconds, unsigned int& nextVSyncTimeMilliseconds )
 {
   if ( mRunning )
   {
@@ -201,10 +201,10 @@ void FrameTime::PredictNextRenderTime( float& lastFrameDeltaSeconds, unsigned in
 
     // Set the input variables
     lastFrameDeltaSeconds = lastFrameDelta * MICROSECONDS_TO_SECONDS;
-    lastRenderTimeMilliseconds = lastVSyncTime / MICROSECONDS_PER_MILLISECOND;
-    nextRenderTimeMilliseconds = ( lastVSyncTime + timeTillNextRender ) / MICROSECONDS_PER_MILLISECOND;
+    lastVSyncTimeMilliseconds = lastVSyncTime / MICROSECONDS_PER_MILLISECOND;
+    nextVSyncTimeMilliseconds = ( lastVSyncTime + timeTillNextRender ) / MICROSECONDS_PER_MILLISECOND;
 
-    DALI_LOG_INFO( gLogFilter, Debug::General, "FrameTime: Frame: %u, Time: %u, NextTime: %u, LastDelta: %f\n", mLastUpdateFrameNumber, lastRenderTimeMilliseconds, nextRenderTimeMilliseconds, lastFrameDeltaSeconds );
+    DALI_LOG_INFO( gLogFilter, Debug::General, "FrameTime: Frame: %u, Time: %u, NextTime: %u, LastDelta: %f\n", mLastUpdateFrameNumber, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, lastFrameDeltaSeconds );
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "                      FramesInLastUpdate: %u, FramesTillNextVSync: %u\n", framesInLastUpdate, framesTillNextVSync );
   }
 }

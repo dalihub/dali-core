@@ -20,6 +20,7 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
+#include <dali/internal/update/gestures/pan-gesture-profiling.h>
 
 namespace Dali
 {
@@ -32,7 +33,12 @@ namespace SceneGraph
 
 namespace
 {
+
 const unsigned int ARRAY_SIZE( 4u );
+
+const unsigned int UPDATES_BETWEEN_PRINT( 120u );
+unsigned int UPDATE_COUNT( 0u );
+
 } // unnamed namespace
 
 PanGesture* PanGesture::New()
@@ -42,6 +48,7 @@ PanGesture* PanGesture::New()
 
 PanGesture::~PanGesture()
 {
+  delete mProfiling;
 }
 
 void PanGesture::AddGesture( const Dali::PanGesture& gesture )
@@ -54,7 +61,7 @@ void PanGesture::AddGesture( const Dali::PanGesture& gesture )
   mWritePosition %= ARRAY_SIZE;
 }
 
-void PanGesture::UpdateProperties( unsigned int nextRenderTime )
+void PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
 {
   unsigned int time( 0u );
   bool justStarted ( false );
@@ -65,6 +72,11 @@ void PanGesture::UpdateProperties( unsigned int nextRenderTime )
   while(mReadPosition != mWritePosition)
   {
     const PanInfo& currentGesture = mGestures[mReadPosition];
+
+    if( mProfiling )
+    {
+      mProfiling->mRawData.push_back( PanGestureProfiling::Position( currentGesture.time, currentGesture.screen.position ) );
+    }
 
     if ( currentGesture.time > time )
     {
@@ -100,6 +112,11 @@ void PanGesture::UpdateProperties( unsigned int nextRenderTime )
   {
     PanInfo gesture(mLatestGesture);
 
+    if( mProfiling )
+    {
+      mProfiling->mLatestData.push_back( PanGestureProfiling::Position( lastVSyncTime, gesture.screen.position ) );
+    }
+
     if( !justStarted ) // only use previous frame if this is the continuing.
     {
       // If previous gesture exists, then produce position as 50/50 interpolated blend of these two points.
@@ -112,6 +129,11 @@ void PanGesture::UpdateProperties( unsigned int nextRenderTime )
       gesture.local.displacement -= mPreviousGesture.local.displacement;
     }
 
+    if( mProfiling )
+    {
+      mProfiling->mAveragedData.push_back( PanGestureProfiling::Position( lastVSyncTime, gesture.screen.position ) );
+    }
+
     mPreviousGesture = mLatestGesture;
 
     mScreenPosition.Set( gesture.screen.position );
@@ -121,6 +143,14 @@ void PanGesture::UpdateProperties( unsigned int nextRenderTime )
   }
 
   mInGesture &= ~justFinished;
+
+  if( mProfiling &&
+      UPDATE_COUNT++ >= UPDATES_BETWEEN_PRINT )
+  {
+    mProfiling->PrintData();
+    mProfiling->ClearData();
+    UPDATE_COUNT = 0u;
+  }
 }
 
 const GesturePropertyVector2& PanGesture::GetScreenPositionProperty() const
@@ -143,6 +173,14 @@ const GesturePropertyVector2& PanGesture::GetLocalDisplacementProperty() const
   return mLocalDisplacement;
 }
 
+void PanGesture::EnableProfiling()
+{
+  if( !mProfiling )
+  {
+    mProfiling = new PanGestureProfiling();
+  }
+}
+
 void PanGesture::ResetDefaultProperties( BufferIndex updateBufferIndex )
 {
   mScreenPosition.Reset();
@@ -155,7 +193,8 @@ PanGesture::PanGesture()
 : mGestures(),
   mWritePosition( 0 ),
   mReadPosition( 0 ),
-  mInGesture( false )
+  mInGesture( false ),
+  mProfiling( NULL )
 {
 }
 

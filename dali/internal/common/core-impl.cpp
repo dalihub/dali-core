@@ -230,18 +230,18 @@ void Core::SetMinimumFrameTimeInterval(unsigned int interval)
 void Core::Update( UpdateStatus& status )
 {
   // get the last delta and the predict when this update will be rendered
-  float lastRenderDelta( 0.0f );
-  unsigned int lastRenderTime( 0 );
-  unsigned int nextRenderTime( 0 );
-  mFrameTime->PredictNextRenderTime( lastRenderDelta, lastRenderTime, nextRenderTime );
+  float lastFrameDelta( 0.0f );
+  unsigned int lastVSyncTime( 0 );
+  unsigned int nextVSyncTime( 0 );
+  mFrameTime->PredictNextVSyncTime( lastFrameDelta, lastVSyncTime, nextVSyncTime );
 
   // set the time delta so adaptor can easily print FPS with a release build with 0 as
   // it is cached by frametime
-  status.secondsFromLastFrame = lastRenderDelta;
+  status.secondsFromLastFrame = lastFrameDelta;
 
   // Render returns true when there are updates on the stage or one or more animations are completed.
   // Use the estimated time diff till we render as the elapsed time.
-  status.keepUpdating = mUpdateManager->Update( lastRenderDelta, lastRenderTime, nextRenderTime );
+  status.keepUpdating = mUpdateManager->Update( lastFrameDelta, lastVSyncTime, nextVSyncTime );
 
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();

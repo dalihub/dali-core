@@ -31,6 +31,8 @@ struct PanGesture;
 namespace Internal
 {
 
+struct PanGestureProfiling;
+
 namespace SceneGraph
 {
 
@@ -59,9 +61,10 @@ public:
 
   /**
    * Called by the update manager so that we can update the value of our properties.
-   * @param[in]  nextRenderTime  The estimated time of the next render (in milliseconds).
+   * @param[in]  lastVSyncTime  The last VSync time (in milliseconds).
+   * @param[in]  nextVSyncTime  The estimated time of the next VSync (in milliseconds).
    */
-  virtual void UpdateProperties( unsigned int nextRenderTime );
+  virtual void UpdateProperties( unsigned int lastVSyncTime, unsigned int nextVSyncTime );
 
   /**
    * Retrieves a reference to the screen position property.
@@ -86,6 +89,11 @@ public:
    * @return The local displacement property.
    */
   const GesturePropertyVector2& GetLocalDisplacementProperty() const;
+
+  /**
+   * Called to provide pan-gesture profiling information.
+   */
+  void EnableProfiling();
 
 private:
 
@@ -224,6 +232,8 @@ private:
   PanInfo mLatestGesture;       ///< The latest gesture. (this update frame)
   PanInfo mPreviousGesture;     ///< The previous gesture. (one update frame ago)
   bool mInGesture;              ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled
+
+  PanGestureProfiling* mProfiling; ///< NULL unless pan-gesture profiling information is required.
 };
 
 } // namespace SceneGraph

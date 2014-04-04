@@ -88,13 +88,13 @@ public: // Core Methods
   /**
    * Predicts when the next render time will occur.
    *
-   * @param[out]  lastFrameDeltaSeconds       The delta, in seconds (with float precision), between the last two renders.
-   * @param[out]  lastRenderTimeMilliseconds  The time, in milliseconds, of the last render.
-   * @param[out]  nextRenderTimeMilliseconds  The estimated time, in milliseconds, at the next render.
+   * @param[out]  lastFrameDeltaSeconds      The delta, in seconds (with float precision), between the last two renders.
+   * @param[out]  lastVSyncTimeMilliseconds  The time, in milliseconds, of the last VSync.
+   * @param[out]  nextVSyncTimeMilliseconds  The estimated time, in milliseconds, at the next VSync.
    *
    * @note Should only be called once per tick, from the update thread.
    */
-  void PredictNextRenderTime( float& lastFrameDeltaSeconds, unsigned int& lastRenderTimeMilliseconds, unsigned int& nextRenderTimeMilliseconds );
+  void PredictNextVSyncTime( float& lastFrameDeltaSeconds, unsigned int& lastVSyncTimeMilliseconds, unsigned int& nextVSyncTimeMilliseconds );
 
   // Called from VSync thread
 

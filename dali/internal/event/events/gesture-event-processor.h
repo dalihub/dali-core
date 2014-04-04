@@ -116,6 +116,11 @@ public: // Called by Core
    */
   bool NeedsUpdate();
 
+  /**
+   * Called to provide pan-gesture profiling information.
+   */
+  void EnablePanGestureProfiling();
+
 private:
 
   // Undefined

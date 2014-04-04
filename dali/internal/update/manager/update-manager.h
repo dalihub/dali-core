@@ -354,11 +354,11 @@ public:
   /**
    * Performs an Update traversal on the scene-graph.
    * @param[in] elapsedSeconds The elapsed time that should be applied to animations.
-   * @param[in] lastRenderTime The last time, in milliseconds, that we rendered.
-   * @param[in] nextRenderTime The estimated time, in milliseconds, of the next render.
+   * @param[in] lastVSyncTime The last time, in milliseconds, that we had a VSync.
+   * @param[in] nextVSyncTime The estimated time, in milliseconds, of the next VSync.
    * @return True if further updates are required e.g. during animations.
    */
-  unsigned int Update( float elapsedSeconds, unsigned int lastRenderTime, unsigned int nextRenderTime );
+  unsigned int Update( float elapsedSeconds, unsigned int lastVSyncTime, unsigned int nextVSyncTime );
 
   /**
    * Set the background color i.e. the glClear color used at the beginning of each frame.
@@ -426,9 +426,10 @@ private:
 
   /**
    * Perform gesture updates.
-   * @param[in]  nextRenderTime  The estimated time of the next render.
+   * @param[in]  lastVSyncTime  The last VSync time.
+   * @param[in]  nextVSyncTime  The estimated time of the next VSync.
    */
-  void ProcessGestures( unsigned int nextRenderTime );
+  void ProcessGestures( unsigned int lastVSyncTime, unsigned int nextVSyncTime );
 
   /**
    * Perform animation updates

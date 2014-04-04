@@ -800,7 +800,7 @@ void UpdateManager::ResetProperties()
   PERF_MONITOR_END(PerformanceMonitor::RESET_PROPERTIES);
 }
 
-void UpdateManager::ProcessGestures( unsigned int nextRenderTime )
+void UpdateManager::ProcessGestures( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
 {
   // constrain gestures... (in construction order)
   GestureContainer& gestures = mImpl->gestures;
@@ -808,7 +808,7 @@ void UpdateManager::ProcessGestures( unsigned int nextRenderTime )
   for ( GestureIter iter = gestures.Begin(), endIter = gestures.End(); iter != endIter; ++iter )
   {
     PanGesture& gesture = **iter;
-    gesture.UpdateProperties( nextRenderTime );
+    gesture.UpdateProperties( lastVSyncTime, nextVSyncTime );
   }
 }
 
@@ -1001,7 +1001,7 @@ void UpdateManager::PrepareMaterials( BufferIndex updateBufferIndex, MaterialCon
   }
 }
 
-unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastRenderTime, unsigned int nextRenderTime )
+unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSyncTime, unsigned int nextVSyncTime )
 {
   PERF_MONITOR_END(PerformanceMonitor::FRAME_RATE);   // Mark the End of the last frame
   PERF_MONITOR_NEXT_FRAME();             // Prints out performance info for the last frame (if enabled)
@@ -1048,7 +1048,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastRende
   {
     // 6) Process Touches & Gestures
     mImpl->touchResampler.Update();
-    ProcessGestures( nextRenderTime );
+    ProcessGestures( lastVSyncTime, nextVSyncTime );
 
     // 7) Animate
     Animate( elapsedSeconds );
