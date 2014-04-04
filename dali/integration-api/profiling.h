@@ -43,6 +43,15 @@ enum ProfilingType
  */
 DALI_IMPORT_API void EnableProfiling( ProfilingType type );
 
+/**
+ * @brief Called by adaptor to set the pan gesture prediction mode from
+ * an environment variable
+ *
+ * @pre Should be called after Core creation.
+ * @param mode The pan gesture prediction mode.
+ */
+DALI_IMPORT_API void SetPanGesturePredictionMode( int mode );
+
 } // namespace Integration
 
 } // namespace Dali

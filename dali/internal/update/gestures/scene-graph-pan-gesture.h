@@ -43,81 +43,16 @@ class PanGesture : public PropertyOwner
 {
 public:
 
-  /**
-   * Create a new PanGesture
-   */
-  static PanGesture* New();
+  enum PredictionMode
+  {
+    NONE,
+    AVERAGE,
+    PREDICTION_1,
+    PREDICTION_2
+  };
 
-  /**
-   * Virtual destructor
-   */
-  virtual ~PanGesture();
-
-  /**
-   * Adds a PanGesture to the internal circular-buffer waiting to be handled by UpdateProperties.
-   * @param[in]  gesture  The latest pan gesture.
-   */
-  void AddGesture( const Dali::PanGesture& gesture );
-
-  /**
-   * Called by the update manager so that we can update the value of our properties.
-   * @param[in]  lastVSyncTime  The last VSync time (in milliseconds).
-   * @param[in]  nextVSyncTime  The estimated time of the next VSync (in milliseconds).
-   */
-  virtual void UpdateProperties( unsigned int lastVSyncTime, unsigned int nextVSyncTime );
-
-  /**
-   * Retrieves a reference to the screen position property.
-   * @return The screen position property.
-   */
-  const GesturePropertyVector2& GetScreenPositionProperty() const;
-
-  /**
-   * Retrieves a reference to the screen displacement property.
-   * @return The screen displacement property.
-   */
-  const GesturePropertyVector2& GetScreenDisplacementProperty() const;
-
-  /**
-   * Retrieves a reference to the local position property.
-   * @return The local position property.
-   */
-  const GesturePropertyVector2& GetLocalPositionProperty() const;
-
-  /**
-   * Retrieves a reference to the local displacement property.
-   * @return The local displacement property.
-   */
-  const GesturePropertyVector2& GetLocalDisplacementProperty() const;
-
-  /**
-   * Called to provide pan-gesture profiling information.
-   */
-  void EnableProfiling();
-
-private:
-
-  /**
-   * Protected constructor.
-   */
-  PanGesture();
-
-  // Undefined
-  PanGesture(const PanGesture&);
-
-  // Undefined
-  PanGesture& operator=(const PanGesture&);
-
-  // PropertyOwner
-  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
-
-private:
-
-  // Properties
-  GesturePropertyVector2 mScreenPosition;     ///< screen-position
-  GesturePropertyVector2 mScreenDisplacement; ///< screen-displacement
-  GesturePropertyVector2 mLocalPosition;      ///< local-position
-  GesturePropertyVector2 mLocalDisplacement;  ///< local-displacement
+  static const PredictionMode DEFAULT_PREDICTION_MODE;
+  static const int NUM_PREDICTION_MODES;
 
   // Latest Pan Information
 
@@ -169,7 +104,8 @@ private:
      */
     PanInfo()
     : time( 0u ),
-      state( Gesture::Clear )
+      state( Gesture::Clear ),
+      read( true )
     {
     }
 
@@ -180,7 +116,8 @@ private:
     : time( rhs.time ),
       state( rhs.state ),
       local( rhs.local ),
-      screen( rhs.screen )
+      screen( rhs.screen ),
+      read( true )
     {
     }
 
@@ -218,21 +155,141 @@ private:
     }
 
     // Data
-
     unsigned int time;
     Gesture::State state;
     Info local;
     Info screen;
+    volatile bool read;
   };
 
-  PanInfo mGestures[4];         ///< Circular buffer storing the 4 most recent gestures.
+  typedef std::vector<PanInfo> PanInfoHistory;
+  typedef PanInfoHistory::iterator PanInfoHistoryIter;
+  typedef PanInfoHistory::const_iterator PanInfoHistoryConstIter;
+
+private:
+  static const unsigned int PAN_GESTURE_HISTORY = 4u;
+
+public:
+
+  /**
+   * Create a new PanGesture
+   */
+  static PanGesture* New();
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~PanGesture();
+
+  /**
+   * Adds a PanGesture to the internal circular-buffer waiting to be handled by UpdateProperties.
+   * @param[in]  gesture  The latest pan gesture.
+   */
+  void AddGesture( const Dali::PanGesture& gesture );
+
+  /**
+   * @brief Removes pan events from the history that are older than maxAge, leaving at least minEvents
+   *
+   * @param[in] panHistory The pan event history container
+   * @param[in] currentTime The current frame time
+   * @param[in] maxAge Maximum age of an event before removing (in millis)
+   * @param[in] minEvents The minimum number of events to leave in history, oldest events are removed before newest
+   */
+  void RemoveOldHistory(PanInfoHistory& panHistory, uint currentTime, uint maxAge, uint minEvents);
+
+  /**
+   * USes last two gestures
+   *
+   * @param[out] gestureOut Output gesture using average values from last two gestures
+   */
+  void SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut);
+
+  /**
+   * Uses elapsed time and time stamps
+   */
+  void PredictiveAlgorithm1(int eventsThisFrame, PanInfo& gestureOut, PanInfoHistory& panHistory, unsigned int lastVSyncTime, unsigned int nextVSyncTime);
+
+  /**
+   * Uses elapsed time, time stamps and future render time
+   */
+  void PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, PanInfoHistory& panHistory, unsigned int lastVSyncTime, unsigned int nextVSyncTime);
+
+  /**
+   * Called by the update manager so that we can update the value of our properties.
+   * @param[in]  nextRenderTime  The estimated time of the next render (in milliseconds).
+   */
+  virtual void UpdateProperties( unsigned int lastRenderTime, unsigned int nextRenderTime );
+
+  /**
+   * Retrieves a reference to the screen position property.
+   * @return The screen position property.
+   */
+  const GesturePropertyVector2& GetScreenPositionProperty() const;
+
+  /**
+   * Retrieves a reference to the screen displacement property.
+   * @return The screen displacement property.
+   */
+  const GesturePropertyVector2& GetScreenDisplacementProperty() const;
+
+  /**
+   * Retrieves a reference to the local position property.
+   * @return The local position property.
+   */
+  const GesturePropertyVector2& GetLocalPositionProperty() const;
+
+  /**
+   * Retrieves a reference to the local displacement property.
+   * @return The local displacement property.
+   */
+  const GesturePropertyVector2& GetLocalDisplacementProperty() const;
+
+  /**
+   * @brief Sets the prediction mode of the pan gesture
+   *
+   * @param[in] mode The prediction mode
+   */
+  void SetPredictionMode(PredictionMode mode) { mPredictionMode = mode; }
+
+  /**
+   * Called to provide pan-gesture profiling information.
+   */
+  void EnableProfiling();
+
+private:
+
+  /**
+   * Protected constructor.
+   */
+  PanGesture();
+
+  // Undefined
+  PanGesture(const PanGesture&);
+
+  // Undefined
+  PanGesture& operator=(const PanGesture&);
+
+  // PropertyOwner
+  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
+
+private:
+
+  // Properties
+  GesturePropertyVector2 mScreenPosition;     ///< screen-position
+  GesturePropertyVector2 mScreenDisplacement; ///< screen-displacement
+  GesturePropertyVector2 mLocalPosition;      ///< local-position
+  GesturePropertyVector2 mLocalDisplacement;  ///< local-displacement
+
+  PanInfo mGestures[PAN_GESTURE_HISTORY];         ///< Circular buffer storing the 4 most recent gestures.
+  PanInfoHistory mPanHistory;
   unsigned int mWritePosition;  ///< The next PanInfo buffer to write to. (starts at 0)
   unsigned int mReadPosition;   ///< The next PanInfo buffer to read. (starts at 0)
 
+  PanInfo mEventGesture;        ///< Result of all pan events received since last frame
   PanInfo mLatestGesture;       ///< The latest gesture. (this update frame)
-  PanInfo mPreviousGesture;     ///< The previous gesture. (one update frame ago)
   bool mInGesture;              ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled
 
+  PredictionMode mPredictionMode;  ///< The pan gesture prediction mode
   PanGestureProfiling* mProfiling; ///< NULL unless pan-gesture profiling information is required.
 };
 

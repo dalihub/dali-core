@@ -30,16 +30,15 @@ namespace Internal
 
 namespace SceneGraph
 {
-
 namespace
 {
-
-const unsigned int ARRAY_SIZE( 4u );
-
 const unsigned int UPDATES_BETWEEN_PRINT( 120u );
 unsigned int UPDATE_COUNT( 0u );
-
+const int MAX_GESTURE_AGE = 100; ///< maximum age of a gesture before disallowing its use in algorithm
 } // unnamed namespace
+
+const PanGesture::PredictionMode PanGesture::DEFAULT_PREDICTION_MODE = PanGesture::AVERAGE;
+const int PanGesture::NUM_PREDICTION_MODES = PanGesture::PREDICTION_2 + 1;
 
 PanGesture* PanGesture::New()
 {
@@ -55,91 +54,280 @@ void PanGesture::AddGesture( const Dali::PanGesture& gesture )
 {
   mGestures[ mWritePosition ] = gesture;
 
-  // Update our write position (so now this new value can be read)
-  // Note: we want to overwrite oldest gesture information even if it hasn't been read.
+  // Update our write position.
   ++mWritePosition;
-  mWritePosition %= ARRAY_SIZE;
+  mWritePosition %= PAN_GESTURE_HISTORY;
+}
+
+void PanGesture::RemoveOldHistory(PanInfoHistory& panHistory, uint currentTime, uint maxAge, uint minEvents)
+{
+  PanInfoHistoryConstIter endIter = panHistory.end();
+  PanInfoHistoryIter iter = panHistory.begin();
+  while( iter != endIter && panHistory.size() > minEvents)
+  {
+    PanInfo currentGesture = *iter;
+    if( currentTime < currentGesture.time + maxAge )
+    {
+      break;
+    }
+    panHistory.erase(iter);
+    endIter = panHistory.end();
+  }
+}
+
+void PanGesture::SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut)
+{
+  if( mInGesture )
+  {
+    if( !justStarted )
+    {
+      gestureOut.screen.position += mLatestGesture.screen.position;
+      gestureOut.local.position += mLatestGesture.local.position;
+      gestureOut.screen.position *= 0.5f;
+      gestureOut.local.position *= 0.5f;
+      // make current displacement relative to previous update-frame now.
+      gestureOut.screen.displacement -= mLatestGesture.screen.displacement;
+      gestureOut.local.displacement -= mLatestGesture.local.displacement;
+    }
+  }
+}
+
+void PanGesture::PredictiveAlgorithm1(int eventsThisFrame, PanInfo& gestureOut, PanInfoHistory& panHistory, unsigned int lastVSyncTime, unsigned int nextVSyncTime)
+{
+  RemoveOldHistory(panHistory, lastVSyncTime, MAX_GESTURE_AGE, 1);
+  size_t panHistorySize = panHistory.size();
+
+  PanInfoHistoryConstIter endIter = panHistory.end();
+  PanInfoHistoryIter iter = panHistory.end() - (panHistorySize > 2 ? 2 : panHistorySize);
+  if( panHistorySize >= 2 )
+  {
+    // create average velocity and acceleration
+    // gestureOut is the combination of gesture events from this frame
+    PanInfo lastGesture = *iter;
+    ++iter;
+    float previousAccel = 0.0f;
+    while( iter != endIter )
+    {
+      PanInfo currentGesture = *iter;
+      lastGesture = *(iter - 1);
+      float velMag = currentGesture.screen.velocity.Length();
+      float velDiff = velMag - lastGesture.screen.velocity.Length();
+      float acceleration = 0.0f;
+      float time = (float)(currentGesture.time - lastGesture.time);
+      if( time >= Math::MACHINE_EPSILON_1 )
+      {
+        acceleration = velDiff / time;
+      }
+      float interpolationTime = (float)((int)lastVSyncTime - (int)currentGesture.time);
+      float newVelMag = velMag + (((acceleration + previousAccel) * 0.5f) * interpolationTime);
+      float velMod = 1.0f;
+      if( velMag > Math::MACHINE_EPSILON_1 )
+      {
+        velMod = newVelMag / velMag;
+      }
+      gestureOut.screen.velocity *= velMod;
+      gestureOut.local.velocity *= velMod;
+      lastGesture = *iter;
+      previousAccel = acceleration;
+      ++iter;
+    }
+  }
+  // gestureOut's position is currently equal to the last event's position and its displacement is equal to last frame's total displacement
+  // add interpolated distance and position to current
+  float interpolationTime = (float)((int)lastVSyncTime - (int)gestureOut.time);
+  // work out interpolated velocity
+  gestureOut.screen.displacement = (gestureOut.screen.velocity * interpolationTime);
+  gestureOut.local.displacement = (gestureOut.local.velocity * interpolationTime);
+  gestureOut.screen.position += gestureOut.screen.displacement;
+  gestureOut.local.position += gestureOut.local.displacement;
+  gestureOut.time += interpolationTime;
+}
+
+void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, PanInfoHistory& panHistory, unsigned int lastVSyncTime, unsigned int nextVSyncTime)
+{
+  // TODO - adapt PredictiveAlgorithm1 with better smoothing, still under development
+  RemoveOldHistory(panHistory, lastVSyncTime, MAX_GESTURE_AGE, 1);
+  size_t panHistorySize = panHistory.size();
+
+  PanInfoHistoryConstIter endIter = panHistory.end();
+  PanInfoHistoryIter iter = panHistory.end() - (panHistorySize > 2 ? 2 : panHistorySize);
+  if( panHistorySize >= 2 )
+  {
+    // create average velocity and acceleration
+    // gestureOut is the combination of gesture events from this frame
+    PanInfo lastGesture = *iter;
+    ++iter;
+    float previousAccel = 0.0f;
+    while( iter != endIter )
+    {
+      PanInfo currentGesture = *iter;
+      lastGesture = *(iter - 1);
+      float velMag = currentGesture.screen.velocity.Length();
+      float velDiff = velMag - lastGesture.screen.velocity.Length();
+      float acceleration = 0.0f;
+      float time = (float)(currentGesture.time - lastGesture.time);
+      if( time >= Math::MACHINE_EPSILON_1 )
+      {
+        acceleration = velDiff / time;
+      }
+      float interpolationTime = (float)((int)lastVSyncTime - (int)currentGesture.time);
+      float newVelMag = velMag + (((acceleration + previousAccel) * 0.5f) * interpolationTime);
+      float velMod = 1.0f;
+      if( velMag > Math::MACHINE_EPSILON_1 )
+      {
+        velMod = newVelMag / velMag;
+      }
+      gestureOut.screen.velocity *= velMod;
+      gestureOut.local.velocity *= velMod;
+      lastGesture = *iter;
+      previousAccel = acceleration;
+      ++iter;
+    }
+  }
+  // gestureOut's position is currently equal to the last event's position and its displacement is equal to last frame's total displacement
+  // add interpolated distance and position to current
+  float interpolationTime = (float)((int)lastVSyncTime - (int)gestureOut.time);
+  // work out interpolated velocity
+  gestureOut.screen.displacement = (gestureOut.screen.velocity * interpolationTime);
+  gestureOut.local.displacement = (gestureOut.local.velocity * interpolationTime);
+  gestureOut.screen.position += gestureOut.screen.displacement;
+  gestureOut.local.position += gestureOut.local.displacement;
+  gestureOut.time += interpolationTime;
 }
 
 void PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
 {
-  unsigned int time( 0u );
+  if( !mInGesture )
+  {
+    // clear current pan history
+    mPanHistory.clear();
+  }
+
+  // create an event for this frame
   bool justStarted ( false );
   bool justFinished ( false );
+  bool eventFound( false );
 
-  // If our read position is not same as write position, then there
-  // must be new values on circular buffer to read.
+  // Not going through array from the beginning, using it as a circular buffer and only using unread
+  // values.
+  int eventsThisFrame = 0;
+  // set nextGesture to last gesture so it's position is correct and velocity is same as last frame
+  mEventGesture = mLatestGesture;
+  // add new gestures and work out one full gesture for the frame
   while(mReadPosition != mWritePosition)
   {
-    const PanInfo& currentGesture = mGestures[mReadPosition];
+    // Copy the gesture first
+    PanInfo currentGesture(mGestures[mReadPosition]);
 
     if( mProfiling )
     {
       mProfiling->mRawData.push_back( PanGestureProfiling::Position( currentGesture.time, currentGesture.screen.position ) );
     }
 
-    if ( currentGesture.time > time )
+    if ( currentGesture.time < mEventGesture.time )
     {
-      justStarted |= (currentGesture.state == Gesture::Started);
-      justFinished |= (currentGesture.state == Gesture::Finished || currentGesture.state == Gesture::Cancelled);
-
-      // use position values direct from gesture.
-      mLatestGesture.screen.position = currentGesture.screen.position;
-      mLatestGesture.local.position = currentGesture.local.position;
-
-      // change displacement to be relative to initial touch, instead of relative to last touch-frame.
-      if(currentGesture.state == Gesture::Started)
-      {
-        mLatestGesture.screen.displacement = currentGesture.screen.displacement;
-        mLatestGesture.local.displacement = currentGesture.local.displacement;
-      }
-      else
-      {
-        mLatestGesture.screen.displacement += currentGesture.screen.displacement;
-        mLatestGesture.local.displacement += currentGesture.local.displacement;
-      }
-
-      time = currentGesture.time;
+      break;
     }
 
+    mEventGesture.local.position = currentGesture.local.position;
+    mEventGesture.local.velocity = currentGesture.local.velocity;
+    mEventGesture.screen.position = currentGesture.screen.position;
+    mEventGesture.screen.velocity = currentGesture.screen.velocity;
+    if( !eventFound )
+    {
+      mEventGesture.local.displacement = currentGesture.local.displacement;
+      mEventGesture.screen.displacement = currentGesture.screen.displacement;
+      eventFound = true;
+    }
+    else
+    {
+      mEventGesture.local.displacement += currentGesture.local.displacement;
+      mEventGesture.screen.displacement += currentGesture.screen.displacement;
+    }
+    mEventGesture.time = currentGesture.time;
+
+    // add event to history
+    mPanHistory.push_back(currentGesture);
+    justStarted |= (currentGesture.state == Gesture::Started);
+    if( currentGesture.state == Gesture::Started )
+    {
+      justStarted = true;
+      // clear just finished as we have started new pan
+      justFinished = false;
+    }
+    justFinished |= (currentGesture.state == Gesture::Finished || currentGesture.state == Gesture::Cancelled);
+
+    // Update our read position.
     ++mReadPosition;
-    mReadPosition %= ARRAY_SIZE;
+    ++eventsThisFrame;
+    mReadPosition %= PAN_GESTURE_HISTORY;
   }
+
+  // create PanInfo to pass into prediction method
+  PanInfo nextGesture(mEventGesture);
 
   mInGesture |= justStarted;
 
+  bool updateProperties = false;
+
   if ( mInGesture )
   {
-    PanInfo gesture(mLatestGesture);
+    if( mProfiling )
+    {
+      mProfiling->mLatestData.push_back( PanGestureProfiling::Position( lastVSyncTime, mLatestGesture.screen.position ) );
+    }
+
+    switch( mPredictionMode )
+    {
+      case NONE:
+      {
+        updateProperties = eventFound;
+        // no prediction, just using latest event info
+        mLatestGesture = mEventGesture;
+        break;
+      }
+      case AVERAGE:
+      {
+        SimpleAverageAlgorithm(justStarted, nextGesture);
+        // make latest gesture equal to current gesture after averaging
+        updateProperties = true;
+        break;
+      }
+      case PREDICTION_1:
+      {
+        // make latest gesture equal to current gesture before interpolation
+        mLatestGesture = nextGesture;
+        PredictiveAlgorithm1(eventsThisFrame, nextGesture, mPanHistory, lastVSyncTime, nextVSyncTime);
+        updateProperties = true;
+        break;
+      }
+      case PREDICTION_2:
+      {
+        // make latest gesture equal to current gesture before interpolation
+        mLatestGesture = nextGesture;
+        PredictiveAlgorithm2(eventsThisFrame, nextGesture, mPanHistory, lastVSyncTime, nextVSyncTime);
+        updateProperties = true;
+        break;
+      }
+    }
+
+    // always keep latest gesture up to date with event gesture
+    mLatestGesture = mEventGesture;
+
+    if( updateProperties )
+    {
+      // only update properties if event received
+      // set latest gesture to raw pan info with unchanged time
+      mScreenPosition.Set( nextGesture.screen.position );
+      mScreenDisplacement.Set( nextGesture.screen.displacement );
+      mLocalPosition.Set( nextGesture.local.position );
+      mLocalDisplacement.Set( nextGesture.local.displacement );
+    }
 
     if( mProfiling )
     {
-      mProfiling->mLatestData.push_back( PanGestureProfiling::Position( lastVSyncTime, gesture.screen.position ) );
+      mProfiling->mAveragedData.push_back( PanGestureProfiling::Position( nextGesture.time, nextGesture.screen.position ) );
     }
-
-    if( !justStarted ) // only use previous frame if this is the continuing.
-    {
-      // If previous gesture exists, then produce position as 50/50 interpolated blend of these two points.
-      gesture.screen.position += mPreviousGesture.screen.position;
-      gesture.local.position += mPreviousGesture.local.position;
-      gesture.screen.position *= 0.5f;
-      gesture.local.position *= 0.5f;
-      // make current displacement relative to previous update-frame now.
-      gesture.screen.displacement -= mPreviousGesture.screen.displacement;
-      gesture.local.displacement -= mPreviousGesture.local.displacement;
-    }
-
-    if( mProfiling )
-    {
-      mProfiling->mAveragedData.push_back( PanGestureProfiling::Position( lastVSyncTime, gesture.screen.position ) );
-    }
-
-    mPreviousGesture = mLatestGesture;
-
-    mScreenPosition.Set( gesture.screen.position );
-    mScreenDisplacement.Set( gesture.screen.displacement );
-    mLocalPosition.Set( gesture.local.position );
-    mLocalDisplacement.Set( gesture.local.displacement );
   }
 
   mInGesture &= ~justFinished;
@@ -194,6 +382,7 @@ PanGesture::PanGesture()
   mWritePosition( 0 ),
   mReadPosition( 0 ),
   mInGesture( false ),
+  mPredictionMode(DEFAULT_PREDICTION_MODE),
   mProfiling( NULL )
 {
 }

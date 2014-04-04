@@ -27,6 +27,7 @@
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/events/pinch-gesture-detector-impl.h>
+#include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 #include <dali/public-api/events/pan-gesture.h>
 
 namespace Dali
@@ -226,6 +227,11 @@ bool GestureEventProcessor::NeedsUpdate()
 void GestureEventProcessor::EnablePanGestureProfiling()
 {
   mPanGestureProcessor.EnableProfiling();
+}
+
+void GestureEventProcessor::SetPanGesturePredictionMode(int mode)
+{
+  mPanGestureProcessor.SetPredictionMode(mode);
 }
 
 } // namespace Internal

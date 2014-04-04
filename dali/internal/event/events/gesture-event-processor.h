@@ -121,6 +121,13 @@ public: // Called by Core
    */
   void EnablePanGestureProfiling();
 
+  /**
+   * @brief Called to set how pan gestures predict and smooth input
+   *
+   * @param[in] mode The prediction mode to use
+   */
+  void SetPanGesturePredictionMode( int mode );
+
 private:
 
   // Undefined

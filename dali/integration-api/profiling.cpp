@@ -49,6 +49,12 @@ void EnableProfiling( ProfilingType type )
   }
 }
 
+void SetPanGesturePredictionMode( int mode )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGesturePredictionMode(mode);
+}
+
 } // namespace Integration
 
 } // namespace Dali

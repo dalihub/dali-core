@@ -422,6 +422,17 @@ void PanGestureProcessor::EnableProfiling()
   mSceneObject->EnableProfiling();
 }
 
+void PanGestureProcessor::SetPredictionMode(int mode)
+{
+  if( (mode < 0)
+      || (mode >= SceneGraph::PanGesture::NUM_PREDICTION_MODES) )
+  {
+    mode = SceneGraph::PanGesture::DEFAULT_PREDICTION_MODE;
+  }
+  SceneGraph::PanGesture::PredictionMode modeEnum = static_cast<SceneGraph::PanGesture::PredictionMode>(mode);
+  mSceneObject->SetPredictionMode(modeEnum);
+}
+
 void PanGestureProcessor::UpdateDetection()
 {
   DALI_ASSERT_DEBUG(!mGestureDetectors.empty());
