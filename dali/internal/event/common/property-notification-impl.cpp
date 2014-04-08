@@ -188,7 +188,10 @@ Property::Index PropertyNotification::GetTargetProperty() const
 void PropertyNotification::SetNotifyMode( NotifyMode mode )
 {
   mNotifyMode = mode;
-  PropertyNotificationSetNotifyModeMessage( mUpdateManager, mPropertyNotification, mode );
+  if( mPropertyNotification )
+  {
+    PropertyNotificationSetNotifyModeMessage( mUpdateManager, mPropertyNotification, mode );
+  }
 }
 
 PropertyNotification::NotifyMode PropertyNotification::GetNotifyMode()
