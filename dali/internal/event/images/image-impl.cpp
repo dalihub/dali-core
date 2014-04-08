@@ -303,10 +303,10 @@ bool Image::IsNinePatchFileName( std::string filename )
 {
   bool match = false;
 
-  std::string::const_iterator iter = filename.end();
+  std::string::const_reverse_iterator iter = filename.rbegin();
   iter--;
   enum { SUFFIX, HASH, HASH_DOT, DONE } state = SUFFIX;
-  while(iter >= filename.begin() && state != DONE)
+  while(iter < filename.rend() && state != DONE)
   {
     switch(state)
     {
@@ -338,9 +338,9 @@ bool Image::IsNinePatchFileName( std::string filename )
       {
         if(*iter == '.')
         {
-          state = DONE;
           match = true;
         }
+        state = DONE; // Stop testing characters
       }
       break;
       case DONE:
@@ -348,7 +348,7 @@ bool Image::IsNinePatchFileName( std::string filename )
       }
       break;
     }
-    iter--;
+    iter++;
   }
   return match;
 }
