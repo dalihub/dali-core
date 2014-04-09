@@ -5776,9 +5776,7 @@ int UtcDaliAnimationAnimateBetweenActorVisible01(void)
   END_TEST;
 }
 
-#if 0
-// Valid test case, but no fix in dali-core yet.
-//int UtcDaliAnimationAnimateBetweenActorRotation01(void)
+int UtcDaliAnimationAnimateBetweenActorRotation01(void)
 {
   TestApplication application;
 
@@ -5815,12 +5813,11 @@ int UtcDaliAnimationAnimateBetweenActorVisible01(void)
   application.SendNotification();
 
   Quaternion check = Quaternion::FromAxisAngle(Vector4::ZAXIS, Radian(Degree(60)));
-  // THIS CHECK IS CURRENTLY FAILING!!!!
+
   DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
   finishCheck.CheckSignalReceived();
   END_TEST;
 }
-#endif
 
 int UtcDaliAnimationAnimateBetweenActorRotation02(void)
 {

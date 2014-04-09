@@ -179,11 +179,19 @@ CLEANFILES = dali-shaders.cpp \
 
 noinst_PROGRAMS = linker.test
 
-linker_test_SOURCES = linker-test.cpp ../../../automated-tests/TET/dali-test-suite-utils/test-application.cpp
+linker_test_SOURCES = linker-test.cpp  \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-application.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-platform-abstraction.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-render-controller.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
+
 
 linker_test_CXXFLAGS = \
   -Werror -Wall -Wfloat-equal \
-  -I../../../automated-tests/TET/dali-test-suite-utils \
+  -I../../../automated-tests/src/dali/dali-test-suite-utils \
   $(dali_core_includes) \
   $(DALI_CFLAGS) \
   $(OPENGLES20_CFLAGS)

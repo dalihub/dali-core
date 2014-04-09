@@ -222,6 +222,7 @@ extern int UtcDaliActorGetChildAt(void);
 extern int UtcDaliActorSetGetOverlay(void);
 extern int UtcDaliActorDynamics(void);
 extern int UtcDaliActorCreateDestroy(void);
+extern int UtcDaliActorProperties(void);
 extern int UtcDaliAlphaFunctionsDefault(void);
 extern int UtcDaliAlphaFunctionsLinear(void);
 extern int UtcDaliAlphaFunctionsReverse(void);
@@ -378,6 +379,7 @@ extern int UtcDaliAnimationKeyFrames06(void);
 extern int UtcDaliAnimationAnimateBetweenActorColorAlpha(void);
 extern int UtcDaliAnimationAnimateBetweenActorColor(void);
 extern int UtcDaliAnimationAnimateBetweenActorVisible01(void);
+extern int UtcDaliAnimationAnimateBetweenActorRotation01(void);
 extern int UtcDaliAnimationAnimateBetweenActorRotation02(void);
 extern int UtcDaliAnimationMoveByFloat3(void);
 extern int UtcDaliAnimationMoveByVector3Alpha(void);
@@ -637,6 +639,7 @@ extern int UtcDaliHandleGetPropertyName(void);
 extern int UtcDaliHandleGetPropertyIndex(void);
 extern int UtcDaliHandleIsPropertyWritable(void);
 extern int UtcDaliHandleIsPropertyAnimatable(void);
+extern int UtcDaliHandleIsPropertyAConstraintInput(void);
 extern int UtcDaliHandleGetPropertyType(void);
 extern int UtcDaliHandleNonAnimtableProperties(void);
 extern int UtcDaliHandleNonAnimtableCompositeProperties(void);
@@ -704,6 +707,7 @@ extern int UtcDaliImageActorNewNull(void);
 extern int UtcDaliImageActorNewNullWithArea(void);
 extern int UtcDaliImageActorSetImage(void);
 extern int UtcDaliImageActorPropertyIndices(void);
+extern int UtcDaliImageActorImageProperty(void);
 extern int UtcDaliImageAttributesConstructor(void);
 extern int UtcDaliImageAttributesLessThan(void);
 extern int UtcDaliImageAttributesEquality(void);
@@ -760,7 +764,7 @@ extern int UtcDaliLongPressGestureSignalReceptionActorBecomesUntouchable(void);
 extern int UtcDaliLongPressGestureSignalReceptionMultipleGestureDetectors(void);
 extern int UtcDaliLongPressGestureSignalReceptionMultipleDetectorsOnActor(void);
 extern int UtcDaliLongPressGestureSignalReceptionDifferentPossible(void);
-extern int UtcDaliLongPressGestureEmitIncorrecteStateClear(void);
+extern int UtcDaliLongPressGestureEmitIncorrectStateClear(void);
 extern int UtcDaliLongPressGestureEmitIncorrectStateContinuing(void);
 extern int UtcDaliLongPressGestureRepeatedState(void);
 extern int UtcDaliLongPressGesturePossibleCancelled(void);
@@ -804,7 +808,7 @@ extern int UtcDaliMatrixSetTranslation3(void);
 extern int UtcDaliMatrixTranspose(void);
 extern int UtcDaliMatrixOStreamOperator(void);
 extern int UtcDaliMatrixMultiply(void);
-extern int UtcDaliMatrixOperatorMultiply(void);
+extern int UtcDaliMatrixOperatorMultiply01(void);
 extern int UtcDaliMatrixOperatorMultiply02(void);
 extern int UtcDaliMatrixOperatorEquals(void);
 extern int UtcDaliMatrixOperatorNotEquals(void);
@@ -829,6 +833,7 @@ extern int UtcDaliMatrix3EqualityOperator(void);
 extern int UtcDaliMatrix3InequalityOperator(void);
 extern int UtcDaliMeshActorConstructorVoid(void);
 extern int UtcDaliMeshActorNew01(void);
+extern int UtcDaliMeshActorNew03(void);
 extern int UtcDaliMeshActorIndices(void);
 extern int UtcDaliPanGestureConstructor(void);
 extern int UtcDaliPanGestureAssignment(void);
@@ -1425,6 +1430,7 @@ testcase tc_array[] = {
     {"UtcDaliActorSetGetOverlay", UtcDaliActorSetGetOverlay, utc_dali_actor_startup, utc_dali_actor_cleanup},
     {"UtcDaliActorDynamics", UtcDaliActorDynamics, utc_dali_actor_startup, utc_dali_actor_cleanup},
     {"UtcDaliActorCreateDestroy", UtcDaliActorCreateDestroy, utc_dali_actor_startup, utc_dali_actor_cleanup},
+    {"UtcDaliActorProperties", UtcDaliActorProperties, utc_dali_actor_startup, utc_dali_actor_cleanup},
     {"UtcDaliAlphaFunctionsDefault", UtcDaliAlphaFunctionsDefault, utc_dali_alpha_functions_startup, utc_dali_alpha_functions_cleanup},
     {"UtcDaliAlphaFunctionsLinear", UtcDaliAlphaFunctionsLinear, utc_dali_alpha_functions_startup, utc_dali_alpha_functions_cleanup},
     {"UtcDaliAlphaFunctionsReverse", UtcDaliAlphaFunctionsReverse, utc_dali_alpha_functions_startup, utc_dali_alpha_functions_cleanup},
@@ -1581,6 +1587,7 @@ testcase tc_array[] = {
     {"UtcDaliAnimationAnimateBetweenActorColorAlpha", UtcDaliAnimationAnimateBetweenActorColorAlpha, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationAnimateBetweenActorColor", UtcDaliAnimationAnimateBetweenActorColor, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationAnimateBetweenActorVisible01", UtcDaliAnimationAnimateBetweenActorVisible01, utc_dali_animation_startup, utc_dali_animation_cleanup},
+    {"UtcDaliAnimationAnimateBetweenActorRotation01", UtcDaliAnimationAnimateBetweenActorRotation01, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationAnimateBetweenActorRotation02", UtcDaliAnimationAnimateBetweenActorRotation02, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationMoveByFloat3", UtcDaliAnimationMoveByFloat3, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationMoveByVector3Alpha", UtcDaliAnimationMoveByVector3Alpha, utc_dali_animation_startup, utc_dali_animation_cleanup},
@@ -1840,6 +1847,7 @@ testcase tc_array[] = {
     {"UtcDaliHandleGetPropertyIndex", UtcDaliHandleGetPropertyIndex, handle_test_startup, handle_test_cleanup},
     {"UtcDaliHandleIsPropertyWritable", UtcDaliHandleIsPropertyWritable, handle_test_startup, handle_test_cleanup},
     {"UtcDaliHandleIsPropertyAnimatable", UtcDaliHandleIsPropertyAnimatable, handle_test_startup, handle_test_cleanup},
+    {"UtcDaliHandleIsPropertyAConstraintInput", UtcDaliHandleIsPropertyAConstraintInput, handle_test_startup, handle_test_cleanup},
     {"UtcDaliHandleGetPropertyType", UtcDaliHandleGetPropertyType, handle_test_startup, handle_test_cleanup},
     {"UtcDaliHandleNonAnimtableProperties", UtcDaliHandleNonAnimtableProperties, handle_test_startup, handle_test_cleanup},
     {"UtcDaliHandleNonAnimtableCompositeProperties", UtcDaliHandleNonAnimtableCompositeProperties, handle_test_startup, handle_test_cleanup},
@@ -1907,6 +1915,7 @@ testcase tc_array[] = {
     {"UtcDaliImageActorNewNullWithArea", UtcDaliImageActorNewNullWithArea, image_actor_test_startup, image_actor_test_cleanup},
     {"UtcDaliImageActorSetImage", UtcDaliImageActorSetImage, image_actor_test_startup, image_actor_test_cleanup},
     {"UtcDaliImageActorPropertyIndices", UtcDaliImageActorPropertyIndices, image_actor_test_startup, image_actor_test_cleanup},
+    {"UtcDaliImageActorImageProperty", UtcDaliImageActorImageProperty, image_actor_test_startup, image_actor_test_cleanup},
     {"UtcDaliImageAttributesConstructor", UtcDaliImageAttributesConstructor, utc_dali_image_attributes_startup, utc_dali_image_attributes_cleanup},
     {"UtcDaliImageAttributesLessThan", UtcDaliImageAttributesLessThan, utc_dali_image_attributes_startup, utc_dali_image_attributes_cleanup},
     {"UtcDaliImageAttributesEquality", UtcDaliImageAttributesEquality, utc_dali_image_attributes_startup, utc_dali_image_attributes_cleanup},
@@ -1963,7 +1972,7 @@ testcase tc_array[] = {
     {"UtcDaliLongPressGestureSignalReceptionMultipleGestureDetectors", UtcDaliLongPressGestureSignalReceptionMultipleGestureDetectors, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
     {"UtcDaliLongPressGestureSignalReceptionMultipleDetectorsOnActor", UtcDaliLongPressGestureSignalReceptionMultipleDetectorsOnActor, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
     {"UtcDaliLongPressGestureSignalReceptionDifferentPossible", UtcDaliLongPressGestureSignalReceptionDifferentPossible, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
-    {"UtcDaliLongPressGestureEmitIncorrecteStateClear", UtcDaliLongPressGestureEmitIncorrecteStateClear, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
+    {"UtcDaliLongPressGestureEmitIncorrectStateClear", UtcDaliLongPressGestureEmitIncorrectStateClear, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
     {"UtcDaliLongPressGestureEmitIncorrectStateContinuing", UtcDaliLongPressGestureEmitIncorrectStateContinuing, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
     {"UtcDaliLongPressGestureRepeatedState", UtcDaliLongPressGestureRepeatedState, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
     {"UtcDaliLongPressGesturePossibleCancelled", UtcDaliLongPressGesturePossibleCancelled, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
@@ -2007,7 +2016,7 @@ testcase tc_array[] = {
     {"UtcDaliMatrixTranspose", UtcDaliMatrixTranspose, utc_dali_matrix_startup, utc_dali_matrix_cleanup},
     {"UtcDaliMatrixOStreamOperator", UtcDaliMatrixOStreamOperator, utc_dali_matrix_startup, utc_dali_matrix_cleanup},
     {"UtcDaliMatrixMultiply", UtcDaliMatrixMultiply, utc_dali_matrix_startup, utc_dali_matrix_cleanup},
-    {"UtcDaliMatrixOperatorMultiply", UtcDaliMatrixOperatorMultiply, utc_dali_matrix_startup, utc_dali_matrix_cleanup},
+    {"UtcDaliMatrixOperatorMultiply01", UtcDaliMatrixOperatorMultiply01, utc_dali_matrix_startup, utc_dali_matrix_cleanup},
     {"UtcDaliMatrixOperatorMultiply02", UtcDaliMatrixOperatorMultiply02, utc_dali_matrix_startup, utc_dali_matrix_cleanup},
     {"UtcDaliMatrixOperatorEquals", UtcDaliMatrixOperatorEquals, utc_dali_matrix_startup, utc_dali_matrix_cleanup},
     {"UtcDaliMatrixOperatorNotEquals", UtcDaliMatrixOperatorNotEquals, utc_dali_matrix_startup, utc_dali_matrix_cleanup},
@@ -2032,6 +2041,7 @@ testcase tc_array[] = {
     {"UtcDaliMatrix3InequalityOperator", UtcDaliMatrix3InequalityOperator, utc_dali_matrix3_startup, utc_dali_matrix3_cleanup},
     {"UtcDaliMeshActorConstructorVoid", UtcDaliMeshActorConstructorVoid, mesh_actor_test_startup, mesh_actor_test_cleanup},
     {"UtcDaliMeshActorNew01", UtcDaliMeshActorNew01, mesh_actor_test_startup, mesh_actor_test_cleanup},
+    {"UtcDaliMeshActorNew03", UtcDaliMeshActorNew03, mesh_actor_test_startup, mesh_actor_test_cleanup},
     {"UtcDaliMeshActorIndices", UtcDaliMeshActorIndices, mesh_actor_test_startup, mesh_actor_test_cleanup},
     {"UtcDaliPanGestureConstructor", UtcDaliPanGestureConstructor, utc_dali_pan_gesture_startup, utc_dali_pan_gesture_cleanup},
     {"UtcDaliPanGestureAssignment", UtcDaliPanGestureAssignment, utc_dali_pan_gesture_startup, utc_dali_pan_gesture_cleanup},

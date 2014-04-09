@@ -18,7 +18,8 @@
 //
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
+#include <dali/public-api/dali-core-capi-internal.h>
 #include <stdarg.h>
 
 void tet_infoline(const char*str);

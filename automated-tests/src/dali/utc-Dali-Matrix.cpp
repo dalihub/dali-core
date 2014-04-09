@@ -499,7 +499,7 @@ int UtcDaliMatrixMultiply(void)
   END_TEST;
 }
 
-int UtcDaliMatrixOperatorMultiply(void)
+int UtcDaliMatrixOperatorMultiply01(void)
 {
   Vector4 v1(2.0f, 5.0f, 4.0f, 0.0f);
 

@@ -80,6 +80,24 @@ int UtcDaliMeshActorNew01(void)
   END_TEST;
 }
 
+int UtcDaliMeshActorNew03(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Mesh::New() - Create with no mesh");
+
+  try
+  {
+    MeshActor actor = MeshActor::New(); // Shouldn't assert
+    tet_result(TET_PASS);
+  }
+  catch (Dali::DaliException& e)
+  {
+    tet_result(TET_FAIL);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliMeshActorIndices(void)
 {
   TestApplication application;

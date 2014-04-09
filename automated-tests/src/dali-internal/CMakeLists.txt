@@ -6,10 +6,12 @@ SET(RPM_NAME "core-${PKG_NAME}-tests")
 SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
-        utc-Dali-ImageFactory.cpp
-        utc-Dali-Material.cpp
-        utc-DaliInternal-Font.cpp
-        utc-DaliInternal-ResourceClient.cpp
+        utc-Dali-Internal-Font.cpp
+        utc-Dali-Internal-Handles.cpp
+        utc-Dali-Internal-ImageFactory.cpp
+        utc-Dali-Internal-Material.cpp
+        utc-Dali-Internal-Text.cpp
+        utc-Dali-Internal-ResourceClient.cpp
 )
 
 LIST(APPEND TC_SOURCES
@@ -29,7 +31,7 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
      dali-core
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -O0 -ggdb --coverage -Wall -Werror=return-type")
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")

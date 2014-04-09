@@ -6,6 +6,16 @@
 extern void utc_dali_material_startup(void);
 extern void utc_dali_material_cleanup(void);
 
+extern int UtcDaliFontMeasureTextWidth(void);
+extern int UtcDaliFontMeasureTextWidthNegative(void);
+extern int UtcDaliFontMeasureTextHeight(void);
+extern int UtcDaliFontMeasureTextHeightNegative(void);
+extern int UtcDaliCameraActorConstructorRefObject(void);
+extern int UtcDaliImageActorConstructorRefObject(void);
+extern int UtcDaliLightActorConstructorRefObject(void);
+extern int UtcDaliMeshActorConstructorRefObject(void);
+extern int UtcDaliModelConstructorRefObject(void);
+extern int UtcDaliTextActorConstructorRefObject(void);
 extern int UtcDaliImageFactoryUseCachedRequest01(void);
 extern int UtcDaliImageFactoryUseCachedRequest02(void);
 extern int UtcDaliImageFactoryUseCachedRequest03(void);
@@ -32,10 +42,7 @@ extern int UtcDaliMaterialIsOpaqueWithoutTexture(void);
 extern int UtcDaliMaterialIsOpaqueWithTexture(void);
 extern int UtcDaliMaterialIsOpaqueWithProps(void);
 extern int UtcDaliMaterialRender(void);
-extern int UtcDaliFontMeasureTextWidth(void);
-extern int UtcDaliFontMeasureTextWidthNegative(void);
-extern int UtcDaliFontMeasureTextHeight(void);
-extern int UtcDaliFontMeasureTextHeightNegative(void);
+extern int UtcDaliTextGetImplementation(void);
 extern int UtcDaliInternalRequestResourceBitmapRequests01(void);
 extern int UtcDaliInternalRequestResourceBitmapRequests02(void);
 extern int UtcDaliInternalRequestResourceBitmapRequests03(void);
@@ -64,6 +71,16 @@ extern int UtcDaliInternalAddFrameBufferImage(void);
 extern int UtcDaliInternalAllocateMesh01(void);
 
 testcase tc_array[] = {
+    {"UtcDaliFontMeasureTextWidth", UtcDaliFontMeasureTextWidth, NULL, NULL},
+    {"UtcDaliFontMeasureTextWidthNegative", UtcDaliFontMeasureTextWidthNegative, NULL, NULL},
+    {"UtcDaliFontMeasureTextHeight", UtcDaliFontMeasureTextHeight, NULL, NULL},
+    {"UtcDaliFontMeasureTextHeightNegative", UtcDaliFontMeasureTextHeightNegative, NULL, NULL},
+    {"UtcDaliCameraActorConstructorRefObject", UtcDaliCameraActorConstructorRefObject, NULL, NULL},
+    {"UtcDaliImageActorConstructorRefObject", UtcDaliImageActorConstructorRefObject, NULL, NULL},
+    {"UtcDaliLightActorConstructorRefObject", UtcDaliLightActorConstructorRefObject, NULL, NULL},
+    {"UtcDaliMeshActorConstructorRefObject", UtcDaliMeshActorConstructorRefObject, NULL, NULL},
+    {"UtcDaliModelConstructorRefObject", UtcDaliModelConstructorRefObject, NULL, NULL},
+    {"UtcDaliTextActorConstructorRefObject", UtcDaliTextActorConstructorRefObject, NULL, NULL},
     {"UtcDaliImageFactoryUseCachedRequest01", UtcDaliImageFactoryUseCachedRequest01, NULL, NULL},
     {"UtcDaliImageFactoryUseCachedRequest02", UtcDaliImageFactoryUseCachedRequest02, NULL, NULL},
     {"UtcDaliImageFactoryUseCachedRequest03", UtcDaliImageFactoryUseCachedRequest03, NULL, NULL},
@@ -90,10 +107,7 @@ testcase tc_array[] = {
     {"UtcDaliMaterialIsOpaqueWithTexture", UtcDaliMaterialIsOpaqueWithTexture, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliMaterialIsOpaqueWithProps", UtcDaliMaterialIsOpaqueWithProps, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliMaterialRender", UtcDaliMaterialRender, utc_dali_material_startup, utc_dali_material_cleanup},
-    {"UtcDaliFontMeasureTextWidth", UtcDaliFontMeasureTextWidth, utc_dali_material_startup, utc_dali_material_cleanup},
-    {"UtcDaliFontMeasureTextWidthNegative", UtcDaliFontMeasureTextWidthNegative, utc_dali_material_startup, utc_dali_material_cleanup},
-    {"UtcDaliFontMeasureTextHeight", UtcDaliFontMeasureTextHeight, utc_dali_material_startup, utc_dali_material_cleanup},
-    {"UtcDaliFontMeasureTextHeightNegative", UtcDaliFontMeasureTextHeightNegative, utc_dali_material_startup, utc_dali_material_cleanup},
+    {"UtcDaliTextGetImplementation", UtcDaliTextGetImplementation, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliInternalRequestResourceBitmapRequests01", UtcDaliInternalRequestResourceBitmapRequests01, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliInternalRequestResourceBitmapRequests02", UtcDaliInternalRequestResourceBitmapRequests02, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliInternalRequestResourceBitmapRequests03", UtcDaliInternalRequestResourceBitmapRequests03, utc_dali_material_startup, utc_dali_material_cleanup},

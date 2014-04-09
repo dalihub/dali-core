@@ -358,6 +358,63 @@ int UtcDaliHandleIsPropertyAnimatable(void)
   END_TEST;
 }
 
+int UtcDaliHandleIsPropertyAConstraintInput(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Actor properties which can be used as a constraint input:
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::PARENT_ORIGIN ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::PARENT_ORIGIN_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::PARENT_ORIGIN_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::PARENT_ORIGIN_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::ANCHOR_POINT ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::ANCHOR_POINT_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::ANCHOR_POINT_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::ANCHOR_POINT_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::SIZE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::SIZE_WIDTH  ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::SIZE_HEIGHT ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::SIZE_DEPTH  ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::POSITION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::POSITION_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::POSITION_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::POSITION_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::SCALE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::SCALE_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::SCALE_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::SCALE_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::VISIBLE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::COLOR ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::COLOR_RED ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::COLOR_GREEN ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::COLOR_BLUE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::COLOR_ALPHA ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::WORLD_POSITION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::WORLD_ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::WORLD_SCALE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::WORLD_COLOR ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::WORLD_POSITION_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::WORLD_POSITION_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::WORLD_POSITION_Z ) );
+
+  // Actor properties that cannot be used as a constraint input
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::NAME ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::SENSITIVE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::LEAVE_REQUIRED ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::INHERIT_SHADER_EFFECT ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::INHERIT_ROTATION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::INHERIT_SCALE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::COLOR_MODE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::POSITION_INHERITANCE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::DRAW_MODE ) );
+
+  END_TEST;
+}
+
+
 int UtcDaliHandleGetPropertyType(void)
 {
   tet_infoline("Positive Test Dali::Handle::GetPropertyType()");

@@ -914,7 +914,7 @@ int UtcDaliLongPressGestureSignalReceptionDifferentPossible(void)
   END_TEST;
 }
 
-int UtcDaliLongPressGestureEmitIncorrecteStateClear(void)
+int UtcDaliLongPressGestureEmitIncorrectStateClear(void)
 {
   TestApplication application;
 

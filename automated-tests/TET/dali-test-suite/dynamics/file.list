@@ -1,7 +1,0 @@
-TARGETS += \
-  utc-Dali-DynamicsBody \
-  utc-Dali-DynamicsBodyConfig \
-  utc-Dali-DynamicsJoint \
-  utc-Dali-DynamicsShape \
-  utc-Dali-DynamicsWorld \
-  utc-Dali-DynamicsWorldConfig

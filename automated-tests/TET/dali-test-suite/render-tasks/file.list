@@ -1,3 +1,0 @@
-TARGETS += \
-        utc-Dali-RenderTaskList \
-        utc-Dali-RenderTask \

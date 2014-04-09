@@ -23,7 +23,6 @@
 #include <map>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-sync-abstraction.h>
 #include "test-trace-call-stack.h"

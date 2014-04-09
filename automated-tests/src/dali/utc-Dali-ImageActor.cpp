@@ -938,3 +938,20 @@ int UtcDaliImageActorPropertyIndices(void)
   DALI_TEST_EQUALS( indices.size(), imageActor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliImageActorImageProperty(void)
+{
+  TestApplication application;
+  Image image = Image::New( "MY_PATH" );
+  ImageActor imageActor = ImageActor::New( image );
+
+  Stage::GetCurrent().Add( imageActor );
+  application.SendNotification();
+  application.Render();
+
+  Property::Value imageMap = imageActor.GetProperty( ImageActor::IMAGE );
+  DALI_TEST_CHECK( imageMap.HasKey( "filename" ) );
+  DALI_TEST_EQUALS( imageMap.GetValue( "filename" ).Get< std::string >(), "MY_PATH", TEST_LOCATION );
+  END_TEST;
+}
+

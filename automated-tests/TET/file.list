@@ -1,4 +1,0 @@
-# Add test suite util header files here
-
-test_suite_utils_header_files = \
-  $(automated_tests_src_dir)/dali-test-suite-utils/*.h

@@ -23,8 +23,8 @@
 #include <map>
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
-
+#include <dali/public-api/dali-core-capi-internal.h>
+#include <dali/public-api/dali-core.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include "test-trace-call-stack.h"

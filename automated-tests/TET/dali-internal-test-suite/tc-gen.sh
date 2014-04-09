@@ -1,1 +1,0 @@
-../dali-test-suite/tc-gen.sh

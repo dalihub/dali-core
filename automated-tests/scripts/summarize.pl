@@ -67,6 +67,7 @@ print SUMMARY << "EOS";
   </summary>
 EOS
 
+print "\n\nSummary of all tests:\n";
 my $output_files = `ls tct*core-tests.xml`;
 my $file;
 foreach $file (split /\s+/, $output_files )
@@ -85,6 +86,8 @@ foreach $file (split /\s+/, $output_files )
     my $suite_name = $file;
     $suite_name =~ s/\.xml$//;
 
+    print "$suite_name: $num_passes tests passed out of $num_tests ( $pass_rate% )\n";
+
 print SUMMARY << "EOS2";
   <suite name="$suite_name">
     <total_case>$num_tests</total_case>
@@ -102,3 +105,5 @@ EOS2
 
 print SUMMARY "</result_summary>\n";
 close SUMMARY;
+
+print "Summary of results written to summary.xml\n";

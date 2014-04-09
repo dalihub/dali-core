@@ -17,48 +17,12 @@
 #include <iostream>
 
 #include <stdlib.h>
-#include <tet_api.h>
-
-#include <dali/public-api/dali-core.h>
-
+#include <dali/dali.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
 
-static void Startup();
-static void Cleanup();
-
-extern "C" {
-  void (*tet_startup)() = Startup;
-  void (*tet_cleanup)() = Cleanup;
-}
-
-enum {
-  POSITIVE_TC_IDX = 0x01,
-  NEGATIVE_TC_IDX,
-};
-
-#define MAX_NUMBER_OF_TESTS 10000
-extern "C" {
-  struct tet_testlist tet_testlist[MAX_NUMBER_OF_TESTS];
-}
-
-TEST_FUNCTION( UtcDaliGlyphImageNew01, POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliGlyphImageNew02, POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliGlyphImageDownCast, POSITIVE_TC_IDX );
-TEST_FUNCTION( UtcDaliGlyphImageIsColorGlyph, POSITIVE_TC_IDX );
-
-// Called only once before first test is run.
-static void Startup()
-{
-}
-
-// Called only once after last test is run
-static void Cleanup()
-{
-}
-
-static void UtcDaliGlyphImageNew01()
+int UtcDaliGlyphImageNew01(void)
 {
   TestApplication application;
 
@@ -72,9 +36,10 @@ static void UtcDaliGlyphImageNew01()
 
   DALI_TEST_CHECK( image );
   DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::GetGlyphImageFunc ) );
+  END_TEST;
 }
 
-static void UtcDaliGlyphImageNew02()
+int UtcDaliGlyphImageNew02(void)
 {
   TestApplication application;
 
@@ -89,9 +54,10 @@ static void UtcDaliGlyphImageNew02()
 
   DALI_TEST_CHECK( image );
   DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::GetGlyphImageFunc ) );
+  END_TEST;
 }
 
-static void UtcDaliGlyphImageDownCast()
+int UtcDaliGlyphImageDownCast(void)
 {
   TestApplication application;
 
@@ -115,9 +81,10 @@ static void UtcDaliGlyphImageDownCast()
 
   GlyphImage image5 = DownCast< GlyphImage >(unInitializedObject);
   DALI_TEST_CHECK(!image5);
+  END_TEST;
 }
 
-static void UtcDaliGlyphImageIsColorGlyph()
+int UtcDaliGlyphImageIsColorGlyph(void)
 {
   TestApplication application;
 
@@ -126,4 +93,5 @@ static void UtcDaliGlyphImageIsColorGlyph()
   Character character = Text( std::string( "\xf0\x9f\x98\x81" ) )[0];
 
   DALI_TEST_CHECK( GlyphImage::IsColorGlyph( character ) );
+  END_TEST;
 }

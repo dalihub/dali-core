@@ -99,7 +99,6 @@ AC_CONFIG_FILES([
  dali-core/Makefile
  dali-core.pc
  dali-test-suite-utils.pc
- ../../automated-tests/TET/rules.mk
 ])
 
 AC_OUTPUT

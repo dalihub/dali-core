@@ -182,7 +182,6 @@ extern int UtcDaliRenderTaskSetScreenToFrameBufferMappingActor(void);
 extern int UtcDaliShaderEffectFromProperties01(void);
 extern int UtcDaliShaderEffectFromProperties02(void);
 extern int UtcDaliShaderEffectFromProperties03(void);
-extern int UtcDaliShaderEffectPropertyIndices(void);
 extern int UtcDaliScriptingGetColorMode(void);
 extern int UtcDaliScriptingGetPositionInheritanceMode(void);
 extern int UtcDaliScriptingGetDrawMode(void);
@@ -430,7 +429,6 @@ testcase tc_array[] = {
     {"UtcDaliShaderEffectFromProperties01", UtcDaliShaderEffectFromProperties01, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliShaderEffectFromProperties02", UtcDaliShaderEffectFromProperties02, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliShaderEffectFromProperties03", UtcDaliShaderEffectFromProperties03, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
-    {"UtcDaliShaderEffectPropertyIndices", UtcDaliShaderEffectPropertyIndices, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliScriptingGetColorMode", UtcDaliScriptingGetColorMode, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliScriptingGetPositionInheritanceMode", UtcDaliScriptingGetPositionInheritanceMode, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliScriptingGetDrawMode", UtcDaliScriptingGetDrawMode, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},

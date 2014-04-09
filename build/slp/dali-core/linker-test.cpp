@@ -17,10 +17,23 @@
 #include "dali/public-api/dali-core.h"
 
 #include <cstdio>
+#include <stdarg.h>
 
 // Link with TET Test application, need to redefine TET functions
-#define tet_infoline printf
-#define tet_printf printf
+void tet_infoline(const char* str)
+{
+  puts(str);
+}
+
+void tet_printf(const char* str, ...)
+{
+  va_list args;
+  va_start(args, str);
+  vprintf(str, args);
+  va_end(args);
+}
+
+
 #include "test-application.h"
 
 /*****************************************************************************

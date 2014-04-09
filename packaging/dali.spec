@@ -49,17 +49,6 @@ Requires:   %{name} = %{version}-%{release}
 Integration development package for the OpenGLES Canvas
 
 ##############################
-# test-suite-utils
-##############################
-%package test-suite-utils
-Summary:    Automated Test Suite Framework for OpenGLES Canvas Library
-Group:      Development/Libs
-Requires:   %{name} = %{version}-%{release}
-
-%description test-suite-utils
-Automated Test Suite Framework for OpenGLES Canvas Library
-
-##############################
 # Preparation
 ##############################
 %prep
@@ -153,8 +142,3 @@ exit 0
 %files integration-devel
 %defattr(-,root,root,-)
 %{_includedir}/%{name}/integration-api/*
-
-%files test-suite-utils
-%defattr(-,root,root,-)
-%{_libdir}/pkgconfig/%{name}-test-suite-utils.pc
-%{_includedir}/%{name}/test-suite-utils/*

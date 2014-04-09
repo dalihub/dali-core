@@ -1,4 +1,0 @@
-TARGETS += \
-        utc-Dali-Spline \
-        utc-Dali-MeshData \
-        utc-Dali-AnimatableMesh \

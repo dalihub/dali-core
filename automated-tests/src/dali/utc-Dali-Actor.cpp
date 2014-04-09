@@ -2851,3 +2851,78 @@ int UtcDaliActorCreateDestroy(void)
   delete actor;
   END_TEST;
 }
+
+namespace
+{
+struct PropertyStringIndex
+{
+  const char * const name;
+  const Property::Index index;
+  const Property::Type type;
+};
+
+const PropertyStringIndex PROPERTY_TABLE[] =
+{
+  { "parent-origin",            Actor::PARENT_ORIGIN,           Property::VECTOR3     },
+  { "parent-origin-x",          Actor::PARENT_ORIGIN_X,         Property::FLOAT       },
+  { "parent-origin-y",          Actor::PARENT_ORIGIN_Y,         Property::FLOAT       },
+  { "parent-origin-z",          Actor::PARENT_ORIGIN_Z,         Property::FLOAT       },
+  { "anchor-point",             Actor::ANCHOR_POINT,            Property::VECTOR3     },
+  { "anchor-point-x",           Actor::ANCHOR_POINT_X,          Property::FLOAT       },
+  { "anchor-point-y",           Actor::ANCHOR_POINT_Y,          Property::FLOAT       },
+  { "anchor-point-z",           Actor::ANCHOR_POINT_Z,          Property::FLOAT       },
+  { "size",                     Actor::SIZE,                    Property::VECTOR3     },
+  { "size-width",               Actor::SIZE_WIDTH,              Property::FLOAT       },
+  { "size-height",              Actor::SIZE_HEIGHT,             Property::FLOAT       },
+  { "size-depth",               Actor::SIZE_DEPTH,              Property::FLOAT       },
+  { "position",                 Actor::POSITION,                Property::VECTOR3     },
+  { "position-x",               Actor::POSITION_X,              Property::FLOAT       },
+  { "position-y",               Actor::POSITION_Y,              Property::FLOAT       },
+  { "position-z",               Actor::POSITION_Z,              Property::FLOAT       },
+  { "world-position",           Actor::WORLD_POSITION,          Property::VECTOR3     },
+  { "world-position-x",         Actor::WORLD_POSITION_X,        Property::FLOAT       },
+  { "world-position-y",         Actor::WORLD_POSITION_Y,        Property::FLOAT       },
+  { "world-position-z",         Actor::WORLD_POSITION_Z,        Property::FLOAT       },
+  { "rotation",                 Actor::ROTATION,                Property::ROTATION    },
+  { "world-rotation",           Actor::WORLD_ROTATION,          Property::ROTATION    },
+  { "scale",                    Actor::SCALE,                   Property::VECTOR3     },
+  { "scale-x",                  Actor::SCALE_X,                 Property::FLOAT       },
+  { "scale-y",                  Actor::SCALE_Y,                 Property::FLOAT       },
+  { "scale-z",                  Actor::SCALE_Z,                 Property::FLOAT       },
+  { "world-scale",              Actor::WORLD_SCALE,             Property::VECTOR3     },
+  { "visible",                  Actor::VISIBLE,                 Property::BOOLEAN     },
+  { "color",                    Actor::COLOR,                   Property::VECTOR4     },
+  { "color-red",                Actor::COLOR_RED,               Property::FLOAT       },
+  { "color-green",              Actor::COLOR_GREEN,             Property::FLOAT       },
+  { "color-blue",               Actor::COLOR_BLUE,              Property::FLOAT       },
+  { "color-alpha",              Actor::COLOR_ALPHA,             Property::FLOAT       },
+  { "world-color",              Actor::WORLD_COLOR,             Property::VECTOR4     },
+  { "world-matrix",             Actor::WORLD_MATRIX,            Property::MATRIX      },
+  { "name",                     Actor::NAME,                    Property::STRING      },
+  { "sensitive",                Actor::SENSITIVE,               Property::BOOLEAN     },
+  { "leave-required",           Actor::LEAVE_REQUIRED,          Property::BOOLEAN     },
+  { "inherit-shader-effect",    Actor::INHERIT_SHADER_EFFECT,   Property::BOOLEAN     },
+  { "inherit-rotation",         Actor::INHERIT_ROTATION,        Property::BOOLEAN     },
+  { "inherit-scale",            Actor::INHERIT_SCALE,           Property::BOOLEAN     },
+  { "color-mode",               Actor::COLOR_MODE,              Property::STRING      },
+  { "position-inheritance",     Actor::POSITION_INHERITANCE,    Property::STRING      },
+  { "draw-mode",                Actor::DRAW_MODE,               Property::STRING      },
+};
+const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
+} // unnamed namespace
+
+int UtcDaliActorProperties(void)
+{
+  TestApplication app;
+
+  Actor actor = Actor::New();
+
+  for ( unsigned int i = 0; i < PROPERTY_TABLE_COUNT; ++i )
+  {
+    tet_printf( "Checking %s == %d\n", PROPERTY_TABLE[i].name, PROPERTY_TABLE[i].index );
+    DALI_TEST_EQUALS( actor.GetPropertyName( PROPERTY_TABLE[i].index ), PROPERTY_TABLE[i].name, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetPropertyIndex( PROPERTY_TABLE[i].name ), PROPERTY_TABLE[i].index, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetPropertyType( PROPERTY_TABLE[i].index ), PROPERTY_TABLE[i].type, TEST_LOCATION );
+  }
+  END_TEST;
+}

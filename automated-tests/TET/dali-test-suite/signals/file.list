@@ -1,3 +1,0 @@
-TARGETS += \
-        utc-Dali-SignalTemplatesV2 \
-        utc-Dali-SignalTemplatesFunctors \

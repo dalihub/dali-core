@@ -20,9 +20,6 @@ SUBDIRS = dali-core
 pkgconfigdir = $(libdir)/pkgconfig
 pkgconfig_DATA = dali-core.pc dali-test-suite-utils.pc
 
-automated_tests_src_dir = ../../automated-tests/TET
-include ../../automated-tests/TET/file.list
-
 dalitestsuitedir = $(includedir)/dali/test-suite-utils
 dalitestsuite_HEADERS = $(test_suite_utils_header_files)
 
