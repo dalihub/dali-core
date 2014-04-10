@@ -304,7 +304,6 @@ bool Image::IsNinePatchFileName( std::string filename )
   bool match = false;
 
   std::string::const_reverse_iterator iter = filename.rbegin();
-  iter--;
   enum { SUFFIX, HASH, HASH_DOT, DONE } state = SUFFIX;
   while(iter < filename.rend() && state != DONE)
   {
