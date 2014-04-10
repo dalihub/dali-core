@@ -32,13 +32,12 @@
 
 <FragmentShader>
 
-#extension GL_OES_standard_derivatives : enable
-
   uniform mediump sampler2D sTexture;
+  uniform highp   vec4      sTextureRect;
   uniform lowp    vec4      uColor;
-  uniform mediump float     uSmoothing;
+  uniform highp   vec2      uSmoothing;
 
-  varying mediump vec2      vTexCoord;
+  varying highp vec2      vTexCoord;
 
 #ifdef USE_GRADIENT
   varying lowp    vec4      vColor;
@@ -49,9 +48,7 @@
   void main()
   {
     // sample distance field
-    mediump float distance = texture2D(sTexture, vTexCoord).a;
-
-    mediump float smoothWidth = fwidth(distance) * 0.8;
+    highp float distance = texture2D(sTexture, vTexCoord).a;
 
 #ifdef USE_GRADIENT
     lowp vec4 color = clamp(vColor, 0.0, 1.0);
@@ -60,7 +57,7 @@
 #endif
 
     // adjust fragment alpha by sampled distance
-    color.a *= smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);
+    color.a *= smoothstep(uSmoothing[0], uSmoothing[1], distance );
 
     // final color multiplied by Actor color
     gl_FragColor = uColor * color;

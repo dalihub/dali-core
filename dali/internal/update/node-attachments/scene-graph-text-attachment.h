@@ -75,6 +75,13 @@ public:
   void SetTextVertexBuffer( BufferIndex updateBufferIndex, TextVertexBuffer* vertexBuffer );
 
   /**
+   * Set the pixel size of the font, this is passed to the renderer
+   * @param updateBufferIndex The current update buffer index.
+   * @param pixelSize The new pixel size
+   */
+  void SetTextFontSize( BufferIndex updateBufferIndex, float pixelSize );
+
+  /**
    * Set the color associated with the gradient end point.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] color The gradient color (end-point color)
@@ -214,6 +221,17 @@ inline void SetTextVertexBufferMessage( EventToUpdate& eventToUpdate, const Text
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetTextVertexBuffer, &buffer );
+}
+
+inline void SetTextFontSizeMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, float pixelSize )
+{
+  typedef MessageDoubleBuffered1< TextAttachment, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &TextAttachment::SetTextFontSize, pixelSize );
 }
 
 inline void SetGradientColorMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, const Vector4& color )

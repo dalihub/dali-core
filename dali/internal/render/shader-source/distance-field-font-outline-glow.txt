@@ -27,14 +27,12 @@
 
 <FragmentShader>
 
-#extension GL_OES_standard_derivatives : enable
-
   uniform mediump sampler2D sTexture;
   uniform lowp    vec4      uColor;
-  uniform mediump float     uSmoothing;
-  uniform mediump vec2      uOutline;
+  uniform highp   vec2      uSmoothing;
+  uniform highp   vec2      uOutline;
   uniform lowp    vec4      uOutlineColor;
-  uniform mediump float     uGlow;
+  uniform highp   float     uGlow;
   uniform lowp    vec4      uGlowColor;
 
   varying mediump vec2      vTexCoord;
@@ -45,12 +43,8 @@
     // sample distance field
     mediump float distance = texture2D(sTexture, vTexCoord).a;
 
-    mediump float smoothWidth = fwidth(distance) * 0.8;
-
-    mediump float outlineWidth = uOutline[1] + smoothWidth;
-
     // blend fragment color between outline color and text color
-    mediump float outlineBlend = smoothstep(uOutline[0] - outlineWidth, uOutline[0] + outlineWidth, distance);
+    mediump float outlineBlend = smoothstep(uOutline[0], uOutline[1], distance);
 
     lowp vec4 clampedColor = clamp( vColor, 0.0, 1.0 );
 
@@ -58,14 +52,14 @@
     lowp vec4 outlineColor = vec4( uOutlineColor.rgb, uOutlineColor.a * clampedColor.a );
     lowp vec4 color = mix(outlineColor, clampedColor, outlineBlend);
 
-    mediump float glowBlend = smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);
+    mediump float glowBlend = smoothstep(uSmoothing[0], uSmoothing[1], distance);
 
     // blend fragment color between glow color and text color
     lowp vec4 glowColor = vec4( uGlowColor.rgb, uGlowColor.a * clampedColor.a );
     color = mix(glowColor, color, glowBlend);
 
     // fade out glow between uSmoothing and uGlow
-    color.a *= smoothstep(uGlow, uSmoothing, distance);
+    color.a *= smoothstep(uGlow, uSmoothing[0], distance);
 
     // final color multiplied by Actor color
     gl_FragColor = uColor * color;

@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/text-actor.h>
 #include <dali/internal/common/text-parameters.h>
 #include <dali/internal/common/text-vertex-2d.h>
+#include <dali/internal/event/text/font-impl.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/shaders/program.h>
@@ -192,6 +193,11 @@ void TextRenderer::SetVertexData( TextVertexBuffer* vertexData )
   delete vertexData;
 }
 
+void TextRenderer::SetFontSize( float pixelSize )
+{
+  mPixelSize = pixelSize;
+}
+
 void TextRenderer::SetGradientColor( const Vector4& color )
 {
   AllocateTextParameters();
@@ -347,10 +353,23 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
     program.SetUniform1i( samplerLoc, 0 );
   }
 
+  const float SMOOTHING_ADJUSTMENT( 12.0f );
+  const float SMOOTHING_ADJUSTMENT_PIXEL_SIZE( 32.0f );
+
+  float smoothWidth = SMOOTHING_ADJUSTMENT / mPixelSize;
+  float smoothing = mSmoothing;
+
   const int smoothingLoc = program.GetUniformLocation( Program::UNIFORM_SMOOTHING );
   if( Program::UNIFORM_UNKNOWN != smoothingLoc )
   {
-    program.SetUniform1f( smoothingLoc, mSmoothing );
+    smoothWidth = min( min(mSmoothing, 1.0f - mSmoothing), smoothWidth );
+
+    if( mPixelSize < SMOOTHING_ADJUSTMENT_PIXEL_SIZE )
+    {
+      smoothing *= Lerp( mPixelSize / SMOOTHING_ADJUSTMENT_PIXEL_SIZE, 0.5f, 1.0f );
+    }
+
+    program.SetUniform2f( smoothingLoc, std::max(0.0f, smoothing - smoothWidth), std::min(1.0f, smoothing + smoothWidth) );
   }
 
   if( mTextParameters )
@@ -362,7 +381,11 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
       if( Program::UNIFORM_UNKNOWN != outlineLoc && Program::UNIFORM_UNKNOWN != outlineColorLoc )
       {
-        program.SetUniform2f(outlineLoc, mTextParameters->mOutline[0], mTextParameters->mOutline[1]);
+        float outlineWidth = mTextParameters->mOutline[1] + smoothWidth;
+        float outlineStart = mTextParameters->mOutline[0];
+        float outlineEnd = min( 1.0f, mTextParameters->mOutline[0] + outlineWidth );
+
+        program.SetUniform2f(outlineLoc, outlineStart, outlineEnd);
         program.SetUniform4f(outlineColorLoc, mTextParameters->mOutlineColor.r, mTextParameters->mOutlineColor.g, mTextParameters->mOutlineColor.b, mTextParameters->mOutlineColor.a);
       }
     }
@@ -390,9 +413,10 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
       {
         // convert shadow offset from tile to atlas coordinates
         const Vector2 offset( mTextParameters->mDropShadow / mTexture->GetWidth());
+        float shadowSmoothing = std::max(0.0f, smoothing - mTextParameters->mDropShadowSize );
         program.SetUniform2f(shadowLoc, offset.x, offset.y);
         program.SetUniform4f(shadowColorLoc, mTextParameters->mDropShadowColor.r, mTextParameters->mDropShadowColor.g, mTextParameters->mDropShadowColor.b, mTextParameters->mDropShadowColor.a);
-        program.SetUniform1f( shadowSmoothingLoc, std::max(0.0f, mSmoothing - mTextParameters->mDropShadowSize ) );
+        program.SetUniform2f( shadowSmoothingLoc, std::max(0.0f, shadowSmoothing - smoothWidth), std::min(1.0f, shadowSmoothing + smoothWidth) );
       }
     }
   }
@@ -480,7 +504,8 @@ TextRenderer::TextRenderer( RenderDataProvider& dataprovider )
   mTextureId( 0 ),
   mTexture( NULL ),
   mTextColor( NULL ),
-  mSmoothing( Dali::TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD )
+  mSmoothing( Dali::TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD ),
+  mPixelSize(0.0f)
 {
 }
 

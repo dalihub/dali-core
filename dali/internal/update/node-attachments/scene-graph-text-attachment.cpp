@@ -119,6 +119,17 @@ void TextAttachment::SetTextVertexBuffer( BufferIndex updateBufferIndex, TextVer
   }
 }
 
+void TextAttachment::SetTextFontSize( BufferIndex updateBufferIndex, float pixelSize )
+{
+  typedef MessageValue1< TextRenderer, float > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetFontSize, pixelSize );
+}
+
 void TextAttachment::SetGradientColor( BufferIndex updateBufferIndex, const Vector4& color )
 {
   DALI_ASSERT_DEBUG(mSceneController);

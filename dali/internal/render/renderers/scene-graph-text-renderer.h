@@ -68,6 +68,12 @@ public:
   void SetVertexData( TextVertexBuffer* vertexData );
 
   /**
+   * Set the pixel size of the font, required by the shader
+   * @param pixelSize The pixel size
+   */
+  void SetFontSize( float pixelSize );
+
+  /**
    * @copydoc Dali::TextActor::SetGradientColor()
    */
   void SetGradientColor( const Vector4& color );
@@ -174,6 +180,7 @@ private:
   OwnerPointer< TextParameters > mTextParameters; ///< Optional text parameters
   Vector4* mTextColor;
   float   mSmoothing;
+  float   mPixelSize;
 
 };
 

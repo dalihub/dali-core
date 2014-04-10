@@ -29,12 +29,10 @@
 
 <FragmentShader>
 
-#extension GL_OES_standard_derivatives : enable
-
   uniform mediump sampler2D sTexture;
   uniform lowp    vec4      uColor;
-  uniform mediump float     uSmoothing;
-  uniform mediump float     uShadowSmoothing;
+  uniform highp   vec2      uSmoothing;
+  uniform highp   vec2      uShadowSmoothing;
   uniform lowp    vec4      uShadowColor;
 
   varying highp   vec2      vTexCoord;
@@ -47,11 +45,8 @@
     mediump float distance = texture2D(sTexture, vTexCoord).a;
     mediump float shadow_distance = texture2D(sTexture, vShadowCoord).a;
 
-    mediump float smoothWidth = fwidth(distance) * 0.8;
-    mediump float shadow_smoothWidth = fwidth(shadow_distance) * 0.8;
-
-    mediump float inText = smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);
-    mediump float inShadow = smoothstep(uShadowSmoothing - shadow_smoothWidth, uShadowSmoothing + shadow_smoothWidth, shadow_distance);
+    mediump float inText = smoothstep(uSmoothing[0], uSmoothing[1], distance);
+    mediump float inShadow = smoothstep(uShadowSmoothing[0], uShadowSmoothing[1], shadow_distance);
 
     lowp vec4 color;
 

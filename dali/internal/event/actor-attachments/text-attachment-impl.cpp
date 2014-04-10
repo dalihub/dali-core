@@ -593,6 +593,11 @@ void TextAttachment::SetTextChanges()
 
     // release the vertex buffer to pass  ownership to the scene-graph-text-attachment
     SetTextVertexBufferMessage( eventToUpdate, attachment, *mVertexBuffer.Release() );
+
+    if( mFontChanged )
+    {
+      SetTextFontSizeMessage( eventToUpdate, attachment, mFont->GetPixelSize() );
+    }
   }
 }
 
