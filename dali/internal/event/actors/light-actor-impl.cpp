@@ -105,35 +105,37 @@ LightType LightTypeEnum(const std::string &stringValue)
 
 std::string LightTypeString(const LightType type)
 {
-  std::string ret;
+  std::string ret("AMBIENT");
 
-  if(type == AMBIENT)
+  switch ( type )
   {
-    ret = "AMBIENT" ;
-  }
-  else if(type == DIRECTIONAL)
-  {
-    ret = "DIRECTIONAL" ;
-  }
-  else if(type == SPOT)
-  {
-    ret = "SPOT" ;
-  }
-  else if(type == POINT)
-  {
-    ret = "POINT" ;
-  }
-  else
-  {
-    DALI_LOG_WARNING("Unknown Light Type:%d\n", type);
-    ret = "AMBIENT";
-  }
+    case AMBIENT:
+    {
+      ret = "AMBIENT";
+      break;
+    }
 
+    case DIRECTIONAL:
+    {
+      ret = "DIRECTIONAL";
+      break;
+    }
+
+    case SPOT:
+    {
+      ret = "SPOT";
+      break;
+    }
+    case POINT:
+    {
+      ret = "POINT";
+      break;
+    }
+  }
   return ret;
 }
 
-
-}
+} // namespace
 
 
 LightActorPtr LightActor::New()

@@ -54,6 +54,8 @@ TextVertexBuffer* GlyphAtlasManager::TextRequired( const TextArray& text ,
   // find the atlas which is best suited to displaying the text string
   GlyphAtlas* atlas  = FindAtlas( text, format, fontId, bestRank);
 
+  DALI_ASSERT_DEBUG( atlas && "Find atlas should always return a valid atlas." );
+
   // if the atlas is full, create a new larger one
   if( bestRank.GetSpaceStatus() == AtlasRanking::FULL_CAN_BE_RESIZED )
   {
@@ -150,7 +152,10 @@ GlyphAtlas* GlyphAtlasManager::CreateAtlas( unsigned int size )
   return atlas;
 }
 
-GlyphAtlas* GlyphAtlasManager::FindAtlas( const TextArray& text ,  const TextFormat& format, FontId fontId,  AtlasRanking &bestRank)
+GlyphAtlas* GlyphAtlasManager::FindAtlas( const TextArray& text,
+                                          const TextFormat& format,
+                                          FontId fontId,
+                                          AtlasRanking &bestRank )
 {
   // if the text is underlined, add the underline character to the text string
   TextArray searchText( text );

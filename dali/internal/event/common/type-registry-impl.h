@@ -156,8 +156,15 @@ private:
   TypeRegistry();
   ~TypeRegistry();
 
+  /**
+   * @brief Undefined Copy Constructor
+   */
   TypeRegistry(TypeRegistry &);
-  TypeRegistry &operator()(const TypeRegistry &);
+
+  /**
+   * @brief Undefined Assignment Operator
+   */
+  TypeRegistry& operator=(const TypeRegistry &);
 };
 
 

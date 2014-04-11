@@ -121,6 +121,11 @@ private:
    */
   AnimatableVertex(const AnimatableVertex& vertex);
 
+  /**
+   * @brief Undefined Assignment Operator
+   */
+  AnimatableVertex& operator=(const AnimatableVertex& vertex);
+
   int mVertex; ///< The index of this vertex in the parent mesh
   Internal::AnimatableMesh& mMesh;  ///< The parent mesh
 };

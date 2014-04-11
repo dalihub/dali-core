@@ -82,7 +82,7 @@ unsigned int GlyphAtlasSize::GetInitialSize( unsigned int initialiCharacterCount
   return GetMaxSize();
 }
 
-unsigned int GlyphAtlasSize::GetNextSize( unsigned int currentSize)
+unsigned int GlyphAtlasSize::GetNextSize( unsigned int currentSize )
 {
   for( std::size_t i = 0; i <  ATLAS_SIZE_COUNT; ++i)
   {

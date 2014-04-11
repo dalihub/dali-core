@@ -185,9 +185,7 @@ const std::string& ProxyObject::GetPropertyName( Property::Index index ) const
 
 Property::Index ProxyObject::GetPropertyIndex(const std::string& name) const
 {
-  Property::Index index = Property::INVALID_INDEX;
-
-  index = GetDefaultPropertyIndex( name );
+  Property::Index index = GetDefaultPropertyIndex( name );
 
   if ( index == Property::INVALID_INDEX )
   {

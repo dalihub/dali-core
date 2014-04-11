@@ -52,16 +52,6 @@ Constrainable::Constrainable(const Constrainable& handle)
 {
 }
 
-Constrainable& Constrainable::operator=(const Handle& rhs)
-{
-  if( this != &rhs )
-  {
-    Handle::operator=(rhs);
-  }
-
-  return *this;
-}
-
 ActiveConstraint Constrainable::ApplyConstraint( Constraint constraint )
 {
   return GetImplementation(*this).ApplyConstraint(GetImplementation(constraint));

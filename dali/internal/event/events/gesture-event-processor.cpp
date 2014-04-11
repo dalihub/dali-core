@@ -75,10 +75,6 @@ void GestureEventProcessor::ProcessGestureEvent(const Integration::GestureEvent&
     case Gesture::Tap:
       mTapGestureProcessor.Process(static_cast<const Integration::TapGestureEvent&>(event));
       break;
-
-    default:
-      DALI_ASSERT_ALWAYS( false && "Invalid gesture type sent from Integration\n" );
-      break;
   }
 }
 
@@ -113,10 +109,6 @@ void GestureEventProcessor::AddGestureDetector(GestureDetector* gestureDetector)
       mTapGestureProcessor.AddGestureDetector(tap);
       break;
     }
-
-    default:
-      DALI_ASSERT_DEBUG( false && "Invalid gesture detector type created\n" );
-      break;
   }
 }
 
@@ -151,10 +143,6 @@ void GestureEventProcessor::RemoveGestureDetector(GestureDetector* gestureDetect
       mTapGestureProcessor.RemoveGestureDetector(tap);
       break;
     }
-
-    default:
-      DALI_ASSERT_DEBUG( false && "Invalid gesture detector type removal request\n" );
-      break;
   }
 }
 
@@ -189,10 +177,6 @@ void GestureEventProcessor::GestureDetectorUpdated(GestureDetector* gestureDetec
       mTapGestureProcessor.GestureDetectorUpdated(tap);
       break;
     }
-
-    default:
-      DALI_ASSERT_DEBUG( false && "Invalid gesture type update request\n" );
-      break;
   }
 }
 

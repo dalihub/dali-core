@@ -101,11 +101,6 @@ PropertyNotification::PropertyNotification(ProxyObject& proxy,
       mConditionFunction = PropertyNotification::EvalFalse;
       break;
     }
-    default:
-    {
-      DALI_ASSERT_ALWAYS(false && "Unrecognized ConditionType");
-      break;
-    }
   }
 
   mProperty = mProxy->GetSceneObjectInputProperty( mPropertyIndex );

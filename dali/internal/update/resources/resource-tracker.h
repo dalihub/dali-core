@@ -101,9 +101,10 @@ protected:
 
 private:
   /**
-   * Undefined Copy Constructor
+   * Undefined Copy Constructor and assignment operator
    */
   ResourceTracker(const ResourceTracker& rhs);
+  ResourceTracker& operator=(const ResourceTracker& rhs);
 };
 
 

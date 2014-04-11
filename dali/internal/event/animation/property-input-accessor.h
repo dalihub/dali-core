@@ -56,6 +56,16 @@ public:
   }
 
   /**
+   * Copy from a PropertyInputAccessor
+   */
+  PropertyInputAccessor& operator=(const PropertyInputAccessor& accessor)
+  {
+    mInput = accessor.mInput;
+
+    return *this;
+  }
+
+  /**
    * Set the property input.
    */
   void SetInput( const PropertyInputImpl& input, int componentIndex )
@@ -187,6 +197,16 @@ public:
   : mInput( accessor.mInput ),
     mComponentIndex( accessor.mComponentIndex )
   {
+  }
+
+  /**
+   * Assign from a PropertyInputComponentAccessor
+   */
+  PropertyInputComponentAccessor& operator=(const PropertyInputComponentAccessor& accessor)
+  {
+    mInput = accessor.mInput;
+    mComponentIndex = accessor.mComponentIndex;
+    return *this;
   }
 
   /**

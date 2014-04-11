@@ -90,10 +90,16 @@ protected:
   virtual bool DoIsComplete();
 
 private:
+
   /**
    * Undefined Copy Constructor
    */
   SyncResourceTracker(const SyncResourceTracker& rhs);
+
+  /**
+   * @brief Undefined Assignment Operator
+   */
+  SyncResourceTracker& operator=(const SyncResourceTracker& rhs);
 
 private:
   Integration::GlSyncAbstraction& mGlSyncAbstraction; ///< The synchronisation interface

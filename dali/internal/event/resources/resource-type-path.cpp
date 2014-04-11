@@ -151,11 +151,6 @@ int ResourceTypeCompare(const ResourceType& lhs, const ResourceType& rhs)
         break; // result = 0
       }
 
-      default:
-      {
-        DALI_ASSERT_ALWAYS( false && "ResourceTypeId enumeration invalid" );
-        break;
-      }
     }
   }
   return result;

@@ -85,7 +85,7 @@ bool XyPlaneIntersect( const Vector4& pointA, const Vector4& pointB, Vector4& in
   const Vector4* near = NULL;
   const Vector4* far = NULL;
 
-  if ( true || (pointA.z > 0.0f && pointB.z < 0.0f ))
+  if ( pointA.z > 0.0f && pointB.z < 0.0f )
   {
     near = &pointA;
     far  = &pointB;

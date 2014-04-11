@@ -124,23 +124,12 @@ void EventProcessor::QueueEvent( const Event& event )
       break;
     }
 
-    case Event::Notification:
-    {
-      // TODO - Remove this deprecated event
-      break;
-    }
-
     case Event::Gesture:
     {
       QueueGestureEvent( static_cast<const Integration::GestureEvent&>(event) );
       break;
     }
 
-    default:
-    {
-      DALI_ASSERT_ALWAYS( false && "Invalid event sent from Integration\n" );
-      break;
-    }
   }
 }
 
@@ -199,12 +188,6 @@ void EventProcessor::QueueGestureEvent(const Integration::GestureEvent& event)
 
       break;
     }
-
-    default:
-    {
-      DALI_ASSERT_ALWAYS( false && "Invalid event sent from Integration\n" );
-      break;
-    }
   }
 }
 
@@ -245,15 +228,9 @@ void EventProcessor::ProcessEvents()
         break;
       }
 
-      default:
-      {
-        DALI_ASSERT_ALWAYS( false && "Invalid event sent from Integration\n" );
-        break;
-      }
-
-      // Call virtual destructor explictly; since delete will not be called after placement new
-      event->~Event();
     }
+    // Call virtual destructor explictly; since delete will not be called after placement new
+    event->~Event();
   }
 
   queueToProcess->Reset();

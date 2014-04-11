@@ -139,6 +139,9 @@ public:
     AnimatableProperty<Vector3> position;
     AnimatableProperty<Vector4> color;
     AnimatableProperty<Vector2> textureCoords;
+
+  private:
+    VertexProperties& operator=(const VertexProperties& rhs);
   };
 
   VertexProperties* mVertices;

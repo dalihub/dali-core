@@ -211,8 +211,6 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
   //   3) Traverse the scene-graph, filling the lists for the current render-task
   //   4) Prepare render-instructions
 
-  bool resourcesFinished = false;
-
   DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "ProcessRenderTasks() Offscreens first\n");
 
   // First process off screen render tasks - we may need the results of these for the on screen renders
@@ -250,7 +248,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
       continue;
     }
 
-    resourcesFinished = false;
+    bool resourcesFinished = false;
     if( renderTask.IsRenderRequired() )
     {
       ClearRenderables( sortedLayers );
@@ -290,8 +288,6 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
     renderTask.UpdateState(resourcesFinished);
   }
 
-  resourcesFinished = false;
-
   DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "ProcessRenderTasks() Onscreen\n");
 
   // Now that the off screen renders are done we can process on screen render tasks
@@ -327,7 +323,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
       continue;
     }
 
-    resourcesFinished = false;
+    bool resourcesFinished = false;
     if( renderTask.IsRenderRequired() )
     {
       ClearRenderables( sortedLayers );

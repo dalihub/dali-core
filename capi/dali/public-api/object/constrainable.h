@@ -88,14 +88,6 @@ public:
   Constrainable(const Constrainable& handle);
 
   /**
-   * @brief This assignment operator is required for (smart) pointer semantics.
-   *
-   * @param [in] rhs  A reference to the copied handle
-   * @return A reference to this
-   */
-  Constrainable& operator=(const Handle& rhs);
-
-  /**
    * @copydoc Dali::BaseHandle::operator=
    */
   using BaseHandle::operator=;

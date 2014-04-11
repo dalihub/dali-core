@@ -45,7 +45,6 @@ struct Event
   {
     Touch,         ///< A touch event, when the user interacts with the screen.
     Key,           ///< A key pressed event, from the virtual or external keyboard.
-    Notification,  ///< @deprecated; Use Core::ProcessEvents() instead.
     Gesture,       ///< A Gesture event has been detected.
     MouseWheel     ///< A mouse wheel event, when the mouse wheel is being rolled from an external mouse.
   };
