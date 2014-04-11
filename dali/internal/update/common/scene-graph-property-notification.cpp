@@ -159,7 +159,7 @@ void PropertyNotification::SetNotifyMode( NotifyMode notifyMode )
 
 bool PropertyNotification::Check( BufferIndex bufferIndex )
 {
-  bool validityChanged = false;
+  bool notifyRequired = false;
   bool currentValid = false;
 
   if ( Property::INVALID_COMPONENT_INDEX != mComponentIndex )
@@ -176,13 +176,15 @@ bool PropertyNotification::Check( BufferIndex bufferIndex )
     currentValid = mConditionFunction(input, mArguments);
   }
 
-  if( mValid != currentValid )
+  if( mValid != currentValid
+      || (currentValid && ((mConditionType == PropertyCondition::Step)
+                        || (mConditionType == PropertyCondition::VariableStep))) )
   {
     mValid = currentValid;
-    validityChanged = mNotifyValidity[currentValid];
+    notifyRequired = mNotifyValidity[currentValid];
   }
 
-  return validityChanged;
+  return notifyRequired;
 }
 
 bool PropertyNotification::GetValidity() const
