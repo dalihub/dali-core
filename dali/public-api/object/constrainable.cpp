@@ -14,7 +14,11 @@
 // limitations under the License.
 //
 
+// CLASS HEADER
 #include <dali/public-api/object/constrainable.h>
+
+// INTERNAL INCLUDES
+#include <dali/public-api/object/property-index.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/internal/event/common/proxy-object.h>
@@ -54,7 +58,12 @@ Constrainable::Constrainable(const Constrainable& handle)
 
 ActiveConstraint Constrainable::ApplyConstraint( Constraint constraint )
 {
-  return GetImplementation(*this).ApplyConstraint(GetImplementation(constraint));
+  return GetImplementation(*this).ApplyConstraint( GetImplementation( constraint ) );
+}
+
+ActiveConstraint Constrainable::ApplyConstraint( Constraint constraint, Constrainable weightObject )
+{
+  return GetImplementation(*this).ApplyConstraint( GetImplementation( constraint ), weightObject );
 }
 
 void Constrainable::RemoveConstraint(ActiveConstraint activeConstraint)
@@ -72,6 +81,20 @@ void Constrainable::RemoveConstraints( unsigned int tag )
   GetImplementation(*this).RemoveConstraints( tag );
 }
 
+namespace WeightObject
+{
 
+const Property::Index WEIGHT = PROPERTY_CUSTOM_START_INDEX;
 
-} // Dali
+Constrainable New()
+{
+  Constrainable handle = Constrainable::New();
+
+  handle.RegisterProperty( "weight", 0.0f );
+
+  return handle;
+}
+
+} // namespace WeightObject
+
+} // namespace Dali

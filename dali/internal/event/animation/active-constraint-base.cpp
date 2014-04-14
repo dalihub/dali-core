@@ -78,6 +78,7 @@ ActiveConstraintBase::ActiveConstraintBase( EventToUpdate& eventToUpdate, Proper
   mTargetPropertyIndex( targetPropertyIndex ),
   mTargetProxy( NULL ),
   mSceneGraphConstraint( NULL ),
+  mCustomWeight( NULL ),
   mOffstageWeight( Dali::ActiveConstraint::DEFAULT_WEIGHT ),
   mRemoveTime( 0.0f ),
   mAlphaFunction( Dali::Constraint::DEFAULT_ALPHA_FUNCTION ),
@@ -103,7 +104,20 @@ ActiveConstraintBase::~ActiveConstraintBase()
   }
 }
 
-void ActiveConstraintBase::FirstApply( ProxyObject& parent, TimePeriod applyTime, ActiveConstraintCallbackType* callback )
+void ActiveConstraintBase::SetCustomWeightObject( ProxyObject& weightObject, Property::Index weightIndex )
+{
+  const SceneGraph::PropertyBase* base = weightObject.GetSceneObjectAnimatableProperty( weightIndex );
+  const SceneGraph::AnimatableProperty<float>* sceneProperty = dynamic_cast< const SceneGraph::AnimatableProperty<float>* >( base );
+
+  if( sceneProperty )
+  {
+    mCustomWeight = sceneProperty;
+
+    OnCustomWeightSet( weightObject );
+  }
+}
+
+void ActiveConstraintBase::FirstApply( ProxyObject& parent, TimePeriod applyTime )
 {
   // Notify derived classes
   OnFirstApply( parent );

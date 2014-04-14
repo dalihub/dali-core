@@ -112,6 +112,14 @@ public:
   }
 
   /**
+   * @copydoc ActiveConstraintBase::OnCustomWeightSet()
+   */
+  virtual void OnCustomWeightSet( ProxyObject& weightObject )
+  {
+    ObserveProxy( weightObject );
+  }
+
+  /**
    * @copydoc ActiveConstraintBase::OnFirstApply()
    */
   virtual void OnFirstApply( ProxyObject& parent )
@@ -299,7 +307,8 @@ private:
       SceneGraph::ConstraintBase* sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
                                                                                      propertyOwners,
                                                                                      func,
-                                                                                     mInterpolatorFunction );
+                                                                                     mInterpolatorFunction,
+                                                                                     mCustomWeight );
       DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
       sceneGraphConstraint->SetInitialWeight( mOffstageWeight );
       sceneGraphConstraint->SetRemoveAction( mRemoveAction );
@@ -488,6 +497,14 @@ public:
     clone->SetTag( mTag );
 
     return clone;
+  }
+
+  /**
+   * @copydoc ActiveConstraintBase::OnCustomWeightSet()
+   */
+  virtual void OnCustomWeightSet( ProxyObject& weightObject )
+  {
+    ObserveProxy( weightObject );
   }
 
   /**
@@ -688,7 +705,8 @@ private:
         sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
                                                            propertyOwners,
                                                            func,
-                                                           mInterpolatorFunction );
+                                                           mInterpolatorFunction,
+                                                           mCustomWeight );
       }
       else
       {
@@ -701,17 +719,17 @@ private:
           if ( 0 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
           }
           else if ( 1 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
           }
           else if ( 2 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
           }
         }
         else if ( PropertyTypes::Get< Vector4 >() == targetProperty->GetType() )
@@ -721,22 +739,22 @@ private:
           if ( 0 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
           }
           else if ( 1 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
           }
           else if ( 2 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
           }
           else if ( 3 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorW<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
           }
         }
       }

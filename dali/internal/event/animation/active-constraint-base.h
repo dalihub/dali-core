@@ -39,6 +39,9 @@ class ProxyObject;
 namespace SceneGraph
 {
 class ConstraintBase;
+
+template <typename T>
+class AnimatableProperty;
 }
 
 /**
@@ -70,13 +73,19 @@ public:
   virtual ActiveConstraintBase* Clone() = 0;
 
   /**
+   * Set a custom "weight" property.
+   * @param[in] weightObject An object with a "weight" float property.
+   * @param[in] weightIndex The index of the weight property.
+   */
+  void SetCustomWeightObject( ProxyObject& weightObject, Property::Index weightIndex );
+
+  /**
    * Called when the ActiveConstraint is first applied.
    * @pre The active-constraint does not already have a parent.
    * @param[in] parent The parent object.
    * @param[in] applyTime The apply-time for this constraint.
-   * @param[in] callback A pointer to a callback for the applied signal, or NULL.
    */
-  void FirstApply( ProxyObject& parent, TimePeriod applyTime, ActiveConstraintCallbackType* callback );
+  void FirstApply( ProxyObject& parent, TimePeriod applyTime );
 
   /**
    * Called when the ActiveConstraint is removed.
@@ -278,6 +287,12 @@ private:
   // To be implemented in derived classes
 
   /**
+   * Used to observe the lifetime of an object with custom "weight" property
+   * @param [in] weightObject The object.
+   */
+  virtual void OnCustomWeightSet( ProxyObject& weightObject ) = 0;
+
+  /**
    * Set the parent of the active-constraint; called during OnFirstApply().
    * @param [in] parent The parent object.
    */
@@ -297,6 +312,8 @@ protected:
   ProxyObject* mTargetProxy; ///< The proxy-object owns the active-constraint.
 
   const SceneGraph::ConstraintBase* mSceneGraphConstraint;
+
+  const SceneGraph::AnimatableProperty<float>* mCustomWeight;
 
   float mOffstageWeight;
 

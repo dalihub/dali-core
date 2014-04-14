@@ -261,9 +261,9 @@ public: // Constraints
   /**
    * Apply a constraint to a ProxyObject.
    * @param[in] constraint The constraint to apply.
-   * @param[in] callback This method will be called at the end of the constraint apply-time.
+   * @param[in] weightObject An object with a "weight" float property.
    */
-  Dali::ActiveConstraint ApplyConstraint( Constraint& constraint, ActiveConstraintCallbackType callback );
+  Dali::ActiveConstraint ApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject );
 
   /**
    * Remove one constraint from a ProxyObject.
@@ -308,9 +308,11 @@ private:
 
   /**
    * Helper for ApplyConstraint overloads.
+   * @param[in] constraint The constraint to apply.
+   * @param[in] weightObject An object with a "weight" float property, or an empty handle.
    * @return The new active-constraint which is owned by ProxyObject.
    */
-  ActiveConstraintBase* DoApplyConstraint( Constraint& constraint, ActiveConstraintCallbackType* callback );
+  ActiveConstraintBase* DoApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject );
 
   /**
    * Helper to delete removed constraints

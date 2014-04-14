@@ -57,12 +57,14 @@ public:
    * @param[in] ownerSet A set of property owners; func is connected to the properties provided by these objects.
    * @param[in] func The function to calculate the final constrained value.
    * @param[in] interpolator The function to interpolate between start & final value.
+   * @param[in] customWeight A custom weight property, or NULL if the constraint is using its own.
    * @return A smart-pointer to a newly allocated constraint.
    */
   static ConstraintBase* New( const PropertyBase& targetProperty,
                               PropertyOwnerSet& ownerSet,
                               ConstraintFunctionPtr func,
-                              InterpolatorFunc interpolator )
+                              InterpolatorFunc interpolator,
+                              const AnimatableProperty<float>* customWeight )
   {
     // Scene-graph thread can edit these objects
     PropertyBase& property = const_cast< PropertyBase& >( targetProperty );
@@ -70,7 +72,8 @@ public:
     return new Constraint< PropertyType, PropertyAccessorType >( property,
                                                                  ownerSet,
                                                                  func,
-                                                                 interpolator );
+                                                                 interpolator,
+                                                                 customWeight );
   }
 
   /**
@@ -94,7 +97,7 @@ public:
 
     if ( ! mTargetProperty.IsClean() ||
            mFunc->InputsChanged()    ||
-         ! mWeight.IsClean() )
+         ! mWeightInput->IsClean() )
     {
       return true;
     }
@@ -119,12 +122,12 @@ public:
       const PropertyType& current = mTargetProperty.Get( updateBufferIndex );
 
       // FINAL_WEIGHT means the constraint is fully-applied, unless weight is still being animated
-      if ( ! mWeight.IsClean() ||
-           ! Equals( Dali::ActiveConstraint::FINAL_WEIGHT, mWeight[updateBufferIndex] ) )
+      if ( ! mWeightInput->IsClean() ||
+           ! Equals( Dali::ActiveConstraint::FINAL_WEIGHT, (*mWeightInput)[updateBufferIndex] ) )
       {
         // Constraint is not fully-applied; interpolation between start & final values
         mTargetProperty.Set( updateBufferIndex,
-                             mInterpolator( current, mFunc->Apply( updateBufferIndex, current ), mWeight[updateBufferIndex] ) );
+                             mInterpolator( current, mFunc->Apply( updateBufferIndex, current ), (*mWeightInput)[updateBufferIndex] ) );
       }
       else
       {
@@ -155,11 +158,13 @@ private:
   Constraint( PropertyBase& targetProperty,
               PropertyOwnerSet& ownerSet,
               ConstraintFunctionPtr func,
-              InterpolatorFunc interpolator )
+              InterpolatorFunc interpolator,
+              const AnimatableProperty<float>* customWeight )
   : ConstraintBase( ownerSet ),
     mTargetProperty( &targetProperty ),
     mFunc( func ),
-    mInterpolator( interpolator )
+    mInterpolator( interpolator ),
+    mWeightInput( customWeight ? customWeight : &mWeight)
   {
   }
 
@@ -186,6 +191,8 @@ protected:
   ConstraintFunctionPtr mFunc;
 
   InterpolatorFunc mInterpolator;
+
+  const AnimatableProperty<float>* mWeightInput;
 };
 
 } // namespace SceneGraph

@@ -728,20 +728,31 @@ void ProxyObject::DisablePropertyNotifications()
 
 Dali::ActiveConstraint ProxyObject::ApplyConstraint( Constraint& constraint )
 {
-  return Dali::ActiveConstraint(DoApplyConstraint( constraint, NULL/*callback is optional*/ ));
+  return Dali::ActiveConstraint( DoApplyConstraint( constraint, Dali::Constrainable() ) );
 }
 
-Dali::ActiveConstraint ProxyObject::ApplyConstraint( Constraint& constraint, ActiveConstraintCallbackType callback )
+Dali::ActiveConstraint ProxyObject::ApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject )
 {
-  return Dali::ActiveConstraint(DoApplyConstraint( constraint, &callback ));
+  return Dali::ActiveConstraint( DoApplyConstraint( constraint, weightObject ) );
 }
 
-ActiveConstraintBase* ProxyObject::DoApplyConstraint( Constraint& constraint, ActiveConstraintCallbackType* callback )
+ActiveConstraintBase* ProxyObject::DoApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject )
 {
   ActiveConstraintBase* activeConstraintImpl = constraint.CreateActiveConstraint();
   DALI_ASSERT_DEBUG( NULL != activeConstraintImpl );
 
   Dali::ActiveConstraint activeConstraint( activeConstraintImpl );
+
+  if( weightObject )
+  {
+    ProxyObject& weightObjectImpl = GetImplementation( weightObject );
+    Property::Index weightIndex = weightObjectImpl.GetPropertyIndex( "weight" );
+
+    if( Property::INVALID_INDEX != weightIndex )
+    {
+      activeConstraintImpl->SetCustomWeightObject( weightObjectImpl, weightIndex );
+    }
+  }
 
   if( !mConstraints )
   {
@@ -749,7 +760,7 @@ ActiveConstraintBase* ProxyObject::DoApplyConstraint( Constraint& constraint, Ac
   }
   mConstraints->push_back( activeConstraint );
 
-  activeConstraintImpl->FirstApply( *this, constraint.GetApplyTime(), callback );
+  activeConstraintImpl->FirstApply( *this, constraint.GetApplyTime() );
 
   return activeConstraintImpl;
 }

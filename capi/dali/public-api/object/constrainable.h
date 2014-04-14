@@ -98,10 +98,22 @@ public:
    * @note The constraint will be copied by the Actor. This means that modifying the apply-time etc.
    * of the constraint, will not affect actors which are already being constrained.
    * @pre The Actor has been initialized.
-   * @param[in] constraint The constraint to add.
+   * @param[in] constraint The constraint to apply.
    * @return The active-constraint being applied to the actor.
    */
   ActiveConstraint ApplyConstraint( Constraint constraint );
+
+  /**
+   * @brief Constrain one of the properties of an Actor, using a custom weight property.
+   *
+   * This overload is intended to allow a single weight property to be shared by many constraints
+   * e.g. call WeightObject::New() once, and pass the return value into every call to ApplyConstraint().
+   * @pre The Actor has been initialized.
+   * @param[in] constraint The constraint to apply.
+   * @param[in] weightObject An object which is expected to have a float property named "weight".
+   * @return The active-constraint being applied to the actor.
+   */
+  ActiveConstraint ApplyConstraint( Constraint constraint, Constrainable weightObject );
 
   /**
    * @brief Remove one constraint from an Object.
@@ -119,15 +131,14 @@ public:
   void RemoveConstraints();
 
   /**
-     * @brief Remove all the constraint from the Object with a matching tag.
-     *
-     * @pre The Object has been intialized.
-     * @param[in] tag The tag of the constraints which will be removed
-     */
+   * @brief Remove all the constraint from the Object with a matching tag.
+   *
+   * @pre The Object has been intialized.
+   * @param[in] tag The tag of the constraints which will be removed
+   */
   void RemoveConstraints( unsigned int tag );
 
 public:
-
 
   /**
    * @brief This constructor is used by Dali New() methods.
@@ -136,6 +147,20 @@ public:
    */
   explicit DALI_INTERNAL Constrainable(Dali::Internal::Object* handle);
 };
+
+namespace WeightObject
+{
+
+extern const Property::Index WEIGHT; ///< name "weight", type FLOAT
+
+/**
+ * @brief Convenience function to create an object with a custom "weight" property.
+ *
+ * @return A handle to a newly allocated object.
+ */
+Constrainable New();
+
+} // namespace WeightObject
 
 } // namespace Dali
 
