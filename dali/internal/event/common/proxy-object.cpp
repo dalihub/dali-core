@@ -894,43 +894,74 @@ TypeInfo* ProxyObject::GetTypeInfo() const
   return mTypeInfo;
 }
 
+void ProxyObject::RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph )
+{
+  if( isInScenegraph )
+  {
+    ActiveConstraintBase& baseConstraint = GetImplementation( constraint );
+    baseConstraint.BeginRemove();
+    if ( baseConstraint.IsRemoving() )
+    {
+      if( !mRemovedConstraints )
+      {
+        mRemovedConstraints = new ActiveConstraintContainer;
+      }
+      // Wait for remove animation before destroying active-constraints
+      mRemovedConstraints->push_back( constraint );
+    }
+  }
+  else if( mRemovedConstraints )
+  {
+    delete mRemovedConstraints;
+    mRemovedConstraints = NULL;
+  }
+}
+
+
 void ProxyObject::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
 {
   if( mConstraints )
   {
-    // If we have nothing in the scene-graph, just remove the activeConstraint from container
-    const SceneGraph::PropertyOwner* propertyOwner = GetSceneObject();
-    if ( NULL == propertyOwner )
+    bool isInSceneGraph( NULL != GetSceneObject() );
+    if( isInSceneGraph )
     {
-      ActiveConstraintIter it( std::find( mConstraints->begin(), mConstraints->end(), activeConstraint ) );
-      if( it != mConstraints->end() )
-      {
-        mConstraints->erase( it );
-      }
-      delete mRemovedConstraints;
-      mRemovedConstraints = NULL;
-      return;
+      DeleteRemovedConstraints();
     }
 
-    // Discard constraints which are fully removed
-    DeleteRemovedConstraints();
-
     ActiveConstraintIter it( std::find( mConstraints->begin(), mConstraints->end(), activeConstraint ) );
-    if( it != mConstraints->end() )
+    if( it !=  mConstraints->end() )
     {
-      ActiveConstraintBase& constraint = GetImplementation( *it );
-
-      constraint.BeginRemove();
+      RemoveConstraint( *it, isInSceneGraph );
       mConstraints->erase( it );
+    }
+  }
 
-      if ( constraint.IsRemoving() )
+}
+
+
+
+void ProxyObject::RemoveConstraints( unsigned int tag )
+{
+  if( mConstraints )
+  {
+    bool isInSceneGraph( NULL != GetSceneObject() );
+    if( isInSceneGraph )
+    {
+      DeleteRemovedConstraints();
+    }
+
+    ActiveConstraintIter iter( mConstraints->begin() );
+    while(iter != mConstraints->end() )
+    {
+      ActiveConstraintBase& constraint = GetImplementation( *iter );
+      if( constraint.GetTag() == tag )
       {
-        if( !mRemovedConstraints )
-        {
-          mRemovedConstraints = new ActiveConstraintContainer;
-        }
-        // Wait for remove animation before destroying active-constraints
-        mRemovedConstraints->push_back( *it );
+        RemoveConstraint( *iter, isInSceneGraph );
+        iter = mConstraints->erase( iter );
+      }
+      else
+      {
+        ++iter;
       }
     }
   }
@@ -944,31 +975,18 @@ void ProxyObject::RemoveConstraints()
     const SceneGraph::PropertyOwner* propertyOwner = GetSceneObject();
     if ( NULL == propertyOwner )
     {
-      delete mConstraints;
-      mConstraints = NULL;
       delete mRemovedConstraints;
       mRemovedConstraints = NULL;
-      return;
     }
-
-    // Discard constraints which are fully removed
-    DeleteRemovedConstraints();
-
-    const ActiveConstraintConstIter endIter = mConstraints->end();
-    for ( ActiveConstraintIter iter = mConstraints->begin(); endIter != iter; ++iter )
+    else
     {
-      ActiveConstraintBase& constraint = GetImplementation( *iter );
+      // Discard constraints which are fully removed
+      DeleteRemovedConstraints();
 
-      constraint.BeginRemove();
-
-      if ( constraint.IsRemoving() )
+      const ActiveConstraintConstIter endIter = mConstraints->end();
+      for ( ActiveConstraintIter iter = mConstraints->begin(); endIter != iter; ++iter )
       {
-        if( !mRemovedConstraints )
-        {
-          mRemovedConstraints = new ActiveConstraintContainer;
-        }
-        // Wait for remove animation before destroying active-constraints
-        mRemovedConstraints->push_back( *iter );
+        RemoveConstraint( *iter, true );
       }
     }
 
@@ -976,6 +994,8 @@ void ProxyObject::RemoveConstraints()
     mConstraints = NULL;
   }
 }
+
+
 
 ProxyObject::~ProxyObject()
 {

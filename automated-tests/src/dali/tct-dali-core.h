@@ -205,6 +205,7 @@ extern int UtcDaliActorApplyConstraint(void);
 extern int UtcDaliActorApplyConstraintAppliedCallback(void);
 extern int UtcDaliActorRemoveConstraints(void);
 extern int UtcDaliActorRemoveConstraint(void);
+extern int UtcDaliActorRemoveConstraintTag(void);
 extern int UtcDaliActorTouchedSignal(void);
 extern int UtcDaliActorSetSizeSignal(void);
 extern int UtcDaliActorOnOffStageSignal(void);
@@ -1413,6 +1414,7 @@ testcase tc_array[] = {
     {"UtcDaliActorApplyConstraintAppliedCallback", UtcDaliActorApplyConstraintAppliedCallback, utc_dali_actor_startup, utc_dali_actor_cleanup},
     {"UtcDaliActorRemoveConstraints", UtcDaliActorRemoveConstraints, utc_dali_actor_startup, utc_dali_actor_cleanup},
     {"UtcDaliActorRemoveConstraint", UtcDaliActorRemoveConstraint, utc_dali_actor_startup, utc_dali_actor_cleanup},
+    {"UtcDaliActorRemoveConstraintTag", UtcDaliActorRemoveConstraintTag, utc_dali_actor_startup, utc_dali_actor_cleanup},
     {"UtcDaliActorTouchedSignal", UtcDaliActorTouchedSignal, utc_dali_actor_startup, utc_dali_actor_cleanup},
     {"UtcDaliActorSetSizeSignal", UtcDaliActorSetSizeSignal, utc_dali_actor_startup, utc_dali_actor_cleanup},
     {"UtcDaliActorOnOffStageSignal", UtcDaliActorOnOffStageSignal, utc_dali_actor_startup, utc_dali_actor_cleanup},

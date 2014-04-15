@@ -98,6 +98,19 @@ public:
   Dali::Constraint::RemoveAction GetRemoveAction() const;
 
   /**
+   * @copydoc Dali::Constraint::SetTag()
+   */
+  void SetTag( const unsigned int tag);
+
+  /**
+   * @copydoc Dali::Constraint::GetTag()
+   */
+  unsigned int GetTag() const;
+
+
+
+
+  /**
    * Create an active constraint.
    * An active constraint is created each time the constraint is applied to an object.
    * @return A newly allocated active-constraint.

@@ -591,6 +591,20 @@ public:
    */
   RemoveAction GetRemoveAction() const;
 
+  /**
+   * @brief Set a tag for the constraint so it can be identified later
+   *
+   * @param[in] tag An integer to identify the constraint
+   */
+  void SetTag( const unsigned int tag );
+
+  /**
+   * @brief Get the tag
+   *
+   * @return The tag
+   */
+  unsigned int GetTag() const;
+
 public: // Not intended for use by Application developers
 
   /**

@@ -82,6 +82,7 @@ ActiveConstraintBase::ActiveConstraintBase( EventToUpdate& eventToUpdate, Proper
   mRemoveTime( 0.0f ),
   mAlphaFunction( Dali::Constraint::DEFAULT_ALPHA_FUNCTION ),
   mRemoveAction( Dali::Constraint::DEFAULT_REMOVE_ACTION ),
+  mTag(0),
   mApplyAnimation(),
   mRemoveAnimation()
 {
@@ -262,6 +263,17 @@ ActiveConstraintBase::RemoveAction ActiveConstraintBase::GetRemoveAction() const
 {
   return mRemoveAction;
 }
+
+void ActiveConstraintBase::SetTag(const unsigned int tag)
+{
+  mTag = tag;
+}
+
+unsigned int ActiveConstraintBase::GetTag() const
+{
+  return mTag;
+}
+
 
 bool ActiveConstraintBase::IsSceneObjectRemovable() const
 {

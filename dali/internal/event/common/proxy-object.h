@@ -276,6 +276,11 @@ public: // Constraints
    */
   void RemoveConstraints();
 
+  /**
+   * Remove all constraints from a ProxyObject with a matching tag
+   */
+  void RemoveConstraints( unsigned int tag );
+
 protected:
 
   /**
@@ -311,6 +316,12 @@ private:
    * Helper to delete removed constraints
    */
   void DeleteRemovedConstraints();
+
+  /**
+   * Helper to remove active constraints
+   */
+  void RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph );
+
 
 private: // Default property extensions for derived classes
 

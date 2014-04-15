@@ -118,6 +118,14 @@ public:
    */
   void RemoveConstraints();
 
+  /**
+     * @brief Remove all the constraint from the Object with a matching tag.
+     *
+     * @pre The Object has been intialized.
+     * @param[in] tag The tag of the constraints which will be removed
+     */
+  void RemoveConstraints( unsigned int tag );
+
 public:
 
 

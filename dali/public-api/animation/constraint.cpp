@@ -81,6 +81,20 @@ Constraint::RemoveAction Constraint::GetRemoveAction() const
   return GetImplementation(*this).GetRemoveAction();
 }
 
+void Constraint::SetTag( const unsigned int tag )
+{
+  GetImplementation(*this).SetTag( tag );
+}
+
+unsigned int Constraint::GetTag() const
+{
+  return GetImplementation(*this).GetTag();
+}
+
+
+
+
+
 Constraint Constraint::New( Property::Index target,
                             Property::Type targetType,
                             AnyFunction func,

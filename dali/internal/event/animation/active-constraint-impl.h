@@ -106,6 +106,7 @@ public:
     clone->SetRemoveTime(mRemoveTime);
     clone->SetAlphaFunction(mAlphaFunction);
     clone->SetRemoveAction(mRemoveAction);
+    clone->SetTag( mTag );
 
     return clone;
   }
@@ -484,6 +485,7 @@ public:
     clone->SetRemoveTime(mRemoveTime);
     clone->SetAlphaFunction(mAlphaFunction);
     clone->SetRemoveAction(mRemoveAction);
+    clone->SetTag( mTag );
 
     return clone;
   }

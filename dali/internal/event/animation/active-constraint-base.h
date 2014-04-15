@@ -157,6 +157,18 @@ public:
   RemoveAction GetRemoveAction() const;
 
   /**
+   * @copydoc Dali::Constraint::SetTag()
+   */
+  void SetTag(const unsigned int tag);
+
+  /**
+   * @copydoc Dali::Constraint::GetTag()
+   */
+  unsigned int GetTag() const;
+
+
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -293,6 +305,7 @@ protected:
   AlphaFunction mAlphaFunction;
 
   RemoveAction mRemoveAction;
+  unsigned int mTag;
 
 private:
 
@@ -300,6 +313,8 @@ private:
 
   Dali::Animation mApplyAnimation;  ///< Used to automatically animate weight from 0.0f -> 1.0f
   Dali::Animation mRemoveAnimation; ///< Used to automatically animate weight back to 0.0f
+
+
 };
 
 } // namespace Internal

@@ -2157,6 +2157,88 @@ int UtcDaliActorRemoveConstraint(void)
   END_TEST;
 }
 
+int UtcDaliActorRemoveConstraintTag(void)
+{
+  tet_infoline(" UtcDaliActorRemoveConstraintTag");
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // 1. Apply Constraint1 and Constraint2, and test...
+  unsigned int result1 = 0u;
+  unsigned int result2 = 0u;
+
+  unsigned constraint1Tag = 1u;
+  Constraint constraint1 = Constraint::New<Vector4>( Actor::COLOR, TestConstraintRef<Vector4>(result1, 1) );
+  constraint1.SetTag( constraint1Tag );
+  actor.ApplyConstraint( constraint1 );
+
+  unsigned constraint2Tag = 2u;
+  Constraint constraint2 = Constraint::New<Vector4>( Actor::COLOR, TestConstraintRef<Vector4>(result2, 2) );
+  constraint2.SetTag( constraint2Tag );
+  actor.ApplyConstraint( constraint2 );
+
+  Stage::GetCurrent().Add( actor );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( result1, 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( result2, 2u, TEST_LOCATION );
+
+  // 2. Remove Constraint1 and test...
+  result1 = 0;
+  result2 = 0;
+  actor.RemoveConstraints(constraint1Tag);
+  // make color property dirty, which will trigger constraints to be reapplied.
+  actor.SetColor( Color::WHITE );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( result1, 0u, TEST_LOCATION );  ///< constraint 1 should not apply now.
+  DALI_TEST_EQUALS( result2, 2u, TEST_LOCATION );
+
+  // 3. Re-Apply Constraint1 and test...
+  result1 = 0;
+  result2 = 0;
+  actor.ApplyConstraint( constraint1 );
+  // make color property dirty, which will trigger constraints to be reapplied.
+  actor.SetColor( Color::WHITE );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( result1, 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( result2, 2u, TEST_LOCATION );
+
+  // 2. Remove Constraint2 and test...
+  result1 = 0;
+  result2 = 0;
+  actor.RemoveConstraints(constraint2Tag);
+  // make color property dirty, which will trigger constraints to be reapplied.
+  actor.SetColor( Color::WHITE );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( result1, 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( result2, 0u, TEST_LOCATION ); ///< constraint 2 should not apply now.
+
+  // 2. Remove Constraint1 as well and test...
+  result1 = 0;
+  result2 = 0;
+  actor.RemoveConstraints(constraint1Tag);
+  // make color property dirty, which will trigger constraints to be reapplied.
+  actor.SetColor( Color::WHITE );
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( result1, 0u, TEST_LOCATION ); ///< constraint 1 should not apply now.
+  DALI_TEST_EQUALS( result2, 0u, TEST_LOCATION ); ///< constraint 2 should not apply now.
+  END_TEST;
+}
 
 int UtcDaliActorTouchedSignal(void)
 {

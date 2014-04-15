@@ -67,4 +67,11 @@ void Constrainable::RemoveConstraints()
   GetImplementation(*this).RemoveConstraints();
 }
 
+void Constrainable::RemoveConstraints( unsigned int tag )
+{
+  GetImplementation(*this).RemoveConstraints( tag );
+}
+
+
+
 } // Dali

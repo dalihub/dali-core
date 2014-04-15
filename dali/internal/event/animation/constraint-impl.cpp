@@ -269,6 +269,19 @@ Dali::Constraint::RemoveAction Constraint::GetRemoveAction() const
   return GetImplementation( mActiveConstraintTemplate ).GetRemoveAction();
 }
 
+
+void Constraint::SetTag(unsigned int tag)
+{
+  GetImplementation( mActiveConstraintTemplate ).SetTag(tag);
+}
+
+unsigned int Constraint::GetTag() const
+{
+  return GetImplementation( mActiveConstraintTemplate ).GetTag();
+}
+
+
+
 Constraint::~Constraint()
 {
 }
