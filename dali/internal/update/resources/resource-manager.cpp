@@ -585,9 +585,9 @@ void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceT
   }
 
   // ID should be in one of the live sets
-  if (foundLiveRequest)
+  if (!foundLiveRequest)
   {
-    DALI_LOG_WARNING("HandleDiscardResourceRequest: ID should be in one of the live sets!");
+    DALI_LOG_WARNING("HandleDiscardResourceRequest: ID should be in one of the live sets!\n");
   }
   DALI_ASSERT_DEBUG(foundLiveRequest);
 
