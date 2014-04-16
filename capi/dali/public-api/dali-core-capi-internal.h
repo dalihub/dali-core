@@ -48,6 +48,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/view-mode.h>
 
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/events/gesture.h>

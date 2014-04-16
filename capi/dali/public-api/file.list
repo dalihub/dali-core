@@ -33,7 +33,8 @@ capi_devel_common_header_files = \
   $(capi_devel_src_dir)/common/loading-state.h \
   $(capi_devel_src_dir)/common/intrusive-ptr.h \
   $(capi_devel_src_dir)/common/stage.h \
-  $(capi_devel_src_dir)/common/vector-wrapper.h
+  $(capi_devel_src_dir)/common/vector-wrapper.h \
+  $(capi_devel_src_dir)/common/view-mode.h
 
 capi_devel_events_header_files = \
   $(capi_devel_src_dir)/events/gesture.h \

@@ -29,7 +29,6 @@
 #include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/common/light.h>
-#include <dali/public-api/common/view-mode.h>
 
 #include <dali/public-api/dynamics/dynamics-body.h>
 #include <dali/public-api/dynamics/dynamics-body-config.h>
