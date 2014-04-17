@@ -48,7 +48,8 @@ namespace
 struct HitActor
 {
   HitActor()
-  : x( 0 ),
+  : actor( NULL ),
+    x( 0 ),
     y( 0 ),
     distance( std::numeric_limits<float>::max() ),
     overlay( false )
@@ -56,7 +57,7 @@ struct HitActor
 
   }
 
-  Dali::Actor actor;                    ///< the actor hit. (if actor hit, then initialised)
+  Actor *actor;                         ///< the actor hit. (if actor hit, then initialised)
   float x;                              ///< x position of hit (only valid if actor valid)
   float y;                              ///< y position of hit (only valid if actor valid)
   float distance;                       ///< distance from ray origin to hit actor
@@ -159,7 +160,7 @@ HitActor HitTestWithinLayer( Actor& actor,
           }
           else
           {
-            hit.actor = Dali::Actor(&actor);
+            hit.actor = &actor;
             hit.x = hitPointLocal.x;
             hit.y = hitPointLocal.y;
             hit.distance = distance;
@@ -370,7 +371,7 @@ bool HitTestRenderTask( LayerList& layers,
         if ( hit.actor )
         {
           results.renderTask = Dali::RenderTask(&renderTask);
-          results.actor = hit.actor;
+          results.actor = Dali::Actor(hit.actor);
           results.actorCoordinates.x = hit.x;
           results.actorCoordinates.y = hit.y;
           return true; // Success
