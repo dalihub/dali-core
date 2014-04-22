@@ -35,6 +35,7 @@ const Property::Index PanGestureDetector::SCREEN_POSITION      = Internal::DEFAU
 const Property::Index PanGestureDetector::SCREEN_DISPLACEMENT  = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 1;
 const Property::Index PanGestureDetector::LOCAL_POSITION       = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 2;
 const Property::Index PanGestureDetector::LOCAL_DISPLACEMENT   = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index PanGestureDetector::PANNING              = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 4;
 
 namespace Internal
 {
@@ -50,6 +51,7 @@ const std::string DEFAULT_PROPERTY_NAMES[] =
   "screen-displacement",
   "local-position",
   "local-displacement",
+  "panning",
 };
 const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_NAMES ) / sizeof( std::string );
 
@@ -59,6 +61,7 @@ const Property::Type DEFAULT_PROPERTY_TYPES[DEFAULT_PROPERTY_COUNT] =
   Property::VECTOR2,  // SCREEN_DISPLACEMENT
   Property::VECTOR2,  // LOCAL_POSITION
   Property::VECTOR2,  // LOCAL_DISPLACEMENT
+  Property::BOOLEAN,  // PANNING
 };
 
 BaseHandle Create()
@@ -487,6 +490,19 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       break;
     }
 
+    case Dali::PanGestureDetector::PANNING:
+    {
+      if(mSceneObject)
+      {
+        value = mSceneObject->GetPanningProperty().Get();
+      }
+      else
+      {
+        value = false;
+      }
+      break;
+    }
+
     default:
     {
       DALI_ASSERT_ALWAYS(false && "PanGestureDetector Property index invalid" ); // should not come here
@@ -560,6 +576,12 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
       case Dali::PanGestureDetector::LOCAL_DISPLACEMENT:
       {
         property = &mSceneObject->GetLocalDisplacementProperty();
+        break;
+      }
+
+      case Dali::PanGestureDetector::PANNING:
+      {
+        property = &mSceneObject->GetPanningProperty();
         break;
       }
 

@@ -163,6 +163,29 @@ public:
   }
 };
 
+/**
+ * A read only bool property used by Gestures.
+ */
+class GesturePropertyBool : public GestureProperty< bool >
+{
+public:
+
+  /**
+   * Virtual destructor.
+   */
+  virtual ~GesturePropertyBool()
+  {
+  }
+
+  /**
+   * @copydoc Dali::PropertyInput::GetBoolean()
+   */
+  virtual const bool& GetBoolean( BufferIndex bufferIndex ) const
+  {
+    return mValue;
+  }
+};
+
 } // namespace SceneGraph
 
 } // namespace Internal

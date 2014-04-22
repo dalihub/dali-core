@@ -83,6 +83,7 @@ public: // Typedefs
   static const Property::Index SCREEN_DISPLACEMENT;   ///< name "screen-displacement", type VECTOR2
   static const Property::Index LOCAL_POSITION;        ///< name "local-position",      type VECTOR2
   static const Property::Index LOCAL_DISPLACEMENT;    ///< name "local-displacement",  type VECTOR2
+  static const Property::Index PANNING;               ///< name "panning",             type BOOLEAN
 
 public: // Creation & Destruction
 

@@ -167,7 +167,7 @@ public:
   typedef PanInfoHistory::const_iterator PanInfoHistoryConstIter;
 
 private:
-  static const unsigned int PAN_GESTURE_HISTORY = 20u;
+  static const unsigned int PAN_GESTURE_HISTORY = 10u;
 
 public:
 
@@ -220,6 +220,12 @@ public:
    * @return true, if properties were updated.
    */
   virtual bool UpdateProperties( unsigned int lastRenderTime, unsigned int nextRenderTime );
+
+  /**
+   * Retrieves a reference to the panning flag property.
+   * @return The panning flag property.
+   */
+  const GesturePropertyBool& GetPanningProperty() const;
 
   /**
    * Retrieves a reference to the screen position property.
@@ -276,6 +282,7 @@ private:
 private:
 
   // Properties
+  GesturePropertyBool    mPanning;            ///< panning flag
   GesturePropertyVector2 mScreenPosition;     ///< screen-position
   GesturePropertyVector2 mScreenDisplacement; ///< screen-displacement
   GesturePropertyVector2 mLocalPosition;      ///< local-position
@@ -286,7 +293,8 @@ private:
   unsigned int mWritePosition;  ///< The next PanInfo buffer to write to. (starts at 0)
   unsigned int mReadPosition;   ///< The next PanInfo buffer to read. (starts at 0)
 
-  PanInfo mEventGesture;        ///< Result of all pan events received since last frame
+  PanInfo mEventGesture;        ///< Result of all pan events received this frame
+  PanInfo mLastEventGesture;    ///< The last frame's event gesture.
   PanInfo mLatestGesture;       ///< The latest gesture. (this update frame)
   bool mInGesture;              ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled
 
