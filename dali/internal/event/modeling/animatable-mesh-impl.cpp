@@ -306,11 +306,6 @@ void AnimatableMesh::SetDefaultProperty( Property::Index index, const Property::
       SetTextureCoords( vertexIndex, property.Get<Vector2>() );
       break;
     }
-    default:
-    {
-      DALI_ASSERT_ALWAYS(false && "AnimatableMesh property index out of range"); // should not come here
-      break;
-    }
   }
 }
 
@@ -340,11 +335,6 @@ Property::Value AnimatableMesh::GetDefaultProperty(Property::Index index) const
     case Dali::AnimatableVertex::TEXTURE_COORDS:
     {
       value = GetCurrentTextureCoords(vertexIndex);
-      break;
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS(false && "AnimatableMesh property index out of range"); // should not come here
       break;
     }
   }
@@ -385,10 +375,6 @@ const SceneGraph::PropertyBase* AnimatableMesh::GetSceneObjectAnimatableProperty
       case Dali::AnimatableVertex::TEXTURE_COORDS:
         property = &mSceneObject->mVertices[vertexIndex].textureCoords;
         break;
-
-      default:
-        DALI_ASSERT_DEBUG( 0 && "Index out of bounds" );
-        break;
     }
   }
 
@@ -413,9 +399,6 @@ const PropertyInputImpl* AnimatableMesh::GetSceneObjectInputProperty( Property::
         break;
       case Dali::AnimatableVertex::TEXTURE_COORDS:
         property = &mSceneObject->mVertices[vertexIndex].textureCoords;
-        break;
-
-      default:
         break;
     }
   }

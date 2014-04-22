@@ -89,31 +89,30 @@ PropertyNotification::PropertyNotification(UpdateManager& updateManager,
 
   // Observe target proxy and create/destroy notification scene object accordingly.
   mProxy = dynamic_cast<ProxyObject*>( &GetImplementation(target.object) );
-  mPropertyType = mProxy->GetPropertyType(mProxyPropertyIndex);
-
-  int internalComponentIndex = mProxy->GetPropertyComponentIndex(mProxyPropertyIndex);
-  if( internalComponentIndex != Property::INVALID_COMPONENT_INDEX )
-  {
-    // override the one passed in
-    mComponentIndex = internalComponentIndex;
-  }
-  if(mComponentIndex != Property::INVALID_COMPONENT_INDEX)
-  {
-    Property::Type type = mProxy->GetPropertyType(mProxyPropertyIndex);
-    if( type == Property::VECTOR2
-        || type == Property::VECTOR3
-        || type == Property::VECTOR4 )
-    {
-      mPropertyType = Property::FLOAT;
-    }
-  }
-
-  // Check if target scene-object already present, and if so create our notification
-  // scene-object
   if ( mProxy )
   {
-    const SceneGraph::PropertyOwner* object = mProxy->GetSceneObject();
+    mPropertyType = mProxy->GetPropertyType(mProxyPropertyIndex);
 
+    int internalComponentIndex = mProxy->GetPropertyComponentIndex(mProxyPropertyIndex);
+    if( internalComponentIndex != Property::INVALID_COMPONENT_INDEX )
+    {
+      // override the one passed in
+      mComponentIndex = internalComponentIndex;
+    }
+    if(mComponentIndex != Property::INVALID_COMPONENT_INDEX)
+    {
+      Property::Type type = mProxy->GetPropertyType(mProxyPropertyIndex);
+      if( type == Property::VECTOR2
+          || type == Property::VECTOR3
+          || type == Property::VECTOR4 )
+      {
+        mPropertyType = Property::FLOAT;
+      }
+    }
+
+    // Check if target scene-object already present, and if so create our notification
+    // scene-object
+    const SceneGraph::PropertyOwner* object = mProxy->GetSceneObject();
     if (object)
     {
       CreateSceneObject();

@@ -305,7 +305,7 @@ bool Image::IsNinePatchFileName( std::string filename )
 
   std::string::const_reverse_iterator iter = filename.rbegin();
   enum { SUFFIX, HASH, HASH_DOT, DONE } state = SUFFIX;
-  while(iter < filename.rend() && state != DONE)
+  while(iter < filename.rend())
   {
     switch(state)
     {
@@ -347,6 +347,13 @@ bool Image::IsNinePatchFileName( std::string filename )
       }
       break;
     }
+
+    // Satisfy prevnet
+    if( state == DONE )
+    {
+      break;
+    }
+
     iter++;
   }
   return match;
