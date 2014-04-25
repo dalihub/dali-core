@@ -274,9 +274,9 @@ void MessageQueue::ProcessMessages()
 
     // Pass back for use in the event-thread
     mImpl->recycleQueue.push_back( buffer );
-
-    mImpl->sceneUpdate >>= 1;
   }
+
+  mImpl->sceneUpdate >>= 1;
 
   mImpl->queueWasEmpty = mImpl->processQueue.empty(); // Flag whether we processed anything
 
