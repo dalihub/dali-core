@@ -791,25 +791,24 @@ void UpdateManager::ResetProperties()
     (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
-  // Reset gesture properties to base values
-  for ( GestureIter iter = mImpl->gestures.Begin(); iter != mImpl->gestures.End(); ++iter )
-  {
-    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
-  }
-
   PERF_MONITOR_END(PerformanceMonitor::RESET_PROPERTIES);
 }
 
-void UpdateManager::ProcessGestures( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
+bool UpdateManager::ProcessGestures( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
 {
+  bool gestureUpdated( false );
+
   // constrain gestures... (in construction order)
   GestureContainer& gestures = mImpl->gestures;
 
   for ( GestureIter iter = gestures.Begin(), endIter = gestures.End(); iter != endIter; ++iter )
   {
     PanGesture& gesture = **iter;
-    gesture.UpdateProperties( lastVSyncTime, nextVSyncTime );
+    gesture.ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
+    gestureUpdated |= gesture.UpdateProperties( lastVSyncTime, nextVSyncTime );
   }
+
+  return gestureUpdated;
 }
 
 void UpdateManager::Animate( float elapsedSeconds )
@@ -1019,26 +1018,31 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
   // 2) Grab any loaded resources
   bool resourceChanged = mImpl->resourceManager.UpdateCache( mSceneGraphBuffers.GetUpdateBufferIndex() );
 
+  // 3) Process Touches & Gestures
+  mImpl->touchResampler.Update();
+  const bool gestureUpdated = ProcessGestures( lastVSyncTime, nextVSyncTime );
+
   const bool updateScene =                                            // The scene-graph requires an update if..
       mImpl->activeConstraints != 0 ||                                // ..constraints were active in previous frame OR
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||              // ..nodes were dirty in previous frame OR
       IsAnimationRunning() ||                                         // ..at least one animation is running OR
       mImpl->dynamicsChanged ||                                       // ..there was a change in the dynamics simulation OR
-      mImpl->messageQueue.IsSceneUpdateRequired() ||                  // ..a message that modifies the scene graph node tree is queued
-      resourceChanged;                                                // one or more resources were updated/changed
+      mImpl->messageQueue.IsSceneUpdateRequired() ||                  // ..a message that modifies the scene graph node tree is queued OR
+      resourceChanged ||                                              // ..one or more resources were updated/changed OR
+      gestureUpdated;                                                // ..a gesture property was updated
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // values if the scene was updated in the previous frame.
   if( updateScene || mImpl->previousUpdateScene )
   {
-    // 3) Reset properties from the previous update
+    // 4) Reset properties from the previous update
     ResetProperties();
   }
 
-  // 4) Process the queued scene messages
+  // 5) Process the queued scene messages
   mImpl->messageQueue.ProcessMessages();
 
-  // 5) Post Process Ids of resources updated by renderer
+  // 6) Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( mSceneGraphBuffers.GetUpdateBufferIndex() );
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
@@ -1046,10 +1050,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
   // We should not start skipping update steps or reusing lists until there has been two frames where nothing changes
   if( updateScene || mImpl->previousUpdateScene )
   {
-    // 6) Process Touches & Gestures
-    mImpl->touchResampler.Update();
-    ProcessGestures( lastVSyncTime, nextVSyncTime );
-
     // 7) Animate
     Animate( elapsedSeconds );
 

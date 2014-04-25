@@ -428,8 +428,9 @@ private:
    * Perform gesture updates.
    * @param[in]  lastVSyncTime  The last VSync time.
    * @param[in]  nextVSyncTime  The estimated time of the next VSync.
+   * @return true, if any properties were updated.
    */
-  void ProcessGestures( unsigned int lastVSyncTime, unsigned int nextVSyncTime );
+  bool ProcessGestures( unsigned int lastVSyncTime, unsigned int nextVSyncTime );
 
   /**
    * Perform animation updates

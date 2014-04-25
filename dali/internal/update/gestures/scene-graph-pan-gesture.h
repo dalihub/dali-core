@@ -217,8 +217,9 @@ public:
   /**
    * Called by the update manager so that we can update the value of our properties.
    * @param[in]  nextRenderTime  The estimated time of the next render (in milliseconds).
+   * @return true, if properties were updated.
    */
-  virtual void UpdateProperties( unsigned int lastRenderTime, unsigned int nextRenderTime );
+  virtual bool UpdateProperties( unsigned int lastRenderTime, unsigned int nextRenderTime );
 
   /**
    * Retrieves a reference to the screen position property.

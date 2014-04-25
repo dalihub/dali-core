@@ -195,8 +195,10 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
   gestureOut.time += interpolationTime;
 }
 
-void PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
+bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
 {
+  bool propertiesUpdated( false );
+
   if( !mInGesture )
   {
     // clear current pan history
@@ -322,6 +324,8 @@ void PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
       mScreenDisplacement.Set( nextGesture.screen.displacement );
       mLocalPosition.Set( nextGesture.local.position );
       mLocalDisplacement.Set( nextGesture.local.displacement );
+
+      propertiesUpdated = true;
     }
 
     if( mProfiling )
@@ -339,6 +343,8 @@ void PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
     mProfiling->ClearData();
     UPDATE_COUNT = 0u;
   }
+
+  return propertiesUpdated;
 }
 
 const GesturePropertyVector2& PanGesture::GetScreenPositionProperty() const
