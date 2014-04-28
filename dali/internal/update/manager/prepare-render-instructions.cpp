@@ -121,6 +121,16 @@ inline void SetOverlayRenderFlags( RenderList& renderList, bool stencilRenderabl
 }
 
 /**
+ * Set flags for stencil renderlist
+ * @param renderList to set the flags for
+ */
+inline void SetStencilRenderFlags( RenderList& renderList )
+{
+  renderList.ClearFlags();
+  renderList.SetFlags(RenderList::STENCIL_CLEAR | RenderList::STENCIL_WRITE | RenderList::STENCIL_TEST);
+}
+
+/**
  * Add a renderer to the list
  * @param updateBufferIndex to read the model matrix from
  * @param renderList to add the item to
@@ -411,6 +421,7 @@ inline void AddStencilRenderers( BufferIndex updateBufferIndex,
 {
   RenderList& stencilRenderList = instruction.GetNextFreeRenderList( layer.stencilRenderables.size() );
   stencilRenderList.SetClipping( layer.IsClipping(), layer.GetClippingBox() );
+  SetStencilRenderFlags( stencilRenderList );
 
   // try to reuse cached renderitems from last time around
   if( tryReuseRenderList )
@@ -421,11 +432,6 @@ inline void AddStencilRenderers( BufferIndex updateBufferIndex,
     }
   }
   AddRenderersToRenderList( updateBufferIndex, stencilRenderList, layer.stencilRenderables, viewMatrix );
-
-  stencilRenderList.ClearFlags();
-  stencilRenderList.SetFlags(RenderList::STENCIL_CLEAR);
-  stencilRenderList.SetFlags(RenderList::STENCIL_WRITE);
-  stencilRenderList.SetFlags(RenderList::STENCIL_TEST);
 }
 
 /**
