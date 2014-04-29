@@ -447,7 +447,30 @@ int UtcDaliAnimationSetEndAction(void)
   application.Render(0);
   DALI_TEST_EQUALS( Vector3::ZERO, actor.GetCurrentPosition(), TEST_LOCATION );
 
-  // Animate again, but don't bake this time
+  // Test BakeFinal, animate again, for half the duration
+  finishCheck.Reset();
+  animation.SetEndAction(Animation::BakeFinal);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BakeFinal);
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*1000.0f*0.5f) /*half of the animation duration*/);
+
+  // Stop the animation early
+  animation.Stop();
+
+  // We did NOT expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( targetPosition * 0.5f, actor.GetCurrentPosition(), VECTOR4_EPSILON, TEST_LOCATION );
+
+  // Go back to the start
+  actor.SetPosition(Vector3::ZERO);
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( Vector3::ZERO, actor.GetCurrentPosition(), TEST_LOCATION );
+
+  // Test EndAction::Discard, animate again, but don't bake this time
   finishCheck.Reset();
   animation.SetEndAction(Animation::Discard);
   DALI_TEST_CHECK(animation.GetEndAction() == Animation::Discard);
@@ -482,6 +505,10 @@ int UtcDaliAnimationGetEndAction(void)
 
   animation.SetEndAction(Animation::Discard);
   DALI_TEST_CHECK(animation.GetEndAction() == Animation::Discard);
+
+  animation.SetEndAction(Animation::BakeFinal);
+  DALI_TEST_CHECK(animation.GetEndAction() == Animation::BakeFinal);
+
   END_TEST;
 }
 
@@ -493,6 +520,9 @@ int UtcDaliAnimationGetDestroyAction(void)
 
   animation.SetDestroyAction(Animation::Discard);
   DALI_TEST_CHECK(animation.GetDestroyAction() == Animation::Discard);
+
+  animation.SetDestroyAction(Animation::BakeFinal);
+  DALI_TEST_CHECK(animation.GetDestroyAction() == Animation::BakeFinal);
 
   END_TEST;
 }

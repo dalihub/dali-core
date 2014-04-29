@@ -122,12 +122,13 @@ public:
   typedef boost::function<Quaternion (float alpha, const Quaternion& current)> QuaternionAnimatorFunc; ///< Interpolation function
 
   /**
-   * @brief What to do when the animation ends.
+   * @brief What to do when the animation ends, is stopped or is destroyed
    */
   enum EndAction
   {
-    Bake,   ///< When the animation ends, the animated property values are saved.
-    Discard ///< When the animation ends, the animated property values are forgotten.
+    Bake,     ///< When the animation ends, the animated property values are saved.
+    Discard,  ///< When the animation ends, the animated property values are forgotten.
+    BakeFinal ///< If the animation is stopped, the animated property values are saved as if the animation had run to completion, otherwise behaves like Bake.
   };
 
   //Signal Names

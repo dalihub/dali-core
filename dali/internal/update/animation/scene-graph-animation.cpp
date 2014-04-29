@@ -97,8 +97,12 @@ bool Animation::Stop(BufferIndex bufferIndex)
   {
     animationFinished = true; // The actor-thread should be notified of this
 
-    if (mEndAction == Dali::Animation::Bake)
+    if( mEndAction != Dali::Animation::Discard )
     {
+      if( mEndAction == Dali::Animation::BakeFinal )
+      {
+        mElapsedSeconds = mDurationSeconds + Math::MACHINE_EPSILON_1; // Force animation to reach it's end
+      }
       UpdateAnimators(bufferIndex, true/*bake the final result*/);
     }
 
@@ -116,7 +120,7 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
 {
   if (mState == Playing || mState == Paused)
   {
-    if (mDestroyAction == Dali::Animation::Bake)
+    if (mDestroyAction != Dali::Animation::Discard)
     {
       UpdateAnimators(bufferIndex, true/*bake the final result*/);
     }
@@ -156,7 +160,7 @@ bool Animation::Update(BufferIndex bufferIndex, float elapsedSeconds)
 
   const bool animationFinished(mState == Playing && mElapsedSeconds > mDurationSeconds);
 
-  UpdateAnimators(bufferIndex, animationFinished && (mEndAction == Dali::Animation::Bake));
+  UpdateAnimators(bufferIndex, animationFinished && (mEndAction != Dali::Animation::Discard));
 
   if (animationFinished)
   {
