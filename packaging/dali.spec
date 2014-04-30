@@ -63,7 +63,7 @@ Integration development package for the OpenGLES Canvas
 ##############################
 %build
 PREFIX="/usr"
-CXXFLAGS+=" -Wall -g -O2 -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
+CXXFLAGS+=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread"
 
 %if 0%{?sec_build_binary_debug_enable}
