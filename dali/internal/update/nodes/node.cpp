@@ -42,8 +42,8 @@ Node* Node::New()
 }
 
 Node::Node()
-: mParentOrigin( ParentOrigin::DEFAULT, mDirtyFlags ),
-  mAnchorPoint( AnchorPoint::DEFAULT, mDirtyFlags ),
+: mParentOrigin( ParentOrigin::DEFAULT ),
+  mAnchorPoint( AnchorPoint::DEFAULT ),
   mSize( Vector3::ZERO ),
   mPosition( Vector3::ZERO ),
   mRotation( Quaternion::IDENTITY ),
@@ -55,6 +55,15 @@ Node::Node()
   mWorldScale( Vector3::ONE ),
   mWorldMatrix( Matrix::IDENTITY ),
   mWorldColor( Color::WHITE ),
+  mParent( NULL ),
+  mAppliedShader( NULL ),
+  mInheritedShader( NULL ),
+  mExclusiveRenderTask( NULL ),
+  mAttachment( NULL ),
+  mChildren(),
+  mGeometryScale( Vector3::ONE ),
+  mInitialVolume( Vector3::ONE ),
+  mDirtyFlags(AllFlags),
   mIsRoot( false ),
   mInheritShader( true ),
   mInheritRotation( true ),
@@ -64,15 +73,7 @@ Node::Node()
   mIsActive( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( DEFAULT_POSITION_INHERITANCE_MODE ),
-  mColorMode( DEFAULT_COLOR_MODE ),
-  mParent( NULL ),
-  mAttachment( NULL ),
-  mAppliedShader( NULL ),
-  mInheritedShader( NULL ),
-  mDirtyFlags(AllFlags),
-  mGeometryScale( Vector3::ONE ),
-  mInitialVolume( Vector3::ONE ),
-  mExclusiveRenderTask( NULL )
+  mColorMode( DEFAULT_COLOR_MODE )
 {
 }
 
@@ -210,11 +211,13 @@ int Node::GetDirtyFlags() const
 
   if ( !(flags & TransformFlag) )
   {
-    // Check whether the transform related properties have changed, ParentOrigin and AnchorPoint modify mDirtyFlags directly when being modified
+    // Check whether the transform related properties have changed
     if( !sizeFlag            ||
         !mPosition.IsClean() ||
         !mRotation.IsClean() ||
-        !mScale.IsClean() )
+        !mScale.IsClean()    ||
+        mParentOrigin.InputChanged() || // parent origin and anchor point rarely change
+        mAnchorPoint.InputChanged() )
     {
       flags |= TransformFlag;
     }

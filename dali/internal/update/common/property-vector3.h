@@ -46,10 +46,9 @@ public:
   /**
    * Create an non-animatable property.
    * @param [in] initialValue The initial value of the property.
-   * @param [in] dirtyFlags One bit of this mask will be set when the property changes.
    */
-  PropertyVector3( Vector3 initialValue, int& dirtyFlags )
-  : mValue( initialValue ), mDirtyFlags( dirtyFlags )
+  PropertyVector3( Vector3 initialValue )
+  : mValue( initialValue )
   {
   }
 
@@ -114,7 +113,8 @@ public:
 
 private:
 
-  int& mDirtyFlags;
+  int mDirtyFlags;
+
 };
 
 } // namespace SceneGraph

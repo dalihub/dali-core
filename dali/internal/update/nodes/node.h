@@ -1114,32 +1114,31 @@ public: // Default properties
 
 protected:
 
-  // flags, compressed to bitfield (uses only 4 bytes)
-  bool mIsRoot:1; ///< True if the node cannot have a parent
-  bool mInheritShader:1;   ///< Whether the parent's shader should be inherited.
-  bool mInheritRotation:1; ///< Whether the parent's rotation should be inherited.
-  bool mInheritScale:1; ///< Whether the parent's scale should be inherited.
-  bool mTransmitGeometryScaling:1; ///< Whether geometry scaling should be applied to world transform.
-  bool mInhibitLocalTransform:1;  // whether local transform should be applied.
-  bool mIsActive:1;  // When a Node is marked "active" it has been disconnected, and its properties have not been modified
-  DrawMode::Type mDrawMode:2; ///< How the Node and its children should be drawn
-  PositionInheritanceMode mPositionInheritanceMode:2; ///< Determines how position is inherited, 2 bits is enough
-  ColorMode mColorMode:2; ///< Determines whether mWorldColor is inherited, 2 bits is enough
+  Node*               mParent;                       ///< Pointer to parent node (a child is owned by its parent)
+  Shader*             mAppliedShader;                ///< A pointer to an applied shader
+  Shader*             mInheritedShader;              ///< A pointer to an inherited shader
+  RenderTask*         mExclusiveRenderTask;          ///< Nodes can be marked as exclusive to a single RenderTask
 
-  Node* mParent; ///< Pointer to parent node (a child is owned by its parent)
-  NodeContainer mChildren; ///< Container of children; not owned
+  NodeAttachmentOwner mAttachment;                   ///< Optional owned attachment
+  NodeContainer       mChildren;                     ///< Container of children; not owned
 
-  NodeAttachmentOwner mAttachment; ///< Optional owned attachment
+  Vector3             mGeometryScale;                ///< Applied before calculating world transform.
+  Vector3             mInitialVolume;                ///< Initial volume... TODO - need a better name
 
-  Shader* mAppliedShader;   ///< A pointer to an applied shader
-  Shader* mInheritedShader; ///< A pointer to an inherited shader
+  // flags, compressed to bitfield
+  int  mDirtyFlags:10;                               ///< A composite set of flags for each of the Node properties
 
-  int mDirtyFlags; ///< A composite set of flags for each of the Node properties
+  bool mIsRoot:1;                                    ///< True if the node cannot have a parent
+  bool mInheritShader:1;                             ///< Whether the parent's shader should be inherited.
+  bool mInheritRotation:1;                           ///< Whether the parent's rotation should be inherited.
+  bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
+  bool mTransmitGeometryScaling:1;                   ///< Whether geometry scaling should be applied to world transform.
+  bool mInhibitLocalTransform:1;                     ///< whether local transform should be applied.
+  bool mIsActive:1;                                  ///< When a Node is marked "active" it has been disconnected, and its properties have not been modified
 
-  Vector3    mGeometryScale;    ///< Applied before calculating world transform.
-  Vector3    mInitialVolume;    ///< Initial volume... TODO - need a better name
-
-  RenderTask* mExclusiveRenderTask; ///< Nodes can be marked as exclusive to a single RenderTask
+  DrawMode::Type          mDrawMode:2;               ///< How the Node and its children should be drawn
+  PositionInheritanceMode mPositionInheritanceMode:2;///< Determines how position is inherited, 2 bits is enough
+  ColorMode               mColorMode:2;              ///< Determines whether mWorldColor is inherited, 2 bits is enough
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

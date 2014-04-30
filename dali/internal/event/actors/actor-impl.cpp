@@ -1975,8 +1975,17 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 }
 
 Actor::Actor( DerivedType derivedType )
-: mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
-  mStage( NULL ),
+: mStage( NULL ),
+  mParent( NULL ),
+  mChildren( NULL ),
+  mNode( NULL ),
+  mParentOrigin( NULL ),
+  mAnchorPoint( NULL ),
+  mDynamicsData( NULL ),
+  mAttachment(),
+  mShaderEffect(),
+  mName(),
+  mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsRenderable( RENDERABLE == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
@@ -1992,13 +2001,7 @@ Actor::Actor( DerivedType derivedType )
   mInheritScale( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
-  mColorMode( Node::DEFAULT_COLOR_MODE ),
-  mParent( NULL ),
-  mChildren( NULL ),
-  mNode( NULL ),
-  mParentOrigin( NULL ),
-  mAnchorPoint( NULL ),
-  mDynamicsData( NULL )
+  mColorMode( Node::DEFAULT_COLOR_MODE )
 {
 }
 

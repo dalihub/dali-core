@@ -1285,64 +1285,55 @@ private:
 
 protected:
 
-  std::string mName;
+  StagePtr                mStage;        ///< Used to send messages to Node; valid until Core destruction
+  Actor*                  mParent;       ///< Each actor (except the root) can have one parent
+  ActorContainer*         mChildren;     ///< Container of referenced actors
+  const SceneGraph::Node* mNode;         ///< Not owned
+  Vector3*                mParentOrigin; // NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
+  Vector3*                mAnchorPoint;  // NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
+  DynamicsData*           mDynamicsData; ///< optional physics data
 
-  static unsigned int mActorCounter;  ///< A counter to track the actor instance creation
-  unsigned int mId;  ///< A unique ID to identify the actor starting from 1, and 0 is reserved
-
-  StagePtr mStage; ///< Used to send messages to Node; valid until Core destruction
-
-  const bool mIsRoot                   : 1;   ///< Flag to identify the root actor
-  const bool mIsRenderable             : 1;   ///< Flag to identify that this is a renderable actor
-  const bool mIsLayer                  : 1;   ///< Flag to identify that this is a layer
-  bool mIsOnStage                      : 1;   ///< Flag to identify whether the actor is on-stage
-  bool mIsDynamicsRoot                 : 1;   ///< Flag to identify if this is the dynamics world root
-  bool mSensitive                      : 1;   ///< Whether the actor emits touch event signals
-  bool mLeaveRequired                  : 1;   ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
-  bool mKeyboardFocusable              : 1;   ///< Whether the actor should be focusable by keyboard navigation
-  bool mDerivedRequiresTouch           : 1;   ///< Whether the derived actor type requires touch event signals
-  bool mDerivedRequiresMouseWheelEvent : 1;   ///< Whether the derived actor type requires mouse wheel event signals
-  bool mOnStageSignalled               : 1;   ///< Set to true before OnStageConnection signal is emitted, and false before OnStageDisconnection
-
-  bool mInheritRotation:1; ///< Cached: Whether the parent's rotation should be inherited.
-  bool mInheritScale:1; ///< Cached: Whether the parent's scale should be inherited.
-  DrawMode::Type mDrawMode:2; ///< Cached: How the actor and its children should be drawn
-  PositionInheritanceMode mPositionInheritanceMode:2; ///< Cached: Determines how position is inherited
-  ColorMode mColorMode:2; ///< Cached: Determines whether mWorldColor is inherited
-
-  Actor* mParent; ///< Each actor (except the root) can have one parent
-
-  ActorContainer*              mChildren;     ///< Container of referenced actors
-  static ActorContainer        mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
-  ActorAttachmentPtr           mAttachment;   ///< Optional referenced attachment
-
-  const SceneGraph::Node* mNode; ///< Not owned
-
-  // ParentOrigin & AnchorPoint are non-animatable
-  Vector3* mParentOrigin; // NULL means ParentOrigin::DEFAULT
-  Vector3* mAnchorPoint; // NULL means AnchorPoint::DEFAULT
-
-  ShaderEffectPtr mShaderEffect; ///< Optional referenced shader effect
-
-  // Dynamics
-  DynamicsData* mDynamicsData;
+  ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
+  ShaderEffectPtr         mShaderEffect; ///< Optional referenced shader effect
 
   // Signals
-  Dali::Actor::TouchSignalV2              mTouchedSignalV2;
-  Dali::Actor::MouseWheelEventSignalV2    mMouseWheelEventSignalV2;
-  Dali::Actor::SetSizeSignalV2            mSetSizeSignalV2;
-  Dali::Actor::OnStageSignalV2            mOnStageSignalV2;
-  Dali::Actor::OffStageSignalV2           mOffStageSignalV2;
+  Dali::Actor::TouchSignalV2             mTouchedSignalV2;
+  Dali::Actor::MouseWheelEventSignalV2   mMouseWheelEventSignalV2;
+  Dali::Actor::SetSizeSignalV2           mSetSizeSignalV2;
+  Dali::Actor::OnStageSignalV2           mOnStageSignalV2;
+  Dali::Actor::OffStageSignalV2          mOffStageSignalV2;
+
+  std::string     mName;      ///< Name of the actor
+  unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
+
+  const bool mIsRoot                               : 1; ///< Flag to identify the root actor
+  const bool mIsRenderable                         : 1; ///< Flag to identify that this is a renderable actor
+  const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
+  bool mIsOnStage                                  : 1; ///< Flag to identify whether the actor is on-stage
+  bool mIsDynamicsRoot                             : 1; ///< Flag to identify if this is the dynamics world root
+  bool mSensitive                                  : 1; ///< Whether the actor emits touch event signals
+  bool mLeaveRequired                              : 1; ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
+  bool mKeyboardFocusable                          : 1; ///< Whether the actor should be focusable by keyboard navigation
+  bool mDerivedRequiresTouch                       : 1; ///< Whether the derived actor type requires touch event signals
+  bool mDerivedRequiresMouseWheelEvent             : 1; ///< Whether the derived actor type requires mouse wheel event signals
+  bool mOnStageSignalled                           : 1; ///< Set to true before OnStageConnection signal is emitted, and false before OnStageDisconnection
+  bool mInheritRotation                            : 1; ///< Cached: Whether the parent's rotation should be inherited.
+  bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
+  DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
+  PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
+  ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
 
   // Default properties
-
   typedef std::map<std::string, Property::Index> DefaultPropertyLookup;
 
 private:
 
-  // Default properties
+  static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
+  static unsigned int   mActorCounter; ///< A counter to track the actor instance creation
 
+  // Default properties
   static DefaultPropertyLookup* mDefaultPropertyLookup;
+
 };
 
 /**
