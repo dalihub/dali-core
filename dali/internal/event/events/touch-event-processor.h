@@ -112,6 +112,11 @@ private:
      */
     void SetActor( Actor* actor );
 
+    /**
+     * Resets the set actor and disconnects any connected signals.
+     */
+    void ResetActor();
+
   private:
 
     // Undefined
@@ -143,7 +148,8 @@ private:
     virtual void ProxyDestroyed(ProxyObject& proxy);
 
   private:
-    Actor* mActor; ///< Raw pointer to an Actor.
+    Actor* mActor;              ///< Raw pointer to an Actor.
+    bool   mActorDisconnected;  ///< Indicates whether the actor has been disconnected from the scene
   };
 
   Stage& mStage; ///< Used to deliver touch events

@@ -256,7 +256,7 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
 
     case Gesture::Started:
     {
-      if ( mCurrentGesturedActor )
+      if ( GetCurrentGesturedActor() )
       {
         // The pan gesture should only be sent to the gesture detector which first received it so that
         // it can be told when the gesture ends as well.
@@ -264,7 +264,7 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
         HitTestAlgorithm::Results hitTestResults;
         HitTestAlgorithm::HitTest( mStage, mPossiblePanPosition, hitTestResults ); // Hit test original possible position...
 
-        if ( hitTestResults.actor && ( mCurrentGesturedActor == &GetImplementation( hitTestResults.actor ) ) )
+        if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {
           // Record the current render-task for Screen->Actor coordinate conversions
           mCurrentRenderTask = hitTestResults.renderTask;
@@ -290,27 +290,28 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
       // Only send subsequent pan gesture signals if we processed the pan gesture when it started.
       // Check if actor is still touchable.
 
-      if ( mCurrentGesturedActor )
+      Actor* currentGesturedActor = GetCurrentGesturedActor();
+      if ( currentGesturedActor )
       {
-        if ( mCurrentGesturedActor->IsHittable() && !mCurrentPanEmitters.empty() && mCurrentRenderTask )
+        if ( currentGesturedActor->IsHittable() && !mCurrentPanEmitters.empty() && mCurrentRenderTask )
         {
           PanGestureDetectorContainer outsideTouchesRangeEmitters;
 
           // Removes emitters that no longer have the actor attached
           // Also remove emitters whose touches are outside the range of the current pan event and add them to outsideTouchesRangeEmitters
           PanGestureDetectorContainer::iterator endIter = std::remove_if( mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(),
-                                                                          IsNotAttachedAndOutsideTouchesRangeFunctor(mCurrentGesturedActor, panEvent.numberOfTouches, outsideTouchesRangeEmitters) );
+                                                                          IsNotAttachedAndOutsideTouchesRangeFunctor(currentGesturedActor, panEvent.numberOfTouches, outsideTouchesRangeEmitters) );
           mCurrentPanEmitters.erase( endIter, mCurrentPanEmitters.end() );
 
           Vector2 actorCoords;
 
           if ( !outsideTouchesRangeEmitters.empty() || !mCurrentPanEmitters.empty() )
           {
-            mCurrentGesturedActor->ScreenToLocal( GetImplementation( mCurrentRenderTask ), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y );
+            currentGesturedActor->ScreenToLocal( GetImplementation( mCurrentRenderTask ), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y );
 
             // EmitPanSignal checks whether we have a valid actor and whether the container we are passing in has emitters before it emits the pan.
-            EmitPanSignal(Dali::Actor(mCurrentGesturedActor), outsideTouchesRangeEmitters, panEvent, actorCoords, Gesture::Finished, mCurrentRenderTask);
-            EmitPanSignal(Dali::Actor(mCurrentGesturedActor), mCurrentPanEmitters, panEvent, actorCoords, panEvent.state, mCurrentRenderTask);
+            EmitPanSignal(Dali::Actor(currentGesturedActor), outsideTouchesRangeEmitters, panEvent, actorCoords, Gesture::Finished, mCurrentRenderTask);
+            EmitPanSignal(Dali::Actor(currentGesturedActor), mCurrentPanEmitters, panEvent, actorCoords, panEvent.state, mCurrentRenderTask);
           }
 
           if ( mCurrentPanEmitters.empty() )

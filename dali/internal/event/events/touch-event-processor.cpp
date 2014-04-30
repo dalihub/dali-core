@@ -450,7 +450,8 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
 }
 
 TouchEventProcessor::ActorObserver::ActorObserver()
-: mActor ( NULL )
+: mActor ( NULL ),
+  mActorDisconnected(false)
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 }
@@ -463,7 +464,7 @@ TouchEventProcessor::ActorObserver::~ActorObserver()
 
 Actor* TouchEventProcessor::ActorObserver::GetActor()
 {
-  return mActor;
+  return mActorDisconnected ? NULL : mActor;
 }
 
 void TouchEventProcessor::ActorObserver::SetActor( Actor* actor )
@@ -472,10 +473,7 @@ void TouchEventProcessor::ActorObserver::SetActor( Actor* actor )
 
   if ( mActor != actor )
   {
-    if ( mActor )
-    {
-      SceneObjectRemoved( *mActor );
-    }
+    ResetActor();
 
     mActor = actor;
 
@@ -487,15 +485,25 @@ void TouchEventProcessor::ActorObserver::SetActor( Actor* actor )
   }
 }
 
+void TouchEventProcessor::ActorObserver::ResetActor()
+{
+  if ( mActor )
+  {
+    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Stop Observing:             %p\n", mActor);
+    mActor->RemoveObserver( *this );
+    mActor = NULL;
+    mActorDisconnected = false;
+  }
+}
+
 void TouchEventProcessor::ActorObserver::SceneObjectRemoved( ProxyObject& proxy )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 
   if ( mActor == &proxy )
   {
-    proxy.RemoveObserver( *this );
-    DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Stop Observing:             %p\n", mActor);
-    mActor = NULL;
+    // do not call proxy.RemoveObserver here, proxy is currently iterating through observers... you wouldnt want to upset proxy now would you?
+    mActorDisconnected = true;
   }
 }
 

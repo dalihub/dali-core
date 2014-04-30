@@ -138,12 +138,12 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
 
     case Gesture::Started:
     {
-      if ( mCurrentGesturedActor )
+      if ( GetCurrentGesturedActor() )
       {
         HitTestAlgorithm::Results hitTestResults;
         HitTestAlgorithm::HitTest( mStage, tapEvent.point, hitTestResults );
 
-        if ( hitTestResults.actor && ( mCurrentGesturedActor == &GetImplementation( hitTestResults.actor ) ) )
+        if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {
           TapEventFunctor functor( tapEvent );
           GestureDetectorContainer gestureDetectors;

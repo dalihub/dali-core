@@ -180,12 +180,13 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
 
     case Gesture::Started:
     {
-      if ( mCurrentGesturedActor )
+      Actor* currentGesturedActor = GetCurrentGesturedActor();
+      if ( currentGesturedActor )
       {
         HitTestAlgorithm::Results hitTestResults;
         HitTestAlgorithm::HitTest( mStage, longPressEvent.point, hitTestResults );
 
-        if ( hitTestResults.actor && ( mCurrentGesturedActor == &GetImplementation( hitTestResults.actor ) ) )
+        if ( hitTestResults.actor && ( currentGesturedActor == &GetImplementation( hitTestResults.actor ) ) )
         {
           // Record the current render-task for Screen->Actor coordinate conversions
           mCurrentRenderTask = hitTestResults.renderTask;
@@ -212,21 +213,22 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
       // Only send subsequent long press gesture signals if we processed the gesture when it started.
       // Check if actor is still touchable.
 
-      if ( mCurrentGesturedActor )
+      Actor* currentGesturedActor = GetCurrentGesturedActor();
+      if ( currentGesturedActor )
       {
-        if ( mCurrentGesturedActor->IsHittable() && !mCurrentEmitters.empty() && mCurrentRenderTask )
+        if ( currentGesturedActor->IsHittable() && !mCurrentEmitters.empty() && mCurrentRenderTask )
         {
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
-          LongPressGestureDetectorContainer::iterator endIter = std::remove_if( mCurrentEmitters.begin(), mCurrentEmitters.end(), IsNotAttachedFunctor(mCurrentGesturedActor) );
+          LongPressGestureDetectorContainer::iterator endIter = std::remove_if( mCurrentEmitters.begin(), mCurrentEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
           mCurrentEmitters.erase( endIter, mCurrentEmitters.end() );
 
           if ( !mCurrentEmitters.empty() )
           {
             Vector2 actorCoords;
             RenderTask& renderTaskImpl( GetImplementation( mCurrentRenderTask ) );
-            mCurrentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y );
+            currentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y );
 
-            EmitLongPressSignal( Dali::Actor( mCurrentGesturedActor ), mCurrentEmitters, longPressEvent, actorCoords );
+            EmitLongPressSignal( Dali::Actor( currentGesturedActor ), mCurrentEmitters, longPressEvent, actorCoords );
           }
         }
 

@@ -184,21 +184,22 @@ void PinchGestureProcessor::Process( const Integration::PinchGestureEvent& pinch
       // Only send subsequent pinch gesture signals if we processed the pinch gesture when it started.
       // Check if actor is still touchable.
 
-      if ( mCurrentGesturedActor )
+      Actor* currentGesturedActor = GetCurrentGesturedActor();
+      if ( currentGesturedActor )
       {
-        if ( mCurrentGesturedActor->IsHittable() && !mCurrentPinchEmitters.empty() && mCurrentRenderTask )
+        if ( currentGesturedActor->IsHittable() && !mCurrentPinchEmitters.empty() && mCurrentRenderTask )
         {
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
-          PinchGestureDetectorContainer::iterator endIter = std::remove_if( mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), IsNotAttachedFunctor(mCurrentGesturedActor) );
+          PinchGestureDetectorContainer::iterator endIter = std::remove_if( mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
           mCurrentPinchEmitters.erase( endIter, mCurrentPinchEmitters.end() );
 
           if ( !mCurrentPinchEmitters.empty() )
           {
             Vector2 actorCoords;
             RenderTask& renderTaskImpl( GetImplementation(mCurrentRenderTask) );
-            mCurrentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y );
+            currentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y );
 
-            EmitPinchSignal( Dali::Actor(mCurrentGesturedActor), mCurrentPinchEmitters, pinchEvent, actorCoords );
+            EmitPinchSignal( Dali::Actor(currentGesturedActor), mCurrentPinchEmitters, pinchEvent, actorCoords );
           }
           else
           {

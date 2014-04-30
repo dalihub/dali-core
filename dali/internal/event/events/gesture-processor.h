@@ -146,6 +146,13 @@ protected: // Construction & Destruction
    */
   void ResetActor();
 
+  /**
+   * Returns the current gestured actor if it is on stage
+   *
+   * @return The current gestured actor
+   */
+  Actor* GetCurrentGesturedActor();
+
   // For derived classes to override
 
   /**
@@ -191,9 +198,10 @@ private:
    */
   void OnStageDisconnection( Dali::Actor actor );
 
-protected: // Data
+private: // Data
 
-  Actor* mCurrentGesturedActor; ///< The current actor that has been gestured.
+  Actor* mCurrentGesturedActor;       ///< The current actor that has been gestured.
+  bool   mGesturedActorDisconnected;  ///< Indicates whether the gestured actor has been disconnected from the scene
 };
 
 } // namespace Internal

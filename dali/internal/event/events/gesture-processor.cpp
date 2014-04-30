@@ -30,7 +30,8 @@ namespace Internal
 {
 
 GestureProcessor::GestureProcessor()
-: mCurrentGesturedActor( NULL )
+: mCurrentGesturedActor( NULL ),
+  mGesturedActorDisconnected(false)
 {
 }
 
@@ -156,6 +157,7 @@ void GestureProcessor::SetActor( Dali::Actor actor )
     mCurrentGesturedActor = &GetImplementation( actor );
     mCurrentGesturedActor->AddObserver( *this );
   }
+  mGesturedActorDisconnected = false;
 }
 
 void GestureProcessor::ResetActor()
@@ -164,18 +166,25 @@ void GestureProcessor::ResetActor()
   {
     mCurrentGesturedActor->RemoveObserver( *this );
     mCurrentGesturedActor = NULL;
+    mGesturedActorDisconnected = false;
   }
+}
+
+Actor* GestureProcessor::GetCurrentGesturedActor()
+{
+  return mGesturedActorDisconnected ? NULL : mCurrentGesturedActor;
 }
 
 void GestureProcessor::SceneObjectRemoved(ProxyObject& proxy)
 {
-  if ( mCurrentGesturedActor == &proxy )
+  if ( mCurrentGesturedActor == &proxy &&
+      !mGesturedActorDisconnected )
   {
     // Inform deriving classes.
     OnGesturedActorStageDisconnection();
 
-    proxy.RemoveObserver( *this );
-    mCurrentGesturedActor = NULL;
+    // do not call proxy.RemoveObserver here, proxy is currently iterating through observers... you wouldnt want to upset proxy now would you?
+    mGesturedActorDisconnected = true;
   }
 }
 
