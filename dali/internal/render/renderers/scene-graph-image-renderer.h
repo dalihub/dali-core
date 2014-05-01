@@ -190,21 +190,22 @@ private:
 
 private:
 
+  Texture*    mTexture;
+
+  OwnerPointer< GpuBuffer > mVertexBuffer;
+  OwnerPointer< GpuBuffer > mIndexBuffer;
+
+  Vector4   mBorder;
+  PixelArea mPixelArea;
+  Vector2   mGeometrySize;
+
+  ResourceId  mTextureId;
+
   // flags
   MeshType  mMeshType        : 3; // 4 values fits in 3 bits just fine
   bool      mIsMeshGenerated : 1;
   bool      mBorderInPixels  : 1;
   bool      mUsePixelArea    : 1;
-
-  Vector2   mGeometrySize;
-  Vector4   mBorder;
-  PixelArea mPixelArea;
-
-  ResourceId  mTextureId;
-  Texture*    mTexture;
-
-  OwnerPointer< GpuBuffer > mVertexBuffer;
-  OwnerPointer< GpuBuffer > mIndexBuffer;
 
 };
 

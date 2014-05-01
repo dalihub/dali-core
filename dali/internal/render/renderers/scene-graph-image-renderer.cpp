@@ -317,7 +317,7 @@ void ImageRenderer::UpdateVertexBuffer( GLsizeiptr size, const GLvoid *data )
   // create/destroy if needed/not needed.
   if ( size && !mVertexBuffer )
   {
-    mVertexBuffer = new GpuBuffer( *mContext, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW );
+    mVertexBuffer = new GpuBuffer( *mContext, GpuBuffer::ARRAY_BUFFER, GpuBuffer::DYNAMIC_DRAW );
   }
   else if ( !size && mVertexBuffer )
   {
@@ -336,7 +336,7 @@ void ImageRenderer::UpdateIndexBuffer( GLsizeiptr size, const GLvoid *data )
   // create/destroy if needed/not needed.
   if ( size && !mIndexBuffer )
   {
-    mIndexBuffer = new GpuBuffer( *mContext, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
+    mIndexBuffer = new GpuBuffer( *mContext, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
   }
   else if ( !size && mIndexBuffer )
   {
@@ -784,14 +784,15 @@ void ImageRenderer::GenerateMeshIndices(GLushort* indices, int rectanglesX, int 
 
 ImageRenderer::ImageRenderer( RenderDataProvider& dataprovider )
 : Renderer( dataprovider ),
+  mTexture( NULL ),
+  mBorder( 0.45, 0.45, 0.1, 0.1 ),
+  mPixelArea(),
+  mGeometrySize(),
+  mTextureId( 0 ),
   mMeshType( ImageRenderer::QUAD ),
   mIsMeshGenerated( false ),
   mBorderInPixels( false ),
-  mUsePixelArea( false ),
-  mGeometrySize(),
-  mBorder( 0.45, 0.45, 0.1, 0.1 ),
-  mTextureId( 0 ),
-  mTexture( NULL )
+  mUsePixelArea( false )
 {
 }
 

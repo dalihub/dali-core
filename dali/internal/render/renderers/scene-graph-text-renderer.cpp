@@ -164,12 +164,12 @@ void TextRenderer::SetVertexData( TextVertexBuffer* vertexData )
 
     if ( !mVertexBuffer )
     {
-      mVertexBuffer = new GpuBuffer( *mContext, GL_ARRAY_BUFFER, GL_DYNAMIC_DRAW );
+      mVertexBuffer = new GpuBuffer( *mContext, GpuBuffer::ARRAY_BUFFER, GpuBuffer::DYNAMIC_DRAW );
     }
 
     if ( !mIndexBuffer )
     {
-      mIndexBuffer = new GpuBuffer( *mContext, GL_ELEMENT_ARRAY_BUFFER, GL_STATIC_DRAW );
+      mIndexBuffer = new GpuBuffer( *mContext, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
     }
 
     mVertexBuffer->UpdateDataBuffer( vertexData->mVertices.size() * sizeof(TextVertex2D), &vertexData->mVertices[0] );
@@ -501,9 +501,13 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
 TextRenderer::TextRenderer( RenderDataProvider& dataprovider )
 : Renderer( dataprovider ),
-  mTextureId( 0 ),
   mTexture( NULL ),
   mTextColor( NULL ),
+  mVertexBuffer(),
+  mIndexBuffer(),
+  mTextParameters(),
+  mInvTextSize(),
+  mTextureId( 0 ),
   mSmoothing( Dali::TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD ),
   mPixelSize(0.0f)
 {

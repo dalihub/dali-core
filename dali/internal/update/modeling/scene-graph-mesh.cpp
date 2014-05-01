@@ -114,7 +114,7 @@ void Mesh::UploadVertexData( Context& context, BufferIndex renderBufferIndex )
   DALI_ASSERT_DEBUG( !vertices.empty() );
   if ( !mVertexBuffer )
   {
-    mVertexBuffer = new GpuBuffer(context,GL_ARRAY_BUFFER,GL_STATIC_DRAW);
+    mVertexBuffer = new GpuBuffer(context,GpuBuffer::ARRAY_BUFFER,GpuBuffer::STATIC_DRAW);
   }
   DALI_ASSERT_DEBUG(mVertexBuffer);
 
@@ -128,7 +128,7 @@ void Mesh::UploadVertexData( Context& context, BufferIndex renderBufferIndex )
 
     if ( !mIndicesBuffer )
     {
-      mIndicesBuffer = new GpuBuffer(context,GL_ELEMENT_ARRAY_BUFFER,GL_STATIC_DRAW);
+      mIndicesBuffer = new GpuBuffer(context,GpuBuffer::ELEMENT_ARRAY_BUFFER,GpuBuffer::STATIC_DRAW);
     }
 
     mIndicesBuffer->UpdateDataBuffer( numberOfIndices * sizeof(GLushort), &(faces.at(0)) );

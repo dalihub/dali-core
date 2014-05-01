@@ -40,16 +40,37 @@ namespace Internal
  */
 class GpuBuffer : public ContextObserver
 {
+public:
+
+  /**
+   * Enum to encapsulate the GL buffer type. This is to avoid having to store a whole int for type
+   */
+  enum Target
+  {
+    ARRAY_BUFFER,             ///< GL_ARRAY_BUFFER
+    ELEMENT_ARRAY_BUFFER,     ///< GL_ELEMENT_ARRAY_BUFFER
+    TRANSFORM_FEEDBACK_BUFFER ///< GL_TRANSFORM_FEEDBACK_BUFFER
+  };
+
+  /**
+   * Enum to encapsulate the GL draw mode. This is to avoid having to store a whole int for mode
+   */
+  enum Usage
+  {
+    STREAM_DRAW, ///< GL_STREAM_DRAW
+    STATIC_DRAW, ///< GL_STATIC_DRAW
+    DYNAMIC_DRAW, ///< GL_DYNAMIC_DRAW
+  };
 
 public:
 
   /**
    * constructor
    * @param context drawing context
-   * @param target the type of buffer to create (GL_ARRAY_BUFFER or GL_ELEMENT_ARRAY_BUFFER)
-   * @param usage how the buffer will be used (see GL_STATIC_DRAW)
+   * @param target the type of buffer to create @see Type
+   * @param usage how the buffer will be used @see DrawMode
    */
-  GpuBuffer(Context& context,GLenum target,GLenum usage);
+  GpuBuffer( Context& context, Target target, Usage usage );
 
   /**
    * Destructor
@@ -61,7 +82,6 @@ public:
    * Creates or updates a buffer object and binds it to the target.
    * @param size Specifies the size in bytes of the buffer object's new data store.
    * @param data pointer to the data to load
-   *
    */
   void UpdateDataBuffer(GLsizeiptr size,const GLvoid *data);
 
@@ -105,13 +125,17 @@ private:
    */
   void BindNoChecks(GLuint bufferId) const;
 
+private: // Data
+
+  Context&           mContext;             ///< dali drawing context
   GLsizeiptr         mCapacity;            ///< buffer capacity
   GLsizeiptr         mSize;                ///< buffer size
-  Context&           mContext;             ///< dali drawing context
   GLuint             mBufferId;            ///< buffer object name(id)
-  bool               mBufferCreated;       ///< whether buffer has been created
-  GLenum             mTarget;              ///< type of buffer (array/element)
-  GLenum             mUsage;               ///< how the buffer is used (read, read/write etc).
+
+  Target             mTarget:2;            ///< type of buffer (array/element), 2 bits are enough
+  Usage              mUsage:2;             ///< how the buffer is used (read, read/write etc), 2 bits are enough
+  bool               mBufferCreated:1;     ///< whether buffer has been created
+
 };
 
 } // namespace Internal

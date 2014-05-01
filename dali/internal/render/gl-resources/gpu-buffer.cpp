@@ -26,19 +26,82 @@ namespace Dali
 namespace Internal
 {
 
-GpuBuffer::GpuBuffer(Context& context,GLenum target,GLenum usage)
-:mCapacity(0),
- mSize(0),
- mContext(context),
- mBufferId(0),
- mBufferCreated(false),
- mTarget(target),
- mUsage(usage)
+namespace
+{
+/**
+ * Helper to get our type enum as GL enum
+ * @param type to convert
+ * @return the corresponding GL enum or -1
+ */
+inline GLenum TypeAsGlEnum( GpuBuffer::Target type )
+{
+  GLenum retval( -1 );
+  switch( type )
+  {
+    case GpuBuffer::ARRAY_BUFFER :
+    {
+      retval = GL_ARRAY_BUFFER;
+      break;
+    }
+    case GpuBuffer::ELEMENT_ARRAY_BUFFER :
+    {
+      retval = GL_ELEMENT_ARRAY_BUFFER;
+      break;
+    }
+    case GpuBuffer::TRANSFORM_FEEDBACK_BUFFER :
+    {
+      retval = GL_TRANSFORM_FEEDBACK_BUFFER;
+      break;
+    }
+  }
+  return retval;
+}
+
+/**
+ * Helper to get our drawmode enum as GL enum
+ * @param type to convert
+ * @return the corresponding GL enum or -1
+ */
+inline GLenum ModeAsGlEnum( GpuBuffer::Usage type )
+{
+  GLenum retval( -1 );
+  switch( type )
+  {
+    case GpuBuffer::STREAM_DRAW :
+    {
+      retval = GL_STREAM_DRAW;
+      break;
+    }
+    case GpuBuffer::STATIC_DRAW :
+    {
+      retval = GL_STATIC_DRAW;
+      break;
+    }
+    case GpuBuffer::DYNAMIC_DRAW :
+    {
+      retval = GL_DYNAMIC_DRAW;
+      break;
+    }
+  }
+  return retval;
+}
+
+}
+
+GpuBuffer::GpuBuffer( Context& context, Target target, Usage usage )
+: mContext( context ),
+  mCapacity( 0 ),
+  mSize( 0 ),
+  mBufferId( 0 ),
+  mTarget( target ),
+  mUsage( usage ),
+  mBufferCreated( false )
 {
   // the buffer is owned by the GPU so if we lose context, we lose the buffer
   // so we need to know when we lose context
   mContext.AddObserver(*this);
 }
+
 GpuBuffer::~GpuBuffer()
 {
   mContext.RemoveObserver(*this);
@@ -70,43 +133,41 @@ void GpuBuffer::UpdateDataBuffer(GLsizeiptr size,const GLvoid *data)
     // if the data will fit in the existing buffer, just update it
     if (size <= mCapacity )
     {
-      mContext.BufferSubData(mTarget,0, size, data);
+      mContext.BufferSubData( TypeAsGlEnum(mTarget), 0, size, data );
     }
     else
     {
       // create a new buffer of the larger size,
       // gl should automatically deallocate the old buffer
-      mContext.BufferData(mTarget, size, data, mUsage);
+      mContext.BufferData( TypeAsGlEnum(mTarget), size, data, ModeAsGlEnum( mUsage ) );
       mCapacity = size;
     }
   }
   else
   {
     // create the buffer
-    mContext.BufferData(mTarget, size, data, mUsage);
+    mContext.BufferData( TypeAsGlEnum(mTarget), size, data, ModeAsGlEnum( mUsage ) );
     mBufferCreated = true;
     mCapacity = size;
   }
 
   switch (mTarget)
   {
-    case GL_ARRAY_BUFFER:
+    case ARRAY_BUFFER:
     {
       mContext.BindArrayBuffer(0);
       break;
     }
-    case GL_ELEMENT_ARRAY_BUFFER:
+    case ELEMENT_ARRAY_BUFFER:
     {
       mContext.BindElementArrayBuffer(0);
       break;
     }
-    case GL_TRANSFORM_FEEDBACK_BUFFER:
+    case TRANSFORM_FEEDBACK_BUFFER:
     {
       mContext.BindTransformFeedbackBuffer(0);
       break;
     }
-    default:
-      DALI_ASSERT_DEBUG(false && "Unsupported type");
   }
 }
 
@@ -131,7 +192,7 @@ void GpuBuffer::GlContextToBeDestroyed()
   {
     // If the buffer is currently bound, then unbind it by setting the
     // currently bound buffer to zero.
-    if (mContext.GetCurrentBoundArrayBuffer(mTarget) == mBufferId)
+    if (mContext.GetCurrentBoundArrayBuffer( TypeAsGlEnum( mTarget ) ) == mBufferId)
     {
       BindNoChecks(0);
     }
@@ -161,7 +222,7 @@ void GpuBuffer::BindNoChecks(GLuint bufferId) const
   // and it caches both of them (as in it won't bind them if the
   // buffer id is already bound).
 
-  if (mTarget == GL_ARRAY_BUFFER)
+  if (mTarget == ARRAY_BUFFER)
   {
     mContext.BindArrayBuffer(bufferId);
   }

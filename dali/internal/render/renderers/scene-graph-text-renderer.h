@@ -170,15 +170,16 @@ private:
 
 private:
 
-  ResourceId  mTextureId;
-  Texture*    mTexture;
+  Texture*    mTexture;   ///< pointer to texture
+  Vector4*    mTextColor; ///< optional color
 
   OwnerPointer< GpuBuffer > mVertexBuffer;        ///< GPU Buffer containing Vertex coordinate (and texture coordinate) information
   OwnerPointer< GpuBuffer > mIndexBuffer;         ///< GPU Buffer containing Index information
-  Vector2 mInvTextSize;                           ///< 1.0 / (2D size of Vertices in vertex buffer (max extent - min extent))
-
   OwnerPointer< TextParameters > mTextParameters; ///< Optional text parameters
-  Vector4* mTextColor;
+
+  Vector2    mInvTextSize;                        ///< 1.0 / (2D size of Vertices in vertex buffer (max extent - min extent))
+  ResourceId mTextureId;
+
   float   mSmoothing;
   float   mPixelSize;
 

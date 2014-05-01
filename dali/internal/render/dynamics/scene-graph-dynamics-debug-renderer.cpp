@@ -67,7 +67,7 @@ void DynamicsDebugRenderer::UpdateBuffer( const Integration::DynamicsDebugVertex
   {
     if( !mBuffer )
     {
-      mBuffer = new GpuBuffer(*mContext, GL_ARRAY_BUFFER, GL_STATIC_DRAW);
+      mBuffer = new GpuBuffer(*mContext, GpuBuffer::ARRAY_BUFFER, GpuBuffer::STATIC_DRAW);
     }
 
     if( vertices.size() > 1 )
