@@ -17,11 +17,9 @@
 // limitations under the License.
 //
 
-// EXTERNAL INCLUDES
-#include <set>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/map-wrapper.h>
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/integration-api/debug.h>
@@ -387,8 +385,8 @@ public:
    */
   void BlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter)
   {
-      LOG_GL( "BlitFramebuffer %d %d %d %d %d %d %d %d %x %d\n", srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter );
-      CHECK_GL( *this, mGlAbstraction.BlitFramebuffer( srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter ) );
+    LOG_GL( "BlitFramebuffer %d %d %d %d %d %d %d %d %x %d\n", srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter );
+    CHECK_GL( *this, mGlAbstraction.BlitFramebuffer( srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter ) );
   }
 
   /**

@@ -17,11 +17,9 @@
 // CLASS HEADER
 #include <dali/internal/update/manager/update-manager.h>
 
-// EXTERNAL INCLUDES
-#include <set>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
+#include <dali/public-api/common/set-wrapper.h>
 
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/render-controller.h>

@@ -17,10 +17,9 @@
 // limitations under the License.
 //
 
-
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/map-wrapper.h>
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/event/text/glyph-status/glyph-status.h>
 #include <dali/internal/event/text/resource/glyph-resource-observer.h>
 #include <dali/internal/event/text/resource/glyph-resource-request.h>
@@ -30,9 +29,6 @@
 #include <dali/internal/event/text/text-observer.h>
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/integration-api/resource-cache.h>
-
-// EXTERNAL INCLUDES
-#include <set>
 
 namespace Dali
 {

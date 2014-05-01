@@ -19,11 +19,11 @@
 
 // EXTERNAL INCLUDES
 #include <stdio.h>
-#include <set>
 #include <typeinfo>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/map-wrapper.h>
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/images/image-attributes.h>
 

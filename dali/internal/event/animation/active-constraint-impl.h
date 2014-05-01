@@ -18,10 +18,10 @@
 //
 
 // EXTERNAL INCLUDES
-#include <set>
 #include <boost/function.hpp>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/proxy-object.h>

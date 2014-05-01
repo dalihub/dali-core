@@ -18,11 +18,11 @@
 //
 
 // EXTERNAL INCLUDES
-#include <set>
 #include <stdint.h>
 #include <cstring>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/integration-api/platform-abstraction.h>
 
 #include <dali/integration-api/glyph-set.h>

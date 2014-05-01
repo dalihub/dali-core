@@ -18,10 +18,10 @@
 //
 
 // EXTERNAL INCLUDES
-#include <set>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/common/property-base.h>

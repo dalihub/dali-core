@@ -23,11 +23,8 @@
 #ifdef DEBUG_GLYPH_STATUS_CONTAINER
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/event/text/glyph-status/glyph-status.h>
-
-// EXTERNAL INCLUDES
-#include <set>
-
 
 namespace Dali
 {

@@ -17,13 +17,11 @@
 // limitations under the License.
 //
 
-// EXTERNAL INCLUDES
-#include <set>
-
 // INTERNAL INCLUDES
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/animation/animation-finished-notifier.h>
-#include <dali/public-api/animation/animation.h>
 
 namespace Dali
 {

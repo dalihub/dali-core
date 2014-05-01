@@ -17,10 +17,8 @@
 // limitations under the License.
 //
 
-// EXTERNAL INCLUDES
-#include <set>
-
 // INTERNAL INCLUDES
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/property-notifier.h>
 

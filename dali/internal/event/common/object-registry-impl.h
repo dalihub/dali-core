@@ -17,12 +17,10 @@
 // limitations under the License.
 //
 
-// EXTERNAL INCLUDES
-#ifdef DEBUG_ENABLED
-#include <set>
-#endif
-
 // INTERNAL INCLUDES
+#ifdef DEBUG_ENABLED
+#include <dali/public-api/common/set-wrapper.h>
+#endif
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/base-object.h>

@@ -18,13 +18,9 @@
 //
 
 // INTERNAL INCLUDES
-
+#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/event/text/glyph-status/glyph-status.h>
 #include <dali/internal/common/text-array.h>
-
-// EXTERNAL INCLUDES
-#include <set>
-
 
 namespace Dali
 {
