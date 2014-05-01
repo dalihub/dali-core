@@ -133,6 +133,12 @@ void Context::GlContextCreated()
   {
     (*it)->GlContextCreated();
   }
+
+  const ProgramContainer::iterator endp = mProgramCache.end();
+  for ( ProgramContainer::iterator itp = mProgramCache.begin(); itp != endp; ++itp )
+  {
+    (*itp).second->GlContextCreated();
+  }
 }
 
 void Context::GlContextToBeDestroyed()
@@ -144,6 +150,12 @@ void Context::GlContextToBeDestroyed()
       it != end; ++it )
   {
     (*it)->GlContextToBeDestroyed();
+  }
+
+  const ProgramContainer::iterator endp = mProgramCache.end();
+  for ( ProgramContainer::iterator itp = mProgramCache.begin(); itp != endp; ++itp )
+  {
+    (*itp).second->GlContextDestroyed();
   }
 
   mGlContextCreated = false;

@@ -24,7 +24,6 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/gl-resources/context-observer.h>
 #include <dali/integration-api/resource-cache.h>
 
 namespace Dali
@@ -57,7 +56,7 @@ class Context;
  * uColor is set to the value specified by Actor::SetColor and is
  * animatable through the property Actor::COLOR
  */
-class Program : public ContextObserver
+class Program
 {
 public:
 
@@ -247,17 +246,15 @@ public:
    */
   void SetUniformMatrix3fv( GLint location, GLsizei count, const GLfloat* value );
 
-public: // From ContextObserver
+  /**
+   * Needs to be called when GL context is (re)created
+   */
+  void GlContextCreated();
 
   /**
-   * @copydoc ContextObserver::GlContextCreated
+   * Needs to be called when GL context is destroyed
    */
-  virtual void GlContextCreated();          // From ContextObserver
-
-  /**
-   * @copydoc ContextObserver::GlContextToBeDestroyed
-   */
-  virtual void GlContextToBeDestroyed();   // From ContextObserver
+  void GlContextDestroyed();
 
 private: // Implementation
 
@@ -271,9 +268,9 @@ private: // Implementation
 public:
 
   /**
-   * Destructor
+   * Destructor, non virtual as no virtual methods or inheritance
    */
-  virtual ~Program();
+  ~Program();
 
 private:
 

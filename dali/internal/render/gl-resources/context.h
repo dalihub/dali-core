@@ -1774,7 +1774,8 @@ private: // Data
   std::set<ContextObserver*> mObservers;
 
   Program* mCurrentProgram;
-  std::map< std::size_t, Program* > mProgramCache; /// program cache
+  typedef std::map< std::size_t, Program* > ProgramContainer;
+  ProgramContainer mProgramCache; /// program cache
 
 };
 

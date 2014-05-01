@@ -447,7 +447,7 @@ void Program::GlContextCreated()
   }
 }
 
-void Program::GlContextToBeDestroyed()
+void Program::GlContextDestroyed()
 {
   Unload();
 
@@ -470,14 +470,10 @@ Program::Program(Integration::ShaderData* shaderData, Context& context )
 {
   // reset values
   ResetAttribsUniforms();
-
-  mContext.AddObserver( *this );
 }
 
 Program::~Program()
 {
-  mContext.RemoveObserver( *this );
-
   Unload(); // Resets gCurrentProgram
 }
 
