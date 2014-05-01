@@ -238,6 +238,7 @@ extern int UtcDaliLongPressGestureDetectorTypeRegistry(void);
 extern int UtcDaliPanGestureDetectorTypeRegistry(void);
 extern int UtcDaliPinchGestureDetectorTypeRegistry(void);
 extern int UtcDaliTapGestureDetectorTypeRegistry(void);
+extern int UtcDaliTypeRegistryNamedType(void);
 extern int UtcDaliUtf8SequenceLength(void);
 extern int UtcDaliEmptyVectorInt(void);
 extern int UtcDaliVectorInt(void);
@@ -485,6 +486,7 @@ testcase tc_array[] = {
     {"UtcDaliPanGestureDetectorTypeRegistry", UtcDaliPanGestureDetectorTypeRegistry, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliPinchGestureDetectorTypeRegistry", UtcDaliPinchGestureDetectorTypeRegistry, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliTapGestureDetectorTypeRegistry", UtcDaliTapGestureDetectorTypeRegistry, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
+    {"UtcDaliTypeRegistryNamedType", UtcDaliTypeRegistryNamedType, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliUtf8SequenceLength", UtcDaliUtf8SequenceLength, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliEmptyVectorInt", UtcDaliEmptyVectorInt, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliVectorInt", UtcDaliVectorInt, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},

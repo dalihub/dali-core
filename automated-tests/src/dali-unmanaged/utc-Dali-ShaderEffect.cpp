@@ -38,15 +38,6 @@ static const char* FragmentSource =
 "  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
 "}\n";
 
-static const char* FragmentSourceUsingExtensions =
-"void main()\n"
-"{\n"
-"  float floatValue = 0.5f;\n"
-"  float test = fwidth(floatValue);\n"
-"  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
-"  gl_FragColor.a *= test;\n"
-"}\n";
-
 const int GETSOURCE_BUFFER_SIZE = 0x10000;
 
 static const char* TestImageFilename = "icon_wrt.png";

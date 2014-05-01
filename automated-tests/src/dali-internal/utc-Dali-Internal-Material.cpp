@@ -94,7 +94,7 @@ public:
 
   float GetUniformF(std::string uniform)
   {
-    GLint uniformLoc = program->GetUniformLocation( program->RegisterUniform( uniform ) );
+    GLint uniformLoc = program->GetUniformLocation( program->RegisterUniform( uniform.c_str() ) );
     float value=0.0f;
     if(app.GetGlAbstraction().GetUniformValue( programId, (GLuint) uniformLoc, value))
     {
@@ -105,7 +105,7 @@ public:
 
   Vector4 GetUniformV(std::string uniform)
   {
-    GLint uniformLoc = program->GetUniformLocation( program->RegisterUniform( uniform ) );
+    GLint uniformLoc = program->GetUniformLocation( program->RegisterUniform( uniform.c_str() ) );
     Vector4 value;
     if(app.GetGlAbstraction().GetUniformValue( programId, (GLuint) uniformLoc, value))
     {
