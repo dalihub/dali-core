@@ -16,6 +16,7 @@ BuildRequires:  gawk
 BuildRequires:  boost-devel
 BuildRequires:  boost-thread
 BuildRequires:  sec-product-features
+ExclusiveArch:  armv7l
 
 %description
 The OpenGLES Canvas Core Library
