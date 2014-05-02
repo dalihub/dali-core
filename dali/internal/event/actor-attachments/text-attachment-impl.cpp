@@ -336,28 +336,30 @@ void TextAttachment::SetTextColor(const Vector4& color)
 {
   bool sendMessage( false );
 
+  Vector4 clampedColor = Clamp(color, 0.f, 1.f);
+
   if( NULL == mTextColor )
   {
-    if( color != TextStyle::DEFAULT_TEXT_COLOR )
+    if( clampedColor != TextStyle::DEFAULT_TEXT_COLOR )
     {
       // A color (different from default) has been set, so allocate storage for the text color
-      mTextColor = new Vector4( color );
+      mTextColor = new Vector4( clampedColor );
       sendMessage = true;
     }
   }
   else
   {
-    if( *mTextColor != color )
+    if( *mTextColor != clampedColor )
     {
       // text color has changed
-      *mTextColor = color;
+      *mTextColor = clampedColor;
       sendMessage = true;
     }
   }
 
   if( sendMessage )
   {
-    SetTextColorMessage( mStage->GetUpdateInterface(), *mSceneObject, color );
+    SetTextColorMessage( mStage->GetUpdateInterface(), *mSceneObject, clampedColor );
   }
 }
 

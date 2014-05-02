@@ -51,7 +51,7 @@
     highp float distance = texture2D(sTexture, vTexCoord).a;
 
 #ifdef USE_GRADIENT
-    lowp vec4 color = clamp(vColor, 0.0, 1.0);
+    lowp vec4 color = vColor;
 #else
     lowp vec4 color = uTextColor;
 #endif

@@ -2,8 +2,13 @@
 
   void main()
   {
-    gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);
+    gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
     vTexCoord = aTexCoord;
+
+#ifdef USE_GRADIENT
+    lowp float f = dot( aPosition.xy * uInvTextSize - uGradientLine.xy, uGradientLine.zw );
+    vColor = mix(uTextColor, uGradientColor, f);
+#endif
   }
 
 </VertexShader>
@@ -13,16 +18,18 @@
   void main()
   {
     // sample distance field
-    mediump float distance = texture2D(sTexture, vTexCoord).a;
+    highp float distance = texture2D(sTexture, vTexCoord).a;
 
-    mediump float smoothWidth = fwidth(distance);
-
-    // set fragment color
+#ifdef USE_GRADIENT
+    lowp vec4 color = vColor;
+#else
     lowp vec4 color = uTextColor;
+#endif
 
     // adjust fragment alpha by sampled distance
-    color.a *= smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);
+    color.a *= smoothstep(uSmoothing[0], uSmoothing[1], distance );
 
+    // final color multiplied by Actor color
     gl_FragColor = uColor * color;
   }
 
