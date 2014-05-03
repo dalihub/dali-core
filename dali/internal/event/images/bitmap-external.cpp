@@ -33,7 +33,8 @@ BitmapExternal::BitmapExternal(Dali::Integration::PixelBuffer* pixBuf,
                Pixel::Format pixelFormat,
                unsigned int bufferWidth,
                unsigned int bufferHeight)
-: BitmapPackedPixel(false, pixBuf)
+: BitmapPackedPixel(false, NULL/*pixBuf is externally owned*/),
+  mExternalData(pixBuf)
 {
   mImageWidth   = width;
   mImageHeight  = height;

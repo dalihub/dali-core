@@ -70,11 +70,24 @@ public:
     return NULL;
   }
 
+  /**
+   * Get the pixel buffer
+   * @return The buffer. You can modify its contents.
+   */
+  virtual Dali::Integration::PixelBuffer* GetBuffer()
+  {
+    return mExternalData;
+  }
+
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
   virtual ~BitmapExternal();
+
+private:
+
+  Dali::Integration::PixelBuffer* mExternalData; ///< Externally owned pixel data
 
 private:
   BitmapExternal();  ///< defined private to prevent use

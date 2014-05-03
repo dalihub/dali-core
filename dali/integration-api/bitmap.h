@@ -298,12 +298,12 @@ public:
   void DiscardBuffer();
 
   /**
-   * @return True if the buffer of pixel data is owned by this Bitmap itself,
-   * or false if the buffer is owned by an external component.
-   **/
-  bool BufferIsOwned() const
+   * Check if the pixel buffer can be discarded
+   * @return true if the pixel buffer can be discarded
+   */
+  bool IsDiscardable() const
   {
-    return mDataIsOwned;
+    return mDiscardable;
   }
 
  /**
@@ -333,7 +333,7 @@ protected:
 
 private:
 
-  bool          mDataIsOwned;     ///< Should delete the buffer when discard buffer is called.
+  bool mDiscardable; ///< Should delete the buffer when discard buffer is called.
 
   Bitmap(const Bitmap& other);  ///< defined private to prevent use
   Bitmap& operator = (const Bitmap& other); ///< defined private to prevent use

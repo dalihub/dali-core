@@ -264,14 +264,14 @@ ResourceTicketPtr ResourceClient::RequestResourceTicket( ResourceId id )
   return ticket;
 }
 
-ImageTicketPtr ResourceClient::AllocateBitmapImage ( unsigned int width,
-                                                     unsigned int height,
-                                                     unsigned int bufferWidth,
-                                                     unsigned int bufferHeight,
-                                                     Pixel::Format pixelformat )
+ImageTicketPtr ResourceClient::AllocateBitmapImage( unsigned int width,
+                                                    unsigned int height,
+                                                    unsigned int bufferWidth,
+                                                    unsigned int bufferHeight,
+                                                    Pixel::Format pixelformat )
 {
-  Bitmap * const bitmap = Bitmap::New(Bitmap::BITMAP_2D_PACKED_PIXELS, true); ///< Not exception safe.
-  Bitmap::PackedPixelsProfile * const packedBitmap = bitmap->GetPackedPixelsProfile();
+  Bitmap* const bitmap = Bitmap::New( Bitmap::BITMAP_2D_PACKED_PIXELS, false/*buffer is available via public-api, therefore not discardable*/ );
+  Bitmap::PackedPixelsProfile* const packedBitmap = bitmap->GetPackedPixelsProfile();
   DALI_ASSERT_DEBUG(packedBitmap);
 
   packedBitmap->ReserveBuffer(pixelformat, width, height, bufferWidth, bufferHeight);

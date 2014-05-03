@@ -272,13 +272,13 @@ Bitmap::Bitmap( bool discardable, Dali::Integration::PixelBuffer* pixBuf)
   mHasAlphaChannel(true),
   mAlphaChannelUsed(true),
   mData(pixBuf),
-  mDataIsOwned(discardable)
+  mDiscardable(discardable)
 {
 }
 
 void Bitmap::DiscardBuffer()
 {
-  if ( mDataIsOwned )
+  if ( mDiscardable )
   {
     DeletePixelBuffer();
   }
@@ -297,7 +297,7 @@ PixelBuffer* Bitmap::ReleaseBuffer()
 Bitmap::~Bitmap()
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
-  DiscardBuffer();
+  DeletePixelBuffer();
 }
 
 /**
