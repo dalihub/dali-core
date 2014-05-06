@@ -169,16 +169,31 @@ void ImageActor::SetImage( Image* image )
 
   mLoadedConnection.DisconnectAll();
 
-  mImageNext.Set( image, OnStage() );
+  ImagePtr imagePtr( image );
 
-  if ( image == NULL )
+  // Automatically convert nine-patch images to cropped bitmap
+  NinePatchImage* ninePatchImage = NinePatchImage::GetNinePatchImage( image );
+  if( ninePatchImage )
+  {
+    imagePtr = ninePatchImage->CreateCroppedBitmapImage();
+  }
+
+  mImageNext.Set( imagePtr.Get(), OnStage() );
+
+  if( ninePatchImage )
+  {
+    SetStyle( Dali::ImageActor::STYLE_NINE_PATCH );
+    SetNinePatchBorder( ninePatchImage->GetStretchBorders(), true );
+  }
+
+  if ( !imagePtr )
   {
     mImageAttachment->SetImage( NULL );
   }
   else
   {
     // don't disconnect currently shown image until we made sure that the new one is loaded
-    OnImageSet( *image );
+    OnImageSet( *imagePtr.Get() );
   }
 }
 
