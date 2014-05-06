@@ -80,6 +80,22 @@ MeshRenderer::~MeshRenderer()
 {
 }
 
+void MeshRenderer::GlContextDestroyed()
+{
+  MeshInfo& meshInfo0 = mMeshInfo[ 0 ];
+  Mesh* mesh = meshInfo0.mesh;
+  if( mesh )
+  {
+    mesh->GlContextDestroyed();
+  }
+  MeshInfo& meshInfo1 = mMeshInfo[ 1 ];
+  mesh = meshInfo1.mesh;
+  if( mesh )
+  {
+    mesh->GlContextDestroyed();
+  }
+}
+
 void MeshRenderer::GlCleanup()
 {
   // MeshRenderer does not own any GL resources

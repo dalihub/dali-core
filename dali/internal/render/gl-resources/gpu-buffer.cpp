@@ -97,16 +97,17 @@ GpuBuffer::GpuBuffer( Context& context, Target target, Usage usage )
   mUsage( usage ),
   mBufferCreated( false )
 {
-  // the buffer is owned by the GPU so if we lose context, we lose the buffer
-  // so we need to know when we lose context
-  mContext.AddObserver(*this);
 }
 
 GpuBuffer::~GpuBuffer()
 {
-  mContext.RemoveObserver(*this);
-
-  GlContextToBeDestroyed();
+  // If we have a buffer then delete it.
+  if (mBufferId)
+  {
+    // If a buffer object that is currently bound is deleted, the binding reverts to 0
+    // (the absence of any buffer object, which reverts to client memory usage)
+    mContext.DeleteBuffers(1,&mBufferId);
+  }
 }
 
 /*
@@ -183,33 +184,9 @@ bool GpuBuffer::BufferIsValid() const
   return mBufferCreated && (0 != mCapacity );
 }
 
-/*
- * If the context is about to go, and we have a buffer then delete it.
- */
-void GpuBuffer::GlContextToBeDestroyed()
+void GpuBuffer::GlContextDestroyed()
 {
-  if (mBufferId)
-  {
-    // If the buffer is currently bound, then unbind it by setting the
-    // currently bound buffer to zero.
-    if (mContext.GetCurrentBoundArrayBuffer( TypeAsGlEnum( mTarget ) ) == mBufferId)
-    {
-      BindNoChecks(0);
-    }
-
-    mCapacity = 0;
-    mSize = 0;
-    mContext.DeleteBuffers(1,&mBufferId);
-    mBufferId = 0;
-    mBufferCreated = false;
-  }
-}
-
-void GpuBuffer::GlContextCreated()
-{
-  // set some default values, just incase we don't get a
-  // GlContextToBeDestroyed when the context is lost and then
-  // is recreated (should never happen).
+  // If the context is destroyed, GL would have released the buffer.
   mCapacity = 0;
   mSize = 0;
   mBufferId = 0;

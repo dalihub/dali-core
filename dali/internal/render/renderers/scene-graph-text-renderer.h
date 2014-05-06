@@ -114,6 +114,11 @@ public:
   void SetSmoothEdge( float params );
 
   /**
+   * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
+   */
+  virtual void GlContextDestroyed();
+
+  /**
    * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
    */
   virtual void GlCleanup();

@@ -52,12 +52,10 @@ Texture::Texture(Context&      context,
   mPixelFormat(pixelFormat),
   mDiscarded(false)
 {
-  mContext.AddObserver(*this);
 }
 
 Texture::~Texture()
 {
-  mContext.RemoveObserver(*this);
   // GlCleanup() should already have been called by TextureCache ensuring the resource is destroyed
   // on the render thread. (And avoiding a potentially problematic virtual call in the destructor)
 }
@@ -103,9 +101,15 @@ bool Texture::Bind(GLenum target, GLenum textureunit )
   return created;
 }
 
+void Texture::GlContextDestroyed()
+{
+  // texture is gone
+  mId = 0;
+}
+
 void Texture::GlCleanup()
 {
-  // otherwise, delete the gl texture
+  // delete the gl texture
   if (mId != 0)
   {
     mContext.DeleteTextures(1,&mId);
@@ -153,24 +157,6 @@ unsigned int Texture::GetHeight() const
 Pixel::Format Texture::GetPixelFormat() const
 {
   return mPixelFormat;
-}
-
-/*
- * When an OpenGL context is created and made active we don't
- * do anything, because we use lazy binding.
- * This means when a texture is required that's when it's loaded
- * into OpenGL.
- */
-void Texture::GlContextCreated()
-{
-}
-
-/*
- * From Context::Observer, called just before the OpenGL context is destroyed.
- */
-void Texture::GlContextToBeDestroyed()
-{
-  GlCleanup();
 }
 
 void Texture::GetTextureCoordinates(UvRect& uv, const PixelArea* pixelArea)

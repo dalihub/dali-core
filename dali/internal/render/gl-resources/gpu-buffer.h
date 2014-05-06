@@ -19,7 +19,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/gl-resources/context-observer.h>
 
 namespace Dali
 {
@@ -36,9 +35,8 @@ namespace Internal
  * The buffer allows data to be stored in high-performance
  * graphics memory on the server side and
  * promotes efficient data transfer.
- *
  */
-class GpuBuffer : public ContextObserver
+class GpuBuffer
 {
 public:
 
@@ -57,8 +55,8 @@ public:
    */
   enum Usage
   {
-    STREAM_DRAW, ///< GL_STREAM_DRAW
-    STATIC_DRAW, ///< GL_STATIC_DRAW
+    STREAM_DRAW,  ///< GL_STREAM_DRAW
+    STATIC_DRAW,  ///< GL_STATIC_DRAW
     DYNAMIC_DRAW, ///< GL_DYNAMIC_DRAW
   };
 
@@ -73,9 +71,9 @@ public:
   GpuBuffer( Context& context, Target target, Usage usage );
 
   /**
-   * Destructor
+   * Destructor, non virtual as no virtual methods or inheritance
    */
-  virtual ~GpuBuffer();
+  ~GpuBuffer();
 
   /**
    *
@@ -105,17 +103,10 @@ public:
     return mSize;
   }
 
-private: // From Context::Observer
-
   /**
-   * @copydoc ContextObserver::GlContextToBeDestroyed
+   * Needs to be called when GL context is destroyed
    */
-  virtual void GlContextToBeDestroyed();
-
-  /**
-   * @copydoc ContextObserver::GlContextCreated
-   */
-  virtual void GlContextCreated();
+  void GlContextDestroyed();
 
 private:
 

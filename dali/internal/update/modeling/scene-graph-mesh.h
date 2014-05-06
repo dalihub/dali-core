@@ -133,6 +133,18 @@ public:
    **/
   bool HasGeometry( ThreadBuffer threadBuffer ) const;
 
+public: // from GlResourceOwner
+
+  /**
+   * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
+   */
+  virtual void GlContextDestroyed();
+
+  /**
+   * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
+   */
+  virtual void GlCleanup();
+
 private:
 
   /**
@@ -148,13 +160,8 @@ private:
   // Undefined
   Mesh& operator=(const Mesh& rhs);
 
-  /**
-   * From GlResourceOwner - delete the GL texture.
-   * @pre This method is should only be called from the render-thread.
-   */
-  virtual void GlCleanup();
-
 protected:
+
   ResourceId mResourceId;
 
   /**

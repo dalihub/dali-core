@@ -142,8 +142,7 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
 {
   DALI_ASSERT_DEBUG( NULL != shader );
 
-  // Send message to clean-up GL resources in the next Render
-  DoGlCleanup( updateBufferIndex, *shader, mRenderQueue );
+  // Programs are cached for the lifetime of DALi so no need for GL cleanup for shader for now.
 
   // The GL resources will now be freed in frame N
   // The Update for frame N+1 may occur in parallel with the rendering of frame N

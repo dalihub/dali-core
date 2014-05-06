@@ -19,7 +19,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/map-wrapper.h>
-#include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/integration-api/debug.h>
@@ -35,7 +34,6 @@ namespace Dali
 namespace Internal
 {
 
-class ContextObserver;
 class Program; // to be able to cache programs
 
 // wrap gl calls with CHECK_GL eg "CHECK_GL( *this, glBindTexture(textureId) );"
@@ -53,7 +51,6 @@ class Program; // to be able to cache programs
 
 /**
  * Context records the current GL state, and provides access to the OpenGL ES 2.0 API.
- * Observers will be notified when the GL context is created/destroyed.
  * Context avoids duplicate GL calls, if the same setting etc. is requested repeatedly.
  */
 class Context
@@ -82,35 +79,19 @@ public:
 
   /**
    * Called when the GL context has been created.
-   * @post Context observers will be notified.
    */
   void GlContextCreated();
 
   /**
    * Called when the GL context is about to be destroyed.
-   * @post Context observers will be notified, and should free any GL resources held.
    */
-  void GlContextToBeDestroyed();
+  void GlContextDestroyed();
 
   /**
    * Query whether the OpenGL context has been created.
    * @return True if the OpenGL context has been created.
    */
   bool IsGlContextCreated() { return mGlContextCreated; }
-
-  /**
-   * Adds an observer to the Context object.
-   * The observer is responsible for calling RemoveObserver() before destruction.
-   * @param[in] observer The observer to add.
-   */
-  void AddObserver(ContextObserver& observer);
-
-  /**
-   * Removes an observer from the Context object.
-   * The observer must call this method before it is destroyed.
-   * @param[in] observer The observer to remove.
-   */
-  void RemoveObserver(ContextObserver& observer);
 
   /**
    * @return the GLAbstraction
@@ -602,9 +583,13 @@ public:
    */
   void DeleteBuffers(GLsizei n, const GLuint* buffers)
   {
-    LOG_GL("DeleteBuffers %d %p\n", n, buffers);
-    CHECK_GL( *this, mGlAbstraction.DeleteBuffers(n, buffers) );
-
+    // TODO: this is to prevent mesh destructor from doing GL calls when DALi core is being deleted
+    // can be taken out once render manages either knows about meshes or gpubuffers and can tell them directly that context is lost
+    if( this->IsGlContextCreated() )
+    {
+      LOG_GL("DeleteBuffers %d %p\n", n, buffers);
+      CHECK_GL( *this, mGlAbstraction.DeleteBuffers(n, buffers) );
+    }
     // reset the cached buffer id's
     // fixes problem where some drivers will a generate a buffer with the
     // same id, as the last deleted buffer id.
@@ -1770,8 +1755,6 @@ private: // Data
   // Vertex Attribute Buffer enable caching
   bool mVertexAttributeCachedState[ MAX_ATTRIBUTE_CACHE_SIZE ];    ///< Value cache for Enable Vertex Attribute
   bool mVertexAttributeCurrentState[ MAX_ATTRIBUTE_CACHE_SIZE ];   ///< Current state on the driver for Enable Vertex Attribute
-
-  std::set<ContextObserver*> mObservers;
 
   Program* mCurrentProgram;
   typedef std::map< std::size_t, Program* > ProgramContainer;

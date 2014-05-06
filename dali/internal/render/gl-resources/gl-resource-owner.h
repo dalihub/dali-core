@@ -35,14 +35,24 @@ public:
    * Virtual destructor.
    */
   virtual ~GlResourceOwner()
-  {
-  }
+  { }
+
+  /**
+   * Reset all GL resources.
+   * This method is called when context is or has been deleted.
+   * Context cannot be called from this method.
+   * @pre This method can only be called from the render-thread.
+   */
+  virtual void GlContextDestroyed() = 0;
 
   /**
    * Release all GL resources.
-   * @pre This method is should only be called from the render-thread.
+   * This means releasing buffer objects, textures. etc
+   * Context can be used, unless GlContextDestroyed has been called
+   * @pre This method can only be called from the render-thread.
    */
   virtual void GlCleanup() = 0;
+
 };
 
 } // namespace Internal

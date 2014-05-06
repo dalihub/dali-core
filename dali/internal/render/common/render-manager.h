@@ -99,7 +99,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::ContextToBeDestroyed()
    */
-  void ContextToBeDestroyed();
+  void ContextDestroyed();
 
   /**
    * Dispatch requests onto the postProcessResourcesQueue

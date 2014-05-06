@@ -211,7 +211,7 @@ void Core::ContextCreated()
 
 void Core::ContextToBeDestroyed()
 {
-  mRenderManager->ContextToBeDestroyed();
+  mRenderManager->ContextDestroyed();
 }
 
 void Core::SurfaceResized(unsigned int width, unsigned int height)

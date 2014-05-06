@@ -20,7 +20,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/integration-api/bitmap.h>
-#include <dali/internal/render/gl-resources/context-observer.h>
 #include <dali/internal/render/common/uv-rect.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
@@ -45,7 +44,6 @@ struct Vertex2D;
  * Texture class.
  */
 class Texture: public RefObject,
-               public ContextObserver,
                public GlResourceOwner
 {
 public:
@@ -170,18 +168,6 @@ public:
    */
   void GetTextureCoordinates(UvRect& uv, const PixelArea* pixelArea = NULL);
 
-public: // From Context::Observer
-
-  /**
-   * From Context::Observer, called when the OpenGL context is active.
-   */
-  virtual void GlContextCreated();
-
-  /**
-   * From Context::Observer, called just before the OpenGL context is destroyed.
-   */
-  virtual void GlContextToBeDestroyed();
-
 protected:
 
   /**
@@ -216,6 +202,7 @@ protected:
    * @return true on success
    */
   virtual bool CreateGlTexture() = 0;
+
 public:
   /**
    * Destructor.
@@ -226,8 +213,12 @@ public:
 public: // From GlResourceOwner
 
   /**
-   * Delete the GL texture.
-   * @pre This method is should only be called from the render-thread.
+   * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
+   */
+  virtual void GlContextDestroyed();
+
+  /**
+   * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
    */
   virtual void GlCleanup();
 

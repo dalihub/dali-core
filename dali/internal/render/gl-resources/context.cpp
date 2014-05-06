@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
-#include <dali/internal/render/gl-resources/context-observer.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/render/common/render-manager.h>
@@ -114,8 +113,6 @@ Context::~Context()
   // release the cached programs
   std::for_each(mProgramCache.begin(), mProgramCache.end(), deletePrograms);
   mProgramCache.clear();
-
-  DALI_ASSERT_DEBUG(mObservers.empty());
 }
 
 void Context::GlContextCreated()
@@ -127,13 +124,6 @@ void Context::GlContextCreated()
   // Set the initial GL state, and check it.
   ResetGlState();
 
-  const std::set<ContextObserver*>::iterator end = mObservers.end();
-  for ( std::set<ContextObserver*>::iterator it = mObservers.begin();
-      it != end; ++it )
-  {
-    (*it)->GlContextCreated();
-  }
-
   const ProgramContainer::iterator endp = mProgramCache.end();
   for ( ProgramContainer::iterator itp = mProgramCache.begin(); itp != endp; ++itp )
   {
@@ -141,17 +131,8 @@ void Context::GlContextCreated()
   }
 }
 
-void Context::GlContextToBeDestroyed()
+void Context::GlContextDestroyed()
 {
-  DALI_ASSERT_DEBUG(mGlContextCreated);
-
-  const std::set<ContextObserver*>::iterator end = mObservers.end();
-  for ( std::set<ContextObserver*>::iterator it = mObservers.begin();
-      it != end; ++it )
-  {
-    (*it)->GlContextToBeDestroyed();
-  }
-
   const ProgramContainer::iterator endp = mProgramCache.end();
   for ( ProgramContainer::iterator itp = mProgramCache.begin(); itp != endp; ++itp )
   {
@@ -159,16 +140,6 @@ void Context::GlContextToBeDestroyed()
   }
 
   mGlContextCreated = false;
-}
-
-void Context::AddObserver(ContextObserver& observer)
-{
-  mObservers.insert(&observer);
-}
-
-void Context::RemoveObserver(ContextObserver& observer)
-{
-  mObservers.erase(&observer);
 }
 
 const char* Context::ErrorToString( GLenum errorCode )

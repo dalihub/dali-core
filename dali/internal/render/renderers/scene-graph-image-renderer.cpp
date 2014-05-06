@@ -165,17 +165,24 @@ void ImageRenderer::TextureDiscarded( ResourceId textureId )
   mTexture = NULL;
 }
 
+void ImageRenderer::GlContextDestroyed()
+{
+  if( mVertexBuffer )
+  {
+    mVertexBuffer->GlContextDestroyed();
+  }
+  if( mIndexBuffer )
+  {
+    mIndexBuffer->GlContextDestroyed();
+  }
+  // force recreation of the geometry in next render
+  mIsMeshGenerated = false;
+}
+
 void ImageRenderer::GlCleanup()
 {
-  if (mVertexBuffer)
-  {
-    mVertexBuffer.Reset();
-  }
-
-  if (mIndexBuffer)
-  {
-    mIndexBuffer.Reset();
-  }
+  mVertexBuffer.Reset();
+  mIndexBuffer.Reset();
 }
 
 bool ImageRenderer::RequiresDepthTest() const

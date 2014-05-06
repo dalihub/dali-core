@@ -354,6 +354,16 @@ void TextureCache::RemoveObserver( ResourceId id, TextureObserver* observer )
   }
 }
 
+void TextureCache::GlContextDestroyed()
+{
+  TextureIter end = mTextures.end();
+  TextureIter iter = mTextures.begin();
+  for( ; iter != end; ++iter )
+  {
+    (*iter->second).GlContextDestroyed(); // map holds intrusive pointers
+  }
+}
+
 /********************************************************************************
  **********************  Implements TextureCacheDispatcher  *********************
  ********************************************************************************/

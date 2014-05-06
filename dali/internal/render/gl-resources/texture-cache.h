@@ -208,6 +208,12 @@ public:
    */
   void RemoveObserver( ResourceId id, TextureObserver* observer );
 
+  /**
+   * Reset all textures.
+   * This method is called when context is or has been deleted.
+   */
+  void GlContextDestroyed();
+
 protected: // Implements TextureCacheDispatcher
 
   /**

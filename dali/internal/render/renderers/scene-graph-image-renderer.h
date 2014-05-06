@@ -93,6 +93,11 @@ public:
   void CalculateMeshData( MeshType type, const Vector2& targetSize, bool usePixelArea );
 
   /**
+   * @copydoc Dali::Internal::GlResourceOwner::GlContextDestroyed()
+   */
+  virtual void GlContextDestroyed();
+
+  /**
    * @copydoc Dali::Internal::GlResourceOwner::GlCleanup()
    */
   virtual void GlCleanup();

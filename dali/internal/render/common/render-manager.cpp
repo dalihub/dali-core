@@ -95,10 +95,10 @@ struct RenderManager::Impl
     dynamicsDebugRenderer( NULL ),
     frameCount( 0 ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
-    mDefaultSurfaceRect(),
-    mRendererContainer(),
-    mMaterials(),
-    mRenderersAdded( false )
+    defaultSurfaceRect(),
+    rendererContainer(),
+    materials(),
+    renderersAdded( false )
   {
   }
 
@@ -134,9 +134,7 @@ struct RenderManager::Impl
   }
 
   // the order is important for destruction,
-  // programs, textures and gpubuffers are context observers so delete context last
-  // programs are owned by context at the moment. renderers have to be deleted
-  // first as they observe texture cache and own the gpubuffers
+  // programs are owned by context at the moment.
   Context                             context;             ///< holds the GL state
   RenderQueue                         renderQueue;         ///< A message queue for receiving messages from the update-thread.
   TextureCache                        textureCache;        ///< Cache for all GL textures
@@ -157,12 +155,12 @@ struct RenderManager::Impl
   unsigned int                        frameCount;          ///< The current frame count
   BufferIndex                         renderBufferIndex;   ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
-  Rect<int>                           mDefaultSurfaceRect; ///< Rectangle for the default surface we are rendering to
+  Rect<int>                           defaultSurfaceRect; ///< Rectangle for the default surface we are rendering to
 
-  RendererOwnerContainer              mRendererContainer;  ///< List of owned renderers
-  RenderMaterialContainer             mMaterials;          ///< List of owned render materials
+  RendererOwnerContainer              rendererContainer;  ///< List of owned renderers
+  RenderMaterialContainer             materials;          ///< List of owned render materials
 
-  bool                                mRenderersAdded;
+  bool                                renderersAdded;
 
   RenderTrackerContainer              mRenderTrackers;     ///< List of render trackers
 };
@@ -201,14 +199,27 @@ Context& RenderManager::GetContext()
 
 void RenderManager::ContextCreated()
 {
-  // TODO inform renderers etc directly rather than through context observer
   mImpl->context.GlContextCreated();
+
+  // renderers, textures and gpu buffers cannot reinitialize themselves
+  // so they rely on someone reloading the data for them
 }
 
-void RenderManager::ContextToBeDestroyed()
+void RenderManager::ContextDestroyed()
 {
-  // TODO inform renderers etc directly rather than through context observer
-  mImpl->context.GlContextToBeDestroyed();
+  mImpl->context.GlContextDestroyed();
+
+  // inform texture cache
+  mImpl->textureCache.GlContextDestroyed();
+
+  // inform renderers
+  RendererOwnerContainer::Iterator end = mImpl->rendererContainer.End();
+  RendererOwnerContainer::Iterator iter = mImpl->rendererContainer.Begin();
+  for( ; iter != end; ++iter )
+  {
+    GlResourceOwner* renderer = *iter;
+    renderer->GlContextDestroyed();
+  }
 }
 
 void RenderManager::DispatchPostProcessRequest(ResourcePostProcessRequest& request)
@@ -242,7 +253,7 @@ void RenderManager::InitializeDynamicsDebugRenderer(DynamicsDebugRenderer* debug
 
 void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 {
-  mImpl->mDefaultSurfaceRect = rect;
+  mImpl->defaultSurfaceRect = rect;
 }
 
 void RenderManager::AddRenderer( Renderer* renderer )
@@ -250,11 +261,11 @@ void RenderManager::AddRenderer( Renderer* renderer )
   // Initialize the renderer as we are now in render thread
   renderer->Initialize( mImpl->context, mImpl->textureCache );
 
-  mImpl->mRendererContainer.PushBack( renderer );
+  mImpl->rendererContainer.PushBack( renderer );
 
-  if( !mImpl->mRenderersAdded )
+  if( !mImpl->renderersAdded )
   {
-    mImpl->mRenderersAdded = true;
+    mImpl->renderersAdded = true;
   }
 }
 
@@ -262,7 +273,7 @@ void RenderManager::RemoveRenderer( Renderer* renderer )
 {
   DALI_ASSERT_DEBUG( NULL != renderer );
 
-  RendererOwnerContainer& renderers = mImpl->mRendererContainer;
+  RendererOwnerContainer& renderers = mImpl->rendererContainer;
 
   // Find the renderer
   for ( RendererOwnerIter iter = renderers.Begin(); iter != renderers.End(); ++iter )
@@ -279,7 +290,7 @@ void RenderManager::AddRenderMaterial( RenderMaterial* renderMaterial )
 {
   DALI_ASSERT_DEBUG( NULL != renderMaterial );
 
-  mImpl->mMaterials.PushBack( renderMaterial );
+  mImpl->materials.PushBack( renderMaterial );
   renderMaterial->Initialize( mImpl->textureCache );
 }
 
@@ -287,7 +298,7 @@ void RenderManager::RemoveRenderMaterial( RenderMaterial* renderMaterial )
 {
   DALI_ASSERT_DEBUG( NULL != renderMaterial );
 
-  RenderMaterialContainer& materials = mImpl->mMaterials;
+  RenderMaterialContainer& materials = mImpl->materials;
 
   // Find the render material and destroy it
   for ( RenderMaterialIter iter = materials.Begin(); iter != materials.End(); ++iter )
@@ -316,6 +327,9 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
 
+  // Core::Render documents that GL context must be current before calling Render
+  DALI_ASSERT_DEBUG( mImpl->context.IsGlContextCreated() );
+
   status.SetHasRendered( false );
 
   // Increment the frame count at the beginning of each frame
@@ -329,15 +343,15 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
   //No need to make any gl calls if we don't have any renderers to render during startup.
-  if(mImpl->mRenderersAdded)
+  if(mImpl->renderersAdded)
   {
     // switch rendering to adaptor provided (default) buffer
     mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
 
-    mImpl->context.Viewport( mImpl->mDefaultSurfaceRect.x,
-                             mImpl->mDefaultSurfaceRect.y,
-                             mImpl->mDefaultSurfaceRect.width,
-                             mImpl->mDefaultSurfaceRect.height );
+    mImpl->context.Viewport( mImpl->defaultSurfaceRect.x,
+                             mImpl->defaultSurfaceRect.y,
+                             mImpl->defaultSurfaceRect.width,
+                             mImpl->defaultSurfaceRect.height );
 
     mImpl->context.ClearColor( mImpl->backgroundColor.r,
                                mImpl->backgroundColor.g,
@@ -452,12 +466,12 @@ void RenderManager::DoRender( RenderInstruction& instruction, float elapsedTime 
     if ( instruction.mIsViewportSet )
     {
       // For glViewport the lower-left corner is (0,0)
-      const int y = ( mImpl->mDefaultSurfaceRect.height - instruction.mViewport.height ) - instruction.mViewport.y;
+      const int y = ( mImpl->defaultSurfaceRect.height - instruction.mViewport.height ) - instruction.mViewport.y;
       viewportRect.Set( instruction.mViewport.x,  y, instruction.mViewport.width, instruction.mViewport.height );
     }
     else
     {
-      viewportRect = mImpl->mDefaultSurfaceRect;
+      viewportRect = mImpl->defaultSurfaceRect;
     }
   }
 

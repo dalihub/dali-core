@@ -254,9 +254,21 @@ void TextRenderer::SetDropShadow( const bool enable, const Vector4& color, const
   mTextParameters->SetShadow( enable, color, offset, size );
 }
 
-void TextRenderer::SetSmoothEdge( const float params )
+void TextRenderer::SetSmoothEdge( float params )
 {
   mSmoothing = params;
+}
+
+void TextRenderer::GlContextDestroyed()
+{
+  if( mVertexBuffer )
+  {
+    mVertexBuffer->GlContextDestroyed();
+  }
+  if( mIndexBuffer )
+  {
+    mIndexBuffer->GlContextDestroyed();
+  }
 }
 
 void TextRenderer::GlCleanup()

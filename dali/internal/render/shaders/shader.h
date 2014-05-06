@@ -62,7 +62,7 @@ class TextureCache;
  * A base class for a collection of shader programs, to apply an effect to different geometry types.
  * This class is also the default shader so its easier to override default behaviour
  */
-class Shader : public PropertyOwner, public GlResourceOwner
+class Shader : public PropertyOwner
 {
 public:
 
@@ -274,12 +274,6 @@ public:
    * @return TRUE if subtypes are required, FALSE if there is only one subtype available
    */
   bool AreSubtypesRequired(GeometryType geometryType);
-
-  /**
-   * This is called within RenderManager::Render, after the shader is detached from the scene-graph.
-   * @post The base class resets the program references in mPrograms
-   */
-  void GlCleanup();
 
   /**
    * Applies the shader effect specific program and sets the common uniforms

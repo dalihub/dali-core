@@ -161,12 +161,6 @@ void Mesh::BindBuffers(Context& context)
   }
 }
 
-void Mesh::GlCleanup()
-{
-  mVertexBuffer = NULL;
-  mIndicesBuffer = NULL;
-}
-
 size_t Mesh::GetFaceIndexCount( ThreadBuffer threadBuffer ) const
 {
   DALI_ASSERT_DEBUG( threadBuffer == Mesh::RENDER_THREAD );
@@ -190,6 +184,24 @@ size_t Mesh::GetFaceIndexCount( ThreadBuffer threadBuffer ) const
 bool Mesh::HasGeometry( ThreadBuffer threadBuffer ) const
 {
   return GetMeshData(threadBuffer).GetVertexCount() > 0;
+}
+
+void Mesh::GlContextDestroyed()
+{
+  if( mVertexBuffer )
+  {
+    mVertexBuffer->GlContextDestroyed();
+  }
+  if( mIndicesBuffer )
+  {
+    mIndicesBuffer->GlContextDestroyed();
+  }
+}
+
+void Mesh::GlCleanup()
+{
+  mVertexBuffer = NULL;
+  mIndicesBuffer = NULL;
 }
 
 } // namespace SceneGraph

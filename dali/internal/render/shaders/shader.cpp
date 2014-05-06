@@ -276,11 +276,6 @@ bool Shader::AreSubtypesRequired(GeometryType geometryType)
   return ! mPrograms[ programType ].mUseDefaultForAllSubtypes;
 }
 
-void Shader::GlCleanup()
-{
-  mPrograms.clear();
-}
-
 Program& Shader::Apply( Context& context,
                         BufferIndex bufferIndex,
                         GeometryType type,
