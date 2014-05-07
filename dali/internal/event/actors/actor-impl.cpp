@@ -38,22 +38,23 @@
 #include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
-#include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
-#include <dali/internal/event/dynamics/dynamics-body-impl.h>
-#include <dali/internal/event/dynamics/dynamics-joint-impl.h>
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/nodes/node-messages.h>
+#include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/common/message.h>
 #include <dali/integration-api/debug.h>
 
-// DECLARATION FILES
-#include <dali/internal/update/nodes/node-declarations.h>
+#ifdef DYNAMICS_SUPPORT
+#include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
+#include <dali/internal/event/dynamics/dynamics-body-impl.h>
+#include <dali/internal/event/dynamics/dynamics-joint-impl.h>
+#include <dali/internal/event/dynamics/dynamics-world-impl.h>
+#endif
 
 using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::AnimatableProperty;
@@ -175,6 +176,8 @@ namespace Internal
 unsigned int Actor::mActorCounter = 0;
 ActorContainer Actor::mNullChildren;
 
+#ifdef DYNAMICS_SUPPORT
+
 // Encapsulate actor related dynamics data
 struct DynamicsData
 {
@@ -192,6 +195,8 @@ struct DynamicsData
 
   SlotDelegate< Actor > slotDelegate;
 };
+
+#endif // DYNAMICS_SUPPORT
 
 namespace
 {
@@ -1184,6 +1189,8 @@ void Actor::RemoveShaderEffect()
   mShaderEffect.Reset();
 }
 
+#ifdef DYNAMICS_SUPPORT
+
 //--------------- Dynamics ---------------
 
 void Actor::DisableDynamics()
@@ -1557,6 +1564,8 @@ void Actor::DisconnectDynamics()
     }
   }
 }
+
+#endif // DYNAMICS_SUPPORT
 
 void Actor::SetOverlay(bool enable)
 {
@@ -1981,7 +1990,9 @@ Actor::Actor( DerivedType derivedType )
   mNode( NULL ),
   mParentOrigin( NULL ),
   mAnchorPoint( NULL ),
+#ifdef DYNAMICS_SUPPORT
   mDynamicsData( NULL ),
+#endif
   mAttachment(),
   mShaderEffect(),
   mName(),
@@ -2057,8 +2068,11 @@ Actor::~Actor()
     UnregisterObject();
   }
 
+#ifdef DYNAMICS_SUPPORT
   // Cleanup dynamics
   delete mDynamicsData;
+#endif
+
   // Cleanup optional parent origin and anchor
   delete mParentOrigin;
   delete mAnchorPoint;
@@ -2146,11 +2160,13 @@ void Actor::ConnectToSceneGraph()
     mAttachment->Connect();
   }
 
+#ifdef DYNAMICS_SUPPORT
   // Notify dynamics
   if( NULL != mDynamicsData )
   {
     ConnectDynamics();
   }
+#endif
 
   // Notification for ProxyObject::Observers
   OnSceneObjectAdd();
@@ -2244,11 +2260,13 @@ void Actor::DisconnectFromSceneGraph()
     mAttachment->Disconnect();
   }
 
+#ifdef DYNAMICS_SUPPORT
   // Notify dynamics
   if( NULL != mDynamicsData )
   {
     DisconnectDynamics();
   }
+#endif
 }
 
 void Actor::NotifyStageDisconnection()

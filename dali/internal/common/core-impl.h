@@ -48,7 +48,6 @@ namespace Internal
 class NotificationManager;
 class AnimationPlaylist;
 class PropertyNotificationManager;
-class DynamicsNotifier;
 class Context;
 class EventProcessor;
 class GestureEventProcessor;
@@ -305,7 +304,6 @@ private:
   NotificationManager*                      mNotificationManager;         ///< Notification manager
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
-  OwnerPointer<DynamicsNotifier>            mDynamicsNotifier;
   FrameTime*                                mFrameTime;                   ///< Time when we render
   FontFactory*                              mFontFactory;                 ///< font resource factory
   ImageFactory*                             mImageFactory;                ///< Image resource factory

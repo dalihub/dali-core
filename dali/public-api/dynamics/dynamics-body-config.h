@@ -158,7 +158,7 @@ public:
    *
    * @param[in] mass The mass for the body.
    */
-  void SetMass( const float mass);
+  void SetMass( float mass);
 
   /**
    * @brief Get the mass that will be set on bodies created from this config.
@@ -185,7 +185,7 @@ public:
    *                       Set elasticity == 0 to inhibit bouncing at impact, reduces the velocity of the body to 0.
    *                       Set elasticity > 1 will increase the velocity of the object after impact
    */
-  void SetElasticity(const float elasticity);
+  void SetElasticity(float elasticity);
 
   /**
    * @brief Get the friction coefficient for any DynamicsBody created from this DynamicsBodyConfig.
@@ -202,7 +202,7 @@ public:
    * @param[in] friction The friction coefficient.
    *                     This will be clamped between 0 and 1
    */
-  void SetFriction(const float friction);
+  void SetFriction(float friction);
 
   /**
    * @brief Get the linear damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
@@ -218,7 +218,7 @@ public:
    * @param[in] damping The linear damping coefficient.
    *                    This will be clamped between 0 and 1
    */
-  void SetLinearDamping( const float damping );
+  void SetLinearDamping( float damping );
 
   /**
    * @brief Get the angular damping coefficient for any DynamicsBody created from this DynamicsBodyConfig.
@@ -235,7 +235,7 @@ public:
    * @param[in] damping The angular damping coefficient.
    *                    This will be clamped between 0 and 1
    */
-  void SetAngularDamping(const float damping);
+  void SetAngularDamping(float damping);
 
   /**
    * @brief Get the linear velocity below which the DynamicsBody can be put to sleep by the simulation.
@@ -253,7 +253,7 @@ public:
    *
    * See @ref DynamicsBody::SetSleepEnabled.
    */
-  void SetLinearSleepVelocity(const float sleepVelocity);
+  void SetLinearSleepVelocity(float sleepVelocity);
 
   /**
    * @brief Get the angular velocity below which the DynamicsBody can be put to sleep by the simulation.
@@ -271,7 +271,7 @@ public:
    *
    * See @ref DynamicsBody::SetSleepEnabled.
    */
-  void SetAngularSleepVelocity(const float sleepVelocity);
+  void SetAngularSleepVelocity(float sleepVelocity);
 
   /**
    * @brief Get the collision filter group.@n
@@ -319,7 +319,7 @@ public:
    * @param[in] stiffness A value clamped between 0 and 1.
    *                      Values closer to 1 make it more stiff.
    */
-  void SetStiffness( const float stiffness );
+  void SetStiffness( float stiffness );
 
   /**
    * @brief Get the anchor hardness.@n
@@ -335,7 +335,7 @@ public:
    * @param[in] hardness 0 means a soft anchor with no drift correction, 1 mean a hard anchor with full correction
    *                 hardness will be clamped between 0 and 1.
    */
-  void SetAnchorHardness( const float hardness );
+  void SetAnchorHardness( float hardness );
 
   /**
    * @brief Get the volume conservation coefficient.
@@ -350,7 +350,7 @@ public:
    * Defines the magnitude of the force used to conserve the volume of the body after DynamicsBody::ConserveVolume is invoked
    * @param[in] conservation Range 0 <= conservation < +infinity
    */
-  void SetVolumeConservation(const float conservation);
+  void SetVolumeConservation(float conservation);
 
   /**
    * @brief Get the shape conservation factor.
@@ -365,7 +365,7 @@ public:
    * Defines the factor used to match the shape of the body when DynamicsBody::ConserveShape. is invoked
    * @param[in] conservation Range 0 <= conservation < 1
    */
-  void SetShapeConservation(const float conservation);
+  void SetShapeConservation(float conservation);
 
   // Not intended for application developers
 private:

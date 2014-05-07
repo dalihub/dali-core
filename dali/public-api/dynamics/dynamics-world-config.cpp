@@ -18,16 +18,22 @@
 #include <dali/public-api/dynamics/dynamics-world-config.h>
 
 // INTERNAL HEADERS
+#ifdef DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
+#endif
 
 namespace Dali
 {
 
 DynamicsWorldConfig DynamicsWorldConfig::New()
 {
+#ifdef DYNAMICS_SUPPORT
   Internal::DynamicsWorldConfigPtr internal( new Internal::DynamicsWorldConfig() );
 
   return DynamicsWorldConfig( internal.Get() );
+#else
+  return DynamicsWorldConfig();
+#endif
 }
 
 DynamicsWorldConfig::DynamicsWorldConfig()
@@ -40,36 +46,58 @@ DynamicsWorldConfig::~DynamicsWorldConfig()
 
 void DynamicsWorldConfig::SetType( const DynamicsWorldConfig::WorldType type )
 {
+#ifdef DYNAMICS_SUPPORT
   GetImplementation(*this).SetType( type );
+#endif
 }
 
 DynamicsWorldConfig::WorldType DynamicsWorldConfig::GetType() const
 {
+#ifdef DYNAMICS_SUPPORT
   return GetImplementation(*this).GetType();
+#else
+  return DynamicsWorldConfig::RIGID;
+#endif
 }
 
-void DynamicsWorldConfig::SetUnit(const float unit)
+void DynamicsWorldConfig::SetUnit(float unit)
 {
+#ifdef DYNAMICS_SUPPORT
   GetImplementation(*this).SetUnit( unit );
+#endif
 }
 
-const float DynamicsWorldConfig::GetUnit() const
+float DynamicsWorldConfig::GetUnit() const
 {
+#ifdef DYNAMICS_SUPPORT
   return GetImplementation(*this).GetUnit();
+#else
+  return float();
+#endif
 }
 
-void DynamicsWorldConfig::SetSimulationSubSteps( const int subSteps)
+void DynamicsWorldConfig::SetSimulationSubSteps(int subSteps)
 {
+#ifdef DYNAMICS_SUPPORT
   GetImplementation(*this).SetSimulationSubSteps( subSteps );
+#endif
 }
 
-const int DynamicsWorldConfig::GetSimulationSubSteps() const
+int DynamicsWorldConfig::GetSimulationSubSteps() const
 {
+#ifdef DYNAMICS_SUPPORT
   return GetImplementation(*this).GetSimulationSubSteps();
+#else
+  return int();
+#endif
 }
 
 DynamicsWorldConfig::DynamicsWorldConfig( Internal::DynamicsWorldConfig* internal )
+#ifdef DYNAMICS_SUPPORT
 : BaseHandle(internal)
+#else
+: BaseHandle(NULL)
+#endif
 {
 }
 

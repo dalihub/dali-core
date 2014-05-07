@@ -32,13 +32,16 @@
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/event/common/object-registry-impl.h>
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/public-api/common/constants.h>
+#include <dali/public-api/render-tasks/render-task-list.h>
+
+#ifdef DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
 #include <dali/integration-api/dynamics/dynamics-factory-intf.h>
 #include <dali/integration-api/dynamics/dynamics-world-settings.h>
-#include <dali/integration-api/platform-abstraction.h>
-#include <dali/public-api/common/constants.h>
-#include <dali/public-api/render-tasks/render-task-list.h>
+#endif
 
 using namespace std;
 using namespace boost;
@@ -60,11 +63,10 @@ const float DEFAULT_STEREO_BASE( 65.0f );
 
 StagePtr Stage::New( AnimationPlaylist& playlist,
                      PropertyNotificationManager& propertyNotificationManager,
-                     DynamicsNotifier& dynamicsNotifier,
                      SceneGraph::UpdateManager& updateManager,
                      NotificationManager& notificationManager )
 {
-  return StagePtr( new Stage( playlist, propertyNotificationManager, dynamicsNotifier, updateManager, notificationManager ) );
+  return StagePtr( new Stage( playlist, propertyNotificationManager, updateManager, notificationManager ) );
 }
 
 void Stage::Initialize()
@@ -155,11 +157,6 @@ void Stage::Add( Actor& actor )
 void Stage::Remove( Actor& actor )
 {
   mRootLayer->Remove( actor );
-}
-
-DynamicsNotifier& Stage::GetDynamicsNotifier()
-{
-  return mDynamicsNotifier;
 }
 
 void Stage::SetSize(float width, float height)
@@ -385,6 +382,13 @@ void Stage::SetDpi(Vector2 dpi)
   mDpi = dpi;
 }
 
+#ifdef DYNAMICS_SUPPORT
+
+DynamicsNotifier& Stage::GetDynamicsNotifier()
+{
+  return mDynamicsNotifier;
+}
+
 DynamicsWorldPtr Stage::InitializeDynamics(DynamicsWorldConfigPtr config)
 {
   if( !mDynamicsFactory )
@@ -416,6 +420,8 @@ void Stage::TerminateDynamics()
     mDynamicsWorld = NULL;
   }
 }
+
+#endif // DYNAMICS_SUPPORT
 
 void Stage::KeepRendering( float durationSeconds )
 {
@@ -457,19 +463,19 @@ Dali::Stage::TouchedSignalV2& Stage::TouchedSignal()
 
 Stage::Stage( AnimationPlaylist& playlist,
               PropertyNotificationManager& propertyNotificationManager,
-              DynamicsNotifier& dynamicsNotifier,
               SceneGraph::UpdateManager& updateManager,
               NotificationManager& notificationManager )
 : mAnimationPlaylist( playlist ),
   mPropertyNotificationManager(propertyNotificationManager),
-  mDynamicsNotifier(dynamicsNotifier),
   mUpdateManager(updateManager),
   mNotificationManager(notificationManager),
   mSize(Vector2::ZERO),
   mBackgroundColor(Dali::Stage::DEFAULT_BACKGROUND_COLOR),
   mViewMode( MONO ),
   mStereoBase( DEFAULT_STEREO_BASE ),
+#ifdef DYNAMICS_SUPPORT
   mDynamicsFactory(NULL),
+#endif
   mSystemOverlay(NULL)
 {
 }

@@ -27,7 +27,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/animation/animation-playlist.h>
 #include <dali/internal/event/common/property-notification-manager.h>
-#include <dali/internal/event/dynamics/dynamics-notifier.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/integration-api/events/event.h>
 #include <dali/internal/event/events/event-processor.h>
@@ -108,8 +107,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mPropertyNotificationManager = PropertyNotificationManager::New();
 
-  mDynamicsNotifier = DynamicsNotifier::New();
-
   std::vector< ResourcePostProcessRequest> init;
   mResourcePostProcessQueue = new ResourcePostProcessList(init);
 
@@ -143,7 +140,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mResourceClient = new ResourceClient( *mResourceManager, *mUpdateManager );
 
-  mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mDynamicsNotifier, *mUpdateManager, *mNotificationManager ) );
+  mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager ) );
 
   mStage->Initialize();
 

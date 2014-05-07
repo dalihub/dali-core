@@ -38,11 +38,6 @@ DynamicsNotifier::~DynamicsNotifier()
 {
 }
 
-DynamicsNotifier* DynamicsNotifier::New()
-{
-  return new DynamicsNotifier;
-}
-
 void DynamicsNotifier::CollisionImpact( Integration::DynamicsCollisionData* collisionData )
 {
   if( Stage::GetCurrent()->GetDynamicsWorld() )

@@ -40,6 +40,10 @@ src_files = $(internal_src_files) \
             $(platform_abstraction_src_files) \
             $(public_api_src_files)
 
+if DYNAMICS_SUPPORT
+src_files += $(internal_dynamics_src_files)
+endif
+
 lib_LTLIBRARIES = libdali-core.la
 
 libdali_core_la_SOURCES = $(dali_shaders_src_file) \

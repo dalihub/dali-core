@@ -25,7 +25,6 @@
 #include <dali/integration-api/render-controller.h>
 #include <dali/integration-api/shader-data.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/dynamics/dynamics-world-settings.h>
 
 #include <dali/internal/common/core-impl.h>
 #include <dali/internal/common/owner-container.h>
@@ -59,7 +58,6 @@
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
 #include <dali/internal/update/touch/touch-resampler.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
@@ -69,6 +67,11 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/renderers/render-material.h>
 #include <dali/internal/render/shaders/shader.h>
+
+#ifdef DYNAMICS_SUPPORT
+#include <dali/integration-api/dynamics/dynamics-world-settings.h>
+#include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
+#endif
 
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
@@ -178,7 +181,6 @@ struct UpdateManager::Impl
     systemLevelRoot( NULL ),
     defaultShader( NULL ),
     messageQueue( renderController, sceneGraphBuffers ),
-    dynamicsWorld( NULL ),
     dynamicsChanged( false ),
     keepRenderingSeconds( 0.0f ),
     animationFinishedDuringUpdate( false ),
@@ -275,7 +277,9 @@ struct UpdateManager::Impl
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
 
+#ifdef DYNAMICS_SUPPORT
   OwnerPointer<DynamicsWorld>         dynamicsWorld;                 ///< Wrapper for dynamics simulation
+#endif
   bool                                dynamicsChanged;               ///< This is set to true if an object is changed in the dynamics simulation tick
 
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
@@ -1054,12 +1058,14 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
     // 8) Apply Constraints
     ApplyConstraints();
 
+#ifdef DYNAMICS_SUPPORT
     // 9) Update dynamics simulation
     mImpl->dynamicsChanged = false;
     if( mImpl->dynamicsWorld )
     {
       mImpl->dynamicsChanged = mImpl->dynamicsWorld->Update( elapsedSeconds );
     }
+#endif
 
     // 10) Check Property Notifications
     ProcessPropertyNotifications();
@@ -1114,6 +1120,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
                              mImpl->renderInstructions );
       }
 
+#ifdef DYNAMICS_SUPPORT
       // if dynamics enabled and active...update matrices for debug drawing
       if( mImpl->dynamicsWorld && mImpl->dynamicsChanged )
       {
@@ -1124,6 +1131,8 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
                                                 task->GetViewMatrix(mSceneGraphBuffers.GetUpdateBufferIndex()) );
         }
       }
+#endif // DYNAMICS_SUPPORT
+
     }
   }
 
@@ -1262,7 +1271,9 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
   }
 }
 
-void UpdateManager::InitializeDynamicsWorld( DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings, Shader* debugShader )
+#ifdef DYNAMICS_SUPPORT
+
+void UpdateManager::InitializeDynamicsWorld( SceneGraph::DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings, SceneGraph::Shader* debugShader )
 {
   dynamicsWorld->Initialize( mImpl->sceneController, worldSettings, debugShader, &mSceneGraphBuffers );
   mImpl->dynamicsWorld = dynamicsWorld;
@@ -1280,6 +1291,8 @@ void UpdateManager::TerminateDynamicsWorld()
 {
   mImpl->dynamicsWorld.Reset();
 }
+
+#endif // DYNAMICS_SUPPORT
 
 } // namespace SceneGraph
 

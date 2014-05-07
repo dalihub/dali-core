@@ -25,7 +25,6 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/stage-def.h>
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/public-api/common/view-mode.h>
@@ -33,6 +32,11 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/render-tasks/render-task.h>
+
+#ifdef DYNAMICS_SUPPORT
+#include <dali/internal/event/dynamics/dynamics-declarations.h>
+#include <dali/internal/event/dynamics/dynamics-notifier.h>
+#endif
 
 namespace Dali
 {
@@ -70,14 +74,13 @@ public:
 
   /**
    * Create the stage
-   * @param playlist for animations
-   * @param dynamicsNotifier
-   * @param updateManager
-   * @param notificationManager
+   * @param[in] playlist for animations
+   * @param[in] propertyNotificationManager
+   * @param[in] updateManager
+   * @param[in] notificationManager
    */
   static StagePtr New( AnimationPlaylist& playlist,
                        PropertyNotificationManager& propertyNotificationManager,
-                       DynamicsNotifier& dynamicsNotifier,
                        SceneGraph::UpdateManager& updateManager,
                        NotificationManager& notificationManager );
 
@@ -145,12 +148,6 @@ public:
    * @return reference to the property notification manager.
    */
   PropertyNotificationManager& GetPropertyNotificationManager();
-
-  /**
-   * Return the Dynamics Simulation Notifier object
-   * @return The Dynamics Simulation Notifier object
-   */
-  DynamicsNotifier& GetDynamicsNotifier();
 
   // Root actor accessors
 
@@ -303,6 +300,14 @@ public:
    */
   void SetDpi( Vector2 dpi );
 
+#ifdef DYNAMICS_SUPPORT
+
+  /**
+   * Return the Dynamics Simulation Notifier object
+   * @return The Dynamics Simulation Notifier object
+   */
+  DynamicsNotifier& GetDynamicsNotifier();
+
   /**
    * @copydoc Dali::Stage::InitializeDynamics
    */
@@ -317,6 +322,8 @@ public:
    * @copydoc Dali::Stage::TerminateDynamics
    */
   void TerminateDynamics();
+
+#endif // DYNAMICS_SUPPORT
 
   NotificationManager& GetNotificationManager()
   {
@@ -369,7 +376,6 @@ private:
    */
   Stage( AnimationPlaylist& playlist,
          PropertyNotificationManager& propertyNotificationManager,
-         DynamicsNotifier& dynamicsNotifier,
          SceneGraph::UpdateManager& updateManager,
          NotificationManager& notificationManager );
 
@@ -384,8 +390,6 @@ private:
   AnimationPlaylist& mAnimationPlaylist;
 
   PropertyNotificationManager& mPropertyNotificationManager;
-
-  DynamicsNotifier& mDynamicsNotifier;
 
   SceneGraph::UpdateManager& mUpdateManager;
 
@@ -412,9 +416,15 @@ private:
   // The object registry
   ObjectRegistryPtr mObjectRegistry;
 
+#ifdef DYNAMICS_SUPPORT
+
+  DynamicsNotifier mDynamicsNotifier;
+
   // The Dynamics simulation world object
   Integration::DynamicsFactory* mDynamicsFactory;   // Not owned pointer to DynamicsFactory (PlatformAbstraction will clean up)
   DynamicsWorldPtr mDynamicsWorld;
+
+#endif // DYNAMICS_SUPPORT
 
   // The list of render-tasks
   IntrusivePtr<RenderTaskList> mRenderTaskList;

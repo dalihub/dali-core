@@ -384,8 +384,22 @@ public:
    */
   void SetLayerDepths( const std::vector< Layer* >& layers, bool systemLevel );
 
+#ifdef DYNAMICS_SUPPORT
+
+  /**
+   * Initialize the dynamics world
+   * @param[in] world The dynamics world
+   * @param[in] worldSettings The dynamics world settings
+   * @param[in] debugShader The shader used for rendering dynamics debug information
+   */
   void InitializeDynamicsWorld( DynamicsWorld* world, Integration::DynamicsWorldSettings* worldSettings, Shader* debugShader );
+
+  /**
+   * Terminate the dynamics world
+   */
   void TerminateDynamicsWorld();
+
+#endif // DYNAMICS_SUPPORT
 
 private:
 
@@ -786,29 +800,6 @@ inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< La
   new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, systemLevel );
 }
 
-// Dynamics messages
-inline void InitializeDynamicsWorldMessage(UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings, const Shader* debugShader)
-{
-  typedef MessageValue3< UpdateManager, DynamicsWorld*, Integration::DynamicsWorldSettings*, Shader*> LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::InitializeDynamicsWorld, dynamicsworld, worldSettings, const_cast<Shader*>(debugShader) );
-}
-
-inline void TerminateDynamicsWorldMessage(UpdateManager& manager)
-{
-  typedef Message< UpdateManager > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::TerminateDynamicsWorld );
-}
-
 inline void AddMaterialMessage( UpdateManager& manager, Material* material )
 {
   typedef MessageValue1< UpdateManager, Material* > LocalType;
@@ -852,6 +843,33 @@ inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveGesture, gesture );
 }
+
+#ifdef DYNAMICS_SUPPORT
+
+// Dynamics messages
+inline void InitializeDynamicsWorldMessage(UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings, const Shader* debugShader)
+{
+  typedef MessageValue3< UpdateManager, DynamicsWorld*, Integration::DynamicsWorldSettings*, Shader*> LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::InitializeDynamicsWorld, dynamicsworld, worldSettings, const_cast<Shader*>(debugShader) );
+}
+
+inline void TerminateDynamicsWorldMessage(UpdateManager& manager)
+{
+  typedef Message< UpdateManager > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::TerminateDynamicsWorld );
+}
+
+#endif // DYNAMICS_SUPPORT
 
 } // namespace SceneGraph
 

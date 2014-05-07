@@ -22,11 +22,17 @@
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/common/core-impl.h>
+#include <dali/public-api/actors/layer.h>
+#include <dali/public-api/object/object-registry.h>
+
+#include <dali/public-api/dynamics/dynamics-world.h>
+#include <dali/public-api/dynamics/dynamics-world-config.h>
+
+#ifdef DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#include <dali/public-api/actors/layer.h>
-#include <dali/public-api/object/object-registry.h>
+#endif
 
 using namespace std;
 
@@ -124,19 +130,29 @@ ObjectRegistry Stage::GetObjectRegistry() const
 
 DynamicsWorld Stage::InitializeDynamics(DynamicsWorldConfig config)
 {
+#ifdef DYNAMICS_SUPPORT
   Internal::DynamicsWorldConfigPtr configImpl( &(GetImplementation(config)) );
 
   return DynamicsWorld( GetImplementation(*this).InitializeDynamics(configImpl).Get() );
+#else
+  return DynamicsWorld();
+#endif
 }
 
 DynamicsWorld Stage::GetDynamicsWorld()
 {
+#ifdef DYNAMICS_SUPPORT
   return DynamicsWorld( GetImplementation(*this).GetDynamicsWorld().Get() );
+#else
+  return DynamicsWorld();
+#endif
 }
 
 void Stage::TerminateDynamics()
 {
+#ifdef DYNAMICS_SUPPORT
   GetImplementation(*this).TerminateDynamics();
+#endif
 }
 
 void Stage::KeepRendering( float durationSeconds )

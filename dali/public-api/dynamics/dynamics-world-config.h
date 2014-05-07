@@ -98,7 +98,7 @@ public:
    * position (Actor::SetPosition...), forces (DynamicsBody::SetLinearVelocity...) and sizes (DynamicsShape...) passed to the simulation
    * @param[in] unit The world unit [default: 0.01f - 1 DALi unit == 1 simulation centimeter]
    */
-  void SetUnit(const float unit);
+  void SetUnit(float unit);
 
   /**
    * @brief Get the current world unit.
@@ -106,7 +106,7 @@ public:
    * @return The current world unit
    * @ref SetUnit
    */
-  const float GetUnit() const;
+  float GetUnit() const;
 
   /**
    * @brief Set the number of simulation steps / DALi update tick.
@@ -118,14 +118,14 @@ public:
    * Setting subSteps to 4 will perform 4 simulation updates per DALi update each with a time step of Approx 4.2ms.
    * @param[in] subSteps The number of simulation steps per update tick
    */
-  void SetSimulationSubSteps( const int subSteps);
+  void SetSimulationSubSteps(int subSteps);
 
   /**
    * @brief Get the number of simulation steps / DALi update tick.
    *
    * @return The number of simulation steps per update tick
    */
-  const int GetSimulationSubSteps() const;
+  int GetSimulationSubSteps() const;
 
   // Not intended for application developers
 private:

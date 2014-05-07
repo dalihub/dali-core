@@ -46,8 +46,10 @@ class DynamicsBody;
 class DynamicsNotifier
 {
 public:
-  static DynamicsNotifier* New();
 
+  /**
+   * Constructor.
+   */
   DynamicsNotifier();
 
   /**
@@ -60,20 +62,20 @@ public:
    * @param[in] collisionData Contains information about the colliding bodies, their
    *                          points of contact, and impact magnitude
    */
-  virtual void CollisionImpact( Integration::DynamicsCollisionData* collisionData );
+  void CollisionImpact( Integration::DynamicsCollisionData* collisionData );
 
   /**
    * Invoked when the simulation detects two bodies already in collision scraping against each other.
    * @param[in] collisionData Contains information about the colliding bodies, their
    *                          points of contact, and impact magnitude
    */
-  virtual void CollisionScrape( Integration::DynamicsCollisionData* collisionData );
+  void CollisionScrape( Integration::DynamicsCollisionData* collisionData );
 
   /**
    * Invoked when the simulation detects two previously colliding bodies moving apart.
    * @param[in] collisionData Contains information about the colliding bodies.
    */
-  virtual void CollisionDisperse( Integration::DynamicsCollisionData* collisionData );
+  void CollisionDisperse( Integration::DynamicsCollisionData* collisionData );
 }; // class DynamicsNotifier
 
 inline MessageBase* CollisionImpactMessage( DynamicsNotifier& dynamicsNotifier, Integration::DynamicsCollisionData* collisionData )

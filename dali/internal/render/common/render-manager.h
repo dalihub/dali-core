@@ -127,11 +127,13 @@ public:
    */
   void SetFrameDeltaTime( float deltaTime );
 
+#ifdef DYNAMICS_SUPPORT
   /**
    * create a dynamics debug renderer
    * @param[in] debugRenderer The dynamics world debug renderer
    */
   void InitializeDynamicsDebugRenderer(DynamicsDebugRenderer* debugRenderer);
+#endif
 
   /**
    * Returns the rectangle for the default surface (probably the application window).

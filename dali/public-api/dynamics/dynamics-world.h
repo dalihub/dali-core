@@ -148,7 +148,7 @@ public:
    *
    * @param[in] mode A combination of the flags in DEBUG_MODES or 0 to disable debug drawing
    */
-  void SetDebugDrawMode(const int mode);
+  void SetDebugDrawMode(int mode);
 
   /**
    * @brief Set the actor which will represent the dynamics world.

@@ -31,8 +31,11 @@
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/update/nodes/node-declarations.h>
+
+#ifdef DYNAMICS_SUPPORT
+#include <dali/internal/event/dynamics/dynamics-declarations.h>
+#endif
 
 namespace Dali
 {
@@ -740,6 +743,8 @@ public:
    */
   const Vector4& GetCurrentWorldColor() const;
 
+#ifdef DYNAMICS_SUPPORT
+
   // Dynamics
 
   /// @copydoc Dali::Actor::DisableDynamics
@@ -821,6 +826,9 @@ private:
    * @param[in] actor The actor passed into AddDynamicsJoint()
    */
   void AttachedActorOffStage( Dali::Actor actor );
+
+#endif // DYNAMICS_SUPPORT
+
 public:
   /**
    * Converts screen coordinates into the actor's coordinate system.
@@ -1291,7 +1299,10 @@ protected:
   const SceneGraph::Node* mNode;         ///< Not owned
   Vector3*                mParentOrigin; // NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
   Vector3*                mAnchorPoint;  // NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
+
+#ifdef DYNAMICS_SUPPORT
   DynamicsData*           mDynamicsData; ///< optional physics data
+#endif
 
   ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
   ShaderEffectPtr         mShaderEffect; ///< Optional referenced shader effect

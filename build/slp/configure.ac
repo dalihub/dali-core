@@ -52,6 +52,12 @@ AC_ARG_ENABLE([emscripten],
               [enable_emscripten=$enableval],
               [enable_emscripten=no])
 
+AC_ARG_ENABLE([dynamics],
+              [AC_HELP_STRING([--enable-dynamics],
+                              [Builds with dynamics support])],
+              [dynamics_support=$enableval],
+              [dynamics_support=no])
+
 if test "x$enable_debug" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED -DDEBUG_BACKTRACE"
 fi
@@ -63,6 +69,12 @@ fi
 if test "x$enable_emscripten" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DEMSCRIPTEN -std=c++11"
 fi
+
+if test "x$dynamics_support" = "xyes"; then
+  DALI_CFLAGS="$DALI_CFLAGS -DDYNAMICS_SUPPORT"
+fi
+
+AM_CONDITIONAL([DYNAMICS_SUPPORT], [test x$dynamics_support = xyes])
 
 AC_ARG_ENABLE([performance-monitor],
               [AC_HELP_STRING([--enable-performance-monitor],
