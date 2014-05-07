@@ -1094,8 +1094,8 @@ private:
 
 public: // Default properties
 
-  PropertyVector3<TransformFlag> mParentOrigin;  ///< Local transform; the position is relative to this. Sets the TransformFlag dirty when changed
-  PropertyVector3<TransformFlag> mAnchorPoint;   ///< Local transform; local center of rotation. Sets the TransformFlag dirty when changed
+  PropertyVector3                mParentOrigin;  ///< Local transform; the position is relative to this. Sets the TransformFlag dirty when changed
+  PropertyVector3                mAnchorPoint;   ///< Local transform; local center of rotation. Sets the TransformFlag dirty when changed
 
   AnimatableProperty<Vector3>    mSize;          ///< Size is provided for layouting
   AnimatableProperty<Vector3>    mPosition;      ///< Local transform; distance between parent-origin & anchor-point

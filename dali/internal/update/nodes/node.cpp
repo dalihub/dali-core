@@ -246,6 +246,9 @@ int Node::GetDirtyFlags() const
 
 void Node::ResetDefaultProperties( BufferIndex updateBufferIndex )
 {
+  // clear dirty flags in parent origin & anchor point
+  mParentOrigin.Clear();
+  mAnchorPoint.Clear();
   // Reset default properties
   mSize.ResetToBaseValue( updateBufferIndex );
   mPosition.ResetToBaseValue( updateBufferIndex );

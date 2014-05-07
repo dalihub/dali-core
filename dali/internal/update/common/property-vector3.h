@@ -38,7 +38,6 @@ namespace SceneGraph
 /**
  * A Vector3 non-animatable property.
  */
-template <int DirtyFlagMask>
 class PropertyVector3 : public PropertyInputImpl
 {
 public:
@@ -48,7 +47,8 @@ public:
    * @param [in] initialValue The initial value of the property.
    */
   PropertyVector3( Vector3 initialValue )
-  : mValue( initialValue )
+  : mValue( initialValue ),
+    mDirtyFlag( true )
   {
   }
 
@@ -57,6 +57,14 @@ public:
    */
   virtual ~PropertyVector3()
   {
+  }
+
+  /**
+   * Clear the dirty flag
+   */
+  void Clear()
+  {
+    mDirtyFlag = false;
   }
 
   /**
@@ -72,7 +80,7 @@ public:
    */
   virtual bool InputInitialized() const
   {
-    return true; // Animatable properties are always valid
+    return true;
   }
 
   /**
@@ -80,7 +88,7 @@ public:
    */
   virtual bool InputChanged() const
   {
-    return (mDirtyFlags & DirtyFlagMask);
+    return mDirtyFlag;
   }
 
   /**
@@ -96,7 +104,7 @@ public:
    */
   void OnSet()
   {
-    mDirtyFlags |= DirtyFlagMask;
+    mDirtyFlag = true;
   }
 
 private:
@@ -113,7 +121,7 @@ public:
 
 private:
 
-  int mDirtyFlags;
+  bool mDirtyFlag;
 
 };
 
