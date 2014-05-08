@@ -3,7 +3,10 @@
   attribute mediump vec3  aPosition;
   attribute mediump vec2  aTexCoord;
 
+  uniform   mediump mat4  uModelView;
+  uniform   mediump mat4  uProjection;
   uniform   mediump mat4  uMvpMatrix;
+  uniform   mediump mat3  uNormalMatrix;
   uniform   lowp    vec4  uColor;
   uniform   lowp    vec4  uTextColor;
 
