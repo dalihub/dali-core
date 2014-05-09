@@ -36,6 +36,16 @@ namespace Scripting
 {
 
 /**
+ * @brief Template structure which stores an enumeration and its string equivalent.
+ */
+template< typename T >
+struct StringEnum
+{
+  const char* string; ///< The string representation
+  const T value;      ///< The actual enumeration
+};
+
+/**
  * @brief Permissive comparison for string enums.
  *
  * Case insensitive and ignores '_', '-' in either string when comparing.
@@ -53,7 +63,7 @@ bool CompareEnums(const std::string& input, const std::string& enumString);
  * @param[in] b The input string
  * @param[in] set The variable to set
  * @param[in] value The value to set
- * @return true if the strings pass the permissve compare
+ * @return true if the strings pass the permissive compare
  */
 template <typename T>
 bool SetIfEqual(const std::string& a, const std::string& b, T& set, T value)
@@ -70,6 +80,61 @@ bool SetIfEqual(const std::string& a, const std::string& b, T& set, T value)
 }
 
 /**
+ * @brief Chooses the appropriate enumeration for the provided string from the given table.
+ *
+ * @param[in]  value       The string equivalent (case-insensitive).
+ * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
+ * @param[in]  tableCount  Number of items in the array.
+ *
+ * @return The equivalent enumeration for the given string.
+ */
+template< typename T >
+T GetEnumeration( const std::string& value, const StringEnum< T >* table, const unsigned int tableCount )
+{
+  T retVal( table->value );
+  bool set( false );
+
+  for ( unsigned int i = 0; ( i < tableCount ) && ( !set ); ++i )
+  {
+    set = SetIfEqual( value, table->string, retVal, table->value );
+    ++table;
+  }
+
+  if ( !set )
+  {
+    DALI_ASSERT_ALWAYS( !"Unknown enumeration string" );
+  }
+
+  return retVal;
+}
+
+/**
+ * @brief Chooses the appropriate string for the provided enumeration from the given table.
+ *
+ * @param[in]  value       The enumeration.
+ * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
+ * @param[in]  tableCount  Number of items in the array.
+ *
+ * @return The equivalent enumeration for the given string.
+ */
+template< typename T >
+std::string GetEnumerationName( const T& value, const StringEnum< T >* table, const unsigned int tableCount )
+{
+  std::string string( String::EMPTY );
+
+  for ( unsigned int i = 0; i < tableCount; ++i )
+  {
+    if ( value == table[ i ].value )
+    {
+      string = table[ i ].string;
+      break;
+    }
+  }
+
+  return string;
+}
+
+/**
  * @brief Takes a string and returns the appropriate color mode.
  *
  * @param[in] value The input string
@@ -83,7 +148,7 @@ ColorMode GetColorMode( const std::string& value );
  * @param[in] value The color mode
  * @return The corresponding string.
  */
-const std::string& GetColorMode( ColorMode value );
+std::string GetColorMode( ColorMode value );
 
 /**
  * @brief Takes a string and returns the appropriate position inheritance mode.
@@ -99,7 +164,7 @@ PositionInheritanceMode GetPositionInheritanceMode( const std::string& value );
  * @param[in] value The position-inheritance-mode.
  * @return The corresponding string.
  */
-const std::string& GetPositionInheritanceMode( PositionInheritanceMode value );
+std::string GetPositionInheritanceMode( PositionInheritanceMode value );
 
 /**
  * @brief Takes a string and returns the appropriate draw mode.
@@ -115,7 +180,7 @@ DrawMode::Type GetDrawMode( const std::string& value );
  * @param[in] value The draw-mode.
  * @return The corresponding string.
  */
-const std::string& GetDrawMode( DrawMode::Type value );
+std::string GetDrawMode( DrawMode::Type value );
 
 /**
  * @brief Takes a string and returns the appropriate anchor-point or parent-origin constant.

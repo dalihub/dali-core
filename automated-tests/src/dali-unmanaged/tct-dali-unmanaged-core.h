@@ -194,6 +194,7 @@ extern int UtcDaliScriptingNewActorProperties(void);
 extern int UtcDaliScriptingNewActorChildren(void);
 extern int UtcDaliScriptingCreatePropertyMapActor(void);
 extern int UtcDaliScriptingCreatePropertyMapImage(void);
+extern int UtcDaliScriptingGetEnumerationTemplates(void);
 extern int UtcDaliSplineGetYFromMonotonicX(void);
 extern int utcDaliSplineGetKnot01(void);
 extern int utcDaliSplineGetKnot02(void);
@@ -442,6 +443,7 @@ testcase tc_array[] = {
     {"UtcDaliScriptingNewActorChildren", UtcDaliScriptingNewActorChildren, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliScriptingCreatePropertyMapActor", UtcDaliScriptingCreatePropertyMapActor, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliScriptingCreatePropertyMapImage", UtcDaliScriptingCreatePropertyMapImage, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
+    {"UtcDaliScriptingGetEnumerationTemplates", UtcDaliScriptingGetEnumerationTemplates, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"UtcDaliSplineGetYFromMonotonicX", UtcDaliSplineGetYFromMonotonicX, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"utcDaliSplineGetKnot01", utcDaliSplineGetKnot01, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},
     {"utcDaliSplineGetKnot02", utcDaliSplineGetKnot02, utc_dali_unmanaged_startup, utc_dali_unmanaged_cleanup},

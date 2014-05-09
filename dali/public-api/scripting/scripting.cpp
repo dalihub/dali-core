@@ -36,14 +36,7 @@ namespace Scripting
 namespace
 {
 
-// Helpers for converting strings to the enumerations and vice versa
-
-template< typename T >
-struct StringEnum
-{
-  const std::string string;
-  const T value;
-};
+// Tables used here for converting strings to the enumerations and vice versa
 
 const StringEnum< ColorMode > COLOR_MODE_TABLE[] =
 {
@@ -157,41 +150,6 @@ const StringEnum< ImageAttributes::ScalingMode > IMAGE_SCALING_MODE_TABLE[] =
 };
 const unsigned int IMAGE_SCALING_MODE_TABLE_COUNT = sizeof( IMAGE_SCALING_MODE_TABLE ) / sizeof( IMAGE_SCALING_MODE_TABLE[0] );
 
-template< typename T >
-T GetEnumeration( const std::string& value, const StringEnum< T >* table, const unsigned int tableCount )
-{
-  T v( table->value );
-  bool set( false );
-
-  for ( unsigned int i = 0; ( i < tableCount ) && ( !set ); ++i )
-  {
-    set = SetIfEqual(value, table->string, v, table->value );
-    ++table;
-  }
-
-  if ( !set )
-  {
-    DALI_ASSERT_ALWAYS( !"Unknown enumeration string" );
-  }
-
-  return v;
-}
-
-template< typename T >
-const std::string& GetEnumerationName( const T& value, const StringEnum< T >* table, const unsigned int tableCount )
-{
-  for ( unsigned int i = 0; i < tableCount; ++i )
-  {
-    if ( value == table[i].value )
-    {
-      return table[i].string;
-      break;
-    }
-  }
-
-  return String::EMPTY;
-}
-
 } // unnamed namespace
 
 bool CompareEnums(const std::string& a, const std::string& b)
@@ -253,7 +211,7 @@ ColorMode GetColorMode( const std::string& value )
 }
 
 
-const std::string& GetColorMode( ColorMode value )
+std::string GetColorMode( ColorMode value )
 {
   return GetEnumerationName< ColorMode >( value, COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
 }
@@ -264,7 +222,7 @@ PositionInheritanceMode GetPositionInheritanceMode( const std::string& value )
 }
 
 
-const std::string& GetPositionInheritanceMode( PositionInheritanceMode value )
+std::string GetPositionInheritanceMode( PositionInheritanceMode value )
 {
   return GetEnumerationName< PositionInheritanceMode >( value, POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
 }
@@ -276,7 +234,7 @@ DrawMode::Type GetDrawMode( const std::string& value )
 }
 
 
-const std::string& GetDrawMode( DrawMode::Type value )
+std::string GetDrawMode( DrawMode::Type value )
 {
   return GetEnumerationName< DrawMode::Type >( value, DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
 }

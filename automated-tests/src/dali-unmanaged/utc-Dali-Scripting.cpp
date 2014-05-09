@@ -26,13 +26,7 @@ using namespace Dali::Scripting;
 namespace
 {
 
-struct StringEnum
-{
-  const char * string;
-  int value;
-};
-
-const StringEnum COLOR_MODE_VALUES[] =
+const StringEnum< int > COLOR_MODE_VALUES[] =
 {
     { "USE_OWN_COLOR", USE_OWN_COLOR },
     { "USE_PARENT_COLOR", USE_PARENT_COLOR },
@@ -41,7 +35,7 @@ const StringEnum COLOR_MODE_VALUES[] =
 };
 const unsigned int COLOR_MODE_VALUES_COUNT = sizeof( COLOR_MODE_VALUES ) / sizeof( COLOR_MODE_VALUES[0] );
 
-const StringEnum POSITION_INHERITANCE_MODE_VALUES[] =
+const StringEnum< int > POSITION_INHERITANCE_MODE_VALUES[] =
 {
     { "INHERIT_PARENT_POSITION", INHERIT_PARENT_POSITION },
     { "USE_PARENT_POSITION", USE_PARENT_POSITION },
@@ -50,7 +44,7 @@ const StringEnum POSITION_INHERITANCE_MODE_VALUES[] =
 };
 const unsigned int POSITION_INHERITANCE_MODE_VALUES_COUNT = sizeof( POSITION_INHERITANCE_MODE_VALUES ) / sizeof( POSITION_INHERITANCE_MODE_VALUES[0] );
 
-const StringEnum DRAW_MODE_VALUES[] =
+const StringEnum< int > DRAW_MODE_VALUES[] =
 {
     { "NORMAL", DrawMode::NORMAL },
     { "OVERLAY", DrawMode::OVERLAY },
@@ -70,7 +64,7 @@ const unsigned int DRAW_MODE_VALUES_COUNT = sizeof( DRAW_MODE_VALUES ) / sizeof(
 template< typename T, typename X >
 void TestEnumStrings(
   Property::Map& map,                       // The map used to create instance of type X
-  const StringEnum* values,                 // An array of string values
+  const StringEnum< int >* values,          // An array of string values
   unsigned int num,                         // Number of items in the array
   T ( X::*method )() const,                 // The member method of X to call to get the enum
   X ( *creator ) ( const Property::Value& ) // The method which creates an instance of type X
@@ -104,7 +98,7 @@ template< typename T >
 void TestEnumStrings(
   const char * const keyName,               // The name of the key to check
   TestApplication& application,             // Reference to the application class
-  const StringEnum* values,                 // An array of string values
+  const StringEnum< int >* values,          // An array of string values
   unsigned int num,                         // Number of items in the array
   void ( Actor::*method )( T )              // The Actor member method to set the enumeration
 )
@@ -462,7 +456,7 @@ int UtcDaliScriptingNewImage(void)
   // load-policy
   map.push_back( Property::StringValuePair( "load-policy", "" ) );
   {
-    const StringEnum values[] =
+    const StringEnum< int > values[] =
     {
         { "IMMEDIATE", Image::Immediate },
         { "ON_DEMAND", Image::OnDemand }
@@ -473,7 +467,7 @@ int UtcDaliScriptingNewImage(void)
   // release-policy
   map.push_back( Property::StringValuePair( "release-policy", "" ) );
   {
-    const StringEnum values[] =
+    const StringEnum< int > values[] =
     {
         { "UNUSED", Image::Unused },
         { "NEVER", Image::Never }
@@ -505,7 +499,7 @@ int UtcDaliScriptingNewImage(void)
   // pixel-format
   map.push_back( Property::StringValuePair( "pixel-format", "" ) );
   {
-    const StringEnum values[] =
+    const StringEnum< int > values[] =
     {
         { "A8", Pixel::A8 },
         { "L8", Pixel::L8 },
@@ -541,7 +535,7 @@ int UtcDaliScriptingNewImage(void)
   // scaling-mode
   map.push_back( Property::StringValuePair( "scaling-mode", "" ) );
   {
-    const StringEnum values[] =
+    const StringEnum< int > values[] =
     {
         { "SHRINK_TO_FIT", ImageAttributes::ShrinkToFit },
         { "SCALE_TO_FILL", ImageAttributes::ScaleToFill },
@@ -1033,5 +1027,34 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_CHECK( value.HasKey( "type" ) );
     DALI_TEST_EQUALS( value.GetValue( "type" ).Get< std::string >(), "FrameBufferImage", TEST_LOCATION );
   }
+  END_TEST;
+}
+
+int UtcDaliScriptingGetEnumerationTemplates(void)
+{
+  TestApplication application;
+
+  const Scripting::StringEnum< int > myTable[] =
+  {
+    { "ONE",    1 },
+    { "TWO",    2 },
+    { "THREE",  3 },
+    { "FOUR",   4 },
+    { "FIVE",   5 },
+  };
+  const unsigned int myTableCount = sizeof( myTable ) / sizeof( myTable[0] );
+
+  for ( unsigned int i = 0; i < myTableCount; ++i )
+  {
+    tet_printf("Checking: %s\n", myTable[ i ].string );
+    DALI_TEST_EQUALS( myTable[ i ].value, GetEnumeration( myTable[ i ].string, myTable, myTableCount ), TEST_LOCATION );
+  }
+
+  for ( unsigned int i = 0; i < myTableCount; ++i )
+  {
+    tet_printf("Checking: %d\n", myTable[ i ].value );
+    DALI_TEST_EQUALS( myTable[ i ].string, GetEnumerationName( myTable[ i ].value, myTable, myTableCount ), TEST_LOCATION );
+  }
+
   END_TEST;
 }
