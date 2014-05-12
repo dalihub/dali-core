@@ -68,10 +68,10 @@ public:
    * be recreated by dali, the default of Never will usually make sense.
    * @return A pointer to a newly allocated object, or null on error.
    */
-  static Dali::EncodedBufferImage New(const uint8_t * const encodedImage,
-                   const std::size_t encodedImageByteCount,
-                   const ImageAttributes& attributes,
-                   const ReleasePolicy releasePol=Dali::Image::Never);
+  static EncodedBufferImagePtr New(const uint8_t * const encodedImage,
+                                   const std::size_t encodedImageByteCount,
+                                   const ImageAttributes& attributes,
+                                   const ReleasePolicy releasePol=Dali::Image::Never);
 };
 
 } // namespace Internal

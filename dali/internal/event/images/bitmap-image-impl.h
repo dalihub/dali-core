@@ -55,11 +55,11 @@ public:
    * @param [in] loadPol     controls time of loading a resource from the filesystem (default: load when Image is created).
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  static BitmapImage* New( unsigned int width,
-                           unsigned int height,
-                           Pixel::Format pixelformat,
-                           LoadPolicy loadPol=ImageLoadPolicyDefault,
-                           ReleasePolicy releasePol=ImageReleasePolicyDefault);
+  static BitmapImagePtr New( unsigned int width,
+                             unsigned int height,
+                             Pixel::Format pixelformat,
+                             LoadPolicy loadPol=ImageLoadPolicyDefault,
+                             ReleasePolicy releasePol=ImageReleasePolicyDefault);
 
   /**
    * Create a new BitmapImage, which uses external data source.
@@ -75,12 +75,12 @@ public:
    * @param [in] stride      the internal stride of the pixelbuffer in pixels
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  static BitmapImage* New( PixelBuffer* pixBuf,
-                           unsigned int width,
-                           unsigned int height,
-                           Pixel::Format pixelformat,
-                           unsigned int stride,
-                           ReleasePolicy releasePol=ImageReleasePolicyDefault );
+  static BitmapImagePtr New( PixelBuffer* pixBuf,
+                             unsigned int width,
+                             unsigned int height,
+                             Pixel::Format pixelformat,
+                             unsigned int stride,
+                             ReleasePolicy releasePol=ImageReleasePolicyDefault );
 
   /**
    * Create a new BitmapImage.
@@ -158,13 +158,6 @@ public:
    * @return the buffer stride
    */
   unsigned int GetBufferStride() const;
-
-private:
-
-  /**
-   * Initializes internal data.
-   */
-  void Initialize();
 
 protected: // From Resource
   /**

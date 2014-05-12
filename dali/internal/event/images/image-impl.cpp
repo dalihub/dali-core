@@ -19,6 +19,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/object/type-registry.h>
 
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/debug.h>
@@ -37,6 +38,21 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+
+BaseHandle CreateImage()
+{
+  ImagePtr image = Image::New();
+  return Dali::Image(image.Get());
+}
+
+TypeRegistration mType( typeid(Dali::Image), typeid(Dali::BaseHandle), CreateImage );
+
+Dali::SignalConnectorType signalConnector1(mType, Dali::Image::SIGNAL_IMAGE_LOADING_FINISHED,    &Image::DoConnectSignal);
+Dali::SignalConnectorType signalConnector2(mType, Dali::Image::SIGNAL_IMAGE_UPLOADED,            &Image::DoConnectSignal);
+}
+
 Image::Image( LoadPolicy loadPol, ReleasePolicy releasePol )
 : mWidth(0),
   mHeight(0),
@@ -47,21 +63,24 @@ Image::Image( LoadPolicy loadPol, ReleasePolicy releasePol )
 {
 }
 
-Image* Image::New()
+ImagePtr Image::New()
 {
-  return new Image;
+  ImagePtr image = new Image;
+  image->Initialize();
+  return image;
 }
 
-Image* Image::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
+ImagePtr Image::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
   if( IsNinePatchFileName(filename) )
   {
-    NinePatchImage* image = new NinePatchImage( filename, attributes, loadPol, releasePol );
+    NinePatchImagePtr image = NinePatchImage::New( filename, attributes, loadPol, releasePol );
     return image;
   }
   else
   {
-    Image* image = new Image( loadPol, releasePol );
+    ImagePtr image = new Image( loadPol, releasePol );
+    image->Initialize();
 
     if( ! filename.empty() )
     {
@@ -81,6 +100,7 @@ Image* Image::New( const std::string& filename, const Dali::ImageAttributes& att
       image->mTicket = image->mImageFactory.Load( image->mRequest.Get() );
       image->mTicket->AddObserver( *image );
     }
+
     // else lazily load image data later, only when it is needed to draw something:
 
     DALI_LOG_SET_OBJECT_STRING( image, filename );
@@ -89,11 +109,12 @@ Image* Image::New( const std::string& filename, const Dali::ImageAttributes& att
   }
 }
 
-Image* Image::New( NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy releasePol )
+ImagePtr Image::New( NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
-  Image* image = new Image;
-  ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
+  ImagePtr image = new Image;
+  image->Initialize();
 
+  ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
 
   image->mWidth  = nativeImg.GetWidth();
   image->mHeight = nativeImg.GetHeight();
@@ -115,6 +136,11 @@ Image::~Image()
     {
       mImageFactory.ReleaseTicket( mTicket.Get() );
     }
+  }
+
+  if( Stage::IsInstalled() )
+  {
+    UnregisterObject();
   }
 }
 
@@ -249,6 +275,11 @@ void Image::Disconnect()
     // release image memory when it's not visible anymore (decrease ref. count of texture)
     SetTicket( NULL );
   }
+}
+
+void Image::Initialize()
+{
+  RegisterObject();
 }
 
 void Image::SetTicket( ResourceTicket* ticket )

@@ -58,9 +58,12 @@ public:
   static ObjectRegistryPtr New();
 
   /**
-   * Registers the Object into the Object Registry, Which notifies
-   * about this object creation to its observers.
+   * Registers the Object into the Object Registry, which notifies
+   * about this object creation to its observers using signals. As
+   * the signals use a BaseHandle, the object must already have a
+   * ref-count > 0, otherwise it will get deleted on signal completion.
    * @pre The object is not already registered.
+   * @pre the object is ref counted (held in an intrusive pointer)
    * @param[in] object Pointer to the object.
    */
   void RegisterObject( Dali::BaseObject* object );

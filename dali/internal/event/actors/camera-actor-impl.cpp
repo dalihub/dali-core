@@ -17,6 +17,9 @@
 // CLASS HEADER
 #include <dali/internal/event/actors/camera-actor-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cmath>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>

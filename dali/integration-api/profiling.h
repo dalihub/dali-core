@@ -52,6 +52,23 @@ DALI_IMPORT_API void EnableProfiling( ProfilingType type );
  */
 DALI_IMPORT_API void SetPanGesturePredictionMode( int mode );
 
+
+namespace Profiling
+{
+
+DALI_IMPORT_API extern const int ANIMATION_MEMORY_SIZE;    ///< Total size of animation and associated internal objects
+DALI_IMPORT_API extern const int CONSTRAINT_MEMORY_SIZE;   ///< Total size of constraint and associated internal objects
+DALI_IMPORT_API extern const int ACTOR_MEMORY_SIZE;        ///< Total size of actor and associated internal objects
+DALI_IMPORT_API extern const int CAMERA_ACTOR_MEMORY_SIZE; ///< Total size of camera actor and associated internal objects
+DALI_IMPORT_API extern const int TEXT_ACTOR_MEMORY_SIZE;   ///< Total size of text actor and associated internal objects
+DALI_IMPORT_API extern const int MESH_ACTOR_MEMORY_SIZE;   ///< Total size of mesh actor and associated internal objects
+DALI_IMPORT_API extern const int IMAGE_ACTOR_MEMORY_SIZE;  ///< Total size of image actor and associated internal objects
+DALI_IMPORT_API extern const int LAYER_MEMORY_SIZE;        ///< Total size of layer and associated internal objects
+DALI_IMPORT_API extern const int IMAGE_MEMORY_SIZE;        ///< Total size of image and associated internal objects
+DALI_IMPORT_API extern const int MESH_MEMORY_SIZE;         ///< Total size of mesh and associated internal objects
+DALI_IMPORT_API extern const int MATERIAL_MEMORY_SIZE;     ///< Total size of material and associated internal objects
+} // namespace Profiling
+
 } // namespace Integration
 
 } // namespace Dali

@@ -111,11 +111,6 @@ public:
    */
   BitmapImagePtr CreateCroppedBitmapImage();
 
-private:
-  /**
-   * Initializes internal data.
-   */
-  void Initialize();
 
 protected: // From Resource
   /**

@@ -140,7 +140,8 @@ NinePatchImage::NinePatchImage( const std::string& filename, const Dali::ImageAt
 : Image(Dali::Image::Immediate, Dali::Image::Never),
   mParsedBorder(false)
 {
-  Initialize();
+  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+  mResourceClient = &tls.GetResourceClient();
 
   Integration::PlatformAbstraction& platformAbstraction = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
 
@@ -214,12 +215,6 @@ Internal::BitmapImagePtr NinePatchImage::CreateCroppedBitmapImage()
   RectArea area;
   cropped->Update(area); // default area has no width or height
   return cropped;
-}
-
-void NinePatchImage::Initialize()
-{
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  mResourceClient = &tls.GetResourceClient();
 }
 
 void NinePatchImage::Connect()

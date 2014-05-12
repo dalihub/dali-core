@@ -63,7 +63,7 @@ protected:
   virtual ~Image();
 
   /**
-   * Constructor
+   * Constructor, with default parameters
    */
   Image(LoadPolicy loadPol=ImageLoadPolicyDefault, ReleasePolicy releasePol=ImageReleasePolicyDefault);
 
@@ -72,7 +72,7 @@ public:
    * Creates a pointer to an uninitialized Image object.
    * @return a pointer to a newly created object.
    */
-  static Image* New();
+  static ImagePtr New();
 
   /**
    * Creates object and loads image from filesystem
@@ -84,14 +84,10 @@ public:
    * @param [in] releasePol optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    * @return a pointer to a newly created object.
    */
-  static Image* New(const std::string& filename,
-                    const Dali::ImageAttributes& attributes=Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
-                    LoadPolicy loadPol=ImageLoadPolicyDefault,
-                    ReleasePolicy releasePol=ImageReleasePolicyDefault);
-
-
-
-public:
+  static ImagePtr New( const std::string& filename,
+                       const Dali::ImageAttributes& attributes=Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
+                       LoadPolicy loadPol=ImageLoadPolicyDefault,
+                       ReleasePolicy releasePol=ImageReleasePolicyDefault );
 
   /**
    * Creates object with already loaded NativeImage
@@ -102,9 +98,9 @@ public:
    * @param [in] releasePol optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    * @return a pointer to a newly created object.
    */
-  static Image* New(NativeImage& nativeImg,
-                    LoadPolicy loadPol=ImageLoadPolicyDefault,
-                    ReleasePolicy releasePol=ImageReleasePolicyDefault);
+  static ImagePtr New( NativeImage& nativeImg,
+                       LoadPolicy loadPol=ImageLoadPolicyDefault,
+                       ReleasePolicy releasePol=ImageReleasePolicyDefault );
 
   /**
    * @copydoc Dali::Image::GetLoadingState()
@@ -233,6 +229,12 @@ public:
    * Indicates that the image is not used anymore.
    */
   virtual void Disconnect();
+
+protected:
+  /**
+   * Second stage initialization
+   */
+  void Initialize();
 
 private:
 

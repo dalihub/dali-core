@@ -30,6 +30,7 @@
 #include <dali/internal/event/common/system-overlay-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/projection.h>
+#include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 

@@ -27,10 +27,10 @@ namespace Dali
 namespace Internal
 {
 
-Dali::EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedImage,
-                   const std::size_t encodedImageByteCount,
-                   const ImageAttributes& attributes,
-                   const ReleasePolicy releasePol )
+EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImage,
+                                               const std::size_t encodedImageByteCount,
+                                               const ImageAttributes& attributes,
+                                               const ReleasePolicy releasePol )
 {
   DALI_ASSERT_DEBUG( encodedImage && "Null image pointer passed-in for decoding from memory." );
   DALI_ASSERT_DEBUG( encodedImageByteCount > 0U && "Zero size passed for image resource in memory buffer." );
@@ -39,9 +39,8 @@ Dali::EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedI
   // input buffer by reading both ends of it:
   DALI_ASSERT_ALWAYS( static_cast<int>( encodedImage[0] + encodedImage[encodedImageByteCount-1] ) != -1 );
 
-  EncodedBufferImage* const image = new EncodedBufferImage( releasePol );
-  // Make sure that this image object cannot leak if we throw:
-  Dali::EncodedBufferImage publicImage(image);
+  EncodedBufferImagePtr image( new EncodedBufferImage( releasePol ) );
+  image->Initialize(); // Second stage initialization
 
   // Replicate the functionality of ImageFactory::load() without the filesystem caching:
   Dali::Integration::BitmapResourceType resourceType( attributes );
@@ -69,7 +68,7 @@ Dali::EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedI
     imageTicket->AddObserver( *image );
   }
 
-  return publicImage;
+  return image;
 }
 
 } // namespace Internal

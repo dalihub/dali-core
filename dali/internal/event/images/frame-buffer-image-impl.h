@@ -36,16 +36,39 @@ typedef IntrusivePtr<FrameBufferImage> FrameBufferImagePtr;
 class FrameBufferImage : public Image
 {
 public:
-  /// @copydoc Dali::FrameBufferImage::FrameBufferImage
+  /**
+   * @copydoc Dali::FrameBufferImage::New(unsigned int, unsigned int, Pixel::Format)
+   */
+  static FrameBufferImagePtr  New(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy);
+
+  /**
+   * @copydoc Dali::FrameBufferImage::New(NativeImage&)
+   */
+  static FrameBufferImagePtr  New( NativeImage& nativeImage );
+
+  /**
+   * @copydoc Dali::FrameBufferImage::New(NativeImage&, ReleasePolicy)
+   */
+  static FrameBufferImagePtr  New( NativeImage& nativeImage, ReleasePolicy releasePolicy );
+
+  /**
+   * @copydoc Dali::FrameBufferImage::FrameBufferImage
+   */
   FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat);
 
-  /// @copydoc Dali::FrameBufferImage::FrameBufferImage
+  /**
+   * @copydoc Dali::FrameBufferImage::FrameBufferImage
+   */
   FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy);
 
-  /// @copydoc Dali::FrameBufferImage::FrameBufferImage
+  /**
+   * @copydoc Dali::FrameBufferImage::FrameBufferImage
+   */
   FrameBufferImage(NativeImage& image);
 
-  /// @copydoc Dali::FrameBufferImage::FrameBufferImage
+  /**
+   * @copydoc Dali::FrameBufferImage::FrameBufferImage
+   */
   FrameBufferImage(NativeImage& image, ReleasePolicy releasePolicy);
 
 public: // From Image
