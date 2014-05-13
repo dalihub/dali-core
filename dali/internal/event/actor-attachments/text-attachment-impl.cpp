@@ -113,9 +113,9 @@ void TextAttachment::SetGradientColor( const Vector4& color )
 {
   AllocateTextParameters();
 
-  if( mTextParameters->mGradientColor != color )
+  if( mTextParameters->GetGradientColor() != color )
   {
-    mTextParameters->mGradientColor = color;
+    mTextParameters->SetGradientColor( color );
 
     SetGradientColorMessage( mStage->GetUpdateInterface(), *mSceneObject, color );
   }
@@ -123,23 +123,16 @@ void TextAttachment::SetGradientColor( const Vector4& color )
 
 const Vector4& TextAttachment::GetGradientColor() const
 {
-  if( mTextParameters )
-  {
-    return mTextParameters->mGradientColor;
-  }
-  else
-  {
-    return TextStyle::DEFAULT_GRADIENT_COLOR;
-  }
+  return mTextParameters->GetGradientColor();
 }
 
 void TextAttachment::SetGradientStartPoint( const Vector2& position )
 {
   AllocateTextParameters();
 
-  if( mTextParameters->mGradientStartPoint != position )
+  if( mTextParameters->GetGradientStartPoint() != position )
   {
-    mTextParameters->mGradientStartPoint = position;
+    mTextParameters->SetGradientStartPoint( position );
 
     SetGradientStartPointMessage( mStage->GetUpdateInterface(), *mSceneObject, position );
   }
@@ -147,23 +140,16 @@ void TextAttachment::SetGradientStartPoint( const Vector2& position )
 
 const Vector2& TextAttachment::GetGradientStartPoint() const
 {
-  if( mTextParameters )
-  {
-    return mTextParameters->mGradientStartPoint;
-  }
-  else
-  {
-    return TextStyle::DEFAULT_GRADIENT_START_POINT;
-  }
+  return mTextParameters->GetGradientStartPoint();
 }
 
 void TextAttachment::SetGradientEndPoint( const Vector2& position )
 {
   AllocateTextParameters();
 
-  if( mTextParameters->mGradientEndPoint != position )
+  if( mTextParameters->GetGradientEndPoint() != position )
   {
-    mTextParameters->mGradientEndPoint = position;
+    mTextParameters->SetGradientEndPoint( position );
 
     SetGradientEndPointMessage( mStage->GetUpdateInterface(), *mSceneObject, position );
   }
@@ -171,14 +157,7 @@ void TextAttachment::SetGradientEndPoint( const Vector2& position )
 
 const Vector2& TextAttachment::GetGradientEndPoint() const
 {
-  if( mTextParameters )
-  {
-    return mTextParameters->mGradientEndPoint;
-  }
-  else
-  {
-    return TextStyle::DEFAULT_GRADIENT_END_POINT;
-  }
+    return mTextParameters->GetGradientEndPoint();
 }
 
 void TextAttachment::SetSmoothEdge( float smoothEdge )
@@ -206,7 +185,7 @@ void TextAttachment::SetOutline( bool enable, const Vector4& color, const Vector
 {
   AllocateTextParameters();
 
-  if (enable != mTextParameters->mOutlineEnabled || color != mTextParameters->mOutlineColor || thickness != mTextParameters->mOutline)
+  if (enable != mTextParameters->IsOutlineEnabled() || color != mTextParameters->GetOutlineColor() || thickness != mTextParameters->GetOutlineThickness() )
   {
     mTextParameters->SetOutline( enable, color, thickness );
 
@@ -216,35 +195,20 @@ void TextAttachment::SetOutline( bool enable, const Vector4& color, const Vector
 
 bool TextAttachment::GetOutline() const
 {
-  bool result( false );
-
-  if( mTextParameters )
-  {
-    result = mTextParameters->mOutlineEnabled;
-  }
-
-  return result;
+  return mTextParameters->IsOutlineEnabled();
 }
 
 void TextAttachment::GetOutlineParams( Vector4& color, Vector2& thickness ) const
 {
-  if( mTextParameters )
-  {
-    color = mTextParameters->mOutlineColor;
-    thickness = mTextParameters->mOutline;
-  }
-  else
-  {
-    color = TextStyle::DEFAULT_OUTLINE_COLOR;
-    thickness = TextStyle::DEFAULT_OUTLINE_THICKNESS;
-  }
+  color = mTextParameters->GetOutlineColor();
+  thickness = mTextParameters->GetOutlineThickness();
 }
 
 void TextAttachment::SetGlow( bool enable, const Vector4& color, float intensity )
 {
   AllocateTextParameters();
 
-  if (enable != mTextParameters->mGlowEnabled || color != mTextParameters->mGlowColor || fabsf(intensity - mTextParameters->mGlow) > Math::MACHINE_EPSILON_1000)
+  if (enable != mTextParameters->IsGlowEnabled() || color != mTextParameters->GetGlowColor() || fabsf(intensity - mTextParameters->GetGlowIntensity() ) > Math::MACHINE_EPSILON_1000)
   {
     mTextParameters->SetGlow( enable, color, intensity );
 
@@ -254,38 +218,23 @@ void TextAttachment::SetGlow( bool enable, const Vector4& color, float intensity
 
 bool TextAttachment::GetGlow() const
 {
-  bool result( false );
-
-  if( mTextParameters )
-  {
-    result = mTextParameters->mGlowEnabled;
-  }
-
-  return result;
+  return mTextParameters->IsGlowEnabled();
 }
 
 void TextAttachment::GetGlowParams( Vector4& color, float&  intensity) const
 {
-  if( mTextParameters )
-  {
-    color = mTextParameters->mGlowColor;
-    intensity = mTextParameters->mGlow;
-  }
-  else
-  {
-    color = TextStyle::DEFAULT_GLOW_COLOR;
-    intensity = TextStyle::DEFAULT_GLOW_INTENSITY;
-  }
+    color = mTextParameters->GetGlowColor();
+    intensity = mTextParameters->GetGlowIntensity();
 }
 
 void TextAttachment::SetShadow(bool enable, const Vector4& color, const Vector2& offset, const float size)
 {
   AllocateTextParameters();
 
-  if (enable != mTextParameters->mDropShadowEnabled ||
-      color != mTextParameters->mDropShadowColor ||
-      offset != mTextParameters->mDropShadow ||
-      fabsf(size - mTextParameters->mDropShadowSize) > Math::MACHINE_EPSILON_1 )
+  if (enable != mTextParameters->IsDropShadowEnabled() ||
+      color != mTextParameters->GetDropShadowColor() ||
+      offset != mTextParameters->GetDropShadowOffset() ||
+      fabsf(size - mTextParameters->GetDropShadowSize() ) > Math::MACHINE_EPSILON_1 )
   {
     mTextParameters->SetShadow( enable, color, offset, size );
 
@@ -306,30 +255,14 @@ void TextAttachment::SetShadow(bool enable, const Vector4& color, const Vector2&
 
 bool TextAttachment::GetShadow() const
 {
-  bool result( false );
-
-  if( mTextParameters )
-  {
-    result = mTextParameters->mDropShadowEnabled;
-  }
-
-  return result;
+  return mTextParameters->IsDropShadowEnabled();
 }
 
 void TextAttachment::GetShadowParams( Vector4& color, Vector2& offset, float& size ) const
 {
-  if( mTextParameters )
-  {
-    color = mTextParameters->mDropShadowColor;
-    offset = mTextParameters->mDropShadow;
-    size = mTextParameters->mDropShadowSize;
-  }
-  else
-  {
-    color = TextStyle::DEFAULT_SHADOW_COLOR;
-    offset = TextStyle::DEFAULT_SHADOW_OFFSET;
-    size = TextStyle::DEFAULT_SHADOW_SIZE;
-  }
+  color = mTextParameters->GetDropShadowColor();
+  offset = mTextParameters->GetDropShadowOffset();
+  size = mTextParameters->GetDropShadowSize();
 }
 
 void TextAttachment::SetTextColor(const Vector4& color)

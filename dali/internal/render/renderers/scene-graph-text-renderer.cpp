@@ -201,24 +201,21 @@ void TextRenderer::SetFontSize( float pixelSize )
 void TextRenderer::SetGradientColor( const Vector4& color )
 {
   AllocateTextParameters();
-
-  mTextParameters->mGradientColor = color;
+  mTextParameters->SetGradientColor( color );
 }
 
 void TextRenderer::SetGradientStartPoint( const Vector2& position )
 {
   AllocateTextParameters();
-
-  mTextParameters->mGradientStartPoint = position;
-  mTextParameters->mGradientEnabled = mTextParameters->mGradientEndPoint != mTextParameters->mGradientStartPoint;
+  mTextParameters->SetGradientStartPoint( position );
+  mTextParameters->SetGradientEnabled( mTextParameters->GetGradientEndPoint() != mTextParameters->GetGradientStartPoint() );
 }
 
 void TextRenderer::SetGradientEndPoint( const Vector2& position )
 {
   AllocateTextParameters();
-
-  mTextParameters->mGradientEndPoint = position;
-  mTextParameters->mGradientEnabled = mTextParameters->mGradientEndPoint != mTextParameters->mGradientStartPoint;
+  mTextParameters->SetGradientEndPoint( position );
+  mTextParameters->SetGradientEnabled( mTextParameters->GetGradientEndPoint() != mTextParameters->GetGradientStartPoint() );
 }
 
 void TextRenderer::SetTextColor( const Vector4& color )
@@ -329,9 +326,9 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
   ShaderSubTypes shaderType( SHADER_DEFAULT );
   if( mTextParameters )
   {
-    if( mTextParameters->mOutlineEnabled )
+    if( mTextParameters->IsOutlineEnabled() )
     {
-      if( mTextParameters->mGlowEnabled )
+      if( mTextParameters->IsGlowEnabled() )
       {
         shaderType = SHADER_GRADIENT_OUTLINE_GLOW;
       }
@@ -340,11 +337,11 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
         shaderType = SHADER_GRADIENT_OUTLINE;
       }
     }
-    else if( mTextParameters->mGlowEnabled )
+    else if( mTextParameters->IsGlowEnabled() )
     {
       shaderType = SHADER_GRADIENT_GLOW;
     }
-    else if( mTextParameters->mDropShadowEnabled )
+    else if( mTextParameters->IsDropShadowEnabled() )
     {
       shaderType = SHADER_GRADIENT_SHADOW;
     }
@@ -386,23 +383,25 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
   if( mTextParameters )
   {
-    if( mTextParameters->mOutlineEnabled )
+    if( mTextParameters->IsOutlineEnabled() )
     {
       const int outlineLoc = program.GetUniformLocation( Program::UNIFORM_OUTLINE );
       const int outlineColorLoc = program.GetUniformLocation( Program::UNIFORM_OUTLINE_COLOR );
 
       if( Program::UNIFORM_UNKNOWN != outlineLoc && Program::UNIFORM_UNKNOWN != outlineColorLoc )
       {
-        float outlineWidth = mTextParameters->mOutline[1] + smoothWidth;
-        float outlineStart = mTextParameters->mOutline[0];
-        float outlineEnd = min( 1.0f, mTextParameters->mOutline[0] + outlineWidth );
+        const Vector2& outline = mTextParameters->GetOutlineThickness();
+        const Vector4& outlineColor = mTextParameters->GetOutlineColor();
+        float outlineWidth = outline[1] + smoothWidth;
+        float outlineStart = outline[0];
+        float outlineEnd = min( 1.0f, outlineStart + outlineWidth );
 
         program.SetUniform2f(outlineLoc, outlineStart, outlineEnd);
-        program.SetUniform4f(outlineColorLoc, mTextParameters->mOutlineColor.r, mTextParameters->mOutlineColor.g, mTextParameters->mOutlineColor.b, mTextParameters->mOutlineColor.a);
+        program.SetUniform4f(outlineColorLoc, outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a);
       }
     }
 
-    if( mTextParameters->mGlowEnabled )
+    if( mTextParameters->IsGlowEnabled() )
     {
       const int glowLoc = program.GetUniformLocation( Program::UNIFORM_GLOW );
       const int glowColorLoc = program.GetUniformLocation( Program::UNIFORM_GLOW_COLOR );
@@ -410,12 +409,13 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
       if( Program::UNIFORM_UNKNOWN != glowLoc && Program::UNIFORM_UNKNOWN != glowColorLoc )
       {
         // if mGlow is > mSmoothing we get an inverted glyph, so clamp the value
-        program.SetUniform1f(glowLoc, std::min(mTextParameters->mGlow, mSmoothing));
-        program.SetUniform4f(glowColorLoc, mTextParameters->mGlowColor.r, mTextParameters->mGlowColor.g, mTextParameters->mGlowColor.b, mTextParameters->mGlowColor.a);
+        program.SetUniform1f(glowLoc, std::min(mTextParameters->GetGlowIntensity(), mSmoothing));
+        const Vector4& glowColor = mTextParameters->GetGlowColor();
+        program.SetUniform4f(glowColorLoc, glowColor.r, glowColor.g, glowColor.b, glowColor.a);
       }
     }
 
-    if( mTextParameters->mDropShadowEnabled )
+    if( mTextParameters->IsDropShadowEnabled() )
     {
       const int shadowLoc = program.GetUniformLocation( Program::UNIFORM_SHADOW );
       const int shadowColorLoc = program.GetUniformLocation( Program::UNIFORM_SHADOW_COLOR );
@@ -424,10 +424,11 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
       if( Program::UNIFORM_UNKNOWN != shadowLoc && Program::UNIFORM_UNKNOWN != shadowColorLoc && Program::UNIFORM_UNKNOWN != shadowSmoothingLoc )
       {
         // convert shadow offset from tile to atlas coordinates
-        const Vector2 offset( mTextParameters->mDropShadow / mTexture->GetWidth());
-        float shadowSmoothing = std::max(0.0f, smoothing - mTextParameters->mDropShadowSize );
+        const Vector2& offset( mTextParameters->GetDropShadowOffset() / mTexture->GetWidth());
+        float shadowSmoothing = std::max(0.0f, smoothing - mTextParameters->GetDropShadowSize() );
         program.SetUniform2f(shadowLoc, offset.x, offset.y);
-        program.SetUniform4f(shadowColorLoc, mTextParameters->mDropShadowColor.r, mTextParameters->mDropShadowColor.g, mTextParameters->mDropShadowColor.b, mTextParameters->mDropShadowColor.a);
+        const Vector4& dropShadowColor = mTextParameters->GetDropShadowColor();
+        program.SetUniform4f(shadowColorLoc, dropShadowColor.r, dropShadowColor.g, dropShadowColor.b, dropShadowColor.a);
         program.SetUniform2f( shadowSmoothingLoc, std::max(0.0f, shadowSmoothing - smoothWidth), std::min(1.0f, shadowSmoothing + smoothWidth) );
       }
     }
@@ -451,9 +452,9 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
     if( mTextParameters )
     {
-      startPoint = mTextParameters->mGradientStartPoint;
-      projection = mTextParameters->mGradientEndPoint - startPoint;
-      if( mTextParameters->mGradientEnabled ) // same as: mGradientEndPoint != mGradientStartPoint
+      startPoint = mTextParameters->GetGradientStartPoint();
+      projection = mTextParameters->GetGradientEndPoint() - startPoint;
+      if( mTextParameters->IsGradientEnabled() ) // same as: mGradientEndPoint != mGradientStartPoint
       {
         projection /= projection.LengthSquared();
 
@@ -463,7 +464,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
         if( Program::UNIFORM_UNKNOWN != gradientColorLoc && Program::UNIFORM_UNKNOWN != textSizeLoc )
         {
-          const Vector4& color = mTextParameters->mGradientColor;
+          const Vector4& color = mTextParameters->GetGradientColor();
           program.SetUniform4f( gradientColorLoc, color.r, color.g, color.b, color.a );
           program.SetUniform2f( textSizeLoc, mInvTextSize.width, mInvTextSize.height );
         }
