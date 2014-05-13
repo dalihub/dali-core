@@ -16,9 +16,9 @@
 
 // CLASS HEADER
 #include <dali/public-api/images/pixel.h>
-#include <dali/public-api/images/pixel-extras.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -119,50 +119,6 @@ unsigned int Pixel::GetBytesPerPixel(Format pixelFormat)
     }
   }
   return 0;
-}
-
-bool Pixel::IsEncoded( const Format pixelFormat )
-{
-  switch (pixelFormat)
-  {
-    // All "normal" formats of addressable packed pixels are not encoded:
-    case L8:
-    case A8:
-    case LA88:
-    case RGB565:
-    case RGBA4444:
-    case RGBA5551:
-    case BGR565:
-    case BGRA4444:
-    case BGRA5551:
-    case RGB888:
-    case RGB8888:
-    case BGR8888:
-    case RGBA8888:
-    case BGRA8888:
-    {
-      return false;
-    }
-
-    // All compressed texture formats are encoded:
-    case COMPRESSED_R11_EAC:
-    case COMPRESSED_SIGNED_R11_EAC:
-    case COMPRESSED_RG11_EAC:
-    case COMPRESSED_SIGNED_RG11_EAC:
-    case COMPRESSED_RGB8_ETC2:
-    case COMPRESSED_SRGB8_ETC2:
-    case COMPRESSED_RGB8_ETC1:
-    case COMPRESSED_RGB_PVRTC_4BPPV1:
-    case COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-    case COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2:
-    case COMPRESSED_RGBA8_ETC2_EAC:
-    case COMPRESSED_SRGB8_ALPHA8_ETC2_EAC:
-    {
-      // Fall through to default return value:
-      break;
-    }
-  }
-  return true;
 }
 
 void Pixel::GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitMask)

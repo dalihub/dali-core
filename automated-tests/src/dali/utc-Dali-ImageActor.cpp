@@ -231,10 +231,11 @@ int UtcDaliImageActorGetCurrentImageSize02(void)
   DALI_TEST_EQUALS( actor.GetCurrentImageSize(), initialImageSize, TEST_LOCATION );
 
   // Now complete the image load
-  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( initialImageSize.width, initialImageSize.height, Pixel::RGBA8888 );
-  Integration::ResourcePointer resourcePtr(bitmap.Get());
-
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  initialImageSize.width,initialImageSize.height, initialImageSize.width,initialImageSize.height );
+
+  Integration::ResourcePointer resourcePtr(bitmap); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
@@ -282,10 +283,11 @@ int UtcDaliImageActorGetCurrentImageSize03(void)
   DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
 
   // Now complete the image load
-  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( closestImageSize.width, closestImageSize.height, Pixel::RGBA8888 );
-  Integration::ResourcePointer resourcePtr(bitmap.Get());
-
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
+
+  Integration::ResourcePointer resourcePtr(bitmap); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
@@ -331,10 +333,11 @@ int UtcDaliImageActorGetCurrentImageSize04(void)
   DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
 
   // Now complete the image load
-  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( closestImageSize.width, closestImageSize.height, Pixel::RGBA8888 );
-  Integration::ResourcePointer resourcePtr(bitmap.Get());
-
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
+
+  Integration::ResourcePointer resourcePtr(bitmap); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
@@ -369,10 +372,11 @@ int UtcDaliImageActorGetCurrentImageSize04(void)
   DALI_TEST_EQUALS( actor.GetCurrentImageSize(), size, TEST_LOCATION );
 
   // Now complete the image load
-  Integration::ImageDataPtr bitmap2 = Integration::NewBitmapImageData( image2ClosestSize.width, image2ClosestSize.height, Pixel::RGBA8888 );
-  Integration::ResourcePointer resourcePtr2(bitmap2.Get());
-
   req = application.GetPlatform().GetRequest();
+  Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  bitmap2->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  image2ClosestSize.width, image2ClosestSize.height, image2ClosestSize.width, image2ClosestSize.height );
+
+  Integration::ResourcePointer resourcePtr2(bitmap2); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr2);
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
@@ -411,10 +415,11 @@ int UtcDaliImageActorGetCurrentImageSize05(void)
   DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
 
   // Now complete the image load
-  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( closestImageSize.width, closestImageSize.height, Pixel::RGBA8888 );
-  Integration::ResourcePointer resourcePtr(bitmap.Get());
-
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
+
+  Integration::ResourcePointer resourcePtr(bitmap); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
@@ -441,10 +446,11 @@ int UtcDaliImageActorGetCurrentImageSize05(void)
   DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
 
   // Now complete the image load
-  Integration::ImageDataPtr bitmap2 = Integration::NewBitmapImageData( image2ClosestSize.width, image2ClosestSize.height, Pixel::RGBA8888 );
-  Integration::ResourcePointer resourcePtr2(bitmap2.Get());
-
   req = application.GetPlatform().GetRequest();
+  Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  bitmap2->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  image2ClosestSize.width, image2ClosestSize.height, image2ClosestSize.width, image2ClosestSize.height );
+
+  Integration::ResourcePointer resourcePtr2(bitmap2); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr2);
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
@@ -487,10 +493,11 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), closestImageSize, TEST_LOCATION );
 
   // Now complete the image load
-  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( closestImageSize.width, closestImageSize.height, Pixel::RGBA8888 );
-  Integration::ResourcePointer resourcePtr(bitmap.Get());
-
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
+
+  Integration::ResourcePointer resourcePtr(bitmap); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
@@ -553,10 +560,11 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), closestImageSize, TEST_LOCATION );
 
   // Now complete the image load
-  Integration::ImageDataPtr bitmap = Integration::NewBitmapImageData( closestImageSize.width, closestImageSize.height, Pixel::RGBA8888 );
-  Integration::ResourcePointer resourcePtr(bitmap.Get());
-
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
+
+  Integration::ResourcePointer resourcePtr(bitmap); // reference it
   application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages

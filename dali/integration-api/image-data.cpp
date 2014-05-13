@@ -68,14 +68,6 @@ ImageDataPtr ImageData::New( uint8_t * const imageBuffer, const BufferSize numBy
   return ImageDataPtr( new ImageData( imageBuffer, numBytes, imageWidth, imageHeight, pixelFormat ) );
 }
 
-uint8_t * ImageData::ReleaseImageBuffer()
-{
-  DALI_ASSERT_DEBUG( mData && "The buffer was released already." );
-  uint8_t * const data = mData;
-  mData = 0;
-  return data;
-}
-
 ImageDataPtr NewBitmapImageData( unsigned imageWidth, unsigned imageHeight, Pixel::Format pixelFormat )
 {
   DALI_ASSERT_DEBUG( pixelFormat <= Pixel::BGRA8888 && "Pixel format must be an addressable one." );

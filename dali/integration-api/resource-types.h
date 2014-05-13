@@ -34,29 +34,21 @@ namespace Integration
 // Resource Types
 
 /**
- * Extendable set of resource type identifiers used by ResourceType subclasses.
+ * Extendable set of resource types
  */
 enum ResourceTypeId
 {
-  ResourceImageData,   ///< A buffer of image data with dimension and type metadata.
+  ResourceBitmap,
   ResourceNativeImage,
   ResourceTargetImage,
   ResourceShader,
   ResourceModel,
   ResourceMesh,
-  ResourceText,
-  ResourceTexture,     ///< Used to pass through a request for a GLES texture to be allocated on the render thread.
-  ResourceAppBitmap    ///< Used in Core to tag Bitmaps that belong to BitmapImages.
+  ResourceText
 };
 
 /**
- * @brief A ResourceType-derived class is just a data bucket.
- *
- * Each ResourceType derived class carries a bundle of data specific to one or
- * more resource request types that are unambiguously specified by the
- * <code>id</code> member of this base class.
- * Dispatch on that ResourceTypeId to know exactly which kind of resource
- * request is associated with a particular instance.
+ * The abstract base class for resource types.
  */
 struct DALI_IMPORT_API ResourceType
 {
@@ -67,6 +59,9 @@ struct DALI_IMPORT_API ResourceType
   ResourceType(ResourceTypeId typeId)
   : id(typeId) {}
 
+  /**
+   * Destructor.
+   */
   virtual ~ResourceType() {}
 
   /**
@@ -80,44 +75,51 @@ struct DALI_IMPORT_API ResourceType
 private:
 
   // Undefined copy constructor.
-  ResourceType( const ResourceType& type );
+  ResourceType(const ResourceType& typePath);
 
   // Undefined assignment operator.
-  ResourceType& operator=( const ResourceType& rhs );
+  ResourceType& operator=(const ResourceType& rhs);
 };
 
 /**
- * ImageResourceType can be used to identify a a request as pertaining
- * to images and carries some image attributes to modify the request.
- * @todo Replace all uses of other image-related ResourceTypes with
- * this one as they are duplicates.
+ * BitmapResourceType describes a bitmap resource, which can be requested
+ * from ResourceLoader::LoadResource() or AllocateBitmapImage.
  */
-struct DALI_IMPORT_API ImageResourceType : public ResourceType
+struct DALI_IMPORT_API BitmapResourceType : public ResourceType
 {
   /**
    * Constructor.
-   * @param[in] typeId  One of the image ResourceTypeIds.
    * @param[in] attribs parameters for image loading request
    */
-  ImageResourceType(const ResourceTypeId typeId, const ImageAttributes& attribs)
-  : ResourceType(typeId),
-    imageAttributes(attribs)
-  {
-    DALI_ASSERT_DEBUG( typeId == ResourceTexture || typeId == ResourceImageData || typeId == ResourceNativeImage || typeId == ResourceTargetImage || typeId == ResourceAppBitmap );
-  }
+  BitmapResourceType(const ImageAttributes& attribs)
+  : ResourceType(ResourceBitmap),
+    imageAttributes(attribs) {}
+
+  /**
+   * Destructor.
+   */
+  virtual ~BitmapResourceType() {}
 
   /**
    * @copydoc ResourceType::Clone
    */
   virtual ResourceType* Clone() const
   {
-    return new ImageResourceType( id, imageAttributes );
+    return new BitmapResourceType(imageAttributes);
   }
 
   /**
    * Attributes are copied from the request.
    */
   ImageAttributes imageAttributes;
+
+private:
+
+  // Undefined copy constructor.
+  BitmapResourceType(const BitmapResourceType& typePath);
+
+  // Undefined assignment operator.
+  BitmapResourceType& operator=(const BitmapResourceType& rhs);
 };
 
 /**
@@ -128,7 +130,7 @@ struct DALI_IMPORT_API ImageResourceType : public ResourceType
 struct DALI_IMPORT_API NativeImageResourceType : public ResourceType
 {
   /**
-   * Default constructor initialises the base class with the correct ResourceTypeId.
+   * Constructor.
    */
   NativeImageResourceType()
   : ResourceType(ResourceNativeImage) {}
@@ -140,6 +142,11 @@ struct DALI_IMPORT_API NativeImageResourceType : public ResourceType
   NativeImageResourceType(const ImageAttributes& attribs)
   : ResourceType(ResourceNativeImage),
     imageAttributes(attribs) {}
+
+  /**
+   * Destructor.
+   */
+  virtual ~NativeImageResourceType() {}
 
  /**
   * @copydoc ResourceType::Clone
@@ -153,6 +160,14 @@ struct DALI_IMPORT_API NativeImageResourceType : public ResourceType
    * Attributes are copied from the request (if supplied).
    */
   ImageAttributes imageAttributes;
+
+private:
+
+  // Undefined copy constructor.
+  NativeImageResourceType(const NativeImageResourceType& typePath);
+
+  // Undefined assignment operator.
+  NativeImageResourceType& operator=(const NativeImageResourceType& rhs);
 };
 
 /**
@@ -162,7 +177,7 @@ struct DALI_IMPORT_API NativeImageResourceType : public ResourceType
 struct DALI_IMPORT_API RenderTargetResourceType : public ResourceType
 {
   /**
-   * Default constructor initialises the base class with the correct ResourceTypeId.
+   * Constructor.
    */
   RenderTargetResourceType()
   : ResourceType(ResourceTargetImage) {}
@@ -176,6 +191,11 @@ struct DALI_IMPORT_API RenderTargetResourceType : public ResourceType
     imageAttributes(attribs) {}
 
   /**
+   * Destructor.
+   */
+  virtual ~RenderTargetResourceType() {}
+
+  /**
    * @copydoc ResourceType::Clone
    */
   virtual ResourceType* Clone() const
@@ -187,6 +207,14 @@ struct DALI_IMPORT_API RenderTargetResourceType : public ResourceType
    * Attributes are copied from the request.
    */
   ImageAttributes imageAttributes;
+
+private:
+
+  // Undefined copy constructor.
+  RenderTargetResourceType(const RenderTargetResourceType& typePath);
+
+  // Undefined assignment operator.
+  RenderTargetResourceType& operator=(const RenderTargetResourceType& rhs);
 };
 
 /**
@@ -195,11 +223,21 @@ struct DALI_IMPORT_API RenderTargetResourceType : public ResourceType
  */
 struct DALI_IMPORT_API ShaderResourceType : public ResourceType
 {
+  /**
+   * Constructor.
+   */
   ShaderResourceType(size_t shaderHash, const std::string& vertexSource, const std::string& fragmentSource)
   : ResourceType(ResourceShader),
     hash(shaderHash),
     vertexShader(vertexSource),
     fragmentShader(fragmentSource)
+  {
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~ShaderResourceType()
   {
   }
 
@@ -215,6 +253,14 @@ public: // Attributes
   size_t            hash;              ///< Hash of the vertex/fragment sources
   const std::string vertexShader;      ///< source code for vertex program
   const std::string fragmentShader;    ///< source code for fragment program
+
+private:
+
+  // Undefined copy constructor.
+  ShaderResourceType(const ShaderResourceType& typePath);
+
+  // Undefined assignment operator.
+  ShaderResourceType& operator=(const ShaderResourceType& rhs);
 };
 
 /**
@@ -252,10 +298,10 @@ struct DALI_IMPORT_API TextResourceType : public ResourceType
      * on the 32 bit words that follow so rather than using the minimum number of
      * bits for each, we give "loaded" a whole 8 bits and push it to a byte-aligned
      * address to make access possible via a plain byte load instead of a load,
-     * mask, shift sequence. The naive bitwidths before this modification are as follows:<code>
+     * mask, shift sequence. The naive bitwidths before this modification are as follows:
      *    character:21;
      *    quality:1;
-     *    loaded:1;</code>
+     *    loaded:1;
      *  @{
      */
     uint32_t character:21;       ///< character code (UTF-32), max value of 0x10ffff (21 bits)
@@ -309,6 +355,13 @@ struct DALI_IMPORT_API TextResourceType : public ResourceType
   }
 
   /**
+   * virtual destructor
+   */
+  virtual ~TextResourceType()
+  {
+  }
+
+  /**
    * @copydoc ResourceType::Clone
    */
   virtual ResourceType* Clone() const
@@ -339,6 +392,14 @@ struct DALI_IMPORT_API TextResourceType : public ResourceType
   Vector2 mMaxGlyphSize;  ///< Max glyph size for font
 
   GlyphCacheMode mCache; ///< Whether text glyphs should be cached.
+
+private:
+
+  // Undefined copy constructor.
+  TextResourceType(const TextResourceType& typePath);
+
+  // Undefined copy constructor.
+  TextResourceType& operator=(const TextResourceType& rhs);
 };
 
 /**
@@ -348,10 +409,17 @@ struct DALI_IMPORT_API TextResourceType : public ResourceType
 struct DALI_IMPORT_API ModelResourceType : public ResourceType
 {
   /**
-   * Default constructor initialises the base class with the correct ResourceTypeId.
+   * Constructor.
    */
   ModelResourceType()
     : ResourceType(ResourceModel)
+  {
+  }
+
+  /**
+   * Destructor.
+   */
+  virtual ~ModelResourceType()
   {
   }
 
@@ -362,6 +430,14 @@ struct DALI_IMPORT_API ModelResourceType : public ResourceType
   {
     return new ModelResourceType();
   }
+
+private:
+
+  // Undefined copy constructor.
+  ModelResourceType(const ModelResourceType& typePath);
+
+  // Undefined assignment operator.
+  ModelResourceType& operator=(const ModelResourceType& rhs);
 };
 
 
@@ -372,10 +448,15 @@ struct DALI_IMPORT_API ModelResourceType : public ResourceType
 struct DALI_IMPORT_API MeshResourceType : public ResourceType
 {
   /**
-   * Default constructor initialises the base class with the correct ResourceTypeId.
+   * Constructor.
    */
   MeshResourceType()
   : ResourceType(ResourceMesh) {}
+
+  /**
+   * Destructor.
+   */
+  virtual ~MeshResourceType() {}
 
   /**
    * @copydoc ResourceType::Clone
@@ -384,6 +465,14 @@ struct DALI_IMPORT_API MeshResourceType : public ResourceType
   {
     return new MeshResourceType();
   }
+
+private:
+
+  // Undefined copy constructor.
+  MeshResourceType(const MeshResourceType& typePath);
+
+  // Undefined assignment operator.
+  MeshResourceType& operator=(const MeshResourceType& rhs);
 };
 
 inline bool operator==(const TextResourceType::GlyphPosition& lhs, const TextResourceType::GlyphPosition& rhs)

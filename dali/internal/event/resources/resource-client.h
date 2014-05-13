@@ -110,7 +110,7 @@ public: // Used by application-side objects e.g. Dali::Image
    * Adding an observer to the ticket will enable the application to determine when the
    * resource has finished decoding.
    * @note Only images are currently supported by this function.
-   * @param[in] type The type of resource. Must be ResourceImageData.
+   * @param[in] type The type of resource. Must be BitmapResourceType.
    * @param[in] buffer The raw data of the resource.
    * @param[in] priority The priority of the request. This is ignored if the resource is already being loaded.
    * @return A ref-counted request object on success or a null pointer on failure.
@@ -334,11 +334,11 @@ public: // Message methods
   /**
    * Finds ImageTicket which belongs to resource identified by id and updates the cached size and pixelformat
    * with the data from texture.
-   * @note This will replace the whole ImageAttributes member of the ticket, not just the three properties mentioned.
+   * !!! NOTE, this will replace the whole ImageAttributes member of the ticket, not just the three properties mentioned !!!
    * @param id The resource id to find the ticket of
    * @param imageAttributes The image attributes to assign to the ticket
    */
-  void UpdateImageTicket( ResourceId id, const Dali::ImageAttributes& imageAttributes );
+  void UpdateImageTicket( ResourceId id, const Dali::ImageAttributes& imageAttributes ); ///!< Issue #AHC01
 
 private:
   ResourceManager& mResourceManager;          ///< The resource manager

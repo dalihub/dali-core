@@ -138,7 +138,7 @@ public: // Used by ResourceClient
 
   /**
    * Called to update the resource cache before rendering.
-   * New resources will be added to the cache using PlatformAbstraction::GetResources().
+   * New resources will be added to the cache using PlatformAbstraction::FillResourceCache().
    * Unwanted resources will be added to the DiscardQueue.
    * @param[in] updateBufferIndex The current update buffer index.
    * @return true, if a resource load was completed or failed

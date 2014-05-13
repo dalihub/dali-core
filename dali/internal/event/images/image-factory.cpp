@@ -112,7 +112,7 @@ ResourceTicketPtr ImageFactory::Load( Request *req )
       ticket = IssueLoadRequest( req->url, req->attributes );
       req->resourceId = ticket->GetId();
     }
-    DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceImageData   ||
+    DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
                        ticket->GetTypePath().type->id == ResourceNativeImage ||
                        ticket->GetTypePath().type->id == ResourceTargetImage );
   }
@@ -130,7 +130,7 @@ ResourceTicketPtr ImageFactory::Load( Request *req )
 // new resource of size (96, 96), but reloading Req1 would load a scaled down version
 ResourceTicketPtr ImageFactory::Reload( Request* request )
 {
-  DALI_ASSERT_ALWAYS( request ); ///@todo This is not a public api so throwing and thus exiting is not appropriate. A null request indicates a logic error in calling code. Change request to a reference or handle the null case defensively / robustly. Alternatively, change to DALI_ASSERT_DEBUG.
+  DALI_ASSERT_ALWAYS( request );
 
   // go through requests, check real size and attributes again. If different, update related ticket.
   ResourceTicketPtr ticket;
@@ -151,7 +151,7 @@ ResourceTicketPtr ImageFactory::Reload( Request* request )
   }
   else // ticket still alive
   {
-    DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceImageData   ||
+    DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
                        ticket->GetTypePath().type->id == ResourceNativeImage ||
                        ticket->GetTypePath().type->id == ResourceTargetImage );
 
@@ -172,7 +172,7 @@ ResourceTicketPtr ImageFactory::Reload( Request* request )
     }
     else
     {
-      // If not, return a different ticket
+      // if not, return a different ticket
       ticket = IssueLoadRequest( request->url, request->attributes );
       request->resourceId = ticket->GetId();
     }
@@ -197,10 +197,9 @@ const ImageAttributes& ImageFactory::GetActualAttributes( ResourceId resourceId 
   ResourceTicketPtr ticket = mResourceClient.RequestResourceTicket( resourceId );
   if( ticket )
   {
-    DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceImageData   ||
+    DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
                        ticket->GetTypePath().type->id == ResourceNativeImage ||
-                       ticket->GetTypePath().type->id == ResourceTargetImage ||
-                       ticket->GetTypePath().type->id == ResourceAppBitmap );
+                       ticket->GetTypePath().type->id == ResourceTargetImage );
     const ImageAttributes& attrib = static_cast<ImageTicket*>(ticket.Get())->GetAttributes();
     return attrib;
   }
@@ -337,7 +336,7 @@ ResourceTicketPtr ImageFactory::FindCompatibleResource( const std::string& filen
         continue;
       }
 
-      DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceImageData   ||
+      DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
                          ticket->GetTypePath().type->id == ResourceNativeImage ||
                          ticket->GetTypePath().type->id == ResourceTargetImage );
 
@@ -381,7 +380,7 @@ ResourceTicketPtr ImageFactory::IssueLoadRequest( const std::string& filename, c
     attributes.SetSize( size.width, size.height );
   }
 
-  ImageResourceType resourceType( ResourceImageData, attributes );
+  BitmapResourceType resourceType( attributes );
   ResourceTicketPtr ticket = mResourceClient.RequestResource( resourceType, filename );
   return ticket;
 }

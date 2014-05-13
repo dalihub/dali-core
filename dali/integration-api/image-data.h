@@ -140,8 +140,6 @@ public:
   uint8_t * GetBuffer() { return mData; }
 
   /**
-   * @brief Transfer pixel buffer ownership to caller.
-   *
    * Pass ownership of the buffer of pixel-level data that this instance
    * currently owns to the caller, and forget about the buffer here as a
    * side effect.
@@ -149,7 +147,7 @@ public:
    * The caller takes ownership of the buffer and is responsible for calling
    * delete[] on it eventually.
    **/
-  uint8_t * ReleaseImageBuffer();
+  uint8_t * ReleaseImageBuffer() { uint8_t * const data = mData; mData = 0; return data; }
 
   /**
    * @brief Get whether the alpha channel in the pixels is used.
@@ -170,7 +168,7 @@ private:
   uint8_t*     mData;
 
 public:
-  const size_t        dataSize;    ///< Number of bytes in buffer pointed at by mData
+  const size_t        dataSize;   ///< Number of bytes in buffer pointed at by mData
   const uint16_t      imageWidth;  ///< Image logical width in pixels
   const uint16_t      imageHeight; ///< Image logical height in pixels
   const Pixel::Format pixelFormat; ///< Pixel format
@@ -183,8 +181,6 @@ private:
 };
 
 /**
- * @brief Use to make a simple 2d array of pixels.
- *
  * A convenience function for creating the common case of an uncompressed image
  * having width * height pixels in the buffer.
  * @param[in] imageWidth The width in pixels of the image.

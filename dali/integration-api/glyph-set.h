@@ -23,7 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/integration-api/image-data.h>
+#include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
@@ -104,7 +104,7 @@ struct DALI_IMPORT_API GlobalMetrics
 class DALI_IMPORT_API GlyphSet : public Dali::RefObject
 {
 public:
-  typedef std::pair<ImageDataPtr, GlyphMetrics>  Character;
+  typedef std::pair<BitmapPtr, GlyphMetrics>  Character;
   typedef IntrusivePtr<Character>             CharacterPtr;
   typedef std::vector<Character>              CharacterList;
   typedef CharacterList::iterator             CharacterIter;
@@ -122,10 +122,10 @@ public:
 
   /**
    * Add a character to the platform font
-   * @param [in] imageData   A bitmap of the rendered character
+   * @param [in] bitmapData   A bitmap of the rendered character
    * @param [in] glyphMetrics Metrics for the character, including its character code
    */
-  void AddCharacter(ImageDataPtr imageData, const GlyphMetrics& glyphMetrics);
+  void AddCharacter(BitmapPtr bitmapData, const GlyphMetrics& glyphMetrics);
 
   /**
    * Add a character to the platform font

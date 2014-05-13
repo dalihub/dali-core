@@ -229,7 +229,7 @@ public:
   virtual void GetFileNamesFromDirectory( const std::string& directoryName,
                                           std::vector<std::string>& fileNames );
 
-  virtual Integration::ImageDataPtr GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const;
+  virtual Integration::BitmapPtr GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const;
 
 
 public: // TEST FUNCTIONS

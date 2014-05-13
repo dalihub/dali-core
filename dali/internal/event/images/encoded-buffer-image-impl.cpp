@@ -44,7 +44,7 @@ Dali::EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedI
   Dali::EncodedBufferImage publicImage(image);
 
   // Replicate the functionality of ImageFactory::load() without the filesystem caching:
-  Dali::Integration::ImageResourceType resourceType( Dali::Integration::ResourceImageData, attributes );
+  Dali::Integration::BitmapResourceType resourceType( attributes );
   RequestBufferPtr buffer( new RequestBuffer );
   buffer->GetVector().Resize( encodedImageByteCount );
   // Resize() won't throw on failure, so avoid a SEGV if the allocation failed:
