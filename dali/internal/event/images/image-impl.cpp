@@ -205,38 +205,14 @@ void Image::ResourceSavingFailed( const ResourceTicket& ticket )
 
 unsigned int Image::GetWidth() const
 {
-  if( mTicket )
-  {
-    const ImageAttributes& attr = mImageFactory.GetActualAttributes( mTicket->GetId() );
-    return attr.GetWidth();
-  }
-  else if( mRequest )
-  {
-    const ImageAttributes& attr = mImageFactory.GetRequestAttributes( mRequest.Get() );
-    return attr.GetWidth();
-  }
-  else
-  {
-    return mWidth;
-  }
+  // Width has already been calculated - just return that
+  return mWidth;
 }
 
 unsigned int Image::GetHeight() const
 {
-  if( mTicket )
-  {
-    const ImageAttributes& attr = mImageFactory.GetActualAttributes( mTicket->GetId() );
-    return attr.GetHeight();
-  }
-  else if( mRequest )
-  {
-    const ImageAttributes& attr = mImageFactory.GetRequestAttributes( mRequest.Get() );
-    return attr.GetHeight();
-  }
-  else
-  {
-    return mHeight;
-  }
+  // Height has already been calculated - just return that
+  return mHeight;
 }
 
 Vector2 Image::GetNaturalSize() const
