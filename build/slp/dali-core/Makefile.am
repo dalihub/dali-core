@@ -73,10 +73,9 @@ libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            -DDALI_EMOTICON_DIR="\"${emoticons_dir}\"" \
                            -Werror -Wall -Wfloat-equal \
                            $(dali_core_includes) \
-                           $(DALI_CFLAGS) \
-                           $(OPENGLES20_CFLAGS)
+                           $(DALI_CFLAGS)
 
-libdali_core_la_LIBADD = $(OPENGLES20_LIBS) -lboost_thread
+libdali_core_la_LIBADD = -lboost_thread
 
 # Create an empty shaderbin dir
 install-data-local:
@@ -193,8 +192,7 @@ linker_test_CXXFLAGS = \
   -Werror -Wall -Wfloat-equal \
   -I../../../automated-tests/src/dali/dali-test-suite-utils \
   $(dali_core_includes) \
-  $(DALI_CFLAGS) \
-  $(OPENGLES20_CFLAGS)
+  $(DALI_CFLAGS)
 
 linker_test_DEPENDENCIES = libdali-core.la
 linker_test_LDADD = \

@@ -17,7 +17,7 @@
 
 m4_define([dali_version],[0.1.1])
 AC_INIT([dali], [dali_version])
-AM_INIT_AUTOMAKE([-Wall -Wfloat-equal -Werror foreign])
+AM_INIT_AUTOMAKE([-Wall -Wfloat-equal foreign])
 
 AC_PROG_CXX
 AC_PROG_LIBTOOL
@@ -30,7 +30,7 @@ LT_INIT
 DALI_VERSION=dali_version
 AC_SUBST(DALI_VERSION)
 
-PKG_CHECK_MODULES(OPENGLES20, opengl-es-20)
+#PKG_CHECK_MODULES(OPENGLES20, opengl-es-20)
 
 DALI_CFLAGS=-DPLATFORM_SLP
 

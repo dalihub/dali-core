@@ -7,6 +7,6 @@ includedir=@devincludepath@
 Name: Samsung OpenGLES Toolkit
 Description: 3D Canvas Toolkit using OpenGLES
 Version: ${apiversion}
-Requires: opengl-es-20
+Requires:
 Libs: -L${libdir} -ldali-core
 Cflags: -I${includedir}

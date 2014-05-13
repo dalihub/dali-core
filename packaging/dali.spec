@@ -4,22 +4,20 @@ Version:    0.9.15
 Release:    1
 Group:      System/Libraries
 License:    Flora
-URL:        TO_BE_FILLED
+URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-core.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
 Requires:       boost-thread
 BuildRequires:  pkgconfig
-BuildRequires:  opengl-es-devel
 BuildRequires:  gawk
 BuildRequires:  boost-devel
 BuildRequires:  boost-thread
-BuildRequires:  sec-product-features
 ExclusiveArch:  armv7l
 
 %description
-The OpenGLES Canvas Core Library
+The OpenGLES Canvas Core Library provides a 3D scene graph
 
 ##############################
 # devel
@@ -28,26 +26,23 @@ The OpenGLES Canvas Core Library
 # dali-capi - i.e. to break cyclic dependencies.
 %package devel
 Summary:    Development components for the OpenGLES Canvas Core Library
-Group:      Development/Libs
+Group:      Development/Building
 Requires:   %{name} = %{version}-%{release}
 Requires:   %{name}-integration-devel = %{version}-%{release}
-%ifarch %{ix86}
-Requires:   opengl-es-devel
-%endif
 
 %description devel
-Development components for the OpenGLES Canvas Core Library
+Development components for the OpenGLES Canvas Core Library - public headers and package config
 
 ##############################
 # integration-devel
 ##############################
 %package integration-devel
 Summary:    Integration development package for the OpenGLES Canvas
-Group:      Development/Libs
+Group:      Development/Building
 Requires:   %{name} = %{version}-%{release}
 
 %description integration-devel
-Integration development package for the OpenGLES Canvas
+Integration development package for the OpenGLES Canvas - headers for integrating with an adaptor/platform abstraction library.
 
 ##############################
 # Preparation
@@ -95,10 +90,6 @@ cd build/slp
 mkdir -p %{buildroot}/usr/share/license
 cp -af %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/usr/share/license/%{name}
 
-%if 0%{?sec_product_feature_graphics_adreno}
-  mkdir -p %{buildroot}%{shader_bin_dir}
-  mv %{_builddir}/%{name}-%{version}/dali/shaderbins/adreno330/*.dali-bin %{buildroot}%{shader_bin_dir}
-%endif
 
 ##############################
 # Post Install
@@ -129,9 +120,6 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/lib%{name}-core.so*
 %defattr(-,app,app,-)
-%if 0%{?sec_product_feature_graphics_adreno}
-  %{shader_bin_dir}/*
-%endif
 %dir %{shader_bin_dir}
 %{_datadir}/license/%{name}
 
