@@ -89,7 +89,7 @@ bool SetIfEqual(const std::string& a, const std::string& b, T& set, T value)
  * @return The equivalent enumeration for the given string.
  */
 template< typename T >
-T GetEnumeration( const std::string& value, const StringEnum< T >* table, const unsigned int tableCount )
+T GetEnumeration( const std::string& value, const StringEnum< T >* table, unsigned int tableCount )
 {
   T retVal( table->value );
   bool set( false );
@@ -118,7 +118,7 @@ T GetEnumeration( const std::string& value, const StringEnum< T >* table, const 
  * @return The equivalent enumeration for the given string.
  */
 template< typename T >
-std::string GetEnumerationName( const T& value, const StringEnum< T >* table, const unsigned int tableCount )
+std::string GetEnumerationName( T value, const StringEnum< T >* table, unsigned int tableCount )
 {
   std::string string( String::EMPTY );
 
