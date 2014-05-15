@@ -32,7 +32,7 @@ namespace Internal
 
 DynamicsMeshShape::DynamicsMeshShape(Mesh& mesh)
 : DynamicsShape(Dali::DynamicsShape::MESH),
-  mMesh( &mesh )
+  mMesh( mesh )
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
 
@@ -41,7 +41,7 @@ DynamicsMeshShape::DynamicsMeshShape(Mesh& mesh)
   DALI_ASSERT_ALWAYS( world && "No Dynamics World !");
   ResourceManager& resourceManager( ThreadLocalStorage::Get().GetResourceManager() );
 
-  SceneGraph::DynamicsMeshShape* meshShape( new SceneGraph::DynamicsMeshShape( *world->GetSceneObject(), resourceManager, mesh.GetResourceId()) );
+  SceneGraph::DynamicsMeshShape* meshShape( new SceneGraph::DynamicsMeshShape( *world->GetSceneObject(), resourceManager, mMesh.GetResourceId()) );
   mDynamicsShape = meshShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread

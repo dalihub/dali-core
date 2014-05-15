@@ -22,6 +22,7 @@
 
 // BASE CLASS INCLUDES
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/geometry/cloth.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -31,7 +32,6 @@ namespace Internal DALI_INTERNAL
 class DynamicsShape;
 } // namespace Internal
 
-class Mesh;
 class DynamicsWorld;
 
 /**
@@ -96,7 +96,7 @@ public:
    * @param[in] mesh  A mesh.
    * @return A handle to the new shape
    */
-  static DynamicsShape NewMesh(Mesh mesh);
+  static DynamicsShape NewMesh(Cloth mesh);
 
   /**
    * @brief Creates a sphere.

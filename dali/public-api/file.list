@@ -52,7 +52,9 @@ public_api_src_files = \
   $(public_api_src_dir)/events/touch-event.cpp \
   $(public_api_src_dir)/geometry/animatable-mesh.cpp \
   $(public_api_src_dir)/geometry/animatable-vertex.cpp \
+  $(public_api_src_dir)/geometry/cloth.cpp \
   $(public_api_src_dir)/geometry/mesh-data.cpp \
+  $(public_api_src_dir)/geometry/mesh-factory.cpp \
   $(public_api_src_dir)/geometry/mesh.cpp \
   $(public_api_src_dir)/geometry/spline.cpp \
   $(public_api_src_dir)/images/distance-field.cpp \
@@ -147,8 +149,10 @@ public_api_core_events_header_files = \
   $(public_api_src_dir)/events/mouse-wheel-event.h
 
 public_api_core_geometry_header_files = \
+  $(public_api_src_dir)/geometry/cloth.h \
   $(public_api_src_dir)/geometry/mesh.h \
   $(public_api_src_dir)/geometry/mesh-data.h \
+  $(public_api_src_dir)/geometry/mesh-factory.h \
   $(public_api_src_dir)/geometry/spline.h
 
 public_api_core_images_header_files = \

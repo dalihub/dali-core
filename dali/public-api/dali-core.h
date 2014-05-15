@@ -41,7 +41,9 @@
 #include <dali/public-api/events/hit-test-algorithm.h>
 #include <dali/public-api/events/mouse-wheel-event.h>
 
+#include <dali/public-api/geometry/cloth.h>
 #include <dali/public-api/geometry/mesh.h>
+#include <dali/public-api/geometry/mesh-factory.h>
 #include <dali/public-api/geometry/spline.h>
 
 #include <dali/public-api/images/distance-field.h>

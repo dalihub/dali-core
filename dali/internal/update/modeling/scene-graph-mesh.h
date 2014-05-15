@@ -36,7 +36,7 @@ namespace Internal
 
 namespace SceneGraph
 {
-
+class RenderQueue;
 class PostProcessResourceDispatcher;
 class Mesh;
 
@@ -62,9 +62,10 @@ public:
    */
   static Mesh* New( ResourceId id,
                     PostProcessResourceDispatcher& postProcessResourceDispatcher,
+                    RenderQueue& renderQueue,
                     MeshData* meshData )
   {
-    return new Mesh( id, postProcessResourceDispatcher, meshData );
+    return new Mesh( id, postProcessResourceDispatcher, renderQueue, meshData );
   }
 
   /**
@@ -146,12 +147,17 @@ public: // from GlResourceOwner
   virtual void GlCleanup();
 
 private:
+  /**
+   * Method to set if the vertex buffer should be refreshed in the render thread
+   */
+  void RefreshVertexBuffer();
 
   /**
    * Private constructor; see also Mesh::New()
    */
   Mesh( ResourceId id,
         PostProcessResourceDispatcher& postProcessResourceDispatcher,
+        RenderQueue& renderQueue,
         MeshData* meshData );
 
   // Undefined
@@ -161,24 +167,20 @@ private:
   Mesh& operator=(const Mesh& rhs);
 
 protected:
-
-  ResourceId mResourceId;
-
+  PostProcessResourceDispatcher& mPostProcessResourceDispatcher;
+  SceneGraph::RenderQueue& mRenderQueue;
   /**
    * The mUpdateMeshData will point to a mesh data that was just received
    * or to the MeshData pointed by mRenderMeshData if it's more that one frame old
-   **/
+   */
   MeshData* mUpdateMeshData;              ///< Pointer to MeshData object
   OwnerPointer<MeshData> mRenderMeshData; ///< Owner of the MeshData Object
-
-  bool mRefreshVertexBuffer;              ///< True when GpuBuffers need updating
   OwnerPointer<GpuBuffer> mVertexBuffer;  ///< Vertex buffer
   OwnerPointer<GpuBuffer> mIndicesBuffer; ///< Index buffer
-
   size_t     mNumberOfVertices;    ///< Number of vertices
   size_t     mNumberOfFaces;       ///< Number of faces
-
-  PostProcessResourceDispatcher& mPostProcessResourceDispatcher;
+  ResourceId mResourceId;
+  bool mRefreshVertexBuffer;              ///< True when GpuBuffers need updating
 };
 
 } // namespace SceneGraph
