@@ -161,14 +161,7 @@ public:
    * @param [in] name uniform name
    * @return the index of the uniform name in local cache
    */
-  unsigned int RegisterExternalUniform( const std::string& name );
-
-  /**
-   * Register a uniform name in our local cache
-   * @param [in] name uniform name
-   * @return the index of the uniform name in local cache
-   */
-  unsigned int RegisterUniform( const char* name );
+  unsigned int RegisterUniform( const std::string& name );
 
   /**
    * Gets the location of a pre-registered uniform.
@@ -324,11 +317,9 @@ private:  // Data
   GLuint mProgramId;                          ///< GL identifier for program
   Integration::ShaderData* mProgramData;      ///< Shader program source and binary (when compiled & linked or loaded)
 
-  // uniform location caches
+  // location caches
   GLint mAttribLocations[ ATTRIB_TYPE_LAST ]; ///< attribute location cache
-  GLint mBuiltinUniformLocations[ UNIFORM_TYPE_LAST ];  ///< uniform location cache for built in uniforms
-  std::vector< std::pair< const char *, GLint > > mCustomUniformLocations; ///< uniform location cache for custom uniforms
-  static std::set< std::string > mExternalUniformNames; /// < names for externally specified uniforms, set to avoid duplicates
+  std::vector< std::pair< std::string, GLint > > mUniformLocations; ///< uniform location cache
 
   // uniform value caching
   GLint mUniformCacheInt[ MAX_UNIFORM_CACHE_SIZE ];         ///< Value cache for uniforms of single int

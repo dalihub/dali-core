@@ -117,8 +117,6 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
 
 // IMPLEMENTATION
 
-std::set< std::string > Program::mExternalUniformNames;
-
 Program* Program::New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context )
 {
   size_t shaderHash = shaderData->GetHashValue();
@@ -178,64 +176,37 @@ GLint Program::GetAttribLocation( AttribType type )
   return mAttribLocations[type];
 }
 
-unsigned int Program::RegisterExternalUniform( const std::string& name )
-{
-  // insert the name in the table to keep it alive as long as this program exists
-  // we rely on C++ strings COW behaviour to keep the char* alive.
-  // TODO In C++ 11 this is no longer the case so this code needs changing if we upgrade
-  mExternalUniformNames.insert( name );
-  return RegisterUniform( name.c_str() );
-}
-
-unsigned int Program::RegisterUniform( const char* name )
+unsigned int Program::RegisterUniform( const std::string& name )
 {
   unsigned int index = 0;
   // find the value from cache
-  for( ;index < mCustomUniformLocations.size(); ++index )
+  for( ;index < mUniformLocations.size(); ++index )
   {
-    if( !strcmp( mCustomUniformLocations[ index ].first, name ) )
+    if( mUniformLocations[ index ].first == name )
     {
-      // name found so return index plus built in index count
-      return index + UNIFORM_TYPE_LAST;
+      // name found so return index
+      return index;
     }
   }
   // if we get here, index is one past end so push back the new name
-  mCustomUniformLocations.push_back( std::make_pair( name, UNIFORM_NOT_QUERIED ) );
-  return index + UNIFORM_TYPE_LAST; // remember to add the count of the built in ones
+  mUniformLocations.push_back( std::make_pair( name, UNIFORM_NOT_QUERIED ) );
+  return index;
 }
 
 GLint Program::GetUniformLocation( unsigned int uniformIndex )
 {
-  GLint location = UNIFORM_NOT_QUERIED;
-  // is it built in
-  if( uniformIndex < UNIFORM_TYPE_LAST )
-  {
-    // check if we have already queried the location of the uniform
-    location = mBuiltinUniformLocations[ uniformIndex ];
-    if( location  == UNIFORM_NOT_QUERIED )
-    {
-      LOG_GL( "GetUniformLocation(program=%d,%s) = %d\n", mProgramId, mBuiltinUniformLocations[ uniformIndex ], gStdUniforms[ uniformIndex ] );
-      location = CHECK_GL( mContext, mGlAbstraction.GetUniformLocation( mProgramId, gStdUniforms[ uniformIndex ] ) );
+  // debug check that index is within name cache
+  DALI_ASSERT_DEBUG( mUniformLocations.size() > uniformIndex );
 
-      mBuiltinUniformLocations[ uniformIndex ] = location;
-    }
-  }
-  else
-  {
-    // translate the index to custom locations vector
-    unsigned int customIndex = uniformIndex - UNIFORM_TYPE_LAST;
-    if( customIndex < mCustomUniformLocations.size() ) // custom uniform
-    {
-      // check if we have already queried the location of the uniform
-      location = mCustomUniformLocations[ customIndex ].second;
-      if( location == UNIFORM_NOT_QUERIED )
-      {
-        LOG_GL( "GetUniformLocation(program=%d,%s) = %d\n", mProgramId, mCustomUniformLocations[ customIndex ].first, mCustomUniformLocations[ customIndex ].second );
-        location = CHECK_GL( mContext, mGlAbstraction.GetUniformLocation( mProgramId, mCustomUniformLocations[ customIndex ].first ) );
+  // check if we have already queried the location of the uniform
+  GLint location = mUniformLocations[ uniformIndex ].second;
 
-        mCustomUniformLocations[ customIndex ].second = location;
-      }
-    }
+  if( location == UNIFORM_NOT_QUERIED )
+  {
+    LOG_GL( "GetUniformLocation(program=%d,%s) = %d\n", mProgramId, mUniformLocations[ uniformIndex ].first.c_str(), mUniformLocations[ uniformIndex ].second );
+    location = CHECK_GL( mContext, mGlAbstraction.GetUniformLocation( mProgramId, mUniformLocations[ uniformIndex ].first.c_str() ) );
+
+    mUniformLocations[ uniformIndex ].second = location;
   }
 
   return location;
@@ -468,6 +439,13 @@ Program::Program(Integration::ShaderData* shaderData, Context& context )
   mProgramId( 0 ),
   mProgramData(shaderData)
 {
+  // reserve space for standard uniforms
+  mUniformLocations.reserve( UNIFORM_TYPE_LAST );
+  // reset built in uniform names in cache
+  for( int i = 0; i < UNIFORM_TYPE_LAST; ++i )
+  {
+    RegisterUniform( gStdUniforms[ i ] );
+  }
   // reset values
   ResetAttribsUniforms();
 }
@@ -679,13 +657,10 @@ void Program::ResetAttribsUniforms()
   }
 
   // reset all gl uniform locations
-  for( unsigned int i = 0; i < UNIFORM_TYPE_LAST; ++i )
+  for( unsigned int i = 0; i < mUniformLocations.size(); ++i )
   {
-    mBuiltinUniformLocations[ i ] = UNIFORM_NOT_QUERIED;
-  }
-  for( unsigned int i = 0; i < mCustomUniformLocations.size(); ++i )
-  {
-    mCustomUniformLocations[ i ].second = UNIFORM_NOT_QUERIED;
+    // reset gl program locations and names
+    mUniformLocations[ i ].second = UNIFORM_NOT_QUERIED;
   }
 
   // reset uniform cache
