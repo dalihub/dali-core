@@ -34,62 +34,109 @@ TextParameters::TextParameters()
 
 TextParameters::~TextParameters()
 {
-  // nothing to do
+  // destroy all containers.
+  if ( mFlags & OUTLINE_EXISTS )
+  {
+    OutlineAttributes* attrPtr = reinterpret_cast<OutlineAttributes*>( *( mParameters.Begin() + ( mFlags & TEXT_PARAMETER_MASK ) ) );
+    delete attrPtr;
+  }
+  if ( mFlags & GLOW_EXISTS )
+  {
+    GlowAttributes* attrPtr = reinterpret_cast<GlowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GLOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
+    delete attrPtr;
+  }
+  if ( mFlags & DROP_SHADOW_EXISTS )
+  {
+    DropShadowAttributes* attrPtr = reinterpret_cast<DropShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
+    delete attrPtr;
+  }
+  if ( mFlags & GRADIENT_EXISTS )
+  {
+    GradientAttributes* attrPtr = reinterpret_cast<GradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
+    delete attrPtr;
+  }
 }
 
 void TextParameters::SetOutline( bool enable, const Vector4& color, const Vector2& thickness )
 {
-  if ( mFlags & OUTLINE_ENABLED )
+  if ( mFlags & OUTLINE_EXISTS )
   {
-    OutlineAttributes* attrPtr = AnyCast< OutlineAttributes >( &mParameters[ mFlags & TEXT_PARAMETER_MASK ] );
+    OutlineAttributes* attrPtr = reinterpret_cast<OutlineAttributes*>( *( mParameters.Begin() + ( mFlags & TEXT_PARAMETER_MASK ) ) );
     attrPtr->mOutlineColor = color;
     attrPtr->mOutlineThickness = thickness;
   }
   else
   {
-    OutlineAttributes attr;
-    attr.mOutlineColor = color;
-    attr.mOutlineThickness = thickness;
-    mParameters.push_back( attr );
-    mFlags |= ( ( mFlags & ~OUTLINE_INDEX ) | ( ( mParameters.size() - 1 ) & TEXT_PARAMETER_MASK ) | OUTLINE_ENABLED );
+    OutlineAttributes* attr = new OutlineAttributes();
+    attr->mOutlineColor = color;
+    attr->mOutlineThickness = thickness;
+    mFlags |= ( ( mFlags & ~OUTLINE_INDEX ) | ( mParameters.Size() & TEXT_PARAMETER_MASK ) | OUTLINE_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= OUTLINE_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~OUTLINE_ENABLED;
   }
 }
 
-void TextParameters::SetGlow( bool enable, const Vector4& color, const float intensity)
+void TextParameters::SetGlow( bool enable, const Vector4& color, float intensity )
 {
-  if ( mFlags & GLOW_ENABLED )
+  if ( mFlags & GLOW_EXISTS )
   {
-    GlowAttributes* attrPtr = AnyCast< GlowAttributes >( &mParameters[ ( mFlags >> GLOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    GlowAttributes* attrPtr = reinterpret_cast<GlowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GLOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     attrPtr->mGlowColor = color;
     attrPtr->mGlowIntensity = intensity;
   }
   else
   {
-    GlowAttributes attr;
-    attr.mGlowColor = color;
-    attr.mGlowIntensity = intensity;
-    mParameters.push_back( attr );
-    mFlags |= ( ( mFlags & ~GLOW_INDEX ) | ( ( ( mParameters.size() - 1 ) & TEXT_PARAMETER_MASK ) << GLOW_INDEX_SHIFT ) | GLOW_ENABLED );
+    GlowAttributes* attr = new GlowAttributes();
+    attr->mGlowColor = color;
+    attr->mGlowIntensity = intensity;
+    mFlags |= ( ( mFlags & ~GLOW_INDEX ) | ( ( mParameters.Size() & TEXT_PARAMETER_MASK ) << GLOW_INDEX_SHIFT ) | GLOW_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= GLOW_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~GLOW_ENABLED;
   }
 }
 
-void TextParameters::SetShadow( bool enable, const Vector4& color, const Vector2& offset, const float size )
+void TextParameters::SetShadow( bool enable, const Vector4& color, const Vector2& offset, float size )
 {
-  if ( mFlags & DROP_SHADOW_ENABLED )
+  if ( mFlags & DROP_SHADOW_EXISTS )
   {
-    DropShadowAttributes* attrPtr = AnyCast< DropShadowAttributes >( &mParameters[ ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    DropShadowAttributes* attrPtr = reinterpret_cast<DropShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     attrPtr->mDropShadowColor = color;
     attrPtr->mDropShadowOffset = offset;
     attrPtr->mDropShadowSize = size;
   }
   else
   {
-    DropShadowAttributes attr;
-    attr.mDropShadowColor = color;
-    attr.mDropShadowOffset = offset;
-    attr.mDropShadowSize = size;
-    mParameters.push_back( attr );
-    mFlags |= ( ( mFlags & ~DROP_SHADOW_INDEX ) | ( ( ( mParameters.size() - 1 ) & TEXT_PARAMETER_MASK ) << DROP_SHADOW_INDEX_SHIFT ) | DROP_SHADOW_ENABLED );
+    DropShadowAttributes* attr = new DropShadowAttributes();
+    attr->mDropShadowColor = color;
+    attr->mDropShadowOffset = offset;
+    attr->mDropShadowSize = size;
+    mFlags |= ( ( mFlags & ~DROP_SHADOW_INDEX ) | ( ( mParameters.Size() & TEXT_PARAMETER_MASK ) << DROP_SHADOW_INDEX_SHIFT ) | DROP_SHADOW_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= DROP_SHADOW_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~DROP_SHADOW_ENABLED;
   }
 }
 
@@ -97,19 +144,19 @@ void TextParameters::SetGradient( const Vector4& color, const Vector2& start, co
 {
   if ( mFlags & GRADIENT_EXISTS )
   {
-    GradientAttributes* attrPtr = AnyCast< GradientAttributes >( &mParameters[ ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    GradientAttributes* attrPtr = reinterpret_cast<GradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     attrPtr->mGradientColor = color;
     attrPtr->mGradientStartPoint = start;
     attrPtr->mGradientEndPoint = end;
   }
   else
   {
-    GradientAttributes attr;
-    attr.mGradientColor = color;
-    attr.mGradientStartPoint = start;
-    attr.mGradientEndPoint = end;
-    mParameters.push_back( attr );
-    mFlags |= ( ( mFlags & ~GRADIENT_INDEX ) | ( ( ( mParameters.size() - 1 ) & TEXT_PARAMETER_MASK ) << GRADIENT_INDEX_SHIFT ) | GRADIENT_EXISTS );
+    GradientAttributes* attr = new GradientAttributes();
+    attr->mGradientColor = color;
+    attr->mGradientStartPoint = start;
+    attr->mGradientEndPoint = end;
+    mFlags |= ( ( mFlags & ~GRADIENT_INDEX ) | ( ( mParameters.Size() & TEXT_PARAMETER_MASK ) << GRADIENT_INDEX_SHIFT ) | GRADIENT_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
   }
 
   if ( end != start )
@@ -122,65 +169,11 @@ void TextParameters::SetGradient( const Vector4& color, const Vector2& start, co
   }
 }
 
-void TextParameters::SetGradientColor( const Vector4& color )
-{
-  if ( mFlags & GRADIENT_EXISTS )
-  {
-    GradientAttributes* attrPtr = AnyCast< GradientAttributes >( &mParameters[ ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
-    attrPtr->mGradientColor = color;
-  }
-  else
-  {
-    GradientAttributes attr;
-    attr.mGradientColor = color;
-    attr.mGradientStartPoint = TextStyle::DEFAULT_GRADIENT_START_POINT;
-    attr.mGradientEndPoint = TextStyle::DEFAULT_GRADIENT_END_POINT;
-    mParameters.push_back( attr );
-    mFlags |= ( ( mFlags & ~GRADIENT_INDEX ) | ( ( ( mParameters.size() - 1 ) & TEXT_PARAMETER_MASK ) << GRADIENT_INDEX_SHIFT ) | GRADIENT_EXISTS );
-  }
-}
-
-void TextParameters::SetGradientStartPoint( const Vector2& start )
-{
-  if ( mFlags & GRADIENT_EXISTS )
-  {
-    GradientAttributes* attrPtr = AnyCast< GradientAttributes >( &mParameters[ ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
-    attrPtr->mGradientStartPoint = start;
-  }
-  else
-  {
-    GradientAttributes attr;
-    attr.mGradientStartPoint = start;
-    attr.mGradientEndPoint = TextStyle::DEFAULT_GRADIENT_END_POINT;
-    attr.mGradientColor = TextStyle::DEFAULT_GRADIENT_COLOR;
-    mParameters.push_back( attr );
-    mFlags |= ( ( mFlags & ~GRADIENT_INDEX ) | ( ( ( mParameters.size() - 1 ) & TEXT_PARAMETER_MASK ) << GRADIENT_INDEX_SHIFT ) | GRADIENT_EXISTS );
-  }
-}
-
-void TextParameters::SetGradientEndPoint( const Vector2& end )
-{
-  if ( mFlags & GRADIENT_EXISTS )
-  {
-    GradientAttributes* attrPtr = AnyCast< GradientAttributes >( &mParameters[ ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
-    attrPtr->mGradientEndPoint = end;
-  }
-  else
-  {
-    GradientAttributes attr;
-    attr.mGradientEndPoint = end;
-    attr.mGradientStartPoint = TextStyle::DEFAULT_GRADIENT_START_POINT;
-    attr.mGradientColor = TextStyle::DEFAULT_GRADIENT_COLOR;
-    mParameters.push_back( attr );
-    mFlags |= ( ( mFlags & ~GRADIENT_INDEX ) | ( ( ( mParameters.size() - 1 ) & TEXT_PARAMETER_MASK ) << GRADIENT_INDEX_SHIFT ) | GRADIENT_EXISTS );
-  }
-}
-
-const Vector4& TextParameters::GetOutlineColor()
+const Vector4& TextParameters::GetOutlineColor() const
 {
   if ( mFlags & OUTLINE_ENABLED )
   {
-    const OutlineAttributes* attrPtr = AnyCast< OutlineAttributes >( &mParameters[ mFlags & TEXT_PARAMETER_MASK ] );
+    const OutlineAttributes* attrPtr = reinterpret_cast<OutlineAttributes*>( *( mParameters.Begin() + ( mFlags & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mOutlineColor;
   }
   else
@@ -189,11 +182,11 @@ const Vector4& TextParameters::GetOutlineColor()
   }
 }
 
-const Vector2& TextParameters::GetOutlineThickness()
+const Vector2& TextParameters::GetOutlineThickness() const
 {
-  if ( mFlags & OUTLINE_ENABLED )
+  if ( mFlags & OUTLINE_EXISTS )
   {
-    const OutlineAttributes* attrPtr = AnyCast< OutlineAttributes >( &mParameters[ mFlags & TEXT_PARAMETER_MASK ] );
+    const OutlineAttributes* attrPtr = reinterpret_cast<OutlineAttributes*>( *( mParameters.Begin() + ( mFlags & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mOutlineThickness;
   }
   else
@@ -202,11 +195,11 @@ const Vector2& TextParameters::GetOutlineThickness()
   }
 }
 
-const Vector4& TextParameters::GetGlowColor()
+const Vector4& TextParameters::GetGlowColor() const
 {
-  if ( mFlags & GLOW_ENABLED )
+  if ( mFlags & GLOW_EXISTS )
   {
-    const GlowAttributes* attrPtr = AnyCast< GlowAttributes >( &mParameters[ ( mFlags >> GLOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    const GlowAttributes* attrPtr = reinterpret_cast<GlowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GLOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mGlowColor;
   }
   else
@@ -215,11 +208,11 @@ const Vector4& TextParameters::GetGlowColor()
   }
 }
 
-float TextParameters::GetGlowIntensity()
+float TextParameters::GetGlowIntensity() const
 {
-  if ( mFlags & GLOW_ENABLED )
+  if ( mFlags & GLOW_EXISTS )
   {
-    const GlowAttributes* attrPtr = AnyCast< GlowAttributes >( &mParameters[ ( mFlags >> GLOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    const GlowAttributes* attrPtr = reinterpret_cast<GlowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GLOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mGlowIntensity;
   }
   else
@@ -228,11 +221,11 @@ float TextParameters::GetGlowIntensity()
   }
 }
 
-const Vector4& TextParameters::GetDropShadowColor()
+const Vector4& TextParameters::GetDropShadowColor() const
 {
-  if ( mFlags & DROP_SHADOW_ENABLED )
+  if ( mFlags & DROP_SHADOW_EXISTS )
   {
-    const DropShadowAttributes* attrPtr = AnyCast< DropShadowAttributes >( &mParameters[ ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    const DropShadowAttributes* attrPtr = reinterpret_cast<DropShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mDropShadowColor;
   }
   else
@@ -241,12 +234,12 @@ const Vector4& TextParameters::GetDropShadowColor()
   }
 }
 
-const Vector2& TextParameters::GetDropShadowOffset()
+const Vector2& TextParameters::GetDropShadowOffset() const
 {
-  if ( mFlags & DROP_SHADOW_ENABLED )
+  if ( mFlags & DROP_SHADOW_EXISTS )
   {
 
-    const DropShadowAttributes* attrPtr = AnyCast< DropShadowAttributes >( &mParameters[ ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    const DropShadowAttributes* attrPtr = reinterpret_cast<DropShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mDropShadowOffset;
   }
   else
@@ -255,11 +248,11 @@ const Vector2& TextParameters::GetDropShadowOffset()
   }
 }
 
-float TextParameters::GetDropShadowSize()
+float TextParameters::GetDropShadowSize() const
 {
-  if ( mFlags & DROP_SHADOW_ENABLED )
+  if ( mFlags & DROP_SHADOW_EXISTS )
   {
-    const DropShadowAttributes* attrPtr = AnyCast< DropShadowAttributes >( &mParameters[ ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    const DropShadowAttributes* attrPtr = reinterpret_cast<DropShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mDropShadowSize;
   }
   else
@@ -268,11 +261,11 @@ float TextParameters::GetDropShadowSize()
   }
 }
 
-const Vector4& TextParameters::GetGradientColor()
+const Vector4& TextParameters::GetGradientColor() const
 {
   if ( mFlags & GRADIENT_EXISTS )
   {
-    const GradientAttributes* attrPtr = AnyCast< GradientAttributes >( &mParameters[ ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    const GradientAttributes* attrPtr = reinterpret_cast<GradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mGradientColor;
   }
   else
@@ -281,11 +274,11 @@ const Vector4& TextParameters::GetGradientColor()
   }
 }
 
-const Vector2& TextParameters::GetGradientStartPoint()
+const Vector2& TextParameters::GetGradientStartPoint() const
 {
   if ( mFlags & GRADIENT_EXISTS )
   {
-    const GradientAttributes* attrPtr = AnyCast< GradientAttributes >( &mParameters[ ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    const GradientAttributes* attrPtr = reinterpret_cast<GradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mGradientStartPoint;
   }
   else
@@ -294,11 +287,11 @@ const Vector2& TextParameters::GetGradientStartPoint()
   }
 }
 
-const Vector2& TextParameters::GetGradientEndPoint()
+const Vector2& TextParameters::GetGradientEndPoint() const
 {
   if ( mFlags & GRADIENT_EXISTS )
   {
-    const GradientAttributes* attrPtr = AnyCast< GradientAttributes >( &mParameters[ ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ] );
+    const GradientAttributes* attrPtr = reinterpret_cast<GradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & TEXT_PARAMETER_MASK ) ) );
     return attrPtr->mGradientEndPoint;
   }
   else

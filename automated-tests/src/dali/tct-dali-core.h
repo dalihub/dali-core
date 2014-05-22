@@ -1214,20 +1214,22 @@ extern int UtcDaliTextActorAutomaticSizeSetAnimation(void);
 extern int UtcDaliTextActorPropertyIndices(void);
 extern int UtcDaliTextStyleDefaultConstructor(void);
 extern int UtcDaliTextStyleCopyConstructor(void);
+extern int UtcDaliTextStyleAssignmentOperator(void);
 extern int UtcDaliTextStyleComparisonOperator(void);
 extern int UtcDaliTextStyleCopy(void);
+extern int UtcDaliTextStyleReset(void);
 extern int UtcDaliTextStyleSetGetFontName(void);
 extern int UtcDaliTextStyleSetGetFontStyle(void);
 extern int UtcDaliTextStyleSetGetFontPointSize(void);
-extern int UtcDaliTextStyleSetGetWeight(void);
 extern int UtcDaliTextStyleSetGetTextColor(void);
+extern int UtcDaliTextStyleSetGetWeight(void);
+extern int UtcDaliTextStyleSetGetSmoothEdge(void);
 extern int UtcDaliTextStyleSetGetItalics(void);
-extern int UtcDaliTextStyleSetGetItalicsAngle(void);
 extern int UtcDaliTextStyleSetGetUnderline(void);
 extern int UtcDaliTextStyleSetGetShadow(void);
 extern int UtcDaliTextStyleSetGetGlow(void);
 extern int UtcDaliTextStyleSetGetOutline(void);
-extern int UtcDaliTextStyleSetGetSmoothEdge(void);
+extern int UtcDaliTextStyleSetGetGradient(void);
 extern int UtcDaliTouchEventCombinerConstructors(void);
 extern int UtcDaliTouchEventCombinerConstructorsNegative(void);
 extern int UtcDaliTouchEventCombinerSettersAndGetters(void);
@@ -2429,20 +2431,22 @@ testcase tc_array[] = {
     {"UtcDaliTextActorPropertyIndices", UtcDaliTextActorPropertyIndices, text_actor_test_startup, text_actor_test_cleanup},
     {"UtcDaliTextStyleDefaultConstructor", UtcDaliTextStyleDefaultConstructor, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleCopyConstructor", UtcDaliTextStyleCopyConstructor, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
+    {"UtcDaliTextStyleAssignmentOperator", UtcDaliTextStyleAssignmentOperator, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleComparisonOperator", UtcDaliTextStyleComparisonOperator, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleCopy", UtcDaliTextStyleCopy, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
+    {"UtcDaliTextStyleReset", UtcDaliTextStyleReset, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetFontName", UtcDaliTextStyleSetGetFontName, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetFontStyle", UtcDaliTextStyleSetGetFontStyle, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetFontPointSize", UtcDaliTextStyleSetGetFontPointSize, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
-    {"UtcDaliTextStyleSetGetWeight", UtcDaliTextStyleSetGetWeight, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetTextColor", UtcDaliTextStyleSetGetTextColor, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
+    {"UtcDaliTextStyleSetGetWeight", UtcDaliTextStyleSetGetWeight, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
+    {"UtcDaliTextStyleSetGetSmoothEdge", UtcDaliTextStyleSetGetSmoothEdge, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetItalics", UtcDaliTextStyleSetGetItalics, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
-    {"UtcDaliTextStyleSetGetItalicsAngle", UtcDaliTextStyleSetGetItalicsAngle, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetUnderline", UtcDaliTextStyleSetGetUnderline, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetShadow", UtcDaliTextStyleSetGetShadow, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetGlow", UtcDaliTextStyleSetGetGlow, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTextStyleSetGetOutline", UtcDaliTextStyleSetGetOutline, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
-    {"UtcDaliTextStyleSetGetSmoothEdge", UtcDaliTextStyleSetGetSmoothEdge, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
+    {"UtcDaliTextStyleSetGetGradient", UtcDaliTextStyleSetGetGradient, utc_dali_text_style_startup, utc_dali_text_style_cleanup},
     {"UtcDaliTouchEventCombinerConstructors", UtcDaliTouchEventCombinerConstructors, utc_dali_touch_event_combiner_startup, utc_dali_touch_event_combiner_cleanup},
     {"UtcDaliTouchEventCombinerConstructorsNegative", UtcDaliTouchEventCombinerConstructorsNegative, utc_dali_touch_event_combiner_startup, utc_dali_touch_event_combiner_cleanup},
     {"UtcDaliTouchEventCombinerSettersAndGetters", UtcDaliTouchEventCombinerSettersAndGetters, utc_dali_touch_event_combiner_startup, utc_dali_touch_event_combiner_cleanup},

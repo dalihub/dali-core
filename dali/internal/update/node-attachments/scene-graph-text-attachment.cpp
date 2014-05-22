@@ -131,43 +131,17 @@ void TextAttachment::SetTextFontSize( BufferIndex updateBufferIndex, float pixel
   new (slot) DerivedType( mTextRenderer, &TextRenderer::SetFontSize, pixelSize );
 }
 
-void TextAttachment::SetGradientColor( BufferIndex updateBufferIndex, const Vector4& color )
+void TextAttachment::SetGradient( BufferIndex updateBufferIndex, const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
 {
   DALI_ASSERT_DEBUG(mSceneController);
 
-  typedef MessageValue1< TextRenderer, Vector4 > DerivedType;
+  typedef MessageValue3< TextRenderer, Vector4, Vector2, Vector2 > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetGradientColor, color );
-}
-
-void TextAttachment::SetGradientStartPoint( BufferIndex updateBufferIndex, const Vector2& position )
-{
-  DALI_ASSERT_DEBUG(mSceneController);
-
-  typedef MessageValue1< TextRenderer, Vector2 > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetGradientStartPoint, position );
-}
-
-void TextAttachment::SetGradientEndPoint( BufferIndex updateBufferIndex, const Vector2& position )
-{
-  DALI_ASSERT_DEBUG(mSceneController);
-
-  typedef MessageValue1< TextRenderer, Vector2 > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetGradientEndPoint, position );
+  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetGradient, color, startPoint, endPoint );
 }
 
 void TextAttachment::SetTextColor( BufferIndex updateBufferIndex, const Vector4& color )

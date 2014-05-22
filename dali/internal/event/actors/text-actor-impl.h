@@ -144,6 +144,13 @@ public:
   const Vector2& GetGradientEndPoint() const;
 
   /**
+   * @see Dali::TextActor::SetGradientColor()
+   * @see Dali::TextActor::SetGradientStartPoint()
+   * @see Dali::TextActor::SetGradientEndPoint()
+   */
+  void SetGradient( const Vector4& color, const Vector2& startPoint, const Vector2& endPoint );
+
+  /**
    * @copydoc Dali::TextActor::SetTextStyle( const TextStyle& style )
    * @param mode whether new text should be requested
    */
@@ -167,33 +174,38 @@ public:
   /**
    * @copydoc Dali::TextActor::SetSmoothEdge(const float)
    */
-  void SetSmoothEdge(const float smoothEdge);
+  void SetSmoothEdge( float smoothEdge );
 
   /**
-   * @copydoc Dali::TextActor::SetOutline(const bool,const Vector4&,const Vector2&)
+   * @copydoc Dali::TextActor::SetOutline( bool,const Vector4&,const Vector2&)
    */
-  void SetOutline(const bool enable, const Vector4& color, const Vector2& thickness);
+  void SetOutline( bool enable, const Vector4& color, const Vector2& thickness );
 
   /**
    * @copydoc Dali::TextActor::SetGlow(const bool,const Vector4&,const float)
    */
-  void SetGlow(const bool enable, const Vector4& color, const float intensity);
+  void SetGlow( bool enable, const Vector4& color, float intensity );
 
   /**
    * @copydoc Dali::TextActor::SetShadow(const bool,const Vector4&,const Vector2&,const float)
    */
-  void SetShadow(const bool enable, const Vector4& color, const Vector2& offset, const float size);
+  void SetShadow( bool enable, const Vector4& color, const Vector2& offset, float size );
 
   /**
    * Enable italics on the text actor, the text will be sheared by the given angle.
    * @param[in] angle Italics angle in radians.
    */
-  void SetItalics( const Radian& angle );
+  void SetItalics( Radian angle );
 
   /**
    * @copydoc Dali::TextActor::GetItalics()
    */
-  const Radian& GetItalics() const;
+  bool GetItalics() const;
+
+  /**
+   * @copydoc Dali::TextActor::GetItalicsAngle()
+   */
+  Radian GetItalicsAngle() const;
 
   /**
    * @copydoc Dali::TextActor::SetUnderline()

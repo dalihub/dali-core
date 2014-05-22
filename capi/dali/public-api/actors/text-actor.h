@@ -357,7 +357,7 @@ public:
    * @param[in] smoothEdge Specify the distance field value for the center of the text edge.
    *                   0 <= smoothEdge <= 1
    */
-  void SetSmoothEdge(const float smoothEdge = TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD);
+  void SetSmoothEdge( float smoothEdge = TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD );
 
   /**
    * @brief Set text outlining.
@@ -371,7 +371,7 @@ public:
    *                      0 <= smoothEdge[0] <= 1.
    *                      0 <= smoothEdge[1] <= 1.
    */
-  void SetOutline(const bool enable, const Vector4& color, const Vector2& thickness = TextStyle::DEFAULT_OUTLINE_THICKNESS);
+  void SetOutline( bool enable, const Vector4& color, const Vector2& thickness = TextStyle::DEFAULT_OUTLINE_THICKNESS );
 
   /**
    * @brief Set text glow.
@@ -382,7 +382,7 @@ public:
    *                      The edge of the text is at the value set with SetSmoothEdge().
    *                      SetSmoothEdge() The distance field value at which the glow becomes fully transparent.
    */
-  void SetGlow(const bool enable, const Vector4& color, const float intensity = TextStyle::DEFAULT_GLOW_INTENSITY);
+  void SetGlow( bool enable, const Vector4& color, float intensity = TextStyle::DEFAULT_GLOW_INTENSITY );
 
   /**
    * @brief Set text shadow.
@@ -392,8 +392,8 @@ public:
    * @param[in] offset  Offset in pixels. To avoid cropping of the drop shadow limit the offset to PointSize / 3.5
    * @param[in] size    Size of shadow in pixels. 0 means the shadow is the same size as the text.
    */
-  void SetShadow(const bool enable, const Vector4& color, const Vector2& offset = TextStyle::DEFAULT_SHADOW_OFFSET,
-                 const float size = TextStyle::DEFAULT_SHADOW_SIZE );
+  void SetShadow( bool enable, const Vector4& color, const Vector2& offset = TextStyle::DEFAULT_SHADOW_OFFSET,
+                  float size = TextStyle::DEFAULT_SHADOW_SIZE );
 
   /**
    * @brief Enable italics on the text actor, the text will be sheared by the given angle.
@@ -401,7 +401,7 @@ public:
    * @param[in] enabled True will enable italics, false disable it.
    * @param[in] angle Italics angle in degrees.
    */
-  void SetItalics( const bool enabled, const Degree& angle = TextStyle::DEFAULT_ITALICS_ANGLE );
+  void SetItalics( bool enabled, Degree angle = TextStyle::DEFAULT_ITALICS_ANGLE );
 
   /**
    * @brief Enable italics on the text actor, the text will be sheared by the given angle.
@@ -409,7 +409,7 @@ public:
    * @param[in] enabled True will enable italics, false disable it.
    * @param[in] angle Italics angle in radians.
    */
-  void SetItalics( const bool enabled, const Radian& angle );
+  void SetItalics( bool enabled, Radian angle );
 
   /**
    * @brief Get text italics for the actor.
@@ -423,7 +423,7 @@ public:
    *
    * @returns Angle as a Radian.
    */
-  const Radian& GetItalicsAngle() const;
+  Radian GetItalicsAngle() const;
 
   /**
    * @brief Set text underline.

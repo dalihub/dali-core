@@ -75,19 +75,11 @@ public:
   void SetFontSize( float pixelSize );
 
   /**
-   * @copydoc Dali::TextActor::SetGradientColor()
+   * @see Dali::TextActor::SetGradientColor()
+   * @see Dali::TextActor::SetGradientStartPoint()
+   * @see Dali::TextActor::SetGradientEndPoint()
    */
-  void SetGradientColor( const Vector4& color );
-
-  /**
-   * @copydoc Dali::TextActor::SetGradientStartPoint()
-   */
-  void SetGradientStartPoint( const Vector2& position );
-
-  /**
-   * @copydoc Dali::TextActor::SetGradientEndPoint()
-   */
-  void SetGradientEndPoint( const Vector2& position );
+  void SetGradient( const Vector4& color, const Vector2& startPoint, const Vector2& endPoint );
 
   /**
    * @copydoc Dali::TextActor::SetTextColor()

@@ -200,47 +200,47 @@ Vector4 TextActor::GetTextColor() const
   return GetImplementation(*this).GetTextColor();
 }
 
-void TextActor::SetSmoothEdge(const float smoothEdge)
+void TextActor::SetSmoothEdge( float smoothEdge )
 {
   GetImplementation(*this).SetSmoothEdge(smoothEdge);
 }
 
-void TextActor::SetOutline(const bool enable, const Vector4& color, const Vector2& thickness)
+void TextActor::SetOutline( bool enable, const Vector4& color, const Vector2& thickness )
 {
   GetImplementation(*this).SetOutline(enable, color, thickness);
 }
 
-void TextActor::SetGlow(const bool enable, const Vector4& color, const float intensity)
+void TextActor::SetGlow( bool enable, const Vector4& color, float intensity )
 {
   GetImplementation(*this).SetGlow(enable, color, intensity);
 }
 
-void TextActor::SetShadow(const bool enable, const Vector4& color, const Vector2& offset, const float size)
+void TextActor::SetShadow( bool enable, const Vector4& color, const Vector2& offset, float size )
 {
   GetImplementation(*this).SetShadow(enable, color, offset, size);
 }
 
-void TextActor::SetItalics( const bool enabled, const Degree& angle )
+void TextActor::SetItalics( bool enabled, Degree angle )
 {
   GetImplementation(*this).SetItalics( enabled ? Radian(angle) : Radian( 0.0f ) );
 }
 
-void TextActor::SetItalics( const bool enabled, const Radian& angle )
+void TextActor::SetItalics( bool enabled, Radian angle )
 {
   GetImplementation(*this).SetItalics( enabled ? angle : Radian( 0.0f ) );
 }
 
 bool TextActor::GetItalics() const
 {
-  return GetImplementation(*this).GetItalics() != Radian(0.0f);/* parasoft-suppress MISRA2004-13_3_DMC "Comparing with constant value" */
-}
-
-const Radian& TextActor::GetItalicsAngle() const
-{
   return GetImplementation(*this).GetItalics();
 }
 
-void TextActor::SetUnderline( const bool enable )
+Radian TextActor::GetItalicsAngle() const
+{
+  return GetImplementation(*this).GetItalicsAngle();
+}
+
+void TextActor::SetUnderline( bool enable )
 {
   GetImplementation(*this).SetUnderline( enable, 0.f, 0.f );
 }

@@ -24,8 +24,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/update/node-attachments/scene-graph-text-attachment.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/common/text-parameters.h>
-
 
 namespace Dali
 {
@@ -53,7 +51,7 @@ TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;
 
-  attachment->SetSmoothEdge(attachment->mSmoothing);      // adjust smoothedge for font weight
+  attachment->CalculateWeightedSmoothing( TextStyle::DEFAULT_FONT_WEIGHT, TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD );      // adjust smoothedge for font weight
 
   return attachment;
 }
@@ -61,22 +59,15 @@ TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const
 TextAttachment::TextAttachment( Stage& stage )
 : RenderableAttachment( stage ),
   mTextRequestHelper( *this ),
-  mUnderlineEnabled( false ),
+  mTextColor( NULL ),
   mIsLeftToRight(true),
   mTextChanged( true ),
   mFontChanged( true ),
   mUnderlineChanged( true ),
   mItalicsChanged( true ),
-  mItalicsEnabled( false ),
   mTextureIdSet( false ),
   mTextureId(0),
-  mSmoothing(Dali::TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD),
-  mItalicsAngle( Radian(0.0f) ),
-  mUnderlineThickness( 0.f ),
-  mUnderlinePosition( 0.f ),
-  mTextSize( Vector3::ZERO ),
-  mWeight( TextStyle::REGULAR ),
-  mTextColor( NULL )
+  mTextSize( Vector3::ZERO )
 {
 }
 
@@ -110,176 +101,17 @@ void TextAttachment::SetFont(Font& font)
   mFontChanged = true;
 }
 
-void TextAttachment::SetGradientColor( const Vector4& color )
-{
-  AllocateTextParameters();
-
-  if( mTextParameters->GetGradientColor() != color )
-  {
-    mTextParameters->SetGradientColor( color );
-
-    SetGradientColorMessage( mStage->GetUpdateInterface(), *mSceneObject, color );
-  }
-}
-
-const Vector4& TextAttachment::GetGradientColor() const
-{
-  return mTextParameters->GetGradientColor();
-}
-
-void TextAttachment::SetGradientStartPoint( const Vector2& position )
-{
-  AllocateTextParameters();
-
-  if( mTextParameters->GetGradientStartPoint() != position )
-  {
-    mTextParameters->SetGradientStartPoint( position );
-
-    SetGradientStartPointMessage( mStage->GetUpdateInterface(), *mSceneObject, position );
-  }
-}
-
-const Vector2& TextAttachment::GetGradientStartPoint() const
-{
-  return mTextParameters->GetGradientStartPoint();
-}
-
-void TextAttachment::SetGradientEndPoint( const Vector2& position )
-{
-  AllocateTextParameters();
-
-  if( mTextParameters->GetGradientEndPoint() != position )
-  {
-    mTextParameters->SetGradientEndPoint( position );
-
-    SetGradientEndPointMessage( mStage->GetUpdateInterface(), *mSceneObject, position );
-  }
-}
-
-const Vector2& TextAttachment::GetGradientEndPoint() const
-{
-    return mTextParameters->GetGradientEndPoint();
-}
-
-void TextAttachment::SetSmoothEdge( float smoothEdge )
-{
-  mSmoothing = smoothEdge;
-  float weightedSmoothing = smoothEdge;
-
-  // Adjust edge smoothing for font weight
-  const float BOLDER = 0.20f;
-  const float LIGHTER = 1.65f;
-  const float offset = 1.0f - ( ( 1.0f / Dali::TextStyle::EXTRABLACK ) * mWeight );
-  weightedSmoothing *= BOLDER + ( ( LIGHTER - BOLDER ) * offset );
-  weightedSmoothing = std::max( 0.0f, weightedSmoothing );
-  weightedSmoothing = std::min( 1.0f, weightedSmoothing );
-
-  SetSmoothEdgeMessage( mStage->GetUpdateInterface(), *mSceneObject, weightedSmoothing );
-}
-
-float TextAttachment::GetSmoothEdge() const
-{
-  return mSmoothing;
-}
-
-void TextAttachment::SetOutline( bool enable, const Vector4& color, const Vector2& thickness )
-{
-  AllocateTextParameters();
-
-  if (enable != mTextParameters->IsOutlineEnabled() || color != mTextParameters->GetOutlineColor() || thickness != mTextParameters->GetOutlineThickness() )
-  {
-    mTextParameters->SetOutline( enable, color, thickness );
-
-    SetOutlineMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, thickness );
-  }
-}
-
-bool TextAttachment::GetOutline() const
-{
-  return mTextParameters->IsOutlineEnabled();
-}
-
-void TextAttachment::GetOutlineParams( Vector4& color, Vector2& thickness ) const
-{
-  color = mTextParameters->GetOutlineColor();
-  thickness = mTextParameters->GetOutlineThickness();
-}
-
-void TextAttachment::SetGlow( bool enable, const Vector4& color, float intensity )
-{
-  AllocateTextParameters();
-
-  if (enable != mTextParameters->IsGlowEnabled() || color != mTextParameters->GetGlowColor() || fabsf(intensity - mTextParameters->GetGlowIntensity() ) > Math::MACHINE_EPSILON_1000)
-  {
-    mTextParameters->SetGlow( enable, color, intensity );
-
-    SetGlowMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, intensity );
-  }
-}
-
-bool TextAttachment::GetGlow() const
-{
-  return mTextParameters->IsGlowEnabled();
-}
-
-void TextAttachment::GetGlowParams( Vector4& color, float&  intensity) const
-{
-    color = mTextParameters->GetGlowColor();
-    intensity = mTextParameters->GetGlowIntensity();
-}
-
-void TextAttachment::SetShadow(bool enable, const Vector4& color, const Vector2& offset, const float size)
-{
-  AllocateTextParameters();
-
-  if (enable != mTextParameters->IsDropShadowEnabled() ||
-      color != mTextParameters->GetDropShadowColor() ||
-      offset != mTextParameters->GetDropShadowOffset() ||
-      fabsf(size - mTextParameters->GetDropShadowSize() ) > Math::MACHINE_EPSILON_1 )
-  {
-    mTextParameters->SetShadow( enable, color, offset, size );
-
-    const float unitPointSize( 64.0f );
-    const float unitsToPixels( mFont->GetUnitsToPixels());
-    const float fontPointSize( mFont->GetPointSize() );
-
-    float shadowSize( (size * 0.25f) / unitsToPixels );
-
-    Vector2 shadowOffset( offset );
-    Vector2 maxOffset( fontPointSize / 4.5f, fontPointSize / 4.5f );
-    shadowOffset = Min( shadowOffset, maxOffset );
-    shadowOffset = Max( shadowOffset, -maxOffset );
-    shadowOffset *= unitPointSize / fontPointSize;
-    SetDropShadowMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, shadowOffset, shadowSize );
-  }
-}
-
-bool TextAttachment::GetShadow() const
-{
-  return mTextParameters->IsDropShadowEnabled();
-}
-
-void TextAttachment::GetShadowParams( Vector4& color, Vector2& offset, float& size ) const
-{
-  color = mTextParameters->GetDropShadowColor();
-  offset = mTextParameters->GetDropShadowOffset();
-  size = mTextParameters->GetDropShadowSize();
-}
-
-void TextAttachment::SetTextColor(const Vector4& color)
+void TextAttachment::SetTextColor( const Vector4& color )
 {
   bool sendMessage( false );
 
-  Vector4 clampedColor = Clamp(color, 0.f, 1.f);
+  Vector4 clampedColor = Clamp( color, 0.f, 1.f );
 
   if( NULL == mTextColor )
   {
-    if( clampedColor != TextStyle::DEFAULT_TEXT_COLOR )
-    {
-      // A color (different from default) has been set, so allocate storage for the text color
-      mTextColor = new Vector4( clampedColor );
-      sendMessage = true;
-    }
+    // A color (different from default) has been set, so allocate storage for the text color
+    mTextColor = new Vector4( clampedColor );
+    sendMessage = true;
   }
   else
   {
@@ -313,79 +145,322 @@ Vector4 TextAttachment::GetTextColor() const
   return color;
 }
 
-void TextAttachment::SetItalics( const Radian& angle )
+void TextAttachment::ResetTextColor()
 {
-  if ( angle != mItalicsAngle )
+  if( NULL != mTextColor )
   {
-    mItalicsChanged = true;
-    mItalicsAngle = angle;
-  }
-  Radian radian0( 0.0f );
+    delete mTextColor;
+    mTextColor = NULL;
 
-  if( radian0 != mItalicsAngle )
-  {
-    mItalicsEnabled = true;
-  }
-  else
-  {
-    mItalicsEnabled = false;
+    SetTextColorMessage( mStage->GetUpdateInterface(), *mSceneObject, TextStyle::DEFAULT_TEXT_COLOR );
   }
 }
 
-const Radian& TextAttachment::GetItalics() const
+void TextAttachment::SetWeight( TextStyle::Weight weight )
 {
-  return mItalicsAngle;
+  if( mStyle.IsFontWeightDefault() ||
+      ( mStyle.GetWeight() != weight ) )
+  {
+    mStyle.SetWeight( weight );
+
+    CalculateWeightedSmoothing( weight, mStyle.GetSmoothEdge() );
+  }
+}
+
+TextStyle::Weight TextAttachment::GetWeight() const
+{
+  return mStyle.GetWeight();
+}
+
+void TextAttachment::ResetWeight()
+{
+  if( !mStyle.IsFontWeightDefault() )
+  {
+    mStyle.Reset( TextStyle::WEIGHT );
+
+    CalculateWeightedSmoothing( TextStyle::DEFAULT_FONT_WEIGHT, mStyle.GetSmoothEdge() );
+  }
+}
+
+void TextAttachment::SetSmoothEdge( float smoothEdge )
+{
+  if( mStyle.IsSmoothEdgeDefault() ||
+      ( fabsf( smoothEdge - mStyle.GetSmoothEdge() ) > Math::MACHINE_EPSILON_1000 ) )
+  {
+    mStyle.SetSmoothEdge( smoothEdge );
+    CalculateWeightedSmoothing( mStyle.GetWeight(), smoothEdge );
+  }
+}
+
+float TextAttachment::GetSmoothEdge() const
+{
+  return mStyle.GetSmoothEdge();
+}
+
+void TextAttachment::ResetSmoothEdge()
+{
+  if( !mStyle.IsSmoothEdgeDefault() )
+  {
+    mStyle.Reset( TextStyle::SMOOTH );
+
+    CalculateWeightedSmoothing( mStyle.GetWeight(), TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD );
+  }
+}
+
+void TextAttachment::SetItalics( Radian angle )
+{
+  if( mStyle.IsItalicsDefault() ||
+      ( Radian( mStyle.GetItalicsAngle() ) != angle ) )
+  {
+    mItalicsChanged = true;
+
+    const Radian radian0( 0.0f );
+    mStyle.SetItalics( ( radian0 != angle ), Degree( angle ) );
+  }
+}
+
+bool TextAttachment::GetItalics() const
+{
+  return mStyle.IsItalicsEnabled();
+}
+
+Radian TextAttachment::GetItalicsAngle() const
+{
+  return Radian( mStyle.GetItalicsAngle() );
+}
+
+void TextAttachment::ResetItalics()
+{
+  if( !mStyle.IsItalicsDefault() )
+  {
+    mStyle.Reset( TextStyle::ITALICS );
+
+    mItalicsChanged = true;
+  }
 }
 
 void TextAttachment::SetUnderline( bool enable, float thickness, float position )
 {
-  if ( enable != mUnderlineEnabled )
+  if( mStyle.IsUnderlineDefault() ||
+      ( mStyle.IsUnderlineEnabled() != enable ) ||
+      ( fabsf( mStyle.GetUnderlineThickness() - thickness ) > Math::MACHINE_EPSILON_1000 ) ||
+      ( fabsf( mStyle.GetUnderlinePosition() - position ) > Math::MACHINE_EPSILON_1000 ) )
   {
-    mUnderlineEnabled = enable;
     mUnderlineChanged = true;
-  }
 
-  if( mUnderlineEnabled )
-  {
-    if( fabsf( thickness - mUnderlineThickness ) > Math::MACHINE_EPSILON_0 )
-    {
-      mUnderlineThickness = thickness;
-      mUnderlineChanged = true;
-    }
-
-    if( fabsf( position - mUnderlinePosition ) > Math::MACHINE_EPSILON_0 )
-    {
-      mUnderlinePosition = position;
-      mUnderlineChanged = true;
-    }
+    mStyle.SetUnderline( enable, thickness, position );
   }
 }
 
 bool TextAttachment::GetUnderline() const
 {
-  return mUnderlineEnabled;
+  return mStyle.IsUnderlineEnabled();
 }
 
 float TextAttachment::GetUnderlineThickness() const
 {
-  return mUnderlineThickness;
+  return mStyle.GetUnderlineThickness();
 }
 
 float TextAttachment::GetUnderlinePosition() const
 {
-  return mUnderlinePosition;
+  return mStyle.GetUnderlinePosition();
 }
 
-void TextAttachment::SetWeight( TextStyle::Weight weight )
+void TextAttachment::ResetUnderline()
 {
-  mWeight = weight;
+  if( !mStyle.IsUnderlineDefault()  )
+  {
+    mStyle.Reset( TextStyle::UNDERLINE );
 
-  SetSmoothEdge(mSmoothing);
+    mUnderlineChanged = true;
+  }
 }
 
-TextStyle::Weight TextAttachment::GetWeight() const
+void TextAttachment::SetOutline( bool enable, const Vector4& color, const Vector2& thickness )
 {
-  return mWeight;
+  if( mStyle.IsOutlineDefault() ||
+      ( mStyle.IsOutlineEnabled() != enable ) ||
+      ( mStyle.GetOutlineColor() != color ) ||
+      ( mStyle.GetOutlineThickness() != thickness ) )
+  {
+    mStyle.SetOutline( enable, color, thickness );
+
+    SetOutlineMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, thickness );
+  }
+}
+
+bool TextAttachment::GetOutline() const
+{
+  return mStyle.IsOutlineEnabled();
+}
+
+void TextAttachment::GetOutlineParams( Vector4& color, Vector2& thickness ) const
+{
+  color = mStyle.GetOutlineColor();
+  thickness = mStyle.GetOutlineThickness();
+}
+
+void TextAttachment::ResetOutline()
+{
+  if( !mStyle.IsOutlineDefault() )
+  {
+    mStyle.Reset( TextStyle::OUTLINE );
+
+    SetOutlineMessage( mStage->GetUpdateInterface(), *mSceneObject, false, TextStyle::DEFAULT_OUTLINE_COLOR, TextStyle::DEFAULT_OUTLINE_THICKNESS );
+  }
+}
+
+void TextAttachment::SetGlow( bool enable, const Vector4& color, float intensity )
+{
+  if( mStyle.IsGlowDefault() ||
+      ( mStyle.IsGlowEnabled() != enable ) ||
+      ( mStyle.GetGlowColor() != color ) ||
+      ( fabsf( mStyle.GetGlowIntensity() - intensity ) > Math::MACHINE_EPSILON_1000 ) )
+  {
+    mStyle.SetGlow( enable, color, intensity );
+
+    SetGlowMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, intensity );
+  }
+}
+
+bool TextAttachment::GetGlow() const
+{
+  return mStyle.IsGlowEnabled();
+}
+
+void TextAttachment::GetGlowParams( Vector4& color, float&  intensity) const
+{
+    color = mStyle.GetGlowColor();
+    intensity = mStyle.GetGlowIntensity();
+}
+
+void TextAttachment::ResetGlow()
+{
+  if( !mStyle.IsGlowDefault() )
+  {
+    mStyle.Reset( TextStyle::GLOW );
+
+    SetGlowMessage( mStage->GetUpdateInterface(), *mSceneObject, false, TextStyle::DEFAULT_GLOW_COLOR, TextStyle::DEFAULT_GLOW_INTENSITY );
+  }
+}
+
+void TextAttachment::SetShadow( bool enable, const Vector4& color, const Vector2& offset, float size )
+{
+  if( mStyle.IsShadowDefault() ||
+      ( mStyle.IsShadowEnabled() != enable ) ||
+      ( mStyle.GetShadowColor() != color ) ||
+      ( mStyle.GetShadowOffset() != offset ) ||
+      ( fabsf( mStyle.GetShadowSize() - size ) > Math::MACHINE_EPSILON_1000 ) )
+  {
+    mStyle.SetShadow( enable, color, offset, size );
+
+    const float unitPointSize( 64.0f );
+    const float unitsToPixels( mFont->GetUnitsToPixels());
+    const float fontPointSize( mFont->GetPointSize() );
+
+    float shadowSize( (size * 0.25f) / unitsToPixels );
+
+    Vector2 shadowOffset( offset );
+    Vector2 maxOffset( fontPointSize / 4.5f, fontPointSize / 4.5f );
+    shadowOffset = Min( shadowOffset, maxOffset );
+    shadowOffset = Max( shadowOffset, -maxOffset );
+    shadowOffset *= unitPointSize / fontPointSize;
+    SetDropShadowMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, shadowOffset, shadowSize );
+  }
+}
+
+bool TextAttachment::GetShadow() const
+{
+  return mStyle.IsShadowEnabled();
+}
+
+void TextAttachment::GetShadowParams( Vector4& color, Vector2& offset, float& size ) const
+{
+  color = mStyle.GetShadowColor();
+  offset = mStyle.GetShadowOffset();
+  size = mStyle.GetShadowSize();
+}
+
+void TextAttachment::ResetShadow()
+{
+  if( !mStyle.IsShadowDefault() )
+  {
+    mStyle.Reset( TextStyle::SHADOW );
+
+    const float unitPointSize( 64.0f );
+    const float unitsToPixels( mFont->GetUnitsToPixels());
+    const float fontPointSize( mFont->GetPointSize() );
+
+    float shadowSize( ( TextStyle::DEFAULT_SHADOW_SIZE * 0.25f ) / unitsToPixels );
+
+    Vector2 shadowOffset( TextStyle::DEFAULT_SHADOW_OFFSET );
+    Vector2 maxOffset( fontPointSize / 4.5f, fontPointSize / 4.5f );
+    shadowOffset = Min( shadowOffset, maxOffset );
+    shadowOffset = Max( shadowOffset, -maxOffset );
+    shadowOffset *= unitPointSize / fontPointSize;
+    SetDropShadowMessage( mStage->GetUpdateInterface(), *mSceneObject, false, TextStyle::DEFAULT_SHADOW_COLOR, shadowOffset, shadowSize );
+  }
+}
+
+void TextAttachment::SetGradient( const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
+{
+  if( mStyle.IsGradientDefault() ||
+      ( mStyle.GetGradientColor() != color ) ||
+      ( mStyle.GetGradientStartPoint() != startPoint ) ||
+      ( mStyle.GetGradientEndPoint() != endPoint ) )
+  {
+    mStyle.SetGradient( true, color, startPoint, endPoint );
+    SetGradientMessage( mStage->GetUpdateInterface(), *mSceneObject, color, startPoint, endPoint );
+  }
+}
+
+const Vector4& TextAttachment::GetGradientColor() const
+{
+  return mStyle.GetGradientColor();
+}
+
+const Vector2& TextAttachment::GetGradientStartPoint() const
+{
+  return mStyle.GetGradientStartPoint();
+}
+
+const Vector2& TextAttachment::GetGradientEndPoint() const
+{
+  return mStyle.GetGradientEndPoint();
+}
+
+void TextAttachment::ResetGradient()
+{
+  if( !mStyle.IsGradientDefault() )
+  {
+    mStyle.Reset( TextStyle::GRADIENT );
+
+    SetGradientMessage( mStage->GetUpdateInterface(), *mSceneObject, TextStyle::DEFAULT_GRADIENT_COLOR, TextStyle::DEFAULT_GRADIENT_START_POINT, TextStyle::DEFAULT_GRADIENT_END_POINT );
+  }
+}
+
+void TextAttachment::GetTextStyle( TextStyle& style ) const
+{
+  style.Copy( mStyle );
+
+  // Font name, font style, font point size and color are not store inside the mStyle, so they need to be copied after.
+
+  if( NULL != mTextColor )
+  {
+    style.SetTextColor( *mTextColor );
+  }
+
+  if( !mFont->IsDefaultSystemFont() )
+  {
+    style.SetFontName( mFont->GetName() );
+    style.SetFontStyle( mFont->GetStyle() );
+  }
+
+  if( !mFont->IsDefaultSystemSize() )
+  {
+    style.SetFontPointSize( PointSize( mFont->GetPointSize() ) );
+  }
 }
 
 Vector3 TextAttachment::MeasureText() const
@@ -408,7 +483,13 @@ void TextAttachment::TextChanged()
     mTextChanged = true;
   }
 
-  TextFormat format( mUnderlineEnabled, mIsLeftToRight, mItalicsEnabled, mItalicsAngle, mFont->GetPointSize(), mUnderlineThickness, mUnderlinePosition );
+  TextFormat format( mStyle.IsUnderlineEnabled(),
+                     mIsLeftToRight,
+                     mStyle.IsItalicsEnabled(),
+                     Radian( mStyle.GetItalicsAngle() ),
+                     mFont->GetPointSize(),
+                     mStyle.GetUnderlineThickness(),
+                     mStyle.GetUnderlinePosition() );
 
   if ( mTextChanged && mFontChanged )
   {
@@ -441,6 +522,21 @@ bool TextAttachment::IsTextLoaded()
   }
 
   return loaded;
+}
+
+void TextAttachment::CalculateWeightedSmoothing( TextStyle::Weight weight, float smoothEdge )
+{
+  float weightedSmoothing = smoothEdge;
+
+  // Adjust edge smoothing for font weight
+  const float BOLDER = 0.20f;
+  const float LIGHTER = 1.65f;
+  const float offset = 1.0f - ( ( 1.0f / Dali::TextStyle::EXTRABLACK ) * weight );
+  weightedSmoothing *= BOLDER + ( ( LIGHTER - BOLDER ) * offset );
+  weightedSmoothing = std::max( 0.0f, weightedSmoothing );
+  weightedSmoothing = std::min( 1.0f, weightedSmoothing );
+
+  SetSmoothEdgeMessage( mStage->GetUpdateInterface(), *mSceneObject, weightedSmoothing );
 }
 
 void TextAttachment::TextureResized( const TextureIdList& oldTextureIds, unsigned int newTextureId )
@@ -488,14 +584,6 @@ bool TextAttachment::IsTextModified()
   return ( mTextChanged || mFontChanged || mUnderlineChanged || mItalicsChanged );
 }
 
-void TextAttachment::AllocateTextParameters()
-{
-  if( !mTextParameters )
-  {
-    mTextParameters = new TextParameters;
-  }
-}
-
 void TextAttachment::OnStageConnection2()
 {
   // do nothing
@@ -536,7 +624,6 @@ void TextAttachment::SetTextChanges()
     }
   }
 }
-
 
 } // namespace Internal
 

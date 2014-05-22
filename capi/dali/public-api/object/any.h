@@ -59,7 +59,7 @@ public:
    */
   ~Any();
 
-/**
+  /**
    * @brief Pass Assert message
    *
    * @param assertMessage Assert message to report
@@ -203,7 +203,7 @@ public:
    *
    * @return true if the container is empty, else false.
    */
-  bool Empty()
+  bool Empty() const
   {
     return ( NULL == mContainer ) ? true : false;
   }

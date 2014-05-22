@@ -199,24 +199,10 @@ void TextRenderer::SetFontSize( float pixelSize )
   mPixelSize = pixelSize;
 }
 
-void TextRenderer::SetGradientColor( const Vector4& color )
+void TextRenderer::SetGradient( const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
 {
   AllocateTextParameters();
-  mTextParameters->SetGradientColor( color );
-}
-
-void TextRenderer::SetGradientStartPoint( const Vector2& position )
-{
-  AllocateTextParameters();
-  mTextParameters->SetGradientStartPoint( position );
-  mTextParameters->SetGradientEnabled( mTextParameters->GetGradientEndPoint() != mTextParameters->GetGradientStartPoint() );
-}
-
-void TextRenderer::SetGradientEndPoint( const Vector2& position )
-{
-  AllocateTextParameters();
-  mTextParameters->SetGradientEndPoint( position );
-  mTextParameters->SetGradientEnabled( mTextParameters->GetGradientEndPoint() != mTextParameters->GetGradientStartPoint() );
+  mTextParameters->SetGradient( color, startPoint, endPoint );
 }
 
 void TextRenderer::SetTextColor( const Vector4& color )
