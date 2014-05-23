@@ -24,6 +24,38 @@
 // Temp include
 #include <dali/public-api/object/any.h>
 
+namespace
+{
+struct MyStruct
+{
+  MyStruct()
+  : mFloatValue( 0.f ),
+    mIntValue( 0 )
+  {}
+
+  MyStruct( float fValue, int iValue )
+  : mFloatValue( fValue ),
+    mIntValue( iValue )
+  {}
+
+  MyStruct( const MyStruct& myStruct )
+  : mFloatValue( myStruct.mFloatValue ),
+    mIntValue( myStruct.mIntValue )
+  {}
+
+  MyStruct& operator=( const MyStruct& myStruct )
+  {
+    mFloatValue = myStruct.mFloatValue;
+    mIntValue = myStruct.mIntValue;
+
+    return *this;
+  }
+
+  float mFloatValue;
+  int mIntValue;
+};
+}
+
 using namespace Dali;
 
 void utc_dali_any_startup(void)
@@ -194,6 +226,50 @@ int UtcDaliAnyGet(void)
   fValue = 0.f;
   value1.Get( fValue );
   DALI_TEST_EQUALS( fValue, 5.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  class MyClass
+  {
+  public:
+    MyClass( float fValue, int iValue )
+    : mAny( MyStruct( fValue, iValue ) )
+    {
+    }
+
+    const MyStruct& Get() const
+    {
+      return AnyCastReference<MyStruct>( mAny );
+    }
+
+    MyStruct* GetPointer()
+    {
+      return AnyCast<MyStruct>( &mAny );
+    }
+
+    const MyStruct* GetPointer() const
+    {
+      return AnyCast<MyStruct>( &mAny );
+    }
+
+  private:
+    Dali::Any mAny;
+  };
+
+  MyClass myClass( 3.25f, 3 );
+
+  MyStruct myStruct1 = myClass.Get();
+  const MyStruct& myStruct2 = myClass.Get();
+  MyStruct* myStruct3 = myClass.GetPointer();
+  const MyStruct* myStruct4 = myClass.GetPointer();
+
+  DALI_TEST_EQUALS( myStruct1.mFloatValue, 3.25f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( myStruct2.mFloatValue, 3.25f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( myStruct3->mFloatValue, 3.25f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( myStruct4->mFloatValue, 3.25f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( myStruct1.mIntValue, 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( myStruct2.mIntValue, 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( myStruct3->mIntValue, 3, TEST_LOCATION );
+  DALI_TEST_EQUALS( myStruct4->mIntValue, 3, TEST_LOCATION );
+
   END_TEST;
 }
 

@@ -143,7 +143,7 @@ public:
    * @param type destination of type Type to write to
    */
   template<typename Type>
-  void Get( Type& type )
+  void Get( Type& type ) const
   {
     type = Get<Type>();
   }
@@ -185,6 +185,26 @@ public:
    */
   template<typename Type>
   Type* GetPointer()
+  {
+    if( NULL == mContainer )
+    {
+      return NULL;
+    }
+     // Check if the value has the same value than the Any type.
+    if( mContainer->GetType() != typeid( Type ) )
+    {
+      AssertAlways( "Any::GetPointer(). Trying to retrieve a pointer to a value of a different type than the template one." );
+    }
+    return static_cast< AnyContainerImpl< Type >* >( mContainer )->GetPointerToValue();
+  }
+
+  /**
+   * @brief Return pointer of Type to the value stored
+   *
+   * @return pointer to the value or NULL if no value is contained
+   */
+  template<typename Type>
+  const Type* GetPointer() const
   {
     if( NULL == mContainer )
     {
@@ -339,6 +359,16 @@ public:
       return static_cast< Type* >( &mValue );
     }
 
+    /**
+     * @brief Get a pointer to the value held
+     *
+     * @return pointer to the value of type Type
+     */
+    const Type* GetPointerToValue() const
+    {
+      return static_cast< const Type* >( &mValue );
+    }
+
     private:
       Type mValue;
   };
@@ -395,6 +425,30 @@ template<typename Type>inline Type AnyCast( Any& any )
  * @return Type value of type Type
  */
 template<typename Type>inline Type AnyCast( const Any& any )
+{
+  return any.Get<Type>();
+}
+
+/**
+ * @brief Extract a reference to the held value of type Type from an Any object from a reference to that Any object
+ *
+ * @param any reference to an Any object
+ *
+ * @return A reference to the Type value of type Type
+ */
+template<typename Type>inline Type& AnyCastReference( Any& any )
+{
+  return any.Get<Type>();
+}
+
+/**
+ * @brief Extract a const reference to the held value of type Type from an Any object from a const reference to that Any object
+ *
+ * @param any reference to an Any object
+ *
+ * @return A const reference to the Type value of type Type
+ */
+template<typename Type>inline const Type& AnyCastReference( const Any& any )
 {
   return any.Get<Type>();
 }
