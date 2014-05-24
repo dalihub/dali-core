@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    0.9.17
+Version:    0.9.18
 Release:    1
 Group:      System/Libraries
 License:    Flora
