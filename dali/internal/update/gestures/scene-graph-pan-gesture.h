@@ -167,7 +167,7 @@ public:
   typedef PanInfoHistory::const_iterator PanInfoHistoryConstIter;
 
 private:
-  static const unsigned int PAN_GESTURE_HISTORY = 4u;
+  static const unsigned int PAN_GESTURE_HISTORY = 20u;
 
 public:
 
