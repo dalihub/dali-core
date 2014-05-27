@@ -17,7 +17,7 @@
 
 m4_define([dali_version],[0.1.1])
 AC_INIT([dali], [dali_version])
-AM_INIT_AUTOMAKE([-Wall -Wfloat-equal foreign])
+AM_INIT_AUTOMAKE([-Wall foreign])
 
 AC_PROG_CXX
 AC_PROG_LIBTOOL
@@ -29,8 +29,6 @@ LT_INIT
 
 DALI_VERSION=dali_version
 AC_SUBST(DALI_VERSION)
-
-#PKG_CHECK_MODULES(OPENGLES20, opengl-es-20)
 
 DALI_CFLAGS=-DPLATFORM_SLP
 
@@ -98,9 +96,13 @@ else
   dataReadOnlyDir=${prefix}/share/dali/
 fi
 
+DALI_CFLAGS="$DALI_CFLAGS -I${includedir}"
+DALI_LDFLAGS="-L${libdir}"
+
 AC_SUBST(dataReadWriteDir)
 AC_SUBST(dataReadOnlyDir)
 AC_SUBST(DALI_CFLAGS)
+AC_SUBST(DALI_LDFLAGS)
 
 # Specify the include directory for development headers
 devincludepath=${includedir}
