@@ -70,7 +70,7 @@ void PanGesture::RemoveOldHistory(PanInfoHistory& panHistory, uint currentTime, 
     {
       break;
     }
-    panHistory.erase(iter);
+    iter = panHistory.erase(iter);
     endIter = panHistory.end();
   }
 }
