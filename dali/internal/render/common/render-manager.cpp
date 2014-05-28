@@ -101,7 +101,8 @@ struct RenderManager::Impl
     defaultSurfaceRect(),
     rendererContainer(),
     materials(),
-    renderersAdded( false )
+    renderersAdded( false ),
+    firstRenderCompleted( false )
   {
   }
 
@@ -168,6 +169,8 @@ struct RenderManager::Impl
   bool                                renderersAdded;
 
   RenderTrackerContainer              mRenderTrackers;     ///< List of render trackers
+
+  bool                                firstRenderCompleted; ///< False until the first render is done
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction, ResourcePostProcessList& resourcePostProcessQ )
@@ -349,8 +352,8 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
-  //No need to make any gl calls if we don't have any renderers to render during startup.
-  if(mImpl->renderersAdded)
+  // No need to make any gl calls if we've done 1st glClear & don't have any renderers to render during startup.
+  if( !mImpl->firstRenderCompleted || mImpl->renderersAdded )
   {
     // switch rendering to adaptor provided (default) buffer
     mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
@@ -402,6 +405,8 @@ bool RenderManager::Render( Integration::RenderStatus& status )
     mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 
     mImpl->UpdateTrackers();
+
+    mImpl->firstRenderCompleted = true;
   }
 
   PERF_MONITOR_END(PerformanceMonitor::DRAW_NODES);
