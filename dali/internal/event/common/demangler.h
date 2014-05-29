@@ -17,9 +17,11 @@
 // limitations under the License.
 //
 
-// INTERNAL INCLUDES
-#include <vector>
+// EXTERNAL INCLUDES
 #include <string>
+
+// INTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

@@ -19,9 +19,9 @@
 
 // EXTERNAL INCLUDES
 #include <stdint.h>
-#include <vector>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/image-attributes.h>
 #include <dali/integration-api/resource-declarations.h>
 
