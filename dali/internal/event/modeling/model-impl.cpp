@@ -29,6 +29,7 @@
 #include <dali/internal/event/modeling/model-logger.h>
 #include <dali/internal/event/modeling/model-data-impl.h>
 #include <dali/public-api/modeling/model-animation-map.h>
+#include <dali/public-api/object/type-registry.h>
 
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/resources/resource-manager.h>
@@ -42,6 +43,11 @@ using Integration::PlatformAbstraction;
 
 namespace Internal
 {
+
+namespace
+{
+TypeRegistration mType( typeid( Dali::Model ), typeid( Dali::BaseHandle ), NULL );
+} // unnamed namespace
 
 using Dali::Vector4;
 

@@ -18,6 +18,7 @@
 #include <dali/internal/event/images/bitmap-image-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/images/bitmap-external.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -29,6 +30,11 @@ namespace Dali
 {
 namespace Internal
 {
+
+namespace
+{
+TypeRegistration mType( typeid( Dali::BitmapImage ), typeid( Dali::Image ), NULL );
+} // unnamed namespace
 
 BitmapImagePtr BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol )
 {

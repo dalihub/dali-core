@@ -18,6 +18,7 @@
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/resources/resource-client.h>
 
@@ -26,6 +27,11 @@ namespace Dali
 
 namespace Internal
 {
+
+namespace
+{
+TypeRegistration mType( typeid( Dali::FrameBufferImage ), typeid( Dali::Image ), NULL );
+} // unnamed namespace
 
 FrameBufferImage::~FrameBufferImage()
 {

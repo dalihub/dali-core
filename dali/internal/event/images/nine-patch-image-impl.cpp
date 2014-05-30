@@ -18,6 +18,7 @@
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/images/bitmap-external.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -128,6 +129,10 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+TypeRegistration mType( typeid( Dali::NinePatchImage ), typeid( Dali::Image ), NULL );
+} // unnamed namespace
 
 NinePatchImagePtr NinePatchImage::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
