@@ -84,8 +84,8 @@ void PanGesture::SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut)
       gestureOut.screen.position *= 0.5f;
       gestureOut.local.position *= 0.5f;
       // make current displacement relative to previous update-frame now.
-      gestureOut.screen.displacement = mLastEventGesture.screen.position - gestureOut.screen.position;
-      gestureOut.local.displacement = mLastEventGesture.local.position - gestureOut.local.position;
+      gestureOut.screen.displacement = gestureOut.screen.position - mLastEventGesture.screen.position;
+      gestureOut.local.displacement = gestureOut.local.position - mLastEventGesture.local.position;
     }
   }
 }
