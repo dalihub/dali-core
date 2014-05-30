@@ -234,6 +234,11 @@ void GestureEventProcessor::SetPanGesturePredictionMode(int mode)
   mPanGestureProcessor.SetPredictionMode(mode);
 }
 
+void GestureEventProcessor::SetPanGesturePredictionAmount( float amount )
+{
+  mPanGestureProcessor.SetPredictionAmount(amount);
+}
+
 } // namespace Internal
 
 } // namespace Dali

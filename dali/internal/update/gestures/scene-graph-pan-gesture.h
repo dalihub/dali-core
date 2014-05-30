@@ -256,7 +256,14 @@ public:
    *
    * @param[in] mode The prediction mode
    */
-  void SetPredictionMode(PredictionMode mode) { mPredictionMode = mode; }
+  void SetPredictionMode(PredictionMode mode);
+
+  /**
+   * @brief Sets the prediction amount of the pan gesture
+   *
+   * @param[in] amount The prediction amount, 0.0f being next vsync and each 1.0f on top is another vsync ahead, can be divisions of (0.5f)
+   */
+  void SetPredictionAmount(float amount);
 
   /**
    * Called to provide pan-gesture profiling information.
@@ -299,6 +306,7 @@ private:
   bool mInGesture;              ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled
 
   PredictionMode mPredictionMode;  ///< The pan gesture prediction mode
+  float          mPredictionAmount; ///< how far into future to predict. 0.0f is next vsync since no point being less than that, adding 1.0f will predict another vsync in advance
   PanGestureProfiling* mProfiling; ///< NULL unless pan-gesture profiling information is required.
 };
 

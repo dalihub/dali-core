@@ -125,6 +125,13 @@ public: // To be called by GestureEventProcessor
    */
   void SetPredictionMode(int mode);
 
+  /**
+   * @brief Sets the prediction amount of the pan gesture
+   *
+   * @param[in] amount The prediction amount, 0.0f being next vsync and each 1.0f on top is another vsync ahead, can be divisions of (0.5f)
+   */
+  void SetPredictionAmount(float amount);
+
 private:
 
   // Undefined

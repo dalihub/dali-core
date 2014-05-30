@@ -110,6 +110,12 @@ void SetPanGesturePredictionMode( int mode )
   eventProcessor.SetPanGesturePredictionMode(mode);
 }
 
+void SetPanGesturePredictionAmount(float amount)
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGesturePredictionAmount(amount);
+}
+
 namespace Profiling
 {
 

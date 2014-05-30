@@ -33,9 +33,10 @@ namespace SceneGraph
 namespace
 {
 const int MAX_GESTURE_AGE = 50; ///< maximum age of a gesture before disallowing its use in algorithm
+const float DEFAULT_PREDICTION_INTERPOLATION = 0.0f; ///< how much to interpolate pan position and displacement from last vsync time
 } // unnamed namespace
 
-const PanGesture::PredictionMode PanGesture::DEFAULT_PREDICTION_MODE = PanGesture::AVERAGE;
+const PanGesture::PredictionMode PanGesture::DEFAULT_PREDICTION_MODE = PanGesture::PREDICTION_2;
 const int PanGesture::NUM_PREDICTION_MODES = PanGesture::PREDICTION_2 + 1;
 
 PanGesture* PanGesture::New()
@@ -229,13 +230,14 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
   }
   // gestureOut's position is currently equal to the last event's position and its displacement is equal to last frame's total displacement
   // add interpolated distance and position to current
-  float interpolationTime = (float)((int)lastVSyncTime - (int)gestureOut.time);
+  unsigned int timeAdvance = ((nextVSyncTime - lastVSyncTime) * mPredictionAmount);
+  unsigned int interpolationTime = (lastVSyncTime + timeAdvance) - gestureOut.time;
   // work out interpolated velocity
   gestureOut.screen.displacement = (gestureOut.screen.velocity * interpolationTime);
   gestureOut.local.displacement = (gestureOut.local.velocity * interpolationTime);
   gestureOut.screen.position += gestureOut.screen.displacement;
   gestureOut.local.position += gestureOut.local.displacement;
-  gestureOut.time += (lastVSyncTime - gestureOut.time);
+  gestureOut.time += interpolationTime;
 }
 
 bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
@@ -405,6 +407,16 @@ const GesturePropertyVector2& PanGesture::GetLocalDisplacementProperty() const
   return mLocalDisplacement;
 }
 
+void PanGesture::SetPredictionMode(PredictionMode mode)
+{
+  mPredictionMode = mode;
+}
+
+void PanGesture::SetPredictionAmount(float amount)
+{
+  mPredictionAmount = amount;
+}
+
 void PanGesture::EnableProfiling()
 {
   if( !mProfiling )
@@ -428,6 +440,7 @@ PanGesture::PanGesture()
   mReadPosition( 0 ),
   mInGesture( false ),
   mPredictionMode(DEFAULT_PREDICTION_MODE),
+  mPredictionAmount(DEFAULT_PREDICTION_INTERPOLATION),
   mProfiling( NULL )
 {
 }

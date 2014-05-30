@@ -434,6 +434,11 @@ void PanGestureProcessor::SetPredictionMode(int mode)
   mSceneObject->SetPredictionMode(modeEnum);
 }
 
+void PanGestureProcessor::SetPredictionAmount(float amount)
+{
+  mSceneObject->SetPredictionAmount(amount);
+}
+
 void PanGestureProcessor::UpdateDetection()
 {
   DALI_ASSERT_DEBUG(!mGestureDetectors.empty());
