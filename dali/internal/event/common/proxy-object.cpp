@@ -907,31 +907,35 @@ TypeInfo* ProxyObject::GetTypeInfo() const
 
 void ProxyObject::RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph )
 {
-  if( isInScenegraph )
+  // guard against constraint sending messages during core destruction
+  if ( Stage::IsInstalled() )
   {
-    ActiveConstraintBase& baseConstraint = GetImplementation( constraint );
-    baseConstraint.BeginRemove();
-    if ( baseConstraint.IsRemoving() )
+    if( isInScenegraph )
     {
-      if( !mRemovedConstraints )
+      ActiveConstraintBase& baseConstraint = GetImplementation( constraint );
+      baseConstraint.BeginRemove();
+      if ( baseConstraint.IsRemoving() )
       {
-        mRemovedConstraints = new ActiveConstraintContainer;
+        if( !mRemovedConstraints )
+        {
+          mRemovedConstraints = new ActiveConstraintContainer;
+        }
+        // Wait for remove animation before destroying active-constraints
+        mRemovedConstraints->push_back( constraint );
       }
-      // Wait for remove animation before destroying active-constraints
-      mRemovedConstraints->push_back( constraint );
     }
-  }
-  else if( mRemovedConstraints )
-  {
-    delete mRemovedConstraints;
-    mRemovedConstraints = NULL;
+    else if( mRemovedConstraints )
+    {
+      delete mRemovedConstraints;
+      mRemovedConstraints = NULL;
+    }
   }
 }
 
-
 void ProxyObject::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
 {
-  if( mConstraints )
+  // guard against constraint sending messages during core destruction
+  if( mConstraints && Stage::IsInstalled() )
   {
     bool isInSceneGraph( NULL != GetSceneObject() );
     if( isInSceneGraph )
@@ -946,14 +950,12 @@ void ProxyObject::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
       mConstraints->erase( it );
     }
   }
-
 }
-
-
 
 void ProxyObject::RemoveConstraints( unsigned int tag )
 {
-  if( mConstraints )
+  // guard against constraint sending messages during core destruction
+  if( mConstraints && Stage::IsInstalled() )
   {
     bool isInSceneGraph( NULL != GetSceneObject() );
     if( isInSceneGraph )
@@ -980,7 +982,8 @@ void ProxyObject::RemoveConstraints( unsigned int tag )
 
 void ProxyObject::RemoveConstraints()
 {
-  if( mConstraints )
+  // guard against constraint sending messages during core destruction
+  if( mConstraints && Stage::IsInstalled() )
   {
     // If we have nothing in the scene-graph, just clear constraint containers
     const SceneGraph::PropertyOwner* propertyOwner = GetSceneObject();
