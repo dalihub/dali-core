@@ -59,7 +59,7 @@ void PanGesture::AddGesture( const Dali::PanGesture& gesture )
   mWritePosition %= PAN_GESTURE_HISTORY;
 }
 
-void PanGesture::RemoveOldHistory(PanInfoHistory& panHistory, uint currentTime, uint maxAge, uint minEvents)
+void PanGesture::RemoveOldHistory(PanInfoHistory& panHistory, unsigned int currentTime, unsigned int maxAge, unsigned int minEvents)
 {
   PanInfoHistoryConstIter endIter = panHistory.end();
   PanInfoHistoryIter iter = panHistory.begin();
@@ -180,11 +180,14 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
   PanInfoHistoryIter iter = panHistory.begin();
   Vector2 screenVelocity = gestureOut.screen.velocity;
   Vector2 localVelocity = gestureOut.local.velocity;
+  Vector2 screenDisplacement = gestureOut.screen.displacement;
+  Vector2 localDisplacement = gestureOut.local.displacement;
 
   bool havePreviousAcceleration = false;
   bool previousVelocity = false;
   float previousAccel = 0.0f;
   unsigned int lastTime(0);
+  unsigned int interpolationTime = (lastVSyncTime + mPredictionAmount) - gestureOut.time;
   while( iter != endIter )
   {
     PanInfo currentGesture = *iter;
@@ -206,11 +209,11 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
     {
       acceleration = velDiff / time;
     }
-    float interpolationTime = (float)((int)lastVSyncTime - (int)currentGesture.time);
     float newVelMag = 0.0f;
+    int currentInterpolation = (lastVSyncTime + mPredictionAmount) - currentGesture.time;
     if( !havePreviousAcceleration )
     {
-      newVelMag =  velMag + (acceleration * interpolationTime);
+      newVelMag =  velMag + (acceleration * currentInterpolation);
       havePreviousAcceleration = true;
     }
     else
@@ -224,6 +227,8 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
     }
     gestureOut.screen.velocity = currentGesture.screen.velocity * velMod;
     gestureOut.local.velocity = currentGesture.local.velocity * velMod;
+    screenDisplacement = gestureOut.screen.displacement + (gestureOut.screen.velocity * interpolationTime);
+    localDisplacement = gestureOut.local.displacement + (gestureOut.local.velocity * interpolationTime);
     screenVelocity = currentGesture.screen.velocity;
     localVelocity = currentGesture.local.velocity;
     previousAccel = acceleration;
@@ -231,12 +236,11 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
   }
   // gestureOut's position is currently equal to the last event's position and its displacement is equal to last frame's total displacement
   // add interpolated distance and position to current
-  unsigned int interpolationTime = (lastVSyncTime + mPredictionAmount) - gestureOut.time;
   // work out interpolated velocity
-  gestureOut.screen.displacement = (gestureOut.screen.velocity * interpolationTime);
-  gestureOut.local.displacement = (gestureOut.local.velocity * interpolationTime);
-  gestureOut.screen.position += gestureOut.screen.displacement;
-  gestureOut.local.position += gestureOut.local.displacement;
+  gestureOut.screen.displacement = screenDisplacement;
+  gestureOut.local.displacement = localDisplacement;
+  gestureOut.screen.position = (gestureOut.screen.position - gestureOut.screen.displacement) + screenDisplacement;
+  gestureOut.local.position = (gestureOut.local.position - gestureOut.local.displacement) + localDisplacement;
   gestureOut.time += interpolationTime;
 }
 

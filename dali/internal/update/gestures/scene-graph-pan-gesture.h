@@ -196,7 +196,7 @@ public:
    * @param[in] maxAge Maximum age of an event before removing (in millis)
    * @param[in] minEvents The minimum number of events to leave in history, oldest events are removed before newest
    */
-  void RemoveOldHistory(PanInfoHistory& panHistory, uint currentTime, uint maxAge, uint minEvents);
+  void RemoveOldHistory(PanInfoHistory& panHistory, unsigned int currentTime, unsigned int maxAge, unsigned int minEvents);
 
   /**
    * USes last two gestures
