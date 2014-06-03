@@ -3,7 +3,7 @@ Summary:    The OpenGLES Canvas Core Library
 Version:    0.9.21
 Release:    1
 Group:      System/Libraries
-License:    Flora
+License:    Apache
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-core.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
@@ -73,8 +73,30 @@ CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"
 %endif
 
 libtoolize --force
-cd %{_builddir}/%{name}-%{version}/build/slp && autoreconf --install
-cd %{_builddir}/%{name}-%{version}/build/slp && CXXFLAGS="$CXXFLAGS" LDFLAGS="$LDFLAGS" DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}" ./configure --prefix="$PREFIX"
+cd %{_builddir}/%{name}-%{version}/build/slp
+autoreconf --install
+DALI_DATA_RW_DIR="%{dali_data_rw_dir}"
+DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
+export DALI_DATA_RW_DIR
+export DALI_DATA_RO_DIR
+
+CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ;
+CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS ;
+./configure \
+      --program-prefix=%{?_program_prefix} \
+      --prefix=%{_prefix} \
+      --exec-prefix=%{_exec_prefix} \
+      --bindir=%{_bindir} \
+      --sbindir=%{_sbindir} \
+      --sysconfdir=%{_sysconfdir} \
+      --datadir=%{_datadir} \
+      --includedir=%{_includedir} \
+      --libdir=%{_libdir} \
+      --libexecdir=%{_libexecdir} \
+      --localstatedir=%{_localstatedir} \
+      --sharedstatedir=%{_sharedstatedir} \
+      --mandir=%{_mandir} \
+      --infodir=%{_infodir}
 
 make %{?jobs:-j%jobs}
 
