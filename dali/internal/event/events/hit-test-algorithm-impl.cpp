@@ -67,41 +67,51 @@ struct HitActor
 };
 
 /**
- * The function to be used in the hit-test algorithm to check whether the actor is touchable.
- * It is used by the touch event and gesture processor.
+ * Creates an Actor handle so that a HitTestFunction provided via the public API can be called.
  */
-bool IsActorTouchableFunction(Dali::Actor actor, Dali::HitTestAlgorithm::TraverseType type)
+struct HitTestFunctionWrapper : public HitTestInterface
 {
-  bool hittable = false;
-
-  switch (type)
+  /**
+   * Constructor
+   *
+   * @param[in] func HitTestFunction to call with an Actor handle.
+   */
+  HitTestFunctionWrapper( Dali::HitTestAlgorithm::HitTestFunction func )
+  : mFunc( func )
   {
-    case Dali::HitTestAlgorithm::CHECK_ACTOR:
-    {
-      if( GetImplementation(actor).GetTouchRequired() && // Does the Application or derived actor type require a touch event?
-          GetImplementation(actor).IsHittable() ) // Is actor sensitive, visible and on the scene?
-      {
-        hittable = true;
-      }
-      break;
-    }
-    case Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE:
-    {
-      if( actor.IsVisible() &&     // Actor is visible, if not visible then none of its children are visible.
-          actor.IsSensitive() )    // Actor is sensitive, if insensitive none of its children should be hittable either.
-      {
-        hittable = true;
-      }
-      break;
-    }
-    default:
-    {
-      break;
-    }
   }
 
-  return hittable;
-}
+  virtual bool IsActorHittable( Actor* actor )
+  {
+    return mFunc( Dali::Actor( actor ), Dali::HitTestAlgorithm::CHECK_ACTOR );
+  }
+
+  virtual bool DescendActorHierarchy( Actor* actor )
+  {
+    return mFunc( Dali::Actor( actor ), Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE );
+  }
+
+  Dali::HitTestAlgorithm::HitTestFunction mFunc;
+};
+
+/**
+ * Used in the hit-test algorithm to check whether the actor is touchable.
+ * It is used by the touch event processor.
+ */
+struct ActorTouchableCheck : public HitTestInterface
+{
+  virtual bool IsActorHittable( Actor* actor )
+  {
+    return actor->GetTouchRequired() && // Does the Application or derived actor type require a touch event?
+           actor->IsHittable();         // Is actor sensitive, visible and on the scene?
+  }
+
+  virtual bool DescendActorHierarchy( Actor* actor )
+  {
+    return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
+           actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
+  }
+};
 
 /**
  * Recursively hit test all the actors, without crossing into other layers.
@@ -120,7 +130,7 @@ HitActor HitTestWithinLayer( Actor& actor,
                              bool worldOverlay,
                              float& nearClippingPlane,
                              float& farClippingPlane,
-                             Dali::HitTestAlgorithm::HitTestFunction func,
+                             HitTestInterface& hitCheck,
                              bool& stencilOnLayer,
                              bool& stencilHit,
                              bool parentIsStencil )
@@ -139,11 +149,11 @@ HitActor HitTestWithinLayer( Actor& actor,
   }
 
   // If we are a stencil or hittable...
-  if ( isStencil || func(Dali::Actor(&actor), Dali::HitTestAlgorithm::CHECK_ACTOR) ) // Is actor hittable
+  if ( isStencil || hitCheck.IsActorHittable( &actor ) )
   {
     Vector3 size( actor.GetCurrentSize() );
 
-    if ( size.x > 0.0f && size.y > 0.0f &&              // Ensure the actor has a valid size.
+    if ( size.x > 0.0f && size.y > 0.0f &&          // Ensure the actor has a valid size.
          actor.RaySphereTest( rayOrigin, rayDir ) ) // Perform quicker ray sphere test to see if our ray is close to the actor.
     {
       Vector4 hitPointLocal;
@@ -192,9 +202,9 @@ HitActor HitTestWithinLayer( Actor& actor,
     {
       // Descend tree only if...
       if ( !iter->IsLayer() &&    // Child is NOT a layer, hit testing current layer only or Child is not a layer and we've inherited the stencil draw mode
-           ( isStencil || func(*iter, Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE ) ) ) // Child is visible and sensitive, otherwise none of its children should be hittable.
+           ( isStencil || hitCheck.DescendActorHierarchy( &GetImplementation( *iter ) ) ) ) // We are a stencil OR we can descend into child hierarchy
       {
-        HitActor currentHit( HitTestWithinLayer( GetImplementation(*iter), rayOrigin, rayDir, worldOverlay, nearClippingPlane, farClippingPlane, func, stencilOnLayer, stencilHit, isStencil ) );
+        HitActor currentHit( HitTestWithinLayer( GetImplementation(*iter), rayOrigin, rayDir, worldOverlay, nearClippingPlane, farClippingPlane, hitCheck, stencilOnLayer, stencilHit, isStencil ) );
 
         // If Current child is an overlay, then it takes priority.
         // If it is not an overlay, and the previously hit sibling is also not an overlay, then closest takes priority.
@@ -244,7 +254,7 @@ bool IsWithinSourceActors( const Actor& sourceActor, const Actor& actor )
 /**
  * Returns true if the layer and all of the layer's parents are visible and sensitive.
  */
-inline bool IsActuallyHittable( Layer& layer, const Vector2& screenCoordinates, const Vector2& stageSize, Dali::HitTestAlgorithm::HitTestFunction func )
+inline bool IsActuallyHittable( Layer& layer, const Vector2& screenCoordinates, const Vector2& stageSize, HitTestInterface& hitCheck )
 {
   bool hittable( true );
 
@@ -265,9 +275,11 @@ inline bool IsActuallyHittable( Layer& layer, const Vector2& screenCoordinates, 
   if(hittable)
   {
     Actor* actor( &layer );
+
+    // Ensure that we can descend into the layer's (or any of its parent's) hierarchy.
     while ( actor && hittable )
     {
-      if ( !(func(Dali::Actor(actor), Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE)) ) // Layer (or its Parent) is NOT visible and sensitive, so our layer is not either.
+      if ( ! hitCheck.DescendActorHierarchy( actor ) )
       {
         hittable = false;
         break;
@@ -296,7 +308,7 @@ bool HitTestRenderTask( LayerList& layers,
                         RenderTask& renderTask,
                         Vector2 screenCoordinates,
                         Results& results,
-                        Dali::HitTestAlgorithm::HitTestFunction func )
+                        HitTestInterface& hitCheck )
 {
   if ( renderTask.IsHittable( screenCoordinates ) )
   {
@@ -349,18 +361,18 @@ bool HitTestRenderTask( LayerList& layers,
           stencilHit = false;
 
           // Ensure layer is touchable (also checks whether ancestors are also touchable)
-          if ( IsActuallyHittable ( *layer, screenCoordinates, stageSize, func ) )
+          if ( IsActuallyHittable ( *layer, screenCoordinates, stageSize, hitCheck ) )
           {
             // Always hit-test the source actor; otherwise test whether the layer is below the source actor in the hierarchy
             if ( sourceActorDepth == static_cast<unsigned int>(i) )
             {
               // Recursively hit test the source actor & children, without crossing into other layers.
-              hit = HitTestWithinLayer( *sourceActor, results.rayOrigin, results.rayDirection, false, nearClippingPlane, farClippingPlane, func, stencilOnLayer, stencilHit, false );
+              hit = HitTestWithinLayer( *sourceActor, results.rayOrigin, results.rayDirection, false, nearClippingPlane, farClippingPlane, hitCheck, stencilOnLayer, stencilHit, false );
             }
             else if ( IsWithinSourceActors( *sourceActor, *layer ) )
             {
               // Recursively hit test all the actors, without crossing into other layers.
-              hit = HitTestWithinLayer( *layer, results.rayOrigin, results.rayDirection, false, nearClippingPlane, farClippingPlane, func, stencilOnLayer, stencilHit, false );
+              hit = HitTestWithinLayer( *layer, results.rayOrigin, results.rayDirection, false, nearClippingPlane, farClippingPlane, hitCheck, stencilOnLayer, stencilHit, false );
             }
             // If a stencil on this layer hasn't been hit, then discard hit results for this layer
             if ( stencilOnLayer && !stencilHit )
@@ -391,7 +403,7 @@ void HitTestForEachRenderTask( LayerList& layers,
                                RenderTaskList& taskList,
                                const Vector2& screenCoordinates,
                                Results& results,
-                               Dali::HitTestAlgorithm::HitTestFunction func )
+                               HitTestInterface& hitCheck )
 {
   RenderTaskList::RenderTaskContainer& tasks = taskList.GetTasks();
   RenderTaskList::RenderTaskContainer::reverse_iterator endIter = tasks.rend();
@@ -417,7 +429,7 @@ void HitTestForEachRenderTask( LayerList& layers,
       }
     }
 
-    if ( HitTestRenderTask( layers, renderTask, screenCoordinates, results, func ) )
+    if ( HitTestRenderTask( layers, renderTask, screenCoordinates, results, hitCheck ) )
     {
       // Exit when an actor is hit
       return; // don't bother checking off screen tasks
@@ -442,7 +454,7 @@ void HitTestForEachRenderTask( LayerList& layers,
         continue;
       }
 
-      if ( HitTestRenderTask( layers, renderTask, screenCoordinates, results, func ) )
+      if ( HitTestRenderTask( layers, renderTask, screenCoordinates, results, hitCheck ) )
       {
         // Exit when an actor is hit
         break;
@@ -460,13 +472,14 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
   LayerList& layerList = stage.GetLayerList();
 
   Results hitTestResults;
-  HitTestForEachRenderTask( layerList, taskList, screenCoordinates, hitTestResults, func );
+  HitTestFunctionWrapper hitTestFunctionWrapper( func );
+  HitTestForEachRenderTask( layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper );
 
   results.actor = hitTestResults.actor;
   results.actorCoordinates = hitTestResults.actorCoordinates;
 }
 
-void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results )
+void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface )
 {
   // Hit-test the system-overlay actors first
   SystemOverlay* systemOverlay = stage.GetSystemOverlayInternal();
@@ -476,7 +489,7 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results )
     RenderTaskList& overlayTaskList = systemOverlay->GetOverlayRenderTasks();
     LayerList& overlayLayerList = systemOverlay->GetLayerList();
 
-    HitTestForEachRenderTask( overlayLayerList, overlayTaskList, screenCoordinates, results, IsActorTouchableFunction );
+    HitTestForEachRenderTask( overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
   }
 
   // Hit-test the regular on-stage actors
@@ -485,15 +498,22 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results )
     RenderTaskList& taskList = stage.GetRenderTaskList();
     LayerList& layerList = stage.GetLayerList();
 
-    HitTestForEachRenderTask( layerList, taskList, screenCoordinates, results, IsActorTouchableFunction );
+    HitTestForEachRenderTask( layerList, taskList, screenCoordinates, results, hitTestInterface );
   }
+}
+
+void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results )
+{
+  ActorTouchableCheck actorTouchableCheck;
+  HitTest( stage, screenCoordinates, results, actorTouchableCheck );
 }
 
 void HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordinates,
               Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
 {
   Results hitTestResults;
-  HitTestRenderTask( stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, func );
+  HitTestFunctionWrapper hitTestFunctionWrapper( func );
+  HitTestRenderTask( stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper );
   results.actor = hitTestResults.actor;
   results.actorCoordinates = hitTestResults.actorCoordinates;
 }

@@ -43,6 +43,26 @@ struct Results
 };
 
 /**
+ * Interface used by the hit-test-algorithm to determine whether the actor is hittable or whether
+ * we walk down its hierarchy.
+ */
+struct HitTestInterface
+{
+  /**
+   * Called by the hit-test algorithm to determine whether the actor is hittable or not.
+   * @param[in] actor Raw pointer to an Actor object.
+   */
+  virtual bool IsActorHittable( Actor* actor ) = 0;
+
+  /**
+   * Called by the hit-test algorithm to determine whether the algorithm should descend the actor's
+   * hierarchy (and hit-test its children as well).
+   * @param[in] actor Raw pointer to an Actor object.
+   */
+  virtual bool DescendActorHierarchy( Actor* actor ) = 0;
+};
+
+/**
  * @copydoc Dali::HitTestAlgorithm::HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
  */
 void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
@@ -52,6 +72,7 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
  * @param[in] stage The stage.
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
+ * @param[in] hitTestInterface Used to determine whether the actor is hit or whether we walk down its hierarchy
  *
  * <h3>Hit Test Algorithm:</h3>
  *
@@ -65,13 +86,25 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
  *   first to determine if the ray is in the actor's proximity.
  * - If this is also successful, then a more accurate ray test is performed to see if we have a hit.
  *
- * - NOTE: Currently, we prefer a child hit over a parent (regardless of the distance from the
- *   camera) unless the parent is a RenderableActor but this is subject to change.
+ * @note Currently, we prefer a child hit over a parent (regardless of the distance from the
+ *       camera) unless the parent is a RenderableActor but this is subject to change.
+ */
+void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface );
+
+/**
+ * Default HitTest where we check if a touch is required.
+ *
+ * @param[in] stage The stage.
+ * @param[in] screenCoordinates The screen coordinates.
+ * @param[out] results The results of the hit-test.
+ *
+ * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
 void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results );
 
 /**
  * Hit test specific to a given RenderTask
+ *
  * @param[in] stage The stage.
  * @param[in] renderTask The render task for hit test
  * @param[in] screenCoordinates The screen coordinates.
