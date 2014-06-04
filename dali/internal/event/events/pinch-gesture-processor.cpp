@@ -140,7 +140,8 @@ struct PinchGestureProcessor::PinchEventFunctor : public GestureProcessor::Funct
 };
 
 PinchGestureProcessor::PinchGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager )
-: mStage(stage),
+: GestureProcessor( Gesture::Pinch ),
+  mStage(stage),
   mGestureManager(gestureManager),
   mGestureDetectors(),
   mCurrentPinchEmitters()

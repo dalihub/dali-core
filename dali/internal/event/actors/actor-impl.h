@@ -26,6 +26,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/internal/event/common/proxy-object.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -48,9 +49,11 @@ namespace Internal
 {
 
 class Actor;
+class GestureDetector;
 class RenderTask;
 class ShaderEffect;
 struct DynamicsData;
+struct GestureData;
 
 typedef IntrusivePtr<Actor>                   ActorPtr;
 typedef IntrusivePtr<ShaderEffect>            ShaderEffectPtr;
@@ -940,6 +943,30 @@ public:
    */
   bool IsHittable() const;
 
+  // Gestures
+
+  /**
+   * Adds a gesture detector to the actor so that the actor is aware that it requires this type of
+   * gesture.
+   * @param[in] detector The detector being added.
+   * @note A raw pointer to the detector is stored, so the detector MUST remove itself when it is
+   * destroyed using RemoveGestureDetector()
+   */
+  void AddGestureDetector( GestureDetector& detector );
+
+  /**
+   * Removes a previously added gesture detector from the actor. If no more gesture detectors of
+   * this type are registered with this actor then the actor will no longer be hit-tested for that
+   * gesture.
+   * @param[in] detector The detector to remove.
+   */
+  void RemoveGestureDetector( GestureDetector& detector );
+
+  /**
+   * Queries whether the actor requires the gesture type.
+   * @param[in] type The gesture type.
+   */
+  bool IsGestureRequred( Gesture::Type type ) const;
 
   // Signals
 
@@ -1303,6 +1330,8 @@ protected:
 #ifdef DYNAMICS_SUPPORT
   DynamicsData*           mDynamicsData; ///< optional physics data
 #endif
+
+  GestureData*            mGestureData; /// Optional Gesture data. Only created when actor requires gestures
 
   ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
   ShaderEffectPtr         mShaderEffect; ///< Optional referenced shader effect

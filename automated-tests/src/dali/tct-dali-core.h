@@ -31,8 +31,6 @@ extern void custom_actor_test_startup(void);
 extern void custom_actor_test_cleanup(void);
 extern void utc_dali_degree_startup(void);
 extern void utc_dali_degree_cleanup(void);
-extern void utc_dali_event_processing_startup(void);
-extern void utc_dali_event_processing_cleanup(void);
 extern void utc_dali_font_startup(void);
 extern void utc_dali_font_cleanup(void);
 extern void utc_dali_font_parameters_startup(void);
@@ -585,8 +583,6 @@ extern int UtcDaliDegreeCastOperators01(void);
 extern int UtcDaliDegreeCastOperatorEquals(void);
 extern int UtcDaliDegreeCastOperatorNotEquals(void);
 extern int UtcDaliDegreeCastOperatorLessThan(void);
-extern int UtcDaliInvalidEvent(void);
-extern int UtcDaliInvalidGesture(void);
 extern int UtcDaliFontNew01(void);
 extern int UtcDaliFontNew02(void);
 extern int UtcDaliFontNew03(void);
@@ -773,6 +769,8 @@ extern int UtcDaliLongPressGestureDetachAfterStarted(void);
 extern int UtcDaliLongPressGestureActorUnstaged(void);
 extern int UtcDaliLongPressGestureActorStagedAndDestroyed(void);
 extern int UtcDaliLongPressGestureSystemOverlay(void);
+extern int UtcDaliLongPressGestureBehindTouchableSystemOverlay(void);
+extern int UtcDaliLongPressGestureTouchBehindGesturedSystemOverlay(void);
 extern int UtcDaliMaterialNew01(void);
 extern int UtcDaliMaterialDownCast(void);
 extern int UtcDaliMaterialSettersAndGetters(void);
@@ -869,6 +867,8 @@ extern int UtcDaliPanGestureEmitIncorrectState(void);
 extern int UtcDaliPanGestureActorUnstaged(void);
 extern int UtcDaliPanGestureActorStagedAndDestroyed(void);
 extern int UtcDaliPanGestureSystemOverlay(void);
+extern int UtcDaliPanGestureBehindTouchableSystemOverlay(void);
+extern int UtcDaliPanGestureTouchBehindGesturedSystemOverlay(void);
 extern int UtcDaliPanGestureAngleHandling(void);
 extern int UtcDaliPanGestureAngleOutOfRange(void);
 extern int UtcDaliPanGestureAngleProcessing(void);
@@ -901,6 +901,8 @@ extern int UtcDaliPinchGestureEmitIncorrectStatePossible(void);
 extern int UtcDaliPinchGestureActorUnstaged(void);
 extern int UtcDaliPinchGestureActorStagedAndDestroyed(void);
 extern int UtcDaliPinchGestureSystemOverlay(void);
+extern int UtcDaliPinchGestureBehindTouchableSystemOverlay(void);
+extern int UtcDaliPinchGestureTouchBehindGesturedSystemOverlay(void);
 extern int UtcDaliPixelHasAlpha(void);
 extern int UtcDaliPixelGetBytesPerPixel(void);
 extern int UtcDaliPixelGetAlphaOffsetAndMask(void);
@@ -1169,6 +1171,8 @@ extern int UtcDaliTapGesturePossibleCancelled(void);
 extern int UtcDaliTapGestureDetectorRemovedWhilePossible(void);
 extern int UtcDaliTapGestureActorRemovedWhilePossible(void);
 extern int UtcDaliTapGestureSystemOverlay(void);
+extern int UtcDaliTapGestureBehindTouchableSystemOverlay(void);
+extern int UtcDaliTapGestureTouchBehindGesturedSystemOverlay(void);
 extern int UtcDaliTextConstructor(void);
 extern int UtcDaliTextCopyConstructor(void);
 extern int UtcDaliTextAssignmentOperator(void);
@@ -1794,8 +1798,6 @@ testcase tc_array[] = {
     {"UtcDaliDegreeCastOperatorEquals", UtcDaliDegreeCastOperatorEquals, utc_dali_degree_startup, utc_dali_degree_cleanup},
     {"UtcDaliDegreeCastOperatorNotEquals", UtcDaliDegreeCastOperatorNotEquals, utc_dali_degree_startup, utc_dali_degree_cleanup},
     {"UtcDaliDegreeCastOperatorLessThan", UtcDaliDegreeCastOperatorLessThan, utc_dali_degree_startup, utc_dali_degree_cleanup},
-    {"UtcDaliInvalidEvent", UtcDaliInvalidEvent, utc_dali_event_processing_startup, utc_dali_event_processing_cleanup},
-    {"UtcDaliInvalidGesture", UtcDaliInvalidGesture, utc_dali_event_processing_startup, utc_dali_event_processing_cleanup},
     {"UtcDaliFontNew01", UtcDaliFontNew01, utc_dali_font_startup, utc_dali_font_cleanup},
     {"UtcDaliFontNew02", UtcDaliFontNew02, utc_dali_font_startup, utc_dali_font_cleanup},
     {"UtcDaliFontNew03", UtcDaliFontNew03, utc_dali_font_startup, utc_dali_font_cleanup},
@@ -1982,6 +1984,8 @@ testcase tc_array[] = {
     {"UtcDaliLongPressGestureActorUnstaged", UtcDaliLongPressGestureActorUnstaged, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
     {"UtcDaliLongPressGestureActorStagedAndDestroyed", UtcDaliLongPressGestureActorStagedAndDestroyed, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
     {"UtcDaliLongPressGestureSystemOverlay", UtcDaliLongPressGestureSystemOverlay, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
+    {"UtcDaliLongPressGestureBehindTouchableSystemOverlay", UtcDaliLongPressGestureBehindTouchableSystemOverlay, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
+    {"UtcDaliLongPressGestureTouchBehindGesturedSystemOverlay", UtcDaliLongPressGestureTouchBehindGesturedSystemOverlay, utc_dali_long_press_gesture_detector_startup, utc_dali_long_press_gesture_detector_cleanup},
     {"UtcDaliMaterialNew01", UtcDaliMaterialNew01, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliMaterialDownCast", UtcDaliMaterialDownCast, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliMaterialSettersAndGetters", UtcDaliMaterialSettersAndGetters, utc_dali_material_startup, utc_dali_material_cleanup},
@@ -2078,6 +2082,8 @@ testcase tc_array[] = {
     {"UtcDaliPanGestureActorUnstaged", UtcDaliPanGestureActorUnstaged, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
     {"UtcDaliPanGestureActorStagedAndDestroyed", UtcDaliPanGestureActorStagedAndDestroyed, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
     {"UtcDaliPanGestureSystemOverlay", UtcDaliPanGestureSystemOverlay, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
+    {"UtcDaliPanGestureBehindTouchableSystemOverlay", UtcDaliPanGestureBehindTouchableSystemOverlay, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
+    {"UtcDaliPanGestureTouchBehindGesturedSystemOverlay", UtcDaliPanGestureTouchBehindGesturedSystemOverlay, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
     {"UtcDaliPanGestureAngleHandling", UtcDaliPanGestureAngleHandling, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
     {"UtcDaliPanGestureAngleOutOfRange", UtcDaliPanGestureAngleOutOfRange, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
     {"UtcDaliPanGestureAngleProcessing", UtcDaliPanGestureAngleProcessing, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
@@ -2110,6 +2116,8 @@ testcase tc_array[] = {
     {"UtcDaliPinchGestureActorUnstaged", UtcDaliPinchGestureActorUnstaged, utc_dali_pinch_gesture_detector_startup, utc_dali_pinch_gesture_detector_cleanup},
     {"UtcDaliPinchGestureActorStagedAndDestroyed", UtcDaliPinchGestureActorStagedAndDestroyed, utc_dali_pinch_gesture_detector_startup, utc_dali_pinch_gesture_detector_cleanup},
     {"UtcDaliPinchGestureSystemOverlay", UtcDaliPinchGestureSystemOverlay, utc_dali_pinch_gesture_detector_startup, utc_dali_pinch_gesture_detector_cleanup},
+    {"UtcDaliPinchGestureBehindTouchableSystemOverlay", UtcDaliPinchGestureBehindTouchableSystemOverlay, utc_dali_pinch_gesture_detector_startup, utc_dali_pinch_gesture_detector_cleanup},
+    {"UtcDaliPinchGestureTouchBehindGesturedSystemOverlay", UtcDaliPinchGestureTouchBehindGesturedSystemOverlay, utc_dali_pinch_gesture_detector_startup, utc_dali_pinch_gesture_detector_cleanup},
     {"UtcDaliPixelHasAlpha", UtcDaliPixelHasAlpha, utc_dali_pixel_startup, utc_dali_pixel_cleanup},
     {"UtcDaliPixelGetBytesPerPixel", UtcDaliPixelGetBytesPerPixel, utc_dali_pixel_startup, utc_dali_pixel_cleanup},
     {"UtcDaliPixelGetAlphaOffsetAndMask", UtcDaliPixelGetAlphaOffsetAndMask, utc_dali_pixel_startup, utc_dali_pixel_cleanup},
@@ -2378,6 +2386,8 @@ testcase tc_array[] = {
     {"UtcDaliTapGestureDetectorRemovedWhilePossible", UtcDaliTapGestureDetectorRemovedWhilePossible, utc_dali_tap_gesture_detector_startup, utc_dali_tap_gesture_detector_cleanup},
     {"UtcDaliTapGestureActorRemovedWhilePossible", UtcDaliTapGestureActorRemovedWhilePossible, utc_dali_tap_gesture_detector_startup, utc_dali_tap_gesture_detector_cleanup},
     {"UtcDaliTapGestureSystemOverlay", UtcDaliTapGestureSystemOverlay, utc_dali_tap_gesture_detector_startup, utc_dali_tap_gesture_detector_cleanup},
+    {"UtcDaliTapGestureBehindTouchableSystemOverlay", UtcDaliTapGestureBehindTouchableSystemOverlay, utc_dali_tap_gesture_detector_startup, utc_dali_tap_gesture_detector_cleanup},
+    {"UtcDaliTapGestureTouchBehindGesturedSystemOverlay", UtcDaliTapGestureTouchBehindGesturedSystemOverlay, utc_dali_tap_gesture_detector_startup, utc_dali_tap_gesture_detector_cleanup},
     {"UtcDaliTextConstructor", UtcDaliTextConstructor, utc_dali_text_startup, utc_dali_text_cleanup},
     {"UtcDaliTextCopyConstructor", UtcDaliTextCopyConstructor, utc_dali_text_startup, utc_dali_text_cleanup},
     {"UtcDaliTextAssignmentOperator", UtcDaliTextAssignmentOperator, utc_dali_text_startup, utc_dali_text_cleanup},

@@ -56,6 +56,11 @@
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
 #endif
 
+#include <dali/internal/event/events/pan-gesture-detector-impl.h>
+#include <dali/internal/event/events/pinch-gesture-detector-impl.h>
+#include <dali/internal/event/events/long-press-gesture-detector-impl.h>
+#include <dali/internal/event/events/tap-gesture-detector-impl.h>
+
 using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
@@ -175,6 +180,90 @@ namespace Internal
 
 unsigned int Actor::mActorCounter = 0;
 ActorContainer Actor::mNullChildren;
+
+// Encapsulate actor related gesture information
+struct GestureData
+{
+  /**
+   * Constructor
+   */
+  GestureData()
+  : gesturesRequired( Gesture::Type( 0 ) ),
+    panDetectors( NULL ),
+    pinchDetectors( NULL ),
+    longPressDetectors( NULL ),
+    tapDetectors( NULL )
+  {
+  }
+
+  /**
+   * Destructor
+   */
+  ~GestureData()
+  {
+    delete panDetectors;
+    delete pinchDetectors;
+    delete longPressDetectors;
+    delete tapDetectors;
+  }
+
+  /**
+   * Checks if the containers in GestureData are empty
+   */
+  bool Empty() const
+  {
+    return !panDetectors       &&
+           !pinchDetectors     &&
+           !longPressDetectors &&
+           !tapDetectors;
+  }
+
+  /**
+   * Template to add a detector to the appropriate container. Dynamically allocates the container
+   * only if it is used.
+   */
+  template< typename DetectorType, typename ContainerType >
+  void AddDetector( ContainerType*& containerPtr, GestureDetector* detector )
+  {
+    if ( NULL == containerPtr )
+    {
+      containerPtr = new ContainerType;
+    }
+
+    containerPtr->push_back( static_cast< DetectorType* >( detector ) );
+    gesturesRequired = Gesture::Type( gesturesRequired | detector->GetType() );
+  }
+
+  /**
+   * Template to remove a detector from the appropriate container. Deletes the container if it is
+   * no longer required.
+   */
+  template< typename ContainerType >
+  void RemoveDetector( ContainerType*& containerPtr, GestureDetector* detector )
+  {
+    if ( NULL != containerPtr )
+    {
+      ContainerType& container( *containerPtr );
+      typename ContainerType::iterator match( std::remove( container.begin(), container.end(), detector ) );
+      DALI_ASSERT_DEBUG( match != container.end() && "Actor does not have the detector" );
+      container.erase( match, container.end() );
+
+      if ( container.empty() )
+      {
+        gesturesRequired = Gesture::Type( gesturesRequired & ~detector->GetType() );
+        delete containerPtr;
+        containerPtr = NULL;
+      }
+    }
+  }
+
+  Gesture::Type gesturesRequired;
+
+  PanGestureDetectorContainer*       panDetectors;
+  PinchGestureDetectorContainer*     pinchDetectors;
+  LongPressGestureDetectorContainer* longPressDetectors;
+  TapGestureDetectorContainer*       tapDetectors;
+};
 
 #ifdef DYNAMICS_SUPPORT
 
@@ -1886,6 +1975,91 @@ bool Actor::IsHittable() const
          IsNodeConnected();
 }
 
+void Actor::AddGestureDetector( GestureDetector& detector )
+{
+  if ( NULL == mGestureData )
+  {
+    mGestureData = new GestureData;
+  }
+
+  const Gesture::Type type( detector.GetType() );
+  switch ( type )
+  {
+    case Gesture::Pan:
+    {
+      mGestureData->AddDetector< PanGestureDetector, PanGestureDetectorContainer >( mGestureData->panDetectors, &detector );
+      break;
+    }
+
+    case Gesture::Pinch:
+    {
+      mGestureData->AddDetector< PinchGestureDetector, PinchGestureDetectorContainer >( mGestureData->pinchDetectors, &detector );
+      break;
+    }
+
+    case Gesture::LongPress:
+    {
+      mGestureData->AddDetector< LongPressGestureDetector, LongPressGestureDetectorContainer >( mGestureData->longPressDetectors, &detector );
+      break;
+    }
+
+    case Gesture::Tap:
+    {
+      mGestureData->AddDetector< TapGestureDetector, TapGestureDetectorContainer >( mGestureData->tapDetectors, &detector );
+      break;
+    }
+  }
+}
+
+void Actor::RemoveGestureDetector( GestureDetector& detector )
+{
+  if ( NULL != mGestureData )
+  {
+    switch ( detector.GetType() )
+    {
+      case Gesture::Pan:
+      {
+        mGestureData->RemoveDetector< PanGestureDetectorContainer >( mGestureData->panDetectors, &detector );
+        break;
+      }
+
+      case Gesture::Pinch:
+      {
+        mGestureData->RemoveDetector< PinchGestureDetectorContainer >( mGestureData->pinchDetectors, &detector );
+        break;
+      }
+
+      case Gesture::LongPress:
+      {
+        mGestureData->RemoveDetector< LongPressGestureDetectorContainer >( mGestureData->longPressDetectors, &detector );
+        break;
+      }
+
+      case Gesture::Tap:
+      {
+        mGestureData->RemoveDetector< TapGestureDetectorContainer >( mGestureData->tapDetectors, &detector );
+        break;
+      }
+    }
+
+    if ( mGestureData->Empty() )
+    {
+      delete mGestureData;
+      mGestureData = NULL;
+    }
+  }
+}
+
+bool Actor::IsGestureRequred( Gesture::Type type ) const
+{
+  bool required( false );
+  if ( NULL != mGestureData )
+  {
+    required = type & mGestureData->gesturesRequired;
+  }
+  return required;
+}
+
 bool Actor::EmitTouchEventSignal(const TouchEvent& event)
 {
   bool consumed = false;
@@ -1993,6 +2167,7 @@ Actor::Actor( DerivedType derivedType )
 #ifdef DYNAMICS_SUPPORT
   mDynamicsData( NULL ),
 #endif
+  mGestureData( NULL ),
   mAttachment(),
   mShaderEffect(),
   mName(),
@@ -2072,6 +2247,9 @@ Actor::~Actor()
   // Cleanup dynamics
   delete mDynamicsData;
 #endif
+
+  // Cleanup optional gesture data
+  delete mGestureData;
 
   // Cleanup optional parent origin and anchor
   delete mParentOrigin;

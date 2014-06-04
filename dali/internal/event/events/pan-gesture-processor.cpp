@@ -212,7 +212,8 @@ struct PanGestureProcessor::PanEventFunctor : public GestureProcessor::Functor
 };
 
 PanGestureProcessor::PanGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager )
-: mStage( stage ),
+: GestureProcessor( Gesture::Pan ),
+  mStage( stage ),
   mGestureManager( gestureManager ),
   mGestureDetectors(),
   mCurrentPanEmitters(),
@@ -262,7 +263,7 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
         // it can be told when the gesture ends as well.
 
         HitTestAlgorithm::Results hitTestResults;
-        HitTestAlgorithm::HitTest( mStage, mPossiblePanPosition, hitTestResults ); // Hit test original possible position...
+        HitTest( mStage, mPossiblePanPosition, hitTestResults ); // Hit test original possible position...
 
         if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {

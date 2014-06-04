@@ -29,9 +29,41 @@ namespace Dali
 namespace Internal
 {
 
-GestureProcessor::GestureProcessor()
-: mCurrentGesturedActor( NULL ),
-  mGesturedActorDisconnected(false)
+namespace
+{
+
+/**
+ * Functor to check whether an actor requires a particular gesture or not
+ */
+struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
+{
+  GestureHitTestCheck( Gesture::Type type )
+  : mType( type )
+  {
+  }
+
+  virtual bool IsActorHittable( Actor* actor )
+  {
+    return actor->IsGestureRequred( mType ) && // Does the Application or derived actor type require the gesture?
+           actor->IsHittable();                // Is actor sensitive, visible and on the scene?
+  }
+
+  virtual bool DescendActorHierarchy( Actor* actor )
+  {
+    return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
+           actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
+  }
+
+  Gesture::Type mType;
+};
+
+} // unnamed namespace
+
+
+GestureProcessor::GestureProcessor( Gesture::Type type )
+: mType( type ),
+  mCurrentGesturedActor( NULL ),
+  mGesturedActorDisconnected( false )
 {
 }
 
@@ -131,21 +163,9 @@ bool GestureProcessor::HitTest(
   Vector2                    screenCoordinates,
   HitTestAlgorithm::Results& hitTestResults)
 {
-  bool hit = false;
-
-  HitTestAlgorithm::HitTest( stage, screenCoordinates, hitTestResults );
-  if( hitTestResults.renderTask && hitTestResults.actor )
-  {
-    if( ! GetImplementation( hitTestResults.renderTask ).IsSystemLevel() )
-    {
-      hit = true;
-    }
-    else
-    {
-      DALI_LOG_ERROR( "Gesture not possible in SystemOverlay" );
-    }
-  }
-  return hit;
+  GestureHitTestCheck hitCheck( mType );
+  HitTestAlgorithm::HitTest( stage, screenCoordinates, hitTestResults, hitCheck );
+  return hitTestResults.renderTask && hitTestResults.actor;
 }
 
 void GestureProcessor::SetActor( Dali::Actor actor )

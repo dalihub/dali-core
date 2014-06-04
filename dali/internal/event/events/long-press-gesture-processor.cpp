@@ -144,10 +144,9 @@ struct LongPressGestureProcessor::LongPressEventFunctor : public GestureProcesso
   LongPressGestureProcessor& processor;
 };
 
-LongPressGestureProcessor::LongPressGestureProcessor(
-    Stage& stage,
-    Integration::GestureManager& gestureManager)
-: mStage( stage ),
+LongPressGestureProcessor::LongPressGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager)
+: GestureProcessor( Gesture::LongPress ),
+  mStage( stage ),
   mGestureManager( gestureManager ),
   mGestureDetectors(),
   mCurrentEmitters(),
@@ -184,7 +183,7 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
       if ( currentGesturedActor )
       {
         HitTestAlgorithm::Results hitTestResults;
-        HitTestAlgorithm::HitTest( mStage, longPressEvent.point, hitTestResults );
+        HitTest( mStage, longPressEvent.point, hitTestResults );
 
         if ( hitTestResults.actor && ( currentGesturedActor == &GetImplementation( hitTestResults.actor ) ) )
         {

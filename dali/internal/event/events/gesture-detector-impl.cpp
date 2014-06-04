@@ -39,8 +39,7 @@ const std::string INVALID_PROPERTY; // Empty string for invalid calls
 
 GestureDetector::GestureDetector(Gesture::Type type)
 : mType(type),
-  mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor()),
-  mSlotDelegate(this)
+  mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor())
 {
 }
 
@@ -50,8 +49,9 @@ GestureDetector::~GestureDetector()
   {
     for ( GestureDetectorActorContainer::iterator iter = mAttachedActors.begin(), endIter = mAttachedActors.end(); iter != endIter; ++iter )
     {
-      (*iter)->RemoveObserver( *this );
-      (*iter)->TouchedSignal().Disconnect( mSlotDelegate, &GestureDetector::OnTouchEvent );
+      Actor* actor( *iter );
+      actor->RemoveObserver( *this );
+      actor->RemoveGestureDetector( *this );
     }
 
     mAttachedActors.clear();
@@ -79,8 +79,8 @@ void GestureDetector::Attach(Actor& actor)
     // We need to observe the actor's destruction
     actor.AddObserver(*this);
 
-    // Dummy connection to touch event
-    actor.TouchedSignal().Connect( mSlotDelegate, &GestureDetector::OnTouchEvent );
+    // Add the detector to the actor (so the actor knows it requires this gesture when going through hit-test algorithm)
+    actor.AddGestureDetector( *this );
 
     // Notification for derived classes
     OnActorAttach(actor);
@@ -98,10 +98,10 @@ void GestureDetector::Detach(Actor& actor)
       // We no longer need to observe the actor's destruction
       actor.RemoveObserver(*this);
 
-      mAttachedActors.erase(match);
+      // Remove detector from actor (so it is set to no longer requiring this gesture when going through the hit-test algorithm)
+      actor.RemoveGestureDetector( *this );
 
-      // Disconnect connection to touch event
-      actor.TouchedSignal().Disconnect( mSlotDelegate, &PanGestureDetector::OnTouchEvent );
+      mAttachedActors.erase(match);
 
       // Notification for derived classes
       OnActorDetach(actor);
@@ -130,6 +130,9 @@ void GestureDetector::DetachAll()
 
       // We no longer need to observe the actor's destruction
       actor->RemoveObserver(*this);
+
+      // Remove detector from actor (so it is set to no longer requiring this gesture when going through the hit-test algorithm)
+      actor->RemoveGestureDetector( *this );
 
       // Notification for derived classes
       OnActorDetach(*actor);
@@ -180,11 +183,6 @@ void GestureDetector::ProxyDestroyed(ProxyObject& proxy)
       }
     }
   }
-}
-
-bool GestureDetector::OnTouchEvent(Dali::Actor actor, const TouchEvent& event)
-{
-  return false;
 }
 
 bool GestureDetector::IsSceneObjectRemovable() const

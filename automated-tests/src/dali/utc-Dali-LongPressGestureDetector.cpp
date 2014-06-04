@@ -22,6 +22,7 @@
 #include <dali/integration-api/events/long-press-gesture-event.h>
 #include <dali/integration-api/system-overlay.h>
 #include <dali-test-suite-utils.h>
+#include <test-touch-utils.h>
 
 using namespace Dali;
 
@@ -1261,6 +1262,114 @@ int UtcDaliLongPressGestureSystemOverlay(void)
   Vector2 screenCoords( 50.0f, 50.0f );
   application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, screenCoords ) );
   application.ProcessEvent( GenerateLongPress( Gesture::Started, 1u, screenCoords ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureBehindTouchableSystemOverlay(void)
+{
+  TestApplication application;
+  Dali::Integration::Core& core = application.GetCore();
+  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  // SystemOverlay actor
+  Actor systemOverlayActor = Actor::New();
+  systemOverlayActor.SetSize(100.0f, 100.0f);
+  systemOverlayActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  systemOverlay.Add(systemOverlayActor);
+
+  // Stage actor
+  Actor stageActor = Actor::New();
+  stageActor.SetSize(100.0f, 100.0f);
+  stageActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(stageActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set system-overlay actor to touchable
+  TouchEventData touchData;
+  TouchEventDataFunctor touchFunctor( touchData );
+  systemOverlayActor.TouchedSignal().Connect(&application, touchFunctor);
+
+  // Set stage actor to receive the gesture
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(stageActor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start long press within the two actors' area
+  Vector2 screenCoords( 50.0f, 50.0f );
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, screenCoords ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started, 1u, screenCoords ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, touchData.functorCalled, TEST_LOCATION );
+
+  data.Reset();
+  touchData.Reset();
+
+  // Do touch in the same area
+  application.ProcessEvent( touchFunctor.GenerateSingleTouch( TouchPoint::Down, screenCoords ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, touchData.functorCalled, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliLongPressGestureTouchBehindGesturedSystemOverlay(void)
+{
+  TestApplication application;
+  Dali::Integration::Core& core = application.GetCore();
+  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  // SystemOverlay actor
+  Actor systemOverlayActor = Actor::New();
+  systemOverlayActor.SetSize(100.0f, 100.0f);
+  systemOverlayActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  systemOverlay.Add(systemOverlayActor);
+
+  // Stage actor
+  Actor stageActor = Actor::New();
+  stageActor.SetSize(100.0f, 100.0f);
+  stageActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(stageActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set stage actor to touchable
+  TouchEventData touchData;
+  TouchEventDataFunctor touchFunctor( touchData );
+  stageActor.TouchedSignal().Connect(&application, touchFunctor);
+
+  // Set system-overlay actor to have the gesture
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+
+  LongPressGestureDetector detector = LongPressGestureDetector::New();
+  detector.Attach(systemOverlayActor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  // Start long press within the two actors' area
+  Vector2 screenCoords( 50.0f, 50.0f );
+  application.ProcessEvent( GenerateLongPress( Gesture::Possible, 1u, screenCoords ) );
+  application.ProcessEvent( GenerateLongPress( Gesture::Started, 1u, screenCoords ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, touchData.functorCalled, TEST_LOCATION );
+
+  data.Reset();
+  touchData.Reset();
+
+  // Do touch in the same area
+  application.ProcessEvent( touchFunctor.GenerateSingleTouch( TouchPoint::Down, screenCoords ) );
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, touchData.functorCalled, TEST_LOCATION );
+
   END_TEST;
 }

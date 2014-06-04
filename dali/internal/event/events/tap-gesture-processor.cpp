@@ -105,7 +105,8 @@ struct TapGestureProcessor::TapEventFunctor : public GestureProcessor::Functor
 };
 
 TapGestureProcessor::TapGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager)
-: mStage( stage ),
+: GestureProcessor( Gesture::Tap ),
+  mStage( stage ),
   mGestureManager( gestureManager ),
   mGestureDetectors(),
   mMinTapsRequired( 1 ),
@@ -141,7 +142,7 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
       if ( GetCurrentGesturedActor() )
       {
         HitTestAlgorithm::Results hitTestResults;
-        HitTestAlgorithm::HitTest( mStage, tapEvent.point, hitTestResults );
+        HitTest( mStage, tapEvent.point, hitTestResults );
 
         if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {

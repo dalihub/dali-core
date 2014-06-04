@@ -159,15 +159,6 @@ private:
    */
   virtual void OnActorDestroyed(Object& object) = 0;
 
-  /**
-   * Dummy touch event handler.  We do not need to know when touch happens on our actor.  We just
-   * need to connect a function so that our attached actor is checked during our hit testing.
-   * @param[in]  actor  The hit actor (or one of its parents).
-   * @param[in]  event  The touch event.
-   * @return false always as we do not process the event.
-   */
-  bool OnTouchEvent(Dali::Actor actor, const TouchEvent& event);
-
 private: // Default property extensions from ProxyObject
 
   /**
@@ -255,10 +246,6 @@ protected:
   Gesture::Type                 mType;                  ///< The gesture detector will detect this type of gesture.
   GestureDetectorActorContainer mAttachedActors;        ///< Proxy<Node>::Observer is used to provide weak-pointer behaviour
   GestureEventProcessor&        mGestureEventProcessor; ///< A reference to the gesture event processor.
-
-private:
-
-  SlotDelegate< GestureDetector > mSlotDelegate;
 };
 
 } // namespace Internal

@@ -21,7 +21,9 @@
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/integration-api/system-overlay.h>
+#include <dali/integration-api/profiling.h>
 #include <dali-test-suite-utils.h>
+#include <test-touch-utils.h>
 
 using namespace Dali;
 
@@ -41,7 +43,7 @@ namespace
 typedef Dali::PanGestureDetector::AngleContainer::size_type AngleSizeType;
 
 
-// Stores data that is populated in the callback and will be read by the TET cases
+// Stores data that is populated in the callback and will be read by the test cases
 struct SignalData
 {
   SignalData()
@@ -1532,7 +1534,121 @@ int UtcDaliPanGestureSystemOverlay(void)
   // Start pan within the actor's area
   application.ProcessEvent( GeneratePan( Gesture::Possible, screenCoordsStart, screenCoordsEnd, 10 ) );
   application.ProcessEvent( GeneratePan( Gesture::Started, screenCoordsStart, screenCoordsEnd, 10 ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPanGestureBehindTouchableSystemOverlay(void)
+{
+  TestApplication application;
+  Dali::Integration::Core& core = application.GetCore();
+  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  // SystemOverlay actor
+  Actor systemOverlayActor = Actor::New();
+  systemOverlayActor.SetSize(100.0f, 100.0f);
+  systemOverlayActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  systemOverlay.Add(systemOverlayActor);
+
+  // Stage actor
+  Actor stageActor = Actor::New();
+  stageActor.SetSize(100.0f, 100.0f);
+  stageActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(stageActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set system-overlay actor to touchable
+  TouchEventData touchData;
+  TouchEventDataFunctor touchFunctor( touchData );
+  systemOverlayActor.TouchedSignal().Connect(&application, touchFunctor);
+
+  // Set stage actor to receive the gesture
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(stageActor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  Vector2 screenCoordsStart( 10.0f, 20.0f );
+  Vector2 screenCoordsEnd( 20.0f, 20.0f );
+
+  // Start pan within the two actors' area
+  application.ProcessEvent( GeneratePan( Gesture::Possible, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished, screenCoordsStart, screenCoordsEnd, 10 ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, touchData.functorCalled, TEST_LOCATION );
+
+  data.Reset();
+  touchData.Reset();
+
+  // Do touch in the same area
+  application.ProcessEvent( touchFunctor.GenerateSingleTouch( TouchPoint::Down, screenCoordsStart ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, touchData.functorCalled, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureTouchBehindGesturedSystemOverlay(void)
+{
+  TestApplication application;
+  Dali::Integration::Core& core = application.GetCore();
+  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  // SystemOverlay actor
+  Actor systemOverlayActor = Actor::New();
+  systemOverlayActor.SetSize(100.0f, 100.0f);
+  systemOverlayActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  systemOverlay.Add(systemOverlayActor);
+
+  // Stage actor
+  Actor stageActor = Actor::New();
+  stageActor.SetSize(100.0f, 100.0f);
+  stageActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(stageActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set stage actor to touchable
+  TouchEventData touchData;
+  TouchEventDataFunctor touchFunctor( touchData );
+  stageActor.TouchedSignal().Connect(&application, touchFunctor);
+
+  // Set system-overlay actor to have the gesture
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(systemOverlayActor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  Vector2 screenCoordsStart( 10.0f, 20.0f );
+  Vector2 screenCoordsEnd( 20.0f, 20.0f );
+
+  // Start pan within the two actors' area
+  application.ProcessEvent( GeneratePan( Gesture::Possible, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished, screenCoordsStart, screenCoordsEnd, 10 ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, touchData.functorCalled, TEST_LOCATION );
+
+  data.Reset();
+  touchData.Reset();
+
+  // Do touch in the same area
+  application.ProcessEvent( touchFunctor.GenerateSingleTouch( TouchPoint::Down, screenCoordsStart ) );
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, touchData.functorCalled, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1885,6 +2001,7 @@ int UtcDaliPanGestureSetProperties(void)
 {
   TestApplication application;
   TestRenderController& renderController( application.GetRenderController() );
+  Integration::SetPanGesturePredictionMode(0);
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1938,6 +2055,7 @@ int UtcDaliPanGestureSetProperties(void)
 int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
 {
   TestApplication application;
+  Integration::SetPanGesturePredictionMode(0);
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
