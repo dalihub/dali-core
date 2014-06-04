@@ -109,7 +109,7 @@ void PanGesture::PredictiveAlgorithm1(int eventsThisFrame, PanInfo& gestureOut, 
   bool havePreviousAcceleration = false;
   bool previousVelocity = false;
   float previousAccel = 0.0f;
-  unsigned int lastTime;
+  unsigned int lastTime(0);
   while( iter != endIter )
   {
     PanInfo currentGesture = *iter;
@@ -183,7 +183,7 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
   bool havePreviousAcceleration = false;
   bool previousVelocity = false;
   float previousAccel = 0.0f;
-  unsigned int lastTime;
+  unsigned int lastTime(0);
   while( iter != endIter )
   {
     PanInfo currentGesture = *iter;
