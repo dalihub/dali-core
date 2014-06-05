@@ -93,6 +93,7 @@ int UtcDaliRenderTaskSetScreenToFrameBufferMappingActor(void)
   renderTask.SetTargetFrameBuffer( frameBufferImage );
   renderTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
   renderTask.SetScreenToFrameBufferMappingActor( mappingActor );
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
   // Render and notify
   application.SendNotification();

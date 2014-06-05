@@ -179,6 +179,7 @@ int UtcDaliHitTestAlgorithmWithFunctorOnRenderTask(void)
   renderTask[1].SetTargetFrameBuffer( frameBufferImage );
   renderTask[1].SetRefreshRate( RenderTask::REFRESH_ONCE );
   renderTask[1].SetScreenToFrameBufferFunction( RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION );
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
 
   // Render and notify
   application.SendNotification();
