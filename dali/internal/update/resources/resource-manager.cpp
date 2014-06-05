@@ -857,7 +857,8 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
   }
   else
   {
-    DALI_LOG_ERROR("ResourceManager::LoadResponse() received a stray load notification for a resource whose loading is not being tracked: (id:%u, status=%s)\n", id, loadStatus==RESOURCE_LOADING?"LOADING":loadStatus==RESOURCE_PARTIALLY_LOADED?"PARTIAL":"COMPLETE");
+    // This warning can fire if a cancelled load is forgotten here while already complete on a resource thread:
+    DALI_LOG_WARNING( "Received a notification for an untracked resource: (id:%u, status=%s)\n", id, loadStatus==RESOURCE_LOADING?"LOADING":loadStatus==RESOURCE_PARTIALLY_LOADED?"PARTIAL":"COMPLETE");
   }
 }
 
