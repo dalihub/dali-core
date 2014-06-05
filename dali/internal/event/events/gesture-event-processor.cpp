@@ -235,7 +235,7 @@ void GestureEventProcessor::SetPanGesturePredictionMode(int mode)
   mPanGestureProcessor.SetPredictionMode(mode);
 }
 
-void GestureEventProcessor::SetPanGesturePredictionAmount( float amount )
+void GestureEventProcessor::SetPanGesturePredictionAmount( unsigned int amount )
 {
   mPanGestureProcessor.SetPredictionAmount(amount);
 }

@@ -111,7 +111,7 @@ void SetPanGesturePredictionMode( int mode )
   eventProcessor.SetPanGesturePredictionMode(mode);
 }
 
-void SetPanGesturePredictionAmount(float amount)
+void SetPanGesturePredictionAmount(unsigned int amount)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
   eventProcessor.SetPanGesturePredictionAmount(amount);

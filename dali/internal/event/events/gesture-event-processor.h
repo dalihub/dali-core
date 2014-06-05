@@ -132,9 +132,9 @@ public: // Called by Core
   /**
    * @brief Sets the prediction amount of the pan gesture
    *
-   * @param[in] amount The prediction amount, 0.0f being next vsync and each 1.0f on top is another vsync ahead, can be divisions of (0.5f)
+   * @param[in] amount The prediction amount in milliseconds
    */
-  void SetPanGesturePredictionAmount( float amount );
+  void SetPanGesturePredictionAmount( unsigned int amount );
 
 private:
 

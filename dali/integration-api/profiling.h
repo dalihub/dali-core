@@ -56,9 +56,9 @@ DALI_IMPORT_API void SetPanGesturePredictionMode( int mode );
 /**
  * @brief Called by adaptor to set the prediction amount of the pan gesture from an environment variable
  *
- * @param[in] amount The prediction amount, 0.0f being next vsync and each 1.0f on top is another vsync ahead, can be divisions of (0.5f)
+ * @param[in] amount The prediction amount in milliseconds
  */
-DALI_IMPORT_API void SetPanGesturePredictionAmount(float amount);
+DALI_IMPORT_API void SetPanGesturePredictionAmount(unsigned int amount);
 
 
 namespace Profiling

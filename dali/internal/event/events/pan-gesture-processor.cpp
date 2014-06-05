@@ -436,7 +436,7 @@ void PanGestureProcessor::SetPredictionMode(int mode)
   mSceneObject->SetPredictionMode(modeEnum);
 }
 
-void PanGestureProcessor::SetPredictionAmount(float amount)
+void PanGestureProcessor::SetPredictionAmount(unsigned int amount)
 {
   mSceneObject->SetPredictionAmount(amount);
 }

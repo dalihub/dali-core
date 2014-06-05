@@ -34,7 +34,7 @@ namespace SceneGraph
 namespace
 {
 const int MAX_GESTURE_AGE = 50; ///< maximum age of a gesture before disallowing its use in algorithm
-const float DEFAULT_PREDICTION_INTERPOLATION = 0.0f; ///< how much to interpolate pan position and displacement from last vsync time
+const unsigned int DEFAULT_PREDICTION_INTERPOLATION = 0; ///< how much to interpolate pan position and displacement from last vsync time
 } // unnamed namespace
 
 const PanGesture::PredictionMode PanGesture::DEFAULT_PREDICTION_MODE = PanGesture::AVERAGE;
@@ -231,8 +231,7 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
   }
   // gestureOut's position is currently equal to the last event's position and its displacement is equal to last frame's total displacement
   // add interpolated distance and position to current
-  unsigned int timeAdvance = ((nextVSyncTime - lastVSyncTime) * mPredictionAmount);
-  unsigned int interpolationTime = (lastVSyncTime + timeAdvance) - gestureOut.time;
+  unsigned int interpolationTime = (lastVSyncTime + mPredictionAmount) - gestureOut.time;
   // work out interpolated velocity
   gestureOut.screen.displacement = (gestureOut.screen.velocity * interpolationTime);
   gestureOut.local.displacement = (gestureOut.local.velocity * interpolationTime);
@@ -413,7 +412,7 @@ void PanGesture::SetPredictionMode(PredictionMode mode)
   mPredictionMode = mode;
 }
 
-void PanGesture::SetPredictionAmount(float amount)
+void PanGesture::SetPredictionAmount(unsigned int amount)
 {
   mPredictionAmount = amount;
 }
