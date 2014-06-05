@@ -36,7 +36,7 @@ const int MAX_GESTURE_AGE = 50; ///< maximum age of a gesture before disallowing
 const float DEFAULT_PREDICTION_INTERPOLATION = 0.0f; ///< how much to interpolate pan position and displacement from last vsync time
 } // unnamed namespace
 
-const PanGesture::PredictionMode PanGesture::DEFAULT_PREDICTION_MODE = PanGesture::PREDICTION_2;
+const PanGesture::PredictionMode PanGesture::DEFAULT_PREDICTION_MODE = PanGesture::AVERAGE;
 const int PanGesture::NUM_PREDICTION_MODES = PanGesture::PREDICTION_2 + 1;
 
 PanGesture* PanGesture::New()
