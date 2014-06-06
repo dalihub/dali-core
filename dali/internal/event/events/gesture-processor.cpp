@@ -21,8 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
-#include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
+#include <dali/internal/event/events/actor-gesture-data.h>
+#include <dali/internal/event/render-tasks/render-task-impl.h>
 
 namespace Dali
 {
@@ -73,88 +74,92 @@ GestureProcessor::~GestureProcessor()
   ResetActor();
 }
 
-void GestureProcessor::GetGesturedActor( Dali::Actor& actor, const GestureDetectorContainer& connectedDetectors, std::vector<GestureDetector*>& gestureDetectors, Functor& functor )
+void GestureProcessor::GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors, Functor& functor )
 {
   while ( actor )
   {
-    Actor* actorImpl( &GetImplementation(actor) );
-
-    // Check if our hit actor or any of its parents are attached to any registered detector.
-    // Find all detectors that have the actor attached.
-    for ( GestureDetectorContainer::const_iterator iter = connectedDetectors.begin(), endIter = connectedDetectors.end(); iter != endIter; ++iter )
+    // We may be checking a parent so ensure the parent requires this gesture (and do not unintentionally create the gesture data for the parent)
+    if ( actor->IsGestureRequred( mType ) )
     {
-      GestureDetector* current(*iter);
-
-      // Check whether the actor is attached to the gesture detector and then call the functor to
-      // check whether the gesture detector satisfies the current gesture's parameters.
-      if ( current->IsAttached( *actorImpl ) && functor( current, actorImpl ) )
+      // Retrieve the actor's detectors and check if they satisfy current gesture
+      const GestureDetectorContainer& connectedDetectors( actor->GetGestureData().GetGestureDetectorContainer( mType ) );
+      const GestureDetectorContainer::const_iterator endIter( connectedDetectors.end() );
+      for ( GestureDetectorContainer::const_iterator iter = connectedDetectors.begin(); iter != endIter; ++iter )
       {
-        gestureDetectors.push_back(current);
-      }
-    }
+        GestureDetector* current(*iter);
 
-    // The hit actor or one of the parents is a gestured actor, break out.
-    if ( !gestureDetectors.empty() )
-    {
-      break;
+        // Check whether the gesture detector satisfies the current gesture's parameters.
+        if ( functor( current, actor ) )
+        {
+          gestureDetectors.push_back(current);
+        }
+      }
+
+      // The hit actor or one of the parents is a gestured actor, break out.
+      if ( !gestureDetectors.empty() )
+      {
+        break;
+      }
     }
 
     // No match, we should now check the hit actor's parent.
-    actor = actor.GetParent();
+    actor = actor->GetParent();
   }
 }
 
-void GestureProcessor::ProcessAndEmit( const HitTestAlgorithm::Results& hitTestResults, const GestureDetectorContainer& connectedDetectors, Functor& functor )
+void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults, Functor& functor )
 {
-  Dali::Actor actor( hitTestResults.actor );
-
-  while ( actor )
+  if ( hitTestResults.actor )
   {
-    std::vector<GestureDetector*> gestureDetectors;
+    Actor* hitTestActor( &GetImplementation( hitTestResults.actor ) );
+    Actor* actor( hitTestActor );
 
-    GetGesturedActor( actor, connectedDetectors, gestureDetectors, functor );
-
-    if ( actor && !gestureDetectors.empty() )
+    while ( actor )
     {
-      // We have a match but check if the hit point is within the gestured actor's bounds.
-      // If it is not then continue up the actor hierarchy.
+      GestureDetectorContainer gestureDetectors;
+      GetGesturedActor( actor, gestureDetectors, functor );
 
-      if ( actor == hitTestResults.actor )
+      if ( actor && !gestureDetectors.empty() )
       {
-        // Our gesture detector's attached actor WAS the hit actor so we can call the emitting functor.
-        functor( actor, gestureDetectors, hitTestResults.actorCoordinates );
-        break; // We have found AND emitted a signal on the gestured actor, break out.
-      }
-      else
-      {
-        if ( GetImplementation(actor).IsHittable() )
+        // We have a match but check if the hit point is within the gestured actor's bounds.
+        // If it is not then continue up the actor hierarchy.
+
+        if ( actor == hitTestActor )
         {
-          const Vector3 size( actor.GetCurrentSize() );
-
-          if ( ( size.x > 0.0f ) && ( size.y > 0.0f ) )
+          // Our gesture detector's attached actor WAS the hit actor so we can call the emitting functor.
+          functor( actor, gestureDetectors, hitTestResults.actorCoordinates );
+          break; // We have found AND emitted a signal on the gestured actor, break out.
+        }
+        else
+        {
+          if ( actor->IsHittable() )
           {
-            // Ensure tap is within the actor's area
-            Actor& actorImpl = GetImplementation(actor);
-            if ( actorImpl.RaySphereTest( hitTestResults.rayOrigin, hitTestResults.rayDirection ) ) // Quick check
+            const Vector3 size( actor->GetCurrentSize() );
+
+            if ( ( size.x > 0.0f ) && ( size.y > 0.0f ) )
             {
-              Vector4 hitPointLocal;
-              float distance( 0.0f );
-              if( actorImpl.RayActorTest( hitTestResults.rayOrigin, hitTestResults.rayDirection, hitPointLocal, distance ) )
+              // Ensure tap is within the actor's area
+              if ( actor->RaySphereTest( hitTestResults.rayOrigin, hitTestResults.rayDirection ) ) // Quick check
               {
-                // One of the hit actor's parents was the gestured actor so call the emitting functor.
-                functor( actor, gestureDetectors, Vector2( hitPointLocal.x, hitPointLocal.y ) );
-                break; // We have found AND emitted a signal on the gestured actor, break out.
+                Vector4 hitPointLocal;
+                float distance( 0.0f );
+                if( actor->RayActorTest( hitTestResults.rayOrigin, hitTestResults.rayDirection, hitPointLocal, distance ) )
+                {
+                  // One of the hit actor's parents was the gestured actor so call the emitting functor.
+                  functor( actor, gestureDetectors, Vector2( hitPointLocal.x, hitPointLocal.y ) );
+                  break; // We have found AND emitted a signal on the gestured actor, break out.
+                }
               }
             }
           }
         }
       }
-    }
 
-    // Continue up hierarchy to see if any of the parents require this gesture.
-    if ( actor )
-    {
-      actor = actor.GetParent();
+      // Continue up hierarchy to see if any of the parents require this gesture.
+      if ( actor )
+      {
+        actor = actor->GetParent();
+      }
     }
   }
 }
@@ -169,13 +174,13 @@ bool GestureProcessor::HitTest(
   return hitTestResults.renderTask && hitTestResults.actor;
 }
 
-void GestureProcessor::SetActor( Dali::Actor actor )
+void GestureProcessor::SetActor( Actor* actor )
 {
   if ( actor && actor != mCurrentGesturedActor )
   {
     ResetActor();
 
-    mCurrentGesturedActor = &GetImplementation( actor );
+    mCurrentGesturedActor = actor;
     mCurrentGesturedActor->AddObserver( *this );
   }
   mGesturedActorDisconnected = false;

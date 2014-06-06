@@ -48,34 +48,7 @@ protected: // Construction & Destruction
    */
   virtual ~GestureProcessor();
 
-  // Templates and types for deriving classes
-
-  /**
-   * Given a container of derived pointer types, this populates an equivalent container of base pointer types.
-   * @param[in]   derivedContainer  A const reference to the container with pointers to the derived class.
-   * @param[out]  baseContainer     A reference to the container to populate with equivalent pointers to the base class.
-   * @pre Ensure the baseContainer is empty.
-   */
-  template< typename Detector >
-  static void UpCastContainer( const typename DerivedGestureDetectorContainer<Detector>::type& derivedContainer, GestureDetectorContainer& baseContainer )
-  {
-    baseContainer.assign( derivedContainer.begin(), derivedContainer.end() );
-  }
-
-  /**
-   * Given a container of base pointer types, this populates an equivalent container of derived pointer types.
-   * @param[in]   baseContainer     A const reference to the container with pointers to the base class.
-   * @param[out]  derivedContainer  A reference to the container to populate with equivalent pointers to the derived class.
-   * @pre Ensure the derivedContainer is empty.
-   */
-  template< typename Detector >
-  static void DownCastContainer( const GestureDetectorContainer& baseContainer, typename DerivedGestureDetectorContainer<Detector>::type& derivedContainer )
-  {
-    for ( GestureDetectorContainer::const_iterator iter = baseContainer.begin(), endIter = baseContainer.end(); iter != endIter; ++iter )
-    {
-      derivedContainer.push_back( static_cast< Detector* >( *iter ) );
-    }
-  }
+  // Types for deriving classes
 
   /**
    * Functor to use in GetGesturedActor() and ProcessAndEmit() methods.
@@ -97,35 +70,31 @@ protected: // Construction & Destruction
      * @param[in]  gestureDetectors  The detectors that should emit the signal.
      * @param[in]  actorCoordinates  The local actor coordinates where the gesture took place.
      */
-    virtual void operator() ( Dali::Actor actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) = 0;
+    virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) = 0;
   };
 
   // Methods for deriving classes
 
   /**
-   * Given the hit actor and attached detectors, this walks up the actor tree to determine the actor that is connected to one (or several) gesture
-   * detectors. The functor is used to check whether the gesture falls within the gesture detector's parameters.
-   * Derived classes need to provide this functor.
+   * Given the hit actor, this walks up the actor tree to determine the actor that is connected to one (or several) gesture detectors.
    *
-   * @param[in,out]  actor               The hit actor. When this function returns, this is the actor that has been hit by the gesture.
-   * @param[in]      connectedDetectors  Reference to the detectors connected to the derived processor
+   * @param[in,out]  actor               The gestured actor. When this function returns, this is the actor that has been hit by the gesture.
    * @param[out]     gestureDetectors    A container containing all the gesture detectors that have the hit actor attached and satisfy the functor parameters.
-   * @param[in]      functor             A reference to Functor.  The operator() (GestureDetector*) should be used to check if the connected gesture detector
-   *                                     meets the current gesture's parameters.
+   * @param[in]      functor             Used to check if a gesture-detector matches the criteria the gesture detector requires.
+   *
+   * @pre gestureDetectors should be empty.
    */
-  void GetGesturedActor( Dali::Actor& actor, const GestureDetectorContainer& connectedDetectors, GestureDetectorContainer& gestureDetectors, Functor& functor );
+  void GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors, Functor& functor );
 
   /**
-   * This does what GetGesturedActor() does but also starts emission of the gesture (using the functor).
+   * Calls the emission method in the deriving class for matching gesture-detectors with the hit-actor (or one of its parents).
    *
    * @param[in]  hitTestResults      The Hit Test Results.
-   * @param[in]  connectedDetectors  The detectors attached to the gesture processor.
-   * @param[in]  functor             A reference to the functor which should provide an operator() to check if detector satisfies current gesture and another
-   *                                 operator() which will be called when all conditions are met and the gesture should be emitted for the actor and detectors.
+   * @param[in]  functor             Used to check if a gesture-detector matches the criteria the gesture detector requires and for emitting the signal.
    *
    * @pre Hit Testing should already be done.
    */
-  void ProcessAndEmit( const HitTestAlgorithm::Results& hitTestResults, const GestureDetectorContainer& connectedDetectors, Functor& functor );
+  void ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults, Functor& functor );
 
   /**
    * Hit test the screen coordinates, and place the results in hitTestResults.
@@ -140,7 +109,7 @@ protected: // Construction & Destruction
    * Sets the mCurrentGesturedActor and connects to the required signals.
    * @actor  actor  The actor so set.
    */
-  void SetActor( Dali::Actor actor );
+  void SetActor( Actor* actor );
 
   /**
    * Resets the set actor and disconnects any connected signals.

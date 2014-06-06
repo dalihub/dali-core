@@ -121,7 +121,7 @@ private:
   Integration::GestureManager& mGestureManager;
   LongPressGestureDetectorContainer mGestureDetectors;
 
-  LongPressGestureDetectorContainer mCurrentEmitters;
+  GestureDetectorContainer mCurrentEmitters;
   Dali::RenderTask mCurrentRenderTask;
 
   unsigned int mMinTouchesRequired;

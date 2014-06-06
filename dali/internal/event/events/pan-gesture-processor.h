@@ -154,8 +154,8 @@ private:
    * @param[in]  state             The state of the gesture.
    * @param[in]  renderTask        The renderTask to use.
    */
-  void EmitPanSignal( Dali::Actor actor,
-                      PanGestureDetectorContainer& gestureDetectors,
+  void EmitPanSignal( Actor* actor,
+                      const GestureDetectorContainer& gestureDetectors,
                       const Integration::PanGestureEvent& panEvent,
                       Vector2 localCurrent,
                       Gesture::State state,
@@ -173,7 +173,7 @@ private:
   Stage& mStage;
   Integration::GestureManager& mGestureManager;
   PanGestureDetectorContainer mGestureDetectors;
-  PanGestureDetectorContainer mCurrentPanEmitters;
+  GestureDetectorContainer mCurrentPanEmitters;
   Dali::RenderTask mCurrentRenderTask;
   Vector2 mPossiblePanPosition;
 

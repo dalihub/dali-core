@@ -59,7 +59,7 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
    * @param[in]  touches               The number of touches in the current pan event.
    * @param[in]  outsideRangeEmitters  Reference to container where emitters outside of the touches range should be added.
    */
-  IsNotAttachedAndOutsideTouchesRangeFunctor(Actor* actor, unsigned int touches, PanGestureDetectorContainer& outsideRangeEmitters)
+  IsNotAttachedAndOutsideTouchesRangeFunctor(Actor* actor, unsigned int touches, GestureDetectorContainer& outsideRangeEmitters)
   : actorToCheck(actor),
     numberOfTouches(touches),
     outsideTouchesRangeEmitters(outsideRangeEmitters)
@@ -73,16 +73,18 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
    * @param[in]  detector  The detector to check.
    * @return true, if not attached, false otherwise.
    */
-  bool operator()(PanGestureDetector* detector) const
+  bool operator()(GestureDetector* detector) const
   {
     bool remove(!detector->IsAttached(*actorToCheck));
 
     if (!remove)
     {
+      PanGestureDetector* panDetector( static_cast< PanGestureDetector* >( detector ) );
+
       // Ensure number of touch points is within the range of our emitter. If it isn't then remove
       // this emitter and add it to the outsideTouchesRangeEmitters container
-      if ( (numberOfTouches < detector->GetMinimumTouchesRequired()) ||
-           (numberOfTouches > detector->GetMaximumTouchesRequired()) )
+      if ( (numberOfTouches < panDetector->GetMinimumTouchesRequired()) ||
+           (numberOfTouches > panDetector->GetMaximumTouchesRequired()) )
       {
         remove = true;
         outsideTouchesRangeEmitters.push_back(detector);
@@ -94,7 +96,7 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
 
   Actor* actorToCheck; ///< The actor to check whether it is attached or not.
   unsigned int numberOfTouches; ///< The number of touches in the pan event.
-  PanGestureDetectorContainer& outsideTouchesRangeEmitters; ///< Emitters that are outside of the range of current pan.
+  GestureDetectorContainer& outsideTouchesRangeEmitters; ///< Emitters that are outside of the range of current pan.
 };
 
 } // unnamed namespace
@@ -188,22 +190,18 @@ struct PanGestureProcessor::PanEventFunctor : public GestureProcessor::Functor
   /**
    * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
    */
-  virtual void operator() ( Dali::Actor actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+  virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
   {
-    PanGestureDetectorContainer derivedContainer;
-    DownCastContainer<PanGestureDetector>( gestureDetectors, derivedContainer );
-
     processor.mCurrentPanEmitters.clear();
     processor.ResetActor();
 
-    Actor* actorImpl( &GetImplementation( actor ) );
-    actorImpl->ScreenToLocal( GetImplementation(processor.mCurrentRenderTask), actorCoordinates.x, actorCoordinates.y, panEvent.currentPosition.x, panEvent.currentPosition.y );
+    actor->ScreenToLocal( GetImplementation(processor.mCurrentRenderTask), actorCoordinates.x, actorCoordinates.y, panEvent.currentPosition.x, panEvent.currentPosition.y );
 
-    processor.EmitPanSignal( actor, derivedContainer, panEvent, actorCoordinates, panEvent.state, processor.mCurrentRenderTask );
+    processor.EmitPanSignal( actor, gestureDetectors, panEvent, actorCoordinates, panEvent.state, processor.mCurrentRenderTask );
 
-    if ( actorImpl->OnStage() )
+    if ( actor->OnStage() )
     {
-      processor.mCurrentPanEmitters = derivedContainer;
+      processor.mCurrentPanEmitters = gestureDetectors;
       processor.SetActor( actor );
     }
   }
@@ -249,7 +247,7 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
       HitTestAlgorithm::Results hitTestResults;
       if( HitTest( mStage, panEvent.currentPosition, hitTestResults ) )
       {
-        SetActor( hitTestResults.actor );
+        SetActor( &GetImplementation( hitTestResults.actor ) );
         mPossiblePanPosition = panEvent.currentPosition;
       }
 
@@ -272,9 +270,7 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
           mCurrentRenderTask = hitTestResults.renderTask;
 
           PanEventFunctor functor( panEvent, *this );
-          GestureDetectorContainer gestureDetectors;
-          UpCastContainer<PanGestureDetector>( mGestureDetectors, gestureDetectors );
-          ProcessAndEmit( hitTestResults, gestureDetectors, functor );
+          ProcessAndEmit( hitTestResults, functor );
         }
         else
         {
@@ -297,12 +293,12 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
       {
         if ( currentGesturedActor->IsHittable() && !mCurrentPanEmitters.empty() && mCurrentRenderTask )
         {
-          PanGestureDetectorContainer outsideTouchesRangeEmitters;
+          GestureDetectorContainer outsideTouchesRangeEmitters;
 
           // Removes emitters that no longer have the actor attached
           // Also remove emitters whose touches are outside the range of the current pan event and add them to outsideTouchesRangeEmitters
-          PanGestureDetectorContainer::iterator endIter = std::remove_if( mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(),
-                                                                          IsNotAttachedAndOutsideTouchesRangeFunctor(currentGesturedActor, panEvent.numberOfTouches, outsideTouchesRangeEmitters) );
+          GestureDetectorContainer::iterator endIter = std::remove_if( mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(),
+                                                                       IsNotAttachedAndOutsideTouchesRangeFunctor(currentGesturedActor, panEvent.numberOfTouches, outsideTouchesRangeEmitters) );
           mCurrentPanEmitters.erase( endIter, mCurrentPanEmitters.end() );
 
           Vector2 actorCoords;
@@ -312,8 +308,8 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
             currentGesturedActor->ScreenToLocal( GetImplementation( mCurrentRenderTask ), actorCoords.x, actorCoords.y, panEvent.currentPosition.x, panEvent.currentPosition.y );
 
             // EmitPanSignal checks whether we have a valid actor and whether the container we are passing in has emitters before it emits the pan.
-            EmitPanSignal(Dali::Actor(currentGesturedActor), outsideTouchesRangeEmitters, panEvent, actorCoords, Gesture::Finished, mCurrentRenderTask);
-            EmitPanSignal(Dali::Actor(currentGesturedActor), mCurrentPanEmitters, panEvent, actorCoords, panEvent.state, mCurrentRenderTask);
+            EmitPanSignal( currentGesturedActor, outsideTouchesRangeEmitters, panEvent, actorCoords, Gesture::Finished, mCurrentRenderTask);
+            EmitPanSignal( currentGesturedActor, mCurrentPanEmitters, panEvent, actorCoords, panEvent.state, mCurrentRenderTask);
           }
 
           if ( mCurrentPanEmitters.empty() )
@@ -374,7 +370,7 @@ void PanGestureProcessor::RemoveGestureDetector( PanGestureDetector* gestureDete
   if (!mCurrentPanEmitters.empty())
   {
     // Check if the removed detector was one that is currently being panned and remove it from emitters.
-    PanGestureDetectorContainer::iterator endIter = std::remove( mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(), gestureDetector );
+    GestureDetectorContainer::iterator endIter = std::remove( mCurrentPanEmitters.begin(), mCurrentPanEmitters.end(), gestureDetector );
     mCurrentPanEmitters.erase( endIter, mCurrentPanEmitters.end() );
 
     // If we no longer have any emitters, then we should clear mCurrentGesturedActor as well
@@ -477,17 +473,15 @@ void PanGestureProcessor::UpdateDetection()
   }
 }
 
-void PanGestureProcessor::EmitPanSignal( Dali::Actor actorHandle,
-                                         PanGestureDetectorContainer& gestureDetectors,
+void PanGestureProcessor::EmitPanSignal( Actor* actor,
+                                         const GestureDetectorContainer& gestureDetectors,
                                          const Integration::PanGestureEvent& panEvent,
                                          Vector2 localCurrent,
                                          Gesture::State state,
                                          Dali::RenderTask renderTask )
 {
-  if ( actorHandle && !gestureDetectors.empty() )
+  if ( actor && !gestureDetectors.empty() )
   {
-    Actor& actor = GetImplementation(actorHandle);
-
     PanGesture pan(state);
     pan.time = panEvent.time;
 
@@ -498,7 +492,7 @@ void PanGestureProcessor::EmitPanSignal( Dali::Actor actorHandle,
     RenderTask& renderTaskImpl( GetImplementation( renderTask ) );
 
     Vector2 localPrevious;
-    actor.ScreenToLocal( renderTaskImpl, localPrevious.x, localPrevious.y, panEvent.previousPosition.x, panEvent.previousPosition.y );
+    actor->ScreenToLocal( renderTaskImpl, localPrevious.x, localPrevious.y, panEvent.previousPosition.x, panEvent.previousPosition.y );
 
     pan.displacement = localCurrent - localPrevious;
     Vector2 previousPos( panEvent.previousPosition );
@@ -537,9 +531,11 @@ void PanGestureProcessor::EmitPanSignal( Dali::Actor actorHandle,
       mSceneObject->AddGesture( pan );
     }
 
-    for ( PanGestureDetectorContainer::iterator iter = gestureDetectors.begin(), endIter = gestureDetectors.end(); iter != endIter; ++iter )
+    Dali::Actor actorHandle( actor );
+    const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
+    for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
     {
-      (*iter)->EmitPanGestureSignal(actorHandle, pan);
+      static_cast< PanGestureDetector* >( *iter )->EmitPanGestureSignal( actorHandle, pan );
     }
   }
 }

@@ -49,8 +49,8 @@ namespace
  * @param[in]  localPoint        Relative to the actor attached to the detector.
  */
 void EmitLongPressSignal(
-    Dali::Actor actor,
-    LongPressGestureDetectorContainer& gestureDetectors,
+    Actor* actor,
+    const GestureDetectorContainer& gestureDetectors,
     const Integration::LongPressGestureEvent& longPressEvent,
     Vector2 localPoint)
 {
@@ -60,9 +60,11 @@ void EmitLongPressSignal(
   longPress.screenPoint = longPressEvent.point;
   longPress.localPoint = localPoint;
 
-  for ( LongPressGestureDetectorContainer::iterator iter = gestureDetectors.begin(), endIter = gestureDetectors.end(); iter != endIter; ++iter )
+  Dali::Actor actorHandle( actor );
+  const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
+  for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
   {
-    (*iter)->EmitLongPressGestureSignal(actor, longPress);
+    static_cast< LongPressGestureDetector* >( *iter )->EmitLongPressGestureSignal( actorHandle, longPress );
   }
 }
 
@@ -86,7 +88,7 @@ struct IsNotAttachedFunctor
    * @param[in]  detector  The detector to check.
    * @return true, if not attached, false otherwise.
    */
-  bool operator()( const LongPressGestureDetector* detector ) const
+  bool operator()( const GestureDetector* detector ) const
   {
     return !detector->IsAttached( *actorToCheck );
   }
@@ -123,20 +125,17 @@ struct LongPressGestureProcessor::LongPressEventFunctor : public GestureProcesso
   /**
    * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
    */
-  virtual void operator() ( Dali::Actor actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+  virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
   {
-    LongPressGestureDetectorContainer derivedContainer;
-    DownCastContainer<LongPressGestureDetector>( gestureDetectors, derivedContainer );
-
     // Clear actor as
     processor.mCurrentEmitters.clear();
     processor.ResetActor();
 
-    EmitLongPressSignal( actor, derivedContainer, longPressEvent, actorCoordinates );
+    EmitLongPressSignal( actor, gestureDetectors, longPressEvent, actorCoordinates );
 
-    if ( actor.OnStage() )
+    if ( actor->OnStage() )
     {
-      processor.mCurrentEmitters = derivedContainer;
+      processor.mCurrentEmitters = gestureDetectors;
       processor.SetActor( actor );
     }
   }
@@ -173,7 +172,7 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
       HitTestAlgorithm::Results hitTestResults;
       if( HitTest( mStage, longPressEvent.point, hitTestResults ) )
       {
-        SetActor( hitTestResults.actor );
+        SetActor( &GetImplementation( hitTestResults.actor ) );
       }
       break;
     }
@@ -192,9 +191,7 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
           mCurrentRenderTask = hitTestResults.renderTask;
 
           LongPressEventFunctor functor( longPressEvent, *this );
-          GestureDetectorContainer gestureDetectors;
-          UpCastContainer<LongPressGestureDetector>( mGestureDetectors, gestureDetectors );
-          ProcessAndEmit( hitTestResults, gestureDetectors, functor );
+          ProcessAndEmit( hitTestResults, functor );
         }
         else
         {
@@ -219,7 +216,7 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
         if ( currentGesturedActor->IsHittable() && !mCurrentEmitters.empty() && mCurrentRenderTask )
         {
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
-          LongPressGestureDetectorContainer::iterator endIter = std::remove_if( mCurrentEmitters.begin(), mCurrentEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
+          GestureDetectorContainer::iterator endIter = std::remove_if( mCurrentEmitters.begin(), mCurrentEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
           mCurrentEmitters.erase( endIter, mCurrentEmitters.end() );
 
           if ( !mCurrentEmitters.empty() )
@@ -228,7 +225,7 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
             RenderTask& renderTaskImpl( GetImplementation( mCurrentRenderTask ) );
             currentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, longPressEvent.point.x, longPressEvent.point.y );
 
-            EmitLongPressSignal( Dali::Actor( currentGesturedActor ), mCurrentEmitters, longPressEvent, actorCoords );
+            EmitLongPressSignal( currentGesturedActor, mCurrentEmitters, longPressEvent, actorCoords );
           }
         }
 

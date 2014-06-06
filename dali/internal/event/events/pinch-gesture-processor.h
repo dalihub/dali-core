@@ -115,7 +115,7 @@ private:
   Stage& mStage;
   Integration::GestureManager& mGestureManager;
   PinchGestureDetectorContainer mGestureDetectors;
-  PinchGestureDetectorContainer mCurrentPinchEmitters;
+  GestureDetectorContainer mCurrentPinchEmitters;
   Dali::RenderTask mCurrentRenderTask;
 
   struct PinchEventFunctor;

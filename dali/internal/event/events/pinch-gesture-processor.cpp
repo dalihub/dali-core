@@ -48,8 +48,8 @@ namespace
  * @param[in]  localCenter       Relative to the actor attached to the detector.
  */
 void EmitPinchSignal(
-    Dali::Actor actor,
-    PinchGestureDetectorContainer& gestureDetectors,
+    Actor* actor,
+    const GestureDetectorContainer& gestureDetectors,
     const Integration::PinchGestureEvent& pinchEvent,
     Vector2 localCenter)
 {
@@ -62,9 +62,11 @@ void EmitPinchSignal(
 
   pinch.localCenterPoint = localCenter;
 
-  for ( PinchGestureDetectorContainer::iterator iter = gestureDetectors.begin(), endIter = gestureDetectors.end(); iter != endIter; ++iter )
+  Dali::Actor actorHandle( actor );
+  const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
+  for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
   {
-    (*iter)->EmitPinchGestureSignal(actor, pinch);
+    static_cast< PinchGestureDetector* >( *iter )->EmitPinchGestureSignal( actorHandle, pinch );
   }
 }
 
@@ -88,7 +90,7 @@ struct IsNotAttachedFunctor
    * @param[in]  detector  The detector to check.
    * @return true, if not attached, false otherwise.
    */
-  bool operator()(const PinchGestureDetector* detector) const
+  bool operator()(const GestureDetector* detector) const
   {
     return !detector->IsAttached(*actorToCheck);
   }
@@ -122,16 +124,13 @@ struct PinchGestureProcessor::PinchEventFunctor : public GestureProcessor::Funct
   /**
    * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
    */
-  virtual void operator() ( Dali::Actor actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+  virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
   {
-    PinchGestureDetectorContainer derivedContainer;
-    DownCastContainer<PinchGestureDetector>( gestureDetectors, derivedContainer );
+    EmitPinchSignal( actor, gestureDetectors, pinchEvent, actorCoordinates );
 
-    EmitPinchSignal( actor, derivedContainer, pinchEvent, actorCoordinates );
-
-    if ( actor.OnStage() )
+    if ( actor->OnStage() )
     {
-      processor.mCurrentPinchEmitters = derivedContainer;
+      processor.mCurrentPinchEmitters = gestureDetectors;
       processor.SetActor( actor );
     }
   }
@@ -172,9 +171,7 @@ void PinchGestureProcessor::Process( const Integration::PinchGestureEvent& pinch
         mCurrentRenderTask = hitTestResults.renderTask;
 
         PinchEventFunctor functor( pinchEvent, *this ); // Sets mCurrentGesturedActor
-        GestureDetectorContainer gestureDetectors;
-        UpCastContainer<PinchGestureDetector>( mGestureDetectors, gestureDetectors );
-        ProcessAndEmit( hitTestResults, gestureDetectors, functor );
+        ProcessAndEmit( hitTestResults, functor );
       }
       break;
     }
@@ -192,7 +189,7 @@ void PinchGestureProcessor::Process( const Integration::PinchGestureEvent& pinch
         if ( currentGesturedActor->IsHittable() && !mCurrentPinchEmitters.empty() && mCurrentRenderTask )
         {
           // Ensure actor is still attached to the emitters, if it is not then remove the emitter.
-          PinchGestureDetectorContainer::iterator endIter = std::remove_if( mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
+          GestureDetectorContainer::iterator endIter = std::remove_if( mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), IsNotAttachedFunctor(currentGesturedActor) );
           mCurrentPinchEmitters.erase( endIter, mCurrentPinchEmitters.end() );
 
           if ( !mCurrentPinchEmitters.empty() )
@@ -201,7 +198,7 @@ void PinchGestureProcessor::Process( const Integration::PinchGestureEvent& pinch
             RenderTask& renderTaskImpl( GetImplementation(mCurrentRenderTask) );
             currentGesturedActor->ScreenToLocal( renderTaskImpl, actorCoords.x, actorCoords.y, pinchEvent.centerPoint.x, pinchEvent.centerPoint.y );
 
-            EmitPinchSignal( Dali::Actor(currentGesturedActor), mCurrentPinchEmitters, pinchEvent, actorCoords );
+            EmitPinchSignal( currentGesturedActor, mCurrentPinchEmitters, pinchEvent, actorCoords );
           }
           else
           {
@@ -253,7 +250,7 @@ void PinchGestureProcessor::RemoveGestureDetector( PinchGestureDetector* gesture
   if ( !mCurrentPinchEmitters.empty() )
   {
     // Check if the removed detector was one that is currently being pinched and remove it from emitters.
-    PinchGestureDetectorContainer::iterator endIter = std::remove( mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), gestureDetector );
+    GestureDetectorContainer::iterator endIter = std::remove( mCurrentPinchEmitters.begin(), mCurrentPinchEmitters.end(), gestureDetector );
     mCurrentPinchEmitters.erase( endIter, mCurrentPinchEmitters.end() );
 
     // If we no longer have any emitters, then we should clear mCurrentGesturedActor as well

@@ -50,8 +50,8 @@ namespace
  * @param[in]  localPoint        Relative to the actor attached to the detector.
  */
 void EmitTapSignal(
-    Dali::Actor actor,
-    TapGestureDetectorContainer& gestureDetectors,
+    Actor* actor,
+    const GestureDetectorContainer& gestureDetectors,
     const Integration::TapGestureEvent& tapEvent,
     Vector2 localPoint)
 {
@@ -62,9 +62,11 @@ void EmitTapSignal(
   tap.screenPoint = tapEvent.point;
   tap.localPoint = localPoint;
 
-  for ( TapGestureDetectorContainer::iterator iter = gestureDetectors.begin(), endIter = gestureDetectors.end(); iter != endIter; ++iter )
+  Dali::Actor actorHandle( actor );
+  const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
+  for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
   {
-    (*iter)->EmitTapGestureSignal( actor, tap );
+    static_cast< TapGestureDetector* >( *iter )->EmitTapGestureSignal( actorHandle, tap );
   }
 }
 
@@ -95,11 +97,9 @@ struct TapGestureProcessor::TapEventFunctor : public GestureProcessor::Functor
   /**
    * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
    */
-  virtual void operator() ( Dali::Actor actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+  virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
   {
-    TapGestureDetectorContainer derivedContainer;
-    DownCastContainer<TapGestureDetector>( gestureDetectors, derivedContainer );
-    EmitTapSignal( actor, derivedContainer, tapEvent, actorCoordinates );
+    EmitTapSignal( actor, gestureDetectors, tapEvent, actorCoordinates );
   }
 
   const Integration::TapGestureEvent& tapEvent;
@@ -133,7 +133,7 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
       if( HitTest( mStage, tapEvent.point, hitTestResults ) )
       {
         // Only sets the actor if we have a hit.
-        SetActor( hitTestResults.actor );
+        SetActor( &GetImplementation( hitTestResults.actor ) );
       }
       break;
     }
@@ -148,9 +148,7 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
         if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {
           TapEventFunctor functor( tapEvent );
-          GestureDetectorContainer gestureDetectors;
-          UpCastContainer<TapGestureDetector>( mGestureDetectors, gestureDetectors );
-          ProcessAndEmit( hitTestResults, gestureDetectors, functor );
+          ProcessAndEmit( hitTestResults, functor );
         }
 
         ResetActor();

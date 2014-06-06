@@ -19,10 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/events/pan-gesture-detector-impl.h>
-#include <dali/internal/event/events/pinch-gesture-detector-impl.h>
-#include <dali/internal/event/events/long-press-gesture-detector-impl.h>
-#include <dali/internal/event/events/tap-gesture-detector-impl.h>
+#include <dali/internal/event/events/gesture-detector-impl.h>
 
 namespace Dali
 {
@@ -74,14 +71,29 @@ public:
     return type & gesturesRequired;
   }
 
+  /**
+   * Retrieve a reference to the detectors for the given type.
+   * @param[in] type The container type required
+   * @pre Ensure IsGestureRequired() is used to check if the container is actually available.
+   */
+  GestureDetectorContainer& GetGestureDetectorContainer( Gesture::Type type );
+
+private:
+
+  /**
+   * Helper to retrieve the appropriate container type.
+   * @param[in] type The container type required.
+   */
+  inline GestureDetectorContainer*& GetContainerPtr( Gesture::Type type );
+
 private:
 
   Gesture::Type gesturesRequired; ///< Stores which gestures are required
 
-  PanGestureDetectorContainer*       panDetectors;       ///< Pointer to a container of pan-detectors
-  PinchGestureDetectorContainer*     pinchDetectors;     ///< Pointer to a container of pinch-detectors
-  LongPressGestureDetectorContainer* longPressDetectors; ///< Pointer to a container of long-press-detectors
-  TapGestureDetectorContainer*       tapDetectors;       ///< Pointer to a container of tap-detectors
+  GestureDetectorContainer* panDetectors;       ///< Pointer to a container of pan-detectors
+  GestureDetectorContainer* pinchDetectors;     ///< Pointer to a container of pinch-detectors
+  GestureDetectorContainer* longPressDetectors; ///< Pointer to a container of long-press-detectors
+  GestureDetectorContainer* tapDetectors;       ///< Pointer to a container of tap-detectors
 };
 
 } // namespace Internal
