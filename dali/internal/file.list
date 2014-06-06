@@ -46,6 +46,7 @@ internal_src_files = \
   $(internal_src_dir)/event/common/type-registry-impl.cpp \
   $(internal_src_dir)/event/effects/shader-effect-impl.cpp \
   $(internal_src_dir)/event/effects/shader-factory.cpp \
+  $(internal_src_dir)/event/events/actor-gesture-data.cpp \
   $(internal_src_dir)/event/events/event-processor.cpp \
   $(internal_src_dir)/event/events/key-event-processor.cpp \
   $(internal_src_dir)/event/events/gesture-detector-impl.cpp \

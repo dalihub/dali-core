@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -32,11 +33,6 @@ namespace Dali
 
 namespace Internal
 {
-
-namespace
-{
-const std::string INVALID_PROPERTY; // Empty string for invalid calls
-}
 
 GestureDetector::GestureDetector(Gesture::Type type)
 : mType(type),
@@ -52,7 +48,7 @@ GestureDetector::~GestureDetector()
     {
       Actor* actor( *iter );
       actor->RemoveObserver( *this );
-      actor->RemoveGestureDetector( *this );
+      actor->GetGestureData().RemoveGestureDetector( *this );
     }
 
     mAttachedActors.clear();
@@ -81,7 +77,7 @@ void GestureDetector::Attach(Actor& actor)
     actor.AddObserver(*this);
 
     // Add the detector to the actor (so the actor knows it requires this gesture when going through hit-test algorithm)
-    actor.AddGestureDetector( *this );
+    actor.GetGestureData().AddGestureDetector( *this );
 
     // Notification for derived classes
     OnActorAttach(actor);
@@ -99,8 +95,8 @@ void GestureDetector::Detach(Actor& actor)
       // We no longer need to observe the actor's destruction
       actor.RemoveObserver(*this);
 
-      // Remove detector from actor (so it is set to no longer requiring this gesture when going through the hit-test algorithm)
-      actor.RemoveGestureDetector( *this );
+      // Remove detector from actor-gesture-data
+      actor.GetGestureData().RemoveGestureDetector( *this );
 
       mAttachedActors.erase(match);
 
@@ -132,8 +128,8 @@ void GestureDetector::DetachAll()
       // We no longer need to observe the actor's destruction
       actor->RemoveObserver(*this);
 
-      // Remove detector from actor (so it is set to no longer requiring this gesture when going through the hit-test algorithm)
-      actor->RemoveGestureDetector( *this );
+      // Remove detector from actor-gesture-data
+      actor->GetGestureData().RemoveGestureDetector( *this );
 
       // Notification for derived classes
       OnActorDetach(*actor);
@@ -202,7 +198,7 @@ void GestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& ) con
 
 const std::string& GestureDetector::GetDefaultPropertyName( Property::Index index ) const
 {
-  return INVALID_PROPERTY;
+  return String::EMPTY;
 }
 
 Property::Index GestureDetector::GetDefaultPropertyIndex(const std::string& name) const

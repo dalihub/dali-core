@@ -50,11 +50,10 @@ namespace Internal
 {
 
 class Actor;
-class GestureDetector;
+class ActorGestureData;
 class RenderTask;
 class ShaderEffect;
 struct DynamicsData;
-struct GestureData;
 
 typedef IntrusivePtr<Actor>                   ActorPtr;
 typedef IntrusivePtr<ShaderEffect>            ShaderEffectPtr;
@@ -947,21 +946,14 @@ public:
   // Gestures
 
   /**
-   * Adds a gesture detector to the actor so that the actor is aware that it requires this type of
-   * gesture.
-   * @param[in] detector The detector being added.
-   * @note A raw pointer to the detector is stored, so the detector MUST remove itself when it is
-   * destroyed using RemoveGestureDetector()
+   * Retrieve the gesture data associated with this actor. The first call to this method will
+   * allocate space for the ActorGestureData so this should only be called if an actor really does
+   * require gestures.
+   * @return Reference to the ActorGestureData for this actor.
+   * @note Once the gesture-data is created for an actor it is likely that gestures are required
+   * throughout the actor's lifetime so it will only be deleted when the actor is destroyed.
    */
-  void AddGestureDetector( GestureDetector& detector );
-
-  /**
-   * Removes a previously added gesture detector from the actor. If no more gesture detectors of
-   * this type are registered with this actor then the actor will no longer be hit-tested for that
-   * gesture.
-   * @param[in] detector The detector to remove.
-   */
-  void RemoveGestureDetector( GestureDetector& detector );
+  ActorGestureData& GetGestureData();
 
   /**
    * Queries whether the actor requires the gesture type.
@@ -1332,7 +1324,7 @@ protected:
   DynamicsData*           mDynamicsData; ///< optional physics data
 #endif
 
-  GestureData*            mGestureData; /// Optional Gesture data. Only created when actor requires gestures
+  ActorGestureData*            mGestureData; /// Optional Gesture data. Only created when actor requires gestures
 
   ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
   ShaderEffectPtr         mShaderEffect; ///< Optional referenced shader effect
