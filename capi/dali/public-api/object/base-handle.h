@@ -147,7 +147,10 @@ public:
   /**
    * @brief Returns the type name for the Handle.
    *
-   * @return The type name.
+   * Will return an empty string if the typename does not exist. This will happen for types that
+   * have not registered with type-registry.
+   *
+   * @return The type name. Empty string if the typename does not exist.
    */
   const std::string& GetTypeName() const;
 

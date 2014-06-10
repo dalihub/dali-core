@@ -80,10 +80,9 @@ const std::string& BaseObject::GetTypeName() const
     }
   }
 
-  // We should not reach here
-  static const std::string INVALID_NAME;
-  DALI_LOG_ERROR( "TypeName Not Found\n" );
-  return INVALID_NAME;
+  // Return an empty string if type-name not found.
+  DALI_LOG_WARNING( "TypeName Not Found\n" );
+  return String::EMPTY;
 }
 
 bool BaseObject::DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor )
