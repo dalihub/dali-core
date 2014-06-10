@@ -20,6 +20,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/render/queue/render-queue.h>
 
 using namespace std;
 
@@ -34,16 +35,19 @@ namespace SceneGraph
 
 Mesh::Mesh( ResourceId id,
             PostProcessResourceDispatcher& postProcessResourceDispatcher,
+            RenderQueue& renderQueue,
             MeshData* meshData )
-: mResourceId ( id ),
+:
+  mPostProcessResourceDispatcher(postProcessResourceDispatcher),
+  mRenderQueue(renderQueue),
   mUpdateMeshData(meshData),
   mRenderMeshData(meshData),
-  mRefreshVertexBuffer(true),
   mVertexBuffer(NULL),
   mIndicesBuffer(NULL),
   mNumberOfVertices(0u),
   mNumberOfFaces(0u),
-  mPostProcessResourceDispatcher(postProcessResourceDispatcher)
+  mResourceId ( id ),
+  mRefreshVertexBuffer(true)
 {
 }
 
@@ -69,6 +73,7 @@ const MeshData& Mesh::GetMeshData( Mesh::ThreadBuffer threadBuffer ) const
   {
     case Mesh::UPDATE_THREAD:
     {
+
       meshDataPtr = mUpdateMeshData;
     }
     break;
@@ -84,21 +89,30 @@ const MeshData& Mesh::GetMeshData( Mesh::ThreadBuffer threadBuffer ) const
   return *meshDataPtr;
 }
 
+void Mesh::RefreshVertexBuffer()
+{
+    mRefreshVertexBuffer = true;
+}
+
 void Mesh::MeshDataUpdated( BufferIndex bufferIndex, Mesh::ThreadBuffer threadBuffer, MeshData* meshData )
 {
   if ( threadBuffer == Mesh::RENDER_THREAD )
   {
     // Called from a message, the old MeshData will be release and the new one is saved.
     mRenderMeshData = meshData;
+    RefreshVertexBuffer();
   }
   else
   {
     // Dynamics and animatable meshes don't create new mesh data
     DALI_ASSERT_DEBUG( threadBuffer == Mesh::UPDATE_THREAD );
     DALI_ASSERT_DEBUG( meshData == NULL );
-  }
 
-  mRefreshVertexBuffer = true;
+    // Send a message to self in render thread
+    typedef Message< Mesh > LocalType;
+    unsigned int* slot = mRenderQueue.ReserveMessageSlot( bufferIndex, sizeof( LocalType ) );
+    new (slot) LocalType( this, &Mesh::RefreshVertexBuffer);
+  }
 }
 
 void Mesh::UploadVertexData( Context& context, BufferIndex renderBufferIndex )

@@ -21,7 +21,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-declarations.h>
-#include <dali/internal/event/images/frame-buffer-image-impl.h>
 
 namespace Dali
 {
@@ -73,7 +72,7 @@ public:
    */
   void OnInitialize();
 
-   /**
+  /**
    * Query the current depth of the layer
    */
   unsigned int GetDepth() const;
@@ -258,7 +257,6 @@ private:
   LayerList* mLayerList; ///< Only valid when layer is on-stage
 
   // These properties not animatable; the actor side has the most up-to-date values
-  FrameBufferImagePtr mFrameBufferImage;        ///< Ticket for offscreen render target
   ClippingBox mClippingBox;                     ///< The clipping box, in window coordinates
   Dali::Layer::SortFunctionType mSortFunction;  ///< Used to sort semi-transparent geometry
 

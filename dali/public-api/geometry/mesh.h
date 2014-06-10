@@ -19,12 +19,8 @@
 
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/geometry/mesh-data.h>
 #include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/vector4.h>
-#include <dali/public-api/modeling/material.h>
-#include <dali/public-api/modeling/bone.h>
 #include <dali/public-api/object/base-handle.h>
 
 namespace Dali DALI_IMPORT_API

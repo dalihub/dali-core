@@ -399,7 +399,7 @@ Program& Shader::Apply( Context& context,
       if( 0 == metadata.cacheIndeces[ programType ][ subType ] )
       {
         // register cacheindex for this program
-        metadata.cacheIndeces[ programType ][ subType ] = program.RegisterExternalUniform( metadata.name );
+        metadata.cacheIndeces[ programType ][ subType ] = program.RegisterUniform( metadata.name );
       }
       loc = program.GetUniformLocation( metadata.cacheIndeces[ programType ][ subType ] );
 

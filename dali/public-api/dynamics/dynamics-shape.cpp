@@ -78,10 +78,10 @@ DynamicsShape DynamicsShape::NewCylinder(const float radius, const float length)
 #endif
 }
 
-DynamicsShape DynamicsShape::NewMesh(Mesh mesh)
+DynamicsShape DynamicsShape::NewMesh(Cloth cloth)
 {
 #ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsMeshShapePtr internal( new Internal::DynamicsMeshShape( GetImplementation(mesh) ) );
+  Internal::DynamicsMeshShapePtr internal( new Internal::DynamicsMeshShape( GetImplementation(cloth) ) );
 
   return DynamicsShape(internal.Get());
 #else

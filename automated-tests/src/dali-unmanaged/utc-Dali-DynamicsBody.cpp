@@ -447,7 +447,7 @@ int UtcDaliDynamicsBodyAddAnchor(void)
 
   DynamicsBodyConfig softConfig( DynamicsBodyConfig::New() );
   softConfig.SetType(DynamicsBodyConfig::SOFT);
-  Mesh mesh(Mesh::NewPlane(10.0f, 10.0f, 10, 10));
+  Cloth mesh(Cloth::New(10.0f, 10.0f, 10, 10));
   DynamicsShape meshShape(DynamicsShape::NewMesh(mesh));
   softConfig.SetShape( meshShape );
   softConfig.SetMass(1.0f);

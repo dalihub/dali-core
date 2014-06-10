@@ -104,7 +104,7 @@ public: // construction, destruction and initialisation
    *
    * @param[in] meshData object to copy
    */
-  explicit MeshData( const MeshData& meshData );
+  MeshData( const MeshData& meshData );
 
   /**
    * @brief Assignment operator.

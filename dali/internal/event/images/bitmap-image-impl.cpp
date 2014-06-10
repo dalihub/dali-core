@@ -30,16 +30,16 @@ namespace Dali
 namespace Internal
 {
 
-BitmapImage* BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol )
+BitmapImagePtr BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
-  BitmapImage* internal = new BitmapImage( width, height, pixelformat, loadPol, releasePol );
+  BitmapImagePtr internal = new BitmapImage( width, height, pixelformat, loadPol, releasePol );
   internal->Initialize();
   return internal;
 }
 
-BitmapImage* BitmapImage::New( PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol )
+BitmapImagePtr BitmapImage::New( PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol )
 {
-  BitmapImage* internal = new BitmapImage( pixBuf, width, height, pixelformat, stride, releasePol );
+  BitmapImagePtr internal = new BitmapImage( pixBuf, width, height, pixelformat, stride, releasePol );
   internal->Initialize();
   return internal;
 }
@@ -48,8 +48,8 @@ BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format 
 : Image(loadPol, releasePol),
   mIsDataExternal(false)
 {
-  Initialize();
-
+  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+  mResourceClient = &tls.GetResourceClient();
   mWidth  = width;
   mHeight = height;
 
@@ -63,7 +63,8 @@ BitmapImage::BitmapImage(PixelBuffer* pixBuf, unsigned int width, unsigned int h
 : Image(ImageLoadPolicyDefault, releasePol),
   mIsDataExternal(true)
 {
-  Initialize();
+  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+  mResourceClient = &tls.GetResourceClient();
   mWidth  = width;
   mHeight = height;
   Integration::Bitmap* bitmap = new BitmapExternal(pixBuf, width, height, pixelformat, stride);
@@ -144,12 +145,6 @@ unsigned int BitmapImage::GetBufferStride() const
   }
 
   return bufferStride;
-}
-
-void BitmapImage::Initialize()
-{
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  mResourceClient = &tls.GetResourceClient();
 }
 
 void BitmapImage::Connect()

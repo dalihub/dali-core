@@ -371,7 +371,7 @@ void ResourceManager::HandleAllocateMeshRequest( ResourceId id, MeshData* meshDa
 {
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAllocateMeshRequest(id:%u)\n", id);
 
-  SceneGraph::Mesh* renderableMesh(SceneGraph::Mesh::New(id, mImpl->mPostProcessResourceDispatcher, meshData));
+  SceneGraph::Mesh* renderableMesh(SceneGraph::Mesh::New(id, mImpl->mPostProcessResourceDispatcher, mImpl->mRenderQueue, meshData));
 
   DALI_ASSERT_ALWAYS(renderableMesh && "renderableMesh not created");
 

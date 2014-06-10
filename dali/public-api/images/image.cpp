@@ -51,70 +51,70 @@ Image::~Image()
 
 Image Image::New(const std::string& filename)
 {
-  Internal::Image* internal = Internal::Image::New(filename);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(filename);
+  return Image(internal.Get());
 }
 
 Image Image::New(const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol)
 {
-  Internal::Image* internal = Internal::Image::New(filename,
-                                                   Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
-                                                   loadPol, releasePol);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(filename,
+                                                     Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
+                                                     loadPol, releasePol);
+  return Image(internal.Get());
 }
 
 Image Image::New(const std::string& filename, const ImageAttributes& attributes)
 {
-  Internal::Image* internal = Internal::Image::New(filename, attributes);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(filename, attributes);
+  return Image(internal.Get());
 }
 
 Image Image::New(const std::string& filename, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol)
 {
-  Internal::Image* internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
+  return Image(internal.Get());
 }
 
 Image Image::NewDistanceField(const std::string& filename)
 {
   ImageAttributes attributes = ImageAttributes::NewDistanceField();
-  Internal::Image* internal = Internal::Image::New(filename, attributes);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(filename, attributes);
+  return Image(internal.Get());
 }
 
 Image Image::NewDistanceField(const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol)
 {
   ImageAttributes attributes = ImageAttributes::NewDistanceField();
-  Internal::Image* internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
+  return Image(internal.Get());
 }
 
 Image Image::NewDistanceField(const std::string& filename, const ImageAttributes& attributes)
 {
   DALI_ASSERT_DEBUG(attributes.IsDistanceField());
 
-  Internal::Image* internal = Internal::Image::New(filename, attributes);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(filename, attributes);
+  return Image(internal.Get());
 }
 
 Image Image::NewDistanceField(const std::string& filename, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol)
 {
   DALI_ASSERT_DEBUG(attributes.IsDistanceField());
 
-  Internal::Image* internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
+  return Image(internal.Get());
 }
 
 Image Image::New(NativeImage& nativeImg)
 {
-  Internal::Image* internal = Internal::Image::New(nativeImg);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(nativeImg);
+  return Image(internal.Get());
 }
 
 Image Image::New(NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy releasePol)
 {
-  Internal::Image* internal = Internal::Image::New(nativeImg, loadPol, releasePol);
-  return Image(internal);
+  Internal::ImagePtr internal = Internal::Image::New(nativeImg, loadPol, releasePol);
+  return Image(internal.Get());
 }
 
 Image Image::DownCast( BaseHandle handle )

@@ -42,29 +42,37 @@ FrameBufferImage::~FrameBufferImage()
 FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat)
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();
-  return FrameBufferImage(new Internal::FrameBufferImage((0 == width) ? stageSize.width : width,
-                                                         (0 == height) ? stageSize.height : height,
-                                                         pixelformat,
-                                                         Dali::Image::Never));
+  Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New(
+    (0 == width) ? stageSize.width : width,
+    (0 == height) ? stageSize.height : height,
+    pixelformat,
+    Dali::Image::Never);
+
+  return FrameBufferImage(internal.Get());
 }
 
 FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePolicy)
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();
-  return FrameBufferImage(new Internal::FrameBufferImage((0 == width) ? stageSize.width : width,
-                                                         (0 == height) ? stageSize.height : height,
-                                                         pixelformat,
-                                                         releasePolicy));
+  Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New(
+    (0 == width) ? stageSize.width : width,
+    (0 == height) ? stageSize.height : height,
+    pixelformat,
+    releasePolicy);
+
+  return FrameBufferImage(internal.Get());
 }
 
 FrameBufferImage FrameBufferImage::New( NativeImage& image, ReleasePolicy releasePolicy )
 {
-  return FrameBufferImage(new Internal::FrameBufferImage( image, releasePolicy ));
+  Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New( image, releasePolicy );
+  return FrameBufferImage(internal.Get());
 }
 
 FrameBufferImage FrameBufferImage::New( NativeImage& image )
 {
-  return FrameBufferImage(new Internal::FrameBufferImage( image ));
+  Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New( image );
+  return FrameBufferImage(internal.Get());
 }
 
 FrameBufferImage FrameBufferImage::DownCast( BaseHandle handle )

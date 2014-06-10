@@ -31,6 +31,27 @@ FrameBufferImage::~FrameBufferImage()
 {
 }
 
+FrameBufferImagePtr  FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy)
+{
+  FrameBufferImagePtr image = new FrameBufferImage(width, height, pixelFormat, releasePolicy);
+  image->Initialize();
+  return image;
+}
+
+FrameBufferImagePtr  FrameBufferImage::New( NativeImage& nativeImage )
+{
+  FrameBufferImagePtr image = new FrameBufferImage(nativeImage);
+  image->Initialize();
+  return image;
+}
+
+FrameBufferImagePtr  FrameBufferImage::New( NativeImage& nativeImage, ReleasePolicy releasePolicy )
+{
+  FrameBufferImagePtr image = new FrameBufferImage(nativeImage, releasePolicy);
+  image->Initialize();
+  return image;
+}
+
 FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy)
 : Image(Dali::Image::Immediate, releasePolicy),
   mPixelFormat(pixelFormat)
@@ -38,6 +59,7 @@ FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixe
   mWidth  = width;
   mHeight = height;
 }
+
 
 FrameBufferImage::FrameBufferImage( NativeImage& nativeImage )
 : Image(Dali::Image::Immediate),
@@ -47,6 +69,7 @@ FrameBufferImage::FrameBufferImage( NativeImage& nativeImage )
   mWidth = nativeImage.GetWidth();
   mHeight = nativeImage.GetHeight();
 }
+
 
 FrameBufferImage::FrameBufferImage( NativeImage& nativeImage, ReleasePolicy releasePolicy )
 : Image(Dali::Image::Immediate, releasePolicy),

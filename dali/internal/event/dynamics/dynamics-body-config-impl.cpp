@@ -30,6 +30,7 @@
 #include <dali/internal/event/dynamics/dynamics-mesh-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-sphere-shape-impl.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
+#include <dali/public-api/geometry/cloth.h>
 
 namespace Dali
 {
@@ -102,8 +103,8 @@ void DynamicsBodyConfig::SetShape( const Dali::DynamicsShape::ShapeType type, co
     }
     case Dali::DynamicsShape::MESH:
     {
-      Dali::Mesh mesh( Dali::Mesh::NewPlane( dimensions.x, dimensions.y, dimensions.z, dimensions.z ) );
-      mShape = new DynamicsMeshShape( GetImplementation(mesh) );
+      Dali::Cloth cloth = Dali::Cloth::New( dimensions.x, dimensions.y, dimensions.z, dimensions.z );
+      mShape = new DynamicsMeshShape( GetImplementation(cloth) );
       break;
     }
     case Dali::DynamicsShape::SPHERE:

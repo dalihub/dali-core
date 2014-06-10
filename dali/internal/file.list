@@ -75,6 +75,7 @@ internal_src_files = \
   $(internal_src_dir)/event/images/nine-patch-image-impl.cpp \
   $(internal_src_dir)/event/images/emoji-factory.cpp \
   $(internal_src_dir)/event/modeling/animatable-mesh-impl.cpp \
+  $(internal_src_dir)/event/modeling/cloth-impl.cpp \
   $(internal_src_dir)/event/modeling/entity-impl.cpp \
   $(internal_src_dir)/event/modeling/light-impl.cpp \
   $(internal_src_dir)/event/modeling/material-impl.cpp \

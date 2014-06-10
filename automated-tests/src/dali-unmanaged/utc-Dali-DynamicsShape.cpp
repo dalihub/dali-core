@@ -193,7 +193,7 @@ int UtcDaliDynamicsShapeNewMesh(void)
 
   if( world )
   {
-    DynamicsShape shape( DynamicsShape::NewMesh( Mesh::NewPlane(10.0f, 10.0f, 10, 10)) );
+    DynamicsShape shape( DynamicsShape::NewMesh( Cloth::New(10.0f, 10.0f, 10, 10)) );
 
     DALI_TEST_CHECK( shape );
     DALI_TEST_CHECK( DynamicsShape::MESH == shape.GetType() );

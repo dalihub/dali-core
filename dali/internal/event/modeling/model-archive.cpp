@@ -799,7 +799,7 @@ Archive& operator<< (Archive& ar, const ModelData& t)
   {
     for( unsigned int i = 0; i < count; ++i)
     {
-      ar << t.GetAnimationMap(i);
+      ar << *t.GetAnimationMap(i);
     }
   }
   ar.CloseChunk(); // ANIS

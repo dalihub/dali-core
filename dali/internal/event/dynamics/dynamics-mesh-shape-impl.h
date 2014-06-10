@@ -65,8 +65,16 @@ public:
    */
   virtual Vector3 GetAABB() const;
 
+  /**
+   * Get the mesh
+   */
+  Mesh& GetMesh()
+  {
+    return mMesh;
+  }
+
 private:
-  MeshIPtr mMesh;
+  Mesh& mMesh;
 }; // class DynamicsMeshShape
 
 } // namespace Internal
