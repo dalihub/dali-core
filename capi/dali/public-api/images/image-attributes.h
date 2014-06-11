@@ -34,26 +34,55 @@ namespace Dali DALI_IMPORT_API
 class ImageAttributes;
 
 /**
- * @brief Describes Image properties like width or pixel format.
- * ImageAttributes are used to request specific details when loading an image.
- * Loading a scaled-down version of a JPEG image can be done by requesting width and height values that are
- * smaller than the image's natural size. The requested values are taken into consideration but
- * original aspect ratio is still preserved.
- * After an image has successfuly loaded, ImageAttributes contain the actual size of the image.
+ * @brief Describes Image properties like dimensions and pixel format and
+ * operations to be applied to images during the load process.
+ *
+ * ImageAttributes is used to define a set of properties of an image and a
+ * sequence of operations to be applied when loading it.
+ *
+ * The overall order of operations which can be applied is:
+ *   1. Determine the desired dimensions for the final bitmap.
+ *   2. Scale the image to fit the desired dimensions.
+ *
+ * The default for each stage is to do nothing.
+ * To enable a calculation of desired final image dimensions and fitting to it, SetSize() must be called.
+ *
+ * The loader does not guarantee to rescale a loaded image to the exact desired dimensions, but it will make a best effort to downscale images.
+ * The fitting to destination dimensions controlled by the ScalingMode may choose to fit to a larger area with an equivalent aspect ratio.
+ * If the requested dimensions are larger than the loaded ones, it will never upscale on load to fill them but will instead fit to smaller dimensions of identical aspect ratio.
+ * This is transparent to an application as the upscaling can happen during rendering.
+ *
+ * To enable scaling of images on load, desired dimensions must be set using SetSize().
+ * Only one of the dimensions need be supplied, in which case, the other is calculated based on the aspect ratio of the raw loaded image.
+ * The desired dimensions 2-tuple 'd' is determined as follows for loaded image dimensions 'l' and 's', the dimensions tuple set with SetSize():
+ *   *  `d = s, if s.x != 0 & s.y != 0, else:`
+ *   *  `d = [s.x, s.x * (l.y / l.x)], if s.x != 0 & s.y = 0, else:`
+ *   *  `d = [s.y * (l.x / l.y), s.y], if s.x = 0 & s.y != 0, else:`
+ *   *  `d = l, otherwise.`
+ *
+ * Use cases for scaling images on load include:
+ *   1. Full-screen image display: Limit loaded image resolution to device resolution using ShrinkToFit mode.
+ *   2. Thumbnail gallery grid: Limit loaded image resolution to screen tile using ScaleToFill mode.
+ *   3. Image columns: Limit loaded image resolution to column width using FitWidth mode.
+ *   4. Image rows: Limit loaded image resolution to row height using FitHeight mode.
+ *
+ * @note The aspect ratio of image contents is preserved by all scaling modes, so for example squares in input images stay square after loading.
  */
 class ImageAttributes
 {
 public:
 
   /**
-   * @brief Scaling options, meant for thumbnail loading.
+   * @brief Scaling options, used when resizing images on load to fit desired dimensions.
+   *
+   * All scaling modes preserve the aspect ratio of the image contents.
    */
   enum ScalingMode
   {
-    ShrinkToFit, ///< fit full thumbnail inside width & height, maintain aspect ratio
-    ScaleToFill, ///< thumbnail fills whole width & height, maintain aspect ratio
-    FitWidth,    ///< thumbnail fills whole width, height is scaled to maintain aspect ratio
-    FitHeight     ///< thumbnail fills whole height, width is scaled to maintain aspect ratio
+    ShrinkToFit, ///< Fit full image inside desired width & height, potentially not filling one of either the desired image width or height with pixels.
+    ScaleToFill, ///< Image fills whole desired width & height with image data. The image is centred in the desired dimensions, exactly touching in one dimension, with image regions outside the other desired dimension cropped away.
+    FitWidth,    ///< Image fills whole width. Height is scaled proportionately to maintain aspect ratio.
+    FitHeight    ///< Image fills whole height. Width is scaled proportionately to maintain aspect ratio.
   };
 
   static const ImageAttributes DEFAULT_ATTRIBUTES; ///< Default attributes have no size
@@ -121,16 +150,22 @@ public:
    * @brief Set the size properties.
    *
    * By default width and height are set to zero which means the image loaded has the original size.
+   * If one dimension is set to non-zero, but the other zeroed, the unspecified one is derived from
+   * the one that is set and the aspect ratio of the image.
+   *
    * @param [in] width  desired width.
    * @param [in] height desired height
    */
   void SetSize(unsigned int width, unsigned int height);
 
   /**
-   * @brief Set the size properties.
+   * @brief Set the image dimension properties.
    *
-   * By default width and height are set to zero which means the image loaded has the original size.
-   * @param [in] size  desired size.
+   * By default, width and height are set to zero which means the image loaded has the original size.
+   * If one dimension is set to non-zero, but the other zeroed, the unspecified one is derived from
+   * the one that is set and the aspect ratio of the image.
+   *
+   * @param [in] size desired size.
    */
   void SetSize( const Size& size );
 
