@@ -183,8 +183,8 @@ HitActor HitTestWithinLayer( Actor& actor,
     }
   }
 
-  // If there is a stencil on this layer and we've also registered a hit, then don't both searching any children
-  if ( stencilHit && hit.actor )
+  // If we are a stencil (or a child of a stencil) and we have already ascertained that the stencil has been hit then there is no need to hit-test the children of this stencil-actor
+  if ( isStencil && stencilHit  )
   {
     return hit;
   }
