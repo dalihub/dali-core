@@ -3,7 +3,7 @@ Summary:    The OpenGLES Canvas Core Library
 Version:    0.9.21
 Release:    1
 Group:      System/Libraries
-License:    Apache
+License:    Apache-2.0
 URL:        https://review.tizen.org/git/?p=platform/core/uifw/dali-core.git;a=summary
 Source0:    %{name}-%{version}.tar.gz
 
@@ -14,7 +14,6 @@ BuildRequires:  pkgconfig
 BuildRequires:  gawk
 BuildRequires:  boost-devel
 BuildRequires:  boost-thread
-ExclusiveArch:  armv7l
 
 %description
 The OpenGLES Canvas Core Library provides a 3D scene graph
@@ -119,10 +118,7 @@ cp -af %{_builddir}/%{name}-%{version}/LICENSE %{buildroot}/usr/share/license/%{
 %post
 /sbin/ldconfig
 chown 5000:5000 %{shader_bin_dir}
-%if 0%{?sec_product_feature_graphics_adreno}
-%else
-  rm -rf %{shader_bin_dir}/*
-%endif
+rm -rf %{shader_bin_dir}/*
 exit 0
 
 ##############################
