@@ -131,6 +131,7 @@ void MeshActor::SetMesh(Dali::Mesh mesh)
 
 void MeshActor::SetMesh(Dali::AnimatableMesh mesh)
 {
+  mAnimatableMeshHandle = mesh;
   SetMesh( GetImplementation(mesh).GetMesh() );
 
   SetInitialVolume(Vector3(1.0f, 1.0f, 1.0f));

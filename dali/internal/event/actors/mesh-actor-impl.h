@@ -22,7 +22,7 @@
 #include <cstddef>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/object/handle.h>
 #include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/modeling/entity.h>
@@ -157,6 +157,8 @@ protected:
 
 private:
   Internal::MeshAttachmentPtr mMeshAttachment;
+  // To keep a reference to the AnimatableMesh so it would not be destroyed before the MeshActor object
+  Dali::Handle                mAnimatableMeshHandle;
 };
 
 } // namespace Internal
