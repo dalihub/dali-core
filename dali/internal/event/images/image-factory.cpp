@@ -236,14 +236,13 @@ bool ImageFactory::CompareAttributes( const Dali::ImageAttributes& requested,
   // do not load image resource again if there is a similar resource loaded
   // eg. if size is less than 50% different of what we have
   // see explanation in image.h of what is deemed compatible
-  return (actual.GetCrop().Contains(requested.GetCrop())) &&
-         (requested.GetScalingMode() == actual.GetScalingMode()) &&
-         (requested.GetPixelFormat() == actual.GetPixelFormat()) &&
-         (requested.GetFieldBorder() == actual.GetFieldBorder()) &&
-         (fabs(actual.GetFieldRadius() - requested.GetFieldRadius()) <= FLT_EPSILON) &&
-         (requested.IsDistanceField() == actual.IsDistanceField()) &&
-         (fabsf(requested.GetWidth()  - actual.GetWidth())  < actual.GetWidth()  * mMaxScale) &&
-         (fabsf(requested.GetHeight() - actual.GetHeight()) < actual.GetHeight() * mMaxScale);
+  return (requested.GetScalingMode() ==  actual.GetScalingMode()) &&
+          (requested.GetPixelFormat() ==  actual.GetPixelFormat()) &&
+          (requested.GetFieldBorder() ==  actual.GetFieldBorder()) &&
+          (fabs(actual.GetFieldRadius() - requested.GetFieldRadius()) <= FLT_EPSILON) &&
+          (requested.IsDistanceField() == actual.IsDistanceField()) &&
+          (fabsf(requested.GetWidth()  -  actual.GetWidth())  < actual.GetWidth()  * mMaxScale) &&
+          (fabsf(requested.GetHeight() -  actual.GetHeight()) < actual.GetHeight() * mMaxScale);
 }
 
 Request* ImageFactory::InsertNewRequest( ResourceId resourceId, const std::string& filename, std::size_t urlHash, const ImageAttributes* attr )

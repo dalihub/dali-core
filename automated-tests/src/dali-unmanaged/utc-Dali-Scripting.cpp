@@ -397,19 +397,6 @@ int UtcDaliScriptingNewImageNegative(void)
     }
   }
 
-  // Invalid crop
-  try
-  {
-    Property::Map map;
-    map.push_back( Property::StringValuePair( "crop", "Invalid" ) );
-    Image image = NewImage( map );
-    tet_result( TET_FAIL );
-  }
-  catch ( DaliException& e )
-  {
-    DALI_TEST_ASSERT( e, "map.GetValue(field).GetType()", TEST_LOCATION );
-  }
-
   // Invalid type
   try
   {
@@ -544,18 +531,6 @@ int UtcDaliScriptingNewImage(void)
         { "FIT_HEIGHT", ImageAttributes::FitHeight },
     };
     TestEnumStrings< ImageAttributes::ScalingMode, ImageAttributes >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &ImageAttributes::GetScalingMode, &NewImageAttributes );
-  }
-
-  // crop
-  map.push_back( Property::StringValuePair( "crop", Vector4( 50, 60, 70, 80 ) ) );
-  {
-    Image image = NewImage( map );
-    ImageAttributes attributes = image.GetAttributes();
-    Rect<float> crop = attributes.GetCrop();
-    DALI_TEST_EQUALS( crop.x, 50, TEST_LOCATION );
-    DALI_TEST_EQUALS( crop.y, 60, TEST_LOCATION );
-    DALI_TEST_EQUALS( crop.width, 70, TEST_LOCATION );
-    DALI_TEST_EQUALS( crop.height, 80, TEST_LOCATION );
   }
 
   // type FrameBufferImage
@@ -969,8 +944,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( value.GetValue( "pixel-format" ).Get< std::string >(), "RGBA8888", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "scaling-mode") );
     DALI_TEST_EQUALS( value.GetValue( "scaling-mode" ).Get< std::string >(), "SHRINK_TO_FIT", TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "crop" ) );
-    DALI_TEST_EQUALS( value.GetValue( "crop" ).Get< Vector4 >(), Vector4( 0.0f, 0.0f, 1.0f, 1.0f ), TEST_LOCATION );
     DALI_TEST_CHECK( !value.HasKey( "width" ) );
     DALI_TEST_CHECK( !value.HasKey( "height" ) );
   }
@@ -980,7 +953,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     ImageAttributes attributes;
     attributes.SetPixelFormat( Pixel::A8 );
     attributes.SetScalingMode( ImageAttributes::FitWidth );
-    attributes.SetCrop( Rect< float >( 0.5f, 0.2f, 0.2f, 0.4f ) );
     attributes.SetSize( 300, 400 );
     Image image = Image::New( "MY_PATH", attributes, Image::OnDemand, Image::Unused );
 
@@ -1001,8 +973,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( value.GetValue( "pixel-format" ).Get< std::string >(), "A8", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "scaling-mode") );
     DALI_TEST_EQUALS( value.GetValue( "scaling-mode" ).Get< std::string >(), "FIT_WIDTH", TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "crop" ) );
-    DALI_TEST_EQUALS( value.GetValue( "crop" ).Get< Vector4 >(), Vector4( 0.5f, 0.2f, 0.2f, 0.4f ), TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "width" ) );
     DALI_TEST_EQUALS( value.GetValue( "width" ).Get< int >(), 300, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "height" ) );

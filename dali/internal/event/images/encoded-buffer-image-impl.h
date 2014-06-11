@@ -64,7 +64,7 @@ public:
    * discard it as soon as the function returns.
    * @param [in] encodedImageByteCount The size in bytes of the buffer pointed to
    * by encodedImage.
-   * @param [in] attributes Requested parameters for loading (size, cropping etc.).
+   * @param [in] attributes Requested parameters for loading (size, scaling etc.).
    * @param [in] releasePol The ReleasePolicy to apply to image. Since it cannot
    * be recreated by dali, the default of Never will usually make sense.
    * @return A pointer to a newly allocated object, or null on error.

@@ -186,18 +186,6 @@ public:
   void SetScalingMode(ScalingMode scalingMode);
 
   /**
-   * @brief Set the desired cropping for the attribute.
-   *
-   * Cropping options, relative to image actual size.
-   * (0.0, 0.0) is top left corner, (1.0, 1.0) is the full width and height
-   * defaults are (0,0,1,1) so that whole image is loaded
-   * (0.25, 0.25, 0.5, 0.5) would mean that 50% of the image is loaded from the middle
-   *
-   * @param [in] cropRect - The crop rectangle
-   */
-  void SetCrop(const Rect<float>& cropRect);
-
-  /**
    * @brief Set whether the image will be rotated/flipped back into portrait orientation.
    *
    * This will only be necessary if metadata indicates that the
@@ -272,13 +260,6 @@ public:
    * @return field radius
    */
   float GetFieldRadius() const;
-
-  /**
-   * @brief Return the crop currently represented by the attribute.
-   *
-   * @return crop
-   */
-  const Rect<float>& GetCrop() const;
 
   /**
    * @brief Whether to correct for physical orientation of an image.

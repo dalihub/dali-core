@@ -72,7 +72,7 @@ class ImageAttributes;
  * and ReleasePolicy "Never" overrides "Unused".
  *
  * <i>Custom load requests</i>
- * Size, scaling mode, cropping area can be set when requesting an image resource.
+ * Size, scaling mode, orientation compensation can be set when requesting an image resource.
  * See ImageAttributes for more details.
  *
  * <i>Compatible resources</i>
@@ -189,7 +189,7 @@ public:
    * @brief Create an initialised image object.
    *
    * @param [in] filename   The filename of the image file to use.
-   * @param [in] attributes Requested parameters for loading (size, cropping etc.).
+   * @param [in] attributes Requested parameters for loading (size, scaling etc.).
    * @return A handle to a newly allocated object
    */
   static Image New(const std::string& filename, const ImageAttributes& attributes);
@@ -198,7 +198,7 @@ public:
    * @brief Create an initialised image object.
    *
    * @param [in] filename   The filename of the image file to use.
-   * @param [in] attributes Requested parameters for loading (size, cropping etc.).
+   * @param [in] attributes Requested parameters for loading (size, scaling etc.).
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
    * @param [in] releasePol The ReleasePolicy to apply to Image.
    * @return A handle to a newly allocated object

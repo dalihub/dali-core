@@ -79,7 +79,7 @@ public:
    * Creates object and loads image from filesystem
    * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @param [in] filename   the path of the image on the filesystem
-   * @param [in] attributes requested parameters for loading (size, cropping etc.)
+   * @param [in] attributes requested parameters for loading (size, scaling etc.)
    *                        if width or height is specified as 0, the natural size will be used.
    * @param [in] loadPol controls time of loading a resource from the filesystem (default: load when Image is created).
    * @param [in] releasePol optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).

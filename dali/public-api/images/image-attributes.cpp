@@ -35,7 +35,6 @@ struct ImageAttributes::ImageAttributesImpl
      height(0),
      scaling(ShrinkToFit),
      pixelformat(Pixel::RGBA8888),
-     crop(0.0f,0.0f,1.0f,1.0f),
      mOrientationCorrection(false),
      isDistanceField(false),
      fieldRadius(4.0f),
@@ -52,7 +51,6 @@ struct ImageAttributes::ImageAttributesImpl
     height( rhs.height ),
     scaling( rhs.scaling ),
     pixelformat( rhs.pixelformat ),
-    crop( rhs.crop ),
     mOrientationCorrection( rhs.mOrientationCorrection ),
     isDistanceField( rhs.isDistanceField ),
     fieldRadius( rhs.fieldRadius ),
@@ -68,7 +66,6 @@ struct ImageAttributes::ImageAttributesImpl
       height = rhs.height;
       scaling = rhs.scaling;
       pixelformat = rhs.pixelformat;
-      crop = rhs.crop;
       mOrientationCorrection = rhs.mOrientationCorrection;
       isDistanceField = rhs.isDistanceField;
       fieldRadius = rhs.fieldRadius;
@@ -82,14 +79,6 @@ struct ImageAttributes::ImageAttributesImpl
   unsigned int  height;           ///< image height in pixels
   ScalingMode   scaling;          ///< scaling option, ShrinkToFit is default
   Pixel::Format pixelformat;      ///< pixel format, default is RGBA8888
-
-  /**
-   * Cropping options, relative to image actual size.
-   * (0.0, 0.0) is top left corner, (1.0, 1.0) is the full width and height
-   * defaults are (0,0,1,1) so that whole image is loaded
-   * (0.25, 0.25, 0.5, 0.5) would mean that 50% of the image is loaded from the middle
-   */
-  Rect<float>   crop;
 
   bool          mOrientationCorrection; ///< If true, image pixels are reordered according to orientation metadata on load.
 
@@ -144,11 +133,6 @@ void ImageAttributes::SetScalingMode(ScalingMode scale)
   impl->scaling = scale;
 }
 
-void ImageAttributes::SetCrop(const Rect<float>& cropRect)
-{
-  impl->crop = cropRect;
-}
-
 void ImageAttributes::SetOrientationCorrection(const bool enabled)
 {
   impl->mOrientationCorrection = enabled;
@@ -192,11 +176,6 @@ int ImageAttributes::GetFieldBorder() const
 float ImageAttributes::GetFieldRadius() const
 {
   return impl->fieldRadius;
-}
-
-const Rect<float>& ImageAttributes::GetCrop() const
-{
-  return impl->crop;
 }
 
 bool ImageAttributes::GetOrientationCorrection() const
@@ -259,13 +238,6 @@ bool operator<(const ImageAttributes& a, const ImageAttributes& b)
     return a.impl->height < b.impl->height;
   }
 
-  float a_area = a.impl->crop.Area();
-  float b_area = b.impl->crop.Area();
-  if (fabsf(a_area - b_area) > GetRangedEpsilon(a_area, b_area))
-  {
-    return a_area < b_area;
-  }
-
   if (a.impl->mOrientationCorrection != b.impl->mOrientationCorrection)
   {
     return a.impl->mOrientationCorrection < b.impl->mOrientationCorrection;
@@ -307,7 +279,6 @@ bool operator==(const ImageAttributes& a, const ImageAttributes& b)
 {
   return a.impl->width                  == b.impl->width       &&
          a.impl->height                 == b.impl->height      &&
-         a.impl->crop                   == b.impl->crop        &&
          a.impl->mOrientationCorrection == b.impl->mOrientationCorrection &&
          a.impl->pixelformat            == b.impl->pixelformat &&
          a.impl->scaling                == b.impl->scaling     &&

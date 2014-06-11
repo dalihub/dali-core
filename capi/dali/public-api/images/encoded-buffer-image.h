@@ -86,7 +86,7 @@ public:
    * discard it as soon as the function returns.
    * @param [in] encodedImageByteCount The size in bytes of the buffer pointed to
    * by encodedImage.
-   * @param [in] attributes Requested parameters for loading (size, cropping etc.).
+   * @param [in] attributes Requested parameters for loading (size, scaling etc.).
    * @param [in] releasePol The ReleasePolicy to apply to Image. If the Unused
    * policy is set, a reload will not be possible, so the Image should never be
    * used once all actors using it have gone off-stage.

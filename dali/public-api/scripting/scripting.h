@@ -203,7 +203,6 @@ Vector3 GetAnchorConstant( const std::string& value );
  * "height"          type FLOAT
  * "pixel-format"    type STRING (enum)
  * "scaling-mode"    type STRING (enum)
- * "crop"            type VECTOR4
  * "type"            type STRING (FrameBufferImage|BitMapImage|Image(default))
  * @endcode
  * Some fields are optional and some only pertain to a specific type.
