@@ -333,7 +333,6 @@ void RenderManager::RemoveRenderTracker( RenderTracker* renderTracker )
   mImpl->RemoveRenderTracker(renderTracker);
 }
 
-
 bool RenderManager::Render( Integration::RenderStatus& status )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
@@ -345,6 +344,9 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 
   // Increment the frame count at the beginning of each frame
   ++(mImpl->frameCount);
+  mImpl->context.SetFrameCount(mImpl->frameCount);
+  mImpl->context.ClearRendererCount();
+  mImpl->context.ClearCulledCount();
 
   PERF_MONITOR_START(PerformanceMonitor::DRAW_NODES);
 
@@ -426,6 +428,9 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   mImpl->renderBufferIndex = (0 != mImpl->renderBufferIndex) ? 0 : 1;
 
   DALI_PRINT_RENDER_END();
+
+  DALI_PRINT_RENDERER_COUNT(mImpl->frameCount, mImpl->context.GetRendererCount());
+  DALI_PRINT_CULL_COUNT(mImpl->frameCount, mImpl->context.GetCulledCount());
 
   return updateRequired;
 }

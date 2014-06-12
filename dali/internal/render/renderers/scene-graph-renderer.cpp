@@ -22,6 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/renderers/render-data-provider.h>
 #include <dali/public-api/actors/blending.h>
 
@@ -74,7 +75,8 @@ void Renderer::Render( BufferIndex bufferIndex,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
-                       float frametime )
+                       float frametime,
+                       bool cull)
 {
   DALI_ASSERT_DEBUG( mContext && "Renderer::Render. Renderer not initialised!! (mContext == NULL)." );
   DALI_ASSERT_DEBUG( mShader && "Renderer::Render. Shader not set!!" );
@@ -118,10 +120,21 @@ void Renderer::Render( BufferIndex bufferIndex,
   const Matrix& modelMatrix = mDataProvider.GetModelMatrix( bufferIndex );
   const Vector4& color = mDataProvider.GetRenderColor( bufferIndex );
 
+  // Calculate the MVP matrix first
+  Matrix& modelViewProjectionMatrix = mShader->GetMVPMatrix();
+  Matrix::Multiply( modelViewProjectionMatrix, modelViewMatrix, projectionMatrix );
+
   // Call to over ridden method in the child class
-  // TODO, once MeshRenderer is fixed to render only one mesh, move mShader.Apply here
+  // @todo, once MeshRenderer is fixed to render only one mesh, move mShader.Apply here
   // and we can greatly reduce these parameters. Also then derived renderers can be passed the Program&
-  DoRender( bufferIndex, modelViewMatrix, modelMatrix, viewMatrix, projectionMatrix, color );
+
+  GeometryType geometryType=GEOMETRY_TYPE_IMAGE;
+  ShaderSubTypes subType=SHADER_DEFAULT;
+  GetGeometryTypes( bufferIndex, geometryType, subType );
+  Program& program = mShader->GetProgram( *mContext, geometryType, subType );
+  bool areVerticesFixed = program.AreVerticesFixed();
+
+  DoRender( bufferIndex, modelViewMatrix, modelMatrix, viewMatrix, projectionMatrix, color, cull && areVerticesFixed );
 }
 
 Renderer::Renderer( RenderDataProvider& dataprovider )

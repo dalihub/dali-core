@@ -257,17 +257,19 @@ public:
 
   /**
    * Set the program for a geometry type and subtype
-   * @param[in] geometryType The type of the object (geometry) that is to be rendered.
-   * @param[in] subType      The subtype, one of ShaderSubTypes.
-   * @param[in] resourceId   The resource ID for the program.
-   * @param[in] shaderData   The program's vertex/fragment source and optionally compiled bytecode
-   * @param[in] context      Reference to the GL context.
+   * @param[in] geometryType  The type of the object (geometry) that is to be rendered.
+   * @param[in] subType       The subtype, one of ShaderSubTypes.
+   * @param[in] resourceId    The resource ID for the program.
+   * @param[in] shaderData    The program's vertex/fragment source and optionally compiled bytecode
+   * @param[in] context       Reference to the GL context.
+   * @param[in] areVerticesFixed True if the vertex shader does not change vertex position
    */
   void SetProgram( GeometryType geometryType,
                    Internal::ShaderSubTypes subType,
                    Integration::ResourceId resourceId,
                    Integration::ShaderDataPtr shaderData,
-                   Context* context );
+                   Context* context,
+                   bool areVerticesFixed );
 
   /**
    * Determine if subtypes are required for the given geometry type
@@ -275,6 +277,13 @@ public:
    * @return TRUE if subtypes are required, FALSE if there is only one subtype available
    */
   bool AreSubtypesRequired(GeometryType geometryType);
+
+  /**
+   * Get the program associated with the given type and subtype
+   */
+  Program& GetProgram( Context& context,
+                       GeometryType type,
+                       const ShaderSubTypes subType );
 
   /**
    * Applies the shader effect specific program and sets the common uniforms
@@ -307,6 +316,14 @@ public:
    * @param[in] frametime   time elapsed between the two last updates.
    */
   void SetFrameTime( float frametime );
+
+  /**
+   * @return The model view projection matrix
+   */
+  inline Matrix& GetMVPMatrix()
+  {
+    return mModelViewProjection;
+  }
 
 private: // Data
 

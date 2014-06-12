@@ -130,6 +130,7 @@ public:
   static const bool         DEFAULT_INPUT_ENABLED; ///< true
   static const Vector4      DEFAULT_CLEAR_COLOR;   ///< Color::BLACK
   static const bool         DEFAULT_CLEAR_ENABLED; ///< false
+  static const bool         DEFAULT_CULL_MODE;     ///< true
   static const unsigned int DEFAULT_REFRESH_RATE;  ///< REFRESH_ALWAYS
 
   /**
@@ -336,6 +337,22 @@ public:
    * @return True if the render-task should clear.
    */
   bool GetClearEnabled() const;
+
+  /**
+   * @brief Set whether the render task will cull the actors to the camera's view frustum.
+   *
+   * Note that this will only affect image actors that use the default vertex shader.
+   * The default mode is to cull actors.
+   * @param[in] cullMode True if the renderers should be culled.
+   */
+  void SetCullMode( bool cullMode );
+
+  /**
+   * @brief Get the cull mode.
+   *
+   * @return True if the render task should cull the actors to the camera's view frustum
+   */
+  bool GetCullMode() const;
 
   /**
    * @brief Set the refresh-rate of the RenderTask.

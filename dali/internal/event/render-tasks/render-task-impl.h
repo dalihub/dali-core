@@ -172,6 +172,16 @@ public:
   bool GetClearEnabled() const;
 
   /**
+   * @copydoc Dali::RenderTask::SetCullMode()
+   */
+  void SetCullMode( bool mode );
+
+  /**
+   * @copydoc Dali::RenderTask::GetCullMode()
+   */
+  bool GetCullMode() const;
+
+  /**
    * @copydoc Dali::RenderTask::SetRefreshRate()
    */
   void SetRefreshRate( unsigned int refreshRate );
@@ -441,6 +451,7 @@ private:
   bool mExclusive     : 1; ///< True if the render-task has exclusive access to the source Nodes.
   bool mInputEnabled  : 1; ///< True if the render-task should be considered for input handling.
   bool mClearEnabled  : 1; ///< True if the render-task should be clear the color buffer.
+  bool mCullMode      : 1; ///< True if the render-task's actors should be culled
   bool mIsSystemLevel : 1; ///< True if the render-task is on the system level task list.
 
   // Default properties

@@ -285,6 +285,25 @@ bool RenderTask::GetClearEnabled() const
   return mClearEnabled;
 }
 
+void RenderTask::SetCullMode( bool mode )
+{
+  if ( mCullMode != mode )
+  {
+    mCullMode = mode;
+
+    if ( mSceneObject )
+    {
+      // mSceneObject is being used in a separate thread; queue a message to set the value
+      SetCullModeMessage( mEventToUpdate, *mSceneObject, mCullMode );
+    }
+  }
+}
+
+bool RenderTask::GetCullMode() const
+{
+  return mCullMode;
+}
+
 void RenderTask::SetRefreshRate( unsigned int refreshRate )
 {
   DALI_LOG_TRACE_METHOD_FMT(gLogRender, "this:%p  rate:%d\n", this, refreshRate);
@@ -405,6 +424,7 @@ SceneGraph::RenderTask* RenderTask::CreateSceneObject()
   SetExclusiveMessage( mEventToUpdate, *mSceneObject, mExclusive );
   SetClearColorMessage(  mEventToUpdate, *mSceneObject, mClearColor );
   SetClearEnabledMessage(  mEventToUpdate, *mSceneObject, mClearEnabled );
+  SetCullModeMessage(  mEventToUpdate, *mSceneObject, mCullMode );
   SetRefreshRateMessage(  mEventToUpdate, *mSceneObject, mRefreshRate );
 
   // Caller takes ownership
@@ -721,6 +741,7 @@ RenderTask::RenderTask( EventToUpdate& eventToUpdate, bool isSystemLevel )
   mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),
   mInputEnabled( Dali::RenderTask::DEFAULT_INPUT_ENABLED ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
+  mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
   mIsSystemLevel( isSystemLevel )
 {
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::RenderTask(this:%p)\n", this);

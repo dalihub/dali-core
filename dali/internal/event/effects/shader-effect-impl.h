@@ -146,6 +146,12 @@ public:
    */
   const Dali::ShaderEffect::Extension& GetExtension() const;
 
+  enum FixedVertexShader
+  {
+    FLEXIBLE,
+    FIXED,
+  };
+
   /**
    * Add a GeometryType specific default program to this ShaderEffect
    * @param[in] geometryType    The GeometryType rendered by the shader program
@@ -154,7 +160,8 @@ public:
    * @param[in] fragmentSource  The source code for the fragment shader
    */
   void SetProgram( GeometryType geometryType, ShaderSubTypes subType,
-                   const std::string& vertexSource, const std::string& fragmentSource );
+                   const std::string& vertexSource, const std::string& fragmentSource,
+                   FixedVertexShader fixedVertexShader=FLEXIBLE);
 
   /**
    * Add a GeometryType specific default program to this ShaderEffect.
@@ -166,10 +173,12 @@ public:
    * @param[in] fragmentPrefix  The prefix source code for the fragment shader
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
+   * @param[in] fixedVertexShader True if this shader doesn't change the vertices
    */
   void SetProgram( GeometryType geometryType, ShaderSubTypes subType,
                    const std::string& vertexPrefix, const std::string& fragmentPrefix,
-                   const std::string& vertexSource, const std::string& fragmentSource );
+                   const std::string& vertexSource, const std::string& fragmentSource,
+                   FixedVertexShader fixedVertexShader=FLEXIBLE);
 
   /**
    * Notify ShaderEffect that it's being used by an Actor.

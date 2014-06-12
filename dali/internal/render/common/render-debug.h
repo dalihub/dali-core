@@ -42,6 +42,20 @@
 
 #endif // DALI_PRINT_RENDER_INFO
 
+#undef DALI_PRINT_RENDERERS
+
+// Turn this on to see a snapshot of # renderers and # culled renderers every 2 seconds
+//#define DALI_PRINT_RENDERERS 1
+
+#ifdef DALI_PRINT_RENDERERS
+#define DALI_PRINT_RENDERER_COUNT(x, y)  Render::PrintRendererCount(x, y)
+#define DALI_PRINT_CULL_COUNT(x, y)      Render::PrintCullCount(x, y)
+#else // DALI_PRINT_RENDERERS
+#define DALI_PRINT_RENDERER_COUNT(x, y)
+#define DALI_PRINT_CULL_COUNT(x, y)
+#endif // DALI_PRINT_RENDERERS
+
+
 namespace Dali
 {
 
@@ -88,6 +102,20 @@ void PrintRenderList( const SceneGraph::RenderList& list );
  * @param[in] instruction The render-item.
  */
 void PrintRenderItem( const SceneGraph::RenderItem& item );
+
+/**
+ * Print the number of culled renderers
+ * @param[in] frameCount The frame counter
+ * @param[in] culledCount The number of culled renderers
+ */
+void PrintCullCount( unsigned int frameCount, unsigned int culledCount );
+
+/**
+ * Print the number of image renderers
+ * @param[in] frameCount The frame counter
+ * @param[in] rendererCount The number of image renderers
+ */
+void PrintRendererCount( unsigned int frameCount, unsigned int rendererCount );
 
 } // Render
 

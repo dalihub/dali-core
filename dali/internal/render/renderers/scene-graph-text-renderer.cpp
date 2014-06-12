@@ -297,7 +297,42 @@ bool TextRenderer::CheckResources()
   return true;
 }
 
-void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color )
+void TextRenderer::GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
+{
+  outType = GEOMETRY_TYPE_TEXT;
+
+  // If we have a color gradient, then we cannot use the default shader.
+
+  outSubType = SHADER_DEFAULT;
+  if( mTextParameters )
+  {
+    if( mTextParameters->IsOutlineEnabled() )
+    {
+      if( mTextParameters->IsGlowEnabled() )
+      {
+        outSubType = SHADER_GRADIENT_OUTLINE_GLOW;
+      }
+      else
+      {
+        outSubType = SHADER_GRADIENT_OUTLINE;
+      }
+    }
+    else if( mTextParameters->IsGlowEnabled() )
+    {
+      outSubType = SHADER_GRADIENT_GLOW;
+    }
+    else if( mTextParameters->IsDropShadowEnabled() )
+    {
+      outSubType = SHADER_GRADIENT_SHADOW;
+    }
+    else
+    {
+      outSubType = SHADER_GRADIENT;
+    }
+  }
+}
+
+void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest )
 {
   if ( ! ( mVertexBuffer && mIndexBuffer ) )
   {
@@ -309,37 +344,12 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
   DALI_LOG_INFO( gTextFilter, Debug::General, "TextRenderer::DoRender(this: %p) textureId:%d\n", this, mTextureId );
 
-  // If we have a color gradient, then we cannot use the default shader.
-  ShaderSubTypes shaderType( SHADER_DEFAULT );
-  if( mTextParameters )
-  {
-    if( mTextParameters->IsOutlineEnabled() )
-    {
-      if( mTextParameters->IsGlowEnabled() )
-      {
-        shaderType = SHADER_GRADIENT_OUTLINE_GLOW;
-      }
-      else
-      {
-        shaderType = SHADER_GRADIENT_OUTLINE;
-      }
-    }
-    else if( mTextParameters->IsGlowEnabled() )
-    {
-      shaderType = SHADER_GRADIENT_GLOW;
-    }
-    else if( mTextParameters->IsDropShadowEnabled() )
-    {
-      shaderType = SHADER_GRADIENT_SHADOW;
-    }
-    else
-    {
-      shaderType = SHADER_GRADIENT;
-    }
-  }
+  GeometryType geometryType;
+  ShaderSubTypes shaderType;
+  GetGeometryTypes( bufferIndex, geometryType, shaderType );
 
   // Apply shader effect specific program and common uniforms
-  Program& program = mShader->Apply( *mContext, bufferIndex, GEOMETRY_TYPE_TEXT, modelMatrix, viewMatrix, modelViewMatrix, projectionMatrix, color, shaderType );
+  Program& program = mShader->Apply( *mContext, bufferIndex, geometryType, modelMatrix, viewMatrix, modelViewMatrix, projectionMatrix, color, shaderType );
 
   // Set sampler uniform
   GLint samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER );

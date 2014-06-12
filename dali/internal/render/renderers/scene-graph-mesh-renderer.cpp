@@ -120,7 +120,53 @@ bool MeshRenderer::CheckResources()
   return true;
 }
 
-void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color )
+void MeshRenderer::GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
+{
+  MeshInfo& meshInfo = mMeshInfo[bufferIndex];
+  Mesh*           mesh     =   meshInfo.mesh;
+  RenderMaterial& material = *(meshInfo.material);
+
+  outType = GEOMETRY_TYPE_TEXTURED_MESH;
+  if( ! material.HasTexture() )
+  {
+    outType = GEOMETRY_TYPE_MESH;
+  }
+  outSubType = SHADER_DEFAULT;
+
+  if( mShader->AreSubtypesRequired( outType ) )
+  {
+    GLsizei numBoneMatrices = (GLsizei)mesh->GetMeshData(Mesh::RENDER_THREAD).GetBoneCount();
+
+    if( numBoneMatrices )
+    {
+      if( mesh->GetMeshData(Mesh::RENDER_THREAD).HasColor() )
+      {
+        outSubType = SHADER_RIGGED_AND_VERTEX_COLOR;
+      }
+      else if( mAffectedByLighting )
+      {
+        outSubType = SHADER_RIGGED_AND_LIT;
+      }
+      else
+      {
+        outSubType = SHADER_RIGGED_AND_EVENLY_LIT;
+      }
+    }
+    else
+    {
+      if( mesh->GetMeshData(Mesh::RENDER_THREAD).HasColor() )
+      {
+        outSubType = SHADER_VERTEX_COLOR;
+      }
+      else if( ! mAffectedByLighting )
+      {
+        outSubType = SHADER_EVENLY_LIT;
+      } // else default
+    }
+  }
+}
+
+void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest )
 {
   MeshInfo& meshInfo = mMeshInfo[bufferIndex];
   Mesh*           mesh              =    meshInfo.mesh;
@@ -138,45 +184,11 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
   mesh->UploadVertexData( *mContext, bufferIndex );
   mesh->BindBuffers( *mContext );
 
-  GeometryType geometryType = GEOMETRY_TYPE_TEXTURED_MESH;
-  if( ! material.HasTexture() )
-  {
-    geometryType = GEOMETRY_TYPE_MESH;
-  }
-
   GLsizei numBoneMatrices = (GLsizei)mesh->GetMeshData(Mesh::RENDER_THREAD).GetBoneCount();
 
-  // Select program type
+  GeometryType geometryType = GEOMETRY_TYPE_TEXTURED_MESH;
   ShaderSubTypes shaderType = SHADER_DEFAULT;
-  if( mShader->AreSubtypesRequired( geometryType ) )
-  {
-    if( numBoneMatrices )
-    {
-      if( mesh->GetMeshData(Mesh::RENDER_THREAD).HasColor() )
-      {
-        shaderType = SHADER_RIGGED_AND_VERTEX_COLOR;
-      }
-      else if( mAffectedByLighting )
-      {
-        shaderType = SHADER_RIGGED_AND_LIT;
-      }
-      else
-      {
-        shaderType = SHADER_RIGGED_AND_EVENLY_LIT;
-      }
-    }
-    else
-    {
-      if( mesh->GetMeshData(Mesh::RENDER_THREAD).HasColor() )
-      {
-        shaderType = SHADER_VERTEX_COLOR;
-      }
-      else if( ! mAffectedByLighting )
-      {
-        shaderType = SHADER_EVENLY_LIT;
-      } // else default
-    }
-  }
+  GetGeometryTypes( bufferIndex, geometryType, shaderType );
 
   if( geometryType != mGeometryType || shaderType != mShaderType )
   {

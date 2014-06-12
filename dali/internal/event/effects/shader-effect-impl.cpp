@@ -454,7 +454,8 @@ const Dali::ShaderEffect::Extension& ShaderEffect::GetExtension() const
 }
 
 void ShaderEffect::SetProgram( GeometryType geometryType, ShaderSubTypes subType,
-                               const std::string& vertexSource, const std::string& fragmentSource )
+                               const std::string& vertexSource, const std::string& fragmentSource,
+                               ShaderEffect::FixedVertexShader fixedShader )
 {
   // Load done asynchronously in update thread. SetProgram message below must be processed afterwards.
   // Therefore, resource manager cannot farm out the loading to the adaptor resource threads,
@@ -464,8 +465,9 @@ void ShaderEffect::SetProgram( GeometryType geometryType, ShaderSubTypes subType
 
   DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(geometryType %d subType:%d ticket.id:%d)\n", geometryType, subType, ticket->GetId() );
 
+  bool areVerticesFixed = (fixedShader == ShaderEffect::FIXED);
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( mUpdateManager, *mSceneObject, geometryType, subType, ticket->GetId(), shaderHash );
+  SetShaderProgramMessage( mUpdateManager, *mSceneObject, geometryType, subType, ticket->GetId(), shaderHash, areVerticesFixed );
 
   mTickets.push_back(ticket);       // add ticket to collection to keep it alive.
 }
@@ -473,11 +475,12 @@ void ShaderEffect::SetProgram( GeometryType geometryType, ShaderSubTypes subType
 
 void ShaderEffect::SetProgram( GeometryType geometryType, ShaderSubTypes subType,
                                const std::string& vertexPrefix, const std::string& fragmentPrefix,
-                               const std::string& vertexSource, const std::string& fragmentSource )
+                               const std::string& vertexSource, const std::string& fragmentSource,
+                               ShaderEffect::FixedVertexShader fixedShader )
 {
   const std::string vertex( vertexPrefix + vertexSource );
   const std::string fragment( fragmentPrefix + fragmentSource );
-  SetProgram( geometryType, subType, vertex, fragment );
+  SetProgram( geometryType, subType, vertex, fragment, fixedShader );
 }
 
 void ShaderEffect::Connect()

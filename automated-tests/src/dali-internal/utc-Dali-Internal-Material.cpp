@@ -79,7 +79,7 @@ public:
     shaderData->AllocateBuffer(10);
 
     Integration::ResourceId resourceId = 100;
-    program = Internal::Program::New(resourceId, shaderData.Get(), *testContext);
+    program = Internal::Program::New(resourceId, shaderData.Get(), *testContext, true);
     programId = app.GetGlAbstraction().GetLastProgramCreated();
     program->Use();
   }

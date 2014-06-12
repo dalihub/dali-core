@@ -118,7 +118,7 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
 
 // IMPLEMENTATION
 
-Program* Program::New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context )
+Program* Program::New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context, bool fixedVertices )
 {
   size_t shaderHash = shaderData->GetHashValue();
   Program* program = context.GetCachedProgram( shaderHash );
@@ -126,7 +126,7 @@ Program* Program::New( const Integration::ResourceId& resourceId, Integration::S
   if( NULL == program )
   {
     // program not found so create it
-    program = new Program( shaderData, context );
+    program = new Program( shaderData, context, fixedVertices );
 
     program->Load();
 
@@ -431,14 +431,20 @@ void Program::GlContextDestroyed()
   ResetAttribsUniforms();
 }
 
-Program::Program(Integration::ShaderData* shaderData, Context& context )
+bool Program::AreVerticesFixed()
+{
+  return mAreVerticesFixed;
+}
+
+Program::Program(Integration::ShaderData* shaderData, Context& context, bool areVerticesFixed )
 : mContext( context ),
   mGlAbstraction( context.GetAbstraction() ),
   mLinked( false ),
   mVertexShaderId( 0 ),
   mFragmentShaderId( 0 ),
   mProgramId( 0 ),
-  mProgramData(shaderData)
+  mProgramData(shaderData),
+  mAreVerticesFixed(areVerticesFixed)
 {
   // reserve space for standard uniforms
   mUniformLocations.reserve( UNIFORM_TYPE_LAST );

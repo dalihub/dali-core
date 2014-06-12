@@ -213,6 +213,16 @@ public:
   bool GetClearEnabled() const;
 
   /**
+   * @copydoc Dali::RenderTask::SetCullMode()
+   */
+  void SetCullMode( bool mode );
+
+  /**
+   * @copydoc Dali::RenderTask::GetCullMode()
+   */
+  bool GetCullMode() const;
+
+  /**
    * Set the refresh-rate of the RenderTask.
    * @param[in] refreshRate The new refresh rate.
    */
@@ -331,6 +341,7 @@ private:
   bool mNotifyTrigger:1; ///< True if a render once render task has finished renderering
   bool mExclusive: 1; ///< Whether the render task has exclusive access to the source actor (node in the scene graph implementation).
   bool mClearEnabled: 1; ///< Whether previous results are cleared.
+  bool mCullMode: 1; ///< Whether renderers should be frustum culled
 
   FrameBufferTexture* mRenderTarget;
   Viewport mViewport;
@@ -387,6 +398,17 @@ inline void SetClearEnabledMessage( EventToUpdate& eventToUpdate, RenderTask& ta
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &task, &RenderTask::SetClearEnabled, enabled );
+}
+
+inline void SetCullModeMessage( EventToUpdate& eventToUpdate, RenderTask& task, bool mode )
+{
+  typedef MessageValue1< RenderTask, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &task, &RenderTask::SetCullMode, mode );
 }
 
 inline void SetRefreshRateMessage( EventToUpdate& eventToUpdate, RenderTask& task, unsigned int refreshRate )

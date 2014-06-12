@@ -457,6 +457,94 @@ private:
 
 /**
  * Templated message which calls a member function of an object.
+ * This overload passes six value-type parameters.
+ * Template parameters need to match the MemberFunction!
+ * The message will contain copy of the value (in case of & or const&)
+ */
+template< typename T, typename P1, typename P2, typename P3, typename P4, typename P5, typename P6 >
+class MessageValue6 : public MessageBase
+{
+public:
+
+  typedef void(T::*MemberFunction)(
+      typename ParameterType< P1 >::PassingType,
+      typename ParameterType< P2 >::PassingType,
+      typename ParameterType< P3 >::PassingType,
+      typename ParameterType< P4 >::PassingType,
+      typename ParameterType< P5 >::PassingType,
+      typename ParameterType< P6 >::PassingType );
+
+  /**
+   * Create a message.
+   * @note The object is expected to be const in the thread which sends this message.
+   * However it can be modified when Process() is called in a different thread.
+   * @param[in] obj The object.
+   * @param[in] member The member function of the object.
+   * @param[in] p1 The first parameter to pass to the member function.
+   * @param[in] p2 The second parameter to pass to the member function.
+   * @param[in] p3 The third parameter to pass to the member function.
+   * @param[in] p4 The fourth parameter to pass to the member function.
+   * @param[in] p5 The fifth parameter to pass to the member function.
+   * @param[in] p6 The sixth parameter to pass to the member function.
+   */
+  MessageValue6( const T* obj,
+                 MemberFunction member,
+                 typename ParameterType< P1 >::PassingType p1,
+                 typename ParameterType< P2 >::PassingType p2,
+                 typename ParameterType< P3 >::PassingType p3,
+                 typename ParameterType< P4 >::PassingType p4,
+                 typename ParameterType< P5 >::PassingType p5,
+                 typename ParameterType< P6 >::PassingType p6 )
+  : MessageBase(),
+    object( const_cast< T* >( obj ) ),
+    memberFunction( member ),
+    param1( p1 ),
+    param2( p2 ),
+    param3( p3 ),
+    param4( p4 ),
+    param5( p5 ),
+    param6( p6 )
+  {
+  }
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~MessageValue6()
+  {
+  }
+
+  /**
+   * @copydoc MessageBase::Process
+   */
+  virtual void Process( BufferIndex /*bufferIndex*/ )
+  {
+    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+    (object->*memberFunction)(
+        ParameterType< P1 >::PassObject( param1 ),
+        ParameterType< P2 >::PassObject( param2 ),
+        ParameterType< P3 >::PassObject( param3 ),
+        ParameterType< P4 >::PassObject( param4 ),
+        ParameterType< P5 >::PassObject( param5 ),
+        ParameterType< P6 >::PassObject( param6 ) );
+
+  }
+
+private:
+
+  T* object;
+  MemberFunction memberFunction;
+  typename ParameterType< P1 >::HolderType param1;
+  typename ParameterType< P2 >::HolderType param2;
+  typename ParameterType< P3 >::HolderType param3;
+  typename ParameterType< P4 >::HolderType param4;
+  typename ParameterType< P5 >::HolderType param5;
+  typename ParameterType< P6 >::HolderType param6;
+
+};
+
+/**
+ * Templated message which calls a member function of an object.
  * This overload passes a value-type to set a double-buffered property.
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)

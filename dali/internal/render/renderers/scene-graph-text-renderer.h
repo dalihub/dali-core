@@ -127,9 +127,14 @@ public:
   virtual bool CheckResources();
 
   /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::GetGeometryTypes()
+   */
+  virtual void GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType );
+
+  /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoRender()
    */
-  virtual void DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color );
+  virtual void DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest );
 
 protected: // TextureObserver implementation
   /**

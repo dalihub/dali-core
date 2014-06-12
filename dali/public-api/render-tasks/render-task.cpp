@@ -47,6 +47,7 @@ const bool         RenderTask::DEFAULT_EXCLUSIVE     = false;
 const bool         RenderTask::DEFAULT_INPUT_ENABLED = true;
 const Vector4      RenderTask::DEFAULT_CLEAR_COLOR   = Vector4( 0.0f, 0.0f, 0.0f, 1.0f ); // cannot use Color::Black because it may or may not be initialized yet
 const bool         RenderTask::DEFAULT_CLEAR_ENABLED = false;
+const bool         RenderTask::DEFAULT_CULL_MODE     = true;
 const unsigned int RenderTask::DEFAULT_REFRESH_RATE  = REFRESH_ALWAYS;
 
 RenderTask::RenderTask()
@@ -195,6 +196,16 @@ bool RenderTask::GetClearEnabled() const
   return GetImplementation(*this).GetClearEnabled();
 }
 
+void RenderTask::SetCullMode( bool mode )
+{
+  GetImplementation(*this).SetCullMode( mode );
+}
+
+bool RenderTask::GetCullMode() const
+{
+  return GetImplementation(*this).GetCullMode();
+}
+
 void RenderTask::SetRefreshRate( unsigned int refreshRate )
 {
   GetImplementation(*this).SetRefreshRate( refreshRate );
@@ -226,4 +237,3 @@ RenderTask::RenderTask( Internal::RenderTask* internal )
 }
 
 } // namespace Dali
-

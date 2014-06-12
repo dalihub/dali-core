@@ -133,6 +133,24 @@ void PrintRenderItem( const SceneGraph::RenderItem& item )
   DALI_LOG_RENDER_INFO( "         %s\n", debugString.c_str() );
 }
 
+void PrintRendererCount( unsigned int frameCount, unsigned int rendererCount )
+{
+  if( frameCount % 120 == 30 ) // Print every 2 seconds reg
+  {
+    Debug::LogMessage( Debug::DebugInfo, "ImageRenderer Total # renderers: %u\n", rendererCount );
+  }
+}
+
+void PrintCullCount( unsigned int frameCount, unsigned int culledCount )
+{
+  if( frameCount % 120 == 30 ) // Print every 2 seconds reg
+  {
+    Debug::LogMessage( Debug::DebugInfo, "ImageRenderer # Culled renderers: %u\n", culledCount );
+  }
+}
+
+
+
 } // Render
 
 } // Internal

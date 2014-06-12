@@ -195,6 +195,16 @@ bool RenderTask::GetClearEnabled() const
   return mClearEnabled;
 }
 
+void RenderTask::SetCullMode( bool mode )
+{
+  mCullMode = mode;
+}
+
+bool RenderTask::GetCullMode() const
+{
+  return mCullMode;
+}
+
 void RenderTask::SetRefreshRate( unsigned int refreshRate )
 {
   DALI_LOG_TRACE_METHOD_FMT(gRenderTaskLogFilter, "this:%p RefreshRate:%d\n", this, refreshRate);
@@ -502,6 +512,7 @@ RenderTask::RenderTask()
   mNotifyTrigger( false ),
   mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
+  mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
   mRenderTarget( NULL ),
   mState( (Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
           ? RENDER_CONTINUOUSLY

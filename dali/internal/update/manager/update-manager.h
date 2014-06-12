@@ -303,9 +303,10 @@ public:
    * @param[in] geometryType  The GeometryType to map to the program
    * @param[in] subType       The program subtype
    * @param[in] resourceId    A ResourceManager ticket ID for the program data (source and compiled binary)
-   * @param[in] shaderHash  hash key created with vertex and fragment shader code
+   * @param[in] shaderHash    hash key created with vertex and fragment shader code
+   * @param[in] fixed         True if the vertex shader doesn't alter vertices
    */
-  void SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, Integration::ResourceId resourceId, size_t shaderHash );
+  void SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, Integration::ResourceId resourceId, size_t shaderHash, bool fixed );
 
   /**
    * Add an animatable mesh
@@ -715,15 +716,16 @@ inline void SetShaderProgramMessage( UpdateManager& manager,
                                      GeometryType geometryType,
                                      ShaderSubTypes subType,
                                      Integration::ResourceId resourceId,
-                                     size_t shaderHash )
+                                     size_t shaderHash,
+                                     bool fixed )
 {
-  typedef MessageValue5< UpdateManager, Shader*, GeometryType, ShaderSubTypes, Integration::ResourceId, size_t > LocalType;
+  typedef MessageValue6< UpdateManager, Shader*, GeometryType, ShaderSubTypes, Integration::ResourceId, size_t, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, geometryType, subType, resourceId, shaderHash );
+  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, geometryType, subType, resourceId, shaderHash, fixed );
 }
 
 // The render thread can safely change the AnimatableMesh

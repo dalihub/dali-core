@@ -130,6 +130,10 @@ public:
         mActiveTextures[ mActiveTextureUnit ].mBoundTextures.push_back( texture );
       }
     }
+
+    std::stringstream out;
+    out << target << ", " << texture;
+    mTextureTrace.PushCall("BindTexture", out.str());
   }
 
   inline void BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
@@ -472,6 +476,17 @@ public:
         *(textures+i) = ++mLastAutoTextureIdUsed;
       }
     }
+
+    std::stringstream out;
+    for(int i=0; i<n; i++)
+    {
+      out << textures[i];
+      if(i<n-1)
+      {
+        out << ", ";
+      }
+    }
+    mTextureTrace.PushCall("GenTexture", out.str());
   }
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)

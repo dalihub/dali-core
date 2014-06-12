@@ -508,6 +508,7 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
   }
 
   instruction.mRenderTracker = renderTracker;
+  instruction.mCullMode = renderTask.GetCullMode();
 
   // inform the render instruction that all renderers have been added and this frame is complete
   instruction.UpdateCompleted();

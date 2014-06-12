@@ -5,6 +5,8 @@
 
 extern void utc_dali_material_startup(void);
 extern void utc_dali_material_cleanup(void);
+extern void utc_dali_internal_image_culling_startup(void);
+extern void utc_dali_internal_image_culling_cleanup(void);
 
 extern int UtcDaliFontMeasureTextWidth(void);
 extern int UtcDaliFontMeasureTextWidthNegative(void);
@@ -69,6 +71,30 @@ extern int UtcDaliInternalAllocateTexture01(void);
 extern int UtcDaliInternalAddNativeImage(void);
 extern int UtcDaliInternalAddFrameBufferImage(void);
 extern int UtcDaliInternalAllocateMesh01(void);
+extern int UtcDaliImageCulling_Inside01(void);
+extern int UtcDaliImageCulling_Inside02(void);
+extern int UtcDaliImageCulling_Inside03(void);
+extern int UtcDaliImageCulling_Inside04(void);
+extern int UtcDaliImageCulling_Inside05(void);
+extern int UtcDaliImageCulling_WithinBoundary01(void);
+extern int UtcDaliImageCulling_WithinBoundary02(void);
+extern int UtcDaliImageCulling_WithinBoundary03(void);
+extern int UtcDaliImageCulling_WithinBoundary04(void);
+extern int UtcDaliImageCulling_WithinBoundary05(void);
+extern int UtcDaliImageCulling_OutsideBoundary01(void);
+extern int UtcDaliImageCulling_OutsideBoundary02(void);
+extern int UtcDaliImageCulling_OutsideBoundary03(void);
+extern int UtcDaliImageCulling_OutsideBoundary04(void);
+extern int UtcDaliImageCulling_OutsideBoundary05(void);
+extern int UtcDaliImageCulling_OutsideIntersect01(void);
+extern int UtcDaliImageCulling_OutsideIntersect02(void);
+extern int UtcDaliImageCulling_OutsideIntersect03(void);
+extern int UtcDaliImageCulling_OutsideIntersect04(void);
+extern int UtcDaliImageCulling_Plane01(void);
+extern int UtcDaliImageCulling_Plane02(void);
+extern int UtcDaliImageCulling_Plane03(void);
+extern int UtcDaliImageCulling_Plane04(void);
+extern int UtcDaliImageCulling_Disable(void);
 
 testcase tc_array[] = {
     {"UtcDaliFontMeasureTextWidth", UtcDaliFontMeasureTextWidth, NULL, NULL},
@@ -134,6 +160,30 @@ testcase tc_array[] = {
     {"UtcDaliInternalAddNativeImage", UtcDaliInternalAddNativeImage, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliInternalAddFrameBufferImage", UtcDaliInternalAddFrameBufferImage, utc_dali_material_startup, utc_dali_material_cleanup},
     {"UtcDaliInternalAllocateMesh01", UtcDaliInternalAllocateMesh01, utc_dali_material_startup, utc_dali_material_cleanup},
+    {"UtcDaliImageCulling_Inside01", UtcDaliImageCulling_Inside01, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Inside02", UtcDaliImageCulling_Inside02, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Inside03", UtcDaliImageCulling_Inside03, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Inside04", UtcDaliImageCulling_Inside04, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Inside05", UtcDaliImageCulling_Inside05, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_WithinBoundary01", UtcDaliImageCulling_WithinBoundary01, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_WithinBoundary02", UtcDaliImageCulling_WithinBoundary02, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_WithinBoundary03", UtcDaliImageCulling_WithinBoundary03, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_WithinBoundary04", UtcDaliImageCulling_WithinBoundary04, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_WithinBoundary05", UtcDaliImageCulling_WithinBoundary05, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideBoundary01", UtcDaliImageCulling_OutsideBoundary01, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideBoundary02", UtcDaliImageCulling_OutsideBoundary02, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideBoundary03", UtcDaliImageCulling_OutsideBoundary03, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideBoundary04", UtcDaliImageCulling_OutsideBoundary04, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideBoundary05", UtcDaliImageCulling_OutsideBoundary05, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideIntersect01", UtcDaliImageCulling_OutsideIntersect01, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideIntersect02", UtcDaliImageCulling_OutsideIntersect02, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideIntersect03", UtcDaliImageCulling_OutsideIntersect03, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_OutsideIntersect04", UtcDaliImageCulling_OutsideIntersect04, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Plane01", UtcDaliImageCulling_Plane01, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Plane02", UtcDaliImageCulling_Plane02, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Plane03", UtcDaliImageCulling_Plane03, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Plane04", UtcDaliImageCulling_Plane04, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
+    {"UtcDaliImageCulling_Disable", UtcDaliImageCulling_Disable, utc_dali_internal_image_culling_startup, utc_dali_internal_image_culling_cleanup},
     {NULL, NULL}
 };
 

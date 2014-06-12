@@ -1045,7 +1045,7 @@ int UtcDaliInternalLoadShaderRequest02(void)
   AddShaderMessage( updateManager, *sceneObject );
 
   size_t shaderHash=0;
-  SetShaderProgramMessage( updateManager, *sceneObject, GEOMETRY_TYPE_IMAGE, Internal::SHADER_DEFAULT, ticket->GetId(), shaderHash );
+  SetShaderProgramMessage( updateManager, *sceneObject, GEOMETRY_TYPE_IMAGE, Internal::SHADER_DEFAULT, ticket->GetId(), shaderHash, true );
 
   DALI_TEST_CHECK( ticket );
 

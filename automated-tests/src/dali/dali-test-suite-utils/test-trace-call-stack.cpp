@@ -34,6 +34,8 @@ TraceCallStack::~TraceCallStack() { }
  */
 void TraceCallStack::Enable(bool enable) { mTraceActive = enable; }
 
+bool TraceCallStack::IsEnabled() { return mTraceActive; }
+
 /**
  * Push a call onto the stack if the trace is active
  * @param[in] method The name of the method
@@ -68,6 +70,20 @@ bool TraceCallStack::FindMethod(std::string method) const
   }
   return found;
 }
+
+int TraceCallStack::CountMethod(std::string method) const
+{
+  int numCalls = 0;
+  for( size_t i=0; i < mCallStack.size(); i++ )
+  {
+    if( 0 == mCallStack[i][0].compare(method) )
+    {
+      numCalls++;
+    }
+  }
+  return numCalls;
+}
+
 
 /**
  * Search for a method in the stack with the given parameter list

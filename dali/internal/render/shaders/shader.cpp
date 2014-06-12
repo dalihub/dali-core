@@ -231,13 +231,14 @@ void Shader::SetProgram( GeometryType geometryType,
                          ShaderSubTypes subType,
                          Integration::ResourceId resourceId,
                          Integration::ShaderDataPtr shaderData,
-                         Context* context )
+                         Context* context,
+                         bool areVerticesFixed )
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d %d\n", (int)geometryType, resourceId);
 
   bool precompiledBinary = shaderData->HasBinary();
 
-  Program* program = Program::New( resourceId, shaderData.Get(), *context );
+  Program* program = Program::New( resourceId, shaderData.Get(), *context, areVerticesFixed );
 
   ShaderSubTypes theSubType = subType;
   if( subType == SHADER_SUBTYPE_ALL )
@@ -276,6 +277,24 @@ bool Shader::AreSubtypesRequired(GeometryType geometryType)
 
   return ! mPrograms[ programType ].mUseDefaultForAllSubtypes;
 }
+
+Program& Shader::GetProgram( Context& context,
+                             GeometryType type,
+                             const ShaderSubTypes subType )
+{
+  DALI_ASSERT_DEBUG(type < GEOMETRY_TYPE_LAST);
+  DALI_DEBUG_OSTREAM(debugStream);
+
+  unsigned int programType = GetGeometryTypeIndex( type );
+
+  DALI_ASSERT_DEBUG(!mPrograms[ programType ].mUseDefaultForAllSubtypes || subType == SHADER_DEFAULT);
+  DALI_ASSERT_DEBUG((unsigned int)subType < mPrograms[ programType ].Count());
+  DALI_ASSERT_DEBUG(NULL != mPrograms[ programType ][ subType ]);
+
+  Program& program = *(mPrograms[ programType ][ subType ]);
+  return program;
+}
+
 
 Program& Shader::Apply( Context& context,
                         BufferIndex bufferIndex,
@@ -351,7 +370,6 @@ Program& Shader::Apply( Context& context,
   loc = program.GetUniformLocation( Program::UNIFORM_MVP_MATRIX );
   if( Program::UNIFORM_UNKNOWN != loc )
   {
-    Matrix::Multiply( mModelViewProjection, modelview, projection );
     DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uMvpMatrix", mModelViewProjection );
     program.SetUniformMatrix4fv( loc, 1, mModelViewProjection.AsFloat() );
   }

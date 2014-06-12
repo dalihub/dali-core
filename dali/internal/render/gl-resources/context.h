@@ -57,7 +57,6 @@ class Program; // to be able to cache programs
 class Context
 {
 public:
-
   /**
    * Size of the VertexAttributeArray enables
    * GLES specification states that there's minimum of 8
@@ -1674,6 +1673,72 @@ public:
 
 #endif // DEBUG_ENABLED
 
+
+  /**
+   * Set the frame count of render thread
+   */
+  inline void SetFrameCount(unsigned int frameCount)
+  {
+    mFrameCount = frameCount;
+  }
+
+  /**
+   * Get the frame count
+   */
+  inline unsigned int GetFrameCount()
+  {
+    return mFrameCount;
+  }
+
+  /**
+   * Increment the count of culled renderers
+   */
+  inline void IncrementCulledCount()
+  {
+    mCulledCount++;
+  }
+
+  /**
+   * Clear the count of culled renderers
+   */
+  inline void ClearCulledCount()
+  {
+    mCulledCount = 0;
+  }
+
+  /**
+   * Get the count of culled renderers in this frame
+   */
+  inline unsigned int GetCulledCount()
+  {
+    return mCulledCount;
+  }
+
+  /**
+   * Increment the count of culled renderers
+   */
+  inline void IncrementRendererCount()
+  {
+    mRendererCount++;
+  }
+
+  /**
+   * Clear the count of image renderers
+   */
+  inline void ClearRendererCount()
+  {
+    mRendererCount = 0;
+  }
+
+  /**
+   * Get the count of image renderers in this frame
+   */
+  inline unsigned int GetRendererCount()
+  {
+    return mRendererCount;
+  }
+
+
 private: // Implementation
 
   /**
@@ -1759,8 +1824,10 @@ private: // Data
 
   Program* mCurrentProgram;
   typedef std::map< std::size_t, Program* > ProgramContainer;
-  ProgramContainer mProgramCache; /// program cache
-
+  ProgramContainer mProgramCache; ///< Cache of shader programs
+  unsigned int mFrameCount;       ///< Number of render frames
+  unsigned int mCulledCount;      ///< Number of culled renderers per frame
+  unsigned int mRendererCount;    ///< Number of image renderers per frame
 };
 
 } // namespace Internal

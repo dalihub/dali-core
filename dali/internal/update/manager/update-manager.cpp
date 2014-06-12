@@ -586,7 +586,7 @@ void UpdateManager::RemoveShader(Shader* shader)
   DALI_ASSERT_DEBUG(false);
 }
 
-void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, ResourceId resourceId, size_t shaderHash )
+void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, ResourceId resourceId, size_t shaderHash, bool fixed )
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, " - (geometryType:%d subType:%d id:%d hash:%d)\n", geometryType, subType, resourceId, shaderHash);
 
@@ -599,13 +599,13 @@ void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType,
   {
     // This is done in the render thread, to allow GL program compilation
     // Will trigger a NotifySaveRequest back to updateManager to forward onto ResourceClient
-    typedef MessageValue5< Shader, GeometryType, Internal::ShaderSubTypes, Integration::ResourceId, Integration::ShaderDataPtr, Context* > DerivedType;
+    typedef MessageValue6< Shader, GeometryType, Internal::ShaderSubTypes, Integration::ResourceId, Integration::ShaderDataPtr, Context*, bool> DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( shader, &Shader::SetProgram, geometryType, subType, resourceId, shaderData, &(mImpl->renderManager.GetContext()) );
+    new (slot) DerivedType( shader, &Shader::SetProgram, geometryType, subType, resourceId, shaderData, &(mImpl->renderManager.GetContext()), fixed );
   }
 }
 

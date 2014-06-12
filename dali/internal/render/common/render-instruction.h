@@ -115,6 +115,7 @@ public: // Data, TODO hide these
   Vector4  mClearColor;                 ///< Optional color to clear with
   bool     mIsViewportSet:1;            ///< Flag to determine whether the viewport is set
   bool     mIsClearColorSet:1;          ///< Flag to determine whether the clear-color is set
+  bool     mCullMode:1;                 ///< True if renderers should be frustum culled
 
   unsigned int mOffscreenTextureId;     ///< Optional offscreen target
 

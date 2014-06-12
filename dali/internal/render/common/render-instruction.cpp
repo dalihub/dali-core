@@ -38,6 +38,7 @@ RenderInstruction::RenderInstruction()
   mClearColor(),
   mIsViewportSet( false ),
   mIsClearColorSet( false ),
+  mCullMode(false),
   mOffscreenTextureId( 0 ),
   mNextFreeRenderList( 0 )
 {
@@ -101,7 +102,7 @@ void RenderInstruction::Reset( const Matrix*   viewMatrix,
                                const Matrix*   projectionMatrix,
                                unsigned int    offscreenTextureId,
                                const Viewport* viewport,
-                               const Vector4*  clearColor )
+                               const Vector4*  clearColor)
 {
   mViewMatrix = viewMatrix;
   mProjectionMatrix = projectionMatrix;
@@ -109,6 +110,7 @@ void RenderInstruction::Reset( const Matrix*   viewMatrix,
   mIsViewportSet = NULL != viewport;
   mClearColor = clearColor ? *clearColor : Color::BLACK;
   mIsClearColorSet = NULL != clearColor;
+  mCullMode = false;
   mOffscreenTextureId = offscreenTextureId;
   mRenderTracker = NULL;
   mNextFreeRenderList = 0;

@@ -103,18 +103,28 @@ public:
   virtual bool RequiresDepthTest() const = 0;
 
   /**
+   * Query the derived type for it's geometry type and subtype
+   * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[out] outType    The geometry type
+   * @param[out] outSubType The geometry subtype
+   */
+  virtual void GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType ) = 0;
+
+  /**
    * Called to render during RenderManager::Render().
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
    * @param[in] frametime The elapsed time between the last two updates.
+   * @param[in] cull Whether to frustum cull this renderer
    */
   void Render( BufferIndex bufferIndex,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
-               float frametime );
+               float frametime,
+               bool cull);
 
 protected:
 
@@ -147,8 +157,9 @@ private:
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
    * @param[in] color to use
+   * @param[in] cullTest Whether to try and cull the renderer.
    */
-  virtual void DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color ) = 0;
+  virtual void DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest ) = 0;
 
 protected:
 

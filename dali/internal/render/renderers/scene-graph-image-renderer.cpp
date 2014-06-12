@@ -219,10 +219,27 @@ bool ImageRenderer::CheckResources()
   return true;
 }
 
-void ImageRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color )
+void ImageRenderer::GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
+{
+  outType = GEOMETRY_TYPE_IMAGE;
+  outSubType = SHADER_DEFAULT;
+}
+
+
+void ImageRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest )
 {
   DALI_ASSERT_DEBUG( 0 != mTextureId && "ImageRenderer::DoRender. mTextureId == 0." );
   DALI_ASSERT_DEBUG( NULL != mTexture && "ImageRenderer::DoRender. mTexture == NULL." );
+
+  mContext->IncrementRendererCount();
+  if( cullTest )
+  {
+    if(IsOutsideClipSpace(modelMatrix) )
+    {
+      mContext->IncrementCulledCount();
+      return;
+    }
+  }
 
   if(! mIsMeshGenerated )
   {
@@ -802,6 +819,138 @@ ImageRenderer::ImageRenderer( RenderDataProvider& dataprovider )
   mBorderInPixels( false ),
   mUsePixelArea( false )
 {
+}
+
+// Frustum culling using clip space and oriented bounding box checks
+bool ImageRenderer::IsOutsideClipSpace(const Matrix& modelMatrix)
+{
+  // First, calculate if the center is inside clip space:
+
+  // Downside is mvp matrix calc per renderer per frame
+  // and up to 4 matrix * vector calls.
+  const Matrix& mvp = mShader->GetMVPMatrix();
+  Vector4 translation = mvp.GetTranslation();
+
+  // Upside is point test is very simple:
+  if( -translation.w <= translation.x  &&  translation.x <= translation.w &&
+      -translation.w <= translation.y  &&  translation.y <= translation.w &&
+      -translation.w <= translation.z  &&  translation.z <= translation.w)
+  {
+    // Definitely inside clip space - don't do any more processing
+    return false;
+  }
+
+  // Transform oriented bounding box to clip space:
+  Vector4 topLeft(    mGeometrySize.x * -0.5f, mGeometrySize.y * -0.5f, 0.0f, 1.0f);
+  Vector4 topRight(   mGeometrySize.x *  0.5f, mGeometrySize.y * -0.5f, 0.0f, 1.0f);
+  Vector4 bottomLeft( mGeometrySize.x * -0.5f, mGeometrySize.y *  0.5f, 0.0f, 1.0f);
+  Vector4 bottomRight(mGeometrySize.x *  0.5f, mGeometrySize.y *  0.5f, 0.0f, 1.0f);
+
+  Vector4 topLeftClip = mvp * topLeft;
+  if( -topLeftClip.w <= topLeftClip.x && topLeftClip.x <= topLeftClip.w &&
+      -topLeftClip.w <= topLeftClip.y && topLeftClip.y <= topLeftClip.w &&
+      -topLeftClip.w <= topLeftClip.z && topLeftClip.z <= topLeftClip.w )
+  {
+    // Definitely inside clip space - don't do any more processing
+    return false;
+  }
+
+  Vector4 bottomRightClip = mvp * bottomRight;
+  if( -bottomRightClip.w <= bottomRightClip.x && bottomRightClip.x <= bottomRightClip.w &&
+      -bottomRightClip.w <= bottomRightClip.y && bottomRightClip.y <= bottomRightClip.w &&
+      -bottomRightClip.w <= bottomRightClip.z && bottomRightClip.z <= bottomRightClip.w )
+  {
+    // Definitely inside clip space - don't do any more processing
+    return false;
+  }
+
+  Vector4 topRightClip = mvp * topRight;
+  if( -topRightClip.w <= topRightClip.x && topRightClip.x <= topRightClip.w &&
+      -topRightClip.w <= topRightClip.y && topRightClip.y <= topRightClip.w &&
+      -topRightClip.w <= topRightClip.z && topRightClip.z <= topRightClip.w )
+  {
+    // Definitely inside clip space - don't do any more processing
+    return false;
+  }
+
+  Vector4 bottomLeftClip = mvp * bottomLeft;
+  if( -bottomLeftClip.w <= bottomLeftClip.x && bottomLeftClip.x <= bottomLeftClip.w &&
+      -bottomLeftClip.w <= bottomLeftClip.y && bottomLeftClip.y <= bottomLeftClip.w &&
+      -bottomLeftClip.w <= bottomLeftClip.z && bottomLeftClip.z <= bottomLeftClip.w )
+  {
+    // Definitely inside clip space - don't do any more processing
+    return false;
+  }
+
+  // Check to see if all four points are outside each plane (AABB would cut this processing
+  // in half)
+
+  unsigned int insideLeftPlaneCount=0;
+  unsigned int insideRightPlaneCount=0;
+  unsigned int insideTopPlaneCount=0;
+  unsigned int insideBottomPlaneCount=0;
+
+  if(-topLeftClip.w <= topLeftClip.x) { insideLeftPlaneCount++; }
+  if(-topRightClip.w <= topRightClip.x){ insideLeftPlaneCount++; }
+  if(-bottomRightClip.w <= bottomRightClip.x) {insideLeftPlaneCount++;}
+  if(-bottomLeftClip.w <= bottomLeftClip.x) {insideLeftPlaneCount++;}
+
+  if( insideLeftPlaneCount == 0 )
+  {
+    return true;
+  }
+
+  if(topLeftClip.x <= topLeftClip.w) { insideRightPlaneCount++;}
+  if(topRightClip.x <= topRightClip.w) { insideRightPlaneCount++; }
+  if(bottomRightClip.x <= bottomRightClip.w) { insideRightPlaneCount++; }
+  if(bottomLeftClip.x <= bottomLeftClip.w ) { insideRightPlaneCount++; }
+
+  if( insideRightPlaneCount == 0 )
+  {
+    return true;
+  }
+
+  if(-topLeftClip.w <= topLeftClip.y ) {insideTopPlaneCount++; }
+  if(-topRightClip.w <= topRightClip.y) {insideTopPlaneCount++; }
+  if(-bottomRightClip.w <= bottomRightClip.y) {insideTopPlaneCount++;}
+  if(-bottomLeftClip.w <= bottomLeftClip.y) { insideTopPlaneCount++;}
+
+  if( insideTopPlaneCount == 0 )
+  {
+    return true;
+  }
+
+  if(topLeftClip.y <= topLeftClip.w) { insideBottomPlaneCount++; }
+  if(topRightClip.y <= topRightClip.w) { insideBottomPlaneCount++; }
+  if(bottomRightClip.y <= bottomRightClip.w) { insideBottomPlaneCount++; }
+  if(bottomLeftClip.y <= bottomLeftClip.w) { insideBottomPlaneCount++; }
+
+  if( insideBottomPlaneCount == 0 )
+  {
+    return true;
+  }
+
+  // Test if any planes are bisected, if they are, then there is likely to
+  // be an intersection into clip space.
+
+  if( insideLeftPlaneCount < 4 )
+  {
+    return false;
+  }
+  if( insideRightPlaneCount < 4 )
+  {
+    return false;
+  }
+  if( insideTopPlaneCount < 4 )
+  {
+    return false;
+  }
+  if( insideBottomPlaneCount < 4 )
+  {
+    return false;
+  }
+
+  return true;
 }
 
 } // namespace SceneGraph

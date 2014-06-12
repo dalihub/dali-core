@@ -45,6 +45,8 @@ public:
    */
   void Enable(bool enable);
 
+  bool IsEnabled();
+
   /**
    * Push a call onto the stack if the trace is active
    * @param[in] method The name of the method
@@ -59,6 +61,13 @@ public:
    * @return true if the method was in the stack
    */
   bool FindMethod(std::string method) const;
+
+  /**
+   * Count how many times a method was called
+   * @param[in] method The name of the method
+   * @return The number of times it was called
+   */
+  int CountMethod(std::string method) const;
 
   /**
    * Search for a method in the stack with the given parameter list
