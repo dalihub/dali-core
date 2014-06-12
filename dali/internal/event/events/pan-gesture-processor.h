@@ -133,6 +133,24 @@ public: // To be called by GestureEventProcessor
    */
   void SetPredictionAmount(unsigned int amount);
 
+  /**
+   * Called to set the prediction mode for pan gestures
+   *
+   * @param[in] mode The prediction mode
+   *
+   * Valid modes:
+   * 0 - No smoothing
+   * 1 - average between last 2 values
+   */
+  void SetSmoothingMode(int mode);
+
+  /**
+   * @brief Sets the smoothing amount of the pan gesture
+   *
+   * @param[in] amount The smotthing amount from 0.0f (none) to 1.0f (full)
+   */
+  void SetSmoothingAmount(float amount);
+
 private:
 
   // Undefined

@@ -46,14 +46,21 @@ public:
 
   enum PredictionMode
   {
-    NONE,
-    AVERAGE,
-    PREDICTION_1,
-    PREDICTION_2
+    PREDICTION_NONE = 0,
+    PREDICTION_1
+  };
+
+  enum SmoothingMode
+  {
+    SMOOTHING_NONE,           // no smoothing
+    SMOOTHING_LAST_VALUE,     // smooth between last value and latest value
   };
 
   static const PredictionMode DEFAULT_PREDICTION_MODE;
   static const int NUM_PREDICTION_MODES;
+
+  static const SmoothingMode DEFAULT_SMOOTHING_MODE;
+  static const int NUM_SMOOTHING_MODES;
 
   // Latest Pan Information
 
@@ -199,23 +206,23 @@ public:
   void RemoveOldHistory(PanInfoHistory& panHistory, unsigned int currentTime, unsigned int maxAge, unsigned int minEvents);
 
   /**
-   * USes last two gestures
-   *
-   * @param[in]  justStarted Whether the pan has just started.
-   * @param[out] gestureOut Output gesture using average values from last two gestures
-   * @param[in]  lastVSyncTime The time to set on gestureOut.
-   */
-  void SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut, unsigned int lastVSyncTime);
-
-  /**
    * Uses elapsed time and time stamps
    */
   void PredictiveAlgorithm1(int eventsThisFrame, PanInfo& gestureOut, PanInfoHistory& panHistory, unsigned int lastVSyncTime, unsigned int nextVSyncTime);
 
   /**
-   * Uses elapsed time, time stamps and future render time
+   * Uses last two gestures
+   *
+   * @param[in]  justStarted Whether the pan has just started.
+   * @param[out] gestureOut Output gesture using average values from last two gestures
+   * @param[in]  lastVSyncTime The time to set on gestureOut.
    */
-  void PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, PanInfoHistory& panHistory, unsigned int lastVSyncTime, unsigned int nextVSyncTime);
+  void SmoothingAlgorithm1(bool justStarted, PanInfo& gestureOut, unsigned int lastVSyncTime);
+
+  /**
+   * Future smoothing method, implementation not complete
+   */
+  void SmoothingAlgorithm2(bool justStarted, PanInfo& gestureOut, unsigned int lastVSyncTime);
 
   /**
    * Called by the update manager so that we can update the value of our properties.
@@ -281,6 +288,20 @@ public:
   void SetPredictionAmount(unsigned int amount);
 
   /**
+   * @brief Sets the prediction mode of the pan gesture
+   *
+   * @param[in] mode The prediction mode
+   */
+  void SetSmoothingMode(SmoothingMode mode);
+
+  /**
+   * @brief Sets the amount of smoothing to apply for the current smoothing mode
+   *
+   * @param[in] amount The amount of smoothing [0.0f,1.0f]
+   */
+  void SetSmoothingAmount(float amount);
+
+  /**
    * Called to provide pan-gesture profiling information.
    */
   void EnableProfiling();
@@ -314,16 +335,20 @@ private:
 
   PanInfo mGestures[PAN_GESTURE_HISTORY];         ///< Circular buffer storing the 4 most recent gestures.
   PanInfoHistory mPanHistory;
+  PanInfoHistory mPredictionHistory;
   unsigned int mWritePosition;  ///< The next PanInfo buffer to write to. (starts at 0)
   unsigned int mReadPosition;   ///< The next PanInfo buffer to read. (starts at 0)
 
   PanInfo mEventGesture;        ///< Result of all pan events received this frame
   PanInfo mLastEventGesture;    ///< The last frame's event gesture.
+  PanInfo mLastGesture;         ///< The latest gesture. (this update frame)
   PanInfo mLatestGesture;       ///< The latest gesture. (this update frame)
   bool mInGesture;              ///< True if the gesture is currently being handled i.e. between Started <-> Finished/Cancelled
 
   PredictionMode mPredictionMode;  ///< The pan gesture prediction mode
   unsigned int mPredictionAmount;  ///< how far into future to predict in milliseconds
+  SmoothingMode mSmoothingMode;    ///< The pan gesture prediction mode
+  float         mSmoothingAmount;  ///< How much smoothing to apply [0.0f,1.0f]
   PanGestureProfiling* mProfiling; ///< NULL unless pan-gesture profiling information is required.
 };
 

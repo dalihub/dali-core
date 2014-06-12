@@ -123,7 +123,7 @@ public: // Called by Core
   void EnablePanGestureProfiling();
 
   /**
-   * @brief Called to set how pan gestures predict and smooth input
+   * @brief Called to set how pan gestures predict input
    *
    * @param[in] mode The prediction mode to use
    */
@@ -135,6 +135,20 @@ public: // Called by Core
    * @param[in] amount The prediction amount in milliseconds
    */
   void SetPanGesturePredictionAmount( unsigned int amount );
+
+  /**
+   * @brief Called to set how pan gestures smooth input
+   *
+   * @param[in] mode The smoothing mode to use
+   */
+  void SetPanGestureSmoothingMode( int mode );
+
+  /**
+   * @brief Sets the prediction amount of the pan gesture
+   *
+   * @param[in] amount The smoothing amount [0.0f,1.0f] - 0.0f would be no smoothing, 1.0f maximum smoothing
+   */
+  void SetPanGestureSmoothingAmount( float amount );
 
 private:
 

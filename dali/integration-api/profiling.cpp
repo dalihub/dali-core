@@ -117,6 +117,18 @@ void SetPanGesturePredictionAmount(unsigned int amount)
   eventProcessor.SetPanGesturePredictionAmount(amount);
 }
 
+void SetPanGestureSmoothingMode(int mode)
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGestureSmoothingMode(mode);
+}
+
+void SetPanGestureSmoothingAmount( float amount )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGestureSmoothingAmount(amount);
+}
+
 namespace Profiling
 {
 

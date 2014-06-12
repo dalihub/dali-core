@@ -240,6 +240,16 @@ void GestureEventProcessor::SetPanGesturePredictionAmount( unsigned int amount )
   mPanGestureProcessor.SetPredictionAmount(amount);
 }
 
+void GestureEventProcessor::SetPanGestureSmoothingMode(int mode)
+{
+  mPanGestureProcessor.SetSmoothingMode(mode);
+}
+
+void GestureEventProcessor::SetPanGestureSmoothingAmount( float amount )
+{
+  mPanGestureProcessor.SetSmoothingAmount(amount);
+}
+
 } // namespace Internal
 
 } // namespace Dali

@@ -331,6 +331,22 @@ void PanGestureProcessor::SetPredictionAmount(unsigned int amount)
   mSceneObject->SetPredictionAmount(amount);
 }
 
+void PanGestureProcessor::SetSmoothingMode(int mode)
+{
+  if( (mode < 0)
+      || (mode >= SceneGraph::PanGesture::NUM_SMOOTHING_MODES) )
+  {
+    mode = SceneGraph::PanGesture::DEFAULT_SMOOTHING_MODE;
+  }
+  SceneGraph::PanGesture::SmoothingMode modeEnum = static_cast<SceneGraph::PanGesture::SmoothingMode>(mode);
+  mSceneObject->SetSmoothingMode(modeEnum);
+}
+
+void PanGestureProcessor::SetSmoothingAmount(float amount)
+{
+  mSceneObject->SetSmoothingAmount(amount);
+}
+
 void PanGestureProcessor::UpdateDetection()
 {
   DALI_ASSERT_DEBUG(!mGestureDetectors.empty());

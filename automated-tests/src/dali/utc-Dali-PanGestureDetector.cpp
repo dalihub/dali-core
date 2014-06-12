@@ -2013,6 +2013,7 @@ int UtcDaliPanGestureSetProperties(void)
   TestApplication application;
   TestRenderController& renderController( application.GetRenderController() );
   Integration::SetPanGesturePredictionMode(0);
+  Integration::SetPanGestureSmoothingMode(0);
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);

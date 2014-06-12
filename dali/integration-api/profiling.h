@@ -60,6 +60,20 @@ DALI_IMPORT_API void SetPanGesturePredictionMode( int mode );
  */
 DALI_IMPORT_API void SetPanGesturePredictionAmount(unsigned int amount);
 
+/**
+ * @brief Called to set how pan gestures smooth input
+ *
+ * @param[in] mode The smoothing mode to use
+ */
+DALI_IMPORT_API void SetPanGestureSmoothingMode( int mode );
+
+/**
+ * @brief Sets the prediction amount of the pan gesture
+ *
+ * @param[in] amount The smoothing amount [0.0f,1.0f] - 0.0f would be no smoothing, 1.0f maximum smoothing
+ */
+DALI_IMPORT_API void SetPanGestureSmoothingAmount( float amount );
+
 
 namespace Profiling
 {
