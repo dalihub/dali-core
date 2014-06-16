@@ -58,13 +58,10 @@ struct PanGesture;
  */
 class PanGestureDetector : public GestureDetector
 {
-public: // Typedefs
+public:
 
-  // Signals
+  // Typedefs
   typedef SignalV2< void (Actor, PanGesture) > DetectedSignalV2; ///< Pan gesture detected signal type
-
-  // Signal Names
-  static const char* const SIGNAL_PAN_DETECTED; ///< name "pan-detected"
 
   // Directional Pan
   typedef std::pair< Radian, Radian > AngleThresholdPair; ///< Range of angles for a direction
@@ -79,12 +76,21 @@ public: // Typedefs
 
   static const Radian DEFAULT_THRESHOLD;    ///< The default threshold is PI * 0.25 radians (or 45 degrees).
 
-  // Default Properties
+  /// @name Properties
+  /** @{ */
   static const Property::Index SCREEN_POSITION;       ///< name "screen-position",     type VECTOR2
   static const Property::Index SCREEN_DISPLACEMENT;   ///< name "screen-displacement", type VECTOR2
+  static const Property::Index SCREEN_VELOCITY;       ///< name "screen-velocity",     type VECTOR2
   static const Property::Index LOCAL_POSITION;        ///< name "local-position",      type VECTOR2
   static const Property::Index LOCAL_DISPLACEMENT;    ///< name "local-displacement",  type VECTOR2
+  static const Property::Index LOCAL_VELOCITY;        ///< name "local-velocity",      type VECTOR2
   static const Property::Index PANNING;               ///< name "panning",             type BOOLEAN
+  /** @} */
+
+  /// @name Signals
+  /** @{ */
+  static const char* const SIGNAL_PAN_DETECTED; ///< name "pan-detected",   @see DetectedSignal()
+  /** @} */
 
 public: // Creation & Destruction
 

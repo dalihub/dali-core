@@ -201,9 +201,11 @@ public:
   /**
    * USes last two gestures
    *
+   * @param[in]  justStarted Whether the pan has just started.
    * @param[out] gestureOut Output gesture using average values from last two gestures
+   * @param[in]  lastVSyncTime The time to set on gestureOut.
    */
-  void SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut);
+  void SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut, unsigned int lastVSyncTime);
 
   /**
    * Uses elapsed time and time stamps
@@ -235,6 +237,12 @@ public:
   const GesturePropertyVector2& GetScreenPositionProperty() const;
 
   /**
+   * Retrieves a reference to the screen velocity property.
+   * @return The screen velocity property.
+   */
+  const GesturePropertyVector2& GetScreenVelocityProperty() const;
+
+  /**
    * Retrieves a reference to the screen displacement property.
    * @return The screen displacement property.
    */
@@ -251,6 +259,12 @@ public:
    * @return The local displacement property.
    */
   const GesturePropertyVector2& GetLocalDisplacementProperty() const;
+
+  /**
+   * Retrieves a reference to the local velocity property.
+   * @return The local velocity property.
+   */
+  const GesturePropertyVector2& GetLocalVelocityProperty() const;
 
   /**
    * @brief Sets the prediction mode of the pan gesture
@@ -293,8 +307,10 @@ private:
   GesturePropertyBool    mPanning;            ///< panning flag
   GesturePropertyVector2 mScreenPosition;     ///< screen-position
   GesturePropertyVector2 mScreenDisplacement; ///< screen-displacement
+  GesturePropertyVector2 mScreenVelocity;     ///< screen-velocity
   GesturePropertyVector2 mLocalPosition;      ///< local-position
   GesturePropertyVector2 mLocalDisplacement;  ///< local-displacement
+  GesturePropertyVector2 mLocalVelocity;      ///< local-velocity
 
   PanInfo mGestures[PAN_GESTURE_HISTORY];         ///< Circular buffer storing the 4 most recent gestures.
   PanInfoHistory mPanHistory;

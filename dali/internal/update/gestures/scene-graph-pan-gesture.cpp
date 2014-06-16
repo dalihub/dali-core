@@ -75,7 +75,7 @@ void PanGesture::RemoveOldHistory(PanInfoHistory& panHistory, unsigned int curre
   }
 }
 
-void PanGesture::SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut)
+void PanGesture::SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut, unsigned int lastVSyncTime)
 {
   if( mInGesture )
   {
@@ -88,7 +88,13 @@ void PanGesture::SimpleAverageAlgorithm(bool justStarted, PanInfo& gestureOut)
       // make current displacement relative to previous update-frame now.
       gestureOut.screen.displacement = gestureOut.screen.position - mLastEventGesture.screen.position;
       gestureOut.local.displacement = gestureOut.local.position - mLastEventGesture.local.position;
+      // calculate velocity relative to previous update-frame
+      unsigned int timeDiff( lastVSyncTime - mLastEventGesture.time );
+      gestureOut.screen.velocity = gestureOut.screen.displacement / timeDiff;
+      gestureOut.local.velocity = gestureOut.local.displacement / timeDiff;
     }
+
+    gestureOut.time = lastVSyncTime;
   }
 }
 
@@ -246,8 +252,6 @@ void PanGesture::PredictiveAlgorithm2(int eventsThisFrame, PanInfo& gestureOut, 
 
 bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
 {
-  bool propertiesUpdated( false );
-
   if( !mInGesture )
   {
     // clear current pan history
@@ -331,7 +335,7 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
       }
       case AVERAGE:
       {
-        SimpleAverageAlgorithm(justStarted, nextGesture);
+        SimpleAverageAlgorithm(justStarted, nextGesture, lastVSyncTime);
         // make latest gesture equal to current gesture after averaging
         updateProperties = true;
         break;
@@ -362,10 +366,10 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
       mPanning.Set( mInGesture & !justFinished );
       mScreenPosition.Set( nextGesture.screen.position );
       mScreenDisplacement.Set( nextGesture.screen.displacement );
+      mScreenVelocity.Set( nextGesture.screen.velocity );
       mLocalPosition.Set( nextGesture.local.position );
       mLocalDisplacement.Set( nextGesture.local.displacement );
-
-      propertiesUpdated = true;
+      mLocalVelocity.Set( nextGesture.local.velocity );
     }
 
     if( mProfiling )
@@ -383,7 +387,7 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
     mProfiling->ClearData();
   }
 
-  return propertiesUpdated;
+  return updateProperties;
 }
 
 const GesturePropertyBool& PanGesture::GetPanningProperty() const
@@ -394,6 +398,11 @@ const GesturePropertyBool& PanGesture::GetPanningProperty() const
 const GesturePropertyVector2& PanGesture::GetScreenPositionProperty() const
 {
   return mScreenPosition;
+}
+
+const GesturePropertyVector2& PanGesture::GetScreenVelocityProperty() const
+{
+  return mScreenVelocity;
 }
 
 const GesturePropertyVector2& PanGesture::GetScreenDisplacementProperty() const
@@ -409,6 +418,11 @@ const GesturePropertyVector2& PanGesture::GetLocalPositionProperty() const
 const GesturePropertyVector2& PanGesture::GetLocalDisplacementProperty() const
 {
   return mLocalDisplacement;
+}
+
+const GesturePropertyVector2& PanGesture::GetLocalVelocityProperty() const
+{
+  return mLocalVelocity;
 }
 
 void PanGesture::SetPredictionMode(PredictionMode mode)

@@ -135,13 +135,15 @@ struct ConstraintData
 
   Vector2 screenPosition;
   Vector2 screenDisplacement;
+  Vector2 screenVelocity;
   Vector2 localPosition;
   Vector2 localDisplacement;
+  Vector2 localVelocity;
   bool called;
 
   void Reset()
   {
-    screenPosition = screenDisplacement = localPosition = localDisplacement = Vector2::ZERO;
+    screenPosition = screenDisplacement = screenVelocity = localPosition = localDisplacement = localVelocity = Vector2::ZERO;
     called = false;
   }
 };
@@ -154,13 +156,17 @@ struct PanConstraint
   Vector3 operator()(const Vector3&       current,
                      const PropertyInput& screenPositionProperty,
                      const PropertyInput& screenDisplacementProperty,
+                     const PropertyInput& screenVelocityProperty,
                      const PropertyInput& localPositionProperty,
-                     const PropertyInput& localDisplacementProperty)
+                     const PropertyInput& localDisplacementProperty,
+                     const PropertyInput& localVelocityProperty)
   {
     constraintData.screenPosition = screenPositionProperty.GetVector2();
     constraintData.screenDisplacement = screenDisplacementProperty.GetVector2();
+    constraintData.screenVelocity = screenVelocityProperty.GetVector2();
     constraintData.localPosition = localPositionProperty.GetVector2();
     constraintData.localDisplacement = localDisplacementProperty.GetVector2();
+    constraintData.localVelocity = localVelocityProperty.GetVector2();
     constraintData.called = true;
     return Vector3::ZERO;
   }
@@ -195,7 +201,8 @@ PanGesture GeneratePan( unsigned int time,
                         Vector2 localPosition,
                         Vector2 screenDisplacement = Vector2::ONE,
                         Vector2 localDisplacement = Vector2::ONE,
-                        Vector2 velocity = Vector2::ONE,
+                        Vector2 screenVelocity = Vector2::ONE,
+                        Vector2 localVelocity = Vector2::ONE,
                         unsigned int numberOfTouches = 1 )
 {
   PanGesture pan( state );
@@ -208,7 +215,9 @@ PanGesture GeneratePan( unsigned int time,
   pan.screenDisplacement = screenDisplacement;
   pan.displacement = localDisplacement;
 
-  pan.screenVelocity = pan.velocity = velocity;
+  pan.screenVelocity = screenVelocity;
+  pan.velocity = localVelocity;
+
   pan.numberOfTouches = numberOfTouches;
 
   return pan;
@@ -2021,8 +2030,10 @@ int UtcDaliPanGestureSetProperties(void)
   ConstraintData constraintData;
   actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::SCREEN_POSITION ),
                                                              Source( detector, PanGestureDetector::SCREEN_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::SCREEN_VELOCITY ),
                                                              Source( detector, PanGestureDetector::LOCAL_POSITION ),
                                                              Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::LOCAL_VELOCITY ),
                                                              PanConstraint( constraintData ) ) );
 
   // Render and notify
@@ -2034,10 +2045,12 @@ int UtcDaliPanGestureSetProperties(void)
 
   Vector2 screenPosition( 20.0f, 20.0f );
   Vector2 screenDisplacement( 1.0f, 1.0f );
+  Vector2 screenVelocity( 1.3f, 4.0f );
   Vector2 localPosition( 21.0f, 21.0f );
   Vector2 localDisplacement( 0.5f, 0.5f );
+  Vector2 localVelocity( 1.5f, 2.5f );
 
-  PanGestureDetector::SetPanGestureProperties( GeneratePan( 1u, Gesture::Started, screenPosition, localPosition, screenDisplacement, localDisplacement ) );
+  PanGestureDetector::SetPanGestureProperties( GeneratePan( 1u, Gesture::Started, screenPosition, localPosition, screenDisplacement, localDisplacement, screenVelocity, localVelocity ) );
   DALI_TEST_EQUALS( renderController.WasCalled( TestRenderController::RequestUpdateFunc ), true, TEST_LOCATION );
 
   // Render and notify
@@ -2049,6 +2062,8 @@ int UtcDaliPanGestureSetProperties(void)
   DALI_TEST_EQUALS( constraintData.localPosition,      localPosition,      TEST_LOCATION );
   DALI_TEST_EQUALS( constraintData.screenDisplacement, screenDisplacement, TEST_LOCATION );
   DALI_TEST_EQUALS( constraintData.localDisplacement,  localDisplacement,  TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.screenVelocity,     screenVelocity,     TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.localVelocity,      localVelocity,      TEST_LOCATION );
   constraintData.Reset();
   END_TEST;
 }
@@ -2075,8 +2090,10 @@ int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
   ConstraintData constraintData;
   actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::SCREEN_POSITION ),
                                                              Source( detector, PanGestureDetector::SCREEN_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::SCREEN_VELOCITY ),
                                                              Source( detector, PanGestureDetector::LOCAL_POSITION ),
                                                              Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::LOCAL_VELOCITY ),
                                                              PanConstraint( constraintData ) ) );
 
   // Render and notify

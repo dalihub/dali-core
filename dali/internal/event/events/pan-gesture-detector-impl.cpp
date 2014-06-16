@@ -24,6 +24,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
@@ -34,9 +35,11 @@ namespace Dali
 
 const Property::Index PanGestureDetector::SCREEN_POSITION      = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
 const Property::Index PanGestureDetector::SCREEN_DISPLACEMENT  = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 1;
-const Property::Index PanGestureDetector::LOCAL_POSITION       = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 2;
-const Property::Index PanGestureDetector::LOCAL_DISPLACEMENT   = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 3;
-const Property::Index PanGestureDetector::PANNING              = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 4;
+const Property::Index PanGestureDetector::SCREEN_VELOCITY      = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index PanGestureDetector::LOCAL_POSITION       = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 3;
+const Property::Index PanGestureDetector::LOCAL_DISPLACEMENT   = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 4;
+const Property::Index PanGestureDetector::LOCAL_VELOCITY       = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 5;
+const Property::Index PanGestureDetector::PANNING              = Internal::DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT + 6;
 
 namespace Internal
 {
@@ -46,24 +49,17 @@ namespace
 
 // Properties
 
-const std::string DEFAULT_PROPERTY_NAMES[] =
+PropertyDetails DEFAULT_PROPERTIES[] =
 {
-  "screen-position",
-  "screen-displacement",
-  "local-position",
-  "local-displacement",
-  "panning",
+  { "screen-position",     Property::VECTOR2, false, false, true },
+  { "screen-displacement", Property::VECTOR2, false, false, true },
+  { "screen-velocity",     Property::VECTOR2, false, false, true },
+  { "local-position",      Property::VECTOR2, false, false, true },
+  { "local-displacement",  Property::VECTOR2, false, false, true },
+  { "local-velocity",      Property::VECTOR2, false, false, true },
+  { "panning",             Property::BOOLEAN, false, false, true },
 };
-const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_NAMES ) / sizeof( std::string );
-
-const Property::Type DEFAULT_PROPERTY_TYPES[DEFAULT_PROPERTY_COUNT] =
-{
-  Property::VECTOR2,  // SCREEN_POSITION
-  Property::VECTOR2,  // SCREEN_DISPLACEMENT
-  Property::VECTOR2,  // LOCAL_POSITION
-  Property::VECTOR2,  // LOCAL_DISPLACEMENT
-  Property::BOOLEAN,  // PANNING
-};
+const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTIES ) / sizeof( DEFAULT_PROPERTIES[0] );
 
 BaseHandle Create()
 {
@@ -126,7 +122,7 @@ PanGestureDetector::PanGestureDetector()
     const int start = DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
     for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
     {
-      ( *mDefaultPropertyLookup )[ DEFAULT_PROPERTY_NAMES[i] ] = i + start;
+      ( *mDefaultPropertyLookup )[ DEFAULT_PROPERTIES[i].name ] = i + start;
     }
   }
 }
@@ -365,7 +361,7 @@ const std::string& PanGestureDetector::GetDefaultPropertyName( Property::Index i
   index -= DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
   if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
   {
-    return DEFAULT_PROPERTY_NAMES[ index ];
+    return DEFAULT_PROPERTIES[ index ].name;
   }
   else
   {
@@ -414,7 +410,7 @@ Property::Type PanGestureDetector::GetDefaultPropertyType(Property::Index index)
   index -= DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
   if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
   {
-    return DEFAULT_PROPERTY_TYPES[ index ];
+    return DEFAULT_PROPERTIES[ index ].type;
   }
   else
   {
@@ -465,6 +461,19 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       break;
     }
 
+    case Dali::PanGestureDetector::SCREEN_VELOCITY:
+    {
+      if(mSceneObject)
+      {
+        value = mSceneObject->GetScreenVelocityProperty().Get();
+      }
+      else
+      {
+        value = Vector2();
+      }
+      break;
+    }
+
     case Dali::PanGestureDetector::LOCAL_POSITION:
     {
       if(mSceneObject)
@@ -483,6 +492,19 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       if(mSceneObject)
       {
         value = mSceneObject->GetLocalDisplacementProperty().Get();
+      }
+      else
+      {
+        value = Vector2();
+      }
+      break;
+    }
+
+    case Dali::PanGestureDetector::LOCAL_VELOCITY:
+    {
+      if(mSceneObject)
+      {
+        value = mSceneObject->GetLocalVelocityProperty().Get();
       }
       else
       {
@@ -568,6 +590,12 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
         break;
       }
 
+      case Dali::PanGestureDetector::SCREEN_VELOCITY:
+      {
+        property = &mSceneObject->GetScreenVelocityProperty();
+        break;
+      }
+
       case Dali::PanGestureDetector::LOCAL_POSITION:
       {
         property = &mSceneObject->GetLocalPositionProperty();
@@ -577,6 +605,12 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
       case Dali::PanGestureDetector::LOCAL_DISPLACEMENT:
       {
         property = &mSceneObject->GetLocalDisplacementProperty();
+        break;
+      }
+
+      case Dali::PanGestureDetector::LOCAL_VELOCITY:
+      {
+        property = &mSceneObject->GetLocalVelocityProperty();
         break;
       }
 
