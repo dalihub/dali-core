@@ -160,6 +160,16 @@ public:
   void SetSortFunction(Dali::Layer::SortFunctionType function);
 
   /**
+   * @copydoc Dali::Layer::SetTouchConsumed()
+   */
+  void SetTouchConsumed( bool consume );
+
+  /**
+   * @copydoc Dali::Layer::IsTouchConsumed()
+   */
+  bool IsTouchConsumed() const;
+
+  /**
    * Helper function to get the scene object.
    * This should only be called by Stage
    * @return the scene object for the layer.
@@ -263,6 +273,7 @@ private:
 
   bool mIsClipping:1;                           ///< True when clipping is enabled
   bool mDepthTestDisabled:1;                    ///< Whether depth test is disabled.
+  bool mTouchConsumed:1;                        ///< Whether we should consume touch (including gesture).
 
   static bool mFirstInstance;
   static DefaultPropertyLookup* mDefaultLayerPropertyLookup; ///< Default properties

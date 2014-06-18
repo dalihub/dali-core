@@ -111,7 +111,8 @@ Layer::Layer( Actor::DerivedType type )
   mClippingBox(0,0,0,0),
   mSortFunction(Dali::Layer::ZValue),
   mIsClipping(false),
-  mDepthTestDisabled(false)
+  mDepthTestDisabled(false),
+  mTouchConsumed(false)
 {
 }
 
@@ -268,6 +269,16 @@ void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
     // layerNode is being used in a separate thread; queue a message to set the value
     SetSortFunctionMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), mSortFunction );
   }
+}
+
+void Layer::SetTouchConsumed( bool consume )
+{
+  mTouchConsumed = consume;
+}
+
+bool Layer::IsTouchConsumed() const
+{
+  return mTouchConsumed;
 }
 
 SceneGraph::Node* Layer::CreateNode() const

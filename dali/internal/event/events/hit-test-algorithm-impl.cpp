@@ -92,6 +92,14 @@ struct HitTestFunctionWrapper : public HitTestInterface
     return mFunc( Dali::Actor( actor ), Dali::HitTestAlgorithm::DESCEND_ACTOR_TREE );
   }
 
+  virtual bool DoesLayerConsumeHit( Layer* layer )
+  {
+    // Layer::IsTouchConsumed() focuses on touch only. Here we are a wrapper for the public-api
+    // where the caller may want to check for something completely different.
+    // TODO: Should provide a means to let caller decide. For now do not allow layers to consume
+    return false;
+  }
+
   Dali::HitTestAlgorithm::HitTestFunction mFunc;
 };
 
@@ -111,6 +119,11 @@ struct ActorTouchableCheck : public HitTestInterface
   {
     return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
            actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
+  }
+
+  virtual bool DoesLayerConsumeHit( Layer* layer )
+  {
+    return layer->IsTouchConsumed();
   }
 };
 
@@ -351,6 +364,7 @@ bool HitTestRenderTask( LayerList& layers,
         HitActor hit;
         bool stencilOnLayer = false;
         bool stencilHit = false;
+        bool layerConsumesHit = false;
         const Vector2& stageSize = Stage::GetCurrent()->GetSize();
 
         for (int i=layers.GetLayerCount()-1; i>=0 && !(hit.actor); --i)
@@ -375,10 +389,18 @@ bool HitTestRenderTask( LayerList& layers,
               // Recursively hit test all the actors, without crossing into other layers.
               hit = HitTestWithinLayer( *layer, results.rayOrigin, results.rayDirection, false, nearClippingPlane, farClippingPlane, hitCheck, stencilOnLayer, stencilHit, false );
             }
+
             // If a stencil on this layer hasn't been hit, then discard hit results for this layer
             if ( stencilOnLayer && !stencilHit )
             {
              hit = previousHit;
+            }
+
+            // If this layer is set to consume the hit, then do not check any layers behind it
+            if ( hitCheck.DoesLayerConsumeHit( layer ) )
+            {
+              layerConsumesHit = true;
+              break;
             }
           }
         }
@@ -390,6 +412,10 @@ bool HitTestRenderTask( LayerList& layers,
           results.actorCoordinates.y = hit.y;
           return true; // Success
         }
+        else if ( layerConsumesHit )
+        {
+          return true; // Also success if layer is consuming the hit
+        }
       }
     }
   }
@@ -398,9 +424,10 @@ bool HitTestRenderTask( LayerList& layers,
 
 /**
  * Iterate through RenderTaskList and perform hit test.
+ *
+ * @return true if we have a hit, false otherwise
  */
-
-void HitTestForEachRenderTask( LayerList& layers,
+bool HitTestForEachRenderTask( LayerList& layers,
                                RenderTaskList& taskList,
                                const Vector2& screenCoordinates,
                                Results& results,
@@ -432,8 +459,8 @@ void HitTestForEachRenderTask( LayerList& layers,
 
     if ( HitTestRenderTask( layers, renderTask, screenCoordinates, results, hitCheck ) )
     {
-      // Exit when an actor is hit
-      return; // don't bother checking off screen tasks
+      // Return true when an actor is hit (or layer in our render-task consumes the hit)
+      return true; // don't bother checking off screen tasks
     }
   }
 
@@ -457,11 +484,12 @@ void HitTestForEachRenderTask( LayerList& layers,
 
       if ( HitTestRenderTask( layers, renderTask, screenCoordinates, results, hitCheck ) )
       {
-        // Exit when an actor is hit
-        break;
+        // Return true when an actor is hit (or a layer in our render-task consumes the hit)
+        return true;
       }
     }
   }
+  return false;
 }
 
 } // unnamed namespace
@@ -474,14 +502,17 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
 
   Results hitTestResults;
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
-  HitTestForEachRenderTask( layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper );
-
-  results.actor = hitTestResults.actor;
-  results.actorCoordinates = hitTestResults.actorCoordinates;
+  if (  HitTestForEachRenderTask( layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
+  {
+    results.actor = hitTestResults.actor;
+    results.actorCoordinates = hitTestResults.actorCoordinates;
+  }
 }
 
 void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface )
 {
+  bool hit = false;
+
   // Hit-test the system-overlay actors first
   SystemOverlay* systemOverlay = stage.GetSystemOverlayInternal();
 
@@ -490,11 +521,11 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, 
     RenderTaskList& overlayTaskList = systemOverlay->GetOverlayRenderTasks();
     LayerList& overlayLayerList = systemOverlay->GetLayerList();
 
-    HitTestForEachRenderTask( overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
+    hit = HitTestForEachRenderTask( overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
   }
 
   // Hit-test the regular on-stage actors
-  if ( !results.actor )
+  if ( !hit )
   {
     RenderTaskList& taskList = stage.GetRenderTaskList();
     LayerList& layerList = stage.GetLayerList();
@@ -514,9 +545,11 @@ void HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordin
 {
   Results hitTestResults;
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
-  HitTestRenderTask( stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper );
-  results.actor = hitTestResults.actor;
-  results.actorCoordinates = hitTestResults.actorCoordinates;
+  if ( HitTestRenderTask( stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
+  {
+    results.actor = hitTestResults.actor;
+    results.actorCoordinates = hitTestResults.actorCoordinates;
+  }
 }
 
 } // namespace HitTestAlgorithm

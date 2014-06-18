@@ -303,6 +303,22 @@ public:
   */
   void SetSortFunction( SortFunctionType function );
 
+  /**
+   * @brief This allows the user to specify whether this layer should consume touch (including gestures).
+   *
+   * If set, any layers behind this layer will not be hit-test.
+   *
+   * @param[in]  consume  Whether the layer should consume touch (including gestures).
+   */
+  void SetTouchConsumed( bool consume );
+
+  /**
+   * @brief Retrieves whether the layer consumes touch (including gestures).
+   *
+   * @return true if consuming touch, false otherwise.
+   */
+  bool IsTouchConsumed() const;
+
 public: // Not intended for application developers
 
   /**

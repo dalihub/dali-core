@@ -1299,3 +1299,56 @@ int UtcDaliPinchGestureTouchBehindGesturedSystemOverlay(void)
 
   END_TEST;
 }
+
+int UtcDaliPinchGestureLayerConsumesTouch(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a detector
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+  PinchGestureDetector detector = PinchGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect( &application, functor );
+
+  // Add a layer to overlap the actor
+  Layer layer = Layer::New();
+  layer.SetSize(100.0f, 100.0f);
+  layer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add( layer );
+  layer.RaiseToTop();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector2 screenCoords( 50.0f, 50.0f );
+  float scale ( 10.0f );
+  float speed ( 50.0f );
+
+  // Emit signals, should receive
+  application.ProcessEvent( GeneratePinch( Gesture::Started, scale, speed, screenCoords ) );
+  application.ProcessEvent( GeneratePinch( Gesture::Finished, scale, speed, screenCoords ) );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Set layer to consume all touch
+  layer.SetTouchConsumed( true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit the same signals again, should not receive
+  application.ProcessEvent( GeneratePinch( Gesture::Started, scale, speed, screenCoords ) );
+  application.ProcessEvent( GeneratePinch( Gesture::Finished, scale, speed, screenCoords ) );
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}

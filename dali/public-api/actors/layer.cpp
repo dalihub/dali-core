@@ -143,6 +143,16 @@ void Layer::SetSortFunction(SortFunctionType function)
   GetImplementation(*this).SetSortFunction(function);
 }
 
+void Layer::SetTouchConsumed( bool consume )
+{
+  GetImplementation( *this ).SetTouchConsumed( consume );
+}
+
+bool Layer::IsTouchConsumed() const
+{
+  return GetImplementation( *this ).IsTouchConsumed();
+}
+
 Layer::Layer(Internal::Layer* internal)
 : Actor(internal)
 {

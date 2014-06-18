@@ -99,6 +99,7 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  *   - Before we perform a hit test within a layer, we check if all the layer's parents are visible
  *     and sensitive.
  *   - If they are not, we skip hit testing the actors in that layer altogether.
+ *   - If a layer is set to consume all touch, then we do not check any layers behind this layer.
  *
  * - Actors
  *   - The final part of hit testing is performed by walking through the actor tree within a layer.

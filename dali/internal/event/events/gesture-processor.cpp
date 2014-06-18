@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -54,6 +55,11 @@ struct GestureHitTestCheck : public HitTestAlgorithm::HitTestInterface
   {
     return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
            actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
+  }
+
+  virtual bool DoesLayerConsumeHit( Layer* layer )
+  {
+    return layer->IsTouchConsumed();
   }
 
   Gesture::Type mType;

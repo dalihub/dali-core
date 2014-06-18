@@ -2133,3 +2133,54 @@ int UtcDaliPanGesturePropertyIndices(void)
   DALI_TEST_EQUALS( indices.size(), detector.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliPanGestureLayerConsumesTouch(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  // Add a layer to overlap the actor
+  Layer layer = Layer::New();
+  layer.SetSize(100.0f, 100.0f);
+  layer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add( layer );
+  layer.RaiseToTop();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit signals, should receive
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Set layer to consume all touch
+  layer.SetTouchConsumed( true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit the same signals again, should not receive
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}

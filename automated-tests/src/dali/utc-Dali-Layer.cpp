@@ -512,3 +512,14 @@ int UtcDaliLayerPropertyIndices(void)
   DALI_TEST_EQUALS( indices.size(), layer.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliLayerTouchConsumed(void)
+{
+  TestApplication application;
+  Layer layer = Layer::New();
+
+  DALI_TEST_EQUALS( layer.IsTouchConsumed(), false, TEST_LOCATION );
+  layer.SetTouchConsumed( true );
+  DALI_TEST_EQUALS( layer.IsTouchConsumed(), true, TEST_LOCATION );
+  END_TEST;
+}

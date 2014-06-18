@@ -1282,3 +1282,54 @@ int UtcDaliTapGestureTouchBehindGesturedSystemOverlay(void)
 
   END_TEST;
 }
+
+int UtcDaliTapGestureLayerConsumesTouch(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a detector
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+  TapGestureDetector detector = TapGestureDetector::New();
+  detector.Attach(actor);
+  detector.DetectedSignal().Connect( &application, functor );
+
+  // Add a layer to overlap the actor
+  Layer layer = Layer::New();
+  layer.SetSize(100.0f, 100.0f);
+  layer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add( layer );
+  layer.RaiseToTop();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector2 screenCoords( 50.0f, 50.0f );
+
+  // Emit signals, should receive
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, screenCoords ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, screenCoords ) );
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Set layer to consume all touch
+  layer.SetTouchConsumed( true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit the same signals again, should not receive
+  application.ProcessEvent( GenerateTap( Gesture::Possible, 1u, 1u, screenCoords ) );
+  application.ProcessEvent( GenerateTap( Gesture::Started, 1u, 1u, screenCoords ) );
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}

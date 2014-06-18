@@ -28,6 +28,8 @@ namespace Dali
 namespace Internal
 {
 
+class Layer;
+
 /**
  * This namespace is provided for application developers to do hit test for the actors.
  */
@@ -51,16 +53,34 @@ struct HitTestInterface
 {
   /**
    * Called by the hit-test algorithm to determine whether the actor is hittable or not.
+   *
    * @param[in] actor Raw pointer to an Actor object.
+   *
+   * @return true if actor is hittable, false otherwise.
    */
   virtual bool IsActorHittable( Actor* actor ) = 0;
 
   /**
    * Called by the hit-test algorithm to determine whether the algorithm should descend the actor's
    * hierarchy (and hit-test its children as well).
+   *
    * @param[in] actor Raw pointer to an Actor object.
+   *
+   * @return true if we should descend the actor's hierarchy, false otherwise.
    */
   virtual bool DescendActorHierarchy( Actor* actor ) = 0;
+
+  /**
+   * Called by the hit-test algorithm to determine whether the layer specified consumes the hit
+   * regardless of whether an actor in the layer requires it or not.
+   *
+   * @note If true is returned, then no layers behind this layer will be hit-test.
+   *
+   * @param[in] layer Raw pointer to a Layer object.
+   *
+   * @return true if the layer should consume the hit, false otherwise.
+   */
+  virtual bool DoesLayerConsumeHit( Layer* layer ) = 0;
 };
 
 /**
