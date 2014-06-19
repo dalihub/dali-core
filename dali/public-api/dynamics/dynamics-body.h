@@ -53,9 +53,11 @@ public:
   DynamicsBody();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~DynamicsBody();
+  ~DynamicsBody();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

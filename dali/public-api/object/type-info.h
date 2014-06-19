@@ -86,9 +86,11 @@ public:
   TypeInfo();
 
   /**
-   * @brief destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~TypeInfo();
+  ~TypeInfo();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

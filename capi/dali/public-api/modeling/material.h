@@ -100,9 +100,11 @@ public:
   Material();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Material();
+  ~Material();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

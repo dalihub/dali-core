@@ -61,9 +61,11 @@ public:
   ActiveConstraint();
 
   /**
-   * @brief Destructor.
+   * @brief Dali::ActiveConstraint is intended as a base class
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ActiveConstraint();
+  ~ActiveConstraint();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

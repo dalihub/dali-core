@@ -150,9 +150,11 @@ public:
   static RenderTask DownCast( BaseHandle handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~RenderTask();
+  ~RenderTask();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

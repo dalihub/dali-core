@@ -90,9 +90,11 @@ public:
   static bool IsColorGlyph( const Character& character );
 
   /**
-   * @brief Destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~GlyphImage();
+  ~GlyphImage();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

@@ -107,8 +107,10 @@ public:
 
   /**
    * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~AnimatableMesh();
+  ~AnimatableMesh();
 
   /**
    * @brief Get the number of vertices with which this mesh was created.

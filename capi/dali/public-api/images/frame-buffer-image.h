@@ -121,9 +121,11 @@ public:
   static FrameBufferImage DownCast( BaseHandle handle );
 
   /**
-   * @brief Destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~FrameBufferImage();
+  ~FrameBufferImage();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

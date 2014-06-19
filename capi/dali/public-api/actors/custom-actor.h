@@ -64,11 +64,11 @@ public:
   static CustomActor DownCast( BaseHandle handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~CustomActor();
+  ~CustomActor();
 
   /**
    * @brief Retrieve the custom actor implementation.

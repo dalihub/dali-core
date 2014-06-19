@@ -70,11 +70,11 @@ public: // Creation & Destruction
   static GestureDetector DownCast( BaseHandle handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Dali::GestureDetector is intended as a base class
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~GestureDetector();
+  ~GestureDetector();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

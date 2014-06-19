@@ -90,10 +90,11 @@ public:
   Handle();
 
   /**
-   * @brief Dali::Handle is intended as a base class.
+   * @brief Dali::Handle is intended as a base class
    *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~Handle();
+  ~Handle();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.

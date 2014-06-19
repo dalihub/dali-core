@@ -312,11 +312,11 @@ public:
   static ShaderEffect DownCast( BaseHandle handle );
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
    *
-   * Dali::Object derived classes typically do not contain member data.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~ShaderEffect();
+  ~ShaderEffect();
 
   /**
    * @brief Copy constructor

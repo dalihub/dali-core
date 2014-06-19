@@ -111,9 +111,11 @@ public:
   DynamicsWorld();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~DynamicsWorld();
+  ~DynamicsWorld();
 
   /**
    * @copydoc Dali::BaseHandle::operator=

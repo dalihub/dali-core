@@ -66,9 +66,11 @@ public:
   DynamicsWorldConfig();
 
   /**
-   * @brief Virtual destructor.
+   * @brief Destructor
+   *
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual ~DynamicsWorldConfig();
+  ~DynamicsWorldConfig();
 
   /**
    * @copydoc Dali::BaseHandle::operator=
