@@ -101,115 +101,6 @@ struct IsNotAttachedAndOutsideTouchesRangeFunctor
 
 } // unnamed namespace
 
-struct PanGestureProcessor::PanEventFunctor : public GestureProcessor::Functor
-{
-  /**
-   * Constructor
-   * @param[in]  panEvent   The current gesture event.
-   * @param[in]  processor  Reference to the processor.
-   */
-  PanEventFunctor( const Integration::PanGestureEvent& panEvent, PanGestureProcessor& processor )
-  : panEvent( panEvent ),
-    processor( processor )
-  {
-  }
-
-  /**
-   * Check if the detector meets the current gesture event parameters.
-   */
-  virtual bool operator() ( GestureDetector* detector, Actor* actor )
-  {
-    bool retVal( false );
-
-    PanGestureDetector* panDetector( static_cast< PanGestureDetector* >( detector ) );
-
-    if ( ( panEvent.numberOfTouches >= panDetector->GetMinimumTouchesRequired() ) &&
-         ( panEvent.numberOfTouches <= panDetector->GetMaximumTouchesRequired() ) )
-    {
-      // Check if the detector requires directional panning.
-      if ( panDetector->RequiresDirectionalPan() && processor.mCurrentRenderTask )
-      {
-        // It does, calculate the angle of the pan in local actor coordinates and ensures it fits
-        // the detector's criteria.
-        RenderTask& renderTaskImpl( GetImplementation( processor.mCurrentRenderTask ) );
-
-        Vector2 startPosition, currentPosition;
-        actor->ScreenToLocal( renderTaskImpl, startPosition.x,   startPosition.y,   processor.mPossiblePanPosition.x, processor.mPossiblePanPosition.y );
-        actor->ScreenToLocal( renderTaskImpl, currentPosition.x, currentPosition.y, panEvent.currentPosition.x,       panEvent.currentPosition.y );
-        Vector2 displacement( currentPosition - startPosition );
-
-        Radian angle( atan( displacement.y / displacement.x ) );
-
-        /////////////////////////////
-        //            |            //
-        //            |            //
-        //   Q3 (-,-) | Q4 (+,-)   //
-        //            |            //
-        //    ----------------- +x //
-        //            |            //
-        //   Q2 (-,+) | Q1 (+,+)   //
-        //            |            //
-        //            |            //
-        //           +y            //
-        /////////////////////////////
-        // Quadrant 1: As is
-        // Quadrant 2: 180 degrees + angle
-        // Quadrant 3: angle - 180 degrees
-        // Quadrant 4: As is
-        /////////////////////////////
-
-        if ( displacement.x < 0.0f )
-        {
-          if ( displacement.y >= 0.0f )
-          {
-            // Quadrant 2
-            angle += Math::PI;
-          }
-          else
-          {
-            // Quadrant 3
-            angle -= Math::PI;
-          }
-        }
-
-        if ( panDetector->CheckAngleAllowed( angle ) )
-        {
-          retVal = true;
-        }
-      }
-      else
-      {
-        // Directional panning not required so we can use this actor and gesture detector.
-        retVal = true;
-      }
-    }
-
-    return retVal;
-  }
-
-  /**
-   * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
-   */
-  virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
-  {
-    processor.mCurrentPanEmitters.clear();
-    processor.ResetActor();
-
-    actor->ScreenToLocal( GetImplementation(processor.mCurrentRenderTask), actorCoordinates.x, actorCoordinates.y, panEvent.currentPosition.x, panEvent.currentPosition.y );
-
-    processor.EmitPanSignal( actor, gestureDetectors, panEvent, actorCoordinates, panEvent.state, processor.mCurrentRenderTask );
-
-    if ( actor->OnStage() )
-    {
-      processor.mCurrentPanEmitters = gestureDetectors;
-      processor.SetActor( actor );
-    }
-  }
-
-  const Integration::PanGestureEvent& panEvent;
-  PanGestureProcessor& processor;
-};
-
 PanGestureProcessor::PanGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager )
 : GestureProcessor( Gesture::Pan ),
   mStage( stage ),
@@ -220,6 +111,7 @@ PanGestureProcessor::PanGestureProcessor( Stage& stage, Integration::GestureMana
   mPossiblePanPosition(),
   mMinTouchesRequired( 1 ),
   mMaxTouchesRequired( 1 ),
+  mCurrentPanEvent( NULL ),
   mSceneObject( SceneGraph::PanGesture::New() ) // Create scene object to store pan information.
 {
   // Pass ownership to scene-graph
@@ -269,8 +161,10 @@ void PanGestureProcessor::Process( const Integration::PanGestureEvent& panEvent 
           // Record the current render-task for Screen->Actor coordinate conversions
           mCurrentRenderTask = hitTestResults.renderTask;
 
-          PanEventFunctor functor( panEvent, *this );
-          ProcessAndEmit( hitTestResults, functor );
+          // Set mCurrentPanEvent to use inside overridden methods called in ProcessAndEmit()
+          mCurrentPanEvent = &panEvent;
+          ProcessAndEmit( hitTestResults );
+          mCurrentPanEvent = NULL;
         }
         else
         {
@@ -543,6 +437,94 @@ void PanGestureProcessor::EmitPanSignal( Actor* actor,
 void PanGestureProcessor::OnGesturedActorStageDisconnection()
 {
   mCurrentPanEmitters.clear();
+}
+
+bool PanGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor* actor )
+{
+  DALI_ASSERT_DEBUG( mCurrentPanEvent );
+
+  bool retVal( false );
+  PanGestureDetector* panDetector( static_cast< PanGestureDetector* >( detector ) );
+
+  if ( ( mCurrentPanEvent->numberOfTouches >= panDetector->GetMinimumTouchesRequired() ) &&
+       ( mCurrentPanEvent->numberOfTouches <= panDetector->GetMaximumTouchesRequired() ) )
+  {
+    // Check if the detector requires directional panning.
+    if ( panDetector->RequiresDirectionalPan() && mCurrentRenderTask )
+    {
+      // It does, calculate the angle of the pan in local actor coordinates and ensures it fits
+      // the detector's criteria.
+      RenderTask& renderTaskImpl( GetImplementation( mCurrentRenderTask ) );
+
+      Vector2 startPosition, currentPosition;
+      actor->ScreenToLocal( renderTaskImpl, startPosition.x,   startPosition.y,   mPossiblePanPosition.x,              mPossiblePanPosition.y );
+      actor->ScreenToLocal( renderTaskImpl, currentPosition.x, currentPosition.y, mCurrentPanEvent->currentPosition.x, mCurrentPanEvent->currentPosition.y );
+      Vector2 displacement( currentPosition - startPosition );
+
+      Radian angle( atan( displacement.y / displacement.x ) );
+
+      /////////////////////////////
+      //            |            //
+      //            |            //
+      //   Q3 (-,-) | Q4 (+,-)   //
+      //            |            //
+      //    ----------------- +x //
+      //            |            //
+      //   Q2 (-,+) | Q1 (+,+)   //
+      //            |            //
+      //            |            //
+      //           +y            //
+      /////////////////////////////
+      // Quadrant 1: As is
+      // Quadrant 2: 180 degrees + angle
+      // Quadrant 3: angle - 180 degrees
+      // Quadrant 4: As is
+      /////////////////////////////
+
+      if ( displacement.x < 0.0f )
+      {
+        if ( displacement.y >= 0.0f )
+        {
+          // Quadrant 2
+          angle += Math::PI;
+        }
+        else
+        {
+          // Quadrant 3
+          angle -= Math::PI;
+        }
+      }
+
+      if ( panDetector->CheckAngleAllowed( angle ) )
+      {
+        retVal = true;
+      }
+    }
+    else
+    {
+      // Directional panning not required so we can use this actor and gesture detector.
+      retVal = true;
+    }
+  }
+  return retVal;
+}
+
+void PanGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+{
+  DALI_ASSERT_DEBUG ( mCurrentPanEvent );
+
+  mCurrentPanEmitters.clear();
+  ResetActor();
+
+  actor->ScreenToLocal( GetImplementation(mCurrentRenderTask), actorCoordinates.x, actorCoordinates.y, mCurrentPanEvent->currentPosition.x, mCurrentPanEvent->currentPosition.y );
+
+  EmitPanSignal( actor, gestureDetectors, *mCurrentPanEvent, actorCoordinates, mCurrentPanEvent->state, mCurrentRenderTask );
+
+  if ( actor->OnStage() )
+  {
+    mCurrentPanEmitters = gestureDetectors;
+    SetActor( actor );
+  }
 }
 
 } // namespace Internal

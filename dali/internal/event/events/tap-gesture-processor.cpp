@@ -72,39 +72,6 @@ void EmitTapSignal(
 
 } // unnamed namespace
 
-struct TapGestureProcessor::TapEventFunctor : public GestureProcessor::Functor
-{
-  /**
-   * Constructor
-   * @param[in]  tapEvent   The current gesture event.
-   */
-  TapEventFunctor( const Integration::TapGestureEvent& tapEvent )
-  : tapEvent(tapEvent)
-  {
-  }
-
-  /**
-   * Check if the detector meets the current gesture event parameters.
-   */
-   virtual bool operator() ( GestureDetector* detector, Actor* )
-  {
-    TapGestureDetector* tapDetector ( static_cast< TapGestureDetector* >( detector ) );
-
-    return tapDetector->GetTapsRequired() == tapEvent.numberOfTaps &&
-           tapDetector->GetTouchesRequired() == tapEvent.numberOfTouches;
-  }
-
-  /**
-   * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
-   */
-  virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
-  {
-    EmitTapSignal( actor, gestureDetectors, tapEvent, actorCoordinates );
-  }
-
-  const Integration::TapGestureEvent& tapEvent;
-};
-
 TapGestureProcessor::TapGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager)
 : GestureProcessor( Gesture::Tap ),
   mStage( stage ),
@@ -113,7 +80,8 @@ TapGestureProcessor::TapGestureProcessor( Stage& stage, Integration::GestureMana
   mMinTapsRequired( 1 ),
   mMaxTapsRequired( 1 ),
   mMinTouchesRequired( 1 ),
-  mMaxTouchesRequired( 1 )
+  mMaxTouchesRequired( 1 ),
+  mCurrentTapEvent( NULL )
 {
 }
 
@@ -147,8 +115,10 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
 
         if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {
-          TapEventFunctor functor( tapEvent );
-          ProcessAndEmit( hitTestResults, functor );
+          // Set mCurrentTapEvent to use inside overridden methods called from ProcessAndEmit()
+          mCurrentTapEvent = &tapEvent;
+          ProcessAndEmit( hitTestResults );
+          mCurrentTapEvent = NULL;
         }
 
         ResetActor();
@@ -283,6 +253,23 @@ void TapGestureProcessor::UpdateDetection()
     request.maxTouches = mMaxTouchesRequired = maxTouches;
     mGestureManager.Update(request);
   }
+}
+
+bool TapGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor* actor )
+{
+  DALI_ASSERT_DEBUG( mCurrentTapEvent );
+
+  TapGestureDetector* tapDetector ( static_cast< TapGestureDetector* >( detector ) );
+
+  return ( tapDetector->GetTapsRequired() == mCurrentTapEvent->numberOfTaps ) &&
+         ( tapDetector->GetTouchesRequired() == mCurrentTapEvent->numberOfTouches );
+}
+
+void TapGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+{
+  DALI_ASSERT_DEBUG( mCurrentTapEvent );
+
+  EmitTapSignal( actor, gestureDetectors, *mCurrentTapEvent, actorCoordinates );
 }
 
 } // namespace Internal

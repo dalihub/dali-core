@@ -98,52 +98,6 @@ struct IsNotAttachedFunctor
 
 } // unnamed namespace
 
-struct LongPressGestureProcessor::LongPressEventFunctor : public GestureProcessor::Functor
-{
-  /**
-   * Constructor
-   * @param[in]  event      The current gesture event.
-   * @param[in]  processor  Reference to the processor.
-   */
-  LongPressEventFunctor( const Integration::LongPressGestureEvent& event, LongPressGestureProcessor& processor )
-  : longPressEvent( event ),
-    processor( processor )
-  {
-  }
-
-  /**
-   * Check if the detector meets the current gesture event parameters.
-   */
-  virtual bool operator() ( GestureDetector* detector, Actor* )
-  {
-    LongPressGestureDetector* longPressDetector ( static_cast< LongPressGestureDetector* >( detector ) );
-
-    return ( longPressDetector->GetMinimumTouchesRequired() <= longPressEvent.numberOfTouches ) &&
-           ( longPressDetector->GetMaximumTouchesRequired() >= longPressEvent.numberOfTouches );
-  }
-
-  /**
-   * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
-   */
-  virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
-  {
-    // Clear actor as
-    processor.mCurrentEmitters.clear();
-    processor.ResetActor();
-
-    EmitLongPressSignal( actor, gestureDetectors, longPressEvent, actorCoordinates );
-
-    if ( actor->OnStage() )
-    {
-      processor.mCurrentEmitters = gestureDetectors;
-      processor.SetActor( actor );
-    }
-  }
-
-  const Integration::LongPressGestureEvent& longPressEvent;
-  LongPressGestureProcessor& processor;
-};
-
 LongPressGestureProcessor::LongPressGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager)
 : GestureProcessor( Gesture::LongPress ),
   mStage( stage ),
@@ -152,7 +106,8 @@ LongPressGestureProcessor::LongPressGestureProcessor( Stage& stage, Integration:
   mCurrentEmitters(),
   mCurrentRenderTask(),
   mMinTouchesRequired( 1 ),
-  mMaxTouchesRequired( 1 )
+  mMaxTouchesRequired( 1 ),
+  mCurrentLongPressEvent( NULL )
 {
 }
 
@@ -190,8 +145,10 @@ void LongPressGestureProcessor::Process( const Integration::LongPressGestureEven
           // Record the current render-task for Screen->Actor coordinate conversions
           mCurrentRenderTask = hitTestResults.renderTask;
 
-          LongPressEventFunctor functor( longPressEvent, *this );
-          ProcessAndEmit( hitTestResults, functor );
+          // Set mCurrentLongPressEvent to use inside overridden methods called from ProcessAndEmit()
+          mCurrentLongPressEvent = &longPressEvent;
+          ProcessAndEmit( hitTestResults );
+          mCurrentLongPressEvent = NULL;
         }
         else
         {
@@ -341,6 +298,32 @@ void LongPressGestureProcessor::UpdateDetection()
 void LongPressGestureProcessor::OnGesturedActorStageDisconnection()
 {
   mCurrentEmitters.clear();
+}
+
+bool LongPressGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor* actor )
+{
+  DALI_ASSERT_DEBUG( mCurrentLongPressEvent );
+
+  LongPressGestureDetector* longPressDetector ( static_cast< LongPressGestureDetector* >( detector ) );
+
+  return ( longPressDetector->GetMinimumTouchesRequired() <= mCurrentLongPressEvent->numberOfTouches ) &&
+         ( longPressDetector->GetMaximumTouchesRequired() >= mCurrentLongPressEvent->numberOfTouches );
+}
+
+void LongPressGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+{
+  DALI_ASSERT_DEBUG( mCurrentLongPressEvent );
+
+  mCurrentEmitters.clear();
+  ResetActor();
+
+  EmitLongPressSignal( actor, gestureDetectors, *mCurrentLongPressEvent, actorCoordinates );
+
+  if ( actor->OnStage() )
+  {
+    mCurrentEmitters = gestureDetectors;
+    SetActor( actor );
+  }
 }
 
 } // namespace Internal

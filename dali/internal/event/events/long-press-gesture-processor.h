@@ -115,6 +115,16 @@ private:
    */
   void OnGesturedActorStageDisconnection();
 
+  /**
+   * @copydoc GestureProcessor::CheckGestureDetector()
+   */
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+
+  /**
+   * @copydoc GestureProcessor::EmitGestureSignal()
+   */
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+
 private:
 
   Stage& mStage;
@@ -127,7 +137,7 @@ private:
   unsigned int mMinTouchesRequired;
   unsigned int mMaxTouchesRequired;
 
-  struct LongPressEventFunctor;
+  const Integration::LongPressGestureEvent* mCurrentLongPressEvent; ///< Pointer to current longPressEvent, used when calling ProcessAndEmit()
 };
 
 } // namespace Internal

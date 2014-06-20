@@ -168,6 +168,16 @@ private:
    */
   void OnGesturedActorStageDisconnection();
 
+  /**
+   * @copydoc GestureProcessor::CheckGestureDetector()
+   */
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+
+  /**
+   * @copydoc GestureProcessor::EmitGestureSignal()
+   */
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+
 private:
 
   Stage& mStage;
@@ -183,8 +193,7 @@ private:
   Vector2 mLastVelocity;       ///< The last recorded velocity in local actor coordinates.
   Vector2 mLastScreenVelocity; ///< The last recorded velocity in screen coordinates.
 
-  struct PanEventFunctor;
-
+  const Integration::PanGestureEvent* mCurrentPanEvent; ///< Pointer to current PanEvent, used when calling ProcessAndEmit()
   SceneGraph::PanGesture* mSceneObject; ///< Not owned, but we write to it directly
 };
 

@@ -36,7 +36,9 @@ namespace Internal
  */
 class GestureProcessor : public ProxyObject::Observer
 {
-protected: // Construction & Destruction
+protected:
+
+  // Construction & Destruction
 
   /**
    * Protected constructor.  Cannot create an instance of GestureProcessor
@@ -48,53 +50,29 @@ protected: // Construction & Destruction
    */
   virtual ~GestureProcessor();
 
-  // Types for deriving classes
-
-  /**
-   * Functor to use in GetGesturedActor() and ProcessAndEmit() methods.
-   */
-  struct Functor
-  {
-    /**
-     * This operator should be overridden to check if the gesture detector meets the parameters of the current gesture.
-     * @param[in]  detector  The gesture detector to check.
-     * @param[in]  actor     The actor that has been gestured.
-     * @return true, if it meets the parameters, false otherwise.
-     */
-    virtual bool operator() ( GestureDetector* detector, Actor* actor ) = 0;
-
-    /**
-     * This operator should be overridden to emit the gesture signal on the provided container of gesture detectors along with the actor
-     * the gesture has occurred on.
-     * @param[in]  actor             The actor which has been gestured.
-     * @param[in]  gestureDetectors  The detectors that should emit the signal.
-     * @param[in]  actorCoordinates  The local actor coordinates where the gesture took place.
-     */
-    virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) = 0;
-  };
-
-  // Methods for deriving classes
+  // Methods to be used by deriving classes
 
   /**
    * Given the hit actor, this walks up the actor tree to determine the actor that is connected to one (or several) gesture detectors.
    *
    * @param[in,out]  actor               The gestured actor. When this function returns, this is the actor that has been hit by the gesture.
    * @param[out]     gestureDetectors    A container containing all the gesture detectors that have the hit actor attached and satisfy the functor parameters.
-   * @param[in]      functor             Used to check if a gesture-detector matches the criteria the gesture detector requires.
    *
+   * @note Uses CheckGestureDetector() to check if a the current gesture matches the criteria the gesture detector requires.
    * @pre gestureDetectors should be empty.
    */
-  void GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors, Functor& functor );
+  void GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors );
 
   /**
    * Calls the emission method in the deriving class for matching gesture-detectors with the hit-actor (or one of its parents).
    *
    * @param[in]  hitTestResults      The Hit Test Results.
-   * @param[in]  functor             Used to check if a gesture-detector matches the criteria the gesture detector requires and for emitting the signal.
    *
+   * @note Uses the CheckGestureDetector() to check if the gesture matches the criteria of the given gesture detector
+   *       and EmitGestureSignal() to emit the signal.
    * @pre Hit Testing should already be done.
    */
-  void ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults, Functor& functor );
+  void ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults );
 
   /**
    * Hit test the screen coordinates, and place the results in hitTestResults.
@@ -123,6 +101,8 @@ protected: // Construction & Destruction
    */
   Actor* GetCurrentGesturedActor();
 
+private:
+
   // For derived classes to override
 
   /**
@@ -130,13 +110,34 @@ protected: // Construction & Destruction
    */
   virtual void OnGesturedActorStageDisconnection() = 0;
 
-private:
+  /**
+   * Called by the ProcessAndEmit() & GetGesturedActor() methods to check if the provided
+   * gesture-detector meets the parameters of the current gesture.
+   *
+   * @param[in]  detector  The gesture detector to check.
+   * @param[in]  actor     The actor that has been gestured.
+   *
+   * @return true, if the detector meets the parameters, false otherwise.
+   */
+  virtual bool CheckGestureDetector( GestureDetector* detector, Actor* actor ) = 0;
+
+  /**
+   * Called by the ProcessAndEmit() method when the gesture meets all applicable criteria and
+   * should be overridden by deriving classes to emit the gesture signal on gesture-detectors
+   * provided for the actor the gesture has occurred on.
+   *
+   * @param[in]  actor             The actor which has been gestured.
+   * @param[in]  gestureDetectors  The detectors that should emit the signal.
+   * @param[in]  actorCoordinates  The local actor coordinates where the gesture took place.
+   */
+  virtual void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates ) = 0;
 
   // Undefined
+
   GestureProcessor( const GestureProcessor& );
   GestureProcessor& operator=( const GestureProcessor& );
 
-private:
+  // SceneObject overrides
 
   /**
    * This will never get called as we do not observe objects that have not been added to the scene.
@@ -159,14 +160,6 @@ private:
    * @see ProxyObject::Observer::ProxyDestroyed()
    */
   virtual void ProxyDestroyed(ProxyObject& proxy);
-
-  // Signal Handlers
-
-  /**
-   * Signal handler called when the actor is removed from the stage.
-   * @param[in]  actor  The actor removed from the stage.
-   */
-  void OnStageDisconnection( Dali::Actor actor );
 
 private: // Data
 

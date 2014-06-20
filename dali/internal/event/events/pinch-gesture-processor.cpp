@@ -100,51 +100,13 @@ struct IsNotAttachedFunctor
 
 } // unnamed namespace
 
-struct PinchGestureProcessor::PinchEventFunctor : public GestureProcessor::Functor
-{
-  /**
-   * Constructor
-   * @param[in]  pinchEvent  The current gesture event.
-   * @param[in]  processor   Reference to the processor.
-   */
-  PinchEventFunctor( const Integration::PinchGestureEvent& pinchEvent, PinchGestureProcessor& processor )
-  : pinchEvent( pinchEvent ),
-    processor( processor )
-  {
-  }
-
-  /**
-   * Check if the detector meets the current gesture event parameters.
-   */
-  virtual bool operator() ( GestureDetector*, Actor* )
-  {
-    return true;
-  }
-
-  /**
-   * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
-   */
-  virtual void operator() ( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
-  {
-    EmitPinchSignal( actor, gestureDetectors, pinchEvent, actorCoordinates );
-
-    if ( actor->OnStage() )
-    {
-      processor.mCurrentPinchEmitters = gestureDetectors;
-      processor.SetActor( actor );
-    }
-  }
-
-  const Integration::PinchGestureEvent& pinchEvent;
-  PinchGestureProcessor& processor;
-};
-
 PinchGestureProcessor::PinchGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager )
 : GestureProcessor( Gesture::Pinch ),
   mStage(stage),
   mGestureManager(gestureManager),
   mGestureDetectors(),
-  mCurrentPinchEmitters()
+  mCurrentPinchEmitters(),
+  mCurrentPinchEvent(NULL)
 {
 }
 
@@ -170,8 +132,10 @@ void PinchGestureProcessor::Process( const Integration::PinchGestureEvent& pinch
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;
 
-        PinchEventFunctor functor( pinchEvent, *this ); // Sets mCurrentGesturedActor
-        ProcessAndEmit( hitTestResults, functor );
+        // Set mCurrentPanEvent to use inside overridden methods called from ProcessAndEmit()
+        mCurrentPinchEvent = &pinchEvent;
+        ProcessAndEmit( hitTestResults );
+        mCurrentPinchEvent = NULL;
       }
       break;
     }
@@ -282,6 +246,25 @@ void PinchGestureProcessor::GestureDetectorUpdated( PinchGestureDetector* gestur
 void PinchGestureProcessor::OnGesturedActorStageDisconnection()
 {
   mCurrentPinchEmitters.clear();
+}
+
+bool PinchGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor* actor )
+{
+  // No special case required for pinch.
+  return true;
+}
+
+void PinchGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+{
+  DALI_ASSERT_DEBUG( mCurrentPinchEvent );
+
+  EmitPinchSignal( actor, gestureDetectors, *mCurrentPinchEvent, actorCoordinates );
+
+  if ( actor->OnStage() )
+  {
+    mCurrentPinchEmitters = gestureDetectors;
+    SetActor( actor );
+  }
 }
 
 } // namespace Internal

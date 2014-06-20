@@ -80,7 +80,7 @@ GestureProcessor::~GestureProcessor()
   ResetActor();
 }
 
-void GestureProcessor::GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors, Functor& functor )
+void GestureProcessor::GetGesturedActor( Actor*& actor, GestureDetectorContainer& gestureDetectors )
 {
   while ( actor )
   {
@@ -94,8 +94,8 @@ void GestureProcessor::GetGesturedActor( Actor*& actor, GestureDetectorContainer
       {
         GestureDetector* current(*iter);
 
-        // Check whether the gesture detector satisfies the current gesture's parameters.
-        if ( functor( current, actor ) )
+        // Check deriving class for whether the current gesture satisfies the gesture detector's parameters.
+        if ( CheckGestureDetector( current, actor ) )
         {
           gestureDetectors.push_back(current);
         }
@@ -113,7 +113,7 @@ void GestureProcessor::GetGesturedActor( Actor*& actor, GestureDetectorContainer
   }
 }
 
-void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults, Functor& functor )
+void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults )
 {
   if ( hitTestResults.actor )
   {
@@ -123,7 +123,7 @@ void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults
     while ( actor )
     {
       GestureDetectorContainer gestureDetectors;
-      GetGesturedActor( actor, gestureDetectors, functor );
+      GetGesturedActor( actor, gestureDetectors );
 
       if ( actor && !gestureDetectors.empty() )
       {
@@ -132,8 +132,8 @@ void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults
 
         if ( actor == hitTestActor )
         {
-          // Our gesture detector's attached actor WAS the hit actor so we can call the emitting functor.
-          functor( actor, gestureDetectors, hitTestResults.actorCoordinates );
+          // Our gesture detector's attached actor WAS the hit actor so we can can emit the signal.
+          EmitGestureSignal( actor, gestureDetectors, hitTestResults.actorCoordinates );
           break; // We have found AND emitted a signal on the gestured actor, break out.
         }
         else
@@ -151,8 +151,8 @@ void GestureProcessor::ProcessAndEmit( HitTestAlgorithm::Results& hitTestResults
                 float distance( 0.0f );
                 if( actor->RayActorTest( hitTestResults.rayOrigin, hitTestResults.rayDirection, hitPointLocal, distance ) )
                 {
-                  // One of the hit actor's parents was the gestured actor so call the emitting functor.
-                  functor( actor, gestureDetectors, Vector2( hitPointLocal.x, hitPointLocal.y ) );
+                  // One of the parents was the gestured actor so we can emit the signal for that actor.
+                  EmitGestureSignal( actor, gestureDetectors, Vector2( hitPointLocal.x, hitPointLocal.y ) );
                   break; // We have found AND emitted a signal on the gestured actor, break out.
                 }
               }

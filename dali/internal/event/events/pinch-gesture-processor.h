@@ -110,6 +110,16 @@ private:
    */
   void OnGesturedActorStageDisconnection();
 
+  /**
+   * @copydoc GestureProcessor::CheckGestureDetector()
+   */
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+
+  /**
+   * @copydoc GestureProcessor::EmitGestureSignal()
+   */
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+
 private:
 
   Stage& mStage;
@@ -118,7 +128,7 @@ private:
   GestureDetectorContainer mCurrentPinchEmitters;
   Dali::RenderTask mCurrentRenderTask;
 
-  struct PinchEventFunctor;
+  const Integration::PinchGestureEvent* mCurrentPinchEvent; ///< Pointer to current PinchEvent, used when calling ProcessAndEmit()
 };
 
 } // namespace Internal
