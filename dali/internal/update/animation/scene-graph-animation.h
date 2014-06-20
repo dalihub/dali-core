@@ -94,6 +94,29 @@ public:
     return mDurationSeconds;
   }
 
+  /*
+   * Retrieve the current progress of the animation.
+   * @return The current progress as a normalized value between [0,1].
+   */
+  float GetCurrentProgress() const
+  {
+    if( mDurationSeconds > 0.0f )
+    {
+      return mElapsedSeconds / mDurationSeconds;
+    }
+
+    return 0.0f;
+  }
+
+  /*
+   * Sets the progress of the animation.
+   * @param[in] The new progress as a normalized value between [0,1]
+   */
+  void SetCurrentProgress( float progress )
+  {
+    mElapsedSeconds = mDurationSeconds * progress;
+  }
+
   /**
    * Set whether the animation will loop.
    * @param[in] looping True if the animation will loop.
@@ -145,6 +168,12 @@ public:
    * Play the animation.
    */
   void Play();
+
+  /*
+   * Play the animation from a given point
+   * @param[in] progress A value between [0,1] form where the animation should start playing
+   */
+  void PlayFrom( float progress );
 
   /**
    * Pause the animation.
@@ -302,6 +331,17 @@ inline void SetDestroyActionMessage( EventToUpdate& eventToUpdate, const Animati
   new (slot) LocalType( &animation, &Animation::SetDestroyAction, action );
 }
 
+inline void SetCurrentProgressMessage( EventToUpdate& eventToUpdate, const Animation& animation, float progress )
+{
+  typedef MessageValue1< Animation, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::SetCurrentProgress, progress );
+}
+
 inline void PlayAnimationMessage( EventToUpdate& eventToUpdate, const Animation& animation )
 {
   typedef Message< Animation > LocalType;
@@ -311,6 +351,17 @@ inline void PlayAnimationMessage( EventToUpdate& eventToUpdate, const Animation&
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::Play );
+}
+
+inline void PlayAnimationFromMessage( EventToUpdate& eventToUpdate, const Animation& animation, float progress )
+{
+  typedef MessageValue1< Animation,float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::PlayFrom, progress );
 }
 
 inline void PauseAnimationMessage( EventToUpdate& eventToUpdate, const Animation& animation )

@@ -286,6 +286,8 @@ extern int UtcDaliAnimationPlay(void);
 extern int UtcDaliAnimationPlayOffStage(void);
 extern int UtcDaliAnimationPlayDiscardHandle(void);
 extern int UtcDaliAnimationPlayStopDiscardHandle(void);
+extern int UtcDaliAnimationPlayFrom(void);
+extern int UtcDaliAnimationSetCurrentProgress(void);
 extern int UtcDaliAnimationPause(void);
 extern int UtcDaliAnimationStop(void);
 extern int UtcDaliAnimationStopSetPosition(void);
@@ -1514,6 +1516,8 @@ testcase tc_array[] = {
     {"UtcDaliAnimationPlayOffStage", UtcDaliAnimationPlayOffStage, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationPlayDiscardHandle", UtcDaliAnimationPlayDiscardHandle, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationPlayStopDiscardHandle", UtcDaliAnimationPlayStopDiscardHandle, utc_dali_animation_startup, utc_dali_animation_cleanup},
+    {"UtcDaliAnimationPlayFrom", UtcDaliAnimationPlayFrom, utc_dali_animation_startup, utc_dali_animation_cleanup},
+    {"UtcDaliAnimationSetCurrentProgress", UtcDaliAnimationSetCurrentProgress, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationPause", UtcDaliAnimationPause, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationStop", UtcDaliAnimationStop, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationStopSetPosition", UtcDaliAnimationStopSetPosition, utc_dali_animation_startup, utc_dali_animation_cleanup},

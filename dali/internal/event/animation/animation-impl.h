@@ -162,6 +162,12 @@ public:
   void Play();
 
   /**
+   * (Re)start the animation from a given point.
+   * @param[in] progress The progress between [0,1] from where the animation should start
+   */
+  void PlayFrom( float progress );
+
+  /**
    * Pause the animation.
    */
   void Pause();
@@ -900,6 +906,16 @@ public:
    * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector4 value, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector4 value, AlphaFunction alpha, float delaySeconds, float durationSeconds );
+
+  /*
+   * @copydoc Dali::Animation::GetCurrentProgress()
+   */
+  float GetCurrentProgress();
+
+  /*
+   * @copydoc Dali::Animation::SetCurrentProgress()
+   */
+  void SetCurrentProgress(float progress);
 
 public: // For connecting animators to animations
 

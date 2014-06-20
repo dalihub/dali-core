@@ -259,9 +259,30 @@ public:
   AlphaFunction GetDefaultAlphaFunction() const;
 
   /**
+  * @brief Retrieve the current progress of the animation.
+  *
+  * @return The current progress as a normalized value between [0,1].
+  */
+  float GetCurrentProgress();
+
+  /*
+   * @brief Sets the progress of the animation.
+   * The animation will play (or continue playing) from this point
+   *
+   * @param[in] progress The new progress as a normalized value between [0,1].
+   */
+  void SetCurrentProgress( float progress );
+
+  /**
    * @brief Play the animation.
    */
   void Play();
+
+  /**
+   * @brief Play the animation from a given point.
+   * @param[in] progress A value between [0,1] form where the animation should start playing
+   */
+  void PlayFrom( float progress );
 
   /**
    * @brief Pause the animation.

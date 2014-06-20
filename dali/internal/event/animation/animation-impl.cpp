@@ -225,6 +225,18 @@ void Animation::Play()
   PlayAnimationMessage( mUpdateManager.GetEventToUpdate(), *mAnimation );
 }
 
+void Animation::PlayFrom( float progress )
+{
+  if( progress >= 0.0f && progress <= 1.0f )
+  {
+    // Update the current playlist
+    mPlaylist.OnPlay( *this );
+
+    // mAnimation is being used in a separate thread; queue a Play message
+    PlayAnimationFromMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
+  }
+}
+
 void Animation::Pause()
 {
   // mAnimation is being used in a separate thread; queue a Pause message
@@ -1239,6 +1251,25 @@ bool Animation::DoAction(BaseObject* object, const std::string& actionName, cons
   }
 
   return done;
+}
+
+float Animation::GetCurrentProgress()
+{
+  if( mAnimation )
+  {
+    return mAnimation->GetCurrentProgress();
+  }
+
+  return 0.0f;
+}
+
+void Animation::SetCurrentProgress(float progress)
+{
+  if( mAnimation && progress >= 0.0f && progress <= 1.0f )
+  {
+    // mAnimation is being used in a separate thread; queue a message to set the current progress
+    SetCurrentProgressMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
+  }
 }
 
 } // namespace Internal

@@ -82,6 +82,16 @@ void Animation::Play()
   mState = Playing;
 }
 
+void Animation::PlayFrom( float progress )
+{
+  //If the animation is already playing this has no effect
+  if( mState != Playing )
+  {
+    mElapsedSeconds = progress * mDurationSeconds;
+    mState = Playing;
+  }
+}
+
 void Animation::Pause()
 {
   if (mState == Playing)

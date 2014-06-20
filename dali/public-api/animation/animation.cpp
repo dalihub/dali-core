@@ -117,6 +117,12 @@ void Animation::Play()
   GetImplementation(*this).Play();
 }
 
+void Animation::PlayFrom(float progress)
+{
+  GetImplementation(*this).PlayFrom(progress);
+}
+
+
 void Animation::Pause()
 {
   GetImplementation(*this).Pause();
@@ -462,6 +468,16 @@ void Animation::Resize(Actor actor, Vector3 size, AlphaFunction alpha)
 void Animation::Resize(Actor actor, Vector3 size, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
   GetImplementation(*this).Resize(GetImplementation(actor), size, alpha, delaySeconds, durationSeconds);
+}
+
+float Animation::GetCurrentProgress()
+{
+  return GetImplementation(*this).GetCurrentProgress();
+}
+
+void Animation::SetCurrentProgress( float progress )
+{
+  return GetImplementation(*this).SetCurrentProgress( progress );
 }
 
 } // namespace Dali
