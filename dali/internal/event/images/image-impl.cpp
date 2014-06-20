@@ -356,7 +356,7 @@ bool Image::IsNinePatchFileName( std::string filename )
       break;
     }
 
-    // Satisfy prevnet
+    // Satisfy prevent
     if( state == DONE )
     {
       break;

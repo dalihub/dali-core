@@ -705,6 +705,8 @@ extern int UtcDaliImageActorNewNullWithArea(void);
 extern int UtcDaliImageActorSetImage(void);
 extern int UtcDaliImageActorPropertyIndices(void);
 extern int UtcDaliImageActorImageProperty(void);
+extern int UtcDaliImageActorNinePatch01(void);
+extern int UtcDaliImageActorNinePatch02(void);
 extern int UtcDaliImageAttributesConstructor(void);
 extern int UtcDaliImageAttributesLessThan(void);
 extern int UtcDaliImageAttributesEquality(void);
@@ -1928,6 +1930,8 @@ testcase tc_array[] = {
     {"UtcDaliImageActorSetImage", UtcDaliImageActorSetImage, image_actor_test_startup, image_actor_test_cleanup},
     {"UtcDaliImageActorPropertyIndices", UtcDaliImageActorPropertyIndices, image_actor_test_startup, image_actor_test_cleanup},
     {"UtcDaliImageActorImageProperty", UtcDaliImageActorImageProperty, image_actor_test_startup, image_actor_test_cleanup},
+    {"UtcDaliImageActorNinePatch01", UtcDaliImageActorNinePatch01, image_actor_test_startup, image_actor_test_cleanup},
+    {"UtcDaliImageActorNinePatch02", UtcDaliImageActorNinePatch02, image_actor_test_startup, image_actor_test_cleanup},
     {"UtcDaliImageAttributesConstructor", UtcDaliImageAttributesConstructor, utc_dali_image_attributes_startup, utc_dali_image_attributes_cleanup},
     {"UtcDaliImageAttributesLessThan", UtcDaliImageAttributesLessThan, utc_dali_image_attributes_startup, utc_dali_image_attributes_cleanup},
     {"UtcDaliImageAttributesEquality", UtcDaliImageAttributesEquality, utc_dali_image_attributes_startup, utc_dali_image_attributes_cleanup},

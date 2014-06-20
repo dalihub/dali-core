@@ -111,6 +111,7 @@ ImageActorPtr ImageActor::New( Image* anImage )
   if( ninePatchImage != NULL )
   {
     theImage = ninePatchImage->CreateCroppedBitmapImage();
+    // Note, if theImage is empty, the nine-patch image was not loaded
   }
 
   // Create the attachment
