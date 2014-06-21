@@ -61,10 +61,12 @@ void VectorBase::Release()
 
 void VectorBase::SetCount( SizeType count )
 {
-  // Setcount is internal so should not be called on empty vector
-  DALI_ASSERT_DEBUG( mData && "Vector is empty" );
-  SizeType* metadata = reinterpret_cast< SizeType* >( mData );
-  *(metadata - 1) = count;
+  // someone can call Resize( 0 ) before ever populating the vector
+  if( mData )
+  {
+    SizeType* metadata = reinterpret_cast< SizeType* >( mData );
+    *(metadata - 1) = count;
+  }
 }
 
 void VectorBase::Reserve( SizeType capacity, SizeType elementSize )
