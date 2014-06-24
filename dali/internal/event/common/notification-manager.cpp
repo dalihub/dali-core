@@ -63,7 +63,8 @@ struct NotificationManager::Impl
 
   // queueMutex must be locked whilst accessing queue
   MessageQueueMutex queueMutex;
-  MessageContainer updateQueue;
+  MessageContainer updateCompletedQueue;
+  MessageContainer updateWorkingQueue;
   MessageContainer eventQueue;
 };
 
@@ -84,7 +85,15 @@ void NotificationManager::QueueMessage( MessageBase* message )
   // queueMutex must be locked whilst accessing queue
   MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
 
-  mImpl->updateQueue.PushBack( message );
+  mImpl->updateWorkingQueue.PushBack( message );
+}
+
+void NotificationManager::UpdateCompleted()
+{
+  // queueMutex must be locked whilst accessing queue
+  MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
+  // Swap the queue, original queue ends up empty, then release the lock
+  mImpl->updateCompletedQueue.Swap( mImpl->updateWorkingQueue );
 }
 
 bool NotificationManager::MessagesToProcess()
@@ -92,7 +101,7 @@ bool NotificationManager::MessagesToProcess()
   // queueMutex must be locked whilst accessing queue
   MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
 
-  return ( false == mImpl->updateQueue.IsEmpty() );
+  return ( false == mImpl->updateCompletedQueue.IsEmpty() );
 }
 
 void NotificationManager::ProcessMessages()
@@ -105,7 +114,7 @@ void NotificationManager::ProcessMessages()
     MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
 
     // Swap the queue, original queue ends up empty, then release the lock
-    mImpl->updateQueue.Swap( mImpl->eventQueue );
+    mImpl->updateCompletedQueue.Swap( mImpl->eventQueue );
   }
   // end of scope, lock is released
 

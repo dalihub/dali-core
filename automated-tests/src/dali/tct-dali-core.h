@@ -427,6 +427,7 @@ extern int UtcDaliAnimationAnimateBetweenActorColorFunction(void);
 extern int UtcDaliAnimationAnimateBetweenActorColorFunctionTimePeriod(void);
 extern int UtcDaliAnimationAnimateVector3Func(void);
 extern int UtcDaliAnimationCreateDestroy(void);
+extern int UtcDaliAnimationUpdateManager(void);
 extern int UtcDaliAnyConstructors(void);
 extern int UtcDaliAnyAssignmentOperators(void);
 extern int UtcDaliAnyNegativeAssignmentOperators(void);
@@ -1654,6 +1655,7 @@ testcase tc_array[] = {
     {"UtcDaliAnimationAnimateBetweenActorColorFunctionTimePeriod", UtcDaliAnimationAnimateBetweenActorColorFunctionTimePeriod, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationAnimateVector3Func", UtcDaliAnimationAnimateVector3Func, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationCreateDestroy", UtcDaliAnimationCreateDestroy, utc_dali_animation_startup, utc_dali_animation_cleanup},
+    {"UtcDaliAnimationUpdateManager", UtcDaliAnimationUpdateManager, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnyConstructors", UtcDaliAnyConstructors, utc_dali_any_startup, utc_dali_any_cleanup},
     {"UtcDaliAnyAssignmentOperators", UtcDaliAnyAssignmentOperators, utc_dali_any_startup, utc_dali_any_cleanup},
     {"UtcDaliAnyNegativeAssignmentOperators", UtcDaliAnyNegativeAssignmentOperators, utc_dali_any_startup, utc_dali_any_cleanup},

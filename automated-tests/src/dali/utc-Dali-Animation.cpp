@@ -8893,3 +8893,58 @@ int UtcDaliAnimationCreateDestroy(void)
   delete animation;
   END_TEST;
 }
+
+struct UpdateManagerTestConstraint
+{
+  UpdateManagerTestConstraint(TestApplication& application)
+  : mApplication(application)
+  {
+  }
+
+  Vector3 operator()(const Vector3& current)
+  {
+    mApplication.SendNotification();  // Process events
+    return current;
+  }
+
+  TestApplication& mApplication;
+};
+
+int UtcDaliAnimationUpdateManager(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  // Build the animation
+  Animation animation = Animation::New( 0.0f );
+
+  bool signalReceived = false;
+  AnimationFinishCheck finishCheck( signalReceived );
+  animation.FinishedSignal().Connect( &application, finishCheck );
+
+  Vector3 startValue(1.0f, 1.0f, 1.0f);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Constraint constraint = Constraint::New<Vector3>( index, UpdateManagerTestConstraint( application ) );
+  actor.ApplyConstraint( constraint );
+
+  // Apply animation to actor
+  BounceFunc func(0.0f, 0.0f, -100.0f);
+  animation.Animate<Vector3>( Property(actor, Actor::POSITION), func, AlphaFunctions::Linear );
+
+  animation.Play();
+
+  application.SendNotification();
+  application.UpdateOnly( 16 );
+
+  finishCheck.CheckSignalNotReceived();
+
+  application.SendNotification();   // Process events
+
+  finishCheck.CheckSignalReceived();
+
+  END_TEST;
+}
+
+

@@ -38,7 +38,7 @@ class NotificationManager
 public:
 
   /**
-   * Create an NotificationManager.
+   * Create an NotificationManager. Owned by Core in event thread side.
    */
   NotificationManager();
 
@@ -47,11 +47,20 @@ public:
    */
   virtual ~NotificationManager();
 
+/// Update side interface, can only be called from Update-thread
+
   /**
    * Queue a scene message. This method is thread-safe.
    * @param[in] message A newly allocated message; NotificationManager takes ownership.
    */
   void QueueMessage( MessageBase* message );
+
+  /**
+   * Signal Notification Manager that update frame is completed so it can let event thread process the notifications
+   */
+  void UpdateCompleted();
+
+/// Event side interface, can only be called from Update-thread
 
   /**
    * Query whether the NotificationManager has messages to process.
