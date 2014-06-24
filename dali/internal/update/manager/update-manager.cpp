@@ -838,12 +838,6 @@ void UpdateManager::Animate( float elapsedSeconds )
     }
   }
 
-  if ( mImpl->animationFinishedDuringUpdate )
-  {
-    // The application should be notified by NotificationManager, in another thread
-    mImpl->notificationManager.QueueMessage( AnimationFinishedMessage( mImpl->animationFinishedNotifier ) );
-  }
-
   PERF_MONITOR_END(PerformanceMonitor::ANIMATE_NODES);
 }
 
@@ -1179,6 +1173,15 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
   // Always keep rendering when measuring FPS
   keepUpdating |= KeepUpdating::MONITORING_PERFORMANCE;
 #endif
+
+  // Only queue the message at the end of the update so that animation finished notifications are
+  // not fired off before the scene has actually been updated.
+  // TODO: implement better queueing mechanism from update-to-event thread.
+  if ( mImpl->animationFinishedDuringUpdate )
+  {
+    // The application should be notified by NotificationManager, in another thread
+    mImpl->notificationManager.QueueMessage( AnimationFinishedMessage( mImpl->animationFinishedNotifier ) );
+  }
 
   // The update has finished; swap the double-buffering indices
   mSceneGraphBuffers.Swap();
