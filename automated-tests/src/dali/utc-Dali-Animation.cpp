@@ -8947,4 +8947,56 @@ int UtcDaliAnimationUpdateManager(void)
   END_TEST;
 }
 
+int UtcDaliAnimationSignalOrder(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add( actor );
+
+  // Build the animations
+  Animation animation1 = Animation::New( 0.0f ); // finishes first frame
+  Animation animation2 = Animation::New( 0.02f ); // finishes in 20 ms
+
+  bool signal1Received = false;
+  animation1.FinishedSignal().Connect( &application, AnimationFinishCheck( signal1Received ) );
+
+  bool signal2Received = false;
+  animation2.FinishedSignal().Connect( &application, AnimationFinishCheck( signal2Received ) );
+
+  // Apply animations to actor
+  animation1.AnimateTo( Property(actor, Actor::POSITION), Vector3( 3.0f, 2.0f, 1.0f ), AlphaFunctions::Linear );
+  animation1.Play();
+  animation2.AnimateTo( Property(actor, Actor::SIZE ), Vector3( 10.0f, 20.0f, 30.0f ), AlphaFunctions::Linear );
+  animation2.Play();
+
+  DALI_TEST_EQUALS( signal1Received, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( signal2Received, false, TEST_LOCATION );
+
+  application.SendNotification();
+  application.UpdateOnly( 10 ); // 10ms progress
+
+  // no notifications yet
+  DALI_TEST_EQUALS( signal1Received, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( signal2Received, false, TEST_LOCATION );
+
+  application.SendNotification();
+
+  // first completed
+  DALI_TEST_EQUALS( signal1Received, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( signal2Received, false, TEST_LOCATION );
+  signal1Received = false;
+
+  // 1st animation is complete now, do another update with no ProcessEvents in between
+  application.UpdateOnly( 20 ); // 20ms progress
+
+  // ProcessEvents
+  application.SendNotification();
+
+  // 2nd should complete now
+  DALI_TEST_EQUALS( signal1Received, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( signal2Received, true, TEST_LOCATION );
+
+  END_TEST;
+}
 

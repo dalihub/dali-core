@@ -17,6 +17,8 @@
 
 // CLASS HEADER
 #include <dali/internal/event/common/notification-manager.h>
+#include <dali/internal/common/owner-container.h>
+#include <dali/internal/common/message.h>
 
 // EXTERNAL INCLUDES
 #ifdef __clang__
@@ -35,9 +37,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/common/property-notification-impl.h>
-#include <dali/internal/common/message-container.h>
-
-using namespace std;
 
 namespace Dali
 {
@@ -46,12 +45,18 @@ namespace Internal
 {
 
 typedef boost::mutex MessageQueueMutex;
+typedef OwnerContainer< MessageBase* > MessageContainer;
 
 struct NotificationManager::Impl
 {
   Impl()
   : notificationCount(0)
   {
+    // reserve space on the vectors to avoid reallocs
+    // applications typically have upto 20-30 notifications at startup
+    updateCompletedQueue.Reserve( 32 );
+    updateWorkingQueue.Reserve( 32 );
+    eventQueue.Reserve( 32 );
   }
 
   ~Impl()
@@ -82,7 +87,7 @@ void NotificationManager::QueueMessage( MessageBase* message )
 {
   DALI_ASSERT_DEBUG( NULL != message );
 
-  // queueMutex must be locked whilst accessing queue
+  // queueMutex must be locked whilst accessing queues
   MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
 
   mImpl->updateWorkingQueue.PushBack( message );
@@ -90,15 +95,18 @@ void NotificationManager::QueueMessage( MessageBase* message )
 
 void NotificationManager::UpdateCompleted()
 {
-  // queueMutex must be locked whilst accessing queue
+  // queueMutex must be locked whilst accessing queues
   MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
-  // Swap the queue, original queue ends up empty, then release the lock
-  mImpl->updateCompletedQueue.Swap( mImpl->updateWorkingQueue );
+  // Move messages from update working queue to completed queue
+  // note that in theory its possible for update completed to have last frames
+  // events as well still hanging around. we need to keep them as well
+  mImpl->updateCompletedQueue.MoveFrom( mImpl->updateWorkingQueue );
+  // finally the lock is released
 }
 
 bool NotificationManager::MessagesToProcess()
 {
-  // queueMutex must be locked whilst accessing queue
+  // queueMutex must be locked whilst accessing queues
   MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
 
   return ( false == mImpl->updateCompletedQueue.IsEmpty() );
@@ -109,12 +117,14 @@ void NotificationManager::ProcessMessages()
   // Done before messages are processed, for notification count comparisons
   ++mImpl->notificationCount;
 
-  // queueMutex must be locked whilst accessing queue
+  // queueMutex must be locked whilst accessing queues
   {
     MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
 
-    // Swap the queue, original queue ends up empty, then release the lock
-    mImpl->updateCompletedQueue.Swap( mImpl->eventQueue );
+    // Move messages from update completed queue to event queue
+    // note that in theory its possible for event queue to have
+    // last frames events as well still hanging around so need to keep them
+    mImpl->eventQueue.MoveFrom( mImpl->updateCompletedQueue );
   }
   // end of scope, lock is released
 

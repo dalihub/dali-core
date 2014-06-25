@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/message.h>
 
 namespace Dali
 {
@@ -28,6 +27,7 @@ namespace Internal
 {
 
 class PropertyNotification;
+class MessageBase;
 
 /**
  * Provides notifications to the event-thread regarding the changes in previous update(s).

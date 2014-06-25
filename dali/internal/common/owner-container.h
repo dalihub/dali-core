@@ -129,6 +129,34 @@ public:
     Vector< T >::Resize( size );
   }
 
+  /**
+   * Move the ownership of objects from another OwnerContainer to this one
+   * without deleting them. It will keep the original items here as well.
+   * @param[in] source where to move elements from to this OwnerContainer
+   */
+  void MoveFrom( OwnerContainer& source )
+  {
+    // Optimisation for the case that this is empty
+    if( IsEmpty() )
+    {
+      Swap( source );
+    }
+    else
+    {
+      // make space for new items
+      Reserve( VectorBase::Count() + source.Count() );
+      Iterator iter = source.Begin();
+      ConstIterator end = source.End();
+      for( ; iter != end; ++iter )
+      {
+        T pointer = *iter;
+        PushBack( pointer );
+      }
+      // cannot call Clear on OwnerContainer as that deletes the elements
+      source.Vector< T >::Clear();
+    }
+  }
+
 private:
 
   // Undefined copy constructor.
