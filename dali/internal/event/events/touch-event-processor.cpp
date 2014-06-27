@@ -460,6 +460,10 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
           touchEvent.points[0].hitActor = touchDownConsumedActorHandle;
           touchEvent.points[0].state = TouchPoint::Interrupted;
           EmitTouchSignals( touchDownConsumedActorHandle, touchEvent );
+
+          // Restore touch-event to original state
+          touchEvent.points[0].hitActor = primaryHitActor;
+          touchEvent.points[0].state = primaryPointState;
         }
 
         mTouchDownConsumedActor.SetActor( NULL );

@@ -202,7 +202,10 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  * - Interrupted State
  *   - If a system event occurs which interrupts the touch processing, then the last primary hit
  *     actor's touch signals are emitted with an "Interrupted" state.
- *   - If the last primary hit actor, or one of its parents, is no longer touchable, then its touch signals are also emitted with an "Interrupted" state.
+ *   - If the last primary hit actor, or one of its parents, is no longer touchable, then its
+ *     touch signals are also emitted with an "Interrupted" state.
+ *   - If the consumed actor on touch-down is not the same as the consumed actor on touch-up, then
+ *     touch signals are also emitted from the touch-down actor with an "Interrupted" state.
  * <h3>Key Events:</h3>
  *
  * Key events are received by an actor once set to grab key events, only one actor can be set as focused.
