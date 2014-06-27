@@ -156,6 +156,7 @@ private:
   Stage& mStage; ///< Used to deliver touch events
   ActorObserver mLastPrimaryHitActor; ///< Stores the last primary point hit actor
   ActorObserver mLastConsumedActor; ///< Stores the last consumed actor
+  ActorObserver mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
   Dali::RenderTask mLastRenderTask; ///< The RenderTask used for the last hit actor
 };
 
