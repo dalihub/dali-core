@@ -228,7 +228,7 @@ void Program::SetUniform1i( GLint location, GLint value0 )
   // check if uniform location fits the cache
   if( location >= MAX_UNIFORM_CACHE_SIZE )
   {
-    // not cached, make the gl call through context
+    // not cached, make the gl call
     LOG_GL( "Uniform1i(%d,%d)\n", location, value0 );
     CHECK_GL( mContext, mGlAbstraction.Uniform1i( location, value0 ) );
   }
@@ -237,7 +237,7 @@ void Program::SetUniform1i( GLint location, GLint value0 )
     // check if the value is different from what's already been set
     if( value0 != mUniformCacheInt[ location ] )
     {
-      // make the gl call through context
+      // make the gl call
       LOG_GL( "Uniform1i(%d,%d)\n", location, value0 );
       CHECK_GL( mContext, mGlAbstraction.Uniform1i( location, value0 ) );
       // update cache
@@ -278,7 +278,7 @@ void Program::SetUniform1f( GLint location, GLfloat value0 )
   // check if uniform location fits the cache
   if( location >= MAX_UNIFORM_CACHE_SIZE )
   {
-    // not cached, make the gl call through context
+    // not cached, make the gl call
     LOG_GL( "Uniform1f(%d,%f)\n", location, value0 );
     CHECK_GL( mContext, mGlAbstraction.Uniform1f( location, value0 ) );
   }
@@ -287,7 +287,7 @@ void Program::SetUniform1f( GLint location, GLfloat value0 )
     // check if the same value has already been set, reset if it is different
     if( ( fabsf(value0 - mUniformCacheFloat[ location ]) >= Math::MACHINE_EPSILON_1 ) )
     {
-      // make the gl call through context
+      // make the gl call
       LOG_GL( "Uniform1f(%d,%f)\n", location, value0 );
       CHECK_GL( mContext, mGlAbstraction.Uniform1f( location, value0 ) );
 
@@ -346,7 +346,7 @@ void Program::SetUniform4f( GLint location, GLfloat value0, GLfloat value1, GLfl
   // check if uniform location fits the cache
   if( location >= MAX_UNIFORM_CACHE_SIZE )
   {
-    // not cached, make the gl call through context
+    // not cached, make the gl call
     LOG_GL( "Uniform4f(%d,%f,%f,%f,%f)\n", location, value0, value1, value2, value3 );
     CHECK_GL( mContext, mGlAbstraction.Uniform4f( location, value0, value1, value2, value3 ) );
   }
@@ -359,7 +359,7 @@ void Program::SetUniform4f( GLint location, GLfloat value0, GLfloat value1, GLfl
         ( fabsf(value1 - mUniformCacheFloat4[ location ][ 1 ]) >= Math::MACHINE_EPSILON_1 )||
         ( fabsf(value2 - mUniformCacheFloat4[ location ][ 2 ]) >= Math::MACHINE_EPSILON_1 ) )
     {
-      // make the gl call through context
+      // make the gl call
       LOG_GL( "Uniform4f(%d,%f,%f,%f,%f)\n", location, value0, value1, value2, value3 );
       CHECK_GL( mContext, mGlAbstraction.Uniform4f( location, value0, value1, value2, value3 ) );
       // update cache
@@ -383,10 +383,9 @@ void Program::SetUniformMatrix4fv( GLint location, GLsizei count, const GLfloat*
     return;
   }
 
-
   // Not caching these calls. Based on current analysis this is called very often
   // but with different values (we're using this for MVP matrices)
-  // NOTE! we never want GPU to transpose
+  // NOTE! we never want driver or GPU to transpose
   LOG_GL( "UniformMatrix4fv(%d,%d,GL_FALSE,%x)\n", location, count, value );
   CHECK_GL( mContext, mGlAbstraction.UniformMatrix4fv( location, count, GL_FALSE, value ) );
 }
@@ -406,7 +405,7 @@ void Program::SetUniformMatrix3fv( GLint location, GLsizei count, const GLfloat*
 
   // Not caching these calls. Based on current analysis this is called very often
   // but with different values (we're using this for MVP matrices)
-  // NOTE! we never want GPU to transpose
+  // NOTE! we never want driver or GPU to transpose
   LOG_GL( "UniformMatrix3fv(%d,%d,GL_FALSE,%x)\n", location, count, value );
   CHECK_GL( mContext, mGlAbstraction.UniformMatrix3fv( location, count, GL_FALSE, value ) );
 }
@@ -439,6 +438,8 @@ bool Program::AreVerticesFixed()
 Program::Program(Integration::ShaderData* shaderData, Context& context, bool areVerticesFixed )
 : mContext( context ),
   mGlAbstraction( context.GetAbstraction() ),
+  mProjectionMatrix( NULL ),
+  mViewMatrix( NULL ),
   mLinked( false ),
   mVertexShaderId( 0 ),
   mFragmentShaderId( 0 ),
@@ -459,7 +460,7 @@ Program::Program(Integration::ShaderData* shaderData, Context& context, bool are
 
 Program::~Program()
 {
-  Unload(); // Resets gCurrentProgram
+  Unload();
 }
 
 void Program::Load()

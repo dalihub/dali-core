@@ -32,6 +32,35 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+/**
+ * Helper to set view and projection matrices once per program
+ */
+inline void SetMatrices( Program& program, const Matrix& projectionMatrix, const Matrix& viewMatrix )
+{
+  // set projection matrix if program has not yet received it this frame or if it is dirty
+  GLint loc = program.GetUniformLocation( Program::UNIFORM_PROJECTION_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    if( program.GetProjectionMatrix() != &projectionMatrix )
+    {
+      program.SetProjectionMatrix( &projectionMatrix );
+      program.SetUniformMatrix4fv( loc, 1, projectionMatrix.AsFloat() );
+    }
+  }
+  loc = program.GetUniformLocation( Program::UNIFORM_VIEW_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    if( program.GetViewMatrix() == &viewMatrix )
+    {
+      program.SetViewMatrix( &viewMatrix );
+      program.SetUniformMatrix4fv( loc, 1, viewMatrix.AsFloat() );
+    }
+  }
+}
+}
+
 namespace SceneGraph
 {
 
@@ -76,7 +105,7 @@ void Renderer::Render( BufferIndex bufferIndex,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
                        float frametime,
-                       bool cull)
+                       bool cull )
 {
   DALI_ASSERT_DEBUG( mContext && "Renderer::Render. Renderer not initialised!! (mContext == NULL)." );
   DALI_ASSERT_DEBUG( mShader && "Renderer::Render. Shader not set!!" );
@@ -132,8 +161,14 @@ void Renderer::Render( BufferIndex bufferIndex,
   ShaderSubTypes subType=SHADER_DEFAULT;
   GetGeometryTypes( bufferIndex, geometryType, subType );
   Program& program = mShader->GetProgram( *mContext, geometryType, subType );
+  program.Use(); // apply the program so we can send uniforms to it
+
   bool areVerticesFixed = program.AreVerticesFixed();
 
+  // set projection and view matrix if program has not yet received them yet this frame
+  SetMatrices( program, projectionMatrix, viewMatrix );
+
+  // subclass rendering
   DoRender( bufferIndex, modelViewMatrix, modelMatrix, viewMatrix, projectionMatrix, color, cull && areVerticesFixed );
 }
 

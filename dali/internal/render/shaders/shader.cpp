@@ -323,7 +323,6 @@ Program& Shader::Apply( Context& context,
   DALI_ASSERT_DEBUG(NULL != mPrograms[ programType ][ subType ]);
 
   Program& program = *(mPrograms[ programType ][ subType ]);
-  program.Use();
 
   // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
 
@@ -360,13 +359,6 @@ Program& Shader::Apply( Context& context,
     program.SetUniformMatrix4fv( loc, 1, modelview.AsFloat() );
   }
 
-  loc = program.GetUniformLocation(Program::UNIFORM_PROJECTION_MATRIX);
-  if( Program::UNIFORM_UNKNOWN != loc )
-  {
-    DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uProjection", projection );
-    program.SetUniformMatrix4fv( loc, 1, projection.AsFloat() );
-  }
-
   loc = program.GetUniformLocation( Program::UNIFORM_MVP_MATRIX );
   if( Program::UNIFORM_UNKNOWN != loc )
   {
@@ -396,13 +388,6 @@ Program& Shader::Apply( Context& context,
   {
     DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uModelMatrix", model );
     program.SetUniformMatrix4fv( loc, 1, model.AsFloat() );
-  }
-
-  loc = program.GetUniformLocation(Program::UNIFORM_VIEW_MATRIX);
-  if( Program::UNIFORM_UNKNOWN != loc )
-  {
-    DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uViewMatrix", view );
-    program.SetUniformMatrix4fv( loc, 1, view.AsFloat() );
   }
 
   // We should have one UniformMeta per uniform property

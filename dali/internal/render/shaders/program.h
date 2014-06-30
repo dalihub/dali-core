@@ -130,7 +130,6 @@ public:
 
   /**
    * Creates a new program, or returns a copy of an existing program in the program cache
-   * maintained by Context
    * @param [in] resourceId ResourceManager resourceId for the shader source and binary.
    *                        Used as a lookup key in the program cache
    * @param[in] shaderData  A pointer to a data structure containing the program source
@@ -257,6 +256,42 @@ public:
    */
   bool AreVerticesFixed();
 
+  /**
+   * Set the projection matrix that has currently been sent
+   * @param matrix to set
+   */
+  void SetProjectionMatrix( const Matrix* matrix )
+  {
+    mProjectionMatrix = matrix;
+  }
+
+  /**
+   * Get the projection matrix that has currently been sent
+   * @return the matrix that is set
+   */
+  const Matrix* GetProjectionMatrix()
+  {
+    return mProjectionMatrix;
+  }
+
+  /**
+   * Set the projection matrix that has currently been sent
+   * @param matrix to set
+   */
+  void SetViewMatrix( const Matrix* matrix )
+  {
+    mViewMatrix = matrix;
+  }
+
+  /**
+   * Get the projection matrix that has currently been sent
+   * @return the matrix that is set
+   */
+  const Matrix* GetViewMatrix()
+  {
+    return mViewMatrix;
+  }
+
 private: // Implementation
 
   /**
@@ -319,6 +354,8 @@ private:  // Data
 
   Context& mContext;                          ///< The GL context state cache
   Integration::GlAbstraction& mGlAbstraction; ///< The OpenGL Abstraction layer
+  const Matrix* mProjectionMatrix;            ///< currently set projection matrix
+  const Matrix* mViewMatrix;                  ///< currently set view matrix
   bool mLinked;                               ///< whether the program is linked
   GLuint mVertexShaderId;                     ///< GL identifier for vertex shader
   GLuint mFragmentShaderId;                   ///< GL identifier for fragment shader

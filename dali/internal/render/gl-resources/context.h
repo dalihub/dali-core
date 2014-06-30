@@ -83,7 +83,7 @@ public:
   void GlContextCreated();
 
   /**
-   * Called when the GL context is about to be destroyed.
+   * Called when the GL context has been destroyed.
    */
   void GlContextDestroyed();
 
@@ -1645,6 +1645,11 @@ public:
   {
     mCurrentProgram = program;
   }
+
+  /**
+   * Reset the program matrices
+   */
+  void ResetProgramMatrices();
 
   /**
    * Get a cached program

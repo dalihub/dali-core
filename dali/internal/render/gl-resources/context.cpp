@@ -155,6 +155,16 @@ const char* Context::ErrorToString( GLenum errorCode )
   return "Unknown Open GLES error";
 }
 
+void Context::ResetProgramMatrices()
+{
+  const ProgramContainer::iterator endp = mProgramCache.end();
+  for ( ProgramContainer::iterator itp = mProgramCache.begin(); itp != endp; ++itp )
+  {
+    (*itp).second->SetProjectionMatrix( NULL );
+    (*itp).second->SetViewMatrix( NULL );
+  }
+}
+
 Program* Context::GetCachedProgram( std::size_t hash ) const
 {
   std::map< std::size_t, Program* >::const_iterator iter = mProgramCache.find(hash);

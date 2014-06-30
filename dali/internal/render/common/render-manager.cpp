@@ -383,6 +383,11 @@ bool RenderManager::Render( Integration::RenderStatus& status )
     mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
     mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
+    // reset the program matrices for all programs once per frame
+    // this ensures we will set view and projection matrix once per program per camera
+    // @todo move programs out of context onto a program controller and let that handle this
+    mImpl->context.ResetProgramMatrices();
+
     size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
     for ( size_t i = 0; i < count; ++i )
     {
