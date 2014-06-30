@@ -397,11 +397,15 @@ void PanGestureProcessor::EmitPanSignal( Actor* actor,
 
     pan.screenDisplacement = panEvent.currentPosition - previousPos;
 
-    pan.velocity.x = pan.displacement.x / panEvent.timeDelta;
-    pan.velocity.y = pan.displacement.y / panEvent.timeDelta;
+    // Avoid dividing by 0
+    if ( panEvent.timeDelta > 0 )
+    {
+      pan.velocity.x = pan.displacement.x / panEvent.timeDelta;
+      pan.velocity.y = pan.displacement.y / panEvent.timeDelta;
 
-    pan.screenVelocity.x = pan.screenDisplacement.x / panEvent.timeDelta;
-    pan.screenVelocity.y = pan.screenDisplacement.y / panEvent.timeDelta;
+      pan.screenVelocity.x = pan.screenDisplacement.x / panEvent.timeDelta;
+      pan.screenVelocity.y = pan.screenDisplacement.y / panEvent.timeDelta;
+    }
 
     // When the gesture ends, we may incorrectly get a ZERO velocity (as we have lifted our finger without any movement)
     // so we should use the last recorded velocity instead in this scenario.

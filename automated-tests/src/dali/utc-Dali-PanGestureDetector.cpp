@@ -18,6 +18,7 @@
 #include <iostream>
 
 #include <stdlib.h>
+#include <cmath>
 #include <dali/dali.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
@@ -2180,6 +2181,42 @@ int UtcDaliPanGestureLayerConsumesTouch(void)
   application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureNoTimeDiff(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit signals, should receive
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 0));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 0));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 0));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.velocity.x ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.velocity.y ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.screenVelocity.x ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.screenVelocity.y ) );
+  data.Reset();
+
   data.Reset();
 
   END_TEST;

@@ -430,6 +430,7 @@ extern int UtcDaliAnimationAnimateBetweenActorColorFunctionTimePeriod(void);
 extern int UtcDaliAnimationAnimateVector3Func(void);
 extern int UtcDaliAnimationCreateDestroy(void);
 extern int UtcDaliAnimationUpdateManager(void);
+extern int UtcDaliAnimationSignalOrder(void);
 extern int UtcDaliAnyConstructors(void);
 extern int UtcDaliAnyAssignmentOperators(void);
 extern int UtcDaliAnyNegativeAssignmentOperators(void);
@@ -887,6 +888,7 @@ extern int UtcDaliPanGestureSetProperties(void);
 extern int UtcDaliPanGestureSetPropertiesAlreadyPanning(void);
 extern int UtcDaliPanGesturePropertyIndices(void);
 extern int UtcDaliPanGestureLayerConsumesTouch(void);
+extern int UtcDaliPanGestureNoTimeDiff(void);
 extern int UtcDaliPinchGestureConstructor(void);
 extern int UtcDaliPinchGestureAssignment(void);
 extern int UtcDaliPinchGestureDetectorConstructor(void);
@@ -939,6 +941,7 @@ extern int UtcDaliPropertyConditionGetArguments(void);
 extern int UtcDaliPropertyConditionGetArgumentsConst(void);
 extern int UtcDaliPropertyNotificationStep(void);
 extern int UtcDaliPropertyNotificationVariableStep(void);
+extern int UtcDaliPropertyNotificationOrder(void);
 extern int UtcDaliQuaternionCtor01(void);
 extern int UtcDaliQuaternionCtor02(void);
 extern int UtcDaliQuaternionCtor03(void);
@@ -1660,6 +1663,7 @@ testcase tc_array[] = {
     {"UtcDaliAnimationAnimateVector3Func", UtcDaliAnimationAnimateVector3Func, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationCreateDestroy", UtcDaliAnimationCreateDestroy, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnimationUpdateManager", UtcDaliAnimationUpdateManager, utc_dali_animation_startup, utc_dali_animation_cleanup},
+    {"UtcDaliAnimationSignalOrder", UtcDaliAnimationSignalOrder, utc_dali_animation_startup, utc_dali_animation_cleanup},
     {"UtcDaliAnyConstructors", UtcDaliAnyConstructors, utc_dali_any_startup, utc_dali_any_cleanup},
     {"UtcDaliAnyAssignmentOperators", UtcDaliAnyAssignmentOperators, utc_dali_any_startup, utc_dali_any_cleanup},
     {"UtcDaliAnyNegativeAssignmentOperators", UtcDaliAnyNegativeAssignmentOperators, utc_dali_any_startup, utc_dali_any_cleanup},
@@ -2117,6 +2121,7 @@ testcase tc_array[] = {
     {"UtcDaliPanGestureSetPropertiesAlreadyPanning", UtcDaliPanGestureSetPropertiesAlreadyPanning, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
     {"UtcDaliPanGesturePropertyIndices", UtcDaliPanGesturePropertyIndices, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
     {"UtcDaliPanGestureLayerConsumesTouch", UtcDaliPanGestureLayerConsumesTouch, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
+    {"UtcDaliPanGestureNoTimeDiff", UtcDaliPanGestureNoTimeDiff, utc_dali_pan_gesture_detector_startup, utc_dali_pan_gesture_detector_cleanup},
     {"UtcDaliPinchGestureConstructor", UtcDaliPinchGestureConstructor, utc_dali_pinch_gesture_startup, utc_dali_pinch_gesture_cleanup},
     {"UtcDaliPinchGestureAssignment", UtcDaliPinchGestureAssignment, utc_dali_pinch_gesture_startup, utc_dali_pinch_gesture_cleanup},
     {"UtcDaliPinchGestureDetectorConstructor", UtcDaliPinchGestureDetectorConstructor, utc_dali_pinch_gesture_detector_startup, utc_dali_pinch_gesture_detector_cleanup},
@@ -2169,6 +2174,7 @@ testcase tc_array[] = {
     {"UtcDaliPropertyConditionGetArgumentsConst", UtcDaliPropertyConditionGetArgumentsConst, utc_dali_property_notification_startup, utc_dali_property_notification_cleanup},
     {"UtcDaliPropertyNotificationStep", UtcDaliPropertyNotificationStep, utc_dali_property_notification_startup, utc_dali_property_notification_cleanup},
     {"UtcDaliPropertyNotificationVariableStep", UtcDaliPropertyNotificationVariableStep, utc_dali_property_notification_startup, utc_dali_property_notification_cleanup},
+    {"UtcDaliPropertyNotificationOrder", UtcDaliPropertyNotificationOrder, utc_dali_property_notification_startup, utc_dali_property_notification_cleanup},
     {"UtcDaliQuaternionCtor01", UtcDaliQuaternionCtor01, utc_dali_quaternion_startup, utc_dali_quaternion_cleanup},
     {"UtcDaliQuaternionCtor02", UtcDaliQuaternionCtor02, utc_dali_quaternion_startup, utc_dali_quaternion_cleanup},
     {"UtcDaliQuaternionCtor03", UtcDaliQuaternionCtor03, utc_dali_quaternion_startup, utc_dali_quaternion_cleanup},
