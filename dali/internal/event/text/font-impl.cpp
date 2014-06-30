@@ -133,7 +133,7 @@ PixelSize Font::GetLineHeightFromCapsHeight(const std::string& fontFamily, const
   return platform.GetFontLineHeightFromCapsHeight(name, style, capsHeight);
 }
 
-std::vector<std::string> Font::GetInstalledFonts(  Dali::Font::FontListMode mode)
+void Font::GetInstalledFonts( Dali::Font::FontListMode mode, std::vector<std::string>& fontList )
 {
   Integration::PlatformAbstraction& platform = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
 
@@ -162,7 +162,7 @@ std::vector<std::string> Font::GetInstalledFonts(  Dali::Font::FontListMode mode
     }
   }
 
-  return platform.GetFontList( listMode );
+  platform.GetFontList( listMode, fontList );
 }
 
 bool Font::AllGlyphsSupported(const std::string& text) const

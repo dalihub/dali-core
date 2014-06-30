@@ -130,7 +130,11 @@ PixelSize Font::GetLineHeightFromCapsHeight(const std::string& fontFamily, const
 
 std::vector<std::string> Font::GetInstalledFonts( FontListMode mode )
 {
-  return Internal::Font::GetInstalledFonts( mode );
+  std::vector<std::string> fontList;
+  Internal::Font::GetInstalledFonts( mode, fontList );
+
+  // VCC TODO: deprecate this method and add void Font::GetInstalledFonts( FontListMode mode, std::vector<std::string>& fontList )
+  return fontList;
 }
 
 float Font::MeasureTextWidth(const std::string& text, float textHeightPx) const

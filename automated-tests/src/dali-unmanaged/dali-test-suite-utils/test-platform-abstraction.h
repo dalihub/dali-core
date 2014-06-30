@@ -136,14 +136,17 @@ public:
   /**
    * @copydoc PlatformAbstraction::GetDefaultFontFamily()
    */
-  virtual std::string GetDefaultFontFamily() const;
+  virtual const std::string& GetDefaultFontFamily() const;
 
   /**
    * @copydoc PlatformAbstraction::GetDefaultFontSize()
    */
-  virtual const float GetDefaultFontSize() const;
+  virtual float GetDefaultFontSize() const;
 
-  virtual const PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight) const;
+  /**
+   * @copydoc PlatformAbstraction::GetFontLineHeightFromCapsHeight()
+   */
+  virtual PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, CapsHeight capsHeight) const;
 
   /**
    * @copydoc PlatformAbstraction::GetGlyphData()
@@ -179,7 +182,7 @@ public:
   /**
    * @copydoc PlatformAbstraction::GetFontFamilyForChars()
    */
-  virtual std::string GetFontFamilyForChars(const TextArray& charsRequested) const;
+  virtual const std::string& GetFontFamilyForChars(const TextArray& charsRequested) const;
 
   /**
    * @copydoc PlatformAbstraction::AllGlyphsSupported()
@@ -194,7 +197,7 @@ public:
   /**
    * @copydoc PlatformAbstraction::GetFontList()
    */
-  virtual std::vector<std::string> GetFontList( PlatformAbstraction::FontListMode mode ) const;
+  virtual void GetFontList( PlatformAbstraction::FontListMode mode, std::vector<std::string>& fontList ) const;
 
   /**
    * @copydoc PlatformAbstraction::LoadFile()

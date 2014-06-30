@@ -160,7 +160,7 @@ bool TestPlatformAbstraction::IsLoading()
 /**
  * @copydoc PlatformAbstraction::GetDefaultFontFamily()
  */
-std::string TestPlatformAbstraction::GetDefaultFontFamily() const
+const std::string& TestPlatformAbstraction::GetDefaultFontFamily() const
 {
   mTrace.PushCall("GetDefaultFontFamily", "");
   return mGetDefaultFontFamilyResult;
@@ -169,13 +169,13 @@ std::string TestPlatformAbstraction::GetDefaultFontFamily() const
 /**
  * @copydoc PlatformAbstraction::GetDefaultFontSize()
  */
-const float TestPlatformAbstraction::GetDefaultFontSize() const
+float TestPlatformAbstraction::GetDefaultFontSize() const
 {
   mTrace.PushCall("GetDefaultFontSize", "");
   return mGetDefaultFontSizeResult;
 }
 
-const PixelSize TestPlatformAbstraction::GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight) const
+PixelSize TestPlatformAbstraction::GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, CapsHeight capsHeight) const
 {
   mTrace.PushCall("GetFontLineHeightFromCapsHeight", "");
   // LineHeight will be bigger than CapsHeight, so return capsHeight + 1
@@ -310,7 +310,7 @@ void TestPlatformAbstraction::SetDpi (unsigned int dpiHorizontal, unsigned int d
 /**
  * @copydoc PlatformAbstraction::GetFontFamilyForChars()
  */
-std::string TestPlatformAbstraction::GetFontFamilyForChars(const TextArray& charsRequested) const
+const std::string& TestPlatformAbstraction::GetFontFamilyForChars(const TextArray& charsRequested) const
 {
   mTrace.PushCall("GetFontFamilyForChars", "");
   return mGetDefaultFontFamilyResult;
@@ -337,12 +337,10 @@ bool TestPlatformAbstraction::ValidateFontFamilyName(const std::string& fontFami
 /**
  * @copydoc PlatformAbstraction::GetFontList()
  */
-std::vector<std::string> TestPlatformAbstraction::GetFontList( PlatformAbstraction::FontListMode mode ) const
+void TestPlatformAbstraction::GetFontList( PlatformAbstraction::FontListMode mode, std::vector<std::string>& fonstList ) const
 {
   mFontListMode = mode;
   mTrace.PushCall("ValidateGetFontList", "");
-  std::vector<std::string> fontList;
-  return fontList;
 }
 
 /**

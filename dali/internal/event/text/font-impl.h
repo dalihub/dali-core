@@ -108,7 +108,7 @@ public:
   /**
    * @copydoc Dali::Font::GetInstalledFonts()
    */
-  static std::vector<std::string> GetInstalledFonts( Dali::Font::FontListMode mode );
+  static void GetInstalledFonts( Dali::Font::FontListMode mode, std::vector<std::string>& fontList );
 
   /**
    * @copydoc Dali::Font::AllGlyphsSupported()

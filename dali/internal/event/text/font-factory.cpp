@@ -102,10 +102,10 @@ void FontFactory::RemoveFontMetrics(const std::string& fontFamily,
 
 
 void FontFactory::GetFontInformation( FontId fontId,
-                                  std::string& family,
-                                  std::string& style,
-                                  float& maxGlyphWidth,
-                                  float& maxGlyphHeight) const
+                                      std::string& family,
+                                      std::string& style,
+                                      float& maxGlyphWidth,
+                                      float& maxGlyphHeight) const
 {
   // typically we only have around 4 fonts in the cache,
   // and GetFontInformation is only called a couple of times on startup

@@ -99,10 +99,10 @@ public: // FontLookupInterface
    * @copydoc FontLookupInterface::GetFontInformation()
    */
   virtual void GetFontInformation( FontId fontId,
-                                    std::string& family,
-                                    std::string& style,
-                                    float& maxGlyphWidth,
-                                    float& maxGlyphHeight) const;
+                                   std::string& family,
+                                   std::string& style,
+                                   float& maxGlyphWidth,
+                                   float& maxGlyphHeight ) const;
 
 private:
 

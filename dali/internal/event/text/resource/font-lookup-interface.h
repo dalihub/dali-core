@@ -41,14 +41,14 @@ public:
    * @param[in] fontId font id
    * @param[out] family font family
    * @param[out] style font style
-   * @param[out] maximum glyph width
-   * @param[out] maximum glyph height
+   * @param[out] maxGlyphWidth maximum glyph width
+   * @param[out] maxGlyphHeight maximum glyph height
    */
   virtual void GetFontInformation( FontId fontId,
-                                    std::string& family,
-                                    std::string& style,
-                                    float& maxGlyphWidth,
-                                    float& maxGlyphHeight) const = 0;
+                                   std::string& family,
+                                   std::string& style,
+                                   float& maxGlyphWidth,
+                                   float& maxGlyphHeight ) const = 0;
 
 
 protected:
