@@ -72,6 +72,14 @@ void TestGlAbstraction::Initialize()
   mProgramUniforms4f.clear();
 }
 
+void TestGlAbstraction::PreRender()
+{
+}
+
+void TestGlAbstraction::PostRender(unsigned int timeDelta)
+{
+}
+
 } // Namespace dali
 
 bool BlendEnabled(const Dali::TraceCallStack& callStack)

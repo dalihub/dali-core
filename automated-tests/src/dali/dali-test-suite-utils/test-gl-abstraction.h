@@ -51,6 +51,9 @@ public:
   ~TestGlAbstraction();
   void Initialize();
 
+  void PreRender();
+  void PostRender(unsigned int timeDelta);
+
   /* OpenGL ES 2.0 */
 
   inline void ActiveTexture( GLenum textureUnit )

@@ -870,7 +870,7 @@ namespace Integration
  * A concrete implementation must be created for each platform, and provided when creating the
  * Dali::Integration::Core object.
  */
-class DALI_IMPORT_API GlAbstraction
+class GlAbstraction
 {
 protected:
 
@@ -880,6 +880,18 @@ protected:
   virtual ~GlAbstraction() {}
 
 public:
+  /**
+   * Invoked by Render thread before Core::Render.
+   */
+  virtual void PreRender() = 0;
+
+  /**
+   * Invoked by Render thread after Core::Render
+   * Inform the gl implementation that the rendering in this frame has finished,
+   * and how much time was spent.
+   * @param[in] timeDelta Time in microseconds since last PostRender call
+   */
+  virtual void PostRender( unsigned int timeDelta ) = 0;
 
   /**
    * The number of texture units an implementation supports is implementation dependent, but must be at least 8.
