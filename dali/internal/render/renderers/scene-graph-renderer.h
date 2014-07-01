@@ -36,6 +36,7 @@ namespace Internal
 {
 class Context;
 class Texture;
+class Program;
 
 namespace SceneGraph
 {
@@ -103,14 +104,6 @@ public:
   virtual bool RequiresDepthTest() const = 0;
 
   /**
-   * Query the derived type for it's geometry type and subtype
-   * @param[in] bufferIndex The index of the previous update buffer.
-   * @param[out] outType    The geometry type
-   * @param[out] outSubType The geometry subtype
-   */
-  virtual void GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType ) = 0;
-
-  /**
    * Called to render during RenderManager::Render().
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] modelViewMatrix The model-view matrix.
@@ -124,7 +117,7 @@ public:
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
                float frametime,
-               bool cull);
+               bool cull );
 
 protected:
 
@@ -150,16 +143,29 @@ private:
   virtual bool CheckResources() = 0;
 
   /**
+   * Resolve the derived renderers geometry type and subtype
+   * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[out] outType    The geometry type
+   * @param[out] outSubType The geometry subtype
+   */
+  virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType ) = 0;
+
+  /**
+   * Checks if renderer's is culled.
+   * @param[in] modelMatrix The model matrix.
+   * @param[in] modelViewProjectionMatrix The MVP matrix.
+   * @return \e true if it is. Otherwise \e false.
+   */
+  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix ) = 0;
+
+  /**
    * Called from Render; implemented in derived classes.
    * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[in] program to use.
    * @param[in] modelViewMatrix The model-view matrix.
-   * @param[in] modelMatrix The model matrix.
    * @param[in] viewMatrix The view matrix.
-   * @param[in] projectionMatrix The projection matrix.
-   * @param[in] color to use
-   * @param[in] cullTest Whether to try and cull the renderer.
    */
-  virtual void DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest ) = 0;
+  virtual void DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix ) = 0;
 
 protected:
 

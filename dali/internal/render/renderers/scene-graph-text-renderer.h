@@ -127,14 +127,19 @@ public:
   virtual bool CheckResources();
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::GetGeometryTypes()
+   * @copydoc Dali::Internal::SceneGraph::Renderer::ResolveGeometryTypes()
    */
-  virtual void GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType );
+  virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType );
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::IsOutsideClipSpace()
+   */
+  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix );
 
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoRender()
    */
-  virtual void DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest );
+  virtual void DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
 
 protected: // TextureObserver implementation
   /**

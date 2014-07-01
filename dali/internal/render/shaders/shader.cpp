@@ -111,11 +111,9 @@ Shader::Shader( Dali::ShaderEffect::GeometryHints& hints )
   mTexture( NULL ),
   mRenderTextureId( 0 ),
   mUpdateTextureId( 0 ),
-  mModelViewProjection( false ), // Don't initialize.
   mRenderQueue(NULL),
   mPostProcessDispatcher(NULL),
-  mTextureCache(NULL),
-  mFrametime(0.f)
+  mTextureCache(NULL)
 {
   // Create enough size for all default types and sub-types
   mPrograms.resize(Log<GEOMETRY_TYPE_LAST>::value);
@@ -280,33 +278,30 @@ bool Shader::AreSubtypesRequired(GeometryType geometryType)
 
 Program& Shader::GetProgram( Context& context,
                              GeometryType type,
-                             const ShaderSubTypes subType )
+                             ShaderSubTypes subType,
+                             unsigned int& programIndex )
 {
   DALI_ASSERT_DEBUG(type < GEOMETRY_TYPE_LAST);
   DALI_DEBUG_OSTREAM(debugStream);
 
-  unsigned int programType = GetGeometryTypeIndex( type );
+  programIndex = GetGeometryTypeIndex( type );
 
-  DALI_ASSERT_DEBUG(!mPrograms[ programType ].mUseDefaultForAllSubtypes || subType == SHADER_DEFAULT);
-  DALI_ASSERT_DEBUG((unsigned int)subType < mPrograms[ programType ].Count());
-  DALI_ASSERT_DEBUG(NULL != mPrograms[ programType ][ subType ]);
+  DALI_ASSERT_DEBUG(!mPrograms[ programIndex ].mUseDefaultForAllSubtypes || subType == SHADER_DEFAULT);
+  DALI_ASSERT_DEBUG((unsigned int)subType < mPrograms[ programIndex ].Count());
+  DALI_ASSERT_DEBUG(NULL != mPrograms[ programIndex ][ subType ]);
 
-  Program& program = *(mPrograms[ programType ][ subType ]);
+  Program& program = *(mPrograms[ programIndex ][ subType ]);
   return program;
 }
 
 
-Program& Shader::Apply( Context& context,
-                        BufferIndex bufferIndex,
-                        GeometryType type,
-                        const Matrix& model,
-                        const Matrix& view,
-                        const Matrix& modelview,
-                        const Matrix& projection,
-                        const Vector4& color,
-                        const ShaderSubTypes subType /*= SHADER_DEFAULT*/ )
+void Shader::SetUniforms( Context& context,
+                          Program& program,
+                          BufferIndex bufferIndex,
+                          unsigned int programIndex,
+                          ShaderSubTypes subType )
 {
-  DALI_ASSERT_DEBUG(type < GEOMETRY_TYPE_LAST);
+  DALI_ASSERT_DEBUG( programIndex < Log<GEOMETRY_TYPE_LAST>::value );
   DALI_DEBUG_OSTREAM(debugStream);
 
   if( mRenderTextureId && ( mTexture == NULL ) )
@@ -314,25 +309,6 @@ Program& Shader::Apply( Context& context,
     mTexture = mTextureCache->GetTexture( mRenderTextureId );
 
     DALI_ASSERT_DEBUG( mTexture != NULL );
-  }
-
-  unsigned int programType = GetGeometryTypeIndex( type );
-
-  DALI_ASSERT_DEBUG(!mPrograms[ programType ].mUseDefaultForAllSubtypes || subType == SHADER_DEFAULT);
-  DALI_ASSERT_DEBUG((unsigned int)subType < mPrograms[ programType ].Count());
-  DALI_ASSERT_DEBUG(NULL != mPrograms[ programType ][ subType ]);
-
-  Program& program = *(mPrograms[ programType ][ subType ]);
-
-  // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
-
-  // get color uniform
-  const GLint colorLoc = program.GetUniformLocation( Program::UNIFORM_COLOR );
-  if( Program::UNIFORM_UNKNOWN != colorLoc )
-  {
-    DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uColor", color );
-    // set the uniform
-    program.SetUniform4f( colorLoc, color.r, color.g, color.b, color.a );
   }
 
   GLint loc = Program::UNIFORM_UNKNOWN;
@@ -351,45 +327,6 @@ Program& Shader::Apply( Context& context,
     }
   }
 
-  // Pass ModelView, projection, MVP, and normal matrices to the shader
-  loc = program.GetUniformLocation(Program::UNIFORM_MODELVIEW_MATRIX);
-  if( Program::UNIFORM_UNKNOWN != loc )
-  {
-    DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uModelView", modelview );
-    program.SetUniformMatrix4fv( loc, 1, modelview.AsFloat() );
-  }
-
-  loc = program.GetUniformLocation( Program::UNIFORM_MVP_MATRIX );
-  if( Program::UNIFORM_UNKNOWN != loc )
-  {
-    DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uMvpMatrix", mModelViewProjection );
-    program.SetUniformMatrix4fv( loc, 1, mModelViewProjection.AsFloat() );
-  }
-
-  loc = program.GetUniformLocation( Program::UNIFORM_NORMAL_MATRIX );
-  if( Program::UNIFORM_UNKNOWN != loc )
-  {
-    Matrix3 normalMatrix( modelview );
-    normalMatrix.Invert();
-    normalMatrix.Transpose();
-    DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uNormalMatrix", normalMatrix );
-    program.SetUniformMatrix3fv( loc, 1, normalMatrix.AsFloat() );
-  }
-
-  loc = program.GetUniformLocation(Program::UNIFORM_TIME_DELTA);
-  if( Program::UNIFORM_UNKNOWN != loc )
-  {
-    DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uTimeDelta", mFrametime );
-    program.SetUniform1f( loc, mFrametime );
-  }
-
-  loc = program.GetUniformLocation(Program::UNIFORM_MODEL_MATRIX);
-  if( Program::UNIFORM_UNKNOWN != loc )
-  {
-    DALI_PRINT_UNIFORM( debugStream, bufferIndex, "uModelMatrix", model );
-    program.SetUniformMatrix4fv( loc, 1, model.AsFloat() );
-  }
-
   // We should have one UniformMeta per uniform property
   for ( unsigned int i = 0u; i < mUniformMetadata.Count(); ++i )
   {
@@ -400,12 +337,12 @@ Program& Shader::Apply( Context& context,
     if ( metadata.name.length() > 0 )
     {
       // 0 means program has not got a cache index for this uniform
-      if( 0 == metadata.cacheIndeces[ programType ][ subType ] )
+      if( 0 == metadata.cacheIndeces[ programIndex ][ subType ] )
       {
         // register cacheindex for this program
-        metadata.cacheIndeces[ programType ][ subType ] = program.RegisterUniform( metadata.name );
+        metadata.cacheIndeces[ programIndex ][ subType ] = program.RegisterUniform( metadata.name );
       }
-      loc = program.GetUniformLocation( metadata.cacheIndeces[ programType ][ subType ] );
+      loc = program.GetUniformLocation( metadata.cacheIndeces[ programIndex ][ subType ] );
 
       // if we find uniform with location
       if ( Program::UNIFORM_UNKNOWN != loc )
@@ -535,15 +472,7 @@ Program& Shader::Apply( Context& context,
   }
 
   DALI_PRINT_SHADER_UNIFORMS(debugStream);
-
-  return program;
 }
-
-void Shader::SetFrameTime( float frametime )
-{
-  mFrametime = frametime;
-}
-
 
 } // namespace SceneGraph
 

@@ -219,27 +219,27 @@ bool ImageRenderer::CheckResources()
   return true;
 }
 
-void ImageRenderer::GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
+void ImageRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
 {
   outType = GEOMETRY_TYPE_IMAGE;
   outSubType = SHADER_DEFAULT;
 }
 
+bool ImageRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
+{
+  mContext->IncrementRendererCount();
+  if(IsOutsideClipSpaceImpl( modelMatrix, modelViewProjectionMatrix ) )
+  {
+    mContext->IncrementCulledCount();
+    return true;
+  }
+  return false;
+}
 
-void ImageRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest )
+void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
   DALI_ASSERT_DEBUG( 0 != mTextureId && "ImageRenderer::DoRender. mTextureId == 0." );
   DALI_ASSERT_DEBUG( NULL != mTexture && "ImageRenderer::DoRender. mTexture == NULL." );
-
-  mContext->IncrementRendererCount();
-  if( cullTest )
-  {
-    if(IsOutsideClipSpace(modelMatrix) )
-    {
-      mContext->IncrementCulledCount();
-      return;
-    }
-  }
 
   if(! mIsMeshGenerated )
   {
@@ -253,11 +253,6 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMa
   // make sure the vertex is bound, this has to be done before
   // we call VertexAttribPointer otherwise you get weird output on the display
   mVertexBuffer->Bind();
-
-  ShaderSubTypes shaderType = SHADER_DEFAULT;
-
-  // Apply shader effect specific program and common uniforms
-  Program& program = mShader->Apply( *mContext, bufferIndex, GEOMETRY_TYPE_IMAGE, modelMatrix, viewMatrix, modelViewMatrix, projectionMatrix, color, shaderType );
 
   // Set sampler uniform
   GLint samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER );
@@ -822,14 +817,14 @@ ImageRenderer::ImageRenderer( RenderDataProvider& dataprovider )
 }
 
 // Frustum culling using clip space and oriented bounding box checks
-bool ImageRenderer::IsOutsideClipSpace(const Matrix& modelMatrix)
+bool ImageRenderer::IsOutsideClipSpaceImpl(const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix)
 {
   // First, calculate if the center is inside clip space:
 
   // Downside is mvp matrix calc per renderer per frame
   // and up to 4 matrix * vector calls.
-  const Matrix& mvp = mShader->GetMVPMatrix();
-  Vector4 translation = mvp.GetTranslation();
+  const Matrix& mvp = modelViewProjectionMatrix;
+  const Vector4 translation = mvp.GetTranslation();
 
   // Upside is point test is very simple:
   if( -translation.w <= translation.x  &&  translation.x <= translation.w &&

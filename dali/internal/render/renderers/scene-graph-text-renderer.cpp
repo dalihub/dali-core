@@ -297,7 +297,7 @@ bool TextRenderer::CheckResources()
   return true;
 }
 
-void TextRenderer::GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
+void TextRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
 {
   outType = GEOMETRY_TYPE_TEXT;
 
@@ -332,27 +332,19 @@ void TextRenderer::GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outT
   }
 }
 
-void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest )
+bool TextRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
 {
-  if ( ! ( mVertexBuffer && mIndexBuffer ) )
-  {
-    // This character has no geometry, must be a white space
-    return;
-  }
+  return false; // @todo add implementation
+}
 
+void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
+{
   DALI_ASSERT_DEBUG( NULL != mTexture && "TextRenderer::DoRender. mTexture == NULL." );
 
   DALI_LOG_INFO( gTextFilter, Debug::General, "TextRenderer::DoRender(this: %p) textureId:%d\n", this, mTextureId );
 
-  GeometryType geometryType;
-  ShaderSubTypes shaderType;
-  GetGeometryTypes( bufferIndex, geometryType, shaderType );
-
-  // Apply shader effect specific program and common uniforms
-  Program& program = mShader->Apply( *mContext, bufferIndex, geometryType, modelMatrix, viewMatrix, modelViewMatrix, projectionMatrix, color, shaderType );
-
   // Set sampler uniform
-  GLint samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER );
+  const GLint samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER );
   if( Program::UNIFORM_UNKNOWN != samplerLoc )
   {
     // set the uniform
@@ -365,7 +357,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
   float smoothWidth = SMOOTHING_ADJUSTMENT / mPixelSize;
   float smoothing = mSmoothing;
 
-  const int smoothingLoc = program.GetUniformLocation( Program::UNIFORM_SMOOTHING );
+  const GLint smoothingLoc = program.GetUniformLocation( Program::UNIFORM_SMOOTHING );
   if( Program::UNIFORM_UNKNOWN != smoothingLoc )
   {
     smoothWidth = min( min(mSmoothing, 1.0f - mSmoothing), smoothWidth );
@@ -382,8 +374,8 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
   {
     if( mTextParameters->IsOutlineEnabled() )
     {
-      const int outlineLoc = program.GetUniformLocation( Program::UNIFORM_OUTLINE );
-      const int outlineColorLoc = program.GetUniformLocation( Program::UNIFORM_OUTLINE_COLOR );
+      const GLint outlineLoc = program.GetUniformLocation( Program::UNIFORM_OUTLINE );
+      const GLint outlineColorLoc = program.GetUniformLocation( Program::UNIFORM_OUTLINE_COLOR );
 
       if( Program::UNIFORM_UNKNOWN != outlineLoc && Program::UNIFORM_UNKNOWN != outlineColorLoc )
       {
@@ -400,8 +392,8 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
     if( mTextParameters->IsGlowEnabled() )
     {
-      const int glowLoc = program.GetUniformLocation( Program::UNIFORM_GLOW );
-      const int glowColorLoc = program.GetUniformLocation( Program::UNIFORM_GLOW_COLOR );
+      const GLint glowLoc = program.GetUniformLocation( Program::UNIFORM_GLOW );
+      const GLint glowColorLoc = program.GetUniformLocation( Program::UNIFORM_GLOW_COLOR );
 
       if( Program::UNIFORM_UNKNOWN != glowLoc && Program::UNIFORM_UNKNOWN != glowColorLoc )
       {
@@ -414,9 +406,9 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
     if( mTextParameters->IsDropShadowEnabled() )
     {
-      const int shadowLoc = program.GetUniformLocation( Program::UNIFORM_SHADOW );
-      const int shadowColorLoc = program.GetUniformLocation( Program::UNIFORM_SHADOW_COLOR );
-      const int shadowSmoothingLoc = program.GetUniformLocation( Program::UNIFORM_SHADOW_SMOOTHING );
+      const GLint shadowLoc = program.GetUniformLocation( Program::UNIFORM_SHADOW );
+      const GLint shadowColorLoc = program.GetUniformLocation( Program::UNIFORM_SHADOW_COLOR );
+      const GLint shadowSmoothingLoc = program.GetUniformLocation( Program::UNIFORM_SHADOW_SMOOTHING );
 
       if( Program::UNIFORM_UNKNOWN != shadowLoc && Program::UNIFORM_UNKNOWN != shadowColorLoc && Program::UNIFORM_UNKNOWN != shadowSmoothingLoc )
       {
@@ -432,7 +424,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
   }
 
   // Set the text color uniform
-  const int textColorLoc = program.GetUniformLocation( Program::UNIFORM_TEXT_COLOR );
+  const GLint textColorLoc = program.GetUniformLocation( Program::UNIFORM_TEXT_COLOR );
   if( Program::UNIFORM_UNKNOWN != textColorLoc )
   {
     Vector4 textColor( (NULL != mTextColor) ? *mTextColor : TextStyle::DEFAULT_TEXT_COLOR );
@@ -440,31 +432,27 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
     program.SetUniform4f(textColorLoc, textColor.r, textColor.g, textColor.b, textColor.a);
   }
 
-  // All shaders except default shader require the uGradientLine.zw uniform to be set
-  // at the very least. (setting it to vec2(0.0, 0.0) will disable gradient)
-  if( shaderType != SHADER_DEFAULT )
+  if( mTextParameters )
   {
+    // All shaders except default shader require the uGradientLine.zw uniform to be set
+    // at the very least. (setting it to vec2(0.0, 0.0) will disable gradient)
     Vector2 projection( Vector2::ZERO );
     Vector2 startPoint( TextStyle::DEFAULT_GRADIENT_START_POINT );
-
-    if( mTextParameters )
+    startPoint = mTextParameters->GetGradientStartPoint();
+    projection = mTextParameters->GetGradientEndPoint() - startPoint;
+    if( mTextParameters->IsGradientEnabled() ) // same as: mGradientEndPoint != mGradientStartPoint
     {
-      startPoint = mTextParameters->GetGradientStartPoint();
-      projection = mTextParameters->GetGradientEndPoint() - startPoint;
-      if( mTextParameters->IsGradientEnabled() ) // same as: mGradientEndPoint != mGradientStartPoint
+      projection /= projection.LengthSquared();
+
+      // For valid gradients Gradient Color and Text Size information must be set.
+      const GLint gradientColorLoc = program.GetUniformLocation( Program::UNIFORM_GRADIENT_COLOR );
+      const GLint textSizeLoc = program.GetUniformLocation( Program::UNIFORM_INVERSE_TEXT_SIZE );
+
+      if( Program::UNIFORM_UNKNOWN != gradientColorLoc && Program::UNIFORM_UNKNOWN != textSizeLoc )
       {
-        projection /= projection.LengthSquared();
-
-        // For valid gradients Gradient Color and Text Size information must be set.
-        const int gradientColorLoc = program.GetUniformLocation( Program::UNIFORM_GRADIENT_COLOR );
-        const int textSizeLoc = program.GetUniformLocation( Program::UNIFORM_INVERSE_TEXT_SIZE );
-
-        if( Program::UNIFORM_UNKNOWN != gradientColorLoc && Program::UNIFORM_UNKNOWN != textSizeLoc )
-        {
-          const Vector4& color = mTextParameters->GetGradientColor();
-          program.SetUniform4f( gradientColorLoc, color.r, color.g, color.b, color.a );
-          program.SetUniform2f( textSizeLoc, mInvTextSize.width, mInvTextSize.height );
-        }
+        const Vector4& color = mTextParameters->GetGradientColor();
+        program.SetUniform4f( gradientColorLoc, color.r, color.g, color.b, color.a );
+        program.SetUniform2f( textSizeLoc, mInvTextSize.width, mInvTextSize.height );
       }
     }
 
@@ -472,7 +460,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
     // gradient information (gradientRequired), then we set
     // uGradientLine.zw = vec2(0.0, 0.0) to force vColor = uColor in the expression.
     // If we do have a gradient present, then we set up all information.
-    const int gradientLineLoc = program.GetUniformLocation( Program::UNIFORM_GRADIENT_LINE );
+    const GLint gradientLineLoc = program.GetUniformLocation( Program::UNIFORM_GRADIENT_LINE );
     if( Program::UNIFORM_UNKNOWN != gradientLineLoc )
     {
       program.SetUniform4f( gradientLineLoc,
@@ -483,8 +471,8 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
     }
   }
 
-  const int positionLoc = program.GetAttribLocation(Program::ATTRIB_POSITION);
-  const int texCoordLoc = program.GetAttribLocation(Program::ATTRIB_TEXCOORD);
+  const GLint positionLoc = program.GetAttribLocation(Program::ATTRIB_POSITION);
+  const GLint texCoordLoc = program.GetAttribLocation(Program::ATTRIB_TEXCOORD);
 
   mTexture->Bind(GL_TEXTURE_2D, GL_TEXTURE0);
 

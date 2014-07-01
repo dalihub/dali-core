@@ -120,7 +120,7 @@ bool MeshRenderer::CheckResources()
   return true;
 }
 
-void MeshRenderer::GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
+void MeshRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
 {
   MeshInfo& meshInfo = mMeshInfo[bufferIndex];
   Mesh*           mesh     =   meshInfo.mesh;
@@ -164,9 +164,20 @@ void MeshRenderer::GetGeometryTypes( BufferIndex bufferIndex, GeometryType& outT
       } // else default
     }
   }
+  if( outType != mGeometryType || outSubType != mShaderType )
+  {
+    mGeometryType = outType;
+    mShaderType = outSubType;
+    ResetCustomUniforms();
+  }
 }
 
-void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color, bool cullTest )
+bool MeshRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
+{
+  return false; // @todo add implementation
+}
+
+void MeshRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
   MeshInfo& meshInfo = mMeshInfo[bufferIndex];
   Mesh*           mesh              =    meshInfo.mesh;
@@ -186,19 +197,6 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
   GLsizei numBoneMatrices = (GLsizei)mesh->GetMeshData(Mesh::RENDER_THREAD).GetBoneCount();
 
-  GeometryType geometryType = GEOMETRY_TYPE_TEXTURED_MESH;
-  ShaderSubTypes shaderType = SHADER_DEFAULT;
-  GetGeometryTypes( bufferIndex, geometryType, shaderType );
-
-  if( geometryType != mGeometryType || shaderType != mShaderType )
-  {
-    mGeometryType = geometryType;
-    mShaderType = shaderType;
-    ResetCustomUniforms();
-  }
-
-  Program& program = mShader->Apply( *mContext, bufferIndex, geometryType, modelMatrix, viewMatrix, modelViewMatrix, projectionMatrix, color, mShaderType );
-
   GLint location       = Program::UNIFORM_UNKNOWN;
   GLint positionLoc    = program.GetAttribLocation(Program::ATTRIB_POSITION);
   GLint texCoordLoc    = Program::ATTRIB_UNKNOWN;
@@ -212,20 +210,20 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
   if( numBoneMatrices > 0 )
   {
-    location = mCustomUniform[ shaderType ][ 0 ].GetUniformLocation( program, "uBoneCount" );
+    location = mCustomUniform[ mShaderType ][ 0 ].GetUniformLocation( program, "uBoneCount" );
     if( Program::UNIFORM_UNKNOWN != location )
     {
       program.SetUniform1i(location, numBoneMatrices);
     }
 
-    location = mCustomUniform[ shaderType ][ 1 ].GetUniformLocation( program, "uBoneMatrices" );
+    location = mCustomUniform[ mShaderType ][ 1 ].GetUniformLocation( program, "uBoneMatrices" );
     if( Program::UNIFORM_UNKNOWN != location )
     {
       program.SetUniformMatrix4fv(location, numBoneMatrices, boneTransforms.viewTransforms[0].AsFloat());
     }
     if( mesh->GetMeshData(Mesh::RENDER_THREAD).HasNormals() )
     {
-      location = mCustomUniform[ shaderType ][ 2 ].GetUniformLocation( program, "uBoneMatricesIT" );
+      location = mCustomUniform[ mShaderType ][ 2 ].GetUniformLocation( program, "uBoneMatricesIT" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         program.SetUniformMatrix3fv( location, numBoneMatrices, boneTransforms.inverseTransforms[0].AsFloat() );
@@ -278,19 +276,19 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
     }
   }
 
-  material.SetUniforms( mRenderMaterialUniforms, program, shaderType );
+  material.SetUniforms( mRenderMaterialUniforms, program, mShaderType );
 
   if( mAffectedByLighting )
   {
     // Set light parameters
-    location = mCustomUniform[ shaderType ][ 3 ].GetUniformLocation( program, "uNumberOfLights" );
+    location = mCustomUniform[ mShaderType ][ 3 ].GetUniformLocation( program, "uNumberOfLights" );
     if( Program::UNIFORM_UNKNOWN != location )
     {
       program.SetUniform1i( location, mLightController->GetNumberOfLights() );
     }
 
     // Model View IT matrix required for vertex normal lighting calculation
-    location = mCustomUniform[ shaderType ][ 4 ].GetUniformLocation( program, "uModelViewIT" );
+    location = mCustomUniform[ mShaderType ][ 4 ].GetUniformLocation( program, "uModelViewIT" );
     if( Program::UNIFORM_UNKNOWN != location )
     {
       Matrix3 modelViewInverseTranspose = modelViewMatrix;
@@ -310,27 +308,27 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
 
       LightAttachment& light = dynamic_cast< LightAttachment& >( lightNode.GetAttachment() );
 
-      location = mCustomUniform[ shaderType ][ 5 ].GetUniformLocation( program, "uLight0.mType" );
+      location = mCustomUniform[ mShaderType ][ 5 ].GetUniformLocation( program, "uLight0.mType" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         program.SetUniform1i( location, (GLint)light.GetType() );
       }
 
-      location = mCustomUniform[ shaderType ][ 6 ].GetUniformLocation( program, "uLight0.mFallOff" );
+      location = mCustomUniform[ mShaderType ][ 6 ].GetUniformLocation( program, "uLight0.mFallOff" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         tempVector2 = light.GetFallOff();
         program.SetUniform2f( location, tempVector2.x, tempVector2.y );
       }
 
-      location = mCustomUniform[ shaderType ][ 7 ].GetUniformLocation( program, "uLight0.mSpotAngle" );
+      location = mCustomUniform[ mShaderType ][ 7 ].GetUniformLocation( program, "uLight0.mSpotAngle" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         tempVector2 = light.GetSpotAngle();
         program.SetUniform2f( location, tempVector2.x, tempVector2.y );
       }
 
-      location = mCustomUniform[ shaderType ][ 8 ].GetUniformLocation( program, "uLight0.mLightPos" );
+      location = mCustomUniform[ mShaderType ][ 8 ].GetUniformLocation( program, "uLight0.mLightPos" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         // light position in eyespace
@@ -338,7 +336,7 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
         program.SetUniform3f( location, tempVector3.x, tempVector3.y, tempVector3.z );
       }
 
-      location = mCustomUniform[ shaderType ][ 9 ].GetUniformLocation( program, "uLight0.mLightDir" );
+      location = mCustomUniform[ mShaderType ][ 9 ].GetUniformLocation( program, "uLight0.mLightDir" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         tempVector3 = light.GetDirection();
@@ -346,21 +344,21 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
         program.SetUniform3f( location, tempVector3.x, tempVector3.y, tempVector3.z );
       }
 
-      location = mCustomUniform[ shaderType ][ 10 ].GetUniformLocation( program, "uLight0.mAmbient" );
+      location = mCustomUniform[ mShaderType ][ 10 ].GetUniformLocation( program, "uLight0.mAmbient" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         tempVector3 = light.GetAmbientColor();
         program.SetUniform3f( location, tempVector3.r, tempVector3.g, tempVector3.b );
       }
 
-      location = mCustomUniform[ shaderType ][ 11 ].GetUniformLocation( program, "uLight0.mDiffuse" );
+      location = mCustomUniform[ mShaderType ][ 11 ].GetUniformLocation( program, "uLight0.mDiffuse" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         tempVector3 = light.GetDiffuseColor();
         program.SetUniform3f( location, tempVector3.r, tempVector3.g, tempVector3.b );
       }
 
-      location = mCustomUniform[ shaderType ][ 12 ].GetUniformLocation( program, "uLight0.mSpecular" );
+      location = mCustomUniform[ mShaderType ][ 12 ].GetUniformLocation( program, "uLight0.mSpecular" );
       if( Program::UNIFORM_UNKNOWN != location )
       {
         tempVector3 = light.GetSpecularColor();
@@ -373,16 +371,23 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, const Matrix& modelViewMat
   switch( vertexGeometry )
   {
     case Dali::MeshData::TRIANGLES:
+    {
       mContext->DrawElements(GL_TRIANGLES, mesh->GetFaceIndexCount(Mesh::RENDER_THREAD), GL_UNSIGNED_SHORT, 0);
       DRAW_ELEMENT_RECORD(mesh->GetFaceIndexCount());
       break;
+    }
     case Dali::MeshData::LINES:
+    {
       mContext->DrawElements(GL_LINES, mesh->GetFaceIndexCount(Mesh::RENDER_THREAD), GL_UNSIGNED_SHORT, 0);
       DRAW_ELEMENT_RECORD(mesh->GetFaceIndexCount());
       break;
+    }
     case Dali::MeshData::POINTS:
+    {
       mContext->DrawArrays(GL_POINTS, 0, mesh->GetFaceIndexCount(Mesh::RENDER_THREAD) );
       DRAW_ARRAY_RECORD(mesh->GetFaceIndexCount());
+      break;
+    }
   }
 
   if( normalLoc != Program::ATTRIB_UNKNOWN )

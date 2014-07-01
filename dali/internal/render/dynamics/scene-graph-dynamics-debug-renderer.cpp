@@ -81,23 +81,7 @@ void DynamicsDebugRenderer::UpdateBuffer( const Integration::DynamicsDebugVertex
 
 void DynamicsDebugRenderer::Render()
 {
-  if( mBuffer && mNumberOfPoints )
-  {
-    Integration::DynamicsDebugVertex* vertex = 0;
-
-    Program& program = mShader.Apply(*mContext, mBufferIndex, GEOMETRY_TYPE_IMAGE, Matrix::IDENTITY, Matrix::IDENTITY, mViewMatrix, mProjectionMatrix, Color::WHITE, SHADER_DEFAULT);
-    const GLint positionLoc = program.GetAttribLocation(Program::ATTRIB_POSITION);
-    const GLint colorLoc = program.GetAttribLocation(Program::ATTRIB_COLOR);
-    mBuffer->Bind();
-    mContext->VertexAttribPointer(positionLoc, 3, GL_FLOAT, false, sizeof(Integration::DynamicsDebugVertex), (void*)&vertex->position);
-    mContext->VertexAttribPointer(colorLoc, 4, GL_FLOAT, false, sizeof(Integration::DynamicsDebugVertex), (void*)&vertex->color);
-    mContext->EnableVertexAttributeArray(positionLoc);
-    mContext->EnableVertexAttributeArray(colorLoc);
-    mContext->DrawArrays( GL_LINES, 0, mNumberOfPoints );
-    mContext->DisableVertexAttributeArray(positionLoc);
-    mContext->DisableVertexAttributeArray(colorLoc);
-    mContext->BindArrayBuffer( 0 );
-  }
+  // @todo reimplement this properly in future
 }
 
 
