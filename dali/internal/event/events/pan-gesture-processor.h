@@ -120,9 +120,7 @@ public: // To be called by GestureEventProcessor
    *
    * Valid modes:
    * 0 - No prediction
-   * 1 - Average Smoothing (no actual prediction)
-   * 2 - Interpolation using last vsync time and event time
-   * 3 - Same as 2 for now, in progress
+   * 1 - Prediction using average acceleration
    */
   void SetPredictionMode(int mode);
 

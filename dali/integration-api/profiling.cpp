@@ -105,30 +105,6 @@ void EnableProfiling( ProfilingType type )
   }
 }
 
-void SetPanGesturePredictionMode( int mode )
-{
-  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGesturePredictionMode(mode);
-}
-
-void SetPanGesturePredictionAmount(unsigned int amount)
-{
-  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGesturePredictionAmount(amount);
-}
-
-void SetPanGestureSmoothingMode(int mode)
-{
-  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureSmoothingMode(mode);
-}
-
-void SetPanGestureSmoothingAmount( float amount )
-{
-  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
-  eventProcessor.SetPanGestureSmoothingAmount(amount);
-}
-
 namespace Profiling
 {
 

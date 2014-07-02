@@ -44,36 +44,6 @@ enum ProfilingType
  */
 DALI_IMPORT_API void EnableProfiling( ProfilingType type );
 
-/**
- * @brief Called by adaptor to set the pan gesture prediction mode from
- * an environment variable
- *
- * @pre Should be called after Core creation.
- * @param mode The pan gesture prediction mode.
- */
-DALI_IMPORT_API void SetPanGesturePredictionMode( int mode );
-
-/**
- * @brief Called by adaptor to set the prediction amount of the pan gesture from an environment variable
- *
- * @param[in] amount The prediction amount in milliseconds
- */
-DALI_IMPORT_API void SetPanGesturePredictionAmount(unsigned int amount);
-
-/**
- * @brief Called to set how pan gestures smooth input
- *
- * @param[in] mode The smoothing mode to use
- */
-DALI_IMPORT_API void SetPanGestureSmoothingMode( int mode );
-
-/**
- * @brief Sets the prediction amount of the pan gesture
- *
- * @param[in] amount The smoothing amount [0.0f,1.0f] - 0.0f would be no smoothing, 1.0f maximum smoothing
- */
-DALI_IMPORT_API void SetPanGestureSmoothingAmount( float amount );
-
 
 namespace Profiling
 {
