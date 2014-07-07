@@ -35,7 +35,7 @@ namespace Internal
 namespace
 {
 static Matrix gModelViewProjectionMatrix( false ); ///< a shared matrix to calculate the MVP matrix, dont want to store it locally to reduce storage overhead
-static Matrix gNormalMatrix( false ); ///< a shared matrix to calculate normal matrix, dont want to store it locally to reduce storage overhead
+static Matrix3 gNormalMatrix; ///< a shared matrix to calculate normal matrix, dont want to store it locally to reduce storage overhead
 
 /**
  * Helper to set view and projection matrices once per program
@@ -61,7 +61,7 @@ inline void SetMatrices( Program& program,
   loc = program.GetUniformLocation( Program::UNIFORM_VIEW_MATRIX );
   if( Program::UNIFORM_UNKNOWN != loc )
   {
-    if( program.GetViewMatrix() == &viewMatrix )
+    if( program.GetViewMatrix() != &viewMatrix )
     {
       program.SetViewMatrix( &viewMatrix );
       program.SetUniformMatrix4fv( loc, 1, viewMatrix.AsFloat() );
@@ -92,7 +92,7 @@ inline void SetMatrices( Program& program,
   loc = program.GetUniformLocation( Program::UNIFORM_NORMAL_MATRIX );
   if( Program::UNIFORM_UNKNOWN != loc )
   {
-    gNormalMatrix = modelMatrix;
+    gNormalMatrix = modelViewMatrix;
     gNormalMatrix.Invert();
     gNormalMatrix.Transpose();
     program.SetUniformMatrix3fv( loc, 1, gNormalMatrix.AsFloat() );
