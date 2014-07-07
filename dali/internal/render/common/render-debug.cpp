@@ -48,12 +48,12 @@ void PrintFrameEnd()
   DALI_LOG_RENDER_INFO( "RENDER END\n\n" );
 }
 
-void PrintRenderInstruction( const SceneGraph::RenderInstruction& instruction )
+void PrintRenderInstruction( const SceneGraph::RenderInstruction& instruction, BufferIndex index )
 {
   const char* target = (0 != instruction.mOffscreenTextureId) ? "FrameBuffer" : "Screen";
 
   std::stringstream debugStream;
-  debugStream << "Rendering to " << target << ", View: " << *(instruction.mViewMatrix) << " Projection: " << *(instruction.mProjectionMatrix);
+  debugStream << "Rendering to " << target << ", View: " << *(instruction.GetViewMatrix(index)) << " Projection: " << *(instruction.GetProjectionMatrix(index));
 
   if( instruction.mIsViewportSet )
   {

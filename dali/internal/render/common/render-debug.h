@@ -28,7 +28,7 @@
 
 #define DALI_PRINT_RENDER_START(x) Render::PrintFrameStart(x);
 #define DALI_PRINT_RENDER_END() Render::PrintFrameEnd();
-#define DALI_PRINT_RENDER_INSTRUCTION(x) Render::PrintRenderInstruction(x);
+#define DALI_PRINT_RENDER_INSTRUCTION(x,index) Render::PrintRenderInstruction(x,index);
 #define DALI_PRINT_RENDER_LIST(x) Render::PrintRenderList(x);
 #define DALI_PRINT_RENDER_ITEM(x) Render::PrintRenderItem(x);
 
@@ -36,7 +36,7 @@
 
 #define DALI_PRINT_RENDER_START(x)
 #define DALI_PRINT_RENDER_END()
-#define DALI_PRINT_RENDER_INSTRUCTION(x)
+#define DALI_PRINT_RENDER_INSTRUCTION(x,index)
 #define DALI_PRINT_RENDER_LIST(x)
 #define DALI_PRINT_RENDER_ITEM(x)
 
@@ -88,8 +88,9 @@ void PrintFrameEnd();
 /**
  * Print some information about a render-instruction.
  * @param[in] instruction The render-instruction.
+ * @param[in] index to use
  */
-void PrintRenderInstruction( const SceneGraph::RenderInstruction& instruction );
+void PrintRenderInstruction( const SceneGraph::RenderInstruction& instruction, BufferIndex index );
 
 /**
  * Print some information about a render-list.

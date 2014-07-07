@@ -32,14 +32,13 @@ namespace SceneGraph
 {
 
 RenderInstruction::RenderInstruction()
-: mViewMatrix( 0 ),
-  mProjectionMatrix( 0 ),
-  mRenderTracker( NULL ),
+: mRenderTracker( NULL ),
   mClearColor(),
   mIsViewportSet( false ),
   mIsClearColorSet( false ),
   mCullMode(false),
   mOffscreenTextureId( 0 ),
+  mCameraAttachment( 0 ),
   mNextFreeRenderList( 0 )
 {
   // reserve 6 lists, which is enough for three layers with opaque and transparent things on
@@ -98,14 +97,12 @@ const RenderList* RenderInstruction::GetRenderList( RenderListContainer::SizeTyp
   return mRenderLists[ index ];
 }
 
-void RenderInstruction::Reset( const Matrix*   viewMatrix,
-                               const Matrix*   projectionMatrix,
-                               unsigned int    offscreenTextureId,
-                               const Viewport* viewport,
-                               const Vector4*  clearColor)
+void RenderInstruction::Reset( CameraAttachment* cameraAttachment,
+                               unsigned int      offscreenTextureId,
+                               const Viewport*   viewport,
+                               const Vector4*    clearColor )
 {
-  mViewMatrix = viewMatrix;
-  mProjectionMatrix = projectionMatrix;
+  mCameraAttachment = cameraAttachment;
   mViewport = viewport ? *viewport : Viewport();
   mIsViewportSet = NULL != viewport;
   mClearColor = clearColor ? *clearColor : Color::BLACK;

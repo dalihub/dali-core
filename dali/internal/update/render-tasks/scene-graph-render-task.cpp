@@ -123,11 +123,6 @@ void RenderTask::SetCameraNode( Node* cameraNode )
   }
 }
 
-Node* RenderTask::GetCameraNode() const
-{
-  return mCameraNode;
-}
-
 void RenderTask::SetFrameBufferId( unsigned int resourceId )
 {
   if ( mFrameBufferResourceId != resourceId )
@@ -421,13 +416,14 @@ const Matrix& RenderTask::GetProjectionMatrix( BufferIndex bufferIndex ) const
 
 void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, BufferIndex updateBufferIndex )
 {
+  DALI_ASSERT_DEBUG( NULL != mCameraAttachment );
+
   TASK_LOG(Debug::General);
 
   Viewport viewport;
   bool viewportSet = QueryViewport( updateBufferIndex, viewport );
 
-  instruction.Reset( &GetViewMatrix( updateBufferIndex ),
-                     &GetProjectionMatrix( updateBufferIndex ),
+  instruction.Reset( mCameraAttachment,
                      GetFrameBufferId(),
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );

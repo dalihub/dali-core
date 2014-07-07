@@ -125,10 +125,10 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
                                BufferIndex bufferIndex,
                                float frameTime )
 {
-  DALI_PRINT_RENDER_INSTRUCTION( instruction );
+  DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
 
-  const Matrix* viewMatrix       = instruction.mViewMatrix;
-  const Matrix* projectionMatrix = instruction.mProjectionMatrix;
+  const Matrix* viewMatrix       = instruction.GetViewMatrix( bufferIndex );
+  const Matrix* projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
 
   DALI_ASSERT_DEBUG( NULL != viewMatrix );
   DALI_ASSERT_DEBUG( NULL != projectionMatrix );

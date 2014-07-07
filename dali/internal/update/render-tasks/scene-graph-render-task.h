@@ -97,12 +97,6 @@ public:
   void SetCameraNode( Node* node );
 
   /**
-   * Retrieve the camera node.
-   * @return The scene is viewed from the perspective of this node.
-   */
-  Node* GetCameraNode() const;
-
-  /**
    * Set the frame-buffer used as a render target.
    * @param[in] resourceId The resource ID of the frame-buffer, or zero if not rendering off-screen.
    */
