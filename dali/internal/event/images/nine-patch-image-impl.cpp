@@ -325,8 +325,7 @@ void NinePatchImage::ParseBorders()
       }
       else if(startX1 >= 0 && endX1 < 0)
       {
-        endX1 = col-1;
-        break;
+        endX1 = col;
       }
 
       if( (bottom[testByte] & testBits) == testValue )
@@ -338,9 +337,14 @@ void NinePatchImage::ParseBorders()
       }
       else if(startX2 >= 0 && endX2 < 0)
       {
-        endX2 = col-1;
+        endX2 = col;
+      }
+
+      if ( ( endX2 > 0 ) && ( endX1 > 0 ) )
+      {
         break;
       }
+
       top+=pixelWidth;
       bottom+=pixelWidth;
     }
@@ -361,8 +365,7 @@ void NinePatchImage::ParseBorders()
       }
       else if(startY1 >= 0 && endY1 < 0)
       {
-        endY1 = row-1;
-        break;
+        endY1 = row;
       }
 
       if((right[testByte] & testBits) == testValue)
@@ -374,20 +377,24 @@ void NinePatchImage::ParseBorders()
       }
       else if(startY2 >= 0 && endY2 < 0)
       {
-        endY2 = row-1;
-        break;
+        endY2 = row;
       }
       left += srcStride;
       right += srcStride;
+
+      if ( ( endY2 > 0 ) && ( endY1 > 0 ) )
+      {
+        break;
+      }
     }
 
-    mStretchBorders.x = startX1-1;
-    mStretchBorders.y = startY1-1;
-    mStretchBorders.z = mWidth-endX1-1;
-    mStretchBorders.w = mHeight-endY1-1;
+    mStretchBorders.x = startX1;
+    mStretchBorders.y = startY1;
+    mStretchBorders.z = mWidth-endX1;
+    mStretchBorders.w = mHeight-endY1;
 
-    mChildRectangle.x = startX2-1;
-    mChildRectangle.y = startY2-1;
+    mChildRectangle.x = startX2;
+    mChildRectangle.y = startY2;
     mChildRectangle.width = endX2-startX2;
     mChildRectangle.height = endY2-startY2;
 
