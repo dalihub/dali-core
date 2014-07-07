@@ -257,6 +257,7 @@ private:
 protected:
   unsigned int mWidth;
   unsigned int mHeight;
+  bool         mNaturalSizeSet;
 
   ResourceTicketPtr mTicket;
   ImageFactoryCache::RequestPtr mRequest;         ///< contains the initially requested attributes for image. Request is reissued when memory was released.

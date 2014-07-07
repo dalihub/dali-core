@@ -157,6 +157,8 @@ NinePatchImage::NinePatchImage( const std::string& filename, const Dali::ImageAt
   loadedAttrs.SetSize( closestSize );
   mWidth = closestSize.width;
   mHeight = closestSize.height;
+  mNaturalSizeSet = true;
+
   Integration::BitmapResourceType resourceType( loadedAttrs );
 
   // Note, bitmap is only destroyed when the image is destroyed.

@@ -63,6 +63,7 @@ EncodedBufferImagePtr EncodedBufferImage::New( const uint8_t * const encodedImag
   Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( buffer, attributes, size );
   image->mWidth = (unsigned int) size.width;
   image->mHeight = (unsigned int) size.height;
+  image->mNaturalSizeSet = true;
 
   ResourceClient &resourceClient = ThreadLocalStorage::Get().GetResourceClient();
   ResourceTicketPtr ticket = resourceClient.DecodeResource( resourceType, buffer );
