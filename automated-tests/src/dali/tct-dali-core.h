@@ -1282,6 +1282,7 @@ extern int UtcDaliTouchActorSignalNotConsumed(void);
 extern int UtcDaliTouchActorUnStaged(void);
 extern int UtcDaliTouchSystemOverlayActor(void);
 extern int UtcDaliTouchLayerConsumesTouch(void);
+extern int UtcDaliTouchLeaveActorReadded(void);
 extern int UtcDaliVector2Cons(void);
 extern int UtcDaliVector2FitInside(void);
 extern int UtcDaliVector2FitScaleToFill(void);
@@ -2515,6 +2516,7 @@ testcase tc_array[] = {
     {"UtcDaliTouchActorUnStaged", UtcDaliTouchActorUnStaged, utc_dali_touch_processing_startup, utc_dali_touch_processing_cleanup},
     {"UtcDaliTouchSystemOverlayActor", UtcDaliTouchSystemOverlayActor, utc_dali_touch_processing_startup, utc_dali_touch_processing_cleanup},
     {"UtcDaliTouchLayerConsumesTouch", UtcDaliTouchLayerConsumesTouch, utc_dali_touch_processing_startup, utc_dali_touch_processing_cleanup},
+    {"UtcDaliTouchLeaveActorReadded", UtcDaliTouchLeaveActorReadded, utc_dali_touch_processing_startup, utc_dali_touch_processing_cleanup},
     {"UtcDaliVector2Cons", UtcDaliVector2Cons, utc_dali_vector2_startup, utc_dali_vector2_cleanup},
     {"UtcDaliVector2FitInside", UtcDaliVector2FitInside, utc_dali_vector2_startup, utc_dali_vector2_cleanup},
     {"UtcDaliVector2FitScaleToFill", UtcDaliVector2FitScaleToFill, utc_dali_vector2_startup, utc_dali_vector2_cleanup},

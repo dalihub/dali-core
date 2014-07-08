@@ -1243,3 +1243,49 @@ int UtcDaliTouchLayerConsumesTouch(void)
 
   END_TEST;
 }
+
+int UtcDaliTouchLeaveActorReadded(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stage.Add(actor);
+
+  // Set actor to receive touch-events
+  actor.SetLeaveRequired( true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData data;
+  TouchEventFunctor functor( data );
+  actor.TouchedSignal().Connect( &application, functor );
+
+  // Emit a down and motion
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 11.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Remove actor from stage and add again
+  stage.Remove( actor );
+  stage.Add( actor );
+
+  // Emit a motion within the actor's bounds
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 12.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Emit a motion outside the actor's bounds
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 200.0f, 200.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( TouchPoint::Leave, data.touchEvent.points[0].state, TEST_LOCATION );
+  data.Reset();
+
+  END_TEST;
+}
