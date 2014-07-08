@@ -523,6 +523,9 @@ void TouchEventProcessor::ActorObserver::SetActor( Actor* actor )
       DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Start Observing:            %p\n", mActor);
     }
   }
+
+  // Make sure this flag is unset (as we may have been disconnected if it's the same actor)
+  mActorDisconnected = false;
 }
 
 void TouchEventProcessor::ActorObserver::ResetActor()
