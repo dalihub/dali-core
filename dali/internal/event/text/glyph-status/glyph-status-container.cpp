@@ -38,13 +38,13 @@ namespace // un-named namespace
 /**
  * @return the unique characters in a text array
  */
-TextArray GetUniqueCharacters( const TextArray &text  )
+Integration::TextArray GetUniqueCharacters( const Integration::TextArray &text  )
 {
-  TextArray utfCodes( text );
+  Integration::TextArray utfCodes( text );
 
-  std::sort( utfCodes.begin(), utfCodes.end() );
-  TextArray::iterator it = std::unique( utfCodes.begin(), utfCodes.end() );
-  utfCodes.resize(it - utfCodes.begin());
+  std::sort( utfCodes.Begin(), utfCodes.End() );
+  Integration::TextArray::Iterator it = std::unique( utfCodes.Begin(), utfCodes.End() );
+  utfCodes.Resize(it - utfCodes.Begin());
   return utfCodes;
 }
 
@@ -191,11 +191,11 @@ const GlyphStatusContainer::StatusSet& GlyphStatusContainer::GetStatusSet() cons
   return mCharacterLookup;
 }
 
-bool GlyphStatusContainer::IsTextLoaded( const TextArray& text, FontId fontId) const
+bool GlyphStatusContainer::IsTextLoaded( const Integration::TextArray& text, FontId fontId ) const
 {
-  for( std::size_t n = 0, size = text.size(); n < size; ++n)
+  for( Integration::TextArray::ConstIterator it = text.Begin(), endIt = text.End(); it != endIt; ++it )
   {
-    uint32_t charCode = text[n];
+    const uint32_t charCode = *it;
 
     // ignore invisible characters
     if( charCode < SpecialCharacters::FIRST_VISIBLE_CHAR )
@@ -212,7 +212,7 @@ bool GlyphStatusContainer::IsTextLoaded( const TextArray& text, FontId fontId) c
   return true;
 }
 
-void GlyphStatusContainer::GetTextStatus( const TextArray& text,
+void GlyphStatusContainer::GetTextStatus( const Integration::TextArray& text,
                     FontId fontId,
                     unsigned int& charsNotLoaded,
                     bool& fitsInContainer ) const
@@ -220,11 +220,11 @@ void GlyphStatusContainer::GetTextStatus( const TextArray& text,
   charsNotLoaded = 0;
   fitsInContainer = false;
 
-  TextArray uniqueText = GetUniqueCharacters( text );
+  Integration::TextArray uniqueText = GetUniqueCharacters( text );
 
-  for( std::size_t n = 0, size = uniqueText.size(); n < size; ++n)
+  for( Integration::TextArray::ConstIterator it = text.Begin(), endIt = text.End(); it != endIt; ++it )
   {
-    uint32_t charCode = uniqueText[n];
+    const uint32_t charCode = *it;
 
     // ignore invisible characters
     if( charCode < SpecialCharacters::FIRST_VISIBLE_CHAR )
@@ -270,9 +270,9 @@ void GlyphStatusContainer::CloneContents( const GlyphStatusContainer& clone )
 }
 
 
-void GlyphStatusContainer::GetDeadCharacters( std::vector< unsigned int >& deadList )
+void GlyphStatusContainer::GetDeadCharacters( Integration::TextArray& deadList )
 {
-  deadList.reserve( mDeadCharacters.size() );
+  deadList.Reserve( mDeadCharacters.size() );
 
   // iterate through the dead character list
 
@@ -280,7 +280,7 @@ void GlyphStatusContainer::GetDeadCharacters( std::vector< unsigned int >& deadL
   for( StatusPointerSet::iterator iter = mDeadCharacters.begin(); iter != endIter; ++iter )
   {
     const GlyphStatus* glyphStatus(*iter);
-    deadList.push_back( glyphStatus->GetUniqueId());
+    deadList.PushBack( glyphStatus->GetUniqueId());
   }
 
 }

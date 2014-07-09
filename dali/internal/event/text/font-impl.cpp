@@ -79,11 +79,11 @@ bool Font::operator==( const Font& font ) const
   return ( font.GetResourceId() == GetResourceId() ) && ( fabsf( font.GetPointSize() - GetPointSize() ) < Math::MACHINE_EPSILON_1000 );
 }
 
-const std::string Font::GetFamilyForText(const TextArray& text)
+const std::string Font::GetFamilyForText(const Integration::TextArray& text)
 {
   Integration::PlatformAbstraction& platform = ThreadLocalStorage::Get().GetPlatformAbstraction();
   // this is a synchronous request
-  return platform.GetFontFamilyForChars(text);
+  return platform.GetFontFamilyForChars( text );
 }
 
 PixelSize Font::GetLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight)
@@ -133,7 +133,7 @@ void Font::GetInstalledFonts( Dali::Font::FontListMode mode, std::vector<std::st
   platform.GetFontList( listMode, fontList );
 }
 
-bool Font::AllGlyphsSupported(const TextArray& text) const
+bool Font::AllGlyphsSupported(const Integration::TextArray& text) const
 {
   // this is a synchronous request
   return mPlatform.AllGlyphsSupported(mName, mStyle, text);
@@ -144,7 +144,7 @@ unsigned int Font::GetResourceId() const
   return mMetrics->GetFontId();
 }
 
-float Font::MeasureTextWidth(const TextArray& text, float textHeightPx) const
+float Font::MeasureTextWidth(const Integration::TextArray& text, float textHeightPx) const
 {
   Vector3 size = MeasureText(text);
 
@@ -159,7 +159,7 @@ float Font::MeasureTextWidth(const TextArray& text, float textHeightPx) const
   return width;
 }
 
-float Font::MeasureTextHeight(const TextArray& text, float textWidthPx) const
+float Font::MeasureTextHeight(const Integration::TextArray& text, float textWidthPx) const
 {
   Vector3 size = MeasureText(text);
 
@@ -174,7 +174,7 @@ float Font::MeasureTextHeight(const TextArray& text, float textWidthPx) const
   return height;
 }
 
-Vector3 Font::MeasureText(const TextArray& text) const
+Vector3 Font::MeasureText(const Integration::TextArray& text) const
 {
   if (mMetrics)
   {
@@ -246,8 +246,8 @@ float Font::GetUnitsToPixels() const
 
 void Font::GetMetrics(const Dali::Character& character, Dali::Font::Metrics::Impl& metricsImpl) const
 {
-  TextArray text;
-  text.push_back( character.GetImplementation().GetCharacter() );
+  Integration::TextArray text;
+  text.PushBack( character.GetImplementation().GetCharacter() );
 
   mMetrics->GetMetrics( character, metricsImpl );
 
@@ -324,13 +324,13 @@ void Font::RemoveObserver(TextObserver& observer)
   mAtlasManager.RemoveTextObserver(observer);
 }
 
-TextVertexBuffer* Font::TextRequired( const TextArray& text, const TextFormat& format)
+TextVertexBuffer* Font::TextRequired( const Integration::TextArray& text, const TextFormat& format)
 {
   // make sure the metrics are loaded for the text string, along with underline character if required
   if( format.IsUnderLined() )
   {
-    TextArray underline;
-    underline.push_back( SpecialCharacters::UNDERLINE_CHARACTER );
+    Integration::TextArray underline;
+    underline.PushBack( SpecialCharacters::UNDERLINE_CHARACTER );
 
     mMetrics->LoadMetricsSynchronously( underline );
   }
@@ -341,7 +341,7 @@ TextVertexBuffer* Font::TextRequired( const TextArray& text, const TextFormat& f
   return mAtlasManager.TextRequired(text, format, *(mMetrics.Get()));
 }
 
-void Font::TextNotRequired( const TextArray& text, const TextFormat& format, unsigned int mTextureId )
+void Font::TextNotRequired( const Integration::TextArray& text, const TextFormat& format, unsigned int mTextureId )
 {
   // let the atlas manager we no longer need the text
   mAtlasManager.TextNotRequired( text, format, mMetrics->GetFontId(), mTextureId );
@@ -357,7 +357,7 @@ void Font::RemoveTextureObserver(GlyphTextureObserver& observer )
   mAtlasManager.RemoveTextureObserver( observer );
 }
 
-bool Font::IsTextLoaded( const TextArray& text, const TextFormat& format, unsigned int textureId ) const
+bool Font::IsTextLoaded( const Integration::TextArray& text, const TextFormat& format, unsigned int textureId ) const
 {
   return mAtlasManager.IsTextLoaded( text, format, mMetrics->GetFontId(), textureId );
 }

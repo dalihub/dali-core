@@ -298,7 +298,7 @@ void DebugVertexBuffer( VertexBuffer& buffer )
 
 } // unnamed namespace
 
-TextVertexBuffer* TextVertexGenerator::Generate( const TextArray& text,
+TextVertexBuffer* TextVertexGenerator::Generate( const Integration::TextArray& text,
                                                  const TextFormat& format,
                                                  const FontMetricsInterface& metrics,
                                                  const AtlasUvInterface& uvInterface,
@@ -332,7 +332,7 @@ TextVertexBuffer* TextVertexGenerator::Generate( const TextArray& text,
   const float tileWidth( metrics.GetMaxWidth() * scalar );
   const float tileHeight( metrics.GetMaxHeight() * scalar );
 
-  for( TextArray::const_iterator it = text.begin(), endIt = text.end(); it != endIt; ++it )
+  for( Integration::TextArray::ConstIterator it = text.Begin(), endIt = text.End(); it != endIt; ++it )
   {
     const uint32_t charIndex = *it;
 
@@ -416,7 +416,7 @@ TextVertexBuffer* TextVertexGenerator::Generate( const TextArray& text,
 #endif
 
   DALI_LOG_INFO(gTextVertsLogFilter, Debug::General, "TextVertexBuffer for %c%c%c...: Calculated Extents:(%5.2f, %5.2f)\n  Geometry Extents:(%5.2f, %5.2f )\n",
-                text.size()>0?(char)text[0]:' ', text.size()>1?(char)text[1]:' ', text.size()>2?(char)text[2]:' ',
+                text.Count()>0?(char)text[0]:' ', text.Count()>1?(char)text[1]:' ', text.Count()>2?(char)text[2]:' ',
                 textVertexBuffer->mVertexMax.x,textVertexBuffer->mVertexMax.y,
                 textVertexBuffer->mGeometryExtent.width,textVertexBuffer->mGeometryExtent.height);
 

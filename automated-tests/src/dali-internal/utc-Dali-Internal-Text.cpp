@@ -107,7 +107,7 @@ int UtcDaliTextGetTextArray(void)
 
   Text text( std::string( "Hello world" ) );
 
-  DALI_TEST_EQUALS( text.GetImplementation().GetTextArray().size(), 11u, TEST_LOCATION );
+  DALI_TEST_EQUALS( text.GetImplementation().GetTextArray().Count(), 11u, TEST_LOCATION );
 
   END_TEST;
 }

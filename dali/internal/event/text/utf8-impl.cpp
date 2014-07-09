@@ -124,7 +124,7 @@ size_t UTF8Write(const uint32_t code, unsigned char* utf8Data)
   return sequenceLength;
 }
 
-size_t UTF8Tokenize(const unsigned char* utf8Data, const size_t utf8DataLength, TextArray& tokens)
+size_t UTF8Tokenize(const unsigned char* utf8Data, const size_t utf8DataLength, Integration::TextArray& tokens)
 {
   size_t dataLength = utf8DataLength;
 
@@ -145,12 +145,12 @@ size_t UTF8Tokenize(const unsigned char* utf8Data, const size_t utf8DataLength, 
     }
 
     code = UTF8Read(utf8Data, sequenceLength);
-    tokens.push_back(code);
+    tokens.PushBack(code);
 
     utf8Data += sequenceLength;
     dataLength -= sequenceLength;
   }
-  return tokens.size();
+  return tokens.Count();
 }
 
 } // namespace Internal

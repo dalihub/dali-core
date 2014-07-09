@@ -26,10 +26,10 @@
 #include <dali/internal/event/actor-attachments/renderable-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
 #include <dali/internal/event/text/font-declarations.h>
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/event/text/text-request-helper.h>
 #include <dali/internal/event/text/resource/glyph-texture-observer.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -59,19 +59,19 @@ public:
    * @param [in] font The font which will be used for the text.
    * @return A smart-pointer to the newly allocated TextAttachment.
    */
-  static TextAttachmentPtr New( const SceneGraph::Node& parentNode, const TextArray& text, FontPointer font );
+  static TextAttachmentPtr New( const SceneGraph::Node& parentNode, const Integration::TextArray& text, FontPointer font );
 
   /**
    * Set the text label displayed by the attachment
    * @param [in] text The new text label
    */
-  void SetText(const TextArray& text);
+  void SetText(const Integration::TextArray& text);
 
   /**
    * Get the text label displayed by the attachment
    * @return The text label
    */
-  const TextArray& GetText() const
+  const Integration::TextArray& GetText() const
   {
     // This is not animatable; the cached value is up-to-date.
     return mText;
@@ -389,7 +389,7 @@ private:
                                                   ///< Font parameters are stored in the FontPointer member. Inside the TextStyle, font parameters and color are allocated in the same struct,
                                                   ///< so store the text color in the style will allocate space for the font parameters as well, wasting space.
   // Cached values for public getters
-  TextArray mText;
+  Integration::TextArray mText;
 
   bool    mTextChanged:1;       ///< whether the text has changed
   bool    mFontChanged:1;       ///< whether the font has changed

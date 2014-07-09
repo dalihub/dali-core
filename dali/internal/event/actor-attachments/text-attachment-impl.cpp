@@ -31,7 +31,7 @@ namespace Dali
 namespace Internal
 {
 
-TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const TextArray& text, FontPointer font )
+TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const Integration::TextArray& text, FontPointer font )
 {
   StagePtr stage = Stage::GetCurrent();
 
@@ -74,11 +74,11 @@ TextAttachment::~TextAttachment()
   delete mTextColor;
 }
 
-void TextAttachment::SetText(const TextArray& text)
+void TextAttachment::SetText( const Integration::TextArray& text )
 {
   // return if the text hasn't changed
-  if( (text.size() == mText.size() ) &&
-      std::equal(mText.begin(), mText.end(), text.begin ()) )
+  if( ( text.Count() == mText.Count() ) &&
+      std::equal( mText.Begin(), mText.End(), text.Begin () ) )
   {
     return;
   }
@@ -468,7 +468,7 @@ Vector3 TextAttachment::MeasureText() const
 
 void TextAttachment::TextChanged()
 {
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::Verbose, "TextAttachment::TextChanged()  TextModified:%s  TextEmpty:%s\n", IsTextModified()?"Y":"N", mText.empty()?"Y":"N");
+  DALI_LOG_INFO(Debug::Filter::gResource, Debug::Verbose, "TextAttachment::TextChanged()  TextModified:%s  TextEmpty:%s\n", IsTextModified()?"Y":"N", ( 0u == mText.Count() )?"Y":"N");
 
   if( !IsTextModified() )
   {

@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/text-array.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -57,7 +57,7 @@ size_t UTF8Write(const uint32_t code, unsigned char* utf8Data);
  * @param[out] tokens         A vector which will receive the converted UTF-32 codes
  * @return The number of UTF-32 codes.
  */
-size_t UTF8Tokenize(const unsigned char* utf8Data, const size_t utf8DataLength, TextArray& tokens);
+size_t UTF8Tokenize(const unsigned char* utf8Data, const size_t utf8DataLength, Integration::TextArray& tokens);
 
 } // namespace Internal
 

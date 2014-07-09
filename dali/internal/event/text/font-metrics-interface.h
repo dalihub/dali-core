@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/text/resource/font-id.h>
 #include <dali/internal/event/text/glyph-metric.h>
-#include <dali/internal/common/text-array.h>
+#include <dali/integration-api/text-array.h>
 
 // EXTERNAL INCLUDES
 #include <string>
@@ -46,7 +46,7 @@ public:
    * Ensures the metrics for each character in the text are loaded and cached.
    * @param[in] text The text string to load the metrics for.
    */
-  virtual void LoadMetricsSynchronously( const TextArray& text ) = 0;
+  virtual void LoadMetricsSynchronously( const Integration::TextArray& text ) = 0;
 
   /**
    * Gets the metrics for a single character.

@@ -19,12 +19,12 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/common/text-vertex-buffer.h>
 #include <dali/internal/event/text/font-metrics-interface.h>
 #include <dali/internal/event/text/text-format.h>
 #include <dali/internal/event/text/text-observer.h>
 #include <dali/internal/event/text/resource/glyph-texture-observer.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -50,7 +50,7 @@ public:
    * @param[in] metric interface to get metric information for the text
    * @return text vertex buffer
    */
-  virtual TextVertexBuffer* TextRequired( const TextArray& text,
+  virtual TextVertexBuffer* TextRequired( const Integration::TextArray& text,
                                           const TextFormat& format,
                                           FontMetricsInterface& metrics ) = 0;
 
@@ -62,7 +62,7 @@ public:
    * @param[in] fontId font id
    * @param[in] textureId texture id (each atlas has a single texture)
    */
-   virtual void TextNotRequired( const TextArray& text,
+   virtual void TextNotRequired( const Integration::TextArray& text,
                                  const TextFormat& format,
                                  FontId fontId,
                                  unsigned int textureId ) = 0;
@@ -75,10 +75,10 @@ public:
    * @param[in] textureId texture id (each atlas has a single texture)
    * @return true if all characters are available, false if not
    */
-  virtual bool IsTextLoaded( const TextArray& text,
-                              const TextFormat& format,
-                              FontId fontId,
-                              unsigned int textureId) const = 0;
+  virtual bool IsTextLoaded( const Integration::TextArray& text,
+                             const TextFormat& format,
+                             FontId fontId,
+                             unsigned int textureId) const = 0;
 
 
   /**

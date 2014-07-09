@@ -25,7 +25,7 @@
 #include <dali/internal/event/actors/renderable-actor-impl.h>
 #include <dali/internal/event/text/text-observer.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
-#include <dali/internal/common/text-array.h>
+#include <dali/integration-api/text-array.h>
 
 
 namespace Dali
@@ -57,7 +57,7 @@ public:
    * @see Dali::TextActor::New( const Text& text, const TextActorParameters& parameters )
    * @return A pointer to a new TextActor.
    */
-  static TextActorPtr New( const TextArray& utfCodes, const TextActorParameters& parameters );
+  static TextActorPtr New( const Integration::TextArray& utfCodes, const TextActorParameters& parameters );
 
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize
@@ -73,7 +73,7 @@ public:
    * @copybrief Dali::TextActor::SetText(const std::string&)
    * @param[in] utfCodes  An std::vector containing the UTF-32 codes
    */
-  void SetText(const TextArray& utfCodes);
+  void SetText(const Integration::TextArray& utfCodes);
 
   /**
    * @copydoc Dali::TextActor::SetToNaturalSize()

@@ -74,7 +74,7 @@ AtlasRanking::SpaceStatus GetAtlasSpaceStatus( bool canFit,  bool atlasResizable
 
 } // un-named namespace
 
-AtlasRanking GetAtlasRanking( const TextArray& text,
+AtlasRanking GetAtlasRanking( const Integration::TextArray& text,
                                FontId fontId,
                                const GlyphStatusContainer&  container,
                                bool atlasResizable)
@@ -85,7 +85,7 @@ AtlasRanking GetAtlasRanking( const TextArray& text,
   // find if the text will fit or not, and how many characters are missing
   container.GetTextStatus( text, fontId, charsNotLoaded, canFit);
 
-  AtlasRanking::CharacterMatch charMatchStatus = GetTextMatchStatus( text.size(), charsNotLoaded );
+  AtlasRanking::CharacterMatch charMatchStatus = GetTextMatchStatus( text.Count(), charsNotLoaded );
 
   AtlasRanking::SpaceStatus spaceStatus = GetAtlasSpaceStatus( canFit,  atlasResizable);
 
