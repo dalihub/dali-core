@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include <errno.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 
 #include <dali-test-suite-utils.h>
 

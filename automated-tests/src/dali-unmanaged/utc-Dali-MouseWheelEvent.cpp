@@ -17,7 +17,6 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <dali/dali.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/mouse-wheel-event-integ.h>
 #include <dali-test-suite-utils.h>

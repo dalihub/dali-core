@@ -16,7 +16,7 @@
  */
 
 #include "assert.h"
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <string>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-test-suite-utils.h>

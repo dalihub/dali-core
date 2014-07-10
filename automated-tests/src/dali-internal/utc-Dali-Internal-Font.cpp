@@ -18,7 +18,7 @@
 #include <iostream>
 
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali/integration-api/glyph-set.h>
 
 #include <dali-test-suite-utils.h>

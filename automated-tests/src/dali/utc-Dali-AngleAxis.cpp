@@ -17,7 +17,7 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
 void utc_dali_angle_axis_startup(void)

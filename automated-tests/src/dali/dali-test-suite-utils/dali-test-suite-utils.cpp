@@ -16,7 +16,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <stdarg.h>
 
 #include "dali-test-suite-utils.h"

@@ -18,7 +18,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
 

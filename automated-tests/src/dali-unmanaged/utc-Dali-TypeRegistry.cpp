@@ -17,7 +17,6 @@
 
 #include <iostream>
 #include <stdlib.h>
-#include <dali/dali.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
@@ -1143,4 +1142,3 @@ int UtcDaliTypeRegistryNamedType(void)
   DALI_TEST_CHECK( namedActorPropertyCount > actorPropertyCount );
   END_TEST;
 }
-
