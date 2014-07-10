@@ -335,6 +335,36 @@ struct AnimateToFloat
   float mTarget;
 };
 
+struct AnimateByInteger
+{
+  AnimateByInteger(const int& relativeValue)
+  : mRelative(relativeValue)
+  {
+  }
+
+  float operator()(float alpha, const int& property)
+  {
+    return int(property + mRelative * alpha + 0.5f );
+  }
+
+  int mRelative;
+};
+
+struct AnimateToInteger
+{
+  AnimateToInteger(const int& targetValue)
+  : mTarget(targetValue)
+  {
+  }
+
+  float operator()(float alpha, const int& property)
+  {
+    return int(property + ((mTarget - property) * alpha) + 0.5f);
+  }
+
+  int mTarget;
+};
+
 struct AnimateByVector2
 {
   AnimateByVector2(const Vector2& relativeValue)
@@ -567,6 +597,25 @@ struct KeyFrameNumberFunctor
   }
 
   KeyFrameNumberPtr mKeyFrames;
+};
+
+struct KeyFrameIntegerFunctor
+{
+  KeyFrameIntegerFunctor(KeyFrameIntegerPtr keyFrames)
+  : mKeyFrames(keyFrames)
+  {
+  }
+
+  float operator()(float progress, const int& property)
+  {
+    if(mKeyFrames->IsActive(progress))
+    {
+      return mKeyFrames->GetValue(progress);
+    }
+    return property;
+  }
+
+  KeyFrameIntegerPtr mKeyFrames;
 };
 
 struct KeyFrameVector2Functor

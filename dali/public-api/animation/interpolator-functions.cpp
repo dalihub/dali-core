@@ -40,6 +40,11 @@ float LerpFloat( const float& current, const float& target, float progress )
   return current + ((target - current) * progress);
 }
 
+int LerpInteger( const int& current, const int& target, float progress )
+{
+  return static_cast<int>( current + ( (target - current) * progress ) + 0.5f );
+}
+
 Vector2 LerpVector2( const Vector2& current, const Vector2& target, float progress )
 {
   return current + ((target - current) * progress);
@@ -95,6 +100,12 @@ AnyInterpolator GetDefaultInterpolator( Property::Type type )
     case Property::FLOAT:
     {
       function = boost::function<float (const float&, const float&, float)>( &LerpFloat );
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      function = boost::function<int (const int&, const int&, float)>( &LerpInteger );
       break;
     }
 

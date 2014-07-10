@@ -110,6 +110,23 @@ struct AnimateFloatTestFunctor
   float mEnd;
 };
 
+struct AnimateIntegerTestFunctor
+{
+  AnimateIntegerTestFunctor( int start, int end )
+  : mStart( start ),
+    mEnd( end )
+  {
+  }
+
+  int operator()( float alpha, const int& current )
+  {
+    return static_cast<int>( mStart + ((mEnd - mStart) * alpha ) + 0.5f );
+  }
+
+  int mStart;
+  int mEnd;
+};
+
 struct AnimateVector2TestFunctor
 {
   AnimateVector2TestFunctor( Vector2 start, Vector2 end )
@@ -1776,6 +1793,236 @@ int UtcDaliAnimationAnimateByFloatAlphaFunctionTimePeriod(void)
   END_TEST;
 }
 
+int UtcDaliAnimationAnimateByInteger(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(1);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(2.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetValue(50);
+  int relativeValue(targetValue - startValue);
+  animation.AnimateBy(Property(actor, index), relativeValue);
+
+  int ninetyFivePercentProgress(static_cast<int>(startValue + relativeValue*0.95f + 0.5f));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*950.0f)/* 95% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), ninetyFivePercentProgress, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*50.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByIntegerAlphaFunction(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(1);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetValue(90);
+  int relativeValue(targetValue - startValue);
+  animation.AnimateBy(Property(actor, index), relativeValue, AlphaFunctions::EaseOut);
+
+  int ninetyFivePercentProgress(static_cast<int>(startValue + relativeValue*0.95f + 0.5f));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*950.0f)/* 95% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  // The position should have moved more, than with a linear alpha function
+  int current(actor.GetProperty<int>(index));
+  DALI_TEST_CHECK( current > ninetyFivePercentProgress );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*50.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByIntegerTimePeriod(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(10);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetValue(30);
+  int relativeValue(targetValue - startValue);
+  float delay = 0.5f;
+  animation.AnimateBy(Property(actor, index),
+                      relativeValue,
+                      TimePeriod(delay, durationSeconds - delay));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*500.0f)/* 50% animation progress, 0% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% animation progress, 50% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), static_cast<int>(startValue+(relativeValue*0.5f)+0.5f), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateByIntegerAlphaFunctionTimePeriod(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(10);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetValue(30);
+  int relativeValue(targetValue - startValue);
+  float delay = 0.5f;
+  animation.AnimateBy(Property(actor, index),
+                      relativeValue,
+                      AlphaFunctions::Linear,
+                      TimePeriod(delay, durationSeconds - delay));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*500.0f)/* 50% animation progress, 0% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% animation progress, 50% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), static_cast<int>(startValue+(relativeValue*0.5f)+0.5f), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliAnimationAnimateByVector2(void)
 {
   TestApplication application;
@@ -3184,6 +3431,212 @@ int UtcDaliAnimationAnimateToFloatAlphaFunctionTimePeriod(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToInteger(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(10);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(2.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetValue(50);
+  int relativeValue(targetValue - startValue);
+  animation.AnimateTo(Property(actor, "test-property"), targetValue);
+
+  int ninetyFivePercentProgress(static_cast<int>(startValue + relativeValue*0.95f + 0.5f));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*950.0f)/* 95% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), ninetyFivePercentProgress, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*50.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToIntegerAlphaFunction(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(10);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetValue(90);
+  int relativeValue(targetValue - startValue);
+  animation.AnimateTo(Property(actor, index), targetValue, AlphaFunctions::EaseOut);
+
+  int ninetyFivePercentProgress(static_cast<int>(startValue + relativeValue*0.95f + 0.5f));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*950.0f)/* 95% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+  // The position should have moved more, than with a linear alpha function
+  int current(actor.GetProperty<int>(index));
+  DALI_TEST_CHECK( current > ninetyFivePercentProgress );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*50.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToIntegerTimePeriod(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(10);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetValue(30);
+  int relativeValue(targetValue - startValue);
+  float delay = 0.5f;
+  animation.AnimateTo(Property(actor, index),
+                      targetValue,
+                      TimePeriod(delay, durationSeconds - delay));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*500.0f)/* 50% animation progress, 0% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% animation progress, 50% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), static_cast<int>(startValue+(relativeValue*0.5f)+0.5f), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateToIntegerAlphaFunctionTimePeriod(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register an integer property
+  int startValue(10);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetValue(30);
+  int relativeValue(targetValue - startValue);
+  float delay = 0.5f;
+  animation.AnimateTo(Property(actor, index),
+                      targetValue,
+                      AlphaFunctions::Linear,
+                      TimePeriod(delay, durationSeconds - delay));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*500.0f)/* 50% animation progress, 0% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% animation progress, 50% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), static_cast<int>(startValue+(relativeValue*0.5f)+0.5f), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -8364,6 +8817,66 @@ int UtcDaliAnimationAnimateFloat(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetProperty<float>(index), targetPosition, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliAnimationAnimateInteger(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Register an integer property
+  int startValue(10);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float durationSeconds(10.0f);
+  Animation animation = Animation::New(durationSeconds);
+  int targetPosition(0);
+  AnimateIntegerTestFunctor func( 100, targetPosition );
+  animation.Animate<int>( Property(actor, index), func );
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), 75, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), 50, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), 25, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<int>(index), targetPosition, TEST_LOCATION );
   END_TEST;
 }
 

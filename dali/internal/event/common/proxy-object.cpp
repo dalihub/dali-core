@@ -424,6 +424,15 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
           break;
         }
 
+        case Property::INTEGER:
+        {
+          AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry->second.GetSceneGraphProperty() );
+          DALI_ASSERT_DEBUG( NULL != property );
+
+          value = (*property)[ bufferIndex ];
+          break;
+        }
+
         case Property::VECTOR2:
         {
           AnimatableProperty<Vector2>* property = dynamic_cast< AnimatableProperty<Vector2>* >( entry->second.GetSceneGraphProperty() );
@@ -537,6 +546,12 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
     case Property::FLOAT:
     {
       newProperty.reset(new AnimatableProperty<float>( propertyValue.Get<float>()));
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      newProperty.reset(new AnimatableProperty<int>( propertyValue.Get<int>()));
       break;
     }
 
@@ -808,6 +823,16 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       // property is being used in a separate thread; queue a message to set the property
       BakeMessage<float>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<float>() );
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<int>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<int>() );
       break;
     }
 

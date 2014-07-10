@@ -39,6 +39,7 @@ namespace Internal
  */
 static const bool DUMMY_BOOLEAN_VALUE( false );
 static const float DUMMY_FLOAT_VALUE( 0.0f );
+static const int DUMMY_INTEGER_VALUE( 0 );
 static const Vector2 DUMMY_VECTOR2_VALUE( 0.0f, 0.0f );
 static const Vector3 DUMMY_VECTOR3_VALUE( 0.0f, 0.0f, 0.0f );
 static const Vector4 DUMMY_VECTOR4_VALUE( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -101,6 +102,18 @@ public:
   {
     DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
     return DUMMY_FLOAT_VALUE;
+  }
+
+  /**
+   * Retrieve an integer value.
+   * @pre GetType() returns Property::INTEGER.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The integer value.
+   */
+  virtual const int& GetInteger( BufferIndex bufferIndex ) const
+  {
+    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
+    return DUMMY_INTEGER_VALUE;
   }
 
   /**
@@ -204,6 +217,19 @@ public:
   }
 
   /**
+   * Retrieve an integer input for a constraint function.
+   * @note For inherited properties, this method should be overriden to return the value
+   * from the previous frame i.e. not from the current update buffer.
+   * @pre GetType() returns Property::INTEGER.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @return The integer value.
+   */
+  virtual const int& GetConstraintInputInteger( BufferIndex updateBufferIndex ) const
+  {
+    return GetInteger( updateBufferIndex );
+  }
+
+  /**
    * Retrieve a Vector2 input for a constraint function.
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
@@ -299,6 +325,12 @@ public:
       case Property::FLOAT:
       {
         debugStream << GetFloat( bufferIndex );
+        break;
+      }
+
+      case Property::INTEGER:
+      {
+        debugStream << GetInteger( bufferIndex );
         break;
       }
 

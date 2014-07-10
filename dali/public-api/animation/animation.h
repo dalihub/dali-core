@@ -45,6 +45,7 @@ struct Vector4;
 
 typedef boost::function<bool       (float alpha, const bool& current)>       AnimatorFunctionBool;      ///< Animator function signature for boolean properties.
 typedef boost::function<float      (float alpha, const float& current)>      AnimatorFunctionFloat;     ///< Animator function signature for float properties.
+typedef boost::function<int        (float alpha, const int& current)>        AnimatorFunctionInteger;   ///< Animator function signature for integer properties.
 typedef boost::function<Vector2    (float alpha, const Vector2& current)>    AnimatorFunctionVector2;   ///< Animator function signature for Vector2 properties.
 typedef boost::function<Vector3    (float alpha, const Vector3& current)>    AnimatorFunctionVector3;   ///< Animator function signature for Vector3 properties.
 typedef boost::function<Vector4    (float alpha, const Vector4& current)>    AnimatorFunctionVector4;   ///< Animator function signature for Vector4 properties.

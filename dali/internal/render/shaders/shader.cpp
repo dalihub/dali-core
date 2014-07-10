@@ -357,6 +357,11 @@ void Shader::SetUniforms( Context& context,
             program.SetUniform1f( loc, property.GetFloat( bufferIndex ) );
             break;
           }
+          case Property::INTEGER :
+          {
+            program.SetUniform1i( loc, property.GetInteger( bufferIndex ) );
+            break;
+          }
           case Property::VECTOR2 :
           {
             Vector2 value( property.GetVector2( bufferIndex ) );

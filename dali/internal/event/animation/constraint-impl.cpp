@@ -151,6 +151,17 @@ Constraint::Constraint( Property::Index targetIndex,
       break;
     }
 
+    case Property::INTEGER:
+    {
+      PropertyConstraintPtr<int>::Type funcPtr( CreatePropertyConstraint<int>( func, sources.size() ) );
+
+      mActiveConstraintTemplate = ActiveConstraint<int>::New( targetIndex,
+                                                              sources,
+                                                              funcPtr,
+                                                              AnyCast< IntegerInterpolator >( interpolator ) );
+      break;
+    }
+
     case Property::VECTOR2:
     {
       PropertyConstraintPtr<Vector2>::Type funcPtr( CreatePropertyConstraint<Vector2>( func, sources.size() ) );

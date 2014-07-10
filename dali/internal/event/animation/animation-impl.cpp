@@ -310,6 +310,17 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
       break;
     }
 
+    case Property::INTEGER:
+    {
+      AddAnimatorConnector( AnimatorConnector<int>::New( proxy,
+                                                         target.propertyIndex,
+                                                         target.componentIndex,
+                                                         AnimateByInteger(relativeValue.Get<int>()),
+                                                         alpha,
+                                                         period ) );
+      break;
+    }
+
     case Property::VECTOR2:
     {
       AddAnimatorConnector( AnimatorConnector<Vector2>::New( proxy,
@@ -422,6 +433,17 @@ void Animation::AnimateTo(ProxyObject& targetObject, Property::Index targetPrope
       break;
     }
 
+    case Property::INTEGER:
+    {
+      AddAnimatorConnector( AnimatorConnector<int>::New(targetObject,
+                                                        targetPropertyIndex,
+                                                        componentIndex,
+                                                        AnimateToInteger(destinationValue.Get<int>()),
+                                                        alpha,
+                                                        period) );
+      break;
+    }
+
     case Property::VECTOR2:
     {
       AddAnimatorConnector( AnimatorConnector<Vector2>::New(targetObject,
@@ -517,6 +539,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
                                                           period ) );
       break;
     }
+
     case Dali::Property::FLOAT:
     {
       const KeyFrameNumber* kf;
@@ -528,6 +551,20 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
                                                            KeyFrameNumberFunctor(kfCopy),
                                                            alpha,
                                                            period ) );
+      break;
+    }
+
+    case Dali::Property::INTEGER:
+    {
+      const KeyFrameInteger* kf;
+      GetSpecialization(keyFrames, kf);
+      KeyFrameIntegerPtr kfCopy = KeyFrameInteger::Clone(*kf);
+      AddAnimatorConnector( AnimatorConnector<int>::New( proxy,
+                                                         target.propertyIndex,
+                                                         target.componentIndex,
+                                                         KeyFrameIntegerFunctor(kfCopy),
+                                                         alpha,
+                                                         period ) );
       break;
     }
 
@@ -644,6 +681,17 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
                                                           AnyCast< AnimatorFunctionFloat >( func ),
                                                           alpha,
                                                           period) );
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      AddAnimatorConnector( AnimatorConnector<int>::New(proxy,
+                                                        target.propertyIndex,
+                                                        target.componentIndex,
+                                                        AnyCast< AnimatorFunctionInteger >( func ),
+                                                        alpha,
+                                                        period) );
       break;
     }
 

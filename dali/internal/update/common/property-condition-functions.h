@@ -81,6 +81,14 @@ private:
   static bool EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
 
   /**
+   * Checks if integer is LessThan
+   * @param[in] value The value being examined.
+   * @param[in] arg The supplied arguments for the condition.
+   * @return Condition result (true if condition met, false if not)
+   */
+  static bool EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+
+  /**
    * Checks if Vector2.Length() is LessThan
    * @param[in] value The value being examined.
    * @param[in] arg The supplied arguments for the condition.
@@ -155,6 +163,14 @@ private:
    * @return Condition result (true if condition met, false if not)
    */
   static bool EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+
+  /**
+   * Checks if integer is GreaterThan
+   * @param[in] value The value being examined.
+   * @param[in] arg The supplied arguments for the condition.
+   * @return Condition result (true if condition met, false if not)
+   */
+  static bool EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
 
   /**
    * Checks if Vector2.Length() is GreaterThan
@@ -233,6 +249,14 @@ private:
   static bool EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
 
   /**
+   * Checks if integer is Inside
+   * @param[in] value The value being examined.
+   * @param[in] arg The supplied arguments for the condition.
+   * @return Condition result (true if condition met, false if not)
+   */
+  static bool EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+
+  /**
    * Checks if Vector2.Length() is Inside
    * @param[in] value The value being examined.
    * @param[in] arg The supplied arguments for the condition.
@@ -307,6 +331,14 @@ private:
    * @return Condition result (true if condition met, false if not)
    */
   static bool EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
+
+  /**
+   * Checks if integer is Outside
+   * @param[in] value The value being examined.
+   * @param[in] arg The supplied arguments for the condition.
+   * @return Condition result (true if condition met, false if not)
+   */
+  static bool EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg );
 
   /**
    * Checks if Vector2.Length() is Outside

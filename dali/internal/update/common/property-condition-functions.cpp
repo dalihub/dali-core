@@ -49,6 +49,11 @@ ConditionFunction LessThan::GetFunction(Property::Type valueType)
       function = LessThan::EvalFloat;
       break;
     }
+    case Property::INTEGER:
+    {
+      function = LessThan::EvalInteger;
+      break;
+    }
     case Property::VECTOR2:
     {
       function = LessThan::EvalVector2;
@@ -84,6 +89,12 @@ bool LessThan::EvalFloat( const Dali::PropertyInput& value, PropertyNotification
 {
   const float arg0 = arg[0];
   return (value.GetFloat() < arg0);
+}
+
+bool LessThan::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+{
+  const int arg0 = arg[0];
+  return (value.GetInteger() < arg0);
 }
 
 bool LessThan::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
@@ -127,6 +138,11 @@ ConditionFunction GreaterThan::GetFunction(Property::Type valueType)
       function = GreaterThan::EvalFloat;
       break;
     }
+    case Property::INTEGER:
+    {
+      function = GreaterThan::EvalInteger;
+      break;
+    }
     case Property::VECTOR2:
     {
       function = GreaterThan::EvalVector2;
@@ -162,6 +178,12 @@ bool GreaterThan::EvalFloat( const Dali::PropertyInput& value, PropertyNotificat
 {
   const float arg0 = arg[0];
   return (value.GetFloat() > arg0);
+}
+
+bool GreaterThan::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+{
+  const int arg0 = arg[0];
+  return (value.GetInteger() > arg0);
 }
 
 bool GreaterThan::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
@@ -205,6 +227,11 @@ ConditionFunction Inside::GetFunction(Property::Type valueType)
       function = Inside::EvalFloat;
       break;
     }
+    case Property::INTEGER:
+    {
+      function = Inside::EvalInteger;
+      break;
+    }
     case Property::VECTOR2:
     {
       function = Inside::EvalVector2;
@@ -240,6 +267,12 @@ bool Inside::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::
 {
   const float valueFloat = value.GetFloat();
   return ( (valueFloat > arg[0]) && (valueFloat < arg[1]) );
+}
+
+bool Inside::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+{
+  const int valueInteger = value.GetInteger();
+  return ( (valueInteger > arg[0]) && (valueInteger < arg[1]) );
 }
 
 bool Inside::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
@@ -283,6 +316,11 @@ ConditionFunction Outside::GetFunction(Property::Type valueType)
       function = Outside::EvalFloat;
       break;
     }
+    case Property::INTEGER:
+    {
+      function = Outside::EvalInteger;
+      break;
+    }
     case Property::VECTOR2:
     {
       function = Outside::EvalVector2;
@@ -318,6 +356,12 @@ bool Outside::EvalFloat( const Dali::PropertyInput& value, PropertyNotification:
 {
   const float valueFloat = value.GetFloat();
   return ( (valueFloat < arg[0]) || (valueFloat > arg[1]) );
+}
+
+bool Outside::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+{
+  const int valueInterger = value.GetInteger();
+  return ( (valueInterger < arg[0]) || (valueInterger > arg[1]) );
 }
 
 bool Outside::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )

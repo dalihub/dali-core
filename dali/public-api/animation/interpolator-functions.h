@@ -53,6 +53,16 @@ bool LerpBoolean( const bool& current, const bool& target, float progress );
 float LerpFloat( const float& current, const float& target, float progress );
 
 /**
+ * @brief Interpolate linearly between two integer values.
+ *
+ * @param [in] current The current value.
+ * @param [in] target The target value.
+ * @param [in] progress The current progress (between 0 & 1).
+ * @return The interpolated value.
+ */
+int LerpInteger( const int& current, const int& target, float progress );
+
+/**
  * @brief Interpolate linearly between two Vector2 values.
  *
  * @param [in] current The current value.
@@ -111,6 +121,16 @@ typedef boost::function<bool (const bool& start, const bool& target, float progr
  * @return The interpolated value.
  */
 typedef boost::function<float (const float& start, const float& target, float progress)> FloatInterpolator;
+
+/**
+ * @brief A function which interpolates between a start and target value.
+ *
+ * @param[in] start The start value.
+ * @param[in] target The target value.
+ * @param[in] progress The current progress (between 0 and 1).
+ * @return The interpolated value.
+ */
+typedef boost::function<int (const int& start, const int& target, float progress)> IntegerInterpolator;
 
 /**
  * @brief A function which interpolates between a start and target value.
