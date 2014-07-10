@@ -1,0 +1,4 @@
+*.xml
+build
+build.log
+tct*core.h
