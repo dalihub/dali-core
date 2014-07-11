@@ -806,6 +806,67 @@ int UtcDaliTextStyleCopy(void)
   END_TEST;
 }
 
+int UtcDaliTextStyleMerge(void)
+{
+  tet_infoline(" UtcDaliTextStyleMerge ");
+
+  TestApplication application;
+
+  TextStyle defaultStyle;
+
+  TextStyle style;
+
+  // Set a style different than default.
+  TextStyle style2;
+  style2.SetFontName( FONT_FAMILY );
+  style2.SetFontStyle( FONT_STYLE );
+  style2.SetFontPointSize( FONT_POINT_SIZE );
+  style2.SetTextColor( TEXT_COLOR );
+
+  style2.SetWeight( TEXT_WEIGHT );
+  style2.SetSmoothEdge( SMOOTH_EDGE );
+
+  style2.SetItalics( ITALICS, ITALICS_ANGLE );
+  style2.SetUnderline( UNDERLINE, UNDERLINE_THICKNESS, UNDERLINE_POSITION );
+  style2.SetShadow( SHADOW, SHADOW_COLOR, SHADOW_OFFSET, SHADOW_SIZE );
+  style2.SetGlow( GLOW, GLOW_COLOR, GLOW_INTENSITY );
+  style2.SetOutline( OUTLINE, OUTLINE_COLOR, OUTLINE_THICKNESS );
+  style2.SetGradient( GRADIENT, GRADIENT_COLOR, GRADIENT_START_POINT, GRADIENT_END_POINT );
+
+  // Test not to merge the same object. To increase coverage.
+
+  const TextStyle& same( style2 );
+
+  style2.Merge( same );
+
+  DALI_TEST_CHECK( same == style2 );
+
+  // Test merge two styles
+
+  style.Merge( style2 );
+
+  DALI_TEST_CHECK( style == style2 );
+
+  // Test merge a default style
+
+  style.Merge( defaultStyle );
+
+  DALI_TEST_CHECK( style == style2 );
+
+  // Tests to increase branch coverage.
+
+  style = defaultStyle;
+  style.SetFontName( FONT_FAMILY );
+
+  TextStyle style3;
+  style3.Merge( style );
+
+  DALI_TEST_CHECK( style == style3 );
+
+
+  END_TEST;
+}
+
 int UtcDaliTextStyleReset(void)
 {
   tet_infoline(" UtcDaliTextStyleReset ");

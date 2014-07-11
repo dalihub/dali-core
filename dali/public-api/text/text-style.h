@@ -147,6 +147,14 @@ public:
   void Copy( const TextStyle& textStyle, Mask mask = ALL );
 
   /**
+   * @brief Copies from the given text style those parameters specified in the given mask which are not default.
+   *
+   * @param[in] textStyle The given text style.
+   * @param[in] mask Specifies which text style parameters are going to be copied. By default all parateres are copied.
+   */
+  void Merge( const TextStyle& textStyle, Mask mask = ALL );
+
+  /**
    * @brief Resets to default the text style parameters specified in the mask.
    *
    * @param[in] mask Specifies which text style parameters are going to be reset. By default all parateres are reset.
