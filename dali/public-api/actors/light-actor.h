@@ -43,7 +43,7 @@ public:
 
   // Default Properties additional to Actor
   static const Property::Index LIGHT_TYPE;                           ///< name "light-type",       type STRING
-  static const Property::Index ENABLE;                               ///< name "enable",           type VECTOR2
+  static const Property::Index ENABLE;                               ///< name "enable",           type BOOLEAN
   static const Property::Index FALL_OFF;                             ///< name "fall-off",         type VECTOR2
   static const Property::Index SPOT_ANGLE;                           ///< name "spot-angle",       type VECTOR2
   static const Property::Index AMBIENT_COLOR;                        ///< name "ambient-color",    type VECTOR3
