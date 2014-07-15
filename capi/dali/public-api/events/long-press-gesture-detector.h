@@ -49,7 +49,7 @@ struct LongPressGesture;
  * @code
  * LongPressGestureDetector detector = LongPressGestureDetector::New();
  * detector.Attach(myActor);
- * detector.SignalDetected().Connect(this, &MyApplication::OnLongPress);
+ * detector.DetectedSignal().Connect(this, &MyApplication::OnLongPress);
  * @endcode
  *
  * @see LongPressGesture

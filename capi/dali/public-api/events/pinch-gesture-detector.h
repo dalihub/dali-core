@@ -48,7 +48,7 @@ struct PinchGesture;
  * @code
  * PinchGestureDetector detector = PinchGestureDetector::New();
  * detector.Attach(myActor);
- * detector.SignalDetected().Connect(this, &MyApplication::OnPinch);
+ * detector.DetectedSignal().Connect(this, &MyApplication::OnPinch);
  * @endcode
  *
  * @see PinchGesture

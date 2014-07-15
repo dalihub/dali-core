@@ -50,7 +50,7 @@ struct TapGesture;
  * @code
  * TapGestureDetector detector = TapGestureDetector::New();
  * detector.Attach(myActor);
- * detector.SignalDetected().Connect(this, &MyApplication::OnTap);
+ * detector.DetectedSignal().Connect(this, &MyApplication::OnTap);
  * @endcode
  *
  * @see TapGesture

@@ -132,7 +132,7 @@ void PinchGestureProcessor::Process( const Integration::PinchGestureEvent& pinch
         // Record the current render-task for Screen->Actor coordinate conversions
         mCurrentRenderTask = hitTestResults.renderTask;
 
-        // Set mCurrentPanEvent to use inside overridden methods called from ProcessAndEmit()
+        // Set mCurrentPinchEvent to use inside overridden methods called from ProcessAndEmit()
         mCurrentPinchEvent = &pinchEvent;
         ProcessAndEmit( hitTestResults );
         mCurrentPinchEvent = NULL;

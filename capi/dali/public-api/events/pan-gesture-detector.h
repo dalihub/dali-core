@@ -48,7 +48,7 @@ struct PanGesture;
  * @code
  * PanGestureDetector detector = PanGestureDetector::New();
  * detector.Attach(myActor);
- * detector.SignalDetected().Connect(this, &MyApplication::OnPan);
+ * detector.DetectedSignal().Connect(this, &MyApplication::OnPan);
  *
  * // Detect pan gesture for single and double touch.
  * detector.SetMaximumTouchesRequired(2);

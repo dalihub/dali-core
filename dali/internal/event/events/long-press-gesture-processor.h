@@ -42,11 +42,8 @@ class Stage;
  * Long Press Gesture Event Processing:
  *
  * When we receive a long press gesture event, we do the following:
- * - Determine the hit actor underneath the long press gesture event.
- * - Determine whether this actor is attached to any of the detectors or is a child of an actor
- *   attached to one of the detectors.
- * - Ensure the touches in the long press event match the requirements of the detector.
- * - Emit the gesture when all the above conditions are met.
+ * - Find the actor that requires a long-press at the long press position.
+ * - Emit the gesture if the event satisfies the detector conditions.
  */
 class LongPressGestureProcessor : public GestureProcessor
 {

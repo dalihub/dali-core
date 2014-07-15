@@ -46,11 +46,9 @@ class PanGesture;
 /**
  * Pan Gesture Event Processing:
  *
- * When we receive a pinch gesture event, we do the following:
- * - Determine the hot actor underneath the current position of the pan gesture event.
- * - Determine whether this actor is, or is a child of, the actor(s) attached to any of the
- *   detectors.
- * - Emit the gesture when all the above conditions are met.
+ * When we receive a pan gesture event, we do the following:
+ * - Find the actor that requires a pan where the pan started from (i.e. the down position).
+ * - Emit the gesture if the event satisfies the detector conditions.
  *
  * The above is only checked when our gesture starts.  We continue sending the pan gesture to the
  * same actor and detector until the pan ends or is cancelled.
@@ -74,7 +72,7 @@ public:
 public: // To be called by GestureEventProcessor
 
   /**
-   * This method is called whenever a pinch gesture event occurs.
+   * This method is called whenever a pan gesture event occurs.
    * @param[in] panEvent The event that has occurred.
    */
   void Process( const Integration::PanGestureEvent& panEvent );

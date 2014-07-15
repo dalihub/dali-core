@@ -42,11 +42,8 @@ class Actor;
  * Tap Gesture Event Processing:
  *
  * When we receive a tap gesture event, we do the following:
- * - Determine the hit actor underneath the tap gesture event.
- * - Determine whether this actor is attached to any of the detectors or is a child of an actor
- *   attached to one of the detectors.
- * - Ensure the taps and the touches in the tap event match the requirements of the detector.
- * - Emit the gesture when all the above conditions are met.
+ * - Find the actor that requires a tap where the tap occurred.
+ * - Emit the gesture if the tap gesture event satisfies the detector conditions.
  */
 class TapGestureProcessor : public GestureProcessor
 {
@@ -143,4 +140,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H__
+#endif // __DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H__

@@ -42,9 +42,8 @@ class Stage;
  * Pinch Gesture Event Processing:
  *
  * When we receive a pinch gesture event, we do the following:
- * - Determine the hit actor underneath the center of the pinch gesture event.
- * - Determine whether this actor is, or is a child of, the actor attached to any of the detectors.
- * - Emit the gesture when all the above conditions are met.
+ * - Find the hit actor that requires a pinch underneath the center-point of the pinch.
+ * - Emit the gesture if the event satisfies the detector conditions.
  *
  * The above is only checked when our gesture starts. We continue sending the pinch gesture to this
  * detector until the pinch ends or is cancelled.
