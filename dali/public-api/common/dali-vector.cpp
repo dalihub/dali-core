@@ -120,12 +120,16 @@ void VectorBase::Swap( VectorBase& vector )
 
 void VectorBase::Erase( char* address, SizeType elementSize )
 {
-  char* startAddress = address + elementSize;
-  const char* endAddress = reinterpret_cast< char* >( mData ) + Count() * elementSize;
-  SizeType numberOfBytes = endAddress - startAddress;
-  // addresses overlap so use memmove
-  memmove( address, startAddress, numberOfBytes );
-  SetCount( Count() - 1 );
+  // erase can be called on an unallocated vector
+  if( mData )
+  {
+    char* startAddress = address + elementSize;
+    const char* endAddress = reinterpret_cast< char* >( mData ) + Count() * elementSize;
+    SizeType numberOfBytes = endAddress - startAddress;
+    // addresses overlap so use memmove
+    memmove( address, startAddress, numberOfBytes );
+    SetCount( Count() - 1 );
+  }
 }
 
 } // namespace Dali
