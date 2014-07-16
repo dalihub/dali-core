@@ -32,7 +32,6 @@
 #include <dali/internal/event/dynamics/dynamics-collision-impl.h>
 #include <dali/internal/event/dynamics/dynamics-joint-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-body.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
 
@@ -77,32 +76,12 @@ DynamicsWorld::DynamicsWorld(const std::string& name)
 
 void DynamicsWorld::Initialize(Stage& stage, Integration::DynamicsFactory& dynamicsFactory, DynamicsWorldConfigPtr config)
 {
-  // Create shader for debug drawing
-  const std::string debugDrawVertexShader(
-      "attribute lowp vec4 aColor;\n"
-      "varying mediump vec4 vColor;\n"
-      "void main()\n"
-      "{\n"
-      "  vColor = aColor;\n"
-      "  gl_Position = uMvpMatrix * vec4(aPosition, 1.0);\n"
-      "}\n" );
-
-  const std::string debugDrawFragmentShader(
-      "varying mediump vec4 vColor;\n"
-      "void main()\n"
-      "{\n"
-      "  gl_FragColor = vColor;\n"
-      "}\n" );
-
-  mDebugShader = ShaderEffect::New(debugDrawVertexShader, debugDrawFragmentShader, GEOMETRY_TYPE_IMAGE, Dali::ShaderEffect::HINT_NONE);
-
   mDynamicsWorld = new SceneGraph::DynamicsWorld( stage.GetDynamicsNotifier(),
                                                   stage.GetNotificationManager(),
                                                   dynamicsFactory );
 
   Integration::DynamicsWorldSettings* worldSettings( new Integration::DynamicsWorldSettings(*config->GetSettings()) );
-  const SceneGraph::Shader* shader( static_cast< const SceneGraph::Shader* >(mDebugShader->GetSceneObject()) );
-  InitializeDynamicsWorldMessage( stage.GetUpdateManager(), mDynamicsWorld, worldSettings, shader );
+  InitializeDynamicsWorldMessage( stage.GetUpdateManager(), mDynamicsWorld, worldSettings );
 
   mGravity = config->GetGravity();
 }
@@ -174,8 +153,6 @@ void DynamicsWorld::SetDebugDrawMode(const int mode)
   if( mDebugMode != mode )
   {
     mDebugMode = mode;
-
-    SetDebugDrawModeMessage( Stage::GetCurrent()->GetUpdateInterface(), *mDynamicsWorld, mDebugMode );
   }
 }
 

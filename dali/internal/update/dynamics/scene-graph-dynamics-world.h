@@ -37,7 +37,6 @@ namespace Integration
 {
 
 struct DynamicsCollisionData;
-class  DynamicsDebugRenderer;
 class  DynamicsFactory;
 class  DynamicsWorld;
 struct DynamicsWorldSettings;
@@ -61,8 +60,6 @@ struct DynamicsCollisionData;
 class DynamicsBody;
 class DynamicsJoint;
 class DynamicsShape;
-class DynamicsWorldDebug;
-class DynamicsDebugRenderer;
 class SceneController;
 
 class DynamicsWorld
@@ -89,7 +86,7 @@ public:
    * @param[in] sceneController Allows access to the render message queue
    * @param[in] worldSettings   The configuration for the new DynamicsWorld
    */
-  void Initialize(SceneController* sceneController, Integration::DynamicsWorldSettings* worldSettings, const Shader* debugShader, const SceneGraphBuffers* buffers);
+  void Initialize(SceneController* sceneController, Integration::DynamicsWorldSettings* worldSettings, const SceneGraphBuffers* buffers);
 
   void AddBody(DynamicsBody& body);
   void RemoveBody(DynamicsBody& body);
@@ -105,15 +102,12 @@ public:
   /// @copydoc Dali::DynamicsWorld::SetGravity
   void SetGravity( const Vector3& gravity );
 
-  /// @copydoc Dali::DynamicsWorld::SetDebugDrawMode
-  void SetDebugDrawMode( int mode );
-
   /**
    * Step the simulation and check for collisions
    * @param[in] elapsedSeconds Time in seconds since last invocation
    * @return true if any body was translated or rotated
    */
-  bool Update( const float elapsedSeconds );
+  bool Update( float elapsedSeconds );
 
   /**
    * Update the simulation positions from the corresponding node position
@@ -125,11 +119,6 @@ public:
    * @return true if any body was translated or rotated
    */
   bool PostSimulationStep();
-
-  /**
-   * Allow dynamics engine to do its debug drawing
-   */
-  void DebugDraw();
 
   /**
    * Check for collisions between simulation objects
@@ -172,14 +161,6 @@ public:
    */
   Integration::DynamicsWorld& GetDynamicsWorld();
 
-public: // debug drawing
-
-  // Send projection and view matrices to the debug renderer
-  void UpdateMatrices( const Matrix& projectionMatrix, const Matrix& viewMatrix );
-
-  // Get the debug renderer
-  DynamicsDebugRenderer& GetDebugRenderer() const;
-
 private:
 
   // unimplemented copy constructor and assignment operator
@@ -207,7 +188,6 @@ private:
   NotificationManager&      mNotificationManager;
 
   Node*                     mNode;
-  DynamicsDebugRenderer*    mRenderer;
   SceneController*          mSceneController;
   const SceneGraphBuffers*  mBuffers;
 
@@ -229,17 +209,6 @@ inline void SetGravityMessage( EventToUpdate& eventToUpdate, const DynamicsWorld
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &world, &DynamicsWorld::SetGravity, gravity );
-}
-
-inline void SetDebugDrawModeMessage( EventToUpdate& eventToUpdate, const DynamicsWorld& world, int mode )
-{
-  typedef MessageValue1< DynamicsWorld, int > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &world, &DynamicsWorld::SetDebugDrawMode, mode );
 }
 
 inline void SetRootActorMessage( EventToUpdate& eventToUpdate, const DynamicsWorld& world, const Node* node )

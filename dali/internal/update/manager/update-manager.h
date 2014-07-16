@@ -394,7 +394,7 @@ public:
    * @param[in] worldSettings The dynamics world settings
    * @param[in] debugShader The shader used for rendering dynamics debug information
    */
-  void InitializeDynamicsWorld( DynamicsWorld* world, Integration::DynamicsWorldSettings* worldSettings, Shader* debugShader );
+  void InitializeDynamicsWorld( DynamicsWorld* world, Integration::DynamicsWorldSettings* worldSettings );
 
   /**
    * Terminate the dynamics world
@@ -850,15 +850,15 @@ inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
 #ifdef DYNAMICS_SUPPORT
 
 // Dynamics messages
-inline void InitializeDynamicsWorldMessage(UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings, const Shader* debugShader)
+inline void InitializeDynamicsWorldMessage( UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings )
 {
-  typedef MessageValue3< UpdateManager, DynamicsWorld*, Integration::DynamicsWorldSettings*, Shader*> LocalType;
+  typedef MessageValue2< UpdateManager, DynamicsWorld*, Integration::DynamicsWorldSettings* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::InitializeDynamicsWorld, dynamicsworld, worldSettings, const_cast<Shader*>(debugShader) );
+  new (slot) LocalType( &manager, &UpdateManager::InitializeDynamicsWorld, dynamicsworld, worldSettings );
 }
 
 inline void TerminateDynamicsWorldMessage(UpdateManager& manager)

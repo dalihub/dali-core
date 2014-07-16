@@ -38,10 +38,6 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/render/dynamics/scene-graph-dynamics-debug-renderer.h>
-#endif
-
 // Uncomment the next line to enable frame snapshot logging
 //#define FRAME_SNAPSHOT_LOGGING
 
@@ -155,10 +151,6 @@ struct RenderManager::Impl
   float                               frameTime;                     ///< The elapsed time since the previous frame
   float                               lastFrameTime;                 ///< Last frame delta.
 
-#ifdef DYNAMICS_SUPPORT
-  OwnerPointer<DynamicsDebugRenderer> dynamicsDebugRenderer;
-#endif
-
   unsigned int                        frameCount;          ///< The current frame count
   BufferIndex                         renderBufferIndex;   ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
@@ -250,17 +242,6 @@ void RenderManager::SetFrameDeltaTime( float deltaTime )
 {
   mImpl->frameTime = deltaTime;
 }
-
-#ifdef DYNAMICS_SUPPORT
-void RenderManager::InitializeDynamicsDebugRenderer(SceneGraph::DynamicsDebugRenderer* debugRenderer)
-{
-  if( !mImpl->dynamicsDebugRenderer )
-  {
-    mImpl->dynamicsDebugRenderer = debugRenderer;
-    debugRenderer->Initialize( mImpl->context );
-  }
-}
-#endif
 
 void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 {
@@ -401,13 +382,6 @@ bool RenderManager::Render( Integration::RenderStatus& status )
         status.SetHasRendered( true );
       }
     }
-
-#ifdef DYNAMICS_SUPPORT
-    if( mImpl->dynamicsDebugRenderer )
-    {
-      mImpl->dynamicsDebugRenderer->Render();
-    }
-#endif
 
     GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
     mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);

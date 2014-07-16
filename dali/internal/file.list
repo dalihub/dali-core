@@ -209,7 +209,6 @@ internal_dynamics_src_files = \
   $(internal_src_dir)/event/dynamics/dynamics-sphere-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-world-config-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-world-impl.cpp \
-  $(internal_src_dir)/render/dynamics/scene-graph-dynamics-debug-renderer.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-body.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-capsule-shape.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-cone-shape.cpp \

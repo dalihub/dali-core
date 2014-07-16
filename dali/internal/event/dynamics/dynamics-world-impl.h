@@ -181,8 +181,6 @@ private:
 
   Dali::DynamicsWorld::CollisionSignalV2 mCollisionSignalV2;
 
-  ShaderEffectPtr mDebugShader;
-
   SlotDelegate< DynamicsWorld > mSlotDelegate;
 };
 

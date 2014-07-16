@@ -1120,20 +1120,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
                              mImpl->renderSortingHelper,
                              mImpl->renderInstructions );
       }
-
-#ifdef DYNAMICS_SUPPORT
-      // if dynamics enabled and active...update matrices for debug drawing
-      if( mImpl->dynamicsWorld && mImpl->dynamicsChanged )
-      {
-        RenderTask* task(mImpl->taskList.GetTasks()[0]);
-        if( task )
-        {
-          mImpl->dynamicsWorld->UpdateMatrices( task->GetProjectionMatrix(mSceneGraphBuffers.GetUpdateBufferIndex()),
-                                                task->GetViewMatrix(mSceneGraphBuffers.GetUpdateBufferIndex()) );
-        }
-      }
-#endif // DYNAMICS_SUPPORT
-
     }
   }
 
@@ -1278,18 +1264,10 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
 
 #ifdef DYNAMICS_SUPPORT
 
-void UpdateManager::InitializeDynamicsWorld( SceneGraph::DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings, SceneGraph::Shader* debugShader )
+void UpdateManager::InitializeDynamicsWorld( SceneGraph::DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings )
 {
-  dynamicsWorld->Initialize( mImpl->sceneController, worldSettings, debugShader, &mSceneGraphBuffers );
+  dynamicsWorld->Initialize( mImpl->sceneController, worldSettings, &mSceneGraphBuffers );
   mImpl->dynamicsWorld = dynamicsWorld;
-
-  typedef MessageValue1< RenderManager, DynamicsDebugRenderer* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::InitializeDynamicsDebugRenderer, &dynamicsWorld->GetDebugRenderer() );
 }
 
 void UpdateManager::TerminateDynamicsWorld()
