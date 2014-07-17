@@ -156,12 +156,13 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  *
  *     Hit Priority of above Actor tree (all overlays): 1 - Lowest. 6 - Highest.
  *     @endcode
- *   - Stencil Actors can be used to influence the result of hits within a layer.
+ *   - Stencil Actors can be used to influence the result of hits on renderable actors within a layer.
  *     If a Stencil Actor exists on a layer and that Actor is marked visible then a successful
- *     hit can only take place in the area that the stencil Actor marks as visible.
+ *     hit on a renderable actor can only take place in the area that the stencil Actor marks as visible.
  *     The hit can be in any Stencil Actor in that layer, but must be in the region of one of them.
  *     Stencil Actor inheritance behaves as with rendering in that any child of a Stencil Actor will
  *     also be considered a Stencil Actor.
+ *     Non-renderable actors can be hit regardless of whether a stencil actor is hit or not.
  *
  * <i>Touch Event Delivery:</i>
  *

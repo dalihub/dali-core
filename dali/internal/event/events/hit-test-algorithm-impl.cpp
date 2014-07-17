@@ -390,10 +390,11 @@ bool HitTestRenderTask( LayerList& layers,
               hit = HitTestWithinLayer( *layer, results.rayOrigin, results.rayDirection, false, nearClippingPlane, farClippingPlane, hitCheck, stencilOnLayer, stencilHit, false );
             }
 
-            // If a stencil on this layer hasn't been hit, then discard hit results for this layer
-            if ( stencilOnLayer && !stencilHit )
+            // If a stencil on this layer hasn't been hit, then discard hit results for this layer if our current hit actor is renderable
+            if ( stencilOnLayer && !stencilHit &&
+                 hit.actor && hit.actor->IsRenderable() )
             {
-             hit = previousHit;
+              hit = previousHit;
             }
 
             // If this layer is set to consume the hit, then do not check any layers behind it
