@@ -17,7 +17,6 @@
 
 // HEADER CLASS
 #include <dali/internal/event/text/character-impl.h>
-// INTERNAL INCLUDES
 
 namespace
 {
@@ -247,26 +246,9 @@ namespace Dali
 namespace Internal
 {
 
-Character::Character()
-: mCharacter( 0 )
-{
-}
-
 Character::Character( uint32_t character )
 : mCharacter( character )
 {
-}
-
-Character::Character( const Character& character )
-: mCharacter( character.mCharacter )
-{
-}
-
-Character& Character::operator=( const Character& character )
-{
-  mCharacter = character.mCharacter;
-
-  return *this;
 }
 
 Character::~Character()
@@ -301,13 +283,12 @@ bool Character::IsLeftToRight() const
 
 bool Character::IsWhiteSpace() const
 {
-  // TODO: It should cover unicode characters: http://en.wikipedia.org/wiki/Whitespace_character
-  return mCharacter <= CHAR_WHITE_SPACE;
+  return Character::IsWhiteSpace( mCharacter );
 }
 
 bool Character::IsNewLine() const
 {
-  return mCharacter == CHAR_NEW_LINE;
+  return Character::IsNewLine( mCharacter );
 }
 
 uint32_t Character::GetCharacter() const
@@ -318,6 +299,17 @@ uint32_t Character::GetCharacter() const
 void Character::SetCharacter( uint32_t character )
 {
   mCharacter = character;
+}
+
+bool Character::IsWhiteSpace( uint32_t character )
+{
+  // TODO: It should cover unicode characters: http://en.wikipedia.org/wiki/Whitespace_character
+  return character <= CHAR_WHITE_SPACE;
+}
+
+bool Character::IsNewLine( uint32_t character )
+{
+  return character == CHAR_NEW_LINE;
 }
 
 } // namespace Internal

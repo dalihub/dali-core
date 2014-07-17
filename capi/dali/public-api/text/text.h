@@ -29,6 +29,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/text/character.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -43,6 +44,18 @@ namespace Internal DALI_INTERNAL
  */
 class Text
 {
+
+public:
+
+  /**
+   * @brief Enums special characters used to find their positions inside the text.
+   */
+  enum SpecialCharacter
+  {
+    WHITE_SPACE,
+    NEW_LINE
+  };
+
 public:
 
   /**
@@ -165,6 +178,58 @@ public:
    * @param[in] numberOfCharacters The number of characters to remove.
    */
   void Remove( size_t position, size_t numberOfCharacters );
+
+  /**
+   * @brief Finds all the positions of the given \e character within the \e from, \e to range.
+   *
+   * @param[in] character The character to find.
+   * @param[in] from First position of the range.
+   * @param[in] to Last position of the range.
+   * @param[out] positions Contains all the positions of \e character within the \e from, \e to range.
+   */
+  void Find( const Character& character, std::size_t from, std::size_t to, Vector<std::size_t>& positions ) const;
+
+  /**
+   * @brief Finds all the positions of either white space or new line character within the \e from, \e to range.
+   *
+   * @param[in] character One of white space or new line.
+   * @param[in] from First position of the range.
+   * @param[in] to Last position of the range.
+   * @param[out] positions Contains all the positions of \e character within the \e from, \e to range.
+   *
+   */
+  void Find( SpecialCharacter character, std::size_t from, std::size_t to, Vector<std::size_t>& positions ) const;
+
+  /**
+   * @brief Retrieves a subtext withing the \e from, \e to range.
+   *
+   * If \e to is smaller than \e from, sub-text will be reversed.
+   *
+   * @note \e subText will be untouched if current text is not initialized of the range \e from, \e to is out of bounds.
+   *
+   * @param[in] from First position of the range.
+   * @param[in] to Last position of the range.
+   * @param[out] subText The subtext.
+   */
+  void GetSubText( std::size_t from, std::size_t to, Text& subText ) const;
+
+  /**
+   * @brief Whether the character in the \e index position is a white space.
+   *
+   * @param[in] index position of the character.
+   *
+   * @return \e true if the character pointed by \e index is a white space
+   */
+  bool IsWhiteSpace( std::size_t index ) const;
+
+  /**
+   * @brief Whether the character in the \e index position is a new line character.
+   *
+   * @param[in] index position of the character.
+   *
+   * @return \e true if the character pointed by \e index is a new line character.
+   */
+  bool IsNewLine( std::size_t index ) const;
 
 private:
 

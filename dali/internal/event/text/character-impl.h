@@ -43,26 +43,11 @@ public:
 public:
 
   /**
-   * @copydoc Dali::Character::Character().
-   */
-  Character();
-
-  /**
    * Constructor.
    * Creates a Character with the given UTF-32 encoded character.
    * @param character A UTF-32 encoded character.
    */
   Character( uint32_t character );
-
-  /**
-   * @copydoc Dali::Character::Character( const Character& character ).
-   */
-  Character( const Character& character );
-
-  /**
-   * @copydoc Dali::Character::operator=( const Character& character ).
-   */
-  Character& operator=( const Character& character );
 
   /**
    * Non virtual destructor.
@@ -108,8 +93,38 @@ public:
    */
   void SetCharacter( uint32_t character );
 
+  /**
+   * Whether the given character is a white space.
+   *
+   * @param[in] character The character.
+   *
+   * @return \e true the given character is a white space.
+   */
+  static bool IsWhiteSpace( uint32_t character );
+
+  /**
+   * Whether the given character is a new line character.
+   *
+   * @param[in] character The character.
+   *
+   * @return \e true the given character is a new line character.
+   */
+  static bool IsNewLine( uint32_t character );
+
 private:
-  uint32_t mCharacter;
+
+  // Undefined constructor.
+  Character();
+
+  // Undefined copy constructor.
+  Character( const Character& character );
+
+  // Undefined assignment operator
+  Character& operator=( const Character& character );
+
+ private: //data
+
+  uint32_t mCharacter; ///< Stores the unicode of the character.
 };
 
 } // namespace Internal
