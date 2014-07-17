@@ -139,18 +139,18 @@ public:
     // Optimisation for the case that this is empty
     if( IsEmpty() )
     {
-      this->Swap( source );
+      VectorBase::Swap( source );
     }
     else
     {
       // make space for new items
-      this->Reserve( VectorBase::Count() + source.Count() );
+      Vector< T >::Reserve( VectorBase::Count() + source.Count() );
       Iterator iter = source.Begin();
       ConstIterator end = source.End();
       for( ; iter != end; ++iter )
       {
         T pointer = *iter;
-        this->PushBack( pointer );
+        Vector< T >::PushBack( pointer );
       }
       // cannot call Clear on OwnerContainer as that deletes the elements
       source.Vector< T >::Clear();
