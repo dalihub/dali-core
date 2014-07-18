@@ -136,7 +136,7 @@ void Orthographic(Matrix& result, float left, float right, float bottom, float t
 
 } // unnamed namespace
 
-const Dali::Camera::Type CameraAttachment::DEFAULT_TYPE( Dali::Camera::LOOK_AT_TARGET );
+const Dali::Camera::Type CameraAttachment::DEFAULT_TYPE( Dali::Camera::FREE_LOOK );
 const Dali::Camera::ProjectionMode CameraAttachment::DEFAULT_MODE( Dali::Camera::PERSPECTIVE_PROJECTION );
 const bool  CameraAttachment::DEFAULT_INVERT_Y_AXIS( false );
 const float CameraAttachment::DEFAULT_FIELD_OF_VIEW( 45.0f*(M_PI/180.0f) );

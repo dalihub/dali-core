@@ -56,13 +56,14 @@ enum ProjectionMode
  *
  * Allows the developer to use actor semantics to control a camera.
  *
- * There are two types of camera actor, LookAt and FreeLook. A LookAt
- * camera actor ignores the actor rotation, and instead points towards
- * TargetPosition in world coordinates. This is the default behaviour.
+ * There are two types of camera actor, FREE_LOOK and LOOK_AT_TARGET. By default
+ * the camera actor will be FREE_LOOK.
  *
- * A FreeLook camera uses the camera actor's world rotation to control
- * where the camera is looking. If no rotation is specified, then the camera
- * looks along the negative Z axis.
+ * A FREE_LOOK camera uses actor's rotation to control where the camera is looking.
+ * If no additional rotations are specified, the camera looks in the negative Z direction.
+ *
+ * For LOOK_AT_TARGET the actor's rotation is ignored, instead the camera looks at TARGET_POSITION
+ * in world coordinates.
  *
  */
 class CameraActor : public Actor
@@ -70,20 +71,20 @@ class CameraActor : public Actor
 public:
 
   // Default Properties; additional to Actor properties
-  static const Property::Index TYPE;                         ///< Property::STRING,   // "type"                 // Not animatable
-  static const Property::Index PROJECTION_MODE;              ///< Property::STRING,   // "projection-mode"      // Not animatable
-  static const Property::Index FIELD_OF_VIEW;                ///< Property::FLOAT,    // "field-of-view"        // Not animatable
-  static const Property::Index ASPECT_RATIO;                 ///< Property::FLOAT,    // "aspect-ratio"         // Not animatable
-  static const Property::Index NEAR_PLANE_DISTANCE;          ///< Property::FLOAT,    // "near-plane-distance"  // Not animatable
-  static const Property::Index FAR_PLANE_DISTANCE;           ///< Property::FLOAT,    // "far-plane-distance"   // Not animatable
-  static const Property::Index LEFT_PLANE_DISTANCE;          ///< Property::FLOAT,    // "left-plane-distance"  // Not animatable
-  static const Property::Index RIGHT_PLANE_DISTANCE;         ///< Property::FLOAT,    // "right-plane-distance" // Not animatable
-  static const Property::Index TOP_PLANE_DISTANCE;           ///< Property::FLOAT,    // "top-plane-distance"   // Not animatable
-  static const Property::Index BOTTOM_PLANE_DISTANCE;        ///< Property::FLOAT,    // "bottom-plane-distance"// Not animatable
-  static const Property::Index TARGET_POSITION;              ///< Property::VECTOR3,  // "target"               // Not animatable
-  static const Property::Index PROJECTION_MATRIX;            ///< Property::MATRIX,   // "projection-matrix"    // Constraint input, not animatable
-  static const Property::Index VIEW_MATRIX;                  ///< Property::MATRIX,   // "view-matrix"          // constraint input, not abimatable
-  static const Property::Index INVERT_Y_AXIS;                ///< Property::BOOLEAN,  // "invert-y-axis"        // Not animatable
+  static const Property::Index TYPE;                         ///< Property::STRING,   // "type"                  // Not animatable
+  static const Property::Index PROJECTION_MODE;              ///< Property::STRING,   // "projection-mode"       // Not animatable
+  static const Property::Index FIELD_OF_VIEW;                ///< Property::FLOAT,    // "field-of-view"         // Not animatable
+  static const Property::Index ASPECT_RATIO;                 ///< Property::FLOAT,    // "aspect-ratio"          // Not animatable
+  static const Property::Index NEAR_PLANE_DISTANCE;          ///< Property::FLOAT,    // "near-plane-distance"   // Not animatable
+  static const Property::Index FAR_PLANE_DISTANCE;           ///< Property::FLOAT,    // "far-plane-distance"    // Not animatable
+  static const Property::Index LEFT_PLANE_DISTANCE;          ///< Property::FLOAT,    // "left-plane-distance"   // Not animatable
+  static const Property::Index RIGHT_PLANE_DISTANCE;         ///< Property::FLOAT,    // "right-plane-distance"  // Not animatable
+  static const Property::Index TOP_PLANE_DISTANCE;           ///< Property::FLOAT,    // "top-plane-distance"    // Not animatable
+  static const Property::Index BOTTOM_PLANE_DISTANCE;        ///< Property::FLOAT,    // "bottom-plane-distance" // Not animatable
+  static const Property::Index TARGET_POSITION;              ///< Property::VECTOR3,  // "target-position"       // Not animatable
+  static const Property::Index PROJECTION_MATRIX;            ///< Property::MATRIX,   // "projection-matrix"     // Constraint input, not animatable
+  static const Property::Index VIEW_MATRIX;                  ///< Property::MATRIX,   // "view-matrix"           // Constraint input, not animatable
+  static const Property::Index INVERT_Y_AXIS;                ///< Property::BOOLEAN,  // "invert-y-axis"         // Not animatable
 
   /**
    * @brief Create an uninitialized CameraActor handle.
@@ -135,7 +136,7 @@ public:
 
   /**
    * @brief Set the camera type.
-   * The default type is Dali::Camera::LookAtTarget
+   * The default type is Dali::Camera::FREE_LOOK
    * @param[in] type The camera type
    */
   void SetType( Dali::Camera::Type type );
@@ -150,14 +151,14 @@ public:
   /**
    * @brief Set the projection mode.
    *
-   * @param[in] mode One of PerspectiveProjection or OrthographicProjection
+   * @param[in] mode One of PERSPECTIVE_PROJECTION or ORTHOGRAPHIC_PROJECTION
    */
   void SetProjectionMode( Dali::Camera::ProjectionMode mode );
 
   /**
    * @brief Get the projection mode.
    *
-   * @return One of PerspectiveProjection or OrthographicProjection
+   * @return One of PERSPECTIVE_PROJECTION or ORTHOGRAPHIC_PROJECTION
    */
   Dali::Camera::ProjectionMode GetProjectionMode() const;
 
@@ -225,7 +226,7 @@ public:
   /**
    * @brief Set the target position of the camera.
    *
-   * @pre Camera type is LookAtTarget
+   * @pre Camera type is LOOK_AT_TARGET
    * @param[in] targetPosition The position of the target to look at
    */
   void SetTargetPosition( const Vector3& targetPosition );
@@ -234,7 +235,7 @@ public:
    * @brief Get Camera Target position.
    *
    * The target position is Vector3::ZERO
-   * @pre Camera type is LookAtTarget
+   * @pre Camera type is LOOK_AT_TARGET
    * @return The target position of the camera
    */
   Vector3 GetTargetPosition() const;
