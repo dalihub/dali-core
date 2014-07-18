@@ -1,0 +1,15 @@
+<manifest>
+	<define>
+		<domain name="dali" policy="restricted" plist="dali-adaptor,dali-toolkit" />
+	</define>
+	<assign>
+		<filesystem path="/usr/lib/*" label="_" />
+		<filesystem path="/opt/usr/share/dali" label="dali" type="transmutable" />
+		<filesystem path="/opt/usr/share/dali/core" label="dali" type="transmutable" />
+		<filesystem path="/opt/usr/share/dali/core/shaderbin" label="dali" type="transmutable" />
+		<filesystem path="/opt/usr/share/dali/glyphcache" label="dali" type="transmutable" />
+	</assign>
+	<request>
+		<domain name="dali"/>
+	</request>
+</manifest>

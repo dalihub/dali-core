@@ -132,7 +132,11 @@ exit 0
 ##############################
 
 %files
+%if 0%{?enable_dali_smack_rules}
+%manifest dali.manifest-smack
+%else
 %manifest dali.manifest
+%endif
 %defattr(-,root,root,-)
 %{_libdir}/lib%{name}-core.so*
 %defattr(-,app,app,-)
