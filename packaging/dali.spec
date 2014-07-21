@@ -79,6 +79,7 @@ export DALI_DATA_RO_DIR
 
 CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ;
 CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS ;
+LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS ;
 ./configure \
       --program-prefix=%{?_program_prefix} \
       --prefix=%{_prefix} \
