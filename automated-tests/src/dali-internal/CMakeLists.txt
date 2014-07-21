@@ -6,6 +6,7 @@ SET(RPM_NAME "core-${PKG_NAME}-tests")
 SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
+        utc-Dali-Internal-Character.cpp
         utc-Dali-Internal-Font.cpp
         utc-Dali-Internal-Handles.cpp
         utc-Dali-Internal-ImageFactory.cpp

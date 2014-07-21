@@ -21,8 +21,6 @@ The OpenGLES Canvas Core Library provides a 3D scene graph
 ##############################
 # devel
 ##############################
-# This should be used only for building dali-adaptor and dali-toolkit independently of
-# dali-capi - i.e. to break cyclic dependencies.
 %package devel
 Summary:    Development components for the OpenGLES Canvas Core Library
 Group:      Development/Building

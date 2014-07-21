@@ -48,9 +48,9 @@ static const std::size_t MAX_MESSAGE_SIZE = std::max( sizeof(Integration::TouchE
                                                       std::max( sizeof(Integration::KeyEvent),
                                                                 std::max( sizeof(Integration::MouseWheelEvent), sizeof(Integration::GestureEvent) ) ) );
 
-static const std::size_t INITIAL_MIN_CAPICITY = 4;
+static const std::size_t INITIAL_MIN_CAPACITY = 4;
 
-static const std::size_t INITIAL_BUFFER_SIZE = MAX_MESSAGE_SIZE * INITIAL_MIN_CAPICITY;
+static const std::size_t INITIAL_BUFFER_SIZE = MAX_MESSAGE_SIZE * INITIAL_MIN_CAPACITY;
 
 } // unnamed namespace
 

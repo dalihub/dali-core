@@ -160,21 +160,3 @@ int UtcDaliCharacterIsNewLine(void)
   DALI_TEST_CHECK(!text[8].IsNewLine()); // 'f'
   END_TEST;
 }
-
-int UtcDaliCharacterGetImplementation(void)
-{
-  TestApplication application;
-
-  Text text( std::string( "Hello world" ) );
-  Character c = text[0];
-
-  const Internal::Character& characterImpl1 = c.GetImplementation();
-
-  DALI_TEST_CHECK( NULL != &characterImpl1 );
-
-  Internal::Character& characterImpl2 = c.GetImplementation();
-
-  DALI_TEST_CHECK( NULL != &characterImpl2 );
-
-  END_TEST;
-}

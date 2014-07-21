@@ -110,7 +110,6 @@ AC_CONFIG_FILES([
  Makefile
  dali-core/Makefile
  dali-core.pc
- dali-test-suite-utils.pc
 ])
 
 AC_OUTPUT

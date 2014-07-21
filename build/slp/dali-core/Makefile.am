@@ -28,9 +28,6 @@ include ../../../dali/public-api/file.list
 platform_abstraction_src_dir = ../../../dali/integration-api
 include ../../../dali/integration-api/file.list
 
-capi_devel_src_dir = ../../../capi/dali/public-api
-include ${capi_devel_src_dir}/file.list
-
 # Build the Dali libtool library
 
 src_files = $(internal_src_files) \
@@ -58,11 +55,8 @@ dali_shaders_src_file = dali-shaders.cpp
 dali-shaders.cpp: $(dali_shaders_script) $(dali_shaders_dir)/*.txt
 	$< --shader-dir=$(dali_shaders_dir) --file-prefix=dali-shaders
 
-# Building dali doesn't rely on installed capi headers
-# It will instead use headers from this repo in place
 dali_core_includes = \
-        -I../../.. \
-        -I../../../capi
+        -I../../..
 
 daliShaderbinDir  = ${dataReadWriteDir}/core/shaderbin/
 daliGlyphCacheDir = ${dataReadWriteDir}/glyphcache/
@@ -93,15 +87,11 @@ platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
 platformabstractiondynamics_HEADERS = $(platform_abstraction_dynamics_header_files)
 
-# Should match same subdirectory list as CAPI DEVEL HEADERS below
 publicapidir = $(devincludepath)/dali/public-api
-publicapiactionsdir = $(publicapidir)/actions
 publicapiactorsdir = $(publicapidir)/actors
-publicapiactorattachmentsdir = $(publicapidir)/actor-attachments
 publicapianimationdir = $(publicapidir)/animation
 publicapicommondir = $(publicapidir)/common
 publicapidynamicsdir = $(publicapidir)/dynamics
-publicapieffectsdir = $(publicapidir)/effects
 publicapieventsdir = $(publicapidir)/events
 publicapigeometrydir = $(publicapidir)/geometry
 publicapiimagesdir = $(publicapidir)/images
@@ -115,13 +105,10 @@ publicapitextdir = $(publicapidir)/text
 publicapiscriptingdir = $(publicapidir)/scripting
 
 publicapi_HEADERS = $(public_api_header_files)
-publicapiactorattachments_HEADERS = $(public_api_core_actor_attachments_header_files)
-publicapiactions_HEADERS = $(public_api_core_actions_header_files)
 publicapiactors_HEADERS = $(public_api_core_actors_header_files)
 publicapianimation_HEADERS = $(public_api_core_animation_header_files)
 publicapicommon_HEADERS = $(public_api_core_common_header_files)
 publicapidynamics_HEADERS = $(public_api_core_dynamics_header_files)
-publicapieffects_HEADERS = $(public_api_core_effects_header_files)
 publicapievents_HEADERS = $(public_api_core_events_header_files)
 publicapigeometry_HEADERS = $(public_api_core_geometry_header_files)
 publicapiimages_HEADERS = $(public_api_core_images_header_files)
@@ -133,46 +120,6 @@ publicapiscripting_HEADERS = $(public_api_core_scripting_header_files)
 publicapishadereffects_HEADERS = $(public_api_core_shader_effects_header_files)
 publicapisignals_HEADERS = $(public_api_core_signals_header_files)
 publicapitext_HEADERS = $(public_api_core_text_header_files)
-
-capideveldir = $(devincludepath)/dali/public-api
-capidevelactionsdir = $(capideveldir)/actions
-capidevelactorsdir = $(capideveldir)/actors
-capidevelactorattachmentsdir = $(capideveldir)/actor-attachments
-capidevelanimationdir = $(capideveldir)/animation
-capidevelcommondir = $(capideveldir)/common
-capideveldynamicsdir = $(capideveldir)/dynamics
-capideveleffectsdir = $(capideveldir)/effects
-capideveleventsdir = $(capideveldir)/events
-capidevelgeometrydir = $(capideveldir)/geometry
-capidevelimagesdir = $(capideveldir)/images
-capidevelmathdir = $(capideveldir)/math
-capidevelmodelingdir = $(capideveldir)/modeling
-capidevelobjectdir = $(capideveldir)/object
-capidevelrendertasksdir = $(capideveldir)/render-tasks
-capidevelshadereffectsdir = $(capideveldir)/shader-effects
-capidevelsignalsdir = $(capideveldir)/signals
-capideveltextdir = $(capideveldir)/text
-capidevelscriptingdir = $(capideveldir)/scripting
-
-capidevel_HEADERS = $(capi_devel_header_files)
-capidevelactorattachments_HEADERS = $(capi_devel_actor_attachments_header_files)
-capidevelactions_HEADERS = $(capi_devel_actions_header_files)
-capidevelactors_HEADERS = $(capi_devel_actors_header_files)
-capidevelanimation_HEADERS = $(capi_devel_animation_header_files)
-capidevelcommon_HEADERS = $(capi_devel_common_header_files)
-capideveldynamics_HEADERS = $(capi_devel_dynamics_header_files)
-capideveleffects_HEADERS = $(capi_devel_effects_header_files)
-capidevelevents_HEADERS = $(capi_devel_events_header_files)
-capidevelgeometry_HEADERS = $(capi_devel_geometry_header_files)
-capidevelimages_HEADERS = $(capi_devel_images_header_files)
-capidevelmath_HEADERS = $(capi_devel_math_header_files)
-capidevelmodeling_HEADERS = $(capi_devel_modeling_header_files)
-capidevelrendertasks_HEADERS = $(capi_devel_render_tasks_header_files)
-capidevelobject_HEADERS = $(capi_devel_object_header_files)
-capidevelscripting_HEADERS = $(capi_devel_scripting_header_files)
-capidevelshadereffects_HEADERS = $(capi_devel_shader_effects_header_files)
-capidevelsignals_HEADERS = $(capi_devel_signals_header_files)
-capideveltext_HEADERS = $(capi_devel_text_header_files)
 
 CLEANFILES = dali-shaders.cpp \
              dali-shaders.h
