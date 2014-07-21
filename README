@@ -1,0 +1,12 @@
+GBS Builds
+==========
+
+NON-SMACK Targets
+-----------------
+
+gbs build -A [TARGET_ARCH]
+
+SMACK enabled Targets
+---------------------
+
+gbs build -A [TARGET_ARCH] --define "%enable_dali_smack_rules 1"
