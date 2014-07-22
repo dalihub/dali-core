@@ -154,7 +154,7 @@ public:
    * Retrieve the set of geometry hints.
    * @return The hints.
    */
-  int GetGeometryHints() const
+  Dali::ShaderEffect::GeometryHints GetGeometryHints() const
   {
     return mGeometryHints;
   }
@@ -163,7 +163,7 @@ public:
    * Set the geometry hints.
    * @param[in] hints The hints.
    */
-  void SetGeometryHints( int hints )
+  void SetGeometryHints( Dali::ShaderEffect::GeometryHints hints )
   {
     mGeometryHints = hints;
   }
@@ -215,7 +215,7 @@ public:
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] hint The geometry hints.
    */
-  void ForwardHints( BufferIndex updateBufferIndex, int hint );
+  void ForwardHints( BufferIndex updateBufferIndex, Dali::ShaderEffect::GeometryHints hint );
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // The following methods are called in Render thread
@@ -262,14 +262,14 @@ public:
    * @param[in] resourceId    The resource ID for the program.
    * @param[in] shaderData    The program's vertex/fragment source and optionally compiled bytecode
    * @param[in] context       Reference to the GL context.
-   * @param[in] areVerticesFixed True if the vertex shader does not change vertex position
+   * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
   void SetProgram( GeometryType geometryType,
                    Internal::ShaderSubTypes subType,
                    Integration::ResourceId resourceId,
                    Integration::ShaderDataPtr shaderData,
                    Context* context,
-                   bool areVerticesFixed );
+                   bool modifiesGeometry );
 
   /**
    * Determine if subtypes are required for the given geometry type
@@ -311,7 +311,7 @@ private: // Data
 
   typedef OwnerContainer< UniformMeta* > UniformMetaContainer;
 
-  int                            mGeometryHints;    ///< shader geometry hints for building the geometry
+  Dali::ShaderEffect::GeometryHints mGeometryHints;    ///< shader geometry hints for building the geometry
   float                          mGridDensity;      ///< grid density
   Texture*                       mTexture;          ///< Raw Pointer to Texture
   Integration::ResourceId        mRenderTextureId;  ///< Copy of the texture ID for the render thread
@@ -328,6 +328,15 @@ private: // Data
   PostProcessResourceDispatcher* mPostProcessDispatcher; ///< Used for saving shaders through the resource manager
   TextureCache*                  mTextureCache; // Used for retrieving textures in the render thread
 };
+
+} // namespace SceneGraph
+
+template <> struct ParameterType<Dali::ShaderEffect::GeometryHints> : public BasicType< Dali::ShaderEffect::GeometryHints >
+{
+};
+
+namespace SceneGraph
+{
 
 // Messages for Shader, to be processed in Update thread.
 
@@ -355,7 +364,7 @@ inline void SetGridDensityMessage( EventToUpdate& eventToUpdate, const Shader& s
 
 inline void SetHintsMessage( EventToUpdate& eventToUpdate, const Shader& shader, Dali::ShaderEffect::GeometryHints hint )
 {
-  typedef MessageDoubleBuffered1< Shader, int > LocalType;
+  typedef MessageDoubleBuffered1< Shader, Dali::ShaderEffect::GeometryHints > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
