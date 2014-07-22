@@ -2,10 +2,6 @@
 #define USE_NORMALS
 #define MAX_BONES_PER_MESH  12
 
-  uniform   mediump mat4    uProjection;
-  uniform   mediump mat4    uModelView;
-  uniform   mediump mat4    uMvpMatrix;
-
 #ifdef USE_BONES
   uniform   int             uBoneCount;
   uniform   mediump mat4    uBoneMatrices[MAX_BONES_PER_MESH];
@@ -13,15 +9,6 @@
   attribute mediump vec4    aBoneWeights;
   attribute mediump vec4    aBoneIndices;
 #endif
-
-#ifdef USE_NORMALS
-  uniform   mat3            uModelViewIT;
-  attribute mediump vec3    aNormal;
-  varying   mediump vec3    vNormal;
-#endif
-
-  attribute mediump vec3    aPosition;
-  varying   mediump vec4    vVertex;
 
 #ifdef USE_COLOR
   attribute lowp vec3       aColor;
@@ -78,16 +65,6 @@
 <FragmentShader>
    precision mediump float;
 
-  struct Material
-  {
-    mediump float mOpacity;
-    mediump float mShininess;
-    lowp    vec4  mAmbient;
-    lowp    vec4  mDiffuse;
-    lowp    vec4  mSpecular;
-    lowp    vec4  mEmissive;
-  };
-
 #ifdef USE_LIGHTING
   struct Light
   {
@@ -102,18 +79,12 @@
   };
 #endif
 
-  uniform Material      uMaterial;
-
 #ifdef USE_LIGHTING
   uniform         int   uNumberOfLights;
   uniform Light         uLight0;
   uniform Light         uLight1;
   uniform Light         uLight2;
 #endif
-
-  uniform lowp    vec4  uColor;
-  varying highp   vec4  vVertex;
-  varying highp   vec3  vNormal;
 
 #ifdef USE_COLOR
   varying mediump vec3  vColor;
