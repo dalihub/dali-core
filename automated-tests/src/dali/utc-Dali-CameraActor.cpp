@@ -350,14 +350,14 @@ int UtcDaliCameraActorSetType01(void)
   tet_infoline("Testing Dali::CameraActor Get/Set Type");
 
   CameraActor actor = CameraActor::New();
-  DALI_TEST_EQUALS( actor.GetType(), Dali::Camera::LOOK_AT_TARGET, TEST_LOCATION );
-
-  actor.SetType(Dali::Camera::FREE_LOOK);
   DALI_TEST_EQUALS( actor.GetType(), Dali::Camera::FREE_LOOK, TEST_LOCATION );
+
+  actor.SetType(Dali::Camera::LOOK_AT_TARGET);
+  DALI_TEST_EQUALS( actor.GetType(), Dali::Camera::LOOK_AT_TARGET, TEST_LOCATION );
 
   std::string sValue;
   actor.GetProperty(CameraActor::TYPE).Get(sValue);
-  std::string result("FREE_LOOK");
+  std::string result("LOOK_AT_TARGET");
   DALI_TEST_EQUALS(result, sValue, TEST_LOCATION);
   END_TEST;
 }
