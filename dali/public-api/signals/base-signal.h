@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
@@ -154,8 +154,8 @@ public:
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that mSignalConnections.size() count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.size() );
+    // Note that count cannot be reduced while iterating
+    const std::size_t initialCount( mSignalConnections.Count() );
 
     for( std::size_t i = 0; i < initialCount; ++i )
     {
@@ -192,8 +192,8 @@ public:
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that mSignalConnections.size() count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.size() );
+    // Note that count cannot be reduced while iterating
+    const std::size_t initialCount( mSignalConnections.Count() );
 
     for( std::size_t i = 0; i < initialCount; ++i )
     {
@@ -231,8 +231,8 @@ public:
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that mSignalConnections.size() count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.size() );
+    // Note that count cannot be reduced while iterating
+    const std::size_t initialCount( mSignalConnections.Count() );
 
     for( std::size_t i = 0; i < initialCount; ++i )
     {
@@ -270,8 +270,8 @@ public:
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that mSignalConnections.size() count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.size() );
+    // Note that count cannot be reduced while iterating
+    const std::size_t initialCount( mSignalConnections.Count() );
 
     for( std::size_t i = 0; i < initialCount; ++i )
     {
@@ -310,8 +310,8 @@ public:
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that mSignalConnections.size() count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.size() );
+    // Note that count cannot be reduced while iterating
+    const std::size_t initialCount( mSignalConnections.Count() );
 
     for( std::size_t i = 0; i < initialCount; ++i )
     {
@@ -350,8 +350,8 @@ public:
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that mSignalConnections.size() count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.size() );
+    // Note that count cannot be reduced while iterating
+    const std::size_t initialCount( mSignalConnections.Count() );
 
     for( std::size_t i = 0; i < initialCount; ++i )
     {
@@ -391,8 +391,8 @@ public:
     }
 
     // If more connections are added by callbacks, these are ignore until the next Emit()
-    // Note that mSignalConnections.size() count cannot be reduced while iterating
-    const std::size_t initialCount( mSignalConnections.size() );
+    // Note that count cannot be reduced while iterating
+    const std::size_t initialCount( mSignalConnections.Count() );
 
     for( std::size_t i = 0; i < initialCount; ++i )
     {
@@ -487,7 +487,7 @@ private:
 
 private:
 
-  std::vector< SignalConnection* > mSignalConnections;   ///< Array of connections
+  Dali::Vector< SignalConnection* > mSignalConnections;   ///< Array of connections
 
   bool mEmittingFlag; ///< Used to guard against nested Emit() calls
 };
