@@ -169,6 +169,13 @@ public:
    */
   void GetTextureCoordinates(UvRect& uv, const PixelArea* pixelArea = NULL);
 
+  /**
+   * @brief Apply the given sampler to the texture.
+   *
+   * @param[in] samplerBitfield A bitfield with packed sampler options.
+   */
+  void ApplySampler( unsigned int samplerBitfield );
+
 protected:
 
   /**
@@ -245,6 +252,8 @@ protected:
   Context&      mContext;      ///< The GL Context
 
   GLuint        mId;           ///< Texture id
+
+  unsigned int  mSamplerBitfield;    ///< The packed bitfield of the current sampler
 
   unsigned int  mWidth;        ///< texture width, may be scaled power of 2 (if not in an atlas)
   unsigned int  mHeight;       ///< texture width, may be scaled power of 2 (if not in an atlas)

@@ -136,7 +136,8 @@ public_api_core_actors_header_files =  \
   $(public_api_src_dir)/actors/mesh-actor.h \
   $(public_api_src_dir)/actors/model-actor-factory.h \
   $(public_api_src_dir)/actors/text-actor.h \
-  $(public_api_src_dir)/actors/renderable-actor.h
+  $(public_api_src_dir)/actors/renderable-actor.h \
+  $(public_api_src_dir)/actors/sampling.h
 
 public_api_core_animation_header_files = \
   $(public_api_src_dir)/animation/active-constraint.h \

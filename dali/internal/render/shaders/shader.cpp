@@ -32,6 +32,7 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/uniform-meta.h>
+#include <dali/internal/common/image-sampler.h>
 
 // See render-debug.h
 #ifdef DALI_PRINT_RENDER_INFO
@@ -317,6 +318,9 @@ void Shader::SetUniforms( Context& context,
   {
     // got effect texture, bind it to texture unit 1
     mTexture->Bind( GL_TEXTURE_2D, GL_TEXTURE1 );
+    // Just apply the default sampling options for now
+    mTexture->ApplySampler( ImageSampler::DefaultOptions() );
+
     // get effect sampler uniform
     const GLint loc = program.GetUniformLocation( Program::UNIFORM_EFFECT_SAMPLER );
     if( Program::UNIFORM_UNKNOWN != loc )

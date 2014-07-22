@@ -32,6 +32,7 @@
 #include <dali/public-api/actors/model-actor-factory.h>
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/actors/text-actor.h>
+#include <dali/public-api/actors/sampling.h>
 
 #include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/animation/active-constraint.h>

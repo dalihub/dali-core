@@ -475,6 +475,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
   const GLint texCoordLoc = program.GetAttribLocation(Program::ATTRIB_TEXCOORD);
 
   mTexture->Bind(GL_TEXTURE_2D, GL_TEXTURE0);
+  mTexture->ApplySampler( mSamplerBitfield );
 
   mContext->EnableVertexAttributeArray( positionLoc );
   mContext->EnableVertexAttributeArray( texCoordLoc );

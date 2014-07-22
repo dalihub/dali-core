@@ -249,6 +249,7 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
   DALI_ASSERT_DEBUG( mVertexBuffer );
 
   mTextureCache->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, GL_TEXTURE0 );
+  mTexture->ApplySampler( mSamplerBitfield );
 
   // make sure the vertex is bound, this has to be done before
   // we call VertexAttribPointer otherwise you get weird output on the display

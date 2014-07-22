@@ -111,6 +111,16 @@ const Vector4& RenderableActor::GetBlendColor() const
   return GetImplementation(*this).GetBlendColor();
 }
 
+void RenderableActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
+{
+  GetImplementation(*this).SetFilterMode( minFilter, magFilter );
+}
+
+void RenderableActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
+{
+  GetImplementation(*this).GetFilterMode( minFilter, magFilter );
+}
+
 RenderableActor::RenderableActor(Internal::RenderableActor* internal)
 : Actor(internal)
 {

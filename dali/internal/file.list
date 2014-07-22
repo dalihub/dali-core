@@ -7,6 +7,7 @@ internal_src_files = \
   $(internal_src_dir)/common/internal-constants.cpp \
   $(internal_src_dir)/common/message-buffer.cpp \
   $(internal_src_dir)/common/text-parameters.cpp \
+  $(internal_src_dir)/common/image-sampler.cpp \
   \
   $(internal_src_dir)/event/actor-attachments/actor-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/camera-attachment-impl.cpp \

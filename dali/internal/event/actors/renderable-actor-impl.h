@@ -110,6 +110,16 @@ public:
    */
   const Vector4& GetBlendColor() const;
 
+  /**
+   * @copydoc Dali::RenderableActor::SetFilterMode()
+   */
+  void SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetFilterMode()
+   */
+  void GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const;
+
 protected:
 
   /**

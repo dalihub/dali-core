@@ -25,6 +25,7 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/renderers/render-data-provider.h>
 #include <dali/public-api/actors/blending.h>
+#include <dali/internal/common/image-sampler.h>
 
 namespace Dali
 {
@@ -139,6 +140,11 @@ void Renderer::SetCullFace( CullFaceMode mode )
   mCullFaceMode = mode;
 }
 
+void Renderer::SetSampler( unsigned int samplerBitfield )
+{
+  mSamplerBitfield = samplerBitfield;
+}
+
 void Renderer::Render( BufferIndex bufferIndex,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
@@ -236,6 +242,7 @@ Renderer::Renderer( RenderDataProvider& dataprovider )
   mContext( NULL ),
   mTextureCache( NULL ),
   mShader( NULL ),
+  mSamplerBitfield( ImageSampler::DefaultOptions() ),
   mUseBlend( false ),
   mCullFaceMode( CullNone )
 {

@@ -98,6 +98,12 @@ public:
   void SetCullFace( CullFaceMode mode );
 
   /**
+   * Set the sampler used to render the set texture.
+   * @param[in] samplerBitfield The packed sampler options used to render.
+   */
+  void SetSampler( unsigned int samplerBitfield );
+
+  /**
    * Query whether the derived type of Renderer requires depth testing.
    * @return True if the renderer requires depth testing.
    */
@@ -173,6 +179,7 @@ protected:
   Context* mContext;
   TextureCache* mTextureCache;
   Shader* mShader;
+  unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 
 private:
 

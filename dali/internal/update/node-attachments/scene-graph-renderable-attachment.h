@@ -106,6 +106,13 @@ public: // API
   void SetCullFace( BufferIndex updateBufferIndex, CullFaceMode mode );
 
   /**
+   * Set the sampler used to render the texture for this renderable.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] samplerBitfield The image sampler packed options to set.
+   */
+  void SetSampler( BufferIndex updateBufferIndex, unsigned int samplerBitfield );
+
+  /**
    * Flag to check if any geometry scaling is needed, inlined as called from update algorithm often
    * @return true if the derived renderable uses geometry scaling
    */
@@ -390,6 +397,17 @@ inline void SetBlendColorMessage( EventToUpdate& eventToUpdate, const Renderable
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &attachment, &RenderableAttachment::SetBlendColor, color );
+}
+
+inline void SetSamplerMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, unsigned int samplerBitfield )
+{
+  typedef MessageDoubleBuffered1< RenderableAttachment, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &RenderableAttachment::SetSampler, samplerBitfield );
 }
 
 } // namespace SceneGraph

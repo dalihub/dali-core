@@ -119,6 +119,16 @@ const Vector4& RenderableActor::GetBlendColor() const
   return GetRenderableAttachment().GetBlendColor();
 }
 
+void RenderableActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
+{
+  GetRenderableAttachment().SetFilterMode( minFilter, magFilter );
+}
+
+void RenderableActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
+{
+  return GetRenderableAttachment().GetFilterMode( minFilter, magFilter );
+}
+
 RenderableActor::RenderableActor()
 : Actor( Actor::RENDERABLE )
 {
