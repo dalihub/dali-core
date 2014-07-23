@@ -289,18 +289,21 @@ void BaseSignal::CleanupConnections()
   // only do something if there are items
   if( total > 0 )
   {
-    std::size_t removed = 0;
+    std::size_t index = 0;
+    // process the whole vector
     for( std::size_t i = 0; i < total; ++i )
     {
-      if( mSignalConnections[ i ] == NULL )
+      if( mSignalConnections[ index ] == NULL )
       {
-        ++removed;
-        // swaps it to the end
-        mSignalConnections.Remove( mSignalConnections.Begin() + i );
+        // items will be moved so don't increase index (erase will decrease the count of vector)
+        mSignalConnections.Erase( mSignalConnections.Begin() + index );
+      }
+      else
+      {
+        // increase to next element
+        ++index;
       }
     }
-    // dont reallocate memory, just resize vector
-    mSignalConnections.Resize( total - removed );
   }
 }
 
