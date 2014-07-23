@@ -150,7 +150,7 @@ void TestImageInside( TestApplication& application, int width, int height )
 }
 
 
-void RepositionActor(TestApplication& application, Actor actor, float x, float y, bool inside)
+bool RepositionActor(TestApplication& application, Actor actor, float x, float y, bool inside)
 {
   TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
 
@@ -158,19 +158,11 @@ void RepositionActor(TestApplication& application, Actor actor, float x, float y
   actor.SetPosition( x, y, 0.0f);
   application.SendNotification();
   application.Render(16);
-  if( inside )
-  {
-    bool found = drawTrace.FindMethod( "DrawArrays" );
-    if( ! found ) tet_printf( "Not drawn: Position:(%3.0f, %3.0f)\n", x, y );
-    DALI_TEST_CHECK( found );
-  }
-  else
-  {
-    bool found = drawTrace.FindMethod( "DrawArrays" );
-    if( found ) tet_printf( "Drawn when not needed: Position:(%3.0f, %3.0f)\n", x, y );
-    DALI_TEST_CHECK( ! found );
-  }
+
+  bool found = drawTrace.FindMethod( "DrawArrays" );
+  return (inside && found) || (!inside && !found);
 }
+
 
 void RepositionActorWithAngle(TestApplication& application, Actor actor, float x, float y, float angle, bool inside)
 {
@@ -289,6 +281,8 @@ void OBBTestImageAtBoundary( TestApplication& application, int width, int height
   tet_printf("Testing Stage Size: (%3.0f, %3.0f) image size:(%3.0f, %3.0f) \n",
              stageSize.x, stageSize.y, imageSize.x, imageSize.y);
 
+  int successCount = 0;
+  int totalCount = 0;
   for( int i=0; i<100; i++ )
   {
     float x1 = -stageSize.x/2.0f - imageSize.x*i/200.0f;
@@ -311,12 +305,16 @@ void OBBTestImageAtBoundary( TestApplication& application, int width, int height
       float x = ((stageSize.x+imageSize.x/2.0f)/21.0f) * j;
       float y = ((stageSize.y+imageSize.y/2.0f)/21.0f) * j;
 
-      RepositionActor( application, imageActor, x1, y, true );
-      RepositionActor( application, imageActor, x2, y, true );
-      RepositionActor( application, imageActor, x, y1, true );
-      RepositionActor( application, imageActor, x, y2, true );
+      if(RepositionActor( application, imageActor, x1, y, true )) successCount++;
+      if(RepositionActor( application, imageActor, x2, y, true )) successCount++;
+      if(RepositionActor( application, imageActor, x, y1, true )) successCount++;
+      if(RepositionActor( application, imageActor, x, y2, true )) successCount++;
+
+      totalCount += 4;
     }
   }
+  DALI_TEST_EQUALS(successCount, totalCount, TEST_LOCATION);
+  tet_printf( "Test succeeded with %d passes out of %d tests\n", successCount, totalCount);
 }
 
 
@@ -384,6 +382,9 @@ void OBBTestImageOutsideBoundary( TestApplication& application, int width, int h
   tet_printf("Testing Stage Size: (%3.0f, %3.0f) image size:(%3.0f, %3.0f)\n",
              stageSize.x, stageSize.y, imageSize.x, imageSize.y);
 
+  int successCount=0;
+  int totalCount=0;
+
   for( int i=0; i<=100; i++ )
   {
     float x1 = -stageSize.x/2.0f - imageSize.x * (1.5f + i/100.0f);
@@ -396,12 +397,15 @@ void OBBTestImageOutsideBoundary( TestApplication& application, int width, int h
       float x = (stageSize.x/17.0f) * j; // use larger intervals to test more area
       float y = (stageSize.y/17.0f) * j;
 
-      RepositionActor( application, imageActor, x1, y, false );
-      RepositionActor( application, imageActor, x2, y, false );
-      RepositionActor( application, imageActor, x, y1, false );
-      RepositionActor( application, imageActor, x, y2, false );
+      if(RepositionActor( application, imageActor, x1, y, false )) successCount++;
+      if(RepositionActor( application, imageActor, x2, y, false )) successCount++;
+      if(RepositionActor( application, imageActor, x, y1, false )) successCount++;
+      if(RepositionActor( application, imageActor, x, y2, false )) successCount++;
+      totalCount+=4;
     }
   }
+  DALI_TEST_EQUALS(successCount, totalCount, TEST_LOCATION);
+  tet_printf( "Test succeeded with %d passes out of %d tests\n", successCount, totalCount);
 }
 
 void TestPlaneOfImages(TestApplication& application, float z)
@@ -791,8 +795,6 @@ int UtcDaliImageCulling_Plane04(void)
   END_TEST;
 }
 
-
-
 int UtcDaliImageCulling_Disable(void)
 {
   tet_infoline("Test that culling can be disabled");
@@ -814,17 +816,16 @@ int UtcDaliImageCulling_Disable(void)
   DALI_TEST_EQUALS( imageSize, Vector3(width, height, std::min(width, height)), TEST_LOCATION);
 
   imageSize.z = 0.0f;
-  float radius = imageSize.Length() * 0.5f; // Radius of bounding box
 
   tet_infoline("Setting cull mode to false\n");
   Stage::GetCurrent().GetRenderTaskList().GetTask(0).SetCullMode(false);
 
-  float x1 = -stageSize.x/2.0f - imageSize.x;
-  float x2 =  stageSize.x/2.0f + imageSize.x;
-  float y1 = -stageSize.y/2.0f - imageSize.y;
-  float y2 =  stageSize.y/2.0f + imageSize.y;
+  float x1 = -stageSize.x - imageSize.x;
+  float x2 =  stageSize.x + imageSize.x;
+  float y1 = -stageSize.y - imageSize.y;
+  float y2 =  stageSize.y + imageSize.y;
 
-  // Positioning actors well outside stage, with no culling, they should still be drawn.
+  // Positioning actors outside stage, with no culling, they should still be drawn.
   RepositionActorOutside( application, imageActor, x1, y1, true );
   RepositionActorOutside( application, imageActor, x2, y1, true );
   RepositionActorOutside( application, imageActor, x1, y2, true );

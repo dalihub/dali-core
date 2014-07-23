@@ -86,7 +86,19 @@ void TestPlatformAbstraction::GetClosestImageSize( Integration::ResourcePointer 
  */
 void TestPlatformAbstraction::LoadResource(const Integration::ResourceRequest& request)
 {
-  mTrace.PushCall("LoadResource", "");
+  std::ostringstream out;
+  out << "Type:";
+  if( request.GetType()->id == Integration::ResourceText )
+  {
+    out << "Text";
+  }
+  else
+  {
+    out << request.GetType()->id;
+  }
+  out << ", Path: " << request.GetPath() << std::endl ;
+
+  mTrace.PushCall("LoadResource", out.str());
   if(mRequest != NULL)
   {
     delete mRequest;

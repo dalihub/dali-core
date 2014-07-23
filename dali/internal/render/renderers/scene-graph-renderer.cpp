@@ -23,6 +23,7 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/render/shaders/program.h>
+#include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
 #include <dali/internal/render/renderers/render-data-provider.h>
 #include <dali/public-api/actors/blending.h>
 #include <dali/internal/common/image-sampler.h>
@@ -35,6 +36,8 @@ namespace Internal
 
 namespace
 {
+
+
 static Matrix gModelViewProjectionMatrix( false ); ///< a shared matrix to calculate the MVP matrix, dont want to store it locally to reduce storage overhead
 static Matrix3 gNormalMatrix; ///< a shared matrix to calculate normal matrix, dont want to store it locally to reduce storage overhead
 
@@ -99,6 +102,7 @@ inline void SetMatrices( Program& program,
     program.SetUniformMatrix3fv( loc, 1, gNormalMatrix.AsFloat() );
   }
 }
+
 }
 
 namespace SceneGraph
@@ -183,6 +187,7 @@ void Renderer::Render( BufferIndex bufferIndex,
       return;
     }
   }
+
   // Take the program into use so we can send uniforms to it
   program.Use();
 
@@ -240,6 +245,7 @@ void Renderer::Render( BufferIndex bufferIndex,
 Renderer::Renderer( RenderDataProvider& dataprovider )
 : mDataProvider( dataprovider ),
   mContext( NULL ),
+
   mTextureCache( NULL ),
   mShader( NULL ),
   mSamplerBitfield( ImageSampler::DefaultOptions() ),

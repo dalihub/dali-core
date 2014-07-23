@@ -22,6 +22,7 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/internal/event/text/glyph-status/glyph-status.h>
 #include <dali/internal/event/text/special-characters.h>
+#include <dali/integration-api/debug.h>
 
 // EXTERNAL INCLUDES
 #include <cmath>  // for std::sin
@@ -34,6 +35,10 @@ namespace Internal
 
 namespace // unnamed namespace
 {
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gTextVertsLogFilter = Debug::Filter::New( Debug::Concise, false, "LOG_TEXT_VERTEX_FILTER" );
+#endif
 
 typedef std::vector<TextVertex2D> VertexBuffer;
 
@@ -91,6 +96,9 @@ void RepositionData( TextVertexBuffer& buffer )
     vertex.mX -= offset.x;
     vertex.mY -= offset.y;
   }
+
+  buffer.mGeometryExtent.width = maxX - minX;
+  buffer.mGeometryExtent.height = maxY - minY;
 }
 
 void AddVertex( VertexBuffer& vertexBuffer,
@@ -406,6 +414,11 @@ TextVertexBuffer* TextVertexGenerator::Generate( const TextArray& text,
 #ifdef DEBUG_VERTS
   DebugVertexBuffer( vertexBuffer );
 #endif
+
+  DALI_LOG_INFO(gTextVertsLogFilter, Debug::General, "TextVertexBuffer for %c%c%c...: Calculated Extents:(%5.2f, %5.2f)\n  Geometry Extents:(%5.2f, %5.2f )\n",
+                text.size()>0?(char)text[0]:' ', text.size()>1?(char)text[1]:' ', text.size()>2?(char)text[2]:' ',
+                textVertexBuffer->mVertexMax.x,textVertexBuffer->mVertexMax.y,
+                textVertexBuffer->mGeometryExtent.width,textVertexBuffer->mGeometryExtent.height);
 
   return textVertexBuffer;
 }
