@@ -66,13 +66,16 @@ typedef ProgressValue<Quaternion>                       ProgressQuaternion;
 typedef std::vector<ProgressQuaternion>                 ProgressQuaternionContainer;
 
 typedef ProgressValue<AngleAxis>                        ProgressAngleAxis;
-typedef std::vector<ProgressQuaternion>                 ProgressQuaternionContainer;
+typedef std::vector<AngleAxis>                          ProgressAngleAxisContainer;
 
 typedef ProgressValue<bool>                             ProgressBoolean;
 typedef std::vector<ProgressBoolean>                    ProgressBooleanContainer;
 
 typedef ProgressValue<float>                            ProgressNumber;
 typedef std::vector<ProgressNumber>                     ProgressNumberContainer;
+
+typedef ProgressValue<int>                              ProgressInteger;
+typedef std::vector<ProgressInteger>                    ProgressIntegerContainer;
 
 typedef ProgressValue<Vector2>                          ProgressVector2;
 typedef std::vector<ProgressVector2>                    ProgressVector2Container;
@@ -110,6 +113,11 @@ inline bool Interpolate (ProgressBoolean& a, ProgressBoolean& b, float progress)
 inline float Interpolate (ProgressNumber& a, ProgressNumber& b, float progress)
 {
   return (a.GetValue() + (b.GetValue() - a.GetValue()) * progress);
+}
+
+inline int Interpolate (ProgressInteger& a, ProgressInteger& b, float progress)
+{
+  return static_cast<int>(a.GetValue() + (b.GetValue() - a.GetValue()) * progress + 0.5f);
 }
 
 inline Vector2 Interpolate (ProgressVector2& a, ProgressVector2& b, float progress)

@@ -2690,6 +2690,17 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
         break;
       }
 
+      case Property::INTEGER:
+      {
+        AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::NodePropertyMessage<int>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<int>::Bake, value.Get<int>() );
+
+        break;
+      }
+
       case Property::VECTOR2:
       {
         AnimatableProperty<Vector2>* property = dynamic_cast< AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );

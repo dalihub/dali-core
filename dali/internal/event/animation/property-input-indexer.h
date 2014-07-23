@@ -73,6 +73,14 @@ public:
   }
 
   /**
+   * @copydoc Dali::Internal::PropertyInput::GetInteger()
+   */
+  virtual const int& GetInteger() const
+  {
+    return mInput->GetConstraintInputInteger( mBufferIndex );
+  }
+
+  /**
    * @copydoc Dali::Internal::PropertyInput::GetVector2()
    */
   virtual const Vector2& GetVector2() const

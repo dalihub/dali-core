@@ -51,6 +51,11 @@ ConditionFunction Step::GetFunction(Property::Type valueType)
       function = EvalFloat;
       break;
     }
+    case Property::INTEGER:
+    {
+      function = EvalInteger;
+      break;
+    }
     case Property::VECTOR2:
     {
       function = EvalVector2;
@@ -97,6 +102,12 @@ bool Step::Evaluate( const float propertyValue, PropertyNotification::RawArgumen
 bool Step::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float propertyValue = value.GetFloat();
+  return Evaluate( propertyValue, arg );
+}
+
+bool Step::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+{
+  const float propertyValue = static_cast<float>( value.GetInteger() );
   return Evaluate( propertyValue, arg );
 }
 

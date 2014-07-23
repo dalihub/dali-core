@@ -108,6 +108,14 @@ public:
   }
 
   /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputInteger() const
+   */
+  const int& GetConstraintInputInteger( BufferIndex updateBufferIndex ) const
+  {
+    return mInput->GetConstraintInputInteger( updateBufferIndex );
+  }
+
+  /**
    * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputVector2()
    */
   const Vector2& GetConstraintInputVector2( BufferIndex updateBufferIndex ) const
@@ -287,6 +295,16 @@ public:
 
     DALI_ASSERT_DEBUG( 3 == mComponentIndex && "Invalid Vector4 component index" );
     return mInput->GetConstraintInputVector4( updateBufferIndex ).w;
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetConstraintInputInteger() const
+   */
+  const int& GetConstraintInputInteger( BufferIndex updateBufferIndex ) const
+  {
+    DALI_ASSERT_DEBUG( mComponentIndex < 0 && "Did not expect valid component index" );
+
+    return mInput->GetConstraintInputInteger( updateBufferIndex );
   }
 
   /**

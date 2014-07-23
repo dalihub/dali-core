@@ -67,6 +67,14 @@ public:
   virtual const float& GetFloat() const = 0;
 
   /**
+   * @brief Retrieve an integer value.
+   *
+   * @pre GetType() returns Property::INTEGER.
+   * @return The integer value.
+   */
+  virtual const int& GetInteger() const = 0;
+
+  /**
    * @brief Retrieve a Vector2 value.
    *
    * @pre GetType() returns Property::VECTOR2.

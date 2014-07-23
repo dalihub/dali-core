@@ -240,6 +240,7 @@ public:
 
 typedef KeyFrameBaseSpec<float>      KeyFrameNumber;
 typedef KeyFrameBaseSpec<bool>       KeyFrameBoolean;
+typedef KeyFrameBaseSpec<int>        KeyFrameInteger;
 typedef KeyFrameBaseSpec<Vector2>    KeyFrameVector2;
 typedef KeyFrameBaseSpec<Vector3>    KeyFrameVector3;
 typedef KeyFrameBaseSpec<Vector4>    KeyFrameVector4;
@@ -247,6 +248,7 @@ typedef KeyFrameBaseSpec<Quaternion> KeyFrameQuaternion;
 
 typedef IntrusivePtr<KeyFrameBoolean>    KeyFrameBooleanPtr;
 typedef IntrusivePtr<KeyFrameNumber>     KeyFrameNumberPtr;
+typedef IntrusivePtr<KeyFrameInteger>    KeyFrameIntegerPtr;
 typedef IntrusivePtr<KeyFrameVector2>    KeyFrameVector2Ptr;
 typedef IntrusivePtr<KeyFrameVector3>    KeyFrameVector3Ptr;
 typedef IntrusivePtr<KeyFrameVector4>    KeyFrameVector4Ptr;
@@ -263,7 +265,6 @@ inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Intern
   keyFrameSpec = static_cast<const Internal::KeyFrameBoolean*>(keyFrames.GetKeyFramesBase());
 }
 
-
 inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameNumber*& keyFrameSpec)
 {
   keyFrameSpec = static_cast<Internal::KeyFrameNumber*>(keyFrames.GetKeyFramesBase());
@@ -272,6 +273,16 @@ inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrame
 inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameNumber*& keyFrameSpec)
 {
   keyFrameSpec = static_cast<const Internal::KeyFrameNumber*>(keyFrames.GetKeyFramesBase());
+}
+
+inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameInteger*& keyFrameSpec)
+{
+  keyFrameSpec = static_cast<Internal::KeyFrameInteger*>(keyFrames.GetKeyFramesBase());
+}
+
+inline void GetSpecialization(const Internal::KeyFrames& keyFrames, const Internal::KeyFrameInteger*& keyFrameSpec)
+{
+  keyFrameSpec = static_cast<const Internal::KeyFrameInteger*>(keyFrames.GetKeyFramesBase());
 }
 
 inline void GetSpecialization(Internal::KeyFrames& keyFrames, Internal::KeyFrameVector2*& keyFrameSpec)

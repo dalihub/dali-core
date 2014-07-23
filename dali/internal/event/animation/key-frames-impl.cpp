@@ -51,6 +51,9 @@ void KeyFrames::CreateKeyFramesSpec(Property::Type type)
     case Property::FLOAT:
       mKeyFrames = Internal::KeyFrameNumber::New();
       break;
+    case Property::INTEGER:
+      mKeyFrames = Internal::KeyFrameInteger::New();
+      break;
     case Property::VECTOR2:
       mKeyFrames = Internal::KeyFrameVector2::New();
       break;
@@ -98,6 +101,12 @@ void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)
     {
       Internal::KeyFrameNumber* kf = static_cast<Internal::KeyFrameNumber*>(mKeyFrames.Get());
       kf->AddKeyFrame(time, value.Get<float>(), alpha);
+      break;
+    }
+    case Property::INTEGER:
+    {
+      Internal::KeyFrameInteger* kf = static_cast<Internal::KeyFrameInteger*>(mKeyFrames.Get());
+      kf->AddKeyFrame(time, value.Get<int>(), alpha);
       break;
     }
     case Property::VECTOR2:
