@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/update/node-attachments/scene-graph-text-attachment.h>
@@ -130,43 +131,17 @@ void TextAttachment::SetTextFontSize( BufferIndex updateBufferIndex, float pixel
   new (slot) DerivedType( mTextRenderer, &TextRenderer::SetFontSize, pixelSize );
 }
 
-void TextAttachment::SetGradientColor( BufferIndex updateBufferIndex, const Vector4& color )
+void TextAttachment::SetGradient( BufferIndex updateBufferIndex, const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
 {
   DALI_ASSERT_DEBUG(mSceneController);
 
-  typedef MessageValue1< TextRenderer, Vector4 > DerivedType;
+  typedef MessageValue3< TextRenderer, Vector4, Vector2, Vector2 > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetGradientColor, color );
-}
-
-void TextAttachment::SetGradientStartPoint( BufferIndex updateBufferIndex, const Vector2& position )
-{
-  DALI_ASSERT_DEBUG(mSceneController);
-
-  typedef MessageValue1< TextRenderer, Vector2 > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetGradientStartPoint, position );
-}
-
-void TextAttachment::SetGradientEndPoint( BufferIndex updateBufferIndex, const Vector2& position )
-{
-  DALI_ASSERT_DEBUG(mSceneController);
-
-  typedef MessageValue1< TextRenderer, Vector2 > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetGradientEndPoint, position );
+  new (slot) DerivedType( mTextRenderer, &TextRenderer::SetGradient, color, startPoint, endPoint );
 }
 
 void TextAttachment::SetTextColor( BufferIndex updateBufferIndex, const Vector4& color )

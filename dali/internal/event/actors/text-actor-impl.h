@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_TEXT_ACTOR_H__
 #define __DALI_INTERNAL_TEXT_ACTOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
@@ -143,6 +144,13 @@ public:
   const Vector2& GetGradientEndPoint() const;
 
   /**
+   * @see Dali::TextActor::SetGradientColor()
+   * @see Dali::TextActor::SetGradientStartPoint()
+   * @see Dali::TextActor::SetGradientEndPoint()
+   */
+  void SetGradient( const Vector4& color, const Vector2& startPoint, const Vector2& endPoint );
+
+  /**
    * @copydoc Dali::TextActor::SetTextStyle( const TextStyle& style )
    * @param mode whether new text should be requested
    */
@@ -166,33 +174,38 @@ public:
   /**
    * @copydoc Dali::TextActor::SetSmoothEdge(const float)
    */
-  void SetSmoothEdge(const float smoothEdge);
+  void SetSmoothEdge( float smoothEdge );
 
   /**
-   * @copydoc Dali::TextActor::SetOutline(const bool,const Vector4&,const Vector2&)
+   * @copydoc Dali::TextActor::SetOutline( bool,const Vector4&,const Vector2&)
    */
-  void SetOutline(const bool enable, const Vector4& color, const Vector2& thickness);
+  void SetOutline( bool enable, const Vector4& color, const Vector2& thickness );
 
   /**
    * @copydoc Dali::TextActor::SetGlow(const bool,const Vector4&,const float)
    */
-  void SetGlow(const bool enable, const Vector4& color, const float intensity);
+  void SetGlow( bool enable, const Vector4& color, float intensity );
 
   /**
    * @copydoc Dali::TextActor::SetShadow(const bool,const Vector4&,const Vector2&,const float)
    */
-  void SetShadow(const bool enable, const Vector4& color, const Vector2& offset, const float size);
+  void SetShadow( bool enable, const Vector4& color, const Vector2& offset, float size );
 
   /**
    * Enable italics on the text actor, the text will be sheared by the given angle.
    * @param[in] angle Italics angle in radians.
    */
-  void SetItalics( const Radian& angle );
+  void SetItalics( Radian angle );
 
   /**
    * @copydoc Dali::TextActor::GetItalics()
    */
-  const Radian& GetItalics() const;
+  bool GetItalics() const;
+
+  /**
+   * @copydoc Dali::TextActor::GetItalicsAngle()
+   */
+  Radian GetItalicsAngle() const;
 
   /**
    * @copydoc Dali::TextActor::SetUnderline()

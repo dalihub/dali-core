@@ -46,6 +46,7 @@ internal_src_files = \
   $(internal_src_dir)/event/common/type-registry-impl.cpp \
   $(internal_src_dir)/event/effects/shader-effect-impl.cpp \
   $(internal_src_dir)/event/effects/shader-factory.cpp \
+  $(internal_src_dir)/event/events/actor-gesture-data.cpp \
   $(internal_src_dir)/event/events/event-processor.cpp \
   $(internal_src_dir)/event/events/key-event-processor.cpp \
   $(internal_src_dir)/event/events/gesture-detector-impl.cpp \
@@ -208,7 +209,6 @@ internal_dynamics_src_files = \
   $(internal_src_dir)/event/dynamics/dynamics-sphere-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-world-config-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-world-impl.cpp \
-  $(internal_src_dir)/render/dynamics/scene-graph-dynamics-debug-renderer.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-body.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-capsule-shape.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-cone-shape.cpp \

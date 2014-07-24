@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 
@@ -22,198 +23,493 @@
 
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/text/font.h>
+#include <dali/public-api/common/dali-vector.h>
+
+// EXTERNAL INCLUDES
+
+#include <stdint.h>
 
 namespace Dali
 {
 
-const Degree  TextStyle::DEFAULT_ITALICS_ANGLE( 20.0f );
-const float   TextStyle::DEFAULT_UNDERLINE_THICKNESS( 0.f );
-const float   TextStyle::DEFAULT_UNDERLINE_POSITION( 0.f );
-const Vector4 TextStyle::DEFAULT_TEXT_COLOR( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) ); // cannot use Color::WHITE because it may or may not be initialized yet
-const Vector4 TextStyle::DEFAULT_SHADOW_COLOR( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) ); // cannot use Color::BLACK because it may or may not be initialized yet
-const Vector2 TextStyle::DEFAULT_SHADOW_OFFSET( 1.0f, 1.0f );
-const float   TextStyle::DEFAULT_SHADOW_SIZE( 0.0f );
-const Vector4 TextStyle::DEFAULT_GLOW_COLOR( Vector4( 1.0f, 1.0f, 0.0f, 1.0f ) ); // cannot use Color::YELLOW because it may or may not be initialized yet
-const float   TextStyle::DEFAULT_GLOW_INTENSITY( 0.05f );
-const float   TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD( 0.46f );
-const Vector4 TextStyle::DEFAULT_OUTLINE_COLOR( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) ); // cannot use Color::BLACK because it may or may not be initialized yet
-const Vector2 TextStyle::DEFAULT_OUTLINE_THICKNESS( 0.51f, 0.00f );
-const Vector4 TextStyle::DEFAULT_GRADIENT_COLOR( 1.0f, 1.0f, 1.0f, 1.0f );            // cannot use Color::WHI|TE because it may or may not be initialized yet
-const Vector2 TextStyle::DEFAULT_GRADIENT_START_POINT( 0.0f, 0.0f );
-const Vector2 TextStyle::DEFAULT_GRADIENT_END_POINT( 0.0f, 0.0f );
-
-const std::string DEFAULT_NAME;
-
-struct TextStyle::Impl
+class TextStyleContainer
 {
-  Impl()
-  : mFontName(),
-    mFontStyle(),
-    mFontPointSize( 0.f ),
-    mWeight( REGULAR ),
-    mTextColor( DEFAULT_TEXT_COLOR ),
-    mItalics( false ),
-    mUnderline( false ),
-    mShadow( false ),
-    mGlow( false ),
-    mOutline( false ),
-    mItalicsAngle( DEFAULT_ITALICS_ANGLE ),
-    mUnderlineThickness( DEFAULT_UNDERLINE_THICKNESS ),
-    mUnderlinePosition( DEFAULT_UNDERLINE_POSITION ),
-    mShadowColor( DEFAULT_SHADOW_COLOR ),
-    mShadowOffset( DEFAULT_SHADOW_OFFSET ),
-    mShadowSize( DEFAULT_SHADOW_SIZE ),
-    mGlowColor( DEFAULT_GLOW_COLOR ),
-    mGlowIntensity( DEFAULT_GLOW_INTENSITY ),
-    mSmoothEdge( DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD ),
-    mOutlineColor( DEFAULT_OUTLINE_COLOR ),
-    mOutlineThickness( DEFAULT_OUTLINE_THICKNESS )
+private:
+
+  // Number of bits for an index mask - increase if more attributes are added...
+  static const unsigned int PARAMETER_BITS;
+  // Set mask for this number of bits
+  static const uint64_t PARAMETER_MASK;
+
+  // Shift values for attribute indices
+  static const unsigned int COMMON_INDEX_SHIFT;
+  static const unsigned int WEIGHT_INDEX_SHIFT;
+  static const unsigned int ITALICS_INDEX_SHIFT;
+  static const unsigned int UNDERLINE_INDEX_SHIFT;
+  static const unsigned int DROP_SHADOW_INDEX_SHIFT;
+  static const unsigned int GLOW_INDEX_SHIFT;
+  static const unsigned int OUTLINE_INDEX_SHIFT;
+  static const unsigned int GRADIENT_INDEX_SHIFT;
+  static const unsigned int PARAMETER_FLAGS;
+
+  // Position in flags for attribute index
+  static const uint64_t COMMON_INDEX;
+  static const uint64_t WEIGHT_INDEX;
+  static const uint64_t ITALICS_INDEX;
+  static const uint64_t UNDERLINE_INDEX;
+  static const uint64_t DROP_SHADOW_INDEX;
+  static const uint64_t GLOW_INDEX;
+  static const uint64_t OUTLINE_INDEX;
+  static const uint64_t GRADIENT_INDEX;
+
+  // Flag positions and enables for attributes
+  static const uint64_t ITALICS_ENABLED;
+  static const uint64_t UNDERLINE_ENABLED;
+  static const uint64_t DROP_SHADOW_ENABLED;
+  static const uint64_t GLOW_ENABLED;
+  static const uint64_t OUTLINE_ENABLED;
+  static const uint64_t GRADIENT_ENABLED;
+
+  static const uint64_t FONT_NAME_EXISTS;
+  static const uint64_t FONT_STYLE_EXISTS;
+  static const uint64_t FONT_SIZE_EXISTS;
+  static const uint64_t TEXT_COLOR_EXISTS;
+  static const uint64_t COMMON_PARAMETERS_EXISTS;
+  static const uint64_t FONT_WEIGHT_EXISTS;
+  static const uint64_t SMOOTH_EDGE_EXISTS;
+  static const uint64_t SMOOTH_WEIGHT_EXISTS;
+  static const uint64_t ITALICS_EXISTS;
+  static const uint64_t UNDERLINE_EXISTS;
+  static const uint64_t DROP_SHADOW_EXISTS;
+  static const uint64_t GLOW_EXISTS;
+  static const uint64_t OUTLINE_EXISTS;
+  static const uint64_t GRADIENT_EXISTS;
+  static const uint64_t ATTRIBUTE_END;
+
+  TextStyleContainer()
+  : mFlags( 0 )
   {
   }
 
-  Impl( const std::string& fontName,
-        const std::string& fontStyle,
-        PointSize fontPointSize,
-        Weight weight,
-        const Vector4& textColor,
-        bool italics,
-        bool underline,
-        bool shadow,
-        bool glow,
-        bool outline,
-        Degree italicsAngle,
-        float underlineThickness,
-        float underlinePosition,
-        const Vector4& shadowColor,
-        const Vector2& shadowOffset,
-        const float shadowSize,
-        const Vector4& glowColor,
-        float glowIntensity,
-        float smoothEdge,
-        const Vector4& outlineColor,
-        const Vector2& outlineThickness )
-  : mFontName( fontName ),
-    mFontStyle( fontStyle ),
-    mFontPointSize( fontPointSize ),
-    mWeight( weight ),
-    mTextColor( textColor ),
-    mItalics( italics ),
-    mUnderline( underline ),
-    mShadow( shadow ),
-    mGlow( glow ),
-    mOutline( outline ),
-    mItalicsAngle( italicsAngle ),
-    mUnderlineThickness( underlineThickness ),
-    mUnderlinePosition( underlinePosition ),
-    mShadowColor( shadowColor ),
-    mShadowOffset( shadowOffset ),
-    mShadowSize( shadowSize ),
-    mGlowColor( glowColor ),
-    mGlowIntensity( glowIntensity ),
-    mSmoothEdge( smoothEdge ),
-    mOutlineColor( outlineColor ),
-    mOutlineThickness( outlineThickness )
+  ~TextStyleContainer()
   {
+    if( mFlags & COMMON_PARAMETERS_EXISTS )
+    {
+      StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+      delete attrPtr;
+    }
+    if( mFlags & SMOOTH_WEIGHT_EXISTS )
+    {
+      StyleWeightAttributes* attrPtr = reinterpret_cast<StyleWeightAttributes*>( *( mParameters.Begin() + ( ( mFlags >> WEIGHT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+      delete attrPtr;
+    }
+    if( mFlags & ITALICS_EXISTS )
+    {
+      StyleItalicsAttributes* attrPtr = reinterpret_cast<StyleItalicsAttributes*>( *( mParameters.Begin() + ( ( mFlags >> ITALICS_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+      delete attrPtr;
+    }
+    if( mFlags & UNDERLINE_EXISTS )
+    {
+      StyleUnderlineAttributes* attrPtr = reinterpret_cast<StyleUnderlineAttributes*>( *( mParameters.Begin() + ( ( mFlags >> UNDERLINE_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+      delete attrPtr;
+    }
+    if( mFlags & DROP_SHADOW_EXISTS )
+    {
+      StyleShadowAttributes* attrPtr = reinterpret_cast<StyleShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+      delete attrPtr;
+    }
+    if( mFlags & GLOW_EXISTS )
+    {
+      StyleGlowAttributes* attrPtr = reinterpret_cast<StyleGlowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GLOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+      delete attrPtr;
+    }
+    if( mFlags & OUTLINE_EXISTS )
+    {
+      StyleOutlineAttributes* attrPtr = reinterpret_cast<StyleOutlineAttributes*>( *( mParameters.Begin() + ( ( mFlags >> OUTLINE_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+      delete attrPtr;
+    }
+    if( mFlags & GRADIENT_EXISTS )
+    {
+      StyleGradientAttributes* attrPtr = reinterpret_cast<StyleGradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+      delete attrPtr;
+    }
   }
 
-  std::string mFontName;             ///< Font family name.
-  std::string mFontStyle;            ///< Font style.
-  PointSize   mFontPointSize;        ///< Size of the font in points.
-  Weight      mWeight;               ///< Style weight.
-  Vector4     mTextColor;            ///< Color of the text.
-  bool        mItalics:1;            ///< Whether the text is in italics or not.
-  bool        mUnderline:1;          ///< Whether the text is underlined or not.
-  bool        mShadow:1;             ///< Whether the text has a shadow or not.
-  bool        mGlow:1;               ///< Whether the text has a glow or not.
-  bool        mOutline:1;            ///< Whether the text has an outline or not.
-  Degree      mItalicsAngle;         ///< The italics angle.
-  float       mUnderlineThickness;   ///< The underline's thickness.
-  float       mUnderlinePosition;    ///< The underline's position.
-  Vector4     mShadowColor;          ///< The color of the shadow.
-  Vector2     mShadowOffset;         ///< The shadow offset in pixels.
-  float       mShadowSize;           ///< The shadow size in pixels
-  Vector4     mGlowColor;            ///< The color of the glow.
-  float       mGlowIntensity;        ///< Determines the amount of glow around text.
-  float       mSmoothEdge;           ///< Specify the distance field value for the center of the text edge.
-  Vector4     mOutlineColor;         ///< The color of the outline.
-  Vector2     mOutlineThickness;     ///< The outline's thickness.
+  struct StyleCommonAttributes
+  {
+    StyleCommonAttributes()
+    : mFontPointSize( 0.0f )
+    {}
+
+    std::string mFontName;
+    std::string mFontStyle;
+    PointSize mFontPointSize;
+    Vector4 mTextColor;
+  };
+
+  struct StyleWeightAttributes
+  {
+    StyleWeightAttributes()
+    : mWeight( TextStyle::DEFAULT_FONT_WEIGHT ),
+      mSmoothEdge( 0.0f )
+    {}
+
+    TextStyle::Weight mWeight;
+    float mSmoothEdge;
+  };
+
+  struct StyleItalicsAttributes
+  {
+    StyleItalicsAttributes()
+    : mItalicsAngle( Degree( 0.0f ) )
+    {}
+    Degree mItalicsAngle;
+  };
+
+  struct StyleUnderlineAttributes
+  {
+    float mUnderlineThickness;
+    float mUnderlinePosition;
+  };
+
+  struct StyleShadowAttributes
+  {
+    Vector4 mShadowColor;
+    Vector2 mShadowOffset;
+    float mShadowSize;
+  };
+
+  struct StyleGlowAttributes
+  {
+    Vector4 mGlowColor;
+    float mGlowIntensity;
+  };
+
+  struct StyleOutlineAttributes
+  {
+    Vector4 mOutlineColor;
+    Vector2 mOutlineThickness;
+  };
+
+  struct StyleGradientAttributes
+  {
+    Vector4 mColor;
+    Vector2 mStartPoint;
+    Vector2 mEndPoint;
+  };
+
+  void SetCommonDefaults( StyleCommonAttributes* attr );
+  void SetFontName( const std::string& fontName );
+  void SetFontStyle( const std::string& fontStyle );
+  void SetFontPointSize( PointSize fontPointSize );
+  void SetTextColor( const Vector4& textColor );
+  void SetWeight( TextStyle::Weight weight );
+  void SetSmoothEdge( float smoothEdge );
+  void SetItalics( bool enable, Degree angle );
+  void SetUnderline( bool enable, float thickness, float position );
+  void SetShadow( bool enable, const Vector4& shadowColor, const Vector2& shadowOffset, float shadowSize );
+  void SetGlow( bool enable, const Vector4& glowColor, float glowIntensity );
+  void SetOutline( bool enable, const Vector4& outlineColor, const Vector2& outlineThickness );
+  void SetGradient( bool enable, const Vector4& color, const Vector2& startPosition, const Vector2& endPosition );
+
+  const std::string& GetFontName() const;
+  const std::string& GetFontStyle() const;
+  PointSize GetFontPointSize() const;
+  const Vector4& GetTextColor() const;
+  TextStyle::Weight GetWeight() const;
+  float GetSmoothEdge() const;
+  Degree GetItalicsAngle() const;
+  float GetUnderlineThickness() const;
+  float GetUnderlinePosition() const;
+  const Vector4& GetShadowColor() const;
+  const Vector2& GetShadowOffset() const;
+  float GetShadowSize() const;
+  const Vector4& GetGlowColor() const;
+  float GetGlowIntensity() const;
+  const Vector2& GetOutlineThickness() const;
+  const Vector4& GetOutlineColor() const;
+  const Vector4& GetGradientColor() const;
+  const Vector2& GetGradientStartPoint() const;
+  const Vector2& GetGradientEndPoint() const;
+
+  void UpdateIndex( std::size_t index );
+  void ResetFontName();
+  void ResetFontStyle();
+  void ResetFontSize();
+  void ResetTextColor();
+  void ResetFontWeight();
+  void ResetSmoothEdge();
+  void ResetItalics();
+  void ResetUnderline();
+  void ResetShadow();
+  void ResetGlow();
+  void ResetOutline();
+  void ResetGradient();
+
+  // Private and not implemented.
+  TextStyleContainer( const TextStyleContainer& );
+  TextStyleContainer& operator=( const TextStyleContainer& );
+
+  Vector< char* > mParameters; ///< container for used style parameters.
+  uint64_t mFlags;             ///< flags for used attributes, packed with position in container
+  friend class TextStyle;
 };
 
+// Number of bits for an index mask - increase if more attributes are added...
+const unsigned int TextStyleContainer::PARAMETER_BITS =          3u;
+const uint64_t ONE = 1lu;
+
+// Set mask for this number of bits
+const uint64_t TextStyleContainer::PARAMETER_MASK =              ~( -1l << TextStyleContainer::PARAMETER_BITS );
+
+// Shift values for attribute indices
+const unsigned int TextStyleContainer::COMMON_INDEX_SHIFT =      0u;                                     // starts at bit 0
+const unsigned int TextStyleContainer::WEIGHT_INDEX_SHIFT =      TextStyleContainer::PARAMETER_BITS * 1; // starts at bit 3
+const unsigned int TextStyleContainer::ITALICS_INDEX_SHIFT =     TextStyleContainer::PARAMETER_BITS * 2; // starts at bit 6
+const unsigned int TextStyleContainer::UNDERLINE_INDEX_SHIFT =   TextStyleContainer::PARAMETER_BITS * 3; // starts at bit 9
+const unsigned int TextStyleContainer::DROP_SHADOW_INDEX_SHIFT = TextStyleContainer::PARAMETER_BITS * 4; // starts at bit 12
+const unsigned int TextStyleContainer::GLOW_INDEX_SHIFT =        TextStyleContainer::PARAMETER_BITS * 5; // starts at bit 15
+const unsigned int TextStyleContainer::OUTLINE_INDEX_SHIFT =     TextStyleContainer::PARAMETER_BITS * 6; // starts at bit 18
+const unsigned int TextStyleContainer::GRADIENT_INDEX_SHIFT =    TextStyleContainer::PARAMETER_BITS * 7; // starts at bit 21
+const unsigned int TextStyleContainer::PARAMETER_FLAGS =         TextStyleContainer::PARAMETER_BITS * 8; // 24 == 3 x 8
+
+// Position in flags for attribute index
+const uint64_t TextStyleContainer::COMMON_INDEX =                0lu;                                                                               // bits  0 ..  2
+const uint64_t TextStyleContainer::WEIGHT_INDEX =                TextStyleContainer::PARAMETER_MASK << TextStyleContainer::WEIGHT_INDEX_SHIFT;      // bits  3 ..  5
+const uint64_t TextStyleContainer::ITALICS_INDEX =               TextStyleContainer::PARAMETER_MASK << TextStyleContainer::ITALICS_INDEX_SHIFT;     // bits  6 ..  8
+const uint64_t TextStyleContainer::UNDERLINE_INDEX =             TextStyleContainer::PARAMETER_MASK << TextStyleContainer::UNDERLINE_INDEX_SHIFT;   // bits  9 .. 11
+const uint64_t TextStyleContainer::DROP_SHADOW_INDEX =           TextStyleContainer::PARAMETER_MASK << TextStyleContainer::DROP_SHADOW_INDEX_SHIFT; // bits 12 .. 14
+const uint64_t TextStyleContainer::GLOW_INDEX =                  TextStyleContainer::PARAMETER_MASK << TextStyleContainer::GLOW_INDEX_SHIFT;        // bits 15 .. 17
+const uint64_t TextStyleContainer::OUTLINE_INDEX =               TextStyleContainer::PARAMETER_MASK << TextStyleContainer::OUTLINE_INDEX_SHIFT;     // bits 18 .. 20
+const uint64_t TextStyleContainer::GRADIENT_INDEX =              TextStyleContainer::PARAMETER_MASK << TextStyleContainer::GRADIENT_INDEX_SHIFT;    // bits 21 .. 23
+
+// Flag positions and enables for attributes
+const uint64_t TextStyleContainer::ITALICS_ENABLED =             ONE << TextStyleContainer::PARAMETER_FLAGS;          // bit 24
+const uint64_t TextStyleContainer::UNDERLINE_ENABLED =           ONE << ( TextStyleContainer::PARAMETER_FLAGS + 1 );  // bit 25
+const uint64_t TextStyleContainer::DROP_SHADOW_ENABLED =         ONE << ( TextStyleContainer::PARAMETER_FLAGS + 2 );  // bit 26
+const uint64_t TextStyleContainer::GLOW_ENABLED =                ONE << ( TextStyleContainer::PARAMETER_FLAGS + 3 );  // bit 27
+const uint64_t TextStyleContainer::OUTLINE_ENABLED =             ONE << ( TextStyleContainer::PARAMETER_FLAGS + 4 );  // bit 28
+const uint64_t TextStyleContainer::GRADIENT_ENABLED =            ONE << ( TextStyleContainer::PARAMETER_FLAGS + 5 );  // bit 29
+
+const uint64_t TextStyleContainer::FONT_NAME_EXISTS =            ONE << ( TextStyleContainer::PARAMETER_FLAGS + 6 );  // bit 30
+const uint64_t TextStyleContainer::FONT_STYLE_EXISTS =           ONE << ( TextStyleContainer::PARAMETER_FLAGS + 7 );  // bit 31
+const uint64_t TextStyleContainer::FONT_SIZE_EXISTS =            ONE << ( TextStyleContainer::PARAMETER_FLAGS + 8 );  // bit 32
+const uint64_t TextStyleContainer::TEXT_COLOR_EXISTS =           ONE << ( TextStyleContainer::PARAMETER_FLAGS + 9 );  // bit 33
+const uint64_t TextStyleContainer::COMMON_PARAMETERS_EXISTS =    ( TextStyleContainer::FONT_NAME_EXISTS | TextStyleContainer::FONT_STYLE_EXISTS | TextStyleContainer::FONT_SIZE_EXISTS | TextStyleContainer::TEXT_COLOR_EXISTS );
+const uint64_t TextStyleContainer::FONT_WEIGHT_EXISTS =          ONE << ( TextStyleContainer::PARAMETER_FLAGS + 10 ); // bit 34
+const uint64_t TextStyleContainer::SMOOTH_EDGE_EXISTS =          ONE << ( TextStyleContainer::PARAMETER_FLAGS + 11 ); // bit 35
+const uint64_t TextStyleContainer::SMOOTH_WEIGHT_EXISTS =        ( TextStyleContainer::FONT_WEIGHT_EXISTS | TextStyleContainer::SMOOTH_EDGE_EXISTS );
+const uint64_t TextStyleContainer::ITALICS_EXISTS =              ONE << ( TextStyleContainer::PARAMETER_FLAGS + 12 ); // bit 36
+const uint64_t TextStyleContainer::UNDERLINE_EXISTS =            ONE << ( TextStyleContainer::PARAMETER_FLAGS + 13 ); // bit 37
+const uint64_t TextStyleContainer::DROP_SHADOW_EXISTS =          ONE << ( TextStyleContainer::PARAMETER_FLAGS + 14 ); // bit 38
+const uint64_t TextStyleContainer::GLOW_EXISTS =                 ONE << ( TextStyleContainer::PARAMETER_FLAGS + 15 ); // bit 39
+const uint64_t TextStyleContainer::OUTLINE_EXISTS =              ONE << ( TextStyleContainer::PARAMETER_FLAGS + 16 ); // bit 40
+const uint64_t TextStyleContainer::GRADIENT_EXISTS =             ONE << ( TextStyleContainer::PARAMETER_FLAGS + 17 ); // bit 41
+const uint64_t TextStyleContainer::ATTRIBUTE_END =               TextStyleContainer::GRADIENT_EXISTS;
+
+const Vector4           TextStyle::DEFAULT_TEXT_COLOR( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );    // cannot use Color::WHITE because it may or may not be initialized yet.
+const TextStyle::Weight TextStyle::DEFAULT_FONT_WEIGHT( TextStyle::REGULAR );
+const float             TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD( 0.46f );
+const Degree            TextStyle::DEFAULT_ITALICS_ANGLE( 20.0f );
+const float             TextStyle::DEFAULT_UNDERLINE_THICKNESS( 0.f );
+const float             TextStyle::DEFAULT_UNDERLINE_POSITION( 0.f );
+const Vector4           TextStyle::DEFAULT_SHADOW_COLOR( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) );  // cannot use Color::BLACK because it may or may not be initialized yet.
+const Vector2           TextStyle::DEFAULT_SHADOW_OFFSET( 1.0f, 1.0f );
+const float             TextStyle::DEFAULT_SHADOW_SIZE( 0.0f );
+const Vector4           TextStyle::DEFAULT_GLOW_COLOR( Vector4( 1.0f, 1.0f, 0.0f, 1.0f ) );    // cannot use Color::YELLOW because it may or may not be initialized yet.
+const float             TextStyle::DEFAULT_GLOW_INTENSITY( 0.05f );
+const Vector4           TextStyle::DEFAULT_OUTLINE_COLOR( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) ); // cannot use Color::BLACK because it may or may not be initialized yet.
+const Vector2           TextStyle::DEFAULT_OUTLINE_THICKNESS( 0.51f, 0.00f );
+const Vector4           TextStyle::DEFAULT_GRADIENT_COLOR( 1.0f, 1.0f, 1.0f, 1.0f );           // cannot use Color::WHITE because it may or may not be initialized yet.
+const Vector2           TextStyle::DEFAULT_GRADIENT_START_POINT( 0.0f, 0.0f );
+const Vector2           TextStyle::DEFAULT_GRADIENT_END_POINT( 0.0f, 0.0f );
+
+namespace
+{
+const std::string DEFAULT_NAME;
+const PointSize DEFAULT_FONT_POINT_SIZE( 0.f );
+} // namespace
 
 TextStyle::TextStyle()
-: mImpl( NULL )
+: mContainer( NULL )
 {
+}
+
+TextStyle::~TextStyle()
+{
+  delete mContainer;
 }
 
 TextStyle::TextStyle( const TextStyle& textStyle )
-: mImpl( NULL )
+: mContainer( NULL )
 {
-
-  if ( textStyle.mImpl )
-  {
-    mImpl = new TextStyle::Impl( textStyle.mImpl->mFontName,
-                                 textStyle.mImpl->mFontStyle,
-                                 textStyle.mImpl->mFontPointSize,
-                                 textStyle.mImpl->mWeight,
-                                 textStyle.mImpl->mTextColor,
-                                 textStyle.mImpl->mItalics,
-                                 textStyle.mImpl->mUnderline,
-                                 textStyle.mImpl->mShadow,
-                                 textStyle.mImpl->mGlow,
-                                 textStyle.mImpl->mOutline,
-                                 textStyle.mImpl->mItalicsAngle,
-                                 textStyle.mImpl->mUnderlineThickness,
-                                 textStyle.mImpl->mUnderlinePosition,
-                                 textStyle.mImpl->mShadowColor,
-                                 textStyle.mImpl->mShadowOffset,
-                                 textStyle.mImpl->mShadowSize,
-                                 textStyle.mImpl->mGlowColor,
-                                 textStyle.mImpl->mGlowIntensity,
-                                 textStyle.mImpl->mSmoothEdge,
-                                 textStyle.mImpl->mOutlineColor,
-                                 textStyle.mImpl->mOutlineThickness );
-  }
-}
-TextStyle::~TextStyle()
-{
-  delete mImpl;
+  TextStyle::operator=( textStyle );
 }
 
 TextStyle& TextStyle::operator=( const TextStyle& textStyle )
 {
-  if( &textStyle != this )
+  if( this == &textStyle )
   {
-    // Is the source object current set to defaults?
-    if ( textStyle.mImpl == NULL )
+    // Return 'this' if trying to assign the object itself.
+    return *this;
+  }
+
+  if ( textStyle.mContainer == NULL )
+  {
+    // If text-style to be assigned is default, delete the container to make 'this' default.
+    delete mContainer;
+    mContainer = NULL;
+    return *this;
+  }
+  else
+  {
+    int resetMask = TextStyle::NONE;
+
+    if( textStyle.IsFontNameDefault() )
     {
-      // Yes, so delete our current implementation and set to defaults (ie/ no implementation)
-      delete mImpl;
-      mImpl = NULL;
-      return *this;
+      if( !IsFontNameDefault() )
+      {
+        resetMask |= TextStyle::FONT;
+      }
+    }
+    else
+    {
+      SetFontName( textStyle.GetFontName() );
     }
 
-    CreateImplementationJustInTime();
-    mImpl->mFontName = textStyle.mImpl->mFontName;
-    mImpl->mFontStyle = textStyle.mImpl->mFontStyle;
-    mImpl->mFontPointSize = textStyle.mImpl->mFontPointSize;
-    mImpl->mWeight = textStyle.mImpl->mWeight;
-    mImpl->mTextColor = textStyle.mImpl->mTextColor;
-    mImpl->mItalics = textStyle.mImpl->mItalics;
-    mImpl->mUnderline = textStyle.mImpl->mUnderline;
-    mImpl->mShadow = textStyle.mImpl->mShadow;
-    mImpl->mGlow = textStyle.mImpl->mGlow;
-    mImpl->mOutline = textStyle.mImpl->mOutline;
-    mImpl->mItalicsAngle = textStyle.mImpl->mItalicsAngle;
-    mImpl->mUnderlineThickness = textStyle.mImpl->mUnderlineThickness;
-    mImpl->mUnderlinePosition = textStyle.mImpl->mUnderlinePosition;
-    mImpl->mShadowColor = textStyle.mImpl->mShadowColor;
-    mImpl->mShadowOffset = textStyle.mImpl->mShadowOffset;
-    mImpl->mShadowSize = textStyle.mImpl->mShadowSize;
-    mImpl->mGlowColor = textStyle.mImpl->mGlowColor;
-    mImpl->mGlowIntensity = textStyle.mImpl->mGlowIntensity;
-    mImpl->mSmoothEdge = textStyle.mImpl->mSmoothEdge;
-    mImpl->mOutlineColor = textStyle.mImpl->mOutlineColor;
-    mImpl->mOutlineThickness = textStyle.mImpl->mOutlineThickness;
+    if( textStyle.IsFontStyleDefault() )
+    {
+      if( !IsFontStyleDefault() )
+      {
+        resetMask |= TextStyle::STYLE;
+      }
+    }
+    else
+    {
+      SetFontStyle( textStyle.GetFontStyle() );
+    }
+
+    if( textStyle.IsFontSizeDefault() )
+    {
+      if( !IsFontSizeDefault() )
+      {
+        resetMask |= TextStyle::SIZE;
+      }
+    }
+    else
+    {
+      SetFontPointSize( textStyle.GetFontPointSize() );
+    }
+
+    if( textStyle.IsTextColorDefault() )
+    {
+      if( !IsTextColorDefault() )
+      {
+        resetMask |= TextStyle::COLOR;
+      }
+    }
+    else
+    {
+      SetTextColor( textStyle.GetTextColor() );
+    }
+
+    if( textStyle.IsFontWeightDefault() )
+    {
+      if( !IsFontWeightDefault() )
+      {
+        resetMask |= TextStyle::WEIGHT;
+      }
+    }
+    else
+    {
+      SetWeight( textStyle.GetWeight() );
+    }
+
+    if( textStyle.IsSmoothEdgeDefault() )
+    {
+      if( !IsSmoothEdgeDefault() )
+      {
+        resetMask |= TextStyle::SMOOTH;
+      }
+    }
+    else
+    {
+      SetSmoothEdge( textStyle.GetSmoothEdge() );
+    }
+
+    if( textStyle.IsItalicsDefault() )
+    {
+      if( !IsItalicsDefault() )
+      {
+        resetMask |= TextStyle::ITALICS;
+      }
+    }
+    else
+    {
+      SetItalics( textStyle.IsItalicsEnabled(), textStyle.GetItalicsAngle() );
+    }
+
+    if( textStyle.IsUnderlineDefault() )
+    {
+      if( !IsUnderlineDefault() )
+      {
+        resetMask |= TextStyle::UNDERLINE;
+      }
+    }
+    else
+    {
+      SetUnderline( textStyle.IsUnderlineEnabled(), textStyle.GetUnderlineThickness(), textStyle.GetUnderlinePosition() );
+    }
+
+    if ( textStyle.IsShadowDefault() )
+    {
+      if( !IsShadowDefault() )
+      {
+        resetMask |= TextStyle::SHADOW;
+      }
+    }
+    else
+    {
+      SetShadow( textStyle.IsShadowEnabled(), textStyle.GetShadowColor(), textStyle.GetShadowOffset(), textStyle.GetShadowSize() );
+    }
+
+    if ( textStyle.IsGlowDefault() )
+    {
+      if( !IsGlowDefault() )
+      {
+        resetMask |= TextStyle::GLOW;
+      }
+    }
+    else
+    {
+      SetGlow( textStyle.IsGlowEnabled(), textStyle.GetGlowColor(), textStyle.GetGlowIntensity() );
+    }
+
+    if ( textStyle.IsOutlineDefault() )
+    {
+      if( !IsOutlineDefault() )
+      {
+        resetMask |= TextStyle::OUTLINE;
+      }
+    }
+    else
+    {
+      SetOutline( textStyle.IsOutlineEnabled(), textStyle.GetOutlineColor(), textStyle.GetOutlineThickness() );
+    }
+
+    if ( textStyle.IsGradientDefault() )
+    {
+      if( !IsGradientDefault() )
+      {
+        resetMask |= TextStyle::GRADIENT;
+      }
+    }
+    else
+    {
+      SetGradient( textStyle.IsGradientEnabled(), textStyle.GetGradientColor(), textStyle.GetGradientStartPoint(), textStyle.GetGradientEndPoint() );
+    }
+
+    Reset( static_cast<TextStyle::Mask>( resetMask ) );
   }
 
   return *this;
@@ -222,36 +518,71 @@ TextStyle& TextStyle::operator=( const TextStyle& textStyle )
 bool TextStyle::operator==( const TextStyle& textStyle ) const
 {
   // If both Implementations are uninitialized then return equal
-  if ( mImpl == NULL && textStyle.mImpl == NULL )
+  if ( mContainer == NULL && textStyle.mContainer == NULL )
   {
     return true;
   }
   // Otherwise if either one of the Implemetations are uninitialized then return not equal
-  else if ( mImpl == NULL || textStyle.mImpl == NULL )
+  else if ( mContainer == NULL || textStyle.mContainer == NULL )
   {
     return false;
   }
-  return ( ( mImpl->mFontName == textStyle.mImpl->mFontName ) &&
-           ( mImpl->mFontStyle == textStyle.mImpl->mFontStyle ) &&
-           ( fabsf( mImpl->mFontPointSize - textStyle.mImpl->mFontPointSize ) < GetRangedEpsilon( mImpl->mFontPointSize, textStyle.mImpl->mFontPointSize ) ) &&
-           ( mImpl->mWeight == textStyle.mImpl->mWeight ) &&
-           ( mImpl->mTextColor == textStyle.mImpl->mTextColor ) &&
-           ( mImpl->mItalics == textStyle.mImpl->mItalics ) &&
-           ( mImpl->mUnderline == textStyle.mImpl->mUnderline ) &&
-           ( mImpl->mShadow == textStyle.mImpl->mShadow ) &&
-           ( mImpl->mGlow == textStyle.mImpl->mGlow ) &&
-           ( mImpl->mOutline == textStyle.mImpl->mOutline ) &&
-           ( mImpl->mItalicsAngle == textStyle.mImpl->mItalicsAngle ) &&
-           ( fabsf( mImpl->mUnderlineThickness - textStyle.mImpl->mUnderlineThickness ) < GetRangedEpsilon( mImpl->mUnderlineThickness, textStyle.mImpl->mUnderlineThickness ) ) &&
-           ( fabsf( mImpl->mUnderlinePosition - textStyle.mImpl->mUnderlinePosition ) < GetRangedEpsilon( mImpl->mUnderlinePosition, textStyle.mImpl->mUnderlinePosition ) ) &&
-           ( mImpl->mShadowColor == textStyle.mImpl->mShadowColor ) &&
-           ( mImpl->mShadowOffset == textStyle.mImpl->mShadowOffset ) &&
-           ( fabsf( mImpl->mShadowSize - textStyle.mImpl->mShadowSize ) < GetRangedEpsilon( mImpl->mShadowSize, textStyle.mImpl->mShadowSize ) ) &&
-           ( mImpl->mGlowColor == textStyle.mImpl->mGlowColor ) &&
-           ( fabsf( mImpl->mGlowIntensity - textStyle.mImpl->mGlowIntensity ) < GetRangedEpsilon( mImpl->mGlowIntensity, textStyle.mImpl->mGlowIntensity ) ) &&
-           ( fabsf( mImpl->mSmoothEdge - textStyle.mImpl->mSmoothEdge ) < GetRangedEpsilon( mImpl->mSmoothEdge, textStyle.mImpl->mSmoothEdge ) ) &&
-           ( mImpl->mOutlineColor == textStyle.mImpl->mOutlineColor ) &&
-           ( mImpl->mOutlineThickness == textStyle.mImpl->mOutlineThickness ) );
+  // If the number of style parameters set are different or
+  // different flags are set, without taking into account the indices, then return not equal.
+  // Two equal styles can have different indices if the parameters have been set in different order.
+  else if( ( mContainer->mParameters.Size() != textStyle.mContainer->mParameters.Size() ) ||
+           ( mContainer->mFlags >> TextStyleContainer::PARAMETER_FLAGS ) != ( textStyle.mContainer->mFlags >> TextStyleContainer::PARAMETER_FLAGS ) )
+  {
+    return false;
+  }
+
+  if( ( !IsFontWeightDefault() &&
+        ( GetWeight() != textStyle.GetWeight() ) ) ||
+
+      ( !IsFontSizeDefault() &&
+        ( fabsf( GetFontPointSize() - textStyle.GetFontPointSize() ) > Math::MACHINE_EPSILON_1000 ) ) ||
+
+      ( !IsItalicsDefault() &&
+        ( GetItalicsAngle() != textStyle.GetItalicsAngle() ) ) ||
+
+      ( !IsSmoothEdgeDefault() &&
+        ( fabsf( GetSmoothEdge() - textStyle.GetSmoothEdge() ) > Math::MACHINE_EPSILON_1000 ) ) ||
+
+      ( !IsUnderlineDefault() &&
+        ( ( fabsf( GetUnderlineThickness() - textStyle.GetUnderlineThickness() ) > Math::MACHINE_EPSILON_1000 ) ||
+          ( fabsf( GetUnderlinePosition() - textStyle.GetUnderlinePosition() ) > Math::MACHINE_EPSILON_1000 ) ) ) ||
+
+      ( !IsFontNameDefault() &&
+        ( GetFontName() != textStyle.GetFontName() ) ) ||
+
+      ( !IsFontStyleDefault() &&
+        ( GetFontStyle() != textStyle.GetFontStyle() ) ) ||
+
+      ( !IsTextColorDefault() &&
+        ( GetTextColor() != textStyle.GetTextColor() ) ) ||
+
+      ( !IsGlowDefault() &&
+        ( ( fabsf( GetGlowIntensity() - textStyle.GetGlowIntensity() ) > Math::MACHINE_EPSILON_1000 ) ||
+          ( GetGlowColor() != textStyle.GetGlowColor() ) ) ) ||
+
+      ( !IsOutlineDefault() &&
+        ( ( GetOutlineThickness() != textStyle.GetOutlineThickness() ) ||
+          ( GetOutlineColor() != textStyle.GetOutlineColor() ) ) ) ||
+
+      ( !IsShadowDefault() &&
+        ( ( fabsf( GetShadowSize() - textStyle.GetShadowSize() ) > Math::MACHINE_EPSILON_1000 ) ||
+          ( GetShadowOffset() != textStyle.GetShadowOffset() ) ||
+          ( GetShadowColor() != textStyle.GetShadowColor() ) ) ) ||
+
+      ( !IsGradientDefault() &&
+        ( ( GetGradientStartPoint() != textStyle.GetGradientStartPoint() ) ||
+          ( GetGradientEndPoint() != textStyle.GetGradientEndPoint() ) ||
+          ( GetGradientColor() != textStyle.GetGradientColor() ) ) ) )
+  {
+    return false;
+  }
+
+  return true;
 }
 
 bool TextStyle::operator!=( const TextStyle& textStyle ) const
@@ -259,7 +590,7 @@ bool TextStyle::operator!=( const TextStyle& textStyle ) const
   return !( *this == textStyle );
 }
 
-void TextStyle::Copy( const TextStyle& textStyle, const Mask mask )
+void TextStyle::Copy( const TextStyle& textStyle, Mask mask )
 {
   // If we're attemping to copy ourselves then just return
   if ( this == &textStyle )
@@ -268,474 +599,2027 @@ void TextStyle::Copy( const TextStyle& textStyle, const Mask mask )
   }
 
   // Check to see if we're copying a default style ?
-  if ( textStyle.mImpl == NULL )
+  if ( textStyle.mContainer == NULL )
   {
     // Yes, so if we're coping entirely then re-create a default style, else the mask resets attributes to defaults
-    if ( mImpl && mask == ALL )
+    if ( mContainer && mask == ALL )
     {
-      delete mImpl;
-      mImpl = NULL;
+      delete mContainer;
+      mContainer = NULL;
     }
     else
     {
-      if ( mImpl )
+      if( NULL != mContainer )
       {
+        int resetMask = TextStyle::NONE;
+
         if( mask & FONT )
         {
-          mImpl->mFontName = DEFAULT_NAME;
+          resetMask |= FONT;
         }
         if( mask & STYLE )
         {
-          mImpl->mFontStyle = DEFAULT_NAME;
+          resetMask |= STYLE;
         }
         if( mask & SIZE )
         {
-          mImpl->mFontPointSize = static_cast<PointSize>( 0.f );
-        }
-        if( mask & WEIGHT )
-        {
-          mImpl->mWeight = REGULAR;
-          mImpl->mSmoothEdge = DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD;
+          resetMask |= SIZE;
         }
         if( mask & COLOR )
         {
-          mImpl->mTextColor = DEFAULT_TEXT_COLOR;
+          resetMask |= COLOR;
+        }
+        if( mask & WEIGHT )
+        {
+          resetMask |= WEIGHT;
+        }
+        if( mask & SMOOTH )
+        {
+          resetMask |= SMOOTH;
         }
         if( mask & ITALICS )
         {
-          mImpl->mItalics = false;
-          mImpl->mItalicsAngle = DEFAULT_ITALICS_ANGLE;
+          resetMask |= ITALICS;
         }
         if( mask & UNDERLINE )
         {
-          mImpl->mUnderline = false;
-          mImpl->mUnderlineThickness = DEFAULT_UNDERLINE_THICKNESS;
-          mImpl->mUnderlinePosition = DEFAULT_UNDERLINE_POSITION;
+          resetMask |= UNDERLINE;
         }
         if ( mask & SHADOW )
         {
-          mImpl->mShadow = false;
-          mImpl->mShadowColor = DEFAULT_SHADOW_COLOR;
-          mImpl->mShadowOffset = DEFAULT_SHADOW_OFFSET;
-          mImpl->mShadowSize = DEFAULT_SHADOW_SIZE;
+          resetMask |= SHADOW;
         }
         if ( mask & GLOW )
         {
-          mImpl->mGlow = false;
-          mImpl->mGlowColor = DEFAULT_GLOW_COLOR;
-          mImpl->mGlowIntensity = DEFAULT_GLOW_INTENSITY;
+          resetMask |= GLOW;
         }
         if ( mask & OUTLINE )
         {
-          mImpl->mOutline = false;
-          mImpl->mOutlineColor = DEFAULT_OUTLINE_COLOR;
-          mImpl->mOutlineThickness = DEFAULT_OUTLINE_THICKNESS;
+          resetMask |= OUTLINE;
         }
+        if ( mask & GRADIENT )
+        {
+          resetMask |= GRADIENT;
+        }
+
+        Reset( static_cast<TextStyle::Mask>( resetMask ) );
       }
     }
     return;
   }
 
-  // Source has an implementation and so the target also needs one
-  CreateImplementationJustInTime();
+  // Source has a container, so the target will also need one
+  CreateContainerJustInTime();
+
   if( mask == ALL )
   {
     *this = textStyle;
   }
   else
   {
+    int resetMask = TextStyle::NONE;
+
     if( mask & FONT )
     {
-      mImpl->mFontName = textStyle.mImpl->mFontName;
+      if( textStyle.IsFontNameDefault() )
+      {
+        resetMask |= FONT;
+      }
+      else
+      {
+        SetFontName( textStyle.GetFontName() );
+      }
     }
     if( mask & STYLE )
     {
-      mImpl->mFontStyle = textStyle.mImpl->mFontStyle;
+      if( textStyle.IsFontStyleDefault() )
+      {
+        resetMask |= STYLE;
+      }
+      else
+      {
+        SetFontStyle( textStyle.GetFontStyle() );
+      }
     }
     if( mask & SIZE )
     {
-      mImpl->mFontPointSize = textStyle.mImpl->mFontPointSize;
-    }
-    if( mask & WEIGHT )
-    {
-      mImpl->mWeight = textStyle.mImpl->mWeight;
-      mImpl->mSmoothEdge = textStyle.mImpl->mSmoothEdge;
+      if( textStyle.IsFontSizeDefault() )
+      {
+        resetMask |= SIZE;
+      }
+      else
+      {
+        SetFontPointSize( textStyle.GetFontPointSize() );
+      }
     }
     if( mask & COLOR )
     {
-      mImpl->mTextColor = textStyle.mImpl->mTextColor;
+      if( textStyle.IsTextColorDefault() )
+      {
+        resetMask |= COLOR;
+      }
+      else
+      {
+        SetTextColor( textStyle.GetTextColor() ) ;
+      }
+    }
+    if( mask & WEIGHT )
+    {
+      if( textStyle.IsFontWeightDefault() )
+      {
+        resetMask |= WEIGHT;
+      }
+      else
+      {
+        SetWeight( textStyle.GetWeight() );
+      }
+    }
+    if( mask & SMOOTH )
+    {
+      if( textStyle.IsSmoothEdgeDefault() )
+      {
+        resetMask |= SMOOTH;
+      }
+      else
+      {
+        SetSmoothEdge( textStyle.GetSmoothEdge() );
+      }
     }
     if( mask & ITALICS )
     {
-      mImpl->mItalics = textStyle.mImpl->mItalics;
-      mImpl->mItalicsAngle = textStyle.mImpl->mItalicsAngle;
+      if( textStyle.IsItalicsDefault() )
+      {
+        resetMask |= ITALICS;
+      }
+      else
+      {
+        SetItalics( textStyle.IsItalicsEnabled(), textStyle.GetItalicsAngle() );
+      }
     }
     if( mask & UNDERLINE )
     {
-      mImpl->mUnderline = textStyle.mImpl->mUnderline;
-      mImpl->mUnderlineThickness = textStyle.mImpl->mUnderlineThickness;
-      mImpl->mUnderlinePosition = textStyle.mImpl->mUnderlinePosition;
+      if( textStyle.IsUnderlineDefault() )
+      {
+        resetMask |= UNDERLINE;
+      }
+      else
+      {
+        SetUnderline( textStyle.IsUnderlineEnabled(), textStyle.GetUnderlineThickness(), textStyle.GetUnderlinePosition() );
+      }
     }
     if ( mask & SHADOW )
     {
-      mImpl->mShadow = textStyle.mImpl->mShadow;
-      mImpl->mShadowColor = textStyle.mImpl->mShadowColor;
-      mImpl->mShadowOffset = textStyle.mImpl->mShadowOffset;
-      mImpl->mShadowSize = textStyle.mImpl->mShadowSize;
+      if( textStyle.IsShadowDefault() )
+      {
+        resetMask |= SHADOW;
+      }
+      else
+      {
+        SetShadow( textStyle.IsShadowEnabled(), textStyle.GetShadowColor(), textStyle.GetShadowOffset(), textStyle.GetShadowSize() );
+      }
     }
     if ( mask & GLOW )
     {
-      mImpl->mGlow = textStyle.mImpl->mGlow;
-      mImpl->mGlowColor = textStyle.mImpl->mGlowColor;
-      mImpl->mGlowIntensity = textStyle.mImpl->mGlowIntensity;
+      if( textStyle.IsGlowDefault() )
+      {
+        resetMask |= GLOW;
+      }
+      else
+      {
+        SetGlow( textStyle.IsGlowEnabled(), textStyle.GetGlowColor(), textStyle.GetGlowIntensity() );
+      }
     }
     if ( mask & OUTLINE )
     {
-      mImpl->mOutline = textStyle.mImpl->mOutline;
-      mImpl->mOutlineColor = textStyle.mImpl->mOutlineColor;
-      mImpl->mOutlineThickness = textStyle.mImpl->mOutlineThickness;
+      if( textStyle.IsOutlineDefault() )
+      {
+        resetMask |= OUTLINE;
+      }
+      else
+      {
+        SetOutline( textStyle.IsOutlineEnabled(), textStyle.GetOutlineColor(), textStyle.GetOutlineThickness() );
+      }
     }
+    if ( mask & GRADIENT )
+    {
+      if( textStyle.IsGradientDefault() )
+      {
+        resetMask |= GRADIENT;
+      }
+      else
+      {
+        SetGradient( textStyle.IsGradientEnabled(), textStyle.GetGradientColor(), textStyle.GetGradientStartPoint(), textStyle.GetGradientEndPoint() );
+      }
+    }
+
+    Reset( static_cast<TextStyle::Mask>( resetMask ) );
+  }
+}
+
+void TextStyle::Merge( const TextStyle& textStyle, Mask mask )
+{
+  // If we're attemping to merge ourselves then just return
+  if ( this == &textStyle )
+  {
+    return;
+  }
+
+  // Check to see if we're merging from default style ?
+  if ( textStyle.mContainer == NULL )
+  {
+    // nothing to merge.
+    return;
+  }
+
+  if( mask & FONT )
+  {
+    if( !textStyle.IsFontNameDefault() )
+    {
+      SetFontName( textStyle.GetFontName() );
+    }
+  }
+  if( mask & STYLE )
+  {
+    if( !textStyle.IsFontStyleDefault() )
+    {
+      SetFontStyle( textStyle.GetFontStyle() );
+    }
+  }
+  if( mask & SIZE )
+  {
+    if( !textStyle.IsFontSizeDefault() )
+    {
+      SetFontPointSize( textStyle.GetFontPointSize() );
+    }
+  }
+  if( mask & COLOR )
+  {
+    if( !textStyle.IsTextColorDefault() )
+    {
+      SetTextColor( textStyle.GetTextColor() ) ;
+    }
+  }
+  if( mask & WEIGHT )
+  {
+    if( !textStyle.IsFontWeightDefault() )
+    {
+      SetWeight( textStyle.GetWeight() );
+    }
+  }
+  if( mask & SMOOTH )
+  {
+    if( !textStyle.IsSmoothEdgeDefault() )
+    {
+      SetSmoothEdge( textStyle.GetSmoothEdge() );
+    }
+  }
+  if( mask & ITALICS )
+  {
+    if( !textStyle.IsItalicsDefault() )
+    {
+      SetItalics( textStyle.IsItalicsEnabled(), textStyle.GetItalicsAngle() );
+    }
+  }
+  if( mask & UNDERLINE )
+  {
+    if( !textStyle.IsUnderlineDefault() )
+    {
+      SetUnderline( textStyle.IsUnderlineEnabled(), textStyle.GetUnderlineThickness(), textStyle.GetUnderlinePosition() );
+    }
+  }
+  if( mask & SHADOW )
+  {
+    if( !textStyle.IsShadowDefault() )
+    {
+      SetShadow( textStyle.IsShadowEnabled(), textStyle.GetShadowColor(), textStyle.GetShadowOffset(), textStyle.GetShadowSize() );
+    }
+  }
+  if( mask & GLOW )
+  {
+    if( !textStyle.IsGlowDefault() )
+    {
+      SetGlow( textStyle.IsGlowEnabled(), textStyle.GetGlowColor(), textStyle.GetGlowIntensity() );
+    }
+  }
+  if( mask & OUTLINE )
+  {
+    if( !textStyle.IsOutlineDefault() )
+    {
+      SetOutline( textStyle.IsOutlineEnabled(), textStyle.GetOutlineColor(), textStyle.GetOutlineThickness() );
+    }
+  }
+  if( mask & GRADIENT )
+  {
+    if( !textStyle.IsGradientDefault() )
+    {
+      SetGradient( textStyle.IsGradientEnabled(), textStyle.GetGradientColor(), textStyle.GetGradientStartPoint(), textStyle.GetGradientEndPoint() );
+    }
+  }
+}
+
+void TextStyle::Reset( Mask mask )
+{
+  if( NULL == mContainer )
+  {
+    // nothing to do if any text-style parameter is set.
+    return;
+  }
+
+  if( TextStyle::NONE == mask )
+  {
+    // nothing to do if the mask is NONE.
+    return;
+  }
+
+  // Check first if all text-style parameters are going to be reset.
+
+  // Reset all if the mask is the default (ALL).
+  bool resetAll = ALL == mask;
+
+  if( !resetAll )
+  {
+    resetAll = true;
+
+    // Checks if a style parameter is set in the style but is not in the mask.
+    if( ( mContainer->mFlags & TextStyleContainer::FONT_NAME_EXISTS ) && !( mask & FONT ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::FONT_STYLE_EXISTS ) && !( mask & STYLE ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::FONT_SIZE_EXISTS ) && !( mask & SIZE ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::TEXT_COLOR_EXISTS ) && !( mask & COLOR ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::FONT_WEIGHT_EXISTS ) && !( mask & WEIGHT ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::SMOOTH_EDGE_EXISTS ) && !( mask & SMOOTH ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::ITALICS_EXISTS ) && !( mask & ITALICS ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::UNDERLINE_EXISTS ) && !( mask & UNDERLINE ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::DROP_SHADOW_EXISTS ) && !( mask & SHADOW ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::GLOW_EXISTS ) && !( mask & GLOW ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::OUTLINE_EXISTS ) && !( mask & OUTLINE ) )
+    {
+      resetAll = false;
+    }
+    else if( ( mContainer->mFlags & TextStyleContainer::GRADIENT_EXISTS ) && !( mask & GRADIENT ) )
+    {
+      resetAll = false;
+    }
+  }
+
+  if( resetAll )
+  {
+    // delete the container if all text-style parametes are reset.
+    delete mContainer;
+    mContainer = NULL;
+
+    return;
+  }
+
+  if( mask & FONT )
+  {
+    mContainer->ResetFontName();
+  }
+  if( mask & STYLE )
+  {
+    mContainer->ResetFontStyle();
+  }
+  if( mask & SIZE )
+  {
+    mContainer->ResetFontSize();
+  }
+  if( mask & COLOR )
+  {
+    mContainer->ResetTextColor();
+  }
+  if( mask & WEIGHT )
+  {
+    mContainer->ResetFontWeight();
+  }
+  if( mask & SMOOTH )
+  {
+    mContainer->ResetSmoothEdge();
+  }
+  if( mask & ITALICS )
+  {
+    mContainer->ResetItalics();
+  }
+  if( mask & UNDERLINE )
+  {
+    mContainer->ResetUnderline();
+  }
+  if ( mask & SHADOW )
+  {
+    mContainer->ResetShadow();
+  }
+  if ( mask & GLOW )
+  {
+    mContainer->ResetGlow();
+  }
+  if ( mask & OUTLINE )
+  {
+    mContainer->ResetOutline();
+  }
+  if ( mask & GRADIENT )
+  {
+    mContainer->ResetGradient();
   }
 }
 
 const std::string& TextStyle::GetFontName() const
 {
-  if ( !mImpl )
+  if ( mContainer )
   {
-    return DEFAULT_NAME;
+    return mContainer->GetFontName();
   }
   else
   {
-    return mImpl->mFontName;
+    return DEFAULT_NAME;
   }
 }
 
 void TextStyle::SetFontName( const std::string& fontName )
 {
-  CreateImplementationJustInTime();
-  mImpl->mFontName = fontName;
+  CreateContainerJustInTime();
+  mContainer->SetFontName( fontName );
 }
 
 const std::string& TextStyle::GetFontStyle() const
 {
-  if ( !mImpl )
+  if ( mContainer )
   {
-    return DEFAULT_NAME;
+    return mContainer->GetFontStyle();
   }
   else
   {
-    return mImpl->mFontStyle;
+    return DEFAULT_NAME;
   }
 }
 
 void TextStyle::SetFontStyle( const std::string& fontStyle )
 {
-  CreateImplementationJustInTime();
-  mImpl->mFontStyle = fontStyle;
+  CreateContainerJustInTime();
+  mContainer->SetFontStyle( fontStyle );
 }
 
 PointSize TextStyle::GetFontPointSize() const
 {
-  if ( !mImpl )
+  if ( mContainer )
   {
-    return static_cast<PointSize>( 0.f );
+    return mContainer->GetFontPointSize();
   }
   else
   {
-    return mImpl->mFontPointSize;
+    return DEFAULT_FONT_POINT_SIZE;
   }
 }
 
 void TextStyle::SetFontPointSize( PointSize fontPointSize )
 {
-  CreateImplementationJustInTime();
-  mImpl->mFontPointSize = fontPointSize;
-}
-
-TextStyle::Weight TextStyle::GetWeight() const
-{
-  if ( !mImpl )
-  {
-    return REGULAR;
-  }
-  else
-  {
-    return mImpl->mWeight ;
-  }
-}
-
-void TextStyle::SetWeight( TextStyle::Weight weight )
-{
-  CreateImplementationJustInTime();
-  mImpl->mWeight = weight;
+  CreateContainerJustInTime();
+  mContainer->SetFontPointSize( fontPointSize );
 }
 
 const Vector4& TextStyle::GetTextColor() const
 {
-  if ( !mImpl )
+  if ( mContainer )
   {
-    return DEFAULT_TEXT_COLOR;
+    return mContainer->GetTextColor();
   }
   else
   {
-    return mImpl->mTextColor;
+    return DEFAULT_TEXT_COLOR;
   }
 }
 
 void TextStyle::SetTextColor( const Vector4& textColor )
 {
-  CreateImplementationJustInTime();
-  mImpl->mTextColor = textColor;
+  CreateContainerJustInTime();
+  mContainer->SetTextColor( textColor );
 }
 
-bool TextStyle::GetItalics() const
+TextStyle::Weight TextStyle::GetWeight() const
 {
-  if ( !mImpl )
+  if ( mContainer )
   {
-    return false;
-  }
-  return mImpl->mItalics;
-}
-
-void TextStyle::SetItalics( bool italics )
-{
-  CreateImplementationJustInTime();
-  mImpl->mItalics = italics;
-}
-
-Degree TextStyle::GetItalicsAngle() const
-{
-  if ( !mImpl )
-  {
-    return DEFAULT_ITALICS_ANGLE;
+    return mContainer->GetWeight();
   }
   else
   {
-    return mImpl->mItalicsAngle;
+    return TextStyle::DEFAULT_FONT_WEIGHT;
   }
 }
 
-void TextStyle::SetItalicsAngle( Degree angle )
+void TextStyle::SetWeight( TextStyle::Weight weight )
 {
-  CreateImplementationJustInTime();
-  mImpl->mItalicsAngle = angle;
-}
-
-bool TextStyle::GetUnderline() const
-{
-  if ( !mImpl )
-  {
-    return false;
-  }
-  else
-  {
-    return mImpl->mUnderline;
-  }
-}
-
-void TextStyle::SetUnderline( bool underline )
-{
-  CreateImplementationJustInTime();
-  mImpl->mUnderline = underline;
-}
-
-float TextStyle::GetUnderlineThickness() const
-{
-  if ( !mImpl )
-  {
-    return DEFAULT_UNDERLINE_THICKNESS;
-  }
-  else
-  {
-    return mImpl->mUnderlineThickness;
-  }
-}
-
-void TextStyle::SetUnderlineThickness( float thickness )
-{
-  CreateImplementationJustInTime();
-  mImpl->mUnderlineThickness = thickness;
-}
-
-float TextStyle::GetUnderlinePosition() const
-{
-  if ( !mImpl )
-  {
-    return DEFAULT_UNDERLINE_POSITION;
-  }
-  else
-  {
-    return mImpl->mUnderlinePosition;
-  }
-}
-
-void TextStyle::SetUnderlinePosition( float position )
-{
-  CreateImplementationJustInTime();
-  mImpl->mUnderlinePosition = position;
-}
-
-bool TextStyle::GetShadow() const
-{
-  if ( !mImpl )
-  {
-    return false;
-  }
-  else
-  {
-    return mImpl->mShadow;
-  }
-}
-
-const Vector4& TextStyle::GetShadowColor() const
-{
-  if ( !mImpl )
-  {
-    return DEFAULT_SHADOW_COLOR;
-  }
-  return mImpl->mShadowColor;
-}
-
-const Vector2& TextStyle::GetShadowOffset() const
-{
-  if ( !mImpl )
-  {
-    return DEFAULT_SHADOW_OFFSET;
-  }
-  return mImpl->mShadowOffset;
-}
-
-float TextStyle::GetShadowSize() const
-{
-  if ( !mImpl )
-  {
-    return DEFAULT_SHADOW_SIZE;
-  }
-  else
-  {
-    return mImpl->mShadowSize;
-  }
-}
-
-void TextStyle::SetShadow( bool shadow, const Vector4& shadowColor, const Vector2& shadowOffset, const float shadowSize )
-{
-  CreateImplementationJustInTime();
-  mImpl->mShadow = shadow;
-  mImpl->mShadowColor = shadowColor;
-  mImpl->mShadowOffset = shadowOffset;
-  mImpl->mShadowSize = shadowSize;
-}
-
-bool TextStyle::GetGlow() const
-{
-  if ( !mImpl )
-  {
-    return false;
-  }
-  return mImpl->mGlow;
-}
-
-const Vector4& TextStyle::GetGlowColor() const
-{
-  if ( !mImpl )
-  {
-    return DEFAULT_GLOW_COLOR;
-  }
-  else
-  {
-    return mImpl->mGlowColor;
-  }
-}
-
-float TextStyle::GetGlowIntensity() const
-{
-  if ( !mImpl )
-  {
-    return DEFAULT_GLOW_INTENSITY;
-  }
-  else
-  {
-    return mImpl->mGlowIntensity;
-  }
-}
-
-void TextStyle::SetGlow( bool glow, const Vector4& glowColor, float glowIntensity )
-{
-  CreateImplementationJustInTime();
-  mImpl->mGlow = glow;
-  mImpl->mGlowColor = glowColor;
-  mImpl->mGlowIntensity = glowIntensity;
+  CreateContainerJustInTime();
+  mContainer->SetWeight( weight );
 }
 
 float TextStyle::GetSmoothEdge() const
 {
-  if ( !mImpl )
+  if ( mContainer )
   {
-    return DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD;
+    return mContainer->GetSmoothEdge();
   }
   else
   {
-    return mImpl->mSmoothEdge;
+    return DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD;
   }
 }
 
 void TextStyle::SetSmoothEdge( float smoothEdge )
 {
-  CreateImplementationJustInTime();
-  mImpl->mSmoothEdge = smoothEdge;
+  CreateContainerJustInTime();
+  mContainer->SetSmoothEdge( smoothEdge );
 }
 
-bool TextStyle::GetOutline() const
+bool TextStyle::IsItalicsEnabled() const
 {
-  if ( !mImpl )
+  if ( mContainer )
+  {
+    return ( ( mContainer->mFlags & TextStyleContainer::ITALICS_ENABLED ) != 0 );
+  }
+  else
   {
     return false;
   }
+}
+
+Degree TextStyle::GetItalicsAngle() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetItalicsAngle();
+  }
   else
   {
-    return mImpl->mOutline;
+    return DEFAULT_ITALICS_ANGLE;
   }
 }
 
-const Vector4& TextStyle::GetOutlineColor() const
+void TextStyle::SetItalics( bool enable, Degree angle )
 {
-  if ( !mImpl )
+  CreateContainerJustInTime();
+  mContainer->SetItalics( enable, angle );
+}
+
+bool TextStyle::GetItalics() const
+{
+  // Deprecated.
+  return IsItalicsEnabled();
+}
+
+void TextStyle::SetItalics( bool italics )
+{
+  // Deprecated
+  CreateContainerJustInTime();
+  mContainer->SetItalics( italics, GetItalicsAngle() );
+}
+
+void TextStyle::SetItalicsAngle( Degree angle )
+{
+  // Deprecated
+  CreateContainerJustInTime();
+  mContainer->SetItalics( IsItalicsEnabled(), angle );
+}
+
+bool TextStyle::IsUnderlineEnabled() const
+{
+  if ( mContainer )
   {
-    return DEFAULT_OUTLINE_COLOR;
+    return ( ( mContainer->mFlags & TextStyleContainer::UNDERLINE_ENABLED ) != 0 );
   }
   else
   {
-    return mImpl->mOutlineColor;
+    return false;
+  }
+}
+
+float TextStyle::GetUnderlineThickness() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetUnderlineThickness();
+  }
+  else
+  {
+    return DEFAULT_UNDERLINE_THICKNESS;
+  }
+}
+
+float TextStyle::GetUnderlinePosition() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetUnderlinePosition();
+  }
+  else
+  {
+    return DEFAULT_UNDERLINE_POSITION;
+  }
+}
+
+void TextStyle::SetUnderline( bool enable, float thickness, float position )
+{
+  CreateContainerJustInTime();
+  mContainer->SetUnderline( enable, thickness, position );
+}
+
+bool TextStyle::GetUnderline() const
+{
+  // Deprecated
+  return IsUnderlineEnabled();
+}
+
+void TextStyle::SetUnderline( bool underline )
+{
+  // Deprecated
+  CreateContainerJustInTime();
+  mContainer->SetUnderline( underline, GetUnderlineThickness(), GetUnderlinePosition() );
+}
+
+void TextStyle::SetUnderlineThickness( float thickness )
+{
+  // Deprecated.
+  CreateContainerJustInTime();
+  mContainer->SetUnderline( IsUnderlineEnabled(), thickness, GetUnderlinePosition() );
+}
+
+void TextStyle::SetUnderlinePosition( float position )
+{
+  // Deprecated.
+  CreateContainerJustInTime();
+  mContainer->SetUnderline( IsUnderlineEnabled(), GetUnderlineThickness(), position );
+}
+
+bool TextStyle::IsShadowEnabled() const
+{
+  if ( mContainer )
+  {
+    return ( ( mContainer->mFlags & TextStyleContainer::DROP_SHADOW_ENABLED ) != 0 );
+  }
+  else
+  {
+    return false;
+  }
+}
+
+const Vector4& TextStyle::GetShadowColor() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetShadowColor();
+  }
+  else
+  {
+    return DEFAULT_SHADOW_COLOR;
+  }
+}
+
+const Vector2& TextStyle::GetShadowOffset() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetShadowOffset();
+  }
+  else
+  {
+    return DEFAULT_SHADOW_OFFSET;
+  }
+}
+
+float TextStyle::GetShadowSize() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetShadowSize();
+  }
+  else
+  {
+    return DEFAULT_SHADOW_SIZE;
+  }
+}
+
+void TextStyle::SetShadow( bool enabled, const Vector4& shadowColor, const Vector2& shadowOffset, float shadowSize )
+{
+  CreateContainerJustInTime();
+  mContainer->SetShadow( enabled, shadowColor, shadowOffset, shadowSize );
+}
+
+bool TextStyle::GetShadow() const
+{
+  // Deprecated
+  return IsShadowEnabled();
+}
+
+bool TextStyle::IsGlowEnabled() const
+{
+  if ( mContainer )
+  {
+    return ( ( mContainer->mFlags & TextStyleContainer::GLOW_ENABLED ) != 0 );
+  }
+  else
+  {
+    return false;
+  }
+}
+
+const Vector4& TextStyle::GetGlowColor() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetGlowColor();
+  }
+  else
+  {
+    return DEFAULT_GLOW_COLOR;
+  }
+}
+
+float TextStyle::GetGlowIntensity() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetGlowIntensity();
+  }
+  else
+  {
+    return DEFAULT_GLOW_INTENSITY;
+  }
+}
+
+void TextStyle::SetGlow( bool enabled, const Vector4& glowColor, float glowIntensity )
+{
+  CreateContainerJustInTime();
+  mContainer->SetGlow( enabled, glowColor, glowIntensity );
+}
+
+bool TextStyle::GetGlow() const
+{
+  // Deprecated
+  return IsGlowEnabled();
+}
+
+bool TextStyle::IsOutlineEnabled() const
+{
+  if ( mContainer )
+  {
+    return ( ( mContainer->mFlags & TextStyleContainer::OUTLINE_ENABLED ) != 0 );
+  }
+  else
+  {
+    return false;
   }
 }
 
 const Vector2& TextStyle::GetOutlineThickness() const
 {
-  if ( !mImpl )
+  if ( mContainer )
   {
-    return DEFAULT_OUTLINE_THICKNESS;
+    return mContainer->GetOutlineThickness();
   }
   else
   {
-    return mImpl->mOutlineThickness;
+    return DEFAULT_OUTLINE_THICKNESS;
   }
 }
 
-void TextStyle::SetOutline( bool outline, const Vector4& outlineColor, const Vector2& outlineThickness )
+const Vector4& TextStyle::GetOutlineColor() const
 {
-  CreateImplementationJustInTime();
-  mImpl->mOutline = outline;
-  mImpl->mOutlineColor = outlineColor;
-  mImpl->mOutlineThickness = outlineThickness;
-}
-
-void TextStyle::CreateImplementationJustInTime()
-{
-  if ( mImpl == NULL )
+  if ( mContainer )
   {
-    mImpl = new TextStyle::Impl();
+    return mContainer->GetOutlineColor();
+  }
+  else
+  {
+    return DEFAULT_OUTLINE_COLOR;
   }
 }
 
+void TextStyle::SetOutline( bool enabled, const Vector4& outlineColor, const Vector2& outlineThickness )
+{
+  CreateContainerJustInTime();
+  mContainer->SetOutline( enabled, outlineColor, outlineThickness );
+}
+
+bool TextStyle::GetOutline() const
+{
+  // Deprecated
+  return IsOutlineEnabled();
+}
+
+bool TextStyle::IsGradientEnabled() const
+{
+  if ( mContainer )
+  {
+    return ( ( mContainer->mFlags & TextStyleContainer::GRADIENT_ENABLED ) != 0 );
+  }
+  else
+  {
+    return false;
+  }
+}
+
+const Vector4& TextStyle::GetGradientColor() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetGradientColor();
+  }
+  else
+  {
+    return DEFAULT_GRADIENT_COLOR;
+  }
+}
+
+const Vector2& TextStyle::GetGradientStartPoint() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetGradientStartPoint();
+  }
+  else
+  {
+    return DEFAULT_GRADIENT_START_POINT;
+  }
+}
+
+const Vector2& TextStyle::GetGradientEndPoint() const
+{
+  if ( mContainer )
+  {
+    return mContainer->GetGradientEndPoint();
+  }
+  else
+  {
+    return DEFAULT_GRADIENT_END_POINT;
+  }
+}
+
+void TextStyle::SetGradient( bool enabled, const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
+{
+  CreateContainerJustInTime();
+  mContainer->SetGradient( enabled, color, startPoint, endPoint );
+}
+
+bool TextStyle::IsFontNameDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::FONT_NAME_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsFontStyleDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::FONT_STYLE_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsFontSizeDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::FONT_SIZE_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsTextColorDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::TEXT_COLOR_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsFontWeightDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::FONT_WEIGHT_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsSmoothEdgeDefault() const
+{
+  if( mContainer )
+  {
+    return ( ( mContainer->mFlags & TextStyleContainer::SMOOTH_EDGE_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsItalicsDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::ITALICS_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsUnderlineDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::UNDERLINE_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsShadowDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::DROP_SHADOW_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsGlowDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::GLOW_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsOutlineDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::OUTLINE_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+bool TextStyle::IsGradientDefault() const
+{
+  if( mContainer )
+  {
+    return( ( mContainer->mFlags & TextStyleContainer::GRADIENT_EXISTS ) == 0 );
+  }
+  else
+  {
+    return true;
+  }
+}
+
+//--------------------------------------------------------------
+
+void TextStyle::CreateContainerJustInTime()
+{
+  if ( !mContainer )
+  {
+    mContainer = new TextStyleContainer;
+  }
+}
+
+//--------------------------------------------------------------
+
+void TextStyleContainer::SetCommonDefaults( StyleCommonAttributes* attr )
+{
+  attr->mFontName = DEFAULT_NAME;
+  attr->mFontStyle = DEFAULT_NAME;
+  attr->mFontPointSize = DEFAULT_FONT_POINT_SIZE;
+  attr->mTextColor = TextStyle::DEFAULT_TEXT_COLOR;
+}
+
+void TextStyleContainer::SetFontName( const std::string& fontName )
+{
+  if ( mFlags & COMMON_PARAMETERS_EXISTS )
+  {
+    StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+    attrPtr->mFontName = fontName;
+    mFlags |= FONT_NAME_EXISTS;
+  }
+  else
+  {
+    StyleCommonAttributes* attr = new StyleCommonAttributes();
+    SetCommonDefaults( attr );
+    attr->mFontName = fontName;
+    mFlags |= ( mFlags & ~COMMON_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) | FONT_NAME_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+}
+
+void TextStyleContainer::SetFontStyle( const std::string& fontStyle )
+{
+  if ( mFlags & COMMON_PARAMETERS_EXISTS )
+  {
+    StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+    attrPtr->mFontStyle = fontStyle;
+    mFlags |= FONT_STYLE_EXISTS;
+  }
+  else
+  {
+    StyleCommonAttributes* attr = new StyleCommonAttributes();
+    SetCommonDefaults( attr );
+    attr->mFontStyle = fontStyle;
+    mFlags |= ( mFlags & ~COMMON_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) | FONT_STYLE_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+}
+
+void TextStyleContainer::SetFontPointSize( PointSize fontPointSize )
+{
+  if ( mFlags & COMMON_PARAMETERS_EXISTS )
+  {
+    StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+    attrPtr->mFontPointSize = fontPointSize;
+    mFlags |= FONT_SIZE_EXISTS;
+  }
+  else
+  {
+    StyleCommonAttributes* attr = new StyleCommonAttributes();
+    SetCommonDefaults( attr );
+    attr->mFontPointSize = fontPointSize;
+    mFlags |= ( mFlags & ~COMMON_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) | FONT_SIZE_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+}
+
+void TextStyleContainer::SetTextColor( const Vector4& textColor )
+{
+  if ( mFlags & COMMON_PARAMETERS_EXISTS )
+  {
+    StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+    attrPtr->mTextColor = textColor;
+    mFlags |= TEXT_COLOR_EXISTS;
+  }
+  else
+  {
+    StyleCommonAttributes* attr = new StyleCommonAttributes();
+    SetCommonDefaults( attr );
+    attr->mTextColor = textColor;
+    mFlags |= ( mFlags & ~COMMON_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) | TEXT_COLOR_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+}
+
+void TextStyleContainer::SetWeight( TextStyle::Weight weight )
+{
+  if ( mFlags & SMOOTH_WEIGHT_EXISTS )
+  {
+    StyleWeightAttributes* attrPtr = reinterpret_cast<StyleWeightAttributes*>( *( mParameters.Begin() + ( ( mFlags >> WEIGHT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    attrPtr->mWeight = weight;
+    mFlags |= FONT_WEIGHT_EXISTS;
+  }
+  else
+  {
+    StyleWeightAttributes* attr = new StyleWeightAttributes();
+    attr->mSmoothEdge = TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD;
+    attr->mWeight = weight;
+    mFlags |= ( ( mFlags & ~WEIGHT_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) << WEIGHT_INDEX_SHIFT ) | FONT_WEIGHT_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+}
+
+void TextStyleContainer::SetSmoothEdge( float smoothEdge )
+{
+  if ( mFlags & SMOOTH_WEIGHT_EXISTS )
+  {
+    StyleWeightAttributes* attrPtr = reinterpret_cast<StyleWeightAttributes*>( *( mParameters.Begin() + ( ( mFlags >> WEIGHT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    attrPtr->mSmoothEdge = smoothEdge;
+    mFlags |= SMOOTH_EDGE_EXISTS;
+  }
+  else
+  {
+    StyleWeightAttributes* attr = new StyleWeightAttributes();
+    attr->mSmoothEdge = smoothEdge;
+    attr->mWeight = TextStyle::DEFAULT_FONT_WEIGHT;
+    mFlags |= ( ( mFlags & ~WEIGHT_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) << WEIGHT_INDEX_SHIFT ) | SMOOTH_EDGE_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+}
+
+void TextStyleContainer::SetItalics( bool enable, Degree angle )
+{
+  if ( mFlags & ITALICS_EXISTS )
+  {
+    StyleItalicsAttributes* attrPtr = reinterpret_cast<StyleItalicsAttributes*>( *( mParameters.Begin() + ( ( mFlags >> ITALICS_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    attrPtr->mItalicsAngle = angle;
+  }
+  else
+  {
+    StyleItalicsAttributes* attr = new StyleItalicsAttributes();
+    attr->mItalicsAngle = angle;
+    mFlags |= ( ( mFlags & ~ITALICS_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) << ITALICS_INDEX_SHIFT ) | ITALICS_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= ITALICS_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~ITALICS_ENABLED;
+  }
+}
+
+void TextStyleContainer::SetUnderline( bool enable, float thickness, float position )
+{
+  if ( mFlags & UNDERLINE_EXISTS )
+  {
+    StyleUnderlineAttributes* attrPtr = reinterpret_cast<StyleUnderlineAttributes*>( *( mParameters.Begin() + ( ( mFlags >> UNDERLINE_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    attrPtr->mUnderlineThickness = thickness;
+    attrPtr->mUnderlinePosition = position;
+  }
+  else
+  {
+    StyleUnderlineAttributes* attr = new StyleUnderlineAttributes();
+    attr->mUnderlineThickness = thickness;
+    attr->mUnderlinePosition = position;
+    mFlags |= ( ( mFlags & ~UNDERLINE_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) << UNDERLINE_INDEX_SHIFT ) | UNDERLINE_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= UNDERLINE_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~UNDERLINE_ENABLED;
+  }
+}
+
+void TextStyleContainer::SetShadow( bool enable, const Vector4& shadowColor, const Vector2& shadowOffset, float shadowSize )
+{
+  if ( mFlags & DROP_SHADOW_EXISTS )
+  {
+    StyleShadowAttributes* attrPtr = reinterpret_cast<StyleShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    attrPtr->mShadowColor = shadowColor;
+    attrPtr->mShadowOffset = shadowOffset;
+    attrPtr->mShadowSize = shadowSize;
+  }
+  else
+  {
+    StyleShadowAttributes* attr = new StyleShadowAttributes();
+    attr->mShadowColor = shadowColor;
+    attr->mShadowOffset = shadowOffset;
+    attr->mShadowSize = shadowSize;
+    mFlags |= ( ( mFlags & ~DROP_SHADOW_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) << DROP_SHADOW_INDEX_SHIFT ) | DROP_SHADOW_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= DROP_SHADOW_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~DROP_SHADOW_ENABLED;
+  }
+}
+
+void TextStyleContainer::SetGlow( bool enable, const Vector4& glowColor, float glowIntensity )
+{
+  if ( mFlags & GLOW_EXISTS )
+  {
+    StyleGlowAttributes* attrPtr = reinterpret_cast<StyleGlowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GLOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    attrPtr->mGlowColor = glowColor;
+    attrPtr->mGlowIntensity = glowIntensity;
+  }
+  else
+  {
+    StyleGlowAttributes* attr = new StyleGlowAttributes();
+    attr->mGlowColor = glowColor;
+    attr->mGlowIntensity = glowIntensity;
+    mFlags |= ( ( mFlags & ~GLOW_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) << GLOW_INDEX_SHIFT ) | GLOW_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= GLOW_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~GLOW_ENABLED;
+  }
+}
+
+void TextStyleContainer::SetOutline( bool enable, const Vector4& outlineColor, const Vector2& outlineThickness )
+{
+  if ( mFlags & OUTLINE_EXISTS )
+  {
+    StyleOutlineAttributes* attrPtr = reinterpret_cast<StyleOutlineAttributes*>( *( mParameters.Begin() + ( ( mFlags >> OUTLINE_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    attrPtr->mOutlineColor = outlineColor;
+    attrPtr->mOutlineThickness = outlineThickness;
+  }
+  else
+  {
+    StyleOutlineAttributes* attr = new StyleOutlineAttributes();
+    attr->mOutlineColor = outlineColor;
+    attr->mOutlineThickness = outlineThickness;
+    mFlags |= ( ( mFlags & ~OUTLINE_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) << OUTLINE_INDEX_SHIFT ) | OUTLINE_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= OUTLINE_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~OUTLINE_ENABLED;
+  }
+}
+
+void TextStyleContainer::SetGradient( bool enable, const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
+{
+  if ( mFlags & GRADIENT_EXISTS )
+  {
+    StyleGradientAttributes* attrPtr = reinterpret_cast<StyleGradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    attrPtr->mColor = color;
+    attrPtr->mStartPoint = startPoint;
+    attrPtr->mEndPoint = endPoint;
+  }
+  else
+  {
+    StyleGradientAttributes* attr = new StyleGradientAttributes();
+    attr->mColor = color;
+    attr->mStartPoint = startPoint;
+    attr->mEndPoint = endPoint;
+    mFlags |= ( ( mFlags & ~GRADIENT_INDEX ) | ( ( mParameters.Size() & PARAMETER_MASK ) << GRADIENT_INDEX_SHIFT ) | GRADIENT_EXISTS );
+    mParameters.PushBack( reinterpret_cast<char*>( attr ) );
+  }
+
+  if( enable )
+  {
+    mFlags |= GRADIENT_ENABLED;
+  }
+  else
+  {
+    mFlags &= ~GRADIENT_ENABLED;
+  }
+}
+
+//-----------------------------------
+
+const std::string& TextStyleContainer::GetFontName() const
+{
+  if ( mFlags & FONT_NAME_EXISTS )
+  {
+    const StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+    return attrPtr->mFontName;
+  }
+  else
+  {
+    return DEFAULT_NAME;
+  }
+}
+
+const std::string& TextStyleContainer::GetFontStyle() const
+{
+  if ( mFlags & FONT_STYLE_EXISTS )
+  {
+    const StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+    return attrPtr->mFontStyle;
+  }
+  else
+  {
+    return DEFAULT_NAME;
+  }
+}
+
+PointSize TextStyleContainer::GetFontPointSize() const
+{
+  if ( mFlags & FONT_SIZE_EXISTS )
+  {
+    const StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+    return attrPtr->mFontPointSize;
+  }
+  else
+  {
+    return ( static_cast<PointSize>( 0.f ) );
+  }
+}
+
+const Vector4& TextStyleContainer::GetTextColor() const
+{
+  if ( mFlags & TEXT_COLOR_EXISTS )
+  {
+    const StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + ( mFlags & PARAMETER_MASK ) ) );
+    return attrPtr->mTextColor;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_TEXT_COLOR;
+  }
+}
+
+TextStyle::Weight TextStyleContainer::GetWeight() const
+{
+  if ( mFlags & FONT_WEIGHT_EXISTS )
+  {
+    const StyleWeightAttributes* attrPtr = reinterpret_cast<StyleWeightAttributes*>( *( mParameters.Begin() + ( ( mFlags >> WEIGHT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mWeight;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_FONT_WEIGHT;
+  }
+}
+
+float TextStyleContainer::GetSmoothEdge() const
+{
+  if ( mFlags & SMOOTH_EDGE_EXISTS )
+  {
+    const StyleWeightAttributes* attrPtr = reinterpret_cast<StyleWeightAttributes*>( *( mParameters.Begin() + ( ( mFlags >> WEIGHT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mSmoothEdge;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD;
+  }
+}
+
+Degree TextStyleContainer::GetItalicsAngle() const
+{
+  if ( mFlags & ITALICS_EXISTS )
+  {
+    const StyleItalicsAttributes* attrPtr = reinterpret_cast<StyleItalicsAttributes*>( *( mParameters.Begin() +( ( mFlags >> ITALICS_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mItalicsAngle;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_ITALICS_ANGLE;
+  }
+}
+
+float TextStyleContainer::GetUnderlineThickness() const
+{
+  if ( mFlags & UNDERLINE_EXISTS )
+  {
+    const StyleUnderlineAttributes* attrPtr = reinterpret_cast<StyleUnderlineAttributes*>( *( mParameters.Begin() + ( ( mFlags >> UNDERLINE_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mUnderlineThickness;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_UNDERLINE_THICKNESS;
+  }
+}
+
+float TextStyleContainer::GetUnderlinePosition() const
+{
+  if ( mFlags & UNDERLINE_EXISTS )
+  {
+    const StyleUnderlineAttributes* attrPtr = reinterpret_cast<StyleUnderlineAttributes*>( *( mParameters.Begin() +( ( mFlags >> UNDERLINE_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mUnderlinePosition;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_UNDERLINE_POSITION;
+  }
+}
+
+const Vector4& TextStyleContainer::GetShadowColor() const
+{
+  if ( mFlags & DROP_SHADOW_EXISTS )
+  {
+    const StyleShadowAttributes* attrPtr = reinterpret_cast<StyleShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mShadowColor;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_SHADOW_COLOR;
+  }
+}
+
+const Vector2& TextStyleContainer::GetShadowOffset() const
+{
+  if ( mFlags & DROP_SHADOW_EXISTS )
+  {
+    const StyleShadowAttributes* attrPtr = reinterpret_cast<StyleShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mShadowOffset;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_SHADOW_OFFSET;
+  }
+}
+
+float TextStyleContainer::GetShadowSize() const
+{
+  if ( mFlags & DROP_SHADOW_EXISTS )
+  {
+    const StyleShadowAttributes* attrPtr = reinterpret_cast<StyleShadowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mShadowSize;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_SHADOW_SIZE;
+  }
+}
+
+const Vector4& TextStyleContainer::GetGlowColor() const
+{
+  if ( mFlags & GLOW_EXISTS )
+  {
+    const StyleGlowAttributes* attrPtr = reinterpret_cast<StyleGlowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GLOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mGlowColor;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_GLOW_COLOR;
+  }
+}
+
+float TextStyleContainer::GetGlowIntensity() const
+{
+  if ( mFlags & GLOW_EXISTS )
+  {
+    const StyleGlowAttributes* attrPtr = reinterpret_cast<StyleGlowAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GLOW_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mGlowIntensity;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_GLOW_INTENSITY;
+  }
+}
+
+const Vector2& TextStyleContainer::GetOutlineThickness() const
+{
+  if ( mFlags & OUTLINE_EXISTS )
+  {
+    const StyleOutlineAttributes* attrPtr = reinterpret_cast<StyleOutlineAttributes*>( *( mParameters.Begin() + ( ( mFlags >> OUTLINE_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mOutlineThickness;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_OUTLINE_THICKNESS;
+  }
+}
+
+const Vector4& TextStyleContainer::GetOutlineColor() const
+{
+  if ( mFlags & OUTLINE_EXISTS )
+  {
+    const StyleOutlineAttributes* attrPtr = reinterpret_cast<StyleOutlineAttributes*>( *( mParameters.Begin() + ( ( mFlags >> OUTLINE_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mOutlineColor;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_OUTLINE_COLOR;
+  }
+}
+
+const Vector4& TextStyleContainer::GetGradientColor() const
+{
+  if ( mFlags & GRADIENT_EXISTS )
+  {
+    const StyleGradientAttributes* attrPtr = reinterpret_cast<StyleGradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mColor;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_GRADIENT_COLOR;
+  }
+}
+
+const Vector2& TextStyleContainer::GetGradientStartPoint() const
+{
+  if ( mFlags & GRADIENT_EXISTS )
+  {
+    const StyleGradientAttributes* attrPtr = reinterpret_cast<StyleGradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mStartPoint;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_GRADIENT_START_POINT;
+  }
+}
+
+const Vector2& TextStyleContainer::GetGradientEndPoint() const
+{
+  if ( mFlags & GRADIENT_EXISTS )
+  {
+    const StyleGradientAttributes* attrPtr = reinterpret_cast<StyleGradientAttributes*>( *( mParameters.Begin() + ( ( mFlags >> GRADIENT_INDEX_SHIFT ) & PARAMETER_MASK ) ) );
+    return attrPtr->mEndPoint;
+  }
+  else
+  {
+    return TextStyle::DEFAULT_GRADIENT_END_POINT;
+  }
+}
+
+void TextStyleContainer::UpdateIndex( std::size_t index )
+{
+  // If a style parameter is reset to default, the value is removed from the vector.
+  // To remove a value (pointed by index) from the vector, it's swapped with the
+  // value of the last position. The index in the mFlag needs to be swapped as well.
+
+  // Find where in the flag is pointing to the last position of the vector
+
+  const std::size_t lastIndex = mParameters.Size() - 1u;
+  bool found = false;
+
+  for( uint64_t flagIndex = mFlags, mask = PARAMETER_MASK; !found; flagIndex = flagIndex >> PARAMETER_BITS, mask = mask << PARAMETER_BITS, index = index << PARAMETER_BITS )
+  {
+    if( ( flagIndex & PARAMETER_MASK ) == lastIndex )
+    {
+      mFlags &= ~mask;
+      mFlags |= index;
+      found = true;
+    }
+  }
+}
+
+void TextStyleContainer::ResetFontName()
+{
+  if( !( mFlags & FONT_NAME_EXISTS ) )
+  {
+    // nothing to do if the font name is not set.
+    return;
+  }
+
+  const std::size_t fontNameIndex = mFlags & PARAMETER_MASK;
+
+  // Check whether the other parameters stored in the same index are default.
+  if( ( mFlags & FONT_STYLE_EXISTS ) ||
+      ( mFlags & FONT_SIZE_EXISTS ) ||
+      ( mFlags & TEXT_COLOR_EXISTS ) )
+  {
+    // Style, size or color exist, so just set the default font name ("").
+    StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + fontNameIndex ) );
+    attrPtr->mFontName = DEFAULT_NAME;
+  }
+  else
+  {
+    if( fontNameIndex < mParameters.Size() - 1u )
+    {
+      // The index of the moved value needs to be updated.
+      UpdateIndex( fontNameIndex );
+    }
+
+    // Reset the common index.
+    mFlags &= ~PARAMETER_MASK;
+
+    Vector<char*>::Iterator index = mParameters.Begin() + fontNameIndex;
+    char* toDelete = *index;
+
+    // Swaps the index to be removed with the last one and removes it.
+    mParameters.Remove( index );
+
+    delete reinterpret_cast<StyleCommonAttributes*>( toDelete );
+  }
+
+  // Reset the FONT_NAME_EXISTS flag
+  mFlags &= ~FONT_NAME_EXISTS;
+}
+
+void TextStyleContainer::ResetFontStyle()
+{
+  if( !( mFlags & FONT_STYLE_EXISTS ) )
+  {
+    // nothing to do if the font style is not set.
+    return;
+  }
+
+  const std::size_t fontStyleIndex = mFlags & PARAMETER_MASK;
+
+  // Check whether the other parameters stored in the same index are default.
+  if( ( mFlags & FONT_NAME_EXISTS ) ||
+      ( mFlags & FONT_SIZE_EXISTS ) ||
+      ( mFlags & TEXT_COLOR_EXISTS ) )
+  {
+    // Name, size or color exist, so just set the default font style ("") and reset the FONT_STYLE_EXISTS flag.
+    StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + fontStyleIndex ) );
+    attrPtr->mFontStyle = DEFAULT_NAME;
+  }
+  else
+  {
+    if( fontStyleIndex < mParameters.Size() - 1u )
+    {
+      // The index of the moved value needs to be updated.
+      UpdateIndex( fontStyleIndex );
+    }
+
+    // Reset the common index.
+    mFlags &= ~PARAMETER_MASK;
+
+    Vector<char*>::Iterator index = mParameters.Begin() + fontStyleIndex;
+    char* toDelete = *index;
+
+    // Swaps the index to be removed with the last one and removes it.
+    mParameters.Remove( index );
+
+    delete reinterpret_cast<StyleCommonAttributes*>( toDelete );
+  }
+
+  // Reset the FONT_STYLE_EXISTS flag
+  mFlags &= ~FONT_STYLE_EXISTS;
+}
+
+void TextStyleContainer::ResetFontSize()
+{
+  if( !( mFlags & FONT_SIZE_EXISTS ) )
+  {
+    // nothing to do if the font size is not set.
+    return;
+  }
+
+  const std::size_t fontSizeIndex = mFlags & PARAMETER_MASK;
+
+  // Check whether the other parameters stored in the same index are default.
+  if( ( mFlags & FONT_NAME_EXISTS ) ||
+      ( mFlags & FONT_STYLE_EXISTS ) ||
+      ( mFlags & TEXT_COLOR_EXISTS ) )
+  {
+    // Name, style or color exist, so just set the default font size (0.0) and reset the FONT_SIZE_EXISTS flag.
+    StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + fontSizeIndex ) );
+    attrPtr->mFontPointSize = DEFAULT_FONT_POINT_SIZE;
+  }
+  else
+  {
+    if( fontSizeIndex < mParameters.Size() - 1u )
+    {
+      // The index of the moved value needs to be updated.
+      UpdateIndex( fontSizeIndex );
+    }
+
+    // Reset the common index.
+    mFlags &= ~PARAMETER_MASK;
+
+    Vector<char*>::Iterator index = mParameters.Begin() + fontSizeIndex;
+    char* toDelete = *index;
+
+    // Swaps the index to be removed with the last one and removes it.
+    mParameters.Remove( index );
+
+    delete reinterpret_cast<StyleCommonAttributes*>( toDelete );
+  }
+
+  // Reset the FONT_SIZE_EXISTS flag
+  mFlags &= ~FONT_SIZE_EXISTS;
+}
+
+void TextStyleContainer::ResetTextColor()
+{
+  if( !( mFlags & TEXT_COLOR_EXISTS ) )
+  {
+    // nothing to do if the text color is not set.
+    return;
+  }
+
+  const std::size_t textColorIndex = mFlags & PARAMETER_MASK;
+
+  // Check whether the other parameters stored in the same index are default.
+  if( ( mFlags & FONT_NAME_EXISTS ) ||
+      ( mFlags & FONT_STYLE_EXISTS ) ||
+      ( mFlags & FONT_SIZE_EXISTS ) )
+  {
+    // Name, style or size exist, so just set the default color (WHITE) and reset the TEXT_COLOR_EXISTS flag.
+    StyleCommonAttributes* attrPtr = reinterpret_cast<StyleCommonAttributes*>( *( mParameters.Begin() + textColorIndex ) );
+    attrPtr->mTextColor = TextStyle::DEFAULT_TEXT_COLOR;
+  }
+  else
+  {
+    if( textColorIndex < mParameters.Size() - 1u )
+    {
+      // The index of the moved value needs to be updated.
+      UpdateIndex( textColorIndex );
+    }
+
+    // Reset the common index.
+    mFlags &= ~PARAMETER_MASK;
+
+    Vector<char*>::Iterator index = mParameters.Begin() + textColorIndex;
+    char* toDelete = *index;
+
+    // Swaps the index to be removed with the last one and removes it.
+    mParameters.Remove( index );
+
+    delete reinterpret_cast<StyleCommonAttributes*>( toDelete );
+  }
+
+  // Reset the TEXT_COLOR_EXISTS flag
+  mFlags &= ~TEXT_COLOR_EXISTS;
+}
+
+void TextStyleContainer::ResetFontWeight()
+{
+  if( !( mFlags & FONT_WEIGHT_EXISTS ) )
+  {
+    // nothing to do if the font weight is not set.
+    return;
+  }
+
+  const std::size_t fontWeightIndex = ( mFlags >> WEIGHT_INDEX_SHIFT ) & PARAMETER_MASK;
+
+  // Check whether the smooth edge exists
+  if( mFlags & SMOOTH_EDGE_EXISTS )
+  {
+    StyleWeightAttributes* attrPtr = reinterpret_cast<StyleWeightAttributes*>( *( mParameters.Begin() + fontWeightIndex ) );
+    attrPtr->mWeight = TextStyle::DEFAULT_FONT_WEIGHT;
+  }
+  else
+  {
+    if( fontWeightIndex < mParameters.Size() - 1u )
+    {
+      // The index of the moved value needs to be updated.
+      UpdateIndex( fontWeightIndex );
+    }
+
+    // Reset the font weight index.
+    const uint64_t weightMask = PARAMETER_MASK << WEIGHT_INDEX_SHIFT;
+    mFlags &= ~weightMask;
+
+    Vector<char*>::Iterator index = mParameters.Begin() + fontWeightIndex;
+    char* toDelete = *index;
+
+    // Swaps the index to be removed with the last one and removes it.
+    mParameters.Remove( index );
+
+    delete reinterpret_cast<StyleWeightAttributes*>( toDelete );
+  }
+
+  // Reset the FONT_WEIGHT_EXISTS flag
+  mFlags &= ~FONT_WEIGHT_EXISTS;
+}
+
+void TextStyleContainer::ResetSmoothEdge()
+{
+  if( !( mFlags & SMOOTH_EDGE_EXISTS ) )
+  {
+    // nothing to do if the smooth edge is not set.
+    return;
+  }
+
+  const std::size_t smoothEdgeIndex = ( mFlags >> WEIGHT_INDEX_SHIFT ) & PARAMETER_MASK;
+
+  // Check whether the weight exists
+  if( mFlags & FONT_WEIGHT_EXISTS )
+  {
+    StyleWeightAttributes* attrPtr = reinterpret_cast<StyleWeightAttributes*>( *( mParameters.Begin() + smoothEdgeIndex ) );
+    attrPtr->mSmoothEdge = TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD;
+  }
+  else
+  {
+    if( smoothEdgeIndex < mParameters.Size() - 1u )
+    {
+      // The index of the moved value needs to be updated.
+      UpdateIndex( smoothEdgeIndex );
+    }
+
+    // Reset the font weight index. (The smooth edge is stored with the weight)
+    const uint64_t weightMask = PARAMETER_MASK << WEIGHT_INDEX_SHIFT;
+    mFlags &= ~weightMask;
+
+    Vector<char*>::Iterator index = mParameters.Begin() + smoothEdgeIndex;
+    char* toDelete = *index;
+
+    // Swaps the index to be removed with the last one and removes it.
+    mParameters.Remove( index );
+
+    delete reinterpret_cast<StyleWeightAttributes*>( toDelete );
+  }
+
+  // Reset the SMOOTH_EDGE_EXISTS flag
+  mFlags &= ~SMOOTH_EDGE_EXISTS;
+}
+
+void TextStyleContainer::ResetItalics()
+{
+  if( !( mFlags & ITALICS_EXISTS ) )
+  {
+    // nothing to do if the italics is not set.
+    return;
+  }
+
+  const std::size_t italicIndex = ( mFlags >> ITALICS_INDEX_SHIFT ) & PARAMETER_MASK;
+
+  if( italicIndex < mParameters.Size() - 1u )
+  {
+    // The index of the moved value needs to be updated.
+    UpdateIndex( italicIndex );
+  }
+
+  // Reset the italics index, the ITALICS_EXISTS and the ITALICS_ENABLED flags.
+  const uint64_t italicsMask = PARAMETER_MASK << ITALICS_INDEX_SHIFT;
+  mFlags &= ~( italicsMask | ITALICS_EXISTS | ITALICS_ENABLED );
+
+  Vector<char*>::Iterator index = mParameters.Begin() + italicIndex;
+  char* toDelete = *index;
+
+  // Swaps the index to be removed with the last one and removes it.
+  mParameters.Remove( index );
+
+  delete reinterpret_cast<StyleItalicsAttributes*>( toDelete );
+}
+
+void TextStyleContainer::ResetUnderline()
+{
+  if( !( mFlags & UNDERLINE_EXISTS ) )
+  {
+    // nothing to do if the underline is not set.
+    return;
+  }
+
+  const std::size_t underlineIndex = ( mFlags >> UNDERLINE_INDEX_SHIFT ) & PARAMETER_MASK;
+
+  if( underlineIndex < mParameters.Size() - 1u )
+  {
+    // The index of the moved value needs to be updated.
+    UpdateIndex( underlineIndex );
+  }
+
+  // Reset the underline index and the UNDERLINE_EXISTS and the UNDERLINE_ENABLED flags.
+  const uint64_t underlineMask = PARAMETER_MASK << UNDERLINE_INDEX_SHIFT;
+  mFlags &= ~( underlineMask | UNDERLINE_EXISTS | UNDERLINE_ENABLED );
+
+  Vector<char*>::Iterator index = mParameters.Begin() + underlineIndex;
+  char* toDelete = *index;
+
+  // Swaps the index to be removed with the last one and removes it.
+  mParameters.Remove( index );
+
+  delete reinterpret_cast<StyleUnderlineAttributes*>( toDelete );
+}
+
+void TextStyleContainer::ResetShadow()
+{
+  if( !( mFlags & DROP_SHADOW_EXISTS ) )
+  {
+    // nothing to do if the shadow is not set.
+    return;
+  }
+
+  const std::size_t shadowIndex = ( mFlags >> DROP_SHADOW_INDEX_SHIFT ) & PARAMETER_MASK;
+
+  if( shadowIndex < mParameters.Size() - 1u )
+  {
+    // The index of the moved value needs to be updated.
+    UpdateIndex( shadowIndex );
+  }
+
+  // Reset the shadow index and the DROP_SHADOW_EXISTS and the DROP_SHADOW_ENABLED flags.
+  const uint64_t shadowMask = PARAMETER_MASK << DROP_SHADOW_INDEX_SHIFT;
+  mFlags &= ~( shadowMask | DROP_SHADOW_EXISTS | DROP_SHADOW_ENABLED );
+
+  Vector<char*>::Iterator index = mParameters.Begin() + shadowIndex;
+  char* toDelete = *index;
+
+  // Swaps the index to be removed with the last one and removes it.
+  mParameters.Remove( index );
+
+  delete reinterpret_cast<StyleShadowAttributes*>( toDelete );
+}
+
+void TextStyleContainer::ResetGlow()
+{
+  if( !( mFlags & GLOW_EXISTS ) )
+  {
+    // nothing to do if the glow is not set.
+    return;
+  }
+
+  const std::size_t glowIndex = ( mFlags >> GLOW_INDEX_SHIFT ) & PARAMETER_MASK;
+
+  if( glowIndex < mParameters.Size() - 1u )
+  {
+    // The index of the moved value needs to be updated.
+    UpdateIndex( glowIndex );
+  }
+
+  // Reset the glow index and the GLOW_EXISTS and the GLOW_ENABLED flags.
+  const uint64_t glowMask = PARAMETER_MASK << GLOW_INDEX_SHIFT;
+  mFlags &= ~( glowMask | GLOW_EXISTS | GLOW_ENABLED );
+
+  Vector<char*>::Iterator index = mParameters.Begin() + glowIndex;
+  char* toDelete = *index;
+
+  // Swaps the index to be removed with the last one and removes it.
+  mParameters.Remove( index );
+
+  delete reinterpret_cast<StyleGlowAttributes*>( toDelete );
+}
+
+void TextStyleContainer::ResetOutline()
+{
+  if( !( mFlags & OUTLINE_EXISTS ) )
+  {
+    // nothing to do if the outline is not set.
+    return;
+  }
+
+  const std::size_t outlineIndex = ( mFlags >> OUTLINE_INDEX_SHIFT ) & PARAMETER_MASK;
+
+  if( outlineIndex < mParameters.Size() - 1u )
+  {
+    // The index of the moved value needs to be updated.
+    UpdateIndex( outlineIndex );
+  }
+
+  // Reset the outline index and the OUTLINE_EXISTS and the OUTLINE_ENABLED flags.
+  const uint64_t outlineMask = PARAMETER_MASK << OUTLINE_INDEX_SHIFT;
+  mFlags &= ~( outlineMask | OUTLINE_EXISTS | OUTLINE_ENABLED );
+
+  Vector<char*>::Iterator index = mParameters.Begin() + outlineIndex;
+  char* toDelete = *index;
+
+  // Swaps the index to be removed with the last one and removes it.
+  mParameters.Remove( index );
+
+  delete reinterpret_cast<StyleOutlineAttributes*>( toDelete );
+}
+
+void TextStyleContainer::ResetGradient()
+{
+  if( !( mFlags & GRADIENT_EXISTS ) )
+  {
+    // nothing to do if the gradient is not set.
+    return;
+  }
+
+  const std::size_t gradientIndex = ( mFlags >> GRADIENT_INDEX_SHIFT ) & PARAMETER_MASK;
+
+  if( gradientIndex < mParameters.Size() - 1u )
+  {
+    // The index of the moved value needs to be updated.
+    UpdateIndex( gradientIndex );
+  }
+
+  // Reset the gradient index and the GRADIENT_EXISTS and the GRADIENT_ENABLED flags.
+  const uint64_t gradientMask = PARAMETER_MASK << GRADIENT_INDEX_SHIFT;
+  mFlags &= ~( gradientMask | GRADIENT_EXISTS | GRADIENT_ENABLED );
+
+  Vector<char*>::Iterator index = mParameters.Begin() + gradientIndex;
+  char* toDelete = *index;
+
+  // Swaps the index to be removed with the last one and removes it.
+  mParameters.Remove( index );
+
+  delete reinterpret_cast<StyleGradientAttributes*>( toDelete );
+}
 
 } // namespace Dali

@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_SCENE_GRAPH_SHADER_H__
 #define __DALI_INTERNAL_SCENE_GRAPH_SHADER_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
@@ -256,17 +257,19 @@ public:
 
   /**
    * Set the program for a geometry type and subtype
-   * @param[in] geometryType The type of the object (geometry) that is to be rendered.
-   * @param[in] subType      The subtype, one of ShaderSubTypes.
-   * @param[in] resourceId   The resource ID for the program.
-   * @param[in] shaderData   The program's vertex/fragment source and optionally compiled bytecode
-   * @param[in] context      Reference to the GL context.
+   * @param[in] geometryType  The type of the object (geometry) that is to be rendered.
+   * @param[in] subType       The subtype, one of ShaderSubTypes.
+   * @param[in] resourceId    The resource ID for the program.
+   * @param[in] shaderData    The program's vertex/fragment source and optionally compiled bytecode
+   * @param[in] context       Reference to the GL context.
+   * @param[in] areVerticesFixed True if the vertex shader does not change vertex position
    */
   void SetProgram( GeometryType geometryType,
                    Internal::ShaderSubTypes subType,
                    Integration::ResourceId resourceId,
                    Integration::ShaderDataPtr shaderData,
-                   Context* context );
+                   Context* context,
+                   bool areVerticesFixed );
 
   /**
    * Determine if subtypes are required for the given geometry type
@@ -276,36 +279,33 @@ public:
   bool AreSubtypesRequired(GeometryType geometryType);
 
   /**
-   * Applies the shader effect specific program and sets the common uniforms
+   * Get the program associated with the given type and subtype
+   * @param[in]  context      the context used to render.
+   * @param[in]  type         the type of the object (geometry) that is being rendered.
+   * @param[in]  subType      Identifier for geometry types with specialised default shaders
+   * @param[out] programIndex returns the program index to be passed onto SetUniforms.
+   * @return the program to use.
+   */
+  Program& GetProgram( Context& context,
+                       GeometryType type,
+                       ShaderSubTypes subType,
+                       unsigned int& programIndex );
+
+  /**
+   * Sets the shader specific uniforms including custom uniforms
    * @pre The shader has been initialized.
    * @pre This method is not thread-safe, and should only be called from the render-thread.
    * @param[in] context The context used to render.
+   * @param[in] program to use.
    * @param[in] bufferIndex The buffer to read shader properties from.
    * @param[in] type        the type of the object (geometry) that is being rendered.
-   * @param[in] model       model matrix of the object.
-   * @param[in] view        view matrix of the object.
-   * @param[in] modelview   matrix of the object.
-   * @param[in] projection  matrix for the camera.
-   * @param[in] color       to be used.
    * @param[in] subType     Identifier for geometry types with specialised default shaders
    */
-  Program& Apply( Context& context,
-                  BufferIndex bufferIndex,
-                  GeometryType type,
-                  const Matrix& model,
-                  const Matrix& view,
-                  const Matrix& modelview,
-                  const Matrix& projection,
-                  const Vector4& color,
-                  const ShaderSubTypes subType = SHADER_DEFAULT );
-
-  /**
-   * Applies the shader effect specific program and sets the common uniforms
-   * @pre The shader has been initialized.
-   * @pre This method is not thread-safe, and should only be called from the render-thread.
-   * @param[in] frametime   time elapsed between the two last updates.
-   */
-  void SetFrameTime( float frametime );
+  void SetUniforms( Context& context,
+                    Program& program,
+                    BufferIndex bufferIndex,
+                    unsigned int programIndex,
+                    ShaderSubTypes subType = SHADER_DEFAULT );
 
 private: // Data
 
@@ -319,7 +319,6 @@ private: // Data
 
   std::vector<ProgramContainer>  mPrograms;         ///< 2D array of Program*. Access by [Log<GEOMETRY_TYPE_XXX>::value][index]. An index of 0 selects the default program for that geometry type.
 
-  Matrix                         mModelViewProjection; ///< Model view projection
   UniformMetaContainer           mUniformMetadata;     ///< A container of owned UniformMeta values; one for each property in PropertyOwner::mDynamicProperties
 
   // These members are only safe to access during UpdateManager::Update()
@@ -328,7 +327,6 @@ private: // Data
   // These members are only safe to access in render thread
   PostProcessResourceDispatcher* mPostProcessDispatcher; ///< Used for saving shaders through the resource manager
   TextureCache*                  mTextureCache; // Used for retrieving textures in the render thread
-  float                          mFrametime;   ///< Used for setting the frametime delta shader uniform.
 };
 
 // Messages for Shader, to be processed in Update thread.

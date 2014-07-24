@@ -1,24 +1,25 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 
 #include <stdlib.h>
 #include <boost/bind.hpp>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -839,5 +840,59 @@ int UtcDaliPropertyNotificationVariableStep(void)
     Wait(application, DEFAULT_WAIT_PERIOD);
     DALI_TEST_CHECK( gCallBackCalled );
   }
+  END_TEST;
+}
+
+static bool gCallBack2Called = false;
+void TestCallback2(PropertyNotification& source)
+{
+  gCallBack2Called = true;
+}
+
+int UtcDaliPropertyNotificationOrder(void)
+{
+  TestApplication application; // Reset all test adapter return codes
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  // this should complete in first frame
+  PropertyNotification notification1 = actor.AddPropertyNotification( Actor::POSITION_X, GreaterThanCondition(90.0f) );
+  notification1.NotifySignal().Connect( &TestCallback );
+  // this should complete in second frame
+  PropertyNotification notification2 = actor.AddPropertyNotification( Actor::POSITION_X, GreaterThanCondition(150.0f) );
+  notification2.NotifySignal().Connect( &TestCallback2 );
+  Animation animation = Animation::New( 0.032f ); // finishes in 32 ms
+  animation.AnimateTo( Property(actor, Actor::POSITION ), Vector3( 200.0f, 0.0f, 0.0f ), AlphaFunctions::Linear );
+  animation.Play();
+
+  // flush the queue
+  application.SendNotification();
+  // first frame
+  application.Render(RENDER_FRAME_INTERVAL);
+  // no notifications yet
+  DALI_TEST_EQUALS( gCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gCallBack2Called, false, TEST_LOCATION );
+  gCallBackCalled = false;
+  gCallBack2Called = false;
+
+  // dont serve the notifications but run another update & render
+  // this simulates situation where there is a notification in event side but it's not been picked up by event thread
+  // second frame
+  application.Render(RENDER_FRAME_INTERVAL);
+  DALI_TEST_EQUALS( gCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gCallBack2Called, false, TEST_LOCATION );
+
+  // serve the notifications
+  application.SendNotification();
+  DALI_TEST_EQUALS( gCallBackCalled, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( gCallBack2Called, true, TEST_LOCATION );
+
+  gCallBackCalled = false;
+  gCallBack2Called = false;
+  application.Render(RENDER_FRAME_INTERVAL);
+  application.SendNotification();
+  DALI_TEST_EQUALS( gCallBackCalled, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( gCallBack2Called, false, TEST_LOCATION );
+
   END_TEST;
 }

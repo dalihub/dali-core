@@ -1,23 +1,25 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/images/bitmap-external.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -128,6 +130,10 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+TypeRegistration mType( typeid( Dali::NinePatchImage ), typeid( Dali::Image ), NULL );
+} // unnamed namespace
 
 NinePatchImagePtr NinePatchImage::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
@@ -151,11 +157,20 @@ NinePatchImage::NinePatchImage( const std::string& filename, const Dali::ImageAt
   loadedAttrs.SetSize( closestSize );
   mWidth = closestSize.width;
   mHeight = closestSize.height;
+  mNaturalSizeSet = true;
+
   Integration::BitmapResourceType resourceType( loadedAttrs );
 
   // Note, bitmap is only destroyed when the image is destroyed.
   Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously(resourceType, filename);
-  mBitmap = static_cast<Integration::Bitmap*>( resource.Get());
+  if( resource )
+  {
+    mBitmap = static_cast<Integration::Bitmap*>( resource.Get());
+  }
+  else
+  {
+    mBitmap.Reset();
+  }
 }
 
 NinePatchImage* NinePatchImage::GetNinePatchImage( Image* image)
@@ -187,43 +202,54 @@ Rect<int> NinePatchImage::GetChildRectangle()
 
 Internal::BitmapImagePtr NinePatchImage::CreateCroppedBitmapImage()
 {
-  Pixel::Format pixelFormat = mBitmap->GetPixelFormat();
+  BitmapImagePtr cropped;
 
-  BitmapImagePtr cropped = BitmapImage::New( mWidth-2, mHeight-2, pixelFormat,
-                                             Dali::Image::Immediate, Dali::Image::Never );
-
-  Integration::Bitmap::PackedPixelsProfile* srcProfile = mBitmap->GetPackedPixelsProfile();
-  DALI_ASSERT_DEBUG( srcProfile && "Wrong profile for source bitmap");
-
-  if( srcProfile )
+  if( ! mBitmap )
   {
-    PixelBuffer* destPixels = cropped->GetBuffer();
-    unsigned int destStride = cropped->GetBufferStride();
-    unsigned int pixelWidth = GetBytesPerPixel(pixelFormat);
-
-    PixelBuffer* srcPixels = mBitmap->GetBuffer();
-    unsigned int srcStride = srcProfile->GetBufferStride();
-
-    for( unsigned int row=1; row < mHeight-1; ++row )
-    {
-      PixelBuffer* src  = srcPixels + row*srcStride + pixelWidth;
-      PixelBuffer* dest = destPixels + (row-1)*destStride;
-      memcpy(dest, src, destStride );
-    }
+    DALI_LOG_ERROR( "NinePatchImage: Bitmap not loaded, cannot perform operation\n");
   }
+  else
+  {
+    Pixel::Format pixelFormat = mBitmap->GetPixelFormat();
 
-  RectArea area;
-  cropped->Update(area); // default area has no width or height
+    cropped = BitmapImage::New( mWidth-2, mHeight-2, pixelFormat, Dali::Image::Immediate, Dali::Image::Never );
+
+    Integration::Bitmap::PackedPixelsProfile* srcProfile = mBitmap->GetPackedPixelsProfile();
+    DALI_ASSERT_DEBUG( srcProfile && "Wrong profile for source bitmap");
+
+    if( srcProfile )
+    {
+      PixelBuffer* destPixels = cropped->GetBuffer();
+      unsigned int destStride = cropped->GetBufferStride();
+      unsigned int pixelWidth = GetBytesPerPixel(pixelFormat);
+
+      PixelBuffer* srcPixels = mBitmap->GetBuffer();
+      unsigned int srcStride = srcProfile->GetBufferStride();
+
+      for( unsigned int row=1; row < mHeight-1; ++row )
+      {
+        PixelBuffer* src  = srcPixels + row*srcStride + pixelWidth;
+        PixelBuffer* dest = destPixels + (row-1)*destStride;
+        memcpy(dest, src, destStride );
+      }
+    }
+
+    RectArea area;
+    cropped->Update(area); // default area has no width or height
+  }
   return cropped;
 }
 
 void NinePatchImage::Connect()
 {
-  if( mConnectionCount == 0 && !mTicket )
+  if( !mTicket )
   {
-    const ImageTicketPtr& t = mResourceClient->AddBitmapImage(mBitmap.Get());
-    mTicket = t.Get();
-    mTicket->AddObserver(*this);
+    if( mBitmap )
+    {
+      const ImageTicketPtr& t = mResourceClient->AddBitmapImage(mBitmap.Get());
+      mTicket = t.Get();
+      mTicket->AddObserver(*this);
+    }
   }
 
   ++mConnectionCount;
@@ -240,6 +266,12 @@ void NinePatchImage::Disconnect()
 
 void NinePatchImage::ParseBorders()
 {
+  if( ! mBitmap )
+  {
+    DALI_LOG_ERROR( "NinePatchImage: Bitmap not loaded, cannot perform operation\n");
+    return;
+  }
+
   Pixel::Format pixelFormat = mBitmap->GetPixelFormat();
 
   Integration::Bitmap::PackedPixelsProfile* srcProfile = mBitmap->GetPackedPixelsProfile();
@@ -293,8 +325,7 @@ void NinePatchImage::ParseBorders()
       }
       else if(startX1 >= 0 && endX1 < 0)
       {
-        endX1 = col-1;
-        break;
+        endX1 = col;
       }
 
       if( (bottom[testByte] & testBits) == testValue )
@@ -306,9 +337,14 @@ void NinePatchImage::ParseBorders()
       }
       else if(startX2 >= 0 && endX2 < 0)
       {
-        endX2 = col-1;
+        endX2 = col;
+      }
+
+      if ( ( endX2 > 0 ) && ( endX1 > 0 ) )
+      {
         break;
       }
+
       top+=pixelWidth;
       bottom+=pixelWidth;
     }
@@ -329,8 +365,7 @@ void NinePatchImage::ParseBorders()
       }
       else if(startY1 >= 0 && endY1 < 0)
       {
-        endY1 = row-1;
-        break;
+        endY1 = row;
       }
 
       if((right[testByte] & testBits) == testValue)
@@ -342,20 +377,24 @@ void NinePatchImage::ParseBorders()
       }
       else if(startY2 >= 0 && endY2 < 0)
       {
-        endY2 = row-1;
-        break;
+        endY2 = row;
       }
       left += srcStride;
       right += srcStride;
+
+      if ( ( endY2 > 0 ) && ( endY1 > 0 ) )
+      {
+        break;
+      }
     }
 
-    mStretchBorders.x = startX1-1;
-    mStretchBorders.y = startY1-1;
-    mStretchBorders.z = mWidth-endX1-1;
-    mStretchBorders.w = mHeight-endY1-1;
+    mStretchBorders.x = startX1;
+    mStretchBorders.y = startY1;
+    mStretchBorders.z = mWidth-endX1;
+    mStretchBorders.w = mHeight-endY1;
 
-    mChildRectangle.x = startX2-1;
-    mChildRectangle.y = startY2-1;
+    mChildRectangle.x = startX2;
+    mChildRectangle.y = startY2;
     mChildRectangle.width = endX2-startX2;
     mChildRectangle.height = endY2-startY2;
 

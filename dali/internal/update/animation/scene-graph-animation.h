@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H__
 #define __DALI_INTERNAL_SCENE_GRAPH_ANIMATION_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
@@ -93,6 +94,29 @@ public:
     return mDurationSeconds;
   }
 
+  /*
+   * Retrieve the current progress of the animation.
+   * @return The current progress as a normalized value between [0,1].
+   */
+  float GetCurrentProgress() const
+  {
+    if( mDurationSeconds > 0.0f )
+    {
+      return mElapsedSeconds / mDurationSeconds;
+    }
+
+    return 0.0f;
+  }
+
+  /*
+   * Sets the progress of the animation.
+   * @param[in] The new progress as a normalized value between [0,1]
+   */
+  void SetCurrentProgress( float progress )
+  {
+    mElapsedSeconds = mDurationSeconds * progress;
+  }
+
   /**
    * Set whether the animation will loop.
    * @param[in] looping True if the animation will loop.
@@ -144,6 +168,12 @@ public:
    * Play the animation.
    */
   void Play();
+
+  /*
+   * Play the animation from a given point
+   * @param[in] progress A value between [0,1] form where the animation should start playing
+   */
+  void PlayFrom( float progress );
 
   /**
    * Pause the animation.
@@ -301,6 +331,17 @@ inline void SetDestroyActionMessage( EventToUpdate& eventToUpdate, const Animati
   new (slot) LocalType( &animation, &Animation::SetDestroyAction, action );
 }
 
+inline void SetCurrentProgressMessage( EventToUpdate& eventToUpdate, const Animation& animation, float progress )
+{
+  typedef MessageValue1< Animation, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::SetCurrentProgress, progress );
+}
+
 inline void PlayAnimationMessage( EventToUpdate& eventToUpdate, const Animation& animation )
 {
   typedef Message< Animation > LocalType;
@@ -310,6 +351,17 @@ inline void PlayAnimationMessage( EventToUpdate& eventToUpdate, const Animation&
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::Play );
+}
+
+inline void PlayAnimationFromMessage( EventToUpdate& eventToUpdate, const Animation& animation, float progress )
+{
+  typedef MessageValue1< Animation,float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::PlayFrom, progress );
 }
 
 inline void PauseAnimationMessage( EventToUpdate& eventToUpdate, const Animation& animation )

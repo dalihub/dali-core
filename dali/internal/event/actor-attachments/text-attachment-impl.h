@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_TEXT_ATTACHMENT_H__
 #define __DALI_INTERNAL_TEXT_ATTACHMENT_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/radian.h>
@@ -103,102 +104,6 @@ public:
   }
 
   /**
-   * @copydoc Dali::TextActor::SetGradientColor()
-   */
-  void SetGradientColor( const Vector4& color );
-
-  /**
-   * @copydoc Dali::TextActor::GetGradientColor()
-   */
-  const Vector4& GetGradientColor() const;
-
-  /**
-   * @copydoc Dali::TextActor::SetGradientStartPoint()
-   */
-  void SetGradientStartPoint( const Vector2& position );
-
-  /**
-   * @copydoc Dali::TextActor::GetGradientStartPoint()
-   */
-  const Vector2& GetGradientStartPoint() const;
-
-  /**
-   * @copydoc Dali::TextActor::SetGradientEndPoint()
-   */
-  void SetGradientEndPoint( const Vector2& position );
-
-  /**
-   * @copydoc Dali::TextActor::GetGradientEndPoint()
-   */
-  const Vector2& GetGradientEndPoint() const;
-
-  /**
-   * @copydoc Dali::TextActor::SetSmoothEdge(const float)
-   */
-  void SetSmoothEdge(const float smoothEdge);
-
-  /**
-   * Retrieve the smooth edge value.
-   * @return the smooth edge value.
-   */
-  float GetSmoothEdge() const;
-
-  /**
-   * @copydoc Dali::TextActor::SetOutline(const bool,const Vector4&,const Vector2&)
-   */
-  void SetOutline( bool enable, const Vector4& color, const Vector2& thickness );
-
-  /**
-   * Get outline state.
-   * @return \e true if outline is enabled, otherwise \e false.
-   */
-  bool GetOutline() const;
-
-  /**
-   * Retrieve outline parameters.
-   * @param[out] color The outline color.
-   * @param[out] thickness The outline parameters.
-   */
-  void GetOutlineParams( Vector4& color, Vector2& thickness ) const;
-
-  /**
-   * @copydoc Dali::TextActor::SetGlow(const bool,const Vector4&,const float)
-   */
-  void SetGlow( bool enable, const Vector4& color, const float intensity);
-
-  /**
-   * Get glow state.
-   * @return \e true if glow is enabled, otherwise \e false.
-   */
-  bool GetGlow() const;
-
-  /**
-   * Retrieve glow parameters.
-   * @param[out] color The glow color.
-   * @param[out] intensity The glow intensity.
-   */
-  void GetGlowParams( Vector4& color, float& intensity ) const;
-
-  /**
-   * @copydoc Dali::TextActor::SetShadow(const bool,const Vector4&,const Vector2&,const float)
-   */
-  void SetShadow( bool enable, const Vector4& color, const Vector2& offset, const float size);
-
-  /**
-   * Retrieve the shadow state.
-   * @return \e true if shadow is enabled, otherwise \e false.
-   */
-  bool GetShadow() const;
-
-  /**
-   * Retrieve shadow parameters.
-   * @param[out] color The shadow color.
-   * @param[out] offset The shadow offset.
-   * @param[out] size The shadow size.
-   */
-  void GetShadowParams( Vector4& color, Vector2& offset, float& size ) const;
-
-  /**
    * Set the text color
    * @param[in] color The text color
    */
@@ -211,15 +116,61 @@ public:
   Vector4 GetTextColor() const;
 
   /**
+   * Resets to default the text color.
+   */
+  void ResetTextColor();
+
+  /**
+   * @copydoc Dali::TextActor::SetWeight()
+   */
+  void SetWeight( TextStyle::Weight weight );
+
+  /**
+   * @copydoc Dali::TextActor::GetWeight()
+   */
+  TextStyle::Weight GetWeight() const;
+
+  /**
+   * Resets to default the text weight.
+   */
+  void ResetWeight();
+
+  /**
+   * @copydoc Dali::TextActor::SetSmoothEdge(const float)
+   */
+  void SetSmoothEdge( float smoothEdge );
+
+  /**
+   * Retrieve the smooth edge value.
+   * @return the smooth edge value.
+   */
+  float GetSmoothEdge() const;
+
+  /**
+   * Resets to default the smooth edge.
+   */
+  void ResetSmoothEdge();
+
+  /**
    * Enable italics on the text actor, the text will be sheared by the given angle.
    * @param[in] angle Italics angle in radians.
    */
-  void SetItalics( const Radian& angle );
+  void SetItalics( Radian angle );
 
   /**
    * @copydoc Dali::TextActor::GetItalics()
    */
-  const Radian& GetItalics() const;
+  bool GetItalics() const;
+
+  /**
+   * @copydoc Dali::TextActor::GetItalicsAngle()
+   */
+  Radian GetItalicsAngle() const;
+
+  /**
+   * Resets to default the italics.
+   */
+  void ResetItalics();
 
   /**
    * @copydoc Dali::TextActor::SetUnderline()
@@ -242,14 +193,113 @@ public:
   float GetUnderlinePosition() const;
 
   /**
-   * @copydoc Dali::TextActor::SetWeight()
+   * Resets to default the text underline.
    */
-  void SetWeight( TextStyle::Weight weight );
+  void ResetUnderline();
 
   /**
-   * @copydoc Dali::TextActor::GetWeight()
+   * @copydoc Dali::TextActor::SetOutline(const bool,const Vector4&,const Vector2&)
    */
-  TextStyle::Weight GetWeight() const;
+  void SetOutline( bool enable, const Vector4& color, const Vector2& thickness );
+
+  /**
+   * Get outline state.
+   * @return \e true if outline is enabled, otherwise \e false.
+   */
+  bool GetOutline() const;
+
+  /**
+   * Retrieve outline parameters.
+   * @param[out] color The outline color.
+   * @param[out] thickness The outline parameters.
+   */
+  void GetOutlineParams( Vector4& color, Vector2& thickness ) const;
+
+  /**
+   * Resets to default the text outline.
+   */
+  void ResetOutline();
+
+  /**
+   * @copydoc Dali::TextActor::SetGlow(const bool,const Vector4&,const float)
+   */
+  void SetGlow( bool enable, const Vector4& color, float intensity );
+
+  /**
+   * Get glow state.
+   * @return \e true if glow is enabled, otherwise \e false.
+   */
+  bool GetGlow() const;
+
+  /**
+   * Retrieve glow parameters.
+   * @param[out] color The glow color.
+   * @param[out] intensity The glow intensity.
+   */
+  void GetGlowParams( Vector4& color, float& intensity ) const;
+
+  /**
+   * Resets to default the text glow.
+   */
+  void ResetGlow();
+
+  /**
+   * @copydoc Dali::TextActor::SetShadow(const bool,const Vector4&,const Vector2&,const float)
+   */
+  void SetShadow( bool enable, const Vector4& color, const Vector2& offset, float size );
+
+  /**
+   * Retrieve the shadow state.
+   * @return \e true if shadow is enabled, otherwise \e false.
+   */
+  bool GetShadow() const;
+
+  /**
+   * Retrieve shadow parameters.
+   * @param[out] color The shadow color.
+   * @param[out] offset The shadow offset.
+   * @param[out] size The shadow size.
+   */
+  void GetShadowParams( Vector4& color, Vector2& offset, float& size ) const;
+
+  /**
+   * Resets to default the text shadow.
+   */
+  void ResetShadow();
+
+  /**
+   * @see Dali::TextActor::SetGradientColor()
+   * @see Dali::TextActor::SetGradientStartPoint()
+   * @see Dali::TextActor::SetGradientEndPoint()
+   */
+  void SetGradient( const Vector4& color, const Vector2& startPoint, const Vector2& endPoint );
+
+  /**
+   * @copydoc Dali::TextActor::GetGradientColor()
+   */
+  const Vector4& GetGradientColor() const;
+
+  /**
+   * @copydoc Dali::TextActor::GetGradientStartPoint()
+   */
+  const Vector2& GetGradientStartPoint() const;
+
+  /**
+   * @copydoc Dali::TextActor::GetGradientEndPoint()
+   */
+  const Vector2& GetGradientEndPoint() const;
+
+  /**
+   * Resets to default the text gradient.
+   */
+  void ResetGradient();
+
+  /**
+   * Retrieves the text style.
+   *
+   * @param[out] style The text style.
+   */
+  void GetTextStyle( TextStyle& style ) const;
 
   /**
    * Measure the natural size of a text string, as displayed in this font.
@@ -271,6 +321,11 @@ public:
    */
   bool IsTextLoaded();
 
+  /**
+   * Calculates the weighted smoothing value.
+   */
+  void CalculateWeightedSmoothing( TextStyle::Weight weight, float smoothEdge );
+
 public: // glyph texture observer
 
   /**
@@ -290,11 +345,6 @@ private:
    * @return true if the text or it's formating has been modified
    */
    bool IsTextModified();
-
-  /**
-   * Allocate a TextParameters object on this TextAttachment if one does not exist
-   */
-  void AllocateTextParameters();
 
   /**
    * First stage construction of a TextAttachment.
@@ -322,17 +372,6 @@ private:
    */
   void SetTextChanges();
 
-  /**
-   * Send new texture-id message
-   */
-  void SendTextureIdMessage();
-
-  /**
-   * Make a request to load the current text
-   * @param uniqueText the text to request to be loaded
-   */
-  void RequestText( const TextArray& uniqueText );
-
 protected:
 
   /**
@@ -344,31 +383,25 @@ private:
 
   const SceneGraph::TextAttachment* mSceneObject; ///< Not owned
 
-  TextRequestHelper mTextRequestHelper;  ///< Text request helper
-  FontPointer mFont; ///< The font resource
-
+  TextRequestHelper mTextRequestHelper;           ///< Text request helper
+  FontPointer mFont;                              ///< The font resource
+  Vector4* mTextColor;                            ///< on demand storage for text color
+  TextStyle mStyle;                               ///< on demand storage for text effects parameters ( do not store font parameters and color )
+                                                  ///< Font parameters are stored in the FontPointer member. Inside the TextStyle, font parameters and color are allocated in the same struct,
+                                                  ///< so store the text color in the style will allocate space for the font parameters as well, wasting space.
   // Cached values for public getters
   TextArray mText;
 
-  bool    mUnderlineEnabled:1;  ///< whether the text is underlined
   bool    mIsLeftToRight:1;     ///< whether the text is left to right
   bool    mTextChanged:1;       ///< whether the text has changed
   bool    mFontChanged:1;       ///< whether the font has changed
   bool    mUnderlineChanged:1;  ///< whether the underline has changed
   bool    mItalicsChanged:1;    ///< whether the italics has changed
-  bool    mItalicsEnabled:1;    ///< whether italics are enabled
   bool    mTextureIdSet:1;      ///< flag to signify if the texture id has been set on the scene-graph text-attachment
   unsigned int mTextureId;      ///< the texture id of the glyph atlas being used
-  float   mSmoothing;           ///< edge smoothing for the font
-  Radian  mItalicsAngle;        ///< font italics angle
-  float mUnderlineThickness;    ///< The underline's thickness.
-  float mUnderlinePosition;     ///< The underline's position.
   Vector2 mTextSize;            ///< text natural size
-  TextStyle::Weight mWeight;    ///< font weight
 
   OwnerPointer< TextVertexBuffer > mVertexBuffer; ///< vertex data to display the text
-  OwnerPointer< TextParameters > mTextParameters; ///< on demand storage for text effect parameters
-  Vector4* mTextColor;                            ///< on demand storage for text color
 };
 
 } // namespace Internal

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
@@ -21,6 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/renderers/render-data-provider.h>
 #include <dali/public-api/actors/blending.h>
 
@@ -29,6 +31,74 @@ namespace Dali
 
 namespace Internal
 {
+
+namespace
+{
+static Matrix gModelViewProjectionMatrix( false ); ///< a shared matrix to calculate the MVP matrix, dont want to store it locally to reduce storage overhead
+static Matrix3 gNormalMatrix; ///< a shared matrix to calculate normal matrix, dont want to store it locally to reduce storage overhead
+
+/**
+ * Helper to set view and projection matrices once per program
+ * @param program to set the matrices to
+ * @param modelMatrix to set
+ * @param viewMatrix to set
+ * @param projectionMatrix to set
+ * @param modelViewMatrix to set
+ * @param modelViewProjectionMatrix to set
+ */
+inline void SetMatrices( Program& program,
+                         const Matrix& modelMatrix,
+                         const Matrix& viewMatrix,
+                         const Matrix& projectionMatrix,
+                         const Matrix& modelViewMatrix,
+                         const Matrix& modelViewProjectionMatrix )
+{
+  GLint loc = program.GetUniformLocation(Program::UNIFORM_MODEL_MATRIX);
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    program.SetUniformMatrix4fv( loc, 1, modelMatrix.AsFloat() );
+  }
+  loc = program.GetUniformLocation( Program::UNIFORM_VIEW_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    if( program.GetViewMatrix() != &viewMatrix )
+    {
+      program.SetViewMatrix( &viewMatrix );
+      program.SetUniformMatrix4fv( loc, 1, viewMatrix.AsFloat() );
+    }
+  }
+  // set projection matrix if program has not yet received it this frame or if it is dirty
+  loc = program.GetUniformLocation( Program::UNIFORM_PROJECTION_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    if( program.GetProjectionMatrix() != &projectionMatrix )
+    {
+      program.SetProjectionMatrix( &projectionMatrix );
+      program.SetUniformMatrix4fv( loc, 1, projectionMatrix.AsFloat() );
+    }
+  }
+  loc = program.GetUniformLocation(Program::UNIFORM_MODELVIEW_MATRIX);
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    program.SetUniformMatrix4fv( loc, 1, modelViewMatrix.AsFloat() );
+  }
+
+  loc = program.GetUniformLocation( Program::UNIFORM_MVP_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    program.SetUniformMatrix4fv( loc, 1, modelViewProjectionMatrix.AsFloat() );
+  }
+
+  loc = program.GetUniformLocation( Program::UNIFORM_NORMAL_MATRIX );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    gNormalMatrix = modelViewMatrix;
+    gNormalMatrix.Invert();
+    gNormalMatrix.Transpose();
+    program.SetUniformMatrix3fv( loc, 1, gNormalMatrix.AsFloat() );
+  }
+}
+}
 
 namespace SceneGraph
 {
@@ -73,7 +143,8 @@ void Renderer::Render( BufferIndex bufferIndex,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
-                       float frametime )
+                       float frametime,
+                       bool cull )
 {
   DALI_ASSERT_DEBUG( mContext && "Renderer::Render. Renderer not initialised!! (mContext == NULL)." );
   DALI_ASSERT_DEBUG( mShader && "Renderer::Render. Shader not set!!" );
@@ -84,6 +155,30 @@ void Renderer::Render( BufferIndex bufferIndex,
     // Prevents modify the GL state if resources are not ready and nothing is to be rendered.
     return;
   }
+
+  // Calculate the MVP matrix first so we can do the culling test
+  const Matrix& modelMatrix = mDataProvider.GetModelMatrix( bufferIndex );
+  Matrix::Multiply( gModelViewProjectionMatrix, modelViewMatrix, projectionMatrix );
+
+  // Get the program to use
+  GeometryType geometryType=GEOMETRY_TYPE_IMAGE;
+  ShaderSubTypes subType=SHADER_DEFAULT;
+  ResolveGeometryTypes( bufferIndex, geometryType, subType );
+  unsigned int programIndex = 0;
+  Program& program = mShader->GetProgram( *mContext, geometryType, subType, programIndex );
+
+  // Check culling (does not need the program to be in use)
+  bool areVerticesFixed = program.AreVerticesFixed();
+  if( cull && areVerticesFixed )
+  {
+    if( IsOutsideClipSpace( modelMatrix, gModelViewProjectionMatrix ) )
+    {
+      // don't do any further gl state changes as this renderer is not visible
+      return;
+    }
+  }
+  // Take the program into use so we can send uniforms to it
+  program.Use();
 
   // Enables/disables blending mode.
   mContext->SetBlend( mUseBlend );
@@ -112,15 +207,28 @@ void Renderer::Render( BufferIndex bufferIndex,
   mContext->BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
                                    mBlendingOptions.GetBlendEquationAlpha() );
 
-  mShader->SetFrameTime( frametime );
+  // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
+  // set projection and view matrix if program has not yet received them yet this frame
+  SetMatrices( program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix, gModelViewProjectionMatrix );
 
-  const Matrix& modelMatrix = mDataProvider.GetModelMatrix( bufferIndex );
-  const Vector4& color = mDataProvider.GetRenderColor( bufferIndex );
+  // set color uniform
+  GLint loc = program.GetUniformLocation( Program::UNIFORM_COLOR );
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    const Vector4& color = mDataProvider.GetRenderColor( bufferIndex );
+    program.SetUniform4f( loc, color.r, color.g, color.b, color.a );
+  }
+  loc = program.GetUniformLocation(Program::UNIFORM_TIME_DELTA);
+  if( Program::UNIFORM_UNKNOWN != loc )
+  {
+    program.SetUniform1f( loc, frametime );
+  }
 
-  // Call to over ridden method in the child class
-  // TODO, once MeshRenderer is fixed to render only one mesh, move mShader.Apply here
-  // and we can greatly reduce these parameters. Also then derived renderers can be passed the Program&
-  DoRender( bufferIndex, modelViewMatrix, modelMatrix, viewMatrix, projectionMatrix, color );
+  // set custom uniforms
+  mShader->SetUniforms( *mContext, program, bufferIndex, programIndex, subType );
+
+  // subclass rendering and actual draw call
+  DoRender( bufferIndex, program, modelViewMatrix, viewMatrix );
 }
 
 Renderer::Renderer( RenderDataProvider& dataprovider )

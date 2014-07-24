@@ -20,7 +20,6 @@ SET(TC_SOURCES
         utc-Dali-Constraint.cpp
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp
-        utc-Dali-EventProcessing.cpp
         utc-Dali-Font.cpp
         utc-Dali-FontParameters.cpp
         utc-Dali-FrameBufferImage.cpp

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/events/event-processor.h>
@@ -47,9 +48,9 @@ static const std::size_t MAX_MESSAGE_SIZE = std::max( sizeof(Integration::TouchE
                                                       std::max( sizeof(Integration::KeyEvent),
                                                                 std::max( sizeof(Integration::MouseWheelEvent), sizeof(Integration::GestureEvent) ) ) );
 
-static const std::size_t INITIAL_MIN_CAPICITY = 4;
+static const std::size_t INITIAL_MIN_CAPACITY = 4;
 
-static const std::size_t INITIAL_BUFFER_SIZE = MAX_MESSAGE_SIZE * INITIAL_MIN_CAPICITY;
+static const std::size_t INITIAL_BUFFER_SIZE = MAX_MESSAGE_SIZE * INITIAL_MIN_CAPACITY;
 
 } // unnamed namespace
 

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
@@ -122,11 +123,6 @@ void RenderTask::SetCameraNode( Node* cameraNode )
   }
 }
 
-Node* RenderTask::GetCameraNode() const
-{
-  return mCameraNode;
-}
-
 void RenderTask::SetFrameBufferId( unsigned int resourceId )
 {
   if ( mFrameBufferResourceId != resourceId )
@@ -192,6 +188,16 @@ void RenderTask::SetClearEnabled( bool enabled )
 bool RenderTask::GetClearEnabled() const
 {
   return mClearEnabled;
+}
+
+void RenderTask::SetCullMode( bool mode )
+{
+  mCullMode = mode;
+}
+
+bool RenderTask::GetCullMode() const
+{
+  return mCullMode;
 }
 
 void RenderTask::SetRefreshRate( unsigned int refreshRate )
@@ -410,13 +416,14 @@ const Matrix& RenderTask::GetProjectionMatrix( BufferIndex bufferIndex ) const
 
 void RenderTask::PrepareRenderInstruction( RenderInstruction& instruction, BufferIndex updateBufferIndex )
 {
+  DALI_ASSERT_DEBUG( NULL != mCameraAttachment );
+
   TASK_LOG(Debug::General);
 
   Viewport viewport;
   bool viewportSet = QueryViewport( updateBufferIndex, viewport );
 
-  instruction.Reset( &GetViewMatrix( updateBufferIndex ),
-                     &GetProjectionMatrix( updateBufferIndex ),
+  instruction.Reset( mCameraAttachment,
                      GetFrameBufferId(),
                      viewportSet ? &viewport : NULL,
                      mClearEnabled ? &GetClearColor( updateBufferIndex ) : NULL );
@@ -501,6 +508,7 @@ RenderTask::RenderTask()
   mNotifyTrigger( false ),
   mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),
   mClearEnabled( Dali::RenderTask::DEFAULT_CLEAR_ENABLED ),
+  mCullMode( Dali::RenderTask::DEFAULT_CULL_MODE ),
   mRenderTarget( NULL ),
   mState( (Dali::RenderTask::DEFAULT_REFRESH_RATE == Dali::RenderTask::REFRESH_ALWAYS)
           ? RENDER_CONTINUOUSLY

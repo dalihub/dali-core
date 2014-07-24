@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/actors/actor-impl.h>
@@ -46,6 +47,7 @@
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
+#include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/common/message.h>
 #include <dali/integration-api/debug.h>
 
@@ -1886,6 +1888,22 @@ bool Actor::IsHittable() const
          IsNodeConnected();
 }
 
+ActorGestureData& Actor::GetGestureData()
+{
+  // Likely scenario is that once gesture-data is created for this actor, the actor will require
+  // that gesture for its entire life-time so no need to destroy it until the actor is destroyed
+  if ( NULL == mGestureData )
+  {
+    mGestureData = new ActorGestureData;
+  }
+  return *mGestureData;
+}
+
+bool Actor::IsGestureRequred( Gesture::Type type ) const
+{
+  return mGestureData && mGestureData->IsGestureRequred( type );
+}
+
 bool Actor::EmitTouchEventSignal(const TouchEvent& event)
 {
   bool consumed = false;
@@ -1993,6 +2011,7 @@ Actor::Actor( DerivedType derivedType )
 #ifdef DYNAMICS_SUPPORT
   mDynamicsData( NULL ),
 #endif
+  mGestureData( NULL ),
   mAttachment(),
   mShaderEffect(),
   mName(),
@@ -2072,6 +2091,9 @@ Actor::~Actor()
   // Cleanup dynamics
   delete mDynamicsData;
 #endif
+
+  // Cleanup optional gesture data
+  delete mGestureData;
 
   // Cleanup optional parent origin and anchor
   delete mParentOrigin;
@@ -2664,6 +2686,17 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
         // property is being used in a separate thread; queue a message to set the property
         SceneGraph::NodePropertyMessage<float>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<float>::Bake, value.Get<float>() );
+
+        break;
+      }
+
+      case Property::INTEGER:
+      {
+        AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::NodePropertyMessage<int>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<int>::Bake, value.Get<int>() );
 
         break;
       }

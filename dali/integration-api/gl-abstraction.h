@@ -1,21 +1,22 @@
 #ifndef __DALI_INTEGRATION_GL_ABSTRACTION_H__
 #define __DALI_INTEGRATION_GL_ABSTRACTION_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <stdint.h>
 
@@ -869,7 +870,7 @@ namespace Integration
  * A concrete implementation must be created for each platform, and provided when creating the
  * Dali::Integration::Core object.
  */
-class DALI_IMPORT_API GlAbstraction
+class GlAbstraction
 {
 protected:
 
@@ -879,6 +880,18 @@ protected:
   virtual ~GlAbstraction() {}
 
 public:
+  /**
+   * Invoked by Render thread before Core::Render.
+   */
+  virtual void PreRender() = 0;
+
+  /**
+   * Invoked by Render thread after Core::Render
+   * Inform the gl implementation that the rendering in this frame has finished,
+   * and how much time was spent.
+   * @param[in] timeDelta Time in microseconds since last PostRender call
+   */
+  virtual void PostRender( unsigned int timeDelta ) = 0;
 
   /**
    * The number of texture units an implementation supports is implementation dependent, but must be at least 8.

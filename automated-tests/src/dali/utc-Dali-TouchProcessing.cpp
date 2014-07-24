@@ -1,23 +1,24 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/system-overlay.h>
 #include <dali-test-suite-utils.h>
@@ -1189,5 +1190,314 @@ int UtcDaliTouchSystemOverlayActor(void)
   application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_CHECK( systemActor == data.touchedActor );
+  END_TEST;
+}
+
+int UtcDaliTouchLayerConsumesTouch(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData data;
+  TouchEventFunctor functor( data );
+  actor.TouchedSignal().Connect( &application, functor );
+
+  // Add a layer to overlap the actor
+  Layer layer = Layer::New();
+  layer.SetSize(100.0f, 100.0f);
+  layer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add( layer );
+  layer.RaiseToTop();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit a few touch signals
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Up, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Set layer to consume all touch
+  layer.SetTouchConsumed( true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit the same signals again, should not receive
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Up, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTouchLeaveActorReadded(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stage.Add(actor);
+
+  // Set actor to receive touch-events
+  actor.SetLeaveRequired( true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData data;
+  TouchEventFunctor functor( data );
+  actor.TouchedSignal().Connect( &application, functor );
+
+  // Emit a down and motion
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 11.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Remove actor from stage and add again
+  stage.Remove( actor );
+  stage.Add( actor );
+
+  // Emit a motion within the actor's bounds
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 12.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Emit a motion outside the actor's bounds
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 200.0f, 200.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( TouchPoint::Leave, data.touchEvent.points[0].state, TEST_LOCATION );
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTouchStencil(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  TextActor actor = TextActor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stage.Add(actor);
+
+  Actor stencil = Actor::New();
+  stencil.SetSize(50.0f, 50.0f);
+  stencil.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stencil.SetDrawMode( DrawMode::STENCIL );
+  stage.Add(stencil);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData data;
+  TouchEventFunctor functor( data );
+  actor.TouchedSignal().Connect( &application, functor );
+
+  // Emit an event within stencil area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Emit an event outside the stencil area but within the actor area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 60.0f, 60.0f ) ) );
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTouchStencilInActorHierarchy(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  TextActor parent = TextActor::New();
+  parent.SetSize(100.0f, 100.0f);
+  parent.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stage.Add(parent);
+
+  TextActor child = TextActor::New();
+  child.SetSize(25.0f, 25.0f);
+  child.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  parent.Add(child);
+
+  Actor stencil = Actor::New();
+  stencil.SetSize(50.0f, 50.0f);
+  stencil.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stencil.SetDrawMode( DrawMode::STENCIL );
+  stage.Add(stencil);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to touch signals
+  SignalData parentData;
+  parent.TouchedSignal().Connect( &application, TouchEventFunctor(parentData) );
+  SignalData childData;
+  child.TouchedSignal().Connect( &application, TouchEventFunctor(childData) );
+
+  // Emit an event within stencil area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, childData.functorCalled, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+
+  // Emit an event outside child area and within stencil area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 40.0f, 40.0f ) ) );
+  DALI_TEST_EQUALS( true, parentData.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, childData.functorCalled, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+
+  // Emit an event outside stencil are but within parent area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 60.0f, 60.0f ) ) );
+  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, childData.functorCalled, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+
+  // Readd actor (so that stencil is the first child)
+  stage.Remove(parent);
+  application.SendNotification();
+  application.Render();
+  stage.Add(parent);
+  application.SendNotification();
+  application.Render();
+
+  // Redo hit in same area...
+
+  // Emit an event within stencil area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, childData.functorCalled, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+
+  // Emit an event outside child area and within stencil area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 40.0f, 40.0f ) ) );
+  DALI_TEST_EQUALS( true, parentData.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, childData.functorCalled, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+
+  // Emit an event outside stencil are but within parent area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 60.0f, 60.0f ) ) );
+  DALI_TEST_EQUALS( false, parentData.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, childData.functorCalled, TEST_LOCATION );
+  parentData.Reset();
+  childData.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTouchMultipleStencils(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  TextActor actor = TextActor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stage.Add(actor);
+
+  Actor stencil = Actor::New();
+  stencil.SetSize(50.0f, 50.0f);
+  stencil.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stencil.SetDrawMode( DrawMode::STENCIL );
+  stage.Add(stencil);
+
+  Actor stencil2 = Actor::New();
+  stencil2.SetSize(50.0f, 50.0f);
+  stencil2.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stencil2.SetDrawMode( DrawMode::STENCIL );
+  stencil2.SetPosition(50.0f, 50.0f);
+  stage.Add(stencil2);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData data;
+  TouchEventFunctor functor( data );
+  actor.TouchedSignal().Connect( &application, functor );
+
+  // Emit an event within stencil area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Emit an event inside the second stencil area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 60.0f, 60.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Emit an event outside both stencil areas but within the actor area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 60.0f ) ) );
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliTouchStencilNonRenderableActor(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stage.Add(actor);
+
+  Actor stencil = Actor::New();
+  stencil.SetSize(50.0f, 50.0f);
+  stencil.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  stencil.SetDrawMode( DrawMode::STENCIL );
+  stage.Add(stencil);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Connect to actor's touched signal
+  SignalData data;
+  TouchEventFunctor functor( data );
+  actor.TouchedSignal().Connect( &application, functor );
+
+  // Emit an event within stencil area
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 10.0f, 10.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
+  // Emit an event outside the stencil area but within the actor area, we should have a hit!
+  application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, Vector2( 60.0f, 60.0f ) ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
   END_TEST;
 }

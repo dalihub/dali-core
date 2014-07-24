@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_GESTURE_DETECTOR_H__
 #define __DALI_INTERNAL_GESTURE_DETECTOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -159,15 +160,6 @@ private:
    */
   virtual void OnActorDestroyed(Object& object) = 0;
 
-  /**
-   * Dummy touch event handler.  We do not need to know when touch happens on our actor.  We just
-   * need to connect a function so that our attached actor is checked during our hit testing.
-   * @param[in]  actor  The hit actor (or one of its parents).
-   * @param[in]  event  The touch event.
-   * @return false always as we do not process the event.
-   */
-  bool OnTouchEvent(Dali::Actor actor, const TouchEvent& event);
-
 private: // Default property extensions from ProxyObject
 
   /**
@@ -255,10 +247,6 @@ protected:
   Gesture::Type                 mType;                  ///< The gesture detector will detect this type of gesture.
   GestureDetectorActorContainer mAttachedActors;        ///< Proxy<Node>::Observer is used to provide weak-pointer behaviour
   GestureEventProcessor&        mGestureEventProcessor; ///< A reference to the gesture event processor.
-
-private:
-
-  SlotDelegate< GestureDetector > mSlotDelegate;
 };
 
 } // namespace Internal

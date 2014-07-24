@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H__
 #define __DALI_INTERNAL_SCENE_GRAPH_ANIMATOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <boost/function.hpp>
@@ -334,6 +335,36 @@ struct AnimateToFloat
   float mTarget;
 };
 
+struct AnimateByInteger
+{
+  AnimateByInteger(const int& relativeValue)
+  : mRelative(relativeValue)
+  {
+  }
+
+  float operator()(float alpha, const int& property)
+  {
+    return int(property + mRelative * alpha + 0.5f );
+  }
+
+  int mRelative;
+};
+
+struct AnimateToInteger
+{
+  AnimateToInteger(const int& targetValue)
+  : mTarget(targetValue)
+  {
+  }
+
+  float operator()(float alpha, const int& property)
+  {
+    return int(property + ((mTarget - property) * alpha) + 0.5f);
+  }
+
+  int mTarget;
+};
+
 struct AnimateByVector2
 {
   AnimateByVector2(const Vector2& relativeValue)
@@ -566,6 +597,25 @@ struct KeyFrameNumberFunctor
   }
 
   KeyFrameNumberPtr mKeyFrames;
+};
+
+struct KeyFrameIntegerFunctor
+{
+  KeyFrameIntegerFunctor(KeyFrameIntegerPtr keyFrames)
+  : mKeyFrames(keyFrames)
+  {
+  }
+
+  float operator()(float progress, const int& property)
+  {
+    if(mKeyFrames->IsActive(progress))
+    {
+      return mKeyFrames->GetValue(progress);
+    }
+    return property;
+  }
+
+  KeyFrameIntegerPtr mKeyFrames;
 };
 
 struct KeyFrameVector2Functor

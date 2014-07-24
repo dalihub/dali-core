@@ -24,6 +24,7 @@ SET(TC_SOURCES
   utc-Dali-MeshData.cpp
   utc-Dali-Model.cpp
   utc-Dali-MouseWheelEvent.cpp
+  utc-Dali-NinePatchImages.cpp
   utc-Dali-ObjectRegistry.cpp
   utc-Dali-Random.cpp
   utc-Dali-RenderTask.cpp

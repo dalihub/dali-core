@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_PAN_GESTURE_EVENT_PROCESSOR_H__
 #define __DALI_INTERNAL_PAN_GESTURE_EVENT_PROCESSOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/render-tasks/render-task.h>
@@ -45,11 +46,9 @@ class PanGesture;
 /**
  * Pan Gesture Event Processing:
  *
- * When we receive a pinch gesture event, we do the following:
- * - Determine the hot actor underneath the current position of the pan gesture event.
- * - Determine whether this actor is, or is a child of, the actor(s) attached to any of the
- *   detectors.
- * - Emit the gesture when all the above conditions are met.
+ * When we receive a pan gesture event, we do the following:
+ * - Find the actor that requires a pan where the pan started from (i.e. the down position).
+ * - Emit the gesture if the event satisfies the detector conditions.
  *
  * The above is only checked when our gesture starts.  We continue sending the pan gesture to the
  * same actor and detector until the pan ends or is cancelled.
@@ -73,7 +72,7 @@ public:
 public: // To be called by GestureEventProcessor
 
   /**
-   * This method is called whenever a pinch gesture event occurs.
+   * This method is called whenever a pan gesture event occurs.
    * @param[in] panEvent The event that has occurred.
    */
   void Process( const Integration::PanGestureEvent& panEvent );
@@ -119,11 +118,34 @@ public: // To be called by GestureEventProcessor
    *
    * Valid modes:
    * 0 - No prediction
-   * 1 - Average Smoothing (no actual prediction)
-   * 2 - Interpolation using last vsync time and event time
-   * 3 - Same as 2 for now, in progress
+   * 1 - Prediction using average acceleration
    */
   void SetPredictionMode(int mode);
+
+  /**
+   * @brief Sets the prediction amount of the pan gesture
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetPredictionAmount(unsigned int amount);
+
+  /**
+   * Called to set the prediction mode for pan gestures
+   *
+   * @param[in] mode The prediction mode
+   *
+   * Valid modes:
+   * 0 - No smoothing
+   * 1 - average between last 2 values
+   */
+  void SetSmoothingMode(int mode);
+
+  /**
+   * @brief Sets the smoothing amount of the pan gesture
+   *
+   * @param[in] amount The smotthing amount from 0.0f (none) to 1.0f (full)
+   */
+  void SetSmoothingAmount(float amount);
 
 private:
 
@@ -146,8 +168,8 @@ private:
    * @param[in]  state             The state of the gesture.
    * @param[in]  renderTask        The renderTask to use.
    */
-  void EmitPanSignal( Dali::Actor actor,
-                      PanGestureDetectorContainer& gestureDetectors,
+  void EmitPanSignal( Actor* actor,
+                      const GestureDetectorContainer& gestureDetectors,
                       const Integration::PanGestureEvent& panEvent,
                       Vector2 localCurrent,
                       Gesture::State state,
@@ -160,12 +182,22 @@ private:
    */
   void OnGesturedActorStageDisconnection();
 
+  /**
+   * @copydoc GestureProcessor::CheckGestureDetector()
+   */
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+
+  /**
+   * @copydoc GestureProcessor::EmitGestureSignal()
+   */
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+
 private:
 
   Stage& mStage;
   Integration::GestureManager& mGestureManager;
   PanGestureDetectorContainer mGestureDetectors;
-  PanGestureDetectorContainer mCurrentPanEmitters;
+  GestureDetectorContainer mCurrentPanEmitters;
   Dali::RenderTask mCurrentRenderTask;
   Vector2 mPossiblePanPosition;
 
@@ -175,8 +207,7 @@ private:
   Vector2 mLastVelocity;       ///< The last recorded velocity in local actor coordinates.
   Vector2 mLastScreenVelocity; ///< The last recorded velocity in screen coordinates.
 
-  struct PanEventFunctor;
-
+  const Integration::PanGestureEvent* mCurrentPanEvent; ///< Pointer to current PanEvent, used when calling ProcessAndEmit()
   SceneGraph::PanGesture* mSceneObject; ///< Not owned, but we write to it directly
 };
 

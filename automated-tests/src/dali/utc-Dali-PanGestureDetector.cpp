@@ -1,27 +1,32 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <cmath>
+#include <dali/public-api/dali-core.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/pan-gesture-event.h>
 #include <dali/integration-api/system-overlay.h>
+#include <dali/integration-api/profiling.h>
+#include <dali/integration-api/input-options.h>
 #include <dali-test-suite-utils.h>
+#include <test-touch-utils.h>
 
 using namespace Dali;
 
@@ -40,8 +45,10 @@ namespace
 {
 typedef Dali::PanGestureDetector::AngleContainer::size_type AngleSizeType;
 
+const int PAN_EVENT_TIME_DELTA = 8;
+const int PAN_GESTURE_UPDATE_COUNT = 50;
 
-// Stores data that is populated in the callback and will be read by the TET cases
+// Stores data that is populated in the callback and will be read by the test cases
 struct SignalData
 {
   SignalData()
@@ -132,13 +139,15 @@ struct ConstraintData
 
   Vector2 screenPosition;
   Vector2 screenDisplacement;
+  Vector2 screenVelocity;
   Vector2 localPosition;
   Vector2 localDisplacement;
+  Vector2 localVelocity;
   bool called;
 
   void Reset()
   {
-    screenPosition = screenDisplacement = localPosition = localDisplacement = Vector2::ZERO;
+    screenPosition = screenDisplacement = screenVelocity = localPosition = localDisplacement = localVelocity = Vector2::ZERO;
     called = false;
   }
 };
@@ -151,13 +160,17 @@ struct PanConstraint
   Vector3 operator()(const Vector3&       current,
                      const PropertyInput& screenPositionProperty,
                      const PropertyInput& screenDisplacementProperty,
+                     const PropertyInput& screenVelocityProperty,
                      const PropertyInput& localPositionProperty,
-                     const PropertyInput& localDisplacementProperty)
+                     const PropertyInput& localDisplacementProperty,
+                     const PropertyInput& localVelocityProperty)
   {
     constraintData.screenPosition = screenPositionProperty.GetVector2();
     constraintData.screenDisplacement = screenDisplacementProperty.GetVector2();
+    constraintData.screenVelocity = screenVelocityProperty.GetVector2();
     constraintData.localPosition = localPositionProperty.GetVector2();
     constraintData.localDisplacement = localDisplacementProperty.GetVector2();
+    constraintData.localVelocity = localVelocityProperty.GetVector2();
     constraintData.called = true;
     return Vector3::ZERO;
   }
@@ -192,7 +205,8 @@ PanGesture GeneratePan( unsigned int time,
                         Vector2 localPosition,
                         Vector2 screenDisplacement = Vector2::ONE,
                         Vector2 localDisplacement = Vector2::ONE,
-                        Vector2 velocity = Vector2::ONE,
+                        Vector2 screenVelocity = Vector2::ONE,
+                        Vector2 localVelocity = Vector2::ONE,
                         unsigned int numberOfTouches = 1 )
 {
   PanGesture pan( state );
@@ -205,10 +219,65 @@ PanGesture GeneratePan( unsigned int time,
   pan.screenDisplacement = screenDisplacement;
   pan.displacement = localDisplacement;
 
-  pan.screenVelocity = pan.velocity = velocity;
+  pan.screenVelocity = screenVelocity;
+  pan.velocity = localVelocity;
+
   pan.numberOfTouches = numberOfTouches;
 
   return pan;
+}
+
+/**
+ * Helper to generate PanGestureEvent
+ *
+ * @param[in] application Application instance
+ * @param[in] state The Gesture State
+ * @param[in] pos The current position of touch.
+ */
+static void SendPan(TestApplication& application, Gesture::State state, const Vector2& pos)
+{
+  static Vector2 last;
+  static int LastTime = 0;
+
+  if( (state == Gesture::Started) ||
+      (state == Gesture::Possible) )
+  {
+    last.x = pos.x;
+    last.y = pos.y;
+  }
+
+  application.ProcessEvent(GeneratePan(state, last, pos, PAN_EVENT_TIME_DELTA));
+
+  last.x = pos.x;
+  last.y = pos.y;
+  LastTime += PAN_EVENT_TIME_DELTA;
+}
+
+static Vector2 PerformSwipeGestureSwipe(TestApplication& application, Vector2 start, Vector2 direction, int frames, bool finish = true)
+{
+  // Now do a pan starting from (start) and heading (direction)
+  Vector2 pos(start);
+  SendPan(application, Gesture::Possible, pos);
+  SendPan(application, Gesture::Started, pos);
+  application.SendNotification();
+  application.Render();
+
+  for(int i = 0;i<frames;i++)
+  {
+    pos += direction; // Move in this direction
+    SendPan(application, Gesture::Continuing, pos);
+    application.SendNotification();
+    application.Render();
+  }
+
+  if(finish)
+  {
+    SendPan(application, Gesture::Finished, pos);
+    application.SendNotification();
+    application.Render();
+  }
+
+  return pos;
 }
 
 } // anon namespace
@@ -1532,7 +1601,121 @@ int UtcDaliPanGestureSystemOverlay(void)
   // Start pan within the actor's area
   application.ProcessEvent( GeneratePan( Gesture::Possible, screenCoordsStart, screenCoordsEnd, 10 ) );
   application.ProcessEvent( GeneratePan( Gesture::Started, screenCoordsStart, screenCoordsEnd, 10 ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPanGestureBehindTouchableSystemOverlay(void)
+{
+  TestApplication application;
+  Dali::Integration::Core& core = application.GetCore();
+  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  // SystemOverlay actor
+  Actor systemOverlayActor = Actor::New();
+  systemOverlayActor.SetSize(100.0f, 100.0f);
+  systemOverlayActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  systemOverlay.Add(systemOverlayActor);
+
+  // Stage actor
+  Actor stageActor = Actor::New();
+  stageActor.SetSize(100.0f, 100.0f);
+  stageActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(stageActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set system-overlay actor to touchable
+  TouchEventData touchData;
+  TouchEventDataFunctor touchFunctor( touchData );
+  systemOverlayActor.TouchedSignal().Connect(&application, touchFunctor);
+
+  // Set stage actor to receive the gesture
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(stageActor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  Vector2 screenCoordsStart( 10.0f, 20.0f );
+  Vector2 screenCoordsEnd( 20.0f, 20.0f );
+
+  // Start pan within the two actors' area
+  application.ProcessEvent( GeneratePan( Gesture::Possible, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished, screenCoordsStart, screenCoordsEnd, 10 ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, touchData.functorCalled, TEST_LOCATION );
+
+  data.Reset();
+  touchData.Reset();
+
+  // Do touch in the same area
+  application.ProcessEvent( touchFunctor.GenerateSingleTouch( TouchPoint::Down, screenCoordsStart ) );
   DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, touchData.functorCalled, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureTouchBehindGesturedSystemOverlay(void)
+{
+  TestApplication application;
+  Dali::Integration::Core& core = application.GetCore();
+  Dali::Integration::SystemOverlay& systemOverlay( core.GetSystemOverlay() );
+  systemOverlay.GetOverlayRenderTasks().CreateTask();
+
+  // SystemOverlay actor
+  Actor systemOverlayActor = Actor::New();
+  systemOverlayActor.SetSize(100.0f, 100.0f);
+  systemOverlayActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  systemOverlay.Add(systemOverlayActor);
+
+  // Stage actor
+  Actor stageActor = Actor::New();
+  stageActor.SetSize(100.0f, 100.0f);
+  stageActor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(stageActor);
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Set stage actor to touchable
+  TouchEventData touchData;
+  TouchEventDataFunctor touchFunctor( touchData );
+  stageActor.TouchedSignal().Connect(&application, touchFunctor);
+
+  // Set system-overlay actor to have the gesture
+  SignalData data;
+  GestureReceivedFunctor functor(data);
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach(systemOverlayActor);
+  detector.DetectedSignal().Connect(&application, functor);
+
+  Vector2 screenCoordsStart( 10.0f, 20.0f );
+  Vector2 screenCoordsEnd( 20.0f, 20.0f );
+
+  // Start pan within the two actors' area
+  application.ProcessEvent( GeneratePan( Gesture::Possible, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Started, screenCoordsStart, screenCoordsEnd, 10 ) );
+  application.ProcessEvent( GeneratePan( Gesture::Finished, screenCoordsStart, screenCoordsEnd, 10 ) );
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, touchData.functorCalled, TEST_LOCATION );
+
+  data.Reset();
+  touchData.Reset();
+
+  // Do touch in the same area
+  application.ProcessEvent( touchFunctor.GenerateSingleTouch( TouchPoint::Down, screenCoordsStart ) );
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( true, touchData.functorCalled, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -1881,10 +2064,11 @@ int UtcDaliPanGestureDirectionProcessing(void)
   END_TEST;
 }
 
-int UtcDaliPanGestureSetProperties(void)
+int UtcDaliPanGestureNoPredictionNoSmoothing(void)
 {
   TestApplication application;
-  TestRenderController& renderController( application.GetRenderController() );
+  Integration::SetPanGesturePredictionMode(0);
+  Integration::SetPanGestureSmoothingMode(0);
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1903,8 +2087,194 @@ int UtcDaliPanGestureSetProperties(void)
   ConstraintData constraintData;
   actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::SCREEN_POSITION ),
                                                              Source( detector, PanGestureDetector::SCREEN_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::SCREEN_VELOCITY ),
                                                              Source( detector, PanGestureDetector::LOCAL_POSITION ),
                                                              Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::LOCAL_VELOCITY ),
+                                                             PanConstraint( constraintData ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector2 direction(Vector2::XAXIS * -5.0f);
+  Vector2 startPosition( 1.0f, 1.0f );
+  PerformSwipeGestureSwipe(application, startPosition, direction, PAN_GESTURE_UPDATE_COUNT, true);
+  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.screenPosition, startPosition + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.localPosition,  startPosition + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION );
+
+  constraintData.Reset();
+  END_TEST;
+}
+
+int UtcDaliPanGestureNoPredictionSmoothing(void)
+{
+  TestApplication application;
+  Integration::SetPanGesturePredictionMode(0);
+  Integration::SetPanGestureSmoothingMode(1);
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+
+  ConstraintData constraintData;
+  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::SCREEN_POSITION ),
+                                                             Source( detector, PanGestureDetector::SCREEN_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::SCREEN_VELOCITY ),
+                                                             Source( detector, PanGestureDetector::LOCAL_POSITION ),
+                                                             Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::LOCAL_VELOCITY ),
+                                                             PanConstraint( constraintData ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector2 direction(Vector2::XAXIS * -5.0f);
+  Vector2 previousPosition( 20.0f, 20.0f );
+  Vector2 currentPosition( 20.0f, 10.0f );
+  PerformSwipeGestureSwipe(application, Vector2(1.0f, 1.0f), direction, PAN_GESTURE_UPDATE_COUNT, true);
+  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 0.1f, TEST_LOCATION );
+
+  constraintData.Reset();
+  END_TEST;
+}
+
+int UtcDaliPanGesturePredictionNoSmoothing(void)
+{
+  TestApplication application;
+  Integration::SetPanGesturePredictionMode(1);
+  Integration::SetPanGestureSmoothingMode(0);
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+
+  ConstraintData constraintData;
+  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::SCREEN_POSITION ),
+                                                             Source( detector, PanGestureDetector::SCREEN_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::SCREEN_VELOCITY ),
+                                                             Source( detector, PanGestureDetector::LOCAL_POSITION ),
+                                                             Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::LOCAL_VELOCITY ),
+                                                             PanConstraint( constraintData ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector2 direction(Vector2::XAXIS * -5.0f);
+  Vector2 previousPosition( 20.0f, 20.0f );
+  Vector2 currentPosition( 20.0f, 10.0f );
+  PerformSwipeGestureSwipe(application, Vector2(1.0f, 1.0f), direction, PAN_GESTURE_UPDATE_COUNT, true);
+  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION );
+
+  constraintData.Reset();
+  END_TEST;
+}
+
+int UtcDaliPanGesturePredictionSmoothing(void)
+{
+  TestApplication application;
+  Integration::SetPanGesturePredictionMode(1);
+  Integration::SetPanGestureSmoothingMode(1);
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+
+  ConstraintData constraintData;
+  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::SCREEN_POSITION ),
+                                                             Source( detector, PanGestureDetector::SCREEN_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::SCREEN_VELOCITY ),
+                                                             Source( detector, PanGestureDetector::LOCAL_POSITION ),
+                                                             Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::LOCAL_VELOCITY ),
+                                                             PanConstraint( constraintData ) ) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  Vector2 direction(Vector2::XAXIS * -5.0f);
+  Vector2 previousPosition( 20.0f, 20.0f );
+  Vector2 currentPosition( 20.0f, 10.0f );
+  PerformSwipeGestureSwipe(application, Vector2(1.0f, 1.0f), direction, PAN_GESTURE_UPDATE_COUNT, true);
+  DALI_TEST_EQUALS( true,  data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.called, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.screenPosition, Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.localPosition,  Vector2(1.0f, 1.0f) + (direction * PAN_GESTURE_UPDATE_COUNT), 10.0f, TEST_LOCATION );
+
+  constraintData.Reset();
+  END_TEST;
+}
+
+int UtcDaliPanGestureSetProperties(void)
+{
+  TestApplication application;
+  TestRenderController& renderController( application.GetRenderController() );
+  Integration::SetPanGesturePredictionMode(0);
+  Integration::SetPanGestureSmoothingMode(0);
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
+
+  ConstraintData constraintData;
+  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::SCREEN_POSITION ),
+                                                             Source( detector, PanGestureDetector::SCREEN_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::SCREEN_VELOCITY ),
+                                                             Source( detector, PanGestureDetector::LOCAL_POSITION ),
+                                                             Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::LOCAL_VELOCITY ),
                                                              PanConstraint( constraintData ) ) );
 
   // Render and notify
@@ -1916,10 +2286,12 @@ int UtcDaliPanGestureSetProperties(void)
 
   Vector2 screenPosition( 20.0f, 20.0f );
   Vector2 screenDisplacement( 1.0f, 1.0f );
+  Vector2 screenVelocity( 1.3f, 4.0f );
   Vector2 localPosition( 21.0f, 21.0f );
   Vector2 localDisplacement( 0.5f, 0.5f );
+  Vector2 localVelocity( 1.5f, 2.5f );
 
-  PanGestureDetector::SetPanGestureProperties( GeneratePan( 1u, Gesture::Started, screenPosition, localPosition, screenDisplacement, localDisplacement ) );
+  PanGestureDetector::SetPanGestureProperties( GeneratePan( 1u, Gesture::Started, screenPosition, localPosition, screenDisplacement, localDisplacement, screenVelocity, localVelocity ) );
   DALI_TEST_EQUALS( renderController.WasCalled( TestRenderController::RequestUpdateFunc ), true, TEST_LOCATION );
 
   // Render and notify
@@ -1931,6 +2303,8 @@ int UtcDaliPanGestureSetProperties(void)
   DALI_TEST_EQUALS( constraintData.localPosition,      localPosition,      TEST_LOCATION );
   DALI_TEST_EQUALS( constraintData.screenDisplacement, screenDisplacement, TEST_LOCATION );
   DALI_TEST_EQUALS( constraintData.localDisplacement,  localDisplacement,  TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.screenVelocity,     screenVelocity,     TEST_LOCATION );
+  DALI_TEST_EQUALS( constraintData.localVelocity,      localVelocity,      TEST_LOCATION );
   constraintData.Reset();
   END_TEST;
 }
@@ -1938,6 +2312,7 @@ int UtcDaliPanGestureSetProperties(void)
 int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
 {
   TestApplication application;
+  Integration::SetPanGesturePredictionMode(0);
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -1956,8 +2331,10 @@ int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
   ConstraintData constraintData;
   actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::SCREEN_POSITION ),
                                                              Source( detector, PanGestureDetector::SCREEN_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::SCREEN_VELOCITY ),
                                                              Source( detector, PanGestureDetector::LOCAL_POSITION ),
                                                              Source( detector, PanGestureDetector::LOCAL_DISPLACEMENT ),
+                                                             Source( detector, PanGestureDetector::LOCAL_VELOCITY ),
                                                              PanConstraint( constraintData ) ) );
 
   // Render and notify
@@ -1995,5 +2372,92 @@ int UtcDaliPanGesturePropertyIndices(void)
   detector.GetPropertyIndices( indices );
   DALI_TEST_CHECK( ! indices.empty() );
   DALI_TEST_EQUALS( indices.size(), detector.GetPropertyCount(), TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliPanGestureLayerConsumesTouch(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  // Add a layer to overlap the actor
+  Layer layer = Layer::New();
+  layer.SetSize(100.0f, 100.0f);
+  layer.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add( layer );
+  layer.RaiseToTop();
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit signals, should receive
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  // Set layer to consume all touch
+  layer.SetTouchConsumed( true );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit the same signals again, should not receive
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 10));
+  DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
+  data.Reset();
+
+  END_TEST;
+}
+
+int UtcDaliPanGestureNoTimeDiff(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  Stage::GetCurrent().Add(actor);
+
+  // Add a pan detector
+  PanGestureDetector detector = PanGestureDetector::New();
+  detector.Attach( actor );
+  SignalData data;
+  GestureReceivedFunctor functor( data );
+  detector.DetectedSignal().Connect( &application, functor );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Emit signals, should receive
+  application.ProcessEvent(GeneratePan(Gesture::Possible, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 0));
+  application.ProcessEvent(GeneratePan(Gesture::Started, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 0));
+  application.ProcessEvent(GeneratePan(Gesture::Finished, Vector2(10.0f, 20.0f), Vector2(20.0f, 20.0f), 0));
+  DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.velocity.x ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.velocity.y ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.screenVelocity.x ) );
+  DALI_TEST_CHECK( !std::isinf( data.receivedGesture.screenVelocity.y ) );
+  data.Reset();
+
+  data.Reset();
+
   END_TEST;
 }

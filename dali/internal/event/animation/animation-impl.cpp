@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/animation/animation-impl.h>
@@ -224,6 +225,18 @@ void Animation::Play()
   PlayAnimationMessage( mUpdateManager.GetEventToUpdate(), *mAnimation );
 }
 
+void Animation::PlayFrom( float progress )
+{
+  if( progress >= 0.0f && progress <= 1.0f )
+  {
+    // Update the current playlist
+    mPlaylist.OnPlay( *this );
+
+    // mAnimation is being used in a separate thread; queue a Play message
+    PlayAnimationFromMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
+  }
+}
+
 void Animation::Pause()
 {
   // mAnimation is being used in a separate thread; queue a Pause message
@@ -294,6 +307,17 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
                                                            AnimateByFloat(relativeValue.Get<float>()),
                                                            alpha,
                                                            period ) );
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      AddAnimatorConnector( AnimatorConnector<int>::New( proxy,
+                                                         target.propertyIndex,
+                                                         target.componentIndex,
+                                                         AnimateByInteger(relativeValue.Get<int>()),
+                                                         alpha,
+                                                         period ) );
       break;
     }
 
@@ -409,6 +433,17 @@ void Animation::AnimateTo(ProxyObject& targetObject, Property::Index targetPrope
       break;
     }
 
+    case Property::INTEGER:
+    {
+      AddAnimatorConnector( AnimatorConnector<int>::New(targetObject,
+                                                        targetPropertyIndex,
+                                                        componentIndex,
+                                                        AnimateToInteger(destinationValue.Get<int>()),
+                                                        alpha,
+                                                        period) );
+      break;
+    }
+
     case Property::VECTOR2:
     {
       AddAnimatorConnector( AnimatorConnector<Vector2>::New(targetObject,
@@ -504,6 +539,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
                                                           period ) );
       break;
     }
+
     case Dali::Property::FLOAT:
     {
       const KeyFrameNumber* kf;
@@ -515,6 +551,20 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
                                                            KeyFrameNumberFunctor(kfCopy),
                                                            alpha,
                                                            period ) );
+      break;
+    }
+
+    case Dali::Property::INTEGER:
+    {
+      const KeyFrameInteger* kf;
+      GetSpecialization(keyFrames, kf);
+      KeyFrameIntegerPtr kfCopy = KeyFrameInteger::Clone(*kf);
+      AddAnimatorConnector( AnimatorConnector<int>::New( proxy,
+                                                         target.propertyIndex,
+                                                         target.componentIndex,
+                                                         KeyFrameIntegerFunctor(kfCopy),
+                                                         alpha,
+                                                         period ) );
       break;
     }
 
@@ -631,6 +681,17 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
                                                           AnyCast< AnimatorFunctionFloat >( func ),
                                                           alpha,
                                                           period) );
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      AddAnimatorConnector( AnimatorConnector<int>::New(proxy,
+                                                        target.propertyIndex,
+                                                        target.componentIndex,
+                                                        AnyCast< AnimatorFunctionInteger >( func ),
+                                                        alpha,
+                                                        period) );
       break;
     }
 
@@ -1238,6 +1299,25 @@ bool Animation::DoAction(BaseObject* object, const std::string& actionName, cons
   }
 
   return done;
+}
+
+float Animation::GetCurrentProgress()
+{
+  if( mAnimation )
+  {
+    return mAnimation->GetCurrentProgress();
+  }
+
+  return 0.0f;
+}
+
+void Animation::SetCurrentProgress(float progress)
+{
+  if( mAnimation && progress >= 0.0f && progress <= 1.0f )
+  {
+    // mAnimation is being used in a separate thread; queue a message to set the current progress
+    SetCurrentProgressMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
+  }
 }
 
 } // namespace Internal

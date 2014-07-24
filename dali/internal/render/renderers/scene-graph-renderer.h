@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_SCENE_GRAPH_RENDERER_H__
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDERER_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
@@ -35,6 +36,7 @@ namespace Internal
 {
 class Context;
 class Texture;
+class Program;
 
 namespace SceneGraph
 {
@@ -108,12 +110,14 @@ public:
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
    * @param[in] frametime The elapsed time between the last two updates.
+   * @param[in] cull Whether to frustum cull this renderer
    */
   void Render( BufferIndex bufferIndex,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,
-               float frametime );
+               float frametime,
+               bool cull );
 
 protected:
 
@@ -139,15 +143,29 @@ private:
   virtual bool CheckResources() = 0;
 
   /**
+   * Resolve the derived renderers geometry type and subtype
+   * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[out] outType    The geometry type
+   * @param[out] outSubType The geometry subtype
+   */
+  virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType ) = 0;
+
+  /**
+   * Checks if renderer's is culled.
+   * @param[in] modelMatrix The model matrix.
+   * @param[in] modelViewProjectionMatrix The MVP matrix.
+   * @return \e true if it is. Otherwise \e false.
+   */
+  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix ) = 0;
+
+  /**
    * Called from Render; implemented in derived classes.
    * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[in] program to use.
    * @param[in] modelViewMatrix The model-view matrix.
-   * @param[in] modelMatrix The model matrix.
    * @param[in] viewMatrix The view matrix.
-   * @param[in] projectionMatrix The projection matrix.
-   * @param[in] color to use
    */
-  virtual void DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color ) = 0;
+  virtual void DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix ) = 0;
 
 protected:
 

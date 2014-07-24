@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H__
 #define __DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/render-tasks/render-task.h>
@@ -41,9 +42,8 @@ class Stage;
  * Pinch Gesture Event Processing:
  *
  * When we receive a pinch gesture event, we do the following:
- * - Determine the hit actor underneath the center of the pinch gesture event.
- * - Determine whether this actor is, or is a child of, the actor attached to any of the detectors.
- * - Emit the gesture when all the above conditions are met.
+ * - Find the hit actor that requires a pinch underneath the center-point of the pinch.
+ * - Emit the gesture if the event satisfies the detector conditions.
  *
  * The above is only checked when our gesture starts. We continue sending the pinch gesture to this
  * detector until the pinch ends or is cancelled.
@@ -109,15 +109,25 @@ private:
    */
   void OnGesturedActorStageDisconnection();
 
+  /**
+   * @copydoc GestureProcessor::CheckGestureDetector()
+   */
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+
+  /**
+   * @copydoc GestureProcessor::EmitGestureSignal()
+   */
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+
 private:
 
   Stage& mStage;
   Integration::GestureManager& mGestureManager;
   PinchGestureDetectorContainer mGestureDetectors;
-  PinchGestureDetectorContainer mCurrentPinchEmitters;
+  GestureDetectorContainer mCurrentPinchEmitters;
   Dali::RenderTask mCurrentRenderTask;
 
-  struct PinchEventFunctor;
+  const Integration::PinchGestureEvent* mCurrentPinchEvent; ///< Pointer to current PinchEvent, used when calling ProcessAndEmit()
 };
 
 } // namespace Internal

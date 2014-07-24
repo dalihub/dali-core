@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/public-api/render-tasks/render-task.h>
@@ -46,6 +47,7 @@ const bool         RenderTask::DEFAULT_EXCLUSIVE     = false;
 const bool         RenderTask::DEFAULT_INPUT_ENABLED = true;
 const Vector4      RenderTask::DEFAULT_CLEAR_COLOR   = Vector4( 0.0f, 0.0f, 0.0f, 1.0f ); // cannot use Color::Black because it may or may not be initialized yet
 const bool         RenderTask::DEFAULT_CLEAR_ENABLED = false;
+const bool         RenderTask::DEFAULT_CULL_MODE     = true;
 const unsigned int RenderTask::DEFAULT_REFRESH_RATE  = REFRESH_ALWAYS;
 
 RenderTask::RenderTask()
@@ -194,6 +196,16 @@ bool RenderTask::GetClearEnabled() const
   return GetImplementation(*this).GetClearEnabled();
 }
 
+void RenderTask::SetCullMode( bool mode )
+{
+  GetImplementation(*this).SetCullMode( mode );
+}
+
+bool RenderTask::GetCullMode() const
+{
+  return GetImplementation(*this).GetCullMode();
+}
+
 void RenderTask::SetRefreshRate( unsigned int refreshRate )
 {
   GetImplementation(*this).SetRefreshRate( refreshRate );
@@ -225,4 +237,3 @@ RenderTask::RenderTask( Internal::RenderTask* internal )
 }
 
 } // namespace Dali
-

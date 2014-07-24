@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_ACTOR_H__
 #define __DALI_INTERNAL_ACTOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <string>
@@ -26,6 +27,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/internal/event/common/proxy-object.h>
 #include <dali/internal/event/common/stage-def.h>
@@ -48,6 +50,7 @@ namespace Internal
 {
 
 class Actor;
+class ActorGestureData;
 class RenderTask;
 class ShaderEffect;
 struct DynamicsData;
@@ -940,6 +943,23 @@ public:
    */
   bool IsHittable() const;
 
+  // Gestures
+
+  /**
+   * Retrieve the gesture data associated with this actor. The first call to this method will
+   * allocate space for the ActorGestureData so this should only be called if an actor really does
+   * require gestures.
+   * @return Reference to the ActorGestureData for this actor.
+   * @note Once the gesture-data is created for an actor it is likely that gestures are required
+   * throughout the actor's lifetime so it will only be deleted when the actor is destroyed.
+   */
+  ActorGestureData& GetGestureData();
+
+  /**
+   * Queries whether the actor requires the gesture type.
+   * @param[in] type The gesture type.
+   */
+  bool IsGestureRequred( Gesture::Type type ) const;
 
   // Signals
 
@@ -1303,6 +1323,8 @@ protected:
 #ifdef DYNAMICS_SUPPORT
   DynamicsData*           mDynamicsData; ///< optional physics data
 #endif
+
+  ActorGestureData*            mGestureData; /// Optional Gesture data. Only created when actor requires gestures
 
   ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
   ShaderEffectPtr         mShaderEffect; ///< Optional referenced shader effect

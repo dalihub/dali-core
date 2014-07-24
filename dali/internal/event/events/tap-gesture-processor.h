@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H__
 #define __DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/tap-gesture-detector-impl.h>
@@ -41,11 +42,8 @@ class Actor;
  * Tap Gesture Event Processing:
  *
  * When we receive a tap gesture event, we do the following:
- * - Determine the hit actor underneath the tap gesture event.
- * - Determine whether this actor is attached to any of the detectors or is a child of an actor
- *   attached to one of the detectors.
- * - Ensure the taps and the touches in the tap event match the requirements of the detector.
- * - Emit the gesture when all the above conditions are met.
+ * - Find the actor that requires a tap where the tap occurred.
+ * - Emit the gesture if the tap gesture event satisfies the detector conditions.
  */
 class TapGestureProcessor : public GestureProcessor
 {
@@ -114,6 +112,16 @@ private:
    */
   void OnGesturedActorStageDisconnection() { /* Nothing to do */ }
 
+  /**
+   * @copydoc GestureProcessor::CheckGestureDetector()
+   */
+  bool CheckGestureDetector( GestureDetector* detector, Actor* actor );
+
+  /**
+   * @copydoc GestureProcessor::EmitGestureSignal()
+   */
+  void EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates );
+
 private:
 
   Stage& mStage;
@@ -125,11 +133,11 @@ private:
   unsigned int mMinTouchesRequired;
   unsigned int mMaxTouchesRequired;
 
-  struct TapEventFunctor;
+  const Integration::TapGestureEvent* mCurrentTapEvent; ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
 };
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_PINCH_GESTURE_EVENT_PROCESSOR_H__
+#endif // __DALI_INTERNAL_TAP_GESTURE_EVENT_PROCESSOR_H__

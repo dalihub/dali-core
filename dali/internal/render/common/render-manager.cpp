@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/render/common/render-manager.h>
@@ -36,10 +37,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/render-tasks/render-task.h>
-
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/render/dynamics/scene-graph-dynamics-debug-renderer.h>
-#endif
 
 // Uncomment the next line to enable frame snapshot logging
 //#define FRAME_SNAPSHOT_LOGGING
@@ -101,7 +98,8 @@ struct RenderManager::Impl
     defaultSurfaceRect(),
     rendererContainer(),
     materials(),
-    renderersAdded( false )
+    renderersAdded( false ),
+    firstRenderCompleted( false )
   {
   }
 
@@ -153,10 +151,6 @@ struct RenderManager::Impl
   float                               frameTime;                     ///< The elapsed time since the previous frame
   float                               lastFrameTime;                 ///< Last frame delta.
 
-#ifdef DYNAMICS_SUPPORT
-  OwnerPointer<DynamicsDebugRenderer> dynamicsDebugRenderer;
-#endif
-
   unsigned int                        frameCount;          ///< The current frame count
   BufferIndex                         renderBufferIndex;   ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
@@ -168,6 +162,8 @@ struct RenderManager::Impl
   bool                                renderersAdded;
 
   RenderTrackerContainer              mRenderTrackers;     ///< List of render trackers
+
+  bool                                firstRenderCompleted; ///< False until the first render is done
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction, ResourcePostProcessList& resourcePostProcessQ )
@@ -247,17 +243,6 @@ void RenderManager::SetFrameDeltaTime( float deltaTime )
   mImpl->frameTime = deltaTime;
 }
 
-#ifdef DYNAMICS_SUPPORT
-void RenderManager::InitializeDynamicsDebugRenderer(SceneGraph::DynamicsDebugRenderer* debugRenderer)
-{
-  if( !mImpl->dynamicsDebugRenderer )
-  {
-    mImpl->dynamicsDebugRenderer = debugRenderer;
-    debugRenderer->Initialize( mImpl->context );
-  }
-}
-#endif
-
 void RenderManager::SetDefaultSurfaceRect(const Rect<int>& rect)
 {
   mImpl->defaultSurfaceRect = rect;
@@ -329,7 +314,6 @@ void RenderManager::RemoveRenderTracker( RenderTracker* renderTracker )
   mImpl->RemoveRenderTracker(renderTracker);
 }
 
-
 bool RenderManager::Render( Integration::RenderStatus& status )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
@@ -341,6 +325,9 @@ bool RenderManager::Render( Integration::RenderStatus& status )
 
   // Increment the frame count at the beginning of each frame
   ++(mImpl->frameCount);
+  mImpl->context.SetFrameCount(mImpl->frameCount);
+  mImpl->context.ClearRendererCount();
+  mImpl->context.ClearCulledCount();
 
   PERF_MONITOR_START(PerformanceMonitor::DRAW_NODES);
 
@@ -349,8 +336,8 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   // Process messages queued during previous update
   mImpl->renderQueue.ProcessMessages( mImpl->renderBufferIndex );
 
-  //No need to make any gl calls if we don't have any renderers to render during startup.
-  if(mImpl->renderersAdded)
+  // No need to make any gl calls if we've done 1st glClear & don't have any renderers to render during startup.
+  if( !mImpl->firstRenderCompleted || mImpl->renderersAdded )
   {
     // switch rendering to adaptor provided (default) buffer
     mImpl->context.BindFramebuffer( GL_FRAMEBUFFER, 0 );
@@ -377,6 +364,11 @@ bool RenderManager::Render( Integration::RenderStatus& status )
     mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
     mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
 
+    // reset the program matrices for all programs once per frame
+    // this ensures we will set view and projection matrix once per program per camera
+    // @todo move programs out of context onto a program controller and let that handle this
+    mImpl->context.ResetProgramMatrices();
+
     size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
     for ( size_t i = 0; i < count; ++i )
     {
@@ -391,17 +383,12 @@ bool RenderManager::Render( Integration::RenderStatus& status )
       }
     }
 
-#ifdef DYNAMICS_SUPPORT
-    if( mImpl->dynamicsDebugRenderer )
-    {
-      mImpl->dynamicsDebugRenderer->Render();
-    }
-#endif
-
     GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
     mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
 
     mImpl->UpdateTrackers();
+
+    mImpl->firstRenderCompleted = true;
   }
 
   PERF_MONITOR_END(PerformanceMonitor::DRAW_NODES);
@@ -420,6 +407,9 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   mImpl->renderBufferIndex = (0 != mImpl->renderBufferIndex) ? 0 : 1;
 
   DALI_PRINT_RENDER_END();
+
+  DALI_PRINT_RENDERER_COUNT(mImpl->frameCount, mImpl->context.GetRendererCount());
+  DALI_PRINT_CULL_COUNT(mImpl->frameCount, mImpl->context.GetCulledCount());
 
   return updateRequired;
 }

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/public-api/common/dali-vector.h>
@@ -60,10 +61,12 @@ void VectorBase::Release()
 
 void VectorBase::SetCount( SizeType count )
 {
-  // Setcount is internal so should not be called on empty vector
-  DALI_ASSERT_DEBUG( mData && "Vector is empty" );
-  SizeType* metadata = reinterpret_cast< SizeType* >( mData );
-  *(metadata - 1) = count;
+  // someone can call Resize( 0 ) before ever populating the vector
+  if( mData )
+  {
+    SizeType* metadata = reinterpret_cast< SizeType* >( mData );
+    *(metadata - 1) = count;
+  }
 }
 
 void VectorBase::Reserve( SizeType capacity, SizeType elementSize )
@@ -117,12 +120,16 @@ void VectorBase::Swap( VectorBase& vector )
 
 void VectorBase::Erase( char* address, SizeType elementSize )
 {
-  char* startAddress = address + elementSize;
-  const char* endAddress = reinterpret_cast< char* >( mData ) + Count() * elementSize;
-  SizeType numberOfBytes = endAddress - startAddress;
-  // addresses overlap so use memmove
-  memmove( address, startAddress, numberOfBytes );
-  SetCount( Count() - 1 );
+  // erase can be called on an unallocated vector
+  if( mData )
+  {
+    char* startAddress = address + elementSize;
+    const char* endAddress = reinterpret_cast< char* >( mData ) + Count() * elementSize;
+    SizeType numberOfBytes = endAddress - startAddress;
+    // addresses overlap so use memmove
+    memmove( address, startAddress, numberOfBytes );
+    SetCount( Count() - 1 );
+  }
 }
 
 } // namespace Dali

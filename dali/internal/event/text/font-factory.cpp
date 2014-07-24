@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/text/font-factory.h>
@@ -101,10 +102,10 @@ void FontFactory::RemoveFontMetrics(const std::string& fontFamily,
 
 
 void FontFactory::GetFontInformation( FontId fontId,
-                                  std::string& family,
-                                  std::string& style,
-                                  float& maxGlyphWidth,
-                                  float& maxGlyphHeight) const
+                                      std::string& family,
+                                      std::string& style,
+                                      float& maxGlyphWidth,
+                                      float& maxGlyphHeight) const
 {
   // typically we only have around 4 fonts in the cache,
   // and GetFontInformation is only called a couple of times on startup

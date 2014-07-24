@@ -1,22 +1,23 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
 using namespace Dali;
@@ -955,3 +956,191 @@ int UtcDaliImageActorImageProperty(void)
   END_TEST;
 }
 
+int UtcDaliImageActorNinePatch01(void)
+{
+  TestApplication application;
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = glAbstraction.GetTextureTrace();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+
+  tet_infoline("Test the successful loading of a nine-patch image\n");
+
+  platform.SetClosestImageSize(Vector2(4, 4));
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::PixelBuffer* pixels = bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  4,4,4,4 );
+  memset( pixels, 0, 64 );
+
+  Integration::ResourcePointer resourcePtr(bitmap); // reference it
+  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+
+  Image ninePatchImage = Image::New( "blah.#.png" );
+  DALI_TEST_CHECK( ninePatchImage );
+
+  ImageActor imageActor = ImageActor::New( ninePatchImage );
+  DALI_TEST_CHECK( imageActor );
+  Stage::GetCurrent().Add( imageActor );
+
+  drawTrace.Reset();
+  textureTrace.Reset();
+  drawTrace.Enable(true);
+  textureTrace.Enable(true);
+  glAbstraction.ClearBoundTextures();
+  std::vector<GLuint> ids;
+  ids.push_back( 23 );
+  glAbstraction.SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  typedef std::vector<GLuint> TexVec;
+  const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
+  DALI_TEST_CHECK( textures.size() > 0 );
+  if( textures.size() > 0 )
+  {
+    DALI_TEST_EQUALS( textures[0], 23u, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+
+int UtcDaliImageActorNinePatch02(void)
+{
+  TestApplication application;
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = glAbstraction.GetTextureTrace();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+
+  tet_infoline("Test the failed loading of a nine-patch image\n");
+
+  platform.SetClosestImageSize(Vector2(0, 0));
+  Integration::ResourcePointer resourcePtr;
+  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+
+  Image ninePatchImage = Image::New( "blah.#.png" );
+  DALI_TEST_CHECK( ninePatchImage );
+
+  ImageActor imageActor = ImageActor::New( ninePatchImage );
+  DALI_TEST_CHECK( imageActor );
+  Stage::GetCurrent().Add( imageActor );
+
+  drawTrace.Reset();
+  textureTrace.Reset();
+  drawTrace.Enable(true);
+  textureTrace.Enable(true);
+  glAbstraction.ClearBoundTextures();
+  std::vector<GLuint> ids;
+  ids.push_back( 23 );
+  glAbstraction.SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check that nothing was drawn.
+  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawArrays" ) );
+  typedef std::vector<GLuint> TexVec;
+  const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
+  DALI_TEST_CHECK( textures.size() == 0u );
+
+  END_TEST;
+}
+
+
+int UtcDaliImageActorNinePatch03(void)
+{
+  TestApplication application;
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = glAbstraction.GetTextureTrace();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+
+  tet_infoline("Test the successful loading of a nine-patch image added using ImageActor::SetImage()\n");
+
+  platform.SetClosestImageSize(Vector2(4, 4));
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::PixelBuffer* pixels = bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  4,4,4,4 );
+  memset( pixels, 0, 64 );
+
+  Integration::ResourcePointer resourcePtr(bitmap); // reference it
+  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+
+  Image ninePatchImage = Image::New( "blah.#.png" );
+  DALI_TEST_CHECK( ninePatchImage );
+
+  ImageActor imageActor = ImageActor::New();
+  DALI_TEST_CHECK( imageActor );
+  Stage::GetCurrent().Add( imageActor );
+
+  imageActor.SetImage( ninePatchImage );
+
+  drawTrace.Reset();
+  textureTrace.Reset();
+  drawTrace.Enable(true);
+  textureTrace.Enable(true);
+  glAbstraction.ClearBoundTextures();
+  std::vector<GLuint> ids;
+  ids.push_back( 23 );
+  glAbstraction.SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( drawTrace.FindMethod( "DrawArrays" ) );
+  typedef std::vector<GLuint> TexVec;
+  const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
+  DALI_TEST_CHECK( textures.size() > 0 );
+  if( textures.size() > 0 )
+  {
+    DALI_TEST_EQUALS( textures[0], 23u, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+
+int UtcDaliImageActorNinePatch04(void)
+{
+  TestApplication application;
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& textureTrace = glAbstraction.GetTextureTrace();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+
+  tet_infoline("Test the failed loading of a nine-patch image using ImageActor::SetImage()\n");
+
+  platform.SetClosestImageSize(Vector2(0, 0));
+  Integration::ResourcePointer resourcePtr;
+  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+
+  Image ninePatchImage = Image::New( "blah.#.png" );
+  DALI_TEST_CHECK( ninePatchImage );
+
+  ImageActor imageActor = ImageActor::New();
+  DALI_TEST_CHECK( imageActor );
+  Stage::GetCurrent().Add( imageActor );
+
+  imageActor.SetImage( ninePatchImage );
+
+  drawTrace.Reset();
+  textureTrace.Reset();
+  drawTrace.Enable(true);
+  textureTrace.Enable(true);
+  glAbstraction.ClearBoundTextures();
+  std::vector<GLuint> ids;
+  ids.push_back( 23 );
+  glAbstraction.SetNextTextureIds( ids );
+
+  application.SendNotification();
+  application.Render();
+
+  // Check that nothing was drawn.
+  DALI_TEST_CHECK( ! drawTrace.FindMethod( "DrawArrays" ) );
+  typedef std::vector<GLuint> TexVec;
+  const TexVec& textures = glAbstraction.GetBoundTextures(GL_TEXTURE0);
+  DALI_TEST_CHECK( textures.size() == 0u );
+
+  END_TEST;
+}

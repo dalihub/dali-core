@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_PROGRAM_H__
 #define __DALI_INTERNAL_PROGRAM_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <string>
@@ -129,16 +130,16 @@ public:
 
   /**
    * Creates a new program, or returns a copy of an existing program in the program cache
-   * maintained by Context
    * @param [in] resourceId ResourceManager resourceId for the shader source and binary.
    *                        Used as a lookup key in the program cache
    * @param[in] shaderData  A pointer to a data structure containing the program source
    *                        and optionally precompiled binary. If the binary is empty the program bytecode
    *                        is copied into it after compilation and linking)
    * @param [in] context    GL context
+   * @param [in] fixedVertices True if the vertex shader does not change verts
    * @return pointer to the program
    */
-  static Program* New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context );
+  static Program* New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context, bool fixedVertices );
 
   /**
    * Takes this program into use
@@ -250,14 +251,56 @@ public:
    */
   void GlContextDestroyed();
 
+  /**
+   * @return true if this program does not change vertex position
+   */
+  bool AreVerticesFixed();
+
+  /**
+   * Set the projection matrix that has currently been sent
+   * @param matrix to set
+   */
+  void SetProjectionMatrix( const Matrix* matrix )
+  {
+    mProjectionMatrix = matrix;
+  }
+
+  /**
+   * Get the projection matrix that has currently been sent
+   * @return the matrix that is set
+   */
+  const Matrix* GetProjectionMatrix()
+  {
+    return mProjectionMatrix;
+  }
+
+  /**
+   * Set the projection matrix that has currently been sent
+   * @param matrix to set
+   */
+  void SetViewMatrix( const Matrix* matrix )
+  {
+    mViewMatrix = matrix;
+  }
+
+  /**
+   * Get the projection matrix that has currently been sent
+   * @return the matrix that is set
+   */
+  const Matrix* GetViewMatrix()
+  {
+    return mViewMatrix;
+  }
+
 private: // Implementation
 
   /**
    * Constructor, private so no direct instantiation
    * @param[in] shaderData A pointer to a data structure containing the program source and binary
    * @param[in] context    The GL context state cache.
+   * @param[in] areVerticesFixed True if the vertex shader does not move vertices
    */
-  Program( Integration::ShaderData* shaderData, Context& context );
+  Program( Integration::ShaderData* shaderData, Context& context, bool areVerticesFixed );
 
 public:
 
@@ -311,6 +354,8 @@ private:  // Data
 
   Context& mContext;                          ///< The GL context state cache
   Integration::GlAbstraction& mGlAbstraction; ///< The OpenGL Abstraction layer
+  const Matrix* mProjectionMatrix;            ///< currently set projection matrix
+  const Matrix* mViewMatrix;                  ///< currently set view matrix
   bool mLinked;                               ///< whether the program is linked
   GLuint mVertexShaderId;                     ///< GL identifier for vertex shader
   GLuint mFragmentShaderId;                   ///< GL identifier for fragment shader
@@ -325,7 +370,7 @@ private:  // Data
   GLint mUniformCacheInt[ MAX_UNIFORM_CACHE_SIZE ];         ///< Value cache for uniforms of single int
   GLfloat mUniformCacheFloat[ MAX_UNIFORM_CACHE_SIZE ];     ///< Value cache for uniforms of single float
   GLfloat mUniformCacheFloat4[ MAX_UNIFORM_CACHE_SIZE ][4]; ///< Value cache for uniforms of four float
-
+  bool mAreVerticesFixed;  ///< True if the program does not change vertex position
 };
 
 } // namespace Internal

@@ -1,21 +1,22 @@
 #ifndef __DALI_INTEGRATION_PLATFORM_ABSTRACTION_H__
 #define __DALI_INTEGRATION_PLATFORM_ABSTRACTION_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <stdint.h>
@@ -170,7 +171,7 @@ public:
    * from within the Core::Render() method.
    * @return The default font family.
    */
-  virtual std::string GetDefaultFontFamily() const = 0;
+  virtual const std::string& GetDefaultFontFamily() const = 0;
 
   /**
    * Called by Dali to retrieve the default font size for the platform in points.
@@ -178,18 +179,26 @@ public:
    * from within the Core::Render() method.
    * @return The default font size.
    */
-  virtual const float GetDefaultFontSize() const = 0;
+  virtual float GetDefaultFontSize() const = 0;
 
   /**
    * Gets a font line height to match a given caps-height
+   *
+   * @note fontFamily and fontStyle must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * @param[in] fontFamily The name of the font's family
    * @param[in] fontStyle  The style of the font
    * @param[in] capsHeight The caps-height in pixels
    */
-  virtual const PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight) const = 0;
+  virtual PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, CapsHeight capsHeight) const = 0;
 
   /**
    * Called by Font objects to synchronously query glyph data.
+   *
+   * @note fontFamily and font style, included in the resource request,  must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * @note Font's style goes inside the textRequest parameter
    * @param[in] textRequest  Resource request. Includes font's style.
    * @param[in] fontFamily   The name of the font's family
@@ -202,6 +211,10 @@ public:
 
   /**
    * Called by GlyphResourceManager to synchronously load glyph data.
+   *
+   * @note fontFamily and font style, included in the resource request,  must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * @param[in] textRequest     resource request
    * @param[in] fontFamily      name of the font's family
    * @return A GlyphSet pointer containing the requested glyph bitmaps.
@@ -211,6 +224,10 @@ public:
 
   /**
    * Called by Font objects to synchronously query global font metrics.
+   *
+   * @note fontFamily and fontStyle, must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * @param[in] fontFamily     The name of the font's family
    * @param[in] fontStyle      The style of the font
    * @param[out] globalMetrics font requested global metrics.
@@ -232,10 +249,14 @@ public:
    * Otherwise returns closest match.
    * @param[in] charsRequested displayed text
    */
-  virtual std::string GetFontFamilyForChars(const TextArray& charsRequested) const = 0;
+  virtual const std::string& GetFontFamilyForChars(const TextArray& charsRequested) const = 0;
 
   /**
    * Checks whether all characters of text could be displayed with specified font family.
+   *
+   * @note fontFamily and fontStyle must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * @param[in] fontFamily     The name of the font's family
    * @param[in] fontStyle      The style of the font
    * @param[in] text     displayed text
@@ -243,14 +264,15 @@ public:
   virtual bool AllGlyphsSupported(const std::string& fontFamily, const std::string& fontStyle, const TextArray& text) const = 0;
 
   /**
-   * Checks whether fontName is a valid font family name.
-   * closestMatch is always set to the best matching font or the system default font if no near match is detected.
+   * Checks whether fontName is a valid font family name and fontStyle is a valid font style.
+   * closestFontFamilyMatch and closestFontStyleMatch are always set to the best matching font
+   * or the system default font if no near match is detected.
    * @param[in] fontFamily     The name of the font's family
    * @param[in] fontStyle      The style of the font
    * @param[out] isDefaultSystemFont Whether this font has been created with a default system font.
    * @param[out] closestFontFamilyMatch Name of the font's family found based on the user input family's name
    * @param[out] closestFontStyleMatch  Name of the font's style found based on the user input font's style
-   * @return     true if fontName is valid, false otherwise
+   * @return Whether a valid match has been found.
    */
   virtual bool ValidateFontFamilyName(const std::string& fontFamily, const std::string& fontStyle, bool& isDefaultSystemFont, std::string& closestFontFamilyMatch, std::string& closestFontStyleMatch) const = 0;
 
@@ -266,10 +288,10 @@ public:
 
   /**
    * Gets a list of fonts installed on the system.
-   * @param fontListMode which fonts to include in the list
-   * @return a list of font family names
+   * @param[in] mode which fonts to include in the list.
+   * @param[out] fontList The list of font family names.
    */
-  virtual std::vector<std::string> GetFontList( FontListMode mode ) const = 0;
+  virtual void GetFontList( FontListMode mode, std::vector<std::string>& fontList ) const = 0;
 
   /**
    * Load a file into a buffer
@@ -302,6 +324,10 @@ public:
 
   /**
    * Read from the metrics cache into the global metrics parameter
+   *
+   * @note fontFamily and fontStyle must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * @param[in] fontFamily The name of the font family
    * @param[in] fontStyle The name of the font style
    * @param[out] globalMetrics The data store to write into
@@ -312,6 +338,10 @@ public:
                                            Integration::GlobalMetrics& globalMetrics ) = 0;
 
   /**
+   *
+   * @note fontFamily and fontStyle must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * Write the global metrics parameter to the metrics cache
    * @param[in] fontFamily The name of the font family
    * @param[in] fontStyle The name of the font style
@@ -323,6 +353,10 @@ public:
 
   /**
    * Read the metrics from the cache into the supplied vector
+   *
+   * @note fontFamily and fontStyle must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * @param[in] fontFamily The name of the font family
    * @param[in] fontStyle The name of the font style
    * @param[out] glyphMetricsContainer The vector of metrics to write
@@ -334,6 +368,10 @@ public:
 
   /**
    * Write the metrics to the cache
+   *
+   * @note fontFamily and fontStyle must have been validated previously.
+   * @see ValidateFontFamilyName().
+   *
    * @param[in] fontFamily The name of the font family
    * @param[in] fontStyle The name of the font style
    * @param[in] glyphSet The set of metrics to write

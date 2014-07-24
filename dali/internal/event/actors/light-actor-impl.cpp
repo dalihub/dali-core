@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/actors/light-actor-impl.h>
@@ -49,31 +50,19 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::LightActor), typeid(Dali::Actor), Create );
 
-const std::string DEFAULT_LIGHT_ACTOR_PROPERTY_NAMES[] =
+const Internal::PropertyDetails DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[] =
 {
-  "light-type",
-  "enable",
-  "fall-off",
-  "spot-angle",
-  "ambient-color",
-  "diffuse-color",
-  "specular-color",
-  "direction"
+  // Name             Type              writable animatable constraint-input
+  { "light-type",     Property::STRING,   true,    false,   true },  // LIGHT_TYPE
+  { "enable",         Property::BOOLEAN,  true,    false,   true },  // ENABLE
+  { "fall-off",       Property::VECTOR2,  true,    false,   true },  // FALL_OFF
+  { "spot-angle",     Property::VECTOR2,  true,    false,   true },  // SPOT_ANGLE
+  { "ambient-color",  Property::VECTOR3,  true,    false,   true },  // AMBIENT_COLOR
+  { "diffuse-color",  Property::VECTOR3,  true,    false,   true },  // DIFFUSE_COLOR
+  { "specular-color", Property::VECTOR3,  true,    false,   true },  // SPECULAR_COLOR
+  { "direction",      Property::VECTOR3,  true,    false,   true },  // DIRECTION
 };
-const int DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_LIGHT_ACTOR_PROPERTY_NAMES ) / sizeof( std::string );
-
-const Property::Type DEFAULT_LIGHT_ACTOR_PROPERTY_TYPES[DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT] =
-{
-  Property::STRING,  // "light-type",
-  Property::VECTOR2, // "enable",
-  Property::VECTOR2, // "fall-off",
-  Property::VECTOR2, // "spot-angle",
-  Property::VECTOR3, // "ambient-color",
-  Property::VECTOR3, // "diffuse-color",
-  Property::VECTOR3, // "specular-color",
-  Property::VECTOR3, // "direction",
-};
-
+const int DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails );
 
 LightType LightTypeEnum(const std::string &stringValue)
 {
@@ -163,7 +152,7 @@ void LightActor::OnInitialize()
     const int start = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
     for ( int i = 0; i < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT; ++i )
     {
-      (*mDefaultLightActorPropertyLookup)[DEFAULT_LIGHT_ACTOR_PROPERTY_NAMES[i]] = i + start;
+      (*mDefaultLightActorPropertyLookup)[DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].name] = i + start;
     }
     LightActor::mFirstInstance = false ;
   }
@@ -266,7 +255,7 @@ Property::Type LightActor::GetDefaultPropertyType( Property::Index index ) const
 
     if ( ( index >= 0 ) && ( index < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT ) )
     {
-      return DEFAULT_LIGHT_ACTOR_PROPERTY_TYPES[index];
+      return DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[index].type;
     }
     else
     {
@@ -288,7 +277,7 @@ const std::string& LightActor::GetDefaultPropertyName( Property::Index index ) c
 
     if ( ( index >= 0 ) && ( index < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT ) )
     {
-      return DEFAULT_LIGHT_ACTOR_PROPERTY_NAMES[index];
+      return DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[index].name;
     }
     else
     {

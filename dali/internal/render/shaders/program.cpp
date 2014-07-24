@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/render/shaders/program.h>
@@ -117,7 +118,7 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
 
 // IMPLEMENTATION
 
-Program* Program::New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context )
+Program* Program::New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context, bool fixedVertices )
 {
   size_t shaderHash = shaderData->GetHashValue();
   Program* program = context.GetCachedProgram( shaderHash );
@@ -125,7 +126,7 @@ Program* Program::New( const Integration::ResourceId& resourceId, Integration::S
   if( NULL == program )
   {
     // program not found so create it
-    program = new Program( shaderData, context );
+    program = new Program( shaderData, context, fixedVertices );
 
     program->Load();
 
@@ -227,7 +228,7 @@ void Program::SetUniform1i( GLint location, GLint value0 )
   // check if uniform location fits the cache
   if( location >= MAX_UNIFORM_CACHE_SIZE )
   {
-    // not cached, make the gl call through context
+    // not cached, make the gl call
     LOG_GL( "Uniform1i(%d,%d)\n", location, value0 );
     CHECK_GL( mContext, mGlAbstraction.Uniform1i( location, value0 ) );
   }
@@ -236,7 +237,7 @@ void Program::SetUniform1i( GLint location, GLint value0 )
     // check if the value is different from what's already been set
     if( value0 != mUniformCacheInt[ location ] )
     {
-      // make the gl call through context
+      // make the gl call
       LOG_GL( "Uniform1i(%d,%d)\n", location, value0 );
       CHECK_GL( mContext, mGlAbstraction.Uniform1i( location, value0 ) );
       // update cache
@@ -277,7 +278,7 @@ void Program::SetUniform1f( GLint location, GLfloat value0 )
   // check if uniform location fits the cache
   if( location >= MAX_UNIFORM_CACHE_SIZE )
   {
-    // not cached, make the gl call through context
+    // not cached, make the gl call
     LOG_GL( "Uniform1f(%d,%f)\n", location, value0 );
     CHECK_GL( mContext, mGlAbstraction.Uniform1f( location, value0 ) );
   }
@@ -286,7 +287,7 @@ void Program::SetUniform1f( GLint location, GLfloat value0 )
     // check if the same value has already been set, reset if it is different
     if( ( fabsf(value0 - mUniformCacheFloat[ location ]) >= Math::MACHINE_EPSILON_1 ) )
     {
-      // make the gl call through context
+      // make the gl call
       LOG_GL( "Uniform1f(%d,%f)\n", location, value0 );
       CHECK_GL( mContext, mGlAbstraction.Uniform1f( location, value0 ) );
 
@@ -345,7 +346,7 @@ void Program::SetUniform4f( GLint location, GLfloat value0, GLfloat value1, GLfl
   // check if uniform location fits the cache
   if( location >= MAX_UNIFORM_CACHE_SIZE )
   {
-    // not cached, make the gl call through context
+    // not cached, make the gl call
     LOG_GL( "Uniform4f(%d,%f,%f,%f,%f)\n", location, value0, value1, value2, value3 );
     CHECK_GL( mContext, mGlAbstraction.Uniform4f( location, value0, value1, value2, value3 ) );
   }
@@ -358,7 +359,7 @@ void Program::SetUniform4f( GLint location, GLfloat value0, GLfloat value1, GLfl
         ( fabsf(value1 - mUniformCacheFloat4[ location ][ 1 ]) >= Math::MACHINE_EPSILON_1 )||
         ( fabsf(value2 - mUniformCacheFloat4[ location ][ 2 ]) >= Math::MACHINE_EPSILON_1 ) )
     {
-      // make the gl call through context
+      // make the gl call
       LOG_GL( "Uniform4f(%d,%f,%f,%f,%f)\n", location, value0, value1, value2, value3 );
       CHECK_GL( mContext, mGlAbstraction.Uniform4f( location, value0, value1, value2, value3 ) );
       // update cache
@@ -382,10 +383,9 @@ void Program::SetUniformMatrix4fv( GLint location, GLsizei count, const GLfloat*
     return;
   }
 
-
   // Not caching these calls. Based on current analysis this is called very often
   // but with different values (we're using this for MVP matrices)
-  // NOTE! we never want GPU to transpose
+  // NOTE! we never want driver or GPU to transpose
   LOG_GL( "UniformMatrix4fv(%d,%d,GL_FALSE,%x)\n", location, count, value );
   CHECK_GL( mContext, mGlAbstraction.UniformMatrix4fv( location, count, GL_FALSE, value ) );
 }
@@ -405,7 +405,7 @@ void Program::SetUniformMatrix3fv( GLint location, GLsizei count, const GLfloat*
 
   // Not caching these calls. Based on current analysis this is called very often
   // but with different values (we're using this for MVP matrices)
-  // NOTE! we never want GPU to transpose
+  // NOTE! we never want driver or GPU to transpose
   LOG_GL( "UniformMatrix3fv(%d,%d,GL_FALSE,%x)\n", location, count, value );
   CHECK_GL( mContext, mGlAbstraction.UniformMatrix3fv( location, count, GL_FALSE, value ) );
 }
@@ -430,14 +430,22 @@ void Program::GlContextDestroyed()
   ResetAttribsUniforms();
 }
 
-Program::Program(Integration::ShaderData* shaderData, Context& context )
+bool Program::AreVerticesFixed()
+{
+  return mAreVerticesFixed;
+}
+
+Program::Program(Integration::ShaderData* shaderData, Context& context, bool areVerticesFixed )
 : mContext( context ),
   mGlAbstraction( context.GetAbstraction() ),
+  mProjectionMatrix( NULL ),
+  mViewMatrix( NULL ),
   mLinked( false ),
   mVertexShaderId( 0 ),
   mFragmentShaderId( 0 ),
   mProgramId( 0 ),
-  mProgramData(shaderData)
+  mProgramData(shaderData),
+  mAreVerticesFixed(areVerticesFixed)
 {
   // reserve space for standard uniforms
   mUniformLocations.reserve( UNIFORM_TYPE_LAST );
@@ -452,7 +460,7 @@ Program::Program(Integration::ShaderData* shaderData, Context& context )
 
 Program::~Program()
 {
-  Unload(); // Resets gCurrentProgram
+  Unload();
 }
 
 void Program::Load()

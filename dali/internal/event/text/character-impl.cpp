@@ -1,22 +1,22 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // HEADER CLASS
 #include <dali/internal/event/text/character-impl.h>
-// INTERNAL INCLUDES
 
 namespace
 {
@@ -246,26 +246,9 @@ namespace Dali
 namespace Internal
 {
 
-Character::Character()
-: mCharacter( 0 )
-{
-}
-
 Character::Character( uint32_t character )
 : mCharacter( character )
 {
-}
-
-Character::Character( const Character& character )
-: mCharacter( character.mCharacter )
-{
-}
-
-Character& Character::operator=( const Character& character )
-{
-  mCharacter = character.mCharacter;
-
-  return *this;
 }
 
 Character::~Character()
@@ -300,13 +283,12 @@ bool Character::IsLeftToRight() const
 
 bool Character::IsWhiteSpace() const
 {
-  // TODO: It should cover unicode characters: http://en.wikipedia.org/wiki/Whitespace_character
-  return mCharacter <= CHAR_WHITE_SPACE;
+  return Character::IsWhiteSpace( mCharacter );
 }
 
 bool Character::IsNewLine() const
 {
-  return mCharacter == CHAR_NEW_LINE;
+  return Character::IsNewLine( mCharacter );
 }
 
 uint32_t Character::GetCharacter() const
@@ -317,6 +299,17 @@ uint32_t Character::GetCharacter() const
 void Character::SetCharacter( uint32_t character )
 {
   mCharacter = character;
+}
+
+bool Character::IsWhiteSpace( uint32_t character )
+{
+  // TODO: It should cover unicode characters: http://en.wikipedia.org/wiki/Whitespace_character
+  return character <= CHAR_WHITE_SPACE;
+}
+
+bool Character::IsNewLine( uint32_t character )
+{
+  return character == CHAR_NEW_LINE;
 }
 
 } // namespace Internal

@@ -1,23 +1,24 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/debug.h>
 
@@ -1229,6 +1230,8 @@ int UtcDaliRenderTaskContinuous01(void)
 
   // START PROCESS/RENDER                     Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
+  application.GetPlatform().ClearReadyResources();
+
   DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
 
   // ADD SOURCE ACTOR TO STAGE - expect continuous renders to start, no finished signal
@@ -1278,6 +1281,7 @@ int UtcDaliRenderTaskContinuous02(void)
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
 
   // MAKE SOURCE ACTOR VISIBLE - expect continuous renders to start, no finished signal
@@ -1323,6 +1327,7 @@ int UtcDaliRenderTaskContinuous03(void)
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
 
   // ADD CAMERA ACTOR TO STAGE - expect continuous renders to start, no finished signal
@@ -1374,6 +1379,7 @@ int UtcDaliRenderTaskContinuous04(void)
   // FINISH RESOURCE LOADING - expect continuous renders to start, no finished signal
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  application.GetPlatform().ClearReadyResources();
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
@@ -1418,6 +1424,7 @@ int UtcDaliRenderTaskContinuous05(void)
   // FINISH RESOURCE LOADING - expect continuous renders to start, no finished signal
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
@@ -1461,6 +1468,7 @@ int UtcDaliRenderTaskContinuous06(void)
   // FINISH RESOURCE LOADING - expect continuous renders to start, no finished signal
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
 
   // CHANGE FREQUENCY
@@ -1532,6 +1540,7 @@ int UtcDaliRenderTaskOnce01(void)
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   sync.SetObjectSynced( lastSyncObj, true );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
@@ -1584,6 +1593,7 @@ int UtcDaliRenderTaskOnce02(void)
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -1657,6 +1667,7 @@ int UtcDaliRenderTaskOnce03(void)
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
+  application.GetPlatform().ClearReadyResources();
 
   sync.SetObjectSynced( lastSyncObj, true );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
@@ -1701,6 +1712,7 @@ int UtcDaliRenderTaskOnce03(void)
   application.Render();
 
   Stage::GetCurrent().Add(secondRootActor);
+  application.GetPlatform().ClearReadyResources();
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
   bool finished = false;
@@ -1726,6 +1738,7 @@ int UtcDaliRenderTaskOnce03(void)
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
@@ -1771,6 +1784,7 @@ int UtcDaliRenderTaskOnce05(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.Render();
+  application.GetPlatform().ClearReadyResources();
 
   Stage::GetCurrent().Add(secondRootActor);
 
@@ -1845,6 +1859,7 @@ int UtcDaliRenderTaskOnce06(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.Render();
+  application.GetPlatform().ClearReadyResources();
 
   Stage::GetCurrent().Add(secondRootActor);
 
@@ -1926,6 +1941,7 @@ int UtcDaliRenderTaskOnce07(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.Render();
+  application.GetPlatform().ClearReadyResources();
 
   Stage::GetCurrent().Add(secondRootActor);
 
@@ -2072,6 +2088,7 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   // FINISH RESOURCE LOADING - expect immediate rendering yet
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
@@ -2116,6 +2133,7 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -2174,6 +2192,7 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
@@ -2207,6 +2226,7 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.Render();
+  application.GetPlatform().ClearReadyResources();
 
   Stage::GetCurrent().Add(secondRootActor);
 
@@ -2234,6 +2254,7 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, true ) );
+  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
@@ -2267,6 +2288,7 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.Render();
+  application.GetPlatform().ClearReadyResources();
 
   Stage::GetCurrent().Add(secondRootActor);
 
@@ -2326,6 +2348,7 @@ int UtcDaliRenderTaskOnceNoSync06(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.Render();
+  application.GetPlatform().ClearReadyResources();
 
   Stage::GetCurrent().Add(secondRootActor);
 
@@ -2388,6 +2411,7 @@ int UtcDaliRenderTaskOnceNoSync07(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.Render();
+  application.GetPlatform().ClearReadyResources();
 
   Stage::GetCurrent().Add(secondRootActor);
 

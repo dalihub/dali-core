@@ -1,23 +1,23 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 
 #include <stdlib.h>
-#include <dali/dali.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
@@ -300,5 +300,53 @@ int UtcDaliLightActorPropertyIndices(void)
   light.GetPropertyIndices( indices );
   DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
   DALI_TEST_EQUALS( indices.size(), light.GetPropertyCount(), TEST_LOCATION );
+  END_TEST;
+}
+
+namespace
+{
+
+struct PropertyDetails
+{
+  Property::Index index;
+  std::string name;
+  Property::Type type;
+};
+
+const PropertyDetails DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[] =
+{
+  // Index Name             Type
+  { LightActor::LIGHT_TYPE,     "light-type",     Property::STRING  },
+  { LightActor::ENABLE,         "enable",         Property::BOOLEAN },
+  { LightActor::FALL_OFF,       "fall-off",       Property::VECTOR2 },
+  { LightActor::SPOT_ANGLE,     "spot-angle",     Property::VECTOR2 },
+  { LightActor::AMBIENT_COLOR,  "ambient-color",  Property::VECTOR3 },
+  { LightActor::DIFFUSE_COLOR,  "diffuse-color",  Property::VECTOR3 },
+  { LightActor::SPECULAR_COLOR, "specular-color", Property::VECTOR3 },
+  { LightActor::DIRECTION,      "direction",      Property::VECTOR3 },
+};
+const int DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS ) / sizeof( PropertyDetails );
+} // unnamed namespace
+
+int UtcDaliLightActorProperties(void)
+{
+  TestApplication application;
+  Actor basicActor = Actor::New();
+  LightActor light = LightActor::New();
+
+  Property::IndexContainer indices;
+  light.GetPropertyIndices( indices );
+  DALI_TEST_EQUALS( DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT, indices.size() - basicActor.GetPropertyCount(), TEST_LOCATION );
+
+  for ( int i = 0; i < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT; ++i )
+  {
+    tet_printf( "Checking: %s\n", DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].name.c_str() );
+    DALI_TEST_EQUALS( light.GetPropertyIndex( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].name ), DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].index, TEST_LOCATION );
+    DALI_TEST_EQUALS( light.GetPropertyName( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].index ), DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].name, TEST_LOCATION );
+    DALI_TEST_EQUALS( light.GetPropertyType( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].index ), DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].type, TEST_LOCATION );
+    DALI_TEST_EQUALS( light.IsPropertyWritable( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].index ), true, TEST_LOCATION );
+    DALI_TEST_EQUALS( light.IsPropertyAnimatable( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].index ), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( light.IsPropertyAConstraintInput( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].index ), true, TEST_LOCATION );
+  }
   END_TEST;
 }

@@ -1,23 +1,24 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 #include <stdlib.h>
 
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
@@ -38,28 +39,42 @@ static const char* TestTextHello = "Hello";
 static const char* TestTextHelloWorld = "Hello World";
 static const char* LongTestText = "This is a very long piece of text, and is sure not to fit into any box presented to it";
 
-const std::string FAMILY_NAME = "Arial";
-const std::string STYLE = "Bold";
-const unsigned int POINT_SIZE = 11.f;
-static const Vector4 FONT_TEXT_COLOR = Color::RED;
-static const Degree FONT_ITALICS_ANGLE(10.f);
-static const Radian FONT_ITALICS_RADIAN_ANGLE(0.4f);
-static const bool FONT_ITALICS = true;
-static const bool FONT_UNDERLINE = true;
-static const bool FONT_SHADOW = true;
-static const bool FONT_GLOW = true;
-static const bool FONT_OUTLINE = true;
-static const float FONT_UNDERLINE_THICKNESS = 5.0f;
-static const float FONT_UNDERLINE_POSITION = 60.0f;
-static const Vector4 FONT_SHADOW_COLOR = Color::BLUE;
-static const Vector2 FONT_SHADOW_OFFSET(2.f, 2.f );
-static const float FONT_SHADOW_SIZE = 55.f;
-static const Vector4 FONT_TEXT_GLOW_COLOR = Color::BLACK;
-static const float FONT_GLOW_INTENSITY = 10.0f;
-static const float FONT_SMOOTH_EDGE = 5.0f;
-static const Vector4 FONT_OUTLINE_COLOR = Color::MAGENTA;
-static const Vector2 FONT_OUTLINE_THICKNESS(15.f, 14.f );
+static const std::string DEFAULT_NAME_STYLE( "" );
+static const PointSize DEFAULT_FONT_POINT_SIZE( 0.f );
 
+static const std::string FONT_FAMILY( "Arial" );
+static const std::string FONT_STYLE( "Bold" );
+static const PointSize FONT_POINT_SIZE( 12.f );
+static const Vector4 TEXT_COLOR( Color::RED );
+
+static const TextStyle::Weight TEXT_WEIGHT( TextStyle::EXTRALIGHT );
+static const float SMOOTH_EDGE( 5.0f );
+
+static const bool ITALICS( true );
+static const Degree ITALICS_ANGLE( 10.f );
+static const Radian ITALICS_RADIAN_ANGLE(0.4f);
+
+static const bool UNDERLINE( true );
+static const float UNDERLINE_THICKNESS( 5.0f );
+static const float UNDERLINE_POSITION( 60.0f );
+
+static const bool SHADOW( true );
+static const Vector4 SHADOW_COLOR( Color::BLUE );
+static const Vector2 SHADOW_OFFSET( 2.f, 2.f );
+static const float SHADOW_SIZE( 55.f );
+
+static const bool GLOW( true );
+static const Vector4 GLOW_COLOR( Color::BLACK );
+static const float GLOW_INTENSITY( 10.0f );
+
+static const bool OUTLINE( true );
+static const Vector4 OUTLINE_COLOR( Color::MAGENTA );
+static const Vector2 OUTLINE_THICKNESS( 15.f, 14.f );
+
+static const bool GRADIENT( true );
+static const Vector4 GRADIENT_COLOR( Color::YELLOW );
+static const Vector2 GRADIENT_START_POINT( 1.f, 1.f );
+static const Vector2 GRADIENT_END_POINT( 2.f, 2.f );
 } // anon namespace
 
 int UtcDaliTextActorConstructorVoid(void)
@@ -296,14 +311,34 @@ int UtcDaliTextActorSetFont(void)
 
   TextActor actor = TextActor::New(TestTextHello);
 
-  PointSize pointSize( POINT_SIZE );
-  FontParameters params( FAMILY_NAME, STYLE, pointSize);
+  Font defaultFont = actor.GetFont();
+  DALI_TEST_EQUALS( defaultFont.GetName(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultFont.GetStyle(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_CHECK( defaultFont.IsDefaultSystemSize() );
+
+  TextStyle defaultStyle = actor.GetTextStyle();
+  DALI_TEST_EQUALS( defaultStyle.GetFontName(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetFontStyle(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetFontPointSize(), DEFAULT_FONT_POINT_SIZE, TEST_LOCATION );
+
+  FontParameters params( FONT_FAMILY, FONT_STYLE, FONT_POINT_SIZE );
 
   Font font = Font::New( params );
 
   actor.SetFont( font );
 
-  DALI_TEST_CHECK( actor.GetFont().GetName() == FAMILY_NAME );
+  Font font2 = actor.GetFont();
+
+  DALI_TEST_EQUALS( font2.GetName(), FONT_FAMILY, TEST_LOCATION );
+  DALI_TEST_EQUALS( font2.GetStyle(), FONT_STYLE, TEST_LOCATION );
+  DALI_TEST_CHECK( !font2.IsDefaultSystemSize() );
+  DALI_TEST_EQUALS( PointSize( font2.GetPointSize() ), FONT_POINT_SIZE, TEST_LOCATION );
+
+  TextStyle style = actor.GetTextStyle();
+  DALI_TEST_EQUALS( style.GetFontName(), FONT_FAMILY, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetFontStyle(), FONT_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetFontPointSize(), FONT_POINT_SIZE, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -325,50 +360,135 @@ int UtcDaliTextActorSetTextIndividualStyles(void)
   TestApplication application;
 
   TextActor actor = TextActor::New(TestTextHello);
+  TextStyle defaultStyle = actor.GetTextStyle();
 
-  actor.SetTextColor( FONT_TEXT_COLOR);
+  DALI_TEST_EQUALS( actor.GetTextColor(), TextStyle::DEFAULT_TEXT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetTextColor(), TextStyle::DEFAULT_TEXT_COLOR, TEST_LOCATION );
 
-  DALI_TEST_CHECK( actor.GetTextColor() == FONT_TEXT_COLOR );
+  DALI_TEST_EQUALS( actor.GetWeight(), TextStyle::DEFAULT_FONT_WEIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetWeight(), TextStyle::DEFAULT_FONT_WEIGHT, TEST_LOCATION );
 
-  actor.SetSmoothEdge( FONT_SMOOTH_EDGE  );
+  DALI_TEST_EQUALS( defaultStyle.GetSmoothEdge(), TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
-  actor.SetOutline( FONT_OUTLINE, FONT_OUTLINE_COLOR, FONT_OUTLINE_THICKNESS );
+  DALI_TEST_CHECK( !actor.GetItalics() );
+  DALI_TEST_EQUALS( actor.GetItalicsAngle(), TextStyle::DEFAULT_ITALICS_ANGLE, TEST_LOCATION );
+  DALI_TEST_CHECK( defaultStyle.IsItalicsDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsItalicsEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetItalicsAngle(), TextStyle::DEFAULT_ITALICS_ANGLE, TEST_LOCATION );
 
-  actor.SetShadow( FONT_SHADOW, FONT_SHADOW_COLOR, FONT_SHADOW_OFFSET, FONT_SHADOW_SIZE );
+  DALI_TEST_CHECK( !actor.GetUnderline() );
+  DALI_TEST_CHECK( defaultStyle.IsUnderlineDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsUnderlineEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetUnderlinePosition(), TextStyle::DEFAULT_UNDERLINE_POSITION, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetUnderlineThickness(), TextStyle::DEFAULT_UNDERLINE_THICKNESS, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
-  actor.SetItalics( FONT_ITALICS, FONT_ITALICS_ANGLE );
+  DALI_TEST_CHECK( defaultStyle.IsShadowDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsShadowEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetShadowColor(), TextStyle::DEFAULT_SHADOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetShadowOffset(), TextStyle::DEFAULT_SHADOW_OFFSET, TEST_LOCATION );
 
-  actor.SetGlow( FONT_GLOW, FONT_TEXT_GLOW_COLOR, FONT_GLOW_INTENSITY );
+  DALI_TEST_CHECK( defaultStyle.IsGlowDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsGlowEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetGlowColor(), TextStyle::DEFAULT_GLOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetGlowIntensity(), TextStyle::DEFAULT_GLOW_INTENSITY, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( defaultStyle.IsOutlineDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsOutlineEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetOutlineColor(), TextStyle::DEFAULT_OUTLINE_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetOutlineThickness(), TextStyle::DEFAULT_OUTLINE_THICKNESS, TEST_LOCATION );
+
+  DALI_TEST_CHECK( defaultStyle.IsGradientDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsGradientEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetGradientColor(), TextStyle::DEFAULT_GRADIENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetGradientStartPoint(), TextStyle::DEFAULT_GRADIENT_START_POINT, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetGradientEndPoint(), TextStyle::DEFAULT_GRADIENT_END_POINT, TEST_LOCATION );
+
+
+  actor.SetTextColor( TEXT_COLOR );
+
+  actor.SetWeight( TEXT_WEIGHT );
+  actor.SetSmoothEdge( SMOOTH_EDGE  );
+
+  actor.SetItalics( ITALICS, ITALICS_ANGLE );
+  actor.SetUnderline( UNDERLINE );
+
+  actor.SetShadow( SHADOW, SHADOW_COLOR, SHADOW_OFFSET, SHADOW_SIZE );
+  actor.SetGlow( GLOW, GLOW_COLOR, GLOW_INTENSITY );
+  actor.SetOutline( OUTLINE, OUTLINE_COLOR, OUTLINE_THICKNESS );
+  actor.SetGradientColor( GRADIENT_COLOR );
+  actor.SetGradientStartPoint( GRADIENT_START_POINT );
+  actor.SetGradientEndPoint( GRADIENT_END_POINT );
+
 
   TextStyle style = actor.GetTextStyle();
 
-  DALI_TEST_CHECK( FONT_TEXT_COLOR == style.GetTextColor() );
+  DALI_TEST_EQUALS( actor.GetTextColor(), TEXT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetTextColor(), TEXT_COLOR, TEST_LOCATION );
 
-  DALI_TEST_CHECK( FONT_SMOOTH_EDGE == style.GetSmoothEdge() );
+  DALI_TEST_EQUALS( actor.GetWeight(), TEXT_WEIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetWeight(), TEXT_WEIGHT, TEST_LOCATION );
 
-  DALI_TEST_CHECK( FONT_OUTLINE == style.GetOutline() );
-  DALI_TEST_CHECK( FONT_OUTLINE_COLOR == style.GetOutlineColor() );
-  DALI_TEST_CHECK( FONT_OUTLINE_THICKNESS == style.GetOutlineThickness() );
+  DALI_TEST_EQUALS( style.GetSmoothEdge(), SMOOTH_EDGE, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
+  DALI_TEST_CHECK( actor.GetItalics() );
+  DALI_TEST_EQUALS( actor.GetItalicsAngle(), ITALICS_ANGLE, TEST_LOCATION );
+  DALI_TEST_CHECK( !style.IsItalicsDefault() );
+  DALI_TEST_CHECK( style.IsItalicsEnabled() );
+  DALI_TEST_EQUALS( style.GetItalicsAngle(), ITALICS_ANGLE, TEST_LOCATION );
 
-  DALI_TEST_CHECK( FONT_SHADOW == style.GetShadow() );
-  DALI_TEST_CHECK( FONT_SHADOW_COLOR == style.GetShadowColor() );
-  DALI_TEST_CHECK( FONT_SHADOW_OFFSET == style.GetShadowOffset() );
-  DALI_TEST_CHECK( FONT_SHADOW_SIZE == style.GetShadowSize() );
+  DALI_TEST_CHECK( actor.GetUnderline() );
+  DALI_TEST_CHECK( !style.IsUnderlineDefault() );
+  DALI_TEST_CHECK( style.IsUnderlineEnabled() );
+  DALI_TEST_EQUALS( style.GetUnderlinePosition(), TextStyle::DEFAULT_UNDERLINE_POSITION, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetUnderlineThickness(), TextStyle::DEFAULT_UNDERLINE_THICKNESS, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
-  DALI_TEST_CHECK( FONT_ITALICS == style.GetItalics() );
-  DALI_TEST_CHECK( FONT_ITALICS_ANGLE == style.GetItalicsAngle() );
+  DALI_TEST_CHECK( !style.IsShadowDefault() );
+  DALI_TEST_CHECK( style.IsShadowEnabled() );
+  DALI_TEST_EQUALS( style.GetShadowColor(), SHADOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetShadowOffset(), SHADOW_OFFSET, TEST_LOCATION );
 
-  DALI_TEST_CHECK( FONT_GLOW == style.GetGlow() );
-  DALI_TEST_CHECK( FONT_OUTLINE == style.GetOutline() );
-  DALI_TEST_CHECK( FONT_TEXT_GLOW_COLOR == style.GetGlowColor() );
-  DALI_TEST_CHECK( FONT_GLOW_INTENSITY == style.GetGlowIntensity() );
+  DALI_TEST_CHECK( !style.IsGlowDefault() );
+  DALI_TEST_CHECK( style.IsGlowEnabled() );
+  DALI_TEST_EQUALS( style.GetGlowColor(), GLOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetGlowIntensity(), GLOW_INTENSITY, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
 
+  DALI_TEST_CHECK( !style.IsOutlineDefault() );
+  DALI_TEST_CHECK( style.IsOutlineEnabled() );
+  DALI_TEST_EQUALS( style.GetOutlineColor(), OUTLINE_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetOutlineThickness(), OUTLINE_THICKNESS, TEST_LOCATION );
 
-  actor.SetItalics( FONT_ITALICS, FONT_ITALICS_RADIAN_ANGLE );
-  style = actor.GetTextStyle();
-  DALI_TEST_CHECK( FONT_ITALICS_RADIAN_ANGLE == style.GetItalicsAngle() );
+  DALI_TEST_EQUALS( actor.GetGradientColor(), GRADIENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetGradientStartPoint(), GRADIENT_START_POINT, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetGradientEndPoint(), GRADIENT_END_POINT, TEST_LOCATION );
+  DALI_TEST_CHECK( !style.IsGradientDefault() );
+  DALI_TEST_CHECK( style.IsGradientEnabled() );
+  DALI_TEST_EQUALS( style.GetGradientColor(), GRADIENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetGradientStartPoint(), GRADIENT_START_POINT, TEST_LOCATION );
+  DALI_TEST_EQUALS( style.GetGradientEndPoint(), GRADIENT_END_POINT, TEST_LOCATION );
 
+  // Added to increase coverage.
+
+  // Set a different color.
+  actor.SetTextColor( TEXT_COLOR );
+  actor.SetTextColor( Color::GREEN );
+  DALI_TEST_EQUALS( actor.GetTextColor(), Color::GREEN, TEST_LOCATION );
+
+  // Set a different weight
+  actor.SetWeight( TEXT_WEIGHT );
+  actor.SetWeight( TextStyle::BOLD );
+  DALI_TEST_EQUALS( actor.GetWeight(), TextStyle::BOLD, TEST_LOCATION );
+
+  // Set a different smooth edge
+  actor.SetSmoothEdge( SMOOTH_EDGE );
+  actor.SetSmoothEdge( 1.f );
+  DALI_TEST_EQUALS( actor.GetTextStyle().GetSmoothEdge(), 1.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // Set different italic parameters
+  actor.SetItalics( true, ITALICS_ANGLE );
+  actor.SetItalics( false );
+  DALI_TEST_CHECK( !actor.GetItalics() );
+  actor.SetItalics( true, Degree( 15.f ) );
+  DALI_TEST_EQUALS( actor.GetItalicsAngle(), Degree( 15.f ), TEST_LOCATION );
 
   END_TEST;
 }
@@ -486,39 +606,208 @@ int UtcDaliTextActorSetStyle(void)
 
   TextActor actor = TextActor::New(TestTextHello);
 
-  TextStyle defaultStyle = actor.GetTextStyle();
-  DALI_TEST_CHECK( defaultStyle.GetFontName().empty() );
-  DALI_TEST_CHECK( TextStyle::REGULAR == defaultStyle.GetWeight() );
-  DALI_TEST_CHECK( Color::WHITE == defaultStyle.GetTextColor() );
-  DALI_TEST_CHECK( !defaultStyle.GetItalics() );
-  DALI_TEST_CHECK( !defaultStyle.GetUnderline() );
+  const TextStyle defaultStyle = actor.GetTextStyle();
+
+  DALI_TEST_EQUALS( defaultStyle.GetFontName(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetFontStyle(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetFontPointSize(), DEFAULT_FONT_POINT_SIZE, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetTextColor(), TextStyle::DEFAULT_TEXT_COLOR, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( defaultStyle.GetWeight(), TextStyle::DEFAULT_FONT_WEIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetSmoothEdge(), TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( defaultStyle.IsItalicsDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsItalicsEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetItalicsAngle(), TextStyle::DEFAULT_ITALICS_ANGLE, TEST_LOCATION );
+
+  DALI_TEST_CHECK( defaultStyle.IsUnderlineDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsUnderlineEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetUnderlinePosition(), TextStyle::DEFAULT_UNDERLINE_POSITION, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetUnderlineThickness(), TextStyle::DEFAULT_UNDERLINE_THICKNESS, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( defaultStyle.IsShadowDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsShadowEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetShadowColor(), TextStyle::DEFAULT_SHADOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetShadowOffset(), TextStyle::DEFAULT_SHADOW_OFFSET, TEST_LOCATION );
+
+  DALI_TEST_CHECK( defaultStyle.IsGlowDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsGlowEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetGlowColor(), TextStyle::DEFAULT_GLOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetGlowIntensity(), TextStyle::DEFAULT_GLOW_INTENSITY, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( defaultStyle.IsOutlineDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsOutlineEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetOutlineColor(), TextStyle::DEFAULT_OUTLINE_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetOutlineThickness(), TextStyle::DEFAULT_OUTLINE_THICKNESS, TEST_LOCATION );
+
+  DALI_TEST_CHECK( defaultStyle.IsGradientDefault() );
+  DALI_TEST_CHECK( !defaultStyle.IsGradientEnabled() );
+  DALI_TEST_EQUALS( defaultStyle.GetGradientColor(), TextStyle::DEFAULT_GRADIENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetGradientStartPoint(), TextStyle::DEFAULT_GRADIENT_START_POINT, TEST_LOCATION );
+  DALI_TEST_EQUALS( defaultStyle.GetGradientEndPoint(), TextStyle::DEFAULT_GRADIENT_END_POINT, TEST_LOCATION );
+
+
+  // Set a non default style.
 
   TextStyle style;
-  style.SetFontPointSize(PointSize( 16.f ));
-  style.SetWeight(TextStyle::EXTRABLACK);
-  style.SetTextColor(Color::BLUE);
-  style.SetItalics(true);
-  style.SetUnderline(true);
-  style.SetShadow(false);
-  style.SetGlow(false);
-  style.SetOutline(false);
+  style.SetFontName( FONT_FAMILY );
+  style.SetFontStyle( FONT_STYLE );
+  style.SetFontPointSize( FONT_POINT_SIZE );
+  style.SetTextColor( TEXT_COLOR );
+
+  style.SetWeight( TEXT_WEIGHT );
+  style.SetSmoothEdge( SMOOTH_EDGE );
+
+  style.SetItalics( ITALICS, ITALICS_ANGLE );
+  style.SetUnderline( UNDERLINE, UNDERLINE_THICKNESS, UNDERLINE_POSITION );
+
+  style.SetShadow( SHADOW, SHADOW_COLOR, SHADOW_OFFSET, SHADOW_SIZE );
+  style.SetGlow( GLOW, GLOW_COLOR, GLOW_INTENSITY );
+  style.SetOutline( OUTLINE, OUTLINE_COLOR, OUTLINE_THICKNESS );
+  style.SetGradient( GRADIENT, GRADIENT_COLOR, GRADIENT_START_POINT, GRADIENT_END_POINT );
 
   actor.SetTextStyle( style );
+
   // This is necessary since SetColor (via TextStyle) is asynchronous
   application.SendNotification();
   application.Render();
-  style = actor.GetTextStyle();
 
-  DALI_TEST_CHECK( style.GetFontName().empty() );
-  DALI_TEST_CHECK( style.GetFontStyle().empty() );
-  DALI_TEST_EQUALS( static_cast<float>( PointSize( 16.f ) ),
-                    static_cast<float>( style.GetFontPointSize() ),
-                    GetRangedEpsilon( PointSize( 16.f ), style.GetFontPointSize() ),
-                    TEST_LOCATION );
-  DALI_TEST_CHECK( TextStyle::EXTRABLACK == style.GetWeight() );
-  DALI_TEST_EQUALS( Vector4( 0.f, 0.f, 1.f, 1.f ), style.GetTextColor(), TEST_LOCATION );
-  DALI_TEST_CHECK( style.GetItalics() );
-  DALI_TEST_CHECK( style.GetUnderline() );
+  TextStyle style2 = actor.GetTextStyle();
+
+  DALI_TEST_CHECK( !style2.IsFontNameDefault() );
+  DALI_TEST_CHECK( !style2.IsFontStyleDefault() );
+  DALI_TEST_CHECK( !style2.IsFontSizeDefault() );
+  DALI_TEST_CHECK( !style2.IsTextColorDefault() );
+  DALI_TEST_CHECK( !style2.IsFontWeightDefault() );
+  DALI_TEST_CHECK( !style2.IsSmoothEdgeDefault() );
+  DALI_TEST_CHECK( !style2.IsItalicsDefault() );
+  DALI_TEST_CHECK( !style2.IsUnderlineDefault() );
+  DALI_TEST_CHECK( !style2.IsShadowDefault() );
+  DALI_TEST_CHECK( !style2.IsGlowDefault() );
+  DALI_TEST_CHECK( !style2.IsOutlineDefault() );
+  DALI_TEST_CHECK( !style2.IsGradientDefault() );
+
+  DALI_TEST_EQUALS( style2.GetFontName(), FONT_FAMILY, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetFontStyle(), FONT_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetFontPointSize(), FONT_POINT_SIZE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetTextColor(), TEXT_COLOR, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( style2.GetWeight(), TEXT_WEIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetSmoothEdge(), SMOOTH_EDGE, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style2.IsItalicsEnabled() );
+  DALI_TEST_EQUALS( style2.GetItalicsAngle(), ITALICS_ANGLE, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style2.IsUnderlineEnabled() );
+  DALI_TEST_EQUALS( style2.GetUnderlineThickness(), UNDERLINE_THICKNESS, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetUnderlinePosition(), UNDERLINE_POSITION, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style2.IsShadowEnabled() );
+  DALI_TEST_EQUALS( style2.GetShadowColor(), SHADOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetShadowOffset(), SHADOW_OFFSET, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style2.IsGlowEnabled() );
+  DALI_TEST_EQUALS( style2.GetGlowColor(), GLOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetGlowIntensity(), GLOW_INTENSITY, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style2.IsOutlineEnabled() );
+  DALI_TEST_EQUALS( style2.GetOutlineColor(), OUTLINE_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetOutlineThickness(), OUTLINE_THICKNESS, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style2.IsGradientEnabled() );
+  DALI_TEST_EQUALS( style2.GetGradientColor(), GRADIENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetGradientStartPoint(), GRADIENT_START_POINT, TEST_LOCATION );
+  DALI_TEST_EQUALS( style2.GetGradientEndPoint(), GRADIENT_END_POINT, TEST_LOCATION );
+
+
+  // Set a default style
+  actor.SetTextStyle( defaultStyle );
+
+  TextStyle style3 = actor.GetTextStyle();
+
+  DALI_TEST_EQUALS( style3.GetFontName(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetFontStyle(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetFontPointSize(), DEFAULT_FONT_POINT_SIZE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetTextColor(), TextStyle::DEFAULT_TEXT_COLOR, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( style3.GetWeight(), TextStyle::DEFAULT_FONT_WEIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetSmoothEdge(), TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style3.IsItalicsDefault() );
+  DALI_TEST_CHECK( !style3.IsItalicsEnabled() );
+  DALI_TEST_EQUALS( style3.GetItalicsAngle(), TextStyle::DEFAULT_ITALICS_ANGLE, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style3.IsUnderlineDefault() );
+  DALI_TEST_CHECK( !style3.IsUnderlineEnabled() );
+  DALI_TEST_EQUALS( style3.GetUnderlinePosition(), TextStyle::DEFAULT_UNDERLINE_POSITION, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetUnderlineThickness(), TextStyle::DEFAULT_UNDERLINE_THICKNESS, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style3.IsShadowDefault() );
+  DALI_TEST_CHECK( !style3.IsShadowEnabled() );
+  DALI_TEST_EQUALS( style3.GetShadowColor(), TextStyle::DEFAULT_SHADOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetShadowOffset(), TextStyle::DEFAULT_SHADOW_OFFSET, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style3.IsGlowDefault() );
+  DALI_TEST_CHECK( !style3.IsGlowEnabled() );
+  DALI_TEST_EQUALS( style3.GetGlowColor(), TextStyle::DEFAULT_GLOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetGlowIntensity(), TextStyle::DEFAULT_GLOW_INTENSITY, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style3.IsOutlineDefault() );
+  DALI_TEST_CHECK( !style3.IsOutlineEnabled() );
+  DALI_TEST_EQUALS( style3.GetOutlineColor(), TextStyle::DEFAULT_OUTLINE_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetOutlineThickness(), TextStyle::DEFAULT_OUTLINE_THICKNESS, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style3.IsGradientDefault() );
+  DALI_TEST_CHECK( !style3.IsGradientEnabled() );
+  DALI_TEST_EQUALS( style3.GetGradientColor(), TextStyle::DEFAULT_GRADIENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetGradientStartPoint(), TextStyle::DEFAULT_GRADIENT_START_POINT, TEST_LOCATION );
+  DALI_TEST_EQUALS( style3.GetGradientEndPoint(), TextStyle::DEFAULT_GRADIENT_END_POINT, TEST_LOCATION );
+
+  // Added to increase coverage.
+  // Reset what is already reset.
+
+  actor.SetTextStyle( style3 );
+
+  TextStyle style4 = actor.GetTextStyle();
+
+  DALI_TEST_EQUALS( style4.GetFontName(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetFontStyle(), DEFAULT_NAME_STYLE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetFontPointSize(), DEFAULT_FONT_POINT_SIZE, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetTextColor(), TextStyle::DEFAULT_TEXT_COLOR, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( style4.GetWeight(), TextStyle::DEFAULT_FONT_WEIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetSmoothEdge(), TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style4.IsItalicsDefault() );
+  DALI_TEST_CHECK( !style4.IsItalicsEnabled() );
+  DALI_TEST_EQUALS( style4.GetItalicsAngle(), TextStyle::DEFAULT_ITALICS_ANGLE, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style4.IsUnderlineDefault() );
+  DALI_TEST_CHECK( !style4.IsUnderlineEnabled() );
+  DALI_TEST_EQUALS( style4.GetUnderlinePosition(), TextStyle::DEFAULT_UNDERLINE_POSITION, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetUnderlineThickness(), TextStyle::DEFAULT_UNDERLINE_THICKNESS, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style4.IsShadowDefault() );
+  DALI_TEST_CHECK( !style4.IsShadowEnabled() );
+  DALI_TEST_EQUALS( style4.GetShadowColor(), TextStyle::DEFAULT_SHADOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetShadowOffset(), TextStyle::DEFAULT_SHADOW_OFFSET, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style4.IsGlowDefault() );
+  DALI_TEST_CHECK( !style4.IsGlowEnabled() );
+  DALI_TEST_EQUALS( style4.GetGlowColor(), TextStyle::DEFAULT_GLOW_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetGlowIntensity(), TextStyle::DEFAULT_GLOW_INTENSITY, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style4.IsOutlineDefault() );
+  DALI_TEST_CHECK( !style4.IsOutlineEnabled() );
+  DALI_TEST_EQUALS( style4.GetOutlineColor(), TextStyle::DEFAULT_OUTLINE_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetOutlineThickness(), TextStyle::DEFAULT_OUTLINE_THICKNESS, TEST_LOCATION );
+
+  DALI_TEST_CHECK( style4.IsGradientDefault() );
+  DALI_TEST_CHECK( !style4.IsGradientEnabled() );
+  DALI_TEST_EQUALS( style4.GetGradientColor(), TextStyle::DEFAULT_GRADIENT_COLOR, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetGradientStartPoint(), TextStyle::DEFAULT_GRADIENT_START_POINT, TEST_LOCATION );
+  DALI_TEST_EQUALS( style4.GetGradientEndPoint(), TextStyle::DEFAULT_GRADIENT_END_POINT, TEST_LOCATION );
+
   END_TEST;
 }
 

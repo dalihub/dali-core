@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/images/image-factory.h>
@@ -235,14 +236,13 @@ bool ImageFactory::CompareAttributes( const Dali::ImageAttributes& requested,
   // do not load image resource again if there is a similar resource loaded
   // eg. if size is less than 50% different of what we have
   // see explanation in image.h of what is deemed compatible
-  return (actual.GetCrop().Contains(requested.GetCrop())) &&
-         (requested.GetScalingMode() == actual.GetScalingMode()) &&
-         (requested.GetPixelFormat() == actual.GetPixelFormat()) &&
-         (requested.GetFieldBorder() == actual.GetFieldBorder()) &&
-         (fabs(actual.GetFieldRadius() - requested.GetFieldRadius()) <= FLT_EPSILON) &&
-         (requested.IsDistanceField() == actual.IsDistanceField()) &&
-         (fabsf(requested.GetWidth()  - actual.GetWidth())  < actual.GetWidth()  * mMaxScale) &&
-         (fabsf(requested.GetHeight() - actual.GetHeight()) < actual.GetHeight() * mMaxScale);
+  return (requested.GetScalingMode() ==  actual.GetScalingMode()) &&
+          (requested.GetPixelFormat() ==  actual.GetPixelFormat()) &&
+          (requested.GetFieldBorder() ==  actual.GetFieldBorder()) &&
+          (fabs(actual.GetFieldRadius() - requested.GetFieldRadius()) <= FLT_EPSILON) &&
+          (requested.IsDistanceField() == actual.IsDistanceField()) &&
+          (fabsf(requested.GetWidth()  -  actual.GetWidth())  < actual.GetWidth()  * mMaxScale) &&
+          (fabsf(requested.GetHeight() -  actual.GetHeight()) < actual.GetHeight() * mMaxScale);
 }
 
 Request* ImageFactory::InsertNewRequest( ResourceId resourceId, const std::string& filename, std::size_t urlHash, const ImageAttributes* attr )

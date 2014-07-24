@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/update/manager/update-manager.h>
@@ -585,7 +586,7 @@ void UpdateManager::RemoveShader(Shader* shader)
   DALI_ASSERT_DEBUG(false);
 }
 
-void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, ResourceId resourceId, size_t shaderHash )
+void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, ResourceId resourceId, size_t shaderHash, bool fixed )
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, " - (geometryType:%d subType:%d id:%d hash:%d)\n", geometryType, subType, resourceId, shaderHash);
 
@@ -598,13 +599,13 @@ void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType,
   {
     // This is done in the render thread, to allow GL program compilation
     // Will trigger a NotifySaveRequest back to updateManager to forward onto ResourceClient
-    typedef MessageValue5< Shader, GeometryType, Internal::ShaderSubTypes, Integration::ResourceId, Integration::ShaderDataPtr, Context* > DerivedType;
+    typedef MessageValue6< Shader, GeometryType, Internal::ShaderSubTypes, Integration::ResourceId, Integration::ShaderDataPtr, Context*, bool> DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( shader, &Shader::SetProgram, geometryType, subType, resourceId, shaderData, &(mImpl->renderManager.GetContext()) );
+    new (slot) DerivedType( shader, &Shader::SetProgram, geometryType, subType, resourceId, shaderData, &(mImpl->renderManager.GetContext()), fixed );
   }
 }
 
@@ -1119,20 +1120,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
                              mImpl->renderSortingHelper,
                              mImpl->renderInstructions );
       }
-
-#ifdef DYNAMICS_SUPPORT
-      // if dynamics enabled and active...update matrices for debug drawing
-      if( mImpl->dynamicsWorld && mImpl->dynamicsChanged )
-      {
-        RenderTask* task(mImpl->taskList.GetTasks()[0]);
-        if( task )
-        {
-          mImpl->dynamicsWorld->UpdateMatrices( task->GetProjectionMatrix(mSceneGraphBuffers.GetUpdateBufferIndex()),
-                                                task->GetViewMatrix(mSceneGraphBuffers.GetUpdateBufferIndex()) );
-        }
-      }
-#endif // DYNAMICS_SUPPORT
-
     }
   }
 
@@ -1145,7 +1132,8 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
   {
     RenderTask& renderTask(*(*iter));
 
-    if( renderTask.IsWaitingToRender() )
+    if( renderTask.IsWaitingToRender() &&
+        renderTask.ReadyToRender(mSceneGraphBuffers.GetUpdateBufferIndex()) /*avoid updating forever when source actor is off-stage*/ )
     {
       mImpl->renderTaskWaiting = true; // keep update/render threads alive
     }
@@ -1180,6 +1168,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
 
   // The update has finished; swap the double-buffering indices
   mSceneGraphBuffers.Swap();
+
+  // tell the update manager that we're done so the queue can be given to event thread
+  mImpl->notificationManager.UpdateCompleted();
 
   PERF_MONITOR_END(PerformanceMonitor::UPDATE);
 
@@ -1273,18 +1264,10 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
 
 #ifdef DYNAMICS_SUPPORT
 
-void UpdateManager::InitializeDynamicsWorld( SceneGraph::DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings, SceneGraph::Shader* debugShader )
+void UpdateManager::InitializeDynamicsWorld( SceneGraph::DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings )
 {
-  dynamicsWorld->Initialize( mImpl->sceneController, worldSettings, debugShader, &mSceneGraphBuffers );
+  dynamicsWorld->Initialize( mImpl->sceneController, worldSettings, &mSceneGraphBuffers );
   mImpl->dynamicsWorld = dynamicsWorld;
-
-  typedef MessageValue1< RenderManager, DynamicsDebugRenderer* > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &mImpl->renderManager, &RenderManager::InitializeDynamicsDebugRenderer, &dynamicsWorld->GetDebugRenderer() );
 }
 
 void UpdateManager::TerminateDynamicsWorld()

@@ -1,23 +1,25 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/images/bitmap-image-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/images/bitmap-external.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -29,6 +31,11 @@ namespace Dali
 {
 namespace Internal
 {
+
+namespace
+{
+TypeRegistration mType( typeid( Dali::BitmapImage ), typeid( Dali::Image ), NULL );
+} // unnamed namespace
 
 BitmapImagePtr BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
@@ -52,6 +59,7 @@ BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format 
   mResourceClient = &tls.GetResourceClient();
   mWidth  = width;
   mHeight = height;
+  mNaturalSizeSet = true;
 
   const ImageTicketPtr& t = mResourceClient->AllocateBitmapImage(width, height, width, height, pixelformat);
   mTicket = t.Get();
@@ -67,6 +75,7 @@ BitmapImage::BitmapImage(PixelBuffer* pixBuf, unsigned int width, unsigned int h
   mResourceClient = &tls.GetResourceClient();
   mWidth  = width;
   mHeight = height;
+  mNaturalSizeSet = true;
   Integration::Bitmap* bitmap = new BitmapExternal(pixBuf, width, height, pixelformat, stride);
   const ImageTicketPtr& t = mResourceClient->AddBitmapImage(bitmap);
   mTicket = t.Get();

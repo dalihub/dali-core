@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H__
 #define __DALI_INTERNAL_GESTURE_EVENT_PROCESSOR_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
@@ -122,11 +123,32 @@ public: // Called by Core
   void EnablePanGestureProfiling();
 
   /**
-   * @brief Called to set how pan gestures predict and smooth input
+   * @brief Called to set how pan gestures predict input
    *
    * @param[in] mode The prediction mode to use
    */
   void SetPanGesturePredictionMode( int mode );
+
+  /**
+   * @brief Sets the prediction amount of the pan gesture
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetPanGesturePredictionAmount( unsigned int amount );
+
+  /**
+   * @brief Called to set how pan gestures smooth input
+   *
+   * @param[in] mode The smoothing mode to use
+   */
+  void SetPanGestureSmoothingMode( int mode );
+
+  /**
+   * @brief Sets the prediction amount of the pan gesture
+   *
+   * @param[in] amount The smoothing amount [0.0f,1.0f] - 0.0f would be no smoothing, 1.0f maximum smoothing
+   */
+  void SetPanGestureSmoothingAmount( float amount );
 
 private:
 

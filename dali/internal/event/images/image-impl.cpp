@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/images/image-impl.h>
@@ -56,6 +57,7 @@ Dali::SignalConnectorType signalConnector2(mType, Dali::Image::SIGNAL_IMAGE_UPLO
 Image::Image( LoadPolicy loadPol, ReleasePolicy releasePol )
 : mWidth(0),
   mHeight(0),
+  mNaturalSizeSet(false),
   mLoadPolicy(loadPol),
   mReleasePolicy(releasePol),
   mConnectionCount(0),
@@ -81,15 +83,6 @@ ImagePtr Image::New( const std::string& filename, const Dali::ImageAttributes& a
   {
     ImagePtr image = new Image( loadPol, releasePol );
     image->Initialize();
-
-    if( ! filename.empty() )
-    {
-      Vector2 closestSize;
-
-      Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( filename, attributes, closestSize );
-      image->mWidth = closestSize.width;
-      image->mHeight = closestSize.height;
-    }
 
     image->mRequest = image->mImageFactory.RegisterRequest( filename, &attributes );
 
@@ -118,6 +111,7 @@ ImagePtr Image::New( NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy r
 
   image->mWidth  = nativeImg.GetWidth();
   image->mHeight = nativeImg.GetHeight();
+  image->mNaturalSizeSet = true;
 
   const ResourceTicketPtr& ticket = resourceClient.AddNativeImage( nativeImg );
   DALI_ASSERT_DEBUG( dynamic_cast<ImageTicket*>( ticket.Get() ) && "Resource ticket not ImageTicket subclass for image resource.\n" );
@@ -211,6 +205,7 @@ void Image::ResourceLoadingSucceeded(const ResourceTicket& ticket)
   const ImageTicket* imageTicket = static_cast<const ImageTicket*>(&ticket);
   mWidth = imageTicket->GetWidth();
   mHeight = imageTicket->GetHeight();
+  mNaturalSizeSet = true;
   mLoadingFinishedV2.Emit( Dali::Image( this ) );
 }
 
@@ -231,19 +226,67 @@ void Image::ResourceSavingFailed( const ResourceTicket& ticket )
 
 unsigned int Image::GetWidth() const
 {
-  // Width has already been calculated - just return that
-  return mWidth;
+  unsigned int width = 0;
+  if( mNaturalSizeSet )
+  {
+    // Width has already been calculated - just return that
+    width = mWidth;
+  }
+  else if( mTicket )
+  {
+    const ImageAttributes& attr = mImageFactory.GetActualAttributes( mTicket->GetId() );
+    width = attr.GetWidth();
+  }
+  else if( mRequest )
+  {
+    const ImageAttributes& attr = mImageFactory.GetRequestAttributes( mRequest.Get() );
+    width = attr.GetWidth();
+  }
+
+  return width;
 }
 
 unsigned int Image::GetHeight() const
 {
-  // Height has already been calculated - just return that
-  return mHeight;
+  unsigned int height = 0;
+  if( mNaturalSizeSet )
+  {
+    // Height has already been calculated - just return that
+    height = mHeight;
+  }
+  else if( mTicket )
+  {
+    const ImageAttributes& attr = mImageFactory.GetActualAttributes( mTicket->GetId() );
+    height = attr.GetHeight();
+  }
+  else if( mRequest )
+  {
+    const ImageAttributes& attr = mImageFactory.GetRequestAttributes( mRequest.Get() );
+    height = attr.GetHeight();
+  }
+
+  return height;
 }
 
 Vector2 Image::GetNaturalSize() const
 {
-  return Vector2( mWidth, mHeight );
+  Vector2 naturalSize(mWidth, mHeight);
+  if( ! mNaturalSizeSet )
+  {
+    if( mTicket )
+    {
+      const ImageAttributes& attr = mImageFactory.GetActualAttributes( mTicket->GetId() );
+      naturalSize.width = attr.GetWidth();
+      naturalSize.height = attr.GetHeight();
+    }
+    else if( mRequest )
+    {
+      const ImageAttributes& attr = mImageFactory.GetRequestAttributes( mRequest.Get() );
+      naturalSize.width = attr.GetWidth();
+      naturalSize.height = attr.GetHeight();
+    }
+  }
+  return naturalSize;
 }
 
 void Image::Connect()
@@ -355,7 +398,7 @@ bool Image::IsNinePatchFileName( std::string filename )
       break;
     }
 
-    // Satisfy prevnet
+    // Satisfy prevent
     if( state == DONE )
     {
       break;

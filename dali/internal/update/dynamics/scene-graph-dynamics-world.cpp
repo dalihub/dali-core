@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
@@ -31,7 +32,6 @@
 #include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
 #include <dali/internal/render/queue/render-queue.h>
-#include <dali/internal/render/dynamics/scene-graph-dynamics-debug-renderer.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-body.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-joint.h>
@@ -50,7 +50,6 @@ DynamicsWorld::DynamicsWorld(DynamicsNotifier& dynamicsNotifier,
                              Integration::DynamicsFactory& dynamicsFactory )
 : mDynamicsNotifier(dynamicsNotifier),
   mNotificationManager(notificationManager),
-  mRenderer(NULL),
   mSceneController(NULL),
   mBuffers(NULL),
   mDynamicsFactory(dynamicsFactory),
@@ -104,7 +103,7 @@ DynamicsWorld::~DynamicsWorld()
   mDynamicsFactory.TerminateDynamics();
 }
 
-void DynamicsWorld::Initialize(SceneController* sceneController, Integration::DynamicsWorldSettings* worldSettings, const Shader* debugShader, const SceneGraphBuffers* buffers )
+void DynamicsWorld::Initialize(SceneController* sceneController, Integration::DynamicsWorldSettings* worldSettings, const SceneGraphBuffers* buffers )
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::General, "%s\n", __PRETTY_FUNCTION__);
 
@@ -115,8 +114,6 @@ void DynamicsWorld::Initialize(SceneController* sceneController, Integration::Dy
 
   mSceneController = sceneController;
   mBuffers = buffers;
-
-  mRenderer = new DynamicsDebugRenderer( *debugShader );
 }
 
 void DynamicsWorld::AddBody(DynamicsBody& body)
@@ -263,11 +260,6 @@ void DynamicsWorld::SetGravity( const Vector3& gravity )
   mDynamicsWorld->SetGravity( gravity );
 }
 
-void DynamicsWorld::SetDebugDrawMode(const int mode)
-{
-  mDynamicsWorld->SetDebugDrawMode( mode );
-}
-
 BufferIndex DynamicsWorld::GetBufferIndex() const
 {
   return mBuffers->GetUpdateBufferIndex();
@@ -283,7 +275,7 @@ Integration::DynamicsWorld& DynamicsWorld::GetDynamicsWorld()
   return *mDynamicsWorld;
 }
 
-bool DynamicsWorld::Update( const float elapsedSeconds )
+bool DynamicsWorld::Update( float elapsedSeconds )
 {
   bool anyPositionChanged( false );
 
@@ -297,7 +289,6 @@ bool DynamicsWorld::Update( const float elapsedSeconds )
 
     if( anyPositionChanged )
     {
-      DebugDraw();
       CheckForCollisions();
     }
   }
@@ -416,49 +407,6 @@ void DynamicsWorld::SetNode(Node* node)
 float DynamicsWorld::GetWorldScale() const
 {
   return 1.0f / mSettings->worldScale;
-}
-
-void DynamicsWorld::DebugDraw()
-{
-  // Send request to the simulation to render selected debug information
-  typedef MessageValue1< DynamicsDebugRenderer, Integration::DynamicsDebugVertexContainer > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( GetBufferIndex(), sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetDebugRenderer(), &DynamicsDebugRenderer::UpdateBuffer, mDynamicsWorld->DebugDraw() );
-}
-
-void DynamicsWorld::UpdateMatrices( const Matrix& projectionMatrix, const Matrix& viewMatrix)
-{
-  typedef MessageDoubleBuffered2< DynamicsDebugRenderer, Matrix, Matrix > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( GetBufferIndex(), sizeof( DerivedType ) );
-
-  if( mNode )
-  {
-    Matrix modelView(false);
-    Matrix::Multiply(modelView, mNode->GetWorldMatrix( GetBufferIndex() ), viewMatrix);
-    const float scale(GetWorldScale());
-    modelView.SetXAxis(modelView.GetXAxis()*scale);
-    modelView.SetYAxis(modelView.GetYAxis()*scale);
-    modelView.SetZAxis(modelView.GetZAxis()*scale);
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mRenderer, &DynamicsDebugRenderer::UpdateMatrices, projectionMatrix, modelView );
-  }
-  else
-  {
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mRenderer, &DynamicsDebugRenderer::UpdateMatrices, projectionMatrix, viewMatrix );
-  }
-}
-
-DynamicsDebugRenderer& DynamicsWorld::GetDebugRenderer() const
-{
-  return *mRenderer;
 }
 
 } // namespace SceneGraph

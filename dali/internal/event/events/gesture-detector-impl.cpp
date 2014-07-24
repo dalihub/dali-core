@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/events/gesture-detector-impl.h>
@@ -22,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/event/events/gesture-event-processor.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -32,15 +34,9 @@ namespace Dali
 namespace Internal
 {
 
-namespace
-{
-const std::string INVALID_PROPERTY; // Empty string for invalid calls
-}
-
 GestureDetector::GestureDetector(Gesture::Type type)
 : mType(type),
-  mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor()),
-  mSlotDelegate(this)
+  mGestureEventProcessor(ThreadLocalStorage::Get().GetGestureEventProcessor())
 {
 }
 
@@ -50,8 +46,9 @@ GestureDetector::~GestureDetector()
   {
     for ( GestureDetectorActorContainer::iterator iter = mAttachedActors.begin(), endIter = mAttachedActors.end(); iter != endIter; ++iter )
     {
-      (*iter)->RemoveObserver( *this );
-      (*iter)->TouchedSignal().Disconnect( mSlotDelegate, &GestureDetector::OnTouchEvent );
+      Actor* actor( *iter );
+      actor->RemoveObserver( *this );
+      actor->GetGestureData().RemoveGestureDetector( *this );
     }
 
     mAttachedActors.clear();
@@ -79,8 +76,8 @@ void GestureDetector::Attach(Actor& actor)
     // We need to observe the actor's destruction
     actor.AddObserver(*this);
 
-    // Dummy connection to touch event
-    actor.TouchedSignal().Connect( mSlotDelegate, &GestureDetector::OnTouchEvent );
+    // Add the detector to the actor (so the actor knows it requires this gesture when going through hit-test algorithm)
+    actor.GetGestureData().AddGestureDetector( *this );
 
     // Notification for derived classes
     OnActorAttach(actor);
@@ -98,10 +95,10 @@ void GestureDetector::Detach(Actor& actor)
       // We no longer need to observe the actor's destruction
       actor.RemoveObserver(*this);
 
-      mAttachedActors.erase(match);
+      // Remove detector from actor-gesture-data
+      actor.GetGestureData().RemoveGestureDetector( *this );
 
-      // Disconnect connection to touch event
-      actor.TouchedSignal().Disconnect( mSlotDelegate, &PanGestureDetector::OnTouchEvent );
+      mAttachedActors.erase(match);
 
       // Notification for derived classes
       OnActorDetach(actor);
@@ -130,6 +127,9 @@ void GestureDetector::DetachAll()
 
       // We no longer need to observe the actor's destruction
       actor->RemoveObserver(*this);
+
+      // Remove detector from actor-gesture-data
+      actor->GetGestureData().RemoveGestureDetector( *this );
 
       // Notification for derived classes
       OnActorDetach(*actor);
@@ -182,11 +182,6 @@ void GestureDetector::ProxyDestroyed(ProxyObject& proxy)
   }
 }
 
-bool GestureDetector::OnTouchEvent(Dali::Actor actor, const TouchEvent& event)
-{
-  return false;
-}
-
 bool GestureDetector::IsSceneObjectRemovable() const
 {
   return false;
@@ -203,7 +198,7 @@ void GestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& ) con
 
 const std::string& GestureDetector::GetDefaultPropertyName( Property::Index index ) const
 {
-  return INVALID_PROPERTY;
+  return String::EMPTY;
 }
 
 Property::Index GestureDetector::GetDefaultPropertyIndex(const std::string& name) const

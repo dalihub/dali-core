@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/common/proxy-object.h>
@@ -423,6 +424,15 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
           break;
         }
 
+        case Property::INTEGER:
+        {
+          AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry->second.GetSceneGraphProperty() );
+          DALI_ASSERT_DEBUG( NULL != property );
+
+          value = (*property)[ bufferIndex ];
+          break;
+        }
+
         case Property::VECTOR2:
         {
           AnimatableProperty<Vector2>* property = dynamic_cast< AnimatableProperty<Vector2>* >( entry->second.GetSceneGraphProperty() );
@@ -536,6 +546,12 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
     case Property::FLOAT:
     {
       newProperty.reset(new AnimatableProperty<float>( propertyValue.Get<float>()));
+      break;
+    }
+
+    case Property::INTEGER:
+    {
+      newProperty.reset(new AnimatableProperty<int>( propertyValue.Get<int>()));
       break;
     }
 
@@ -810,6 +826,16 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
       break;
     }
 
+    case Property::INTEGER:
+    {
+      AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<int>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<int>() );
+      break;
+    }
+
     case Property::VECTOR2:
     {
       AnimatableProperty<Vector2>* property = dynamic_cast< AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
@@ -907,31 +933,35 @@ TypeInfo* ProxyObject::GetTypeInfo() const
 
 void ProxyObject::RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph )
 {
-  if( isInScenegraph )
+  // guard against constraint sending messages during core destruction
+  if ( Stage::IsInstalled() )
   {
-    ActiveConstraintBase& baseConstraint = GetImplementation( constraint );
-    baseConstraint.BeginRemove();
-    if ( baseConstraint.IsRemoving() )
+    if( isInScenegraph )
     {
-      if( !mRemovedConstraints )
+      ActiveConstraintBase& baseConstraint = GetImplementation( constraint );
+      baseConstraint.BeginRemove();
+      if ( baseConstraint.IsRemoving() )
       {
-        mRemovedConstraints = new ActiveConstraintContainer;
+        if( !mRemovedConstraints )
+        {
+          mRemovedConstraints = new ActiveConstraintContainer;
+        }
+        // Wait for remove animation before destroying active-constraints
+        mRemovedConstraints->push_back( constraint );
       }
-      // Wait for remove animation before destroying active-constraints
-      mRemovedConstraints->push_back( constraint );
     }
-  }
-  else if( mRemovedConstraints )
-  {
-    delete mRemovedConstraints;
-    mRemovedConstraints = NULL;
+    else if( mRemovedConstraints )
+    {
+      delete mRemovedConstraints;
+      mRemovedConstraints = NULL;
+    }
   }
 }
 
-
 void ProxyObject::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
 {
-  if( mConstraints )
+  // guard against constraint sending messages during core destruction
+  if( mConstraints && Stage::IsInstalled() )
   {
     bool isInSceneGraph( NULL != GetSceneObject() );
     if( isInSceneGraph )
@@ -946,14 +976,12 @@ void ProxyObject::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
       mConstraints->erase( it );
     }
   }
-
 }
-
-
 
 void ProxyObject::RemoveConstraints( unsigned int tag )
 {
-  if( mConstraints )
+  // guard against constraint sending messages during core destruction
+  if( mConstraints && Stage::IsInstalled() )
   {
     bool isInSceneGraph( NULL != GetSceneObject() );
     if( isInSceneGraph )
@@ -980,7 +1008,8 @@ void ProxyObject::RemoveConstraints( unsigned int tag )
 
 void ProxyObject::RemoveConstraints()
 {
-  if( mConstraints )
+  // guard against constraint sending messages during core destruction
+  if( mConstraints && Stage::IsInstalled() )
   {
     // If we have nothing in the scene-graph, just clear constraint containers
     const SceneGraph::PropertyOwner* propertyOwner = GetSceneObject();

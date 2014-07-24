@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_IMAGE_H__
 #define __DALI_INTERNAL_IMAGE_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <string>
@@ -78,7 +79,7 @@ public:
    * Creates object and loads image from filesystem
    * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @param [in] filename   the path of the image on the filesystem
-   * @param [in] attributes requested parameters for loading (size, cropping etc.)
+   * @param [in] attributes requested parameters for loading (size, scaling etc.)
    *                        if width or height is specified as 0, the natural size will be used.
    * @param [in] loadPol controls time of loading a resource from the filesystem (default: load when Image is created).
    * @param [in] releasePol optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
@@ -256,6 +257,7 @@ private:
 protected:
   unsigned int mWidth;
   unsigned int mHeight;
+  bool         mNaturalSizeSet;
 
   ResourceTicketPtr mTicket;
   ImageFactoryCache::RequestPtr mRequest;         ///< contains the initially requested attributes for image. Request is reissued when memory was released.

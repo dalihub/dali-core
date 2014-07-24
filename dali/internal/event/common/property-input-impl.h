@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_PROPERTY_INPUT_IMPL_H__
 #define __DALI_INTERNAL_PROPERTY_INPUT_IMPL_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-input.h>
@@ -38,6 +39,7 @@ namespace Internal
  */
 static const bool DUMMY_BOOLEAN_VALUE( false );
 static const float DUMMY_FLOAT_VALUE( 0.0f );
+static const int DUMMY_INTEGER_VALUE( 0 );
 static const Vector2 DUMMY_VECTOR2_VALUE( 0.0f, 0.0f );
 static const Vector3 DUMMY_VECTOR3_VALUE( 0.0f, 0.0f, 0.0f );
 static const Vector4 DUMMY_VECTOR4_VALUE( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -100,6 +102,18 @@ public:
   {
     DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
     return DUMMY_FLOAT_VALUE;
+  }
+
+  /**
+   * Retrieve an integer value.
+   * @pre GetType() returns Property::INTEGER.
+   * @param[in] bufferIndex The buffer to read from.
+   * @return The integer value.
+   */
+  virtual const int& GetInteger( BufferIndex bufferIndex ) const
+  {
+    DALI_ASSERT_ALWAYS( false && "Property type mismatch" );
+    return DUMMY_INTEGER_VALUE;
   }
 
   /**
@@ -203,6 +217,19 @@ public:
   }
 
   /**
+   * Retrieve an integer input for a constraint function.
+   * @note For inherited properties, this method should be overriden to return the value
+   * from the previous frame i.e. not from the current update buffer.
+   * @pre GetType() returns Property::INTEGER.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @return The integer value.
+   */
+  virtual const int& GetConstraintInputInteger( BufferIndex updateBufferIndex ) const
+  {
+    return GetInteger( updateBufferIndex );
+  }
+
+  /**
    * Retrieve a Vector2 input for a constraint function.
    * @note For inherited properties, this method should be overriden to return the value
    * from the previous frame i.e. not from the current update buffer.
@@ -298,6 +325,12 @@ public:
       case Property::FLOAT:
       {
         debugStream << GetFloat( bufferIndex );
+        break;
+      }
+
+      case Property::INTEGER:
+      {
+        debugStream << GetInteger( bufferIndex );
         break;
       }
 

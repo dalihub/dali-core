@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_CHARACTER_H__
 #define __DALI_INTERNAL_CHARACTER_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <stdint.h>
@@ -42,26 +43,11 @@ public:
 public:
 
   /**
-   * @copydoc Dali::Character::Character().
-   */
-  Character();
-
-  /**
    * Constructor.
    * Creates a Character with the given UTF-32 encoded character.
    * @param character A UTF-32 encoded character.
    */
   Character( uint32_t character );
-
-  /**
-   * @copydoc Dali::Character::Character( const Character& character ).
-   */
-  Character( const Character& character );
-
-  /**
-   * @copydoc Dali::Character::operator=( const Character& character ).
-   */
-  Character& operator=( const Character& character );
 
   /**
    * Non virtual destructor.
@@ -107,8 +93,38 @@ public:
    */
   void SetCharacter( uint32_t character );
 
+  /**
+   * Whether the given character is a white space.
+   *
+   * @param[in] character The character.
+   *
+   * @return \e true the given character is a white space.
+   */
+  static bool IsWhiteSpace( uint32_t character );
+
+  /**
+   * Whether the given character is a new line character.
+   *
+   * @param[in] character The character.
+   *
+   * @return \e true the given character is a new line character.
+   */
+  static bool IsNewLine( uint32_t character );
+
 private:
-  uint32_t mCharacter;
+
+  // Undefined constructor.
+  Character();
+
+  // Undefined copy constructor.
+  Character( const Character& character );
+
+  // Undefined assignment operator
+  Character& operator=( const Character& character );
+
+ private: //data
+
+  uint32_t mCharacter; ///< Stores the unicode of the character.
 };
 
 } // namespace Internal

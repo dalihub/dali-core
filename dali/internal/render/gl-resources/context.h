@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_CONTEXT_H__
 #define __DALI_INTERNAL_CONTEXT_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/map-wrapper.h>
@@ -56,7 +57,6 @@ class Program; // to be able to cache programs
 class Context
 {
 public:
-
   /**
    * Size of the VertexAttributeArray enables
    * GLES specification states that there's minimum of 8
@@ -83,7 +83,7 @@ public:
   void GlContextCreated();
 
   /**
-   * Called when the GL context is about to be destroyed.
+   * Called when the GL context has been destroyed.
    */
   void GlContextDestroyed();
 
@@ -1647,6 +1647,11 @@ public:
   }
 
   /**
+   * Reset the program matrices
+   */
+  void ResetProgramMatrices();
+
+  /**
    * Get a cached program
    * @param [in] hash value
    * @return pointer to the program
@@ -1672,6 +1677,72 @@ public:
   static Debug::Filter *gGlLogFilter;
 
 #endif // DEBUG_ENABLED
+
+
+  /**
+   * Set the frame count of render thread
+   */
+  inline void SetFrameCount(unsigned int frameCount)
+  {
+    mFrameCount = frameCount;
+  }
+
+  /**
+   * Get the frame count
+   */
+  inline unsigned int GetFrameCount()
+  {
+    return mFrameCount;
+  }
+
+  /**
+   * Increment the count of culled renderers
+   */
+  inline void IncrementCulledCount()
+  {
+    mCulledCount++;
+  }
+
+  /**
+   * Clear the count of culled renderers
+   */
+  inline void ClearCulledCount()
+  {
+    mCulledCount = 0;
+  }
+
+  /**
+   * Get the count of culled renderers in this frame
+   */
+  inline unsigned int GetCulledCount()
+  {
+    return mCulledCount;
+  }
+
+  /**
+   * Increment the count of culled renderers
+   */
+  inline void IncrementRendererCount()
+  {
+    mRendererCount++;
+  }
+
+  /**
+   * Clear the count of image renderers
+   */
+  inline void ClearRendererCount()
+  {
+    mRendererCount = 0;
+  }
+
+  /**
+   * Get the count of image renderers in this frame
+   */
+  inline unsigned int GetRendererCount()
+  {
+    return mRendererCount;
+  }
+
 
 private: // Implementation
 
@@ -1758,8 +1829,10 @@ private: // Data
 
   Program* mCurrentProgram;
   typedef std::map< std::size_t, Program* > ProgramContainer;
-  ProgramContainer mProgramCache; /// program cache
-
+  ProgramContainer mProgramCache; ///< Cache of shader programs
+  unsigned int mFrameCount;       ///< Number of render frames
+  unsigned int mCulledCount;      ///< Number of culled renderers per frame
+  unsigned int mRendererCount;    ///< Number of image renderers per frame
 };
 
 } // namespace Internal

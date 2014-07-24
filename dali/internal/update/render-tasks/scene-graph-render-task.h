@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H__
 #define __DALI_INTERNAL_SCENE_GRAPH_RENDER_TASK_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/viewport.h>
@@ -94,12 +95,6 @@ public:
    * @param[in] node The scene is viewed from the perspective of this node.
    */
   void SetCameraNode( Node* node );
-
-  /**
-   * Retrieve the camera node.
-   * @return The scene is viewed from the perspective of this node.
-   */
-  Node* GetCameraNode() const;
 
   /**
    * Set the frame-buffer used as a render target.
@@ -210,6 +205,16 @@ public:
    * @copydoc Dali::RenderTask::GetClearEnabled()
    */
   bool GetClearEnabled() const;
+
+  /**
+   * @copydoc Dali::RenderTask::SetCullMode()
+   */
+  void SetCullMode( bool mode );
+
+  /**
+   * @copydoc Dali::RenderTask::GetCullMode()
+   */
+  bool GetCullMode() const;
 
   /**
    * Set the refresh-rate of the RenderTask.
@@ -330,6 +335,7 @@ private:
   bool mNotifyTrigger:1; ///< True if a render once render task has finished renderering
   bool mExclusive: 1; ///< Whether the render task has exclusive access to the source actor (node in the scene graph implementation).
   bool mClearEnabled: 1; ///< Whether previous results are cleared.
+  bool mCullMode: 1; ///< Whether renderers should be frustum culled
 
   FrameBufferTexture* mRenderTarget;
   Viewport mViewport;
@@ -386,6 +392,17 @@ inline void SetClearEnabledMessage( EventToUpdate& eventToUpdate, RenderTask& ta
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &task, &RenderTask::SetClearEnabled, enabled );
+}
+
+inline void SetCullModeMessage( EventToUpdate& eventToUpdate, RenderTask& task, bool mode )
+{
+  typedef MessageValue1< RenderTask, bool > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &task, &RenderTask::SetCullMode, mode );
 }
 
 inline void SetRefreshRateMessage( EventToUpdate& eventToUpdate, RenderTask& task, unsigned int refreshRate )

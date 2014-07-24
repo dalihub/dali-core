@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include "test-platform-abstraction.h"
 #include "dali-test-suite-utils.h"
@@ -159,7 +160,7 @@ bool TestPlatformAbstraction::IsLoading()
 /**
  * @copydoc PlatformAbstraction::GetDefaultFontFamily()
  */
-std::string TestPlatformAbstraction::GetDefaultFontFamily() const
+const std::string& TestPlatformAbstraction::GetDefaultFontFamily() const
 {
   mTrace.PushCall("GetDefaultFontFamily", "");
   return mGetDefaultFontFamilyResult;
@@ -168,13 +169,13 @@ std::string TestPlatformAbstraction::GetDefaultFontFamily() const
 /**
  * @copydoc PlatformAbstraction::GetDefaultFontSize()
  */
-const float TestPlatformAbstraction::GetDefaultFontSize() const
+float TestPlatformAbstraction::GetDefaultFontSize() const
 {
   mTrace.PushCall("GetDefaultFontSize", "");
   return mGetDefaultFontSizeResult;
 }
 
-const PixelSize TestPlatformAbstraction::GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight) const
+PixelSize TestPlatformAbstraction::GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, CapsHeight capsHeight) const
 {
   mTrace.PushCall("GetFontLineHeightFromCapsHeight", "");
   // LineHeight will be bigger than CapsHeight, so return capsHeight + 1
@@ -309,7 +310,7 @@ void TestPlatformAbstraction::SetDpi (unsigned int dpiHorizontal, unsigned int d
 /**
  * @copydoc PlatformAbstraction::GetFontFamilyForChars()
  */
-std::string TestPlatformAbstraction::GetFontFamilyForChars(const TextArray& charsRequested) const
+const std::string& TestPlatformAbstraction::GetFontFamilyForChars(const TextArray& charsRequested) const
 {
   mTrace.PushCall("GetFontFamilyForChars", "");
   return mGetDefaultFontFamilyResult;
@@ -336,12 +337,10 @@ bool TestPlatformAbstraction::ValidateFontFamilyName(const std::string& fontFami
 /**
  * @copydoc PlatformAbstraction::GetFontList()
  */
-std::vector<std::string> TestPlatformAbstraction::GetFontList( PlatformAbstraction::FontListMode mode ) const
+void TestPlatformAbstraction::GetFontList( PlatformAbstraction::FontListMode mode, std::vector<std::string>& fonstList ) const
 {
   mFontListMode = mode;
   mTrace.PushCall("ValidateGetFontList", "");
-  std::vector<std::string> fontList;
-  return fontList;
 }
 
 /**

@@ -1,21 +1,22 @@
 #ifndef __TEST_GL_ABSTRACTION_H__
 #define __TEST_GL_ABSTRACTION_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // EXTERNAL INCLUDES
 #include <sstream>
@@ -23,7 +24,6 @@
 #include <map>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/dali-core-capi-internal.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-abstraction.h>
@@ -49,6 +49,9 @@ public:
   TestGlAbstraction();
   ~TestGlAbstraction();
   void Initialize();
+
+  void PreRender();
+  void PostRender(unsigned int timeDelta);
 
   /* OpenGL ES 2.0 */
 
@@ -129,6 +132,10 @@ public:
         mActiveTextures[ mActiveTextureUnit ].mBoundTextures.push_back( texture );
       }
     }
+
+    std::stringstream out;
+    out << target << ", " << texture;
+    mTextureTrace.PushCall("BindTexture", out.str());
   }
 
   inline void BlendColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
@@ -471,6 +478,17 @@ public:
         *(textures+i) = ++mLastAutoTextureIdUsed;
       }
     }
+
+    std::stringstream out;
+    for(int i=0; i<n; i++)
+    {
+      out << textures[i];
+      if(i<n-1)
+      {
+        out << ", ";
+      }
+    }
+    mTextureTrace.PushCall("GenTexture", out.str());
   }
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/events/tap-gesture-processor.h>
@@ -49,8 +50,8 @@ namespace
  * @param[in]  localPoint        Relative to the actor attached to the detector.
  */
 void EmitTapSignal(
-    Dali::Actor actor,
-    TapGestureDetectorContainer& gestureDetectors,
+    Actor* actor,
+    const GestureDetectorContainer& gestureDetectors,
     const Integration::TapGestureEvent& tapEvent,
     Vector2 localPoint)
 {
@@ -61,57 +62,26 @@ void EmitTapSignal(
   tap.screenPoint = tapEvent.point;
   tap.localPoint = localPoint;
 
-  for ( TapGestureDetectorContainer::iterator iter = gestureDetectors.begin(), endIter = gestureDetectors.end(); iter != endIter; ++iter )
+  Dali::Actor actorHandle( actor );
+  const GestureDetectorContainer::const_iterator endIter = gestureDetectors.end();
+  for ( GestureDetectorContainer::const_iterator iter = gestureDetectors.begin(); iter != endIter; ++iter )
   {
-    (*iter)->EmitTapGestureSignal( actor, tap );
+    static_cast< TapGestureDetector* >( *iter )->EmitTapGestureSignal( actorHandle, tap );
   }
 }
 
 } // unnamed namespace
 
-struct TapGestureProcessor::TapEventFunctor : public GestureProcessor::Functor
-{
-  /**
-   * Constructor
-   * @param[in]  tapEvent   The current gesture event.
-   */
-  TapEventFunctor( const Integration::TapGestureEvent& tapEvent )
-  : tapEvent(tapEvent)
-  {
-  }
-
-  /**
-   * Check if the detector meets the current gesture event parameters.
-   */
-   virtual bool operator() ( GestureDetector* detector, Actor* )
-  {
-    TapGestureDetector* tapDetector ( static_cast< TapGestureDetector* >( detector ) );
-
-    return tapDetector->GetTapsRequired() == tapEvent.numberOfTaps &&
-           tapDetector->GetTouchesRequired() == tapEvent.numberOfTouches;
-  }
-
-  /**
-   * Gestured actor and gesture detectors that meet the gesture's parameters found, emit and save required information.
-   */
-  virtual void operator() ( Dali::Actor actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
-  {
-    TapGestureDetectorContainer derivedContainer;
-    DownCastContainer<TapGestureDetector>( gestureDetectors, derivedContainer );
-    EmitTapSignal( actor, derivedContainer, tapEvent, actorCoordinates );
-  }
-
-  const Integration::TapGestureEvent& tapEvent;
-};
-
 TapGestureProcessor::TapGestureProcessor( Stage& stage, Integration::GestureManager& gestureManager)
-: mStage( stage ),
+: GestureProcessor( Gesture::Tap ),
+  mStage( stage ),
   mGestureManager( gestureManager ),
   mGestureDetectors(),
   mMinTapsRequired( 1 ),
   mMaxTapsRequired( 1 ),
   mMinTouchesRequired( 1 ),
-  mMaxTouchesRequired( 1 )
+  mMaxTouchesRequired( 1 ),
+  mCurrentTapEvent( NULL )
 {
 }
 
@@ -131,7 +101,7 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
       if( HitTest( mStage, tapEvent.point, hitTestResults ) )
       {
         // Only sets the actor if we have a hit.
-        SetActor( hitTestResults.actor );
+        SetActor( &GetImplementation( hitTestResults.actor ) );
       }
       break;
     }
@@ -141,14 +111,14 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
       if ( GetCurrentGesturedActor() )
       {
         HitTestAlgorithm::Results hitTestResults;
-        HitTestAlgorithm::HitTest( mStage, tapEvent.point, hitTestResults );
+        HitTest( mStage, tapEvent.point, hitTestResults );
 
         if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
         {
-          TapEventFunctor functor( tapEvent );
-          GestureDetectorContainer gestureDetectors;
-          UpCastContainer<TapGestureDetector>( mGestureDetectors, gestureDetectors );
-          ProcessAndEmit( hitTestResults, gestureDetectors, functor );
+          // Set mCurrentTapEvent to use inside overridden methods called from ProcessAndEmit()
+          mCurrentTapEvent = &tapEvent;
+          ProcessAndEmit( hitTestResults );
+          mCurrentTapEvent = NULL;
         }
 
         ResetActor();
@@ -283,6 +253,23 @@ void TapGestureProcessor::UpdateDetection()
     request.maxTouches = mMaxTouchesRequired = maxTouches;
     mGestureManager.Update(request);
   }
+}
+
+bool TapGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor* actor )
+{
+  DALI_ASSERT_DEBUG( mCurrentTapEvent );
+
+  TapGestureDetector* tapDetector ( static_cast< TapGestureDetector* >( detector ) );
+
+  return ( tapDetector->GetTapsRequired() == mCurrentTapEvent->numberOfTaps ) &&
+         ( tapDetector->GetTouchesRequired() == mCurrentTapEvent->numberOfTouches );
+}
+
+void TapGestureProcessor::EmitGestureSignal( Actor* actor, const GestureDetectorContainer& gestureDetectors, Vector2 actorCoordinates )
+{
+  DALI_ASSERT_DEBUG( mCurrentTapEvent );
+
+  EmitTapSignal( actor, gestureDetectors, *mCurrentTapEvent, actorCoordinates );
 }
 
 } // namespace Internal

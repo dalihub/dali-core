@@ -161,13 +161,12 @@ function tc_fullinfo {
 
 
 # usage note and exit:
-# - argument begin with '-' but is not recognised or number of arguments is > 2,
-# - argument doesn't begin with '-' and number of arguments is > 1
-if [[ ( "$1" == -* && ( ! "$1" =~ ^-(anum|mnum|f)$ || $# > 2 ) ) || ( "$1" != -* && $# > 1 ) ]]; then
+# - argument begin with '-' but is not recognised or number of arguments is > 3,
+# - argument doesn't begin with '-' and number of arguments is > 2
+if [[ ( "$1" == -* && ( ! "$1" =~ ^-(anum|mnum|f)$ || $# > 3 ) ) || ( "$1" != -* && $# > 2 ) ]]; then
     echo -e "$USAGE"
     exit 1
 fi
-
 
 # get directory from last argument (or assume current one)
 if [[ ! "$1" =~ ^-(anum|mnum|f)$ ]]; then
@@ -176,12 +175,28 @@ else
     DIR=${2:-.}
 fi
 
+# get filename from last argument
+if [[ $# == 3 && -f $DIR/$3 ]] ; then
+    FILE=$3
+elif [[ $# == 2 && -f $DIR/$2 ]] ; then
+    FILE=$2
+fi
+
+#echo "Dir: $DIR  File: $FILE" >& 2
+
 
 # populate $TC_FILES with files declared in CMakeLists.txt
-get_tc_files $DIR
-if [ $? != 0 ]; then
-    exit 1
+if [[ -z $FILE ]]; then
+    get_tc_files $DIR
+    if [ $? != 0 ]; then
+        exit 1
+    fi
+    echo "Got all files" >& 2
+else
+    TC_FILES="$DIR/$FILE"
+    echo "TC_FILES: $TC_FILES" >& 2
 fi
+
 
 
 # run appropriate subcommand

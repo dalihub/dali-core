@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/actors/text-actor-impl.h>
@@ -359,7 +360,7 @@ RenderableAttachment& TextActor::GetRenderableAttachment() const
 
 void TextActor::SetGradientColor( const Vector4& color )
 {
-  mTextAttachment->SetGradientColor( color );
+  mTextAttachment->SetGradient( color, mTextAttachment->GetGradientStartPoint(), mTextAttachment->GetGradientEndPoint() );
 }
 
 const Vector4& TextActor::GetGradientColor() const
@@ -369,7 +370,7 @@ const Vector4& TextActor::GetGradientColor() const
 
 void TextActor::SetGradientStartPoint( const Vector2& position )
 {
-  mTextAttachment->SetGradientStartPoint( position );
+  mTextAttachment->SetGradient( mTextAttachment->GetGradientColor(), position, mTextAttachment->GetGradientEndPoint() );
 }
 
 const Vector2& TextActor::GetGradientStartPoint() const
@@ -379,12 +380,17 @@ const Vector2& TextActor::GetGradientStartPoint() const
 
 void TextActor::SetGradientEndPoint( const Vector2& position )
 {
-  mTextAttachment->SetGradientEndPoint( position );
+  mTextAttachment->SetGradient( mTextAttachment->GetGradientColor(), mTextAttachment->GetGradientStartPoint(), position );
 }
 
 const Vector2& TextActor::GetGradientEndPoint() const
 {
   return mTextAttachment->GetGradientEndPoint();
+}
+
+void TextActor::SetGradient( const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
+{
+  mTextAttachment->SetGradient( color, startPoint, endPoint );
 }
 
 void TextActor::SetTextStyle( const TextStyle& style, TextRequestMode mode )
@@ -417,85 +423,107 @@ void TextActor::SetTextStyle( const TextStyle& style, TextRequestMode mode )
   }
 
   // Set color.
-  SetTextColor( style.GetTextColor() );
+  if( !style.IsTextColorDefault() )
+  {
+    SetTextColor( style.GetTextColor() );
+  }
+  else
+  {
+    mTextAttachment->ResetTextColor();
+  }
 
   // Italics
-  SetItalics( style.GetItalics() ? Radian( style.GetItalicsAngle() ) : Radian( 0.0f ) );
+  if( !style.IsItalicsDefault() )
+  {
+    SetItalics( style.IsItalicsEnabled() ? Radian( style.GetItalicsAngle() ) : Radian( 0.0f ) );
+  }
+  else
+  {
+    mTextAttachment->ResetItalics();
+  }
 
   // Underline
-  SetUnderline( style.GetUnderline(), style.GetUnderlineThickness(), style.GetUnderlinePosition() );
+  if( !style.IsUnderlineDefault() )
+  {
+    SetUnderline( style.IsUnderlineEnabled(), style.GetUnderlineThickness(), style.GetUnderlinePosition() );
+  }
+  else
+  {
+    mTextAttachment->ResetUnderline();
+  }
 
   // Shadow
-  SetShadow( style.GetShadow(), style.GetShadowColor(), style.GetShadowOffset(), style.GetShadowSize() );
+  if( !style.IsShadowDefault() )
+  {
+    SetShadow( style.IsShadowEnabled(), style.GetShadowColor(), style.GetShadowOffset(), style.GetShadowSize() );
+  }
+  else
+  {
+    mTextAttachment->ResetShadow();
+  }
 
   // Glow
-  SetGlow( style.GetGlow(), style.GetGlowColor(), style.GetGlowIntensity() );
+  if( !style.IsGlowDefault() )
+  {
+    SetGlow( style.IsGlowEnabled(), style.GetGlowColor(), style.GetGlowIntensity() );
+  }
+  else
+  {
+    mTextAttachment->ResetGlow();
+  }
 
   // Soft Smooth edge.
-  SetSmoothEdge( style.GetSmoothEdge() );
+  if( !style.IsSmoothEdgeDefault() )
+  {
+    SetSmoothEdge( style.GetSmoothEdge() );
+  }
+  else
+  {
+    mTextAttachment->ResetSmoothEdge();
+  }
 
   // Outline
-  SetOutline( style.GetOutline(), style.GetOutlineColor(), style.GetOutlineThickness() );
+  if( !style.IsOutlineDefault() )
+  {
+    SetOutline( style.IsOutlineEnabled(), style.GetOutlineColor(), style.GetOutlineThickness() );
+  }
+  else
+  {
+    mTextAttachment->ResetOutline();
+  }
 
   // Weight
-  SetWeight( style.GetWeight() );
+  if( !style.IsFontWeightDefault() )
+  {
+    SetWeight( style.GetWeight() );
+  }
+  else
+  {
+    mTextAttachment->ResetWeight();
+  }
+
+  //Gradient
+  if( !style.IsGradientDefault() )
+  {
+    if( style.IsGradientEnabled() )
+    {
+      SetGradient( style.GetGradientColor(), style.GetGradientStartPoint(), style.GetGradientEndPoint() );
+    }
+    else
+    {
+      SetGradient( TextStyle::DEFAULT_GRADIENT_COLOR, TextStyle::DEFAULT_GRADIENT_START_POINT, TextStyle::DEFAULT_GRADIENT_END_POINT );
+    }
+  }
+  else
+  {
+    mTextAttachment->ResetGradient();
+  }
 }
 
 TextStyle TextActor::GetTextStyle() const
 {
-  // Reset to default values.
   TextStyle textStyle;
-
-  // Font parameters.
-  const Font& font = mTextAttachment->GetFont();
-
-  if( !font.IsDefaultSystemFont() )
-  {
-    textStyle.SetFontName( font.GetName() );
-    textStyle.SetFontStyle( font.GetStyle() );
-  }
-
-  if( !font.IsDefaultSystemSize() )
-  {
-    textStyle.SetFontPointSize( PointSize( font.GetPointSize() ) );
-  }
-
-  // Color.
-  textStyle.SetTextColor( GetTextColor() );
-
-  // Italics
-  textStyle.SetItalics( Radian( 0.f ) != GetItalics() );
-  textStyle.SetItalicsAngle( Degree( GetItalics() ) );
-
-  // Underline
-  textStyle.SetUnderline( GetUnderline() );
-  textStyle.SetUnderlinePosition( GetUnderlinePosition() );
-  textStyle.SetUnderlineThickness( GetUnderlineThickness() );
-
-  // Shadow
-  Vector4 shadowColor;
-  Vector2 shadowOffset;
-  float shadowSize;
-  mTextAttachment->GetShadowParams( shadowColor, shadowOffset, shadowSize );
-  textStyle.SetShadow( mTextAttachment->GetShadow(), shadowColor, shadowOffset, shadowSize );
-
-  // Glow
-  Vector4 glowColor;
-  float glowOffset(0.0f);
-  mTextAttachment->GetGlowParams( glowColor, glowOffset );
-  textStyle.SetGlow( mTextAttachment->GetGlow(), glowColor, glowOffset );
-
-  // Soft Smooth edge.
-  textStyle.SetSmoothEdge( mTextAttachment->GetSmoothEdge() );
-
-  // Outline
-  Vector4 outlineColor;
-  Vector2 outlineOffset;
-  mTextAttachment->GetOutlineParams( outlineColor, outlineOffset );
-  textStyle.SetOutline( mTextAttachment->GetOutline(), outlineColor, outlineOffset );
-
-  // Weight
-  textStyle.SetWeight( mTextAttachment->GetWeight() );
+  mTextAttachment->GetTextStyle( textStyle );
 
   return textStyle;
 }
@@ -510,39 +538,44 @@ Vector4 TextActor::GetTextColor() const
   return mTextAttachment->GetTextColor();
 }
 
-void TextActor::SetSmoothEdge(const float smoothEdge)
+void TextActor::SetSmoothEdge( float smoothEdge )
 {
   mTextAttachment->SetSmoothEdge(smoothEdge);
 }
 
-void TextActor::SetOutline(const bool enable, const Vector4& color, const Vector2& offset)
+void TextActor::SetOutline( bool enable, const Vector4& color, const Vector2& offset )
 {
   mTextAttachment->SetOutline(enable, color, offset);
 }
 
-void TextActor::SetGlow(const bool enable, const Vector4& color, const float intensity)
+void TextActor::SetGlow( bool enable, const Vector4& color, float intensity )
 {
   mTextAttachment->SetGlow(enable, color, intensity);
 }
 
-void TextActor::SetShadow(const bool enable, const Vector4& color, const Vector2& offset, const float size)
+void TextActor::SetShadow( bool enable, const Vector4& color, const Vector2& offset, float size )
 {
   mTextAttachment->SetShadow(enable, color, offset, size);
 }
 
-void TextActor::SetItalics( const Radian& angle )
+void TextActor::SetItalics( Radian angle )
 {
   mTextAttachment->SetItalics( angle );
 
   TextChanged();
 }
 
-const Radian& TextActor::GetItalics() const
+bool TextActor::GetItalics() const
 {
   return mTextAttachment->GetItalics();
 }
 
-void TextActor::SetUnderline( const bool enable, float thickness, float position )
+Radian TextActor::GetItalicsAngle() const
+{
+  return mTextAttachment->GetItalicsAngle();
+}
+
+void TextActor::SetUnderline( bool enable, float thickness, float position )
 {
   mTextAttachment->SetUnderline( enable, thickness, position );
 
@@ -906,17 +939,17 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
       }
       case Dali::TextActor::GRADIENT_COLOR:
       {
-        mTextAttachment->SetGradientColor( propertyValue.Get<Vector4>() );
+        mTextAttachment->SetGradient( propertyValue.Get<Vector4>(), mTextAttachment->GetGradientStartPoint(), mTextAttachment->GetGradientEndPoint() );
         break;
       }
       case Dali::TextActor::GRADIENT_START_POINT:
       {
-        mTextAttachment->SetGradientStartPoint( propertyValue.Get<Vector2>() );
+        mTextAttachment->SetGradient( mTextAttachment->GetGradientColor(), propertyValue.Get<Vector2>(), mTextAttachment->GetGradientEndPoint() );
         break;
       }
       case Dali::TextActor::GRADIENT_END_POINT:
       {
-        mTextAttachment->SetGradientEndPoint( propertyValue.Get<Vector2>() );
+        mTextAttachment->SetGradient( mTextAttachment->GetGradientColor(), mTextAttachment->GetGradientStartPoint(), propertyValue.Get<Vector2>() );
         break;
       }
       case Dali::TextActor::TEXT_COLOR:

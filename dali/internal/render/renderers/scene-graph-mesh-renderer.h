@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_SCENE_GRAPH_MESH_RENDERER_H__
 #define __DALI_INTERNAL_SCENE_GRAPH_MESH_RENDERER_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/owner-pointer.h>
@@ -120,9 +121,19 @@ private:
   virtual bool CheckResources();
 
   /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::ResolveGeometryTypes()
+   */
+  virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType );
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::Renderer::IsOutsideClipSpace()
+   */
+  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix );
+
+  /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoRender()
    */
-  virtual void DoRender( BufferIndex bufferIndex, const Matrix& modelViewMatrix, const Matrix& modelMatrix, const Matrix& viewMatrix, const Matrix& projectionMatrix, const Vector4& color );
+  virtual void DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
 
   /**
    * Apply the view matrix to the bone transforms, and generate inverse transforms (for normal

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/render/common/render-instruction.h>
@@ -31,13 +32,13 @@ namespace SceneGraph
 {
 
 RenderInstruction::RenderInstruction()
-: mViewMatrix( 0 ),
-  mProjectionMatrix( 0 ),
-  mRenderTracker( NULL ),
+: mRenderTracker( NULL ),
   mClearColor(),
   mIsViewportSet( false ),
   mIsClearColorSet( false ),
+  mCullMode(false),
   mOffscreenTextureId( 0 ),
+  mCameraAttachment( 0 ),
   mNextFreeRenderList( 0 )
 {
   // reserve 6 lists, which is enough for three layers with opaque and transparent things on
@@ -96,18 +97,17 @@ const RenderList* RenderInstruction::GetRenderList( RenderListContainer::SizeTyp
   return mRenderLists[ index ];
 }
 
-void RenderInstruction::Reset( const Matrix*   viewMatrix,
-                               const Matrix*   projectionMatrix,
-                               unsigned int    offscreenTextureId,
-                               const Viewport* viewport,
-                               const Vector4*  clearColor )
+void RenderInstruction::Reset( CameraAttachment* cameraAttachment,
+                               unsigned int      offscreenTextureId,
+                               const Viewport*   viewport,
+                               const Vector4*    clearColor )
 {
-  mViewMatrix = viewMatrix;
-  mProjectionMatrix = projectionMatrix;
+  mCameraAttachment = cameraAttachment;
   mViewport = viewport ? *viewport : Viewport();
   mIsViewportSet = NULL != viewport;
   mClearColor = clearColor ? *clearColor : Color::BLACK;
   mIsClearColorSet = NULL != clearColor;
+  mCullMode = false;
   mOffscreenTextureId = offscreenTextureId;
   mRenderTracker = NULL;
   mNextFreeRenderList = 0;

@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/event/animation/key-frames-impl.h>
@@ -49,6 +50,9 @@ void KeyFrames::CreateKeyFramesSpec(Property::Type type)
       break;
     case Property::FLOAT:
       mKeyFrames = Internal::KeyFrameNumber::New();
+      break;
+    case Property::INTEGER:
+      mKeyFrames = Internal::KeyFrameInteger::New();
       break;
     case Property::VECTOR2:
       mKeyFrames = Internal::KeyFrameVector2::New();
@@ -97,6 +101,12 @@ void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)
     {
       Internal::KeyFrameNumber* kf = static_cast<Internal::KeyFrameNumber*>(mKeyFrames.Get());
       kf->AddKeyFrame(time, value.Get<float>(), alpha);
+      break;
+    }
+    case Property::INTEGER:
+    {
+      Internal::KeyFrameInteger* kf = static_cast<Internal::KeyFrameInteger*>(mKeyFrames.Get());
+      kf->AddKeyFrame(time, value.Get<int>(), alpha);
       break;
     }
     case Property::VECTOR2:

@@ -1,23 +1,24 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
@@ -349,14 +350,14 @@ int UtcDaliCameraActorSetType01(void)
   tet_infoline("Testing Dali::CameraActor Get/Set Type");
 
   CameraActor actor = CameraActor::New();
-  DALI_TEST_EQUALS( actor.GetType(), Dali::Camera::LOOK_AT_TARGET, TEST_LOCATION );
-
-  actor.SetType(Dali::Camera::FREE_LOOK);
   DALI_TEST_EQUALS( actor.GetType(), Dali::Camera::FREE_LOOK, TEST_LOCATION );
+
+  actor.SetType(Dali::Camera::LOOK_AT_TARGET);
+  DALI_TEST_EQUALS( actor.GetType(), Dali::Camera::LOOK_AT_TARGET, TEST_LOCATION );
 
   std::string sValue;
   actor.GetProperty(CameraActor::TYPE).Get(sValue);
-  std::string result("FREE_LOOK");
+  std::string result("LOOK_AT_TARGET");
   DALI_TEST_EQUALS(result, sValue, TEST_LOCATION);
   END_TEST;
 }

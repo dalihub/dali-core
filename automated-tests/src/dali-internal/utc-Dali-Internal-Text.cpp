@@ -1,23 +1,24 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 #include <iostream>
 
 #include <stdlib.h>
-#include <dali/dali.h>
+#include <dali/public-api/dali-core.h>
 #include <dali/integration-api/glyph-set.h>
 #include <dali-test-suite-utils.h>
 
@@ -37,8 +38,24 @@ void utc_dali_internal_text_cleanup()
   test_return_value = TET_PASS;
 }
 
+int UtcDaliTextGetImplementation01(void)
+{
+  TestApplication application;
 
-int UtcDaliTextGetImplementation(void)
+  Text text( std::string( "Hello world" ) );
+
+  const Internal::Text& textImpl1 = text.GetImplementation();
+
+  DALI_TEST_CHECK( NULL != &textImpl1 );
+
+  Internal::Text& textImpl2 = text.GetImplementation();
+
+  DALI_TEST_CHECK( NULL != &textImpl2 );
+
+  END_TEST;
+}
+
+int UtcDaliTextGetImplementation02(void)
 {
   TestApplication application;
 
@@ -81,5 +98,16 @@ int UtcDaliTextGetImplementation(void)
   {
     tet_result( TET_FAIL );
   }
+  END_TEST;
+}
+
+int UtcDaliTextGetTextArray(void)
+{
+  TestApplication application;
+
+  Text text( std::string( "Hello world" ) );
+
+  DALI_TEST_EQUALS( text.GetImplementation().GetTextArray().size(), 11u, TEST_LOCATION );
+
   END_TEST;
 }

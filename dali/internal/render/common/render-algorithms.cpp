@@ -1,18 +1,19 @@
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // CLASS HEADER
 #include <dali/internal/render/common/render-algorithms.h>
@@ -46,13 +47,15 @@ namespace Render
  * @param[in] frameTime The elapsed time between the last two updates.
  * @param[in] viewMatrix The view matrix from the appropriate camera.
  * @param[in] projectionMatrix The projection matrix from the appropriate camera.
+ * @param[in] cullMode True if the renderers should be subjected to clipspace culling
  */
 inline void ProcessRenderList( const RenderList& renderList,
                                Context& context,
                                BufferIndex bufferIndex,
                                float frameTime,
                                const Matrix& viewMatrix,
-                               const Matrix& projectionMatrix )
+                               const Matrix& projectionMatrix,
+                               bool cullMode )
 {
   DALI_PRINT_RENDER_LIST( renderList );
 
@@ -113,7 +116,7 @@ inline void ProcessRenderList( const RenderList& renderList,
     SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( item.GetRenderer() );
     const Matrix& modelViewMatrix = item.GetModelViewMatrix();
 
-    renderer->Render( bufferIndex, modelViewMatrix, viewMatrix, projectionMatrix, frameTime );
+    renderer->Render( bufferIndex, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode );
   }
 }
 
@@ -122,10 +125,10 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
                                BufferIndex bufferIndex,
                                float frameTime )
 {
-  DALI_PRINT_RENDER_INSTRUCTION( instruction );
+  DALI_PRINT_RENDER_INSTRUCTION( instruction, bufferIndex );
 
-  const Matrix* viewMatrix       = instruction.mViewMatrix;
-  const Matrix* projectionMatrix = instruction.mProjectionMatrix;
+  const Matrix* viewMatrix       = instruction.GetViewMatrix( bufferIndex );
+  const Matrix* projectionMatrix = instruction.GetProjectionMatrix( bufferIndex );
 
   DALI_ASSERT_DEBUG( NULL != viewMatrix );
   DALI_ASSERT_DEBUG( NULL != projectionMatrix );
@@ -141,7 +144,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       if(  renderList &&
           !renderList->IsEmpty() )
       {
-        ProcessRenderList( *renderList, context, bufferIndex, frameTime, *viewMatrix, *projectionMatrix );
+        ProcessRenderList( *renderList, context, bufferIndex, frameTime, *viewMatrix, *projectionMatrix, instruction.mCullMode );
       }
     }
   }

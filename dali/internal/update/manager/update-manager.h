@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H__
 #define __DALI_INTERNAL_SCENE_GRAPH_UPDATE_MANAGER_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -302,9 +303,10 @@ public:
    * @param[in] geometryType  The GeometryType to map to the program
    * @param[in] subType       The program subtype
    * @param[in] resourceId    A ResourceManager ticket ID for the program data (source and compiled binary)
-   * @param[in] shaderHash  hash key created with vertex and fragment shader code
+   * @param[in] shaderHash    hash key created with vertex and fragment shader code
+   * @param[in] fixed         True if the vertex shader doesn't alter vertices
    */
-  void SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, Integration::ResourceId resourceId, size_t shaderHash );
+  void SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, Integration::ResourceId resourceId, size_t shaderHash, bool fixed );
 
   /**
    * Add an animatable mesh
@@ -392,7 +394,7 @@ public:
    * @param[in] worldSettings The dynamics world settings
    * @param[in] debugShader The shader used for rendering dynamics debug information
    */
-  void InitializeDynamicsWorld( DynamicsWorld* world, Integration::DynamicsWorldSettings* worldSettings, Shader* debugShader );
+  void InitializeDynamicsWorld( DynamicsWorld* world, Integration::DynamicsWorldSettings* worldSettings );
 
   /**
    * Terminate the dynamics world
@@ -714,15 +716,16 @@ inline void SetShaderProgramMessage( UpdateManager& manager,
                                      GeometryType geometryType,
                                      ShaderSubTypes subType,
                                      Integration::ResourceId resourceId,
-                                     size_t shaderHash )
+                                     size_t shaderHash,
+                                     bool fixed )
 {
-  typedef MessageValue5< UpdateManager, Shader*, GeometryType, ShaderSubTypes, Integration::ResourceId, size_t > LocalType;
+  typedef MessageValue6< UpdateManager, Shader*, GeometryType, ShaderSubTypes, Integration::ResourceId, size_t, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, geometryType, subType, resourceId, shaderHash );
+  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, geometryType, subType, resourceId, shaderHash, fixed );
 }
 
 // The render thread can safely change the AnimatableMesh
@@ -847,15 +850,15 @@ inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
 #ifdef DYNAMICS_SUPPORT
 
 // Dynamics messages
-inline void InitializeDynamicsWorldMessage(UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings, const Shader* debugShader)
+inline void InitializeDynamicsWorldMessage( UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings )
 {
-  typedef MessageValue3< UpdateManager, DynamicsWorld*, Integration::DynamicsWorldSettings*, Shader*> LocalType;
+  typedef MessageValue2< UpdateManager, DynamicsWorld*, Integration::DynamicsWorldSettings* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::InitializeDynamicsWorld, dynamicsworld, worldSettings, const_cast<Shader*>(debugShader) );
+  new (slot) LocalType( &manager, &UpdateManager::InitializeDynamicsWorld, dynamicsworld, worldSettings );
 }
 
 inline void TerminateDynamicsWorldMessage(UpdateManager& manager)

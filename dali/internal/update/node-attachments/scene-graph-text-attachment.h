@@ -1,21 +1,22 @@
 #ifndef __DALI_INTERNAL_SCENE_GRAPH_TEXT_ATTACHMENT_H__
 #define __DALI_INTERNAL_SCENE_GRAPH_TEXT_ATTACHMENT_H__
 
-//
-// Copyright (c) 2014 Samsung Electronics Co., Ltd.
-//
-// Licensed under the Flora License, Version 1.0 (the License);
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://floralicense.org/license/
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an AS IS BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
+/*
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/event-to-update.h>
@@ -82,25 +83,13 @@ public:
   void SetTextFontSize( BufferIndex updateBufferIndex, float pixelSize );
 
   /**
-   * Set the color associated with the gradient end point.
+   * Sets the gradient start point, the gradient end point and the color associated with the gradient end point.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] color The gradient color (end-point color)
+   * @param[in] startPoint The relative position of the gradient start point.
+   * @param[in] endPoint The relative position of the gradient end point.
    */
-  void SetGradientColor( BufferIndex updateBufferIndex, const Vector4& color );
-
-  /**
-   * Set the gradient start point.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] position The relative position of the gradient start point.
-   */
-  void SetGradientStartPoint( BufferIndex updateBufferIndex, const Vector2& position );
-
-  /**
-   * Set the gradient end point.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] position The relative position of the gradient end point.
-   */
-  void SetGradientEndPoint( BufferIndex updateBufferIndex, const Vector2& position );
+  void SetGradient( BufferIndex updateBufferIndex, const Vector4& color, const Vector2& startPoint, const Vector2& endPoint );
 
   /**
    * Set the text color.
@@ -234,37 +223,15 @@ inline void SetTextFontSizeMessage( EventToUpdate& eventToUpdate, const TextAtta
   new (slot) LocalType( &attachment, &TextAttachment::SetTextFontSize, pixelSize );
 }
 
-inline void SetGradientColorMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, const Vector4& color )
+inline void SetGradientMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
 {
-  typedef MessageDoubleBuffered1< TextAttachment, Vector4 > LocalType;
+  typedef MessageDoubleBuffered3< TextAttachment, Vector4, Vector2, Vector2 > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &TextAttachment::SetGradientColor, color );
-}
-
-inline void SetGradientStartPointMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, const Vector2& position )
-{
-  typedef MessageDoubleBuffered1< TextAttachment, Vector2 > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &TextAttachment::SetGradientStartPoint, position );
-}
-
-inline void SetGradientEndPointMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, const Vector2& position )
-{
-  typedef MessageDoubleBuffered1< TextAttachment, Vector2 > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &TextAttachment::SetGradientEndPoint, position );
+  new (slot) LocalType( &attachment, &TextAttachment::SetGradient, color, startPoint, endPoint );
 }
 
 inline void SetTextColorMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, const Vector4& color )
