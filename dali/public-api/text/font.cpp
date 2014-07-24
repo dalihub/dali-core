@@ -19,7 +19,9 @@
 #include <dali/public-api/text/font.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/text/character-impl.h>
 #include <dali/internal/event/text/font-impl.h>
+#include <dali/internal/event/text/text-impl.h>
 
 namespace Dali
 {
@@ -104,19 +106,9 @@ Font Font::DownCast( BaseHandle handle )
   return Font( dynamic_cast<Dali::Internal::Font*>(handle.GetObjectPtr()) );
 }
 
-const std::string Font::GetFamilyForText(const std::string& text)
-{
-  return Internal::Font::GetFamilyForText(text);
-}
-
 const std::string Font::GetFamilyForText(const Text& text)
 {
-  return Internal::Font::GetFamilyForText(text);
-}
-
-const std::string Font::GetFamilyForText(const Character& character)
-{
-  return Internal::Font::GetFamilyForText(character);
+  return Internal::Font::GetFamilyForText( Internal::GetTextArray( text ) );
 }
 
 Font::~Font()
@@ -137,64 +129,24 @@ std::vector<std::string> Font::GetInstalledFonts( FontListMode mode )
   return fontList;
 }
 
-float Font::MeasureTextWidth(const std::string& text, float textHeightPx) const
-{
-  return GetImplementation(*this).MeasureTextWidth(text, textHeightPx);
-}
-
 float Font::MeasureTextWidth(const Text& text, float textHeightPx) const
 {
-  return GetImplementation(*this).MeasureTextWidth(text, textHeightPx);
-}
-
-float Font::MeasureTextWidth(const Character& character, float textHeightPx) const
-{
-  return GetImplementation(*this).MeasureTextWidth(character, textHeightPx);
-}
-
-float Font::MeasureTextHeight(const std::string& text, float textWidthPx) const
-{
-  return GetImplementation(*this).MeasureTextHeight(text, textWidthPx);
+  return GetImplementation(*this).MeasureTextWidth( Internal::GetTextArray( text ), textHeightPx );
 }
 
 float Font::MeasureTextHeight(const Text& text, float textWidthPx) const
 {
-  return GetImplementation(*this).MeasureTextHeight(text, textWidthPx);
-}
-
-float Font::MeasureTextHeight(const Character& character, float textWidthPx) const
-{
-  return GetImplementation(*this).MeasureTextHeight(character, textWidthPx);
-}
-
-Vector3 Font::MeasureText(const std::string& text) const
-{
-  return GetImplementation(*this).MeasureText(text);
+  return GetImplementation(*this).MeasureTextHeight( Internal::GetTextArray( text ), textWidthPx );
 }
 
 Vector3 Font::MeasureText(const Text& text) const
 {
-  return GetImplementation(*this).MeasureText(text);
-}
-
-Vector3 Font::MeasureText(const Character& character) const
-{
-  return GetImplementation(*this).MeasureText(character);
-}
-
-bool Font::AllGlyphsSupported(const std::string& text) const
-{
-  return GetImplementation(*this).AllGlyphsSupported(text);
+  return GetImplementation(*this).MeasureText( Internal::GetTextArray( text ) );
 }
 
 bool Font::AllGlyphsSupported(const Text& text) const
 {
-  return GetImplementation(*this).AllGlyphsSupported(text);
-}
-
-bool Font::AllGlyphsSupported(const Character& character) const
-{
-  return GetImplementation(*this).AllGlyphsSupported(character);
+  return GetImplementation(*this).AllGlyphsSupported( Internal::GetTextArray( text ) );
 }
 
 float Font::GetLineHeight() const

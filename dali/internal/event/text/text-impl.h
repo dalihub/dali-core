@@ -146,6 +146,15 @@ private:
   TextArray mString; ///< Stores an array of unicodes.
 };
 
+/**
+ * @brief  Helper function to get the TextArray from a Dali::Text.
+ *
+ * @param[in] text A Dali::Text.
+ *
+ * @return The Text's TextArray.
+ */
+ const TextArray& GetTextArray( const Dali::Text& text );
+
 } // namespace Internal
 
 } // namespace Dali

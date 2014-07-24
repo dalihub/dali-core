@@ -274,11 +274,11 @@ void DebugVertexBuffer( VertexBuffer& buffer )
 
 } // unnamed namespace
 
-TextVertexBuffer* TextVertexGenerator::Generate(const TextArray& text,
-                           const TextFormat& format,
-                           const FontMetricsInterface& metrics,
-                           const AtlasUvInterface& uvInterface,
-                           const FontId fontId)
+TextVertexBuffer* TextVertexGenerator::Generate( const TextArray& text,
+                                                 const TextFormat& format,
+                                                 const FontMetricsInterface& metrics,
+                                                 const AtlasUvInterface& uvInterface,
+                                                 FontId fontId )
 
 {
   TextVertexBuffer* textVertexBuffer = new TextVertexBuffer;
@@ -307,12 +307,10 @@ TextVertexBuffer* TextVertexGenerator::Generate(const TextArray& text,
   const float padAdjustY( metrics.GetPadAdjustY() );
   const float tileWidth( metrics.GetMaxWidth() * scalar );
   const float tileHeight( metrics.GetMaxHeight() * scalar );
-  unsigned int textSize = text.size();
 
-  for (unsigned int i = 0; i < textSize; ++i)
+  for( TextArray::const_iterator it = text.begin(), endIt = text.end(); it != endIt; ++it )
   {
-    // buffer is always filled starting from the first vector position. However text characters are visited from left to right or from right to left.
-    uint32_t charIndex = text[ ( format.IsLeftToRight() ? i : ( textSize - 1 - i ) ) ];
+    const uint32_t charIndex = *it;
 
     glyph = metrics.GetGlyph( charIndex );
 

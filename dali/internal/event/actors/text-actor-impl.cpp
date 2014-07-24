@@ -19,6 +19,8 @@
 #include <dali/internal/event/actors/text-actor-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/text/text-actor-parameters.h>
 #include <dali/internal/event/actor-attachments/text-attachment-impl.h>
 #include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/text/font-impl.h>
@@ -27,7 +29,6 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/core-impl.h>
-#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
@@ -132,34 +133,12 @@ SignalConnectorType s1( mType, Dali::TextActor::SIGNAL_TEXT_LOADING_FINISHED, &T
 
 }
 
-TextActorPtr TextActor::New(const Dali::Text& text, bool fontDetection, bool isLeftToRight)
-{
-  Dali::Font font( Dali::Font::New() );
-  return New( text, fontDetection, isLeftToRight, GetImplementation( font ) );
-}
-
-TextActorPtr TextActor::New(const Dali::Text& text, bool fontDetection, bool isLeftToRight, Font& font )
+TextActorPtr TextActor::New( const TextArray& utfCodes, const TextActorParameters& parameters )
 {
   // first stage construction
-  TextActorPtr actor ( new TextActor( fontDetection, isLeftToRight ) );
+  TextActorPtr actor ( new TextActor( parameters.IsAutomaticFontDetectionEnabled() ) );
 
-  FontPointer fontPtr(&font);
-
-  // Second-phase construction
-  actor->Initialize();
-
-  //create the attachment
-  actor->mTextAttachment = TextAttachment::New( *actor->mNode, TextArray(), fontPtr, isLeftToRight);
-
-  actor->SetText( text );
-
-  return actor;
-}
-
-TextActorPtr TextActor::New(const Dali::Text& text, bool fontDetection, bool isLeftToRight, const Dali::TextStyle& style )
-{
-  // first stage construction
-  TextActorPtr actor ( new TextActor( fontDetection, isLeftToRight ) );
+  const TextStyle& style = parameters.GetTextStyle();
 
   FontPointer fontPtr( Font::New(style.GetFontName(), style.GetFontStyle(), style.GetFontPointSize() ) );
 
@@ -167,25 +146,24 @@ TextActorPtr TextActor::New(const Dali::Text& text, bool fontDetection, bool isL
   actor->Initialize();
 
   //create the attachment
-  actor->mTextAttachment = TextAttachment::New( *actor->mNode, TextArray(), fontPtr, isLeftToRight );
+  actor->mTextAttachment = TextAttachment::New( *actor->mNode, TextArray(), fontPtr );
 
   // Note: SetTextStyle() MUST be called before SetText(), to ensure
   //       that a single ResourceRequest for the glyphs is made. Calling
   //       them in the wrong order will issue two requests.
   actor->SetTextStyle( style, DONT_REQUEST_NEW_TEXT );
 
-  actor->SetText( text );
+  actor->SetText( utfCodes );
 
   return actor;
 }
 
-TextActor::TextActor(bool fontDetection, bool isLeftToRight)
+TextActor::TextActor(bool fontDetection)
 : RenderableActor(),
   mLoadingState(Dali::ResourceLoading),
   mUsingNaturalSize(true),
   mInternalSetSize(false),
   mFontDetection(fontDetection),
-  mIsLeftToRight(isLeftToRight),
   mObserving(false)
 {
 }
@@ -231,37 +209,9 @@ const std::string TextActor::GetText() const
   return text;
 }
 
-void TextActor::SetText(const std::string& text)
-{
-  TextArray utfCodes;
-
-  if( !text.empty() )
-  {
-    // minimize allocations for ascii strings
-    utfCodes.reserve(text.size());
-
-    // break string into UTF-8 tokens
-    UTF8Tokenize(reinterpret_cast<const unsigned char*>(text.c_str()), text.size(), utfCodes);
-  }
-
-  SetText(utfCodes);
-}
-
 Font* TextActor::GetFont() const
 {
   return &mTextAttachment->GetFont();
-}
-
-void TextActor::SetText(const Dali::Text& text)
-{
-  TextArray utfCodes;
-
-  if( !text.IsEmpty() )
-  {
-    utfCodes = text.GetImplementation().GetTextArray();
-  }
-
-  SetText( utfCodes );
 }
 
 void TextActor::SetToNaturalSize()
@@ -811,7 +761,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
     {
       case Dali::TextActor::TEXT:
       {
-        SetText(propertyValue.Get<std::string>());
+        SetText( GetTextArray( Dali::Text( propertyValue.Get<std::string>() ) ) );
         break;
       }
       case Dali::TextActor::FONT:

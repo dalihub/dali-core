@@ -113,6 +113,7 @@ public_api_src_files = \
   $(public_api_src_dir)/text/font.cpp \
   $(public_api_src_dir)/text/font-parameters.cpp \
   $(public_api_src_dir)/text/text.cpp \
+  $(public_api_src_dir)/text/text-actor-parameters.cpp \
   $(public_api_src_dir)/text/text-style.cpp \
   $(public_api_src_dir)/text/utf8.cpp
 
@@ -283,5 +284,6 @@ public_api_core_text_header_files = \
   $(public_api_src_dir)/text/font.h \
   $(public_api_src_dir)/text/font-parameters.h \
   $(public_api_src_dir)/text/text.h \
+  $(public_api_src_dir)/text/text-actor-parameters.h \
   $(public_api_src_dir)/text/text-style.h \
   $(public_api_src_dir)/text/utf8.h

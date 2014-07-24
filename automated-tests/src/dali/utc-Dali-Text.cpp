@@ -41,23 +41,31 @@ int UtcDaliTextConstructor(void)
 
   DALI_TEST_CHECK( text.IsEmpty() );
 
-  Text someText( std::string( "Some text" ) );
+  Text someEmptyText1( "" );
 
-  DALI_TEST_CHECK( !someText.IsEmpty() );
+  DALI_TEST_CHECK( someEmptyText1.IsEmpty() );
 
-  Text someEmptyText( std::string( "" ) );
-
-  DALI_TEST_CHECK( someEmptyText.IsEmpty() );
-
-  Text someText2( Text( std::string( "Some text" ) ) );
-
-  DALI_TEST_CHECK( !someText2.IsEmpty() );
-
-  Text someEmptyText2( text );
+  Text someEmptyText2( std::string( "" ) );
 
   DALI_TEST_CHECK( someEmptyText2.IsEmpty() );
 
-  Character c = someText[0];
+  Text someEmptyText3( text );
+
+  DALI_TEST_CHECK( someEmptyText3.IsEmpty() );
+
+  Text someText1( "Some text" );
+
+  DALI_TEST_CHECK( !someText1.IsEmpty() );
+
+  Text someText2( std::string( "Some text" ) );
+
+  DALI_TEST_CHECK( !someText2.IsEmpty() );
+
+  Text someText3( Text( std::string( "Some text" ) ) );
+
+  DALI_TEST_CHECK( !someText3.IsEmpty() );
+
+  Character c = someText1[0];
 
   Text cText( c );
 
@@ -114,7 +122,7 @@ int UtcDaliTextSetGetText(void)
 {
   TestApplication application;
 
-  const std::string someText( "Some text" );
+  const char* someText = "Some text";
   const std::string someText2( "Some text2" );
 
   Text text;
@@ -238,19 +246,23 @@ int UtcDaliTextAppend(void)
 
   Text text( std::string( "Some text") );
 
-  text.Append( std::string( "A" ) );
+  text.Append( "A" );
 
   DALI_TEST_CHECK( std::string( "Some textA" ) == text.GetText() );
+
+  text.Append( std::string( "B" ) );
+
+  DALI_TEST_CHECK( std::string( "Some textAB" ) == text.GetText() );
 
   Character c = text[0];
   text.Append( c );
 
-  DALI_TEST_CHECK( std::string( "Some textAS" ) == text.GetText() );
+  DALI_TEST_CHECK( std::string( "Some textABS" ) == text.GetText() );
 
-  Text text2( std::string("B") );
+  Text text2( std::string("C") );
   text.Append( text2 );
 
-  DALI_TEST_CHECK( std::string( "Some textASB" ) == text.GetText() );
+  DALI_TEST_CHECK( std::string( "Some textABSC" ) == text.GetText() );
 
   // append to a null text
 

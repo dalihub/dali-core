@@ -158,6 +158,7 @@
 
 #include <dali/public-api/text/font-parameters.h>
 #include <dali/public-api/text/font.h>
+#include <dali/public-api/text/text-actor-parameters.h>
 #include <dali/public-api/text/text-style.h>
 #include <dali/public-api/text/text.h>
 #include <dali/public-api/text/utf8.h>
