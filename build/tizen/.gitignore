@@ -1,6 +1,8 @@
 /gmon.out
 /aclocal.m4
 /autom4te.cache
+/ar-lib
+/compile
 /config.guess
 /config.log
 /config.status

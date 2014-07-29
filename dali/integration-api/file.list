@@ -35,6 +35,7 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/resource-cache.h \
    $(platform_abstraction_src_dir)/resource-declarations.h \
    $(platform_abstraction_src_dir)/gl-abstraction.h \
+   $(platform_abstraction_src_dir)/gl-defines.h \
    $(platform_abstraction_src_dir)/gl-sync-abstraction.h \
    $(platform_abstraction_src_dir)/gesture-manager.h \
    $(platform_abstraction_src_dir)/render-controller.h \

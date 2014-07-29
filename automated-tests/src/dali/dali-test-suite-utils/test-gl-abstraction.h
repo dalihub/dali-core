@@ -27,6 +27,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/gl-abstraction.h>
+#include <dali/integration-api/gl-defines.h>
 #include "test-trace-call-stack.h"
 
 namespace Dali

@@ -26,6 +26,7 @@
 #include <dali/internal/event/images/bitmap-compressed.h>
 #include <dali/internal/event/images/bitmap-external.h>
 #include <dali/integration-api/gl-abstraction.h>
+#include <dali/integration-api/gl-defines.h>
 
 namespace Dali
 {
