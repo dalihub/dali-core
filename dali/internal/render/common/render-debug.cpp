@@ -137,7 +137,7 @@ void PrintRendererCount( unsigned int frameCount, unsigned int rendererCount )
 {
   if( frameCount % 120 == 30 ) // Print every 2 seconds reg
   {
-    Debug::LogMessage( Debug::DebugInfo, "ImageRenderer Total # renderers: %u\n", rendererCount );
+    Debug::LogMessage( Debug::DebugInfo, "Renderer Total # renderers: %u\n", rendererCount );
   }
 }
 
@@ -145,7 +145,7 @@ void PrintCullCount( unsigned int frameCount, unsigned int culledCount )
 {
   if( frameCount % 120 == 30 ) // Print every 2 seconds reg
   {
-    Debug::LogMessage( Debug::DebugInfo, "ImageRenderer # Culled renderers: %u\n", culledCount );
+    Debug::LogMessage( Debug::DebugInfo, "Renderer # Culled renderers: %u\n", culledCount );
   }
 }
 

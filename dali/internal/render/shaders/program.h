@@ -136,10 +136,10 @@ public:
    *                        and optionally precompiled binary. If the binary is empty the program bytecode
    *                        is copied into it after compilation and linking)
    * @param [in] context    GL context
-   * @param [in] fixedVertices True if the vertex shader does not change verts
+   * @param [in] modifiesGeometry True if the shader modifies geometry
    * @return pointer to the program
    */
-  static Program* New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context, bool fixedVertices );
+  static Program* New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context, bool modifiesGeometry );
 
   /**
    * Takes this program into use
@@ -252,9 +252,9 @@ public:
   void GlContextDestroyed();
 
   /**
-   * @return true if this program does not change vertex position
+   * @return true if this program modifies geometry
    */
-  bool AreVerticesFixed();
+  bool ModifiesGeometry();
 
   /**
    * Set the projection matrix that has currently been sent
@@ -298,9 +298,9 @@ private: // Implementation
    * Constructor, private so no direct instantiation
    * @param[in] shaderData A pointer to a data structure containing the program source and binary
    * @param[in] context    The GL context state cache.
-   * @param[in] areVerticesFixed True if the vertex shader does not move vertices
+   * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
-  Program( Integration::ShaderData* shaderData, Context& context, bool areVerticesFixed );
+  Program( Integration::ShaderData* shaderData, Context& context, bool modifiesGeometry );
 
 public:
 
@@ -370,7 +370,7 @@ private:  // Data
   GLint mUniformCacheInt[ MAX_UNIFORM_CACHE_SIZE ];         ///< Value cache for uniforms of single int
   GLfloat mUniformCacheFloat[ MAX_UNIFORM_CACHE_SIZE ];     ///< Value cache for uniforms of single float
   GLfloat mUniformCacheFloat4[ MAX_UNIFORM_CACHE_SIZE ][4]; ///< Value cache for uniforms of four float
-  bool mAreVerticesFixed;  ///< True if the program does not change vertex position
+  bool mModifiesGeometry;  ///< True if the program changes geometry
 };
 
 } // namespace Internal

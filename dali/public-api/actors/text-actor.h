@@ -33,6 +33,7 @@
 namespace Dali DALI_IMPORT_API
 {
 
+struct TextActorParameters;
 class Font;
 
 namespace Internal DALI_INTERNAL
@@ -99,102 +100,21 @@ public:
   static TextActor New();
 
   /**
-   * @brief Create a TextActor object with LeftToRight text and font detection
+   * @brief Create a TextActor object with text, a default style and font detection.
    *
-   * @param [in] text          The text which will be displayed
-   * @return A handle to a newly allocated Dali resource.
+   * @param[in] text The text which will be displayed
    */
-  static TextActor New(const std::string& text);
+  static TextActor New( const Text& text );
 
   /**
-   * @copydoc New(const std::string& text)
-   */
-  static TextActor New(const Text& text);
-
-  /**
-   * @brief Create a TextActor object with LeftToRight text.
+   * @brief Create a TextActor object with text.
    *
-   * @param [in] text          The text which will be displayed
-   * @param [in] fontDetection Try to detect font in case text is not supported with current one.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static TextActor New(const std::string& text, bool fontDetection);
-
-  /**
-   * @copydoc New(const std::string& text, bool fontDetection)
-   */
-  static TextActor New(const Text& text, bool fontDetection);
-
-  /**
-   * @brief Create a TextActor object.
+   * The style and whether to automatically detect the font could be set in the parameters.
    *
-   * @param [in] text          The text which will be displayed
-   * @param [in] fontDetection Try to detect font in case text is not supported with current one.
-   * @param [in] isLeftToRight Text is displayed from left to right if true, otherwise from right to left.
-   * @return A handle to a newly allocated Dali resource.
+   * @param[in] text The text which will be displayed
+   * @param[in] parameters Text parameters.
    */
-  static TextActor New(const std::string& text, bool fontDetection, bool isLeftToRight);
-
-  /**
-   * @copydoc New(const std::string& text, bool fontDetection, bool isLeftToRight)
-   */
-  static TextActor New(const Text& text, bool fontDetection, bool isLeftToRight);
-
-  /**
-   * @brief Create a TextActor object with LeftToRight text and font detection.
-   *
-   * @param [in] text          The text which will be displayed
-   * @param [in] font          The font which will be used for the text
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static TextActor New(const std::string& text, Font font);
-
-  /**
-   * @copydoc New(const std::string& text, Font font)
-   */
-  static TextActor New(const Text& text, Font font);
-
-  /**
-   * @brief Create a TextActor object with LeftToRight text.
-   *
-   * @param [in] text          The text which will be displayed
-   * @param [in] font          The font which will be used for the text
-   * @param [in] fontDetection Try to detect font in case text is not supported with current one.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static TextActor New(const std::string& text, Font font, bool fontDetection);
-
-  /**
-   * @copydoc New(const std::string& text, Font font, bool fontDetection)
-   */
-  static TextActor New(const Text& text, Font font, bool fontDetection);
-
-  /**
-   * @brief Create a TextActor object.
-   *
-   * @param [in] text          The text which will be displayed
-   * @param [in] font          The font which will be used for the text
-   * @param [in] fontDetection Try to detect font in case text is not supported with current one.
-   * @param [in] isLeftToRight Text is displayed from left to right if true, otherwise from right to left.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static TextActor New(const std::string& text, Font font, bool fontDetection, bool isLeftToRight);
-
-  /**
-   * @copydoc New(const std::string& text, Font font, bool fontDetection, bool isLeftToRight)
-   */
-  static TextActor New(const Text& text, Font font, bool fontDetection, bool isLeftToRight);
-
-  /**
-   * @brief Create a TextActor object.
-   *
-   * @param [in] text          The text which will be displayed
-   * @param [in] style         The style which will be used for the text
-   * @param [in] fontDetection Try to detect font in case text is not supported with current one.
-   * @param [in] isLeftToRight Text is displayed from left to right if true, otherwise from right to left.
-   * @return A handle to a newly allocated Dali resource.
-   */
-  static TextActor New(const Text& text, const TextStyle& style, bool fontDetection, bool isLeftToRight);
+  static TextActor New( const Text& text, const TextActorParameters& parameters );
 
   /**
    * @brief Downcast an Object handle to TextActor.
@@ -231,11 +151,6 @@ public:
    *
    * @pre The text actor has been initialized.
    * @param [in] text The new text label
-   */
-  void SetText(const std::string& text);
-
-  /**
-   * @copydoc  SetText(const std::string& text)
    */
   void SetText(const Text& text);
 

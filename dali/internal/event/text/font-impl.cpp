@@ -51,18 +51,6 @@ const float POINT_TO_INCHES( 1.f / INCH_TO_POINTS );
 
 const char * const DALI_DEFAULT_FONT_CACHE_PATH( DALI_GLYPH_CACHE_DIR );
 
-TextArray ConvertStdStringToTextArray( const std::string& text )
-{
-  TextArray utfCodes;
-
-  // minimize allocations for ascii strings
-  utfCodes.reserve(text.size());
-
-  // break string into UTF-8 tokens
-  UTF8Tokenize(reinterpret_cast<const unsigned char*>(text.c_str()), text.size(), utfCodes);
-  return utfCodes;
-}
-
 const float MINIMUM_TEXT_SIZE = 1.0f;     // Text will not be drawn if it's less than this size in pixels
 
 } // unnamed namespace
@@ -89,26 +77,6 @@ Font* Font::New(const std::string& fontFamily, const std::string& fontStyle, flo
 bool Font::operator==( const Font& font ) const
 {
   return ( font.GetResourceId() == GetResourceId() ) && ( fabsf( font.GetPointSize() - GetPointSize() ) < Math::MACHINE_EPSILON_1000 );
-}
-
-const std::string Font::GetFamilyForText(const std::string& text)
-{
-  const TextArray utf8codes( ConvertStdStringToTextArray( text ) );
-
-  return GetFamilyForText( utf8codes );
-}
-
-const std::string Font::GetFamilyForText(const Dali::Text& text)
-{
-  return GetFamilyForText( text.IsEmpty() ? TextArray() : text.GetImplementation().GetTextArray() );
-}
-
-const std::string Font::GetFamilyForText(const Dali::Character& character)
-{
-  TextArray utfCodes;
-  utfCodes.push_back( character.GetImplementation().GetCharacter() );
-
-  return GetFamilyForText(utfCodes);
 }
 
 const std::string Font::GetFamilyForText(const TextArray& text)
@@ -165,26 +133,6 @@ void Font::GetInstalledFonts( Dali::Font::FontListMode mode, std::vector<std::st
   platform.GetFontList( listMode, fontList );
 }
 
-bool Font::AllGlyphsSupported(const std::string& text) const
-{
-  const TextArray utf8codes( ConvertStdStringToTextArray( text ) );
-
-  return AllGlyphsSupported( utf8codes );
-}
-
-bool Font::AllGlyphsSupported(const Dali::Text& text) const
-{
-  return AllGlyphsSupported( text.IsEmpty() ? TextArray() : text.GetImplementation().GetTextArray() );
-}
-
-bool Font::AllGlyphsSupported(const Dali::Character& character) const
-{
-  TextArray utfCodes;
-  utfCodes.push_back(character.GetImplementation().GetCharacter());
-
-  return AllGlyphsSupported(utfCodes);
-}
-
 bool Font::AllGlyphsSupported(const TextArray& text) const
 {
   // this is a synchronous request
@@ -194,26 +142,6 @@ bool Font::AllGlyphsSupported(const TextArray& text) const
 unsigned int Font::GetResourceId() const
 {
   return mMetrics->GetFontId();
-}
-
-float Font::MeasureTextWidth(const std::string& text, float textHeightPx) const
-{
-  TextArray utf8codes( ConvertStdStringToTextArray( text ) );
-
-  return MeasureTextWidth( utf8codes , textHeightPx);
-}
-
-float Font::MeasureTextWidth(const Dali::Text& text, float textHeightPx) const
-{
-  return ( text.IsEmpty() ? 0.f : MeasureTextWidth( text.GetImplementation().GetTextArray(), textHeightPx ) );
-}
-
-float Font::MeasureTextWidth(const Dali::Character& character, float textHeightPx) const
-{
-  TextArray utfCodes;
-  utfCodes.push_back( character.GetImplementation().GetCharacter() );
-
-  return MeasureTextWidth(utfCodes, textHeightPx);
 }
 
 float Font::MeasureTextWidth(const TextArray& text, float textHeightPx) const
@@ -231,26 +159,6 @@ float Font::MeasureTextWidth(const TextArray& text, float textHeightPx) const
   return width;
 }
 
-float Font::MeasureTextHeight(const std::string& text, float textHeightPx) const
-{
-  TextArray utf8codes( ConvertStdStringToTextArray( text ) );
-
-  return MeasureTextHeight(utf8codes, textHeightPx);
-}
-
-float Font::MeasureTextHeight(const Dali::Text& text, float textHeightPx) const
-{
-  return MeasureTextHeight( text.IsEmpty() ? TextArray() : text.GetImplementation().GetTextArray(), textHeightPx );
-}
-
-float Font::MeasureTextHeight(const Dali::Character& character, float textHeightPx) const
-{
-  TextArray utfCodes;
-  utfCodes.push_back(character.GetImplementation().GetCharacter());
-
-  return MeasureTextHeight(utfCodes, textHeightPx);
-}
-
 float Font::MeasureTextHeight(const TextArray& text, float textWidthPx) const
 {
   Vector3 size = MeasureText(text);
@@ -264,26 +172,6 @@ float Font::MeasureTextHeight(const TextArray& text, float textWidthPx) const
   float height = size.y * scale;
 
   return height;
-}
-
-Vector3 Font::MeasureText(const std::string& text) const
-{
-  TextArray utfCodes( ConvertStdStringToTextArray( text ) );
-
-  return MeasureText(utfCodes);
-}
-
-Vector3 Font::MeasureText(const Dali::Text& text) const
-{
-  return MeasureText( text.IsEmpty() ? TextArray() : text.GetImplementation().GetTextArray() );
-}
-
-Vector3 Font::MeasureText(const Dali::Character& character) const
-{
-  TextArray utfCodes;
-  utfCodes.push_back(character.GetImplementation().GetCharacter());
-
-  return MeasureText(utfCodes);
 }
 
 Vector3 Font::MeasureText(const TextArray& text) const

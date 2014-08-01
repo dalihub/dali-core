@@ -30,6 +30,11 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+static const TextArray VOID_TEXT_ARRAY; ///< A void text array to be used in the helper Internal::GetTextArray() function.
+} // namespace
+
 Text::Text()
 : mString()
 {
@@ -202,6 +207,16 @@ bool Text::IsNewLine( std::size_t index ) const
 const TextArray& Text::GetTextArray() const
 {
   return mString;
+}
+
+const TextArray& GetTextArray( const Dali::Text& text )
+{
+  if( text.IsEmpty() )
+  {
+    return VOID_TEXT_ARRAY;
+  }
+
+  return text.GetImplementation().GetTextArray();
 }
 
 } // namespace Internal

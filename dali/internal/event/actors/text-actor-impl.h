@@ -54,22 +54,10 @@ public:
   };
 
   /**
-   * @copydoc Dali::TextActor::New(const Dali::Text&,bool,bool)
+   * @see Dali::TextActor::New( const Text& text, const TextActorParameters& parameters )
    * @return A pointer to a new TextActor.
    */
-  static TextActorPtr New(const Dali::Text& text, bool fontDetection, bool isLeftToRight);
-
-  /**
-   * @copydoc Dali::TextActor::New(const Dali::Text&,Dali::Font,bool,bool)
-   * @return A pointer to a new TextActor.
-   */
-  static TextActorPtr New(const Dali::Text& text, bool fontDetection, bool isLeftToRight, Font& font);
-
-  /**
-   * @copydoc Dali::TextActor::New(const Text&,const TextStyle&,bool,bool)
-   * @return A pointer to a new TextActor.
-   */
-  static TextActorPtr New(const Dali::Text& text, bool fontDetection, bool isLeftToRight, const Dali::TextStyle& style );
+  static TextActorPtr New( const TextArray& utfCodes, const TextActorParameters& parameters );
 
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize
@@ -80,16 +68,6 @@ public:
    * @copydoc Dali::TextActor::GetText()
    */
   const std::string GetText() const;
-
-  /**
-   * @copydoc Dali::TextActor::SetText()
-   */
-  void SetText(const std::string& text);
-
-  /**
-   * @copydoc Dali::TextActor::SetText()
-   */
-  void SetText(const Dali::Text& text);
 
   /**
    * @copybrief Dali::TextActor::SetText(const std::string&)
@@ -271,7 +249,7 @@ protected:
   /**
    * Protected constructor; see also TextActor::New()
    */
-  TextActor(bool fontDetection, bool isLeftToRight );
+  TextActor(bool fontDetection);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -401,7 +379,6 @@ private:
   bool mUsingNaturalSize:1;  ///< whether the actor is using natural size
   bool mInternalSetSize:1;  ///< to determine when we are internally setting size
   bool mFontDetection:1;  ///< tells whether TextActor should query platform abstraction after SetText
-  bool mIsLeftToRight:1;  ///< tells whether text is displayed from left to right or from right to left
   bool mObserving:1;      ///< Whether the text actor is waiting for text to load
   static bool mFirstInstance;
   static DefaultPropertyLookup* mDefaultTextActorPropertyLookup; ///< Default properties

@@ -98,6 +98,12 @@ public:
   void SetCullFace( CullFaceMode mode );
 
   /**
+   * Set the sampler used to render the set texture.
+   * @param[in] samplerBitfield The packed sampler options used to render.
+   */
+  void SetSampler( unsigned int samplerBitfield );
+
+  /**
    * Query whether the derived type of Renderer requires depth testing.
    * @return True if the renderer requires depth testing.
    */
@@ -151,7 +157,7 @@ private:
   virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType ) = 0;
 
   /**
-   * Checks if renderer's is culled.
+   * Checks if renderer is culled.
    * @param[in] modelMatrix The model matrix.
    * @param[in] modelViewProjectionMatrix The MVP matrix.
    * @return \e true if it is. Otherwise \e false.
@@ -173,13 +179,13 @@ protected:
   Context* mContext;
   TextureCache* mTextureCache;
   Shader* mShader;
+  unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 
 private:
 
   BlendingOptions mBlendingOptions;
   bool mUseBlend:1;                 ///< True if blending should be enabled, 1 bit is enough
   CullFaceMode mCullFaceMode:3;     ///< cullface enum, 3 bits is enough
-
 };
 
 } // namespace SceneGraph

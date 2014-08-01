@@ -32,6 +32,7 @@
 #include <dali/public-api/actors/model-actor-factory.h>
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/actors/text-actor.h>
+#include <dali/public-api/actors/sampling.h>
 
 #include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/animation/active-constraint.h>
@@ -158,8 +159,11 @@
 
 #include <dali/public-api/text/font-parameters.h>
 #include <dali/public-api/text/font.h>
+#include <dali/public-api/text/text-actor-parameters.h>
 #include <dali/public-api/text/text-style.h>
 #include <dali/public-api/text/text.h>
 #include <dali/public-api/text/utf8.h>
+
+#include <dali/public-api/dali-core-version.h>
 
 #endif // __DALI_CORE_H__

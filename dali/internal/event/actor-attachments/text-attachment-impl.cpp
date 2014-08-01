@@ -31,7 +31,7 @@ namespace Dali
 namespace Internal
 {
 
-TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const TextArray& text, FontPointer font, bool isLeftToRight )
+TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const TextArray& text, FontPointer font )
 {
   StagePtr stage = Stage::GetCurrent();
 
@@ -41,7 +41,6 @@ TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const
 
   attachment->mFont = font;
   attachment->mText = text;
-  attachment->mIsLeftToRight = isLeftToRight;
 
   // Transfer object ownership of scene-object to message
   SceneGraph::TextAttachment* sceneObject = SceneGraph::TextAttachment::New();
@@ -60,7 +59,6 @@ TextAttachment::TextAttachment( Stage& stage )
 : RenderableAttachment( stage ),
   mTextRequestHelper( *this ),
   mTextColor( NULL ),
-  mIsLeftToRight(true),
   mTextChanged( true ),
   mFontChanged( true ),
   mUnderlineChanged( true ),
@@ -484,7 +482,6 @@ void TextAttachment::TextChanged()
   }
 
   TextFormat format( mStyle.IsUnderlineEnabled(),
-                     mIsLeftToRight,
                      mStyle.IsItalicsEnabled(),
                      Radian( mStyle.GetItalicsAngle() ),
                      mFont->GetPointSize(),

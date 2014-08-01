@@ -368,8 +368,6 @@ void FontMetrics::CheckMetricsLoaded()
   {
     // Create a new one
     WriteGlobalMetricsToCache();
-
-    DALI_LOG_ERROR("metrics cache corrupted or older version found. New cache created. \n");
   }
 
   mMetricsLoaded = true;

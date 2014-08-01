@@ -57,10 +57,9 @@ public:
    * @param[in] parentNode The node to attach a scene-object to.
    * @param [in] text The text which will be displayed.
    * @param [in] font The font which will be used for the text.
-   * @param [in] isLeftToRight Text is displayed from left to right if true, otherwise from right to left.
    * @return A smart-pointer to the newly allocated TextAttachment.
    */
-  static TextAttachmentPtr New( const SceneGraph::Node& parentNode, const TextArray& text, FontPointer font, bool isLeftToRight );
+  static TextAttachmentPtr New( const SceneGraph::Node& parentNode, const TextArray& text, FontPointer font );
 
   /**
    * Set the text label displayed by the attachment
@@ -392,7 +391,6 @@ private:
   // Cached values for public getters
   TextArray mText;
 
-  bool    mIsLeftToRight:1;     ///< whether the text is left to right
   bool    mTextChanged:1;       ///< whether the text has changed
   bool    mFontChanged:1;       ///< whether the font has changed
   bool    mUnderlineChanged:1;  ///< whether the underline has changed

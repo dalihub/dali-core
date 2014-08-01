@@ -32,6 +32,7 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/uniform-meta.h>
+#include <dali/internal/common/image-sampler.h>
 
 // See render-debug.h
 #ifdef DALI_PRINT_RENDER_INFO
@@ -181,9 +182,9 @@ void Shader::ForwardGridDensity( BufferIndex updateBufferIndex, float density )
   new (slot) DerivedType( this, &Shader::SetGridDensity, density );
 }
 
-void Shader::ForwardHints( BufferIndex updateBufferIndex, int hint )
+void Shader::ForwardHints( BufferIndex updateBufferIndex, Dali::ShaderEffect::GeometryHints hint )
 {
-  typedef MessageValue1< Shader, int > DerivedType;
+  typedef MessageValue1< Shader, Dali::ShaderEffect::GeometryHints > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue->ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
@@ -230,13 +231,13 @@ void Shader::SetProgram( GeometryType geometryType,
                          Integration::ResourceId resourceId,
                          Integration::ShaderDataPtr shaderData,
                          Context* context,
-                         bool areVerticesFixed )
+                         bool modifiesGeometry )
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d %d\n", (int)geometryType, resourceId);
 
   bool precompiledBinary = shaderData->HasBinary();
 
-  Program* program = Program::New( resourceId, shaderData.Get(), *context, areVerticesFixed );
+  Program* program = Program::New( resourceId, shaderData.Get(), *context, modifiesGeometry );
 
   ShaderSubTypes theSubType = subType;
   if( subType == SHADER_SUBTYPE_ALL )
@@ -317,6 +318,9 @@ void Shader::SetUniforms( Context& context,
   {
     // got effect texture, bind it to texture unit 1
     mTexture->Bind( GL_TEXTURE_2D, GL_TEXTURE1 );
+    // Just apply the default sampling options for now
+    mTexture->ApplySampler( ImageSampler::DefaultOptions() );
+
     // get effect sampler uniform
     const GLint loc = program.GetUniformLocation( Program::UNIFORM_EFFECT_SAMPLER );
     if( Program::UNIFORM_UNKNOWN != loc )

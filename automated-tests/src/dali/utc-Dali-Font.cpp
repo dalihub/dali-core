@@ -333,8 +333,7 @@ int UtcFontMeasureText(void)
   DALI_TEST_EQUALS(size.height, 7.5868f, Math::MACHINE_EPSILON_1000, TEST_LOCATION);
 
 
-  Text text = Text(std::string("t"))[0];
-  Character c = text[0];
+  Character c = Text(std::string("t"))[0];
   size = font.MeasureText(c);
 
   // character size is square
@@ -408,8 +407,7 @@ int UtcFontAllGlyphsSupported(void)
 
   application.GetPlatform().ResetTrace();
 
-  Text text = Text(std::string("t"))[0];
-  Character c = text[0];
+  Character c = Text(std::string("t"))[0];
   font.AllGlyphsSupported(c);
 
   DALI_TEST_CHECK(application.GetPlatform().WasCalled(TestPlatformAbstraction::AllGlyphsSupportedFunc));

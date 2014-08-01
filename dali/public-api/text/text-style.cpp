@@ -1188,26 +1188,6 @@ void TextStyle::SetItalics( bool enable, Degree angle )
   mContainer->SetItalics( enable, angle );
 }
 
-bool TextStyle::GetItalics() const
-{
-  // Deprecated.
-  return IsItalicsEnabled();
-}
-
-void TextStyle::SetItalics( bool italics )
-{
-  // Deprecated
-  CreateContainerJustInTime();
-  mContainer->SetItalics( italics, GetItalicsAngle() );
-}
-
-void TextStyle::SetItalicsAngle( Degree angle )
-{
-  // Deprecated
-  CreateContainerJustInTime();
-  mContainer->SetItalics( IsItalicsEnabled(), angle );
-}
-
 bool TextStyle::IsUnderlineEnabled() const
 {
   if ( mContainer )
@@ -1248,33 +1228,6 @@ void TextStyle::SetUnderline( bool enable, float thickness, float position )
 {
   CreateContainerJustInTime();
   mContainer->SetUnderline( enable, thickness, position );
-}
-
-bool TextStyle::GetUnderline() const
-{
-  // Deprecated
-  return IsUnderlineEnabled();
-}
-
-void TextStyle::SetUnderline( bool underline )
-{
-  // Deprecated
-  CreateContainerJustInTime();
-  mContainer->SetUnderline( underline, GetUnderlineThickness(), GetUnderlinePosition() );
-}
-
-void TextStyle::SetUnderlineThickness( float thickness )
-{
-  // Deprecated.
-  CreateContainerJustInTime();
-  mContainer->SetUnderline( IsUnderlineEnabled(), thickness, GetUnderlinePosition() );
-}
-
-void TextStyle::SetUnderlinePosition( float position )
-{
-  // Deprecated.
-  CreateContainerJustInTime();
-  mContainer->SetUnderline( IsUnderlineEnabled(), GetUnderlineThickness(), position );
 }
 
 bool TextStyle::IsShadowEnabled() const
@@ -1331,12 +1284,6 @@ void TextStyle::SetShadow( bool enabled, const Vector4& shadowColor, const Vecto
   mContainer->SetShadow( enabled, shadowColor, shadowOffset, shadowSize );
 }
 
-bool TextStyle::GetShadow() const
-{
-  // Deprecated
-  return IsShadowEnabled();
-}
-
 bool TextStyle::IsGlowEnabled() const
 {
   if ( mContainer )
@@ -1379,12 +1326,6 @@ void TextStyle::SetGlow( bool enabled, const Vector4& glowColor, float glowInten
   mContainer->SetGlow( enabled, glowColor, glowIntensity );
 }
 
-bool TextStyle::GetGlow() const
-{
-  // Deprecated
-  return IsGlowEnabled();
-}
-
 bool TextStyle::IsOutlineEnabled() const
 {
   if ( mContainer )
@@ -1425,12 +1366,6 @@ void TextStyle::SetOutline( bool enabled, const Vector4& outlineColor, const Vec
 {
   CreateContainerJustInTime();
   mContainer->SetOutline( enabled, outlineColor, outlineThickness );
-}
-
-bool TextStyle::GetOutline() const
-{
-  // Deprecated
-  return IsOutlineEnabled();
 }
 
 bool TextStyle::IsGradientEnabled() const

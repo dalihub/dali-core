@@ -22,6 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/blending.h>
+#include <dali/public-api/actors/sampling.h>
 
 namespace Dali DALI_IMPORT_API
 {
@@ -222,6 +223,29 @@ public:
    * @return The blend color.
    */
   const Vector4& GetBlendColor() const;
+
+  /**
+   * @brief Sets the filtering mode.
+   *
+   * Possible values are: FilterMode::NEAREST and FilterMode::LINEAR. Default is FilterMode::LINEAR.
+   *
+   * <ul>
+   *   <li> \e NEAREST Use nearest filtering
+   *   <li> \e LINEAR Use linear filtering
+   * </ul>
+   *
+   * @param[in] minFilter The minification filtering mode.
+   * @param[in] magFilter The magnification filtering mode.
+   */
+  void SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter );
+
+  /**
+   * @brief Retrieves the filtering mode.
+   *
+   * @param[out] minFilter The return minification value
+   * @param[out] magFilter The return magnification value
+   */
+  void GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter) const;
 
 public: // Not intended for application developers
 

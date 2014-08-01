@@ -34,8 +34,6 @@ namespace Dali
 namespace Internal
 {
 
-class ShaderFactory;
-
 namespace SceneGraph
 {
 class UpdateManager;
@@ -49,8 +47,13 @@ class UpdateManager;
 class ShaderEffect : public ProxyObject
 {
 public:
-
   typedef Dali::ShaderEffect::UniformCoordinateType UniformCoordinateType;
+
+  enum GeometryState
+  {
+    DOESNT_MODIFY_GEOMETRY,
+    MODIFIES_GEOMETRY
+  };
 
   /**
    * Create a new ShaderEffect with no programs
@@ -146,22 +149,17 @@ public:
    */
   const Dali::ShaderEffect::Extension& GetExtension() const;
 
-  enum FixedVertexShader
-  {
-    FLEXIBLE,
-    FIXED,
-  };
-
   /**
    * Add a GeometryType specific default program to this ShaderEffect
    * @param[in] geometryType    The GeometryType rendered by the shader program
    * @param[in] subType         The subtype, one of ShaderSubTypes.
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
+   * @param[in] modifiesGeometry True if the shader modifies geometry
    */
   void SetProgram( GeometryType geometryType, ShaderSubTypes subType,
                    const std::string& vertexSource, const std::string& fragmentSource,
-                   FixedVertexShader fixedVertexShader=FLEXIBLE);
+                   GeometryState modifiesGeometry );
 
   /**
    * Add a GeometryType specific default program to this ShaderEffect.
@@ -173,12 +171,12 @@ public:
    * @param[in] fragmentPrefix  The prefix source code for the fragment shader
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
-   * @param[in] fixedVertexShader True if this shader doesn't change the vertices
+   * @param[in] modifiesGeometry True if the shader modifies geometry
    */
   void SetProgram( GeometryType geometryType, ShaderSubTypes subType,
                    const std::string& vertexPrefix, const std::string& fragmentPrefix,
                    const std::string& vertexSource, const std::string& fragmentSource,
-                   FixedVertexShader fixedVertexShader=FLEXIBLE);
+                   GeometryState modifiesGeometry );
 
   /**
    * Notify ShaderEffect that it's being used by an Actor.
@@ -272,7 +270,7 @@ protected:
   /**
    * Protected constructor.
    */
-  ShaderEffect( SceneGraph::UpdateManager& updateManager, ShaderFactory& shaderFactory, SceneGraph::Shader& sceneObject );
+  ShaderEffect( SceneGraph::UpdateManager& updateManager, Dali::ShaderEffect::GeometryHints hints );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -285,24 +283,69 @@ private:
   ShaderEffect( const ShaderEffect& );
   ShaderEffect& operator=( const ShaderEffect& rhs );
 
-  void OnImageLoaded( Dali::Image image ); ///< just a helper for image loaded callback
+  /**
+   * Set the given program for all shader types set in the geometryType bitfield.
+   * @param[in] geometryType         A GeometryType bitfield
+   * @param[in] vertexShaderPrefix   The prefix source code for the vertex shader
+   * @param[in] vertexShader         The source code for the vertex shader
+   * @param[in] fragmentShaderPrefix The prefix source code for the fragment shader
+   * @param[in] fragmentShader       The source code for the fragment shader
+   */
+  void SetPrograms( GeometryType  geometryTypes,
+                    const std::string& vertexShaderPrefix,
+                    const std::string& vertexShader,
+                    const std::string& fragmentShaderPrefix,
+                    const std::string& fragmentShader );
+
+  /**
+   * Wrap the given prefix and body code around the predefined prefix source for the
+   * given geometry type. Specifying an empty string for the body code means that the
+   * predefined body code is used instead.
+   *
+   * @param[in] geometryType    The GeometryType rendered by the shader program
+   * @param[in] subType         The subtype, one of ShaderSubTypes.
+   * @param[in] vertexPrefix    The prefix source code for the vertex shader
+   * @param[in] fragmentPrefix  The prefix source code for the fragment shader
+   * @param[in] vertexSource    The source code for the vertex shader
+   * @param[in] fragmentSource  The source code for the fragment shader
+   */
+  void SetWrappedProgram( GeometryType geometryType, ShaderSubTypes subType,
+                          const std::string& vertexPrefix, const std::string& fragmentPrefix,
+                          const std::string& vertexSource, const std::string& fragmentSource );
+
+  /**
+   * Send shader program to scene-graph object.
+   * Uses the shader hints to determine whether the shader modifies geometry
+   * @param[in] geometryType    The GeometryType rendered by the shader program
+   * @param[in] subType         The subtype, one of ShaderSubTypes.
+   * @param[in] vertexSource    The source code for the vertex shader
+   * @param[in] fragmentSource  The source code for the fragment shader
+   */
+  void SetProgramImpl( GeometryType geometryType, ShaderSubTypes subType,
+                       const std::string& vertexSource, const std::string& fragmentSource );
+
+  /**
+   * Send shader program to scene-graph object.
+   * @param[in] geometryType    The GeometryType rendered by the shader program
+   * @param[in] subType         The subtype, one of ShaderSubTypes.
+   * @param[in] vertexSource    The source code for the vertex shader
+   * @param[in] fragmentSource  The source code for the fragment shader
+   * @param[in] modifiesGeometry True if the shader modifies geometry
+   */
+  void SetProgramImpl( GeometryType geometryType, ShaderSubTypes subType,
+                       const std::string& vertexSource, const std::string& fragmentSource,
+                       GeometryState modifiesGeometry );
 
 private: // Data
 
-  SceneGraph::UpdateManager& mUpdateManager;            ///< reference to the update manager
-  ShaderFactory& mShaderFactory;                        ///< reference to the shader factory
-
-  SceneGraph::Shader* mSceneObject;                     ///< pointer to the scene shader, should not be changed on this thread
-
-  Dali::Image mImage;                                   ///< Client-side handle for the effect image
-
-  CustomUniformMetaLookup mCustomMetadata;            ///< Used for accessing metadata for custom Shader properties
-
+  SceneGraph::UpdateManager& mUpdateManager;///< reference to the update manager
+  SceneGraph::Shader* mSceneObject;         ///< pointer to the scene shader, should not be changed on this thread
+  Dali::Image mImage;                       ///< Client-side handle for the effect image
+  CustomUniformMetaLookup mCustomMetadata;  ///< Used for accessing metadata for custom Shader properties
   IntrusivePtr<Dali::ShaderEffect::Extension> mExtension;
-
-  std::vector<ResourceTicketPtr>  mTickets;             ///< Collection of shader program tickets
-
-  unsigned int  mConnectionCount;                       ///< number of on-stage ImageActors using this shader effect
+  std::vector<ResourceTicketPtr>  mTickets; ///< Collection of shader program tickets
+  unsigned int  mConnectionCount;           ///< number of on-stage ImageActors using this shader effect
+  Dali::ShaderEffect::GeometryHints  mGeometryHints; ///< shader geometry hints for building the geometry
 
   // Default properties
   typedef std::map<std::string, Property::Index> DefaultPropertyLookup;

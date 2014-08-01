@@ -502,3 +502,178 @@ int UtcDaliRenderableActorCreateDestroy(void)
   delete ractor;
   END_TEST;
 }
+
+int UtcDaliRenderableActorSetGetFilterModes(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing Dali::RenderableActor::SetFilterMode() / Dali::RenderableActor::GetFilterMode()");
+
+  TextActor actor = TextActor::New(TestTextHelloWorld);
+
+  FilterMode::Type minifyFilter = FilterMode::NEAREST;
+  FilterMode::Type magnifyFilter = FilterMode::NEAREST;
+
+  // Default test
+  actor.GetFilterMode( minifyFilter, magnifyFilter );
+  DALI_TEST_CHECK( FilterMode::DEFAULT == minifyFilter );
+  DALI_TEST_CHECK( FilterMode::DEFAULT == magnifyFilter );
+
+  // Default/Default
+  actor.SetFilterMode( FilterMode::DEFAULT, FilterMode::DEFAULT );
+  actor.GetFilterMode( minifyFilter, magnifyFilter );
+  DALI_TEST_CHECK( FilterMode::DEFAULT == minifyFilter );
+  DALI_TEST_CHECK( FilterMode::DEFAULT == magnifyFilter );
+
+  // Nearest/Nearest
+  actor.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+  actor.GetFilterMode( minifyFilter, magnifyFilter );
+  DALI_TEST_CHECK( FilterMode::NEAREST == minifyFilter );
+  DALI_TEST_CHECK( FilterMode::NEAREST == magnifyFilter );
+
+  // Linear/Linear
+  actor.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+  actor.GetFilterMode( minifyFilter, magnifyFilter );
+  DALI_TEST_CHECK( FilterMode::LINEAR == minifyFilter );
+  DALI_TEST_CHECK( FilterMode::LINEAR == magnifyFilter );
+
+  // Nearest/Linear
+  actor.SetFilterMode( FilterMode::NEAREST, FilterMode::LINEAR );
+  actor.GetFilterMode( minifyFilter, magnifyFilter );
+  DALI_TEST_CHECK( FilterMode::NEAREST == minifyFilter );
+  DALI_TEST_CHECK( FilterMode::LINEAR == magnifyFilter );
+
+  // Linear/Nearest
+  actor.SetFilterMode( FilterMode::LINEAR, FilterMode::NEAREST );
+  actor.GetFilterMode( minifyFilter, magnifyFilter );
+  DALI_TEST_CHECK( FilterMode::LINEAR == minifyFilter );
+  DALI_TEST_CHECK( FilterMode::NEAREST == magnifyFilter );
+
+  END_TEST;
+}
+
+int UtcDaliRenderableActorSetFilterMode(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing Dali::RenderableActor::SetFilterMode()");
+
+  BitmapImage img = BitmapImage::New( 1,1 );
+  ImageActor actor = ImageActor::New( img );
+
+  actor.SetSize(100.0f, 100.0f);
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  actor.SetAnchorPoint(AnchorPoint::CENTER);
+
+  Stage::GetCurrent().Add(actor);
+
+  /**************************************************************/
+
+  // Default/Default
+  TraceCallStack& texParameterTrace = application.GetGlAbstraction().GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  actor.SetFilterMode( FilterMode::DEFAULT, FilterMode::DEFAULT );
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  std::stringstream out;
+
+  // Verify actor gl state
+
+  // The first one should be true as we don't want to use the GL default
+  // The second one should be false as we want to use the GL default, therefore the TexParameter function should not be called
+  // There are two calls to TexParameteri when the texture is first created
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3, TEST_LOCATION);
+
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(2, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+
+  // Nearest/Nearest
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  actor.SetFilterMode( FilterMode::NEAREST, FilterMode::NEAREST );
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2, TEST_LOCATION);
+
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_NEAREST;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(1, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+
+  // Linear/Linear
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  actor.SetFilterMode( FilterMode::LINEAR, FilterMode::LINEAR );
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2, TEST_LOCATION);
+
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_LINEAR;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(1, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+
+  /**************************************************************/
+
+  // Nearest/Linear
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  actor.SetFilterMode( FilterMode::NEAREST, FilterMode::LINEAR );
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2, TEST_LOCATION);
+
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_LINEAR;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(1, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+
+  Stage::GetCurrent().Remove(actor);
+
+  END_TEST;
+}

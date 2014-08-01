@@ -204,13 +204,6 @@ private:
   // Undefined
   ImageRenderer& operator=(const ImageRenderer& rhs);
 
-  /**
-   * @param modelMatrix
-   * @param modelViewProjectionMatrix
-   * @return true if the renderer is outside clip space and doesn't need rendering
-   */
-  bool IsOutsideClipSpaceImpl(const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix);
-
 private:
 
   Texture*    mTexture;

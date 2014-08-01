@@ -3,10 +3,6 @@
 #define USE_NORMALS
 #define MAX_BONES_PER_MESH  12
 
-  uniform   mediump mat4    uProjection;
-  uniform   mediump mat4    uModelView;
-  uniform   mediump mat4    uMvpMatrix;
-
 #ifdef USE_BONES
   uniform   int             uBoneCount;
   uniform   mediump mat4    uBoneMatrices[MAX_BONES_PER_MESH];
@@ -14,22 +10,6 @@
   attribute mediump vec4    aBoneWeights;
   attribute mediump vec4    aBoneIndices;
 #endif
-
-#ifdef USE_TEXTURES
-  uniform   bool            uTextureMapped;
-  uniform   mediump vec4    uCustomTextureCoords;
-  attribute mediump vec2    aTexCoord;
-  varying   mediump vec2    vTexCoord;
-#endif
-
-#ifdef USE_NORMALS
-  uniform   mat3            uModelViewIT;
-  attribute mediump vec3    aNormal;
-  varying   mediump vec3    vNormal;
-#endif
-
-  attribute mediump vec3    aPosition;
-  varying   mediump vec4    vVertex;
 
   void main()
   {
@@ -80,17 +60,6 @@
 </VertexShader>
 
 <FragmentShader>
-   precision mediump float;
-
-  struct Material
-  {
-    mediump float mOpacity;
-    mediump float mShininess;
-    lowp    vec4  mAmbient;
-    lowp    vec4  mDiffuse;
-    lowp    vec4  mSpecular;
-    lowp    vec4  mEmissive;
-  };
 
 #ifdef USE_LIGHTING
   struct Light
@@ -104,22 +73,10 @@
     lowp    vec3  mDiffuse;                   // diffuse component of the light's color
     lowp    vec3  mSpecular;                  // specular component of the light's color
   };
-#endif
 
-  uniform sampler2D     sTexture;
-  uniform sampler2D     sOpacityTexture;
-  uniform sampler2D     sNormalMapTexture;
-  varying mediump vec2  vTexCoord;
-  uniform Material      uMaterial;
-#ifdef USE_LIGHTING
   uniform         int   uNumberOfLights;
   uniform Light         uLight0;
-#endif
-  uniform lowp    vec4  uColor;
-  varying highp   vec4  vVertex;
-  varying highp   vec3  vNormal;
 
-#ifdef USE_LIGHTING
   lowp vec3 lightColor;
   lowp vec3 specularColor;
 

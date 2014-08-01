@@ -164,20 +164,7 @@ public:
    * @param [in] text displayed text
    * @return string containing a font name, or an empty string.
    */
-  static const std::string GetFamilyForText(const std::string& text);
-
-  /**
-   * @copydoc GetFamilyForText(const std::string& text)
-   */
   static const std::string GetFamilyForText(const Text& text);
-
-  /**
-   * @brief Try to detect font for character.
-   *
-   * @param [in] character displayed character
-   * @return string containing a font name, or an empty string.
-   */
-  static const std::string GetFamilyForText(const Character& character);
 
   /**
    * @brief Destructor
@@ -227,22 +214,7 @@ public:
    * @param [in] textHeightPx   The text height required
    * @return                    The displayed width in pixels
    */
-  float MeasureTextWidth(const std::string& text, float textHeightPx) const;
-
-  /**
-   * @copydoc MeasureTextWidth(const std::string& text, float textHeightPx) const
-   */
   float MeasureTextWidth(const Text& text, float textHeightPx) const;
-
-  /**
-   * @brief Returns the width of the area needed to display the character if the text is textHeightPx pixels high.
-   *
-   * Note that the character is not processed in any way before this calculation is performed (no stretching/scaling)
-   * @param [in] character      The character to measure
-   * @param [in] textHeightPx   The text height required
-   * @return                    The displayed width in pixels
-   */
-  float MeasureTextWidth(const Character& character, float textHeightPx) const;
 
   /**
    * @brief Returns the height of the area needed to display the text if the text is textWidthPx pixels wide.
@@ -252,22 +224,7 @@ public:
    * @param [in] textWidthPx    The text width required
    * @return                    The displayed height in pixels
    */
-  float MeasureTextHeight(const std::string& text, float textWidthPx) const;
-
-  /**
-   * @copydoc MeasureTextHeight(const std::string& text, float textWidthPx) const
-   */
   float MeasureTextHeight(const Text& text, float textWidthPx) const;
-
-  /**
-   * @brief Returns the height of the area needed to display the character if the text is textWidthPx pixels wide.
-   *
-   * Note that the character is not processed in any way before this calculation is performed (no stretching/scaling)
-   * @param [in] character      The character to measure
-   * @param [in] textWidthPx    The text width required
-   * @return                    The displayed height in pixels
-   */
-  float MeasureTextHeight(const Character& character, float textWidthPx) const;
 
   /**
    * @brief Measure the natural size of a text string, as displayed in this font.
@@ -275,20 +232,7 @@ public:
    * @param[in] text The text string to measure.
    * @return The natural size of the text.
    */
-  Vector3 MeasureText(const std::string& text) const;
-
-  /**
-   * @copydoc MeasureText(const std::string& text) const
-   */
   Vector3 MeasureText(const Text& text) const;
-
-  /**
-   * @brief Measure the natural size of a character, as displayed in this font.
-   *
-   * @param[in] character The character to measure.
-   * @return The natural size of the character.
-   */
-  Vector3 MeasureText(const Character& character) const;
 
   /**
    * @brief Tells whether text is supported with font.
@@ -296,22 +240,7 @@ public:
    * @param [in] text glyphs to test
    * @return true if the glyphs are all supported by the font
    */
-  bool AllGlyphsSupported(const std::string& text) const;
-
-  /**
-   * @copydoc AllGlyphsSupported(const std::string& text) const
-   * @param [in] text glyphs to test
-   * @return true if the glyphs are all supported by the font
-   */
   bool AllGlyphsSupported(const Text& text) const;
-
-  /**
-   * @brief Tells whether character is supported with font.
-   *
-   * @param [in] character The character to test
-   * @return true if the glyph is supported by the font
-   */
-  bool AllGlyphsSupported(const Character& character) const;
 
   /**
    * @brief Retrieves the line height.

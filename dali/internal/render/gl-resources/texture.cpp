@@ -26,12 +26,40 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/common/image-sampler.h>
 
 namespace Dali
 {
 
 namespace Internal
 {
+
+/**
+ * Convert a FilterMode to it's corresponding GL type.
+ *
+ * @param[in] filterMode The FilterMode type.
+ * @return Return the equivalent GL type.
+ */
+GLint FilterModeToGL( FilterMode::Type filterMode )
+{
+  switch( filterMode )
+  {
+    case FilterMode::NEAREST:
+    {
+      return GL_NEAREST;
+    }
+    case FilterMode::LINEAR:
+    {
+      return GL_LINEAR;
+    }
+    case FilterMode::DEFAULT:
+    {
+      // Do nothing
+    }
+  }
+
+  return GL_LINEAR;
+}
 
 using Dali::Internal::Vertex2D;
 using Dali::Internal::Vertex3D;
@@ -46,6 +74,7 @@ Texture::Texture(Context&      context,
                  Pixel::Format pixelFormat)
 : mContext(context),
   mId(0),
+  mSamplerBitfield( 0 ),
   mWidth(width),
   mHeight(height),
   mImageWidth(imageWidth),
@@ -210,6 +239,37 @@ void Texture::GetDefaultTextureCoordinates(UvRect& uv) const
   uv.u2 = uScale;
   uv.v2 = vScale;
 
+}
+
+void Texture::ApplySampler( unsigned int samplerBitfield )
+{
+  if( mSamplerBitfield != samplerBitfield )
+  {
+    // Only set the tex parameters if they have been set in the sampler bitfield
+    FilterMode::Type filterMode = ImageSampler::GetMinifyFilterMode( samplerBitfield );
+    if( filterMode != FilterMode::DEFAULT )
+    {
+      mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterModeToGL( filterMode ) );
+    }
+    else  // We don't want to use the GL default
+    {
+      // Reset to system default option
+      mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, FilterModeToGL( ImageSampler::GetMinifyFilterMode( ImageSampler::DefaultOptions() ) ) );
+    }
+
+    filterMode = ImageSampler::GetMagnifyFilterMode( samplerBitfield );
+    if( filterMode != FilterMode::DEFAULT )
+    {
+      mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, FilterModeToGL( filterMode ) );
+    }
+    else if( ImageSampler::IsMagnifyAssigned( mSamplerBitfield ) )   // We want to use the GL default
+    {
+      // Reset to system default option
+      mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, FilterModeToGL( ImageSampler::GetMagnifyFilterMode( ImageSampler::DefaultOptions() ) ) );
+    }
+
+    mSamplerBitfield = samplerBitfield;
+  }
 }
 
 } // namespace Internal

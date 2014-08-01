@@ -7,6 +7,7 @@ internal_src_files = \
   $(internal_src_dir)/common/internal-constants.cpp \
   $(internal_src_dir)/common/message-buffer.cpp \
   $(internal_src_dir)/common/text-parameters.cpp \
+  $(internal_src_dir)/common/image-sampler.cpp \
   \
   $(internal_src_dir)/event/actor-attachments/actor-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/camera-attachment-impl.cpp \
@@ -119,6 +120,7 @@ internal_src_files = \
   $(internal_src_dir)/event/text/resource/debug/glyph-resource-debug.cpp \
   $(internal_src_dir)/event/text/generator/text-vertex-generator.cpp \
   \
+  $(internal_src_dir)/render/common/culling-algorithms.cpp \
   $(internal_src_dir)/render/common/performance-monitor.cpp \
   $(internal_src_dir)/render/common/render-algorithms.cpp \
   $(internal_src_dir)/render/common/render-debug.cpp \
@@ -143,6 +145,7 @@ internal_src_files = \
   $(internal_src_dir)/render/renderers/scene-graph-image-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-mesh-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer.cpp \
+  $(internal_src_dir)/render/renderers/scene-graph-renderer-debug.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-text-renderer.cpp \
   $(internal_src_dir)/render/shaders/custom-uniform.cpp \
   $(internal_src_dir)/render/shaders/program.cpp \

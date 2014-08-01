@@ -95,13 +95,10 @@ int UtcDaliTextActorNew01(void)
 
   tet_infoline("Testing Dali::TextActor::New()");
 
-  TextActor actor = TextActor::New(TestTextHello);
+  TextActor actor = TextActor::New();
 
   DALI_TEST_CHECK(actor);
 
-  actor = TextActor::New(Text(std::string(TestTextHello)));
-
-  DALI_TEST_CHECK(actor);
   END_TEST;
 }
 
@@ -110,15 +107,24 @@ int UtcDaliTextActorNew02(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing Dali::TextActor::New()");
+  tet_infoline("Testing Dali::TextActor::New(const Text& text)");
 
-  TextActor actor = TextActor::New(TestTextHello, false);
+  TextActor actor1 = TextActor::New(TestTextHello);
 
-  DALI_TEST_CHECK(actor);
+  DALI_TEST_CHECK(actor1);
 
-  actor = TextActor::New(Text(std::string(TestTextHello)), false);
+  TextActor actor2 = TextActor::New(std::string(TestTextHello));
 
-  DALI_TEST_CHECK(actor);
+  DALI_TEST_CHECK(actor2);
+
+  TextActor actor3 = TextActor::New(Text(TestTextHello));
+
+  DALI_TEST_CHECK(actor3);
+
+  TextActor actor4 = TextActor::New(Text(std::string(TestTextHello)));
+
+  DALI_TEST_CHECK(actor4);
+
   END_TEST;
 }
 
@@ -126,90 +132,36 @@ int UtcDaliTextActorNew03(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing Dali::TextActor::New()");
+  tet_infoline("Testing Dali::TextActor::New(const Text& text, const TextActorParameters& parameters)");
 
-  TextActor actor = TextActor::New(TestTextHello, false, false);
+  TextActorParameters parameters;
 
-  DALI_TEST_CHECK(actor);
+  TextActor actor1 = TextActor::New(TestTextHello, parameters);
 
-  actor = TextActor::New(Text(std::string(TestTextHello)), false, false);
-
-  DALI_TEST_CHECK(actor);
-  END_TEST;
-}
-
-
-int UtcDaliTextActorNew04(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing Dali::TextActor::New()");
-
-  FontParameters parameters( "FreeSerif", "Book", PointSize(8) );
-  Font freeSerif = Font::New( parameters );
-
-  TextActor actor = TextActor::New(TestTextHello, freeSerif);
-
-  DALI_TEST_CHECK(actor);
-
-  actor = TextActor::New(Text(std::string(TestTextHello)), freeSerif);
-
-  DALI_TEST_CHECK(actor);
-  END_TEST;
-}
-
-int UtcDaliTextActorNew05(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing Dali::TextActor::New()");
-
-  FontParameters parameters( "FreeSerif", "Book", PointSize(8) );
-  Font freeSerif = Font::New( parameters );
-
-  TextActor actor = TextActor::New(TestTextHello, freeSerif, false);
-
-  DALI_TEST_CHECK(actor);
-
-  actor = TextActor::New(Text(std::string(TestTextHello)), freeSerif, false);
-
-  DALI_TEST_CHECK(actor);
-  END_TEST;
-}
-
-int UtcDaliTextActorNew06(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing Dali::TextActor::New()");
-
-  FontParameters parameters( "FreeSerif", "Book", PointSize(8) );
-  Font freeSerif = Font::New( parameters );
-
-  TextActor actor = TextActor::New(TestTextHello, freeSerif, false, false);
-
-  DALI_TEST_CHECK(actor);
-
-  actor = TextActor::New(Text(std::string(TestTextHello)), freeSerif, false, false);
-
-  DALI_TEST_CHECK(actor);
-  END_TEST;
-}
-
-int UtcDaliTextActorNew07(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing Dali::TextActor::New()");
+  DALI_TEST_CHECK(actor1);
+  DALI_TEST_CHECK(actor1.IsFontDetectionAutomatic());
 
   TextStyle style;
+  style.SetTextColor( Color::RED );
 
-  TextActor actor = TextActor::New(Text(TestTextHello), style, false, false);
+  parameters = TextActorParameters( style, TextActorParameters::FONT_DETECTION_OFF );
 
-  DALI_TEST_CHECK(actor);
+  TextActor actor2 = TextActor::New(std::string(TestTextHello), parameters);
+
+  DALI_TEST_CHECK(actor2);
+  DALI_TEST_CHECK(!actor2.IsFontDetectionAutomatic());
+  DALI_TEST_CHECK( style.GetTextColor() == actor2.GetTextStyle().GetTextColor());
+
+  TextActor actor3 = TextActor::New(Text(TestTextHello), parameters);
+
+  DALI_TEST_CHECK(actor3);
+
+  TextActor actor4 = TextActor::New(Text(std::string(TestTextHello)), parameters);
+
+  DALI_TEST_CHECK(actor4);
+
   END_TEST;
 }
-
 
 int UtcDaliTextActorDownCast(void)
 {

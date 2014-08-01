@@ -247,7 +247,7 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
 
   if( material.HasTexture() )
   {
-    material.BindTextures( program );
+    material.BindTextures( program, mSamplerBitfield );
   }
   // Always use UV's - may be being used for another purpose by a custom shader!
   texCoordLoc = program.GetAttribLocation(Program::ATTRIB_TEXCOORD);

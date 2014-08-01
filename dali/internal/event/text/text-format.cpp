@@ -29,7 +29,6 @@ namespace Internal
 
 TextFormat::TextFormat()
 : mUnderline(false),
-  mLeftToRight(false),
   mItalics(false),
   mItalicsAngle(0.0f),
   mPointSize(0.0f),
@@ -38,14 +37,12 @@ TextFormat::TextFormat()
 {}
 
 TextFormat::TextFormat( bool underline,
-                        bool leftToRight,
                         bool italics,
                         Dali::Radian italicsAngle,
                         float pointSize,
                         float underlineThickness,
                         float underlinePosition )
 : mUnderline( underline ),
-  mLeftToRight( leftToRight ),
   mItalics( italics ),
   mItalicsAngle( italicsAngle ),
   mPointSize( pointSize ),
@@ -56,7 +53,6 @@ TextFormat::TextFormat( bool underline,
 
 TextFormat::TextFormat( const TextFormat& rhs )
 : mUnderline( rhs.mUnderline ),
-  mLeftToRight( rhs.mLeftToRight ),
   mItalics( rhs.mItalics ),
   mItalicsAngle( rhs.mItalicsAngle ),
   mPointSize( rhs.mPointSize ),
@@ -68,7 +64,6 @@ TextFormat::TextFormat( const TextFormat& rhs )
 TextFormat& TextFormat::operator=( const TextFormat& rhs )
 {
   mUnderline = rhs.mUnderline;
-  mLeftToRight = rhs.mLeftToRight;
   mItalics = rhs.mItalics;
   mItalicsAngle = rhs.mItalicsAngle;
   mPointSize = rhs.mPointSize;
@@ -85,11 +80,6 @@ TextFormat::~TextFormat()
 bool TextFormat::IsUnderLined() const
 {
   return mUnderline;
-}
-
-bool TextFormat::IsLeftToRight() const
-{
-  return mLeftToRight;
 }
 
 bool TextFormat::IsItalic() const

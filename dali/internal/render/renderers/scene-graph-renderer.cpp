@@ -23,8 +23,10 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/render/shaders/program.h>
+#include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
 #include <dali/internal/render/renderers/render-data-provider.h>
 #include <dali/public-api/actors/blending.h>
+#include <dali/internal/common/image-sampler.h>
 
 namespace Dali
 {
@@ -34,6 +36,8 @@ namespace Internal
 
 namespace
 {
+
+
 static Matrix gModelViewProjectionMatrix( false ); ///< a shared matrix to calculate the MVP matrix, dont want to store it locally to reduce storage overhead
 static Matrix3 gNormalMatrix; ///< a shared matrix to calculate normal matrix, dont want to store it locally to reduce storage overhead
 
@@ -98,6 +102,7 @@ inline void SetMatrices( Program& program,
     program.SetUniformMatrix3fv( loc, 1, gNormalMatrix.AsFloat() );
   }
 }
+
 }
 
 namespace SceneGraph
@@ -139,6 +144,11 @@ void Renderer::SetCullFace( CullFaceMode mode )
   mCullFaceMode = mode;
 }
 
+void Renderer::SetSampler( unsigned int samplerBitfield )
+{
+  mSamplerBitfield = samplerBitfield;
+}
+
 void Renderer::Render( BufferIndex bufferIndex,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
@@ -168,8 +178,7 @@ void Renderer::Render( BufferIndex bufferIndex,
   Program& program = mShader->GetProgram( *mContext, geometryType, subType, programIndex );
 
   // Check culling (does not need the program to be in use)
-  bool areVerticesFixed = program.AreVerticesFixed();
-  if( cull && areVerticesFixed )
+  if( cull && ! program.ModifiesGeometry() )
   {
     if( IsOutsideClipSpace( modelMatrix, gModelViewProjectionMatrix ) )
     {
@@ -177,6 +186,7 @@ void Renderer::Render( BufferIndex bufferIndex,
       return;
     }
   }
+
   // Take the program into use so we can send uniforms to it
   program.Use();
 
@@ -234,8 +244,10 @@ void Renderer::Render( BufferIndex bufferIndex,
 Renderer::Renderer( RenderDataProvider& dataprovider )
 : mDataProvider( dataprovider ),
   mContext( NULL ),
+
   mTextureCache( NULL ),
   mShader( NULL ),
+  mSamplerBitfield( ImageSampler::DefaultOptions() ),
   mUseBlend( false ),
   mCullFaceMode( CullNone )
 {

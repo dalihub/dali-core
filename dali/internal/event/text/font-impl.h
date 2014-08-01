@@ -80,21 +80,6 @@ public:
    */
   bool operator==( const Font& font ) const;
 
- /**
-   * @copydoc Dali::Font::GetFamilyForText()
-   */
-  static const std::string GetFamilyForText(const std::string& text);
-
- /**
-   * @copydoc Dali::Font::GetFamilyForText()
-   */
-  static const std::string GetFamilyForText(const Dali::Text& text);
-
- /**
-   * @copydoc Dali::Font::GetFamilyForText()
-   */
-  static const std::string GetFamilyForText(const Dali::Character& text);
-
   /**
     * @copydoc Dali::Font::GetFamilyForText()
     */
@@ -113,21 +98,6 @@ public:
   /**
    * @copydoc Dali::Font::AllGlyphsSupported()
    */
-  bool AllGlyphsSupported(const std::string& text) const;
-
-  /**
-   * @copydoc Dali::Font::AllGlyphsSupported()
-   */
-  bool AllGlyphsSupported(const Dali::Text& text) const;
-
-  /**
-   * @copydoc Dali::Font::AllGlyphsSupported(const Character& character) const
-   */
-  bool AllGlyphsSupported(const Dali::Character& character) const;
-
-  /**
-   * @copydoc Dali::Font::AllGlyphsSupported()
-   */
   bool AllGlyphsSupported(const TextArray& text) const;
 
   /**
@@ -139,57 +109,12 @@ public:
   /**
    * @copydoc Dali::Font::MeasureTextWidth()
    */
-  float MeasureTextWidth(const std::string& text, float textHeightPx) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureTextWidth()
-   */
-  float MeasureTextWidth(const Dali::Text& text, float textHeightPx) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureTextWidth(const Character& character, float textWidthPx) const
-   */
-  float MeasureTextWidth(const Dali::Character& character, float textHeightPx) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureTextWidth()
-   */
   float MeasureTextWidth(const TextArray& text, float textHeightPx) const;
 
   /**
    * @copydoc Dali::Font::MeasureTextHeight()
    */
-  float MeasureTextHeight(const std::string& text, float textWidthPx) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureTextHeight()
-   */
-  float MeasureTextHeight(const Dali::Text& text, float textWidthPx) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureTextHeight(const Character& character, float textWidthPx) const
-   */
-  float MeasureTextHeight(const Dali::Character& character, float textWidthPx) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureTextHeight()
-   */
   float MeasureTextHeight(const TextArray& text, float textWidthPx) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureText(const std::string& text) const
-   */
-  Vector3 MeasureText(const std::string& text) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureText(const Text& text) const
-   */
-  Vector3 MeasureText(const Dali::Text& text) const;
-
-  /**
-   * @copydoc Dali::Font::MeasureText(const Character& character) const
-   */
-  Vector3 MeasureText(const Dali::Character& character) const;
 
   /**
    * @copydoc Dali::Font::MeasureText(const Text& text) const

@@ -47,13 +47,11 @@ struct TextFormat
   /**
    * Constructor
    * @param[in] underline whether to underline the text
-   * @param[in] leftToRight whether text is rendered left to right
    * @param[in] italics whether italics is enabled
    * @param[in] italicsAngle italics angle
    * @param[in] pointSize the point size
    */
   TextFormat( bool underline,
-              bool leftToRight,
               bool italics,
               Dali::Radian italicsAngle,
               float pointSize,
@@ -84,12 +82,6 @@ struct TextFormat
    * @return true if underline is enabled
    */
   bool IsUnderLined() const;
-
-  /**
-   * Whether left to right character layout is enabled
-   * @return true if left to right is true
-   */
-  bool IsLeftToRight() const;
 
   /**
    * whether italics are enabled
@@ -128,7 +120,6 @@ struct TextFormat
 private:
 
   bool mUnderline:1;              ///< whether to underline the text
-  bool mLeftToRight:1;            ///< Whether text is displayed left to right
   bool mItalics:1;                ///< whether to apply italics
   Dali::Radian mItalicsAngle;     ///< italics angle if applied
   float mPointSize;               ///< Point size. Used to scale the vertices by this amount.

@@ -267,25 +267,8 @@ public:
    *
    * @param[in] enable \e true enables the italics.
    * @param[in] angle The italics angle in degree.
-   *
-   * @note uncoment the default parameter when the deprecated SetItalics() method is finally removed.
    */
-  void SetItalics( bool enable, Degree angle /*= DEFAULT_ITALICS_ANGLE*/ );
-
-  /**
-   * @deprecated. Use IsItalicsEnabled()
-   */
-  bool GetItalics() const;
-
-  /**
-   * @deprecated Use SetItalicsEnabled( bool enable, Degree angle )
-   */
-  void SetItalics( bool italics );
-
-  /**
-   * @deprecated Use SetItalics( bool enable, Degree angle )
-   */
-  void SetItalicsAngle( Degree angle );
+  void SetItalics( bool enable, Degree angle = DEFAULT_ITALICS_ANGLE );
 
   /**
    * @brief Whether text underline is enabled.
@@ -316,30 +299,8 @@ public:
    * @param[in] enable \e true enables the text underline.
    * @param[in] thickness The underline thickness.
    * @param[in] position The underline position.
-   *
-   * @note uncoment the default parameters when the deprecated SetUnderline() method is finally removed.
    */
-  void SetUnderline( bool enable, float thickness /*= DEFAULT_UNDERLINE_THICKNESS*/, float position /*= DEFAULT_UNDERLINE_POSITION*/ );
-
-  /**
-   * @deprecated Use IsUnderlineEnabled()
-   */
-  bool GetUnderline() const;
-
-  /**
-   * @deprecated Use SetUnderline( bool enable, float thickness, float position )
-   */
-  void SetUnderline( bool underline );
-
-  /**
-   * @deprecated Use SetUnderline( bool enable, float thickness, float position )
-   */
-  void SetUnderlineThickness( float thickness );
-
-  /**
-   * @deprecated Use SetUnderline( bool enable, float thickness, float position )
-   */
-  void SetUnderlinePosition( float position );
+  void SetUnderline( bool enable, float thickness = DEFAULT_UNDERLINE_THICKNESS, float position = DEFAULT_UNDERLINE_POSITION );
 
   /**
    * @brief Whether the text shadow is enabled.
@@ -381,11 +342,6 @@ public:
                   float shadowSize = DEFAULT_SHADOW_SIZE );
 
   /**
-   * @deprecated Use IsShadowEnabled()
-   */
-  bool GetShadow() const;
-
-  /**
    * @brief Whether the text glow is enabled.
    *
    * @return \e true if glow is enabled, otherwise \e false.
@@ -416,11 +372,6 @@ public:
    *                          SetSmoothEdge() The distance field value at which the glow becomes fully transparent.
    */
   void SetGlow( bool enable, const Vector4& glowColor = DEFAULT_GLOW_COLOR, float glowIntensity = DEFAULT_GLOW_INTENSITY );
-
-  /**
-   * @deprecated Use IsGlowEnabled()
-   */
-  bool GetGlow() const;
 
   /**
    * @brief Whether the text outline is enabled.
@@ -456,11 +407,6 @@ public:
    *                             0 <= smoothEdge[1] <= 1.
    */
   void SetOutline( bool enable, const Vector4& outlineColor = DEFAULT_OUTLINE_COLOR, const Vector2& outlineThickness = DEFAULT_OUTLINE_THICKNESS );
-
-  /**
-   * @deprecated Use IsOutlineEnabled()
-   */
-  bool GetOutline() const;
 
   /**
    * @brief Whether the text gradient is enabled.

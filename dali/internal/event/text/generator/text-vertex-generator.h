@@ -56,7 +56,7 @@ namespace TextVertexGenerator
                             const TextFormat& format,
                             const FontMetricsInterface& metrics,
                             const AtlasUvInterface& uvInterface,
-                            const FontId fontId);
+                            FontId fontId);
 
 
 

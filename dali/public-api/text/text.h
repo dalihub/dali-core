@@ -64,7 +64,12 @@ public:
    * @brief Constructor.
    *
    * Creates a Text object with the given string.
-   * @param [in] text An ASCII or UTF-8 encoded string.
+   * @param [in] text An ASCII or UTF-8 encoded array.
+   */
+  Text( const char* text );
+
+  /**
+   * @copydoc Text( const char* text )
    */
   Text( const std::string& text );
 
@@ -109,18 +114,6 @@ public:
    *
    * @param [in] text The text to be set.
    */
-  void SetText( const std::string& text );
-
-  /**
-   * @brief Sets the given character.
-   *
-   * @param [in] character The character to be set.
-   */
-  void SetText( const Character& character );
-
-  /**
-   * @copydoc SetText( const std::string& text )
-   */
   void SetText( const Text& text );
 
   /**
@@ -150,18 +143,6 @@ public:
    * @brief Appends the given text.
    *
    * @param [in] text The text to be appended.
-   */
-  void Append( const std::string& text );
-
-  /**
-   * @brief Appends the given character.
-   *
-   * @param [in] character The character to be appended.
-   */
-  void Append( const Character& character );
-
-  /**
-   * @copydoc Append( const std::string& text )
    */
   void Append( const Text& text );
 

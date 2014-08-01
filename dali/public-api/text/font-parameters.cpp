@@ -15,9 +15,11 @@
  *
  */
 
-// CLASS HEADER
-#include <dali/public-api/text/font.h>
+// FILE HEADER
 #include <dali/public-api/text/font-parameters.h>
+
+// INTERNAL INCLUDES
+#include <dali/public-api/text/font.h>
 
 namespace Dali
 {

@@ -113,9 +113,9 @@ void ShaderFactory::LoadDefaultShaders()
 {
   mDefaultShader = ShaderEffect::New();
 
-  mDefaultShader->SetProgram( GEOMETRY_TYPE_IMAGE, SHADER_DEFAULT, FlatColorTextureVertex, FlatColorTextureFragment, ShaderEffect::FIXED );
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_IMAGE, SHADER_DEFAULT, FlatColorTextureVertex, FlatColorTextureFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, DistanceFieldFontVertex, DistanceFieldFontFragment, ShaderEffect::FIXED );
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, DistanceFieldFontVertex, DistanceFieldFontFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
   LoadTextSubtypeShaders(mDefaultShader); // TODO: Remove when applications no longer need these shaders
 
@@ -123,80 +123,91 @@ void ShaderFactory::LoadDefaultShaders()
   mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_DEFAULT,
                               "", // Vertex shader defs
                               SHADER_DEF_USE_LIGHTING, // fragment shader defs
-                              MeshColorNoTextureVertex, MeshColorNoTextureFragment,
-                              ShaderEffect::FIXED );
+                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
+                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  mDefaultShader->SetProgram(GEOMETRY_TYPE_MESH, SHADER_EVENLY_LIT,
-                             "", // Vertex shader defs
-                             "", // fragment shader defs
-                             MeshColorNoTextureVertex, MeshColorNoTextureFragment,
-                             ShaderEffect::FIXED );
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_EVENLY_LIT,
+                              "", // Vertex shader defs
+                              "", // fragment shader defs
+                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
+                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  mDefaultShader->SetProgram(GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_LIT,
-                             SHADER_DEF_USE_BONES,    // vertex shader defs
-                             SHADER_DEF_USE_LIGHTING, // fragment shader defs
-                             MeshColorNoTextureVertex, MeshColorNoTextureFragment,
-                             ShaderEffect::FLEXIBLE);
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_LIT,
+                              SHADER_DEF_USE_BONES,    // vertex shader defs
+                              SHADER_DEF_USE_LIGHTING, // fragment shader defs
+                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
+                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              ShaderEffect::MODIFIES_GEOMETRY );
 
-  mDefaultShader->SetProgram(GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
-                             SHADER_DEF_USE_BONES, // Vertex shader defs
-                             "",                   // Fragment shader defs
-                             MeshColorNoTextureVertex, MeshColorNoTextureFragment,
-                             ShaderEffect::FLEXIBLE);
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
+                              SHADER_DEF_USE_BONES, // Vertex shader defs
+                              "",                   // Fragment shader defs
+                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
+                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              ShaderEffect::MODIFIES_GEOMETRY );
 
-  mDefaultShader->SetProgram(GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_VERTEX_COLOR,
-                             (SHADER_DEF_USE_BONES SHADER_DEF_USE_COLOR), // Vertex shader defs
-                             SHADER_DEF_USE_COLOR,                        // Fragment shader defs
-                             MeshColorNoTextureVertex, MeshColorNoTextureFragment,
-                             ShaderEffect::FLEXIBLE);
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_VERTEX_COLOR,
+                              (SHADER_DEF_USE_BONES SHADER_DEF_USE_COLOR), // Vertex shader defs
+                              SHADER_DEF_USE_COLOR,                        // Fragment shader defs
+                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
+                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              ShaderEffect::MODIFIES_GEOMETRY );
 
-  mDefaultShader->SetProgram(GEOMETRY_TYPE_MESH, SHADER_VERTEX_COLOR,
-                             SHADER_DEF_USE_COLOR,  // Vertex shader defs
-                             SHADER_DEF_USE_COLOR,  // Fragment shader defs
-                             MeshColorNoTextureVertex, MeshColorNoTextureFragment,
-                             ShaderEffect::FIXED);
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_VERTEX_COLOR,
+                              SHADER_DEF_USE_COLOR,  // Vertex shader defs
+                              SHADER_DEF_USE_COLOR,  // Fragment shader defs
+                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
+                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
   // Textured meshes
   mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_DEFAULT,
                               "",                      // Vertex shader defs
                               SHADER_DEF_USE_LIGHTING, // fragment shader defs
-                              MeshVertex, MeshFragment,
-                              ShaderEffect::FIXED);
+                              CustomMeshPrefixVertex + MeshVertex,
+                              CustomMeshPrefixFragment + MeshFragment,
+                              ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
 
-  mDefaultShader->SetProgram(GEOMETRY_TYPE_TEXTURED_MESH, SHADER_EVENLY_LIT,
-                             "",                      // Vertex shader defs
-                             "",                      // Fragment shader defs
-                             MeshVertex, MeshFragment,
-                             ShaderEffect::FIXED);
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_EVENLY_LIT,
+                              "",                      // Vertex shader defs
+                              "",                      // Fragment shader defs
+                              CustomMeshPrefixVertex + MeshVertex,
+                              CustomMeshPrefixFragment + MeshFragment,
+                              ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  mDefaultShader->SetProgram(GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_LIT,
-                             SHADER_DEF_USE_BONES,    // Vertex shader defs
-                             SHADER_DEF_USE_LIGHTING, // Fragment shader defs
-                             MeshVertex, MeshFragment,
-                             ShaderEffect::FLEXIBLE);
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_LIT,
+                              SHADER_DEF_USE_BONES,    // Vertex shader defs
+                              SHADER_DEF_USE_LIGHTING, // Fragment shader defs
+                              CustomMeshPrefixVertex + MeshVertex,
+                              CustomMeshPrefixFragment + MeshFragment,
+                              ShaderEffect::MODIFIES_GEOMETRY );
 
-  mDefaultShader->SetProgram(GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
-                             SHADER_DEF_USE_BONES, // Vertex shader defs
-                             "",                   // Fragment shader defs
-                             MeshVertex, MeshFragment,
-                             ShaderEffect::FLEXIBLE);
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
+                              SHADER_DEF_USE_BONES, // Vertex shader defs
+                              "",                   // Fragment shader defs
+                              CustomMeshPrefixVertex + MeshVertex,
+                              CustomMeshPrefixFragment + MeshFragment,
+                              ShaderEffect::MODIFIES_GEOMETRY );
 }
 
 void ShaderFactory::LoadTextSubtypeShaders(ShaderEffectPtr shaderEffect)
 {
   shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT,
-                             SHADER_DEF_USE_GRADIENT,
-                             SHADER_DEF_USE_GRADIENT,
-                             DistanceFieldFontVertex, DistanceFieldFontFragment);
+                           SHADER_DEF_USE_GRADIENT,
+                           SHADER_DEF_USE_GRADIENT,
+                           DistanceFieldFontVertex, DistanceFieldFontFragment,
+                           ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_GLOW, DistanceFieldFontGlowVertex, DistanceFieldFontGlowFragment, ShaderEffect::FIXED);
+  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_GLOW, DistanceFieldFontGlowVertex, DistanceFieldFontGlowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_SHADOW, DistanceFieldFontShadowVertex, DistanceFieldFontShadowFragment, ShaderEffect::FIXED);
+  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_SHADOW, DistanceFieldFontShadowVertex, DistanceFieldFontShadowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE, DistanceFieldFontOutlineVertex, DistanceFieldFontOutlineFragment, ShaderEffect::FIXED);
+  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE, DistanceFieldFontOutlineVertex, DistanceFieldFontOutlineFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE_GLOW, DistanceFieldFontOutlineGlowVertex, DistanceFieldFontOutlineGlowFragment, ShaderEffect::FIXED);
+  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE_GLOW, DistanceFieldFontOutlineGlowVertex, DistanceFieldFontOutlineGlowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 }
 
 

@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/actors/blending.h>
 #include <dali/internal/common/blending-options.h>
+#include <dali/internal/common/image-sampler.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 
 namespace Dali
@@ -110,6 +111,16 @@ public:
    */
   const Vector4& GetBlendColor() const;
 
+  /**
+   * @copydoc Dali::RenderableActor::SetFilterMode()
+   */
+  void SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetFilterMode()
+   */
+  void GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const;
+
 protected:
 
   /**
@@ -170,6 +181,7 @@ private:
   CullFaceMode       mCullFaceMode;
   BlendingMode::Type mBlendingMode;
   BlendingOptions    mBlendingOptions;
+  unsigned int       mSamplerBitfield;
 };
 
 } // namespace Internal

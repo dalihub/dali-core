@@ -33,7 +33,8 @@ RenderableAttachment::RenderableAttachment( Stage& stage )
 : ActorAttachment( stage ),
   mSortModifier( 0.0f ),
   mCullFaceMode( CullNone ),
-  mBlendingMode( BlendingMode::AUTO )
+  mBlendingMode( BlendingMode::AUTO ),
+  mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) )
 {
 }
 
@@ -138,6 +139,20 @@ const Vector4& RenderableAttachment::GetBlendColor() const
 
   return Vector4::ZERO;
 }
+
+void RenderableAttachment::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
+{
+  mSamplerBitfield = ImageSampler::PackBitfield( minFilter, magFilter );
+
+  SetSamplerMessage( mStage->GetUpdateInterface(), GetSceneObject(), mSamplerBitfield );
+}
+
+void RenderableAttachment::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
+{
+  minFilter = ImageSampler::GetMinifyFilterMode( mSamplerBitfield );
+  magFilter = ImageSampler::GetMagnifyFilterMode( mSamplerBitfield );
+}
+
 
 void RenderableAttachment::OnStageConnection()
 {
