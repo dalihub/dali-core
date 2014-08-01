@@ -1,12 +1,70 @@
-GBS Builds
-==========
+T.O.C.
+======
 
-NON-SMACK Targets
------------------
+ 1.   GBS Builds
+ 1.1. NON-SMACK Targets
+ 1.2. SMACK enabled Targets
+ 2.   Building for Ubuntu desktop
+ 2.1. Minimum Requirements
+ 2.2. Creating a DALi Environment
+ 2.3. Building the Repository
 
-gbs build -A [TARGET_ARCH]
 
-SMACK enabled Targets
----------------------
 
-gbs build -A [TARGET_ARCH] --define "%enable_dali_smack_rules 1"
+1. GBS Builds
+=============
+
+1.1. NON-SMACK Targets
+----------------------
+
+ gbs build -A [TARGET_ARCH]
+
+1.2. SMACK enabled Targets
+--------------------------
+
+ gbs build -A [TARGET_ARCH] --define "%enable_dali_smack_rules 1"
+
+
+
+2. Building for Ubuntu desktop
+==============================
+
+2.1. Minimum Requirements
+------------------------
+
+ - Ubuntu 14.04
+
+2.2. Creating a DALi Environment
+-------------------------------
+
+To build for desktop first create a dali-env folder in your home folder with:
+
+ dali-core/build/dali_env -c
+
+This will also download any dependencies that the dali repositories require.
+
+You can save the environment variables to a file:
+
+ dali-env/opt/bin/dali_env -s > setenv
+
+This process only needs to be done once.
+
+Next source these variables:
+
+ . setenv
+
+You will have to source these variables every time you open up a new terminal (or you can add to .bashrc if you prefer).
+
+2.3. Building the Repository
+----------------------------
+
+To build the repository enter the 'build/tizen' folder:
+
+ cd dali-core/build/tizen
+
+Then run the following commands:
+
+ autoreconf --install
+ ./configure --prefix=$DESKTOP_PREFIX
+ make install -j8
+
