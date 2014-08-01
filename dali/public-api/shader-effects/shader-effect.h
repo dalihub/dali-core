@@ -195,12 +195,13 @@ public:
    */
   enum GeometryHints
   {
-    HINT_NONE         = 0x00,   ///< no hints
-    HINT_GRID_X       = 0x01,   ///< Geometry must be subdivided in X
-    HINT_GRID_Y       = 0x02,   ///< Geometry must be subdivided in Y
-    HINT_GRID         = (HINT_GRID_X | HINT_GRID_Y),
-    HINT_DEPTH_BUFFER = 0x04,   ///< Needs depth buffering turned on
-    HINT_BLENDING     = 0x08    ///< Notifies the actor to use blending even if it's fully opaque. Needs actor's blending set to BlendingMode::AUTO
+    HINT_NONE           = 0x00,   ///< no hints
+    HINT_GRID_X         = 0x01,   ///< Geometry must be subdivided in X
+    HINT_GRID_Y         = 0x02,   ///< Geometry must be subdivided in Y
+    HINT_GRID           = (HINT_GRID_X | HINT_GRID_Y),
+    HINT_DEPTH_BUFFER   = 0x04,   ///< Needs depth buffering turned on
+    HINT_BLENDING       = 0x08,   ///< Notifies the actor to use blending even if it's fully opaque. Needs actor's blending set to BlendingMode::AUTO
+    HINT_DOESNT_MODIFY_GEOMETRY = 0x10 ///< Notifies that the vertex shader will not change geometry (enables bounding box culling)
   };
 
   /**

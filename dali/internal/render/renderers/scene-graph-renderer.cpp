@@ -178,8 +178,7 @@ void Renderer::Render( BufferIndex bufferIndex,
   Program& program = mShader->GetProgram( *mContext, geometryType, subType, programIndex );
 
   // Check culling (does not need the program to be in use)
-  bool areVerticesFixed = program.AreVerticesFixed();
-  if( cull && areVerticesFixed )
+  if( cull && ! program.ModifiesGeometry() )
   {
     if( IsOutsideClipSpace( modelMatrix, gModelViewProjectionMatrix ) )
     {

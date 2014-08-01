@@ -182,9 +182,9 @@ void Shader::ForwardGridDensity( BufferIndex updateBufferIndex, float density )
   new (slot) DerivedType( this, &Shader::SetGridDensity, density );
 }
 
-void Shader::ForwardHints( BufferIndex updateBufferIndex, int hint )
+void Shader::ForwardHints( BufferIndex updateBufferIndex, Dali::ShaderEffect::GeometryHints hint )
 {
-  typedef MessageValue1< Shader, int > DerivedType;
+  typedef MessageValue1< Shader, Dali::ShaderEffect::GeometryHints > DerivedType;
 
   // Reserve some memory inside the render queue
   unsigned int* slot = mRenderQueue->ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
@@ -231,13 +231,13 @@ void Shader::SetProgram( GeometryType geometryType,
                          Integration::ResourceId resourceId,
                          Integration::ShaderDataPtr shaderData,
                          Context* context,
-                         bool areVerticesFixed )
+                         bool modifiesGeometry )
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d %d\n", (int)geometryType, resourceId);
 
   bool precompiledBinary = shaderData->HasBinary();
 
-  Program* program = Program::New( resourceId, shaderData.Get(), *context, areVerticesFixed );
+  Program* program = Program::New( resourceId, shaderData.Get(), *context, modifiesGeometry );
 
   ShaderSubTypes theSubType = subType;
   if( subType == SHADER_SUBTYPE_ALL )
