@@ -1,6 +1,6 @@
 #!/bin/bash
 
-( cd ../build/slp ; make cov_data )
+( cd ../build/tizen ; make cov_data )
 
 
 for i in `find . -name "*.dir"` ; do
@@ -18,5 +18,5 @@ done
 
 (
     cd .. ;
-    genhtml -o build/slp/doc/coverage `find . -name dali.info`
+    genhtml -o build/tizen/doc/coverage `find . -name dali.info`
 )

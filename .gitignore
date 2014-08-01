@@ -33,7 +33,7 @@ BROWSE
 *.creator
 *.creator.user
 /docs/generated/*
-/build/slp/doc
-/build/slp/.cov
+/build/tizen/doc
+/build/tizen/.cov
 /build/desktop
 /packaging/home*

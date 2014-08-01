@@ -70,7 +70,7 @@ CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"
 %endif
 
 libtoolize --force
-cd %{_builddir}/%{name}-%{version}/build/slp
+cd %{_builddir}/%{name}-%{version}/build/tizen
 autoreconf --install
 DALI_DATA_RW_DIR="%{dali_data_rw_dir}"
 DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
@@ -103,7 +103,7 @@ make %{?jobs:-j%jobs}
 ##############################
 %install
 rm -rf %{buildroot}
-cd build/slp
+cd build/tizen
 %make_install DALI_DATA_RW_DIR="%{dali_data_rw_dir}" DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 
 # LICENSE
