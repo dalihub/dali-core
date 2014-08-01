@@ -47,6 +47,7 @@ using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
 using Dali::Internal::SceneGraph::PropertyBase;
 using Dali::Internal::SceneGraph::RenderQueue;
+using std::string;
 
 namespace Dali
 {
@@ -63,6 +64,30 @@ ShaderEffect::DefaultPropertyLookup* ShaderEffect::mDefaultPropertyLookup = NULL
 
 namespace
 {
+
+struct WrapperStrings
+{
+  const char* vertexShaderPrefix;
+  const char* fragmentShaderPrefix;
+  const char* vertexShaderPostfix;
+  const char* fragmentShaderPostfix;
+};
+
+WrapperStrings customShaderWrappers [] =
+{
+  {
+    CustomImagePrefixVertex.c_str(), CustomImagePrefixFragment.c_str(),
+    CustomImagePostfixVertex.c_str(), CustomImagePostfixFragment.c_str()
+  },
+  {
+    CustomFontPrefixVertex.c_str(), CustomFontPrefixFragment.c_str(),
+    CustomFontPostfixVertex.c_str(), CustomFontPostfixFragment.c_str()
+  },
+  {
+    CustomMeshPrefixVertex.c_str(), CustomMeshPrefixFragment.c_str(),
+    MeshVertex.c_str(), MeshFragment.c_str()
+  }
+};
 
 BaseHandle Create()
 {
@@ -92,175 +117,6 @@ const Property::Type DEFAULT_PROPERTY_TYPES[DEFAULT_PROPERTY_COUNT] =
   Property::INTEGER,  // "geometry-hints",
 };
 
-void SetShaderProgram( const std::string& imageVertexSnippet, const std::string& imageFragmentSnippet,
-                       const std::string& textVertexSnippet, const std::string& textFragmentSnippet,
-                       const std::string& texturedMeshVertexSnippet, const std::string& texturedMeshFragmentSnippet,
-                       const std::string& meshVertexSnippet, const std::string& meshFragmentSnippet,
-                       const std::string& vertexShaderPrefix, const std::string& fragmentShaderPrefix,
-                       ShaderEffectPtr shaderEffect )
-{
-  DALI_ASSERT_DEBUG(shaderEffect);
-
-  // create complete shader program strings for GEOMETRY_TYPE_IMAGE
-  std::string vertexSource = vertexShaderPrefix + CustomImagePrefixVertex;
-  std::string fragmentSource = fragmentShaderPrefix + CustomImagePrefixFragment;
-
-  // Append the custom vertex shader code if supplied, otherwise append the default
-  if ( imageVertexSnippet.length() > 0 )
-  {
-    vertexSource.append( imageVertexSnippet );
-  }
-  else
-  {
-    vertexSource.append( CustomImagePostfixVertex );
-  }
-
-  // Append the custom fragment shader code if supplied, otherwise append the default
-  if ( imageFragmentSnippet.length() > 0 )
-  {
-    fragmentSource.append( imageFragmentSnippet );
-  }
-  else
-  {
-    fragmentSource.append( CustomImagePostfixFragment );
-  }
-
-  // Add the program
-  shaderEffect->SetProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, vertexSource, fragmentSource );
-
-
-  // create complete shader program strings for GEOMETRY_TYPE_TEXT
-  vertexSource = CustomFontPrefixVertex;
-  fragmentSource = CustomFontPrefixFragment;
-
-  // Append the custom vertex shader code if supplied, otherwise append the default
-  if ( textVertexSnippet.length() > 0 )
-  {
-    vertexSource.append( textVertexSnippet );
-  }
-  else
-  {
-    vertexSource.append( CustomFontPostfixVertex );
-  }
-
-  // Append the custom fragment shader code if supplied, otherwise append the default
-  if ( textFragmentSnippet.length() > 0 )
-  {
-    fragmentSource.append( textFragmentSnippet );
-  }
-  else
-  {
-    fragmentSource.append( CustomFontPostfixFragment );
-  }
-
-  // Add Program. Note, we only change the default program here, and leave the other sub-types as-is
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, vertexSource, fragmentSource);
-
-  // create complete shader program strings for GEOMETRY_TYPE_TEXTURED_MESH
-  if( texturedMeshVertexSnippet.length() > 0 )
-  {
-    vertexSource = CustomMeshPrefixVertex;
-    vertexSource.append( texturedMeshVertexSnippet );
-  }
-  else
-  {
-    vertexSource = MeshVertex;
-  }
-
-  if( texturedMeshFragmentSnippet.length() > 0 )
-  {
-    fragmentSource = CustomMeshPrefixFragment;
-    fragmentSource.append( texturedMeshFragmentSnippet );
-  }
-  else
-  {
-    fragmentSource = MeshFragment;
-  }
-
-  // Add Program
-  shaderEffect->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, vertexSource, fragmentSource );
-
-  // create complete shader program strings for GEOMETRY_TYPE_MESH
-  if( meshVertexSnippet.length() > 0 )
-  {
-    vertexSource = CustomMeshPrefixVertex;
-    vertexSource.append( meshVertexSnippet );
-  }
-  else
-  {
-    vertexSource = MeshVertex;
-  }
-
-  if( meshFragmentSnippet.length() > 0 )
-  {
-    fragmentSource = CustomMeshPrefixFragment;
-    fragmentSource.append( meshFragmentSnippet );
-  }
-  else
-  {
-    fragmentSource = MeshFragment;
-  }
-
-  // Add Program
-  shaderEffect->SetProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, vertexSource, fragmentSource );
-}
-
-void SetShaderProgram( const std::string& vertexShaderPrefix, const std::string& vertexShader,
-                       const std::string& fragmentShaderPrefix, const std::string& fragmentShader,
-                       GeometryType geometryTypes,
-                       ShaderEffectPtr shaderEffect )
-{
-  DALI_ASSERT_DEBUG(shaderEffect);
-
-  if( geometryTypes & GEOMETRY_TYPE_IMAGE )
-  {
-    shaderEffect->SetProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL,
-                              vertexShaderPrefix + CustomImagePrefixVertex + ( !vertexShader.empty() ? vertexShader : CustomImagePostfixVertex ),
-                              fragmentShaderPrefix + CustomImagePrefixFragment + ( !fragmentShader.empty() ? fragmentShader : CustomImagePostfixFragment ) );
-  }
-  else
-  {
-    shaderEffect->SetProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL,
-                              CustomImagePrefixVertex + CustomImagePostfixVertex,
-                              CustomImagePrefixFragment + CustomImagePostfixFragment );
-  }
-
-  if( geometryTypes & GEOMETRY_TYPE_TEXT )
-  {
-    shaderEffect->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT,
-                              vertexShaderPrefix + CustomFontPrefixVertex + ( !vertexShader.empty() ? vertexShader : CustomFontPostfixVertex ),
-                              fragmentShaderPrefix + CustomFontPrefixFragment + ( !fragmentShader.empty() ? fragmentShader : CustomFontPostfixFragment ) );
-  }
-  else
-  {
-    shaderEffect->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT,
-                              CustomFontPrefixVertex + CustomFontPostfixVertex,
-                              CustomFontPrefixFragment + CustomFontPostfixFragment );
-  }
-
-  if( geometryTypes & GEOMETRY_TYPE_TEXTURED_MESH )
-  {
-    shaderEffect->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL,
-                              vertexShaderPrefix + ( !vertexShader.empty() ? CustomMeshPrefixVertex + vertexShader : MeshVertex ),
-                              fragmentShaderPrefix + ( !fragmentShader.empty() ? CustomMeshPrefixFragment + fragmentShader : MeshFragment ) );
-  }
-  else
-  {
-    shaderEffect->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, MeshVertex, MeshFragment );
-  }
-
-  if( geometryTypes & GEOMETRY_TYPE_MESH )
-  {
-    shaderEffect->SetProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL,
-                              vertexShaderPrefix + ( !vertexShader.empty() ? CustomMeshPrefixVertex + vertexShader : MeshColorNoTextureVertex ),
-                              fragmentShaderPrefix + ( !fragmentShader.empty() ? CustomMeshPrefixFragment + fragmentShader : MeshColorNoTextureFragment ) );
-  }
-  else
-  {
-    shaderEffect->SetProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, MeshColorNoTextureVertex, MeshColorNoTextureFragment );
-  }
-}
-
 std::string GetFileContents( const std::string& filename )
 {
   std::ifstream input( filename.c_str() );
@@ -289,7 +145,6 @@ std::string GetShader(const std::string& field, const Property::Value& property)
     }
   }
 
-  // if we got here
   return std::string();
 }
 
@@ -312,53 +167,46 @@ ShaderEffectPtr ShaderEffect::New( Dali::ShaderEffect::GeometryHints hints )
   return shaderEffect;
 }
 
-ShaderEffectPtr ShaderEffect::New( const std::string& vertexShader,
-                                   const std::string& fragmentShader,
+ShaderEffectPtr ShaderEffect::New( const string& vertexShader,
+                                   const string& fragmentShader,
                                    GeometryType geometryType,
                                    Dali::ShaderEffect::GeometryHints hints )
 {
   return NewWithPrefix( "", vertexShader, "", fragmentShader, geometryType, hints);
 }
 
-ShaderEffectPtr ShaderEffect::NewWithPrefix( const std::string& vertexShaderPrefix,
-                                             const std::string& vertexShader,
-                                             const std::string& fragmentShaderPrefix,
-                                             const std::string& fragmentShader,
+ShaderEffectPtr ShaderEffect::NewWithPrefix( const string& vertexShaderPrefix,
+                                             const string& vertexShader,
+                                             const string& fragmentShaderPrefix,
+                                             const string& fragmentShader,
                                              GeometryType geometryTypes,
                                              Dali::ShaderEffect::GeometryHints hints )
 {
   ShaderEffectPtr shaderEffect( New(hints) );
-
   ShaderFactory::LoadTextSubtypeShaders(shaderEffect);
 
-  SetShaderProgram( vertexShaderPrefix, vertexShader,
-                    fragmentShaderPrefix, fragmentShader,
-                    geometryTypes,
-                    shaderEffect );
-
+  shaderEffect->SetPrograms( geometryTypes, vertexShaderPrefix, vertexShader, fragmentShaderPrefix, fragmentShader );
   return shaderEffect;
 }
 
-ShaderEffectPtr ShaderEffect::New( const std::string& imageVertexShader,
-                                   const std::string& imageFragmentShader,
-                                   const std::string& textVertexShader,
-                                   const std::string& textFragmentShader,
-                                   const std::string& texturedMeshVertexShader,
-                                   const std::string& texturedMeshFragmentShader,
-                                   const std::string& meshVertexShader,
-                                   const std::string& meshFragmentShader,
+ShaderEffectPtr ShaderEffect::New( const string& imageVertexShader,
+                                   const string& imageFragmentShader,
+                                   const string& textVertexShader,
+                                   const string& textFragmentShader,
+                                   const string& texturedMeshVertexShader,
+                                   const string& texturedMeshFragmentShader,
+                                   const string& meshVertexShader,
+                                   const string& meshFragmentShader,
                                    Dali::ShaderEffect::GeometryHints hints )
 {
   ShaderEffectPtr shaderEffect( New(hints) );
 
   ShaderFactory::LoadTextSubtypeShaders(shaderEffect);
 
-  SetShaderProgram( imageVertexShader, imageFragmentShader,
-                    textVertexShader,  textFragmentShader,
-                    texturedMeshVertexShader, texturedMeshFragmentShader,
-                    meshVertexShader,  meshFragmentShader,
-                    "", "",
-                    shaderEffect );
+  shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, "", "", imageVertexShader, imageFragmentShader );
+  shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, "", "", textVertexShader, textFragmentShader );
+  shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, "", "", texturedMeshVertexShader, texturedMeshFragmentShader );
+  shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, "", "", meshVertexShader, meshFragmentShader );
 
   return shaderEffect;
 }
@@ -454,24 +302,11 @@ const Dali::ShaderEffect::Extension& ShaderEffect::GetExtension() const
 }
 
 void ShaderEffect::SetProgram( GeometryType geometryType, ShaderSubTypes subType,
-                               const std::string& vertexSource, const std::string& fragmentSource,
+                               const string& vertexSource, const string& fragmentSource,
                                ShaderEffect::FixedVertexShader fixedShader )
 {
-  // Load done asynchronously in update thread. SetProgram message below must be processed afterwards.
-  // Therefore, resource manager cannot farm out the loading to the adaptor resource threads,
-  // but must instead use synchronous loading via PlatformAbstraction::LoadFile()
-  size_t shaderHash;
-  ResourceTicketPtr ticket( mShaderFactory.Load(vertexSource, fragmentSource, shaderHash) );
-
-  DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(geometryType %d subType:%d ticket.id:%d)\n", geometryType, subType, ticket->GetId() );
-
-  bool areVerticesFixed = (fixedShader == ShaderEffect::FIXED);
-  // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( mUpdateManager, *mSceneObject, geometryType, subType, ticket->GetId(), shaderHash, areVerticesFixed );
-
-  mTickets.push_back(ticket);       // add ticket to collection to keep it alive.
+  SetProgramImpl(geometryType, subType, vertexSource, fragmentSource, fixedShader);
 }
-
 
 void ShaderEffect::SetProgram( GeometryType geometryType, ShaderSubTypes subType,
                                const std::string& vertexPrefix, const std::string& fragmentPrefix,
@@ -480,7 +315,7 @@ void ShaderEffect::SetProgram( GeometryType geometryType, ShaderSubTypes subType
 {
   const std::string vertex( vertexPrefix + vertexSource );
   const std::string fragment( fragmentPrefix + fragmentSource );
-  SetProgram( geometryType, subType, vertex, fragment, fixedShader );
+  SetProgramImpl( geometryType, subType, vertex, fragment, fixedShader );
 }
 
 void ShaderEffect::Connect()
@@ -655,7 +490,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
           DALI_ASSERT_ALWAYS(!"Geometry type unknown" );
         }
       }
-      SetShaderProgram( vertexPrefix, vertex, fragmentPrefix, fragment, geometryType, ShaderEffectPtr(this) );
+      SetPrograms( geometryType, vertexPrefix, vertex, fragmentPrefix, fragment );
       break;
     }
 
@@ -755,6 +590,131 @@ const PropertyInputImpl* ShaderEffect::GetSceneObjectInputProperty( Property::In
 
   return entry->second.GetSceneGraphProperty();
 }
+
+void ShaderEffect::SetPrograms( GeometryType  geometryTypes,
+                                const std::string& vertexShaderPrefix,
+                                const std::string& vertexShader,
+                                const std::string& fragmentShaderPrefix,
+                                const std::string& fragmentShader )
+{
+  static std::string emptyStr;
+
+  if( geometryTypes & GEOMETRY_TYPE_IMAGE )
+  {
+    SetWrappedProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
+  }
+  else
+  {
+    SetWrappedProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, emptyStr, emptyStr, emptyStr, emptyStr );
+  }
+
+  if( geometryTypes & GEOMETRY_TYPE_TEXT )
+  {
+    // Only change the default program, leaving the other sub-types as-is.
+    SetWrappedProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
+  }
+  else
+  {
+    SetWrappedProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, emptyStr, emptyStr, emptyStr, emptyStr );
+  }
+
+  if( geometryTypes & GEOMETRY_TYPE_TEXTURED_MESH )
+  {
+    SetWrappedProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
+  }
+  else
+  {
+    SetWrappedProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, emptyStr, emptyStr, emptyStr, emptyStr );
+  }
+
+  if( geometryTypes & GEOMETRY_TYPE_MESH )
+  {
+    SetWrappedProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
+  }
+  else
+  {
+    SetWrappedProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, emptyStr, emptyStr, emptyStr, emptyStr );
+  }
+}
+
+void ShaderEffect::SetWrappedProgram( GeometryType geometryType, ShaderSubTypes subType,
+                                      const string& vertexPrefix, const string& fragmentPrefix,
+                                      const string& vertexSnippet, const string& fragmentSnippet )
+{
+  // create complete shader program strings for the given geometry type
+  unsigned int index = 0;
+  switch( geometryType )
+  {
+    case GEOMETRY_TYPE_IMAGE:
+    {
+      index = 0;
+      break;
+    }
+    case GEOMETRY_TYPE_TEXT:
+    {
+      index = 1;
+      break;
+    }
+    case GEOMETRY_TYPE_MESH:
+    case GEOMETRY_TYPE_TEXTURED_MESH:
+    {
+      index = 2;
+      break;
+    }
+    case GEOMETRY_TYPE_LAST:
+    {
+      DALI_ASSERT_DEBUG(0 && "Wrong geometry type");
+      break;
+    }
+  }
+
+  string vertexSource = vertexPrefix + customShaderWrappers[index].vertexShaderPrefix;
+  string fragmentSource = fragmentPrefix + customShaderWrappers[index].fragmentShaderPrefix;
+
+  // Append the custom vertex shader code if supplied, otherwise append the default
+  if ( vertexSnippet.length() > 0 )
+  {
+    vertexSource.append( vertexSnippet );
+  }
+  else
+  {
+    vertexSource.append( customShaderWrappers[index].vertexShaderPostfix );
+  }
+
+  // Append the custom fragment shader code if supplied, otherwise append the default
+  if ( fragmentSnippet.length() > 0 )
+  {
+    fragmentSource.append( fragmentSnippet );
+  }
+  else
+  {
+    fragmentSource.append( customShaderWrappers[index].fragmentShaderPostfix );
+  }
+
+  // Add the program
+  SetProgramImpl( geometryType, subType, vertexSource, fragmentSource, ShaderEffect::FLEXIBLE );
+}
+
+void ShaderEffect::SetProgramImpl( GeometryType geometryType, ShaderSubTypes subType,
+                                   const string& vertexSource, const string& fragmentSource,
+                                   ShaderEffect::FixedVertexShader fixedShader )
+{
+  // Load done asynchronously in update thread. SetProgram message below must be processed afterwards.
+  // Therefore, resource manager cannot farm out the loading to the adaptor resource threads,
+  // but must instead use synchronous loading via PlatformAbstraction::LoadFile()
+  size_t shaderHash;
+  ResourceTicketPtr ticket( mShaderFactory.Load(vertexSource, fragmentSource, shaderHash) );
+
+  DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(geometryType %d subType:%d ticket.id:%d)\n", geometryType, subType, ticket->GetId() );
+
+  bool areVerticesFixed = (fixedShader == ShaderEffect::FIXED);
+
+  // Add shader program to scene-object using a message to the UpdateManager
+  SetShaderProgramMessage( mUpdateManager, *mSceneObject, geometryType, subType, ticket->GetId(), shaderHash, areVerticesFixed );
+
+  mTickets.push_back(ticket);       // add ticket to collection to keep it alive.
+}
+
 
 } // namespace Internal
 

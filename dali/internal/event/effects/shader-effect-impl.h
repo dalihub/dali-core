@@ -285,7 +285,48 @@ private:
   ShaderEffect( const ShaderEffect& );
   ShaderEffect& operator=( const ShaderEffect& rhs );
 
-  void OnImageLoaded( Dali::Image image ); ///< just a helper for image loaded callback
+  /**
+   * Set the given program for all shader types set in the geometryType bitfield.
+   * @param[in] geometryType         A GeometryType bitfield
+   * @param[in] vertexShaderPrefix   The prefix source code for the vertex shader
+   * @param[in] vertexShader         The source code for the vertex shader
+   * @param[in] fragmentShaderPrefix The prefix source code for the fragment shader
+   * @param[in] fragmentShader       The source code for the fragment shader
+   */
+  void SetPrograms( GeometryType  geometryTypes,
+                    const std::string& vertexShaderPrefix,
+                    const std::string& vertexShader,
+                    const std::string& fragmentShaderPrefix,
+                    const std::string& fragmentShader );
+
+  /**
+   * Wrap the given prefix and body code around the predefined prefix source for the
+   * given geometry type. Specifying an empty string for the body code means that the
+   * predefined body code is used instead.
+   *
+   * @param[in] geometryType    The GeometryType rendered by the shader program
+   * @param[in] subType         The subtype, one of ShaderSubTypes.
+   * @param[in] vertexPrefix    The prefix source code for the vertex shader
+   * @param[in] fragmentPrefix  The prefix source code for the fragment shader
+   * @param[in] vertexSource    The source code for the vertex shader
+   * @param[in] fragmentSource  The source code for the fragment shader
+   */
+  void SetWrappedProgram( GeometryType geometryType, ShaderSubTypes subType,
+                          const std::string& vertexPrefix, const std::string& fragmentPrefix,
+                          const std::string& vertexSource, const std::string& fragmentSource );
+
+  /**
+   * Send shader program to scene-graph object.
+   * Uses the shader hints to determine whether the vertices are fixed.
+   * @param[in] geometryType    The GeometryType rendered by the shader program
+   * @param[in] subType         The subtype, one of ShaderSubTypes.
+   * @param[in] vertexSource    The source code for the vertex shader
+   * @param[in] fragmentSource  The source code for the fragment shader
+   * @param[in] fixedVertexShader True if this shader doesn't change the vertices
+   */
+  void SetProgramImpl( GeometryType geometryType, ShaderSubTypes subType,
+                       const std::string& vertexSource, const std::string& fragmentSource,
+                       FixedVertexShader fixedVertexShader );
 
 private: // Data
 
