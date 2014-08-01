@@ -164,4 +164,6 @@
 #include <dali/public-api/text/text.h>
 #include <dali/public-api/text/utf8.h>
 
+#include <dali/public-api/dali-core-version.h>
+
 #endif // __DALI_CORE_H__
