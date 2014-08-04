@@ -34,6 +34,7 @@ class RenderMessageDispatcher;
 class RenderQueue;
 class DiscardQueue;
 class TextureCache;
+class Shader;
 
 /**
  * Abstract interface for the scene controller
@@ -94,6 +95,12 @@ public:
    * @return a reference to the complete status manager
    */
   virtual CompleteStatusManager& GetCompleteStatusManager() = 0;
+
+  /**
+   * Return the default shader
+   * @return pointer to the default shader
+   */
+  virtual Shader* GetDefaultShader() = 0;
 
 private:
 

@@ -119,27 +119,14 @@ const Renderer& MeshAttachment::GetRenderer() const
 void MeshAttachment::ShaderChanged( BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG(mSceneController);
-  Shader* shader = GetParent().GetInheritedShader();
 
-  {
-    typedef MessageValue1< Renderer, Shader* > DerivedType;
+  typedef Message< MeshRenderer > DerivedType;
 
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
 
-    // Construct message in the mRenderer queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mRenderer, &Renderer::SetShader, shader );
-  }
-
-  {
-    typedef Message< MeshRenderer > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the mRenderer queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mRenderer, &MeshRenderer::ResetCustomUniforms );
-  }
+  // Construct message in the mRenderer queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( mRenderer, &MeshRenderer::ResetCustomUniforms );
 }
 
 void MeshAttachment::SizeChanged( BufferIndex updateBufferIndex )
@@ -311,10 +298,9 @@ bool MeshAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
 
     if ( fullyOpaque )
     {
-      Shader* shader = mParent->GetInheritedShader();
-      if( shader != NULL )
+      if( mShader != NULL )
       {
-        fullyOpaque = (shader->GetGeometryHints() != Dali::ShaderEffect::HINT_BLENDING );
+        fullyOpaque = (mShader->GetGeometryHints() != Dali::ShaderEffect::HINT_BLENDING );
       }
     }
   }

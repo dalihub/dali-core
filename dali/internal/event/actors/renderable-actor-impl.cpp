@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/actor-attachments/renderable-attachment-impl.h>
 
 namespace // unnamed namespace
@@ -136,6 +137,21 @@ RenderableActor::RenderableActor()
 
 RenderableActor::~RenderableActor()
 {
+}
+
+void RenderableActor::SetShaderEffect(ShaderEffect& effect)
+{
+  GetRenderableAttachment().SetShaderEffect( effect );
+}
+
+ShaderEffectPtr RenderableActor::GetShaderEffect() const
+{
+  return GetRenderableAttachment().GetShaderEffect();
+}
+
+void RenderableActor::RemoveShaderEffect()
+{
+  return GetRenderableAttachment().RemoveShaderEffect();
 }
 
 } // namespace Internal

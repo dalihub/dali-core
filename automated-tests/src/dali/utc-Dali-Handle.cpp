@@ -405,7 +405,6 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::NAME ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::SENSITIVE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::LEAVE_REQUIRED ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::INHERIT_SHADER_EFFECT ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::INHERIT_ROTATION ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::INHERIT_SCALE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::COLOR_MODE ) );

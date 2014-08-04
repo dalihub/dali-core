@@ -108,9 +108,9 @@ void RenderableAttachment::PrepareResources( BufferIndex updateBufferIndex, Reso
   mHasUntrackedResources = false; // Only need to know this if the resources are not yet complete
   mTrackedResources.Clear(); // Resource trackers are only needed if not yet completea
 
-  if( Shader* shader = mParent->GetAppliedShader() )
+  if( mShader )
   {
-    Integration::ResourceId id = shader->GetEffectTextureResourceId();
+    Integration::ResourceId id = mShader->GetEffectTextureResourceId();
 
     if( id != 0 )
     {
@@ -203,6 +203,29 @@ void RenderableAttachment::GetScaleForSize( const Vector3& nodeSize, Vector3& sc
   mScaleForSizeDirty = false;
 }
 
+void RenderableAttachment::ApplyShader( BufferIndex updateBufferIndex, Shader* shader )
+{
+  mShader = shader;
+
+  // send the message to renderer
+  SendShaderChangeMessage( updateBufferIndex );
+
+  // tell derived class to do something
+  ShaderChanged( updateBufferIndex );
+}
+
+void RenderableAttachment::RemoveShader( BufferIndex updateBufferIndex )
+{
+  // return to default shader
+  mShader = mSceneController->GetDefaultShader();
+
+  // send the message to renderer
+  SendShaderChangeMessage( updateBufferIndex );
+
+  // tell derived class to do something
+  ShaderChanged( updateBufferIndex );
+}
+
 void RenderableAttachment::DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
 {
   scaling = Vector3::ONE;
@@ -282,6 +305,9 @@ void RenderableAttachment::PrepareRender( BufferIndex updateBufferIndex )
 
 RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
 : mSceneController(NULL),
+  mShader( NULL ),
+  mTrackedResources(),
+  mSortModifier( 0.0f ),
   mBlendingMode( Dali::RenderableActor::DEFAULT_BLENDING_MODE ),
   mUsesGeometryScaling( usesGeometryScaling ),
   mScaleForSizeDirty( true ),
@@ -290,8 +316,7 @@ RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
   mHasUntrackedResources( false ),
-  mCullFaceMode( CullNone ),
-  mSortModifier( 0.0f )
+  mCullFaceMode( CullNone )
 {
 }
 
@@ -302,12 +327,18 @@ RenderableAttachment::~RenderableAttachment()
 void RenderableAttachment::ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex )
 {
   mSceneController = &sceneController;
+  // get the default shader
+  mShader = mSceneController->GetDefaultShader();
 
   // Chain to derived attachments
   ConnectToSceneGraph2( updateBufferIndex );
 
   // After derived classes have (potentially) created their renderer
-  GetRenderer().SetCullFace( mCullFaceMode );
+  Renderer& renderer = GetRenderer();
+  renderer.SetCullFace( mCullFaceMode );
+
+  // set the default shader here as well
+  renderer.SetShader( mShader );
 }
 
 void RenderableAttachment::OnDestroy()
@@ -324,6 +355,14 @@ RenderableAttachment* RenderableAttachment::GetRenderable()
   return this;
 }
 
+void RenderableAttachment::SendShaderChangeMessage( BufferIndex updateBufferIndex )
+{
+  typedef MessageValue1< Renderer, Shader* > DerivedType;
+  // Reserve memory inside the render queue
+  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+  // Construct message in the mRenderer queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( &GetRenderer(), &Renderer::SetShader, mShader );
+}
 
 } // namespace SceneGraph
 

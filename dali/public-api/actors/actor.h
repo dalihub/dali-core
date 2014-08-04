@@ -260,7 +260,6 @@ public:
   static const Property::Index NAME;                  ///< name "name",                  type STRING
   static const Property::Index SENSITIVE;             ///< name "sensitive",             type BOOLEAN
   static const Property::Index LEAVE_REQUIRED;        ///< name "leave-required",        type BOOLEAN
-  static const Property::Index INHERIT_SHADER_EFFECT; ///< name "inherit-shader-effect", type BOOLEAN
   static const Property::Index INHERIT_ROTATION;      ///< name "inherit-rotation",      type BOOLEAN
   static const Property::Index INHERIT_SCALE;         ///< name "inherit-scale",         type BOOLEAN
   static const Property::Index COLOR_MODE;            ///< name "color-mode",            type STRING
@@ -405,7 +404,7 @@ public:
    * @brief Adds a child Actor to this Actor.
    *
    * NOTE! if the child already has a parent, it will be removed from old parent
-   * and reparented to this actor. This may change childs position, color, shader effect,
+   * and reparented to this actor. This may change childs position, color,
    * scale etc as it now inherits them from this actor
    * @pre This Actor (the parent) has been initialized.
    * @pre The child actor has been initialized.
@@ -991,45 +990,35 @@ public:
   // Shader Effects
 
   /**
-   * @brief Set whether the actor inherits a shader effect from its parent; it does inherit by default.
+   * @deprecated call Set/RemoveShaderEffectRecursively if you want to apply the same shader for a tree of actors
    *
-   * The inherited effect can still be overriden using SetShaderEffect().
-   * @pre The Actor has been initialized.
-   * @param [in] inherit True if the parent effect is inherited.
+   * @param [in] ignored
    */
-  void SetInheritShaderEffect(bool inherit);
+  void SetInheritShaderEffect(bool ignored);
 
   /**
-   * @brief Query whether the actor inherits a shader effect from its parent.
+   * @deprecated functionality no longer supported
    *
-   * @pre The Actor has been initialized.
-   * @return True if the parent effect is inherited.
+   * @return false
    */
   bool GetInheritShaderEffect() const;
 
   /**
-   * @brief Sets the shader effect for the Actor.
+   * @deprecated you need to call RenderableActor::SetShaderEffect
    *
-   * Shader effects provide special effects like rippling and bending.
-   * Setting a shader effect removes any shader effect previously set by SetShaderEffect.
-   * @pre The actor has been initialized.
-   * @pre effect has been initialized.
    * @param [in] effect The shader effect.
    */
   void SetShaderEffect(ShaderEffect effect);
 
   /**
-   * @brief Retrieve the shader effect for the Actor.
+   * @deprecated you need to call RenderableActor::GetShaderEffect
    *
-   * @pre The Actor has been initialized.
    * @return The shader effect
    */
   ShaderEffect GetShaderEffect() const;
 
   /**
-   * @brief Removes the current shader effect.
-   *
-   * @pre The Actor has been initialized.
+   * @deprecated you need to call RenderableActor::GetShaderEffect
    */
   void RemoveShaderEffect();
 

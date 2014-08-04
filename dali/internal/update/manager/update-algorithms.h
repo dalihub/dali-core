@@ -36,7 +36,6 @@ class Layer;
 class Node;
 class PropertyOwner;
 class RenderQueue;
-class Shader;
 
 /**
  * Recursively apply the constraints on the nodes.
@@ -63,14 +62,12 @@ unsigned int ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex u
  * @param[in] updateBufferIndex The current update buffer index.
  * @param[in] resourceManager The resource manager.
  * @param[in] renderQueue Used to query messages for the next Render.
- * @param[in] defaultShader The default shader.
  * @return The cumulative (ORed) dirty flags for the updated nodes
  */
 int UpdateNodesAndAttachments( Layer& rootNode,
                                BufferIndex updateBufferIndex,
                                ResourceManager& resourceManager,
-                               RenderQueue& renderQueue,
-                               Shader* defaultShader );
+                               RenderQueue& renderQueue );
 
 } // namespace SceneGraph
 

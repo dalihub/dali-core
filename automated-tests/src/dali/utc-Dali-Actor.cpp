@@ -40,19 +40,6 @@ void utc_dali_actor_cleanup(void)
 namespace
 {
 
-const char* vertexSource =
-"void main()\n"
-"{\n"
-"  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n"
-"  vTexCoord = aTexCoord;\n"
-"}\n";
-
-const char* fragmentSource =
-"void main()\n"
-"{\n"
-"  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
-"}\n";
-
 bool gTouchCallBackCalled=false;
 bool gTouchCallBack2Called=false;
 
@@ -1548,94 +1535,6 @@ int UtcDaliActorIsSensitive(void)
   END_TEST;
 }
 
-int UtcDaliActorSetInheritShaderEffect(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-
-  actor.SetInheritShaderEffect(false);
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_CHECK(actor.GetInheritShaderEffect() == false);
-
-  actor.SetInheritShaderEffect(true);
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_CHECK(actor.GetInheritShaderEffect() == true);
-  END_TEST;
-}
-
-int UtcDaliActorGetInheritShaderEffect(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-
-  DALI_TEST_CHECK(actor.GetInheritShaderEffect() == true);
-  END_TEST;
-}
-
-int UtcDaliActorSetShaderEffect(void)
-{
-  TestApplication application;
-  Actor actor = Actor::New();
-
-  ShaderEffect effect = ShaderEffect::New(vertexSource, fragmentSource);
-
-  DALI_TEST_CHECK(effect != actor.GetShaderEffect());
-
-  actor.SetShaderEffect(effect);
-
-  DALI_TEST_CHECK(effect == actor.GetShaderEffect());
-  END_TEST;
-}
-
-int UtcDaliActorGetShaderEffect(void)
-{
-  TestApplication application;
-  Actor actor = Actor::New();
-
-  ShaderEffect effect = ShaderEffect::New(vertexSource, fragmentSource);
-  actor.SetShaderEffect(effect);
-
-  DALI_TEST_CHECK(effect == actor.GetShaderEffect());
-  END_TEST;
-}
-
-int UtcDaliActorRemoveShaderEffect01(void)
-{
-  TestApplication application;
-  Actor actor = Actor::New();
-
-  ShaderEffect defaultEffect = actor.GetShaderEffect();
-
-  ShaderEffect effect = ShaderEffect::New(vertexSource, fragmentSource);
-  actor.SetShaderEffect(effect);
-
-  DALI_TEST_CHECK(effect == actor.GetShaderEffect());
-
-  actor.RemoveShaderEffect();
-
-  DALI_TEST_CHECK(defaultEffect == actor.GetShaderEffect());
-  END_TEST;
-}
-
-int UtcDaliActorRemoveShaderEffect02(void)
-{
-  TestApplication application;
-  Actor actor = Actor::New();
-
-  ShaderEffect defaultEffect = actor.GetShaderEffect();
-
-  actor.RemoveShaderEffect();
-
-  DALI_TEST_CHECK(defaultEffect == actor.GetShaderEffect());
-  END_TEST;
-}
-
 int UtcDaliActorSetColor(void)
 {
   TestApplication application;
@@ -2984,7 +2883,6 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "name",                     Actor::NAME,                    Property::STRING      },
   { "sensitive",                Actor::SENSITIVE,               Property::BOOLEAN     },
   { "leave-required",           Actor::LEAVE_REQUIRED,          Property::BOOLEAN     },
-  { "inherit-shader-effect",    Actor::INHERIT_SHADER_EFFECT,   Property::BOOLEAN     },
   { "inherit-rotation",         Actor::INHERIT_ROTATION,        Property::BOOLEAN     },
   { "inherit-scale",            Actor::INHERIT_SCALE,           Property::BOOLEAN     },
   { "color-mode",               Actor::COLOR_MODE,              Property::STRING      },
