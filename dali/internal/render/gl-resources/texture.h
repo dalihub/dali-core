@@ -28,6 +28,7 @@
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/actors/sampling.h>
 
 namespace Dali
 {
@@ -246,6 +247,17 @@ private:
    * @param uv texture co-ordinates
    */
   void GetDefaultTextureCoordinates(UvRect& uv) const;
+
+  /**
+   * @brief Apply the given texture parameters.
+   *
+   * @param[in] filterType Minification or magnification.
+   * @param[in] currentFilterMode The current filter mode.
+   * @param[in] newFilterMode The new filter mode.
+   * @param[in] daliDefault The default dali filter mode for the given filterType.
+   * @param[in] systemDefault The default system filter mode for the given filterType.
+   */
+  void ApplyTextureParameter( GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault );
 
 protected:
 
