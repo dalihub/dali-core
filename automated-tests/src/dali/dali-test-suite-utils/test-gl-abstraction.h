@@ -761,6 +761,11 @@ public:
     }
   }
 
+  inline std::string GetShaderSource(GLuint shader)
+  {
+    return mShaderSources[shader];
+  }
+
   inline void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
   }
