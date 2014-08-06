@@ -52,8 +52,6 @@ namespace Internal
 class Actor;
 class ActorGestureData;
 class RenderTask;
-class ShaderEffect;
-typedef IntrusivePtr<ShaderEffect>            ShaderEffectPtr;
 struct DynamicsData;
 
 typedef IntrusivePtr<Actor>                   ActorPtr;
@@ -616,31 +614,6 @@ public:
   {
     return mSensitive;
   }
-
-  // Shader effects, these are virtual so that RenderableActor can override the behaviour.
-  // Default actor behaviour is to do nothing, but the API is kept in Actor for convenience.
-
-  /**
-   * @todo remove when API is cleaned up
-   * Sets the shader effect for the Actor.
-   * Shader effects provide special effects like rippling and bending.
-   * Setting a shader effect removes any shader effect previously set by SetShaderEffect.
-   * @param [in] effect The shader effect.
-   */
-  virtual void SetShaderEffect(ShaderEffect& effect);
-
-  /**
-   * @todo remove when API is cleaned up
-   * Retrieve the shader effect for the Actor.
-   * @return The shader effect
-   */
-  virtual ShaderEffectPtr GetShaderEffect() const;
-
-  /**
-   * @todo remove when API is cleaned up
-   * Removes the current shader effect.
-   */
-  virtual void RemoveShaderEffect();
 
   /**
    * @copydoc Dali::Actor::SetDrawMode

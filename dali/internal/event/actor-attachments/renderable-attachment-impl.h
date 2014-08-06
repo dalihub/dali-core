@@ -24,6 +24,7 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
+#include <dali/internal/event/effects/shader-declarations.h>
 
 namespace Dali
 {
@@ -35,8 +36,6 @@ namespace SceneGraph
 {
 class RenderableAttachment;
 }
-class ShaderEffect;
-typedef IntrusivePtr<ShaderEffect> ShaderEffectPtr;
 
 /**
  * An base class for renderable actor attachments

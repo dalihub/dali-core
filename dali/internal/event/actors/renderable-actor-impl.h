@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/effects/shader-declarations.h>
 
 namespace Dali
 {

@@ -22,7 +22,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
@@ -31,7 +30,6 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
 
 #include <dali/public-api/dynamics/dynamics-body.h>
 #include <dali/public-api/dynamics/dynamics-joint.h>
@@ -430,37 +428,6 @@ ColorMode Actor::GetColorMode() const
 Vector4 Actor::GetCurrentWorldColor() const
 {
   return GetImplementation(*this).GetCurrentWorldColor();
-}
-
-void Actor::SetInheritShaderEffect(bool inherit)
-{
-  // TODO remove this API
-  // @deprecated
-}
-
-bool Actor::GetInheritShaderEffect() const
-{
-  // TODO remove this API
-  // @deprecated
-  return false;
-}
-
-void Actor::SetShaderEffect(ShaderEffect effect)
-{
-  // TODO remove this API
-  GetImplementation(*this).SetShaderEffect(GetImplementation(effect));
-}
-
-ShaderEffect Actor::GetShaderEffect() const
-{
-  // TODO remove this API
-  return ShaderEffect();
-}
-
-void Actor::RemoveShaderEffect()
-{
-  // TODO remove this API
-  GetImplementation(*this).RemoveShaderEffect();
 }
 
 void Actor::SetDrawMode( DrawMode::Type drawMode )

@@ -41,7 +41,6 @@
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/nodes/node-messages.h>
@@ -1113,20 +1112,6 @@ const Vector3& Actor::GetCurrentSize() const
   }
 
   return Vector3::ZERO;
-}
-
-void Actor::SetShaderEffect(ShaderEffect& effect)
-{
-  // no-op on an Actor
-}
-
-ShaderEffectPtr Actor::GetShaderEffect() const
-{
-  return ShaderEffectPtr();
-}
-
-void Actor::RemoveShaderEffect()
-{
 }
 
 #ifdef DYNAMICS_SUPPORT

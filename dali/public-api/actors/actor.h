@@ -48,7 +48,6 @@ class DynamicsJoint;
 class Quaternion;
 class Layer;
 struct Radian;
-class ShaderEffect;
 struct KeyEvent;
 struct TouchEvent;
 struct MouseWheelEvent;
@@ -986,41 +985,6 @@ public:
    * @return The Actor's current color in the world.
    */
   Vector4 GetCurrentWorldColor() const;
-
-  // Shader Effects
-
-  /**
-   * @deprecated call Set/RemoveShaderEffectRecursively if you want to apply the same shader for a tree of actors
-   *
-   * @param [in] ignored
-   */
-  void SetInheritShaderEffect(bool ignored);
-
-  /**
-   * @deprecated functionality no longer supported
-   *
-   * @return false
-   */
-  bool GetInheritShaderEffect() const;
-
-  /**
-   * @deprecated you need to call RenderableActor::SetShaderEffect
-   *
-   * @param [in] effect The shader effect.
-   */
-  void SetShaderEffect(ShaderEffect effect);
-
-  /**
-   * @deprecated you need to call RenderableActor::GetShaderEffect
-   *
-   * @return The shader effect
-   */
-  ShaderEffect GetShaderEffect() const;
-
-  /**
-   * @deprecated you need to call RenderableActor::GetShaderEffect
-   */
-  void RemoveShaderEffect();
 
   /**
    * @brief Set how the actor and its children should be drawn.
