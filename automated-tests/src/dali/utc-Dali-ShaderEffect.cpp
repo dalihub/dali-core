@@ -37,26 +37,16 @@ namespace
 {
 
 static const char* VertexSource =
-"void main()\n"
-"{\n"
-"  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n"
-"  vTexCoord = aTexCoord;\n"
-"}\n";
+"This is a custom vertex shader\n"
+"made on purpose to look nothing like a normal vertex shader inside dali\n";
 
 static const char* FragmentSource =
-"void main()\n"
-"{\n"
-"  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
-"}\n";
+"This is a custom fragment shader\n"
+"made on purpose to look nothing like a normal fragment shader inside dali\n";
 
 static const char* FragmentSourceUsingExtensions =
-"void main()\n"
-"{\n"
-"  float floatValue = 0.5f;\n"
-"  float test = fwidth(floatValue);\n"
-"  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
-"  gl_FragColor.a *= test;\n"
-"}\n";
+"This is a custom fragment shader using extensions\n"
+"made on purpose to look nothing like a normal fragment shader inside dali\n";
 
 const int GETSOURCE_BUFFER_SIZE = 0x10000;
 
@@ -202,26 +192,25 @@ int UtcDaliShaderEffectMethodNew04(void)
     GLuint lastShaderCompiledAfter = application.GetGlAbstraction().GetLastShaderCompiled();
     bool testResult = false;
 
-    // we should have compiled 4 shaders.
-    if (lastShaderCompiledAfter - lastShaderCompiledBefore == 4)
-    {
-      char testVertexSourceResult[GETSOURCE_BUFFER_SIZE];
-      char testFragmentSourceResult[GETSOURCE_BUFFER_SIZE];
+    // we should have compiled 2 shaders.
+    DALI_TEST_EQUALS( lastShaderCompiledAfter, lastShaderCompiledBefore + 2, TEST_LOCATION );
 
-      // we are interested in the first two.
-      GLuint vertexShaderId = lastShaderCompiledBefore + 1;
-      GLuint fragmentShaderId = lastShaderCompiledBefore + 2;
+    char testVertexSourceResult[GETSOURCE_BUFFER_SIZE];
+    char testFragmentSourceResult[GETSOURCE_BUFFER_SIZE];
 
-      GLsizei lengthVertexResult;
-      GLsizei lengthFragmentResult;
+     // we are interested in the first two.
+    GLuint vertexShaderId = lastShaderCompiledBefore + 1;
+    GLuint fragmentShaderId = lastShaderCompiledBefore + 2;
 
-      application.GetGlAbstraction().GetShaderSource(vertexShaderId, GETSOURCE_BUFFER_SIZE, &lengthVertexResult, testVertexSourceResult);
-      application.GetGlAbstraction().GetShaderSource(fragmentShaderId, GETSOURCE_BUFFER_SIZE, &lengthFragmentResult, testFragmentSourceResult);
+    GLsizei lengthVertexResult;
+    GLsizei lengthFragmentResult;
 
-      int vertexShaderHasPrefix = strncmp(testVertexSourceResult, "#define ", strlen("#define "));
-      int fragmentShaderHasPrefix = strncmp(testFragmentSourceResult, "#define ", strlen("#define "));
-      testResult = (vertexShaderHasPrefix == 0) && (fragmentShaderHasPrefix == 0);
-    }
+    application.GetGlAbstraction().GetShaderSource(vertexShaderId, GETSOURCE_BUFFER_SIZE, &lengthVertexResult, testVertexSourceResult);
+    application.GetGlAbstraction().GetShaderSource(fragmentShaderId, GETSOURCE_BUFFER_SIZE, &lengthFragmentResult, testFragmentSourceResult);
+
+    int vertexShaderHasPrefix = strncmp(testVertexSourceResult, "#define ", strlen("#define "));
+    int fragmentShaderHasPrefix = strncmp(testFragmentSourceResult, "#define ", strlen("#define "));
+    testResult = (vertexShaderHasPrefix == 0) && (fragmentShaderHasPrefix == 0);
 
     DALI_TEST_CHECK(testResult);
   }
@@ -287,24 +276,14 @@ int UtcDaliShaderEffectMethodDelete01(void)
 {
    TestApplication application;
 
-   // Only want to test the first few characters
-   std::string customFontPrefixVertShader =
-     "\n"
-     "  attribute mediump vec3  aPosition;\n"
-     "  attribute mediump vec2  aTexCoord;\n";
-
-
    // get the default shaders built, this is not required but makes it
    // easier to debug the TET case and isolate the custom shader compilation.
    application.SendNotification();
    application.Render();
 
-   application.SendNotification();
-   application.Render();
-
    // create a new shader effect
    // the vertex and fragment shader will be cached in the ShaderFactory
-   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource);
+   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
 
    // destroy the shader effect
    effect.Reset();
@@ -321,20 +300,15 @@ int UtcDaliShaderEffectMethodDelete01(void)
 
    // get the vertex shader (compiled before fragment shader).
    // this last shaders compiled is for text.
-   GLuint vertexShaderId = lastShaderCompiled-1;
-   GLsizei lengthVertexResult;
+   GLuint vertexShaderId = lastShaderCompiled - 1;
 
-   char testVertexSourceResult[GETSOURCE_BUFFER_SIZE];
-   application.GetGlAbstraction().GetShaderSource(vertexShaderId, GETSOURCE_BUFFER_SIZE, &lengthVertexResult, testVertexSourceResult);
-
-   // compare the first 40 bytes of the vertex shader sent to be compiled, with
-   // the shader string that ended up being compiled (in the render task)
+   // compare the vertex shader sent to be compiled, with the shader string that ended up being compiled
    // this is to confirm the string hasn't been deleted / corrupted.
-   int testPassed = strncmp( testVertexSourceResult , customFontPrefixVertShader.c_str(), 40 ) ;
+   std::string actualVertexShader = application.GetGlAbstraction().GetShaderSource( vertexShaderId );
+   DALI_TEST_EQUALS( VertexSource,
+                     actualVertexShader.substr( actualVertexShader.length() - strlen( VertexSource ) ), TEST_LOCATION );
 
-   DALI_TEST_CHECK( testPassed == 0 );
    END_TEST;
-
 }
 
 int UtcDaliShaderEffectMethodSetUniformFloat(void)

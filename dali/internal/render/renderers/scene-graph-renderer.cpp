@@ -247,7 +247,7 @@ Renderer::Renderer( RenderDataProvider& dataprovider )
 
   mTextureCache( NULL ),
   mShader( NULL ),
-  mSamplerBitfield( ImageSampler::DefaultOptions() ),
+  mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
   mUseBlend( false ),
   mCullFaceMode( CullNone )
 {

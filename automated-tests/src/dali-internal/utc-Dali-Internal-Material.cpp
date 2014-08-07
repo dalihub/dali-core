@@ -387,7 +387,7 @@ int UtcDaliMaterialStaging01(void)
   application.Render(); //Process render Q stores & processes mat
 
   renderMaterial->SetUniforms( materialUniforms, testProgram.GetProgram(), Internal::SHADER_DEFAULT );
-  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::DefaultOptions() );
+  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
   DALI_TEST_CHECK( boundTextures.GetNumBoundTextures() == 0 );
 
   DALI_TEST_EQUALS( testProgram.GetOpacity(),       TEST_PROPS.mOpacity,       TEST_LOCATION);
@@ -441,7 +441,7 @@ int UtcDaliMaterialStaging02(void)
   application.Render(); //Process render Q stores & processes mat
 
   renderMaterial->SetUniforms( materialUniforms, testProgram.GetProgram(), Internal::SHADER_DEFAULT );
-  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::DefaultOptions() );
+  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
 
   DALI_TEST_CHECK( boundTextures.GetNumBoundTextures() == 0 );
   DALI_TEST_EQUALS( testProgram.GetOpacity(),       0.4f, TEST_LOCATION);
@@ -484,7 +484,7 @@ int UtcDaliMaterialSetPropsWhilstStaged(void)
 
   Internal::SceneGraph::RenderMaterialUniforms materialUniforms;
   renderMaterial->SetUniforms( materialUniforms, testProgram.GetProgram(), Internal::SHADER_DEFAULT );
-  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::DefaultOptions() );
+  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
 
   DALI_TEST_EQUALS( boundTextures.GetNumBoundTextures(), 0u, TEST_LOCATION );
 
@@ -526,7 +526,7 @@ int UtcDaliMaterialSetTextureWhilstStaged(void)
   application.Render(); // Update & Prepare material
   application.Render(); // Process render Q
 
-  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::DefaultOptions() );
+  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
   DALI_TEST_CHECK( boundTextures.CheckFirstTextureBound( GL_TEXTURE0 ) );
   END_TEST;
 }
@@ -566,7 +566,7 @@ int UtcDaliMaterialSetUnreadyTextureWhilstStaged(void)
   application.Render(); // Update & Prepare material
   application.Render(); // Process render Q
 
-  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::DefaultOptions() );
+  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
 
   DALI_TEST_EQUALS( boundTextures.GetNumBoundTextures(), 0u, TEST_LOCATION );
 
@@ -578,7 +578,7 @@ int UtcDaliMaterialSetUnreadyTextureWhilstStaged(void)
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
 
-  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::DefaultOptions() );
+  renderMaterial->BindTextures( testProgram.GetProgram(), Internal::ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
   DALI_TEST_CHECK( boundTextures.CheckFirstTextureBound( GL_TEXTURE0 ) );
   END_TEST;
 }

@@ -23,9 +23,6 @@
 </VertexShader>
 
 <FragmentShader>
-
-  #extension GL_OES_standard_derivatives : enable
-
   uniform mediump sampler2D sTexture;
   uniform highp   vec4      sTextureRect;
   uniform lowp    vec4      uColor;

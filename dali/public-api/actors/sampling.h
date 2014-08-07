@@ -32,7 +32,8 @@ namespace FilterMode
  */
 enum Type
 {
-  DEFAULT,
+  NONE,       ///< Use GL system defaults (minification NEAREST_MIPMAP_LINEAR, magnification LINEAR)
+  DEFAULT,    ///< Use dali defaults (minification LINEAR, magnification LINEAR)
   NEAREST,    ///< Filter nearest
   LINEAR      ///< Filter linear
 };

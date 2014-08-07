@@ -586,14 +586,33 @@ int UtcDaliRenderableActorSetFilterMode(void)
 
   // Verify actor gl state
 
-  // The first one should be true as we don't want to use the GL default
-  // The second one should be false as we want to use the GL default, therefore the TexParameter function should not be called
   // There are two calls to TexParameteri when the texture is first created
+  // Texture mag filter is not called as the first time set it uses the system default
   DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 3, TEST_LOCATION);
 
   out.str("");
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR;
   DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(2, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+
+  // Default/Default
+  texParameterTrace = application.GetGlAbstraction().GetTexParameterTrace();
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  actor.SetFilterMode( FilterMode::DEFAULT, FilterMode::DEFAULT );
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  // Verify actor gl state
+
+  // Should not make any calls when settings are the same
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 0, TEST_LOCATION);
 
   /**************************************************************/
 
@@ -661,15 +680,53 @@ int UtcDaliRenderableActorSetFilterMode(void)
   texParameterTrace.Enable( false );
 
   // Verify actor gl state
-  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 2, TEST_LOCATION);
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 1, TEST_LOCATION);
 
   out.str("");
   out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST;
   DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
+  /**************************************************************/
+
+  // Default/Default
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  actor.SetFilterMode( FilterMode::DEFAULT, FilterMode::DEFAULT );
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 1, TEST_LOCATION);
+
   out.str("");
-  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MAG_FILTER << ", " << GL_LINEAR;
-  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(1, "TexParameteri", out.str()), true, TEST_LOCATION);
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_LINEAR;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
+
+  /**************************************************************/
+
+  // None/None
+  texParameterTrace.Reset();
+  texParameterTrace.Enable( true );
+
+  actor.SetFilterMode( FilterMode::NONE, FilterMode::NONE );
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  texParameterTrace.Enable( false );
+
+  // Verify actor gl state
+  DALI_TEST_EQUALS( texParameterTrace.CountMethod( "TexParameteri" ), 1, TEST_LOCATION);
+
+  out.str("");
+  out << GL_TEXTURE_2D << ", " << GL_TEXTURE_MIN_FILTER << ", " << GL_NEAREST_MIPMAP_LINEAR;
+  DALI_TEST_EQUALS( texParameterTrace.TestMethodAndParams(0, "TexParameteri", out.str()), true, TEST_LOCATION);
 
   /**************************************************************/
 
