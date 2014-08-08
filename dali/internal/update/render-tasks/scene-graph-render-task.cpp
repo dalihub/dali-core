@@ -487,6 +487,11 @@ bool RenderTask::GetViewportEnabled( BufferIndex bufferIndex ) const
   return false;
 }
 
+Node* RenderTask::GetCamera() const
+{
+  return mCameraNode;
+}
+
 void RenderTask::ResetDefaultProperties( BufferIndex updateBufferIndex )
 {
   // Reset default properties

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <cmath>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/system-overlay.h>
@@ -263,28 +264,26 @@ void Stage::SetViewMode( ViewMode viewMode )
   {
     DALI_LOG_INFO( Debug::Filter::gActor, Debug::Concise, "View mode changed from %d to %d\n", mViewMode, viewMode);
 
-    const float stereoBase( ( (mStereoBase / 25.4f) * GetDpi().x ) * 0.5f );
-
     if( mViewMode == MONO )
     {
       mDefaultCamera->SetRotation( Degree( 180.0f ), Vector3::YAXIS );
       mRenderTaskList->GetTask(0).SetSourceActor( Dali::Actor() );
 
+      //Create camera and RenderTask for left eye
       mLeftCamera = CameraActor::New( Size::ZERO );
       mLeftCamera->SetParentOrigin( ParentOrigin::CENTER );
-      mLeftCamera->SetPerspectiveProjection( mSize, stereoBase );
-      mLeftCamera->SetPosition( Vector3( stereoBase, 0.0f, 0.0f ) );
       mDefaultCamera->Add( *mLeftCamera.Get() );
       mLeftRenderTask = mRenderTaskList->CreateTask();
       mLeftRenderTask.SetCameraActor( Dali::CameraActor( mLeftCamera.Get() ) );
       mLeftCamera->SetType( Dali::Camera::FREE_LOOK );
 
+      //Create camera and RenderTask for right eye
       mRightCamera = CameraActor::New( Size::ZERO );
       mRightCamera->SetParentOrigin( ParentOrigin::CENTER );
-      mRightCamera->SetPerspectiveProjection( mSize, -stereoBase );
-      mRightCamera->SetPosition( Vector3( -stereoBase, 0.0f, 0.0f ) );
       mDefaultCamera->Add( *mRightCamera.Get() );
       mRightRenderTask = mRenderTaskList->CreateTask();
+      mRightRenderTask.SetClearColor( Vector4( 1.0f,0.0f,0.0f,1.0f));
+
       mRightRenderTask.SetCameraActor( Dali::CameraActor( mRightCamera.Get() ) );
       mRightCamera->SetType( Dali::Camera::FREE_LOOK );
     }
@@ -309,18 +308,54 @@ void Stage::SetViewMode( ViewMode viewMode )
         mDefaultCamera->SetRotation( Degree( 0.0f ), Vector3::YAXIS );
         mDefaultCamera->SetType( Dali::Camera::LOOK_AT_TARGET );
         mRenderTaskList->GetTask(0).SetSourceActor( Dali::Layer(mRootLayer.Get()) );
+
         break;
       }
       case STEREO_HORIZONTAL:
       {
-        mLeftRenderTask.SetViewport( Viewport(0, 0, mSize.width, mSize.height * 0.5f ) );
-        mRightRenderTask.SetViewport( Viewport(0, mSize.height * 0.5f, mSize.width, mSize.height * 0.5f) );
+        //Stereo mode with horizontal split is for landscape mode. That's the reason for the cameras being rotated
+        //Top camera renders the scene as seen from the right eye and bottom camera as seen from left.
+
+        //Calculate separation in pixels along vertical axis ( mStereoBase is defined in millimetres )
+        const float stereoBase( ( (mStereoBase / 25.4f) * GetDpi().y ) * 0.5f );
+
+        //Calculate aspect ratio
+        float aspect = mSize.width / (mSize.height * 0.5f);
+
+        mLeftCamera->SetPerspectiveProjection( mSize, Vector2( 0.0f,stereoBase) );
+        mLeftCamera->SetAspectRatio( aspect );
+        mLeftCamera->SetRotation( Degree(-90.0f), Vector3::ZAXIS );
+        mLeftCamera->SetPosition( Vector3( stereoBase, 0.0f, 0.0f ) );
+        mLeftRenderTask.SetViewport( Viewport(0, mSize.height * 0.5f, mSize.width, mSize.height * 0.5f) );
+
+        mRightCamera->SetPerspectiveProjection( mSize, Vector2( 0.0,  -stereoBase) );
+        mRightCamera->SetAspectRatio( aspect );
+        mRightCamera->SetRotation( Degree(-90.0f), Vector3::ZAXIS );
+        mRightCamera->SetPosition( Vector3(-stereoBase, 0.0f, 0.0f ) );
+        mRightRenderTask.SetViewport( Viewport(0, 0, mSize.width, mSize.height * 0.5f ) );
+
         break;
       }
       case STEREO_VERTICAL:
       {
+        //Calculate separation in pixels along horizontal axis
+        const float stereoBase( ( (mStereoBase / 25.4f) * GetDpi().x ) * 0.5f );
+
+        //Recalculate fov based on viewport size
+        const float fov = 2.0f * std::atan(  mSize.y / (2.0f * std::max( mSize.x*0.5f, mSize.y )) );
+
+        mLeftCamera->SetPerspectiveProjection( Size( mSize.x * 0.5f, mSize.y ), Vector2(stereoBase,0.0f) );
+        mLeftCamera->SetFieldOfView( fov );
+        mLeftCamera->SetRotation( Degree(0.0f), Vector3::ZAXIS );
+        mLeftCamera->SetPosition( Vector3( stereoBase, 0.0f, 0.0f ) );
         mLeftRenderTask.SetViewport( Viewport(0, 0, mSize.width * 0.5f, mSize.height ) );
+
+        mRightCamera->SetPerspectiveProjection( Size( mSize.x * 0.5f, mSize.y ), Vector2(-stereoBase,0.0f) );
+        mRightCamera->SetFieldOfView( fov );
+        mRightCamera->SetRotation( Degree(0.0f), Vector3::ZAXIS );
+        mRightCamera->SetPosition( Vector3( -stereoBase, 0.0f, 0.0f ) );
         mRightRenderTask.SetViewport( Viewport(mSize.width * 0.5f, 0, mSize.width * 0.5f, mSize.height ) );
+
         break;
       }
       case STEREO_INTERLACED:
@@ -343,13 +378,40 @@ void Stage::SetStereoBase( float stereoBase )
     DALI_LOG_INFO( Debug::Filter::gActor, Debug::Concise, "old( %.2f) new(%.2f)", mStereoBase, stereoBase );
     mStereoBase = stereoBase;
 
-    if( mViewMode != MONO )
+    switch( mViewMode  )
     {
-      stereoBase *= 0.5f;
-      mLeftCamera->SetX( stereoBase );
-      mLeftCamera->SetPerspectiveProjection( mSize, stereoBase );
-      mRightCamera->SetX( -stereoBase );
-      mRightCamera->SetPerspectiveProjection( mSize, -stereoBase );
+      case STEREO_VERTICAL:
+      {
+        stereoBase = mStereoBase / 25.4f * GetDpi().y * 0.5f;
+        float aspect = mSize.width / (mSize.height * 0.5f);
+
+        mLeftCamera->SetPerspectiveProjection( mSize, Vector2( 0.0, stereoBase) );
+        mLeftCamera->SetAspectRatio( aspect );
+        mLeftCamera->SetX( stereoBase );
+
+        mRightCamera->SetPerspectiveProjection( mSize, Vector2( 0.0, -stereoBase) );
+        mRightCamera->SetAspectRatio( aspect );
+        mRightCamera->SetX( -stereoBase );
+
+        break;
+      }
+      case STEREO_HORIZONTAL:
+      {
+        stereoBase = mStereoBase / 25.4f * GetDpi().x * 0.5f;
+        const float fov = 2.0f * std::atan(  mSize.y / (2.0f * std::max( mSize.x*0.5f, mSize.y )) );
+
+        mLeftCamera->SetPerspectiveProjection( Size( mSize.x * 0.5f, mSize.y ), Vector2(stereoBase,0.0f) );
+        mLeftCamera->SetFieldOfView( fov );
+        mLeftCamera->SetX( stereoBase );
+
+        mRightCamera->SetPerspectiveProjection( Size( mSize.x * 0.5f, mSize.y ), Vector2(-stereoBase,0.0f) );
+        mRightCamera->SetFieldOfView( fov );
+        mRightCamera->SetX( -stereoBase );
+
+        break;
+      }
+      default:
+        break;
     }
   }
 }

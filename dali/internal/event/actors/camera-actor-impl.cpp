@@ -292,7 +292,7 @@ bool CameraActor::GetInvertYAxis() const
   return mCameraAttachment->GetInvertYAxis();
 }
 
-void CameraActor::SetPerspectiveProjection( const Size& size, float stereoBias /* = 0.0f */ )
+void CameraActor::SetPerspectiveProjection( const Size& size, const Vector2& stereoBias /* = Vector2::ZERO */ )
 {
   float width = size.width;
   float height = size.height;

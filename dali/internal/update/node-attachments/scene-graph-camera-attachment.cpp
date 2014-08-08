@@ -91,13 +91,13 @@ void Frustum(Matrix& result, float left, float right, float bottom, float top, f
   m[12] = m[13] = m[15] = 0.0f;
 }
 
-void Perspective(Matrix& result, float fovy, float aspect, float near, float far, bool invertYAxis, float stereoBias )
+void Perspective(Matrix& result, float fovy, float aspect, float near, float far, bool invertYAxis, const Vector2& stereoBias )
 {
   float frustumH = tanf( fovy * 0.5f ) * near;
   float frustumW = frustumH * aspect;
-  float bias = stereoBias * 0.5f;
+  Vector2 bias = stereoBias * 0.5f;
 
-  Frustum(result, -(frustumW + bias), frustumW - bias, -frustumH, frustumH, near, far, invertYAxis);
+  Frustum(result, -(frustumW + bias.x), frustumW - bias.x, -(frustumH + bias.y), frustumH - bias.y, near, far, invertYAxis);
 }
 
 void Orthographic(Matrix& result, float left, float right, float bottom, float top, float near, float far, bool invertYAxis)
@@ -141,13 +141,13 @@ const Dali::Camera::ProjectionMode CameraAttachment::DEFAULT_MODE( Dali::Camera:
 const bool  CameraAttachment::DEFAULT_INVERT_Y_AXIS( false );
 const float CameraAttachment::DEFAULT_FIELD_OF_VIEW( 45.0f*(M_PI/180.0f) );
 const float CameraAttachment::DEFAULT_ASPECT_RATIO( 4.0f/3.0f );
-const float CameraAttachment::DEFAULT_STEREO_BIAS( 0.0f );
 const float CameraAttachment::DEFAULT_LEFT_CLIPPING_PLANE(-240.0f);
 const float CameraAttachment::DEFAULT_RIGHT_CLIPPING_PLANE(240.0f);
 const float CameraAttachment::DEFAULT_TOP_CLIPPING_PLANE(-400.0f);
 const float CameraAttachment::DEFAULT_BOTTOM_CLIPPING_PLANE(400.0f);
 const float CameraAttachment::DEFAULT_NEAR_CLIPPING_PLANE( 800.0f ); // default height of the screen
 const float CameraAttachment::DEFAULT_FAR_CLIPPING_PLANE( DEFAULT_NEAR_CLIPPING_PLANE + 2.f * DEFAULT_NEAR_CLIPPING_PLANE );
+const Vector2 CameraAttachment::DEFAULT_STEREO_BIAS( 0.0f, 0.0f );
 const Vector3 CameraAttachment::DEFAULT_TARGET_POSITION( 0.0f, 0.0f, 0.0f );
 
 
@@ -160,13 +160,13 @@ CameraAttachment::CameraAttachment()
   mInvertYAxis( DEFAULT_INVERT_Y_AXIS ),
   mFieldOfView( DEFAULT_FIELD_OF_VIEW ),
   mAspectRatio( DEFAULT_ASPECT_RATIO ),
-  mStereoBias( DEFAULT_STEREO_BIAS ),
   mLeftClippingPlane( DEFAULT_LEFT_CLIPPING_PLANE ),
   mRightClippingPlane( DEFAULT_RIGHT_CLIPPING_PLANE ),
   mTopClippingPlane( DEFAULT_TOP_CLIPPING_PLANE ),
   mBottomClippingPlane( DEFAULT_BOTTOM_CLIPPING_PLANE ),
   mNearClippingPlane( DEFAULT_NEAR_CLIPPING_PLANE ),
   mFarClippingPlane( DEFAULT_FAR_CLIPPING_PLANE ),
+  mStereoBias( DEFAULT_STEREO_BIAS ),
   mTargetPosition( DEFAULT_TARGET_POSITION ),
   mViewMatrix( Matrix::IDENTITY ),
   mProjectionMatrix( Matrix::IDENTITY ),
@@ -227,7 +227,7 @@ void CameraAttachment::SetAspectRatio( float aspectRatio )
   mUpdateProjectionFlag = UPDATE_COUNT;
 }
 
-void CameraAttachment::SetStereoBias( float stereoBias )
+void CameraAttachment::SetStereoBias( const Vector2& stereoBias )
 {
   mStereoBias = stereoBias;
   mUpdateProjectionFlag = UPDATE_COUNT;
