@@ -182,12 +182,17 @@ Dali::Actor EmitTouchSignals( Dali::Actor actor, const TouchEvent& event )
 Dali::Actor EmitTouchSignals( Actor* actor, RenderTask& renderTask, const TouchEvent& originalEvent, TouchPoint::State state )
 {
   TouchEvent touchEvent( originalEvent );
-  TouchPoint& primaryPoint = touchEvent.points[0];
 
-  actor->ScreenToLocal( renderTask, primaryPoint.local.x, primaryPoint.local.y, primaryPoint.screen.x, primaryPoint.screen.y );
+  DALI_ASSERT_DEBUG( NULL != actor && "NULL actor pointer" );
+  if( actor )
+  {
+    TouchPoint& primaryPoint = touchEvent.points[0];
 
-  primaryPoint.hitActor = actor;
-  primaryPoint.state = state;
+    actor->ScreenToLocal( renderTask, primaryPoint.local.x, primaryPoint.local.y, primaryPoint.screen.x, primaryPoint.screen.y );
+
+    primaryPoint.hitActor = Dali::Actor(actor);
+    primaryPoint.state = state;
+  }
 
   return EmitTouchSignals( Dali::Actor(actor), touchEvent );
 }

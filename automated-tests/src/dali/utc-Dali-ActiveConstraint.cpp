@@ -278,13 +278,6 @@ int UtcDaliConstraintRemove(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1000.0f));
   DALI_TEST_CHECK( 0.5f == active.GetCurrentWeight() );
-
-  // Quick check for operator = override on constrainables (needs rhs as a Handle!!) and destructor from heap
-  Constrainable* constrainable = new Constrainable;
-  Constrainable constrainable2;
-  Handle& handle = dynamic_cast< Handle& > ( *constrainable );
-  constrainable2 = handle;
-  delete constrainable;
   END_TEST;
 }
 

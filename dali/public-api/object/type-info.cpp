@@ -34,6 +34,24 @@ TypeInfo::~TypeInfo()
 {
 }
 
+TypeInfo::TypeInfo(const TypeInfo& copy)
+: BaseHandle(copy)
+{
+}
+
+TypeInfo& TypeInfo::operator=(const TypeInfo& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+TypeInfo& TypeInfo::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 const std::string& TypeInfo::GetName()
 {
   return GetImplementation(*this).GetName();

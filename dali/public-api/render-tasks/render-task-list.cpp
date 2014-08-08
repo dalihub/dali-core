@@ -37,6 +37,24 @@ RenderTaskList::~RenderTaskList()
 {
 }
 
+RenderTaskList::RenderTaskList(const RenderTaskList& handle)
+: BaseHandle(handle)
+{
+}
+
+RenderTaskList& RenderTaskList::operator=(const RenderTaskList& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+RenderTaskList& RenderTaskList::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 RenderTask RenderTaskList::CreateTask()
 {
   return GetImplementation(*this).CreateTask();

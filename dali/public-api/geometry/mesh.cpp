@@ -41,6 +41,24 @@ Mesh::~Mesh()
 {
 }
 
+Mesh::Mesh(const Mesh& handle)
+: BaseHandle(handle)
+{
+}
+
+Mesh& Mesh::operator=(const Mesh& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+Mesh& Mesh::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 Mesh Mesh::New( const MeshData& meshData )
 {
   // Convert material handle to intrusive pointer

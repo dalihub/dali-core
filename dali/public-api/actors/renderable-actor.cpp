@@ -39,6 +39,24 @@ RenderableActor::~RenderableActor()
 {
 }
 
+RenderableActor::RenderableActor(const RenderableActor& copy)
+: Actor(copy)
+{
+}
+
+RenderableActor& RenderableActor::operator=(const RenderableActor& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+RenderableActor& RenderableActor::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void RenderableActor::SetSortModifier(float modifier)
 {
   GetImplementation(*this).SetSortModifier(modifier);

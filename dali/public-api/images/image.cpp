@@ -50,6 +50,24 @@ Image::~Image()
 {
 }
 
+Image::Image(const Image& handle)
+: BaseHandle(handle)
+{
+}
+
+Image& Image::operator=(const Image& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+Image& Image::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 Image Image::New(const std::string& filename)
 {
   Internal::ImagePtr internal = Internal::Image::New(filename);

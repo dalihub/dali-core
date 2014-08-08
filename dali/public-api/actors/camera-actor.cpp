@@ -57,6 +57,24 @@ CameraActor::~CameraActor()
 {
 }
 
+CameraActor::CameraActor(const CameraActor& copy)
+: Actor(copy)
+{
+}
+
+CameraActor& CameraActor::operator=(const CameraActor& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+CameraActor& CameraActor::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void CameraActor::SetType( Dali::Camera::Type type )
 {
   GetImplementation(*this).SetType(type);

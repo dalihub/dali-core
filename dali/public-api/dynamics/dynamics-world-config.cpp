@@ -45,6 +45,24 @@ DynamicsWorldConfig::~DynamicsWorldConfig()
 {
 }
 
+DynamicsWorldConfig::DynamicsWorldConfig(const DynamicsWorldConfig& handle)
+: BaseHandle(handle)
+{
+}
+
+DynamicsWorldConfig& DynamicsWorldConfig::operator=(const DynamicsWorldConfig& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+DynamicsWorldConfig& DynamicsWorldConfig::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void DynamicsWorldConfig::SetType( const DynamicsWorldConfig::WorldType type )
 {
 #ifdef DYNAMICS_SUPPORT

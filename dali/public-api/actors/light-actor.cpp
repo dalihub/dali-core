@@ -45,6 +45,24 @@ LightActor::~LightActor()
 {
 }
 
+LightActor::LightActor(const LightActor& copy)
+: Actor(copy)
+{
+}
+
+LightActor& LightActor::operator=(const LightActor& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+LightActor& LightActor::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void LightActor::SetLight(Light light)
 {
   GetImplementation(*this).SetLight(light);

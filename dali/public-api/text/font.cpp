@@ -115,6 +115,24 @@ Font::~Font()
 {
 }
 
+Font::Font(const Font& handle)
+: BaseHandle(handle)
+{
+}
+
+Font& Font::operator=(const Font& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+Font& Font::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 PixelSize Font::GetLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, const CapsHeight& capsHeight)
 {
   return Internal::Font::GetLineHeightFromCapsHeight(fontFamily,fontStyle,capsHeight);

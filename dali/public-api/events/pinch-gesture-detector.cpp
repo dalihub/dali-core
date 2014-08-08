@@ -51,6 +51,24 @@ PinchGestureDetector::~PinchGestureDetector()
 {
 }
 
+PinchGestureDetector::PinchGestureDetector(const PinchGestureDetector& handle)
+: GestureDetector(handle)
+{
+}
+
+PinchGestureDetector& PinchGestureDetector::operator=(const PinchGestureDetector& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+PinchGestureDetector& PinchGestureDetector::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 PinchGestureDetector::DetectedSignalV2& PinchGestureDetector::DetectedSignal()
 {
   return GetImplementation(*this).DetectedSignal();

@@ -57,6 +57,24 @@ Stage::~Stage()
 {
 }
 
+Stage::Stage(const Stage& handle)
+: BaseHandle(handle)
+{
+}
+
+Stage& Stage::operator=(const Stage& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+Stage& Stage::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 Stage::Stage(Internal::Stage* internal)
 : BaseHandle(internal)
 {

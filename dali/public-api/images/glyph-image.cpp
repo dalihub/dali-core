@@ -43,6 +43,24 @@ GlyphImage::~GlyphImage()
 {
 }
 
+GlyphImage::GlyphImage(const GlyphImage& handle)
+: Image(handle)
+{
+}
+
+GlyphImage& GlyphImage::operator=(const GlyphImage& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+GlyphImage& GlyphImage::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 GlyphImage GlyphImage::New( const Character& character )
 {
   // Retrieves the font family name for the given character.

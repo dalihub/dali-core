@@ -38,6 +38,24 @@ DynamicsCollision::~DynamicsCollision()
 {
 }
 
+DynamicsCollision::DynamicsCollision(const DynamicsCollision& handle)
+: BaseHandle(handle)
+{
+}
+
+DynamicsCollision& DynamicsCollision::operator=(const DynamicsCollision& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+DynamicsCollision& DynamicsCollision::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 Actor DynamicsCollision::GetActorA()
 {
 #ifdef DYNAMICS_SUPPORT
