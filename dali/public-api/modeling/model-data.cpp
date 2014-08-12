@@ -126,16 +126,6 @@ ModelAnimationMapContainer& ModelData::GetAnimationMapContainer()
   return GetImplementation(*this).GetAnimationMapContainer();
 }
 
-const ModelAnimationMap* ModelData::GetAnimationMap (unsigned int index) const
-{
-  return GetImplementation(*this).GetAnimationMap(index);
-}
-
-const ModelAnimationMap* ModelData::GetAnimationMap (const std::string& name) const
-{
-  return GetImplementation(*this).GetAnimationMap(name);
-}
-
 bool ModelData::FindAnimation (const std::string& name, unsigned int& index) const
 {
   return GetImplementation(*this).FindAnimation(name, index);

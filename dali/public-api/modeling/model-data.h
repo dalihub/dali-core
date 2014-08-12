@@ -186,24 +186,6 @@ public:
    ModelAnimationMapContainer& GetAnimationMapContainer();
 
   /**
-   * @brief Get an animation map from the model data.
-   *
-   * @deprecated Use ModelActorFactory to generate animations
-   * @param[in] index The index of the animation map.
-   * @return a pointer to model animation map.
-   */
-  const ModelAnimationMap* GetAnimationMap (unsigned int index) const;
-
-  /**
-   * @brief Get the animation for the given name.
-   *
-   * @deprecated Use ModelActorFactory to generate animations
-   * @param[in] name The name of an animation map to search for.
-   * @return a pointer to model animation map.
-   */
-  const ModelAnimationMap* GetAnimationMap (const std::string& name) const;
-
-  /**
    * @brief Find the index for the given animation name.
    *
    * @param[in] name The name of the animation map to search for.
