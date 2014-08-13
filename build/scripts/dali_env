@@ -1,0 +1,276 @@
+#!/usr/bin/perl
+
+# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+
+# http://www.apache.org/licenses/LICENSE-2.0
+
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+use Cwd;
+use Cwd 'abs_path';
+use File::Basename;
+use File::Path;
+use File::Copy;
+use File::Copy::Recursive qw(dircopy);
+use strict;
+use Getopt::Long;
+use Pod::Usage;
+
+################################################################################
+#                                SYSTEM PACKAGES                               #
+################################################################################
+# Add any required system packages to this list - if they are not present, then
+# this script will attempt to install them for you.
+my @system_packages = (
+    "automake",
+    "g++",
+    "pkg-config",
+    "libtool",
+    "ccache",
+    "libboost-dev",
+    "libboost-thread-dev",
+    "libelementary-dev",
+    "libexif-dev",
+    "libxml2-dev",
+    "libgles2-mesa-dev",
+    "libdrm-dev",
+    "libgif-dev",
+    "libturbojpeg",
+    "libfribidi-dev",
+);
+
+# Make best guess as to where this program was run from (note, it is
+# always possible to override the location of $0 by the calling
+# program, so we can't really tell for sure that this is where we
+# expect it to be. :/
+
+my $new_env   = 0;
+my $exec_path = $0;
+if($0 !~ m!^/!)
+{
+    $exec_path = abs_path($0);
+}
+$exec_path = dirname($exec_path);
+
+my $root_path = getcwd();
+if($exec_path =~ m!dali-env/opt/bin!)
+{
+    $root_path = $exec_path;
+    while($root_path !~ m!dali-env$!)
+    {
+        $root_path = dirname($root_path);
+    }
+}
+elsif($root_path =~ m!dali-env!)
+{
+    while($root_path !~ m!dali-env$!)
+    {
+        $root_path = dirname($root_path);
+    }
+}
+else
+{
+    $new_env = 1;
+    $root_path .= "/dali-env";
+}
+
+my $src_path     = "$root_path/src-packages";
+my $sbs_path     = "$root_path/target";
+my $install_path = "$root_path/opt";
+
+my $opt_create=0;
+my $opt_list=0;
+my $opt_setenv=0;
+my $opt_help=0;
+my $opt_man=0;
+
+GetOptions("create"     => \$opt_create,
+           "list"       => \$opt_list,
+           "setenv"     => \$opt_setenv,
+           "help"       => \$opt_help,
+           "man"        => \$opt_man) or pod2usage(2);
+
+pod2usage(1) if $opt_help;
+pod2usage(-exitstatus => 0, -verbose => 2) if $opt_man;
+
+
+################################################################################
+
+sub create_env
+{
+    mkpath("$install_path/bin");
+    mkpath("$install_path/lib/pkgconfig");
+    mkpath("$install_path/include");
+    mkpath("$install_path/share/aclocal");
+    mkpath("$src_path");
+    mkpath("$sbs_path");
+
+    copy($0, "$install_path/bin/dali_env");
+    chmod(0755, "$install_path/bin/dali_env");
+}
+
+################################################################################
+
+sub in_dali_env
+{
+    my $cwd = substr(getcwd(), 0, length($root_path));
+    #print "cwd = $cwd\nroot = $root_path\n";
+    return $cwd eq $root_path;
+}
+
+################################################################################
+
+sub create_setenv
+{
+    print <<"EOF";
+# To use the desktop libraries, please add the following lines to your .bashrc or
+# create a setenv script from them, e.g. by running this command as follows
+# \$ dali_env -s > setenv
+#
+# You can then source this script by using
+# \$ . setenv
+#
+# Use DESKTOP_PREFIX when running configure in dali/build/slp:
+# \$ CXXFLAGS="-g -O0" ./configure --prefix=\$DESKTOP_PREFIX --without-libccss
+
+export DESKTOP_PREFIX=$install_path
+export PATH=$install_path/bin:\$PATH
+export LD_LIBRARY_PATH=$install_path/lib:\$LD_LIBRARY_PATH
+export INCLUDEDIR=$install_path/include
+export PKG_CONFIG_PATH=$install_path/lib/pkgconfig:/usr/lib/pkgconfig:/usr/share/pkgconfig
+
+EOF
+}
+
+################################################################################
+
+sub check_system_package
+{
+    my $package;
+    foreach $package (@_)
+    {
+        my @x=split(/\s+/, `dpkg -l $package|grep $package`);
+        if($x[0] ne "ii")
+        {
+            print "Attempting to install $package\n";
+            system("sudo apt-get -y install $package");
+        }
+    }
+}
+
+sub check_system_packages
+{
+    print "Checking for required system packages (may require sudo password)\n";
+
+    check_system_package(@system_packages);
+    my $gnome_v =`dpkg -l gnome-common| tail -1| sed "s/ \\+/ /g" | cut -d' ' -f 3`;
+    my @am = split(/\./, `automake --version | head -1 | cut -f4 -d' '`);
+    if($gnome_v =~ /$2.24/ && $am[1]>10)
+    {
+        die "Gnome common and automake are not compatible - automake is too new\n";
+    }
+    my @gpp_v = (`g++ --version  | head -1` =~ /(\d+)\.(\d+)\.(\d+)/);
+
+    if(! (($gpp_v[0] > 4)
+          ||
+          ($gpp_v[0] == 4 && $gpp_v[1] > 4)
+          ||
+          ($gpp_v[0] == 4 && $gpp_v[1] == 4 && $gpp_v[2] >= 5)))
+    {
+        die "You need g++ 4.5.1 or greater to build dali\n";
+    }
+}
+
+
+################################################################################
+#                                       MAIN
+################################################################################
+
+
+if($opt_create)
+{
+    my $new_root = getcwd() . "/dali-env";
+
+    if($exec_path =~ m!dali-env/opt/bin!)
+    {
+        die "Already in a dali-env directory\n";
+        # Could query if user wants to re-create?
+    }
+    elsif(-e $new_root)
+    {
+        die "A dali-env directory already exists here\n";
+    }
+
+    check_system_packages();
+
+    create_env();
+    create_setenv();
+}
+elsif($opt_setenv)
+{
+    if(! -d $root_path)
+    {
+        die "$root_path does not exist\n";
+    }
+    elsif($new_env)
+    {
+        die "$root_path is not an existing environment\n";
+    }
+    create_setenv();
+}
+else
+{
+    pod2usage(1);
+}
+
+__END__
+
+=head1 NAME
+
+dali_env - Install / update / rebuild the dali environment for desktop and scratchbox
+
+=head1 SYNOPSIS
+
+dali_env [-c|-u|-b]  [-a <user>] [-s] [-h|-m]
+
+=head1 OPTIONS
+
+=over 28
+
+=item B<-c|--create>
+
+Create a dali environment directory in the current directory.
+
+=item B<-l|--list>
+
+Display the local packages
+
+=item B<-s|--setenv>
+
+Display environment variables to setup.
+
+=item B<-h|--help>
+
+Display this help
+
+=item B<-m|--man>
+
+Display the manual page
+
+=back
+
+=head1 DESCRIPTION
+
+B<dali_env>
+
+Gets and builds the required packages for Dali. For desktop, installs them to a local directory, and creates a setenv script to point to the installation. For scratchbox, creates the debian packages for you to install.
+
+=cut

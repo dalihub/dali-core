@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/gl-defines.h>
 #include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/renderable-actor.h>

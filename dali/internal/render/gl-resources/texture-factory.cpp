@@ -18,6 +18,7 @@
 #include "texture-factory.h"
 
 #include <dali/integration-api/bitmap.h>
+#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
 #include <dali/internal/render/gl-resources/compressed-bitmap-texture.h>
