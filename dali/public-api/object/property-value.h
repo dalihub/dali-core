@@ -339,7 +339,7 @@ public:
    *
    * @pre GetType() returns Property::MAP.
    * @param [in] key A string.
-   * @return Property value if avaiable at key or Invalid
+   * @return Property value if available at key or Invalid
    */
   Property::Value& GetValue(const std::string& key) const;
 
@@ -366,7 +366,7 @@ public:
    * @pre GetType() returns Property::MAP.
    * @param [in] key A string key.
    * @param [in] value The value to set.
-   * @return Property value if avaiable at key
+   * @return Property value if available at key
    */
   void SetValue(const std::string& key, const Property::Value &value);
 
@@ -375,9 +375,19 @@ public:
    *
    * @pre GetType() returns Property::ARRAY or Property::MAP.
    * @param [in] index The item index.
-   * @return Property value if avaiable at key or Invalid
+   * @return Property value if available at index or Invalid
    */
   Property::Value& GetItem(const int index) const;
+
+  /**
+   * @brief Retrieve a property value from the internal array or map.
+   *
+   * @pre GetType() returns Property::ARRAY or Property::MAP.
+   * @param [in] index The item index.
+   * @param [out] key The key of the index (Applicable only for Property::MAP).
+   * @return Property value if available at index or Invalid
+   */
+  Property::Value& GetItem(const int index, std::string& key) const;
 
   /**
    * @brief Set a property value in the array or map.

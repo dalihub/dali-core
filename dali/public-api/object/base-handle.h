@@ -33,6 +33,7 @@ namespace Dali DALI_IMPORT_API
 
 class BaseObject;
 class ConnectionTrackerInterface;
+class TypeInfo;
 
 /**
  * @brief Dali::BaseHandle is a handle to an internal Dali resource.
@@ -150,6 +151,13 @@ public:
    * @return The type name. Empty string if the typename does not exist.
    */
   const std::string& GetTypeName() const;
+
+  /**
+   * @brief Returns the type info for the Handle.
+   *
+   * @return The type info.
+   */
+  bool GetTypeInfo(Dali::TypeInfo& info) const;
 
 public:
 

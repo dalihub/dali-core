@@ -29,12 +29,6 @@ namespace
 
 const int INVALID_CALLBACK_INDEX = -1;
 
-// Predicate for std::remove_if algorithm
-bool IsNullPredicate(void* ptr)
-{
-  return ptr == NULL;
-}
-
 } // unnamed namespace
 
 namespace Dali

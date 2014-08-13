@@ -60,12 +60,12 @@ Dali::Integration::PixelBuffer* BitmapPackedPixel::ReserveBuffer(Pixel::Format p
 }
 
 void BitmapPackedPixel::AssignBuffer(Pixel::Format pixelFormat,
-                          Dali::Integration::PixelBuffer* buffer,
-                          std::size_t bufferSize,
-                          unsigned int width,
-                          unsigned int height,
-                          unsigned int bufferWidth,
-                          unsigned int bufferHeight)
+                                     Dali::Integration::PixelBuffer* buffer,
+                                     std::size_t bufferSize,
+                                     unsigned int width,
+                                     unsigned int height,
+                                     unsigned int bufferWidth,
+                                     unsigned int bufferHeight)
 {
   DALI_ASSERT_DEBUG( buffer );
 

@@ -47,7 +47,7 @@ ConstraintBase::~ConstraintBase()
   }
 
 // TODO - Override new & delete to provide this for everything
-#ifdef DEBUG_ENABLED
+#if defined(DEBUG_ENABLED) && !defined(EMSCRIPTEN)
   // Fill with garbage pattern to help detect invalid memory access
   memset ( &mWeight, 0xFA, sizeof(mWeight) );
 #endif

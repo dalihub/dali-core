@@ -52,34 +52,39 @@ TypeInfo& TypeInfo::operator=(BaseHandle::NullType* rhs)
   return *this;
 }
 
-const std::string& TypeInfo::GetName()
+const std::string& TypeInfo::GetName() const
 {
   return GetImplementation(*this).GetName();
 }
 
-const std::string& TypeInfo::GetBaseName()
+const std::string& TypeInfo::GetBaseName() const
 {
   return GetImplementation(*this).GetBaseName();
 }
 
-BaseHandle TypeInfo::CreateInstance()
+BaseHandle TypeInfo::CreateInstance() const
 {
   return GetImplementation(*this).CreateInstance();
 }
 
-TypeInfo::CreateFunction TypeInfo::GetCreator()
+TypeInfo::CreateFunction TypeInfo::GetCreator() const
 {
   return GetImplementation(*this).GetCreator();
 }
 
-TypeInfo::NameContainer TypeInfo::GetActions()
+void TypeInfo::GetActions( TypeInfo::NameContainer& container ) const
 {
-  return GetImplementation(*this).GetActions();
+  GetImplementation(*this).GetActions( container );
 }
 
-TypeInfo::NameContainer TypeInfo::GetSignals()
+void TypeInfo::GetSignals( TypeInfo::NameContainer& container ) const
 {
-  return GetImplementation(*this).GetSignals();
+  GetImplementation(*this).GetSignals( container );
+}
+
+void TypeInfo::GetProperties( TypeInfo::NameContainer& container ) const
+{
+  GetImplementation(*this).GetProperties( container );
 }
 
 void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const

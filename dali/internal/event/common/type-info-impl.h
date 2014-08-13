@@ -58,32 +58,37 @@ public:
   /**
    * @copydoc Dali::TypeInfo::GetName
    */
-  const std::string& GetName();
+  const std::string& GetName() const;
 
   /**
    * @copydoc Dali::TypeInfo::GetBaseName
    */
-  const std::string& GetBaseName();
+  const std::string& GetBaseName() const;
 
   /**
    * @copydoc TypeInfo::CreateFunction
    */
-  BaseHandle CreateInstance();
+  BaseHandle CreateInstance() const;
 
   /**
    * @copydoc Dali::TypeInfo::GetCreator
    */
-  Dali::TypeInfo::CreateFunction GetCreator();
+  Dali::TypeInfo::CreateFunction GetCreator() const;
 
   /**
    * @copydoc Dali::TypeInfo::GetActions
    */
-  Dali::TypeInfo::NameContainer GetActions();
+  void GetActions( Dali::TypeInfo::NameContainer& container ) const;
 
   /**
    * @copydoc Dali::TypeInfo::GetSignals
    */
-  Dali::TypeInfo::NameContainer GetSignals();
+  void GetSignals( Dali::TypeInfo::NameContainer& container) const;
+
+  /**
+   * @copydoc Dali::TypeInfo::GetProperties
+   */
+  void GetProperties( Dali::TypeInfo::NameContainer& container) const;
 
   /**
    * Adds the property indices to the container specified.
@@ -171,7 +176,7 @@ public:
    * @param[in] index The property index.
    * @param[in] value The value to set.
    */
-  void SetProperty( BaseObject *object, Property::Index index, const Property::Value& value );
+  void SetProperty( BaseObject *object, Property::Index index, const Property::Value& value ) const;
 
   /**
    * Sets the value of a property with the name specified for the given object.
@@ -179,7 +184,7 @@ public:
    * @param[in] name The property name.
    * @param[in] value The value to set.
    */
-  void SetProperty( BaseObject *object, const std::string& name, const Property::Value& value );
+  void SetProperty( BaseObject *object, const std::string& name, const Property::Value& value ) const;
 
   /**
    * Retrieves the value of a property at the index specified for the given object.
@@ -187,7 +192,7 @@ public:
    * @param[in] index The property index.
    * @return The current value of the property.
    */
-  Property::Value GetProperty( const BaseObject *object, Property::Index index );
+  Property::Value GetProperty( const BaseObject *object, Property::Index index ) const;
 
   /**
    * Retrieves the value of a property with the name specified for the given object.
@@ -195,7 +200,7 @@ public:
    * @param[in] name The property name.
    * @return The current value of the property.
    */
-  Property::Value GetProperty( const BaseObject *object, const std::string& name );
+  Property::Value GetProperty( const BaseObject *object, const std::string& name ) const;
 
 private:
 
