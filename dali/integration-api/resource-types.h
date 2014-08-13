@@ -22,6 +22,7 @@
 #include <stdint.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/image-attributes.h>
 #include <dali/integration-api/resource-declarations.h>
@@ -486,4 +487,3 @@ inline bool operator==(const TextResourceType::GlyphPosition& lhs, const TextRes
 } // namespace Dali
 
 #endif // __DALI_INTEGRATION_RESOURCE_TYPES_H__
-
