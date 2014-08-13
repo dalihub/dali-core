@@ -193,7 +193,7 @@ struct UpdateManager::Impl
     renderTaskList( NULL ),
     renderTaskWaiting( false )
   {
-    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager );
+    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager, defaultShader );
   }
 
   ~Impl()
@@ -951,26 +951,19 @@ void UpdateManager::UpdateNodes()
 
   PERF_MONITOR_START( PerformanceMonitor::UPDATE_NODES );
 
-  Shader* defaultShader = GetDefaultShader();
+  // Prepare resources, update shaders, update attachments, for each node
+  // And add the renderers to the sorted layers. Start from root, which is also a layer
+  mImpl->nodeDirtyFlags = UpdateNodesAndAttachments( *( mImpl->root ),
+                                                     mSceneGraphBuffers.GetUpdateBufferIndex(),
+                                                     mImpl->resourceManager,
+                                                     mImpl->renderQueue );
 
-  if ( NULL != defaultShader )
+  if ( mImpl->systemLevelRoot )
   {
-    // Prepare resources, update shaders, update attachments, for each node
-    // And add the renderers to the sorted layers. Start from root, which is also a layer
-    mImpl->nodeDirtyFlags = UpdateNodesAndAttachments( *( mImpl->root ),
-                                                       mSceneGraphBuffers.GetUpdateBufferIndex(),
-                                                       mImpl->resourceManager,
-                                                       mImpl->renderQueue,
-                                                       defaultShader );
-
-    if ( mImpl->systemLevelRoot )
-    {
-      mImpl->nodeDirtyFlags |= UpdateNodesAndAttachments( *( mImpl->systemLevelRoot ),
-                                                          mSceneGraphBuffers.GetUpdateBufferIndex(),
-                                                          mImpl->resourceManager,
-                                                          mImpl->renderQueue,
-                                                          defaultShader );
-    }
+    mImpl->nodeDirtyFlags |= UpdateNodesAndAttachments( *( mImpl->systemLevelRoot ),
+                                                        mSceneGraphBuffers.GetUpdateBufferIndex(),
+                                                        mImpl->resourceManager,
+                                                        mImpl->renderQueue );
   }
 
   PERF_MONITOR_END( PerformanceMonitor::UPDATE_NODES );

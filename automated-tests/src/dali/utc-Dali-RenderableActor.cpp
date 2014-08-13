@@ -734,3 +734,170 @@ int UtcDaliRenderableActorSetFilterMode(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderableActorSetShaderEffect(void)
+{
+  TestApplication application;
+  BitmapImage img = BitmapImage::New( 1,1 );
+  ImageActor actor = ImageActor::New( img );
+  Stage::GetCurrent().Add( actor );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  GLuint lastShaderCompiledBefore = application.GetGlAbstraction().GetLastShaderCompiled();
+
+  application.GetGlAbstraction().EnableShaderCallTrace( true );
+
+  const std::string vertexShader = "UtcDaliRenderableActorSetShaderEffect-VertexSource";
+  const std::string fragmentShader = "UtcDaliRenderableActorSetShaderEffect-FragmentSource";
+  ShaderEffect effect = ShaderEffect::New(vertexShader, fragmentShader );
+  DALI_TEST_CHECK( effect != actor.GetShaderEffect() );
+
+  actor.SetShaderEffect( effect );
+  DALI_TEST_CHECK( effect == actor.GetShaderEffect() );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  GLuint lastShaderCompiledAfter = application.GetGlAbstraction().GetLastShaderCompiled();
+  DALI_TEST_EQUALS( lastShaderCompiledAfter, lastShaderCompiledBefore + 2, TEST_LOCATION );
+
+  std::string actualVertexShader = application.GetGlAbstraction().GetShaderSource( lastShaderCompiledBefore + 1 );
+  DALI_TEST_EQUALS( vertexShader,
+                    actualVertexShader.substr( actualVertexShader.length() - vertexShader.length() ), TEST_LOCATION );
+  std::string actualFragmentShader = application.GetGlAbstraction().GetShaderSource( lastShaderCompiledBefore + 2 );
+  DALI_TEST_EQUALS( fragmentShader,
+                    actualFragmentShader.substr( actualFragmentShader.length() - fragmentShader.length() ), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRenderableActorGetShaderEffect(void)
+{
+  TestApplication application;
+  TextActor actor = TextActor::New();
+
+  ShaderEffect effect = ShaderEffect::New("UtcDaliRenderableActorGetShaderEffect-VertexSource", "UtcDaliRenderableActorGetShaderEffect-FragmentSource" );
+  actor.SetShaderEffect(effect);
+
+  DALI_TEST_CHECK(effect == actor.GetShaderEffect());
+  END_TEST;
+}
+
+int UtcDaliRenderableActorRemoveShaderEffect01(void)
+{
+  TestApplication application;
+  TextActor actor = TextActor::New();
+
+  ShaderEffect defaultEffect = actor.GetShaderEffect();
+
+  ShaderEffect effect = ShaderEffect::New("UtcDaliRenderableActorRemoveShaderEffect-VertexSource", "UtcDaliRenderableActorRemoveShaderEffect-FragmentSource" );
+  actor.SetShaderEffect(effect);
+
+  DALI_TEST_CHECK(effect == actor.GetShaderEffect());
+
+  actor.RemoveShaderEffect();
+
+  DALI_TEST_CHECK(defaultEffect == actor.GetShaderEffect());
+  END_TEST;
+}
+
+int UtcDaliRenderableActorRemoveShaderEffect02(void)
+{
+  TestApplication application;
+  TextActor actor = TextActor::New();
+
+  ShaderEffect defaultEffect = actor.GetShaderEffect();
+
+  actor.RemoveShaderEffect();
+
+  DALI_TEST_CHECK(defaultEffect == actor.GetShaderEffect());
+  END_TEST;
+}
+
+int UtcDaliSetShaderEffectRecursively(void)
+{
+  TestApplication application;
+  /**
+   * create a tree
+   *                 actor1
+   *           actor2       actor4
+   *       actor3 textactor
+   * imageactor
+   */
+  BitmapImage img = BitmapImage::New( 1,1 );
+  ImageActor actor1 = ImageActor::New( img );
+  Actor actor2 = Actor::New();
+  actor1.Add( actor2 );
+  Actor actor3 = Actor::New();
+  actor2.Add( actor3 );
+  TextActor textactor = TextActor::New( "Foo" );
+  actor2.Add( textactor );
+  ImageActor imageactor = ImageActor::New( img );
+  actor3.Add( imageactor );
+  Actor actor4 = Actor::New();
+  actor1.Add( actor4 );
+  Stage::GetCurrent().Add( actor1 );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+  GLuint lastShaderCompiledBefore = application.GetGlAbstraction().GetLastShaderCompiled();
+
+  application.GetGlAbstraction().EnableShaderCallTrace( true );
+
+  const std::string vertexShader = "UtcDaliRenderableActorSetShaderEffect-VertexSource";
+  const std::string fragmentShader = "UtcDaliRenderableActorSetShaderEffect-FragmentSource";
+  // test with empty effect
+  ShaderEffect effect;
+  SetShaderEffectRecursively( actor1, effect );
+
+  effect = ShaderEffect::New(vertexShader, fragmentShader );
+
+  DALI_TEST_CHECK( effect != actor1.GetShaderEffect() );
+  DALI_TEST_CHECK( effect != textactor.GetShaderEffect() );
+  DALI_TEST_CHECK( effect != imageactor.GetShaderEffect() );
+
+  SetShaderEffectRecursively( actor1, effect );
+  DALI_TEST_CHECK( effect == textactor.GetShaderEffect() );
+  DALI_TEST_CHECK( effect == imageactor.GetShaderEffect() );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  GLuint lastShaderCompiledAfter = application.GetGlAbstraction().GetLastShaderCompiled();
+  DALI_TEST_EQUALS( lastShaderCompiledAfter, lastShaderCompiledBefore + 2, TEST_LOCATION );
+
+  std::string actualVertexShader = application.GetGlAbstraction().GetShaderSource( lastShaderCompiledBefore + 1 );
+  DALI_TEST_EQUALS( vertexShader,
+                    actualVertexShader.substr( actualVertexShader.length() - vertexShader.length() ), TEST_LOCATION );
+  std::string actualFragmentShader = application.GetGlAbstraction().GetShaderSource( lastShaderCompiledBefore + 2 );
+  DALI_TEST_EQUALS( fragmentShader,
+                    actualFragmentShader.substr( actualFragmentShader.length() - fragmentShader.length() ), TEST_LOCATION );
+
+  // remove from one that does not have shader
+  RemoveShaderEffectRecursively( actor4 );
+
+  // remove partially
+  RemoveShaderEffectRecursively( actor3 );
+  DALI_TEST_CHECK( effect == textactor.GetShaderEffect() );
+  DALI_TEST_CHECK( effect != imageactor.GetShaderEffect() );
+
+  // test with empty actor just to check it does not crash
+  Actor empty;
+  SetShaderEffectRecursively( empty, effect );
+  RemoveShaderEffectRecursively( empty );
+
+  // test with actor with no children just to check it does not crash
+  Actor loner = Actor::New();
+  Stage::GetCurrent().Add( loner );
+  SetShaderEffectRecursively( loner, effect );
+  DALI_TEST_CHECK( effect != loner.GetShaderEffect() ); // base actor does not have shader effects
+  RemoveShaderEffectRecursively( loner );
+
+  END_TEST;
+}
+

@@ -190,22 +190,10 @@ void ImageAttachment::SetBorder( BufferIndex updateBufferIndex, const Vector4& b
 
 void ImageAttachment::ShaderChanged( BufferIndex updateBufferIndex )
 {
-  Shader* shader = GetParent().GetInheritedShader();
-  DALI_ASSERT_DEBUG( shader != NULL );
+  DALI_ASSERT_DEBUG( mShader != NULL );
   DALI_ASSERT_DEBUG( mSceneController );
 
-  // Use the Node's inherited shader in the next render
-  {
-    typedef MessageValue1< Renderer, Shader* > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mImageRenderer, &Renderer::SetShader, shader );
-  }
-
-  int hints = shader->GetGeometryHints();
+  int hints = mShader->GetGeometryHints();
 
   if ( hints != mPreviousRefreshHints )
   {
@@ -331,7 +319,7 @@ bool ImageAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
    * Fully opaque when...
    *   1) not using the alpha channel from the image data
    *   2) the inherited color is not transparent nor semi-transparent
-   *   3) the shader doesn't require it
+   *   3) the shader doesn't require blending
    */
   bool opaque = mBitmapMetadata.IsFullyOpaque();
 
@@ -339,7 +327,7 @@ bool ImageAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
   {
     opaque = ( mParent->GetWorldColor(updateBufferIndex).a >= FULLY_OPAQUE );
 
-    if ( opaque && mParent->GetInheritedShader() != NULL )
+    if ( opaque && mShader != NULL )
     {
       opaque = !PreviousHintEnabled( Dali::ShaderEffect::HINT_BLENDING );
     }

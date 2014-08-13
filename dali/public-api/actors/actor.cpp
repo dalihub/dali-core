@@ -434,28 +434,32 @@ Vector4 Actor::GetCurrentWorldColor() const
 
 void Actor::SetInheritShaderEffect(bool inherit)
 {
-  GetImplementation(*this).SetInheritShaderEffect(inherit);
+  // TODO remove this API
+  // @deprecated
 }
 
 bool Actor::GetInheritShaderEffect() const
 {
-  return GetImplementation(*this).GetInheritShaderEffect();
+  // TODO remove this API
+  // @deprecated
+  return false;
 }
 
 void Actor::SetShaderEffect(ShaderEffect effect)
 {
+  // TODO remove this API
   GetImplementation(*this).SetShaderEffect(GetImplementation(effect));
 }
 
 ShaderEffect Actor::GetShaderEffect() const
 {
-  Internal::ShaderEffectPtr internal = GetImplementation(*this).GetShaderEffect();
-
-  return ShaderEffect(internal.Get());
+  // TODO remove this API
+  return ShaderEffect();
 }
 
 void Actor::RemoveShaderEffect()
 {
+  // TODO remove this API
   GetImplementation(*this).RemoveShaderEffect();
 }
 

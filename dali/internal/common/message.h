@@ -545,6 +545,55 @@ private:
 
 /**
  * Templated message which calls a member function of an object.
+ * This overload passes just the buffer index to the method, no parameters.
+ */
+template< typename T >
+class MessageDoubleBuffered0 : public MessageBase
+{
+public:
+
+  typedef void(T::*MemberFunction)( BufferIndex );
+
+  /**
+   * Create a message.
+   * @note The object is expected to be const in the thread which sends this message.
+   * However it can be modified when Process() is called in a different thread.
+   * @param[in] obj The object.
+   * @param[in] member The member function of the object.
+   */
+  MessageDoubleBuffered0( const T* obj, MemberFunction member )
+  : MessageBase(),
+    object( const_cast< T* >( obj ) ),
+    memberFunction( member )
+  {
+  }
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~MessageDoubleBuffered0()
+  {
+  }
+
+  /**
+   * @copydoc MessageBase::Process
+   */
+  virtual void Process( BufferIndex bufferIndex )
+  {
+    DALI_ASSERT_DEBUG( object && "Message does not have an object" );
+    (object->*memberFunction)( bufferIndex );
+  }
+
+private:
+
+  T* object;
+  MemberFunction memberFunction;
+
+};
+
+
+/**
+ * Templated message which calls a member function of an object.
  * This overload passes a value-type to set a double-buffered property.
  * Template parameters need to match the MemberFunction!
  * The message will contain copy of the value (in case of & or const&)

@@ -266,6 +266,33 @@ public:
    */
   void GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter) const;
 
+  /**
+   * @brief Sets the shader effect for the RenderableActor.
+   *
+   * Shader effects provide special effects like ripple and bend.
+   * Setting a shader effect removes any shader effect previously set by SetShaderEffect.
+   * @pre The actor has been initialized.
+   * @pre effect has been initialized.
+   * @param [in] effect The shader effect.
+   */
+  void SetShaderEffect( ShaderEffect effect );
+
+  /**
+   * @brief Retrieve the custom shader effect for the RenderableActor.
+   * If default shader is used an empty handle is returned.
+   *
+   * @pre The Actor has been initialized.
+   * @return The shader effect
+   */
+  ShaderEffect GetShaderEffect() const;
+
+  /**
+   * @brief Removes the current shader effect.
+   *
+   * @pre The Actor has been initialized.
+   */
+  void RemoveShaderEffect();
+
 public: // Not intended for application developers
 
   /**
@@ -275,6 +302,25 @@ public: // Not intended for application developers
    */
   explicit DALI_INTERNAL RenderableActor(Internal::RenderableActor* actor);
 };
+
+/**
+ * @brief Sets the shader effect for all RenderableActors in a tree of Actors.
+ *
+ * @see RenderableActor::SetShaderEffect
+ *
+ * @param [in] actor root of a tree of actors.
+ * @param [in] effect The shader effect.
+ */
+void SetShaderEffectRecursively( Actor actor, ShaderEffect effect );
+
+/**
+ * @brief Removes the shader effect from all RenderableActors in a tree of Actors.
+ *
+ * @see RenderableActor::RemoveShaderEffect
+ *
+ * @param [in] actor root of a tree of actors.
+ */
+void RemoveShaderEffectRecursively( Actor actor );
 
 } // namespace Dali
 

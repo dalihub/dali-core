@@ -41,12 +41,12 @@
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/nodes/node-messages.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/events/actor-gesture-data.h>
 #include <dali/internal/common/message.h>
 #include <dali/integration-api/debug.h>
@@ -61,7 +61,6 @@
 using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
-using Dali::Internal::SceneGraph::Shader;
 
 using namespace std;
 
@@ -106,12 +105,11 @@ const Property::Index Actor::WORLD_MATRIX               = 34;
 const Property::Index Actor::NAME                       = 35;
 const Property::Index Actor::SENSITIVE                  = 36;
 const Property::Index Actor::LEAVE_REQUIRED             = 37;
-const Property::Index Actor::INHERIT_SHADER_EFFECT      = 38;
-const Property::Index Actor::INHERIT_ROTATION           = 39;
-const Property::Index Actor::INHERIT_SCALE              = 40;
-const Property::Index Actor::COLOR_MODE                 = 41;
-const Property::Index Actor::POSITION_INHERITANCE       = 42;
-const Property::Index Actor::DRAW_MODE                  = 43;
+const Property::Index Actor::INHERIT_ROTATION           = 38;
+const Property::Index Actor::INHERIT_SCALE              = 39;
+const Property::Index Actor::COLOR_MODE                 = 40;
+const Property::Index Actor::POSITION_INHERITANCE       = 41;
+const Property::Index Actor::DRAW_MODE                  = 42;
 
 namespace // unnamed namespace
 {
@@ -161,7 +159,6 @@ const Internal::PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
   { "name",                   Property::STRING,   true,    false,   false },  // NAME
   { "sensitive",              Property::BOOLEAN,  true,    false,   false },  // SENSITIVE
   { "leave-required",         Property::BOOLEAN,  true,    false,   false },  // LEAVE_REQUIRED
-  { "inherit-shader-effect",  Property::BOOLEAN,  true,    false,   false },  // INHERIT_SHADER_EFFECT
   { "inherit-rotation",       Property::BOOLEAN,  true,    false,   false },  // INHERIT_ROTATION
   { "inherit-scale",          Property::BOOLEAN,  true,    false,   false },  // INHERIT_SCALE
   { "color-mode",             Property::STRING,   true,    false,   false },  // COLOR_MODE
@@ -1118,77 +1115,18 @@ const Vector3& Actor::GetCurrentSize() const
   return Vector3::ZERO;
 }
 
-void Actor::SetInheritShaderEffect(bool inherit)
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value
-    SetInheritShaderMessage( mStage->GetUpdateInterface(), *mNode, inherit );
-  }
-}
-
-bool Actor::GetInheritShaderEffect() const
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; copy the value from the previous update
-    return mNode->GetInheritShader();
-  }
-
-  return true;
-}
-
 void Actor::SetShaderEffect(ShaderEffect& effect)
 {
-  if ( OnStage() )
-  {
-    if (mShaderEffect)
-    {
-      mShaderEffect->Disconnect();
-    }
-
-    mShaderEffect = ShaderEffectPtr(&effect);
-
-    const Shader& shader = dynamic_cast<const Shader&>( *mShaderEffect->GetSceneObject() );
-
-    if( NULL != mNode )
-    {
-      // mNode is being used in a separate thread; queue a message to apply shader
-      ApplyShaderMessage( mStage->GetUpdateInterface(), *mNode, shader );
-    }
-
-    mShaderEffect->Connect();
-  }
-  else
-  {
-    mShaderEffect = ShaderEffectPtr(&effect);
-  }
-  // Effects can only be applied when the Node is connected to scene-graph
+  // no-op on an Actor
 }
 
 ShaderEffectPtr Actor::GetShaderEffect() const
 {
-  return mShaderEffect;
+  return ShaderEffectPtr();
 }
 
 void Actor::RemoveShaderEffect()
 {
-  if ( OnStage() )
-  {
-    if( NULL != mNode )
-    {
-      // mNode is being used in a separate thread; queue a message to remove shader
-      RemoveShaderMessage( mStage->GetUpdateInterface(), *mNode );
-    }
-
-    // Notify shader effect
-    if (mShaderEffect)
-    {
-      mShaderEffect->Disconnect();
-    }
-  }
-
-  mShaderEffect.Reset();
 }
 
 #ifdef DYNAMICS_SUPPORT
@@ -2013,7 +1951,6 @@ Actor::Actor( DerivedType derivedType )
 #endif
   mGestureData( NULL ),
   mAttachment(),
-  mShaderEffect(),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mIsRoot( ROOT_LAYER == derivedType ),
@@ -2162,20 +2099,6 @@ void Actor::ConnectToSceneGraph()
     ConnectNodeMessage( mStage->GetUpdateManager(), *(mParent->mNode), *mNode );
   }
 
-  if (mShaderEffect)
-  {
-    const Shader& shader = dynamic_cast<const Shader&>( *mShaderEffect->GetSceneObject() );
-
-    if( NULL != mNode )
-    {
-      // Effects can only be applied when the node is on-stage
-      ApplyShaderMessage( mStage->GetUpdateInterface(), *mNode, shader );
-    }
-
-    // Notify shader effect
-    mShaderEffect->Connect();
-  }
-
   // Notify attachment
   if (mAttachment)
   {
@@ -2269,12 +2192,6 @@ void Actor::DisconnectFromSceneGraph()
 {
   // Notification for ProxyObject::Observers
   OnSceneObjectRemove();
-
-  // Notify shader effect
-  if (mShaderEffect)
-  {
-    mShaderEffect->Disconnect();
-  }
 
   // Notify attachment
   if (mAttachment)
@@ -2610,12 +2527,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::Actor::LEAVE_REQUIRED:
     {
       SetLeaveRequired( property.Get<bool>() );
-      break;
-    }
-
-    case Dali::Actor::INHERIT_SHADER_EFFECT:
-    {
-      SetInheritShaderEffect( property.Get<bool>() );
       break;
     }
 
@@ -2985,12 +2896,6 @@ Property::Value Actor::GetDefaultProperty(Property::Index index) const
     case Dali::Actor::LEAVE_REQUIRED:
     {
       value = GetLeaveRequired();
-      break;
-    }
-
-    case Dali::Actor::INHERIT_SHADER_EFFECT:
-    {
-      value = GetInheritShaderEffect();
       break;
     }
 

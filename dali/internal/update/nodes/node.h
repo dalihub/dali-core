@@ -52,7 +52,6 @@ namespace SceneGraph
 
 class DiscardQueue;
 class Layer;
-class Shader;
 class NodeAttachment;
 class RenderTask;
 class UpdateManager;
@@ -67,10 +66,9 @@ enum NodePropertyFlags
   VisibleFlag          = 0x002,
   ColorFlag            = 0x004,
   SizeFlag             = 0x008,
-  ShaderFlag           = 0x010,
-  OverlayFlag          = 0x020,
-  SortModifierFlag     = 0x040,
-  ChildDeletedFlag     = 0x080
+  OverlayFlag          = 0x010,
+  SortModifierFlag     = 0x020,
+  ChildDeletedFlag     = 0x040
 };
 
 static const int AllFlags = ( ChildDeletedFlag << 1 ) - 1; // all the flags
@@ -79,7 +77,7 @@ static const int AllFlags = ( ChildDeletedFlag << 1 ) - 1; // all the flags
  * Size is not inherited.
  * VisibleFlag is inherited so that attachments can be synchronized with nodes after they become visible
  */
-static const int InheritedDirtyFlags = TransformFlag | VisibleFlag | ColorFlag | ShaderFlag | OverlayFlag;
+static const int InheritedDirtyFlags = TransformFlag | VisibleFlag | ColorFlag | OverlayFlag;
 
 // Flags which require the scene renderable lists to be updated
 static const int RenderableUpdateFlags = TransformFlag | SortModifierFlag | ChildDeletedFlag;
@@ -256,70 +254,6 @@ public:
   {
     return mChildren;
   }
-
-  // Shaders
-
-  /**
-   * Set whether the node inherits a shader effect from its parent.
-   * The inherited effect can be overriden using ApplyShader()
-   * @param [in] inherit True if the parent effect is inherited.
-   */
-  void SetInheritShader(bool inherit)
-  {
-    if (inherit != mInheritShader)
-    {
-      mInheritShader = inherit;
-
-      SetDirtyFlag(ShaderFlag);
-    }
-  }
-
-  /**
-   * Query whether the node inherits a shader from its parent.
-   * @return True if the parent effect is inherited.
-   */
-  bool GetInheritShader() const
-  {
-    return mInheritShader;
-  }
-
-  /**
-   * Apply a shader object to this Node.
-   * Shader effects are weakly referenced, potentially by multiple nodes & node attachments.
-   * @param[in] shader The shader to apply.
-   */
-  void ApplyShader( Shader* shader );
-
-  /**
-   * Remove the shader object from this Node (if any).
-   */
-  void RemoveShader();
-
-  /**
-   * Retrieve the applied shader.
-   * @return The applied shader.
-   */
-  Shader* GetAppliedShader() const;
-
-  /**
-   * Sets the inherited shader of the node.
-   * @param[in] shader The new inherited shader.
-   */
-  void SetInheritedShader(Shader* shader);
-
-  /**
-   * Retrieve the inherited shader.
-   * @return The inherited shader.
-   */
-  Shader* GetInheritedShader() const;
-
-  /**
-   * Inherit a shader (if any) applied to the parent node.
-   * This method should only be called when the parents inherited shader is up-to-date.
-   * @param defaultShader pointer to the default shader, used if inherit shader is set to false
-   * @pre The node has a parent.
-   */
-  void InheritShader(Shader* defaultShader);
 
   // Update methods
 
@@ -1116,8 +1050,6 @@ public: // Default properties
 protected:
 
   Node*               mParent;                       ///< Pointer to parent node (a child is owned by its parent)
-  Shader*             mAppliedShader;                ///< A pointer to an applied shader
-  Shader*             mInheritedShader;              ///< A pointer to an inherited shader
   RenderTask*         mExclusiveRenderTask;          ///< Nodes can be marked as exclusive to a single RenderTask
 
   NodeAttachmentOwner mAttachment;                   ///< Optional owned attachment
@@ -1130,7 +1062,6 @@ protected:
   int  mDirtyFlags:10;                               ///< A composite set of flags for each of the Node properties
 
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
-  bool mInheritShader:1;                             ///< Whether the parent's shader should be inherited.
   bool mInheritRotation:1;                           ///< Whether the parent's rotation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
   bool mTransmitGeometryScaling:1;                   ///< Whether geometry scaling should be applied to world transform.
@@ -1146,17 +1077,6 @@ protected:
 };
 
 // Messages for Node
-
-inline void SetInheritShaderMessage( EventToUpdate& eventToUpdate, const Node& node, bool inherit )
-{
-  typedef MessageValue1< Node, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetInheritShader, inherit );
-}
 
 inline void SetInheritRotationMessage( EventToUpdate& eventToUpdate, const Node& node, bool inherit )
 {
@@ -1189,31 +1109,6 @@ inline void SetTransmitGeometryScalingMessage( EventToUpdate& eventToUpdate, con
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetTransmitGeometryScaling, transmitGeometryScaling );
-}
-
-inline void ApplyShaderMessage( EventToUpdate& eventToUpdate, const Node& node, const Shader& constShader )
-{
-  // Update thread can edit the object
-  Shader& shader = const_cast< Shader& >( constShader );
-
-  typedef MessageValue1< Node, Shader* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::ApplyShader, &shader );
-}
-
-inline void RemoveShaderMessage( EventToUpdate& eventToUpdate, const Node& node )
-{
-  typedef Message< Node > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::RemoveShader );
 }
 
 inline void SetParentOriginMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& origin )

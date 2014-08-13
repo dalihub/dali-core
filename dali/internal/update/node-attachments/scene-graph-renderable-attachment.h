@@ -42,6 +42,7 @@ class ResourceTracker;
 namespace SceneGraph
 {
 class Renderer;
+class Shader;
 
 /**
  * RenderableAttachments are responsible for preparing textures, meshes, matrices etc. during the Update.
@@ -142,6 +143,19 @@ public: // API
    * @param[out] scaling factors
    */
   void GetScaleForSize( const Vector3& nodeSize, Vector3& scaling );
+
+  /**
+   * Apply a shader on the renderable
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] shader to apply.
+   */
+  void ApplyShader( BufferIndex updateBufferIndex, Shader* shader );
+
+  /**
+   * Remove the shader from the renderable
+   * @param[in] updateBufferIndex The current update buffer index.
+   */
+  void RemoveShader( BufferIndex updateBufferIndex );
 
 public: // For use during in the update algorithm only
 
@@ -319,6 +333,12 @@ private:
    */
   virtual bool DoPrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager ) = 0;
 
+  /**
+   * Sends the shader to the renderer
+   * @param updateBufferIndex for the message buffer
+   */
+  void SendShaderChangeMessage( BufferIndex updateBufferIndex );
+
   // Undefined
   RenderableAttachment( const RenderableAttachment& );
 
@@ -328,8 +348,13 @@ private:
 protected:
 
   SceneController* mSceneController;   ///< Used for initializing renderers whilst attached
+  Shader*          mShader;            ///< A pointer to the shader
 
-  BlendingMode::Type mBlendingMode:2;    ///< Whether blending is used to render the renderable attachment. 2 bits is enough for 3 values
+  Dali::Vector< Integration::ResourceId > mTrackedResources; ///< Filled during PrepareResources if there are uncomplete, tracked resources.
+
+  float mSortModifier;
+
+  BlendingMode::Type mBlendingMode:2;  ///< Whether blending is used to render the renderable attachment. 2 bits is enough for 3 values
 
   bool mUsesGeometryScaling:1;         ///< True if the derived renderer uses scaling.
   bool mScaleForSizeDirty:1;           ///< True if mScaleForSize has changed in the current frame.
@@ -340,9 +365,6 @@ protected:
   bool mHasUntrackedResources:1;       ///< Set during PrepareResources, true if have tried to follow untracked resources
   CullFaceMode mCullFaceMode:3;        ///< Cullface mode, 3 bits is enough for 4 values
 
-  float mSortModifier;
-
-  Dali::Vector< Integration::ResourceId > mTrackedResources; ///< Filled during PrepareResources if there are uncomplete, tracked resources.
 };
 
 // Messages for RenderableAttachment
@@ -408,6 +430,31 @@ inline void SetSamplerMessage( EventToUpdate& eventToUpdate, const RenderableAtt
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &RenderableAttachment::SetSampler, samplerBitfield );
+}
+
+inline void ApplyShaderMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, const Shader& constShader )
+{
+  // Update thread can edit the object
+  Shader& shader = const_cast< Shader& >( constShader );
+
+  typedef MessageDoubleBuffered1< RenderableAttachment, Shader* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &RenderableAttachment::ApplyShader, &shader );
+}
+
+inline void RemoveShaderMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment )
+{
+  typedef MessageDoubleBuffered0< RenderableAttachment > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &RenderableAttachment::RemoveShader );
 }
 
 } // namespace SceneGraph

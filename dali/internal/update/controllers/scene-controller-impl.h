@@ -46,51 +46,56 @@ public:
    * @param[in] renderQueue  The renderQueue
    * @param[in] discardQueue The discardQueue
    * @param[in] completeStatusTracker The resource complete status tracker
+   * @param[in] defaultShader to use for renderable attachments
    */
-  SceneControllerImpl( RenderMessageDispatcher& renderMessageDispatcher, RenderQueue& renderQueue, DiscardQueue& discardQueue, TextureCache& textureCache, CompleteStatusManager& completeStatusManager );
+  SceneControllerImpl( RenderMessageDispatcher& renderMessageDispatcher,
+                       RenderQueue& renderQueue,
+                       DiscardQueue& discardQueue,
+                       TextureCache& textureCache,
+                       CompleteStatusManager& completeStatusManager,
+                       Shader*& defaultShader );
 
   /**
    * Destructor
    */
   virtual ~SceneControllerImpl();
 
-public:  // for scene controller interface
+public:  // from SceneController
 
   /**
-   * Get the light  controller
-   * @return  reference to a light controller
+   * @copydoc SceneController::GetLightController()
    */
   virtual LightController& GetLightController() { return *mLightController; }
 
   /**
-   * Return the renderer dispatcher
-   * @return A reference to the renderer dispatcher
+   * @copydoc SceneController::GetRenderMessageDispatcher()
    */
   virtual RenderMessageDispatcher& GetRenderMessageDispatcher() { return mRenderMessageDispatcher; }
 
   /**
-   * Return the render queue
-   * @return A reference to the render queue
+   * @copydoc SceneController::GetRenderQueue()
    */
   virtual RenderQueue& GetRenderQueue() { return mRenderQueue; }
 
   /**
-   * Return the discard queue
-   * @return A reference to the discard queue
+   * @copydoc SceneController::GetDiscardQueue()
    */
   virtual DiscardQueue& GetDiscardQueue() { return mDiscardQueue; }
 
   /**
-   * Return the texture cache
-   * @note USE ONLY IN RENDER THREAD OBJECTS
-   * @return The texture cache
+   * @copydoc SceneController::GetTextureCache()
    */
   virtual TextureCache& GetTextureCache() { return mTextureCache; }
 
   /**
-   * @return the complete status tracker
+   * @copydoc SceneController::GetCompleteStatusManager()
    */
   virtual CompleteStatusManager& GetCompleteStatusManager() { return mCompleteStatusManager;  }
+
+  /**
+   * @copydoc SceneController::GetDefaultShader()
+   */
+  virtual Shader* GetDefaultShader() { return mDefaultShader; }
 
 private:
 
@@ -102,12 +107,14 @@ private:
 
 private:
 
-  LightController*       mLightController;       ///< light controller
+  LightController*         mLightController;       ///< light controller
   RenderMessageDispatcher& mRenderMessageDispatcher;    ///< Used for passing messages to the render-thread
-  RenderQueue&           mRenderQueue;           ///< render queue
-  DiscardQueue&          mDiscardQueue;          ///< discard queue
-  TextureCache&          mTextureCache;          ///< texture cache
-  CompleteStatusManager& mCompleteStatusManager; ///< Complete Status manager
+  RenderQueue&             mRenderQueue;           ///< render queue
+  DiscardQueue&            mDiscardQueue;          ///< discard queue
+  TextureCache&            mTextureCache;          ///< texture cache
+  CompleteStatusManager&   mCompleteStatusManager; ///< Complete Status manager
+  Shader*&                 mDefaultShader;         ///< default shader, reference to a pointer as it will be setup later
+
 };
 
 } // namespace SceneGraph

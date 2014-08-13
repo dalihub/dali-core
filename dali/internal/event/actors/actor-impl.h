@@ -53,10 +53,10 @@ class Actor;
 class ActorGestureData;
 class RenderTask;
 class ShaderEffect;
+typedef IntrusivePtr<ShaderEffect>            ShaderEffectPtr;
 struct DynamicsData;
 
 typedef IntrusivePtr<Actor>                   ActorPtr;
-typedef IntrusivePtr<ShaderEffect>            ShaderEffectPtr;
 typedef Dali::ActorContainer                  ActorContainer; // Store handles to return via public-api
 typedef ActorContainer::iterator              ActorIter;
 typedef ActorContainer::const_iterator        ActorConstIter;
@@ -617,37 +617,30 @@ public:
     return mSensitive;
   }
 
-  /**
-   * Set whether the actor inherits a shader effect from its parent.
-   * The inherited effect can be overridden using SetShaderEffect()
-   * @param [in] inherit True if the parent effect is inherited.
-   */
-  void SetInheritShaderEffect(bool inherit);
+  // Shader effects, these are virtual so that RenderableActor can override the behaviour.
+  // Default actor behaviour is to do nothing, but the API is kept in Actor for convenience.
 
   /**
-   * Query whether the actor inherits a shader effect from its parent.
-   * @return True if the parent effect is inherited.
-   */
-  bool GetInheritShaderEffect() const;
-
-  /**
+   * @todo remove when API is cleaned up
    * Sets the shader effect for the Actor.
    * Shader effects provide special effects like rippling and bending.
    * Setting a shader effect removes any shader effect previously set by SetShaderEffect.
    * @param [in] effect The shader effect.
    */
-  void SetShaderEffect(ShaderEffect& effect);
+  virtual void SetShaderEffect(ShaderEffect& effect);
 
   /**
+   * @todo remove when API is cleaned up
    * Retrieve the shader effect for the Actor.
    * @return The shader effect
    */
-  ShaderEffectPtr GetShaderEffect() const;
+  virtual ShaderEffectPtr GetShaderEffect() const;
 
   /**
+   * @todo remove when API is cleaned up
    * Removes the current shader effect.
    */
-  void RemoveShaderEffect();
+  virtual void RemoveShaderEffect();
 
   /**
    * @copydoc Dali::Actor::SetDrawMode
@@ -1324,10 +1317,9 @@ protected:
   DynamicsData*           mDynamicsData; ///< optional physics data
 #endif
 
-  ActorGestureData*            mGestureData; /// Optional Gesture data. Only created when actor requires gestures
+  ActorGestureData*       mGestureData; /// Optional Gesture data. Only created when actor requires gestures
 
   ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
-  ShaderEffectPtr         mShaderEffect; ///< Optional referenced shader effect
 
   // Signals
   Dali::Actor::TouchSignalV2             mTouchedSignalV2;
