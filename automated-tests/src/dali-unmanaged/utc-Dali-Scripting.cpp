@@ -834,8 +834,6 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_EQUALS( value.GetValue( "anchor-point" ).Get< Vector3 >(), AnchorPoint::CENTER_LEFT, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "parent-origin" ) );
     DALI_TEST_EQUALS( value.GetValue( "parent-origin" ).Get< Vector3 >(), ParentOrigin::TOP_RIGHT, TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "inherit-shader-effect" ) );
-    DALI_TEST_EQUALS( value.GetValue( "inherit-shader-effect" ).Get< bool >(), false, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "sensitive" ) );
     DALI_TEST_EQUALS( value.GetValue( "sensitive" ).Get< bool >(), false, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "leave-required" ) );
