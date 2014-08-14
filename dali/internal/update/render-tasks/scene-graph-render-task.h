@@ -302,6 +302,11 @@ public:
    */
   void SetCompleteStatusManager( CompleteStatusManager* completeStatusManager );
 
+  /**
+   * @return A pointer to the camera used by the RenderTask
+   */
+  Node* GetCamera() const;
+
 private:
 
   /**

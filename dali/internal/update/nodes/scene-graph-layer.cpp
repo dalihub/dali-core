@@ -41,6 +41,7 @@ SceneGraph::Layer* Layer::New()
 Layer::Layer()
 : mSortFunction( Dali::Layer::ZValue ),
   mClippingBox( 0,0,0,0 ),
+  mLastCamera(0),
   mIsClipping( false ),
   mDepthTestDisabled( false ),
   mIsDefaultSortFunction( true )
