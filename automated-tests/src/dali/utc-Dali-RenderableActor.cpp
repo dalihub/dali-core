@@ -895,7 +895,6 @@ int UtcDaliSetShaderEffectRecursively(void)
   Actor loner = Actor::New();
   Stage::GetCurrent().Add( loner );
   SetShaderEffectRecursively( loner, effect );
-  DALI_TEST_CHECK( effect != loner.GetShaderEffect() ); // base actor does not have shader effects
   RemoveShaderEffectRecursively( loner );
 
   END_TEST;

@@ -147,8 +147,6 @@ int UtcDaliNinePatch01(void)
   tet_infoline("Add Stretch regions to Bitmap");
   AddStretchRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder, pixelFormat );
 
-  PixelBuffer* srcPixels = bitmap->GetBuffer();
-
   tet_infoline("Getting resource");
   Integration::ResourcePointer resourcePtr(bitmap);
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );

@@ -651,7 +651,6 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS( handle.GetCurrentColor(), Color::MAGENTA, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetName(), "MyActor", TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetInheritShaderEffect(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.IsSensitive(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetLeaveRequired(), true, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
@@ -805,7 +804,6 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetName( "MyActor" );
     actor.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
     actor.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-    actor.SetInheritShaderEffect( false );
     actor.SetSensitive( false );
     actor.SetLeaveRequired( true );
     actor.SetInheritRotation( false );
