@@ -48,7 +48,9 @@ class RenderTask;
  * typically this is a window provided by the native system.
  *
  * By default Dali provides a single RenderTask, which renders the entire actor hierachy using
- * a default camera actor and GL surface.
+ * a default camera actor and GL surface. If stereoscopic rendering is enabled, Dali will create
+ * two additional render tasks, on for each eye. Each render task will have its own camera parented
+ * to the default camera actor.
  *
  * The first RenderTask used for input handling will be the last one rendered, which also has input enabled,
  * and has a valid source & camera actor; see SetInputEnabled().
