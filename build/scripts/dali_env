@@ -87,13 +87,11 @@ my $sbs_path     = "$root_path/target";
 my $install_path = "$root_path/opt";
 
 my $opt_create=0;
-my $opt_list=0;
 my $opt_setenv=0;
 my $opt_help=0;
 my $opt_man=0;
 
 GetOptions("create"     => \$opt_create,
-           "list"       => \$opt_list,
            "setenv"     => \$opt_setenv,
            "help"       => \$opt_help,
            "man"        => \$opt_man) or pod2usage(2);
@@ -139,7 +137,7 @@ sub create_setenv
 # \$ . setenv
 #
 # Use DESKTOP_PREFIX when running configure in dali/build/slp:
-# \$ CXXFLAGS="-g -O0" ./configure --prefix=\$DESKTOP_PREFIX --without-libccss
+# \$ CXXFLAGS="-g -O0" ./configure --prefix=\$DESKTOP_PREFIX
 
 export DESKTOP_PREFIX=$install_path
 export PATH=$install_path/bin:\$PATH
@@ -189,6 +187,21 @@ sub check_system_packages
     }
 }
 
+################################################################################
+
+sub create_link
+{
+    my $arch=`uname -i`;
+    $arch =~ s/\r|\n//g;
+
+    my $link = "/usr/lib/$arch-linux-gnu/libturbojpeg.so";
+
+    unless (-e $link)
+    {
+       print "Creating libjpegturbo symbolic link\n";
+       system("sudo ln -s $link.0 $link");
+    }
+}
 
 ################################################################################
 #                                       MAIN
@@ -210,6 +223,8 @@ if($opt_create)
     }
 
     check_system_packages();
+
+    create_link();
 
     create_env();
     create_setenv();
@@ -235,11 +250,11 @@ __END__
 
 =head1 NAME
 
-dali_env - Install / update / rebuild the dali environment for desktop and scratchbox
+dali_env - Create the DALi environment for Ubuntu
 
 =head1 SYNOPSIS
 
-dali_env [-c|-u|-b]  [-a <user>] [-s] [-h|-m]
+dali_env [-c] [-s] [-h|-m]
 
 =head1 OPTIONS
 
@@ -247,11 +262,7 @@ dali_env [-c|-u|-b]  [-a <user>] [-s] [-h|-m]
 
 =item B<-c|--create>
 
-Create a dali environment directory in the current directory.
-
-=item B<-l|--list>
-
-Display the local packages
+Create a DALi environment directory in the current directory.
 
 =item B<-s|--setenv>
 
@@ -271,6 +282,6 @@ Display the manual page
 
 B<dali_env>
 
-Gets and builds the required packages for Dali. For desktop, installs them to a local directory, and creates a setenv script to point to the installation. For scratchbox, creates the debian packages for you to install.
+Gets the required dependencies for DALi and them to a local directory. Can also create a setenv script to point to the installation.
 
 =cut
