@@ -37,7 +37,7 @@ template<int x> struct CompileTimeAssertInt {};    ///< Template to wrap conditi
  *
  * If x is false, then 'sizeof' will be attempted with incomplete type.
  */
-#define DALI_COMPILE_TIME_ASSERT( x ) typedef CompileTimeAssertInt< sizeof( CompileTimeAssertBool< ( x ) > ) > CompileTimeAssertType
+#define DALI_COMPILE_TIME_ASSERT( x ) typedef CompileTimeAssertInt< sizeof( CompileTimeAssertBool< ( x ) > ) > CompileTimeAssertType __attribute__((__unused__))
 
 } // namespace Dali
 
