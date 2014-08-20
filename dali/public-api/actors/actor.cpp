@@ -22,7 +22,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
@@ -31,7 +30,6 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
 
 #include <dali/public-api/dynamics/dynamics-body.h>
 #include <dali/public-api/dynamics/dynamics-joint.h>
@@ -77,6 +75,24 @@ Actor Actor::DownCast( BaseHandle handle )
 
 Actor::~Actor()
 {
+}
+
+Actor::Actor(const Actor& copy)
+: Constrainable(copy)
+{
+}
+
+Actor& Actor::operator=(const Actor& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+Actor& Actor::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
 }
 
 const std::string& Actor::GetName() const
@@ -412,33 +428,6 @@ ColorMode Actor::GetColorMode() const
 Vector4 Actor::GetCurrentWorldColor() const
 {
   return GetImplementation(*this).GetCurrentWorldColor();
-}
-
-void Actor::SetInheritShaderEffect(bool inherit)
-{
-  GetImplementation(*this).SetInheritShaderEffect(inherit);
-}
-
-bool Actor::GetInheritShaderEffect() const
-{
-  return GetImplementation(*this).GetInheritShaderEffect();
-}
-
-void Actor::SetShaderEffect(ShaderEffect effect)
-{
-  GetImplementation(*this).SetShaderEffect(GetImplementation(effect));
-}
-
-ShaderEffect Actor::GetShaderEffect() const
-{
-  Internal::ShaderEffectPtr internal = GetImplementation(*this).GetShaderEffect();
-
-  return ShaderEffect(internal.Get());
-}
-
-void Actor::RemoveShaderEffect()
-{
-  GetImplementation(*this).RemoveShaderEffect();
 }
 
 void Actor::SetDrawMode( DrawMode::Type drawMode )

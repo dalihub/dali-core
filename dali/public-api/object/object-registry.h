@@ -85,9 +85,29 @@ public:
   ~ObjectRegistry();
 
   /**
-   * @copydoc Dali::BaseHandle::operator=
+   * @brief This copy constructor is required for (smart) pointer semantics.
+   *
+   * @param [in] handle A reference to the copied handle
    */
-  using BaseHandle::operator=;
+  ObjectRegistry(const ObjectRegistry& handle);
+
+  /**
+   * @brief This assignment operator is required for (smart) pointer semantics.
+   *
+   * @param [in] rhs  A reference to the copied handle
+   * @return A reference to this
+   */
+  ObjectRegistry& operator=(const ObjectRegistry& rhs);
+
+  /**
+   * @brief This method is defined to allow assignment of the NULL value,
+   * and will throw an exception if passed any other value.
+   *
+   * Assigning to NULL is an alias for Reset().
+   * @param [in] rhs  A NULL pointer
+   * @return A reference to this handle
+   */
+  ObjectRegistry& operator=(BaseHandle::NullType* rhs);
 
 public: // Signals
 

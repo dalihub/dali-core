@@ -46,6 +46,24 @@ KeyFrames::~KeyFrames()
 {
 }
 
+KeyFrames::KeyFrames(const KeyFrames& handle)
+: BaseHandle(handle)
+{
+}
+
+KeyFrames& KeyFrames::operator=(const KeyFrames& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+KeyFrames& KeyFrames::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 Property::Type KeyFrames::GetType() const
 {
   return GetImplementation(*this).GetType();

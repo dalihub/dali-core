@@ -325,7 +325,7 @@ const PropertyDetails DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[] =
   { LightActor::SPECULAR_COLOR, "specular-color", Property::VECTOR3 },
   { LightActor::DIRECTION,      "direction",      Property::VECTOR3 },
 };
-const int DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS ) / sizeof( PropertyDetails );
+const unsigned int DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS ) / sizeof( PropertyDetails );
 } // unnamed namespace
 
 int UtcDaliLightActorProperties(void)
@@ -338,7 +338,7 @@ int UtcDaliLightActorProperties(void)
   light.GetPropertyIndices( indices );
   DALI_TEST_EQUALS( DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT, indices.size() - basicActor.GetPropertyCount(), TEST_LOCATION );
 
-  for ( int i = 0; i < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT; ++i )
+  for ( unsigned int i = 0; i < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT; ++i )
   {
     tet_printf( "Checking: %s\n", DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].name.c_str() );
     DALI_TEST_EQUALS( light.GetPropertyIndex( DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].name ), DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].index, TEST_LOCATION );

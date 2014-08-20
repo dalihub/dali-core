@@ -48,7 +48,6 @@ class DynamicsJoint;
 class Quaternion;
 class Layer;
 struct Radian;
-class ShaderEffect;
 struct KeyEvent;
 struct TouchEvent;
 struct MouseWheelEvent;
@@ -260,7 +259,6 @@ public:
   static const Property::Index NAME;                  ///< name "name",                  type STRING
   static const Property::Index SENSITIVE;             ///< name "sensitive",             type BOOLEAN
   static const Property::Index LEAVE_REQUIRED;        ///< name "leave-required",        type BOOLEAN
-  static const Property::Index INHERIT_SHADER_EFFECT; ///< name "inherit-shader-effect", type BOOLEAN
   static const Property::Index INHERIT_ROTATION;      ///< name "inherit-rotation",      type BOOLEAN
   static const Property::Index INHERIT_SCALE;         ///< name "inherit-scale",         type BOOLEAN
   static const Property::Index COLOR_MODE;            ///< name "color-mode",            type STRING
@@ -318,9 +316,28 @@ public:
   ~Actor();
 
   /**
-   * @copydoc Dali::BaseHandle::operator=
+   * @brief Copy constructor
+   *
+   * @param [in] copy The actor to copy.
    */
-  using BaseHandle::operator=;
+  Actor(const Actor& copy);
+
+  /**
+   * @brief Assignment operator
+   *
+   * @param [in] rhs The actor to copy.
+   */
+  Actor& operator=(const Actor& rhs);
+
+  /**
+   * @brief This method is defined to allow assignment of the NULL value,
+   * and will throw an exception if passed any other value.
+   *
+   * Assigning to NULL is an alias for Reset().
+   * @param [in] rhs  A NULL pointer
+   * @return A reference to this handle
+   */
+  Actor& operator=(BaseHandle::NullType* rhs);
 
   /**
    * @brief Retrieve the Actor's name.
@@ -386,7 +403,7 @@ public:
    * @brief Adds a child Actor to this Actor.
    *
    * NOTE! if the child already has a parent, it will be removed from old parent
-   * and reparented to this actor. This may change childs position, color, shader effect,
+   * and reparented to this actor. This may change childs position, color,
    * scale etc as it now inherits them from this actor
    * @pre This Actor (the parent) has been initialized.
    * @pre The child actor has been initialized.
@@ -968,51 +985,6 @@ public:
    * @return The Actor's current color in the world.
    */
   Vector4 GetCurrentWorldColor() const;
-
-  // Shader Effects
-
-  /**
-   * @brief Set whether the actor inherits a shader effect from its parent; it does inherit by default.
-   *
-   * The inherited effect can still be overriden using SetShaderEffect().
-   * @pre The Actor has been initialized.
-   * @param [in] inherit True if the parent effect is inherited.
-   */
-  void SetInheritShaderEffect(bool inherit);
-
-  /**
-   * @brief Query whether the actor inherits a shader effect from its parent.
-   *
-   * @pre The Actor has been initialized.
-   * @return True if the parent effect is inherited.
-   */
-  bool GetInheritShaderEffect() const;
-
-  /**
-   * @brief Sets the shader effect for the Actor.
-   *
-   * Shader effects provide special effects like rippling and bending.
-   * Setting a shader effect removes any shader effect previously set by SetShaderEffect.
-   * @pre The actor has been initialized.
-   * @pre effect has been initialized.
-   * @param [in] effect The shader effect.
-   */
-  void SetShaderEffect(ShaderEffect effect);
-
-  /**
-   * @brief Retrieve the shader effect for the Actor.
-   *
-   * @pre The Actor has been initialized.
-   * @return The shader effect
-   */
-  ShaderEffect GetShaderEffect() const;
-
-  /**
-   * @brief Removes the current shader effect.
-   *
-   * @pre The Actor has been initialized.
-   */
-  void RemoveShaderEffect();
 
   /**
    * @brief Set how the actor and its children should be drawn.

@@ -211,17 +211,7 @@ void TextAttachment::SetSmoothEdge( BufferIndex updateBufferIndex, const float p
 
 void TextAttachment::ShaderChanged( BufferIndex updateBufferIndex )
 {
-  {
-    Shader* shader = GetParent().GetInheritedShader();
-
-    typedef MessageValue1< Renderer, Shader* > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the mRenderer queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mTextRenderer, &Renderer::SetShader, shader );
-  }
+  // nothing to do
 }
 
 void TextAttachment::SizeChanged( BufferIndex updateBufferIndex )

@@ -48,6 +48,24 @@ DynamicsBodyConfig::~DynamicsBodyConfig()
 {
 }
 
+DynamicsBodyConfig::DynamicsBodyConfig(const DynamicsBodyConfig& handle)
+: BaseHandle(handle)
+{
+}
+
+DynamicsBodyConfig& DynamicsBodyConfig::operator=(const DynamicsBodyConfig& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+DynamicsBodyConfig& DynamicsBodyConfig::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void DynamicsBodyConfig::SetType( const DynamicsBodyConfig::BodyType type )
 {
 #ifdef DYNAMICS_SUPPORT

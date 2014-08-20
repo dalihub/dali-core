@@ -92,9 +92,28 @@ public:
   ~MeshActor();
 
   /**
-   * @copydoc Dali::BaseHandle::operator=
+   * @brief Copy constructor
+   *
+   * @param [in] copy The actor to copy.
    */
-  using BaseHandle::operator=;
+  MeshActor(const MeshActor& copy);
+
+  /**
+   * @brief Assignment operator
+   *
+   * @param [in] rhs The actor to copy.
+   */
+  MeshActor& operator=(const MeshActor& rhs);
+
+  /**
+   * @brief This method is defined to allow assignment of the NULL value,
+   * and will throw an exception if passed any other value.
+   *
+   * Assigning to NULL is an alias for Reset().
+   * @param [in] rhs  A NULL pointer
+   * @return A reference to this handle
+   */
+  MeshActor& operator=(BaseHandle::NullType* rhs);
 
   /**
    * @brief Set a custom material on the given actor or one of it's children.

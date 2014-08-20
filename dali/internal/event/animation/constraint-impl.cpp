@@ -133,10 +133,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<bool>::Type funcPtr( CreatePropertyConstraint<bool>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<bool>::New( targetIndex,
-                                                               sources,
-                                                               funcPtr,
-                                                               AnyCast< BoolInterpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<bool>::New( targetIndex,
+                                                                                       sources,
+                                                                                       funcPtr,
+                                                                                       AnyCast< BoolInterpolator >( interpolator ) ) );
       break;
     }
 
@@ -144,10 +144,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<float>::Type funcPtr( CreatePropertyConstraint<float>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<float>::New( targetIndex,
-                                                                sources,
-                                                                funcPtr,
-                                                                AnyCast< FloatInterpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<float>::New( targetIndex,
+                                                                                        sources,
+                                                                                        funcPtr,
+                                                                                        AnyCast< FloatInterpolator >( interpolator ) ) );
       break;
     }
 
@@ -155,10 +155,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<int>::Type funcPtr( CreatePropertyConstraint<int>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<int>::New( targetIndex,
-                                                              sources,
-                                                              funcPtr,
-                                                              AnyCast< IntegerInterpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<int>::New( targetIndex,
+                                                                                      sources,
+                                                                                      funcPtr,
+                                                                                      AnyCast< IntegerInterpolator >( interpolator ) ) );
       break;
     }
 
@@ -166,10 +166,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<Vector2>::Type funcPtr( CreatePropertyConstraint<Vector2>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<Vector2>::New( targetIndex,
-                                                                  sources,
-                                                                  funcPtr,
-                                                                  AnyCast< Vector2Interpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Vector2>::New( targetIndex,
+                                                                                          sources,
+                                                                                          funcPtr,
+                                                                                          AnyCast< Vector2Interpolator >( interpolator ) ) );
       break;
     }
 
@@ -177,10 +177,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<Vector3>::Type funcPtr( CreatePropertyConstraint<Vector3>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<Vector3>::New( targetIndex,
-                                                                  sources,
-                                                                  funcPtr,
-                                                                  AnyCast< Vector3Interpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Vector3>::New( targetIndex,
+                                                                                          sources,
+                                                                                          funcPtr,
+                                                                                          AnyCast< Vector3Interpolator >( interpolator ) ) );
       break;
     }
 
@@ -188,10 +188,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<Vector4>::Type funcPtr( CreatePropertyConstraint<Vector4>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<Vector4>::New( targetIndex,
-                                                                  sources,
-                                                                  funcPtr,
-                                                                  AnyCast< Vector4Interpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Vector4>::New( targetIndex,
+                                                                                          sources,
+                                                                                          funcPtr,
+                                                                                          AnyCast< Vector4Interpolator >( interpolator ) ) );
       break;
     }
 
@@ -199,10 +199,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<Quaternion>::Type funcPtr( CreatePropertyConstraint<Quaternion>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<Quaternion>::New( targetIndex,
-                                                                     sources,
-                                                                     funcPtr,
-                                                                     AnyCast< QuaternionInterpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Quaternion>::New( targetIndex,
+                                                                                             sources,
+                                                                                             funcPtr,
+                                                                                             AnyCast< QuaternionInterpolator >( interpolator ) ) );
       break;
     }
 
@@ -210,10 +210,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<Matrix>::Type funcPtr( CreatePropertyConstraint<Matrix>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<Matrix>::New( targetIndex,
-                                                                 sources,
-                                                                 funcPtr,
-                                                                 AnyCast< MatrixInterpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Matrix>::New( targetIndex,
+                                                                                         sources,
+                                                                                         funcPtr,
+                                                                                         AnyCast< MatrixInterpolator >( interpolator ) ) );
       break;
     }
 
@@ -221,10 +221,10 @@ Constraint::Constraint( Property::Index targetIndex,
     {
       PropertyConstraintPtr<Matrix3>::Type funcPtr( CreatePropertyConstraint<Matrix3>( func, sources.size() ) );
 
-      mActiveConstraintTemplate = ActiveConstraint<Matrix3>::New( targetIndex,
-                                                                  sources,
-                                                                  funcPtr,
-                                                                  AnyCast< Matrix3Interpolator >( interpolator ) );
+      mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Matrix3>::New( targetIndex,
+                                                                                          sources,
+                                                                                          funcPtr,
+                                                                                          AnyCast< Matrix3Interpolator >( interpolator ) ) );
       break;
     }
 

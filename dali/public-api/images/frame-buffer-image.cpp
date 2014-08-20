@@ -40,6 +40,24 @@ FrameBufferImage::~FrameBufferImage()
 {
 }
 
+FrameBufferImage::FrameBufferImage(const FrameBufferImage& handle)
+: Image(handle)
+{
+}
+
+FrameBufferImage& FrameBufferImage::operator=(const FrameBufferImage& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+FrameBufferImage& FrameBufferImage::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat)
 {
   Dali::Vector2 stageSize = Stage::GetCurrent().GetSize();

@@ -142,11 +142,19 @@ public:
   }
 
   /**
-   * @return True if all children have been clean for two consequtive frames
+   * Checks if it is ok to reuse renderers. Renderers can be reused if ModelView transform for all the renderers
+   * has not changed from previous use.
+   * @param[in] camera A pointer to the camera that we want to use to render the list.
+   * @return True if all children transforms have been clean for two consecutive frames and the camera we are going
+   * to use is the same than the one used before ( Otherwise View transform will be different )
+   *
    */
-  bool CanReuseRenderers()
+  bool CanReuseRenderers(Node* camera)
   {
-    return mAllChildTransformsClean[ 0 ] && mAllChildTransformsClean[ 1 ];
+    bool bReturn( mAllChildTransformsClean[ 0 ] && mAllChildTransformsClean[ 1 ] && camera == mLastCamera );
+    mLastCamera = camera;
+
+    return bReturn;
   }
 
   /**
@@ -183,6 +191,8 @@ private:
   SortFunctionType mSortFunction; ///< Used to sort semi-transparent geometry
 
   ClippingBox mClippingBox;           ///< The clipping box, in window coordinates
+  Node* mLastCamera;                  ///< Pointer to the last camera that has rendered the layer
+
   bool mAllChildTransformsClean[ 2 ]; ///< True if all child nodes transforms are clean,
                                       /// double buffered as we need two clean frames before we can reuse N-1 for N+1
                                       /// this allows us to cache render items when layer is "static"

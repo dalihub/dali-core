@@ -36,6 +36,24 @@ TypeRegistry::~TypeRegistry()
 {
 }
 
+TypeRegistry::TypeRegistry(const TypeRegistry& copy)
+: BaseHandle(copy)
+{
+}
+
+TypeRegistry& TypeRegistry::operator=(const TypeRegistry& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+TypeRegistry& TypeRegistry::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 TypeRegistry TypeRegistry::Get()
 {
   return TypeRegistry(Internal::TypeRegistry::Get());

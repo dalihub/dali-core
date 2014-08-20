@@ -651,7 +651,6 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS( handle.GetCurrentColor(), Color::MAGENTA, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetName(), "MyActor", TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetColorMode(), USE_PARENT_COLOR, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetInheritShaderEffect(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.IsSensitive(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetLeaveRequired(), true, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
@@ -805,7 +804,6 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetName( "MyActor" );
     actor.SetAnchorPoint( AnchorPoint::CENTER_LEFT );
     actor.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-    actor.SetInheritShaderEffect( false );
     actor.SetSensitive( false );
     actor.SetLeaveRequired( true );
     actor.SetInheritRotation( false );
@@ -836,8 +834,6 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_EQUALS( value.GetValue( "anchor-point" ).Get< Vector3 >(), AnchorPoint::CENTER_LEFT, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "parent-origin" ) );
     DALI_TEST_EQUALS( value.GetValue( "parent-origin" ).Get< Vector3 >(), ParentOrigin::TOP_RIGHT, TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "inherit-shader-effect" ) );
-    DALI_TEST_EQUALS( value.GetValue( "inherit-shader-effect" ).Get< bool >(), false, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "sensitive" ) );
     DALI_TEST_EQUALS( value.GetValue( "sensitive" ).Get< bool >(), false, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "leave-required" ) );

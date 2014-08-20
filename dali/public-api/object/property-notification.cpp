@@ -48,6 +48,24 @@ PropertyNotification::~PropertyNotification()
 {
 }
 
+PropertyNotification::PropertyNotification(const PropertyNotification& copy)
+: BaseHandle(copy)
+{
+}
+
+PropertyNotification& PropertyNotification::operator=(const PropertyNotification& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+PropertyNotification& PropertyNotification::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 PropertyCondition PropertyNotification::GetCondition()
 {
   return GetImplementation(*this).GetCondition();

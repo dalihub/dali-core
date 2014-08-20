@@ -55,6 +55,13 @@ Handle& Handle::operator=(const Handle& rhs)
   return *this;
 }
 
+Handle& Handle::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 Handle Handle::DownCast( BaseHandle handle )
 {
   return Handle( dynamic_cast<Dali::Internal::Object*>(handle.GetObjectPtr()) );

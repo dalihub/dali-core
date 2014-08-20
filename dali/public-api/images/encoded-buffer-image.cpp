@@ -59,4 +59,22 @@ EncodedBufferImage::~EncodedBufferImage()
 {
 }
 
+EncodedBufferImage::EncodedBufferImage(const EncodedBufferImage& handle)
+: Image(handle)
+{
+}
+
+EncodedBufferImage& EncodedBufferImage::operator=(const EncodedBufferImage& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+EncodedBufferImage& EncodedBufferImage::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 } // namespace Dali

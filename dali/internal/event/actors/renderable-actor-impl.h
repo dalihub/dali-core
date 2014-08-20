@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/effects/shader-declarations.h>
 
 namespace Dali
 {
@@ -132,6 +133,23 @@ protected:
    */
   virtual ~RenderableActor();
 
+public: // from Actor, in future not virtual. Accessible also from RenderableActor
+
+  /**
+   * @copydoc Actor::SetShaderEffect
+   */
+  virtual void SetShaderEffect(ShaderEffect& effect);
+
+  /**
+   * @copydoc Actor::GetShaderEffect
+   */
+  virtual ShaderEffectPtr GetShaderEffect() const;
+
+  /**
+   * @copydoc Actor::RemoveShaderEffect
+   */
+  virtual void RemoveShaderEffect();
+
 private:
 
   /**
@@ -143,6 +161,7 @@ private:
   RenderableActor(const RenderableActor&);
   // Undefined
   RenderableActor& operator=(const RenderableActor& rhs);
+
 };
 
 } // namespace Internal

@@ -57,13 +57,13 @@ public:
   static const bool  DEFAULT_INVERT_Y_AXIS;
   static const float DEFAULT_FIELD_OF_VIEW;
   static const float DEFAULT_ASPECT_RATIO;
-  static const float DEFAULT_STEREO_BIAS;
   static const float DEFAULT_LEFT_CLIPPING_PLANE;
   static const float DEFAULT_RIGHT_CLIPPING_PLANE;
   static const float DEFAULT_TOP_CLIPPING_PLANE;
   static const float DEFAULT_BOTTOM_CLIPPING_PLANE;
   static const float DEFAULT_NEAR_CLIPPING_PLANE;
   static const float DEFAULT_FAR_CLIPPING_PLANE;
+  static const Vector2 DEFAULT_STEREO_BIAS;
   static const Vector3 DEFAULT_TARGET_POSITION;
 
   /**
@@ -121,7 +121,7 @@ public:
   /**
    * @copydoc Dali::Internal::CameraAttachment::SetStereoBias
    */
-  void SetStereoBias(float stereoBias);
+  void SetStereoBias(const Vector2& stereoBias);
 
    /**
    * @copydoc Dali::Internal::CameraAttachment::SetLeftClippingPlane
@@ -246,13 +246,13 @@ public:  // PROPERTIES
 
   float                         mFieldOfView;
   float                         mAspectRatio;
-  float                         mStereoBias;
   float                         mLeftClippingPlane;
   float                         mRightClippingPlane;
   float                         mTopClippingPlane;
   float                         mBottomClippingPlane;
   float                         mNearClippingPlane;
   float                         mFarClippingPlane;
+  Vector2                       mStereoBias;
   Vector3                       mTargetPosition;
 
   InheritedProperty<Matrix>     mViewMatrix;           ///< The view-matrix; this is double buffered for input handling.
@@ -309,9 +309,9 @@ inline void SetAspectRatioMessage( EventToUpdate& eventToUpdate, const CameraAtt
   new (slot) LocalType( &attachment, &CameraAttachment::SetAspectRatio, parameter );
 }
 
-inline void SetStereoBiasMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetStereoBiasMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, const Vector2& parameter )
 {
-  typedef MessageValue1< CameraAttachment, float > LocalType;
+  typedef MessageValue1< CameraAttachment, Vector2 > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );

@@ -468,7 +468,7 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
     const bool opaqueRenderablesExist( !layer.opaqueRenderables.empty() );
     const bool transparentRenderablesExist( !layer.transparentRenderables.empty() );
     const bool overlayRenderablesExist( !layer.overlayRenderables.empty() );
-    const bool tryReuseRenderList( layer.CanReuseRenderers() && viewMatrixHasNotChanged );
+    const bool tryReuseRenderList( viewMatrixHasNotChanged && layer.CanReuseRenderers(renderTask.GetCamera()) );
 
     // Ignore stencils if there's nothing to test
     if( stencilRenderablesExist &&

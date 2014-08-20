@@ -31,7 +31,6 @@
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
 
 #include <dali/integration-api/debug.h>
@@ -109,24 +108,6 @@ unsigned int ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
 /******************************************************************************
  ************************** Update node hierarchy *****************************
  ******************************************************************************/
-
-inline void UpdateRootNodeShader( Layer& rootNode, int nodeDirtyFlags, Shader* defaultShader )
-{
-  if ( nodeDirtyFlags & ShaderFlag )
-  {
-    rootNode.SetInheritedShader( defaultShader );
-  }
-}
-
-inline void UpdateNodeShader( Node& node, int nodeDirtyFlags, Shader* defaultShader )
-{
-  // If shader needs to be re-inherited
-  if ( nodeDirtyFlags & ShaderFlag )
-  {
-    // It will use the default if the nodes mInheritShader is set to false
-    node.InheritShader( defaultShader );
-  }
-}
 
 inline void UpdateRootNodeOpacity( Layer& rootNode, int nodeDirtyFlags, BufferIndex updateBufferIndex )
 {
@@ -331,12 +312,6 @@ inline RenderableAttachment* UpdateAttachment( NodeAttachment& attachment,
       renderable->SizeChanged( updateBufferIndex );
     }
 
-    // Notify renderables when shader has changed
-    if( nodeDirtyFlags & ShaderFlag )
-    {
-      renderable->ShaderChanged( updateBufferIndex );
-    }
-
     // check if node is visible
     if( renderable->ResolveVisibility( updateBufferIndex ) )
     {
@@ -365,7 +340,6 @@ inline int UpdateNodesAndAttachments( Node& node,
                                       ResourceManager& resourceManager,
                                       RenderQueue& renderQueue,
                                       Layer& currentLayer,
-                                      Shader* defaultShader,
                                       int inheritedDrawMode )
 {
   Layer* layer = &currentLayer;
@@ -387,11 +361,6 @@ inline int UpdateNodesAndAttachments( Node& node,
   // Some dirty flags are inherited from parent
   int nodeDirtyFlags( node.GetDirtyFlags() | ( parentFlags & InheritedDirtyFlags ) );
 
-  if ( node.GetInheritedShader() == NULL )
-  {
-    nodeDirtyFlags |= ShaderFlag;
-  }
-
   int cumulativeDirtyFlags = nodeDirtyFlags;
 
   if ( node.IsLayer() )
@@ -406,8 +375,6 @@ inline int UpdateNodesAndAttachments( Node& node,
     inheritedDrawMode = DrawMode::NORMAL;
   }
   DALI_ASSERT_DEBUG( NULL != layer );
-
-  UpdateNodeShader( node, nodeDirtyFlags, defaultShader );
 
   UpdateNodeOpacity( node, nodeDirtyFlags, updateBufferIndex );
 
@@ -465,7 +432,6 @@ inline int UpdateNodesAndAttachments( Node& node,
                                                       resourceManager,
                                                       renderQueue,
                                                       *layer,
-                                                      defaultShader,
                                                       inheritedDrawMode );
   }
 
@@ -478,8 +444,7 @@ inline int UpdateNodesAndAttachments( Node& node,
 int UpdateNodesAndAttachments( Layer& rootNode,
                                BufferIndex updateBufferIndex,
                                ResourceManager& resourceManager,
-                               RenderQueue& renderQueue,
-                               Shader* defaultShader )
+                               RenderQueue& renderQueue )
 {
   DALI_ASSERT_DEBUG( rootNode.IsRoot() );
 
@@ -499,14 +464,7 @@ int UpdateNodesAndAttachments( Layer& rootNode,
 
   int nodeDirtyFlags( rootNode.GetDirtyFlags() );
 
-  if ( rootNode.GetInheritedShader() == NULL )
-  {
-    nodeDirtyFlags |= ShaderFlag;
-  }
-
   int cumulativeDirtyFlags = nodeDirtyFlags;
-
-  UpdateRootNodeShader( rootNode, nodeDirtyFlags, defaultShader );
 
   UpdateRootNodeOpacity( rootNode, nodeDirtyFlags, updateBufferIndex );
 
@@ -526,7 +484,6 @@ int UpdateNodesAndAttachments( Layer& rootNode,
                                                        resourceManager,
                                                        renderQueue,
                                                        rootNode,
-                                                       defaultShader,
                                                        drawMode );
   }
 

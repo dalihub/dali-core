@@ -108,16 +108,36 @@ public:
   ~AnimatableMesh();
 
   /**
+   * @brief This copy constructor is required for (smart) pointer semantics.
+   *
+   * @param [in] handle A reference to the copied handle
+   */
+  AnimatableMesh(const AnimatableMesh& handle);
+
+  /**
+   * @brief This assignment operator is required for (smart) pointer semantics.
+   *
+   * @param [in] rhs  A reference to the copied handle
+   * @return A reference to this
+   */
+  AnimatableMesh& operator=(const AnimatableMesh& rhs);
+
+  /**
+   * @brief This method is defined to allow assignment of the NULL value,
+   * and will throw an exception if passed any other value.
+   *
+   * Assigning to NULL is an alias for Reset().
+   * @param [in] rhs  A NULL pointer
+   * @return A reference to this handle
+   */
+  AnimatableMesh& operator=(BaseHandle::NullType* rhs);
+
+  /**
    * @brief Get the number of vertices with which this mesh was created.
    *
    * @return number of vertices in this mesh
    */
   unsigned int GetNumberOfVertices() const;
-
-  /**
-   * @copydoc Dali::BaseHandle::operator=
-   */
-  using BaseHandle::operator=;
 
   /**
    * @brief Array subscript operator overload.

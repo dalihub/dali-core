@@ -24,6 +24,7 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
+#include <dali/internal/event/effects/shader-declarations.h>
 
 namespace Dali
 {
@@ -121,6 +122,21 @@ public:
    */
   void GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const;
 
+  /**
+   * @copydoc Dali::RenderableActor::SetShaderEffect
+   */
+  void SetShaderEffect(ShaderEffect& effect);
+
+  /**
+   * @copydoc Dali::RenderableActor::GetShaderEffect
+   */
+  ShaderEffectPtr GetShaderEffect() const;
+
+  /**
+   * @copydoc Dali::RenderableActor::RemoveShaderEffect
+   */
+  void RemoveShaderEffect();
+
 protected:
 
   /**
@@ -174,14 +190,16 @@ private:
    */
   virtual const SceneGraph::RenderableAttachment& GetSceneObject() const = 0;
 
-private:
+private: // Data, cached for actor-thread getters
 
-  // Cached for actor-thread getters
-  float              mSortModifier;
-  CullFaceMode       mCullFaceMode;
-  BlendingMode::Type mBlendingMode;
+  ShaderEffectPtr    mShaderEffect;    ///< Optional referenced shader effect
   BlendingOptions    mBlendingOptions;
   unsigned int       mSamplerBitfield;
+  float              mSortModifier;
+  CullFaceMode       mCullFaceMode:3;  ///< cullface mode, 3 bits enough for 4 values
+  BlendingMode::Type mBlendingMode:2;  ///< blending mode, 2 bits enough for 3 values
+
+
 };
 
 } // namespace Internal

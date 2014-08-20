@@ -20,8 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
-#include <dali/internal/render/renderers/scene-graph-renderer.h>
+
+using Dali::Internal::SceneGraph::Shader;
 
 namespace Dali
 {
@@ -31,10 +33,12 @@ namespace Internal
 
 RenderableAttachment::RenderableAttachment( Stage& stage )
 : ActorAttachment( stage ),
+  mShaderEffect(),
+  mBlendingOptions(),
+  mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
   mSortModifier( 0.0f ),
   mCullFaceMode( CullNone ),
-  mBlendingMode( BlendingMode::AUTO ),
-  mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) )
+  mBlendingMode( BlendingMode::AUTO )
 {
 }
 
@@ -153,15 +157,75 @@ void RenderableAttachment::GetFilterMode( FilterMode::Type& minFilter, FilterMod
   magFilter = ImageSampler::GetMagnifyFilterMode( mSamplerBitfield );
 }
 
+void RenderableAttachment::SetShaderEffect(ShaderEffect& effect)
+{
+  if ( OnStage() )
+  {
+    if ( mShaderEffect )
+    {
+      mShaderEffect->Disconnect();
+    }
+
+    mShaderEffect.Reset( &effect );
+
+    const Shader& shader = dynamic_cast<const Shader&>( *mShaderEffect->GetSceneObject() );
+
+    ApplyShaderMessage( mStage->GetUpdateInterface(), GetSceneObject(), shader );
+
+    mShaderEffect->Connect();
+  }
+  else
+  {
+    mShaderEffect = ShaderEffectPtr(&effect);
+  }
+  // Effects can only be applied when the Node is connected to scene-graph
+}
+
+ShaderEffectPtr RenderableAttachment::GetShaderEffect() const
+{
+  return mShaderEffect;
+}
+
+void RenderableAttachment::RemoveShaderEffect()
+{
+  if ( OnStage() )
+  {
+    RemoveShaderMessage( mStage->GetUpdateInterface(), GetSceneObject() );
+
+    // Notify shader effect
+    if (mShaderEffect)
+    {
+      mShaderEffect->Disconnect();
+    }
+  }
+
+  mShaderEffect.Reset();
+}
 
 void RenderableAttachment::OnStageConnection()
 {
+  if ( mShaderEffect )
+  {
+    const Shader& shader = dynamic_cast<const Shader&>( *mShaderEffect->GetSceneObject() );
+
+    ApplyShaderMessage( mStage->GetUpdateInterface(), GetSceneObject(), shader );
+
+    // Notify shader effect
+    mShaderEffect->Connect();
+  }
+
   // For derived classes
   OnStageConnection2();
 }
 
 void RenderableAttachment::OnStageDisconnection()
 {
+  // Notify shader effect
+  if ( mShaderEffect )
+  {
+    mShaderEffect->Disconnect();
+  }
+
   // For derived classes
   OnStageDisconnection2();
 }

@@ -332,18 +332,18 @@ Image NewImage( const Property::Value& map )
       std::string s(map.GetValue("type").Get<std::string>());
       if("FrameBufferImage" == s)
       {
-        ret = new Internal::FrameBufferImage(attributes.GetWidth(),
-                                             attributes.GetHeight(),
-                                             attributes.GetPixelFormat(),
-                                             releasePolicy );
+        ret = Image( new Internal::FrameBufferImage(attributes.GetWidth(),
+                                                    attributes.GetHeight(),
+                                                    attributes.GetPixelFormat(),
+                                                    releasePolicy) );
       }
       else if("BitmapImage" == s)
       {
-        ret = new Internal::BitmapImage(attributes.GetWidth(),
-                                        attributes.GetHeight(),
-                                        attributes.GetPixelFormat(),
-                                        loadPolicy,
-                                        releasePolicy);
+        ret = Image( new Internal::BitmapImage(attributes.GetWidth(),
+                                               attributes.GetHeight(),
+                                               attributes.GetPixelFormat(),
+                                               loadPolicy,
+                                               releasePolicy) );
       }
       else if("Image" == s)
       {

@@ -45,6 +45,24 @@ DynamicsWorld::~DynamicsWorld()
 {
 }
 
+DynamicsWorld::DynamicsWorld(const DynamicsWorld& handle)
+: BaseHandle(handle)
+{
+}
+
+DynamicsWorld& DynamicsWorld::operator=(const DynamicsWorld& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+DynamicsWorld& DynamicsWorld::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void DynamicsWorld::SetGravity(const Vector3& gravity )
 {
 #ifdef DYNAMICS_SUPPORT

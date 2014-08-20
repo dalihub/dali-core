@@ -40,6 +40,24 @@ NinePatchImage::~NinePatchImage()
 {
 }
 
+NinePatchImage::NinePatchImage(const NinePatchImage& handle)
+: Image(handle)
+{
+}
+
+NinePatchImage& NinePatchImage::operator=(const NinePatchImage& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+NinePatchImage& NinePatchImage::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 NinePatchImage NinePatchImage::New( const std::string& filename )
 {
   ImageAttributes defaultAttrs;

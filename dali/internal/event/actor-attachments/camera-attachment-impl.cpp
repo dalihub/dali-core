@@ -55,13 +55,13 @@ CameraAttachment::CameraAttachment( Stage& stage )
   mInvertYAxis( SceneGraph::CameraAttachment::DEFAULT_INVERT_Y_AXIS ),
   mFieldOfView( SceneGraph::CameraAttachment::DEFAULT_FIELD_OF_VIEW ),
   mAspectRatio( SceneGraph::CameraAttachment::DEFAULT_ASPECT_RATIO ),
-  mStereoBias( SceneGraph::CameraAttachment::DEFAULT_STEREO_BIAS ),
   mLeftClippingPlane( SceneGraph::CameraAttachment::DEFAULT_LEFT_CLIPPING_PLANE ),
   mRightClippingPlane( SceneGraph::CameraAttachment::DEFAULT_RIGHT_CLIPPING_PLANE ),
   mTopClippingPlane( SceneGraph::CameraAttachment::DEFAULT_TOP_CLIPPING_PLANE ),
   mBottomClippingPlane( SceneGraph::CameraAttachment::DEFAULT_BOTTOM_CLIPPING_PLANE ),
   mNearClippingPlane( SceneGraph::CameraAttachment::DEFAULT_NEAR_CLIPPING_PLANE ),
   mFarClippingPlane( SceneGraph::CameraAttachment::DEFAULT_FAR_CLIPPING_PLANE ),
+  mStereoBias( SceneGraph::CameraAttachment::DEFAULT_STEREO_BIAS ),
   mTargetPosition( SceneGraph::CameraAttachment::DEFAULT_TARGET_POSITION )
 {
 }
@@ -139,9 +139,9 @@ float CameraAttachment::GetAspectRatio() const
   return mAspectRatio;
 }
 
-void CameraAttachment::SetStereoBias(float stereoBias)
+void CameraAttachment::SetStereoBias(const Vector2& stereoBias)
 {
-  if( ! Equals(stereoBias, mStereoBias) )
+  if( ! Equals(stereoBias.x, mStereoBias.x ) || ! Equals(stereoBias.y, mStereoBias.y )  )
   {
     mStereoBias = stereoBias;
 
@@ -150,7 +150,7 @@ void CameraAttachment::SetStereoBias(float stereoBias)
   }
 }
 
-float CameraAttachment::GetStereoBias(float stereoBias) const
+Vector2 CameraAttachment::GetStereoBias() const
 {
   return mStereoBias;
 }

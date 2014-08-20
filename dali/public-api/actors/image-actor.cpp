@@ -78,6 +78,24 @@ ImageActor::~ImageActor()
 {
 }
 
+ImageActor::ImageActor(const ImageActor& copy)
+: RenderableActor(copy)
+{
+}
+
+ImageActor& ImageActor::operator=(const ImageActor& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+ImageActor& ImageActor::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void ImageActor::SetImage(Image image)
 {
   if (image)

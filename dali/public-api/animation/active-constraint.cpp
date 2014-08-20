@@ -42,6 +42,24 @@ ActiveConstraint::~ActiveConstraint()
 {
 }
 
+ActiveConstraint::ActiveConstraint(const ActiveConstraint& handle)
+: Handle( handle )
+{
+}
+
+ActiveConstraint& ActiveConstraint::operator=(const ActiveConstraint& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+ActiveConstraint& ActiveConstraint::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 Handle ActiveConstraint::GetTargetObject()
 {
   return GetImplementation(*this).GetTargetObject();

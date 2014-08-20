@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/renderable-actor-impl.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
 
 namespace Dali
 {
@@ -37,6 +38,24 @@ RenderableActor RenderableActor::DownCast( BaseHandle handle )
 
 RenderableActor::~RenderableActor()
 {
+}
+
+RenderableActor::RenderableActor(const RenderableActor& copy)
+: Actor(copy)
+{
+}
+
+RenderableActor& RenderableActor::operator=(const RenderableActor& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+RenderableActor& RenderableActor::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
 }
 
 void RenderableActor::SetSortModifier(float modifier)
@@ -121,9 +140,68 @@ void RenderableActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Ty
   GetImplementation(*this).GetFilterMode( minFilter, magFilter );
 }
 
+void RenderableActor::SetShaderEffect(ShaderEffect effect)
+{
+  GetImplementation(*this).SetShaderEffect(GetImplementation(effect));
+}
+
+ShaderEffect RenderableActor::GetShaderEffect() const
+{
+  Internal::ShaderEffectPtr internal = GetImplementation(*this).GetShaderEffect();
+
+  return ShaderEffect(internal.Get());
+}
+
+void RenderableActor::RemoveShaderEffect()
+{
+  GetImplementation(*this).RemoveShaderEffect();
+}
+
 RenderableActor::RenderableActor(Internal::RenderableActor* internal)
 : Actor(internal)
 {
+}
+
+void SetShaderEffectRecursively( Actor actor, ShaderEffect effect )
+{
+  // only do something if the actor and effect are valid
+  if( actor && effect )
+  {
+    // first remove from this actor
+    RenderableActor renderable = RenderableActor::DownCast( actor );
+    if( renderable )
+    {
+      renderable.SetShaderEffect( effect );
+    }
+    // then all children recursively
+    const unsigned int count = actor.GetChildCount();
+    for( unsigned int index = 0; index < count; ++index )
+    {
+      Actor child( actor.GetChildAt( index ) );
+      SetShaderEffectRecursively( child, effect );
+    }
+  }
+}
+
+void RemoveShaderEffectRecursively( Actor actor )
+{
+  // only do something if the actor is valid
+  if( actor )
+  {
+    // first remove from this actor
+    RenderableActor renderable = RenderableActor::DownCast( actor );
+    if( renderable )
+    {
+      renderable.RemoveShaderEffect();
+    }
+    // then all children recursively
+    const unsigned int count = actor.GetChildCount();
+    for( unsigned int index = 0; index < count; ++index )
+    {
+      Actor child( actor.GetChildAt( index ) );
+      RemoveShaderEffectRecursively( child );
+    }
+  }
 }
 
 } // namespace Dali

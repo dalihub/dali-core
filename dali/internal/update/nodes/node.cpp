@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/render/shaders/shader.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
 
@@ -57,8 +56,6 @@ Node::Node()
   mWorldMatrix( Matrix::IDENTITY ),
   mWorldColor( Color::WHITE ),
   mParent( NULL ),
-  mAppliedShader( NULL ),
-  mInheritedShader( NULL ),
   mExclusiveRenderTask( NULL ),
   mAttachment( NULL ),
   mChildren(),
@@ -66,7 +63,6 @@ Node::Node()
   mInitialVolume( Vector3::ONE ),
   mDirtyFlags(AllFlags),
   mIsRoot( false ),
-  mInheritShader( true ),
   mInheritRotation( true ),
   mInheritScale( true ),
   mTransmitGeometryScaling( false ),
@@ -147,61 +143,6 @@ void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode, std:
   DALI_ASSERT_ALWAYS( NULL != found );
 
   found->RecursiveDisconnectFromSceneGraph( updateBufferIndex, connectedNodes, disconnectedNodes );
-}
-
-void Node::ApplyShader( Shader* shader )
-{
-  DALI_ASSERT_DEBUG( shader && "null shader passed to node" );
-
-  mAppliedShader = shader;
-
-  SetDirtyFlag(ShaderFlag);
-}
-
-void Node::RemoveShader()
-{
-  mAppliedShader = NULL; // Wait until InheritShader to grab default shader
-
-  SetDirtyFlag(ShaderFlag);
-}
-
-Shader* Node::GetAppliedShader() const
-{
-  return mAppliedShader;
-}
-
-void Node::SetInheritedShader(Shader* shader)
-{
-  mInheritedShader = shader;
-}
-
-Shader* Node::GetInheritedShader() const
-{
-  return mInheritedShader;
-}
-
-void Node::InheritShader(Shader* defaultShader)
-{
-  DALI_ASSERT_DEBUG(mParent != NULL);
-
-  // If we have a custom shader for this node, then use it
-  if ( mAppliedShader != NULL )
-  {
-    mInheritedShader = mAppliedShader;
-  }
-  else
-  {
-    // Otherwise we either inherit a shader, or fall-back to the default
-    if (mInheritShader)
-    {
-      mInheritedShader = mParent->GetInheritedShader();
-    }
-    else
-    {
-      mInheritedShader = defaultShader;
-    }
-  }
-  DALI_ASSERT_DEBUG( mInheritedShader != NULL );
 }
 
 int Node::GetDirtyFlags() const
@@ -305,10 +246,6 @@ void Node::RecursiveDisconnectFromSceneGraph( BufferIndex updateBufferIndex, std
 
   // Animators, Constraints etc. should be disconnected from the child's properties.
   PropertyOwner::DisconnectFromSceneGraph();
-
-  // Remove effects
-  mAppliedShader         = NULL;
-  mInheritedShader       = NULL;
 
   // Remove back-pointer to parent
   mParent = NULL;

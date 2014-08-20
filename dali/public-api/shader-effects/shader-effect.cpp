@@ -49,9 +49,22 @@ ShaderEffect::~ShaderEffect()
 {
 }
 
-ShaderEffect::ShaderEffect(const ShaderEffect& object)
+ShaderEffect::ShaderEffect(const ShaderEffect& handle)
+: Constrainable(handle)
 {
-  *this = object;
+}
+
+ShaderEffect& ShaderEffect::operator=(const ShaderEffect& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+ShaderEffect& ShaderEffect::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
 }
 
 ShaderEffect ShaderEffect::New( const std::string& vertexShader, const std::string& fragmentShader, GeometryType type, GeometryHints hints)

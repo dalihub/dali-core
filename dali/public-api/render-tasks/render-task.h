@@ -48,7 +48,9 @@ class RenderTask;
  * typically this is a window provided by the native system.
  *
  * By default Dali provides a single RenderTask, which renders the entire actor hierachy using
- * a default camera actor and GL surface.
+ * a default camera actor and GL surface. If stereoscopic rendering is enabled, Dali will create
+ * two additional render tasks, on for each eye. Each render task will have its own camera parented
+ * to the default camera actor.
  *
  * The first RenderTask used for input handling will be the last one rendered, which also has input enabled,
  * and has a valid source & camera actor; see SetInputEnabled().
@@ -153,9 +155,29 @@ public:
   ~RenderTask();
 
   /**
-   * @copydoc Dali::BaseHandle::operator=
+   * @brief This copy constructor is required for (smart) pointer semantics.
+   *
+   * @param [in] handle A reference to the copied handle
    */
-  using BaseHandle::operator=;
+  RenderTask(const RenderTask& handle);
+
+  /**
+   * @brief This assignment operator is required for (smart) pointer semantics.
+   *
+   * @param [in] rhs  A reference to the copied handle
+   * @return A reference to this
+   */
+  RenderTask& operator=(const RenderTask& rhs);
+
+  /**
+   * @brief This method is defined to allow assignment of the NULL value,
+   * and will throw an exception if passed any other value.
+   *
+   * Assigning to NULL is an alias for Reset().
+   * @param [in] rhs  A NULL pointer
+   * @return A reference to this handle
+   */
+  RenderTask& operator=(BaseHandle::NullType* rhs);
 
   /**
    * @brief Set the actors to be rendered.

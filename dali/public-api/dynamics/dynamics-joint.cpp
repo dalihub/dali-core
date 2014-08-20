@@ -36,6 +36,24 @@ DynamicsJoint::~DynamicsJoint()
 {
 }
 
+DynamicsJoint::DynamicsJoint(const DynamicsJoint& handle)
+: BaseHandle(handle)
+{
+}
+
+DynamicsJoint& DynamicsJoint::operator=(const DynamicsJoint& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+DynamicsJoint& DynamicsJoint::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void DynamicsJoint::SetLinearLimit( const int axisIndex, const float lowerLimit, const float upperLimit )
 {
 #ifdef DYNAMICS_SUPPORT

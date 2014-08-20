@@ -81,9 +81,29 @@ public:
   ~ModelData();
 
   /**
-   * @copydoc Dali::BaseHandle::operator=
+   * @brief This copy constructor is required for (smart) pointer semantics.
+   *
+   * @param [in] handle A reference to the copied handle
    */
-  using BaseHandle::operator=;
+  ModelData(const ModelData& handle);
+
+  /**
+   * @brief This assignment operator is required for (smart) pointer semantics.
+   *
+   * @param [in] rhs  A reference to the copied handle
+   * @return A reference to this
+   */
+  ModelData& operator=(const ModelData& rhs);
+
+  /**
+   * @brief This method is defined to allow assignment of the NULL value,
+   * and will throw an exception if passed any other value.
+   *
+   * Assigning to NULL is an alias for Reset().
+   * @param [in] rhs  A NULL pointer
+   * @return A reference to this handle
+   */
+  ModelData& operator=(BaseHandle::NullType* rhs);
 
   /**
    * @brief Returns the name of the model.
@@ -164,24 +184,6 @@ public:
    * @return reference to the animation map container.
    */
    ModelAnimationMapContainer& GetAnimationMapContainer();
-
-  /**
-   * @brief Get an animation map from the model data.
-   *
-   * @deprecated Use ModelActorFactory to generate animations
-   * @param[in] index The index of the animation map.
-   * @return a pointer to model animation map.
-   */
-  const ModelAnimationMap* GetAnimationMap (unsigned int index) const;
-
-  /**
-   * @brief Get the animation for the given name.
-   *
-   * @deprecated Use ModelActorFactory to generate animations
-   * @param[in] name The name of an animation map to search for.
-   * @return a pointer to model animation map.
-   */
-  const ModelAnimationMap* GetAnimationMap (const std::string& name) const;
 
   /**
    * @brief Find the index for the given animation name.

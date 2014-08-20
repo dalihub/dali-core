@@ -42,6 +42,24 @@ Constraint::~Constraint()
 {
 }
 
+Constraint::Constraint(const Constraint& handle)
+: BaseHandle(handle)
+{
+}
+
+Constraint& Constraint::operator=(const Constraint& rhs)
+{
+  BaseHandle::operator=(rhs);
+  return *this;
+}
+
+Constraint& Constraint::operator=(BaseHandle::NullType* rhs)
+{
+  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
+  Reset();
+  return *this;
+}
+
 void Constraint::SetApplyTime( TimePeriod timePeriod )
 {
   GetImplementation(*this).SetApplyTime( timePeriod );
