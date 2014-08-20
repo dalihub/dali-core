@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.0.4
+Version:    1.0.5
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0
@@ -77,9 +77,9 @@ DALI_DATA_RO_DIR="%{dali_data_ro_dir}"
 export DALI_DATA_RW_DIR
 export DALI_DATA_RO_DIR
 
-CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS ;
-CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS ;
-LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS ;
+CFLAGS="${CFLAGS:-%optflags}" ; export CFLAGS;
+CXXFLAGS="${CXXFLAGS:-%optflags}" ; export CXXFLAGS;
+LDFLAGS="${LDFLAGS:-%optflags}" ; export LDFLAGS;
 ./configure \
       --program-prefix=%{?_program_prefix} \
       --prefix=%{_prefix} \
