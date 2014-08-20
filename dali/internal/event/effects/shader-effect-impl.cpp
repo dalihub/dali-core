@@ -76,16 +76,16 @@ struct WrapperStrings
 WrapperStrings customShaderWrappers [] =
 {
   {
-    CustomImagePrefixVertex.c_str(), CustomImagePrefixFragment.c_str(),
-    CustomImagePostfixVertex.c_str(), CustomImagePostfixFragment.c_str()
+    CustomImagePrefixVertex, CustomImagePrefixFragment,
+    CustomImagePostfixVertex, CustomImagePostfixFragment
   },
   {
-    CustomFontPrefixVertex.c_str(), CustomFontPrefixFragment.c_str(),
-    CustomFontPostfixVertex.c_str(), CustomFontPostfixFragment.c_str()
+    CustomFontPrefixVertex, CustomFontPrefixFragment,
+    CustomFontPostfixVertex, CustomFontPostfixFragment
   },
   {
-    CustomMeshPrefixVertex.c_str(), CustomMeshPrefixFragment.c_str(),
-    MeshVertex.c_str(), MeshFragment.c_str()
+    CustomMeshPrefixVertex, CustomMeshPrefixFragment,
+    MeshVertex, MeshFragment
   }
 };
 
