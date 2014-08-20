@@ -1,7 +1,7 @@
 prefix=@prefix@
 exec_prefix=@exec_prefix@
 apiversion=@DALI_VERSION@
-libdir=${exec_prefix}/lib
+libdir=@libdir@
 includedir=@devincludepath@
 
 Name: Samsung OpenGLES Toolkit
