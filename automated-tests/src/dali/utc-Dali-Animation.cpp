@@ -9660,3 +9660,65 @@ int UtcDaliAnimationSignalOrder(void)
 
   END_TEST;
 }
+
+int UtcDaliAnimationExtendDuration(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+
+  // Register a float property
+  float startValue(10.0f);
+  Property::Index index = actor.RegisterProperty( "test-property", startValue );
+  Stage::GetCurrent().Add(actor);
+  DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
+
+  // Build the animation
+  float initialDurationSeconds(1.0f);
+  float animatorDelay = 5.0f;
+  float animatorDurationSeconds(5.0f);
+  float extendedDurationSeconds(animatorDelay+animatorDurationSeconds);
+  Animation animation = Animation::New(initialDurationSeconds);
+  float targetValue(30.0f);
+  float relativeValue(targetValue - startValue);
+
+  animation.AnimateTo(Property(actor, index),
+                      targetValue,
+                      TimePeriod(animatorDelay, animatorDurationSeconds));
+
+  // The duration should have been extended
+  DALI_TEST_EQUALS( animation.GetDuration(), extendedDurationSeconds, TEST_LOCATION );
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(extendedDurationSeconds*500.0f)/* 50% animation progress, 0% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(extendedDurationSeconds*250.0f)/* 75% animation progress, 50% animator progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<float>(index), startValue+(relativeValue*0.5f), TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(extendedDurationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetProperty<float>(index), targetValue, TEST_LOCATION );
+  END_TEST;
+}
+
