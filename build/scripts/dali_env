@@ -45,6 +45,7 @@ my @system_packages = (
     "libgif-dev",
     "libturbojpeg",
     "libfribidi-dev",
+    "doxygen",
 );
 
 # Make best guess as to where this program was run from (note, it is
