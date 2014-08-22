@@ -76,6 +76,9 @@ public:
   bool RenderOnly( );
   void ResetContext();
 
+private:
+  void DoUpdate( unsigned int intervalMilliseconds );
+
 protected:
   TestPlatformAbstraction   mPlatformAbstraction;
   TestRenderController      mRenderController;
@@ -93,6 +96,7 @@ protected:
   unsigned int mFrame;
 
   Vector2 mDpi;
+  unsigned int mLastVSyncTime;
 };
 
 } // Dali

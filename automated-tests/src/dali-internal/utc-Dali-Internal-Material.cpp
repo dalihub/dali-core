@@ -364,10 +364,7 @@ int UtcDaliMaterialStaging01(void)
   Internal::SceneGraph::UpdateManager& updateManager = Internal::ThreadLocalStorage::Get().GetUpdateManager();
   AddMaterialMessage( updateManager, sceneObject );
   application.SendNotification(); // Flush update Q
-
-  application.GetPlatform().IncrementGetTimeResult( 1 );
-  Integration::UpdateStatus status;
-  application.GetCore().Update( status );
+  application.UpdateOnly(1);
 
   // Check that a render object has been created
   Internal::SceneGraph::RenderMaterial* renderMaterial = sceneObject->GetRenderMaterial();
@@ -418,10 +415,7 @@ int UtcDaliMaterialStaging02(void)
   Internal::SceneGraph::UpdateManager& updateManager = Internal::ThreadLocalStorage::Get().GetUpdateManager();
   AddMaterialMessage( updateManager, sceneObject );
   application.SendNotification(); // Flush update Q
-
-  application.GetPlatform().IncrementGetTimeResult( 1 );
-  Integration::UpdateStatus status;
-  application.GetCore().Update( status );
+  application.UpdateOnly(1);
 
   // Check that a render object has been created
   Internal::SceneGraph::RenderMaterial* renderMaterial = sceneObject->GetRenderMaterial();
