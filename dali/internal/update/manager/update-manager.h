@@ -177,7 +177,7 @@ public:
    * @param[in] node The new parent node.
    * @param[in] node The node to connect.
    */
-  void ConnectNode( Node* parent, Node* node );
+  void ConnectNode( Node* parent, Node* node, int index );
 
   /**
    * Disconnect a Node from the scene-graph.
@@ -528,19 +528,19 @@ inline void AddNodeMessage( UpdateManager& manager, Node& node )
   new (slot) LocalType( &manager, &UpdateManager::AddNode, &node );
 }
 
-inline void ConnectNodeMessage( UpdateManager& manager, const Node& constParent, const Node& constChild )
+inline void ConnectNodeMessage( UpdateManager& manager, const Node& constParent, const Node& constChild, int index )
 {
   // Update thread can edit the object
   Node& parent = const_cast< Node& >( constParent );
   Node& child = const_cast< Node& >( constChild );
 
-  typedef MessageValue2< UpdateManager, Node*, Node* > LocalType;
+  typedef MessageValue3< UpdateManager, Node*, Node*, int > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::ConnectNode, &parent, &child );
+  new (slot) LocalType( &manager, &UpdateManager::ConnectNode, &parent, &child, index );
 }
 
 inline void DisconnectNodeMessage( UpdateManager& manager, const Node& constNode )

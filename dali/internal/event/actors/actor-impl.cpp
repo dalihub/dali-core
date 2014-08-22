@@ -331,6 +331,46 @@ void Actor::Add(Actor& child)
   }
 }
 
+void Actor::Insert(unsigned int index, Actor& child)
+{
+  DALI_ASSERT_ALWAYS( this != &child && "Cannot add actor to itself" );
+  DALI_ASSERT_ALWAYS( !child.IsRoot() && "Cannot add root actor" );
+
+  if( !mChildren )
+  {
+    mChildren = new ActorContainer;
+  }
+
+  Actor* const oldParent( child.mParent );
+
+  // since an explicit position has been given, always insert, even if already a child
+  if( oldParent )
+  {
+    oldParent->Remove( child ); // This causes OnChildRemove callback
+  }
+
+  // Guard against Add() during previous OnChildRemove callback
+  if ( !child.mParent )
+  {
+    // Do this first, since user callbacks from within SetParent() may need to remove child
+    if (index < child.GetChildCount())
+    {
+      ActorIter it = mChildren->begin();
+      std::advance(it, index);
+      mChildren->insert(it, Dali::Actor(&child));
+    }
+    else
+    {
+      mChildren->push_back(Dali::Actor(&child));
+    }
+    // SetParent asserts that child can be added
+    child.SetParent(this, index);
+
+    // Notification for derived classes
+    OnChildAdd(child);
+  }
+}
+
 void Actor::Remove(Actor& child)
 {
   DALI_ASSERT_ALWAYS( this != &child && "Cannot remove actor from itself" );
@@ -2022,14 +2062,14 @@ Actor::~Actor()
   delete mAnchorPoint;
 }
 
-void Actor::ConnectToStage( Stage& stage )
+void Actor::ConnectToStage( Stage& stage, int index )
 {
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
   // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveConnectToStage( stage, connectionList );
+  RecursiveConnectToStage( stage, connectionList, index );
 
   // Notify applications about the newly connected actors.
   const ActorIter endIter = connectionList.end();
@@ -2040,13 +2080,13 @@ void Actor::ConnectToStage( Stage& stage )
   }
 }
 
-void Actor::RecursiveConnectToStage( Stage& stage, ActorContainer& connectionList )
+void Actor::RecursiveConnectToStage( Stage& stage, ActorContainer& connectionList, int index )
 {
   DALI_ASSERT_ALWAYS( !OnStage() );
 
   mIsOnStage = true;
 
-  ConnectToSceneGraph();
+  ConnectToSceneGraph(index);
 
   // Notification for internal derived classes
   OnStageConnectionInternal();
@@ -2072,7 +2112,7 @@ void Actor::RecursiveConnectToStage( Stage& stage, ActorContainer& connectionLis
  * The child must connect its Node to the parent's Node.
  * This is resursive; the child calls ConnectToStage() for its children.
  */
-void Actor::ConnectToSceneGraph()
+void Actor::ConnectToSceneGraph(int index)
 {
   DALI_ASSERT_DEBUG( mNode != NULL);
   DALI_ASSERT_DEBUG( mParent != NULL);
@@ -2081,7 +2121,7 @@ void Actor::ConnectToSceneGraph()
   if( NULL != mNode )
   {
     // Reparent Node in next Update
-    ConnectNodeMessage( mStage->GetUpdateManager(), *(mParent->mNode), *mNode );
+    ConnectNodeMessage( mStage->GetUpdateManager(), *(mParent->mNode), *mNode, index );
   }
 
   // Notify attachment
@@ -3275,7 +3315,7 @@ int Actor::GetPropertyComponentIndex( Property::Index index ) const
   return componentIndex;
 }
 
-void Actor::SetParent(Actor* parent)
+void Actor::SetParent(Actor* parent, int index)
 {
   if( parent )
   {
@@ -3289,7 +3329,7 @@ void Actor::SetParent(Actor* parent)
       StagePtr stage = parent->mStage;
 
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToStage(*stage);
+      ConnectToStage(*stage, index);
     }
   }
   else // parent being set to NULL

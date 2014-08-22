@@ -163,6 +163,16 @@ public:
   void Add(Actor& child);
 
   /**
+   * Inserts a child Actor to this Actor's child list
+   * @pre The child actor is not the same as the parent actor.
+   * @pre The child actor does not already have a parent.
+   * @param [in] index in childlist to insert child at
+   * @param [in] child The child.
+   * @post The child will be referenced by its parent.
+   */
+  void Insert(unsigned int index, Actor& child);
+
+  /**
    * Removes a child Actor from this Actor.
    * @param [in] child The child.
    * @post The child will be unreferenced.
@@ -1026,21 +1036,24 @@ protected:
   /**
    * Called on a child during Add() when the parent actor is connected to the Stage.
    * @param[in] stage The stage.
+   * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void ConnectToStage(Stage& stage);
+  void ConnectToStage(Stage& stage, int index = -1);
 
   /**
    * Helper for ConnectToStage, to recursively connect a tree of actors.
    * This is atomic i.e. not interrupted by user callbacks.
    * @param[in] stage The stage.
+   * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToStage( Stage& stage, ActorContainer& connectionList );
+  void RecursiveConnectToStage( Stage& stage, ActorContainer& connectionList, int index = -1 );
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.
+   * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void ConnectToSceneGraph();
+  void ConnectToSceneGraph(int index = -1);
 
   /**
    * Helper for ConnectToStage, to notify a connected actor through the public API.
@@ -1176,8 +1189,9 @@ private:
   /**
    * Set the actors parent.
    * @param[in] parent The new parent.
+   * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void SetParent(Actor* parent);
+  void SetParent(Actor* parent, int index = -1);
 
   /**
    * Helper to create a Node for this Actor.
