@@ -243,11 +243,16 @@ public:
   bool IsRenderRequired();
 
   /**
+   * Set whether all resources were available when the render-task was processed
+   * @param[in] resourcesComplete True if the resources of the source tree are completely loaded.
+   */
+  void SetResourcesFinished( bool resourcesFinished );
+
+  /**
    * Process a frame. This method is called each frame for every ready render task, regardless
    * of whether it needs to render (so that the frame counter can be updated).
-   * @param[in] resourcesComplete true if the resources of the source tree are completely loaded.
    */
-  void UpdateState( bool resourcesComplete );
+  void UpdateState();
 
   /**
    * Return true only if currently waiting for the render task to
@@ -336,6 +341,7 @@ private:
   CameraAttachment* mCameraAttachment;
   unsigned int mFrameBufferResourceId;
 
+  bool mResourcesFinished:1; ///< True if all resources were available when the render-task was processed
   bool mWaitingToRender:1; ///< True when an render once to FBO is waiting
   bool mNotifyTrigger:1; ///< True if a render once render task has finished renderering
   bool mExclusive: 1; ///< Whether the render task has exclusive access to the source actor (node in the scene graph implementation).

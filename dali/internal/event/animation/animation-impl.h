@@ -787,126 +787,6 @@ public:
    */
   void Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
-  /**
-   * Animate the parent-origin of an actor.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] parentOrigin The target value.
-   */
-  void ParentOriginTo(Actor& actor, const Vector3& parentOrigin);
-
-  /**
-   * Animate the parent-origin of an actor.
-   * This overload allows the alpha function to be customized.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] parentOrigin The target value.
-   * @param [in] alpha The alpha function to apply.
-   */
-  void ParentOriginTo(Actor& actor, const Vector3& parentOrigin, AlphaFunction alpha);
-
-  /**
-   * Animate the parent-origin of an actor.
-   * This overload allows the start & end time to be customized.
-   * @pre delaySeconds & durationSeconds must be zero or greater.
-   * @param [in] actor The actor to animate.
-   * @param [in] parentOrigin The target value.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the effect.
-   * @param [in] durationSeconds The duration of the effect.
-   */
-  void ParentOriginTo(Actor& actor, const Vector3& parentOrigin, AlphaFunction alpha, float delaySeconds, float durationSeconds);
-
-  /**
-   * Animate the anchor-point of an actor.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] anchorPoint The target value.
-   */
-  void AnchorPointTo(Actor& actor, const Vector3& anchorPoint);
-
-  /**
-   * Animate the anchor-point of an actor.
-   * This overload allows the alpha function to be customized.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] anchorPoint The target value.
-   * @param [in] alpha The alpha function to apply.
-   */
-  void AnchorPointTo(Actor& actor, const Vector3& anchorPoint, AlphaFunction alpha);
-
-  /**
-   * Animate the anchor-point of an actor.
-   * This overload allows the start & end time to be customized.
-   * @pre delaySeconds & durationSeconds must be zero or greater.
-   * @param [in] actor The actor to animate.
-   * @param [in] anchorPoint The target value.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the effect.
-   * @param [in] durationSeconds The duration of the effect.
-   */
-  void AnchorPointTo(Actor& actor, const Vector3& anchorPoint, AlphaFunction alpha, float delaySeconds, float durationSeconds);
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, float value)
-   */
-  void AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, float value );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, float value, AlphaFunction alpha)
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, float value, AlphaFunction alpha );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, float value, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, float value, AlphaFunction alpha, float delaySeconds, float durationSeconds );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector2 value )
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector2 value );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector2 value, AlphaFunction alpha )
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector2 value, AlphaFunction alpha );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector2 value, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector2 value, AlphaFunction alpha, float delaySeconds, float durationSeconds );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector3 value )
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector3 value );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector3 value, AlphaFunction alpha )
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector3 value, AlphaFunction alpha );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector3 value, AlphaFunction alpha, float delaySeconds, float durationSeconds )
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector3 value, AlphaFunction alpha, float delaySeconds, float durationSeconds );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector4 value )
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector4 value );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector4 value, AlphaFunction alpha)
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector4 value, AlphaFunction alpha );
-
-  /**
-   * @copydoc Dali::Animation::AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector4 value, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-   */
-  void AnimateProperty( ShaderEffect& shaderEffect, const std::string& name, Vector4 value, AlphaFunction alpha, float delaySeconds, float durationSeconds );
-
   /*
    * @copydoc Dali::Animation::GetCurrentProgress()
    */
@@ -982,6 +862,12 @@ protected:
   virtual ~Animation();
 
 private:
+
+  /**
+   * Extends the duration when an animator is added with TimePeriod that exceeds current duration.
+   * @param[in] timePeriod The time period for an animator.
+   */
+  void ExtendDuration( const TimePeriod& timePeriod );
 
   // Undefined
   Animation(const Animation&);

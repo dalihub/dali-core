@@ -43,8 +43,6 @@ sub GenerateHeaderFileHeader
 #ifndef __DALI_GENERATED_SHADERS_H_
 #define __DALI_GENERATED_SHADERS_H_
 
-#include <string>
-
 namespace Dali
 {
 namespace Internal
@@ -77,8 +75,6 @@ sub GenerateSourceFileHeader
 //
 // Automatically Generated on $time
 //
-
-#include <string>
 
 namespace Dali
 {
@@ -124,14 +120,16 @@ sub GenerateStringsFromFile
       if (/<VertexShader>/)
       {
         $state = 1;
-        print $headerFile "extern const std::string ${shadername}Vertex;\n";
-        print $sourceFile "extern const std::string ${shadername}Vertex(\n";
+        print $headerFile "extern const char* const ${shadername}Vertex;\n";
+        print $sourceFile "extern const char* const ${shadername}Vertex;\n";
+        print $sourceFile "const char* const ${shadername}Vertex(\n";
       }
       elsif (/<FragmentShader>/)
       {
         $state = 1;
-        print $headerFile "extern const std::string ${shadername}Fragment;\n";
-        print $sourceFile "extern const std::string ${shadername}Fragment(\n";
+        print $headerFile "extern const char* const ${shadername}Fragment;\n";
+        print $sourceFile "extern const char* const ${shadername}Fragment;\n";
+        print $sourceFile "const char* const ${shadername}Fragment(\n";
       }
     }
     elsif ($state == 1)

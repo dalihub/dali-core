@@ -36,11 +36,11 @@ VectorBase::~VectorBase()
 
 VectorBase::SizeType VectorBase::Capacity() const
 {
-  SizeType capacity = 0;
+  SizeType capacity = 0u;
   if( mData )
   {
     SizeType* metadata = reinterpret_cast< SizeType* >( mData );
-    capacity = *(metadata - 2);
+    capacity = *(metadata - 2u);
   }
   return capacity;
 }
@@ -54,18 +54,18 @@ void VectorBase::Release()
     SizeType* metadata = reinterpret_cast< SizeType* >( mData );
     // TODO would be nice to memset to a bitpattern to catch illegal use of container after release
     // but that would require knowledge of the itemsize
-    free( metadata - 2 );
-    mData = 0;
+    free( metadata - 2u );
+    mData = 0u;
   }
 }
 
 void VectorBase::SetCount( SizeType count )
 {
-  // someone can call Resize( 0 ) before ever populating the vector
+  // someone can call Resize( 0u ) before ever populating the vector
   if( mData )
   {
     SizeType* metadata = reinterpret_cast< SizeType* >( mData );
-    *(metadata - 1) = count;
+    *(metadata - 1u) = count;
   }
 }
 
@@ -75,7 +75,7 @@ void VectorBase::Reserve( SizeType capacity, SizeType elementSize )
   SizeType oldCount = Count();
   if( capacity > oldCapacity )
   {
-    const SizeType wholeAllocation = sizeof(SizeType) * 2 + capacity * elementSize;
+    const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
     void* wholeData = (void*)malloc( wholeAllocation );
 #if defined( DEBUG_ENABLED )
     // in debug build this will help identify a vector of uninitialized data
@@ -97,19 +97,16 @@ void VectorBase::Reserve( SizeType capacity, SizeType elementSize )
 
 void VectorBase::Copy( const VectorBase& vector, SizeType elementSize )
 {
-  if( this != &vector )
-  {
-    // release old data
-    Release();
-    // reserve space based on source capacity
-    const SizeType capacity = vector.Capacity();
-    Reserve( capacity, elementSize );
-    // copy over whole data
-    const SizeType wholeAllocation = sizeof(SizeType) * 2 + capacity * elementSize;
-    SizeType* srcData = reinterpret_cast< SizeType* >( vector.mData );
-    SizeType* dstData = reinterpret_cast< SizeType* >( mData );
-    memcpy( dstData - 2, srcData - 2, wholeAllocation );
-  }
+  // release old data
+  Release();
+  // reserve space based on source capacity
+  const SizeType capacity = vector.Capacity();
+  Reserve( capacity, elementSize );
+  // copy over whole data
+  const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
+  SizeType* srcData = reinterpret_cast< SizeType* >( vector.mData );
+  SizeType* dstData = reinterpret_cast< SizeType* >( mData );
+  memcpy( dstData - 2u, srcData - 2u, wholeAllocation );
 }
 
 void VectorBase::Swap( VectorBase& vector )
@@ -128,7 +125,41 @@ void VectorBase::Erase( char* address, SizeType elementSize )
     SizeType numberOfBytes = endAddress - startAddress;
     // addresses overlap so use memmove
     memmove( address, startAddress, numberOfBytes );
-    SetCount( Count() - 1 );
+    SetCount( Count() - 1u );
+  }
+}
+
+char* VectorBase::Erase( char* first, char* last, SizeType elementSize )
+{
+  char* next = NULL;
+
+  if( mData )
+  {
+    char* startAddress = last;
+    const char* endAddress = reinterpret_cast< char* >( mData ) + Count() * elementSize;
+    SizeType numberOfBytes = endAddress - startAddress;
+    // addresses overlap so use memmove
+    memmove( first, startAddress, numberOfBytes );
+    SetCount( Count() - ( last - first ) / elementSize );
+
+    next = first;
+  }
+
+  return next;
+}
+
+void VectorBase::CopyMemory( char* destination, const char* source, size_t numberOfBytes )
+{
+  if( ( ( source < destination ) && ( source + numberOfBytes > destination ) ) ||
+      ( ( destination < source ) && ( destination + numberOfBytes > source ) ) )
+  {
+    // If there is overlap, use memmove.
+    memmove( destination, source, numberOfBytes );
+  }
+  else
+  {
+    // It's safe to use memcpy if there isn't overlap.
+    memcpy( destination, source, numberOfBytes );
   }
 }
 

@@ -286,7 +286,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                 instructions );
     }
 
-    renderTask.UpdateState(resourcesFinished);
+    renderTask.SetResourcesFinished( resourcesFinished );
   }
 
   DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "ProcessRenderTasks() Onscreen\n");
@@ -343,7 +343,7 @@ void ProcessRenderTasks( BufferIndex updateBufferIndex,
                                 instructions );
     }
 
-    renderTask.UpdateState(resourcesFinished);
+    renderTask.SetResourcesFinished( resourcesFinished );
   }
 }
 

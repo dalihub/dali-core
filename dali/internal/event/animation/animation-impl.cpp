@@ -286,6 +286,8 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
 {
   ProxyObject& proxy = dynamic_cast<ProxyObject&>( GetImplementation(target.object) );
 
+  ExtendDuration( period );
+
   switch ( relativeValue.GetType() )
   {
     case Property::BOOLEAN:
@@ -409,6 +411,8 @@ void Animation::AnimateTo(ProxyObject& targetObject, Property::Index targetPrope
   }
   DALI_ASSERT_ALWAYS( type == destinationValue.GetType() && "DestinationValue does not match Target Property type" );
 
+  ExtendDuration( period );
+
   switch (destinationValue.GetType())
   {
     case Property::BOOLEAN:
@@ -523,6 +527,8 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
 {
   ProxyObject& proxy = dynamic_cast<ProxyObject&>( GetImplementation(target.object) );
+
+  ExtendDuration( period );
 
   switch(keyFrames.GetType())
   {
@@ -659,6 +665,8 @@ void Animation::Animate( Property& target, Property::Type targetType, AnyFunctio
   DALI_ASSERT_ALWAYS( type == targetType && "Animation function must match target property type" );
 
   ProxyObject& proxy = dynamic_cast<ProxyObject&>( GetImplementation(target.object) );
+
+  ExtendDuration( period );
 
   switch ( targetType )
   {
@@ -827,6 +835,8 @@ void Animation::MoveBy(Actor& actor, const Vector3& displacement, AlphaFunction 
 
 void Animation::MoveBy(Actor& actor, const Vector3& displacement, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
                                                          Dali::Actor::POSITION,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -847,6 +857,8 @@ void Animation::MoveTo(Actor& actor, const Vector3& position, AlphaFunction alph
 
 void Animation::MoveTo(Actor& actor, const Vector3& position, AlphaFunction alpha,  float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
                                                          Dali::Actor::POSITION,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -857,6 +869,8 @@ void Animation::MoveTo(Actor& actor, const Vector3& position, AlphaFunction alph
 
 void Animation::Move(Actor& actor, AnimatorFunctionVector3 func, AlphaFunction alpha,  float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
                                                          Dali::Actor::POSITION,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -877,6 +891,8 @@ void Animation::RotateBy(Actor& actor, Radian angle, const Vector3& axis, AlphaF
 
 void Animation::RotateBy(Actor& actor, Radian angle, const Vector3& axis, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
                                                             Dali::Actor::ROTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
@@ -927,6 +943,8 @@ void Animation::RotateTo(Actor& actor, Radian angle, const Vector3& axis, AlphaF
 
 void Animation::RotateTo(Actor& actor, const Quaternion& rotation, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
                                                             Dali::Actor::ROTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
@@ -937,6 +955,8 @@ void Animation::RotateTo(Actor& actor, const Quaternion& rotation, AlphaFunction
 
 void Animation::Rotate(Actor& actor, AnimatorFunctionQuaternion func, AlphaFunction alpha,  float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
                                                             Dali::Actor::ROTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
@@ -957,6 +977,8 @@ void Animation::ScaleBy(Actor& actor, const Vector3& scale, AlphaFunction alpha)
 
 void Animation::ScaleBy(Actor& actor, const Vector3& scale, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
                                                          Dali::Actor::SCALE,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -977,6 +999,8 @@ void Animation::ScaleTo(Actor& actor, const Vector3& scale, AlphaFunction alpha)
 
 void Animation::ScaleTo(Actor& actor, const Vector3& scale, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
                                                          Dali::Actor::SCALE,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -987,6 +1011,8 @@ void Animation::ScaleTo(Actor& actor, const Vector3& scale, AlphaFunction alpha,
 
 void Animation::Show(Actor& actor, float delaySeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, 0) );
+
   AddAnimatorConnector( AnimatorConnector<bool>::New( actor,
                                                       Dali::Actor::VISIBLE,
                                                       Property::INVALID_COMPONENT_INDEX,
@@ -997,6 +1023,8 @@ void Animation::Show(Actor& actor, float delaySeconds)
 
 void Animation::Hide(Actor& actor, float delaySeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, 0) );
+
   AddAnimatorConnector( AnimatorConnector<bool>::New( actor,
                                                       Dali::Actor::VISIBLE,
                                                       Property::INVALID_COMPONENT_INDEX,
@@ -1017,6 +1045,8 @@ void Animation::OpacityBy(Actor& actor, float opacity, AlphaFunction alpha)
 
 void Animation::OpacityBy(Actor& actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector4>::New( actor,
                                                          Dali::Actor::COLOR,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -1037,6 +1067,8 @@ void Animation::OpacityTo(Actor& actor, float opacity, AlphaFunction alpha)
 
 void Animation::OpacityTo(Actor& actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector4>::New( actor,
                                                          Dali::Actor::COLOR,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -1057,6 +1089,8 @@ void Animation::ColorBy(Actor& actor, const Vector4& color, AlphaFunction alpha)
 
 void Animation::ColorBy(Actor& actor, const Vector4& color, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector4>::New( actor,
                                                          Dali::Actor::COLOR,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -1077,6 +1111,8 @@ void Animation::ColorTo(Actor& actor, const Vector4& color, AlphaFunction alpha)
 
 void Animation::ColorTo(Actor& actor, const Vector4& color, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   AddAnimatorConnector( AnimatorConnector<Vector4>::New( actor,
                                                          Dali::Actor::COLOR,
                                                          Property::INVALID_COMPONENT_INDEX,
@@ -1098,6 +1134,8 @@ void Animation::Resize(Actor& actor, float width, float height, AlphaFunction al
 void Animation::Resize(Actor& actor, float width, float height, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
   Vector3 targetSize( width, height, min(width, height) );
+
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   // notify the actor impl that its size is being animated
   actor.OnSizeAnimation( *this, targetSize );
@@ -1122,6 +1160,8 @@ void Animation::Resize(Actor& actor, const Vector3& size, AlphaFunction alpha)
 
 void Animation::Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
+  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
+
   // notify the actor impl that its size is being animated
   actor.OnSizeAnimation( *this, size );
 
@@ -1131,142 +1171,6 @@ void Animation::Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, f
                                                          AnimateToVector3(size),
                                                          alpha,
                                                          TimePeriod(delaySeconds, durationSeconds) ) );
-}
-
-void Animation::ParentOriginTo(Actor& actor, const Vector3& parentOrigin)
-{
-  ParentOriginTo(actor, parentOrigin, mDefaultAlpha, 0.0f, GetDuration());
-}
-
-void Animation::ParentOriginTo(Actor& actor, const Vector3& parentOrigin, AlphaFunction alpha)
-{
-  ParentOriginTo(actor, parentOrigin, alpha, 0.0f, GetDuration());
-}
-
-void Animation::ParentOriginTo(Actor& actor, const Vector3& parentOrigin, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::PARENT_ORIGIN,
-                                                         Property::INVALID_COMPONENT_INDEX,
-                                                         AnimateToVector3(parentOrigin),
-                                                         alpha,
-                                                         TimePeriod(delaySeconds, durationSeconds) ) );
-}
-
-void Animation::AnchorPointTo(Actor& actor, const Vector3& anchorPoint)
-{
-  AnchorPointTo(actor, anchorPoint, mDefaultAlpha, 0.0f, GetDuration());
-}
-
-void Animation::AnchorPointTo(Actor& actor, const Vector3& anchorPoint, AlphaFunction alpha)
-{
-  AnchorPointTo(actor, anchorPoint, alpha, 0.0f, GetDuration());
-}
-
-void Animation::AnchorPointTo(Actor& actor, const Vector3& anchorPoint, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::ANCHOR_POINT,
-                                                         Property::INVALID_COMPONENT_INDEX,
-                                                         AnimateToVector3(anchorPoint),
-                                                         alpha,
-                                                         TimePeriod(delaySeconds, durationSeconds) ) );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, float value )
-{
-  AnimateProperty( shaderEffect, name, value, GetDefaultAlphaFunction(), 0, GetDuration() );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, float value, AlphaFunction alpha )
-{
-  AnimateProperty( shaderEffect, name, value, alpha, 0, GetDuration() );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, float value, AlphaFunction alpha, float delaySeconds, float durationSeconds )
-{
-  Property::Value propertyValue( value );
-
-  // Register the property if it does not exist
-  Property::Index index = shaderEffect.GetPropertyIndex( name );
-  if ( Property::INVALID_INDEX == index )
-  {
-    index = shaderEffect.RegisterProperty( name, propertyValue );
-  }
-
-  AnimateTo( shaderEffect, index, Property::INVALID_COMPONENT_INDEX, propertyValue, alpha, TimePeriod(delaySeconds, durationSeconds) );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector2 value )
-{
-  AnimateProperty( shaderEffect, name, value, GetDefaultAlphaFunction(), 0, GetDuration());
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector2 value, AlphaFunction alpha )
-{
-  AnimateProperty( shaderEffect, name, value, alpha, 0, GetDuration() );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector2 value, AlphaFunction alpha, float delaySeconds, float durationSeconds )
-{
-  Property::Value propertyValue( value );
-
-  // Register the property if it does not exist
-  Property::Index index = shaderEffect.GetPropertyIndex( name );
-  if ( Property::INVALID_INDEX == index )
-  {
-    index = shaderEffect.RegisterProperty( name, propertyValue );
-  }
-
-  AnimateTo( shaderEffect, index, Property::INVALID_COMPONENT_INDEX, propertyValue, alpha, TimePeriod(delaySeconds, durationSeconds) );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector3 value )
-{
-  AnimateProperty( shaderEffect, name, value, GetDefaultAlphaFunction(), 0, GetDuration() );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector3 value, AlphaFunction alpha )
-{
-  AnimateProperty( shaderEffect, name, value, alpha, 0, GetDuration() );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector3 value, AlphaFunction alpha, float delaySeconds, float durationSeconds )
-{
-  Property::Value propertyValue( value );
-
-  // Register the property if it does not exist
-  Property::Index index = shaderEffect.GetPropertyIndex( name );
-  if ( Property::INVALID_INDEX == index )
-  {
-    index = shaderEffect.RegisterProperty( name, propertyValue );
-  }
-
-  AnimateTo( shaderEffect, index, Property::INVALID_COMPONENT_INDEX, propertyValue, alpha, TimePeriod(delaySeconds, durationSeconds) );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector4 value )
-{
-  AnimateProperty( shaderEffect, name, value, GetDefaultAlphaFunction(), 0, GetDuration() );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector4 value, AlphaFunction alpha )
-{
-  AnimateProperty( shaderEffect, name, value, alpha, 0, GetDuration() );
-}
-
-void Animation::AnimateProperty( Internal::ShaderEffect& shaderEffect, const std::string& name, Vector4 value, AlphaFunction alpha, float delaySeconds, float durationSeconds )
-{
-  Property::Value propertyValue( value );
-
-  // Register the property if it does not exist
-  Property::Index index = shaderEffect.GetPropertyIndex( name );
-  if ( Property::INVALID_INDEX == index )
-  {
-    index = shaderEffect.RegisterProperty( name, propertyValue );
-  }
-
-  AnimateTo( shaderEffect, index, Property::INVALID_COMPONENT_INDEX, propertyValue, alpha, TimePeriod(delaySeconds, durationSeconds) );
 }
 
 bool Animation::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
@@ -1317,6 +1221,16 @@ void Animation::SetCurrentProgress(float progress)
   {
     // mAnimation is being used in a separate thread; queue a message to set the current progress
     SetCurrentProgressMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
+  }
+}
+
+void Animation::ExtendDuration( const TimePeriod& timePeriod )
+{
+  float duration = timePeriod.delaySeconds + timePeriod.durationSeconds;
+
+  if( duration > mDurationSeconds )
+  {
+    SetDuration( duration );
   }
 }
 

@@ -123,73 +123,73 @@ void ShaderFactory::LoadDefaultShaders()
   mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_DEFAULT,
                               "", // Vertex shader defs
                               SHADER_DEF_USE_LIGHTING, // fragment shader defs
-                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
-                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshColorNoTextureVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshColorNoTextureFragment),
                               ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_EVENLY_LIT,
                               "", // Vertex shader defs
                               "", // fragment shader defs
-                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
-                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshColorNoTextureVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshColorNoTextureFragment),
                               ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_LIT,
                               SHADER_DEF_USE_BONES,    // vertex shader defs
                               SHADER_DEF_USE_LIGHTING, // fragment shader defs
-                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
-                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshColorNoTextureVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshColorNoTextureFragment),
                               ShaderEffect::MODIFIES_GEOMETRY );
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
                               SHADER_DEF_USE_BONES, // Vertex shader defs
                               "",                   // Fragment shader defs
-                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
-                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshColorNoTextureVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshColorNoTextureFragment),
                               ShaderEffect::MODIFIES_GEOMETRY );
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_RIGGED_AND_VERTEX_COLOR,
                               (SHADER_DEF_USE_BONES SHADER_DEF_USE_COLOR), // Vertex shader defs
                               SHADER_DEF_USE_COLOR,                        // Fragment shader defs
-                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
-                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshColorNoTextureVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshColorNoTextureFragment),
                               ShaderEffect::MODIFIES_GEOMETRY );
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_VERTEX_COLOR,
                               SHADER_DEF_USE_COLOR,  // Vertex shader defs
                               SHADER_DEF_USE_COLOR,  // Fragment shader defs
-                              CustomMeshPrefixVertex + MeshColorNoTextureVertex,
-                              CustomMeshPrefixFragment + MeshColorNoTextureFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshColorNoTextureVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshColorNoTextureFragment),
                               ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
   // Textured meshes
   mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_DEFAULT,
                               "",                      // Vertex shader defs
                               SHADER_DEF_USE_LIGHTING, // fragment shader defs
-                              CustomMeshPrefixVertex + MeshVertex,
-                              CustomMeshPrefixFragment + MeshFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshFragment),
                               ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_EVENLY_LIT,
                               "",                      // Vertex shader defs
                               "",                      // Fragment shader defs
-                              CustomMeshPrefixVertex + MeshVertex,
-                              CustomMeshPrefixFragment + MeshFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshFragment),
                               ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_LIT,
                               SHADER_DEF_USE_BONES,    // Vertex shader defs
                               SHADER_DEF_USE_LIGHTING, // Fragment shader defs
-                              CustomMeshPrefixVertex + MeshVertex,
-                              CustomMeshPrefixFragment + MeshFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshFragment),
                               ShaderEffect::MODIFIES_GEOMETRY );
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
                               SHADER_DEF_USE_BONES, // Vertex shader defs
                               "",                   // Fragment shader defs
-                              CustomMeshPrefixVertex + MeshVertex,
-                              CustomMeshPrefixFragment + MeshFragment,
+                              std::string(CustomMeshPrefixVertex) + std::string(MeshVertex),
+                              std::string(CustomMeshPrefixFragment) + std::string(MeshFragment),
                               ShaderEffect::MODIFIES_GEOMETRY );
 }
 

@@ -1125,6 +1125,8 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
   {
     RenderTask& renderTask(*(*iter));
 
+    renderTask.UpdateState();
+
     if( renderTask.IsWaitingToRender() &&
         renderTask.ReadyToRender(mSceneGraphBuffers.GetUpdateBufferIndex()) /*avoid updating forever when source actor is off-stage*/ )
     {

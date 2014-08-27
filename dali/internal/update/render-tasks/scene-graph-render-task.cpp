@@ -300,11 +300,16 @@ bool RenderTask::IsRenderRequired()
   return required;
 }
 
+void RenderTask::SetResourcesFinished( bool resourcesFinished )
+{
+  mResourcesFinished = resourcesFinished;
+}
+
 // Called every frame regardless of whether render was required.
 // If render was not required, ignore resourcesFinished.
-void RenderTask::UpdateState(bool resourcesFinished)
+void RenderTask::UpdateState()
 {
-  TASK_LOG_FMT( Debug::General, "(resourcesFinished:%s)  FC:%d State:%s RR:%d\n", resourcesFinished?"T":"F", mFrameCounter, STATE_STRING(mState), mRefreshRate );
+  TASK_LOG_FMT( Debug::General, "(mResourcesFinished:%s)  FC:%d State:%s RR:%d\n", mResourcesFinished?"T":"F", mFrameCounter, STATE_STRING(mState), mRefreshRate );
 
   switch( mState )
   {
@@ -314,12 +319,12 @@ void RenderTask::UpdateState(bool resourcesFinished)
       {
         if( mFrameCounter == 0 )
         {
-          if( resourcesFinished )
+          if( mResourcesFinished )
           {
-            ++mFrameCounter; // Only start missing frames when resources are loaded
+            ++mFrameCounter; // Only start skipping frames when resources are loaded
           }
         }
-        else // Continue counting to miss frames
+        else // Continue counting to skip frames
         {
           ++mFrameCounter;
           if( mFrameCounter >= mRefreshRate )
@@ -334,7 +339,7 @@ void RenderTask::UpdateState(bool resourcesFinished)
 
     case RENDER_ONCE_WAITING_FOR_RESOURCES:
     {
-      if( resourcesFinished )
+      if( mResourcesFinished )
       {
         mState = RENDERED_ONCE;
       }
@@ -509,6 +514,7 @@ RenderTask::RenderTask()
   mCameraNode( NULL ),
   mCameraAttachment( NULL ),
   mFrameBufferResourceId( 0 ),
+  mResourcesFinished( false ),
   mWaitingToRender( false ),
   mNotifyTrigger( false ),
   mExclusive( Dali::RenderTask::DEFAULT_EXCLUSIVE ),
