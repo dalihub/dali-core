@@ -68,13 +68,6 @@ public:
    */
   virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback ) = 0;
 
-  /**
-   * @brief Query the connection count.
-   *
-   * @return The number of signal/slot connections know by the connection tracker.
-   */
-  virtual std::size_t GetConnectionCount() const = 0;
-
 private:
 
   ConnectionTrackerInterface( const ConnectionTrackerInterface& );            ///< undefined copy constructor

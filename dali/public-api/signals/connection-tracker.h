@@ -65,7 +65,7 @@ public:
   /**
    * @copydoc ConnectionTrackerInterface::GetConnectionCount
    */
-  virtual std::size_t GetConnectionCount() const;
+  std::size_t GetConnectionCount() const;
 
 private:
 
