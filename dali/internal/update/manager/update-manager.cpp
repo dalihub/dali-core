@@ -797,7 +797,7 @@ void UpdateManager::ResetProperties()
   PERF_MONITOR_END(PerformanceMonitor::RESET_PROPERTIES);
 }
 
-bool UpdateManager::ProcessGestures( unsigned int lastVSyncTime, unsigned int nextVSyncTime )
+bool UpdateManager::ProcessGestures( unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds )
 {
   bool gestureUpdated( false );
 
@@ -808,7 +808,7 @@ bool UpdateManager::ProcessGestures( unsigned int lastVSyncTime, unsigned int ne
   {
     PanGesture& gesture = **iter;
     gesture.ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() ); // Needs to be done every time as gesture data is written directly to an update-buffer rather than via a message
-    gestureUpdated |= gesture.UpdateProperties( lastVSyncTime, nextVSyncTime );
+    gestureUpdated |= gesture.UpdateProperties( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
   }
 
   return gestureUpdated;
@@ -996,7 +996,9 @@ void UpdateManager::PrepareMaterials( BufferIndex updateBufferIndex, MaterialCon
   }
 }
 
-unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSyncTime, unsigned int nextVSyncTime )
+unsigned int UpdateManager::Update( float elapsedSeconds,
+                                    unsigned int lastVSyncTimeMilliseconds,
+                                    unsigned int nextVSyncTimeMilliseconds )
 {
   PERF_MONITOR_END(PerformanceMonitor::FRAME_RATE);   // Mark the End of the last frame
   PERF_MONITOR_NEXT_FRAME();             // Prints out performance info for the last frame (if enabled)
@@ -1016,7 +1018,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds, unsigned int lastVSync
 
   // 3) Process Touches & Gestures
   mImpl->touchResampler.Update();
-  const bool gestureUpdated = ProcessGestures( lastVSyncTime, nextVSyncTime );
+  const bool gestureUpdated = ProcessGestures( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
   const bool updateScene =                                            // The scene-graph requires an update if..
       mImpl->activeConstraints != 0 ||                                // ..constraints were active in previous frame OR

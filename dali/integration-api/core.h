@@ -259,22 +259,6 @@ public:
    */
   void SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical);
 
-  /**
-   * Sets the expected interval between frames used to predict future intervals and the time when the
-   * next render will take place.
-   *
-   * This is the minimum interval that Core should expect. Core will adapt the predicted interval
-   * accordingly if the expected interval is constantly not met (but will not drop it below this
-   * amount).
-   *
-   * The value provided should be in microseconds.
-   *
-   * @param[in]  interval  The minimum interval between frames (in microseconds).
-   *
-   * Multi-threading note: this method should be called from the render thread
-   */
-  void SetMinimumFrameTimeInterval(unsigned int interval);
-
   // Core Lifecycle
 
   /**
@@ -337,10 +321,13 @@ public:
    * However the update-thread must wait until frame N has been rendered, before processing frame N+2.
    * After this method returns, messages may be queued internally for the main thread.
    * In order to process these messages, a notification is sent via the main thread's event loop.
+   * @param[in] elapsedSeconds Number of seconds since the last call
+   * @param[in] lastVSyncTimeMilliseconds The last vsync time in milliseconds
+   * @param[in] nextVSyncTimeMilliseconds The time of the next predicted VSync in milliseconds
    * @param[out] status showing whether further updates are required. This also shows
    * whether a Notification event should be sent, regardless of whether the multi-threading is used.
    */
-  void Update( UpdateStatus& status );
+  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status );
 
   /**
    * Render the next frame. This method should be preceded by a call up Update.
@@ -349,31 +336,6 @@ public:
    * @param[out] status showing whether update is required to run.
    */
   void Render( RenderStatus& status );
-
-  /**
-   * Tells core that it is about to sleep.
-   * Application is running as normal, but no updates are taking place i.e. no ongoing animations.
-   * This should be called when we choose to stop updating and rendering when there are no screen
-   * updates required.
-   * Multi-threading note: this method should be called from the update-thread.
-   */
-  void Sleep();
-
-  /**
-   * Wakes up core from a sleep state.
-   * At the first update the elapsed time passed to the animations is zero.
-   * Multi-threading note: this method should be called from the update-thread.
-   */
-  void WakeUp();
-
-  /**
-   * Notification of a vertical blank sync
-   * @param[in] frameNumber  The frame number of this vsync. This number will not update
-   *                         while paused.
-   * @param[in] seconds      The timestamp seconds
-   * @param[in] microseconds The timestamp microseconds
-   */
-  void VSync( unsigned int frameNumber, unsigned int seconds, unsigned int microseconds );
 
   // System-level overlay
 
