@@ -27,36 +27,36 @@ namespace Dali DALI_IMPORT_API
 /**
  * @brief Dispatcher to call a functor
  */
-template< class T >
+template< typename T >
 struct FunctorDispatcher
 {
   /**
    * @brief Call a function object.
    *
-   * @param[in] objectPtr The object to call.
+   * @param[in] functorPtr The functor to call.
    */
-  static void Dispatch( void* objectPtr )
+  static void Dispatch( void* functorPtr )
   {
-    // "downcast" the object and function type back to the correct ones
-    T* object = reinterpret_cast< T* >( objectPtr );
-    (*object)();
+    // "downcast" the functor type back to the correct one
+    T* functor = reinterpret_cast< T* >( functorPtr );
+    (*functor)();
   }
 };
 
 /**
- * @brief Dispatcher to delete an object
+ * @brief Dispatcher to delete a functor object
  */
-template< class T >
+template< typename T >
 struct FunctorDestroyer
 {
   /**
    * @brief Dispatcher to delete an object
    */
-  static void Delete( void* object )
+  static void Delete( void* functorPtr )
   {
     // FunctorDelegate owns the object but we're the only one who knows the real type so need
     // to delete by "downcasting" from void* to the correct type
-    delete reinterpret_cast< T* >( object );
+    delete reinterpret_cast< T* >( functorPtr );
   }
 };
 
@@ -70,15 +70,15 @@ public:
   /**
    * @brief Constructor which copies a function object.
    *
-   * @param[in] object The object to copy.
+   * @param[in] functor The functor object to copy, either a class with operator() or a C function
    * @return A pointer to the new function object
    */
-  template< class T >
-  static FunctorDelegate* New( const T& object )
+  template< typename T >
+  static FunctorDelegate* New( const T& functor )
   {
-    return new FunctorDelegate( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                            reinterpret_cast< FunctorDelegate::Dispatcher >( &FunctorDispatcher<T>::Dispatch ),
-                            reinterpret_cast< FunctorDelegate::Destructor >( &FunctorDestroyer<T>::Delete ) );
+    return new FunctorDelegate( reinterpret_cast< void* >( new T( functor ) ), // heap allocate the functor
+                                reinterpret_cast< FunctorDelegate::Dispatcher >( &FunctorDispatcher<T>::Dispatch ),
+                                reinterpret_cast< FunctorDelegate::Destructor >( &FunctorDestroyer<T>::Delete ) );
   }
 
   /**
@@ -94,12 +94,12 @@ public:
 private:
 
   /**
-   * @brief Used to call the correct member function.
+   * @brief Used to call the correct function.
    */
   typedef void (*Dispatcher)( void* objectPtr );
 
   /**
-   * @brief Used to destroy mObjectPointer (NULL if not mObjectPointer is not owned).
+   * @brief Used to destroy mObjectPointer.
    */
   typedef void(*Destructor)( void* objectPtr );
 
@@ -116,17 +116,17 @@ private:
   /**
    * @brief Private constructor.
    *
-   * @param[in] objectPtr A newly allocated object (takes ownership)
-   * @param dispatcher Used to call the actual object.
-   * @param destructor Used to delete the owned object.
+   * @param[in] functorPtr A newly allocated functor object (takes ownership)
+   * @param dispatcher Used to call the actual function.
+   * @param destructor Used to delete the owned functor object.
    */
-  FunctorDelegate( void* objectPtr, Dispatcher dispatcher, Destructor destructor );
+  FunctorDelegate( void* functorPtr, Dispatcher dispatcher, Destructor destructor );
 
 public: // Data for deriving classes & Dispatchers
 
-  void* mObjectPointer;                 ///< Object whose member function will be called. Not owned if mDestructorDispatcher is NULL.
+  void* mFunctorPointer;                ///< Functor that will be called
   Dispatcher mMemberFunctionDispatcher; ///< Dispatcher for member functions
-  Destructor mDestructorDispatcher;     ///< Destructor for owned objects. NULL if mDestructorDispatcher is not owned.
+  Destructor mDestructorDispatcher;     ///< Destructor for owned objects
 };
 
 } // namespace DALI
