@@ -48,17 +48,17 @@ public:
   ~ImageConnector();
 
   /**
-   * Returns a pointer to the managed Image or NULL.
-   * @return a pointer to mImage or NULL if not set.
+   * Returns a smart pointer to the image
+   * @return a smart pointer to the image
    */
-  Image* Get() const;
+  ImagePtr Get() const;
 
   /**
    * Assigns image, calling Connect and Disconnect methods accordingly, taking onStage into account.
-   * @param [in] image   pointer to new Image
+   * @param [in] image   smart pointer to new Image
    * @param [in] onStage whether Image is used on stage or not
    */
-  void Set ( Image *image, bool onStage);
+  void Set( ImagePtr image, bool onStage );
 
   /**
    * Manages connection reference count.
@@ -78,6 +78,7 @@ private:
   const ImageConnector& operator=( const ImageConnector& ptr );  ///< copy assignment operator, not defined
 
   ImagePtr mImage;  ///< intrusive pointer to the Image. ImageConnector owns this.
+
 };
 
 } // namespace Internal

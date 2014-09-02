@@ -35,14 +35,14 @@ ImageConnector::~ImageConnector()
 {
 }
 
-Image* ImageConnector::Get() const
+ImagePtr ImageConnector::Get() const
 {
-  return mImage.Get();
+  return mImage;
 }
 
-void ImageConnector::Set( Image* image, bool onStage )
+void ImageConnector::Set( ImagePtr image, bool onStage )
 {
-  if ( mImage.Get() != image )
+  if ( mImage != image )
   {
     // Disconnect from old image
     if ( mImage && onStage )
@@ -50,7 +50,7 @@ void ImageConnector::Set( Image* image, bool onStage )
       mImage->Disconnect();
     }
 
-    mImage.Reset(image);
+    mImage = image;
 
     // Connect to new image
     if ( mImage && onStage )

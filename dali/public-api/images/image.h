@@ -331,10 +331,7 @@ public:
   /**
    * @brief Returns the width of the image.
    *
-   * Only to be used after the image has finished loading.
-   * (Ticket's LoadingSucceeded callback was called)
-   * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
-   * Connect to SignalLoadingFinished or use GetLoadingState to make sure this value is actual.
+   * Returns either the requested width or the actual loaded width if no specific size was requested.
    *
    * @return width of the image in pixels.
    */
@@ -343,10 +340,7 @@ public:
   /**
    * @brief Returns the height of the image.
    *
-   * Only to be used after the image has finished loading.
-   * (Ticket's LoadingSucceeded callback was called)
-   * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
-   * Connect to SignalLoadingFinished or use GetLoadingState to make sure this value is actual.
+   * Returns either the requested height or the actual loaded height if no specific size was requested.
    *
    * @return height of the image in pixels.
    */

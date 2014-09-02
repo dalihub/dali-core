@@ -99,7 +99,7 @@ public:
   void StopLifetimeObservation();
 
 protected:
-  ~Request();
+  virtual ~Request();
 
 private:
   Request(); ///< not defined

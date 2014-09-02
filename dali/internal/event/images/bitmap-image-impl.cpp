@@ -59,7 +59,6 @@ BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format 
   mResourceClient = &tls.GetResourceClient();
   mWidth  = width;
   mHeight = height;
-  mNaturalSizeSet = true;
 
   const ImageTicketPtr& t = mResourceClient->AllocateBitmapImage(width, height, width, height, pixelformat);
   mTicket = t.Get();
@@ -75,7 +74,6 @@ BitmapImage::BitmapImage(PixelBuffer* pixBuf, unsigned int width, unsigned int h
   mResourceClient = &tls.GetResourceClient();
   mWidth  = width;
   mHeight = height;
-  mNaturalSizeSet = true;
   Integration::Bitmap* bitmap = new BitmapExternal(pixBuf, width, height, pixelformat, stride);
   const ImageTicketPtr& t = mResourceClient->AddBitmapImage(bitmap);
   mTicket = t.Get();

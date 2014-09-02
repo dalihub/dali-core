@@ -64,8 +64,6 @@ public:
 
   // Default Properties additional to RenderableActor
   static const Property::Index PIXEL_AREA;           ///< name "pixel-area",          type RECTANGLE
-  static const Property::Index FADE_IN;              ///< name "fade-in",             type BOOLEAN
-  static const Property::Index FADE_IN_DURATION;     ///< name "fade-in-duration",    type FLOAT
   static const Property::Index STYLE;                ///< name "style",               type STRING
   static const Property::Index BORDER;               ///< name "border",              type VECTOR4
   static const Property::Index IMAGE;                ///< name "image",               type MAP {"filename":"", "load-policy":...}
@@ -158,8 +156,9 @@ public:
    * @brief Create a image actor object.
    *
    * The actor will take the image's natural size unless a custom size
-   * is chosen, e.g. via Actor:SetSize()
-   * @pre image must be initialized.
+   * is chosen, e.g. via Actor:SetSize().
+   * If the handle is empty, ImageActor will display nothing
+   * @pre ImageActor must be initialized.
    * @param[in] image The image to display.
    * @return A handle to a newly allocated actor.
    */
@@ -168,9 +167,10 @@ public:
   /**
    * @brief Create a image actor object.
    *
-   * When the image is loaded the actor's size will reset to the pixelArea,
-   * unless a custom size was chosen, e.g. via Actor:SetSize().
-   * @pre image must be initialized.
+   * The actor will take the image's natural size unless a custom size
+   * is chosen, e.g. via Actor:SetSize()
+   * If the handle is empty, ImageActor will display nothing
+   * @pre ImageActor must be initialized.
    * @param [in] image The image to display.
    * @param [in] pixelArea The area of the image to display.
    * This in pixels, relative to the top-left (0,0) of the image.
@@ -223,19 +223,22 @@ public:
 
   /**
    * @brief Set the image rendered by the actor.
+   * Set the image rendered by the actor.
+   * If actor was already displaying a different image, the old image is dropped and actor may
+   * temporarily display nothing. Setting an empty image (handle) causes the current image to be
+   * dropped and actor displays nothing.
+   * The actor will take the image's natural size unless a custom size
+   * is chosen, e.g. via Actor:SetSize()
    *
-   * When the image is loaded the actor's size will be reset to the image size,
-   * unless a custom size was chosen, e.g. via Actor:SetSize() or a pixel area
-   * was set.
-   * @note The old image will continue to be displayed until the given image has loaded.
-   * @pre image must be initialized.
+   * @pre ImageActor must be initialized.
    * @param [in] image The image to display.
    */
   void SetImage(Image image);
 
   /**
-   * @brief Retrieve the image rendered by the actor's attachment.
+   * @brief Retrieve the image rendered by the actor.
    *
+   * If no image is assigned, an empty handle is returned
    * @return The image.
    */
   Image GetImage();
@@ -321,49 +324,6 @@ public:
    * @return The nine-patch border.
    */
   Vector4 GetNinePatchBorder() const;
-
-  /**
-   * @brief Set whether the image should gradually fade in when first rendered.
-   *
-   * @pre image must be initialized.
-   * @param [in] enableFade True if the image should fade in.
-   */
-  void SetFadeIn(bool enableFade);
-
-  /**
-   * @brief Query whether the image will gradually fade in when first rendered.
-   *
-   * @pre image must be initialized.
-   * @return True if the image will fade in.
-   */
-  bool GetFadeIn() const;
-
-  /**
-   * @brief Set the duration of the fade-in effect; the default is 1 second.
-   *
-   * @pre image must be initialized.
-   * @param [in] durationSeconds The duration in seconds.
-   */
-  void SetFadeInDuration(float durationSeconds);
-
-  /**
-   * @brief Retrieve the duration of the fade-in effect.
-   *
-   * @pre image must be initialized.
-   * @return The duration in seconds.
-   */
-  float GetFadeInDuration() const;
-
-  /**
-   * @brief Retrieve the size of the displayed image within the image actor.
-   *
-   * The size of the image may be different to that of the image actor
-   * size depending on the geometry scaling used.
-   * @pre image must be initialized.
-   * @return The actual size of the image shown.
-   * @note If a pixel area is set then this returns the size of the pixel area shown.
-   */
-  Vector2 GetCurrentImageSize() const;
 
 public: // Not intended for application developers
 

@@ -174,10 +174,10 @@ int UtcDaliImageActorPixelArea(void)
   END_TEST;
 }
 
-int UtcDaliImageActorGetCurrentImageSize01(void)
+int UtcDaliImageActorGetCurrentSize01(void)
 {
   TestApplication application;
-  tet_infoline("Positive test for Dali::ImageActor::GetCurrentImageSize");
+  tet_infoline("Positive test for Dali::ImageActor::GetCurrentSize");
 
   Vector2 initialImageSize(100, 50);
   BitmapImage image = BitmapImage::New( initialImageSize.width, initialImageSize.height );
@@ -187,7 +187,7 @@ int UtcDaliImageActorGetCurrentImageSize01(void)
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), initialImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), initialImageSize, TEST_LOCATION );
 
   Vector2 size(200.0f, 200.0f);
   actor.SetSize(size);
@@ -195,7 +195,7 @@ int UtcDaliImageActorGetCurrentImageSize01(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), size, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
   size.x = 200.0f;
   size.y = 200.0f;
@@ -206,15 +206,22 @@ int UtcDaliImageActorGetCurrentImageSize01(void)
   ImageActor::PixelArea area(0, 0, 10, 10);
   actor.SetPixelArea(area);
   application.Render(9);
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), Vector2( area.width, area.height ), TEST_LOCATION );
+  // natural size is not used as setsize is called
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
+
+  actor.SetToNaturalSize();
+  application.SendNotification();
+  application.Render(9);
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2( area.width, area.height ), TEST_LOCATION );
+
   END_TEST;
 }
 
 
-int UtcDaliImageActorGetCurrentImageSize02(void)
+int UtcDaliImageActorGetCurrentSize02(void)
 {
   TestApplication application;
-  tet_infoline("Positive test for Dali::ImageActor::GetCurrentImageSize - Test that using an image resource sets the actor size with it's natural size immediately rather than on load");
+  tet_infoline("Positive test for Dali::ImageActor::GetCurrentSize - Test that using an image resource sets the actor size with it's natural size immediately rather than on load");
 
   Vector2 initialImageSize(100, 50);
 
@@ -229,7 +236,7 @@ int UtcDaliImageActorGetCurrentImageSize02(void)
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), initialImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), initialImageSize, TEST_LOCATION );
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
@@ -243,7 +250,7 @@ int UtcDaliImageActorGetCurrentImageSize02(void)
   application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
   application.GetPlatform().ClearReadyResources(); //
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), initialImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), initialImageSize, TEST_LOCATION );
 
   Vector2 size(200.0f, 200.0f);
   actor.SetSize(size);
@@ -251,27 +258,27 @@ int UtcDaliImageActorGetCurrentImageSize02(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), size, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
   actor.SetToNaturalSize();
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), initialImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), initialImageSize, TEST_LOCATION );
   END_TEST;
 }
 
 
-int UtcDaliImageActorGetCurrentImageSize03(void)
+int UtcDaliImageActorGetCurrentSize03(void)
 {
   TestApplication application;
-  tet_infoline("Positive test for Dali::ImageActor::GetCurrentImageSize - Test that using an image resource with a requested size sets the actor size with it's nearest size immediately rather than on load");
+  tet_infoline("Positive test for Dali::ImageActor::GetCurrentSize - Test that using an image resource with a requested size sets the actor size with it's nearest size immediately rather than on load");
 
-  Vector2 closestImageSize( 80, 45);
-
+  const Vector2 closestImageSize( 80, 45);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   ImageAttributes attrs;
-  attrs.SetSize(40, 30);
+  const Vector2 requestedSize( 40, 30 );
+  attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = Image::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
@@ -281,7 +288,7 @@ int UtcDaliImageActorGetCurrentImageSize03(void)
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
@@ -295,7 +302,7 @@ int UtcDaliImageActorGetCurrentImageSize03(void)
   application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
   application.GetPlatform().ClearReadyResources(); //
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Test that setting a size on the actor can be 'undone' with SetNaturalSize()
   Vector2 size(200.0f, 200.0f);
@@ -304,26 +311,27 @@ int UtcDaliImageActorGetCurrentImageSize03(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), size, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
   actor.SetToNaturalSize();
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
   END_TEST;
 }
 
 
-int UtcDaliImageActorGetCurrentImageSize04(void)
+int UtcDaliImageActorGetCurrentSize04(void)
 {
   TestApplication application;
-  tet_infoline("Positive test for Dali::ImageActor::GetCurrentImageSize - check a new image doesn't change a set actor size");
+  tet_infoline("Positive test for Dali::ImageActor::GetCurrentSize - check a new image doesn't change a set actor size");
 
-  Vector2 closestImageSize( 80, 45);
+  const Vector2 closestImageSize( 80, 45);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
+  const Vector2 requestedSize( 40, 30 );
   ImageAttributes attrs;
-  attrs.SetSize(40, 30); // Request a really small size we won't get.
+  attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = Image::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
@@ -331,7 +339,7 @@ int UtcDaliImageActorGetCurrentImageSize04(void)
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
@@ -345,7 +353,7 @@ int UtcDaliImageActorGetCurrentImageSize04(void)
   application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
   application.GetPlatform().ClearReadyResources(); //
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   Vector2 size(200.0f, 200.0f);
   actor.SetSize(size);
@@ -353,14 +361,15 @@ int UtcDaliImageActorGetCurrentImageSize04(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), size, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
   // Load a different image
 
   Vector2 image2ClosestSize = Vector2(240, 150); // The actual size image loader will return for the request below
   application.GetPlatform().SetClosestImageSize(image2ClosestSize);
 
-  attrs.SetSize(100, 100);
+  const Vector2 request2Size( 100, 100 );
+  attrs.SetSize( request2Size.width, request2Size.height );
   Image image2 = Image::New("image2.jpg", attrs);
   actor.SetImage(image2);
 
@@ -370,7 +379,7 @@ int UtcDaliImageActorGetCurrentImageSize04(void)
   application.Render();           // Process resource request
 
   // Ensure the actor size is kept
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), size, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
   // Now complete the image load
   req = application.GetPlatform().GetRequest();
@@ -385,27 +394,28 @@ int UtcDaliImageActorGetCurrentImageSize04(void)
   application.GetPlatform().ClearReadyResources(); //
 
   // Ensure the actor size is kept
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), size, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
   actor.SetToNaturalSize();
   application.SendNotification();
   application.Render();
   // Ensure the actor size gets the new image's natural size
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), image2ClosestSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), request2Size, TEST_LOCATION );
   END_TEST;
 }
 
 
-int UtcDaliImageActorGetCurrentImageSize05(void)
+int UtcDaliImageActorGetCurrentSize05(void)
 {
   TestApplication application;
-  tet_infoline("Positive test for Dali::ImageActor::GetCurrentImageSize - check a new image doens't change actor size until load complete");
+  tet_infoline("Positive test for Dali::ImageActor::GetCurrentSize - check a new image doens't change actor size until load complete");
 
   Vector2 closestImageSize( 80, 45);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   ImageAttributes attrs;
-  attrs.SetSize(40, 30); // Request a really small size we won't get.
+  const Vector2 requestedSize( 40, 30 );
+  attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = Image::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
@@ -413,7 +423,7 @@ int UtcDaliImageActorGetCurrentImageSize05(void)
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
@@ -427,14 +437,15 @@ int UtcDaliImageActorGetCurrentImageSize05(void)
   application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
   application.GetPlatform().ClearReadyResources(); //
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Load a different image
 
   Vector2 image2ClosestSize = Vector2(240, 150);
   application.GetPlatform().SetClosestImageSize(image2ClosestSize);
 
-  attrs.SetSize(100, 100);
+  const Vector2 requestedSize2( 100, 100 );
+  attrs.SetSize( requestedSize2.width, requestedSize2.height );
   Image image2 = Image::New("image2.jpg", attrs);
   actor.SetImage(image2);
 
@@ -444,7 +455,7 @@ int UtcDaliImageActorGetCurrentImageSize05(void)
   application.Render();           // Process resource request
 
   // Ensure the actor size is kept
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize2, TEST_LOCATION );
 
   // Now complete the image load
   req = application.GetPlatform().GetRequest();
@@ -462,14 +473,14 @@ int UtcDaliImageActorGetCurrentImageSize05(void)
   application.Render();           // Process LoadComplete
 
   // Ensure the actor size gets the new image's natural size
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), image2ClosestSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize2, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliImageActorNaturalPixelAreaSize01(void)
 {
   TestApplication application;
-  tet_infoline("Positive test for Dali::ImageActor::GetCurrentImageSize - check a new image doens't change actor size until load complete");
+  tet_infoline("Positive test for Dali::ImageActor::GetCurrentSize - check a new image doens't change actor size until load complete");
 
 //If an image is loaded without setting size, then the actor gets the natural size of the image
 //Setting the pixel area will change the actor size to match the pixel area
@@ -482,7 +493,8 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   ImageAttributes attrs;
-  attrs.SetSize(40, 30); // Request a really small size we won't get.
+  const Vector2 requestedSize( 40, 30 );
+  attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = Image::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
@@ -490,8 +502,7 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
@@ -505,15 +516,13 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
   application.GetPlatform().ClearReadyResources(); //
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Set a pixel area on a naturally sized actor - expect the actor to take the
   // pixel area as size
   actor.SetPixelArea(ImageActor::PixelArea(0, 0, 30, 30));
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), Vector2(30, 30), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(30, 30), TEST_LOCATION );
 
   // Set a size. Expect the partial image to stretch to fill the new size
@@ -521,14 +530,12 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), Vector2(30, 30), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(100, 100), TEST_LOCATION );
 
   // Clear the pixel area. Expect the whole image to be shown, filling the set size.
   actor.ClearPixelArea();
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), Vector2(100, 100), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(100, 100), TEST_LOCATION );
   END_TEST;
 }
@@ -536,7 +543,7 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
 int UtcDaliImageActorNaturalPixelAreaSize02(void)
 {
   TestApplication application;
-  tet_infoline("Positive test for Dali::ImageActor::GetCurrentImageSize - check a new image doens't change actor size until load complete");
+  tet_infoline("Positive test for Dali::ImageActor::GetCurrentSize - check a new image doens't change actor size until load complete");
 
 //If an image is loaded without setting size, then the actor gets the natural size of the image
 //Setting the pixel area will change the actor size to match the pixel area
@@ -549,7 +556,8 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   ImageAttributes attrs;
-  attrs.SetSize(40, 30); // Request a really small size we won't get.
+  const Vector2 requestedSize( 40, 30 );
+  attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = Image::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
@@ -557,8 +565,7 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
@@ -572,51 +579,44 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
   application.GetPlatform().ClearReadyResources(); //
 
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Set a pixel area on a naturally sized actor - expect the actor to take the
   // pixel area as size
   actor.SetPixelArea(ImageActor::PixelArea(0, 0, 30, 30));
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), Vector2(30, 30), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(30, 30), TEST_LOCATION );
 
   // Clear the pixel area. Expect the whole image to be shown, changing actor size
   actor.ClearPixelArea();
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
   // Set a size. Expect the partial image to stretch to fill the new size
   actor.SetSize(100, 100);
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), Vector2(100, 100), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(100, 100), TEST_LOCATION );
 
   // Set a pixel area, don't expect size to change
   actor.SetPixelArea(ImageActor::PixelArea(0, 0, 40, 40));
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), Vector2(40, 40), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(100, 100), TEST_LOCATION );
 
   // Use natural size - expect actor to change to pixel area
   actor.SetToNaturalSize();
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), Vector2(40, 40), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(40, 40), TEST_LOCATION );
 
   // Clearing pixel area should change actor size to image size
   actor.ClearPixelArea();
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( actor.GetCurrentImageSize(), closestImageSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), closestImageSize, TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
   END_TEST;
 }
 
@@ -632,8 +632,6 @@ int UtcDaliImageActorDefaultProperties(void)
 
   std::vector<Property::Index> indices;
   indices.push_back(ImageActor::PIXEL_AREA      );
-  indices.push_back(ImageActor::FADE_IN         );
-  indices.push_back(ImageActor::FADE_IN_DURATION);
   indices.push_back(ImageActor::STYLE           );
   indices.push_back(ImageActor::BORDER          );
   indices.push_back(ImageActor::IMAGE           );
@@ -837,57 +835,6 @@ int UtcDaliImageSetNinePatchBorder(void)
   DALI_TEST_EQUALS( 2.0f, actor.GetNinePatchBorder().y, TEST_LOCATION );
   DALI_TEST_EQUALS( 3.0f, actor.GetNinePatchBorder().z, TEST_LOCATION );
   DALI_TEST_EQUALS( 4.0f, actor.GetNinePatchBorder().w, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliImageSetFadeIn(void)
-{
-  TestApplication application;
-
-  Image image = Image::New(TestImageFilename);
-  ImageActor actor = ImageActor::New(image);
-
-  actor.SetFadeIn(true);
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( true, actor.GetFadeIn(), TEST_LOCATION );
-
-  actor.SetFadeIn(false);
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( false, actor.GetFadeIn(), TEST_LOCATION );
-  END_TEST;
-}
-
-
-int UtcDaliImageSetFadeInDuration(void)
-{
-  TestApplication application;
-
-  Image image = Image::New(TestImageFilename);
-  ImageActor actor = ImageActor::New(image);
-
-  actor.SetFadeInDuration( 1.0f );
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( 1.0f, actor.GetFadeInDuration(), TEST_LOCATION );
-
-  actor.SetFadeInDuration( 3.0f );
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( 3.0f, actor.GetFadeInDuration(), TEST_LOCATION );
   END_TEST;
 }
 

@@ -65,7 +65,6 @@ FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixe
 {
   mWidth  = width;
   mHeight = height;
-  mNaturalSizeSet = true;
 }
 
 

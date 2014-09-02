@@ -82,7 +82,7 @@ public:
    * @return A pointer to the 9 patch image object, or NULL
    * if the conversion is not possible.
    */
-  static NinePatchImage* GetNinePatchImage( Image* image);
+  static NinePatchImage* DownCast( Image* image);
 
 
 protected:

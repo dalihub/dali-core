@@ -70,15 +70,16 @@ Image& Image::operator=(BaseHandle::NullType* rhs)
 
 Image Image::New(const std::string& filename)
 {
-  Internal::ImagePtr internal = Internal::Image::New(filename);
+  Internal::ImagePtr internal = Internal::Image::New( filename,
+                                                      Dali::ImageAttributes::DEFAULT_ATTRIBUTES );
   return Image(internal.Get());
 }
 
 Image Image::New(const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol)
 {
-  Internal::ImagePtr internal = Internal::Image::New(filename,
-                                                     Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
-                                                     loadPol, releasePol);
+  Internal::ImagePtr internal = Internal::Image::New( filename,
+                                                      Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
+                                                      loadPol, releasePol );
   return Image(internal.Get());
 }
 
