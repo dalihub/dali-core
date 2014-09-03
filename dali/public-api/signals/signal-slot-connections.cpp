@@ -32,8 +32,6 @@ SlotConnection::SlotConnection( SlotObserver* slotObserver, CallbackBase* callba
 
 SlotConnection::~SlotConnection()
 {
-  // slot connections have ownership of the callback.
-  delete mCallback;
 }
 
 CallbackBase* SlotConnection::GetCallback()
@@ -60,6 +58,8 @@ SignalConnection::SignalConnection( SignalObserver* signalObserver, CallbackBase
 
 SignalConnection::~SignalConnection()
 {
+  // signal connections have ownership of the callback.
+  delete mCallback;
 }
 
 void SignalConnection::Disconnect( SlotObserver* slotObserver )
