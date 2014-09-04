@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/event/text/glyph-status/glyph-status.h>
-#include <dali/internal/common/text-array.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -129,7 +129,7 @@ public:
    * @param[in] fontId font id
    * @return true if all characters are loaded false if not
    */
-  bool IsTextLoaded( const TextArray& text, FontId fontId) const;
+  bool IsTextLoaded( const Integration::TextArray& text, FontId fontId) const;
 
   /**
    * Given a text array, find how many character are loaded and
@@ -139,7 +139,7 @@ public:
    * @param[out] charsNotLoaded how many characters are not loaded
    * @param[out] fitsInContainer whether the text fits in the container
    */
-  void GetTextStatus( const TextArray& text,
+  void GetTextStatus( const Integration::TextArray& text,
                       FontId fontId,
                       unsigned int& charsNotLoaded,
                       bool& fitsInContainer ) const;
@@ -154,7 +154,7 @@ public:
    * Get the list of dead characters
    * @param[out] deadList to be filled with a list of dead characters
    */
-  void GetDeadCharacters( std::vector< unsigned int >& deadList );
+  void GetDeadCharacters( Integration::TextArray& deadList );
 
   /**
    * Clear dead characters.

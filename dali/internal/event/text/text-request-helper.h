@@ -20,11 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/event/text/font-declarations.h>
 #include <dali/internal/event/text/text-format.h>
 #include <dali/internal/common/text-vertex-buffer.h>
 #include <dali/internal/event/text/resource/glyph-texture-observer.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -61,7 +61,7 @@ public:
    * @param [in] format text format
    * @return the vertex data required to draw the text
    */
-  TextVertexBuffer* SetText(const TextArray& text, const TextFormat& format );
+  TextVertexBuffer* SetText(const Integration::TextArray& text, const TextFormat& format );
 
   /**
    * Set the font
@@ -78,7 +78,7 @@ public:
    * @param [in] format text format
    * @return the vertex data required to draw the text
    */
-  TextVertexBuffer* SetTextAndFont(const TextArray& text, const FontPointer& font, const TextFormat& format );
+  TextVertexBuffer* SetTextAndFont(const Integration::TextArray& text, const FontPointer& font, const TextFormat& format );
 
   /**
    * Called when the texture id has changed
@@ -113,7 +113,7 @@ private:
   void AddTextureObserver();
 
   unsigned int mTextureId;                ///< the texture id of the glyph atlas being used
-  TextArray mText;                        ///< text string
+  Integration::TextArray mText;           ///< text string
   TextFormat mFormat;                     ///< text format
   FontPointer mFont;                      ///< the font
   bool mTextureObserverInstalled:1;       ///< whether texture observer is installed

@@ -63,9 +63,10 @@ public:
   virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback );
 
   /**
-   * @copydoc ConnectionTrackerInterface::GetConnectionCount
+   * @brief returns the connection count
+   * @return the connection count
    */
-  virtual std::size_t GetConnectionCount() const;
+  std::size_t GetConnectionCount() const;
 
 private:
 

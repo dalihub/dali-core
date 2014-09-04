@@ -133,7 +133,7 @@ SignalConnectorType s1( mType, Dali::TextActor::SIGNAL_TEXT_LOADING_FINISHED, &T
 
 }
 
-TextActorPtr TextActor::New( const TextArray& utfCodes, const TextActorParameters& parameters )
+TextActorPtr TextActor::New( const Integration::TextArray& utfCodes, const TextActorParameters& parameters )
 {
   // first stage construction
   TextActorPtr actor ( new TextActor( parameters.IsAutomaticFontDetectionEnabled() ) );
@@ -146,7 +146,7 @@ TextActorPtr TextActor::New( const TextArray& utfCodes, const TextActorParameter
   actor->Initialize();
 
   //create the attachment
-  actor->mTextAttachment = TextAttachment::New( *actor->mNode, TextArray(), fontPtr );
+  actor->mTextAttachment = TextAttachment::New( *actor->mNode, Integration::TextArray(), fontPtr );
 
   // Note: SetTextStyle() MUST be called before SetText(), to ensure
   //       that a single ResourceRequest for the glyphs is made. Calling
@@ -189,14 +189,15 @@ TextActor::~TextActor()
 
 const std::string TextActor::GetText() const
 {
-  const TextArray& utfCodes = mTextAttachment->GetText();
+  const Integration::TextArray& utfCodes = mTextAttachment->GetText();
 
   std::string text;
 
+  const std::size_t length = utfCodes.Count();
   // minimize allocations for ascii strings
-  text.reserve(utfCodes.size());
+  text.reserve( length );
 
-  for (unsigned int i = 0; i < utfCodes.size(); ++i)
+  for (unsigned int i = 0; i < length; ++i)
   {
     unsigned char utf8Data[4];
     unsigned int utf8Length;
@@ -239,7 +240,7 @@ void TextActor::StartObservingTextLoads()
   }
 }
 
-void TextActor::SetText(const TextArray& utfCodes)
+void TextActor::SetText(const Integration::TextArray& utfCodes)
 {
   StopObservingTextLoads();
 

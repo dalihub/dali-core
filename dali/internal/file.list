@@ -3,7 +3,6 @@
 internal_src_files = \
   $(internal_src_dir)/common/blending-options.cpp \
   $(internal_src_dir)/common/core-impl.cpp \
-  $(internal_src_dir)/common/frame-time.cpp \
   $(internal_src_dir)/common/internal-constants.cpp \
   $(internal_src_dir)/common/message-buffer.cpp \
   $(internal_src_dir)/common/text-parameters.cpp \

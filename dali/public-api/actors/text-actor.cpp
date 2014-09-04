@@ -38,7 +38,7 @@ TextActor::TextActor()
 TextActor TextActor::New()
 {
   TextActorParameters parameters;
-  Internal::TextActorPtr internal = Internal::TextActor::New( Internal::TextArray(), parameters );
+  Internal::TextActorPtr internal = Internal::TextActor::New( Integration::TextArray(), parameters );
 
   return TextActor( internal.Get() );
 }

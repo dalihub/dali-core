@@ -85,11 +85,6 @@ void Core::SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical)
   mImpl->SetDpi(dpiHorizontal, dpiVertical);
 }
 
-void Core::SetMinimumFrameTimeInterval(unsigned int interval)
-{
-  mImpl->SetMinimumFrameTimeInterval(interval);
-}
-
 void Core::Suspend()
 {
   mImpl->Suspend();
@@ -120,29 +115,14 @@ unsigned int Core::GetMaximumUpdateCount() const
   return mImpl->GetMaximumUpdateCount();
 }
 
-void Core::Update( UpdateStatus& status )
+void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, UpdateStatus& status )
 {
-  mImpl->Update( status );
+  mImpl->Update( elapsedSeconds, lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds, status );
 }
 
 void Core::Render( RenderStatus& status )
 {
   mImpl->Render( status );
-}
-
-void Core::Sleep()
-{
-  mImpl->Sleep();
-}
-
-void Core::WakeUp()
-{
-  mImpl->WakeUp();
-}
-
-void Core::VSync( unsigned int frameNumber, unsigned int seconds, unsigned int microseconds )
-{
-  mImpl->VSync( frameNumber, seconds, microseconds );
 }
 
 SystemOverlay& Core::GetSystemOverlay()

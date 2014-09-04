@@ -185,12 +185,12 @@ public:
   /**
    * @copydoc PlatformAbstraction::GetFontFamilyForChars()
    */
-  virtual const std::string& GetFontFamilyForChars(const TextArray& charsRequested) const;
+  virtual const std::string& GetFontFamilyForChars(const Integration::TextArray& charsRequested) const;
 
   /**
    * @copydoc PlatformAbstraction::AllGlyphsSupported()
    */
-  virtual bool AllGlyphsSupported(const std::string& name, const std::string& fontStyle, const TextArray& text) const;
+  virtual bool AllGlyphsSupported(const std::string& name, const std::string& fontStyle, const Integration::TextArray& text) const;
 
   /**
    * @copydoc PlatformAbstraction::ValidateFontFamilyName()

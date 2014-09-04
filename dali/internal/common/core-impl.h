@@ -54,7 +54,6 @@ class EventProcessor;
 class GestureEventProcessor;
 class ResourceClient;
 class ResourceManager;
-class FrameTime;
 class FontFactory;
 class ImageFactory;
 class ModelFactory;
@@ -118,7 +117,7 @@ public:
   /**
    * @copydoc Dali::Integration::Core::Update()
    */
-  void Update( Integration::UpdateStatus& status );
+  void Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status );
 
   /**
    * @copydoc Dali::Integration::Core::Render()
@@ -154,21 +153,6 @@ public:
    * @copydoc Dali::Integration::Core::GetMaximumUpdateCount()
    */
   unsigned int GetMaximumUpdateCount() const;
-
-  /**
-   * @copydoc Dali::Integration::Core::Sleep()
-   */
-  void Sleep();
-
-  /**
-   * @copydoc Dali::Integration::Core::Wake()
-   */
-  void WakeUp();
-
-  /**
-   * @copydoc Dali::Integration::Core::VSync()
-   */
-  void VSync( unsigned int frameNumber, unsigned int seconds, unsigned int microseconds );
 
   /**
    * @copydoc Dali::Integration::Core::GetSystemOverlay()
@@ -305,7 +289,6 @@ private:
   NotificationManager*                      mNotificationManager;         ///< Notification manager
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
-  FrameTime*                                mFrameTime;                   ///< Time when we render
   FontFactory*                              mFontFactory;                 ///< font resource factory
   ImageFactory*                             mImageFactory;                ///< Image resource factory
   ModelFactory*                             mModelFactory;                ///< Model resource factory

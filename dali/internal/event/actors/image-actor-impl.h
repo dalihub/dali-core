@@ -48,7 +48,7 @@ class Image;
  * mImageAttachment's member object. The first one points to the Image object that is going to
  * be displayed next, the second one to the Image that is currently being displayed.
  */
-class ImageActor : public RenderableActor
+class ImageActor : public RenderableActor, public ConnectionTrackerInterface
 {
 public:
 
@@ -240,6 +240,18 @@ private: // From RenderableActor
    */
   virtual RenderableAttachment& GetRenderableAttachment() const;
 
+private: // From ConnectionTrackerInterface
+
+  /**
+   * @copydoc SignalObserver::SignalConnected
+   */
+  virtual void SignalConnected( SlotObserver*, CallbackBase* );
+
+  /**
+   * @copydoc ConnectionTrackerInterface::SignalDisconnected
+   */
+  virtual void SignalDisconnected(Dali::SlotObserver*, Dali::CallbackBase* );
+
 protected:
 
   /**
@@ -254,12 +266,11 @@ protected:
 
 private:
 
-  // Helper for overloads of SetImage().
-  void OnImageSet( Image& image );
-
-  // Helper to set the actor to the image's natural size
+  /**
+   * Helper to set the actor to the image's natural size
+   * @param image that is used
+   */
   void SetNaturalSize( Image& image );
-
 
   /**
    * From Actor.
@@ -293,21 +304,26 @@ private:
    */
   void FadeIn();
 
+  /**
+   * Helper to set image internally
+   * @param currentImage
+   * @param image to set
+   */
+  void SetImageInternal( Image* currentImage, Image* image );
+
 private:
 
   ImageAttachmentPtr mImageAttachment; ///< Used to display the image (holds a pointer to currently showed Image)
   ImageConnector     mImageNext;       ///< Manages the Image this ImageActor will show (used when changing displayed image)
 
-  // flags, compressed to bitfield (uses only 4 bytes)
-  bool mUsingNaturalSize:1; ///< True only when the actor is using
-  bool mInternalSetSize:1;  ///< True whilst setting size internally, false at all other times
-  bool mFadeIn:1;           ///< True if fade in animation is enabled
-  bool mFadeInitial:1;      ///< True if fading in for the first time
-
-  SlotDelegate<ImageActor> mLoadedConnection; ///< Tracks the connection to the "loading finished" signal
-
   // For fade-in animations
-  float        mFadeInDuration;  ///< Length of animation
+  float mFadeInDuration;  ///< Length of animation
+
+  // flags, compressed to bitfield (uses only 4 bytes)
+  bool mUsingNaturalSize:1;      ///< True only when the actor is using
+  bool mInternalSetSize:1;       ///< True whilst setting size internally, false at all other times
+  bool mFadeIn:1;                ///< True if fade in animation is enabled
+  bool mFadeInitial:1;           ///< True if fading in for the first time
 
   static bool mFirstInstance ;
   static DefaultPropertyLookup* mDefaultImageActorPropertyLookup; ///< Default properties

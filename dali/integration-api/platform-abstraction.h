@@ -18,17 +18,13 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <stdint.h>
-
 // INTERNAL INCLUDES
-#include <dali/integration-api/resource-cache.h>
 #include <dali/integration-api/glyph-set.h>
+#include <dali/integration-api/resource-cache.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
-
-typedef std::vector<uint32_t> TextArray;
 
 namespace Integration
 {

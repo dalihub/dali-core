@@ -180,7 +180,7 @@ int UtcDaliTextAccessOperator01(void)
   catch( DaliException& e )
   {
     tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "position < mString.size() && \"Text::operator[]: Character position is out of bounds\"", TEST_LOCATION );
+    DALI_TEST_EQUALS( e.mCondition, "position < mString.Count() && \"Text::operator[]: Character position is out of bounds\"", TEST_LOCATION );
 
     assert2 = true;
   }
@@ -296,7 +296,7 @@ int UtcDaliTextRemove01(void)
   catch( DaliException& e )
   {
     tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "position < mString.size() && \"Text::Remove: Character position is out of bounds\"", TEST_LOCATION );
+    DALI_TEST_EQUALS( e.mCondition, "position < mString.Count() && \"Text::Remove: Character position is out of bounds\"", TEST_LOCATION );
     assert1 = true;
   }
 
@@ -307,7 +307,7 @@ int UtcDaliTextRemove01(void)
   catch( DaliException& e )
   {
     tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "position + numberOfCharacters <= mString.size() && \"Text::Remove: Character position + numberOfCharacters is out of bounds\"", TEST_LOCATION );
+    DALI_TEST_EQUALS( e.mCondition, "position + numberOfCharacters <= mString.Count() && \"Text::Remove: Character position + numberOfCharacters is out of bounds\"", TEST_LOCATION );
     assert2 = true;
   }
 

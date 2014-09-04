@@ -29,7 +29,8 @@ TestApplication::TestApplication( size_t surfaceWidth,
   mSurfaceWidth( surfaceWidth ),
   mSurfaceHeight( surfaceHeight ),
   mFrame( 0u ),
-  mDpi( horizontalDpi, verticalDpi )
+  mDpi( horizontalDpi, verticalDpi ),
+  mLastVSyncTime(0u)
 {
   Initialize();
 }
@@ -142,15 +143,23 @@ void TestApplication::SetSurfaceWidth( unsigned int width, unsigned height )
   mCore->SurfaceResized( mSurfaceWidth, mSurfaceHeight );
 }
 
-bool TestApplication::Render( unsigned int intervalMilliseconds  )
+void TestApplication::DoUpdate( unsigned int intervalMilliseconds )
 {
-  // Update Time values
-  mPlatformAbstraction.IncrementGetTimeResult( intervalMilliseconds );
   unsigned int seconds(0u), microseconds(0u);
   mPlatformAbstraction.GetTimeMicroseconds( seconds, microseconds );
+  mLastVSyncTime = ( seconds * 1e3 ) + ( microseconds / 1e3 );
+  unsigned int nextVSyncTime = mLastVSyncTime + 16;
 
-  mCore->VSync( mFrame, seconds, microseconds );
-  mCore->Update( mStatus );
+  // Update Time values
+  mPlatformAbstraction.IncrementGetTimeResult( intervalMilliseconds );
+
+  float elapsedSeconds = intervalMilliseconds / 1e3f;
+  mCore->Update( elapsedSeconds, mLastVSyncTime, nextVSyncTime, mStatus );
+}
+
+bool TestApplication::Render( unsigned int intervalMilliseconds  )
+{
+  DoUpdate( intervalMilliseconds );
   mCore->Render( mRenderStatus );
 
   mFrame++;
@@ -165,14 +174,7 @@ unsigned int TestApplication::GetUpdateStatus()
 
 bool TestApplication::UpdateOnly( unsigned int intervalMilliseconds  )
 {
-  // Update Time values
-  mPlatformAbstraction.IncrementGetTimeResult( intervalMilliseconds );
-  unsigned int seconds(0u), microseconds(0u);
-  mPlatformAbstraction.GetTimeMicroseconds( seconds, microseconds );
-
-  mCore->VSync( mFrame, seconds, microseconds );
-  mCore->Update( mStatus );
-
+  DoUpdate( intervalMilliseconds );
   return mStatus.KeepUpdating();
 }
 

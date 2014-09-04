@@ -44,7 +44,7 @@ TextRequestHelper::~TextRequestHelper()
   }
 }
 
-TextVertexBuffer* TextRequestHelper::SetText(const TextArray& text, const TextFormat& format)
+TextVertexBuffer* TextRequestHelper::SetText(const Integration::TextArray& text, const TextFormat& format)
 {
   // current text no longer required.
   TextNotRequired();
@@ -65,7 +65,7 @@ TextVertexBuffer* TextRequestHelper::SetFont( const FontPointer& font, const Tex
   return TextRequired( format );
 }
 
-TextVertexBuffer* TextRequestHelper::SetTextAndFont( const TextArray& text,
+TextVertexBuffer* TextRequestHelper::SetTextAndFont( const Integration::TextArray& text,
                                                      const FontPointer& font,
                                                      const TextFormat& format )
 {
@@ -82,7 +82,7 @@ TextVertexBuffer* TextRequestHelper::SetTextAndFont( const TextArray& text,
 
 void TextRequestHelper::TextNotRequired()
 {
-  if( mFont && !mText.empty() )
+  if( mFont && ( 0u < mText.Count() ) )
   {
     mFont->TextNotRequired( mText, mFormat, mTextureId );
   }
@@ -92,7 +92,7 @@ TextVertexBuffer* TextRequestHelper::TextRequired( const TextFormat& format )
 {
   mFormat = format;
 
-  if( mFont && !mText.empty() )
+  if( mFont && ( 0u < mText.Count() ) )
   {
     // watch out for texture resizes / splits
     AddTextureObserver();
@@ -105,7 +105,7 @@ TextVertexBuffer* TextRequestHelper::TextRequired( const TextFormat& format )
 
     return buffer;
   }
-  else if( mText.empty() )
+  else if( 0u == mText.Count()  )
   {
     // create an empty vertex buffer
     TextVertexBuffer* buffer = new TextVertexBuffer;
@@ -125,7 +125,7 @@ void TextRequestHelper::TextureChanged( unsigned int oldTextureId, unsigned int 
 
 bool TextRequestHelper::IsTextLoaded() const
 {
-  if( mTextureId == 0 || (!mFont) || mText.empty() )
+  if( mTextureId == 0 || (!mFont) || ( 0u == mText.Count() ) )
   {
     return false;
   }

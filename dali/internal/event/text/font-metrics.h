@@ -27,11 +27,11 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/text/font.h>
 #include <dali/internal/event/resources/resource-ticket.h>
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/event/text/font-metrics-interface.h>
 #include <dali/internal/event/text/resource/font-id.h>
 #include <dali/internal/event/text/font-layout.h>
 #include <dali/integration-api/glyph-set.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -110,14 +110,14 @@ public:
    * @param[in] text              The text string to measure.
    * @return The natural size of the text.
    */
-  Vector3 MeasureText(const TextArray& text);
+  Vector3 MeasureText(const Integration::TextArray& text);
 
   /**
    * Check if all characters in a string are currently in the font
    * @param[in] text          The string to check
    * @return true if all characters are currently in the font
    */
-  bool TextAvailable (const TextArray& text) const;
+  bool TextAvailable (const Integration::TextArray& text) const;
 
   /**
    * Given a text array, checks which characters have their metrics loaded.
@@ -126,14 +126,14 @@ public:
    * @param[out] missingText  Characters from text not contained in this font.
    * @return number of characters that have not had their metrics loaded
    */
-  unsigned int GetMissingText(const TextArray& text, CharacterList& missingText ) const;
+  unsigned int GetMissingText(const Integration::TextArray& text, CharacterList& missingText ) const;
 
 public: // for FontMetricsInterface
 
   /**
    * @copydoc FontMetricsInterface::LoadMetricsSynchronously
    */
-  virtual void LoadMetricsSynchronously( const TextArray& text );
+  virtual void LoadMetricsSynchronously( const Integration::TextArray& text );
 
   /**
    * @copydoc FontMetricsInterface::GetGlyph()

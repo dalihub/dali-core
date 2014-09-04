@@ -100,7 +100,7 @@ public:
   }
 
   /**
-   * @copydoc ConnectionTrackerInterface::GetConnectionCount
+   * @copydoc ConnectionTracker::GetConnectionCount
    */
   std::size_t GetConnectionCount() const
   {

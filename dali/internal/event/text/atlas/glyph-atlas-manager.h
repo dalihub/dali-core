@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/event/text/font-metrics-interface.h>
 #include <dali/internal/event/text/atlas/glyph-atlas.h>
@@ -67,14 +66,14 @@ public: // for GlyphAtlasManagerInterface
   /**
    * @copydoc GlyphAtlasManagerInterface::TextRequired()
    */
-  virtual TextVertexBuffer* TextRequired( const TextArray& text,
+  virtual TextVertexBuffer* TextRequired( const Integration::TextArray& text,
                                           const TextFormat& format,
                                           FontMetricsInterface& metrics );
 
   /**
    * @copydoc GlyphAtlasManagerInterface::TextNotRequired()
    */
-  virtual void TextNotRequired( const TextArray& text,
+  virtual void TextNotRequired( const Integration::TextArray& text,
                                 const TextFormat& format,
                                 FontId font,
                                 unsigned int textureId );
@@ -82,7 +81,7 @@ public: // for GlyphAtlasManagerInterface
   /**
    * @copydoc GlyphAtlasManagerInterface::IsTextLoaded()
    */
-  virtual bool IsTextLoaded( const TextArray& text,
+  virtual bool IsTextLoaded( const Integration::TextArray& text,
                              const TextFormat& format,
                              FontId fontId,
                              unsigned int textureId) const;
@@ -142,7 +141,7 @@ private:
    * @param[in,out] the ranking for the atlas that is found
    * @return atlas
    */
-  GlyphAtlas* FindAtlas( const TextArray& text ,
+  GlyphAtlas* FindAtlas( const Integration::TextArray& text ,
                          const TextFormat& format,
                          FontId fontId,
                          AtlasRanking& bestRank);

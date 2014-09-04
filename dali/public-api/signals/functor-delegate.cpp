@@ -17,29 +17,41 @@
 
 // CLASS HEADER
 #include <dali/public-api/signals/functor-delegate.h>
+#include <dali/public-api/math/compile-time-assert.h>
 
 namespace Dali
 {
+namespace
+{
+/**
+ * our implementation currently relies on C function pointer to be the size of void*
+ * in FunctorDispatcher we pass the C function as void* as the code is common between member
+ * functions and regular functions.
+ * If this assert fails, please implement the template specialisation for C functions.
+ */
+void Function() { }
+DALI_COMPILE_TIME_ASSERT( sizeof(void*) == sizeof(&Function) );
+}
 
 FunctorDelegate::~FunctorDelegate()
 {
-  if( mObjectPointer )
+  if( mFunctorPointer )
   {
-    (*mDestructorDispatcher)( mObjectPointer );
+    (*mDestructorDispatcher)( mFunctorPointer );
   }
 }
 
 void FunctorDelegate::Execute()
 {
-  if( mObjectPointer )
+  if( mFunctorPointer )
   {
     Dispatcher dispatcher = mMemberFunctionDispatcher;
-    (*dispatcher)( mObjectPointer );
+    (*dispatcher)( mFunctorPointer );
   }
 }
 
 FunctorDelegate::FunctorDelegate( void* objectPtr, Dispatcher dispatcher, Destructor destructor )
-: mObjectPointer( objectPtr ),
+: mFunctorPointer( objectPtr ),
   mMemberFunctionDispatcher( dispatcher ),
   mDestructorDispatcher( destructor )
 {

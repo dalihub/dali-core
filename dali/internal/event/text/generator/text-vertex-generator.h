@@ -21,12 +21,12 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/event/text/text-format.h>
 #include <dali/internal/common/text-vertex-buffer.h>
 #include <dali/internal/event/text/font-metrics-interface.h>
 #include <dali/internal/event/text/atlas/atlas-uv-interface.h>
 #include <dali/internal/event/text/resource/font-id.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -52,7 +52,7 @@ namespace TextVertexGenerator
  * @param[in] fontId the font id
  * @return text vertex buffer
  */
- TextVertexBuffer* Generate(const TextArray& text,
+ TextVertexBuffer* Generate(const Integration::TextArray& text,
                             const TextFormat& format,
                             const FontMetricsInterface& metrics,
                             const AtlasUvInterface& uvInterface,

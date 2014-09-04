@@ -21,12 +21,12 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/text/atlas/atlas.h>
 #include <dali/internal/event/text/atlas/atlas-ranking.h>
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/event/text/glyph-status/glyph-status.h>
 #include <dali/internal/event/text/glyph-status/glyph-status-container.h>
 #include <dali/internal/event/text/resource/glyph-resource-observer.h>
 #include <dali/internal/event/text/resource/glyph-resource-request.h>
 #include <dali/internal/event/text/font-metrics-interface.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -87,7 +87,7 @@ public:
    * @param[in] fontId the font id
    * @param[in] metrics font metrics interface
    */
-  TextVertexBuffer* AssignText( const TextArray& text, const TextFormat &format, FontId fontId, FontMetricsInterface& metrics );
+  TextVertexBuffer* AssignText( const Integration::TextArray& text, const TextFormat &format, FontId fontId, FontMetricsInterface& metrics );
 
   /**
    * Inform the atlas that text is no longer used
@@ -95,7 +95,7 @@ public:
    * @param[in] format the text format
    * @param[in] fontId the font id
    */
-  void TextNoLongerUsed( const TextArray& text, const TextFormat &format, FontId fontId );
+  void TextNoLongerUsed( const Integration::TextArray& text, const TextFormat &format, FontId fontId );
 
   /**
    * Given a text string, returns an atlas ranking.
@@ -104,7 +104,7 @@ public:
    * @param[in] fontId the font id
    * @return atlas ranking
    */
-  AtlasRanking GetRanking( const TextArray& text , FontId fontId ) const;
+  AtlasRanking GetRanking( const Integration::TextArray& text , FontId fontId ) const;
 
   /**
    * Get the atlas size
@@ -142,7 +142,7 @@ public:
    * @param[in] fontId the font id
    * @return true if the text is loaded
    */
-  bool IsTextLoaded( const TextArray& text, const TextFormat &format, FontId fontId) const;
+  bool IsTextLoaded( const Integration::TextArray& text, const TextFormat &format, FontId fontId) const;
 
   /**
    * Clone the contents of the atlas into this atlas
@@ -208,9 +208,9 @@ private:
    * @param[in] format the text format
    * @param[in] fontId font id
    */
-  void ReferenceText( const TextArray& text,
-                 const TextFormat &format,
-                 FontId fontId);
+  void ReferenceText( const Integration::TextArray& text,
+                      const TextFormat &format,
+                      FontId fontId);
 
   /**
    * Increase glyph reference count.

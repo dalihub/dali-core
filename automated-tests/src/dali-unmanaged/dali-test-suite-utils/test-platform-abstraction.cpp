@@ -312,7 +312,7 @@ void TestPlatformAbstraction::SetDpi (unsigned int dpiHorizontal, unsigned int d
 /**
  * @copydoc PlatformAbstraction::GetFontFamilyForChars()
  */
-const std::string& TestPlatformAbstraction::GetFontFamilyForChars(const TextArray& charsRequested) const
+const std::string& TestPlatformAbstraction::GetFontFamilyForChars(const Integration::TextArray& charsRequested) const
 {
   mTrace.PushCall("GetFontFamilyForChars", "");
   return mGetDefaultFontFamilyResult;
@@ -321,7 +321,7 @@ const std::string& TestPlatformAbstraction::GetFontFamilyForChars(const TextArra
 /**
  * @copydoc PlatformAbstraction::AllGlyphsSupported()
  */
-bool TestPlatformAbstraction::AllGlyphsSupported(const std::string& name, const std::string& fontStyle, const TextArray& text) const
+bool TestPlatformAbstraction::AllGlyphsSupported(const std::string& name, const std::string& fontStyle, const Integration::TextArray& text) const
 {
   mTrace.PushCall("AllGlyphsSupported", "");
   return true;

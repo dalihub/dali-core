@@ -38,7 +38,7 @@ namespace Internal
   * @param[in] atlasResizable whether the atlas is resizable
   * @return atlas ranking
   */
- AtlasRanking GetAtlasRanking(  const TextArray& text,
+ AtlasRanking GetAtlasRanking(  const Integration::TextArray& text,
                                 FontId fontId,
                                 const GlyphStatusContainer&  container,
                                 bool atlasResizable);

@@ -26,13 +26,12 @@
 #include <dali/public-api/text/font.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/internal/event/text/font-metrics.h>
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/common/text-vertex-buffer.h>
 #include <dali/internal/event/text/text-observer.h>
 #include <dali/internal/event/text/resource/glyph-texture-observer.h>
 #include <dali/internal/event/text/atlas/glyph-atlas-manager-interface.h>
-
 #include <dali/internal/common/message.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -83,7 +82,7 @@ public:
   /**
     * @copydoc Dali::Font::GetFamilyForText()
     */
-  static const std::string GetFamilyForText(const TextArray& text);
+  static const std::string GetFamilyForText(const Integration::TextArray& text);
 
   /**
    * @copydoc Dali::Font::GetLineHeightFromCapsHeight()
@@ -98,7 +97,7 @@ public:
   /**
    * @copydoc Dali::Font::AllGlyphsSupported()
    */
-  bool AllGlyphsSupported(const TextArray& text) const;
+  bool AllGlyphsSupported(const Integration::TextArray& text) const;
 
   /**
    * returns the Id used for lookups
@@ -109,17 +108,17 @@ public:
   /**
    * @copydoc Dali::Font::MeasureTextWidth()
    */
-  float MeasureTextWidth(const TextArray& text, float textHeightPx) const;
+  float MeasureTextWidth(const Integration::TextArray& text, float textHeightPx) const;
 
   /**
    * @copydoc Dali::Font::MeasureTextHeight()
    */
-  float MeasureTextHeight(const TextArray& text, float textWidthPx) const;
+  float MeasureTextHeight(const Integration::TextArray& text, float textWidthPx) const;
 
   /**
    * @copydoc Dali::Font::MeasureText(const Text& text) const
    */
-  Vector3 MeasureText(const TextArray& text) const;
+  Vector3 MeasureText(const Integration::TextArray& text) const;
 
   /**
    * @copydoc Dali::Font::IsDefaultSystemFont()
@@ -223,12 +222,12 @@ public:
   /**
    * @copydoc GlyphAtlasManagerInterface::TextRequired()
    */
-  TextVertexBuffer* TextRequired( const TextArray& text, const TextFormat& format );
+  TextVertexBuffer* TextRequired( const Integration::TextArray& text, const TextFormat& format );
 
   /**
    * @copydoc GlyphAtlasManagerInterface::TextNotRequired()
    */
-  void TextNotRequired( const TextArray& text, const TextFormat& format, unsigned int textureId );
+  void TextNotRequired( const Integration::TextArray& text, const TextFormat& format, unsigned int textureId );
 
   /**
    * Add a glyph texture observer
@@ -249,7 +248,7 @@ public:
    * @param[in] textureId texture ID of the atlas
    * @return true if all characters are available, false if not
    */
-  bool IsTextLoaded( const TextArray& text, const TextFormat& format, unsigned int textureId ) const;
+  bool IsTextLoaded( const Integration::TextArray& text, const TextFormat& format, unsigned int textureId ) const;
 
 
 private:

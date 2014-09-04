@@ -37,7 +37,6 @@
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/common/event-to-update.h>
-#include <dali/internal/common/frame-time.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/event/text/font-factory.h>
 #include <dali/internal/event/images/image-factory.h>
@@ -87,7 +86,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mDiscardQueue(NULL),
   mResourcePostProcessQueue(),
   mNotificationManager(NULL),
-  mFrameTime(NULL),
   mFontFactory(NULL),
   mImageFactory(NULL),
   mModelFactory(NULL),
@@ -150,7 +148,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
 
-  mFrameTime = new FrameTime( mPlatform );
   mFontFactory = new FontFactory(*mResourceClient);
   mImageFactory = new ImageFactory( *mResourceClient );
   mModelFactory = new ModelFactory(*mResourceClient);
@@ -199,7 +196,6 @@ Core::~Core()
   delete mRenderManager;
   delete mDiscardQueue;
   delete mResourcePostProcessQueue;
-  delete mFrameTime;
 }
 
 void Core::ContextCreated()
@@ -224,26 +220,17 @@ void Core::SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical)
   mStage->SetDpi( Vector2( dpiHorizontal , dpiVertical) );
 }
 
-void Core::SetMinimumFrameTimeInterval(unsigned int interval)
+void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds, unsigned int nextVSyncTimeMilliseconds, Integration::UpdateStatus& status )
 {
-  mFrameTime->SetMinimumFrameTimeInterval(interval);
-}
-
-void Core::Update( UpdateStatus& status )
-{
-  // get the last delta and the predict when this update will be rendered
-  float lastFrameDelta( 0.0f );
-  unsigned int lastVSyncTime( 0 );
-  unsigned int nextVSyncTime( 0 );
-  mFrameTime->PredictNextVSyncTime( lastFrameDelta, lastVSyncTime, nextVSyncTime );
-
   // set the time delta so adaptor can easily print FPS with a release build with 0 as
   // it is cached by frametime
-  status.secondsFromLastFrame = lastFrameDelta;
+  status.secondsFromLastFrame = elapsedSeconds;
 
   // Render returns true when there are updates on the stage or one or more animations are completed.
   // Use the estimated time diff till we render as the elapsed time.
-  status.keepUpdating = mUpdateManager->Update( lastFrameDelta, lastVSyncTime, nextVSyncTime );
+  status.keepUpdating = mUpdateManager->Update( elapsedSeconds,
+                                                lastVSyncTimeMilliseconds,
+                                                nextVSyncTimeMilliseconds );
 
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();
@@ -273,11 +260,6 @@ void Core::Render( RenderStatus& status )
 
 void Core::Suspend()
 {
-  if( mFrameTime )
-  {
-    mFrameTime->Suspend();
-  }
-
   mPlatform.Suspend();
 
   mIsActive = false;
@@ -285,39 +267,12 @@ void Core::Suspend()
 
 void Core::Resume()
 {
-  if( mFrameTime )
-  {
-    mFrameTime->Resume();
-  }
-
   mPlatform.Resume();
 
   mIsActive = true;
 
   // trigger processing of events queued up while paused
   ProcessEvents();
-}
-
-void Core::Sleep()
-{
-  if( mFrameTime )
-  {
-    mFrameTime->Sleep();
-  }
-}
-
-void Core::WakeUp()
-{
-  if( mFrameTime )
-  {
-    mFrameTime->WakeUp();
-  }
-}
-
-void Core::VSync( unsigned int frameNumber, unsigned int seconds, unsigned int microseconds )
-{
-  // Can't use passed in time as that is not the clock the touch events use so our predicted render value will be meaningless.
-  mFrameTime->SetVSyncTime( frameNumber );
 }
 
 void Core::QueueEvent( const Integration::Event& event )

@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/text/text.h>
-#include <dali/internal/common/text-array.h>
+#include <dali/integration-api/text-array.h>
 
 namespace Dali
 {
@@ -139,21 +139,21 @@ public:
    * Retrieves a reference to the UTF-32 encoded string.
    * @return A reference to the UTF-32 encoded string.
    */
-  const TextArray& GetTextArray() const;
+  const Integration::TextArray& GetTextArray() const;
 
 private:
 
-  TextArray mString; ///< Stores an array of unicodes.
+  Integration::TextArray mString; ///< Stores an array of unicodes.
 };
 
 /**
- * @brief  Helper function to get the TextArray from a Dali::Text.
+ * @brief  Helper function to get the Integration::TextArray from a Dali::Text.
  *
  * @param[in] text A Dali::Text.
  *
- * @return The Text's TextArray.
+ * @return The Text's Integration::TextArray.
  */
- const TextArray& GetTextArray( const Dali::Text& text );
+ const Integration::TextArray& GetTextArray( const Dali::Text& text );
 
 } // namespace Internal
 

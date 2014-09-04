@@ -22,7 +22,6 @@
 #include <dali/internal/event/text/atlas/atlas-ranking.h>
 #include <dali/internal/event/text/atlas/atlas-size.h>
 #include <dali/internal/event/text/atlas/debug/atlas-debug.h>
-#include <dali/internal/common/text-array.h>
 #include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
@@ -43,14 +42,14 @@ GlyphAtlasManager::~GlyphAtlasManager()
   // Atlases automatically get destroyed.
 }
 
-TextVertexBuffer* GlyphAtlasManager::TextRequired( const TextArray& text ,
+TextVertexBuffer* GlyphAtlasManager::TextRequired( const Integration::TextArray& text ,
                                                    const TextFormat& format,
                                                    FontMetricsInterface& metrics )
 {
   // get the font id
   FontId fontId = metrics.GetFontId();
 
-  AtlasRanking bestRank( text.size() );
+  AtlasRanking bestRank( text.Count() );
 
   // find the atlas which is best suited to displaying the text string
   GlyphAtlas* atlas  = FindAtlas( text, format, fontId, bestRank);
@@ -67,7 +66,7 @@ TextVertexBuffer* GlyphAtlasManager::TextRequired( const TextArray& text ,
   return atlas->AssignText( text, format, fontId, metrics );
 }
 
-void GlyphAtlasManager::TextNotRequired( const TextArray& text,
+void GlyphAtlasManager::TextNotRequired( const Integration::TextArray& text,
                                          const TextFormat& format,
                                          FontId fontId,
                                          unsigned int textureId )
@@ -78,7 +77,7 @@ void GlyphAtlasManager::TextNotRequired( const TextArray& text,
 }
 
 
-bool GlyphAtlasManager::IsTextLoaded( const TextArray& text,
+bool GlyphAtlasManager::IsTextLoaded( const Integration::TextArray& text,
                                       const TextFormat& format,
                                       FontId fontId,
                                       unsigned int textureId ) const
@@ -153,22 +152,22 @@ GlyphAtlas* GlyphAtlasManager::CreateAtlas( unsigned int size )
   return atlas;
 }
 
-GlyphAtlas* GlyphAtlasManager::FindAtlas( const TextArray& text,
+GlyphAtlas* GlyphAtlasManager::FindAtlas( const Integration::TextArray& text,
                                           const TextFormat& format,
                                           FontId fontId,
                                           AtlasRanking &bestRank )
 {
   // if the text is underlined, add the underline character to the text string
-  TextArray searchText( text );
+  Integration::TextArray searchText( text );
   if( format.IsUnderLined() )
   {
-    searchText.push_back( format.GetUnderLineCharacter() );
+    searchText.PushBack( format.GetUnderLineCharacter() );
   }
 
   if( mAtlasList.Count() == 0 )
   {
     // make sure the initial atlas size holds the requested text.
-    unsigned int size = GlyphAtlasSize::GetInitialSize( searchText.size() );
+    unsigned int size = GlyphAtlasSize::GetInitialSize( searchText.Count() );
 
     return CreateAtlas( size );
   }

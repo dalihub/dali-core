@@ -19,10 +19,11 @@
 #include <dali/internal/event/text/text-impl.h>
 
 // INTERNAL INCLUDES
-
-#include <dali/internal/common/text-array.h>
 #include <dali/internal/event/text/character-impl.h>
 #include <dali/internal/event/text/utf8-impl.h>
+
+// EXTERNAL INCLUDES
+#include <algorithm>
 
 namespace Dali
 {
@@ -32,7 +33,7 @@ namespace Internal
 
 namespace
 {
-static const TextArray VOID_TEXT_ARRAY; ///< A void text array to be used in the helper Internal::GetTextArray() function.
+static const Integration::TextArray VOID_TEXT_ARRAY; ///< A void text array to be used in the helper Internal::GetTextArray() function.
 } // namespace
 
 Text::Text()
@@ -43,17 +44,19 @@ Text::Text()
 Text::Text( const std::string& text )
 : mString()
 {
+  const std::size_t length = text.size();
+
   // minimize allocations for ascii strings
-  mString.reserve( text.size() );
+  mString.Reserve( length );
 
   // break string into UTF-8 tokens
-  UTF8Tokenize( reinterpret_cast<const unsigned char*>( text.c_str() ), text.size(), mString );
+  UTF8Tokenize( reinterpret_cast<const unsigned char*>( text.c_str() ), length, mString );
 }
 
 Text::Text( const Character& character )
 : mString()
 {
-  mString.push_back( character.GetCharacter() );
+  mString.PushBack( character.GetCharacter() );
 }
 
 Text::Text( const Text& text )
@@ -64,9 +67,9 @@ Text::Text( const Text& text )
 void Text::GetText( std::string& text ) const
 {
   // minimize allocations for ascii strings
-  text.reserve( mString.size() );
+  text.reserve( mString.Count() );
 
-  for( TextArray::const_iterator it = mString.begin(), endIt = mString.end(); it != endIt; ++it )
+  for( Integration::TextArray::ConstIterator it = mString.Begin(), endIt = mString.End(); it != endIt; ++it )
   {
     unsigned char utf8Data[4];
     unsigned int utf8Length;
@@ -87,18 +90,19 @@ Text& Text::operator=( const Text& text )
 Text::~Text()
 {
   Clear();
+  mString.Release();
 }
 
 void Text::Clear()
 {
-  mString.clear();
+  mString.Clear();
 }
 
 Dali::Character Text::operator[]( size_t position ) const
 {
-  DALI_ASSERT_ALWAYS( position < mString.size() && "Text::operator[]: Character position is out of bounds" );
+  DALI_ASSERT_ALWAYS( position < mString.Count() && "Text::operator[]: Character position is out of bounds" );
 
-  const uint32_t c = *( mString.begin() + position );
+  const uint32_t c = *( mString.Begin() + position );
 
   Dali::Character character( new Character( c ) );
 
@@ -107,34 +111,34 @@ Dali::Character Text::operator[]( size_t position ) const
 
 bool Text::IsEmpty() const
 {
-  return mString.empty();
+  return 0u == mString.Count();
 }
 
 size_t Text::GetLength() const
 {
-  return mString.size();
+  return mString.Count();
 }
 
 void Text::Append( const Dali::Text& text )
 {
-  const TextArray& utfCodes = text.GetImplementation().GetTextArray();
+  const Integration::TextArray& utfCodes = text.GetImplementation().GetTextArray();
 
-  mString.insert( mString.end(), utfCodes.begin(), utfCodes.end() );
+  mString.Insert( mString.End(), utfCodes.Begin(), utfCodes.End() );
 }
 
 void Text::Remove( size_t position, size_t numberOfCharacters )
 {
-  DALI_ASSERT_ALWAYS( position < mString.size() && "Text::Remove: Character position is out of bounds" );
-  DALI_ASSERT_ALWAYS( position + numberOfCharacters <= mString.size() && "Text::Remove: Character position + numberOfCharacters is out of bounds" );
+  DALI_ASSERT_ALWAYS( position < mString.Count() && "Text::Remove: Character position is out of bounds" );
+  DALI_ASSERT_ALWAYS( position + numberOfCharacters <= mString.Count() && "Text::Remove: Character position + numberOfCharacters is out of bounds" );
 
-  mString.erase( mString.begin() + position, mString.begin() + position + numberOfCharacters );
+  mString.Erase( mString.Begin() + position, mString.Begin() + position + numberOfCharacters );
 }
 
 void Text::Find( uint32_t character, std::size_t from, std::size_t to, Vector<std::size_t>& positions ) const
 {
   std::size_t position = from;
 
-  for( TextArray::const_iterator it = mString.begin() + from, endIt = mString.begin() + to + 1u; it != endIt; ++position, ++it )
+  for( Integration::TextArray::ConstIterator it = mString.Begin() + from, endIt = mString.Begin() + to + 1u; it != endIt; ++position, ++it )
   {
     if( *it == character )
     {
@@ -147,7 +151,7 @@ void Text::FindWhiteSpace( std::size_t from, std::size_t to, Vector<std::size_t>
 {
   std::size_t position = from;
 
-  for( TextArray::const_iterator it = mString.begin() + from, endIt = mString.begin() + to + 1u; it != endIt; ++position, ++it )
+  for( Integration::TextArray::ConstIterator it = mString.Begin() + from, endIt = mString.Begin() + to + 1u; it != endIt; ++position, ++it )
   {
     if( Character::IsWhiteSpace( *it ) )
     {
@@ -160,7 +164,7 @@ void Text::FindNewLine( std::size_t from, std::size_t to, Vector<std::size_t>& p
 {
   std::size_t position = from;
 
-  for( TextArray::const_iterator it = mString.begin() + from, endIt = mString.begin() + to + 1u; it != endIt; ++position, ++it )
+  for( Integration::TextArray::ConstIterator it = mString.Begin() + from, endIt = mString.Begin() + to + 1u; it != endIt; ++position, ++it )
   {
     if( Character::IsNewLine( *it ) )
     {
@@ -173,22 +177,21 @@ void Text::GetSubText( std::size_t from, std::size_t to, Text* subText ) const
 {
   if( to < from )
   {
-    const std::size_t length = mString.size();
-    const std::size_t rfrom = length - ( from + 1u );
-    const std::size_t rto = length - to;
-    subText->mString.insert( subText->mString.end(), mString.rbegin() + rfrom, mString.rbegin() + rto );
+    std::swap( from, to );
+    subText->mString.Insert( subText->mString.End(), mString.Begin() + from, mString.Begin() + to + 1u );
+    std::reverse( subText->mString.Begin(), subText->mString.End() );
   }
   else
   {
-    subText->mString.insert( subText->mString.end(), mString.begin() + from, mString.begin() + to + 1u );
+    subText->mString.Insert( subText->mString.End(), mString.Begin() + from, mString.Begin() + to + 1u );
   }
 }
 
 bool Text::IsWhiteSpace( std::size_t index ) const
 {
-  if( index < mString.size() )
+  if( index < mString.Count() )
   {
-    return Character::IsWhiteSpace( *( mString.begin() + index ) );
+    return Character::IsWhiteSpace( *( mString.Begin() + index ) );
   }
 
   return false;
@@ -196,20 +199,20 @@ bool Text::IsWhiteSpace( std::size_t index ) const
 
 bool Text::IsNewLine( std::size_t index ) const
 {
-  if( index < mString.size() )
+  if( index < mString.Count() )
   {
-    return Character::IsNewLine( *( mString.begin() + index ) );
+    return Character::IsNewLine( *( mString.Begin() + index ) );
   }
 
   return false;
 }
 
-const TextArray& Text::GetTextArray() const
+const Integration::TextArray& Text::GetTextArray() const
 {
   return mString;
 }
 
-const TextArray& GetTextArray( const Dali::Text& text )
+const Integration::TextArray& GetTextArray( const Dali::Text& text )
 {
   if( text.IsEmpty() )
   {
