@@ -281,6 +281,8 @@ int UtcDaliShaderEffectMethodDelete01(void)
    application.SendNotification();
    application.Render();
 
+   GLuint beforeShaderCompiled = application.GetGlAbstraction().GetLastShaderCompiled();
+
    // create a new shader effect
    // the vertex and fragment shader will be cached in the ShaderFactory
    ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
@@ -297,16 +299,8 @@ int UtcDaliShaderEffectMethodDelete01(void)
    application.Render();
 
    GLuint lastShaderCompiled = application.GetGlAbstraction().GetLastShaderCompiled();
-
-   // get the vertex shader (compiled before fragment shader).
-   // this last shaders compiled is for text.
-   GLuint vertexShaderId = lastShaderCompiled - 1;
-
-   // compare the vertex shader sent to be compiled, with the shader string that ended up being compiled
-   // this is to confirm the string hasn't been deleted / corrupted.
-   std::string actualVertexShader = application.GetGlAbstraction().GetShaderSource( vertexShaderId );
-   DALI_TEST_EQUALS( VertexSource,
-                     actualVertexShader.substr( actualVertexShader.length() - strlen( VertexSource ) ), TEST_LOCATION );
+   // no shaders were compiled as they are now compiled on demand and this shader was not used
+   DALI_TEST_EQUALS( beforeShaderCompiled, lastShaderCompiled, TEST_LOCATION );
 
    END_TEST;
 }
