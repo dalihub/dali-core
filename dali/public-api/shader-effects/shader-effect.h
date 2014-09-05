@@ -40,7 +40,7 @@ namespace Dali DALI_IMPORT_API
  * "  }\n";
  *
  * [An example of DALI_COMPOSE_SHADER usage]
- * const string FRAGMENT_SHADER_SOURCE = DALI_COMPOSE_SHADER (
+ * const string VERTEX_SHADER_SOURCE = DALI_COMPOSE_SHADER (
  *   void main()
  *   {
  *     gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);
@@ -342,7 +342,7 @@ public:
   /**
    * @brief Sets image for using as effect texture.
    *
-   * This image texture will be bound to the "sEffectTexture" sampler
+   * This image texture will be bound to the "sEffect" sampler
    * so it can be used in fragment shader for effects
    *
    * @param[in] image to use as effect texture

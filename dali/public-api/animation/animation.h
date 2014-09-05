@@ -91,7 +91,7 @@ class Animation;
  * {
  *   Animation animation = Animation::New(2.0f); // duration 2 seconds
  *   animation.MoveTo(actor, 10.0f, 50.0f, 0.0f);
- *   animation.SignalFinished().Connect( ExampleCallback );
+ *   animation.FinishedSignal().Connect( ExampleCallback );
  *   animation.Play();
  * } // At this point the animation handle has gone out of scope
  *
