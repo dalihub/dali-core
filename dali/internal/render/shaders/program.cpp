@@ -128,7 +128,7 @@ Program* Program::New( const Integration::ResourceId& resourceId, Integration::S
     // program not found so create it
     program = new Program( shaderData, context, modifiesGeometry );
 
-    program->Load();
+    // we want to lazy load programs so dont do a Load yet, it gets done in Use
 
     // tell context to cache it
     context.CacheProgram( shaderHash, program );
