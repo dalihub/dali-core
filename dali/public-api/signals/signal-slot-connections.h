@@ -36,8 +36,7 @@ class CallbackBase;
  * - Callback (slot)
  * - SlotObserver -interface provided by the signal
  *
- * It takes ownership of the callback, and will delete it when
- * the connection is destroyed.
+ * It holds a pointer to the callback, but does not own it.
  */
 class SlotConnection
 {
@@ -47,7 +46,7 @@ public:
    * @brief Constructor.
    *
    * @param[in] slotObserver The slot observer.
-   * @param[in] callback Ownership of this callback object is taken.
+   * @param[in] callback A callback object (not owned).
    */
   SlotConnection(SlotObserver* slotObserver, CallbackBase* callback);
 
@@ -78,7 +77,7 @@ private:
 private:
 
   SlotObserver* mSlotObserver; ///< a pointer to the slot observer (not owned)
-  CallbackBase* mCallback;     ///< callback, has ownership
+  CallbackBase* mCallback;     ///< The callback. This is not owned, the corresponding SignalConnection has ownership.
 };
 
 /**
@@ -91,8 +90,8 @@ private:
  * - Callback (slot)
  * - SignalObserver - interface provided by a slot owning object.
  *
- * It holds a pointer to the callback, but does not own it.
- *
+ * It takes ownership of the callback, and will delete it when
+ * the connection is destroyed.
  */
 class SignalConnection
 {
@@ -109,7 +108,7 @@ public:
    * @brief Constructor.
    *
    * @param[in] signalObserver The signal observer.
-   * @param[in] callback The callback which should be a member function of the signalObserver.
+   * @param[in] callback Ownership of this callback object is taken.
    */
   SignalConnection( SignalObserver* signalObserver, CallbackBase* callback );
 
@@ -140,7 +139,7 @@ private:
 private:
 
   SignalObserver* mSignalObserver; ///< a pointer to the signal observer (not owned)
-  CallbackBase* mCallback;         ///< The callback. This is not owned, the corresponding SlotConnection has ownership.
+  CallbackBase* mCallback;         ///< The callback, has ownership.
 };
 
 } // namespace Dali
