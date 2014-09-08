@@ -154,6 +154,8 @@ void Texture::GlContextDestroyed()
 {
   // texture is gone
   mId = 0;
+  // reset sampler state as well
+  mSamplerBitfield = 0;
 }
 
 void Texture::GlCleanup()
