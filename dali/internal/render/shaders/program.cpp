@@ -465,7 +465,7 @@ Program::~Program()
 
 void Program::Load()
 {
-  DALI_ASSERT_ALWAYS( NULL != mProgramData && "Program data is not initialized" );
+  DALI_ASSERT_ALWAYS( NULL != mProgramData.Get() && "Program data is not initialized" );
 
   Unload();
 
