@@ -48,6 +48,12 @@ AC_ARG_ENABLE([emscripten],
               [enable_emscripten=$enableval],
               [enable_emscripten=no])
 
+AC_ARG_ENABLE([backtrace],
+              [AC_HELP_STRING([--enable-backtrace],
+                              [Backtrace for exceptions])],
+              [enable_backtrace=$enableval],
+              [enable_backtrace=yes])
+
 AC_ARG_ENABLE([dynamics],
               [AC_HELP_STRING([--enable-dynamics],
                               [Builds with dynamics support])],
@@ -55,7 +61,7 @@ AC_ARG_ENABLE([dynamics],
               [dynamics_support=no])
 
 if test "x$enable_debug" = "xyes"; then
-  DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED -DDEBUG_BACKTRACE"
+  DALI_CFLAGS="$DALI_CFLAGS -DDEBUG_ENABLED"
 fi
 
 if test "x$enable_debug" = "xno" -a "x$enable_exportall" = "xno"; then
@@ -64,10 +70,17 @@ fi
 
 if test "x$enable_emscripten" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DEMSCRIPTEN -std=c++11"
+  # Automatically turn off backtrace support
+  enable_backtrace="no"
 fi
 
 if test "x$dynamics_support" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDYNAMICS_SUPPORT"
+fi
+
+# Must come after Emscripten feature test
+if test "x$enable_backtrace" = "xyes"; then
+  DALI_CFLAGS="$DALI_CFLAGS -DBACKTRACE_ENABLED"
 fi
 
 AM_CONDITIONAL([DYNAMICS_SUPPORT], [test x$dynamics_support = xyes])
@@ -123,4 +136,5 @@ Configuration
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
   Emscripten:                       $enable_emscripten
+  Backtrace:                        $enable_backtrace
 "
