@@ -27,6 +27,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/integration-api/resource-cache.h>
+#include <dali/integration-api/shader-data.h>
 
 namespace Dali
 {
@@ -360,7 +361,7 @@ private:  // Data
   GLuint mVertexShaderId;                     ///< GL identifier for vertex shader
   GLuint mFragmentShaderId;                   ///< GL identifier for fragment shader
   GLuint mProgramId;                          ///< GL identifier for program
-  Integration::ShaderData* mProgramData;      ///< Shader program source and binary (when compiled & linked or loaded)
+  Integration::ShaderDataPtr mProgramData;    ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
   GLint mAttribLocations[ ATTRIB_TYPE_LAST ]; ///< attribute location cache
