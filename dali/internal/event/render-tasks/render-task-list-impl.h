@@ -96,6 +96,12 @@ public:
    */
   static void NotifyFinished( void* object );
 
+  /**
+   * This method refreshes all render tasks that have a frame buffer
+   * and a refresh rate of RefreshOnce.
+   */
+  void RecoverFromContextLoss();
+
 protected:
 
   /**

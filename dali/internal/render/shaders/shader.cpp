@@ -317,7 +317,8 @@ void Shader::SetUniforms( Context& context,
   if( mTexture )
   {
     // got effect texture, bind it to texture unit 1
-    mTexture->Bind( GL_TEXTURE_2D, GL_TEXTURE1 );
+    mTextureCache->BindTexture( mTexture, mRenderTextureId, GL_TEXTURE_2D, GL_TEXTURE1 );
+
     // Just apply the default sampling options for now
     mTexture->ApplySampler( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
 

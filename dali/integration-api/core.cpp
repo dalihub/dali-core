@@ -51,10 +51,10 @@ const unsigned int RENDER_TASK_SYNC       = 0x40;  ///< The refresh once render 
 } // namespace KeepUpdating
 
 Core* Core::New(RenderController& renderController, PlatformAbstraction& platformAbstraction,
-                GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction, GestureManager& gestureManager)
+                GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction, GestureManager& gestureManager, ResourcePolicy::DataRetention policy )
 {
   Core* instance = new Core;
-  instance->mImpl = new Internal::Core( renderController, platformAbstraction, glAbstraction, glSyncAbstraction, gestureManager );
+  instance->mImpl = new Internal::Core( renderController, platformAbstraction, glAbstraction, glSyncAbstraction, gestureManager, policy );
 
   return instance;
 }
@@ -64,14 +64,28 @@ Core::~Core()
   delete mImpl;
 }
 
+ContextNotifierInterface* Core::GetContextNotifier()
+{
+  return mImpl->GetContextNotifier();
+}
+
+// @todo Rename to ResetGlContext
 void Core::ContextCreated()
 {
   mImpl->ContextCreated();
 }
 
-void Core::ContextToBeDestroyed()
+// @todo Replace with StopRendering that prevents RenderManager from rendering
+// until we get ResetGLContext again, change ContextCreated to reset gpu buffer cache,
+// gl texture id's
+void Core::ContextDestroyed()
 {
-  mImpl->ContextToBeDestroyed();
+  mImpl->ContextDestroyed();
+}
+
+void Core::RecoverFromContextLoss()
+{
+  mImpl->RecoverFromContextLoss();
 }
 
 void Core::SurfaceResized(unsigned int width, unsigned int height)

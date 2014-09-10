@@ -22,6 +22,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/base-object.h>
+#include <dali/integration-api/context-notifier.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/common/object-registry-impl.h>
@@ -69,7 +70,7 @@ class RenderTaskList;
 /**
  * Implementation of Stage
  */
-class Stage : public BaseObject, public RenderTaskDefaults
+class Stage : public BaseObject, public RenderTaskDefaults, public Integration::ContextNotifierInterface
 {
 public:
 
@@ -331,6 +332,7 @@ public:
     return mNotificationManager;
   }
 
+
   /**
    * @copydoc Dali::Stage::KeepRendering()
    */
@@ -369,6 +371,28 @@ public:
     * @copydoc Dali::Stage::TouchedSignal()
     */
   Dali::Stage::TouchedSignalV2& TouchedSignal();
+
+  /**
+   * @copydoc Dali::Stage::ContextLostSignal()
+   */
+  Dali::Stage::ContextStatusSignal& ContextLostSignal();
+
+  /**
+   * @copydoc Dali::Stage::ContextRegainedSignal()
+   */
+  Dali::Stage::ContextStatusSignal& ContextRegainedSignal();
+
+private: // Implementation of ContextNotificationInterface:
+
+  /**
+   * @copydoc Dali::Integration::NotifyContextLost();
+   */
+  virtual void NotifyContextLost();
+
+  /**
+   * @copydoc Dali::Integration::NotifyContextRegained();
+   */
+  virtual void NotifyContextRegained();
 
 private:
 
@@ -445,6 +469,9 @@ private:
 
   // The touched signal
   Dali::Stage::TouchedSignalV2                  mTouchedSignalV2;
+
+  Dali::Stage::ContextStatusSignal mContextLostSignal;
+  Dali::Stage::ContextStatusSignal mContextRegainedSignal;
 };
 
 } // namespace Internal

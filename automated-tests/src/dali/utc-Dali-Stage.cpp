@@ -20,6 +20,7 @@
 #include <stdlib.h>
 
 #include <dali/public-api/dali-core.h>
+#include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 
@@ -134,6 +135,26 @@ bool DummyTouchCallback( Actor actor, const TouchEvent& touch )
 {
   return true;
 }
+
+
+struct ContextStatusFunctor
+{
+  ContextStatusFunctor(bool& calledFlag) : mCalledFlag( calledFlag )
+  {
+    mCalledFlag = false;
+  }
+
+  void operator()()
+  {
+    mCalledFlag = true;
+  }
+  void Reset()
+  {
+    mCalledFlag = false;
+  }
+
+  bool& mCalledFlag;
+};
 
 } // unnamed namespace
 
@@ -593,5 +614,28 @@ int UtcDaliStageTouchedSignal(void)
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     data.Reset();
   }
+  END_TEST;
+}
+
+int UtcDaliStageContextLostRegainedSignals(void)
+{
+  TestApplication app;
+  Stage stage = Stage::GetCurrent();
+
+  bool contextLost = false;
+  bool contextRegained = false;
+  ContextStatusFunctor contextLostFunctor( contextLost );
+  ContextStatusFunctor contextRegainedFunctor( contextRegained );
+  stage.ContextLostSignal().Connect(&app, contextLostFunctor );
+  stage.ContextRegainedSignal().Connect(&app, contextRegainedFunctor );
+
+  Integration::Core& core = app.GetCore();
+  Integration::ContextNotifierInterface* notifier = core.GetContextNotifier();
+  notifier->NotifyContextLost();
+  DALI_TEST_EQUALS( contextLost, true, TEST_LOCATION );
+
+  notifier->NotifyContextRegained();
+  DALI_TEST_EQUALS( contextRegained, true, TEST_LOCATION );
+
   END_TEST;
 }

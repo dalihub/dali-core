@@ -11,6 +11,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-Handles.cpp
         utc-Dali-Internal-ImageFactory.cpp
         utc-Dali-Internal-Material.cpp
+        utc-Dali-Internal-Mesh.cpp
         utc-Dali-Internal-Text.cpp
         utc-Dali-Internal-ResourceClient.cpp
         utc-Dali-Internal-Image-Culling.cpp

@@ -98,8 +98,7 @@ Texture::Texture(Context&      context,
   mHeight(height),
   mImageWidth(imageWidth),
   mImageHeight(imageHeight),
-  mPixelFormat(pixelFormat),
-  mDiscarded(false)
+  mPixelFormat(pixelFormat)
 {
 }
 
@@ -275,7 +274,7 @@ void Texture::ApplyTextureParameter( GLint filterType, FilterMode::Type currentF
 
 void Texture::ApplySampler( unsigned int samplerBitfield )
 {
-  if( mSamplerBitfield != samplerBitfield )
+  if( mSamplerBitfield != samplerBitfield && mId != 0 )
   {
     ApplyTextureParameter( GL_TEXTURE_MIN_FILTER,
                            ImageSampler::GetMinifyFilterMode( mSamplerBitfield ),

@@ -27,6 +27,8 @@
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/integration-api/resource-policies.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
@@ -68,7 +70,7 @@ typedef TextureContainer::const_iterator        TextureConstIter;
 class TextureCache : public TextureCacheDispatcher
 {
 public:
-  /**
+ /**
    * Constructor
    * @param[in] renderQueue Queue to use for dispatching messages to this object
    * @param[in] postProcessDispatcher Dispatcher for resource post processing requests
@@ -215,6 +217,18 @@ public:
    */
   void GlContextDestroyed();
 
+  /**
+   * Set whether textures should retain or discard their bitmaps after upload to GL
+   * @param[in] policy Whether to retain or discard bitmaps
+   */
+  void SetDiscardBitmapsPolicy( ResourcePolicy::Discardable policy );
+
+  /**
+   * Get the discard policy.
+   * @return The discard policy.
+   */
+  ResourcePolicy::Discardable GetDiscardBitmapsPolicy();
+
 protected: // Implements TextureCacheDispatcher
 
   /**
@@ -285,6 +299,7 @@ private:
   typedef TextureResourceObservers::iterator       TextureResourceObserversIter;
 
   TextureResourceObservers mObservers;
+  ResourcePolicy::Discardable mDiscardBitmapsPolicy;
 };
 
 

@@ -489,7 +489,7 @@ public:
         out << ", ";
       }
     }
-    mTextureTrace.PushCall("GenTexture", out.str());
+    mTextureTrace.PushCall("GenTextures", out.str());
   }
 
   inline void GetActiveAttrib(GLuint program, GLuint index, GLsizei bufsize, GLsizei* length, GLint* size, GLenum* type, char* name)

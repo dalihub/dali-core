@@ -38,21 +38,21 @@ namespace Internal
 namespace TextureFactory
 {
 
-Internal::Texture* NewBitmapTexture( Integration::Bitmap* const bitmap, Context& context )
+Internal::Texture* NewBitmapTexture( Integration::Bitmap* const bitmap, Context& context, ResourcePolicy::Discardable discardPolicy )
 {
   DALI_ASSERT_DEBUG( bitmap );
   Texture * texture = 0;
   Integration::Bitmap::PackedPixelsProfile * const  packedPixelBitmapView = bitmap->GetPackedPixelsProfile();
   if( packedPixelBitmapView )
   {
-    texture = new BitmapTexture( bitmap, packedPixelBitmapView, context );
+    texture = new BitmapTexture( bitmap, packedPixelBitmapView, context, discardPolicy );
   }
   else
   {
     Internal::BitmapCompressed * const compressedBitmap = dynamic_cast<Dali::Internal::BitmapCompressed*>( bitmap );
     if( compressedBitmap != 0 )
     {
-      texture = new CompressedBitmapTexture( compressedBitmap, context );
+      texture = new CompressedBitmapTexture( compressedBitmap, context, discardPolicy );
     }
   }
   if( texture )
@@ -70,9 +70,10 @@ Internal::Texture* NewBitmapTexture( unsigned int      width,
                                      unsigned int      height,
                                      Pixel::Format     pixelFormat,
                                      bool              clearPixels,
-                                     Context&          context )
+                                     Context&          context,
+                                     ResourcePolicy::Discardable discardPolicy )
 {
-  Texture *texture=new BitmapTexture(width, height, pixelFormat, clearPixels, context);
+  Texture *texture=new BitmapTexture(width, height, pixelFormat, clearPixels, context, discardPolicy);
 
   return texture;
 }
@@ -120,4 +121,3 @@ Internal::Texture* NewFrameBufferTexture( NativeImagePtr nativeImage,
 } // TextureFactory
 } // Internal
 } // Dali
-

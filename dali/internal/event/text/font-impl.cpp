@@ -337,7 +337,6 @@ TextVertexBuffer* Font::TextRequired( const Integration::TextArray& text, const 
 
   mMetrics->LoadMetricsSynchronously( text );
 
-
   return mAtlasManager.TextRequired(text, format, *(mMetrics.Get()));
 }
 

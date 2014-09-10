@@ -17,13 +17,16 @@
 
 #include <dali/internal/update/modeling/internal-mesh-data.h>
 
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/internal/event/common/thread-local-storage.h>
+
 namespace Dali
 {
 
 namespace Internal
 {
 
-MeshData::MeshData( const Dali::MeshData& meshData, bool discardable, bool scalingRequired )
+MeshData::MeshData( const Dali::MeshData& meshData, ResourcePolicy::Discardable discardable, bool scalingRequired )
 : mVertices( meshData.GetVertices() ),
   mFaces( meshData.GetFaces() ),
   mBones( meshData.GetBones() ),
@@ -32,7 +35,7 @@ MeshData::MeshData( const Dali::MeshData& meshData, bool discardable, bool scali
   mGeometryType( meshData.GetVertexGeometryType() ),
   mHasNormals( meshData.HasNormals() ),
   mHasColor( meshData.HasColor() ),
-  mDiscardable( discardable ),
+  mDiscardable( discardable==ResourcePolicy::DISCARD ),
   mDiscarded( false ),
   mScalingRequired( scalingRequired )
 {
@@ -118,7 +121,7 @@ bool MeshData::HasColor() const
 
 void MeshData::Discard()
 {
-  if (mDiscardable)
+  if( mDiscardable )
   {
     DALI_ASSERT_DEBUG( !mDiscarded );
     VertexContainer().swap(mVertices);  // this will enforce releasing the memory

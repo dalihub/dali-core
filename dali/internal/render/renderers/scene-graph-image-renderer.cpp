@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/integration-api/debug.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/render/common/culling-algorithms.h>
 #include <dali/internal/render/common/performance-monitor.h>
@@ -36,6 +37,10 @@ using namespace std;
 
 namespace
 {
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gImageRenderFilter=Debug::Filter::New(Debug::NoLogging, false, "LOG_IMAGE_RENDERER");
+#endif
+
 /**
  * VertexToTextureCoord
  * Represents a mapping between a 1 dimensional vertex coordinate
@@ -184,6 +189,8 @@ void ImageRenderer::GlContextDestroyed()
 
 void ImageRenderer::GlCleanup()
 {
+  DALI_LOG_INFO( gImageRenderFilter, Debug::Verbose, "GlCleanup() textureId=%d  texture:%p\n", mTextureId, mTexture);
+
   mVertexBuffer.Reset();
   mIndexBuffer.Reset();
 }
@@ -245,6 +252,8 @@ bool ImageRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix&
 
 void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
+  DALI_LOG_INFO( gImageRenderFilter, Debug::Verbose, "DoRender() textureId=%d  texture:%p\n", mTextureId, mTexture);
+
   DALI_ASSERT_DEBUG( 0 != mTextureId && "ImageRenderer::DoRender. mTextureId == 0." );
   DALI_ASSERT_DEBUG( NULL != mTexture && "ImageRenderer::DoRender. mTexture == NULL." );
 
@@ -256,6 +265,12 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
   DALI_ASSERT_DEBUG( mVertexBuffer );
 
   mTextureCache->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, GL_TEXTURE0 );
+
+  if( mTexture->GetTextureId() == 0 )
+  {
+    return; // early out if we haven't got a GL texture yet (e.g. due to context loss)
+  }
+
   mTexture->ApplySampler( mSamplerBitfield );
 
   // make sure the vertex is bound, this has to be done before

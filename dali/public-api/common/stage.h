@@ -54,6 +54,7 @@ public:
   typedef SignalV2< void (const KeyEvent&)> KeyEventSignalV2;  ///< Key event signal type
   typedef SignalV2< void () > EventProcessingFinishedSignalV2; ///< Event Processing finished signal type
   typedef SignalV2< void (const TouchEvent&)> TouchedSignalV2; ///< Touched signal type
+  typedef SignalV2< void () > ContextStatusSignal; // Context status signal type
 
   static const Vector4 DEFAULT_BACKGROUND_COLOR; ///< Default black background.
   static const Vector4 DEBUG_BACKGROUND_COLOR;   ///< Green background, useful when debugging.
@@ -62,6 +63,8 @@ public:
   static const char* const SIGNAL_KEY_EVENT; ///< name "key-event"
   static const char* const SIGNAL_EVENT_PROCESSING_FINISHED; ///< name "event-processing-finished"
   static const char* const SIGNAL_TOUCHED; ///< name "touched"
+  static const char* const SIGNAL_CONTEXT_LOST; ///< name "context-lost"
+  static const char* const SIGNAL_CONTEXT_REGAINED; ///< name "context-regained"
 
   /**
    * @brief Allows the creation of an empty stage handle.
@@ -288,6 +291,25 @@ public:
    * @return The touch signal to connect to.
    */
   TouchedSignalV2& TouchedSignal();
+
+  /**
+   * @brief This signal is emitted when the GL context is lost (Platform specific behaviour).
+   *
+   * If the application is responsible for handling context loss, it should listen to
+   * this signal and tear down UI components when recieved.
+   * @return The ContextLost signal to connect to.
+   */
+  ContextStatusSignal& ContextLostSignal();
+
+  /**
+   * @brief This signal is emitted when the GL context is regained (Platform specific
+   * behaviour).
+   *
+   * If the application is responsible for handling context loss, it should listen to
+   * this signal and rebuild UI components on receipt.
+   * @return The ContextRegained signal to connect to.
+   */
+  ContextStatusSignal& ContextRegainedSignal();
 
 public: // Not intended for application developers
 

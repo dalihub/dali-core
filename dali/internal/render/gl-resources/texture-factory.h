@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/images/native-image.h>
-
+#include <dali/internal/render/gl-resources/texture-cache.h>
 
 namespace Dali
 {
@@ -45,7 +45,9 @@ namespace TextureFactory
  * @param[in] context The GL context
  * @return A newly allocated texture
  */
-Internal::Texture* NewBitmapTexture( Integration::Bitmap* const bitmap, Context& context );
+Internal::Texture* NewBitmapTexture( Integration::Bitmap* const bitmap,
+                                     Context& context,
+                                     ResourcePolicy::Discardable discardPolicy );
 
 /**
  * Creates a new bitmap texture object of the given dimensions.
@@ -59,7 +61,8 @@ Internal::Texture* NewBitmapTexture( unsigned int      width,
                                      unsigned int      height,
                                      Pixel::Format     pixelFormat,
                                      bool              clearPixels,
-                                     Context&          context );
+                                     Context&          context,
+                                     ResourcePolicy::Discardable discardPolicy );
 
 /**
  * Creates a texture object from a native image (eg.: EGLImage).

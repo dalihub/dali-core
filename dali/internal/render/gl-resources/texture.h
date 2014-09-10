@@ -85,11 +85,12 @@ public:
 
   /**
    * Binds the texture for use.
-   * Only when Bind() is first called, does a texture create an
-   * an opengl texture.
+   * If there is no GL texture yet, it tries to create one.
+   *
    * @param target (e.g. GL_TEXTURE_2D)
    * @param textureunit to bind to
-   * @return True if the opengl texture was created
+   * @return True if the opengl texture was created, false if there was already a texture
+   * or no texture could be created yet ( e.g. no bitmap data after context loss )
    */
   virtual bool Bind(GLenum target, GLenum textureunit);
 
@@ -274,7 +275,6 @@ protected:
   unsigned int  mImageHeight;  ///< height of the original image (may be smaller than texture height)
 
   Pixel::Format mPixelFormat;  ///< Pixel format of the contained image data.
-  bool          mDiscarded;    ///< True if texture was added to the DiscardQueue
 
 };
 

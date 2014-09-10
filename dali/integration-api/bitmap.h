@@ -25,6 +25,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
@@ -53,13 +54,14 @@ typedef unsigned char                 PixelBuffer;  ///< Pixel data buffers are 
 class DALI_IMPORT_API Bitmap : public Dali::RefObject
 {
 protected:
+
   /**
    * Constructor
-   * Use the static function Bitmap::Create() to create instances.
+   * Use the static function Bitmap::New() to create instances.
    * @param[in] discardable Flag to tell the bitmap if it can delete the buffer with the pixel data.
    * @param[in] pixBuf External buffer of pixel data or null.
    */
-  Bitmap( bool discardable = false, Dali::Integration::PixelBuffer* pixBuf = 0 );
+  Bitmap( ResourcePolicy::Discardable discardable = ResourcePolicy::RETAIN, Dali::Integration::PixelBuffer* pixBuf = 0 );
 
   /**
    * Initializes internal class members
@@ -87,17 +89,18 @@ public:
   };
 
   /**
-   * Create a new instance of a Bitmap with the profile asked for.
+   * Create a new instance of a Bitmap with the required profile.
    * @return Pointer to created Bitmap subclass. Clients should immediately
    * wrap this in a reference-counting smart pointer or store it in a similarly
    * automatic owning collection.
    * @param[in] profile Defines required features of the bitmap (\sa Profile).
-   * @param[in] managePixelBuffer If true, the bitmap object owns it's own
-   * buffer of pixel data and can delete it, else the lifetime of the pixel
-   * buffer is managed by an external component and is guaranteed to remain
+   * @param[in] discardable If this is set to DISCARD, the bitmap
+   * object owns it's own buffer of pixel data and can delete it. If
+   * it's set to RETAIN, then the lifetime of the pixel buffer is
+   * managed by an external component and is guaranteed to remain
    * dereferenceable at least as long as the Bitmap remains alive.
    **/
-  static Bitmap* New(Profile profile, bool managePixelBuffer);
+  static Bitmap* New( Profile profile, ResourcePolicy::Discardable discardable );
 
   /** \name GeneralFeatures
    * Features that are generic between profiles. */
@@ -131,13 +134,13 @@ public:
   }
 
   /**
-   * Get the pixel buffer
-   * @return The buffer. You can modify its contents.
+   * Get the pixel buffer if it's present.
+   * @return The buffer if present, or NULL if there is no pixel buffer.
+   * You can modify its contents.
    * @sa ReserveBuffer GetBufferSize
    */
   virtual PixelBuffer* GetBuffer()
   {
-    DALI_ASSERT_DEBUG(mData != NULL);
     return mData;
   }
 
@@ -304,7 +307,7 @@ public:
    */
   bool IsDiscardable() const
   {
-    return mDiscardable;
+    return mDiscardable == ResourcePolicy::DISCARD;
   }
 
  /**
@@ -334,7 +337,7 @@ protected:
 
 private:
 
-  bool mDiscardable; ///< Should delete the buffer when discard buffer is called.
+  ResourcePolicy::Discardable mDiscardable; ///< Should delete the buffer when discard buffer is called.
 
   Bitmap(const Bitmap& other);  ///< defined private to prevent use
   Bitmap& operator = (const Bitmap& other); ///< defined private to prevent use
