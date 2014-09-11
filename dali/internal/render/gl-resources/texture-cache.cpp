@@ -363,6 +363,13 @@ void TextureCache::GlContextDestroyed()
   {
     (*iter->second).GlContextDestroyed(); // map holds intrusive pointers
   }
+
+  end = mFramebufferTextures.end();
+  iter = mFramebufferTextures.begin();
+  for( ; iter != end; ++iter )
+  {
+    (*iter->second).GlContextDestroyed(); // map holds intrusive pointers
+  }
 }
 
 /********************************************************************************
