@@ -22,7 +22,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
 
-#include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -52,15 +51,16 @@ TypeRegistration mType( typeid(Dali::Image), typeid(Dali::BaseHandle), CreateIma
 
 Dali::SignalConnectorType signalConnector1(mType, Dali::Image::SIGNAL_IMAGE_LOADING_FINISHED,    &Image::DoConnectSignal);
 Dali::SignalConnectorType signalConnector2(mType, Dali::Image::SIGNAL_IMAGE_UPLOADED,            &Image::DoConnectSignal);
+
 }
 
 Image::Image( LoadPolicy loadPol, ReleasePolicy releasePol )
-: mWidth(0),
+: mImageFactory(ThreadLocalStorage::Get().GetImageFactory()),
+  mWidth(0),
   mHeight(0),
-  mLoadPolicy(loadPol),
-  mReleasePolicy(releasePol),
   mConnectionCount(0),
-  mImageFactory(ThreadLocalStorage::Get().GetImageFactory())
+  mLoadPolicy(loadPol),
+  mReleasePolicy(releasePol)
 {
 }
 
@@ -83,34 +83,14 @@ ImagePtr Image::New( const std::string& filename, const Dali::ImageAttributes& a
     image = new Image( loadPol, releasePol );
     image->Initialize();
 
-    // if the attributes have a size, use that as natural size, otherwise get the size
-    const unsigned int width = attributes.GetWidth();
-    const unsigned int height = attributes.GetHeight();
-    // if one is zero, then there is some scaling calculation so we have to ask the loading logic what it will do
-    if( width > 0 && height > 0 )
-    {
-      image->mWidth  = width;
-      image->mHeight = height;
-      image->mRequest = image->mImageFactory.RegisterRequest( filename, &attributes );
-    }
-    else
-    {
-      // TODO do this query only if/when its needed (if someone is calling GetSize)
-      Integration::PlatformAbstraction& platformAbstraction = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
-      Vector2 closestSize;
-      platformAbstraction.GetClosestImageSize( filename, attributes, closestSize );
-      image->mWidth = closestSize.width;
-      image->mHeight = closestSize.height;
-      // need a new request object as we will request for the closest size
-      Dali::ImageAttributes newAttributes( attributes );
-      newAttributes.SetSize( closestSize );
-      image->mRequest = image->mImageFactory.RegisterRequest( filename, &newAttributes );
-    }
+    // consider the requested size as natural size, 0 means we don't (yet) know it
+    image->mWidth = attributes.GetWidth();
+    image->mHeight = attributes.GetHeight();
+    image->mRequest = image->mImageFactory.RegisterRequest( filename, &attributes );
 
     if( Dali::Image::Immediate == loadPol )
     {
-      // Trigger loading of the image on a seperate resource thread as soon as it
-      // can be scheduled:
+      // Trigger loading of the image on a as soon as it can be done
       image->mTicket = image->mImageFactory.Load( image->mRequest.Get() );
       image->mTicket->AddObserver( *image );
     }
@@ -189,17 +169,17 @@ const Dali::ImageAttributes& Image::GetAttributes() const
 {
   if( mTicket )
   {
-    return mImageFactory.GetActualAttributes( mTicket->GetId() );
+    return mImageFactory.GetActualAttributes( mTicket );
   }
   else
   {
-    return mImageFactory.GetRequestAttributes( mRequest.Get() );
+    return mImageFactory.GetRequestAttributes( mRequest );
   }
 }
 
 const std::string& Image::GetFilename() const
 {
-  return mImageFactory.GetRequestPath( mRequest.Get() );
+  return mImageFactory.GetRequestPath( mRequest );
 }
 
 void Image::Reload()
@@ -238,17 +218,36 @@ void Image::ResourceSavingFailed( const ResourceTicket& ticket )
 
 unsigned int Image::GetWidth() const
 {
+  // if width is 0, it means we've not yet loaded the image
+  if( 0u == mWidth )
+  {
+    Size size;
+    mImageFactory.GetImageSize( mRequest, mTicket, size );
+    mWidth = size.width;
+  }
   return mWidth;
 }
 
 unsigned int Image::GetHeight() const
 {
+  if( 0u == mHeight )
+  {
+    Size size;
+    mImageFactory.GetImageSize( mRequest, mTicket, size );
+    mHeight = size.height;
+  }
   return mHeight;
 }
 
 Vector2 Image::GetNaturalSize() const
 {
   Vector2 naturalSize(mWidth, mHeight);
+  if( 0u == mWidth || 0u == mHeight )
+  {
+    mImageFactory.GetImageSize( mRequest, mTicket, naturalSize );
+    mWidth = naturalSize.width;
+    mHeight = naturalSize.height;
+  }
   return naturalSize;
 }
 
@@ -312,7 +311,7 @@ void Image::SetTicket( ResourceTicket* ticket )
   }
 }
 
-bool Image::IsNinePatchFileName( std::string filename )
+bool Image::IsNinePatchFileName( const std::string& filename )
 {
   bool match = false;
 
