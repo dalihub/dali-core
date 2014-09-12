@@ -107,7 +107,7 @@ void Node::SetRoot(bool isRoot)
   mIsRoot = isRoot;
 }
 
-void Node::ConnectChild( Node* childNode )
+void Node::ConnectChild( Node* childNode, int index )
 {
   DALI_ASSERT_ALWAYS( this != childNode );
   DALI_ASSERT_ALWAYS( IsRoot() || NULL != mParent ); // Parent should be connected first
@@ -118,7 +118,14 @@ void Node::ConnectChild( Node* childNode )
   // Everything should be reinherited when reconnected to scene-graph
   childNode->SetAllDirtyFlags();
 
-  mChildren.PushBack( childNode );
+  if (index == -1)
+  {
+    mChildren.PushBack( childNode );
+  }
+  else
+  {
+    mChildren.Insert(mChildren.Begin()+index, childNode);
+  }
 }
 
 void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode, std::set<Node*>& connectedNodes,  std::set<Node*>& disconnectedNodes )

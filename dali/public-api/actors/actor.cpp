@@ -135,6 +135,11 @@ void Actor::Add(Actor actor)
   GetImplementation(*this).Add(GetImplementation(actor));
 }
 
+void Actor::Insert(unsigned int index, Actor actor)
+{
+  GetImplementation(*this).Insert(index, GetImplementation(actor));
+}
+
 void Actor::Remove(Actor actor)
 {
   GetImplementation(*this).Remove(GetImplementation(actor));

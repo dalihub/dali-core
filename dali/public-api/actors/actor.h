@@ -417,6 +417,25 @@ public:
   void Add(Actor child);
 
   /**
+   * @brief Inserts a child Actor to this actor's list of children at the given index
+   *
+   * NOTE! if the child already has a parent, it will be removed from old parent
+   * and reparented to this actor. This may change childs position, color,
+   * scale etc as it now inherits them from this actor
+   * @pre This Actor (the parent) has been initialized.
+   * @pre The child actor has been initialized.
+   * @pre The child actor is not the same as the parent actor.
+   * @pre The actor is not the Root actor
+   * @param [in] index of actor to insert before
+   * @param [in] child The child.
+   * @post The child will be referenced by its parent. This means that the child will be kept alive,
+   * even if the handle passed into this method is reset or destroyed.
+   * @post If the index is greater than the current child count, it will be ignored and added at the end.
+   * @post This may invalidate ActorContainer iterators.
+   */
+  void Insert(unsigned int index, Actor child);
+
+  /**
    * @brief Removes a child Actor from this Actor.
    *
    * If the actor was not a child of this actor, this is a no-op.
