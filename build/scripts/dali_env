@@ -46,6 +46,7 @@ my @system_packages = (
     "libturbojpeg",
     "libfribidi-dev",
     "doxygen",
+    "lcov",
 );
 
 # Make best guess as to where this program was run from (note, it is
