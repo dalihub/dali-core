@@ -281,6 +281,24 @@ public:
   */
   float GetCurrentProgress();
 
+  /**
+   * @brief Specifies an speed factor for the animation.
+   *
+   * The speed factor is a multiplier of the normal velocity of the animation. Values between [0,1] will
+   * slow down the animation and values above one will speed up the animation. It is also possible to specify a negative multiplier
+   * to play the animation in reverse.
+   *
+   * @param[in] factor A value which will multiply the velocity.
+   */
+  void SetSpeedFactor( float factor );
+
+  /**
+   * @brief Retrieve the speed factor of the animation
+   *
+   * @return speed factor
+   */
+  float GetSpeedFactor() const;
+
   /*
    * @brief Sets the progress of the animation.
    * The animation will play (or continue playing) from this point
