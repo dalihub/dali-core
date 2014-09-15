@@ -563,17 +563,12 @@ public:
   TimePeriod GetApplyTime() const;
 
   /**
-   * @brief Set the time taken for the constraint to be fully removed.
-   *
-   * The default is zero, meaning that the constraint is removed immediately.
-   * @param [in] timePeriod The constraint will be removed during this time period.
+   * @deprecated Use animation API directly instead.
    */
   void SetRemoveTime( TimePeriod timePeriod );
 
   /**
-   * @brief Retrieve the time taken for the constraint to be fully removed.
-   *
-   * @return The remove time.
+   * @deprecated Use animation API directly instead.
    */
   TimePeriod GetRemoveTime() const;
 

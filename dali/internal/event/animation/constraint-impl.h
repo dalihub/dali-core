@@ -69,16 +69,6 @@ public:
   TimePeriod GetApplyTime() const;
 
   /**
-   * @copydoc Dali::Constraint::SetRemoveTime()
-   */
-  void SetRemoveTime( TimePeriod timePeriod );
-
-  /**
-   * @copydoc Dali::Constraint::GetRemoveTime()
-   */
-  TimePeriod GetRemoveTime() const;
-
-  /**
    * @copydoc Dali::Constraint::SetAlphaFunction( AlphaFunction func )
    */
   void SetAlphaFunction( AlphaFunction func );

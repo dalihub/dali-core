@@ -27,6 +27,8 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/set-wrapper.h>
+#include <dali/internal/event/animation/constraint-source-impl.h>
 
 namespace Dali
 {
@@ -35,7 +37,8 @@ namespace Internal
 {
 
 class EventToUpdate;
-class ProxyObject;
+typedef std::set<ProxyObject*>         ProxyObjectContainer;
+typedef ProxyObjectContainer::iterator ProxyObjectIter;
 
 namespace SceneGraph
 {
@@ -48,7 +51,7 @@ class AnimatableProperty;
 /**
  * An abstract base class for active constraints.
  */
-class ActiveConstraintBase : public ProxyObject
+class ActiveConstraintBase : public ProxyObject, public ProxyObject::Observer
 {
 public:
 
@@ -59,8 +62,10 @@ public:
    * Constructor.
    * @param[in] messageController Used to send messages to the update-thread.
    * @param[in] targetPropertyIndex The index of the property being constrained.
+   * @param[in] sources The sources of the input properties.
+   * @param[in] sourceCount The original number of sources; this may not match sources.size() if objects have died.
    */
-  ActiveConstraintBase( EventToUpdate& messageController, Property::Index targetPropertyIndex );
+  ActiveConstraintBase( EventToUpdate& messageController, Property::Index targetPropertyIndex, SourceContainer& sources, unsigned int sourceCount );
 
   /**
    * Virtual destructor.
@@ -94,11 +99,19 @@ public:
   void BeginRemove();
 
   /**
-   * Query whether the constraint is being removed.
-   * This is only possible if mRemoveTime.durationSeconds is non-zero.
-   * @return True if constraint is being removed.
+   * Called when the target object is destroyed.
    */
-  bool IsRemoving();
+  void OnParentDestroyed();
+
+  /**
+   * Called when the target object is connected to the scene-graph
+   */
+  void OnParentSceneObjectAdded();
+
+  /**
+   * Called when the target object is disconnected from the scene-graph
+   */
+  void OnParentSceneObjectRemoved();
 
   /**
    * Retrieve the parent of the active-constraint.
@@ -137,16 +150,6 @@ public:
   ActiveConstraintSignalV2& AppliedSignal();
 
   /**
-   * @copydoc Dali::Constraint::SetRemoveTime()
-   */
-  void SetRemoveTime( TimePeriod timePeriod );
-
-  /**
-   * @copydoc Dali::Constraint::GetRemoveTime()
-   */
-  TimePeriod GetRemoveTime() const;
-
-  /**
    * @copydoc Dali::Constraint::SetAlphaFunction()
    */
   void SetAlphaFunction(AlphaFunction func);
@@ -175,8 +178,6 @@ public:
    * @copydoc Dali::Constraint::GetTag()
    */
   unsigned int GetTag() const;
-
-
 
   /**
    * Connects a callback function with the object's signals.
@@ -271,7 +272,34 @@ public: // Default property extensions from ProxyObject
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 
+public: // ProxyObject::Observer methods
+
+  /**
+   * @copydoc ProxyObject::Observer::SceneObjectAdded()
+   */
+  virtual void SceneObjectAdded( ProxyObject& proxy );
+
+  /**
+   * @copydoc ProxyObject::Observer::SceneObjectRemoved()
+   */
+  virtual void SceneObjectRemoved( ProxyObject& proxy );
+
+  /**
+   * @copydoc ProxyObject::Observer::ProxyDestroyed()
+   */
+  virtual void ProxyDestroyed( ProxyObject& proxy );
+
 private:
+
+  /**
+   * Helper to observe a proxy, if not already observing it
+   */
+  void ObserveProxy( ProxyObject& proxy );
+
+  /**
+   * Helper to stop observing proxies
+   */
+  void StopObservation();
 
   /**
    * Helper called after the first apply animation.
@@ -279,46 +307,29 @@ private:
    */
   static void FirstApplyFinished( Object* object );
 
-  /**
-   * Helper called after the remove animation.
-   * @param [in] object The active constraint.
-   */
-  static void OnRemoveFinished( Object* object );
-
   // To be implemented in derived classes
 
   /**
-   * Used to observe the lifetime of an object with custom "weight" property
-   * @param [in] weightObject The object.
+   * Create and connect a constraint for a scene-object.
    */
-  virtual void OnCustomWeightSet( ProxyObject& weightObject ) = 0;
-
-  /**
-   * Set the parent of the active-constraint; called during OnFirstApply().
-   * @param [in] parent The parent object.
-   */
-  virtual void OnFirstApply( ProxyObject& parent ) = 0;
-
-  /**
-   * Notification for the derived class, when BeginRemove() is called.
-   */
-  virtual void OnBeginRemove() = 0;
+  virtual void ConnectConstraint() = 0;
 
 protected:
 
   EventToUpdate& mEventToUpdate;
 
   Property::Index mTargetPropertyIndex;
+  SourceContainer mSources;
+  const unsigned int mSourceCount;
 
   ProxyObject* mTargetProxy; ///< The proxy-object owns the active-constraint.
+  ProxyObjectContainer mObservedProxies; // We don't observe the same object twice
 
   const SceneGraph::ConstraintBase* mSceneGraphConstraint;
 
   const SceneGraph::AnimatableProperty<float>* mCustomWeight;
 
   float mOffstageWeight;
-
-  TimePeriod mRemoveTime;
 
   AlphaFunction mAlphaFunction;
 
@@ -330,8 +341,6 @@ private:
   ActiveConstraintSignalV2 mAppliedSignal;
 
   Dali::Animation mApplyAnimation;  ///< Used to automatically animate weight from 0.0f -> 1.0f
-  Dali::Animation mRemoveAnimation; ///< Used to automatically animate weight back to 0.0f
-
 
 };
 

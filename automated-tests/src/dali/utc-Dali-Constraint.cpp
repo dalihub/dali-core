@@ -2412,99 +2412,6 @@ int UtcDaliConstraintGetApplyTime(void)
   END_TEST;
 }
 
-int UtcDaliConstraintSetRemoveTime(void)
-{
-  TestApplication application;
-
-  Vector3 sourcePosition(0.0f, 0.0f, 0.0f);
-  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
-
-  // Build constraint
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, TestPositionConstraint(targetPosition) );
-  DALI_TEST_EQUALS(constraint.GetRemoveTime(), TimePeriod(0.0f), TEST_LOCATION);
-
-  float removeSeconds(8.0f);
-  constraint.SetRemoveTime(removeSeconds);
-  DALI_TEST_EQUALS(constraint.GetRemoveTime(), TimePeriod(removeSeconds), TEST_LOCATION);
-
-  // Apply to an actor
-
-  Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
-
-  actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), sourcePosition, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(100u/*0.1 seconds*/);
-
-  // Constraint should be fully applied
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
-
-  // Check that nothing has changed after a couple of buffer swaps
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
-
-  // Remove from the actor, and set to alternative position
-
-  actor.RemoveConstraints();
-
-  Vector3 thirdPosition(200.0f, 200.0f, 200.0f);
-  actor.SetPosition(thirdPosition); // Go back to 3rd position
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 20% removal progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 twentyPercentBack( targetPosition + (thirdPosition - targetPosition)*0.2f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), twentyPercentBack, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 40% removal progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 fourtyPercentBack( targetPosition + (thirdPosition - targetPosition)*0.4f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), fourtyPercentBack, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 60% removal progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 sixtyPercentBack( targetPosition + (thirdPosition - targetPosition)*0.6f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), sixtyPercentBack, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 80% removal progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 eightyPercentBack( targetPosition + (thirdPosition - targetPosition)*0.8f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), eightyPercentBack, TEST_LOCATION );
-
-  // Constraint should be fully removed
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 100% removal progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), thirdPosition, TEST_LOCATION );
-
-  // Constraint should still be fully applied
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* Still 100% removal progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), thirdPosition, TEST_LOCATION );
-
-  // Check that nothing has changed after a couple of buffer swaps
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), thirdPosition, TEST_LOCATION );
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), thirdPosition, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliConstraintGetRemoveTime(void)
-{
-  TestApplication application;
-
-  Constraint constraint = Constraint::New<Vector4>( Actor::COLOR, TestConstraint() );
-  DALI_TEST_EQUALS(constraint.GetRemoveTime(), TimePeriod(0.0f), TEST_LOCATION);
-  END_TEST;
-}
-
 int UtcDaliConstraintSetAlphaFunction(void)
 {
   TestApplication application;
@@ -2634,10 +2541,6 @@ int UtcDaliConstraintSetRemoveAction(void)
   constraint.SetRemoveAction(Constraint::Discard);
   DALI_TEST_EQUALS((unsigned int)constraint.GetRemoveAction(), (unsigned int)Constraint::Discard, TEST_LOCATION);
 
-  float removeSeconds(8.0f);
-  constraint.SetRemoveTime(removeSeconds);
-  DALI_TEST_EQUALS(constraint.GetRemoveTime(), TimePeriod(removeSeconds), TEST_LOCATION);
-
   // Apply to an actor
 
   Actor actor = Actor::New();
@@ -2659,40 +2562,16 @@ int UtcDaliConstraintSetRemoveAction(void)
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
 
   // Remove from the actor
-
   actor.RemoveConstraints(); // should go back to source position
 
   application.SendNotification();
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 20% removal progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 twentyPercentBack( targetPosition * 0.8f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), twentyPercentBack, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 40% removal progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 fourtyPercentBack( targetPosition * 0.6f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), fourtyPercentBack, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 60% removal progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 sixtyPercentBack( targetPosition * 0.4f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), sixtyPercentBack, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 80% removal progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 eightyPercentBack( targetPosition * 0.2f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), eightyPercentBack, TEST_LOCATION );
+  application.Render(static_cast<unsigned int>(1000.0f));
 
   // Constraint should be fully removed
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* 100% removal progress */);
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), sourcePosition, TEST_LOCATION );
 
-  // Constraint should still be fully applied
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* Still 100% removal progress */);
+  // Constraint should still be fully removed
+  application.Render(static_cast<unsigned int>(1000.0f)/* Still 100% removal progress */);
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), sourcePosition, TEST_LOCATION );
 
   // Check that nothing has changed after a couple of buffer swaps
@@ -2719,83 +2598,6 @@ int UtcDaliConstraintGetRemoveAction(void)
 }
 
 /**
- * Test a constraint with non-zero apply-time and remove-time, where the constraint is removed during the apply-time
- */
-int UtcDaliConstraintRemoveDuringApply(void)
-{
-  TestApplication application;
-
-  Vector3 sourcePosition(0.0f, 0.0f, 0.0f);
-  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
-  Vector3 halfwayPosition(targetPosition * 0.5f);
-
-  // Build constraint
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, TestPositionConstraint(targetPosition) );
-  DALI_TEST_EQUALS((unsigned int)constraint.GetRemoveAction(), (unsigned int)Constraint::Bake, TEST_LOCATION);
-
-  float applySeconds(4.0f);
-  constraint.SetApplyTime(applySeconds);
-  DALI_TEST_EQUALS(constraint.GetApplyTime(), TimePeriod(applySeconds), TEST_LOCATION);
-
-  float removeSeconds(8.0f);
-  constraint.SetRemoveTime(removeSeconds);
-  DALI_TEST_EQUALS(constraint.GetRemoveTime(), TimePeriod(removeSeconds), TEST_LOCATION);
-
-  // Apply to an actor
-
-  Actor actor = Actor::New();
-  Stage::GetCurrent().Add(actor);
-
-  actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), sourcePosition, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(applySeconds*250.0f)/* 25% progress */);
-
-  // Constraint shouldn't be fully applied yet
-  Vector3 twentyFivePercent( targetPosition * 0.25f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), twentyFivePercent, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(applySeconds*250.0f)/* 50% progress */);
-
-  // Constraint shouldn't be fully applied yet
-  Vector3 fiftyPercent( targetPosition * 0.5f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), fiftyPercent, TEST_LOCATION );
-
-  // Remove from the actor
-
-  actor.RemoveConstraints(); // should go back to source position
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(removeSeconds*100.0f)/* 50% - 5% = 45% progress */);
-
-  // Constraint shouldn't be fully removed yet
-  Vector3 fourtyFivePercent( targetPosition * 0.45f );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), fourtyFivePercent, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(removeSeconds*400.0f)/* 50% - 25% = 25% progress */);
-
-  // Constraint shouldn't be fully removed yet
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), twentyFivePercent, TEST_LOCATION );
-
-  // Constraint should be fully removed
-  application.Render(static_cast<unsigned int>(removeSeconds*500.0f)/* 0% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), sourcePosition, TEST_LOCATION );
-
-  // Constraint should still be fully applied
-  application.Render(static_cast<unsigned int>(removeSeconds*200.0f)/* Still 0% progress */);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), sourcePosition, TEST_LOCATION );
-
-  // Check that nothing has changed after a couple of buffer swaps
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), sourcePosition, TEST_LOCATION );
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), sourcePosition, TEST_LOCATION );
-  END_TEST;
-}
-
-/**
  * Test a constraint with non-zero apply-time & zero (immediate) remove-time, where the constraint is removed during the apply-time
  */
 int UtcDaliConstraintImmediateRemoveDuringApply(void)
@@ -2813,7 +2615,6 @@ int UtcDaliConstraintImmediateRemoveDuringApply(void)
   float applySeconds(4.0f);
   constraint.SetApplyTime(applySeconds);
   DALI_TEST_EQUALS(constraint.GetApplyTime(), TimePeriod(applySeconds), TEST_LOCATION);
-  DALI_TEST_EQUALS(constraint.GetRemoveTime(), TimePeriod(0.0f), TEST_LOCATION);
 
   // Apply to an actor
 

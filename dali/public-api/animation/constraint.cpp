@@ -72,12 +72,13 @@ TimePeriod Constraint::GetApplyTime() const
 
 void Constraint::SetRemoveTime( TimePeriod timePeriod )
 {
-  GetImplementation(*this).SetRemoveTime( timePeriod );
+  // TODO - Remove this deprecated method
 }
 
 TimePeriod Constraint::GetRemoveTime() const
 {
-  return GetImplementation(*this).GetRemoveTime();
+  // TODO - Remove this deprecated method
+  return TimePeriod(0.0f);
 }
 
 void Constraint::SetAlphaFunction( AlphaFunction func )

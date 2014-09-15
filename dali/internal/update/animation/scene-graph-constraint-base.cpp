@@ -30,6 +30,11 @@ namespace Internal
 namespace SceneGraph
 {
 
+#ifdef DEBUG_ENABLED
+  unsigned int ConstraintBase::mCurrentInstanceCount = 0;
+  unsigned int ConstraintBase::mTotalInstanceCount   = 0;
+#endif
+
 ConstraintBase::ConstraintBase( PropertyOwnerSet& ownerSet )
 : mWeight( Dali::ActiveConstraint::DEFAULT_WEIGHT ),
   mRemoveAction( Dali::Constraint::DEFAULT_REMOVE_ACTION ),
@@ -37,6 +42,10 @@ ConstraintBase::ConstraintBase( PropertyOwnerSet& ownerSet )
   mDisconnected( true ),
   mObservedOwners( ownerSet )
 {
+#ifdef DEBUG_ENABLED
+  ++mCurrentInstanceCount;
+  ++mTotalInstanceCount;
+#endif
 }
 
 ConstraintBase::~ConstraintBase()
@@ -46,10 +55,11 @@ ConstraintBase::~ConstraintBase()
     StopObservation();
   }
 
-// TODO - Override new & delete to provide this for everything
-#if defined(DEBUG_ENABLED) && !defined(EMSCRIPTEN)
-  // Fill with garbage pattern to help detect invalid memory access
-  memset ( &mWeight, 0xFA, sizeof(mWeight) );
+#ifdef DEBUG_ENABLED
+  --mCurrentInstanceCount;
+#ifndef EMSCRIPTEN
+  memset ( &mWeight, 0xFA, sizeof(mWeight) ); // Fill with garbage pattern to help detect invalid memory access
+#endif
 #endif
 }
 
@@ -57,6 +67,24 @@ void ConstraintBase::ResetDefaultProperties( BufferIndex updateBufferIndex )
 {
   // Not used, since the weight property is reset by PropertyOwner
   DALI_ASSERT_DEBUG( false );
+}
+
+unsigned int ConstraintBase::GetCurrentInstanceCount()
+{
+#ifdef DEBUG_ENABLED
+  return mCurrentInstanceCount;
+#else
+  return 0u;
+#endif
+}
+
+unsigned int ConstraintBase::GetTotalInstanceCount()
+{
+#ifdef DEBUG_ENABLED
+  return mTotalInstanceCount;
+#else
+  return 0u;
+#endif
 }
 
 } // namespace SceneGraph

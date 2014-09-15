@@ -324,11 +324,6 @@ private:
   ActiveConstraintBase* DoApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject );
 
   /**
-   * Helper to delete removed constraints
-   */
-  void DeleteRemovedConstraints();
-
-  /**
    * Helper to remove active constraints
    */
   void RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph );
@@ -449,7 +444,6 @@ private:
   Dali::Vector<Observer*> mObservers;
 
   ActiveConstraintContainer* mConstraints;               ///< Container of owned active-constraints.
-  ActiveConstraintContainer* mRemovedConstraints;        ///< Container of owned active-constraints, which are being removed.
 
   typedef std::vector< Dali::PropertyNotification >     PropertyNotificationContainer;
   typedef PropertyNotificationContainer::iterator       PropertyNotificationContainerIter;
