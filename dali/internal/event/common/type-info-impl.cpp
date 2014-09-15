@@ -225,7 +225,6 @@ void TypeInfo::GetProperties( Dali::TypeInfo::NameContainer& ret ) const
 
   ret.reserve(indices.size());
 
-  typedef std::vector< Property::Index > IndexContainer; ///< A vector of property indices
   for(Property::IndexContainer::iterator iter = indices.begin(); iter != indices.end(); ++iter)
   {
     const std::string& name = GetPropertyName( *iter );
