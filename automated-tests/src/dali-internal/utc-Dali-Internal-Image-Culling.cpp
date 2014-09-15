@@ -48,8 +48,12 @@ Image LoadImage( TestApplication& application, GLuint textureId, int width, int 
   Image image;
   char* filename = NULL;
   int numChars = asprintf(&filename, "image%u.png", textureId );
+
   if( numChars > 0 )
   {
+    const Vector2 closestImageSize( width, height );
+    application.GetPlatform().SetClosestImageSize(closestImageSize);
+
     image = Image::New( filename, Image::Immediate, Image::Never );
     free (filename);
   }
