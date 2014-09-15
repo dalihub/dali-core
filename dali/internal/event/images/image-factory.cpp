@@ -27,6 +27,7 @@
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/resources/resource-manager.h>
+#include <dali/internal/common/dali-hash.h>
 
 // EXTERNAL INCLUDES
 #include <float.h>

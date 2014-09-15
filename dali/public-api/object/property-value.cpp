@@ -882,6 +882,23 @@ Property::Value& Property::Value::GetItem(const int index) const
   return null;
 }
 
+Property::Value& Property::Value::GetItem(const int index, std::string& key) const
+{
+  Property::Value& ret( GetItem(index) );
+
+  if( Property::MAP == GetType() )
+  {
+    Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
+    if( index < static_cast<int>(container->size()) )
+    {
+
+      key = (*container)[ index ].first;
+    }
+  }
+
+  return ret;
+}
+
 void Property::Value::SetItem(const int index, const Property::Value &value)
 {
   switch( GetType() )

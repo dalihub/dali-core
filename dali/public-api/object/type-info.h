@@ -122,42 +122,49 @@ public:
    *
    * @return string name
    */
-  const std::string& GetName();
+  const std::string& GetName() const;
 
   /**
    * @brief Retrieve the base type name for this type.
    *
    * @return string of base name
    */
-  const std::string& GetBaseName();
+  const std::string& GetBaseName() const;
 
   /**
    * @brief Create an object from this type.
    *
    * @return the BaseHandle for the newly created object
    */
-  BaseHandle CreateInstance();
+  BaseHandle CreateInstance() const;
 
   /**
    * @brief Retrieve the creator function for this type.
    *
    * @return the creator function
    */
-  CreateFunction GetCreator();
+  CreateFunction GetCreator() const;
 
   /**
    * @brief Retrieve the actions for this type.
    *
-   * @return Container of action names
+   * @param[in] container of action names
    */
-  NameContainer GetActions();
+  void GetActions( NameContainer &container ) const;
 
   /**
    * @brief Retrieve the signals for this type.
    *
-   * @return Container of signal names
+   * @param[in] container of action names
    */
-  NameContainer GetSignals();
+  void GetSignals( NameContainer &container ) const;
+
+  /**
+   * @brief Retrieve the event side registered properties for this type.
+   *
+   * @param[in] container of action names
+   */
+  void GetProperties( NameContainer &container ) const;
 
   // Properties
 

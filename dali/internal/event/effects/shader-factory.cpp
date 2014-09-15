@@ -21,9 +21,9 @@
 // EXTERNAL INCLUDES
 #include <algorithm>
 #include <sstream>
-#include <boost/functional/hash.hpp>
 
 // INTERNAL INCLUDES
+#include <dali/internal/common/dali-hash.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/resources/resource-client.h>
@@ -220,7 +220,8 @@ size_t ShaderFactory::HashShaderSource(const std::string& vertexSource, const st
   source.erase(std::remove(source.begin(), source.end(), '\n'), source.end());
   source.erase(std::remove(source.begin(), source.end(), '\t'), source.end());
 
-  return boost::hash_value( source );
+  StringHash hasher;
+  return hasher( source );
 }
 
 } // namespace Internal

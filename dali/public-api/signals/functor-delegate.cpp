@@ -29,8 +29,10 @@ namespace
  * functions and regular functions.
  * If this assert fails, please implement the template specialisation for C functions.
  */
+#if !defined(EMSCRIPTEN)
 void Function() { }
 DALI_COMPILE_TIME_ASSERT( sizeof(void*) == sizeof(&Function) );
+#endif
 }
 
 FunctorDelegate::~FunctorDelegate()

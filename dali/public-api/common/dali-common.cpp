@@ -22,9 +22,9 @@
 #include <stdlib.h>
 #include <string>
 #include <cstdio>
-#include <execinfo.h>
 
 #ifndef EMSCRIPTEN // cxxabi not supported
+# include <execinfo.h>
 # include <cxxabi.h>
 #endif
 

@@ -130,7 +130,7 @@ unsigned int ProxyObject::GetPropertyCount() const
 
   DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Default Properties: %d\n", count );
 
-  TypeInfo* typeInfo( GetTypeInfo() );
+  const TypeInfo* typeInfo( GetTypeInfo() );
   if ( typeInfo )
   {
     unsigned int manual( typeInfo->GetPropertyCount() );
@@ -163,7 +163,7 @@ const std::string& ProxyObject::GetPropertyName( Property::Index index ) const
 
   if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    TypeInfo* typeInfo( GetTypeInfo() );
+    const TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
     {
       return typeInfo->GetPropertyName( index );
@@ -190,7 +190,7 @@ Property::Index ProxyObject::GetPropertyIndex(const std::string& name) const
 
   if ( index == Property::INVALID_INDEX )
   {
-    TypeInfo* typeInfo( GetTypeInfo() );
+    const TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
     {
       index = typeInfo->GetPropertyIndex( name );
@@ -224,7 +224,7 @@ bool ProxyObject::IsPropertyWritable( Property::Index index ) const
 
   if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    TypeInfo* typeInfo( GetTypeInfo() );
+    const TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
     {
       return typeInfo->IsPropertyWritable( index );
@@ -310,7 +310,7 @@ Property::Type ProxyObject::GetPropertyType( Property::Index index ) const
 
   if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    TypeInfo* typeInfo( GetTypeInfo() );
+    const TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
     {
       return typeInfo->GetPropertyType( index );
@@ -343,7 +343,7 @@ void ProxyObject::SetProperty( Property::Index index, const Property::Value& pro
   }
   else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    TypeInfo* typeInfo( GetTypeInfo() );
+    const TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
     {
       typeInfo->SetProperty( this, index, propertyValue );
@@ -381,7 +381,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
   }
   else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    TypeInfo* typeInfo( GetTypeInfo() );
+    const TypeInfo* typeInfo( GetTypeInfo() );
     if ( typeInfo )
     {
       value = typeInfo->GetProperty( this, index );
@@ -508,7 +508,7 @@ void ProxyObject::GetPropertyIndices( Property::IndexContainer& indices ) const
   GetDefaultPropertyIndices( indices );
 
   // Manual Properties
-  TypeInfo* typeInfo( GetTypeInfo() );
+  const TypeInfo* typeInfo( GetTypeInfo() );
   if ( typeInfo )
   {
     typeInfo->GetPropertyIndices( indices );
@@ -914,7 +914,7 @@ CustomPropertyLookup& ProxyObject::GetCustomPropertyLookup() const
   return *mCustomProperties;
 }
 
-TypeInfo* ProxyObject::GetTypeInfo() const
+const TypeInfo* ProxyObject::GetTypeInfo() const
 {
   if ( !mTypeInfo )
   {
@@ -1035,7 +1035,7 @@ void ProxyObject::RemoveConstraints()
   }
 }
 
-void ProxyObject::SetTypeInfo( TypeInfo* typeInfo )
+void ProxyObject::SetTypeInfo( const TypeInfo* typeInfo )
 {
   mTypeInfo = typeInfo;
 }

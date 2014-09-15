@@ -23,6 +23,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/text/atlas/glyph-atlas-manager.h>
+#include <dali/internal/common/dali-hash.h>
 
 // EXTERNAL INCLUDES
 #include <boost/functional/hash.hpp>

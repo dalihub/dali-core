@@ -288,7 +288,7 @@ public: // Called by TypeInfo
    * Called by TypeInfo to set the type-info that this proxy-object is created by.
    * @param[in] typeInfo The TypeInfo that creates this proxy-object.
    */
-  void SetTypeInfo( TypeInfo* typeInfo );
+  void SetTypeInfo( const TypeInfo* typeInfo );
 
 protected:
 
@@ -437,14 +437,14 @@ protected:
    * to it locally there-after. The type info will not change during the life-time of the application.
    * @return The type-info for this object (Can be NULL)
    */
-  TypeInfo* GetTypeInfo() const;
+  const TypeInfo* GetTypeInfo() const;
 
 private:
 
   Property::Index mNextCustomPropertyIndex; ///< The ID of the next custom property to be registered
 
   mutable CustomPropertyLookup* mCustomProperties; ///< Used for accessing custom Node properties, mutable so it can be lazy initialized from const function
-  mutable TypeInfo* mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
+  mutable TypeInfo const *  mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
 
   Dali::Vector<Observer*> mObservers;
 

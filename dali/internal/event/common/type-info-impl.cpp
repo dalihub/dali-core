@@ -93,7 +93,7 @@ TypeInfo::~TypeInfo()
 {
 }
 
-BaseHandle TypeInfo::CreateInstance()
+BaseHandle TypeInfo::CreateInstance() const
 {
   BaseHandle ret;
 
@@ -162,26 +162,24 @@ bool TypeInfo::ConnectSignal( BaseObject* object, ConnectionTrackerInterface* co
   return connected;
 }
 
-const std::string& TypeInfo::GetName()
+const std::string& TypeInfo::GetName() const
 {
   return mTypeName;
 }
 
-const std::string& TypeInfo::GetBaseName()
+const std::string& TypeInfo::GetBaseName() const
 {
   return mBaseTypeName;
 }
 
-Dali::TypeInfo::CreateFunction TypeInfo::GetCreator()
+Dali::TypeInfo::CreateFunction TypeInfo::GetCreator() const
 {
   return mCreate;
 }
 
-Dali::TypeInfo::NameContainer TypeInfo::GetActions()
+void TypeInfo::GetActions( Dali::TypeInfo::NameContainer& ret ) const
 {
-  Dali::TypeInfo::NameContainer ret;
-
-  for(ActionContainer::iterator iter = mActions.begin(); iter != mActions.end(); ++iter)
+  for(ActionContainer::const_iterator iter = mActions.begin(); iter != mActions.end(); ++iter)
   {
     ret.push_back(iter->first);
   }
@@ -189,7 +187,7 @@ Dali::TypeInfo::NameContainer TypeInfo::GetActions()
   Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
   while( base )
   {
-    for(ActionContainer::iterator iter = GetImplementation(base).mActions.begin();
+    for(ActionContainer::const_iterator iter = GetImplementation(base).mActions.begin();
         iter != GetImplementation(base).mActions.end(); ++iter)
     {
       ret.push_back(iter->first);
@@ -197,15 +195,11 @@ Dali::TypeInfo::NameContainer TypeInfo::GetActions()
 
     base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
   }
-
-  return ret;
 }
 
-Dali::TypeInfo::NameContainer TypeInfo::GetSignals()
+void TypeInfo::GetSignals(Dali::TypeInfo::NameContainer& ret) const
 {
-  Dali::TypeInfo::NameContainer ret;
-
-  for(ConnectorContainerV2::iterator iter = mSignalConnectors.begin(); iter != mSignalConnectors.end(); ++iter)
+  for(ConnectorContainerV2::const_iterator iter = mSignalConnectors.begin(); iter != mSignalConnectors.end(); ++iter)
   {
     ret.push_back(iter->first);
   }
@@ -213,7 +207,7 @@ Dali::TypeInfo::NameContainer TypeInfo::GetSignals()
   Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
   while( base )
   {
-    for(ConnectorContainerV2::iterator iter = GetImplementation(base).mSignalConnectors.begin();
+    for(ConnectorContainerV2::const_iterator iter = GetImplementation(base).mSignalConnectors.begin();
         iter != GetImplementation(base).mSignalConnectors.end(); ++iter)
     {
       ret.push_back(iter->first);
@@ -221,8 +215,29 @@ Dali::TypeInfo::NameContainer TypeInfo::GetSignals()
 
     base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
   }
+}
 
-  return ret;
+void TypeInfo::GetProperties( Dali::TypeInfo::NameContainer& ret ) const
+{
+  Property::IndexContainer indices;
+
+  GetPropertyIndices(indices);
+
+  ret.reserve(indices.size());
+
+  typedef std::vector< Property::Index > IndexContainer; ///< A vector of property indices
+  for(Property::IndexContainer::iterator iter = indices.begin(); iter != indices.end(); ++iter)
+  {
+    const std::string& name = GetPropertyName( *iter );
+    if(name.size())
+    {
+      ret.push_back( name );
+    }
+    else
+    {
+      DALI_LOG_WARNING("Property had no name\n");
+    }
+  }
 }
 
 void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
@@ -430,10 +445,10 @@ Property::Type TypeInfo::GetPropertyType( Property::Index index ) const
   return type;
 }
 
-void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Property::Value& value )
+void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Property::Value& value ) const
 {
-  RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
-                                                    PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                              PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
   if ( iter != mRegisteredProperties.end() )
   {
     DALI_ASSERT_ALWAYS( iter->second.setFunc && "Trying to write to a read-only property" );
@@ -453,10 +468,10 @@ void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Pro
   }
 }
 
-void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const Property::Value& value )
+void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const Property::Value& value ) const
 {
-  RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
-                                                    PropertyNameFinder< RegisteredPropertyPair >( name ) );
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                              PropertyNameFinder< RegisteredPropertyPair >( name ) );
   if ( iter != mRegisteredProperties.end() )
   {
     DALI_ASSERT_ALWAYS( iter->second.setFunc && "Trying to write to a read-only property" );
@@ -476,7 +491,7 @@ void TypeInfo::SetProperty( BaseObject *object, const std::string& name, const P
   }
 }
 
-Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index index )
+Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index index ) const
 {
   RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
                                                           PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
@@ -497,7 +512,7 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
   return Property::Value();
 }
 
-Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::string& name )
+Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::string& name ) const
 {
   RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
                                                           PropertyNameFinder< RegisteredPropertyPair >( name ) );

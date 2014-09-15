@@ -41,6 +41,8 @@ class DALI_IMPORT_API PlatformAbstraction
 {
 public:
 
+  virtual ~PlatformAbstraction() {}
+
   // Dali Lifecycle
 
   /**

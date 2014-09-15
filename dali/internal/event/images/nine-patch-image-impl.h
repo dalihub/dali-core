@@ -134,7 +134,6 @@ private:
 private:
   ResourceClient*               mResourceClient;
   Integration::BitmapPtr        mBitmap;
-  SceneGraph::UpdateManager*    mUpdateManager;
   Vector4                       mStretchBorders;
   Rect<int>                     mChildRectangle;
   bool                          mParsedBorder;

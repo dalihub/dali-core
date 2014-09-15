@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <boost/functional/hash.hpp>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
@@ -47,8 +46,6 @@
 
 namespace Dali
 {
-
-typedef boost::hash<const std::string> StringHash;
 
 class NativeImage;
 
