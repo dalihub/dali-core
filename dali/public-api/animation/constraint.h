@@ -563,16 +563,6 @@ public:
   TimePeriod GetApplyTime() const;
 
   /**
-   * @deprecated Use animation API directly instead.
-   */
-  void SetRemoveTime( TimePeriod timePeriod );
-
-  /**
-   * @deprecated Use animation API directly instead.
-   */
-  TimePeriod GetRemoveTime() const;
-
-  /**
    * @brief Set the alpha function for a constraint; the default is AlphaFunctions::Linear.
    *
    * @param [in] func The alpha function to use when applying/removing the constraint.
