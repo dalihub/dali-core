@@ -451,12 +451,13 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
     {
       case Dali::Layer::CLIPPING_ENABLE:
       {
-        mIsClipping = propertyValue.Get<bool>();
+        SetClipping( propertyValue.Get<bool>() );
         break;
       }
       case Dali::Layer::CLIPPING_BOX:
       {
-        mClippingBox = propertyValue.Get<Rect<int> >();
+        Rect<int> clippingBox( propertyValue.Get<Rect<int> >() );
+        SetClippingBox( clippingBox.x, clippingBox.y, clippingBox.width, clippingBox.height );
         break;
       }
       default:
