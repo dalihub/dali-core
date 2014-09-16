@@ -238,8 +238,12 @@ void Layer::SetClippingBox(int x, int y, int width, int height)
     // Clipping box is not animatable; this is the most up-to-date value
     mClippingBox.Set(x, y, width, height);
 
+    // Convert mClippingBox to GL based coordinates (from bottom-left)
+    ClippingBox clippingBox( mClippingBox );
+    clippingBox.y = mStage->GetSize().height - clippingBox.y - clippingBox.height;
+
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingBoxMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), mClippingBox );
+    SetClippingBoxMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), clippingBox );
   }
 }
 
