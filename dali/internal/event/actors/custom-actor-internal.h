@@ -158,6 +158,14 @@ private:
   }
 
   /**
+   * @copydoc Internal::Actor::GetNaturalSize
+   */
+  virtual Vector3 GetNaturalSize() const
+  {
+    return mImpl->GetNaturalSize();
+  }
+
+  /**
    * Private constructor; see also CustomActor::New()
    */
   CustomActor(CustomActorImpl& extension);

@@ -242,6 +242,11 @@ struct MyTestCustomActor : public CustomActorImpl
     return Actor::New();
   }
 
+  virtual Vector3 GetNaturalSize()
+  {
+    return Vector3( 0.0f, 0.0f, 0.0f );
+  }
+
 public:
 
   SignalType mSignal;

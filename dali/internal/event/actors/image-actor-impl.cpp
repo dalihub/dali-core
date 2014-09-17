@@ -237,26 +237,39 @@ void ImageActor::SetNaturalSize()
 {
   if( mUsingNaturalSize )
   {
-    // if no image then natural size is 0
-    Vector2 size;
-    ImagePtr image = mImageAttachment->GetImage();
-    if( image )
-    {
-      if( IsPixelAreaSet() )
-      {
-        PixelArea area(GetPixelArea());
-        size.width = area.width;
-        size.height = area.height;
-      }
-      else
-      {
-        size = image->GetNaturalSize();
-      }
-    }
     mInternalSetSize = true;
-    SetSize( size );
+    SetSize( CalculateNaturalSize() );
     mInternalSetSize = false;
   }
+}
+
+Vector3 ImageActor::GetNaturalSize() const
+{
+  Vector2 naturalSize( CalculateNaturalSize() );
+  return Vector3( naturalSize.width, naturalSize.height, CalculateSizeZ( naturalSize ) );
+}
+
+Vector2 ImageActor::CalculateNaturalSize() const
+{
+  // if no image then natural size is 0
+  Vector2 size( 0.0f, 0.0f );
+
+  ImagePtr image = mImageAttachment->GetImage();
+  if( image )
+  {
+    if( IsPixelAreaSet() )
+    {
+      PixelArea area(GetPixelArea());
+      size.width = area.width;
+      size.height = area.height;
+    }
+    else
+    {
+      size = image->GetNaturalSize();
+    }
+  }
+
+  return size;
 }
 
 void ImageActor::OnSizeSet( const Vector3& targetSize )

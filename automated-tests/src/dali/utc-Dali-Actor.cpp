@@ -806,6 +806,18 @@ int UtcDaliActorGetCurrentSize(void)
   END_TEST;
 }
 
+int UtcDaliActorGetNaturalSize(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Vector3 vector( 0.0f, 0.0f, 0.0f );
+
+  DALI_TEST_CHECK( actor.GetNaturalSize() == vector );
+
+  END_TEST;
+}
+
 // SetPosition(float x, float y)
 int UtcDaliActorSetPosition01(void)
 {

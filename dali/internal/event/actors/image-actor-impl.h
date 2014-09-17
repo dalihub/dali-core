@@ -181,6 +181,13 @@ public: // Default property extensions from ProxyObject
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
+public: // From Actor
+
+  /**
+   * @copydoc Dali::Actor::GetNaturalSize()
+   */
+  virtual Vector3 GetNaturalSize() const;
+
 private: // From RenderableActor
 
   /**
@@ -206,6 +213,13 @@ private:
    * Helper to set the actor to the image's natural size
    */
   void SetNaturalSize();
+
+  /**
+   * Calculate the natural size of this image actor
+   *
+   * @return Return the natural size as a Vector2
+   */
+  Vector2 CalculateNaturalSize() const;
 
   /**
    * From Actor.

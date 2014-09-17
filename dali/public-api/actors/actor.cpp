@@ -230,6 +230,11 @@ Vector3 Actor::GetCurrentSize() const
   return GetImplementation(*this).GetCurrentSize();
 }
 
+Vector3 Actor::GetNaturalSize() const
+{
+  return GetImplementation(*this).GetNaturalSize();
+}
+
 void Actor::SetPosition(float x, float y)
 {
   GetImplementation(*this).SetPosition(x, y);

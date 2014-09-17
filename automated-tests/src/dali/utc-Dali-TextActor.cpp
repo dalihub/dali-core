@@ -1061,3 +1061,19 @@ int UtcDaliTextActorPropertyIndices(void)
   DALI_TEST_EQUALS( indices.size(), textActor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliTextActorGetNaturalSize(void)
+{
+  TestApplication application;
+
+  TextActor actor = TextActor::New();
+  std::string text( "something else" );
+  actor.SetText( text );
+
+  Font defaultFont = Font::New();
+  Vector3 naturalSize = defaultFont.MeasureText( text );
+
+  DALI_TEST_CHECK( actor.GetNaturalSize().GetVectorXY() == naturalSize.GetVectorXY() );
+
+  END_TEST;
+}

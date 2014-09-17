@@ -189,6 +189,13 @@ public:
    */
   virtual Dali::Actor GetChildByAlias(const std::string& actorAlias) = 0;
 
+  /**
+   * Return the natural size of the actor
+   *
+   * @return The actor's natural size
+   */
+  virtual Vector3 GetNaturalSize() = 0;
+
 protected: // For derived classes
 
   /**

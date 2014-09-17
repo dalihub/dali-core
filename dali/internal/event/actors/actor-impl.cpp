@@ -1091,9 +1091,12 @@ void Actor::SetSize(float width, float height, float depth)
 
 void Actor::SetSize(const Vector2& size)
 {
-  Vector3 volume( size );
-  volume.z = std::min( size.width, size.height );
-  SetSize( volume );
+  SetSize( Vector3( size.width, size.height, CalculateSizeZ( size ) ) );
+}
+
+float Actor::CalculateSizeZ( const Vector2& size ) const
+{
+  return std::min( size.width, size.height );
 }
 
 void Actor::SetSize(const Vector3& size)
@@ -1153,6 +1156,13 @@ const Vector3& Actor::GetCurrentSize() const
 
   return Vector3::ZERO;
 }
+
+Vector3 Actor::GetNaturalSize() const
+{
+  // It is up to deriving classes to return the appropriate natural size
+  return Vector3( 0.0f, 0.0f, 0.0f );
+}
+
 
 #ifdef DYNAMICS_SUPPORT
 

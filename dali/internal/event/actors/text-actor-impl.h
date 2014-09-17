@@ -225,6 +225,13 @@ public:
    */
   bool IsFontDetectionAutomatic() const;
 
+public: // From Actor
+
+  /**
+   * @copydoc Dali::Actor::GetNaturalSize()
+   */
+  virtual Vector3 GetNaturalSize() const;
+
 private: // from Actor
 
   /**

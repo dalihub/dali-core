@@ -164,6 +164,11 @@ struct TestCustomActor : public CustomActorImpl
     }
   }
 
+  virtual Vector3 GetNaturalSize()
+  {
+    return Vector3( 0.0f, 0.0f, 0.0f );
+  }
+
   void SetDaliProperty(std::string s)
   {
     Self().SetProperty(mDaliProperty, s) ;
