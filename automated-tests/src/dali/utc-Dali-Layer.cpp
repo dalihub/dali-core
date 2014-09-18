@@ -523,3 +523,30 @@ int UtcDaliLayerTouchConsumed(void)
   DALI_TEST_EQUALS( layer.IsTouchConsumed(), true, TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliLayerClippingGLCalls(void)
+{
+  TestApplication application;
+  const TestGlAbstraction::ScissorParams& glScissorParams( application.GetGlAbstraction().GetScissorParams() );
+  Stage stage( Stage::GetCurrent() );
+
+  ClippingBox testBox( 5, 6, 77, 83 );
+  Layer layer = Stage::GetCurrent().GetRootLayer();
+  layer.SetClipping( true );
+  layer.SetClippingBox( testBox );
+
+  // Add at least one renderable actor so the GL calls are actually made
+  Actor textActor = TextActor::New("Hello");
+  stage.Add( textActor );
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( testBox.x, glScissorParams.x, TEST_LOCATION );
+  DALI_TEST_EQUALS( testBox.y, stage.GetSize().height - glScissorParams.y - testBox.height, TEST_LOCATION ); // GL Coordinates are from bottom left
+  DALI_TEST_EQUALS( testBox.width, glScissorParams.width, TEST_LOCATION );
+  DALI_TEST_EQUALS( testBox.height, glScissorParams.height, TEST_LOCATION );
+
+  END_TEST;
+}
