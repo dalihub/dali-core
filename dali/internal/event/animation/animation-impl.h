@@ -788,14 +788,14 @@ public:
   void Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /*
-   * @copydoc Dali::Animation::GetCurrentProgress()
-   */
-  float GetCurrentProgress();
-
-  /*
    * @copydoc Dali::Animation::SetCurrentProgress()
    */
   void SetCurrentProgress(float progress);
+
+  /*
+   * @copydoc Dali::Animation::GetCurrentProgress()
+   */
+  float GetCurrentProgress();
 
   /*
    * @copydoc Dali::Animation::SetSpeedFactor()
@@ -806,6 +806,16 @@ public:
    * @copydoc Dali::Animation::GetSpeedFactor()
    */
   float GetSpeedFactor() const;
+
+  /*
+   * @copydoc Dali::Animation::SetPlayRange()
+   */
+  void SetPlayRange( const Vector2& range );
+
+  /*
+   * @copydoc Dali::Animation::GetPlayRange
+   */
+  Vector2 GetPlayRange() const;
 
 public: // For connecting animators to animations
 
@@ -905,6 +915,7 @@ private:
   float mDurationSeconds;
   float mSpeedFactor;
   bool mIsLooping;
+  Vector2 mPlayRange;
   EndAction mEndAction;
   EndAction mDestroyAction;
   AlphaFunction mDefaultAlpha;

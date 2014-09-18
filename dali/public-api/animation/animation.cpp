@@ -488,14 +488,14 @@ void Animation::Resize(Actor actor, Vector3 size, AlphaFunction alpha, float del
   GetImplementation(*this).Resize(GetImplementation(actor), size, alpha, delaySeconds, durationSeconds);
 }
 
-float Animation::GetCurrentProgress()
-{
-  return GetImplementation(*this).GetCurrentProgress();
-}
-
 void Animation::SetCurrentProgress( float progress )
 {
   return GetImplementation(*this).SetCurrentProgress( progress );
+}
+
+float Animation::GetCurrentProgress()
+{
+  return GetImplementation(*this).GetCurrentProgress();
 }
 
 void Animation::SetSpeedFactor( float factor )
@@ -506,6 +506,16 @@ void Animation::SetSpeedFactor( float factor )
 float Animation::GetSpeedFactor() const
 {
   return GetImplementation(*this).GetSpeedFactor();
+}
+
+void Animation::SetPlayRange( const Vector2& range )
+{
+  GetImplementation(*this).SetPlayRange(range);
+}
+
+Vector2 Animation::GetPlayRange() const
+{
+  return GetImplementation(*this).GetPlayRange();
 }
 
 } // namespace Dali

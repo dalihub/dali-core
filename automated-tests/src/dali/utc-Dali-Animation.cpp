@@ -1194,6 +1194,144 @@ int UtcDaliAnimationSetCurrentProgress(void)
   END_TEST;
 }
 
+int UtcDaliAnimationPlayRange(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  float durationSeconds(1.0f);
+  Animation animation = Animation::New(durationSeconds);
+  Vector3 targetPosition(100.0f, 100.0f, 100.0f);
+  KeyFrames keyframes = KeyFrames::New();
+  keyframes.Add( 0.0f , Vector3(0.0f,0.0f,0.0f ) );
+  keyframes.Add( 1.0f , Vector3(100.0f,100.0f,100.0f ) );
+
+  animation.AnimateBetween( Property( actor, Actor::POSITION), keyframes );
+
+  // Set range between 0.4 and 0.8
+  animation.SetPlayRange( Vector2(0.4f,0.8f) );
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+
+  //Test that setting progress outside the range doesn't work
+  animation.SetCurrentProgress( 0.9f );
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( animation.GetCurrentProgress(), 0.4f, TEST_LOCATION );
+  animation.SetCurrentProgress( 0.2f );
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( animation.GetCurrentProgress(), 0.4f, TEST_LOCATION );
+
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 60% progress */);
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.6f), TEST_LOCATION );
+
+  animation.Play(); // Test that calling play has no effect, when animation is already playing
+  application.SendNotification();
+  application.Render(static_cast<unsigned int>(durationSeconds*200.0f) + 1u/* 80% progress */);
+
+  // We did expect the animation to finish
+  application.SendNotification();
+  finishCheck.CheckSignalReceived();
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), (targetPosition * 0.8f), TEST_LOCATION );
+
+  // Check that nothing has changed after a couple of buffer swaps
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition * 0.8f, actor.GetCurrentPosition(), TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( targetPosition * 0.8f, actor.GetCurrentPosition(), TEST_LOCATION );
+
+
+  //Loop inside the range
+  finishCheck.Reset();
+  animation.SetLooping( true );
+  animation.Play();
+  application.SendNotification();
+  float intervalSeconds = 0.1f;
+  float progress = 0.4f;
+  for (int iterations = 0; iterations < 10; ++iterations )
+  {
+    application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+
+    progress += intervalSeconds;
+    if (progress > 0.8f)
+    {
+      progress = progress - 0.4f;
+    }
+
+    DALI_TEST_EQUALS( targetPosition*progress, actor.GetCurrentPosition(), 0.001f, TEST_LOCATION );
+  }
+
+  // We didn't expect the animation to finish yet
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+
+
+  //Test change range on the fly
+  animation.SetPlayRange( Vector2( 0.2f, 0.9f ) );
+  application.SendNotification();
+
+  for (int iterations = 0; iterations < 10; ++iterations )
+  {
+    application.Render(static_cast<unsigned int>(durationSeconds*intervalSeconds*1000.0f));
+
+    progress += intervalSeconds;
+    if (progress > 0.9f)
+    {
+      progress = progress - 0.7f;
+    }
+
+    DALI_TEST_EQUALS( targetPosition*progress, actor.GetCurrentPosition(), 0.001f, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimationSetPlayRange(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  // Build the animation
+  Animation animation = Animation::New(0);
+  application.SendNotification();
+
+  //If PlayRange not specified it should be 0.0-1.0 by default
+  DALI_TEST_EQUALS( Vector2(0.0,1.0), animation.GetPlayRange(), TEST_LOCATION );
+
+  //PlayRange out of bounds
+  animation.SetPlayRange( Vector2(-1.0f,1.0f) );
+  application.SendNotification();
+  DALI_TEST_EQUALS( Vector2(0.0f,1.0f), animation.GetPlayRange(), TEST_LOCATION );
+  animation.SetPlayRange( Vector2(0.0f,2.0f) );
+  application.SendNotification();
+  DALI_TEST_EQUALS( Vector2(0.0f,1.0f), animation.GetPlayRange(), TEST_LOCATION );
+
+  //If playRange is not in the correct order it has to be ordered
+  animation.SetPlayRange( Vector2(0.8f,0.2f) );
+  application.SendNotification();
+  DALI_TEST_EQUALS( Vector2(0.2f,0.8f), animation.GetPlayRange(), TEST_LOCATION );
+
+  // Set range between 0.4 and 0.8
+  animation.SetPlayRange( Vector2(0.4f,0.8f) );
+  application.SendNotification();
+  DALI_TEST_EQUALS( Vector2(0.4f,0.8f), animation.GetPlayRange(), TEST_LOCATION );
+
+  END_TEST;
+}
 
 int UtcDaliAnimationPause(void)
 {
