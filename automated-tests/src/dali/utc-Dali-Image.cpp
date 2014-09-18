@@ -158,6 +158,8 @@ int UtcDaliImageNewWithPolicies01(void)
 int UtcDaliImageNewWithPolicies02(void)
 {
   TestApplication application;
+  const Vector2 closestImageSize( 80, 45);
+  application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   // testing resource deletion when taken off stage
   tet_infoline("UtcDaliImageNewWithPolicies02 - Load image with LoadPolicy::OnDemand, ReleasePolicy::Unused");
@@ -214,6 +216,8 @@ int UtcDaliImageNewWithPolicies02(void)
 int UtcDaliImageNewWithPolicies03(void)
 {
   TestApplication application;
+  const Vector2 closestImageSize( 80, 45);
+  application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   // load immediately -> resource deletion when taken off stage -> put actor back on stage -> load resource again
   tet_infoline("UtcDaliImageNewWithPolicies03 - Load image with LoadPolicy::Immediate, ReleasePolicy::Unused");
@@ -422,6 +426,9 @@ int UtcDaliImageNewDistanceFieldWithPolicies02(void)
 {
   TestApplication application;
 
+  const Vector2 closestImageSize( 80, 45);
+  application.GetPlatform().SetClosestImageSize(closestImageSize);
+
   // testing resource deletion when taken off stage
   tet_infoline("UtcDaliImageNewDistanceFieldWithPolicies02 - Load image with LoadPolicy::OnDemand, ReleasePolicy::Unused");
 
@@ -477,6 +484,8 @@ int UtcDaliImageNewDistanceFieldWithPolicies02(void)
 int UtcDaliImageNewDistanceFieldWithPolicies03(void)
 {
   TestApplication application;
+  const Vector2 closestImageSize( 80, 45);
+  application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   // load immediately -> resource deletion when taken off stage -> put actor back on stage -> load resource again
   tet_infoline("UtcDaliImageNewDistanceFieldWithPolicies03 - Load image with LoadPolicy::Immediate, ReleasePolicy::Unused");
@@ -629,6 +638,9 @@ int UtcDaliImageNewDistanceFieldWithAttributes(void)
 int UtcDaliImageNewDistanceFieldWithAttrandPol(void)
 {
   TestApplication application;
+
+  const Vector2 closestImageSize( 80, 45);
+  application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   tet_infoline("UtcDaliImageNewDistanceFieldWithAttrandPol - Load image with LoadPolicy::OnDemand, ReleasePolicy::Unused");
 
@@ -998,13 +1010,17 @@ int UtcDaliImageDiscard01(void)
 int UtcDaliImageDiscard02(void)
 {
   TestApplication application;
+  application.GetGlAbstraction().EnableTextureCallTrace( true );
   tet_infoline("UtcDaliImageDiscard02 - one actor, tests TextureCache::DiscardTexture");
 
   {
     {
       ImageActor actor;
       {
-        Image image = Image::New(gTestImageFilename);
+        ImageAttributes attrs;
+        const Vector2 requestedSize( 40, 30 );
+        attrs.SetSize( requestedSize.width, requestedSize.height );
+        Image image = Image::New(gTestImageFilename, attrs);
         actor = ImageActor::New(image);
         Stage::GetCurrent().Add(actor);
 
@@ -1025,6 +1041,7 @@ int UtcDaliImageDiscard02(void)
         }
         application.Render(16);
         application.SendNotification();
+        DALI_TEST_CHECK( application.GetGlAbstraction().GetTextureTrace().FindMethod("BindTexture") );
       } // lose image handle, actor should still keep one
       application.SendNotification();
       application.Render(16);
@@ -1053,6 +1070,9 @@ int UtcDaliImageDiscard03(void)
 {
   TestApplication application;
   tet_infoline("UtcDaliImageDiscard03 - one actor, tests TextureCache::RemoveObserver");
+
+  const Vector2 closestImageSize( 1, 1);
+  application.GetPlatform().SetClosestImageSize(closestImageSize);
 
   Image image = Image::New(gTestImageFilename);
   ImageActor actor = ImageActor::New(image);

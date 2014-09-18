@@ -85,6 +85,22 @@ const std::string& BaseObject::GetTypeName() const
   return String::EMPTY;
 }
 
+bool BaseObject::GetTypeInfo(Dali::TypeInfo& typeInfo) const
+{
+  Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
+
+  Dali::TypeInfo info = registry->GetTypeInfo(this);
+  if(info)
+  {
+    typeInfo = info;
+    return true;
+  }
+  else
+  {
+    return false;
+  }
+}
+
 bool BaseObject::DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor )
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();

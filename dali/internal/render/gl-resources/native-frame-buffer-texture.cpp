@@ -87,16 +87,13 @@ bool NativeFrameBufferTexture::CreateGlTexture()
     // platform specific implementation decides on what GL extension to use
     mNativeImage->TargetTexture();
 
-    if (!mFrameBufferName)
-    {
-      // generate frame and render buffer names
-      mContext.GenFramebuffers(1, &mFrameBufferName);
-      mContext.GenRenderbuffers(1, &mRenderBufferName);
+    // generate frame and render buffer names
+    mContext.GenFramebuffers(1, &mFrameBufferName);
+    mContext.GenRenderbuffers(1, &mRenderBufferName);
 
-      // Bind render buffer and create 16 depth buffer
-      mContext.BindRenderbuffer(GL_RENDERBUFFER, mRenderBufferName);
-      mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
-    }
+    // Bind render buffer and create 16 depth buffer
+    mContext.BindRenderbuffer(GL_RENDERBUFFER, mRenderBufferName);
+    mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
   }
   else
   {

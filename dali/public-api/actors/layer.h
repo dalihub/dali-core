@@ -221,6 +221,8 @@ public:
    *
    * Clipping is initially disabled; see also SetClippingBox().
    * @param [in] enabled True if clipping is enabled.
+   *
+   * @note When clipping is enabled, the default clipping box is empty (0,0,0,0) which means everything is clipped.
    */
   void SetClipping(bool enabled);
 
@@ -234,11 +236,11 @@ public:
    * @brief Sets the clipping box of a layer, in window coordinates.
    *
    * The contents of the layer will not be visible outside this box, when clipping is
-   * enabled. The default clipping box is empty (0,0,0,0).
-   * This has the limitation that it only applies to rectangles on a window.
+   * enabled. The default clipping box is empty (0,0,0,0) which means everything is clipped.
+   * You can only do rectangular clipping using this API in window coordinates.
    * For other kinds of clipping, @see Dali::Actor::SetDrawMode().
-   * @param [in] x The X-coordinate of the lower-left corner.
-   * @param [in] y The Y-coordinate of the lower-left corner.
+   * @param [in] x The X-coordinate of the top-left corner of the box.
+   * @param [in] y The Y-coordinate of the top-left corner of the box.
    * @param [in] width  The width of the box.
    * @param [in] height The height of the box.
    */

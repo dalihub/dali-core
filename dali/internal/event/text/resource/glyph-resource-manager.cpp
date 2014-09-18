@@ -106,12 +106,12 @@ void GlyphResourceManager::AddRequests( const GlyphRequestList& requestList,
 {
   // each entry in the request list is for a specific font,
   // style, quality and a list of characters
-
   for( std::size_t n = 0, size = requestList.size(); n < size ; ++n )
   {
     const GlyphResourceRequest& request( requestList[n] );
     SendRequests( request, observer, atlasTextureId );
   }
+
 }
 
 void GlyphResourceManager::GlyphsLoaded( Integration::ResourceId id, const Integration::GlyphSet& glyphSet, LoadStatus loadStatus )

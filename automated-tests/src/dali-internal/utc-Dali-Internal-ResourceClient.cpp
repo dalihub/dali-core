@@ -117,7 +117,7 @@ static TestTicketLifetimeObserver testTicketLifetimeObserver;
 
 Internal::ImagePtr LoadImage(TestApplication& application, char* name)
 {
-  Internal::ImagePtr image = Internal::Image::New(name);
+  Internal::ImagePtr image = Internal::Image::New(name, Dali::ImageAttributes::DEFAULT_ATTRIBUTES );
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();

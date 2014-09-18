@@ -86,7 +86,7 @@ public:
    * @return a pointer to a newly created object.
    */
   static ImagePtr New( const std::string& filename,
-                       const Dali::ImageAttributes& attributes=Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
+                       const Dali::ImageAttributes& attributes,
                        LoadPolicy loadPol=ImageLoadPolicyDefault,
                        ReleasePolicy releasePol=ImageReleasePolicyDefault );
 
@@ -257,7 +257,6 @@ private:
 protected:
   unsigned int mWidth;
   unsigned int mHeight;
-  bool         mNaturalSizeSet;
 
   ResourceTicketPtr mTicket;
   ImageFactoryCache::RequestPtr mRequest;         ///< contains the initially requested attributes for image. Request is reissued when memory was released.

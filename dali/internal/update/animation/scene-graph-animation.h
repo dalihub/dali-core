@@ -63,14 +63,15 @@ public:
   /**
    * Construct a new Animation.
    * @param[in] durationSeconds The duration of the animation in seconds.
+   * @param[in] speedFactor Multiplier to the animation velocity.
    * @param[in] isLooping Whether the animation will loop.
    * @param[in] endAction The action to perform when the animation ends.
    * @param[in] destroyAction The action to perform when the animation is destroyed.
    * @return A new Animation
    */
-  static Animation* New( float durationSeconds, bool isLooping, EndAction endAction, EndAction destroyAction )
+  static Animation* New( float durationSeconds, float speedFactor, bool isLooping, EndAction endAction, EndAction destroyAction )
   {
-    return new Animation( durationSeconds, isLooping, endAction, destroyAction );
+    return new Animation( durationSeconds, speedFactor, isLooping, endAction, destroyAction );
   }
 
   /**
@@ -115,6 +116,11 @@ public:
   void SetCurrentProgress( float progress )
   {
     mElapsedSeconds = mDurationSeconds * progress;
+  }
+
+  void SetSpeedFactor( float factor )
+  {
+    mSpeedFactor = factor;
   }
 
   /**
@@ -245,7 +251,7 @@ protected:
   /**
    * Protected constructor. See New()
    */
-  Animation( float durationSeconds, bool isLooping, EndAction endAction, EndAction destroyAction );
+  Animation( float durationSeconds, float speedFactor, bool isLooping, EndAction endAction, EndAction destroyAction );
 
 
 private:
@@ -266,6 +272,7 @@ private:
 protected:
 
   float mDurationSeconds;
+  float mSpeedFactor;
   bool mLooping;
   EndAction mEndAction;
   EndAction mDestroyAction;
@@ -340,6 +347,17 @@ inline void SetCurrentProgressMessage( EventToUpdate& eventToUpdate, const Anima
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetCurrentProgress, progress );
+}
+
+inline void SetSpeedFactorMessage( EventToUpdate& eventToUpdate, const Animation& animation, float factor )
+{
+  typedef MessageValue1< Animation, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &animation, &Animation::SetSpeedFactor, factor );
 }
 
 inline void PlayAnimationMessage( EventToUpdate& eventToUpdate, const Animation& animation )

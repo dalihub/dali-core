@@ -32,41 +32,25 @@ ImageActor::ImageActor()
 
 ImageActor ImageActor::New()
 {
-  // empty image
-  Internal::ImageActorPtr internal = Internal::ImageActor::New(NULL);
-  return ImageActor(internal.Get());
+  Internal::ImageActorPtr internal = Internal::ImageActor::New();
+  return ImageActor( internal.Get() );
 }
 
 ImageActor ImageActor::New(Image image)
 {
-  Internal::ImageActorPtr internal;
-  if (image)
-  {
-    internal = Internal::ImageActor::New(&GetImplementation(image));
-  }
-  else
-  {
-    // empty image
-    internal = Internal::ImageActor::New(NULL);
-  }
+  ImageActor actor = ImageActor::New();
+  actor.SetImage( image );
 
-  return ImageActor(internal.Get());
+  return actor;
 }
 
 ImageActor ImageActor::New(Image image, PixelArea pixelArea)
 {
-  Internal::ImageActorPtr internal;
-  if (image)
-  {
-    internal = Internal::ImageActor::New(&GetImplementation(image), pixelArea);
-  }
-  else
-  {
-    // empty image
-    internal = Internal::ImageActor::New(NULL, pixelArea);
-  }
+  ImageActor actor = ImageActor::New();
+  actor.SetImage( image );
+  actor.SetPixelArea( pixelArea );
 
-  return ImageActor(internal.Get());
+  return actor;
 }
 
 ImageActor ImageActor::DownCast( BaseHandle handle )
@@ -98,19 +82,18 @@ ImageActor& ImageActor::operator=(BaseHandle::NullType* rhs)
 
 void ImageActor::SetImage(Image image)
 {
-  if (image)
+  Internal::ImagePtr imagePtr;
+  if( image )
   {
-    GetImplementation(*this).SetImage(&GetImplementation(image));
+    imagePtr = &GetImplementation(image);
   }
-  else
-  {
-    GetImplementation(*this).SetImage(NULL);
-  }
+  GetImplementation(*this).SetImage( imagePtr );
 }
 
 Image ImageActor::GetImage()
 {
-  return GetImplementation(*this).GetImage();
+  Internal::ImagePtr imagePtr( GetImplementation(*this).GetImage() );
+  return Dali::Image( imagePtr.Get() );
 }
 
 void ImageActor::SetToNaturalSize()
@@ -156,31 +139,6 @@ void ImageActor::SetNinePatchBorder(const Vector4& border)
 Vector4 ImageActor::GetNinePatchBorder() const
 {
   return GetImplementation(*this).GetNinePatchBorder();
-}
-
-void ImageActor::SetFadeIn(bool enableFade)
-{
-  GetImplementation(*this).SetFadeIn(enableFade);
-}
-
-bool ImageActor::GetFadeIn() const
-{
-  return GetImplementation(*this).GetFadeIn();
-}
-
-void ImageActor::SetFadeInDuration(float durationSeconds)
-{
-  GetImplementation(*this).SetFadeInDuration(durationSeconds);
-}
-
-float ImageActor::GetFadeInDuration() const
-{
-  return GetImplementation(*this).GetFadeInDuration();
-}
-
-Vector2 ImageActor::GetCurrentImageSize() const
-{
-  return GetImplementation(*this).GetCurrentImageSize();
 }
 
 ImageActor::ImageActor(Internal::ImageActor* internal)

@@ -198,7 +198,9 @@ Internal::ResourceTicketPtr CheckLoadBitmap(TestApplication& application, const 
 
 Internal::ImagePtr LoadImage(TestApplication& application, const char* name)
 {
-  Internal::ImagePtr image = Internal::Image::New(name);
+  const Vector2 closestImageSize( 80, 80);
+  application.GetPlatform().SetClosestImageSize(closestImageSize);
+  Internal::ImagePtr image = Internal::Image::New(name, Dali::ImageAttributes::DEFAULT_ATTRIBUTES );
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();

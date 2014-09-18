@@ -251,16 +251,6 @@ TimePeriod Constraint::GetApplyTime() const
   return mApplyTime;
 }
 
-void Constraint::SetRemoveTime( TimePeriod timePeriod )
-{
-  GetImplementation( mActiveConstraintTemplate ).SetRemoveTime( timePeriod );
-}
-
-TimePeriod Constraint::GetRemoveTime() const
-{
-  return GetImplementation( mActiveConstraintTemplate ).GetRemoveTime();
-}
-
 void Constraint::SetAlphaFunction( Dali::AlphaFunction func )
 {
   GetImplementation( mActiveConstraintTemplate ).SetAlphaFunction( func );

@@ -44,14 +44,11 @@ namespace Dali
 namespace Internal
 {
 
-typedef std::set<ProxyObject*>          ProxyObjectContainer;
-typedef ProxyObjectContainer::iterator  ProxyObjectIter;
-
 /**
  * Connects a constraint which takes another property as an input.
  */
 template < typename PropertyType >
-class ActiveConstraint : public ActiveConstraintBase, public ProxyObject::Observer
+class ActiveConstraint : public ActiveConstraintBase
 {
 public:
 
@@ -83,8 +80,6 @@ public:
    */
   virtual ~ActiveConstraint()
   {
-    StopObservation();
-
     // This is not responsible for removing constraints.
   }
 
@@ -104,100 +99,11 @@ public:
                                                   funcPtr,
                                                   mInterpolatorFunction );
 
-    clone->SetRemoveTime(mRemoveTime);
     clone->SetAlphaFunction(mAlphaFunction);
     clone->SetRemoveAction(mRemoveAction);
     clone->SetTag( mTag );
 
     return clone;
-  }
-
-  /**
-   * @copydoc ActiveConstraintBase::OnCustomWeightSet()
-   */
-  virtual void OnCustomWeightSet( ProxyObject& weightObject )
-  {
-    ObserveProxy( weightObject );
-  }
-
-  /**
-   * @copydoc ActiveConstraintBase::OnFirstApply()
-   */
-  virtual void OnFirstApply( ProxyObject& parent )
-  {
-    DALI_ASSERT_ALWAYS( NULL == mTargetProxy && "Parent of ActiveConstraint already set" );
-
-    // No need to do anything, if the source objects are gone
-    if( mSources.size() == mSourceCount )
-    {
-      mTargetProxy = &parent;
-
-      ObserveProxy( parent );
-
-      ConnectConstraint();
-    }
-  }
-
-  /**
-   * @copydoc ActiveConstraintBase::OnBeginRemove()
-   */
-  virtual void OnBeginRemove()
-  {
-    // Stop observing the remaining proxies
-    StopObservation();
-
-    // Discard all proxy pointers
-    mSources.clear();
-  }
-
-  /**
-   * @copydoc ProxyObject::Observer::SceneObjectAdded()
-   */
-  virtual void SceneObjectAdded( ProxyObject& proxy )
-  {
-    // Should not be getting callbacks when mSources has been cleared
-    DALI_ASSERT_DEBUG( mSources.size() == mSourceCount );
-
-    if ( mTargetProxy )
-    {
-      ConnectConstraint();
-    }
-  }
-
-  /**
-   * @copydoc ProxyObject::Observer::SceneObjectRemoved()
-   */
-  virtual void SceneObjectRemoved( ProxyObject& proxy )
-  {
-    // Notify base class that the scene-graph constraint is being removed
-    OnSceneObjectRemove();
-
-    if ( mSceneGraphConstraint )
-    {
-      // Preserve the previous weight
-      mOffstageWeight = mSceneGraphConstraint->GetWeight( mEventToUpdate.GetEventBufferIndex() );
-
-      // This is not responsible for removing constraints.
-      mSceneGraphConstraint = NULL;
-    }
-  }
-
-  /**
-   * @copydoc ProxyObject::Observer::ProxyDestroyed()
-   */
-  virtual void ProxyDestroyed( ProxyObject& proxy )
-  {
-    // Remove proxy pointer from observation set
-    ProxyObjectIter iter = mObservedProxies.find( &proxy );
-    DALI_ASSERT_DEBUG( mObservedProxies.end() != iter );
-    mObservedProxies.erase( iter );
-
-    // Stop observing the remaining proxies
-    StopObservation();
-
-    // Discard all proxy pointers
-    mTargetProxy = NULL;
-    mSources.clear();
   }
 
 private:
@@ -211,31 +117,11 @@ private:
                     unsigned int sourceCount,
                     ConstraintFunctionPtr& func,
                     InterpolatorFunction& interpolator )
-  : ActiveConstraintBase( eventToUpdate, targetIndex ),
+  : ActiveConstraintBase( eventToUpdate, targetIndex, sources, sourceCount ),
     mTargetIndex( targetIndex ),
-    mSources( sources ),
-    mSourceCount( sourceCount ),
     mUserFunction( func ),
     mInterpolatorFunction( interpolator )
   {
-    // Skip init when any of the proxy objects have been destroyed
-    if ( mSources.size() != mSourceCount )
-    {
-      // Discard all proxy pointers
-      mTargetProxy = NULL;
-      mSources.clear();
-    }
-
-    // Observe the objects providing properties
-    for ( SourceIter iter = mSources.begin(); mSources.end() != iter; ++iter )
-    {
-      if ( OBJECT_PROPERTY == iter->sourceType )
-      {
-        DALI_ASSERT_ALWAYS( NULL != iter->object && "ActiveConstraint source object not found" );
-
-        ObserveProxy( *(iter->object) );
-      }
-    }
   }
 
   // Undefined
@@ -243,31 +129,6 @@ private:
 
   // Undefined
   ActiveConstraint& operator=( const ActiveConstraint& rhs );
-
-  /**
-   * Helper to observe a proxy, if not already observing it
-   */
-  void ObserveProxy( ProxyObject& proxy )
-  {
-    if ( mObservedProxies.end() == mObservedProxies.find(&proxy) )
-    {
-      proxy.AddObserver( *this );
-      mObservedProxies.insert( &proxy );
-    }
-  }
-
-  /**
-   * Helper to stop observing proxies
-   */
-  void StopObservation()
-  {
-    for( ProxyObjectIter iter = mObservedProxies.begin(); mObservedProxies.end() != iter; ++iter )
-    {
-      (*iter)->RemoveObserver( *this );
-    }
-
-    mObservedProxies.clear();
-  }
 
   /**
    * Create and connect a constraint for a scene-object.
@@ -428,11 +289,6 @@ protected:
 
   Property::Index mTargetIndex;
 
-  SourceContainer mSources;
-  unsigned int mSourceCount;
-
-  ProxyObjectContainer mObservedProxies; // We don't observe the same object twice
-
   ConstraintFunctionPtr mUserFunction;
   InterpolatorFunction mInterpolatorFunction;
 };
@@ -441,7 +297,7 @@ protected:
  * Variant which allows float components to be animated individually.
  */
 template <>
-class ActiveConstraint<float> : public ActiveConstraintBase, public ProxyObject::Observer
+class ActiveConstraint<float> : public ActiveConstraintBase
 {
 public:
 
@@ -471,8 +327,6 @@ public:
    */
   virtual ~ActiveConstraint()
   {
-    StopObservation();
-
     // This is not responsible for removing constraints.
   }
 
@@ -492,100 +346,11 @@ public:
                                            funcPtr,
                                            mInterpolatorFunction );
 
-    clone->SetRemoveTime(mRemoveTime);
     clone->SetAlphaFunction(mAlphaFunction);
     clone->SetRemoveAction(mRemoveAction);
     clone->SetTag( mTag );
 
     return clone;
-  }
-
-  /**
-   * @copydoc ActiveConstraintBase::OnCustomWeightSet()
-   */
-  virtual void OnCustomWeightSet( ProxyObject& weightObject )
-  {
-    ObserveProxy( weightObject );
-  }
-
-  /**
-   * @copydoc ActiveConstraintBase::OnFirstApply()
-   */
-  virtual void OnFirstApply( ProxyObject& parent )
-  {
-    DALI_ASSERT_ALWAYS( NULL == mTargetProxy && "Parent of ActiveConstraint already set" );
-
-    // No need to do anything, if the source objects are gone
-    if( mSources.size() == mSourceCount )
-    {
-      mTargetProxy = &parent;
-
-      ObserveProxy( parent );
-
-      ConnectConstraint();
-    }
-  }
-
-  /**
-   * @copydoc ActiveConstraintBase::OnBeginRemove()
-   */
-  virtual void OnBeginRemove()
-  {
-    // Stop observing the remaining proxies
-    StopObservation();
-
-    // Discard all proxy pointers
-    mSources.clear();
-  }
-
-  /**
-   * @copydoc ProxyObject::Observer::SceneObjectAdded()
-   */
-  virtual void SceneObjectAdded( ProxyObject& proxy )
-  {
-    // Should not be getting callbacks when mSources has been cleared
-    DALI_ASSERT_DEBUG( mSources.size() == mSourceCount );
-
-    if ( mTargetProxy )
-    {
-      ConnectConstraint();
-    }
-  }
-
-  /**
-   * @copydoc ProxyObject::Observer::SceneObjectRemoved()
-   */
-  virtual void SceneObjectRemoved( ProxyObject& proxy )
-  {
-    // Notify base class that the scene-graph constraint is being removed
-    OnSceneObjectRemove();
-
-    if ( mSceneGraphConstraint )
-    {
-      // Preserve the previous weight
-      mOffstageWeight = mSceneGraphConstraint->GetWeight( mEventToUpdate.GetEventBufferIndex() );
-
-      // This is not responsible for removing constraints.
-      mSceneGraphConstraint = NULL;
-    }
-  }
-
-  /**
-   * @copydoc ProxyObject::Observer::ProxyDestroyed()
-   */
-  virtual void ProxyDestroyed( ProxyObject& proxy )
-  {
-    // Remove proxy pointer from observation set
-    ProxyObjectIter iter = mObservedProxies.find( &proxy );
-    DALI_ASSERT_DEBUG( mObservedProxies.end() != iter );
-    mObservedProxies.erase( iter );
-
-    // Stop observing the remaining proxies
-    StopObservation();
-
-    // Discard all proxy pointers
-    mTargetProxy = NULL;
-    mSources.clear();
   }
 
 private:
@@ -599,31 +364,11 @@ private:
                     unsigned int sourceCount,
                     ConstraintFunctionPtr& func,
                     InterpolatorFunction& interpolator )
-  : ActiveConstraintBase( eventToUpdate, targetIndex ),
+  : ActiveConstraintBase( eventToUpdate, targetIndex, sources, sourceCount ),
     mTargetIndex( targetIndex ),
-    mSources( sources ),
-    mSourceCount( sourceCount ),
     mUserFunction( func ),
     mInterpolatorFunction( interpolator )
   {
-    // Skip init when any of the proxy objects have been destroyed
-    if ( mSources.size() != mSourceCount )
-    {
-      // Discard all proxy pointers
-      mTargetProxy = NULL;
-      mSources.clear();
-    }
-
-    // Observe the objects providing properties
-    for ( SourceIter iter = mSources.begin(); mSources.end() != iter; ++iter )
-    {
-      if ( OBJECT_PROPERTY == iter->sourceType )
-      {
-        DALI_ASSERT_ALWAYS( NULL != iter->object && "ActiveConstraint source object not found" );
-
-        ObserveProxy( *(iter->object) );
-      }
-    }
   }
 
   // Undefined
@@ -631,31 +376,6 @@ private:
 
   // Undefined
   ActiveConstraint& operator=( const ActiveConstraint& rhs );
-
-  /**
-   * Helper to observe a proxy, if not already observing it
-   */
-  void ObserveProxy( ProxyObject& proxy )
-  {
-    if ( mObservedProxies.end() == mObservedProxies.find(&proxy) )
-    {
-      proxy.AddObserver( *this );
-      mObservedProxies.insert( &proxy );
-    }
-  }
-
-  /**
-   * Helper to stop observing proxies
-   */
-  void StopObservation()
-  {
-    for( ProxyObjectIter iter = mObservedProxies.begin(); mObservedProxies.end() != iter; ++iter )
-    {
-      (*iter)->RemoveObserver( *this );
-    }
-
-    mObservedProxies.clear();
-  }
 
   /**
    * Create and connect a constraint for a scene-object.
@@ -877,11 +597,6 @@ private:
 protected:
 
   Property::Index mTargetIndex;
-
-  SourceContainer mSources;
-  unsigned int mSourceCount;
-
-  ProxyObjectContainer mObservedProxies; // We don't observe the same object twice
 
   ConstraintFunctionPtr mUserFunction;
   InterpolatorFunction mInterpolatorFunction;

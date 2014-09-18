@@ -113,16 +113,13 @@ bool FrameBufferTexture::CreateGlTexture()
 
   mContext.TexImage2D(GL_TEXTURE_2D, 0, pixelFormat,mWidth, mHeight, 0, pixelFormat, pixelDataType, NULL);
 
-  if (!mFrameBufferName)
-  {
-    // generate frame and render buffer names
-    mContext.GenFramebuffers(1, &mFrameBufferName);
-    mContext.GenRenderbuffers(1, &mRenderBufferName);
+  // generate frame and render buffer names
+  mContext.GenFramebuffers(1, &mFrameBufferName);
+  mContext.GenRenderbuffers(1, &mRenderBufferName);
 
-    // Bind render buffer and create 16 depth buffer
-    mContext.BindRenderbuffer(GL_RENDERBUFFER, mRenderBufferName);
-    mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
-  }
+  // Bind render buffer and create 16 depth buffer
+  mContext.BindRenderbuffer(GL_RENDERBUFFER, mRenderBufferName);
+  mContext.RenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, mWidth, mHeight);
 
   return mId != 0;
 }

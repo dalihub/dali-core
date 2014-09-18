@@ -329,23 +329,35 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
   application.Render(0);
   application.Render(10);
 
-  HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2( 240.0f, 400.0f ), results, &DefaultIsActorTouchableFunction);
-  DALI_TEST_CHECK( results.actor == green );
-  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 0.6f, TEST_LOCATION );
+  {
+    HitTestAlgorithm::Results results;
+    HitTest(stage, Vector2( 240.0f, 400.0f ), results, &DefaultIsActorTouchableFunction);
+    DALI_TEST_CHECK( results.actor == green );
+    DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 0.6f, 0.01f, TEST_LOCATION );
+  }
 
-  HitTest(stage, Vector2::ZERO, results, &DefaultIsActorTouchableFunction);
-  DALI_TEST_CHECK( results.actor == blue );
-  DALI_TEST_EQUALS( results.actorCoordinates, Vector2::ZERO, TEST_LOCATION );
+  {
+    HitTestAlgorithm::Results results;
+    HitTest(stage, Vector2::ZERO, results, &DefaultIsActorTouchableFunction);
+    DALI_TEST_CHECK( results.actor == blue );
+    DALI_TEST_EQUALS( results.actorCoordinates, Vector2::ZERO, TEST_LOCATION );
+  }
 
-  HitTest(stage, stageSize, results, &DefaultIsActorTouchableFunction);
-  DALI_TEST_CHECK( ! results.actor );
-  DALI_TEST_EQUALS( results.actorCoordinates, Vector2::ZERO, TEST_LOCATION );
+  {
+    HitTestAlgorithm::Results results;
+    HitTest(stage, stageSize, results, &DefaultIsActorTouchableFunction);
+    DALI_TEST_CHECK( ! results.actor );
+    DALI_TEST_EQUALS( results.actorCoordinates, Vector2::ZERO, TEST_LOCATION );
+  }
 
   // Just inside green
-  HitTest(stage, stageSize*0.69f, results, &DefaultIsActorTouchableFunction);
-  DALI_TEST_CHECK( results.actor == green );
-  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 0.98f, TEST_LOCATION );
+  {
+    HitTestAlgorithm::Results results;
+    HitTest(stage, stageSize*0.69f, results, &DefaultIsActorTouchableFunction);
+    DALI_TEST_CHECK( results.actor == green );
+    DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 0.98f, 0.01f, TEST_LOCATION );
+  }
+
   END_TEST;
 }
 

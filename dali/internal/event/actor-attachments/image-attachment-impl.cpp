@@ -36,14 +36,14 @@ namespace Dali
 namespace Internal
 {
 
-ImageAttachmentPtr ImageAttachment::New( const SceneGraph::Node& parentNode, Image* image )
+ImageAttachmentPtr ImageAttachment::New( const SceneGraph::Node& parentNode )
 {
   StagePtr stage = Stage::GetCurrent();
 
-  ImageAttachmentPtr attachment( new ImageAttachment( *stage, image ) );
+  ImageAttachmentPtr attachment( new ImageAttachment( *stage ) );
 
   // Transfer object ownership of scene-object to message
-  SceneGraph::ImageAttachment* sceneObject = CreateSceneObject( image );
+  SceneGraph::ImageAttachment* sceneObject = CreateSceneObject();
   AttachToNodeMessage( stage->GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
@@ -52,7 +52,7 @@ ImageAttachmentPtr ImageAttachment::New( const SceneGraph::Node& parentNode, Ima
   return attachment;
 }
 
-ImageAttachment::ImageAttachment(Stage& stage, Image* image)
+ImageAttachment::ImageAttachment( Stage& stage )
 : RenderableAttachment(stage),
   mSceneObject(NULL),
   mPixelArea(EMPTY_PIXEL_AREA),
@@ -61,14 +61,14 @@ ImageAttachment::ImageAttachment(Stage& stage, Image* image)
   mIsPixelAreaSet(false),
   mBorderInPixels(false)
 {
-  mImageConnectable.Set( image, false );
+  mImageConnectable.Set( NULL, false );
 }
 
 ImageAttachment::~ImageAttachment()
 {
 }
 
-void ImageAttachment::SetImage(Image* image)
+void ImageAttachment::SetImage( ImagePtr& image )
 {
   bool onStage = OnStage();
   // keep a reference to Image object
@@ -77,26 +77,16 @@ void ImageAttachment::SetImage(Image* image)
   // Wait until the scene-graph attachment is connected, before providing resource ID
   if ( OnStage() )
   {
-    unsigned int resourceId = (NULL != image) ? image->GetResourceId() : 0u;
+    unsigned int resourceId = (image) ? image->GetResourceId() : 0u;
 
     // sceneObject is being used in a separate thread; queue a message to set
     SetTextureIdMessage( mStage->GetUpdateInterface(), *mSceneObject, resourceId );
   }
 }
 
-Dali::Image ImageAttachment::GetImage()
+ImagePtr ImageAttachment::GetImage()
 {
-  Dali::Image image;
-  Image* current = mImageConnectable.Get();
-  if ( current != NULL)
-  {
-    image = Dali::Image( current );
-  }
-  else
-  {
-    // returning uninitialized image (empty image)
-  }
-  return image;
+  return mImageConnectable.Get();
 }
 
 void ImageAttachment::SetPixelArea(const PixelArea& pixelArea)
@@ -141,13 +131,8 @@ void ImageAttachment::SetNinePatchBorder(const Vector4& border, bool inPixels)
   SetNinePatchBorderMessage( mStage->GetUpdateInterface(), *mSceneObject, border, inPixels );
 }
 
-SceneGraph::ImageAttachment* ImageAttachment::CreateSceneObject( const Image* current )
+SceneGraph::ImageAttachment* ImageAttachment::CreateSceneObject()
 {
-  if ( current )
-  {
-    return SceneGraph::ImageAttachment::New( current->GetResourceId() );
-  }
-
   return SceneGraph::ImageAttachment::New( 0u );
 }
 
@@ -156,8 +141,8 @@ void ImageAttachment::OnStageConnection2()
   mImageConnectable.OnStageConnect();
 
   // Provide resource ID when scene-graph attachment is connected
-  Image* image = mImageConnectable.Get();
-  unsigned int resourceId = (NULL != image) ? image->GetResourceId() : 0u;
+  ImagePtr image = mImageConnectable.Get();
+  unsigned int resourceId = (image) ? image->GetResourceId() : 0u;
   if ( 0u != resourceId )
   {
     SetTextureIdMessage( mStage->GetUpdateInterface(), *mSceneObject, resourceId );

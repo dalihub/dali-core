@@ -29,11 +29,9 @@ namespace Dali
 {
 
 const Property::Index ImageActor::PIXEL_AREA           = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
-const Property::Index ImageActor::FADE_IN              = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 1;
-const Property::Index ImageActor::FADE_IN_DURATION     = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 2;
-const Property::Index ImageActor::STYLE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 3;
-const Property::Index ImageActor::BORDER               = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 4;
-const Property::Index ImageActor::IMAGE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 5;
+const Property::Index ImageActor::STYLE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 1;
+const Property::Index ImageActor::BORDER               = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 2;
+const Property::Index ImageActor::IMAGE                = Internal::DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT + 3;
 
 namespace Internal
 {
@@ -53,8 +51,6 @@ TypeRegistration mType( typeid(Dali::ImageActor), typeid(Dali::RenderableActor),
 const std::string DEFAULT_IMAGE_ACTOR_PROPERTY_NAMES[] =
 {
   "pixel-area",
-  "fade-in",
-  "fade-in-duration",
   "style",
   "border",
   "image"
@@ -64,8 +60,6 @@ const int DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_IMAGE_ACTOR_PROPE
 const Property::Type DEFAULT_IMAGE_ACTOR_PROPERTY_TYPES[DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT] =
 {
   Property::RECTANGLE,  // "pixel-area",
-  Property::BOOLEAN,    // "fade-in",
-  Property::FLOAT,      // "fade-in-duration",
   Property::STRING,     // "style",
   Property::VECTOR4,    // "border",
   Property::MAP,        // "image",
@@ -96,31 +90,17 @@ std::string StyleString(const ImageActor::Style style)
 }
 }
 
-ImageActorPtr ImageActor::New( Image* anImage )
+ImageActorPtr ImageActor::New()
 {
-  ImageActorPtr actor( new ImageActor() );
-  ImagePtr theImage( anImage );
+  ImageActorPtr actor( new ImageActor );
 
   // Second-phase construction of base class
   actor->Initialize();
 
   // Create the attachment
-  actor->mImageAttachment = ImageAttachment::New( *actor->mNode, theImage.Get() );
+  actor->mImageAttachment = ImageAttachment::New( *actor->mNode );
   actor->Attach( *actor->mImageAttachment );
 
-  // don't call the external version as attachment already has the image
-  actor->SetImageInternal( NULL, anImage );
-
-  return actor;
-}
-
-
-ImageActorPtr ImageActor::New( Image* image, const PixelArea& pixelArea )
-{
-  // re-use basic New
-  ImageActorPtr actor = New( image );
-  // then set the pixel area
-  actor->mImageAttachment->SetPixelArea( pixelArea );
   return actor;
 }
 
@@ -138,19 +118,35 @@ void ImageActor::OnInitialize()
   }
 }
 
-void ImageActor::SetImage( Image* image )
+void ImageActor::SetImage( ImagePtr& image )
 {
-  Image* currentImage = static_cast<Image*>(mImageAttachment->GetImage().GetObjectPtr());
-  // early exit if it's the same image
-  if ( currentImage == image || mImageNext.Get() == image )
+  ImagePtr currentImage = mImageAttachment->GetImage();
+  // early exit if it's the same image as we already have
+  if ( currentImage == image )
   {
     return;
   }
 
-  SetImageInternal( currentImage, image );
+  // NOTE! image might be pointing to NULL, which is fine as in that case app wants to just remove the image
+  ImagePtr newImage( image );
+  // if image is not NULL, check for 9 patch
+  if( newImage )
+  {
+    // Automatically convert nine-patch images to cropped bitmap
+    NinePatchImage* ninePatchImage = NinePatchImage::DownCast( image.Get() );
+    if( ninePatchImage )
+    {
+      newImage = ninePatchImage->CreateCroppedBitmapImage();
+      SetStyle( Dali::ImageActor::STYLE_NINE_PATCH );
+      SetNinePatchBorder( ninePatchImage->GetStretchBorders(), true );
+    }
+  }
+  // set the actual image (normal or 9 patch) and natural size based on that
+  mImageAttachment->SetImage( newImage );
+  SetNaturalSize();
 }
 
-Dali::Image ImageActor::GetImage()
+ImagePtr ImageActor::GetImage()
 {
   return mImageAttachment->GetImage();
 }
@@ -158,24 +154,15 @@ Dali::Image ImageActor::GetImage()
 void ImageActor::SetToNaturalSize()
 {
   mUsingNaturalSize = true;
-  Dali::Image image = mImageAttachment->GetImage();
 
-  if( image )
-  {
-    SetNaturalSize( GetImplementation(image) );
-  }
+  SetNaturalSize();
 }
 
 void ImageActor::SetPixelArea( const PixelArea& pixelArea )
 {
   mImageAttachment->SetPixelArea( pixelArea );
 
-  if( mUsingNaturalSize )
-  {
-    mInternalSetSize = true;
-    SetSize(pixelArea.width, pixelArea.height);
-    mInternalSetSize = false;
-  }
+  SetNaturalSize();
 }
 
 const ImageActor::PixelArea& ImageActor::GetPixelArea() const
@@ -194,11 +181,11 @@ void ImageActor::ClearPixelArea()
 
   if( mUsingNaturalSize )
   {
-    Dali::Image image = mImageAttachment->GetImage();
+    ImagePtr image = mImageAttachment->GetImage();
     if( image )
     {
       mInternalSetSize = true;
-      SetSize(GetImplementation(image).GetNaturalSize());
+      SetSize( image->GetNaturalSize() );
       mInternalSetSize = false;
     }
   }
@@ -224,46 +211,9 @@ Vector4 ImageActor::GetNinePatchBorder() const
   return mImageAttachment->GetNinePatchBorder();
 }
 
-void ImageActor::SetFadeIn( bool enableFade )
-{
-  mFadeIn = enableFade;
-}
-
-bool ImageActor::GetFadeIn() const
-{
-  return mFadeIn;
-}
-
-void ImageActor::SetFadeInDuration( float durationSeconds )
-{
-  mFadeInDuration = durationSeconds;
-}
-
-float ImageActor::GetFadeInDuration() const
-{
-  return mFadeInDuration;
-}
-
 ImageAttachment& ImageActor::GetImageAttachment()
 {
   return *mImageAttachment;
-}
-
-Vector2 ImageActor::GetCurrentImageSize() const
-{
-  Vector3 size;
-  Vector3 currentSize;
-
-  // get the texture size / pixel area if only a subset of it is displayed
-  if( IsPixelAreaSet() )
-  {
-    PixelArea area(GetPixelArea());
-    return Vector2(area.width, area.height );
-  }
-  else
-  {
-    return Vector2( GetCurrentSize() );
-  }
 }
 
 RenderableAttachment& ImageActor::GetRenderableAttachment() const
@@ -272,56 +222,37 @@ RenderableAttachment& ImageActor::GetRenderableAttachment() const
   return *mImageAttachment;
 }
 
-void ImageActor::SignalConnected( SlotObserver*, CallbackBase* )
-{
-  // nothing to do as we only ever connect to one signal, which we disconnect from in the destructor
-}
-
-void ImageActor::SignalDisconnected( SlotObserver*, CallbackBase* )
-{
-  // nothing to do as we only ever connect to one signal, which we disconnect from in the destructor
-  // also worth noting that we own the image whose signal we connect to so in practice this method is never called.
-}
-
 ImageActor::ImageActor()
 : RenderableActor(),
-  mFadeInDuration( 1.0f ),
   mUsingNaturalSize(true),
-  mInternalSetSize(false),
-  mFadeIn( false ),
-  mFadeInitial( true )
+  mInternalSetSize(false)
 {
 }
 
 ImageActor::~ImageActor()
 {
-  if( mImageAttachment )
-  {
-    Dali::Image image = mImageAttachment->GetImage();
-    if( image )
-    {
-      // just call Disconnect as if not connected it is a no-op
-      image.LoadingFinishedSignal().Disconnect( this, &ImageActor::ImageLoaded );
-    }
-  }
 }
 
-void ImageActor::SetNaturalSize( Image& image )
+void ImageActor::SetNaturalSize()
 {
   if( mUsingNaturalSize )
   {
+    // if no image then natural size is 0
     Vector2 size;
-    if( IsPixelAreaSet() )
+    ImagePtr image = mImageAttachment->GetImage();
+    if( image )
     {
-      PixelArea area(GetPixelArea());
-      size.width = area.width;
-      size.height = area.height;
+      if( IsPixelAreaSet() )
+      {
+        PixelArea area(GetPixelArea());
+        size.width = area.width;
+        size.height = area.height;
+      }
+      else
+      {
+        size = image->GetNaturalSize();
+      }
     }
-    else
-    {
-      size = image.GetNaturalSize();
-    }
-
     mInternalSetSize = true;
     SetSize( size );
     mInternalSetSize = false;
@@ -343,74 +274,10 @@ void ImageActor::OnSizeAnimation(Animation& animation, const Vector3& targetSize
 
 void ImageActor::OnStageConnectionInternal()
 {
-  FadeIn();
-
-  mImageNext.OnStageConnect();
 }
 
 void ImageActor::OnStageDisconnectionInternal()
 {
-  mImageNext.OnStageDisconnect();
-}
-
-void ImageActor::ImageLoaded( Dali::Image image )
-{
-  DALI_ASSERT_DEBUG (image && "Image handle empty!");
-
-  // TODO: Handle case where image loading failed
-
-  // Need to keep mUploadedConnection connected as image may change later through Reload
-  // Note: Reloaded images may have changed size.
-
-  // Set the attachment's image once we know the image has loaded to prevent
-  // blank frames during load / reload.
-  mImageAttachment->SetImage( &GetImplementation( image ) );
-
-  // If size has never been set by application
-  if( mUsingNaturalSize )
-  {
-    // If a pixel area has been set, use this size
-    if( IsPixelAreaSet() )
-    {
-      const PixelArea& area = GetPixelArea();
-      mInternalSetSize = true;
-      SetSize(area.width, area.height);
-      mInternalSetSize = false;
-    }
-    else
-    {
-      mInternalSetSize = true;
-      SetSize( GetImplementation(image).GetNaturalSize() );
-      mInternalSetSize = false;
-    }
-  }
-
-  // fade in if required
-  FadeIn();
-}
-
-void ImageActor::FadeIn()
-{
-  // only fade in if enabled and newly displayed on screen
-  if( mFadeIn && mFadeInitial && ( mFadeInDuration > 0.0f ) )
-  {
-    // need to set opacity immediately to 0 otherwise child actors might get rendered
-    SetOpacity( 0.0f );
-
-    Dali::Image image = mImageAttachment->GetImage();
-
-    // Fade-in when on-stage & the image is loaded
-    if (OnStage() &&
-        image &&
-        image.GetLoadingState() == Dali::ResourceLoadingSucceeded)
-    {
-      // fire and forget animation; will clean up after it's finished
-      Dali::Animation animation = Dali::Animation::New( mFadeInDuration );
-      animation.OpacityTo( Dali::Actor( this ), 1.0f, AlphaFunctions::EaseOut );
-      animation.Play();
-      mFadeInitial = false;
-    }
-  }
 }
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
@@ -545,16 +412,6 @@ void ImageActor::SetDefaultProperty( Property::Index index, const Property::Valu
         SetPixelArea(propertyValue.Get<Rect<int> >());
         break;
       }
-      case Dali::ImageActor::FADE_IN:
-      {
-        SetFadeIn(propertyValue.Get<bool>());
-        break;
-      }
-      case Dali::ImageActor::FADE_IN_DURATION:
-      {
-        SetFadeInDuration(propertyValue.Get<float>());
-        break;
-      }
       case Dali::ImageActor::STYLE:
       {
         SetStyle(StyleEnum(propertyValue.Get<std::string>()));
@@ -570,7 +427,8 @@ void ImageActor::SetDefaultProperty( Property::Index index, const Property::Valu
         Dali::Image img = Scripting::NewImage( propertyValue );
         if(img)
         {
-          SetImage( &GetImplementation(img) );
+          ImagePtr image( &GetImplementation(img) );
+          SetImage( image );
         }
         else
         {
@@ -605,16 +463,6 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
         ret = r;
         break;
       }
-      case Dali::ImageActor::FADE_IN:
-      {
-        ret = GetFadeIn();
-        break;
-      }
-      case Dali::ImageActor::FADE_IN_DURATION:
-      {
-        ret = GetFadeInDuration();
-        break;
-      }
       case Dali::ImageActor::STYLE:
       {
         ret = StyleString(GetStyle());
@@ -628,7 +476,7 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
       case Dali::ImageActor::IMAGE:
       {
         Property::Map map;
-        Scripting::CreatePropertyMap( mImageAttachment->GetImage(), map );
+        Scripting::CreatePropertyMap( Dali::Image( mImageAttachment->GetImage().Get() ), map );
         ret = Property::Value( map );
         break;
       }
@@ -641,47 +489,6 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
   }
 
   return ret;
-}
-
-void ImageActor::SetImageInternal( Image* currentImage, Image* image )
-{
-  if( currentImage )
-  {
-    // just call Disconnect as if not connected it is a no-op
-    currentImage->LoadingFinishedSignal().Disconnect( this, &ImageActor::ImageLoaded );
-  }
-
-  ImagePtr imagePtr( image );
-  // Automatically convert nine-patch images to cropped bitmap
-  NinePatchImage* ninePatchImage = NinePatchImage::GetNinePatchImage( image );
-  if( ninePatchImage )
-  {
-    imagePtr = ninePatchImage->CreateCroppedBitmapImage();
-  }
-  mImageNext.Set( imagePtr.Get(), OnStage() );
-  if( ninePatchImage )
-  {
-    SetStyle( Dali::ImageActor::STYLE_NINE_PATCH );
-    SetNinePatchBorder( ninePatchImage->GetStretchBorders(), true );
-  }
-  if( !imagePtr )
-  {
-    mImageAttachment->SetImage( NULL );
-  }
-  else
-  {
-    // don't disconnect currently shown image until we made sure that the new one is loaded
-    if( Dali::ResourceLoading == image->GetLoadingState() && !image->GetFilename().empty() )
-    {
-      // observe image loading, @todo stop using signals internally!
-      image->LoadingFinishedSignal().Connect( this, &ImageActor::ImageLoaded );
-    }
-    else
-    {
-      // image already loaded, generated or 9 patch
-      ImageLoaded( Dali::Image( image ) );
-    }
-  }
 }
 
 } // namespace Internal

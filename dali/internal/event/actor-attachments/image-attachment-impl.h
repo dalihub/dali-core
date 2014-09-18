@@ -51,22 +51,21 @@ public:
   /**
    * Create a new ImageAttachment.
    * @param[in] parentNode The node to attach a scene-object to.
-   * @param[in] image A pointer to the image to display or NULL to not render anything.
    * @return A smart-pointer to the newly allocated ImageAttachment.
    */
-  static ImageAttachmentPtr New( const SceneGraph::Node& parentNode, Image* image );
+  static ImageAttachmentPtr New( const SceneGraph::Node& parentNode );
 
   /**
    * Sets image rendered by the attachment.
-   * @param [in] image A pointer to the image to display or NULL to clear.
+   * @param [in] image A pointer to the image to display or NULL to clear. Reference to avoid unnecessary increment/decrement reference count.
    */
-  void SetImage(Image* image);
+  void SetImage( ImagePtr& image );
 
   /**
    * Retrieve the image rendered by the attachment.
    * @return The image or an uninitialized image in case the ImageActor was cleared.
    */
-  Dali::Image GetImage();
+  ImagePtr GetImage();
 
   /**
    * Set a region of the image to display, in pixels.
@@ -138,13 +137,13 @@ private:
    * @param[in] stage Used to send messages to scene-graph.
    * @param[in] image A pointer to the image to display or NULL to not render anything.
    */
-  ImageAttachment(Stage& stage, Image* image);
+  ImageAttachment(Stage& stage);
 
   /**
    * Creates the corresponding scene-graph ImageAttachment.
    * @return A newly allocated scene object.
    */
-  static SceneGraph::ImageAttachment* CreateSceneObject( const Image* current );
+  static SceneGraph::ImageAttachment* CreateSceneObject();
 
   /**
    * @copydoc Dali::Internal::RenderableAttachment::OnStageConnection2()

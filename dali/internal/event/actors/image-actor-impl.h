@@ -48,7 +48,7 @@ class Image;
  * mImageAttachment's member object. The first one points to the Image object that is going to
  * be displayed next, the second one to the Image that is currently being displayed.
  */
-class ImageActor : public RenderableActor, public ConnectionTrackerInterface
+class ImageActor : public RenderableActor
 {
 public:
 
@@ -56,24 +56,10 @@ public:
   typedef Dali::ImageActor::PixelArea PixelArea;
 
   /**
-   * @brief Create an initialised image actor.
-   * When the image is loaded the actors size will reset to the image size,
-   * unless a custom size chosen via Actor:SetSize().
-   * @param[in] image A pointer to the image object to display or NULL not to display anything.
+   * @brief Create an image actor instance.
    * @return A smart-pointer to a newly allocated image actor.
    */
-  static ImageActorPtr New( Image* image );
-
-  /**
-   * @brief Create an initialised image actor.
-   * When the image is loaded the actors size will reset to the image size,
-   * unless a custom size chosen via Actor:SetSize().
-   * @param [in] image A pointer to the image object to display or NULL not to display anything.
-   * @param [in] pixelArea The area of the image to display.
-   * This in pixels, relative to the top-left (0,0) of the image.
-   * @return A smart-pointer to a newly allocated image actor.
-   */
-  static ImageActorPtr New( Image* image, const PixelArea& pixelArea );
+  static ImageActorPtr New();
 
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize
@@ -81,19 +67,16 @@ public:
   void OnInitialize() ;
 
   /**
-   * Set the image rendered by the actor's attachment.
-   * When the image is loaded the actors size will be reset to the image size,
-   * unless a custom size is chosen via Actor:SetSize().
-   * The old image will continue to be displayed until the new image has loaded
-   * @param [in] image A pointer to the image to display or NULL not to display anything.
+   * @see Dali::ImageActor::SetImage()
+   * @param[in] ImagePtr reference to the image object to display. Reference to avoid unnecessary increment/decrement reference.
    */
-  void SetImage( Image* image );
+  void SetImage( ImagePtr& image );
 
   /**
    * Retrieve the image rendered by the actor's attachment.
-   * @return The image (uninitialized Image object in case the ImageActor does not display anything).
+   * @return smart pointer to the image or an empty one if no image is assigned
    */
-  Dali::Image GetImage();
+  ImagePtr GetImage();
 
   /**
    * @copydoc Dali::ImageActor::SetToNaturalSize()
@@ -101,38 +84,32 @@ public:
   void SetToNaturalSize();
 
   /**
-   * Set a region of the image to display, in pixels.
-   * @param [in] pixelArea The area of the image to display.
-   * This in pixels, relative to the top-left (0,0) of the image.
+   * @copydoc Dali::ImageActor::SetPixelArea()
    */
   void SetPixelArea( const PixelArea& pixelArea );
 
   /**
-   * Retrieve the region of the image to display, in pixels.
-   * @return The pixel area, or a default-constructed area if none was set.
+   * @copydoc Dali::ImageActor::GetPixelArea()
    */
   const PixelArea& GetPixelArea() const;
 
   /**
-   * Query whether a pixel area has been set.
-   * @return True if a pixel area has been set.
+   * @copydoc Dali::ImageActor::IsPixelAreaSet()
    */
   bool IsPixelAreaSet() const;
 
   /**
-   * Remove any pixel areas specified with SetPixelArea; the entire image will be displayed.
+   * @copydoc Dali::ImageActor::ClearPixelArea()
    */
   void ClearPixelArea();
 
   /**
-   * Set how the image is rendered; the default is STYLE_QUAD.
-   * @param [in] style The new style.
+   * @copydoc Dali::ImageActor::SetStyle()
    */
   void SetStyle( Style style );
 
   /**
-   * Query how the image is rendered.
-   * @return The rendering style.
+   * @copydoc Dali::ImageActor::GetStyle()
    */
   Style GetStyle() const;
 
@@ -147,39 +124,10 @@ public:
   Vector4 GetNinePatchBorder() const;
 
   /**
-   * Set whether the image should gradually fade in when first rendered.
-   * @param [in] enableFade True if the image should fade in.
-   */
-  void SetFadeIn(bool enableFade);
-
-  /**
-   * Query whether the image will gradually fade in when first rendered.
-   * @return True if the image will fade in.
-   */
-  bool GetFadeIn() const;
-
-  /**
-   * Set the duration of the fade-in effect; the default is 1 second.
-   * @param [in] durationSeconds The duration in seconds.
-   */
-  void SetFadeInDuration( float durationSeconds );
-
-  /**
-   * Retrieve the duration of the fade-in effect.
-   * @return The duration in seconds.
-   */
-  float GetFadeInDuration() const;
-
-  /**
    * Retrieve the attachment which renders the image.
    * @return The attachment.
    */
   ImageAttachment& GetImageAttachment();
-
-  /**
-   * @copydoc Dali::ImageActor::GetCurrentImageSize
-   */
-  Vector2 GetCurrentImageSize() const;
 
 public: // Default property extensions from ProxyObject
 
@@ -240,18 +188,6 @@ private: // From RenderableActor
    */
   virtual RenderableAttachment& GetRenderableAttachment() const;
 
-private: // From ConnectionTrackerInterface
-
-  /**
-   * @copydoc SignalObserver::SignalConnected
-   */
-  virtual void SignalConnected( SlotObserver*, CallbackBase* );
-
-  /**
-   * @copydoc ConnectionTrackerInterface::SignalDisconnected
-   */
-  virtual void SignalDisconnected(Dali::SlotObserver*, Dali::CallbackBase* );
-
 protected:
 
   /**
@@ -268,9 +204,8 @@ private:
 
   /**
    * Helper to set the actor to the image's natural size
-   * @param image that is used
    */
-  void SetNaturalSize( Image& image );
+  void SetNaturalSize();
 
   /**
    * From Actor.
@@ -293,37 +228,13 @@ private:
    */
   virtual void OnStageDisconnectionInternal();
 
-  /**
-   * Helper for when the image loads.
-   * @param[in] image The newly (re)loaded image.
-   */
-  void ImageLoaded( Dali::Image image );
-
-  /**
-   * Helper to start fade-in animations.
-   */
-  void FadeIn();
-
-  /**
-   * Helper to set image internally
-   * @param currentImage
-   * @param image to set
-   */
-  void SetImageInternal( Image* currentImage, Image* image );
-
 private:
 
   ImageAttachmentPtr mImageAttachment; ///< Used to display the image (holds a pointer to currently showed Image)
-  ImageConnector     mImageNext;       ///< Manages the Image this ImageActor will show (used when changing displayed image)
 
-  // For fade-in animations
-  float mFadeInDuration;  ///< Length of animation
-
-  // flags, compressed to bitfield (uses only 4 bytes)
+  // flags, compressed to bitfield (uses only 1 byte)
   bool mUsingNaturalSize:1;      ///< True only when the actor is using
   bool mInternalSetSize:1;       ///< True whilst setting size internally, false at all other times
-  bool mFadeIn:1;                ///< True if fade in animation is enabled
-  bool mFadeInitial:1;           ///< True if fading in for the first time
 
   static bool mFirstInstance ;
   static DefaultPropertyLookup* mDefaultImageActorPropertyLookup; ///< Default properties

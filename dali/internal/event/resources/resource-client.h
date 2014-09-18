@@ -20,7 +20,6 @@
 
 // EXTERNAL INCLUDES
 #include <string>
-#include <boost/functional/hash.hpp>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/ref-counted-dali-vector.h>
@@ -36,7 +35,6 @@
 namespace Dali
 {
 
-typedef boost::hash<const std::string> StringHash;
 class NativeImage;
 
 namespace Integration

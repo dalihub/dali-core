@@ -630,8 +630,19 @@ int UtcDaliTypeRegistryCustomActor(void)
   MyTestCustomActor customHandle = MyTestCustomActor::DownCast( handle );
   DALI_TEST_CHECK( customHandle );
 
-  DALI_TEST_EQUALS( type.GetActions().size(), TEST_ACTION_COUNT + baseType.GetActions().size(), TEST_LOCATION );
-  DALI_TEST_EQUALS( type.GetSignals().size(), TEST_SIGNAL_COUNT + baseType.GetSignals().size(), TEST_LOCATION );
+  TypeInfo::NameContainer names;
+  type.GetActions(names);
+  TypeInfo::NameContainer baseNames;
+  baseType.GetActions(baseNames);
+  DALI_TEST_EQUALS( names.size(), TEST_ACTION_COUNT + baseNames.size(), TEST_LOCATION );
+
+  names.clear();
+  type.GetSignals(names);
+
+  baseNames.clear();
+  baseType.GetSignals(baseNames);
+
+  DALI_TEST_EQUALS( names.size(), TEST_SIGNAL_COUNT + baseNames.size(), TEST_LOCATION );
 
   {
     TestConnectionTracker tracker;
@@ -685,8 +696,21 @@ int UtcDaliTypeRegistryCustomSignalFailure(void)
   MyTestCustomActor customHandle = MyTestCustomActor::DownCast( handle );
   DALI_TEST_CHECK( customHandle );
 
-  DALI_TEST_EQUALS( type.GetActions().size(), TEST_ACTION_COUNT + baseType.GetActions().size(), TEST_LOCATION );
-  DALI_TEST_EQUALS( type.GetSignals().size(), TEST_SIGNAL_COUNT + baseType.GetSignals().size(), TEST_LOCATION );
+  TypeInfo::NameContainer names;
+  TypeInfo::NameContainer baseNames;
+
+  type.GetActions(names);
+  baseType.GetActions(baseNames);
+
+  DALI_TEST_EQUALS( names.size(), TEST_ACTION_COUNT + baseNames.size(), TEST_LOCATION );
+
+  names.clear();
+  baseNames.clear();
+
+  type.GetSignals(names);
+  baseType.GetSignals(baseNames);
+
+  DALI_TEST_EQUALS( names.size(), TEST_SIGNAL_COUNT + baseNames.size(), TEST_LOCATION );
 
   {
     TestConnectionTracker tracker;

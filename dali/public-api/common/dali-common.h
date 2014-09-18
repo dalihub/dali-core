@@ -22,7 +22,9 @@
 #include <string>
 #include <cstdio>
 
-
+#ifdef EMSCRIPTEN
+#include <emscripten/emscripten.h>
+#endif
 /*
  * Definitions for shared library support
  *
@@ -67,7 +69,7 @@
 
 // clang cpp11 check is per feature
 #if !__has_feature(cxx_constexpr)
-# error constexpr needed for compile-time-math. Use --std=c11
+# error constexpr needed for compile-time-math. Use -std=c+11
 #endif
 
 #define _CPP11
@@ -131,12 +133,26 @@ public:
  * (which it is often equivalent to in effect).
  * It should not be used for simple parameter validation for instance.
  */
-#define DALI_ASSERT_ALWAYS(cond) \
+#ifdef EMSCRIPTEN
+
+#define DALI_ASSERT_ALWAYS(cond)                \
+  if(!(cond)) \
+  { \
+    Dali::DaliAssertMessage(#cond, __FILE__, __LINE__);   \
+    throw Dali::DaliException(__PRETTY_FUNCTION__, #cond);  \
+    EM_ASM(print(new Error().stack)); \
+  }\
+
+#else
+
+#define DALI_ASSERT_ALWAYS(cond)                \
   if(!(cond)) \
   { \
     Dali::DaliAssertMessage(#cond, __FILE__, __LINE__);   \
     throw Dali::DaliException(__PRETTY_FUNCTION__, #cond);  \
   }\
+
+#endif
 
 /**
  * @brief An invariant concurrent assertion to ensure its argument evaluates TRUE in debug builds.

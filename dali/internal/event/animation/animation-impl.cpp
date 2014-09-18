@@ -101,6 +101,7 @@ Animation::Animation( UpdateManager& updateManager, AnimationPlaylist& playlist,
   mFinishedCallback( NULL ),
   mFinishedCallbackObject( NULL ),
   mDurationSeconds( durationSeconds ),
+  mSpeedFactor(1.0f),
   mIsLooping( false ),
   mEndAction( endAction ),
   mDestroyAction( destroyAction ),
@@ -137,7 +138,7 @@ void Animation::CreateSceneObject()
   DALI_ASSERT_DEBUG( mAnimation == NULL );
 
   // Create a new animation, temporarily owned
-  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mIsLooping, mEndAction, mDestroyAction );
+  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mIsLooping, mEndAction, mDestroyAction );
 
   // Keep a const pointer to the animation.
   mAnimation = animation;
@@ -1233,6 +1234,22 @@ void Animation::ExtendDuration( const TimePeriod& timePeriod )
     SetDuration( duration );
   }
 }
+
+void Animation::SetSpeedFactor( float factor )
+{
+  if( mAnimation )
+  {
+    mSpeedFactor = factor;
+    SetSpeedFactorMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, factor );
+  }
+}
+
+float Animation::GetSpeedFactor() const
+{
+  return mSpeedFactor;
+}
+
+
 
 } // namespace Internal
 

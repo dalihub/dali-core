@@ -797,6 +797,16 @@ public:
    */
   void SetCurrentProgress(float progress);
 
+  /*
+   * @copydoc Dali::Animation::SetSpeedFactor()
+   */
+  void SetSpeedFactor( float factor );
+
+  /*
+   * @copydoc Dali::Animation::GetSpeedFactor()
+   */
+  float GetSpeedFactor() const;
+
 public: // For connecting animators to animations
 
   /**
@@ -893,6 +903,7 @@ private:
 
   // Cached for public getters
   float mDurationSeconds;
+  float mSpeedFactor;
   bool mIsLooping;
   EndAction mEndAction;
   EndAction mDestroyAction;

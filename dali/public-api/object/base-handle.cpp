@@ -74,6 +74,11 @@ const std::string& BaseHandle::GetTypeName() const
   return GetImplementation(*this).GetTypeName();
 }
 
+bool BaseHandle::GetTypeInfo(Dali::TypeInfo& typeInfo) const
+{
+  return GetImplementation(*this).GetTypeInfo(typeInfo);
+}
+
 BaseObject& BaseHandle::GetBaseObject()
 {
   DALI_ASSERT_ALWAYS( mObjectHandle.Get() && "BaseHandle is empty" );

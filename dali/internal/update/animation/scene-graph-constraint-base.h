@@ -124,6 +124,18 @@ public:
    */
   virtual void Apply( BufferIndex updateBufferIndex ) = 0;
 
+  /**
+   * Helper for internal test cases; only available for debug builds.
+   * @return The current number of Constraint instances in existence.
+   */
+  static unsigned int GetCurrentInstanceCount();
+
+  /**
+   * Helper for internal test cases; only available for debug builds.
+   * @return The total number of Constraint instances created during the Dali core lifetime.
+   */
+  static unsigned int GetTotalInstanceCount();
+
 private:
 
   /**
@@ -193,6 +205,11 @@ protected:
 private:
 
   PropertyOwnerSet mObservedOwners; ///< A set of pointers to each observed object. Not owned.
+
+#ifdef DEBUG_ENABLED
+  static unsigned int mCurrentInstanceCount;  ///< The current number of Constraint instances in existence.
+  static unsigned int mTotalInstanceCount;    ///< The total number of Constraint instances created during the Dali core lifetime.
+#endif
 };
 
 // Messages for ConstraintBase

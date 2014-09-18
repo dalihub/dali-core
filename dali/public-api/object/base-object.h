@@ -61,6 +61,11 @@ public:
    */
   const std::string& GetTypeName() const;
 
+  /**
+   * @copydoc Dali::BaseHandle::GetTypeInfo
+   */
+  bool GetTypeInfo(Dali::TypeInfo& info) const;
+
 public: // Not intended for application developers
 
   /**

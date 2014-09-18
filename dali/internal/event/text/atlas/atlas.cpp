@@ -261,7 +261,7 @@ void Atlas::FillAtlasItem( unsigned int blockNum, AtlasItem& atlasItem, UvMode m
   unsigned int block1dPos = blockNum * mBlockSize;
 
   unsigned int blockX = block1dPos  % mSize;
-  unsigned int blockY = mBlockSize * floor( block1dPos / mSize ) ;
+  unsigned int blockY = mBlockSize * floor( block1dPos / mSize );
 
   atlasItem.xPos = blockX;
   atlasItem.yPos = blockY;
@@ -300,7 +300,7 @@ void Atlas::GetPositionOfBlock( unsigned int block1dPos, unsigned int& row, unsi
   {
     column =  block1dPos % GetBlocksPerRow();
   }
-  row =  floor( block1dPos / GetBlocksPerRow() ) ;
+  row =  floor( block1dPos / GetBlocksPerRow() );
 
   unsigned int bytePos, bitPos;
 

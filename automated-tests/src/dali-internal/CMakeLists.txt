@@ -15,6 +15,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-ResourceClient.cpp
         utc-Dali-Internal-Image-Culling.cpp
         utc-Dali-Internal-Text-Culling.cpp
+        utc-Dali-Internal-Constraint.cpp
 )
 
 LIST(APPEND TC_SOURCES

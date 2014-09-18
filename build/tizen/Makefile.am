@@ -37,6 +37,9 @@ CLEANFILES = \
 COVERAGE_DIR=.cov
 COVERAGE_OUTPUT_DIR=doc/coverage
 
+# From lcov version 1.10 onwards, branch coverage is off by default and earlier versions do not support the rc option
+LCOV_OPTS=`if [ \`printf "\\\`lcov --version | cut -d' ' -f4\\\`\n1.10\n" | sort -V | head -n 1\` = 1.10 ] ; then echo "--rc lcov_branch_coverage=1" ; fi`
+
 cov_data:
 	@test -z $(COVERAGE_DIR) || mkdir -p $(COVERAGE_DIR)
 	@rm -f $(COVERAGE_DIR)/*
@@ -45,12 +48,12 @@ cov_data:
 		do mv $$i `echo $$i | sed s/libdali_core_la-//` ; echo $$i ; done
 	@for i in `find $(COVERAGE_DIR) -name "libdali_la-*.gcda" -o -name "libdali_la-*.gcno"` ;\
 		do mv $$i `echo $$i | sed s/libdali_la-//` ; done
-	@cd $(COVERAGE_DIR) ; lcov --base-directory . --directory . -c -o dali.info
-	@cd $(COVERAGE_DIR) ; lcov --remove dali.info "*boost*" "*/dali-env/*" "/usr/include/*" -o dali.info
+	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --base-directory . --directory . -c -o dali.info
+	@cd $(COVERAGE_DIR) ; lcov $(LCOV_OPTS) --remove dali.info "*boost*" "*/dali-env/*" "/usr/include/*" -o dali.info
 	@test -z $(COVERAGE_OUTPUT_DIR) || mkdir -p $(COVERAGE_OUTPUT_DIR)
 
 coverage: cov_data
-	@genhtml -o $(COVERAGE_OUTPUT_DIR) $(COVERAGE_DIR)/dali.info
+	@genhtml $(LCOV_OPTS) -o $(COVERAGE_OUTPUT_DIR) $(COVERAGE_DIR)/dali.info
 
 reset_coverage:
 	@lcov -z --directory `pwd`
