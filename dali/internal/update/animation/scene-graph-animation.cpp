@@ -40,8 +40,9 @@ float DefaultAlphaFunc(float progress)
   return progress; // linear
 }
 
-Animation::Animation(float durationSeconds, bool isLooping, Dali::Animation::EndAction endAction, Dali::Animation::EndAction destroyAction)
+Animation::Animation(float durationSeconds, float speedFactor, bool isLooping, Dali::Animation::EndAction endAction, Dali::Animation::EndAction destroyAction)
 : mDurationSeconds(durationSeconds),
+  mSpeedFactor( speedFactor ),
   mLooping(isLooping),
   mEndAction(endAction),
   mDestroyAction(destroyAction),
@@ -80,6 +81,11 @@ void Animation::SetDestroyAction(Dali::Animation::EndAction action)
 void Animation::Play()
 {
   mState = Playing;
+
+  if ( mSpeedFactor < 0.0f && mElapsedSeconds <= 0.0f )
+  {
+    mElapsedSeconds = mDurationSeconds;
+  }
 }
 
 void Animation::PlayFrom( float progress )
@@ -112,7 +118,15 @@ bool Animation::Stop(BufferIndex bufferIndex)
     {
       if( mEndAction == Dali::Animation::BakeFinal )
       {
-        mElapsedSeconds = mDurationSeconds + Math::MACHINE_EPSILON_1; // Force animation to reach it's end
+        if( mSpeedFactor > 0.0f )
+        {
+          mElapsedSeconds = mDurationSeconds + Math::MACHINE_EPSILON_1; // Force animation to reach it's end
+        }
+        else
+        {
+          mElapsedSeconds = 0.0f - Math::MACHINE_EPSILON_1; //Force animation to reach it's beginning
+        }
+
       }
       UpdateAnimators(bufferIndex, true/*bake the final result*/);
     }
@@ -158,18 +172,26 @@ bool Animation::Update(BufferIndex bufferIndex, float elapsedSeconds)
   // The animation must still be applied when Paused/Stopping
   if (mState == Playing)
   {
-    mElapsedSeconds += elapsedSeconds;
+    mElapsedSeconds += elapsedSeconds * mSpeedFactor;
   }
 
   if (mLooping)
   {
-    if (mElapsedSeconds > mDurationSeconds)
+    if (mElapsedSeconds > mDurationSeconds )
     {
       mElapsedSeconds = fmod(mElapsedSeconds, mDurationSeconds);
     }
+    else if( mElapsedSeconds < 0.0f )
+    {
+      mElapsedSeconds = mDurationSeconds - fmod(mElapsedSeconds, mDurationSeconds);
+    }
   }
 
-  const bool animationFinished(mState == Playing && mElapsedSeconds > mDurationSeconds);
+
+  const bool animationFinished(mState == Playing                                              &&
+                              (( mSpeedFactor > 0.0f && mElapsedSeconds > mDurationSeconds )  ||
+                               ( mSpeedFactor < 0.0f && mElapsedSeconds < 0.0f ))
+                              );
 
   UpdateAnimators(bufferIndex, animationFinished && (mEndAction != Dali::Animation::Discard));
 
@@ -195,14 +217,14 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake)
     AnimatorBase *animator = *iter;
     const float initialDelay(animator->GetInitialDelay());
 
-    if (mElapsedSeconds >= initialDelay)
+    if (mElapsedSeconds >= initialDelay || mSpeedFactor < 0.0f )
     {
       // Calculate a progress specific to each individual animator
       float progress(1.0f);
       const float animatorDuration = animator->GetDuration();
       if (animatorDuration > 0.0f) // animators can be "immediate"
       {
-        progress = min(1.0f, (mElapsedSeconds - initialDelay) / animatorDuration);
+        progress = Clamp((mElapsedSeconds - initialDelay) / animatorDuration, 0.0f , 1.0f );
       }
 
       applied = animator->Update(bufferIndex, progress, bake);

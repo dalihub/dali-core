@@ -498,4 +498,14 @@ void Animation::SetCurrentProgress( float progress )
   return GetImplementation(*this).SetCurrentProgress( progress );
 }
 
+void Animation::SetSpeedFactor( float factor )
+{
+  GetImplementation(*this).SetSpeedFactor( factor );
+}
+
+float Animation::GetSpeedFactor() const
+{
+  return GetImplementation(*this).GetSpeedFactor();
+}
+
 } // namespace Dali
