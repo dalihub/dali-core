@@ -1,5 +1,5 @@
-#ifndef __DALI_TOUCH_EVENT_H__
-#define __DALI_TOUCH_EVENT_H__
+#ifndef __DALI_HOVER_EVENT_H__
+#define __DALI_HOVER_EVENT_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -25,36 +25,37 @@
 
 namespace Dali DALI_IMPORT_API
 {
+
 /**
- * @brief Touch events are a collection of touch points at a specific moment in time.
+ * @brief Hover events are a collection of touch points at a specific moment in time.
  *
  * When a multi-touch event occurs, each touch point represents the points that are currently being
- * touched or the points where a touch has stopped.
+ * hovered or the points where a hover has stopped.
  */
-struct DALI_IMPORT_API TouchEvent
+struct DALI_IMPORT_API HoverEvent
 {
   // Construction & Destruction
 
   /**
    * @brief Default constructor
    */
-  TouchEvent();
+  HoverEvent();
 
   /**
    * @brief Constructor
    * @param[in]  time  The time the event occurred
    */
-  TouchEvent(unsigned long time);
+  HoverEvent(unsigned long time);
 
   /**
    * @brief Destructor
    */
-  ~TouchEvent();
+  ~HoverEvent();
 
   // Data
 
   /**
-   * @brief This is a container of points for this touch event.
+   * @brief This is a container of points for this hover event.
    *
    * The first point in the set is always the
    * primary touch point (i.e. the first point touched in a multi-touch event).
@@ -62,14 +63,14 @@ struct DALI_IMPORT_API TouchEvent
   TouchPointContainer points;
 
   /**
-   * @brief The time (in ms) that the touch event occurred.
+   * @brief The time (in ms) that the hover event occurred.
    */
   unsigned long time;
 
   // Convenience Methods
 
   /**
-   * @brief Returns the total number of points in this TouchEvent.
+   * @brief Returns the total number of points in this HoverEvent.
    *
    * @return Total number of Points.
    */
@@ -90,4 +91,4 @@ struct DALI_IMPORT_API TouchEvent
 
 } // namespace Dali
 
-#endif // __DALI_TOUCH_EVENT_H__
+#endif // __DALI_HOVER_EVENT_H__

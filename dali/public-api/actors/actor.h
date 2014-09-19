@@ -50,6 +50,7 @@ class Layer;
 struct Radian;
 struct KeyEvent;
 struct TouchEvent;
+struct HoverEvent;
 struct MouseWheelEvent;
 struct Vector2;
 struct Vector3;
@@ -71,11 +72,11 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  *
  * <h3>Multi-Touch Events:</h3>
  *
- * Touch events are received via signals; see Actor::TouchedSignal() for more details.
+ * Touch or hover events are received via signals; see Actor::TouchedSignal() and Actor::HoveredSignal() for more details.
  *
  * <i>Hit Testing Rules Summary:</i>
  *
- * - An actor is only hittable if the actor's touch signal has a connection.
+ * - An actor is only hittable if the actor's touch or hover signal has a connection.
  * - An actor is only hittable when it is between the camera's near and far planes.
  * - If an actor is made insensitive, then the actor and its children are not hittable; see IsSensitive()
  * - If an actor's visibility flag is unset, then none of its children are hittable either; see IsVisible()
@@ -108,7 +109,7 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  *         // Depth-first traversal within current layer, visiting parent first
  *
  *         // Check whether current actor should be hit-tested
- *         IF ( TOUCH-SIGNAL-NOT-EMPTY &&
+ *         IF ( ( TOUCH-SIGNAL-NOT-EMPTY || HOVER-SIGNAL-NOT-EMPTY ) &&
  *              ACTOR-HAS-NON-ZERO-SIZE &&
  *              ACTOR-WORLD-COLOR-IS-NOT-TRANSPARENT )
  *         {
@@ -158,11 +159,11 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  *     also be considered a Stencil Actor.
  *     Non-renderable actors can be hit regardless of whether a stencil actor is hit or not.
  *
- * <i>Touch Event Delivery:</i>
+ * <i>Touch or hover Event Delivery:</i>
  *
  * - Delivery
- *   - The hit actor's touch signal is emitted first; if it is not consumed by any of the listeners,
- *     the parent's touch signal is emitted, and so on.
+ *   - The hit actor's touch or hover signal is emitted first; if it is not consumed by any of the listeners,
+ *     the parent's touch or hover signal is emitted, and so on.
  *   - The following pseudocode shows the delivery mechanism:
  *     @code
  *     EMIT-TOUCH-SIGNAL( ACTOR )
@@ -182,25 +183,45 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  *         }
  *       }
  *     }
+ *
+ *     EMIT-HOVER-SIGNAL( ACTOR )
+ *     {
+ *       IF ( HOVER-SIGNAL-NOT-EMPTY )
+ *       {
+ *         // Only do the emission if hover signal of actor has connections.
+ *         CONSUMED = HOVERED-SIGNAL( HOVER-EVENT )
+ *       }
+ *
+ *       IF ( NOT-CONSUMED )
+ *       {
+ *         // If event is not consumed then deliver it to the parent unless we reach the root actor
+ *         IF ( ACTOR-PARENT )
+ *         {
+ *           EMIT-HOVER-SIGNAL( ACTOR-PARENT )
+ *         }
+ *       }
+ *     }
  *     @endcode
  *   - If there are several touch points, then the delivery is only to the first touch point's hit
- *     actor (and its parents).  There will be NO touch signal delivery for the hit actors of the
+ *     actor (and its parents).  There will be NO touch or hover signal delivery for the hit actors of the
  *     other touch points.
  *   - The local coordinates are from the top-left (0.0f, 0.0f, 0.5f) of the hit actor.
  *
  * - Leave State
  *   - A "Leave" state is set when the first point exits the bounds of the previous first point's
  *     hit actor (primary hit actor).
- *   - When this happens, the last primary hit actor's touch signal is emitted with a "Leave" state
+ *   - When this happens, the last primary hit actor's touch or hover signal is emitted with a "Leave" state
  *     (only if it requires leave signals); see SetLeaveRequired().
  *
  * - Interrupted State
- *   - If a system event occurs which interrupts the touch processing, then the last primary hit
- *     actor's touch signals are emitted with an "Interrupted" state.
- *   - If the last primary hit actor, or one of its parents, is no longer touchable, then its
- *     touch signals are also emitted with an "Interrupted" state.
+ *   - If a system event occurs which interrupts the touch or hover processing, then the last primary hit
+ *     actor's touch or hover signals are emitted with an "Interrupted" state.
+ *   - If the last primary hit actor, or one of its parents, is no longer touchable or hoverable, then its
+ *     touch or hover signals are also emitted with an "Interrupted" state.
  *   - If the consumed actor on touch-down is not the same as the consumed actor on touch-up, then
  *     touch signals are also emitted from the touch-down actor with an "Interrupted" state.
+ *   - If the consumed actor on hover-start is not the same as the consumed actor on hover-finished, then
+ *     hover signals are also emitted from the hover-started actor with an "Interrupted" state.
  * <h3>Key Events:</h3>
  *
  * Key events are received by an actor once set to grab key events, only one actor can be set as focused.
@@ -214,6 +235,7 @@ public:
   // Typedefs
 
   typedef SignalV2< bool (Actor, const TouchEvent&)> TouchSignalV2;                ///< Touch signal type
+  typedef SignalV2< bool (Actor, const HoverEvent&)> HoverSignalV2;                ///< Hover signal type
   typedef SignalV2< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalV2;///< Mousewheel signal type
   typedef SignalV2< void (Actor, const Vector3&) > SetSizeSignalV2; ///< SetSize signal type
   typedef SignalV2< void (Actor) > OnStageSignalV2;  ///< Stage connection signal type
@@ -269,6 +291,7 @@ public:
   /// @name Signals
   /** @{ */
   static const char* const SIGNAL_TOUCHED;            ///< name "touched",           @see TouchedSignal()
+  static const char* const SIGNAL_HOVERED;            ///< name "hovered",           @see HoveredSignal()
   static const char* const SIGNAL_MOUSE_WHEEL_EVENT;  ///< name "mouse-wheel-event", @see MouseWheelEventSignal()
   static const char* const SIGNAL_SET_SIZE;           ///< name "set-size",          @see SetSizeSignal()
   static const char* const SIGNAL_ON_STAGE;           ///< name "on-stage",          @see OnStageSignal()
@@ -1055,38 +1078,39 @@ public:
   // Input Handling
 
   /**
-   * @brief Sets whether an actor should emit touch event signals; @see SignalTouched().
+   * @brief Sets whether an actor should emit touch or hover signals; see SignalTouch() and SignalHover().
    *
-   * An actor is sensitive by default, which means that as soon as an application connects to the SignalTouched(),
-   * the touch event signal will be emitted.
+   * An actor is sensitive by default, which means that as soon as an application connects to the SignalTouch(),
+   * the touch event signal will be emitted, and as soon as an application connects to the SignalHover(), the
+   * hover event signal will be emitted.
    *
-   * If the application wishes to temporarily disable the touch event signal emission, then they can do so by calling:
+   * If the application wishes to temporarily disable the touch or hover event signal emission, then they can do so by calling:
    * @code
    * actor.SetSensitive(false);
    * @endcode
    *
-   * Then, to re-enable the touch event signal emission, the application should call:
+   * Then, to re-enable the touch or hover event signal emission, the application should call:
    * @code
    * actor.SetSensitive(true);
    * @endcode
    *
-   * @see SignalTouched().
+   * @see @see SignalTouch() and SignalHover().
    * @note If an actor's sensitivity is set to false, then it's children will not be hittable either.
    *       This is regardless of the individual sensitivity values of the children i.e. an actor will only be
    *       hittable if all of its parents have sensitivity set to true.
    * @pre The Actor has been initialized.
-   * @param[in]  sensitive  true to enable emission of the touch event signals, false otherwise.
+   * @param[in]  sensitive  true to enable emission of the touch or hover event signals, false otherwise.
    */
   void SetSensitive(bool sensitive);
 
   /**
-   * @brief Query whether an actor emits touch event signals.
+   * @brief Query whether an actor emits touch or hover event signals.
    *
    * @note If an actor is not sensitive, then it's children will not be hittable either.
    *       This is regardless of the individual sensitivity values of the children i.e. an actor will only be
    *       hittable if all of its parents have sensitivity set to true.
    * @pre The Actor has been initialized.
-   * @return true, if emission of touch event signals is enabled, false otherwise.
+   * @return true, if emission of touch or hover event signals is enabled, false otherwise.
    */
   bool IsSensitive() const;
 
@@ -1104,11 +1128,11 @@ public:
   bool ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const;
 
   /**
-   * @brief Sets whether the actor should receive a notification when touch motion events leave
+   * @brief Sets whether the actor should receive a notification when touch or hover motion events leave
    * the boundary of the actor.
    *
    * @note By default, this is set to false as most actors do not require this.
-   * @note Need to connect to the SignalTouch to actually receive this event.
+   * @note Need to connect to the SignalTouch or SignalHover to actually receive this event.
    *
    * @pre The Actor has been initialized.
    * @param[in]  required  Should be set to true if a Leave event is required
@@ -1116,7 +1140,7 @@ public:
   void SetLeaveRequired(bool required);
 
   /**
-   * @brief This returns whether the actor requires touch events whenever touch motion events leave
+   * @brief This returns whether the actor requires touch or hover events whenever touch or hover motion events leave
    * the boundary of the actor.
    *
    * @pre The Actor has been initialized.
@@ -1157,6 +1181,20 @@ public: // Signals
    * @return The signal to connect to.
    */
   TouchSignalV2& TouchedSignal();
+
+  /**
+   * @brief This signal is emitted when hover input is received.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   bool YourCallbackName(Actor actor, const HoverEvent& event);
+   * @endcode
+   * The return value of True, indicates that the hover event should be consumed.
+   * Otherwise the signal will be emitted on the next sensitive parent of the actor.
+   * @pre The Actor has been initialized.
+   * @return The signal to connect to.
+   */
+  HoverSignalV2& HoveredSignal();
 
   /**
    * @brief This signal is emitted when mouse wheel event is received.

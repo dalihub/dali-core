@@ -70,6 +70,7 @@
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/hit-test-algorithm.h>
+#include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/public-api/events/long-press-gesture.h>

@@ -112,7 +112,8 @@ Layer::Layer( Actor::DerivedType type )
   mSortFunction(Dali::Layer::ZValue),
   mIsClipping(false),
   mDepthTestDisabled(false),
-  mTouchConsumed(false)
+  mTouchConsumed(false),
+  mHoverConsumed(false)
 {
 }
 
@@ -283,6 +284,16 @@ void Layer::SetTouchConsumed( bool consume )
 bool Layer::IsTouchConsumed() const
 {
   return mTouchConsumed;
+}
+
+void Layer::SetHoverConsumed( bool consume )
+{
+  mHoverConsumed = consume;
+}
+
+bool Layer::IsHoverConsumed() const
+{
+  return mHoverConsumed;
 }
 
 SceneGraph::Node* Layer::CreateNode() const

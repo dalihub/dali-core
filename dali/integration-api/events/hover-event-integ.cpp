@@ -16,38 +16,28 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/actors/custom-actor-internal.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 
 namespace Dali
 {
 
-namespace Internal
+namespace Integration
 {
 
-CustomActorPtr CustomActor::New(CustomActorImpl& extension)
-{
-  CustomActorPtr actor(new CustomActor(extension));
-
-  // Second-phase construction
-  extension.Initialize(*actor);
-  actor->Initialize();
-
-  return actor;
-}
-
-CustomActor::CustomActor(CustomActorImpl& extension)
-: Actor( Actor::BASIC ),
-  mImpl( &extension )
-{
-  mDerivedRequiresTouch = extension.RequiresTouchEvents();
-  mDerivedRequiresHover = extension.RequiresHoverEvents();
-  mDerivedRequiresMouseWheelEvent = extension.RequiresMouseWheelEvents();
-}
-
-CustomActor::~CustomActor()
+HoverEvent::HoverEvent()
+: MultiPointEvent( Hover )
 {
 }
 
-} // namespace Internal
+HoverEvent::HoverEvent( unsigned long time )
+: MultiPointEvent( Hover, time )
+{
+}
+
+HoverEvent::~HoverEvent()
+{
+}
+
+} // namespace Integration
 
 } // namespace Dali

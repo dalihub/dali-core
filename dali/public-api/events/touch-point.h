@@ -38,15 +38,17 @@ struct TouchPoint
    */
   enum State
   {
-    Down,        /**< Screen touched */
-    Up,          /**< Touch stopped */
-    Motion,      /**< Finger dragged */
-    Leave,       /**< Leave the boundary of an actor */
-    Stationary,  /**< No change from last event.  Useful when a multi-touch event occurs where
-                      all points are sent but indicates that this particular point has not changed
-                      since the last time */
-    Interrupted, /**< A system event has occurred which has interrupted the touch event sequence. */
-    Last         /**< Number of states. */
+    Started,        /**< Touch or hover started */
+    Finished,       /**< Touch or hover finished */
+    Down = Started, /**< Screen touched */
+    Up = Finished,  /**< Touch stopped */
+    Motion,         /**< Finger dragged or hovered */
+    Leave,          /**< Leave the boundary of an actor */
+    Stationary,     /**< No change from last event.  Useful when a multi-point event occurs where
+                         all points are sent but indicates that this particular point has not changed
+                         since the last time */
+    Interrupted,    /**< A system event has occurred which has interrupted the touch or hover event sequence. */
+    Last            /**< Number of states. */
   };
 
   // Construction & Destruction
@@ -111,6 +113,10 @@ struct TouchPoint
    */
   Vector2 screen;
 };
+
+typedef std::vector<TouchPoint> TouchPointContainer; ///< Container of touch points.
+typedef TouchPointContainer::iterator TouchPointContainerIterator; ///< Iterator for Dali::TouchPointContainer
+typedef TouchPointContainer::const_iterator TouchPointContainerConstIterator; ///< Const iterator for Dali::TouchPointContainer
 
 } // namespace Dali
 

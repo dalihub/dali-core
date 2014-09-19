@@ -49,6 +49,7 @@ namespace Dali
 {
 
 const char* const Actor::SIGNAL_TOUCHED = "touched";
+const char* const Actor::SIGNAL_HOVERED = "hovered";
 const char* const Actor::SIGNAL_MOUSE_WHEEL_EVENT = "mouse-wheel-event";
 const char* const Actor::SIGNAL_SET_SIZE = "set-size";
 const char* const Actor::SIGNAL_ON_STAGE = "on-stage";
@@ -493,6 +494,11 @@ bool Actor::IsKeyboardFocusable() const
 Actor::TouchSignalV2& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
+}
+
+Actor::HoverSignalV2& Actor::HoveredSignal()
+{
+  return GetImplementation(*this).HoveredSignal();
 }
 
 Actor::MouseWheelEventSignalV2& Actor::MouseWheelEventSignal()

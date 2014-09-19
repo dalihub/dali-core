@@ -209,9 +209,10 @@ BaseHandle CreateActor()
 TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor );
 
 SignalConnectorType signalConnector1(mType, Dali::Actor::SIGNAL_TOUCHED,    &Actor::DoConnectSignal);
-SignalConnectorType signalConnector2(mType, Dali::Actor::SIGNAL_SET_SIZE,   &Actor::DoConnectSignal);
-SignalConnectorType signalConnector3(mType, Dali::Actor::SIGNAL_ON_STAGE,   &Actor::DoConnectSignal);
-SignalConnectorType signalConnector4(mType, Dali::Actor::SIGNAL_OFF_STAGE,  &Actor::DoConnectSignal);
+SignalConnectorType signalConnector2(mType, Dali::Actor::SIGNAL_HOVERED,    &Actor::DoConnectSignal);
+SignalConnectorType signalConnector3(mType, Dali::Actor::SIGNAL_SET_SIZE,   &Actor::DoConnectSignal);
+SignalConnectorType signalConnector4(mType, Dali::Actor::SIGNAL_ON_STAGE,   &Actor::DoConnectSignal);
+SignalConnectorType signalConnector5(mType, Dali::Actor::SIGNAL_OFF_STAGE,  &Actor::DoConnectSignal);
 
 TypeAction a1(mType, Dali::Actor::ACTION_SHOW, &Actor::DoAction);
 TypeAction a2(mType, Dali::Actor::ACTION_HIDE, &Actor::DoAction);
@@ -1863,6 +1864,11 @@ bool Actor::GetTouchRequired() const
   return !mTouchedSignalV2.Empty() || mDerivedRequiresTouch;
 }
 
+bool Actor::GetHoverRequired() const
+{
+  return !mHoveredSignalV2.Empty() || mDerivedRequiresHover;
+}
+
 bool Actor::GetMouseWheelEventRequired() const
 {
   return !mMouseWheelEventSignalV2.Empty() || mDerivedRequiresMouseWheelEvent;
@@ -1911,6 +1917,25 @@ bool Actor::EmitTouchEventSignal(const TouchEvent& event)
   return consumed;
 }
 
+bool Actor::EmitHoverEventSignal(const HoverEvent& event)
+{
+  bool consumed = false;
+
+  if ( !mHoveredSignalV2.Empty() )
+  {
+    Dali::Actor handle( this );
+    consumed = mHoveredSignalV2.Emit( handle, event );
+  }
+
+  if (!consumed)
+  {
+    // Notification for derived classes
+    consumed = OnHoverEvent( event );
+  }
+
+  return consumed;
+}
+
 bool Actor::EmitMouseWheelEventSignal(const MouseWheelEvent& event)
 {
   bool consumed = false;
@@ -1933,6 +1958,11 @@ bool Actor::EmitMouseWheelEventSignal(const MouseWheelEvent& event)
 Dali::Actor::TouchSignalV2& Actor::TouchedSignal()
 {
   return mTouchedSignalV2;
+}
+
+Dali::Actor::HoverSignalV2& Actor::HoveredSignal()
+{
+  return mHoveredSignalV2;
 }
 
 Dali::Actor::MouseWheelEventSignalV2& Actor::MouseWheelEventSignal()
@@ -1963,6 +1993,10 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   if(Dali::Actor::SIGNAL_TOUCHED == signalName)
   {
     actor->TouchedSignal().Connect( tracker, functor );
+  }
+  else if(Dali::Actor::SIGNAL_HOVERED == signalName)
+  {
+    actor->HoveredSignal().Connect( tracker, functor );
   }
   else if(Dali::Actor::SIGNAL_MOUSE_WHEEL_EVENT == signalName)
   {
@@ -2013,6 +2047,7 @@ Actor::Actor( DerivedType derivedType )
   mLeaveRequired( false ),
   mKeyboardFocusable( false ),
   mDerivedRequiresTouch( false ),
+  mDerivedRequiresHover( false ),
   mDerivedRequiresMouseWheelEvent( false ),
   mOnStageSignalled( false ),
   mInheritRotation( true ),

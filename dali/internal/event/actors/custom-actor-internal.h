@@ -134,6 +134,14 @@ private:
   }
 
   /**
+   * @copydoc Internal::Actor::OnHoverEvent
+   */
+  virtual bool OnHoverEvent(const HoverEvent& event)
+  {
+    return mImpl->OnHoverEvent(event);
+  }
+
+  /**
    * @copydoc Internal::Actor::OnKeyEvent
    */
   virtual bool OnKeyEvent(const KeyEvent& event)

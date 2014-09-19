@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
@@ -82,13 +83,13 @@ TouchEventCombiner::~TouchEventCombiner()
 {
 }
 
-bool TouchEventCombiner::GetNextTouchEvent( const TouchPoint& point, unsigned long time, TouchEvent& touchEvent )
+TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( const TouchPoint& point, unsigned long time, TouchEvent& touchEvent, HoverEvent& hoverEvent )
 {
-  bool dispatchEvent( false );
+  TouchEventCombiner::EventDispatchType dispatchEvent( TouchEventCombiner::DispatchNone );
 
   switch ( point.state )
   {
-    case TouchPoint::Down:
+    case TouchPoint::Started:
     {
       touchEvent.time = time;
       bool addToContainer( true );
@@ -117,13 +118,42 @@ bool TouchEventCombiner::GetNextTouchEvent( const TouchPoint& point, unsigned lo
       {
         mPressedPoints.push_back( PointInfo( point, time ) );
         touchEvent.AddPoint( point );
-        dispatchEvent = true; // Only dispatch event if just added to container
+        dispatchEvent = TouchEventCombiner::DispatchTouch; // Only dispatch touch event if just added to container
+
+        // Check whether hover event was dispatched previously
+        if ( !mHoveredPoints.empty() )
+        {
+          hoverEvent.time = time;
+
+          PointInfoContainer::iterator match( mHoveredPoints.end() );
+          for ( PointInfoContainer::iterator iter = mHoveredPoints.begin(), endIter = mHoveredPoints.end(); iter != endIter; ++iter )
+          {
+            if ( point.deviceId == iter->point.deviceId )
+            {
+              match = iter;
+              // Add new point to the HoverEvent
+              iter->point.state = TouchPoint::Finished;
+              hoverEvent.AddPoint( iter->point );
+            }
+            else
+            {
+              iter->point.state = TouchPoint::Stationary;
+              hoverEvent.AddPoint( iter->point );
+            }
+          }
+
+          if ( match != mHoveredPoints.end() )
+          {
+            mHoveredPoints.erase( match );
+            dispatchEvent = TouchEventCombiner::DispatchBoth; // We should only dispatch hover events if the point was actually hovered in this window
+          }
+        }
       }
 
       break;
     }
 
-    case TouchPoint::Up:
+    case TouchPoint::Finished:
     {
       touchEvent.time = time;
 
@@ -148,17 +178,29 @@ bool TouchEventCombiner::GetNextTouchEvent( const TouchPoint& point, unsigned lo
       if ( match != mPressedPoints.end() )
       {
         mPressedPoints.erase( match );
-        dispatchEvent = true; // We should only dispatch events if the point was actually pressed in this window
+        dispatchEvent = TouchEventCombiner::DispatchTouch; // We should only dispatch touch events if the point was actually pressed in this window
+
+        // Iterate through already stored touch points for HoverEvent and delete them
+        for ( PointInfoContainer::iterator iter = mHoveredPoints.begin(), endIter = mHoveredPoints.end(); iter != endIter; ++iter )
+        {
+          if ( iter->point.deviceId == point.deviceId )
+          {
+            mHoveredPoints.erase( iter );
+          }
+        }
       }
       break;
     }
 
     case TouchPoint::Motion:
     {
+      bool fromNewDeviceId = false;
+
       if ( !mPressedPoints.empty() )
       {
         touchEvent.time = time;
 
+        bool ignore = false;
         PointInfoContainer::iterator match = mPressedPoints.end();
         for ( PointInfoContainer::iterator iter = mPressedPoints.begin(), endIter = mPressedPoints.end(); iter != endIter; ++iter )
         {
@@ -169,6 +211,7 @@ bool TouchEventCombiner::GetNextTouchEvent( const TouchPoint& point, unsigned lo
             if ( timeDiff < mMinMotionTime )
             {
               // Motion event sent too soon after previous event so ignore
+              ignore = true;
               break;
             }
 
@@ -176,6 +219,7 @@ bool TouchEventCombiner::GetNextTouchEvent( const TouchPoint& point, unsigned lo
                  ( abs( point.screen.y - iter->point.screen.y ) < mMinMotionDistance.y ) )
             {
               // Not enough positional change from last event so ignore
+              ignore = true;
               break;
             }
 
@@ -196,7 +240,79 @@ bool TouchEventCombiner::GetNextTouchEvent( const TouchPoint& point, unsigned lo
           PointInfo matchedPoint( point, time );
           std::swap( *match, matchedPoint );
 
-          dispatchEvent = true;
+          dispatchEvent = TouchEventCombiner::DispatchTouch; // Dispatch touch event
+        }
+        else if(!ignore)
+        {
+          fromNewDeviceId = true;
+        }
+      }
+
+      // Dispatch hover event if no previous down event received or the motion event comes from a new device ID
+      if(mPressedPoints.empty() || fromNewDeviceId)
+      {
+        hoverEvent.time = time;
+
+        // Iterate through already stored touch points and add to HoverEvent
+        bool ignore = false;
+        PointInfoContainer::iterator match = mHoveredPoints.end();
+        for ( PointInfoContainer::iterator iter = mHoveredPoints.begin(), endIter = mHoveredPoints.end(); iter != endIter; ++iter )
+        {
+          if ( iter->point.deviceId == point.deviceId )
+          {
+            unsigned long timeDiff( time - iter->time );
+
+            if ( timeDiff < mMinMotionTime )
+            {
+              // Motion event sent too soon after previous event so ignore
+              ignore = true;
+              break;
+            }
+
+            if ( ( abs( point.screen.x - iter->point.screen.x ) < mMinMotionDistance.x ) &&
+                 ( abs( point.screen.y - iter->point.screen.y ) < mMinMotionDistance.y ) )
+            {
+              // Not enough positional change from last event so ignore
+              ignore = true;
+              break;
+            }
+
+            match = iter;
+
+            // Add new touch point to the HoverEvent
+            hoverEvent.AddPoint( point );
+          }
+          else
+          {
+            iter->point.state = TouchPoint::Stationary;
+            hoverEvent.AddPoint( iter->point );
+          }
+        }
+
+        // Add new hover point to the list and to the HoverEvent
+        if ( !ignore ) // Only dispatch hover event when it should not be ignored
+        {
+          if( match == mHoveredPoints.end() )
+          {
+            TouchPoint hoverPoint(point);
+            hoverPoint.state = TouchPoint::Started; // The first hover event received
+            mHoveredPoints.push_back( PointInfo( hoverPoint, time ) );
+            hoverEvent.AddPoint( hoverPoint );
+          }
+          else
+          {
+            PointInfo matchedPoint( point, time );
+            std::swap( *match, matchedPoint );
+          }
+
+          if(dispatchEvent == TouchEventCombiner::DispatchTouch)
+          {
+            dispatchEvent = TouchEventCombiner::DispatchBoth;
+          }
+          else
+          {
+            dispatchEvent = TouchEventCombiner::DispatchHover;
+          }
         }
       }
       break;
@@ -208,7 +324,8 @@ bool TouchEventCombiner::GetNextTouchEvent( const TouchPoint& point, unsigned lo
 
       // We should still tell core about the interruption.
       touchEvent.AddPoint( point );
-      dispatchEvent = true;
+      hoverEvent.AddPoint( point );
+      dispatchEvent = TouchEventCombiner::DispatchBoth;
       break;
     }
 
@@ -259,6 +376,7 @@ Vector2 TouchEventCombiner::GetMinimumMotionDistanceThreshold() const
 void TouchEventCombiner::Reset()
 {
   mPressedPoints.clear();
+  mHoveredPoints.clear();
 }
 
 } // namespace Integration

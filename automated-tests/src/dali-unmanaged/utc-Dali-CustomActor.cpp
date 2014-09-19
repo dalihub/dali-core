@@ -21,6 +21,7 @@
 #include <dali/public-api/dali-core.h>
 
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/mouse-wheel-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 
@@ -130,6 +131,11 @@ struct TestCustomActor : public CustomActorImpl
   virtual bool OnTouchEvent(const TouchEvent& event)
   {
     AddToCallStacks("OnTouchEvent");
+    return true;
+  }
+  virtual bool OnHoverEvent(const HoverEvent& event)
+  {
+    AddToCallStacks("OnHoverEvent");
     return true;
   }
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event)

@@ -170,6 +170,16 @@ public:
   bool IsTouchConsumed() const;
 
   /**
+   * @copydoc Dali::Layer::SetHoverConsumed()
+   */
+  void SetHoverConsumed( bool consume );
+
+  /**
+   * @copydoc Dali::Layer::IsHoverConsumed()
+   */
+  bool IsHoverConsumed() const;
+
+  /**
    * Helper function to get the scene object.
    * This should only be called by Stage
    * @return the scene object for the layer.
@@ -274,6 +284,7 @@ private:
   bool mIsClipping:1;                           ///< True when clipping is enabled
   bool mDepthTestDisabled:1;                    ///< Whether depth test is disabled.
   bool mTouchConsumed:1;                        ///< Whether we should consume touch (including gesture).
+  bool mHoverConsumed:1;                        ///< Whether we should consume hover.
 
   static bool mFirstInstance;
   static DefaultPropertyLookup* mDefaultLayerPropertyLookup; ///< Default properties

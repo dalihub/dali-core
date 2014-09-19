@@ -335,6 +335,22 @@ public:
    */
   bool IsTouchConsumed() const;
 
+  /**
+   * @brief This allows the user to specify whether this layer should consume hover.
+   *
+   * If set, any layers behind this layer will not be hit-test.
+   *
+   * @param[in]  consume  Whether the layer should consume hover.
+   */
+  void SetHoverConsumed( bool consume );
+
+  /**
+   * @brief Retrieves whether the layer consumes hover.
+   *
+   * @return true if consuming hover, false otherwise.
+   */
+  bool IsHoverConsumed() const;
+
 public: // Not intended for application developers
 
   /**
