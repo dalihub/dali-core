@@ -107,7 +107,17 @@ void PanGesture::PredictiveAlgorithm1(int eventsThisFrame, PanInfo& gestureOut, 
   bool previousVelocity = false;
   float previousAccel = 0.0f;
   unsigned int lastTime(0);
-  unsigned int interpolationTime = (lastVSyncTime + mPredictionAmount) - gestureOut.time;
+
+  unsigned int interpolationTime = lastVSyncTime + mPredictionAmount;
+  if( interpolationTime > gestureOut.time ) // Guard against the rare case when gestureOut.time > (lastVSyncTime + mPredictionAmount)
+  {
+    interpolationTime -= gestureOut.time;
+  }
+  else
+  {
+    interpolationTime = 0u;
+  }
+
   while( iter != endIter )
   {
     PanInfo currentGesture = *iter;
@@ -124,13 +134,19 @@ void PanGesture::PredictiveAlgorithm1(int eventsThisFrame, PanInfo& gestureOut, 
     float velMag = currentGesture.screen.velocity.Length();
     float velDiff = velMag - screenVelocity.Length();
     float acceleration = 0.0f;
-    float time = (float)(currentGesture.time - lastTime);
+
+    float time(0.f);
+    if (currentGesture.time > lastTime) // Guard against invalid timestamps
+    {
+      time = static_cast<float>( currentGesture.time - lastTime );
+    }
     if( time > Math::MACHINE_EPSILON_1 )
     {
       acceleration = velDiff / time;
     }
+
     float newVelMag = 0.0f;
-    int currentInterpolation = interpolationTime; //(lastVSyncTime + mPredictionAmount) - currentGesture.time;
+    int currentInterpolation = interpolationTime;
     if( !havePreviousAcceleration )
     {
       newVelMag =  velMag;
