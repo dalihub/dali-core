@@ -350,6 +350,11 @@ bool TextRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& 
 void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
   DALI_ASSERT_DEBUG( NULL != mTexture && "TextRenderer::DoRender. mTexture == NULL." );
+  if( NULL == mTexture )
+  {
+    // Nothing to render.
+    return;
+  }
 
   DALI_LOG_INFO( gTextFilter, Debug::General, "TextRenderer::DoRender(this: %p) textureId:%d\n", this, mTextureId );
 
