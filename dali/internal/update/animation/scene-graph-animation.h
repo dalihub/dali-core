@@ -263,6 +263,14 @@ private:
    */
   void UpdateAnimators(BufferIndex bufferIndex, bool bake);
 
+  /**
+   * Helper function to bake the result of the animation when it is stopped or
+   * destroyed.
+   * @param[in] bufferIndex The buffer to update.
+   * @param[in] action The end action specified.
+   */
+  void Bake(BufferIndex bufferIndex, EndAction action );
+
   // Undefined
   Animation(const Animation&);
 

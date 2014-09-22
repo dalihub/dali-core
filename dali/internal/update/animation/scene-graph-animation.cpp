@@ -106,6 +106,23 @@ void Animation::Pause()
   }
 }
 
+void Animation::Bake(BufferIndex bufferIndex, EndAction action)
+{
+  if( action == Dali::Animation::BakeFinal )
+  {
+    if( mSpeedFactor > 0.0f )
+    {
+      mElapsedSeconds = mDurationSeconds + Math::MACHINE_EPSILON_1; // Force animation to reach it's end
+    }
+    else
+    {
+      mElapsedSeconds = 0.0f - Math::MACHINE_EPSILON_1; //Force animation to reach it's beginning
+    }
+  }
+
+  UpdateAnimators(bufferIndex, true/*bake the final result*/);
+}
+
 bool Animation::Stop(BufferIndex bufferIndex)
 {
   bool animationFinished(false);
@@ -116,19 +133,7 @@ bool Animation::Stop(BufferIndex bufferIndex)
 
     if( mEndAction != Dali::Animation::Discard )
     {
-      if( mEndAction == Dali::Animation::BakeFinal )
-      {
-        if( mSpeedFactor > 0.0f )
-        {
-          mElapsedSeconds = mDurationSeconds + Math::MACHINE_EPSILON_1; // Force animation to reach it's end
-        }
-        else
-        {
-          mElapsedSeconds = 0.0f - Math::MACHINE_EPSILON_1; //Force animation to reach it's beginning
-        }
-
-      }
-      UpdateAnimators(bufferIndex, true/*bake the final result*/);
+      Bake( bufferIndex, mEndAction );
     }
 
     // The animation has now been played to completion
@@ -147,7 +152,7 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
   {
     if (mDestroyAction != Dali::Animation::Discard)
     {
-      UpdateAnimators(bufferIndex, true/*bake the final result*/);
+      Bake( bufferIndex, mDestroyAction );
     }
   }
 
