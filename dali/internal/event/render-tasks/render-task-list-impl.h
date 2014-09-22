@@ -23,7 +23,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/render-tasks/render-task.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
-#include <dali/internal/common/message.h>
+#include <dali/internal/event/common/complete-notification-interface.h>
 
 namespace Dali
 {
@@ -44,7 +44,7 @@ class UpdateManager;
  * A proxy for the scene-graph RenderTaskList.
  * A separate LayerList is maintained for actors added via the SystemLevel::Add().
  */
-class RenderTaskList : public BaseObject
+class RenderTaskList : public BaseObject, public CompleteNotificationInterface
 {
 public:
 
@@ -92,8 +92,9 @@ public:
    * Provide notification signals for a "Finished" render task.
    * This method should be called in the event-thread
    * Queue NotifyFinishedMessage() from update-thread
+   * @param object pointer to this class instance
    */
-  void NotifyFinished();
+  static void NotifyFinished( void* object );
 
 protected:
 
@@ -115,6 +116,13 @@ protected:
    */
   void Initialize( SceneGraph::UpdateManager& updateManager );
 
+private: // from CompleteNotificationInterface
+
+  /**
+   * @copydoc CompleteNotificationInterface::NotifyCompleted()
+   */
+  virtual void NotifyCompleted();
+
 private:
 
   EventToUpdate& mEventToUpdate;
@@ -126,15 +134,6 @@ private:
 
   RenderTaskContainer mTasks; ///< Reference counted render-tasks
 };
-
-/**
- * Notification message for when 1+ render tasks have finished
- * @param[in] renderTaskList This will provide the notification signals.
- */
-inline MessageBase* NotifyFinishedMessage( RenderTaskList& renderTaskList )
-{
-  return new Message< RenderTaskList >( &renderTaskList, &RenderTaskList::NotifyFinished );
-}
 
 } // namespace Internal
 

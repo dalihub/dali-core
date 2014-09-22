@@ -113,7 +113,30 @@ Dali::RenderTask RenderTaskList::GetTask( unsigned int index ) const
   return mTasks[index];
 }
 
-void RenderTaskList::NotifyFinished()
+RenderTaskList::RenderTaskList( EventToUpdate& eventToUpdate, RenderTaskDefaults& defaults, bool systemLevel )
+: mEventToUpdate( eventToUpdate ),
+  mDefaults( defaults ),
+  mIsSystemLevel( systemLevel ),
+  mSceneObject( NULL )
+{
+}
+
+RenderTaskList::~RenderTaskList()
+{
+}
+
+void RenderTaskList::Initialize( UpdateManager& updateManager )
+{
+  // This should only be called once, with no existing scene-object
+  DALI_ASSERT_DEBUG( NULL == mSceneObject );
+
+  // Get raw-pointer to render task list
+  mSceneObject = updateManager.GetRenderTaskList( mIsSystemLevel );
+  // set the callback to call us back when tasks are completed
+  mSceneObject->SetCompleteNotificationInterface( this );
+}
+
+void RenderTaskList::NotifyCompleted()
 {
   DALI_LOG_TRACE_METHOD(gLogRenderList);
 
@@ -138,27 +161,6 @@ void RenderTaskList::NotifyFinished()
 
     GetImplementation(handle).EmitSignalFinish();
   }
-}
-
-RenderTaskList::RenderTaskList( EventToUpdate& eventToUpdate, RenderTaskDefaults& defaults, bool systemLevel )
-: mEventToUpdate( eventToUpdate ),
-  mDefaults( defaults ),
-  mIsSystemLevel( systemLevel ),
-  mSceneObject( NULL )
-{
-}
-
-RenderTaskList::~RenderTaskList()
-{
-}
-
-void RenderTaskList::Initialize( UpdateManager& updateManager )
-{
-  // This should only be called once, with no existing scene-object
-  DALI_ASSERT_DEBUG( NULL == mSceneObject );
-
-  // Get raw-pointer to render task list
-  mSceneObject = updateManager.GetRenderTaskList( mIsSystemLevel );
 }
 
 } // namespace Internal

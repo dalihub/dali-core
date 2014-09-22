@@ -21,8 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/common/set-wrapper.h>
-#include <dali/internal/common/message.h>
-#include <dali/internal/event/animation/animation-finished-notifier.h>
+#include <dali/internal/event/common/complete-notification-interface.h>
 
 namespace Dali
 {
@@ -36,7 +35,7 @@ class Animation;
  * AnimationPlaylist provides notifications to applications when animations are finished.
  * It reference-counts playing animations, to allow "fire and forget" behaviour.
  */
-class AnimationPlaylist : public AnimationFinishedNotifier
+class AnimationPlaylist : public CompleteNotificationInterface
 {
 public:
 
@@ -73,13 +72,6 @@ public:
    */
   void OnClear( Animation& animation );
 
-  /**
-   * From AnimationFinishedNotifier; emit "Finished" signal on any animations that have finished.
-   * This method should be called in the event-thread; the update-thread must use AnimationFinishedMessage.
-   * @post The "Finished" animations will no longer be referenced by AnimationPlaylist.
-   */
-  void NotifyFinishedAnimations();
-
 private:
 
   /**
@@ -93,11 +85,18 @@ private:
   // Undefined
   AnimationPlaylist& operator=(const AnimationPlaylist& rhs);
 
+private: // from CompleteNotificationInterface
+
+  /**
+   * @copydoc CompleteNotificationInterface::NotifyCompleted()
+   */
+  virtual void NotifyCompleted();
+
 private:
 
   std::set< Animation* > mAnimations; ///< All existing animations (not referenced)
-
   std::set< Dali::Animation > mPlaylist; ///< The currently playing animations (reference counted)
+
 };
 
 } // namespace Internal

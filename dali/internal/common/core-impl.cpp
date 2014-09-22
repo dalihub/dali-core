@@ -143,8 +143,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mStage->Initialize();
 
-  mUpdateManager->SetRenderTaskList( &mStage->GetRenderTaskList() );
-
   mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
 
