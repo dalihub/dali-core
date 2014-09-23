@@ -971,3 +971,56 @@ int UtcDaliHandleGetPropertyIndices(void)
   DALI_TEST_EQUALS( indices.size(), actor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliHandleRegisterPropertyTypes(void)
+{
+  TestApplication application;
+
+  struct PropertyTypeAnimatable
+  {
+    const char * name;
+    Property::Value value;
+    bool animatable;
+  };
+
+  Property::Array array;
+  Property::Map map;
+
+  PropertyTypeAnimatable properties[] =
+  {
+    { "Property::BOOLEAN",          true,              true  },
+    { "Property::FLOAT",            1.0f,              true  },
+    { "Property::INTEGER",          1,                 true  },
+    { "Property::UNSIGNED_INTEGER", 1u,                false },
+    { "Property::VECTOR2",          Vector2::ONE,      true  },
+    { "Property::VECTOR3",          Vector3::ONE,      true  },
+    { "Property::VECTOR4",          Vector4::ONE,      true  },
+    { "Property::MATRIX3",          Matrix3::IDENTITY, true  },
+    { "Property::MATRIX",           Matrix::IDENTITY,  true  },
+    { "Property::RECTANGLE",        Rect<int>(),       false },
+    { "Property::ROTATION",         AngleAxis(),       true  },
+    { "Property::STRING",           std::string("Me"), false },
+    { "Property::ARRAY",            array,             false },
+    { "Property::MAP",              map,               false },
+  };
+  unsigned int numOfProperties( sizeof( properties ) / sizeof( properties[0] ) );
+
+  for ( unsigned int i = 0; i < numOfProperties; ++i )
+  {
+    tet_printf( "Testing: %s\n", properties[i].name );
+
+    bool exception = false;
+    try
+    {
+      Actor actor = Actor::New();
+      actor.RegisterProperty( "man-from-delmonte", properties[i].value );
+    }
+    catch (Dali::DaliException& e)
+    {
+      exception = true;
+    }
+
+    DALI_TEST_CHECK( properties[i].animatable != exception );
+  }
+  END_TEST;
+}

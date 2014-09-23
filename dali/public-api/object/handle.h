@@ -203,10 +203,20 @@ public:
   void SetProperty(Property::Index index, Property::Value propertyValue);
 
   /**
-   * @brief Register a new property.
+   * @brief Register a new animatable property.
    *
    * @pre The handle supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
    * @pre name is unused i.e. GetPropertyIndex(name) returns PropertyIndex::INVALID.
+   * @note Only the following types can be animated:
+   *       - Property::BOOLEAN
+   *       - Property::FLOAT
+   *       - Property::INTEGER
+   *       - Property::VECTOR2
+   *       - Property::VECTOR3
+   *       - Property::VECTOR4
+   *       - Property::MATRIX3
+   *       - Property::MATRIX
+   *       - Property::ROTATION
    * @param [in] name The name of the property.
    * @param [in] propertyValue The new value of the property.
    * @return The index of the property
@@ -219,6 +229,16 @@ public:
    * Properties can be set as non animatable using property attributes.
    * @pre The handle supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
    * @pre name is unused i.e. GetPropertyIndex(name) returns PropertyIndex::INVALID.
+   * @note Only the following types can be animated:
+   *       - Property::BOOLEAN
+   *       - Property::FLOAT
+   *       - Property::INTEGER
+   *       - Property::VECTOR2
+   *       - Property::VECTOR3
+   *       - Property::VECTOR4
+   *       - Property::MATRIX3
+   *       - Property::MATRIX
+   *       - Property::ROTATION
    * @param [in] name The name of the property.
    * @param [in] propertyValue The new value of the property.
    * @param [in] accessMode The property access mode (writable, animatable etc).
