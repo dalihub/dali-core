@@ -131,12 +131,6 @@ Image Image::New(NativeImage& nativeImg)
   return Image(internal.Get());
 }
 
-Image Image::New(NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy releasePol)
-{
-  Internal::ImagePtr internal = Internal::Image::New(nativeImg, loadPol, releasePol);
-  return Image(internal.Get());
-}
-
 Image Image::DownCast( BaseHandle handle )
 {
   return Image( dynamic_cast<Dali::Internal::Image*>(handle.GetObjectPtr()) );

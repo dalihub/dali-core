@@ -269,18 +269,6 @@ public:
   static Image New(NativeImage& nativeImg);
 
   /**
-   * @brief Creates object with already loaded NativeImage.
-   *
-   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
-   * @pre nativeImg should be initialised
-   * @param [in] nativeImg already initialised NativeImage
-   * @param [in] loadPol    The LoadPolicy to apply when allocating the GL resource.
-   * @param [in] releasePol The ReleasePolicy to apply to Image.
-   * @return A handle to a newly allocated object
-   */
-  static Image New(NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy releasePol);
-
-  /**
    * @brief Downcast an Object handle to Image handle.
    *
    * If handle points to a Image object the

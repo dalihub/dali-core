@@ -95,13 +95,9 @@ public:
    * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @pre nativeImg should be initialised
    * @param [in] nativeImg already initialised NativeImage
-   * @param [in] loadPol controls time of loading a resource from the filesystem (default: load when Image is created).
-   * @param [in] releasePol optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    * @return a pointer to a newly created object.
    */
-  static ImagePtr New( NativeImage& nativeImg,
-                       LoadPolicy loadPol=ImageLoadPolicyDefault,
-                       ReleasePolicy releasePol=ImageReleasePolicyDefault );
+  static ImagePtr New( NativeImage& nativeImg );
 
   /**
    * @copydoc Dali::Image::GetLoadingState()
