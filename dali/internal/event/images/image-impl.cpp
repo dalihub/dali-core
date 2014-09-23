@@ -100,7 +100,7 @@ ImagePtr Image::New( const std::string& filename, const Dali::ImageAttributes& a
   return image;
 }
 
-ImagePtr Image::New( NativeImage& nativeImg, LoadPolicy loadPol, ReleasePolicy releasePol )
+ImagePtr Image::New( NativeImage& nativeImg )
 {
   ImagePtr image = new Image;
   image->Initialize();
