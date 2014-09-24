@@ -274,6 +274,17 @@ public:
    */
   AlphaFunction GetDefaultAlphaFunction() const;
 
+  /*
+   * @brief Sets the progress of the animation.
+   * The animation will play (or continue playing) from this point. The progress
+   * must be in the 0-1 interval or in the play range interval if defined ( See SetPlayRange ),
+   * otherwise, it will be ignored.
+   *
+   * @param[in] progress The new progress as a normalized value between [0,1] or between the
+   * play range if specified.
+   */
+  void SetCurrentProgress( float progress );
+
   /**
   * @brief Retrieve the current progress of the animation.
   *
@@ -299,13 +310,22 @@ public:
    */
   float GetSpeedFactor() const;
 
-  /*
-   * @brief Sets the progress of the animation.
-   * The animation will play (or continue playing) from this point
+  /**
+   * @brief Set the playing range.
+   * Animation will play between the values specified. Both values ( range.x and range.y ) should be between 0-1,
+   * otherwise they will be ignored. If the range provided is not in proper order ( minimum,maximum ), it will be reordered.
    *
-   * @param[in] progress The new progress as a normalized value between [0,1].
+   * @param[in] range Two values between [0,1] to specify minimum and maximum progress. The
+   * animation will play between those values.
    */
-  void SetCurrentProgress( float progress );
+  void SetPlayRange( const Vector2& range );
+
+  /**
+   * @brief Get the playing range
+   *
+   * @return The play range defined for the animation.
+   */
+  Vector2 GetPlayRange() const;
 
   /**
    * @brief Play the animation.
@@ -314,7 +334,10 @@ public:
 
   /**
    * @brief Play the animation from a given point.
-   * @param[in] progress A value between [0,1] form where the animation should start playing
+   * The progress must be in the 0-1 interval or in the play range interval if defined ( See SetPlayRange ),
+   * otherwise, it will be ignored.
+   *
+   * @param[in] progress A value between [0,1], or between the play range if specified, form where the animation should start playing
    */
   void PlayFrom( float progress );
 
