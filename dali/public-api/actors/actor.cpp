@@ -225,6 +225,11 @@ void Actor::SetSize(const Vector3& size)
   GetImplementation(*this).SetSize(size);
 }
 
+Vector3 Actor::GetSize() const
+{
+  return GetImplementation(*this).GetSize();
+}
+
 Vector3 Actor::GetCurrentSize() const
 {
   return GetImplementation(*this).GetCurrentSize();

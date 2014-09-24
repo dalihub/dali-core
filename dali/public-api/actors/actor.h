@@ -615,6 +615,15 @@ public:
    * @brief Retrieve the actor's size.
    *
    * @pre The actor has been initialized.
+   * @note This return is the value that was set using SetSize or the target size of an animation
+   * @return The actor's current size.
+   */
+  Vector3 GetSize() const;
+
+  /**
+   * @brief Retrieve the actor's size.
+   *
+   * @pre The actor has been initialized.
    * @note This property can be animated; the return value may not match the value written with SetSize().
    * @return The actor's current size.
    */

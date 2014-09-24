@@ -1103,20 +1103,30 @@ void Actor::SetSize(const Vector3& size)
 {
   if( NULL != mNode )
   {
+    mSize = size;
+
     // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, &mNode->mSize, &AnimatableProperty<Vector3>::Bake, size );
+    SceneGraph::NodePropertyMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, &mNode->mSize, &AnimatableProperty<Vector3>::Bake, mSize );
 
     // Notification for derived classes
-    OnSizeSet(size);
+    OnSizeSet( mSize );
 
     // Emit signal for application developer
 
     if( !mSetSizeSignalV2.Empty() )
     {
       Dali::Actor handle( this );
-      mSetSizeSignalV2.Emit( handle, size );
+      mSetSizeSignalV2.Emit( handle, mSize );
     }
   }
+}
+
+void Actor::NotifySizeAnimation(Animation& animation, const Vector3& targetSize)
+{
+  mSize = targetSize;
+
+  // Notify deriving classes
+  OnSizeAnimation( animation, targetSize );
 }
 
 void Actor::SetWidth( float width )
@@ -1144,6 +1154,11 @@ void Actor::SetDepth( float depth )
     // mNode is being used in a separate thread; queue a message to set the value & base value
     SceneGraph::NodePropertyComponentMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, &mNode->mSize, &AnimatableProperty<Vector3>::BakeZ, depth );
   }
+}
+
+const Vector3& Actor::GetSize() const
+{
+  return mSize;
 }
 
 const Vector3& Actor::GetCurrentSize() const
@@ -1986,6 +2001,7 @@ Actor::Actor( DerivedType derivedType )
 #endif
   mGestureData( NULL ),
   mAttachment(),
+  mSize( 0.0f, 0.0f, 0.0f ),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mIsRoot( ROOT_LAYER == derivedType ),
