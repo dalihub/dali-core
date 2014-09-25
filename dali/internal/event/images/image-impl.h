@@ -95,13 +95,9 @@ public:
    * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @pre nativeImg should be initialised
    * @param [in] nativeImg already initialised NativeImage
-   * @param [in] loadPol controls time of loading a resource from the filesystem (default: load when Image is created).
-   * @param [in] releasePol optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    * @return a pointer to a newly created object.
    */
-  static ImagePtr New( NativeImage& nativeImg,
-                       LoadPolicy loadPol=ImageLoadPolicyDefault,
-                       ReleasePolicy releasePol=ImageReleasePolicyDefault );
+  static ImagePtr New( NativeImage& nativeImg );
 
   /**
    * @copydoc Dali::Image::GetLoadingState()
@@ -232,6 +228,7 @@ public:
   virtual void Disconnect();
 
 protected:
+
   /**
    * Second stage initialization
    */
@@ -251,22 +248,25 @@ private:
    * @param[in] filename The filename to check
    * @return true if it is a 9 patch image
    */
-  static bool IsNinePatchFileName( std::string filename );
+  static bool IsNinePatchFileName( const std::string& filename );
 
+protected: //@TODO these should not be protected
 
-protected:
-  unsigned int mWidth;
-  unsigned int mHeight;
-
-  ResourceTicketPtr mTicket;
-  ImageFactoryCache::RequestPtr mRequest;         ///< contains the initially requested attributes for image. Request is reissued when memory was released.
-  LoadPolicy     mLoadPolicy;
-  ReleasePolicy  mReleasePolicy;
-
-  unsigned int   mConnectionCount; ///< number of on-stage objects using this image
   ImageFactory&  mImageFactory;
 
+  ImageFactoryCache::RequestPtr mRequest; ///< contains the initially requested attributes for image. Request is reissued when memory was released.
+  ResourceTicketPtr mTicket;              ///< smart pointer to the ticket object that gets completed when load finishes
+
+  mutable unsigned int mWidth;     ///< natural width of the image, needs to be mutable for lazy resolving and as the API for GetWidth is const
+  mutable unsigned int mHeight;    ///< natural height of the image, needs to be mutable for lazy resolving and as the API for GetHeight is const
+
+  unsigned int   mConnectionCount; ///< number of on-stage objects using this image
+
+  LoadPolicy     mLoadPolicy:2;    ///< 2 bits is enough space
+  ReleasePolicy  mReleasePolicy:2; ///< 2 bits is enough space
+
 private:
+
   Dali::Image::ImageSignalV2 mLoadingFinishedV2;
   Dali::Image::ImageSignalV2 mUploadedV2;
 

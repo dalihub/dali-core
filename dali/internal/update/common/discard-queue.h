@@ -88,15 +88,6 @@ public:
   void Add( BufferIndex updateBufferIndex, NodeAttachment* attachment );
 
   /**
-   * Adds an unwanted resource to the discard queue.
-   * If necessary, a message will be sent to clean-up GL resources in the next Render.
-   * @pre This method is not thread-safe, and should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] resource The resource to queue; DiscardQueue takes a reference.
-   */
-  void Add( BufferIndex updateBufferIndex, RefObject& resource );
-
-  /**
    * Adds an unwanted mesh resource to the discard queue.
    * A message will be sent to clean-up GL resources in the next Render.
    * @pre This method is not thread-safe, and should only be called from the update-thread.

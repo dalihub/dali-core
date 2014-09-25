@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -182,7 +183,7 @@ ResourceTicketPtr ImageFactory::Reload( Request* request )
   return ticket;
 }
 
-const std::string& ImageFactory::GetRequestPath( const Request* request ) const
+const std::string& ImageFactory::GetRequestPath( const ImageFactoryCache::RequestPtr& request ) const
 {
   if( request )
   {
@@ -192,11 +193,8 @@ const std::string& ImageFactory::GetRequestPath( const Request* request ) const
   return String::EMPTY;
 }
 
-const ImageAttributes& ImageFactory::GetActualAttributes( ResourceId resourceId ) const
+const ImageAttributes& ImageFactory::GetActualAttributes( const ResourceTicketPtr& ticket ) const
 {
-  DALI_ASSERT_DEBUG( resourceId );
-
-  ResourceTicketPtr ticket = mResourceClient.RequestResourceTicket( resourceId );
   if( ticket )
   {
     DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
@@ -205,12 +203,10 @@ const ImageAttributes& ImageFactory::GetActualAttributes( ResourceId resourceId 
     const ImageAttributes& attrib = static_cast<ImageTicket*>(ticket.Get())->GetAttributes();
     return attrib;
   }
-
-  DALI_ASSERT_DEBUG( 0 && "Resource no longer exists in cache" );
   return ImageAttributes::DEFAULT_ATTRIBUTES;
 }
 
-const ImageAttributes& ImageFactory::GetRequestAttributes( const Request* request ) const
+const ImageAttributes& ImageFactory::GetRequestAttributes( const ImageFactoryCache::RequestPtr& request ) const
 {
   if( request && request->attributes )
   {
@@ -218,6 +214,21 @@ const ImageAttributes& ImageFactory::GetRequestAttributes( const Request* reques
   }
 
   return ImageAttributes::DEFAULT_ATTRIBUTES;
+}
+
+void ImageFactory::GetImageSize( const ImageFactoryCache::RequestPtr& request, const ResourceTicketPtr& ticket, Size& size )
+{
+  if( ticket && ticket->GetLoadingState() != ResourceLoading )
+  {
+    // it is loaded so get the size from actual attributes
+    size = GetActualAttributes( ticket ).GetSize();
+  }
+  else
+  {
+    // not loaded so either loading or not yet loaded, ask platform abstraction
+    Integration::PlatformAbstraction& platformAbstraction = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
+    platformAbstraction.GetClosestImageSize( GetRequestPath( request ), GetRequestAttributes( request ), size );
+  }
 }
 
 void ImageFactory::ReleaseTicket( ResourceTicket* ticket )

@@ -806,6 +806,60 @@ int UtcDaliActorGetCurrentSize(void)
   END_TEST;
 }
 
+int UtcDaliActorGetNaturalSize(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Vector3 vector( 0.0f, 0.0f, 0.0f );
+
+  DALI_TEST_CHECK( actor.GetNaturalSize() == vector );
+
+  END_TEST;
+}
+
+int UtcDaliActorGetCurrentSizeImmediate(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Vector3 vector(100.0f, 100.0f, 20.0f);
+
+  DALI_TEST_CHECK(vector != actor.GetSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+
+  actor.SetSize(vector);
+
+  DALI_TEST_CHECK(vector == actor.GetSize());
+  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK(vector == actor.GetSize());
+  DALI_TEST_CHECK(vector == actor.GetCurrentSize());
+
+  // Animation
+  // Build the animation
+  const float durationSeconds = 2.0f;
+  Animation animation = Animation::New( durationSeconds );
+  const Vector3 targetValue( 10.0f, 20.0f, 30.0f );
+  animation.AnimateTo( Property( actor, Actor::SIZE ), targetValue );
+
+  DALI_TEST_CHECK( actor.GetSize() == targetValue );
+
+  // Start the animation
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( static_cast<unsigned int>( durationSeconds * 1000.0f ) );
+
+  DALI_TEST_CHECK( actor.GetSize() == targetValue );
+
+  END_TEST;
+}
+
 // SetPosition(float x, float y)
 int UtcDaliActorSetPosition01(void)
 {
@@ -1837,6 +1891,11 @@ int UtcDaliActorApplyConstraintAppliedCallback(void)
   ActiveConstraint activeConstraint3 = child3.ApplyConstraint( constraint );
   activeConstraint3.AppliedSignal().Connect( TestConstraintCallback3 );
 
+  // Check event-side size
+  DALI_TEST_EQUALS( child1.GetSize(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( child2.GetSize(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetSize(), Vector3::ZERO, TEST_LOCATION );
+
   DALI_TEST_EQUALS( child1.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
   DALI_TEST_EQUALS( child2.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
   DALI_TEST_EQUALS( child3.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
@@ -1844,6 +1903,7 @@ int UtcDaliActorApplyConstraintAppliedCallback(void)
   application.SendNotification();
 
   application.Render(static_cast<unsigned int>(1000.0f)); // 1 elapsed second
+
   DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize*0.20f, TEST_LOCATION ); // 1 /  5 * 100 = 20%
   DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.10f, TEST_LOCATION ); // 1 / 10 * 100 = 10%
   DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize*0.00f, TEST_LOCATION ); // 0%

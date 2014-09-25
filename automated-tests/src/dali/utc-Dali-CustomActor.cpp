@@ -176,6 +176,11 @@ struct TestCustomActor : public CustomActorImpl
     }
   }
 
+  virtual Vector3 GetNaturalSize()
+  {
+    return Vector3( 0.0f, 0.0f, 0.0f );
+  }
+
   void SetDaliProperty(std::string s)
   {
     Self().SetProperty(mDaliProperty, s) ;
@@ -470,6 +475,11 @@ public:
   {
     return Actor();
   }
+
+  virtual Vector3 GetNaturalSize()
+  {
+    return Vector3( 0.0f, 0.0f, 0.0f );
+  }
 };
 
 } ; // namespace Impl
@@ -607,6 +617,11 @@ public:
   Vector3 GetTargetSize()
   {
     return GetImpl().mTargetSize;
+  }
+
+  virtual Vector3 GetNaturalSize()
+  {
+    return Vector3( 0.0f, 0.0f, 0.0f );
   }
 
 private:

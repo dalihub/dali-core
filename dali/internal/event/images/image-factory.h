@@ -85,27 +85,36 @@ public:
 
   /**
    * Get resource path used in request.
-   * @param [in] req request pointer
+   * @param [in] request of the image
    * @return     resource path
    */
-  const std::string& GetRequestPath( const ImageFactoryCache::Request* req ) const;
+  const std::string& GetRequestPath( const ImageFactoryCache::RequestPtr& request ) const;
 
   /**
    * Get ImageAttributes for an already requested image resource.
    * @pre id should mark an existing Resource (Ticket is alive)
-   * @param [in] id resource id
+   * @param [in] ticket of the image
    * @return     ImageAttributes used for request.
    * @throws     Throws exception if id is not valid.
    */
-  const ImageAttributes& GetActualAttributes( ResourceId id ) const;
+  const ImageAttributes& GetActualAttributes( const ResourceTicketPtr& ticket ) const;
 
   /**
    * Get ImageAttributes used for request.
    * @pre req must point to a Request registered with ImageFactory
-   * @param [in] req request pointer
+   * @param [in] request of the image
    * @return     ImageAttributes used for request.
    */
-  const ImageAttributes& GetRequestAttributes( const ImageFactoryCache::Request* req ) const;
+  const ImageAttributes& GetRequestAttributes( const ImageFactoryCache::RequestPtr& request ) const;
+
+  /**
+   * Retrieve the size of an image. This is either the application requested size or
+   * the actual (full size) that is or will be loaded.
+   * @param[in] request of the image
+   * @param[in] ticket of the image
+   * @param[out] size of the image
+   */
+  void GetImageSize( const ImageFactoryCache::RequestPtr& request, const ResourceTicketPtr& ticket, Size& size );
 
   /**
    * Prevents releasing and reloading image resources in the same frame

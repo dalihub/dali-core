@@ -1063,7 +1063,7 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
         ModelCacheIter model = mImpl->mModels.find(iter->first);
         DALI_ASSERT_DEBUG( mImpl->mModels.end() != model );
 
-        mImpl->mDiscardQueue.Add( updateBufferIndex, *(model->second) );
+        // model data is owned through intrusive pointers so no need for discard queue
         mImpl->mModels.erase( model );
         break;
       }
@@ -1087,8 +1087,7 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
       {
         ShaderCacheIter shaderIter = mImpl->mShaders.find(iter->first);
         DALI_ASSERT_DEBUG( mImpl->mShaders.end() != shaderIter );
-
-        mImpl->mDiscardQueue.Add( updateBufferIndex, *(shaderIter->second) );
+        // shader data is owned through intrusive pointers so no need for discard queue
         mImpl->mShaders.erase( shaderIter );
         break;
       }

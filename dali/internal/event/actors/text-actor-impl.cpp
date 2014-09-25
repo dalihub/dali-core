@@ -288,6 +288,12 @@ void TextActor::SetFont(Font& font, TextRequestMode mode )
   }
 }
 
+Vector3 TextActor::GetNaturalSize() const
+{
+  Vector2 naturalSize( mTextAttachment->GetNaturalTextSize() );
+  return Vector3( naturalSize.width, naturalSize.height, CalculateSizeZ( naturalSize ) );
+}
+
 void TextActor::OnSizeSet(const Vector3& targetSize)
 {
   if( !mInternalSetSize )

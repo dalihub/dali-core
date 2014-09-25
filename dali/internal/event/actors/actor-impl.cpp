@@ -1091,29 +1091,42 @@ void Actor::SetSize(float width, float height, float depth)
 
 void Actor::SetSize(const Vector2& size)
 {
-  Vector3 volume( size );
-  volume.z = std::min( size.width, size.height );
-  SetSize( volume );
+  SetSize( Vector3( size.width, size.height, CalculateSizeZ( size ) ) );
+}
+
+float Actor::CalculateSizeZ( const Vector2& size ) const
+{
+  return std::min( size.width, size.height );
 }
 
 void Actor::SetSize(const Vector3& size)
 {
   if( NULL != mNode )
   {
+    mSize = size;
+
     // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, &mNode->mSize, &AnimatableProperty<Vector3>::Bake, size );
+    SceneGraph::NodePropertyMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, &mNode->mSize, &AnimatableProperty<Vector3>::Bake, mSize );
 
     // Notification for derived classes
-    OnSizeSet(size);
+    OnSizeSet( mSize );
 
     // Emit signal for application developer
 
     if( !mSetSizeSignalV2.Empty() )
     {
       Dali::Actor handle( this );
-      mSetSizeSignalV2.Emit( handle, size );
+      mSetSizeSignalV2.Emit( handle, mSize );
     }
   }
+}
+
+void Actor::NotifySizeAnimation(Animation& animation, const Vector3& targetSize)
+{
+  mSize = targetSize;
+
+  // Notify deriving classes
+  OnSizeAnimation( animation, targetSize );
 }
 
 void Actor::SetWidth( float width )
@@ -1143,6 +1156,11 @@ void Actor::SetDepth( float depth )
   }
 }
 
+const Vector3& Actor::GetSize() const
+{
+  return mSize;
+}
+
 const Vector3& Actor::GetCurrentSize() const
 {
   if( NULL != mNode )
@@ -1153,6 +1171,13 @@ const Vector3& Actor::GetCurrentSize() const
 
   return Vector3::ZERO;
 }
+
+Vector3 Actor::GetNaturalSize() const
+{
+  // It is up to deriving classes to return the appropriate natural size
+  return Vector3( 0.0f, 0.0f, 0.0f );
+}
+
 
 #ifdef DYNAMICS_SUPPORT
 
@@ -1976,6 +2001,7 @@ Actor::Actor( DerivedType derivedType )
 #endif
   mGestureData( NULL ),
   mAttachment(),
+  mSize( 0.0f, 0.0f, 0.0f ),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mIsRoot( ROOT_LAYER == derivedType ),

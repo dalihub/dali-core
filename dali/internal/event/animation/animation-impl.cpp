@@ -103,6 +103,7 @@ Animation::Animation( UpdateManager& updateManager, AnimationPlaylist& playlist,
   mDurationSeconds( durationSeconds ),
   mSpeedFactor(1.0f),
   mIsLooping( false ),
+  mPlayRange( Vector2(0.0f,1.0f)),
   mEndAction( endAction ),
   mDestroyAction( destroyAction ),
   mDefaultAlpha( defaultAlpha )
@@ -138,7 +139,7 @@ void Animation::CreateSceneObject()
   DALI_ASSERT_DEBUG( mAnimation == NULL );
 
   // Create a new animation, temporarily owned
-  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mIsLooping, mEndAction, mDestroyAction );
+  SceneGraph::Animation* animation = SceneGraph::Animation::New( mDurationSeconds, mSpeedFactor, mPlayRange, mIsLooping, mEndAction, mDestroyAction );
 
   // Keep a const pointer to the animation.
   mAnimation = animation;
@@ -228,7 +229,7 @@ void Animation::Play()
 
 void Animation::PlayFrom( float progress )
 {
-  if( progress >= 0.0f && progress <= 1.0f )
+  if( progress >= mPlayRange.x && progress <= mPlayRange.y )
   {
     // Update the current playlist
     mPlaylist.OnPlay( *this );
@@ -469,7 +470,7 @@ void Animation::AnimateTo(ProxyObject& targetObject, Property::Index targetPrope
         if ( maybeActor )
         {
           // Notify the actor that its size is being animated
-          maybeActor->OnSizeAnimation( *this, destinationValue.Get<Vector3>() );
+          maybeActor->NotifySizeAnimation( *this, destinationValue.Get<Vector3>() );
         }
       }
 
@@ -1138,8 +1139,8 @@ void Animation::Resize(Actor& actor, float width, float height, AlphaFunction al
 
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
-  // notify the actor impl that its size is being animated
-  actor.OnSizeAnimation( *this, targetSize );
+  // Notify the actor impl that its size is being animated
+  actor.NotifySizeAnimation( *this, targetSize );
 
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
                                                          Dali::Actor::SIZE,
@@ -1163,8 +1164,8 @@ void Animation::Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, f
 {
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
-  // notify the actor impl that its size is being animated
-  actor.OnSizeAnimation( *this, size );
+  // Notify the actor impl that its size is being animated
+  actor.NotifySizeAnimation( *this, size );
 
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
                                                          Dali::Actor::SIZE,
@@ -1206,6 +1207,15 @@ bool Animation::DoAction(BaseObject* object, const std::string& actionName, cons
   return done;
 }
 
+void Animation::SetCurrentProgress(float progress)
+{
+  if( mAnimation && progress >= mPlayRange.x && progress <= mPlayRange.y )
+  {
+    // mAnimation is being used in a separate thread; queue a message to set the current progress
+    SetCurrentProgressMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
+  }
+}
+
 float Animation::GetCurrentProgress()
 {
   if( mAnimation )
@@ -1214,15 +1224,6 @@ float Animation::GetCurrentProgress()
   }
 
   return 0.0f;
-}
-
-void Animation::SetCurrentProgress(float progress)
-{
-  if( mAnimation && progress >= 0.0f && progress <= 1.0f )
-  {
-    // mAnimation is being used in a separate thread; queue a message to set the current progress
-    SetCurrentProgressMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
-  }
 }
 
 void Animation::ExtendDuration( const TimePeriod& timePeriod )
@@ -1249,6 +1250,30 @@ float Animation::GetSpeedFactor() const
   return mSpeedFactor;
 }
 
+void Animation::SetPlayRange( const Vector2& range)
+{
+  //Make sure the range specified is between 0.0 and 1.0
+  if( range.x >= 0.0f && range.x <= 1.0f && range.y >= 0.0f && range.y <= 1.0f )
+  {
+    Vector2 orderedRange( range );
+    //If the range is not in order swap values
+    if( range.x > range.y )
+    {
+      orderedRange = Vector2(range.y, range.x);
+    }
+
+    // Cache for public getters
+    mPlayRange = orderedRange;
+
+    // mAnimation is being used in a separate thread; queue a message to set play range
+    SetPlayRangeMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, orderedRange );
+  }
+}
+
+Vector2 Animation::GetPlayRange() const
+{
+  return mPlayRange;
+}
 
 
 } // namespace Internal

@@ -295,10 +295,25 @@ public:
   void SetDepth( float depth );
 
   /**
-   * Retrieve the Actor's size.
+   * Retrieve the Actor's size from event side.
+   * This size will be the size set or if animating then the target size.
+   * @return The Actor's size.
+   */
+  const Vector3& GetSize() const;
+
+  /**
+   * Retrieve the Actor's size from update side.
+   * This size will be the size set or animating but will be a frame behind.
    * @return The Actor's size.
    */
   const Vector3& GetCurrentSize() const;
+
+  /**
+   * Return the natural size of the actor
+   *
+   * @return The actor's natural size
+   */
+  virtual Vector3 GetNaturalSize() const;
 
   /**
    * Set the origin of an actor, within its parent's area.
@@ -1001,6 +1016,14 @@ public:
 public:  // For Animation
 
   /**
+   * This should only be called by Animation, when the actor is resized using Animation::Resize().
+   *
+   * @param[in] animation The animation that resized the actor
+   * @param[in] targetSize The new target size of the actor
+   */
+  void NotifySizeAnimation(Animation& animation, const Vector3& targetSize);
+
+  /**
    * For use in derived classes.
    * This should only be called by Animation, when the actor is resized using Animation::Resize().
    */
@@ -1087,6 +1110,15 @@ protected:
    * @return True if the Actor is OnStage & has a Node connected to the scene graph.
    */
   bool IsNodeConnected() const;
+
+  /**
+   * Calculate the size of the z dimension for a 2D size
+   *
+   * @param[in] size The 2D size (X, Y) to calculate Z from
+   *
+   * @return Return the Z dimension for this size
+   */
+  float CalculateSizeZ( const Vector2& size ) const;
 
 public: // Default property extensions from ProxyObject
 
@@ -1314,6 +1346,8 @@ protected:
   Dali::Actor::SetSizeSignalV2           mSetSizeSignalV2;
   Dali::Actor::OnStageSignalV2           mOnStageSignalV2;
   Dali::Actor::OffStageSignalV2          mOffStageSignalV2;
+
+  Vector3         mSize;      ///< Event-side storage for size (not a pointer as most actors will have a size)
 
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved

@@ -96,29 +96,6 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, NodeAttachment* attachmen
   }
 }
 
-void DiscardQueue::Add( BufferIndex updateBufferIndex, RefObject& resource )
-{
-  // Check whether resource has GL data
-  GlResourceOwner* glResource = dynamic_cast<GlResourceOwner*>( &resource );
-  if ( glResource )
-  {
-    // Send message to clean-up GL resources in the next Render
-    DoGlCleanup( updateBufferIndex, *glResource, mRenderQueue );
-  }
-
-  // The GL resources will now be freed in frame N
-  // The Update for frame N+1 may occur in parallel with the rendering of frame N
-  // Queue the node for destruction in frame N+2
-  if ( 0u == updateBufferIndex )
-  {
-    mResourceQueue0.push_back( DiscardQueue::ResourcePointer(&resource) );
-  }
-  else
-  {
-    mResourceQueue1.push_back( DiscardQueue::ResourcePointer(&resource) );
-  }
-}
-
 void DiscardQueue::Add( BufferIndex updateBufferIndex, Mesh* mesh )
 {
   DALI_ASSERT_DEBUG( mesh );
