@@ -74,6 +74,18 @@ const RenderTaskList::RenderTaskContainer& RenderTaskList::GetTasks() const
   return mRenderTasks;
 }
 
+void RenderTaskList::SetCompleteNotificationInterface( CompleteNotificationInterface* object )
+{
+
+  mNotificationObject = object;
+}
+
+CompleteNotificationInterface* RenderTaskList::GetCompleteNotificationInterface()
+{
+
+  return mNotificationObject;
+}
+
 } // namespace SceneGraph
 
 } // namespace Internal

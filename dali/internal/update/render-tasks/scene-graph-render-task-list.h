@@ -29,6 +29,7 @@ namespace Dali
 namespace Internal
 {
 class CompleteStatusManager;
+class CompleteNotificationInterface;
 
 namespace SceneGraph
 {
@@ -78,6 +79,17 @@ public:
    */
   const RenderTaskContainer& GetTasks() const;
 
+  /**
+   * Set the notification method to package in the NotifyFinishedMessage
+   * @param object to store in notification managers queue
+   */
+  void SetCompleteNotificationInterface( CompleteNotificationInterface* object );
+
+  /**
+   * Get the Notification interface for when 1+ render tasks have finished
+   */
+  CompleteNotificationInterface* GetCompleteNotificationInterface();
+
 private:
 
   // Undefined
@@ -87,8 +99,11 @@ private:
   RenderTaskList& operator=(const RenderTaskList&);
 
 private:
+
+  CompleteNotificationInterface* mNotificationObject; ///< object to pass in to the complete notification
   RenderTaskContainer mRenderTasks; ///< A container of owned RenderTasks
   CompleteStatusManager& mCompleteStatusManager; ///< The complete status tracker (render tasks need this)
+
 };
 
 // Messages for RenderTaskList
