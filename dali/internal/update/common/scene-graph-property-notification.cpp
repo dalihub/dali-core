@@ -61,7 +61,8 @@ PropertyNotification::PropertyNotification(ProxyObject& proxy,
   mComponentIndex(componentIndex),
   mConditionType(condition),
   mArguments(arguments),
-  mValid(false)
+  mValid(false),
+  mNotifyMode( Dali::PropertyNotification::Disabled )
 {
   SetNotifyMode(notifyMode);
 
@@ -124,33 +125,7 @@ bool PropertyNotification::EvalFalse( const Dali::PropertyInput& value, RawArgum
 
 void PropertyNotification::SetNotifyMode( NotifyMode notifyMode )
 {
-  switch(notifyMode)
-  {
-    case Dali::PropertyNotification::Disabled:
-    {
-      mNotifyValidity[0] = false;
-      mNotifyValidity[1] = false;
-      break;
-    }
-    case Dali::PropertyNotification::NotifyOnTrue:
-    {
-      mNotifyValidity[0] = false;
-      mNotifyValidity[1] = true;
-      break;
-    }
-    case Dali::PropertyNotification::NotifyOnFalse:
-    {
-      mNotifyValidity[0] = true;
-      mNotifyValidity[1] = false;
-      break;
-    }
-    case Dali::PropertyNotification::NotifyOnChanged:
-    {
-      mNotifyValidity[0] = true;
-      mNotifyValidity[1] = true;
-      break;
-    }
-  }
+  mNotifyMode = notifyMode;
 }
 
 bool PropertyNotification::Check( BufferIndex bufferIndex )
@@ -177,7 +152,30 @@ bool PropertyNotification::Check( BufferIndex bufferIndex )
                         || (mConditionType == PropertyCondition::VariableStep))) )
   {
     mValid = currentValid;
-    notifyRequired = mNotifyValidity[currentValid];
+    //  means don't notify so notifyRequired stays false
+    switch( mNotifyMode )
+    {
+      case Dali::PropertyNotification::Disabled:
+      {
+        // notify never, already initialized to false
+        break;
+      }
+      case Dali::PropertyNotification::NotifyOnTrue:
+      {
+        notifyRequired = mValid; // notify if value is true
+        break;
+      }
+      case Dali::PropertyNotification::NotifyOnFalse:
+      {
+        notifyRequired = !mValid; // notify when its false
+        break;
+      }
+      case Dali::PropertyNotification::NotifyOnChanged:
+      {
+        notifyRequired = true; // notify whenever changed
+        break;
+      }
+    }
   }
 
   return notifyRequired;
