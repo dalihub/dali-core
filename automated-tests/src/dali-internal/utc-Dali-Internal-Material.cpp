@@ -76,13 +76,15 @@ public:
   : app(application)
   {
     Internal::Context* testContext = new Internal::Context( application.GetGlAbstraction() );
+    testContext->GlContextCreated();
+
     Integration::ShaderDataPtr shaderData = new Integration::ShaderData("123", "132");
     shaderData->AllocateBuffer(10);
 
     Integration::ResourceId resourceId = 100;
     program = Internal::Program::New(resourceId, shaderData.Get(), *testContext, true);
+    program->Use(); // Ensure program lazy loading is forced to load program.
     programId = app.GetGlAbstraction().GetLastProgramCreated();
-    program->Use();
   }
 
   virtual ~TestProgram()
