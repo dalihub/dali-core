@@ -163,6 +163,12 @@ public:
                                 BoneTransforms&           boneTransforms );
 
 private:
+
+  /**
+   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
+   */
+  virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner );
+
   /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed()
    */

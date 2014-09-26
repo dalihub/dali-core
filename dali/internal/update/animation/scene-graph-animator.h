@@ -265,6 +265,15 @@ public:
   }
 
   /**
+   * Called when mPropertyOwner is disconnected from the scene graph.
+   */
+  virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
+  {
+    mPropertyOwner = NULL;
+    mPropertyAccessor.Reset();
+  }
+
+  /**
    * Called shortly before mPropertyOwner is destroyed, along with its property.
    */
   virtual void PropertyOwnerDestroyed( PropertyOwner& owner )

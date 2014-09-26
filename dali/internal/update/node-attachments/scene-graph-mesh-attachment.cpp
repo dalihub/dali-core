@@ -69,6 +69,11 @@ MeshAttachment::MeshAttachment()
 {
 }
 
+void MeshAttachment::PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
+{
+  // Bone node has been disconnected.
+}
+
 void MeshAttachment::PropertyOwnerDestroyed( PropertyOwner& owner )
 {
   // Bone node has been destroyed.
