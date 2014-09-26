@@ -72,25 +72,6 @@ public:
   static AnimationPtr New(float durationSeconds);
 
   /**
-   * Create a new Animation object.
-   * @param[in] durationSeconds The duration of the animation.
-   * @param[in] endAction The action to perform when the animation ends.
-   * @param[in] destroyAction The action to perform when the animation ends.
-   * @return A smart-pointer to the newly allocated Animation.
-   */
-  static AnimationPtr New(float durationSeconds, EndAction endAction, EndAction destroyAction);
-
-  /**
-   * Create a new Animation object.
-   * @param[in] durationSeconds The duration of the animation.
-   * @param[in] endAction The action to perform when the animation ends.
-   * @param[in] destroyAction The action to perform when the animation ends.
-   * @param[in] alpha The default alpha function to apply to animators.
-   * @return A smart-pointer to the newly allocated Animation.
-   */
-  static AnimationPtr New(float durationSeconds, EndAction endAction, EndAction destroyAction, AlphaFunction alpha);
-
-  /**
    * Set the duration of an animation.
    * @pre durationSeconds must be greater than zero.
    * @param[in] seconds The duration in seconds.
@@ -127,15 +108,15 @@ public:
   EndAction GetEndAction() const;
 
   /**
-   * Set the destroy action of the animation.
-   * @param[in] action The destroy action.
+   * Set the disconnect action of the animation.
+   * @param[in] action The disconnect action.
    */
-  void SetDestroyAction(EndAction action);
+  void SetDisconnectAction(EndAction action);
 
   /**
-   * Returns the destroy action of the animation.
+   * Returns the disconnect action of the animation.
    */
-  EndAction GetDestroyAction() const;
+  EndAction GetDisconnectAction() const;
 
   /**
    * Set the default alpha function for an animation.
@@ -851,14 +832,14 @@ protected:
    * @param[in] playlist The list of currently playing animations.
    * @param[in] durationSeconds The duration of the animation in seconds.
    * @param[in] endAction The action to perform when the animation ends.
-   * @param[in] destroyAction The action to perform when the animation is destroyed.
+   * @param[in] disconnectAction The action to perform when the property owner of an animator is disconnected.
    * @param[in] defaultAlpha The default alpha function to apply to animators.
    */
   Animation( SceneGraph::UpdateManager& updateManager,
              AnimationPlaylist& playlist,
              float durationSeconds,
              EndAction endAction,
-             EndAction destroyAction,
+             EndAction disconnectAction,
              AlphaFunction defaultAlpha);
 
   /**
@@ -917,7 +898,7 @@ private:
   bool mIsLooping;
   Vector2 mPlayRange;
   EndAction mEndAction;
-  EndAction mDestroyAction;
+  EndAction mDisconnectAction;
   AlphaFunction mDefaultAlpha;
 
 };

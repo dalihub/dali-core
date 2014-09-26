@@ -28,6 +28,7 @@
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/common/observer-pointer.h>
 #include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/quaternion.h>
@@ -66,7 +67,7 @@ public:
   : mDurationSeconds(1.0f),
     mInitialDelaySeconds(0.0f),
     mAlphaFunc(AlphaFunctions::Linear),
-    mRelative(false)
+    mDisconnectAction(Dali::Animation::BakeFinal)
   {
   }
 
@@ -136,6 +137,15 @@ public:
   }
 
   /**
+   * Whether to bake the animation if attached property owner is disconnected.
+   * @param [in] action The disconnect action.
+   */
+  void SetDisconnectAction( Dali::Animation::EndAction action )
+  {
+    mDisconnectAction = action;
+  }
+
+  /**
    * This must be called when the animator is attached to the scene-graph.
    * @pre The animatable scene object must also be attached to the scene-graph.
    * @param[in] propertyOwner The scene-object that owns the animatable property.
@@ -165,7 +175,7 @@ protected:
 
   AlphaFunc mAlphaFunc;
 
-  bool mRelative;
+  Dali::Animation::EndAction mDisconnectAction;
 };
 
 /**
@@ -251,6 +261,8 @@ public:
       {
         mPropertyAccessor.Set( bufferIndex, result );
       }
+
+      mCurrentProgress = progress;
     }
 
     return IsAttached(); // return false if orphaned
@@ -269,6 +281,13 @@ public:
    */
   virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
   {
+    // Bake the value if required
+    if ( mDisconnectAction != Dali::Animation::Discard )
+    {
+      // Bake to target-value if BakeFinal, otherwise bake current value
+      Update( bufferIndex, ( mDisconnectAction == Dali::Animation::Bake ? mCurrentProgress : 1.0f ), true );
+    }
+
     mPropertyOwner = NULL;
     mPropertyAccessor.Reset();
   }
@@ -291,7 +310,8 @@ private:
             AnimatorFunction animatorFunction )
   : mPropertyOwner( NULL ),
     mPropertyAccessor( property ),
-    mAnimatorFunction( animatorFunction )
+    mAnimatorFunction( animatorFunction ),
+    mCurrentProgress( 0.0f )
   {
   }
 
@@ -307,6 +327,7 @@ protected:
   PropertyAccessorType mPropertyAccessor;
 
   AnimatorFunction mAnimatorFunction;
+  float mCurrentProgress;
 };
 
 } // namespace SceneGraph

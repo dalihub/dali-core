@@ -40,12 +40,12 @@ float DefaultAlphaFunc(float progress)
   return progress; // linear
 }
 
-Animation::Animation(float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, Dali::Animation::EndAction endAction, Dali::Animation::EndAction destroyAction)
+Animation::Animation( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction )
 : mDurationSeconds(durationSeconds),
   mSpeedFactor( speedFactor ),
   mLooping(isLooping),
   mEndAction(endAction),
-  mDestroyAction(destroyAction),
+  mDisconnectAction(disconnectAction),
   mState(Stopped),
   mElapsedSeconds(playRange.x*mDurationSeconds),
   mPlayCount(0),
@@ -74,9 +74,17 @@ void Animation::SetEndAction(Dali::Animation::EndAction action)
   mEndAction = action;
 }
 
-void Animation::SetDestroyAction(Dali::Animation::EndAction action)
+void Animation::SetDisconnectAction(Dali::Animation::EndAction action)
 {
-  mDestroyAction = action;
+  if ( mDisconnectAction != action )
+  {
+    mDisconnectAction = action;
+
+    for ( AnimatorIter iter = mAnimators.Begin(), endIter = mAnimators.End(); iter != endIter; ++iter )
+    {
+      (*iter)->SetDisconnectAction( action );
+    }
+  }
 }
 
 void Animation::SetPlayRange( const Vector2& range )
@@ -159,9 +167,9 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
 {
   if (mState == Playing || mState == Paused)
   {
-    if (mDestroyAction != Dali::Animation::Discard)
+    if (mEndAction != Dali::Animation::Discard)
     {
-      Bake( bufferIndex, mDestroyAction );
+      Bake( bufferIndex, mEndAction );
     }
   }
 
@@ -171,6 +179,7 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
 void Animation::AddAnimator( AnimatorBase* animator, PropertyOwner* propertyOwner )
 {
   animator->Attach( propertyOwner );
+  animator->SetDisconnectAction( mDisconnectAction );
 
   mAnimators.PushBack( animator );
 }

@@ -67,12 +67,12 @@ public:
    * @param[in] playRange Minimum and maximum progress between which the animation will play.
    * @param[in] isLooping Whether the animation will loop.
    * @param[in] endAction The action to perform when the animation ends.
-   * @param[in] destroyAction The action to perform when the animation is destroyed.
+   * @param[in] disconnectAction The action to perform when the property owner of an animator is disconnected.
    * @return A new Animation
    */
-  static Animation* New( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, EndAction endAction, EndAction destroyAction )
+  static Animation* New( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, EndAction endAction, EndAction disconnectAction )
   {
-    return new Animation( durationSeconds, speedFactor, playRange, isLooping, endAction, destroyAction );
+    return new Animation( durationSeconds, speedFactor, playRange, isLooping, endAction, disconnectAction );
   }
 
   /**
@@ -155,20 +155,20 @@ public:
   }
 
   /**
-   * Set the destroy action of the animation.
+   * Set the disconnect action of the animation when connected objects are disconnected.
    * This action is performed during the next update when
-   * the animation is destroyed.
-   * @param[in] action The destroy action.
+   * the connected object is disconnected.
+   * @param[in] action The disconnect action.
    */
-  void SetDestroyAction(EndAction action);
+  void SetDisconnectAction(EndAction action);
 
   /**
    * Retrieve the action performed when the animation is destroyed.
    * @return The destroy action.
    */
-  EndAction GetDestroyAction()
+  EndAction GetDisconnectAction()
   {
-    return mDestroyAction;
+    return mDisconnectAction;
   }
 
   /**
@@ -204,7 +204,7 @@ public:
 
   /**
    * Called shortly before the animation is destroyed.
-   * @param[in] bufferIndex The buffer to update when mDestroyAction == Bake.
+   * @param[in] bufferIndex The buffer to update when mEndAction == Bake.
    */
   void OnDestroy(BufferIndex bufferIndex);
 
@@ -260,7 +260,7 @@ protected:
   /**
    * Protected constructor. See New()
    */
-  Animation( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, EndAction endAction, EndAction destroyAction );
+  Animation( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, EndAction endAction, EndAction disconnectAction );
 
 
 private:
@@ -292,7 +292,7 @@ protected:
   float mSpeedFactor;
   bool mLooping;
   EndAction mEndAction;
-  EndAction mDestroyAction;
+  EndAction mDisconnectAction;
 
   State mState;
   float mElapsedSeconds;
@@ -345,7 +345,7 @@ inline void SetEndActionMessage( EventToUpdate& eventToUpdate, const Animation& 
   new (slot) LocalType( &animation, &Animation::SetEndAction, action );
 }
 
-inline void SetDestroyActionMessage( EventToUpdate& eventToUpdate, const Animation& animation, Dali::Animation::EndAction action )
+inline void SetDisconnectActionMessage( EventToUpdate& eventToUpdate, const Animation& animation, Dali::Animation::EndAction action )
 {
   typedef MessageValue1< Animation, Dali::Animation::EndAction > LocalType;
 
@@ -353,7 +353,7 @@ inline void SetDestroyActionMessage( EventToUpdate& eventToUpdate, const Animati
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::SetDestroyAction, action );
+  new (slot) LocalType( &animation, &Animation::SetDisconnectAction, action );
 }
 
 inline void SetCurrentProgressMessage( EventToUpdate& eventToUpdate, const Animation& animation, float progress )

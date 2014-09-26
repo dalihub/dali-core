@@ -530,17 +530,106 @@ int UtcDaliAnimationGetEndAction(void)
   END_TEST;
 }
 
-int UtcDaliAnimationGetDestroyAction(void)
+int UtcDaliAnimationSetDisconnectAction(void)
+{
+  TestApplication application;
+  Stage stage( Stage::GetCurrent() );
+
+  // Default: BakeFinal
+  {
+    Actor actor = Actor::New();
+    stage.Add(actor);
+
+    // Build the animation
+    float durationSeconds(1.0f);
+    Animation animation = Animation::New(durationSeconds);
+    DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::BakeFinal);
+
+    Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+    animation.MoveTo(actor, targetPosition, AlphaFunctions::Linear);
+
+    // Start the animation
+    animation.Play();
+
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds*0.5f*1000.0f)/*Only half the animation*/);
+
+    actor.Unparent();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition, TEST_LOCATION );
+  }
+
+  // Bake
+  {
+    Actor actor = Actor::New();
+    stage.Add(actor);
+
+    // Build the animation
+    float durationSeconds(1.0f);
+    Animation animation = Animation::New(durationSeconds);
+    animation.SetDisconnectAction( Animation::Bake );
+
+    Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+    animation.MoveTo(actor, targetPosition, AlphaFunctions::Linear);
+
+    // Start the animation
+    animation.Play();
+
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds*0.5f*1000.0f)/*Only half the animation*/);
+
+    actor.Unparent();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), targetPosition*0.5f, TEST_LOCATION );
+  }
+
+  // Discard
+  {
+    Actor actor = Actor::New();
+    stage.Add(actor);
+
+    // Build the animation
+    float durationSeconds(1.0f);
+    Animation animation = Animation::New(durationSeconds);
+    animation.SetDisconnectAction( Animation::Discard );
+
+    Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+    animation.MoveTo(actor, targetPosition, AlphaFunctions::Linear);
+
+    // Start the animation
+    animation.Play();
+
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds*0.5f*1000.0f)/*Only half the animation*/);
+
+    actor.Unparent();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliAnimationGetDisconnectAction(void)
 {
   TestApplication application;
   Animation animation = Animation::New(1.0f);
-  DALI_TEST_CHECK(animation.GetDestroyAction() == Animation::Bake); // default!
+  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::BakeFinal); // default!
 
-  animation.SetDestroyAction(Animation::Discard);
-  DALI_TEST_CHECK(animation.GetDestroyAction() == Animation::Discard);
+  animation.SetDisconnectAction(Animation::Discard);
+  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::Discard);
 
-  animation.SetDestroyAction(Animation::BakeFinal);
-  DALI_TEST_CHECK(animation.GetDestroyAction() == Animation::BakeFinal);
+  animation.SetDisconnectAction(Animation::Bake);
+  DALI_TEST_CHECK(animation.GetDisconnectAction() == Animation::Bake);
 
   END_TEST;
 }
@@ -836,6 +925,7 @@ int UtcDaliAnimationPlayOffStage(void)
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
+  animation.SetDisconnectAction( Animation::Discard );
   Vector3 targetPosition(100.0f, 100.0f, 100.0f);
   animation.MoveTo(actor, targetPosition, AlphaFunctions::Linear);
 
