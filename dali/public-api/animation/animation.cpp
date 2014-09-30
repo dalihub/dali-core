@@ -110,18 +110,6 @@ Dali::Animation::EndAction Animation::GetEndAction() const
   return GetImplementation(*this).GetEndAction();
 }
 
-void Animation::SetDestroyAction(Dali::Animation::EndAction destroyAction)
-{
-  // Deprecated
-  GetImplementation(*this).SetEndAction(destroyAction);
-}
-
-Dali::Animation::EndAction Animation::GetDestroyAction() const
-{
-  // Deprecated
-  return GetImplementation(*this).GetEndAction();
-}
-
 void Animation::SetDisconnectAction( Animation::EndAction disconnectAction )
 {
   GetImplementation(*this).SetDisconnectAction( disconnectAction );

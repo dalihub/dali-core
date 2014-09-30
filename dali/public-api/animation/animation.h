@@ -244,24 +244,6 @@ public:
   EndAction GetEndAction() const;
 
   /**
-   * @brief Deprecated
-   *
-   * @param[in] action The destroy action.
-   *
-   * @deprecated Use SetEndAction
-   */
-  void SetDestroyAction(EndAction action);
-
-  /**
-   * @brief Deprecated
-   *
-   * @return The destroy action.
-   *
-   * @deprecated Use GetEndAction
-   */
-  EndAction GetDestroyAction() const;
-
-  /**
    * @brief Set the disconnect action.
    *
    * If any of the animated property owners are disconnected from the stage, then this action is performed.
