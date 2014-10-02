@@ -616,6 +616,29 @@ int UtcDaliAnimationSetDisconnectAction(void)
     DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
   }
 
+  // Don't play the animation: disconnect action should not be applied
+  {
+    Actor actor = Actor::New();
+    stage.Add(actor);
+
+    // Build the animation
+    float durationSeconds(1.0f);
+    Animation animation = Animation::New(durationSeconds);
+
+    Vector3 targetPosition(10.0f, 10.0f, 10.0f);
+    animation.MoveTo(actor, targetPosition, AlphaFunctions::Linear);
+
+    application.SendNotification();
+    application.Render(static_cast<unsigned int>(durationSeconds*0.5f*1000.0f)/*Only half the animation*/);
+
+    actor.Unparent();
+
+    application.SendNotification();
+    application.Render();
+
+    DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+  }
+
   END_TEST;
 }
 

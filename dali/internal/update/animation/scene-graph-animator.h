@@ -67,7 +67,8 @@ public:
   : mDurationSeconds(1.0f),
     mInitialDelaySeconds(0.0f),
     mAlphaFunc(AlphaFunctions::Linear),
-    mDisconnectAction(Dali::Animation::BakeFinal)
+    mDisconnectAction(Dali::Animation::BakeFinal),
+    mActive(false)
   {
   }
 
@@ -138,11 +139,41 @@ public:
 
   /**
    * Whether to bake the animation if attached property owner is disconnected.
+   * Property is only baked if the animator is active.
    * @param [in] action The disconnect action.
    */
   void SetDisconnectAction( Dali::Animation::EndAction action )
   {
     mDisconnectAction = action;
+  }
+
+  /**
+   * Retrieve the disconnect action of an animator.
+   * @return The disconnect action.
+   */
+  Dali::Animation::EndAction GetDisconnectAction() const
+  {
+    return mDisconnectAction;
+  }
+
+  /**
+   * Whether the animator is active or not.
+   * @param [in] action The disconnect action.
+   * @post When the animator becomes active, it applies the disconnect-action if the property owner is then disconnected.
+   * @note When the property owner is disconnected, the active state is set to false.
+   */
+  void SetActive( bool active )
+  {
+    mActive = active;
+  }
+
+  /**
+   * Retrieve whether the animator has been set to active or not.
+   * @return The active state.
+   */
+  bool GetActive() const
+  {
+    return mActive;
   }
 
   /**
@@ -176,6 +207,7 @@ protected:
   AlphaFunc mAlphaFunc;
 
   Dali::Animation::EndAction mDisconnectAction;
+  bool mActive:1;
 };
 
 /**
@@ -281,13 +313,14 @@ public:
    */
   virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
   {
-    // Bake the value if required
-    if ( mDisconnectAction != Dali::Animation::Discard )
+    // If we are active, then bake the value if required
+    if ( mActive && mDisconnectAction != Dali::Animation::Discard )
     {
       // Bake to target-value if BakeFinal, otherwise bake current value
       Update( bufferIndex, ( mDisconnectAction == Dali::Animation::Bake ? mCurrentProgress : 1.0f ), true );
     }
 
+    mActive = false;
     mPropertyOwner = NULL;
     mPropertyAccessor.Reset();
   }
