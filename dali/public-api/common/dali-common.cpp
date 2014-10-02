@@ -33,15 +33,15 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 
-namespace
-{
-const int MAX_NUM_STACK_FRAMES = 25;
-}
-
 namespace Dali
 {
 
 #if defined(BACKTRACE_ENABLED)
+
+namespace
+{
+const int MAX_NUM_STACK_FRAMES = 25;
+}
 
 std::string Demangle(const char* symbol)
 {

@@ -27,6 +27,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-types.h>
+#include <dali/public-api/math/math-utils.h> // Clamp
 
 namespace Dali
 {

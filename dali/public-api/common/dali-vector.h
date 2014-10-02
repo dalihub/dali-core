@@ -570,9 +570,20 @@ public: // API
    * @brief Resize the vector. Does not change capacity.
    *
    * @param count to resize to.
+   */
+  void Resize( SizeType count )
+  {
+    ItemType item = ItemType();
+    Resize(count, item);
+  }
+
+  /**
+   * @brief Resize the vector. Does not change capacity.
+   *
+   * @param count to resize to.
    * @param item to insert to the new indices.
    */
-  void Resize( SizeType count, ItemType item = ItemType() )
+  void Resize( SizeType count, const ItemType& item )
   {
     const SizeType oldCount = VectorBase::Count();
     if( count <= oldCount )

@@ -30,14 +30,13 @@ namespace Dali
 namespace Internal
 {
 
-CompressedBitmapTexture::CompressedBitmapTexture(Internal::BitmapCompressed* const bitmap, Context& context, ResourcePolicy::Discardable discardPolicy)
+CompressedBitmapTexture::CompressedBitmapTexture(Internal::BitmapCompressed* const bitmap, Context& context, ResourcePolicy::Discardable /*discardPolicy*/)
 : Texture(context,
           bitmap->GetImageWidth(),
           bitmap->GetImageHeight(),
           bitmap->GetImageWidth(),
           bitmap->GetImageHeight()),
   mBitmap(bitmap),
-  mDiscardPolicy(discardPolicy),
   mPixelFormat( bitmap->GetPixelFormat() )
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);

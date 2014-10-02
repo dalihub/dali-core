@@ -56,8 +56,8 @@ struct LinearConstraintFunctor
   /**
    * @brief Functor operator for float properties
    *
-   * @param[in,out] position Current value of the property
-   * @param[in]     inputs Contains the input property used as the parameter for the path
+   * @param[out]  value Current value of the property
+   * @param[in]   inputs Contains the input property used as the parameter for the path
    *
    * @return The value of the linear map at the given parameter.
    */
@@ -106,7 +106,7 @@ struct LinearConstraintFunctor
           max = min+1;
         }
 
-        tLocal =(t - min*step) / step;
+        tLocal = (t - min*step) / step;
       }
       else
       {
