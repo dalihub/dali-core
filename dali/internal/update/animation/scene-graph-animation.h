@@ -269,8 +269,9 @@ private:
    * Helper for Update, also used to bake when the animation is stopped or destroyed.
    * @param[in] bufferIndex The buffer to update.
    * @param[in] bake True if the final result should be baked.
+   * @param[in] animationFinished True if the animation has finished.
    */
-  void UpdateAnimators(BufferIndex bufferIndex, bool bake);
+  void UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animationFinished );
 
   /**
    * Helper function to bake the result of the animation when it is stopped or
@@ -279,6 +280,12 @@ private:
    * @param[in] action The end action specified.
    */
   void Bake(BufferIndex bufferIndex, EndAction action );
+
+  /**
+   * Helper function to set active state of animators.
+   * @param[in] active Every animator is set to this state
+   */
+  void SetAnimatorsActive( bool active );
 
   // Undefined
   Animation(const Animation&);
