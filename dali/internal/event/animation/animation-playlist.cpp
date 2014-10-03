@@ -67,7 +67,7 @@ void AnimationPlaylist::OnClear( Animation& animation )
   mPlaylist.erase( Dali::Animation(&animation) );
 }
 
-void AnimationPlaylist::NotifyFinishedAnimations()
+void AnimationPlaylist::NotifyCompleted()
 {
   std::vector< Dali::Animation > finishedAnimations;
 

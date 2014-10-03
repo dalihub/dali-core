@@ -163,22 +163,35 @@ private:
   }
 
   /**
+   * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
+   */
+  virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
+  {
+    PropertyOwnerDestroyed( owner );
+  }
+
+  /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDestroyed()
    */
   virtual void PropertyOwnerDestroyed( PropertyOwner& owner )
   {
-    // Discard pointer to destroyed property owner
-    PropertyOwnerIter iter = mObservedOwners.find( &owner );
-    DALI_ASSERT_DEBUG( mObservedOwners.end() != iter );
-    mObservedOwners.erase( iter );
+    if ( !mDisconnected )
+    {
+      // Discard pointer to disconnected property owner
+      PropertyOwnerIter iter = mObservedOwners.find( &owner );
+      if( mObservedOwners.end() != iter )
+      {
+        mObservedOwners.erase( iter );
 
-    // Stop observing the remaining property owners
-    StopObservation();
+        // Stop observing the remaining property owners
+        StopObservation();
 
-    // Notification for derived class
-    OnDisconnect();
+        // Notification for derived class
+        OnDisconnect();
 
-    mDisconnected = true;
+        mDisconnected = true;
+      }
+    }
   }
 
   /**

@@ -26,7 +26,7 @@ namespace Dali
 namespace Internal
 {
 
-class PropertyNotification;
+class CompleteNotificationInterface;
 class MessageBase;
 
 /**
@@ -48,6 +48,12 @@ public:
   virtual ~NotificationManager();
 
 /// Update side interface, can only be called from Update-thread
+
+  /**
+   * Queue a scene message to an interface. This method is thread-safe.
+   * @param[in] instance to be notified about completion of the Update side event.
+   */
+  void QueueCompleteNotification( CompleteNotificationInterface* instance );
 
   /**
    * Queue a scene message. This method is thread-safe.
@@ -73,36 +79,11 @@ public:
    */
   void ProcessMessages();
 
-  /**
-   * Retrieve the notification count; this is incremented when Notify() is called.
-   */
-  unsigned int GetNotificationCount() const;
-
 private:
 
   struct Impl;
   Impl* mImpl;
-};
 
-/**
- * A functor for querying the notification count.
- * This is useful for skipping duplicate operations during NotificationManager::Notify()
- */
-struct NotificationCountQuery
-{
-  NotificationCountQuery(const NotificationManager& manager)
-  : mNotificationManager(manager)
-  {
-  }
-
-  unsigned int operator()() const
-  {
-    return mNotificationManager.GetNotificationCount();
-  }
-
-private:
-
-  const NotificationManager& mNotificationManager;
 };
 
 } // namespace Internal

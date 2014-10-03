@@ -34,8 +34,6 @@
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-notifier.h>
-#include <dali/internal/event/animation/animation-finished-notifier.h>
-#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
@@ -151,7 +149,7 @@ struct UpdateManager::Impl
 {
   Impl( NotificationManager& notificationManager,
         GlSyncAbstraction& glSyncAbstraction,
-        AnimationFinishedNotifier& animationFinishedNotifier,
+        CompleteNotificationInterface& animationFinishedNotifier,
         PropertyNotifier& propertyNotifier,
         ResourceManager& resourceManager,
         DiscardQueue& discardQueue,
@@ -190,7 +188,6 @@ struct UpdateManager::Impl
     previousUpdateScene( false ),
     frameCounter( 0 ),
     renderSortingHelper(),
-    renderTaskList( NULL ),
     renderTaskWaiting( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager, defaultShader );
@@ -240,7 +237,7 @@ struct UpdateManager::Impl
   SceneGraphBuffers                   sceneGraphBuffers;             ///< Used to keep track of which buffers are being written or read
   RenderMessageDispatcher             renderMessageDispatcher;       ///< Used for passing messages to the render-thread
   NotificationManager&                notificationManager;           ///< Queues notification messages for the event-thread.
-  AnimationFinishedNotifier&          animationFinishedNotifier;     ///< Provides notification to applications when animations are finished.
+  CompleteNotificationInterface&      animationFinishedNotifier;     ///< Provides notification to applications when animations are finished.
   PropertyNotifier&                   propertyNotifier;              ///< Provides notification to applications when properties are modified.
   ResourceManager&                    resourceManager;               ///< resource manager
   DiscardQueue&                       discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
@@ -293,14 +290,13 @@ struct UpdateManager::Impl
   int                                 frameCounter;                  ///< Frame counter used in debugging to choose which frame to debug and which to ignore.
   RendererSortingHelper               renderSortingHelper;           ///< helper used to sort transparent renderers
 
-  Internal::RenderTaskList*           renderTaskList;                ///< Stores a pointer to the internal implementation to the render task list.
   GestureContainer                    gestures;                      ///< A container of owned gesture detectors
   bool                                renderTaskWaiting;             ///< A REFRESH_ONCE render task is waiting to be rendered
 };
 
 UpdateManager::UpdateManager( NotificationManager& notificationManager,
                               GlSyncAbstraction& glSyncAbstraction,
-                              AnimationFinishedNotifier& animationFinishedNotifier,
+                              CompleteNotificationInterface& animationFinishedNotifier,
                               PropertyNotifier& propertyNotifier,
                               ResourceManager& resourceManager,
                               DiscardQueue& discardQueue,
@@ -330,11 +326,6 @@ UpdateManager::UpdateManager( NotificationManager& notificationManager,
 UpdateManager::~UpdateManager()
 {
   delete mImpl;
-}
-
-void UpdateManager::SetRenderTaskList( Internal::RenderTaskList* renderTaskList )
-{
-  mImpl->renderTaskList = renderTaskList;
 }
 
 EventToUpdate& UpdateManager::GetEventToUpdate()
@@ -841,7 +832,7 @@ void UpdateManager::Animate( float elapsedSeconds )
   if ( mImpl->animationFinishedDuringUpdate )
   {
     // The application should be notified by NotificationManager, in another thread
-    mImpl->notificationManager.QueueMessage( AnimationFinishedMessage( mImpl->animationFinishedNotifier ) );
+    mImpl->notificationManager.QueueCompleteNotification( &mImpl->animationFinishedNotifier );
   }
 
   PERF_MONITOR_END(PerformanceMonitor::ANIMATE_NODES);
@@ -1118,7 +1109,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     }
   }
 
-  // check the countdown and notify
+  // check the countdown and notify (note, at the moment this is only done for normal tasks, not for systemlevel tasks)
   bool doRenderOnceNotify = false;
   mImpl->renderTaskWaiting = false;
   const RenderTaskList::RenderTaskContainer& tasks = mImpl->taskList.GetTasks();
@@ -1144,7 +1135,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   if( doRenderOnceNotify )
   {
     DALI_LOG_INFO(gRenderTaskLogFilter, Debug::General, "Notify a render task has finished\n");
-    mImpl->notificationManager.QueueMessage( NotifyFinishedMessage( *mImpl->renderTaskList ) );
+    mImpl->notificationManager.QueueCompleteNotification( mImpl->taskList.GetCompleteNotificationInterface() );
   }
 
   PERF_MONITOR_END(PerformanceMonitor::PROCESS_RENDER_TASKS);

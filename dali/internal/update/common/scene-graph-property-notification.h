@@ -151,7 +151,7 @@ protected:
   ConditionType mConditionType;                 ///< The ConditionType
   RawArgumentContainer mArguments;              ///< The arguments.
   bool mValid;                                  ///< Whether this property notification is currently valid or not.
-  char mNotifyValidity[2];                      ///< Whether to notify on invalid and/or valid
+  NotifyMode mNotifyMode;                       ///< Whether to notify on invalid and/or valid
   ConditionFunction mConditionFunction;         ///< The Condition Function pointer to be evaluated.
 };
 

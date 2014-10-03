@@ -110,14 +110,14 @@ Dali::Animation::EndAction Animation::GetEndAction() const
   return GetImplementation(*this).GetEndAction();
 }
 
-void Animation::SetDestroyAction(Dali::Animation::EndAction destroyAction)
+void Animation::SetDisconnectAction( Animation::EndAction disconnectAction )
 {
-  GetImplementation(*this).SetDestroyAction(destroyAction);
+  GetImplementation(*this).SetDisconnectAction( disconnectAction );
 }
 
-Dali::Animation::EndAction Animation::GetDestroyAction() const
+Animation::EndAction Animation::GetDisconnectAction() const
 {
-  return GetImplementation(*this).GetDestroyAction();
+  return GetImplementation(*this).GetDisconnectAction();
 }
 
 void Animation::SetDefaultAlphaFunction(AlphaFunction alpha)

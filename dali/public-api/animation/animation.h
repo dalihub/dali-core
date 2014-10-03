@@ -230,7 +230,7 @@ public:
   /**
    * @brief Set the end action of the animation.
    *
-   * This action is performed when the animation ends.
+   * This action is performed when the animation ends or if it is stopped.
    * Default end action is bake
    * @param[in] action The end action.
    */
@@ -244,20 +244,20 @@ public:
   EndAction GetEndAction() const;
 
   /**
-   * @brief Set the destroy action of the animation.
+   * @brief Set the disconnect action.
    *
-   * If the animation is destroyed this action is performed on the following update.
-   * Default destroy action is bake
-   * @param[in] action The destroy action.
+   * If any of the animated property owners are disconnected from the stage, then this action is performed.
+   * Default action is to BakeFinal.
+   * @param[in] disconnectAction The disconnect action.
    */
-  void SetDestroyAction(EndAction action);
+  void SetDisconnectAction( EndAction disconnectAction );
 
   /**
-   * @brief Returns the destroy action of the animation.
+   * @brief Returns the disconnect action.
    *
-   * @return The destroy action.
+   * @return The disconnect action.
    */
-  EndAction GetDestroyAction() const;
+  EndAction GetDisconnectAction() const;
 
   /**
    * @brief Set the default alpha function for an animation.

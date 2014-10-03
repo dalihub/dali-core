@@ -50,13 +50,12 @@ struct DynamicsWorldSettings;
 namespace Internal
 {
 
-class AnimationFinishedNotifier;
 class PropertyNotifier;
 class EventToUpdate;
 struct DynamicsWorldSettings;
 class NotificationManager;
+class CompleteNotificationInterface;
 class ResourceManager;
-class RenderTaskList;
 class TouchResampler;
 
 // value types used by messages
@@ -92,7 +91,7 @@ public:
    * Construct a new UpdateManager.
    * @param[in] notificationManager This should be notified when animations have finished.
    * @param[in] glSyncAbstraction Used to determine when framebuffers are ready
-   * @param[in] animationFinishedNotifier The AnimationFinishedNotifier
+   * @param[in] animationFinishedNotifier The CompleteNotificationInterface that handles animation completions
    * @param[in] propertyNotifier The PropertyNotifier
    * @param[in] resourceManager The resource manager used to load textures etc.
    * @param[in] discardQueue Nodes are added here when disconnected from the scene-graph.
@@ -104,7 +103,7 @@ public:
    */
   UpdateManager( NotificationManager& notificationManager,
                  Integration::GlSyncAbstraction& glSyncAbstraction,
-                 AnimationFinishedNotifier& animationFinishedNotifier,
+                 CompleteNotificationInterface& animationFinishedNotifier,
                  PropertyNotifier& propertyNotifier,
                  ResourceManager& resourceManager,
                  DiscardQueue& discardQueue,
@@ -118,15 +117,6 @@ public:
    * Destructor. Not virtual as this is not a base class
    */
   ~UpdateManager();
-
-  /**
-   * Sets a pointer to the internal render task list.
-   *
-   * The render task list is used to notify which render tasks with refresh rate REFRESH_ONCE have finished.
-   *
-   * @param[in] renderTaskList A pointer to the internal render task list.
-   */
-  void SetRenderTaskList( Internal::RenderTaskList* renderTaskList );
 
   /**
    * The event-thread uses this interface to queue messages for the next update.

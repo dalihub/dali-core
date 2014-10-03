@@ -136,24 +136,29 @@ public:
    */
   void MoveFrom( OwnerContainer& source )
   {
-    // Optimisation for the case that this is empty
-    if( IsEmpty() )
+    typename Vector< T >::SizeType sourceCount = source.Count();
+    // if source is empty, nothing to move
+    if( sourceCount > 0u )
     {
-      VectorBase::Swap( source );
-    }
-    else
-    {
-      // make space for new items
-      Vector< T >::Reserve( VectorBase::Count() + source.Count() );
-      Iterator iter = source.Begin();
-      ConstIterator end = source.End();
-      for( ; iter != end; ++iter )
+      // Optimisation for the case that this is empty
+      if( IsEmpty() )
       {
-        T pointer = *iter;
-        Vector< T >::PushBack( pointer );
+        VectorBase::Swap( source );
       }
-      // cannot call Clear on OwnerContainer as that deletes the elements
-      source.Vector< T >::Clear();
+      else
+      {
+        // make space for new items
+        Vector< T >::Reserve( VectorBase::Count() + sourceCount );
+        Iterator iter = source.Begin();
+        ConstIterator end = source.End();
+        for( ; iter != end; ++iter )
+        {
+          T pointer = *iter;
+          Vector< T >::PushBack( pointer );
+        }
+        // cannot call Clear on OwnerContainer as that deletes the elements
+        source.Vector< T >::Clear();
+      }
     }
   }
 
