@@ -24,6 +24,7 @@
 #include <dali/integration-api/events/pinch-gesture-event.h>
 #include <dali/integration-api/events/tap-gesture-event.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 
 using namespace Dali;
 
@@ -220,6 +221,10 @@ struct MyTestCustomActor : public CustomActorImpl
   {
   }
   virtual bool OnTouchEvent(const TouchEvent& event)
+  {
+    return true;
+  }
+  virtual bool OnHoverEvent(const HoverEvent& event)
   {
     return true;
   }

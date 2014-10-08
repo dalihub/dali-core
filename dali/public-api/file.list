@@ -38,6 +38,7 @@ public_api_src_files = \
   $(public_api_src_dir)/events/gesture.cpp \
   $(public_api_src_dir)/events/gesture-detector.cpp \
   $(public_api_src_dir)/events/hit-test-algorithm.cpp \
+  $(public_api_src_dir)/events/hover-event.cpp \
   $(public_api_src_dir)/events/key-event.cpp \
   $(public_api_src_dir)/events/long-press-gesture.cpp \
   $(public_api_src_dir)/events/long-press-gesture-detector.cpp \
@@ -182,6 +183,7 @@ public_api_core_events_header_files = \
   $(public_api_src_dir)/events/gesture.h \
   $(public_api_src_dir)/events/gesture-detector.h \
   $(public_api_src_dir)/events/hit-test-algorithm.h \
+  $(public_api_src_dir)/events/hover-event.h \
   $(public_api_src_dir)/events/key-event.h \
   $(public_api_src_dir)/events/long-press-gesture.h \
   $(public_api_src_dir)/events/long-press-gesture-detector.h \

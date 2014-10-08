@@ -30,13 +30,14 @@ namespace Integration
 {
 
 struct TouchEvent;
+struct HoverEvent;
 
 /**
  * Dali::Integration::TouchEventCombiner is a utility class, an instance of which, should be created
  * upon initialisation.  It accepts single Point(s) containing information about a touch area and
- * creates a TouchEvent combining the latest event's information with previous TouchPoint(s).
+ * creates a TouchEvent and/or HoverEvent combining the latest event's information with previous TouchPoint(s).
  *
- * The created TouchEvent can then be sent to the Dali Core as indicated by the GetNextTouchEvent()
+ * The created TouchEvent and/or HoverEvent can then be sent to the Dali Core as indicated by the GetNextTouchEvent()
  * method.
  *
  * The TouchEventCombiner ensures that the following rules are also adhered to:
@@ -48,6 +49,16 @@ struct TouchEvent;
 class TouchEventCombiner
 {
 public:
+
+  // Enumerations
+
+  enum EventDispatchType
+  {
+    DispatchTouch,      ///< The touch event should be dispatched.
+    DispatchHover,      ///< The hover event should be dispatched.
+    DispatchBoth,       ///< Both touch event and hover event should be dispatched.
+    DispatchNone        ///< Neither touch event nor hover event should be dispatched.
+  };
 
   /**
    * Default Constructor.
@@ -81,19 +92,20 @@ public:
 public:
 
   /**
-   * Allows the caller to pass in a point which is processed and the TouchEvent is appropriately filled with the new,
+   * Allows the caller to pass in a point which is processed and the TouchEvent and/or HoverEvent is appropriately filled with the new,
    * and previously stored Point information.
    *
-   * @note If the thresholds set have not been passed, then false is returned and the TouchEvent should not be sent
+   * @note If the thresholds set have not been passed, then false is returned and the TouchEvent and/or HoverEvent should not be sent
    * to Dali Core.
    *
    * @param[in]   point         The new Point.
    * @param[in]   time          The time the event occurred.
    * @param[out]  touchEvent    This is populated with the correct Point(s) and time information.
+   * @param[out]  hoverEvent    This is populated with the correct Point(s) and time information.
    *
    * @return true if the point is beyond the different thresholds set thus, should be sent to core, false otherwise.
    */
-  bool GetNextTouchEvent( const TouchPoint& point, unsigned long time, TouchEvent& touchEvent );
+  EventDispatchType GetNextTouchEvent( const TouchPoint& point, unsigned long time, TouchEvent& touchEvent, HoverEvent& hoverEvent );
 
   /**
    * Sets the minimum time (in ms) that should occur between motion events.
@@ -148,7 +160,8 @@ private:
 
   struct PointInfo;
   typedef std::vector< PointInfo > PointInfoContainer;
-  PointInfoContainer mPressedPoints; ///< A container of point and time.
+  PointInfoContainer mPressedPoints; ///< A container of touched point and time.
+  PointInfoContainer mHoveredPoints; ///< A container of hovered point and time.
 
   unsigned long mMinMotionTime; ///< The minimum time that should elapse before considering a new motion event.
   Vector2 mMinMotionDistance; ///< The minimum distance in the X and Y direction before considering a new motion event.

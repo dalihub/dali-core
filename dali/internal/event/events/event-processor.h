@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/touch-event-processor.h>
+#include <dali/internal/event/events/hover-event-processor.h>
 #include <dali/internal/event/events/key-event-processor.h>
 #include <dali/internal/event/events/mouse-wheel-event-processor.h>
 #include <dali/internal/common/message-buffer.h>
@@ -87,6 +88,7 @@ private:
 private:
 
   TouchEventProcessor      mTouchEventProcessor;        ///< Processes touch events.
+  HoverEventProcessor      mHoverEventProcessor;        ///< Processes hover events.
   GestureEventProcessor&   mGestureEventProcessor;      ///< Processes gesture events.
   KeyEventProcessor        mKeyEventProcessor;          ///< Processes key events.
   MouseWheelEventProcessor mMouseWheelEventProcessor;   ///< Processes mouse wheel events.

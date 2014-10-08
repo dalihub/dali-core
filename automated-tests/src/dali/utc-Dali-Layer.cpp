@@ -524,6 +524,17 @@ int UtcDaliLayerTouchConsumed(void)
   END_TEST;
 }
 
+int UtcDaliLayerHoverConsumed(void)
+{
+  TestApplication application;
+  Layer layer = Layer::New();
+
+  DALI_TEST_EQUALS( layer.IsHoverConsumed(), false, TEST_LOCATION );
+  layer.SetHoverConsumed( true );
+  DALI_TEST_EQUALS( layer.IsHoverConsumed(), true, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliLayerClippingGLCalls(void)
 {
   TestApplication application;
@@ -547,6 +558,5 @@ int UtcDaliLayerClippingGLCalls(void)
   DALI_TEST_EQUALS( testBox.y, stage.GetSize().height - glScissorParams.y - testBox.height, TEST_LOCATION ); // GL Coordinates are from bottom left
   DALI_TEST_EQUALS( testBox.width, glScissorParams.width, TEST_LOCATION );
   DALI_TEST_EQUALS( testBox.height, glScissorParams.height, TEST_LOCATION );
-
   END_TEST;
 }

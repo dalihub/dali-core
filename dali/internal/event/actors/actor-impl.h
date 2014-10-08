@@ -44,6 +44,7 @@ namespace Dali
 
 struct KeyEvent;
 struct TouchEvent;
+struct HoverEvent;
 struct MouseWheelEvent;
 
 namespace Internal
@@ -607,23 +608,24 @@ public:
   float GetCurrentOpacity() const;
 
   /**
-   * Sets whether an actor should emit touch signals; see SignalTouch().
+   * Sets whether an actor should emit touch or hover signals; see SignalTouch() and SignalHover().
    * An actor is sensitive by default, which means that as soon as an application connects to the SignalTouch(),
-   * the touch event signal will be emitted.
+   * the touch event signal will be emitted, and as soon as an application connects to the SignalHover(), the
+   * hover event signal will be emitted.
    *
-   * If the application wishes to temporarily disable the touch event signal emission, then they can do so by calling:
+   * If the application wishes to temporarily disable the touch or hover event signal emission, then they can do so by calling:
    * @code
    * actor.SetSensitive(false);
    * @endcode
    *
-   * Then, to re-enable the touch event signal emission, the application should call:
+   * Then, to re-enable the touch or hover event signal emission, the application should call:
    * @code
    * actor.SetSensitive(true);
    * @endcode
    *
-   * @see SignalTouch().
-   * @note If an actor's sensitivity is set to false, then it's children will not emit a touch event signal either.
-   * @param[in]  sensitive  true to enable emission of the touch event signals, false otherwise.
+   * @see SignalTouch() and SignalHover().
+   * @note If an actor's sensitivity is set to false, then it's children will not emit a touch or hover event signal either.
+   * @param[in]  sensitive  true to enable emission of the touch or hover event signals, false otherwise.
    */
   void SetSensitive(bool sensitive)
   {
@@ -631,9 +633,9 @@ public:
   }
 
   /**
-   * Query whether an actor emits touch event signals.
+   * Query whether an actor emits touch or hover event signals.
    * @see SetSensitive(bool)
-   * @return true, if emission of touch event signals is enabled, false otherwise.
+   * @return true, if emission of touch or hover event signals is enabled, false otherwise.
    */
   bool IsSensitive() const
   {
@@ -888,18 +890,18 @@ public:
   bool RayActorTest( const Vector4& rayOrigin, const Vector4& rayDir, Vector4& hitPointLocal, float& distance ) const;
 
   /**
-   * Sets whether the actor should receive a notification when touch motion events leave
+   * Sets whether the actor should receive a notification when touch or hover motion events leave
    * the boundary of the actor.
    *
    * @note By default, this is set to false as most actors do not require this.
-   * @note Need to connect to the SignalTouch to actually receive this event.
+   * @note Need to connect to the SignalTouch or SignalHover to actually receive this event.
    *
    * @param[in]  required  Should be set to true if a Leave event is required
    */
   void SetLeaveRequired(bool required);
 
   /**
-   * This returns whether the actor requires touch events whenever touch motion events leave
+   * This returns whether the actor requires touch or hover events whenever touch or hover motion events leave
    * the boundary of the actor.
    * @return true if a Leave event is required, false otherwise.
    */
@@ -920,6 +922,12 @@ public:
    * @return True if touch events are required.
    */
   bool GetTouchRequired() const;
+
+  /**
+   * Query whether the application or derived actor type requires hover events.
+   * @return True if hover events are required.
+   */
+  bool GetHoverRequired() const;
 
   /**
    * Query whether the application or derived actor type requires mouse wheel events.
@@ -962,6 +970,13 @@ public:
   bool EmitTouchEventSignal(const TouchEvent& event);
 
   /**
+   * Used by the EventProcessor to emit hover event signals.
+   * @param[in] event The hover event.
+   * @return True if the event was consumed.
+   */
+  bool EmitHoverEventSignal(const HoverEvent& event);
+
+  /**
    * Used by the EventProcessor to emit mouse wheel event signals.
    * @param[in] event The mouse wheel event.
    * @return True if the event was consumed.
@@ -972,6 +987,11 @@ public:
    * @copydoc Dali::Actor::TouchedSignal()
    */
   Dali::Actor::TouchSignalV2& TouchedSignal();
+
+  /**
+   * @copydoc Dali::Actor::HoveredSignal()
+   */
+  Dali::Actor::HoverSignalV2& HoveredSignal();
 
   /**
    * @copydoc Dali::Actor::MouseWheelEventSignal()
@@ -1291,11 +1311,19 @@ private:
 
   /**
    * For use in derived classes.
-   * This is only called if mTouchRequired is true, and the touch-signal was not consumed.
+   * This is only called if mDerivedRequiresTouch is true, and the touch-signal was not consumed.
    * @param[in] event The touch event.
    * @return True if the event should be consumed.
    */
   virtual bool OnTouchEvent(const TouchEvent& event) { return false; }
+
+  /**
+   * For use in derived classes.
+   * This is only called if mDerivedRequiresHover is true, and the hover-signal was not consumed.
+   * @param[in] event The hover event.
+   * @return True if the event should be consumed.
+   */
+  virtual bool OnHoverEvent(const HoverEvent& event) { return false; }
 
   /**
    * For use in derived classes.
@@ -1342,6 +1370,7 @@ protected:
 
   // Signals
   Dali::Actor::TouchSignalV2             mTouchedSignalV2;
+  Dali::Actor::HoverSignalV2             mHoveredSignalV2;
   Dali::Actor::MouseWheelEventSignalV2   mMouseWheelEventSignalV2;
   Dali::Actor::SetSizeSignalV2           mSetSizeSignalV2;
   Dali::Actor::OnStageSignalV2           mOnStageSignalV2;
@@ -1361,6 +1390,7 @@ protected:
   bool mLeaveRequired                              : 1; ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
   bool mKeyboardFocusable                          : 1; ///< Whether the actor should be focusable by keyboard navigation
   bool mDerivedRequiresTouch                       : 1; ///< Whether the derived actor type requires touch event signals
+  bool mDerivedRequiresHover                       : 1; ///< Whether the derived actor type requires hover event signals
   bool mDerivedRequiresMouseWheelEvent             : 1; ///< Whether the derived actor type requires mouse wheel event signals
   bool mOnStageSignalled                           : 1; ///< Set to true before OnStageConnection signal is emitted, and false before OnStageDisconnection
   bool mInheritRotation                            : 1; ///< Cached: Whether the parent's rotation should be inherited.

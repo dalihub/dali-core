@@ -37,6 +37,7 @@ class CustomActor;
 class CustomActorImpl;
 struct KeyEvent;
 struct TouchEvent;
+struct HoverEvent;
 struct MouseWheelEvent;
 struct Vector3;
 
@@ -151,6 +152,15 @@ public:
   virtual bool OnTouchEvent(const TouchEvent& event) = 0;
 
   /**
+   * @brief Called after a hover-event is received by the owning actor.
+   *
+   * @note This must be enabled during construction; see CustomActorImpl::SetRequiresHoverEvents(bool)
+   * @param[in] event The hover event.
+   * @return True if the event should be consumed.
+   */
+  virtual bool OnHoverEvent(const HoverEvent& event) = 0;
+
+  /**
    * @brief Called after a key-event is received by the actor that has had its focus set.
    *
    * @param[in] event the Key Event
@@ -205,6 +215,12 @@ protected: // For derived classes
   CustomActorImpl(bool requiresTouchEvents);
 
   /**
+   * @brief Set whether the custom actor requires hover events.
+   * @param[in] requiresHoverEvents True if the OnHoverEvent() callback is required.
+   */
+  void SetRequiresHoverEvents(bool requiresHoverEvents);
+
+  /**
    * @brief Set whether the custom actor requires mouse wheel events.
    * @param[in] requiresMouseWheelEvents True if the OnMouseWheelEvent() callback is required.
    */
@@ -237,6 +253,12 @@ public: // Not intended for application developers
 
   /**
    * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
+   * @return True if the OnHoverEvent() callback is required.
+   */
+  bool RequiresHoverEvents() const;
+
+  /**
+   * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
    * @return True if the OnMouseWheelEvent() callback is required.
    */
   bool RequiresMouseWheelEvents() const;
@@ -245,6 +267,7 @@ private:
 
   Internal::CustomActor* mOwner;  ///< Internal owner of this custom actor implementation
   bool mRequiresTouchEvents;      ///< Whether the OnTouchEvent() callback is required
+  bool mRequiresHoverEvents;      ///< Whether the OnHoverEvent() callback is required
   bool mRequiresMouseWheelEvents; ///< Whether the OnMouseWheelEvent() callback is required
 };
 

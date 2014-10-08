@@ -171,6 +171,16 @@ bool Layer::IsTouchConsumed() const
   return GetImplementation( *this ).IsTouchConsumed();
 }
 
+void Layer::SetHoverConsumed( bool consume )
+{
+  GetImplementation( *this ).SetHoverConsumed( consume );
+}
+
+bool Layer::IsHoverConsumed() const
+{
+  return GetImplementation( *this ).IsHoverConsumed();
+}
+
 Layer::Layer(Internal::Layer* internal)
 : Actor(internal)
 {

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/events/touch-event-processor.h>
+#include <dali/internal/event/events/hover-event-processor.h>
 
 #if defined(DEBUG_ENABLED)
 #include <sstream>
@@ -26,7 +26,7 @@
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -44,12 +44,12 @@ namespace
 {
 
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_TOUCH_PROCESSOR" );
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_HOVER_PROCESSOR" );
 
 const char * TOUCH_POINT_STATE[TouchPoint::Last] =
 {
-  "Down",
-  "Up",
+  "Started",
+  "Finished",
   "Motion",
   "Leave",
   "Stationary",
@@ -61,7 +61,7 @@ const char * TOUCH_POINT_STATE[TouchPoint::Last] =
 /**
  *  Recursively deliver events to the actor and its parents, until the event is consumed or the stage is reached.
  */
-Dali::Actor EmitTouchSignals( Dali::Actor actor, const TouchEvent& event )
+Dali::Actor EmitHoverSignals( Dali::Actor actor, const HoverEvent& event )
 {
   Dali::Actor consumedActor;
 
@@ -73,10 +73,10 @@ Dali::Actor EmitTouchSignals( Dali::Actor actor, const TouchEvent& event )
 
     bool consumed( false );
 
-    // Only emit the signal if the actor's touch signal has connections (or derived actor implementation requires touch).
-    if ( actorImpl.GetTouchRequired() )
+    // Only emit the signal if the actor's hover signal has connections (or derived actor implementation requires hover).
+    if ( actorImpl.GetHoverRequired() )
     {
-      consumed = actorImpl.EmitTouchEventSignal( event );
+      consumed = actorImpl.EmitHoverEventSignal( event );
     }
 
     if ( consumed )
@@ -93,7 +93,7 @@ Dali::Actor EmitTouchSignals( Dali::Actor actor, const TouchEvent& event )
            (parent == oldParent) )
       {
         // One of the actor's parents may consumed the event and they should be set as the consumed actor.
-        consumedActor = EmitTouchSignals( parent, event );
+        consumedActor = EmitHoverSignals( parent, event );
       }
     }
   }
@@ -102,16 +102,16 @@ Dali::Actor EmitTouchSignals( Dali::Actor actor, const TouchEvent& event )
 }
 
 /**
- * Changes the state of the primary point to leave and emits the touch signals
+ * Changes the state of the primary point to leave and emits the hover signals
  */
-Dali::Actor EmitTouchSignals( Actor* actor, RenderTask& renderTask, const TouchEvent& originalEvent, TouchPoint::State state )
+Dali::Actor EmitHoverSignals( Actor* actor, RenderTask& renderTask, const HoverEvent& originalEvent, TouchPoint::State state )
 {
-  TouchEvent touchEvent( originalEvent );
+  HoverEvent hoverEvent( originalEvent );
 
   DALI_ASSERT_DEBUG( NULL != actor && "NULL actor pointer" );
   if( actor )
   {
-    TouchPoint& primaryPoint = touchEvent.points[0];
+    TouchPoint& primaryPoint = hoverEvent.points[0];
 
     actor->ScreenToLocal( renderTask, primaryPoint.local.x, primaryPoint.local.y, primaryPoint.screen.x, primaryPoint.screen.y );
 
@@ -119,38 +119,61 @@ Dali::Actor EmitTouchSignals( Actor* actor, RenderTask& renderTask, const TouchE
     primaryPoint.state = state;
   }
 
-  return EmitTouchSignals( Dali::Actor(actor), touchEvent );
+  return EmitHoverSignals( Dali::Actor(actor), hoverEvent );
 }
+
+/**
+ * Used in the hit-test algorithm to check whether the actor is hoverable.
+ */
+struct ActorHoverableCheck : public HitTestAlgorithm::HitTestInterface
+{
+  bool IsActorHittable( Actor* actor )
+  {
+    return actor->GetHoverRequired() && // Does the Application or derived actor type require a hover event?
+           actor->IsHittable();         // Is actor sensitive, visible and on the scene?
+  }
+
+  bool DescendActorHierarchy( Actor* actor )
+  {
+    return actor->IsVisible() && // Actor is visible, if not visible then none of its children are visible.
+           actor->IsSensitive(); // Actor is sensitive, if insensitive none of its children should be hittable either.
+  }
+
+  bool DoesLayerConsumeHit( Layer* layer )
+  {
+    return layer->IsHoverConsumed();
+  }
+};
 
 } // unnamed namespace
 
-TouchEventProcessor::TouchEventProcessor( Stage& stage )
+HoverEventProcessor::HoverEventProcessor( Stage& stage )
 : mStage( stage ),
   mLastPrimaryHitActor(),
   mLastConsumedActor(),
-  mTouchDownConsumedActor(),
+  mHoverStartConsumedActor(),
   mLastRenderTask()
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
-TouchEventProcessor::~TouchEventProcessor()
+HoverEventProcessor::~HoverEventProcessor()
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
-void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& event )
+void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& event )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 
-  DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty TouchEvent sent from Integration\n" );
+  DALI_ASSERT_ALWAYS( !event.points.empty() && "Empty HoverEvent sent from Integration\n" );
 
   Stage& stage = mStage;
 
   PRINT_HIERARCHY(gLogFilter);
 
   // Copy so we can add the results of a hit-test.
-  TouchEvent touchEvent( event.time );
+  HoverEvent hoverEvent( event.time );
 
   // 1) Check if it is an interrupted event - we should inform our last primary hit actor about this
   //    and emit the stage signal as well.
@@ -158,14 +181,14 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   if ( event.points[0].state == TouchPoint::Interrupted )
   {
     Dali::Actor consumingActor;
-    touchEvent.points.push_back(event.points[0]);
+    hoverEvent.points.push_back(event.points[0]);
 
     Actor* lastPrimaryHitActor( mLastPrimaryHitActor.GetActor() );
     if ( lastPrimaryHitActor )
     {
       Dali::Actor lastPrimaryHitActorHandle( lastPrimaryHitActor );
-      touchEvent.points[0].hitActor = lastPrimaryHitActorHandle;
-      consumingActor = EmitTouchSignals( lastPrimaryHitActorHandle, touchEvent );
+      hoverEvent.points[0].hitActor = lastPrimaryHitActorHandle;
+      consumingActor = EmitHoverSignals( lastPrimaryHitActorHandle, hoverEvent );
     }
 
     // If the last consumed actor was different to the primary hit actor then inform it as well (if it has not already been informed).
@@ -175,29 +198,28 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
          lastConsumedActor != consumingActor )
     {
       Dali::Actor lastConsumedActorHandle( lastConsumedActor );
-      touchEvent.points[0].hitActor = lastConsumedActorHandle;
-      EmitTouchSignals( lastConsumedActorHandle, touchEvent );
+      hoverEvent.points[0].hitActor = lastConsumedActorHandle;
+      EmitHoverSignals( lastConsumedActorHandle, hoverEvent );
     }
 
-    // Tell the touch-down consuming actor as well, if required
-    Actor* touchDownConsumedActor( mTouchDownConsumedActor.GetActor() );
-    if ( touchDownConsumedActor &&
-         touchDownConsumedActor != lastPrimaryHitActor &&
-         touchDownConsumedActor != lastConsumedActor &&
-         touchDownConsumedActor != consumingActor )
+    // Tell the hover-start consuming actor as well, if required
+    Actor* hoverStartConsumedActor( mHoverStartConsumedActor.GetActor() );
+    if ( hoverStartConsumedActor &&
+         hoverStartConsumedActor != lastPrimaryHitActor &&
+         hoverStartConsumedActor != lastConsumedActor &&
+         hoverStartConsumedActor != consumingActor )
     {
-      Dali::Actor touchDownConsumedActorHandle( touchDownConsumedActor );
-      touchEvent.points[0].hitActor = touchDownConsumedActorHandle;
-      EmitTouchSignals( touchDownConsumedActorHandle, touchEvent );
+      Dali::Actor hoverStartConsumedActorHandle( hoverStartConsumedActor );
+      hoverEvent.points[0].hitActor = hoverStartConsumedActorHandle;
+      EmitHoverSignals( hoverStartConsumedActorHandle, hoverEvent );
     }
 
     mLastPrimaryHitActor.SetActor( NULL );
     mLastConsumedActor.SetActor( NULL );
-    mTouchDownConsumedActor.SetActor( NULL );
+    mHoverStartConsumedActor.SetActor( NULL );
     mLastRenderTask.Reset();
 
-    touchEvent.points[0].hitActor = NULL;
-    mStage.EmitTouchedSignal( touchEvent );
+    hoverEvent.points[0].hitActor = NULL;
 
     return; // No need for hit testing
   }
@@ -212,13 +234,14 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   for ( TouchPointContainerConstIterator iter = event.points.begin(), beginIter = event.points.begin(), endIter = event.points.end(); iter != endIter; ++iter )
   {
     HitTestAlgorithm::Results hitTestResults;
-    HitTestAlgorithm::HitTest( stage, iter->screen, hitTestResults );
+    ActorHoverableCheck actorHoverableCheck;
+    HitTestAlgorithm::HitTest( stage, iter->screen, hitTestResults, actorHoverableCheck );
 
     TouchPoint newPoint( iter->deviceId, iter->state, iter->screen.x, iter->screen.y );
     newPoint.hitActor = hitTestResults.actor;
     newPoint.local = hitTestResults.actorCoordinates;
 
-    touchEvent.points.push_back( newPoint );
+    hoverEvent.points.push_back( newPoint );
 
     DALI_LOG_INFO( gLogFilter, Debug::General, "  State(%s), Screen(%.0f, %.0f), HitActor(%p, %s), Local(%.2f, %.2f)\n",
                    TOUCH_POINT_STATE[iter->state], iter->screen.x, iter->screen.y,
@@ -239,21 +262,21 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
   Dali::Actor consumedActor;
   if ( currentRenderTask )
   {
-    consumedActor = EmitTouchSignals( touchEvent.points[0].hitActor, touchEvent );
+    consumedActor = EmitHoverSignals( hoverEvent.points[0].hitActor, hoverEvent );
   }
 
-  TouchPoint& primaryPoint = touchEvent.points[0];
+  TouchPoint& primaryPoint = hoverEvent.points[0];
   Dali::Actor primaryHitActor = primaryPoint.hitActor;
   TouchPoint::State primaryPointState = primaryPoint.state;
 
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "PrimaryHitActor:     (%p) %s\n", primaryPoint.hitActor ? (void*)&primaryPoint.hitActor.GetBaseObject() : NULL, primaryPoint.hitActor ? primaryPoint.hitActor.GetName().c_str() : "" );
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "ConsumedActor:       (%p) %s\n", consumedActor ? (void*)&consumedActor.GetBaseObject() : NULL, consumedActor ? consumedActor.GetName().c_str() : "" );
 
-  if ( ( primaryPointState == TouchPoint::Down ) &&
-       ( touchEvent.GetPointCount() == 1 ) &&
+  if ( ( primaryPointState == TouchPoint::Started ) &&
+       ( hoverEvent.GetPointCount() == 1 ) &&
        ( consumedActor && consumedActor.OnStage() ) )
   {
-    mTouchDownConsumedActor.SetActor( &GetImplementation( consumedActor ) );
+    mHoverStartConsumedActor.SetActor( &GetImplementation( consumedActor ) );
   }
 
   // 4) Check if the last primary hit actor requires a leave event and if it was different to the current primary
@@ -261,7 +284,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
 
   Actor* lastPrimaryHitActor( mLastPrimaryHitActor.GetActor() );
   Actor* lastConsumedActor( mLastConsumedActor.GetActor() );
-  if( (primaryPointState == TouchPoint::Motion) || (primaryPointState == TouchPoint::Up) || (primaryPointState == TouchPoint::Stationary) )
+  if( (primaryPointState == TouchPoint::Motion) || (primaryPointState == TouchPoint::Finished) || (primaryPointState == TouchPoint::Stationary) )
   {
     if ( mLastRenderTask )
     {
@@ -277,7 +300,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
           if ( lastPrimaryHitActor->GetLeaveRequired() )
           {
             DALI_LOG_INFO( gLogFilter, Debug::Concise, "LeaveActor(Hit):     (%p) %s\n", (void*)lastPrimaryHitActor, lastPrimaryHitActor->GetName().c_str() );
-            leaveEventConsumer = EmitTouchSignals( mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, touchEvent, TouchPoint::Leave );
+            leaveEventConsumer = EmitHoverSignals( mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, TouchPoint::Leave );
           }
         }
         else
@@ -285,7 +308,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
           // At this point mLastPrimaryHitActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
           DALI_LOG_INFO( gLogFilter, Debug::Concise, "InterruptedActor(Hit):     (%p) %s\n", (void*)lastPrimaryHitActor, lastPrimaryHitActor->GetName().c_str() );
-          leaveEventConsumer = EmitTouchSignals( mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, touchEvent, TouchPoint::Interrupted );
+          leaveEventConsumer = EmitHoverSignals( mLastPrimaryHitActor.GetActor(), lastRenderTaskImpl, hoverEvent, TouchPoint::Interrupted );
         }
       }
 
@@ -303,7 +326,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
           if( lastConsumedActor->GetLeaveRequired() )
           {
             DALI_LOG_INFO( gLogFilter, Debug::Concise, "LeaveActor(Consume): (%p) %s\n", (void*)lastConsumedActor, lastConsumedActor->GetName().c_str() );
-            EmitTouchSignals( lastConsumedActor, lastRenderTaskImpl, touchEvent, TouchPoint::Leave );
+            EmitHoverSignals( lastConsumedActor, lastRenderTaskImpl, hoverEvent, TouchPoint::Leave );
           }
         }
         else
@@ -311,16 +334,16 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
           // At this point mLastConsumedActor was touchable and sensitive in the previous touch event process but is not in the current one.
           // An interrupted event is send to allow some actors to go back to their original state (i.e. Button controls)
           DALI_LOG_INFO( gLogFilter, Debug::Concise, "InterruptedActor(Consume):     (%p) %s\n", (void*)lastConsumedActor, lastConsumedActor->GetName().c_str() );
-          EmitTouchSignals( mLastConsumedActor.GetActor(), lastRenderTaskImpl, touchEvent, TouchPoint::Interrupted );
+          EmitHoverSignals( mLastConsumedActor.GetActor(), lastRenderTaskImpl, hoverEvent, TouchPoint::Interrupted );
         }
       }
     }
   }
 
-  // 5) If our primary point is an Up event, then the primary point (in multi-touch) will change next
+  // 5) If our primary point is an Finished event, then the primary point (in multi-touch) will change next
   //    time so set our last primary actor to NULL.  Do the same to the last consumed actor as well.
 
-  if ( primaryPointState == TouchPoint::Up )
+  if ( primaryPointState == TouchPoint::Finished )
   {
     mLastPrimaryHitActor.SetActor( NULL );
     mLastConsumedActor.SetActor( NULL );
@@ -353,41 +376,35 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
     }
   }
 
-  // 6) Emit an interrupted event to the touch-down actor if it hasn't consumed the up and
-  //    emit the stage touched event if required.
+  // 6) Emit an interrupted event to the hover-started actor if it hasn't consumed the Finished.
 
-  if ( touchEvent.GetPointCount() == 1 ) // Only want the first touch and the last release
+  if ( hoverEvent.GetPointCount() == 1 ) // Only want the first hover started
   {
     switch ( primaryPointState )
     {
-      case TouchPoint::Up:
+      case TouchPoint::Finished:
       {
-        Actor* touchDownConsumedActor( mTouchDownConsumedActor.GetActor() );
-        if ( touchDownConsumedActor &&
-             touchDownConsumedActor != consumedActor &&
-             touchDownConsumedActor != lastPrimaryHitActor &&
-             touchDownConsumedActor != lastConsumedActor )
+        Actor* hoverStartConsumedActor( mHoverStartConsumedActor.GetActor() );
+        if ( hoverStartConsumedActor &&
+             hoverStartConsumedActor != consumedActor &&
+             hoverStartConsumedActor != lastPrimaryHitActor &&
+             hoverStartConsumedActor != lastConsumedActor )
         {
-          Dali::Actor touchDownConsumedActorHandle( touchDownConsumedActor );
-          touchEvent.points[0].hitActor = touchDownConsumedActorHandle;
-          touchEvent.points[0].state = TouchPoint::Interrupted;
-          EmitTouchSignals( touchDownConsumedActorHandle, touchEvent );
+          Dali::Actor hoverStartConsumedActorHandle( hoverStartConsumedActor );
+          hoverEvent.points[0].hitActor = hoverStartConsumedActorHandle;
+          hoverEvent.points[0].state = TouchPoint::Interrupted;
+          EmitHoverSignals( hoverStartConsumedActorHandle, hoverEvent );
 
-          // Restore touch-event to original state
-          touchEvent.points[0].hitActor = primaryHitActor;
-          touchEvent.points[0].state = primaryPointState;
+          // Restore hover-event to original state
+          hoverEvent.points[0].hitActor = primaryHitActor;
+          hoverEvent.points[0].state = primaryPointState;
         }
 
-        mTouchDownConsumedActor.SetActor( NULL );
+        mHoverStartConsumedActor.SetActor( NULL );
       }
       // No break, Fallthrough
 
-      case TouchPoint::Down:
-      {
-        mStage.EmitTouchedSignal( touchEvent );
-        break;
-      }
-
+      case TouchPoint::Started:
       case TouchPoint::Motion:
       case TouchPoint::Leave:
       case TouchPoint::Stationary:

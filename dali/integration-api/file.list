@@ -13,9 +13,11 @@ platform_abstraction_src_files = \
    $(platform_abstraction_src_dir)/common/lockless-buffer.cpp \
    $(platform_abstraction_src_dir)/events/event.cpp \
    $(platform_abstraction_src_dir)/events/gesture-event.cpp \
+   $(platform_abstraction_src_dir)/events/hover-event-integ.cpp \
    $(platform_abstraction_src_dir)/events/key-event-integ.cpp \
    $(platform_abstraction_src_dir)/events/long-press-gesture-event.cpp \
    $(platform_abstraction_src_dir)/events/mouse-wheel-event-integ.cpp \
+   $(platform_abstraction_src_dir)/events/multi-point-event-integ.cpp \
    $(platform_abstraction_src_dir)/events/pan-gesture-event.cpp \
    $(platform_abstraction_src_dir)/events/pinch-gesture-event.cpp \
    $(platform_abstraction_src_dir)/events/tap-gesture-event.cpp \
@@ -60,9 +62,11 @@ platform_abstraction_events_header_files = \
    $(platform_abstraction_src_dir)/events/event.h \
    $(platform_abstraction_src_dir)/events/gesture-event.h \
    $(platform_abstraction_src_dir)/events/gesture-requests.h \
+   $(platform_abstraction_src_dir)/events/hover-event-integ.h \
    $(platform_abstraction_src_dir)/events/key-event-integ.h \
    $(platform_abstraction_src_dir)/events/long-press-gesture-event.h \
    $(platform_abstraction_src_dir)/events/mouse-wheel-event-integ.h \
+   $(platform_abstraction_src_dir)/events/multi-point-event-integ.h \
    $(platform_abstraction_src_dir)/events/pan-gesture-event.h \
    $(platform_abstraction_src_dir)/events/pinch-gesture-event.h \
    $(platform_abstraction_src_dir)/events/tap-gesture-event.h \

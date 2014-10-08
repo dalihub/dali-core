@@ -19,6 +19,7 @@
 #include <dali/public-api/dali-core.h>
 #include <string>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 #include <dali-test-suite-utils.h>
 
 //& set: DaliActor
@@ -42,6 +43,7 @@ namespace
 
 bool gTouchCallBackCalled=false;
 bool gTouchCallBack2Called=false;
+bool gHoverCallBackCalled=false;
 
 /**
  * Simulates a Down Touch at 25.0, 25.0.
@@ -134,6 +136,13 @@ static bool TestCallback(Actor actor, const TouchEvent& event)
 static bool TestCallback2(Actor actor, const TouchEvent& event)
 {
   gTouchCallBack2Called = true;
+  return false;
+  END_TEST;
+}
+
+static bool TestCallback3(Actor actor, const HoverEvent& event)
+{
+  gHoverCallBackCalled = true;
   return false;
   END_TEST;
 }
@@ -2254,6 +2263,32 @@ int UtcDaliActorTouchedSignal(void)
   END_TEST;
 }
 
+int UtcDaliActorHoveredSignal(void)
+{
+  TestApplication application;
+
+  gHoverCallBackCalled = false;
+
+  // get the root layer
+  Actor actor = Stage::GetCurrent().GetRootLayer();
+  DALI_TEST_CHECK( gHoverCallBackCalled == false );
+
+  application.SendNotification();
+  application.Render();
+
+  // connect to its hover signal
+  actor.HoveredSignal().Connect( TestCallback3 );
+
+  // simulate a hover event in the middle of the screen
+  Vector2 touchPoint( Stage::GetCurrent().GetSize() * 0.5 );
+  Dali::TouchPoint point( 1, TouchPoint::Motion, touchPoint.x, touchPoint.y );
+  Dali::Integration::HoverEvent event;
+  event.AddPoint( point );
+  application.ProcessEvent( event );
+
+  DALI_TEST_CHECK( gHoverCallBackCalled == true );
+  END_TEST;
+}
 
 int UtcDaliActorSetSizeSignal(void)
 {

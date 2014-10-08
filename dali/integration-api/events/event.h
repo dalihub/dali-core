@@ -47,7 +47,8 @@ struct Event
     Touch,         ///< A touch event, when the user interacts with the screen.
     Key,           ///< A key pressed event, from the virtual or external keyboard.
     Gesture,       ///< A Gesture event has been detected.
-    MouseWheel     ///< A mouse wheel event, when the mouse wheel is being rolled from an external mouse.
+    MouseWheel,    ///< A mouse wheel event, when the mouse wheel is being rolled from an external mouse.
+    Hover          ///< A hover event, when the user hovers above the screen.
   };
 
   // Data

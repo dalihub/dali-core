@@ -103,6 +103,8 @@ void Animation::Play()
   {
     mElapsedSeconds = mPlayRange.y * mDurationSeconds;
   }
+
+  SetAnimatorsActive( true );
 }
 
 void Animation::PlayFrom( float progress )
@@ -112,6 +114,8 @@ void Animation::PlayFrom( float progress )
   {
     mElapsedSeconds = progress * mDurationSeconds;
     mState = Playing;
+
+    SetAnimatorsActive( true );
   }
 }
 
@@ -137,7 +141,15 @@ void Animation::Bake(BufferIndex bufferIndex, EndAction action)
     }
   }
 
-  UpdateAnimators(bufferIndex, true/*bake the final result*/);
+  UpdateAnimators( bufferIndex, true/*bake the final result*/, true /*animation finished*/ );
+}
+
+void Animation::SetAnimatorsActive( bool active )
+{
+  for ( AnimatorIter iter = mAnimators.Begin(), endIter = mAnimators.End(); iter != endIter; ++iter )
+  {
+    (*iter)->SetActive( active );
+  }
 }
 
 bool Animation::Stop(BufferIndex bufferIndex)
@@ -151,6 +163,12 @@ bool Animation::Stop(BufferIndex bufferIndex)
     if( mEndAction != Dali::Animation::Discard )
     {
       Bake( bufferIndex, mEndAction );
+
+      // Animators are automatically set to inactive in Bake
+    }
+    else
+    {
+      SetAnimatorsActive( false );
     }
 
     // The animation has now been played to completion
@@ -170,6 +188,12 @@ void Animation::OnDestroy(BufferIndex bufferIndex)
     if (mEndAction != Dali::Animation::Discard)
     {
       Bake( bufferIndex, mEndAction );
+
+      // Animators are automatically set to inactive in Bake
+    }
+    else
+    {
+      SetAnimatorsActive( false );
     }
   }
 
@@ -216,7 +240,7 @@ bool Animation::Update(BufferIndex bufferIndex, float elapsedSeconds)
                                ( mSpeedFactor < 0.0f && mElapsedSeconds < playRangeSeconds.x ))
                               );
 
-  UpdateAnimators(bufferIndex, animationFinished && (mEndAction != Dali::Animation::Discard));
+  UpdateAnimators(bufferIndex, animationFinished && (mEndAction != Dali::Animation::Discard), animationFinished);
 
   if (animationFinished)
   {
@@ -230,7 +254,7 @@ bool Animation::Update(BufferIndex bufferIndex, float elapsedSeconds)
   return animationFinished;
 }
 
-void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake)
+void Animation::UpdateAnimators( BufferIndex bufferIndex, bool bake, bool animationFinished )
 {
   float elapsedSecondsClamped = Clamp( mElapsedSeconds, mPlayRange.x * mDurationSeconds,mPlayRange.y * mDurationSeconds );
   for ( AnimatorIter iter = mAnimators.Begin(); iter != mAnimators.End(); )
@@ -252,6 +276,11 @@ void Animation::UpdateAnimators(BufferIndex bufferIndex, bool bake)
       }
 
       applied = animator->Update(bufferIndex, progress, bake);
+    }
+
+    if ( animationFinished )
+    {
+      animator->SetActive( false );
     }
 
     // Animators are automatically removed, when orphaned from animatable scene objects.

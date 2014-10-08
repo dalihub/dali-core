@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_TOUCH_EVENT_PROCESSOR_H__
-#define __DALI_INTERNAL_TOUCH_EVENT_PROCESSOR_H__
+#ifndef __DALI_INTERNAL_HOVER_EVENT_PROCESSOR_H__
+#define __DALI_INTERNAL_HOVER_EVENT_PROCESSOR_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -31,25 +31,24 @@ struct Vector4;
 
 namespace Integration
 {
-struct TouchEvent;
+struct HoverEvent;
 }
 
 namespace Internal
 {
 
-class Actor;
-class Stage;
 class ActorObserver;
+class Stage;
 
 /**
- * <h3>Multi-Touch Event Processing:</h3>
+ * <h3>Multi-Hover Event Processing:</h3>
  *
- * The TouchEventProcessor processes touch events and emits the Touched signal on the hit actor (and
+ * The HoverEventProcessor processes hover events and emits the Hovered signal on the hit actor (and
  * its parents).
  *
- * - Hit Testing & Touch Event Delivery are described in Dali::Actor.
+ * - Hit Testing & Hover Event Delivery are described in Dali::Actor.
  */
-class TouchEventProcessor
+class HoverEventProcessor
 {
 public:
 
@@ -57,33 +56,31 @@ public:
    * Create an event processor.
    * @param[in] stage The stage.
    */
-  TouchEventProcessor( Stage& stage );
+  HoverEventProcessor( Stage& stage );
 
   /**
-   * Non-virtual destructor; TouchEventProcessor is not a base class
+   * Non-virtual destructor; HoverEventProcessor is not a base class
    */
-  ~TouchEventProcessor();
+  ~HoverEventProcessor();
 
   /**
-   * This function is called by the event processor whenever a touch event occurs.
-   * @param[in] event The touch event that has occurred.
+   * This function is called by the event processor whenever a hover event occurs.
+   * @param[in] event The hover event that has occurred.
    */
-  void ProcessTouchEvent( const Integration::TouchEvent& event );
+  void ProcessHoverEvent( const Integration::HoverEvent& event );
 
 private:
 
   // Undefined
-  TouchEventProcessor(const TouchEventProcessor&);
+  HoverEventProcessor(const HoverEventProcessor&);
 
   // Undefined
-  TouchEventProcessor& operator=(const TouchEventProcessor& rhs);
-
-private:
+  HoverEventProcessor& operator=(const HoverEventProcessor& rhs);
 
   Stage& mStage; ///< Used to deliver touch events
   ActorObserver mLastPrimaryHitActor; ///< Stores the last primary point hit actor
   ActorObserver mLastConsumedActor; ///< Stores the last consumed actor
-  ActorObserver mTouchDownConsumedActor; ///< Stores the touch-down consumed actor
+  ActorObserver mHoverStartConsumedActor; ///< Stores the hover-start consumed actor
   Dali::RenderTask mLastRenderTask; ///< The RenderTask used for the last hit actor
 };
 
@@ -91,4 +88,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_TOUCH_EVENT_PROCESSOR_H__
+#endif // __DALI_INTERNAL_HOVER_EVENT_PROCESSOR_H__

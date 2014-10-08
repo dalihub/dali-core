@@ -20,6 +20,7 @@
 #include <dali/public-api/dali-core.h>
 
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/mouse-wheel-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 
@@ -61,6 +62,7 @@ struct TestCustomActor : public CustomActorImpl
     mTargetSize( Vector3::ZERO )
   {
     SetRequiresMouseWheelEvents(true);
+    SetRequiresHoverEvents(true);
   }
 
   /**
@@ -142,6 +144,11 @@ struct TestCustomActor : public CustomActorImpl
   virtual bool OnTouchEvent(const TouchEvent& event)
   {
     AddToCallStacks("OnTouchEvent");
+    return true;
+  }
+  virtual bool OnHoverEvent(const HoverEvent& event)
+  {
+    AddToCallStacks("OnHoverEvent");
     return true;
   }
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event)
@@ -453,6 +460,10 @@ public:
   {
   }
   virtual bool OnTouchEvent(const TouchEvent& event)
+  {
+    return true;
+  }
+  virtual bool OnHoverEvent(const HoverEvent& event)
   {
     return true;
   }
@@ -1509,6 +1520,37 @@ int UtcDaliCustomActorOnTouchEvent(void)
 
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnTouchEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliCustomActorOnHoverEvent(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::CustomActor::OnHoverEvent()");
+
+  TestCustomActor custom = TestCustomActor::New();
+  DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+
+  // set size for custom actor
+  custom.SetSize( 100, 100 );
+  // add the custom actor to stage
+  Stage::GetCurrent().Add( custom );
+  custom.ResetCallStack();
+
+  // Render and notify a couple of times
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // simulate a hover event
+  Dali::TouchPoint point( 0, TouchPoint::Motion, 1, 1 );
+  Dali::Integration::HoverEvent event;
+  event.AddPoint( point );
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnHoverEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
   END_TEST;
 }
 

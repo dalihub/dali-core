@@ -43,6 +43,7 @@ void CustomActorImpl::OnPropertySet( Property::Index index, Property::Value prop
 CustomActorImpl::CustomActorImpl(bool requiresTouchEvents)
 : mOwner(NULL),
   mRequiresTouchEvents(requiresTouchEvents),
+  mRequiresHoverEvents(false),
   mRequiresMouseWheelEvents(false)
 {
 }
@@ -62,6 +63,16 @@ Internal::CustomActor* CustomActorImpl::GetOwner() const
 bool CustomActorImpl::RequiresTouchEvents() const
 {
   return mRequiresTouchEvents;
+}
+
+bool CustomActorImpl::RequiresHoverEvents() const
+{
+  return mRequiresHoverEvents;
+}
+
+void CustomActorImpl::SetRequiresHoverEvents(bool requiresHoverEvents)
+{
+  mRequiresHoverEvents = requiresHoverEvents;
 }
 
 bool CustomActorImpl::RequiresMouseWheelEvents() const

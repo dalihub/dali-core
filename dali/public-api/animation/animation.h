@@ -246,7 +246,7 @@ public:
   /**
    * @brief Set the disconnect action.
    *
-   * If any of the animated property owners are disconnected from the stage, then this action is performed.
+   * If any of the animated property owners are disconnected from the stage while the animation is being played, then this action is performed.
    * Default action is to BakeFinal.
    * @param[in] disconnectAction The disconnect action.
    */
