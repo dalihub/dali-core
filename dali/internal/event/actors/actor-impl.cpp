@@ -2661,8 +2661,6 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
   if(entry.IsAnimatable())
   {
-    // TODO: ADD MATRIX & MATRIX3 types
-
     switch ( entry.type )
     {
       case Property::BOOLEAN:
@@ -2738,6 +2736,28 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
         // property is being used in a separate thread; queue a message to set the property
         SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Quaternion>::Bake,  value.Get<Quaternion>() );
+
+        break;
+      }
+
+      case Property::MATRIX:
+      {
+        AnimatableProperty<Matrix>* property = dynamic_cast< AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::NodePropertyMessage<Matrix>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Matrix>::Bake,  value.Get<Matrix>() );
+
+        break;
+      }
+
+      case Property::MATRIX3:
+      {
+        AnimatableProperty<Matrix3>* property = dynamic_cast< AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::NodePropertyMessage<Matrix3>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Matrix3>::Bake,  value.Get<Matrix3>() );
 
         break;
       }
