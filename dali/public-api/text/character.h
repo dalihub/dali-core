@@ -58,6 +58,31 @@ public:
     Neutral                                                 ///< Neutral characters follow the direction of characters surrounding them (e.g. whitespace ' ')
   };
 
+  /**
+   * @brief Script
+   *
+   * Script is the writing system used by a language.
+   * Typically one script can be used to write different languages although one language could be written in different scrips.
+   *
+   * i.e Many of the western languages like English, latin languages, etc use the latin script. Japanese uses the kanji, hiragana, katakana and latin scrips.
+   */
+  enum Script
+  {
+    LATIN,      ///< The latin script. Used by many western languages.
+    ARABIC,     ///< The arabic script. Used by Arab and Urdu among others.
+    DEVANAGARI, ///< The devanagari script. Used by Hindi, Marathi, Sindhi, Nepali and Sanskrit.
+    BENGALI,    ///< The Bengali script. Used by Bangla, Assamese, Bishnupriya Manipuri, Daphla, Garo, Hallam, Khasi, Mizo, Munda, Naga, Rian, and Santali.
+    GURMUKHI,   ///< The Gurmukhi script. Used by Punjabi.
+    GUJARATI,   ///< The Gujarati script. Used by Gujarati.
+    ORIYA,      ///< The Oriya script. Used by Oriya, Khondi, and Santali.
+    TAMIL,      ///< The Tamil script. Used by Tamil, Badaga, and Saurashtra.
+    TELUGU,     ///< The Telugu script. Used by Telugu, Gondi, and Lambadi.
+    KANNADA,    ///< The Kannada script. Used by Kannada and Tulu.
+    MALAYALAM,  ///< The Malayalam script. Used by Malayalam.
+    SINHALA,    ///< The Sinhala script. Used by Sinhala and Pali.
+    UNKNOWN     ///< The script is unknown.
+  };
+
 public:
 
   /**
@@ -102,6 +127,12 @@ public:
    * @return The character's direction is returned see CharacterDirection
    */
   CharacterDirection GetCharacterDirection() const;
+
+
+  /**
+   * @brief Returs the script of this character.
+   */
+  Script GetScript() const;
 
   /**
    * @brief Returns whether this character is white space (true)
