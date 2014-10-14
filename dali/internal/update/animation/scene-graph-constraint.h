@@ -117,13 +117,15 @@ public:
       return; // Early-out when property owners have been disconnected
     }
 
+    bool firstApply( mFirstApply );
+
     if ( mFunc->InputsInitialized() &&
          ApplyNeeded() )
     {
       const PropertyType& current = mTargetProperty.Get( updateBufferIndex );
 
       // FINAL_WEIGHT means the constraint is fully-applied, unless weight is still being animated
-      if ( ! mWeightInput->IsClean() ||
+      if ( ( ! firstApply && ! mWeightInput->IsClean() ) || // We should not rely on the flag state of weight-input on first apply
            ! Equals( Dali::ActiveConstraint::FINAL_WEIGHT, (*mWeightInput)[updateBufferIndex] ) )
       {
         // Constraint is not fully-applied; interpolation between start & final values
