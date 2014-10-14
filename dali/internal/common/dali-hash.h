@@ -22,10 +22,25 @@
 namespace Dali
 {
 
-struct StringHash
-{
-  unsigned long operator()(const std::string& toHash);
-};
+
+/**
+ * @brief Create a hash code for the string
+ * @param toHash string to hash
+ * @return hash code
+ */
+unsigned long CalculateHash(const std::string& toHash);
+
+
+/**
+ * @brief Create a hash code for 2 strings combined
+ * @param string1 first string
+ * @param string2 second string
+ * @return hash code
+ */
+unsigned long CalculateHash(const std::string& string1, const std::string& string2);
+
+
+
 
 } // namespace Dali
 

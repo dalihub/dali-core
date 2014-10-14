@@ -83,14 +83,6 @@ private:
   // Undefined
   ShaderFactory& operator=( const ShaderFactory& rhs );
 
-  /**
-   * Returns a hash of the shader strings
-   * @param[in] vertexShaderSrc   Source code for the vertex shader
-   * @param[in] fragmentShaderSrc Source code for the fragment shader
-   * @return Hashed value
-   */
-  size_t HashShaderSource( const std::string& vertexShaderSrc, const std::string& fragmentShaderSrc ) const;
-
 private:
   ResourceClient&       mResourceClient;
   ResourceTypePathIdMap mResourceTypePathIdMap; ///< A map of resource IDs sorted by ResourceTypePath

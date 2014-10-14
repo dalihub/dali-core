@@ -25,8 +25,6 @@
 #include <dali/internal/event/text/atlas/glyph-atlas-manager.h>
 #include <dali/internal/common/dali-hash.h>
 
-// EXTERNAL INCLUDES
-#include <boost/functional/hash.hpp>
 
 using namespace Dali::Integration;
 
@@ -57,8 +55,7 @@ FontFactory::~FontFactory()
 FontMetricsIntrusivePtr FontFactory::GetFontMetrics( const std::string& fontFamily, const std::string& fontStyle )
 {
 
-  StringHash hasher;
-  std::size_t hashValue = hasher(fontFamily + fontStyle);
+  std::size_t hashValue = CalculateHash(fontFamily,fontStyle);
   FontMetricsIntrusivePtr metrics;
 
   FontMetricsIter iter = mMetricsCache.find( hashValue );
@@ -87,8 +84,7 @@ FontMetricsIntrusivePtr FontFactory::GetFontMetrics( const std::string& fontFami
 void FontFactory::RemoveFontMetrics(const std::string& fontFamily,
                                     const std::string& fontStyle)
 {
-  StringHash hasher;
-  std::size_t hashValue = hasher(fontFamily + fontStyle);
+  std::size_t hashValue = CalculateHash(fontFamily, fontStyle);
   FontMetricsIntrusivePtr metrics;
 
   FontMetricsIter iter = mMetricsCache.find( hashValue );
