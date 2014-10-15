@@ -60,8 +60,7 @@ Request* ImageFactory::RegisterRequest( const std::string &filename, const Image
 {
   // check url cache
   // check if same request exists
-  StringHash stringHashFunc;
-  std::size_t urlHash = stringHashFunc( filename );
+  std::size_t urlHash = CalculateHash( filename );
 
   Request* foundReq( NULL );
   foundReq = FindRequest(filename, urlHash, attr);

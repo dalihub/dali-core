@@ -61,7 +61,7 @@ ResourceTicketPtr ShaderFactory::Load(const std::string& vertexSource, const std
 {
   ResourceTicketPtr ticket;
 
-  shaderHash = HashShaderSource(vertexSource, fragmentSource);
+  shaderHash = CalculateHash(vertexSource, fragmentSource);
   std::stringstream stringHash;
   stringHash << shaderHash;
   std::string filename = DALI_SHADERBIN_DIR;
@@ -210,19 +210,6 @@ void ShaderFactory::LoadTextSubtypeShaders(ShaderEffectPtr shaderEffect)
   shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE_GLOW, DistanceFieldFontOutlineGlowVertex, DistanceFieldFontOutlineGlowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 }
 
-
-size_t ShaderFactory::HashShaderSource(const std::string& vertexSource, const std::string& fragmentSource) const
-{
-  std::string source = vertexSource + fragmentSource;
-
-  // remove all white spaces, tabs and new lines
-  source.erase(std::remove(source.begin(), source.end(), ' '), source.end());
-  source.erase(std::remove(source.begin(), source.end(), '\n'), source.end());
-  source.erase(std::remove(source.begin(), source.end(), '\t'), source.end());
-
-  StringHash hasher;
-  return hasher( source );
-}
 
 } // namespace Internal
 
