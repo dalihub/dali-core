@@ -123,6 +123,59 @@ int UtcDaliGetCharacterDirection(void)
   END_TEST;
 }
 
+int UtcDaliGetScript(void)
+{
+  tet_infoline("UtcDaliGetScript ");
+  TestApplication application;
+
+  Text text( std::string("aᴆₘऄঅਅઅଅஅఅಅഅඅض") );
+
+  Character c0 = text[0];
+  Character c1 = text[1];
+  Character c2 = text[2];
+
+  DALI_TEST_EQUALS( c0.GetScript(), Character::LATIN, TEST_LOCATION );
+  DALI_TEST_EQUALS( c1.GetScript(), Character::LATIN, TEST_LOCATION );
+  DALI_TEST_EQUALS( c2.GetScript(), Character::LATIN, TEST_LOCATION );
+
+
+  Character c3 = text[3];
+  DALI_TEST_EQUALS( c3.GetScript(), Character::DEVANAGARI, TEST_LOCATION );
+
+  Character c4 = text[4];
+  DALI_TEST_EQUALS( c4.GetScript(), Character::BENGALI, TEST_LOCATION );
+
+  Character c5 = text[5];
+  DALI_TEST_EQUALS( c5.GetScript(), Character::GURMUKHI, TEST_LOCATION );
+
+  Character c6 = text[6];
+  DALI_TEST_EQUALS( c6.GetScript(), Character::GUJARATI, TEST_LOCATION );
+
+  Character c7 = text[7];
+  DALI_TEST_EQUALS( c7.GetScript(), Character::ORIYA, TEST_LOCATION );
+
+  Character c8 = text[8];
+  DALI_TEST_EQUALS( c8.GetScript(), Character::TAMIL, TEST_LOCATION );
+
+  Character c9 = text[9];
+  DALI_TEST_EQUALS( c9.GetScript(), Character::TELUGU, TEST_LOCATION );
+
+  Character c10 = text[10];
+  DALI_TEST_EQUALS( c10.GetScript(), Character::KANNADA, TEST_LOCATION );
+
+  Character c11 = text[11];
+  DALI_TEST_EQUALS( c11.GetScript(), Character::MALAYALAM, TEST_LOCATION );
+
+  Character c12 = text[12];
+  DALI_TEST_EQUALS( c12.GetScript(), Character::SINHALA, TEST_LOCATION );
+
+  Character c13 = text[13];
+  DALI_TEST_EQUALS( c13.GetScript(), Character::ARABIC, TEST_LOCATION );
+
+  // TODO : add more characters to cover all ranges.
+  END_TEST;
+}
+
 int UtcDaliCharacterIsWhiteSpace(void)
 {
   tet_infoline("UtcDaliCharacterIsWhiteSpace ");

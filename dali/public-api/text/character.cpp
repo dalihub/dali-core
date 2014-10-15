@@ -59,6 +59,11 @@ Character::CharacterDirection Character::GetCharacterDirection() const
   return mImpl->GetCharacterDirection();
 }
 
+Character::Script Character::GetScript() const
+{
+  return mImpl->GetScript();
+}
+
 bool Character::IsWhiteSpace() const
 {
   return mImpl->IsWhiteSpace();

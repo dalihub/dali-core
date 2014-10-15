@@ -238,6 +238,196 @@ bool IsCharLeftToRight(uint32_t i)
   return true;
 }
 
+Dali::Character::Script GetCharacterScript( uint32_t character )
+{
+  // Latin script:
+  // 0x0000 - 0x007f C0 Controls and Basic Latin
+  // 0x0080 - 0x00ff C1 Controls and Latin-1 Supplement
+  // 0x0100 - 0x017f Latin Extended-A
+  // 0x0180 - 0x024f Latin Extended-B
+  // 0x0250 - 0x02af IPA Extensions
+  // 0x02b0 - 0x02ff Spacing Modifier Letters
+  // 0x1d00 - 0x1d7f Phonetic Extensions
+  // 0x1d80 - 0x1dbf Phonetic Extensions Supplement
+  // 0x1e00 - 0x1eff Latin Extended Additional
+  // 0x2070 - 0x209f Superscripts and Subscripts
+  // 0x2100 - 0x214f Letterlike symbols
+  // 0x2150 - 0x218f Number Forms
+  // 0x2c60 - 0x2c7f Latin Extended-C
+  // 0xa720 - 0xa7ff Latin Extended-D
+  // 0xab30 - 0xab6f Latin Extended-E
+  // 0xfb00 - 0xfb4f Alphabetic Presentation Forms
+  // 0xff00 - 0xffef Halfwidth and Fullwidth Forms
+
+  // Brahmic scripts:
+  // 0x0900 - 0x097f Devanagari
+  // 0x0980 - 0x09ff Bengali
+  // 0x0a00 - 0x0a7f Gurmukhi
+  // 0x0a80 - 0x0aff Gujarati
+  // 0x0b00 - 0x0b7f Oriya
+  // 0x0b80 - 0x0bff Tamil
+  // 0x0c00 - 0x0c7f Telugu
+  // 0x0c80 - 0x0cff Kannada
+  // 0x0d00 - 0x0d7f Malayalam
+
+  // Sinhala script.
+  // 0x0d80 - 0x0dff Sinhala
+
+  // Arabic script.
+  // 0x0600 - 0x06ff
+  // 0x0750 - 0x077f
+  // 0x08A0 - 0x08ff
+  // 0xfb50 - 0xfdff
+  // 0xfe70 - 0xfeff
+  // 0x1ee00 - 0x1eeff
+
+
+  if( character <= 0x0cff )
+  {
+    if( character <= 0x09ff )
+    {
+      if( character <= 0x077f )
+      {
+        if( character <= 0x02ff )
+        {
+          return Dali::Character::LATIN;
+        }
+        if( ( 0x0600 <= character ) && ( character <= 0x06ff ) )
+        {
+          return Dali::Character::ARABIC;
+        }
+        if( ( 0x0750 <= character ) && ( character <= 0x077f ) )
+        {
+          return Dali::Character::ARABIC;
+        }
+      }
+      else
+      {
+        if( ( 0x08A0 <= character ) && ( character <= 0x08ff ) )
+        {
+          return Dali::Character::ARABIC;
+        }
+        if( ( 0x0900 <= character ) && ( character <= 0x097f ) )
+        {
+          return Dali::Character::DEVANAGARI;
+        }
+        if( ( 0x0980 <= character ) && ( character <= 0x09ff ) )
+        {
+          return Dali::Character::BENGALI;
+        }
+      }
+    }
+    else
+    {
+      if( character <= 0x0b7f )
+      {
+        if( ( 0x0a00 <= character ) && ( character <= 0x0a7f ) )
+        {
+          return Dali::Character::GURMUKHI;
+        }
+        if( ( 0x0a80 <= character ) && ( character <= 0x0aff ) )
+        {
+          return Dali::Character::GUJARATI;
+        }
+        if( ( 0x0b00 <= character ) && ( character <= 0x0b7f ) )
+        {
+          return Dali::Character::ORIYA;
+        }
+      }
+      else
+      {
+        if( ( 0x0b80 <= character ) && ( character <= 0x0bff ) )
+        {
+          return Dali::Character::TAMIL;
+        }
+        if( ( 0x0c00 <= character ) && ( character <= 0x0c7f ) )
+        {
+          return Dali::Character::TELUGU;
+        }
+        if( ( 0x0c80 <= character ) && ( character <= 0x0cff ) )
+        {
+          return Dali::Character::KANNADA;
+        }
+      }
+    }
+  }
+  else
+  {
+    if( character <= 0x2c7f )
+    {
+      if( character <= 0x1eff )
+      {
+        if( ( 0x0d00 <= character ) && ( character <= 0x0d7f ) )
+        {
+          return Dali::Character::MALAYALAM;
+        }
+        if( ( 0x0d80 <= character ) && ( character <= 0x0dff ) )
+        {
+          return Dali::Character::SINHALA;
+        }
+        if( ( 0x1d00 <= character ) && ( character <= 0x1eff ) )
+        {
+          return Dali::Character::LATIN;
+        }
+      }
+      else
+      {
+        if( ( 0x2070 <= character ) && ( character <= 0x209f ) )
+        {
+          return Dali::Character::LATIN;
+        }
+        if( ( 0x2100 <= character ) && ( character <= 0x218f ) )
+        {
+          return Dali::Character::LATIN;
+        }
+        if( ( 0x2c60 <= character ) && ( character <= 0x2c7f ) )
+        {
+          return Dali::Character::LATIN;
+        }
+      }
+    }
+    else
+    {
+      if( character <= 0xfdff )
+      {
+        if( ( 0xa720 <= character ) && ( character <= 0xa7ff ) )
+        {
+          return Dali::Character::LATIN;
+        }
+        if( ( 0xab30 <= character ) && ( character <= 0xab6f ) )
+        {
+          return Dali::Character::LATIN;
+        }
+        if( ( 0xfb00 <= character ) && ( character <= 0xfb4f ) )
+        {
+          return Dali::Character::LATIN;
+        }
+        if( ( 0xfb50 <= character ) && ( character <= 0xfdff ) )
+        {
+          return Dali::Character::ARABIC;
+        }
+      }
+      else
+      {
+        if( ( 0xfe70 <= character ) && ( character <= 0xfeff ) )
+        {
+          return Dali::Character::ARABIC;
+        }
+        if( ( 0xff00 <= character ) && ( character <= 0xffef ) )
+        {
+          return Dali::Character::LATIN;
+        }
+        if( ( 0x1ee00 <= character ) && ( character <= 0x1eeff ) )
+        {
+          return Dali::Character::ARABIC;
+        }
+      }
+    }
+  }
+
+  return Dali::Character::UNKNOWN;
+}
+
 } // unnamed namespace
 
 namespace Dali
@@ -274,6 +464,16 @@ Character::CharacterDirection Character::GetCharacterDirection(uint32_t characte
 Character::CharacterDirection Character::GetCharacterDirection() const
 {
   return GetCharacterDirection( mCharacter );
+}
+
+Dali::Character::Script Character::GetScript( uint32_t character )
+{
+  return GetCharacterScript( character );
+}
+
+Dali::Character::Script Character::GetScript() const
+{
+  return GetCharacterScript( mCharacter );
 }
 
 bool Character::IsLeftToRight() const
