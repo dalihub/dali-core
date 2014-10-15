@@ -1,22 +1,6 @@
 <VertexShader>
-  precision mediump float;
-
-  uniform   mediump mat4    uProjection;
-  uniform   mediump mat4    uModelView;
-  uniform   mediump mat4    uMvpMatrix;
-
-  uniform           bool    uTextureMapped;
-  uniform   mediump vec4    uCustomTextureCoords;
-  attribute mediump vec2    aTexCoord;
-  varying   mediump vec2    vTexCoord;
-
-  uniform   mat3            uModelViewIT;
-  attribute mediump vec3    aNormal;
-  varying   mediump vec3    vNormal;
-
-  attribute mediump vec3    aPosition;
-  varying   mediump vec4    vVertex;
-
+#define USE_TEXTURES
+#define USE_NORMALS
 #define MAX_BONES_PER_MESH  12
 
 #ifdef USE_BONES
@@ -76,29 +60,6 @@
 </VertexShader>
 
 <FragmentShader>
-  precision mediump float;
-
-  struct Material
-  {
-    mediump float mOpacity;
-    mediump float mShininess;
-    lowp    vec4  mAmbient;
-    lowp    vec4  mDiffuse;
-    lowp    vec4  mSpecular;
-    lowp    vec4  mEmissive;
-  };
-
-  uniform sampler2D     sTexture;
-  uniform sampler2D     sOpacityTexture;
-  uniform sampler2D     sNormalMapTexture;
-  uniform sampler2D     sEffect;
-  varying vec2          vTexCoord;
-
-  uniform Material      uMaterial;
-
-  uniform lowp  vec4    uColor;
-  varying highp vec4    vVertex;
-  varying highp vec3    vNormal;
 
 #ifdef USE_LIGHTING
   struct Light
