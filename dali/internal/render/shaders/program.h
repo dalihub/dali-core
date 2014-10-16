@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/integration-api/resource-cache.h>

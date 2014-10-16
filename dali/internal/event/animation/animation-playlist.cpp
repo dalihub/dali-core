@@ -46,25 +46,32 @@ AnimationPlaylist::~AnimationPlaylist()
 
 void AnimationPlaylist::AnimationCreated( Animation& animation )
 {
-  mAnimations.insert( &animation );
+  mAnimations.PushBack( &animation );
 }
 
 void AnimationPlaylist::AnimationDestroyed( Animation& animation )
 {
-  std::set< Animation* >::iterator iter = find( mAnimations.begin(), mAnimations.end(), &animation );
-  DALI_ASSERT_ALWAYS( iter != mAnimations.end() && "Animation not found" );
+  Dali::Vector< Animation* >::Iterator iter = std::find( mAnimations.Begin(), mAnimations.End(), &animation );
+  DALI_ASSERT_ALWAYS( iter != mAnimations.End() && "Animation not found" );
 
-  mAnimations.erase( iter );
+  mAnimations.Remove( iter );
 }
 
 void AnimationPlaylist::OnPlay( Animation& animation )
 {
-  mPlaylist.insert( Dali::Animation(&animation) );
+  mPlaylist.push_back( Dali::Animation(&animation) );
 }
 
 void AnimationPlaylist::OnClear( Animation& animation )
 {
-  mPlaylist.erase( Dali::Animation(&animation) );
+  std::vector< Dali::Animation >::iterator iter = std::find( mPlaylist.begin(), mPlaylist.end(), Dali::Animation(&animation) );
+  std::vector< Dali::Animation >::iterator last = mPlaylist.end();
+  if( iter != last )
+  {
+    --last; // move to real last
+    std::swap( *iter, *last ); // swap
+    mPlaylist.resize( mPlaylist.size() - 1u );
+  }
 }
 
 void AnimationPlaylist::NotifyCompleted()
@@ -73,7 +80,7 @@ void AnimationPlaylist::NotifyCompleted()
 
   // Since animations can be unreferenced during the signal emissions, iterators into animationPointers may be invalidated.
   // First copy and reference the finished animations, then emit signals
-  for ( std::set< Animation* >::iterator iter = mAnimations.begin(); iter != mAnimations.end(); ++iter )
+  for ( Dali::Vector< Animation* >::Iterator iter = mAnimations.Begin(); iter != mAnimations.End(); ++iter )
   {
     Animation* animation = *iter;
 
@@ -83,7 +90,8 @@ void AnimationPlaylist::NotifyCompleted()
 
       // The animation may be present in mPlaylist - remove if necessary
       // Note that the animation "Finish" signal is emitted after Stop() has been called
-      mPlaylist.erase( Dali::Animation(animation) );
+      std::vector< Dali::Animation >::iterator iter = std::find( mPlaylist.begin(), mPlaylist.end(), Dali::Animation(animation) );
+      mPlaylist.erase( iter );
     }
   }
 

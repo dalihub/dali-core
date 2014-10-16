@@ -19,9 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#ifdef DEBUG_ENABLED
-#include <dali/public-api/common/set-wrapper.h>
-#endif
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/base-object.h>
@@ -120,10 +117,6 @@ private:
 
   Dali::ObjectRegistry::ObjectCreatedSignalV2 mObjectCreatedSignalV2;
   Dali::ObjectRegistry::ObjectDestroyedSignalV2 mObjectDestroyedSignalV2;
-
-#ifdef DEBUG_ENABLED
-  std::set< Dali::BaseObject* > mDebugRegistry; ///< This allows us to assert that an object is only registered once (debug builds only)
-#endif
 
 };
 

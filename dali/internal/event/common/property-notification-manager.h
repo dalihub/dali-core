@@ -19,8 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/set-wrapper.h>
-#include <dali/internal/common/message.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/event/common/property-notifier.h>
 
 namespace Dali
@@ -84,7 +83,7 @@ private:
 
 private:
 
-  std::set< PropertyNotification* > mPropertyNotifications; ///< All existing PropertyNotifications (not referenced)
+  Dali::Vector< PropertyNotification* > mPropertyNotifications; ///< All existing PropertyNotifications (not owned)
 
 };
 
