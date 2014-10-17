@@ -186,6 +186,14 @@ protected: // Data
 
 };
 
+} // namespace Dali
+
+/**
+ * This template section does not need to be exported, it should use the visibility of the code its used in
+ */
+namespace Dali
+{
+
 /**
  * @brief Vector algorithm variant for trivial types.
  *
