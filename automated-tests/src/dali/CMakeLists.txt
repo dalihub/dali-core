@@ -44,6 +44,7 @@ SET(TC_SOURCES
         utc-Dali-PinchGesture.cpp
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-Pixel.cpp
+        utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyNotification.cpp
         utc-Dali-Quaternion.cpp
         utc-Dali-Radian.cpp

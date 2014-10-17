@@ -23,6 +23,7 @@
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-value.h>
 
 namespace Dali DALI_IMPORT_API

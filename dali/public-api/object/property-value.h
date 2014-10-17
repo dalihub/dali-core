@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct AngleAxis;
@@ -43,14 +43,14 @@ typedef PropertyValueContainer::const_iterator PropertyValueConstIter; ///< Cons
 /**
  * @brief A value-type representing a property value.
  */
-class Property::Value
+class DALI_IMPORT_API Property::Value
 {
 public:
 
   /**
    * @brief Default constructor.
    *
-   * This creates a property with type Property::INVALID.
+   * This creates a property with type Property::NONE.
    */
   Value();
 
@@ -207,7 +207,7 @@ public:
    * @return A value of type T.
    */
   template <typename T>
-  T Get() const
+  T DALI_INTERNAL Get() const
   {
     T temp;
     Get(temp);
@@ -420,7 +420,7 @@ public:
 
 private:
 
-  struct Impl;
+  struct DALI_INTERNAL Impl;
   Impl* mImpl; ///< Pointer to the implementation
 };
 

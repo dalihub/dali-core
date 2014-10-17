@@ -71,11 +71,14 @@ void TestEnumStrings(
   X ( *creator ) ( const Property::Value& ) // The method which creates an instance of type X
 )
 {
-  Property::Map::iterator iter = map.end() - 1;
+  const unsigned int lastIndex( map.Count() - 1 );
+  const std::string& key = map.GetKey( lastIndex );
+  Property::Value& value = map.GetValue( lastIndex );
+
   for ( unsigned int i = 0; i < num; ++i )
   {
-    iter->second = values[i].string;
-    tet_printf("Checking: %s: %s\n", iter->first.c_str(), values[i].string );
+    value = values[i].string;
+    tet_printf("Checking: %s: %s\n", key.c_str(), values[i].string );
     X instance = creator( map );
     DALI_TEST_EQUALS( values[i].value, ( instance.*method )(), TEST_LOCATION );
   }
@@ -118,7 +121,7 @@ void TestEnumStrings(
     Property::Map map;
     CreatePropertyMap( actor, map );
 
-    DALI_TEST_CHECK( !map.empty() );
+    DALI_TEST_CHECK( map.Count() );
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( keyName ) );
     DALI_TEST_EQUALS( value.GetValue( keyName ).Get< std::string >(), values[i].string, TEST_LOCATION );
@@ -256,7 +259,7 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "filename", Vector3::ZERO ) );
+    map[ "filename" ] = Vector3::ZERO;
     Image image = NewImage( map );
     tet_result( TET_FAIL );
   }
@@ -269,7 +272,7 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "load-policy", Vector3::ZERO ) );
+    map[ "load-policy" ] = Vector3::ZERO;
     Image image = NewImage( map );
     tet_result( TET_FAIL );
   }
@@ -281,7 +284,7 @@ int UtcDaliScriptingNewImageNegative(void)
     try
     {
       Property::Map map;
-      map.push_back( Property::StringValuePair( "load-policy", "INVALID" ) );
+      map[ "load-policy" ] = "INVALID";
       Image image = NewImage( map );
       tet_result( TET_FAIL );
     }
@@ -295,7 +298,7 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "release-policy", Vector3::ZERO ) );
+    map[ "release-policy" ] = Vector3::ZERO;
     Image image = NewImage( map );
     tet_result( TET_FAIL );
   }
@@ -307,7 +310,7 @@ int UtcDaliScriptingNewImageNegative(void)
     try
     {
       Property::Map map;
-      map.push_back( Property::StringValuePair( "release-policy", "INVALID" ) );
+      map[ "release-policy" ] = "INVALID";
       Image image = NewImage( map );
       tet_result( TET_FAIL );
     }
@@ -321,8 +324,8 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "width", "Invalid" ) );
-    map.push_back( Property::StringValuePair( "height", "Invalid" ) );
+    map[ "width" ] = "Invalid";
+    map[ "height" ] = "Invalid";
     Image image = NewImage( map );
     tet_result( TET_FAIL );
   }
@@ -335,8 +338,8 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "width", 10 ) );
-    map.push_back( Property::StringValuePair( "height", "Invalid" ) );
+    map[ "width" ] = 10;
+    map[ "height" ] = "Invalid";
     Image image = NewImage( map );
     tet_result( TET_FAIL );
   }
@@ -349,7 +352,7 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "pixel-format", Vector3::ZERO ) );
+    map[ "pixel-format" ] = Vector3::ZERO;
     Image image = NewImage( map );
     tet_result( TET_FAIL );
   }
@@ -361,7 +364,7 @@ int UtcDaliScriptingNewImageNegative(void)
     try
     {
       Property::Map map;
-      map.push_back( Property::StringValuePair( "pixel-format", "INVALID" ) );
+      map[ "pixel-format" ] = "INVALID";
       Image image = NewImage( map );
       tet_result( TET_FAIL );
     }
@@ -375,7 +378,7 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "scaling-mode", Vector3::ZERO ) );
+    map[ "scaling-mode" ] = Vector3::ZERO;
     Image image = NewImage( map );
     tet_result( TET_FAIL );
   }
@@ -387,7 +390,7 @@ int UtcDaliScriptingNewImageNegative(void)
     try
     {
       Property::Map map;
-      map.push_back( Property::StringValuePair( "scaling-mode", "INVALID" ) );
+      map[ "scaling-mode" ] = "INVALID";
       Image image = NewImage( map );
       tet_result( TET_FAIL );
     }
@@ -401,7 +404,7 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "type", Vector3::ZERO ) );
+    map[ "type" ] = Vector3::ZERO;
     Image image = NewImage( map );
     tet_result( TET_FAIL );
   }
@@ -413,7 +416,7 @@ int UtcDaliScriptingNewImageNegative(void)
     try
     {
       Property::Map map;
-      map.push_back( Property::StringValuePair( "type", "INVALID" ) );
+      map[ "type" ] = "INVALID";
       Image image = NewImage( map );
       tet_result( TET_FAIL );
     }
@@ -433,7 +436,7 @@ int UtcDaliScriptingNewImage(void)
   TestApplication application;
 
   Property::Map map;
-  map.push_back( Property::StringValuePair( "filename", "TEST_FILE" ) );
+  map[ "filename" ] = "TEST_FILE";
 
   // Filename only
   {
@@ -442,7 +445,7 @@ int UtcDaliScriptingNewImage(void)
   }
 
   // load-policy
-  map.push_back( Property::StringValuePair( "load-policy", "" ) );
+  map[ "load-policy" ] = "";
   {
     const StringEnum< int > values[] =
     {
@@ -453,7 +456,7 @@ int UtcDaliScriptingNewImage(void)
   }
 
   // release-policy
-  map.push_back( Property::StringValuePair( "release-policy", "" ) );
+  map[ "release-policy" ] = "";
   {
     const StringEnum< int > values[] =
     {
@@ -464,8 +467,8 @@ int UtcDaliScriptingNewImage(void)
   }
 
   // float width and height
-  map.push_back( Property::StringValuePair( "width", (float) 10.0f ) );
-  map.push_back( Property::StringValuePair( "height", (float) 20.0f ) );
+  map[ "width" ] = (float) 10.0f;
+  map[ "height" ] = (float) 20.0f;
   {
     Image image = NewImage( map );
     DALI_TEST_EQUALS( image.GetWidth(), 10.0f, TEST_LOCATION );
@@ -473,9 +476,8 @@ int UtcDaliScriptingNewImage(void)
   }
 
   // int width and height
-  map.erase( map.end() - 2, map.end() );
-  map.push_back( Property::StringValuePair( "width", 50 ) );
-  map.push_back( Property::StringValuePair( "height", 70 ) );
+  map[ "width"] = (int) 50;
+  map[ "height" ] = (int) 70;
   {
     Image image = NewImage( map );
     DALI_TEST_EQUALS( image.GetWidth(), 50u, TEST_LOCATION );
@@ -485,7 +487,7 @@ int UtcDaliScriptingNewImage(void)
   //map.erase( map.end() - 2, map.end() );
 
   // pixel-format
-  map.push_back( Property::StringValuePair( "pixel-format", "" ) );
+  map[ "pixel-format" ] = "";
   {
     const StringEnum< int > values[] =
     {
@@ -521,7 +523,7 @@ int UtcDaliScriptingNewImage(void)
   }
 
   // scaling-mode
-  map.push_back( Property::StringValuePair( "scaling-mode", "" ) );
+  map[ "scaling-mode" ] = "";
   {
     const StringEnum< int > values[] =
     {
@@ -534,19 +536,19 @@ int UtcDaliScriptingNewImage(void)
   }
 
   // type FrameBufferImage
-  map.push_back( Property::StringValuePair( "type", "FrameBufferImage" ) );
+  map[ "type" ] = "FrameBufferImage";
   {
     Image image = NewImage( map );
     DALI_TEST_CHECK( FrameBufferImage::DownCast( image ) );
   }
   // type BitMapImage
-  (map.end() - 1)->second = "BitmapImage";
+  map[ "type" ] = "BitmapImage";
   {
     Image image = NewImage( map );
     DALI_TEST_CHECK( BitmapImage::DownCast( image ) );
   }
   // type Image
-  (map.end() - 1)->second = "Image";
+  map[ "type" ] = "Image";
   {
     Image image = NewImage( map );
     DALI_TEST_CHECK( Image::DownCast( image ) );
@@ -561,17 +563,17 @@ int UtcDaliScriptingNewShaderEffect(void)
   TestApplication application;
 
   Property::Map programMap;
-  programMap.push_back( Property::StringValuePair( "vertex-filename", "bump.vert" ) );
-  programMap.push_back( Property::StringValuePair( "fragment-filename", "bump.frag" ) );
+  programMap[ "vertex-filename" ] = "bump.vert";
+  programMap[ "fragment-filename" ] = "bump.frag";
 
   Property::Map imageMap;
-  imageMap.push_back( Property::StringValuePair( "filename", "image.png" ) );
+  imageMap[ "filename" ] = "image.png";
 
   Property::Map map;
-  map.push_back( Property::StringValuePair( "image", imageMap ) );
-  map.push_back( Property::StringValuePair( "program", programMap ) );
-  map.push_back( Property::StringValuePair( "uLightPosition", Vector3( 0.0, 0.0, -1.5) ) );
-  map.push_back( Property::StringValuePair( "uAmbientLight", (int)10 ) );
+  map[ "image" ] = imageMap;
+  map[ "program" ] = programMap;
+  map[ "uLightPosition" ] = Vector3( 0.0, 0.0, -1.5);
+  map[ "uAmbientLight" ] = (int)10;
 
   ShaderEffect shader = NewShaderEffect( map );
 
@@ -592,8 +594,8 @@ int UtcDaliScriptingNewActorNegative(void)
   // Map with only properties
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "parent-origin", ParentOrigin::TOP_CENTER ) );
-    map.push_back( Property::StringValuePair( "anchor-point", AnchorPoint::TOP_CENTER ) );
+    map[ "parent-origin" ] = ParentOrigin::TOP_CENTER;
+    map[ "anchor-point" ] = AnchorPoint::TOP_CENTER;
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( !handle );
   }
@@ -601,8 +603,8 @@ int UtcDaliScriptingNewActorNegative(void)
   // Add some signals to the map, we should have no signal connections as its not yet supported
   {
     Property::Map map;
-    map.push_back( Property::StringValuePair( "type", "Actor" ) );
-    map.push_back( Property::StringValuePair( "signals", Property::MAP ) );
+    map[ "type" ] = "Actor";
+    map[ "signals" ] = Property::MAP;
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( handle );
     DALI_TEST_CHECK( !handle.MouseWheelEventSignal().GetConnectionCount() );
@@ -619,21 +621,21 @@ int UtcDaliScriptingNewActorProperties(void)
   TestApplication application;
 
   Property::Map map;
-  map.push_back( Property::StringValuePair( "type", "Actor" ) );
-  map.push_back( Property::StringValuePair( "size", Vector3::ONE ) );
-  map.push_back( Property::StringValuePair( "position", Vector3::XAXIS ) );
-  map.push_back( Property::StringValuePair( "scale", Vector3::ONE ) );
-  map.push_back( Property::StringValuePair( "visible", false ) );
-  map.push_back( Property::StringValuePair( "color", Color::MAGENTA ) );
-  map.push_back( Property::StringValuePair( "name", "MyActor" ) );
-  map.push_back( Property::StringValuePair( "color-mode", "USE_PARENT_COLOR" ) );
-  map.push_back( Property::StringValuePair( "inherit-shader-effect", false ) );
-  map.push_back( Property::StringValuePair( "sensitive", false ) );
-  map.push_back( Property::StringValuePair( "leave-required", true ) );
-  map.push_back( Property::StringValuePair( "position-inheritance", "DONT_INHERIT_POSITION" ) );
-  map.push_back( Property::StringValuePair( "draw-mode", "STENCIL" ) );
-  map.push_back( Property::StringValuePair( "inherit-rotation", false ) );
-  map.push_back( Property::StringValuePair( "inherit-scale", false ) );
+  map[ "type" ] = "Actor";
+  map[ "size" ] = Vector3::ONE;
+  map[ "position" ] = Vector3::XAXIS;
+  map[ "scale" ] = Vector3::ONE;
+  map[ "visible" ] = false;
+  map[ "color" ] = Color::MAGENTA;
+  map[ "name" ] = "MyActor";
+  map[ "color-mode" ] = "USE_PARENT_COLOR";
+  map[ "inherit-shader-effect" ] = false;
+  map[ "sensitive" ] = false;
+  map[ "leave-required" ] = true;
+  map[ "position-inheritance" ] = "DONT_INHERIT_POSITION";
+  map[ "draw-mode" ] = "STENCIL";
+  map[ "inherit-rotation" ] = false;
+  map[ "inherit-scale" ] = false;
 
   // Default properties
   {
@@ -662,8 +664,8 @@ int UtcDaliScriptingNewActorProperties(void)
   }
 
   // Check Anchor point and parent origin vector3s
-  map.push_back( Property::StringValuePair( "parent-origin", ParentOrigin::TOP_CENTER ) );
-  map.push_back( Property::StringValuePair( "anchor-point", AnchorPoint::TOP_LEFT ) );
+  map[ "parent-origin" ] = ParentOrigin::TOP_CENTER;
+  map[ "anchor-point" ] = AnchorPoint::TOP_LEFT;
   {
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( handle );
@@ -679,9 +681,8 @@ int UtcDaliScriptingNewActorProperties(void)
   }
 
   // Check Anchor point and parent origin STRINGS
-  map.erase( map.end() - 2, map.end() ); // delete previously added parent origin and anchor point
-  map.push_back( Property::StringValuePair( "parent-origin", "BACK_TOP_LEFT" ) );
-  map.push_back( Property::StringValuePair( "anchor-point", "FRONT_CENTER_LEFT" ) );
+  map[ "parent-origin" ] = "BACK_TOP_LEFT";
+  map[ "anchor-point" ] = "FRONT_CENTER_LEFT";
   {
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( handle );
@@ -703,29 +704,29 @@ int UtcDaliScriptingNewActorChildren(void)
   TestApplication application;
 
   Property::Map map;
-  map.push_back( Property::StringValuePair( "type", "Actor" ) );
-  map.push_back( Property::StringValuePair( "position", Vector3::XAXIS ) );
+  map[ "type" ] = "Actor";
+  map[ "position" ] = Vector3::XAXIS;
 
   Property::Map child1Map;
-  child1Map.push_back( Property::StringValuePair( "type", "ImageActor" ) );
-  child1Map.push_back( Property::StringValuePair( "position", Vector3::YAXIS ) );
+  child1Map[ "type" ] = "ImageActor";
+  child1Map[ "position" ] = Vector3::YAXIS;
 
   Property::Map child2Map;
-  child2Map.push_back( Property::StringValuePair( "type", "TextActor" ) );
-  child2Map.push_back( Property::StringValuePair( "position", Vector3::ZAXIS ) );
+  child2Map[ "type" ] = "TextActor";
+  child2Map[ "position" ] = Vector3::ZAXIS;
 
   Property::Map grandChildMap;
-  grandChildMap.push_back( Property::StringValuePair( "type", "LightActor" ) );
-  grandChildMap.push_back( Property::StringValuePair( "position", Vector3::ONE ) );
+  grandChildMap[ "type" ] = "LightActor";
+  grandChildMap[ "position" ] = Vector3::ONE;
 
   // Add arrays to appropriate maps
   Property::Array grandChildArray;
   grandChildArray.push_back( grandChildMap );
   Property::Array childArray;
-  child1Map.push_back( Property::StringValuePair( "actors", grandChildArray ) );
+  child1Map[ "actors" ] = grandChildArray;
   childArray.push_back( child1Map );
   childArray.push_back( child2Map );
-  map.push_back( Property::StringValuePair( "actors", childArray ) );
+  map[ "actors" ] = childArray;
 
   // Create
   Actor handle = NewActor( map );
@@ -771,7 +772,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
 
     Property::Map map;
     CreatePropertyMap( actor, map );
-    DALI_TEST_CHECK( !map.empty() );
+    DALI_TEST_CHECK( !map.Empty() );
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( "type" ) );
     DALI_TEST_EQUALS( value.GetValue( "type").Get< std::string >(), "Actor", TEST_LOCATION );
@@ -785,7 +786,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
 
     Property::Map map;
     CreatePropertyMap( actor, map );
-    DALI_TEST_CHECK( !map.empty() );
+    DALI_TEST_CHECK( !map.Empty() );
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( "type" ) );
     DALI_TEST_EQUALS( value.GetValue( "type").Get< std::string >(), "ImageActor", TEST_LOCATION );
@@ -816,7 +817,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     Property::Map map;
     CreatePropertyMap( actor, map );
 
-    DALI_TEST_CHECK( !map.empty() );
+    DALI_TEST_CHECK( !map.Empty() );
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( "size" ) );
     DALI_TEST_EQUALS( value.GetValue( "size" ).Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
@@ -871,7 +872,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
 
     Property::Map map;
     CreatePropertyMap( actor, map );
-    DALI_TEST_CHECK( !map.empty() );
+    DALI_TEST_CHECK( !map.Empty() );
 
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( "type" ) );
@@ -881,7 +882,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     Property::Array children( value.GetValue( "actors").Get< Property::Array >() );
     DALI_TEST_CHECK( !children.empty() );
     Property::Map childMap( children[0].Get< Property::Map >() );
-    DALI_TEST_CHECK( !childMap.empty() );
+    DALI_TEST_CHECK( !childMap.Empty() );
     Property::Value childValue( childMap );
     DALI_TEST_CHECK( childValue.HasKey( "type" ) );
     DALI_TEST_EQUALS( childValue.GetValue( "type" ).Get< std::string >(), "ImageActor", TEST_LOCATION );
@@ -891,13 +892,13 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_CHECK( grandChildren.size() == 2u );
 
     Property::Map grandChildMap( grandChildren[0].Get< Property::Map >() );
-    DALI_TEST_CHECK( !grandChildMap.empty() );
+    DALI_TEST_CHECK( !grandChildMap.Empty() );
     Property::Value grandChildValue( grandChildMap );
     DALI_TEST_CHECK( grandChildValue.HasKey( "type" ) );
     DALI_TEST_EQUALS( grandChildValue.GetValue( "type" ).Get< std::string >(), "TextActor", TEST_LOCATION );
 
     Property::Map grandChild2Map( grandChildren[1].Get< Property::Map >() );
-    DALI_TEST_CHECK( !grandChild2Map.empty() );
+    DALI_TEST_CHECK( !grandChild2Map.Empty() );
     Property::Value grandChild2Value( grandChild2Map );
     DALI_TEST_CHECK( grandChild2Value.HasKey( "type" ) );
     DALI_TEST_EQUALS( grandChild2Value.GetValue( "type" ).Get< std::string >(), "LightActor", TEST_LOCATION );
@@ -916,7 +917,7 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     Image image;
     Property::Map map;
     CreatePropertyMap( image, map );
-    DALI_TEST_CHECK( map.empty() );
+    DALI_TEST_CHECK( map.Empty() );
   }
 
   // Default
@@ -925,7 +926,7 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
 
     Property::Map map;
     CreatePropertyMap( image, map );
-    DALI_TEST_CHECK( !map.empty() );
+    DALI_TEST_CHECK( !map.Empty() );
 
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( "type" ) );
@@ -954,7 +955,7 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
 
     Property::Map map;
     CreatePropertyMap( image, map );
-    DALI_TEST_CHECK( !map.empty() );
+    DALI_TEST_CHECK( !map.Empty() );
 
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( "type" ) );

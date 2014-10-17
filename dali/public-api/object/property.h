@@ -59,7 +59,7 @@ struct Property
   /**
    * @brief A Map of property values.
    */
-  typedef std::vector<StringValuePair> Map;
+  class Map;
 
   /**
    * @brief An Array of property values.
