@@ -40,7 +40,7 @@
 #define DALI_ASSERT_VECTOR(cond)
 #endif
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -50,7 +50,7 @@ namespace Dali DALI_IMPORT_API
  * and capacity of the vector. mData is adjusted so that it points to the
  * beginning of the first real item so that iterating the items is quick.
  */
-class VectorBase
+class DALI_IMPORT_API VectorBase
 {
 public: // Typedefs
 
@@ -185,14 +185,6 @@ protected: // Data
   void* mData; ///< Pointer to the data.
 
 };
-
-} // namespace Dali
-
-/**
- * This template section does not need to be exported, it should use the visibility of the code its used in
- */
-namespace Dali
-{
 
 /**
  * @brief Vector algorithm variant for trivial types.
