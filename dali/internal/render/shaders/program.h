@@ -309,17 +309,17 @@ public:
    */
   ~Program();
 
+  /**
+   * Load the shader, from a precompiled binary if available, else from source code
+   */
+  void Load();
+
 private:
 
   // default constructor, not defined
   Program();
   // assignment operator, not defined
   Program& operator=( const Program& );
-
-  /**
-   * Load the shader, from a precompiled binary if available, else from source code
-   */
-  void Load();
 
   /**
    * Unload the shader

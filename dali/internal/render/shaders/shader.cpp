@@ -253,9 +253,13 @@ void Shader::SetProgram( GeometryType geometryType,
     mPrograms[geometryIndex].mUseDefaultForAllSubtypes = false;
   }
 
-  if( !precompiledBinary )
+  // if platform supports program binaries and we haven't yet saved a binary
+  if( context->CachedNumberOfProgramBinaryFormats() > 0 && !precompiledBinary )
   {
-    // The binary will have been compiled/linked during Program::New(), so save it
+    // this is the first time this shader is being used so force compilation
+    program->Load();
+
+    // The binary should now have been compiled/linked, so save it
     if( shaderData->HasBinary() )
     {
       DALI_ASSERT_DEBUG( mPostProcessDispatcher != NULL );
