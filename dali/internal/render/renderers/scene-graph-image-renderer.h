@@ -50,8 +50,10 @@ public:
   {
     QUAD,
     NINE_PATCH,
+    NINE_PATCH_NO_CENTER,
     GRID_QUAD,
-    GRID_NINE_PATCH
+    GRID_NINE_PATCH,
+    GRID_NINE_PATCH_NO_CENTER ///< Not supported yet.
   };
 
   /**
@@ -171,8 +173,9 @@ private:
    * @param[in] border 9 patch border information.
    * @param[in] borderInPixels True if border is in pixels instead of percentages.
    * @param[in] pixelArea An area within the texture, used when building UV coordinates. A value of NULL means use default image size.
+   * @param[in] noCenter True if the center section of nine patch should not be rendered.
    */
-  void SetNinePatchMeshData( Texture* texture, const Vector2& size, const Vector4& border, bool borderInPixels, const PixelArea* pixelArea );
+  void SetNinePatchMeshData( Texture* texture, const Vector2& size, const Vector4& border, bool borderInPixels, const PixelArea* pixelArea, bool noCenter );
 
   /**
    * Helper to fill vertex/index buffers with grid data.
