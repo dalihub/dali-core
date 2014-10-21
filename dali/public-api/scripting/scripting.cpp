@@ -419,20 +419,14 @@ Actor NewActor( const Property::Map& map )
 {
   BaseHandle handle;
 
-  const Property::Map::const_iterator endIter = map.end();
-
   // First find type and create Actor
-  Property::Map::const_iterator typeIter = map.begin();
-  for (; typeIter != endIter; ++typeIter )
+  Property::Value* typeValue = map.Find( "type" );
+  if ( typeValue )
   {
-    if ( typeIter->first == "type" )
+    TypeInfo type = TypeRegistry::Get().GetTypeInfo( typeValue->Get< std::string >() );
+    if ( type )
     {
-      TypeInfo type = TypeRegistry::Get().GetTypeInfo( typeIter->second.Get< std::string >() );
-      if ( type )
-      {
-        handle = type.CreateInstance();
-      }
-      break;
+      handle = type.CreateInstance();
     }
   }
 
@@ -447,62 +441,66 @@ Actor NewActor( const Property::Map& map )
   if ( actor )
   {
     // Now set the properties, or create children
-    for ( Property::Map::const_iterator iter = map.begin(); iter != endIter; ++iter )
+    for ( unsigned int i = 0, mapCount = map.Count(); i < mapCount; ++i )
     {
-      if ( iter == typeIter )
+      const Property::StringValuePair& pair( map.GetPair( i ) );
+      const std::string& key( pair.first );
+      if ( key == "type" )
       {
         continue;
       }
 
-      if ( iter->first == "actors" )
+      const Property::Value& value( pair.second );
+
+      if ( key == "actors" )
       {
         // Create children
 
-        Property::Array actorArray = iter->second.Get< Property::Array >();
+        Property::Array actorArray = value.Get< Property::Array >();
         for ( Property::Array::iterator arrayIter = actorArray.begin(), arrayEndIter = actorArray.end(); arrayIter != arrayEndIter; ++arrayIter )
         {
           actor.Add( NewActor( arrayIter->Get< Property::Map >() ) );
         }
       }
-      else if ( iter->first == "signals" )
+      else if ( key == "signals" )
       {
         DALI_LOG_ERROR( "signals not supported" );
       }
-      else if( iter->first ==  "parent-origin" )
+      else if( key ==  "parent-origin" )
       {
         // Parent Origin can be a string constant as well as a Vector3
 
-        const Property::Type type( iter->second.GetType() );
+        const Property::Type type( value.GetType() );
         if ( type == Property::VECTOR3 )
         {
-          actor.SetParentOrigin( iter->second.Get< Vector3 >() );
+          actor.SetParentOrigin( value.Get< Vector3 >() );
         }
         else if( type == Property::STRING )
         {
-          actor.SetParentOrigin( GetAnchorConstant( iter->second.Get< std::string >() ) );
+          actor.SetParentOrigin( GetAnchorConstant( value.Get< std::string >() ) );
         }
       }
-      else if( iter->first ==  "anchor-point" )
+      else if( key ==  "anchor-point" )
       {
         // Anchor Point can be a string constant as well as a Vector3
 
-        const Property::Type type( iter->second.GetType() );
+        const Property::Type type( value.GetType() );
         if ( type == Property::VECTOR3 )
         {
-          actor.SetAnchorPoint( iter->second.Get< Vector3 >() );
+          actor.SetAnchorPoint( value.Get< Vector3 >() );
         }
         else if( type == Property::STRING )
         {
-          actor.SetAnchorPoint( GetAnchorConstant( iter->second.Get< std::string >() ) );
+          actor.SetAnchorPoint( GetAnchorConstant( value.Get< std::string >() ) );
         }
       }
       else
       {
-        Property::Index index( actor.GetPropertyIndex( iter->first ) );
+        Property::Index index( actor.GetPropertyIndex( key ) );
 
         if ( index != Property::INVALID_INDEX )
         {
-          actor.SetProperty( index, iter->second );
+          actor.SetProperty( index, value );
         }
       }
     }
@@ -513,11 +511,11 @@ Actor NewActor( const Property::Map& map )
 
 void CreatePropertyMap( Actor actor, Property::Map& map )
 {
-  map.clear();
+  map.Clear();
 
   if ( actor )
   {
-    map.push_back( Property::StringValuePair( "type", actor.GetTypeName() ) );
+    map[ "type" ] = actor.GetTypeName();
 
     // Default properties
     Property::IndexContainer indices;
@@ -525,7 +523,7 @@ void CreatePropertyMap( Actor actor, Property::Map& map )
     const Property::IndexContainer::const_iterator endIter = indices.end();
     for ( Property::IndexContainer::iterator iter = indices.begin(); iter != endIter; ++iter )
     {
-      map.push_back( Property::StringValuePair( actor.GetPropertyName( *iter ), actor.GetProperty( *iter ) ) );
+      map[ actor.GetPropertyName( *iter ) ] = actor.GetProperty( *iter );
     }
 
     // Children
@@ -539,14 +537,14 @@ void CreatePropertyMap( Actor actor, Property::Map& map )
         CreatePropertyMap( actor.GetChildAt( child ), childMap );
         childArray.push_back( childMap );
       }
-      map.push_back( Property::StringValuePair( "actors", childArray ) );
+      map[ "actors" ] = childArray;
     }
   }
 }
 
 void CreatePropertyMap( Image image, Property::Map& map )
 {
-  map.clear();
+  map.Clear();
 
   if ( image )
   {
@@ -562,22 +560,22 @@ void CreatePropertyMap( Image image, Property::Map& map )
       imageType = "FrameBufferImage";
     }
 
-    map.push_back( Property::StringValuePair( "type", imageType ) );
-    map.push_back( Property::StringValuePair( "filename", image.GetFilename() ) );
-    map.push_back( Property::StringValuePair( "load-policy", GetEnumerationName< Image::LoadPolicy >( image.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT ) ) );
-    map.push_back( Property::StringValuePair( "release-policy", GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT ) ) );
+    map[ "type" ] = imageType;
+    map[ "filename" ] = image.GetFilename();
+    map[ "load-policy" ] = GetEnumerationName< Image::LoadPolicy >( image.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
+    map[ "release-policy" ] = GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
 
     ImageAttributes attributes( image.GetAttributes() );
-    map.push_back( Property::StringValuePair( "pixel-format", GetEnumerationName< Pixel::Format >( attributes.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT ) ) );
-    map.push_back( Property::StringValuePair( "scaling-mode", GetEnumerationName< ImageAttributes::ScalingMode >( attributes.GetScalingMode(), IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT ) ) );
+    map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( attributes.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
+    map[ "scaling-mode" ] = GetEnumerationName< ImageAttributes::ScalingMode >( attributes.GetScalingMode(), IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT );
 
     int width( image.GetWidth() );
     int height( image.GetHeight() );
 
     if ( width && height )
     {
-      map.push_back( Property::StringValuePair( "width", width ) );
-      map.push_back( Property::StringValuePair( "height", height ) );
+      map[ "width" ] = width;
+      map[ "height" ] = height;
     }
   }
 }

@@ -29,6 +29,7 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-types.h>
 #include <dali/integration-api/debug.h>
 
@@ -688,12 +689,10 @@ Property::Value& Property::Value::GetValue(const std::string& key) const
 
   if(container)
   {
-    for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
+    Property::Value* value = container->Find( key );
+    if ( value )
     {
-      if(iter->first == key)
-      {
-        return iter->second;
-      }
+      return *value;
     }
   }
 
@@ -717,12 +716,10 @@ bool Property::Value::HasKey(const std::string& key) const
 
     if(container)
     {
-      for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
+      Property::Value* value = container->Find( key );
+      if ( value )
       {
-        if(iter->first == key)
-        {
-          has = true;
-        }
+        has = true;
       }
     }
   }
@@ -737,20 +734,13 @@ const std::string& Property::Value::GetKey(const int index) const
   {
     case Property::MAP:
     {
-      int i = 0;
       Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
       DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
       if(container)
       {
-        if(0 <= index && index < static_cast<int>(container->size()))
+        if(0 <= index && index < static_cast<int>(container->Count()))
         {
-          for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
-          {
-            if(i++ == index)
-            {
-              return iter->first;
-            }
-          }
+          return container->GetKey( index );
         }
       }
     }
@@ -790,18 +780,7 @@ void Property::Value::SetValue(const std::string& key, const Property::Value &va
 
   if(container)
   {
-    for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
-    {
-      if(iter->first == key)
-      {
-        iter->second = value;
-        return;
-      }
-    }
-
-    // if we get here its a new key
-    container->push_back(Property::StringValuePair(key, value));
-
+    (*container)[ key ] = value;
   }
 }
 
@@ -811,22 +790,15 @@ Property::Value& Property::Value::GetItem(const int index) const
   {
     case Property::MAP:
     {
-      int i = 0;
       Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
 
       DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
       if(container)
       {
-        DALI_ASSERT_ALWAYS(index < static_cast<int>(container->size()) && "Property array index invalid");
+        DALI_ASSERT_ALWAYS(index < static_cast<int>(container->Count()) && "Property array index invalid");
         DALI_ASSERT_ALWAYS(index >= 0 && "Property array index invalid");
 
-        for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
-        {
-          if(i++ == index)
-          {
-            return iter->second;
-          }
-        }
+        return container->GetValue( index );
       }
     }
     break;
@@ -889,10 +861,9 @@ Property::Value& Property::Value::GetItem(const int index, std::string& key) con
   if( Property::MAP == GetType() )
   {
     Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-    if( index < static_cast<int>(container->size()) )
+    if( index < static_cast<int>(container->Count()) )
     {
-
-      key = (*container)[ index ].first;
+      key = container->GetKey( index );
     }
   }
 
@@ -906,17 +877,10 @@ void Property::Value::SetItem(const int index, const Property::Value &value)
     case Property::MAP:
     {
       Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-      if( container && index < static_cast<int>(container->size()) )
+      if( container && index < static_cast<int>(container->Count()) )
       {
-        int i = 0;
-        for(Property::Map::iterator iter = container->begin(); iter != container->end(); ++iter)
-        {
-          if(i++ == index)
-          {
-            iter->second = value;
-            break;
-          }
-        }
+        Property::Value& indexValue = container->GetValue( index );
+        indexValue = value;
       }
     }
     break;
@@ -981,7 +945,7 @@ int Property::Value::GetSize() const
       Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
       if(container)
       {
-        ret = container->size();
+        ret = container->Count();
       }
     }
     break;
