@@ -281,6 +281,10 @@ void ImageAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
       {
         meshType = ImageRenderer::NINE_PATCH;
       }
+      else if ( mStyle == Dali::ImageActor::STYLE_NINE_PATCH_NO_CENTER )
+      {
+        meshType = ImageRenderer::NINE_PATCH_NO_CENTER;
+      }
       else
       {
         meshType = ImageRenderer::QUAD;
@@ -291,6 +295,10 @@ void ImageAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
       if ( mStyle == Dali::ImageActor::STYLE_NINE_PATCH )
       {
         meshType = ImageRenderer::GRID_NINE_PATCH;
+      }
+      else if ( mStyle == Dali::ImageActor::STYLE_NINE_PATCH_NO_CENTER )
+      {
+        meshType = ImageRenderer::GRID_NINE_PATCH_NO_CENTER;
       }
       else
       {

@@ -106,9 +106,14 @@ public:
    *                                  | 7 |              8              | 9 |
    *                                  |---|-----------------------------|---|
    *
-   * @endcode
    * Image is rendered as a textured rectangle. The texture
    * is scaled differently over each of the 9 sections.
+   *
+   * STYLE_NINE_PATCH_NO_CENTER:
+   *
+   * Image is rendered in the same way as STYLE_NINE_PATCH,
+   * but the Center Section (5) is not rendered.
+   * @endcode
    *
    * Visualise a Picture Frame:
    *
@@ -123,13 +128,14 @@ public:
    *
    * Note: If GRID hints are enabled (via a Shader that requires it),
    * the above geometry will be further subdivided into rectangles of
-   * approx. 40x40 in size.
-   *
+   * approx. 40x40 in size. STYLE_NINE_PATCH_NO_CENTER is not supported
+   * yet when GRID hints are enabled.
    */
   enum Style
   {
-    STYLE_QUAD,       ///< As a simple quad.
-    STYLE_NINE_PATCH  ///< As a nine-patch.
+    STYLE_QUAD,                 ///< As a simple quad.
+    STYLE_NINE_PATCH,           ///< As a nine-patch.
+    STYLE_NINE_PATCH_NO_CENTER  ///< As a nine-patch without center section being rendered.
   };
 
   /**
