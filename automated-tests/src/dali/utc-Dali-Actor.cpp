@@ -433,9 +433,9 @@ int UtcDaliActorInsert(void)
 
   DALI_TEST_EQUALS( parent.GetChildCount(), 3u, TEST_LOCATION );
 
-  DALI_TEST_CHECK(parent.GetChildAt(0) == first);
-  DALI_TEST_CHECK(parent.GetChildAt(1) == second);
-  DALI_TEST_CHECK(parent.GetChildAt(2) == third);
+  DALI_TEST_CHECK(parent.GetChildAt(0) == second);
+  DALI_TEST_CHECK(parent.GetChildAt(1) == third);
+  DALI_TEST_CHECK(parent.GetChildAt(2) == first);
 
   END_TEST;
 }
