@@ -71,6 +71,10 @@ ImageActor::Style StyleEnum(const std::string &s)
   {
     return Dali::ImageActor::STYLE_NINE_PATCH;
   }
+  else if(s == "STYLE_NINE_PATCH_NO_CENTER")
+  {
+    return Dali::ImageActor::STYLE_NINE_PATCH_NO_CENTER;
+  }
   else // if(s == "QUAD")
   {
     return Dali::ImageActor::STYLE_QUAD;
@@ -82,6 +86,10 @@ std::string StyleString(const ImageActor::Style style)
   if(style == Dali::ImageActor::STYLE_NINE_PATCH)
   {
     return "STYLE_NINE_PATCH";
+  }
+  else if(style == Dali::ImageActor::STYLE_NINE_PATCH_NO_CENTER)
+  {
+    return "STYLE_NINE_PATCH_NO_CENTER";
   }
   else // if(s == "QUAD")
   {

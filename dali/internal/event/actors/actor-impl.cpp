@@ -354,7 +354,7 @@ void Actor::Insert(unsigned int index, Actor& child)
   if ( !child.mParent )
   {
     // Do this first, since user callbacks from within SetParent() may need to remove child
-    if (index < child.GetChildCount())
+    if (index < GetChildCount())
     {
       ActorIter it = mChildren->begin();
       std::advance(it, index);

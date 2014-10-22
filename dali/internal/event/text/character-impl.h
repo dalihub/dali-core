@@ -67,6 +67,20 @@ public:
   CharacterDirection GetCharacterDirection() const;
 
   /**
+   * Returns the character's script.
+   *
+   * @param[in] character The unicode value of the character.
+   *
+   * @return The script of the character.
+   */
+  static Dali::Character::Script GetScript( uint32_t character );
+
+  /**
+   * @copydoc Dali::Character::GetScript()
+   */
+  Dali::Character::Script GetScript() const;
+
+  /**
    * @copydoc Dali::Character::IsLeftToRight()
    */
   bool IsLeftToRight() const;

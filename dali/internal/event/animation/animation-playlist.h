@@ -20,7 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/common/set-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/internal/event/common/complete-notification-interface.h>
 
 namespace Dali
@@ -94,8 +95,8 @@ private: // from CompleteNotificationInterface
 
 private:
 
-  std::set< Animation* > mAnimations; ///< All existing animations (not referenced)
-  std::set< Dali::Animation > mPlaylist; ///< The currently playing animations (reference counted)
+  Dali::Vector< Animation* > mAnimations; ///< All existing animations (not owned)
+  std::vector< Dali::Animation > mPlaylist; ///< The currently playing animations (owned through handle)
 
 };
 

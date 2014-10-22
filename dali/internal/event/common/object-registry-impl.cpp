@@ -46,14 +46,6 @@ ObjectRegistry::~ObjectRegistry()
 
 void ObjectRegistry::RegisterObject( Dali::BaseObject* object )
 {
-  // Assert than an object is only registered once
-  DALI_ASSERT_DEBUG( mDebugRegistry.end() == mDebugRegistry.find( object ) );
-
-#ifdef DEBUG_ENABLED
-  // This allows us to assert that an object is only registered once (debug builds only)
-  mDebugRegistry.insert( object );
-#endif // DEBUG_ENABLED
-
   if ( !mObjectCreatedSignalV2.Empty() )
   {
     Dali::BaseHandle handle( object );
@@ -63,11 +55,6 @@ void ObjectRegistry::RegisterObject( Dali::BaseObject* object )
 
 void ObjectRegistry::UnregisterObject( Dali::BaseObject* object )
 {
-#ifdef DEBUG_ENABLED
-  // This allows us to assert that an object is only registered once (debug builds only)
-  mDebugRegistry.erase( object );
-#endif // DEBUG_ENABLED
-
   mObjectDestroyedSignalV2.Emit( object );
 }
 

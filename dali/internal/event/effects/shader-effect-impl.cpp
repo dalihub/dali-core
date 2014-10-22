@@ -85,7 +85,7 @@ WrapperStrings customShaderWrappers [] =
   },
   {
     CustomMeshPrefixVertex, CustomMeshPrefixFragment,
-    MeshVertex, MeshFragment
+    CustomMeshPostfixVertex, CustomMeshPostfixFragment
   }
 };
 

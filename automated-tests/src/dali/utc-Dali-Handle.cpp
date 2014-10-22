@@ -954,7 +954,7 @@ int UtcDaliHandleGetPropertyGet(void)
   value = Property::Value(Property::MAP);
   value.SetValue("key", "value");
   value.Get(map);
-  DALI_TEST_CHECK( map[0].first == "key" );
+  DALI_TEST_CHECK( map.GetKey(0) == "key" );
 
   END_TEST;
 }

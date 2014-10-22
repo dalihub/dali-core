@@ -15,9 +15,12 @@
  *
  */
 
-// INTERNAL INCLUDES
+// CLASS HEADER
 #include <dali/internal/event/common/property-notification-manager.h>
+
+// INTERNAL INCLUDES
 #include <dali/internal/event/common/property-notification-impl.h>
+#include <dali/internal/common/message.h>
 
 namespace Dali
 {
@@ -36,21 +39,21 @@ PropertyNotificationManager::~PropertyNotificationManager()
 
 void PropertyNotificationManager::PropertyNotificationCreated( PropertyNotification& propertyNotification )
 {
-  mPropertyNotifications.insert( &propertyNotification );
+  mPropertyNotifications.PushBack( &propertyNotification );
 }
 
 void PropertyNotificationManager::PropertyNotificationDestroyed( PropertyNotification& propertyNotification )
 {
-  std::set< PropertyNotification* >::iterator iter = std::find( mPropertyNotifications.begin(), mPropertyNotifications.end(), &propertyNotification );
-  DALI_ASSERT_ALWAYS( iter != mPropertyNotifications.end() && "PropertyNotification not found" );
+  Dali::Vector< PropertyNotification* >::Iterator iter = std::find( mPropertyNotifications.Begin(), mPropertyNotifications.End(), &propertyNotification );
+  DALI_ASSERT_ALWAYS( iter != mPropertyNotifications.End() && "PropertyNotification not found" );
 
-  mPropertyNotifications.erase( iter );
+  mPropertyNotifications.Remove( iter );
 }
 
 void PropertyNotificationManager::NotifyProperty( SceneGraph::PropertyNotification* propertyNotification, bool validity )
 {
-  std::set< PropertyNotification* >::iterator iter = mPropertyNotifications.begin();
-  std::set< PropertyNotification* >::iterator endIter = mPropertyNotifications.end();
+  Dali::Vector< PropertyNotification* >::Iterator iter = mPropertyNotifications.Begin();
+  const Dali::Vector< PropertyNotification* >::Iterator endIter = mPropertyNotifications.End();
 
   // walk the collection of PropertyNotifications
   for( ; iter != endIter; ++iter )

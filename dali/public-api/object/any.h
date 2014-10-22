@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -47,19 +47,19 @@ public:
   /**
    * Default constructor.
    */
-  Any();
+  DALI_IMPORT_API Any();
 
   /**
    * Destructor. Free resources.
    */
-  ~Any();
+  DALI_IMPORT_API ~Any();
 
   /**
    * @brief Pass Assert message
    *
    * @param assertMessage Assert message to report
    */
-  static void AssertAlways( const char* assertMessage );
+  DALI_IMPORT_API static void AssertAlways( const char* assertMessage );
 
   /**
    * @brief Constructs a Any type with the given value.
@@ -130,7 +130,7 @@ public:
    *
    * @param [in] any Any to be assigned which contains a value of identical type to current contents.
    */
-  Any& operator=( const Any& any );
+  DALI_IMPORT_API Any& operator=( const Any& any );
 
   /**
    * @brief Get a value of type Type from container
@@ -149,7 +149,7 @@ public:
    * @return The std::type_info of the stored value or the type info of the void
    * type if there is no value stored.
    */
-  const std::type_info& GetType() const;
+  DALI_IMPORT_API const std::type_info& GetType() const;
 
   /**
    * @brief Retrieves the stored value in the Any type.

@@ -3,7 +3,10 @@
   attribute mediump vec3  aPosition;
   attribute mediump vec2  aTexCoord;
 
+  uniform   mediump mat4  uModelView;
+  uniform   mediump mat4  uProjection;
   uniform   mediump mat4  uMvpMatrix;
+  uniform   mediump mat3  uNormalMatrix;
   uniform   lowp    vec4  uColor;
   uniform   lowp    vec4  uTextColor;
 
@@ -31,14 +34,13 @@
 </VertexShader>
 
 <FragmentShader>
-#extension GL_OES_standard_derivatives : enable
 
   uniform mediump sampler2D sTexture;
   uniform highp   vec4      sTextureRect;
   uniform lowp    vec4      uColor;
   uniform highp   vec2      uSmoothing;
 
-  varying highp   vec2      vTexCoord;
+  varying highp vec2      vTexCoord;
 
 #ifdef USE_GRADIENT
   varying lowp    vec4      vColor;
@@ -49,9 +51,7 @@
   void main()
   {
     // sample distance field
-    highp vec2 offset = dFdx(vTexCoord) * 0.33333;
-    highp float distanceL = texture2D(sTexture, vTexCoord - offset).a;
-    highp float distanceR = texture2D(sTexture, vTexCoord + offset).a;
+    highp float distance = texture2D(sTexture, vTexCoord).a;
 
 #ifdef USE_GRADIENT
     lowp vec4 color = clamp(vColor, 0., 1.); // gradiant calculation can overflow.
@@ -60,19 +60,10 @@
 #endif
 
     // adjust fragment alpha by sampled distance
-    mediump float distance = distanceL * .5 + distanceR *.5;
-    mediump vec3 attenuation = vec3( distanceL, distance, distanceR );
-    attenuation = smoothstep(uSmoothing[0], uSmoothing[1], attenuation );
-
     color.a *= smoothstep(uSmoothing[0], uSmoothing[1], distance );
 
-    // color multiplied by Actor color
-    color = uColor * color;
-
-    // apply attenuation
-    color.rgb = mix(vec3(1.)-color.rgb, color.rgb, attenuation);
-
-    gl_FragColor = color;
+    // final color multiplied by Actor color
+    gl_FragColor = uColor * color;
   }
 
 </FragmentShader>

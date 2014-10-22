@@ -312,6 +312,7 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
   {
     case QUAD:
     case NINE_PATCH:
+    case NINE_PATCH_NO_CENTER:
     {
       const GLsizei vertexCount = mVertexBuffer->GetBufferSize() / sizeof(Vertex2D); // compiler will optimize this to >> if possible
       mContext->DrawArrays( GL_TRIANGLE_STRIP, 0, vertexCount );
@@ -320,6 +321,7 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
     }
     case GRID_QUAD:
     case GRID_NINE_PATCH:
+    case GRID_NINE_PATCH_NO_CENTER:
     {
       const GLsizei indexCount = mIndexBuffer->GetBufferSize() / sizeof(GLushort); // compiler will optimize this to >> if possible
       mIndexBuffer->Bind();
@@ -395,7 +397,12 @@ void ImageRenderer::GenerateMeshData( Texture* texture )
     }
     case ImageRenderer::NINE_PATCH:
     {
-      SetNinePatchMeshData( texture, mGeometrySize, mBorder, mBorderInPixels, pixelArea );
+      SetNinePatchMeshData( texture, mGeometrySize, mBorder, mBorderInPixels, pixelArea, false );
+      break;
+    }
+    case ImageRenderer::NINE_PATCH_NO_CENTER:
+    {
+      SetNinePatchMeshData( texture, mGeometrySize, mBorder, mBorderInPixels, pixelArea, true );
       break;
     }
     case ImageRenderer::GRID_QUAD:
@@ -404,6 +411,7 @@ void ImageRenderer::GenerateMeshData( Texture* texture )
       break;
     }
     case ImageRenderer::GRID_NINE_PATCH:
+    case ImageRenderer::GRID_NINE_PATCH_NO_CENTER:
     {
       SetGridMeshData( texture, mGeometrySize, &mBorder, mBorderInPixels, pixelArea );
       break;
@@ -460,7 +468,7 @@ void ImageRenderer::SetQuadMeshData( Texture* texture, const Vector2& size, cons
   UpdateIndexBuffer( 0, NULL );
 }
 
-void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size, const Vector4& border, bool borderInPixels, const PixelArea* pixelArea )
+void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size, const Vector4& border, bool borderInPixels, const PixelArea* pixelArea, bool noCenter )
 {
   DALI_ASSERT_ALWAYS( mTexture->GetWidth()  > 0.0f && "Invalid Texture width" );
   DALI_ASSERT_ALWAYS( mTexture->GetHeight() > 0.0f && "Invalid Texture height" );
@@ -516,82 +524,172 @@ void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size,
   const float y2 = y0 + size.y - borderBottom;
   const float y3 = y0 + size.y;
 
-  /*
-   * We're breaking a quad in to 9 smaller quads, so that when it's
-   * stretched the corners maintain their size.
-   * For speed the 9-patch is drawn with a single triangle span, the draw
-   * order of the span is 1->9.
-   * Previously it would draw three separate spans (1->3, 4->6, 7->9), but now it
-   * it does it one go by turning the corner when gets to the end of each row.
-   *
-   * No indices are needed as we tell GL to render in strip mode
-   * (GL_TRIANGLE_STRIP), which is faster, and consumes less
-   * memory.
-   *
-   *  |---|---------------|---|
-   *  |  7|    --> 8      | 9 |
-   *  |---|---------------|---|
-   *  |   |               |   |
-   *  | 6 |     <-- 5     | 4 |
-   *  |   |               |   |
-   *  |   |               |   |
-   *  |-------------------|---|
-   *  | 1 |      2 -->    | 3 |
-   *  |---|---------------|---|
-   */
+  Vertex2D* verts = NULL;
+  size_t vertsSize = 0;
 
-  Vertex2D verts[]={
-                     // bottom left
-                     {  x0, y0, u0, v0 },
-                     {  x0, y1, u0, v1 },
-                     {  x1, y0, u1, v0 },
-                     {  x1, y1, u1, v1 },
+  if ( !noCenter )
+  {
+    /*
+     * We're breaking a quad in to 9 smaller quads, so that when it's
+     * stretched the corners maintain their size.
+     * For speed the 9-patch is drawn with a single triangle span, the draw
+     * order of the span is 1->9.
+     * Previously it would draw three separate spans (1->3, 4->6, 7->9), but now it
+     * it does it one go by turning the corner when gets to the end of each row.
+     *
+     * No indices are needed as we tell GL to render in strip mode
+     * (GL_TRIANGLE_STRIP), which is faster, and consumes less
+     * memory.
+     *
+     *  |---|---------------|---|
+     *  |  7|    --> 8      | 9 |
+     *  |---|---------------|---|
+     *  |   |               |   |
+     *  | 6 |     <-- 5     | 4 |
+     *  |   |               |   |
+     *  |   |               |   |
+     *  |---|---------------|---|
+     *  | 1 |      2 -->    | 3 |
+     *  |---|---------------|---|
+     */
 
-                     // bottom right
-                     {  x2, y0, u2, v0 },
-                     {  x2, y1, u2, v1 },
-                     {  x3, y0, u3, v0 },
-                     {  x3, y1, u3, v1 },
+    Vertex2D vertsWithCenter[]={
+                                 // bottom left
+                                 {  x0, y0, u0, v0 },
+                                 {  x0, y1, u0, v1 },
+                                 {  x1, y0, u1, v0 },
+                                 {  x1, y1, u1, v1 },
 
-                     // turn the corner
-                     {  x3, y1, u3, v1 },
-                     {  x3, y1, u3, v1 },
+                                 // bottom middle
+                                 {  x2, y0, u2, v0 },
+                                 {  x2, y1, u2, v1 },
 
-                     // 10 verts here
+                                 // bottom right
+                                 {  x3, y0, u3, v0 },
+                                 {  x3, y1, u3, v1 },
 
-                     // middle right
-                     {  x3, y2, u3, v2 },
-                     {  x2, y1, u2, v1 },
-                     {  x2, y2, u2, v2 },
+                                 // turn the corner
+                                 {  x3, y1, u3, v1 },
+                                 {  x3, y1, u3, v1 },
 
-                     // middle left
+                                 // 10 verts here
 
-                     {  x1, y1, u1, v1 },
-                     {  x1, y2, u1, v2 },
-                     {  x0, y1, u0, v1 },
-                     {  x0, y2, u0, v2 },
+                                 // middle right
+                                 {  x3, y2, u3, v2 },
+                                 {  x2, y1, u2, v1 },
+                                 {  x2, y2, u2, v2 },
 
-                     // turn the corner
-                     {  x0, y2, u0, v2 },
-                     {  x0, y2, u0, v2 },
+                                 // middle left
 
-                     // top left
-                     {  x0, y3, u0, v3 },
-                     {  x1, y2, u1, v2 },
-                     {  x1, y3, u1, v3 },
+                                 {  x1, y1, u1, v1 },
+                                 {  x1, y2, u1, v2 },
+                                 {  x0, y1, u0, v1 },
+                                 {  x0, y2, u0, v2 },
 
-                     // top right
+                                 // turn the corner
+                                 {  x0, y2, u0, v2 },
+                                 {  x0, y2, u0, v2 },
 
-                     {  x2, y2, u2, v2 },
-                     {  x2, y3, u2, v3 },
-                     {  x3, y2, u3, v2 },
-                     {  x3, y3, u3, v3 },
-                   };
+                                 // top left
+                                 {  x0, y3, u0, v3 },
+                                 {  x1, y2, u1, v2 },
+                                 {  x1, y3, u1, v3 },
 
-  const unsigned int vertexCount = sizeof( verts ) / sizeof( verts[0] );
+                                 // top middle
+                                 {  x2, y2, u2, v2 },
+                                 {  x2, y3, u2, v3 },
 
+                                 // top right
+                                 {  x3, y2, u3, v2 },
+                                 {  x3, y3, u3, v3 },
+                               };
+
+    verts = vertsWithCenter;
+    vertsSize = sizeof( vertsWithCenter );
+  }
+  else
+  {
+    /*
+     * The center part is not going to be rendered. The 9-patch border is drawn with
+     * a single triangle span, and the draw order of the span is 1->8.
+     *
+     *  |---|---------------|---|
+     *  | 7 |    <-- 6      | 5 |
+     *  |---|---------------|---|
+     *  |   |               |   |
+     *  |   |               |   |
+     *  | 8 |               | 4 |
+     *  |   | (not rendered)|   |
+     *  |   |               |   |
+     *  |---|---------------|---|
+     *  | 1 |      2 -->    | 3 |
+     *  |---|---------------|---|
+     */
+
+    Vertex2D vertsWithNoCenter[]={
+                                   // bottom left (1)
+                                   {  x0, y0, u0, v0 },
+                                   {  x0, y1, u0, v1 },
+                                   {  x1, y0, u1, v0 },
+                                   {  x1, y1, u1, v1 },
+
+                                   // bottom middle (2)
+                                   {  x2, y0, u2, v0 },
+                                   {  x2, y1, u2, v1 },
+
+                                   // bottom right (3)
+                                   {  x3, y0, u3, v0 },
+                                   {  x3, y1, u3, v1 },
+
+                                   // reset the starting point to x3, y1
+                                   {  x3, y1, u3, v1 },
+                                   {  x3, y1, u3, v1 },
+
+                                   // middle right (4)
+                                   {  x3, y2, u3, v2 },
+                                   {  x2, y1, u2, v1 },
+                                   {  x2, y2, u2, v2 },
+
+                                   // corner turning
+                                   {  x2, y2, u2, v2 },
+                                   {  x3, y2, u3, v2 },
+                                   {  x3, y2, u3, v2 },
+
+                                   // top right (5)
+                                   {  x3, y3, u3, v3 },
+                                   {  x2, y2, u2, v2 },
+                                   {  x2, y3, u2, v3 },
+
+                                   // top middle (6)
+                                   {  x1, y2, u1, v2 },
+                                   {  x1, y3, u1, v3 },
+
+                                   // reset point to x0,y3
+                                   {  x1, y3, u1, v3 },
+                                   {  x0, y3, u0, v3 },
+                                   {  x0, y3, u0, v3 },
+
+                                   // top left box (starting from (x0,y3)) (7)
+                                   {  x0, y2, u0, v2 },
+                                   {  x1, y3, u1, v3 },
+                                   {  x1, y2, u1, v2 },
+
+                                   // reset point
+                                   {  x1, y2, u1, v2 },
+
+                                   // middle left (8)
+                                   {  x0, y2, u0, v2 },
+                                   {  x1, y1, u1, v2 },
+                                   {  x0, y1, u0, v2 },
+                                 };
+
+    verts = vertsWithNoCenter;
+    vertsSize = sizeof( vertsWithNoCenter );
+  }
+
+  const unsigned int vertexCount = vertsSize / sizeof( verts[0] );
   texture->MapUV( vertexCount, verts, pixelArea );
-  UpdateVertexBuffer( sizeof(verts), verts );
+  UpdateVertexBuffer( vertsSize, verts );
   UpdateIndexBuffer( 0, NULL );
 }
 

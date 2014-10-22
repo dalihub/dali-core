@@ -53,8 +53,6 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/light.h>
 #include <dali/public-api/common/loading-state.h>
-#include <dali/public-api/common/map-wrapper.h>
-#include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/view-mode.h>
@@ -132,6 +130,7 @@
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-index.h>
 #include <dali/public-api/object/property-input.h>
+#include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-notification-declarations.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/public-api/object/property-types.h>
