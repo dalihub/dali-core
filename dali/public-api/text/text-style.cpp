@@ -29,62 +29,89 @@
 
 #include <stdint.h>
 
+namespace
+{
+
+// Number of bits for an index mask - increase if more attributes are added...
+const unsigned int PARAMETER_BITS =          3u;
+const uint64_t ONE = 1lu;
+
+// Set mask for this number of bits
+const uint64_t PARAMETER_MASK =              ~( -1l << PARAMETER_BITS );
+
+// Shift values for attribute indices
+const unsigned int COMMON_INDEX_SHIFT =      0u;                                     // starts at bit 0
+const unsigned int WEIGHT_INDEX_SHIFT =      PARAMETER_BITS * 1; // starts at bit 3
+const unsigned int ITALICS_INDEX_SHIFT =     PARAMETER_BITS * 2; // starts at bit 6
+const unsigned int UNDERLINE_INDEX_SHIFT =   PARAMETER_BITS * 3; // starts at bit 9
+const unsigned int DROP_SHADOW_INDEX_SHIFT = PARAMETER_BITS * 4; // starts at bit 12
+const unsigned int GLOW_INDEX_SHIFT =        PARAMETER_BITS * 5; // starts at bit 15
+const unsigned int OUTLINE_INDEX_SHIFT =     PARAMETER_BITS * 6; // starts at bit 18
+const unsigned int GRADIENT_INDEX_SHIFT =    PARAMETER_BITS * 7; // starts at bit 21
+const unsigned int PARAMETER_FLAGS =         PARAMETER_BITS * 8; // 24 == 3 x 8
+
+// Position in flags for attribute index
+const uint64_t COMMON_INDEX =                0lu;                                                                               // bits  0 ..  2
+const uint64_t WEIGHT_INDEX =                PARAMETER_MASK << WEIGHT_INDEX_SHIFT;      // bits  3 ..  5
+const uint64_t ITALICS_INDEX =               PARAMETER_MASK << ITALICS_INDEX_SHIFT;     // bits  6 ..  8
+const uint64_t UNDERLINE_INDEX =             PARAMETER_MASK << UNDERLINE_INDEX_SHIFT;   // bits  9 .. 11
+const uint64_t DROP_SHADOW_INDEX =           PARAMETER_MASK << DROP_SHADOW_INDEX_SHIFT; // bits 12 .. 14
+const uint64_t GLOW_INDEX =                  PARAMETER_MASK << GLOW_INDEX_SHIFT;        // bits 15 .. 17
+const uint64_t OUTLINE_INDEX =               PARAMETER_MASK << OUTLINE_INDEX_SHIFT;     // bits 18 .. 20
+const uint64_t GRADIENT_INDEX =              PARAMETER_MASK << GRADIENT_INDEX_SHIFT;    // bits 21 .. 23
+
+// Flag positions and enables for attributes
+const uint64_t ITALICS_ENABLED =             ONE << PARAMETER_FLAGS;          // bit 24
+const uint64_t UNDERLINE_ENABLED =           ONE << ( PARAMETER_FLAGS + 1 );  // bit 25
+const uint64_t DROP_SHADOW_ENABLED =         ONE << ( PARAMETER_FLAGS + 2 );  // bit 26
+const uint64_t GLOW_ENABLED =                ONE << ( PARAMETER_FLAGS + 3 );  // bit 27
+const uint64_t OUTLINE_ENABLED =             ONE << ( PARAMETER_FLAGS + 4 );  // bit 28
+const uint64_t GRADIENT_ENABLED =            ONE << ( PARAMETER_FLAGS + 5 );  // bit 29
+
+const uint64_t FONT_NAME_EXISTS =            ONE << ( PARAMETER_FLAGS + 6 );  // bit 30
+const uint64_t FONT_STYLE_EXISTS =           ONE << ( PARAMETER_FLAGS + 7 );  // bit 31
+const uint64_t FONT_SIZE_EXISTS =            ONE << ( PARAMETER_FLAGS + 8 );  // bit 32
+const uint64_t TEXT_COLOR_EXISTS =           ONE << ( PARAMETER_FLAGS + 9 );  // bit 33
+const uint64_t COMMON_PARAMETERS_EXISTS =    ( FONT_NAME_EXISTS | FONT_STYLE_EXISTS | FONT_SIZE_EXISTS | TEXT_COLOR_EXISTS );
+const uint64_t FONT_WEIGHT_EXISTS =          ONE << ( PARAMETER_FLAGS + 10 ); // bit 34
+const uint64_t SMOOTH_EDGE_EXISTS =          ONE << ( PARAMETER_FLAGS + 11 ); // bit 35
+const uint64_t SMOOTH_WEIGHT_EXISTS =        ( FONT_WEIGHT_EXISTS | SMOOTH_EDGE_EXISTS );
+const uint64_t ITALICS_EXISTS =              ONE << ( PARAMETER_FLAGS + 12 ); // bit 36
+const uint64_t UNDERLINE_EXISTS =            ONE << ( PARAMETER_FLAGS + 13 ); // bit 37
+const uint64_t DROP_SHADOW_EXISTS =          ONE << ( PARAMETER_FLAGS + 14 ); // bit 38
+const uint64_t GLOW_EXISTS =                 ONE << ( PARAMETER_FLAGS + 15 ); // bit 39
+const uint64_t OUTLINE_EXISTS =              ONE << ( PARAMETER_FLAGS + 16 ); // bit 40
+const uint64_t GRADIENT_EXISTS =             ONE << ( PARAMETER_FLAGS + 17 ); // bit 41
+const uint64_t ATTRIBUTE_END =               GRADIENT_EXISTS;
+
+const std::string DEFAULT_NAME;
+const Dali::PointSize DEFAULT_FONT_POINT_SIZE( 0.f );
+
+} // unnamed namespace
+
 namespace Dali
 {
+
+const Vector4           TextStyle::DEFAULT_TEXT_COLOR( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );    // cannot use Color::WHITE because it may or may not be initialized yet.
+const TextStyle::Weight TextStyle::DEFAULT_FONT_WEIGHT( TextStyle::REGULAR );
+const float             TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD( 0.46f );
+const Degree            TextStyle::DEFAULT_ITALICS_ANGLE( 20.0f );
+const float             TextStyle::DEFAULT_UNDERLINE_THICKNESS( 0.f );
+const float             TextStyle::DEFAULT_UNDERLINE_POSITION( 0.f );
+const Vector4           TextStyle::DEFAULT_SHADOW_COLOR( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) );  // cannot use Color::BLACK because it may or may not be initialized yet.
+const Vector2           TextStyle::DEFAULT_SHADOW_OFFSET( 1.0f, 1.0f );
+const float             TextStyle::DEFAULT_SHADOW_SIZE( 0.0f );
+const Vector4           TextStyle::DEFAULT_GLOW_COLOR( Vector4( 1.0f, 1.0f, 0.0f, 1.0f ) );    // cannot use Color::YELLOW because it may or may not be initialized yet.
+const float             TextStyle::DEFAULT_GLOW_INTENSITY( 0.05f );
+const Vector4           TextStyle::DEFAULT_OUTLINE_COLOR( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) ); // cannot use Color::BLACK because it may or may not be initialized yet.
+const Vector2           TextStyle::DEFAULT_OUTLINE_THICKNESS( 0.51f, 0.00f );
+const Vector4           TextStyle::DEFAULT_GRADIENT_COLOR( 1.0f, 1.0f, 1.0f, 1.0f );           // cannot use Color::WHITE because it may or may not be initialized yet.
+const Vector2           TextStyle::DEFAULT_GRADIENT_START_POINT( 0.0f, 0.0f );
+const Vector2           TextStyle::DEFAULT_GRADIENT_END_POINT( 0.0f, 0.0f );
 
 class TextStyleContainer
 {
 private:
-
-  // Number of bits for an index mask - increase if more attributes are added...
-  static const unsigned int PARAMETER_BITS;
-  // Set mask for this number of bits
-  static const uint64_t PARAMETER_MASK;
-
-  // Shift values for attribute indices
-  static const unsigned int COMMON_INDEX_SHIFT;
-  static const unsigned int WEIGHT_INDEX_SHIFT;
-  static const unsigned int ITALICS_INDEX_SHIFT;
-  static const unsigned int UNDERLINE_INDEX_SHIFT;
-  static const unsigned int DROP_SHADOW_INDEX_SHIFT;
-  static const unsigned int GLOW_INDEX_SHIFT;
-  static const unsigned int OUTLINE_INDEX_SHIFT;
-  static const unsigned int GRADIENT_INDEX_SHIFT;
-  static const unsigned int PARAMETER_FLAGS;
-
-  // Position in flags for attribute index
-  static const uint64_t COMMON_INDEX;
-  static const uint64_t WEIGHT_INDEX;
-  static const uint64_t ITALICS_INDEX;
-  static const uint64_t UNDERLINE_INDEX;
-  static const uint64_t DROP_SHADOW_INDEX;
-  static const uint64_t GLOW_INDEX;
-  static const uint64_t OUTLINE_INDEX;
-  static const uint64_t GRADIENT_INDEX;
-
-  // Flag positions and enables for attributes
-  static const uint64_t ITALICS_ENABLED;
-  static const uint64_t UNDERLINE_ENABLED;
-  static const uint64_t DROP_SHADOW_ENABLED;
-  static const uint64_t GLOW_ENABLED;
-  static const uint64_t OUTLINE_ENABLED;
-  static const uint64_t GRADIENT_ENABLED;
-
-  static const uint64_t FONT_NAME_EXISTS;
-  static const uint64_t FONT_STYLE_EXISTS;
-  static const uint64_t FONT_SIZE_EXISTS;
-  static const uint64_t TEXT_COLOR_EXISTS;
-  static const uint64_t COMMON_PARAMETERS_EXISTS;
-  static const uint64_t FONT_WEIGHT_EXISTS;
-  static const uint64_t SMOOTH_EDGE_EXISTS;
-  static const uint64_t SMOOTH_WEIGHT_EXISTS;
-  static const uint64_t ITALICS_EXISTS;
-  static const uint64_t UNDERLINE_EXISTS;
-  static const uint64_t DROP_SHADOW_EXISTS;
-  static const uint64_t GLOW_EXISTS;
-  static const uint64_t OUTLINE_EXISTS;
-  static const uint64_t GRADIENT_EXISTS;
-  static const uint64_t ATTRIBUTE_END;
 
   TextStyleContainer()
   : mFlags( 0 )
@@ -254,81 +281,6 @@ private:
   uint64_t mFlags;             ///< flags for used attributes, packed with position in container
   friend class TextStyle;
 };
-
-// Number of bits for an index mask - increase if more attributes are added...
-const unsigned int TextStyleContainer::PARAMETER_BITS =          3u;
-const uint64_t ONE = 1lu;
-
-// Set mask for this number of bits
-const uint64_t TextStyleContainer::PARAMETER_MASK =              ~( -1l << TextStyleContainer::PARAMETER_BITS );
-
-// Shift values for attribute indices
-const unsigned int TextStyleContainer::COMMON_INDEX_SHIFT =      0u;                                     // starts at bit 0
-const unsigned int TextStyleContainer::WEIGHT_INDEX_SHIFT =      TextStyleContainer::PARAMETER_BITS * 1; // starts at bit 3
-const unsigned int TextStyleContainer::ITALICS_INDEX_SHIFT =     TextStyleContainer::PARAMETER_BITS * 2; // starts at bit 6
-const unsigned int TextStyleContainer::UNDERLINE_INDEX_SHIFT =   TextStyleContainer::PARAMETER_BITS * 3; // starts at bit 9
-const unsigned int TextStyleContainer::DROP_SHADOW_INDEX_SHIFT = TextStyleContainer::PARAMETER_BITS * 4; // starts at bit 12
-const unsigned int TextStyleContainer::GLOW_INDEX_SHIFT =        TextStyleContainer::PARAMETER_BITS * 5; // starts at bit 15
-const unsigned int TextStyleContainer::OUTLINE_INDEX_SHIFT =     TextStyleContainer::PARAMETER_BITS * 6; // starts at bit 18
-const unsigned int TextStyleContainer::GRADIENT_INDEX_SHIFT =    TextStyleContainer::PARAMETER_BITS * 7; // starts at bit 21
-const unsigned int TextStyleContainer::PARAMETER_FLAGS =         TextStyleContainer::PARAMETER_BITS * 8; // 24 == 3 x 8
-
-// Position in flags for attribute index
-const uint64_t TextStyleContainer::COMMON_INDEX =                0lu;                                                                               // bits  0 ..  2
-const uint64_t TextStyleContainer::WEIGHT_INDEX =                TextStyleContainer::PARAMETER_MASK << TextStyleContainer::WEIGHT_INDEX_SHIFT;      // bits  3 ..  5
-const uint64_t TextStyleContainer::ITALICS_INDEX =               TextStyleContainer::PARAMETER_MASK << TextStyleContainer::ITALICS_INDEX_SHIFT;     // bits  6 ..  8
-const uint64_t TextStyleContainer::UNDERLINE_INDEX =             TextStyleContainer::PARAMETER_MASK << TextStyleContainer::UNDERLINE_INDEX_SHIFT;   // bits  9 .. 11
-const uint64_t TextStyleContainer::DROP_SHADOW_INDEX =           TextStyleContainer::PARAMETER_MASK << TextStyleContainer::DROP_SHADOW_INDEX_SHIFT; // bits 12 .. 14
-const uint64_t TextStyleContainer::GLOW_INDEX =                  TextStyleContainer::PARAMETER_MASK << TextStyleContainer::GLOW_INDEX_SHIFT;        // bits 15 .. 17
-const uint64_t TextStyleContainer::OUTLINE_INDEX =               TextStyleContainer::PARAMETER_MASK << TextStyleContainer::OUTLINE_INDEX_SHIFT;     // bits 18 .. 20
-const uint64_t TextStyleContainer::GRADIENT_INDEX =              TextStyleContainer::PARAMETER_MASK << TextStyleContainer::GRADIENT_INDEX_SHIFT;    // bits 21 .. 23
-
-// Flag positions and enables for attributes
-const uint64_t TextStyleContainer::ITALICS_ENABLED =             ONE << TextStyleContainer::PARAMETER_FLAGS;          // bit 24
-const uint64_t TextStyleContainer::UNDERLINE_ENABLED =           ONE << ( TextStyleContainer::PARAMETER_FLAGS + 1 );  // bit 25
-const uint64_t TextStyleContainer::DROP_SHADOW_ENABLED =         ONE << ( TextStyleContainer::PARAMETER_FLAGS + 2 );  // bit 26
-const uint64_t TextStyleContainer::GLOW_ENABLED =                ONE << ( TextStyleContainer::PARAMETER_FLAGS + 3 );  // bit 27
-const uint64_t TextStyleContainer::OUTLINE_ENABLED =             ONE << ( TextStyleContainer::PARAMETER_FLAGS + 4 );  // bit 28
-const uint64_t TextStyleContainer::GRADIENT_ENABLED =            ONE << ( TextStyleContainer::PARAMETER_FLAGS + 5 );  // bit 29
-
-const uint64_t TextStyleContainer::FONT_NAME_EXISTS =            ONE << ( TextStyleContainer::PARAMETER_FLAGS + 6 );  // bit 30
-const uint64_t TextStyleContainer::FONT_STYLE_EXISTS =           ONE << ( TextStyleContainer::PARAMETER_FLAGS + 7 );  // bit 31
-const uint64_t TextStyleContainer::FONT_SIZE_EXISTS =            ONE << ( TextStyleContainer::PARAMETER_FLAGS + 8 );  // bit 32
-const uint64_t TextStyleContainer::TEXT_COLOR_EXISTS =           ONE << ( TextStyleContainer::PARAMETER_FLAGS + 9 );  // bit 33
-const uint64_t TextStyleContainer::COMMON_PARAMETERS_EXISTS =    ( TextStyleContainer::FONT_NAME_EXISTS | TextStyleContainer::FONT_STYLE_EXISTS | TextStyleContainer::FONT_SIZE_EXISTS | TextStyleContainer::TEXT_COLOR_EXISTS );
-const uint64_t TextStyleContainer::FONT_WEIGHT_EXISTS =          ONE << ( TextStyleContainer::PARAMETER_FLAGS + 10 ); // bit 34
-const uint64_t TextStyleContainer::SMOOTH_EDGE_EXISTS =          ONE << ( TextStyleContainer::PARAMETER_FLAGS + 11 ); // bit 35
-const uint64_t TextStyleContainer::SMOOTH_WEIGHT_EXISTS =        ( TextStyleContainer::FONT_WEIGHT_EXISTS | TextStyleContainer::SMOOTH_EDGE_EXISTS );
-const uint64_t TextStyleContainer::ITALICS_EXISTS =              ONE << ( TextStyleContainer::PARAMETER_FLAGS + 12 ); // bit 36
-const uint64_t TextStyleContainer::UNDERLINE_EXISTS =            ONE << ( TextStyleContainer::PARAMETER_FLAGS + 13 ); // bit 37
-const uint64_t TextStyleContainer::DROP_SHADOW_EXISTS =          ONE << ( TextStyleContainer::PARAMETER_FLAGS + 14 ); // bit 38
-const uint64_t TextStyleContainer::GLOW_EXISTS =                 ONE << ( TextStyleContainer::PARAMETER_FLAGS + 15 ); // bit 39
-const uint64_t TextStyleContainer::OUTLINE_EXISTS =              ONE << ( TextStyleContainer::PARAMETER_FLAGS + 16 ); // bit 40
-const uint64_t TextStyleContainer::GRADIENT_EXISTS =             ONE << ( TextStyleContainer::PARAMETER_FLAGS + 17 ); // bit 41
-const uint64_t TextStyleContainer::ATTRIBUTE_END =               TextStyleContainer::GRADIENT_EXISTS;
-
-const Vector4           TextStyle::DEFAULT_TEXT_COLOR( Vector4( 1.0f, 1.0f, 1.0f, 1.0f ) );    // cannot use Color::WHITE because it may or may not be initialized yet.
-const TextStyle::Weight TextStyle::DEFAULT_FONT_WEIGHT( TextStyle::REGULAR );
-const float             TextStyle::DEFAULT_SMOOTH_EDGE_DISTANCE_FIELD( 0.46f );
-const Degree            TextStyle::DEFAULT_ITALICS_ANGLE( 20.0f );
-const float             TextStyle::DEFAULT_UNDERLINE_THICKNESS( 0.f );
-const float             TextStyle::DEFAULT_UNDERLINE_POSITION( 0.f );
-const Vector4           TextStyle::DEFAULT_SHADOW_COLOR( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) );  // cannot use Color::BLACK because it may or may not be initialized yet.
-const Vector2           TextStyle::DEFAULT_SHADOW_OFFSET( 1.0f, 1.0f );
-const float             TextStyle::DEFAULT_SHADOW_SIZE( 0.0f );
-const Vector4           TextStyle::DEFAULT_GLOW_COLOR( Vector4( 1.0f, 1.0f, 0.0f, 1.0f ) );    // cannot use Color::YELLOW because it may or may not be initialized yet.
-const float             TextStyle::DEFAULT_GLOW_INTENSITY( 0.05f );
-const Vector4           TextStyle::DEFAULT_OUTLINE_COLOR( Vector4( 0.0f, 0.0f, 0.0f, 1.0f ) ); // cannot use Color::BLACK because it may or may not be initialized yet.
-const Vector2           TextStyle::DEFAULT_OUTLINE_THICKNESS( 0.51f, 0.00f );
-const Vector4           TextStyle::DEFAULT_GRADIENT_COLOR( 1.0f, 1.0f, 1.0f, 1.0f );           // cannot use Color::WHITE because it may or may not be initialized yet.
-const Vector2           TextStyle::DEFAULT_GRADIENT_START_POINT( 0.0f, 0.0f );
-const Vector2           TextStyle::DEFAULT_GRADIENT_END_POINT( 0.0f, 0.0f );
-
-namespace
-{
-const std::string DEFAULT_NAME;
-const PointSize DEFAULT_FONT_POINT_SIZE( 0.f );
-} // namespace
 
 TextStyle::TextStyle()
 : mContainer( NULL )
@@ -531,7 +483,7 @@ bool TextStyle::operator==( const TextStyle& textStyle ) const
   // different flags are set, without taking into account the indices, then return not equal.
   // Two equal styles can have different indices if the parameters have been set in different order.
   else if( ( mContainer->mParameters.Size() != textStyle.mContainer->mParameters.Size() ) ||
-           ( mContainer->mFlags >> TextStyleContainer::PARAMETER_FLAGS ) != ( textStyle.mContainer->mFlags >> TextStyleContainer::PARAMETER_FLAGS ) )
+           ( mContainer->mFlags >> PARAMETER_FLAGS ) != ( textStyle.mContainer->mFlags >> PARAMETER_FLAGS ) )
   {
     return false;
   }
@@ -941,51 +893,51 @@ void TextStyle::Reset( Mask mask )
     resetAll = true;
 
     // Checks if a style parameter is set in the style but is not in the mask.
-    if( ( mContainer->mFlags & TextStyleContainer::FONT_NAME_EXISTS ) && !( mask & FONT ) )
+    if( ( mContainer->mFlags & FONT_NAME_EXISTS ) && !( mask & FONT ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::FONT_STYLE_EXISTS ) && !( mask & STYLE ) )
+    else if( ( mContainer->mFlags & FONT_STYLE_EXISTS ) && !( mask & STYLE ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::FONT_SIZE_EXISTS ) && !( mask & SIZE ) )
+    else if( ( mContainer->mFlags & FONT_SIZE_EXISTS ) && !( mask & SIZE ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::TEXT_COLOR_EXISTS ) && !( mask & COLOR ) )
+    else if( ( mContainer->mFlags & TEXT_COLOR_EXISTS ) && !( mask & COLOR ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::FONT_WEIGHT_EXISTS ) && !( mask & WEIGHT ) )
+    else if( ( mContainer->mFlags & FONT_WEIGHT_EXISTS ) && !( mask & WEIGHT ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::SMOOTH_EDGE_EXISTS ) && !( mask & SMOOTH ) )
+    else if( ( mContainer->mFlags & SMOOTH_EDGE_EXISTS ) && !( mask & SMOOTH ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::ITALICS_EXISTS ) && !( mask & ITALICS ) )
+    else if( ( mContainer->mFlags & ITALICS_EXISTS ) && !( mask & ITALICS ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::UNDERLINE_EXISTS ) && !( mask & UNDERLINE ) )
+    else if( ( mContainer->mFlags & UNDERLINE_EXISTS ) && !( mask & UNDERLINE ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::DROP_SHADOW_EXISTS ) && !( mask & SHADOW ) )
+    else if( ( mContainer->mFlags & DROP_SHADOW_EXISTS ) && !( mask & SHADOW ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::GLOW_EXISTS ) && !( mask & GLOW ) )
+    else if( ( mContainer->mFlags & GLOW_EXISTS ) && !( mask & GLOW ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::OUTLINE_EXISTS ) && !( mask & OUTLINE ) )
+    else if( ( mContainer->mFlags & OUTLINE_EXISTS ) && !( mask & OUTLINE ) )
     {
       resetAll = false;
     }
-    else if( ( mContainer->mFlags & TextStyleContainer::GRADIENT_EXISTS ) && !( mask & GRADIENT ) )
+    else if( ( mContainer->mFlags & GRADIENT_EXISTS ) && !( mask & GRADIENT ) )
     {
       resetAll = false;
     }
@@ -1162,7 +1114,7 @@ bool TextStyle::IsItalicsEnabled() const
 {
   if ( mContainer )
   {
-    return ( ( mContainer->mFlags & TextStyleContainer::ITALICS_ENABLED ) != 0 );
+    return ( ( mContainer->mFlags & ITALICS_ENABLED ) != 0 );
   }
   else
   {
@@ -1192,7 +1144,7 @@ bool TextStyle::IsUnderlineEnabled() const
 {
   if ( mContainer )
   {
-    return ( ( mContainer->mFlags & TextStyleContainer::UNDERLINE_ENABLED ) != 0 );
+    return ( ( mContainer->mFlags & UNDERLINE_ENABLED ) != 0 );
   }
   else
   {
@@ -1234,7 +1186,7 @@ bool TextStyle::IsShadowEnabled() const
 {
   if ( mContainer )
   {
-    return ( ( mContainer->mFlags & TextStyleContainer::DROP_SHADOW_ENABLED ) != 0 );
+    return ( ( mContainer->mFlags & DROP_SHADOW_ENABLED ) != 0 );
   }
   else
   {
@@ -1288,7 +1240,7 @@ bool TextStyle::IsGlowEnabled() const
 {
   if ( mContainer )
   {
-    return ( ( mContainer->mFlags & TextStyleContainer::GLOW_ENABLED ) != 0 );
+    return ( ( mContainer->mFlags & GLOW_ENABLED ) != 0 );
   }
   else
   {
@@ -1330,7 +1282,7 @@ bool TextStyle::IsOutlineEnabled() const
 {
   if ( mContainer )
   {
-    return ( ( mContainer->mFlags & TextStyleContainer::OUTLINE_ENABLED ) != 0 );
+    return ( ( mContainer->mFlags & OUTLINE_ENABLED ) != 0 );
   }
   else
   {
@@ -1372,7 +1324,7 @@ bool TextStyle::IsGradientEnabled() const
 {
   if ( mContainer )
   {
-    return ( ( mContainer->mFlags & TextStyleContainer::GRADIENT_ENABLED ) != 0 );
+    return ( ( mContainer->mFlags & GRADIENT_ENABLED ) != 0 );
   }
   else
   {
@@ -1426,7 +1378,7 @@ bool TextStyle::IsFontNameDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::FONT_NAME_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & FONT_NAME_EXISTS ) == 0 );
   }
   else
   {
@@ -1438,7 +1390,7 @@ bool TextStyle::IsFontStyleDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::FONT_STYLE_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & FONT_STYLE_EXISTS ) == 0 );
   }
   else
   {
@@ -1450,7 +1402,7 @@ bool TextStyle::IsFontSizeDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::FONT_SIZE_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & FONT_SIZE_EXISTS ) == 0 );
   }
   else
   {
@@ -1462,7 +1414,7 @@ bool TextStyle::IsTextColorDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::TEXT_COLOR_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & TEXT_COLOR_EXISTS ) == 0 );
   }
   else
   {
@@ -1474,7 +1426,7 @@ bool TextStyle::IsFontWeightDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::FONT_WEIGHT_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & SMOOTH_EDGE_EXISTS ) == 0 );
   }
   else
   {
@@ -1486,7 +1438,7 @@ bool TextStyle::IsSmoothEdgeDefault() const
 {
   if( mContainer )
   {
-    return ( ( mContainer->mFlags & TextStyleContainer::SMOOTH_EDGE_EXISTS ) == 0 );
+    return ( ( mContainer->mFlags & SMOOTH_EDGE_EXISTS ) == 0 );
   }
   else
   {
@@ -1498,7 +1450,7 @@ bool TextStyle::IsItalicsDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::ITALICS_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & ITALICS_EXISTS ) == 0 );
   }
   else
   {
@@ -1510,7 +1462,7 @@ bool TextStyle::IsUnderlineDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::UNDERLINE_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & UNDERLINE_EXISTS ) == 0 );
   }
   else
   {
@@ -1522,7 +1474,7 @@ bool TextStyle::IsShadowDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::DROP_SHADOW_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & DROP_SHADOW_EXISTS ) == 0 );
   }
   else
   {
@@ -1534,7 +1486,7 @@ bool TextStyle::IsGlowDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::GLOW_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & GLOW_EXISTS ) == 0 );
   }
   else
   {
@@ -1546,7 +1498,7 @@ bool TextStyle::IsOutlineDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::OUTLINE_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & OUTLINE_EXISTS ) == 0 );
   }
   else
   {
@@ -1558,7 +1510,7 @@ bool TextStyle::IsGradientDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & TextStyleContainer::GRADIENT_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & GRADIENT_EXISTS ) == 0 );
   }
   else
   {
