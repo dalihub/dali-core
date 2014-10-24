@@ -19,7 +19,7 @@
 #include <dali/public-api/math/radian.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/constants.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/degree.h>
 
 namespace

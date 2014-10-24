@@ -18,9 +18,6 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/public-api/common/constants.h>
-
 namespace Dali
 {
 

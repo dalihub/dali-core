@@ -70,7 +70,6 @@ public_api_src_files = \
   $(public_api_src_dir)/math/angle-axis.cpp \
   $(public_api_src_dir)/math/compile-time-math.cpp \
   $(public_api_src_dir)/math/degree.cpp \
-  $(public_api_src_dir)/math/math-utils.cpp \
   $(public_api_src_dir)/math/matrix.cpp \
   $(public_api_src_dir)/math/matrix3.cpp \
   $(public_api_src_dir)/math/quaternion.cpp \

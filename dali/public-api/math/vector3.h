@@ -23,8 +23,7 @@
 #include <iostream>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/math-utils.h>
-#include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali DALI_IMPORT_API
 {

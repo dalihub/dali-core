@@ -47,7 +47,7 @@ typedef IntrusivePtr<Dali::RefObject> ResourcePointer;
  * Abstract interface to receive notifications of resource IO operations.
  * This is used when pulling loaded resources from the PlatformAbstraction.
  */
-class DALI_IMPORT_API ResourceCache
+class ResourceCache
 {
 protected:
 

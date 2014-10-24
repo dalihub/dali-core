@@ -37,7 +37,7 @@ class DynamicsFactory;
  * A concrete implementation must be created for each platform, and provided when creating the
  * Dali::Integration::Core object.
  */
-class DALI_IMPORT_API PlatformAbstraction
+class PlatformAbstraction
 {
 public:
 

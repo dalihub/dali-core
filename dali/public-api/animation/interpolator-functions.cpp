@@ -20,8 +20,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/interpolator-functions.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
 
-namespace Dali
+namespace
 {
 
 bool LerpBoolean( const bool& current, const bool& target, float progress )
@@ -45,27 +51,27 @@ int LerpInteger( const int& current, const int& target, float progress )
   return static_cast<int>( current + ( (target - current) * progress ) + 0.5f );
 }
 
-Vector2 LerpVector2( const Vector2& current, const Vector2& target, float progress )
+Dali::Vector2 LerpVector2( const Dali::Vector2& current, const Dali::Vector2& target, float progress )
 {
   return current + ((target - current) * progress);
 }
 
-Vector3 LerpVector3( const Vector3& current, const Vector3& target, float progress )
+Dali::Vector3 LerpVector3( const Dali::Vector3& current, const Dali::Vector3& target, float progress )
 {
   return current + ((target - current) * progress);
 }
 
-Vector4 LerpVector4( const Vector4& current, const Vector4& target, float progress )
+Dali::Vector4 LerpVector4( const Dali::Vector4& current, const Dali::Vector4& target, float progress )
 {
   return current + ((target - current) * progress);
 }
 
-Quaternion SlerpQuaternion( const Quaternion& current, const Quaternion& target, float progress )
+Dali::Quaternion SlerpQuaternion( const Dali::Quaternion& current, const Dali::Quaternion& target, float progress )
 {
-  return Quaternion::Slerp(current, target, progress);
+  return Dali::Quaternion::Slerp(current, target, progress);
 }
 
-Matrix LerpMatrix( const Matrix& current, const Matrix& target, float progress )
+Dali::Matrix LerpMatrix( const Dali::Matrix& current, const Dali::Matrix& target, float progress )
 {
   if (progress > 0.5f)
   {
@@ -75,7 +81,7 @@ Matrix LerpMatrix( const Matrix& current, const Matrix& target, float progress )
   return current;
 }
 
-Matrix3 LerpMatrix3( const Matrix3& current, const Matrix3& target, float progress )
+Dali::Matrix3 LerpMatrix3( const Dali::Matrix3& current, const Dali::Matrix3& target, float progress )
 {
   if (progress > 0.5f)
   {
@@ -84,6 +90,11 @@ Matrix3 LerpMatrix3( const Matrix3& current, const Matrix3& target, float progre
 
   return current;
 }
+
+} // unnamed namespace
+
+namespace Dali
+{
 
 AnyInterpolator GetDefaultInterpolator( Property::Type type )
 {

@@ -51,7 +51,7 @@ enum LoadResourcePriority
 /**
  * Used to request a resource from the native filesystem.
  */
-class DALI_IMPORT_API ResourceRequest
+class ResourceRequest
 {
 public:
 
