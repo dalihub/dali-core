@@ -305,14 +305,14 @@ void ResourceManager::HandleDecodeResourceRequest(
   mImpl->mPlatformAbstraction.LoadResource(ResourceRequest(id, *typePath.type, "", buffer, priority));
 }
 
-void ResourceManager::HandleAddBitmapImageRequest( ResourceId id, Bitmap* bitmap )
+void ResourceManager::HandleAddBitmapImageRequest( ResourceId id, BitmapPtr bitmap )
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddBitmapImageRequest(id:%u)\n", id);
 
   mImpl->oldCompleteRequests.insert(id);
-  mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New(bitmap)));
-  mImpl->mTextureCacheDispatcher.DispatchCreateTextureForBitmap( id, bitmap );
+  mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New( bitmap.Get() )));
+  mImpl->mTextureCacheDispatcher.DispatchCreateTextureForBitmap( id, bitmap.Get() );
 }
 
 void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImagePtr nativeImage)
