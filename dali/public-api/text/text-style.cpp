@@ -1426,7 +1426,7 @@ bool TextStyle::IsFontWeightDefault() const
 {
   if( mContainer )
   {
-    return( ( mContainer->mFlags & SMOOTH_EDGE_EXISTS ) == 0 );
+    return( ( mContainer->mFlags & FONT_WEIGHT_EXISTS ) == 0 );
   }
   else
   {
