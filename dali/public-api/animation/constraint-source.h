@@ -22,7 +22,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/signals/signal-slot-observers.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class CallbackBase;
@@ -38,7 +38,7 @@ class CallbackBase;
  *
  * It holds a pointer to the callback, but does not own it.
  */
-class SlotConnection
+class DALI_IMPORT_API SlotConnection
 {
 public:
 
@@ -93,7 +93,7 @@ private:
  * It takes ownership of the callback, and will delete it when
  * the connection is destroyed.
  */
-class SignalConnection
+class DALI_IMPORT_API SignalConnection
 {
 public:
 

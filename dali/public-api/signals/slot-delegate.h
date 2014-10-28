@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/connection-tracker.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**

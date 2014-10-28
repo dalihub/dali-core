@@ -30,7 +30,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-input.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 struct TimePeriod;
 

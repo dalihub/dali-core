@@ -33,7 +33,7 @@ class Quaternion;
  *
  * A local-constraint function is based on local properties of the Actor.
  */
-namespace LocalConstraint DALI_IMPORT_API
+namespace LocalConstraint
 {
 
 /**
@@ -105,7 +105,7 @@ typedef boost::function<bool (const Vector3&    size,
 /**
  * @brief A parent-constraint function is based on properties related to the Actor's parent.
  */
-namespace ParentConstraint DALI_IMPORT_API
+namespace ParentConstraint
 {
 
 /**

@@ -23,7 +23,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class CallbackBase;
@@ -33,7 +33,7 @@ class SlotConnection;
 /**
  * @brief Connection tracker concrete implementation
  */
-class ConnectionTracker : public ConnectionTrackerInterface
+class DALI_IMPORT_API ConnectionTracker : public ConnectionTrackerInterface
 {
 public:
 

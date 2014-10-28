@@ -22,7 +22,7 @@
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -37,7 +37,7 @@ typedef Any AnyInterpolator;
  * @param[in] type The property type for which to get an interpolator
  * @return The interpolator function.
  */
-AnyInterpolator GetDefaultInterpolator(Property::Type type);
+AnyInterpolator DALI_IMPORT_API GetDefaultInterpolator(Property::Type type);
 
 } // namespace Dali
 

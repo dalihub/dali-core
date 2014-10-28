@@ -30,7 +30,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;

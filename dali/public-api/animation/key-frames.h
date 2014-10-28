@@ -24,7 +24,7 @@
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property-types.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -40,7 +40,7 @@ class KeyFrames;
  * type of the first value to be added. Adding key frames with a
  * different Property::Value type will result in a run time assert.
  */
-class KeyFrames : public BaseHandle
+class DALI_IMPORT_API KeyFrames : public BaseHandle
 {
 public:
   /**
