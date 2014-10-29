@@ -46,7 +46,7 @@
 #endif
       vertexPosition = uMvpMatrix * vec4(aPosition, 1.0);
       vVertex = uModelView * vec4(aPosition, 1.0);
-      vNormal = mat3(uModelViewIT) * aNormal;
+      vNormal = uModelViewIT * aNormal;
 #ifdef USE_BONES
     }
 #endif
