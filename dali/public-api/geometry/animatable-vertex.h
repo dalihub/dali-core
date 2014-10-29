@@ -25,7 +25,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 class AnimatableMesh;
 
@@ -45,7 +45,7 @@ class AnimatableMesh;
  * mesh[vertex].SetColor(color);
  * @endcode
  */
-class AnimatableVertex
+class DALI_IMPORT_API AnimatableVertex
 {
 public:
 

@@ -36,11 +36,11 @@ namespace MeshFactory
  * @param[in] textureCoordinates  UV coordinates.
  * @return A mesh data structure containing the plane mesh
  */
-Dali::MeshData NewPlane( const float width,
-                         const float height,
-                         const int xSteps,
-                         const int ySteps,
-                         const Rect<float>& textureCoordinates = Rect<float>(0.0f, 0.0f, 1.0f, 1.0f) );
+DALI_IMPORT_API Dali::MeshData NewPlane( const float width,
+                                         const float height,
+                                         const int xSteps,
+                                         const int ySteps,
+                                         const Rect<float>& textureCoordinates = Rect<float>(0.0f, 0.0f, 1.0f, 1.0f) );
 
 } // MeshFactory
 } // Dali

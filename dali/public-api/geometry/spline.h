@@ -24,7 +24,7 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/matrix.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Matrix;
@@ -47,7 +47,7 @@ struct Vector3;
  * be chosen carefully. (Most useful for animation curves)
  *
  */
-class Spline
+class DALI_IMPORT_API Spline
 {
 public:
   /**

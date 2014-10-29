@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace BlendingMode
@@ -83,13 +83,13 @@ enum Type
 
 } // namespace BlendingEquation
 
-extern const BlendingFactor::Type   DEFAULT_BLENDING_SRC_FACTOR_RGB;    ///< BlendingFactor::SRC_ALPHA
-extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR_RGB;   ///< BlendingFactor::ONE_MINUS_SRC_ALPHA
-extern const BlendingFactor::Type   DEFAULT_BLENDING_SRC_FACTOR_ALPHA;  ///< BlendingFactor::ONE
-extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR_ALPHA; ///< BlendingFactor::ONE_MINUS_SRC_ALPHA
+DALI_IMPORT_API extern const BlendingFactor::Type   DEFAULT_BLENDING_SRC_FACTOR_RGB;    ///< BlendingFactor::SRC_ALPHA
+DALI_IMPORT_API extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR_RGB;   ///< BlendingFactor::ONE_MINUS_SRC_ALPHA
+DALI_IMPORT_API extern const BlendingFactor::Type   DEFAULT_BLENDING_SRC_FACTOR_ALPHA;  ///< BlendingFactor::ONE
+DALI_IMPORT_API extern const BlendingFactor::Type   DEFAULT_BLENDING_DEST_FACTOR_ALPHA; ///< BlendingFactor::ONE_MINUS_SRC_ALPHA
 
-extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_RGB;     ///< BlendingEquation::ADD
-extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_ALPHA;   ///< BlendingEquation::ADD
+DALI_IMPORT_API extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_RGB;     ///< BlendingEquation::ADD
+DALI_IMPORT_API extern const BlendingEquation::Type DEFAULT_BLENDING_EQUATION_ALPHA;   ///< BlendingEquation::ADD
 
 } // namespace Dali
 

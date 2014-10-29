@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Radian;
@@ -51,7 +51,7 @@ struct PanGesture;
  *
  * @see PanGesture
  */
-class PanGestureDetector : public GestureDetector
+class DALI_IMPORT_API PanGestureDetector : public GestureDetector
 {
 public:
 

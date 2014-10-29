@@ -23,7 +23,7 @@
 #include <dali/public-api/text/font-parameters.h>
 #include <dali/public-api/text/text.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Vector3;
@@ -43,7 +43,7 @@ class Font;
  *
  * Fonts will be created from a font name (like courier or comic) and font size (specified in points).
  */
-class Font : public BaseHandle
+class DALI_IMPORT_API Font : public BaseHandle
 {
 public:
   /**

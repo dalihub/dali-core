@@ -22,7 +22,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/common/constants.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Vector4;
@@ -43,7 +43,7 @@ typedef MaterialContainer::const_iterator MaterialConstIter; ///< Const iterator
  *
  * Color, opacity, shininess, shading mode, texture/normal/height mapping...
  */
-class Material : public BaseHandle
+class DALI_IMPORT_API Material : public BaseHandle
 {
 public:
   /**

@@ -24,7 +24,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -37,7 +37,7 @@ class Mesh;
  *
  * It is used to tell the Scene Graph if the mesh data has changed.
  */
-class Mesh : public BaseHandle
+class DALI_IMPORT_API Mesh : public BaseHandle
 {
 public:
 

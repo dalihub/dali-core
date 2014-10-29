@@ -26,7 +26,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/images/image.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL

@@ -23,7 +23,7 @@
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/modeling/entity.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Entity;
@@ -37,7 +37,7 @@ typedef EntityAnimatorMapContainer::const_iterator EntityAnimatorMapIter; ///< I
  * @brief The entity animator map class is a mapping from an entity name to raw animation
  * data for that entity, stored in 3 KeyFrames for position, scale and rotation.
  */
-class EntityAnimatorMap
+class DALI_IMPORT_API EntityAnimatorMap
 {
 public:
   /**

@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -36,7 +36,7 @@ namespace Dali DALI_IMPORT_API
  * A pinch gesture will continue to be sent to the actor under the center point of the pinch
  * until the pinch ends.
  */
-struct PinchGesture: public Gesture
+struct DALI_IMPORT_API PinchGesture: public Gesture
 {
   // Construction & Destruction
 

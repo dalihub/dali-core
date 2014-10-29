@@ -29,7 +29,7 @@
 // DECLARATION FILES
 
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 class Matrix;
 
@@ -68,7 +68,7 @@ class Matrix;
  * The mesh vertex shader then applies up to 4 weighted transforms to each
  * vertex and vertex normal.
  */
-class MeshData
+class DALI_IMPORT_API MeshData
 {
 public:
   static const unsigned int MAX_NUMBER_OF_BONES = 12; ///< Maximum number of bones that can affect this mesh.

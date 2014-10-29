@@ -30,7 +30,7 @@
 #include <dali/public-api/text/text-style.h>
 #include <dali/public-api/text/text.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct TextActorParameters;

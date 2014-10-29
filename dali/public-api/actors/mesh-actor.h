@@ -22,7 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/renderable-actor.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 class Material;
 class Mesh;

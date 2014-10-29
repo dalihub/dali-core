@@ -22,7 +22,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/text/text.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -30,7 +30,7 @@ namespace Dali DALI_IMPORT_API
  *
  * This reduces ambiguity when using methods which accept size in pixels or points.
  */
-struct PointSize
+struct DALI_IMPORT_API PointSize
 {
   /**
    * @brief Create size in points.
@@ -68,7 +68,7 @@ struct PointSize
  *
  * This reduces ambiguity when using methods which accept size in pixels or points.
  */
-struct PixelSize
+struct DALI_IMPORT_API PixelSize
 {
   /**
    * @brief Create size in pixels.
@@ -88,7 +88,7 @@ struct PixelSize
 /**
  * @brief Font size in Caps height
  */
-struct CapsHeight
+struct DALI_IMPORT_API CapsHeight
 {
   /**
    * @brief Size in CapsHeight
@@ -106,7 +106,7 @@ struct CapsHeight
 /**
  * @brief Encapsulates all font parameters.
  */
-struct FontParameters
+struct DALI_IMPORT_API FontParameters
 {
   /**
    * @brief Default constructor.
@@ -196,7 +196,7 @@ private:
 
 };
 
-extern FontParameters DEFAULT_FONT_PARAMETERS; ///< Used to choose the platform's font parameters
+DALI_IMPORT_API extern FontParameters DEFAULT_FONT_PARAMETERS; ///< Used to choose the platform's font parameters
 
 } // namespace Dali
 

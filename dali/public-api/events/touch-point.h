@@ -22,14 +22,14 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
  * @brief A TouchPoint represents a point on the screen that is currently being touched
  * or where touch has stopped.
  */
-struct TouchPoint
+struct DALI_IMPORT_API TouchPoint
 {
   // Enumerations
 

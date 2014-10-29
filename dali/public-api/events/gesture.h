@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -38,7 +38,7 @@ namespace Dali DALI_IMPORT_API
  *
  * @note An instance of this class cannot be created.
  */
-struct Gesture
+struct DALI_IMPORT_API Gesture
 {
   /**
    * @brief Copy constructor.

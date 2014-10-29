@@ -52,7 +52,7 @@ enum ResourceTypeId
 /**
  * The abstract base class for resource types.
  */
-struct DALI_IMPORT_API ResourceType
+struct ResourceType
 {
   /**
    * Constructor.
@@ -87,7 +87,7 @@ private:
  * BitmapResourceType describes a bitmap resource, which can be requested
  * from ResourceLoader::LoadResource() or AllocateBitmapImage.
  */
-struct DALI_IMPORT_API BitmapResourceType : public ResourceType
+struct BitmapResourceType : public ResourceType
 {
   /**
    * Constructor.
@@ -129,7 +129,7 @@ private:
  * through ResourceManager::AddNativeImage() or requested through ResourceLoader::LoadResource().
  * If the adaptor does not support NativeImages, it can fall back to Bitmap type.
  */
-struct DALI_IMPORT_API NativeImageResourceType : public ResourceType
+struct NativeImageResourceType : public ResourceType
 {
   /**
    * Constructor.
@@ -176,7 +176,7 @@ private:
  * RenderTargetResourceType describes a bitmap resource, which can injected
  * through ResourceManager::AddTargetImage()
  */
-struct DALI_IMPORT_API RenderTargetResourceType : public ResourceType
+struct RenderTargetResourceType : public ResourceType
 {
   /**
    * Constructor.
@@ -223,7 +223,7 @@ private:
  * ShaderResourceType describes a shader program resource, which can be requested
  * from PlatformAbstraction::LoadResource()
  */
-struct DALI_IMPORT_API ShaderResourceType : public ResourceType
+struct ShaderResourceType : public ResourceType
 {
   /**
    * Constructor.
@@ -269,7 +269,7 @@ private:
  * TextResourceType describes a font resource, which can be requested.
  * from PlatformAbstraction::LoadResource()  No font atlas is created.
  */
-struct DALI_IMPORT_API TextResourceType : public ResourceType
+struct TextResourceType : public ResourceType
 {
   /**
    *  Text quality enum
@@ -408,7 +408,7 @@ private:
  * ModelResourceType describes a model resource, which can be requested
  * from PlatformAbstraction::LoadResource()
  */
-struct DALI_IMPORT_API ModelResourceType : public ResourceType
+struct ModelResourceType : public ResourceType
 {
   /**
    * Constructor.
@@ -447,7 +447,7 @@ private:
  * MeshResourceType describes a mesh program resource, which can be created
  * using ResourceManager::AllocateMesh.
  */
-struct DALI_IMPORT_API MeshResourceType : public ResourceType
+struct MeshResourceType : public ResourceType
 {
   /**
    * Constructor.

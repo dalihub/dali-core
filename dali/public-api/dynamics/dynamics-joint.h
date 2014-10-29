@@ -24,7 +24,7 @@
 // BASE CLASS INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 namespace Internal DALI_INTERNAL
 {
@@ -36,7 +36,7 @@ class Actor;
 /**
  * @brief Represents a connection (or constraint) relationship between two dynamic bodies.
  */
-class DynamicsJoint : public BaseHandle
+class DALI_IMPORT_API DynamicsJoint : public BaseHandle
 {
 public:
   /**

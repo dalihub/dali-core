@@ -23,7 +23,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -62,7 +62,7 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h)
  * If the image is opaque and blending is not required, then the user
  * should call ImageActor::SetUseImageAlpha(false) on the containing actor.
  */
-class BitmapImage : public Image
+class DALI_IMPORT_API BitmapImage : public Image
 {
 public:
   /**

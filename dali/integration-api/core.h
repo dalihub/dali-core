@@ -64,7 +64,7 @@ namespace KeepUpdating DALI_IMPORT_API
 /**
  * The status of the Core::Update operation.
  */
-class DALI_IMPORT_API UpdateStatus
+class UpdateStatus
 {
 public:
 
@@ -110,7 +110,7 @@ public:
 /**
  * The status of the Core::Render operation.
  */
-class DALI_IMPORT_API RenderStatus
+class RenderStatus
 {
 public:
 

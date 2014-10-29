@@ -27,7 +27,7 @@
 
 
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;

@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -31,7 +31,7 @@ namespace Dali DALI_IMPORT_API
  * This is a discrete gesture so does not have any state information.
  * @see TapGestureDetector
  */
-struct TapGesture : public Gesture
+struct DALI_IMPORT_API TapGesture : public Gesture
 {
   // Construction & Destruction
 

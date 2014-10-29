@@ -22,7 +22,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -36,7 +36,7 @@ class FrameBufferImage;
  * The FrameBufferImage can then be used with an ImageActor (with optional shader
  * effects) and rendered to the screen.
  */
-class FrameBufferImage : public Image
+class DALI_IMPORT_API FrameBufferImage : public Image
 {
 public:
   /**

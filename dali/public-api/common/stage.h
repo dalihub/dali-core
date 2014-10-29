@@ -22,7 +22,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -47,7 +47,7 @@ struct TouchEvent;
  *
  * Multiple stage/window support is not currently provided.
  */
-class Stage : public BaseHandle
+class DALI_IMPORT_API Stage : public BaseHandle
 {
 public:
 

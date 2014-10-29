@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -49,7 +49,7 @@ struct LongPressGesture;
  *
  * @see LongPressGesture
  */
-class LongPressGestureDetector : public GestureDetector
+class DALI_IMPORT_API LongPressGestureDetector : public GestureDetector
 {
 public: // Typedefs
 

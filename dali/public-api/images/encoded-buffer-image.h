@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -58,7 +58,7 @@ class EncodedBufferImage;
  * Image::UploadedSignal is emitted when the decoded image data gets
  * uploaded to the OpenGL ES implementation.
  */
-class EncodedBufferImage : public Image
+class DALI_IMPORT_API EncodedBufferImage : public Image
 {
 public:
   /**

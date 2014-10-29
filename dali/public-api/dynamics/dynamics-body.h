@@ -24,7 +24,7 @@
 // BASE CLASS INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -42,7 +42,7 @@ class DynamicsWorld;
  *
  * The body is defined with a shape giving it dimension enabling it to collide with other bodies.
  */
-class DynamicsBody : public BaseHandle
+class DALI_IMPORT_API DynamicsBody : public BaseHandle
 {
 public:
   /**

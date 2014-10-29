@@ -22,7 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/geometry/mesh.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Entity;
@@ -48,7 +48,7 @@ typedef std::vector<unsigned int>       EntityMeshIndices;  ///< Container to ho
  * It can contain zero or more meshes.  The entity names are used for
  * cross referencing, e.g. from animations or from bone structures.
  */
-class Entity : public BaseHandle
+class DALI_IMPORT_API Entity : public BaseHandle
 {
 public:
 

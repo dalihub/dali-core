@@ -22,7 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -43,7 +43,7 @@ class Actor;
  *
  * @see Gesture
  */
-class GestureDetector : public Handle
+class DALI_IMPORT_API GestureDetector : public Handle
 {
 public: // Creation & Destruction
 

@@ -25,7 +25,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/geometry/mesh.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -37,7 +37,7 @@ class Cloth;
  * @brief A Cloth is a specialized mesh that can be used and modified
  * by the Dynamics engine.
  */
-class Cloth : public Mesh
+class DALI_IMPORT_API Cloth : public Mesh
 {
 public:
 

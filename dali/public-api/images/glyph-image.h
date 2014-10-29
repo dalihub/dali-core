@@ -22,7 +22,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/text/font.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Character;
@@ -31,7 +31,7 @@ class TextStyle;
 /**
  * @brief A GlyphImage object is an image resource which represents a character.
  */
-class GlyphImage : public Image
+class DALI_IMPORT_API GlyphImage : public Image
 {
 public:
   /**

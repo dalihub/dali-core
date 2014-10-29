@@ -26,7 +26,7 @@
 #include <dali/public-api/text/character.h>
 #include <dali/public-api/common/dali-vector.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -37,7 +37,7 @@ namespace Internal DALI_INTERNAL
 /**
  * @brief Encapsulates a string of characters implementation to support multiple languages.
  */
-class Text
+class DALI_IMPORT_API Text
 {
 
 public:
