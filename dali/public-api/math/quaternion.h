@@ -27,7 +27,7 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 // Forward declaration

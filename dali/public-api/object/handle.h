@@ -29,7 +29,7 @@
 #include <dali/public-api/object/property-notification-declarations.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class PropertyNotification;
@@ -43,7 +43,7 @@ class Object;
 /**
  * @brief Dali::Handle is a handle to an internal property owning Dali object.
  */
-class Handle : public BaseHandle
+class DALI_IMPORT_API Handle : public BaseHandle
 {
 public:
 

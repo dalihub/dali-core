@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/vector4.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 class Quaternion;
 

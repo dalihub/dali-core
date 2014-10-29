@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/math-utils.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**

@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Vector2;
@@ -597,7 +597,7 @@ DALI_IMPORT_API Vector3 FillXYKeepAspectRatio( const Vector3& target, const Vect
  * @param [in] source size
  * @return target scaled inside source
  */
-Vector3 ShrinkInsideKeepAspectRatio( const Vector3& target, const Vector3& source );
+DALI_IMPORT_API Vector3 ShrinkInsideKeepAspectRatio( const Vector3& target, const Vector3& source );
 
 
 } // namespace Dali

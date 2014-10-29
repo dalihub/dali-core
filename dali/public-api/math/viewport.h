@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**

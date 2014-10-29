@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Vector2;
@@ -34,7 +34,7 @@ class Quaternion;
 /**
  * @brief An abstract interface for receiving property values.
  */
-class PropertyInput
+class DALI_IMPORT_API PropertyInput
 {
 public:
 

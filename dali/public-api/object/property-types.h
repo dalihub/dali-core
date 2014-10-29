@@ -31,7 +31,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -46,7 +46,7 @@ namespace PropertyTypes
  * @param [in] type The property type.
  * @return The name of this type.
  */
-const char* GetName(Property::Type type);
+DALI_IMPORT_API const char* GetName(Property::Type type);
 
 /**
  * @brief Retrieve an enumerated property type.

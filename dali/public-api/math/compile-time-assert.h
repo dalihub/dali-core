@@ -24,7 +24,7 @@
 // EXTERNAL INCLUDES
 #include <cstddef>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 template <bool x> struct CompileTimeAssertBool;    ///< Bool Template to test condition

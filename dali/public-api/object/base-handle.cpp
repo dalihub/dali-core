@@ -123,9 +123,4 @@ bool BaseHandle::DoConnectSignal( ConnectionTrackerInterface* connectionTracker,
   return GetImplementation(*this).DoConnectSignal( connectionTracker, signalName, functor );
 }
 
-bool operator<(const BaseHandle& lhs, const BaseHandle& rhs)
-{
-  return lhs.GetObjectPtr() < rhs.GetObjectPtr();
-}
-
 } // namespace Dali

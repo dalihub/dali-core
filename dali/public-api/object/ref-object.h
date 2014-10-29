@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Value;
@@ -33,7 +33,7 @@ class Value;
  * Typically this should be used with a Boost instrusive pointer,
  * instead of calling Reference() and Unreference() methods directly.
  */
-class RefObject
+class DALI_IMPORT_API RefObject
 {
 public:
 
