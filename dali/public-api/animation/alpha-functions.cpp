@@ -135,21 +135,24 @@ float EaseInOutSine90(float progress)
 
 float DoubleEaseInOutSine60(float progress)
 {
-  if (progress < 0.5f) {
+  if (progress < 0.5f)
+  {
     return EaseInOutSine60(progress * 2.0f) / 2.0f;
-  } else {
+  }
+  else
+  {
     return EaseInOutSine60((progress - 0.5f) * 2.0f) / 2.0f + 0.5f;
   }
 }
 
 float EaseOutQuint50(float progress)
 {
-  return 1.0f - pow(1.0f - progress, 1.7f);
+  return 1.0f - powf(1.0f - progress, 1.7f);
 }
 
 float EaseOutQuint80(float progress)
 {
-  return 1.0f - pow(1.0f - progress, 2.3f);
+  return 1.0f - powf(1.0f - progress, 2.3f);
 }
 
 float Bounce(float progress)
