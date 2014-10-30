@@ -26,6 +26,27 @@
 #include <dali/internal/event/animation/property-constraint-ptr.h>
 #include <dali/internal/event/animation/property-constraint.h>
 #include <dali/internal/event/animation/property-input-accessor.h>
+#include <dali/public-api/math/vector2.h>
+#include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
+#include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
+
+namespace
+{
+// Constraint Interpolation function prototypes
+typedef boost::function<bool (const bool& start, const bool& target, float progress)> BoolInterpolator;
+typedef boost::function<float (const float& start, const float& target, float progress)> FloatInterpolator;
+typedef boost::function<int (const int& start, const int& target, float progress)> IntegerInterpolator;
+typedef boost::function<Dali::Vector2 (const Dali::Vector2& current, const Dali::Vector2& target, float progress)> Vector2Interpolator;
+typedef boost::function<Dali::Vector3 (const Dali::Vector3& current, const Dali::Vector3& target, float progress)> Vector3Interpolator;
+typedef boost::function<Dali::Vector4 (const Dali::Vector4& current, const Dali::Vector4& target, float progress)> Vector4Interpolator;
+typedef boost::function<Dali::Quaternion (const Dali::Quaternion& current, const Dali::Quaternion& target, float progress)> QuaternionInterpolator;
+typedef boost::function<Dali::Matrix3 (const Dali::Matrix3& current, const Dali::Matrix3& target, float progress)> Matrix3Interpolator;
+typedef boost::function<Dali::Matrix (const Dali::Matrix& current, const Dali::Matrix& target, float progress)> MatrixInterpolator;
+
+}
 
 namespace Dali
 {

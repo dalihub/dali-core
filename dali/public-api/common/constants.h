@@ -22,7 +22,6 @@
 #include <math.h> // M_PI
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/math/radian.h>

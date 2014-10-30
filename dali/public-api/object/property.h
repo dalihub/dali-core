@@ -26,7 +26,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Handle;
@@ -34,7 +34,7 @@ class Handle;
 /**
  * @brief An object + property pair.
  */
-struct Property
+struct DALI_IMPORT_API Property
 {
   /**
    * @brief A valid property index is zero or greater.

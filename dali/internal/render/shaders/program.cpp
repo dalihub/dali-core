@@ -118,7 +118,7 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
 
 // IMPLEMENTATION
 
-Program* Program::New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context, bool modifiesGeometry )
+Program* Program::New( const Integration::ResourceId& resourceId, Integration::ShaderDataPtr shaderData, Context& context, bool modifiesGeometry )
 {
   size_t shaderHash = shaderData->GetHashValue();
   Program* program = context.GetCachedProgram( shaderHash );
@@ -435,7 +435,7 @@ bool Program::ModifiesGeometry()
   return mModifiesGeometry;
 }
 
-Program::Program(Integration::ShaderData* shaderData, Context& context, bool modifiesGeometry )
+Program::Program(Integration::ShaderDataPtr shaderData, Context& context, bool modifiesGeometry )
 : mContext( context ),
   mGlAbstraction( context.GetAbstraction() ),
   mProjectionMatrix( NULL ),

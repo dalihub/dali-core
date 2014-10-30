@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/signal-slot-observers.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -46,7 +46,7 @@ namespace Dali DALI_IMPORT_API
  * It provides a signal observer interface, to observer when signals are destroyed
  * e.g. if Button object is destroyed while it is still connected.
  */
-class ConnectionTrackerInterface : public SignalObserver
+class DALI_IMPORT_API ConnectionTrackerInterface : public SignalObserver
 {
 public:
 

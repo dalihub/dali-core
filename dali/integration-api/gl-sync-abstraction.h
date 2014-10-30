@@ -30,7 +30,7 @@ namespace Integration
  * A typical use case is to determine when GL draw calls have finished drawing
  * to a framebuffer.
  */
-class DALI_IMPORT_API GlSyncAbstraction
+class GlSyncAbstraction
 {
 protected:
   /**

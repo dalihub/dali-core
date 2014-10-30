@@ -237,7 +237,7 @@ void Shader::SetProgram( GeometryType geometryType,
 
   bool precompiledBinary = shaderData->HasBinary();
 
-  Program* program = Program::New( resourceId, shaderData.Get(), *context, modifiesGeometry );
+  Program* program = Program::New( resourceId, shaderData, *context, modifiesGeometry );
 
   ShaderSubTypes theSubType = subType;
   if( subType == SHADER_SUBTYPE_ALL )

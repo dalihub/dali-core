@@ -23,6 +23,7 @@
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/radian.h>
+#include <dali/public-api/math/math-utils.h>
 #include <dali/internal/render/common/performance-monitor.h>
 
 namespace Dali

@@ -25,7 +25,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -49,7 +49,7 @@ class ObjectRegistry;
  * registry.ObjectCreatedSignal().Connect( ObjectCreatedCallbackFunc );
  *
  */
-class ObjectRegistry : public BaseHandle
+class DALI_IMPORT_API ObjectRegistry : public BaseHandle
 {
 public:
 

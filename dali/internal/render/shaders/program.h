@@ -139,7 +139,7 @@ public:
    * @param [in] modifiesGeometry True if the shader modifies geometry
    * @return pointer to the program
    */
-  static Program* New( const Integration::ResourceId& resourceId, Integration::ShaderData* shaderData, Context& context, bool modifiesGeometry );
+  static Program* New( const Integration::ResourceId& resourceId, Integration::ShaderDataPtr shaderData, Context& context, bool modifiesGeometry );
 
   /**
    * Takes this program into use
@@ -296,11 +296,11 @@ private: // Implementation
 
   /**
    * Constructor, private so no direct instantiation
-   * @param[in] shaderData A pointer to a data structure containing the program source and binary
+   * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
    * @param[in] context    The GL context state cache.
    * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
-  Program( Integration::ShaderData* shaderData, Context& context, bool modifiesGeometry );
+  Program( Integration::ShaderDataPtr shaderData, Context& context, bool modifiesGeometry );
 
 public:
 

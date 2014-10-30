@@ -25,7 +25,7 @@
 #include <dali/public-api/signals/connection-tracker-interface.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -70,7 +70,7 @@ namespace Dali DALI_IMPORT_API
  * Connection tracker implements the Signal Observer interface, to be told when a signal has disconnected (died)
  *
  */
-class BaseSignal : public SlotObserver
+class DALI_IMPORT_API BaseSignal : public SlotObserver
 {
 public:
 

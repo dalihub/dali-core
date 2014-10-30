@@ -24,7 +24,7 @@
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL

@@ -22,7 +22,7 @@
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/vector3.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Radian;

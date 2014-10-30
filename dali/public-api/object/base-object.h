@@ -24,7 +24,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class BaseHandle;
@@ -32,7 +32,7 @@ class BaseHandle;
 /**
  * @brief A base class for objects.
  */
-class BaseObject : public Dali::RefObject
+class DALI_IMPORT_API BaseObject : public Dali::RefObject
 {
 public:
 

@@ -203,7 +203,7 @@ public: // Used by ResourceClient
    * @param[in] id The resource id
    * @param[in] bitmap an initialized bitmap
    */
-  void HandleAddBitmapImageRequest(ResourceId id, Integration::Bitmap* bitmap);
+  void HandleAddBitmapImageRequest(ResourceId id, Integration::BitmapPtr bitmap);
 
   /**
    * Add an existing resource to the resource manager.
@@ -489,7 +489,7 @@ inline void RequestAddBitmapImageMessage( EventToUpdate& eventToUpdate,
                                           ResourceId id,
                                           Integration::Bitmap* resourceData )
 {
-  typedef MessageValue2< ResourceManager, ResourceId, Integration::Bitmap* > LocalType;
+  typedef MessageValue2< ResourceManager, ResourceId, Integration::BitmapPtr > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );

@@ -28,7 +28,7 @@
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class BaseObject;
@@ -51,7 +51,7 @@ class TypeInfo;
  * A resource will not be deleted until all its Dali::BaseHandle handles are destroyed, or reset.
  *
  */
-class BaseHandle
+class DALI_IMPORT_API BaseHandle
 {
 public:
 
@@ -248,6 +248,7 @@ private:
 private:
 
   IntrusivePtr<Dali::RefObject> mObjectHandle; ///< Object this handle points at.
+
 };
 
 /**
@@ -258,7 +259,7 @@ private:
  * @return handle pointer to either a valid deriving handle or an uninitialized handle
  */
 template< class T >
-T DownCast( BaseHandle handle )
+inline T DownCast( BaseHandle handle )
 {
   return T::DownCast( handle );
 }
@@ -269,7 +270,7 @@ T DownCast( BaseHandle handle )
  * @brief Equality operator
  */
 template <typename T>
-bool operator==(const BaseHandle& lhs, const T& rhs)
+inline bool operator==(const BaseHandle& lhs, const T& rhs)
 {
   // We depart from the safe bool idiom to allow Dali::BaseHandle derived classes to be compared
   return lhs == static_cast<const BaseHandle&>(rhs);
@@ -279,18 +280,19 @@ bool operator==(const BaseHandle& lhs, const T& rhs)
  * @brief Equality operator
  */
 template <typename T>
-bool operator!=(const BaseHandle& lhs, const T& rhs)
+inline bool operator!=(const BaseHandle& lhs, const T& rhs)
 {
   // We depart from the safe bool idiom to allow Dali::BaseHandle derived classes to be compared
   return lhs != static_cast<const BaseHandle&>(rhs);
 }
 
-// More Operators
-
 /**
  * @brief Less than operator
  */
-bool operator<(const BaseHandle& lhs, const BaseHandle& rhs);
+inline bool operator<(const BaseHandle& lhs, const BaseHandle& rhs)
+{
+  return lhs.GetObjectPtr() < rhs.GetObjectPtr();
+}
 
 } // namespace Dali
 

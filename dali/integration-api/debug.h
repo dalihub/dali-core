@@ -44,12 +44,6 @@ namespace Integration
 namespace Log
 {
 
-// environment variable for enabling/disabling fps tracking
-#define DALI_ENV_FPS_TRACKING "DALI_FPS_TRACKING"
-
-// environment variable for enabling/disabling fps tracking
-#define DALI_ENV_UPDATE_STATUS_INTERVAL "DALI_UPDATE_STATUS_INTERVAL"
-
 enum DebugPriority
 {
   DebugInfo,

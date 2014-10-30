@@ -22,7 +22,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/matrix.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Matrix;

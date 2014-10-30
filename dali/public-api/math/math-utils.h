@@ -23,8 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/constants.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -35,7 +36,23 @@ namespace Dali DALI_IMPORT_API
  * @param[in] i input number
  * @return    next power of two or i itself in case it's a power of two
  */
-DALI_IMPORT_API unsigned int NextPowerOfTwo( unsigned int i );
+inline unsigned int NextPowerOfTwo( unsigned int i )
+{
+  DALI_ASSERT_DEBUG(i <= 1U << (sizeof(unsigned) * 8 - 1) && "Return type cannot represent the next power of two greater than the argument.");
+  if(i==0)
+  {
+    return 1;
+  }
+
+  i--;
+  i |= i >> 1;
+  i |= i >> 2;
+  i |= i >> 4;
+  i |= i >> 8;
+  i |= i >> 16;
+  i++;
+  return i;
+}
 
 /**
  * @brief Whether a number is power of two.
@@ -43,7 +60,10 @@ DALI_IMPORT_API unsigned int NextPowerOfTwo( unsigned int i );
  * @param[in] i input number
  * @return    true if i is power of two
  */
-DALI_IMPORT_API bool IsPowerOfTwo( unsigned int i );
+inline bool IsPowerOfTwo( unsigned int i )
+{
+  return (i != 0) && ((i & (i - 1)) == 0);
+}
 
 /**
  * @brief Clamp a value.
@@ -54,7 +74,7 @@ DALI_IMPORT_API bool IsPowerOfTwo( unsigned int i );
  * @return T the clamped value
  */
 template< typename T >
-const T& Clamp( const T& value, const T& min, const T& max )
+inline const T& Clamp( const T& value, const T& min, const T& max )
 {
   return std::max( std::min( value, max ), min );
 }
@@ -67,7 +87,7 @@ const T& Clamp( const T& value, const T& min, const T& max )
  * @param[in] max The maximum allowed value.
  */
 template< typename T >
-void ClampInPlace( T& value, const T& min, const T& max )
+inline void ClampInPlace( T& value, const T& min, const T& max )
 {
   value =  std::max( std::min( value, max ), min );
 }
@@ -95,7 +115,34 @@ inline const T Lerp( const float offset, const T& low, const T& high )
  * @param[in] b the second value in the range.
  * @return a suitable epsilon
  */
-DALI_IMPORT_API float GetRangedEpsilon(float a, float b);
+inline float GetRangedEpsilon(float a, float b)
+{
+  float abs_f = std::max(fabsf(a), fabsf(b));
+  int abs_i = (int) abs_f;
+
+  float epsilon = Math::MACHINE_EPSILON_10000;
+  if (abs_f < 0.1f)
+  {
+    return Math::MACHINE_EPSILON_0;
+  }
+  else if (abs_i < 2)
+  {
+    return Math::MACHINE_EPSILON_1;
+  }
+  else if (abs_i < 20)
+  {
+    return Math::MACHINE_EPSILON_10;
+  }
+  else if (abs_i < 200)
+  {
+    return Math::MACHINE_EPSILON_100;
+  }
+  else if (abs_i < 2000)
+  {
+    return Math::MACHINE_EPSILON_1000;
+  }
+  return epsilon;
+}
 
 /**
  * @brief Helper function to compare equality of a floating point value with zero.
@@ -103,7 +150,13 @@ DALI_IMPORT_API float GetRangedEpsilon(float a, float b);
  * @param[in] value the value to compare
  * @return true if the value is equal to zero
  */
-DALI_IMPORT_API bool EqualsZero( float value );
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wfloat-equal"
+inline bool EqualsZero( float value )
+{
+  return value == 0.0f;
+}
+#pragma GCC diagnostic pop
 
 /**
  * @brief Helper function to compare equality of two floating point values.
@@ -112,7 +165,10 @@ DALI_IMPORT_API bool EqualsZero( float value );
  * @param[in] b the second value to compare
  * @return true if the values are equal within a minimal epsilon for their values
  */
-DALI_IMPORT_API bool Equals( float a, float b );
+inline bool Equals( float a, float b )
+{
+  return ( fabsf( a - b ) <= GetRangedEpsilon( a, b ) );
+}
 
 /**
  * @brief Helper function to compare equality of two floating point values.
@@ -122,7 +178,10 @@ DALI_IMPORT_API bool Equals( float a, float b );
  * @param[in] epsilon the minimum epsilon value that will be used to consider the values different
  * @return true if the difference between the values is less than the epsilon
  */
-DALI_IMPORT_API bool Equals( float a, float b, float epsilon );
+inline bool Equals( float a, float b, float epsilon )
+{
+  return ( fabsf( a - b ) <= epsilon );
+}
 
 /**
  * @brief Get an float that is rounded at specified place of decimals.
@@ -131,7 +190,14 @@ DALI_IMPORT_API bool Equals( float a, float b, float epsilon );
  * @param[in] pos decimal place
  * @return a rounded float
  */
-DALI_IMPORT_API float Round( float value, int pos );
+inline float Round(float value, int pos)
+{
+  float temp;
+  temp = value * powf( 10, pos );
+  temp = floorf( temp + 0.5 );
+  temp *= powf( 10, -pos );
+  return temp;
+}
 
 /**
  * @brief Wrap x in domain (start) to (end).
@@ -165,7 +231,19 @@ DALI_IMPORT_API float Round( float value, int pos );
  *
  * @return the wrapped value over the domain (start) (end)
  */
-DALI_IMPORT_API float WrapInDomain(float x, float start, float end);
+inline float WrapInDomain(float x, float start, float end)
+{
+  float domain = end - start;
+  x -= start;
+
+  if(fabsf(domain) > Math::MACHINE_EPSILON_1)
+  {
+    return start + (x - floorf(x / domain) * domain);
+  }
+
+  return start;
+}
+
 
 /**
  * @brief Find the shortest distance (magnitude) and direction (sign)
@@ -195,7 +273,35 @@ DALI_IMPORT_API float WrapInDomain(float x, float start, float end);
  * @param end the end of the domain
  * @return the shortest direction (the sign) and distance (the magnitude)
  */
-DALI_IMPORT_API float ShortestDistanceInDomain(float a, float b, float start, float end);
+inline float ShortestDistanceInDomain( float a, float b, float start, float end )
+{
+  //  (a-start + end-b)
+  float size = end-start;
+  float vect = b-a;
+
+  if(vect > 0)
+  {
+    // +ve vector, let's try perspective 1 domain to the right,
+    // and see if closer.
+    float aRight = a+size;
+    if( aRight-b < vect )
+    {
+      return b-aRight;
+    }
+  }
+  else
+  {
+    // -ve vector, let's try perspective 1 domain to the left,
+    // and see if closer.
+    float aLeft = a-size;
+    if( aLeft-b > vect )
+    {
+      return b-aLeft;
+    }
+  }
+
+  return vect;
+}
 
 } // namespace Dali
 

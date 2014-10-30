@@ -24,15 +24,14 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/text/font.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
-
 class TextStyleContainer;
 
 /**
  * @brief Encapsulates style properties for text, such as weight, italics, underline, shadow, etc.
  */
-class TextStyle
+class DALI_IMPORT_API TextStyle
 {
 public:
   /**

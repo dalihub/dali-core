@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class SlotObserver;
@@ -32,7 +32,7 @@ class CallbackBase;
  *
  * This will happen if the object owning the signal is destroyed.
  */
-class SignalObserver
+class DALI_IMPORT_API SignalObserver
 {
 public:
 
@@ -60,7 +60,7 @@ public:
  *
  * This is used by the slot if wants to disconnect or is deleted.
  */
-class SlotObserver
+class DALI_IMPORT_API SlotObserver
 {
 public:
 

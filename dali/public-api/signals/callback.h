@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/functor-delegate.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class CallbackBase;
@@ -30,7 +30,7 @@ class CallbackBase;
 /**
  * @brief Callback base class to hold the data for callback function and member function calls.
  */
-class CallbackBase
+class DALI_IMPORT_API CallbackBase
 {
 public:
 

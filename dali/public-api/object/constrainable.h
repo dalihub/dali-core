@@ -26,7 +26,7 @@
 namespace Dali DALI_IMPORT_API
 {
 
-namespace Internal DALI_INTERNAL
+namespace Internal
 {
 class Object;
 }
@@ -37,7 +37,7 @@ class Constraint;
  * @brief Dali::Constrainable is a handle to an internal property owning Dali object that
  * can have constraints applied to it.
  */
-class Constrainable : public Handle
+class DALI_IMPORT_API Constrainable : public Handle
 {
 public:
 

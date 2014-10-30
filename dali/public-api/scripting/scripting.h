@@ -26,7 +26,7 @@
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-value.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;
@@ -56,7 +56,7 @@ struct StringEnum
  * @param[in] enumString The enum string
  * @return true if the strings are equal as defined above
  */
-bool CompareEnums(const std::string& input, const std::string& enumString);
+DALI_IMPORT_API bool CompareEnums(const std::string& input, const std::string& enumString);
 
 /**
  * @brief Set the value if strings pass a permissive compare.
@@ -142,7 +142,7 @@ std::string GetEnumerationName( T value, const StringEnum< T >* table, unsigned 
  * @param[in] value The input string
  * @return The corresponding color-mode.
  */
-ColorMode GetColorMode( const std::string& value );
+DALI_IMPORT_API ColorMode GetColorMode( const std::string& value );
 
 /**
  * @brief Takes a color mode and returns the appropriate string equivalent.
@@ -150,7 +150,7 @@ ColorMode GetColorMode( const std::string& value );
  * @param[in] value The color mode
  * @return The corresponding string.
  */
-std::string GetColorMode( ColorMode value );
+DALI_IMPORT_API std::string GetColorMode( ColorMode value );
 
 /**
  * @brief Takes a string and returns the appropriate position inheritance mode.
@@ -158,7 +158,7 @@ std::string GetColorMode( ColorMode value );
  * @param[in] value The input string
  * @return The corresponding position-inheritance-mode.
  */
-PositionInheritanceMode GetPositionInheritanceMode( const std::string& value );
+DALI_IMPORT_API PositionInheritanceMode GetPositionInheritanceMode( const std::string& value );
 
 /**
  * @brief Takes a position inheritance mode and returns the string equivalent.
@@ -166,7 +166,7 @@ PositionInheritanceMode GetPositionInheritanceMode( const std::string& value );
  * @param[in] value The position-inheritance-mode.
  * @return The corresponding string.
  */
-std::string GetPositionInheritanceMode( PositionInheritanceMode value );
+DALI_IMPORT_API std::string GetPositionInheritanceMode( PositionInheritanceMode value );
 
 /**
  * @brief Takes a string and returns the appropriate draw mode.
@@ -174,7 +174,7 @@ std::string GetPositionInheritanceMode( PositionInheritanceMode value );
  * @param[in] value The input string
  * @return The corresponding draw-mode.
  */
-DrawMode::Type GetDrawMode( const std::string& value );
+DALI_IMPORT_API DrawMode::Type GetDrawMode( const std::string& value );
 
 /**
  * @brief Takes a draw-mode and returns the string equivalent.
@@ -182,7 +182,7 @@ DrawMode::Type GetDrawMode( const std::string& value );
  * @param[in] value The draw-mode.
  * @return The corresponding string.
  */
-std::string GetDrawMode( DrawMode::Type value );
+DALI_IMPORT_API std::string GetDrawMode( DrawMode::Type value );
 
 /**
  * @brief Takes a string and returns the appropriate anchor-point or parent-origin constant.
@@ -190,7 +190,7 @@ std::string GetDrawMode( DrawMode::Type value );
  * @param[in] value The input string
  * @return The corresponding anchor-point or parent-origin constant.
  */
-Vector3 GetAnchorConstant( const std::string& value );
+DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
 
 /**
  * @brief Creates object with data from the property value map.
@@ -210,7 +210,7 @@ Vector3 GetAnchorConstant( const std::string& value );
  *
  * @return a pointer to a newly created object.
  */
-Image NewImage( const Property::Value& map );
+DALI_IMPORT_API Image NewImage( const Property::Value& map );
 
 /**
  * @brief Creates object with data from the property value map.
@@ -243,7 +243,7 @@ Image NewImage( const Property::Value& map );
  *
  * @return a pointer to a newly created object.
  */
-ShaderEffect NewShaderEffect( const Property::Value& map );
+DALI_IMPORT_API ShaderEffect NewShaderEffect( const Property::Value& map );
 
 /**
  * @brief Creates an actor with the date from the property value map.
@@ -269,7 +269,7 @@ ShaderEffect NewShaderEffect( const Property::Value& map );
  *
  * @return Handle to the newly created actor.
  */
-Actor NewActor( const Property::Map& map );
+DALI_IMPORT_API Actor NewActor( const Property::Map& map );
 
 /**
  * @brief Creates a Property::Map from the actor provided.
@@ -277,7 +277,7 @@ Actor NewActor( const Property::Map& map );
  * @param[in] actor The base-actor from which a Property::Map should be created
  * @param[out] map This map is cleared and a property map of actor and its children is filled in
  */
-void CreatePropertyMap( Actor actor, Property::Map& map );
+DALI_IMPORT_API void CreatePropertyMap( Actor actor, Property::Map& map );
 
 /**
  * @brief Creates a Property::Map from the image provided.
@@ -285,7 +285,7 @@ void CreatePropertyMap( Actor actor, Property::Map& map );
  * @param[in] image The image from which a Property::Map should be created
  * @param[out] map This map is cleared and a property map of the image is filled in
  */
-void CreatePropertyMap( Image image, Property::Map& map );
+DALI_IMPORT_API void CreatePropertyMap( Image image, Property::Map& map );
 
 }
 

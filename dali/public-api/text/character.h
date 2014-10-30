@@ -130,7 +130,7 @@ public:
 
 
   /**
-   * @brief Returs the script of this character.
+   * @brief Returns the script of this character.
    */
   Script GetScript() const;
 

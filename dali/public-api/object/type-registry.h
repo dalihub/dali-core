@@ -26,7 +26,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/type-info.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -88,7 +88,7 @@ class TypeRegistry;
  *   separated ie 'next-page'. This maintains consistency with the scripted interface.
  *
  */
-class TypeRegistry : public BaseHandle
+class DALI_IMPORT_API TypeRegistry : public BaseHandle
 {
 public:
   typedef std::vector<std::string> NameContainer; ///< Container of type names
@@ -171,7 +171,7 @@ public: // Not intended for application developers
 /**
  * @brief Register a type from type info.
  */
-class TypeRegistration
+class DALI_IMPORT_API TypeRegistration
 {
 public:
   /**
@@ -222,7 +222,7 @@ private:
 /**
  * @brief Register a signal connector function to a registered type.
  */
-class SignalConnectorType
+class DALI_IMPORT_API SignalConnectorType
 {
 public:
   /**
@@ -238,7 +238,7 @@ public:
 /**
  * @brief Register an action function.
  */
-class TypeAction
+class DALI_IMPORT_API TypeAction
 {
 public:
   /**
@@ -254,7 +254,7 @@ public:
 /**
  * @brief Register a property for the given type.
  */
-class PropertyRegistration
+class DALI_IMPORT_API PropertyRegistration
 {
 public:
 

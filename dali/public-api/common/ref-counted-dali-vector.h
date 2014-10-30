@@ -22,8 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/ref-object.h>
 
-
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**

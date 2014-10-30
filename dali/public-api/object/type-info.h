@@ -22,7 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class ConnectionTrackerInterface;
@@ -39,7 +39,7 @@ namespace Internal DALI_INTERNAL
  *
  * See TypeRegistry for methods of type registration and TypeInfo retrieval.
  */
-class TypeInfo : public BaseHandle
+class DALI_IMPORT_API TypeInfo : public BaseHandle
 {
 public:
   typedef BaseHandle (*CreateFunction)(); ///< Function signature for creating an instance of the associated object type.

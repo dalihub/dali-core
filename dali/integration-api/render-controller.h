@@ -28,7 +28,7 @@ namespace Integration
  * Abstract interface for an object which controls rendering.
  * This will be informed when Dali has new content to render.
  */
-class DALI_IMPORT_API RenderController
+class RenderController
 {
 protected:
 

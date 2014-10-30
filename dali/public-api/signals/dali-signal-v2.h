@@ -57,7 +57,7 @@
 #include <dali/public-api/signals/slot-delegate.h>
 #include <dali/public-api/signals/base-signal.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**

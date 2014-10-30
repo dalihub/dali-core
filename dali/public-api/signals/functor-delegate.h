@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -63,7 +63,7 @@ struct FunctorDestroyer
 /**
  * @brief Used to connect a void() functor to a signal via BaseObject::SignalConnect()
  */
-class FunctorDelegate
+class DALI_IMPORT_API FunctorDelegate
 {
 public:
 
