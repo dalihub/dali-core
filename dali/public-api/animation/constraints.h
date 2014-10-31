@@ -20,15 +20,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/vector3.h>
+#include <dali/public-api/math/vector4.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/matrix.h>
+#include <dali/public-api/math/matrix3.h>
+#include <dali/public-api/object/property-input.h>
 
 namespace Dali
 {
-
-class PropertyInput;
-class Quaternion;
-class Matrix;
-class Matrix3;
 
 /**
  * @brief Scale To Fit constraint.
@@ -36,12 +35,13 @@ class Matrix3;
  * Scales an Actor, such that it fits within it's Parent's Size.
  * f(current, size, parentSize) = parentSize / size
  */
-struct DALI_IMPORT_API ScaleToFitConstraint
+struct ScaleToFitConstraint
 {
   /**
    * @brief Constructor.
    */
-  ScaleToFitConstraint();
+  ScaleToFitConstraint()
+  { }
 
   /**
    * @brief Functor operator
@@ -53,8 +53,15 @@ struct DALI_IMPORT_API ScaleToFitConstraint
    */
   Vector3 operator()(const Vector3&    current,
                      const PropertyInput& sizeProperty,
-                     const PropertyInput& parentSizeProperty);
+                     const PropertyInput& parentSizeProperty)
+  {
+    const Vector3 size = sizeProperty.GetVector3();
+    const Vector3 parentSize = parentSizeProperty.GetVector3();
 
+    return Vector3( fabsf(size.x) > Math::MACHINE_EPSILON_1 ? (parentSize.x / size.x) : 0.0f,
+                    fabsf(size.y) > Math::MACHINE_EPSILON_1 ? (parentSize.y / size.y) : 0.0f,
+                    fabsf(size.z) > Math::MACHINE_EPSILON_1 ? (parentSize.z / size.z) : 0.0f );
+  }
 };
 
 /**
@@ -63,12 +70,13 @@ struct DALI_IMPORT_API ScaleToFitConstraint
  * Scales an Actor, such that it fits within its Parent's Size Keeping the aspect ratio.
  * f(current, size, parentSize) = Vector3( min( parentSizeX / sizeX, min( parentSizeY / sizeY, parentSizeZ / sizeZ ) )
  */
-struct DALI_IMPORT_API ScaleToFitKeepAspectRatioConstraint
+struct ScaleToFitKeepAspectRatioConstraint
 {
   /**
    * @brief Constructor.
    */
-  ScaleToFitKeepAspectRatioConstraint();
+  ScaleToFitKeepAspectRatioConstraint()
+  { }
 
   /**
    * @brief Functor operator
@@ -80,31 +88,10 @@ struct DALI_IMPORT_API ScaleToFitKeepAspectRatioConstraint
    */
   Vector3 operator()(const Vector3&    current,
                      const PropertyInput& sizeProperty,
-                     const PropertyInput& parentSizeProperty);
-};
-
-/**
- * @brief Scale To Fill Keep Aspect Ratio constraint.
- *
- * Scales an Actor, such that it fill its Parent's Size Keeping the aspect ratio.
- * f(current, size, parentSize) = Vector3( max( parentSizeX / sizeX, max( parentSizeY / sizeY, parentSizeZ / sizeZ ) )
- */
-struct DALI_IMPORT_API ScaleToFillKeepAspectRatioConstraint
-{
-  /**
-   * @brief Constructor.
-   */
-  ScaleToFillKeepAspectRatioConstraint();
-
-  /**
-   * @param[in] current The actor's current scale
-   * @param[in] sizeProperty The actor's current size
-   * @param[in] parentSizeProperty The parent's current size.
-   * @return The actor's new scale
-   */
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& sizeProperty,
-                     const PropertyInput& parentSizeProperty);
+                     const PropertyInput& parentSizeProperty)
+  {
+    return FitKeepAspectRatio( parentSizeProperty.GetVector3(), sizeProperty.GetVector3() );
+  }
 };
 
 /**
@@ -113,12 +100,13 @@ struct DALI_IMPORT_API ScaleToFillKeepAspectRatioConstraint
  * Scales an Actor, such that it fill its Parent's Size in the X and Y coordinates Keeping the aspect ratio.
  * f(current, size, parentSize) = Vector3( max( parentSizeX / sizeX, max( parentSizeY / sizeY, parentSizeZ / sizeZ ) )
  */
-struct DALI_IMPORT_API ScaleToFillXYKeepAspectRatioConstraint
+struct ScaleToFillXYKeepAspectRatioConstraint
 {
   /**
    * @brief Constructor.
    */
-  ScaleToFillXYKeepAspectRatioConstraint();
+  ScaleToFillXYKeepAspectRatioConstraint()
+  { }
 
   /**
    * @param[in] current The actor's current scale
@@ -128,71 +116,10 @@ struct DALI_IMPORT_API ScaleToFillXYKeepAspectRatioConstraint
    */
   Vector3 operator()(const Vector3&    current,
                      const PropertyInput& sizeProperty,
-                     const PropertyInput& parentSizeProperty);
-};
-
-/**
- * @brief Shrinks source size inside the target size maintaining aspect ratio of source.
- * If source is smaller than target it returns source
- */
-struct ShrinkInsideKeepAspectRatioConstraint
-{
-  /**
-   * @brief Constructor.
-   */
-  ShrinkInsideKeepAspectRatioConstraint();
-
-  /**
-   * @param[in] current The actor's current scale
-   * @param[in] sizeProperty The actor's current size
-   * @param[in] parentSizeProperty The parent's current size.
-   * @return The actor's new scale
-   */
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& sizeProperty,
-                     const PropertyInput& parentSizeProperty);
-};
-
-/**
- * @brief MultiplyConstraint
- *
- * f(current, property) = current * property
- */
-struct DALI_IMPORT_API MultiplyConstraint
-{
-  /**
-   * @brief Constructor.
-   */
-  MultiplyConstraint();
-
-  /**
-   * @param[in] current The object's current property value
-   * @param[in] property The property to multiply by.
-   * @return The object's new property value
-   */
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& property);
-};
-
-/**
- * @brief DivideConstraint
- *
- * f(current, property) = current / property
- */
-struct DALI_IMPORT_API DivideConstraint
-{
-  /**
-   * @brief Constructor.
-   */
-  DivideConstraint();
-
-  /**
-   * @param[in] current The object's current property value
-   * @param[in] property The property to divide by.
-   * @return The object's new property value
-   */
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& property);
+                     const PropertyInput& parentSizeProperty)
+  {
+    return FillXYKeepAspectRatio( parentSizeProperty.GetVector3(), sizeProperty.GetVector3() );
+  }
 };
 
 /**
@@ -200,12 +127,13 @@ struct DALI_IMPORT_API DivideConstraint
  *
  * f(current, property) = property
  */
-struct DALI_IMPORT_API EqualToConstraint
+struct EqualToConstraint
 {
   /**
    * @brief Constructor.
    */
-  EqualToConstraint();
+  EqualToConstraint()
+  { }
 
   /**
    * @brief override functor for float properties
@@ -214,7 +142,10 @@ struct DALI_IMPORT_API EqualToConstraint
    * @param[in] property The property to copy
    * @return The copy of the input property
    */
-  float operator()(const float current, const PropertyInput& property);
+  float operator()(const float current, const PropertyInput& property)
+  {
+    return property.GetFloat();
+  }
 
   /**
    * @brief override functor for float properties
@@ -223,7 +154,10 @@ struct DALI_IMPORT_API EqualToConstraint
    * @param[in] property The property to copy
    * @return The copy of the input property
    */
-  Vector3 operator()(const Vector3& current, const PropertyInput& property);
+  Vector3 operator()(const Vector3& current, const PropertyInput& property)
+  {
+    return property.GetVector3();
+  }
 
   /**
    * @brief override functor for float properties
@@ -232,7 +166,10 @@ struct DALI_IMPORT_API EqualToConstraint
    * @param[in] property The property to copy
    * @return The copy of the input property
    */
-  Vector4 operator()(const Vector4& current, const PropertyInput& property);
+  Vector4 operator()(const Vector4& current, const PropertyInput& property)
+  {
+    return property.GetVector4();
+  }
 
   /**
    * @brief override functor for float properties
@@ -241,7 +178,10 @@ struct DALI_IMPORT_API EqualToConstraint
    * @param[in] property The property to copy
    * @return The copy of the input property
    */
-  Quaternion operator()(const Quaternion& current, const PropertyInput& property);
+  Quaternion operator()(const Quaternion& current, const PropertyInput& property)
+  {
+    return property.GetQuaternion();
+  }
 
   /**
    * @brief override functor for float properties
@@ -250,7 +190,10 @@ struct DALI_IMPORT_API EqualToConstraint
    * @param[in] property The property to copy
    * @return The copy of the input property
    */
-  Matrix3 operator()(const Matrix3& current, const PropertyInput& property);
+  Matrix3 operator()(const Matrix3& current, const PropertyInput& property)
+  {
+    return property.GetMatrix3();
+  }
 
   /**
    * @brief override functor for float properties
@@ -259,7 +202,11 @@ struct DALI_IMPORT_API EqualToConstraint
    * @param[in] property The property to copy
    * @return The copy of the input property
    */
-  Matrix operator()(const Matrix& current, const PropertyInput& property);
+  Matrix operator()(const Matrix& current, const PropertyInput& property)
+  {
+    return property.GetMatrix();
+  }
+
 };
 
 /**
@@ -267,22 +214,27 @@ struct DALI_IMPORT_API EqualToConstraint
  *
  * f(current, property, scale) = property * scale
  */
-struct DALI_IMPORT_API RelativeToConstraint
+struct RelativeToConstraint
 {
   /**
    * @brief Constructor.
    */
-  RelativeToConstraint( float scale );
+  RelativeToConstraint( float scale )
+  : mScale( scale, scale, scale ) { }
 
   /**
    * @brief Constructor.
    */
-  RelativeToConstraint( const Vector3& scale );
+  RelativeToConstraint( const Vector3& scale )
+  : mScale( scale ) { }
 
   /**
    * @brief Functor.
    */
-  Vector3 operator()(const Vector3& current, const PropertyInput& property);
+  Vector3 operator()(const Vector3& current, const PropertyInput& property)
+  {
+    return property.GetVector3() * mScale;
+  }
 
   Vector3 mScale; ///< Component-wise scale factor
 };
@@ -290,78 +242,47 @@ struct DALI_IMPORT_API RelativeToConstraint
 /**
  * @brief RelativeToConstraint for float properties
  */
-struct DALI_IMPORT_API RelativeToConstraintFloat
+struct RelativeToConstraintFloat
 {
   /**
    * @brief Constructor.
    */
-  RelativeToConstraintFloat( float scale );
+  RelativeToConstraintFloat( float scale )
+  : mScale( scale ) { }
 
   /**
    * @brief Functor.
    */
-  float operator()(const float current, const PropertyInput& property);
+  float operator()(const float current, const PropertyInput& property)
+  {
+    return property.GetFloat() * mScale;
+  }
 
   float mScale; ///< Scale factor
-};
-
-/**
- * @brief InverseOfConstraint
- *
- * f(current, property) = 1 / property
- */
-struct DALI_IMPORT_API InverseOfConstraint
-{
-  /**
-   * @brief Constructor.
-   */
-  InverseOfConstraint();
-
-  /**
-   * @brief Functor.
-   */
-  Vector3 operator()(const Vector3&    current,
-                     const PropertyInput& property);
 };
 
 /**
  * @brief Constraint which sets width to be another actor's width,
  * and the height to a fixed height.
  */
-struct DALI_IMPORT_API SourceWidthFixedHeight
+struct SourceWidthFixedHeight
 {
   /**
    * @brief Constructor.
    */
-  SourceWidthFixedHeight( float height );
+  SourceWidthFixedHeight( float height )
+  : mFixedHeight( height ) { }
 
   /**
    * @brief Functor.
    */
   Vector3 operator()(const Vector3& current,
-                     const PropertyInput& sourceSize);
+                     const PropertyInput& sourceSize)
+  {
+    return Vector3( sourceSize.GetVector3().width, mFixedHeight, current.depth );
+  }
 
   float mFixedHeight; ///< the fixed height
-};
-
-/**
- * @brief Constraint which sets height to be another actor's height,
- * and the width to a fixed width.
- */
-struct DALI_IMPORT_API SourceHeightFixedWidth
-{
-  /**
-   * @brief Constructor
-   */
-  SourceHeightFixedWidth( float width );
-
-  /**
-   * @brief Functor
-   */
-  Vector3 operator()(const Vector3& current,
-                     const PropertyInput& sourceSize);
-
-  float mFixedWidth; ///< the fixed width
 };
 
 /**
@@ -378,48 +299,29 @@ struct DALI_IMPORT_API SourceHeightFixedWidth
  * @param[in] targetRotation World rotation of the target
  * @return The orientation of the camera
  */
-DALI_IMPORT_API Dali::Quaternion LookAt( const Dali::Quaternion& current,
-                                         const PropertyInput& targetPosition,
-                                         const PropertyInput& cameraPosition,
-                                         const PropertyInput& targetRotation );
-
-
-/**
- * @brief Constraint functor to aim a camera at a target.
- *
- * Constraint which sets rotation given camera world position,
- * target world position (usually the looked at actor's world position)
- * and the angle parameter (how much the camera is offset with respect
- * to the target's up vector).
- */
-struct DALI_IMPORT_API OrientedLookAt
+inline Quaternion LookAt( const Quaternion& current,
+                          const PropertyInput& targetPosition,
+                          const PropertyInput& cameraPosition,
+                          const PropertyInput& targetRotation )
 {
-  /**
-   * @brief Functor constructor.
-   *
-   * @param[in] angle The angle of the camera's up vector with regards
-   * to the target's up vector in radians. Positive angles rotate the
-   * camera clockwise, negative angles rotate anti-clockwise.
-   */
-  OrientedLookAt( float angle );
+  Vector3 vForward = targetPosition.GetVector3() - cameraPosition.GetVector3();
+  vForward.Normalize();
 
-  /**
-   * @brief Functor.
-   *
-   * @param[in] current The current rotation property value
-   * @param[in] targetPosition World position of target
-   * @param[in] cameraPosition World position of camera
-   * @param[in] targetRotation World rotation of the target
-   * @return The orientation of the camera
-   */
-  Dali::Quaternion operator()(const Dali::Quaternion& current,
-                              const PropertyInput& targetPosition,
-                              const PropertyInput& cameraPosition,
-                              const PropertyInput& targetRotation );
+  const Quaternion& targetRotationQ = targetRotation.GetQuaternion();
 
-  float mAngle; ///< camera angle offset
-};
+  Vector3 targetY(targetRotationQ.Rotate(Vector3::YAXIS));
+  targetY.Normalize();
 
+  // Camera Right vector is perpendicular to forward & target up
+  Vector3 vX = targetY.Cross(vForward);
+  vX.Normalize();
+
+  // Camera Up vector is perpendicular to forward and right
+  Vector3 vY = vForward.Cross(vX);
+  vY.Normalize();
+
+  return Quaternion( vX, vY, vForward );
+}
 
 } // namespace Dali
 

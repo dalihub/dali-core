@@ -3247,7 +3247,7 @@ int UtcDaliConstraintInvalidInputProperty(void)
 {
   TestApplication application;
   Actor actor = Actor::New();
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, LocalSource( PROPERTY_REGISTRATION_START_INDEX ), MultiplyConstraint() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, LocalSource( PROPERTY_REGISTRATION_START_INDEX ), EqualToConstraint() );
 
   Stage::GetCurrent().Add( actor );
 
@@ -3479,53 +3479,6 @@ int UtcDaliBuiltinConstraintScaleToFitKeepAspectRatio(void)
   END_TEST;
 }
 
-int UtcDaliBuiltinConstraintScaleToFillKeepAspectRatio(void)
-{
-  TestApplication application;
-
-  Actor parent = Actor::New();
-  Vector3 parentSize1( 10, 10, 10 );
-  parent.SetSize( parentSize1 );
-  Stage::GetCurrent().Add( parent );
-
-  Actor actor = Actor::New();
-  Vector3 childSize( 4, 5, 5 );
-  actor.SetSize( childSize );
-  parent.Add( actor );
-
-  application.SendNotification();
-  application.Render(0);
-  Vector3 childScale1( 1.0f, 1.0f, 1.0f );
-  DALI_TEST_EQUALS( actor.GetCurrentScale(), childScale1, TEST_LOCATION );
-
-  // Apply constraint
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                                    LocalSource( Actor::SIZE ),
-                                                    ParentSource( Actor::SIZE ),
-                                                    ScaleToFillKeepAspectRatioConstraint() );
-  actor.ApplyConstraint( constraint );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied, but parent size is larger than child
-  float val = 10.f / 4.f;
-  Vector3 childScale2( val, val, val );
-  DALI_TEST_EQUALS( actor.GetCurrentScale(), childScale2, TEST_LOCATION );
-
-  // change parent size
-  Vector3 parentSize2( 40, 50, 50 );
-  parent.SetSize( parentSize2 );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied, but parent size is larger than child
-  Vector3 childScale3( 10.0f, 10.0f, 10.0f );
-  DALI_TEST_EQUALS( actor.GetCurrentScale(), childScale3, TEST_LOCATION );
-  END_TEST;
-}
 
 int UtcDaliBuiltinConstraintScaleToFillXYKeepAspectRatio(void)
 {
@@ -3572,151 +3525,6 @@ int UtcDaliBuiltinConstraintScaleToFillXYKeepAspectRatio(void)
   // Constraint should be fully applied, but parent size is larger than child
   Vector3 childScale3( 10.0f, 10.0f, 10.0f );
   DALI_TEST_EQUALS( actor.GetCurrentScale(), childScale3, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliBuiltinConstraintShrinkInsideKeepAspectRatioConstraint(void)
-{
-  TestApplication application;
-
-  Actor parent = Actor::New();
-  Vector3 parentSize1( 10, 10, 10 );
-  parent.SetSize( parentSize1 );
-  Stage::GetCurrent().Add( parent );
-
-  Actor actor = Actor::New();
-  Vector3 childSize( 4, 5, 5 );
-  actor.SetSize( childSize );
-  parent.Add( actor );
-
-  application.SendNotification();
-  application.Render(0);
-  Vector3 childScale1( 1.0f, 1.0f, 1.0f );
-  DALI_TEST_EQUALS( actor.GetCurrentScale(), childScale1, TEST_LOCATION );
-
-  // Apply constraint
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                                    LocalSource( Actor::SIZE ),
-                                                    ParentSource( Actor::SIZE ),
-                                                    ShrinkInsideKeepAspectRatioConstraint() );
-  actor.ApplyConstraint( constraint );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied, but parent size is larger than child
-  Vector3 childScale2( 1.0f, 1.0f, 1.0f );
-  DALI_TEST_EQUALS( actor.GetCurrentScale(), childScale2, TEST_LOCATION );
-
-  // change parent size
-  Vector3 parentSize2( 40, 50, 50 );
-  parent.SetSize( parentSize2 );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied, but parent size is larger than child
-  Vector3 childScale3( 1.0f, 1.0f, 1.0f );
-  DALI_TEST_EQUALS( actor.GetCurrentScale(), childScale3, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliBuiltinConstraintMultiplyConstraint(void)
-{
-  TestApplication application;
-
-  Actor actor1 = Actor::New();
-  Vector3 startPosition( 10, 10, 10 );
-  actor1.SetPosition( startPosition );
-  Stage::GetCurrent().Add( actor1 );
-
-  Actor actor2 = Actor::New();
-  Vector3 startSize( 100, 100, 100 );
-  actor2.SetSize( startSize );
-  Stage::GetCurrent().Add( actor2 );
-
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_CHECK( actor1.GetCurrentPosition() == startPosition );
-  DALI_TEST_CHECK( actor2.GetCurrentSize()     == startSize );
-
-  // Apply constraint - multiply actor1 size by actor2 position
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                    Source( actor1, Actor::POSITION ),
-                                                    MultiplyConstraint() );
-  constraint.SetRemoveAction( Constraint::Discard );
-  actor2.ApplyConstraint( constraint );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied
-  Vector3 size( startSize * startPosition );
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, TEST_LOCATION );
-
-  // Change the multiply input
-  Vector3 endPosition( 2, 2, 2 );
-  actor1.SetPosition( endPosition );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied
-  size = Vector3( startSize * endPosition );
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, TEST_LOCATION );
-  application.Render(0);
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliBuiltinConstraintDivideConstraint(void)
-{
-  TestApplication application;
-
-  Actor actor1 = Actor::New();
-  Vector3 startPosition( 10, 10, 10 );
-  actor1.SetPosition( startPosition );
-  Stage::GetCurrent().Add( actor1 );
-
-  Actor actor2 = Actor::New();
-  Vector3 startSize( 100, 100, 100 );
-  actor2.SetSize( startSize );
-  Stage::GetCurrent().Add( actor2 );
-
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_CHECK( actor1.GetCurrentPosition() == startPosition );
-  DALI_TEST_CHECK( actor2.GetCurrentSize()     == startSize );
-
-  // Apply constraint - divide actor1 size by actor2 position
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                    Source( actor1, Actor::POSITION ),
-                                                    DivideConstraint() );
-  constraint.SetRemoveAction( Constraint::Discard );
-  actor2.ApplyConstraint( constraint );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied
-  Vector3 size( 10, 10, 10 ); // startSize / startPosition
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, TEST_LOCATION );
-
-  // Change the divide input
-  Vector3 endPosition( 2, 2, 2 );
-  actor1.SetPosition( endPosition );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied
-  size = Vector3( 50, 50, 50 ); // startSize / endPosition
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, TEST_LOCATION );
-  application.Render(0);
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, TEST_LOCATION );
   END_TEST;
 }
 
@@ -3921,55 +3729,6 @@ int UtcDaliBuiltinConstraintRelativeToConstraint(void)
   END_TEST;
 }
 
-int UtcDaliBuiltinConstraintInverseOfConstraint(void)
-{
-  TestApplication application;
-
-  Actor actor1 = Actor::New();
-  Vector3 startPosition( 10, 10, 10 );
-  actor1.SetPosition( startPosition );
-  Stage::GetCurrent().Add( actor1 );
-
-  Actor actor2 = Actor::New();
-  Vector3 startSize( 100, 100, 100 );
-  actor2.SetSize( startSize );
-  Stage::GetCurrent().Add( actor2 );
-
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_CHECK( actor1.GetCurrentPosition() == startPosition );
-  DALI_TEST_CHECK( actor2.GetCurrentSize()     == startSize );
-
-  // Apply constraint - actor1 size == ( 1 / actor2 position )
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                    Source( actor1, Actor::POSITION ),
-                                                    InverseOfConstraint() );
-  constraint.SetRemoveAction( Constraint::Discard );
-  actor2.ApplyConstraint( constraint );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied
-  Vector3 size( 0.1, 0.1, 0.1 ); // 1 / startPosition
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, 0.00001f, TEST_LOCATION );
-
-  // Change the input
-  Vector3 endPosition( 2, 2, 2 );
-  actor1.SetPosition( endPosition );
-
-  application.SendNotification();
-  application.Render(0);
-
-  // Constraint should be fully applied
-  size = Vector3( 0.5, 0.5, 0.5 ); // 1 / endPosition
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, TEST_LOCATION );
-  application.Render(0);
-  DALI_TEST_EQUALS( actor2.GetCurrentSize(), size, TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliBuiltinConstraintFunctions(void)
 {
   TestApplication application;
@@ -3994,26 +3753,6 @@ int UtcDaliBuiltinConstraintFunctions(void)
     }
   }
 
-  {
-    SourceHeightFixedWidth sourceHeightFixedWidth( 10.f );
-    Vector3 current;
-    {
-      Vector3 reference(10,1,0);
-      Vector3 value = sourceHeightFixedWidth( current, PropertyInputAbstraction(Vector3::ONE) );
-      DALI_TEST_EQUALS( reference, value, TEST_LOCATION );
-    }
-    {
-      Vector3 reference(10,10,0);
-      Vector3 value = sourceHeightFixedWidth( current, PropertyInputAbstraction(Vector3::ONE*10.f) );
-      DALI_TEST_EQUALS( reference, value, TEST_LOCATION );
-    }
-    {
-      Vector3 reference(10,100,0);
-      Vector3 value = sourceHeightFixedWidth( current, PropertyInputAbstraction(Vector3::ONE*100.f) );
-      DALI_TEST_EQUALS( reference, value, TEST_LOCATION );
-    }
-  }
-
   { // LookAt
     Quaternion current(0, Vector3::YAXIS);
     PropertyInputAbstraction target(Vector3::ZAXIS);
@@ -4026,12 +3765,6 @@ int UtcDaliBuiltinConstraintFunctions(void)
       DALI_TEST_EQUALS( reference, value, 0.001, TEST_LOCATION );
     }
 
-    {
-      OrientedLookAt orientedLookAt(90.f);
-      Quaternion reference(.525322, 0., 0., 0.850904);
-      Quaternion value = orientedLookAt( current, target, camera, targetRotation );
-      DALI_TEST_EQUALS( reference, value, 0.001, TEST_LOCATION );
-    }
   }
 
   END_TEST;

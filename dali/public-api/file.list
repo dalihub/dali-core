@@ -17,7 +17,6 @@ public_api_src_files = \
   $(public_api_src_dir)/animation/animation.cpp \
   $(public_api_src_dir)/animation/alpha-functions.cpp \
   $(public_api_src_dir)/animation/constraint.cpp \
-  $(public_api_src_dir)/animation/constraints.cpp \
   $(public_api_src_dir)/animation/constraint-source.cpp \
   $(public_api_src_dir)/animation/interpolator-functions.cpp \
   $(public_api_src_dir)/animation/key-frames.cpp \
