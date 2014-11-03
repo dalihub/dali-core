@@ -19,7 +19,10 @@ print RESULTS_OUT $fline;
 print RESULTS_OUT "<?xml-stylesheet type=\"text/xsl\" href=\"./style/testresult.xsl\"?>\n";
 while(<RESULTS>)
 {
-    print RESULTS_OUT $_;
+    if( ! /xml-stylesheet/ )
+    {
+        print RESULTS_OUT $_;
+    }
 }
 close RESULTS_OUT;
 close RESULTS;
