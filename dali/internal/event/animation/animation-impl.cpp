@@ -630,124 +630,6 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
   }
 }
 
-void Animation::Animate( Property& target, Property::Type targetType, AnyFunction& func )
-{
-  Animate( target, targetType, func, mDefaultAlpha, mDurationSeconds );
-}
-
-void Animation::Animate( Property& target, Property::Type targetType, AnyFunction& func, AlphaFunction& alpha )
-{
-  Animate( target, targetType, func, alpha, mDurationSeconds );
-}
-
-void Animation::Animate( Property& target, Property::Type targetType, AnyFunction& func, TimePeriod period )
-{
-  Animate( target, targetType, func, mDefaultAlpha, period );
-}
-
-void Animation::Animate( Property& target, Property::Type targetType, AnyFunction& func, AlphaFunction& alpha, TimePeriod period )
-{
-  Property::Type type = target.object.GetPropertyType(target.propertyIndex);
-  if(target.componentIndex != Property::INVALID_COMPONENT_INDEX)
-  {
-    if( type == Property::VECTOR2
-        || type == Property::VECTOR3
-        || type == Property::VECTOR4 )
-    {
-      type = Property::FLOAT;
-    }
-  }
-  DALI_ASSERT_ALWAYS( type == targetType && "Animation function must match target property type" );
-
-  ProxyObject& proxy = dynamic_cast<ProxyObject&>( GetImplementation(target.object) );
-
-  ExtendDuration( period );
-
-  switch ( targetType )
-  {
-    case Property::BOOLEAN:
-    {
-      AddAnimatorConnector( AnimatorConnector<bool>::New(proxy,
-                                                         target.propertyIndex,
-                                                         target.componentIndex,
-                                                         AnyCast< AnimatorFunctionBool >( func ),
-                                                         alpha,
-                                                         period) );
-      break;
-    }
-
-    case Property::FLOAT:
-    {
-      AddAnimatorConnector( AnimatorConnector<float>::New(proxy,
-                                                          target.propertyIndex,
-                                                          target.componentIndex,
-                                                          AnyCast< AnimatorFunctionFloat >( func ),
-                                                          alpha,
-                                                          period) );
-      break;
-    }
-
-    case Property::INTEGER:
-    {
-      AddAnimatorConnector( AnimatorConnector<int>::New(proxy,
-                                                        target.propertyIndex,
-                                                        target.componentIndex,
-                                                        AnyCast< AnimatorFunctionInteger >( func ),
-                                                        alpha,
-                                                        period) );
-      break;
-    }
-
-    case Property::VECTOR2:
-    {
-      AddAnimatorConnector( AnimatorConnector<Vector2>::New(proxy,
-                                                            target.propertyIndex,
-                                                            target.componentIndex,
-                                                            AnyCast< AnimatorFunctionVector2 >( func ),
-                                                            alpha,
-                                                            period) );
-      break;
-    }
-
-    case Property::VECTOR3:
-    {
-      AddAnimatorConnector( AnimatorConnector<Vector3>::New(proxy,
-                                                            target.propertyIndex,
-                                                            target.componentIndex,
-                                                            AnyCast< AnimatorFunctionVector3 >( func ),
-                                                            alpha,
-                                                            period) );
-      break;
-    }
-
-    case Property::VECTOR4:
-    {
-      AddAnimatorConnector( AnimatorConnector<Vector4>::New(proxy,
-                                                            target.propertyIndex,
-                                                            target.componentIndex,
-                                                            AnyCast< AnimatorFunctionVector4 >( func ),
-                                                            alpha,
-                                                            period) );
-      break;
-    }
-
-    case Property::ROTATION:
-    {
-      AddAnimatorConnector( AnimatorConnector<Quaternion>::New(proxy,
-                                                               target.propertyIndex,
-                                                               target.componentIndex,
-                                                               AnyCast< AnimatorFunctionQuaternion >( func ),
-                                                               alpha,
-                                                               period) );
-      break;
-    }
-
-    default:
-      DALI_ASSERT_ALWAYS(false && "Property type enumeration out of bounds" ); // should never come here
-      break;
-  }
-}
-
 bool Animation::HasFinished()
 {
   bool hasFinished(false);
@@ -862,18 +744,6 @@ void Animation::MoveTo(Actor& actor, const Vector3& position, AlphaFunction alph
                                                          TimePeriod(delaySeconds, durationSeconds) ) );
 }
 
-void Animation::Move(Actor& actor, AnimatorFunctionVector3 func, AlphaFunction alpha,  float delaySeconds, float durationSeconds)
-{
-  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
-
-  AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::POSITION,
-                                                         Property::INVALID_COMPONENT_INDEX,
-                                                         func,
-                                                         alpha,
-                                                         TimePeriod(delaySeconds, durationSeconds) ) );
-}
-
 void Animation::RotateBy(Actor& actor, Radian angle, const Vector3& axis)
 {
   RotateBy(actor, angle, axis, mDefaultAlpha, 0.0f, GetDuration());
@@ -944,18 +814,6 @@ void Animation::RotateTo(Actor& actor, const Quaternion& rotation, AlphaFunction
                                                             Dali::Actor::ROTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
                                                             RotateToQuaternion(rotation),
-                                                            alpha,
-                                                            TimePeriod(delaySeconds, durationSeconds) ) );
-}
-
-void Animation::Rotate(Actor& actor, AnimatorFunctionQuaternion func, AlphaFunction alpha,  float delaySeconds, float durationSeconds)
-{
-  ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
-
-  AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
-                                                            Dali::Actor::ROTATION,
-                                                            Property::INVALID_COMPONENT_INDEX,
-                                                            func,
                                                             alpha,
                                                             TimePeriod(delaySeconds, durationSeconds) ) );
 }

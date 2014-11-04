@@ -25,7 +25,6 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/animation/active-constraint.h>
-#include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/constrainable.h>
 #include <dali/public-api/object/property-input.h>
