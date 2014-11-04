@@ -35,6 +35,7 @@ KeyEvent::KeyEvent()
   keyPressed(""),
   keyCode(KEY_INVALID_CODE),
   keyModifier(0),
+  time(0),
   state(KeyEvent::Down)
 {
 }

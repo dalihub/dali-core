@@ -47,7 +47,8 @@ LightAttachmentPtr LightAttachment::New( const SceneGraph::Node& parentNode )
 }
 
 LightAttachment::LightAttachment( Stage& stage )
-: ActorAttachment( stage )
+: ActorAttachment( stage ),
+  mSceneObject( NULL )
 {
   mCachedLight = new Internal::Light( "Unnamed" );
 }

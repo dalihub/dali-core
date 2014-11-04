@@ -54,6 +54,7 @@ MeshAttachmentPtr MeshAttachment::New( const SceneGraph::Node& parentNode )
 
 MeshAttachment::MeshAttachment( Stage& stage )
 : RenderableAttachment( stage ),
+  mSceneObject( NULL ),
   mAffectedByLighting( true )
 {
 }

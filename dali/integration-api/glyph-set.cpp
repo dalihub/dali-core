@@ -31,7 +31,8 @@ GlyphSet::GlyphSet()
   mUnitsPerEM(0.0f),
   mUnderlinePosition(0.0f),
   mUnderlineThickness(0.0f),
-  mPadAdjust(0.0f)
+  mPadAdjust(0.0f),
+  mAtlasId( 0 )
 {
 }
 
