@@ -233,14 +233,8 @@ void Core::Update( float elapsedSeconds, unsigned int lastVSyncTimeMilliseconds,
   // Check the Notification Manager message queue to set needsNotification
   status.needsNotification = mNotificationManager->MessagesToProcess();
 
-  // If there are notifications to process keep the update thread running as well.
-  // A notification event might add a new actor or animation to the stage which needs
-  // update thread to process it. This also prevents update thread from sleeping
-  // while actor thread is still processing events.
-  if ( status.needsNotification )
-  {
-    status.keepUpdating |= Integration::KeepUpdating::NOTIFICATIONS_PENDING;
-  }
+  // No need to keep update running if there are notifications to process.
+  // Any message to update will wake it up anyways
 
   if ( mResourceManager->ResourcesToProcess() )
   {
