@@ -25,6 +25,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/light.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/platform-abstraction.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/modeling/entity-impl.h>
 #include <dali/internal/event/modeling/material-impl.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
@@ -228,6 +230,11 @@ unsigned int ModelData::NumberOfLights() const
 
 void ModelData::Unpack( ResourceClient& resourceClient )
 {
+  ResourcePolicy::DataRetention dataRetentionPolicy = resourceClient.GetResourceDataRetentionPolicy();
+  ResourcePolicy::Discardable discardable = (dataRetentionPolicy == ResourcePolicy::DALI_DISCARDS_ALL_DATA ) ? ResourcePolicy::DISCARD : ResourcePolicy::RETAIN;
+
+  bool scalable = false; /* scaling is transmitted through parent Node */
+
   // Only unpack once
   if ( !mUnpacked )
   {
@@ -235,7 +242,7 @@ void ModelData::Unpack( ResourceClient& resourceClient )
     for ( size_t meshIdx = 0; meshIdx < NumberOfMeshes(); meshIdx++ )
     {
       // Copy the mesh-data into an internal structure, and pass ownership to the resourceClient
-      OwnerPointer<MeshData> meshDataPtr( new MeshData( GetMesh( meshIdx ), true /* discardable */, false /* scaling is transmitted through parent Node */ ) );
+      OwnerPointer<MeshData> meshDataPtr( new MeshData( GetMesh( meshIdx ), discardable, scalable ));
       ResourceTicketPtr meshTicket = resourceClient.AllocateMesh( meshDataPtr );
 
       AddMeshTicket( meshTicket );

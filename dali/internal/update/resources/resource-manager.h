@@ -34,6 +34,7 @@
 
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/common/bitmap-upload.h>
 #include <dali/internal/event/text/font-impl.h>
 #include <dali/internal/event/modeling/model-data-impl.h>
@@ -284,8 +285,9 @@ public: // Used by ResourceClient
    * @param[in] id The resource id
    * @param[in] typePath The type & path of the resource
    * @param[in] priority The priority of the request. This is ignored if the resource is already being refreshed.
+   * @param[in] resetFinishedStatus True if the finished status of the resource id should be reset
    */
-  void HandleReloadResourceRequest( ResourceId id, const ResourceTypePath& typePath, Integration::LoadResourcePriority priority );
+  void HandleReloadResourceRequest( ResourceId id, const ResourceTypePath& typePath, Integration::LoadResourcePriority priority, bool resetFinishedStatus );
 
   /**
    * Save a resource to the given url
@@ -631,14 +633,14 @@ inline void RequestUpdateBitmapAreaMessage( EventToUpdate& eventToUpdate,
 inline void RequestUpdateMeshMessage( EventToUpdate& eventToUpdate,
                                       ResourceManager& manager,
                                       ResourceId id,
-                                      const Dali::MeshData& meshData )
+                                      const Dali::MeshData& meshData,
+                                      ResourcePolicy::Discardable discardable )
 {
   typedef MessageDoubleBuffered2< ResourceManager, ResourceId, OwnerPointer< MeshData > > LocalType;
-
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
-  MeshData* internalMeshData = new MeshData( meshData, true, false );
+  MeshData* internalMeshData = new MeshData( meshData, discardable, false );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUpdateMeshRequest, id, internalMeshData );
@@ -648,15 +650,16 @@ inline void RequestReloadResourceMessage( EventToUpdate& eventToUpdate,
                                           ResourceManager& manager,
                                           ResourceId id,
                                           const ResourceTypePath& typePath,
-                                          Integration::LoadResourcePriority priority )
+                                          Integration::LoadResourcePriority priority,
+                                          bool resetFinishedStatus )
 {
-  typedef MessageValue3< ResourceManager, ResourceId, ResourceTypePath, Integration::LoadResourcePriority > LocalType;
+  typedef MessageValue4< ResourceManager, ResourceId, ResourceTypePath, Integration::LoadResourcePriority, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleReloadResourceRequest, id, typePath, priority );
+  new (slot) LocalType( &manager, &ResourceManager::HandleReloadResourceRequest, id, typePath, priority, resetFinishedStatus );
 }
 
 inline void RequestSaveResourceMessage( EventToUpdate& eventToUpdate,

@@ -21,6 +21,8 @@
 // EXTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/view-mode.h>
+#include <dali/integration-api/context-notifier.h>
+#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
@@ -42,6 +44,7 @@ class RenderController;
 class SystemOverlay;
 struct Event;
 struct TouchData;
+
 
 /**
  * The reasons why further updates are required.
@@ -205,13 +208,17 @@ public:
    * @param[in] glAbstraction The interface providing OpenGL services.
    * @param[in] glSyncAbstraction The interface providing OpenGL sync objects.
    * @param[in] gestureManager The interface providing gesture manager services.
+   * @param[in] policy The data retention policy. This depends on application setting
+   * and platform support. Dali should honour this policy when deciding to discard
+   * intermediate resource data.
    * @return A newly allocated Core.
    */
   static Core* New(RenderController& renderController,
                    PlatformAbstraction& platformAbstraction,
                    GlAbstraction& glAbstraction,
                    GlSyncAbstraction& glSyncAbstraction,
-                   GestureManager& gestureManager);
+                   GestureManager& gestureManager,
+                   ResourcePolicy::DataRetention policy);
 
   /**
    * Non-virtual destructor. Core is not intended as a base class.
@@ -219,6 +226,11 @@ public:
   ~Core();
 
   // GL Context Lifecycle
+
+  /**
+   * Get the object that will notify the application/toolkit when context is lost/regained
+   */
+  ContextNotifierInterface* GetContextNotifier();
 
   /**
    * Notify the Core that the GL context has been created.
@@ -234,7 +246,18 @@ public:
    * Multi-threading note: this method should be called from the rendering thread only
    * @post The Core is unaware of any GL context.
    */
-  void ContextToBeDestroyed();
+  void ContextDestroyed();
+
+  /**
+   * Notify the Core that the GL context has been re-created, e.g. after ReplaceSurface
+   * or Context loss.
+   *
+   * In the case of ReplaceSurface, both ContextToBeDestroyed() and ContextCreated() will have
+   * been called on the render thread before this is called on the event thread.
+   *
+   * Multi-threading note: this method should be called from the main thread
+   */
+  void RecoverFromContextLoss();
 
   /**
    * Notify the Core that the GL surface has been resized.

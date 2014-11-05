@@ -26,11 +26,13 @@ platform_abstraction_src_files = \
 
 platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/core.h \
+   $(platform_abstraction_src_dir)/context-notifier.h \
    $(platform_abstraction_src_dir)/glyph-set.h \
    $(platform_abstraction_src_dir)/debug.h \
    $(platform_abstraction_src_dir)/profiling.h \
    $(platform_abstraction_src_dir)/input-options.h \
    $(platform_abstraction_src_dir)/bitmap.h \
+   $(platform_abstraction_src_dir)/resource-policies.h \
    $(platform_abstraction_src_dir)/image-data.h \
    $(platform_abstraction_src_dir)/resource-types.h \
    $(platform_abstraction_src_dir)/resource-request.h \

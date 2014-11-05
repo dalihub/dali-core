@@ -36,6 +36,14 @@ using Dali::Internal::Texture;
 using Dali::Internal::FrameBufferTexture;
 using Dali::Integration::Bitmap;
 
+namespace
+{
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gTextureCacheFilter = Debug::Filter::New(Debug::Concise, false, "LOG_TEXTURE_CACHE");
+#endif
+}
+
+
 namespace Dali
 {
 namespace Internal
@@ -52,7 +60,8 @@ TextureCache::TextureCache( RenderQueue& renderQueue,
                             Context& context)
 : TextureCacheDispatcher(renderQueue),
   mPostProcessResourceDispatcher(postProcessResourceDispatcher),
-  mContext(context)
+  mContext(context),
+  mDiscardBitmapsPolicy(ResourcePolicy::DISCARD)
 {
 }
 
@@ -68,7 +77,7 @@ void TextureCache::CreateTexture( ResourceId        id,
 {
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::CreateTexture(id=%i width:%u height:%u)\n", id, width, height);
 
-  Texture* texture = TextureFactory::NewBitmapTexture(width, height, pixelFormat, clearPixels, mContext);
+  Texture* texture = TextureFactory::NewBitmapTexture(width, height, pixelFormat, clearPixels, mContext, GetDiscardBitmapsPolicy() );
   mTextures.insert(TexturePair(id, texture));
 }
 
@@ -76,7 +85,7 @@ void TextureCache::AddBitmap(ResourceId id, Integration::BitmapPtr bitmap)
 {
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::AddBitmap(id=%i Bitmap:%p)\n", id, bitmap.Get());
 
-  Texture* texture = TextureFactory::NewBitmapTexture(bitmap.Get(), mContext);
+  Texture* texture = TextureFactory::NewBitmapTexture(bitmap.Get(), mContext, GetDiscardBitmapsPolicy());
   mTextures.insert(TexturePair(id, texture));
 }
 
@@ -120,7 +129,7 @@ void TextureCache::UpdateTexture( ResourceId id, Integration::BitmapPtr bitmap )
     TexturePointer texturePtr = textureIter->second;
     if( texturePtr )
     {
-      texturePtr->Update(bitmap.Get());
+      texturePtr->Update( bitmap.Get() );
 
       ResourcePostProcessRequest ppRequest( id, ResourcePostProcessRequest::UPLOADED );
       mPostProcessResourceDispatcher.DispatchPostProcessRequest(ppRequest);
@@ -371,6 +380,19 @@ void TextureCache::GlContextDestroyed()
     (*iter->second).GlContextDestroyed(); // map holds intrusive pointers
   }
 }
+
+void TextureCache::SetDiscardBitmapsPolicy( ResourcePolicy::Discardable policy )
+{
+  DALI_LOG_INFO( gTextureCacheFilter, Debug::General, "TextureCache::SetDiscardBitmapsPolicy(%s)\n",
+                 policy==ResourcePolicy::RETAIN?"RETAIN":"DISCARD" );
+  mDiscardBitmapsPolicy = policy;
+}
+
+ResourcePolicy::Discardable TextureCache::GetDiscardBitmapsPolicy()
+{
+  return mDiscardBitmapsPolicy;
+}
+
 
 /********************************************************************************
  **********************  Implements TextureCacheDispatcher  *********************

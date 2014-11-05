@@ -26,6 +26,7 @@
 #include <dali/public-api/images/bitmap-image.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/render/gl-resources/texture.h>
+#include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/common/bitmap-upload.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/images/bitmap-compressed.h>
@@ -55,9 +56,10 @@ public:
    * Constructor
    * Creates a new texture object from a Bitmap
    * @param[in] bitmap The Bitmap
-   * @param     context The GL context
+   * @param[in] context The GL context
+   * @param[in] discardPolicy The discard policy
    */
-  CompressedBitmapTexture( Internal::BitmapCompressed* const bitmap, Context& context );
+  CompressedBitmapTexture( Internal::BitmapCompressed* const bitmap, Context& context, ResourcePolicy::Discardable discardPolicy );
 
   /**
    * Destructor.
@@ -121,6 +123,7 @@ private:
 
 private:
   Internal::BitmapCompressedPtr mBitmap;      ///< The Bitmap the Texture was created from (may be NULL)
+  ResourcePolicy::Discardable mDiscardPolicy;
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

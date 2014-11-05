@@ -45,7 +45,7 @@ public:
    * Constructor
    * @param[in] discardable Flag to tell the bitmap if it can delete the buffer with the pixel data.
    */
-  BitmapCompressed( bool discardable = false );
+  BitmapCompressed( ResourcePolicy::Discardable discardable = ResourcePolicy::RETAIN );
 
   virtual const Bitmap::CompressedProfile* GetCompressedProfile() const { return this; }
   virtual Bitmap::CompressedProfile* GetCompressedProfile() { return this; }

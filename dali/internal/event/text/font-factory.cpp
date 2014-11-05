@@ -140,6 +140,11 @@ void FontFactory::SetDpi( float horizontalDpi, float verticalDpi )
   mVerticalDpi = verticalDpi;
 }
 
+void FontFactory::RecoverFromContextLoss()
+{
+  mAtlasManager->ReloadAtlases();
+}
+
 } // namespace Internal
 
 } // namespace Dali

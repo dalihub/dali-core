@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/system-overlay.h>
 #include <dali/integration-api/core.h>
+#include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/gl-sync-abstraction.h>
 #include <dali/integration-api/render-controller.h>
@@ -46,6 +47,7 @@
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/touch/touch-resampler.h>
 #include <dali/internal/event/common/type-registry-impl.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/gl-resources/context.h>
@@ -56,8 +58,15 @@ using Dali::Internal::SceneGraph::DiscardQueue;
 using Dali::Internal::SceneGraph::RenderQueue;
 using Dali::Internal::SceneGraph::TextureCache;
 
+namespace
+{
 // The Update for frame N+1 may be processed whilst frame N is being rendered.
-static const unsigned int MAXIMUM_UPDATE_COUNT = 2u;
+const unsigned int MAXIMUM_UPDATE_COUNT = 2u;
+
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gCoreFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CORE");
+#endif
+}
 
 namespace Dali
 {
@@ -76,7 +85,7 @@ using Integration::RenderStatus;
 
 Core::Core( RenderController& renderController, PlatformAbstraction& platform,
             GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction,
-            GestureManager& gestureManager)
+            GestureManager& gestureManager, ResourcePolicy::DataRetention dataRetentionPolicy)
 : mRenderController( renderController ),
   mPlatform(platform),
   mGestureEventProcessor(NULL),
@@ -113,6 +122,14 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   RenderQueue& renderQueue = mRenderManager->GetRenderQueue();
   TextureCache& textureCache = mRenderManager->GetTextureCache();
+
+  ResourcePolicy::Discardable discardPolicy = ResourcePolicy::DISCARD;
+  if( dataRetentionPolicy == ResourcePolicy::DALI_RETAINS_ALL_DATA )
+  {
+    discardPolicy = ResourcePolicy::RETAIN;
+  }
+  textureCache.SetDiscardBitmapsPolicy(discardPolicy);
+
   mDiscardQueue = new DiscardQueue( renderQueue );
 
   mResourceManager = new ResourceManager(  mPlatform,
@@ -137,7 +154,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                        textureCache,
                                       *mTouchResampler );
 
-  mResourceClient = new ResourceClient( *mResourceManager, *mUpdateManager );
+  mResourceClient = new ResourceClient( *mResourceManager, *mUpdateManager, dataRetentionPolicy );
 
   mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager ) );
 
@@ -196,12 +213,26 @@ Core::~Core()
   delete mResourcePostProcessQueue;
 }
 
+Integration::ContextNotifierInterface* Core::GetContextNotifier()
+{
+  return mStage.Get();
+}
+
+void Core::RecoverFromContextLoss()
+{
+  DALI_LOG_INFO(gCoreFilter, Debug::Verbose, "Core::RecoverFromContextLoss()\n");
+
+  mImageFactory->RecoverFromContextLoss(); // Reload images from files
+  mFontFactory->RecoverFromContextLoss();  // Reload glyphs from cache into new atlas
+  mStage->GetRenderTaskList().RecoverFromContextLoss(); // Re-trigger render-tasks
+}
+
 void Core::ContextCreated()
 {
   mRenderManager->ContextCreated();
 }
 
-void Core::ContextToBeDestroyed()
+void Core::ContextDestroyed()
 {
   mRenderManager->ContextDestroyed();
 }
@@ -213,7 +244,7 @@ void Core::SurfaceResized(unsigned int width, unsigned int height)
 
 void Core::SetDpi(unsigned int dpiHorizontal, unsigned int dpiVertical)
 {
-  mPlatform.SetDpi( dpiHorizontal, dpiVertical  );
+  mPlatform.SetDpi( dpiHorizontal, dpiVertical );
   mFontFactory->SetDpi( dpiHorizontal, dpiVertical);
   mStage->SetDpi( Vector2( dpiHorizontal , dpiVertical) );
 }

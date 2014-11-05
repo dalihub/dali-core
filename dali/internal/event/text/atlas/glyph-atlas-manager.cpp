@@ -143,6 +143,37 @@ GlyphLoadObserver& GlyphAtlasManager::GetLoadObserver()
   return mGlyphResourceManager;
 }
 
+void GlyphAtlasManager::ReloadAtlases()
+{
+  std::vector<GlyphAtlas*> newAtlasList;
+
+  // Copy all atlases to a new list
+  for( AtlasList::Iterator it = mAtlasList.Begin(), end = mAtlasList.End() ;
+       it != end ; ++it )
+  {
+    // Create a new atlas the same size as the previous atlas.
+    GlyphAtlas* oldAtlas = *it;
+
+    GlyphAtlas* newAtlas = GlyphAtlas::New(oldAtlas->GetSize());
+    newAtlas->CloneContents( oldAtlas );
+
+    // Add it to temporary list
+    newAtlasList.push_back(newAtlas);
+
+    mGlyphResourceManager.RemoveObserver( *oldAtlas );
+  }
+  // destroy old atlases
+  mAtlasList.Clear();
+
+  // Add new atlases to proper list
+  for( std::vector<GlyphAtlas*>::iterator it = newAtlasList.begin(); it != newAtlasList.end(); ++it )
+  {
+    AddAtlas( *it );
+  }
+
+  mAtlasesChanged = true;
+}
+
 GlyphAtlas* GlyphAtlasManager::CreateAtlas( unsigned int size )
 {
   GlyphAtlas* atlas =  GlyphAtlas::New( size  );

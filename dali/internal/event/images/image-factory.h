@@ -78,10 +78,25 @@ public:
    * This operation uses the originally requested attributes when reloading the image.
    * @pre req must be registered with ImageFactory
    * @note if image is still loading, no new load request will be issued
-   * @param [in]  req Request pointer
-   * @return[out] the ResourceTicket mapped to the request
+   * @param[in]  requestPtr Request pointer
+   * @return the ResourceTicket mapped to the request
    */
-  ResourceTicketPtr Reload( ImageFactoryCache::Request* req );
+  ResourceTicketPtr Reload( ImageFactoryCache::Request* requestPtr );
+
+  /**
+   * Ensures all filesystem images are reloaded into textures.
+   * This operation uses the originally requested attributes when reloading the image.
+   *
+   * Recovering from context loss does not change the number of tickets if the
+   * image size has changed on the file system since the last load/reload.
+   *
+   * If two different requests mapped to the same resource before, they will still
+   * map to the same resource after context regain even if there would be a better
+   * fitting texture.
+   * @pre requests must be registered with ImageFactory
+   * @note If an image is still loading, no new load request will be issued.
+   */
+  void RecoverFromContextLoss();
 
   /**
    * Get resource path used in request.

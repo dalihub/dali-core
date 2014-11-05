@@ -19,6 +19,7 @@
  */
 
 #include <dali/public-api/geometry/mesh-data.h>
+#include <dali/integration-api/resource-policies.h>
 
 namespace Dali
 {
@@ -52,7 +53,7 @@ public:
    * @param[in] discardable if true, the vertex and index data will be discarded after they are uploaded to gl
    * @param[in] scalingRequired - True if this Mesh should be scaled to fit actor size
    */
-  explicit MeshData( const Dali::MeshData& meshData, bool discardable, bool scalingRequired );
+  explicit MeshData( const Dali::MeshData& meshData, ResourcePolicy::Discardable discardable, bool scalingRequired );
 
   /**
    * @copydoc Dali::MeshData::GetVertexCount

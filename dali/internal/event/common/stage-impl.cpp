@@ -524,6 +524,26 @@ Dali::Stage::TouchedSignalV2& Stage::TouchedSignal()
   return mTouchedSignalV2;
 }
 
+Dali::Stage::ContextStatusSignal& Stage::ContextLostSignal()
+{
+  return mContextLostSignal;
+}
+
+Dali::Stage::ContextStatusSignal& Stage::ContextRegainedSignal()
+{
+  return mContextRegainedSignal;
+}
+
+void Stage::NotifyContextLost()
+{
+  mContextLostSignal.Emit();
+}
+
+void Stage::NotifyContextRegained()
+{
+  mContextRegainedSignal.Emit();
+}
+
 Stage::Stage( AnimationPlaylist& playlist,
               PropertyNotificationManager& propertyNotificationManager,
               SceneGraph::UpdateManager& updateManager,

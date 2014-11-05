@@ -88,6 +88,11 @@ typedef ShaderCache::iterator                 ShaderCacheIter;
 typedef ShaderCache::size_type                ShaderCacheSize;
 typedef pair<ResourceId, ShaderDataPtr>       ShaderDataPair;
 
+static inline bool RemoveId( LiveRequestContainer& container, ResourceId id )
+{
+  return container.erase(id) != 0;
+}
+
 struct ResourceManager::ResourceManagerImpl
 {
   ResourceManagerImpl( PlatformAbstraction& platformAbstraction,
@@ -445,12 +450,20 @@ void ResourceManager::HandleUpdateMeshRequest( BufferIndex updateBufferIndex, Re
   new (slot) DerivedType( mesh, &SceneGraph::Mesh::MeshDataUpdated, SceneGraph::Mesh::RENDER_THREAD, meshData );
 }
 
-void ResourceManager::HandleReloadResourceRequest( ResourceId id, const ResourceTypePath& typePath, LoadResourcePriority priority )
+void ResourceManager::HandleReloadResourceRequest( ResourceId id, const ResourceTypePath& typePath, LoadResourcePriority priority, bool resetFinishedStatus )
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO( Debug::Filter::gResource, Debug::General, "ResourceManager: HandleReloadRequest(id:%u, path:%s)\n", id, typePath.path.c_str() );
 
   bool resourceIsAlreadyLoading = true;
+
+  if( resetFinishedStatus )
+  {
+    if( ! RemoveId( mImpl->newCompleteRequests, id ) )
+    {
+      RemoveId( mImpl->oldCompleteRequests, id );
+    }
+  }
 
   // ID might be in the loading set
   LiveRequestIter iter = mImpl->loadingRequests.find( id );
@@ -463,7 +476,7 @@ void ResourceManager::HandleReloadResourceRequest( ResourceId id, const Resource
 
   if ( !resourceIsAlreadyLoading )
   {
-    //load resource again
+    // load resource again
     mImpl->mPlatformAbstraction.LoadResource(ResourceRequest(id, *typePath.type, typePath.path, priority));
     SendToClient( LoadingMessage( *mImpl->mResourceClient, id ) );
   }
@@ -537,11 +550,6 @@ void ResourceManager::HandleSaveResourceRequest( ResourceId id, const ResourceTy
       mImpl->mPlatformAbstraction.SaveResource(request);
     }
   }
-}
-
-static inline bool RemoveId( LiveRequestContainer& container, ResourceId id )
-{
-  return container.erase(id) != 0;
 }
 
 void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceTypeId typeId )

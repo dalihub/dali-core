@@ -107,12 +107,18 @@ public:
   void MeshDataUpdated( BufferIndex bufferIndex, ThreadBuffer threadBuffer, MeshData* meshData );
 
   /**
-   * Sends the vertex data to GL
+   * Sends the vertex data to GL if it has been refreshed. Notify resource manager when it has finished.
    * @pre this function should only be called from the render thread
    * @param[in] context The GL context.
    * @param[in] renderBufferIndex The index that should be accessed in double buffered values.
    */
   void UploadVertexData( Context& context, BufferIndex renderBufferIndex );
+
+  /**
+   * Actually perform the vertex upload.
+   * @param[in] context The GL context.
+   */
+  void DoUpload( Context& context );
 
   /**
    * Bind the vertex and index buffers.

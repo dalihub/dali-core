@@ -240,7 +240,7 @@ int UtcDaliImageActorGetCurrentSize02(void)
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  initialImageSize.width,initialImageSize.height, initialImageSize.width,initialImageSize.height );
 
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
@@ -292,7 +292,7 @@ int UtcDaliImageActorGetCurrentSize03(void)
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
 
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
@@ -343,7 +343,7 @@ int UtcDaliImageActorGetCurrentSize04(void)
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
 
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
@@ -383,7 +383,7 @@ int UtcDaliImageActorGetCurrentSize04(void)
 
   // Now complete the image load
   req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   bitmap2->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  image2ClosestSize.width, image2ClosestSize.height, image2ClosestSize.width, image2ClosestSize.height );
 
   Integration::ResourcePointer resourcePtr2(bitmap2); // reference it
@@ -427,7 +427,7 @@ int UtcDaliImageActorGetCurrentSize05(void)
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
 
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
@@ -459,7 +459,7 @@ int UtcDaliImageActorGetCurrentSize05(void)
 
   // Now complete the image load
   req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap2 = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   bitmap2->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  image2ClosestSize.width, image2ClosestSize.height, image2ClosestSize.width, image2ClosestSize.height );
 
   Integration::ResourcePointer resourcePtr2(bitmap2); // reference it
@@ -506,7 +506,7 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
 
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
@@ -569,7 +569,7 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
 
   // Now complete the image load
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  closestImageSize.width, closestImageSize.height, closestImageSize.width, closestImageSize.height );
 
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
@@ -914,7 +914,7 @@ int UtcDaliImageActorNinePatch01(void)
   tet_infoline("Test the successful loading of a nine-patch image\n");
 
   platform.SetClosestImageSize(Vector2(4, 4));
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   Integration::PixelBuffer* pixels = bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  4,4,4,4 );
   memset( pixels, 0, 64 );
 
@@ -1007,7 +1007,7 @@ int UtcDaliImageActorNinePatch03(void)
   tet_infoline("Test the successful loading of a nine-patch image added using ImageActor::SetImage()\n");
 
   platform.SetClosestImageSize(Vector2(4, 4));
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, false );
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   Integration::PixelBuffer* pixels = bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  4,4,4,4 );
   memset( pixels, 0, 64 );
 
