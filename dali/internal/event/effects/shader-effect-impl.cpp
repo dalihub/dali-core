@@ -91,9 +91,7 @@ WrapperStrings customShaderWrappers [] =
 
 BaseHandle Create()
 {
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( );
-
-  ShaderFactory::LoadTextSubtypeShaders(internal);
+  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New();
 
   return Dali::ShaderEffect(internal.Get());
 }
@@ -167,7 +165,6 @@ ShaderEffectPtr ShaderEffect::NewWithPrefix( const string& vertexShaderPrefix,
                                              Dali::ShaderEffect::GeometryHints hints )
 {
   ShaderEffectPtr shaderEffect( New(hints) );
-  ShaderFactory::LoadTextSubtypeShaders(shaderEffect);
 
   shaderEffect->SetPrograms( geometryTypes, vertexShaderPrefix, vertexShader, fragmentShaderPrefix, fragmentShader );
   return shaderEffect;
@@ -184,8 +181,6 @@ ShaderEffectPtr ShaderEffect::New( const string& imageVertexShader,
                                    Dali::ShaderEffect::GeometryHints hints )
 {
   ShaderEffectPtr shaderEffect( New(hints) );
-
-  ShaderFactory::LoadTextSubtypeShaders(shaderEffect);
 
   shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, "", "", imageVertexShader, imageFragmentShader );
   shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, "", "", textVertexShader, textFragmentShader );
@@ -604,37 +599,21 @@ void ShaderEffect::SetPrograms( GeometryType  geometryTypes,
   {
     SetWrappedProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
   }
-  else
-  {
-    SetWrappedProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, emptyStr, emptyStr, emptyStr, emptyStr );
-  }
 
   if( geometryTypes & GEOMETRY_TYPE_TEXT )
   {
     // Only change the default program, leaving the other sub-types as-is.
     SetWrappedProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
   }
-  else
-  {
-    SetWrappedProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, emptyStr, emptyStr, emptyStr, emptyStr );
-  }
 
   if( geometryTypes & GEOMETRY_TYPE_TEXTURED_MESH )
   {
     SetWrappedProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
   }
-  else
-  {
-    SetWrappedProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, emptyStr, emptyStr, emptyStr, emptyStr );
-  }
 
   if( geometryTypes & GEOMETRY_TYPE_MESH )
   {
     SetWrappedProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
-  }
-  else
-  {
-    SetWrappedProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, emptyStr, emptyStr, emptyStr, emptyStr );
   }
 }
 

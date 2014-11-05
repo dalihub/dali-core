@@ -117,7 +117,15 @@ void ShaderFactory::LoadDefaultShaders()
 
   mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, DistanceFieldFontVertex, DistanceFieldFontFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
-  LoadTextSubtypeShaders(mDefaultShader); // TODO: Remove when applications no longer need these shaders
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT, SHADER_DEF_USE_GRADIENT, SHADER_DEF_USE_GRADIENT, DistanceFieldFontVertex, DistanceFieldFontFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
+
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_GLOW, DistanceFieldFontGlowVertex, DistanceFieldFontGlowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
+
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_SHADOW, DistanceFieldFontShadowVertex, DistanceFieldFontShadowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
+
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE, DistanceFieldFontOutlineVertex, DistanceFieldFontOutlineFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
+
+  mDefaultShader->SetProgram( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE_GLOW, DistanceFieldFontOutlineGlowVertex, DistanceFieldFontOutlineGlowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
 
   // Untextured meshes
   mDefaultShader->SetProgram( GEOMETRY_TYPE_MESH, SHADER_DEFAULT,
@@ -192,24 +200,6 @@ void ShaderFactory::LoadDefaultShaders()
                               MeshFragment,
                               ShaderEffect::MODIFIES_GEOMETRY );
 }
-
-void ShaderFactory::LoadTextSubtypeShaders(ShaderEffectPtr shaderEffect)
-{
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT,
-                           SHADER_DEF_USE_GRADIENT,
-                           SHADER_DEF_USE_GRADIENT,
-                           DistanceFieldFontVertex, DistanceFieldFontFragment,
-                           ShaderEffect::DOESNT_MODIFY_GEOMETRY );
-
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_GLOW, DistanceFieldFontGlowVertex, DistanceFieldFontGlowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
-
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_SHADOW, DistanceFieldFontShadowVertex, DistanceFieldFontShadowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
-
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE, DistanceFieldFontOutlineVertex, DistanceFieldFontOutlineFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
-
-  shaderEffect->SetProgram(GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE_GLOW, DistanceFieldFontOutlineGlowVertex, DistanceFieldFontOutlineGlowFragment, ShaderEffect::DOESNT_MODIFY_GEOMETRY );
-}
-
 
 } // namespace Internal
 

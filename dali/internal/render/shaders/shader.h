@@ -100,7 +100,7 @@ public:
      */
     void Resize(size_t length)
     {
-      mSubPrograms.Resize(length);
+      mSubPrograms.Resize( length, NULL );
     }
 
     /**
@@ -286,7 +286,7 @@ public:
    * @param[out] programIndex returns the program index to be passed onto SetUniforms.
    * @return the program to use.
    */
-  Program& GetProgram( Context& context,
+  Program* GetProgram( Context& context,
                        GeometryType type,
                        ShaderSubTypes subType,
                        unsigned int& programIndex );

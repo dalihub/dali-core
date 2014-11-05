@@ -37,9 +37,8 @@ namespace Internal
 namespace
 {
 
-
-static Matrix gModelViewProjectionMatrix( false ); ///< a shared matrix to calculate the MVP matrix, dont want to store it locally to reduce storage overhead
-static Matrix3 gNormalMatrix; ///< a shared matrix to calculate normal matrix, dont want to store it locally to reduce storage overhead
+static Matrix gModelViewProjectionMatrix( false ); ///< a shared matrix to calculate the MVP matrix, dont want to store it in object to reduce storage overhead
+static Matrix3 gNormalMatrix; ///< a shared matrix to calculate normal matrix, dont want to store it in object to reduce storage overhead
 
 /**
  * Helper to set view and projection matrices once per program
@@ -150,6 +149,7 @@ void Renderer::SetSampler( unsigned int samplerBitfield )
 }
 
 void Renderer::Render( BufferIndex bufferIndex,
+                       Shader& defaultShader,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
                        const Matrix& projectionMatrix,
@@ -157,7 +157,12 @@ void Renderer::Render( BufferIndex bufferIndex,
                        bool cull )
 {
   DALI_ASSERT_DEBUG( mContext && "Renderer::Render. Renderer not initialised!! (mContext == NULL)." );
-  DALI_ASSERT_DEBUG( mShader && "Renderer::Render. Shader not set!!" );
+
+  // if mShader is NULL it means we're set to default
+  if( !mShader )
+  {
+    mShader = &defaultShader;
+  }
 
   if( !CheckResources() )
   {
@@ -175,10 +180,16 @@ void Renderer::Render( BufferIndex bufferIndex,
   ShaderSubTypes subType=SHADER_DEFAULT;
   ResolveGeometryTypes( bufferIndex, geometryType, subType );
   unsigned int programIndex = 0;
-  Program& program = mShader->GetProgram( *mContext, geometryType, subType, programIndex );
+  Program* program = mShader->GetProgram( *mContext, geometryType, subType, programIndex );
+  if( !program )
+  {
+    // if program is NULL it means this is a custom shader with non matching geometry type so we need to use default shaders program
+    program = defaultShader.GetProgram( *mContext, geometryType, subType, programIndex );
+    DALI_ASSERT_ALWAYS( program && "Default shader is missing a geometry type!!" );
+  }
 
   // Check culling (does not need the program to be in use)
-  if( cull && ! program.ModifiesGeometry() )
+  if( cull && ! program->ModifiesGeometry() )
   {
     if( IsOutsideClipSpace( modelMatrix, gModelViewProjectionMatrix ) )
     {
@@ -188,7 +199,7 @@ void Renderer::Render( BufferIndex bufferIndex,
   }
 
   // Take the program into use so we can send uniforms to it
-  program.Use();
+  program->Use();
 
   // Enables/disables blending mode.
   mContext->SetBlend( mUseBlend );
@@ -219,26 +230,26 @@ void Renderer::Render( BufferIndex bufferIndex,
 
   // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
   // set projection and view matrix if program has not yet received them yet this frame
-  SetMatrices( program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix, gModelViewProjectionMatrix );
+  SetMatrices( *program, modelMatrix, viewMatrix, projectionMatrix, modelViewMatrix, gModelViewProjectionMatrix );
 
   // set color uniform
-  GLint loc = program.GetUniformLocation( Program::UNIFORM_COLOR );
+  GLint loc = program->GetUniformLocation( Program::UNIFORM_COLOR );
   if( Program::UNIFORM_UNKNOWN != loc )
   {
     const Vector4& color = mDataProvider.GetRenderColor( bufferIndex );
-    program.SetUniform4f( loc, color.r, color.g, color.b, color.a );
+    program->SetUniform4f( loc, color.r, color.g, color.b, color.a );
   }
-  loc = program.GetUniformLocation(Program::UNIFORM_TIME_DELTA);
+  loc = program->GetUniformLocation(Program::UNIFORM_TIME_DELTA);
   if( Program::UNIFORM_UNKNOWN != loc )
   {
-    program.SetUniform1f( loc, frametime );
+    program->SetUniform1f( loc, frametime );
   }
 
   // set custom uniforms
-  mShader->SetUniforms( *mContext, program, bufferIndex, programIndex, subType );
+  mShader->SetUniforms( *mContext, *program, bufferIndex, programIndex, subType );
 
   // subclass rendering and actual draw call
-  DoRender( bufferIndex, program, modelViewMatrix, viewMatrix );
+  DoRender( bufferIndex, *program, modelViewMatrix, viewMatrix );
 }
 
 Renderer::Renderer( RenderDataProvider& dataprovider )

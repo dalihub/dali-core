@@ -267,12 +267,6 @@ public:
   // Shaders
 
   /**
-   * Retrieve the default shader.
-   * @return The default shader.
-   */
-  Shader* GetDefaultShader();
-
-  /**
    * Add a newly created shader.
    * @param[in] shader The shader to add.
    * @post The shader is owned by the UpdateManager.

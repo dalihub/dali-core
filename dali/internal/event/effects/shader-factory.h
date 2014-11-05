@@ -68,13 +68,6 @@ public:
    */
   void LoadDefaultShaders();
 
-  /**
-   * Called during ShaderEffect::New() to load shaders for text sub-types
-   * (Default shader can be overridden)
-   * @param[in] shaderEffect The shader effect for which to load the sub-type shaders
-   */
-  static void LoadTextSubtypeShaders(ShaderEffectPtr shaderEffect);
-
 private:
 
   // Undefined

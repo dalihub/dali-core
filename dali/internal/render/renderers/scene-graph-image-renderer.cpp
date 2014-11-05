@@ -33,8 +33,6 @@
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 
-using namespace std;
-
 namespace
 {
 #if defined(DEBUG_ENABLED)

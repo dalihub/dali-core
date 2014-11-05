@@ -217,7 +217,7 @@ void RenderableAttachment::ApplyShader( BufferIndex updateBufferIndex, Shader* s
 void RenderableAttachment::RemoveShader( BufferIndex updateBufferIndex )
 {
   // return to default shader
-  mShader = mSceneController->GetDefaultShader();
+  mShader = NULL;
 
   // send the message to renderer
   SendShaderChangeMessage( updateBufferIndex );
@@ -327,8 +327,6 @@ RenderableAttachment::~RenderableAttachment()
 void RenderableAttachment::ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex )
 {
   mSceneController = &sceneController;
-  // get the default shader
-  mShader = mSceneController->GetDefaultShader();
 
   // Chain to derived attachments
   ConnectToSceneGraph2( updateBufferIndex );

@@ -137,7 +137,7 @@ void Context::GlContextCreated()
 void Context::GlContextDestroyed()
 {
   DALI_LOG_INFO(gContextLogFilter, Debug::Verbose, "Context::GlContextDestroyed()\n");
-
+  SetCurrentProgram( NULL );
   // Inform programs they are no longer valid
   const ProgramContainer::iterator endp = mProgramCache.end();
   for ( ProgramContainer::iterator itp = mProgramCache.begin(); itp != endp; ++itp )

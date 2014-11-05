@@ -190,11 +190,13 @@ void ImageAttachment::SetBorder( BufferIndex updateBufferIndex, const Vector4& b
 
 void ImageAttachment::ShaderChanged( BufferIndex updateBufferIndex )
 {
-  DALI_ASSERT_DEBUG( mShader != NULL );
   DALI_ASSERT_DEBUG( mSceneController );
 
-  int hints = mShader->GetGeometryHints();
-
+  int hints = 0; // default shader hints are 0
+  if( mShader )
+  {
+    hints = mShader->GetGeometryHints();
+  }
   if ( hints != mPreviousRefreshHints )
   {
     mPreviousRefreshHints = hints;

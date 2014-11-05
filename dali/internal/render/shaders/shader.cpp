@@ -79,7 +79,7 @@ namespace // unnamed namespace
 {
 
 // Convert Geometry type bitmask to an array index
-unsigned int GetGeometryTypeIndex(GeometryType type)
+inline unsigned int GetGeometryTypeIndex(GeometryType type)
 {
   unsigned int index = Log<GEOMETRY_TYPE_IMAGE>::value;
   if ( type & GEOMETRY_TYPE_IMAGE )
@@ -245,16 +245,17 @@ void Shader::SetProgram( GeometryType geometryType,
     theSubType = SHADER_DEFAULT;
   }
 
+  const unsigned int geometryIndex = GetGeometryTypeIndex( geometryType );
   if(geometryType != GEOMETRY_TYPE_TEXT && subType == SHADER_SUBTYPE_ALL)
   {
-    mPrograms[GetGeometryTypeIndex(geometryType)].Resize(1);
-    mPrograms[GetGeometryTypeIndex(geometryType)][theSubType] = program;
-    mPrograms[GetGeometryTypeIndex(geometryType)].mUseDefaultForAllSubtypes = true;
+    mPrograms[geometryIndex].Resize(1);
+    mPrograms[geometryIndex][theSubType] = program;
+    mPrograms[geometryIndex].mUseDefaultForAllSubtypes = true;
   }
   else
   {
-    mPrograms[GetGeometryTypeIndex(geometryType)][theSubType] = program;
-    mPrograms[GetGeometryTypeIndex(geometryType)].mUseDefaultForAllSubtypes = false;
+    mPrograms[geometryIndex][theSubType] = program;
+    mPrograms[geometryIndex].mUseDefaultForAllSubtypes = false;
   }
 
   if( !precompiledBinary )
@@ -277,7 +278,7 @@ bool Shader::AreSubtypesRequired(GeometryType geometryType)
   return ! mPrograms[ programType ].mUseDefaultForAllSubtypes;
 }
 
-Program& Shader::GetProgram( Context& context,
+Program* Shader::GetProgram( Context& context,
                              GeometryType type,
                              ShaderSubTypes subType,
                              unsigned int& programIndex )
@@ -287,12 +288,9 @@ Program& Shader::GetProgram( Context& context,
 
   programIndex = GetGeometryTypeIndex( type );
 
-  DALI_ASSERT_DEBUG(!mPrograms[ programIndex ].mUseDefaultForAllSubtypes || subType == SHADER_DEFAULT);
   DALI_ASSERT_DEBUG((unsigned int)subType < mPrograms[ programIndex ].Count());
-  DALI_ASSERT_DEBUG(NULL != mPrograms[ programIndex ][ subType ]);
 
-  Program& program = *(mPrograms[ programIndex ][ subType ]);
-  return program;
+  return mPrograms[ programIndex ][ subType ];
 }
 
 

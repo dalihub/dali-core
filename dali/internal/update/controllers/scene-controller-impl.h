@@ -52,8 +52,7 @@ public:
                        RenderQueue& renderQueue,
                        DiscardQueue& discardQueue,
                        TextureCache& textureCache,
-                       CompleteStatusManager& completeStatusManager,
-                       Shader*& defaultShader );
+                       CompleteStatusManager& completeStatusManager );
 
   /**
    * Destructor
@@ -92,11 +91,6 @@ public:  // from SceneController
    */
   virtual CompleteStatusManager& GetCompleteStatusManager() { return mCompleteStatusManager;  }
 
-  /**
-   * @copydoc SceneController::GetDefaultShader()
-   */
-  virtual Shader* GetDefaultShader() { return mDefaultShader; }
-
 private:
 
   // Undefined copy constructor.
@@ -113,7 +107,6 @@ private:
   DiscardQueue&            mDiscardQueue;          ///< discard queue
   TextureCache&            mTextureCache;          ///< texture cache
   CompleteStatusManager&   mCompleteStatusManager; ///< Complete Status manager
-  Shader*&                 mDefaultShader;         ///< default shader, reference to a pointer as it will be setup later
 
 };
 

@@ -417,11 +417,9 @@ void Program::GlContextCreated()
 void Program::GlContextDestroyed()
 {
   mLinked = false;
-
   mVertexShaderId = 0;
   mFragmentShaderId = 0;
   mProgramId = 0;
-  mContext.SetCurrentProgram( NULL );
 
   ResetAttribsUniformCache();
 }
