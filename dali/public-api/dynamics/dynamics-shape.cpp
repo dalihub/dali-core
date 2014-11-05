@@ -120,13 +120,6 @@ DynamicsShape& DynamicsShape::operator=(const DynamicsShape& rhs)
   return *this;
 }
 
-DynamicsShape& DynamicsShape::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 DynamicsShape::DynamicsShape(Internal::DynamicsShape* internal)
 #ifdef DYNAMICS_SUPPORT
 : BaseHandle(internal)

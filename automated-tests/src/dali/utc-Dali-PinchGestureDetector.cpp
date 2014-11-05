@@ -61,7 +61,7 @@ struct SignalData
     receivedGesture.screenCenterPoint = Vector2(0.0f, 0.0f);
     receivedGesture.localCenterPoint = Vector2(0.0f, 0.0f);
 
-    pinchedActor = NULL;
+    pinchedActor.Reset();
   }
 
   bool functorCalled;
@@ -1138,7 +1138,7 @@ int UtcDaliPinchGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Delete actor as well
-  actor = NULL;
+  actor.Reset();
 
   // Render and notify
   application.SendNotification();

@@ -82,16 +82,6 @@ public:
   RenderTaskList& operator=(const RenderTaskList& rhs);
 
   /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  RenderTaskList& operator=(BaseHandle::NullType* rhs);
-
-  /**
    * @brief Create a new RenderTask.
    *
    * This will be appended to the list of render-tasks.

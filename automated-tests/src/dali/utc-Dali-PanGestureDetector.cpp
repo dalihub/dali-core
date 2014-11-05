@@ -69,7 +69,7 @@ struct SignalData
     receivedGesture.screenPosition = Vector2(0.0f, 0.0f);
     receivedGesture.numberOfTouches = 0;
 
-    pannedActor = NULL;
+    pannedActor.Reset();
   }
 
   bool functorCalled;
@@ -1557,7 +1557,7 @@ int UtcDaliPanGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Delete actor as well
-  actor = NULL;
+  actor.Reset();
 
   // Render and notify
   application.SendNotification();

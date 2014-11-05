@@ -89,7 +89,7 @@ int UtcDaliCameraActorNew(void)
 
   DALI_TEST_CHECK(actor);
 
-  actor = NULL;
+  actor.Reset();
 
   DALI_TEST_CHECK(!actor);
   END_TEST;
@@ -108,7 +108,7 @@ int UtcDaliCameraActorDownCast(void)
   CameraActor cameraActor = CameraActor::DownCast( child );
   DALI_TEST_CHECK( cameraActor );
 
-  cameraActor = NULL;
+  cameraActor.Reset();
   DALI_TEST_CHECK( !cameraActor );
 
   cameraActor = DownCast< CameraActor >( child );

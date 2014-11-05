@@ -49,13 +49,6 @@ Cloth& Cloth::operator=(const Cloth& rhs)
   return *this;
 }
 
-Cloth& Cloth::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 Cloth Cloth::New( const float width, const float height, const int xSteps, const int ySteps, const Rect<float>& textureCoordinates )
 {
   MeshData meshData( MeshFactory::NewPlane(width, height, xSteps, ySteps, textureCoordinates) );

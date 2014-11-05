@@ -50,7 +50,7 @@ struct SignalData
     receivedMouseWheelEvent.z = 0;
     receivedMouseWheelEvent.timeStamp = 0;
 
-    mouseWheeledActor = NULL;
+    mouseWheeledActor.Reset();
   }
 
   bool functorCalled;

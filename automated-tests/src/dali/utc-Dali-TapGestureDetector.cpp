@@ -59,7 +59,7 @@ struct SignalData
     receivedGesture.screenPoint = Vector2(0.0f, 0.0f);
     receivedGesture.localPoint = Vector2(0.0f, 0.0f);
 
-    tappedActor = NULL;
+    tappedActor.Reset();
   }
 
   bool functorCalled;
@@ -1133,7 +1133,7 @@ int UtcDaliTapGestureActorRemovedWhilePossible(void)
   Stage::GetCurrent().Remove(actor);
   application.SendNotification();
   application.Render();
-  actor = NULL;
+  actor.Reset();
 
   // Send a Started state, no signal.
   application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));

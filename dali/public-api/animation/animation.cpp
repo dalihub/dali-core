@@ -73,13 +73,6 @@ Animation& Animation::operator=(const Animation& rhs)
   return *this;
 }
 
-Animation& Animation::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void Animation::SetDuration(float durationSeconds)
 {
   GetImplementation(*this).SetDuration(durationSeconds);

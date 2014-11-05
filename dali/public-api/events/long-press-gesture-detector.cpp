@@ -76,13 +76,6 @@ LongPressGestureDetector& LongPressGestureDetector::operator=(const LongPressGes
   return *this;
 }
 
-LongPressGestureDetector& LongPressGestureDetector::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void LongPressGestureDetector::SetTouchesRequired(unsigned int touches)
 {
   GetImplementation(*this).SetTouchesRequired(touches);

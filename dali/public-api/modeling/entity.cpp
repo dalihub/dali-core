@@ -58,13 +58,6 @@ Entity& Entity::operator=(const Entity& rhs)
   return *this;
 }
 
-Entity& Entity::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 Entity Entity::Find(const std::string& name) const
 {
   Internal::Entity* entity = GetImplementation(*this).Find(name);

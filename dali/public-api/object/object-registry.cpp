@@ -46,13 +46,6 @@ ObjectRegistry& ObjectRegistry::operator=(const ObjectRegistry& rhs)
   return *this;
 }
 
-ObjectRegistry& ObjectRegistry::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 ObjectRegistry::ObjectCreatedSignalV2& ObjectRegistry::ObjectCreatedSignal()
 {
   return GetImplementation(*this).ObjectCreatedSignal();

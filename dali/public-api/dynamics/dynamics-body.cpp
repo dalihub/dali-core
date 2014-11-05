@@ -50,13 +50,6 @@ DynamicsBody& DynamicsBody::operator=(const DynamicsBody& rhs)
   return *this;
 }
 
-DynamicsBody& DynamicsBody::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 DynamicsBody::DynamicsBody(Internal::DynamicsBody* internal)
 #ifdef DYNAMICS_SUPPORT
 : BaseHandle(internal)
