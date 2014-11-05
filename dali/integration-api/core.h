@@ -56,9 +56,8 @@ namespace KeepUpdating DALI_IMPORT_API
   extern const unsigned int ANIMATIONS_RUNNING;     ///< 0x04 - Animations are ongoing
   extern const unsigned int DYNAMICS_CHANGED;       ///< 0x08 - A dynamics simulation is running
   extern const unsigned int LOADING_RESOURCES;      ///< 0x10 - Resources are being loaded
-  extern const unsigned int NOTIFICATIONS_PENDING;  ///< 0x20 - Notifications are pending for the event-thread
-  extern const unsigned int MONITORING_PERFORMANCE; ///< 0x40 - The --enable-performance-monitor option is being used
-  extern const unsigned int RENDER_TASK_SYNC;       ///< 0x80 - A render task is waiting for render sync
+  extern const unsigned int MONITORING_PERFORMANCE; ///< 0x20 - The --enable-performance-monitor option is being used
+  extern const unsigned int RENDER_TASK_SYNC;       ///< 0x40 - A render task is waiting for render sync
 };
 
 /**

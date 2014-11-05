@@ -45,9 +45,8 @@ const unsigned int INCOMING_MESSAGES      = 0x02;  ///< Event-thread is sending 
 const unsigned int ANIMATIONS_RUNNING     = 0x04;  ///< Animations are ongoing
 const unsigned int DYNAMICS_CHANGED       = 0x08;  ///< A dynamics simulation is running
 const unsigned int LOADING_RESOURCES      = 0x10;  ///< Resources are being loaded
-const unsigned int NOTIFICATIONS_PENDING  = 0x20;  ///< Notifications are pending for the event-thread
-const unsigned int MONITORING_PERFORMANCE = 0x40;  ///< The --enable-performance-monitor option is being used
-const unsigned int RENDER_TASK_SYNC       = 0x80;  ///< The refresh once render task is waiting for render sync
+const unsigned int MONITORING_PERFORMANCE = 0x20;  ///< The --enable-performance-monitor option is being used
+const unsigned int RENDER_TASK_SYNC       = 0x40;  ///< The refresh once render task is waiting for render sync
 
 } // namespace KeepUpdating
 
