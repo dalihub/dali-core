@@ -26,7 +26,6 @@
 #include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/common/property-base.h>
-#include <dali/internal/common/observer-pointer.h>
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/time-period.h>
