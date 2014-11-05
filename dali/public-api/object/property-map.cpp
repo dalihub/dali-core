@@ -134,10 +134,6 @@ const Property::Value& Property::Map::operator[]( const std::string& key ) const
   }
 
   DALI_ASSERT_ALWAYS( ! "Invalid Key" );
-
-  // Should not reach here
-  static Value value;
-  return value;
 }
 
 Property::Value& Property::Map::operator[]( const std::string& key )

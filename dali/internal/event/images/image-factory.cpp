@@ -280,32 +280,35 @@ Request* ImageFactory::FindRequest( const std::string& filename, size_t hash, co
     // get cached request
     RequestIdMap::iterator foundRequestIter = mRequestCache.find( cachedReqId );
     DALI_ASSERT_DEBUG( foundRequestIter != mRequestCache.end() );
-    const Request& cachedRequest = *(foundRequestIter->second);
-    const ImageAttributes* storedAttributes = cachedRequest.attributes;
-
-    // compare attributes: NULL means default attributes
-    if( !attributes )
+    if( foundRequestIter != mRequestCache.end() )
     {
-      attributes = &ImageAttributes::DEFAULT_ATTRIBUTES;
-    }
-    if( !storedAttributes )
-    {
-      storedAttributes = &ImageAttributes::DEFAULT_ATTRIBUTES;
-    }
+      const Request& cachedRequest = *(foundRequestIter->second);
+      const ImageAttributes* storedAttributes = cachedRequest.attributes;
 
-    if( *attributes != *storedAttributes )
-    {
-      continue;
-    }
+      // compare attributes: NULL means default attributes
+      if( !attributes )
+      {
+        attributes = &ImageAttributes::DEFAULT_ATTRIBUTES;
+      }
+      if( !storedAttributes )
+      {
+        storedAttributes = &ImageAttributes::DEFAULT_ATTRIBUTES;
+      }
 
-    if( filename.compare( cachedRequest.url ) )
-    {
-      // hash collision, filenames don't match
-      continue;
-    }
+      if( *attributes != *storedAttributes )
+      {
+        continue;
+      }
 
-    // we've found an exact match
-    return foundRequestIter->second;
+      if( filename.compare( cachedRequest.url ) )
+      {
+        // hash collision, filenames don't match
+        continue;
+      }
+
+      // we've found an exact match
+      return foundRequestIter->second;
+    }
   }
 
   return NULL;
@@ -328,42 +331,45 @@ ResourceTicketPtr ImageFactory::FindCompatibleResource( const std::string& filen
       // get cached request
       RequestIdMap::iterator foundRequestIter = mRequestCache.find( cachedReqId );
       DALI_ASSERT_DEBUG( foundRequestIter != mRequestCache.end() );
-      Request& cachedRequest = *(foundRequestIter->second);
-      if( filename.compare( cachedRequest.url ) )
+      if( foundRequestIter != mRequestCache.end() )
       {
-        // hash collision, filenames don't match
-        continue;
-      }
+        Request& cachedRequest = *(foundRequestIter->second);
+        if( filename.compare( cachedRequest.url ) )
+        {
+          // hash collision, filenames don't match
+          continue;
+        }
 
-      if( !cachedRequest.resourceId )
-      {
-        continue;
-      }
+        if( !cachedRequest.resourceId )
+        {
+          continue;
+        }
 
-      ticket = mResourceClient.RequestResourceTicket( cachedRequest.resourceId );
-      if( !ticket )
-      {
-        cachedRequest.resourceId = 0;
-        continue;
-      }
+        ticket = mResourceClient.RequestResourceTicket( cachedRequest.resourceId );
+        if( !ticket )
+        {
+          cachedRequest.resourceId = 0;
+          continue;
+        }
 
-      DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
-                         ticket->GetTypePath().type->id == ResourceNativeImage ||
-                         ticket->GetTypePath().type->id == ResourceTargetImage );
+        DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
+                           ticket->GetTypePath().type->id == ResourceNativeImage ||
+                           ticket->GetTypePath().type->id == ResourceTargetImage );
 
-      // check for compatible ImageAttributes
-      const ImageAttributes& storedAttributes = static_cast<ImageTicket*>(ticket.Get())->GetAttributes();
-      if( !attr )
-      {
-        attr = &ImageAttributes::DEFAULT_ATTRIBUTES;
-      }
+        // check for compatible ImageAttributes
+        const ImageAttributes& storedAttributes = static_cast<ImageTicket*>(ticket.Get())->GetAttributes();
+        if( !attr )
+        {
+          attr = &ImageAttributes::DEFAULT_ATTRIBUTES;
+        }
 
-      // in case both attributes are default or they are matching custom ones
-      if( CompareAttributes( *attr, storedAttributes ) )
-      {
-        // found compatible resource
-        foundCompatible = true;
-        break;
+        // in case both attributes are default or they are matching custom ones
+        if( CompareAttributes( *attr, storedAttributes ) )
+        {
+          // found compatible resource
+          foundCompatible = true;
+          break;
+        }
       }
     } // for( it ...
   } // foundRequests.first
