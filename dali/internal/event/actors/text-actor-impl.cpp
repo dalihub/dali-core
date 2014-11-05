@@ -147,6 +147,7 @@ TextActorPtr TextActor::New( const Integration::TextArray& utfCodes, const TextA
 
   //create the attachment
   actor->mTextAttachment = TextAttachment::New( *actor->mNode, Integration::TextArray(), fontPtr );
+  actor->Attach(*actor->mTextAttachment);
 
   // Note: SetTextStyle() MUST be called before SetText(), to ensure
   //       that a single ResourceRequest for the glyphs is made. Calling
