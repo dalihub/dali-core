@@ -894,8 +894,11 @@ void ResourceManager::SaveComplete(ResourceId id, ResourceTypeId type)
     {
       ShaderCacheIter shaderIter  = mImpl->mShaders.find(id);
       DALI_ASSERT_DEBUG( mImpl->mShaders.end() != shaderIter );
-      ShaderDataPtr shaderDataPtr = shaderIter->second;
-      std::vector<unsigned char>().swap(shaderDataPtr->buffer);
+      if( mImpl->mShaders.end() != shaderIter )
+      {
+        ShaderDataPtr shaderDataPtr = shaderIter->second;
+        std::vector<unsigned char>().swap(shaderDataPtr->buffer);
+      }
     }
   }
 }
@@ -1080,9 +1083,11 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
       {
         MeshCacheIter mesh = mImpl->mMeshes.find(iter->first);
         DALI_ASSERT_DEBUG( mImpl->mMeshes.end() != mesh );
-
-        mImpl->mDiscardQueue.Add( updateBufferIndex, mesh->second );
-        mImpl->mMeshes.erase( mesh );
+        if( mImpl->mMeshes.end() != mesh )
+        {
+          mImpl->mDiscardQueue.Add( updateBufferIndex, mesh->second );
+          mImpl->mMeshes.erase( mesh );
+        }
       }
       break;
 

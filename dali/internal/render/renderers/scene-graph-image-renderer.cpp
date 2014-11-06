@@ -78,26 +78,29 @@ void GenerateIntervals(std::vector<VertexToTextureCoord>& intervalList, int inte
   DALI_ASSERT_DEBUG(intervals > 0);
 
   std::vector<VertexToTextureCoord>::const_iterator iter = insertionList.begin();
-  std::vector<VertexToTextureCoord>::const_iterator end = insertionList.end()-1;
-
-  const float length = end->x - iter->x;
-  const float intervalSize = length / static_cast<float>(intervals);
-  float x = iter->x;
-
-  for(;iter!=end;++iter)
+  if( iter != insertionList.end() )
   {
-    float x0 = iter[0].x;
-    float u0 = iter[0].u;
-    float x1 = iter[1].x;
-    float u1 = iter[1].u;
+    std::vector<VertexToTextureCoord>::const_iterator end = insertionList.end()-1;
 
-    for(;x<x1;x+=intervalSize)
+    const float length = end->x - iter->x;
+    const float intervalSize = length / static_cast<float>(intervals);
+    float x = iter->x;
+
+    for(;iter!=end;++iter)
     {
-      float progress = (x - x0) / (x1 - x0);  // progress value between current interval and next.
-      float u = u0 + (u1 - u0) * progress;    // u 1D texture coordinate value for this x position.
-      intervalList.push_back( VertexToTextureCoord( x, u ) );
+      float x0 = iter[0].x;
+      float u0 = iter[0].u;
+      float x1 = iter[1].x;
+      float u1 = iter[1].u;
+
+      for(;x<x1;x+=intervalSize)
+      {
+        float progress = (x - x0) / (x1 - x0);  // progress value between current interval and next.
+        float u = u0 + (u1 - u0) * progress;    // u 1D texture coordinate value for this x position.
+        intervalList.push_back( VertexToTextureCoord( x, u ) );
+      }
+      intervalList.push_back( VertexToTextureCoord( x1, u1 ) );
     }
-    intervalList.push_back( VertexToTextureCoord( x1, u1 ) );
   }
 }
 
