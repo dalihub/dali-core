@@ -93,6 +93,8 @@ struct RenderManager::Impl
     resourcePostProcessQueue( resourcePostProcessQ ),
     instructions(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
+    frameTime( 0.0f ),
+    lastFrameTime( 0.0f ),
     frameCount( 0 ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),

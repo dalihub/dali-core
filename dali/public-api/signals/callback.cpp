@@ -82,7 +82,8 @@ void CallbackBase::Reset()
 
 CallbackBase::Impl::Impl()
 : mObjectPointer( NULL ),
-  mMemberFunctionDispatcher( NULL )
+  mMemberFunctionDispatcher( NULL ),
+  mDestructorDispatcher( NULL )
 {
 }
 

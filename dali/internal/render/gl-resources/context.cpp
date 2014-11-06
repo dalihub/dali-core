@@ -106,7 +106,10 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
   mCullFaceMode(CullNone),
   mViewPort( 0, 0, 0, 0 ),
-  mCurrentProgram( NULL )
+  mCurrentProgram( NULL ),
+  mFrameCount( 0 ),
+  mCulledCount( 0 ),
+  mRendererCount( 0 )
 {
 }
 

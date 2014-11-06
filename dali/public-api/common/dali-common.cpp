@@ -71,23 +71,26 @@ std::string Demangle(const char* symbol)
 
       // Allocate space for symbol
       char *mangledSymbol = (char*)malloc(tokenLength+1u);
-      strncpy(mangledSymbol, startOfToken, tokenLength);
-      mangledSymbol[tokenLength] = '\0';
+      if(mangledSymbol != NULL)
+      {
+        strncpy(mangledSymbol, startOfToken, tokenLength);
+        mangledSymbol[tokenLength] = '\0';
 
-      size_t size;
-      int    status;
-      char*  demangled=NULL;
-      demangled = abi::__cxa_demangle( mangledSymbol, NULL, &size, &status );
-      if( demangled != NULL )
-      {
-        result = demangled;
-        free(demangled); // demangle() allocates returned string, so free it
+        size_t size;
+        int    status;
+        char*  demangled=NULL;
+        demangled = abi::__cxa_demangle( mangledSymbol, NULL, &size, &status );
+        if( demangled != NULL )
+        {
+          result = demangled;
+          free(demangled); // demangle() allocates returned string, so free it
+        }
+        else
+        {
+          result = symbol;
+        }
+        free(mangledSymbol);
       }
-      else
-      {
-        result = symbol;
-      }
-      free(mangledSymbol);
     }
   }
 

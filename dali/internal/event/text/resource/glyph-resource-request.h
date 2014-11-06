@@ -102,9 +102,7 @@ private:
   /**
    * constructor
    */
-  GlyphResourceRequest()
-  {
-  }
+  GlyphResourceRequest();
 
   FontId mFontId;                  ///< font id
   GlyphQuality mQuality;           ///< quality

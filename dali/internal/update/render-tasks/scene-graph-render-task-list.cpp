@@ -32,7 +32,8 @@ namespace SceneGraph
 {
 
 RenderTaskList::RenderTaskList(CompleteStatusManager& completeStatusManager)
-: mCompleteStatusManager( completeStatusManager )
+: mNotificationObject( NULL ),
+  mCompleteStatusManager( completeStatusManager )
 {
 }
 

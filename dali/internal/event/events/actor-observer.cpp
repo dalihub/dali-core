@@ -16,9 +16,9 @@
  */
 
 // CLASS HEADER
+#include <dali/internal/event/events/actor-observer.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/actor-impl.h>
-#include <dali/internal/event/events/actor-observer.h>
 
 namespace Dali
 {
@@ -33,25 +33,25 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_ACT
 #endif // defined(DEBUG_ENABLED)
 }
 
-ActorObserver::ActorObserver::ActorObserver()
+ActorObserver::ActorObserver()
 : mActor ( NULL ),
   mActorDisconnected(false)
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 }
 
-ActorObserver::ActorObserver::~ActorObserver()
+ActorObserver::~ActorObserver()
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
   SetActor( NULL );
 }
 
-Actor* ActorObserver::ActorObserver::GetActor()
+Actor* ActorObserver::GetActor()
 {
   return mActorDisconnected ? NULL : mActor;
 }
 
-void ActorObserver::ActorObserver::SetActor( Actor* actor )
+void ActorObserver::SetActor( Actor* actor )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 
@@ -72,7 +72,7 @@ void ActorObserver::ActorObserver::SetActor( Actor* actor )
   mActorDisconnected = false;
 }
 
-void ActorObserver::ActorObserver::ResetActor()
+void ActorObserver::ResetActor()
 {
   if ( mActor )
   {
@@ -83,7 +83,7 @@ void ActorObserver::ActorObserver::ResetActor()
   }
 }
 
-void ActorObserver::ActorObserver::SceneObjectRemoved( ProxyObject& proxy )
+void ActorObserver::SceneObjectRemoved( ProxyObject& proxy )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 
@@ -94,7 +94,7 @@ void ActorObserver::ActorObserver::SceneObjectRemoved( ProxyObject& proxy )
   }
 }
 
-void ActorObserver::ActorObserver::ProxyDestroyed(ProxyObject& proxy)
+void ActorObserver::ProxyDestroyed(ProxyObject& proxy)
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 

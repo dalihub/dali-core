@@ -450,52 +450,75 @@ Archive& operator<< (Archive& ar, const Dali::EntityAnimatorMap& t)
   ar << t.GetEntityName();
   ar << t.GetDuration();
 
+  unsigned int count = 0;
+
   const KeyFrameVector3* positionKeyFrames = NULL;
   GetSpecialization(GetImplementation(t.GetPositionKeyFrames()), positionKeyFrames);
-  unsigned int count = positionKeyFrames->GetNumberOfKeyFrames();
-  ar << count;
-  if( count )
+  if( positionKeyFrames )
   {
-    for( unsigned int i = 0; i < count; ++i)
+    count = positionKeyFrames->GetNumberOfKeyFrames();
+    ar << count;
+    if( count )
     {
-      float progress;
-      Vector3 position;
-      positionKeyFrames->GetKeyFrame(i, progress, position);
+      for( unsigned int i = 0; i < count; ++i)
+      {
+        float progress;
+        Vector3 position;
+        positionKeyFrames->GetKeyFrame(i, progress, position);
 
-      ar << progress << position;
+        ar << progress << position;
+      }
     }
+  }
+  else
+  {
+    ar << 0;
   }
 
   const KeyFrameVector3* scaleKeyFrames = NULL;
   GetSpecialization(GetImplementation(t.GetScaleKeyFrames()), scaleKeyFrames);
-  count = scaleKeyFrames->GetNumberOfKeyFrames();
-  ar << count;
-  if( count )
+  if( scaleKeyFrames )
   {
-    for( unsigned int i = 0; i < count; ++i)
+    count = scaleKeyFrames->GetNumberOfKeyFrames();
+    ar << count;
+    if( count )
     {
-      float progress;
-      Vector3 scale;
-      scaleKeyFrames->GetKeyFrame(i, progress, scale);
+      for( unsigned int i = 0; i < count; ++i)
+      {
+        float progress;
+        Vector3 scale;
+        scaleKeyFrames->GetKeyFrame(i, progress, scale);
 
-      ar << progress << scale;
+        ar << progress << scale;
+      }
     }
+  }
+  else
+  {
+    ar << 0;
   }
 
   const KeyFrameQuaternion* rotationKeyFrames = NULL;
   GetSpecialization(GetImplementation(t.GetRotationKeyFrames()), rotationKeyFrames);
-  count = rotationKeyFrames->GetNumberOfKeyFrames();
-  ar << count;
-  if( count )
+  if( rotationKeyFrames )
   {
-    for( unsigned int i = 0; i < count; ++i)
+    count = rotationKeyFrames->GetNumberOfKeyFrames();
+    ar << count;
+    if( count )
     {
-      float progress;
-      Quaternion rotation;
-      rotationKeyFrames->GetKeyFrame(i, progress, rotation);
+      for( unsigned int i = 0; i < count; ++i)
+      {
+        float progress;
+        Quaternion rotation;
+        rotationKeyFrames->GetKeyFrame(i, progress, rotation);
 
-      ar << progress << rotation;
+        ar << progress << rotation;
+      }
     }
+  }
+  else
+  {
+    ar << 0;
   }
 
   ar.CloseChunk(); // EANI

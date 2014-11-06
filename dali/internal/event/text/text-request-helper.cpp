@@ -99,11 +99,13 @@ TextVertexBuffer* TextRequestHelper::TextRequired( const TextFormat& format )
 
     // get the vertex buffer required to display the text
     TextVertexBuffer* buffer =  mFont->TextRequired( mText, format );
+    if( buffer )
+    {
+      // keep track of the texture id, ( texture id == atlas id)
+      mTextureId = buffer->mTextureId;
 
-    // keep track of the texture id, ( texture id == atlas id)
-    mTextureId = buffer->mTextureId;
-
-    return buffer;
+      return buffer;
+    }
   }
   else if( 0u == mText.Count()  )
   {

@@ -110,7 +110,8 @@ struct ResourceManager::ResourceManagerImpl
     mPostProcessResourceDispatcher(postProcessResourceDispatcher),
     mDiscardQueue(discardQueue),
     mRenderQueue(renderQueue),
-    mNotificationCount(0)
+    mNotificationCount(0),
+    cacheUpdated(false)
   {
   }
 

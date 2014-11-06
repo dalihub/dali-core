@@ -55,15 +55,21 @@ TextVertexBuffer* GlyphAtlasManager::TextRequired( const Integration::TextArray&
   GlyphAtlas* atlas  = FindAtlas( text, format, fontId, bestRank);
 
   DALI_ASSERT_DEBUG( atlas && "Find atlas should always return a valid atlas." );
-
-  // if the atlas is full, create a new larger one
-  if( bestRank.GetSpaceStatus() == AtlasRanking::FULL_CAN_BE_RESIZED )
+  if( atlas )
   {
-    atlas = CreateLargerAtlas( atlas );
-  }
+    // if the atlas is full, create a new larger one
+    if( bestRank.GetSpaceStatus() == AtlasRanking::FULL_CAN_BE_RESIZED )
+    {
+      atlas = CreateLargerAtlas( atlas );
+    }
 
-  // assign the text to it
-  return atlas->AssignText( text, format, fontId, metrics );
+    // assign the text to it
+    return atlas->AssignText( text, format, fontId, metrics );
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 void GlyphAtlasManager::TextNotRequired( const Integration::TextArray& text,
