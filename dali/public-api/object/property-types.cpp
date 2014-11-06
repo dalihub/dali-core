@@ -18,13 +18,12 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-types.h>
 
-namespace Dali DALI_EXPORT_API
+namespace Dali
 {
 
-namespace PropertyTypes
+namespace
 {
-
-static const char* PROPERTY_TYPE_NAMES[Property::TYPE_COUNT] =
+const char* const PROPERTY_TYPE_NAMES[ Property::TYPE_COUNT ] =
 {
   "NONE",
   "BOOLEAN",
@@ -42,7 +41,12 @@ static const char* PROPERTY_TYPE_NAMES[Property::TYPE_COUNT] =
   "ARRAY",
   "MAP",
 };
+}
 
+namespace PropertyTypes
+{
+
+DALI_EXPORT_API
 const char* GetName(Property::Type type)
 {
   if (type < Property::TYPE_COUNT)
@@ -52,24 +56,6 @@ const char* GetName(Property::Type type)
 
   return PROPERTY_TYPE_NAMES[Property::NONE];
 }
-
-template <typename T> Property::Type Get()             { return Property::NONE;  }
-template <>           Property::Type Get<bool>()       { return Property::BOOLEAN;  }
-template <>           Property::Type Get<float>()      { return Property::FLOAT;    }
-template <>           Property::Type Get<int>()        { return Property::INTEGER;  }
-template <>           Property::Type Get<unsigned int>(){ return Property::UNSIGNED_INTEGER;  }
-template <>           Property::Type Get<Vector2>()    { return Property::VECTOR2;  }
-template <>           Property::Type Get<Vector3>()    { return Property::VECTOR3;  }
-template <>           Property::Type Get<Vector4>()    { return Property::VECTOR4;  }
-template <>           Property::Type Get<Matrix3>()    { return Property::MATRIX3;  }
-template <>           Property::Type Get<Matrix>()     { return Property::MATRIX;  }
-template <>           Property::Type Get<AngleAxis>()  { return Property::ROTATION; } // Rotation has two representations
-template <>           Property::Type Get<Quaternion>() { return Property::ROTATION; } // Rotation has two representations
-template <>           Property::Type Get<std::string>(){ return Property::STRING; }
-template <>           Property::Type Get<Dali::Rect<int> >(){ return Property::RECTANGLE; }
-template <>           Property::Type Get<Property::Map>() { return Property::MAP; }
-template <>           Property::Type Get<Property::Array>() { return Property::ARRAY; }
-
 
 }; // namespace PropertyTypes
 
