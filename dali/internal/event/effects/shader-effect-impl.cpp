@@ -80,12 +80,16 @@ WrapperStrings customShaderWrappers [] =
     CustomImagePostfixVertex, CustomImagePostfixFragment
   },
   {
-    CustomFontPrefixVertex, CustomFontPrefixFragment,
-    CustomFontPostfixVertex, CustomFontPostfixFragment
+    CustomTextDistanceFieldPrefixVertex, CustomTextDistanceFieldPrefixFragment,
+    CustomTextDistanceFieldPostfixVertex, CustomTextDistanceFieldPostfixFragment
   },
   {
-    CustomMeshPrefixVertex, CustomMeshPrefixFragment,
-    CustomMeshPostfixVertex, CustomMeshPostfixFragment
+    CustomUntexturedMeshPrefixVertex, CustomUntexturedMeshPrefixFragment,
+    CustomUntexturedMeshPostfixVertex, CustomUntexturedMeshPostfixFragment
+  },
+  {
+    CustomTexturedMeshPrefixVertex, CustomTexturedMeshPrefixFragment,
+    CustomTexturedMeshPostfixVertex, CustomTexturedMeshPostfixFragment
   }
 };
 
@@ -176,8 +180,8 @@ ShaderEffectPtr ShaderEffect::New( const string& imageVertexShader,
                                    const string& textFragmentShader,
                                    const string& texturedMeshVertexShader,
                                    const string& texturedMeshFragmentShader,
-                                   const string& meshVertexShader,
-                                   const string& meshFragmentShader,
+                                   const string& untexturedMeshVertexShader,
+                                   const string& untexturedMeshFragmentShader,
                                    Dali::ShaderEffect::GeometryHints hints )
 {
   ShaderEffectPtr shaderEffect( New(hints) );
@@ -185,7 +189,7 @@ ShaderEffectPtr ShaderEffect::New( const string& imageVertexShader,
   shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, "", "", imageVertexShader, imageFragmentShader );
   shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, "", "", textVertexShader, textFragmentShader );
   shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, "", "", texturedMeshVertexShader, texturedMeshFragmentShader );
-  shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, "", "", meshVertexShader, meshFragmentShader );
+  shaderEffect->SetWrappedProgram( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_SUBTYPE_ALL, "", "", untexturedMeshVertexShader, untexturedMeshFragmentShader );
 
   return shaderEffect;
 }
@@ -469,9 +473,9 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
         {
           geometryType  = GEOMETRY_TYPE_TEXT;
         }
-        else if( s == "GEOMETRY_TYPE_MESH")
+        else if( s == "GEOMETRY_TYPE_UNTEXTURED_MESH")
         {
-          geometryType  = GEOMETRY_TYPE_MESH;
+          geometryType  = GEOMETRY_TYPE_UNTEXTURED_MESH;
         }
         else if( s == "GEOMETRY_TYPE_TEXTURED_MESH")
         {
@@ -611,9 +615,9 @@ void ShaderEffect::SetPrograms( GeometryType  geometryTypes,
     SetWrappedProgram( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
   }
 
-  if( geometryTypes & GEOMETRY_TYPE_MESH )
+  if( geometryTypes & GEOMETRY_TYPE_UNTEXTURED_MESH )
   {
-    SetWrappedProgram( GEOMETRY_TYPE_MESH, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
+    SetWrappedProgram( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_SUBTYPE_ALL, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
   }
 }
 
@@ -635,10 +639,14 @@ void ShaderEffect::SetWrappedProgram( GeometryType geometryType, ShaderSubTypes 
       index = 1;
       break;
     }
-    case GEOMETRY_TYPE_MESH:
-    case GEOMETRY_TYPE_TEXTURED_MESH:
+    case GEOMETRY_TYPE_UNTEXTURED_MESH:
     {
       index = 2;
+      break;
+    }
+    case GEOMETRY_TYPE_TEXTURED_MESH:
+    {
+      index = 3;
       break;
     }
     case GEOMETRY_TYPE_LAST:

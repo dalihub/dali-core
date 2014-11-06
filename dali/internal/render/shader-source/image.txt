@@ -1,0 +1,44 @@
+<VertexShader>
+
+attribute mediump vec3  aPosition;
+attribute mediump vec2  aTexCoord;
+
+uniform   mediump mat4  uModelView;
+uniform   mediump mat4  uProjection;
+uniform   mediump mat4  uMvpMatrix;
+uniform   mediump mat3  uNormalMatrix;
+uniform   mediump mat4  uModelMatrix;
+uniform   mediump mat4  uViewMatrix;
+
+uniform   mediump vec4  uColor;
+
+varying   mediump vec2  vTexCoord;
+
+uniform   mediump vec4  sTextureRect;
+uniform   mediump vec4  sEffectRect;
+
+void main()
+{
+  gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+  vTexCoord = aTexCoord;
+}
+
+</VertexShader>
+
+<FragmentShader>
+
+uniform sampler2D sTexture;
+uniform sampler2D sEffect;
+
+uniform mediump vec4 sTextureRect;
+uniform mediump vec4 sEffectRect;
+
+uniform mediump vec4 uColor;
+varying mediump vec2 vTexCoord;
+
+void main()
+{
+  gl_FragColor = texture2D(sTexture, vTexCoord) * uColor;
+}
+
+</FragmentShader>

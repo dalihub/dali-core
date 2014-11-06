@@ -90,9 +90,9 @@ inline unsigned int GetGeometryTypeIndex(GeometryType type)
   {
     index = Log<GEOMETRY_TYPE_TEXT>::value;
   }
-  else if ( type & GEOMETRY_TYPE_MESH )
+  else if ( type & GEOMETRY_TYPE_UNTEXTURED_MESH )
   {
-    index = Log<GEOMETRY_TYPE_MESH>::value;
+    index = Log<GEOMETRY_TYPE_UNTEXTURED_MESH>::value;
   }
   else if ( type & GEOMETRY_TYPE_TEXTURED_MESH )
   {

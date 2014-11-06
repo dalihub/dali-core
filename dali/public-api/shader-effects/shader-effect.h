@@ -68,7 +68,7 @@ enum GeometryType
 {
   GEOMETRY_TYPE_IMAGE = 0x01,         ///< image, with flat color or texture
   GEOMETRY_TYPE_TEXT = 0x02,          ///< text, with flat color or texture
-  GEOMETRY_TYPE_MESH = 0x04,          ///< Complex meshes, with flat color
+  GEOMETRY_TYPE_UNTEXTURED_MESH = 0x04,///< Complex meshes, with flat color
   GEOMETRY_TYPE_TEXTURED_MESH = 0x08, ///< Complex meshes, with texture
   GEOMETRY_TYPE_LAST = 0x10
 };
