@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/actors/custom-actor-impl.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL

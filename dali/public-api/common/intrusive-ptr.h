@@ -25,7 +25,7 @@ namespace Dali
 {
 
 /**
- * @brief Templated class to emulate a sub-set of functions served by deprecating boost::intrusive_ptr.
+ * @brief Templated intrusive pointer class
  *
  * Uses the Dali:Refobject type supply actual reference counting
  * The object is responsible for destroying itself
@@ -211,7 +211,8 @@ private:
  * @param rhs intrusive pointer to compare against
  * @return true if the pointers point at the same object
  */
-template<typename T, typename U> inline bool operator==( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const& rhs )
+template<typename T, typename U>
+inline bool operator==( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const& rhs )
 {
   return lhs.Get() == rhs.Get();
 }
@@ -223,7 +224,8 @@ template<typename T, typename U> inline bool operator==( IntrusivePtr<T>const& l
  * @param rhs intrusive pointer to compare against
  * @return true if the pointers point at different objects
  */
-template<typename T, typename U> inline bool operator!=( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const &rhs)
+template<typename T, typename U>
+inline bool operator!=( IntrusivePtr<T>const& lhs, IntrusivePtr<U>const &rhs)
 {
   return lhs.Get() != rhs.Get();
 }
@@ -235,7 +237,8 @@ template<typename T, typename U> inline bool operator!=( IntrusivePtr<T>const& l
  * @param rhs object to compare against
  * @return true if the intrusive pointer points at the specified object
  */
-template<typename T, typename U> inline bool operator==( IntrusivePtr<T>const& lhs, U* rhs )
+template<typename T, typename U>
+inline bool operator==( IntrusivePtr<T>const& lhs, U* rhs )
 {
   return lhs.Get() == rhs;
 }
@@ -247,7 +250,8 @@ template<typename T, typename U> inline bool operator==( IntrusivePtr<T>const& l
  * @param rhs intrusive pointer to compare against
  * @return true if the intrusive pointer doesn't point at the specified object
  */
-template<typename T, typename U> inline bool operator!=( IntrusivePtr<T>const& lhs, U* rhs )
+template<typename T, typename U>
+inline bool operator!=( IntrusivePtr<T>const& lhs, U* rhs )
 {
   return lhs.Get() != rhs;
 }
@@ -259,7 +263,8 @@ template<typename T, typename U> inline bool operator!=( IntrusivePtr<T>const& l
  * @param rhs intrusive pointer to compare against
  * @return true if the intrusive pointer points at the specified object
  */
-template<typename T, typename U> inline bool operator==( T* lhs, IntrusivePtr<U>const& rhs )
+template<typename T, typename U>
+inline bool operator==( T* lhs, IntrusivePtr<U>const& rhs )
 {
   return lhs == rhs.Get();
 }
@@ -271,7 +276,8 @@ template<typename T, typename U> inline bool operator==( T* lhs, IntrusivePtr<U>
  * @param rhs intrusive pointer to compare against
  * @return true if the intrusive pointer doesn't point at the specified object
  */
-template<typename T, typename U> inline bool operator!=( T* lhs, IntrusivePtr<U>const& rhs )
+template<typename T, typename U>
+inline bool operator!=( T* lhs, IntrusivePtr<U>const& rhs )
 {
   return lhs != rhs.Get();
 }
@@ -282,7 +288,8 @@ template<typename T, typename U> inline bool operator!=( T* lhs, IntrusivePtr<U>
  * @param rhs intrusive pointer wrapping object
  * @return pointer to object
  */
-template<typename T>inline T* GetPointer(IntrusivePtr<T> const& rhs)
+template<typename T>
+inline T* GetPointer(IntrusivePtr<T> const& rhs)
 {
   return rhs.Get();
 }
@@ -293,7 +300,8 @@ template<typename T>inline T* GetPointer(IntrusivePtr<T> const& rhs)
  * @param rhs intrusive pointer wrapping object
  * @return pointer to object
  */
-template<typename T>inline T* get_pointer(IntrusivePtr<T> const& rhs)
+template<typename T>
+inline T* get_pointer(IntrusivePtr<T> const& rhs)
 {
   return rhs.Get();
 }

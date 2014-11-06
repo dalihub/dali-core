@@ -235,7 +235,6 @@ public:
 
   virtual Integration::BitmapPtr GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const;
 
-
 public: // TEST FUNCTIONS
 
   // Enumeration of Platform Abstraction methods
@@ -322,7 +321,6 @@ public: // TEST FUNCTIONS
   void SetReadGlobalMetricsResult( bool success, Integration::GlobalMetrics& globalMetrics );
 
   void SetReadMetricsResult( bool success, std::vector<Integration::GlyphMetrics>& glyphMetricsContainer );
-
 
 private:
   mutable TraceCallStack        mTrace;

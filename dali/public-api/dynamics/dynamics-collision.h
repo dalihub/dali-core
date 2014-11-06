@@ -21,7 +21,7 @@
 // BASE CLASS INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;
@@ -37,7 +37,7 @@ class DynamicsCollision;
 /**
  * @brief Contains information about a collision between two actors.
  */
-class DynamicsCollision : public BaseHandle
+class DALI_IMPORT_API DynamicsCollision : public BaseHandle
 {
 public:
   /**

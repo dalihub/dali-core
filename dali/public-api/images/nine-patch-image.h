@@ -24,7 +24,7 @@
 #include <dali/public-api/images/bitmap-image.h>
 #include <dali/public-api/math/rect.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -47,7 +47,7 @@ class NinePatchImage;
  * to use the cropped BitmapImage - if you don't retain a handle to this object, it will
  * be automatically destroyed.
  */
-class NinePatchImage : public Image
+class DALI_IMPORT_API NinePatchImage : public Image
 {
 public:
   /**

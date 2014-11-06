@@ -38,7 +38,7 @@ typedef IntrusivePtr<GlyphSet> GlyphSetPointer;
 /**
  * A Glyph holds information for a single character.
  */
-struct DALI_IMPORT_API GlyphMetrics
+struct GlyphMetrics
 {
   enum GlyphQuality
   {
@@ -60,7 +60,7 @@ struct DALI_IMPORT_API GlyphMetrics
 /**
  * Stores font global metrics.
  */
-struct DALI_IMPORT_API GlobalMetrics
+struct GlobalMetrics
 {
   GlobalMetrics()
   : lineHeight( 0.f ),

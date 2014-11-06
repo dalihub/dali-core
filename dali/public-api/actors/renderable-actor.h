@@ -24,7 +24,7 @@
 #include <dali/public-api/actors/blending.h>
 #include <dali/public-api/actors/sampling.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 namespace Internal DALI_INTERNAL
 {
@@ -313,7 +313,7 @@ public: // Not intended for application developers
  * @param [in] actor root of a tree of actors.
  * @param [in] effect The shader effect.
  */
-void SetShaderEffectRecursively( Actor actor, ShaderEffect effect );
+DALI_IMPORT_API void SetShaderEffectRecursively( Actor actor, ShaderEffect effect );
 
 /**
  * @brief Removes the shader effect from all RenderableActors in a tree of Actors.
@@ -322,7 +322,7 @@ void SetShaderEffectRecursively( Actor actor, ShaderEffect effect );
  *
  * @param [in] actor root of a tree of actors.
  */
-void RemoveShaderEffectRecursively( Actor actor );
+DALI_IMPORT_API void RemoveShaderEffectRecursively( Actor actor );
 
 } // namespace Dali
 

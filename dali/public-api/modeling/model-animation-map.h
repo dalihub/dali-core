@@ -22,7 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/modeling/entity-animator-map.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct ModelAnimationMap;

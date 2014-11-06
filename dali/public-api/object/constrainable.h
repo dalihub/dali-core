@@ -162,14 +162,14 @@ public:
 namespace WeightObject
 {
 
-extern const Property::Index WEIGHT; ///< name "weight", type FLOAT
+DALI_IMPORT_API extern const Property::Index WEIGHT; ///< name "weight", type FLOAT
 
 /**
  * @brief Convenience function to create an object with a custom "weight" property.
  *
  * @return A handle to a newly allocated object.
  */
-Constrainable New();
+DALI_IMPORT_API Constrainable New();
 
 } // namespace WeightObject
 

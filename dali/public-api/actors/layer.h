@@ -25,7 +25,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL

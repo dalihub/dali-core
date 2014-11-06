@@ -20,7 +20,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**

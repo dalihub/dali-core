@@ -21,7 +21,7 @@
 
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 /**
  * @brief Determine the length (in bytes) of a UTF-8 character.

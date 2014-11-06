@@ -27,6 +27,7 @@
 #include <dali/internal/common/bitmap-upload.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/render/gl-resources/texture-cache.h>
 
 namespace Dali
 {
@@ -54,7 +55,7 @@ public:
    * @param[in] bitmapPackedPixelsProfile The Bitmap features related to an addressable array of raw pixel data
    * @param     context The GL context
    */
-  BitmapTexture(Integration::Bitmap* const bitmap, const Integration::Bitmap::PackedPixelsProfile * const bitmapPackedPixelsProfile, Context& context);
+  BitmapTexture(Integration::Bitmap* const bitmap, const Integration::Bitmap::PackedPixelsProfile * const bitmapPackedPixelsProfile, Context& context, ResourcePolicy::Discardable discardPolicy);
 
   /**
    * Constructor
@@ -66,7 +67,7 @@ public:
    * @param[in] context Dali context
    */
   BitmapTexture( unsigned int width, unsigned int height, Pixel::Format pixelFormat,
-                 bool clearPixels, Context& context );
+                 bool clearPixels, Context& context, ResourcePolicy::Discardable discardPolicy );
 
   /**
    * Destructor.
@@ -159,9 +160,15 @@ private:
    */
   void AssignBitmap( bool generateTexture, const unsigned char* pixels );
 
+  /**
+   * If the discard policy is not RETAIN, then discards the bitmap's pixel buffer
+   */
+  void DiscardBitmapBuffer();
+
 private:
   Integration::BitmapPtr mBitmap;      ///< The Bitmap the Texture was created from (may be NULL)
   bool                   mClearPixels; ///< true if initial texture should be cleared on creation
+  ResourcePolicy::Discardable mDiscardPolicy; ///< The bitmap discard policy
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

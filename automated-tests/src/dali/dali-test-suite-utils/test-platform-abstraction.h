@@ -325,8 +325,6 @@ public: // TEST FUNCTIONS
   void SetReadGlobalMetricsResult( bool success, Integration::GlobalMetrics& globalMetrics );
 
   void SetReadMetricsResult( bool success, std::vector<Integration::GlyphMetrics>& glyphMetricsContainer );
-
-
 private:
   mutable TraceCallStack        mTrace;
   size_t                        mSeconds;

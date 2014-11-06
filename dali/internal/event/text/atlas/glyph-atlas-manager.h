@@ -118,6 +118,12 @@ public:
    */
   GlyphLoadObserver& GetLoadObserver();
 
+  /**
+   * Reload glyphs into atlas, should be used after GL context has been regained
+   * (i.e. the GL texture backing the atlas has been lost)
+   */
+  void ReloadAtlases();
+
 private:
 
   // Undefined copy constructor.

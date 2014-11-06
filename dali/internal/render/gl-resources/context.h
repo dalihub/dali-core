@@ -584,7 +584,7 @@ public:
    */
   void DeleteBuffers(GLsizei n, const GLuint* buffers)
   {
-    // TODO: this is to prevent mesh destructor from doing GL calls when DALi core is being deleted
+    // @todo: this is to prevent mesh destructor from doing GL calls when DALi core is being deleted
     // can be taken out once render manages either knows about meshes or gpubuffers and can tell them directly that context is lost
     if( this->IsGlContextCreated() )
     {

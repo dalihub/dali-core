@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -41,7 +41,7 @@ namespace Dali DALI_IMPORT_API
  * IMF keyboard to Core. In future IMF may communicate via its own
  * module.
  */
-struct KeyEvent
+struct DALI_IMPORT_API KeyEvent
 {
   // Enumerations
 

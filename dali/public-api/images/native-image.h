@@ -22,7 +22,7 @@
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -98,6 +98,7 @@ protected:
   virtual ~NativeImage()
   {
   }
+
 };
 
 /**

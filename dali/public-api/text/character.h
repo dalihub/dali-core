@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -35,7 +35,7 @@ namespace Internal DALI_INTERNAL
  * This class is provided for convenience. A user can't instantiate Characters directly.
  * However, by instantiating a Text object, Characters are returned by Text::operator[].
  */
-class Character
+class DALI_IMPORT_API Character
 {
 public:
 

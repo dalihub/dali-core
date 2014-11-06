@@ -23,7 +23,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL

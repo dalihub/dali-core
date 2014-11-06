@@ -169,9 +169,9 @@ GLint Program::GetAttribLocation( AttribType type )
 
   if( mAttribLocations[ type ] == ATTRIB_UNKNOWN )
   {
-    LOG_GL( "GetAttribLocation(program=%d,%s) = %d\n", mProgramId, gStdAttribs[type], mAttribLocations[type] );
     GLint loc = CHECK_GL( mContext, mGlAbstraction.GetAttribLocation( mProgramId, gStdAttribs[type] ) );
     mAttribLocations[ type ] = loc;
+    LOG_GL( "GetAttribLocation(program=%d,%s) = %d\n", mProgramId, gStdAttribs[type], mAttribLocations[type] );
   }
 
   return mAttribLocations[type];
@@ -204,10 +204,10 @@ GLint Program::GetUniformLocation( unsigned int uniformIndex )
 
   if( location == UNIFORM_NOT_QUERIED )
   {
-    LOG_GL( "GetUniformLocation(program=%d,%s) = %d\n", mProgramId, mUniformLocations[ uniformIndex ].first.c_str(), mUniformLocations[ uniformIndex ].second );
     location = CHECK_GL( mContext, mGlAbstraction.GetUniformLocation( mProgramId, mUniformLocations[ uniformIndex ].first.c_str() ) );
 
     mUniformLocations[ uniformIndex ].second = location;
+    LOG_GL( "GetUniformLocation(program=%d,%s) = %d\n", mProgramId, mUniformLocations[ uniformIndex ].first.c_str(), mUniformLocations[ uniformIndex ].second );
   }
 
   return location;
@@ -412,22 +412,18 @@ void Program::SetUniformMatrix3fv( GLint location, GLsizei count, const GLfloat*
 
 void Program::GlContextCreated()
 {
-  if (!mLinked)
-  {
-    Load();
-  }
 }
 
 void Program::GlContextDestroyed()
 {
-  Unload();
+  mLinked = false;
 
   mVertexShaderId = 0;
   mFragmentShaderId = 0;
   mProgramId = 0;
   mContext.SetCurrentProgram( NULL );
 
-  ResetAttribsUniforms();
+  ResetAttribsUniformCache();
 }
 
 bool Program::ModifiesGeometry()
@@ -455,7 +451,7 @@ Program::Program(Integration::ShaderDataPtr shaderData, Context& context, bool m
     RegisterUniform( gStdUniforms[ i ] );
   }
   // reset values
-  ResetAttribsUniforms();
+  ResetAttribsUniformCache();
 }
 
 Program::~Program()
@@ -656,7 +652,7 @@ void Program::FreeShaders()
   }
 }
 
-void Program::ResetAttribsUniforms()
+void Program::ResetAttribsUniformCache()
 {
   // reset attribute locations
   for( unsigned i = 0; i < ATTRIB_TYPE_LAST; ++i )

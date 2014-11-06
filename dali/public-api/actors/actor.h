@@ -30,7 +30,7 @@
 #include <dali/public-api/object/constrainable.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -1366,7 +1366,7 @@ public: // Not intended for application developers
  * actor.Unparent() will be called, followed by actor.Reset().
  * @param[in,out] actor A handle to an actor, or an empty handle.
  */
-void UnparentAndReset( Actor& actor );
+ DALI_IMPORT_API void UnparentAndReset( Actor& actor );
 
 } // namespace Dali
 

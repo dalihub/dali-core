@@ -32,6 +32,7 @@ namespace Integration
 class Bitmap;
 class DynamicsFactory;
 
+
 /**
  * PlatformAbstraction is an abstract interface, used by Dali to access platform specific services.
  * A concrete implementation must be created for each platform, and provided when creating the

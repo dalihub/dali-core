@@ -24,7 +24,7 @@
 // BASE CLASS INCLUDES
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 struct Vector3;
@@ -37,7 +37,7 @@ class DynamicsWorldConfig;
 /**
  * @brief Describes the requirements/capabilities of a physics siumlation encapsulated by a DynamicsWorld.
  */
-class DynamicsWorldConfig : public BaseHandle
+class DALI_IMPORT_API DynamicsWorldConfig : public BaseHandle
 {
 public:
   /**

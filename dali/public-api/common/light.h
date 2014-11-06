@@ -28,7 +28,7 @@
 /**
  * The top level DALi namespace
  */
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -52,7 +52,7 @@ enum LightType
 /**
  * @brief Encapsulates the data describing a light source.
  */
-class Light : public BaseHandle
+class DALI_IMPORT_API Light : public BaseHandle
 {
 public:
   /**

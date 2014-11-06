@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -35,7 +35,7 @@ namespace Dali DALI_IMPORT_API
  *
  * @see LongPressGestureDetector
  */
-struct LongPressGesture : public Gesture
+struct DALI_IMPORT_API LongPressGesture : public Gesture
 {
   // Construction & Destruction
 

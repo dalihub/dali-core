@@ -46,6 +46,7 @@
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/animation/time-period.h>
 
+#include <dali/public-api/common/compile-time-assert.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
@@ -100,7 +101,6 @@
 #include <dali/public-api/images/pixel.h>
 
 #include <dali/public-api/math/angle-axis.h>
-#include <dali/public-api/math/compile-time-assert.h>
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/math-utils.h>

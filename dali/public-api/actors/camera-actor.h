@@ -20,7 +20,7 @@
 
 #include <dali/public-api/actors/actor.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -66,7 +66,7 @@ enum ProjectionMode
  * in world coordinates.
  *
  */
-class CameraActor : public Actor
+class DALI_IMPORT_API CameraActor : public Actor
 {
 public:
 

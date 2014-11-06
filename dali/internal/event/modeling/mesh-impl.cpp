@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/geometry/mesh.h>
+#include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/modeling/material-impl.h>
 #include <dali/internal/update/modeling/scene-graph-mesh.h>
@@ -47,10 +48,19 @@ MeshIPtr Mesh::New( const Dali::MeshData& meshData, bool discardable, bool scali
 Mesh::Mesh( const Dali::MeshData& publicMeshData, bool discardable, bool scalingRequired )
 : mBoneContainer( publicMeshData.GetBones() )
 {
-  ResourceClient& resourceClient = ThreadLocalStorage::Get().GetResourceClient();
+  ThreadLocalStorage tls = ThreadLocalStorage::Get();
+  ResourceClient& resourceClient = tls.GetResourceClient();
+  ResourcePolicy::DataRetention dataRetentionPolicy = resourceClient.GetResourceDataRetentionPolicy();
+
+  ResourcePolicy::Discardable discard = ResourcePolicy::DISCARD;
+  if( ! (dataRetentionPolicy == ResourcePolicy::DALI_DISCARDS_ALL_DATA) ||
+      ! discardable )
+  {
+    discard = ResourcePolicy::RETAIN;
+  }
 
   // Copy the mesh-data into an internal structure, and pass ownership to the resourceClient
-  OwnerPointer<MeshData> meshDataPtr( new MeshData( publicMeshData, discardable, scalingRequired ) );
+  OwnerPointer<MeshData> meshDataPtr( new MeshData( publicMeshData, discard, scalingRequired ) );
   const ResourceTicketPtr& ticket = resourceClient.AllocateMesh( meshDataPtr );
 
   mTicket = ticket.Get();
@@ -118,4 +128,3 @@ void Mesh::ResourceSavingFailed( const ResourceTicket& ticket )
 } // namespace Internal
 
 } // namespace Dali
-

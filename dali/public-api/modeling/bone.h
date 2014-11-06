@@ -23,7 +23,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/math/matrix.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Matrix;
@@ -39,7 +39,7 @@ typedef BoneContainer::const_iterator BoneConstIter; ///< @ref Dali::BoneContain
  * A Bone is a named actor that can be used to deform a mesh. @see Dali::MeshData for more
  * information.
  */
-class Bone
+class DALI_IMPORT_API Bone
 {
 public:
   /**

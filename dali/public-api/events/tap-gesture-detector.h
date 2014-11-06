@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -50,7 +50,7 @@ struct TapGesture;
  *
  * @see TapGesture
  */
-class TapGestureDetector : public GestureDetector
+class DALI_IMPORT_API TapGestureDetector : public GestureDetector
 {
 public: // Typedefs
 

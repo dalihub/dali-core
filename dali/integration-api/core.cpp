@@ -45,17 +45,16 @@ const unsigned int INCOMING_MESSAGES      = 0x02;  ///< Event-thread is sending 
 const unsigned int ANIMATIONS_RUNNING     = 0x04;  ///< Animations are ongoing
 const unsigned int DYNAMICS_CHANGED       = 0x08;  ///< A dynamics simulation is running
 const unsigned int LOADING_RESOURCES      = 0x10;  ///< Resources are being loaded
-const unsigned int NOTIFICATIONS_PENDING  = 0x20;  ///< Notifications are pending for the event-thread
-const unsigned int MONITORING_PERFORMANCE = 0x40;  ///< The --enable-performance-monitor option is being used
-const unsigned int RENDER_TASK_SYNC       = 0x80;  ///< The refresh once render task is waiting for render sync
+const unsigned int MONITORING_PERFORMANCE = 0x20;  ///< The --enable-performance-monitor option is being used
+const unsigned int RENDER_TASK_SYNC       = 0x40;  ///< The refresh once render task is waiting for render sync
 
 } // namespace KeepUpdating
 
 Core* Core::New(RenderController& renderController, PlatformAbstraction& platformAbstraction,
-                GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction, GestureManager& gestureManager)
+                GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction, GestureManager& gestureManager, ResourcePolicy::DataRetention policy )
 {
   Core* instance = new Core;
-  instance->mImpl = new Internal::Core( renderController, platformAbstraction, glAbstraction, glSyncAbstraction, gestureManager );
+  instance->mImpl = new Internal::Core( renderController, platformAbstraction, glAbstraction, glSyncAbstraction, gestureManager, policy );
 
   return instance;
 }
@@ -65,14 +64,28 @@ Core::~Core()
   delete mImpl;
 }
 
+ContextNotifierInterface* Core::GetContextNotifier()
+{
+  return mImpl->GetContextNotifier();
+}
+
+// @todo Rename to ResetGlContext
 void Core::ContextCreated()
 {
   mImpl->ContextCreated();
 }
 
-void Core::ContextToBeDestroyed()
+// @todo Replace with StopRendering that prevents RenderManager from rendering
+// until we get ResetGLContext again, change ContextCreated to reset gpu buffer cache,
+// gl texture id's
+void Core::ContextDestroyed()
 {
-  mImpl->ContextToBeDestroyed();
+  mImpl->ContextDestroyed();
+}
+
+void Core::RecoverFromContextLoss()
+{
+  mImpl->RecoverFromContextLoss();
 }
 
 void Core::SurfaceResized(unsigned int width, unsigned int height)

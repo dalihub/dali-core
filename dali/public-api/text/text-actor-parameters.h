@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 // Forward declarations
@@ -30,7 +30,7 @@ class TextStyle;
 /**
  * @brief Encapsulates text-actor parameters.
  */
-struct TextActorParameters
+struct DALI_IMPORT_API TextActorParameters
 {
   /**
    * @brief Enumeration of the automatic font detection medes.
@@ -98,7 +98,7 @@ private:
   Impl* mImpl;
 };
 
-extern TextActorParameters DEFAULT_TEXT_ACTOR_PARAMETERS; ///< By default the text style is the default one and the automatic font detection is enabled.
+DALI_IMPORT_API extern TextActorParameters DEFAULT_TEXT_ACTOR_PARAMETERS; ///< By default the text style is the default one and the automatic font detection is enabled.
 
 } // namespace Dali
 

@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -77,7 +77,7 @@ class DynamicsShape;
  * dynamicsRootActor.Add( actor );
  * @endcode
  */
-class DynamicsWorld : public BaseHandle
+class DALI_IMPORT_API DynamicsWorld : public BaseHandle
 {
 public:
 

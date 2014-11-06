@@ -170,7 +170,7 @@ ResourceTicketPtr ImageFactory::Reload( Request* request )
 
     if( size == attrib.GetSize() )
     {
-      mResourceClient.ReloadResource( ticket->GetId() );
+      mResourceClient.ReloadResource( ticket->GetId(), false );
     }
     else
     {
@@ -180,6 +180,26 @@ ResourceTicketPtr ImageFactory::Reload( Request* request )
     }
   }
   return ticket;
+}
+
+void ImageFactory::RecoverFromContextLoss()
+{
+  for( RequestIdMap::iterator it = mRequestCache.begin(); it != mRequestCache.end(); ++it )
+  {
+    // go through requests, reload with resource ticket's attributes.
+    Request* request = (*it).second;
+    if( request->resourceId )
+    {
+      ResourceTicketPtr ticket = mResourceClient.RequestResourceTicket( request->resourceId );
+
+      // do not reload if still loading
+      if ( ticket->GetLoadingState() != ResourceLoading )
+      {
+        // Ensure the finished status is reset
+        mResourceClient.ReloadResource( ticket->GetId(), true );
+      }
+    }
+  }
 }
 
 const std::string& ImageFactory::GetRequestPath( const ImageFactoryCache::RequestPtr& request ) const

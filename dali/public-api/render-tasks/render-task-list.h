@@ -22,7 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-handle.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class RenderTask;
@@ -37,7 +37,7 @@ class RenderTaskList;
  *
  * These tasks describe how the Dali scene should be rendered; @see Dali::RenderTask for more details.
  */
-class RenderTaskList : public BaseHandle
+class DALI_IMPORT_API RenderTaskList : public BaseHandle
 {
 public:
 

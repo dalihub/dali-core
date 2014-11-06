@@ -36,14 +36,15 @@ namespace Dali
 namespace Internal
 {
 
-CompressedBitmapTexture::CompressedBitmapTexture(Internal::BitmapCompressed* const bitmap, Context& context)
+CompressedBitmapTexture::CompressedBitmapTexture(Internal::BitmapCompressed* const bitmap, Context& context, ResourcePolicy::Discardable discardPolicy)
 : Texture(context,
           bitmap->GetImageWidth(),
           bitmap->GetImageHeight(),
           bitmap->GetImageWidth(),
           bitmap->GetImageHeight(),
           bitmap->GetPixelFormat()),
-  mBitmap(bitmap)
+  mBitmap(bitmap),
+  mDiscardPolicy(discardPolicy)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
   DALI_LOG_SET_OBJECT_STRING(this, DALI_LOG_GET_OBJECT_STRING(bitmap));
@@ -139,7 +140,11 @@ void CompressedBitmapTexture::Update( Integration::Bitmap* bitmap )
     if ( mId ) // If the texture is already bound
     {
       AssignBitmap( false, pixels, mBitmap->GetBufferSize() );
-      mBitmap->DiscardBuffer();
+
+      if( mDiscardPolicy == ResourcePolicy::DISCARD )
+      {
+        mBitmap->DiscardBuffer();
+      }
     }
   }
 }

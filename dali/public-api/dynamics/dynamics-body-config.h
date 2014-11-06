@@ -27,7 +27,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/dynamics/dynamics-shape.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 class DynamicsWorld;
 struct Vector3;
@@ -42,7 +42,7 @@ class DynamicsBodyConfig;
  *
  * Use to create multiple instances of a DynamicsBody
  */
-class DynamicsBodyConfig : public BaseHandle
+class DALI_IMPORT_API DynamicsBodyConfig : public BaseHandle
 {
 public:
 

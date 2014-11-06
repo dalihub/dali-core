@@ -46,9 +46,10 @@ typedef BitmapCache::iterator                        BitmapCacheIter;
 
 struct ResourceClient::Impl
 {
-  Impl()
+  Impl(ResourcePolicy::DataRetention dataRetentionPolicy)
   : mNextId(0),
-    mGlyphLoadObserver( NULL)
+    mGlyphLoadObserver(NULL),
+    mDataRetentionPolicy( dataRetentionPolicy )
   {
   }
 
@@ -56,14 +57,16 @@ struct ResourceClient::Impl
   TicketContainer  mTickets;
   BitmapCache      mBitmaps;
   GlyphLoadObserver* mGlyphLoadObserver;
+  ResourcePolicy::DataRetention mDataRetentionPolicy;
 };
 
 ResourceClient::ResourceClient( ResourceManager& resourceManager,
-                                SceneGraph::UpdateManager& updateManager )
+                                SceneGraph::UpdateManager& updateManager,
+                                ResourcePolicy::DataRetention dataRetentionPolicy)
 : mResourceManager(resourceManager),
   mUpdateManager(updateManager)
 {
-  mImpl = new ResourceClient::Impl();
+  mImpl = new ResourceClient::Impl(dataRetentionPolicy);
   mResourceManager.SetClient(*this);
 }
 
@@ -78,6 +81,11 @@ ResourceClient::~ResourceClient()
     }
   }
   delete mImpl;
+}
+
+ResourcePolicy::DataRetention ResourceClient::GetResourceDataRetentionPolicy()
+{
+  return mImpl->mDataRetentionPolicy;
 }
 
 ResourceTicketPtr ResourceClient::RequestResource(
@@ -202,7 +210,7 @@ ResourceTicketPtr ResourceClient::LoadShader( ShaderResourceType& type,
   return newTicket;
 }
 
-bool ResourceClient::ReloadResource( ResourceId id, LoadResourcePriority priority )
+bool ResourceClient::ReloadResource( ResourceId id, bool resetFinishedStatus, LoadResourcePriority priority )
 {
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: ReloadResource(Id: %u)\n", id);
 
@@ -218,7 +226,7 @@ bool ResourceClient::ReloadResource( ResourceId id, LoadResourcePriority priorit
     DALI_ASSERT_DEBUG(ticket && "Null ticket for tracked resource request." );
     const ResourceTypePath * const typePathPtr = &ticket->GetTypePath();
     DALI_ASSERT_DEBUG( typePathPtr );
-    RequestReloadResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, id, *typePathPtr, priority );
+    RequestReloadResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, id, *typePathPtr, priority, resetFinishedStatus );
   }
   else
   {
@@ -271,7 +279,8 @@ ImageTicketPtr ResourceClient::AllocateBitmapImage( unsigned int width,
                                                     unsigned int bufferHeight,
                                                     Pixel::Format pixelformat )
 {
-  Bitmap* const bitmap = Bitmap::New( Bitmap::BITMAP_2D_PACKED_PIXELS, false/*buffer is available via public-api, therefore not discardable*/ );
+  /* buffer is available via public-api, therefore not discardable */
+  Bitmap* const bitmap = Bitmap::New( Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
   Bitmap::PackedPixelsProfile* const packedBitmap = bitmap->GetPackedPixelsProfile();
   DALI_ASSERT_DEBUG(packedBitmap);
 
@@ -432,10 +441,17 @@ void ResourceClient::UpdateMesh( ResourceTicketPtr ticket, const Dali::MeshData&
 {
   DALI_ASSERT_DEBUG( ticket );
 
+  ResourcePolicy::Discardable discardable = ResourcePolicy::RETAIN;
+  if( mImpl->mDataRetentionPolicy == ResourcePolicy::DALI_DISCARDS_ALL_DATA )
+  {
+    discardable = ResourcePolicy::DISCARD;
+  }
+
   RequestUpdateMeshMessage( mUpdateManager.GetEventToUpdate(),
                             mResourceManager,
                             ticket->GetId(),
-                            meshData );
+                            meshData,
+                            discardable );
 }
 
 Bitmap* ResourceClient::GetBitmap(ResourceTicketPtr ticket)

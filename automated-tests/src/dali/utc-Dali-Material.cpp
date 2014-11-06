@@ -183,7 +183,7 @@ int UtcDaliMaterialStage01(void)
     std::vector<GLuint> ids;
     ids.push_back( 23 );
     application.GetGlAbstraction().SetNextTextureIds( ids );
-    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
+    Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
     Integration::ResourcePointer resource(bitmap);
     bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
     DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
@@ -295,7 +295,7 @@ int UtcDaliMaterialStage02(void)
       Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
       DALI_TEST_CHECK( request != NULL );
 
-      Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, true );
+      Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
       Integration::ResourcePointer resource(bitmap);
       bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
       if(request)

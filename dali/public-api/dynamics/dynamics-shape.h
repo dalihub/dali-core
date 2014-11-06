@@ -25,7 +25,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/geometry/cloth.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -38,7 +38,7 @@ class DynamicsWorld;
 /**
  * @brief Defines the shape of an object in the simulation.
  */
-class DynamicsShape : public BaseHandle
+class DALI_IMPORT_API DynamicsShape : public BaseHandle
 {
 public:
   /**

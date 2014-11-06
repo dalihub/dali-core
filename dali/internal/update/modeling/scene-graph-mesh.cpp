@@ -124,6 +124,18 @@ void Mesh::UploadVertexData( Context& context, BufferIndex renderBufferIndex )
     return;
   }
 
+  DoUpload(context);
+
+  // Note, dispatcher should only be used in Render Thread (as should the rest of this method!)
+  ResourcePostProcessRequest ppRequest( mResourceId, ResourcePostProcessRequest::UPLOADED );
+  mPostProcessResourceDispatcher.DispatchPostProcessRequest(ppRequest);
+
+  mRenderMeshData->Discard();
+  mRefreshVertexBuffer = false;
+}
+
+void Mesh::DoUpload( Context& context )
+{
   const MeshData::VertexContainer& vertices = mRenderMeshData->GetVertices();
 
   DALI_ASSERT_DEBUG( !vertices.empty() );
@@ -149,13 +161,6 @@ void Mesh::UploadVertexData( Context& context, BufferIndex renderBufferIndex )
     mIndicesBuffer->UpdateDataBuffer( numberOfIndices * sizeof(GLushort), &(faces.at(0)) );
     mNumberOfFaces = mRenderMeshData->GetFaceCount();
   }
-
-  // Note, dispatcher should only be used in Render Thread (as should the rest of this method!)
-  ResourcePostProcessRequest ppRequest( mResourceId, ResourcePostProcessRequest::UPLOADED );
-  mPostProcessResourceDispatcher.DispatchPostProcessRequest(ppRequest);
-
-  mRenderMeshData->Discard();
-  mRefreshVertexBuffer = false;
 }
 
 void Mesh::BindBuffers(Context& context)
@@ -168,9 +173,18 @@ void Mesh::BindBuffers(Context& context)
 
   DALI_ASSERT_DEBUG( mIndicesBuffer || mRenderMeshData->GetVertexGeometryType() == Dali::MeshData::POINTS );
 
-  mVertexBuffer->Bind();
+  // Try and recover from context loss using retained data.
+  if( ! mVertexBuffer->BufferIsValid() && ! mRenderMeshData->GetVertices().empty() )
+  {
+    DoUpload( context );
+  }
 
-  if( mIndicesBuffer)
+  if( mVertexBuffer->BufferIsValid() )
+  {
+    mVertexBuffer->Bind();
+  }
+
+  if( mIndicesBuffer && mIndicesBuffer->BufferIsValid())
   {
     mIndicesBuffer->Bind();
   }

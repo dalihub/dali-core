@@ -17,7 +17,9 @@
 
 // CLASS HEADER
 #include <dali/public-api/signals/functor-delegate.h>
-#include <dali/public-api/math/compile-time-assert.h>
+
+// INTERNAL INCLUDES
+#include <dali/public-api/common/compile-time-assert.h>
 
 namespace Dali
 {

@@ -22,7 +22,7 @@
 #include <dali/public-api/common/stage.h>
 
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class RenderTask;
@@ -142,7 +142,7 @@ typedef bool (*HitTestFunction)(Actor actor, TraverseType type);
  * @param[out] results The results of the hit-test.
  * @param[in] func The function to use in the hit-test algorithm.
  */
-void HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
+DALI_IMPORT_API void HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
 
 /**
  * @brief Hit test specific to a given RenderTask.
@@ -152,7 +152,7 @@ void HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, H
  * @param[out] results The results of the hit-test.
  * @param[in] func The function to use in the hit-test algorithm.
  */
-void HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
+DALI_IMPORT_API void HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
 
 } // namespace HitTestAlgorithm
 

@@ -28,7 +28,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class MeshActor;
@@ -45,7 +45,7 @@ class Model;
  * Use ModelActorFactory::BuildActorTree() to create actors from this model.
  * Use ModelActorFactory::BuildAnimation() to create animations on such actors.
  */
-class Model : public BaseHandle
+class DALI_IMPORT_API Model : public BaseHandle
 {
 public:
 

@@ -208,10 +208,13 @@ void RenderManager::ContextCreated()
 
 void RenderManager::ContextDestroyed()
 {
+  // @todo Set an atomic value to prevent render manager rendering again until
+  // ContextCreated has been called.
+
   mImpl->context.GlContextDestroyed();
 
   // inform texture cache
-  mImpl->textureCache.GlContextDestroyed();
+  mImpl->textureCache.GlContextDestroyed(); // Clears gl texture ids
 
   // inform renderers
   RendererOwnerContainer::Iterator end = mImpl->rendererContainer.End();
@@ -219,7 +222,7 @@ void RenderManager::ContextDestroyed()
   for( ; iter != end; ++iter )
   {
     GlResourceOwner* renderer = *iter;
-    renderer->GlContextDestroyed();
+    renderer->GlContextDestroyed(); // Clear up vertex buffers
   }
 }
 

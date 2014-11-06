@@ -27,7 +27,7 @@
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 struct Vector2;
 
@@ -95,7 +95,7 @@ class ImageAttributes;
  * Note: if a resource was shared between Image objects it exists until its last reference is gone.
  *
  */
-class Image : public BaseHandle
+class DALI_IMPORT_API Image : public BaseHandle
 {
 public:
   /**

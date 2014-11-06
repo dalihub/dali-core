@@ -92,6 +92,12 @@ public:
    */
   void SetDpi( float horizontalDpi, float verticalDpi );
 
+  /**
+   * Called when context has been regained after a loss. The text subsystem will
+   * reload the glyphs into a new atlas and inform their observers.
+   */
+  void RecoverFromContextLoss();
+
 public: // FontLookupInterface
 
   /**

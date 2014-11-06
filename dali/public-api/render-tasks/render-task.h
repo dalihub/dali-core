@@ -23,7 +23,7 @@
 #include <dali/public-api/object/constrainable.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 class Actor;
@@ -69,7 +69,7 @@ class RenderTask;
  * Note that all connected signals must be disconnected before the object is destroyed. This is typically done in the
  * object destructor, and requires either the Dali::Connection object or Dali::RenderTask handle to be stored.
  */
-class RenderTask : public Constrainable
+class DALI_IMPORT_API RenderTask : public Constrainable
 {
 public:
   /**

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -88,7 +88,7 @@ const Format LAST_VALID_PIXEL_FORMAT = COMPRESSED_RGB_PVRTC_4BPPV1;
  * @param [in] pixelformat pixel format
  * @return true if format has alpha, false otherwise
  */
-bool HasAlpha(Format pixelformat);
+DALI_IMPORT_API bool HasAlpha(Format pixelformat);
 
 /**
  * @brief Returns The number of bytes per pixel for the specified pixel format.
@@ -96,7 +96,7 @@ bool HasAlpha(Format pixelformat);
  * @param [in] pixelFormat The pixel format
  * @return The number of bytes per pixel
  */
-unsigned int GetBytesPerPixel(Format pixelFormat);
+DALI_IMPORT_API unsigned int GetBytesPerPixel(Format pixelFormat);
 
 /**
  * @brief Returns the offset of the byte containing the alpha mask from the start of the pixel data
@@ -107,7 +107,7 @@ unsigned int GetBytesPerPixel(Format pixelFormat);
  * @param[out] byteOffset the byte offset
  * @param[out] bitMask the bitmask
  */
-void GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitMask);
+DALI_IMPORT_API void GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitMask);
 
 } //namespace Pixel
 

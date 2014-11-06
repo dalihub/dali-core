@@ -255,7 +255,9 @@ bool ImageAttachment::DoPrepareResources( BufferIndex updateBufferIndex, Resourc
     break;
   }
 
-  ATTACHMENT_LOG_FMT(Debug::General, " finished:%s ready:%s \n", mFinishedResourceAcquisition?"T":"F", ready?"T":"F");
+  ATTACHMENT_LOG_FMT(Debug::General, " ObjName:%s finished:%s ready:%s \n",
+                     DALI_LOG_GET_OBJECT_C_STR(mParent),
+                     mFinishedResourceAcquisition?"T":"F", ready?"T":"F");
 
   return ready;
 }
@@ -264,7 +266,9 @@ void ImageAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG( mSceneController && mImageRenderer );
 
-  ATTACHMENT_LOG_FMT(Debug::General, " textureId:%d\n", mTextureId);
+  ATTACHMENT_LOG_FMT(Debug::General, "ObjName:%s textureId:%d\n",
+                     DALI_LOG_GET_OBJECT_C_STR(mParent),
+                     mTextureId);
 
   // Check whether we need to refresh the vertex buffer.
   if ( mRefreshMeshData )

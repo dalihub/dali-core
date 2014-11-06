@@ -23,7 +23,7 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/touch-point.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 /**
  * @brief Touch events are a collection of touch points at a specific moment in time.

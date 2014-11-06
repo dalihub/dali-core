@@ -105,7 +105,7 @@ public:
    * @param[in] location  - the location of the assertion
    * @param[in] condition - The assertion condition
    */
-  DALI_IMPORT_API DaliException(const char *location, const char* condition);
+  DaliException(const char *location, const char* condition);
 
   std::string mLocation;  ///< Location in code of the assertion
   std::string mCondition; ///< The assertion string

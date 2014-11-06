@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/signals/dali-signal-v2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
@@ -48,7 +48,7 @@ struct PinchGesture;
  *
  * @see PinchGesture
  */
-class PinchGestureDetector : public GestureDetector
+class DALI_IMPORT_API PinchGestureDetector : public GestureDetector
 {
 public: // Typedefs
 

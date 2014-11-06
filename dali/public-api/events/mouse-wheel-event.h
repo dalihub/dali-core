@@ -23,7 +23,7 @@
 #include <dali/public-api/math/vector2.h>
 
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -33,7 +33,7 @@ namespace Dali DALI_IMPORT_API
  * There is a key modifier which relates to keys like alt, shift and control functions are
  * supplied to check if they have been pressed when the mouse wheel is being rolled.
  */
-struct MouseWheelEvent
+struct DALI_IMPORT_API MouseWheelEvent
 {
   /**
    * @brief Default constructor.

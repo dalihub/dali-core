@@ -22,7 +22,7 @@
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/vector2.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -40,7 +40,7 @@ namespace Dali DALI_IMPORT_API
  *
  * A pan gesture will continue to be sent to the actor under than initial pan until it ends.
  */
-struct PanGesture: public Gesture
+struct DALI_IMPORT_API PanGesture: public Gesture
 {
   // Construction & Destruction
 

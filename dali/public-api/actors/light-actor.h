@@ -23,7 +23,7 @@
 #include <dali/public-api/common/light.h>
 
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 namespace Internal DALI_INTERNAL
