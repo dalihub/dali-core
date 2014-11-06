@@ -73,13 +73,6 @@ ImageActor& ImageActor::operator=(const ImageActor& rhs)
   return *this;
 }
 
-ImageActor& ImageActor::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void ImageActor::SetImage(Image image)
 {
   Internal::ImagePtr imagePtr;

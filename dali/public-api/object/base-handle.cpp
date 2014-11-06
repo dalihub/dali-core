@@ -57,13 +57,6 @@ BaseHandle& BaseHandle::operator=(const BaseHandle& rhs)
   return *this;
 }
 
-BaseHandle& BaseHandle::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 bool BaseHandle::DoAction(const std::string& command, const std::vector<Property::Value>& attributes)
 {
   return GetImplementation(*this).DoAction( command, attributes );

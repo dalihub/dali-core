@@ -94,16 +94,6 @@ public:
   Constrainable& operator=(const Constrainable& rhs);
 
   /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  Constrainable& operator=(BaseHandle::NullType* rhs);
-
-  /**
    * @brief Constrain one of the properties of an Actor.
    *
    * @note The constraint will be copied by the Actor. This means that modifying the apply-time etc.

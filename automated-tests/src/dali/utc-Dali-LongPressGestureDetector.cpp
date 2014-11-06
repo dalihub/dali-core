@@ -60,7 +60,7 @@ struct SignalData
     receivedGesture.screenPoint = Vector2(0.0f, 0.0f);
     receivedGesture.localPoint = Vector2(0.0f, 0.0f);
 
-    pressedActor = NULL;
+    pressedActor.Reset();
   }
 
   bool functorCalled;
@@ -1224,7 +1224,7 @@ int UtcDaliLongPressGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Delete actor as well
-  actor = NULL;
+  actor.Reset();
 
   // Render and notify
   application.SendNotification();

@@ -89,13 +89,6 @@ Actor& Actor::operator=(const Actor& rhs)
   return *this;
 }
 
-Actor& Actor::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 const std::string& Actor::GetName() const
 {
   return GetImplementation(*this).GetName();

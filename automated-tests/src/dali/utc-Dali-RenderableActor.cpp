@@ -73,7 +73,7 @@ int UtcDaliRenderableActorDownCast(void)
   RenderableActor renderableActor = RenderableActor::DownCast( child );
   DALI_TEST_CHECK( renderableActor );
 
-  renderableActor = NULL;
+  renderableActor.Reset();
   DALI_TEST_CHECK( !renderableActor );
 
   renderableActor = DownCast< RenderableActor >( child );

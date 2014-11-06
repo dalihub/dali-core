@@ -70,13 +70,6 @@ PanGestureDetector& PanGestureDetector::operator=(const PanGestureDetector& rhs)
   return *this;
 }
 
-PanGestureDetector& PanGestureDetector::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void PanGestureDetector::SetMinimumTouchesRequired(unsigned int minimum)
 {
   GetImplementation(*this).SetMinimumTouchesRequired(minimum);

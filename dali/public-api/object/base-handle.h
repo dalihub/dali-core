@@ -56,14 +56,6 @@ class DALI_IMPORT_API BaseHandle
 public:
 
   /**
-   * @brief Used for null pointer assignment below
-   */
-  class NullType
-  {
-    NullType() { }
-  };
-
-  /**
    * @brief This constructor is used by Dali New() methods.
    *
    * @param [in] handle A pointer to a newly allocated Dali resource
@@ -107,16 +99,6 @@ public:
    * @return A reference to this handle
    */
   BaseHandle& operator=(const BaseHandle& rhs);
-
-  /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  BaseHandle& operator=(NullType* rhs);
 
   /**
    * @brief Connects a void() functor to a specified signal.

@@ -57,7 +57,7 @@ struct SignalData
     hoverEvent.time = 0u;
     hoverEvent.points.clear();
 
-    hoveredActor = NULL;
+    hoveredActor.Reset();
   }
 
   bool functorCalled;
@@ -1088,7 +1088,7 @@ int UtcDaliHoverActorRemovedInSignal(void)
   data.Reset();
 
   // Completely delete the actor
-  actor = NULL;
+  actor.Reset();
 
   // Emit event, should not crash and should not receive an event.
   application.ProcessEvent( GenerateSingleHover( TouchPoint::Motion, Vector2( 210.0f, 210.0f ) ) );

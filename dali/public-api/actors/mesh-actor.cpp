@@ -69,13 +69,6 @@ MeshActor& MeshActor::operator=(const MeshActor& rhs)
   return *this;
 }
 
-MeshActor& MeshActor::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void MeshActor::SetMaterial(
   Actor               actor,
   const std::string&  actorName,

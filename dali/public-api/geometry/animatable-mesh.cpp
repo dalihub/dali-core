@@ -65,13 +65,6 @@ AnimatableMesh& AnimatableMesh::operator=(const AnimatableMesh& rhs)
   return *this;
 }
 
-AnimatableMesh& AnimatableMesh::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 unsigned int AnimatableMesh::GetNumberOfVertices() const
 {
   return GetImplementation(*this).GetNumberOfVertices();

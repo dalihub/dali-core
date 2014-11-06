@@ -72,16 +72,6 @@ public:
    */
   PropertyCondition& operator=(const PropertyCondition& rhs);
 
-  /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  PropertyCondition& operator=(BaseHandle::NullType* rhs);
-
 public:
 
   /**

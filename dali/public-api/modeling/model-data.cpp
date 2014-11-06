@@ -62,13 +62,6 @@ ModelData& ModelData::operator=(const ModelData& rhs)
   return *this;
 }
 
-ModelData& ModelData::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 const std::string& ModelData::GetName() const
 {
   return GetImplementation(*this).GetName();

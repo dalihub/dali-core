@@ -123,16 +123,6 @@ public:
   AnimatableMesh& operator=(const AnimatableMesh& rhs);
 
   /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  AnimatableMesh& operator=(BaseHandle::NullType* rhs);
-
-  /**
    * @brief Get the number of vertices with which this mesh was created.
    *
    * @return number of vertices in this mesh

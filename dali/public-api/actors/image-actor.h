@@ -218,16 +218,6 @@ public:
   ImageActor& operator=(const ImageActor& rhs);
 
   /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  ImageActor& operator=(BaseHandle::NullType* rhs);
-
-  /**
    * @brief Set the image rendered by the actor.
    * Set the image rendered by the actor.
    * If actor was already displaying a different image, the old image is dropped and actor may

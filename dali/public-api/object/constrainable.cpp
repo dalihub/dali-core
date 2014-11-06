@@ -63,13 +63,6 @@ Constrainable& Constrainable::operator=(const Constrainable& rhs)
   return *this;
 }
 
-Constrainable& Constrainable::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 ActiveConstraint Constrainable::ApplyConstraint( Constraint constraint )
 {
   return GetImplementation(*this).ApplyConstraint( GetImplementation( constraint ) );

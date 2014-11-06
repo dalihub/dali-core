@@ -330,16 +330,6 @@ public:
   ShaderEffect& operator=(const ShaderEffect& rhs);
 
   /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  ShaderEffect& operator=(BaseHandle::NullType* rhs);
-
-  /**
    * @brief Sets image for using as effect texture.
    *
    * This image texture will be bound to the "sEffect" sampler
