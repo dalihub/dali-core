@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-types.h>
 #include <dali/internal/event/common/property-input-impl.h>
 
 namespace Dali

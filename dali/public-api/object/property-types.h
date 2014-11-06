@@ -54,22 +54,39 @@ DALI_IMPORT_API const char* GetName(Property::Type type);
  * New versions of this templated function must be defined for future types.
  * @return The property type.
  */
-template <typename T> Property::Type Get();
-template <>           Property::Type Get<bool>();
-template <>           Property::Type Get<float>();
-template <>           Property::Type Get<int>();
-template <>           Property::Type Get<unsigned int>();
-template <>           Property::Type Get<Vector2>();
-template <>           Property::Type Get<Vector3>();
-template <>           Property::Type Get<Vector4>();
-template <>           Property::Type Get<Matrix3>();
-template <>           Property::Type Get<Matrix>();
-template <>           Property::Type Get<AngleAxis>();
-template <>           Property::Type Get<Quaternion>();
-template <>           Property::Type Get<std::string>();
-template <>           Property::Type Get<Rect<int> >();
-template <>           Property::Type Get<Property::Map >();
-template <>           Property::Type Get<Property::Array >();
+template <typename T>
+inline Property::Type Get()                   { return Property::NONE;  }
+template <>
+inline Property::Type Get<bool>()             { return Property::BOOLEAN;  }
+template <>
+inline Property::Type Get<float>()            { return Property::FLOAT;    }
+template <>
+inline Property::Type Get<int>()              { return Property::INTEGER;  }
+template <>
+inline Property::Type Get<unsigned int>()     { return Property::UNSIGNED_INTEGER;  }
+template <>
+inline Property::Type Get<Vector2>()          { return Property::VECTOR2;  }
+template <>
+inline Property::Type Get<Vector3>()          { return Property::VECTOR3;  }
+template <>
+inline Property::Type Get<Vector4>()          { return Property::VECTOR4;  }
+template <>
+inline Property::Type Get<Matrix3>()          { return Property::MATRIX3;  }
+template <>
+inline Property::Type Get<Matrix>()           { return Property::MATRIX;  }
+template <>
+inline Property::Type Get<AngleAxis>()        { return Property::ROTATION; } // Rotation has two representations
+template <>
+inline Property::Type Get<Quaternion>()       { return Property::ROTATION; } // Rotation has two representations
+template <>
+inline Property::Type Get<std::string>()      { return Property::STRING; }
+template <>
+inline Property::Type Get<Dali::Rect<int> >() { return Property::RECTANGLE; }
+template <>
+inline Property::Type Get<Property::Map>()    { return Property::MAP; }
+template <>
+inline Property::Type Get<Property::Array>()  { return Property::ARRAY; }
+
 
 }; // namespace PropertyTypes
 
