@@ -24,8 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/modeling/mesh-impl.h>
 
-using namespace std;
-
 namespace Dali
 {
 namespace Internal

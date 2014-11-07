@@ -25,8 +25,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 
-using namespace std;
-
 namespace Dali
 {
 

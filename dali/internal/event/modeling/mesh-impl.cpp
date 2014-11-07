@@ -31,8 +31,6 @@
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/modeling/internal-mesh-data.h>
 
-using namespace std;
-
 namespace Dali
 {
 namespace Internal

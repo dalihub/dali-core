@@ -23,13 +23,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
-using namespace std;
-
-namespace
-{
-static Dali::Internal::SceneGraph::ImageAttachment::PixelArea EMPTY_PIXEL_AREA(0,0,0,0);
-}
-
 namespace Dali
 {
 
@@ -55,7 +48,7 @@ ImageAttachmentPtr ImageAttachment::New( const SceneGraph::Node& parentNode )
 ImageAttachment::ImageAttachment( Stage& stage )
 : RenderableAttachment(stage),
   mSceneObject(NULL),
-  mPixelArea(EMPTY_PIXEL_AREA),
+  mPixelArea(0,0,0,0),
   mStyle(Dali::ImageActor::STYLE_QUAD),
   mBorder(0.45,0.45,0.1,0.1),
   mIsPixelAreaSet(false),

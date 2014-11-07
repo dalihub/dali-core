@@ -23,8 +23,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 
-using namespace std;
-
 namespace Dali
 {
 

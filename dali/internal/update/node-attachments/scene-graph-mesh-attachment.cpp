@@ -41,9 +41,6 @@
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/shader.h>
 
-
-using namespace std;
-
 namespace Dali
 {
 

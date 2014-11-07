@@ -45,9 +45,6 @@
 #include <dali/integration-api/dynamics/dynamics-world-settings.h>
 #endif
 
-using namespace std;
-using namespace boost;
-
 using Dali::Internal::SceneGraph::Node;
 
 namespace Dali

@@ -22,8 +22,6 @@
 #include <dali/internal/update/nodes/node.h>
 #include <dali/public-api/common/dali-common.h>
 
-using namespace std;
-
 namespace Dali
 {
 

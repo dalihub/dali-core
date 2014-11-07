@@ -30,8 +30,6 @@
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/common/image-sampler.h>
 
-using namespace std;
-
 namespace Dali
 {
 

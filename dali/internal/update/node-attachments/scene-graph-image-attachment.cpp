@@ -39,8 +39,6 @@
 
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment-debug.h>
 
-using namespace std;
-
 namespace Dali
 {
 

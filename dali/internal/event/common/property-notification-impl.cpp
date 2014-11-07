@@ -30,8 +30,6 @@
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 
-using namespace std;
-
 using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace Dali

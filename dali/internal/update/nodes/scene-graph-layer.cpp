@@ -21,9 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
-
-using namespace std;
-
 namespace Dali
 {
 

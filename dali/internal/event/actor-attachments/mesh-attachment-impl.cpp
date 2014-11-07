@@ -25,8 +25,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/nodes/node.h>
 
-using namespace std;
-
 using Dali::Internal::MeshIPtr;
 using Dali::Internal::MaterialIPtr;
 

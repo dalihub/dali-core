@@ -28,8 +28,6 @@
 #include <dali/internal/event/resources/resource-ticket-observer.h>
 #include <dali/internal/event/resources/resource-ticket-lifetime-observer.h>
 
-using namespace std;
-
 namespace // unnamed namespace
 {
 

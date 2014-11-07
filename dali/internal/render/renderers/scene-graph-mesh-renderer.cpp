@@ -31,8 +31,6 @@
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/render/renderers/render-material.h>
 
-using namespace std;
-
 namespace Dali
 {
 

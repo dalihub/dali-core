@@ -25,12 +25,10 @@
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/integration-api/debug.h>
 
-using namespace std;
-
 namespace // unnamed namespace
 {
-static unsigned int UPDATE_COUNT        = 2u; // Update projection or view matrix this many frames after a change
-static unsigned int COPY_PREVIOUS_PROJECTION = 1u; // Copy projection matrix from previous frame
+const unsigned int UPDATE_COUNT        = 2u; // Update projection or view matrix this many frames after a change
+const unsigned int COPY_PREVIOUS_PROJECTION = 1u; // Copy projection matrix from previous frame
 }
 
 namespace Dali

@@ -48,7 +48,6 @@
 #include <dali/internal/render/common/texture-cache-dispatcher.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 
-using namespace std;
 using namespace Dali::Integration;
 
 using Dali::Internal::SceneGraph::DiscardQueue;
@@ -60,33 +59,33 @@ namespace Dali
 namespace Internal
 {
 
-typedef set<ResourceId>                       LiveRequestContainer;
-typedef LiveRequestContainer::iterator        LiveRequestIter;
-typedef LiveRequestContainer::size_type       LiveRequestSize;
+typedef std::set<ResourceId>                     LiveRequestContainer;
+typedef LiveRequestContainer::iterator           LiveRequestIter;
+typedef LiveRequestContainer::size_type          LiveRequestSize;
 
-typedef map<ResourceId, ResourceTypeId>       DeadRequestContainer;
-typedef DeadRequestContainer::iterator        DeadRequestIter;
-typedef pair<ResourceId, ResourceTypeId>      DeadRequestPair;
+typedef std::map<ResourceId, ResourceTypeId>     DeadRequestContainer;
+typedef DeadRequestContainer::iterator           DeadRequestIter;
+typedef std::pair<ResourceId, ResourceTypeId>    DeadRequestPair;
 
-typedef vector<ResourceId>                    NotifyQueue;
-typedef NotifyQueue::iterator                 NotifyQueueIter;
+typedef std::vector<ResourceId>                  NotifyQueue;
+typedef NotifyQueue::iterator                    NotifyQueueIter;
 
-typedef map<ResourceId, BitmapMetadata>       BitmapMetadataCache;
-typedef BitmapMetadataCache::iterator         BitmapMetadataIter;
-typedef pair<ResourceId, BitmapMetadata>      BitmapMetadataPair;
+typedef std::map<ResourceId, BitmapMetadata>     BitmapMetadataCache;
+typedef BitmapMetadataCache::iterator            BitmapMetadataIter;
+typedef std::pair<ResourceId, BitmapMetadata>    BitmapMetadataPair;
 
-typedef map<ResourceId, ModelDataPtr>         ModelCache;
-typedef ModelCache::iterator                  ModelCacheIter;
-typedef pair<ResourceId, ModelDataPtr>        ModelDataPair;
+typedef std::map<ResourceId, ModelDataPtr>       ModelCache;
+typedef ModelCache::iterator                     ModelCacheIter;
+typedef std::pair<ResourceId, ModelDataPtr>      ModelDataPair;
 
-typedef map<ResourceId, SceneGraph::Mesh*>    MeshCache;
-typedef MeshCache::iterator                   MeshCacheIter;
-typedef pair<ResourceId, SceneGraph::Mesh*>   MeshDataPair;
+typedef std::map<ResourceId, SceneGraph::Mesh*>  MeshCache;
+typedef MeshCache::iterator                      MeshCacheIter;
+typedef std::pair<ResourceId, SceneGraph::Mesh*> MeshDataPair;
 
-typedef map<ResourceId, ShaderDataPtr>        ShaderCache;
-typedef ShaderCache::iterator                 ShaderCacheIter;
-typedef ShaderCache::size_type                ShaderCacheSize;
-typedef pair<ResourceId, ShaderDataPtr>       ShaderDataPair;
+typedef std::map<ResourceId, ShaderDataPtr>      ShaderCache;
+typedef ShaderCache::iterator                    ShaderCacheIter;
+typedef ShaderCache::size_type                   ShaderCacheSize;
+typedef std::pair<ResourceId, ShaderDataPtr>     ShaderDataPair;
 
 static inline bool RemoveId( LiveRequestContainer& container, ResourceId id )
 {

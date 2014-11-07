@@ -24,8 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/common/performance-monitor.h>
 
-using namespace std;
-
 namespace Dali
 {
 

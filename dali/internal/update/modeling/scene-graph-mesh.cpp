@@ -23,8 +23,6 @@
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/queue/render-queue.h>
 
-using namespace std;
-
 namespace Dali
 {
 

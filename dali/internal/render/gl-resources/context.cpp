@@ -29,8 +29,6 @@
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/integration-api/debug.h>
 
-using namespace std;
-
 namespace Dali
 {
 

@@ -43,8 +43,6 @@
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
 #endif
 
-using namespace std;
-
 namespace Dali
 {
 

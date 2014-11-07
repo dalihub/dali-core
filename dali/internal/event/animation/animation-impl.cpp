@@ -34,8 +34,6 @@
 #include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 
-using namespace std;
-
 using Dali::Internal::SceneGraph::UpdateManager;
 using Dali::Internal::SceneGraph::AnimatorBase;
 using Dali::Internal::SceneGraph::Shader;
@@ -986,7 +984,7 @@ void Animation::Resize(Actor& actor, float width, float height, AlphaFunction al
 
 void Animation::Resize(Actor& actor, float width, float height, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
-  Vector3 targetSize( width, height, min(width, height) );
+  Vector3 targetSize( width, height, std::min(width, height) );
 
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 

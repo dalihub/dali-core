@@ -35,8 +35,6 @@
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 
-using namespace std;
-
 #if defined(DEBUG_ENABLED)
 namespace
 {
@@ -375,7 +373,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
   const GLint smoothingLoc = program.GetUniformLocation( Program::UNIFORM_SMOOTHING );
   if( Program::UNIFORM_UNKNOWN != smoothingLoc )
   {
-    smoothWidth = min( min(mSmoothing, 1.0f - mSmoothing), smoothWidth );
+    smoothWidth = std::min( std::min(mSmoothing, 1.0f - mSmoothing), smoothWidth );
 
     if( mPixelSize < SMOOTHING_ADJUSTMENT_PIXEL_SIZE )
     {
@@ -398,7 +396,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
         const Vector4& outlineColor = mTextParameters->GetOutlineColor();
         float outlineWidth = outline[1] + smoothWidth;
         float outlineStart = outline[0];
-        float outlineEnd = min( 1.0f, outlineStart + outlineWidth );
+        float outlineEnd = std::min( 1.0f, outlineStart + outlineWidth );
 
         program.SetUniform2f(outlineLoc, outlineStart, outlineEnd);
         program.SetUniform4f(outlineColorLoc, outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a);

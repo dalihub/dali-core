@@ -61,8 +61,6 @@ using Dali::Internal::SceneGraph::Node;
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
 
-using namespace std;
-
 namespace Dali
 {
 
