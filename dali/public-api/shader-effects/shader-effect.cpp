@@ -62,7 +62,9 @@ ShaderEffect& ShaderEffect::operator=(const ShaderEffect& rhs)
 
 ShaderEffect ShaderEffect::New( const std::string& vertexShader, const std::string& fragmentShader, GeometryType type, GeometryHints hints)
 {
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( vertexShader, fragmentShader, type, hints );
+  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
+
+  internal->SetPrograms( type, vertexShader, fragmentShader );
 
   return ShaderEffect( internal.Get() );
 }
@@ -74,7 +76,9 @@ ShaderEffect ShaderEffect::NewWithPrefix( const std::string& vertexShaderPrefix,
                                           GeometryType type,
                                           GeometryHints hints)
 {
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::NewWithPrefix( vertexShaderPrefix, vertexShader, fragmentShaderPrefix, fragmentShader, type, hints );
+  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
+
+  internal->SetPrograms( type, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
 
   return ShaderEffect( internal.Get() );
 }
@@ -85,7 +89,10 @@ ShaderEffect ShaderEffect::New( const std::string& imageVertexShader,
                                 const std::string& textFragmentShader,
                                 GeometryHints hints)
 {
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( imageVertexShader, imageFragmentShader, textVertexShader, textFragmentShader, "", "", "", "", hints );
+  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
+
+  internal->SetPrograms( GEOMETRY_TYPE_IMAGE, imageVertexShader, imageFragmentShader );
+  internal->SetPrograms( GEOMETRY_TYPE_TEXT, textVertexShader, textFragmentShader );
 
   return ShaderEffect( internal.Get() );
 }
@@ -100,7 +107,12 @@ ShaderEffect ShaderEffect::New( const std::string& imageVertexShader,
                                 const std::string& meshFragmentShader,
                                 GeometryHints hints)
 {
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( imageVertexShader, imageFragmentShader, textVertexShader, textFragmentShader, texturedMeshVertexShader, texturedMeshFragmentShader, meshVertexShader, meshFragmentShader, hints );
+  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
+
+  internal->SetPrograms( GEOMETRY_TYPE_IMAGE, imageVertexShader, imageFragmentShader );
+  internal->SetPrograms( GEOMETRY_TYPE_TEXT, textVertexShader, textFragmentShader );
+  internal->SetPrograms( GEOMETRY_TYPE_TEXTURED_MESH, texturedMeshVertexShader, texturedMeshFragmentShader );
+  internal->SetPrograms( GEOMETRY_TYPE_UNTEXTURED_MESH, meshVertexShader, meshFragmentShader );
 
   return ShaderEffect( internal.Get() );
 }

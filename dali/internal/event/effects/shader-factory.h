@@ -43,14 +43,14 @@ class ShaderFactory
 public:
 
   /**
-   * default constructor
+   * Default constructor
    */
   ShaderFactory(ResourceClient& resourceClient);
 
   /**
-   * Default destructor
+   * Destructor
    */
-  virtual ~ShaderFactory();
+  ~ShaderFactory();
 
   /**
    * Issues a request to load a binary version of a shader program, and returns a resource ticket

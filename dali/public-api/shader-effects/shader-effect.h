@@ -185,8 +185,8 @@ public:
    */
   static const Property::Index GRID_DENSITY;       ///< name "grid-density",   type FLOAT
   static const Property::Index IMAGE;              ///< name "image",          type MAP; {"filename":"", "load-policy":...}
-  static const Property::Index PROGRAM;            ///< name "program",        type MAP; {"vertex-filename":"",...}
-  static const Property::Index GEOMETRY_HINTS;     ///< name "geometry-hints", type INT (bitfield)
+  static const Property::Index PROGRAM;            ///< name "program",        type MAP; {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
+  static const Property::Index GEOMETRY_HINTS;     ///< name "geometry-hints", type INT (bitfield) values from enum GeometryHints
 
   static const float DEFAULT_GRID_DENSITY;         ///< The default density is 40 pixels
 
