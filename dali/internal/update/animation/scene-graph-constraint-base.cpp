@@ -35,7 +35,7 @@ namespace SceneGraph
   unsigned int ConstraintBase::mTotalInstanceCount   = 0;
 #endif
 
-ConstraintBase::ConstraintBase( PropertyOwnerSet& ownerSet )
+ConstraintBase::ConstraintBase( PropertyOwnerContainer& ownerSet )
 : mWeight( Dali::ActiveConstraint::DEFAULT_WEIGHT ),
   mRemoveAction( Dali::Constraint::DEFAULT_REMOVE_ACTION ),
   mFirstApply( true ),

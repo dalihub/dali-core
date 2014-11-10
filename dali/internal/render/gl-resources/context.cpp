@@ -100,7 +100,6 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mBlendEquationSeparateModeRGB( GL_FUNC_ADD ),
   mBlendEquationSeparateModeAlpha( GL_FUNC_ADD ),
   mMaxTextureSize(0),
-  mMaxTextureUnits(0),
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
   mCullFaceMode(CullNone),
   mViewPort( 0, 0, 0, 0 ),
@@ -333,12 +332,8 @@ void Context::ResetGlState()
   mGlAbstraction.FrontFace(GL_CCW);
   mGlAbstraction.CullFace(GL_BACK);
 
-  // get max texture units
-  mGlAbstraction.GetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, &mMaxTextureUnits);
-  DALI_ASSERT_DEBUG(mMaxTextureUnits > 7);  // according to GLES 2.0 specification
-  mBound2dTextureId.reserve(mMaxTextureUnits);
   // rebind texture units
-  for( int i=0; i < mMaxTextureUnits; ++i )
+  for( unsigned int i=0; i < MAX_TEXTURE_UNITS; ++i )
   {
     mBound2dTextureId[ i ] = 0;
     // set active texture
@@ -354,7 +349,7 @@ void Context::ResetGlState()
   mGlAbstraction.GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &numProgramBinaryFormats);
   if( GL_NO_ERROR == mGlAbstraction.GetError() && 0 != numProgramBinaryFormats )
   {
-    mProgramBinaryFormats.resize(numProgramBinaryFormats);
+    mProgramBinaryFormats.Resize(numProgramBinaryFormats);
     mGlAbstraction.GetIntegerv(GL_PROGRAM_BINARY_FORMATS_OES, &mProgramBinaryFormats[0]);
   }
 

@@ -41,6 +41,9 @@ template <> struct ParameterType< Dali::Constraint::RemoveAction >
 namespace SceneGraph
 {
 
+typedef Dali::Vector<PropertyOwner*>     PropertyOwnerContainer;
+typedef PropertyOwnerContainer::Iterator PropertyOwnerIter;
+
 /**
  * An abstract base class for Constraints.
  * This can be used to constrain a property of a scene-object, after animations have been applied.
@@ -54,7 +57,7 @@ public:
   /**
    * Constructor
    */
-  ConstraintBase( PropertyOwnerSet& ownerSet );
+  ConstraintBase( PropertyOwnerContainer& ownerContainer );
 
   /**
    * Virtual destructor.
@@ -143,7 +146,8 @@ private:
    */
   void StartObservation()
   {
-    for( PropertyOwnerIter iter = mObservedOwners.begin(); mObservedOwners.end() != iter; ++iter )
+    const PropertyOwnerIter end =  mObservedOwners.End();
+    for( PropertyOwnerIter iter = mObservedOwners.Begin(); end != iter; ++iter )
     {
       (*iter)->AddObserver( *this );
     }
@@ -154,12 +158,13 @@ private:
    */
   void StopObservation()
   {
-    for( PropertyOwnerIter iter = mObservedOwners.begin(); mObservedOwners.end() != iter; ++iter )
+    const PropertyOwnerIter end =  mObservedOwners.End();
+    for( PropertyOwnerIter iter = mObservedOwners.Begin(); end != iter; ++iter )
     {
       (*iter)->RemoveObserver( *this );
     }
 
-    mObservedOwners.clear();
+    mObservedOwners.Clear();
   }
 
   /**
@@ -178,10 +183,10 @@ private:
     if ( !mDisconnected )
     {
       // Discard pointer to disconnected property owner
-      PropertyOwnerIter iter = mObservedOwners.find( &owner );
-      if( mObservedOwners.end() != iter )
+      PropertyOwnerIter iter = std::find( mObservedOwners.Begin(), mObservedOwners.End(), &owner );
+      if( mObservedOwners.End() != iter )
       {
-        mObservedOwners.erase( iter );
+        mObservedOwners.Erase( iter );
 
         // Stop observing the remaining property owners
         StopObservation();
@@ -217,7 +222,7 @@ protected:
 
 private:
 
-  PropertyOwnerSet mObservedOwners; ///< A set of pointers to each observed object. Not owned.
+  PropertyOwnerContainer mObservedOwners; ///< A set of pointers to each observed object. Not owned.
 
 #ifdef DEBUG_ENABLED
   static unsigned int mCurrentInstanceCount;  ///< The current number of Constraint instances in existence.
