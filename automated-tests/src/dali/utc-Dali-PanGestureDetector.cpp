@@ -83,7 +83,7 @@ struct GestureReceivedFunctor
 {
   GestureReceivedFunctor(SignalData& data) : signalData(data) { }
 
-  void operator()(Actor actor, PanGesture pan)
+  void operator()(Actor actor, const PanGesture& pan)
   {
     signalData.functorCalled = true;
     signalData.receivedGesture = pan;
@@ -107,7 +107,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
   }
 
-  void operator()( Actor actor, PanGesture pan )
+  void operator()( Actor actor, const PanGesture& pan )
   {
     GestureReceivedFunctor::operator()( actor, pan );
 

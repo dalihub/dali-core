@@ -57,7 +57,7 @@ public: // Typedefs
   /**
    * @brief Signal type for detected signal.
    */
-  typedef SignalV2< void (Actor, TapGesture) > DetectedSignalV2;
+  typedef SignalV2< void ( Actor, const TapGesture& ) > DetectedSignalV2;
 
   //Signal Names
   static const char* const SIGNAL_TAP_DETECTED; ///< name "tap-detected"
@@ -167,7 +167,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(Actor actor, TapGesture gesture);
+   *   void YourCallbackName( Actor actor, const TapGesture& gesture );
    * @endcode
    * @pre The gesture detector has been initialized.
    * @return The signal to connect to.

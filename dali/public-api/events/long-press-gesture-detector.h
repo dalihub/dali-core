@@ -53,7 +53,7 @@ class DALI_IMPORT_API LongPressGestureDetector : public GestureDetector
 {
 public: // Typedefs
 
-  typedef SignalV2< void (Actor, LongPressGesture) > DetectedSignalV2; ///< Gesture detected signal type
+  typedef SignalV2< void ( Actor, const LongPressGesture& ) > DetectedSignalV2; ///< Gesture detected signal type
 
   //Signal Names
   static const char* const SIGNAL_LONG_PRESS_DETECTED; ///< name "long-press-detected"
@@ -181,7 +181,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(Actor actor, LongPressGesture gesture);
+   *   void YourCallbackName( Actor actor, const LongPressGesture& gesture );
    * @endcode
    * @pre The gesture detector has been initialized.
    * @return The signal to connect to.
