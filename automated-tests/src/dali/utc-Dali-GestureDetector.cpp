@@ -50,7 +50,7 @@ int UtcDaliGestureDetectorConstructorNegative(void)
   }
   catch (DaliException& exception)
   {
-    if ( exception.mCondition.find("detector") != string::npos )
+    if ( exception.mCondition.find("detector") != std::string::npos )
     {
       tet_result(TET_PASS);
     }
@@ -114,7 +114,7 @@ int UtcDaliGestureDetectorAttachPositive(void)
 
   detector.Attach(actor);
 
-  vector<Actor> actors = detector.GetAttachedActors();
+  std::vector<Actor> actors = detector.GetAttachedActors();
 
   if (find(actors.begin(), actors.end(), actor) != actors.end())
   {
@@ -153,7 +153,7 @@ int UtcDaliGestureDetectorAttachNegative(void)
   }
   catch (DaliException& exception)
   {
-    if ( exception.mCondition.find("actor") != string::npos )
+    if ( exception.mCondition.find("actor") != std::string::npos )
     {
       tet_result(TET_PASS);
     }
@@ -170,7 +170,7 @@ int UtcDaliGestureDetectorDetachPositive(void)
 
   Actor actor = Actor::New();
   detector.Attach(actor);
-  vector<Actor> actors = detector.GetAttachedActors();
+  std::vector<Actor> actors = detector.GetAttachedActors();
 
   if (find(actors.begin(), actors.end(), actor) != actors.end())
   {
@@ -181,7 +181,7 @@ int UtcDaliGestureDetectorDetachPositive(void)
     tet_result(TET_FAIL);
   }
 
-  // Detach and retrive attached actors again, the vector should be empty.
+  // Detach and retrieve attached actors again, the vector should be empty.
   detector.Detach(actor);
 
   actors = detector.GetAttachedActors();
@@ -213,7 +213,7 @@ int UtcDaliGestureDetectorDetachNegative01(void)
   }
   catch (DaliException& exception)
   {
-    if ( exception.mCondition.find("actor") != string::npos )
+    if ( exception.mCondition.find("actor") != std::string::npos )
     {
       tet_result(TET_PASS);
     }
@@ -281,7 +281,7 @@ int UtcDaliGestureDetectorDetachAll(void)
   GestureDetector detector = PanGestureDetector::New();
 
   const unsigned int actorsToAdd = 5;
-  vector<Actor> myActors;
+  std::vector<Actor> myActors;
 
   for (unsigned int i = 0; i < actorsToAdd; ++i)
   {
@@ -290,7 +290,7 @@ int UtcDaliGestureDetectorDetachAll(void)
     detector.Attach(actor);
   }
 
-  vector<Actor> attachedActors = detector.GetAttachedActors();
+  std::vector<Actor> attachedActors = detector.GetAttachedActors();
   DALI_TEST_EQUALS(actorsToAdd, attachedActors.size(), TEST_LOCATION);
 
   // Detach and retrieve attached actors again, the vector should be empty.
@@ -310,7 +310,7 @@ int UtcDaliGestureDetectorDetachAllNegative(void)
   GestureDetector detector = PanGestureDetector::New();
 
   const unsigned int actorsToAdd = 5;
-  vector<Actor> myActors;
+  std::vector<Actor> myActors;
 
   for (unsigned int i = 0; i < actorsToAdd; ++i)
   {
@@ -319,7 +319,7 @@ int UtcDaliGestureDetectorDetachAllNegative(void)
     detector.Attach(actor);
   }
 
-  vector<Actor> attachedActors = detector.GetAttachedActors();
+  std::vector<Actor> attachedActors = detector.GetAttachedActors();
   DALI_TEST_EQUALS(actorsToAdd, attachedActors.size(), TEST_LOCATION);
 
   // Detach and retrieve attached actors again, the vector should be empty.
@@ -364,7 +364,7 @@ int UtcDaliGestureDetectorGetAttachedActors(void)
   DALI_TEST_EQUALS(2u, detector.GetAttachedActors().size(), TEST_LOCATION);
 
   // Attach another five actors
-  vector<Actor> myActors;
+  std::vector<Actor> myActors;
   for (unsigned int i = 0; i < 5; ++i)
   {
     Actor actor = Actor::New();
