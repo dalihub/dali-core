@@ -41,6 +41,7 @@ SET(TC_SOURCES
         utc-Dali-MeshActor.cpp
         utc-Dali-PanGesture.cpp
         utc-Dali-PanGestureDetector.cpp
+        utc-Dali-Path.cpp
         utc-Dali-PinchGesture.cpp
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-Pixel.cpp

@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/key-frames.h>
+#include <dali/public-api/animation/path.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/handle.h>
@@ -459,6 +460,50 @@ public:
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period);
 
   // Actor-specific convenience methods
+
+  /**
+   * @brief Animate an actor's position and orientation through a predefined path. The actor will rotate to orient the supplied
+   * forward vector with the path's tangent. If forward is the zero vector then no rotation will happen.
+   *
+   * @param[in] actor The actor to animate
+   * @param[in] path The path. It defines position and orientation
+   * @param[in] forward The vector (in local space coordinate system) that will be oriented with the path's tangent direction
+   */
+  void Animate( Actor actor, Path path, const Vector3& forward );
+
+  /**
+   * @brief Animate an actor's position and orientation through a predefined path. The actor will rotate to orient the supplied
+   * forward vector with the path's tangent. If forward is the zero vector then no rotation will happen.
+   *
+   * @param[in] actor The actor to animate
+   * @param[in] path The path. It defines position and orientation
+   * @param[in] forward The vector (in local space coordinate system) that will be oriented with the path's tangent direction
+   * @param [in] alpha The alpha function to apply.
+   */
+  void Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha );
+
+  /**
+   * @brief Animate an actor's position and orientation through a predefined path. The actor will rotate to orient the supplied
+   * forward vector with the path's tangent. If forward is the zero vector then no rotation will happen.
+   *
+   * @param[in] actor The actor to animate
+   * @param[in] path The path. It defines position and orientation
+   * @param[in] forward The vector (in local space coordinate system) that will be oriented with the path's tangent direction
+   * @param [in] period The effect will occur during this time period.
+   */
+  void Animate( Actor actor, Path path, const Vector3& forward, TimePeriod period );
+
+  /**
+   * @brief Animate an actor's position and orientation through a predefined path. The actor will rotate to orient the supplied
+   * forward vector with the path's tangent. If forward is the zero vector then no rotation will happen.
+   *
+   * @param[in] actor The actor to animate
+   * @param[in] path The path. It defines position and orientation
+   * @param[in] forward The vector (in local space coordinate system) that will be oriented with the path's tangent direction
+   * @param [in] alpha The alpha function to apply.
+   * @param [in] period The effect will occur during this time period.
+   */
+  void Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha, TimePeriod period);
 
   /**
    * @brief Move an actor relative to its position.

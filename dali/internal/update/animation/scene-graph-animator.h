@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
+#include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/public-api/animation/alpha-functions.h>
@@ -757,7 +758,39 @@ struct KeyFrameQuaternionFunctor
   KeyFrameQuaternionPtr mKeyFrames;
 };
 
+struct PathPositionFunctor
+{
+  PathPositionFunctor( PathPtr path )
+  : mPath(path)
+  {
+  }
 
+  Vector3 operator()(float progress, const Vector3& property)
+  {
+    return mPath->SamplePosition(progress );
+  }
+
+  PathPtr mPath;
+};
+
+struct PathRotationFunctor
+{
+  PathRotationFunctor( PathPtr path, const Vector3& forward )
+  : mPath(path),
+    mForward( forward )
+  {
+    mForward.Normalize();
+  }
+
+  Quaternion operator()(float progress, const Quaternion& property)
+  {
+    Vector3 tangent( mPath->SampleTangent(progress) );
+    return Quaternion( mForward, tangent );
+  }
+
+  PathPtr mPath;
+  Vector3 mForward;
+};
 
 
 } // namespace Internal

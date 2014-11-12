@@ -9440,3 +9440,81 @@ int UtcDaliAnimationExtendDuration(void)
   END_TEST;
 }
 
+int UtcDaliAnimationPath(void)
+{
+  TestApplication application;
+
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+
+  //Build the path
+  Vector3 position0( 30.0,  80.0,  0.0);
+  Vector3 position1( 70.0,  120.0, 0.0);
+  Vector3 position2( 100.0, 100.0, 0.0);
+
+  Dali::Path path = Dali::Path::New();
+  path.AddPoint(position0);
+  path.AddPoint(position1);
+  path.AddPoint(position2);
+
+  //Control points for first segment
+  path.AddControlPoint( Vector3( 39.0,  90.0, 0.0) );
+  path.AddControlPoint(Vector3( 56.0, 119.0, 0.0) );
+
+  //Control points for second segment
+  path.AddControlPoint(Vector3( 78.0, 120.0, 0.0));
+  path.AddControlPoint(Vector3( 93.0, 104.0, 0.0));
+
+  // Build the animation
+  float durationSeconds( 1.0f );
+  Animation animation = Animation::New(durationSeconds);
+  animation.Animate(actor, path, Vector3::XAXIS, AlphaFunctions::Linear, TimePeriod(0.0f, 1.0f ));
+
+  // Start the animation
+  animation.Play();
+
+  bool signalReceived(false);
+  AnimationFinishCheck finishCheck(signalReceived);
+  animation.FinishedSignal().Connect(&application, finishCheck);
+  application.SendNotification();
+  application.Render(0);
+  application.SendNotification();
+  finishCheck.CheckSignalNotReceived();
+  Vector3 position, tangent;
+  Quaternion rotation;
+  path.Sample( 0.0f, position, tangent );
+  rotation = Quaternion( Vector3::XAXIS, tangent );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
+  application.SendNotification();
+  path.Sample( 0.25f, position, tangent );
+  rotation = Quaternion( Vector3::XAXIS, tangent );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
+  application.SendNotification();
+  path.Sample( 0.5f, position, tangent );
+  rotation = Quaternion( Vector3::XAXIS, tangent );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
+  application.SendNotification();
+  path.Sample( 0.75f, position, tangent );
+  rotation = Quaternion( Vector3::XAXIS, tangent );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+
+  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
+  application.SendNotification();
+  path.Sample( 1.0f, position, tangent );
+  rotation = Quaternion( Vector3::XAXIS, tangent );
+  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+
+  finishCheck.CheckSignalReceived();
+  END_TEST;
+}
