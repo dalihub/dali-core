@@ -443,7 +443,7 @@ Actor NewActor( const Property::Map& map )
     // Now set the properties, or create children
     for ( unsigned int i = 0, mapCount = map.Count(); i < mapCount; ++i )
     {
-      const Property::StringValuePair& pair( map.GetPair( i ) );
+      const StringValuePair& pair( map.GetPair( i ) );
       const std::string& key( pair.first );
       if ( key == "type" )
       {

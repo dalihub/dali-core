@@ -33,6 +33,10 @@ namespace Internal DALI_INTERNAL
   class TypeInfo;
 };
 
+typedef std::vector<Property::Value> PropertyValueContainer;
+typedef PropertyValueContainer::iterator PropertyValueIter; ///< Iterator for Dali::PropertyValueContainer
+typedef PropertyValueContainer::const_iterator PropertyValueConstIter; ///< Const iterator for Dali::PropertyValueContainer
+
 /**
  * @brief TypeInfo class for instantiation of registered types and introspection of
  * their actions and signals.
@@ -44,7 +48,7 @@ class DALI_IMPORT_API TypeInfo : public BaseHandle
 public:
   typedef BaseHandle (*CreateFunction)(); ///< Function signature for creating an instance of the associated object type.
 
-  typedef bool (*ActionFunction)(BaseObject*, const std::string&, const std::vector<Property::Value>&); ///< Function signature for creating scriptable actions
+  typedef bool (*ActionFunction)(BaseObject*, const std::string&, const PropertyValueContainer&); ///< Function signature for creating scriptable actions
 
   /**
    * @brief Connects a callback function with the object's signals.

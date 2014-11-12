@@ -52,11 +52,6 @@ struct DALI_IMPORT_API Property
   class Value;
 
   /**
-   * @brief A pair of property values.
-   */
-  typedef std::pair<std::string, Value> StringValuePair;
-
-  /**
    * @brief A Map of property values.
    */
   class Map;

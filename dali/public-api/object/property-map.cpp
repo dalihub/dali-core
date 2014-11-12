@@ -30,7 +30,7 @@ namespace Dali
 
 namespace
 {
-typedef std::vector< Property::StringValuePair > Container;
+typedef std::vector< StringValuePair > Container;
 }; // unnamed namespace
 
 struct Property::Map::Impl
@@ -78,7 +78,7 @@ const std::string& Property::Map::GetKey( unsigned int position ) const
   return mImpl->mContainer[ position ].first;
 }
 
-Property::StringValuePair& Property::Map::GetPair( unsigned int position ) const
+StringValuePair& Property::Map::GetPair( unsigned int position ) const
 {
   DALI_ASSERT_ALWAYS( position < Count() && "position out-of-bounds" );
 

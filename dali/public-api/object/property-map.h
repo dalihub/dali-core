@@ -28,6 +28,7 @@
 
 namespace Dali
 {
+typedef std::pair<std::string, Property::Value> StringValuePair;
 
 /**
  * @brief A Map of property values.
