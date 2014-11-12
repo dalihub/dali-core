@@ -178,17 +178,6 @@ public:
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event) = 0;
 
   /**
-   * @brief Called when this actor gains keyboard focus.
-   *
-   */
-  virtual void OnKeyInputFocusGained() = 0;
-
-  /**
-   * @brief Called when this actor loses keyboard focus.
-   */
-  virtual void OnKeyInputFocusLost() = 0;
-
-  /**
    * @brief Called to find a child by an alias.
    *
    * If an alias for a child exists, return the child otherwise return an empty handle.
