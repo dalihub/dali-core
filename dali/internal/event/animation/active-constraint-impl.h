@@ -22,7 +22,6 @@
 #include <boost/function.hpp>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/proxy-object.h>
@@ -43,6 +42,21 @@ namespace Dali
 
 namespace Internal
 {
+
+/**
+ * Helper to add only unique entries to the propertyOwner container
+ * @param propertyOwners to add the entries to
+ * @param object to add
+ */
+inline void AddUnique( SceneGraph::PropertyOwnerContainer& propertyOwners, SceneGraph::PropertyOwner* object )
+{
+  const SceneGraph::PropertyOwnerIter iter = std::find( propertyOwners.Begin(), propertyOwners.End(), object );
+  if( iter == propertyOwners.End() )
+  {
+    // each owner should only be added once
+    propertyOwners.PushBack( object );
+  }
+}
 
 /**
  * Connects a constraint which takes another property as an input.
@@ -149,9 +163,9 @@ private:
       return;
     }
 
-    // Build a set of property-owners, providing the scene-graph properties
-    SceneGraph::PropertyOwnerSet propertyOwners;
-    propertyOwners.insert( targetObject );
+    // Build a container of property-owners, providing the scene-graph properties
+    SceneGraph::PropertyOwnerContainer propertyOwners;
+    propertyOwners.PushBack( targetObject );
 
     // Build the constraint function; this requires a scene-graph property from each source
     ConstraintFunctionPtr func( ConnectConstraintFunction( propertyOwners ) );
@@ -188,11 +202,11 @@ private:
 
   /**
    * Helper for ConnectConstraint. Creates a connected constraint-function.
-   * Also populates the property-owner set, for each input connected to the constraint-function.
-   * @param[out] propertyOwners The set of property-owners providing the scene-graph properties.
+   * Also populates the property-owner container, for each input connected to the constraint-function.
+   * @param[out] propertyOwners The container of property-owners providing the scene-graph properties.
    * @return A connected constraint-function, or NULL if the scene-graph properties are not available.
    */
-  PropertyConstraintBase<PropertyType>* ConnectConstraintFunction( SceneGraph::PropertyOwnerSet& propertyOwners )
+  PropertyConstraintBase<PropertyType>* ConnectConstraintFunction( SceneGraph::PropertyOwnerContainer& propertyOwners )
   {
     PropertyConstraintBase<PropertyType>* func = mUserFunction->Clone();
     bool usingComponentFunc( false );
@@ -213,7 +227,7 @@ private:
         // The property owner will not exist, if the target proxy-object is off-stage
         if( NULL != owner )
         {
-          propertyOwners.insert( owner );
+          AddUnique( propertyOwners, owner );
           inputProperty = const_cast< PropertyInputImpl* >( source.object->GetSceneObjectInputProperty( source.propertyIndex ) );
           componentIndex = source.object->GetPropertyComponentIndex( source.propertyIndex );
 
@@ -247,7 +261,7 @@ private:
           // The property owner will not exist, if the parent proxy-object is off-stage
           if ( NULL != owner )
           {
-            propertyOwners.insert( owner );
+            AddUnique( propertyOwners, owner );
             inputProperty = const_cast< PropertyInputImpl* >( proxyParent->GetSceneObjectInputProperty( source.propertyIndex ) );
             componentIndex = proxyParent->GetPropertyComponentIndex( source.propertyIndex );
 
@@ -396,9 +410,9 @@ private:
       return;
     }
 
-    // Build a set of property-owners, providing the scene-graph properties
-    SceneGraph::PropertyOwnerSet propertyOwners;
-    propertyOwners.insert( targetObject );
+    // Build a container of property-owners, providing the scene-graph properties
+    SceneGraph::PropertyOwnerContainer propertyOwners;
+    propertyOwners.PushBack( targetObject );
 
     // Build the constraint function; this requires a scene-graph property from each source
     ConstraintFunctionPtr func( ConnectConstraintFunction( propertyOwners ) );
@@ -497,11 +511,11 @@ private:
 
   /**
    * Helper for ConnectConstraint. Creates a connected constraint-function.
-   * Also populates the property-owner set, for each input connected to the constraint-function.
-   * @param[out] propertyOwners The set of property-owners providing the scene-graph properties.
+   * Also populates the property-owner container, for each input connected to the constraint-function.
+   * @param[out] propertyOwners The container of property-owners providing the scene-graph properties.
    * @return A connected constraint-function, or NULL if the scene-graph properties are not available.
    */
-  PropertyConstraintBase<float>* ConnectConstraintFunction( SceneGraph::PropertyOwnerSet& propertyOwners )
+  PropertyConstraintBase<float>* ConnectConstraintFunction( SceneGraph::PropertyOwnerContainer& propertyOwners )
   {
     PropertyConstraintBase<float>* func = mUserFunction->Clone();
     bool usingComponentFunc( false );
@@ -522,7 +536,7 @@ private:
         // The property owner will not exist, if the target proxy-object is off-stage
         if( NULL != owner )
         {
-          propertyOwners.insert( owner );
+          AddUnique( propertyOwners, owner );
           inputProperty = const_cast< PropertyInputImpl* >( source.object->GetSceneObjectInputProperty( source.propertyIndex ) );
           componentIndex = source.object->GetPropertyComponentIndex( source.propertyIndex );
 
@@ -556,7 +570,7 @@ private:
           // The property owner will not exist, if the parent proxy-object is off-stage
           if ( NULL != owner )
           {
-            propertyOwners.insert( owner );
+            AddUnique( propertyOwners, owner );
             inputProperty = const_cast< PropertyInputImpl* >( proxyParent->GetSceneObjectInputProperty( source.propertyIndex ) );
             componentIndex = proxyParent->GetPropertyComponentIndex( source.propertyIndex );
 
