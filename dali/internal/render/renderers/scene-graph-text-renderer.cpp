@@ -25,14 +25,15 @@
 #include <dali/internal/common/text-vertex-2d.h>
 #include <dali/internal/event/text/font-impl.h>
 #include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/render/gl-resources/texture.h>
+#include <dali/internal/render/gl-resources/texture-cache.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/common/culling-algorithms.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/shader.h>
-#include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 
 #if defined(DEBUG_ENABLED)
@@ -356,13 +357,21 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
 
   DALI_LOG_INFO( gTextFilter, Debug::General, "TextRenderer::DoRender(this: %p) textureId:%d\n", this, mTextureId );
 
+  mTextureCache->BindTexture( mTexture, mTextureId, GL_TEXTURE_2D, TextureUnitAsGLenum( TEXTURE_UNIT_TEXT ) );
+  if( mTexture->GetTextureId() == 0 )
+  {
+    return; // early out if we haven't got a GL texture yet (e.g. due to context loss)
+  }
+
   // Set sampler uniform
   const GLint samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER );
   if( Program::UNIFORM_UNKNOWN != samplerLoc )
   {
     // set the uniform
-    program.SetUniform1i( samplerLoc, 0 );
+    program.SetUniform1i( samplerLoc, TEXTURE_UNIT_TEXT );
   }
+
+  mTexture->ApplySampler( mSamplerBitfield );
 
   const float SMOOTHING_ADJUSTMENT( 12.0f );
   const float SMOOTHING_ADJUSTMENT_PIXEL_SIZE( 32.0f );
@@ -491,9 +500,6 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
 
   const GLint positionLoc = program.GetAttribLocation(Program::ATTRIB_POSITION);
   const GLint texCoordLoc = program.GetAttribLocation(Program::ATTRIB_TEXCOORD);
-
-  mTexture->Bind(GL_TEXTURE_2D, GL_TEXTURE0);
-  mTexture->ApplySampler( mSamplerBitfield );
 
   mContext->EnableVertexAttributeArray( positionLoc );
   mContext->EnableVertexAttributeArray( texCoordLoc );

@@ -18,17 +18,12 @@
 // CLASS HEADER
 #include <dali/internal/render/gl-resources/native-texture.h>
 
-// EXTERNAL INCLUDES
-#include <math.h>
-#include <memory.h>
-
 // INTERNAL INCLUDES
-#include <dali/public-api/math/rect.h>
-#include <dali/public-api/math/math-utils.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 
 namespace Dali
 {
@@ -95,7 +90,7 @@ bool NativeTexture::CreateGlTexture()
   if( mNativeImage->GlExtensionCreate() )
   {
     mContext.GenTextures( 1, &mId );
-    mContext.ActiveTexture( GL_TEXTURE7 );  // bind in unused unit so rebind works the first time
+    mContext.ActiveTexture( TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD ) );  // bind in unused unit so rebind works the first time
     mContext.Bind2dTexture( mId );
 
     mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 ); // We always use tightly packed data

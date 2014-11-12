@@ -19,17 +19,12 @@
 #include <dali/internal/render/shaders/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/stage.h>
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/matrix3.h>
-#include <dali/public-api/math/vector4.h>
-#include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/uniform-meta.h>
 #include <dali/internal/common/image-sampler.h>
@@ -315,7 +310,7 @@ void Shader::SetUniforms( Context& context,
   if( mTexture )
   {
     // got effect texture, bind it to texture unit 1
-    mTextureCache->BindTexture( mTexture, mRenderTextureId, GL_TEXTURE_2D, GL_TEXTURE1 );
+    mTextureCache->BindTexture( mTexture, mRenderTextureId, GL_TEXTURE_2D, TextureUnitAsGLenum( TEXTURE_UNIT_SHADER ) );
 
     // Just apply the default sampling options for now
     mTexture->ApplySampler( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
@@ -324,9 +319,9 @@ void Shader::SetUniforms( Context& context,
     const GLint loc = program.GetUniformLocation( Program::UNIFORM_EFFECT_SAMPLER );
     if( Program::UNIFORM_UNKNOWN != loc )
     {
-      DALI_PRINT_UNIFORM( debugStream, bufferIndex, "sEffect", 1 );
+      DALI_PRINT_UNIFORM( debugStream, bufferIndex, "sEffect", TEXTURE_UNIT_SHADER );
       // set the uniform
-      program.SetUniform1i( loc, 1 );
+      program.SetUniform1i( loc, TEXTURE_UNIT_SHADER );
     }
   }
 

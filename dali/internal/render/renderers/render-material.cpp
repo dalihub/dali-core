@@ -227,16 +227,16 @@ void RenderMaterial::SetUniforms( RenderMaterialUniforms& uniforms, Program& pro
   uniforms.SetUniforms( *this, program, shaderType );
 }
 
-void RenderMaterial::BindTexture( Program& program, ResourceId id, Texture* texture, unsigned int textureUnit, Program::UniformType samplerIndex ) const
+void RenderMaterial::BindTexture( Program& program, ResourceId id, Texture* texture, TextureUnit textureUnit, Program::UniformType samplerIndex ) const
 {
   DALI_ASSERT_DEBUG( NULL != mTextureCache );
 
   if( texture != NULL )
   {
-    mTextureCache->BindTexture( texture, id, GL_TEXTURE_2D, GL_TEXTURE0 + textureUnit );
+    mTextureCache->BindTexture( texture, id, GL_TEXTURE_2D, TextureUnitAsGLenum( textureUnit ) );
     // Set sampler uniforms for textures
     GLint samplerLoc = program.GetUniformLocation( samplerIndex );
-    if( -1 != samplerLoc )
+    if( Program::UNIFORM_UNKNOWN != samplerLoc )
     {
       program.SetUniform1i( samplerLoc, textureUnit );
     }
@@ -281,7 +281,7 @@ void RenderMaterial::BindTextures( Program& program, unsigned int textureSampler
     }
   }
 
-  BindTexture( program, mDiffuseTextureId, mDiffuseTexture, 0, Program::UNIFORM_SAMPLER );
+  BindTexture( program, mDiffuseTextureId, mDiffuseTexture, TEXTURE_UNIT_MATERIAL_DIFFUSE, Program::UNIFORM_SAMPLER );
 
   if( mDiffuseTexture )
   {
@@ -289,14 +289,14 @@ void RenderMaterial::BindTextures( Program& program, unsigned int textureSampler
   }
 
   // GL_TEXTURE1 is used by shader effect texture
-  BindTexture( program, mOpacityTextureId, mOpacityTexture, 2, Program::UNIFORM_SAMPLER_OPACITY );
+  BindTexture( program, mOpacityTextureId, mOpacityTexture, TEXTURE_UNIT_MATERIAL_OPACITY, Program::UNIFORM_SAMPLER_OPACITY );
 
   if( mOpacityTexture )
   {
     mOpacityTexture->ApplySampler( textureSampler );
   }
 
-  BindTexture( program, mNormalMapTextureId, mNormalMapTexture, 3, Program::UNIFORM_SAMPLER_NORMAL_MAP );
+  BindTexture( program, mNormalMapTextureId, mNormalMapTexture, TEXTURE_UNIT_MATERIAL_NORMAL_MAP, Program::UNIFORM_SAMPLER_NORMAL_MAP );
 
   if( mNormalMapTexture )
   {
