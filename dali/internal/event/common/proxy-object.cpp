@@ -429,7 +429,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
       {
         case Property::BOOLEAN:
         {
-          AnimatableProperty<bool>* property = dynamic_cast< AnimatableProperty<bool>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -438,7 +438,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::FLOAT:
         {
-          AnimatableProperty<float>* property = dynamic_cast< AnimatableProperty<float>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -447,7 +447,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::INTEGER:
         {
-          AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -456,7 +456,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::VECTOR2:
         {
-          AnimatableProperty<Vector2>* property = dynamic_cast< AnimatableProperty<Vector2>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -465,7 +465,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::VECTOR3:
         {
-          AnimatableProperty<Vector3>* property = dynamic_cast< AnimatableProperty<Vector3>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -474,7 +474,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::VECTOR4:
         {
-          AnimatableProperty<Vector4>* property = dynamic_cast< AnimatableProperty<Vector4>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -483,7 +483,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::MATRIX:
         {
-          AnimatableProperty<Matrix>* property = dynamic_cast< AnimatableProperty<Matrix>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -492,7 +492,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::MATRIX3:
         {
-          AnimatableProperty<Matrix3>* property = dynamic_cast< AnimatableProperty<Matrix3>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -501,7 +501,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::ROTATION:
         {
-          AnimatableProperty<Quaternion>* property = dynamic_cast< AnimatableProperty<Quaternion>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry->second.GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -554,61 +554,61 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
   DALI_ASSERT_ALWAYS( Property::INVALID_INDEX == GetPropertyIndex(name) && "Property index is out of bounds" );
 
   // Create a new property
-  std::auto_ptr<PropertyBase> newProperty;
+  Dali::Internal::OwnerPointer<PropertyBase> newProperty;
 
   switch ( propertyValue.GetType() )
   {
     case Property::BOOLEAN:
     {
-      newProperty.reset(new AnimatableProperty<bool>( propertyValue.Get<bool>()));
+      newProperty = new AnimatableProperty<bool>( propertyValue.Get<bool>() );
       break;
     }
 
     case Property::FLOAT:
     {
-      newProperty.reset(new AnimatableProperty<float>( propertyValue.Get<float>()));
+      newProperty = new AnimatableProperty<float>( propertyValue.Get<float>() );
       break;
     }
 
     case Property::INTEGER:
     {
-      newProperty.reset(new AnimatableProperty<int>( propertyValue.Get<int>()));
+      newProperty = new AnimatableProperty<int>( propertyValue.Get<int>() );
       break;
     }
 
     case Property::VECTOR2:
     {
-      newProperty.reset(new AnimatableProperty<Vector2>( propertyValue.Get<Vector2>()));
+      newProperty = new AnimatableProperty<Vector2>( propertyValue.Get<Vector2>() );
       break;
     }
 
     case Property::VECTOR3:
     {
-      newProperty.reset(new AnimatableProperty<Vector3>( propertyValue.Get<Vector3>()));
+      newProperty = new AnimatableProperty<Vector3>( propertyValue.Get<Vector3>() );
       break;
     }
 
     case Property::VECTOR4:
     {
-      newProperty.reset(new AnimatableProperty<Vector4>( propertyValue.Get<Vector4>()));
+      newProperty = new AnimatableProperty<Vector4>( propertyValue.Get<Vector4>() );
       break;
     }
 
     case Property::MATRIX:
     {
-      newProperty.reset(new AnimatableProperty<Matrix>( propertyValue.Get<Matrix>()));
+      newProperty = new AnimatableProperty<Matrix>( propertyValue.Get<Matrix>() );
       break;
     }
 
     case Property::MATRIX3:
     {
-      newProperty.reset(new AnimatableProperty<Matrix3>( propertyValue.Get<Matrix3>()));
+      newProperty = new AnimatableProperty<Matrix3>( propertyValue.Get<Matrix3>() );
       break;
     }
 
     case Property::ROTATION:
     {
-      newProperty.reset(new AnimatableProperty<Quaternion>( propertyValue.Get<Quaternion>()));
+      newProperty = new AnimatableProperty<Quaternion>( propertyValue.Get<Quaternion>() );
       break;
     }
 
@@ -643,10 +643,11 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
   CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
   DALI_ASSERT_ALWAYS( mCustomProperties->end() == entry && "Custom property already registered" );
 
-  (*mCustomProperties)[ index ] = CustomProperty( name, propertyValue.GetType(), newProperty.get() );
+  (*mCustomProperties)[ index ] = CustomProperty( name, propertyValue.GetType(), newProperty.Get() );
 
   // The derived class now passes ownership of this new property to a scene-object
-  InstallSceneObjectProperty( *(newProperty.release()), name, index );
+  // TODO: change this so that OwnerPointer is passed all the way as owership passing cannot be done with a reference
+  InstallSceneObjectProperty( *(newProperty.Release()), name, index );
 
   return index;
 }
@@ -821,7 +822,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
     {
       case Property::BOOLEAN:
       {
-        AnimatableProperty<bool>* property = dynamic_cast< AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -831,7 +832,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       case Property::FLOAT:
       {
-        AnimatableProperty<float>* property = dynamic_cast< AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -841,7 +842,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       case Property::INTEGER:
       {
-        AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -851,7 +852,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       case Property::VECTOR2:
       {
-        AnimatableProperty<Vector2>* property = dynamic_cast< AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -861,7 +862,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       case Property::VECTOR3:
       {
-        AnimatableProperty<Vector3>* property = dynamic_cast< AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -871,7 +872,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       case Property::VECTOR4:
       {
-        AnimatableProperty<Vector4>* property = dynamic_cast< AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -881,7 +882,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       case Property::ROTATION:
       {
-        AnimatableProperty<Quaternion>* property = dynamic_cast< AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -891,7 +892,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       case Property::MATRIX:
       {
-        AnimatableProperty<Matrix>* property = dynamic_cast< AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -901,7 +902,7 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
 
       case Property::MATRIX3:
       {
-        AnimatableProperty<Matrix3>* property = dynamic_cast< AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
