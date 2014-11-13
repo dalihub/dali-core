@@ -1,0 +1,206 @@
+<VertexShader>
+uniform   mediump mat4    uProjection;
+uniform   mediump mat4    uModelView;
+uniform   mediump mat4    uMvpMatrix;
+
+uniform           bool    uTextureMapped;
+uniform   mediump vec4    uCustomTextureCoords;
+attribute mediump vec2    aTexCoord;
+varying   mediump vec2    vTexCoord;
+
+uniform   mat3    uModelViewIT;
+attribute mediump vec3    aNormal;
+varying   mediump vec3    vNormal;
+
+attribute mediump vec3    aPosition;
+varying   mediump vec4    vVertex;
+#define USE_NORMALS
+#define MAX_BONES_PER_MESH  12
+
+#ifdef USE_BONES
+uniform   int             uBoneCount;
+uniform   mediump mat4    uBoneMatrices[MAX_BONES_PER_MESH];
+uniform   mediump mat3    uBoneMatricesIT[MAX_BONES_PER_MESH];
+attribute mediump vec4    aBoneWeights;
+attribute mediump vec4    aBoneIndices;
+#endif
+
+#ifdef USE_COLOR
+attribute lowp vec3       aColor;
+varying   mediump vec3    vColor;
+#endif
+
+void main()
+{
+  mediump vec4 vertexPosition = vec4(aPosition, 1.0);
+
+#ifdef USE_BONES
+  if(uBoneCount > 0)
+  {
+    mediump vec4 boneWeights = aBoneWeights;
+    mediump ivec4 boneIndices = ivec4(aBoneIndices);
+    mediump vec3 vertexNormal;
+
+    // re-calculate the final weight
+    boneWeights.w = 1.0 - dot(boneWeights.xyz, vec3(1.0, 1.0, 1.0));
+
+    vec4 bonePos = (uBoneMatrices[boneIndices.x] * vertexPosition) * boneWeights.x;
+    bonePos     += (uBoneMatrices[boneIndices.y] * vertexPosition) * boneWeights.y;
+    bonePos     += (uBoneMatrices[boneIndices.z] * vertexPosition) * boneWeights.z;
+    bonePos     += (uBoneMatrices[boneIndices.w] * vertexPosition) * boneWeights.w;
+
+    vertexNormal  = (uBoneMatricesIT[boneIndices.x] * aNormal) * boneWeights.x;
+    vertexNormal += (uBoneMatricesIT[boneIndices.y] * aNormal) * boneWeights.y;
+    vertexNormal += (uBoneMatricesIT[boneIndices.z] * aNormal) * boneWeights.z;
+    vertexNormal += (uBoneMatricesIT[boneIndices.w] * aNormal) * boneWeights.w;
+    vertexNormal =  normalize(vertexNormal);
+
+    vertexPosition = uProjection * bonePos;
+    vVertex = bonePos;
+    vNormal = vertexNormal;
+  }
+  else
+  {
+#endif
+    vertexPosition = uMvpMatrix * vec4(aPosition, 1.0);
+    vVertex = uModelView * vec4(aPosition, 1.0);
+    vNormal = uModelViewIT * aNormal;
+#ifdef USE_BONES
+  }
+#endif
+  gl_Position = vertexPosition;
+
+#ifdef USE_COLOR
+  vColor = aColor;
+#endif
+}
+
+</VertexShader>
+
+<FragmentShader>
+
+struct Material
+{
+  mediump float mOpacity;
+  mediump float mShininess;
+  lowp    vec4  mAmbient;
+  lowp    vec4  mDiffuse;
+  lowp    vec4  mSpecular;
+  lowp    vec4  mEmissive;
+};
+
+uniform sampler2D     sTexture;
+uniform sampler2D     sOpacityTexture;
+uniform sampler2D     sNormalMapTexture;
+uniform sampler2D     sEffect;
+varying mediump vec2  vTexCoord;
+
+uniform Material      uMaterial;
+
+uniform lowp  vec4    uColor;
+varying highp vec4    vVertex;
+varying highp vec3    vNormal;
+
+#ifdef USE_LIGHTING
+struct Light
+{
+  int           mType;                      // 0=AMBIENT,1=DIRECTIONAL,2=SPOT,3=POINT
+  highp   vec2  mFallOff;                   // x,y = falloff start, falloff end
+  mediump vec2  mSpotAngle;                 // x,y   = inner cone and outer cone
+  mediump vec3  mLightPos;                  // position
+  mediump vec3  mLightDir;                  // directional (for direction/spot lights)
+  lowp    vec3  mAmbient;                   // ambient component of the light's color
+  lowp    vec3  mDiffuse;                   // diffuse component of the light's color
+  lowp    vec3  mSpecular;                  // specular component of the light's color
+};
+#endif
+
+#ifdef USE_LIGHTING
+uniform         int   uNumberOfLights;
+uniform Light         uLight0;
+uniform Light         uLight1;
+uniform Light         uLight2;
+#endif
+
+#ifdef USE_COLOR
+varying mediump vec3  vColor;
+#endif
+
+#ifdef USE_LIGHTING
+lowp vec3 lightColor;
+lowp vec3 specularColor;
+
+void calculateLight(Light light)
+{
+  highp vec3 lightVector = light.mLightPos - vVertex.xyz;
+  vec3 N = normalize(vNormal);
+  vec3 L = normalize(lightVector);
+  // TODO: for directional light, should use mLightDir for light direction not lightVector
+  float NdotL = dot(N, L);
+
+  vec3 color = light.mAmbient * uMaterial.mAmbient.rgb;
+  color += light.mDiffuse * uMaterial.mDiffuse.rgb * abs(NdotL);
+
+  // Attenuation
+  highp float attenuation = 1.0;      // requires highp
+  if (light.mType >= 2)
+  {
+    attenuation -= smoothstep(light.mFallOff.x, light.mFallOff.y, length(lightVector));
+  }
+
+  // TODO spotlights
+
+  // add color to cumulative light total. TODO: don't attenuate directional light
+  lightColor += color * attenuation;
+
+  if (light.mType > 1 && NdotL > 0.0 && uMaterial.mShininess > 0.0)
+  {
+    // Specular highlight
+    vec3 E = normalize(vVertex.xyz);
+    vec3 R = reflect(L, N);
+    float specular = pow(max(dot(R, E), 0.0), uMaterial.mShininess);
+    specularColor += uMaterial.mSpecular.rgb * light.mSpecular * specular * attenuation;
+  }
+}
+#endif
+
+void main()
+{
+#ifdef USE_COLOR
+
+  // set initial color to vertex color
+  mediump vec4 fragColor = vec4(vColor, 1.0);
+
+#else
+
+  // set initial color to material color
+  mediump vec4 fragColor = uMaterial.mAmbient + uMaterial.mDiffuse;
+
+#endif
+
+#ifdef USE_LIGHTING
+  // apply lighting and material properties
+  specularColor = vec3(0.0);
+  lightColor = vec3(0.0);
+
+  // @TODO conditionally compile different shaders for different number of lights
+  if (uNumberOfLights > 0)
+  {
+    calculateLight(uLight0);
+  }
+
+  fragColor.rgb *= lightColor;
+  fragColor.rgb += specularColor;
+
+#endif
+
+  // apply material alpha/opacity to alpha channel
+  fragColor.a *= uMaterial.mOpacity * uMaterial.mDiffuse.a;
+
+  // and finally, apply Actor color
+  fragColor *= uColor;
+
+  gl_FragColor = fragColor;
+}
+
+</FragmentShader>

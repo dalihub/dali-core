@@ -59,7 +59,6 @@ class Animation : public BaseObject
 {
 public:
 
-  typedef Dali::Animation::AnyFunction AnyFunction;
   typedef Dali::Animation::EndAction EndAction;
 
   typedef void (*FinishedCallback)(Object* object);
@@ -296,26 +295,6 @@ public:
    */
   void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period);
 
-  /**
-   * @copydoc Dali::Animation::Animate( Property target, Property::Type targetType, AnyFunction func )
-   */
-  void Animate( Property& target, Property::Type targetType, AnyFunction& func );
-
-  /**
-   * @copydoc Dali::Animation::Animate(Property target, Property::Type targetType, AnyFunction func, AlphaFunction alpha )
-   */
-  void Animate( Property& target, Property::Type targetType, AnyFunction& func, AlphaFunction& alpha );
-
-  /**
-   * @copydoc Dali::Animation::Animate(Property target, Property::Type targetType, AnyFunction func, TimePeriod period)
-   */
-  void Animate( Property& target, Property::Type targetType, AnyFunction& func, TimePeriod period );
-
-  /**
-   * @copydoc Dali::Animation::Animate(Property target, Property::Type targetType, AnyFunction func, AlphaFunction alpha, TimePeriod period)
-   */
-  void Animate( Property& target, Property::Type targetType, AnyFunction& func, AlphaFunction& alpha, TimePeriod period );
-
   // Action-specific convenience functions
 
   /**
@@ -381,19 +360,6 @@ public:
    * @param [in] durationSeconds The duration of the translation.
    */
   void MoveTo(Actor& actor, const Vector3& translation, AlphaFunction alpha,  float delaySeconds, float durationSeconds);
-
-  /**
-   * Translate an actor using a custom function.
-   * The animatorFunc will be called from the rendering thread; it should return quickly, to avoid performance degredation.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
-   * @param [in] actor The actor to animate.
-   * @param [in] func The function to call during the animation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
-   */
-  void Move(Actor& actor, AnimatorFunctionVector3 func, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
    * Rotate an actor around an arbitrary axis.
@@ -490,19 +456,6 @@ public:
    * @param [in] durationSeconds The duration of the rotation.
    */
   void RotateTo(Actor& actor, Radian angle, const Vector3& axis, AlphaFunction alpha, float delaySeconds, float durationSeconds);
-
-  /**
-   * Rotate an actor using a custom function.
-   * The animatorFunc will be called from the rendering thread; it should return quickly, to avoid performance degredation.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
-   * @param [in] actor The actor to animate.
-   * @param [in] func The function to call during the animation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
-   */
-  void Rotate(Actor& actor, AnimatorFunctionQuaternion func, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
    * Scale an actor.

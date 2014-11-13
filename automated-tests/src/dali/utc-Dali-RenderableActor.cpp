@@ -24,7 +24,6 @@
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
-using namespace std;
 
 void renderable_actor_startup(void)
 {
@@ -73,7 +72,7 @@ int UtcDaliRenderableActorDownCast(void)
   RenderableActor renderableActor = RenderableActor::DownCast( child );
   DALI_TEST_CHECK( renderableActor );
 
-  renderableActor = NULL;
+  renderableActor.Reset();
   DALI_TEST_CHECK( !renderableActor );
 
   renderableActor = DownCast< RenderableActor >( child );

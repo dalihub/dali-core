@@ -97,12 +97,12 @@ CPP_FOOTER_END
 
 ###############################################################################
 
+my %shaders=();
+
 sub GenerateStringsFromFile
 {
   my($file) = shift;
   my($dir) = shift;
-  my($headerFile) = shift;
-  my($sourceFile) = shift;
 
   my $shadername = $file;
   $shadername =~ s/-([a-z])/uc($1)/eg;
@@ -111,6 +111,7 @@ sub GenerateStringsFromFile
 
   my $state = 0;
 
+  my $shader="";
   open MEM, "$dir/$file" || die "Can't open $file for reading: $!\n";
   while(<MEM>)
   {
@@ -120,28 +121,31 @@ sub GenerateStringsFromFile
       if (/<VertexShader>/)
       {
         $state = 1;
-        print $headerFile "extern const char* const ${shadername}Vertex;\n";
-        print $sourceFile "extern const char* const ${shadername}Vertex;\n";
-        print $sourceFile "const char* const ${shadername}Vertex(\n";
+        $shader = "";
       }
       elsif (/<FragmentShader>/)
       {
         $state = 1;
-        print $headerFile "extern const char* const ${shadername}Fragment;\n";
-        print $sourceFile "extern const char* const ${shadername}Fragment;\n";
-        print $sourceFile "const char* const ${shadername}Fragment(\n";
+        $shader = "";
       }
     }
     elsif ($state == 1)
     {
-      if (m!</VertexShader>! || m!</FragmentShader>!)
+      if (m!</VertexShader>!)
       {
         $state = 0;
-        print $sourceFile ");\n\n";
+        $shaders{$shadername}->{"vertex"} = $shader;
+      }
+      elsif( m!</FragmentShader>!)
+      {
+        $state = 0;
+        $shaders{$shadername}->{"fragment"} = $shader;
       }
       else
       {
-        print $sourceFile "\"$_\\n\"\n";
+        ## Accumulate
+        $shader .= "$_\n";
+#       print $sourceFile "\"$_\\n\"\n";
       }
     }
   }
@@ -161,22 +165,167 @@ sub GetShaderFiles
 
 ###############################################################################
 
+sub PrintSourceLine
+{
+    my $sourceFile=shift;
+    my $line=shift;
+    chomp $line;
+    $line =~ s!//.*$!!; # Strip out comments
+    $line =~ s!\s*$!!; # Strip out trailing space
+    if( $line !~ m!^\s*$! )
+    {
+        print $sourceFile "\"$line\\n\"\n";
+    }
+}
+
+sub PrintMacroLine
+{
+    my $sourceFile=shift;
+    my $line=shift;
+    chomp $line;
+    $line =~ s!//.*$!!; # Strip out comments
+    $line =~ s!\s*$!!; # Strip out trailing space
+    if( $line !~ m!^\s*$! )
+    {
+        print $sourceFile "\"$line\\n\" \\\n";
+    }
+}
+
+
+sub PrintShaderProgramWithMacros
+{
+    my $sourceFile=shift;
+    my $shadername=shift;
+    my $SHADERNAME=$shadername;
+    $SHADERNAME =~ s/([A-Z])/_$1/g;
+    substr($SHADERNAME,0,1)="";
+    $SHADERNAME = uc($SHADERNAME);
+
+    my $program_type=shift;
+    my $ProgramType=ucfirst($program_type);
+    my $PROGRAM_TYPE=uc($program_type);
+    my $custom=shift;
+
+    my @lines=split(/\n/, $shaders{$shadername}->{$program_type} );
+
+    print $sourceFile "#define ${SHADERNAME}_PREFIX_${PROGRAM_TYPE} \\\n";
+    LINE: while( scalar(@lines) )
+    {
+        last LINE if $lines[0] =~ /main()/;
+        PrintMacroLine($sourceFile, shift(@lines));
+    }
+    print $sourceFile "\n\n";
+
+    print $sourceFile "#define ${SHADERNAME}_POSTFIX_${PROGRAM_TYPE} \\\n";
+    LINE: while( scalar(@lines) )
+    {
+        PrintMacroLine($sourceFile, shift(@lines));
+    }
+    print $sourceFile "\n\n";
+
+    if($custom)
+    {
+        print $sourceFile "extern const char* const Custom${shadername}Prefix${ProgramType};\n";
+        print $sourceFile "const char* const Custom${shadername}Prefix${ProgramType}(\n";
+        print $sourceFile "  ${SHADERNAME}_PREFIX_${PROGRAM_TYPE}\n";
+        print $sourceFile ");\n\n";
+
+        print $sourceFile "extern const char* const Custom${shadername}Postfix${ProgramType};\n";
+        print $sourceFile "const char* const Custom${shadername}Postfix${ProgramType}(\n";
+        print $sourceFile "  ${SHADERNAME}_POSTFIX_${PROGRAM_TYPE}\n";
+        print $sourceFile ");\n\n";
+    }
+    print $sourceFile "extern const char* const ${shadername}${ProgramType};\n";
+    print $sourceFile "const char* const ${shadername}${ProgramType}(\n";
+    print $sourceFile "  ${SHADERNAME}_PREFIX_${PROGRAM_TYPE}\n";
+    print $sourceFile "  ${SHADERNAME}_POSTFIX_${PROGRAM_TYPE}\n";
+    print $sourceFile ");\n\n";
+
+}
+
+sub PrintShaderProgram
+{
+    my $sourceFile=shift;
+    my $shadername=shift;
+    my $program_type=shift;
+    my $custom=shift;
+    my $ProgramType=ucfirst($program_type);
+
+    my @lines=split(/\n/, $shaders{$shadername}->{$program_type} );
+
+    print $sourceFile "const char* const ${shadername}${ProgramType}(\n";
+    for my $i (0..scalar(@lines)-1)
+    {
+        PrintSourceLine($sourceFile, $lines[$i]);
+    }
+    print $sourceFile ");\n\n";
+
+    if( $custom )
+    {
+        print $sourceFile "const char* const Custom${shadername}Prefix${ProgramType}(\n";
+      LINE:
+        while( scalar(@lines) )
+        {
+            last LINE if $lines[0] =~ /main()/;
+            PrintSourceLine($sourceFile, shift(@lines));
+        }
+        print $sourceFile ");\n\n";
+
+        print $sourceFile "const char* const Custom${shadername}Postfix${ProgramType}(\n";
+
+        while( scalar(@lines) )
+        {
+            PrintSourceLine($sourceFile, shift(@lines));
+        }
+        print $sourceFile ");\n\n";
+    }
+}
+
+
+sub PrintShaderSources
+{
+  my($headerFile) = shift;
+  my($sourceFile) = shift;
+  my $shadername;
+
+  # Strings are now in memory. Dump them back out again:
+  foreach $shadername (sort(keys(%shaders)))
+  {
+    print $headerFile "extern const char* const ${shadername}Vertex;\n";
+    print $headerFile "extern const char* const ${shadername}Fragment;\n";
+
+    my $custom = 0;
+    if( $shadername !~ /TextDistanceField/ || $shadername eq "TextDistanceField" )
+    {
+        print $headerFile "extern const char* const Custom${shadername}PrefixVertex;\n";
+        print $headerFile "extern const char* const Custom${shadername}PostfixVertex;\n";
+        print $headerFile "extern const char* const Custom${shadername}PrefixFragment;\n";
+        print $headerFile "extern const char* const Custom${shadername}PostfixFragment;\n";
+        $custom = 1;
+    }
+    PrintShaderProgramWithMacros($sourceFile, $shadername, "vertex", $custom);
+    PrintShaderProgramWithMacros($sourceFile, $shadername, "fragment", $custom);
+  }
+}
+
+###############################################################################
+
 my($optHelp);
 my($optMan);
 my($shaderDir) = "";
-my($filePrefix) = "";
+my($fileName) = "";
 
 GetOptions(
   "help"           => \$optHelp,
   "man"            => \$optMan,
   "shader-dir=s"   => \$shaderDir,
-  "file-prefix=s"  => \$filePrefix
+  "file-name=s"  => \$fileName
 ) or pod2usage(2);
 
 pod2usage(1) if $optHelp;
 pod2usage(-exitstatus => 0, -verbose => 2) if $optMan;
 
-if ($shaderDir eq "" || $filePrefix eq "")
+if ($shaderDir eq "" || $fileName eq "")
 {
   pod2usage(1);
 }
@@ -185,8 +334,8 @@ else
   my $dir = $shaderDir;
   my @shaderFiles = GetShaderFiles($dir);
 
-  my $headerFile = OpenFileForWriting("$filePrefix.h");
-  my $sourceFile = OpenFileForWriting("$filePrefix.cpp");
+  my $headerFile = OpenFileForWriting("$fileName.h");
+  my $sourceFile = OpenFileForWriting("$fileName.cpp");
 
   GenerateHeaderFileHeader($headerFile);
   GenerateSourceFileHeader($sourceFile);
@@ -194,8 +343,10 @@ else
   my $file;
   foreach $file (@shaderFiles)
   {
-    GenerateStringsFromFile($file, $dir, $headerFile, $sourceFile);
+    GenerateStringsFromFile($file, $dir);
   }
+
+  PrintShaderSources($headerFile, $sourceFile);
 
   GenerateHeaderFileFooter($headerFile);
   GenerateSourceFileFooter($sourceFile);
@@ -210,21 +361,21 @@ __END__
 
 =head1 NAME
 
-generate-shader-strings.pl - Given a shader directory and a file prefix, this script generates a header and source file where all the shaders in the directory are stored as vertex and fragment shader std::string(s).
+generate-shader-strings.pl - Given a shader directory and a file name, this script generates a header and source file where all the shaders in the directory are stored as vertex and fragment shader const char arrays.
 
 =head1 SYNOPSIS
 
-generate-shader-strings.pl -s=<shader-dir> -f=<file-prefix>
+generate-shader-strings.pl -s=<shader-dir> -f=<file-name>
 
-generate-shader-strings.pl --shader-dir=<shader-dir> -file-prefix=<file-prefix>
+generate-shader-strings.pl -shader-dir=<shader-dir> -file-name=<file-name>
 
 =head1 DESCRIPTION
 
-Given a shader directory and a file prefix, this script generates a header and source file where all the shaders in the directory are stored as vertex and fragment shader std::string(s).
+Given a shader directory and a file name, this script generates a header and source file where all the shaders in the directory are stored as vertex and fragment shader const char arrays.
 
 The shader files in the specified directory should have the suffix ".txt" and the vertex and fragment shaders should be encapsulated within <VertexShader>*</VertexShader> and <FragmentShader>*</FragmentShader> respectively in this text file.
 
-The generated source files will be called <file-prefix>.h and <file-prefix>.cpp.
+The generated source files will be called <file-name>.h and <file-name>.cpp.
 
 =head1 OPTIONS
 
@@ -234,7 +385,6 @@ The generated source files will be called <file-prefix>.h and <file-prefix>.cpp.
 
 The directory the shader files should be loaded from.
 
-=item B<-f|--file-prefix>
+=item B<-f|--file-name>
 
-The prefix of the output files.
-
+The name of the output files.

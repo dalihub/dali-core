@@ -52,6 +52,7 @@ namespace Internal
 
 class Actor;
 class ActorGestureData;
+class Animation;
 class RenderTask;
 struct DynamicsData;
 
@@ -1041,13 +1042,13 @@ public:  // For Animation
    * @param[in] animation The animation that resized the actor
    * @param[in] targetSize The new target size of the actor
    */
-  void NotifySizeAnimation(Animation& animation, const Vector3& targetSize);
+  void NotifySizeAnimation( Animation& animation, const Vector3& targetSize);
 
   /**
    * For use in derived classes.
    * This should only be called by Animation, when the actor is resized using Animation::Resize().
    */
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize) {}
+  virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize) {}
 
 protected:
 

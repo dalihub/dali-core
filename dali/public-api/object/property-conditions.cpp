@@ -47,13 +47,6 @@ PropertyCondition& PropertyCondition::operator=(const PropertyCondition& rhs)
   return *this;
 }
 
-PropertyCondition& PropertyCondition::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 PropertyCondition::ArgumentContainer PropertyCondition::GetArguments()
 {
   return GetImplementation(*this).arguments;

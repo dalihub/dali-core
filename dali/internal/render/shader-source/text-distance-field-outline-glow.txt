@@ -1,0 +1,68 @@
+<VertexShader>
+
+attribute mediump vec3  aPosition;
+attribute mediump vec2  aTexCoord;
+
+uniform   mediump mat4  uMvpMatrix;
+uniform   lowp    vec4  uColor;
+uniform   lowp    vec4  uTextColor;
+uniform   lowp    vec4  uGradientColor;
+uniform   mediump vec4  uGradientLine;
+uniform   mediump vec2  uInvTextSize;
+
+varying   mediump vec2  vTexCoord;
+varying   lowp    vec4  vColor;
+
+void main()
+{
+  gl_Position = uMvpMatrix * vec4(aPosition, 1.0);
+  vTexCoord = aTexCoord;
+
+  lowp float f = dot( aPosition.xy * uInvTextSize - uGradientLine.xy, uGradientLine.zw );
+
+  vColor = mix(uTextColor, uGradientColor, f);
+}
+
+</VertexShader>
+
+<FragmentShader>
+
+uniform mediump sampler2D sTexture;
+uniform lowp    vec4      uColor;
+uniform highp   vec2      uSmoothing;
+uniform highp   vec2      uOutline;
+uniform lowp    vec4      uOutlineColor;
+uniform highp   float     uGlow;
+uniform lowp    vec4      uGlowColor;
+
+varying mediump vec2      vTexCoord;
+varying lowp vec4         vColor;
+
+void main()
+{
+  // sample distance field
+  mediump float distance = texture2D(sTexture, vTexCoord).a;
+
+  // blend fragment color between outline color and text color
+  mediump float outlineBlend = smoothstep(uOutline[0], uOutline[1], distance);
+
+  lowp vec4 clampedColor = clamp( vColor, 0.0, 1.0 );
+
+  // create blend between text color and outline color using outlineBlend
+  lowp vec4 outlineColor = vec4( uOutlineColor.rgb, uOutlineColor.a * clampedColor.a );
+  lowp vec4 color = mix(outlineColor, clampedColor, outlineBlend);
+
+  mediump float glowBlend = smoothstep(uSmoothing[0], uSmoothing[1], distance);
+
+  // blend fragment color between glow color and text color
+  lowp vec4 glowColor = vec4( uGlowColor.rgb, uGlowColor.a * clampedColor.a );
+  color = mix(glowColor, color, glowBlend);
+
+  // fade out glow between uSmoothing and uGlow
+  color.a *= smoothstep(uGlow, uSmoothing[0], distance);
+
+  // final color multiplied by Actor color
+  gl_FragColor = uColor * color;
+}
+
+</FragmentShader>

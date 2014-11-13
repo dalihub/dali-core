@@ -43,14 +43,14 @@ class ShaderFactory
 public:
 
   /**
-   * default constructor
+   * Default constructor
    */
   ShaderFactory(ResourceClient& resourceClient);
 
   /**
-   * Default destructor
+   * Destructor
    */
-  virtual ~ShaderFactory();
+  ~ShaderFactory();
 
   /**
    * Issues a request to load a binary version of a shader program, and returns a resource ticket
@@ -67,13 +67,6 @@ public:
    * Called during Core initialization to load the default shader.
    */
   void LoadDefaultShaders();
-
-  /**
-   * Called during ShaderEffect::New() to load shaders for text sub-types
-   * (Default shader can be overridden)
-   * @param[in] shaderEffect The shader effect for which to load the sub-type shaders
-   */
-  static void LoadTextSubtypeShaders(ShaderEffectPtr shaderEffect);
 
 private:
 

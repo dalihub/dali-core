@@ -33,6 +33,10 @@ namespace Internal DALI_INTERNAL
   class TypeInfo;
 };
 
+typedef std::vector<Property::Value> PropertyValueContainer;
+typedef PropertyValueContainer::iterator PropertyValueIter; ///< Iterator for Dali::PropertyValueContainer
+typedef PropertyValueContainer::const_iterator PropertyValueConstIter; ///< Const iterator for Dali::PropertyValueContainer
+
 /**
  * @brief TypeInfo class for instantiation of registered types and introspection of
  * their actions and signals.
@@ -44,7 +48,7 @@ class DALI_IMPORT_API TypeInfo : public BaseHandle
 public:
   typedef BaseHandle (*CreateFunction)(); ///< Function signature for creating an instance of the associated object type.
 
-  typedef bool (*ActionFunction)(BaseObject*, const std::string&, const std::vector<Property::Value>&); ///< Function signature for creating scriptable actions
+  typedef bool (*ActionFunction)(BaseObject*, const std::string&, const PropertyValueContainer&); ///< Function signature for creating scriptable actions
 
   /**
    * @brief Connects a callback function with the object's signals.
@@ -106,16 +110,6 @@ public:
    * @return A reference to this
    */
   TypeInfo& operator=(const TypeInfo& rhs);
-
-  /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  TypeInfo& operator=(BaseHandle::NullType* rhs);
 
   /**
    * @brief Retrieve the type name for this type.

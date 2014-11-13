@@ -109,10 +109,6 @@ void StoreBlendingFactor( unsigned int& options, BlendingFactor::Type factor, in
     case BlendingFactor::ONE_MINUS_CONSTANT_ALPHA:
       options |= ( 14u << bitShift );
       break;
-
-    default:
-      DALI_ASSERT_ALWAYS( false && "Invalid BlendingFactor" );
-      break;
   }
 }
 
@@ -136,10 +132,6 @@ void StoreBlendingEquation( unsigned int& options, BlendingEquation::Type factor
 
     case BlendingEquation::REVERSE_SUBTRACT:
       options |= ( 2u << bitShift );
-      break;
-
-    default:
-      DALI_ASSERT_ALWAYS( false && "Invalid BlendingEquation" );
       break;
   }
 }

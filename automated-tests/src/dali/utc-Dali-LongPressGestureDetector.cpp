@@ -60,7 +60,7 @@ struct SignalData
     receivedGesture.screenPoint = Vector2(0.0f, 0.0f);
     receivedGesture.localPoint = Vector2(0.0f, 0.0f);
 
-    pressedActor = NULL;
+    pressedActor.Reset();
   }
 
   bool functorCalled;
@@ -74,7 +74,7 @@ struct GestureReceivedFunctor
 {
   GestureReceivedFunctor(SignalData& data) : signalData(data) { }
 
-  void operator()(Actor actor, LongPressGesture longPress)
+  void operator()(Actor actor, const LongPressGesture& longPress)
   {
     signalData.functorCalled = true;
     signalData.receivedGesture = longPress;
@@ -98,7 +98,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
   {
   }
 
-  void operator()( Actor actor, LongPressGesture longPress )
+  void operator()( Actor actor, const LongPressGesture& longPress )
   {
     GestureReceivedFunctor::operator()( actor, longPress );
 
@@ -1224,7 +1224,7 @@ int UtcDaliLongPressGestureActorStagedAndDestroyed(void)
   application.Render();
 
   // Delete actor as well
-  actor = NULL;
+  actor.Reset();
 
   // Render and notify
   application.SendNotification();

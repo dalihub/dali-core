@@ -19,17 +19,12 @@
 #include <dali/internal/render/shaders/shader.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/stage.h>
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/matrix3.h>
-#include <dali/public-api/math/vector4.h>
-#include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/render-debug.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/uniform-meta.h>
 #include <dali/internal/common/image-sampler.h>
@@ -79,7 +74,7 @@ namespace // unnamed namespace
 {
 
 // Convert Geometry type bitmask to an array index
-unsigned int GetGeometryTypeIndex(GeometryType type)
+inline unsigned int GetGeometryTypeIndex(GeometryType type)
 {
   unsigned int index = Log<GEOMETRY_TYPE_IMAGE>::value;
   if ( type & GEOMETRY_TYPE_IMAGE )
@@ -90,9 +85,9 @@ unsigned int GetGeometryTypeIndex(GeometryType type)
   {
     index = Log<GEOMETRY_TYPE_TEXT>::value;
   }
-  else if ( type & GEOMETRY_TYPE_MESH )
+  else if ( type & GEOMETRY_TYPE_UNTEXTURED_MESH )
   {
-    index = Log<GEOMETRY_TYPE_MESH>::value;
+    index = Log<GEOMETRY_TYPE_UNTEXTURED_MESH>::value;
   }
   else if ( type & GEOMETRY_TYPE_TEXTURED_MESH )
   {
@@ -245,16 +240,17 @@ void Shader::SetProgram( GeometryType geometryType,
     theSubType = SHADER_DEFAULT;
   }
 
+  const unsigned int geometryIndex = GetGeometryTypeIndex( geometryType );
   if(geometryType != GEOMETRY_TYPE_TEXT && subType == SHADER_SUBTYPE_ALL)
   {
-    mPrograms[GetGeometryTypeIndex(geometryType)].Resize(1);
-    mPrograms[GetGeometryTypeIndex(geometryType)][theSubType] = program;
-    mPrograms[GetGeometryTypeIndex(geometryType)].mUseDefaultForAllSubtypes = true;
+    mPrograms[geometryIndex].Resize(1);
+    mPrograms[geometryIndex][theSubType] = program;
+    mPrograms[geometryIndex].mUseDefaultForAllSubtypes = true;
   }
   else
   {
-    mPrograms[GetGeometryTypeIndex(geometryType)][theSubType] = program;
-    mPrograms[GetGeometryTypeIndex(geometryType)].mUseDefaultForAllSubtypes = false;
+    mPrograms[geometryIndex][theSubType] = program;
+    mPrograms[geometryIndex].mUseDefaultForAllSubtypes = false;
   }
 
   if( !precompiledBinary )
@@ -277,7 +273,7 @@ bool Shader::AreSubtypesRequired(GeometryType geometryType)
   return ! mPrograms[ programType ].mUseDefaultForAllSubtypes;
 }
 
-Program& Shader::GetProgram( Context& context,
+Program* Shader::GetProgram( Context& context,
                              GeometryType type,
                              ShaderSubTypes subType,
                              unsigned int& programIndex )
@@ -287,12 +283,9 @@ Program& Shader::GetProgram( Context& context,
 
   programIndex = GetGeometryTypeIndex( type );
 
-  DALI_ASSERT_DEBUG(!mPrograms[ programIndex ].mUseDefaultForAllSubtypes || subType == SHADER_DEFAULT);
   DALI_ASSERT_DEBUG((unsigned int)subType < mPrograms[ programIndex ].Count());
-  DALI_ASSERT_DEBUG(NULL != mPrograms[ programIndex ][ subType ]);
 
-  Program& program = *(mPrograms[ programIndex ][ subType ]);
-  return program;
+  return mPrograms[ programIndex ][ subType ];
 }
 
 
@@ -317,7 +310,7 @@ void Shader::SetUniforms( Context& context,
   if( mTexture )
   {
     // got effect texture, bind it to texture unit 1
-    mTextureCache->BindTexture( mTexture, mRenderTextureId, GL_TEXTURE_2D, GL_TEXTURE1 );
+    mTextureCache->BindTexture( mTexture, mRenderTextureId, GL_TEXTURE_2D, TextureUnitAsGLenum( TEXTURE_UNIT_SHADER ) );
 
     // Just apply the default sampling options for now
     mTexture->ApplySampler( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
@@ -326,9 +319,9 @@ void Shader::SetUniforms( Context& context,
     const GLint loc = program.GetUniformLocation( Program::UNIFORM_EFFECT_SAMPLER );
     if( Program::UNIFORM_UNKNOWN != loc )
     {
-      DALI_PRINT_UNIFORM( debugStream, bufferIndex, "sEffect", 1 );
+      DALI_PRINT_UNIFORM( debugStream, bufferIndex, "sEffect", TEXTURE_UNIT_SHADER );
       // set the uniform
-      program.SetUniform1i( loc, 1 );
+      program.SetUniform1i( loc, TEXTURE_UNIT_SHADER );
     }
   }
 

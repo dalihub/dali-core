@@ -112,6 +112,7 @@ public:
   /**
    * Called to render during RenderManager::Render().
    * @param[in] bufferIndex The index of the previous update buffer.
+   * @param[in] defaultShader in case there is no custom shader
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    * @param[in] projectionMatrix The projection matrix.
@@ -119,6 +120,7 @@ public:
    * @param[in] cull Whether to frustum cull this renderer
    */
   void Render( BufferIndex bufferIndex,
+               Shader& defaultShader,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
                const Matrix& projectionMatrix,

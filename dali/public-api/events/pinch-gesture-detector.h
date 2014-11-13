@@ -55,7 +55,7 @@ public: // Typedefs
   /**
    * @brief Signal type.
    */
-  typedef SignalV2< void (Actor, PinchGesture) > DetectedSignalV2;
+  typedef SignalV2< void ( Actor, const PinchGesture& ) > DetectedSignalV2;
 
   //Signal Names
   static const char* const SIGNAL_PINCH_DETECTED; ///< name "pinch-detected"
@@ -108,16 +108,6 @@ public: // Creation & Destruction
    */
   PinchGestureDetector& operator=(const PinchGestureDetector& rhs);
 
-  /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  PinchGestureDetector& operator=(BaseHandle::NullType* rhs);
-
 public: // Signals
 
   /**
@@ -125,7 +115,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(Actor actor, PinchGesture gesture);
+   *   void YourCallbackName( Actor actor, const PinchGesture& gesture );
    * @endcode
    * @pre The gesture detector has been initialized.
    * @return The signal to connect to.

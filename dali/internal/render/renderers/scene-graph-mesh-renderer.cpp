@@ -31,8 +31,6 @@
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/render/renderers/render-material.h>
 
-using namespace std;
-
 namespace Dali
 {
 
@@ -129,7 +127,7 @@ void MeshRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& 
   outType = GEOMETRY_TYPE_TEXTURED_MESH;
   if( ! material.HasTexture() )
   {
-    outType = GEOMETRY_TYPE_MESH;
+    outType = GEOMETRY_TYPE_UNTEXTURED_MESH;
   }
   outSubType = SHADER_DEFAULT;
 

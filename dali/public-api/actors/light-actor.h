@@ -98,16 +98,6 @@ public:
   LightActor& operator=(const LightActor& rhs);
 
   /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  LightActor& operator=(BaseHandle::NullType* rhs);
-
-  /**
    * @brief Set the light properties for the actor.
    *
    * @param[in] light The light properties

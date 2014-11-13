@@ -35,6 +35,7 @@ const float POINT_TO_INCHES( 1.f / INCH_TO_POINTS );
 }
 
 FontLayout::FontLayout()
+  :mUnitsPerEM(0.0f)
 {
 }
 

@@ -37,7 +37,9 @@
 #include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/event/modeling/model-impl.h>
 
-using namespace std;
+using std::cout;
+using std::endl;
+using std::string;
 
 namespace Dali
 {

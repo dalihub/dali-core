@@ -40,7 +40,7 @@ struct TouchEventData
     receivedTouch.points.clear();
     receivedTouch.time = 0;
 
-    touchActor = NULL;
+    touchActor.Reset();
   }
 
   bool functorCalled;

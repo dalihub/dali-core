@@ -144,16 +144,6 @@ public:
   CameraActor& operator=(const CameraActor& rhs);
 
   /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  CameraActor& operator=(BaseHandle::NullType* rhs);
-
-  /**
    * @brief Set the camera type.
    * The default type is Dali::Camera::FREE_LOOK
    * @param[in] type The camera type

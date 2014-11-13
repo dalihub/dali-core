@@ -43,6 +43,7 @@ namespace Render
  * Process a render-list.
  * @param[in] renderList The render-list to process.
  * @param[in] context The GL context.
+ * @param[in] defaultShader The default shader to use.
  * @param[in] buffer The current render buffer index (previous update buffer)
  * @param[in] frameTime The elapsed time between the last two updates.
  * @param[in] viewMatrix The view matrix from the appropriate camera.
@@ -51,6 +52,7 @@ namespace Render
  */
 inline void ProcessRenderList( const RenderList& renderList,
                                Context& context,
+                               SceneGraph::Shader& defaultShader,
                                BufferIndex bufferIndex,
                                float frameTime,
                                const Matrix& viewMatrix,
@@ -116,12 +118,13 @@ inline void ProcessRenderList( const RenderList& renderList,
     SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( item.GetRenderer() );
     const Matrix& modelViewMatrix = item.GetModelViewMatrix();
 
-    renderer->Render( bufferIndex, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode );
+    renderer->Render( bufferIndex, defaultShader, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode );
   }
 }
 
 void ProcessRenderInstruction( const RenderInstruction& instruction,
                                Context& context,
+                               SceneGraph::Shader& defaultShader,
                                BufferIndex bufferIndex,
                                float frameTime )
 {
@@ -144,7 +147,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       if(  renderList &&
           !renderList->IsEmpty() )
       {
-        ProcessRenderList( *renderList, context, bufferIndex, frameTime, *viewMatrix, *projectionMatrix, instruction.mCullMode );
+        ProcessRenderList( *renderList, context, defaultShader, bufferIndex, frameTime, *viewMatrix, *projectionMatrix, instruction.mCullMode );
       }
     }
   }

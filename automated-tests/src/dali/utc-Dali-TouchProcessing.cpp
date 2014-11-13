@@ -57,7 +57,7 @@ struct SignalData
     touchEvent.time = 0u;
     touchEvent.points.clear();
 
-    touchedActor = NULL;
+    touchedActor.Reset();
   }
 
   bool functorCalled;
@@ -1088,7 +1088,7 @@ int UtcDaliTouchActorRemovedInSignal(void)
   data.Reset();
 
   // Completely delete the actor
-  actor = NULL;
+  actor.Reset();
 
   // Emit event, should not crash and should not receive an event.
   application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, Vector2( 210.0f, 210.0f ) ) );

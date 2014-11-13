@@ -24,8 +24,6 @@
 // Dali includes
 #include "actor.h"
 
-using namespace std;
-
 namespace // unnamed namespace start
 {
 

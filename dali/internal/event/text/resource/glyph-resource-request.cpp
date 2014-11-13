@@ -26,6 +26,12 @@ namespace Internal
 
 using Integration::TextResourceType;
 
+GlyphResourceRequest::GlyphResourceRequest()
+:mFontId( 0 ),
+ mQuality( LOW_QUALITY )
+{
+
+}
 
 GlyphResourceRequest::GlyphResourceRequest( FontId fontId, GlyphQuality quality )
 :mFontId( fontId ),

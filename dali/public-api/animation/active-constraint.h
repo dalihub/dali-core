@@ -78,16 +78,6 @@ public:
   ActiveConstraint& operator=(const ActiveConstraint& rhs);
 
   /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  ActiveConstraint& operator=(BaseHandle::NullType* rhs);
-
-  /**
    * @brief Retrieve the object which this constraint is targeting.
    *
    * @return The target object.

@@ -57,6 +57,7 @@ TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const
 
 TextAttachment::TextAttachment( Stage& stage )
 : RenderableAttachment( stage ),
+  mSceneObject( NULL ),
   mTextRequestHelper( *this ),
   mTextColor( NULL ),
   mTextChanged( true ),
@@ -599,25 +600,28 @@ const SceneGraph::RenderableAttachment& TextAttachment::GetSceneObject() const
 
 void TextAttachment::SetTextChanges()
 {
-  // record the natural size of the text
-  mTextSize = mVertexBuffer->mVertexMax;
-
-  // remember the texture id, so we can detect atlas resizes / splits
-  mTextureId = mVertexBuffer->mTextureId;
-
-  EventToUpdate& eventToUpdate(  mStage->GetUpdateInterface() );
-  const SceneGraph::TextAttachment& attachment( *mSceneObject );
-
-  if( mTextChanged  || mFontChanged )
+  if( mVertexBuffer )
   {
-    DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "TextAttachment::SetTextChanges() Sending VertexBuffer to attachment:%p  textureId:%d\n", &attachment, mVertexBuffer->mTextureId);
+    // record the natural size of the text
+    mTextSize = mVertexBuffer->mVertexMax;
 
-    // release the vertex buffer to pass  ownership to the scene-graph-text-attachment
-    SetTextVertexBufferMessage( eventToUpdate, attachment, *mVertexBuffer.Release() );
+    // remember the texture id, so we can detect atlas resizes / splits
+    mTextureId = mVertexBuffer->mTextureId;
 
-    if( mFontChanged )
+    EventToUpdate& eventToUpdate(  mStage->GetUpdateInterface() );
+    const SceneGraph::TextAttachment& attachment( *mSceneObject );
+
+    if( mTextChanged  || mFontChanged )
     {
-      SetTextFontSizeMessage( eventToUpdate, attachment, mFont->GetPixelSize() );
+      DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "TextAttachment::SetTextChanges() Sending VertexBuffer to attachment:%p  textureId:%d\n", &attachment, mVertexBuffer->mTextureId);
+
+      // release the vertex buffer to pass  ownership to the scene-graph-text-attachment
+      SetTextVertexBufferMessage( eventToUpdate, attachment, *mVertexBuffer.Release() );
+
+      if( mFontChanged )
+      {
+        SetTextFontSizeMessage( eventToUpdate, attachment, mFont->GetPixelSize() );
+      }
     }
   }
 }

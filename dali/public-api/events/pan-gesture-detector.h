@@ -56,7 +56,7 @@ class DALI_IMPORT_API PanGestureDetector : public GestureDetector
 public:
 
   // Typedefs
-  typedef SignalV2< void (Actor, PanGesture) > DetectedSignalV2; ///< Pan gesture detected signal type
+  typedef SignalV2< void ( Actor, const PanGesture& ) > DetectedSignalV2; ///< Pan gesture detected signal type
 
   // Directional Pan
   typedef std::pair< Radian, Radian > AngleThresholdPair; ///< Range of angles for a direction
@@ -134,16 +134,6 @@ public: // Creation & Destruction
    * @return A reference to this
    */
   PanGestureDetector& operator=(const PanGestureDetector& rhs);
-
-  /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  PanGestureDetector& operator=(BaseHandle::NullType* rhs);
 
 public: // Setters
 
@@ -285,7 +275,7 @@ public: // Signals
    *
    * A callback of the following type may be connected:
    * @code
-   *   void YourCallbackName(Actor actor, PanGesture gesture);
+   *   void YourCallbackName( Actor actor, const PanGesture& gesture );
    * @endcode
    * @pre The gesture detector has been initialized.
    * @return The signal to connect to.

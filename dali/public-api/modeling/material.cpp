@@ -73,13 +73,6 @@ Material& Material::operator=(const Material& rhs)
   return *this;
 }
 
-Material& Material::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void Material::SetName(const std::string& name)
 {
   GetImplementation(*this).SetName(name);

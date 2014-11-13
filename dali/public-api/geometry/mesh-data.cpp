@@ -22,14 +22,12 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/integration-api/debug.h>
 
-using namespace std;
-
 namespace Dali
 {
 
 namespace // unnamed namespace
 {
-static const float kBoundsDefault = 1e10f;
+const float kBoundsDefault = 1e10f;
 } // unnamed namespace
 
 using Dali::Vector4;

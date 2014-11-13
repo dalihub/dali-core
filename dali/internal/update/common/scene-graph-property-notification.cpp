@@ -24,8 +24,6 @@
 #include <dali/internal/update/common/scene-graph-property-notification.h>
 #include <dali/internal/update/common/property-condition-functions.h>
 
-using namespace std;
-
 namespace Dali
 {
 

@@ -178,7 +178,6 @@ struct UpdateManager::Impl
     systemLevelTaskList ( completeStatusManager ),
     root( NULL ),
     systemLevelRoot( NULL ),
-    defaultShader( NULL ),
     messageQueue( renderController, sceneGraphBuffers ),
     dynamicsChanged( false ),
     keepRenderingSeconds( 0.0f ),
@@ -190,7 +189,7 @@ struct UpdateManager::Impl
     renderSortingHelper(),
     renderTaskWaiting( false )
   {
-    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager, defaultShader );
+    sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager );
   }
 
   ~Impl()
@@ -268,7 +267,6 @@ struct UpdateManager::Impl
   AnimationContainer                  animations;                    ///< A container of owned animations
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
 
-  Shader*                             defaultShader;                 ///< The default shader; owned by ShaderContainer
   ShaderContainer                     shaders;                       ///< A container of owned shaders
   AnimatableMeshContainer             animatableMeshes;              ///< A container of owned animatable meshes
   MaterialContainer                   materials;                     ///< A container of owned materials
@@ -532,19 +530,21 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
   propertyNotification->SetNotifyMode( notifyMode );
 }
 
-Shader* UpdateManager::GetDefaultShader()
-{
-  return mImpl->defaultShader;
-}
-
 void UpdateManager::AddShader( Shader* shader )
 {
   DALI_ASSERT_DEBUG( NULL != shader );
 
-  // Note: The first shader added becomes the default shader
-  if( NULL == mImpl->defaultShader )
+  if( mImpl->shaders.Count() == 0 )
   {
-    mImpl->defaultShader = shader;
+    // the first added shader becomes our default shader
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    typedef MessageValue1< RenderManager, Shader* > DerivedType;
+
+    // Reserve some memory inside the render queue
+    unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new (slot) DerivedType( &mImpl->renderManager, &RenderManager::SetDefaultShader, shader );
   }
 
   mImpl->shaders.PushBack( shader );

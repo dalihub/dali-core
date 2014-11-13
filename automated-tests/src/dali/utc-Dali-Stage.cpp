@@ -27,7 +27,6 @@
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
-using namespace std;
 
 void stage_test_startup(void)
 {

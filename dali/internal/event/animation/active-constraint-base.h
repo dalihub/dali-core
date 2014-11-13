@@ -27,7 +27,6 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/set-wrapper.h>
 #include <dali/internal/event/animation/constraint-source-impl.h>
 
 namespace Dali
@@ -37,8 +36,8 @@ namespace Internal
 {
 
 class EventToUpdate;
-typedef std::set<ProxyObject*>         ProxyObjectContainer;
-typedef ProxyObjectContainer::iterator ProxyObjectIter;
+typedef Dali::Vector<ProxyObject*>     ProxyObjectContainer;
+typedef ProxyObjectContainer::Iterator ProxyObjectIter;
 
 namespace SceneGraph
 {

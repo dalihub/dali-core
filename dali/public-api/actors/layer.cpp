@@ -64,13 +64,6 @@ Layer& Layer::operator=(const Layer& rhs)
   return *this;
 }
 
-Layer& Layer::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 unsigned int Layer::GetDepth() const
 {
   return GetImplementation(*this).GetDepth();

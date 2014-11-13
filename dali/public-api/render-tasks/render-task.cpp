@@ -74,13 +74,6 @@ RenderTask& RenderTask::operator=(const RenderTask& rhs)
   return *this;
 }
 
-RenderTask& RenderTask::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void RenderTask::SetSourceActor( Actor actor )
 {
   // NULL handle is allowed

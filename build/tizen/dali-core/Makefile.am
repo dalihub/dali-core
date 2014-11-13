@@ -53,7 +53,7 @@ $(nodist_libdali_core_la_OBJECTS): $(dali_shaders_src_file)
 dali_shaders_src_file = dali-shaders.cpp
 
 dali-shaders.cpp: $(dali_shaders_script) $(dali_shaders_dir)/*.txt
-	$< --shader-dir=$(dali_shaders_dir) --file-prefix=dali-shaders
+	$< --shader-dir=$(dali_shaders_dir) --file-name=dali-shaders
 
 dali_core_includes = \
         -I../../..

@@ -509,9 +509,9 @@ void ActiveConstraintBase::SceneObjectRemoved( ProxyObject& proxy )
 void ActiveConstraintBase::ProxyDestroyed( ProxyObject& proxy )
 {
   // Remove proxy pointer from observation set
-  ProxyObjectIter iter = mObservedProxies.find( &proxy );
-  DALI_ASSERT_DEBUG( mObservedProxies.end() != iter );
-  mObservedProxies.erase( iter );
+  ProxyObjectIter iter = std::find( mObservedProxies.Begin(), mObservedProxies.End(), &proxy );
+  DALI_ASSERT_DEBUG( mObservedProxies.End() != iter );
+  mObservedProxies.Erase( iter );
 
   // Stop observing the remaining proxies
   StopObservation();
@@ -524,41 +524,43 @@ void ActiveConstraintBase::ProxyDestroyed( ProxyObject& proxy )
 
 void ActiveConstraintBase::ObserveProxy( ProxyObject& proxy )
 {
-  if ( mObservedProxies.end() == mObservedProxies.find(&proxy) )
+  ProxyObjectIter iter = std::find( mObservedProxies.Begin(), mObservedProxies.End(), &proxy );
+  if ( mObservedProxies.End() == iter )
   {
     proxy.AddObserver( *this );
-    mObservedProxies.insert( &proxy );
+    mObservedProxies.PushBack( &proxy );
   }
 }
 
 void ActiveConstraintBase::StopObservation()
 {
-  for( ProxyObjectIter iter = mObservedProxies.begin(); mObservedProxies.end() != iter; ++iter )
+  const ProxyObjectIter end = mObservedProxies.End();
+  for( ProxyObjectIter iter = mObservedProxies.Begin(); iter != end; ++iter )
   {
     (*iter)->RemoveObserver( *this );
   }
 
-  mObservedProxies.clear();
+  mObservedProxies.Clear();
 }
 
 void ActiveConstraintBase::FirstApplyFinished( Object* object )
 {
-  ActiveConstraintBase& self = dynamic_cast<ActiveConstraintBase&>( *object );
+  // trust the object is correct as its set in FirstApply (in this same file)
+  ActiveConstraintBase* self = static_cast<ActiveConstraintBase*>( object );
 
   // This is necessary when the constraint was not added to scene-graph during the animation
-  self.SetWeight( Dali::ActiveConstraint::FINAL_WEIGHT );
+  self->SetWeight( Dali::ActiveConstraint::FINAL_WEIGHT );
 
   // The animation is no longer needed
-  GetImplementation(self.mApplyAnimation).SetFinishedCallback( NULL, NULL );
-  self.mApplyAnimation.Reset();
+  GetImplementation(self->mApplyAnimation).SetFinishedCallback( NULL, NULL );
+  self->mApplyAnimation.Reset();
 
   // Chain "Finish" to "Applied" signal
 
-  if ( !self.mAppliedSignal.Empty() )
+  if ( !self->mAppliedSignal.Empty() )
   {
-    Dali::ActiveConstraint handle( &self );
-
-    self.mAppliedSignal.Emit( handle );
+    Dali::ActiveConstraint handle( self );
+    self->mAppliedSignal.Emit( handle );
   }
 
   // WARNING - this constraint may now have been deleted; don't do anything else here

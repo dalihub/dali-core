@@ -34,13 +34,6 @@ class Matrix3;
 class Matrix;
 
 /**
- * @brief Container of Dali::Property::Value.
- */
-typedef std::vector<Property::Value> PropertyValueContainer;
-typedef PropertyValueContainer::iterator PropertyValueIter; ///< Iterator for Dali::PropertyValueContainer
-typedef PropertyValueContainer::const_iterator PropertyValueConstIter; ///< Const iterator for Dali::PropertyValueContainer
-
-/**
  * @brief A value-type representing a property value.
  */
 class DALI_IMPORT_API Property::Value

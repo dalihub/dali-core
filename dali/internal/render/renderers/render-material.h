@@ -23,6 +23,7 @@
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/render/shaders/custom-uniform.h>
 #include <dali/internal/render/gl-resources/texture-observer.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/shaders/program.h>
 
 namespace Dali
@@ -183,7 +184,7 @@ private:
    * @param[in] textureUnit Texture unit ( should be a value between 0 and the max number of samplers - 1 )
    * @param[in] samplerIndex The index of the uniform to bind the texture sampler
    */
-  void BindTexture( Program& program, unsigned int textureId, Texture* texture, unsigned int textureUnit, Program::UniformType samplerIndex ) const;
+  void BindTexture( Program& program, unsigned int textureId, Texture* texture, TextureUnit textureUnit, Program::UniformType samplerIndex ) const;
 
 private:
   TextureCache*  mTextureCache;       ///< Texture cache of GL resources

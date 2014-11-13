@@ -56,13 +56,6 @@ LightActor& LightActor::operator=(const LightActor& rhs)
   return *this;
 }
 
-LightActor& LightActor::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void LightActor::SetLight(Light light)
 {
   GetImplementation(*this).SetLight(light);

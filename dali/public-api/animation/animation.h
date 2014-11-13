@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <boost/function.hpp>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/key-frames.h>
@@ -42,14 +39,6 @@ struct Property;
 struct Vector2;
 struct Vector3;
 struct Vector4;
-
-typedef boost::function<bool       (float alpha, const bool& current)>       AnimatorFunctionBool;      ///< Animator function signature for boolean properties.
-typedef boost::function<float      (float alpha, const float& current)>      AnimatorFunctionFloat;     ///< Animator function signature for float properties.
-typedef boost::function<int        (float alpha, const int& current)>        AnimatorFunctionInteger;   ///< Animator function signature for integer properties.
-typedef boost::function<Vector2    (float alpha, const Vector2& current)>    AnimatorFunctionVector2;   ///< Animator function signature for Vector2 properties.
-typedef boost::function<Vector3    (float alpha, const Vector3& current)>    AnimatorFunctionVector3;   ///< Animator function signature for Vector3 properties.
-typedef boost::function<Vector4    (float alpha, const Vector4& current)>    AnimatorFunctionVector4;   ///< Animator function signature for Vector4 properties.
-typedef boost::function<Quaternion (float alpha, const Quaternion& current)> AnimatorFunctionQuaternion;///< Animator function signature for Quaternion properties.
 
 namespace Internal DALI_INTERNAL
 {
@@ -115,8 +104,6 @@ public:
   typedef SignalV2< void (Animation&) > AnimationSignalV2; ///< Animation finished signal type
 
   typedef Any AnyFunction; ///< Interpolation function
-  typedef boost::function<Vector3 (float alpha, const Vector3& current)> Vector3AnimatorFunc; ///< Interpolation function
-  typedef boost::function<Quaternion (float alpha, const Quaternion& current)> QuaternionAnimatorFunc; ///< Interpolation function
 
   /**
    * @brief What to do when the animation ends, is stopped or is destroyed
@@ -187,16 +174,6 @@ public:
    * @return A reference to this
    */
   Animation& operator=(const Animation& rhs);
-
-  /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  Animation& operator=(BaseHandle::NullType* rhs);
 
   /**
    * @brief Set the duration of an animation.
@@ -481,66 +458,6 @@ public:
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period);
 
-  /**
-   * @brief Animate a property using a custom function.
-   *
-   * The function will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
-   * @pre The property type is equal PropertyTypes::Get<P>().
-   * @param [in] target The target object/property to animate.
-   * @param [in] animatorFunc The function to call during the animation.
-   */
-  template <class P>
-  void Animate( Property target, boost::function<P (float alpha, const P& current)> animatorFunc )
-  {
-    Animate( target, PropertyTypes::Get<P>(), animatorFunc );
-  }
-
-  /**
-   * @brief Animate a property using a custom function.
-   *
-   * The function will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
-   * @pre The property type is equal PropertyTypes::Get<P>().
-   * @param [in] target The target object/property to animate.
-   * @param [in] animatorFunc The function to call during the animation.
-   * @param [in] alpha The alpha function to apply.
-   */
-  template <class P>
-  void Animate( Property target, boost::function<P (float alpha, const P& current)> animatorFunc, AlphaFunction alpha )
-  {
-    Animate( target, PropertyTypes::Get<P>(), animatorFunc, alpha );
-  }
-
-  /**
-   * @brief Animate a property using a custom function.
-   *
-   * The function will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
-   * @pre The property type is equal PropertyTypes::Get<P>().
-   * @param [in] target The target object/property to animate.
-   * @param [in] animatorFunc The function to call during the animation.
-   * @param [in] period The effect will occur during this time period.
-   */
-  template <class P>
-  void Animate( Property target, boost::function<P (float alpha, const P& current)> animatorFunc, TimePeriod period )
-  {
-    Animate( target, PropertyTypes::Get<P>(), animatorFunc, period );
-  }
-
-  /**
-   * @brief Animate a property using a custom function.
-   *
-   * The function will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
-   * @pre The property type is equal PropertyTypes::Get<P>().
-   * @param [in] target The target object/property to animate.
-   * @param [in] animatorFunc The function to call during the animation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] period The effect will occur during this time period.
-   */
-  template <class P>
-  void Animate( Property target, boost::function<P (float alpha, const P& current)> animatorFunc, AlphaFunction alpha, TimePeriod period )
-  {
-    Animate( target, PropertyTypes::Get<P>(), animatorFunc, alpha, period );
-  }
-
   // Actor-specific convenience methods
 
   /**
@@ -616,20 +533,6 @@ public:
    * @param [in] durationSeconds The duration of the translation.
    */
   void MoveTo(Actor actor, Vector3 position, AlphaFunction alpha, float delaySeconds, float durationSeconds);
-
-  /**
-   * @brief Move an actor using a custom function.
-   *
-   * The animatorFunc will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
-   * @param [in] actor The actor to animate.
-   * @param [in] animatorFunc The function to call during the animation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
-   */
-  void Move(Actor actor, AnimatorFunctionVector3 animatorFunc, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
    * @brief Rotate an actor around an arbitrary axis.
@@ -817,20 +720,6 @@ public:
    * @param [in] durationSeconds The duration of the rotation.
    */
   void RotateTo(Actor actor, Quaternion orientation, AlphaFunction alpha, float delaySeconds, float durationSeconds);
-
-  /**
-   * @brief Rotate an actor using a custom function.
-   *
-   * The animatorFunc will be called from a separate animation-thread; it should return quickly, to avoid performance degredation.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
-   * @param [in] actor The actor to animate.
-   * @param [in] animatorFunc The function to call during the animation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the rotation.
-   */
-  void Rotate(Actor actor, AnimatorFunctionQuaternion animatorFunc, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
    * @brief Scale an actor.
@@ -1146,63 +1035,6 @@ public: // Not intended for use by Application developers
    */
   explicit DALI_INTERNAL Animation(Internal::Animation* animation);
 
-private:
-
-  /**
-   * @brief Animate a property using a custom function.
-   *
-   * @pre The property type is equal expectedType.
-   * @param [in] target The target object/property to animate.
-   * @param [in] targetType The expected type of the property.
-   * @param [in] func The function to call during the animation.
-   */
-  void Animate( Property target,
-                Property::Type targetType,
-                AnyFunction func );
-
-  /**
-   * @brief Animate a property using a custom function.
-   *
-   * @pre The property type is equal expectedType.
-   * @param [in] target The target object/property to animate.
-   * @param [in] targetType The expected type of the property.
-   * @param [in] func The function to call during the animation.
-   * @param [in] alpha The alpha function to apply.
-   */
-  void Animate( Property target,
-                Property::Type targetType,
-                AnyFunction func,
-                AlphaFunction alpha );
-
-  /**
-   * @brief Animate a property using a custom function.
-   *
-   * @pre The property type is equal expectedType.
-   * @param [in] target The target object/property to animate.
-   * @param [in] targetType The expected type of the property.
-   * @param [in] func The function to call during the animation.
-   * @param [in] period The effect will occur during this time period.
-   */
-  void Animate( Property target,
-                Property::Type targetType,
-                AnyFunction func,
-                TimePeriod period );
-
-  /**
-   * @brief Animate a property using a custom function.
-   *
-   * @pre The property type is equal expectedType.
-   * @param [in] target The target object/property to animate.
-   * @param [in] targetType The expected type of the property.
-   * @param [in] func The function to call during the animation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] period The effect will occur during this time period.
-   */
-  void Animate( Property target,
-                Property::Type targetType,
-                AnyFunction func,
-                AlphaFunction alpha,
-                TimePeriod period );
 };
 
 } // namespace Dali

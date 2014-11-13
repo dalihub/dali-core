@@ -43,8 +43,6 @@
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
 #endif
 
-using namespace std;
-
 namespace Dali
 {
 
@@ -86,13 +84,6 @@ Actor::Actor(const Actor& copy)
 Actor& Actor::operator=(const Actor& rhs)
 {
   BaseHandle::operator=(rhs);
-  return *this;
-}
-
-Actor& Actor::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
   return *this;
 }
 

@@ -50,6 +50,7 @@ class TextureCache;
 class RenderInstruction;
 class RenderInstructionContainer;
 class RenderTracker;
+class Shader;
 
 /**
  * RenderManager is responsible for rendering the result of the previous "update", which
@@ -178,6 +179,12 @@ public:
    */
   void RemoveRenderTracker( RenderTracker* renderTracker );
 
+  /**
+   * Set the default shader that is to be used in absence of custom shader
+   * @param[in] shader that is the default one
+   */
+  void SetDefaultShader( Shader* shader );
+
   // This method should be called from Core::Render()
 
   /**
@@ -192,8 +199,10 @@ private:
   /**
    * Helper to process a single RenderInstruction.
    * @param[in] instruction A description of the rendering operation.
+   * @param[in] defaultShader default shader to use.
+   * @param[in] elapsedTime from previous render.
    */
-  void DoRender( RenderInstruction& instruction, float elapsedTime );
+  void DoRender( RenderInstruction& instruction, Shader& defaultShader, float elapsedTime );
 
 private:
 

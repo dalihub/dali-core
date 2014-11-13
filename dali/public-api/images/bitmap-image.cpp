@@ -55,14 +55,6 @@ BitmapImage& BitmapImage::operator=(const BitmapImage& rhs)
   return *this;
 }
 
-BitmapImage& BitmapImage::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
-
 const BitmapImage BitmapImage::WHITE()
 {
   Internal::BitmapImage* internal = new Internal::BitmapImage(1,1,Pixel::RGBA8888, Immediate, Never);

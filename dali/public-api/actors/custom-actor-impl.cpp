@@ -22,8 +22,6 @@
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/actors/custom-actor-internal.h>
 
-using namespace std;
-
 namespace Dali
 {
 

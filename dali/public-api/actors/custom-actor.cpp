@@ -65,13 +65,6 @@ CustomActor& CustomActor::operator=(const CustomActor& rhs)
   return *this;
 }
 
-CustomActor& CustomActor::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 CustomActorImpl& CustomActor::GetImplementation()
 {
   Internal::CustomActor& internal = GetImpl(*this);

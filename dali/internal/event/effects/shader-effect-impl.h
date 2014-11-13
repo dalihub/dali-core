@@ -60,67 +60,7 @@ public:
    * @param hints GeometryHints to define the geometry of the rendered object
    * @return A smart-pointer to a newly allocated shader effect.
    */
-  static ShaderEffectPtr New(Dali::ShaderEffect::GeometryHints hints = Dali::ShaderEffect::HINT_NONE);
-
-  /**
-   * Create a new ShaderEffect
-   * @param vertexShader code for the effect. If empty, the default version will be used
-   * @param fragmentShader code for the effect. If empty, the default version will be used
-   * @param type GeometryType
-   * @param hints GeometryHints to define the geometry of the rendered object
-   * @return A smart-pointer to a newly allocated shader effect.
-   */
-  static ShaderEffectPtr New( const std::string& vertexShader,
-                              const std::string& fragmentShader,
-                              GeometryType type,
-                              Dali::ShaderEffect::GeometryHints hints );
-  /**
-   * Create a new ShaderEffect
-   * @param vertexShaderPrefix code for the effect. It will be inserted before the default uniforms.
-   * @param vertexShader code for the effect. If empty, the default version will be used
-   * @param fragmentShaderPrefix code for the effect. It will be inserted before the default uniforms.
-   * @param fragmentShader code for the effect. If empty, the default version will be used
-   * @param type GeometryType
-   * @param hints GeometryHints to define the geometry of the rendered object
-   * @return A smart-pointer to a newly allocated shader effect.
-   */
-  static ShaderEffectPtr NewWithPrefix( const std::string& vertexShaderPrefix,
-                                        const std::string& vertexShader,
-                                        const std::string& fragmentShaderPrefix,
-                                        const std::string& fragmentShader,
-                                        GeometryType type,
-                                        Dali::ShaderEffect::GeometryHints hints );
-
-  /**
-   * Create a new ShaderEffect.
-   * If you pass in an empty string in the following arguments, the default version will be used instead.
-   * @param imageVertexShader code for the effect.
-   * @param imageFragmentShader code for the effect.
-   * @param textVertexShader code for the effect.
-   * @param textFragmentShader code for the effect.
-   * @param texturedMeshVertexShader code for the effect.
-   * @param texturedMeshFragmentShader code for the effect.
-   * @param meshVertexShader code for the effect.
-   * @param meshFragmentShader code for the effect.
-   * @param hints GeometryHints to define the geometry of the rendered object
-   * @return A handle to a shader effect
-   */
-  static ShaderEffectPtr New( const std::string& imageVertexShader,
-                              const std::string& imageFragmentShader,
-                              const std::string& textVertexShader,
-                              const std::string& textFragmentShader,
-                              const std::string& texturedMeshVertexShader,
-                              const std::string& texturedMeshFragmentShader,
-                              const std::string& meshVertexShader,
-                              const std::string& meshFragmentShader,
-                              Dali::ShaderEffect::GeometryHints hints );
-
-  /**
-   * Creates object with data from the property value map
-   * @param [in] map The property value map with fields such as 'vertex-filename' '..'
-   * @return a pointer to a newly created object.
-   */
-  static ShaderEffectPtr New( const Property::Value& map );
+  static ShaderEffectPtr New( Dali::ShaderEffect::GeometryHints hints = Dali::ShaderEffect::HINT_NONE );
 
   /**
    * @copydoc Dali::ShaderEffect::SetEffectImage
@@ -152,31 +92,36 @@ public:
   /**
    * Add a GeometryType specific default program to this ShaderEffect
    * @param[in] geometryType    The GeometryType rendered by the shader program
-   * @param[in] subType         The subtype, one of ShaderSubTypes.
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
-   * @param[in] modifiesGeometry True if the shader modifies geometry
    */
-  void SetProgram( GeometryType geometryType, ShaderSubTypes subType,
-                   const std::string& vertexSource, const std::string& fragmentSource,
-                   GeometryState modifiesGeometry );
+  void SetPrograms( GeometryType geometryType, const std::string& vertexSource, const std::string& fragmentSource );
 
   /**
    * Add a GeometryType specific default program to this ShaderEffect.
    * This overload allows the optional prefixing for both the vertex and fragment shader.
    * A useful prefix may be shader \#defines for conditional compilation.
    * @param[in] geometryType    The GeometryType rendered by the shader program
-   * @param[in] subType         The subtype, one of ShaderSubTypes.
    * @param[in] vertexPrefix    The prefix source code for the vertex shader
    * @param[in] fragmentPrefix  The prefix source code for the fragment shader
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
+   */
+  void SetPrograms( GeometryType geometryType,
+                    const std::string& vertexPrefix, const std::string& fragmentPrefix,
+                    const std::string& vertexSource, const std::string& fragmentSource );
+
+  /**
+   * Send shader program to scene-graph object.
+   * @param[in] geometryType     The GeometryType rendered by the shader program
+   * @param[in] subType          The subtype, one of ShaderSubTypes.
+   * @param[in] vertexSource     The source code for the vertex shader
+   * @param[in] fragmentSource   The source code for the fragment shader
    * @param[in] modifiesGeometry True if the shader modifies geometry
    */
-  void SetProgram( GeometryType geometryType, ShaderSubTypes subType,
-                   const std::string& vertexPrefix, const std::string& fragmentPrefix,
-                   const std::string& vertexSource, const std::string& fragmentSource,
-                   GeometryState modifiesGeometry );
+  void SendProgramMessage( GeometryType geometryType, ShaderSubTypes subType,
+                           const std::string& vertexSource, const std::string& fragmentSource,
+                           bool modifiesGeometry );
 
   /**
    * Notify ShaderEffect that it's being used by an Actor.
@@ -282,59 +227,6 @@ private:
   // No copying allowed, thus these are undefined
   ShaderEffect( const ShaderEffect& );
   ShaderEffect& operator=( const ShaderEffect& rhs );
-
-  /**
-   * Set the given program for all shader types set in the geometryType bitfield.
-   * @param[in] geometryType         A GeometryType bitfield
-   * @param[in] vertexShaderPrefix   The prefix source code for the vertex shader
-   * @param[in] vertexShader         The source code for the vertex shader
-   * @param[in] fragmentShaderPrefix The prefix source code for the fragment shader
-   * @param[in] fragmentShader       The source code for the fragment shader
-   */
-  void SetPrograms( GeometryType  geometryTypes,
-                    const std::string& vertexShaderPrefix,
-                    const std::string& vertexShader,
-                    const std::string& fragmentShaderPrefix,
-                    const std::string& fragmentShader );
-
-  /**
-   * Wrap the given prefix and body code around the predefined prefix source for the
-   * given geometry type. Specifying an empty string for the body code means that the
-   * predefined body code is used instead.
-   *
-   * @param[in] geometryType    The GeometryType rendered by the shader program
-   * @param[in] subType         The subtype, one of ShaderSubTypes.
-   * @param[in] vertexPrefix    The prefix source code for the vertex shader
-   * @param[in] fragmentPrefix  The prefix source code for the fragment shader
-   * @param[in] vertexSource    The source code for the vertex shader
-   * @param[in] fragmentSource  The source code for the fragment shader
-   */
-  void SetWrappedProgram( GeometryType geometryType, ShaderSubTypes subType,
-                          const std::string& vertexPrefix, const std::string& fragmentPrefix,
-                          const std::string& vertexSource, const std::string& fragmentSource );
-
-  /**
-   * Send shader program to scene-graph object.
-   * Uses the shader hints to determine whether the shader modifies geometry
-   * @param[in] geometryType    The GeometryType rendered by the shader program
-   * @param[in] subType         The subtype, one of ShaderSubTypes.
-   * @param[in] vertexSource    The source code for the vertex shader
-   * @param[in] fragmentSource  The source code for the fragment shader
-   */
-  void SetProgramImpl( GeometryType geometryType, ShaderSubTypes subType,
-                       const std::string& vertexSource, const std::string& fragmentSource );
-
-  /**
-   * Send shader program to scene-graph object.
-   * @param[in] geometryType    The GeometryType rendered by the shader program
-   * @param[in] subType         The subtype, one of ShaderSubTypes.
-   * @param[in] vertexSource    The source code for the vertex shader
-   * @param[in] fragmentSource  The source code for the fragment shader
-   * @param[in] modifiesGeometry True if the shader modifies geometry
-   */
-  void SetProgramImpl( GeometryType geometryType, ShaderSubTypes subType,
-                       const std::string& vertexSource, const std::string& fragmentSource,
-                       GeometryState modifiesGeometry );
 
 private: // Data
 

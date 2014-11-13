@@ -62,7 +62,7 @@ public:
    * @return A smart-pointer to a newly allocated constraint.
    */
   static ConstraintBase* New( const PropertyBase& targetProperty,
-                              PropertyOwnerSet& ownerSet,
+                              PropertyOwnerContainer& ownerContainer,
                               ConstraintFunctionPtr func,
                               InterpolatorFunc interpolator,
                               const AnimatableProperty<float>* customWeight )
@@ -71,7 +71,7 @@ public:
     PropertyBase& property = const_cast< PropertyBase& >( targetProperty );
 
     return new Constraint< PropertyType, PropertyAccessorType >( property,
-                                                                 ownerSet,
+                                                                 ownerContainer,
                                                                  func,
                                                                  interpolator,
                                                                  customWeight );
@@ -159,11 +159,11 @@ private:
    * @copydoc Dali::Internal::SceneGraph::Constraint::New()
    */
   Constraint( PropertyBase& targetProperty,
-              PropertyOwnerSet& ownerSet,
+              PropertyOwnerContainer& ownerContainer,
               ConstraintFunctionPtr func,
               InterpolatorFunc interpolator,
               const AnimatableProperty<float>* customWeight )
-  : ConstraintBase( ownerSet ),
+  : ConstraintBase( ownerContainer ),
     mTargetProperty( &targetProperty ),
     mFunc( func ),
     mInterpolator( interpolator ),

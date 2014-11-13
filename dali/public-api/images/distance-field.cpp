@@ -96,7 +96,7 @@ void DistanceTransform( float *source, float* dest, unsigned int length )
     const float initialDistance( source[i] + SQUARE( i ) );
     int parabola = parabolas[rightmost];
     float newDistance( (initialDistance - (source[parabola] + SQUARE( parabola ))) / (2 * i - 2 * parabola) );
-    while( newDistance <= edge[rightmost] )
+    while( rightmost > 0 && newDistance <= edge[rightmost] )
     {
       rightmost--;
       parabola = parabolas[rightmost];

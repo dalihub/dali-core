@@ -35,8 +35,6 @@
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
 #endif
 
-using namespace std;
-
 namespace Dali
 {
 
@@ -65,13 +63,6 @@ Stage::Stage(const Stage& handle)
 Stage& Stage::operator=(const Stage& rhs)
 {
   BaseHandle::operator=(rhs);
-  return *this;
-}
-
-Stage& Stage::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
   return *this;
 }
 

@@ -277,10 +277,6 @@ const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
   }
 
   DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
-
-  // Property not found, return reference to invalid property string.
-  static const std::string EMPTY_PROPERTY_NAME;
-  return EMPTY_PROPERTY_NAME;
 }
 
 void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo::ActionFunction function )
@@ -507,8 +503,6 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
   }
 
   DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
-
-  return Property::Value();
 }
 
 Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::string& name ) const
@@ -528,8 +522,6 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::stri
   }
 
   DALI_ASSERT_ALWAYS( ! "Cannot find property name" );
-
-  return Property::Value();
 }
 
 } // namespace Internal

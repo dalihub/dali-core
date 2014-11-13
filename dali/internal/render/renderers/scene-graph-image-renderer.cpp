@@ -28,12 +28,11 @@
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/update/controllers/scene-controller.h>
-
-using namespace std;
 
 namespace
 {
@@ -78,26 +77,29 @@ void GenerateIntervals(std::vector<VertexToTextureCoord>& intervalList, int inte
   DALI_ASSERT_DEBUG(intervals > 0);
 
   std::vector<VertexToTextureCoord>::const_iterator iter = insertionList.begin();
-  std::vector<VertexToTextureCoord>::const_iterator end = insertionList.end()-1;
-
-  const float length = end->x - iter->x;
-  const float intervalSize = length / static_cast<float>(intervals);
-  float x = iter->x;
-
-  for(;iter!=end;++iter)
+  if( iter != insertionList.end() )
   {
-    float x0 = iter[0].x;
-    float u0 = iter[0].u;
-    float x1 = iter[1].x;
-    float u1 = iter[1].u;
+    std::vector<VertexToTextureCoord>::const_iterator end = insertionList.end()-1;
 
-    for(;x<x1;x+=intervalSize)
+    const float length = end->x - iter->x;
+    const float intervalSize = length / static_cast<float>(intervals);
+    float x = iter->x;
+
+    for(;iter!=end;++iter)
     {
-      float progress = (x - x0) / (x1 - x0);  // progress value between current interval and next.
-      float u = u0 + (u1 - u0) * progress;    // u 1D texture coordinate value for this x position.
-      intervalList.push_back( VertexToTextureCoord( x, u ) );
+      float x0 = iter[0].x;
+      float u0 = iter[0].u;
+      float x1 = iter[1].x;
+      float u1 = iter[1].u;
+
+      for(;x<x1;x+=intervalSize)
+      {
+        float progress = (x - x0) / (x1 - x0);  // progress value between current interval and next.
+        float u = u0 + (u1 - u0) * progress;    // u 1D texture coordinate value for this x position.
+        intervalList.push_back( VertexToTextureCoord( x, u ) );
+      }
+      intervalList.push_back( VertexToTextureCoord( x1, u1 ) );
     }
-    intervalList.push_back( VertexToTextureCoord( x1, u1 ) );
   }
 }
 
@@ -264,7 +266,7 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
 
   DALI_ASSERT_DEBUG( mVertexBuffer );
 
-  mTextureCache->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, GL_TEXTURE0 );
+  mTextureCache->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, TextureUnitAsGLenum( TEXTURE_UNIT_IMAGE ) );
 
   if( mTexture->GetTextureId() == 0 )
   {
@@ -273,17 +275,17 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
 
   mTexture->ApplySampler( mSamplerBitfield );
 
-  // make sure the vertex is bound, this has to be done before
-  // we call VertexAttribPointer otherwise you get weird output on the display
-  mVertexBuffer->Bind();
-
   // Set sampler uniform
   GLint samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER );
   if( -1 != samplerLoc )
   {
     // set the uniform
-    program.SetUniform1i( samplerLoc, 0 );
+    program.SetUniform1i( samplerLoc, TEXTURE_UNIT_IMAGE );
   }
+
+  // make sure the vertex is bound, this has to be done before
+  // we call VertexAttribPointer otherwise you get weird output on the display
+  mVertexBuffer->Bind();
 
   samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER_RECT );
   if( -1 != samplerLoc )

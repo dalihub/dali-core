@@ -219,7 +219,7 @@ void HoverEventProcessor::ProcessHoverEvent( const Integration::HoverEvent& even
     mHoverStartConsumedActor.SetActor( NULL );
     mLastRenderTask.Reset();
 
-    hoverEvent.points[0].hitActor = NULL;
+    hoverEvent.points[0].hitActor.Reset();
 
     return; // No need for hit testing
   }

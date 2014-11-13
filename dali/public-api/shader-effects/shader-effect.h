@@ -68,7 +68,7 @@ enum GeometryType
 {
   GEOMETRY_TYPE_IMAGE = 0x01,         ///< image, with flat color or texture
   GEOMETRY_TYPE_TEXT = 0x02,          ///< text, with flat color or texture
-  GEOMETRY_TYPE_MESH = 0x04,          ///< Complex meshes, with flat color
+  GEOMETRY_TYPE_UNTEXTURED_MESH = 0x04,///< Complex meshes, with flat color
   GEOMETRY_TYPE_TEXTURED_MESH = 0x08, ///< Complex meshes, with texture
   GEOMETRY_TYPE_LAST = 0x10
 };
@@ -185,8 +185,8 @@ public:
    */
   static const Property::Index GRID_DENSITY;       ///< name "grid-density",   type FLOAT
   static const Property::Index IMAGE;              ///< name "image",          type MAP; {"filename":"", "load-policy":...}
-  static const Property::Index PROGRAM;            ///< name "program",        type MAP; {"vertex-filename":"",...}
-  static const Property::Index GEOMETRY_HINTS;     ///< name "geometry-hints", type INT (bitfield)
+  static const Property::Index PROGRAM;            ///< name "program",        type MAP; {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
+  static const Property::Index GEOMETRY_HINTS;     ///< name "geometry-hints", type INT (bitfield) values from enum GeometryHints
 
   static const float DEFAULT_GRID_DENSITY;         ///< The default density is 40 pixels
 
@@ -328,16 +328,6 @@ public:
    * @return A reference to this
    */
   ShaderEffect& operator=(const ShaderEffect& rhs);
-
-  /**
-   * @brief This method is defined to allow assignment of the NULL value,
-   * and will throw an exception if passed any other value.
-   *
-   * Assigning to NULL is an alias for Reset().
-   * @param [in] rhs  A NULL pointer
-   * @return A reference to this handle
-   */
-  ShaderEffect& operator=(BaseHandle::NullType* rhs);
 
   /**
    * @brief Sets image for using as effect texture.

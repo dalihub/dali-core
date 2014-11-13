@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/gl-defines.h>
 #include <dali/public-api/common/map-wrapper.h>
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-abstraction.h>
@@ -63,6 +63,8 @@ public:
    * GLES specification states that there's minimum of 8
    */
   static const unsigned int MAX_ATTRIBUTE_CACHE_SIZE = 8;
+
+  static const unsigned int MAX_TEXTURE_UNITS = 8; // for GLES 2.0 its 8, which is more than DALi uses anyways
 
   /**
    * Creates the Dali Context object.
@@ -636,7 +638,7 @@ public:
 
     // reset the cached texture id's incase the driver re-uses them
     // when creating new textures
-    for( int i=0; i < mMaxTextureUnits; ++i )
+    for( unsigned int i=0; i < MAX_TEXTURE_UNITS; ++i )
     {
        mBound2dTextureId[ i ] = 0;
     }
@@ -1615,7 +1617,7 @@ public:
    */
   GLint CachedNumberOfProgramBinaryFormats() const
   {
-    return mProgramBinaryFormats.size();
+    return mProgramBinaryFormats.Count();
   }
 
   /**
@@ -1625,7 +1627,7 @@ public:
    */
   GLint CachedProgramBinaryFormat( const unsigned int formatIndex = 0 ) const
   {
-    DALI_ASSERT_ALWAYS( formatIndex < mProgramBinaryFormats.size() && "formatIndex out of bounds");
+    DALI_ASSERT_ALWAYS( formatIndex < mProgramBinaryFormats.Count() && "formatIndex out of bounds");
 
     return mProgramBinaryFormats[ formatIndex ];
   }
@@ -1797,7 +1799,7 @@ private: // Data
 
   // glBindTexture() state
   unsigned int mActiveTextureUnit;
-  std::vector<GLuint> mBound2dTextureId;  ///< The ID passed to glBindTexture(GL_TEXTURE_2D)
+  GLuint mBound2dTextureId[ MAX_TEXTURE_UNITS ];  ///< The ID passed to glBindTexture(GL_TEXTURE_2D)
 
   // glBlendColor() state
   bool mUsingDefaultBlendColor;
@@ -1813,10 +1815,9 @@ private: // Data
   GLenum mBlendEquationSeparateModeAlpha;  ///< Controls Alpha blend mode
 
   GLint mMaxTextureSize;      ///< return value from GetIntegerv(GL_MAX_TEXTURE_SIZE)
-  GLint mMaxTextureUnits;     ///< return value from GetIntegerv(GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS)
   Vector4 mClearColor;        ///< clear color
 
-  std::vector<GLint>  mProgramBinaryFormats; ///< array of supported program binary formats
+  Dali::Vector<GLint>  mProgramBinaryFormats; ///< array of supported program binary formats
 
   // Face culling mode
   CullFaceMode mCullFaceMode;

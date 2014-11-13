@@ -59,7 +59,7 @@ struct SignalData
     receivedGesture.screenPoint = Vector2(0.0f, 0.0f);
     receivedGesture.localPoint = Vector2(0.0f, 0.0f);
 
-    tappedActor = NULL;
+    tappedActor.Reset();
   }
 
   bool functorCalled;
@@ -73,7 +73,7 @@ struct GestureReceivedFunctor
 {
   GestureReceivedFunctor(SignalData& data) : signalData(data) { }
 
-  void operator()(Actor actor, TapGesture tap)
+  void operator()(Actor actor, const TapGesture& tap)
   {
     signalData.functorCalled = true;
     signalData.receivedGesture = tap;
@@ -93,7 +93,7 @@ struct UnstageActorFunctor : public GestureReceivedFunctor
 {
   UnstageActorFunctor( SignalData& data ) : GestureReceivedFunctor( data ) { }
 
-  void operator()(Actor actor, TapGesture tap)
+  void operator()(Actor actor, const TapGesture& tap)
   {
     GestureReceivedFunctor::operator()( actor, tap );
     Stage::GetCurrent().Remove( actor );
@@ -1133,7 +1133,7 @@ int UtcDaliTapGestureActorRemovedWhilePossible(void)
   Stage::GetCurrent().Remove(actor);
   application.SendNotification();
   application.Render();
-  actor = NULL;
+  actor.Reset();
 
   // Send a Started state, no signal.
   application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));

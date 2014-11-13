@@ -69,13 +69,6 @@ TapGestureDetector& TapGestureDetector::operator=(const TapGestureDetector& rhs)
   return *this;
 }
 
-TapGestureDetector& TapGestureDetector::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void TapGestureDetector::SetTapsRequired(unsigned int taps)
 {
   GetImplementation(*this).SetTapsRequired(taps);

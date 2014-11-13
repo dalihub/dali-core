@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/gl-resources/context.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
@@ -98,7 +99,7 @@ bool FrameBufferTexture::CreateGlTexture()
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 
   mContext.GenTextures(1, &mId);
-  mContext.ActiveTexture(GL_TEXTURE7);  // bind in unused unit so rebind works the first time
+  mContext.ActiveTexture( TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD ) );  // bind in unused unit so rebind works the first time
   mContext.Bind2dTexture(mId);
 
   // set texture parameters

@@ -73,13 +73,6 @@ Animation& Animation::operator=(const Animation& rhs)
   return *this;
 }
 
-Animation& Animation::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void Animation::SetDuration(float durationSeconds)
 {
   GetImplementation(*this).SetDuration(durationSeconds);
@@ -221,26 +214,6 @@ void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunct
   GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, period);
 }
 
-void Animation::Animate( Property target, Property::Type targetType, AnyFunction func )
-{
-  GetImplementation(*this).Animate( target, targetType, func );
-}
-
-void Animation::Animate( Property target, Property::Type targetType, AnyFunction func, AlphaFunction alpha )
-{
-  GetImplementation(*this).Animate( target, targetType, func, alpha );
-}
-
-void Animation::Animate( Property target, Property::Type targetType, AnyFunction func, TimePeriod period )
-{
-  GetImplementation(*this).Animate( target, targetType, func, period );
-}
-
-void Animation::Animate( Property target, Property::Type targetType, AnyFunction func, AlphaFunction alpha, TimePeriod period )
-{
-  GetImplementation(*this).Animate( target, targetType, func, alpha, period );
-}
-
 // Actor specific animations
 
 void Animation::MoveBy(Actor actor, float x, float y, float z)
@@ -271,11 +244,6 @@ void Animation::MoveTo(Actor actor, Vector3 position, AlphaFunction alpha)
 void Animation::MoveTo(Actor actor, Vector3 position, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
   GetImplementation(*this).MoveTo(GetImplementation(actor), position, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::Move(Actor actor, AnimatorFunctionVector3 animatorFunc, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).Move(GetImplementation(actor), animatorFunc, alpha, delaySeconds, durationSeconds);
 }
 
 void Animation::RotateBy(Actor actor, Degree angle, Vector3 axis)
@@ -351,11 +319,6 @@ void Animation::RotateTo(Actor actor, Radian angle, Vector3 axis, AlphaFunction 
 void Animation::RotateTo(Actor actor, Quaternion rotation, AlphaFunction alpha, float delaySeconds, float durationSeconds)
 {
   GetImplementation(*this).RotateTo(GetImplementation(actor), rotation, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::Rotate(Actor actor, AnimatorFunctionQuaternion animatorFunc, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).Rotate(GetImplementation(actor), animatorFunc, alpha, delaySeconds, durationSeconds);
 }
 
 void Animation::ScaleBy(Actor actor, float x, float y, float z)

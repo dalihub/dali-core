@@ -196,7 +196,7 @@ void TouchEventProcessor::ProcessTouchEvent( const Integration::TouchEvent& even
     mTouchDownConsumedActor.SetActor( NULL );
     mLastRenderTask.Reset();
 
-    touchEvent.points[0].hitActor = NULL;
+    touchEvent.points[0].hitActor.Reset();
     mStage.EmitTouchedSignal( touchEvent );
 
     return; // No need for hit testing

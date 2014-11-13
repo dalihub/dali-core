@@ -93,13 +93,16 @@ struct RenderManager::Impl
     resourcePostProcessQueue( resourcePostProcessQ ),
     instructions(),
     backgroundColor( Dali::Stage::DEFAULT_BACKGROUND_COLOR ),
+    frameTime( 0.0f ),
+    lastFrameTime( 0.0f ),
     frameCount( 0 ),
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
     rendererContainer(),
     materials(),
     renderersAdded( false ),
-    firstRenderCompleted( false )
+    firstRenderCompleted( false ),
+    defaultShader( NULL )
   {
   }
 
@@ -164,6 +167,7 @@ struct RenderManager::Impl
   RenderTrackerContainer              mRenderTrackers;     ///< List of render trackers
 
   bool                                firstRenderCompleted; ///< False until the first render is done
+  Shader*                             defaultShader;        ///< Default shader to use
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction, ResourcePostProcessList& resourcePostProcessQ )
@@ -317,6 +321,11 @@ void RenderManager::RemoveRenderTracker( RenderTracker* renderTracker )
   mImpl->RemoveRenderTracker(renderTracker);
 }
 
+void RenderManager::SetDefaultShader( Shader* shader )
+{
+  mImpl->defaultShader = shader;
+}
+
 bool RenderManager::Render( Integration::RenderStatus& status )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
@@ -372,26 +381,29 @@ bool RenderManager::Render( Integration::RenderStatus& status )
     // @todo move programs out of context onto a program controller and let that handle this
     mImpl->context.ResetProgramMatrices();
 
-    size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
-    for ( size_t i = 0; i < count; ++i )
+    // if we don't have default shader, no point doing the render calls
+    if( mImpl->defaultShader )
     {
-      RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
-
-      DoRender( instruction, mImpl->lastFrameTime );
-
-      const RenderListContainer::SizeType countRenderList = instruction.RenderListCount();
-      if ( countRenderList > 0 )
+      size_t count = mImpl->instructions.Count( mImpl->renderBufferIndex );
+      for ( size_t i = 0; i < count; ++i )
       {
-        status.SetHasRendered( true );
+        RenderInstruction& instruction = mImpl->instructions.At( mImpl->renderBufferIndex, i );
+
+        DoRender( instruction, *mImpl->defaultShader, mImpl->lastFrameTime );
+
+        const RenderListContainer::SizeType countRenderList = instruction.RenderListCount();
+        if ( countRenderList > 0 )
+        {
+          status.SetHasRendered( true );
+        }
       }
+      GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
+      mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
+
+      mImpl->UpdateTrackers();
+
+      mImpl->firstRenderCompleted = true;
     }
-
-    GLenum attachments[] = { GL_DEPTH, GL_STENCIL };
-    mImpl->context.InvalidateFramebuffer(GL_FRAMEBUFFER, 2, attachments);
-
-    mImpl->UpdateTrackers();
-
-    mImpl->firstRenderCompleted = true;
   }
 
   PERF_MONITOR_END(PerformanceMonitor::DRAW_NODES);
@@ -417,7 +429,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
   return updateRequired;
 }
 
-void RenderManager::DoRender( RenderInstruction& instruction, float elapsedTime )
+void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultShader, float elapsedTime )
 {
   Rect<int> viewportRect;
   Vector4   clearColor;
@@ -496,6 +508,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, float elapsedTime 
 
   Render::ProcessRenderInstruction( instruction,
                                     mImpl->context,
+                                    defaultShader,
                                     mImpl->renderBufferIndex,
                                     elapsedTime );
 

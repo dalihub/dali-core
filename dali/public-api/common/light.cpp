@@ -56,13 +56,6 @@ Light& Light::operator=(const Light& rhs)
   return *this;
 }
 
-Light& Light::operator=(BaseHandle::NullType* rhs)
-{
-  DALI_ASSERT_ALWAYS( (rhs == NULL) && "Can only assign NULL pointer to handle");
-  Reset();
-  return *this;
-}
-
 void Light::SetName(const std::string& name)
 {
   GetImplementation(*this).SetName(name);
