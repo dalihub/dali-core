@@ -82,7 +82,7 @@ void MeshAttachment::SetMesh( const MeshIPtr        meshPtr,
     // Copy bone names locally in order to perform actor binding later
 
     // Must keep names in same order (vertices reference into bone matrix array by index)
-    for ( BoneContainer::const_iterator iter = bones.begin(); iter != bones.end(); iter++ )
+    for ( BoneContainer::const_iterator iter = bones.begin(); iter != bones.end(); ++iter )
     {
       const Bone& bone = (*iter);
       mMesh.mBoneNames.push_back( bone.GetName() );

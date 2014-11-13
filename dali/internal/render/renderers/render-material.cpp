@@ -44,9 +44,7 @@ void RenderMaterialUniforms::ResetCustomUniforms()
 
 void RenderMaterialUniforms::SetUniforms( const RenderMaterial& material, Program& program, ShaderSubTypes shaderType )
 {
-  GLint location = Program::UNIFORM_UNKNOWN;
-
-  location = mCustomUniform[ shaderType ][ 0 ].GetUniformLocation( program, "uMaterial.mOpacity" );
+  GLint location = mCustomUniform[ shaderType ][ 0 ].GetUniformLocation( program, "uMaterial.mOpacity" );
   if( Program::UNIFORM_UNKNOWN != location )
   {
     program.SetUniform1f( location, material.mOpacity );

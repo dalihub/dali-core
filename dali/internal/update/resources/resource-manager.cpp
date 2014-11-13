@@ -564,10 +564,8 @@ void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceT
 
   // Search for the ID in one of the live containers
   // IDs are only briefly held in the new-completed or failed containers; check those last
-  bool foundLiveRequest = false;
-
   // Try removing from the old-completed requests
-  foundLiveRequest = wasComplete = RemoveId(mImpl->oldCompleteRequests, deadId);
+  bool foundLiveRequest = wasComplete = RemoveId(mImpl->oldCompleteRequests, deadId);
 
   // Try removing from the loading requests
   if (!foundLiveRequest)
@@ -964,9 +962,7 @@ void ResourceManager::ClearRequestedGlyphArea( ResourceId id, const ResourceType
            end = textResourceType->mCharacterList.end() ;
          iter != end ; iter ++ )
     {
-      Vector2 clearArea;
-      clearArea.x= iter->xPosition;
-      clearArea.y= iter->yPosition;
+      Vector2 clearArea( iter->xPosition, iter->yPosition );
       clearAreas.push_back(clearArea);
     }
 

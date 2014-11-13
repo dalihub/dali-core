@@ -366,7 +366,7 @@ bool Image::IsNinePatchFileName( const std::string& filename )
       break;
     }
 
-    iter++;
+    ++iter;
   }
   return match;
 }

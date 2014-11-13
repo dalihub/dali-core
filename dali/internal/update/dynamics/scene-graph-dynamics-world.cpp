@@ -380,7 +380,7 @@ void DynamicsWorld::CheckForCollisions()
   /* ... and removed contacts */
   if (!mContacts.empty())
   {
-    for (it = mContacts.begin(); it != mContacts.end(); it++)
+    for (it = mContacts.begin(); it != mContacts.end(); ++it)
     {
       // signal end of collision
       Integration::DynamicsCollisionData& data = (*it).second;

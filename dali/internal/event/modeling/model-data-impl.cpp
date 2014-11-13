@@ -164,7 +164,7 @@ const ModelAnimationMap* ModelData::GetAnimationMap (const std::string& name) co
 
   for(ModelAnimationMapContainer::const_iterator iter=mAnimationMaps.begin();
       iter != mAnimationMaps.end();
-      iter++)
+      ++iter)
   {
     const ModelAnimationMap& animData = *iter;
     if(animData.name == name)
@@ -184,7 +184,7 @@ bool ModelData::FindAnimation (const std::string& name, unsigned int& index) con
   index = 0;
   for(ModelAnimationMapContainer::const_iterator iter=mAnimationMaps.begin();
       iter != mAnimationMaps.end();
-      iter++, index++)
+      ++iter, ++index)
   {
     const ModelAnimationMap& animData(*iter);
     if(animData.name == name)
