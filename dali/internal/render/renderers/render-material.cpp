@@ -231,7 +231,7 @@ void RenderMaterial::BindTexture( Program& program, ResourceId id, Texture* text
 
   if( texture != NULL )
   {
-    mTextureCache->BindTexture( texture, id, GL_TEXTURE_2D, TextureUnitAsGLenum( textureUnit ) );
+    mTextureCache->BindTexture( texture, id, GL_TEXTURE_2D, textureUnit );
     // Set sampler uniforms for textures
     GLint samplerLoc = program.GetUniformLocation( samplerIndex );
     if( Program::UNIFORM_UNKNOWN != samplerLoc )
@@ -283,22 +283,21 @@ void RenderMaterial::BindTextures( Program& program, unsigned int textureSampler
 
   if( mDiffuseTexture )
   {
-    mDiffuseTexture->ApplySampler( textureSampler );
+    mDiffuseTexture->ApplySampler( TEXTURE_UNIT_MATERIAL_DIFFUSE, textureSampler );
   }
 
-  // GL_TEXTURE1 is used by shader effect texture
   BindTexture( program, mOpacityTextureId, mOpacityTexture, TEXTURE_UNIT_MATERIAL_OPACITY, Program::UNIFORM_SAMPLER_OPACITY );
 
   if( mOpacityTexture )
   {
-    mOpacityTexture->ApplySampler( textureSampler );
+    mOpacityTexture->ApplySampler( TEXTURE_UNIT_MATERIAL_OPACITY, textureSampler );
   }
 
   BindTexture( program, mNormalMapTextureId, mNormalMapTexture, TEXTURE_UNIT_MATERIAL_NORMAL_MAP, Program::UNIFORM_SAMPLER_NORMAL_MAP );
 
   if( mNormalMapTexture )
   {
-    mNormalMapTexture->ApplySampler( textureSampler );
+    mNormalMapTexture->ApplySampler( TEXTURE_UNIT_MATERIAL_NORMAL_MAP, textureSampler );
   }
 }
 

@@ -67,7 +67,7 @@ bool FrameBufferTexture::Init()
 bool FrameBufferTexture::Prepare()
 {
   // bind texture
-  Bind(GL_TEXTURE_2D, GL_TEXTURE0);
+  Bind( GL_TEXTURE_2D, TEXTURE_UNIT_FRAMEBUFFER );
 
   if( 0 != mId )
   {
@@ -99,7 +99,7 @@ bool FrameBufferTexture::CreateGlTexture()
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 
   mContext.GenTextures(1, &mId);
-  mContext.ActiveTexture( TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD ) );  // bind in unused unit so rebind works the first time
+  mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );  // bind in unused unit so rebind works the first time
   mContext.Bind2dTexture(mId);
 
   // set texture parameters

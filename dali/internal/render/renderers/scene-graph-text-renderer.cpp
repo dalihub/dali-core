@@ -357,7 +357,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
 
   DALI_LOG_INFO( gTextFilter, Debug::General, "TextRenderer::DoRender(this: %p) textureId:%d\n", this, mTextureId );
 
-  mTextureCache->BindTexture( mTexture, mTextureId, GL_TEXTURE_2D, TextureUnitAsGLenum( TEXTURE_UNIT_TEXT ) );
+  mTextureCache->BindTexture( mTexture, mTextureId, GL_TEXTURE_2D, TEXTURE_UNIT_TEXT );
   if( mTexture->GetTextureId() == 0 )
   {
     return; // early out if we haven't got a GL texture yet (e.g. due to context loss)
@@ -371,7 +371,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
     program.SetUniform1i( samplerLoc, TEXTURE_UNIT_TEXT );
   }
 
-  mTexture->ApplySampler( mSamplerBitfield );
+  mTexture->ApplySampler( TEXTURE_UNIT_TEXT, mSamplerBitfield );
 
   const float SMOOTHING_ADJUSTMENT( 12.0f );
   const float SMOOTHING_ADJUSTMENT_PIXEL_SIZE( 32.0f );

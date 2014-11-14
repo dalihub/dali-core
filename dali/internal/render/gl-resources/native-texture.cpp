@@ -50,7 +50,7 @@ NativeTexture::~NativeTexture()
   // on the render thread. (And avoiding a potentially problematic virtual call in the destructor)
 }
 
-bool NativeTexture::Bind(GLenum target, GLenum textureunit )
+bool NativeTexture::Bind(GLenum target, TextureUnit textureunit )
 {
   bool created = false;
 
@@ -90,7 +90,7 @@ bool NativeTexture::CreateGlTexture()
   if( mNativeImage->GlExtensionCreate() )
   {
     mContext.GenTextures( 1, &mId );
-    mContext.ActiveTexture( TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD ) );  // bind in unused unit so rebind works the first time
+    mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );  // bind in unused unit so rebind works the first time
     mContext.Bind2dTexture( mId );
 
     mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 ); // We always use tightly packed data

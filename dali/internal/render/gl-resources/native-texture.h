@@ -56,7 +56,7 @@ public:
   /**
    * @copydoc Texture::Bind
    */
-  virtual bool Bind(GLenum target, GLenum textureunit = GL_TEXTURE0);
+  virtual bool Bind( GLenum target, TextureUnit textureunit );
 
   /**
    * @copydoc Texture::IsFullyOpaque

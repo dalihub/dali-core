@@ -254,7 +254,7 @@ void TextureCache::DiscardTexture( ResourceId id )
   }
 }
 
-void TextureCache::BindTexture( Texture *texture, ResourceId id, GLenum target, GLenum textureunit )
+void TextureCache::BindTexture( Texture *texture, ResourceId id, GLenum target, TextureUnit textureunit )
 {
   bool created = texture->Bind(target, textureunit);
   if( created && texture->UpdateOnCreate() ) // i.e. the pixel data was sent to GL

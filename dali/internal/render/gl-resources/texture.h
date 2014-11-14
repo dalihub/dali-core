@@ -24,6 +24,7 @@
 #include <dali/internal/render/common/uv-rect.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/images/native-image.h>
@@ -92,7 +93,7 @@ public:
    * @return True if the opengl texture was created, false if there was already a texture
    * or no texture could be created yet ( e.g. no bitmap data after context loss )
    */
-  virtual bool Bind(GLenum target, GLenum textureunit);
+  virtual bool Bind(GLenum target, TextureUnit textureunit);
 
   /**
    * Returns GL texture ID
@@ -174,9 +175,10 @@ public:
   /**
    * @brief Apply the given sampler to the texture.
    *
+   * @param[in] texture unit to use
    * @param[in] samplerBitfield A bitfield with packed sampler options.
    */
-  void ApplySampler( unsigned int samplerBitfield );
+  void ApplySampler( TextureUnit unit, unsigned int samplerBitfield );
 
 protected:
 
@@ -252,13 +254,14 @@ private:
   /**
    * @brief Apply the given texture parameters.
    *
+   * @param[in] texture unit to use
    * @param[in] filterType Minification or magnification.
    * @param[in] currentFilterMode The current filter mode.
    * @param[in] newFilterMode The new filter mode.
    * @param[in] daliDefault The default dali filter mode for the given filterType.
    * @param[in] systemDefault The default system filter mode for the given filterType.
    */
-  void ApplyTextureParameter( GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault );
+  void ApplyTextureParameter( TextureUnit unit, GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault );
 
 protected:
 

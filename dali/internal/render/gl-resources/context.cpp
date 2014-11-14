@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/compile-time-assert.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/render/common/render-manager.h>
@@ -37,6 +38,8 @@ namespace Internal
 
 namespace // unnamed namespace
 {
+
+DALI_COMPILE_TIME_ASSERT( TEXTURE_UNIT_LAST <= Context::MAX_TEXTURE_UNITS );
 
 /**
  * GL error strings
@@ -64,8 +67,6 @@ void deletePrograms(std::pair< std::size_t, Program* > hashProgram)
   delete hashProgram.second;
 }
 
-const unsigned int UNINITIALIZED_TEXTURE_UNIT = std::numeric_limits<unsigned int>::max();// GL_MAX_TEXTURE_UNITS can't be used because it's depreciated in gles2
-
 } // unnamed namespace
 
 #ifdef DEBUG_ENABLED
@@ -91,7 +92,7 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mBoundArrayBufferId(0),
   mBoundElementArrayBufferId(0),
   mBoundTransformFeedbackBufferId(0),
-  mActiveTextureUnit( UNINITIALIZED_TEXTURE_UNIT ),
+  mActiveTextureUnit( TEXTURE_UNIT_LAST ),
   mUsingDefaultBlendColor(true),
   mBlendFuncSeparateSrcRGB(GL_ONE),
   mBlendFuncSeparateDstRGB(GL_ZERO),
@@ -310,7 +311,7 @@ void Context::ResetGlState()
   mGlAbstraction.BindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER, mBoundTransformFeedbackBufferId);
 #endif
 
-  mActiveTextureUnit = UNINITIALIZED_TEXTURE_UNIT;
+  mActiveTextureUnit = TEXTURE_UNIT_LAST;
 
   mUsingDefaultBlendColor = true;
   mGlAbstraction.BlendColor( 0.0f, 0.0f, 0.0f, 0.0f );
@@ -332,13 +333,12 @@ void Context::ResetGlState()
   mGlAbstraction.FrontFace(GL_CCW);
   mGlAbstraction.CullFace(GL_BACK);
 
-  // rebind texture units
+  // rebind texture units to 0
   for( unsigned int i=0; i < MAX_TEXTURE_UNITS; ++i )
   {
     mBound2dTextureId[ i ] = 0;
     // set active texture
     mGlAbstraction.ActiveTexture( GL_TEXTURE0 + i );
-    // bind the previous texture
     mGlAbstraction.BindTexture(GL_TEXTURE_2D, mBound2dTextureId[ i ] );
   }
 
