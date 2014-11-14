@@ -36,7 +36,12 @@ RefObject::RefObject(const RefObject&)
 
 RefObject::~RefObject()
 {
-  DALI_ASSERT_DEBUG(mCount == 0);
+#ifdef ENABLE_DEBUG
+  if(mCount)
+  {
+    DALI_LOG_ERROR("mCount should be zero, deleting referenced object!");
+  }
+#endif // ENABLE_DEBUG
 }
 
 RefObject& RefObject::operator=(const RefObject&)

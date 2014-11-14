@@ -139,12 +139,13 @@ AnimatableMeshPtr AnimatableMesh::New(
 
 AnimatableMesh::~AnimatableMesh()
 {
-  DALI_ASSERT_DEBUG( mSceneObject != NULL );
-
   // Guard to allow handle destruction after Core has been destroyed
   if ( Stage::IsInstalled() )
   {
-    RemoveAnimatableMeshMessage( mUpdateManager, *mSceneObject );
+    if( mSceneObject )
+    {
+      RemoveAnimatableMeshMessage( mUpdateManager, *mSceneObject );
+    }
   }
 }
 

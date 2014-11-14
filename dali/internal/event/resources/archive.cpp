@@ -48,7 +48,10 @@ Archive::Archive(std::streambuf& buf)
 
 Archive::~Archive()
 {
-  DALI_ASSERT_DEBUG(mChunkStack.empty());
+  if(!mChunkStack.empty())
+  {
+    DALI_LOG_ERROR("mChunkStack should be empty!");
+  }
 }
 
 
