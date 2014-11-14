@@ -516,7 +516,10 @@ int UtcDaliShaderEffectMethodSetEffectImage(void)
   application.Render(16);
   application.SendNotification();
 
-  DALI_TEST_CHECK( application.GetGlAbstraction().CheckUniformValue( "sEffect", 1 ) );
+  GLuint programId, uniformId;
+  bool uniformWasSet = application.GetGlAbstraction().GetUniformIds( "sEffect", programId, uniformId );
+  // we dont care about the value of the sampler uniform as thats internal to DALi core and subject to change
+  DALI_TEST_CHECK( uniformWasSet );
   END_TEST;
 }
 
