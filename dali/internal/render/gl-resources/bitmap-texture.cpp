@@ -85,7 +85,7 @@ void BitmapTexture::UploadBitmapArray( const BitmapUploadArray& bitmapArray )
     CreateGlTexture();
   }
 
-  mContext.ActiveTexture( TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD ) );  // bind in unused unit so rebind works the first time
+  mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
   mContext.Bind2dTexture(mId);
   mContext.PixelStorei(GL_UNPACK_ALIGNMENT, 1); // We always use tightly packed data
 
@@ -159,7 +159,7 @@ void BitmapTexture::AreaUpdated( const RectArea& updateArea, const unsigned char
   GLenum pixelDataType = GL_UNSIGNED_BYTE;
   Integration::ConvertToGlFormat(mPixelFormat, pixelDataType, pixelFormat);
 
-  mContext.ActiveTexture( TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD ) );  // bind in unused unit so rebind works the first time
+  mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
 
   mContext.Bind2dTexture(mId);
 
@@ -218,7 +218,7 @@ void BitmapTexture::AssignBitmap( bool generateTexture, const unsigned char* pix
   }
   DALI_ASSERT_DEBUG( mId != 0 );
 
-  mContext.ActiveTexture( TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD ) ); // bind in unused unit so rebind works the first time
+  mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
   mContext.Bind2dTexture(mId);
   Integration::ConvertToGlFormat(mPixelFormat, pixelDataType, pixelFormat);
 
@@ -329,7 +329,7 @@ void BitmapTexture::ClearAreas( const BitmapClearArray& areaArray, std::size_t b
     GLenum pixelDataType = GL_UNSIGNED_BYTE;
     Integration::ConvertToGlFormat(mPixelFormat, pixelDataType, pixelFormat);
 
-    mContext.ActiveTexture( TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD ) );  // bind in unused unit so rebind works the first time
+    mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
     mContext.Bind2dTexture(mId);
 
     size_t numPixels = blockSize*blockSize;

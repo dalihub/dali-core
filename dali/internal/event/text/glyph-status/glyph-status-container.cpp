@@ -71,7 +71,10 @@ GlyphStatusContainer::~GlyphStatusContainer()
   for( StatusSet::iterator iter = mCharacterLookup.begin(); iter != endIter; ++iter)
   {
     const GlyphStatus& status( (*iter) );
-    DALI_ASSERT_DEBUG( status.GetRefCount() == 0 && "glyph still referenced (leaking)");
+    if(status.GetRefCount())
+    {
+      DALI_LOG_ERROR("glyph still referenced (leaking)");
+    }
   }
 #endif
 }

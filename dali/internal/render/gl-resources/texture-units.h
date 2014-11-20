@@ -29,12 +29,14 @@ namespace Internal
 enum TextureUnit
 {
   TEXTURE_UNIT_IMAGE = 0,
-  TEXTURE_UNIT_TEXT = 0, // for now use same texture unit as text to avoid too many ActiveTexture Calls
+  TEXTURE_UNIT_TEXT,
   TEXTURE_UNIT_MATERIAL_DIFFUSE,
   TEXTURE_UNIT_MATERIAL_OPACITY,
   TEXTURE_UNIT_MATERIAL_NORMAL_MAP,
   TEXTURE_UNIT_SHADER,
   TEXTURE_UNIT_UPLOAD,
+  TEXTURE_UNIT_FRAMEBUFFER,
+  TEXTURE_UNIT_LAST
 };
 
 inline unsigned int TextureUnitAsGLenum( TextureUnit unit )

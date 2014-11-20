@@ -266,14 +266,14 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
 
   DALI_ASSERT_DEBUG( mVertexBuffer );
 
-  mTextureCache->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, TextureUnitAsGLenum( TEXTURE_UNIT_IMAGE ) );
+  mTextureCache->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, TEXTURE_UNIT_IMAGE );
 
   if( mTexture->GetTextureId() == 0 )
   {
     return; // early out if we haven't got a GL texture yet (e.g. due to context loss)
   }
 
-  mTexture->ApplySampler( mSamplerBitfield );
+  mTexture->ApplySampler( TEXTURE_UNIT_IMAGE, mSamplerBitfield );
 
   // Set sampler uniform
   GLint samplerLoc = program.GetUniformLocation( Program::UNIFORM_SAMPLER );

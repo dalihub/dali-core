@@ -2663,7 +2663,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
     {
       case Property::BOOLEAN:
       {
-        AnimatableProperty<bool>* property = dynamic_cast< AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -2674,7 +2674,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
       case Property::FLOAT:
       {
-        AnimatableProperty<float>* property = dynamic_cast< AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -2685,7 +2685,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
       case Property::INTEGER:
       {
-        AnimatableProperty<int>* property = dynamic_cast< AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -2696,7 +2696,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
       case Property::VECTOR2:
       {
-        AnimatableProperty<Vector2>* property = dynamic_cast< AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -2707,7 +2707,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
       case Property::VECTOR3:
       {
-        AnimatableProperty<Vector3>* property = dynamic_cast< AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -2718,7 +2718,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
       case Property::VECTOR4:
       {
-        AnimatableProperty<Vector4>* property = dynamic_cast< AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -2729,7 +2729,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
       case Property::ROTATION:
       {
-        AnimatableProperty<Quaternion>* property = dynamic_cast< AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -2740,7 +2740,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
       case Property::MATRIX:
       {
-        AnimatableProperty<Matrix>* property = dynamic_cast< AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
@@ -2751,7 +2751,7 @@ void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entr
 
       case Property::MATRIX3:
       {
-        AnimatableProperty<Matrix3>* property = dynamic_cast< AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
+        const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property

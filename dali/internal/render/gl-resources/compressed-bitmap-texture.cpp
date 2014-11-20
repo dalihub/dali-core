@@ -81,7 +81,7 @@ void CompressedBitmapTexture::AssignBitmap( bool generateTexture, const unsigned
   }
   DALI_ASSERT_DEBUG( mId != 0 );
 
-  mContext.ActiveTexture(TextureUnitAsGLenum( TEXTURE_UNIT_UPLOAD )); // bind in unused unit so rebind works the first time
+  mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
   mContext.Bind2dTexture(mId);
 
   GLenum pixelFormat = GL_RGBA;

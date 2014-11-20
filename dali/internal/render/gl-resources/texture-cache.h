@@ -34,6 +34,7 @@
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/render/common/texture-cache-dispatcher.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 
 namespace Dali
 {
@@ -176,9 +177,9 @@ public:
    * @param[in] texture pointer to the  texture
    * @param[in] id Resource id of texture
    * @param[in] target (e.g. GL_TEXTURE_2D)
-   * @param[in] textureunit ( e.g.: GL_TEXTURE0 )
+   * @param[in] textureunit to use
    */
-  void BindTexture( Texture* texture, ResourceId id, GLenum target, GLenum textureunit );
+  void BindTexture( Texture* texture, ResourceId id, GLenum target, TextureUnit textureunit );
 
   /**
    * Get the texture associated with the resource ID

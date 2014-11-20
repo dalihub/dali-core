@@ -185,7 +185,7 @@ TouchEventCombiner::EventDispatchType TouchEventCombiner::GetNextTouchEvent( con
         {
           if ( iter->point.deviceId == point.deviceId )
           {
-            mHoveredPoints.erase( iter );
+            iter = mHoveredPoints.erase( iter );
           }
         }
       }

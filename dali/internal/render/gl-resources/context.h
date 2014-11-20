@@ -20,15 +20,16 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/gl-defines.h>
+#include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/actors/renderable-actor.h>
-#include <dali/integration-api/debug.h>
-#include <dali/integration-api/gl-abstraction.h>
-#include <dali/internal/render/common/performance-monitor.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/gl-abstraction.h>
+#include <dali/internal/render/common/performance-monitor.h>
+#include <dali/internal/render/gl-resources/texture-units.h>
 
 namespace Dali
 {
@@ -64,7 +65,7 @@ public:
    */
   static const unsigned int MAX_ATTRIBUTE_CACHE_SIZE = 8;
 
-  static const unsigned int MAX_TEXTURE_UNITS = 8; // for GLES 2.0 its 8, which is more than DALi uses anyways
+  static const unsigned int MAX_TEXTURE_UNITS = 8; // for GLES 2.0 8 is guaranteed, which is more than DALi uses anyways
 
   /**
    * Creates the Dali Context object.
@@ -148,16 +149,13 @@ public:
   /**
    * Wrapper for OpenGL ES 2.0 glActiveTexture()
    */
-  void ActiveTexture(GLenum textureUnit)
+  void ActiveTexture( TextureUnit textureUnit )
   {
-    // GL texture units are #defines in growing order to converting that to index
-    unsigned int unit = textureUnit - GL_TEXTURE0;
-
-    if ( unit != mActiveTextureUnit )
+    if ( textureUnit != mActiveTextureUnit )
     {
-      mActiveTextureUnit = unit;
+      mActiveTextureUnit = textureUnit;
       LOG_GL("ActiveTexture %x\n", textureUnit);
-      CHECK_GL( *this, mGlAbstraction.ActiveTexture(textureUnit) );
+      CHECK_GL( *this, mGlAbstraction.ActiveTexture(TextureUnitAsGLenum(textureUnit)) );
     }
   }
 
@@ -271,8 +269,22 @@ public:
   }
 
   /**
-   * The wrapper for OpenGL ES 2.0 glBindTexture() has been replaced by Bind2dTexture and BindCubeMapTexture.
+   * Helper to bind texture for rendering. If given texture is
+   * already bound in the given textureunit, this method does nothing.
+   * Otherwise changes the active texture unit and binds the texture.
+   * Note! after this call active texture unit may not necessarily be the one
+   * passed in as argument so you cannot change texture unit state!!
+   * @param textureunit to bind to
+   * @param texture to bind
    */
+  void BindTextureForUnit( TextureUnit textureunit, GLuint texture )
+  {
+    if( mBound2dTextureId[ textureunit ] != texture )
+    {
+      ActiveTexture( textureunit );
+      Bind2dTexture( texture );
+    }
+  }
 
   /**
    * Wrapper for OpenGL ES 2.0 glBindTexture(GL_TEXTURE_2D)
@@ -1798,7 +1810,7 @@ private: // Data
   GLuint mBoundTransformFeedbackBufferId; ///< The ID passed to glBindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER)
 
   // glBindTexture() state
-  unsigned int mActiveTextureUnit;
+  TextureUnit mActiveTextureUnit;
   GLuint mBound2dTextureId[ MAX_TEXTURE_UNITS ];  ///< The ID passed to glBindTexture(GL_TEXTURE_2D)
 
   // glBlendColor() state

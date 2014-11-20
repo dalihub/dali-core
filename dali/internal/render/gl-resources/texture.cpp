@@ -128,7 +128,7 @@ bool Texture::UpdateOnCreate()
   return false;
 }
 
-bool Texture::Bind(GLenum target, GLenum textureunit )
+bool Texture::Bind(GLenum target, TextureUnit textureunit )
 {
   // This is the only supported type at the moment
   DALI_ASSERT_DEBUG( target == GL_TEXTURE_2D );
@@ -143,8 +143,7 @@ bool Texture::Bind(GLenum target, GLenum textureunit )
   }
 
   // Bind the texture id
-  mContext.ActiveTexture(textureunit);
-  mContext.Bind2dTexture(mId);
+  mContext.BindTextureForUnit(textureunit, mId );
 
   return created;
 }
@@ -261,28 +260,31 @@ void Texture::GetDefaultTextureCoordinates(UvRect& uv) const
 
 }
 
-void Texture::ApplyTextureParameter( GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault )
+void Texture::ApplyTextureParameter( TextureUnit unit, GLint filterType, FilterMode::Type currentFilterMode, FilterMode::Type newFilterMode, GLint daliDefault, GLint systemDefault )
 {
   GLint newFilterModeGL = FilterModeToGL( newFilterMode, daliDefault, systemDefault );
   GLint currentFilterModeGL = FilterModeToGL( currentFilterMode, daliDefault, systemDefault );
 
   if( newFilterModeGL != currentFilterModeGL )
   {
+    mContext.ActiveTexture( unit );
     mContext.TexParameteri( GL_TEXTURE_2D, filterType, newFilterModeGL );
   }
 }
 
-void Texture::ApplySampler( unsigned int samplerBitfield )
+void Texture::ApplySampler( TextureUnit unit, unsigned int samplerBitfield )
 {
   if( mSamplerBitfield != samplerBitfield && mId != 0 )
   {
-    ApplyTextureParameter( GL_TEXTURE_MIN_FILTER,
+    ApplyTextureParameter( unit,
+                           GL_TEXTURE_MIN_FILTER,
                            ImageSampler::GetMinifyFilterMode( mSamplerBitfield ),
                            ImageSampler::GetMinifyFilterMode( samplerBitfield ),
                            DALI_MINIFY_DEFAULT,
                            SYSTEM_MINIFY_DEFAULT );
 
-    ApplyTextureParameter( GL_TEXTURE_MAG_FILTER,
+    ApplyTextureParameter( unit,
+                           GL_TEXTURE_MAG_FILTER,
                            ImageSampler::GetMagnifyFilterMode( mSamplerBitfield ),
                            ImageSampler::GetMagnifyFilterMode( samplerBitfield ),
                            DALI_MAGNIFY_DEFAULT,

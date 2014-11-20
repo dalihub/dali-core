@@ -127,7 +127,17 @@ void MessageBuffer::IncreaseCapacity( std::size_t newCapacity )
   if ( mData )
   {
     // Often this avoids the need to copy memory
+
+    unsigned int* oldData = mData;
     mData = reinterpret_cast<unsigned int*>( realloc( mData, newCapacity * sizeof(unsigned int) ) );
+
+    // if realloc fails the old data is still valid
+    if( !mData )
+    {
+      // TODO: Process message queue to free up some data?
+      free(oldData);
+      DALI_ASSERT_DEBUG( false && "Realloc failed we're out of memory!" );
+    }
   }
   else
   {

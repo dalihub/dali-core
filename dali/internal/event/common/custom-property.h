@@ -74,7 +74,7 @@ public:
    */
   CustomProperty(const std::string& newName,
                   Property::Type newType,
-                  SceneGraph::PropertyBase* newProperty)
+                  const SceneGraph::PropertyBase* newProperty)
   : name(newName),
     type(newType),
     mProperty(newProperty),
@@ -111,14 +111,14 @@ public:
 
   Property::Value value ; ///< The property value for a non animatable and custom property
 
-  SceneGraph::PropertyBase* GetSceneGraphProperty() const
+  const SceneGraph::PropertyBase* GetSceneGraphProperty() const
   {
     DALI_ASSERT_DEBUG(mProperty && "Get on uninitialized SceneGraph property") ;
     return mProperty ;
   }
 
 private:
-  SceneGraph::PropertyBase* mProperty; ///< A pointer to a scene-graph property; should not be modified from actor-thread.
+  const SceneGraph::PropertyBase* mProperty; ///< A pointer to a scene-graph property; should not be modified from actor-thread.
   Property::AccessMode mAccessMode; ///< The mode of the property
 };
 

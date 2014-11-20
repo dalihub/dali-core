@@ -310,10 +310,10 @@ void Shader::SetUniforms( Context& context,
   if( mTexture )
   {
     // got effect texture, bind it to texture unit 1
-    mTextureCache->BindTexture( mTexture, mRenderTextureId, GL_TEXTURE_2D, TextureUnitAsGLenum( TEXTURE_UNIT_SHADER ) );
+    mTextureCache->BindTexture( mTexture, mRenderTextureId, GL_TEXTURE_2D, TEXTURE_UNIT_SHADER);
 
     // Just apply the default sampling options for now
-    mTexture->ApplySampler( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
+    mTexture->ApplySampler( TEXTURE_UNIT_SHADER, ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) );
 
     // get effect sampler uniform
     const GLint loc = program.GetUniformLocation( Program::UNIFORM_EFFECT_SAMPLER );

@@ -243,14 +243,14 @@ ShaderEffect::ShaderEffect( UpdateManager& updateManager, Dali::ShaderEffect::Ge
 
 ShaderEffect::~ShaderEffect()
 {
-  DALI_ASSERT_DEBUG( mSceneObject != NULL );
-
   // Guard to allow handle destruction after Core has been destroyed
   if ( Stage::IsInstalled() )
   {
     // Remove scene-object using a message to the UpdateManager
-    RemoveShaderMessage( mUpdateManager, *mSceneObject );
-
+    if( mSceneObject )
+    {
+      RemoveShaderMessage( mUpdateManager, *mSceneObject );
+    }
     UnregisterObject();
   }
 }
