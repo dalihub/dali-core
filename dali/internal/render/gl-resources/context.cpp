@@ -345,6 +345,9 @@ void Context::ResetGlState()
   // get maximum texture size
   mGlAbstraction.GetIntegerv(GL_MAX_TEXTURE_SIZE, &mMaxTextureSize);
 
+  // reset any potential previous errors
+  mGlAbstraction.GetError();
+
   GLint numProgramBinaryFormats;
   mGlAbstraction.GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &numProgramBinaryFormats);
   if( GL_NO_ERROR == mGlAbstraction.GetError() && 0 != numProgramBinaryFormats )

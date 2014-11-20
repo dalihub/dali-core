@@ -461,7 +461,11 @@ void Program::Load()
 {
   DALI_ASSERT_ALWAYS( NULL != mProgramData.Get() && "Program data is not initialized" );
 
-  Unload();
+  // If already linked don't do anything
+  if( mLinked )
+  {
+    return;
+  }
 
   LOG_GL( "CreateProgram()\n" );
   mProgramId = CHECK_GL( mContext, mGlAbstraction.CreateProgram() );
