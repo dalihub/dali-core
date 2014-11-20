@@ -52,10 +52,67 @@ enum PositionInheritanceMode
 enum SizeMode
 {
   USE_OWN_SIZE,                            ///< The mode is bypassed. The size Vector3 will be used as normal.
-  SIZE_EQUAL_TO_PARENT,                    ///< The actor will have the exact same size as the parent.
   SIZE_RELATIVE_TO_PARENT,                 ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ).
   SIZE_FIXED_OFFSET_FROM_PARENT            ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ).
 };
+
+/**
+ * @brief Dimensions for layout
+ */
+enum Dimension
+{
+  WIDTH  = 0x1,       ///< Width dimension
+  HEIGHT = 0x2,       ///< Height dimension
+
+  DIMENSION_COUNT = 2,  ///< Number of dimensions - update this if adding new dimension
+  ALL_DIMENSIONS = 0x3  ///< Mask to cover all flags
+};
+
+/**
+ * @brief Size negotiation resize policies
+ */
+enum ResizePolicy
+{
+  FIXED,                 ///< Size is fixed as set by SetSize
+  USE_NATURAL_SIZE,      ///< Size is to use the actor's natural size
+  USE_ASSIGNED_SIZE,     ///< The size will be assigned to the actor
+  FILL_TO_PARENT,        ///< Size is to fill up to the actor's parent's bounds. Aspect ratio not maintained.
+  FIT_TO_CHILDREN,       ///< Size will adjust to wrap around all children
+  DIMENSION_DEPENDENCY   ///< One dimension is dependent on the other
+};
+
+/**
+ * @brief Policies to determine how an actor should resize itself when having its size set in size negotiation
+ */
+enum SizeScalePolicy
+{
+  USE_SIZE_SET,                ///< Use the size that was set
+  FIT_WITH_ASPECT_RATIO,       ///< Fit within the size set maintaining natural size aspect ratio
+  FILL_WITH_ASPECT_RATIO       ///< Fill up the size set maintaining natural size aspect ratio. May exceed size bounds in one dimension.
+};
+
+/**
+ * @brief Different types of alignment.
+ */
+namespace HorizontalAlignment
+{
+enum Type
+{
+  LEFT,         ///< Align horizontally left
+  CENTER,       ///< Align horizontally center
+  RIGHT         ///< Align horiztonally right
+};
+}
+
+namespace VerticalAlignment
+{
+enum Type
+{
+  TOP,          ///< Align vertically top
+  CENTER,       ///< Align vertically center
+  BOTTOM        ///< Align vertically bottom
+};
+}
 
 } // namespace Dali
 

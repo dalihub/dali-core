@@ -189,9 +189,9 @@ void Actor::SetSize(const Vector3& size)
   GetImplementation(*this).SetSize(size);
 }
 
-Vector3 Actor::GetSize() const
+Vector3 Actor::GetTargetSize() const
 {
-  return GetImplementation(*this).GetSize();
+  return GetImplementation(*this).GetTargetSize();
 }
 
 Vector3 Actor::GetCurrentSize() const
@@ -464,6 +464,135 @@ bool Actor::IsKeyboardFocusable() const
   return GetImplementation(*this).IsKeyboardFocusable();
 }
 
+void Actor::SetRelayoutEnabled( bool enabled )
+{
+  GetImplementation(*this).SetRelayoutEnabled( enabled );
+}
+
+bool Actor::IsRelayoutEnabled() const
+{
+  return GetImplementation(*this).IsRelayoutEnabled();
+}
+
+void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
+{
+  GetImplementation(*this).SetResizePolicy( policy, dimension );
+}
+
+ResizePolicy Actor::GetResizePolicy( Dimension dimension ) const
+{
+  return GetImplementation(*this).GetResizePolicy( dimension );
+}
+
+void Actor::SetSizeScalePolicy( SizeScalePolicy policy )
+{
+  GetImplementation(*this).SetSizeScalePolicy( policy );
+}
+
+SizeScalePolicy Actor::GetSizeScalePolicy() const
+{
+  return GetImplementation(*this).GetSizeScalePolicy();
+}
+
+void Actor::SetDimensionDependency( Dimension dimension, Dimension dependency )
+{
+  GetImplementation(*this).SetDimensionDependency( dimension, dependency );
+}
+
+Dimension Actor::GetDimensionDependency( Dimension dimension )
+{
+  return GetImplementation(*this).GetDimensionDependency( dimension );
+}
+
+float Actor::GetHeightForWidth( float width )
+{
+  return GetImplementation(*this).GetHeightForWidth( width );
+}
+
+float Actor::GetWidthForHeight( float height )
+{
+  return GetImplementation(*this).GetWidthForHeight( height );
+}
+
+float Actor::GetRelayoutSize( Dimension dimension ) const
+{
+  return GetImplementation(*this).GetRelayoutSize( dimension );
+}
+
+void Actor::RelayoutRequestTree()
+{
+  GetImplementation(*this).RelayoutRequestTree();
+}
+
+void Actor::PropagateRelayoutFlags()
+{
+  GetImplementation(*this).PropagateRelayoutFlags();
+}
+
+void Actor::SetPadding( const Padding& padding )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  Vector2 widthPadding( padding.left, padding.right );
+  impl.SetPadding( widthPadding, WIDTH );
+
+  Vector2 heightPadding( padding.bottom, padding.top );
+  impl.SetPadding( heightPadding, HEIGHT );
+}
+
+void Actor::GetPadding( Padding& paddingOut ) const
+{
+  const Internal::Actor& impl = GetImplementation(*this);
+
+  Vector2 widthPadding = impl.GetPadding( WIDTH );
+  Vector2 heightPadding = impl.GetPadding( HEIGHT );
+
+  paddingOut.left = widthPadding.x;
+  paddingOut.right = widthPadding.y;
+  paddingOut.bottom = heightPadding.x;
+  paddingOut.top = heightPadding.y;
+}
+
+void Actor::SetPreferredSize( const Vector2& size )
+{
+  GetImplementation(*this).SetPreferredSize( size );
+}
+
+Vector2 Actor::GetPreferredSize() const
+{
+  return GetImplementation(*this).GetPreferredSize();
+}
+
+void Actor::SetMinimumSize( const Vector2& size )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  impl.SetMinimumSize( size.x, WIDTH );
+  impl.SetMinimumSize( size.y, HEIGHT );
+}
+
+Vector2 Actor::GetMinimumSize()
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  return Vector2( impl.GetMinimumSize( WIDTH ), impl.GetMinimumSize( HEIGHT ) );
+}
+
+void Actor::SetMaximumSize( const Vector2& size )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  impl.SetMaximumSize( size.x, WIDTH );
+  impl.SetMaximumSize( size.y, HEIGHT );
+}
+
+Vector2 Actor::GetMaximumSize()
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  return Vector2( impl.GetMaximumSize( WIDTH ), impl.GetMaximumSize( HEIGHT ) );
+}
+
 Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
@@ -487,6 +616,11 @@ Actor::OnStageSignalType& Actor::OnStageSignal()
 Actor::OffStageSignalType& Actor::OffStageSignal()
 {
   return GetImplementation(*this).OffStageSignal();
+}
+
+Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
+{
+  return GetImplementation(*this).OnRelayoutSignal();
 }
 
 Actor::Actor(Internal::Actor* internal)

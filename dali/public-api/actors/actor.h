@@ -60,6 +60,7 @@ typedef std::vector<Actor> ActorContainer;
 typedef ActorContainer::iterator ActorIter; ///< Iterator for Dali::ActorContainer
 typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for Dali::ActorContainer
 
+typedef Rect<float> Padding;      ///< Padding definition
 
 /**
  * @brief Actor is the primary object with which Dali applications interact.
@@ -295,6 +296,16 @@ public:
       DRAW_MODE,                                          ///< name "draw-mode",             type std::string
       SIZE_MODE,                                          ///< name "size-mode",             type std::string
       SIZE_MODE_FACTOR,                                   ///< name "size-mode-factor",      type Vector3
+      RELAYOUT_ENABLED,                                   ///< name "relayout-enabled",      type Boolean
+      WIDTH_RESIZE_POLICY,                                ///< name "width-resize-policy",   type String
+      HEIGHT_RESIZE_POLICY,                               ///< name "height-resize-policy",  type String
+      SIZE_SCALE_POLICY,                                  ///< name "size-scale-policy",     type String
+      WIDTH_FOR_HEIGHT,                                   ///< name "width-for-height",      type Boolean
+      HEIGHT_FOR_WIDTH,                                   ///< name "height-for-width",      type Boolean
+      PADDING,                                            ///< name "padding",               type Vector4
+      MINIMUM_SIZE,                                       ///< name "minimum-size",          type Vector2
+      MAXIMUM_SIZE,                                       ///< name "maximum-size",          type Vector2
+      PREFERRED_SIZE                                      ///< name "preferred-size",        type Vector2
     };
   };
 
@@ -305,6 +316,7 @@ public:
   typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType; ///< Mousewheel signal type
   typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type
   typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type
+  typedef Signal< void (Actor) > OnRelayoutSignalType; ///< Called when the actor is relaid out
 
   // Creation
 
@@ -621,7 +633,7 @@ public:
    * @note This return is the value that was set using SetSize or the target size of an animation
    * @return The actor's current size.
    */
-  Vector3 GetSize() const;
+  Vector3 GetTargetSize() const;
 
   /**
    * @brief Retrieve the actor's size.
@@ -912,58 +924,6 @@ public:
   bool IsScaleInherited() const;
 
   /**
-   * @brief Defines how a child actor's size is affected by its parent's size.
-   *
-   * The default is to ignore the parent's size and use the size property of this actor.
-   *
-   * If USE_OWN_SIZE is used, this option is bypassed and the actor's size
-   *     property is used.
-   *
-   * If SIZE_EQUAL_TO_PARENT is used, this actor's size will be equal to that
-   *     of its parent. The actor's size property is ignored.
-   *
-   * If SIZE_RELATIVE_TO_PARENT is used, this actor's size will be based on
-   *     its parent's size by multiplying the parent size by
-   *     SizeModeFactor.
-   *
-   * If SIZE_FIXED_OFFSET_FROM_PARENT is used, this actor's size will be based on
-   *     its parent's size plus SizeModeFactor.
-   *
-   * @pre The Actor has been initialized.
-   * @param[in] mode The size relative to parent mode to use.
-   */
-  void SetSizeMode(const SizeMode mode);
-
-  /**
-   * @brief Returns the actor's mode for modifying its size relative to its parent.
-   *
-   * @pre The Actor has been initialized.
-   * @return The mode used.
-   */
-  SizeMode GetSizeMode() const;
-
-  /**
-   * @brief Sets the relative to parent size factor of the actor.
-   *
-   * This factor is only used when SizeMode is set to either:
-   * SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
-   * This actor's size is set to the actor's parent size multipled by or added to this factor,
-   * depending on SideMode (See SetSizeMode).
-   *
-   * @pre The Actor has been initialized.
-   * @param [in] factor A Vector3 representing the relative factor to be applied to each axis.
-   */
-  void SetSizeModeFactor(const Vector3& factor);
-
-  /**
-   * @brief Retrieve the relative to parent size factor of the actor.
-   *
-   * @pre The Actor has been initialized.
-   * @return The Actor's current relative size factor.
-   */
-  Vector3 GetSizeModeFactor() const;
-
-  /**
    * @brief Retrieves the world-matrix of the actor.
    *
    * @note The actor will not have a world-matrix, unless it has previously been added to the stage.
@@ -1183,6 +1143,215 @@ public:
    */
   bool IsKeyboardFocusable() const;
 
+  // SIZE NEGOTIATION
+
+  /**
+   * @brief Set if the actor should do relayout in size negotiation or not.
+   *
+   * @param[in] enabled Flag to specify if actor should do relayout or not.
+   */
+  void SetRelayoutEnabled( bool enabled );
+
+  /**
+   * @brief Is the actor included in relayout or not.
+   *
+   * @return Return if the actor is involved in size negotiation or not.
+   */
+  bool IsRelayoutEnabled() const;
+
+  /**
+   * Set the resize policy to be used for the given dimension(s)
+   *
+   * @param[in] policy The resize policy to use
+   * @param[in] dimension The dimension(s) to set policy for. Can be a bitfield of multiple dimensions.
+   */
+  void SetResizePolicy( ResizePolicy policy, Dimension dimension );
+
+  /**
+   * Return the resize policy used for a single dimension
+   *
+   * @param[in] dimension The dimension to get policy for
+   * @return Return the dimension resize policy
+   */
+  ResizePolicy GetResizePolicy( Dimension dimension ) const;
+
+  /**
+   * @brief Set the policy to use when setting size with size negotiation. Defaults to USE_SIZE_SET.
+   *
+   * @param[in] policy The policy to use for when the size is set
+   */
+  void SetSizeScalePolicy( SizeScalePolicy policy );
+
+  /**
+   * @brief Return the size set policy in use
+   *
+   * @return Return the size set policy
+   */
+  SizeScalePolicy GetSizeScalePolicy() const;
+
+  /**
+   * @brief Defines how a child actor's size is affected by its parent's size.
+   *
+   * The default is to ignore the parent's size and use the size property of this actor.
+   *
+   * If USE_OWN_SIZE is used, this option is bypassed and the actor's size
+   *     property is used.
+   *
+   * If SIZE_RELATIVE_TO_PARENT is used, this actor's size will be based on
+   *     its parent's size by multiplying the parent size by
+   *     SizeModeFactor.
+   *
+   * If SIZE_FIXED_OFFSET_FROM_PARENT is used, this actor's size will be based on
+   *     its parent's size plus SizeModeFactor.
+   *
+   * @pre The Actor has been initialized.
+   * @param[in] mode The size relative to parent mode to use.
+   */
+  void SetSizeMode( const SizeMode mode );
+
+  /**
+   * @brief Returns the actor's mode for modifying its size relative to its parent.
+   *
+   * @pre The Actor has been initialized.
+   * @return The mode used.
+   */
+  SizeMode GetSizeMode() const;
+
+  /**
+   * @brief Sets the relative to parent size factor of the actor.
+   *
+   * This factor is only used when SizeMode is set to either:
+   * SIZE_RELATIVE or SIZE_FIXED_OFFSET.
+   * This actor's size is set to the actor's size multipled by or added to this factor,
+   * depending on SideMode (See SetSizeMode).
+   *
+   * @pre The Actor has been initialized.
+   * @param [in] factor A Vector3 representing the relative factor to be applied to each axis.
+   */
+  void SetSizeModeFactor( const Vector3& factor );
+
+  /**
+   * @brief Retrieve the relative to parent size factor of the actor.
+   *
+   * @pre The Actor has been initialized.
+   * @return The Actor's current relative size factor.
+   */
+  Vector3 GetSizeModeFactor() const;
+
+  /**
+   * @brief This method specifies a dependency between dimensions. Will set resize policy on the actor for
+   * the given dimension to be DIMENSION_DEPENDENCY.
+   *
+   * @param[in] dimension The dimension to set the dependency on
+   * @param[in] dependency The dependency to set on the dimension
+   */
+  void SetDimensionDependency( Dimension dimension, Dimension dependency );
+
+  /**
+   * @brief Return the dependecy for a dimension
+   *
+   * @param[in] dimension The dimension to return the dependency for
+   * @return Return the dependency
+   */
+  Dimension GetDimensionDependency( Dimension dimension );
+
+  /**
+   * @brief Calculate the height of the actor given a width
+   *
+   * @param width Width to use
+   * @return Return the height based on the width
+   */
+  float GetHeightForWidth( float width );
+
+  /**
+   * @brief Calculate the width of the actor given a height
+   *
+   * @param height Height to use
+   * @return Return the width based on the height
+   */
+  float GetWidthForHeight( float height );
+
+  /**
+   * Return the value of negotiated dimension for the given dimension
+   *
+   * @param dimension The dimension to retrieve
+   * @return Return the value of the negotiated dimension
+   */
+  float GetRelayoutSize( Dimension dimension ) const;
+
+  /**
+   * @brief Request to relayout of all actors in the sub-tree below the given actor.
+   *
+   * This flags the actor and all actors below it for relayout. The actual
+   * relayout is performed at the end of the frame. This means that multiple calls to relayout
+   * will not cause multiple relayouts to occur.
+   */
+  void RelayoutRequestTree();
+
+  /**
+   * @brief Force propagate relayout flags through the tree. This actor and all actors
+   * dependent on it will have their relayout flags reset.
+   *
+   * This is useful for resetting layout flags during the layout process.
+   */
+  void PropagateRelayoutFlags();
+
+  /**
+   * @brief Set the padding for use in layout
+   *
+   * @param[in] padding Padding for the actor
+   */
+  void SetPadding( const Padding& padding );
+
+  /**
+   * Return the value of the padding
+   *
+   * @param paddingOut The returned padding data
+   */
+  void GetPadding( Padding& paddingOut ) const;
+
+  /**
+   * @brief Set the preferred size for size negotiation
+   *
+   * @param[in] size The preferred size to set
+   */
+  void SetPreferredSize( const Vector2& size );
+
+  /**
+   * @brief Return the preferred size used for size negotiation
+   *
+   * @return Return the preferred size
+   */
+  Vector2 GetPreferredSize() const;
+
+  /**
+   * @brief Set the minimum size an actor can be assigned in size negotiation
+   *
+   * @param[in] size The minimum size
+   */
+  void SetMinimumSize( const Vector2& size );
+
+  /**
+   * @brief Return the minimum relayout size
+   *
+   * @return Return the mininmum size
+   */
+  Vector2 GetMinimumSize();
+
+  /**
+   * @brief Set the maximum size an actor can be assigned in size negotiation
+   *
+   * @param[in] size The maximum size
+   */
+  void SetMaximumSize( const Vector2& size );
+
+  /**
+   * @brief Return the maximum relayout size
+   *
+   * @return Return the maximum size
+   */
+  Vector2 GetMaximumSize();
+
 public: // Signals
 
   /**
@@ -1267,6 +1436,13 @@ public: // Signals
    * @return The signal
    */
   OffStageSignalType& OffStageSignal();
+
+  /**
+   * @brief This signal is emitted after the size has been set on the actor during relayout
+   *
+   * @return Return the signal
+   */
+  OnRelayoutSignalType& OnRelayoutSignal();
 
 public: // Not intended for application developers
 

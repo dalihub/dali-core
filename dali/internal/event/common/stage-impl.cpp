@@ -97,6 +97,7 @@ void Stage::Initialize()
   // The stage owns the default layer
   mRootLayer = Layer::NewRoot( *mLayerList, mUpdateManager, false/*not system-level*/ );
   mRootLayer->SetName("RootLayer");
+  mRootLayer->SetRelayoutEnabled( false );   // Exclude from size negotiation
 
   // Create the default camera actor first; this is needed by the RenderTaskList
   CreateDefaultCameraActor();

@@ -73,6 +73,8 @@ void TestApplication::Initialize()
 
   Dali::Integration::Log::LogFunction logFunction(&TestApplication::LogMessage);
   Dali::Integration::Log::InstallLogFunction(logFunction);
+
+  mCore->SceneCreated();
 }
 
 TestApplication::~TestApplication()

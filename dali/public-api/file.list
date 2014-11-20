@@ -264,6 +264,9 @@ public_api_core_shader_effects_header_files = \
 public_api_core_scripting_header_files = \
   $(public_api_src_dir)/scripting/scripting.h
 
+public_api_core_size_negotiation_header_files = \
+  $(public_api_src_dir)/size-negotiation/relayout-container.h
+
 public_api_core_signals_header_files = \
   $(public_api_src_dir)/signals/base-signal.h \
   $(public_api_src_dir)/signals/callback.h \
