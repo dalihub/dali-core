@@ -31,6 +31,7 @@ namespace SceneGraph
 
 namespace
 {
+/* rewritten in another patch
 #if defined ( DEBUG_ENABLED )
 
 // Create shader for debug drawing
@@ -52,16 +53,17 @@ const std::string DEBUG_DRAW_FRAGMENT_SHADER(
 static Program* gDebugProgram(NULL); ///< a simple debug shader
 
 #endif
+*/
 } // anonymous namespace
 
 void DebugBoundingBox(Context& context, Rect<float> boundingBox, const Matrix& mvp)
 {
+/* rewritten in another patch
 #if defined ( DEBUG_ENABLED )
   if( gDebugProgram == NULL )
   {
     Integration::ShaderDataPtr shaderData( new Integration::ShaderData( DEBUG_DRAW_VERTEX_SHADER, DEBUG_DRAW_FRAGMENT_SHADER ) );
-    const Integration::ResourceId dummyId(99999999);
-    gDebugProgram = Program::New( dummyId, shaderData.Get(), context, true );
+    gDebugProgram = Program::New( shaderData.Get(), context, true );
   }
 
   context.SetBlend( false );
@@ -107,6 +109,7 @@ void DebugBoundingBox(Context& context, Rect<float> boundingBox, const Matrix& m
 
   context.DisableVertexAttributeArray( positionLoc );
 #endif
+*/
 }
 
 

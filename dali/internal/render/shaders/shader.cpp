@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/render-debug.h>
-#include <dali/internal/render/common/post-process-resource-dispatcher.h>
+#include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
@@ -108,7 +108,6 @@ Shader::Shader( Dali::ShaderEffect::GeometryHints& hints )
   mRenderTextureId( 0 ),
   mUpdateTextureId( 0 ),
   mRenderQueue(NULL),
-  mPostProcessDispatcher(NULL),
   mTextureCache(NULL)
 {
   // Create enough size for all default types and sub-types
@@ -123,9 +122,8 @@ Shader::~Shader()
 {
 }
 
-void Shader::Initialize( PostProcessResourceDispatcher& postProcessDispatcher, RenderQueue& renderQueue, TextureCache& textureCache )
+void Shader::Initialize( RenderQueue& renderQueue, TextureCache& textureCache )
 {
-  mPostProcessDispatcher = &postProcessDispatcher;
   mRenderQueue = &renderQueue;
   mTextureCache = &textureCache;
 }
@@ -225,14 +223,12 @@ void Shader::SetProgram( GeometryType geometryType,
                          ShaderSubTypes subType,
                          Integration::ResourceId resourceId,
                          Integration::ShaderDataPtr shaderData,
-                         Context* context,
+                         ProgramCache* programCache,
                          bool modifiesGeometry )
 {
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d %d\n", (int)geometryType, resourceId);
 
-  bool precompiledBinary = shaderData->HasBinary();
-
-  Program* program = Program::New( resourceId, shaderData, *context, modifiesGeometry );
+  Program* program = Program::New( *programCache, shaderData, modifiesGeometry );
 
   ShaderSubTypes theSubType = subType;
   if( subType == SHADER_SUBTYPE_ALL )
@@ -251,21 +247,6 @@ void Shader::SetProgram( GeometryType geometryType,
   {
     mPrograms[geometryIndex][theSubType] = program;
     mPrograms[geometryIndex].mUseDefaultForAllSubtypes = false;
-  }
-
-  // if platform supports program binaries and we haven't yet saved a binary
-  if( context->CachedNumberOfProgramBinaryFormats() > 0 && !precompiledBinary )
-  {
-    // this is the first time this shader is being used so force compilation
-    program->Load();
-
-    // The binary should now have been compiled/linked, so save it
-    if( shaderData->HasBinary() )
-    {
-      DALI_ASSERT_DEBUG( mPostProcessDispatcher != NULL );
-      ResourcePostProcessRequest request( resourceId, ResourcePostProcessRequest::SAVE );
-      mPostProcessDispatcher->DispatchPostProcessRequest( request );
-    }
   }
 }
 

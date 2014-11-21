@@ -19,12 +19,12 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/math/rect.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
-#include <dali/public-api/math/rect.h>
 
 namespace Dali
 {
@@ -40,6 +40,7 @@ struct Vector4;
 namespace Internal
 {
 class Context;
+class ProgramCache;
 
 namespace SceneGraph
 {
@@ -84,13 +85,6 @@ public:
    * @return The texture cache
    */
   TextureCache& GetTextureCache();
-
-  /**
-   * Retrieves the context. Can only be called inside render thread
-   * TODO remove this when programs are initialized in render thread
-   * @return reference to the context
-   */
-  Context& GetContext();
 
   /**
    * @copydoc Dali::Integration::Core::ContextCreated()
@@ -184,6 +178,12 @@ public:
    * @param[in] shader that is the default one
    */
   void SetDefaultShader( Shader* shader );
+
+  /**
+   * returns the Program controller for sending program messages
+   * @return the ProgramController
+   */
+  ProgramCache* GetProgramCache();
 
   // This method should be called from Core::Render()
 

@@ -20,12 +20,10 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
-#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/compile-time-assert.h>
-#include <dali/internal/render/shaders/program.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/integration-api/debug.h>
@@ -58,20 +56,10 @@ errorStrings errors[] =
    { GL_OUT_OF_MEMORY,      "GL_OUT_OF_MEMORY" }
 };
 
-/*
- * Called by std::for_each from ~Context
- */
-void deletePrograms(std::pair< std::size_t, Program* > hashProgram)
-{
-  DALI_ASSERT_DEBUG( hashProgram.second );
-  delete hashProgram.second;
-}
-
 } // unnamed namespace
 
 #ifdef DEBUG_ENABLED
-Debug::Filter* Context::gGlLogFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CONTEXT");
-Debug::Filter* gContextLogFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CONTEXT_META");
+Debug::Filter* gContextLogFilter = Debug::Filter::New(Debug::Concise, false, "LOG_CONTEXT_STATE");
 #endif
 
 Context::Context(Integration::GlAbstraction& glAbstraction)
@@ -104,7 +92,6 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mClearColor(Color::WHITE),    // initial color, never used until it's been set by the user
   mCullFaceMode(CullNone),
   mViewPort( 0, 0, 0, 0 ),
-  mCurrentProgram( NULL ),
   mFrameCount( 0 ),
   mCulledCount( 0 ),
   mRendererCount( 0 )
@@ -113,9 +100,6 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
 
 Context::~Context()
 {
-  // release the cached programs
-  std::for_each(mProgramCache.begin(), mProgramCache.end(), deletePrograms);
-  mProgramCache.clear();
 }
 
 void Context::GlContextCreated()
@@ -129,20 +113,14 @@ void Context::GlContextCreated()
   // Set the initial GL state, and check it.
   ResetGlState();
 
-  // Programs now load on demand
+#ifdef DEBUG_ENABLED
+  PrintCurrentState();
+#endif
 }
 
 void Context::GlContextDestroyed()
 {
   DALI_LOG_INFO(gContextLogFilter, Debug::Verbose, "Context::GlContextDestroyed()\n");
-  SetCurrentProgram( NULL );
-  // Inform programs they are no longer valid
-  const ProgramContainer::iterator endp = mProgramCache.end();
-  for ( ProgramContainer::iterator itp = mProgramCache.begin(); itp != endp; ++itp )
-  {
-    (*itp).second->GlContextDestroyed();
-  }
-
   mGlContextCreated = false;
 }
 
@@ -156,32 +134,6 @@ const char* Context::ErrorToString( GLenum errorCode )
     }
   }
   return "Unknown Open GLES error";
-}
-
-void Context::ResetProgramMatrices()
-{
-  const ProgramContainer::iterator endp = mProgramCache.end();
-  for ( ProgramContainer::iterator itp = mProgramCache.begin(); itp != endp; ++itp )
-  {
-    (*itp).second->SetProjectionMatrix( NULL );
-    (*itp).second->SetViewMatrix( NULL );
-  }
-}
-
-Program* Context::GetCachedProgram( std::size_t hash ) const
-{
-  std::map< std::size_t, Program* >::const_iterator iter = mProgramCache.find(hash);
-
-  if (iter != mProgramCache.end())
-  {
-     return iter->second;
-  }
-  return NULL;
-}
-
-void Context::CacheProgram( std::size_t hash, Program* pointer )
-{
-  mProgramCache[ hash ] = pointer;
 }
 
 const Rect< int >& Context::GetViewport()
@@ -203,12 +155,12 @@ void Context::FlushVertexAttributeLocations()
       if (mVertexAttributeCurrentState[ i ] )
       {
         LOG_GL("EnableVertexAttribArray %d\n", i);
-        CHECK_GL( *this, mGlAbstraction.EnableVertexAttribArray( i ) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.EnableVertexAttribArray( i ) );
       }
       else
       {
         LOG_GL("DisableVertexAttribArray %d\n", i);
-        CHECK_GL( *this, mGlAbstraction.DisableVertexAttribArray( i ) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.DisableVertexAttribArray( i ) );
       }
     }
   }
@@ -224,12 +176,12 @@ void Context::SetVertexAttributeLocation(unsigned int location, bool state)
     if ( state )
     {
        LOG_GL("EnableVertexAttribArray %d\n", location);
-       CHECK_GL( *this, mGlAbstraction.EnableVertexAttribArray( location ) );
+       CHECK_GL( mGlAbstraction, mGlAbstraction.EnableVertexAttribArray( location ) );
     }
     else
     {
       LOG_GL("DisableVertexAttribArray %d\n", location);
-      CHECK_GL( *this, mGlAbstraction.DisableVertexAttribArray( location ) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.DisableVertexAttribArray( location ) );
     }
   }
   else
@@ -249,7 +201,7 @@ void Context::ResetVertexAttributeState()
     mVertexAttributeCurrentState[ i ] = false;
 
     LOG_GL("DisableVertexAttribArray %d\n", i);
-    CHECK_GL( *this, mGlAbstraction.DisableVertexAttribArray( i ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DisableVertexAttribArray( i ) );
   }
 }
 
@@ -345,29 +297,19 @@ void Context::ResetGlState()
   // get maximum texture size
   mGlAbstraction.GetIntegerv(GL_MAX_TEXTURE_SIZE, &mMaxTextureSize);
 
-  // reset any potential previous errors
-  mGlAbstraction.GetError();
-
-  GLint numProgramBinaryFormats;
-  mGlAbstraction.GetIntegerv(GL_NUM_PROGRAM_BINARY_FORMATS_OES, &numProgramBinaryFormats);
-  if( GL_NO_ERROR == mGlAbstraction.GetError() && 0 != numProgramBinaryFormats )
-  {
-    mProgramBinaryFormats.Resize(numProgramBinaryFormats);
-    mGlAbstraction.GetIntegerv(GL_PROGRAM_BINARY_FORMATS_OES, &mProgramBinaryFormats[0]);
-  }
-
   // reset viewport, this will be set to something useful when rendering
   mViewPort.x = mViewPort.y = mViewPort.width = mViewPort.height = 0;
 
   ResetVertexAttributeState();
 }
 
-#ifdef DALI_CONTEXT_LOGGING
+#ifdef DEBUG_ENABLED
 
 void Context::PrintCurrentState()
 {
-  DALI_LOG_INFO(SceneGraph::Context::gGlLogFilter, Debug::General,
-                "----------------- Context State BEGIN -----------------\n"
+  const char* cullFaceModes[] = { "CullNone", "CullFront", "CullBack", "CullFrontAndBack" };
+  DALI_LOG_INFO( gContextLogFilter, Debug::General,
+                "\n----------------- Context State BEGIN -----------------\n"
                 "Blend = %s\n"
                 "Cull Face = %s\n"
                 "Depth Test = %s\n"
@@ -380,6 +322,7 @@ void Context::PrintCurrentState()
                 "Stencil Test = %s\n"
                 "----------------- Context State END -----------------\n",
                 mBlendEnabled ? "Enabled" : "Disabled",
+                cullFaceModes[ mCullFaceMode ],
                 mDepthTestEnabled ? "Enabled" : "Disabled",
                 mDepthMaskEnabled ? "Enabled" : "Disabled",
                 mDitherEnabled ? "Enabled" : "Disabled",

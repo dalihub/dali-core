@@ -19,15 +19,18 @@
 #include <dali/internal/render/shaders/program.h>
 
 // EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <iomanip>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/internal/render/common/performance-monitor.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/shader-data.h>
+#include <dali/integration-api/gl-defines.h>
+#include <dali/internal/render/common/performance-monitor.h>
+#include <dali/internal/render/shaders/program-cache.h>
+#include <dali/internal/render/gl-resources/gl-call-debug.h>
 
 namespace
 {
@@ -118,20 +121,19 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
 
 // IMPLEMENTATION
 
-Program* Program::New( const Integration::ResourceId& resourceId, Integration::ShaderDataPtr shaderData, Context& context, bool modifiesGeometry )
+Program* Program::New( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
   size_t shaderHash = shaderData->GetHashValue();
-  Program* program = context.GetCachedProgram( shaderHash );
+  Program* program = cache.GetProgram( shaderHash );
 
   if( NULL == program )
   {
     // program not found so create it
-    program = new Program( shaderData, context, modifiesGeometry );
+    program = new Program( cache, shaderData, modifiesGeometry );
 
-    // we want to lazy load programs so dont do a Load yet, it gets done in Use
+    // we want to lazy load programs so dont do a Load yet, it gets done in Use()
 
-    // tell context to cache it
-    context.CacheProgram( shaderHash, program );
+    cache.AddProgram( shaderHash, program );
   }
 
   return program;
@@ -139,28 +141,27 @@ Program* Program::New( const Integration::ResourceId& resourceId, Integration::S
 
 void Program::Use()
 {
-  if ( !mLinked &&
-       mContext.IsGlContextCreated() )
+  if ( !mLinked )
   {
     Load();
   }
 
   if ( mLinked )
   {
-    if ( this != mContext.GetCurrentProgram() )
+    if ( this != mCache.GetCurrentProgram() )
     {
       LOG_GL( "UseProgram(%d)\n", mProgramId );
-      CHECK_GL( mContext, mGlAbstraction.UseProgram(mProgramId) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.UseProgram(mProgramId) );
       INCREASE_COUNTER(PerformanceMonitor::SHADER_STATE_CHANGES);
 
-      mContext.SetCurrentProgram( this );
+      mCache.SetCurrentProgram( this );
     }
   }
 }
 
 bool Program::IsUsed()
 {
-  return ( this == mContext.GetCurrentProgram() );
+  return ( this == mCache.GetCurrentProgram() );
 }
 
 GLint Program::GetAttribLocation( AttribType type )
@@ -169,7 +170,7 @@ GLint Program::GetAttribLocation( AttribType type )
 
   if( mAttribLocations[ type ] == ATTRIB_UNKNOWN )
   {
-    GLint loc = CHECK_GL( mContext, mGlAbstraction.GetAttribLocation( mProgramId, gStdAttribs[type] ) );
+    GLint loc = CHECK_GL( mGlAbstraction, mGlAbstraction.GetAttribLocation( mProgramId, gStdAttribs[type] ) );
     mAttribLocations[ type ] = loc;
     LOG_GL( "GetAttribLocation(program=%d,%s) = %d\n", mProgramId, gStdAttribs[type], mAttribLocations[type] );
   }
@@ -204,7 +205,7 @@ GLint Program::GetUniformLocation( unsigned int uniformIndex )
 
   if( location == UNIFORM_NOT_QUERIED )
   {
-    location = CHECK_GL( mContext, mGlAbstraction.GetUniformLocation( mProgramId, mUniformLocations[ uniformIndex ].first.c_str() ) );
+    location = CHECK_GL( mGlAbstraction, mGlAbstraction.GetUniformLocation( mProgramId, mUniformLocations[ uniformIndex ].first.c_str() ) );
 
     mUniformLocations[ uniformIndex ].second = location;
     LOG_GL( "GetUniformLocation(program=%d,%s) = %d\n", mProgramId, mUniformLocations[ uniformIndex ].first.c_str(), mUniformLocations[ uniformIndex ].second );
@@ -230,7 +231,7 @@ void Program::SetUniform1i( GLint location, GLint value0 )
   {
     // not cached, make the gl call
     LOG_GL( "Uniform1i(%d,%d)\n", location, value0 );
-    CHECK_GL( mContext, mGlAbstraction.Uniform1i( location, value0 ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform1i( location, value0 ) );
   }
   else
   {
@@ -239,7 +240,7 @@ void Program::SetUniform1i( GLint location, GLint value0 )
     {
       // make the gl call
       LOG_GL( "Uniform1i(%d,%d)\n", location, value0 );
-      CHECK_GL( mContext, mGlAbstraction.Uniform1i( location, value0 ) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform1i( location, value0 ) );
       // update cache
       mUniformCacheInt[ location ] = value0;
     }
@@ -260,7 +261,7 @@ void Program::SetUniform4i( GLint location, GLint value0, GLint value1, GLint va
 
   // Not caching these as based on current analysis this is not called that often by our shaders
   LOG_GL( "Uniform4i(%d,%d,%d,%d,%d)\n", location, value0, value1, value2, value3 );
-  CHECK_GL( mContext, mGlAbstraction.Uniform4i( location, value0, value1, value2, value3 ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform4i( location, value0, value1, value2, value3 ) );
 }
 
 void Program::SetUniform1f( GLint location, GLfloat value0 )
@@ -280,7 +281,7 @@ void Program::SetUniform1f( GLint location, GLfloat value0 )
   {
     // not cached, make the gl call
     LOG_GL( "Uniform1f(%d,%f)\n", location, value0 );
-    CHECK_GL( mContext, mGlAbstraction.Uniform1f( location, value0 ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform1f( location, value0 ) );
   }
   else
   {
@@ -289,7 +290,7 @@ void Program::SetUniform1f( GLint location, GLfloat value0 )
     {
       // make the gl call
       LOG_GL( "Uniform1f(%d,%f)\n", location, value0 );
-      CHECK_GL( mContext, mGlAbstraction.Uniform1f( location, value0 ) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform1f( location, value0 ) );
 
       // update cache
       mUniformCacheFloat[ location ] = value0;
@@ -311,7 +312,7 @@ void Program::SetUniform2f( GLint location, GLfloat value0, GLfloat value1 )
 
   // Not caching these as based on current analysis this is not called that often by our shaders
   LOG_GL( "Uniform2f(%d,%f,%f)\n", location, value0, value1 );
-  CHECK_GL( mContext, mGlAbstraction.Uniform2f( location, value0, value1 ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform2f( location, value0, value1 ) );
 }
 
 void Program::SetUniform3f( GLint location, GLfloat value0, GLfloat value1, GLfloat value2 )
@@ -328,7 +329,7 @@ void Program::SetUniform3f( GLint location, GLfloat value0, GLfloat value1, GLfl
 
   // Not caching these as based on current analysis this is not called that often by our shaders
   LOG_GL( "Uniform3f(%d,%f,%f,%f)\n", location, value0, value1, value2 );
-  CHECK_GL( mContext, mGlAbstraction.Uniform3f( location, value0, value1, value2 ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform3f( location, value0, value1, value2 ) );
 }
 
 void Program::SetUniform4f( GLint location, GLfloat value0, GLfloat value1, GLfloat value2, GLfloat value3 )
@@ -348,7 +349,7 @@ void Program::SetUniform4f( GLint location, GLfloat value0, GLfloat value1, GLfl
   {
     // not cached, make the gl call
     LOG_GL( "Uniform4f(%d,%f,%f,%f,%f)\n", location, value0, value1, value2, value3 );
-    CHECK_GL( mContext, mGlAbstraction.Uniform4f( location, value0, value1, value2, value3 ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform4f( location, value0, value1, value2, value3 ) );
   }
   else
   {
@@ -361,7 +362,7 @@ void Program::SetUniform4f( GLint location, GLfloat value0, GLfloat value1, GLfl
     {
       // make the gl call
       LOG_GL( "Uniform4f(%d,%f,%f,%f,%f)\n", location, value0, value1, value2, value3 );
-      CHECK_GL( mContext, mGlAbstraction.Uniform4f( location, value0, value1, value2, value3 ) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.Uniform4f( location, value0, value1, value2, value3 ) );
       // update cache
       mUniformCacheFloat4[ location ][ 0 ] = value0;
       mUniformCacheFloat4[ location ][ 1 ] = value1;
@@ -387,7 +388,7 @@ void Program::SetUniformMatrix4fv( GLint location, GLsizei count, const GLfloat*
   // but with different values (we're using this for MVP matrices)
   // NOTE! we never want driver or GPU to transpose
   LOG_GL( "UniformMatrix4fv(%d,%d,GL_FALSE,%x)\n", location, count, value );
-  CHECK_GL( mContext, mGlAbstraction.UniformMatrix4fv( location, count, GL_FALSE, value ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.UniformMatrix4fv( location, count, GL_FALSE, value ) );
 }
 
 void Program::SetUniformMatrix3fv( GLint location, GLsizei count, const GLfloat* value )
@@ -407,7 +408,7 @@ void Program::SetUniformMatrix3fv( GLint location, GLsizei count, const GLfloat*
   // but with different values (we're using this for MVP matrices)
   // NOTE! we never want driver or GPU to transpose
   LOG_GL( "UniformMatrix3fv(%d,%d,GL_FALSE,%x)\n", location, count, value );
-  CHECK_GL( mContext, mGlAbstraction.UniformMatrix3fv( location, count, GL_FALSE, value ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.UniformMatrix3fv( location, count, GL_FALSE, value ) );
 }
 
 void Program::GlContextCreated()
@@ -429,9 +430,9 @@ bool Program::ModifiesGeometry()
   return mModifiesGeometry;
 }
 
-Program::Program(Integration::ShaderDataPtr shaderData, Context& context, bool modifiesGeometry )
-: mContext( context ),
-  mGlAbstraction( context.GetAbstraction() ),
+Program::Program( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry )
+: mCache( cache ),
+  mGlAbstraction( mCache.GetGlAbstraction() ),
   mProjectionMatrix( NULL ),
   mViewMatrix( NULL ),
   mLinked( false ),
@@ -461,32 +462,28 @@ void Program::Load()
 {
   DALI_ASSERT_ALWAYS( NULL != mProgramData.Get() && "Program data is not initialized" );
 
-  // If already linked don't do anything
-  if( mLinked )
-  {
-    return;
-  }
-
   LOG_GL( "CreateProgram()\n" );
-  mProgramId = CHECK_GL( mContext, mGlAbstraction.CreateProgram() );
+  mProgramId = CHECK_GL( mGlAbstraction, mGlAbstraction.CreateProgram() );
 
   GLint linked = GL_FALSE;
 
-  // ShaderData contains compiled bytecode?
-  if( 0 != mContext.CachedNumberOfProgramBinaryFormats() && mProgramData->HasBinary() )
+  const bool binariesSupported = mCache.IsBinarySupported();
+
+  // if shader binaries are supported and ShaderData contains compiled bytecode?
+  if( binariesSupported && mProgramData->HasBinary() )
   {
-    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - Using Compiled Shader, Size = %d\n", mProgramData->buffer.size());
+    DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - Using Compiled Shader, Size = %d\n", mProgramData->GetBufferSize());
 
-    CHECK_GL( mContext, mGlAbstraction.ProgramBinary(mProgramId, mContext.CachedProgramBinaryFormat(), mProgramData->buffer.data(), mProgramData->buffer.size()) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.ProgramBinary(mProgramId, mCache.ProgramBinaryFormat(), mProgramData->GetBufferData(), mProgramData->GetBufferSize()) );
 
-    CHECK_GL( mContext, mGlAbstraction.ValidateProgram(mProgramId) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.ValidateProgram(mProgramId) );
 
     GLint success;
-    CHECK_GL( mContext, mGlAbstraction.GetProgramiv( mProgramId, GL_VALIDATE_STATUS, &success ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramiv( mProgramId, GL_VALIDATE_STATUS, &success ) );
 
     DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "ValidateProgram Status = %d\n", success);
 
-    CHECK_GL( mContext, mGlAbstraction.GetProgramiv( mProgramId, GL_LINK_STATUS, &linked ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramiv( mProgramId, GL_LINK_STATUS, &linked ) );
 
     if( GL_FALSE == linked )
     {
@@ -494,11 +491,11 @@ void Program::Load()
 
       char* szLog = NULL;
       GLint nLength;
-      CHECK_GL( mContext, mGlAbstraction.GetProgramiv( mProgramId, GL_INFO_LOG_LENGTH, &nLength) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramiv( mProgramId, GL_INFO_LOG_LENGTH, &nLength) );
       if(nLength > 0)
       {
         szLog = new char[ nLength ];
-        CHECK_GL( mContext, mGlAbstraction.GetProgramInfoLog( mProgramId, nLength, &nLength, szLog ) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramInfoLog( mProgramId, nLength, &nLength, szLog ) );
         DALI_LOG_ERROR( "Program Link Error: %s\n", szLog );
 
         delete [] szLog;
@@ -514,24 +511,27 @@ void Program::Load()
   if( GL_FALSE == linked )
   {
     DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - Runtime compilation\n");
-    if( CompileShader( GL_VERTEX_SHADER, mVertexShaderId, mProgramData->vertexShader.c_str() ) )
+    if( CompileShader( GL_VERTEX_SHADER, mVertexShaderId, mProgramData->GetVertexShader() ) )
     {
-      if( CompileShader( GL_FRAGMENT_SHADER, mFragmentShaderId, mProgramData->fragmentShader.c_str() ) )
+      if( CompileShader( GL_FRAGMENT_SHADER, mFragmentShaderId, mProgramData->GetFragmentShader() ) )
       {
         Link();
 
-        if( mLinked )
+        if( binariesSupported && mLinked )
         {
           GLint  binaryLength = 0;
           GLenum binaryFormat;
 
-          CHECK_GL( mContext, mGlAbstraction.GetProgramiv(mProgramId, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength) );
+          CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength) );
           DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - GL_PROGRAM_BINARY_LENGTH_OES: %d\n", binaryLength);
-
-          // Allocate space for the bytecode in ShaderData
-          mProgramData->AllocateBuffer(binaryLength);
-          // Copy the bytecode to ShaderData
-          CHECK_GL( mContext, mGlAbstraction.GetProgramBinary(mProgramId, binaryLength, NULL, &binaryFormat, mProgramData->buffer.data()) );
+          if( binaryLength > 0 )
+          {
+            // Allocate space for the bytecode in ShaderData
+            mProgramData->AllocateBuffer(binaryLength);
+            // Copy the bytecode to ShaderData
+            CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramBinary(mProgramId, binaryLength, NULL, &binaryFormat, mProgramData->GetBufferData()) );
+            mCache.StoreBinary( mProgramData );
+          }
         }
       }
     }
@@ -539,24 +539,23 @@ void Program::Load()
 
   // No longer needed
   FreeShaders();
-
 }
 
 void Program::Unload()
 {
   FreeShaders();
 
-  if( this == mContext.GetCurrentProgram() )
+  if( this == mCache.GetCurrentProgram() )
   {
-    CHECK_GL( mContext, mGlAbstraction.UseProgram(0) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.UseProgram(0) );
 
-    mContext.SetCurrentProgram( NULL );
+    mCache.SetCurrentProgram( NULL );
   }
 
   if (mProgramId)
   {
     LOG_GL( "DeleteProgram(%d)\n", mProgramId );
-    CHECK_GL( mContext, mGlAbstraction.DeleteProgram( mProgramId ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteProgram( mProgramId ) );
     mProgramId = 0;
   }
 
@@ -569,32 +568,32 @@ bool Program::CompileShader( GLenum shaderType, GLuint& shaderId, const char* sr
   if (!shaderId)
   {
     LOG_GL( "CreateShader(%d)\n", shaderType );
-    shaderId = CHECK_GL( mContext, mGlAbstraction.CreateShader( shaderType ) );
+    shaderId = CHECK_GL( mGlAbstraction, mGlAbstraction.CreateShader( shaderType ) );
     LOG_GL( "AttachShader(%d,%d)\n", mProgramId, shaderId );
-    CHECK_GL( mContext, mGlAbstraction.AttachShader( mProgramId, shaderId ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.AttachShader( mProgramId, shaderId ) );
   }
 
   LOG_GL( "ShaderSource(%d)\n", shaderId );
-  CHECK_GL( mContext, mGlAbstraction.ShaderSource(shaderId, 1, &src, NULL ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.ShaderSource(shaderId, 1, &src, NULL ) );
 
   LOG_GL( "CompileShader(%d)\n", shaderId );
-  CHECK_GL( mContext, mGlAbstraction.CompileShader( shaderId ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.CompileShader( shaderId ) );
 
   GLint compiled;
   LOG_GL( "GetShaderiv(%d)\n", shaderId );
-  CHECK_GL( mContext, mGlAbstraction.GetShaderiv( shaderId, GL_COMPILE_STATUS, &compiled ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.GetShaderiv( shaderId, GL_COMPILE_STATUS, &compiled ) );
 
   if (compiled == GL_FALSE)
   {
     DALI_LOG_ERROR("Failed to compile shader\n");
     LogWithLineNumbers(src);
 
-    std::vector< char > szLog;
+    Dali::Vector< char > szLog;
     GLint nLength;
     mGlAbstraction.GetShaderiv( shaderId, GL_INFO_LOG_LENGTH, &nLength);
     if(nLength > 0)
     {
-      szLog.reserve( nLength );
+      szLog.Reserve( nLength );
       mGlAbstraction.GetShaderInfoLog( shaderId, nLength, &nLength, &szLog[ 0 ] );
       DALI_LOG_ERROR( "Shader Compiler Error: %s\n", &szLog[ 0 ] );
     }
@@ -608,11 +607,11 @@ bool Program::CompileShader( GLenum shaderType, GLuint& shaderId, const char* sr
 void Program::Link()
 {
   LOG_GL( "LinkProgram(%d)\n", mProgramId );
-  CHECK_GL( mContext, mGlAbstraction.LinkProgram( mProgramId ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.LinkProgram( mProgramId ) );
 
   GLint linked;
   LOG_GL( "GetProgramiv(%d)\n", mProgramId );
-  CHECK_GL( mContext, mGlAbstraction.GetProgramiv( mProgramId, GL_LINK_STATUS, &linked ) );
+  CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramiv( mProgramId, GL_LINK_STATUS, &linked ) );
 
   if (linked == GL_FALSE)
   {
@@ -640,16 +639,16 @@ void Program::FreeShaders()
   if (mVertexShaderId)
   {
     LOG_GL( "DeleteShader(%d)\n", mVertexShaderId );
-    CHECK_GL( mContext, mGlAbstraction.DetachShader( mProgramId, mVertexShaderId ) );
-    CHECK_GL( mContext, mGlAbstraction.DeleteShader( mVertexShaderId ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DetachShader( mProgramId, mVertexShaderId ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteShader( mVertexShaderId ) );
     mVertexShaderId = 0;
   }
 
   if (mFragmentShaderId)
   {
     LOG_GL( "DeleteShader(%d)\n", mFragmentShaderId );
-    CHECK_GL( mContext, mGlAbstraction.DetachShader( mProgramId, mFragmentShaderId ) );
-    CHECK_GL( mContext, mGlAbstraction.DeleteShader( mFragmentShaderId ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DetachShader( mProgramId, mFragmentShaderId ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteShader( mFragmentShaderId ) );
     mFragmentShaderId = 0;
   }
 }

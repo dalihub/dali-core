@@ -981,3 +981,52 @@ int UtcDaliShaderEffectPropertyIndices(void)
   DALI_TEST_EQUALS( indices.size(), effect.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliShaderBinaries(void)
+{
+  TestApplication application;
+  // these will not affect the "first round" of dali render as core is already initialized and it has queried the defaults
+  application.GetGlAbstraction().SetBinaryFormats( 1 );
+  application.GetGlAbstraction().SetNumBinaryFormats( 1 );
+  application.GetGlAbstraction().SetProgramBinaryLength( 1 );
+
+  GLuint lastShaderCompiledBefore = application.GetGlAbstraction().GetLastShaderCompiled();
+
+  ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
+  DALI_TEST_CHECK( effect );
+
+  BitmapImage image = CreateBitmapImage();
+  ImageActor actor = ImageActor::New( image );
+  actor.SetSize( 100.0f, 100.0f );
+  actor.SetName("TestImageFilenameActor");
+  actor.SetShaderEffect(effect);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(16);
+  // binary was not requested by DALi
+  DALI_TEST_CHECK( !(application.GetGlAbstraction().GetProgramBinaryCalled()) );
+
+  GLuint lastShaderCompiledAfter = application.GetGlAbstraction().GetLastShaderCompiled();
+
+  // check that the shader was compiled
+  DALI_TEST_EQUALS( lastShaderCompiledAfter, lastShaderCompiledBefore + 2, TEST_LOCATION );
+
+  // simulate context loss to get core to re-initialize its GL
+  application.GetCore().ContextDestroyed();
+  application.GetCore().ContextCreated();
+
+  application.SendNotification();
+  application.Render(16);
+
+  // shader is recompiled
+  GLuint finalShaderCompiled = application.GetGlAbstraction().GetLastShaderCompiled();
+  // check that the shader was compiled
+  DALI_TEST_EQUALS( lastShaderCompiledAfter + 2, finalShaderCompiled, TEST_LOCATION );
+
+  // binary was requested by DALi
+  DALI_TEST_CHECK( application.GetGlAbstraction().GetProgramBinaryCalled() );
+
+  END_TEST;
+}
+

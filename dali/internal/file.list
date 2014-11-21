@@ -133,12 +133,13 @@ internal_src_files = \
   $(internal_src_dir)/render/common/render-tracker.cpp \
   $(internal_src_dir)/render/common/render-manager.cpp \
   $(internal_src_dir)/render/common/texture-cache-dispatcher.cpp \
-  $(internal_src_dir)/render/gl-resources/context.cpp \
   $(internal_src_dir)/render/gl-resources/bitmap-texture.cpp \
+  $(internal_src_dir)/render/gl-resources/context.cpp \
   $(internal_src_dir)/render/gl-resources/compressed-bitmap-texture.cpp \
   $(internal_src_dir)/render/gl-resources/frame-buffer-texture.cpp \
-  $(internal_src_dir)/render/gl-resources/native-frame-buffer-texture.cpp \
+  $(internal_src_dir)/render/gl-resources/gl-call-debug.cpp \
   $(internal_src_dir)/render/gl-resources/gpu-buffer.cpp \
+  $(internal_src_dir)/render/gl-resources/native-frame-buffer-texture.cpp \
   $(internal_src_dir)/render/gl-resources/native-texture.cpp \
   $(internal_src_dir)/render/gl-resources/texture.cpp \
   $(internal_src_dir)/render/gl-resources/texture-factory.cpp \
@@ -152,6 +153,7 @@ internal_src_files = \
   $(internal_src_dir)/render/renderers/scene-graph-text-renderer.cpp \
   $(internal_src_dir)/render/shaders/custom-uniform.cpp \
   $(internal_src_dir)/render/shaders/program.cpp \
+  $(internal_src_dir)/render/shaders/program-controller.cpp \
   $(internal_src_dir)/render/shaders/shader.cpp \
   \
   $(internal_src_dir)/update/animation/scene-graph-animation.cpp \
