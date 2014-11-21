@@ -38,7 +38,7 @@ struct Request;
 /**
  * ImageFactory is an object that manages Image resource load requests.
  * It utilises an internal caching system where previous requests and associated
- * resources are stored to avoid accessing the file system when not neccessary.
+ * resources are stored to avoid accessing the file system when not necessary.
  */
 class ImageFactory : public ImageFactoryCache::RequestLifetimeObserver
 {

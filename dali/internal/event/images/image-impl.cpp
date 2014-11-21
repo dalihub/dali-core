@@ -224,6 +224,12 @@ unsigned int Image::GetWidth() const
     Size size;
     mImageFactory.GetImageSize( mRequest, mTicket, size );
     mWidth = size.width;
+    // The app will probably ask for the height immediately, so don't waste the synchronous file IO that ImageFactory may have just done:
+    DALI_ASSERT_DEBUG( 0 == mHeight || unsigned(size.height) == mHeight );
+    if( 0 == mHeight )
+    {
+      mHeight = size.height;
+    }
   }
   return mWidth;
 }
@@ -235,6 +241,11 @@ unsigned int Image::GetHeight() const
     Size size;
     mImageFactory.GetImageSize( mRequest, mTicket, size );
     mHeight = size.height;
+    DALI_ASSERT_DEBUG( 0 == mWidth || unsigned(size.width) == mWidth );
+    if( 0 == mWidth )
+    {
+      mWidth = size.width;
+    }
   }
   return mHeight;
 }
