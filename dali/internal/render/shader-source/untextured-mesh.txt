@@ -44,7 +44,7 @@ void main()
     // re-calculate the final weight
     boneWeights.w = 1.0 - dot(boneWeights.xyz, vec3(1.0, 1.0, 1.0));
 
-    vec4 bonePos = (uBoneMatrices[boneIndices.x] * vertexPosition) * boneWeights.x;
+    mediump vec4 bonePos = (uBoneMatrices[boneIndices.x] * vertexPosition) * boneWeights.x;
     bonePos     += (uBoneMatrices[boneIndices.y] * vertexPosition) * boneWeights.y;
     bonePos     += (uBoneMatrices[boneIndices.z] * vertexPosition) * boneWeights.z;
     bonePos     += (uBoneMatrices[boneIndices.w] * vertexPosition) * boneWeights.w;
@@ -133,12 +133,12 @@ lowp vec3 specularColor;
 void calculateLight(Light light)
 {
   highp vec3 lightVector = light.mLightPos - vVertex.xyz;
-  vec3 N = normalize(vNormal);
-  vec3 L = normalize(lightVector);
+  mediump vec3 N = normalize(vNormal);
+  mediump vec3 L = normalize(lightVector);
   // TODO: for directional light, should use mLightDir for light direction not lightVector
-  float NdotL = dot(N, L);
+  mediump float NdotL = dot(N, L);
 
-  vec3 color = light.mAmbient * uMaterial.mAmbient.rgb;
+  mediump vec3 color = light.mAmbient * uMaterial.mAmbient.rgb;
   color += light.mDiffuse * uMaterial.mDiffuse.rgb * abs(NdotL);
 
   // Attenuation
@@ -156,9 +156,9 @@ void calculateLight(Light light)
   if (light.mType > 1 && NdotL > 0.0 && uMaterial.mShininess > 0.0)
   {
     // Specular highlight
-    vec3 E = normalize(vVertex.xyz);
-    vec3 R = reflect(L, N);
-    float specular = pow(max(dot(R, E), 0.0), uMaterial.mShininess);
+    highp vec3 E = normalize(vVertex.xyz);
+    highp vec3 R = reflect(L, N);
+    highp float specular = pow(max(dot(R, E), 0.0), uMaterial.mShininess);
     specularColor += uMaterial.mSpecular.rgb * light.mSpecular * specular * attenuation;
   }
 }

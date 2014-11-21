@@ -59,8 +59,8 @@ void main()
   else
   {
 #endif
-    vertexPosition = uMvpMatrix * mediump vec4(aPosition, 1.0);
-    vVertex = uModelView * mediump vec4(aPosition, 1.0);
+    vertexPosition = uMvpMatrix * vec4(aPosition, 1.0);
+    vVertex = uModelView * vec4(aPosition, 1.0);
     vNormal = uModelViewIT * aNormal;
 #ifdef USE_BONES
   }
@@ -69,7 +69,7 @@ void main()
 
   mediump vec2 start = uCustomTextureCoords.xy;
   mediump vec2 scale = uCustomTextureCoords.zw;
-  vTexCoord = mediump vec2(start.x + aTexCoord.x * scale.x, start.y + aTexCoord.y * scale.y);
+  vTexCoord = vec2(start.x + aTexCoord.x * scale.x, start.y + aTexCoord.y * scale.y);
 }
 
 </VertexShader>
