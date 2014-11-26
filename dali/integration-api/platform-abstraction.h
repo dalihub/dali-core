@@ -296,7 +296,6 @@ public:
    * Load a file into a buffer
    * @param[in] filename The filename to load
    * @param[out] buffer  A buffer to receive the file.
-   *                     The buffer is implemeneted with a std::vector which is resized to fit the file.
    * @result             true if the file is loaded.
    */
   virtual bool LoadFile( const std::string& filename, std::vector< unsigned char >& buffer ) const = 0;

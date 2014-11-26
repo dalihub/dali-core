@@ -549,9 +549,8 @@ void UpdateManager::AddShader( Shader* shader )
 
   mImpl->shaders.PushBack( shader );
 
-  // Allows the shader to dispatch texture requests to the cache and "save shader"
-  // requests to the resource manager from the render thread.
-  shader->Initialize( mImpl->renderManager, mImpl->renderQueue, mImpl->sceneController->GetTextureCache() );
+  // Allows the shader to dispatch texture requests to the cache
+  shader->Initialize( mImpl->renderQueue, mImpl->sceneController->GetTextureCache() );
 }
 
 void UpdateManager::RemoveShader(Shader* shader)
@@ -584,19 +583,18 @@ void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType,
   DALI_ASSERT_ALWAYS( NULL != shader && "shader is uninitialized" );
 
   Integration::ShaderDataPtr shaderData( mImpl->resourceManager.GetShaderData(resourceId) );
-  shaderData->SetHashValue( shaderHash );
-
   if( shaderData )
   {
-    // This is done in the render thread, to allow GL program compilation
-    // Will trigger a NotifySaveRequest back to updateManager to forward onto ResourceClient
-    typedef MessageValue6< Shader, GeometryType, Internal::ShaderSubTypes, Integration::ResourceId, Integration::ShaderDataPtr, Context*, bool> DerivedType;
+    shaderData->SetHashValue( shaderHash );
+    shaderData->SetResourceId( resourceId );
+
+    typedef MessageValue6< Shader, GeometryType, Internal::ShaderSubTypes, Integration::ResourceId, Integration::ShaderDataPtr, ProgramCache*, bool> DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( shader, &Shader::SetProgram, geometryType, subType, resourceId, shaderData, &(mImpl->renderManager.GetContext()), modifiesGeometry );
+    new (slot) DerivedType( shader, &Shader::SetProgram, geometryType, subType, resourceId, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
   }
 }
 
