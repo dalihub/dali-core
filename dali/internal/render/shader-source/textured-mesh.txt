@@ -6,7 +6,7 @@ uniform   mediump mat4    uMvpMatrix;
 
 uniform           bool    uTextureMapped;
 uniform   mediump vec4    uCustomTextureCoords;
-attribute mediump vec2    aTexCoord;
+attribute highp   vec2    aTexCoord;
 varying   mediump vec2    vTexCoord;
 
 uniform   mat3            uModelViewIT;
