@@ -26,22 +26,24 @@ using namespace Dali;
 namespace
 {
 
-static const char* VertexSource =
-"void main()\n"
-"{\n"
-"  gl_Position = uProjection * uModelView * vec4(aPosition, 1.0);\n"
-"  vTexCoord = aTexCoord;\n"
-"}\n";
+static const char* VertexSource = "VertexSource: this can be whatever you want it to be, but don't make it exact the same as default shader\n";
 
-static const char* FragmentSource =
-"void main()\n"
-"{\n"
-"  gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;\n"
-"}\n";
+static const char* FragmentSource = "FragmentSource: this can be whatever you want it to be, but don't make it exact the same as default shader\n";
 
 const int GETSOURCE_BUFFER_SIZE = 0x10000;
 
 static const char* TestImageFilename = "icon_wrt.png";
+
+Integration::Bitmap* CreateBitmap( unsigned int imageHeight, unsigned int imageWidth, unsigned int initialColor )
+{
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( Pixel::RGBA8888,  imageWidth,imageHeight,imageWidth,imageHeight );
+  unsigned int bytesPerPixel = GetBytesPerPixel(  Pixel::RGBA8888 );
+
+  memset( pixbuffer,  initialColor , imageHeight*imageWidth*bytesPerPixel);
+
+  return bitmap;
+}
 
 } // Anonymous namespace
 
@@ -53,11 +55,11 @@ int UtcDaliShaderEffectFromProperties01(void)
 
   std::string fragmentShaderPrefix = "#define TEST_FS 1\n#extension GL_OES_standard_derivatives : enable";
   std::string vertexShaderPrefix = "#define TEST_VS 1";
+  std::string vertexShader(VertexSource);
+  std::string fragmentShader(FragmentSource);
 
   // Call render to compile default shaders.
   application.SendNotification();
-  application.Render();
-  application.Render();
   application.Render();
 
   GLuint lastShaderCompiledBefore = application.GetGlAbstraction().GetLastShaderCompiled();
@@ -71,11 +73,11 @@ int UtcDaliShaderEffectFromProperties01(void)
 
   Property::Value programMap = Property::Value(Property::MAP);
 
-  programMap.SetValue("vertex", std::string(VertexSource));
-  programMap.SetValue("fragment", std::string(FragmentSource));
+  programMap.SetValue("vertex", vertexShader);
+  programMap.SetValue("fragment", fragmentShader);
 
-  programMap.SetValue("vertex-prefix", std::string(fragmentShaderPrefix));
-  programMap.SetValue("fragment-prefix", std::string(vertexShaderPrefix));
+  programMap.SetValue("vertex-prefix", vertexShaderPrefix);
+  programMap.SetValue("fragment-prefix", fragmentShaderPrefix);
 
   programMap.SetValue("geometry-type", "GEOMETRY_TYPE_IMAGE");
 
@@ -83,11 +85,20 @@ int UtcDaliShaderEffectFromProperties01(void)
 
   Property::Value imageMap = Property::Value(Property::MAP);
   imageMap.SetValue("filename", Property::Value(TestImageFilename));
-
   effect.SetProperty(effect.GetPropertyIndex("image"), imageMap);
 
-  BitmapImage image(CreateBitmapImage());
+  // do a update & render to get the image request
+  application.SendNotification();
+  application.Render();
 
+  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
+  // create the image
+  Integration::Bitmap* bitmap = CreateBitmap( 10, 10, 0xFF );
+  Integration::ResourcePointer resourcePtr(bitmap);
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resourcePtr);
+
+  BitmapImage image(CreateBitmapImage());
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetName("TestImageFilenameActor");
@@ -97,30 +108,18 @@ int UtcDaliShaderEffectFromProperties01(void)
   application.SendNotification();
   application.Render();
   GLuint lastShaderCompiledAfter = application.GetGlAbstraction().GetLastShaderCompiled();
-  bool testResult = false;
 
-  // we should have compiled 4 shaders.
-  DALI_TEST_CHECK(lastShaderCompiledAfter - lastShaderCompiledBefore == 4);
-  if (lastShaderCompiledAfter - lastShaderCompiledBefore == 4)
-  {
-    char testVertexSourceResult[GETSOURCE_BUFFER_SIZE];
-    char testFragmentSourceResult[GETSOURCE_BUFFER_SIZE];
+  // we should have compiled 2 shaders.
+  DALI_TEST_EQUALS(lastShaderCompiledAfter, lastShaderCompiledBefore + 2, TEST_LOCATION );
 
-    // we are interested in the first two.
-    GLuint vertexShaderId = lastShaderCompiledBefore + 1;
-    GLuint fragmentShaderId = lastShaderCompiledBefore + 2;
+  std::string actualVertexShader = application.GetGlAbstraction().GetShaderSource( lastShaderCompiledBefore + 1 );
+  DALI_TEST_EQUALS( vertexShaderPrefix, actualVertexShader.substr( 0, vertexShaderPrefix.length() ), TEST_LOCATION );
+  DALI_TEST_EQUALS( vertexShader, actualVertexShader.substr( actualVertexShader.length() - vertexShader.length() ), TEST_LOCATION );
 
-    GLsizei lengthVertexResult;
-    GLsizei lengthFragmentResult;
+  std::string actualFragmentShader = application.GetGlAbstraction().GetShaderSource( lastShaderCompiledBefore + 2 );
+  DALI_TEST_EQUALS( fragmentShaderPrefix, actualFragmentShader.substr( 0, fragmentShaderPrefix.length() ), TEST_LOCATION );
+  DALI_TEST_EQUALS( fragmentShader, actualFragmentShader.substr( actualFragmentShader.length() - fragmentShader.length() ), TEST_LOCATION );
 
-    application.GetGlAbstraction().GetShaderSource(vertexShaderId, GETSOURCE_BUFFER_SIZE, &lengthVertexResult, testVertexSourceResult);
-    application.GetGlAbstraction().GetShaderSource(fragmentShaderId, GETSOURCE_BUFFER_SIZE, &lengthFragmentResult, testFragmentSourceResult);
-
-    int vertexShaderHasPrefix = strncmp(testVertexSourceResult, "#define ", strlen("#define "));
-    int fragmentShaderHasPrefix = strncmp(testFragmentSourceResult, "#define ", strlen("#define "));
-    testResult = (vertexShaderHasPrefix == 0) && (fragmentShaderHasPrefix == 0);
-  }
-  DALI_TEST_CHECK(testResult);
   END_TEST;
 }
 

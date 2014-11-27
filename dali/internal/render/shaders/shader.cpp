@@ -67,6 +67,9 @@ namespace Dali
 namespace Internal
 {
 
+template <> struct ParameterType< Dali::ShaderEffect::GeometryHints> : public BasicType< Dali::ShaderEffect::GeometryHints > {};
+template <> struct ParameterType< Dali::ShaderEffect::UniformCoordinateType > : public BasicType< Dali::ShaderEffect::UniformCoordinateType > {};
+
 namespace SceneGraph
 {
 
@@ -153,7 +156,6 @@ Integration::ResourceId Shader::GetEffectTextureResourceId()
 void Shader::ForwardUniformMeta( BufferIndex updateBufferIndex, UniformMeta* meta )
 {
   // Defer setting uniform metadata until the next Render
-  // (Maintains thread safety on std::vector)
 
   typedef MessageValue1< Shader, UniformMeta* > DerivedType;
 
@@ -162,6 +164,18 @@ void Shader::ForwardUniformMeta( BufferIndex updateBufferIndex, UniformMeta* met
 
   // Construct message in the render queue memory; note that delete should not be called on the return value
   new (slot) DerivedType( this, &Shader::InstallUniformMetaInRender, meta );
+}
+
+void Shader::ForwardCoordinateType( BufferIndex updateBufferIndex, unsigned int index, Dali::ShaderEffect::UniformCoordinateType type )
+{
+  // Defer setting uniform coordinate type until the next Render
+  typedef MessageValue2< Shader, unsigned int, Dali::ShaderEffect::UniformCoordinateType > DerivedType;
+
+  // Reserve some memory inside the render queue
+  unsigned int* slot = mRenderQueue->ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+
+  // Construct message in the render queue memory; note that delete should not be called on the return value
+  new (slot) DerivedType( this, &Shader::SetCoordinateTypeInRender, index, type );
 }
 
 void Shader::ForwardGridDensity( BufferIndex updateBufferIndex, float density )
@@ -217,6 +231,12 @@ float Shader::GetGridDensity()
 void Shader::InstallUniformMetaInRender( UniformMeta* meta )
 {
   mUniformMetadata.PushBack( meta );
+}
+
+void Shader::SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::UniformCoordinateType type )
+{
+  DALI_ASSERT_DEBUG( index < mUniformMetadata.Count() );
+  mUniformMetadata[ index ]->SetCoordinateType( type );
 }
 
 void Shader::SetProgram( GeometryType geometryType,
@@ -384,21 +404,6 @@ void Shader::SetUniforms( Context& context,
                 value.x *= -1.0f;
                 break;
               }
-              case Dali::ShaderEffect::COORDINATE_TYPE_TEXTURE_POSITION :
-              {
-                if ( mTexture )
-                {
-                  UvRect textureArea;
-                  mTexture->GetTextureCoordinates( textureArea );
-
-                  //TODO: this only works for textures that are mapped as a axis aligned rectangle
-                  float width = textureArea.u2 - textureArea.u0;
-                  float height = textureArea.v2 - textureArea.v0;
-                  value.x = textureArea.u0 + value.x * width;
-                  value.y = textureArea.v0 + value.y * height;
-                }
-                break;
-              }
               case Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT :
               {
                 // nothing to do in this case
@@ -461,6 +466,65 @@ void Shader::SetUniforms( Context& context,
 
   DALI_PRINT_SHADER_UNIFORMS(debugStream);
 }
+
+
+// Messages
+
+void SetTextureIdMessage( EventToUpdate& eventToUpdate, const Shader& shader, Integration::ResourceId textureId )
+{
+  typedef MessageDoubleBuffered1< Shader, Integration::ResourceId > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &shader, &Shader::ForwardTextureId, textureId );
+}
+
+void SetGridDensityMessage( EventToUpdate& eventToUpdate, const Shader& shader, float density )
+{
+  typedef MessageDoubleBuffered1< Shader, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &shader, &Shader::ForwardGridDensity, density );
+}
+
+void SetHintsMessage( EventToUpdate& eventToUpdate, const Shader& shader, Dali::ShaderEffect::GeometryHints hint )
+{
+  typedef MessageDoubleBuffered1< Shader, Dali::ShaderEffect::GeometryHints > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &shader, &Shader::ForwardHints, hint );
+}
+
+void InstallUniformMetaMessage( EventToUpdate& eventToUpdate, const Shader& shader, UniformMeta& meta )
+{
+  typedef MessageDoubleBuffered1< Shader, UniformMeta* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &shader, &Shader::ForwardUniformMeta, &meta );
+}
+
+void SetCoordinateTypeMessage( EventToUpdate& eventToUpdate, const Shader& shader, unsigned int index, Dali::ShaderEffect::UniformCoordinateType type )
+{
+  typedef MessageDoubleBuffered2< Shader, unsigned int, Dali::ShaderEffect::UniformCoordinateType > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &shader, &Shader::ForwardCoordinateType, index, type );
+}
+
 
 } // namespace SceneGraph
 

@@ -18,8 +18,6 @@
 // CLASS HEADER
 #include <dali/internal/event/effects/shader-effect-impl.h>
 
-// EXTERNAL INCLUDES
-
 // INTERNAL INCLUDES
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/matrix.h>
@@ -27,7 +25,6 @@
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
-#include "dali-shaders.h"
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/images/image-impl.h>
@@ -36,8 +33,10 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/uniform-meta.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
+#include "dali-shaders.h"
 
 using Dali::Internal::SceneGraph::UpdateManager;
 using Dali::Internal::SceneGraph::UniformMeta;
@@ -300,7 +299,20 @@ void ShaderEffect::SetUniform( const std::string& name, Property::Value value, U
 
   SetProperty( index, value );
 
-  SetCoordinateTypeMessage( mUpdateManager.GetEventToUpdate(), *mCustomMetadata[index], uniformCoordinateType );
+  // RegisterProperty guarantees a positive value as index
+  DALI_ASSERT_DEBUG( static_cast<unsigned int>(index) >= CustomPropertyStartIndex() );
+  unsigned int metaIndex = index - CustomPropertyStartIndex();
+  // check if there's space in cache
+  if( mCoordinateTypes.Count() < (metaIndex + 1) )
+  {
+    mCoordinateTypes.Resize( metaIndex + 1 );
+  }
+  // only send message if the value is different than current, initial value is COORDINATE_TYPE_DEFAULT (0)
+  if( uniformCoordinateType != mCoordinateTypes[ metaIndex ] )
+  {
+    mCoordinateTypes[ metaIndex ] = uniformCoordinateType;
+    SetCoordinateTypeMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, metaIndex, uniformCoordinateType );
+  }
 }
 
 void ShaderEffect::AttachExtension( Dali::ShaderEffect::Extension *extension )
@@ -538,7 +550,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
           DALI_ASSERT_ALWAYS(!"Geometry type unknown" );
         }
       }
-      SetPrograms( geometryType, vertexPrefix, vertex, fragmentPrefix, fragment );
+      SetPrograms( geometryType, vertexPrefix, fragmentPrefix, vertex, fragment );
       break;
     }
 
@@ -611,9 +623,6 @@ void ShaderEffect::InstallSceneObjectProperty( PropertyBase& newProperty, const 
   UniformMeta* meta = UniformMeta::New( name, newProperty, Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );
   // mSceneObject is being used in a separate thread; queue a message to add the property
   InstallUniformMetaMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, *meta ); // Message takes ownership
-
-  // Add entry to the metadata lookup
-  mCustomMetadata[index] = meta;
 }
 
 const SceneGraph::PropertyOwner* ShaderEffect::GetSceneObject() const

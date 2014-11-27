@@ -46,12 +46,10 @@ class UniformMeta
 {
 public:
 
-  typedef Dali::ShaderEffect::UniformCoordinateType CoordinateType;
-
   /**
    * Create a UniformMeta.
    */
-  static UniformMeta* New( const std::string& name, const PropertyBase& property, CoordinateType coordType )
+  static UniformMeta* New( const std::string& name, const PropertyBase& property, Dali::ShaderEffect::UniformCoordinateType coordType )
   {
     return new UniformMeta( name, property, coordType );
   }
@@ -72,7 +70,7 @@ public:
    * Set the coordinate type.
    * @param [in] coordType The new coordinate type.
    */
-  void SetCoordinateType( CoordinateType coordType )
+  void SetCoordinateType( Dali::ShaderEffect::UniformCoordinateType coordType )
   {
     coordinateType = coordType;
   }
@@ -82,7 +80,7 @@ private:
   /**
    * Constructor
    */
-  UniformMeta( const std::string& uniformName, const PropertyBase& prop, CoordinateType coordType )
+  UniformMeta( const std::string& uniformName, const PropertyBase& prop, Dali::ShaderEffect::UniformCoordinateType coordType )
   : name( uniformName ),
     property( prop ),
     coordinateType( coordType )
@@ -96,42 +94,13 @@ private:
 public:
 
   std::string name; ///< name of uniform to set/animate
-
   const PropertyBase& property; ///< reference to the corresponding property
-
   unsigned int cacheIndeces[ Log<GEOMETRY_TYPE_LAST>::value ][ SHADER_SUBTYPE_LAST ]; ///< internal program cache index, per program
+  Dali::ShaderEffect::UniformCoordinateType coordinateType; ///< The coordinate type of the uniform
 
-  CoordinateType coordinateType; ///< The coordinate type of the uniform
 };
 
-// Messages for UniformMeta
-
-}; // namespace SceneGraph
-
-// value types used by messages
-template <> struct ParameterType< SceneGraph::UniformMeta::CoordinateType >
-: public BasicType< SceneGraph::UniformMeta::CoordinateType > {};
-
-namespace SceneGraph
-{
-
-inline void SetCoordinateTypeMessage( EventToUpdate& eventToUpdate, const UniformMeta& meta, UniformMeta::CoordinateType type )
-{
-  typedef MessageValue1< UniformMeta, UniformMeta::CoordinateType > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &meta, &UniformMeta::SetCoordinateType, type );
-}
-
 } // namespace SceneGraph
-
-/**
- * Used for accessing uniform metadata by property index
- */
-typedef std::map<Property::Index, const SceneGraph::UniformMeta*> CustomUniformMetaLookup;
 
 } // namespace Internal
 

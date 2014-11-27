@@ -1547,6 +1547,30 @@ public: // TEST FUNCTIONS
   inline TraceCallStack& GetDrawTrace() { return mDrawTrace; }
 
   template <typename T>
+  inline bool GetUniformValue( const char* name, T& value ) const
+  {
+    for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
+          program_it != mUniforms.end();
+          ++program_it )
+    {
+      const UniformIDMap &uniformIDs = program_it->second;
+
+      UniformIDMap::const_iterator uniform_it = uniformIDs.find( name );
+      if( uniform_it != uniformIDs.end() )
+      {
+        // found one matching uniform name, lets check the value...
+        GLuint programId = program_it->first;
+        GLint uniformId = uniform_it->second;
+
+        const ProgramUniformValue<T> &mProgramUniforms = GetProgramUniformsForType( value );
+        return mProgramUniforms.GetUniformValue( programId, uniformId, value );
+      }
+    }
+    return false;
+  }
+
+
+  template <typename T>
   inline bool CheckUniformValue( const char* name, const T& value ) const
   {
     for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
