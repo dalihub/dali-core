@@ -193,7 +193,8 @@ void ImageFactory::RecoverFromContextLoss()
       ResourceTicketPtr ticket = mResourceClient.RequestResourceTicket( request->resourceId );
 
       // do not reload if still loading
-      if ( ticket->GetLoadingState() != ResourceLoading )
+      // check ticket is not NULL as the resource could have already been destroyed
+      if ( ticket && ticket->GetLoadingState() != ResourceLoading )
       {
         // Ensure the finished status is reset
         mResourceClient.ReloadResource( ticket->GetId(), true );
