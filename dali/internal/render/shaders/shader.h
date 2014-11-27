@@ -23,21 +23,16 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
-#include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/integration-api/shader-data.h>
-#include <dali/public-api/math/compile-time-math.h>
-#include <dali/public-api/math/matrix.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 
 namespace Dali
 {
-class Matrix;
-struct Vector4;
 
 namespace Integration
 {
@@ -47,16 +42,14 @@ typedef unsigned int ResourceId;
 namespace Internal
 {
 
-class Context;
+class ProgramController;
 class Program;
-class ResourceManager;
 
 namespace SceneGraph
 {
 
 class RenderQueue;
 class UniformMeta;
-class PostProcessResourceDispatcher;
 class TextureCache;
 
 /**
@@ -72,7 +65,7 @@ public:
    * If a custom shader has overridden the subtypes (e.g. mesh custom shader),
    * then the flag is used to indicate that there is only one shader in the
    * vector that should be used.
-   * Note, it does not own the Programs it contains (they are owned by the Context).
+   * Note, it does not own the Programs it contains.
    */
   struct ProgramContainer
   {
@@ -129,11 +122,10 @@ public:
 
   /**
    * Second stage initialization, called when added to the UpdateManager
-   * @param postProcessResourceDispatcher Used to save the compiled GL shader in the next update.
    * @param renderQueue Used to queue messages from update to render thread.
    * @param textureCache Used to retrieve effect textures when rendering.
    */
-  void Initialize( PostProcessResourceDispatcher& postProcessResourceDispatcher, RenderQueue& renderQueue, TextureCache& textureCache );
+  void Initialize( RenderQueue& renderQueue, TextureCache& textureCache );
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   // The following methods are called during UpdateManager::Update()
@@ -257,18 +249,18 @@ public:
 
   /**
    * Set the program for a geometry type and subtype
-   * @param[in] geometryType  The type of the object (geometry) that is to be rendered.
-   * @param[in] subType       The subtype, one of ShaderSubTypes.
-   * @param[in] resourceId    The resource ID for the program.
-   * @param[in] shaderData    The program's vertex/fragment source and optionally compiled bytecode
-   * @param[in] context       Reference to the GL context.
-   * @param[in] modifiesGeometry True if the vertex shader changes geometry
+   * @param[in] geometryType      The type of the object (geometry) that is to be rendered.
+   * @param[in] subType           The subtype, one of ShaderSubTypes.
+   * @param[in] resourceId        The resource ID for the program.
+   * @param[in] shaderData        The program's vertex/fragment source and optionally compiled bytecode
+   * @param[in] programCache      Owner of the Programs
+   * @param[in] modifiesGeometry  True if the vertex shader changes geometry
    */
   void SetProgram( GeometryType geometryType,
                    Internal::ShaderSubTypes subType,
                    Integration::ResourceId resourceId,
                    Integration::ShaderDataPtr shaderData,
-                   Context* context,
+                   ProgramCache* programCache,
                    bool modifiesGeometry );
 
   /**
@@ -325,7 +317,6 @@ private: // Data
   RenderQueue*                   mRenderQueue;                   ///< Used for queuing a message for the next Render
 
   // These members are only safe to access in render thread
-  PostProcessResourceDispatcher* mPostProcessDispatcher; ///< Used for saving shaders through the resource manager
   TextureCache*                  mTextureCache; // Used for retrieving textures in the render thread
 };
 

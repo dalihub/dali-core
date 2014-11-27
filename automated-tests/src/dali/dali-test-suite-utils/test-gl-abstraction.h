@@ -1460,6 +1460,7 @@ public:
 
   inline void GetProgramBinary(GLuint program, GLsizei bufSize, GLsizei* length, GLenum* binaryFormat, GLvoid* binary)
   {
+    mGetProgramBinaryCalled = true;
   }
 
   inline void ProgramBinary(GLuint program, GLenum binaryFormat, const GLvoid* binary, GLsizei length)
@@ -1623,8 +1624,6 @@ public: // TEST FUNCTIONS
     return false;
   }
 
-
-
   inline GLuint GetLastShaderCompiled() const
   {
     return mLastShaderCompiled;
@@ -1660,6 +1659,8 @@ public: // TEST FUNCTIONS
   // Methods to check scissor tests
   inline const ScissorParams& GetScissorParams() const { return mScissorParams; }
 
+  inline bool GetProgramBinaryCalled() const { return mGetProgramBinaryCalled; }
+
 private:
   GLuint     mCurrentProgram;
   GLuint     mCompileStatus;
@@ -1681,6 +1682,7 @@ private:
   GLint      mProgramBinaryLength;
   bool       mVertexAttribArrayState[MAX_ATTRIBUTE_CACHE_SIZE];
   bool       mVertexAttribArrayChanged;                            // whether the vertex attrib array has been changed
+  bool       mGetProgramBinaryCalled;
   typedef std::map< GLuint, std::string> ShaderSourceMap;
   ShaderSourceMap mShaderSources;
   GLuint     mLastShaderCompiled;

@@ -19,6 +19,11 @@
 #include <dali/internal/render/common/render-manager.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/stage.h>
+#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/integration-api/debug.h>
+#include <dali/integration-api/core.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/render-algorithms.h>
@@ -32,11 +37,7 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/renderers/render-material.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
-#include <dali/integration-api/debug.h>
-#include <dali/integration-api/core.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/stage.h>
-#include <dali/public-api/render-tasks/render-task.h>
+#include <dali/internal/render/shaders/program-controller.h>
 
 // Uncomment the next line to enable frame snapshot logging
 //#define FRAME_SNAPSHOT_LOGGING
@@ -68,8 +69,8 @@ namespace Internal
 namespace SceneGraph
 {
 
-typedef OwnerContainer< Renderer* >       RendererOwnerContainer;
-typedef RendererOwnerContainer::Iterator  RendererOwnerIter;
+typedef OwnerContainer< Renderer* >            RendererOwnerContainer;
+typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
 
 typedef OwnerContainer< RenderMaterial* >      RenderMaterialContainer;
 typedef RenderMaterialContainer::Iterator      RenderMaterialIter;
@@ -102,7 +103,8 @@ struct RenderManager::Impl
     materials(),
     renderersAdded( false ),
     firstRenderCompleted( false ),
-    defaultShader( NULL )
+    defaultShader( NULL ),
+    programController( postProcessDispatcher, glAbstraction )
   {
   }
 
@@ -139,35 +141,35 @@ struct RenderManager::Impl
 
   // the order is important for destruction,
   // programs are owned by context at the moment.
-  Context                             context;             ///< holds the GL state
-  RenderQueue                         renderQueue;         ///< A message queue for receiving messages from the update-thread.
-  TextureCache                        textureCache;        ///< Cache for all GL textures
+  Context                             context;                  ///< holds the GL state
+  RenderQueue                         renderQueue;              ///< A message queue for receiving messages from the update-thread.
+  TextureCache                        textureCache;             ///< Cache for all GL textures
   ResourcePostProcessList&            resourcePostProcessQueue; ///< A queue for requesting resource post processing in update thread
 
   // Render instructions describe what should be rendered during RenderManager::Render()
-  // Owned by RenderManager. Update manager updates instructions for the next frame
-  // while we render the current one
+  // Owned by RenderManager. Update manager updates instructions for the next frame while we render the current one
   RenderInstructionContainer          instructions;
 
-  Vector4                             backgroundColor;     ///< The glClear color used at the beginning of each frame.
+  Vector4                             backgroundColor;      ///< The glClear color used at the beginning of each frame.
 
-  float                               frameTime;                     ///< The elapsed time since the previous frame
-  float                               lastFrameTime;                 ///< Last frame delta.
+  float                               frameTime;            ///< The elapsed time since the previous frame
+  float                               lastFrameTime;        ///< Last frame delta.
 
-  unsigned int                        frameCount;          ///< The current frame count
-  BufferIndex                         renderBufferIndex;   ///< The index of the buffer to read from; this is opposite of the "update" buffer
+  unsigned int                        frameCount;           ///< The current frame count
+  BufferIndex                         renderBufferIndex;    ///< The index of the buffer to read from; this is opposite of the "update" buffer
 
-  Rect<int>                           defaultSurfaceRect; ///< Rectangle for the default surface we are rendering to
+  Rect<int>                           defaultSurfaceRect;   ///< Rectangle for the default surface we are rendering to
 
-  RendererOwnerContainer              rendererContainer;  ///< List of owned renderers
-  RenderMaterialContainer             materials;          ///< List of owned render materials
+  RendererOwnerContainer              rendererContainer;    ///< List of owned renderers
+  RenderMaterialContainer             materials;            ///< List of owned render materials
 
   bool                                renderersAdded;
 
-  RenderTrackerContainer              mRenderTrackers;     ///< List of render trackers
+  RenderTrackerContainer              mRenderTrackers;      ///< List of render trackers
 
   bool                                firstRenderCompleted; ///< False until the first render is done
   Shader*                             defaultShader;        ///< Default shader to use
+  ProgramController                   programController;    ///< Owner of the GL programs
 };
 
 RenderManager* RenderManager::New( Integration::GlAbstraction& glAbstraction, ResourcePostProcessList& resourcePostProcessQ )
@@ -197,14 +199,10 @@ TextureCache& RenderManager::GetTextureCache()
   return mImpl->textureCache;
 }
 
-Context& RenderManager::GetContext()
-{
-  return mImpl->context;
-}
-
 void RenderManager::ContextCreated()
 {
   mImpl->context.GlContextCreated();
+  mImpl->programController.GlContextCreated();
 
   // renderers, textures and gpu buffers cannot reinitialize themselves
   // so they rely on someone reloading the data for them
@@ -216,6 +214,7 @@ void RenderManager::ContextDestroyed()
   // ContextCreated has been called.
 
   mImpl->context.GlContextDestroyed();
+  mImpl->programController.GlContextDestroyed();
 
   // inform texture cache
   mImpl->textureCache.GlContextDestroyed(); // Clears gl texture ids
@@ -326,6 +325,11 @@ void RenderManager::SetDefaultShader( Shader* shader )
   mImpl->defaultShader = shader;
 }
 
+ProgramCache* RenderManager::GetProgramCache()
+{
+  return &(mImpl->programController);
+}
+
 bool RenderManager::Render( Integration::RenderStatus& status )
 {
   DALI_PRINT_RENDER_START( mImpl->renderBufferIndex );
@@ -379,7 +383,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
     // @todo move programs out of context onto a program controller and let that handle this
-    mImpl->context.ResetProgramMatrices();
+    mImpl->programController.ResetProgramMatrices();
 
     // if we don't have default shader, no point doing the render calls
     if( mImpl->defaultShader )

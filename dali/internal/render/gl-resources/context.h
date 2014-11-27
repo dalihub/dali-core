@@ -19,38 +19,23 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/gl-defines.h>
 #include <dali/public-api/actors/renderable-actor.h>
-#include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-abstraction.h>
+#include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
+#include <dali/internal/render/gl-resources/gl-call-debug.h>
 
 namespace Dali
 {
 
 namespace Internal
 {
-
-class Program; // to be able to cache programs
-
-// wrap gl calls with CHECK_GL eg "CHECK_GL( *this, glBindTexture(textureId) );"
-// will LOG any glErrors eg "glError (0x0501) GL_INVALID_VALUE - glBindTexture(textureId)"
-// only enable if specifically enabled as it slows down GL a lot!
-#ifdef DALI_GL_ERROR_CHECK
-#define CHECK_GL(c,a)  (a); (c).CheckGlError(#a)
-#else
-#define CHECK_GL(c,a)  (a)
-#endif
-
-// Don't put guards around here (LOG_INFO has it's own guards)
-#define LOG_GL(format, args...) \
-  DALI_LOG_INFO(Context::gGlLogFilter, Debug::General, format, ## args)
 
 /**
  * Context records the current GL state, and provides access to the OpenGL ES 2.0 API.
@@ -102,7 +87,7 @@ public:
    */
   Integration::GlAbstraction& GetAbstraction() { return mGlAbstraction; }
 
-#ifdef DALI_CONTEXT_LOGGING
+#ifdef DEBUG_ENABLED
 
   /**
    * Debug helper which prints the currently cached GL state.
@@ -117,19 +102,6 @@ public:
    * @return C string
    */
   const char* ErrorToString( GLenum errorCode );
-
-  /**
-   * Helper to check GL error during an operation
-   * @param operation that was performed
-   */
-  void CheckGlError( const char* operation )
-  {
-    for( GLint error = GetError(); error; error = GetError() )
-    {
-      DALI_LOG_ERROR( "glError (0x%x) %s - after %s\n",  error, ErrorToString(error), operation );
-      DALI_ASSERT_ALWAYS( error && "GL ERROR"); // if errors are being checked we should assert
-    }
-  }
 
   /**
    * Helper to print GL string to debug log
@@ -155,7 +127,7 @@ public:
     {
       mActiveTextureUnit = textureUnit;
       LOG_GL("ActiveTexture %x\n", textureUnit);
-      CHECK_GL( *this, mGlAbstraction.ActiveTexture(TextureUnitAsGLenum(textureUnit)) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.ActiveTexture(TextureUnitAsGLenum(textureUnit)) );
     }
   }
 
@@ -165,7 +137,7 @@ public:
   void BeginQuery(GLenum target, GLuint id)
   {
     LOG_GL("BeginQuery %d %d\n", target, id);
-    CHECK_GL( *this, mGlAbstraction.BeginQuery(target, id) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BeginQuery(target, id) );
   }
 
   /**
@@ -174,7 +146,7 @@ public:
   void BeginTransformFeedback(GLenum primitiveMode)
   {
     LOG_GL("BeginTransformFeedback %x\n", primitiveMode);
-    CHECK_GL( *this, mGlAbstraction.BeginTransformFeedback(primitiveMode) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BeginTransformFeedback(primitiveMode) );
   }
 
   /**
@@ -192,7 +164,7 @@ public:
       mBoundArrayBufferId = buffer;
 
       LOG_GL("BindBuffer GL_ARRAY_BUFFER %d\n", buffer);
-      CHECK_GL( *this, mGlAbstraction.BindBuffer(GL_ARRAY_BUFFER, buffer) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BindBuffer(GL_ARRAY_BUFFER, buffer) );
     }
   }
 
@@ -207,7 +179,7 @@ public:
       mBoundElementArrayBufferId = buffer;
 
       LOG_GL("BindBuffer GL_ELEMENT_ARRAY_BUFFER %d\n", buffer);
-      CHECK_GL( *this, mGlAbstraction.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer) );
     }
   }
 
@@ -222,7 +194,7 @@ public:
       mBoundTransformFeedbackBufferId = buffer;
 
       LOG_GL("BindBuffer GL_TRANSFORM_FEEDBACK_BUFFER %d\n", buffer);
-      CHECK_GL( *this, mGlAbstraction.BindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER , buffer) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BindBuffer(GL_TRANSFORM_FEEDBACK_BUFFER , buffer) );
     }
   }
 
@@ -237,7 +209,7 @@ public:
       mBoundTransformFeedbackBufferId = buffer;
 
       LOG_GL("BindBufferBase GL_TRANSFORM_FEEDBACK_BUFFER %d %d\n", index, buffer);
-      CHECK_GL( *this, mGlAbstraction.BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, index, buffer) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BindBufferBase(GL_TRANSFORM_FEEDBACK_BUFFER, index, buffer) );
     }
   }
 
@@ -247,7 +219,7 @@ public:
   void BindFramebuffer(GLenum target, GLuint framebuffer)
   {
     LOG_GL("BindFramebuffer %d %d\n", target, framebuffer);
-    CHECK_GL( *this, mGlAbstraction.BindFramebuffer(target, framebuffer) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BindFramebuffer(target, framebuffer) );
   }
 
   /**
@@ -256,7 +228,7 @@ public:
   void BindRenderbuffer(GLenum target, GLuint renderbuffer)
   {
     LOG_GL("BindRenderbuffer %d %d\n", target, renderbuffer);
-    CHECK_GL( *this, mGlAbstraction.BindRenderbuffer(target, renderbuffer) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BindRenderbuffer(target, renderbuffer) );
   }
 
   /**
@@ -265,7 +237,7 @@ public:
   void BindTransformFeedback(GLenum target, GLuint id)
   {
     LOG_GL("BindTransformFeedback %d %d\n", target, id);
-    CHECK_GL( *this, mGlAbstraction.BindTransformFeedback(target, id) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BindTransformFeedback(target, id) );
   }
 
   /**
@@ -296,7 +268,7 @@ public:
       mBound2dTextureId[ mActiveTextureUnit ] = texture;
 
       LOG_GL("BindTexture GL_TEXTURE_2D %d\n", texture);
-      CHECK_GL( *this, mGlAbstraction.BindTexture(GL_TEXTURE_2D, texture) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BindTexture(GL_TEXTURE_2D, texture) );
 
       INCREASE_COUNTER(PerformanceMonitor::TEXTURE_STATE_CHANGES);
     }
@@ -310,7 +282,7 @@ public:
     if( !mUsingDefaultBlendColor )
     {
       LOG_GL( "BlendColor %f %f %f %f\n", 0.0f, 0.0f, 0.0f, 0.0f );
-      CHECK_GL( *this, mGlAbstraction.BlendColor( 0.0f, 0.0f, 0.0f, 0.0f ) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BlendColor( 0.0f, 0.0f, 0.0f, 0.0f ) );
       mUsingDefaultBlendColor = true;
     }
   }
@@ -321,7 +293,7 @@ public:
   void SetCustomBlendColor( const Vector4& color )
   {
     LOG_GL( "BlendColor %f %f %f %f\n", color.r, color.g, color.b, color.a );
-    CHECK_GL( *this, mGlAbstraction.BlendColor(color.r, color.g, color.b, color.a) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BlendColor(color.r, color.g, color.b, color.a) );
     mUsingDefaultBlendColor = false;
   }
 
@@ -345,7 +317,7 @@ public:
       mBlendEquationSeparateModeRGB = modeRGB;
       mBlendEquationSeparateModeAlpha = modeAlpha;
       LOG_GL("BlendEquationSeparate %d %d\n", modeRGB, modeAlpha);
-      CHECK_GL( *this, mGlAbstraction.BlendEquationSeparate(modeRGB, modeAlpha) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BlendEquationSeparate(modeRGB, modeAlpha) );
     }
   }
 
@@ -372,7 +344,7 @@ public:
       mBlendFuncSeparateDstAlpha = dstAlpha;
 
       LOG_GL( "BlendFuncSeparate %d %d %d %d\n", srcRGB, dstRGB, srcAlpha, dstAlpha );
-      CHECK_GL( *this, mGlAbstraction.BlendFuncSeparate( srcRGB, dstRGB, srcAlpha, dstAlpha ) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BlendFuncSeparate( srcRGB, dstRGB, srcAlpha, dstAlpha ) );
     }
   }
 
@@ -382,7 +354,7 @@ public:
   void BlitFramebuffer(GLint srcX0, GLint srcY0, GLint srcX1, GLint srcY1, GLint dstX0, GLint dstY0, GLint dstX1, GLint dstY1, GLbitfield mask, GLenum filter)
   {
     LOG_GL( "BlitFramebuffer %d %d %d %d %d %d %d %d %x %d\n", srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter );
-    CHECK_GL( *this, mGlAbstraction.BlitFramebuffer( srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BlitFramebuffer( srcX0, srcY0, srcX1, srcY1, dstX0, dstY0, dstX1, dstY1, mask, filter ) );
   }
 
   /**
@@ -391,7 +363,7 @@ public:
   void BufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage)
   {
     LOG_GL("BufferData %d %d %p %d\n", target, size, data, usage);
-    CHECK_GL( *this, mGlAbstraction.BufferData(target, size, data, usage) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BufferData(target, size, data, usage) );
   }
 
   /**
@@ -400,7 +372,7 @@ public:
   void BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data)
   {
     LOG_GL("BufferSubData %d %d %d %p\n", target, offset, size, data);
-    CHECK_GL( *this, mGlAbstraction.BufferSubData(target, offset, size, data) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.BufferSubData(target, offset, size, data) );
   }
 
   /**
@@ -409,7 +381,7 @@ public:
   GLenum CheckFramebufferStatus(GLenum target)
   {
     LOG_GL("CheckFramebufferStatus %d\n", target);
-    GLenum value = CHECK_GL( *this, mGlAbstraction.CheckFramebufferStatus(target) );
+    GLenum value = CHECK_GL( mGlAbstraction, mGlAbstraction.CheckFramebufferStatus(target) );
     return value;
   }
 
@@ -419,7 +391,7 @@ public:
   void Clear(GLbitfield mask)
   {
     LOG_GL("Clear %d\n", mask);
-    CHECK_GL( *this, mGlAbstraction.Clear(mask) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Clear(mask) );
   }
 
   /**
@@ -432,7 +404,7 @@ public:
     if (!mClearColorSet || mClearColor !=newCol )
     {
       LOG_GL("ClearColor %f %f %f %f\n", red, green, blue, alpha);
-      CHECK_GL( *this, mGlAbstraction.ClearColor(red, green, blue, alpha) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.ClearColor(red, green, blue, alpha) );
 
       mClearColorSet = true;
       mClearColor = newCol;
@@ -445,7 +417,7 @@ public:
   void ClearDepthf(GLclampf depth)
   {
     LOG_GL("ClearDepthf %f\n", depth);
-    CHECK_GL( *this, mGlAbstraction.ClearDepthf(depth) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.ClearDepthf(depth) );
   }
 
   /**
@@ -454,7 +426,7 @@ public:
   void ClearStencil(GLint s)
   {
     LOG_GL("ClearStencil %d\n", s);
-    CHECK_GL( *this, mGlAbstraction.ClearStencil(s) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.ClearStencil(s) );
   }
 
   /**
@@ -468,7 +440,7 @@ public:
     {
       mColorMask = flag;
       LOG_GL("ColorMask %s %s %s %s\n", flag ? "True" : "False", flag ? "True" : "False", flag ? "True" : "False", flag ? "True" : "False");
-      CHECK_GL( *this, mGlAbstraction.ColorMask(flag, flag, flag, flag) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.ColorMask(flag, flag, flag, flag) );
     }
   }
 
@@ -479,7 +451,7 @@ public:
                             GLint border, GLsizei imageSize, const void* data)
   {
     LOG_GL("CompressedTexImage2D %d %d %x %d %d %d %d %p\n", target, level, internalformat, width, height, border, imageSize, data);
-    CHECK_GL( *this, mGlAbstraction.CompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.CompressedTexImage2D(target, level, internalformat, width, height, border, imageSize, data) );
   }
 
   /**
@@ -489,7 +461,7 @@ public:
                             GLint border, GLsizei imageSize, const void* data)
   {
     LOG_GL("CompressedTexImage3D %d %d %x %d %d %d %d %d %p\n", target, level, internalformat, width, height, depth, border, imageSize, data);
-    CHECK_GL( *this, mGlAbstraction.CompressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.CompressedTexImage3D(target, level, internalformat, width, height, depth, border, imageSize, data) );
   }
 
   /**
@@ -499,7 +471,7 @@ public:
                                GLenum format, GLsizei imageSize, const void* data)
   {
     LOG_GL("CompressedTexSubImage2D %x %d %d %d %d %d %x %d %p\n", target, level, xoffset, yoffset, width, height, format, imageSize, data);
-    CHECK_GL( *this, mGlAbstraction.CompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.CompressedTexSubImage2D(target, level, xoffset, yoffset, width, height, format, imageSize, data) );
   }
 
   /**
@@ -510,7 +482,7 @@ public:
                                GLenum format, GLsizei imageSize, const void* data)
   {
     LOG_GL("CompressedTexSubImage3D %x %d %d %d %d %d %d %d %x %d %p\n", target, level, xoffset, yoffset, xoffset, width, height, depth, format, imageSize, data);
-    CHECK_GL( *this, mGlAbstraction.CompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.CompressedTexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, imageSize, data) );
   }
 
   /**
@@ -519,7 +491,7 @@ public:
   void CopyTexImage2D(GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border)
   {
     LOG_GL("CopyTexImage2D %x %d %x %d %d %d %d %d\n", target, level, internalformat, x, y, width, height, border);
-    CHECK_GL( *this, mGlAbstraction.CopyTexImage2D(target, level, internalformat, x, y, width, height, border) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.CopyTexImage2D(target, level, internalformat, x, y, width, height, border) );
   }
 
   /**
@@ -528,7 +500,7 @@ public:
   void CopyTexSubImage2D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height)
   {
     LOG_GL("CopyTexSubImage2D %x %d %d %d %d %d %d %d\n", target, level, xoffset, yoffset, x, y, width, height);
-    CHECK_GL( *this, mGlAbstraction.CopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.CopyTexSubImage2D(target, level, xoffset, yoffset, x, y, width, height) );
   }
 
   /**
@@ -537,7 +509,7 @@ public:
   void CopyTexSubImage3D(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint zoffset, GLint x, GLint y, GLsizei width, GLsizei height)
   {
     LOG_GL("CopyTexSubImage3D %x %d %d %d %d %d %d %d %d\n", target, level, xoffset, yoffset, zoffset, x, y, width, height);
-    CHECK_GL( *this, mGlAbstraction.CopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.CopyTexSubImage3D(target, level, xoffset, yoffset, zoffset, x, y, width, height) );
   }
 
   /**
@@ -556,34 +528,34 @@ public:
         case CullNone:
         {
           LOG_GL("Disable GL_CULL_FACE\n");
-          CHECK_GL( *this, mGlAbstraction.Disable(GL_CULL_FACE) );
+          CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_CULL_FACE) );
           break;
         }
 
         case CullFront:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
-          CHECK_GL( *this, mGlAbstraction.Enable(GL_CULL_FACE) );
+          CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
           LOG_GL("Enable GL_FRONT\n");
-          CHECK_GL( *this, mGlAbstraction.CullFace(GL_FRONT) );
+          CHECK_GL( mGlAbstraction, mGlAbstraction.CullFace(GL_FRONT) );
           break;
         }
 
         case CullBack:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
-          CHECK_GL( *this, mGlAbstraction.Enable(GL_CULL_FACE) );
+          CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
           LOG_GL("Enable GL_BACK\n");
-          CHECK_GL( *this, mGlAbstraction.CullFace(GL_BACK) );
+          CHECK_GL( mGlAbstraction, mGlAbstraction.CullFace(GL_BACK) );
           break;
         }
 
         case CullFrontAndBack:
         {
           LOG_GL("Enable GL_CULL_FACE\n");
-          CHECK_GL( *this, mGlAbstraction.Enable(GL_CULL_FACE) );
+          CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_CULL_FACE) );
           LOG_GL("Enable GL_FRONT_AND_BACK\n");
-          CHECK_GL( *this, mGlAbstraction.CullFace(GL_FRONT_AND_BACK) );
+          CHECK_GL( mGlAbstraction, mGlAbstraction.CullFace(GL_FRONT_AND_BACK) );
           break;
         }
 
@@ -603,7 +575,7 @@ public:
     if( this->IsGlContextCreated() )
     {
       LOG_GL("DeleteBuffers %d %p\n", n, buffers);
-      CHECK_GL( *this, mGlAbstraction.DeleteBuffers(n, buffers) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteBuffers(n, buffers) );
     }
     // reset the cached buffer id's
     // fixes problem where some drivers will a generate a buffer with the
@@ -619,7 +591,7 @@ public:
   void DeleteFramebuffers(GLsizei n, const GLuint* framebuffers)
   {
     LOG_GL("DeleteFramebuffers %d %p\n", n, framebuffers);
-    CHECK_GL( *this, mGlAbstraction.DeleteFramebuffers(n, framebuffers) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteFramebuffers(n, framebuffers) );
   }
 
   /**
@@ -628,7 +600,7 @@ public:
   void DeleteQueries(GLsizei n, GLuint* ids)
   {
     LOG_GL("DeleteQueries %d %p\n", n, ids);
-    CHECK_GL( *this, mGlAbstraction.DeleteQueries(n, ids) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteQueries(n, ids) );
   }
 
   /**
@@ -637,7 +609,7 @@ public:
   void DeleteRenderbuffers(GLsizei n, const GLuint* renderbuffers)
   {
     LOG_GL("DeleteRenderbuffers %d %p\n", n, renderbuffers);
-    CHECK_GL( *this, mGlAbstraction.DeleteRenderbuffers(n, renderbuffers) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteRenderbuffers(n, renderbuffers) );
   }
 
   /**
@@ -646,7 +618,7 @@ public:
   void DeleteTextures(GLsizei n, const GLuint* textures)
   {
     LOG_GL("DeleteTextures %d %p\n", n, textures);
-    CHECK_GL( *this, mGlAbstraction.DeleteTextures(n, textures) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteTextures(n, textures) );
 
     // reset the cached texture id's incase the driver re-uses them
     // when creating new textures
@@ -662,7 +634,7 @@ public:
   void DeleteTransformFeedbacks(GLsizei n, GLuint* ids)
   {
     LOG_GL("DeleteTransformFeedbacks %d %p\n", n, ids);
-    CHECK_GL( *this, mGlAbstraction.DeleteTransformFeedbacks(n, ids) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteTransformFeedbacks(n, ids) );
   }
 
   /**
@@ -671,7 +643,7 @@ public:
   void DepthFunc(GLenum func)
   {
     LOG_GL("DepthFunc %x\n", func);
-    CHECK_GL( *this, mGlAbstraction.DepthFunc(func) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DepthFunc(func) );
   }
 
   /**
@@ -684,7 +656,7 @@ public:
     {
       mDepthMaskEnabled = flag;
       LOG_GL("DepthMask %s\n", flag ? "True" : "False");
-      CHECK_GL( *this, mGlAbstraction.DepthMask( mDepthMaskEnabled ) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.DepthMask( mDepthMaskEnabled ) );
     }
   }
 
@@ -694,7 +666,7 @@ public:
   void DepthRangef(GLclampf zNear, GLclampf zFar)
   {
     LOG_GL("DepthRangef %f %f\n", zNear, zFar);
-    CHECK_GL( *this, mGlAbstraction.DepthRangef(zNear, zFar) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DepthRangef(zNear, zFar) );
   }
 
   /**
@@ -710,7 +682,7 @@ public:
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawArrays %x %d %d\n", mode, first, count);
-    CHECK_GL( *this, mGlAbstraction.DrawArrays(mode, first, count) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DrawArrays(mode, first, count) );
   }
 
   /**
@@ -721,7 +693,7 @@ public:
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawArraysInstanced %x %d %d %d\n", mode, first, count, instanceCount);
-    CHECK_GL( *this, mGlAbstraction.DrawArraysInstanced(mode, first, count,instanceCount) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DrawArraysInstanced(mode, first, count,instanceCount) );
   }
 
   /**
@@ -730,7 +702,7 @@ public:
   void DrawBuffers(GLsizei n, const GLenum* bufs)
   {
     LOG_GL("DrawBuffers %d %p\n", n, bufs);
-    CHECK_GL( *this, mGlAbstraction.DrawBuffers(n, bufs) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DrawBuffers(n, bufs) );
   }
 
   /**
@@ -741,7 +713,7 @@ public:
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawElements %x %d %d %p\n", mode, count, type, indices);
-    CHECK_GL( *this, mGlAbstraction.DrawElements(mode, count, type, indices) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DrawElements(mode, count, type, indices) );
   }
 
   /**
@@ -752,7 +724,7 @@ public:
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawElementsInstanced %x %d %d %p %d\n", mode, count, type, indices, instanceCount);
-    CHECK_GL( *this, mGlAbstraction.DrawElementsInstanced(mode, count, type, indices, instanceCount) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DrawElementsInstanced(mode, count, type, indices, instanceCount) );
   }
 
   /**
@@ -763,7 +735,7 @@ public:
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawRangeElements %x %u %u %d %d %p\n", mode, start, end, count, type, indices);
-    CHECK_GL( *this, mGlAbstraction.DrawRangeElements(mode, start, end, count, type, indices) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.DrawRangeElements(mode, start, end, count, type, indices) );
   }
 
   /**
@@ -772,7 +744,7 @@ public:
   void GenQueries(GLsizei n, GLuint* ids)
   {
     LOG_GL("GenQueries %d %p\n", n, ids);
-    CHECK_GL( *this, mGlAbstraction.GenQueries(n, ids) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GenQueries(n, ids) );
   }
 
   /**
@@ -781,7 +753,7 @@ public:
   void GenTransformFeedbacks(GLsizei n, GLuint* ids)
   {
     LOG_GL("GenTransformFeedbacks %d %p\n", n, ids);
-    CHECK_GL( *this, mGlAbstraction.GenTransformFeedbacks(n, ids) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GenTransformFeedbacks(n, ids) );
   }
 
   /**
@@ -831,7 +803,7 @@ public:
   void VertexAttribDivisor ( GLuint index, GLuint divisor )
   {
     LOG_GL("VertexAttribPointer(%d, %d)\n", index, divisor );
-    CHECK_GL( *this, mGlAbstraction.VertexAttribDivisor( index, divisor ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.VertexAttribDivisor( index, divisor ) );
   }
 
   /**
@@ -840,7 +812,7 @@ public:
   void VertexAttribPointer( GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* ptr )
   {
     LOG_GL("VertexAttribPointer(%d, %d, %d, %d, %d, %x)\n", index, size, type, normalized, stride, ptr );
-    CHECK_GL( *this, mGlAbstraction.VertexAttribPointer( index, size, type, normalized, stride, ptr ) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.VertexAttribPointer( index, size, type, normalized, stride, ptr ) );
   }
 
   /**
@@ -849,7 +821,7 @@ public:
   void InvalidateFramebuffer(GLenum target, GLsizei numAttachments, const GLenum *attachments)
   {
     LOG_GL("InvalidateFramebuffer\n");
-    CHECK_GL( *this, mGlAbstraction.InvalidateFramebuffer(target, numAttachments, attachments) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.InvalidateFramebuffer(target, numAttachments, attachments) );
   }
 
   /**
@@ -871,12 +843,12 @@ public:
       if (enable)
       {
         LOG_GL("Enable GL_BLEND\n");
-        CHECK_GL( *this, mGlAbstraction.Enable(GL_BLEND) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_BLEND) );
       }
       else
       {
         LOG_GL("Disable GL_BLEND\n");
-        CHECK_GL( *this, mGlAbstraction.Disable(GL_BLEND) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_BLEND) );
       }
     }
   }
@@ -895,12 +867,12 @@ public:
       if (enable)
       {
         LOG_GL("Enable GL_DEPTH_TEST\n");
-        CHECK_GL( *this, mGlAbstraction.Enable(GL_DEPTH_TEST) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_DEPTH_TEST) );
       }
       else
       {
         LOG_GL("Disable GL_DEPTH_TEST\n");
-        CHECK_GL( *this, mGlAbstraction.Disable(GL_DEPTH_TEST) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_DEPTH_TEST) );
       }
     }
   }
@@ -919,12 +891,12 @@ public:
       if (enable)
       {
         LOG_GL("Enable GL_DITHER\n");
-        CHECK_GL( *this, mGlAbstraction.Enable(GL_DITHER) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_DITHER) );
       }
       else
       {
         LOG_GL("Disable GL_DITHER\n");
-        CHECK_GL( *this, mGlAbstraction.Disable(GL_DITHER) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_DITHER) );
       }
     }
   }
@@ -943,12 +915,12 @@ public:
       if (enable)
       {
         LOG_GL("Enable GL_POLYGON_OFFSET_FILL\n");
-        CHECK_GL( *this, mGlAbstraction.Enable(GL_POLYGON_OFFSET_FILL) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_POLYGON_OFFSET_FILL) );
       }
       else
       {
         LOG_GL("Disable GL_POLYGON_OFFSET_FILL\n");
-        CHECK_GL( *this, mGlAbstraction.Disable(GL_POLYGON_OFFSET_FILL) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_POLYGON_OFFSET_FILL) );
       }
     }
   }
@@ -967,12 +939,12 @@ public:
       if (enable)
       {
         LOG_GL("Enable GL_SAMPLE_ALPHA_TO_COVERAGE\n");
-        CHECK_GL( *this, mGlAbstraction.Enable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
       }
       else
       {
         LOG_GL("Disable GL_SAMPLE_ALPHA_TO_COVERAGE\n");
-        CHECK_GL( *this, mGlAbstraction.Disable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_SAMPLE_ALPHA_TO_COVERAGE) );
       }
     }
   }
@@ -991,12 +963,12 @@ public:
       if (enable)
       {
         LOG_GL("Enable GL_SAMPLE_COVERAGE\n");
-        CHECK_GL( *this, mGlAbstraction.Enable(GL_SAMPLE_COVERAGE) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_SAMPLE_COVERAGE) );
       }
       else
       {
         LOG_GL("Disable GL_SAMPLE_COVERAGE\n");
-        CHECK_GL( *this, mGlAbstraction.Disable(GL_SAMPLE_COVERAGE) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_SAMPLE_COVERAGE) );
       }
     }
   }
@@ -1015,12 +987,12 @@ public:
       if (enable)
       {
         LOG_GL("Enable GL_SCISSOR_TEST\n");
-        CHECK_GL( *this, mGlAbstraction.Enable(GL_SCISSOR_TEST) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_SCISSOR_TEST) );
       }
       else
       {
         LOG_GL("Disable GL_SCISSOR_TEST\n");
-        CHECK_GL( *this, mGlAbstraction.Disable(GL_SCISSOR_TEST) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_SCISSOR_TEST) );
       }
     }
   }
@@ -1039,12 +1011,12 @@ public:
       if (enable)
       {
         LOG_GL("Enable GL_STENCIL_TEST\n");
-        CHECK_GL( *this, mGlAbstraction.Enable(GL_STENCIL_TEST) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Enable(GL_STENCIL_TEST) );
       }
       else
       {
         LOG_GL("Disable GL_STENCIL_TEST\n");
-        CHECK_GL( *this, mGlAbstraction.Disable(GL_STENCIL_TEST) );
+        CHECK_GL( mGlAbstraction, mGlAbstraction.Disable(GL_STENCIL_TEST) );
       }
     }
   }
@@ -1055,7 +1027,7 @@ public:
   void EndQuery(GLenum target)
   {
     LOG_GL("EndQuery %d\n", target);
-    CHECK_GL( *this, mGlAbstraction.EndQuery(target) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.EndQuery(target) );
   }
 
   /**
@@ -1064,7 +1036,7 @@ public:
   void EndTransformFeedback()
   {
     LOG_GL("EndTransformFeedback\n");
-    CHECK_GL( *this, mGlAbstraction.EndTransformFeedback() );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.EndTransformFeedback() );
   }
 
   /**
@@ -1073,7 +1045,7 @@ public:
   void Finish(void)
   {
     LOG_GL("Finish\n");
-    CHECK_GL( *this, mGlAbstraction.Finish() );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Finish() );
   }
 
   /**
@@ -1082,7 +1054,7 @@ public:
   void Flush(void)
   {
     LOG_GL("Flush\n");
-    CHECK_GL( *this, mGlAbstraction.Flush() );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Flush() );
   }
 
   /**
@@ -1091,7 +1063,7 @@ public:
   void FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer)
   {
     LOG_GL("FramebufferRenderbuffer %x %x %x %d\n", target, attachment, renderbuffertarget, renderbuffer);
-    CHECK_GL( *this, mGlAbstraction.FramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.FramebufferRenderbuffer(target, attachment, renderbuffertarget, renderbuffer) );
   }
 
   /**
@@ -1100,7 +1072,7 @@ public:
   void FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
   {
     LOG_GL("FramebufferTexture2D %x %x %x %d %d\n", target, attachment, textarget, texture, level);
-    CHECK_GL( *this, mGlAbstraction.FramebufferTexture2D(target, attachment, textarget, texture, level) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.FramebufferTexture2D(target, attachment, textarget, texture, level) );
   }
 
   /**
@@ -1109,7 +1081,7 @@ public:
   void FramebufferTextureLayer(GLenum target, GLenum attachment, GLuint texture, GLint level, GLint layer)
   {
     LOG_GL("FramebufferTextureLayer %x %x %d %d %d\n", target, attachment, texture, level, layer);
-    CHECK_GL( *this, mGlAbstraction.FramebufferTextureLayer(target, attachment, texture, level, layer) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.FramebufferTextureLayer(target, attachment, texture, level, layer) );
   }
 
   /**
@@ -1118,7 +1090,7 @@ public:
   void FrontFace(GLenum mode)
   {
     LOG_GL("FrontFace %x\n", mode);
-    CHECK_GL( *this, mGlAbstraction.FrontFace(mode) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.FrontFace(mode) );
   }
 
   /**
@@ -1127,7 +1099,7 @@ public:
   void GenBuffers(GLsizei n, GLuint* buffers)
   {
     LOG_GL("GenBuffers %d\n", n, buffers);
-    CHECK_GL( *this, mGlAbstraction.GenBuffers(n, buffers) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GenBuffers(n, buffers) );
   }
 
   /**
@@ -1136,7 +1108,7 @@ public:
   void GenerateMipmap(GLenum target)
   {
     LOG_GL("GenerateMipmap %x\n", target);
-    CHECK_GL( *this, mGlAbstraction.GenerateMipmap(target) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GenerateMipmap(target) );
   }
 
   /**
@@ -1145,7 +1117,7 @@ public:
   void GenFramebuffers(GLsizei n, GLuint* framebuffers)
   {
     LOG_GL("GenFramebuffers %d %p\n", n, framebuffers);
-    CHECK_GL( *this, mGlAbstraction.GenFramebuffers(n, framebuffers) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GenFramebuffers(n, framebuffers) );
   }
 
   /**
@@ -1154,7 +1126,7 @@ public:
   void GenRenderbuffers(GLsizei n, GLuint* renderbuffers)
   {
     LOG_GL("GenRenderbuffers %d %p\n", n, renderbuffers);
-    CHECK_GL( *this, mGlAbstraction.GenRenderbuffers(n, renderbuffers) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GenRenderbuffers(n, renderbuffers) );
   }
 
   /**
@@ -1163,7 +1135,7 @@ public:
   void GenTextures(GLsizei n, GLuint* textures)
   {
     LOG_GL("GenTextures %d %p\n", n, textures);
-    CHECK_GL( *this, mGlAbstraction.GenTextures(n, textures) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GenTextures(n, textures) );
   }
 
   /**
@@ -1172,7 +1144,7 @@ public:
   void GetBooleanv(GLenum pname, GLboolean* params)
   {
     LOG_GL("GetBooleanv %x\n", pname);
-    CHECK_GL( *this, mGlAbstraction.GetBooleanv(pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetBooleanv(pname, params) );
   }
 
   /**
@@ -1181,7 +1153,7 @@ public:
   void GetBufferParameteriv(GLenum target, GLenum pname, GLint* params)
   {
     LOG_GL("GetBufferParameteriv %x %x %p\n", target, pname, params);
-    CHECK_GL( *this, mGlAbstraction.GetBufferParameteriv(target, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetBufferParameteriv(target, pname, params) );
   }
 
   /**
@@ -1190,7 +1162,7 @@ public:
   void GetBufferPointerv(GLenum target, GLenum pname, GLvoid** params)
   {
     LOG_GL("GetBufferPointerv %x %x %p\n", target, pname, params);
-    CHECK_GL( *this, mGlAbstraction.GetBufferPointerv(target, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetBufferPointerv(target, pname, params) );
   }
 
   /**
@@ -1208,7 +1180,7 @@ public:
   void GetFloatv(GLenum pname, GLfloat* params)
   {
     LOG_GL("GetFloatv %x\n", pname);
-    CHECK_GL( *this, mGlAbstraction.GetFloatv(pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetFloatv(pname, params) );
   }
 
   /**
@@ -1217,7 +1189,7 @@ public:
   void GetFramebufferAttachmentParameteriv(GLenum target, GLenum attachment, GLenum pname, GLint* params)
   {
     LOG_GL("GetFramebufferAttachmentParameteriv %x %x %x\n", target, attachment, pname);
-    CHECK_GL( *this, mGlAbstraction.GetFramebufferAttachmentParameteriv(target, attachment, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetFramebufferAttachmentParameteriv(target, attachment, pname, params) );
   }
 
   /**
@@ -1226,7 +1198,7 @@ public:
   void GetIntegerv(GLenum pname, GLint* params)
   {
     LOG_GL("GetIntegerv %x\n", pname);
-    CHECK_GL( *this, mGlAbstraction.GetIntegerv(pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetIntegerv(pname, params) );
   }
 
   /**
@@ -1235,7 +1207,7 @@ public:
   void GetQueryiv(GLenum target, GLenum pname, GLint* params)
   {
     LOG_GL("GetQueryiv %x %x\n", target, pname);
-    CHECK_GL( *this, mGlAbstraction.GetQueryiv(target, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetQueryiv(target, pname, params) );
   }
 
   /**
@@ -1244,7 +1216,7 @@ public:
   void GetQueryObjectuiv(GLuint id, GLenum pname, GLuint* params)
   {
     LOG_GL("GetQueryObjectuiv %u %x %p\n", id, pname, params);
-    CHECK_GL( *this, mGlAbstraction.GetQueryObjectuiv(id, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetQueryObjectuiv(id, pname, params) );
   }
 
   /**
@@ -1253,7 +1225,7 @@ public:
   void GetRenderbufferParameteriv(GLenum target, GLenum pname, GLint* params)
   {
     LOG_GL("GetRenderbufferParameteriv %x %x\n", target, pname);
-    CHECK_GL( *this, mGlAbstraction.GetRenderbufferParameteriv(target, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetRenderbufferParameteriv(target, pname, params) );
   }
 
   /**
@@ -1262,7 +1234,7 @@ public:
   const GLubyte* GetString(GLenum name)
   {
     LOG_GL("GetString %x\n", name);
-    const GLubyte* str = CHECK_GL( *this, mGlAbstraction.GetString(name) );
+    const GLubyte* str = CHECK_GL( mGlAbstraction, mGlAbstraction.GetString(name) );
     return str;
   }
 
@@ -1272,7 +1244,7 @@ public:
   void GetTexParameterfv(GLenum target, GLenum pname, GLfloat* params)
   {
     LOG_GL("GetTexParameterfv %x %x\n", target, pname);
-    CHECK_GL( *this, mGlAbstraction.GetTexParameterfv(target, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetTexParameterfv(target, pname, params) );
   }
 
   /**
@@ -1281,7 +1253,7 @@ public:
   void GetTexParameteriv(GLenum target, GLenum pname, GLint* params)
   {
     LOG_GL("GetTexParameteriv %x %x\n", target, pname);
-    CHECK_GL( *this, mGlAbstraction.GetTexParameteriv(target, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.GetTexParameteriv(target, pname, params) );
   }
 
   /**
@@ -1290,7 +1262,7 @@ public:
   void Hint(GLenum target, GLenum mode)
   {
     LOG_GL("Hint %x %x\n", target, mode);
-    CHECK_GL( *this, mGlAbstraction.Hint(target, mode) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Hint(target, mode) );
   }
 
   /**
@@ -1299,7 +1271,7 @@ public:
   GLboolean IsBuffer(GLuint buffer)
   {
     LOG_GL("IsBuffer %d\n", buffer);
-    GLboolean val = CHECK_GL( *this, mGlAbstraction.IsBuffer(buffer) );
+    GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.IsBuffer(buffer) );
     return val;
   }
 
@@ -1309,7 +1281,7 @@ public:
   GLboolean IsEnabled(GLenum cap)
   {
     LOG_GL("IsEnabled %x\n", cap);
-    GLboolean val = CHECK_GL( *this, mGlAbstraction.IsEnabled(cap) );
+    GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.IsEnabled(cap) );
     return val;
   }
 
@@ -1319,7 +1291,7 @@ public:
   GLboolean IsFramebuffer(GLuint framebuffer)
   {
     LOG_GL("IsFramebuffer %d\n", framebuffer);
-    GLboolean val = CHECK_GL( *this, mGlAbstraction.IsFramebuffer(framebuffer) );
+    GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.IsFramebuffer(framebuffer) );
     return val;
   }
 
@@ -1329,7 +1301,7 @@ public:
   GLboolean IsQuery(GLuint id)
   {
     LOG_GL("IsQuery %u\n", id);
-    GLboolean val = CHECK_GL( *this, mGlAbstraction.IsQuery(id) );
+    GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.IsQuery(id) );
     return val;
   }
 
@@ -1339,7 +1311,7 @@ public:
   GLboolean IsRenderbuffer(GLuint renderbuffer)
   {
     LOG_GL("IsRenderbuffer %d\n", renderbuffer);
-    GLboolean val = CHECK_GL( *this, mGlAbstraction.IsRenderbuffer(renderbuffer) );
+    GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.IsRenderbuffer(renderbuffer) );
     return val;
   }
 
@@ -1349,7 +1321,7 @@ public:
   GLboolean IsTexture(GLuint texture)
   {
     LOG_GL("IsTexture %d\n", texture);
-    GLboolean val = CHECK_GL( *this, mGlAbstraction.IsTexture(texture) );
+    GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.IsTexture(texture) );
     return val;
   }
 
@@ -1359,7 +1331,7 @@ public:
   GLboolean IsTransformFeedback(GLuint id)
   {
     LOG_GL("IsTransformFeedback %u\n", id);
-    GLboolean val = CHECK_GL( *this, mGlAbstraction.IsTransformFeedback(id) );
+    GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.IsTransformFeedback(id) );
     return val;
   }
 
@@ -1369,7 +1341,7 @@ public:
   void LineWidth(GLfloat width)
   {
     LOG_GL("LineWidth %f\n", width);
-    CHECK_GL( *this, mGlAbstraction.LineWidth(width) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.LineWidth(width) );
   }
 
   /**
@@ -1378,7 +1350,7 @@ public:
   void PauseTransformFeedback()
   {
     LOG_GL("PauseTransformFeedback\n");
-    CHECK_GL( *this, mGlAbstraction.PauseTransformFeedback() );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.PauseTransformFeedback() );
   }
 
   /**
@@ -1387,7 +1359,7 @@ public:
   void PixelStorei(GLenum pname, GLint param)
   {
     LOG_GL("PixelStorei %x %d\n", pname, param);
-    CHECK_GL( *this, mGlAbstraction.PixelStorei(pname, param) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.PixelStorei(pname, param) );
   }
 
   /**
@@ -1396,7 +1368,7 @@ public:
   void PolygonOffset(GLfloat factor, GLfloat units)
   {
     LOG_GL("PolygonOffset %f %f\n", factor, units);
-    CHECK_GL( *this, mGlAbstraction.PolygonOffset(factor, units) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.PolygonOffset(factor, units) );
   }
 
   /**
@@ -1405,7 +1377,7 @@ public:
   void ReadPixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, void* pixels)
   {
     LOG_GL("ReadPixels %d %d %d %d %x %x\n", x, y, width, height, format, type);
-    CHECK_GL( *this, mGlAbstraction.ReadPixels(x, y, width, height, format, type, pixels) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.ReadPixels(x, y, width, height, format, type, pixels) );
   }
 
   /**
@@ -1414,7 +1386,7 @@ public:
   void RenderbufferStorage(GLenum target, GLenum internalformat, GLsizei width, GLsizei height)
   {
     LOG_GL("RenderbufferStorage %x %x %d %d\n", target, internalformat, width, height);
-    CHECK_GL( *this, mGlAbstraction.RenderbufferStorage(target, internalformat, width, height) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.RenderbufferStorage(target, internalformat, width, height) );
   }
 
   /**
@@ -1423,7 +1395,7 @@ public:
   void RenderbufferStorageMultisample(GLenum target, GLsizei samples, GLenum internalformat, GLsizei width, GLsizei height)
   {
     LOG_GL("RenderbufferStorageMultisample %x %u %x %d %d\n", target, samples, internalformat, width, height);
-    CHECK_GL( *this, mGlAbstraction.RenderbufferStorageMultisample(target, samples, internalformat, width, height) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.RenderbufferStorageMultisample(target, samples, internalformat, width, height) );
   }
 
   /**
@@ -1432,7 +1404,7 @@ public:
   void ResumeTransformFeedback()
   {
     LOG_GL("ResumeTransformFeedback\n");
-    CHECK_GL( *this, mGlAbstraction.ResumeTransformFeedback() );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.ResumeTransformFeedback() );
   }
 
   /**
@@ -1441,7 +1413,7 @@ public:
   void SampleCoverage(GLclampf value, GLboolean invert)
   {
     LOG_GL("SampleCoverage %f %s\n", value, invert ? "True" : "False");
-    CHECK_GL( *this, mGlAbstraction.SampleCoverage(value, invert) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.SampleCoverage(value, invert) );
   }
 
   /**
@@ -1450,7 +1422,7 @@ public:
   void Scissor(GLint x, GLint y, GLsizei width, GLsizei height)
   {
     LOG_GL("Scissor %d %d %d %d\n", x, y, width, height);
-    CHECK_GL( *this, mGlAbstraction.Scissor(x, y, width, height) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.Scissor(x, y, width, height) );
   }
 
   /**
@@ -1459,7 +1431,7 @@ public:
   void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
     LOG_GL("StencilFunc %x %d %d\n", func, ref, mask);
-    CHECK_GL( *this, mGlAbstraction.StencilFunc(func, ref, mask) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilFunc(func, ref, mask) );
   }
 
   /**
@@ -1468,7 +1440,7 @@ public:
   void StencilFuncSeparate(GLenum face, GLenum func, GLint ref, GLuint mask)
   {
     LOG_GL("StencilFuncSeparate %x %x %d %d\n", face, func, ref, mask);
-    CHECK_GL( *this, mGlAbstraction.StencilFuncSeparate(face, func, ref, mask) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilFuncSeparate(face, func, ref, mask) );
   }
 
   /**
@@ -1481,7 +1453,7 @@ public:
       mStencilMask = mask;
 
       LOG_GL("StencilMask %d\n", mask);
-      CHECK_GL( *this, mGlAbstraction.StencilMask(mask) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.StencilMask(mask) );
     }
   }
 
@@ -1491,7 +1463,7 @@ public:
   void StencilMaskSeparate(GLenum face, GLuint mask)
   {
     LOG_GL("StencilMaskSeparate %x %d\n", face, mask);
-    CHECK_GL( *this, mGlAbstraction.StencilMaskSeparate(face, mask) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilMaskSeparate(face, mask) );
   }
 
   /**
@@ -1500,7 +1472,7 @@ public:
   void StencilOp(GLenum fail, GLenum zfail, GLenum zpass)
   {
     LOG_GL("StencilOp %x %x %x\n", fail, zfail, zpass);
-    CHECK_GL( *this, mGlAbstraction.StencilOp(fail, zfail, zpass) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilOp(fail, zfail, zpass) );
   }
 
   /**
@@ -1509,7 +1481,7 @@ public:
   void StencilOpSeparate(GLenum face, GLenum fail, GLenum zfail, GLenum zpass)
   {
     LOG_GL("StencilOpSeparate %x %x %x %x\n", face, fail, zfail, zpass);
-    CHECK_GL( *this, mGlAbstraction.StencilOpSeparate(face, fail, zfail, zpass) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.StencilOpSeparate(face, fail, zfail, zpass) );
   }
 
   /**
@@ -1519,7 +1491,7 @@ public:
                   GLint border, GLenum format, GLenum type, const void* pixels)
   {
     LOG_GL("TexImage2D %x %d %d %dx%d %d %x %x %p\n", target, level, internalformat, width, height, border, format, type, pixels);
-    CHECK_GL( *this, mGlAbstraction.TexImage2D(target, level, internalformat, width, height, border, format, type, pixels) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.TexImage2D(target, level, internalformat, width, height, border, format, type, pixels) );
   }
 
   /**
@@ -1529,7 +1501,7 @@ public:
                   GLint border, GLenum format, GLenum type, const void* pixels)
   {
     LOG_GL("TexImage3D %x %d %d %dx%dx%d %d %x %x %p\n", target, level, internalformat, width, height, depth, border, format, type, pixels);
-    CHECK_GL( *this, mGlAbstraction.TexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixels) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.TexImage3D(target, level, internalformat, width, height, depth, border, format, type, pixels) );
   }
 
   /**
@@ -1538,7 +1510,7 @@ public:
   void TexParameterf(GLenum target, GLenum pname, GLfloat param)
   {
     LOG_GL("TexParameterf %x %x %f\n", target, pname, param);
-    CHECK_GL( *this, mGlAbstraction.TexParameterf(target, pname, param) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.TexParameterf(target, pname, param) );
   }
 
   /**
@@ -1547,7 +1519,7 @@ public:
   void TexParameterfv(GLenum target, GLenum pname, const GLfloat* params)
   {
     LOG_GL("TexParameterfv %x %x\n", target, pname);
-    CHECK_GL( *this, mGlAbstraction.TexParameterfv(target, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.TexParameterfv(target, pname, params) );
   }
 
   /**
@@ -1556,7 +1528,7 @@ public:
   void TexParameteri(GLenum target, GLenum pname, GLint param)
   {
     LOG_GL("TexParameteri %x %x %d\n", target, pname, param);
-    CHECK_GL( *this, mGlAbstraction.TexParameteri(target, pname, param) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.TexParameteri(target, pname, param) );
   }
 
   /**
@@ -1565,7 +1537,7 @@ public:
   void TexParameteriv(GLenum target, GLenum pname, const GLint* params)
   {
     LOG_GL("TexParameteriv %x %x\n", target, pname);
-    CHECK_GL( *this, mGlAbstraction.TexParameteriv(target, pname, params) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.TexParameteriv(target, pname, params) );
   }
 
   /**
@@ -1575,7 +1547,7 @@ public:
                      GLenum format, GLenum type, const void* pixels)
   {
     LOG_GL("TexSubImage2D %x %d %d %d %d %d %x %x %p\n", target, level, xoffset, yoffset, width, height, format, type, pixels);
-    CHECK_GL( *this, mGlAbstraction.TexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.TexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels) );
   }
 
   /**
@@ -1586,7 +1558,7 @@ public:
                      GLenum format, GLenum type, const void* pixels)
   {
     LOG_GL("TexSubImage3D %x %d %d %d %d %d %d %d %x %x %p\n", target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels);
-    CHECK_GL( *this, mGlAbstraction.TexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels) );
+    CHECK_GL( mGlAbstraction, mGlAbstraction.TexSubImage3D(target, level, xoffset, yoffset, zoffset, width, height, depth, format, type, pixels) );
   }
 
   /**
@@ -1595,7 +1567,7 @@ public:
   GLboolean UnmapBuffer(GLenum target)
   {
     LOG_GL("UnmapBuffer %x \n", target);
-    GLboolean val = CHECK_GL( *this, mGlAbstraction.UnmapBuffer(target) );
+    GLboolean val = CHECK_GL( mGlAbstraction, mGlAbstraction.UnmapBuffer(target) );
     return val;
   }
   /**
@@ -1609,7 +1581,7 @@ public:
     {
       // set new one
       LOG_GL("Viewport %d %d %d %d\n", x, y, width, height);
-      CHECK_GL( *this, mGlAbstraction.Viewport(x, y, width, height) );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.Viewport(x, y, width, height) );
       mViewPort = newViewport; // remember new one
     }
   }
@@ -1624,75 +1596,10 @@ public:
   }
 
   /**
-   * Get the number of supported program binary formats
-   * @return The number of supported program binary formats
-   */
-  GLint CachedNumberOfProgramBinaryFormats() const
-  {
-    return mProgramBinaryFormats.Count();
-  }
-
-  /**
-   * Get a supported program binary format
-   * @param[in] formatIndex The index of the format to return (default: 0)
-   * @return A supported program binary format
-   */
-  GLint CachedProgramBinaryFormat( const unsigned int formatIndex = 0 ) const
-  {
-    DALI_ASSERT_ALWAYS( formatIndex < mProgramBinaryFormats.Count() && "formatIndex out of bounds");
-
-    return mProgramBinaryFormats[ formatIndex ];
-  }
-
-  /**
-   * @return current program
-   */
-  const Program* GetCurrentProgram() const
-  {
-    return mCurrentProgram;
-  }
-
-  /**
-   * Set current program
-   * @param [in] program that is in use
-   */
-  void SetCurrentProgram( Program* program )
-  {
-    mCurrentProgram = program;
-  }
-
-  /**
-   * Reset the program matrices
-   */
-  void ResetProgramMatrices();
-
-  /**
-   * Get a cached program
-   * @param [in] hash value
-   * @return pointer to the program
-   */
-  Program* GetCachedProgram( std::size_t hash ) const;
-
-  /**
-   * Cache a program
-   * @param [in] hash value
-   * @param [in] pointer to the program
-   */
-  void CacheProgram( std::size_t hash, Program* pointer );
-
-  /**
    * Get the current viewport.
    * @return Viewport rectangle.
    */
   const Rect< int >& GetViewport();
-
-#ifdef DEBUG_ENABLED
-
-  /// Switch debug level to Concise to disable, General to enable. Note, enabling snapshot logging will do this on the fly.
-  static Debug::Filter *gGlLogFilter;
-
-#endif // DEBUG_ENABLED
-
 
   /**
    * Set the frame count of render thread
@@ -1829,8 +1736,6 @@ private: // Data
   GLint mMaxTextureSize;      ///< return value from GetIntegerv(GL_MAX_TEXTURE_SIZE)
   Vector4 mClearColor;        ///< clear color
 
-  Dali::Vector<GLint>  mProgramBinaryFormats; ///< array of supported program binary formats
-
   // Face culling mode
   CullFaceMode mCullFaceMode;
 
@@ -1841,9 +1746,6 @@ private: // Data
   bool mVertexAttributeCachedState[ MAX_ATTRIBUTE_CACHE_SIZE ];    ///< Value cache for Enable Vertex Attribute
   bool mVertexAttributeCurrentState[ MAX_ATTRIBUTE_CACHE_SIZE ];   ///< Current state on the driver for Enable Vertex Attribute
 
-  Program* mCurrentProgram;
-  typedef std::map< std::size_t, Program* > ProgramContainer;
-  ProgramContainer mProgramCache; ///< Cache of shader programs
   unsigned int mFrameCount;       ///< Number of render frames
   unsigned int mCulledCount;      ///< Number of culled renderers per frame
   unsigned int mRendererCount;    ///< Number of image renderers per frame

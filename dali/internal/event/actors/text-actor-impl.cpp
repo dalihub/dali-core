@@ -476,6 +476,7 @@ void TextActor::SetTextStyle( const TextStyle& style, TextRequestMode mode )
   {
     mTextAttachment->ResetGradient();
   }
+  TextChanged();
 }
 
 TextStyle TextActor::GetTextStyle() const

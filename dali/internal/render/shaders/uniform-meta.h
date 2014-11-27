@@ -22,11 +22,11 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/event-to-update.h>
-#include <dali/internal/render/shaders/shader.h>
 
 namespace Dali
 {

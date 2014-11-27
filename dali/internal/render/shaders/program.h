@@ -24,8 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
-#include <dali/internal/render/gl-resources/context.h>
-#include <dali/integration-api/resource-cache.h>
+#include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/shader-data.h>
 
 namespace Dali
@@ -42,7 +41,7 @@ class ShaderData;
 namespace Internal
 {
 
-class Context;
+class ProgramCache;
 
 /*
  * A program contains a vertex & fragment shader.
@@ -130,16 +129,14 @@ public:
 
   /**
    * Creates a new program, or returns a copy of an existing program in the program cache
-   * @param [in] resourceId ResourceManager resourceId for the shader source and binary.
-   *                        Used as a lookup key in the program cache
+   * @param[in] cache where the programs are stored
    * @param[in] shaderData  A pointer to a data structure containing the program source
    *                        and optionally precompiled binary. If the binary is empty the program bytecode
    *                        is copied into it after compilation and linking)
-   * @param [in] context    GL context
-   * @param [in] modifiesGeometry True if the shader modifies geometry
+   * @param[in] modifiesGeometry True if the shader modifies geometry
    * @return pointer to the program
    */
-  static Program* New( const Integration::ResourceId& resourceId, Integration::ShaderDataPtr shaderData, Context& context, bool modifiesGeometry );
+  static Program* New( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry );
 
   /**
    * Takes this program into use
@@ -296,11 +293,11 @@ private: // Implementation
 
   /**
    * Constructor, private so no direct instantiation
+   * @param[in] cache where the programs are stored
    * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
-   * @param[in] context    The GL context state cache.
    * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
-  Program( Integration::ShaderDataPtr shaderData, Context& context, bool modifiesGeometry );
+  Program( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry );
 
 public:
 
@@ -352,7 +349,7 @@ private:
 
 private:  // Data
 
-  Context& mContext;                          ///< The GL context state cache
+  ProgramCache& mCache;                       ///< The program cache
   Integration::GlAbstraction& mGlAbstraction; ///< The OpenGL Abstraction layer
   const Matrix* mProjectionMatrix;            ///< currently set projection matrix
   const Matrix* mViewMatrix;                  ///< currently set view matrix
@@ -371,6 +368,7 @@ private:  // Data
   GLfloat mUniformCacheFloat[ MAX_UNIFORM_CACHE_SIZE ];     ///< Value cache for uniforms of single float
   GLfloat mUniformCacheFloat4[ MAX_UNIFORM_CACHE_SIZE ][4]; ///< Value cache for uniforms of four float
   bool mModifiesGeometry;  ///< True if the program changes geometry
+
 };
 
 } // namespace Internal

@@ -373,7 +373,7 @@ public:
 };
 
 /**
- * AnyCast helper functions ( replicates boost functionality, but without exception generation )
+ * AnyCast helper functions
  */
 
 /**
@@ -383,7 +383,8 @@ public:
  *
  * @return Pointer to the Type held
  */
-template<typename Type>inline Type* AnyCast( Any* any )
+template<typename Type>
+inline Type* AnyCast( Any* any )
 {
   return any->GetPointer<Type>();
 }
@@ -395,7 +396,8 @@ template<typename Type>inline Type* AnyCast( Any* any )
  *
  * @return const Pointer to the Type held
  */
-template<typename Type>inline const Type* AnyCast( const Any* any )
+template<typename Type>
+inline const Type* AnyCast( const Any* any )
 {
   return any->GetPointer<Type>();
 }
@@ -407,7 +409,8 @@ template<typename Type>inline const Type* AnyCast( const Any* any )
  *
  * @return Type value of type Type
  */
-template<typename Type>inline Type AnyCast( Any& any )
+template<typename Type>
+inline Type AnyCast( Any& any )
 {
   return any.Get<Type>();
 }
@@ -419,7 +422,8 @@ template<typename Type>inline Type AnyCast( Any& any )
  *
  * @return Type value of type Type
  */
-template<typename Type>inline Type AnyCast( const Any& any )
+template<typename Type>
+inline Type AnyCast( const Any& any )
 {
   return any.Get<Type>();
 }
@@ -431,7 +435,8 @@ template<typename Type>inline Type AnyCast( const Any& any )
  *
  * @return A reference to the Type value of type Type
  */
-template<typename Type>inline Type& AnyCastReference( Any& any )
+template<typename Type>
+inline Type& AnyCastReference( Any& any )
 {
   return any.Get<Type>();
 }
@@ -443,7 +448,8 @@ template<typename Type>inline Type& AnyCastReference( Any& any )
  *
  * @return A const reference to the Type value of type Type
  */
-template<typename Type>inline const Type& AnyCastReference( const Any& any )
+template<typename Type>
+inline const Type& AnyCastReference( const Any& any )
 {
   return any.Get<Type>();
 }

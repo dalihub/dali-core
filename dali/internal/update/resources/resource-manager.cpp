@@ -234,14 +234,21 @@ void ResourceManager::PostProcessResources( BufferIndex updateBufferIndex )
     switch(ppRequest.postProcess)
     {
       case ResourcePostProcessRequest::UPLOADED:
+      {
         SendToClient( UploadedMessage( *mImpl->mResourceClient, ppRequest.id ) );
         break;
+      }
       case ResourcePostProcessRequest::SAVE:
+      {
         SendToClient( SaveResourceMessage( *mImpl->mResourceClient, ppRequest.id ) );
         break;
+
+      }
       case ResourcePostProcessRequest::DELETED:
+      {
         // TextureObservers handled in TextureCache
         break;
+      }
     }
   }
 
@@ -400,17 +407,7 @@ void ResourceManager::HandleLoadShaderRequest( ResourceId id, const ResourceType
   {
     ShaderDataPtr shaderData(new ShaderData(shaderType->vertexShader, shaderType->fragmentShader));
 
-    // For startup speed, shader file load must be synchronous in this
-    // thread - Update manager will get a message following this to use
-    // the program data immediately. (i.e. if this load fails, then
-    // buffer is empty)
-
-    // It would be safer, though slower, to handle shader binary load
-    // failure in the event thread through the ticket mechanism;
-    // however, as we are not using the result in the ShaderFactory, it
-    // is safe to return LoadSuccess even if the load failed. Ignore the
-    // result.
-    mImpl->mPlatformAbstraction.LoadFile(typePath.path, shaderData->buffer);
+    mImpl->mPlatformAbstraction.LoadFile(typePath.path, shaderData->GetBuffer());
 
     // Add the ID to the completed set
     mImpl->newCompleteRequests.insert(id);
@@ -885,18 +882,6 @@ void ResourceManager::SaveComplete(ResourceId id, ResourceTypeId type)
     if( mImpl->deadRequests.find(id) == mImpl->deadRequests.end() )
     {
       SendToClient( SavingSucceededMessage( *mImpl->mResourceClient, id ) );
-    }
-
-    // clear the uneeded binary shader data
-    if( type == ResourceShader )
-    {
-      ShaderCacheIter shaderIter  = mImpl->mShaders.find(id);
-      DALI_ASSERT_DEBUG( mImpl->mShaders.end() != shaderIter );
-      if( mImpl->mShaders.end() != shaderIter )
-      {
-        ShaderDataPtr shaderDataPtr = shaderIter->second;
-        std::vector<unsigned char>().swap(shaderDataPtr->buffer);
-      }
     }
   }
 }
