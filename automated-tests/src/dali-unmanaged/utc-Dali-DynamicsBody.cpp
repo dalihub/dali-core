@@ -23,8 +23,11 @@
 
 int UtcDaliDynamicsBodyConstructor(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodyConstructor - DynamicsBody::DynamicsBody()");
-
   TestApplication application;
 
   // start up
@@ -62,6 +65,10 @@ int UtcDaliDynamicsBodyConstructor(void)
 
 int UtcDaliDynamicsBodyGetMass(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -90,11 +97,16 @@ int UtcDaliDynamicsBodyGetMass(void)
 
   tet_infoline("UtcDaliDynamicsBodyGetMass - DynamicsBody::GetMass");
   DALI_TEST_EQUALS( testMass, actor.GetDynamicsBody().GetMass(), Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   END_TEST;
 }
 
 int UtcDaliDynamicsBodyGetElasticity(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -128,6 +140,10 @@ int UtcDaliDynamicsBodyGetElasticity(void)
 
 int UtcDaliDynamicsBodySetLinearVelocity(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodySetLinearVelocity - DynamicsBody::SetLinearVelocity");
 
   TestApplication application;
@@ -171,6 +187,10 @@ int UtcDaliDynamicsBodySetLinearVelocity(void)
 
 int UtcDaliDynamicsBodySetAngularVelocity(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodySetAngularVelocity - DynamicsBody::SetAngularVelocity");
 
   TestApplication application;
@@ -214,6 +234,10 @@ int UtcDaliDynamicsBodySetAngularVelocity(void)
 
 int UtcDaliDynamicsBodySetKinematic(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -258,6 +282,10 @@ int UtcDaliDynamicsBodySetKinematic(void)
 
 int UtcDaliDynamicsBodyIsKinematic(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -298,6 +326,10 @@ int UtcDaliDynamicsBodyIsKinematic(void)
 
 int UtcDaliDynamicsBodySetSleepEnabled(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodySetSleepEnabled");
 
   TestApplication application;
@@ -346,6 +378,10 @@ int UtcDaliDynamicsBodySetSleepEnabled(void)
 
 int UtcDaliDynamicsBodyGetSleepEnabled(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodyGetSleepEnabled");
 
   TestApplication application;
@@ -382,6 +418,10 @@ int UtcDaliDynamicsBodyGetSleepEnabled(void)
 
 int UtcDaliDynamicsBodyWakeUp(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodyWakeUp");
 
   TestApplication application;
@@ -426,6 +466,10 @@ int UtcDaliDynamicsBodyWakeUp(void)
 
 int UtcDaliDynamicsBodyAddAnchor(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodyAddAnchor - DynamicsBody::AddAnchor()");
 
   TestApplication application;
@@ -486,6 +530,10 @@ int UtcDaliDynamicsBodyAddAnchor(void)
 
 int UtcDaliDynamicsBodyConserveVolume(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodyConserveVolume");
 
   TestApplication application;
@@ -520,6 +568,10 @@ int UtcDaliDynamicsBodyConserveVolume(void)
 
 int UtcDaliDynamicsBodyConserveShape(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsBodyConserveShape");
 
   TestApplication application;

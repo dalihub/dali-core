@@ -74,9 +74,12 @@ if test "x$enable_emscripten" = "xyes"; then
   enable_backtrace="no"
 fi
 
+DYNAMICS_SUPPORT=
 if test "x$dynamics_support" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DDYNAMICS_SUPPORT"
+  DYNAMICS_SUPPORT=-DDYNAMICS_SUPPORT
 fi
+AC_SUBST(DYNAMICS_SUPPORT)
 
 # Must come after Emscripten feature test
 if test "x$enable_backtrace" = "xyes"; then
@@ -123,6 +126,7 @@ AC_CONFIG_FILES([
  Makefile
  dali-core/Makefile
  dali-core.pc
+ ../../automated-tests/CMakeLists.txt
 ])
 
 AC_OUTPUT
