@@ -43,6 +43,10 @@ int UtcDaliDynamicsJointConstructor(void)
 
 int UtcDaliDynamicsJointLinearLimit(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -80,6 +84,10 @@ int UtcDaliDynamicsJointLinearLimit(void)
 
 int UtcDaliDynamicsJointAngularLimit(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -113,6 +121,10 @@ int UtcDaliDynamicsJointAngularLimit(void)
 
 int UtcDaliDynamicsJointEnableSpring(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -146,6 +158,10 @@ int UtcDaliDynamicsJointEnableSpring(void)
 
 int UtcDaliDynamicsJointSetSpringStiffness(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -179,6 +195,10 @@ int UtcDaliDynamicsJointSetSpringStiffness(void)
 
 int UtcDaliDynamicsJointSetSpringCenterPoint(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -212,6 +232,10 @@ int UtcDaliDynamicsJointSetSpringCenterPoint(void)
 
 int UtcDaliDynamicsJointEnableMotor(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -245,6 +269,10 @@ int UtcDaliDynamicsJointEnableMotor(void)
 
 int UtcDaliDynamicsJointSetMotorVelocity(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -278,6 +306,10 @@ int UtcDaliDynamicsJointSetMotorVelocity(void)
 
 int UtcDaliDynamicsJointSetMotorForce(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
@@ -311,6 +343,10 @@ int UtcDaliDynamicsJointSetMotorForce(void)
 
 int UtcDaliDynamicsJointGetActor(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
