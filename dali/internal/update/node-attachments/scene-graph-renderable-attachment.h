@@ -163,21 +163,7 @@ public: // For use during in the update algorithm only
    * @param[in] updateBufferIndex The current update buffer index.
    * @return visible tells if this renderer can be potentially seen
    */
-  virtual bool ResolveVisibility( BufferIndex updateBufferIndex )
-  {
-    mHasSizeAndColorFlag = false;
-    const Vector4& color = mParent->GetWorldColor( updateBufferIndex );
-    if( color.a > FULLY_TRANSPARENT )               // not fully transparent
-    {
-      const Vector3& size = mParent->GetSize( updateBufferIndex );
-      if( ( size.width > Math::MACHINE_EPSILON_1000 )&&   // width is greater than a very small number
-          ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
-      {
-        mHasSizeAndColorFlag = true;
-      }
-    }
-    return mHasSizeAndColorFlag;
-  }
+  virtual bool ResolveVisibility( BufferIndex updateBufferIndex );
 
   /**
    * if this renderable actor has visible size and color

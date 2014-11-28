@@ -224,6 +224,30 @@ void RenderableAttachment::RemoveShader( BufferIndex updateBufferIndex )
   ShaderChanged( updateBufferIndex );
 }
 
+bool RenderableAttachment::ResolveVisibility( BufferIndex updateBufferIndex )
+{
+  mHasSizeAndColorFlag = false;
+  const Vector4& color = mParent->GetWorldColor( updateBufferIndex );
+  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
+  {
+    const float MAX_NODE_SIZE = float(1u<<30);
+    const Vector3& size = mParent->GetSize( updateBufferIndex );
+    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&    // width is greater than a very small number
+        ( size.height > Math::MACHINE_EPSILON_1000 ) &&   // height is greater than a very small number
+        ( size.width < MAX_NODE_SIZE ) &&                 // width is smaller than the maximum allowed size
+        ( size.height < MAX_NODE_SIZE ) )                 // height is smaller than the maximum allowed size
+    {
+      mHasSizeAndColorFlag = true;
+    }
+    else
+    {
+      DALI_LOG_ERROR("Actor size should be bigger than 0 but not bigger than %f.\n", MAX_NODE_SIZE );
+      DALI_LOG_ACTOR_TREE( mParent );
+    }
+  }
+  return mHasSizeAndColorFlag;
+}
+
 void RenderableAttachment::DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
 {
   scaling = Vector3::ONE;

@@ -174,6 +174,33 @@ int UtcDaliImageActorPixelArea(void)
   END_TEST;
 }
 
+// Set a size that is too large on an Image with a shader that requires grid
+int UtcDaliImageActorSetSize01(void)
+{
+  TestApplication application;
+
+  BitmapImage img = BitmapImage::New( 1,1 );
+  ImageActor actor = ImageActor::New( img );
+
+  ShaderEffect effect = ShaderEffect::New( " ", " ", " ", " ", ShaderEffect::HINT_GRID );
+  actor.SetShaderEffect( effect );
+
+  const float INVALID_SIZE = float(1u<<31);
+  Vector3 vector( INVALID_SIZE, INVALID_SIZE, INVALID_SIZE );
+
+  DALI_TEST_CHECK(vector != actor.GetCurrentSize());
+
+  actor.SetSize(vector);
+  Stage::GetCurrent().Add(actor);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS(vector, actor.GetCurrentSize(), TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliImageActorGetCurrentSize01(void)
 {
   TestApplication application;
