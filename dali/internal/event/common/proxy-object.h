@@ -22,11 +22,12 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/property-index.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/internal/event/common/object-impl.h>
@@ -281,13 +282,21 @@ public: // Constraints
    */
   void RemoveConstraints( unsigned int tag );
 
-public: // Called by TypeInfo
+public:
 
   /**
    * Called by TypeInfo to set the type-info that this proxy-object is created by.
    * @param[in] typeInfo The TypeInfo that creates this proxy-object.
    */
   void SetTypeInfo( const TypeInfo* typeInfo );
+
+  /**
+   * @return the index from which custom properties start
+   */
+  unsigned int CustomPropertyStartIndex()
+  {
+    return PROPERTY_CUSTOM_START_INDEX;
+  }
 
 protected:
 

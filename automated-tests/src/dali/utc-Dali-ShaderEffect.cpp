@@ -483,13 +483,25 @@ int UtcDaliShaderEffectMethodSetUniformViewport(void)
 
   const Vector2& stageSize(Stage::GetCurrent().GetSize());
 
-  DALI_TEST_CHECK(
-      application.GetGlAbstraction().CheckUniformValue(
-          "uVec2", Vector2( stageSize.x/2, -stageSize.y/2 ) ) );
+  DALI_TEST_CHECK( application.GetGlAbstraction().CheckUniformValue( "uVec2", Vector2( stageSize.x/2, -stageSize.y/2 ) ) );
 
-  DALI_TEST_CHECK(
-      application.GetGlAbstraction().CheckUniformValue(
-          "uVec2Dir", Vector2( -1.0f, 2.0f ) ) );
+  DALI_TEST_CHECK( application.GetGlAbstraction().CheckUniformValue( "uVec2Dir", Vector2( -1.0f, 2.0f ) ) );
+
+  // change coordinate types
+  effect.SetUniform( "uVec2", Vector2( 0.1f, 0.2f ), ShaderEffect::COORDINATE_TYPE_DEFAULT );
+  effect.SetUniform( "uVec2Dir", Vector2( 1.0f, 2.0f ), ShaderEffect::COORDINATE_TYPE_VIEWPORT_POSITION );
+  actor.SetPixelArea( ImageActor::PixelArea( 0, 0, 10, 10 ) );
+
+  application.SendNotification();
+  application.Render();
+
+  Vector2 outValue;
+  application.GetGlAbstraction().GetUniformValue( "uVec2", outValue );
+  DALI_TEST_EQUALS( outValue, Vector2( 0.1f, 0.2f ), TEST_LOCATION );
+
+  application.GetGlAbstraction().GetUniformValue( "uVec2Dir", outValue );
+  DALI_TEST_EQUALS( outValue, Vector2( stageSize.x *.5f - 1.f, -stageSize.y * .5f + 2.f), TEST_LOCATION );
+
   END_TEST;
 }
 
