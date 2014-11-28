@@ -156,7 +156,7 @@ public: // Not intended for application developers
   /**
    * @brief This constructor is used by Dali::New() methods.
    *
-   * @param[in] Path A pointer to an internal path resource
+   * @param[in] path A pointer to an internal path resource
    */
   explicit DALI_INTERNAL Path(Internal::Path* path);
 };
