@@ -37,32 +37,37 @@ namespace Internal
 namespace SceneGraph
 {
 
-template <class T>
-class InheritedProperty;
-
 /**
  * An inherited Vector3 property.
  */
-template <>
-class InheritedProperty<Vector3> : public PropertyInputImpl
+class InheritedVector3 : public PropertyInputImpl
 {
 public:
 
   /**
-   * Create an inherited property.
-   * @param [in] initialValue The initial value of the property.
+   * Create an inherited Vector3.
    */
-  InheritedProperty( const Vector3& initialValue )
-  : mValue( initialValue ),
+  InheritedVector3()
+  : mValue(),
     mInheritedFlag( false ),
     mReinheritedFlag( true )
   {
   }
 
   /**
+   * Create an inherited Vector3.
+   * @param [in] initialValue The initial value of the property.
+   */
+  InheritedVector3( const Vector3& initialValue )
+  : mValue( initialValue ),
+    mInheritedFlag( false ),
+    mReinheritedFlag( true )
+  {
+  }
+  /**
    * Virtual destructor.
    */
-  virtual ~InheritedProperty()
+  virtual ~InheritedVector3()
   {
   }
 
@@ -179,10 +184,10 @@ public:
 private:
 
   // Undefined
-  InheritedProperty(const InheritedProperty& property);
+  InheritedVector3(const InheritedVector3& property);
 
   // Undefined
-  InheritedProperty& operator=(const InheritedProperty& rhs);
+  InheritedVector3& operator=(const InheritedVector3& rhs);
 
 private:
 
@@ -366,17 +371,15 @@ private:
 /**
  * An inherited Quaternion property.
  */
-template <>
-class InheritedProperty<Quaternion> : public PropertyInputImpl
+class InheritedQuaternion : public PropertyInputImpl
 {
 public:
 
   /**
    * Create an inherited property.
-   * @param [in] initialValue The initial value of the property.
    */
-  InheritedProperty( const Quaternion& initialValue )
-  : mValue( initialValue ),
+  InheritedQuaternion()
+  : mValue(),
     mInheritedFlag( false ),
     mReinheritedFlag( true )
   {
@@ -385,7 +388,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedProperty()
+  virtual ~InheritedQuaternion()
   {
   }
 
@@ -502,13 +505,10 @@ public:
 private:
 
   // Undefined
-  InheritedProperty();
+  InheritedQuaternion(const InheritedQuaternion& property);
 
   // Undefined
-  InheritedProperty(const InheritedProperty& property);
-
-  // Undefined
-  InheritedProperty& operator=(const InheritedProperty& rhs);
+  InheritedQuaternion& operator=(const InheritedQuaternion& rhs);
 
 private:
 
@@ -521,8 +521,7 @@ private:
 /**
  * An inherited Matrix property.
  */
-template <>
-class InheritedProperty<Matrix> : public PropertyInputImpl
+class InheritedMatrix : public PropertyInputImpl
 {
 public:
 
@@ -530,8 +529,8 @@ public:
    * Create an inherited property.
    * @param [in] initialValue The initial value of the property.
    */
-  InheritedProperty( const Matrix& initialValue )
-  : mValue( initialValue ),
+  InheritedMatrix()
+  : mValue(),
     mInheritedFlag( false ),
     mReinheritedFlag( true )
   {
@@ -540,7 +539,7 @@ public:
   /**
    * Virtual destructor.
    */
-  virtual ~InheritedProperty()
+  virtual ~InheritedMatrix()
   {
   }
 
@@ -683,13 +682,10 @@ public:
 private:
 
   // Undefined
-  InheritedProperty();
+  InheritedMatrix(const InheritedMatrix& property);
 
   // Undefined
-  InheritedProperty(const InheritedProperty& property);
-
-  // Undefined
-  InheritedProperty& operator=(const InheritedProperty& rhs);
+  InheritedMatrix& operator=(const InheritedMatrix& rhs);
 
 private:
 

@@ -1044,11 +1044,11 @@ public: // Default properties
 
   // Inherited properties; read-only from public API
 
-  InheritedProperty<Vector3>    mWorldPosition; ///< Full inherited position
-  InheritedProperty<Quaternion> mWorldRotation; ///< Full inherited rotation
-  InheritedProperty<Vector3>    mWorldScale;    ///< Full inherited scale
-  InheritedProperty<Matrix>     mWorldMatrix;   ///< Full inherited world matrix
-  InheritedColor                mWorldColor;    ///< Full inherited color
+  InheritedVector3    mWorldPosition; ///< Full inherited position
+  InheritedQuaternion mWorldRotation; ///< Full inherited rotation
+  InheritedVector3    mWorldScale;    ///< Full inherited scale
+  InheritedMatrix     mWorldMatrix;   ///< Full inherited world matrix
+  InheritedColor      mWorldColor;    ///< Full inherited color
 
 protected:
 

@@ -255,8 +255,8 @@ public:  // PROPERTIES
   Vector2                       mStereoBias;
   Vector3                       mTargetPosition;
 
-  InheritedProperty<Matrix>     mViewMatrix;           ///< The view-matrix; this is double buffered for input handling.
-  InheritedProperty<Matrix>     mProjectionMatrix;     ///< The projection-matrix; this is double buffered for input handling.
+  InheritedMatrix mViewMatrix;           ///< The view-matrix; this is double buffered for input handling.
+  InheritedMatrix mProjectionMatrix;     ///< The projection-matrix; this is double buffered for input handling.
 
   DoubleBuffered< Matrix >      mInverseViewProjection;///< Inverted viewprojection; double buffered for input handling
 

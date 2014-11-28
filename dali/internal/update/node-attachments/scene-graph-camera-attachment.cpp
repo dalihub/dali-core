@@ -166,8 +166,8 @@ CameraAttachment::CameraAttachment()
   mFarClippingPlane( DEFAULT_FAR_CLIPPING_PLANE ),
   mStereoBias( DEFAULT_STEREO_BIAS ),
   mTargetPosition( DEFAULT_TARGET_POSITION ),
-  mViewMatrix( Matrix::IDENTITY ),
-  mProjectionMatrix( Matrix::IDENTITY ),
+  mViewMatrix(),
+  mProjectionMatrix(),
   mInverseViewProjection( Matrix::IDENTITY )
 {
 }

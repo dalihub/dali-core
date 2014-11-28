@@ -44,16 +44,16 @@ Node* Node::New()
 Node::Node()
 : mParentOrigin( ParentOrigin::DEFAULT ),
   mAnchorPoint( AnchorPoint::DEFAULT ),
-  mSize( Vector3::ZERO ),
-  mPosition( Vector3::ZERO ),
-  mRotation( Quaternion::IDENTITY ),
+  mSize(),     // zero initialized by default
+  mPosition(), // zero initialized by default
+  mRotation(), // initialized to identity by default
   mScale( Vector3::ONE ),
   mVisible( true ),
   mColor( Color::WHITE ),
-  mWorldPosition( Vector3::ZERO ),
-  mWorldRotation( Quaternion::IDENTITY ),
+  mWorldPosition(), // zero initialized by default
+  mWorldRotation(), // initialized to identity by default
   mWorldScale( Vector3::ONE ),
-  mWorldMatrix( Matrix::IDENTITY ),
+  mWorldMatrix(),
   mWorldColor( Color::WHITE ),
   mParent( NULL ),
   mExclusiveRenderTask( NULL ),
