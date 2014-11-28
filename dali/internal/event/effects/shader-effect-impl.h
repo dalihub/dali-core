@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/images/image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/common/proxy-object.h>

@@ -20,10 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
-#include <dali/internal/common/message.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
-#include <dali/internal/render/gl-resources/bitmap-texture.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 
 namespace Dali

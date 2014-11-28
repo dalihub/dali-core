@@ -30,10 +30,8 @@
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/modeling/scene-graph-animatable-mesh.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 
 namespace Dali

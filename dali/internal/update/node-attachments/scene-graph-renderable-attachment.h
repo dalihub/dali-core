@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/layer.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/internal-constants.h>
@@ -27,7 +26,6 @@
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
 

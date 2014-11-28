@@ -24,7 +24,6 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/common/type-abstraction-enums.h>
