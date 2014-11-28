@@ -181,8 +181,8 @@ private:
   DynamicsWorld& mWorld;
   Mesh*          mMesh;
 
-  DoubleBufferedVector3 mLinearVelocity;
-  DoubleBufferedVector3 mAngularVelocity;
+  DoubleBuffered<Vector3> mLinearVelocity;
+  DoubleBuffered<Vector3> mAngularVelocity;
 
 }; // class DynamicsBody
 

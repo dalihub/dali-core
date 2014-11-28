@@ -818,6 +818,15 @@ public:
 
   /**
    * Create an animatable property.
+   */
+  AnimatableProperty()
+  : mValue(),
+    mBaseValue()
+  {
+  }
+
+  /**
+   * Create an animatable property.
    * @param [in] initialValue The initial value of the property.
    */
   AnimatableProperty( const Vector3& initialValue )
@@ -1508,6 +1517,15 @@ template <>
 class AnimatableProperty<Quaternion> : public AnimatablePropertyBase
 {
 public:
+
+  /**
+   * Create an animatable property.
+   */
+  AnimatableProperty()
+  : mValue(),
+    mBaseValue()
+  {
+  }
 
   /**
    * Create an animatable property.
