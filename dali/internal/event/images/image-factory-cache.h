@@ -40,6 +40,17 @@ namespace ImageFactoryCache
  */
 struct Request;
 
+/**
+ * @brief Unique ID for image resource requests.
+ *
+ * Images are loaded from a string locator (typically a file path) using a set
+ * of ImageAttributes. Each unique pair of string and attributes is mapped to a
+ * unique RequestId value. This ensures multiple Image objects loading the same
+ * image file with the same attributes only generate one resource request and
+ * Core only issues one IO operation to Adaptor to do the load.
+ *
+ * @sa Dali::Integration::ResourceId
+ */
 typedef unsigned int RequestId;
 
 typedef std::multimap<size_t, RequestId>           RequestPathHashMap;

@@ -153,22 +153,22 @@ int UtcDaliImageFactoryUseCachedRequest03(void)
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket2 = imageFactory.Load( req2.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Load( *req2.Get() );
   DALI_TEST_EQUALS( req, req2, TEST_LOCATION );
   DALI_TEST_EQUALS( ticket, ticket2, TEST_LOCATION );
 
   req2 = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket3 = imageFactory.Load( req2.Get() );
+  ResourceTicketPtr ticket3 = imageFactory.Load( *req2.Get() );
   DALI_TEST_EQUALS( req, req2, TEST_LOCATION );
   DALI_TEST_EQUALS( ticket, ticket3, TEST_LOCATION );
 
   // request differs in scaled size - not default size
   ImageAttributes attr = ImageAttributes::New( 80, 160, Pixel::BGR8888 );
   req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
-  ResourceTicketPtr ticket4 = imageFactory.Load( req2.Get() );
+  ResourceTicketPtr ticket4 = imageFactory.Load( *req2.Get() );
   DALI_TEST_CHECK( req != req2 );
   END_TEST;
 }
@@ -203,7 +203,7 @@ int UtcDaliImageFactoryCompatibleResource01(void)
 
   // request with default attributes ( size is 0,0 )
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -216,7 +216,7 @@ int UtcDaliImageFactoryCompatibleResource01(void)
   ImageAttributes attr = ImageAttributes::New();
   attr.SetSize( 80, 80 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
-  ResourceTicketPtr ticket2 = imageFactory.Load( req2.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Load( *req2.Get() );
 
   DALI_TEST_CHECK( req != req2 ); // different requests
   DALI_TEST_EQUALS( ticket->GetId(), ticket2->GetId(), TEST_LOCATION ); // same resource
@@ -236,7 +236,7 @@ int UtcDaliImageFactoryCompatibleResource02(void)
 
   // request with default attributes ( size is 0,0 )
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -254,7 +254,7 @@ int UtcDaliImageFactoryCompatibleResource02(void)
   ImageAttributes attr = ImageAttributes::New();
   attr.SetSize( 92, 92 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
-  ResourceTicketPtr ticket2 = imageFactory.Load( req2.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Load( *req2.Get() );
 
   DALI_TEST_CHECK( req != req2 ); // different requests
   DALI_TEST_EQUALS( ticket->GetId(), ticket2->GetId(), TEST_LOCATION ); // same resource
@@ -278,7 +278,7 @@ int UtcDaliImageFactoryCompatibleResource03(void)
 
   // request with default attributes ( size is 0,0 )
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, &attr );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -291,7 +291,7 @@ int UtcDaliImageFactoryCompatibleResource03(void)
   ImageAttributes attr2 = ImageAttributes::New();
   attr2.SetSize( 80, 80 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr2 );
-  ResourceTicketPtr ticket2 = imageFactory.Load( req2.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Load( *req2.Get() );
 
   DALI_TEST_CHECK( req != req2 ); // different requests
   DALI_TEST_EQUALS( ticket->GetId(), ticket2->GetId(), TEST_LOCATION ); // same resource
@@ -310,12 +310,12 @@ int UtcDaliImageFactoryReload01(void)
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
-  ResourceTicketPtr ticket2 = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Reload( *req.Get() );
   DALI_TEST_EQUALS( ticket, ticket2, TEST_LOCATION );
 
-  ResourceTicketPtr ticket3 = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket3 = imageFactory.Reload( *req.Get() );
   DALI_TEST_EQUALS( ticket, ticket3, TEST_LOCATION );
   END_TEST;
 }
@@ -332,7 +332,7 @@ int UtcDaliImageFactoryReload02(void)
   application.GetPlatform().SetClosestImageSize(testSize);
 
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -342,7 +342,7 @@ int UtcDaliImageFactoryReload02(void)
   DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
   application.GetPlatform().ResetTrace();
 
-  ResourceTicketPtr ticket2 = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Reload( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -356,7 +356,7 @@ int UtcDaliImageFactoryReload02(void)
   // emulate load success
   EmulateImageLoaded( application, 80, 80 );
 
-  ResourceTicketPtr ticket3 = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket3 = imageFactory.Reload( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -367,7 +367,7 @@ int UtcDaliImageFactoryReload02(void)
   DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
   application.GetPlatform().ResetTrace();
 
-  ticket3 = imageFactory.Reload( req.Get() );
+  ticket3 = imageFactory.Reload( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -390,7 +390,7 @@ int UtcDaliImageFactoryReload03(void)
   application.GetPlatform().SetClosestImageSize( testSize );
 
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -402,10 +402,10 @@ int UtcDaliImageFactoryReload03(void)
   application.GetPlatform().SetClosestImageSize( newSize );
 
   // Image file changed size, new resource request should be issued
-  ResourceTicketPtr ticket2 = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Reload( *req.Get() );
   DALI_TEST_CHECK( ticket != ticket2 );
 
-  ResourceTicketPtr ticket3 = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket3 = imageFactory.Reload( *req.Get() );
   DALI_TEST_EQUALS( ticket2, ticket3, TEST_LOCATION );
   END_TEST;
 }
@@ -422,7 +422,7 @@ int UtcDaliImageFactoryReload04(void)
   application.GetPlatform().SetClosestImageSize(testSize);
 
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -430,7 +430,7 @@ int UtcDaliImageFactoryReload04(void)
   DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
   application.GetPlatform().ResetTrace();
 
-  ResourceTicketPtr ticket2 = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Reload( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -444,7 +444,7 @@ int UtcDaliImageFactoryReload04(void)
   // emulate load success
   EmulateImageLoaded( application, 80, 80 );
 
-  ResourceTicketPtr ticket3 = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket3 = imageFactory.Reload( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -457,7 +457,7 @@ int UtcDaliImageFactoryReload04(void)
   application.GetPlatform().ResetTrace();
 
   // still loading
-  ticket3 = imageFactory.Reload( req.Get() );
+  ticket3 = imageFactory.Reload( *req.Get() );
   application.SendNotification();
   application.Render();
   application.SendNotification();
@@ -490,13 +490,13 @@ int UtcDaliImageFactoryReload05(void)
   application.SendNotification();
   application.Render();
 
-  ResourceTicketPtr ticket = imageFactory.Reload( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Reload( *req.Get() );
 
   DALI_TEST_CHECK( !application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
   DALI_TEST_CHECK( !ticket );
 
   // this happens when Image is put on stage
-  ticket = imageFactory.Load( req.Get() );
+  ticket = imageFactory.Load( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -505,7 +505,7 @@ int UtcDaliImageFactoryReload05(void)
   DALI_TEST_CHECK( ticket );
   application.GetPlatform().ResetTrace();
 
-  ticket = imageFactory.Reload( req.Get() );
+  ticket = imageFactory.Reload( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -518,7 +518,7 @@ int UtcDaliImageFactoryReload05(void)
   // emulate load success
   EmulateImageLoaded( application, 80, 80 );
 
-  ticket = imageFactory.Reload( req.Get() );
+  ticket = imageFactory.Reload( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -545,7 +545,7 @@ int UtcDaliImageFactoryReload06(void)
 
   // request with default attributes ( size is 0,0 )
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
-  ResourceTicketPtr ticket = imageFactory.Load( req.Get() );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
 
   application.SendNotification();
   application.Render();
@@ -562,7 +562,7 @@ int UtcDaliImageFactoryReload06(void)
   ImageAttributes attr = ImageAttributes::New();
   attr.SetSize( 92, 92 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
-  ResourceTicketPtr ticket2 = imageFactory.Load( req2.Get() );
+  ResourceTicketPtr ticket2 = imageFactory.Load( *req2.Get() );
 
   DALI_TEST_CHECK( req != req2 ); // different requests
   DALI_TEST_EQUALS( ticket->GetId(), ticket2->GetId(), TEST_LOCATION ); // same resource
@@ -571,14 +571,14 @@ int UtcDaliImageFactoryReload06(void)
   application.GetPlatform().SetClosestImageSize(newSize);
 
   // reload fixed size (192,192) request
-  ticket2 = imageFactory.Reload( req2.Get() );
+  ticket2 = imageFactory.Reload( *req2.Get() );
 
   // emulate load success
   // note: this is the only way to emulate what size is loaded by platform abstraction
   EmulateImageLoaded( application, 92, 92 );
 
   // reload default size request
-  ticket = imageFactory.Reload( req.Get() );
+  ticket = imageFactory.Reload( *req.Get() );
 
   DALI_TEST_CHECK( ticket->GetId() != ticket2->GetId() ); // different resources
   END_TEST;

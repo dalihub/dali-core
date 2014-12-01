@@ -91,7 +91,7 @@ ImagePtr Image::New( const std::string& filename, const Dali::ImageAttributes& a
     if( Dali::Image::Immediate == loadPol )
     {
       // Trigger loading of the image on a as soon as it can be done
-      image->mTicket = image->mImageFactory.Load( image->mRequest.Get() );
+      image->mTicket = image->mImageFactory.Load( *image->mRequest.Get() );
       image->mTicket->AddObserver( *image );
     }
   }
@@ -186,7 +186,7 @@ void Image::Reload()
 {
   if ( mRequest )
   {
-    ResourceTicketPtr ticket = mImageFactory.Reload( mRequest.Get() );
+    ResourceTicketPtr ticket = mImageFactory.Reload( *mRequest.Get() );
     SetTicket( ticket.Get() );
   }
 }
@@ -271,7 +271,8 @@ void Image::Connect()
     // ticket was thrown away when related actors went offstage or image loading on demand
     if( !mTicket )
     {
-      ResourceTicketPtr newTicket = mImageFactory.Load( mRequest.Get() );
+      DALI_ASSERT_DEBUG( mRequest.Get() );
+      ResourceTicketPtr newTicket = mImageFactory.Load( *mRequest.Get() );
       SetTicket( newTicket.Get() );
     }
   }
