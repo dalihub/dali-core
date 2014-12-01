@@ -41,6 +41,18 @@ namespace Dali
 namespace Internal
 {
 
+/**
+ * @brief Structure for setting up default properties and their details.
+ */
+struct PropertyDetails
+{
+  const char* name;         ///< The name of the property.
+  Property::Type type;      ///< The property type.
+  bool writable:1;          ///< Whether the property is writable
+  bool animatable:1;        ///< Whether the property is animatable.
+  bool constraintInput:1;   ///< Whether the property can be used as an input to a constraint.
+};
+
 class Stage;
 class PropertyInputImpl;
 class ProxyObject;
@@ -171,7 +183,7 @@ public: // Property system interface from Internal::Object
   /**
    * @copydoc Dali::Internal::Object::GetPropertyName()
    */
-  virtual const std::string& GetPropertyName( Property::Index index ) const;
+  virtual std::string GetPropertyName( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::GetPropertyIndex()
@@ -356,7 +368,7 @@ private: // Default property extensions for derived classes
    * Query how many default properties the derived class supports.
    * @return The number of default properties.
    */
-  virtual const std::string& GetDefaultPropertyName( Property::Index index ) const = 0;
+  virtual const char* GetDefaultPropertyName( Property::Index index ) const = 0;
 
   /**
    * Query the index of a default property.

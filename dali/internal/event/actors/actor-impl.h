@@ -22,7 +22,6 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor.h>
@@ -1161,7 +1160,7 @@ public: // Default property extensions from ProxyObject
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
    */
-  virtual const std::string& GetDefaultPropertyName(Property::Index index) const;
+  virtual const char* GetDefaultPropertyName(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -1400,29 +1399,11 @@ protected:
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
 
-  // Default properties
-  typedef std::map<std::string, Property::Index> DefaultPropertyLookup;
-
 private:
 
   static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
   static unsigned int   mActorCounter; ///< A counter to track the actor instance creation
 
-  // Default properties
-  static DefaultPropertyLookup* mDefaultPropertyLookup;
-
-};
-
-/**
- * @brief Structure for setting up default properties and their details.
- */
-struct PropertyDetails
-{
-  std::string name;         ///< The name of the property.
-  Property::Type type;      ///< The property type.
-  bool writable:1;          ///< Whether the property is writable
-  bool animatable:1;        ///< Whether the property is animatable.
-  bool constraintInput:1;   ///< Whether the property can be used as an input to a constraint.
 };
 
 } // namespace Internal

@@ -205,7 +205,7 @@ public: // Default property extensions from ProxyObject
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
    */
-  virtual const std::string& GetDefaultPropertyName(Property::Index index) const;
+  virtual const char* GetDefaultPropertyName(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -286,8 +286,6 @@ private:
   bool mTouchConsumed:1;                        ///< Whether we should consume touch (including gesture).
   bool mHoverConsumed:1;                        ///< Whether we should consume hover.
 
-  static bool mFirstInstance;
-  static DefaultPropertyLookup* mDefaultLayerPropertyLookup; ///< Default properties
 };
 
 } // namespace Internal

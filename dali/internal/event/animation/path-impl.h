@@ -90,7 +90,7 @@ private:
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
    */
-  virtual const std::string& GetDefaultPropertyName(Property::Index index) const;
+  virtual const char* GetDefaultPropertyName(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()

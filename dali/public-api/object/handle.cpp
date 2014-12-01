@@ -71,7 +71,7 @@ unsigned int Handle::GetPropertyCount() const
   return GetImplementation(*this).GetPropertyCount();
 }
 
-const std::string& Handle::GetPropertyName(Property::Index index) const
+std::string Handle::GetPropertyName(Property::Index index) const
 {
   return GetImplementation(*this).GetPropertyName( index );
 }

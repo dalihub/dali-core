@@ -37,8 +37,6 @@ const Property::Index LightActor::DIRECTION               = Internal::DEFAULT_AC
 
 namespace Internal
 {
-bool LightActor::mFirstInstance = true ;
-Actor::DefaultPropertyLookup* LightActor::mDefaultLightActorPropertyLookup = NULL;
 
 namespace
 {
@@ -146,16 +144,6 @@ LightActorPtr LightActor::New()
 
 void LightActor::OnInitialize()
 {
-  if(LightActor::mFirstInstance)
-  {
-    mDefaultLightActorPropertyLookup = new DefaultPropertyLookup();
-    const int start = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-    for ( int i = 0; i < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT; ++i )
-    {
-      (*mDefaultLightActorPropertyLookup)[DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[i].name] = i + start;
-    }
-    LightActor::mFirstInstance = false ;
-  }
 }
 
 LightActor::LightActor()
@@ -218,7 +206,7 @@ bool LightActor::IsDefaultPropertyWritable( Property::Index index ) const
   }
   else
   {
-    return true ;
+    return true; // all properties are writable
   }
 }
 
@@ -230,7 +218,7 @@ bool LightActor::IsDefaultPropertyAnimatable( Property::Index index ) const
   }
   else
   {
-    return false ;
+    return false; // all properties are non animateable
   }
 }
 
@@ -265,7 +253,7 @@ Property::Type LightActor::GetDefaultPropertyType( Property::Index index ) const
   }
 }
 
-const std::string& LightActor::GetDefaultPropertyName( Property::Index index ) const
+const char* LightActor::GetDefaultPropertyName( Property::Index index ) const
 {
   if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
@@ -281,9 +269,7 @@ const std::string& LightActor::GetDefaultPropertyName( Property::Index index ) c
     }
     else
     {
-      // index out-of-bounds
-      static const std::string INVALID_PROPERTY_NAME;
-      return INVALID_PROPERTY_NAME;
+      return NULL;
     }
   }
 }
@@ -292,17 +278,20 @@ Property::Index LightActor::GetDefaultPropertyIndex(const std::string& name) con
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  DALI_ASSERT_DEBUG( NULL != mDefaultLightActorPropertyLookup );
-
   // Look for name in current class' default properties
-  DefaultPropertyLookup::const_iterator result = mDefaultLightActorPropertyLookup->find( name );
-  if ( mDefaultLightActorPropertyLookup->end() != result )
+  for( int i = 0; i < DEFAULT_LIGHT_ACTOR_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    const Internal::PropertyDetails* property = &DEFAULT_LIGHT_ACTOR_PROPERTY_DETAILS[ i ];
+    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    {
+      index = i + DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+      break;
+    }
   }
-  else
+
+  // If not found, check in base class
+  if( Property::INVALID_INDEX == index )
   {
-    // If not found, check in base class
     index = Actor::GetDefaultPropertyIndex( name );
   }
 

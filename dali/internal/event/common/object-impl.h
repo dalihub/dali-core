@@ -58,7 +58,7 @@ public:
   /**
    * @copydoc Dali::Handle::GetPropertyName()
    */
-  virtual const std::string& GetPropertyName(Property::Index index) const = 0;
+  virtual std::string GetPropertyName(Property::Index index) const = 0;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndex()

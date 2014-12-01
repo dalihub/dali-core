@@ -21,6 +21,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

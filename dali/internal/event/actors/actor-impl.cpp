@@ -217,8 +217,6 @@ TypeAction a2(mType, Dali::Actor::ACTION_HIDE, &Actor::DoAction);
 
 }
 
-Actor::DefaultPropertyLookup* Actor::mDefaultPropertyLookup = NULL;
-
 ActorPtr Actor::New()
 {
   ActorPtr actor( new Actor( BASIC ) );
@@ -2066,16 +2064,6 @@ void Actor::Initialize()
   AddNodeMessage( mStage->GetUpdateManager(), *node ); // Pass ownership to scene-graph
   mNode = node; // Keep raw-pointer to Node
 
-  if(!mDefaultPropertyLookup)
-  {
-    mDefaultPropertyLookup = new DefaultPropertyLookup();
-
-    for (int i=0; i<DEFAULT_PROPERTY_COUNT; ++i)
-    {
-      (*mDefaultPropertyLookup)[DEFAULT_PROPERTY_DETAILS[i].name] = i;
-    }
-  }
-
   OnInitialize();
 
   RegisterObject();
@@ -2352,7 +2340,7 @@ void Actor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
   }
 }
 
-const std::string& Actor::GetDefaultPropertyName( Property::Index index ) const
+const char* Actor::GetDefaultPropertyName( Property::Index index ) const
 {
   if( index < DEFAULT_PROPERTY_COUNT )
   {
@@ -2360,8 +2348,7 @@ const std::string& Actor::GetDefaultPropertyName( Property::Index index ) const
   }
   else
   {
-    // index out of range..return empty string
-    return String::EMPTY;
+    return NULL;
   }
 }
 
@@ -2369,13 +2356,15 @@ Property::Index Actor::GetDefaultPropertyIndex(const std::string& name) const
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  DALI_ASSERT_DEBUG( NULL != mDefaultPropertyLookup );
-
   // Look for name in default properties
-  DefaultPropertyLookup::const_iterator result = mDefaultPropertyLookup->find( name );
-  if ( mDefaultPropertyLookup->end() != result )
+  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
+    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    {
+      index = i;
+      break;
+    }
   }
 
   return index;

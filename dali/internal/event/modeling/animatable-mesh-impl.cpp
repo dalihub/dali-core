@@ -37,25 +37,17 @@ namespace Internal
 namespace
 {
 
-const std::string DEFAULT_PROPERTY_NAMES[] =
+const PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
 {
-  "position",
-  "vertex-color",
-  "texture-coords"
+ // Name               Type            writable animatable constraint-input
+ { "position",       Property::VECTOR3, true,    true,   true  }, // POSITION
+ { "vertex-color",   Property::VECTOR4, true,    true,   true  }, // COLOR
+ { "texture-coords", Property::VECTOR2, true,    true,   true  }, // TEXTURE_COORDS
 };
-const int VERTEX_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_NAMES ) / sizeof( std::string );
 
-const Property::Type DEFAULT_PROPERTY_TYPES[ VERTEX_PROPERTY_COUNT ] =
-{
-  Property::VECTOR3,  // position
-  Property::VECTOR4,  // Color
-  Property::VECTOR2,  // Texture Coords
-};
+const int VERTEX_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( DEFAULT_PROPERTY_DETAILS[0] );
 
 } // namespace
-
-AnimatableMesh::DefaultPropertyLookup* AnimatableMesh::mDefaultPropertyLookup = NULL;
-
 
 AnimatableMesh::AnimatableMesh(
   SceneGraph::UpdateManager& updateManager,
@@ -234,17 +226,15 @@ void AnimatableMesh::GetDefaultPropertyIndices( Property::IndexContainer& indice
   }
 }
 
-const std::string& AnimatableMesh::GetDefaultPropertyName( Property::Index index ) const
+const char* AnimatableMesh::GetDefaultPropertyName( Property::Index index ) const
 {
   if ( ( index >= 0 ) && ( index < mPropertyCount ) )
   {
-    return DEFAULT_PROPERTY_NAMES[index % VERTEX_PROPERTY_COUNT];
+    return DEFAULT_PROPERTY_DETAILS[index % VERTEX_PROPERTY_COUNT].name;
   }
   else
   {
-    // Index out-of-range... return empty string.
-    static const std::string INVALID_PROPERTY_NAME;
-    return INVALID_PROPERTY_NAME;
+    return NULL;
   }
 }
 
@@ -252,31 +242,39 @@ Property::Index AnimatableMesh::GetDefaultPropertyIndex(const std::string& name)
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  // TODO: Property names should be modified to append the vertex index
-
+  // Look for name in default properties
+  for( int i = 0; i < VERTEX_PROPERTY_COUNT; ++i )
+  {
+    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
+    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    {
+      index = i;
+      break;
+    }
+  }
   return index;
 }
 
 bool AnimatableMesh::IsDefaultPropertyWritable(Property::Index index) const
 {
-  return true;
+  return DEFAULT_PROPERTY_DETAILS[ index % VERTEX_PROPERTY_COUNT ].writable;
 }
 
 bool AnimatableMesh::IsDefaultPropertyAnimatable(Property::Index index) const
 {
-  return true;
+  return DEFAULT_PROPERTY_DETAILS[ index % VERTEX_PROPERTY_COUNT ].animatable;
 }
 
 bool AnimatableMesh::IsDefaultPropertyAConstraintInput( Property::Index index ) const
 {
-  return true;
+  return DEFAULT_PROPERTY_DETAILS[ index % VERTEX_PROPERTY_COUNT ].constraintInput;
 }
 
 Property::Type AnimatableMesh::GetDefaultPropertyType(Property::Index index) const
 {
   if ( ( index >= 0 ) && ( index < mPropertyCount ) )
   {
-    return DEFAULT_PROPERTY_TYPES[index % VERTEX_PROPERTY_COUNT ];
+    return DEFAULT_PROPERTY_DETAILS[ index % VERTEX_PROPERTY_COUNT ].type;
   }
   else
   {

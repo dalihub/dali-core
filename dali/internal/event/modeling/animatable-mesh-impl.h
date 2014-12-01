@@ -172,7 +172,7 @@ public: // Implementation of ProxyObject
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
    */
-  virtual const std::string& GetDefaultPropertyName(Property::Index index) const;
+  virtual const char* GetDefaultPropertyName(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -246,9 +246,6 @@ private:
   unsigned int mNumberOfVertices;
   int mPropertyCount;
 
-  // Default properties
-  typedef std::map<std::string, Property::Index> DefaultPropertyLookup;
-  static DefaultPropertyLookup* mDefaultPropertyLookup;
 };
 
 }//Internal

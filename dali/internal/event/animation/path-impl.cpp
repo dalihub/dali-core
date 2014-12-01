@@ -39,20 +39,13 @@ const float BezierBasisCoeff[] = {  -1.0f,  3.0f, -3.0f, 1.0f,
 
 const Dali::Matrix BezierBasis = Dali::Matrix( BezierBasisCoeff );
 
-struct PropertyDetails
+const Dali::Internal::PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
 {
-  std::string name;           ///< The name of the property.
-  Dali::Property::Type type;  ///< The property type.
-  bool writable:1;            ///< Whether the property is writable
-  bool animatable:1;          ///< Whether the property is animatable.
-  bool constraintInput:1;     ///< Whether the property can be used as an input to a constraint.
+  { "points",         Dali::Property::ARRAY, true, false, false },
+  { "control-points", Dali::Property::ARRAY, true, false, false },
 };
 
-const PropertyDetails DEFAULT_PROPERTY_DETAILS[] =  {{"points", Dali::Property::ARRAY, true, false, false },
-                                                     {"control-points", Dali::Property::ARRAY, true, false, false },
-                                                    };
-
-const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( PropertyDetails );
+const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( DEFAULT_PROPERTY_DETAILS[0] );
 
 }//Unnamed namespace
 
@@ -102,7 +95,7 @@ void Path::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
   }
 }
 
-const std::string& Path::GetDefaultPropertyName(Property::Index index) const
+const char* Path::GetDefaultPropertyName(Property::Index index) const
 {
   if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
   {
@@ -111,8 +104,7 @@ const std::string& Path::GetDefaultPropertyName(Property::Index index) const
   else
   {
     // index out of range
-    static const std::string INVALID_PROPERTY_NAME;
-    return INVALID_PROPERTY_NAME;
+    return NULL;
   }
 }
 
@@ -120,9 +112,11 @@ Property::Index Path::GetDefaultPropertyIndex(const std::string& name) const
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  for( int i(0); i<DEFAULT_PROPERTY_COUNT; ++i )
+  // Look for name in default properties
+  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    if ( name == DEFAULT_PROPERTY_DETAILS[i].name )
+    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
+    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
     {
       index = i;
       break;

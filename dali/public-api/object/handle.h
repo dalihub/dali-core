@@ -139,7 +139,7 @@ public:
    * @param [in] index The index of the property.
    * @return The name of the property.
    */
-  const std::string& GetPropertyName(Property::Index index) const;
+  std::string GetPropertyName(Property::Index index) const;
 
   /**
    * @brief Query the index of a property.

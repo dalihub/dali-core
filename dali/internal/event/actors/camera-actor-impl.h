@@ -211,7 +211,7 @@ public: // properties
   /**
    * copydoc Dali::Internal::ProxyObject
    */
-  virtual const std::string& GetDefaultPropertyName( Property::Index index ) const;
+  virtual const char* GetDefaultPropertyName( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -256,9 +256,9 @@ protected:
   virtual ~CameraActor();
 
 private:
+
   CameraAttachmentPtr mCameraAttachment;
-  static bool mFirstInstance ;
-  static DefaultPropertyLookup* mDefaultCameraActorPropertyLookup; ///< Default properties
+
 };
 
 } // namespace Internal

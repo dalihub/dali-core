@@ -172,7 +172,7 @@ unsigned int ProxyObject::GetPropertyCount() const
   return count;
 }
 
-const std::string& ProxyObject::GetPropertyName( Property::Index index ) const
+std::string ProxyObject::GetPropertyName( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS( index > Property::INVALID_INDEX && "Property index out of bounds" );
 
