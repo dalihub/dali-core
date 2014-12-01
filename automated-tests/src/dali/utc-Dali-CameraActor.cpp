@@ -941,12 +941,6 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
 
   Vector3 targetPosition(Vector3::ZERO);
 
-  CameraActor lookAtCameraActor = CameraActor::New(stageSize);
-  lookAtCameraActor.SetType(Camera::LOOK_AT_TARGET);
-  lookAtCameraActor.SetTargetPosition(targetPosition);
-  lookAtCameraActor.SetParentOrigin(ParentOrigin::CENTER);
-  stage.Add(lookAtCameraActor);
-
   Vector3 cameraOffset( 0.f, 0.f, 100.f );
 
   CameraActor freeLookCameraActor = CameraActor::New(stageSize);
@@ -958,15 +952,14 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
   freeLookCameraActor.SetRotation(cameraOrientation);
 
   Actor cameraAnchor = Actor::New();
-  cameraAnchor.Add(lookAtCameraActor);
+  cameraAnchor.Add(freeLookCameraActor);
   stage.Add(cameraAnchor);
-
 
   for( float angle = 1.f; angle <= 180.f; angle += 1.f )
   {
     Quaternion rotation(Radian(Degree(angle)), Vector3::YAXIS);
 
-    lookAtCameraActor.SetPosition( rotation.Rotate( cameraOffset ) );
+    freeLookCameraActor.SetPosition( rotation.Rotate( cameraOffset ) );
     cameraAnchor.SetRotation( rotation );
 
     application.SendNotification();
