@@ -40,6 +40,7 @@ LIST(APPEND TC_SOURCES
         dali-test-suite-utils/mesh-builder.cpp
         dali-test-suite-utils/test-dynamics.cpp
         dali-test-suite-utils/test-platform-abstraction.cpp
+        ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
         ../dali/dali-test-suite-utils/test-application.cpp
         ../dali/dali-test-suite-utils/test-gesture-manager.cpp
