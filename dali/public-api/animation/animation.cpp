@@ -194,9 +194,14 @@ void Animation::AnimateTo(Property target, Property::Value destinationValue, Alp
   GetImplementation(*this).AnimateTo(target, destinationValue, alpha, period);
 }
 
-void Animation::AnimateBetween(Property target, KeyFrames& keyFrames)
+void Animation::AnimateBetween(Property target, KeyFrames& keyFrames )
 {
-  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames));
+  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames) );
+}
+
+void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, Interpolation interpolation)
+{
+  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), interpolation );
 }
 
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period)
@@ -204,15 +209,32 @@ void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod
   GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), period);
 }
 
+void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation)
+{
+  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), period, interpolation );
+}
+
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha)
 {
   GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha);
 }
 
+void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation)
+{
+  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, interpolation);
+}
+
+
 void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
 {
   GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, period);
 }
+
+void Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
+{
+  GetImplementation(*this).AnimateBetween(target, GetImplementation(keyFrames), alpha, period, interpolation);
+}
+
 
 // Actor specific animations
 
