@@ -44,6 +44,7 @@ else
     if [ $mod != 'common' ] && [ $mod != 'manual' ]; then
         echo BUILDING $mod
         build $mod
+        if [ $? -ne 0 ]; then echo "Build failed" ; exit 1; fi
     fi
   done
 fi
