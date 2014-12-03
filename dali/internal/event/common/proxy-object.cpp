@@ -22,7 +22,6 @@
 #include <algorithm>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-index.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/common/animatable-property.h>

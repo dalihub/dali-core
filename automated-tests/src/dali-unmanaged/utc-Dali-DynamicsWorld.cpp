@@ -25,6 +25,10 @@ using namespace Dali;
 
 int UtcDaliStageInitializeDynamics(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   Stage stage = Stage::GetCurrent();
@@ -60,6 +64,10 @@ int UtcDaliStageTerminateDynamics(void)
 
 int UtcDaliDynamicsWorldConstructor(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsWorldConstructor - DynamicsWorld::DynamicsWorld");
 
   TestApplication application;
@@ -83,6 +91,10 @@ int UtcDaliDynamicsWorldConstructor(void)
 
 int UtcDaliDynamicsWorldGravity(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
   TraceCallStack& trace( application.GetPlatform().GetTrace() );
   trace.Enable( true );
@@ -121,6 +133,10 @@ int UtcDaliDynamicsWorldGravity(void)
 
 int UtcDaliDynamicsWorldDebugDrawMode(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
   TraceCallStack& trace( application.GetPlatform().GetTrace() );
   trace.Enable( true );
@@ -160,6 +176,10 @@ int UtcDaliDynamicsWorldDebugDrawMode(void)
 
 int UtcDaliDynamicsWorldRootActor(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up

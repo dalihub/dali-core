@@ -40,7 +40,8 @@ class ResourceTicketObserver;
 class ResourceTicketLifetimeObserver;
 
 /**
- * ResourceTicket records the lifetime of a resource loading request.
+ * @brief ResourceTicket records the lifetime of a resource loading request.
+ *
  * When a resource is requested from ResourceClient, you get a ticket.
  * The state of the loading operation, can be observed using the ticket.
  * After the ticket is destroyed, the resource will be discarded.

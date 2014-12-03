@@ -28,7 +28,6 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-vector3.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
@@ -1044,11 +1043,11 @@ public: // Default properties
 
   // Inherited properties; read-only from public API
 
-  InheritedProperty<Vector3>    mWorldPosition; ///< Full inherited position
-  InheritedProperty<Quaternion> mWorldRotation; ///< Full inherited rotation
-  InheritedProperty<Vector3>    mWorldScale;    ///< Full inherited scale
-  InheritedProperty<Matrix>     mWorldMatrix;   ///< Full inherited world matrix
-  InheritedColor                mWorldColor;    ///< Full inherited color
+  InheritedVector3    mWorldPosition; ///< Full inherited position
+  InheritedQuaternion mWorldRotation; ///< Full inherited rotation
+  InheritedVector3    mWorldScale;    ///< Full inherited scale
+  InheritedMatrix     mWorldMatrix;   ///< Full inherited world matrix
+  InheritedColor      mWorldColor;    ///< Full inherited color
 
 protected:
 

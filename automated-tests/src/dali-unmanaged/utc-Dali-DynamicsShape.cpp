@@ -25,6 +25,10 @@ using namespace Dali;
 
 int UtcDaliDynamicsShapeConstructor(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsShapeConstructor - DynamicsShape::DynamicsShape");
 
   TestApplication application;
@@ -60,6 +64,10 @@ int UtcDaliDynamicsShapeConstructor(void)
 
 int UtcDaliDynamicsShapeNewCapsule(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsShapeNewCapsule - DynamicsShape::NewCapsule");
 
   TestApplication application;
@@ -91,6 +99,10 @@ int UtcDaliDynamicsShapeNewCapsule(void)
 
 int UtcDaliDynamicsShapeNewCone(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsShapeNewCone - DynamicsShape::NewCone");
 
   TestApplication application;
@@ -121,6 +133,10 @@ int UtcDaliDynamicsShapeNewCone(void)
 
 int UtcDaliDynamicsShapeNewCube(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsShapeNewCube - DynamicsShape::NewCube");
 
   TestApplication application;
@@ -150,6 +166,10 @@ int UtcDaliDynamicsShapeNewCube(void)
 
 int UtcDaliDynamicsShapeNewCylinder(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsShapeNewCylinder - DynamicsShape::NewCylinder");
 
   TestApplication application;
@@ -179,6 +199,10 @@ int UtcDaliDynamicsShapeNewCylinder(void)
 
 int UtcDaliDynamicsShapeNewMesh(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsShapeNewMesh - DynamicsShape::NewMesh");
 
   TestApplication application;
@@ -208,6 +232,10 @@ int UtcDaliDynamicsShapeNewMesh(void)
 
 int UtcDaliDynamicsShapeNewSphere(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsShapeNewSphere - DynamicsShape::NewSphere");
 
   TestApplication application;
@@ -237,6 +265,10 @@ int UtcDaliDynamicsShapeNewSphere(void)
 
 int UtcDaliDynamicsShapeGetType(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsShapeGetType - DynamicsShape::GetType");
 
   TestApplication application;

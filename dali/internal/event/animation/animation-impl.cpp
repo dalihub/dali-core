@@ -698,6 +698,48 @@ void Animation::AddAnimatorConnector( AnimatorConnectorBase* connector )
   mConnectors.PushBack( connector );
 }
 
+void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward )
+{
+  Animate( actor, path, forward, mDefaultAlpha, TimePeriod(0.0f,GetDuration()) );
+}
+
+void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha )
+{
+  Animate( actor, path, forward, alpha, TimePeriod(0.0f,GetDuration()) );
+}
+
+void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward, TimePeriod period )
+{
+  Animate( actor, path, forward, mDefaultAlpha, period );
+}
+
+void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha, TimePeriod period)
+{
+  ExtendDuration( period );
+
+  PathPtr pathCopy = Path::Clone(path);
+
+  //Position animation
+  AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
+                                                         Dali::Actor::POSITION,
+                                                         Property::INVALID_COMPONENT_INDEX,
+                                                         PathPositionFunctor( pathCopy ),
+                                                         alpha,
+                                                         period ) );
+
+  //If forward is zero, PathRotationFunctor will always return the unit quaternion
+  if( forward != Vector3::ZERO )
+  {
+    //Rotation animation
+    AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
+                                                              Dali::Actor::ROTATION,
+                                                              Property::INVALID_COMPONENT_INDEX,
+                                                              PathRotationFunctor( pathCopy, forward ),
+                                                              alpha,
+                                                              period ) );
+  }
+}
+
 void Animation::MoveBy(Actor& actor, float x, float y, float z)
 {
   MoveBy(actor, Vector3(x, y, z), mDefaultAlpha, 0.0f, GetDuration());

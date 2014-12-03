@@ -19,11 +19,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/images/image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/common/proxy-object.h>
-#include <dali/internal/render/shaders/uniform-meta.h>
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/render/shaders/shader.h>
 
@@ -233,11 +232,11 @@ private: // Data
   SceneGraph::UpdateManager& mUpdateManager;///< reference to the update manager
   SceneGraph::Shader* mSceneObject;         ///< pointer to the scene shader, should not be changed on this thread
   Dali::Image mImage;                       ///< Client-side handle for the effect image
-  CustomUniformMetaLookup mCustomMetadata;  ///< Used for accessing metadata for custom Shader properties
   IntrusivePtr<Dali::ShaderEffect::Extension> mExtension;
   std::vector<ResourceTicketPtr>  mTickets; ///< Collection of shader program tickets
   unsigned int  mConnectionCount;           ///< number of on-stage ImageActors using this shader effect
   Dali::ShaderEffect::GeometryHints  mGeometryHints; ///< shader geometry hints for building the geometry
+  Dali::Vector< UniformCoordinateType > mCoordinateTypes; ///< cached to avoid sending tons of unnecessary messages
 
   // Default properties
   typedef std::map<std::string, Property::Index> DefaultPropertyLookup;

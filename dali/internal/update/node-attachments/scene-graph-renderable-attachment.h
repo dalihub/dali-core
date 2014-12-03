@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/layer.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/internal-constants.h>
@@ -27,7 +26,6 @@
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
 
@@ -165,21 +163,7 @@ public: // For use during in the update algorithm only
    * @param[in] updateBufferIndex The current update buffer index.
    * @return visible tells if this renderer can be potentially seen
    */
-  virtual bool ResolveVisibility( BufferIndex updateBufferIndex )
-  {
-    mHasSizeAndColorFlag = false;
-    const Vector4& color = mParent->GetWorldColor( updateBufferIndex );
-    if( color.a > FULLY_TRANSPARENT )               // not fully transparent
-    {
-      const Vector3& size = mParent->GetSize( updateBufferIndex );
-      if( ( size.width > Math::MACHINE_EPSILON_1000 )&&   // width is greater than a very small number
-          ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
-      {
-        mHasSizeAndColorFlag = true;
-      }
-    }
-    return mHasSizeAndColorFlag;
-  }
+  virtual bool ResolveVisibility( BufferIndex updateBufferIndex );
 
   /**
    * if this renderable actor has visible size and color

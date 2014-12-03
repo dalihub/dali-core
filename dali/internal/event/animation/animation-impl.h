@@ -25,6 +25,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/internal/event/animation/animator-connector-base.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
+#include <dali/internal/event/animation/path-impl.h>
 
 namespace Dali
 {
@@ -71,56 +72,47 @@ public:
   static AnimationPtr New(float durationSeconds);
 
   /**
-   * Set the duration of an animation.
-   * @pre durationSeconds must be greater than zero.
-   * @param[in] seconds The duration in seconds.
+   * @copydoc Dali::Animation::SetDuration()
    */
   void SetDuration(float seconds);
 
   /**
-   * Retrieve the duration of an animation.
-   * @return The duration in seconds.
+   * @copydoc Dali::Animation::GetDuration()
    */
   float GetDuration() const;
 
   /**
-   * Set whether the animation will loop.
-   * @param[in] looping True if the animation will loop.
+   * @copydoc Dali::Animation::SetLooping()
    */
   void SetLooping(bool looping);
 
   /**
-   * Query whether the animation will loop.
-   * @return True if the animation will loop.
+   * @copydoc Dali::Animation::IsLooping()
    */
   bool IsLooping() const;
 
   /**
-   * Set the end action of the animation.
-   * @param[in] action The end action.
+   * @copydoc Dali::Animation::SetEndAction()
    */
   void SetEndAction(EndAction action);
 
   /**
-   * Returns the end action of the animation.
+   * @copydoc Dali::Animation::GetEndAction()
    */
   EndAction GetEndAction() const;
 
   /**
-   * Set the disconnect action of the animation.
-   * @param[in] action The disconnect action.
+   * @copydoc Dali::Animation::SetDisconnectAction()
    */
   void SetDisconnectAction(EndAction action);
 
   /**
-   * Returns the disconnect action of the animation.
+   * @copydoc Dali::Animation::GetDisconnectAction()
    */
   EndAction GetDisconnectAction() const;
 
   /**
-   * Set the default alpha function for an animation.
-   * This is applied to individual property animations, if no further alpha functions are supplied.
-   * @param[in] alpha The default alpha function.
+   * @copydoc Dali::Animation::SetDefaultAlphaFunction()
    */
   void SetDefaultAlphaFunction(AlphaFunction alpha)
   {
@@ -128,8 +120,7 @@ public:
   }
 
   /**
-   * Retrieve the default alpha function for an animation.
-   * @return The default alpha function.
+   * @copydoc Dali::Animation::GetDefaultAlphaFunction()
    */
   AlphaFunction GetDefaultAlphaFunction() const
   {
@@ -137,29 +128,27 @@ public:
   }
 
   /**
-   * (Re)start the animation.
+   * @copydoc Dali::Animation::Play()
    */
   void Play();
 
   /**
-   * (Re)start the animation from a given point.
-   * @param[in] progress The progress between [0,1] from where the animation should start
+   * @copydoc Dali::Animation::PlayFrom()
    */
   void PlayFrom( float progress );
 
   /**
-   * Pause the animation.
+   * @copydoc Dali::Animation::Pause()
    */
   void Pause();
 
   /**
-   * Stop the animation.
+   * @copydoc Dali::Animation::Stop()
    */
   void Stop();
 
   /**
-   * Clear the animation.
-   * This disconnects any objects that were being animated, effectively stopping the animation.
+   * @copydoc Dali::Animation::Clear()
    */
   void Clear();
 
@@ -258,466 +247,250 @@ public:
    */
   void AnimateTo(ProxyObject& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period);
 
-
   /**
-   * Animate a property between the keyframe time / value pairs.
-   * It uses the current duration of the animation to run the key
-   * frame animator. Note, If the animation duration is subsequently
-   * changed, this does not change to match.
-   *
-   * @param[in] target The target object + property to animate
-   * @param[in] keyFrames The set of time / value pairs between which to animate.
+   * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames)
    */
   void AnimateBetween(Property target, const KeyFrames& keyFrames);
 
   /**
-   * Animate a property between the keyframe time / value pairs.
-   * @param[in] target The target object + property to animate
-   * @param[in] keyFrames The set of time / value pairs between which to animate.
-   * @param[in] period The effect will occur duing this time period.
+   * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period)
    */
   void AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period);
 
   /**
-   * Animate a property between the keyframe time / value pairs.
-   * @param[in] target The target object + property to animate
-   * @param[in] keyFrames The set of time / value pairs between which to animate.
-   * @param[in] alpha The alpha function to apply to the overall progress.
+   * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha)
    */
   void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha);
 
   /**
-   * Animate a property between the keyframe time / value pairs.
-   * @param[in] target The target object + property to animate
-   * @param[in] keyFrames The set of time / value pairs between which to animate.
-   * @param[in] alpha The alpha function to apply to the overall progress.
-   * @param[in] period The effect will occur duing this time period.
+   * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
    */
   void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period);
 
-  // Action-specific convenience functions
+  // Actor-specific convenience functions
 
   /**
-   * Translate an actor.
-   * The default alpha function will be used.
-   * The translation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] x Translation in the X-direction.
-   * @param [in] y Translation in the Y-direction.
-   * @param [in] z Translation in the Z-direction.
+   * @copydoc Dali::Animation::Animate( Actor actor, Path path, const Vector3& forward )
+   */
+  void Animate( Actor& actor, const Path& path, const Vector3& forward );
+
+  /**
+   * @copydoc Dali::Animation::Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha )
+   */
+  void Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha );
+
+  /**
+   * @copydoc Dali::Animation::Animate( Actor actor, Path path, const Vector3& forward, TimePeriod period )
+   */
+  void Animate( Actor& actor, const Path& path, const Vector3& forward, TimePeriod period );
+
+  /**
+   * @copydoc Dali::Animation::Animate( Actor actor, Path path, const Vector3& forward, AlphaFunction alpha, TimePeriod period)
+   */
+  void Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha, TimePeriod period);
+
+  /**
+   * @copydoc Dali::Animation::MoveBy(Actor actor, float x, float y, float z)
    */
   void MoveBy(Actor& actor, float x, float y, float z);
 
   /**
-   * Translate an actor. This overload allows the alpha function to be customized.
-   * The translation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] translation The translation.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::MoveBy(Actor actor, Vector3 displacement, AlphaFunction alpha)
    */
   void MoveBy(Actor& actor, const Vector3& translation, AlphaFunction alpha);
 
   /**
-   * Translate an actor. This overload allows the translation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] translation The translation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::MoveBy(Actor actor, Vector3 displacement, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void MoveBy(Actor& actor, const Vector3& translation, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Translate an actor to a target position.
-   * The default alpha function will be used.
-   * The translation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] x Translation in the X-direction.
-   * @param [in] y Translation in the Y-direction.
-   * @param [in] z Translation in the Z-direction.
+   * @copydoc Dali::Animation::MoveTo(Actor actor, float x, float y, float z)
    */
   void MoveTo(Actor& actor, float x, float y, float z);
 
   /**
-   * Translate an actor to a target position. This overload allows the alpha function to be customized.
-   * The translation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] translation The translation.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::MoveTo(Actor actor, Vector3 position, AlphaFunction alpha)
    */
   void MoveTo(Actor& actor, const Vector3& translation, AlphaFunction alpha);
 
   /**
-   * Translate an actor to a target position. This overload allows the translation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] translation The translation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::MoveTo(Actor actor, Vector3 position, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void MoveTo(Actor& actor, const Vector3& translation, AlphaFunction alpha,  float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor around an arbitrary axis.
-   * The default alpha function will be used.
-   * The rotation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] angle The angle in radians.
-   * @param [in] axis The axis of rotation.
+   * @copydoc Dali::Animation::RotateBy(Actor actor, Radian angle, Vector3 axis)
    */
   void RotateBy(Actor& actor, Radian angle, const Vector3& axis);
 
   /**
-   * Rotate an actor around an arbitrary axis. This overload allows the alpha function to be customized.
-   * The rotation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] angle The angle in radians.
-   * @param [in] axis The axis of rotation.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::RotateBy(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha)()
    */
   void RotateBy(Actor& actor, Radian angle, const Vector3& axis, AlphaFunction alpha);
 
   /**
-   * Rotate an actor around an arbitrary axis. This overload allows the rotation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
-   * @param [in] actor The actor to animate.
-   * @param [in] angle The angle in radians.
-   * @param [in] axis The axis of rotation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the rotation.
+   * @copydoc Dali::Animation::RotateBy(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void RotateBy(Actor& actor, Radian angle, const Vector3& axis, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor to a target orientation.
-   * The default alpha function will be used.
-   * The rotation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] angle The target rotation angle in radians.
-   * @param [in] axis The target axis of rotation.
+   * @copydoc Dali::Animation::RotateTo(Actor actor, Radian angle, Vector3 axis)
    */
   void RotateTo(Actor& actor, Radian angle, const Vector3& axis);
 
   /**
-   * Rotate an actor to a target orientation.
-   * The default alpha function will be used.
-   * The rotation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] orientation The target orientation.
+   * @copydoc Dali::Animation::RotateTo(Actor actor, Quaternion orientation)
    */
   void RotateTo(Actor& actor, const Quaternion& orientation);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the alpha function to be customized.
-   * The rotation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] angle The target rotation angle in radians.
-   * @param [in] axis The target axis of rotation.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::RotateTo(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha)
    */
   void RotateTo(Actor& actor, Radian angle, const Vector3& axis, AlphaFunction alpha);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the alpha function to be customized.
-   * The rotation will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] orientation The target orientation.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::RotateTo(Actor actor, Quaternion orientation, AlphaFunction alpha)
    */
   void RotateTo(Actor& actor, const Quaternion& orientation, AlphaFunction alpha);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the rotation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] orientation The target orientation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the rotation.
+   * @copydoc Dali::Animation::RotateTo(Actor actor, Quaternion orientation, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void RotateTo(Actor& actor, const Quaternion& orientation, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Rotate an actor to a target orientation. This overload allows the rotation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] angle The target rotation angle in radians.
-   * @param [in] axis The target axis of rotation.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the rotation.
+   * @copydoc Dali::Animation::RotateTo(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds)()
    */
   void RotateTo(Actor& actor, Radian angle, const Vector3& axis, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Scale an actor.
-   * The default alpha function will be used.
-   * The scaling will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] x Scale factor in the X-direction.
-   * @param [in] y Scale factor in the Y-direction.
-   * @param [in] z Scale factor in the Z-direction.
+   * @copydoc Dali::Animation::ScaleBy(Actor actor, float x, float y, float z)()
    */
   void ScaleBy(Actor& actor, float x, float y, float z);
 
   /**
-   * Scale an actor. This overload allows the alpha function to be customized.
-   * The scaling will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] scale The scale factor.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::ScaleBy(Actor actor, Vector3 scale, AlphaFunction alpha)
    */
   void ScaleBy(Actor& actor, const Vector3& scale, AlphaFunction alpha);
 
   /**
-   * Scale an actor. This overload allows the translation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] scale The scale factor.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::ScaleBy(Actor actor, Vector3 scale, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void ScaleBy(Actor& actor, const Vector3& scale, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Scale an actor to a target scale factor.
-   * The default alpha function will be used.
-   * The scaling will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] x Target scale-factor in the X-direction.
-   * @param [in] y Target scale-factor in the Y-direction.
-   * @param [in] z Target scale-factor in the Z-direction.
+   * @copydoc Dali::Animation::ScaleTo(Actor actor, float x, float y, float z)
    */
   void ScaleTo(Actor& actor, float x, float y, float z);
 
   /**
-   * Scale an actor to a target scale factor. This overload allows the alpha function to be customized.
-   * The scaling will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] scale The target scale factor.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::ScaleTo(Actor actor, Vector3 scale, AlphaFunction alpha)
    */
   void ScaleTo(Actor& actor, const Vector3& scale, AlphaFunction alpha);
 
   /**
-   * Scale an actor to a target scale factor. This overload allows the translation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] scale The target scale factor.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::ScaleTo(Actor actor, Vector3 scale, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void ScaleTo(Actor& actor, const Vector3& scale, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Show an actor during the animation.
-   * @param [in] actor The actor to animate.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
+   * @copydoc Dali::Animation::Show()
    */
   void Show(Actor& actor, float delaySeconds);
 
   /**
-   * Hide an actor during the animation.
-   * @param [in] actor The actor to animate.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
+   * @copydoc Dali::Animation::Hide()
    */
   void Hide(Actor& actor, float delaySeconds);
 
   /**
-   * Animate the opacity of an actor.
-   * The default alpha function will be used.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] opacity The relative change in opacity.
+   * @copydoc Dali::Animation::OpacityBy(Actor actor, float opacity)
    */
   void OpacityBy(Actor& actor, float opacity);
 
   /**
-   * Animate the opacity of an actor. This overload allows the alpha function to be customized.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] opacity The relative change in opacity.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::OpacityBy(Actor actor, float opacity, AlphaFunction alpha)
    */
   void OpacityBy(Actor& actor, float opacity, AlphaFunction alpha);
 
   /**
-   * Animate the opacity of an actor. This overload allows the translation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] opacity The relative change in opacity.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::OpacityBy(Actor actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds)()
    */
   void OpacityBy(Actor& actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Animate an actor to a target opacity.
-   * The default alpha function will be used.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] opacity The target opacity.
+   * @copydoc Dali::Animation::OpacityTo(Actor actor, float opacity)
    */
   void OpacityTo(Actor& actor, float opacity);
 
   /**
-   * Animate an actor to a target opacity. This overload allows the alpha function to be customized.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] opacity The target opacity.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::OpacityTo(Actor actor, float opacity, AlphaFunction alpha)
    */
   void OpacityTo(Actor& actor, float opacity, AlphaFunction alpha);
 
   /**
-   * Animate an actor to a target opacity. This overload allows the translation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] opacity The target opacity.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::OpacityTo(Actor actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void OpacityTo(Actor& actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Animate the color of an actor.
-   * The default alpha function will be used.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] color The relative change in color.
+   * @copydoc Dali::Animation::ColorBy(Actor actor, Vector4 color)
    */
   void ColorBy(Actor& actor, const Vector4& color);
 
   /**
-   * Animate the color of an actor. This overload allows the alpha function to be customized.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] color The relative change in color.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::ColorBy(Actor actor, Vector4 color, AlphaFunction alpha)
    */
   void ColorBy(Actor& actor, const Vector4& color, AlphaFunction alpha);
 
   /**
-   * Animate the color of an actor. This overload allows the translation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
-   * @param [in] actor The actor to animate.
-   * @param [in] color The relative change in color.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::ColorBy(Actor actor, Vector4 color, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void ColorBy(Actor& actor, const Vector4& color, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Animate an actor to a target color.
-   * The default alpha function will be used.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] color The target color.
+   * @copydoc Dali::Animation::ColorTo(Actor actor, Vector4 color)
    */
   void ColorTo(Actor& actor, const Vector4& color);
 
   /**
-   * Animate an actor to a target color. This overload allows the alpha function to be customized.
-   * The effect will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] color The target color.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::ColorTo(Actor actor, Vector4 color, AlphaFunction alpha)
    */
   void ColorTo(Actor& actor, const Vector4& color, AlphaFunction alpha);
 
   /**
-   * Animate an actor to a target color. This overload allows the translation start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be zero or greater; zero is useful when animating boolean values.
-   * @param [in] actor The actor to animate.
-   * @param [in] color The target color.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::ColorTo(Actor actor, Vector4 color, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void ColorTo(Actor& actor, const Vector4& color, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Resize an actor.
-   * The default alpha function will be used.
-   * The resizing will start & end when the animation begins & ends.
-   * The depth defaults to the minimum of width & height.
-   * @param [in] actor The actor to animate.
-   * @param [in] width The target width.
-   * @param [in] height The target height.
+   * @copydoc Dali::Animation::Resize(Actor actor, float width, float height)
    */
   void Resize(Actor& actor, float width, float height);
 
   /**
-   * Resize an actor. This overload allows the alpha function to be customized.
-   * The resizing will start & end when the animation begins & ends.
-   * The depth defaults to the minimum of width & height.
-   * @param [in] actor The actor to animate.
-   * @param [in] width The target width.
-   * @param [in] height The target height.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::Resize(Actor actor, float width, float height, AlphaFunction alpha)
    */
   void Resize(Actor& actor, float width, float height, AlphaFunction alpha);
 
   /**
-   * Resize an actor. This overload allows the resizing start & end time to be customized.
-   * The depth defaults to the minimum of width & height.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] width The target width.
-   * @param [in] height The target height.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::Resize(Actor actor, float width, float height, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void Resize(Actor& actor, float width, float height, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 
   /**
-   * Resize an actor.
-   * The default alpha function will be used.
-   * The resizing will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] size The target size.
+   * @copydoc Dali::Animation::Resize(Actor actor, Vector3 size)
    */
   void Resize(Actor& actor, const Vector3& size);
 
   /**
-   * Resize an actor. This overload allows the alpha function to be customized.
-   * The resizing will start & end when the animation begins & ends.
-   * @param [in] actor The actor to animate.
-   * @param [in] size The target size.
-   * @param [in] alpha The alpha function to apply.
+   * @copydoc Dali::Animation::Resize(Actor actor, Vector3 size, AlphaFunction alpha)
    */
   void Resize(Actor& actor, const Vector3& size, AlphaFunction alpha);
 
   /**
-   * Resize an actor. This overload allows the resizing start & end time to be customized.
-   * @pre delaySeconds must be zero or greater.
-   * @pre durationSeconds must be greater than zero.
-   * @param [in] actor The actor to animate.
-   * @param [in] size The target size.
-   * @param [in] alpha The alpha function to apply.
-   * @param [in] delaySeconds The initial delay from the start of the animation.
-   * @param [in] durationSeconds The duration of the translation.
+   * @copydoc Dali::Animation::Resize(Actor actor, Vector3 size, AlphaFunction alpha, float delaySeconds, float durationSeconds)
    */
   void Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, float delaySeconds, float durationSeconds);
 

@@ -23,8 +23,6 @@
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/common/owner-container.h>
-#include <dali/internal/common/message.h>
-#include <dali/internal/update/common/double-buffered.h>
 
 namespace Dali
 {
@@ -154,8 +152,6 @@ protected:
   NotifyMode mNotifyMode;                       ///< Whether to notify on invalid and/or valid
   ConditionFunction mConditionFunction;         ///< The Condition Function pointer to be evaluated.
 };
-
-// Messages for PropertyNotification
 
 } // namespace SceneGraph
 

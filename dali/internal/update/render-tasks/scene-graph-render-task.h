@@ -24,7 +24,6 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/animatable-property.h>
 

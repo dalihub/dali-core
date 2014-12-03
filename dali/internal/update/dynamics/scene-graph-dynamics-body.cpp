@@ -43,8 +43,8 @@ DynamicsBody::DynamicsBody(DynamicsWorld& world, Node& node )
 : mBody(NULL),
   mNode(node),
   mWorld(world),
-  mLinearVelocity(Vector3::ZERO),
-  mAngularVelocity(Vector3::ZERO)
+  mLinearVelocity(),
+  mAngularVelocity()
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
 }

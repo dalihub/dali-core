@@ -21,6 +21,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/public-api/actors/blending.h>
 #include <dali/public-api/actors/sampling.h>
 

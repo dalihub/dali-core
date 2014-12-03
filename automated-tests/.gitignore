@@ -2,3 +2,4 @@
 build
 build.log
 tct*core.h
+results_xml.*

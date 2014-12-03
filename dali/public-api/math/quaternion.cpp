@@ -100,6 +100,31 @@ Quaternion::Quaternion( const Vector3& xAxis, const Vector3& yAxis, const Vector
   SetFromAxes( xAxis, yAxis, zAxis );
 }
 
+Quaternion::Quaternion( const Vector3& v0, const Vector3& v1 )
+{
+  float dot = v0.Dot(v1);
+  if( dot > 1.0f - Math::MACHINE_EPSILON_1 )
+  {
+    //Identity quaternion
+    mVector.x = mVector.y = mVector.z = 0.0f;
+    mVector.w = 1.0f;
+  }
+  else if( dot < -1.0f + Math::MACHINE_EPSILON_1)
+  {
+    //180 degree rotation across the Z axis
+    mVector.x = mVector.y = mVector.w = 0.0f;
+    mVector.z = 1.0f;
+  }
+  else
+  {
+    Vector3 w = v0.Cross(v1);
+    mVector.w = 1.0f + dot;
+    mVector.x = w.x;
+    mVector.y = w.y;
+    mVector.z = w.z;
+    Normalize();
+  }
+}
 
 Quaternion Quaternion::FromAxisAngle(const Vector4 &axis, float angle)
 {

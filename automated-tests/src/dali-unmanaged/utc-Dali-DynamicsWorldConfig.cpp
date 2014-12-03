@@ -26,6 +26,10 @@ using namespace Dali;
 
 int UtcDaliDynamicsWorldConfigConstructor(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsWorldConfigConstructor - DynamicsWorldConfig::DynamicsWorldConfig");
 
   TestApplication application;
@@ -48,6 +52,10 @@ int UtcDaliDynamicsWorldConfigConstructor(void)
 
 int UtcDaliDynamicsWorldConfigNew(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   tet_infoline("UtcDaliDynamicsWorldConfigNew - DynamicsWorldConfig::New");
 
   TestApplication application;
@@ -66,6 +74,10 @@ int UtcDaliDynamicsWorldConfigNew(void)
 
 int UtcDaliDynamicsWorldConfigType(void)
 {
+#if !defined(DYNAMICS_SUPPORT)
+  tet_infoline("No dynamics support compiled\n");
+  return 0;
+#endif
   TestApplication application;
 
   // start up
