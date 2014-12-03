@@ -34,22 +34,6 @@ namespace Dali
 namespace Integration
 {
 
-namespace KeepUpdating
-{
-
-const unsigned int NOT_REQUESTED = 0x00; ///< Zero means that no further updates are required
-
-// Bit-field values
-const unsigned int STAGE_KEEP_RENDERING   = 0x01;  ///< Stage::KeepRendering() is being used
-const unsigned int INCOMING_MESSAGES      = 0x02;  ///< Event-thread is sending messages to update-thread
-const unsigned int ANIMATIONS_RUNNING     = 0x04;  ///< Animations are ongoing
-const unsigned int DYNAMICS_CHANGED       = 0x08;  ///< A dynamics simulation is running
-const unsigned int LOADING_RESOURCES      = 0x10;  ///< Resources are being loaded
-const unsigned int MONITORING_PERFORMANCE = 0x20;  ///< The --enable-performance-monitor option is being used
-const unsigned int RENDER_TASK_SYNC       = 0x40;  ///< The refresh once render task is waiting for render sync
-
-} // namespace KeepUpdating
-
 Core* Core::New(RenderController& renderController, PlatformAbstraction& platformAbstraction,
                 GlAbstraction& glAbstraction, GlSyncAbstraction& glSyncAbstraction, GestureManager& gestureManager, ResourcePolicy::DataRetention policy )
 {
