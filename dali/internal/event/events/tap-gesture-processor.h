@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/tap-gesture-detector-impl.h>
 #include <dali/internal/event/events/gesture-processor.h>
+#include "actor-observer.h"
 
 namespace Dali
 {
@@ -133,7 +134,9 @@ private:
   unsigned int mMinTouchesRequired;
   unsigned int mMaxTouchesRequired;
 
+  ActorObserver mCurrentTapActor; ///< Observer for the current gesture actor
   const Integration::TapGestureEvent* mCurrentTapEvent; ///< Pointer to current TapEvent, used when calling ProcessAndEmit()
+  bool mPossibleProcessed; ///< Indication of whether we've processed a touch down for this gestuee
 };
 
 } // namespace Internal
