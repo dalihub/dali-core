@@ -35,8 +35,6 @@ const Property::Index ImageActor::IMAGE                = Internal::DEFAULT_RENDE
 
 namespace Internal
 {
-bool ImageActor::mFirstInstance = true;
-Actor::DefaultPropertyLookup* ImageActor::mDefaultImageActorPropertyLookup = NULL;
 
 namespace
 {
@@ -48,22 +46,15 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::ImageActor), typeid(Dali::RenderableActor), Create );
 
-const std::string DEFAULT_IMAGE_ACTOR_PROPERTY_NAMES[] =
+const Internal::PropertyDetails DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS[] =
 {
-  "pixel-area",
-  "style",
-  "border",
-  "image"
+  // Name            Type              writable animatable constraint-input
+  { "pixel-area",   Property::RECTANGLE, true,    false,   true },  // PIXEL_AREA
+  { "style",        Property::STRING,    true,    false,   true },  // STYLE
+  { "border",       Property::VECTOR4,   true,    false,   true },  // BORDER
+  { "image",        Property::MAP,       true,    false,   false }, // IMAGE
 };
-const int DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_IMAGE_ACTOR_PROPERTY_NAMES ) / sizeof( std::string );
-
-const Property::Type DEFAULT_IMAGE_ACTOR_PROPERTY_TYPES[DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT] =
-{
-  Property::RECTANGLE,  // "pixel-area",
-  Property::STRING,     // "style",
-  Property::VECTOR4,    // "border",
-  Property::MAP,        // "image",
-};
+const int DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS ) / sizeof( DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS[0] );
 
 ImageActor::Style StyleEnum(const std::string &s)
 {
@@ -114,16 +105,6 @@ ImageActorPtr ImageActor::New()
 
 void ImageActor::OnInitialize()
 {
-  if(ImageActor::mFirstInstance)
-  {
-    mDefaultImageActorPropertyLookup = new DefaultPropertyLookup();
-    const int start = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
-    for ( int i = 0; i < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT; ++i )
-    {
-      (*mDefaultImageActorPropertyLookup)[DEFAULT_IMAGE_ACTOR_PROPERTY_NAMES[i]] = i + start;
-    }
-    ImageActor::mFirstInstance = false;
-  }
 }
 
 void ImageActor::SetImage( ImagePtr& image )
@@ -321,14 +302,19 @@ void ImageActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) 
 
 bool ImageActor::IsDefaultPropertyWritable( Property::Index index ) const
 {
-  if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT )
   {
     return RenderableActor::IsDefaultPropertyWritable(index);
   }
   else
   {
-    return true;
+    index -= DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+    if ( ( index >= 0 ) && ( index < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS[ index ].writable;
+    }
   }
+  return false;
 }
 
 bool ImageActor::IsDefaultPropertyAnimatable( Property::Index index ) const
@@ -339,8 +325,13 @@ bool ImageActor::IsDefaultPropertyAnimatable( Property::Index index ) const
   }
   else
   {
-    return false;
+    index -= DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+    if ( ( index >= 0 ) && ( index < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS[ index ].animatable;
+    }
   }
+  return false;
 }
 
 bool ImageActor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
@@ -349,7 +340,15 @@ bool ImageActor::IsDefaultPropertyAConstraintInput( Property::Index index ) cons
   {
     return RenderableActor::IsDefaultPropertyAConstraintInput(index);
   }
-  return true; // Our properties can be used as input to constraints.
+  else
+  {
+    index -= DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+    if ( ( index >= 0 ) && ( index < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT ) )
+    {
+      return DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS[ index ].constraintInput;
+    }
+  }
+  return false;
 }
 
 Property::Type ImageActor::GetDefaultPropertyType( Property::Index index ) const
@@ -364,7 +363,7 @@ Property::Type ImageActor::GetDefaultPropertyType( Property::Index index ) const
 
     if ( ( index >= 0 ) && ( index < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT ) )
     {
-      return DEFAULT_IMAGE_ACTOR_PROPERTY_TYPES[index];
+      return DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS[index].type;
     }
     else
     {
@@ -374,7 +373,7 @@ Property::Type ImageActor::GetDefaultPropertyType( Property::Index index ) const
   }
 }
 
-const std::string& ImageActor::GetDefaultPropertyName( Property::Index index ) const
+const char* ImageActor::GetDefaultPropertyName( Property::Index index ) const
 {
   if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
@@ -386,13 +385,12 @@ const std::string& ImageActor::GetDefaultPropertyName( Property::Index index ) c
 
     if ( ( index >= 0 ) && ( index < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT ) )
     {
-      return DEFAULT_IMAGE_ACTOR_PROPERTY_NAMES[index];
+      return DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS[index].name;
     }
     else
     {
       // index out-of-bounds
-      static const std::string INVALID_PROPERTY_NAME;
-      return INVALID_PROPERTY_NAME;
+      return NULL;
     }
   }
 }
@@ -401,20 +399,22 @@ Property::Index ImageActor::GetDefaultPropertyIndex(const std::string& name) con
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  DALI_ASSERT_DEBUG( NULL != mDefaultImageActorPropertyLookup );
-
-  // Look for name in current class' default properties
-  DefaultPropertyLookup::const_iterator result = mDefaultImageActorPropertyLookup->find( name );
-  if ( mDefaultImageActorPropertyLookup->end() != result )
+  // Look for name in default properties
+  for( int i = 0; i < DEFAULT_IMAGE_ACTOR_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    const Internal::PropertyDetails* property = &DEFAULT_IMAGE_ACTOR_PROPERTY_DETAILS[ i ];
+    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    {
+      index = i + DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+      break;
+    }
   }
-  else
+
+  // If not found, check in base class
+  if( Property::INVALID_INDEX == index )
   {
-    // If not found, check in base class
     index = RenderableActor::GetDefaultPropertyIndex( name );
   }
-
   return index;
 }
 

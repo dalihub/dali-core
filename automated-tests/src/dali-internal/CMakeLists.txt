@@ -19,6 +19,7 @@ SET(TC_SOURCES
 )
 
 LIST(APPEND TC_SOURCES
+        ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
         ../dali/dali-test-suite-utils/test-application.cpp
         ../dali/dali-test-suite-utils/test-gesture-manager.cpp

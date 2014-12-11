@@ -16,8 +16,8 @@ while true ; do
     case "$1" in
         -r|--rebuild) opt_rebuild=true ; shift ;;
         -n|--no-gen)  opt_generate=false ; shift ;;
-	--) shift ; break ;;
-	*) shift ;;   # Ignore
+        --) shift ; break ;;
+        *) shift ;;   # Ignore
     esac
 done
 

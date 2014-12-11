@@ -527,7 +527,6 @@ public:
 
   /**
    * Create an inherited property.
-   * @param [in] initialValue The initial value of the property.
    */
   InheritedMatrix()
   : mValue(),

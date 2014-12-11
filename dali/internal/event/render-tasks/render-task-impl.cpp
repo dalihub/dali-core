@@ -49,13 +49,13 @@ namespace Internal
 namespace // For internal properties
 {
 
-const std::string DEFAULT_PROPERTY_NAMES[] =
+const char* DEFAULT_PROPERTY_NAMES[] =
 {
   "viewport-position",
   "viewport-size",
   "clear-color"
 };
-const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_NAMES ) / sizeof( std::string );
+const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_NAMES ) / sizeof( DEFAULT_PROPERTY_NAMES[0]);
 
 const Property::Type DEFAULT_PROPERTY_TYPES[DEFAULT_PROPERTY_COUNT] =
 {
@@ -65,8 +65,6 @@ const Property::Type DEFAULT_PROPERTY_TYPES[DEFAULT_PROPERTY_COUNT] =
 };
 
 }// unnamed namespace
-
-RenderTask::DefaultPropertyLookup* RenderTask::sDefaultPropertyLookup = NULL;
 
 RenderTask* RenderTask::New( bool isSystemLevel )
 {
@@ -474,7 +472,7 @@ void RenderTask::GetDefaultPropertyIndices( Property::IndexContainer& indices ) 
   }
 }
 
-const std::string& RenderTask::GetDefaultPropertyName( Property::Index index ) const
+const char* RenderTask::GetDefaultPropertyName( Property::Index index ) const
 {
   if( index < DEFAULT_PROPERTY_COUNT )
   {
@@ -482,9 +480,7 @@ const std::string& RenderTask::GetDefaultPropertyName( Property::Index index ) c
   }
   else
   {
-    // index out of range..return empty string
-    static const std::string INVALID_PROPERTY_NAME;
-    return INVALID_PROPERTY_NAME;
+    return NULL;
   }
 }
 
@@ -492,23 +488,14 @@ Property::Index RenderTask::GetDefaultPropertyIndex(const std::string& name) con
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  // Lazy initialization of static sDefaultPropertyLookup
-  if (!sDefaultPropertyLookup)
-  {
-    sDefaultPropertyLookup = new DefaultPropertyLookup();
-
-    for (int i=0; i<DEFAULT_PROPERTY_COUNT; ++i)
-    {
-      (*sDefaultPropertyLookup)[DEFAULT_PROPERTY_NAMES[i]] = i;
-    }
-  }
-  DALI_ASSERT_DEBUG( NULL != sDefaultPropertyLookup );
-
   // Look for name in default properties
-  DefaultPropertyLookup::const_iterator result = sDefaultPropertyLookup->find( name );
-  if ( sDefaultPropertyLookup->end() != result )
+  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    if( 0 == strcmp( name.c_str(), DEFAULT_PROPERTY_NAMES[ i ] ) ) // dont want to convert rhs to string
+    {
+      index = i;
+      break;
+    }
   }
 
   return index;
@@ -516,17 +503,17 @@ Property::Index RenderTask::GetDefaultPropertyIndex(const std::string& name) con
 
 bool RenderTask::IsDefaultPropertyWritable(Property::Index index) const
 {
-  return true;
+  return true; // all properties writable
 }
 
 bool RenderTask::IsDefaultPropertyAnimatable(Property::Index index) const
 {
-  return true;
+  return true; // all properties animatable
 }
 
 bool RenderTask::IsDefaultPropertyAConstraintInput( Property::Index index ) const
 {
-  return true;
+  return true; // all properties can be used as constraint input
 }
 
 Property::Type RenderTask::GetDefaultPropertyType(Property::Index index) const

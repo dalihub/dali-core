@@ -251,7 +251,7 @@ public: // Implementation of ProxyObject
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
    */
-  virtual const std::string& GetDefaultPropertyName(Property::Index index) const;
+  virtual const char* GetDefaultPropertyName(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -453,10 +453,6 @@ private:
   bool mClearEnabled  : 1; ///< True if the render-task should be clear the color buffer.
   bool mCullMode      : 1; ///< True if the render-task's actors should be culled
   bool mIsSystemLevel : 1; ///< True if the render-task is on the system level task list.
-
-  // Default properties
-  typedef std::map<std::string, Property::Index> DefaultPropertyLookup;
-  static DefaultPropertyLookup* sDefaultPropertyLookup;
 
   //Signals
   Dali::RenderTask::RenderTaskSignalV2  mSignalFinishedV2; ///< Signal emmited when the render task has been processed.

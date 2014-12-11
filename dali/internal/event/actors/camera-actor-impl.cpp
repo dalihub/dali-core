@@ -52,8 +52,6 @@ const Property::Index CameraActor::INVERT_Y_AXIS           = Internal::DEFAULT_A
 
 namespace Internal
 {
-bool CameraActor::mFirstInstance = true;
-Actor::DefaultPropertyLookup* CameraActor::mDefaultCameraActorPropertyLookup = NULL;
 
 namespace
 {
@@ -73,7 +71,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::CameraActor), typeid(Dali::Actor), Create );
 
-const std::string DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[] =
+const char* DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[] =
 {
   "type",
   "projection-mode",
@@ -90,7 +88,7 @@ const std::string DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[] =
   "view-matrix",
   "invert-y-axis"
 };
-const int DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES ) / sizeof( std::string );
+const int DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES ) / sizeof( DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[0] );
 
 const Property::Type DEFAULT_CAMERA_ACTOR_PROPERTY_TYPES[DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT] =
 {
@@ -191,16 +189,6 @@ CameraActorPtr CameraActor::New( const Size& size )
 
 void CameraActor::OnInitialize()
 {
-  if(CameraActor::mFirstInstance)
-  {
-    mDefaultCameraActorPropertyLookup = new DefaultPropertyLookup();
-    const int start = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-    for ( int i = 0; i < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT; ++i )
-    {
-      (*mDefaultCameraActorPropertyLookup)[DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[i]] = i + start;
-    }
-    CameraActor::mFirstInstance = false;
-  }
 }
 
 CameraActor::CameraActor()
@@ -513,7 +501,7 @@ Property::Type CameraActor::GetDefaultPropertyType( Property::Index index ) cons
   }
 }
 
-const std::string& CameraActor::GetDefaultPropertyName( Property::Index index ) const
+const char* CameraActor::GetDefaultPropertyName( Property::Index index ) const
 {
   if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
@@ -527,12 +515,7 @@ const std::string& CameraActor::GetDefaultPropertyName( Property::Index index ) 
     {
       return DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[index];
     }
-    else
-    {
-      // index out-of-bounds
-      static const std::string INVALID_PROPERTY_NAME;
-      return INVALID_PROPERTY_NAME;
-    }
+    return NULL;
   }
 }
 
@@ -540,17 +523,19 @@ Property::Index CameraActor::GetDefaultPropertyIndex(const std::string& name) co
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  DALI_ASSERT_DEBUG( NULL != mDefaultCameraActorPropertyLookup );
-
   // Look for name in current class' default properties
-  DefaultPropertyLookup::const_iterator result = mDefaultCameraActorPropertyLookup->find( name );
-  if ( mDefaultCameraActorPropertyLookup->end() != result )
+  for( int i = 0; i < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    if( 0 == strcmp( name.c_str(), DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[ i ] ) ) // dont want to convert rhs to string
+    {
+      index = i + DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+      break;
+    }
   }
-  else
+
+  // If not found, check in base class
+  if( Property::INVALID_INDEX == index )
   {
-    // If not found, check in base class
     index = Actor::GetDefaultPropertyIndex( name );
   }
 

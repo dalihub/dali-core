@@ -35,8 +35,6 @@ const Property::Index Layer::CLIPPING_BOX    = Internal::DEFAULT_ACTOR_PROPERTY_
 
 namespace Internal
 {
-bool Layer::mFirstInstance = true;
-Actor::DefaultPropertyLookup* Layer::mDefaultLayerPropertyLookup = NULL;
 
 namespace
 {
@@ -53,18 +51,13 @@ TypeAction a2(mType, Dali::Layer::ACTION_LOWER, &Layer::DoAction);
 TypeAction a3(mType, Dali::Layer::ACTION_RAISE_TO_TOP, &Layer::DoAction);
 TypeAction a4(mType, Dali::Layer::ACTION_LOWER_TO_BOTTOM, &Layer::DoAction);
 
-const std::string DEFAULT_LAYER_PROPERTY_NAMES[] =
+const PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
 {
-  "clipping-enable",
-  "clipping-box"
+ // Name                     Type              writable animatable constraint-input
+ { "clipping-enable",     Property::BOOLEAN,    true,    false,   true  },  // CLIPPING_ENABLE
+ { "clipping-box",        Property::RECTANGLE,  true,    false,   true  },  // CLIPPING_BOX
 };
-const int DEFAULT_LAYER_PROPERTY_COUNT = sizeof( DEFAULT_LAYER_PROPERTY_NAMES ) / sizeof( std::string );
-
-const Property::Type DEFAULT_LAYER_PROPERTY_TYPES[DEFAULT_LAYER_PROPERTY_COUNT] =
-{
-  Property::BOOLEAN,    // "clipping-enable",
-  Property::RECTANGLE,  // "clipping-box",
-};
+const int DEFAULT_LAYER_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( DEFAULT_PROPERTY_DETAILS[0] );
 
 } // unnamed namespace
 
@@ -119,16 +112,6 @@ Layer::Layer( Actor::DerivedType type )
 
 void Layer::OnInitialize()
 {
-  if(Layer::mFirstInstance)
-  {
-    mDefaultLayerPropertyLookup = new DefaultPropertyLookup();
-    const int start = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-    for ( int i = 0; i < DEFAULT_LAYER_PROPERTY_COUNT; ++i )
-    {
-      (*mDefaultLayerPropertyLookup)[DEFAULT_LAYER_PROPERTY_NAMES[i]] = i + start;
-    }
-    Layer::mFirstInstance = false;
-  }
 }
 
 Layer::~Layer()
@@ -362,7 +345,7 @@ bool Layer::IsDefaultPropertyWritable( Property::Index index ) const
   }
   else
   {
-    return true;
+    return true; // all properties writable, no need to lookup the table
   }
 }
 
@@ -374,7 +357,7 @@ bool Layer::IsDefaultPropertyAnimatable( Property::Index index ) const
   }
   else
   {
-    return false;
+    return false; // all properties non animateable, no need to lookup the table
   }
 }
 
@@ -384,7 +367,7 @@ bool Layer::IsDefaultPropertyAConstraintInput( Property::Index index ) const
   {
     return Actor::IsDefaultPropertyAConstraintInput(index);
   }
-  return true; // our properties can be used as an input to a constraint
+  return true; // our properties can be used as an input to a constraint, no need to lookup the table
 }
 
 Property::Type Layer::GetDefaultPropertyType( Property::Index index ) const
@@ -399,7 +382,7 @@ Property::Type Layer::GetDefaultPropertyType( Property::Index index ) const
 
     if ( ( index >= 0 ) && ( index < DEFAULT_LAYER_PROPERTY_COUNT ) )
     {
-      return DEFAULT_LAYER_PROPERTY_TYPES[index];
+      return DEFAULT_PROPERTY_DETAILS[index].type;
     }
     else
     {
@@ -409,8 +392,7 @@ Property::Type Layer::GetDefaultPropertyType( Property::Index index ) const
   }
 }
 
-
-const std::string& Layer::GetDefaultPropertyName( Property::Index index ) const
+const char* Layer::GetDefaultPropertyName( Property::Index index ) const
 {
   if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
@@ -422,13 +404,11 @@ const std::string& Layer::GetDefaultPropertyName( Property::Index index ) const
 
     if ( ( index >= 0 ) && ( index < DEFAULT_LAYER_PROPERTY_COUNT ) )
     {
-      return DEFAULT_LAYER_PROPERTY_NAMES[index];
+      return DEFAULT_PROPERTY_DETAILS[index].name;
     }
     else
     {
-      // index out-of-bounds
-      static const std::string INVALID_PROPERTY_NAME;
-      return INVALID_PROPERTY_NAME;
+      return NULL;
     }
   }
 }
@@ -437,15 +417,17 @@ Property::Index Layer::GetDefaultPropertyIndex(const std::string& name) const
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  DALI_ASSERT_DEBUG( NULL != mDefaultLayerPropertyLookup );
-
   // Look for name in current class' default properties
-  DefaultPropertyLookup::const_iterator result = mDefaultLayerPropertyLookup->find( name );
-  if ( mDefaultLayerPropertyLookup->end() != result )
+  for( int i = 0; i < DEFAULT_LAYER_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
+    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    {
+      index = i + DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+      break;
+    }
   }
-  else
+  if( Property::INVALID_INDEX == index )
   {
     // If not found, check in base class
     index = Actor::GetDefaultPropertyIndex( name );

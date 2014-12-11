@@ -32,8 +32,6 @@ namespace Internal DALI_INTERNAL
 class RenderableActor;
 }
 
-class ShaderEffect;
-
 /**
  * @brief Face culling modes.
  */

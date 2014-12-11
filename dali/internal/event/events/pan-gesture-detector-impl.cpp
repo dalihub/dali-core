@@ -103,8 +103,6 @@ float GetOppositeAngle( float angle )
 
 } // unnamed namespace
 
-PanGestureDetector::DefaultPropertyLookup* PanGestureDetector::mDefaultPropertyLookup = NULL;
-
 PanGestureDetectorPtr PanGestureDetector::New()
 {
   return new PanGestureDetector;
@@ -116,15 +114,6 @@ PanGestureDetector::PanGestureDetector()
   mMaximumTouches(1),
   mSceneObject(NULL)
 {
-  if( !mDefaultPropertyLookup )
-  {
-    mDefaultPropertyLookup = new DefaultPropertyLookup();
-    const int start = DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
-    for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
-    {
-      ( *mDefaultPropertyLookup )[ DEFAULT_PROPERTIES[i].name ] = i + start;
-    }
-  }
 }
 
 PanGestureDetector::~PanGestureDetector()
@@ -356,7 +345,7 @@ void PanGestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& in
   }
 }
 
-const std::string& PanGestureDetector::GetDefaultPropertyName( Property::Index index ) const
+const char* PanGestureDetector::GetDefaultPropertyName( Property::Index index ) const
 {
   index -= DEFAULT_GESTURE_DETECTOR_PROPERTY_MAX_COUNT;
   if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
@@ -365,9 +354,7 @@ const std::string& PanGestureDetector::GetDefaultPropertyName( Property::Index i
   }
   else
   {
-    // Index out-of-range... return empty string.
-    static const std::string INVALID_PROPERTY_NAME;
-    return INVALID_PROPERTY_NAME;
+    return NULL;
   }
 }
 
@@ -375,15 +362,16 @@ Property::Index PanGestureDetector::GetDefaultPropertyIndex(const std::string& n
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  DALI_ASSERT_DEBUG( NULL != mDefaultPropertyLookup );
-
   // Look for name in default properties
-  DefaultPropertyLookup::const_iterator result = mDefaultPropertyLookup->find( name );
-  if ( mDefaultPropertyLookup->end() != result )
+  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    const Internal::PropertyDetails* property = &DEFAULT_PROPERTIES[ i ];
+    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    {
+      index = i;
+      break;
+    }
   }
-
   return index;
 }
 

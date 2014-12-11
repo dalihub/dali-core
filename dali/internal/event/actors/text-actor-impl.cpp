@@ -59,7 +59,7 @@ const Property::Index TextActor::TEXT_COLOR                 = Internal::DEFAULT_
 namespace
 {
 
-const std::string DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[] =
+const char* DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[] =
 {
   "text",
   "font",
@@ -84,7 +84,7 @@ const std::string DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[] =
   "shadow-size",
   "text-color"
 };
-const int DEFAULT_TEXT_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_TEXT_ACTOR_PROPERTY_NAMES ) / sizeof( std::string );
+const int DEFAULT_TEXT_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_TEXT_ACTOR_PROPERTY_NAMES ) / sizeof( DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[0] );
 
 const Property::Type DEFAULT_TEXT_ACTOR_PROPERTY_TYPES[DEFAULT_TEXT_ACTOR_PROPERTY_COUNT] =
 {
@@ -116,8 +116,6 @@ const Property::Type DEFAULT_TEXT_ACTOR_PROPERTY_TYPES[DEFAULT_TEXT_ACTOR_PROPER
 
 namespace Internal
 {
-bool TextActor::mFirstInstance = true;
-Actor::DefaultPropertyLookup* TextActor::mDefaultTextActorPropertyLookup = NULL;
 
 namespace
 {
@@ -171,16 +169,6 @@ TextActor::TextActor(bool fontDetection)
 
 void TextActor::OnInitialize()
 {
-  if(TextActor::mFirstInstance)
-  {
-    mDefaultTextActorPropertyLookup = new DefaultPropertyLookup();
-    const int start = DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
-    for ( int i = 0; i < DEFAULT_TEXT_ACTOR_PROPERTY_COUNT; ++i )
-    {
-      (*mDefaultTextActorPropertyLookup)[DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[i]] = i + start;
-    }
-    TextActor::mFirstInstance = false ;
-  }
 }
 
 TextActor::~TextActor()
@@ -659,7 +647,7 @@ void TextActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) c
   }
 }
 
-const std::string& TextActor::GetDefaultPropertyName( Property::Index index ) const
+const char* TextActor::GetDefaultPropertyName( Property::Index index ) const
 {
   if(index < DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT)
   {
@@ -675,9 +663,7 @@ const std::string& TextActor::GetDefaultPropertyName( Property::Index index ) co
     }
     else
     {
-      // index out-of-bounds
-      static const std::string INVALID_PROPERTY_NAME;
-      return INVALID_PROPERTY_NAME;
+      return NULL;
     }
   }
 }
@@ -686,17 +672,19 @@ Property::Index TextActor::GetDefaultPropertyIndex(const std::string& name) cons
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  DALI_ASSERT_DEBUG( NULL != mDefaultTextActorPropertyLookup );
-
-  // Look for name in current class' default properties
-  DefaultPropertyLookup::const_iterator result = mDefaultTextActorPropertyLookup->find( name );
-  if ( mDefaultTextActorPropertyLookup->end() != result )
+  // Look for name in default properties
+  for( int i = 0; i < DEFAULT_TEXT_ACTOR_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    if( 0 == strcmp( name.c_str(), DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[ i ] ) ) // dont want to convert rhs to string
+    {
+      index = i + DEFAULT_RENDERABLE_ACTOR_PROPERTY_MAX_COUNT;
+      break;
+    }
   }
-  else
+
+  // If not found, check in base class
+  if( Property::INVALID_INDEX == index )
   {
-    // If not found, check in base class
     index = RenderableActor::GetDefaultPropertyIndex( name );
   }
 
@@ -711,7 +699,7 @@ bool TextActor::IsDefaultPropertyWritable( Property::Index index ) const
   }
   else
   {
-    return true ;
+    return true;
   }
 }
 
@@ -723,7 +711,7 @@ bool TextActor::IsDefaultPropertyAnimatable( Property::Index index ) const
   }
   else
   {
-    return false ;
+    return false;
   }
 }
 

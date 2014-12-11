@@ -337,7 +337,7 @@ private: // ProxyObject default non-animatable properties
   /**
    * copydoc Dali::Internal::ProxyObject
    */
-  virtual const std::string& GetDefaultPropertyName( Property::Index index ) const ;
+  virtual const char* GetDefaultPropertyName( Property::Index index ) const ;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -387,8 +387,6 @@ private:
   bool mInternalSetSize:1;  ///< to determine when we are internally setting size
   bool mFontDetection:1;  ///< tells whether TextActor should query platform abstraction after SetText
   bool mObserving:1;      ///< Whether the text actor is waiting for text to load
-  static bool mFirstInstance;
-  static DefaultPropertyLookup* mDefaultTextActorPropertyLookup; ///< Default properties
 };
 
 } // namespace Internal

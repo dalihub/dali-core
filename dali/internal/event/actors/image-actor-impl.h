@@ -144,7 +144,7 @@ public: // Default property extensions from ProxyObject
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
    */
-  virtual const std::string& GetDefaultPropertyName(Property::Index index) const;
+  virtual const char* GetDefaultPropertyName(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -249,9 +249,6 @@ private:
   // flags, compressed to bitfield (uses only 1 byte)
   bool mUsingNaturalSize:1;      ///< True only when the actor is using
   bool mInternalSetSize:1;       ///< True whilst setting size internally, false at all other times
-
-  static bool mFirstInstance ;
-  static DefaultPropertyLookup* mDefaultImageActorPropertyLookup; ///< Default properties
 
 };
 

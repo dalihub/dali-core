@@ -152,7 +152,7 @@ public: // Default property extensions from ProxyObject
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
    */
-  virtual const std::string& GetDefaultPropertyName( Property::Index index ) const;
+  virtual const char* GetDefaultPropertyName( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -238,9 +238,6 @@ private: // Data
   Dali::ShaderEffect::GeometryHints  mGeometryHints; ///< shader geometry hints for building the geometry
   Dali::Vector< UniformCoordinateType > mCoordinateTypes; ///< cached to avoid sending tons of unnecessary messages
 
-  // Default properties
-  typedef std::map<std::string, Property::Index> DefaultPropertyLookup;
-  static DefaultPropertyLookup* mDefaultPropertyLookup;
 };
 
 } // namespace Internal

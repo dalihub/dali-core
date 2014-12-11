@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/math/vector2.h>
@@ -227,7 +226,7 @@ private:
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
    */
-  virtual const std::string& GetDefaultPropertyName(Property::Index index) const;
+  virtual const char* GetDefaultPropertyName(Property::Index index) const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
@@ -300,10 +299,6 @@ private:
 
   const SceneGraph::PanGesture* mSceneObject; ///< Not owned
 
-  // Default properties
-
-  typedef std::map<std::string, Property::Index> DefaultPropertyLookup;
-  static DefaultPropertyLookup* mDefaultPropertyLookup;
 };
 
 } // namespace Internal

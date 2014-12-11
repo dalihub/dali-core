@@ -196,9 +196,9 @@ void GestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& ) con
 {
 }
 
-const std::string& GestureDetector::GetDefaultPropertyName( Property::Index index ) const
+const char* GestureDetector::GetDefaultPropertyName( Property::Index index ) const
 {
-  return String::EMPTY;
+  return NULL;
 }
 
 Property::Index GestureDetector::GetDefaultPropertyIndex(const std::string& name) const

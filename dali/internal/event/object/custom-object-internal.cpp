@@ -31,11 +31,6 @@ using Dali::Internal::SceneGraph::PropertyBase;
 using Dali::Internal::SceneGraph::UpdateManager;
 using Dali::Internal::SceneGraph::AnimatableProperty;
 
-namespace
-{
-const std::string INVALID_PROPERTY_NAME;
-}
-
 namespace Dali
 {
 
@@ -84,9 +79,9 @@ void CustomObject::GetDefaultPropertyIndices( Property::IndexContainer& indices 
 {
 }
 
-const std::string& CustomObject::GetDefaultPropertyName( Property::Index index ) const
+const char* CustomObject::GetDefaultPropertyName( Property::Index index ) const
 {
-  return INVALID_PROPERTY_NAME;
+  return NULL;
 }
 
 Property::Index CustomObject::GetDefaultPropertyIndex(const std::string& name) const

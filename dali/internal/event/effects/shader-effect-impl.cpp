@@ -58,10 +58,27 @@ const Property::Index ShaderEffect::GEOMETRY_HINTS      = 3;
 namespace Internal
 {
 
-ShaderEffect::DefaultPropertyLookup* ShaderEffect::mDefaultPropertyLookup = NULL;
-
 namespace
 {
+const PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
+{
+ // Name               Type            writable animatable constraint-input
+ { "grid-density",   Property::FLOAT,   true,    false,   false  }, // GRID_DENSITY
+ { "image",          Property::MAP,     true,    false,   false  }, // IMAGE
+ { "program",        Property::MAP,     true,    false,   false  }, // PROGRAM
+ { "geometry-hints", Property::INTEGER, true,    false,   false  }, // GEOMETRY_HINTS
+};
+
+const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( DEFAULT_PROPERTY_DETAILS[0] );
+
+BaseHandle Create()
+{
+  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New();
+
+  return Dali::ShaderEffect(internal.Get());
+}
+
+TypeRegistration mType( typeid(Dali::ShaderEffect), typeid(Dali::Handle), Create );
 
 struct WrapperStrings
 {
@@ -102,7 +119,7 @@ WrapperStrings customShaderWrappers [] =
  * @param[in] fragmentBody from application
  * @param[in] modifiesGeometry based on flags and vertex shader
  */
-void WrapAndSetProgram( ShaderEffect& effect,
+void WrapAndSetProgram( Internal::ShaderEffect& effect,
                         GeometryType actualGeometryType, GeometryType expectedGeometryType,
                         const std::string& vertexPrefix, const std::string& fragmentPrefix,
                         const std::string& vertexBody, const std::string& fragmentBody,
@@ -174,32 +191,6 @@ void WrapAndSetProgram( ShaderEffect& effect,
     effect.SendProgramMessage( expectedGeometryType, SHADER_SUBTYPE_ALL, vertexSource, fragmentSource, modifiesGeometry );
   }
 }
-
-BaseHandle Create()
-{
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New();
-
-  return Dali::ShaderEffect(internal.Get());
-}
-
-TypeRegistration mType( typeid(Dali::ShaderEffect), typeid(Dali::Handle), Create );
-
-const std::string DEFAULT_PROPERTY_NAMES[] =
-{
-  "grid-density",
-  "image",
-  "program",
-  "geometry-hints",
-};
-const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_NAMES ) / sizeof( std::string );
-
-const Property::Type DEFAULT_PROPERTY_TYPES[DEFAULT_PROPERTY_COUNT] =
-{
-  Property::FLOAT,    // "grid-density",
-  Property::MAP,      // "image",
-  Property::MAP,      // "program",
-  Property::INTEGER,  // "geometry-hints",
-};
 
 std::string GetShader(const std::string& field, const Property::Value& property)
 {
@@ -422,17 +413,15 @@ void ShaderEffect::GetDefaultPropertyIndices( Property::IndexContainer& indices 
   }
 }
 
-const std::string& ShaderEffect::GetDefaultPropertyName(Property::Index index) const
+const char* ShaderEffect::GetDefaultPropertyName(Property::Index index) const
 {
   if( index < DEFAULT_PROPERTY_COUNT )
   {
-    return DEFAULT_PROPERTY_NAMES[index];
+    return DEFAULT_PROPERTY_DETAILS[index].name;
   }
   else
   {
-    // index out of range..return empty string
-    static const std::string INVALID_PROPERTY_NAME;
-    return INVALID_PROPERTY_NAME;
+    return NULL;
   }
 }
 
@@ -440,48 +429,41 @@ Property::Index ShaderEffect::GetDefaultPropertyIndex(const std::string& name) c
 {
   Property::Index index = Property::INVALID_INDEX;
 
-  // Lazy initialization of static mDefaultPropertyLookup
-  if (!mDefaultPropertyLookup)
-  {
-    mDefaultPropertyLookup = new DefaultPropertyLookup();
-
-    for (int i=0; i<DEFAULT_PROPERTY_COUNT; ++i)
-    {
-      (*mDefaultPropertyLookup)[DEFAULT_PROPERTY_NAMES[i]] = i;
-    }
-  }
-  DALI_ASSERT_DEBUG( NULL != mDefaultPropertyLookup );
-
   // Look for name in default properties
-  DefaultPropertyLookup::const_iterator result = mDefaultPropertyLookup->find( name );
-  if ( mDefaultPropertyLookup->end() != result )
+  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    index = result->second;
+    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
+    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    {
+      index = i;
+      break;
+    }
   }
 
   return index;
+
 }
 
 bool ShaderEffect::IsDefaultPropertyWritable(Property::Index index) const
 {
-  return true;
+  return true; // all properties are writable
 }
 
 bool ShaderEffect::IsDefaultPropertyAnimatable(Property::Index index) const
 {
-  return false;
+  return false; // all properties are non animatable
 }
 
 bool ShaderEffect::IsDefaultPropertyAConstraintInput( Property::Index index ) const
 {
-  return false;
+  return false; // all properties cannot be used as constraint input
 }
 
 Property::Type ShaderEffect::GetDefaultPropertyType(Property::Index index) const
 {
   if( index < DEFAULT_PROPERTY_COUNT )
   {
-    return DEFAULT_PROPERTY_TYPES[index];
+    return DEFAULT_PROPERTY_DETAILS[index].type;
   }
   else
   {
