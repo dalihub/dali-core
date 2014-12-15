@@ -42,15 +42,7 @@ enum ShaderSubTypes
   SHADER_VERTEX_COLOR,       ///< Use only vertex color
   TOTAL_MESH_SHADERS,
 
-  // for text shader
-  SHADER_GRADIENT = 1,                 ///< Shader Supports: GRADIENT
-  SHADER_GRADIENT_GLOW,                ///< Shader Supports: GRADIENT + GLOW
-  SHADER_GRADIENT_SHADOW,              ///< Shader Supports: GRADIENT + SHADOW
-  SHADER_GRADIENT_OUTLINE,             ///< Shader Supports: GRADIENT + OUTLINE
-  SHADER_GRADIENT_OUTLINE_GLOW,        ///< Shader Supports: GRADIENT + OUTLINE + GLOW
-  TOTAL_TEXT_SHADERS,
-
-  SHADER_SUBTYPE_LAST = ( ( TOTAL_MESH_SHADERS > TOTAL_TEXT_SHADERS ) ? TOTAL_MESH_SHADERS : TOTAL_TEXT_SHADERS),
+  SHADER_SUBTYPE_LAST = TOTAL_MESH_SHADERS,
 
   SHADER_SUBTYPE_ALL = 0xFF,
 };

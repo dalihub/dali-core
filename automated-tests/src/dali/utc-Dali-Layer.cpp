@@ -547,8 +547,8 @@ int UtcDaliLayerClippingGLCalls(void)
   layer.SetClippingBox( testBox );
 
   // Add at least one renderable actor so the GL calls are actually made
-  Actor textActor = TextActor::New("Hello");
-  stage.Add( textActor );
+  Actor actor = ImageActor::New();
+  stage.Add( actor );
 
   // flush the queue and render once
   application.SendNotification();

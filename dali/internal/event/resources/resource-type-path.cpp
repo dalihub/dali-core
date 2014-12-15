@@ -111,42 +111,6 @@ int ResourceTypeCompare(const ResourceType& lhs, const ResourceType& rhs)
         break; // result = 0
       }
 
-      case ResourceText:
-      {
-        // compare text requests
-        const TextResourceType& lhsText = static_cast<const TextResourceType&>(lhs);
-        const TextResourceType& rhsText = static_cast<const TextResourceType&>(rhs);
-
-        if( lhsText.mStyle != rhsText.mStyle )
-        {
-          result = lhsText.mStyle < rhsText.mStyle ? -1 : 1;
-        }
-        else if (lhsText.mCharacterList.size() != rhsText.mCharacterList.size())
-        {
-          result = lhsText.mCharacterList.size() < rhsText.mCharacterList.size() ? -1 : 1;
-        }
-        else if (!std::equal(lhsText.mCharacterList.begin(), lhsText.mCharacterList.end(), rhsText.mCharacterList.begin()))
-        {
-          for (unsigned int i = 0; i < lhsText.mCharacterList.size(); ++i)
-          {
-            if (lhsText.mCharacterList[i].character != rhsText.mCharacterList[i].character)
-            {
-              result = lhsText.mCharacterList[i].character <= rhsText.mCharacterList[i].character ? -1 : 1;
-              break;
-            }
-          }
-        }
-        else if (lhsText.mFontHash != rhsText.mFontHash)
-        {
-          result = lhsText.mFontHash < rhsText.mFontHash ? -1 : 1;
-        }
-        else if (lhsText.mQuality != rhsText.mQuality)
-        {
-          result = lhsText.mQuality < rhsText.mQuality ? -1 : 1;
-        }
-        break;
-      }
-
       case ResourceMesh:
       {
         break; // result = 0

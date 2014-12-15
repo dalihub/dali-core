@@ -19,12 +19,10 @@
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/public-api/common/map-wrapper.h>
 
-#include <dali/integration-api/glyph-set.h>
 #include <dali/integration-api/resource-request.h>
 #include <dali/integration-api/debug.h>
 
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/text/resource/glyph-load-observer.h>
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/manager/update-manager.h>
@@ -48,7 +46,6 @@ struct ResourceClient::Impl
 {
   Impl(ResourcePolicy::DataRetention dataRetentionPolicy)
   : mNextId(0),
-    mGlyphLoadObserver(NULL),
     mDataRetentionPolicy( dataRetentionPolicy )
   {
   }
@@ -56,7 +53,6 @@ struct ResourceClient::Impl
   ResourceId       mNextId;
   TicketContainer  mTickets;
   BitmapCache      mBitmaps;
-  GlyphLoadObserver* mGlyphLoadObserver;
   ResourcePolicy::DataRetention mDataRetentionPolicy;
 };
 
@@ -126,7 +122,6 @@ ResourceTicketPtr ResourceClient::RequestResource(
     case ResourceTargetImage:
     case ResourceShader:
     case ResourceMesh:
-    case ResourceText:
     {
       newTicket = new ResourceTicket(*this, newId, typePath);
       break;
@@ -175,7 +170,6 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       case ResourceTargetImage:
       case ResourceShader:
       case ResourceMesh:
-      case ResourceText:
       {
         DALI_LOG_ERROR( "Unsupported resource type passed for decoding from a memory buffer." );
       }
@@ -468,16 +462,6 @@ Bitmap* ResourceClient::GetBitmap(ResourceTicketPtr ticket)
   return bitmap;
 }
 
-void ResourceClient::SetGlyphLoadObserver( GlyphLoadObserver* glyphLoadedInterface )
-{
-  mImpl->mGlyphLoadObserver = glyphLoadedInterface;
-}
-
-void ResourceClient::UpdateAtlasStatus( ResourceId id, ResourceId atlasId, Integration::LoadStatus loadStatus )
-{
-  RequestAtlasUpdateMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, id, atlasId, loadStatus );
-}
-
 /********************************************************************************
  ********************   ResourceTicketLifetimeObserver methods   ****************
  ********************************************************************************/
@@ -586,20 +570,6 @@ void ResourceClient::NotifySavingFailed( ResourceId id )
     ResourceTicket* ticket = ticketIter->second;
     ticket->SavingFailed();
   }
-}
-
-void ResourceClient::NotifyGlyphSetLoaded( ResourceId id, const GlyphSet& glyphSet, LoadStatus loadStatus )
-{
-  if( mImpl->mGlyphLoadObserver == NULL)
-  {
-    // should not happen.
-    DALI_ASSERT_DEBUG( !"GlyphLoadObserver == NULL ");
-    return;
-  }
-
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: NotifyGlyphSetLoaded(hash:%u)\n", glyphSet.mFontHash);
-
-  mImpl->mGlyphLoadObserver->GlyphsLoaded( id, glyphSet, loadStatus );
 }
 
 void ResourceClient::UpdateImageTicket( ResourceId id, const Dali::ImageAttributes& imageAttributes ) ///!< Issue #AHC01

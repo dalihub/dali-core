@@ -182,7 +182,7 @@ int UtcDaliImageActorSetSize01(void)
   BitmapImage img = BitmapImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
 
-  ShaderEffect effect = ShaderEffect::New( " ", " ", " ", " ", ShaderEffect::HINT_GRID );
+  ShaderEffect effect = ShaderEffect::New( " ", " ", GEOMETRY_TYPE_IMAGE, ShaderEffect::HINT_GRID );
   actor.SetShaderEffect( effect );
 
   const float INVALID_SIZE = float(1u<<31);

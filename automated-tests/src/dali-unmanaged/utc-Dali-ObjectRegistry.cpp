@@ -180,24 +180,6 @@ struct TestModelCallback
   bool& mSignalVerified;
 };
 
-struct TestTextActorCallback
-{
-  TestTextActorCallback(bool& signalReceived)
-  : mSignalVerified(signalReceived)
-  {
-  }
-  void operator()(BaseHandle object)
-  {
-    tet_infoline("Verifying TestTextActorCallback()");
-    TextActor actor = TextActor::DownCast(object);
-    if(actor)
-    {
-      mSignalVerified = true;
-    }
-  }
-  bool& mSignalVerified;
-};
-
 struct TestAnimationCallback
 {
   TestAnimationCallback(bool& signalReceived)
@@ -433,31 +415,6 @@ int UtcDaliObjectRegistrySignalModelCreated(void)
 
     verified = false;
     objectPointer = model.GetObjectPtr();
-  }
-  DALI_TEST_CHECK( test.mSignalVerified );
-  END_TEST;
-}
-
-int UtcDaliObjectRegistrySignalTextActorCreated(void)
-{
-  TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
-
-  bool verified = false;
-  TestTextActorCallback test(verified);
-
-  Dali::RefObject* objectPointer = NULL;
-  TestObjectDestroyedCallback test2(verified, objectPointer);
-
-  registry.ObjectCreatedSignal().Connect(&application, test);
-  registry.ObjectDestroyedSignal().Connect(&application, test2);
-
-  {
-    TextActor actor = TextActor::New("Hello");
-    DALI_TEST_CHECK( test.mSignalVerified );
-
-    verified = false;
-    objectPointer = actor.GetObjectPtr();
   }
   DALI_TEST_CHECK( test.mSignalVerified );
   END_TEST;

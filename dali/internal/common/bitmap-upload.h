@@ -80,7 +80,7 @@ typedef std::vector<BitmapUpload> BitmapUploadArray; ///< typedef for a array of
 
 
 /**
- * Structure is used for clearing areas of the atlas prior to loading glyphs
+ * Structure is used for clearing areas of the bitmap
  */
 typedef std::vector<Vector2> BitmapClearArray;
 

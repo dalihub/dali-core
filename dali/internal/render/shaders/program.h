@@ -46,13 +46,7 @@ class ProgramCache;
 /*
  * A program contains a vertex & fragment shader.
  *
- * A program will contain vertex attributes and uniform variables
- * E.g. inside the code for our text fragment shaders we have the line:
- * \code
- * uniform lowp vec4  uColor
- * \endcode
- *
- * This describes a variable used to color text as it is drawn.
+ * A program will contain vertex attributes and uniform variables.
  *
  * uColor is set to the value specified by Actor::SetColor and is
  * animatable through the property Actor::COLOR
@@ -110,19 +104,6 @@ public:
     UNIFORM_TIME_DELTA,
     UNIFORM_SAMPLER_OPACITY,
     UNIFORM_SAMPLER_NORMAL_MAP,
-
-    UNIFORM_TEXT_COLOR,
-    UNIFORM_SMOOTHING,
-    UNIFORM_OUTLINE,
-    UNIFORM_OUTLINE_COLOR,
-    UNIFORM_GLOW,
-    UNIFORM_GLOW_COLOR,
-    UNIFORM_SHADOW,
-    UNIFORM_SHADOW_COLOR,
-    UNIFORM_SHADOW_SMOOTHING,
-    UNIFORM_GRADIENT_COLOR,
-    UNIFORM_GRADIENT_LINE,
-    UNIFORM_INVERSE_TEXT_SIZE,
 
     UNIFORM_TYPE_LAST
   };

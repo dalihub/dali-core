@@ -40,11 +40,9 @@ class ResourceClient;
 class ResourceManager;
 class ImageFactory;
 class ModelFactory;
-class FontFactory;
 class ShaderFactory;
 class EventToUpdate;
 class GestureEventProcessor;
-class EmojiFactory;
 
 namespace SceneGraph
 {
@@ -132,12 +130,6 @@ public:
   ModelFactory& GetModelFactory();
 
   /**
-   * Returns the Font Factory
-   * @return reference to the Font Factory
-   */
-  FontFactory& GetFontFactory();
-
-  /**
    * Returns the Shader Factory
    * @return reference to the Shader Factory
    */
@@ -160,12 +152,6 @@ public:
    * @return A reference to the gesture event processor.
    */
   GestureEventProcessor& GetGestureEventProcessor();
-
-  /**
-   * Returns the Emoji factory.
-   * @return a reference to the Emoji factory.
-   */
-  EmojiFactory& GetEmojiFactory();
 
 private:
 

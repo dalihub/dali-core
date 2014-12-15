@@ -225,14 +225,10 @@ DALI_IMPORT_API Image NewImage( const Property::Value& map );
  *   "fragment":                type STRING
  *   "vertex-prefix":           type STRING
  *   "fragment-prefix":         type STRING
- *   "text-vertex":             type STRING
- *   "text-fragment":           type STRING
  *   "vertex-filename":         type STRING
  *   "fragment-filename":       type STRING
  *   "vertex-prefix-filename":  type STRING
  *   "fragment-prefix-filename":type STRING
- *   "text-vertex-filename":    type STRING
- *   "text-fragment-filename":  type STRING
  *   "geometry-type":           type STRING (enum)
  *   "geometry-hints":          type STRING (enum)
  * }

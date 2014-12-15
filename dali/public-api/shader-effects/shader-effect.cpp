@@ -83,40 +83,6 @@ ShaderEffect ShaderEffect::NewWithPrefix( const std::string& vertexShaderPrefix,
   return ShaderEffect( internal.Get() );
 }
 
-ShaderEffect ShaderEffect::New( const std::string& imageVertexShader,
-                                const std::string& imageFragmentShader,
-                                const std::string& textVertexShader,
-                                const std::string& textFragmentShader,
-                                GeometryHints hints)
-{
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
-
-  internal->SetPrograms( GEOMETRY_TYPE_IMAGE, imageVertexShader, imageFragmentShader );
-  internal->SetPrograms( GEOMETRY_TYPE_TEXT, textVertexShader, textFragmentShader );
-
-  return ShaderEffect( internal.Get() );
-}
-
-ShaderEffect ShaderEffect::New( const std::string& imageVertexShader,
-                                const std::string& imageFragmentShader,
-                                const std::string& textVertexShader,
-                                const std::string& textFragmentShader,
-                                const std::string& texturedMeshVertexShader,
-                                const std::string& texturedMeshFragmentShader,
-                                const std::string& meshVertexShader,
-                                const std::string& meshFragmentShader,
-                                GeometryHints hints)
-{
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
-
-  internal->SetPrograms( GEOMETRY_TYPE_IMAGE, imageVertexShader, imageFragmentShader );
-  internal->SetPrograms( GEOMETRY_TYPE_TEXT, textVertexShader, textFragmentShader );
-  internal->SetPrograms( GEOMETRY_TYPE_TEXTURED_MESH, texturedMeshVertexShader, texturedMeshFragmentShader );
-  internal->SetPrograms( GEOMETRY_TYPE_UNTEXTURED_MESH, meshVertexShader, meshFragmentShader );
-
-  return ShaderEffect( internal.Get() );
-}
-
 ShaderEffect ShaderEffect::DownCast( BaseHandle handle )
 {
   return ShaderEffect( dynamic_cast<Dali::Internal::ShaderEffect*>(handle.GetObjectPtr()) );

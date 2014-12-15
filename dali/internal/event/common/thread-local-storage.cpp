@@ -114,11 +114,6 @@ ModelFactory& ThreadLocalStorage::GetModelFactory()
   return mCore->GetModelFactory();
 }
 
-FontFactory& ThreadLocalStorage::GetFontFactory()
-{
-  return mCore->GetFontFactory();
-}
-
 ShaderFactory& ThreadLocalStorage::GetShaderFactory()
 {
   return mCore->GetShaderFactory();
@@ -137,11 +132,6 @@ EventToUpdate& ThreadLocalStorage::GetEventToUpdate()
 GestureEventProcessor& ThreadLocalStorage::GetGestureEventProcessor()
 {
   return mCore->GetGestureEventProcessor();
-}
-
-EmojiFactory& ThreadLocalStorage::GetEmojiFactory()
-{
-  return mCore->GetEmojiFactory();
 }
 
 } // namespace Internal

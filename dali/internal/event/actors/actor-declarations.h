@@ -34,7 +34,6 @@ class ImageActor;
 class Layer;
 class LightActor;
 class MeshActor;
-class TextActor;
 
 typedef IntrusivePtr<Actor>       ActorPtr;
 typedef IntrusivePtr<CameraActor> CameraActorPtr;
@@ -43,7 +42,6 @@ typedef IntrusivePtr<ImageActor>  ImageActorPtr;
 typedef IntrusivePtr<Layer>       LayerPtr;
 typedef IntrusivePtr<LightActor>  LightActorPtr;
 typedef IntrusivePtr<MeshActor>   MeshActorPtr;
-typedef IntrusivePtr<TextActor>   TextActorPtr;
 
 } // namespace Internal
 

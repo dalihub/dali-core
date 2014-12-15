@@ -1244,7 +1244,7 @@ int UtcDaliHoverStencil(void)
   TestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  TextActor actor = TextActor::New();
+  Actor actor = ImageActor::New();
   actor.SetSize(100.0f, 100.0f);
   actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
   stage.Add(actor);
@@ -1282,12 +1282,12 @@ int UtcDaliHoverStencilInActorHierarchy(void)
   TestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  TextActor parent = TextActor::New();
+  ImageActor parent = ImageActor::New();
   parent.SetSize(100.0f, 100.0f);
   parent.SetAnchorPoint(AnchorPoint::TOP_LEFT);
   stage.Add(parent);
 
-  TextActor child = TextActor::New();
+  ImageActor child = ImageActor::New();
   child.SetSize(25.0f, 25.0f);
   child.SetAnchorPoint(AnchorPoint::TOP_LEFT);
   parent.Add(child);
@@ -1368,7 +1368,7 @@ int UtcDaliHoverMultipleStencils(void)
   TestApplication application;
   Stage stage = Stage::GetCurrent();
 
-  TextActor actor = TextActor::New();
+  ImageActor actor = ImageActor::New();
   actor.SetSize(100.0f, 100.0f);
   actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
   stage.Add(actor);

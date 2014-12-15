@@ -387,7 +387,7 @@ int UtcDaliHitTestAlgorithmStencil(void)
   layer.Add( stencil );
 
   // Create a renderable actor and add that to the layer
-  Actor layerHitActor = TextActor::New();
+  Actor layerHitActor = ImageActor::New();
   layerHitActor.SetSize( 100.0f, 100.0f );
   layerHitActor.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   layerHitActor.SetParentOrigin( ParentOrigin::TOP_LEFT );

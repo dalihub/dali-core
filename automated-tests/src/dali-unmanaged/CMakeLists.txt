@@ -32,7 +32,6 @@ SET(TC_SOURCES
   utc-Dali-Scripting.cpp
   utc-Dali-Spline.cpp
   utc-Dali-TypeRegistry.cpp
-  utc-Dali-Utf8.cpp
   utc-Dali-Vector.cpp
 )
 

@@ -56,12 +56,10 @@ class EventProcessor;
 class GestureEventProcessor;
 class ResourceClient;
 class ResourceManager;
-class FontFactory;
 class ImageFactory;
 class ModelFactory;
 class ShaderFactory;
 class TouchResampler;
-class EmojiFactory;
 
 namespace SceneGraph
 {
@@ -239,12 +237,6 @@ private:  // for use by ThreadLocalStorage
   ResourceClient& GetResourceClient();
 
   /**
-   * Returns the Font factory
-   * @return A reference to the Font factory.
-   */
-  FontFactory& GetFontFactory();
-
-  /**
    * Returns the Image factory
    * @return A reference to the Image factory.
    */
@@ -267,12 +259,6 @@ private:  // for use by ThreadLocalStorage
    * @return A reference to the gesture event processor.
    */
   GestureEventProcessor& GetGestureEventProcessor();
-
-  /**
-   * Returns the Emoji factory.
-   * @return a reference to the Emoji factory.
-   */
-  EmojiFactory& GetEmojiFactory();
 
 private:
 
@@ -302,14 +288,12 @@ private:
   NotificationManager*                      mNotificationManager;         ///< Notification manager
   AnimationPlaylistOwner                    mAnimationPlaylist;           ///< For 'Fire and forget' animation support
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
-  FontFactory*                              mFontFactory;                 ///< font resource factory
   ImageFactory*                             mImageFactory;                ///< Image resource factory
   ModelFactory*                             mModelFactory;                ///< Model resource factory
   ShaderFactory*                            mShaderFactory;               ///< Shader resource factory
   ResourceClient*                           mResourceClient;              ///< Asynchronous Resource Loading
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   TouchResampler*                           mTouchResampler;              ///< Resamples touches to correct frame rate.
-  EmojiFactory*                             mEmojiFactory;                ///< Emoji resource factory.
 
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()

@@ -509,13 +509,6 @@ int UtcDaliTypeRegistryCreateDaliObjects(void)
   Stage::GetCurrent().Add( ia );
   application.Render();
 
-  type = registry.GetTypeInfo( "TextActor" );
-  DALI_TEST_CHECK( type );
-  TextActor ta = TextActor::DownCast(type.CreateInstance());
-  DALI_TEST_CHECK( ta );
-  Stage::GetCurrent().Add( ta );
-  application.Render();
-
   type = registry.GetTypeInfo( "CameraActor" );
   DALI_TEST_CHECK( type );
   CameraActor ca = CameraActor::DownCast(type.CreateInstance());
@@ -607,8 +600,8 @@ int UtcDaliTypeRegistryNames(void)
 // Check named and typeid are equivalent
 int UtcDaliTypeRegistryNameEquivalence(void)
 {
-  TypeInfo named_type = TypeRegistry::Get().GetTypeInfo( "TextActor" );
-  TypeInfo typeinfo_type = TypeRegistry::Get().GetTypeInfo( typeid(Dali::TextActor) );
+  TypeInfo named_type = TypeRegistry::Get().GetTypeInfo( "ImageActor" );
+  TypeInfo typeinfo_type = TypeRegistry::Get().GetTypeInfo( typeid(Dali::ImageActor) );
 
   DALI_TEST_CHECK( named_type );
   DALI_TEST_CHECK( typeinfo_type );
