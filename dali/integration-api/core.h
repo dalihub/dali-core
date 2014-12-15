@@ -49,19 +49,20 @@ struct TouchData;
 /**
  * The reasons why further updates are required.
  */
-namespace KeepUpdating DALI_IMPORT_API
+namespace KeepUpdating
 {
-  extern const unsigned int NOT_REQUESTED; ///< Zero means that no further updates are required
-
-  // Bit-field values
-  extern const unsigned int STAGE_KEEP_RENDERING;   ///< 0x01 - Stage::KeepRendering() is being used
-  extern const unsigned int INCOMING_MESSAGES;      ///< 0x02 - Event-thread is sending messages to update-thread
-  extern const unsigned int ANIMATIONS_RUNNING;     ///< 0x04 - Animations are ongoing
-  extern const unsigned int DYNAMICS_CHANGED;       ///< 0x08 - A dynamics simulation is running
-  extern const unsigned int LOADING_RESOURCES;      ///< 0x10 - Resources are being loaded
-  extern const unsigned int MONITORING_PERFORMANCE; ///< 0x20 - The --enable-performance-monitor option is being used
-  extern const unsigned int RENDER_TASK_SYNC;       ///< 0x40 - A render task is waiting for render sync
+enum Reasons
+{
+  NOT_REQUESTED           = 0x00, ///< Zero means that no further updates are required
+  STAGE_KEEP_RENDERING    = 0x01, ///<  - Stage::KeepRendering() is being used
+  INCOMING_MESSAGES       = 0x02, ///< - Event-thread is sending messages to update-thread
+  ANIMATIONS_RUNNING      = 0x04, ///< - Animations are ongoing
+  DYNAMICS_CHANGED        = 0x08, ///< - A dynamics simulation is running
+  LOADING_RESOURCES       = 0x10, ///< - Resources are being loaded
+  MONITORING_PERFORMANCE  = 0x20, ///< - The --enable-performance-monitor option is being used
+  RENDER_TASK_SYNC        = 0x40  ///< - A render task is waiting for render sync
 };
+}
 
 /**
  * The status of the Core::Update operation.

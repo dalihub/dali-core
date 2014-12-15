@@ -73,7 +73,7 @@ void CheckGlError( Integration::GlAbstraction& glAbstraction, const char* operat
   for( GLint error = glAbstraction.GetError(); error; error = glAbstraction.GetError() )
   {
     DALI_LOG_ERROR( "glError (0x%x) %s - after %s\n",  error, ErrorToString(error), operation );
-    DALI_ASSERT_ALWAYS( error && "GL ERROR"); // if errors are being checked we should assert
+    DALI_ASSERT_ALWAYS( !error && "GL ERROR"); // if errors are being checked we should assert
   }
 }
 
