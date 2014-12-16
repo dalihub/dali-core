@@ -506,6 +506,12 @@ void Stage::EmitTouchedSignal( const TouchEvent& touch )
   mTouchedSignalV2.Emit( touch );
 }
 
+
+void Stage::EmitSceneCreatedSignal()
+{
+  mSceneCreatedSignal.Emit();
+}
+
 Dali::Stage::KeyEventSignalV2& Stage::KeyEventSignal()
 {
   return mKeyEventSignalV2;
@@ -529,6 +535,11 @@ Dali::Stage::ContextStatusSignal& Stage::ContextLostSignal()
 Dali::Stage::ContextStatusSignal& Stage::ContextRegainedSignal()
 {
   return mContextRegainedSignal;
+}
+
+Dali::Stage::SceneCreatedSignalV2& Stage::SceneCreatedSignal()
+{
+  return mSceneCreatedSignal;
 }
 
 void Stage::NotifyContextLost()
