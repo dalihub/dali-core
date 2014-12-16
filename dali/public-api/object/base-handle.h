@@ -149,7 +149,7 @@ public:
    * @brief Retrieve the internal Dali resource.
    *
    * This is useful for checking the reference count of the internal resource.
-   * This method will assert, if the Dali::BaseHandle has not been initialized.
+   * This method will not check the validity of the handle so the caller is expected to check it by using if (handle)
    * @return The BaseObject which is referenced by the BaseHandle.
    */
   BaseObject& GetBaseObject();
@@ -158,7 +158,7 @@ public:
    * @brief Retrieve the internal Dali resource.
    *
    * This is useful for checking the reference count of the internal resource.
-   * This method will assert, if the Dali::BaseHandle has not been initialized.
+   * This method will not check the validity of the handle so the caller is expected to check it by using if (handle)
    * @return The BaseObject which is referenced by the BaseHandle.
    */
   const BaseObject& GetBaseObject() const;

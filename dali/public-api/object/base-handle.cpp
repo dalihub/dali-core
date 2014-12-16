@@ -74,15 +74,11 @@ bool BaseHandle::GetTypeInfo(Dali::TypeInfo& typeInfo) const
 
 BaseObject& BaseHandle::GetBaseObject()
 {
-  DALI_ASSERT_ALWAYS( mObjectHandle.Get() && "BaseHandle is empty" );
-
   return static_cast<BaseObject&>(*mObjectHandle);
 }
 
 const BaseObject& BaseHandle::GetBaseObject() const
 {
-  DALI_ASSERT_ALWAYS(mObjectHandle.Get() && "BaseHandle is empty" );
-
   return static_cast<const BaseObject&>(*mObjectHandle);
 }
 
