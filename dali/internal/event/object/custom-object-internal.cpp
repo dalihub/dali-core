@@ -54,15 +54,9 @@ const SceneGraph::PropertyOwner* CustomObject::GetSceneObject() const
 
 const PropertyBase* CustomObject::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  const PropertyBase* property( NULL );
-
-  CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
-
-  DALI_ASSERT_ALWAYS( GetCustomPropertyLookup().end() != entry && "index is invalid" );
-
-  property = dynamic_cast<const PropertyBase*>( entry->second.GetSceneGraphProperty() );
-
-  return property;
+  CustomProperty* custom = FindCustomProperty( index );
+  DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
+  return custom->GetSceneGraphProperty();;
 }
 
 const PropertyInputImpl* CustomObject::GetSceneObjectInputProperty( Property::Index index ) const

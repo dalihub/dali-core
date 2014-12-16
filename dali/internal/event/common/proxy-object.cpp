@@ -48,17 +48,13 @@ const int SUPPORTED_CAPABILITIES = Dali::Handle::DYNAMIC_PROPERTIES;  // ProxyOb
 typedef Dali::Vector<ProxyObject::Observer*>::Iterator ObserverIter;
 typedef Dali::Vector<ProxyObject::Observer*>::ConstIterator ConstObserverIter;
 
-static std::string EMPTY_PROPERTY_NAME;
-
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PROXY_OBJECT" );
 #endif
 } // unnamed namespace
 
 ProxyObject::ProxyObject()
-: mNextCustomPropertyIndex( 0u ),
-  mCustomProperties( NULL ),
-  mTypeInfo( NULL ),
+: mTypeInfo( NULL ),
   mConstraints( NULL ),
   mPropertyNotifications( NULL )
 {
@@ -159,13 +155,9 @@ unsigned int ProxyObject::GetPropertyCount() const
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Manual Properties:  %d\n", manual );
   }
 
-  if( mCustomProperties )
-  {
-    unsigned int custom( mCustomProperties->size() );
-    count += custom;
-
-    DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Custom Properties:  %d\n", custom );
-  }
+  unsigned int custom( mCustomProperties.Count() );
+  count += custom;
+  DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Custom Properties:  %d\n", custom );
 
   DALI_LOG_INFO( gLogFilter, Debug::Concise, "Total Properties:   %d\n", count );
 
@@ -194,14 +186,12 @@ std::string ProxyObject::GetPropertyName( Property::Index index ) const
     }
   }
 
-  if( mCustomProperties )
+  CustomProperty* custom = FindCustomProperty( index );
+  if( custom )
   {
-    CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
-    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Property index is invalid" );
-
-    return entry->second.name;
+    return custom->name;
   }
-  return EMPTY_PROPERTY_NAME;
+  return "";
 }
 
 Property::Index ProxyObject::GetPropertyIndex(const std::string& name) const
@@ -217,14 +207,16 @@ Property::Index ProxyObject::GetPropertyIndex(const std::string& name) const
     }
   }
 
-  if( index == Property::INVALID_INDEX && mCustomProperties )
+  if( ( index == Property::INVALID_INDEX )&&( mCustomProperties.Count() > 0 ) )
   {
-    // This is slow, but we're not (supposed to be) using property names frequently
-    for ( CustomPropertyLookup::const_iterator iter = mCustomProperties->begin(); mCustomProperties->end() != iter; ++iter )
+    Property::Index count = PROPERTY_CUSTOM_START_INDEX;
+    const CustomPropertyLookup::ConstIterator end = mCustomProperties.End();
+    for( CustomPropertyLookup::ConstIterator iter = mCustomProperties.Begin(); iter != end; ++iter, ++count )
     {
-      if (iter->second.name == name)
+      CustomProperty* custom = *iter;
+      if ( custom->name == name )
       {
-        index = iter->first;
+        index = count;
         break;
       }
     }
@@ -251,17 +243,15 @@ bool ProxyObject::IsPropertyWritable( Property::Index index ) const
     }
     else
     {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property index" );
+      DALI_ASSERT_ALWAYS( ! "Invalid property index" );
     }
   }
 
-  if( mCustomProperties)
+  CustomProperty* custom = FindCustomProperty( index );
+  if( custom )
   {
     // Check that the index is valid
-    CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
-    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
-
-    return entry->second.IsWritable();
+    return custom->IsWritable();
   }
   return false;
 }
@@ -281,18 +271,15 @@ bool ProxyObject::IsPropertyAnimatable( Property::Index index ) const
     return false;
   }
 
-  if( mCustomProperties )
+  CustomProperty* custom = FindCustomProperty( index );
+  if( custom )
   {
-    // Check custom property
-    CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
-    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
-
-    return entry->second.IsAnimatable();
+    return custom->IsAnimatable();
   }
   return false;
 }
 
-bool ProxyObject::IsPropertyAConstraintInput(Property::Index index) const
+bool ProxyObject::IsPropertyAConstraintInput( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds");
 
@@ -307,12 +294,9 @@ bool ProxyObject::IsPropertyAConstraintInput(Property::Index index) const
     return false;
   }
 
-  if( mCustomProperties )
+  CustomProperty* custom = FindCustomProperty( index );
+  if( custom )
   {
-    // Check custom property
-    CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
-    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
-
     // ... custom properties can be used as input to a constraint.
     return true;
   }
@@ -341,12 +325,10 @@ Property::Type ProxyObject::GetPropertyType( Property::Index index ) const
     }
   }
 
-  if( mCustomProperties )
+  CustomProperty* custom = FindCustomProperty( index );
+  if( custom )
   {
-    CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
-    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find Property index" );
-
-    return entry->second.type;
+    return custom->type;
   }
   return Property::NONE;
 }
@@ -373,19 +355,16 @@ void ProxyObject::SetProperty( Property::Index index, const Property::Value& pro
       DALI_ASSERT_ALWAYS( ! "Cannot find property index" );
     }
   }
-  else if( mCustomProperties )
+  else
   {
-    CustomPropertyLookup::iterator entry = mCustomProperties->find( index );
-    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
-    DALI_ASSERT_ALWAYS( entry->second.IsWritable() && "Property is read-only" );
+    CustomProperty* custom = FindCustomProperty( index );
+    DALI_ASSERT_ALWAYS( custom && "Invalid property index" );
+    DALI_ASSERT_ALWAYS( custom->IsWritable() && "Property is read-only" );
 
-    // this is only relevant for non animatable properties
-    if(entry->second.IsWritable())
-    {
-      entry->second.value = propertyValue;
-    }
-
-    SetCustomProperty(index, entry->second, propertyValue);
+    // this is only relevant for non animatable properties, but we'll do it anyways
+    custom->value = propertyValue;
+    // set the scene graph property value
+    SetCustomProperty(index, *custom, propertyValue);
   }
 }
 
@@ -411,24 +390,24 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
       DALI_ASSERT_ALWAYS( ! "Cannot find property index" );
     }
   }
-  else if( mCustomProperties )
+  else if( mCustomProperties.Count() > 0 )
   {
-    CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
-    DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
+    CustomProperty* custom = FindCustomProperty( index );
+    DALI_ASSERT_ALWAYS( custom && "Invalid property index" );
 
-    if( !entry->second.IsAnimatable() )
+    if( !custom->IsAnimatable() )
     {
-      value = entry->second.value;
+      value = custom->value;
     }
     else
     {
       BufferIndex bufferIndex( Stage::GetCurrent()->GetEventBufferIndex() );
 
-      switch ( entry->second.type )
+      switch ( custom->type )
       {
         case Property::BOOLEAN:
         {
-          const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -437,7 +416,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::FLOAT:
         {
-          const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -446,7 +425,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::INTEGER:
         {
-          const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -455,7 +434,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::VECTOR2:
         {
-          const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -464,7 +443,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::VECTOR3:
         {
-          const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -473,7 +452,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::VECTOR4:
         {
-          const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -482,7 +461,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::MATRIX:
         {
-          const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -491,7 +470,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::MATRIX3:
         {
-          const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -500,7 +479,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
 
         case Property::ROTATION:
         {
-          const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry->second.GetSceneGraphProperty() );
+          const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( custom->GetSceneGraphProperty() );
           DALI_ASSERT_DEBUG( NULL != property );
 
           value = (*property)[ bufferIndex ];
@@ -535,23 +514,22 @@ void ProxyObject::GetPropertyIndices( Property::IndexContainer& indices ) const
   }
 
   // Custom Properties
-  if ( mCustomProperties )
+  if ( mCustomProperties.Count() > 0 )
   {
-    indices.reserve( indices.size() + mCustomProperties->size() );
+    indices.reserve( indices.size() + mCustomProperties.Count() );
 
-    const CustomPropertyLookup::const_iterator endIter = mCustomProperties->end();
-    for ( CustomPropertyLookup::const_iterator iter = mCustomProperties->begin(); iter != endIter; ++iter )
+    CustomPropertyLookup::ConstIterator iter = mCustomProperties.Begin();
+    const CustomPropertyLookup::ConstIterator endIter = mCustomProperties.End();
+    int i=0;
+    for ( ; iter != endIter; ++iter, ++i )
     {
-      indices.push_back( iter->first );
+      indices.push_back( PROPERTY_CUSTOM_START_INDEX + i );
     }
   }
 }
 
 Property::Index ProxyObject::RegisterProperty( std::string name, const Property::Value& propertyValue)
 {
-  // Assert that property name is unused
-  DALI_ASSERT_ALWAYS( Property::INVALID_INDEX == GetPropertyIndex(name) && "Property index is out of bounds" );
-
   // Create a new property
   Dali::Internal::OwnerPointer<PropertyBase> newProperty;
 
@@ -630,19 +608,8 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
     }
   }
 
-  // Default properties start from index zero
-  if ( 0u == mNextCustomPropertyIndex )
-  {
-    mNextCustomPropertyIndex = PROPERTY_CUSTOM_START_INDEX;
-  }
-
-  // Add entry to the property lookup
-  const Property::Index index = mNextCustomPropertyIndex++;
-
-  CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
-  DALI_ASSERT_ALWAYS( mCustomProperties->end() == entry && "Custom property already registered" );
-
-  (*mCustomProperties)[ index ] = CustomProperty( name, propertyValue.GetType(), newProperty.Get() );
+  const Property::Index index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
+  mCustomProperties.PushBack( new CustomProperty( name, propertyValue.GetType(), newProperty.Get() ) );
 
   // The derived class now passes ownership of this new property to a scene-object
   // TODO: change this so that OwnerPointer is passed all the way as owership passing cannot be done with a reference
@@ -661,15 +628,9 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
   }
   else
   {
-    // Default properties start from index zero
-    if ( 0u == mNextCustomPropertyIndex )
-    {
-      mNextCustomPropertyIndex = PROPERTY_CUSTOM_START_INDEX;
-    }
-
     // Add entry to the property lookup
-    index = mNextCustomPropertyIndex++;
-    GetCustomPropertyLookup()[ index ] = CustomProperty( name, propertyValue, accessMode );
+    index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
+    mCustomProperties.PushBack( new CustomProperty( name, propertyValue, accessMode ) );
   }
 
   return index;
@@ -683,14 +644,13 @@ Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index 
   {
     if ( index <= PROPERTY_REGISTRATION_MAX_INDEX )
     {
-      DALI_ASSERT_ALWAYS( false && "Property notification added to non animatable property." );
+      DALI_ASSERT_ALWAYS( false && "Property notification added to event side only property." );
     }
-    else if ( mCustomProperties )
+    else if ( mCustomProperties.Count() > 0 )
     {
-      CustomPropertyLookup::const_iterator entry = mCustomProperties->find( index );
-      DALI_ASSERT_ALWAYS( mCustomProperties->end() != entry && "Cannot find property index" );
-
-      DALI_ASSERT_ALWAYS( entry->second.IsAnimatable() && "Property notification added to non animatable property (currently not suppported )");
+      CustomProperty* custom = FindCustomProperty( index );
+      DALI_ASSERT_ALWAYS( custom && "Invalid property index" );
+      DALI_ASSERT_ALWAYS( custom->IsAnimatable() && "Property notification added to event side only property." );
     }
   }
 
@@ -918,16 +878,6 @@ void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty
   }
 }
 
-CustomPropertyLookup& ProxyObject::GetCustomPropertyLookup() const
-{
-  // lazy create
-  if( !mCustomProperties )
-  {
-    mCustomProperties = new CustomPropertyLookup;
-  }
-  return *mCustomProperties;
-}
-
 const TypeInfo* ProxyObject::GetTypeInfo() const
 {
   if ( !mTypeInfo )
@@ -1044,9 +994,22 @@ ProxyObject::~ProxyObject()
     (*iter)->ProxyDestroyed(*this);
   }
 
-  delete mCustomProperties;
   delete mConstraints;
   delete mPropertyNotifications;
+}
+
+CustomProperty* ProxyObject::FindCustomProperty( Property::Index index ) const
+{
+  CustomProperty* property( NULL );
+  int arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;
+  if( arrayIndex >= 0 )
+  {
+    if( arrayIndex < (int)mCustomProperties.Count() ) // we can only access the first 2 billion custom properties
+    {
+      property = mCustomProperties[ arrayIndex ];
+    }
+  }
+  return property;
 }
 
 } // namespace Internal

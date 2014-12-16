@@ -43,7 +43,6 @@ using Dali::Internal::SceneGraph::UniformMeta;
 using Dali::Internal::SceneGraph::Shader;
 using Dali::Internal::SceneGraph::AnimatableProperty;
 using Dali::Internal::SceneGraph::PropertyBase;
-using Dali::Internal::SceneGraph::PropertyBase;
 using Dali::Internal::SceneGraph::RenderQueue;
 using std::string;
 
@@ -614,24 +613,14 @@ const SceneGraph::PropertyOwner* ShaderEffect::GetSceneObject() const
 
 const PropertyBase* ShaderEffect::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
-
-  DALI_ASSERT_ALWAYS( GetCustomPropertyLookup().end() != entry && "Property index is invalid" );
-
-  DALI_ASSERT_ALWAYS( entry->second.IsAnimatable() && "shader effect has only animatable properties" );
-
-  return dynamic_cast<const PropertyBase*>( entry->second.GetSceneGraphProperty() );
+  CustomProperty* custom = FindCustomProperty( index );
+  DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
+  return custom->GetSceneGraphProperty();
 }
 
 const PropertyInputImpl* ShaderEffect::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
-
-  DALI_ASSERT_ALWAYS( GetCustomPropertyLookup().end() != entry && "Property index is invalid" );
-
-  DALI_ASSERT_ALWAYS( entry->second.IsAnimatable() && "shader effect has only animatable properties" );
-
-  return entry->second.GetSceneGraphProperty();
+  return GetSceneObjectAnimatableProperty( index );
 }
 
 } // namespace Internal
