@@ -19,8 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/internal/event/animation/progress-value.h>
+#include <dali/public-api/animation/animation.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {
@@ -75,7 +76,7 @@ public:
 
   bool IsActive (float progress);
 
-  V GetValue(float progress) const;
+  V GetValue(float progress, Dali::Animation::Interpolation interpolation) const;
 
   bool FindInterval(typename ProgressValues::iterator& start,
                     typename ProgressValues::iterator& end,
@@ -139,7 +140,7 @@ bool KeyFrameChannel<V>::FindInterval(
 }
 
 template <class V>
-V KeyFrameChannel<V>::GetValue (float progress) const
+V KeyFrameChannel<V>::GetValue (float progress, Dali::Animation::Interpolation interpolation) const
 {
   ProgressValue<V>&  firstPV =  mValues.front();
 
@@ -155,7 +156,37 @@ V KeyFrameChannel<V>::GetValue (float progress) const
   {
     float frameProgress = (progress - start->GetProgress()) / (end->GetProgress() - start->GetProgress());
 
-    interpolatedV = Interpolate(*start, *end, frameProgress);
+    if( interpolation == Dali::Animation::Linear )
+    {
+      Interpolate(interpolatedV, start->GetValue(), end->GetValue(), frameProgress);
+    }
+    else
+    {
+      //Calculate prev and next values
+      V prev;
+      if( start != mValues.begin() )
+      {
+        prev = (start-1)->GetValue();
+      }
+      else
+      {
+        //Project next value through start point
+        prev = start->GetValue() + (start->GetValue()-(start+1)->GetValue());
+      }
+
+      V next;
+      if( end != mValues.end()-1)
+      {
+        next = (end+1)->GetValue();
+      }
+      else
+      {
+        //Project prev value through end point
+        next = end->GetValue() + (end->GetValue()-(end-1)->GetValue());
+      }
+
+      CubicInterpolate(interpolatedV, prev, start->GetValue(), end->GetValue(), next, frameProgress);
+    }
   }
 
   return interpolatedV;

@@ -86,53 +86,116 @@ typedef std::vector<ProgressVector3>                    ProgressVector3Container
 typedef ProgressValue<Vector4>                          ProgressVector4;
 typedef std::vector<ProgressVector4>                    ProgressVector4Container;
 
-inline Quaternion Interpolate (ProgressQuaternion& a, ProgressQuaternion& b, float progress)
+inline void Interpolate (Quaternion& result, const Quaternion& a, const Quaternion& b, float progress)
 {
-  return Quaternion::Slerp(a.GetValue(), b.GetValue(), progress);
+  result = Quaternion::Slerp(a, b, progress);
 }
 
-inline AngleAxis Interpolate (ProgressAngleAxis& a, ProgressAngleAxis& b, float progress)
+inline void Interpolate (AngleAxis& result, const AngleAxis& a, const AngleAxis& b, float progress)
 {
-  AngleAxis av(a.GetValue());
-  AngleAxis bv(b.GetValue());
-  Quaternion q1(Radian(av.angle), av.axis);
-  Quaternion q2(Radian(bv.angle), bv.axis);
+  Quaternion q1(Radian(a.angle), a.axis);
+  Quaternion q2(Radian(b.angle), b.axis);
 
   Quaternion iq = Quaternion::Slerp(q1, q2, progress);
-  AngleAxis result;
   iq.ToAxisAngle(result.axis, result.angle);
-  return result;
 }
 
 
-inline bool Interpolate (ProgressBoolean& a, ProgressBoolean& b, float progress)
+inline void Interpolate (bool& result, bool a, bool b, float progress)
 {
-  return progress < 0.5f ? a.GetValue() : b.GetValue();
+  result = progress < 0.5f ? a : b;
 }
 
-inline float Interpolate (ProgressNumber& a, ProgressNumber& b, float progress)
+inline void Interpolate (float& result, float a, float b, float progress)
 {
-  return (a.GetValue() + (b.GetValue() - a.GetValue()) * progress);
+  result = a + (b-a) * progress;
 }
 
-inline int Interpolate (ProgressInteger& a, ProgressInteger& b, float progress)
+inline void Interpolate (int& result, int a, int b, float progress)
 {
-  return static_cast<int>(a.GetValue() + (b.GetValue() - a.GetValue()) * progress + 0.5f);
+  result = static_cast<int>(a + (b - a) * progress + 0.5f);
 }
 
-inline Vector2 Interpolate (ProgressVector2& a, ProgressVector2& b, float progress)
+inline void Interpolate (Vector2& result, const Vector2& a,  const Vector2& b, float progress)
 {
-  return (a.GetValue() + (b.GetValue() - a.GetValue()) * progress);
+  result = a + (b-a) * progress;
 }
 
-inline Vector3 Interpolate (ProgressVector3& a, ProgressVector3& b, float progress)
+inline void Interpolate (Vector3& result, const Vector3& a, const Vector3& b, float progress)
 {
-  return (a.GetValue() + (b.GetValue() - a.GetValue()) * progress);
+  result = a + (b-a) * progress;
 }
 
-inline Vector4 Interpolate (ProgressVector4& a, ProgressVector4& b, float progress)
+inline void Interpolate (Vector4& result, const Vector4& a, const Vector4& b, float progress)
 {
-  return (a.GetValue() + (b.GetValue() - a.GetValue()) * progress);
+  result = a + (b-a) * progress;
+}
+
+/* Cubic Interpolation (Catmull-Rom spline) between values p1 and p2. p0 and p3 are prev and next values
+ * and are used as control points to calculate tangent of the curve at interpolation points.
+ *
+ * f(t) = a3*t^3 + a2*t^2 + a1*t + a0
+ * Restrictions: f(0)=p1   f(1)=p2   f'(0)=(p2-p0)*0.5   f'(1)=(p3-p1)*0.5
+ */
+
+inline void CubicInterpolate( int& result, int p0, int p1, int p2, int p3, float progress )
+{
+  float a3 = p3*0.5f - p2*1.5f + p1*1.5f - p0*0.5f;
+  float a2 = p0 - p1*2.5f + p2*2.0f - p3*0.5f;
+  float a1 = (p2-p0)*0.5f;
+
+  result = static_cast<int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + p1 + 0.5f );
+}
+
+inline void CubicInterpolate( float& result, float p0, float p1, float  p2, float  p3, float progress )
+{
+  float a3 = p3*0.5f - p2*1.5f + p1*1.5f - p0*0.5f;
+  float a2 = p0 - p1*2.5f + p2*2.0f - p3*0.5f;
+  float a1 = (p2-p0)*0.5f;
+
+  result = a3*progress*progress*progress + a2*progress*progress + a1*progress + p1;
+}
+
+inline void CubicInterpolate( Vector2& result, const Vector2& p0, const Vector2& p1, const Vector2&  p2, const Vector2&  p3, float progress )
+{
+  Vector2 a3 = p3*0.5f - p2*1.5f + p1*1.5f - p0*0.5f;
+  Vector2 a2 = p0 - p1*2.5f + p2*2.0f - p3*0.5f;
+  Vector2 a1 = (p2-p0)*0.5f;
+
+  result = a3*progress*progress*progress + a2*progress*progress + a1*progress + p1;
+}
+
+inline void CubicInterpolate( Vector3& result, const Vector3& p0, const Vector3& p1, const Vector3&  p2, const Vector3&  p3, float progress )
+{
+  Vector3 a3 = p3*0.5f - p2*1.5f + p1*1.5f - p0*0.5f;
+  Vector3 a2 = p0 - p1*2.5f + p2*2.0f - p3*0.5f;
+  Vector3 a1 = (p2-p0)*0.5f;
+
+  result = a3*progress*progress*progress + a2*progress*progress + a1*progress + p1;
+}
+
+inline void CubicInterpolate( Vector4& result, const Vector4& p0, const Vector4& p1, const Vector4&  p2, const Vector4&  p3, float progress )
+{
+  Vector4 a3 = p3*0.5f - p2*1.5f + p1*1.5f - p0*0.5f;
+  Vector4 a2 = p0 - p1*2.5f + p2*2.0f - p3*0.5f;
+  Vector4 a1 = (p2-p0)*0.5f;
+
+  result = a3*progress*progress*progress + a2*progress*progress + a1*progress + p1;
+}
+
+inline void CubicInterpolate( bool& result, bool p0, bool p1, bool  p2, bool  p3, float progress )
+{
+  Interpolate( result, p1, p2, progress);
+}
+
+inline void CubicInterpolate( Quaternion& result, const Quaternion& p0, const Quaternion& p1, const Quaternion& p2, const Quaternion& p3, float progress )
+{
+  Interpolate( result, p1, p2, progress);
+}
+
+inline void CubicInterpolate( AngleAxis& result, const AngleAxis& p0, const AngleAxis& p1, const AngleAxis& p2, const AngleAxis& p3, float progress )
+{
+  Interpolate( result, p1, p2, progress);
 }
 
 } // namespace Internal
