@@ -71,8 +71,8 @@ int UtcDaliTextGetImplementation02(void)
   }
   catch( DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "NULL != mImpl && \"Text::GetImplementation: Text is uninitialized\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "NULL != mImpl && \"Text::GetImplementation: Text is uninitialized\"", TEST_LOCATION );
 
     assert1 = true;
   }
@@ -84,8 +84,8 @@ int UtcDaliTextGetImplementation02(void)
   }
   catch( DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
-    DALI_TEST_EQUALS( e.mCondition, "NULL != mImpl && \"Text::GetImplementation: Text is uninitialized\"", TEST_LOCATION );
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS( e.condition, "NULL != mImpl && \"Text::GetImplementation: Text is uninitialized\"", TEST_LOCATION );
 
     assert2 = true;
   }

@@ -297,7 +297,7 @@ int UtcDaliModelActorFactoryTwoMesh(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "entity.NumberOfMeshes() == 1", TEST_LOCATION);
     DALI_TEST_CHECK( !actor );
   }

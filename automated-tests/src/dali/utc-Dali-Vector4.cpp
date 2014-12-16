@@ -482,7 +482,7 @@ int UtcDaliVector4OperatorSubscript(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "index < 4", TEST_LOCATION );
   }
 
@@ -494,7 +494,7 @@ int UtcDaliVector4OperatorSubscript(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "index < 4", TEST_LOCATION );
   }
   END_TEST;

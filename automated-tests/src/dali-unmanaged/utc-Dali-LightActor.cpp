@@ -133,7 +133,7 @@ int UtcDaliLightActorSetGetLight(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
+    DALI_TEST_PRINT_ASSERT( e );
     tet_result(TET_FAIL);
   }
   catch( ... )
@@ -170,7 +170,7 @@ int UtcDaliLightActorSetGetActive(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
+    DALI_TEST_PRINT_ASSERT( e );
     tet_result(TET_FAIL);
   }
   catch( ... )
@@ -237,7 +237,7 @@ int UtcDaliLightActorMeshTest(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
+    DALI_TEST_PRINT_ASSERT( e );
     tet_result(TET_FAIL);
   }
   catch( ... )

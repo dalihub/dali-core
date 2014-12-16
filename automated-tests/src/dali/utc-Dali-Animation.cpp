@@ -115,12 +115,9 @@ int UtcDaliAnimationNew02(void)
   }
   catch (Dali::DaliException& e)
   {
-    // TODO: Determine why catch doesn't.
-    //
-
     // Tests that a negative test of an assertion succeeds
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-    DALI_TEST_EQUALS(e.mCondition, "durationSeconds > 0.0f", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "durationSeconds > 0.0f", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4645,7 +4642,7 @@ int UtcDaliAnimationAnimateToActorParentOrigin(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
   }
   END_TEST;
@@ -4672,7 +4669,7 @@ int UtcDaliAnimationAnimateToActorParentOriginX(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
   }
   END_TEST;
@@ -4699,7 +4696,7 @@ int UtcDaliAnimationAnimateToActorParentOriginY(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
   }
   END_TEST;
@@ -4726,7 +4723,7 @@ int UtcDaliAnimationAnimateToActorParentOriginZ(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
   }
   END_TEST;
@@ -4751,7 +4748,7 @@ int UtcDaliAnimationAnimateToActorAnchorPoint(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
   }
   END_TEST;
@@ -4778,7 +4775,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointX(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
   }
   END_TEST;
@@ -4805,7 +4802,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointY(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
   }
   END_TEST;
@@ -4832,7 +4829,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointZ(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
   }
   END_TEST;
@@ -6341,7 +6338,7 @@ int UtcDaliAnimationKeyFrames01(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
   }
   END_TEST;
@@ -6369,7 +6366,7 @@ int UtcDaliAnimationKeyFrames02(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
   }
   END_TEST;
@@ -6398,7 +6395,7 @@ int UtcDaliAnimationKeyFrames03(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
   }
   END_TEST;
@@ -6427,7 +6424,7 @@ int UtcDaliAnimationKeyFrames04(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
   }
   END_TEST;
@@ -6455,7 +6452,7 @@ int UtcDaliAnimationKeyFrames05(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
   }
   END_TEST;
@@ -6484,7 +6481,7 @@ int UtcDaliAnimationKeyFrames06(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "mType == value.GetType()", TEST_LOCATION);
   }
   END_TEST;
