@@ -446,8 +446,10 @@ void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Pro
                                                               PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
   if ( iter != mRegisteredProperties.end() )
   {
-    DALI_ASSERT_ALWAYS( iter->second.setFunc && "Trying to write to a read-only property" );
-    iter->second.setFunc( object, index, value );
+    if( iter->second.setFunc )
+    {
+      iter->second.setFunc( object, index, value );
+    }
   }
   else
   {

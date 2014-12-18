@@ -1188,9 +1188,9 @@ public: // Default property extensions from ProxyObject
   virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::SetCustomProperty()
+   * @copydoc Dali::Internal::ProxyObject::SetSceneGraphProperty()
    */
-  virtual void SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
+  virtual void SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultProperty()
@@ -1198,9 +1198,9 @@ public: // Default property extensions from ProxyObject
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::InstallSceneObjectProperty()
+   * @copydoc Dali::Internal::ProxyObject::GetPropertyOwner()
    */
-  virtual void InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
+  virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
@@ -1295,14 +1295,6 @@ private:
    * This is called after SizeSet() has been called.
    */
   virtual void OnSizeSet(const Vector3& targetSize) {}
-
-  /**
-   * For use in derived classes.
-   * This is called after a non animatable custom property is set.
-   * @param [in] index The index of the property.
-   * @param [in] propertyValue The value of the property.
-   */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) {}
 
   /**
    * For use in derived classes.

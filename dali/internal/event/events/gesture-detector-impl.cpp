@@ -226,19 +226,9 @@ void GestureDetector::SetDefaultProperty( Property::Index index, const Property:
   // None of our properties should be settable from Public API
 }
 
-void GestureDetector::SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
-{
-  // None of our properties should be settable from Public API
-}
-
 Property::Value GestureDetector::GetDefaultProperty(Property::Index index) const
 {
   return Property::Value();
-}
-
-void GestureDetector::InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
-{
-  // We do not want the user to install custom properties
 }
 
 const SceneGraph::PropertyOwner* GestureDetector::GetSceneObject() const

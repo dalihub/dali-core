@@ -385,52 +385,22 @@ Property::Type ActiveConstraintBase::GetDefaultPropertyType( Property::Index ind
 
 void ActiveConstraintBase::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  switch ( index )
+  if( Dali::ActiveConstraint::WEIGHT == index )
   {
-    case Dali::ActiveConstraint::WEIGHT:
-    {
-      SetWeight( propertyValue.Get<float>() );
-      break;
-    }
-
-    default:
-    {
-      DALI_ASSERT_ALWAYS( false && "ActiveConstraint property out of bounds" ); // should not come here
-      break;
-    }
+    SetWeight( propertyValue.Get<float>() );
   }
-}
-
-void ActiveConstraintBase::SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
-{
-  DALI_ASSERT_ALWAYS( false && "ActiveConstraintBase does not have custom properties"); // should not come here
 }
 
 Property::Value ActiveConstraintBase::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value value;
 
-  switch ( index )
+  if( Dali::ActiveConstraint::WEIGHT == index )
   {
-    case Dali::ActiveConstraint::WEIGHT:
-    {
-      value = GetCurrentWeight();
-      break;
-    }
-
-    default:
-    {
-      DALI_ASSERT_ALWAYS( false && "ActiveConstraint property out of bounds" ); // should not come here
-      break;
-    }
+    value = GetCurrentWeight();
   }
 
   return value;
-}
-
-void ActiveConstraintBase::InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
-{
-  DALI_ASSERT_ALWAYS( false && "ActiveConstraintBase does not have custom properties" ); // should not come here
 }
 
 const SceneGraph::PropertyOwner* ActiveConstraintBase::GetSceneObject() const

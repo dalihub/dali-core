@@ -203,7 +203,7 @@ void Path::SetDefaultProperty(Property::Index index, const Property::Value& prop
     }
     default:
     {
-      DALI_ASSERT_ALWAYS(false && "Path::Property is out of bounds");
+      // no read only properties
       break;
     }
   }

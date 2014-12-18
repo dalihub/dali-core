@@ -534,7 +534,7 @@ int UtcDaliHandleNonAnimtableProperties(void)
     exception = true;
   }
 
-  DALI_TEST_CHECK(exception);
+  DALI_TEST_CHECK(!exception);// trying to set a read-only property is a no-op
 
   DALI_TEST_EQUALS( 0.f, actor.GetProperty( readonly ).Get<float>(), TEST_LOCATION );
 
@@ -714,16 +714,8 @@ int UtcDaliHandleSetProperty02(void)
 
   DALI_TEST_CHECK( !actor.IsPropertyWritable( Actor::WORLD_POSITION ) );
 
-  try
-  {
-    // World position is not writable
-    actor.SetProperty( Actor::WORLD_POSITION, Vector3(1,2,3) );
-  }
-  catch (Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsDefaultPropertyWritable(index) && \"Property is read-only\"", TEST_LOCATION);
-  }
+  // World position is not writable so this is a no-op and should not crash
+  actor.SetProperty( Actor::WORLD_POSITION, Vector3(1,2,3) );
 
   END_TEST;
 }
