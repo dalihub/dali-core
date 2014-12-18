@@ -88,17 +88,21 @@ To execute tests, cd into automated-tests and run
 
 This will execute dali, dali-unmanaged and dali-internal test sets. Note that the output summary for the first will be printed before running the second.
 
+By default the tests execute in parallel, which is faster but does not produce a single output file (summary.xml).  Use this to execute the tests in series:
+
+    ./execute.sh -s
+
+To see the summary.xml results, execute the tests in series and open as follows:
+
+    firefox --new-window summary.xml
+
+To see a list of all of the options:
+
+    ./execute.sh -h
+
 To execute a subset of tests, you can run individual test sets, e.g.
 
     ./execute.sh dali
-
-or for finer granularity, specify a test source file:
-
-    ./execute.sh dali utc-Dali-Actor.cpp
-
-To see the results, you can open the summary.xml in firefox.
-
-    firefox --new-window summary.xml
 
 To get coverage output, run
 

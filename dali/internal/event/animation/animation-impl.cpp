@@ -65,6 +65,7 @@ TypeAction action3( mType, Dali::Animation::ACTION_PAUSE, &Animation::DoAction )
 
 const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::Bake );
 const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BakeFinal );
+const Dali::Animation::Interpolation DEFAULT_INTERPOLATION( Dali::Animation::Linear );
 
 } // anon namespace
 
@@ -504,20 +505,40 @@ void Animation::AnimateTo(ProxyObject& targetObject, Property::Index targetPrope
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames)
 {
-  AnimateBetween(target, keyFrames, mDefaultAlpha, mDurationSeconds);
+  AnimateBetween(target, keyFrames, mDefaultAlpha, mDurationSeconds, DEFAULT_INTERPOLATION );
+}
+
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Interpolation interpolation )
+{
+  AnimateBetween(target, keyFrames, mDefaultAlpha, mDurationSeconds, interpolation );
 }
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period)
 {
-  AnimateBetween(target, keyFrames, mDefaultAlpha, period);
+  AnimateBetween(target, keyFrames, mDefaultAlpha, period, DEFAULT_INTERPOLATION);
+}
+
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation)
+{
+  AnimateBetween(target, keyFrames, mDefaultAlpha, period, interpolation);
 }
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha)
 {
-  AnimateBetween(target, keyFrames, alpha, mDurationSeconds);
+  AnimateBetween(target, keyFrames, alpha, mDurationSeconds, DEFAULT_INTERPOLATION);
+}
+
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation)
+{
+  AnimateBetween(target, keyFrames, alpha, mDurationSeconds, interpolation);
 }
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
+{
+  AnimateBetween(target, keyFrames, alpha, period, DEFAULT_INTERPOLATION);
+}
+
+void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
 {
   ProxyObject& proxy = dynamic_cast<ProxyObject&>( GetImplementation(target.object) );
 
@@ -547,7 +568,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       AddAnimatorConnector( AnimatorConnector<float>::New( proxy,
                                                            target.propertyIndex,
                                                            target.componentIndex,
-                                                           KeyFrameNumberFunctor(kfCopy),
+                                                           KeyFrameNumberFunctor(kfCopy,interpolation),
                                                            alpha,
                                                            period ) );
       break;
@@ -561,7 +582,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       AddAnimatorConnector( AnimatorConnector<int>::New( proxy,
                                                          target.propertyIndex,
                                                          target.componentIndex,
-                                                         KeyFrameIntegerFunctor(kfCopy),
+                                                         KeyFrameIntegerFunctor(kfCopy,interpolation),
                                                          alpha,
                                                          period ) );
       break;
@@ -575,7 +596,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       AddAnimatorConnector( AnimatorConnector<Vector2>::New( proxy,
                                                              target.propertyIndex,
                                                              target.componentIndex,
-                                                             KeyFrameVector2Functor(kfCopy),
+                                                             KeyFrameVector2Functor(kfCopy,interpolation),
                                                              alpha,
                                                              period ) );
       break;
@@ -589,7 +610,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       AddAnimatorConnector( AnimatorConnector<Vector3>::New( proxy,
                                                              target.propertyIndex,
                                                              target.componentIndex,
-                                                             KeyFrameVector3Functor(kfCopy),
+                                                             KeyFrameVector3Functor(kfCopy,interpolation),
                                                              alpha,
                                                              period ) );
       break;
@@ -603,7 +624,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       AddAnimatorConnector( AnimatorConnector<Vector4>::New( proxy,
                                                              target.propertyIndex,
                                                              target.componentIndex,
-                                                             KeyFrameVector4Functor(kfCopy),
+                                                             KeyFrameVector4Functor(kfCopy,interpolation),
                                                              alpha,
                                                              period ) );
       break;

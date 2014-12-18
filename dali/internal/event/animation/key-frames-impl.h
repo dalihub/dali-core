@@ -232,9 +232,9 @@ public:
    * @param[in] progress The progress to test
    * @return The interpolated value
    */
-  V GetValue(float progress) const
+  V GetValue(float progress, Dali::Animation::Interpolation interpolation) const
   {
-    return mKeyFrames->GetValue(progress);
+    return mKeyFrames->GetValue(progress, interpolation);
   }
 };
 

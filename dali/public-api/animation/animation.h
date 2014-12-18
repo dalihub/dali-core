@@ -116,6 +116,15 @@ public:
     BakeFinal ///< If the animation is stopped, the animated property values are saved as if the animation had run to completion, otherwise behaves like Bake.
   };
 
+  /**
+   * @brief What interpolation method to use on key-frame animations
+   */
+  enum Interpolation
+  {
+    Linear,   ///< Values in between key frames are interpolated using a linear polynomial. (Default)
+    Cubic     ///< Values in between key frames are interpolated using a cubic polynomial.
+  };
+
   //Signal Names
   static const char* const SIGNAL_FINISHED; ///< name "finished"
 
@@ -423,13 +432,22 @@ public:
    */
   void AnimateTo(Property target, Property::Value destinationValue, AlphaFunction alpha, TimePeriod period);
 
-  /**
+   /**
    * @brief Animate a property between keyframes.
    *
    * @param [in] target The target object/property to animate.
    * @param [in] keyFrames The key frames
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames);
+
+  /**
+   * @brief Animate a property between keyframes.
+   *
+   * @param [in] target The target object + property to animate
+   * @param [in] keyFrames The set of time / value pairs between which to animate.
+   * @param [in] interpolation The method used to interpolate between values.
+   */
+  void AnimateBetween(Property target, KeyFrames& keyFrames, Interpolation interpolation);
 
   /**
    * @brief Animate a property between keyframes.
@@ -443,11 +461,31 @@ public:
   /**
    * @brief Animate a property between keyframes.
    *
+   * @param [in] target The target object + property to animate
+   * @param [in] keyFrames The set of time / value pairs between which to animate.
+   * @param [in] alpha The alpha function to apply.
+   * @param [in] interpolation The method used to interpolate between values.
+   */
+  void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation);
+
+  /**
+   * @brief Animate a property between keyframes.
+   *
    * @param [in] target The target object/property to animate.
    * @param [in] keyFrames The key frames
    * @param [in] period The effect will occur during this time period.
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period);
+
+  /**
+   * @brief Animate a property between keyframes.
+   *
+   * @param [in] target The target object + property to animate
+   * @param [in] keyFrames The set of time / value pairs between which to animate.
+   * @param [in] period The effect will occur duing this time period.
+   * @param [in] interpolation The method used to interpolate between values.
+   */
+  void AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation);
 
   /**
    * @brief Animate a property between keyframes.
@@ -458,6 +496,18 @@ public:
    * @param [in] period The effect will occur during this time period.
    */
   void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period);
+
+  /**
+   * @brief Animate a property between keyframes.
+   *
+   * @param [in] target The target object + property to animate
+   * @param [in] keyFrames The set of time / value pairs between which to animate.
+   * @param [in] alpha The alpha function to apply to the overall progress.
+   * @param [in] period The effect will occur duing this time period.
+   * @param [in] interpolation The method used to interpolate between values.
+   */
+  void AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation);
+
 
   // Actor-specific convenience methods
 

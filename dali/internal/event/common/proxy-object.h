@@ -30,6 +30,7 @@
 #include <dali/public-api/object/property-index.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
+#include <dali/internal/common/owner-container.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/custom-property.h>
 #include <dali/internal/event/common/property-input-impl.h>
@@ -40,6 +41,12 @@ namespace Dali
 
 namespace Internal
 {
+
+class Stage;
+class PropertyInputImpl;
+class ProxyObject;
+class Constraint;
+class TypeInfo;
 
 /**
  * @brief Structure for setting up default properties and their details.
@@ -52,12 +59,6 @@ struct PropertyDetails
   bool animatable:1;        ///< Whether the property is animatable.
   bool constraintInput:1;   ///< Whether the property can be used as an input to a constraint.
 };
-
-class Stage;
-class PropertyInputImpl;
-class ProxyObject;
-class Constraint;
-class TypeInfo;
 
 namespace SceneGraph
 {
@@ -231,24 +232,24 @@ public: // Property system interface from Internal::Object
   virtual Property::Index RegisterProperty(std::string name, const Property::Value& propertyValue);
 
   /**
-   * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
+   * @copydoc Dali::Internal::Object::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
   virtual Property::Index RegisterProperty(std::string name, const Property::Value& propertyValue, Property::AccessMode accessMode);
 
   /**
-   * @copydoc Dali::Handle::AddPropertyNotification()
+   * @copydoc Dali::Internal::Object::AddPropertyNotification()
    */
   virtual Dali::PropertyNotification AddPropertyNotification(Property::Index index,
                                                              int componentIndex,
                                                              const Dali::PropertyCondition& condition);
 
   /**
-   * @copydoc Dali::Handle::RemovePropertyNotification()
+   * @copydoc Dali::Internal::Object::RemovePropertyNotification()
    */
   virtual void RemovePropertyNotification(Dali::PropertyNotification propertyNotification);
 
   /**
-   * @copydoc Dali::Handle::RemovePropertyNotifications()
+   * @copydoc Dali::Internal::Object::RemovePropertyNotifications()
    */
   void RemovePropertyNotifications();
 
@@ -442,23 +443,23 @@ private: // Default property extensions for derived classes
 protected:
 
   /**
-   * Not all proxy objects will have custom properties so we want to only create the lookup when its actually needed
-   * @return the custom property lookup
-   */
-  CustomPropertyLookup& GetCustomPropertyLookup() const;
-
-  /**
    * Retrieves the TypeInfo for this object. Only retrieves it from the type-registry once and then stores a pointer
    * to it locally there-after. The type info will not change during the life-time of the application.
    * @return The type-info for this object (Can be NULL)
    */
   const TypeInfo* GetTypeInfo() const;
 
+  /**
+   * Helper to find custom property
+   * @param index
+   * @return pointer to the property
+   */
+  CustomProperty* FindCustomProperty( Property::Index index ) const;
+
 private:
 
-  Property::Index mNextCustomPropertyIndex; ///< The ID of the next custom property to be registered
-
-  mutable CustomPropertyLookup* mCustomProperties; ///< Used for accessing custom Node properties, mutable so it can be lazy initialized from const function
+  typedef OwnerContainer<CustomProperty*> CustomPropertyLookup;
+  CustomPropertyLookup mCustomProperties; ///< Used for accessing custom Node properties
   mutable TypeInfo const *  mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
 
   Dali::Vector<Observer*> mObservers;

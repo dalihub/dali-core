@@ -44,13 +44,13 @@ To build for desktop first ensure ALL sources are selected:
 
 Then you can create a dali-env folder in your home folder with:
 
- dali-core/build/dali_env -c
+ dali-core/build/scripts/dali_env -c
 
 This will also download any dependencies that the dali repositories require.
 
 You can save the environment variables to a file:
 
- dali-env/opt/bin/dali_env -s > setenv
+ dali-env/opt/bin/scripts/dali_env -s > setenv
 
 This process only needs to be done once.
 
