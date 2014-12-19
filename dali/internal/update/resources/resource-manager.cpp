@@ -883,6 +883,8 @@ void ResourceManager::SaveComplete(ResourceId id, ResourceTypeId type)
     {
       SendToClient( SavingSucceededMessage( *mImpl->mResourceClient, id ) );
     }
+
+    mImpl->cacheUpdated = true;
   }
 }
 
@@ -903,6 +905,8 @@ void ResourceManager::LoadFailed(ResourceId id, ResourceFailure failure)
 
     // Let NotificationManager know that the resource manager needs to do some processing
     NotifyTickets();
+
+    mImpl->cacheUpdated = true;
   }
 }
 
@@ -925,6 +929,8 @@ void ResourceManager::SaveFailed(ResourceId id, ResourceFailure failure)
     {
       SendToClient( SavingFailedMessage( *mImpl->mResourceClient, id ) );
     }
+
+    mImpl->cacheUpdated = true;
   }
 }
 
