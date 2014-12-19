@@ -148,6 +148,11 @@ public:
   void Resume();
 
   /**
+   * @copydoc Dali::Integration::Core::SceneCreated()
+   */
+  void SceneCreated();
+
+  /**
    * @copydoc Dali::Integration::Core::QueueEvent(const Integration::Event&)
    */
   void QueueEvent( const Integration::Event& event );

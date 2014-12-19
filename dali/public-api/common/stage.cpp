@@ -185,7 +185,6 @@ Stage::TouchedSignalV2& Stage::TouchedSignal()
   return GetImplementation(*this).TouchedSignal();
 }
 
-
 Stage::ContextStatusSignal& Stage::ContextLostSignal()
 {
   return GetImplementation(*this).ContextLostSignal();
@@ -194,6 +193,11 @@ Stage::ContextStatusSignal& Stage::ContextLostSignal()
 Stage::ContextStatusSignal& Stage::ContextRegainedSignal()
 {
   return GetImplementation(*this).ContextRegainedSignal();
+}
+
+Stage::SceneCreatedSignalV2& Stage::SceneCreatedSignal()
+{
+  return GetImplementation(*this).SceneCreatedSignal();
 }
 
 } // namespace Dali
