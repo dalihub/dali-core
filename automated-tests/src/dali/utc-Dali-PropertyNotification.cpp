@@ -260,7 +260,7 @@ int UtcDaliAddPropertyNotificationTypeProperty(void)
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "false && \"Property notification added to non animatable property", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "false && \"Property notification added to event side only property", TEST_LOCATION );
   }
   END_TEST;
 }

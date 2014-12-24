@@ -79,7 +79,7 @@ int utcDaliPathGetPoint02(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "index < mPoint.Size()", TEST_LOCATION);
   }
   END_TEST;
@@ -98,7 +98,7 @@ int utcDaliPathGetPoint03(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "index < mPoint.Size()", TEST_LOCATION);
   }
   END_TEST;
@@ -132,7 +132,7 @@ int utcDaliPathGetControlPoints01(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "index < mControlPoint.Size()", TEST_LOCATION);
   }
   END_TEST;
@@ -150,7 +150,7 @@ int utcDaliPathGetControlPoints02(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "index < mControlPoint.Size()", TEST_LOCATION);
   }
   END_TEST;
@@ -201,7 +201,7 @@ int utcDaliPathGenerateControlPoints02(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "numSegments > 0", TEST_LOCATION);
   }
   END_TEST;
@@ -220,7 +220,7 @@ int utcDaliPathGenerateControlPoints03(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "numSegments > 0", TEST_LOCATION);
   }
   END_TEST;

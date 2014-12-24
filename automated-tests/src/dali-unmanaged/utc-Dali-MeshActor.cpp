@@ -96,7 +96,7 @@ int UtcDaliMeshActorCreateNoMeshData(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "object", TEST_LOCATION);
   }
   END_TEST;
@@ -120,7 +120,7 @@ int UtcDaliMeshActorCreateSetData01(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "!vertices.empty()", TEST_LOCATION );
   }
   END_TEST;
@@ -144,7 +144,7 @@ int UtcDaliMeshActorCreateSetData02(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "!faceIndices.empty", TEST_LOCATION );
   }
   END_TEST;
@@ -169,7 +169,7 @@ int UtcDaliMeshActorCreateSetData03(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "material", TEST_LOCATION );
   }
   END_TEST;

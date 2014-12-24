@@ -155,6 +155,25 @@ struct ContextStatusFunctor
   bool& mCalledFlag;
 };
 
+struct SceneCreatedStatusFunctor
+{
+  SceneCreatedStatusFunctor(bool& calledFlag) : mCalledFlag( calledFlag )
+  {
+    mCalledFlag = false;
+  }
+
+  void operator()()
+  {
+    mCalledFlag = true;
+  }
+  void Reset()
+  {
+    mCalledFlag = false;
+  }
+
+  bool& mCalledFlag;
+};
+
 } // unnamed namespace
 
 
@@ -635,6 +654,22 @@ int UtcDaliStageContextLostRegainedSignals(void)
 
   notifier->NotifyContextRegained();
   DALI_TEST_EQUALS( contextRegained, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliStageSceneCreatedSignal(void)
+{
+  TestApplication app;
+  Stage stage = Stage::GetCurrent();
+
+  bool signalCalled = false;
+  SceneCreatedStatusFunctor sceneCreatedFunctor( signalCalled );
+  stage.SceneCreatedSignal().Connect(&app, sceneCreatedFunctor );
+
+  Integration::Core& core = app.GetCore();
+  core.SceneCreated();
+  DALI_TEST_EQUALS( signalCalled, true, TEST_LOCATION );
 
   END_TEST;
 }

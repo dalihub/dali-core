@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <string>
 #include <cstdio>
 
 #ifdef EMSCRIPTEN
@@ -85,11 +84,10 @@ namespace Dali
 /**
  * @brief Method to log assertion message in DALI_ASSERT_ALWAYS macro below.
  *
+ * @param[in] location Where the assertion occurred
  * @param[in] condition The assertion condition
- * @param[in] file The file in which the assertion occurred
- * @param[in] line The line number at which the assertion occured
  */
-DALI_IMPORT_API void DaliAssertMessage(const char* condition, const char* file, int line);
+DALI_IMPORT_API void DaliAssertMessage( const char* location, const char* condition );
 
 /**
  * @brief Exception class for Dali Core library - Raised by assertions in codebase.
@@ -105,10 +103,10 @@ public:
    * @param[in] location  - the location of the assertion
    * @param[in] condition - The assertion condition
    */
-  DaliException(const char *location, const char* condition);
+  DaliException( const char* location, const char* condition );
 
-  std::string mLocation;  ///< Location in code of the assertion
-  std::string mCondition; ///< The assertion string
+  const char* location;
+  const char* condition;
 };
 
 }// Dali
@@ -133,25 +131,34 @@ public:
  * (which it is often equivalent to in effect).
  * It should not be used for simple parameter validation for instance.
  */
+
+/**
+ * Strip assert location for release builds, assert text is descriptive enough
+ * This is to save space for low spec devices
+ */
+#if defined(DEBUG_ENABLED)
+#define ASSERT_LOCATION __PRETTY_FUNCTION__
+#else
+#define ASSERT_LOCATION NULL
+#endif
+
 #ifdef EMSCRIPTEN
 
 #define DALI_ASSERT_ALWAYS(cond)                \
   if(!(cond)) \
   { \
-    Dali::DaliAssertMessage(#cond, __FILE__, __LINE__);   \
-    throw Dali::DaliException(__PRETTY_FUNCTION__, #cond);  \
+    Dali::DaliAssertMessage( ASSERT_LOCATION, #cond );   \
+    throw Dali::DaliException( ASSERT_LOCATION, #cond );  \
     EM_ASM(print(new Error().stack)); \
-  }\
-
+  }
 #else
 
 #define DALI_ASSERT_ALWAYS(cond)                \
   if(!(cond)) \
   { \
-    Dali::DaliAssertMessage(#cond, __FILE__, __LINE__);   \
-    throw Dali::DaliException(__PRETTY_FUNCTION__, #cond);  \
-  }\
-
+    Dali::DaliAssertMessage( ASSERT_LOCATION, #cond );   \
+    throw Dali::DaliException( ASSERT_LOCATION, #cond );  \
+  }
 #endif
 
 /**

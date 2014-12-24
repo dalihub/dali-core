@@ -363,7 +363,7 @@ int UtcDaliActorAdd(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "this != &child", TEST_LOCATION);
     DALI_TEST_EQUALS( parent2.GetChildCount(), 1u, TEST_LOCATION );
   }
@@ -382,7 +382,7 @@ int UtcDaliActorAdd(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "!child.IsRoot()", TEST_LOCATION);
     DALI_TEST_EQUALS( parent2.GetChildCount(), 1u, TEST_LOCATION );
   }
@@ -402,7 +402,7 @@ int UtcDaliActorAdd(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "actor", TEST_LOCATION);
     DALI_TEST_EQUALS( parent2.GetChildCount(), 1u, TEST_LOCATION );
   }
@@ -471,7 +471,7 @@ int UtcDaliActorRemove01(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "this != &child", TEST_LOCATION);
     DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
   }
@@ -491,7 +491,7 @@ int UtcDaliActorRemove01(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "actor", TEST_LOCATION);
     DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
   }

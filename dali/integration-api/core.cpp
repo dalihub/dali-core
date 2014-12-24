@@ -92,6 +92,11 @@ void Core::Resume()
   mImpl->Resume();
 }
 
+void Core::SceneCreated()
+{
+  mImpl->SceneCreated();
+}
+
 void Core::QueueEvent(const Event& event)
 {
   mImpl->QueueEvent(event);
