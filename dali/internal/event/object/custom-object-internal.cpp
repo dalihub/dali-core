@@ -56,7 +56,7 @@ const PropertyBase* CustomObject::GetSceneObjectAnimatableProperty( Property::In
 {
   CustomProperty* custom = FindCustomProperty( index );
   DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
-  return custom->GetSceneGraphProperty();;
+  return custom->GetSceneGraphProperty();
 }
 
 const PropertyInputImpl* CustomObject::GetSceneObjectInputProperty( Property::Index index ) const
