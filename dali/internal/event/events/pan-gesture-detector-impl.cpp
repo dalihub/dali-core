@@ -324,11 +324,6 @@ void PanGestureDetector::OnActorDestroyed(Object& object)
   // Do nothing
 }
 
-bool PanGestureDetector::IsSceneObjectRemovable() const
-{
-  return false;
-}
-
 unsigned int PanGestureDetector::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;

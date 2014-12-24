@@ -452,11 +452,6 @@ void RenderTask::DiscardSceneObject()
  ********************************************************************************
  ********************************************************************************/
 
-bool RenderTask::IsSceneObjectRemovable() const
-{
-  return false; // The scene object is permanently "on stage" whilst this object is alive
-}
-
 unsigned int RenderTask::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;

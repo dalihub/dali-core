@@ -43,11 +43,6 @@ public:
   static CustomObject* New();
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsSceneObjectRemovable()
-   */
-  virtual bool IsSceneObjectRemovable() const;
-
-  /**
    * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
    */
   virtual const SceneGraph::PropertyOwner* GetSceneObject() const;

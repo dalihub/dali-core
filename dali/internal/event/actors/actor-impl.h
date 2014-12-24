@@ -1143,11 +1143,6 @@ protected:
 public: // Default property extensions from ProxyObject
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsSceneObjectRemovable()
-   */
-  virtual bool IsSceneObjectRemovable() const;
-
-  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyCount()
    */
   virtual unsigned int GetDefaultPropertyCount() const;

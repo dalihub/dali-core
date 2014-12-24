@@ -182,11 +182,6 @@ void GestureDetector::ProxyDestroyed(ProxyObject& proxy)
   }
 }
 
-bool GestureDetector::IsSceneObjectRemovable() const
-{
-  return false;
-}
-
 unsigned int GestureDetector::GetDefaultPropertyCount() const
 {
   return 0;

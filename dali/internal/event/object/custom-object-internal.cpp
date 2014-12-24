@@ -42,11 +42,6 @@ CustomObject* CustomObject::New()
   return new CustomObject();
 }
 
-bool CustomObject::IsSceneObjectRemovable() const
-{
-  return false;
-}
-
 const SceneGraph::PropertyOwner* CustomObject::GetSceneObject() const
 {
   return mUpdateObject;

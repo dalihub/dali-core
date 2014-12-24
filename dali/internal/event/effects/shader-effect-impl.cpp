@@ -392,11 +392,6 @@ void ShaderEffect::Disconnect()
   }
 }
 
-bool ShaderEffect::IsSceneObjectRemovable() const
-{
-  return false; // The Shader is not removed during this proxy's lifetime
-}
-
 unsigned int ShaderEffect::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;

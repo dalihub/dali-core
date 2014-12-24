@@ -315,11 +315,6 @@ unsigned int ActiveConstraintBase::GetTag() const
   return mTag;
 }
 
-bool ActiveConstraintBase::IsSceneObjectRemovable() const
-{
-  return true; // The constraint removed when target SceneGraph::PropertyOwner is destroyed
-}
-
 unsigned int ActiveConstraintBase::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;
