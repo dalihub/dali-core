@@ -99,13 +99,15 @@ DALI_IMPORT_API bool HasAlpha(Format pixelformat);
 DALI_IMPORT_API unsigned int GetBytesPerPixel(Format pixelFormat);
 
 /**
- * @brief Returns the offset of the byte containing the alpha mask from the start of the pixel data
+ * @brief Returns the offset of the byte containing the alpha value from the start of the pixel data
  * and the bitmask of that byte to get the alpha value.
+ * For example, in case of RGBA4444, byteOffset value is 1 and bitMask value is 0x0f.
+ * It means the second byte contains the alpha value and the last 4 bits of the byte is the alpha value.
  *
  * Bitmask is zero if the pixelFormat does not support alpha
- * @param[in]  pixelFormat
- * @param[out] byteOffset the byte offset
- * @param[out] bitMask the bitmask
+ * @param[in]  pixelFormat the pixel format
+ * @param[out] byteOffset the byte offset of the byte containing the alpha value
+ * @param[out] bitMask the bitmask of the byte to get the alpha value
  */
 DALI_IMPORT_API void GetAlphaOffsetAndMask(Format pixelFormat, int& byteOffset, int& bitMask);
 
