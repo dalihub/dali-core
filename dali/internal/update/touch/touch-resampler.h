@@ -1,5 +1,5 @@
 #ifndef __DALI_INTERNAL_TOUCH_RESAMPLER_H__
-#define __DALI_INTERNAL_TOCUH_RESAMPLER_H__
+#define __DALI_INTERNAL_TOUCH_RESAMPLER_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
