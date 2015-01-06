@@ -126,6 +126,8 @@ void Node::ConnectChild( Node* childNode, int index )
   {
     mChildren.Insert(mChildren.Begin()+index, childNode);
   }
+
+  childNode->ConnectToSceneGraph();
 }
 
 void Node::DisconnectChild( BufferIndex updateBufferIndex, Node& childNode, std::set<Node*>& connectedNodes,  std::set<Node*>& disconnectedNodes )
