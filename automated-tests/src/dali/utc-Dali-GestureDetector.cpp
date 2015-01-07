@@ -48,12 +48,9 @@ int UtcDaliGestureDetectorConstructorNegative(void)
     detector.Attach(actor);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
-    if ( exception.mCondition.find("detector") != std::string::npos )
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT( e, "detector", TEST_LOCATION );
   }
   END_TEST;
 }
@@ -72,8 +69,9 @@ int UtcDaliGestureDetectorConstructorPositive(void)
     detector.Attach(actor);
     tet_result(TET_PASS);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
+    DALI_TEST_PRINT_ASSERT( e );
     tet_result(TET_FAIL);
   }
   END_TEST;
@@ -151,12 +149,9 @@ int UtcDaliGestureDetectorAttachNegative(void)
     detector.Attach(actor);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
-    if ( exception.mCondition.find("actor") != std::string::npos )
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT( e, "actor", TEST_LOCATION );
   }
   END_TEST;
 }
@@ -211,12 +206,9 @@ int UtcDaliGestureDetectorDetachNegative01(void)
     detector.Detach(actor);
     tet_result(TET_FAIL);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
-    if ( exception.mCondition.find("actor") != std::string::npos )
-    {
-      tet_result(TET_PASS);
-    }
+    DALI_TEST_ASSERT( e, "actor", TEST_LOCATION );
   }
   END_TEST;
 }
@@ -238,8 +230,9 @@ int UtcDaliGestureDetectorDetachNegative02(void)
     detector.Detach(actor2);
     tet_result(TET_PASS);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
+    DALI_TEST_PRINT_ASSERT( e );
     tet_result(TET_FAIL);
   }
   END_TEST;
@@ -266,8 +259,9 @@ int UtcDaliGestureDetectorDetachNegative03(void)
     detector.Detach(actor);
     DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
+    DALI_TEST_PRINT_ASSERT( e );
     tet_result(TET_FAIL);
   }
   END_TEST;
@@ -336,8 +330,9 @@ int UtcDaliGestureDetectorDetachAllNegative(void)
     detector.DetachAll();
     DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
   }
-  catch (DaliException& exception)
+  catch (DaliException& e)
   {
+    DALI_TEST_PRINT_ASSERT( e );
     tet_result(TET_FAIL);
   }
   END_TEST;

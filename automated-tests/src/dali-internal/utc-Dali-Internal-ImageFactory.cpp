@@ -213,6 +213,7 @@ int UtcDaliImageFactoryCompatibleResource01(void)
   // emulate load success
   EmulateImageLoaded( application, 80, 80 );
 
+  // Request a second load using exact-match image size:
   ImageAttributes attr = ImageAttributes::New();
   attr.SetSize( 80, 80 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
@@ -231,7 +232,43 @@ int UtcDaliImageFactoryCompatibleResource02(void)
 
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
-  Vector2 testSize(80.0f, 80.0f);
+  Vector2 testSize( 2048.0f, 2048.0f );
+  application.GetPlatform().SetClosestImageSize( testSize );
+
+  // request with default attributes ( size is 0,0 )
+  RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
+  ResourceTicketPtr ticket = imageFactory.Load( *req.Get() );
+
+  application.SendNotification();
+  application.Render();
+  application.SendNotification();
+  application.Render();
+
+  // emulate load success
+  EmulateImageLoaded( application, testSize.x, testSize.y );
+
+  // Request slightly bigger size than actual image.
+  // This will load the same resource as the ImageFactory cache uses a small fudge factor in matching.
+  // See UtcDaliImageFactoryReload06
+  ImageAttributes attr = ImageAttributes::New();
+  attr.SetSize( testSize.x + 1, testSize.y + 1 );
+  RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
+  ResourceTicketPtr ticket2 = imageFactory.Load( *req2.Get() );
+
+  DALI_TEST_CHECK( req != req2 ); // different requests
+  DALI_TEST_EQUALS( ticket->GetId(), ticket2->GetId(), TEST_LOCATION ); // same resource
+  END_TEST;
+}
+
+// Different requests, incompatible resource, so two loads result:
+int UtcDaliImageFactoryInCompatibleResource(void)
+{
+  TestApplication application;
+  tet_infoline( "UtcDaliImageFactoryCompatibleResource02 - Two requests mapping to same resource." );
+
+  ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
+
+  Vector2 testSize(2048.0f, 2048.0f);
   application.GetPlatform().SetClosestImageSize(testSize);
 
   // request with default attributes ( size is 0,0 )
@@ -244,20 +281,18 @@ int UtcDaliImageFactoryCompatibleResource02(void)
   application.Render();
 
   // emulate load success
-  EmulateImageLoaded( application, 80, 80 );
+  EmulateImageLoaded( application, testSize.x, testSize.y );
 
-  // Request bigger size than actual image.
-  // This will load the same resource.
-  // However if image size changes later on to eg. 512*512 (file is overwritten),
-  // reissuing these two requests will load different resources.
-  // See UtcDaliImageFactoryReload06
+  // Request substantially different size than actual image.
+  // This will issue a second resource load as difference in sizes is greater than
+  // the small fudge factor used in the ImageFactory cache.
   ImageAttributes attr = ImageAttributes::New();
-  attr.SetSize( 92, 92 );
+  attr.SetSize( testSize.x - 16, testSize.y - 16 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
   ResourceTicketPtr ticket2 = imageFactory.Load( *req2.Get() );
 
   DALI_TEST_CHECK( req != req2 ); // different requests
-  DALI_TEST_EQUALS( ticket->GetId(), ticket2->GetId(), TEST_LOCATION ); // same resource
+  DALI_TEST_CHECK( ticket->GetId() != ticket2->GetId() ); // differnet resources
   END_TEST;
 }
 
@@ -540,8 +575,8 @@ int UtcDaliImageFactoryReload06(void)
 
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
-  Vector2 testSize(80.0f, 80.0f);
-  application.GetPlatform().SetClosestImageSize(testSize);
+  Vector2 testSize(2048.0f, 2048.0f);
+    application.GetPlatform().SetClosestImageSize( testSize );
 
   // request with default attributes ( size is 0,0 )
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, NULL );
@@ -553,14 +588,14 @@ int UtcDaliImageFactoryReload06(void)
   application.Render();
 
   // emulate load success
-  EmulateImageLoaded( application, 80, 80 );
+  EmulateImageLoaded( application, testSize.x, testSize.y );
 
   // Request bigger size than actual image.
   // This will load the same resource.
   // However if image size changes later on to eg. 512*512 (file is overwritten),
   // reissuing these two requests will load different resources.
   ImageAttributes attr = ImageAttributes::New();
-  attr.SetSize( 92, 92 );
+  attr.SetSize( testSize.x + 1, testSize.y + 1 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
   ResourceTicketPtr ticket2 = imageFactory.Load( *req2.Get() );
 
@@ -575,7 +610,7 @@ int UtcDaliImageFactoryReload06(void)
 
   // emulate load success
   // note: this is the only way to emulate what size is loaded by platform abstraction
-  EmulateImageLoaded( application, 92, 92 );
+  EmulateImageLoaded( application, testSize.x + 1, testSize.y + 1 );
 
   // reload default size request
   ticket = imageFactory.Reload( *req.Get() );

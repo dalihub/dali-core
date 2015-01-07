@@ -810,11 +810,11 @@ int UtcDaliInternalSaveResource02(void)
   try
   {
     resourceClient.SaveResource( aTicket, "model.dali-bin" ); // Should be outside range of valid resources!
-  } catch (DaliException& e)
+  }
+  catch (DaliException& e)
   {
     // Tests that a negative test of an assertion succeeds
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "mImpl->mTickets.find(ticket->GetId()) != mImpl->mTickets.end()", TEST_LOCATION );
   }
 
@@ -857,12 +857,12 @@ int UtcDaliInternalSaveResource03(void)
   try
   {
     resourceClient.SaveResource( aTicket, "model.dali-bin" ); // Should be outside range of valid resources!
-  } catch (DaliException& e)
+  }
+  catch (DaliException& e)
   {
     // Tests that a negative test of an assertion succeeds
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
-
-    DALI_TEST_EQUALS(e.mCondition, "ticket", TEST_LOCATION);
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_EQUALS(e.condition, "ticket", TEST_LOCATION);
   }
 
   application.SendNotification(); // Flush update messages

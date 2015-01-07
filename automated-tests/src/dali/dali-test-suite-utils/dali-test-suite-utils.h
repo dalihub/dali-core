@@ -315,25 +315,22 @@ void DALI_TEST_GREATER( float value1, float value2, const char* location);
 
 /**
  * Test whether the assertion condition that failed and thus triggered the
- * exception \b e contained a given substring at the start of its literal text.
- * @param[in] e The exception that we expect was fired by a runtime assertion
- *              failure.
+ * exception \b e contained a given substring.
+ * @param[in] e The exception that we expect was fired by a runtime assertion failure.
  * @param[in] conditionSubString The text that we expect to be present in an
  *                               assertion which triggered the exception.
  * @param[in] location The TEST_LOCATION macro should be used here.
- *
- * @remark **Side-effects:** The result of the tet test is set to TET_PASS if
- *         the substring is at the start of the exception's condition and
- *         TET_FAIL if it isn't. Note, if the result of a test is set multiple
- *         times, a TET_FAIL will override any number of TET_PASSes.
  */
 void DALI_TEST_ASSERT( DaliException& e, std::string conditionSubString, const char* location );
 
-/** Self-documenting wrapper for DALI_TEST_ASSERT.
- * @copydoc DALI_TEST_ASSERT()
+/**
+ * Print the assert
+ * @param[in] e The exception that we expect was fired by a runtime assertion failure.
  */
-void DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( DaliException& exceptionFromAssertion, std::string conditionSubString, const char* location );
-
+inline void DALI_TEST_PRINT_ASSERT( DaliException& e )
+{
+  tet_printf("Assertion %s failed at %s\n", e.condition, e.location );
+}
 
 // Functor to test whether an Applied signal is emitted
 struct ConstraintAppliedCheck

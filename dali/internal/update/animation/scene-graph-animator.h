@@ -40,6 +40,8 @@ namespace Dali
 namespace Internal
 {
 
+typedef Dali::Animation::Interpolation Interpolation;
+
 namespace SceneGraph
 {
 
@@ -635,7 +637,7 @@ struct KeyFrameBooleanFunctor
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress);
+      return mKeyFrames->GetValue(progress, Dali::Animation::Linear);
     }
     return property;
   }
@@ -645,8 +647,8 @@ struct KeyFrameBooleanFunctor
 
 struct KeyFrameNumberFunctor
 {
-  KeyFrameNumberFunctor(KeyFrameNumberPtr keyFrames)
-  : mKeyFrames(keyFrames)
+  KeyFrameNumberFunctor(KeyFrameNumberPtr keyFrames, Interpolation interpolation)
+  : mKeyFrames(keyFrames),mInterpolation(interpolation)
   {
   }
 
@@ -654,18 +656,19 @@ struct KeyFrameNumberFunctor
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress);
+      return mKeyFrames->GetValue(progress, mInterpolation);
     }
     return property;
   }
 
   KeyFrameNumberPtr mKeyFrames;
+  Interpolation mInterpolation;
 };
 
 struct KeyFrameIntegerFunctor
 {
-  KeyFrameIntegerFunctor(KeyFrameIntegerPtr keyFrames)
-  : mKeyFrames(keyFrames)
+  KeyFrameIntegerFunctor(KeyFrameIntegerPtr keyFrames, Interpolation interpolation)
+  : mKeyFrames(keyFrames),mInterpolation(interpolation)
   {
   }
 
@@ -673,18 +676,19 @@ struct KeyFrameIntegerFunctor
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress);
+      return mKeyFrames->GetValue(progress, mInterpolation);
     }
     return property;
   }
 
   KeyFrameIntegerPtr mKeyFrames;
+  Interpolation mInterpolation;
 };
 
 struct KeyFrameVector2Functor
 {
-  KeyFrameVector2Functor(KeyFrameVector2Ptr keyFrames)
-  : mKeyFrames(keyFrames)
+  KeyFrameVector2Functor(KeyFrameVector2Ptr keyFrames, Interpolation interpolation)
+  : mKeyFrames(keyFrames),mInterpolation(interpolation)
   {
   }
 
@@ -692,19 +696,20 @@ struct KeyFrameVector2Functor
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress);
+      return mKeyFrames->GetValue(progress, mInterpolation);
     }
     return property;
   }
 
   KeyFrameVector2Ptr mKeyFrames;
+  Interpolation mInterpolation;
 };
 
 
 struct KeyFrameVector3Functor
 {
-  KeyFrameVector3Functor(KeyFrameVector3Ptr keyFrames)
-  : mKeyFrames(keyFrames)
+  KeyFrameVector3Functor(KeyFrameVector3Ptr keyFrames, Interpolation interpolation)
+  : mKeyFrames(keyFrames),mInterpolation(interpolation)
   {
   }
 
@@ -712,18 +717,19 @@ struct KeyFrameVector3Functor
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress);
+      return mKeyFrames->GetValue(progress, mInterpolation);
     }
     return property;
   }
 
   KeyFrameVector3Ptr mKeyFrames;
+  Interpolation mInterpolation;
 };
 
 struct KeyFrameVector4Functor
 {
-  KeyFrameVector4Functor(KeyFrameVector4Ptr keyFrames)
-  : mKeyFrames(keyFrames)
+  KeyFrameVector4Functor(KeyFrameVector4Ptr keyFrames, Interpolation interpolation)
+  : mKeyFrames(keyFrames),mInterpolation(interpolation)
   {
   }
 
@@ -731,12 +737,13 @@ struct KeyFrameVector4Functor
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress);
+      return mKeyFrames->GetValue(progress, mInterpolation);
     }
     return property;
   }
 
   KeyFrameVector4Ptr mKeyFrames;
+  Interpolation mInterpolation;
 };
 
 struct KeyFrameQuaternionFunctor
@@ -750,7 +757,7 @@ struct KeyFrameQuaternionFunctor
   {
     if(mKeyFrames->IsActive(progress))
     {
-      return mKeyFrames->GetValue(progress);
+      return mKeyFrames->GetValue(progress, Dali::Animation::Linear);
     }
     return property;
   }

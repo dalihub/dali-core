@@ -70,6 +70,8 @@ public:
   /**
    * @brief Scaling options, used when resizing images on load to fit desired dimensions.
    *
+   * A scaling mode controls the region of a loaded image to be mapped to the
+   * desired image rectangle specified using ImageAttributes.SetSize().
    * All scaling modes preserve the aspect ratio of the image contents.
    */
   enum ScalingMode
@@ -78,6 +80,35 @@ public:
     ScaleToFill, ///< Image fills whole desired width & height with image data. The image is centred in the desired dimensions, exactly touching in one dimension, with image regions outside the other desired dimension cropped away.
     FitWidth,    ///< Image fills whole width. Height is scaled proportionately to maintain aspect ratio.
     FitHeight    ///< Image fills whole height. Width is scaled proportionately to maintain aspect ratio.
+  };
+
+  /**
+   * @brief Filtering options, used when resizing images on load to sample original pixels.
+   *
+   * A FilterMode controls how pixels in the raw image on-disk are sampled and
+   * combined to generate each pixel of the destination loaded image.
+   *
+   * @note NoFilter and Box modes do not guarantee that the loaded pixel array
+   * exactly matches the rectangle specified by the desired dimensions and
+   * ScalingMode, but all other filter modes do if the desired dimensions are
+   * `<=` the raw dimensions of the image file.
+   */
+  enum FilterMode
+  {
+    Box,            ///< Iteratively box filter to generate an image of 1/2, 1/4, 1/8, ... width and height and
+                    ///  approximately the desired size, then if the ScaleToFill scaling mode is enabled, cut away the
+                    ///  top/bottom or left/right borders of the image to match the aspect ratio of desired dimensions.
+                    ///  This is the default.
+    Nearest,        ///< For each output pixel, read one input pixel.
+    Linear,         ///< For each output pixel, read a quad of four input pixels and write a weighted average of them.
+    BoxThenNearest, ///< Iteratively box filter to generate an image of 1/2, 1/4, 1/8, ... width and height and
+                    ///  approximately the desired size, then for each output pixel, read one pixel from the last level
+                    ///  of box filtering.
+    BoxThenLinear,  ///< Iteratively box filter to almost the right size, then for each output pixel, read four pixels
+                    ///  from the last level of box filtering and write their weighted average.
+    NoFilter,       ///< No filtering is performed. If the ScaleToFill scaling mode is enabled, the borders of the
+                    ///  image may be trimmed to match the aspect ratio of the desired dimensions.
+    DontCare        ///< For when the client strongly prefers a cache-hit. Defaults to Box.
   };
 
   static const ImageAttributes DEFAULT_ATTRIBUTES; ///< Default attributes have no size
@@ -181,6 +212,13 @@ public:
   void SetScalingMode(ScalingMode scalingMode);
 
   /**
+   * @brief Setter for the FilterMode.
+   * By default, Box is set.
+   * @param [in] filterMode The desired filter mode.
+   */
+  void SetFilterMode( FilterMode filterMode );
+
+  /**
    * @brief Set whether the image will be rotated/flipped back into portrait orientation.
    *
    * This will only be necessary if metadata indicates that the
@@ -234,6 +272,14 @@ public:
    * @return scale
    */
   ScalingMode GetScalingMode() const;
+
+  /**
+   * @brief Getter for the FilterMode
+   *
+   * @return The FilterMode previously set, or the default value if none has
+   *         been.
+   */
+  FilterMode GetFilterMode() const;
 
   /**
    * @brief Return if the attribute set up as a distance field.

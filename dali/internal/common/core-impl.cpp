@@ -288,6 +288,11 @@ void Core::Resume()
   ProcessEvents();
 }
 
+void Core::SceneCreated()
+{
+  mStage->EmitSceneCreatedSignal();
+}
+
 void Core::QueueEvent( const Integration::Event& event )
 {
   mEventProcessor->QueueEvent( event );

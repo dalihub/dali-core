@@ -358,6 +358,11 @@ public:
   void EmitTouchedSignal( const TouchEvent& touch );
 
   /**
+   * Emits the scene created.
+   */
+  void EmitSceneCreatedSignal();
+
+  /**
    * @copydoc Dali::Stage::KeyEventSignal()
    */
   Dali::Stage::KeyEventSignalV2& KeyEventSignal();
@@ -381,6 +386,11 @@ public:
    * @copydoc Dali::Stage::ContextRegainedSignal()
    */
   Dali::Stage::ContextStatusSignal& ContextRegainedSignal();
+
+  /**
+   * @copydoc Dali::Stage::SceneCreatedSignal()
+   */
+  Dali::Stage::SceneCreatedSignalV2& SceneCreatedSignal();
 
 private: // Implementation of ContextNotificationInterface:
 
@@ -472,6 +482,8 @@ private:
 
   Dali::Stage::ContextStatusSignal mContextLostSignal;
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;
+
+  Dali::Stage::SceneCreatedSignalV2 mSceneCreatedSignal;
 };
 
 } // namespace Internal

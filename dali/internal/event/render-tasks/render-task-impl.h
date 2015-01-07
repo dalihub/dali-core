@@ -234,11 +234,6 @@ public: // Used by RenderTaskList, which owns the SceneGraph::RenderTasks
 public: // Implementation of ProxyObject
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsSceneObjectRemovable()
-   */
-  virtual bool IsSceneObjectRemovable() const;
-
-  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyCount()
    */
   virtual unsigned int GetDefaultPropertyCount() const;

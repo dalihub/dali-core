@@ -180,7 +180,7 @@ int UtcDaliAnyNegativeAssignmentOperators(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
+    DALI_TEST_PRINT_ASSERT( e );
     assert = true;
   }
 
@@ -293,7 +293,7 @@ int UtcDaliAnyNegativeGet(void)
 
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
+    DALI_TEST_PRINT_ASSERT( e );
     assert1 = true;
   }
 
@@ -304,7 +304,7 @@ int UtcDaliAnyNegativeGet(void)
 
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
+    DALI_TEST_PRINT_ASSERT( e );
     assert2 = true;
   }
 

@@ -576,17 +576,17 @@ bool Program::CompileShader( GLenum shaderType, GLuint& shaderId, const char* sr
     DALI_LOG_ERROR("Failed to compile shader\n");
     LogWithLineNumbers(src);
 
-    Dali::Vector< char > szLog;
     GLint nLength;
     mGlAbstraction.GetShaderiv( shaderId, GL_INFO_LOG_LENGTH, &nLength);
     if(nLength > 0)
     {
+      Dali::Vector< char > szLog;
       szLog.Reserve( nLength );
-      mGlAbstraction.GetShaderInfoLog( shaderId, nLength, &nLength, &szLog[ 0 ] );
-      DALI_LOG_ERROR( "Shader Compiler Error: %s\n", &szLog[ 0 ] );
+      mGlAbstraction.GetShaderInfoLog( shaderId, nLength, &nLength, szLog.Begin() );
+      DALI_LOG_ERROR( "Shader Compiler Error: %s\n", szLog.Begin() );
     }
 
-    throw DaliException( "Shader compilation failure", &szLog[ 0 ] );
+    DALI_ASSERT_ALWAYS( 0 && "Shader compilation failure" );
   }
 
   return compiled != 0;

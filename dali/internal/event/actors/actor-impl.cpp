@@ -2320,11 +2320,6 @@ bool Actor::IsNodeConnected() const
   return connected;
 }
 
-bool Actor::IsSceneObjectRemovable() const
-{
-  return false;
-}
-
 unsigned int Actor::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;
@@ -3061,11 +3056,10 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
 
   if ( static_cast<unsigned int>(index) >= DEFAULT_PROPERTY_MAX_COUNT )
   {
-    CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
+    CustomProperty* custom = FindCustomProperty( index );
+    DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
 
-    DALI_ASSERT_ALWAYS( GetCustomPropertyLookup().end() != entry && "index is invalid" );
-
-    property = dynamic_cast<const PropertyBase*>( entry->second.GetSceneGraphProperty() );
+    property = custom->GetSceneGraphProperty();
   }
   else if( NULL != mNode )
   {
@@ -3167,11 +3161,9 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
 
   if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
-    CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
-
-    DALI_ASSERT_ALWAYS( GetCustomPropertyLookup().end() != entry && "property index is invalid" );
-
-    property = entry->second.GetSceneGraphProperty();
+    CustomProperty* custom = FindCustomProperty( index );
+    DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
+    property = custom->GetSceneGraphProperty();
   }
   else if( NULL != mNode )
   {

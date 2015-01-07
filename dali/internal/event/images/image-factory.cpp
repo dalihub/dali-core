@@ -44,7 +44,7 @@ namespace Internal
 
 ImageFactory::ImageFactory( ResourceClient& resourceClient )
 : mResourceClient(resourceClient),
-  mMaxScale(0.5f),
+  mMaxScale( 4 / 1024.0f ), ///< Only allow a very tiny fudge factor in matching new requests to existing resource transactions: 4 pixels at a dimension of 1024, 2 at 512, ...
   mReqIdCurrent(0)
 {
 }
@@ -78,37 +78,32 @@ ResourceTicketPtr ImageFactory::Load( Request& request )
 {
   ResourceTicketPtr ticket;
 
+  // See if any resource transaction has already been associated with this request:
   const ResourceId resId = request.resourceId;
-  if( resId == 0 )
+  if( resId != 0 )
   {
-    // Not yet associated with a ticketed async resource transaction, so attempt to
-    // find a cached one and issue a new load if there isn't one in-flight:
-
-    const std::size_t urlHash = GetHashForCachedRequest( request );
-    ticket = FindCompatibleResource( request.url, urlHash, request.attributes );
-
-    if( !ticket )
-    {
-      // Didn't find compatible resource already being loaded
-      ticket = IssueLoadRequest( request.url, request.attributes );
-    }
-
-    request.resourceId = ticket->GetId();
+    // An IO operation has been started at some time for the request so recover the
+    // ticket that was created for that:
+    ticket = mResourceClient.RequestResourceTicket( resId );  ///@note Always succeeds in normal use.
   }
   else
   {
-    ticket = mResourceClient.RequestResourceTicket( resId );
-    if( !ticket )
-    {
-      // Resource has been discarded since last load
-      ticket = IssueLoadRequest( request.url, request.attributes );
-      request.resourceId = ticket->GetId();
-    }
-    DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
-                       ticket->GetTypePath().type->id == ResourceNativeImage ||
-                       ticket->GetTypePath().type->id == ResourceTargetImage );
+    // Request not yet associated with a ticketed async resource transaction, so
+    // attempt to find a compatible cached one:
+    const std::size_t urlHash = GetHashForCachedRequest( request );
+    ticket = FindCompatibleResource( request.url, urlHash, request.attributes );
   }
 
+  // Start a new resource IO transaction for the request if none is already happening:
+  if( !ticket )
+  {
+    ticket = IssueLoadRequest( request.url, request.attributes );
+  }
+  request.resourceId = ticket->GetId();
+
+  DALI_ASSERT_DEBUG( ticket->GetTypePath().type->id == ResourceBitmap      ||
+                     ticket->GetTypePath().type->id == ResourceNativeImage ||
+                     ticket->GetTypePath().type->id == ResourceTargetImage );
   return ticket;
 }
 
@@ -255,16 +250,19 @@ void ImageFactory::FlushReleaseQueue()
 bool ImageFactory::CompareAttributes( const Dali::ImageAttributes& requested,
                                       const Dali::ImageAttributes& actual ) const
 {
-  // do not load image resource again if there is a similar resource loaded
-  // eg. if size is less than 50% different of what we have
+  // do not load image resource again if there is a similar resource loaded:
   // see explanation in image.h of what is deemed compatible
   return (requested.GetScalingMode() ==  actual.GetScalingMode()) &&
+          (
+            (requested.GetFilterMode() == actual.GetFilterMode()) ||
+            (requested.GetFilterMode() == ImageAttributes::DontCare)
+          ) &&
           (requested.GetPixelFormat() ==  actual.GetPixelFormat()) &&
           (requested.GetFieldBorder() ==  actual.GetFieldBorder()) &&
           (fabs(actual.GetFieldRadius() - requested.GetFieldRadius()) <= FLT_EPSILON) &&
           (requested.IsDistanceField() == actual.IsDistanceField()) &&
-          (fabsf(requested.GetWidth()  -  actual.GetWidth())  < actual.GetWidth()  * mMaxScale) &&
-          (fabsf(requested.GetHeight() -  actual.GetHeight()) < actual.GetHeight() * mMaxScale);
+          (fabsf(requested.GetWidth()  -  actual.GetWidth())  <= actual.GetWidth()  * mMaxScale) &&
+          (fabsf(requested.GetHeight() -  actual.GetHeight()) <= actual.GetHeight() * mMaxScale);
 }
 
 Request* ImageFactory::InsertNewRequest( ResourceId resourceId, const std::string& filename, std::size_t urlHash, const ImageAttributes* attr )

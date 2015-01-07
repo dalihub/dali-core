@@ -61,6 +61,7 @@ class Animation : public BaseObject
 public:
 
   typedef Dali::Animation::EndAction EndAction;
+  typedef Dali::Animation::Interpolation Interpolation;
 
   typedef void (*FinishedCallback)(Object* object);
 
@@ -253,9 +254,19 @@ public:
   void AnimateBetween(Property target, const KeyFrames& keyFrames);
 
   /**
+   * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, Interpolation interpolation)
+   */
+  void AnimateBetween(Property target, const KeyFrames& keyFrames, Interpolation interpolation );
+
+  /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period)
    */
   void AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period);
+
+  /**
+   * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation)
+   */
+  void AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period, Interpolation interpolation);
 
   /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha)
@@ -263,9 +274,19 @@ public:
   void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha);
 
   /**
+   * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation)
+   */
+  void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation);
+
+  /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
    */
   void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period);
+
+  /**
+   * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation )
+   */
+  void AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation );
 
   // Actor-specific convenience functions
 

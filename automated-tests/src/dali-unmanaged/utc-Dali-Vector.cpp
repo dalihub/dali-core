@@ -236,7 +236,7 @@ int UtcDaliVectorIntErase(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "(iterator < End())", TEST_LOCATION );
   }
   catch( ... )
@@ -253,7 +253,7 @@ int UtcDaliVectorIntErase(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "(iterator < End()) && (iterator >= Begin())", TEST_LOCATION );
   }
   catch( ... )
@@ -285,7 +285,7 @@ int UtcDaliVectorIntErase(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "(iterator < End())", TEST_LOCATION );
   }
   catch( ... )
@@ -307,7 +307,7 @@ int UtcDaliVectorIntErase(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "(iterator < End())", TEST_LOCATION );
   }
   catch( ... )
@@ -400,7 +400,7 @@ int UtcDaliVectorDoubleRemove(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "(iterator < End()) && (iterator >= Begin())", TEST_LOCATION );
   }
   catch( ... )
@@ -422,7 +422,7 @@ int UtcDaliVectorDoubleRemove(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "(iterator < End()) && (iterator >= Begin())", TEST_LOCATION );
   }
   catch( ... )
@@ -551,7 +551,7 @@ int UtcDaliVectorAsserts(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "VectorBase::mData", TEST_LOCATION );
   }
   catch(...)
@@ -570,7 +570,7 @@ int UtcDaliVectorAsserts(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "VectorBase::mData", TEST_LOCATION );
   }
   catch(...)
@@ -593,7 +593,7 @@ int UtcDaliVectorAsserts(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "(iterator < End()) && (iterator >= Begin())", TEST_LOCATION );
   }
   catch(...)
@@ -616,7 +616,7 @@ int UtcDaliVectorAsserts(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "(iterator < End()) && (iterator >= Begin())", TEST_LOCATION );
   }
   catch(...)
@@ -656,7 +656,7 @@ int UtcDaliVectorAsserts(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "index < VectorBase::Count()", TEST_LOCATION );
   }
   catch(...)
@@ -674,7 +674,7 @@ int UtcDaliVectorAsserts(void)
   }
   catch(Dali::DaliException& e)
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "index < VectorBase::Count()", TEST_LOCATION );
   }
   catch(...)
@@ -829,7 +829,7 @@ int UtcDaliVectorInsert01(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( at <= End() ) && ( at >= Begin() )", TEST_LOCATION );
   }
   catch( ... )
@@ -846,7 +846,7 @@ int UtcDaliVectorInsert01(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf( "Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str() );
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( at <= End() ) && ( at >= Begin() )", TEST_LOCATION );
   }
   catch( ... )
@@ -1013,7 +1013,7 @@ int UtcDaliVectorIntInsertAssert(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( at <= End() ) && ( at >= Begin() )", TEST_LOCATION );
   }
   catch( ... )
@@ -1029,7 +1029,7 @@ int UtcDaliVectorIntInsertAssert(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( at <= End() ) && ( at >= Begin() )", TEST_LOCATION );
   }
   catch( ... )
@@ -1045,7 +1045,7 @@ int UtcDaliVectorIntInsertAssert(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( from <= to )", TEST_LOCATION );
   }
   catch( ... )
@@ -1168,7 +1168,7 @@ int UtcDaliVectorIntEraseRangeAssert(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( first <= End() ) && ( first >= Begin() )", TEST_LOCATION );
   }
   catch( ... )
@@ -1185,7 +1185,7 @@ int UtcDaliVectorIntEraseRangeAssert(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( first <= End() ) && ( first >= Begin() )", TEST_LOCATION );
   }
   catch( ... )
@@ -1204,7 +1204,7 @@ int UtcDaliVectorIntEraseRangeAssert(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( last <= End() ) && ( last >= Begin() )", TEST_LOCATION );
   }
   catch( ... )
@@ -1221,7 +1221,7 @@ int UtcDaliVectorIntEraseRangeAssert(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( last <= End() ) && ( last >= Begin() )", TEST_LOCATION );
   }
   catch( ... )
@@ -1241,7 +1241,7 @@ int UtcDaliVectorIntEraseRangeAssert(void)
   }
   catch( Dali::DaliException& e )
   {
-    tet_printf("Assertion %s test at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT( e, "( first <= last )", TEST_LOCATION );
   }
   catch( ... )

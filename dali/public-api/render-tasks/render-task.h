@@ -364,10 +364,18 @@ public:
   /**
    * @brief Set the refresh-rate of the RenderTask.
    *
-   * The default is REFRESH_ALWAYS (1), meaning that the RenderTask will be processed every frame.
-   * It may be desirable to process less frequently e.g. SetRefreshRate(3) will process once every 3 frames.
-   * The REFRESH_ONCE value means that the RenderTask will be processed once only, to take a snap-shot of the scene.
-   * Repeatedly calling SetRefreshRate(REFRESH_ONCE) will cause more snap-shots to be taken.
+   * The default is REFRESH_ALWAYS (1), meaning that the RenderTask
+   * will be processed every frame if the scene graph is changing.  It
+   * may be desirable to process less frequently. For example,
+   * SetRefreshRate(3) will process once every 3 frames if the scene
+   * graph is changing.  If the scene graph is not changing, then the
+   * render task will not be rendered, regardless of this value.
+   *
+   * The REFRESH_ONCE value means that the RenderTask will be
+   * processed once only, to take a snap-shot of the scene.
+   * Repeatedly calling SetRefreshRate(REFRESH_ONCE) will cause more
+   * snap-shots to be taken.
+   *
    * @param[in] refreshRate The new refresh rate.
    */
   void SetRefreshRate( unsigned int refreshRate );

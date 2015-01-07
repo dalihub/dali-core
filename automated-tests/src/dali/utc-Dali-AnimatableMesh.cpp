@@ -147,7 +147,7 @@ int UtcDaliAnimatableMeshNew03(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "numVertices > 0", TEST_LOCATION);
   }
   END_TEST;
@@ -167,7 +167,7 @@ int UtcDaliAnimatableMeshNew04(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "faceIndices.size() > 0", TEST_LOCATION);
   }
   END_TEST;
@@ -188,7 +188,7 @@ int UtcDaliAnimatableMeshNew05(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "faceIndex < numVertices", TEST_LOCATION);
   }
   END_TEST;
@@ -209,7 +209,7 @@ int UtcDaliAnimatableMeshNew06(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "material", TEST_LOCATION);
   }
   END_TEST;
@@ -264,7 +264,7 @@ int UtcDaliAnimatableMeshGetPropertyIndex02(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "index < GetNumberOfVertices()", TEST_LOCATION);
   }
   END_TEST;
@@ -283,7 +283,7 @@ int UtcDaliAnimatableMeshGetPropertyIndex03(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "index < GetNumberOfVertices()", TEST_LOCATION);
   }
   END_TEST;
@@ -302,7 +302,7 @@ int UtcDaliAnimatableMeshGetPropertyIndex04(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "index < GetNumberOfVertices()", TEST_LOCATION);
   }
   END_TEST;
@@ -345,7 +345,7 @@ int UtcDaliAnimatableMeshOperatorArray02(void)
   }
   catch (Dali::DaliException& e)
   {
-    tet_printf("Assertion %s failed at %s\n", e.mCondition.c_str(), e.mLocation.c_str());
+    DALI_TEST_PRINT_ASSERT( e );
     DALI_TEST_ASSERT(e, "index < GetNumberOfVertices()", TEST_LOCATION);
   }
   END_TEST;
@@ -439,7 +439,7 @@ int UtcDaliAnimatableMeshExceedVertices(void)
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT_CONDITION_STARTS_WITH_SUBSTRING( e, "( numVertices * 3 ) < DEFAULT_PROPERTY_MAX_COUNT", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "( numVertices * 3 ) < DEFAULT_PROPERTY_MAX_COUNT", TEST_LOCATION );
   }
   END_TEST;
 }

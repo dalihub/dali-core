@@ -18,10 +18,8 @@
 // CLASS HEADER
 #include <dali/public-api/images/image-attributes.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/common/constants.h>
-#include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/math/math-utils.h>
+// EXTERNAL INCLUDES
+#include <cmath>
 
 namespace Dali
 {
@@ -31,14 +29,15 @@ const ImageAttributes ImageAttributes::DEFAULT_ATTRIBUTES;
 struct ImageAttributes::ImageAttributesImpl
 {
   ImageAttributesImpl()
-  :  width(0),
+  :  fieldRadius(4.0f),
+     fieldBorder(4),
+     width(0),
      height(0),
      scaling(ShrinkToFit),
+     filtering(Box),
      pixelformat(Pixel::RGBA8888),
      mOrientationCorrection(false),
-     isDistanceField(false),
-     fieldRadius(4.0f),
-     fieldBorder(4)
+     isDistanceField(false)
   {
   }
 
@@ -47,14 +46,15 @@ struct ImageAttributes::ImageAttributesImpl
   }
 
   ImageAttributesImpl(const ImageAttributesImpl& rhs)
-  : width( rhs.width ),
+  : fieldRadius( rhs.fieldRadius ),
+    fieldBorder( rhs.fieldBorder ),
+    width( rhs.width ),
     height( rhs.height ),
     scaling( rhs.scaling ),
+    filtering( rhs.filtering ),
     pixelformat( rhs.pixelformat ),
     mOrientationCorrection( rhs.mOrientationCorrection ),
-    isDistanceField( rhs.isDistanceField ),
-    fieldRadius( rhs.fieldRadius ),
-    fieldBorder( rhs.fieldBorder )
+    isDistanceField( rhs.isDistanceField )
   {
   }
 
@@ -65,6 +65,8 @@ struct ImageAttributes::ImageAttributesImpl
       width = rhs.width;
       height = rhs.height;
       scaling = rhs.scaling;
+      filtering = rhs.filtering;
+
       pixelformat = rhs.pixelformat;
       mOrientationCorrection = rhs.mOrientationCorrection;
       isDistanceField = rhs.isDistanceField;
@@ -75,17 +77,15 @@ struct ImageAttributes::ImageAttributesImpl
     return *this;
   }
 
-  unsigned int  width;            ///< image width in pixels
-  unsigned int  height;           ///< image height in pixels
-  ScalingMode   scaling;          ///< scaling option, ShrinkToFit is default
-  Pixel::Format pixelformat;      ///< pixel format, default is RGBA8888
-
-  bool          mOrientationCorrection; ///< If true, image pixels are reordered according to orientation metadata on load.
-
-  // For distance fields :
-  bool          isDistanceField;  ///< true, if the image is a distancefield. Default is false.
   float         fieldRadius;      ///< The minimum search radius to check for differing pixels
-  int           fieldBorder;      ///< The amount of distancefield cells to add around the data (for glow/shadow effects)
+  int           fieldBorder : 16; ///< The amount of distancefield cells to add around the data (for glow/shadow effects)
+  unsigned int  width : 16;       ///< image width in pixels
+  unsigned int  height : 16;      ///< image height in pixels
+  ScalingMode   scaling : 3;      ///< scaling option, ShrinkToFit is default
+  FilterMode    filtering : 3;    ///< filtering option. Box is the default
+  Pixel::Format pixelformat : 5;  ///< pixel format, default is RGBA8888
+  bool          mOrientationCorrection : 1; ///< If true, image pixels are reordered according to orientation metadata on load.
+  bool          isDistanceField : 1;  ///< true, if the image is a distancefield. Default is false.
 };
 
 
@@ -133,6 +133,11 @@ void ImageAttributes::SetScalingMode(ScalingMode scale)
   impl->scaling = scale;
 }
 
+void ImageAttributes::SetFilterMode( FilterMode filtering )
+{
+  impl->filtering = filtering;
+}
+
 void ImageAttributes::SetOrientationCorrection(const bool enabled)
 {
   impl->mOrientationCorrection = enabled;
@@ -161,6 +166,11 @@ Pixel::Format ImageAttributes::GetPixelFormat() const
 ImageAttributes::ScalingMode ImageAttributes::GetScalingMode() const
 {
   return impl->scaling;
+}
+
+ImageAttributes::FilterMode ImageAttributes::GetFilterMode() const
+{
+  return impl->filtering;
 }
 
 bool ImageAttributes::IsDistanceField() const
@@ -253,6 +263,11 @@ bool operator<(const ImageAttributes& a, const ImageAttributes& b)
     return a.impl->scaling < b.impl->scaling;
   }
 
+  if (a.impl->filtering != b.impl->filtering)
+  {
+    return a.impl->filtering < b.impl->filtering;
+  }
+
   if (a.impl->isDistanceField && b.impl->isDistanceField)
   {
     if (fabs(a.impl->fieldRadius - b.impl->fieldRadius) > Math::MACHINE_EPSILON_0)
@@ -282,6 +297,7 @@ bool operator==(const ImageAttributes& a, const ImageAttributes& b)
          a.impl->mOrientationCorrection == b.impl->mOrientationCorrection &&
          a.impl->pixelformat            == b.impl->pixelformat &&
          a.impl->scaling                == b.impl->scaling     &&
+         a.impl->filtering              == b.impl->filtering     &&
          a.impl->isDistanceField  == b.impl->isDistanceField &&
          fabs(a.impl->fieldRadius -  b.impl->fieldRadius) < Math::MACHINE_EPSILON_0 &&
          a.impl->fieldBorder      == b.impl->fieldBorder;

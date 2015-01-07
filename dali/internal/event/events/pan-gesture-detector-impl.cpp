@@ -324,11 +324,6 @@ void PanGestureDetector::OnActorDestroyed(Object& object)
   // Do nothing
 }
 
-bool PanGestureDetector::IsSceneObjectRemovable() const
-{
-  return false;
-}
-
 unsigned int PanGestureDetector::GetDefaultPropertyCount() const
 {
   return DEFAULT_PROPERTY_COUNT;
@@ -556,11 +551,9 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
 
   if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
-    CustomPropertyLookup::const_iterator entry = GetCustomPropertyLookup().find( index );
-
-    DALI_ASSERT_ALWAYS( GetCustomPropertyLookup().end() != entry && "property index is invalid" );
-
-    property = entry->second.GetSceneGraphProperty();
+    CustomProperty* custom = FindCustomProperty( index );
+    DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
+    property = custom->GetSceneGraphProperty();
   }
   else
   {
