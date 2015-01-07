@@ -139,20 +139,22 @@ typedef bool (*HitTestFunction)(Actor actor, TraverseType type);
  *
  * @param[in] stage The stage.
  * @param[in] screenCoordinates The screen coordinates.
- * @param[out] results The results of the hit-test.
+ * @param[out] results The results of the hit-test, only modified if something is hit
  * @param[in] func The function to use in the hit-test algorithm.
+ * @return true if something was hit
  */
-DALI_IMPORT_API void HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
+DALI_IMPORT_API bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
 
 /**
  * @brief Hit test specific to a given RenderTask.
  *
  * @param[in] renderTask The render task for hit test
  * @param[in] screenCoordinates The screen coordinates.
- * @param[out] results The results of the hit-test.
+ * @param[out] results The results of the hit-test, only modified if something is hit
  * @param[in] func The function to use in the hit-test algorithm.
+ * @return true if something was hit
  */
-DALI_IMPORT_API void HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
+DALI_IMPORT_API bool HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func );
 
 } // namespace HitTestAlgorithm
 

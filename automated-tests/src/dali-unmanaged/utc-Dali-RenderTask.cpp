@@ -102,28 +102,35 @@ int UtcDaliRenderTaskSetScreenToFrameBufferMappingActor(void)
 
   Vector2 screenCoordinates( stageSize.x * 0.05f, stageSize.y * 0.05f );
   Dali::HitTestAlgorithm::Results results;
-  Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction );
-  DALI_TEST_CHECK( !results.actor);
+  DALI_TEST_CHECK( !results.actor );
+  DALI_TEST_EQUALS( Vector2::ZERO, results.actorCoordinates, 0.1f, TEST_LOCATION );
+  // miss expected, results not changed
+  DALI_TEST_CHECK( false == Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction ) );
+  DALI_TEST_CHECK( !results.actor );
   DALI_TEST_EQUALS( Vector2::ZERO, results.actorCoordinates, 0.1f, TEST_LOCATION );
 
   screenCoordinates.x = stageSize.x * 0.265f;
   screenCoordinates.y = stageSize.y * 0.33f;
   results.actor = Actor();
   results.actorCoordinates = Vector2::ZERO;
-  Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction );
-  DALI_TEST_CHECK( results.actor  == offscreenActor);
+  // hit expected, results changed
+  DALI_TEST_CHECK( true == Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction ) );
+  DALI_TEST_CHECK( results.actor  == offscreenActor );
   DALI_TEST_EQUALS( (screenCoordinates-offset)/scale , results.actorCoordinates, 0.1f, TEST_LOCATION );
 
   screenCoordinates.x = stageSize.x * 0.435f;
   screenCoordinates.y = stageSize.y * 0.52f;
-  Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction );
-  DALI_TEST_CHECK( results.actor  == offscreenActor);
-  DALI_TEST_EQUALS( (screenCoordinates-offset)/scale , results.actorCoordinates, 0.1f, TEST_LOCATION );
+  // hit expected, results changed
+  DALI_TEST_CHECK( true == Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction ) );
+  DALI_TEST_CHECK( results.actor  == offscreenActor );
+  const Vector2 expectedCoordinates = (screenCoordinates-offset)/scale;
+  DALI_TEST_EQUALS( expectedCoordinates , results.actorCoordinates, 0.1f, TEST_LOCATION );
 
   screenCoordinates.x = stageSize.x * 0.65f;
   screenCoordinates.y = stageSize.y * 0.95f;
-  Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction );
-  DALI_TEST_CHECK( !results.actor);
-  DALI_TEST_EQUALS( Vector2::ZERO, results.actorCoordinates, 0.1f, TEST_LOCATION );
+  // miss expected, results not changed
+  DALI_TEST_CHECK( false == Dali::HitTestAlgorithm::HitTest( renderTask, screenCoordinates, results, IsActorHittableFunction ) );
+  DALI_TEST_CHECK( results.actor  == offscreenActor );
+  DALI_TEST_EQUALS( expectedCoordinates , results.actorCoordinates, 0.1f, TEST_LOCATION );
   END_TEST;
 }
