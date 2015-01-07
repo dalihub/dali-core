@@ -39,7 +39,7 @@ namespace Internal
 
 class Actor;
 class Stage;
-class ActorObserver;
+struct ActorObserver;
 
 /**
  * <h3>Multi-Touch Event Processing:</h3>

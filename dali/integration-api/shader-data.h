@@ -135,7 +135,7 @@ public: // API
    * Get the data that the buffer points to
    * @return raw pointer to the buffer data
    */
-  unsigned char* const GetBufferData()
+  unsigned char* GetBufferData()
   {
     DALI_ASSERT_DEBUG( mBuffer.size() > 0 );
     return &mBuffer[0];

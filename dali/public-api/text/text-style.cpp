@@ -40,7 +40,7 @@ const uint64_t ONE = 1lu;
 const uint64_t PARAMETER_MASK =              ~( -1l << PARAMETER_BITS );
 
 // Shift values for attribute indices
-const unsigned int COMMON_INDEX_SHIFT =      0u;                                     // starts at bit 0
+const unsigned int COMMON_INDEX_SHIFT __attribute__((unused)) =      0u; // starts at bit 0
 const unsigned int WEIGHT_INDEX_SHIFT =      PARAMETER_BITS * 1; // starts at bit 3
 const unsigned int ITALICS_INDEX_SHIFT =     PARAMETER_BITS * 2; // starts at bit 6
 const unsigned int UNDERLINE_INDEX_SHIFT =   PARAMETER_BITS * 3; // starts at bit 9
@@ -82,7 +82,6 @@ const uint64_t DROP_SHADOW_EXISTS =          ONE << ( PARAMETER_FLAGS + 14 ); //
 const uint64_t GLOW_EXISTS =                 ONE << ( PARAMETER_FLAGS + 15 ); // bit 39
 const uint64_t OUTLINE_EXISTS =              ONE << ( PARAMETER_FLAGS + 16 ); // bit 40
 const uint64_t GRADIENT_EXISTS =             ONE << ( PARAMETER_FLAGS + 17 ); // bit 41
-const uint64_t ATTRIBUTE_END =               GRADIENT_EXISTS;
 
 const std::string DEFAULT_NAME;
 const Dali::PointSize DEFAULT_FONT_POINT_SIZE( 0.f );

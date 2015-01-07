@@ -215,7 +215,7 @@ const Vector3 Spline::GetPoint(unsigned int segmentIndex, float s) const
 // Given a parameter s (NOT x), return the Y value. Checks that the
 // segment index is valid. For bezier splines, the last segment is
 // only used to specify the end point, so is not valid.
-const float  Spline::GetY(unsigned int segmentIndex, float s) const
+float  Spline::GetY(unsigned int segmentIndex, float s) const
 {
   DALI_ASSERT_ALWAYS( segmentIndex+1 < mKnots.size() && segmentIndex < mKnots.size() && "segmentIndex out of bounds");
   DALI_ASSERT_ALWAYS( mOutTangents.size() == mKnots.size() && "Spline not fully initialized" );
@@ -257,7 +257,7 @@ float ClampToZeroOne(float v)
 // Use de Casteljau subdivision to approximate the parameter required to find x
 // on a Bezier spline
 // note, atX is already determined to be >= P0_X, <P1_X
-const float Spline::ApproximateCubicBezierParameter (
+float Spline::ApproximateCubicBezierParameter (
   float atX, float P0_X, float C0_X, float C1_X, float P1_X ) const
 {
   if (fabs(atX - P0_X) < GetRangedEpsilon(atX, P0_X) )
@@ -312,7 +312,7 @@ const float Spline::ApproximateCubicBezierParameter (
 }
 
 
-const bool Spline::FindSegment(float x, /*out*/ int& segmentIndex) const
+bool Spline::FindSegment(float x, /*out*/ int& segmentIndex) const
 {
   bool found = false;
   unsigned int index=0;
@@ -338,7 +338,7 @@ const bool Spline::FindSegment(float x, /*out*/ int& segmentIndex) const
   return found;
 }
 
-const float Spline::GetYFromMonotonicX(float x) const
+float Spline::GetYFromMonotonicX(float x) const
 {
   int segmentIndex=0;
   float yValue = 0.0f;

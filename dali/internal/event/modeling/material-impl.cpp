@@ -433,7 +433,7 @@ void Material::SetMapU(const unsigned int map)
   SendPropertiesToSceneObject();
 }
 
-const unsigned int Material::GetMapU() const
+unsigned int Material::GetMapU() const
 {
   return mProperties.mMapU;
 }
@@ -444,7 +444,7 @@ void Material::SetMapV(const unsigned int map)
   SendPropertiesToSceneObject();
 }
 
-const unsigned int Material::GetMapV() const
+unsigned int Material::GetMapV() const
 {
   return mProperties.mMapV;
 }
@@ -455,7 +455,7 @@ void Material::SetDiffuseUVIndex(const int index)
   SendPropertiesToSceneObject();
 }
 
-const unsigned int Material::GetDiffuseUVIndex() const
+unsigned int Material::GetDiffuseUVIndex() const
 {
   return mProperties.mDiffuseUVIndex;
 }
@@ -466,7 +466,7 @@ void Material::SetOpacityUVIndex(const int index)
   SendPropertiesToSceneObject();
 }
 
-const unsigned int Material::GetOpacityUVIndex() const
+unsigned int Material::GetOpacityUVIndex() const
 {
   return mProperties.mOpacityUVIndex;
 }
@@ -477,7 +477,7 @@ void Material::SetNormalUVIndex(const int index)
   SendPropertiesToSceneObject();
 }
 
-const unsigned int Material::GetNormalUVIndex() const
+unsigned int Material::GetNormalUVIndex() const
 {
   return mProperties.mNormalUVIndex;
 }
@@ -488,7 +488,7 @@ void Material::SetHasHeightMap(const bool flag)
   SendPropertiesToSceneObject();
 }
 
-const bool Material::GetHasHeightMap() const
+bool Material::GetHasHeightMap() const
 {
   return mProperties.mHasHeightMap;
 }

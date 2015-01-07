@@ -262,7 +262,7 @@ public:
   /**
    * @copydoc Dali::Material::GetMapU
    */
-  const unsigned int GetMapU() const;
+  unsigned int GetMapU() const;
 
   /**
    * @copydoc Dali::Material::SetMapV
@@ -272,7 +272,7 @@ public:
   /**
    * @copydoc Dali::Material::GetMapV
    */
-  const unsigned int GetMapV() const;
+  unsigned int GetMapV() const;
 
   /**
    * @copydoc Dali::Material::SetDiffuseUVIndex
@@ -282,7 +282,7 @@ public:
   /**
    * @copydoc Dali::Material::GetDiffuseUVIndex
    */
-  const unsigned int GetDiffuseUVIndex() const;
+  unsigned int GetDiffuseUVIndex() const;
 
   /**
    * @copydoc Dali::Material::SetOpacityUVIndex
@@ -292,7 +292,7 @@ public:
   /**
    * @copydoc Dali::Material::GetOpacityUVIndex
    */
-  const unsigned int GetOpacityUVIndex() const;
+  unsigned int GetOpacityUVIndex() const;
 
   /**
    * @copydoc Dali::Material::SetNormalUVIndex
@@ -302,7 +302,7 @@ public:
   /**
    * @copydoc Dali::Material::GetNormalUVIndex
    */
-  const unsigned int GetNormalUVIndex() const;
+  unsigned int GetNormalUVIndex() const;
 
   /**
    * @copydoc Dali::Material::SetHasHeightMap
@@ -312,7 +312,7 @@ public:
   /**
    * @copydoc Dali::Material::GetHasHeightMap
    */
-  const bool GetHasHeightMap() const;
+  bool GetHasHeightMap() const;
 
   const MaterialProperties& GetProperties() const
   {
