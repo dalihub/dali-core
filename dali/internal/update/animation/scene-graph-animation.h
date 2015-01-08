@@ -234,7 +234,7 @@ public:
    * @param[in] propertyOwner The scene-object that owns the animatable property.
    * @post The animator is owned by this animation.
    */
-  void AddAnimator( AnimatorBase* animator, PropertyOwner* propertyOwner );
+  void AddAnimator( AnimatorBase* animator );
 
   /**
    * Retrieve the animators from an animation.
@@ -429,16 +429,17 @@ inline void PauseAnimationMessage( EventToUpdate& eventToUpdate, const Animation
   new (slot) LocalType( &animation, &Animation::Pause );
 }
 
-inline void AddAnimatorMessage( EventToUpdate& eventToUpdate, const Animation& animation, AnimatorBase& animator, const PropertyOwner& owner )
+inline void AddAnimatorMessage( EventToUpdate& eventToUpdate, const Animation& animation, AnimatorBase& animator )
 {
-  typedef MessageValue2< Animation, OwnerPointer<AnimatorBase>, PropertyOwner* > LocalType;
+  typedef MessageValue1< Animation, OwnerPointer<AnimatorBase> > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &animation, &Animation::AddAnimator, &animator, const_cast<PropertyOwner*>( &owner ) );
+  new (slot) LocalType( &animation, &Animation::AddAnimator, &animator );
 }
+
 
 } // namespace SceneGraph
 
