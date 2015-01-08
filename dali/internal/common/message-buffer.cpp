@@ -37,7 +37,8 @@ const unsigned int MESSAGE_END_FIELD  = 1u; // Size required to mark the end of 
 
 const unsigned int MESSAGE_SIZE_PLUS_END_FIELD = MESSAGE_SIZE_FIELD + MESSAGE_END_FIELD;
 
-const unsigned int MAX_DIVISION_BY_WORD_REMAINDER = sizeof(unsigned int) - 1u; // For word alignment on ARM
+const unsigned int MAX_DIVISION_BY_WORD_REMAINDER = sizeof(Dali::Internal::MessageBuffer::WordType) - 1u; // For word alignment on ARM
+const unsigned int WORD_SIZE = sizeof(Dali::Internal::MessageBuffer::WordType);
 
 } // unnamed namespace
 
@@ -48,7 +49,7 @@ namespace Internal
 {
 
 MessageBuffer::MessageBuffer( std::size_t initialCapacity )
-: mInitialCapacity( initialCapacity / sizeof(unsigned int) ),
+: mInitialCapacity( initialCapacity / WORD_SIZE ),
   mData( NULL ),
   mNextSlot( NULL ),
   mCapacity( 0 ),
@@ -65,7 +66,8 @@ unsigned int* MessageBuffer::ReserveMessageSlot( std::size_t size )
 {
   DALI_ASSERT_DEBUG( 0 != size );
 
-  std::size_t requestedSize = (size + MAX_DIVISION_BY_WORD_REMAINDER) / sizeof(unsigned int);
+  // Number of aligned words required to handle a message of size in bytes
+  std::size_t requestedSize = (size + MAX_DIVISION_BY_WORD_REMAINDER) / WORD_SIZE;
   std::size_t requiredSize = requestedSize + MESSAGE_SIZE_PLUS_END_FIELD;
 
   // Keep doubling the additional capacity until we have enough
@@ -85,7 +87,7 @@ unsigned int* MessageBuffer::ReserveMessageSlot( std::size_t size )
   }
 
   // Now reserve the slot
-  unsigned int* slot = mNextSlot;
+  WordType* slot = mNextSlot;
 
   *slot++ = requestedSize; // Object size marker is stored in first word
 
@@ -95,12 +97,13 @@ unsigned int* MessageBuffer::ReserveMessageSlot( std::size_t size )
   // End marker
   *mNextSlot = 0;
 
-  return slot;
+  // @todo Remove cast & change all messages to use WordType instead
+  return reinterpret_cast<unsigned int*>(slot);
 }
 
 std::size_t MessageBuffer::GetCapacity() const
 {
-  return mCapacity * sizeof(unsigned int);
+  return mCapacity * WORD_SIZE;
 }
 
 MessageBuffer::Iterator MessageBuffer::Begin() const
@@ -128,8 +131,8 @@ void MessageBuffer::IncreaseCapacity( std::size_t newCapacity )
   {
     // Often this avoids the need to copy memory
 
-    unsigned int* oldData = mData;
-    mData = reinterpret_cast<unsigned int*>( realloc( mData, newCapacity * sizeof(unsigned int) ) );
+    WordType* oldData = mData;
+    mData = reinterpret_cast<WordType*>( realloc( mData, newCapacity * WORD_SIZE ) );
 
     // if realloc fails the old data is still valid
     if( !mData )
@@ -141,7 +144,7 @@ void MessageBuffer::IncreaseCapacity( std::size_t newCapacity )
   }
   else
   {
-    mData = reinterpret_cast<unsigned int*>( malloc( newCapacity * sizeof(unsigned int) ) );
+    mData = reinterpret_cast<WordType*>( malloc( newCapacity * WORD_SIZE ) );
   }
   DALI_ASSERT_ALWAYS( NULL != mData );
 
@@ -149,7 +152,7 @@ void MessageBuffer::IncreaseCapacity( std::size_t newCapacity )
   mNextSlot = mData + mSize;
 }
 
-MessageBuffer::Iterator::Iterator(unsigned int* current)
+MessageBuffer::Iterator::Iterator(WordType* current)
 : mCurrent(current),
   mMessageSize(0)
 {
