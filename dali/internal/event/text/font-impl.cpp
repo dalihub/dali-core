@@ -49,8 +49,6 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_FON
 const float INCH_TO_POINTS( 72.f );
 const float POINT_TO_INCHES( 1.f / INCH_TO_POINTS );
 
-const char * const DALI_DEFAULT_FONT_CACHE_PATH( DALI_GLYPH_CACHE_DIR );
-
 const float MINIMUM_TEXT_SIZE = 1.0f;     // Text will not be drawn if it's less than this size in pixels
 
 } // unnamed namespace

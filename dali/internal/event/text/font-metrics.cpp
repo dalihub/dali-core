@@ -43,8 +43,6 @@ namespace  //unnamed namespace
 const float DEFAULT_UNITS_PER_EM( 1.f );
 
 const uint32_t FIRST_NON_CONTROL_CHAR( 0x20 ); // 0x20 is the white space which is the first non control character.
-const uint32_t LINE_SEPARATOR( '\n' );
-
 
 Integration::TextArray GetUniqueCharacters( const Integration::TextArray& text )
 {

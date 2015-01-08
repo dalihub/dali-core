@@ -28,12 +28,6 @@
 
 #include <dali/internal/update/render-tasks/scene-graph-render-task-debug.h>
 
-namespace
-{
-const unsigned int NUM_FRAMES_BEFORE_NOTIFY_FINISHED(3);
-const unsigned int COUNTDOWN_COMPLETE(-1);
-} // anonymous namespace
-
 namespace Dali
 {
 namespace Internal

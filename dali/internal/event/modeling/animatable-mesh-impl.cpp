@@ -203,11 +203,6 @@ MeshIPtr AnimatableMesh::GetMesh()
 
 bool AnimatableMesh::Supports( Capability capability ) const
 {
-  return false;
-}
-
-bool AnimatableMesh::IsSceneObjectRemovable() const
-{
   return false; // The scene object is permanently "on stage" whilst this object is alive
 }
 

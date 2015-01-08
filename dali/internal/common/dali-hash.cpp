@@ -33,7 +33,7 @@ inline void HashShader( const char* string, unsigned long& hash )
 {
   while( int c = *string++ )
   {
-    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+    hash = hash * 33 + c;
   }
 }
 } // un-named namespace

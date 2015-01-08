@@ -73,11 +73,6 @@ private:
   virtual void ProxyDestroyed(ProxyObject& proxy){}
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsSceneObjectRemovable()
-   */
-  virtual bool IsSceneObjectRemovable() const{ return false;}
-
-  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyCount()
    */
   virtual unsigned int GetDefaultPropertyCount() const;

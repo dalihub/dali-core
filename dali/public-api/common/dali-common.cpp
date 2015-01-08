@@ -36,7 +36,6 @@
 namespace
 {
 const int MAX_NUM_STACK_FRAMES = 25;
-const size_t C_SYMBOL_LENGTH = 4096;
 }
 
 namespace Dali

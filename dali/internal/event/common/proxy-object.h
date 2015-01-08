@@ -120,13 +120,6 @@ public:
   ProxyObject();
 
   /**
-   * Query whether the proxy object removes (& re-adds) its associated scene-object.
-   * Otherwise the scene-object lifetime is expected to match that of the proxy.
-   * @return True if scene-objects are removed.
-   */
-  virtual bool IsSceneObjectRemovable() const = 0;
-
-  /**
    * Add an observer to the proxy.
    * @param[in] observer The observer to add.
    */

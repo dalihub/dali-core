@@ -155,11 +155,6 @@ public: // Implementation of ProxyObject
   virtual bool Supports( Capability capability ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsSceneObjectRemovable()
-   */
-  virtual bool IsSceneObjectRemovable() const;
-
-  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyCount()
    */
   virtual unsigned int GetDefaultPropertyCount() const;

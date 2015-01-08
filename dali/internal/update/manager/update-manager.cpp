@@ -110,8 +110,6 @@ namespace SceneGraph
 namespace
 {
 
-const int DEFAULT_CAMERA_INDEX = -1;
-
 void DestroyNodeSet( std::set<Node*>& nodeSet )
 {
   for( std::set<Node*>::iterator iter = nodeSet.begin(); iter != nodeSet.end(); ++iter )

@@ -22,6 +22,9 @@
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/debug.h>
 
+#define BOOLSTR(x) ((x)?"T":"F")
+
+
 using namespace Dali;
 
 void utc_dali_render_task_startup(void)
@@ -258,8 +261,7 @@ RenderTask CreateRenderTask(TestApplication& application,
   return newTask;
 }
 
-
-bool UpdateRender(TestApplication& application, TraceCallStack& callStack, bool testDrawn, bool& finishedSig, bool testFinished )
+bool UpdateRender(TestApplication& application, TraceCallStack& callStack, bool testDrawn, bool& finishedSig, bool testFinished, bool testKeepUpdating )
 {
   finishedSig = false;
   callStack.Reset();
@@ -276,19 +278,37 @@ bool UpdateRender(TestApplication& application, TraceCallStack& callStack, bool 
     sigPassed = ! finishedSig;
   }
 
+  bool drawResult = callStack.FindMethod("DrawElements") || callStack.FindMethod("DrawArrays");
+
   bool drawPassed = false;
   if( testDrawn )
   {
-    drawPassed = callStack.FindMethod("DrawElements") || callStack.FindMethod("DrawArrays");
+    drawPassed = drawResult;
   }
   else
   {
-    drawPassed = ! callStack.FindMethod("DrawElements") && ! callStack.FindMethod("DrawArrays") ;
+    drawPassed = !drawResult;
   }
 
-  tet_printf("UpdateRender: drawPassed:%s  sigPassed:%s (Expected: %s %s)\n", drawPassed?"T":"F", sigPassed?"T":"F", testDrawn?"T":"F", testFinished?"T":"F");
+  bool keepUpdating = (application.GetUpdateStatus() != 0);
+  bool keepUpdatingPassed = false;
+  if( testKeepUpdating )
+  {
+    keepUpdatingPassed = keepUpdating;
+  }
+  else
+  {
+    keepUpdatingPassed = !keepUpdating;
+  }
 
-  return (sigPassed && drawPassed);
+  bool result = (sigPassed && drawPassed && keepUpdatingPassed);
+
+  tet_printf("UpdateRender: Expected: Draw:%s Signal:%s Keep Updating: %s  Actual: Draw:%s  Signal:%s KeepUpdating: %s  %s\n",
+             BOOLSTR(testDrawn), BOOLSTR(testFinished), BOOLSTR(testKeepUpdating),
+             BOOLSTR(drawResult), BOOLSTR(finishedSig), BOOLSTR(keepUpdating),
+             result ? "Passed":"Failed");
+
+  return result;
 }
 
 } // unnamed namespace
@@ -1228,22 +1248,19 @@ int UtcDaliRenderTaskContinuous01(void)
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.SendNotification();
 
-  // START PROCESS/RENDER                     Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
+  // START PROCESS/RENDER                     Input,    Expected  Input, Expected, KeepUpdating
+  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false, true ) );
   application.GetPlatform().ClearReadyResources();
 
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false, false ) );
 
   // ADD SOURCE ACTOR TO STAGE - expect continuous renders to start, no finished signal
   Stage::GetCurrent().Add(secondRootActor);
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                  Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false, false ) );
   END_TEST;
 }
 
@@ -1280,20 +1297,17 @@ int UtcDaliRenderTaskContinuous02(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, false ) );
 
   // MAKE SOURCE ACTOR VISIBLE - expect continuous renders to start, no finished signal
   secondRootActor.SetVisible(true);
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
   END_TEST;
 }
 
@@ -1326,20 +1340,17 @@ int UtcDaliRenderTaskContinuous03(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, false ) );
 
   // ADD CAMERA ACTOR TO STAGE - expect continuous renders to start, no finished signal
   Stage::GetCurrent().Add( offscreenCameraActor );
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
   END_TEST;
 }
 
@@ -1373,121 +1384,12 @@ int UtcDaliRenderTaskContinuous04(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
-  // FINISH RESOURCE LOADING - expect continuous renders to start, no finished signal
+  // FINISH RESOURCE LOADING - expect 'continuous' renders to start, no finished signal
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  application.GetPlatform().ClearReadyResources();
-
-  // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  END_TEST;
-}
-
-int UtcDaliRenderTaskContinuous05(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask Render Continuous, every 3 frames using loading image\nPRE: Resources not ready\nPOST:continuous renders, no Finished signal");
-
-  // SETUP AN OFFSCREEN RENDER TASK
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
-  drawTrace.Enable(true);
-
-  Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
-
-  CameraActor offscreenCameraActor = CameraActor::New();
-  Stage::GetCurrent().Add( offscreenCameraActor );
-  ImageActor secondRootActor = CreateLoadingImage(application, "aFile.jpg", Image::Immediate, Image::Unused);
-  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
-  Integration::ResourceId imageRequestId = imageRequest->GetId();
-  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  Stage::GetCurrent().Add(secondRootActor);
-
-  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, 3, true);
-  bool finished = false;
-  RenderTaskFinished renderTaskFinished( finished );
-  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
-  application.SendNotification();
-
-  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-
-  // FINISH RESOURCE LOADING - expect continuous renders to start, no finished signal
-  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  END_TEST;
-}
-
-int UtcDaliRenderTaskContinuous06(void)
-{
-  TestApplication application;
-
-  tet_infoline("Testing RenderTask Render Continuous, every 3 frames using loading image\nPRE: Render Always, Resources not ready\nPOST:continuous renders at reduced freq, no Finished signal");
-
-  // SETUP AN OFFSCREEN RENDER TASK
-  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
-  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
-  drawTrace.Enable(true);
-
-  Actor rootActor = Actor::New();
-  Stage::GetCurrent().Add( rootActor );
-
-  CameraActor offscreenCameraActor = CameraActor::New();
-  Stage::GetCurrent().Add( offscreenCameraActor );
-  ImageActor secondRootActor = CreateLoadingImage(application, "aFile.jpg", Image::Immediate, Image::Unused);
-  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
-  Integration::ResourceId imageRequestId = imageRequest->GetId();
-  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
-  Stage::GetCurrent().Add(secondRootActor);
-
-  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
-  bool finished = false;
-  RenderTaskFinished renderTaskFinished( finished );
-  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
-  application.SendNotification();
-
-  // START PROCESS/RENDER                     Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
-
-  // FINISH RESOURCE LOADING - expect continuous renders to start, no finished signal
-  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-
-  // CHANGE FREQUENCY
-  newTask.SetRefreshRate(3);  //              Input,    Expected  Input,    Expected
-  application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false ) );
-
-  newTask.SetRefreshRate(RenderTask::REFRESH_ALWAYS); // Should render every frame immediately
-  application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
   END_TEST;
 }
 
@@ -1524,34 +1426,26 @@ int UtcDaliRenderTaskOnce01(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
   // MAKE SOURCE VISIBLE
   secondRootActor.SetVisible(true);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
   // FINISH RESOURCE LOADING - expect no rendering yet
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   application.GetPlatform().ClearReadyResources();
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
-
-  // Finished rendering - expect no more renders, no more signals:
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,   finished, false, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
   END_TEST;
 }
 
@@ -1587,35 +1481,28 @@ int UtcDaliRenderTaskOnce02(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
   application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification(); //         Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
 
-  // Finished rendering - expect no more renders, no more signals:
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
   END_TEST;
 }
 
@@ -1653,33 +1540,26 @@ int UtcDaliRenderTaskOnce03(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // CHANGE TO RENDER ONCE
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification(); //         Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
   application.GetPlatform().ClearReadyResources();
 
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
 
-  // Finished rendering - expect no more renders, no more signals:
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
   END_TEST;
 }
 
@@ -1721,8 +1601,8 @@ int UtcDaliRenderTaskOnce03(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
 
   // CHANGE TO RENDER ONCE, RESOURCES BECOME NOT READY
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -1731,29 +1611,29 @@ int UtcDaliRenderTaskOnce03(void)
   ReloadImage(application, secondRootActor.GetImage());
   application.SendNotification(); //         Input,    Expected  Input,    Expected
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
   DALI_TEST_EQUALS( secondRootActor.GetImage().GetLoadingState(), Dali::ResourceLoading, TEST_LOCATION);
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   application.GetPlatform().ClearReadyResources();
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, true  ) );
 
   // Finished rendering - expect no more renders, no more signals:
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   END_TEST;
 }
 #endif
@@ -1795,39 +1675,32 @@ int UtcDaliRenderTaskOnce05(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true,  false  ) );
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
   END_TEST;
 }
 
@@ -1872,26 +1745,26 @@ int UtcDaliRenderTaskOnce06(void)
 
   application.SendNotification();
 
+  // Expect 2 frames to be drawn.
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj == NULL );
-
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
   application.SendNotification();
 
   // Expect SetRefreshRate to have been called again
@@ -1899,18 +1772,13 @@ int UtcDaliRenderTaskOnce06(void)
   RenderTaskFinished renderTaskFinished( finished );
   connectionTracker.DisconnectAll();
   newTask.FinishedSignal().Connect( &connectionTracker, renderTaskFinished );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
-
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
   END_TEST;
 }
 
@@ -1952,32 +1820,28 @@ int UtcDaliRenderTaskOnce07(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
   END_TEST;
 }
 
@@ -2015,31 +1879,29 @@ int UtcDaliRenderTaskOnce08(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+
+  tet_printf("  FailImageLoad\n");
 
   FailImageLoad(application, imageRequestId); // Need to run Update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) ); // nothing to draw
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) ); // nothing to draw
+  application.SendNotification();
+
+  // Drawing empty framebuffer, so will still get a GL sync
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  sync.SetObjectSynced( lastSyncObj, true );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
+  // Expect finished signal, as all resources are complete
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,   finished, true, false ) );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
   END_TEST;
 }
 
@@ -2076,23 +1938,20 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
   // MAKE SOURCE VISIBLE
   secondRootActor.SetVisible(true);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
   // FINISH RESOURCE LOADING - expect immediate rendering yet
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false ) );
   END_TEST;
 }
 
@@ -2127,23 +1986,18 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
   application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification(); //         Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
   END_TEST;
 }
 
@@ -2180,23 +2034,20 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // CHANGE TO RENDER ONCE
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification(); //         Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
   END_TEST;
 }
 
@@ -2237,8 +2088,8 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE, RESOURCES BECOME NOT READY
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -2247,18 +2098,18 @@ int UtcDaliRenderTaskOnceNoSync03(void)
   ReloadImage(application, secondRootActor.GetImage());
   application.SendNotification(); //         Input,    Expected  Input,    Expected
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
   DALI_TEST_EQUALS( secondRootActor.GetImage().GetLoadingState(), Dali::ResourceLoading, TEST_LOCATION);
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // FINISH RESOURCE LOADING
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, true, true ) );
   application.GetPlatform().ClearReadyResources();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   END_TEST;
 }
 #endif
@@ -2299,25 +2150,19 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true,  false ) );
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true,  false ) );
   END_TEST;
 }
 
@@ -2362,14 +2207,14 @@ int UtcDaliRenderTaskOnceNoSync06(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true,  false ) );
 
   // Expect SetRefreshRate to have been called again
   // Prevent next finished signal calling refresh once again
@@ -2377,11 +2222,8 @@ int UtcDaliRenderTaskOnceNoSync06(void)
   connectionTracker.DisconnectAll();
   newTask.FinishedSignal().Connect( &connectionTracker, renderTaskFinished );
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true,  false ) );
   END_TEST;
 }
 
@@ -2422,23 +2264,19 @@ int UtcDaliRenderTaskOnceNoSync07(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true,  false ) );
 
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true,  false ) );
   END_TEST;
 }
 
@@ -2473,24 +2311,20 @@ int UtcDaliRenderTaskOnceNoSync08(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,     Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
   application.SendNotification();
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
 
   FailImageLoad(application, imageRequestId); // Need to run Update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) ); // nothing to draw
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, true  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) ); // nothing to draw
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, true,  false  ) );
+
   END_TEST;
 }
 
@@ -2539,28 +2373,18 @@ int UtcDaliRenderTaskOnceChain01(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false, true ) );
   DALI_TEST_CHECK( secondFinished == false );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false, true ) );
   DALI_TEST_CHECK( secondFinished == false );
 
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,  firstFinished, false, true ) );
   DALI_TEST_CHECK( secondFinished == false );
   application.GetPlatform().ClearReadyResources();
 
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,  firstFinished, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,  firstFinished, true,  false ) );
   DALI_TEST_CHECK( secondFinished == true );
-
-  secondFinished = false;
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   firstFinished, false ) );
-  DALI_TEST_CHECK( secondFinished == false );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   firstFinished, false ) );
-  DALI_TEST_CHECK( secondFinished == false );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   firstFinished, false ) );
-  DALI_TEST_CHECK( secondFinished == false );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   firstFinished, false ) );
-  DALI_TEST_CHECK( secondFinished == false );
 
   END_TEST;
 }

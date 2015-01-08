@@ -57,9 +57,6 @@ ConstraintBase::~ConstraintBase()
 
 #ifdef DEBUG_ENABLED
   --mCurrentInstanceCount;
-#ifndef EMSCRIPTEN
-  memset ( &mWeight, 0xFA, sizeof(mWeight) ); // Fill with garbage pattern to help detect invalid memory access
-#endif
 #endif
 }
 
