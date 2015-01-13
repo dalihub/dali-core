@@ -229,7 +229,7 @@ public:
   /**
    * Get the archive version number read from the archive
    */
-  const unsigned int GetFileVersion() const
+  unsigned int GetFileVersion() const
   {
     return mFileVersion;
   }

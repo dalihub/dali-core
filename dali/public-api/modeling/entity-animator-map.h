@@ -162,7 +162,7 @@ public:
    *
    * @return the duration in seconds
    */
-  const float GetDuration() const { return mDuration; }
+  float GetDuration() const { return mDuration; }
 
 private:
   std::string   mEntityName;          ///< The entity name

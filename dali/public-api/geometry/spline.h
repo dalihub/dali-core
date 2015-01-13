@@ -166,7 +166,7 @@ public:
    * @param[in] x The X
    * @return the Y value
    */
-  const float GetYFromMonotonicX(float x) const;
+  float GetYFromMonotonicX(float x) const;
 
   /**
    * @brief For a 2 dimensional curve (z=0), given a parameter 0.0 - 1.0, return the
@@ -181,7 +181,7 @@ public:
    * @param[in] parameter    - the parameter to use in the parametric formula
    * @return y value    - the interpolated point's Y value
    */
-  const float GetY(unsigned int segmentIndex, float parameter) const;
+  float GetY(unsigned int segmentIndex, float parameter) const;
 
 
 private:
@@ -193,7 +193,7 @@ private:
    * @param[out] segmentIndex - the returned segment index
    * @return True if the segment was found.
    */
-  const bool FindSegment(float x, int& segmentIndex) const;
+  bool FindSegment(float x, int& segmentIndex) const;
 
   /**
    * @brief Given two knots and control points, interpolate to find the
@@ -208,7 +208,7 @@ private:
    * @param[in] P1_X the ending knot's X.
    * @return         the corresponding parameter.
    */
-  const float ApproximateCubicBezierParameter (float atX, float P0_X, float C0_X, float C1_X, float P1_X ) const;
+  float ApproximateCubicBezierParameter (float atX, float P0_X, float C0_X, float C1_X, float P1_X ) const;
 
 private:
   std::vector<Vector3>   mKnots;          ///< The set of knot points

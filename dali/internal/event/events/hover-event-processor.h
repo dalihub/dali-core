@@ -37,7 +37,7 @@ struct HoverEvent;
 namespace Internal
 {
 
-class ActorObserver;
+struct ActorObserver;
 class Stage;
 
 /**
