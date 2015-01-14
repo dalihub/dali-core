@@ -27,7 +27,6 @@
 #include <dali/public-api/images/pixel.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/common/bitmap-upload.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/integration-api/bitmap.h>
 
@@ -134,23 +133,6 @@ public:
    * @param[in] area The area of the bitmap that has changed
    */
   virtual void DispatchUpdateTextureArea( ResourceId id, const RectArea& area ) = 0;
-
- /**
-   * Dispatch a message to insert an array of bitmaps into the texture.
-   * Used for uploading multiple images into an atlas.
-   * @param[in] id Resource id of the texture
-   * @param[in] uploadArray array of BitmapUpload structures
-   */
-  virtual void DispatchUploadBitmapArrayToTexture( ResourceId id, const BitmapUploadArray& uploadArray ) = 0;
-
-  /**
-   * Dispatch a message to clear multiple areas of a texture to a specific color
-   * @param[in] id Resource id of the texture to clear
-   * @param[in] area Rectangles to clear
-   * @param[in] blockSize Size of block to clear
-   * @param[in] color Clear color (as a pixel value)
-   */
-  virtual void DispatchClearAreas( ResourceId id, const BitmapClearArray& area, std::size_t blockSize, uint32_t color ) = 0;
 
   /**
    * Dispatch a message to discard a texture

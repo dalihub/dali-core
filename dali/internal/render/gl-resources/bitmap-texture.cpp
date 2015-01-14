@@ -76,62 +76,6 @@ BitmapTexture::~BitmapTexture()
   // on the render thread. (And avoiding a potentially problematic virtual call in the destructor)
 }
 
-void BitmapTexture::UploadBitmapArray( const BitmapUploadArray& bitmapArray )
-{
-  DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
-
-  if( mId == 0 )
-  {
-    CreateGlTexture();
-  }
-
-  mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
-  mContext.Bind2dTexture(mId);
-  mContext.PixelStorei(GL_UNPACK_ALIGNMENT, 1); // We always use tightly packed data
-
-  GLenum pixelFormat   = GL_RGBA;
-  GLenum pixelDataType = GL_UNSIGNED_BYTE;
-
-  Integration::ConvertToGlFormat(mPixelFormat, pixelDataType, pixelFormat);
-
-  // go through each bitmap uploading it
-
-  for( BitmapUploadArray::const_iterator iter =  bitmapArray.begin(), endIter = bitmapArray.end(); iter != endIter ; ++iter)
-  {
-    const BitmapUpload& bitmapItem((*iter));
-
-    DALI_ASSERT_ALWAYS(bitmapItem.mPixelData);
-
-    const unsigned char* pixels = bitmapItem.mPixelData;
-
-    DALI_ASSERT_DEBUG( (pixels!=NULL) && "bitmap has no data \n");
-
-    unsigned int bitmapWidth(bitmapItem.mWidth);
-    unsigned int bitmapHeight(bitmapItem.mHeight);
-
-    DALI_LOG_INFO(Debug::Filter::gImage, Debug::General, "upload bitmap to texture :%d y:%d w:%d h:%d\n",
-                            bitmapItem.mXpos,
-                            bitmapItem.mYpos,
-                            bitmapWidth,
-                            bitmapHeight);
-
-    mContext.TexSubImage2D(GL_TEXTURE_2D,
-                           0,                   /* mip map level */
-                           bitmapItem.mXpos,    /* X pos */
-                           bitmapItem.mYpos,    /* Y pos */
-                           bitmapWidth,         /* width */
-                           bitmapHeight,        /* height */
-                           pixelFormat,         /* our bitmap format (should match internal format) */
-                           pixelDataType,       /* pixel data type */
-                           pixels);             /* texture data */
-
-    if( BitmapUpload::DISCARD_PIXEL_DATA == bitmapItem.mDiscard)
-    {
-      delete [] bitmapItem.mPixelData;
-    }
-  }
-}
-
 bool BitmapTexture::HasAlphaChannel() const
 {
   return Pixel::HasAlpha(mPixelFormat);
@@ -315,53 +259,6 @@ void BitmapTexture::UpdateArea( const RectArea& updateArea )
         }
       }
     }
-  }
-}
-
-void BitmapTexture::ClearAreas( const BitmapClearArray& areaArray, std::size_t blockSize, uint32_t color )
-{
-  if(mId > 0)
-  {
-    DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
-    DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::Verbose, "BitmapTexture::AreaUpdated()\n");
-
-    GLenum pixelFormat   = GL_RGBA;
-    GLenum pixelDataType = GL_UNSIGNED_BYTE;
-    Integration::ConvertToGlFormat(mPixelFormat, pixelDataType, pixelFormat);
-
-    mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
-    mContext.Bind2dTexture(mId);
-
-    size_t numPixels = blockSize*blockSize;
-    size_t bytesPerPixel = Pixel::GetBytesPerPixel(mPixelFormat);
-    char* clearPixels = (char*)malloc(numPixels * bytesPerPixel);
-
-    for(size_t i=0; i<numPixels; i++)
-    {
-      memcpy(&clearPixels[i*bytesPerPixel], &color, bytesPerPixel);
-    }
-
-    for( BitmapClearArray::const_iterator iter =  areaArray.begin(), endIter = areaArray.end(); iter != endIter ; ++iter)
-    {
-      const Vector2& clearPos((*iter));
-
-      mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 ); // We always use tightly packed data
-      DALI_LOG_INFO( Debug::Filter::gImage, Debug::General, "Update x:%0.2f y:%0.2f w:%d h:%d\n",
-                     clearPos.x, clearPos.y, blockSize, blockSize );
-
-      mContext.TexSubImage2D(GL_TEXTURE_2D,
-                             0,
-                             clearPos.x,
-                             clearPos.y,
-                             blockSize,
-                             blockSize,
-                             pixelFormat,         /* our bitmap format (should match internal format) */
-                             pixelDataType,       /* pixel data type */
-                             clearPixels);        /* texture data */
-
-      INCREASE_BY( PerformanceMonitor::TEXTURE_DATA_UPLOADED, numPixels * bytesPerPixel );
-    }
-    free(clearPixels);
   }
 }
 

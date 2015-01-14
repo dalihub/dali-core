@@ -403,12 +403,6 @@ ResourceTicketPtr ResourceClient::AllocateTexture( unsigned int width,
   return newTicket;
 }
 
-void ResourceClient::UpdateTexture(  ResourceId id,
-                                     BitmapUploadArray uploadArray )
-{
-  RequestUpdateTextureMessage(  mUpdateManager.GetEventToUpdate(), mResourceManager, id, uploadArray );
-}
-
 ResourceTicketPtr ResourceClient::AllocateMesh( OwnerPointer<MeshData>& meshData )
 {
   ResourceTicketPtr newTicket;

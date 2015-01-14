@@ -27,7 +27,6 @@
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-lifetime-observer.h>
-#include <dali/internal/common/bitmap-upload.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/modeling/internal-mesh-data.h>
 
@@ -222,14 +221,6 @@ public:
   ResourceTicketPtr AllocateTexture( unsigned int width,
                                      unsigned int height,
                                      Pixel::Format pixelformat );
-
-  /**
-   * Update a texture with an array of bitmaps.
-   * @param[in] id texture resource id
-   * @param[in] uploadArray the upload array
-   */
-  void UpdateTexture( ResourceId id,
-                      BitmapUploadArray uploadArray );
 
   /**
    * Requests allocation of a mesh resource

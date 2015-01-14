@@ -155,43 +155,6 @@ void TextureCache::UpdateTextureArea( ResourceId id, const Dali::RectArea& area 
   }
 }
 
-void TextureCache::AddBitmapUploadArray( ResourceId id, const BitmapUploadArray& uploadArray )
-{
-  DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::AddBitmapUploadArray(id=%i )\n", id);
-
-  TextureIter textureIter = mTextures.find(id);
-
-  DALI_ASSERT_DEBUG( textureIter != mTextures.end() );
-  if( textureIter != mTextures.end() )
-  {
-    TexturePointer texturePtr = textureIter->second;
-    if( texturePtr )
-    {
-      BitmapTexture* texture = static_cast< BitmapTexture* >( texturePtr.Get() );
-      texture->UploadBitmapArray( uploadArray );
-    }
-  }
-}
-
-void TextureCache::ClearAreas( ResourceId id,
-                               const BitmapClearArray& areaArray,
-                               std::size_t blockSize,
-                               uint32_t color )
-{
-  DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::ClearAreas(id: %d)\n", id);
-  TextureIter textureIter = mTextures.find(id);
-  DALI_ASSERT_DEBUG( textureIter != mTextures.end() );
-  if( textureIter != mTextures.end() )
-  {
-    TexturePointer texturePtr = textureIter->second;
-    if( texturePtr )
-    {
-      BitmapTexture* texture = static_cast< BitmapTexture* >( texturePtr.Get() );
-      texture->ClearAreas( areaArray, blockSize, color );
-    }
-  }
-}
-
 void TextureCache::DiscardTexture( ResourceId id )
 {
   bool deleted = false;
@@ -504,36 +467,6 @@ void TextureCache::DispatchUpdateTextureArea( ResourceId id, const Dali::RectAre
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
     new (slot) DerivedType( this, &TextureCache::UpdateTextureArea, id, area );
-  }
-}
-
-void TextureCache::DispatchUploadBitmapArrayToTexture( ResourceId id, const BitmapUploadArray& uploadArray )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue2< TextureCache, ResourceId, BitmapUploadArray > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::AddBitmapUploadArray, id, uploadArray );
-  }
-}
-
-void TextureCache::DispatchClearAreas( ResourceId id, const BitmapClearArray& areaArray, std::size_t blockSize, uint32_t color )
-{
-  // NULL, means being shutdown, so ignore msgs
-  if( mSceneGraphBuffers != NULL )
-  {
-    typedef MessageValue4< TextureCache, ResourceId, BitmapClearArray, std::size_t, uint32_t > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::ClearAreas, id, areaArray, blockSize, color );
   }
 }
 

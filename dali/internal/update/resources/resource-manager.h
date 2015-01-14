@@ -35,7 +35,6 @@
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/common/bitmap-upload.h>
 #include <dali/internal/event/modeling/model-data-impl.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/effects/shader-factory.h>
@@ -237,13 +236,6 @@ public: // Used by ResourceClient
    * @param[in] pixelFormat Pixel format
    */
   void HandleAllocateTextureRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat );
-
-  /**
-   * Upload an array of bitmaps to a texture.
-   * @param[in] id The resource id
-   * @param[in] uploadArray  bitmap upload array.
-   */
-  void HandleUpdateTextureRequest( ResourceId id,  const BitmapUploadArray& uploadArray );
 
   /**
    * Requests allocation of a mesh resource
@@ -518,20 +510,6 @@ inline void RequestAllocateTextureMessage(EventToUpdate& eventToUpdate,
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAllocateTextureRequest, id, width, height, pixelFormat );
-}
-
-inline void RequestUpdateTextureMessage(EventToUpdate& eventToUpdate,
-                                               ResourceManager& manager,
-                                               ResourceId id,
-                                               BitmapUploadArray uploadArray )
-{
-  typedef MessageValue2< ResourceManager, ResourceId, BitmapUploadArray > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleUpdateTextureRequest, id, uploadArray );
 }
 
 inline void RequestAllocateMeshMessage( EventToUpdate& eventToUpdate,

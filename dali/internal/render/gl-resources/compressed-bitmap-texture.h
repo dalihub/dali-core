@@ -27,7 +27,6 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/common/bitmap-upload.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/internal/event/images/bitmap-compressed.h>
 #include <dali/integration-api/debug.h>

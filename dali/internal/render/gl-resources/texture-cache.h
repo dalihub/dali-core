@@ -136,31 +136,12 @@ public:
    */
   void UpdateTexture( ResourceId id, Integration::BitmapPtr bitmap );
 
- /**
-   * Add an array of bitmaps to an existing texture used as an Atlas
-   * @param[in] id Resource id of the texture
-   * @param[in] uploadArray array of upload bitmap structures
-   */
-  void AddBitmapUploadArray( ResourceId id, const BitmapUploadArray& uploadArray );
-
   /**
    * Update the area of the texture from the associated bitmap
    * @param[in] id Resource Id of the bitmap
    * @param[in] area The area of the bitmap that has changed
    */
   void UpdateTextureArea( ResourceId id, const RectArea& area );
-
-  /**
-   * Clear multiple areas of the texture
-   * @param[in] id Resource id of the texture
-   * @param[in] area Areas of the texture to clear
-   * @param[in] blockSize Size of block to clear
-   * @param[in] color Color to clear
-   */
-  void ClearAreas( ResourceId id,
-                   const BitmapClearArray& area,
-                   std::size_t blockSize,
-                   uint32_t color );
 
   /**
    * Discard texture associated with resource ID
@@ -270,16 +251,6 @@ protected: // Implements TextureCacheDispatcher
    * @copydoc TextureCacheDispatcher::DispatchUpdateTextureArea()
    */
   virtual void DispatchUpdateTextureArea( ResourceId id, const RectArea& area );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchUploadBitmapArrayToTexture()
-   */
-  virtual void DispatchUploadBitmapArrayToTexture( ResourceId id, const BitmapUploadArray& uploadArray );
-
-  /**
-   * @copydoc TextureCacheDispatcher::DispatchClearAreas()
-   */
-  virtual void DispatchClearAreas( ResourceId id, const BitmapClearArray& area, std::size_t blockSize, uint32_t color );
 
   /**
    * @copydoc TextureCacheDispatcher::DispatchDiscardTexture()

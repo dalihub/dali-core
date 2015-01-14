@@ -357,11 +357,6 @@ void ResourceManager::HandleAllocateTextureRequest( ResourceId id, unsigned int 
   mImpl->mTextureCacheDispatcher.DispatchCreateTexture( id, width, height, pixelFormat, true /* true = clear the texture */ );
 }
 
-void ResourceManager::HandleUpdateTextureRequest( ResourceId id,  const BitmapUploadArray& uploadArray )
-{
-  mImpl->mTextureCacheDispatcher.DispatchUploadBitmapArrayToTexture( id, uploadArray );
-}
-
 void ResourceManager::HandleAllocateMeshRequest( ResourceId id, MeshData* meshData )
 {
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAllocateMeshRequest(id:%u)\n", id);
