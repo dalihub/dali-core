@@ -593,7 +593,7 @@ bool Program::CompileShader( GLenum shaderType, GLuint& shaderId, const char* sr
     if(nLength > 0)
     {
       Dali::Vector< char > szLog;
-      szLog.Reserve( nLength );
+      szLog.Resize( nLength );
       mGlAbstraction.GetShaderInfoLog( shaderId, nLength, &nLength, szLog.Begin() );
       DALI_LOG_ERROR( "Shader Compiler Error: %s\n", szLog.Begin() );
     }
@@ -617,18 +617,17 @@ void Program::Link()
   {
     DALI_LOG_ERROR("Shader failed to link \n");
 
-    char* szLog = NULL;
     GLint nLength;
     mGlAbstraction.GetProgramiv( mProgramId, GL_INFO_LOG_LENGTH, &nLength);
     if(nLength > 0)
     {
-      szLog = new char[ nLength ];
-      mGlAbstraction.GetProgramInfoLog( mProgramId, nLength, &nLength, szLog );
-      DALI_LOG_ERROR( "Shader Link Error: %s\n", szLog );
-      delete [] szLog;
+      Dali::Vector< char > szLog;
+      szLog.Resize( nLength );
+      mGlAbstraction.GetProgramInfoLog( mProgramId, nLength, &nLength, szLog.Begin() );
+      DALI_LOG_ERROR( "Shader Link Error: %s\n", szLog.Begin() );
     }
 
-    DALI_ASSERT_DEBUG(0);
+    DALI_ASSERT_ALWAYS( 0 && "Shader linking failure" );
   }
 
   mLinked = linked != GL_FALSE;
