@@ -802,7 +802,7 @@ public:
    */
   void VertexAttribDivisor ( GLuint index, GLuint divisor )
   {
-    LOG_GL("VertexAttribPointer(%d, %d)\n", index, divisor );
+    LOG_GL("VertexAttribDivisor(%d, %d)\n", index, divisor );
     CHECK_GL( mGlAbstraction, mGlAbstraction.VertexAttribDivisor( index, divisor ) );
   }
 

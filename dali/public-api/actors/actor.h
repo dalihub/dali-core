@@ -1299,7 +1299,7 @@ public: // Dynamics
    *
    * @return The number of DynamicsJoint objects added to this actor
    */
-  const int GetNumberOfJoints() const;
+  int GetNumberOfJoints() const;
 
   /**
    * @brief Get a joint by index.

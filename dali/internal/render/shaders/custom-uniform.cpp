@@ -46,7 +46,7 @@ void CustomUniform::Reset()
   mCacheIndex = 0;
 }
 
-const int CustomUniform::GetUniformLocation( Program& program, const char* name )
+int CustomUniform::GetUniformLocation( Program& program, const char* name )
 {
   if( 0 == mCacheIndex )
   {

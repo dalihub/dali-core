@@ -63,7 +63,7 @@ public: // API
    * @param program to use
    * @param name of the uniform
    */
-  const int GetUniformLocation( Program& program, const char* name );
+  int GetUniformLocation( Program& program, const char* name );
 
 private: // Data
 
