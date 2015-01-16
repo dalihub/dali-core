@@ -254,11 +254,11 @@ public:
    */
   void Bake(BufferIndex bufferIndex, bool value)
   {
-    // check if the value actually changed to avoid dirtying nodes unnecessarily
-    if( mValue[bufferIndex] != value )
+    // bake has to check the base value as current buffer value can be correct by constraint or something else
+    if( mBaseValue != value )
     {
-      mValue[bufferIndex] = value;
       mBaseValue = value;
+      mValue[bufferIndex] = value;
 
       OnBake();
     }
