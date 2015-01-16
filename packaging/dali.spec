@@ -59,12 +59,6 @@ PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
 LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread"
 
-%if 0%{?sec_build_binary_debug_enable}
-export CFLAGS="$CFLAGS -DTIZEN_DEBUG_ENABLE"
-export CXXFLAGS="$CXXFLAGS -DTIZEN_DEBUG_ENABLE"
-export FFLAGS="$FFLAGS -DTIZEN_DEBUG_ENABLE"
-%endif
-
 %ifarch %{arm}
 CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"
 %endif
