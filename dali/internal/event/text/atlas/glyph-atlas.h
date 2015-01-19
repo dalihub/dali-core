@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/text/atlas/atlas.h>
+#include <dali/internal/event/text/atlas/texture-atlas.h>
 #include <dali/internal/event/text/atlas/atlas-ranking.h>
 #include <dali/internal/event/text/glyph-status/glyph-status.h>
 #include <dali/internal/event/text/glyph-status/glyph-status-container.h>
@@ -272,7 +272,7 @@ private:
 
   GlyphRequestList            mRequestList;             ///< list of GlyphResourceRequest objects
   GlyphStatusContainer        mGlyphContainer;          ///< Glyph status container
-  Atlas                       mAtlas;                   ///< has block allocation algorithm
+  TextureAtlas                mAtlas;                   ///< has block allocation algorithm
   unsigned int                mTextureId;               ///< texture id
   TextureIdList               mTextureIdOfReplacedAtlases; ///< list of previously replaced atlases
 

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/text/atlas/atlas.h>
+#include <dali/internal/event/text/atlas/texture-atlas.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -60,8 +60,8 @@ void GetByteAndBitPosition( unsigned int blockNum, unsigned int& bytePos, unsign
 } // un-named namespace
 
 
-Atlas::Atlas(const unsigned int atlasSize,
-            const unsigned int blockSize)
+TextureAtlas::TextureAtlas(const unsigned int atlasSize,
+                           const unsigned int blockSize)
 : mSize(atlasSize),
   mBlockSize(blockSize)
 {
@@ -80,12 +80,12 @@ Atlas::Atlas(const unsigned int atlasSize,
   mFreeBlocks.resize( bitMaskBytes );  // contents auto-initialised to zero
 }
 
-Atlas::~Atlas()
+TextureAtlas::~TextureAtlas()
 {
 
 }
 
-void Atlas::CloneContents( Atlas* clone )
+void TextureAtlas::CloneContents( TextureAtlas* clone )
 {
   // Internally atlas allocation is done using a 1 dimensional array.
   // A single bit set in the array represents an allocation.
@@ -137,7 +137,7 @@ void Atlas::CloneContents( Atlas* clone )
 #endif
 }
 
-bool Atlas::Insert( unsigned int id)
+bool TextureAtlas::Insert( unsigned int id)
 {
   unsigned int blockNum(0);
 
@@ -162,7 +162,7 @@ bool Atlas::Insert( unsigned int id)
   return true;
 }
 
-void Atlas::Remove(unsigned int id)
+void TextureAtlas::Remove(unsigned int id)
 {
   BlockLookup::const_iterator iter = mBlockLookup.find( id );
 
@@ -174,12 +174,12 @@ void Atlas::Remove(unsigned int id)
   mBlockLookup.erase( id );
 }
 
-unsigned int Atlas::GetSize() const
+unsigned int TextureAtlas::GetSize() const
 {
   return mSize;
 }
 
-void Atlas::GetXYPosition( unsigned int id, unsigned int& xPos, unsigned int& yPos ) const
+void TextureAtlas::GetXYPosition( unsigned int id, unsigned int& xPos, unsigned int& yPos ) const
 {
   AtlasItem item;
 
@@ -190,7 +190,7 @@ void Atlas::GetXYPosition( unsigned int id, unsigned int& xPos, unsigned int& yP
   yPos = item.yPos;
 }
 
-UvRect Atlas::GetUvCoordinates( unsigned int id ) const
+UvRect TextureAtlas::GetUvCoordinates( unsigned int id ) const
 {
   AtlasItem item;
 
@@ -200,14 +200,14 @@ UvRect Atlas::GetUvCoordinates( unsigned int id ) const
   return item.uv;
 }
 
-Atlas::Atlas()
+TextureAtlas::TextureAtlas()
 :mSize( 0 ),
  mBlockSize( 0 )
 {
 
 }
 
-bool Atlas::AllocateBlock( unsigned int& blockNum )
+bool TextureAtlas::AllocateBlock( unsigned int& blockNum )
 {
   // scan the bitmask for a free block
   // each byte is a bitmask for 8 blocks, so 0000 0011, means blocks 1 and 2 are allocated
@@ -236,7 +236,7 @@ bool Atlas::AllocateBlock( unsigned int& blockNum )
   return false;
 }
 
-void Atlas::DeAllocateBlock( unsigned int blockNum )
+void TextureAtlas::DeAllocateBlock( unsigned int blockNum )
 {
   unsigned int bytePos,bitPos;
 
@@ -254,7 +254,7 @@ void Atlas::DeAllocateBlock( unsigned int blockNum )
 
 }
 
-void Atlas::FillAtlasItem( unsigned int blockNum, AtlasItem& atlasItem, UvMode mode ) const
+void TextureAtlas::FillAtlasItem( unsigned int blockNum, AtlasItem& atlasItem, UvMode mode ) const
 {
   UvRect& uv(atlasItem.uv);
 
@@ -279,7 +279,7 @@ void Atlas::FillAtlasItem( unsigned int blockNum, AtlasItem& atlasItem, UvMode m
 
 }
 
-unsigned int Atlas::GetBlockNumber( unsigned int id) const
+unsigned int TextureAtlas::GetBlockNumber( unsigned int id) const
 {
   BlockLookup::const_iterator iter = mBlockLookup.find( id );
 
@@ -288,12 +288,12 @@ unsigned int Atlas::GetBlockNumber( unsigned int id) const
   return  (*iter).second;
 }
 
-unsigned int Atlas::GetBlocksPerRow() const
+unsigned int TextureAtlas::GetBlocksPerRow() const
 {
   return  mSize / mBlockSize;
 }
 
-void Atlas::GetPositionOfBlock( unsigned int block1dPos, unsigned int& row, unsigned int& column )
+void TextureAtlas::GetPositionOfBlock( unsigned int block1dPos, unsigned int& row, unsigned int& column )
 {
   column = 0;
   if( block1dPos > 0)
@@ -307,7 +307,7 @@ void Atlas::GetPositionOfBlock( unsigned int block1dPos, unsigned int& row, unsi
   GetByteAndBitPosition( block1dPos, bytePos, bitPos );
 }
 
-unsigned int Atlas::AllocateBlock( unsigned int row, unsigned int column )
+unsigned int TextureAtlas::AllocateBlock( unsigned int row, unsigned int column )
 {
   unsigned int blockNum = (row * GetBlocksPerRow()) + column;
 

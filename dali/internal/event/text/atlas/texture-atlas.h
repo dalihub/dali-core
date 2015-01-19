@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_ATLAS_H__
-#define __DALI_INTERNAL_ATLAS_H__
+#ifndef __DALI_INTERNAL_TEXTURE_ATLAS_H__
+#define __DALI_INTERNAL_TEXTURE_ATLAS_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -59,7 +59,7 @@ namespace Internal
  * To debug the class, enable DEBUG_ATLAS in atlas-debug.h
  *
  */
-class Atlas : public AtlasUvInterface
+class TextureAtlas : public AtlasUvInterface
 {
 
 public:
@@ -69,18 +69,18 @@ public:
    * @param[in] atlasSize The width / height of the atlas (only square atlases are supported)
    * @param[in] blockSize The width  / height of each block in the atlas
    */
-  Atlas( const unsigned int atlasSize, const unsigned int blockSize );
+  TextureAtlas( const unsigned int atlasSize, const unsigned int blockSize );
 
   /**
    * Destructor
    */
-  virtual ~Atlas();
+  virtual ~TextureAtlas();
 
   /**
    * Clone the contents of the atlas passed as a parameter into this atlas
    * @param clone the atlas to clone
    */
-  void CloneContents( Atlas* clone );
+  void CloneContents( TextureAtlas* clone );
 
   /**
    * Inserts a block in to the atlas.
@@ -123,13 +123,13 @@ private:
   /**
    * Default constructor
    */
-  Atlas();
+  TextureAtlas();
 
   // Undefined copy constructor.
-  Atlas( const Atlas& );
+  TextureAtlas( const TextureAtlas& );
 
   // Undefined assignment operator.
-  Atlas& operator=( const Atlas& );
+  TextureAtlas& operator=( const TextureAtlas& );
 
   /**
    * Allocate a block in the atlas
@@ -196,7 +196,7 @@ private:
   unsigned int GetBlockNumber( unsigned int id) const;
 
   /**
-   * Gets the blocks per row. E.g. a 4 x 4 Atlas will return 4.
+   * Gets the blocks per row. E.g. a 4 x 4 TextureAtlas will return 4.
    * @return the number of blocks per row.
    */
   unsigned int GetBlocksPerRow( ) const;
@@ -212,7 +212,7 @@ private:
 
   /**
    * Gets a position of the block within the atlas.
-   * E.g. In a 8 x 8 Atlas, block 8 (zero based) with have row = 1, col = 0.
+   * E.g. In a 8 x 8 TextureAtlas, block 8 (zero based) with have row = 1, col = 0.
    *
    * @param[in] block1dPos block id
    * @param[out] row atlas row
@@ -242,12 +242,10 @@ private:
   unsigned int  mBlockSize;               ///< The block size
   FreeBlocks    mFreeBlocks;              ///< Bitmask of free blocks
   BlockLookup   mBlockLookup;             ///< lookup between block number and unique id given by user
-
-
-}; // class Atlas
+};
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_ATLAS_H__
+#endif // __DALI_INTERNAL_TEXTURE_ATLAS_H__
