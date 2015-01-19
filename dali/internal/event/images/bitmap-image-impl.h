@@ -160,6 +160,12 @@ public:
    */
   unsigned int GetBufferStride() const;
 
+  /**
+   * Get the pixel format
+   * @return The pixel format
+   */
+  Pixel::Format GetPixelFormat() const;
+
 protected: // From Resource
   /**
    * @copydoc Dali::Internal::Image::Connect

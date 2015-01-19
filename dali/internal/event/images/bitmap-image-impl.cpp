@@ -154,6 +154,20 @@ unsigned int BitmapImage::GetBufferStride() const
   return bufferStride;
 }
 
+Pixel::Format BitmapImage::GetPixelFormat() const
+{
+  Pixel::Format format( Pixel::RGBA8888 );
+
+  Integration::Bitmap* const bitmap = GetBitmap();
+
+  if( bitmap )
+  {
+    format = bitmap->GetPixelFormat();
+  }
+
+  return format;
+}
+
 void BitmapImage::Connect()
 {
   ++mConnectionCount;
