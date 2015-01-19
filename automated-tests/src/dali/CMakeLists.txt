@@ -13,6 +13,7 @@ SET(TC_SOURCES
         utc-Dali-AnimatableMesh.cpp
         utc-Dali-Animation.cpp
         utc-Dali-Any.cpp
+        utc-Dali-Atlas.cpp
         utc-Dali-BaseHandle.cpp
         utc-Dali-BitmapImage.cpp
         utc-Dali-CameraActor.cpp

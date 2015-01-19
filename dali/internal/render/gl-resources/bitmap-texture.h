@@ -90,7 +90,14 @@ public: // Message interface
    */
   void ClearAreas( const BitmapClearArray& areaArray, std::size_t blockSize, uint32_t color );
 
+  /**
+   * Retrieve the bitmap
+   * @return The bitmap or NULL if already discarded
+   */
+  Integration::Bitmap* GetBitmap() { return mBitmap.Get(); }
+
 public:
+
   /**
    * @copydoc Texture::Init
    */
@@ -122,6 +129,14 @@ public:
    * @param[in] bitmap The new bitmap
    */
   virtual void Update( Integration::Bitmap* bitmap );
+
+  /**
+   * Update part of the texture with a different bitmap
+   * @param[in] srcBitmap The bitmap to copy from
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  virtual void Update( Integration::Bitmap* srcBitmap, std::size_t xOffset, std::size_t yOffset );
 
   /**
    * Bitmap area has been modified - update the texture appropriately.

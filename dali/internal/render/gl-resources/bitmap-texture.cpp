@@ -203,7 +203,6 @@ void BitmapTexture::AreaUpdated( const RectArea& updateArea, const unsigned char
   }
 }
 
-
 void BitmapTexture::AssignBitmap( bool generateTexture, const unsigned char* pixels )
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
@@ -282,6 +281,51 @@ void BitmapTexture::Update( Integration::Bitmap* bitmap )
       mPixelFormat = mBitmap->GetPixelFormat();
 
       AssignBitmap( false, pixels );
+    }
+  }
+}
+
+void BitmapTexture::Update( Integration::Bitmap* srcBitmap, std::size_t xOffset, std::size_t yOffset )
+{
+  if( NULL != srcBitmap )
+  {
+    GLenum pixelFormat   = GL_RGBA;
+    GLenum pixelDataType = GL_UNSIGNED_BYTE;
+    Integration::ConvertToGlFormat( mPixelFormat, pixelDataType, pixelFormat );
+
+    if( !mId )
+    {
+      mContext.GenTextures( 1, &mId );
+
+      mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
+      mContext.Bind2dTexture( mId );
+      mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+
+      mContext.TexImage2D( GL_TEXTURE_2D, 0, pixelFormat, mWidth, mHeight, 0, pixelFormat, pixelDataType, NULL );
+      mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+      mContext.TexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+    }
+    else
+    {
+      mContext.ActiveTexture( TEXTURE_UNIT_UPLOAD );
+      mContext.Bind2dTexture( mId );
+      mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
+    }
+
+    const unsigned char* pixels = srcBitmap->GetBuffer();
+    unsigned int srcWidth = srcBitmap->GetImageWidth();
+    const unsigned int pixelDepth = Pixel::GetBytesPerPixel( mPixelFormat );
+
+    unsigned int yBottom = yOffset + srcBitmap->GetImageHeight();
+
+    for( unsigned int y = yOffset; y < yBottom; y++ )
+    {
+      mContext.TexSubImage2D( GL_TEXTURE_2D, 0,
+                              xOffset, y,
+                              srcWidth, 1,
+                              pixelFormat, pixelDataType, pixels );
+
+      pixels += srcWidth * pixelDepth;
     }
   }
 }

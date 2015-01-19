@@ -273,6 +273,15 @@ public: // Used by ResourceClient
   void HandleUpdateBitmapAreaRequest( ResourceId textureId, const Dali::RectArea& area );
 
   /**
+   * Upload a bitmap to a position within a specified texture
+   * @param[in] destId The destination texture ID
+   * @param[in] srcId The resource ID of the bitmap to upload
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void HandleUploadBitmapRequest( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
+
+  /**
    * Upload mesh buffer changes.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] id The ID of a Mesh resource.
@@ -628,6 +637,22 @@ inline void RequestUpdateBitmapAreaMessage( EventToUpdate& eventToUpdate,
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUpdateBitmapAreaRequest, id, area );
+}
+
+inline void RequestUploadBitmapMessage( EventToUpdate& eventToUpdate,
+                                        ResourceManager& manager,
+                                        ResourceId destId,
+                                        ResourceId srcId,
+                                        std::size_t xOffset,
+                                        std::size_t yOffset )
+{
+  typedef MessageValue4< ResourceManager, ResourceId, ResourceId, std::size_t, std::size_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &ResourceManager::HandleUploadBitmapRequest, destId, srcId, xOffset, yOffset );
 }
 
 inline void RequestUpdateMeshMessage( EventToUpdate& eventToUpdate,

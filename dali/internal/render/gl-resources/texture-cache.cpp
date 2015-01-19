@@ -137,6 +137,30 @@ void TextureCache::UpdateTexture( ResourceId id, Integration::BitmapPtr bitmap )
   }
 }
 
+void TextureCache::UpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset )
+{
+  DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::UpdateTexture(destId=%i srcId=%i )\n", destId, srcId );
+
+  BitmapTexture* srcTexture = TextureCache::GetBitmapTexture( srcId );
+  Integration::Bitmap* srcBitmap = ( srcTexture != NULL ) ? srcTexture->GetBitmap() : NULL;
+
+  if( srcBitmap )
+  {
+    TextureIter textureIter = mTextures.find( destId );
+    if( textureIter != mTextures.end() )
+    {
+      TexturePointer texturePtr = textureIter->second;
+      if( texturePtr )
+      {
+        texturePtr->Update( srcBitmap, xOffset, yOffset );
+
+        ResourcePostProcessRequest ppRequest( srcId, ResourcePostProcessRequest::UPLOADED );
+        mPostProcessResourceDispatcher.DispatchPostProcessRequest(ppRequest);
+      }
+    }
+  }
+}
+
 void TextureCache::UpdateTextureArea( ResourceId id, const Dali::RectArea& area )
 {
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::UpdateTextureArea(id=%i)\n", id );
@@ -264,7 +288,6 @@ void TextureCache::BindTexture( Texture *texture, ResourceId id, GLenum target, 
   }
 }
 
-
 Texture* TextureCache::GetTexture(ResourceId id)
 {
   Texture* texture = NULL;
@@ -293,6 +316,23 @@ Texture* TextureCache::GetTexture(ResourceId id)
   }
 
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::GetTexture(id:%u) : %p\n", id, texture);
+
+  return texture;
+}
+
+BitmapTexture* TextureCache::GetBitmapTexture(ResourceId id)
+{
+  BitmapTexture* texture = NULL;
+  TextureIter iter = mTextures.find( id );
+
+  if( iter != mTextures.end() )
+  {
+    TexturePointer texturePtr = iter->second;
+    if( texturePtr )
+    {
+      texture = dynamic_cast< BitmapTexture* >( texturePtr.Get() );
+    }
+  }
 
   return texture;
 }
@@ -489,6 +529,21 @@ void TextureCache::DispatchUpdateTexture( ResourceId id, Bitmap* bitmap )
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
     new (slot) DerivedType( this, &TextureCache::UpdateTexture, id, bitmap );
+  }
+}
+
+void TextureCache::DispatchUpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset )
+{
+  // NULL, means being shutdown, so ignore msgs
+  if( mSceneGraphBuffers != NULL )
+  {
+    typedef MessageValue4< TextureCache, ResourceId, ResourceId, std::size_t, std::size_t > DerivedType;
+
+    // Reserve some memory inside the render queue
+    unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
+
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new (slot) DerivedType( this, &TextureCache::UpdateTexture, destId, srcId, xOffset, yOffset );
   }
 }
 
