@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/image.h>
+#include <dali/public-api/images/pixel.h>
 #include <dali/public-api/math/rect.h>
 
 namespace Dali
@@ -68,7 +69,7 @@ public:
   /**
    * @brief Constructor which creates an uninitialized BitmapImage object.
    *
-   * Use Image::New(...) to create an initialised object.
+   * Use BitmapImage::New(...) to create an initialised object.
    */
   BitmapImage();
 
@@ -103,14 +104,12 @@ public:
    * @param [in] width          Image width in pixels
    * @param [in] height         Image height in pixels
    * @param [in] pixelFormat    The pixel format
-   * @param [in] loadPolicy     Controls time of loading a resource from the filesystem.
    * @param [in] releasePolicy  Optionally release memory when image is not visible on screen.
    * @return a handle to a new instance of BitmapImage
    */
   static BitmapImage New(unsigned int  width,
                          unsigned int  height,
                          Pixel::Format pixelFormat,
-                         LoadPolicy    loadPolicy,
                          ReleasePolicy releasePolicy);
 
   /**

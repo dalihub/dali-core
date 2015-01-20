@@ -32,7 +32,7 @@
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-observer.h>
-#include <dali/internal/event/images/image-impl.h>
+#include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/modeling/model-data-impl.h>
 #include <dali/integration-api/resource-cache.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
@@ -117,7 +117,7 @@ static TestTicketLifetimeObserver testTicketLifetimeObserver;
 
 Internal::ImagePtr LoadImage(TestApplication& application, char* name)
 {
-  Internal::ImagePtr image = Internal::Image::New(name, Dali::ImageAttributes::DEFAULT_ATTRIBUTES );
+  Internal::ResourceImagePtr image = Internal::ResourceImage::New( name, Dali::ImageAttributes::DEFAULT_ATTRIBUTES );
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();

@@ -26,8 +26,6 @@
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/resources/resource-client.h>
-#include <dali/internal/event/images/image-factory.h>
-#include <dali/internal/event/images/nine-patch-image-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 
 using namespace Dali::Integration;
@@ -41,63 +39,10 @@ namespace Internal
 namespace
 {
 
-BaseHandle CreateImage()
-{
-  ImagePtr image = Image::New();
-  return Dali::Image(image.Get());
-}
+TypeRegistration mType( typeid(Dali::Image), typeid(Dali::BaseHandle), NULL );
 
-TypeRegistration mType( typeid(Dali::Image), typeid(Dali::BaseHandle), CreateImage );
+Dali::SignalConnectorType signalConnector2(mType, Dali::Image::SIGNAL_IMAGE_UPLOADED, &Image::DoConnectSignal);
 
-Dali::SignalConnectorType signalConnector1(mType, Dali::Image::SIGNAL_IMAGE_LOADING_FINISHED,    &Image::DoConnectSignal);
-Dali::SignalConnectorType signalConnector2(mType, Dali::Image::SIGNAL_IMAGE_UPLOADED,            &Image::DoConnectSignal);
-
-}
-
-Image::Image( LoadPolicy loadPol, ReleasePolicy releasePol )
-: mImageFactory(ThreadLocalStorage::Get().GetImageFactory()),
-  mWidth(0),
-  mHeight(0),
-  mConnectionCount(0),
-  mLoadPolicy(loadPol),
-  mReleasePolicy(releasePol)
-{
-}
-
-ImagePtr Image::New()
-{
-  ImagePtr image = new Image;
-  image->Initialize();
-  return image;
-}
-
-ImagePtr Image::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
-{
-  ImagePtr image;
-  if( IsNinePatchFileName(filename) )
-  {
-    image = NinePatchImage::New( filename, attributes, loadPol, releasePol );
-  }
-  else
-  {
-    image = new Image( loadPol, releasePol );
-    image->Initialize();
-
-    // consider the requested size as natural size, 0 means we don't (yet) know it
-    image->mWidth = attributes.GetWidth();
-    image->mHeight = attributes.GetHeight();
-    image->mRequest = image->mImageFactory.RegisterRequest( filename, &attributes );
-
-    if( Dali::Image::Immediate == loadPol )
-    {
-      // Trigger loading of the image on a as soon as it can be done
-      image->mTicket = image->mImageFactory.Load( *image->mRequest.Get() );
-      image->mTicket->AddObserver( *image );
-    }
-  }
-  DALI_LOG_SET_OBJECT_STRING( image, filename );
-
-  return image;
 }
 
 ImagePtr Image::New( NativeImage& nativeImg )
@@ -118,34 +63,13 @@ ImagePtr Image::New( NativeImage& nativeImg )
   return image;
 }
 
-Image::~Image()
-{
-  if( mTicket )
-  {
-    mTicket->RemoveObserver( *this );
-    if( Stage::IsInstalled() )
-    {
-      mImageFactory.ReleaseTicket( mTicket.Get() );
-    }
-  }
-
-  if( Stage::IsInstalled() )
-  {
-    UnregisterObject();
-  }
-}
-
 bool Image::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
   DALI_ASSERT_DEBUG( dynamic_cast<Image*>( object ) && "Resource ticket not ImageTicket subclass for image resource.\n" );
   Image* image = static_cast<Image*>(object);
 
-  if( Dali::Image::SIGNAL_IMAGE_LOADING_FINISHED == signalName )
-  {
-    image->LoadingFinishedSignal().Connect( tracker, functor );
-  }
-  else if(Dali::Image::SIGNAL_IMAGE_UPLOADED == signalName)
+  if(Dali::Image::SIGNAL_IMAGE_UPLOADED == signalName)
   {
     image->UploadedSignal().Connect( tracker, functor );
   }
@@ -165,40 +89,14 @@ ResourceId Image::GetResourceId() const
   return ret;
 }
 
-const Dali::ImageAttributes& Image::GetAttributes() const
-{
-  if( mTicket )
-  {
-    return mImageFactory.GetActualAttributes( mTicket );
-  }
-  else
-  {
-    return mImageFactory.GetRequestAttributes( mRequest );
-  }
-}
-
-const std::string& Image::GetFilename() const
-{
-  return mImageFactory.GetRequestPath( mRequest );
-}
-
-void Image::Reload()
-{
-  if ( mRequest )
-  {
-    ResourceTicketPtr ticket = mImageFactory.Reload( *mRequest.Get() );
-    SetTicket( ticket.Get() );
-  }
-}
-
 void Image::ResourceLoadingFailed(const ResourceTicket& ticket)
 {
-  mLoadingFinished.Emit( Dali::Image( this ) );
+  // do nothing
 }
 
 void Image::ResourceLoadingSucceeded(const ResourceTicket& ticket)
 {
-  mLoadingFinished.Emit( Dali::Image( this ) );
+  // do nothing
 }
 
 void Image::ResourceUploaded(const ResourceTicket& ticket)
@@ -218,79 +116,38 @@ void Image::ResourceSavingFailed( const ResourceTicket& ticket )
 
 unsigned int Image::GetWidth() const
 {
-  // if width is 0, it means we've not yet loaded the image
-  if( 0u == mWidth )
-  {
-    Size size;
-    mImageFactory.GetImageSize( mRequest, mTicket, size );
-    mWidth = size.width;
-    // The app will probably ask for the height immediately, so don't waste the synchronous file IO that ImageFactory may have just done:
-    DALI_ASSERT_DEBUG( 0 == mHeight || unsigned(size.height) == mHeight );
-    if( 0 == mHeight )
-    {
-      mHeight = size.height;
-    }
-  }
   return mWidth;
 }
 
 unsigned int Image::GetHeight() const
 {
-  if( 0u == mHeight )
-  {
-    Size size;
-    mImageFactory.GetImageSize( mRequest, mTicket, size );
-    mHeight = size.height;
-    DALI_ASSERT_DEBUG( 0 == mWidth || unsigned(size.width) == mWidth );
-    if( 0 == mWidth )
-    {
-      mWidth = size.width;
-    }
-  }
   return mHeight;
 }
 
 Vector2 Image::GetNaturalSize() const
 {
-  Vector2 naturalSize(mWidth, mHeight);
-  if( 0u == mWidth || 0u == mHeight )
-  {
-    mImageFactory.GetImageSize( mRequest, mTicket, naturalSize );
-    mWidth = naturalSize.width;
-    mHeight = naturalSize.height;
-  }
-  return naturalSize;
+  return Vector2( mWidth, mHeight );
 }
 
-void Image::Connect()
+Image::Image( ReleasePolicy releasePol )
+: mWidth( 0 ),
+  mHeight( 0 ),
+  mConnectionCount( 0 ),
+  mReleasePolicy( releasePol )
 {
-  ++mConnectionCount;
-
-  if( mConnectionCount == 1 )
-  {
-    // ticket was thrown away when related actors went offstage or image loading on demand
-    if( !mTicket )
-    {
-      DALI_ASSERT_DEBUG( mRequest.Get() );
-      ResourceTicketPtr newTicket = mImageFactory.Load( *mRequest.Get() );
-      SetTicket( newTicket.Get() );
-    }
-  }
 }
 
-void Image::Disconnect()
+Image::~Image()
 {
-  if( !mTicket )
+  if( mTicket )
   {
-    return;
+    mTicket->RemoveObserver( *this );
+    mTicket.Reset();
   }
 
-  DALI_ASSERT_DEBUG( mConnectionCount > 0 );
-  --mConnectionCount;
-  if( mConnectionCount == 0 && mReleasePolicy == Dali::Image::Unused )
+  if( Stage::IsInstalled() )
   {
-    // release image memory when it's not visible anymore (decrease ref. count of texture)
-    SetTicket( NULL );
+    UnregisterObject();
   }
 }
 
@@ -298,91 +155,6 @@ void Image::Initialize()
 {
   RegisterObject();
 }
-
-void Image::SetTicket( ResourceTicket* ticket )
-{
-  if( ticket == mTicket.Get() )
-  {
-    return;
-  }
-
-  if( mTicket )
-  {
-    mTicket->RemoveObserver( *this );
-    mImageFactory.ReleaseTicket( mTicket.Get() );
-  }
-
-  if( ticket )
-  {
-    mTicket.Reset( ticket );
-    mTicket->AddObserver( *this );
-  }
-  else
-  {
-    mTicket.Reset();
-  }
-}
-
-bool Image::IsNinePatchFileName( const std::string& filename )
-{
-  bool match = false;
-
-  std::string::const_reverse_iterator iter = filename.rbegin();
-  enum { SUFFIX, HASH, HASH_DOT, DONE } state = SUFFIX;
-  while(iter < filename.rend())
-  {
-    switch(state)
-    {
-      case SUFFIX:
-      {
-        if(*iter == '.')
-        {
-          state = HASH;
-        }
-        else if(!isalnum(*iter))
-        {
-          state = DONE;
-        }
-      }
-      break;
-      case HASH:
-      {
-        if( *iter == '#' || *iter == '9' )
-        {
-          state = HASH_DOT;
-        }
-        else
-        {
-          state = DONE;
-        }
-      }
-      break;
-      case HASH_DOT:
-      {
-        if(*iter == '.')
-        {
-          match = true;
-        }
-        state = DONE; // Stop testing characters
-      }
-      break;
-      case DONE:
-      {
-      }
-      break;
-    }
-
-    // Satisfy prevent
-    if( state == DONE )
-    {
-      break;
-    }
-
-    ++iter;
-  }
-  return match;
-}
-
 
 } // namespace Internal
 

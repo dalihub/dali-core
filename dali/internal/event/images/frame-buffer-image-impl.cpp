@@ -60,16 +60,15 @@ FrameBufferImagePtr  FrameBufferImage::New( NativeImage& nativeImage, ReleasePol
 }
 
 FrameBufferImage::FrameBufferImage(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy)
-: Image(Dali::Image::Immediate, releasePolicy),
+: Image(releasePolicy),
   mPixelFormat(pixelFormat)
 {
   mWidth  = width;
   mHeight = height;
 }
 
-
 FrameBufferImage::FrameBufferImage( NativeImage& nativeImage )
-: Image(Dali::Image::Immediate),
+: Image(),
   mNativeImage(&nativeImage),
   mPixelFormat(nativeImage.GetPixelFormat())
 {
@@ -77,9 +76,8 @@ FrameBufferImage::FrameBufferImage( NativeImage& nativeImage )
   mHeight = nativeImage.GetHeight();
 }
 
-
 FrameBufferImage::FrameBufferImage( NativeImage& nativeImage, ReleasePolicy releasePolicy )
-: Image(Dali::Image::Immediate, releasePolicy),
+: Image(releasePolicy),
   mNativeImage(&nativeImage),
   mPixelFormat(nativeImage.GetPixelFormat())
 {
@@ -120,7 +118,7 @@ void FrameBufferImage::Disconnect()
 
   DALI_ASSERT_DEBUG(mConnectionCount > 0);
   --mConnectionCount;
-  if (mConnectionCount == 0 && mReleasePolicy == Dali::Image::Unused)
+  if (mConnectionCount == 0 && mReleasePolicy == Dali::Image::UNUSED)
   {
     // release image memory when it's not visible anymore (decrease ref. count of texture)
     mTicket->RemoveObserver(*this);

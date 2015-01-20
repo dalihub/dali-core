@@ -58,7 +58,7 @@ FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, 
     (0 == width) ? stageSize.width : width,
     (0 == height) ? stageSize.height : height,
     pixelformat,
-    Dali::Image::Never);
+    Dali::Image::NEVER);
 
   return FrameBufferImage(internal.Get());
 }

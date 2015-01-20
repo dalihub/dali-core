@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/text/text-style.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
@@ -91,7 +92,7 @@ GlyphImage GlyphImage::New( const Character& character, const TextStyle& style )
     ImageAttributes attributes;
     attributes.SetSize( metrics.GetWidth(), metrics.GetHeight() );
 
-    image = Image::New( DALI_EMOTICON_DIR + Internal::ThreadLocalStorage::Get().GetEmojiFactory().GetEmojiFileNameFromCharacter( character.GetImplementation().GetCharacter() ), attributes );
+    image = ResourceImage::New( DALI_EMOTICON_DIR + Internal::ThreadLocalStorage::Get().GetEmojiFactory().GetEmojiFileNameFromCharacter( character.GetImplementation().GetCharacter() ), attributes );
   }
   else
   {

@@ -312,7 +312,7 @@ int UtcDaliObjectRegistrySignalImageActorCreated(void)
   ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
 
   static const char* TestImageFilename = "icon_wrt.png";
-  Image image = Image::New(TestImageFilename);
+  Image image = ResourceImage::New(TestImageFilename);
 
   bool verified = false;
   TestImageActorCallback test(verified);

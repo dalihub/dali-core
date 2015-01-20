@@ -51,9 +51,7 @@ int UtcDaliBitmapImageNew01(void)
   application.Render(16);
   application.SendNotification();
 
-  ImageAttributes attributes = image.GetAttributes();
-
-  DALI_TEST_CHECK( attributes.GetWidth() == 16);
+  DALI_TEST_CHECK( image.GetWidth() == 16);
   END_TEST;
 }
 
@@ -70,9 +68,7 @@ int UtcDaliBitmapImageNew02(void)
   application.Render(16);
   application.SendNotification();
 
-  Dali::ImageAttributes attributes = image.GetAttributes();
-
-  DALI_TEST_CHECK( attributes.GetWidth() == 16);
+  DALI_TEST_CHECK( image.GetWidth() == 16);
 
   delete [] buffer;
   END_TEST;
@@ -93,16 +89,13 @@ int UtcDaliBitmapImageNewWithPolicy01(void)
   BitmapImage image;
 
   // initialise handle
-  image = BitmapImage::New(16, 16, Pixel::A8, Image::OnDemand, Image::Unused);
+  image = BitmapImage::New(16, 16, Pixel::A8, Image::UNUSED);
   application.SendNotification();
   application.Render(16);
   application.Render(16);
   application.SendNotification();
 
-  ImageAttributes attributes = image.GetAttributes();
-  DALI_TEST_CHECK( attributes.GetWidth() == 16);
-  /// @todo: how to test OnDemand? - resource id would be 0 if buffer only allocated on first call to ::GetBuffer()
-
+  DALI_TEST_CHECK( image.GetWidth() == 16);
   ImageActor actor = ImageActor::New(image);
   Stage::GetCurrent().Add(actor);
 
@@ -137,16 +130,13 @@ int UtcDaliBitmapImageNewWithPolicy02(void)
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8, 16, Image::Unused);
+  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8, 16, Image::UNUSED);
   application.SendNotification();
   application.Render(16);
   application.Render(16);
   application.SendNotification();
 
-  ImageAttributes attributes = image.GetAttributes();
-  DALI_TEST_CHECK( attributes.GetWidth() == 16);
-  /// @todo: how to test OnDemand? - resource id would be 0 if buffer only allocated on first call to ::GetBuffer()
-
+  DALI_TEST_CHECK( image.GetWidth() == 16);
   ImageActor actor = ImageActor::New(image);
   Stage::GetCurrent().Add(actor);
 
@@ -193,7 +183,7 @@ int UtcDaliBitmapImageDownCast2(void)
   TestApplication application;
   tet_infoline("Testing Dali::BitmapImage::DownCast()");
 
-  Image image = Image::New("IncorrectImageName");
+  Image image = ResourceImage::New("IncorrectImageName");
   ImageActor imageActor = ImageActor::New(image);
   application.SendNotification();
   application.Render(16);
@@ -223,10 +213,9 @@ int UtcDaliBitmapImageWHITE(void)
   application.Render(16);
   application.SendNotification();
 
-  Dali::ImageAttributes attributes = image.GetAttributes();
   PixelBuffer* buffer = image.GetBuffer();
 
-  DALI_TEST_CHECK( attributes.GetWidth() == 1 &&               // 1 pixel wide
+  DALI_TEST_CHECK( image.GetWidth() == 1 &&               // 1 pixel wide
                    buffer != NULL &&                      // valid buffer
                    *buffer == 0xff);                       // r component is 255
   END_TEST;
@@ -246,8 +235,7 @@ int UtcDaliBitmapImageGetBuffer(void)
   application.Render();
   application.SendNotification();
 
-  ImageAttributes attributes = image.GetAttributes();
-  DALI_TEST_CHECK( attributes.GetWidth() == 1 &&               // 1 pixel wide
+  DALI_TEST_CHECK( image.GetWidth() == 1 &&               // 1 pixel wide
                    buffer != NULL &&                      // valid buffer
                    *((unsigned int*)buffer) == 0xffffffff); // all component are 255
   END_TEST;
@@ -265,12 +253,11 @@ int UtcDaliBitmapImageGetBufferSize(void)
   application.Render();
   application.SendNotification();
 
-  Dali::ImageAttributes attributes = image.GetAttributes();
   PixelBuffer* buffer = image.GetBuffer();
   unsigned int bufferSize = image.GetBufferSize();
-  unsigned int pixelSize = Pixel::GetBytesPerPixel(attributes.GetPixelFormat());
+  unsigned int pixelSize = Pixel::GetBytesPerPixel(image.GetPixelFormat());
 
-  DALI_TEST_CHECK( attributes.GetWidth() == 1 &&               // 1 pixel wide
+  DALI_TEST_CHECK( image.GetWidth() == 1 &&               // 1 pixel wide
                    buffer != NULL &&                      // valid buffer
                    bufferSize == pixelSize);              // r component is 255
   END_TEST;
@@ -288,8 +275,7 @@ int UtcDaliBitmapImageGetBufferStride(void)
   application.Render();
   application.SendNotification();
 
-  Dali::ImageAttributes attributes = image.GetAttributes();
-  unsigned int pixelSize = Pixel::GetBytesPerPixel(attributes.GetPixelFormat());
+  unsigned int pixelSize = Pixel::GetBytesPerPixel(image.GetPixelFormat());
   unsigned int bufferStride = image.GetBufferStride();
   DALI_TEST_CHECK( bufferStride == pixelSize );
   DALI_TEST_CHECK( !image.IsDataExternal() );

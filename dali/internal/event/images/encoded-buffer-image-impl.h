@@ -52,7 +52,7 @@ private:
   /**
    * Construct using the supplied load policy.
    */
-  EncodedBufferImage(ReleasePolicy releasePol=ImageReleasePolicyDefault) : Image( Dali::Image::Immediate, releasePol ) {}
+  EncodedBufferImage( ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT ) : Image( releasePol ) {}
 
 public:
   /**
@@ -72,7 +72,7 @@ public:
   static EncodedBufferImagePtr New(const uint8_t * const encodedImage,
                                    const std::size_t encodedImageByteCount,
                                    const ImageAttributes& attributes,
-                                   const ReleasePolicy releasePol=Dali::Image::Never);
+                                   const ReleasePolicy releasePol=Dali::Image::NEVER);
 };
 
 } // namespace Internal

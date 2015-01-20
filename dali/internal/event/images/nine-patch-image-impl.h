@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/nine-patch-image.h>
+#include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/images/bitmap-image-impl.h>
 
 namespace Dali
@@ -44,7 +45,7 @@ class UpdateManager;
  * It's image data has a border which determines stretch and fill areas
  * Its pixel buffer data is loaded synchronously from file.
  */
-class NinePatchImage : public Image
+class NinePatchImage : public ResourceImage
 {
 public:
 
@@ -54,13 +55,11 @@ public:
    * Dali has ownership of the buffer.
    * @param [in] filename    File to load synchronously into buffer
    * @param [in] attributes  Image attributes of the file
-   * @param [in] loadPol     controls time of loading a resource from the filesystem (default: load when Image is created).
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   static NinePatchImagePtr New( const std::string& filename,
                                 const ImageAttributes& attributes,
-                                LoadPolicy    loadPol    = ImageLoadPolicyDefault,
-                                ReleasePolicy releasePol = ImageReleasePolicyDefault );
+                                ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
    * Create a new NinePatchImage
@@ -68,13 +67,11 @@ public:
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    * @param [in] filename    File to load synchronously into buffer
    * @param [in] attributes  Image attributes of the file
-   * @param [in] loadPol     controls time of loading a resource from the filesystem (default: load when Image is created).
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   NinePatchImage( const std::string& filename,
                   const ImageAttributes& attributes,
-                  LoadPolicy    loadPol    = ImageLoadPolicyDefault,
-                  ReleasePolicy releasePol = ImageReleasePolicyDefault );
+                  ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
    * Convert Image object to a 9 patch image object if possible.
