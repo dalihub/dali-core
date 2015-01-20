@@ -169,9 +169,8 @@ void BitmapTexture::AreaUpdated( const RectArea& updateArea, const unsigned char
     DALI_LOG_INFO( Debug::Filter::gImage, Debug::General, "Update x:%d y:%d w:%d h:%d\n",
                    updateArea.x, updateArea.y, updateArea.width ,updateArea.height );
 
-    // TODO: obtain pitch of source image, obtain pixel depth of source image.
-    const unsigned int pitchPixels = mImageWidth;
-    const unsigned int pixelDepth = sizeof(unsigned int);
+    const unsigned int pitchPixels = mWidth;
+    const unsigned int pixelDepth = GetBytesPerPixel( mPixelFormat );
 
     // If the width of the source update area is the same as the pitch, then can
     // copy the contents in a single contiguous TexSubImage call.
