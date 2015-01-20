@@ -312,21 +312,10 @@ void BitmapTexture::Update( Integration::Bitmap* srcBitmap, std::size_t xOffset,
       mContext.PixelStorei( GL_UNPACK_ALIGNMENT, 1 );
     }
 
-    const unsigned char* pixels = srcBitmap->GetBuffer();
-    unsigned int srcWidth = srcBitmap->GetImageWidth();
-    const unsigned int pixelDepth = Pixel::GetBytesPerPixel( mPixelFormat );
-
-    unsigned int yBottom = yOffset + srcBitmap->GetImageHeight();
-
-    for( unsigned int y = yOffset; y < yBottom; y++ )
-    {
-      mContext.TexSubImage2D( GL_TEXTURE_2D, 0,
-                              xOffset, y,
-                              srcWidth, 1,
-                              pixelFormat, pixelDataType, pixels );
-
-      pixels += srcWidth * pixelDepth;
-    }
+    mContext.TexSubImage2D( GL_TEXTURE_2D, 0,
+                            xOffset, yOffset,
+                            srcBitmap->GetImageWidth(), srcBitmap->GetImageHeight(),
+                            pixelFormat, pixelDataType, srcBitmap->GetBuffer() );
   }
 }
 
