@@ -113,6 +113,11 @@ unsigned int BitmapImage::GetBufferStride() const
   return GetImplementation(*this).GetBufferStride();
 }
 
+Pixel::Format BitmapImage::GetPixelFormat() const
+{
+  return GetImplementation(*this).GetPixelFormat();
+}
+
 void BitmapImage::Update ()
 {
   RectArea area;

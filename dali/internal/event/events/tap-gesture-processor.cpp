@@ -81,7 +81,8 @@ TapGestureProcessor::TapGestureProcessor( Stage& stage, Integration::GestureMana
   mMaxTapsRequired( 1 ),
   mMinTouchesRequired( 1 ),
   mMaxTouchesRequired( 1 ),
-  mCurrentTapEvent( NULL )
+  mCurrentTapEvent( NULL ),
+  mPossibleProcessed( false )
 {
 }
 
@@ -95,40 +96,47 @@ void TapGestureProcessor::Process( const Integration::TapGestureEvent& tapEvent 
   {
     case Gesture::Possible:
     {
-      ResetActor();
-
+      // Do a hit test and if an actor has been hit then save to see if tap event is still valid on a tap( same actor being hit )
       HitTestAlgorithm::Results hitTestResults;
-      if( HitTest( mStage, tapEvent.point, hitTestResults ) )
+      if ( HitTest( mStage, tapEvent.point, hitTestResults ) )
       {
-        // Only sets the actor if we have a hit.
         SetActor( &GetImplementation( hitTestResults.actor ) );
+        mCurrentTapActor.SetActor( GetCurrentGesturedActor() );
+
+        // Indicate that we've processed a touch down. Bool should be sufficient as a change in actor will result in a cancellation
+        mPossibleProcessed = true;
+      }
+      else
+      {
+        ResetActor();
       }
       break;
     }
 
     case Gesture::Started:
     {
-      if ( GetCurrentGesturedActor() )
+      // Ensure that we're processing a hit on the current actor and that we've already processed a touch down
+      HitTestAlgorithm::Results hitTestResults;
+      if ( GetCurrentGesturedActor() && HitTest( mStage, tapEvent.point, hitTestResults ) && mPossibleProcessed )
       {
-        HitTestAlgorithm::Results hitTestResults;
-        HitTest( mStage, tapEvent.point, hitTestResults );
-
-        if ( hitTestResults.actor && ( GetCurrentGesturedActor() == &GetImplementation( hitTestResults.actor ) ) )
+        // Check that this actor is still the one that was used for the last touch down ?
+        if ( mCurrentTapActor.GetActor() == &GetImplementation( hitTestResults.actor ) )
         {
-          // Set mCurrentTapEvent to use inside overridden methods called from ProcessAndEmit()
           mCurrentTapEvent = &tapEvent;
           ProcessAndEmit( hitTestResults );
-          mCurrentTapEvent = NULL;
         }
-
-        ResetActor();
+        mCurrentTapEvent = NULL;
+        mPossibleProcessed = false;
       }
       break;
     }
 
     case Gesture::Cancelled:
+    {
+      mPossibleProcessed = false;
       ResetActor();
       break;
+    }
 
     case Gesture::Continuing:
       DALI_ASSERT_ALWAYS( false && "Incorrect state received from Integration layer: Continuing\n" );

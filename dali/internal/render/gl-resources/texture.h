@@ -80,6 +80,14 @@ public:
   virtual void UpdateArea( const RectArea& area );
 
   /**
+   * Update part of the texture with a different bitmap
+   * @param[in] srcBitmap The bitmap to copy from
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  virtual void Update( Integration::Bitmap* srcBitmap, std::size_t xOffset, std::size_t yOffset ) {}
+
+  /**
    * @return Return true if the texture should be updated on GL texture creation.
    */
   virtual bool UpdateOnCreate();

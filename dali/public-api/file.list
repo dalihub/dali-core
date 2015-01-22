@@ -57,6 +57,7 @@ public_api_src_files = \
   $(public_api_src_dir)/geometry/mesh-factory.cpp \
   $(public_api_src_dir)/geometry/mesh.cpp \
   $(public_api_src_dir)/geometry/spline.cpp \
+  $(public_api_src_dir)/images/atlas.cpp \
   $(public_api_src_dir)/images/distance-field.cpp \
   $(public_api_src_dir)/images/image.cpp \
   $(public_api_src_dir)/images/image-attributes.cpp \
@@ -208,6 +209,7 @@ public_api_core_geometry_header_files = \
   $(public_api_src_dir)/geometry/spline.h
 
 public_api_core_images_header_files = \
+  $(public_api_src_dir)/images/atlas.h \
   $(public_api_src_dir)/images/bitmap-image.h \
   $(public_api_src_dir)/images/distance-field.h \
   $(public_api_src_dir)/images/encoded-buffer-image.h \

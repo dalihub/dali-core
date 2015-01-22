@@ -428,6 +428,14 @@ void ResourceManager::HandleUpdateBitmapAreaRequest( ResourceId textureId, const
   }
 }
 
+void ResourceManager::HandleUploadBitmapRequest( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset )
+{
+  if( destId && srcId )
+  {
+    mImpl->mTextureCacheDispatcher.DispatchUpdateTexture( destId, srcId, xOffset, yOffset );
+  }
+}
+
 void ResourceManager::HandleUpdateMeshRequest( BufferIndex updateBufferIndex, ResourceId id, MeshData* meshData )
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );

@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-container.h>
@@ -52,9 +51,6 @@ class Shader;
 class DiscardQueue
 {
 public:
-
-  typedef IntrusivePtr<RefObject> ResourcePointer;
-  typedef std::vector<ResourcePointer> ResourceQueue;
 
   typedef OwnerContainer< Shader* > ShaderQueue;
 
@@ -127,16 +123,15 @@ private:
   // Messages are queued here when the update buffer index == 0
   NodeOwnerContainer           mNodeQueue0;
   NodeAttachmentOwnerContainer mAttachmentQueue0;
-  ResourceQueue                mResourceQueue0;
   MeshOwnerContainer           mMeshQueue0;
   ShaderQueue                  mShaderQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
   NodeAttachmentOwnerContainer mAttachmentQueue1;
-  ResourceQueue                mResourceQueue1;
   MeshOwnerContainer           mMeshQueue1;
   ShaderQueue                  mShaderQueue1;
+
 };
 
 } // namespace SceneGraph

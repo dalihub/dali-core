@@ -68,6 +68,7 @@ internal_src_files = \
   $(internal_src_dir)/event/events/tap-gesture-detector-impl.cpp \
   $(internal_src_dir)/event/events/tap-gesture-processor.cpp \
   $(internal_src_dir)/event/events/touch-event-processor.cpp \
+  $(internal_src_dir)/event/images/atlas-impl.cpp \
   $(internal_src_dir)/event/images/bitmap-external.cpp \
   $(internal_src_dir)/event/images/bitmap-packed-pixel.cpp \
   $(internal_src_dir)/event/images/bitmap-compressed.cpp \
@@ -112,7 +113,7 @@ internal_src_files = \
   $(internal_src_dir)/event/text/glyph-status/glyph-status.cpp \
   $(internal_src_dir)/event/text/glyph-status/glyph-status-container.cpp \
   $(internal_src_dir)/event/text/glyph-status/debug/glyph-status-container-debug.cpp \
-  $(internal_src_dir)/event/text/atlas/atlas.cpp \
+  $(internal_src_dir)/event/text/atlas/texture-atlas.cpp \
   $(internal_src_dir)/event/text/atlas/atlas-size.cpp \
   $(internal_src_dir)/event/text/atlas/atlas-ranking.cpp \
   $(internal_src_dir)/event/text/atlas/atlas-rank-generator.cpp \

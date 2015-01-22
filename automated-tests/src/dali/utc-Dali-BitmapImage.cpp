@@ -310,6 +310,23 @@ int UtcDaliBitmapImageGetBufferStride(void)
   END_TEST;
 }
 
+int UtcDaliBitmapImageGetPixelFormat(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliBitmapImageGetPixelFormat");
+
+  // Set pixel format to a non-default
+  BitmapImage image = BitmapImage::New( 16, 16, Pixel::A8 );
+  application.SendNotification();
+  application.Render(16);
+  application.Render(16);
+  application.SendNotification();
+
+  DALI_TEST_CHECK( image.GetPixelFormat() == Pixel::A8 );
+  END_TEST;
+}
+
 
 int UtcDaliBitmapImageIsDataExternal(void)
 {
