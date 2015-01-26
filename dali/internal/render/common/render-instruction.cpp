@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h> // for Color::BLACK
 #include <dali/internal/render/common/render-tracker.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -93,7 +94,14 @@ RenderListContainer::SizeType RenderInstruction::RenderListCount() const
 
 const RenderList* RenderInstruction::GetRenderList( RenderListContainer::SizeType index ) const
 {
-  DALI_ASSERT_ALWAYS( (index < mNextFreeRenderList ) && "Renderlist index out of scope" );
+  DALI_ASSERT_DEBUG( (index < mNextFreeRenderList ) && (index < mRenderLists.Size()) && "Renderlist index out of container bounds" );
+
+  // Return null if the caller has passed an invalid index:
+  if( index >= std::min( mNextFreeRenderList, mRenderLists.Size() ) )
+  {
+    return 0;
+  }
+
   return mRenderLists[ index ];
 }
 

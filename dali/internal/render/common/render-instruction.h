@@ -79,7 +79,7 @@ public:
    * Return the renderlist at given index
    * @pre index is inside the valid range of initialized lists
    * @param index of list to return
-   * @return pointer to the renderlist
+   * @return pointer to the renderlist, or null if the index is out of bounds.
    */
   const RenderList* GetRenderList( RenderListContainer::SizeType index ) const;
 

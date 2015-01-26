@@ -127,6 +127,16 @@ public:
   virtual void DispatchUpdateTexture( ResourceId id, Integration::Bitmap* bitmap ) = 0;
 
   /**
+   * Update the part of a texture with a newly loaded bitmap
+   * May be called from Update thread
+   * @param[in] destId The ID of the texture to update
+   * @param[in] srcId The resource ID of the source bitmap
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  virtual void DispatchUpdateTexture( ResourceId destId, ResourceId srcId,std::size_t xOffset, std::size_t yOffset ) = 0;
+
+  /**
    * Dispatch a message to update the texture area
    * May be called from the Update thread
    * @param[in] id Resource Id of the texture

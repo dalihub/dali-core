@@ -242,6 +242,13 @@ public:
   unsigned int GetBufferStride() const;
 
   /**
+   * @brief Returns the pixel format of the contained bitmap
+   *
+   * @return the pixel format
+   */
+  Pixel::Format GetPixelFormat() const;
+
+  /**
    * @brief Inform Dali that the contents of the buffer have changed.
    *
    * SignalUploaded will be sent in response if the image is on stage

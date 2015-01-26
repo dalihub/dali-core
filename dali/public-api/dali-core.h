@@ -89,6 +89,7 @@
 #include <dali/public-api/geometry/mesh-factory.h>
 #include <dali/public-api/geometry/spline.h>
 
+#include <dali/public-api/images/atlas.h>
 #include <dali/public-api/images/bitmap-image.h>
 #include <dali/public-api/images/distance-field.h>
 #include <dali/public-api/images/encoded-buffer-image.h>

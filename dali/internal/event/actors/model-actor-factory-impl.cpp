@@ -27,11 +27,6 @@
 #include <dali/internal/event/animation/animator-connector.h>
 
 
-namespace
-{
-const float ROTATION_EPSILON = 0.003f;
-}
-
 namespace Dali
 {
 using Dali::Entity;

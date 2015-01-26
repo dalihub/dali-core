@@ -178,7 +178,7 @@ void Material::SetMapU(const unsigned int map)
   GetImplementation(*this).SetMapU(map);
 }
 
-const unsigned int Material::GetMapU() const
+unsigned int Material::GetMapU() const
 {
   return GetImplementation(*this).GetMapU();
 }
@@ -188,7 +188,7 @@ void Material::SetMapV(const unsigned int map)
   GetImplementation(*this).SetMapV(map);
 }
 
-const unsigned int Material::GetMapV() const
+unsigned int Material::GetMapV() const
 {
   return GetImplementation(*this).GetMapV();
 }
@@ -198,7 +198,7 @@ void Material::SetDiffuseUVIndex(const int index)
   GetImplementation(*this).SetDiffuseUVIndex(index);
 }
 
-const unsigned int Material::GetDiffuseUVIndex() const
+unsigned int Material::GetDiffuseUVIndex() const
 {
   return GetImplementation(*this).GetDiffuseUVIndex();
 }
@@ -208,7 +208,7 @@ void Material::SetOpacityUVIndex(const int index)
   GetImplementation(*this).SetOpacityUVIndex(index);
 }
 
-const unsigned int Material::GetOpacityUVIndex() const
+unsigned int Material::GetOpacityUVIndex() const
 {
   return GetImplementation(*this).GetOpacityUVIndex();
 }
@@ -218,7 +218,7 @@ void Material::SetNormalUVIndex(const int index)
   GetImplementation(*this).SetNormalUVIndex(index);
 }
 
-const unsigned int Material::GetNormalUVIndex() const
+unsigned int Material::GetNormalUVIndex() const
 {
   return GetImplementation(*this).GetNormalUVIndex();
 }
@@ -228,7 +228,7 @@ void Material::SetHasHeightMap(const bool flag)
   GetImplementation(*this).SetHasHeightMap(flag);
 }
 
-const bool Material::GetHasHeightMap() const
+bool Material::GetHasHeightMap() const
 {
   return GetImplementation(*this).GetHasHeightMap();
 }

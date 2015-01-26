@@ -309,7 +309,7 @@ public:
    *
    * @return The mapping mode
    */
-  const unsigned int GetMapU() const;
+  unsigned int GetMapU() const;
 
   /**
    * @brief Set the V mapping mode.
@@ -323,7 +323,7 @@ public:
    *
    * @return The mapping mode
    */
-  const unsigned int GetMapV() const;
+  unsigned int GetMapV() const;
 
   /**
    * @brief Set the index into the bound mesh's array of UV's for the diffuse texture coordinates.
@@ -337,7 +337,7 @@ public:
    *
    * @return The uv index
    */
-  const unsigned int GetDiffuseUVIndex() const;
+  unsigned int GetDiffuseUVIndex() const;
 
   /**
    * @brief Set the index into the bound mesh's array of UV's for the opacity texture coordinates.
@@ -351,7 +351,7 @@ public:
    *
    * @return The uv index
    */
-  const unsigned int GetOpacityUVIndex() const;
+  unsigned int GetOpacityUVIndex() const;
 
   /**
    * @brief Set the index into the bound mesh's array of UV's for the normal/height map texture coordinates.
@@ -365,7 +365,7 @@ public:
    *
    * @return The uv index
    */
-  const unsigned int GetNormalUVIndex() const;
+  unsigned int GetNormalUVIndex() const;
 
   /**
    * @brief Set whether the normal texture contains a normal or height map.
@@ -379,7 +379,7 @@ public:
    *
    * @return true if the normal map contains a height map, false otherwise
    */
-  const bool GetHasHeightMap() const;
+  bool GetHasHeightMap() const;
 
 public: // Not intended for application developers
 

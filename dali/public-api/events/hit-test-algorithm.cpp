@@ -29,15 +29,15 @@ namespace Dali
 namespace HitTestAlgorithm
 {
 
-void HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
+bool HitTest( Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
 {
-  Internal::HitTestAlgorithm::HitTest( GetImplementation(stage), screenCoordinates, results, func );
+  return Internal::HitTestAlgorithm::HitTest( GetImplementation(stage), screenCoordinates, results, func );
 }
 
-void HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
+bool HitTest( RenderTask& renderTask, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
 {
   Stage stage = Stage::GetCurrent();
-  Internal::HitTestAlgorithm::HitTest( GetImplementation( stage ), GetImplementation(renderTask), screenCoordinates, results, func );
+  return Internal::HitTestAlgorithm::HitTest( GetImplementation( stage ), GetImplementation(renderTask), screenCoordinates, results, func );
 }
 
 } // namespace HitTestAlgorithm

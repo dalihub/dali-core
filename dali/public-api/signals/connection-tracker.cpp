@@ -25,14 +25,6 @@
 namespace Dali
 {
 
-namespace
-{
-
-const int INVALID_CALLBACK_INDEX = -1;
-
-} // unnamed namespace
-
-
 ConnectionTracker::ConnectionTracker()
 {
 }

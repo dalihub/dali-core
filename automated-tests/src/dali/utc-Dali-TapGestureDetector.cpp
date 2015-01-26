@@ -857,26 +857,26 @@ int UtcDaliTapGestureSignalReceptionDifferentPossible(void)
   application.SendNotification();
   application.Render();
 
-  // Emit Started event, we should not receive the long press.
+  // Emit Started event, we should not receive the tap.
   application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  // LongPress possible in empty area.
+  // Tap possible in empty area.
   application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  // Move actor in to the long press position.
+  // Move actor in to the tap position.
   actor.SetPosition( 0.0f, 0.0f );
 
   // Render and notify
   application.SendNotification();
   application.Render();
 
-  // Emit Started event, we should not receive the long press.
+  // Emit Started event, we should not receive the tap.
   application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(false, data.functorCalled, TEST_LOCATION);
 
-  // Normal long press in actor's area for completeness.
+  // Normal tap in actor's area for completeness.
   application.ProcessEvent(GenerateTap(Gesture::Possible, 1u, 1u, Vector2(50.0f, 10.0f)));
   application.ProcessEvent(GenerateTap(Gesture::Started, 1u, 1u, Vector2(50.0f, 10.0f)));
   DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);

@@ -86,7 +86,7 @@ struct HitTestInterface
 /**
  * @copydoc Dali::HitTestAlgorithm::HitTest(Stage stage, const Vector2& screenCoordinates, Results& results, HitTestFunction func )
  */
-void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
+bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
 
 /**
  * Given screen coordinates, this method returns the hit actor & the local coordinates relative to the actor etc.
@@ -94,6 +94,7 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
  * @param[in] hitTestInterface Used to determine whether the actor is hit or whether we walk down its hierarchy
+ * @return true if something was hit
  *
  * <h3>Hit Test Algorithm:</h3>
  *
@@ -110,7 +111,7 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
  * @note Currently, we prefer a child hit over a parent (regardless of the distance from the
  *       camera) unless the parent is a RenderableActor but this is subject to change.
  */
-void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface );
+bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface );
 
 /**
  * Default HitTest where we check if a touch is required.
@@ -118,10 +119,11 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, 
  * @param[in] stage The stage.
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
+ * @return true if something was hit
  *
  * @see HitTest(Stage&, const Vector2&, Results&, HitTestInterface&)
  */
-void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results );
+bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results );
 
 /**
  * Hit test specific to a given RenderTask
@@ -131,8 +133,9 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results )
  * @param[in] screenCoordinates The screen coordinates.
  * @param[out] results The results of the hit-test.
  * @param[in] func The function to use in the hit-test algorithm.
+ * @return true if something was hit
  */
-void HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordinates,
+bool HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordinates,
               Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func );
 
 } // namespace HitTestAlgorithm

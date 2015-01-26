@@ -52,6 +52,7 @@ namespace Internal
 {
 class Context;
 class Texture;
+class BitmapTexture;
 class FrameBufferTexture;
 class TextureObserver;
 
@@ -137,6 +138,16 @@ public:
   void UpdateTexture( ResourceId id, Integration::BitmapPtr bitmap );
 
   /**
+   * Update the part of a texture with a newly loaded bitmap
+   * May be called from Update thread
+   * @param[in] destId The ID of the texture to update
+   * @param[in] srcId The resource ID of the source bitmap
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void UpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
+
+  /**
    * Update the area of the texture from the associated bitmap
    * @param[in] id Resource Id of the bitmap
    * @param[in] area The area of the bitmap that has changed
@@ -170,6 +181,13 @@ public:
    * or a valid pointer if it has.
    */
   Texture* GetTexture( ResourceId id );
+
+  /**
+   * Get the bitmaptexture associated with the resource ID
+   * @param[in] id Resource Id of the texture
+   * @return The texture or NULL
+   */
+  BitmapTexture* GetBitmapTexture(ResourceId id);
 
   /**
    * Get the framebuffer texture associated with the resource ID
@@ -246,6 +264,11 @@ protected: // Implements TextureCacheDispatcher
    * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()
    */
   virtual void DispatchUpdateTexture( ResourceId id, Integration::Bitmap* bitmap );
+
+  /**
+   * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()
+   */
+  virtual void DispatchUpdateTexture( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
 
   /**
    * @copydoc TextureCacheDispatcher::DispatchUpdateTextureArea()

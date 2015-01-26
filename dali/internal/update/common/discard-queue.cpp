@@ -143,7 +143,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   {
     mNodeQueue0.Clear();
     mAttachmentQueue0.Clear();
-    mResourceQueue0.clear();
     mMeshQueue0.Clear();
     mShaderQueue0.Clear();
   }
@@ -151,7 +150,6 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   {
     mNodeQueue1.Clear();
     mAttachmentQueue1.Clear();
-    mResourceQueue1.clear();
     mMeshQueue1.Clear();
     mShaderQueue1.Clear();
   }

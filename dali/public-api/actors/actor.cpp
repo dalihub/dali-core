@@ -549,7 +549,7 @@ DynamicsJoint Actor::AddDynamicsJoint( Actor attachedActor, const Vector3& offse
 #endif
 }
 
-const int Actor::GetNumberOfJoints() const
+int Actor::GetNumberOfJoints() const
 {
 #ifdef DYNAMICS_SUPPORT
   return GetImplementation(*this).GetNumberOfJoints();

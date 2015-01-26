@@ -495,8 +495,9 @@ bool HitTestForEachRenderTask( LayerList& layers,
 
 } // unnamed namespace
 
-void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
+bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
 {
+  bool wasHit( false );
   // Hit-test the regular on-stage actors
   RenderTaskList& taskList = stage.GetRenderTaskList();
   LayerList& layerList = stage.GetLayerList();
@@ -507,12 +508,14 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
   {
     results.actor = hitTestResults.actor;
     results.actorCoordinates = hitTestResults.actorCoordinates;
+    wasHit = true;
   }
+  return wasHit;
 }
 
-void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface )
+bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, HitTestInterface& hitTestInterface )
 {
-  bool hit = false;
+  bool wasHit( false );
 
   // Hit-test the system-overlay actors first
   SystemOverlay* systemOverlay = stage.GetSystemOverlayInternal();
@@ -522,35 +525,40 @@ void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, 
     RenderTaskList& overlayTaskList = systemOverlay->GetOverlayRenderTasks();
     LayerList& overlayLayerList = systemOverlay->GetLayerList();
 
-    hit = HitTestForEachRenderTask( overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
+    wasHit = HitTestForEachRenderTask( overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
   }
 
   // Hit-test the regular on-stage actors
-  if ( !hit )
+  if ( !wasHit )
   {
     RenderTaskList& taskList = stage.GetRenderTaskList();
     LayerList& layerList = stage.GetLayerList();
 
-    HitTestForEachRenderTask( layerList, taskList, screenCoordinates, results, hitTestInterface );
+    wasHit = HitTestForEachRenderTask( layerList, taskList, screenCoordinates, results, hitTestInterface );
   }
+  return wasHit;
 }
 
-void HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results )
+bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results )
 {
   ActorTouchableCheck actorTouchableCheck;
-  HitTest( stage, screenCoordinates, results, actorTouchableCheck );
+  return HitTest( stage, screenCoordinates, results, actorTouchableCheck );
 }
 
-void HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordinates,
+bool HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordinates,
               Dali::HitTestAlgorithm::Results& results, Dali::HitTestAlgorithm::HitTestFunction func )
 {
+  bool wasHit( false );
   Results hitTestResults;
+
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
   if ( HitTestRenderTask( stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
   {
     results.actor = hitTestResults.actor;
     results.actorCoordinates = hitTestResults.actorCoordinates;
+    wasHit = true;
   }
+  return wasHit;
 }
 
 } // namespace HitTestAlgorithm

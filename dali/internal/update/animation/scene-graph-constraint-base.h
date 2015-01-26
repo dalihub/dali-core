@@ -168,11 +168,27 @@ private:
   }
 
   /**
+   * @copydoc PropertyOwner::Observer::PropertyOwnerConnected()
+   */
+  virtual void PropertyOwnerConnected( PropertyOwner& owner )
+  {
+  }
+
+  /**
    * @copydoc PropertyOwner::Observer::PropertyOwnerDisconnected()
    */
   virtual void PropertyOwnerDisconnected( BufferIndex bufferIndex, PropertyOwner& owner )
   {
-    PropertyOwnerDestroyed( owner );
+    if ( !mDisconnected )
+    {
+      // Stop observing property owners
+      StopObservation();
+
+      // Notification for derived class
+      OnDisconnect();
+
+      mDisconnected = true;
+    }
   }
 
   /**
@@ -182,20 +198,22 @@ private:
   {
     if ( !mDisconnected )
     {
-      // Discard pointer to disconnected property owner
+      // Discard pointer to destroyed property owner. Otherwise StopObservation() would crash when trying to remove
+      //the constraint from the destroyed PropertyOwner's observers list
       PropertyOwnerIter iter = std::find( mObservedOwners.Begin(), mObservedOwners.End(), &owner );
       if( mObservedOwners.End() != iter )
       {
         mObservedOwners.Erase( iter );
-
-        // Stop observing the remaining property owners
-        StopObservation();
-
-        // Notification for derived class
-        OnDisconnect();
-
-        mDisconnected = true;
       }
+
+      // Stop observing the rest of property owners
+      StopObservation();
+
+      // Notification for derived class
+      OnDisconnect();
+
+      mDisconnected = true;
+
     }
   }
 
