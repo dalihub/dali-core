@@ -224,18 +224,22 @@ private:
   CameraAttachment& operator=(const CameraAttachment& rhs);
 
   /**
-   * Recalculates the view & projection matrices.
+   * Recalculates the view matrix.
    * @param[in] bufferIndex The current update buffer index.
+   * @param[in] owningNode to use for calculations.
+   * @return count how many frames ago the matrix was changed.
    */
-  void UpdateProjection( BufferIndex updateBufferIndex );
+  unsigned int UpdateViewMatrix( BufferIndex updateBufferIndex, const Node& owningNode );
 
   /**
-   * Recalculates the inverse modelview matrix, which is used for hit testing
-   * @param[in] updateBufferIndex The current update buffer index.
+   * Recalculates the projection matrix.
+   * @param[in] bufferIndex The current update buffer index.
+   * @return count how many frames ago the matrix was changed.
    */
-  void UpdateInverseViewProjection( BufferIndex updateBufferIndex );
+  unsigned int UpdateProjection( BufferIndex updateBufferIndex );
 
 private:
+
   unsigned int                  mUpdateViewFlag;       ///< This is non-zero if the view matrix requires an update
   unsigned int                  mUpdateProjectionFlag; ///< This is non-zero if the projection matrix requires an update
 
