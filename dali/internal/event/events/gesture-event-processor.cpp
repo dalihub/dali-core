@@ -240,6 +240,21 @@ void GestureEventProcessor::SetPanGesturePredictionAmount( unsigned int amount )
   mPanGestureProcessor.SetPredictionAmount(amount);
 }
 
+void GestureEventProcessor::SetPanGestureMaximumPredictionAmount( unsigned int amount )
+{
+  mPanGestureProcessor.SetMaximumPredictionAmount(amount);
+}
+
+void GestureEventProcessor::SetPanGestureMinimumPredictionAmount( unsigned int amount )
+{
+  mPanGestureProcessor.SetMinimumPredictionAmount(amount);
+}
+
+void GestureEventProcessor::SetPanGesturePredictionAmountAdjustment( unsigned int amount )
+{
+  mPanGestureProcessor.SetPredictionAmountAdjustment(amount);
+}
+
 void GestureEventProcessor::SetPanGestureSmoothingMode(int mode)
 {
   mPanGestureProcessor.SetSmoothingMode(mode);

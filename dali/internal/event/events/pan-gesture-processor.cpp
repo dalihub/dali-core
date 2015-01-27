@@ -331,6 +331,21 @@ void PanGestureProcessor::SetPredictionAmount(unsigned int amount)
   mSceneObject->SetPredictionAmount(amount);
 }
 
+void PanGestureProcessor::SetMaximumPredictionAmount(unsigned int amount)
+{
+  mSceneObject->SetMaximumPredictionAmount(amount);
+}
+
+void PanGestureProcessor::SetMinimumPredictionAmount(unsigned int amount)
+{
+  mSceneObject->SetMinimumPredictionAmount(amount);
+}
+
+void PanGestureProcessor::SetPredictionAmountAdjustment(unsigned int amount)
+{
+  mSceneObject->SetPredictionAmountAdjustment(amount);
+}
+
 void PanGestureProcessor::SetSmoothingMode(int mode)
 {
   if( (mode < 0)

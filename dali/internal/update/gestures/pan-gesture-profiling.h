@@ -32,13 +32,16 @@ struct PanGestureProfiling
 {
   struct Position
   {
-    Position( unsigned int time, Vector2 position )
-    : time( time ), position( position )
+    Position( unsigned int time, Vector2 position, Vector2 displacement, Vector2 velocity, int state )
+    : time( time ), position( position ), displacement( displacement ), velocity( velocity ), state( state )
     {
     }
 
     unsigned int time;
     Vector2 position;
+    Vector2 displacement;
+    Vector2 velocity;
+    int state;
   };
 
   typedef std::vector< PanGestureProfiling::Position > PanPositionContainer;

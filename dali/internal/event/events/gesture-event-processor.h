@@ -137,6 +137,31 @@ public: // Called by Core
   void SetPanGesturePredictionAmount( unsigned int amount );
 
   /**
+   * @brief Sets the upper bound of the prediction amount for clamping
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetPanGestureMaximumPredictionAmount( unsigned int amount );
+
+  /**
+   * @brief Sets the lower bound of the prediction amount for clamping
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetPanGestureMinimumPredictionAmount( unsigned int amount );
+
+  /**
+   * @brief Sets the prediction amount to adjust when the pan velocity is changed.
+   * If the pan velocity is accelerating, the prediction amount will be increased
+   * by the specified amount until it reaches the upper bound. If the pan velocity
+   * is decelerating, the prediction amount will be decreased by the specified amount
+   * until it reaches the lower bound.
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetPanGesturePredictionAmountAdjustment( unsigned int amount );
+
+  /**
    * @brief Called to set how pan gestures smooth input
    *
    * @param[in] mode The smoothing mode to use
