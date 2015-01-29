@@ -23,12 +23,12 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
+#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/event/animation/active-constraint-base.h>
 #include <dali/internal/event/animation/constraint-impl.h>
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/common/type-registry-impl.h>
@@ -250,7 +250,6 @@ bool ProxyObject::IsPropertyWritable( Property::Index index ) const
   CustomProperty* custom = FindCustomProperty( index );
   if( custom )
   {
-    // Check that the index is valid
     return custom->IsWritable();
   }
   return false;
@@ -339,8 +338,6 @@ void ProxyObject::SetProperty( Property::Index index, const Property::Value& pro
 
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
-    DALI_ASSERT_ALWAYS( IsDefaultPropertyWritable(index) && "Property is read-only" );
-
     SetDefaultProperty( index, propertyValue );
   }
   else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
@@ -359,12 +356,17 @@ void ProxyObject::SetProperty( Property::Index index, const Property::Value& pro
   {
     CustomProperty* custom = FindCustomProperty( index );
     DALI_ASSERT_ALWAYS( custom && "Invalid property index" );
-    DALI_ASSERT_ALWAYS( custom->IsWritable() && "Property is read-only" );
-
-    // this is only relevant for non animatable properties, but we'll do it anyways
-    custom->value = propertyValue;
-    // set the scene graph property value
-    SetCustomProperty(index, *custom, propertyValue);
+    if( custom->IsAnimatable() )
+    {
+      // set the scene graph property value
+      SetSceneGraphProperty( index, *custom, propertyValue );
+    }
+    else if( custom->IsWritable() )
+    {
+      custom->value = propertyValue;
+      OnPropertySet(index, propertyValue);
+    }
+    // trying to set value on read only property is no-op
   }
 }
 
@@ -528,7 +530,7 @@ void ProxyObject::GetPropertyIndices( Property::IndexContainer& indices ) const
   }
 }
 
-Property::Index ProxyObject::RegisterProperty( std::string name, const Property::Value& propertyValue)
+Property::Index ProxyObject::RegisterProperty( const std::string& name, const Property::Value& propertyValue)
 {
   // Create a new property
   Dali::Internal::OwnerPointer<PropertyBase> newProperty;
@@ -596,29 +598,45 @@ Property::Index ProxyObject::RegisterProperty( std::string name, const Property:
     case Property::MAP:
     {
       DALI_LOG_WARNING( "Property Type %d\n", propertyValue.GetType() );
-      DALI_ASSERT_ALWAYS( false && "PropertyType is not animatable" );
+      DALI_ASSERT_ALWAYS( !"PropertyType is not animatable" );
       break;
     }
 
     default:
     {
       DALI_LOG_WARNING( "Property Type %d\n", propertyValue.GetType() );
-      DALI_ASSERT_ALWAYS( false && "PropertyType enumeration is out of bounds" );
+      DALI_ASSERT_ALWAYS( !"PropertyType enumeration is out of bounds" );
       break;
     }
   }
 
-  const Property::Index index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
-  mCustomProperties.PushBack( new CustomProperty( name, propertyValue.GetType(), newProperty.Get() ) );
+  // get the scene property owner from derived class
+  const SceneGraph::PropertyOwner* scenePropertyOwner = GetPropertyOwner();
+  Property::Index index = PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count();
+  // we can only pass properties to scene graph side if there is a scene object
+  if( scenePropertyOwner )
+  {
+    // keep a local pointer to the property as the OwnerPointer will pass its copy to the message
+    const PropertyBase* property = newProperty.Get();
+    mCustomProperties.PushBack( new CustomProperty( name, propertyValue.GetType(), property ) );
 
-  // The derived class now passes ownership of this new property to a scene-object
-  // TODO: change this so that OwnerPointer is passed all the way as owership passing cannot be done with a reference
-  InstallSceneObjectProperty( *(newProperty.Release()), name, index );
+    // queue a message to add the property
+    InstallCustomPropertyMessage( Stage::GetCurrent()->GetUpdateInterface(), *scenePropertyOwner, newProperty.Release() ); // Message takes ownership
+
+    // notify the derived class (optional) method in case it needs to do some more work on the new property
+    // note! have to use the local pointer as OwnerPointer now points to NULL as it handed over its ownership
+    NotifyScenePropertyInstalled( *property, name, index );
+  }
+  else
+  {
+    // property was orphaned and killed so return invalid index
+    index = Property::INVALID_INDEX;
+  }
 
   return index;
 }
 
-Property::Index ProxyObject::RegisterProperty( std::string name, const Property::Value& propertyValue, Property::AccessMode accessMode)
+Property::Index ProxyObject::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
 {
   Property::Index index = Property::INVALID_INDEX;
 
@@ -773,107 +791,103 @@ ActiveConstraintBase* ProxyObject::DoApplyConstraint( Constraint& constraint, Da
   return activeConstraintImpl;
 }
 
-void ProxyObject::SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
+void ProxyObject::SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
 {
-  if( entry.IsAnimatable() )
+  switch ( entry.type )
   {
-    switch ( entry.type )
+    case Property::BOOLEAN:
     {
-      case Property::BOOLEAN:
-      {
-        const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+      const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<bool>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<bool>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<bool>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<bool>() );
+      break;
+    }
 
-      case Property::FLOAT:
-      {
-        const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::FLOAT:
+    {
+      const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<float>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<float>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<float>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<float>() );
+      break;
+    }
 
-      case Property::INTEGER:
-      {
-        const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::INTEGER:
+    {
+      const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<int>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<int>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<int>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<int>() );
+      break;
+    }
 
-      case Property::VECTOR2:
-      {
-        const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::VECTOR2:
+    {
+      const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<Vector2>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector2>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Vector2>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector2>() );
+      break;
+    }
 
-      case Property::VECTOR3:
-      {
-        const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::VECTOR3:
+    {
+      const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<Vector3>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector3>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Vector3>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector3>() );
+      break;
+    }
 
-      case Property::VECTOR4:
-      {
-        const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::VECTOR4:
+    {
+      const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<Vector4>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector4>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Vector4>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector4>() );
+      break;
+    }
 
-      case Property::ROTATION:
-      {
-        const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::ROTATION:
+    {
+      const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<Quaternion>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Quaternion>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Quaternion>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Quaternion>() );
+      break;
+    }
 
-      case Property::MATRIX:
-      {
-        const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::MATRIX:
+    {
+      const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<Matrix>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Matrix>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Matrix>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Matrix>() );
+      break;
+    }
 
-      case Property::MATRIX3:
-      {
-        const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::MATRIX3:
+    {
+      const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        BakeMessage<Matrix3>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Matrix3>() );
-        break;
-      }
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<Matrix3>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Matrix3>() );
+      break;
+    }
 
-      default:
-      {
-        DALI_ASSERT_ALWAYS(false && "Property type enumeration out of bounds"); // should not come here
-        break;
-      }
+    default:
+    {
+      // non-animatable scene graph property, do nothing
     }
   }
 }

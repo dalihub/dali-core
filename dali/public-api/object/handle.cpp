@@ -40,12 +40,12 @@ Handle::~Handle()
 {
 }
 
-Handle::Handle(const Handle& handle)
-  : BaseHandle(handle)
+Handle::Handle( const Handle& handle )
+: BaseHandle( handle )
 {
 }
 
-Handle& Handle::operator=(const Handle& rhs)
+Handle& Handle::operator=( const Handle& rhs )
 {
   if( this != &rhs )
   {
@@ -61,7 +61,7 @@ Handle Handle::DownCast( BaseHandle handle )
 }
 
 
-bool Handle::Supports(Capability capability) const
+bool Handle::Supports( Capability capability ) const
 {
   return GetImplementation(*this).Supports( capability );
 }
@@ -71,52 +71,52 @@ unsigned int Handle::GetPropertyCount() const
   return GetImplementation(*this).GetPropertyCount();
 }
 
-std::string Handle::GetPropertyName(Property::Index index) const
+std::string Handle::GetPropertyName( Property::Index index ) const
 {
   return GetImplementation(*this).GetPropertyName( index );
 }
 
-Property::Index Handle::GetPropertyIndex(std::string name) const
+Property::Index Handle::GetPropertyIndex( const std::string& name ) const
 {
   return GetImplementation(*this).GetPropertyIndex( name );
 }
 
-bool Handle::IsPropertyWritable(Property::Index index) const
+bool Handle::IsPropertyWritable( Property::Index index ) const
 {
   return GetImplementation(*this).IsPropertyWritable( index );
 }
 
-bool Handle::IsPropertyAnimatable(Property::Index index) const
+bool Handle::IsPropertyAnimatable( Property::Index index ) const
 {
   return GetImplementation(*this).IsPropertyAnimatable( index );
 }
 
-bool Handle::IsPropertyAConstraintInput(Property::Index index) const
+bool Handle::IsPropertyAConstraintInput( Property::Index index ) const
 {
   return GetImplementation(*this).IsPropertyAConstraintInput( index );
 }
 
-Property::Type Handle::GetPropertyType(Property::Index index) const
+Property::Type Handle::GetPropertyType( Property::Index index ) const
 {
   return GetImplementation(*this).GetPropertyType( index );
 }
 
-void Handle::SetProperty(Property::Index index, Property::Value propertyValue)
+void Handle::SetProperty( Property::Index index, const Property::Value& propertyValue )
 {
   GetImplementation(*this).SetProperty( index, propertyValue );
 }
 
-Property::Index Handle::RegisterProperty(std::string name, Property::Value propertyValue)
+Property::Index Handle::RegisterProperty( const std::string& name, const Property::Value& propertyValue )
 {
   return GetImplementation(*this).RegisterProperty( name, propertyValue );
 }
 
-Property::Index Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
+Property::Index Handle::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode )
 {
   return GetImplementation(*this).RegisterProperty( name, propertyValue, accessMode );
 }
 
-Property::Value Handle::GetProperty(Property::Index index) const
+Property::Value Handle::GetProperty( Property::Index index ) const
 {
   return GetImplementation(*this).GetProperty( index );
 }
@@ -126,20 +126,20 @@ void Handle::GetPropertyIndices( Property::IndexContainer& indices ) const
   GetImplementation(*this).GetPropertyIndices( indices );
 }
 
-Dali::PropertyNotification Handle::AddPropertyNotification(Property::Index index,
-                                                           const PropertyCondition& condition)
+Dali::PropertyNotification Handle::AddPropertyNotification( Property::Index index,
+                                                            const PropertyCondition& condition )
 {
   return GetImplementation(*this).AddPropertyNotification( index, -1, condition );
 }
 
-Dali::PropertyNotification Handle::AddPropertyNotification(Property::Index index,
-                                                           int componentIndex,
-                                                           const PropertyCondition& condition)
+Dali::PropertyNotification Handle::AddPropertyNotification( Property::Index index,
+                                                            int componentIndex,
+                                                            const PropertyCondition& condition )
 {
   return GetImplementation(*this).AddPropertyNotification( index, componentIndex, condition );
 }
 
-void Handle::RemovePropertyNotification(Dali::PropertyNotification propertyNotification)
+void Handle::RemovePropertyNotification( Dali::PropertyNotification propertyNotification )
 {
   GetImplementation(*this).RemovePropertyNotification( propertyNotification );
 }

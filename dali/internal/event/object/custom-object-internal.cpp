@@ -22,7 +22,6 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 
@@ -106,15 +105,6 @@ void CustomObject::SetDefaultProperty( Property::Index index, const Property::Va
 Property::Value CustomObject::GetDefaultProperty(Property::Index index) const
 {
   return Property::Value();
-}
-
-void CustomObject::InstallSceneObjectProperty( PropertyBase& newProperty, const std::string& name, unsigned int index )
-{
-  if( NULL != mUpdateObject )
-  {
-    // mUpdateObject is being used in a separate thread; queue a message to add the property
-    InstallCustomPropertyMessage( Stage::GetCurrent()->GetUpdateInterface(), *mUpdateObject, newProperty ); // Message takes ownership
-  }
 }
 
 CustomObject::~CustomObject()

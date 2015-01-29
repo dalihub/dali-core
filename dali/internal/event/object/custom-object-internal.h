@@ -107,11 +107,6 @@ public:
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
-  /**
-   * @copydoc Dali::Internal::ProxyObject::InstallSceneObjectProperty()
-   */
-  virtual void InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
-
 protected:
 
   /**

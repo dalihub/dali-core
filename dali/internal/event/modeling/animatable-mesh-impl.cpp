@@ -280,7 +280,7 @@ Property::Type AnimatableMesh::GetDefaultPropertyType(Property::Index index) con
 
 void AnimatableMesh::SetDefaultProperty( Property::Index index, const Property::Value& property )
 {
-  DALI_ASSERT_ALWAYS( ( index >= 0 ) && ( index < mPropertyCount ) );
+  DALI_ASSERT_ALWAYS( ( index < mPropertyCount ) && "Property index out of bounds" );
 
   int vertexProperty = index % VERTEX_PROPERTY_COUNT;
   int vertexIndex    = index / VERTEX_PROPERTY_COUNT;
@@ -301,12 +301,12 @@ void AnimatableMesh::SetDefaultProperty( Property::Index index, const Property::
       SetTextureCoords( vertexIndex, property.Get<Vector2>() );
       break;
     }
+    default:
+    {
+      // nothing to do
+      break;
+    }
   }
-}
-
-void AnimatableMesh::SetCustomProperty( Property::Index /*index*/, const CustomProperty& /*entry*/, const Property::Value& /*value*/ )
-{
-  DALI_ASSERT_ALWAYS( 0 && "AnimatableMesh does not support custom properties");
 }
 
 Property::Value AnimatableMesh::GetDefaultProperty(Property::Index index) const
@@ -332,14 +332,14 @@ Property::Value AnimatableMesh::GetDefaultProperty(Property::Index index) const
       value = GetCurrentTextureCoords(vertexIndex);
       break;
     }
+    default:
+    {
+      // nothing to do
+      break;
+    }
   }
 
   return value;
-}
-
-void AnimatableMesh::InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
-{
-  DALI_ASSERT_ALWAYS( 0 && "AnimatableMesh does not support custom properties" );
 }
 
 const SceneGraph::PropertyOwner* AnimatableMesh::GetSceneObject() const
