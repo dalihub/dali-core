@@ -482,32 +482,32 @@ bool Actor::IsKeyboardFocusable() const
   return GetImplementation(*this).IsKeyboardFocusable();
 }
 
-Actor::TouchSignalV2& Actor::TouchedSignal()
+Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
 }
 
-Actor::HoverSignalV2& Actor::HoveredSignal()
+Actor::HoverSignalType& Actor::HoveredSignal()
 {
   return GetImplementation(*this).HoveredSignal();
 }
 
-Actor::MouseWheelEventSignalV2& Actor::MouseWheelEventSignal()
+Actor::MouseWheelEventSignalType& Actor::MouseWheelEventSignal()
 {
   return GetImplementation(*this).MouseWheelEventSignal();
 }
 
-Actor::SetSizeSignalV2& Actor::SetSizeSignal()
+Actor::SetSizeSignalType& Actor::SetSizeSignal()
 {
   return GetImplementation(*this).SetSizeSignal();
 }
 
-Actor::OnStageSignalV2& Actor::OnStageSignal()
+Actor::OnStageSignalType& Actor::OnStageSignal()
 {
   return GetImplementation(*this).OnStageSignal();
 }
 
-Actor::OffStageSignalV2& Actor::OffStageSignal()
+Actor::OffStageSignalType& Actor::OffStageSignal()
 {
   return GetImplementation(*this).OffStageSignal();
 }

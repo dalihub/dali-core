@@ -222,7 +222,7 @@ public:
    * @param [in] name The signal name
    * @param [in] func The signal connector function
    */
-  SignalConnectorType( TypeRegistration& typeRegistration, const std::string& name, TypeInfo::SignalConnectorFunctionV2 func );
+  SignalConnectorType( TypeRegistration& typeRegistration, const std::string& name, TypeInfo::SignalConnectorFunction func );
 };
 
 /**

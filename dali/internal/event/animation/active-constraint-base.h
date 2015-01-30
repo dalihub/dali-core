@@ -146,7 +146,7 @@ public:
   /**
    * @copydoc Dali::ActiveConstraint::AppliedSignal()
    */
-  ActiveConstraintSignalV2& AppliedSignal();
+  ActiveConstraintSignalType& AppliedSignal();
 
   /**
    * @copydoc Dali::Constraint::SetAlphaFunction()
@@ -322,7 +322,7 @@ protected:
 
 private:
 
-  ActiveConstraintSignalV2 mAppliedSignal;
+  ActiveConstraintSignalType mAppliedSignal;
 
   Dali::Animation mApplyAnimation;  ///< Used to automatically animate weight from 0.0f -> 1.0f
 

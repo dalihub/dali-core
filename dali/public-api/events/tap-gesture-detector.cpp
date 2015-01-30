@@ -89,7 +89,7 @@ unsigned int TapGestureDetector::GetTouchesRequired() const
   return GetImplementation(*this).GetTouchesRequired();
 }
 
-TapGestureDetector::DetectedSignalV2& TapGestureDetector::DetectedSignal()
+TapGestureDetector::DetectedSignalType& TapGestureDetector::DetectedSignal()
 {
   return GetImplementation(*this).DetectedSignal();
 }

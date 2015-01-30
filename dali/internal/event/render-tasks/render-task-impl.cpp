@@ -667,16 +667,16 @@ void RenderTask::EmitSignalFinish()
 {
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::EmitSignalFinish(this:%p)\n", this);
 
-  if( !mSignalFinishedV2.Empty() )
+  if( !mSignalFinished.Empty() )
   {
     Dali::RenderTask handle( this );
-    mSignalFinishedV2.Emit(handle );
+    mSignalFinished.Emit(handle );
   }
 }
 
-Dali::RenderTask::RenderTaskSignalV2& RenderTask::FinishedSignal()
+Dali::RenderTask::RenderTaskSignalType& RenderTask::FinishedSignal()
 {
-  return mSignalFinishedV2;
+  return mSignalFinished;
 }
 
 bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture-detector.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -56,7 +56,7 @@ class DALI_IMPORT_API PanGestureDetector : public GestureDetector
 public:
 
   // Typedefs
-  typedef SignalV2< void ( Actor, const PanGesture& ) > DetectedSignalV2; ///< Pan gesture detected signal type
+  typedef Signal< void ( Actor, const PanGesture& ) > DetectedSignalType; ///< Pan gesture detected signal type
 
   // Directional Pan
   typedef std::pair< Radian, Radian > AngleThresholdPair; ///< Range of angles for a direction
@@ -280,7 +280,7 @@ public: // Signals
    * @pre The gesture detector has been initialized.
    * @return The signal to connect to.
    */
-  DetectedSignalV2& DetectedSignal();
+  DetectedSignalType& DetectedSignal();
 
 public: // Pan Properties Setters
 

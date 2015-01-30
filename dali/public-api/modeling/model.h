@@ -26,7 +26,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/loading-state.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -49,8 +49,8 @@ class DALI_IMPORT_API Model : public BaseHandle
 {
 public:
 
-  typedef SignalV2<void (Model)> ModelSignalV2; ///< Signal type
-  typedef SignalV2<void (Model,bool)> ModelSaveSignalV2; ///< Signal type for saving models
+  typedef Signal<void (Model)> ModelSignalType; ///< Signal type
+  typedef Signal<void (Model,bool)> ModelSaveSignalType; ///< Signal type for saving models
 
   //Signal Names
   static const char* const SIGNAL_MODEL_LOADING_FINISHED; ///< name "model-loading-finished"
@@ -123,14 +123,14 @@ public:
    *
    * @return A signal object to Connect() with.
    */
-  ModelSignalV2& LoadingFinishedSignal();
+  ModelSignalType& LoadingFinishedSignal();
 
   /**
    * @brief Emitted when the model data save request completes.
    *
    * @return A signal object to Connect() with.
    */
-  ModelSaveSignalV2& SavingFinishedSignal();
+  ModelSaveSignalType& SavingFinishedSignal();
 
   /**
    * @brief Get number of animations in the model.

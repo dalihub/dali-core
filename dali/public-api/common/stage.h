@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -51,11 +51,11 @@ class DALI_IMPORT_API Stage : public BaseHandle
 {
 public:
 
-  typedef SignalV2< void (const KeyEvent&)> KeyEventSignalV2;  ///< Key event signal type
-  typedef SignalV2< void () > EventProcessingFinishedSignalV2; ///< Event Processing finished signal type
-  typedef SignalV2< void (const TouchEvent&)> TouchedSignalV2; ///< Touched signal type
-  typedef SignalV2< void () > ContextStatusSignal;             ///< Context status signal type
-  typedef SignalV2< void () > SceneCreatedSignalV2;            ///< Scene created signal type
+  typedef Signal< void (const KeyEvent&)> KeyEventSignalType;  ///< Key event signal type
+  typedef Signal< void () > EventProcessingFinishedSignalType; ///< Event Processing finished signal type
+  typedef Signal< void (const TouchEvent&)> TouchedSignalType; ///< Touched signal type
+  typedef Signal< void () > ContextStatusSignal;             ///< Context status signal type
+  typedef Signal< void () > SceneCreatedSignalType;            ///< Scene created signal type
 
   static const Vector4 DEFAULT_BACKGROUND_COLOR; ///< Default black background.
   static const Vector4 DEBUG_BACKGROUND_COLOR;   ///< Green background, useful when debugging.
@@ -257,14 +257,14 @@ public:
    * @endcode
    * @return The signal to connect to.
    */
-  KeyEventSignalV2& KeyEventSignal();
+  KeyEventSignalType& KeyEventSignal();
 
   /**
    * @brief This signal is emitted just after the event processing is finished.
    *
    * @return The signal to connect to.
    */
-  EventProcessingFinishedSignalV2& EventProcessingFinishedSignal();
+  EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
 
   /**
    * @brief This signal is emitted when the screen is touched and when the touch ends
@@ -281,7 +281,7 @@ public:
    * @note Motion events are not emitted.
    * @return The touch signal to connect to.
    */
-  TouchedSignalV2& TouchedSignal();
+  TouchedSignalType& TouchedSignal();
 
   /**
    * @brief This signal is emitted when the GL context is lost (Platform specific behaviour).
@@ -312,7 +312,7 @@ public:
    * @endcode
    * @return The signal to connect to.
    */
-  SceneCreatedSignalV2& SceneCreatedSignal();
+  SceneCreatedSignalType& SceneCreatedSignal();
 
 public: // Not intended for application developers
 

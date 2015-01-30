@@ -56,8 +56,8 @@ public:
     mPanelUp.Emit( *this );
   }
 
-  typedef SignalV2< void (TestButton&) > PanelDownSignal;
-  typedef SignalV2< void (TestButton&) > PanelUpSignal;
+  typedef Signal< void (TestButton&) > PanelDownSignal;
+  typedef Signal< void (TestButton&) > PanelUpSignal;
 
   PanelDownSignal& DownSignal()
   {
@@ -133,37 +133,37 @@ class TestSignals
 public:
 
   // Void return, no parameters
-  typedef SignalV2<void ()> VoidRetNoParamSignal;
+  typedef Signal<void ()> VoidRetNoParamSignal;
 
   // Void return, 1 value parameter
-  typedef SignalV2<void (int)> VoidRet1ValueParamSignal;
+  typedef Signal<void (int)> VoidRet1ValueParamSignal;
 
   // Void return, 1 reference parameter
-  typedef SignalV2< void (int&)> VoidRet1RefParamSignal;
+  typedef Signal< void (int&)> VoidRet1RefParamSignal;
 
   // Void return, 2 value parameters
-  typedef SignalV2<void (int, int)> VoidRet2ValueParamSignal;
+  typedef Signal<void (int, int)> VoidRet2ValueParamSignal;
 
   // bool return, 1 value parameter
-  typedef SignalV2< bool (float)> BoolRet1ValueParamSignal;
+  typedef Signal< bool (float)> BoolRet1ValueParamSignal;
 
   // bool return, 2 value parameter
-  typedef SignalV2<bool (float, int) > BoolRet2ValueParamSignal;
+  typedef Signal<bool (float, int) > BoolRet2ValueParamSignal;
 
   // int return, 2 value parameter
-  typedef SignalV2<int (float, int)> IntRet2ValueParamSignal;
+  typedef Signal<int (float, int)> IntRet2ValueParamSignal;
 
   // float return, 0 parameters
-  typedef SignalV2< float () > FloatRet0ParamSignal;
+  typedef Signal< float () > FloatRet0ParamSignal;
 
   // float return, 2 value parameters
-  typedef SignalV2<float (float, float) > FloatRet2ValueParamSignal;
+  typedef Signal<float (float, float) > FloatRet2ValueParamSignal;
 
   // void return, 3 value parameters
-  typedef SignalV2<void (float, float, float) > VoidSignalTypeFloatValue3;
+  typedef Signal<void (float, float, float) > VoidSignalTypeFloatValue3;
 
   // float return, 3 value parameters
-  typedef SignalV2<float (float, float, float) > FloatSignalTypeFloatValue3;
+  typedef Signal<float (float, float, float) > FloatSignalTypeFloatValue3;
 
   VoidRetNoParamSignal&       SignalVoidNone()    { return mSignalVoid0;  }
   VoidRet1RefParamSignal&     SignalVoid1Ref()    { return mSignalVoid1R; }
@@ -2195,7 +2195,7 @@ int UtcDaliSignalTestApp05(void)
 
 int UtcDaliSignalTestApp06(void)
 {
-  SignalV2< bool () > boolSignal;
+  Signal< bool () > boolSignal;
   TestApp app;
   bool result(false);
 

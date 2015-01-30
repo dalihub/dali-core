@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -62,12 +62,12 @@ public:
   /**
    * @brief Object created signal
    */
-  typedef SignalV2<  void (BaseHandle) > ObjectCreatedSignalV2;
+  typedef Signal<  void (BaseHandle) > ObjectCreatedSignalType;
 
   /**
    * @brief Object destroyed signal
    */
-  typedef SignalV2<  void (const Dali::RefObject*) > ObjectDestroyedSignalV2;
+  typedef Signal<  void (const Dali::RefObject*) > ObjectDestroyedSignalType;
 
   /**
    * @brief Allows the creation of an empty objectRegistry handle.
@@ -111,7 +111,7 @@ public: // Signals
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  ObjectCreatedSignalV2& ObjectCreatedSignal();
+  ObjectCreatedSignalType& ObjectCreatedSignal();
 
   /**
    * @brief This signal is emitted when an object is destroyed.
@@ -134,7 +134,7 @@ public: // Signals
    * @pre The Object has been initialized.
    * @return The signal to connect to.
    */
-  ObjectDestroyedSignalV2& ObjectDestroyedSignal();
+  ObjectDestroyedSignalType& ObjectDestroyedSignal();
 
 public: // Not intended for application developers
 

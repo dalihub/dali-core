@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture-detector.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -53,7 +53,7 @@ class DALI_IMPORT_API LongPressGestureDetector : public GestureDetector
 {
 public: // Typedefs
 
-  typedef SignalV2< void ( Actor, const LongPressGesture& ) > DetectedSignalV2; ///< Gesture detected signal type
+  typedef Signal< void ( Actor, const LongPressGesture& ) > DetectedSignalType; ///< Gesture detected signal type
 
   //Signal Names
   static const char* const SIGNAL_LONG_PRESS_DETECTED; ///< name "long-press-detected"
@@ -186,7 +186,7 @@ public: // Signals
    * @pre The gesture detector has been initialized.
    * @return The signal to connect to.
    */
-  DetectedSignalV2& DetectedSignal();
+  DetectedSignalType& DetectedSignal();
 
 public: // Not intended for Application developers
 

@@ -151,8 +151,8 @@ bool TypeInfo::ConnectSignal( BaseObject* object, ConnectionTrackerInterface* co
 {
   bool connected( false );
 
-  ConnectorContainerV2::iterator iter = find_if( mSignalConnectors.begin(), mSignalConnectors.end(),
-                                                 PairFinder<std::string, ConnectionPairV2>(signalName) );
+  ConnectorContainer::iterator iter = find_if( mSignalConnectors.begin(), mSignalConnectors.end(),
+                                                 PairFinder<std::string, ConnectionPair>(signalName) );
 
   if( iter != mSignalConnectors.end() )
   {
@@ -199,7 +199,7 @@ void TypeInfo::GetActions( Dali::TypeInfo::NameContainer& ret ) const
 
 void TypeInfo::GetSignals(Dali::TypeInfo::NameContainer& ret) const
 {
-  for(ConnectorContainerV2::const_iterator iter = mSignalConnectors.begin(); iter != mSignalConnectors.end(); ++iter)
+  for(ConnectorContainer::const_iterator iter = mSignalConnectors.begin(); iter != mSignalConnectors.end(); ++iter)
   {
     ret.push_back(iter->first);
   }
@@ -207,7 +207,7 @@ void TypeInfo::GetSignals(Dali::TypeInfo::NameContainer& ret) const
   Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
   while( base )
   {
-    for(ConnectorContainerV2::const_iterator iter = GetImplementation(base).mSignalConnectors.begin();
+    for(ConnectorContainer::const_iterator iter = GetImplementation(base).mSignalConnectors.begin();
         iter != GetImplementation(base).mSignalConnectors.end(); ++iter)
     {
       ret.push_back(iter->first);
@@ -301,7 +301,7 @@ void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo:
   }
 }
 
-void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeInfo::SignalConnectorFunctionV2 function )
+void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeInfo::SignalConnectorFunction function )
 {
   if( NULL == function)
   {
@@ -309,12 +309,12 @@ void TypeInfo::AddConnectorFunction( const std::string& signalName, Dali::TypeIn
   }
   else
   {
-    ConnectorContainerV2::iterator iter = find_if( mSignalConnectors.begin(), mSignalConnectors.end(),
-                                                   PairFinder<std::string, ConnectionPairV2>(signalName) );
+    ConnectorContainer::iterator iter = find_if( mSignalConnectors.begin(), mSignalConnectors.end(),
+                                                   PairFinder<std::string, ConnectionPair>(signalName) );
 
     if( iter == mSignalConnectors.end() )
     {
-      mSignalConnectors.push_back( ConnectionPairV2( signalName, function ) );
+      mSignalConnectors.push_back( ConnectionPair( signalName, function ) );
     }
     else
     {

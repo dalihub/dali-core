@@ -114,7 +114,7 @@ public:
    * @note A non-zero apply-time must have been set using Constraint::SetApplyTime().
    * @return A signal object to Connect() with.
    */
-  ActiveConstraintSignalV2& AppliedSignal();
+  ActiveConstraintSignalType& AppliedSignal();
 
 public: // Not intended for use by Application developers
 

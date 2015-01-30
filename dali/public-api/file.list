@@ -281,7 +281,7 @@ public_api_core_signals_header_files = \
   $(public_api_src_dir)/signals/callback.h \
   $(public_api_src_dir)/signals/connection-tracker-interface.h \
   $(public_api_src_dir)/signals/connection-tracker.h \
-  $(public_api_src_dir)/signals/dali-signal-v2.h \
+  $(public_api_src_dir)/signals/dali-signal.h \
   $(public_api_src_dir)/signals/functor-delegate.h \
   $(public_api_src_dir)/signals/signal-slot-connections.h \
   $(public_api_src_dir)/signals/signal-slot-observers.h \

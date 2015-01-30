@@ -150,7 +150,7 @@ public:
    *
    * @return A signal object to Connect() with.
    */
-  PropertyNotifySignalV2& NotifySignal();
+  PropertyNotifySignalType& NotifySignal();
 
 public: // Not intended for use by Application developers
 

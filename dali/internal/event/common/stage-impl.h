@@ -365,17 +365,17 @@ public:
   /**
    * @copydoc Dali::Stage::KeyEventSignal()
    */
-  Dali::Stage::KeyEventSignalV2& KeyEventSignal();
+  Dali::Stage::KeyEventSignalType& KeyEventSignal();
 
   /**
    * @copydoc Dali::Stage::SignalEventProcessingFinished()
    */
-  Dali::Stage::EventProcessingFinishedSignalV2& EventProcessingFinishedSignal();
+  Dali::Stage::EventProcessingFinishedSignalType& EventProcessingFinishedSignal();
 
   /**
     * @copydoc Dali::Stage::TouchedSignal()
     */
-  Dali::Stage::TouchedSignalV2& TouchedSignal();
+  Dali::Stage::TouchedSignalType& TouchedSignal();
 
   /**
    * @copydoc Dali::Stage::ContextLostSignal()
@@ -390,7 +390,7 @@ public:
   /**
    * @copydoc Dali::Stage::SceneCreatedSignal()
    */
-  Dali::Stage::SceneCreatedSignalV2& SceneCreatedSignal();
+  Dali::Stage::SceneCreatedSignalType& SceneCreatedSignal();
 
 private: // Implementation of ContextNotificationInterface:
 
@@ -472,18 +472,18 @@ private:
   Integration::SystemOverlay* mSystemOverlay; ///< SystemOverlay stage access
 
   // The key event signal
-  Dali::Stage::KeyEventSignalV2                 mKeyEventSignalV2;
+  Dali::Stage::KeyEventSignalType                 mKeyEventSignal;
 
   // The event processing finished signal
-  Dali::Stage::EventProcessingFinishedSignalV2  mEventProcessingFinishedSignalV2;
+  Dali::Stage::EventProcessingFinishedSignalType  mEventProcessingFinishedSignal;
 
   // The touched signal
-  Dali::Stage::TouchedSignalV2                  mTouchedSignalV2;
+  Dali::Stage::TouchedSignalType                  mTouchedSignal;
 
   Dali::Stage::ContextStatusSignal mContextLostSignal;
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;
 
-  Dali::Stage::SceneCreatedSignalV2 mSceneCreatedSignal;
+  Dali::Stage::SceneCreatedSignalType mSceneCreatedSignal;
 };
 
 } // namespace Internal

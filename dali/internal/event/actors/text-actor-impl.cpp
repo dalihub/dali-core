@@ -620,7 +620,7 @@ bool TextActor::CheckTextLoadState()
 
     // emit text available signal
 
-    mLoadingFinishedV2.Emit( Dali::TextActor( this ) );
+    mLoadingFinished.Emit( Dali::TextActor( this ) );
 
     return true;
   }

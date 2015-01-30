@@ -493,17 +493,17 @@ void Stage::EmitKeyEventSignal(const KeyEvent& event)
 {
   // Emit the key event signal when no actor in the stage has gained the key input focus
 
-  mKeyEventSignalV2.Emit( event );
+  mKeyEventSignal.Emit( event );
 }
 
 void Stage::EmitEventProcessingFinishedSignal()
 {
-   mEventProcessingFinishedSignalV2.Emit();
+   mEventProcessingFinishedSignal.Emit();
 }
 
 void Stage::EmitTouchedSignal( const TouchEvent& touch )
 {
-  mTouchedSignalV2.Emit( touch );
+  mTouchedSignal.Emit( touch );
 }
 
 
@@ -512,19 +512,19 @@ void Stage::EmitSceneCreatedSignal()
   mSceneCreatedSignal.Emit();
 }
 
-Dali::Stage::KeyEventSignalV2& Stage::KeyEventSignal()
+Dali::Stage::KeyEventSignalType& Stage::KeyEventSignal()
 {
-  return mKeyEventSignalV2;
+  return mKeyEventSignal;
 }
 
-Dali::Stage::EventProcessingFinishedSignalV2& Stage::EventProcessingFinishedSignal()
+Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()
 {
-  return mEventProcessingFinishedSignalV2;
+  return mEventProcessingFinishedSignal;
 }
 
-Dali::Stage::TouchedSignalV2& Stage::TouchedSignal()
+Dali::Stage::TouchedSignalType& Stage::TouchedSignal()
 {
-  return mTouchedSignalV2;
+  return mTouchedSignal;
 }
 
 Dali::Stage::ContextStatusSignal& Stage::ContextLostSignal()
@@ -537,7 +537,7 @@ Dali::Stage::ContextStatusSignal& Stage::ContextRegainedSignal()
   return mContextRegainedSignal;
 }
 
-Dali::Stage::SceneCreatedSignalV2& Stage::SceneCreatedSignal()
+Dali::Stage::SceneCreatedSignalType& Stage::SceneCreatedSignal()
 {
   return mSceneCreatedSignal;
 }

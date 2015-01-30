@@ -114,7 +114,7 @@ public:
   const Vector3& GetGravity() const;
 
   /// @copydoc Dali::DynamicsWorld::CollisionSignal
-  Dali::DynamicsWorld::CollisionSignalV2& CollisionSignal();
+  Dali::DynamicsWorld::CollisionSignalType& CollisionSignal();
 
   /// @copydoc Dali::DynamicsWorld::GetDebugDrawMode
   int GetDebugDrawMode() const;
@@ -179,7 +179,7 @@ private:
   BodyContainer mBodies;
   ActorPtr      mRootActor;
 
-  Dali::DynamicsWorld::CollisionSignalV2 mCollisionSignalV2;
+  Dali::DynamicsWorld::CollisionSignalType mCollisionSignal;
 
   SlotDelegate< DynamicsWorld > mSlotDelegate;
 };

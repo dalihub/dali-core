@@ -55,7 +55,7 @@ class DALI_IMPORT_API TextActor : public RenderableActor
 {
 public:
 
-  typedef SignalV2< void (TextActor) > TextSignalV2;     ///< Text available signal type
+  typedef Signal< void (TextActor) > TextSignalType;     ///< Text available signal type
 
   //Signal Names
   static const char* const SIGNAL_TEXT_LOADING_FINISHED; ///< name "text-loading-finished"
@@ -400,7 +400,7 @@ public:
    *
    * @return A signal object to Connect() with.
    */
-  TextSignalV2& TextAvailableSignal();
+  TextSignalType& TextAvailableSignal();
 
 public: // Not intended for use by Application developers
 

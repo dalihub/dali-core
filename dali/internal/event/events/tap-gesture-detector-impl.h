@@ -104,9 +104,9 @@ public: // Signals
   /**
    * @copydoc Dali::TapGestureDetector::DetectedSignal()
    */
-  Dali::TapGestureDetector::DetectedSignalV2& DetectedSignal()
+  Dali::TapGestureDetector::DetectedSignalType& DetectedSignal()
   {
-    return mDetectedSignalV2;
+    return mDetectedSignal;
   }
 
   /**
@@ -152,7 +152,7 @@ private: // GestureDetector overrides
 
 private:
 
-  Dali::TapGestureDetector::DetectedSignalV2 mDetectedSignalV2;
+  Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 
   unsigned int mTapsRequired;
   unsigned int mTouchesRequired;

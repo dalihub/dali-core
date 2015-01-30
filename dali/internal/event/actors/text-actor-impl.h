@@ -273,7 +273,7 @@ public:
   /**
    * @copydoc Dali::TextActor::TextAvailableSignal()
    */
-  Dali::TextActor::TextSignalV2& TextAvailableSignal() { return mLoadingFinishedV2; }
+  Dali::TextActor::TextSignalType& TextAvailableSignal() { return mLoadingFinished; }
 
   /**
    * Connects a callback function with the text actors signals.
@@ -382,7 +382,7 @@ protected:
 
 private:
 
-  Dali::TextActor::TextSignalV2 mLoadingFinishedV2;
+  Dali::TextActor::TextSignalType mLoadingFinished;
   bool mUsingNaturalSize:1;  ///< whether the actor is using natural size
   bool mInternalSetSize:1;  ///< to determine when we are internally setting size
   bool mFontDetection:1;  ///< tells whether TextActor should query platform abstraction after SetText

@@ -69,12 +69,12 @@ LoadingState Model::GetLoadingState()
   return GetImplementation(*this).GetLoadingState();
 }
 
-Model::ModelSignalV2& Model::LoadingFinishedSignal()
+Model::ModelSignalType& Model::LoadingFinishedSignal()
 {
   return GetImplementation(*this).LoadingFinishedSignal();
 }
 
-Model::ModelSaveSignalV2& Model::SavingFinishedSignal()
+Model::ModelSaveSignalType& Model::SavingFinishedSignal()
 {
   return GetImplementation(*this).SavingFinishedSignal();
 }

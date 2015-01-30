@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/gesture-detector.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -55,7 +55,7 @@ public: // Typedefs
   /**
    * @brief Signal type.
    */
-  typedef SignalV2< void ( Actor, const PinchGesture& ) > DetectedSignalV2;
+  typedef Signal< void ( Actor, const PinchGesture& ) > DetectedSignalType;
 
   //Signal Names
   static const char* const SIGNAL_PINCH_DETECTED; ///< name "pinch-detected"
@@ -120,7 +120,7 @@ public: // Signals
    * @pre The gesture detector has been initialized.
    * @return The signal to connect to.
    */
-  DetectedSignalV2& DetectedSignal();
+  DetectedSignalType& DetectedSignal();
 
 public: // Not intended for Application developers
 

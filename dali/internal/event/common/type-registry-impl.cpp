@@ -165,7 +165,7 @@ std::string TypeRegistry::RegistrationName( const std::type_info& registerType )
   return DemangleClassName( registerType.name() );
 }
 
-void TypeRegistry::RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunctionV2 func )
+void TypeRegistry::RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunction func )
 {
   RegistryMap::iterator iter = mRegistryLut.find( typeRegistration.RegisteredName() );
 

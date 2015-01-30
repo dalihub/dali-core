@@ -94,7 +94,7 @@ bool PropertyNotification::GetNotifyResult() const
   return GetImplementation(*this).GetNotifyResult();
 }
 
-PropertyNotifySignalV2& PropertyNotification::NotifySignal()
+PropertyNotifySignalType& PropertyNotification::NotifySignal()
 {
   return GetImplementation(*this).NotifySignal();
 }

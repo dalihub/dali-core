@@ -270,14 +270,14 @@ bool PanGestureDetector::CheckAngleAllowed( Radian angle ) const
 
 void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const PanGesture& pan)
 {
-  if ( !mDetectedSignalV2.Empty() )
+  if ( !mDetectedSignal.Empty() )
   {
     // Guard against destruction during signal emission
     Dali::PanGestureDetector handle( this );
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Emitting Signal (%p)\n", this );
 
-    mDetectedSignalV2.Emit( actor, pan );
+    mDetectedSignal.Emit( actor, pan );
   }
 }
 

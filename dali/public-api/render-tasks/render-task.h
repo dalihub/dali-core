@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/viewport.h>
 #include <dali/public-api/object/constrainable.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -75,7 +75,7 @@ public:
   /**
    * @brief Typedef for signals sent by this class.
    */
-  typedef SignalV2< void (RenderTask& source) > RenderTaskSignalV2;
+  typedef Signal< void (RenderTask& source) > RenderTaskSignalType;
 
   // Default Properties
   static const Property::Index VIEWPORT_POSITION;    ///< Property  0, name "viewport-position",   type VECTOR2
@@ -391,7 +391,7 @@ public: // Signals
   /**
    * @brief If the refresh rate is REFRESH_ONCE, connect to this signal to be notified when a RenderTask has finished.
    */
-  RenderTaskSignalV2& FinishedSignal();
+  RenderTaskSignalType& FinishedSignal();
 
 public: // Not intended for application developers
 
