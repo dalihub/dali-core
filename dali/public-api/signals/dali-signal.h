@@ -62,6 +62,68 @@ namespace Dali
 
 /**
  * @brief Base Template class to provide signals.
+ *
+ * To create a signal for this class, you first have to define a typedef within your handle's scope:
+ * @code
+ * class MyHandle : public Handle
+ * {
+ * public:
+ *
+ *   // Typedefs
+ *
+ *   typedef Signal< void ()> VoidSignalType;         ///< For signals that require no parameters and no return value
+ *   typedef Signal< bool ()> BoolSignalType;         ///< For signals that do not need parameters but require a boolean return
+ *   typedef Signal< void ( float )> ParamSignalType; ///< For signals that need a float as a parameter but no return value
+ *
+ *   ...
+ *
+ * public:
+ *
+ *   // Signals
+ *
+ *   VoidSignalType&  VoidSignal();
+ *   BoolSignalType&  BoolSignal();
+ *   ParamSignalType& ParamSignal();
+ *
+ *   ...
+ * };
+ * @endcode
+ * The methods are required in the handle class so that the application writer can retrieve the Signal in order to connect/disconnect.
+ *
+ * In the implementation class, the members should be defined and the methods should be provided to retrieve the signal itself.
+ * These will be called by the equivalent methods in the MyHandle class.
+ * @code
+ * class MyObject : public Object
+ * {
+ *   ...
+ *
+ * public:
+ *
+ *   MyHandle::VoidSignalType&  VoidSignal()
+ *   {
+ *     return mVoidSignal;
+ *   }
+ *
+ *   MyHandle::BoolSignalType&  BoolSignal()
+ *   {
+ *     return mBoolSignal;
+ *   }
+ *
+ *   MyHandle::ParamSignalType& ParamSignal()
+ *   {
+ *     return mParamSignal;
+ *   }
+ *
+ * private:
+ *
+ *   // Signals
+ *   MyHandle::VoidSignalType   mVoidSignal;
+ *   MyHandle::BoolSignalType   mBoolSignal;
+ *   MyHandle::ParamSignalType  mParamSignal;
+ *
+ *   ...
+ * };
+ * @endcode
  */
 template< typename _Signature >
 class Signal
