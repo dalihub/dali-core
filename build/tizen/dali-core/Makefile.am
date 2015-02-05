@@ -135,8 +135,8 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
-
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp \
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-dynamics.cpp
 
 linker_test_CXXFLAGS = \
   -Werror -Wall -Wfloat-equal \

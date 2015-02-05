@@ -19,6 +19,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <mesh-builder.h>
 
 using namespace Dali;
 
@@ -228,6 +229,21 @@ int UtcDaliAnimatableMeshDownCast01(void)
 
   AnimatableMesh mesh2 = AnimatableMesh::DownCast(*bh);
   DALI_TEST_CHECK( mesh2 );
+  END_TEST;
+}
+
+int UtcDaliAnimatableMeshDownCast02(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::AnimatableMesh::DownCast()");
+
+  MeshData meshData;
+  CreateMeshData(meshData);
+  Mesh mesh = Mesh::New(meshData);
+  BaseHandle* bh = &mesh;
+
+  AnimatableMesh mesh2 = AnimatableMesh::DownCast(*bh);
+  DALI_TEST_CHECK( ! mesh2 );
   END_TEST;
 }
 

@@ -23,12 +23,12 @@
 
 using namespace Dali;
 
-void utc_dali_unmanaged_startup(void)
+void utc_dali_constrainable_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_unmanaged_cleanup(void)
+void utc_dali_constrainable_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
