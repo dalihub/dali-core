@@ -32,7 +32,7 @@ namespace Dali
 {
 
 #ifndef DYNAMICS_SUPPORT
-DynamicsWorld::CollisionSignalV2 STUB_COLLISION_SIGNAL;
+DynamicsWorld::CollisionSignalType STUB_COLLISION_SIGNAL;
 #endif
 
 const char* const DynamicsWorld::SIGNAL_COLLISION = "collision";
@@ -108,7 +108,7 @@ Actor DynamicsWorld::GetRootActor() const
 #endif
 }
 
-DynamicsWorld::CollisionSignalV2& DynamicsWorld::CollisionSignal()
+DynamicsWorld::CollisionSignalType& DynamicsWorld::CollisionSignal()
 {
 #ifdef DYNAMICS_SUPPORT
   return GetImplementation(*this).CollisionSignal();

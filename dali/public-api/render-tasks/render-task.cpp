@@ -227,7 +227,7 @@ unsigned int RenderTask::GetRefreshRate() const
   return GetImplementation(*this).GetRefreshRate();
 }
 
-RenderTask::RenderTaskSignalV2& RenderTask::FinishedSignal()
+RenderTask::RenderTaskSignalType& RenderTask::FinishedSignal()
 {
   return GetImplementation(*this).FinishedSignal();
 }

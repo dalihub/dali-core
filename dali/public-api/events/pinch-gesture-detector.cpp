@@ -62,7 +62,7 @@ PinchGestureDetector& PinchGestureDetector::operator=(const PinchGestureDetector
   return *this;
 }
 
-PinchGestureDetector::DetectedSignalV2& PinchGestureDetector::DetectedSignal()
+PinchGestureDetector::DetectedSignalType& PinchGestureDetector::DetectedSignal()
 {
   return GetImplementation(*this).DetectedSignal();
 }

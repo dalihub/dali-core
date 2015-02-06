@@ -116,7 +116,7 @@ void TapGestureDetector::EmitTapGestureSignal(Dali::Actor tappedActor, const Tap
   // Guard against destruction during signal emission
   Dali::TapGestureDetector handle( this );
 
-  mDetectedSignalV2.Emit( tappedActor, tap );
+  mDetectedSignal.Emit( tappedActor, tap );
 }
 
 bool TapGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

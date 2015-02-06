@@ -39,7 +39,7 @@ void PanGestureProfiling::PrintData( const PanPositionContainer& dataContainer, 
   const PanPositionContainer::const_iterator endIter = dataContainer.end();
   for ( PanPositionContainer::const_iterator iter = dataContainer.begin(); iter != endIter; ++iter )
   {
-    DALI_LOG_UPDATE_STATUS( "%s, %u, %.2f, %.2f\n", prefix, iter->time, iter->position.x, iter->position.y );
+    DALI_LOG_UPDATE_STATUS( "%s, %u, %.2f, %.2f, displacement: %.2f, %.2f, velocity: %.2f, %.2f, state: %d\n", prefix, iter->time, iter->position.x, iter->position.y, iter->displacement.x, iter->displacement.y, iter->velocity.x, iter->velocity.y, iter->state );
   }
 }
 

@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -33,7 +33,7 @@ class PropertyNotification;
 /**
  * @brief Signal type for Dali::PropertyNotification::NotifySignal().
  */
-typedef SignalV2< void (PropertyNotification& source) > PropertyNotifySignalV2;
+typedef Signal< void (PropertyNotification& source) > PropertyNotifySignalType;
 
 /**
  * @brief Function signature for Dali::PropertyNotification::NotifySignal() signal callbacks.

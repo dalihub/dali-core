@@ -262,7 +262,7 @@ float ActiveConstraintBase::GetCurrentWeight() const
   return currentWeight;
 }
 
-ActiveConstraintSignalV2& ActiveConstraintBase::AppliedSignal()
+ActiveConstraintSignalType& ActiveConstraintBase::AppliedSignal()
 {
   return mAppliedSignal;
 }

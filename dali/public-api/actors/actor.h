@@ -28,7 +28,7 @@
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/object/constrainable.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -234,12 +234,12 @@ public:
 
   // Typedefs
 
-  typedef SignalV2< bool (Actor, const TouchEvent&)> TouchSignalV2;                ///< Touch signal type
-  typedef SignalV2< bool (Actor, const HoverEvent&)> HoverSignalV2;                ///< Hover signal type
-  typedef SignalV2< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalV2;///< Mousewheel signal type
-  typedef SignalV2< void (Actor, const Vector3&) > SetSizeSignalV2; ///< SetSize signal type
-  typedef SignalV2< void (Actor) > OnStageSignalV2;  ///< Stage connection signal type
-  typedef SignalV2< void (Actor) > OffStageSignalV2; ///< Stage disconnection signal type
+  typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                ///< Touch signal type
+  typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                ///< Hover signal type
+  typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType;///< Mousewheel signal type
+  typedef Signal< void (Actor, const Vector3&) > SetSizeSignalType; ///< SetSize signal type
+  typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type
+  typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type
 
   /// @name Properties
   /** @{ */
@@ -1170,7 +1170,7 @@ public: // Signals
    * @pre The Actor has been initialized.
    * @return The signal to connect to.
    */
-  TouchSignalV2& TouchedSignal();
+  TouchSignalType& TouchedSignal();
 
   /**
    * @brief This signal is emitted when hover input is received.
@@ -1184,7 +1184,7 @@ public: // Signals
    * @pre The Actor has been initialized.
    * @return The signal to connect to.
    */
-  HoverSignalV2& HoveredSignal();
+  HoverSignalType& HoveredSignal();
 
   /**
    * @brief This signal is emitted when mouse wheel event is received.
@@ -1198,7 +1198,7 @@ public: // Signals
    * @pre The Actor has been initialized.
    * @return The signal to connect to.
    */
-  MouseWheelEventSignalV2& MouseWheelEventSignal();
+  MouseWheelEventSignalType& MouseWheelEventSignal();
 
   /**
    * @brief Signal to indicate when the actor's size is set by application code.
@@ -1213,7 +1213,7 @@ public: // Signals
    * @pre The Actor has been initialized.
    * @return The signal to connect to.
    */
-  SetSizeSignalV2& SetSizeSignal();
+  SetSizeSignalType& SetSizeSignal();
 
   /**
    * @brief This signal is emitted after the actor has been connected to the stage.
@@ -1234,7 +1234,7 @@ public: // Signals
    *
    * @return The signal
    */
-  OnStageSignalV2& OnStageSignal();
+  OnStageSignalType& OnStageSignal();
 
   /**
    * @brief This signal is emitted after the actor has been disconnected from the stage.
@@ -1254,7 +1254,7 @@ public: // Signals
    *
    * @return The signal
    */
-  OffStageSignalV2& OffStageSignal();
+  OffStageSignalType& OffStageSignal();
 
 public: // Dynamics
 

@@ -25,7 +25,7 @@
 #include <dali/public-api/common/loading-state.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -123,7 +123,7 @@ public:
   /**
    * @brief Type of signal for LoadingFinished and Uploaded.
    */
-  typedef SignalV2< void (Image) > ImageSignalV2;
+  typedef Signal< void (Image) > ImageSignalType;
 
   // Signal Names
   static const char* const SIGNAL_IMAGE_LOADING_FINISHED; ///< Name of LoadingFinished signal
@@ -343,7 +343,7 @@ public: // Signals
    *
    * @return A signal object to Connect() with.
    */
-  ImageSignalV2& LoadingFinishedSignal();
+  ImageSignalType& LoadingFinishedSignal();
 
   /**
    * @brief This signal is emitted when the image data gets uploaded to GL.
@@ -353,7 +353,7 @@ public: // Signals
    * BitmapImage calls Update().
    * @return A signal object to Connect() with.
    */
-  ImageSignalV2& UploadedSignal();
+  ImageSignalType& UploadedSignal();
 
 public: // Not intended for application developers
 

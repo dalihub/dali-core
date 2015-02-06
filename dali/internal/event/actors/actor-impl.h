@@ -986,32 +986,32 @@ public:
   /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
-  Dali::Actor::TouchSignalV2& TouchedSignal();
+  Dali::Actor::TouchSignalType& TouchedSignal();
 
   /**
    * @copydoc Dali::Actor::HoveredSignal()
    */
-  Dali::Actor::HoverSignalV2& HoveredSignal();
+  Dali::Actor::HoverSignalType& HoveredSignal();
 
   /**
    * @copydoc Dali::Actor::MouseWheelEventSignal()
    */
-  Dali::Actor::MouseWheelEventSignalV2& MouseWheelEventSignal();
+  Dali::Actor::MouseWheelEventSignalType& MouseWheelEventSignal();
 
   /**
    * @copydoc Dali::Actor::SetSizeSignal()
    */
-  Dali::Actor::SetSizeSignalV2& SetSizeSignal();
+  Dali::Actor::SetSizeSignalType& SetSizeSignal();
 
   /**
    * @copydoc Dali::Actor::OnStageSignal()
    */
-  Dali::Actor::OnStageSignalV2& OnStageSignal();
+  Dali::Actor::OnStageSignalType& OnStageSignal();
 
   /**
    * @copydoc Dali::Actor::OffStageSignal()
    */
-  Dali::Actor::OffStageSignalV2& OffStageSignal();
+  Dali::Actor::OffStageSignalType& OffStageSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1356,12 +1356,12 @@ protected:
   ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
 
   // Signals
-  Dali::Actor::TouchSignalV2             mTouchedSignalV2;
-  Dali::Actor::HoverSignalV2             mHoveredSignalV2;
-  Dali::Actor::MouseWheelEventSignalV2   mMouseWheelEventSignalV2;
-  Dali::Actor::SetSizeSignalV2           mSetSizeSignalV2;
-  Dali::Actor::OnStageSignalV2           mOnStageSignalV2;
-  Dali::Actor::OffStageSignalV2          mOffStageSignalV2;
+  Dali::Actor::TouchSignalType             mTouchedSignal;
+  Dali::Actor::HoverSignalType             mHoveredSignal;
+  Dali::Actor::MouseWheelEventSignalType   mMouseWheelEventSignal;
+  Dali::Actor::SetSizeSignalType           mSetSizeSignal;
+  Dali::Actor::OnStageSignalType           mOnStageSignal;
+  Dali::Actor::OffStageSignalType          mOffStageSignal;
 
   Vector3         mSize;      ///< Event-side storage for size (not a pointer as most actors will have a size)
 

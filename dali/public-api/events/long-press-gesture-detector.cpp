@@ -96,7 +96,7 @@ unsigned int LongPressGestureDetector::GetMaximumTouchesRequired() const
   return GetImplementation(*this).GetMaximumTouchesRequired();
 }
 
-LongPressGestureDetector::DetectedSignalV2& LongPressGestureDetector::DetectedSignal()
+LongPressGestureDetector::DetectedSignalType& LongPressGestureDetector::DetectedSignal()
 {
   return GetImplementation(*this).DetectedSignal();
 }

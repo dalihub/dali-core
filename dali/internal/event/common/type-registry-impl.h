@@ -88,7 +88,7 @@ public:
    * @param [in] name Signal name
    * @param [in] func Signal connector function
    */
-  void RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunctionV2 func );
+  void RegisterSignal( TypeRegistration& typeRegistration, const std::string& name, Dali::TypeInfo::SignalConnectorFunction func );
 
   /*
    * Register an action function to a type

@@ -150,9 +150,9 @@ public: // Signals
   /**
    * @copydoc Dali::PanGestureDetector::DetectedSignal()
    */
-  Dali::PanGestureDetector::DetectedSignalV2& DetectedSignal()
+  Dali::PanGestureDetector::DetectedSignalType& DetectedSignal()
   {
-    return mDetectedSignalV2;
+    return mDetectedSignal;
   }
 
   /**
@@ -275,7 +275,7 @@ private:
 
 private:
 
-  Dali::PanGestureDetector::DetectedSignalV2 mDetectedSignalV2;
+  Dali::PanGestureDetector::DetectedSignalType mDetectedSignal;
 
   unsigned int mMinimumTouches; ///< The minimum number of fingers required to be touching for pan.
   unsigned int mMaximumTouches; ///< The maximum number of fingers required to be touching for pan.

@@ -46,12 +46,12 @@ ObjectRegistry& ObjectRegistry::operator=(const ObjectRegistry& rhs)
   return *this;
 }
 
-ObjectRegistry::ObjectCreatedSignalV2& ObjectRegistry::ObjectCreatedSignal()
+ObjectRegistry::ObjectCreatedSignalType& ObjectRegistry::ObjectCreatedSignal()
 {
   return GetImplementation(*this).ObjectCreatedSignal();
 }
 
-ObjectRegistry::ObjectDestroyedSignalV2& ObjectRegistry::ObjectDestroyedSignal()
+ObjectRegistry::ObjectDestroyedSignalType& ObjectRegistry::ObjectDestroyedSignal()
 {
   return GetImplementation(*this).ObjectDestroyedSignal();
 }

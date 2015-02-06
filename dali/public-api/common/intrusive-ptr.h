@@ -104,7 +104,7 @@ public:
   }
 
   /**
-   * @brief Pointer operator ovveride.
+   * @brief Pointer operator override.
    *
    * @return pointer to reference counted object
    */
@@ -280,30 +280,6 @@ template<typename T, typename U>
 inline bool operator!=( T* lhs, IntrusivePtr<U>const& rhs )
 {
   return lhs != rhs.Get();
-}
-
-/**
- * @brief Get pointer to reference counted object (Dali camel case variant)
- *
- * @param rhs intrusive pointer wrapping object
- * @return pointer to object
- */
-template<typename T>
-inline T* GetPointer(IntrusivePtr<T> const& rhs)
-{
-  return rhs.Get();
-}
-
-/**
- * @brief Get pointer to reference counted object (boost:: naming convention)
- *
- * @param rhs intrusive pointer wrapping object
- * @return pointer to object
- */
-template<typename T>
-inline T* get_pointer(IntrusivePtr<T> const& rhs)
-{
-  return rhs.Get();
 }
 
 } // namespace Dali

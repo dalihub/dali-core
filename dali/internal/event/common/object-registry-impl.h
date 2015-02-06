@@ -77,17 +77,17 @@ public:
   /**
    * @copydoc Dali::ObjectRegistry::ObjectCreatedSignal()
    */
-  Dali::ObjectRegistry::ObjectCreatedSignalV2& ObjectCreatedSignal()
+  Dali::ObjectRegistry::ObjectCreatedSignalType& ObjectCreatedSignal()
   {
-    return mObjectCreatedSignalV2;
+    return mObjectCreatedSignal;
   }
 
   /**
    * @copydoc Dali::ObjectRegistry::ObjectDestroyedSignal()
    */
-  Dali::ObjectRegistry::ObjectDestroyedSignalV2& ObjectDestroyedSignal()
+  Dali::ObjectRegistry::ObjectDestroyedSignalType& ObjectDestroyedSignal()
   {
-    return mObjectDestroyedSignalV2;
+    return mObjectDestroyedSignal;
   }
 
   /**
@@ -115,8 +115,8 @@ private:
 
 private:
 
-  Dali::ObjectRegistry::ObjectCreatedSignalV2 mObjectCreatedSignalV2;
-  Dali::ObjectRegistry::ObjectDestroyedSignalV2 mObjectDestroyedSignalV2;
+  Dali::ObjectRegistry::ObjectCreatedSignalType mObjectCreatedSignal;
+  Dali::ObjectRegistry::ObjectDestroyedSignalType mObjectDestroyedSignal;
 
 };
 

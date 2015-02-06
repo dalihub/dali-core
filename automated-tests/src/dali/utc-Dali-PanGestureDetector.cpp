@@ -2188,7 +2188,7 @@ int UtcDaliPanGesturePredictionNoSmoothing(void)
   application.SendNotification();
   application.Render();
 
-  Vector2 direction(Vector2::XAXIS * -5.0f);
+  Vector2 direction(Vector2::XAXIS * -1.0f);
   Vector2 previousPosition( 20.0f, 20.0f );
   Vector2 currentPosition( 20.0f, 10.0f );
   PerformSwipeGestureSwipe(application, Vector2(1.0f, 1.0f), direction, PAN_GESTURE_UPDATE_COUNT, true);
@@ -2234,7 +2234,7 @@ int UtcDaliPanGesturePredictionSmoothing(void)
   application.SendNotification();
   application.Render();
 
-  Vector2 direction(Vector2::XAXIS * -5.0f);
+  Vector2 direction(Vector2::XAXIS * -1.0f);
   Vector2 previousPosition( 20.0f, 20.0f );
   Vector2 currentPosition( 20.0f, 10.0f );
   PerformSwipeGestureSwipe(application, Vector2(1.0f, 1.0f), direction, PAN_GESTURE_UPDATE_COUNT, true);

@@ -317,7 +317,7 @@ public: //signals
   /**
    * @copydoc Dali::RenderTask::FinishedSignal()
    */
-  Dali::RenderTask::RenderTaskSignalV2& FinishedSignal();
+  Dali::RenderTask::RenderTaskSignalType& FinishedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -440,7 +440,7 @@ private:
   bool mIsSystemLevel : 1; ///< True if the render-task is on the system level task list.
 
   //Signals
-  Dali::RenderTask::RenderTaskSignalV2  mSignalFinishedV2; ///< Signal emmited when the render task has been processed.
+  Dali::RenderTask::RenderTaskSignalType  mSignalFinished; ///< Signal emmited when the render task has been processed.
 };
 
 } // namespace Internal

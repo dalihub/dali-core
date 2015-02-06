@@ -288,6 +288,27 @@ public:
   void SetPredictionAmount(unsigned int amount);
 
   /**
+   * @brief Sets the upper bound of the prediction amount for clamping
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetMaximumPredictionAmount(unsigned int amount);
+
+  /**
+   * @brief Sets the lower bound of the prediction amount for clamping
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetMinimumPredictionAmount(unsigned int amount);
+
+  /**
+   * @brief Sets the amount of prediction interpolation to adjust when the pan velocity is changed
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetPredictionAmountAdjustment(unsigned int amount);
+
+  /**
    * @brief Sets the prediction mode of the pan gesture
    *
    * @param[in] mode The prediction mode
@@ -347,6 +368,10 @@ private:
 
   PredictionMode mPredictionMode;  ///< The pan gesture prediction mode
   unsigned int mPredictionAmount;  ///< how far into future to predict in milliseconds
+  unsigned int mCurrentPredictionAmount;  ///< the current prediction amount used by the prediction algorithm
+  unsigned int mMaxPredictionAmount;  ///< the maximum prediction amount used by the prediction algorithm
+  unsigned int mMinPredictionAmount;  ///< the minimum prediction amount used by the prediction algorithm
+  unsigned int mPredictionAmountAdjustment;  ///< the prediction amount to adjust in milliseconds when pan velocity changes
   SmoothingMode mSmoothingMode;    ///< The pan gesture prediction mode
   float         mSmoothingAmount;  ///< How much smoothing to apply [0.0f,1.0f]
   PanGestureProfiling* mProfiling; ///< NULL unless pan-gesture profiling information is required.

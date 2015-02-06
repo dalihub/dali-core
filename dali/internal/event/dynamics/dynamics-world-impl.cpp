@@ -204,9 +204,9 @@ void DynamicsWorld::RootOffStage( Dali::Actor actor )
   SetRootActorMessage( Stage::GetCurrent()->GetUpdateInterface(), *mDynamicsWorld, static_cast<const SceneGraph::Node*>(NULL) );
 }
 
-Dali::DynamicsWorld::CollisionSignalV2& DynamicsWorld::CollisionSignal()
+Dali::DynamicsWorld::CollisionSignalType& DynamicsWorld::CollisionSignal()
 {
-  return mCollisionSignalV2;
+  return mCollisionSignal;
 }
 
 void DynamicsWorld::CollisionImpact( Integration::DynamicsCollisionData* collisionData )
@@ -216,7 +216,7 @@ void DynamicsWorld::CollisionImpact( Integration::DynamicsCollisionData* collisi
   DALI_ASSERT_DEBUG(collisionData->mBodyA);
   DALI_ASSERT_DEBUG(collisionData->mBodyB);
 
-  if ( !mCollisionSignalV2.Empty() )
+  if ( !mCollisionSignal.Empty() )
   {
     BodyContainer::iterator it = mBodies.begin();
     BodyContainer::iterator endIt = mBodies.end();
@@ -244,7 +244,7 @@ void DynamicsWorld::CollisionImpact( Integration::DynamicsCollisionData* collisi
             Dali::DynamicsCollision collisionHandle( collision.Get() );
             Dali::DynamicsWorld worldHandle( this );
 
-            mCollisionSignalV2.Emit( worldHandle, collisionHandle );
+            mCollisionSignal.Emit( worldHandle, collisionHandle );
 
             break;
           }
@@ -268,7 +268,7 @@ void DynamicsWorld::CollisionDisperse( Integration::DynamicsCollisionData* colli
   DALI_ASSERT_DEBUG(collisionData->mBodyA);
   DALI_ASSERT_DEBUG(collisionData->mBodyB);
 
-  if ( !mCollisionSignalV2.Empty() )
+  if ( !mCollisionSignal.Empty() )
   {
     BodyContainer::iterator it = mBodies.begin();
     BodyContainer::iterator endIt = mBodies.end();
@@ -293,7 +293,7 @@ void DynamicsWorld::CollisionDisperse( Integration::DynamicsCollisionData* colli
             Dali::DynamicsCollision collisionHandle( collision.Get() );
             Dali::DynamicsWorld worldHandle( this );
 
-            mCollisionSignalV2.Emit( worldHandle, collisionHandle );
+            mCollisionSignal.Emit( worldHandle, collisionHandle );
 
             break;
           }

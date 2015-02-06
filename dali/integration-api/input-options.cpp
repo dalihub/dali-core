@@ -24,6 +24,24 @@ void SetPanGesturePredictionAmount(unsigned int amount)
   eventProcessor.SetPanGesturePredictionAmount(amount);
 }
 
+void SetPanGestureMaximumPredictionAmount( unsigned int amount )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGestureMaximumPredictionAmount(amount);
+}
+
+void SetPanGestureMinimumPredictionAmount( unsigned int amount )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGestureMinimumPredictionAmount(amount);
+}
+
+void SetPanGesturePredictionAmountAdjustment( unsigned int amount )
+{
+  GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();
+  eventProcessor.SetPanGesturePredictionAmountAdjustment(amount);
+}
+
 void SetPanGestureSmoothingMode(int mode)
 {
   GestureEventProcessor& eventProcessor = ThreadLocalStorage::Get().GetGestureEventProcessor();

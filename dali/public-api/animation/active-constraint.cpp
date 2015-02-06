@@ -73,7 +73,7 @@ float ActiveConstraint::GetCurrentWeight() const
   return GetImplementation(*this).GetCurrentWeight();
 }
 
-ActiveConstraintSignalV2& ActiveConstraint::AppliedSignal()
+ActiveConstraintSignalType& ActiveConstraint::AppliedSignal()
 {
   return GetImplementation(*this).AppliedSignal();
 }

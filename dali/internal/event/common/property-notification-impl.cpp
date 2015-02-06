@@ -134,7 +134,7 @@ PropertyNotification::~PropertyNotification()
   }
 }
 
-Dali::PropertyNotifySignalV2& PropertyNotification::NotifySignal()
+Dali::PropertyNotifySignalType& PropertyNotification::NotifySignal()
 {
   return mNotifySignal;
 }

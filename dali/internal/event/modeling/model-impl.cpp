@@ -86,7 +86,7 @@ void Model::ResourceLoadingFailed(const ResourceTicket& ticket)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gModel);
 
-  mLoadingFinishedV2.Emit( Dali::Model( this ) );
+  mLoadingFinished.Emit( Dali::Model( this ) );
 }
 
 void Model::ResourceLoadingSucceeded(const ResourceTicket& ticket)
@@ -99,7 +99,7 @@ void Model::ResourceLoadingSucceeded(const ResourceTicket& ticket)
   ModelDataPtr modelData = resourceManager.GetModelData( GetResourceId() );
   modelData->Unpack( *mResourceClient );
 
-  mLoadingFinishedV2.Emit( Dali::Model( this ) );
+  mLoadingFinished.Emit( Dali::Model( this ) );
 }
 
 void Model::ResourceUploaded(const ResourceTicket& ticket)
@@ -111,14 +111,14 @@ void Model::ResourceSavingFailed(const ResourceTicket& ticket)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gModel);
 
-  mSavingFinishedV2.Emit( Dali::Model( this ), false );
+  mSavingFinished.Emit( Dali::Model( this ), false );
 }
 
 void Model::ResourceSavingSucceeded(const ResourceTicket& ticket)
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gModel);
 
-  mSavingFinishedV2.Emit( Dali::Model( this ), true );
+  mSavingFinished.Emit( Dali::Model( this ), true );
 }
 
 ResourceId Model::GetResourceId() const

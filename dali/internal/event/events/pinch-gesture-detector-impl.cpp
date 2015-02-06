@@ -63,7 +63,7 @@ void PinchGestureDetector::EmitPinchGestureSignal(Dali::Actor actor, const Pinch
   // Guard against destruction during signal emission
   Dali::PinchGestureDetector handle( this );
 
-  mDetectedSignalV2.Emit( actor, pinch );
+  mDetectedSignal.Emit( actor, pinch );
 }
 
 bool PinchGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
