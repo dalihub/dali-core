@@ -46,6 +46,16 @@ enum PositionInheritanceMode
   DONT_INHERIT_POSITION                    ///< Actor will not inherit position. Local position is treated as world position. This is useful if a constraint is used to override local position or if an actor is positioned globally. This option ignores parent origin, anchor point and local position.
 };
 
+/**
+ * @brief Actor size relative to parent mode.
+ */
+enum SizeMode
+{
+  USE_OWN_SIZE,                            ///< The mode is bypassed. The size Vector3 will be used as normal.
+  SIZE_EQUAL_TO_PARENT,                    ///< The actor will have the exact same size as the parent.
+  SIZE_RELATIVE_TO_PARENT,                 ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ).
+  SIZE_FIXED_OFFSET_FROM_PARENT            ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ).
+};
 
 } // namespace Dali
 

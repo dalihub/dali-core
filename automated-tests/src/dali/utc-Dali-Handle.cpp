@@ -410,6 +410,8 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::COLOR_MODE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::POSITION_INHERITANCE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::DRAW_MODE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::SIZE_MODE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::SIZE_MODE_FACTOR ) );
 
   END_TEST;
 }
@@ -621,7 +623,7 @@ int UtcDaliHandleNonAnimtableCompositeProperties(void)
   valueMap.SetValue("key", 5.f);
   valueMap.SetValue("2key", "a string");
 
-  DALI_TEST_EQUALS( true, valueMap.HasKey("key"),         TEST_LOCATION);
+  DALI_TEST_EQUALS( true, valueMap.HasKey("key"),        TEST_LOCATION);
   DALI_TEST_EQUALS( "key", valueMap.GetKey(0),           TEST_LOCATION);
 
   DALI_TEST_EQUALS( true, valueMap.HasKey("2key"),       TEST_LOCATION);
@@ -633,8 +635,8 @@ int UtcDaliHandleNonAnimtableCompositeProperties(void)
   valueMap.SetItem(0, Property::Value("a string"));
   valueMap.SetItem(1, Property::Value(5.f));
 
-  DALI_TEST_EQUALS( 5.f,         valueMap.GetValue("2key").Get<float>(),         TEST_LOCATION);
-  DALI_TEST_EQUALS( "a string",  valueMap.GetValue("key").Get<std::string>(),  TEST_LOCATION);
+  DALI_TEST_EQUALS( 5.f,         valueMap.GetValue("2key").Get<float>(),        TEST_LOCATION);
+  DALI_TEST_EQUALS( "a string",  valueMap.GetValue("key").Get<std::string>(),   TEST_LOCATION);
 
   // ordered map
   valueMap = Property::Value(Property::MAP);
