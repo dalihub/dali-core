@@ -67,7 +67,7 @@ public:
    *
    * @param [in] handle A pointer to a newly allocated Dali resource
    */
-  Handle(Dali::Internal::Object* handle);
+  Handle( Dali::Internal::Object* handle );
 
   /**
    * @brief This constructor provides an uninitialized Dali::Handle.
@@ -96,7 +96,7 @@ public:
    *
    * @param [in] handle A reference to the copied handle
    */
-  Handle(const Handle& handle);
+  Handle( const Handle& handle );
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -104,7 +104,7 @@ public:
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
-  Handle& operator=(const Handle& rhs);
+  Handle& operator=( const Handle& rhs );
 
   /**
    * @brief Downcast to a handle.
@@ -123,7 +123,7 @@ public:
    * @param[in] capability The queried capability.
    * @return True if the capability is supported.
    */
-  bool Supports(Capability capability) const;
+  bool Supports( Capability capability ) const;
 
   /**
    * @brief Query how many properties are provided by an handle.
@@ -139,15 +139,16 @@ public:
    * @param [in] index The index of the property.
    * @return The name of the property.
    */
-  std::string GetPropertyName(Property::Index index) const;
+  std::string GetPropertyName( Property::Index index ) const;
 
   /**
    * @brief Query the index of a property.
+   * Returns the first property index that matches the given name exactly.
    *
    * @param [in] name The name of the property.
    * @return The index of the property, or Property::INVALID_INDEX if no property exists with the given name.
    */
-  Property::Index GetPropertyIndex(std::string name) const;
+  Property::Index GetPropertyIndex( const std::string& name ) const;
 
   /**
    * @brief Query whether a property can be set using SetProperty().
@@ -156,7 +157,7 @@ public:
    * @param [in] index The index of the property.
    * @return True if the property is writable.
    */
-  bool IsPropertyWritable(Property::Index index) const;
+  bool IsPropertyWritable( Property::Index index ) const;
 
   /**
    * @brief Query whether a writable property can be the target of an animation or constraint.
@@ -164,7 +165,7 @@ public:
    * @param [in] index The index of the property.
    * @return True if the property is animatable.
    */
-  bool IsPropertyAnimatable(Property::Index index) const;
+  bool IsPropertyAnimatable( Property::Index index ) const;
 
   /**
    * @brief Query whether a property can be used as in input to a constraint.
@@ -172,7 +173,7 @@ public:
    * @param [in] index The index of the property.
    * @return True if the property can be used as a constraint input.
    */
-  bool IsPropertyAConstraintInput(Property::Index index) const;
+  bool IsPropertyAConstraintInput( Property::Index index ) const;
 
   /**
    * @brief Query the type of a property.
@@ -180,23 +181,26 @@ public:
    * @param [in] index The index of the property.
    * @return The type of the property.
    */
-  Property::Type GetPropertyType(Property::Index index) const;
+  Property::Type GetPropertyType( Property::Index index ) const;
 
   /**
    * @brief Set the value of an existing property.
    *
-   * @pre Handle::IsPropertyWritable(index) returns true.
+   * Property should be write-able. Setting a read-only property is a no-op.
    * @pre The property types match i.e. propertyValue.GetType() is equal to GetPropertyType(index).
    * @param [in] index The index of the property.
    * @param [in] propertyValue The new value of the property.
    */
-  void SetProperty(Property::Index index, Property::Value propertyValue);
+  void SetProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
    * @brief Register a new animatable property.
    *
-   * @pre The handle supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
-   * @pre name is unused i.e. GetPropertyIndex(name) returns PropertyIndex::INVALID.
+   * @pre The object supports dynamic properties i.e. Supports(Handle::DYNAMIC_PROPERTIES) returns true.
+   * Property names are expected to be unique, but this is not enforced.
+   * Property indices are unique to each registered custom property in a given object.
+   * returns Property::INVALID_INDEX if registration failed. This can happen if you try to register
+   * animatable property on an object that does not have scene graph object.
    * @note Only the following types can be animated:
    *       - Property::BOOLEAN
    *       - Property::FLOAT
@@ -209,9 +213,9 @@ public:
    *       - Property::ROTATION
    * @param [in] name The name of the property.
    * @param [in] propertyValue The new value of the property.
-   * @return The index of the property
+   * @return The index of the property or Property::INVALID_INDEX if registration failed
    */
-  Property::Index RegisterProperty(std::string name, Property::Value propertyValue);
+  Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
 
   /**
    * @brief Register a new property.
@@ -234,7 +238,7 @@ public:
    * @param [in] accessMode The property access mode (writable, animatable etc).
    * @return The index of the property
    */
-  Property::Index RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode);
+  Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
 
   /**
    * @brief Retrieve a property value.
@@ -242,7 +246,7 @@ public:
    * @param [in] index The index of the property.
    * @return The property value.
    */
-  Property::Value GetProperty(Property::Index index) const;
+  Property::Value GetProperty( Property::Index index ) const;
 
   /**
    * @brief Convenience function for obtaining a property of a known type.
@@ -252,7 +256,7 @@ public:
    * @return The property value.
    */
   template <typename T>
-  T GetProperty(Property::Index index) const
+  T GetProperty( Property::Index index ) const
   {
     Property::Value value = GetProperty(index);
 
@@ -275,8 +279,8 @@ public:
    *
    * @return A handle to the newly created PropertyNotification
    */
-  PropertyNotification AddPropertyNotification(Property::Index index,
-                                               const PropertyCondition& condition);
+  PropertyNotification AddPropertyNotification( Property::Index index,
+                                                const PropertyCondition& condition );
 
   /**
    * @brief Add a property notification to this object.
@@ -287,16 +291,16 @@ public:
    *
    * @return A handle to the newly created PropertyNotification
    */
-  PropertyNotification AddPropertyNotification(Property::Index index,
-                                               int componentIndex,
-                                               const PropertyCondition& condition);
+  PropertyNotification AddPropertyNotification( Property::Index index,
+                                                int componentIndex,
+                                                const PropertyCondition& condition );
 
   /**
    * @brief Remove a property notification from this object.
    *
    * @param [in] propertyNotification The propertyNotification to be removed.
    */
-  void RemovePropertyNotification(Dali::PropertyNotification propertyNotification);
+  void RemovePropertyNotification( Dali::PropertyNotification propertyNotification );
 
   /**
    * @brief Remove all property notifications from this object.

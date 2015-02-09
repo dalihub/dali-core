@@ -15,9 +15,11 @@ SET(TC_SOURCES
 )
 
 LIST(APPEND TC_SOURCES
+        ../dali/dali-test-suite-utils/mesh-builder.cpp
         ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
         ../dali/dali-test-suite-utils/test-application.cpp
+        ../dali/dali-test-suite-utils/test-dynamics.cpp
         ../dali/dali-test-suite-utils/test-gesture-manager.cpp
         ../dali/dali-test-suite-utils/test-gl-abstraction.cpp
         ../dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp
@@ -25,7 +27,6 @@ LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/test-platform-abstraction.cpp
         ../dali/dali-test-suite-utils/test-render-controller.cpp
         ../dali/dali-test-suite-utils/test-trace-call-stack.cpp
-        ../dali-unmanaged/dali-test-suite-utils/mesh-builder.cpp
 )
 
 PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
@@ -41,7 +42,6 @@ ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 INCLUDE_DIRECTORIES(
     ${${CAPI_LIB}_INCLUDE_DIRS}
     ../dali/dali-test-suite-utils
-    ../dali-unmanaged/dali-test-suite-utils
     ../../..
 )
 

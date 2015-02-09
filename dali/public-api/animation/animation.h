@@ -26,7 +26,7 @@
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -102,7 +102,7 @@ class DALI_IMPORT_API Animation : public BaseHandle
 {
 public:
 
-  typedef SignalV2< void (Animation&) > AnimationSignalV2; ///< Animation finished signal type
+  typedef Signal< void (Animation&) > AnimationSignalType; ///< Animation finished signal type
 
   typedef Any AnyFunction; ///< Interpolation function
 
@@ -350,7 +350,7 @@ public:
    *
    * @return A signal object to Connect() with.
    */
-  AnimationSignalV2& FinishedSignal();
+  AnimationSignalType& FinishedSignal();
 
   /**
    * @brief Animate a property value by a relative amount.

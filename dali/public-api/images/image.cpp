@@ -169,12 +169,12 @@ void Image::Reload()
   GetImplementation(*this).Reload();
 }
 
-Image::ImageSignalV2& Image::LoadingFinishedSignal()
+Image::ImageSignalType& Image::LoadingFinishedSignal()
 {
   return GetImplementation(*this).LoadingFinishedSignal();
 }
 
-Image::ImageSignalV2& Image::UploadedSignal()
+Image::ImageSignalType& Image::UploadedSignal()
 {
   return GetImplementation(*this).UploadedSignal();
 }

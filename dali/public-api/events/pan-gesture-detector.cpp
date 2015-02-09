@@ -120,7 +120,7 @@ void PanGestureDetector::RemoveDirection( Radian direction )
   GetImplementation(*this).RemoveDirection( direction );
 }
 
-PanGestureDetector::DetectedSignalV2& PanGestureDetector::DetectedSignal()
+PanGestureDetector::DetectedSignalType& PanGestureDetector::DetectedSignal()
 {
   return GetImplementation(*this).DetectedSignal();
 }

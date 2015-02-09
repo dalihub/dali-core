@@ -279,19 +279,9 @@ public: // Implementation of ProxyObject
   virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::SetCustomProperty()
-   */
-  virtual void SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
-
-  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultProperty()
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::ProxyObject::InstallSceneObjectProperty()
-   */
-  virtual void InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
@@ -327,7 +317,7 @@ public: //signals
   /**
    * @copydoc Dali::RenderTask::FinishedSignal()
    */
-  Dali::RenderTask::RenderTaskSignalV2& FinishedSignal();
+  Dali::RenderTask::RenderTaskSignalType& FinishedSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -450,7 +440,7 @@ private:
   bool mIsSystemLevel : 1; ///< True if the render-task is on the system level task list.
 
   //Signals
-  Dali::RenderTask::RenderTaskSignalV2  mSignalFinishedV2; ///< Signal emmited when the render task has been processed.
+  Dali::RenderTask::RenderTaskSignalType  mSignalFinished; ///< Signal emmited when the render task has been processed.
 };
 
 } // namespace Internal

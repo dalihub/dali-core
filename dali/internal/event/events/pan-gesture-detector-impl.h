@@ -150,9 +150,9 @@ public: // Signals
   /**
    * @copydoc Dali::PanGestureDetector::DetectedSignal()
    */
-  Dali::PanGestureDetector::DetectedSignalV2& DetectedSignal()
+  Dali::PanGestureDetector::DetectedSignalType& DetectedSignal()
   {
-    return mDetectedSignalV2;
+    return mDetectedSignal;
   }
 
   /**
@@ -254,19 +254,9 @@ private:
   virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::SetCustomProperty()
-   */
-  virtual void SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
-
-  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultProperty()
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::ProxyObject::InstallSceneObjectProperty()
-   */
-  virtual void InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
@@ -285,7 +275,7 @@ private:
 
 private:
 
-  Dali::PanGestureDetector::DetectedSignalV2 mDetectedSignalV2;
+  Dali::PanGestureDetector::DetectedSignalType mDetectedSignal;
 
   unsigned int mMinimumTouches; ///< The minimum number of fingers required to be touching for pan.
   unsigned int mMaximumTouches; ///< The maximum number of fingers required to be touching for pan.

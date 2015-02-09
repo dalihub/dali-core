@@ -39,11 +39,39 @@ namespace Integration
 DALI_IMPORT_API void SetPanGesturePredictionMode( int mode );
 
 /**
- * @brief Called by adaptor to set the prediction amount of the pan gesture from an environment variable
+ * @brief Called by adaptor to set the prediction amount of the pan gesture
+ * from an environment variable
  *
  * @param[in] amount The prediction amount in milliseconds
  */
 DALI_IMPORT_API void SetPanGesturePredictionAmount(unsigned int amount);
+
+/**
+ * @brief Sets the upper bound of the prediction amount for clamping
+ * from an environment variable
+ *
+ * @param[in] amount The prediction amount in milliseconds
+ */
+DALI_IMPORT_API void SetPanGestureMaximumPredictionAmount( unsigned int amount );
+
+/**
+ * @brief Sets the lower bound of the prediction amount for clamping
+ * from an environment variable
+ *
+ * @param[in] amount The prediction amount in milliseconds
+ */
+DALI_IMPORT_API void SetPanGestureMinimumPredictionAmount( unsigned int amount );
+
+/**
+ * @brief Sets the prediction amount to adjust when the pan velocity is changed
+ * from an environment variable. If the pan velocity is accelerating, the prediction
+ * amount will be increased by the specified amount until it reaches the upper bound.
+ * If the pan velocity is decelerating, the prediction amount will be decreased by
+ * the specified amount until it reaches the lower bound.
+ *
+ * @param[in] amount The prediction amount in milliseconds
+ */
+DALI_IMPORT_API void SetPanGesturePredictionAmountAdjustment( unsigned int amount );
 
 /**
  * @brief Called to set how pan gestures smooth input
@@ -53,7 +81,7 @@ DALI_IMPORT_API void SetPanGesturePredictionAmount(unsigned int amount);
 DALI_IMPORT_API void SetPanGestureSmoothingMode( int mode );
 
 /**
- * @brief Sets the prediction amount of the pan gesture
+ * @brief Sets the smoothing amount of the pan gesture
  *
  * @param[in] amount The smoothing amount [0.0f,1.0f] - 0.0f would be no smoothing, 1.0f maximum smoothing
  */

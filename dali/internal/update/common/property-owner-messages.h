@@ -33,15 +33,15 @@ namespace SceneGraph
 
 // Messages for PropertyOwner
 
-inline void InstallCustomPropertyMessage( EventToUpdate& eventToUpdate, const PropertyOwner& owner, PropertyBase& property )
+inline void InstallCustomPropertyMessage( EventToUpdate& eventToUpdate, const PropertyOwner& owner, PropertyBase* property )
 {
-  typedef MessageValue1< PropertyOwner, PropertyBase* > LocalType;
+  typedef MessageValue1< PropertyOwner, OwnerPointer<PropertyBase> > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &owner, &PropertyOwner::InstallCustomProperty, &property );
+  new (slot) LocalType( &owner, &PropertyOwner::InstallCustomProperty, property );
 }
 
 inline void ApplyConstraintMessage( EventToUpdate& eventToUpdate, const PropertyOwner& owner, ConstraintBase& constraint )

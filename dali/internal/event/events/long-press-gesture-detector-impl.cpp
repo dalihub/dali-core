@@ -129,7 +129,7 @@ void LongPressGestureDetector::EmitLongPressGestureSignal(Dali::Actor pressedAct
   // Guard against destruction during signal emission
   Dali::LongPressGestureDetector handle( this );
 
-  mDetectedSignalV2.Emit( pressedActor, longPress );
+  mDetectedSignal.Emit( pressedActor, longPress );
 }
 
 bool LongPressGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

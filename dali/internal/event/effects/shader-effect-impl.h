@@ -185,9 +185,9 @@ public: // Default property extensions from ProxyObject
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::InstallSceneObjectProperty()
+   * @copydoc Dali::Internal::ProxyObject::NotifyScenePropertyInstalled()
    */
-  virtual void InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
+  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetSceneObject()

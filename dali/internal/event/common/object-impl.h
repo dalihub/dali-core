@@ -48,7 +48,7 @@ public:
   /**
    * @copydoc Dali::Handle::Supports()
    */
-  virtual bool Supports(Capability capability) const = 0;
+  virtual bool Supports( Capability capability ) const = 0;
 
   /**
    * @copydoc Dali::Handle::GetPropertyCount()
@@ -58,42 +58,42 @@ public:
   /**
    * @copydoc Dali::Handle::GetPropertyName()
    */
-  virtual std::string GetPropertyName(Property::Index index) const = 0;
+  virtual std::string GetPropertyName( Property::Index index ) const = 0;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndex()
    */
-  virtual Property::Index GetPropertyIndex(const std::string& name) const = 0;
+  virtual Property::Index GetPropertyIndex( const std::string& name ) const = 0;
 
   /**
    * @copydoc Dali::Handle::IsPropertyWritable()
    */
-  virtual bool IsPropertyWritable(Property::Index index) const = 0;
+  virtual bool IsPropertyWritable( Property::Index index ) const = 0;
 
   /**
    * @copydoc Dali::Handle::IsPropertyAnimatable()
    */
-  virtual bool IsPropertyAnimatable(Property::Index index) const = 0;
+  virtual bool IsPropertyAnimatable( Property::Index index ) const = 0;
 
   /**
    * @copydoc Dali::Handle::IsPropertyAConstraintInput()
    */
-  virtual bool IsPropertyAConstraintInput(Property::Index index) const = 0;
+  virtual bool IsPropertyAConstraintInput( Property::Index index ) const = 0;
 
   /**
    * @copydoc Dali::Handle::GetPropertyType()
    */
-  virtual Property::Type GetPropertyType(Property::Index index) const = 0;
+  virtual Property::Type GetPropertyType( Property::Index index ) const = 0;
 
   /**
    * @copydoc Dali::Handle::SetProperty()
    */
-  virtual void SetProperty(Property::Index index, const Property::Value& propertyValue) = 0;
+  virtual void SetProperty( Property::Index index, const Property::Value& propertyValue ) = 0;
 
   /**
    * @copydoc Dali::Handle::GetProperty()
    */
-  virtual Property::Value GetProperty(Property::Index index) const = 0;
+  virtual Property::Value GetProperty( Property::Index index ) const = 0;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndices()
@@ -103,30 +103,29 @@ public:
   /**
    * @copydoc Dali::Handle::RegisterProperty()
    */
-  virtual Property::Index RegisterProperty(std::string name, const Property::Value& propertyValue) = 0;
+  virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue ) = 0;
 
   /**
    * @copydoc Dali::Handle::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
-  virtual Property::Index RegisterProperty(std::string name, const Property::Value& propertyValue, Property::AccessMode accessMode) = 0;
+  virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode ) = 0;
 
   /**
    * @copydoc Dali::Handle::AddPropertyNotification()
    */
-  virtual Dali::PropertyNotification AddPropertyNotification(Property::Index index,
-                                                             int componentIndex,
-                                                             const Dali::PropertyCondition& condition) = 0;
+  virtual Dali::PropertyNotification AddPropertyNotification( Property::Index index,
+                                                              int componentIndex,
+                                                              const Dali::PropertyCondition& condition ) = 0;
 
   /**
    * @copydoc Dali::Handle::RemovePropertyNotification()
    */
-  virtual void RemovePropertyNotification(Dali::PropertyNotification propertyNotification) = 0;
+  virtual void RemovePropertyNotification( Dali::PropertyNotification propertyNotification ) = 0;
 
   /**
    * @copydoc Dali::Handle::RemovePropertyNotifications()
    */
   virtual void RemovePropertyNotifications() = 0;
-
 
 protected:
 

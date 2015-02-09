@@ -543,19 +543,12 @@ void RenderTask::SetDefaultProperty( Property::Index index, const Property::Valu
       SetClearColor( property.Get<Vector4>() );
       break;
     }
-
     default:
     {
-      DALI_ASSERT_ALWAYS(false && "RenderTask property index out of range"); // should not come here
+      // nothing to do
       break;
     }
   }
-}
-
-void RenderTask::SetCustomProperty( Property::Index /*index*/, const CustomProperty& /*entry*/, const Property::Value& /*value*/ )
-{
-  // TODO: support them, it doesn't hurt.
-  DALI_ASSERT_ALWAYS( 0 && "RenderTask does not support custom properties");
 }
 
 Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
@@ -589,12 +582,6 @@ Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
   }
 
   return value;
-}
-
-void RenderTask::InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
-{
-  // TODO: support them, it doesn't hurt.
-  DALI_ASSERT_ALWAYS( 0 && "RenderTask does not support custom properties" );
 }
 
 const SceneGraph::PropertyOwner* RenderTask::GetSceneObject() const
@@ -680,16 +667,16 @@ void RenderTask::EmitSignalFinish()
 {
   DALI_LOG_INFO(gLogRender, Debug::General, "RenderTask::EmitSignalFinish(this:%p)\n", this);
 
-  if( !mSignalFinishedV2.Empty() )
+  if( !mSignalFinished.Empty() )
   {
     Dali::RenderTask handle( this );
-    mSignalFinishedV2.Emit(handle );
+    mSignalFinished.Emit(handle );
   }
 }
 
-Dali::RenderTask::RenderTaskSignalV2& RenderTask::FinishedSignal()
+Dali::RenderTask::RenderTaskSignalType& RenderTask::FinishedSignal()
 {
-  return mSignalFinishedV2;
+  return mSignalFinished;
 }
 
 bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )

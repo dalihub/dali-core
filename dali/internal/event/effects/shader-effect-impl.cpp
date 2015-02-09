@@ -34,7 +34,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/render/shaders/uniform-meta.h>
-#include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include "dali-shaders.h"
 
@@ -562,7 +561,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
 
     default:
     {
-      DALI_ASSERT_ALWAYS(false && "ShaderEffect property enumeration out of range"); // should not come here
+      // nothing to do
       break;
     }
   }
@@ -574,12 +573,9 @@ Property::Value ShaderEffect::GetDefaultProperty(Property::Index /*index*/) cons
   return Property::Value();
 }
 
-void ShaderEffect::InstallSceneObjectProperty( PropertyBase& newProperty, const std::string& name, unsigned int index )
+void ShaderEffect::NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
 {
   // Warning - the property is added to the Shader object in the Update thread and the meta-data is added in the Render thread (through a secondary message)
-
-  // mSceneObject is being used in a separate thread; queue a message to add the property
-  InstallCustomPropertyMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, newProperty ); // Message takes ownership
 
   // mSceneObject requires metadata for each custom property (uniform)
   UniformMeta* meta = UniformMeta::New( name, newProperty, Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );

@@ -1,5 +1,5 @@
-#ifndef __DALI_SIGNAL_V2_H__
-#define __DALI_SIGNAL_V2_H__
+#ifndef __DALI_SIGNAL_H__
+#define __DALI_SIGNAL_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -62,9 +62,71 @@ namespace Dali
 
 /**
  * @brief Base Template class to provide signals.
+ *
+ * To create a signal for this class, you first have to define a typedef within your handle's scope:
+ * @code
+ * class MyHandle : public Handle
+ * {
+ * public:
+ *
+ *   // Typedefs
+ *
+ *   typedef Signal< void ()> VoidSignalType;         ///< For signals that require no parameters and no return value
+ *   typedef Signal< bool ()> BoolSignalType;         ///< For signals that do not need parameters but require a boolean return
+ *   typedef Signal< void ( float )> ParamSignalType; ///< For signals that need a float as a parameter but no return value
+ *
+ *   ...
+ *
+ * public:
+ *
+ *   // Signals
+ *
+ *   VoidSignalType&  VoidSignal();
+ *   BoolSignalType&  BoolSignal();
+ *   ParamSignalType& ParamSignal();
+ *
+ *   ...
+ * };
+ * @endcode
+ * The methods are required in the handle class so that the application writer can retrieve the Signal in order to connect/disconnect.
+ *
+ * In the implementation class, the members should be defined and the methods should be provided to retrieve the signal itself.
+ * These will be called by the equivalent methods in the MyHandle class.
+ * @code
+ * class MyObject : public Object
+ * {
+ *   ...
+ *
+ * public:
+ *
+ *   MyHandle::VoidSignalType&  VoidSignal()
+ *   {
+ *     return mVoidSignal;
+ *   }
+ *
+ *   MyHandle::BoolSignalType&  BoolSignal()
+ *   {
+ *     return mBoolSignal;
+ *   }
+ *
+ *   MyHandle::ParamSignalType& ParamSignal()
+ *   {
+ *     return mParamSignal;
+ *   }
+ *
+ * private:
+ *
+ *   // Signals
+ *   MyHandle::VoidSignalType   mVoidSignal;
+ *   MyHandle::BoolSignalType   mBoolSignal;
+ *   MyHandle::ParamSignalType  mParamSignal;
+ *
+ *   ...
+ * };
+ * @endcode
  */
 template< typename _Signature >
-class SignalV2
+class Signal
 {
 };
 
@@ -72,21 +134,21 @@ class SignalV2
  * @brief A template for Signals with no parameters or return value.
  */
 template <>
-class SignalV2< void () >
+class Signal< void () >
 {
 public:
 
   /**
    * @brief Default constructor.
    */
-  SignalV2()
+  Signal()
   {
   }
 
   /**
    * @brief Non-virtual destructor.
    */
-  ~SignalV2()
+  ~Signal()
   {
   }
 
@@ -211,8 +273,8 @@ public:
 
 private:
 
-  SignalV2( const SignalV2& );                   ///< undefined copy constructor, signals don't support copying.
-  SignalV2& operator=( const SignalV2& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
+  Signal& operator=( const Signal& );        ///< undefined assignment operator
 
 private:
 
@@ -224,21 +286,21 @@ private:
  * @brief A template for Signals with no parameters and a return value.
  */
 template < typename Ret >
-class SignalV2< Ret() >
+class Signal< Ret() >
 {
 public:
 
   /**
    * @brief Default constructor.
    */
-  SignalV2()
+  Signal()
   {
   }
 
   /**
    * @brief Non-virtual destructor.
    */
-  ~SignalV2()
+  ~Signal()
   {
   }
 
@@ -364,8 +426,8 @@ public:
 
 private:
 
-  SignalV2( const SignalV2& );                   ///< undefined copy constructor, signals don't support copying.
-  SignalV2& operator=( const SignalV2& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
+  Signal& operator=( const Signal& );        ///< undefined assignment operator
 
 private:
 
@@ -377,21 +439,21 @@ private:
  * @brief A template for Signals with 1 parameter.
  */
 template < typename Arg0 >
-class SignalV2< void ( Arg0 ) >
+class Signal< void ( Arg0 ) >
 {
 public:
 
   /**
    * @brief Default constructor.
    */
-  SignalV2()
+  Signal()
   {
   }
 
   /**
    * @brief Non-virtual destructor.
    */
-  ~SignalV2()
+  ~Signal()
   {
   }
 
@@ -517,8 +579,8 @@ public:
 
 private:
 
-  SignalV2( const SignalV2& );                   ///< undefined copy constructor, signals don't support copying.
-  SignalV2& operator=( const SignalV2& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
+  Signal& operator=( const Signal& );        ///< undefined assignment operator
 
 private:
 
@@ -530,21 +592,21 @@ private:
  * @brief A template for Signals with 1 parameter and a return value.
  */
 template < typename Ret, typename Arg0 >
-class SignalV2< Ret( Arg0 ) >
+class Signal< Ret( Arg0 ) >
 {
 public:
 
   /**
    * @brief Default constructor.
    */
-  SignalV2()
+  Signal()
   {
   }
 
   /**
    * @brief Non-virtual destructor.
    */
-  ~SignalV2()
+  ~Signal()
   {
   }
 
@@ -671,8 +733,8 @@ public:
 
 private:
 
-  SignalV2( const SignalV2& );                   ///< undefined copy constructor, signals don't support copying.
-  SignalV2& operator=( const SignalV2& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
+  Signal& operator=( const Signal& );        ///< undefined assignment operator
 
 private:
 
@@ -685,7 +747,7 @@ private:
  *
  */
 template < typename Arg0, typename Arg1 >
-class SignalV2< void ( Arg0, Arg1 ) >
+class Signal< void ( Arg0, Arg1 ) >
 {
 public:
 
@@ -693,7 +755,7 @@ public:
    * @brief Default constructor.
    *
    */
-  SignalV2()
+  Signal()
   {
   }
 
@@ -701,7 +763,7 @@ public:
    * @brief Non-virtual destructor.
    *
    */
-  ~SignalV2()
+  ~Signal()
   {
   }
 
@@ -828,8 +890,8 @@ public:
 
 private:
 
-  SignalV2( const SignalV2& );                   ///< undefined copy constructor, signals don't support copying.
-  SignalV2& operator=( const SignalV2& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
+  Signal& operator=( const Signal& );        ///< undefined assignment operator
 
 private:
 
@@ -841,21 +903,21 @@ private:
  * @brief A template for Signals with 2 parameters and a return value.
  */
 template < typename Ret, typename Arg0, typename Arg1 >
-class SignalV2< Ret( Arg0, Arg1 ) >
+class Signal< Ret( Arg0, Arg1 ) >
 {
 public:
 
   /**
    * @brief Default constructor.
    */
-  SignalV2()
+  Signal()
   {
   }
 
   /**
    * @brief Non-virtual destructor.
    */
-  ~SignalV2()
+  ~Signal()
   {
   }
 
@@ -982,8 +1044,8 @@ public:
 
 private:
 
-  SignalV2( const SignalV2& );                   ///< undefined copy constructor, signals don't support copying.
-  SignalV2& operator=( const SignalV2& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
+  Signal& operator=( const Signal& );        ///< undefined assignment operator
 
 private:
 
@@ -995,21 +1057,21 @@ private:
  * @brief A template for Signals with 3 parameters.
  */
 template < typename Arg0, typename Arg1, typename Arg2 >
-class SignalV2< void ( Arg0, Arg1, Arg2 ) >
+class Signal< void ( Arg0, Arg1, Arg2 ) >
 {
 public:
 
   /**
    * @brief Default constructor.
    */
-  SignalV2()
+  Signal()
   {
   }
 
   /**
    * @brief Non-virtual destructor.
    */
-  ~SignalV2()
+  ~Signal()
   {
   }
 
@@ -1137,8 +1199,8 @@ public:
 
 private:
 
-  SignalV2( const SignalV2& );                   ///< undefined copy constructor, signals don't support copying.
-  SignalV2& operator=( const SignalV2& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
+  Signal& operator=( const Signal& );        ///< undefined assignment operator
 
 private:
 
@@ -1150,21 +1212,21 @@ private:
  * @brief A template for Signals with 2 parameters and a return value.
  */
 template < typename Ret, typename Arg0, typename Arg1, typename Arg2 >
-class SignalV2< Ret( Arg0, Arg1, Arg2 ) >
+class Signal< Ret( Arg0, Arg1, Arg2 ) >
 {
 public:
 
   /**
    * @brief Default constructor.
    */
-  SignalV2()
+  Signal()
   {
   }
 
   /**
    * @brief Non-virtual destructor.
    */
-  ~SignalV2()
+  ~Signal()
   {
   }
 
@@ -1294,8 +1356,8 @@ public:
 
 private:
 
-  SignalV2( const SignalV2& );                   ///< undefined copy constructor, signals don't support copying.
-  SignalV2& operator=( const SignalV2& );        ///< undefined assignment operator
+  Signal( const Signal& );                   ///< undefined copy constructor, signals don't support copying.
+  Signal& operator=( const Signal& );        ///< undefined assignment operator
 
 private:
 
@@ -1305,4 +1367,4 @@ private:
 
 } // namespace Dali
 
-#endif // __DALI_SIGNAL_V2_H__
+#endif // __DALI_SIGNAL_H__

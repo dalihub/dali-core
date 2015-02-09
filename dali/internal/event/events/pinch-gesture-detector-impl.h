@@ -68,9 +68,9 @@ public: // Signals
   /**
    * @copydoc Dali::PinchGestureDetector::DetectedSignal()
    */
-  Dali::PinchGestureDetector::DetectedSignalV2& DetectedSignal()
+  Dali::PinchGestureDetector::DetectedSignalType& DetectedSignal()
   {
-    return mDetectedSignalV2;
+    return mDetectedSignal;
   }
 
   /**
@@ -116,7 +116,7 @@ private: // GestureDetector overrides
 
 private:
 
-  Dali::PinchGestureDetector::DetectedSignalV2 mDetectedSignalV2;
+  Dali::PinchGestureDetector::DetectedSignalType mDetectedSignal;
 };
 
 } // namespace Internal

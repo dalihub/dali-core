@@ -146,7 +146,7 @@ public:
   /**
    * @copydoc Dali::ActiveConstraint::AppliedSignal()
    */
-  ActiveConstraintSignalV2& AppliedSignal();
+  ActiveConstraintSignalType& AppliedSignal();
 
   /**
    * @copydoc Dali::Constraint::SetAlphaFunction()
@@ -237,19 +237,9 @@ public: // Default property extensions from ProxyObject
   virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::SetCustomProperty()
-   */
-  virtual void SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
-
-  /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultProperty()
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
-
-  /**
-   * @copydoc Dali::Internal::ProxyObject::InstallSceneObjectProperty()
-   */
-  virtual void InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
@@ -332,7 +322,7 @@ protected:
 
 private:
 
-  ActiveConstraintSignalV2 mAppliedSignal;
+  ActiveConstraintSignalType mAppliedSignal;
 
   Dali::Animation mApplyAnimation;  ///< Used to automatically animate weight from 0.0f -> 1.0f
 

@@ -42,7 +42,6 @@
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/property-owner-messages.h>
 #include <dali/internal/update/nodes/node-messages.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
@@ -1110,10 +1109,10 @@ void Actor::SetSize(const Vector3& size)
 
     // Emit signal for application developer
 
-    if( !mSetSizeSignalV2.Empty() )
+    if( !mSetSizeSignal.Empty() )
     {
       Dali::Actor handle( this );
-      mSetSizeSignalV2.Emit( handle, mSize );
+      mSetSizeSignal.Emit( handle, mSize );
     }
   }
 }
@@ -1857,17 +1856,17 @@ bool Actor::IsKeyboardFocusable() const
 
 bool Actor::GetTouchRequired() const
 {
-  return !mTouchedSignalV2.Empty() || mDerivedRequiresTouch;
+  return !mTouchedSignal.Empty() || mDerivedRequiresTouch;
 }
 
 bool Actor::GetHoverRequired() const
 {
-  return !mHoveredSignalV2.Empty() || mDerivedRequiresHover;
+  return !mHoveredSignal.Empty() || mDerivedRequiresHover;
 }
 
 bool Actor::GetMouseWheelEventRequired() const
 {
-  return !mMouseWheelEventSignalV2.Empty() || mDerivedRequiresMouseWheelEvent;
+  return !mMouseWheelEventSignal.Empty() || mDerivedRequiresMouseWheelEvent;
 }
 
 bool Actor::IsHittable() const
@@ -1898,10 +1897,10 @@ bool Actor::EmitTouchEventSignal(const TouchEvent& event)
 {
   bool consumed = false;
 
-  if ( !mTouchedSignalV2.Empty() )
+  if ( !mTouchedSignal.Empty() )
   {
     Dali::Actor handle( this );
-    consumed = mTouchedSignalV2.Emit( handle, event );
+    consumed = mTouchedSignal.Emit( handle, event );
   }
 
   if (!consumed)
@@ -1917,10 +1916,10 @@ bool Actor::EmitHoverEventSignal(const HoverEvent& event)
 {
   bool consumed = false;
 
-  if ( !mHoveredSignalV2.Empty() )
+  if ( !mHoveredSignal.Empty() )
   {
     Dali::Actor handle( this );
-    consumed = mHoveredSignalV2.Emit( handle, event );
+    consumed = mHoveredSignal.Emit( handle, event );
   }
 
   if (!consumed)
@@ -1936,10 +1935,10 @@ bool Actor::EmitMouseWheelEventSignal(const MouseWheelEvent& event)
 {
   bool consumed = false;
 
-  if ( !mMouseWheelEventSignalV2.Empty() )
+  if ( !mMouseWheelEventSignal.Empty() )
   {
     Dali::Actor handle( this );
-    consumed = mMouseWheelEventSignalV2.Emit( handle, event );
+    consumed = mMouseWheelEventSignal.Emit( handle, event );
   }
 
   if (!consumed)
@@ -1951,34 +1950,34 @@ bool Actor::EmitMouseWheelEventSignal(const MouseWheelEvent& event)
   return consumed;
 }
 
-Dali::Actor::TouchSignalV2& Actor::TouchedSignal()
+Dali::Actor::TouchSignalType& Actor::TouchedSignal()
 {
-  return mTouchedSignalV2;
+  return mTouchedSignal;
 }
 
-Dali::Actor::HoverSignalV2& Actor::HoveredSignal()
+Dali::Actor::HoverSignalType& Actor::HoveredSignal()
 {
-  return mHoveredSignalV2;
+  return mHoveredSignal;
 }
 
-Dali::Actor::MouseWheelEventSignalV2& Actor::MouseWheelEventSignal()
+Dali::Actor::MouseWheelEventSignalType& Actor::MouseWheelEventSignal()
 {
-  return mMouseWheelEventSignalV2;
+  return mMouseWheelEventSignal;
 }
 
-Dali::Actor::SetSizeSignalV2& Actor::SetSizeSignal()
+Dali::Actor::SetSizeSignalType& Actor::SetSizeSignal()
 {
-  return mSetSizeSignalV2;
+  return mSetSizeSignal;
 }
 
-Dali::Actor::OnStageSignalV2& Actor::OnStageSignal()
+Dali::Actor::OnStageSignalType& Actor::OnStageSignal()
 {
-  return mOnStageSignalV2;
+  return mOnStageSignal;
 }
 
-Dali::Actor::OffStageSignalV2& Actor::OffStageSignal()
+Dali::Actor::OffStageSignalType& Actor::OffStageSignal()
 {
-  return mOffStageSignalV2;
+  return mOffStageSignal;
 }
 
 bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
@@ -2109,14 +2108,14 @@ Actor::~Actor()
   delete mAnchorPoint;
 }
 
-void Actor::ConnectToStage( Stage& stage, int index )
+void Actor::ConnectToStage( int index )
 {
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
   // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveConnectToStage( stage, connectionList, index );
+  RecursiveConnectToStage( connectionList, index );
 
   // Notify applications about the newly connected actors.
   const ActorIter endIter = connectionList.end();
@@ -2127,7 +2126,7 @@ void Actor::ConnectToStage( Stage& stage, int index )
   }
 }
 
-void Actor::RecursiveConnectToStage( Stage& stage, ActorContainer& connectionList, int index )
+void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
 {
   DALI_ASSERT_ALWAYS( !OnStage() );
 
@@ -2148,7 +2147,7 @@ void Actor::RecursiveConnectToStage( Stage& stage, ActorContainer& connectionLis
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
       Actor& actor = GetImplementation( *iter );
-      actor.RecursiveConnectToStage( stage, connectionList );
+      actor.RecursiveConnectToStage( connectionList );
     }
   }
 }
@@ -2198,10 +2197,10 @@ void Actor::NotifyStageConnection()
     // Notification for external (CustomActor) derived classes
     OnStageConnectionExternal();
 
-    if ( !mOnStageSignalV2.Empty() )
+    if ( !mOnStageSignal.Empty() )
     {
       Dali::Actor handle( this );
-      mOnStageSignalV2.Emit( handle );
+      mOnStageSignal.Emit( handle );
     }
 
     // Guard against Remove during callbacks
@@ -2290,10 +2289,10 @@ void Actor::NotifyStageDisconnection()
     // Notification for external (CustomeActor) derived classes
     OnStageDisconnectionExternal();
 
-    if( !mOffStageSignalV2.Empty() )
+    if( !mOffStageSignal.Empty() )
     {
       Dali::Actor handle( this );
-      mOffStageSignalV2.Emit( handle );
+      mOffStageSignal.Emit( handle );
     }
 
     // Guard against Add during callbacks
@@ -2630,125 +2629,122 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     default:
     {
-      DALI_ASSERT_ALWAYS(false && "Actor::Property is out of bounds"); // should not come here
+      // this can happen in the case of a non-animatable default property so just do nothing
       break;
     }
   }
 }
 
-void Actor::SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
+// TODO: This method needs to be removed
+void Actor::SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
 {
-  // TODO: This should be deprecated
   OnPropertySet(index, value);
 
-  if(entry.IsAnimatable())
+  switch ( entry.type )
   {
-    switch ( entry.type )
+    case Property::BOOLEAN:
     {
-      case Property::BOOLEAN:
-      {
-        const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+      const AnimatableProperty<bool>* property = dynamic_cast< const AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<bool>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<bool>::Bake, value.Get<bool>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<bool>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<bool>::Bake, value.Get<bool>() );
 
-        break;
-      }
+      break;
+    }
 
-      case Property::FLOAT:
-      {
-        const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::FLOAT:
+    {
+      const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<float>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<float>::Bake, value.Get<float>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<float>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<float>::Bake, value.Get<float>() );
 
-        break;
-      }
+      break;
+    }
 
-      case Property::INTEGER:
-      {
-        const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::INTEGER:
+    {
+      const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<int>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<int>::Bake, value.Get<int>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<int>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<int>::Bake, value.Get<int>() );
 
-        break;
-      }
+      break;
+    }
 
-      case Property::VECTOR2:
-      {
-        const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::VECTOR2:
+    {
+      const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<Vector2>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<Vector2>::Bake, value.Get<Vector2>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<Vector2>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<Vector2>::Bake, value.Get<Vector2>() );
 
-        break;
-      }
+      break;
+    }
 
-      case Property::VECTOR3:
-      {
-        const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::VECTOR3:
+    {
+      const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<Vector3>::Bake, value.Get<Vector3>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<Vector3>::Bake, value.Get<Vector3>() );
 
-        break;
-      }
+      break;
+    }
 
-      case Property::VECTOR4:
-      {
-        const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::VECTOR4:
+    {
+      const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<Vector4>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<Vector4>::Bake, value.Get<Vector4>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<Vector4>::Send( mStage->GetUpdateManager(), mNode, property, &AnimatableProperty<Vector4>::Bake, value.Get<Vector4>() );
 
-        break;
-      }
+      break;
+    }
 
-      case Property::ROTATION:
-      {
-        const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::ROTATION:
+    {
+      const AnimatableProperty<Quaternion>* property = dynamic_cast< const AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Quaternion>::Bake,  value.Get<Quaternion>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Quaternion>::Bake,  value.Get<Quaternion>() );
 
-        break;
-      }
+      break;
+    }
 
-      case Property::MATRIX:
-      {
-        const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::MATRIX:
+    {
+      const AnimatableProperty<Matrix>* property = dynamic_cast< const AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<Matrix>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Matrix>::Bake,  value.Get<Matrix>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<Matrix>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Matrix>::Bake,  value.Get<Matrix>() );
 
-        break;
-      }
+      break;
+    }
 
-      case Property::MATRIX3:
-      {
-        const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
-        DALI_ASSERT_DEBUG( NULL != property );
+    case Property::MATRIX3:
+    {
+      const AnimatableProperty<Matrix3>* property = dynamic_cast< const AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
 
-        // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::NodePropertyMessage<Matrix3>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Matrix3>::Bake,  value.Get<Matrix3>() );
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<Matrix3>::Send( mStage->GetUpdateManager(), mNode, property,&AnimatableProperty<Matrix3>::Bake,  value.Get<Matrix3>() );
 
-        break;
-      }
+      break;
+    }
 
-      default:
-      {
-        DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should not come here
-        break;
-      }
+    default:
+    {
+      DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should not come here
+      break;
     }
   }
 }
@@ -3027,13 +3023,9 @@ Property::Value Actor::GetDefaultProperty(Property::Index index) const
   return value;
 }
 
-void Actor::InstallSceneObjectProperty( PropertyBase& newProperty, const std::string& name, unsigned int index )
+const SceneGraph::PropertyOwner* Actor::GetPropertyOwner() const
 {
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to add the property
-    InstallCustomPropertyMessage( mStage->GetUpdateInterface(), *mNode, newProperty ); // Message takes ownership
-  }
+  return mNode;
 }
 
 const SceneGraph::PropertyOwner* Actor::GetSceneObject() const
@@ -3386,10 +3378,8 @@ void Actor::SetParent(Actor* parent, int index)
     if ( Stage::IsInstalled() && // Don't emit signals or send messages during Core destruction
          parent->OnStage() )
     {
-      StagePtr stage = parent->mStage;
-
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToStage(*stage, index);
+      ConnectToStage( index );
     }
   }
   else // parent being set to NULL

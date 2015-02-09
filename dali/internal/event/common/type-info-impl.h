@@ -111,7 +111,7 @@ public:
    * @param[in] signalName The name of the signal.
    * @param[in] function The function used for connecting to the signal.
    */
-  void AddConnectorFunction( const std::string& signalName, Dali::TypeInfo::SignalConnectorFunctionV2 function );
+  void AddConnectorFunction( const std::string& signalName, Dali::TypeInfo::SignalConnectorFunction function );
 
   /**
    * Adds an event-thread only property to the type.
@@ -228,19 +228,19 @@ private:
     std::string name;
   };
 
-  typedef std::pair<std::string, Dali::TypeInfo::SignalConnectorFunctionV2 > ConnectionPairV2;
+  typedef std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction > ConnectionPair;
   typedef std::pair<std::string, Dali::TypeInfo::ActionFunction > ActionPair;
   typedef std::pair<Property::Index, RegisteredProperty> RegisteredPropertyPair;
 
   typedef std::vector< ActionPair > ActionContainer;
-  typedef std::vector< ConnectionPairV2 > ConnectorContainerV2;
+  typedef std::vector< ConnectionPair > ConnectorContainer;
   typedef std::vector< RegisteredPropertyPair > RegisteredPropertyContainer;
 
   std::string mTypeName;
   std::string mBaseTypeName;
   Dali::TypeInfo::CreateFunction mCreate;
   ActionContainer mActions;
-  ConnectorContainerV2 mSignalConnectors;
+  ConnectorContainer mSignalConnectors;
   RegisteredPropertyContainer mRegisteredProperties;
 };
 

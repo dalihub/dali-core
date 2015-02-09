@@ -25,7 +25,7 @@
 #include <dali/public-api/object/base-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
@@ -85,7 +85,7 @@ public:
   static const char* const SIGNAL_COLLISION; ///< name "collision"
 
   // signals
-  typedef SignalV2< void (DynamicsWorld, const DynamicsCollision) > CollisionSignalV2; ///< Type of collision signal
+  typedef Signal< void (DynamicsWorld, const DynamicsCollision) > CollisionSignalType; ///< Type of collision signal
 
 public:
   /**
@@ -190,7 +190,7 @@ public: // Signals
    *
    * @return The signal to connect to.
    */
-  CollisionSignalV2& CollisionSignal();
+  CollisionSignalType& CollisionSignal();
 
 public: // Not intended for application developers
 

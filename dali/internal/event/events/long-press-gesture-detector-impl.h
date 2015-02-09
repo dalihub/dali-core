@@ -112,9 +112,9 @@ public: // Signals
   /**
    * @copydoc Dali::LongPressGestureDetector::DetectedSignal()
    */
-  Dali::LongPressGestureDetector::DetectedSignalV2& DetectedSignal()
+  Dali::LongPressGestureDetector::DetectedSignalType& DetectedSignal()
   {
-    return mDetectedSignalV2;
+    return mDetectedSignal;
   }
 
   /**
@@ -160,7 +160,7 @@ private: // GestureDetector overrides
 
 private:
 
-  Dali::LongPressGestureDetector::DetectedSignalV2 mDetectedSignalV2;
+  Dali::LongPressGestureDetector::DetectedSignalType mDetectedSignal;
 
   unsigned int mMinimumTouchesRequired;
   unsigned int mMaximumTouchesRequired;

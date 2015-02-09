@@ -270,14 +270,14 @@ bool PanGestureDetector::CheckAngleAllowed( Radian angle ) const
 
 void PanGestureDetector::EmitPanGestureSignal(Dali::Actor actor, const PanGesture& pan)
 {
-  if ( !mDetectedSignalV2.Empty() )
+  if ( !mDetectedSignal.Empty() )
   {
     // Guard against destruction during signal emission
     Dali::PanGestureDetector handle( this );
 
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "Emitting Signal (%p)\n", this );
 
-    mDetectedSignalV2.Emit( actor, pan );
+    mDetectedSignal.Emit( actor, pan );
   }
 }
 
@@ -407,11 +407,6 @@ void PanGestureDetector::SetDefaultProperty( Property::Index index, const Proper
   // None of our properties should be settable from Public API
 }
 
-void PanGestureDetector::SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
-{
-  // None of our properties should be settable from Public API
-}
-
 Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) const
 {
   Property::Value value;
@@ -517,12 +512,6 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
   }
 
   return value;
-}
-
-void PanGestureDetector::InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
-{
-  // We do not want the user to install custom properties
-  DALI_ASSERT_ALWAYS(false && "PanGestureDetector does not allow custom properties" );
 }
 
 const SceneGraph::PropertyOwner* PanGestureDetector::GetSceneObject() const

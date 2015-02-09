@@ -27,7 +27,7 @@
 #include <dali/integration-api/platform-abstraction.h>
 
 #include "test-trace-call-stack.h"
-
+#include "test-dynamics.h"
 
 namespace Dali
 {
@@ -110,9 +110,6 @@ public:
    */
   virtual void LoadResource(const Integration::ResourceRequest& request);
 
-  /**
-   * @copydoc PlatformAbstraction::LoadResourceSynchronously()
-   */
   virtual Integration::ResourcePointer LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath );
 
   /**
@@ -226,6 +223,7 @@ private:
 
   LoadFileResult                mLoadFileResult;
   bool                          mSaveFileResult;
+  TestDynamicsFactory*          mDynamicsFactory;
 };
 
 } // Dali

@@ -29,7 +29,7 @@ namespace Dali
 {
 
 /**
- * @brief Implementation class for Dali::SignalV2%s.
+ * @brief Implementation class for Dali::Signal.
  *
  * A slot can be connected to many signals
  * A signal can be connected to many slots

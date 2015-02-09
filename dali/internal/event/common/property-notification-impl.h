@@ -79,7 +79,7 @@ public:
   /**
    * @copydoc Dali::PropertyNotification::NotifySignal()
    */
-  Dali::PropertyNotifySignalV2& NotifySignal();
+  Dali::PropertyNotifySignalType& NotifySignal();
 
   /**
    * Emit the Notify signal
@@ -184,7 +184,7 @@ protected:
   SceneGraph::UpdateManager& mUpdateManager;
   const SceneGraph::PropertyNotification* mPropertyNotification;
 
-  Dali::PropertyNotifySignalV2 mNotifySignal;
+  Dali::PropertyNotifySignalType mNotifySignal;
 
 private:
 

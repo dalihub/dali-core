@@ -170,17 +170,17 @@ void Stage::KeepRendering( float durationSeconds )
   GetImplementation(*this).KeepRendering( durationSeconds );
 }
 
-Stage::KeyEventSignalV2& Stage::KeyEventSignal()
+Stage::KeyEventSignalType& Stage::KeyEventSignal()
 {
   return GetImplementation(*this).KeyEventSignal();
 }
 
-Stage::EventProcessingFinishedSignalV2& Stage::EventProcessingFinishedSignal()
+Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSignal()
 {
   return GetImplementation(*this).EventProcessingFinishedSignal();
 }
 
-Stage::TouchedSignalV2& Stage::TouchedSignal()
+Stage::TouchedSignalType& Stage::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
 }
@@ -195,7 +195,7 @@ Stage::ContextStatusSignal& Stage::ContextRegainedSignal()
   return GetImplementation(*this).ContextRegainedSignal();
 }
 
-Stage::SceneCreatedSignalV2& Stage::SceneCreatedSignal()
+Stage::SceneCreatedSignalType& Stage::SceneCreatedSignal()
 {
   return GetImplementation(*this).SceneCreatedSignal();
 }

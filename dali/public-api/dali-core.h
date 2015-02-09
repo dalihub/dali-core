@@ -148,7 +148,7 @@
 #include <dali/public-api/signals/callback.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 #include <dali/public-api/signals/connection-tracker.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 #include <dali/public-api/signals/functor-delegate.h>
 #include <dali/public-api/signals/signal-slot-connections.h>
 #include <dali/public-api/signals/signal-slot-observers.h>

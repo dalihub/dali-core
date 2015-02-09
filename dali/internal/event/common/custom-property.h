@@ -114,8 +114,8 @@ public:
    */
   const SceneGraph::PropertyBase* GetSceneGraphProperty() const
   {
-    DALI_ASSERT_DEBUG(mProperty && "Get on uninitialized SceneGraph property") ;
-    return mProperty ;
+    DALI_ASSERT_DEBUG(mProperty && "Accessing uninitialized SceneGraph property") ;
+    return mProperty;
   }
 
   std::string name;       ///< The name of the property

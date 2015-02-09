@@ -123,14 +123,14 @@ public:
    * Add an observer to the proxy.
    * @param[in] observer The observer to add.
    */
-  virtual void AddObserver(Observer& observer);
+  virtual void AddObserver( Observer& observer );
 
   /**
    * Remove an observer from the proxy
    * @pre The observer has already been added.
    * @param[in] observer The observer to remove.
    */
-  virtual void RemoveObserver(Observer& observer);
+  virtual void RemoveObserver( Observer& observer );
 
   /**
    * Retrieve the scene-graph object added by this proxy.
@@ -182,37 +182,37 @@ public: // Property system interface from Internal::Object
   /**
    * @copydoc Dali::Internal::Object::GetPropertyIndex()
    */
-  virtual Property::Index GetPropertyIndex(const std::string& name) const;
+  virtual Property::Index GetPropertyIndex( const std::string& name ) const;
 
   /**
    * @copydoc Dali::Internal::Object::IsPropertyWritable()
    */
-  virtual bool IsPropertyWritable(Property::Index index) const;
+  virtual bool IsPropertyWritable( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::IsPropertyAnimatable()
    */
-  virtual bool IsPropertyAnimatable(Property::Index index) const;
+  virtual bool IsPropertyAnimatable( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::IsPropertyAConstraintInput()
    */
-  virtual bool IsPropertyAConstraintInput(Property::Index index) const;
+  virtual bool IsPropertyAConstraintInput( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::GetPropertyType()
    */
-  virtual Property::Type GetPropertyType(Property::Index index) const;
+  virtual Property::Type GetPropertyType( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::SetProperty()
    */
-  virtual void SetProperty(Property::Index index, const Property::Value& propertyValue);
+  virtual void SetProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
    * @copydoc Dali::Internal::Object::GetProperty()
    */
-  virtual Property::Value GetProperty(Property::Index index) const;
+  virtual Property::Value GetProperty( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Handle::GetPropertyIndices()
@@ -222,24 +222,24 @@ public: // Property system interface from Internal::Object
   /**
    * @copydoc Dali::Internal::Object::RegisterProperty()
    */
-  virtual Property::Index RegisterProperty(std::string name, const Property::Value& propertyValue);
+  virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue );
 
   /**
    * @copydoc Dali::Internal::Object::RegisterProperty(std::string name, Property::Value propertyValue, Property::AccessMode accessMode)
    */
-  virtual Property::Index RegisterProperty(std::string name, const Property::Value& propertyValue, Property::AccessMode accessMode);
+  virtual Property::Index RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode );
 
   /**
    * @copydoc Dali::Internal::Object::AddPropertyNotification()
    */
-  virtual Dali::PropertyNotification AddPropertyNotification(Property::Index index,
-                                                             int componentIndex,
-                                                             const Dali::PropertyCondition& condition);
+  virtual Dali::PropertyNotification AddPropertyNotification( Property::Index index,
+                                                              int componentIndex,
+                                                              const Dali::PropertyCondition& condition );
 
   /**
    * @copydoc Dali::Internal::Object::RemovePropertyNotification()
    */
-  virtual void RemovePropertyNotification(Dali::PropertyNotification propertyNotification);
+  virtual void RemovePropertyNotification( Dali::PropertyNotification propertyNotification );
 
   /**
    * @copydoc Dali::Internal::Object::RemovePropertyNotifications()
@@ -247,6 +247,7 @@ public: // Property system interface from Internal::Object
   void RemovePropertyNotifications();
 
 private:
+
   /**
    * Enable property notifications in scene graph
    */
@@ -324,10 +325,10 @@ protected:
 private:
 
   // Undefined
-  ProxyObject(const ProxyObject&);
+  ProxyObject( const ProxyObject& );
 
   // Undefined
-  ProxyObject& operator=(const ProxyObject& rhs);
+  ProxyObject& operator=( const ProxyObject& rhs );
 
   /**
    * Helper for ApplyConstraint overloads.
@@ -342,6 +343,13 @@ private:
    */
   void RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph );
 
+  /**
+   * Set the value of scene graph property.
+   * @param [in] index The index of the property.
+   * @param [in] entry An entry from the CustomPropertyLookup.
+   * @param [in] value The new value of the property.
+   */
+  virtual void SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
 
 private: // Default property extensions for derived classes
 
@@ -410,14 +418,6 @@ private: // Default property extensions for derived classes
   virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue ) = 0;
 
   /**
-   * Set the value of custom property.
-   * @param [in] index The index of the property.
-   * @param [in] entry An entry from the CustomPropertyLookup.
-   * @param [in] value The new value of the property.
-   */
-  virtual void SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
-
-  /**
    * Retrieve a default property value.
    * @param [in] index The index of the property.
    * @return The property value.
@@ -425,15 +425,35 @@ private: // Default property extensions for derived classes
   virtual Property::Value GetDefaultProperty( Property::Index index ) const = 0;
 
   /**
-   * Install a newly allocated scene-object property.
-   * The derived class is responsible for this, since the type of scene-object is not known to this base class.
-   * @param [in] newProperty A newly allocated scene-object property.
+   * @todo this is virtual so that for now actor can override it,
+   * it needs to be removed and only have GetSceneObject but that requires changing actor and constraint logic
+   * Retrieve the scene-graph object added by this proxy.
+   * @return A pointer to the object, or NULL if no object has been added to the scene-graph.
+   */
+  virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const
+  {
+    return GetSceneObject();
+  }
+
+  /**
+   * Notify derived class of installation of a new scene-object property.
+   * This method is called after the message is to sent to install the property
+   * @param [in] newProperty A newly allocated scene-object property. Ownership is obviously not passed.
    * @param [in] name The name allocated to this custom property.
    * @param [in] index The index allocated to this custom property.
    */
-  virtual void InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) = 0;
+  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
+  { }
 
 protected:
+
+  /**
+   * For use in derived classes.
+   * This is called after a non animatable custom property is set.
+   * @param [in] index The index of the property.
+   * @param [in] propertyValue The value of the property.
+   */
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) {}
 
   /**
    * Retrieves the TypeInfo for this object. Only retrieves it from the type-registry once and then stores a pointer

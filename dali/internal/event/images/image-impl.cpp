@@ -193,17 +193,17 @@ void Image::Reload()
 
 void Image::ResourceLoadingFailed(const ResourceTicket& ticket)
 {
-  mLoadingFinishedV2.Emit( Dali::Image( this ) );
+  mLoadingFinished.Emit( Dali::Image( this ) );
 }
 
 void Image::ResourceLoadingSucceeded(const ResourceTicket& ticket)
 {
-  mLoadingFinishedV2.Emit( Dali::Image( this ) );
+  mLoadingFinished.Emit( Dali::Image( this ) );
 }
 
 void Image::ResourceUploaded(const ResourceTicket& ticket)
 {
-  mUploadedV2.Emit( Dali::Image( this ) );
+  mUploaded.Emit( Dali::Image( this ) );
 }
 
 void Image::ResourceSavingSucceeded( const ResourceTicket& ticket )

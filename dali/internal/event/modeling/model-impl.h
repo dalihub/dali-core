@@ -91,17 +91,17 @@ public: // Query methods from external model
   /**
    * @copydoc Dali::Model::LoadingFinishedSignal()
    */
-  Dali::Model::ModelSignalV2& LoadingFinishedSignal()
+  Dali::Model::ModelSignalType& LoadingFinishedSignal()
   {
-    return mLoadingFinishedV2;
+    return mLoadingFinished;
   };
 
   /**
    * @copydoc Dali::Model::SavingFinishedSignal()
    */
-  Dali::Model::ModelSaveSignalV2& SavingFinishedSignal()
+  Dali::Model::ModelSaveSignalType& SavingFinishedSignal()
   {
-    return mSavingFinishedV2;
+    return mSavingFinished;
   };
 
   /**
@@ -155,8 +155,8 @@ private:
 
   ResourceTicketPtr mTicket;
 
-  Dali::Model::ModelSignalV2     mLoadingFinishedV2;
-  Dali::Model::ModelSaveSignalV2 mSavingFinishedV2;
+  Dali::Model::ModelSignalType     mLoadingFinished;
+  Dali::Model::ModelSaveSignalType mSavingFinished;
 
   ResourceClient* mResourceClient;
 };

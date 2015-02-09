@@ -149,7 +149,7 @@ void Animation::Clear()
   GetImplementation(*this).Clear();
 }
 
-Animation::AnimationSignalV2& Animation::FinishedSignal()
+Animation::AnimationSignalType& Animation::FinishedSignal()
 {
   return GetImplementation(*this).FinishedSignal();
 }

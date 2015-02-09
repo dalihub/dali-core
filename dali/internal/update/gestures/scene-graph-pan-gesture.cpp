@@ -19,6 +19,7 @@
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
 
 // EXTERNAL INCLUDES
+#include <cmath>
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/gestures/pan-gesture-profiling.h>
@@ -34,7 +35,11 @@ namespace SceneGraph
 namespace
 {
 const int MAX_GESTURE_AGE = 50; ///< maximum age of a gesture before disallowing its use in algorithm
-const unsigned int DEFAULT_PREDICTION_INTERPOLATION = 0; ///< how much to interpolate pan position and displacement from last vsync time
+const float ACCELERATION_THRESHOLD = 0.1f; ///< minimum pan velocity change to trigger dynamic change of prediction amount
+const unsigned int DEFAULT_PREDICTION_INTERPOLATION = 0; ///< how much to interpolate pan position and displacement from last vsync time (in milliseconds)
+const unsigned int DEFAULT_MAX_PREDICTION_INTERPOLATION = 32; ///< the upper bound of the range to clamp the prediction interpolation
+const unsigned int DEFAULT_MIN_PREDICTION_INTERPOLATION = 0; ///< the lower bound of the range to clamp the prediction interpolation
+const unsigned int DEFAULT_PREDICTION_INTERPOLATION_ADJUSTMENT = 4; ///< the amount of prediction interpolation to adjust (in milliseconds) each time when pan velocity changes
 const float DEFAULT_SMOOTHING_AMOUNT = 1.0f; ///< how much to interpolate pan position and displacement from last vsync time
 } // unnamed namespace
 
@@ -108,8 +113,8 @@ void PanGesture::PredictiveAlgorithm1(int eventsThisFrame, PanInfo& gestureOut, 
   float previousAccel = 0.0f;
   unsigned int lastTime(0);
 
-  unsigned int interpolationTime = lastVSyncTime + mPredictionAmount;
-  if( interpolationTime > gestureOut.time ) // Guard against the rare case when gestureOut.time > (lastVSyncTime + mPredictionAmount)
+  unsigned int interpolationTime = lastVSyncTime + mCurrentPredictionAmount;
+  if( interpolationTime > gestureOut.time ) // Guard against the rare case when gestureOut.time > (lastVSyncTime + mCurrentPredictionAmount)
   {
     interpolationTime -= gestureOut.time;
   }
@@ -237,6 +242,8 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
   bool justFinished ( false );
   bool eventFound( false );
 
+  float acceleration = 0.0f;
+
   // Not going through array from the beginning, using it as a circular buffer and only using unread
   // values.
   int eventsThisFrame = 0;
@@ -245,6 +252,7 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
   mLastEventGesture = mEventGesture;
   mLastGesture = mLatestGesture;
   // add new gestures and work out one full gesture for the frame
+  unsigned int previousReadPosition = 0;
   while(mReadPosition != mWritePosition)
   {
     // Copy the gesture first
@@ -252,12 +260,18 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
 
     if( mProfiling )
     {
-      mProfiling->mRawData.push_back( PanGestureProfiling::Position( currentGesture.time, currentGesture.screen.position ) );
+      mProfiling->mRawData.push_back( PanGestureProfiling::Position( currentGesture.time, currentGesture.screen.position, currentGesture.screen.displacement, currentGesture.screen.velocity, currentGesture.state ) );
     }
     mEventGesture.local.position = currentGesture.local.position;
     mEventGesture.local.velocity = currentGesture.local.velocity;
     mEventGesture.screen.position = currentGesture.screen.position;
     mEventGesture.screen.velocity = currentGesture.screen.velocity;
+
+    if(eventsThisFrame > 0)
+    {
+      acceleration = currentGesture.screen.velocity.Length() - mGestures[previousReadPosition].screen.velocity.Length();
+    }
+
     if( !eventFound )
     {
       mEventGesture.local.displacement = currentGesture.local.displacement;
@@ -282,6 +296,7 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
     justFinished |= (currentGesture.state == Gesture::Finished || currentGesture.state == Gesture::Cancelled);
 
     // Update our read position.
+    previousReadPosition = mReadPosition;
     ++eventsThisFrame;
     ++mReadPosition;
     mReadPosition %= PAN_GESTURE_HISTORY;
@@ -296,7 +311,7 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
   {
     if( mProfiling )
     {
-      mProfiling->mLatestData.push_back( PanGestureProfiling::Position( lastVSyncTime, mEventGesture.screen.position ) );
+      mProfiling->mLatestData.push_back( PanGestureProfiling::Position( lastVSyncTime, mEventGesture.screen.position, mEventGesture.screen.displacement, mEventGesture.screen.velocity, mEventGesture.state ) );
     }
 
     switch( mPredictionMode )
@@ -313,8 +328,81 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
       }
       case PREDICTION_1:
       {
-        // make latest gesture equal to current gesture before interpolation
+        // Dynamically change the prediction amount according to the pan velocity acceleration.
+        if(!justStarted)
+        {
+          if(eventsThisFrame <= 1)
+          {
+            acceleration = mEventGesture.screen.velocity.Length() - mLastEventGesture.screen.velocity.Length();
+          }
+
+          // Ignore tiny velocity fluctuation to avoid unnecessary prediction amount change
+          if(fabsf(acceleration) > ACCELERATION_THRESHOLD)
+          {
+            mCurrentPredictionAmount += mPredictionAmountAdjustment * (acceleration > Math::MACHINE_EPSILON_0 ? 1.0f : -1.0f);
+            if(mCurrentPredictionAmount > mMaxPredictionAmount + mPredictionAmountAdjustment) // Guard against unsigned int overflow
+            {
+              mCurrentPredictionAmount = 0;
+            }
+          }
+        }
+        else
+        {
+          mCurrentPredictionAmount = mPredictionAmount; // Reset the prediction amount for each new gesture
+        }
+
+        mCurrentPredictionAmount = std::max(mMinPredictionAmount, std::min(mCurrentPredictionAmount, mMaxPredictionAmount));
+
+        // Calculate the delta of positions before the prediction
+        Vector2 deltaPosition = mLatestGesture.screen.position - mLastEventGesture.screen.position;
+
+        // Make latest gesture equal to current gesture before interpolation
         PredictiveAlgorithm1(eventsThisFrame, mLatestGesture, mPanHistory, lastVSyncTime, nextVSyncTime);
+
+        // Calculate the delta of positions after the prediction.
+        Vector2 deltaPredictedPosition = mLatestGesture.screen.position - mLastGesture.screen.position;
+
+        // If the change in the prediction has a different sign than the change in the actual position,
+        // there is overshot (i.e. the current prediction is too large). Return the previous prediction
+        // to give the user's finger a chance to catch up with where we have panned to.
+        bool overshotXAxis = false;
+        bool overshotYAxis = false;
+        if( (deltaPosition.x > Math::MACHINE_EPSILON_0 && deltaPredictedPosition.x < Math::MACHINE_EPSILON_0 )
+         || (deltaPosition.x < Math::MACHINE_EPSILON_0 && deltaPredictedPosition.x > Math::MACHINE_EPSILON_0 ) )
+        {
+          overshotXAxis = true;
+          mLatestGesture.screen.position.x = mLastGesture.screen.position.x;
+        }
+
+        if( (deltaPosition.y > Math::MACHINE_EPSILON_0 && deltaPredictedPosition.y < Math::MACHINE_EPSILON_0 )
+         || (deltaPosition.y < Math::MACHINE_EPSILON_0 && deltaPredictedPosition.y > Math::MACHINE_EPSILON_0 ) )
+        {
+          overshotYAxis = true;
+          mLatestGesture.screen.position.y = mLastGesture.screen.position.y;
+        }
+
+        // If there is overshot in one axis, reduce the possible overshot in the other axis,
+        // and reduce the prediction amount so that it doesn't overshoot as easily next time.
+        if(overshotXAxis || overshotYAxis)
+        {
+          mCurrentPredictionAmount -= mPredictionAmountAdjustment;
+          if(mCurrentPredictionAmount > mMaxPredictionAmount + mPredictionAmountAdjustment) // Guard against unsigned int overflow
+          {
+            mCurrentPredictionAmount = 0;
+          }
+          mCurrentPredictionAmount = std::max(mMinPredictionAmount, std::min(mCurrentPredictionAmount, mMaxPredictionAmount));
+
+          if(overshotXAxis && !overshotYAxis)
+          {
+            mLatestGesture.screen.position.y = (mLastGesture.screen.position.y + mLatestGesture.screen.position.y) * 0.5f;
+          }
+
+          if(overshotYAxis && !overshotXAxis)
+          {
+            mLatestGesture.screen.position.x = (mLastGesture.screen.position.x + mLatestGesture.screen.position.x) * 0.5f;
+          }
+        }
+
         updateProperties = true;
         break;
       }
@@ -349,7 +437,7 @@ bool PanGesture::UpdateProperties( unsigned int lastVSyncTime, unsigned int next
 
     if( mProfiling )
     {
-      mProfiling->mAveragedData.push_back( PanGestureProfiling::Position( mLatestGesture.time, mLatestGesture.screen.position ) );
+      mProfiling->mAveragedData.push_back( PanGestureProfiling::Position( mLatestGesture.time, mLatestGesture.screen.position, mLatestGesture.screen.displacement, mLatestGesture.screen.velocity, mLatestGesture.state ) );
     }
   }
 
@@ -409,6 +497,21 @@ void PanGesture::SetPredictionAmount(unsigned int amount)
   mPredictionAmount = amount;
 }
 
+void PanGesture::SetMaximumPredictionAmount(unsigned int amount)
+{
+  mMaxPredictionAmount = amount;
+}
+
+void PanGesture::SetMinimumPredictionAmount(unsigned int amount)
+{
+  mMinPredictionAmount = amount;
+}
+
+void PanGesture::SetPredictionAmountAdjustment(unsigned int amount)
+{
+  mPredictionAmountAdjustment = amount;
+}
+
 void PanGesture::SetSmoothingMode(SmoothingMode mode)
 {
   mSmoothingMode = mode;
@@ -443,6 +546,10 @@ PanGesture::PanGesture()
   mInGesture( false ),
   mPredictionMode(DEFAULT_PREDICTION_MODE),
   mPredictionAmount(DEFAULT_PREDICTION_INTERPOLATION),
+  mCurrentPredictionAmount(DEFAULT_PREDICTION_INTERPOLATION),
+  mMaxPredictionAmount(DEFAULT_MAX_PREDICTION_INTERPOLATION),
+  mMinPredictionAmount(DEFAULT_MIN_PREDICTION_INTERPOLATION),
+  mPredictionAmountAdjustment(DEFAULT_PREDICTION_INTERPOLATION_ADJUSTMENT),
   mSmoothingMode(DEFAULT_SMOOTHING_MODE),
   mSmoothingAmount(DEFAULT_SMOOTHING_AMOUNT),
   mProfiling( NULL )

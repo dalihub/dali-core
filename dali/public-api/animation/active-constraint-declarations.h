@@ -23,14 +23,14 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/signals/dali-signal-v2.h>
+#include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
 {
 
 class ActiveConstraint;
 
-typedef SignalV2< void (ActiveConstraint& constraint) > ActiveConstraintSignalV2;
+typedef Signal< void (ActiveConstraint& constraint) > ActiveConstraintSignalType;
 
 typedef boost::function<void (ActiveConstraint& constraint)> ActiveConstraintCallbackType;
 

@@ -163,7 +163,7 @@ public:
   /**
    * @copydoc Dali::Animation::FinishedSignal()
    */
-  Dali::Animation::AnimationSignalV2& FinishedSignal();
+  Dali::Animation::AnimationSignalType& FinishedSignal();
 
   /**
    * Emit the Finished signal
@@ -632,7 +632,7 @@ private:
 
   int mNotificationCount; ///< Keep track of how many Finished signals have been emitted.
 
-  Dali::Animation::AnimationSignalV2 mFinishedSignal;
+  Dali::Animation::AnimationSignalType mFinishedSignal;
 
   FinishedCallback mFinishedCallback;
   Object* mFinishedCallbackObject;

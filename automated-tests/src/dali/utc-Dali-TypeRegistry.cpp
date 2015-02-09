@@ -188,8 +188,8 @@ namespace Impl
 {
 struct MyTestCustomActor : public CustomActorImpl
 {
-  typedef SignalV2< void ()> SignalType;
-  typedef SignalV2< void (float)> SignalTypeFloat;
+  typedef Signal< void ()> SignalType;
+  typedef Signal< void (float)> SignalTypeFloat;
 
   MyTestCustomActor() : CustomActorImpl( true ) // requires touch
   { }
@@ -263,8 +263,8 @@ class MyTestCustomActor : public CustomActor
 {
 public:
 
-  typedef SignalV2< void ()> SignalType;
-  typedef SignalV2< void (float)> SignalTypeFloat;
+  typedef Signal< void ()> SignalType;
+  typedef Signal< void (float)> SignalTypeFloat;
 
   MyTestCustomActor()
   {

@@ -986,32 +986,32 @@ public:
   /**
    * @copydoc Dali::Actor::TouchedSignal()
    */
-  Dali::Actor::TouchSignalV2& TouchedSignal();
+  Dali::Actor::TouchSignalType& TouchedSignal();
 
   /**
    * @copydoc Dali::Actor::HoveredSignal()
    */
-  Dali::Actor::HoverSignalV2& HoveredSignal();
+  Dali::Actor::HoverSignalType& HoveredSignal();
 
   /**
    * @copydoc Dali::Actor::MouseWheelEventSignal()
    */
-  Dali::Actor::MouseWheelEventSignalV2& MouseWheelEventSignal();
+  Dali::Actor::MouseWheelEventSignalType& MouseWheelEventSignal();
 
   /**
    * @copydoc Dali::Actor::SetSizeSignal()
    */
-  Dali::Actor::SetSizeSignalV2& SetSizeSignal();
+  Dali::Actor::SetSizeSignalType& SetSizeSignal();
 
   /**
    * @copydoc Dali::Actor::OnStageSignal()
    */
-  Dali::Actor::OnStageSignalV2& OnStageSignal();
+  Dali::Actor::OnStageSignalType& OnStageSignal();
 
   /**
    * @copydoc Dali::Actor::OffStageSignal()
    */
-  Dali::Actor::OffStageSignalV2& OffStageSignal();
+  Dali::Actor::OffStageSignalType& OffStageSignal();
 
   /**
    * Connects a callback function with the object's signals.
@@ -1081,16 +1081,15 @@ protected:
    * @param[in] stage The stage.
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void ConnectToStage(Stage& stage, int index = -1);
+  void ConnectToStage( int index = -1 );
 
   /**
    * Helper for ConnectToStage, to recursively connect a tree of actors.
    * This is atomic i.e. not interrupted by user callbacks.
-   * @param[in] stage The stage.
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToStage( Stage& stage, ActorContainer& connectionList, int index = -1 );
+  void RecursiveConnectToStage( ActorContainer& connectionList, int index = -1 );
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.
@@ -1188,9 +1187,9 @@ public: // Default property extensions from ProxyObject
   virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::SetCustomProperty()
+   * @copydoc Dali::Internal::ProxyObject::SetSceneGraphProperty()
    */
-  virtual void SetCustomProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
+  virtual void SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetDefaultProperty()
@@ -1198,9 +1197,9 @@ public: // Default property extensions from ProxyObject
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::InstallSceneObjectProperty()
+   * @copydoc Dali::Internal::ProxyObject::GetPropertyOwner()
    */
-  virtual void InstallSceneObjectProperty( SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
+  virtual const SceneGraph::PropertyOwner* GetPropertyOwner() const;
 
   /**
    * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
@@ -1298,14 +1297,6 @@ private:
 
   /**
    * For use in derived classes.
-   * This is called after a non animatable custom property is set.
-   * @param [in] index The index of the property.
-   * @param [in] propertyValue The value of the property.
-   */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) {}
-
-  /**
-   * For use in derived classes.
    * This is only called if mDerivedRequiresTouch is true, and the touch-signal was not consumed.
    * @param[in] event The touch event.
    * @return True if the event should be consumed.
@@ -1364,12 +1355,12 @@ protected:
   ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
 
   // Signals
-  Dali::Actor::TouchSignalV2             mTouchedSignalV2;
-  Dali::Actor::HoverSignalV2             mHoveredSignalV2;
-  Dali::Actor::MouseWheelEventSignalV2   mMouseWheelEventSignalV2;
-  Dali::Actor::SetSizeSignalV2           mSetSizeSignalV2;
-  Dali::Actor::OnStageSignalV2           mOnStageSignalV2;
-  Dali::Actor::OffStageSignalV2          mOffStageSignalV2;
+  Dali::Actor::TouchSignalType             mTouchedSignal;
+  Dali::Actor::HoverSignalType             mHoveredSignal;
+  Dali::Actor::MouseWheelEventSignalType   mMouseWheelEventSignal;
+  Dali::Actor::SetSizeSignalType           mSetSizeSignal;
+  Dali::Actor::OnStageSignalType           mOnStageSignal;
+  Dali::Actor::OffStageSignalType          mOffStageSignal;
 
   Vector3         mSize;      ///< Event-side storage for size (not a pointer as most actors will have a size)
 

@@ -26,7 +26,8 @@ namespace Dali
  * Constructor
  */
 TestPlatformAbstraction::TestPlatformAbstraction()
-: mRequest(0)
+: mRequest(0),
+  mDynamicsFactory(NULL)
 {
   Initialize();
 }
@@ -36,6 +37,7 @@ TestPlatformAbstraction::TestPlatformAbstraction()
  */
 TestPlatformAbstraction::~TestPlatformAbstraction()
 {
+  delete mDynamicsFactory;
 }
 
 /**
@@ -199,7 +201,11 @@ void TestPlatformAbstraction::JoinLoaderThreads()
 Integration::DynamicsFactory* TestPlatformAbstraction::GetDynamicsFactory()
 {
   mTrace.PushCall("GetDynamicsFactory", "");
-  return NULL;
+  if( mDynamicsFactory == NULL )
+  {
+    mDynamicsFactory = new TestDynamicsFactory( mTrace );
+  }
+  return mDynamicsFactory;
 }
 
 /** Call this every test */

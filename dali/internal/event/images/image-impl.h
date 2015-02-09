@@ -117,12 +117,12 @@ public:
   /**
    * @copydoc Dali::Image::LoadingFinishedSignal()
    */
-  Dali::Image::ImageSignalV2& LoadingFinishedSignal() { return mLoadingFinishedV2; }
+  Dali::Image::ImageSignalType& LoadingFinishedSignal() { return mLoadingFinished; }
 
   /**
    * @copydoc Dali::Image::UploadedSignal()
    */
-  Dali::Image::ImageSignalV2& UploadedSignal() { return mUploadedV2; }
+  Dali::Image::ImageSignalType& UploadedSignal() { return mUploaded; }
 
   /**
    * Connects a callback function with the object's signals.
@@ -267,8 +267,8 @@ protected: //@TODO these should not be protected
 
 private:
 
-  Dali::Image::ImageSignalV2 mLoadingFinishedV2;
-  Dali::Image::ImageSignalV2 mUploadedV2;
+  Dali::Image::ImageSignalType mLoadingFinished;
+  Dali::Image::ImageSignalType mUploaded;
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

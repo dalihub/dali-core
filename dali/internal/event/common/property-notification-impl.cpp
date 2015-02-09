@@ -134,7 +134,7 @@ PropertyNotification::~PropertyNotification()
   }
 }
 
-Dali::PropertyNotifySignalV2& PropertyNotification::NotifySignal()
+Dali::PropertyNotifySignalType& PropertyNotification::NotifySignal()
 {
   return mNotifySignal;
 }
@@ -209,21 +209,23 @@ bool PropertyNotification::CompareSceneObject( const SceneGraph::PropertyNotific
 
 void PropertyNotification::CreateSceneObject()
 {
-  DALI_ASSERT_DEBUG( mPropertyNotification == NULL );
+  // this method can be called from constructor and on stage connection
+  if( !mPropertyNotification )
+  {
+    // Create a new PropertyNotification, temporarily owned
+    SceneGraph::PropertyNotification* propertyNotification = SceneGraph::PropertyNotification::New( *mProxy,
+                                                                                                    mProxyPropertyIndex,
+                                                                                                    mPropertyType,
+                                                                                                    mComponentIndex,
+                                                                                                    GetImplementation(mCondition).type,
+                                                                                                    mRawConditionArgs,
+                                                                                                    mNotifyMode );
+    // Keep a const pointer to the PropertyNotification.
+    mPropertyNotification = propertyNotification;
 
-  // Create a new PropertyNotification, temporarily owned
-  SceneGraph::PropertyNotification* propertyNotification = SceneGraph::PropertyNotification::New( *mProxy,
-                                                                                                  mProxyPropertyIndex,
-                                                                                                  mPropertyType,
-                                                                                                  mComponentIndex,
-                                                                                                  GetImplementation(mCondition).type,
-                                                                                                  mRawConditionArgs,
-                                                                                                  mNotifyMode );
-  // Keep a const pointer to the PropertyNotification.
-  mPropertyNotification = propertyNotification;
-
-  // Transfer scene object ownership to the update manager through a message
-  AddPropertyNotificationMessage( mUpdateManager, propertyNotification );
+    // Transfer scene object ownership to the update manager through a message
+    AddPropertyNotificationMessage( mUpdateManager, propertyNotification );
+  }
 }
 
 void PropertyNotification::DestroySceneObject()

@@ -666,7 +666,7 @@ bool Animation::HasFinished()
   return hasFinished;
 }
 
-Dali::Animation::AnimationSignalV2& Animation::FinishedSignal()
+Dali::Animation::AnimationSignalType& Animation::FinishedSignal()
 {
   return mFinishedSignal;
 }

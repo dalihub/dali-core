@@ -130,6 +130,27 @@ public: // To be called by GestureEventProcessor
   void SetPredictionAmount(unsigned int amount);
 
   /**
+   * @brief Sets the upper bound of the prediction amount for clamping
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetMaximumPredictionAmount(unsigned int amount);
+
+  /**
+   * @brief Sets the lower bound of the prediction amount for clamping
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetMinimumPredictionAmount(unsigned int amount);
+
+  /**
+   * @brief Sets the amount of prediction interpolation to adjust when the pan velocity is changed
+   *
+   * @param[in] amount The prediction amount in milliseconds
+   */
+  void SetPredictionAmountAdjustment(unsigned int amount);
+
+  /**
    * Called to set the prediction mode for pan gestures
    *
    * @param[in] mode The prediction mode

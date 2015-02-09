@@ -643,10 +643,15 @@ private:
 };
 
 
+
+using namespace Dali;
+
 BaseHandle CreateActor()
 {
   return TestCustomActor::New();
 }
+
+Dali::TypeRegistration mType( typeid(TestCustomActor), typeid(Dali::CustomActor), CreateActor );
 
 } // anon namespace
 
@@ -1631,5 +1636,47 @@ int UtcDaliCustomActorGetImplementation(void)
   constImpl.GetOwner();  // Test
 
   DALI_TEST_CHECK( true );
+  END_TEST;
+}
+
+int UtcDaliCustomActorDoAction(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::CustomActor::DoAction()");
+
+  TestCustomActor custom = TestCustomActor::New();
+
+  BaseHandle customActorObject = custom;
+
+  DALI_TEST_CHECK(customActorObject);
+
+  std::vector<Property::Value> attributes;
+
+  // Check that an invalid command is not performed
+  DALI_TEST_CHECK(customActorObject.DoAction("invalidCommand", attributes) == false);
+
+  // Check that the custom actor is visible
+  custom.SetVisible(true);
+  DALI_TEST_CHECK(custom.IsVisible() == true);
+
+  // Check the custom actor performed an action to hide itself
+  DALI_TEST_CHECK(customActorObject.DoAction("hide", attributes) == true);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check that the custom actor is now invisible
+  DALI_TEST_CHECK(custom.IsVisible() == false);
+
+  // Check the custom actor performed an action to show itself
+  DALI_TEST_CHECK(customActorObject.DoAction("show", attributes) == true);
+
+  // flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // Check that the custom actor is now visible
+  DALI_TEST_CHECK(custom.IsVisible() == true);
   END_TEST;
 }

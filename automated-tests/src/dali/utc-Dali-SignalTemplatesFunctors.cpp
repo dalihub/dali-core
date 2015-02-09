@@ -42,11 +42,11 @@ class TestSignals
 {
 public:
 
-  typedef SignalV2<void ()> VoidSignalVoid;
-  typedef SignalV2<void (float)> VoidSignalFloat;
+  typedef Signal<void ()> VoidSignalVoid;
+  typedef Signal<void (float)> VoidSignalFloat;
 
-  typedef SignalV2<float ()> FloatSignalVoid;
-  typedef SignalV2<float (float)> FloatSignalFloat;
+  typedef Signal<float ()> FloatSignalVoid;
+  typedef Signal<float (float)> FloatSignalFloat;
 
   TestSignals()
   {

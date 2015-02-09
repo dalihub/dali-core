@@ -114,7 +114,7 @@ const std::string TypeRegistration::RegisteredName() const
   return mName;
 }
 
-SignalConnectorType::SignalConnectorType( TypeRegistration& typeRegistration, const std::string& name, TypeInfo::SignalConnectorFunctionV2 func )
+SignalConnectorType::SignalConnectorType( TypeRegistration& typeRegistration, const std::string& name, TypeInfo::SignalConnectorFunction func )
 {
   Internal::TypeRegistry::Get()->RegisterSignal( typeRegistration, name, func );
 }
