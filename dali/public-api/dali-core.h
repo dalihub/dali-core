@@ -27,7 +27,6 @@
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/actors/text-actor.h>
 #include <dali/public-api/actors/sampling.h>
@@ -83,11 +82,6 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/touch-point.h>
 
-#include <dali/public-api/geometry/animatable-mesh.h>
-#include <dali/public-api/geometry/animatable-vertex.h>
-#include <dali/public-api/geometry/cloth.h>
-#include <dali/public-api/geometry/mesh.h>
-#include <dali/public-api/geometry/mesh-factory.h>
 #include <dali/public-api/geometry/spline.h>
 
 #include <dali/public-api/images/atlas.h>
@@ -115,9 +109,6 @@
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
-
-#include <dali/public-api/modeling/bone.h>
-#include <dali/public-api/modeling/material.h>
 
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>

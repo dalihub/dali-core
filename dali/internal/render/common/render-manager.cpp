@@ -35,7 +35,6 @@
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/native-frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/renderers/render-material.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
 #include <dali/internal/render/shaders/program-controller.h>
 
@@ -72,10 +71,6 @@ namespace SceneGraph
 typedef OwnerContainer< Renderer* >            RendererOwnerContainer;
 typedef RendererOwnerContainer::Iterator       RendererOwnerIter;
 
-typedef OwnerContainer< RenderMaterial* >      RenderMaterialContainer;
-typedef RenderMaterialContainer::Iterator      RenderMaterialIter;
-typedef RenderMaterialContainer::ConstIterator RenderMaterialConstIter;
-
 typedef OwnerContainer< RenderTracker* >       RenderTrackerContainer;
 typedef RenderTrackerContainer::Iterator       RenderTrackerIter;
 typedef RenderTrackerContainer::ConstIterator  RenderTrackerConstIter;
@@ -100,7 +95,6 @@ struct RenderManager::Impl
     renderBufferIndex( SceneGraphBuffers::INITIAL_UPDATE_BUFFER_INDEX ),
     defaultSurfaceRect(),
     rendererContainer(),
-    materials(),
     renderersAdded( false ),
     firstRenderCompleted( false ),
     defaultShader( NULL ),
@@ -161,7 +155,6 @@ struct RenderManager::Impl
   Rect<int>                           defaultSurfaceRect;   ///< Rectangle for the default surface we are rendering to
 
   RendererOwnerContainer              rendererContainer;    ///< List of owned renderers
-  RenderMaterialContainer             materials;            ///< List of owned render materials
 
   bool                                renderersAdded;
 
@@ -279,32 +272,6 @@ void RenderManager::RemoveRenderer( Renderer* renderer )
     if ( *iter == renderer )
     {
       renderers.Erase( iter ); // Renderer found; now destroy it
-      break;
-    }
-  }
-}
-
-void RenderManager::AddRenderMaterial( RenderMaterial* renderMaterial )
-{
-  DALI_ASSERT_DEBUG( NULL != renderMaterial );
-
-  mImpl->materials.PushBack( renderMaterial );
-  renderMaterial->Initialize( mImpl->textureCache );
-}
-
-void RenderManager::RemoveRenderMaterial( RenderMaterial* renderMaterial )
-{
-  DALI_ASSERT_DEBUG( NULL != renderMaterial );
-
-  RenderMaterialContainer& materials = mImpl->materials;
-
-  // Find the render material and destroy it
-  for ( RenderMaterialIter iter = materials.Begin(); iter != materials.End(); ++iter )
-  {
-    RenderMaterial& current = **iter;
-    if ( &current == renderMaterial )
-    {
-      materials.Erase( iter );
       break;
     }
   }

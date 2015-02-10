@@ -24,7 +24,6 @@
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
-#include <dali/internal/update/modeling/scene-graph-mesh-declarations.h>
 
 namespace Dali
 {
@@ -84,15 +83,6 @@ public:
   void Add( BufferIndex updateBufferIndex, NodeAttachment* attachment );
 
   /**
-   * Adds an unwanted mesh resource to the discard queue.
-   * A message will be sent to clean-up GL resources in the next Render.
-   * @pre This method is not thread-safe, and should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] mesh The mesh to queue; DiscardQueue takes a reference.
-   */
-  void Add( BufferIndex updateBufferIndex, Mesh* mesh );
-
-  /**
    * Adds an unwanted shader to the discard queue.
    * A message will be sent to clean-up GL resources in the next Render.
    * @pre This method is not thread-safe, and should only be called from the update-thread.
@@ -123,15 +113,12 @@ private:
   // Messages are queued here when the update buffer index == 0
   NodeOwnerContainer           mNodeQueue0;
   NodeAttachmentOwnerContainer mAttachmentQueue0;
-  MeshOwnerContainer           mMeshQueue0;
   ShaderQueue                  mShaderQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
   NodeAttachmentOwnerContainer mAttachmentQueue1;
-  MeshOwnerContainer           mMeshQueue1;
   ShaderQueue                  mShaderQueue1;
-
 };
 
 } // namespace SceneGraph

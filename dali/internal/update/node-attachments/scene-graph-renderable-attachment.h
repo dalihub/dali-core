@@ -158,12 +158,10 @@ public: // API
 public: // For use during in the update algorithm only
 
   /**
-   * TODO this method should not be virtual but because mesh attachment is a mess, it needs to be
-   * considered visible regardless of its size... need to remove geometry scaling to fix this!!!
    * @param[in] updateBufferIndex The current update buffer index.
    * @return visible tells if this renderer can be potentially seen
    */
-  virtual bool ResolveVisibility( BufferIndex updateBufferIndex );
+  bool ResolveVisibility( BufferIndex updateBufferIndex );
 
   /**
    * if this renderable actor has visible size and color

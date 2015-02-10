@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/geometry/mesh-data.h>
 
 namespace Dali
 {
@@ -46,10 +45,6 @@ public:
    */
   virtual void Initialize( int type, const Vector3& dimensions ) = 0;
 
-  /**
-   * Initialize the shape
-   */
-  virtual void Initialize( int type, const MeshData::VertexContainer& vertices, const MeshData::FaceIndices& faceIndices ) = 0;
 
 }; // class DynamicsShape
 

@@ -689,28 +689,6 @@ public:
   bool IsOverlay() const;
 
   /**
-   * Sets whether an actor transmits geometry scaling to it's children.
-   * The default value is for it not to transmit scaling.
-   * @param[in] transmitGeometryScaling True to transmit scaling.
-   */
-  void SetTransmitGeometryScaling(bool transmitGeometryScaling);
-
-  /**
-   * Get the TransmitGeometryScaling property for this actor.
-   * @return True if geometry scaling is applied to the inherited scale.
-   */
-  bool GetTransmitGeometryScaling() const;
-
-  /**
-   * Sets the initial volume of the actor. Used for scaling the
-   * actor appropriately as the actor is sized when transmitGeometryScaling
-   * is set to true.
-   *
-   * @param[in] volume the volume of the model and it's children
-   */
-  void SetInitialVolume(const Vector3& volume);
-
-  /**
    * Sets the actor's color.  The final color of actor depends on its color mode.
    * This final color is applied to the drawable elements of an actor.
    * @param [in] color The new color.

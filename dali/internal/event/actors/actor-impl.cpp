@@ -806,35 +806,6 @@ void Actor::SetScaleZ( float z )
   }
 }
 
-void Actor::SetInitialVolume(const Vector3& volume)
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value
-    SetInitialVolumeMessage( mStage->GetUpdateInterface(), *mNode, volume );
-  }
-}
-
-void Actor::SetTransmitGeometryScaling(bool transmitGeometryScaling)
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value
-    SetTransmitGeometryScalingMessage( mStage->GetUpdateInterface(), *mNode, transmitGeometryScaling );
-  }
-}
-
-bool Actor::GetTransmitGeometryScaling() const
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; copy the value from the previous update
-    return mNode->GetTransmitGeometryScaling();
-  }
-
-  return false;
-}
-
 void Actor::ScaleBy(const Vector3& relativeScale)
 {
   if( NULL != mNode )

@@ -66,13 +66,6 @@ public:
 public:
   void Initialize( int type, const Vector3& dimensions );
 
-  void Initialize( int type, const MeshData::VertexContainer& vertices, const MeshData::FaceIndices& faceIndices );
-
-public:
-
-  MeshData::VertexContainer* mVertices;
-  MeshData::FaceIndices*     mFaces;
-
 private:
 
   TraceCallStack& mTrace;
@@ -209,10 +202,6 @@ public: // From Dali::Integration::DynamicsBody
     mTrace.PushCall( "DynamicsBody::GetTransform", "" );
   }
 
-  inline void GetSoftVertices( MeshData::VertexContainer& vertices ) const
-  {
-    mTrace.PushCall( "DynamicsBody::GetSoftVertices", "" );
-  }
 
 private:
   Dali::Integration::DynamicsBodySettings* mSettings;

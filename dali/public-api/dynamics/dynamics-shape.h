@@ -23,7 +23,6 @@
 
 // BASE CLASS INCLUDES
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/geometry/cloth.h>
 
 namespace Dali
 {
@@ -90,14 +89,6 @@ public:
    * @return A handle to the new shape
    */
   static DynamicsShape NewCylinder(const float radius, const float length);
-
-  /**
-   * @brief Creates a mesh.
-   *
-   * @param[in] mesh  A mesh.
-   * @return A handle to the new shape
-   */
-  static DynamicsShape NewMesh(Cloth mesh);
 
   /**
    * @brief Creates a sphere.

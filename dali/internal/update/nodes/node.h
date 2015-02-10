@@ -401,12 +401,8 @@ public:
           localOffset *= mSize[updateBufferIndex];
 
           Vector3 scale = mWorldScale[updateBufferIndex];
-          if(GetTransmitGeometryScaling())
-          {
-            // Remove geometry scaling to get back to actor scale
-            scale /= mGeometryScale;
-          }
-          // Also pick up sign of local scale
+
+          // Pick up sign of local scale
           if (mScale[updateBufferIndex].x < 0.0f)
           {
             scale.x = -scale.x;
@@ -639,57 +635,6 @@ public:
   }
 
   /**
-   * Set the initial volume of the node. Used for calculating geometry scaling
-   * as the node size is changed  when transmitGeometryScaling is set to true.
-   *
-   * This property is not animatable.
-   *
-   * @param[in] volume The initial volume of this nodes meshes & children
-   */
-  void SetInitialVolume( const Vector3& volume )
-  {
-    mInitialVolume = volume;
-    SetDirtyFlag(SizeFlag);
-  }
-
-  /**
-   * Get the initial volume.  Used for calculating geometry scaling
-   * when TransmitGeometryScaling is true (i.e., the scaling is baked
-   * into the node tranform)
-   *
-   * @return The initial volume of this node and children.
-   */
-  Vector3 GetInitialVolume()
-  {
-    return mInitialVolume;
-  }
-
-  /**
-   * Sets whether the geometry scaling should be applied to the node
-   * (In which case, set the initial scale using SetInitialVolume()).
-   *
-   * If it is applied to the node, then the attachments are not scaled,
-   * as the scaling is then already baked into the node transform.
-   *
-   * @param[in] transmitGeometryScaling true if scaling is to be applied
-   * to the node.
-   */
-  void SetTransmitGeometryScaling(bool transmitGeometryScaling)
-  {
-    mTransmitGeometryScaling = transmitGeometryScaling;
-    SetDirtyFlag(SizeFlag);
-  }
-
-  /**
-   * Find out whether the node allows geometry scaling to be transmitted to its children.
-   * @return true if transmitted.
-   */
-  bool GetTransmitGeometryScaling() const
-  {
-    return mTransmitGeometryScaling;
-  }
-
-  /**
    * Retrieve the local scale of the node, relative to its parent.
    * @param[in] bufferIndex The buffer to read from.
    * @return The local scale.
@@ -706,7 +651,7 @@ public:
    */
   void SetWorldScale(BufferIndex updateBufferIndex, const Vector3& scale)
   {
-    mWorldScale.Set( updateBufferIndex, mGeometryScale * scale );
+    mWorldScale.Set( updateBufferIndex, scale );
   }
 
   /**
@@ -719,7 +664,7 @@ public:
   {
     DALI_ASSERT_DEBUG(mParent != NULL);
 
-    mWorldScale.Set( updateBufferIndex, mParent->GetWorldScale(updateBufferIndex) * mGeometryScale * mScale[updateBufferIndex] );
+    mWorldScale.Set( updateBufferIndex, mParent->GetWorldScale(updateBufferIndex) * mScale[updateBufferIndex] );
   }
 
   /**
@@ -764,27 +709,6 @@ public:
   bool IsScaleInherited() const
   {
     return mInheritScale;
-  }
-
-  /**
-   * Sets a geometry scale, calculated when TransmitGeometryScaling is true.
-   * Must only be used from render thread.
-   * @param[in] geometryScale The geometry scale value
-   */
-  void SetGeometryScale(Vector3 geometryScale)
-  {
-    mGeometryScale = geometryScale;
-
-    SetDirtyFlag( TransformFlag );
-  }
-
-  /**
-   * Retrieve the geometry scale, calculated when TransmitGeometryScaling is true.
-   * @return The geometry scale value.
-   */
-  const Vector3& GetGeometryScale() const
-  {
-    return mGeometryScale;
   }
 
   /**
@@ -1123,8 +1047,6 @@ protected:
   NodeAttachmentOwner mAttachment;                   ///< Optional owned attachment
   NodeContainer       mChildren;                     ///< Container of children; not owned
 
-  Vector3             mGeometryScale;                ///< Applied before calculating world transform.
-  Vector3             mInitialVolume;                ///< Initial volume... TODO - need a better name.
   Vector3             mSizeModeFactor;               ///< Factor of parent size. Used for certain SizeModes.
 
   // flags, compressed to bitfield
@@ -1133,7 +1055,6 @@ protected:
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
   bool mInheritRotation:1;                           ///< Whether the parent's rotation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
-  bool mTransmitGeometryScaling:1;                   ///< Whether geometry scaling should be applied to world transform.
   bool mInhibitLocalTransform:1;                     ///< whether local transform should be applied.
   bool mIsActive:1;                                  ///< When a Node is marked "active" it has been disconnected, and its properties have not been modified
 
@@ -1179,28 +1100,6 @@ inline void SetSizeModeFactorMessage( EventToUpdate& eventToUpdate, const Node& 
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetSizeModeFactor, factor );
-}
-
-inline void SetInitialVolumeMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& initialVolume )
-{
-  typedef MessageValue1< Node, Vector3 > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetInitialVolume, initialVolume );
-}
-
-inline void SetTransmitGeometryScalingMessage( EventToUpdate& eventToUpdate, const Node& node, bool transmitGeometryScaling )
-{
-  typedef MessageValue1< Node, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetTransmitGeometryScaling, transmitGeometryScaling );
 }
 
 inline void SetParentOriginMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& origin )

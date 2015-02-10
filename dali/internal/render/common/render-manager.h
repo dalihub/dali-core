@@ -43,7 +43,6 @@ namespace SceneGraph
 {
 class Renderer;
 class RenderQueue;
-class RenderMaterial;
 class TextureCache;
 class RenderInstruction;
 class RenderInstructionContainer;
@@ -138,23 +137,6 @@ public:
    * @post renderer is destroyed.
    */
   void RemoveRenderer( Renderer* renderer );
-
-  /**
-   * Adds a RenderMaterial to the render manager for MeshRenderers to use.
-   * The RenderManager takes ownership of the material
-   * @param[in] renderMaterial
-   * @post renderMaterial is owned by RenderManager
-   */
-  void AddRenderMaterial( RenderMaterial* renderMaterial );
-
-  /**
-   * Removes a RenderMaterial from the RenderManager
-   * RenderManager will destroy the material
-   * @pre renderManager owns the materail
-   * @param[in] renderMaterial
-   * @post renderMaterial is destroyed
-   */
-  void RemoveRenderMaterial( RenderMaterial* renderMaterial );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the

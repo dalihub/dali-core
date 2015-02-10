@@ -30,7 +30,6 @@
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
-#include <dali/internal/update/modeling/scene-graph-animatable-mesh.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 
@@ -63,18 +62,14 @@ template <> struct ParameterType< PropertyNotification::NotifyMode >
 namespace SceneGraph
 {
 
-class AnimatableMesh;
 class Animation;
 class DiscardQueue;
-class Material;
 class PanGesture;
 class RenderManager;
 class RenderTaskList;
 class RenderQueue;
 class DynamicsWorld;
 class TextureCache;
-typedef OwnerContainer< AnimatableMesh* > AnimatableMeshContainer;
-typedef OwnerContainer< Material* >       MaterialContainer;
 
 /**
  * UpdateManager holds a scene graph i.e. a tree of nodes.
@@ -291,34 +286,6 @@ public:
   void SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, Integration::ResourceId resourceId, size_t shaderHash, bool modifiesGeometry );
 
   /**
-   * Add an animatable mesh
-   * @param[in] animatableMesh The animatable mesh to add.
-   * @post the animatableMesh is owned by the UpdateManager.
-   */
-  void AddAnimatableMesh( AnimatableMesh* animatableMesh );
-
-  /**
-   * Remove an animatable mesh
-   * @pre The animatable mesh has been added to the update manager
-   * @param[in] animatableMesh The animatable mesh to add.
-   */
-  void RemoveAnimatableMesh( AnimatableMesh* animatableMesh );
-
-  /**
-   * Add a material
-   * @param[in] material The material to add
-   * @post the material remains owned by its event object
-   */
-  void AddMaterial(Material* material);
-
-  /**
-   * Remove a material
-   * @pre The material has been added to the UpdateManager
-   * @param[in] material The material to remove
-   */
-  void RemoveMaterial(Material* material);
-
-  /**
    * Add a newly created gesture.
    * @param[in] gesture The gesture to add.
    * @post The gesture is owned by the UpdateManager.
@@ -459,22 +426,6 @@ private:
    * Update node shaders, opacity, geometry etc.
    */
   void UpdateNodes();
-
-  /**
-   * Update animatable meshes
-   */
-  void UpdateMeshes( BufferIndex updateBufferIndex, AnimatableMeshContainer& meshes );
-
-  /**
-   * Update materials - Ensure all render materials are updated with texture pointers
-   * when ready.
-   */
-  void UpdateMaterials( BufferIndex updateBufferIndex, MaterialContainer& materials );
-
-  /**
-   * PrepareMaterials - Ensure updated material properties are sent to render materials
-   */
-  void PrepareMaterials( BufferIndex updateBufferIndex, MaterialContainer& materials );
 
 private:
 
@@ -710,31 +661,6 @@ inline void SetShaderProgramMessage( UpdateManager& manager,
   new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, geometryType, subType, resourceId, shaderHash, modifiesGeometry );
 }
 
-// The render thread can safely change the AnimatableMesh
-inline void AddAnimatableMeshMessage( UpdateManager& manager, AnimatableMesh& animatableMesh )
-{
-  typedef MessageValue1< UpdateManager, AnimatableMesh* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddAnimatableMesh, &animatableMesh );
-}
-
-// The render thread can safely change the AnimatableMesh
-inline void RemoveAnimatableMeshMessage( UpdateManager& manager, AnimatableMesh& animatableMesh )
-{
-  typedef MessageValue1< UpdateManager, AnimatableMesh* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveAnimatableMesh, &animatableMesh );
-}
-
-
 inline void SetBackgroundColorMessage( UpdateManager& manager, const Vector4& color )
 {
   typedef MessageValue1< UpdateManager, Vector4 > LocalType;
@@ -783,28 +709,6 @@ inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< La
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, systemLevel );
-}
-
-inline void AddMaterialMessage( UpdateManager& manager, Material* material )
-{
-  typedef MessageValue1< UpdateManager, Material* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddMaterial, material );
-}
-
-inline void RemoveMaterialMessage( UpdateManager& manager, Material* material )
-{
-  typedef MessageValue1< UpdateManager, Material* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveMaterial, material );
 }
 
 inline void AddGestureMessage( UpdateManager& manager, PanGesture* gesture )

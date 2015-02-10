@@ -45,7 +45,6 @@ enum ResourceTypeId
   ResourceNativeImage,
   ResourceTargetImage,
   ResourceShader,
-  ResourceMesh,
   ResourceText
 };
 
@@ -402,41 +401,6 @@ private:
 
   // Undefined copy constructor.
   TextResourceType& operator=(const TextResourceType& rhs);
-};
-
-
-/**
- * MeshResourceType describes a mesh program resource, which can be created
- * using ResourceManager::AllocateMesh.
- */
-struct MeshResourceType : public ResourceType
-{
-  /**
-   * Constructor.
-   */
-  MeshResourceType()
-  : ResourceType(ResourceMesh) {}
-
-  /**
-   * Destructor.
-   */
-  virtual ~MeshResourceType() {}
-
-  /**
-   * @copydoc ResourceType::Clone
-   */
-  virtual ResourceType* Clone() const
-  {
-    return new MeshResourceType();
-  }
-
-private:
-
-  // Undefined copy constructor.
-  MeshResourceType(const MeshResourceType& typePath);
-
-  // Undefined assignment operator.
-  MeshResourceType& operator=(const MeshResourceType& rhs);
 };
 
 inline bool operator==(const TextResourceType::GlyphPosition& lhs, const TextResourceType::GlyphPosition& rhs)

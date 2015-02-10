@@ -26,7 +26,6 @@
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
 #include <dali/internal/render/shaders/shader.h>
-#include <dali/internal/update/modeling/scene-graph-mesh.h>
 
 namespace Dali
 {
@@ -36,22 +35,6 @@ namespace Internal
 
 namespace SceneGraph
 {
-
-namespace // unnamed namespace
-{
-
-static void DoGlCleanup( BufferIndex updateBufferIndex, GlResourceOwner& owner, RenderQueue& renderQueue )
-{
-  typedef Message< GlResourceOwner > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = renderQueue.ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &owner, &GlResourceOwner::GlCleanup );
-}
-
-} // unnamed namespace
 
 DiscardQueue::DiscardQueue( RenderQueue& renderQueue )
 : mRenderQueue( renderQueue )
@@ -96,26 +79,6 @@ void DiscardQueue::Add( BufferIndex updateBufferIndex, NodeAttachment* attachmen
   }
 }
 
-void DiscardQueue::Add( BufferIndex updateBufferIndex, Mesh* mesh )
-{
-  DALI_ASSERT_DEBUG( mesh );
-
-  // Send message to clean-up GL resources in the next Render
-  DoGlCleanup( updateBufferIndex, *mesh, mRenderQueue );
-
-  // The GL resources will now be freed in frame N
-  // The Update for frame N+1 may occur in parallel with the rendering of frame N
-  // Queue the node for destruction in frame N+2
-  if ( 0u == updateBufferIndex )
-  {
-    mMeshQueue0.PushBack( mesh );
-  }
-  else
-  {
-    mMeshQueue1.PushBack( mesh );
-  }
-}
-
 void DiscardQueue::Add( BufferIndex updateBufferIndex, Shader* shader )
 {
   DALI_ASSERT_DEBUG( NULL != shader );
@@ -143,14 +106,12 @@ void DiscardQueue::Clear( BufferIndex updateBufferIndex )
   {
     mNodeQueue0.Clear();
     mAttachmentQueue0.Clear();
-    mMeshQueue0.Clear();
     mShaderQueue0.Clear();
   }
   else
   {
     mNodeQueue1.Clear();
     mAttachmentQueue1.Clear();
-    mMeshQueue1.Clear();
     mShaderQueue1.Clear();
   }
 }

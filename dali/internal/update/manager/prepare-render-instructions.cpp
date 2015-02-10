@@ -50,8 +50,8 @@ namespace SceneGraph
 inline void SetOpaqueRenderFlags( RenderList& renderList, bool transparentRenderersExist, bool stencilRenderablesExist, bool depthTestDisabled )
 {
   // Special optimization if depth test is disabled or if only one opaque rendered in the layer (for example background image)
-  // and this renderer does not need depth test against itself (for example a mesh actor)
-  // if this layer has got exactly one opaque renderer
+  // and this renderer does not need depth test against itself (e.g. mesh)
+  // and if this layer has got exactly one opaque renderer
   // and this renderer is not interested in depth testing
   // (i.e. is an image and not a mesh)
   if ( ( (  renderList.Count() == 1 ) &&

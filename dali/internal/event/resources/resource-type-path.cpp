@@ -143,10 +143,6 @@ int ResourceTypeCompare(const ResourceType& lhs, const ResourceType& rhs)
         break;
       }
 
-      case ResourceMesh:
-      {
-        break; // result = 0
-      }
 
     }
   }

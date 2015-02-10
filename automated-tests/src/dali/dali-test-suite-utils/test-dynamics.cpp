@@ -83,9 +83,7 @@ void TestDynamicsJoint::SetMotorForce( int axisIndex, float force )
 
 
 TestDynamicsShape::TestDynamicsShape( TraceCallStack& trace )
-: mVertices( NULL ),
-  mFaces( NULL ),
-  mTrace( trace )
+: mTrace( trace )
 {
   mTrace.PushCall( "DynamicsShape::DynamicsShape", "" );
 }
@@ -98,11 +96,6 @@ TestDynamicsShape::~TestDynamicsShape()
 void TestDynamicsShape::Initialize( int type, const Vector3& dimensions )
 {
   mTrace.PushCall( "DynamicsShape::Initialize", "" );
-}
-
-void TestDynamicsShape::Initialize( int type, const MeshData::VertexContainer& vertices, const MeshData::FaceIndices& faceIndices )
-{
-  mTrace.PushCall( "DynamicsShape::Initialize", "mesh" );
 }
 
 TestDynamicsBody::TestDynamicsBody( TraceCallStack& trace )

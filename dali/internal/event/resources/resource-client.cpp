@@ -124,7 +124,6 @@ ResourceTicketPtr ResourceClient::RequestResource(
     }
     case ResourceTargetImage:
     case ResourceShader:
-    case ResourceMesh:
     case ResourceText:
     {
       newTicket = new ResourceTicket(*this, newId, typePath);
@@ -172,7 +171,6 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       case ResourceNativeImage:
       case ResourceTargetImage:
       case ResourceShader:
-      case ResourceMesh:
       case ResourceText:
       {
         DALI_LOG_ERROR( "Unsupported resource type passed for decoding from a memory buffer." );
@@ -412,21 +410,6 @@ void ResourceClient::UpdateTexture(  ResourceId id,
   RequestUpdateTextureMessage(  mUpdateManager.GetEventToUpdate(), mResourceManager, id, uploadArray );
 }
 
-ResourceTicketPtr ResourceClient::AllocateMesh( OwnerPointer<MeshData>& meshData )
-{
-  ResourceTicketPtr newTicket;
-  const ResourceId newId = ++(mImpl->mNextId);
-  MeshResourceType meshResourceType; // construct first as no copy ctor (needed to bind ref to object)
-  ResourceTypePath typePath(meshResourceType, "");
-  newTicket = new ResourceTicket(*this, newId, typePath);
-  mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
-
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AllocateMesh() New id = %u\n", newId);
-  RequestAllocateMeshMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, meshData );
-
-  return newTicket;
-}
-
 void ResourceClient::UpdateBitmapArea( ResourceTicketPtr ticket, RectArea& updateArea )
 {
   DALI_ASSERT_DEBUG( ticket );
@@ -442,23 +425,6 @@ void ResourceClient::UploadBitmap( ResourceId destId, ResourceId srcId, std::siz
                               srcId,
                               xOffset,
                               yOffset );
-}
-
-void ResourceClient::UpdateMesh( ResourceTicketPtr ticket, const Dali::MeshData& meshData )
-{
-  DALI_ASSERT_DEBUG( ticket );
-
-  ResourcePolicy::Discardable discardable = ResourcePolicy::RETAIN;
-  if( mImpl->mDataRetentionPolicy == ResourcePolicy::DALI_DISCARDS_ALL_DATA )
-  {
-    discardable = ResourcePolicy::DISCARD;
-  }
-
-  RequestUpdateMeshMessage( mUpdateManager.GetEventToUpdate(),
-                            mResourceManager,
-                            ticket->GetId(),
-                            meshData,
-                            discardable );
 }
 
 Bitmap* ResourceClient::GetBitmap(ResourceTicketPtr ticket)

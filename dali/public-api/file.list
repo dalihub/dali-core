@@ -8,7 +8,6 @@ public_api_src_files = \
   $(public_api_src_dir)/actors/custom-actor-impl.cpp \
   $(public_api_src_dir)/actors/image-actor.cpp \
   $(public_api_src_dir)/actors/layer.cpp \
-  $(public_api_src_dir)/actors/mesh-actor.cpp \
   $(public_api_src_dir)/actors/text-actor.cpp \
   $(public_api_src_dir)/actors/renderable-actor.cpp \
   $(public_api_src_dir)/animation/active-constraint.cpp \
@@ -49,12 +48,6 @@ public_api_src_files = \
   $(public_api_src_dir)/events/tap-gesture-detector.cpp \
   $(public_api_src_dir)/events/touch-point.cpp \
   $(public_api_src_dir)/events/touch-event.cpp \
-  $(public_api_src_dir)/geometry/animatable-mesh.cpp \
-  $(public_api_src_dir)/geometry/animatable-vertex.cpp \
-  $(public_api_src_dir)/geometry/cloth.cpp \
-  $(public_api_src_dir)/geometry/mesh-data.cpp \
-  $(public_api_src_dir)/geometry/mesh-factory.cpp \
-  $(public_api_src_dir)/geometry/mesh.cpp \
   $(public_api_src_dir)/geometry/spline.cpp \
   $(public_api_src_dir)/images/atlas.cpp \
   $(public_api_src_dir)/images/distance-field.cpp \
@@ -78,8 +71,6 @@ public_api_src_files = \
   $(public_api_src_dir)/math/vector2.cpp \
   $(public_api_src_dir)/math/vector3.cpp \
   $(public_api_src_dir)/math/vector4.cpp \
-  $(public_api_src_dir)/modeling/bone.cpp \
-  $(public_api_src_dir)/modeling/material.cpp \
   $(public_api_src_dir)/object/any.cpp \
   $(public_api_src_dir)/object/base-handle.cpp \
   $(public_api_src_dir)/object/handle.cpp \
@@ -131,7 +122,6 @@ public_api_core_actors_header_files =  \
   $(public_api_src_dir)/actors/draw-mode.h \
   $(public_api_src_dir)/actors/image-actor.h \
   $(public_api_src_dir)/actors/layer.h \
-  $(public_api_src_dir)/actors/mesh-actor.h \
   $(public_api_src_dir)/actors/text-actor.h \
   $(public_api_src_dir)/actors/renderable-actor.h \
   $(public_api_src_dir)/actors/sampling.h
@@ -196,12 +186,6 @@ public_api_core_events_header_files = \
   $(public_api_src_dir)/events/touch-event.h
 
 public_api_core_geometry_header_files = \
-  $(public_api_src_dir)/geometry/animatable-mesh.h \
-  $(public_api_src_dir)/geometry/animatable-vertex.h \
-  $(public_api_src_dir)/geometry/cloth.h \
-  $(public_api_src_dir)/geometry/mesh.h \
-  $(public_api_src_dir)/geometry/mesh-data.h \
-  $(public_api_src_dir)/geometry/mesh-factory.h \
   $(public_api_src_dir)/geometry/spline.h
 
 public_api_core_images_header_files = \
@@ -234,10 +218,6 @@ public_api_core_math_header_files = \
   $(public_api_src_dir)/math/vector3.h \
   $(public_api_src_dir)/math/vector4.h \
   $(public_api_src_dir)/math/viewport.h
-
-public_api_core_modeling_header_files =  \
-  $(public_api_src_dir)/modeling/bone.h \
-  $(public_api_src_dir)/modeling/material.h
 
 public_api_core_object_header_files = \
   $(public_api_src_dir)/object/any.h \

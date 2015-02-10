@@ -55,7 +55,7 @@ public:
   /**
    * Second-phase construction.
    * This is called by the UpdateManager, when the attachment is attached to the scene-graph.
-   * @param[in] sceneController Allows attachments to get light/camera controllers.
+   * @param[in] sceneController Allows attachments to get camera controllers.
    * @param[in] updateBufferIndex The current update buffer index.
    */
   virtual void ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex ) = 0;
