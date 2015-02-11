@@ -26,7 +26,8 @@ namespace Dali
  * Constructor
  */
 TestPlatformAbstraction::TestPlatformAbstraction()
-: mRequest(0)
+: mRequest(0),
+  mDynamicsFactory(NULL)
 {
   Initialize();
 }
@@ -36,6 +37,7 @@ TestPlatformAbstraction::TestPlatformAbstraction()
  */
 TestPlatformAbstraction::~TestPlatformAbstraction()
 {
+  delete mDynamicsFactory;
 }
 
 /**
@@ -349,7 +351,7 @@ bool TestPlatformAbstraction::ValidateFontFamilyName(const std::string& fontFami
 /**
  * @copydoc PlatformAbstraction::GetFontList()
  */
-void TestPlatformAbstraction::GetFontList( PlatformAbstraction::FontListMode mode, std::vector<std::string>& fonstList ) const
+void TestPlatformAbstraction::GetFontList( PlatformAbstraction::FontListMode mode, std::vector<std::string>& fontList ) const
 {
   mFontListMode = mode;
   mTrace.PushCall("ValidateGetFontList", "");
@@ -392,7 +394,11 @@ void TestPlatformAbstraction::UpdateDefaultsFromDevice()
 Integration::DynamicsFactory* TestPlatformAbstraction::GetDynamicsFactory()
 {
   mTrace.PushCall("GetDynamicsFactory", "");
-  return NULL;
+  if( mDynamicsFactory == NULL )
+  {
+    mDynamicsFactory = new TestDynamicsFactory( mTrace );
+  }
+  return mDynamicsFactory;
 }
 
 bool TestPlatformAbstraction::ReadGlobalMetricsFromCache( const std::string& fontFamily,
@@ -442,7 +448,6 @@ void TestPlatformAbstraction::WriteMetricsToCache( const std::string& fontFamily
   mTrace.PushCall("WriteMetricsToCacheFile", "");
 }
 
-
 void TestPlatformAbstraction::GetFileNamesFromDirectory( const std::string& directoryName,
                                                          std::vector<std::string>& fileNames )
 {
@@ -451,7 +456,6 @@ void TestPlatformAbstraction::GetFileNamesFromDirectory( const std::string& dire
   fileNames.push_back( std::string( "u1f170.png" ) );
   fileNames.push_back( std::string( "u1f601.png" ) );
 }
-
 
 Integration::BitmapPtr TestPlatformAbstraction::GetGlyphImage( const std::string& fontFamily, const std::string& fontStyle, float fontSize, uint32_t character ) const
 {
@@ -462,7 +466,6 @@ Integration::BitmapPtr TestPlatformAbstraction::GetGlyphImage( const std::string
 
   return image;
 }
-
 
 /** Call this every test */
 void TestPlatformAbstraction::Initialize()
@@ -644,6 +647,5 @@ void TestPlatformAbstraction::SetReadMetricsResult( bool success, std::vector<In
   mReadMetricsResult = success;
   mReadMetrics = glyphMetricsContainer; // copy
 }
-
 
 } // namespace Dali

@@ -2108,14 +2108,14 @@ Actor::~Actor()
   delete mAnchorPoint;
 }
 
-void Actor::ConnectToStage( Stage& stage, int index )
+void Actor::ConnectToStage( int index )
 {
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
   // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveConnectToStage( stage, connectionList, index );
+  RecursiveConnectToStage( connectionList, index );
 
   // Notify applications about the newly connected actors.
   const ActorIter endIter = connectionList.end();
@@ -2126,7 +2126,7 @@ void Actor::ConnectToStage( Stage& stage, int index )
   }
 }
 
-void Actor::RecursiveConnectToStage( Stage& stage, ActorContainer& connectionList, int index )
+void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
 {
   DALI_ASSERT_ALWAYS( !OnStage() );
 
@@ -2147,7 +2147,7 @@ void Actor::RecursiveConnectToStage( Stage& stage, ActorContainer& connectionLis
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
       Actor& actor = GetImplementation( *iter );
-      actor.RecursiveConnectToStage( stage, connectionList );
+      actor.RecursiveConnectToStage( connectionList );
     }
   }
 }
@@ -3378,10 +3378,8 @@ void Actor::SetParent(Actor* parent, int index)
     if ( Stage::IsInstalled() && // Don't emit signals or send messages during Core destruction
          parent->OnStage() )
     {
-      StagePtr stage = parent->mStage;
-
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToStage(*stage, index);
+      ConnectToStage( index );
     }
   }
   else // parent being set to NULL

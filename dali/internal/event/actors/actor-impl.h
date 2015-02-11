@@ -1081,16 +1081,15 @@ protected:
    * @param[in] stage The stage.
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void ConnectToStage(Stage& stage, int index = -1);
+  void ConnectToStage( int index = -1 );
 
   /**
    * Helper for ConnectToStage, to recursively connect a tree of actors.
    * This is atomic i.e. not interrupted by user callbacks.
-   * @param[in] stage The stage.
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToStage( Stage& stage, ActorContainer& connectionList, int index = -1 );
+  void RecursiveConnectToStage( ActorContainer& connectionList, int index = -1 );
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.

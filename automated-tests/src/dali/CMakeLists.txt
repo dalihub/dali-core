@@ -18,21 +18,34 @@ SET(TC_SOURCES
         utc-Dali-BitmapImage.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-Character.cpp
+        utc-Dali-Constrainable.cpp
         utc-Dali-Constraint.cpp
+        utc-Dali-Context.cpp
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp
+        utc-Dali-DistanceField.cpp
+        utc-Dali-DynamicsBody.cpp
+        utc-Dali-DynamicsBodyConfig.cpp
+        utc-Dali-DynamicsJoint.cpp
+        utc-Dali-DynamicsShape.cpp
+        utc-Dali-DynamicsWorld.cpp
+        utc-Dali-DynamicsWorldConfig.cpp
+        utc-Dali-EncodedBufferImage.cpp
         utc-Dali-Font.cpp
         utc-Dali-FontParameters.cpp
         utc-Dali-FrameBufferImage.cpp
         utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
+        utc-Dali-HitTestAlgorithm.cpp
         utc-Dali-HoverProcessing.cpp
         utc-Dali-Image.cpp
         utc-Dali-ImageActor.cpp
         utc-Dali-ImageAttributes.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
+        utc-Dali-LightActor.cpp
+        utc-Dali-LocklessBuffer.cpp
         utc-Dali-LongPressGesture.cpp
         utc-Dali-LongPressGestureDetector.cpp
         utc-Dali-Material.cpp
@@ -40,6 +53,11 @@ SET(TC_SOURCES
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp
         utc-Dali-MeshActor.cpp
+        utc-Dali-MeshData.cpp
+        utc-Dali-Model.cpp
+        utc-Dali-MouseWheelEvent.cpp
+        utc-Dali-NinePatchImages.cpp
+        utc-Dali-ObjectRegistry.cpp
         utc-Dali-PanGesture.cpp
         utc-Dali-PanGestureDetector.cpp
         utc-Dali-Path.cpp
@@ -50,13 +68,16 @@ SET(TC_SOURCES
         utc-Dali-PropertyNotification.cpp
         utc-Dali-Quaternion.cpp
         utc-Dali-Radian.cpp
+        utc-Dali-Random.cpp
         utc-Dali-Rect.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
         utc-Dali-RenderableActor.cpp
         utc-Dali-ShaderEffect.cpp
+        utc-Dali-Scripting.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
+        utc-Dali-Spline.cpp
         utc-Dali-Stage.cpp
         utc-Dali-TapGesture.cpp
         utc-Dali-TapGestureDetector.cpp
@@ -65,15 +86,20 @@ SET(TC_SOURCES
         utc-Dali-TextStyle.cpp
         utc-Dali-TouchEventCombiner.cpp
         utc-Dali-TouchProcessing.cpp
+        utc-Dali-TypeRegistry.cpp
+        utc-Dali-Utf8.cpp
+        utc-Dali-Vector.cpp
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp
         utc-Dali-Vector4.cpp
 )
 
 LIST(APPEND TC_SOURCES
+        dali-test-suite-utils/mesh-builder.cpp
         dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/dali-test-suite-utils.cpp
         dali-test-suite-utils/test-application.cpp
+        dali-test-suite-utils/test-dynamics.cpp
         dali-test-suite-utils/test-gesture-manager.cpp
         dali-test-suite-utils/test-gl-abstraction.cpp
         dali-test-suite-utils/test-gl-sync-abstraction.cpp

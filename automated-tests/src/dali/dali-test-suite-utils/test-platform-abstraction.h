@@ -28,7 +28,7 @@
 
 #include <dali/integration-api/glyph-set.h>
 #include "test-trace-call-stack.h"
-
+#include "test-dynamics.h"
 
 namespace Dali
 {
@@ -111,9 +111,6 @@ public:
    */
   virtual void LoadResource(const Integration::ResourceRequest& request);
 
-  /**
-   * @copydoc PlatformAbstraction::LoadResourceSynchronously()
-   */
   virtual Integration::ResourcePointer LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath );
 
   /**
@@ -149,7 +146,7 @@ public:
   /**
    * @copydoc PlatformAbstraction::GetFontLineHeightFromCapsHeight()
    */
-  virtual Dali::PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, CapsHeight capsHeight) const;
+  virtual PixelSize GetFontLineHeightFromCapsHeight(const std::string& fontFamily, const std::string& fontStyle, CapsHeight capsHeight) const;
 
   /**
    * @copydoc PlatformAbstraction::GetGlyphData()
@@ -232,7 +229,6 @@ public:
   virtual void WriteMetricsToCache( const std::string& fontFamily,
                                     const std::string& fontStyle,
                                     const Integration::GlyphSet& glyphSet );
-
 
   virtual void GetFileNamesFromDirectory( const std::string& directoryName,
                                           std::vector<std::string>& fileNames );
@@ -325,6 +321,7 @@ public: // TEST FUNCTIONS
   void SetReadGlobalMetricsResult( bool success, Integration::GlobalMetrics& globalMetrics );
 
   void SetReadMetricsResult( bool success, std::vector<Integration::GlyphMetrics>& glyphMetricsContainer );
+
 private:
   mutable TraceCallStack        mTrace;
   size_t                        mSeconds;
@@ -345,6 +342,7 @@ private:
   LoadFileResult                mLoadFileResult;
   bool                          mSaveFileResult;
   mutable FontListMode          mFontListMode;
+  TestDynamicsFactory*          mDynamicsFactory;
 };
 
 } // Dali
