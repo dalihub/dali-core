@@ -46,6 +46,11 @@ struct DALI_IMPORT_API PanGesture: public Gesture
 
   /**
    * @brief Default Constructor.
+   */
+  PanGesture();
+
+  /**
+   * @brief Constructor.
    *
    * @param[in]  state  The state of the gesture
    */
