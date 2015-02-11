@@ -610,7 +610,6 @@ int UtcDaliScriptingNewActorNegative(void)
     DALI_TEST_CHECK( !handle.MouseWheelEventSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.OffStageSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.OnStageSignal().GetConnectionCount() );
-    DALI_TEST_CHECK( !handle.SetSizeSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.TouchedSignal().GetConnectionCount() );
   }
   END_TEST;

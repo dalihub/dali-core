@@ -237,7 +237,6 @@ public:
   typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                ///< Touch signal type
   typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                ///< Hover signal type
   typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType;///< Mousewheel signal type
-  typedef Signal< void (Actor, const Vector3&) > SetSizeSignalType; ///< SetSize signal type
   typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type
   typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type
 
@@ -293,7 +292,6 @@ public:
   static const char* const SIGNAL_TOUCHED;            ///< name "touched",           @see TouchedSignal()
   static const char* const SIGNAL_HOVERED;            ///< name "hovered",           @see HoveredSignal()
   static const char* const SIGNAL_MOUSE_WHEEL_EVENT;  ///< name "mouse-wheel-event", @see MouseWheelEventSignal()
-  static const char* const SIGNAL_SET_SIZE;           ///< name "set-size",          @see SetSizeSignal()
   static const char* const SIGNAL_ON_STAGE;           ///< name "on-stage",          @see OnStageSignal()
   static const char* const SIGNAL_OFF_STAGE;          ///< name "off-stage",         @see OffStageSignal()
   /** @} */
@@ -1199,21 +1197,6 @@ public: // Signals
    * @return The signal to connect to.
    */
   MouseWheelEventSignalType& MouseWheelEventSignal();
-
-  /**
-   * @brief Signal to indicate when the actor's size is set by application code.
-   *
-   * This signal is emitted when actors size is being <b>set</b> by application code.
-   * This signal is <b>not</b> emitted when size is animated
-   * Note! GetCurrentSize might not return this same size as the set size message may still be queued
-   * A callback of the following type may be connected:
-   * @code
-   *   void YourCallback(Actor actor, const Vector3& newSize);
-   * @endcode
-   * @pre The Actor has been initialized.
-   * @return The signal to connect to.
-   */
-  SetSizeSignalType& SetSizeSignal();
 
   /**
    * @brief This signal is emitted after the actor has been connected to the stage.

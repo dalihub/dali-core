@@ -248,7 +248,6 @@ public:
    *
    * @post The image actor uses the natural image size after an image
    * has been loaded.
-   * @note Actor::SetSizeSignal() will be triggered if there is a current image.
    */
   void SetToNaturalSize();
 

@@ -49,7 +49,6 @@ namespace Dali
 const char* const Actor::SIGNAL_TOUCHED = "touched";
 const char* const Actor::SIGNAL_HOVERED = "hovered";
 const char* const Actor::SIGNAL_MOUSE_WHEEL_EVENT = "mouse-wheel-event";
-const char* const Actor::SIGNAL_SET_SIZE = "set-size";
 const char* const Actor::SIGNAL_ON_STAGE = "on-stage";
 const char* const Actor::SIGNAL_OFF_STAGE = "off-stage";
 
@@ -495,11 +494,6 @@ Actor::HoverSignalType& Actor::HoveredSignal()
 Actor::MouseWheelEventSignalType& Actor::MouseWheelEventSignal()
 {
   return GetImplementation(*this).MouseWheelEventSignal();
-}
-
-Actor::SetSizeSignalType& Actor::SetSizeSignal()
-{
-  return GetImplementation(*this).SetSizeSignal();
 }
 
 Actor::OnStageSignalType& Actor::OnStageSignal()
