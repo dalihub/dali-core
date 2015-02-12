@@ -24,8 +24,6 @@
 namespace Dali
 {
 
-const char* const PanGestureDetector::SIGNAL_PAN_DETECTED = "pan-detected";
-
 const Radian PanGestureDetector::DIRECTION_LEFT( -Math::PI );
 const Radian PanGestureDetector::DIRECTION_RIGHT( 0.0f );
 const Radian PanGestureDetector::DIRECTION_UP( -0.5f * Math::PI );

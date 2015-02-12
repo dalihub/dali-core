@@ -36,6 +36,7 @@
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
 #ifdef DYNAMICS_SUPPORT
@@ -57,6 +58,24 @@ namespace
 {
 
 const float DEFAULT_STEREO_BASE( 65.0f );
+
+// Signals
+
+const char* const SIGNAL_KEY_EVENT =                 "key-event";
+const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "event-processing-finished";
+const char* const SIGNAL_TOUCHED =                   "touched";
+const char* const SIGNAL_CONTEXT_LOST =              "context-lost";
+const char* const SIGNAL_CONTEXT_REGAINED =          "context-regained";
+const char* const SIGNAL_SCENE_CREATED =             "scene-created";
+
+TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), NULL );
+
+SignalConnectorType signalConnector1( mType, SIGNAL_KEY_EVENT,                 &Stage::DoConnectSignal );
+SignalConnectorType signalConnector2( mType, SIGNAL_EVENT_PROCESSING_FINISHED, &Stage::DoConnectSignal );
+SignalConnectorType signalConnector3( mType, SIGNAL_TOUCHED,                   &Stage::DoConnectSignal );
+SignalConnectorType signalConnector4( mType, SIGNAL_CONTEXT_LOST,              &Stage::DoConnectSignal );
+SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
+SignalConnectorType signalConnector6( mType, SIGNAL_SCENE_CREATED,             &Stage::DoConnectSignal );
 
 } // unnamed namespace
 
@@ -487,6 +506,44 @@ void Stage::KeepRendering( float durationSeconds )
 {
   // Send message to keep rendering
   KeepRenderingMessage( mUpdateManager, durationSeconds );
+}
+
+bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  bool connected( true );
+  Stage* stage = dynamic_cast<Stage*>(object);
+
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_KEY_EVENT ) )
+  {
+    stage->KeyEventSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_EVENT_PROCESSING_FINISHED ) )
+  {
+    stage->EventProcessingFinishedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED ) )
+  {
+    stage->TouchedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_CONTEXT_LOST ) )
+  {
+    stage->ContextLostSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_CONTEXT_REGAINED ) )
+  {
+    stage->ContextRegainedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_SCENE_CREATED ) )
+  {
+    stage->SceneCreatedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
 }
 
 void Stage::EmitKeyEventSignal(const KeyEvent& event)

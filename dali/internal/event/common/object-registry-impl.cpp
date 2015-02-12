@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/object-registry.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
@@ -31,9 +32,24 @@ namespace Dali
 namespace Internal
 {
 
+namespace
+{
+
+// Signals
+
+const char* const SIGNAL_OBJECT_CREATED =   "object-created";
+const char* const SIGNAL_OBJECT_DESTROYED = "object-destroyed";
+
+TypeRegistration mType( typeid( Dali::ObjectRegistry ), typeid( Dali::BaseHandle ), NULL );
+
+SignalConnectorType signalConnector1( mType, SIGNAL_OBJECT_CREATED,   &ObjectRegistry::DoConnectSignal );
+SignalConnectorType signalConnector2( mType, SIGNAL_OBJECT_DESTROYED, &ObjectRegistry::DoConnectSignal );
+
+}
+
 ObjectRegistryPtr ObjectRegistry::New()
 {
-  return ObjectRegistryPtr(new ObjectRegistry());
+  return ObjectRegistryPtr( new ObjectRegistry() );
 }
 
 ObjectRegistry::ObjectRegistry()
@@ -61,11 +77,15 @@ void ObjectRegistry::UnregisterObject( Dali::BaseObject* object )
 bool ObjectRegistry::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );
-  ObjectRegistry* objectRegistry = dynamic_cast<ObjectRegistry*>(object);
+  ObjectRegistry* objectRegistry = dynamic_cast<ObjectRegistry*>( object );
 
-  if(Dali::ObjectRegistry::SIGNAL_OBJECT_CREATED == signalName)
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_OBJECT_CREATED ) )
   {
     objectRegistry->ObjectCreatedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_OBJECT_DESTROYED ) )
+  {
+    objectRegistry->ObjectDestroyedSignal().Connect( tracker, functor );
   }
   else
   {

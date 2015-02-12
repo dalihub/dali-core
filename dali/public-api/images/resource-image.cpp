@@ -28,8 +28,6 @@
 namespace Dali
 {
 
-const char* const ResourceImage::SIGNAL_IMAGE_LOADING_FINISHED = "image-loading-finished";
-
 Vector2 ResourceImage::GetImageSize( const std::string& url )
 {
   Vector2 size;

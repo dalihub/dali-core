@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/object/type-registry.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
@@ -48,6 +49,14 @@ namespace Internal
 
 namespace // For internal properties
 {
+
+// Signals
+
+const char* const SIGNAL_FINISHED = "finished";
+
+TypeRegistration mType( typeid( Dali::RenderTask ), typeid( Dali::BaseHandle ), NULL );
+
+SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &RenderTask::DoConnectSignal );
 
 const char* DEFAULT_PROPERTY_NAMES[] =
 {
@@ -684,7 +693,7 @@ bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   bool connected( true );
   RenderTask* renderTask = dynamic_cast<RenderTask*>(object);
 
-  if ( Dali::RenderTask::SIGNAL_FINISHED == signalName )
+  if ( 0 == strcmp( signalName.c_str(), SIGNAL_FINISHED ) )
   {
     renderTask->FinishedSignal().Connect( tracker, functor );
   }

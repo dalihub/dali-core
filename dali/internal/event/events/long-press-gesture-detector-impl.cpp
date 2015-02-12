@@ -31,6 +31,11 @@ namespace Internal
 
 namespace
 {
+
+// Signals
+
+const char* const SIGNAL_LONG_PRESS_DETECTED = "long-press-detected";
+
 BaseHandle Create()
 {
   return Dali::LongPressGestureDetector::New();
@@ -38,7 +43,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::LongPressGestureDetector), typeid(Dali::GestureDetector), Create );
 
-SignalConnectorType signalConnector1( mType, Dali::LongPressGestureDetector::SIGNAL_LONG_PRESS_DETECTED, &LongPressGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1( mType, SIGNAL_LONG_PRESS_DETECTED, &LongPressGestureDetector::DoConnectSignal );
 
 }
 
@@ -137,7 +142,7 @@ bool LongPressGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTr
   bool connected( true );
   LongPressGestureDetector* gesture = dynamic_cast<LongPressGestureDetector*>(object);
 
-  if ( Dali::LongPressGestureDetector::SIGNAL_LONG_PRESS_DETECTED == signalName )
+  if ( 0 == strcmp( signalName.c_str(), SIGNAL_LONG_PRESS_DETECTED ) )
   {
     gesture->DetectedSignal().Connect( tracker, functor );
   }

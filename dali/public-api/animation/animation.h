@@ -97,6 +97,18 @@ class Animation;
  *
  * If the "Finish" signal is connected to a member function of an object, it must be disconnected before the object is destroyed.
  * This is typically done in the object destructor, and requires either the Dali::Connection object or Dali::Animation handle to be stored.
+ *
+ * Signals
+ * | %Signal Name | Method                   |
+ * |--------------|--------------------------|
+ * | finished     | @ref FinishedSignal()    |
+ *
+ * Actions
+ * | %Action Name | %Animation method called |
+ * |--------------|--------------------------|
+ * | play         | Play()                   |
+ * | stop         | Stop()                   |
+ * | pause        | Pause()                  |
  */
 class DALI_IMPORT_API Animation : public BaseHandle
 {
@@ -124,14 +136,6 @@ public:
     Linear,   ///< Values in between key frames are interpolated using a linear polynomial. (Default)
     Cubic     ///< Values in between key frames are interpolated using a cubic polynomial.
   };
-
-  //Signal Names
-  static const char* const SIGNAL_FINISHED; ///< name "finished"
-
-  //Action Names
-  static const char* const ACTION_PLAY;     ///< name "play"
-  static const char* const ACTION_STOP;     ///< name "stop"
-  static const char* const ACTION_PAUSE;    ///< name "pause"
 
   /**
    * @brief Create an uninitialized Animation; this can be initialized with Animation::New().

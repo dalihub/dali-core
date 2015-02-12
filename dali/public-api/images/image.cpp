@@ -25,8 +25,6 @@
 namespace Dali
 {
 
-const char* const Image::SIGNAL_IMAGE_UPLOADED = "uploaded";
-
 Image::Image()
 {
 }

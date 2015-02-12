@@ -50,6 +50,16 @@ static bool HIDE_VALUE = false;
 namespace
 {
 
+// Signals
+
+const char* const SIGNAL_FINISHED = "finished";
+
+// Actions
+
+const char* const ACTION_PLAY =     "play";
+const char* const ACTION_STOP =     "stop";
+const char* const ACTION_PAUSE =    "pause";
+
 BaseHandle Create()
 {
   return Dali::Animation::New(0.f);
@@ -57,11 +67,11 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::Animation), typeid(Dali::BaseHandle), Create );
 
-SignalConnectorType signalConnector1( mType, Dali::Animation::SIGNAL_FINISHED, &Animation::DoConnectSignal );
+SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &Animation::DoConnectSignal );
 
-TypeAction action1( mType, Dali::Animation::ACTION_PLAY, &Animation::DoAction );
-TypeAction action2( mType, Dali::Animation::ACTION_STOP, &Animation::DoAction );
-TypeAction action3( mType, Dali::Animation::ACTION_PAUSE, &Animation::DoAction );
+TypeAction action1( mType, ACTION_PLAY, &Animation::DoAction );
+TypeAction action2( mType, ACTION_STOP, &Animation::DoAction );
+TypeAction action3( mType, ACTION_PAUSE, &Animation::DoAction );
 
 const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::Bake );
 const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BakeFinal );
@@ -691,7 +701,7 @@ bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( true );
   Animation* animation = dynamic_cast<Animation*>(object);
 
-  if ( Dali::Animation::SIGNAL_FINISHED == signalName )
+  if ( 0 == strcmp( signalName.c_str(), SIGNAL_FINISHED ) )
   {
     animation->FinishedSignal().Connect( tracker, functor );
   }
@@ -1087,29 +1097,29 @@ void Animation::Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, f
                                                          TimePeriod(delaySeconds, durationSeconds) ) );
 }
 
-bool Animation::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool Animation::DoAction( BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes )
 {
   bool done = false;
-  Animation* animation = dynamic_cast<Animation*>(object);
+  Animation* animation = dynamic_cast<Animation*>( object );
 
   if( animation )
   {
-    if(Dali::Animation::ACTION_PLAY == actionName)
+    if( 0 == strcmp( actionName.c_str(), ACTION_PLAY ) )
     {
-      if(attributes.size() > 0)
+      if( attributes.size() > 0 )
       {
-        animation->SetDuration(attributes[0].Get<float>());
+        animation->SetDuration( attributes[0].Get<float>() );
       }
 
       animation->Play();
       done = true;
     }
-    else if(Dali::Animation::ACTION_STOP == actionName)
+    else if( 0 == strcmp( actionName.c_str(), ACTION_STOP ) )
     {
       animation->Stop();
       done = true;
     }
-    else if(Dali::Animation::ACTION_PAUSE == actionName)
+    else if( 0 == strcmp( actionName.c_str(), ACTION_PAUSE ) )
     {
       animation->Pause();
       done = true;

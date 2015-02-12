@@ -39,9 +39,13 @@ namespace Internal
 namespace
 {
 
-TypeRegistration mType( typeid(Dali::Image), typeid(Dali::BaseHandle), NULL );
+// Signals
 
-Dali::SignalConnectorType signalConnector2(mType, Dali::Image::SIGNAL_IMAGE_UPLOADED, &Image::DoConnectSignal);
+const char* const SIGNAL_IMAGE_UPLOADED = "uploaded";
+
+TypeRegistration mType( typeid( Dali::Image ), typeid( Dali::BaseHandle ), NULL );
+
+Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_UPLOADED, &Image::DoConnectSignal );
 
 }
 
@@ -69,7 +73,7 @@ bool Image::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   DALI_ASSERT_DEBUG( dynamic_cast<Image*>( object ) && "Resource ticket not ImageTicket subclass for image resource.\n" );
   Image* image = static_cast<Image*>(object);
 
-  if(Dali::Image::SIGNAL_IMAGE_UPLOADED == signalName)
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_IMAGE_UPLOADED ) )
   {
     image->UploadedSignal().Connect( tracker, functor );
   }
