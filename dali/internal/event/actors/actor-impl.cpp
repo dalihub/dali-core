@@ -221,7 +221,6 @@ TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor )
 
 SignalConnectorType signalConnector1(mType, Dali::Actor::SIGNAL_TOUCHED,    &Actor::DoConnectSignal);
 SignalConnectorType signalConnector2(mType, Dali::Actor::SIGNAL_HOVERED,    &Actor::DoConnectSignal);
-SignalConnectorType signalConnector3(mType, Dali::Actor::SIGNAL_SET_SIZE,   &Actor::DoConnectSignal);
 SignalConnectorType signalConnector4(mType, Dali::Actor::SIGNAL_ON_STAGE,   &Actor::DoConnectSignal);
 SignalConnectorType signalConnector5(mType, Dali::Actor::SIGNAL_OFF_STAGE,  &Actor::DoConnectSignal);
 
@@ -1152,14 +1151,6 @@ void Actor::SetSize(const Vector3& size)
 
     // Notification for derived classes
     OnSizeSet( mSize );
-
-    // Emit signal for application developer
-
-    if( !mSetSizeSignal.Empty() )
-    {
-      Dali::Actor handle( this );
-      mSetSizeSignal.Emit( handle, mSize );
-    }
   }
 }
 
@@ -2011,11 +2002,6 @@ Dali::Actor::MouseWheelEventSignalType& Actor::MouseWheelEventSignal()
   return mMouseWheelEventSignal;
 }
 
-Dali::Actor::SetSizeSignalType& Actor::SetSizeSignal()
-{
-  return mSetSizeSignal;
-}
-
 Dali::Actor::OnStageSignalType& Actor::OnStageSignal()
 {
   return mOnStageSignal;
@@ -2042,10 +2028,6 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   else if(Dali::Actor::SIGNAL_MOUSE_WHEEL_EVENT == signalName)
   {
     actor->MouseWheelEventSignal().Connect( tracker, functor );
-  }
-  else if(Dali::Actor::SIGNAL_SET_SIZE == signalName)
-  {
-    actor->SetSizeSignal().Connect( tracker, functor );
   }
   else if(Dali::Actor::SIGNAL_ON_STAGE == signalName)
   {

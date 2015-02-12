@@ -1025,11 +1025,6 @@ public:
   Dali::Actor::MouseWheelEventSignalType& MouseWheelEventSignal();
 
   /**
-   * @copydoc Dali::Actor::SetSizeSignal()
-   */
-  Dali::Actor::SetSizeSignalType& SetSizeSignal();
-
-  /**
    * @copydoc Dali::Actor::OnStageSignal()
    */
   Dali::Actor::OnStageSignalType& OnStageSignal();
@@ -1384,7 +1379,6 @@ protected:
   Dali::Actor::TouchSignalType             mTouchedSignal;
   Dali::Actor::HoverSignalType             mHoveredSignal;
   Dali::Actor::MouseWheelEventSignalType   mMouseWheelEventSignal;
-  Dali::Actor::SetSizeSignalType           mSetSizeSignal;
   Dali::Actor::OnStageSignalType           mOnStageSignal;
   Dali::Actor::OffStageSignalType          mOffStageSignal;
 

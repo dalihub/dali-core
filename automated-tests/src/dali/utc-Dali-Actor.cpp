@@ -2506,46 +2506,6 @@ int UtcDaliActorHoveredSignal(void)
   END_TEST;
 }
 
-int UtcDaliActorSetSizeSignal(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetSizeSignal().Connect( SetSizeCallback );
-
-  gSetSize.x = gSetSize.y = gSetSize.z = 0.0f;
-  gSetSizeCallBackCalled = false;
-  Vector2 size2d( 1.0f, 2.0f );
-  actor.SetSize( size2d );
-  DALI_TEST_CHECK( gSetSizeCallBackCalled == true );
-  // SetSize with Vector2 sets depth to be the minimum of width & height
-  DALI_TEST_EQUALS( Vector3( 1.0f, 2.0f, 1.0f ), gSetSize,  TEST_LOCATION );
-
-  gSetSize.x = gSetSize.y = gSetSize.z = 0.0f;
-  gSetSizeCallBackCalled = false;
-  actor.SetSize( 22.0f, 11.0f );
-  DALI_TEST_CHECK( gSetSizeCallBackCalled == true );
-  // SetSize with Vector2 sets depth to be the minimum of width & height
-  DALI_TEST_EQUALS( Vector3( 22.0f, 11.0f, 11.0f ), gSetSize,  TEST_LOCATION );
-
-  gSetSize.x = gSetSize.y = gSetSize.z = 0.0f;
-  gSetSizeCallBackCalled = false;
-  Vector3 size( 3.0f, 4.0f, 5.0f );
-  actor.SetSize( size );
-  DALI_TEST_CHECK( gSetSizeCallBackCalled == true );
-  DALI_TEST_EQUALS( size, gSetSize,  TEST_LOCATION );
-
-  // add actor to stage to see that signal still works
-  Stage::GetCurrent().Add( actor );
-
-  gSetSize.x = gSetSize.y = gSetSize.z = 0.0f;
-  gSetSizeCallBackCalled = false;
-  actor.SetSize( -1.0f, -2.0f, -3.0f );
-  DALI_TEST_CHECK( gSetSizeCallBackCalled == true );
-  DALI_TEST_EQUALS( Vector3( -1.0f, -2.0f, -3.0f ), gSetSize,  TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliActorOnOffStageSignal(void)
 {
   tet_infoline("Testing Dali::Actor::OnStageSignal() and OffStageSignal()");
