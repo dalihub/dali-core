@@ -62,11 +62,12 @@ public:
 
   /**
    * Create an initialised MeshAttachment.
+   * @param[in] stage The stage to use for messaging
    * @param[in] parentNode The node to attach a scene-object to.
    * This will not be displayed until a mesh is added with SetMesh().
    * @return A handle to a newly allocated Dali resource.
    */
-  static MeshAttachmentPtr New( const SceneGraph::Node& parentNode );
+  static MeshAttachmentPtr New( Stage& stage, const SceneGraph::Node& parentNode );
 
   /**
    * Set the mesh to be rendererd by this attachment

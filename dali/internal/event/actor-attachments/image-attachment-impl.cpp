@@ -29,15 +29,13 @@ namespace Dali
 namespace Internal
 {
 
-ImageAttachmentPtr ImageAttachment::New( const SceneGraph::Node& parentNode )
+ImageAttachmentPtr ImageAttachment::New( Stage& stage, const SceneGraph::Node& parentNode )
 {
-  StagePtr stage = Stage::GetCurrent();
-
-  ImageAttachmentPtr attachment( new ImageAttachment( *stage ) );
+  ImageAttachmentPtr attachment( new ImageAttachment( stage ) );
 
   // Transfer object ownership of scene-object to message
   SceneGraph::ImageAttachment* sceneObject = CreateSceneObject();
-  AttachToNodeMessage( stage->GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;

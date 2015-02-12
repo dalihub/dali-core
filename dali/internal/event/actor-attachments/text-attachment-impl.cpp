@@ -31,11 +31,9 @@ namespace Dali
 namespace Internal
 {
 
-TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const Integration::TextArray& text, FontPointer font )
+TextAttachmentPtr TextAttachment::New( Stage& stage, const SceneGraph::Node& parentNode, const Integration::TextArray& text, FontPointer font )
 {
-  StagePtr stage = Stage::GetCurrent();
-
-  TextAttachmentPtr attachment( new TextAttachment( *stage ) );
+  TextAttachmentPtr attachment( new TextAttachment( stage ) );
 
   // Second-phase construction
 
@@ -45,7 +43,7 @@ TextAttachmentPtr TextAttachment::New( const SceneGraph::Node& parentNode, const
   // Transfer object ownership of scene-object to message
   SceneGraph::TextAttachment* sceneObject = SceneGraph::TextAttachment::New();
 
-  AttachToNodeMessage( stage->GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;

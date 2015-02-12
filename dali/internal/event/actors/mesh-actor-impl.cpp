@@ -55,7 +55,7 @@ MeshActorPtr MeshActor::New()
   actor->Initialize();
 
   // Create the attachment
-  actor->mMeshAttachment = MeshAttachment::New( *actor->mNode );
+  actor->mMeshAttachment = MeshAttachment::New( *actor->mStage, *actor->mNode );
   actor->Attach(*actor->mMeshAttachment);
   actor->SetCullFace( Dali::CullBack );
 
@@ -89,15 +89,9 @@ MeshActorPtr MeshActor::New(Dali::AnimatableMesh mesh)
 
 MeshActorPtr MeshActor::New(ModelDataPtr modelData, Dali::Entity entity)
 {
-  MeshActorPtr actor(new MeshActor());
-  // Second-phase construction
-  actor->Initialize();
+  MeshActorPtr actor = MeshActor::New();
 
-  // Create the attachment
-  actor->mMeshAttachment = MeshAttachment::New( *actor->mNode );
-  actor->Attach(*actor->mMeshAttachment);
   actor->SetName(entity.GetName());
-  actor->SetCullFace( Dali::CullBack );
 
   DALI_ASSERT_ALWAYS(entity.NumberOfMeshes() == 1 && "Dali does not support multiple meshes per node in the model");
 
