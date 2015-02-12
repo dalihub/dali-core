@@ -53,19 +53,6 @@ public:
    */
   void Disconnect();
 
-  /**
-   * Sets whether a renderable attachment is visible.
-   * By default attachments are visible.
-   * @param[in] visible True if the object is visible.
-   */
-  void SetVisible(bool visible);
-
-  /**
-   * Retrieve whether a renderable attachment is visible.
-   * @return True if the object is visible.
-   */
-  bool IsVisible() const;
-
 protected:
 
   /**
