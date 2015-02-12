@@ -501,6 +501,32 @@ public:
   bool IsRotationInherited() const;
 
   /**
+   * @brief Defines how a child actors size is affected by its parents size.
+   * @param[in] mode The size relative to parent mode to use.
+   */
+  void SetSizeMode(SizeMode mode);
+
+  /**
+   * Query how the child actors size is affected by its parents size.
+   * @return The size relative to parent mode in use.
+   */
+  SizeMode GetSizeMode() const;
+
+  /**
+   * Sets the factor of the parents size used for the child actor.
+   * Note: Only used if SizeMode is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
+   * @param[in] factor The vector to multiply the parents size by to get the childs size.
+   */
+  void SetSizeModeFactor(const Vector3& factor);
+
+  /**
+   * Gets the factor of the parents size used for the child actor.
+   * Note: Only used if SizeMode is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
+   * @return The vector being used to multiply the parents size by to get the childs size.
+   */
+  const Vector3& GetSizeModeFactor() const;
+
+  /**
    * @copydoc Dali::Actor::GetCurrentWorldRotation()
    */
   const Quaternion& GetCurrentWorldRotation() const;
@@ -1343,14 +1369,14 @@ protected:
   Actor*                  mParent;       ///< Each actor (except the root) can have one parent
   ActorContainer*         mChildren;     ///< Container of referenced actors
   const SceneGraph::Node* mNode;         ///< Not owned
-  Vector3*                mParentOrigin; // NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
-  Vector3*                mAnchorPoint;  // NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
+  Vector3*                mParentOrigin; ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
+  Vector3*                mAnchorPoint;  ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
 
 #ifdef DYNAMICS_SUPPORT
   DynamicsData*           mDynamicsData; ///< optional physics data
 #endif
 
-  ActorGestureData*       mGestureData; /// Optional Gesture data. Only created when actor requires gestures
+  ActorGestureData*       mGestureData;  ///< Optional Gesture data. Only created when actor requires gestures
 
   ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
 
@@ -1363,6 +1389,7 @@ protected:
   Dali::Actor::OffStageSignalType          mOffStageSignal;
 
   Vector3         mSize;      ///< Event-side storage for size (not a pointer as most actors will have a size)
+  Vector3         mSizeModeFactor; ///< Factor of parent size used for certain SizeModes.
 
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
@@ -1384,6 +1411,7 @@ protected:
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
+  SizeMode mSizeMode                               : 2; ///< Cached: Determines how the actors parent affects the actors size.
 
 private:
 

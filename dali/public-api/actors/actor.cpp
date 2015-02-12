@@ -377,6 +377,26 @@ bool Actor::IsScaleInherited() const
   return GetImplementation(*this).IsScaleInherited();
 }
 
+void Actor::SetSizeMode(SizeMode mode)
+{
+  GetImplementation(*this).SetSizeMode(mode);
+}
+
+SizeMode Actor::GetSizeMode() const
+{
+  return GetImplementation(*this).GetSizeMode();
+}
+
+void Actor::SetSizeModeFactor(const Vector3& factor)
+{
+  GetImplementation(*this).SetSizeModeFactor(factor);
+}
+
+Vector3 Actor::GetSizeModeFactor() const
+{
+  return GetImplementation(*this).GetSizeModeFactor();
+}
+
 Matrix Actor::GetCurrentWorldMatrix() const
 {
   return GetImplementation(*this).GetCurrentWorldMatrix();
