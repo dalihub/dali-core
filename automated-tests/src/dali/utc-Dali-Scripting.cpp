@@ -54,7 +54,6 @@ const StringEnum< int > DRAW_MODE_VALUES[] =
 const unsigned int DRAW_MODE_VALUES_COUNT = sizeof( DRAW_MODE_VALUES ) / sizeof( DRAW_MODE_VALUES[0] );
 
 
-
 //////////////////////////////////////////////////////////////////////////////
 // Helpers for string to enum comparisons for Image and ImageAttributes
 //////////////////////////////////////////////////////////////////////////////
@@ -610,7 +609,6 @@ int UtcDaliScriptingNewActorNegative(void)
     DALI_TEST_CHECK( !handle.MouseWheelEventSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.OffStageSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.OnStageSignal().GetConnectionCount() );
-    DALI_TEST_CHECK( !handle.SetSizeSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.TouchedSignal().GetConnectionCount() );
   }
   END_TEST;
@@ -803,6 +801,8 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetLeaveRequired( true );
     actor.SetInheritRotation( false );
     actor.SetInheritScale( false );
+    actor.SetSizeMode( USE_OWN_SIZE );
+    actor.SetSizeModeFactor( Vector3::ONE );
 
     Stage::GetCurrent().Add( actor );
     application.SendNotification();
@@ -837,6 +837,8 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_EQUALS( value.GetValue( "inherit-rotation" ).Get< bool >(), false, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "inherit-scale" ) );
     DALI_TEST_EQUALS( value.GetValue( "inherit-scale" ).Get< bool >(), false, TEST_LOCATION );
+    DALI_TEST_CHECK( value.HasKey( "size-mode-factor" ) );
+    DALI_TEST_EQUALS( value.GetValue( "size-mode-factor" ).Get< Vector3 >(), Vector3::ONE, TEST_LOCATION );
 
     Stage::GetCurrent().Remove( actor );
   }

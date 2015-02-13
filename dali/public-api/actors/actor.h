@@ -237,7 +237,6 @@ public:
   typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                ///< Touch signal type
   typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                ///< Hover signal type
   typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType;///< Mousewheel signal type
-  typedef Signal< void (Actor, const Vector3&) > SetSizeSignalType; ///< SetSize signal type
   typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type
   typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type
 
@@ -286,6 +285,8 @@ public:
   static const Property::Index COLOR_MODE;            ///< name "color-mode",            type STRING
   static const Property::Index POSITION_INHERITANCE;  ///< name "position-inheritance",  type STRING
   static const Property::Index DRAW_MODE;             ///< name "draw-mode",             type STRING
+  static const Property::Index SIZE_MODE;             ///< name "size-mode",             type STRING
+  static const Property::Index SIZE_MODE_FACTOR;      ///< name "size-mode-factor",      type VECTOR3
   /** @} */
 
   /// @name Signals
@@ -293,7 +294,6 @@ public:
   static const char* const SIGNAL_TOUCHED;            ///< name "touched",           @see TouchedSignal()
   static const char* const SIGNAL_HOVERED;            ///< name "hovered",           @see HoveredSignal()
   static const char* const SIGNAL_MOUSE_WHEEL_EVENT;  ///< name "mouse-wheel-event", @see MouseWheelEventSignal()
-  static const char* const SIGNAL_SET_SIZE;           ///< name "set-size",          @see SetSizeSignal()
   static const char* const SIGNAL_ON_STAGE;           ///< name "on-stage",          @see OnStageSignal()
   static const char* const SIGNAL_OFF_STAGE;          ///< name "off-stage",         @see OffStageSignal()
   /** @} */
@@ -921,6 +921,58 @@ public:
   bool IsScaleInherited() const;
 
   /**
+   * @brief Defines how a child actor's size is affected by its parent's size.
+   *
+   * The default is to ignore the parent's size and use the size property of this actor.
+   *
+   * If USE_OWN_SIZE is used, this option is bypassed and the actor's size
+   *     property is used.
+   *
+   * If SIZE_EQUAL_TO_PARENT is used, this actor's size will be equal to that
+   *     of its parent. The actor's size property is ignored.
+   *
+   * If SIZE_RELATIVE_TO_PARENT is used, this actor's size will be based on
+   *     its parent's size by multiplying the parent size by
+   *     SizeModeFactor.
+   *
+   * If SIZE_FIXED_OFFSET_FROM_PARENT is used, this actor's size will be based on
+   *     its parent's size plus SizeModeFactor.
+   *
+   * @pre The Actor has been initialized.
+   * @param[in] mode The size relative to parent mode to use.
+   */
+  void SetSizeMode(const SizeMode mode);
+
+  /**
+   * @brief Returns the actor's mode for modifying its size relative to its parent.
+   *
+   * @pre The Actor has been initialized.
+   * @return The mode used.
+   */
+  SizeMode GetSizeMode() const;
+
+  /**
+   * @brief Sets the relative to parent size factor of the actor.
+   *
+   * This factor is only used when SizeMode is set to either:
+   * SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
+   * This actor's size is set to the actor's parent size multipled by or added to this factor,
+   * depending on SideMode (See SetSizeMode).
+   *
+   * @pre The Actor has been initialized.
+   * @param [in] factor A Vector3 representing the relative factor to be applied to each axis.
+   */
+  void SetSizeModeFactor(const Vector3& factor);
+
+  /**
+   * @brief Retrieve the relative to parent size factor of the actor.
+   *
+   * @pre The Actor has been initialized.
+   * @return The Actor's current relative size factor.
+   */
+  Vector3 GetSizeModeFactor() const;
+
+  /**
    * @brief Retrieves the world-matrix of the actor.
    *
    * @note The actor will not have a world-matrix, unless it has previously been added to the stage.
@@ -1199,21 +1251,6 @@ public: // Signals
    * @return The signal to connect to.
    */
   MouseWheelEventSignalType& MouseWheelEventSignal();
-
-  /**
-   * @brief Signal to indicate when the actor's size is set by application code.
-   *
-   * This signal is emitted when actors size is being <b>set</b> by application code.
-   * This signal is <b>not</b> emitted when size is animated
-   * Note! GetCurrentSize might not return this same size as the set size message may still be queued
-   * A callback of the following type may be connected:
-   * @code
-   *   void YourCallback(Actor actor, const Vector3& newSize);
-   * @endcode
-   * @pre The Actor has been initialized.
-   * @return The signal to connect to.
-   */
-  SetSizeSignalType& SetSizeSignal();
 
   /**
    * @brief This signal is emitted after the actor has been connected to the stage.

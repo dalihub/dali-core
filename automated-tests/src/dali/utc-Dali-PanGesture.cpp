@@ -39,25 +39,30 @@ int UtcDaliPanGestureConstructor(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  PanGesture gesture(Gesture::Started);
-  DALI_TEST_EQUALS(Gesture::Started, gesture.state, TEST_LOCATION);
+  PanGesture gesture;
+  DALI_TEST_EQUALS(Gesture::Clear, gesture.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Pan, gesture.type, TEST_LOCATION);
 
-  PanGesture gesture2(Gesture::Continuing);
-  DALI_TEST_EQUALS(Gesture::Continuing, gesture2.state, TEST_LOCATION);
+  PanGesture gesture2(Gesture::Started);
+  DALI_TEST_EQUALS(Gesture::Started, gesture2.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture2.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Pan, gesture2.type, TEST_LOCATION);
 
-  PanGesture gesture3(Gesture::Finished);
-  DALI_TEST_EQUALS(Gesture::Finished, gesture3.state, TEST_LOCATION);
+  PanGesture gesture3(Gesture::Continuing);
+  DALI_TEST_EQUALS(Gesture::Continuing, gesture3.state, TEST_LOCATION);
   DALI_TEST_EQUALS(1u, gesture3.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Pan, gesture3.type, TEST_LOCATION);
 
-  // Test copy constructor
-  gesture3.numberOfTouches = 3u;
+  PanGesture gesture4(Gesture::Finished);
+  DALI_TEST_EQUALS(Gesture::Finished, gesture4.state, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, gesture4.numberOfTouches, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Pan, gesture4.type, TEST_LOCATION);
 
-  PanGesture pan(gesture3);
+  // Test copy constructor
+  gesture4.numberOfTouches = 3u;
+
+  PanGesture pan(gesture4);
   DALI_TEST_EQUALS(Gesture::Finished, pan.state, TEST_LOCATION);
   DALI_TEST_EQUALS(3u, pan.numberOfTouches, TEST_LOCATION);
   DALI_TEST_EQUALS(Gesture::Pan, pan.type, TEST_LOCATION);

@@ -106,6 +106,8 @@ const Property::Index Actor::INHERIT_SCALE              = 39;
 const Property::Index Actor::COLOR_MODE                 = 40;
 const Property::Index Actor::POSITION_INHERITANCE       = 41;
 const Property::Index Actor::DRAW_MODE                  = 42;
+const Property::Index Actor::SIZE_MODE                  = 43;
+const Property::Index Actor::SIZE_MODE_FACTOR           = 44;
 
 namespace // unnamed namespace
 {
@@ -160,8 +162,20 @@ const Internal::PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
   { "color-mode",             Property::STRING,   true,    false,   false },  // COLOR_MODE
   { "position-inheritance",   Property::STRING,   true,    false,   false },  // POSITION_INHERITANCE
   { "draw-mode",              Property::STRING,   true,    false,   false },  // DRAW_MODE
+  { "size-mode",              Property::STRING,   true,    false,   false },  // SIZE_MODE
+  { "size-mode-factor",       Property::VECTOR3,  true,    false,   false },  // SIZE_MODE_FACTOR
 };
 const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( Internal::PropertyDetails );
+
+// Enumeration to/from text conversion tables:
+const Scripting::StringEnum< SizeMode > SIZE_MODE_TABLE[] =
+{
+  { "USE_OWN_SIZE",                  USE_OWN_SIZE                  },
+  { "SIZE_EQUAL_TO_PARENT",          SIZE_EQUAL_TO_PARENT          },
+  { "SIZE_RELATIVE_TO_PARENT",       SIZE_RELATIVE_TO_PARENT       },
+  { "SIZE_FIXED_OFFSET_FROM_PARENT", SIZE_FIXED_OFFSET_FROM_PARENT },
+};
+const unsigned int SIZE_MODE_TABLE_COUNT = sizeof( SIZE_MODE_TABLE ) / sizeof( SIZE_MODE_TABLE[0] );
 
 } // unnamed namespace
 
@@ -207,7 +221,6 @@ TypeRegistration mType( typeid(Dali::Actor), typeid(Dali::Handle), CreateActor )
 
 SignalConnectorType signalConnector1(mType, Dali::Actor::SIGNAL_TOUCHED,    &Actor::DoConnectSignal);
 SignalConnectorType signalConnector2(mType, Dali::Actor::SIGNAL_HOVERED,    &Actor::DoConnectSignal);
-SignalConnectorType signalConnector3(mType, Dali::Actor::SIGNAL_SET_SIZE,   &Actor::DoConnectSignal);
 SignalConnectorType signalConnector4(mType, Dali::Actor::SIGNAL_ON_STAGE,   &Actor::DoConnectSignal);
 SignalConnectorType signalConnector5(mType, Dali::Actor::SIGNAL_OFF_STAGE,  &Actor::DoConnectSignal);
 
@@ -1058,6 +1071,38 @@ bool Actor::IsRotationInherited() const
   return mInheritRotation;
 }
 
+void Actor::SetSizeMode(SizeMode mode)
+{
+  // non animateable so keep local copy
+  mSizeMode = mode;
+  if( NULL != mNode )
+  {
+    // mNode is being used in a separate thread; queue a message to set the value
+    SetSizeModeMessage( mStage->GetUpdateInterface(), *mNode, mode );
+  }
+}
+
+void Actor::SetSizeModeFactor(const Vector3& factor)
+{
+  // non animateable so keep local copy
+  mSizeModeFactor = factor;
+  if( NULL != mNode )
+  {
+    // mNode is being used in a separate thread; queue a message to set the value
+    SetSizeModeFactorMessage( mStage->GetUpdateInterface(), *mNode, factor );
+  }
+}
+
+SizeMode Actor::GetSizeMode() const
+{
+  return mSizeMode;
+}
+
+const Vector3& Actor::GetSizeModeFactor() const
+{
+  return mSizeModeFactor;
+}
+
 void Actor::SetColorMode(ColorMode colorMode)
 {
   // non animateable so keep local copy
@@ -1106,14 +1151,6 @@ void Actor::SetSize(const Vector3& size)
 
     // Notification for derived classes
     OnSizeSet( mSize );
-
-    // Emit signal for application developer
-
-    if( !mSetSizeSignal.Empty() )
-    {
-      Dali::Actor handle( this );
-      mSetSizeSignal.Emit( handle, mSize );
-    }
   }
 }
 
@@ -1965,11 +2002,6 @@ Dali::Actor::MouseWheelEventSignalType& Actor::MouseWheelEventSignal()
   return mMouseWheelEventSignal;
 }
 
-Dali::Actor::SetSizeSignalType& Actor::SetSizeSignal()
-{
-  return mSetSizeSignal;
-}
-
 Dali::Actor::OnStageSignalType& Actor::OnStageSignal()
 {
   return mOnStageSignal;
@@ -1996,10 +2028,6 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   else if(Dali::Actor::SIGNAL_MOUSE_WHEEL_EVENT == signalName)
   {
     actor->MouseWheelEventSignal().Connect( tracker, functor );
-  }
-  else if(Dali::Actor::SIGNAL_SET_SIZE == signalName)
-  {
-    actor->SetSizeSignal().Connect( tracker, functor );
   }
   else if(Dali::Actor::SIGNAL_ON_STAGE == signalName)
   {
@@ -2031,6 +2059,7 @@ Actor::Actor( DerivedType derivedType )
   mGestureData( NULL ),
   mAttachment(),
   mSize( 0.0f, 0.0f, 0.0f ),
+  mSizeModeFactor( Vector3::ONE ),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
   mIsRoot( ROOT_LAYER == derivedType ),
@@ -2049,7 +2078,8 @@ Actor::Actor( DerivedType derivedType )
   mInheritScale( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
-  mColorMode( Node::DEFAULT_COLOR_MODE )
+  mColorMode( Node::DEFAULT_COLOR_MODE ),
+  mSizeMode( Node::DEFAULT_SIZE_MODE )
 {
 }
 
@@ -2603,6 +2633,18 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
+    case Dali::Actor::SIZE_MODE:
+    {
+      SetSizeMode( Scripting::GetEnumeration< SizeMode >( property.Get<std::string>(), SIZE_MODE_TABLE, SIZE_MODE_TABLE_COUNT ) );
+      break;
+    }
+
+    case Dali::Actor::SIZE_MODE_FACTOR:
+    {
+      SetSizeModeFactor( property.Get<Vector3>() );
+      break;
+    }
+
     case Dali::Actor::INHERIT_SCALE:
     {
       SetInheritScale( property.Get<bool>() );
@@ -2986,6 +3028,18 @@ Property::Value Actor::GetDefaultProperty(Property::Index index) const
     case Dali::Actor::INHERIT_ROTATION:
     {
       value = IsRotationInherited();
+      break;
+    }
+
+    case Dali::Actor::SIZE_MODE:
+    {
+      value = Scripting::GetEnumerationName< SizeMode >( GetSizeMode(), SIZE_MODE_TABLE, SIZE_MODE_TABLE_COUNT );
+      break;
+    }
+
+    case Dali::Actor::SIZE_MODE_FACTOR:
+    {
+      value = GetSizeModeFactor();
       break;
     }
 
