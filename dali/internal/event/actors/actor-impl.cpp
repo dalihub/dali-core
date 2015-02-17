@@ -2635,7 +2635,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::SIZE_MODE:
     {
-      SetSizeMode( Scripting::GetEnumeration< SizeMode >( property.Get<std::string>(), SIZE_MODE_TABLE, SIZE_MODE_TABLE_COUNT ) );
+      SetSizeMode( Scripting::GetEnumeration< SizeMode >( property.Get<std::string>().c_str(), SIZE_MODE_TABLE, SIZE_MODE_TABLE_COUNT ) );
       break;
     }
 

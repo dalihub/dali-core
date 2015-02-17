@@ -153,36 +153,29 @@ const unsigned int IMAGE_SCALING_MODE_TABLE_COUNT = sizeof( IMAGE_SCALING_MODE_T
 
 } // unnamed namespace
 
-bool CompareEnums(const std::string& a, const std::string& b)
+bool CompareEnums( const char * a, const char * b )
 {
-  std::string::const_iterator ia = a.begin();
-  std::string::const_iterator ib = b.begin();
-
-  while( (ia != a.end()) && (ib != b.end()) )
+  while( ( *a != '\0' ) && ( *b != '\0' ) )
   {
-    char ca = *ia;
-    char cb = *ib;
+    char ca = *a;
+    char cb = *b;
 
-    if(ca == '-' || ca == '_')
+    if( ( ( ca == '-' ) || ( ca == '_') ) &&
+        ( ( cb == '-' ) || ( cb == '_') ) )
     {
-      ++ia;
+      ++a;
+      ++b;
       continue;
     }
 
-    if(cb == '-' || cb == '_')
+    if( ( 'A' <= ca ) && ( ca <= 'Z') )
     {
-      ++ib;
-      continue;
+      ca = ca + ( 'a' - 'A' );
     }
 
-    if( 'A' <= ca && ca <= 'Z')
+    if( ( 'A' <= cb ) && ( cb <= 'Z') )
     {
-      ca = ca + ('a' - 'A');
-    }
-
-    if( 'A' <= cb && cb <= 'Z')
-    {
-      cb = cb + ('a' - 'A');
+      cb = cb + ( 'a' - 'A' );
     }
 
     if( ca != cb )
@@ -190,25 +183,22 @@ bool CompareEnums(const std::string& a, const std::string& b)
       return false;
     }
 
-    ++ia;
-    ++ib;
+    ++a;
+    ++b;
   }
 
-  if( (ia == a.end() && ib == b.end() ) )
+  if( ( *a == '\0' ) && ( *b == '\0' ) )
   {
     return true;
   }
-  else
-  {
-    return false;
-  }
 
+  return false;
 }
 
 
 ColorMode GetColorMode( const std::string& value )
 {
-  return GetEnumeration< ColorMode >( value, COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
+  return GetEnumeration< ColorMode >( value.c_str(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
 }
 
 
@@ -219,7 +209,7 @@ std::string GetColorMode( ColorMode value )
 
 PositionInheritanceMode GetPositionInheritanceMode( const std::string& value )
 {
-  return GetEnumeration< PositionInheritanceMode >( value, POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
+  return GetEnumeration< PositionInheritanceMode >( value.c_str(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
 }
 
 
@@ -231,7 +221,7 @@ std::string GetPositionInheritanceMode( PositionInheritanceMode value )
 
 DrawMode::Type GetDrawMode( const std::string& value )
 {
-  return GetEnumeration< DrawMode::Type >( value, DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
+  return GetEnumeration< DrawMode::Type >( value.c_str(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
 }
 
 
@@ -243,7 +233,7 @@ std::string GetDrawMode( DrawMode::Type value )
 
 Vector3 GetAnchorConstant( const std::string& value )
 {
-  return GetEnumeration< Vector3 >( value, ANCHOR_CONSTANT_TABLE, ANCHOR_CONSTANT_TABLE_COUNT );
+  return GetEnumeration< Vector3 >( value.c_str(), ANCHOR_CONSTANT_TABLE, ANCHOR_CONSTANT_TABLE_COUNT );
 }
 
 
@@ -270,7 +260,7 @@ Image NewImage( const Property::Value& map )
     {
       DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image load-policy property is not a string" );
       std::string v(map.GetValue(field).Get<std::string>());
-      loadPolicy = GetEnumeration< ResourceImage::LoadPolicy >( v, IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
+      loadPolicy = GetEnumeration< ResourceImage::LoadPolicy >( v.c_str(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
     }
 
     field = "release-policy";
@@ -278,7 +268,7 @@ Image NewImage( const Property::Value& map )
     {
       DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
       std::string v(map.GetValue(field).Get<std::string>());
-      releasePolicy = GetEnumeration< Image::ReleasePolicy >( v, IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
+      releasePolicy = GetEnumeration< Image::ReleasePolicy >( v.c_str(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
     }
 
     if( map.HasKey("width") && map.HasKey("height") )
@@ -315,7 +305,7 @@ Image NewImage( const Property::Value& map )
     {
       DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
       std::string s(map.GetValue(field).Get<std::string>());
-      attributes.SetPixelFormat( GetEnumeration< Pixel::Format >( s, PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT ));
+      attributes.SetPixelFormat( GetEnumeration< Pixel::Format >( s.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT ));
     }
 
     field = "scaling-mode";
@@ -323,7 +313,7 @@ Image NewImage( const Property::Value& map )
     {
       DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
       std::string s(map.GetValue(field).Get<std::string>());
-      attributes.SetScalingMode( GetEnumeration< ImageAttributes::ScalingMode >( s, IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT ) );
+      attributes.SetScalingMode( GetEnumeration< ImageAttributes::ScalingMode >( s.c_str(), IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT ) );
     }
 
     if( map.HasKey("type") )

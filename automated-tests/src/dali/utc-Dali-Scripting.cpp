@@ -1033,3 +1033,23 @@ int UtcDaliScriptingGetEnumerationTemplates(void)
 
   END_TEST;
 }
+
+int UtcDaliScriptingCompareEnums(void)
+{
+  // EQUAL
+  DALI_TEST_CHECK( CompareEnums( "", "" ) );
+  DALI_TEST_CHECK( CompareEnums( "HELLO", "HELLO" ) );
+  DALI_TEST_CHECK( CompareEnums( "HELLO", "hello" ) );
+  DALI_TEST_CHECK( CompareEnums( "hello", "HELLO" ) );
+  DALI_TEST_CHECK( CompareEnums( "hello-world", "HELLO_WORLD" ) );
+  DALI_TEST_CHECK( CompareEnums( "hello_WORLD", "HELLO-world" ) );
+  DALI_TEST_CHECK( CompareEnums( "hello_WORLD-", "HELLO-world_" ) );
+  DALI_TEST_CHECK( CompareEnums( "_hello_WORLD-", "-HELLO-world_" ) );
+  DALI_TEST_CHECK( CompareEnums( "-hello_WORLD-", "_HELLO-world_" ) );
+  DALI_TEST_CHECK( CompareEnums( "hello123", "HELLO123" ) );
+
+  // NOT EQUAL
+  DALI_TEST_CHECK( ! CompareEnums( "hello", "HELLOWORLD" ) );
+
+  END_TEST;
+}
