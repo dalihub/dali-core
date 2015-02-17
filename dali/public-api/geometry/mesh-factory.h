@@ -18,6 +18,7 @@
  */
 
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/animation/path.h>
 
 namespace Dali
 {
@@ -41,6 +42,16 @@ DALI_IMPORT_API Dali::MeshData NewPlane( const float width,
                                          const int xSteps,
                                          const int ySteps,
                                          const Rect<float>& textureCoordinates = Rect<float>(0.0f, 0.0f, 1.0f, 1.0f) );
+
+/**
+ * @brief Create a mesh from a given path.
+ * The mesh generated will be a set of lines, each one connecting a point sampled from the path to the next sampled point.
+ *
+ * @param[in] path The path used to generate the mesh
+ * @param[in] resolution The number of vertices to generate
+ * @return A mesh data structure containing the path mesh
+ */
+DALI_IMPORT_API Dali::MeshData NewPath( Dali::Path path, const unsigned int resolution );
 
 } // MeshFactory
 } // Dali
