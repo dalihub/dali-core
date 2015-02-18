@@ -73,6 +73,11 @@ class ResourceImage;
  * Reload only takes effect if both of these conditions apply:
  * - The ResourceImage has already finished loading
  * - The ResourceImage is either on Stage or using IMMEDIATE load policy
+ *
+ * Signals
+ * | %Signal Name           | Method                       |
+ * |------------------------|------------------------------|
+ * | image-loading-finished | @ref LoadingFinishedSignal() |
  */
 class DALI_IMPORT_API ResourceImage : public Image
 {
@@ -94,9 +99,6 @@ public:
    * @brief Type of signal for LoadingFinished and Uploaded.
    */
   typedef Signal< void (ResourceImage) > ResourceImageSignal;
-
-  // Signal Names
-  static const char* const SIGNAL_IMAGE_LOADING_FINISHED; ///< Name of LoadingFinished signal
 
 public:
 

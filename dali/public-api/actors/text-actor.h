@@ -50,15 +50,17 @@ class TextActor;
  * using the font that the TextActor is using.
  *
  * By default CullFaceMode is set to CullNone to enable the TextActor to be viewed from all angles.
+ *
+ * Signals
+ * | %Signal Name          | Method                     |
+ * |-----------------------|----------------------------|
+ * | text-loading-finished | @ref TextAvailableSignal() |
  */
 class DALI_IMPORT_API TextActor : public RenderableActor
 {
 public:
 
   typedef Signal< void (TextActor) > TextSignalType;     ///< Text available signal type
-
-  //Signal Names
-  static const char* const SIGNAL_TEXT_LOADING_FINISHED; ///< name "text-loading-finished"
 
   // Default Properties; additional to RenderableActor properties
   static const Property::Index TEXT;                              ///< name "text"                     type STRING

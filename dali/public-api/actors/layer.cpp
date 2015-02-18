@@ -27,12 +27,6 @@ namespace Dali
 
 using Dali::Layer;
 
-const char* const Layer::ACTION_RAISE = "raise";
-const char* const Layer::ACTION_LOWER = "lower";
-const char* const Layer::ACTION_RAISE_TO_TOP = "raise-to-top";
-const char* const Layer::ACTION_LOWER_TO_BOTTOM = "lower-to-bottom";
-
-
 Layer::Layer()
 {
 }

@@ -41,6 +41,10 @@ namespace Internal
 namespace // unnamed namespace
 {
 
+// Signals
+
+const char* const SIGNAL_APPLIED = "applied";
+
 BaseHandle Create()
 {
   // not directly creatable
@@ -49,7 +53,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::ActiveConstraint), typeid(Dali::Handle), Create );
 
-SignalConnectorType signalConnector1( mType, Dali::ActiveConstraint::SIGNAL_APPLIED, &ActiveConstraintBase::DoConnectSignal );
+SignalConnectorType signalConnector1( mType, SIGNAL_APPLIED, &ActiveConstraintBase::DoConnectSignal );
 
 }
 
@@ -272,7 +276,7 @@ bool ActiveConstraintBase::DoConnectSignal( BaseObject* object, ConnectionTracke
   bool connected( true );
   ActiveConstraintBase* constraint = dynamic_cast<ActiveConstraintBase*>(object);
 
-  if ( Dali::ActiveConstraint::SIGNAL_APPLIED == signalName )
+  if ( 0 == strcmp( signalName.c_str(), SIGNAL_APPLIED ) )
   {
     constraint->AppliedSignal().Connect( tracker, functor );
   }

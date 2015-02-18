@@ -53,6 +53,10 @@ class NativeImage;
  * <i>Resolution of conflicting policies</i>
  * If the same image is created more than once with conflicting policies, ReleasePolicy "Never" overrides "Unused".
  *
+ * Signals
+ * | %Signal Name           | Method                       |
+ * |------------------------|------------------------------|
+ * | uploaded               | @ref UploadedSignal()        |
  */
 class DALI_IMPORT_API Image : public BaseHandle
 {
@@ -71,12 +75,9 @@ public:
   };
 
   /**
-   * @brief Type of signal for LoadingFinished and Uploaded.
+   * @brief Type of signal for Image Uploaded.
    */
   typedef Signal< void (Image) > ImageSignalType;
-
-  // Signal Names
-  static const char* const SIGNAL_IMAGE_UPLOADED; ///< Name of Uploaded signal
 
 public:
 

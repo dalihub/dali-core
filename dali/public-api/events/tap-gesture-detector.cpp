@@ -23,9 +23,6 @@
 
 namespace Dali
 {
-
-const char* const TapGestureDetector::SIGNAL_TAP_DETECTED = "tap-detected";
-
 TapGestureDetector::TapGestureDetector(Internal::TapGestureDetector* internal)
 : GestureDetector(internal)
 {

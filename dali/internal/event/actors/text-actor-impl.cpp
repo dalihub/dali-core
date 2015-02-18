@@ -59,6 +59,12 @@ const Property::Index TextActor::TEXT_COLOR                 = Internal::DEFAULT_
 namespace
 {
 
+// Signals
+
+const char* const SIGNAL_TEXT_LOADING_FINISHED = "text-loading-finished";
+
+// Default property names
+
 const char* DEFAULT_TEXT_ACTOR_PROPERTY_NAMES[] =
 {
   "text",
@@ -127,7 +133,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::TextActor), typeid(Dali::RenderableActor), Create );
 
-SignalConnectorType s1( mType, Dali::TextActor::SIGNAL_TEXT_LOADING_FINISHED, &TextActor::DoConnectSignal );
+SignalConnectorType s1( mType, SIGNAL_TEXT_LOADING_FINISHED, &TextActor::DoConnectSignal );
 
 }
 
@@ -569,7 +575,7 @@ bool TextActor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( true );
   TextActor* textActor = dynamic_cast<TextActor*>(object);
 
-  if( Dali::TextActor::SIGNAL_TEXT_LOADING_FINISHED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_TEXT_LOADING_FINISHED ) )
   {
     textActor->TextAvailableSignal().Connect( tracker, functor );
   }

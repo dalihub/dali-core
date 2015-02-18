@@ -26,9 +26,6 @@
 namespace Dali
 {
 
-const char* const Model::SIGNAL_MODEL_LOADING_FINISHED = "model-loading-finished";
-const char* const Model::SIGNAL_MODEL_SAVING_FINISHED = "model-saving-finished";
-
 Model Model::New(const std::string& url)
 {
   Internal::ModelPtr internal = Internal::Model::New(url);

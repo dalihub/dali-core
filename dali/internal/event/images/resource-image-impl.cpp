@@ -38,15 +38,19 @@ namespace Internal
 namespace
 {
 
+// Signals
+
+const char* const SIGNAL_IMAGE_LOADING_FINISHED = "image-loading-finished";
+
 BaseHandle CreateImage()
 {
   ImagePtr image = ResourceImage::New();
   return Dali::Image(image.Get());
 }
 
-TypeRegistration mType( typeid(Dali::ResourceImage), typeid(Dali::Image), CreateImage );
+TypeRegistration mType( typeid( Dali::ResourceImage ), typeid( Dali::Image ), CreateImage );
 
-Dali::SignalConnectorType signalConnector1(mType, Dali::ResourceImage::SIGNAL_IMAGE_LOADING_FINISHED, &ResourceImage::DoConnectSignal);
+Dali::SignalConnectorType signalConnector1( mType, SIGNAL_IMAGE_LOADING_FINISHED, &ResourceImage::DoConnectSignal );
 
 }
 
@@ -112,13 +116,9 @@ bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterf
   DALI_ASSERT_DEBUG( dynamic_cast<ResourceImage*>( object ) && "Resource ticket not ImageTicket subclass for image resource.\n" );
   ResourceImage* image = static_cast<ResourceImage*>(object);
 
-  if( Dali::ResourceImage::SIGNAL_IMAGE_LOADING_FINISHED == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_IMAGE_LOADING_FINISHED ) )
   {
     image->LoadingFinishedSignal().Connect( tracker, functor );
-  }
-  else if(Dali::ResourceImage::SIGNAL_IMAGE_UPLOADED == signalName)
-  {
-    image->UploadedSignal().Connect( tracker, functor );
   }
   else
   {

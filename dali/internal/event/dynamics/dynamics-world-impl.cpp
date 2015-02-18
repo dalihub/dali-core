@@ -44,6 +44,10 @@ namespace Internal
 namespace
 {
 
+// Signals
+
+const char* const SIGNAL_COLLISION = "collision";
+
 BaseHandle Create()
 {
   DynamicsWorldPtr p = Stage::GetCurrent()->GetDynamicsWorld();
@@ -52,7 +56,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::DynamicsWorld), typeid(Dali::Handle), Create );
 
-SignalConnectorType signalConnector1( mType, Dali::DynamicsWorld::SIGNAL_COLLISION, &DynamicsWorld::DoConnectSignal );
+SignalConnectorType signalConnector1( mType, SIGNAL_COLLISION, &DynamicsWorld::DoConnectSignal );
 
 } // unnamed namespace
 
@@ -115,7 +119,7 @@ bool DynamicsWorld::DoConnectSignal( BaseObject* object, ConnectionTrackerInterf
   bool connected( true );
   DynamicsWorld* world = dynamic_cast<DynamicsWorld*>(object);
 
-  if( Dali::DynamicsWorld::SIGNAL_COLLISION == signalName )
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_COLLISION ) )
   {
     world->CollisionSignal().Connect( tracker, functor );
   }

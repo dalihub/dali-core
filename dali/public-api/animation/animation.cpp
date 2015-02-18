@@ -32,11 +32,6 @@
 namespace Dali
 {
 
-const char* const Animation::SIGNAL_FINISHED = "finished";
-const char* const Animation::ACTION_PLAY = "play";
-const char* const Animation::ACTION_STOP = "stop";
-const char* const Animation::ACTION_PAUSE = "pause";
-
 Animation::Animation()
 {
 }

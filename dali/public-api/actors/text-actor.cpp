@@ -29,8 +29,6 @@ namespace Dali
 
 using std::string;
 
-const char* const TextActor::SIGNAL_TEXT_LOADING_FINISHED = "text-loading-finished";
-
 TextActor::TextActor()
 {
 }
