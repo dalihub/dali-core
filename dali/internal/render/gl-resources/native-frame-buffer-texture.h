@@ -45,7 +45,7 @@ public:
    * @param[in] nativeImage The NativeImage
    * @param     context The GL context
    */
-  NativeFrameBufferTexture( NativeImagePtr nativeImage, Context& context);
+  NativeFrameBufferTexture( NativeImageInterfacePtr nativeImage, Context& context);
 
   /**
    * Destructor.
@@ -79,7 +79,7 @@ protected:
   virtual void GlCleanup();
 
 private:
-  NativeImagePtr mNativeImage; ///< reference to NativeImage the Texture was created from
+  NativeImageInterfacePtr mNativeImage; ///< reference to NativeImage the Texture was created from
 
 }; // class NativeFrameBufferTexture
 

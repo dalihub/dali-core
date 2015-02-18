@@ -23,7 +23,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/images/native-image.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/resources/resource-ticket-observer.h>
@@ -50,15 +49,6 @@ const ReleasePolicy IMAGE_RELEASE_POLICY_DEFAULT = Dali::Image::NEVER;
 class Image : public BaseObject, public ResourceTicketObserver
 {
 public:
-
-  /**
-   * Creates object with already loaded NativeImage
-   * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
-   * @pre nativeImg should be initialised
-   * @param [in] nativeImg already initialised NativeImage
-   * @return a pointer to a newly created object.
-   */
-  static ImagePtr New( NativeImage& nativeImg );
 
   /**
    * @copydoc Dali::Image::GetReleasePolicy()

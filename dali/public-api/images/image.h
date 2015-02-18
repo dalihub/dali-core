@@ -33,8 +33,6 @@ namespace Internal DALI_INTERNAL
 class Image;
 }
 
-class NativeImage;
-
 /**
  * @brief An Image object represents an image resource that can be added to ImageActors.
  *
@@ -109,16 +107,6 @@ public:
    * @return A reference to this
    */
   Image& operator=(const Image& rhs);
-
-  /**
-   * @brief Creates object with already loaded NativeImage.
-   *
-   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
-   * @pre nativeImg should be initialised
-   * @param [in] nativeImg already initialised NativeImage
-   * @return A handle to a newly allocated object
-   */
-  static Image New(NativeImage& nativeImg);
 
   /**
    * @brief Downcast an Object handle to Image handle.

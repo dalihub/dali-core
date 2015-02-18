@@ -90,6 +90,13 @@ ResourceImage NewResourceImage( const Property::Value& map )
   return image;
 }
 
+/// Helper method to create ResourceImage using property
+BitmapImage NewBitmapImage( const Property::Value& map )
+{
+  BitmapImage image = BitmapImage::DownCast( NewImage( map ) );
+  return image;
+}
+
 /// Helper method to create ImageAttributes using an Image
 ImageAttributes NewImageAttributes( const Property::Value& map )
 {
@@ -490,42 +497,6 @@ int UtcDaliScriptingNewImage(void)
 
   //map.erase( map.end() - 2, map.end() );
 
-  // pixel-format
-  map[ "pixel-format" ] = "";
-  {
-    const StringEnum< int > values[] =
-    {
-        { "A8", Pixel::A8 },
-        { "L8", Pixel::L8 },
-        { "LA88", Pixel::LA88 },
-        { "RGB565", Pixel::RGB565 },
-        { "BGR565", Pixel::BGR565 },
-        { "RGBA4444", Pixel::RGBA4444 },
-        { "BGRA4444", Pixel::BGRA4444 },
-        { "RGBA5551", Pixel::RGBA5551 },
-        { "BGRA5551", Pixel::BGRA5551 },
-        { "RGB888", Pixel::RGB888 },
-        { "RGB8888", Pixel::RGB8888 },
-        { "BGR8888", Pixel::BGR8888 },
-        { "RGBA8888", Pixel::RGBA8888 },
-        { "BGRA8888", Pixel::BGRA8888 },
-        { "COMPRESSED_R11_EAC", Pixel::COMPRESSED_R11_EAC },
-        { "COMPRESSED_SIGNED_R11_EAC", Pixel::COMPRESSED_SIGNED_R11_EAC },
-        { "COMPRESSED_RG11_EAC", Pixel::COMPRESSED_RG11_EAC },
-        { "COMPRESSED_SIGNED_RG11_EAC", Pixel::COMPRESSED_SIGNED_RG11_EAC },
-        { "COMPRESSED_RGB8_ETC2", Pixel::COMPRESSED_RGB8_ETC2 },
-        { "COMPRESSED_SRGB8_ETC2", Pixel::COMPRESSED_SRGB8_ETC2 },
-        { "COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2", Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2 },
-        { "COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2", Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 },
-        { "COMPRESSED_RGBA8_ETC2_EAC", Pixel::COMPRESSED_RGBA8_ETC2_EAC },
-        { "COMPRESSED_SRGB8_ALPHA8_ETC2_EAC", Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC },
-        { "COMPRESSED_RGB8_ETC1", Pixel::COMPRESSED_RGB8_ETC1 },
-        { "COMPRESSED_RGB_PVRTC_4BPPV1", Pixel::COMPRESSED_RGB_PVRTC_4BPPV1 },
-        { "A8", Pixel::A8 }, // Checked already but reset so that BitmapImage works
-    };
-    TestEnumStrings< Pixel::Format, ImageAttributes >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &ImageAttributes::GetPixelFormat, &NewImageAttributes );
-  }
-
   // scaling-mode
   map[ "scaling-mode" ] = "";
   {
@@ -546,11 +517,50 @@ int UtcDaliScriptingNewImage(void)
     DALI_TEST_CHECK( FrameBufferImage::DownCast( image ) );
   }
   // type BitMapImage
-  map[ "type" ] = "BitmapImage";
-  {
-    Image image = NewImage( map );
-    DALI_TEST_CHECK( BitmapImage::DownCast( image ) );
-  }
+   map[ "type" ] = "BitmapImage";
+   {
+     Image image = NewImage( map );
+     DALI_TEST_CHECK( BitmapImage::DownCast( image ) );
+     DALI_TEST_CHECK((BitmapImage::DownCast( image )).GetPixelFormat()== Pixel::RGBA8888);
+   }
+
+   // pixel-format
+   map[ "pixel-format" ] = "";
+   {
+     const StringEnum< int > values[] =
+     {
+         { "A8", Pixel::A8 },
+         { "L8", Pixel::L8 },
+         { "LA88", Pixel::LA88 },
+         { "RGB565", Pixel::RGB565 },
+         { "BGR565", Pixel::BGR565 },
+         { "RGBA4444", Pixel::RGBA4444 },
+         { "BGRA4444", Pixel::BGRA4444 },
+         { "RGBA5551", Pixel::RGBA5551 },
+         { "BGRA5551", Pixel::BGRA5551 },
+         { "RGB888", Pixel::RGB888 },
+         { "RGB8888", Pixel::RGB8888 },
+         { "BGR8888", Pixel::BGR8888 },
+         { "RGBA8888", Pixel::RGBA8888 },
+         { "BGRA8888", Pixel::BGRA8888 },
+       /*{ "COMPRESSED_R11_EAC", Pixel::COMPRESSED_R11_EAC },
+         { "COMPRESSED_SIGNED_R11_EAC", Pixel::COMPRESSED_SIGNED_R11_EAC },
+         { "COMPRESSED_RG11_EAC", Pixel::COMPRESSED_RG11_EAC },
+         { "COMPRESSED_SIGNED_RG11_EAC", Pixel::COMPRESSED_SIGNED_RG11_EAC },
+         { "COMPRESSED_RGB8_ETC2", Pixel::COMPRESSED_RGB8_ETC2 },
+         { "COMPRESSED_SRGB8_ETC2", Pixel::COMPRESSED_SRGB8_ETC2 },
+         { "COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2", Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2 },
+         { "COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2", Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 },
+         { "COMPRESSED_RGBA8_ETC2_EAC", Pixel::COMPRESSED_RGBA8_ETC2_EAC },
+         { "COMPRESSED_SRGB8_ALPHA8_ETC2_EAC", Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC },
+         { "COMPRESSED_RGB8_ETC1", Pixel::COMPRESSED_RGB8_ETC1 },
+         { "COMPRESSED_RGB_PVRTC_4BPPV1", Pixel::COMPRESSED_RGB_PVRTC_4BPPV1 },*/
+         // BitmapImage doesnot support compressed format
+     };
+
+     TestEnumStrings< Pixel::Format, BitmapImage >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &BitmapImage::GetPixelFormat, &NewBitmapImage );
+   }
+
   // type Image
   map[ "type" ] = "Image";
   {
@@ -944,8 +954,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( value.GetValue( "load-policy" ).Get< std::string >(), "IMMEDIATE", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "release-policy") );
     DALI_TEST_EQUALS( value.GetValue( "release-policy" ).Get< std::string >(), "NEVER", TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "pixel-format") );
-    DALI_TEST_EQUALS( value.GetValue( "pixel-format" ).Get< std::string >(), "RGBA8888", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "scaling-mode") );
     DALI_TEST_EQUALS( value.GetValue( "scaling-mode" ).Get< std::string >(), "SHRINK_TO_FIT", TEST_LOCATION );
     DALI_TEST_CHECK( !value.HasKey( "width" ) );
@@ -955,7 +963,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
   // Change values
   {
     ImageAttributes attributes;
-    attributes.SetPixelFormat( Pixel::A8 );
     attributes.SetScalingMode( ImageAttributes::FitWidth );
     attributes.SetSize( 300, 400 );
     Image image = ResourceImage::New( "MY_PATH", attributes, ResourceImage::ON_DEMAND, Image::UNUSED );
@@ -973,8 +980,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( value.GetValue( "load-policy" ).Get< std::string >(), "ON_DEMAND", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "release-policy") );
     DALI_TEST_EQUALS( value.GetValue( "release-policy" ).Get< std::string >(), "UNUSED", TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "pixel-format") );
-    DALI_TEST_EQUALS( value.GetValue( "pixel-format" ).Get< std::string >(), "A8", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "scaling-mode") );
     DALI_TEST_EQUALS( value.GetValue( "scaling-mode" ).Get< std::string >(), "FIT_WIDTH", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "width" ) );
@@ -985,12 +990,14 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
 
   // BitmapImage
   {
-    Image image = BitmapImage::New( 200, 300, Pixel::RGBA8888 );
+    Image image = BitmapImage::New( 200, 300, Pixel::A8 );
     Property::Map map;
     CreatePropertyMap( image, map );
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( "type" ) );
     DALI_TEST_EQUALS( value.GetValue( "type" ).Get< std::string >(), "BitmapImage", TEST_LOCATION );
+    DALI_TEST_CHECK( value.HasKey( "pixel-format") );
+    DALI_TEST_EQUALS( value.GetValue( "pixel-format" ).Get< std::string >(), "A8", TEST_LOCATION );
   }
 
   // FrameBufferImage

@@ -184,6 +184,7 @@ private:
   Integration::BitmapPtr mBitmap;      ///< The Bitmap the Texture was created from (may be NULL)
   bool                   mClearPixels; ///< true if initial texture should be cleared on creation
   ResourcePolicy::Discardable mDiscardPolicy; ///< The bitmap discard policy
+  Pixel::Format            mPixelFormat;
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

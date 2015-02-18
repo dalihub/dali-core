@@ -43,14 +43,14 @@ public:
   static FrameBufferImagePtr  New(unsigned int width, unsigned int height, Pixel::Format pixelFormat, ReleasePolicy releasePolicy);
 
   /**
-   * @copydoc Dali::FrameBufferImage::New(NativeImage&)
+   * @copydoc Dali::FrameBufferImage::New(NativeImageInterface&)
    */
-  static FrameBufferImagePtr  New( NativeImage& nativeImage );
+  static FrameBufferImagePtr  New( NativeImageInterface& nativeImage );
 
   /**
-   * @copydoc Dali::FrameBufferImage::New(NativeImage&, ReleasePolicy)
+   * @copydoc Dali::FrameBufferImage::New(NativeImageInterface&, ReleasePolicy)
    */
-  static FrameBufferImagePtr  New( NativeImage& nativeImage, ReleasePolicy releasePolicy );
+  static FrameBufferImagePtr  New( NativeImageInterface& nativeImage, ReleasePolicy releasePolicy );
 
   /**
    * @copydoc Dali::FrameBufferImage::FrameBufferImage
@@ -65,12 +65,12 @@ public:
   /**
    * @copydoc Dali::FrameBufferImage::FrameBufferImage
    */
-  FrameBufferImage(NativeImage& image);
+  FrameBufferImage(NativeImageInterface& image);
 
   /**
    * @copydoc Dali::FrameBufferImage::FrameBufferImage
    */
-  FrameBufferImage(NativeImage& image, ReleasePolicy releasePolicy);
+  FrameBufferImage(NativeImageInterface& image, ReleasePolicy releasePolicy);
 
 public: // From Image
   /**
@@ -91,7 +91,7 @@ protected:
 
 private:
   // cached values for the size / pixel format we were created with. Needed to recreate us when we Connect() to stage and mTicket was reset from a previous call to Disconnect().
-  NativeImagePtr mNativeImage;
+  NativeImageInterfacePtr mNativeImage;
   Pixel::Format mPixelFormat;
 }; // class FrameBufferImage
 

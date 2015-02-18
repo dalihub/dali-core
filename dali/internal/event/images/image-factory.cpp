@@ -258,10 +258,6 @@ bool ImageFactory::CompareAttributes( const Dali::ImageAttributes& requested,
             (requested.GetFilterMode() == actual.GetFilterMode()) ||
             (requested.GetFilterMode() == ImageAttributes::DontCare)
           ) &&
-          (requested.GetPixelFormat() ==  actual.GetPixelFormat()) &&
-          (requested.GetFieldBorder() ==  actual.GetFieldBorder()) &&
-          (fabs(actual.GetFieldRadius() - requested.GetFieldRadius()) <= FLT_EPSILON) &&
-          (requested.IsDistanceField() == actual.IsDistanceField()) &&
           (fabsf(requested.GetWidth()  -  actual.GetWidth())  <= actual.GetWidth()  * mMaxScale) &&
           (fabsf(requested.GetHeight() -  actual.GetHeight()) <= actual.GetHeight() * mMaxScale);
 }

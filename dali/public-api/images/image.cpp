@@ -48,12 +48,6 @@ Image& Image::operator=(const Image& rhs)
   return *this;
 }
 
-Image Image::New(NativeImage& nativeImg)
-{
-  Internal::ImagePtr internal = Internal::Image::New(nativeImg);
-  return Image(internal.Get());
-}
-
 Image Image::DownCast( BaseHandle handle )
 {
   return Image( dynamic_cast<Dali::Internal::Image*>(handle.GetObjectPtr()) );

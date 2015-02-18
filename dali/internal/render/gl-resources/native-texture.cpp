@@ -31,13 +31,12 @@ namespace Dali
 namespace Internal
 {
 
-NativeTexture::NativeTexture(NativeImage* nativeImg, Context& context)
+NativeTexture::NativeTexture(NativeImageInterface* nativeImg, Context& context)
 : Texture(context,
           nativeImg->GetWidth(),
           nativeImg->GetHeight(),
           nativeImg->GetWidth(),
-          nativeImg->GetHeight(),
-          nativeImg->GetPixelFormat()),
+          nativeImg->GetHeight()),
           mNativeImage(nativeImg)
 {
   DALI_LOG_INFO( Debug::Filter::gImage, Debug::General, "NativeTexture created 0x%x\n", &nativeImg );
@@ -71,18 +70,12 @@ bool NativeTexture::Bind(GLenum target, TextureUnit textureunit )
 
 bool NativeTexture::IsFullyOpaque() const
 {
-  // TODO - Should test actual texture...
   return !HasAlphaChannel();
 }
 
 bool NativeTexture::HasAlphaChannel() const
 {
-  return Pixel::HasAlpha( mNativeImage->GetPixelFormat() );
-}
-
-Pixel::Format NativeTexture::GetPixelFormat() const
-{
-  return mNativeImage->GetPixelFormat();
+  return mNativeImage->RequiresBlending();
 }
 
 bool NativeTexture::CreateGlTexture()

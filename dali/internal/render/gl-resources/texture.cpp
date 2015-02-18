@@ -89,16 +89,14 @@ Texture::Texture(Context&      context,
                  unsigned int  width,
                  unsigned int  height,
                  unsigned int  imageWidth,
-                 unsigned int  imageHeight,
-                 Pixel::Format pixelFormat)
+                 unsigned int  imageHeight)
 : mContext(context),
   mId(0),
   mSamplerBitfield( 0 ),
   mWidth(width),
   mHeight(height),
   mImageWidth(imageWidth),
-  mImageHeight(imageHeight),
-  mPixelFormat(pixelFormat)
+  mImageHeight(imageHeight)
 {
 }
 
@@ -201,11 +199,6 @@ unsigned int Texture::GetWidth() const
 unsigned int Texture::GetHeight() const
 {
   return mHeight;
-}
-
-Pixel::Format Texture::GetPixelFormat() const
-{
-  return mPixelFormat;
 }
 
 void Texture::GetTextureCoordinates(UvRect& uv, const PixelArea* pixelArea)

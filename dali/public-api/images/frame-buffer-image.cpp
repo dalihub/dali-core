@@ -75,13 +75,13 @@ FrameBufferImage FrameBufferImage::New(unsigned int width, unsigned int height, 
   return FrameBufferImage(internal.Get());
 }
 
-FrameBufferImage FrameBufferImage::New( NativeImage& image, ReleasePolicy releasePolicy )
+FrameBufferImage FrameBufferImage::New( NativeImageInterface& image, ReleasePolicy releasePolicy )
 {
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New( image, releasePolicy );
   return FrameBufferImage(internal.Get());
 }
 
-FrameBufferImage FrameBufferImage::New( NativeImage& image )
+FrameBufferImage FrameBufferImage::New( NativeImageInterface& image )
 {
   Internal::FrameBufferImagePtr internal = Internal::FrameBufferImage::New( image );
   return FrameBufferImage(internal.Get());

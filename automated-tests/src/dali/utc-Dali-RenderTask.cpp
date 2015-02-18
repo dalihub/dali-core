@@ -21,6 +21,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/debug.h>
+#include <test-native-image.h>
 
 #define BOOLSTR(x) ((x)?"T":"F")
 
@@ -39,61 +40,6 @@ void utc_dali_render_task_cleanup(void)
 
 namespace // unnamed namespace
 {
-
-class TestNativeImage : public NativeImage
-{
-public:
-  int mWidth;
-  int mHeight;
-  TestNativeImage(int width, int height)
-  : mWidth(width),
-    mHeight(height)
-  {}
-
-  virtual bool GlExtensionCreate() {return true;};
-
-  /**
-   * Destroy the GL resource for the NativeImage.
-   * e.g. For the EglImageKHR extension, this corresponds to calling eglDestroyImageKHR()
-   * @pre There is a GL context for the current thread.
-   */
-  virtual void GlExtensionDestroy() {};
-
-  /**
-   * Use the NativeImage as a texture for rendering
-   * @pre There is a GL context for the current thread.
-   * @return A GL error code
-   */
-  virtual unsigned int TargetTexture() {return 0;};
-
-  /**
-   * Called in each NativeTexture::Bind() call to allow implementation specific operations.
-   * The correct texture sampler has already been bound before the function gets called.
-   * @pre glAbstraction is being used by context in current thread
-   */
-  virtual void PrepareTexture() {}
-
-  /**
-   * Returns the width of the NativeImage
-   * @return width
-   */
-  virtual unsigned int GetWidth() const {return mWidth;}
-
-  /**
-   * Returns the height of the NativeImage
-   * @return height
-   */
-  virtual unsigned int GetHeight() const {return mHeight;}
-
-  /**
-   * Returns the internal pixel NativeImage::PixelFormat of the NativeImage
-   * @return pixel format
-   */
-  virtual Pixel::Format GetPixelFormat() const { return Pixel::RGBA8888; }
-protected:
-  ~TestNativeImage(){}
-};
-
 
 const int RENDER_FRAME_INTERVAL = 16;                           ///< Duration of each frame in ms. (at approx 60FPS)
 
@@ -239,8 +185,8 @@ RenderTask CreateRenderTask(TestApplication& application,
   FrameBufferImage frameBufferImage;
   if( glSync )
   {
-    NativeImagePtr testNativeImagePtr = new TestNativeImage(10, 10);
-    frameBufferImage= FrameBufferImage::New( *testNativeImagePtr.Get() );
+    NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
+    frameBufferImage= FrameBufferImage::New( *(testNativeImagePtr.Get()) );
   }
   else
   {
@@ -1190,7 +1136,7 @@ int UtcDaliRenderTaskSignalFinished(void)
   Stage::GetCurrent().Add( rootActor );
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
-  NativeImagePtr testNativeImagePtr = new TestNativeImage(10, 10);
+  NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
   FrameBufferImage frameBufferImage = FrameBufferImage::New( *testNativeImagePtr.Get() );
 
   // Flush all outstanding messages

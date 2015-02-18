@@ -69,6 +69,7 @@ public_api_src_files = \
   $(public_api_src_dir)/images/nine-patch-image.cpp \
   $(public_api_src_dir)/images/glyph-image.cpp \
   $(public_api_src_dir)/images/resource-image.cpp \
+  $(public_api_src_dir)/images/native-image.cpp \
   $(public_api_src_dir)/math/angle-axis.cpp \
   $(public_api_src_dir)/math/compile-time-math.cpp \
   $(public_api_src_dir)/math/degree.cpp \
@@ -220,10 +221,11 @@ public_api_core_images_header_files = \
   $(public_api_src_dir)/images/glyph-image.h \
   $(public_api_src_dir)/images/image.h \
   $(public_api_src_dir)/images/image-attributes.h \
-  $(public_api_src_dir)/images/native-image.h \
+  $(public_api_src_dir)/images/native-image-interface.h \
   $(public_api_src_dir)/images/nine-patch-image.h \
   $(public_api_src_dir)/images/pixel.h \
-  $(public_api_src_dir)/images/resource-image.h
+  $(public_api_src_dir)/images/resource-image.h \
+  $(public_api_src_dir)/images/native-image.h
 
 public_api_core_math_header_files = \
   $(public_api_src_dir)/math/angle-axis.h \

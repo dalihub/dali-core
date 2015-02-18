@@ -301,11 +301,12 @@ Image NewImage( const Property::Value& map )
     }
 
     field = "pixel-format";
+    Pixel::Format pixelFormat = Pixel::RGBA8888;
     if( map.HasKey(field) )
     {
       DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
       std::string s(map.GetValue(field).Get<std::string>());
-      attributes.SetPixelFormat( GetEnumeration< Pixel::Format >( s.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT ));
+      pixelFormat = GetEnumeration< Pixel::Format >( s.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
     }
 
     field = "scaling-mode";
@@ -322,19 +323,19 @@ Image NewImage( const Property::Value& map )
       std::string s(map.GetValue("type").Get<std::string>());
       if("FrameBufferImage" == s)
       {
-        ret = Image( new Internal::FrameBufferImage(attributes.GetWidth(),
-                                                    attributes.GetHeight(),
-                                                    attributes.GetPixelFormat(),
-                                                    releasePolicy) );
+        ret = FrameBufferImage::New(attributes.GetWidth(),
+                                    attributes.GetHeight(),
+                                    pixelFormat,
+                                    releasePolicy);
       }
       else if("BitmapImage" == s)
       {
-        ret = Image( new Internal::BitmapImage(attributes.GetWidth(),
-                                               attributes.GetHeight(),
-                                               attributes.GetPixelFormat(),
-                                               releasePolicy) );
+        ret = BitmapImage::New(attributes.GetWidth(),
+                               attributes.GetHeight(),
+                               pixelFormat,
+                               releasePolicy);
       }
-      else if("Image" == s)
+      else if("Image" == s || "ResourceImage" == s)
       {
         ret = ResourceImage::New(filename, attributes, loadPolicy, releasePolicy);
       }
@@ -540,9 +541,11 @@ void CreatePropertyMap( Image image, Property::Map& map )
     std::string imageType( "ResourceImage" );
 
     // Get Type - cannot use TypeRegistry as Image is not an Object and thus, not registered
-    if ( BitmapImage::DownCast( image ) )
+    BitmapImage bitmapImage = BitmapImage::DownCast( image );
+    if ( bitmapImage )
     {
       imageType = "BitmapImage";
+      map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( bitmapImage.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
     }
     else if ( FrameBufferImage::DownCast( image ) )
     {
@@ -559,7 +562,6 @@ void CreatePropertyMap( Image image, Property::Map& map )
       map[ "load-policy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
 
       ImageAttributes attributes( resourceImage.GetAttributes() );
-      map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( attributes.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
       map[ "scaling-mode" ] = GetEnumerationName< ImageAttributes::ScalingMode >( attributes.GetScalingMode(), IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT );
     }
 

@@ -19,14 +19,14 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/native-image.h>
+#include <dali/public-api/images/native-image-interface.h>
 
 namespace Dali
 {
 class TestNativeImage;
 typedef IntrusivePtr<TestNativeImage> TestNativeImagePointer;
 
-class DALI_IMPORT_API TestNativeImage : public Dali::NativeImage
+class DALI_IMPORT_API TestNativeImage : public Dali::NativeImageInterface
 {
 public:
   static TestNativeImagePointer New(int width, int height);
@@ -37,7 +37,7 @@ public:
   inline virtual void PrepareTexture() {};
   inline virtual unsigned int GetWidth() const {return mWidth;};
   inline virtual unsigned int GetHeight() const {return mHeight;};
-  inline virtual Pixel::Format GetPixelFormat() const {return Pixel::RGBA8888;};
+  inline virtual bool RequiresBlending() const {return true;};
 
 private:
   TestNativeImage(int width, int height);

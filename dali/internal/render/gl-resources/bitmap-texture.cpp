@@ -40,11 +40,11 @@ BitmapTexture::BitmapTexture(
            bitmapPackedPixelsProfile->GetBufferWidth(),
            bitmapPackedPixelsProfile->GetBufferHeight(),
            bitmap->GetImageWidth(),
-           bitmap->GetImageHeight(),
-           bitmap->GetPixelFormat()),
+           bitmap->GetImageHeight()),
   mBitmap(bitmap),
   mClearPixels(false),
-  mDiscardPolicy(policy)
+  mDiscardPolicy(policy),
+  mPixelFormat(bitmap->GetPixelFormat())
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
   DALI_LOG_SET_OBJECT_STRING(this, DALI_LOG_GET_OBJECT_STRING(bitmap));
@@ -59,11 +59,11 @@ BitmapTexture::BitmapTexture(
   ResourcePolicy::Discardable policy)
 : Texture( context,
            width, height,
-           width, height,
-           pixelFormat),
+           width, height),
   mBitmap(NULL),
   mClearPixels(clearPixels),
-  mDiscardPolicy(policy)
+  mDiscardPolicy(policy),
+  mPixelFormat( pixelFormat )
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 }

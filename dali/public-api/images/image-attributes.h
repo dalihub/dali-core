@@ -150,27 +150,9 @@ public:
    *
    * @param [in] width         desired width.
    * @param [in] height        desired height
-   * @param [in] format        desired pixelformat
    * @return A handle to a newly allocated object
    */
-  static ImageAttributes New(unsigned int width, unsigned int height, Pixel::Format format);
-
-  /**
-   * @brief Create an initialised image attributes object for distance field generation
-   * using default parameters.
-   *
-   * @return A handle to a newly allocated object
-   */
-  static ImageAttributes NewDistanceField();
-
-  /**
-   * @brief Create an initialised image attributes object for distance field generation.
-   *
-   * @param [in] fieldRadius The minimum search radius to check for differing pixels
-   * @param [in] fieldBorder The amount of distancefield cells to add around the data (for glow/shadow effects)
-   * @return A handle to a newly allocated object
-   */
-  static ImageAttributes NewDistanceField(float fieldRadius, int fieldBorder);
+   static ImageAttributes New(unsigned int width, unsigned int height);
 
   /**
    * @brief Set the size properties.
@@ -194,14 +176,6 @@ public:
    * @param [in] size desired size.
    */
   void SetSize( const Size& size );
-
-  /**
-   * @brief Set the pixelformat field of the image attributes.
-   *
-   * By default is set to Pixel::RGBA8888.
-   * @param [in] format desired pixelformat
-   */
-  void SetPixelFormat(Pixel::Format format);
 
   /**
    * @brief Set the scale field of the image attributes.
@@ -260,13 +234,6 @@ public:
   Size GetSize() const;
 
   /**
-   * @brief Return the pixel format currently represented by the attribute.
-   *
-   * @return pixel format
-   */
-  Pixel::Format GetPixelFormat() const;
-
-  /**
    * @brief Return the scale currently represented by the attribute.
    *
    * @return scale
@@ -280,27 +247,6 @@ public:
    *         been.
    */
   FilterMode GetFilterMode() const;
-
-  /**
-   * @brief Return if the attribute set up as a distance field.
-   *
-   * @return true, if the attribute is a distance field.
-   */
-  bool IsDistanceField() const;
-
-  /**
-   * @brief Return the field border currently represented by the attribute.
-   *
-   * @return field border
-   */
-  int GetFieldBorder() const;
-
-  /**
-   * @brief Return the field search radius currently represented by the attribute.
-   *
-   * @return field radius
-   */
-  float GetFieldRadius() const;
 
   /**
    * @brief Whether to correct for physical orientation of an image.
