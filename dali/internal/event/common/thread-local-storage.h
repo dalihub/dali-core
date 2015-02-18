@@ -90,6 +90,12 @@ public:
   static bool Created();
 
   /**
+   * Get a pointer to the TLS or NULL if not initialized
+   * @return pointer to the TLS
+   */
+  static ThreadLocalStorage* GetInternal();
+
+  /**
    * get platform abstraction
    * @return reference to core
    */

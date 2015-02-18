@@ -110,7 +110,14 @@ void Stage::Uninitialize()
 
 StagePtr Stage::GetCurrent()
 {
-  return ThreadLocalStorage::Get().GetCurrentStage();
+  StagePtr stage( NULL );
+  // no checking in this version
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  if( tls )
+  {
+    stage = tls->GetCurrentStage();
+  }
+  return stage;
 }
 
 bool Stage::IsInstalled()
@@ -121,6 +128,16 @@ bool Stage::IsInstalled()
 ObjectRegistry& Stage::GetObjectRegistry()
 {
   return *mObjectRegistry;
+}
+
+void Stage::RegisterObject( Dali::BaseObject* object )
+{
+  mObjectRegistry->RegisterObject( object );
+}
+
+void Stage::UnregisterObject( Dali::BaseObject* object )
+{
+  mObjectRegistry->UnregisterObject( object );
 }
 
 Layer& Stage::GetRootActor()

@@ -73,7 +73,9 @@ Stage::Stage(Internal::Stage* internal)
 
 Stage Stage::GetCurrent()
 {
-  return Stage(Internal::Stage::GetCurrent());
+  Internal::Stage* stage = Internal::Stage::GetCurrent();
+  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+  return Stage( stage );
 }
 
 bool Stage::IsInstalled()
