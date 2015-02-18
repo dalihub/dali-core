@@ -27,6 +27,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/modeling/entity-impl.h>
 #include <dali/internal/event/modeling/material-impl.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
@@ -255,19 +256,19 @@ void ModelData::Unpack( ResourceClient& resourceClient )
       const std::string& diffuseFileName = material.GetDiffuseFileName();
       if( ! diffuseFileName.empty() )
       {
-        material.SetDiffuseTexture( Dali::Image::New( diffuseFileName ) );
+        material.SetDiffuseTexture( Dali::ResourceImage::New( diffuseFileName ) );
       }
 
       const std::string& opacityFileName = material.GetOpacityTextureFileName();
       if( ! opacityFileName.empty() )
       {
-        material.SetOpacityTexture( Dali::Image::New( opacityFileName ) );
+        material.SetOpacityTexture( Dali::ResourceImage::New( opacityFileName ) );
       }
 
       const std::string& normalMapFileName = material.GetNormalMapFileName();
       if( ! normalMapFileName.empty() )
       {
-        material.SetNormalMap( Dali::Image::New( normalMapFileName ) );
+        material.SetNormalMap( Dali::ResourceImage::New( normalMapFileName ) );
       }
     }
 

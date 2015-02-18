@@ -50,7 +50,7 @@ int UtcDaliImageNew01(void)
   DALI_TEST_CHECK( !image );
 
   // initialise handle
-  image = Image::New(gTestImageFilename);
+  image = ResourceImage::New(gTestImageFilename);
 
   DALI_TEST_CHECK( image );
   END_TEST;
@@ -72,7 +72,7 @@ int UtcDaliImageNew02(void)
   Dali::ImageAttributes imageAttributes;
   imageAttributes.SetSize(128, 256);
   imageAttributes.SetScalingMode(Dali::ImageAttributes::FitHeight);
-  image = Image::New(gTestImageFilename, imageAttributes);
+  image = ResourceImage::New(gTestImageFilename, imageAttributes);
 
   DALI_TEST_CHECK( image );
   END_TEST;
@@ -106,7 +106,7 @@ int UtcDaliImageNewWithPolicies01(void)
   // testing delayed loading
   tet_infoline("UtcDaliImageNewWithPolicies01 - Load image with LoadPolicy::OnDemand, ReleasePolicy::Never");
   DALI_TEST_CHECK( !application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-  Image image = Image::New(gTestImageFilename, Image::OnDemand, Image::Never);
+  Image image = ResourceImage::New(gTestImageFilename, ResourceImage::ON_DEMAND, Image::NEVER);
 
   DALI_TEST_CHECK( image );
 
@@ -164,7 +164,7 @@ int UtcDaliImageNewWithPolicies02(void)
   // testing resource deletion when taken off stage
   tet_infoline("UtcDaliImageNewWithPolicies02 - Load image with LoadPolicy::OnDemand, ReleasePolicy::Unused");
 
-  Image image = Image::New(gTestImageFilename, Image::OnDemand, Image::Unused);
+  Image image = ResourceImage::New(gTestImageFilename, ResourceImage::ON_DEMAND, Image::UNUSED);
 
   DALI_TEST_CHECK( image );
 
@@ -222,7 +222,7 @@ int UtcDaliImageNewWithPolicies03(void)
   // load immediately -> resource deletion when taken off stage -> put actor back on stage -> load resource again
   tet_infoline("UtcDaliImageNewWithPolicies03 - Load image with LoadPolicy::Immediate, ReleasePolicy::Unused");
 
-  Image image = Image::New(gTestImageFilename, Image::Immediate, Image::Unused);
+  Image image = ResourceImage::New(gTestImageFilename, ResourceImage::IMMEDIATE, Image::UNUSED);
 
   DALI_TEST_CHECK( image );
 
@@ -288,7 +288,7 @@ int UtcDaliImageNewWithPolicies04(void)
   // load immediately, don't release texture when off stage
   tet_infoline("UtcDaliImageNewWithPolicies03 - Load image with LoadPolicy::Immediate, ReleasePolicy::Never");
 
-  Image image = Image::New(gTestImageFilename, Image::Immediate, Image::Never);
+  Image image = ResourceImage::New(gTestImageFilename, ResourceImage::IMMEDIATE, Image::NEVER);
 
   DALI_TEST_CHECK( image );
 
@@ -347,360 +347,12 @@ int UtcDaliImageNewWithPolicies04(void)
 }
 
 // 1.8
-int UtcDaliImageNewDistanceField(void)
-{
-  TestApplication application;
-
-  tet_infoline("UtcDaliImageNewDistanceField - Image::NewDistanceField(const std::string&)");
-
-  // invoke default handle constructor
-  Image image;
-
-  DALI_TEST_CHECK( !image );
-
-  // initialise handle
-  image = Image::NewDistanceField(gTestImageFilename);
-
-  DALI_TEST_CHECK( image );
-  END_TEST;
-}
-
-// 1.9
-int UtcDaliImageNewDistanceFieldWithPolicies01(void)
-{
-  TestApplication application;
-
-  // testing delayed loading
-  tet_infoline("UtcDaliImageNewDistanceFieldWithPolicies01 - Load image with LoadPolicy::OnDemand, ReleasePolicy::Never");
-  DALI_TEST_CHECK( !application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-  Image image = Image::NewDistanceField(gTestImageFilename, Image::OnDemand, Image::Never);
-
-  DALI_TEST_CHECK( image );
-
-  application.SendNotification();
-  application.Render(16);
-
-  // request file loading only when actor added to stage
-  DALI_TEST_CHECK( !application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-
-  ImageActor actor = ImageActor::New(image);
-
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-
-  // testing ReleasePolicy::Never
-  // fake loading image
-  std::vector<GLuint> ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // never discard texture
-  Stage::GetCurrent().Remove(actor);
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-  END_TEST;
-}
-
-// 1.10
-int UtcDaliImageNewDistanceFieldWithPolicies02(void)
-{
-  TestApplication application;
-
-  const Vector2 closestImageSize( 80, 45);
-  application.GetPlatform().SetClosestImageSize(closestImageSize);
-
-  // testing resource deletion when taken off stage
-  tet_infoline("UtcDaliImageNewDistanceFieldWithPolicies02 - Load image with LoadPolicy::OnDemand, ReleasePolicy::Unused");
-
-  Image image = Image::NewDistanceField(gTestImageFilename, Image::OnDemand, Image::Unused);
-
-  DALI_TEST_CHECK( image );
-
-  application.SendNotification();
-  application.Render(16);
-
-  // request file loading only when actor added to stage
-  DALI_TEST_CHECK( !application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-
-  ImageActor actor = ImageActor::New(image);
-
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-
-  // testing ReleasePolicy::Unused
-  // fake loading image
-  std::vector<GLuint> ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // discard texture when actor comes off stage
-  Stage::GetCurrent().Remove(actor);
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK ( application.GetGlAbstraction().CheckTextureDeleted(23) );
-  END_TEST;
-}
-
-// 1.11
-int UtcDaliImageNewDistanceFieldWithPolicies03(void)
-{
-  TestApplication application;
-  const Vector2 closestImageSize( 80, 45);
-  application.GetPlatform().SetClosestImageSize(closestImageSize);
-
-  // load immediately -> resource deletion when taken off stage -> put actor back on stage -> load resource again
-  tet_infoline("UtcDaliImageNewDistanceFieldWithPolicies03 - Load image with LoadPolicy::Immediate, ReleasePolicy::Unused");
-
-  Image image = Image::NewDistanceField(gTestImageFilename, Image::Immediate, Image::Unused);
-
-  DALI_TEST_CHECK( image );
-
-  application.SendNotification();
-  application.Render(16);
-
-  // request file loading immediately
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-
-  ImageActor actor = ImageActor::New(image);
-
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // testing ReleasePolicy::Unused
-  // fake loading image
-  std::vector<GLuint> ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // discard texture when actor comes off stage
-  Stage::GetCurrent().Remove(actor);
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK ( application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // check load request when actor added back to stage
-  application.GetPlatform().ResetTrace();
-
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-  END_TEST;
-}
-
-// 1.12
-int UtcDaliImageNewDistanceFieldWithPolicies04(void)
-{
-  TestApplication application;
-
-  // load immediately, don't release texture when off stage
-  tet_infoline("UtcDaliImageNewDistanceFieldWithPolicies04 - Load image with LoadPolicy::Immediate, ReleasePolicy::Never");
-
-  Image image = Image::NewDistanceField(gTestImageFilename, Image::Immediate, Image::Never);
-
-  DALI_TEST_CHECK( image );
-
-  application.SendNotification();
-  application.Render(16);
-
-  // request file loading immediately
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-
-  ImageActor actor = ImageActor::New(image);
-
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-
-  // testing ReleasePolicy::Never
-  // fake loading image
-  std::vector<GLuint> ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // texture is not discarded
-  Stage::GetCurrent().Remove(actor);
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // no load request when actor added back to stage
-  application.GetPlatform().ResetTrace();
-
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-
-  DALI_TEST_CHECK( !application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-  END_TEST;
-}
-
-// 1.13
-int UtcDaliImageNewDistanceFieldWithAttributes(void)
-{
-  TestApplication application;
-
-  tet_infoline("UtcDaliImageNewDistanceFieldWithAttributes - Image::NewDistanceField(const std::string&, const ImageAttributes& attributes)");
-
-  // invoke default handle constructor
-  Image image;
-  Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::NewDistanceField(6.0f, 12);
-
-  DALI_TEST_CHECK( !image );
-
-  // initialise handle
-  image = Image::NewDistanceField(gTestImageFilename, imageAttributes);
-
-  DALI_TEST_CHECK( image );
-  END_TEST;
-}
-
-// 1.14
-int UtcDaliImageNewDistanceFieldWithAttrandPol(void)
-{
-  TestApplication application;
-
-  const Vector2 closestImageSize( 80, 45);
-  application.GetPlatform().SetClosestImageSize(closestImageSize);
-
-  tet_infoline("UtcDaliImageNewDistanceFieldWithAttrandPol - Load image with LoadPolicy::OnDemand, ReleasePolicy::Unused");
-
-  Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::NewDistanceField(6.0f, 12);
-
-  Image image = Image::NewDistanceField(gTestImageFilename, imageAttributes, Image::OnDemand, Image::Unused);
-
-  DALI_TEST_CHECK( image );
-
-  application.SendNotification();
-  application.Render(16);
-
-  // request file loading only when actor added to stage
-  DALI_TEST_CHECK( !application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-
-  ImageActor actor = ImageActor::New(image);
-
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render(16);
-
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
-
-  // testing ReleasePolicy::Unused
-  // fake loading image
-  std::vector<GLuint> ids;
-  ids.push_back( 23 );
-  application.GetGlAbstraction().SetNextTextureIds( ids );
-  Integration::ResourceRequest* request = application.GetPlatform().GetRequest();
-  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::DISCARD );
-  Integration::ResourcePointer resource(bitmap);
-  bitmap->GetPackedPixelsProfile()->ReserveBuffer(Pixel::RGBA8888, 80, 80, 80, 80);
-
-  if(request)
-  {
-    application.GetPlatform().SetResourceLoaded(request->GetId(), request->GetType()->id, resource);
-  }
-  application.Render(16);
-  application.SendNotification();
-
-  DALI_TEST_CHECK ( !application.GetGlAbstraction().CheckTextureDeleted(23) );
-
-  // discard texture when actor comes off stage
-  Stage::GetCurrent().Remove(actor);
-  application.Render(16);
-  application.SendNotification();
-  application.Render(16);
-  application.SendNotification();
-  DALI_TEST_CHECK ( application.GetGlAbstraction().CheckTextureDeleted(23) );
-  END_TEST;
-}
-
-// 1.15
 int UtcDaliImageDownCast(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::Image::DownCast()");
 
-  Image image = Image::New(gTestImageFilename);
+  Image image = ResourceImage::New(gTestImageFilename);
 
   BaseHandle object(image);
 
@@ -719,7 +371,7 @@ int UtcDaliImageDownCast(void)
   END_TEST;
 }
 
-// 1.16
+// 1.9
 int UtcDaliImageGetImageSize(void)
 {
   TestApplication application;
@@ -730,39 +382,39 @@ int UtcDaliImageGetImageSize(void)
   Vector2 testSize(8.0f, 16.0f);
   platform.SetClosestImageSize(testSize);
 
-  Vector2 size = Image::GetImageSize(gTestImageFilename);
+  Vector2 size = ResourceImage::GetImageSize(gTestImageFilename);
 
   DALI_TEST_CHECK( application.GetPlatform().GetTrace().FindMethod("GetClosestImageSize"));
   DALI_TEST_EQUALS( size, testSize, TEST_LOCATION);
   END_TEST;
 }
 
-// 1.17
-int UtcDaliImageGetFilename(void)
+// 1.10
+int UtcDaliImageGetUrl(void)
 {
   TestApplication application;
 
   tet_infoline("UtcDaliImageGetFilename");
 
   // invoke default handle constructor
-  Image image;
+  ResourceImage image;
 
   DALI_TEST_CHECK( !image );
 
   // initialise handle
-  image = Image::New(gTestImageFilename);
+  image = ResourceImage::New(gTestImageFilename);
 
-  DALI_TEST_EQUALS( image.GetFilename(), gTestImageFilename, TEST_LOCATION);
+  DALI_TEST_EQUALS( image.GetUrl(), gTestImageFilename, TEST_LOCATION);
   END_TEST;
 }
 
-// 1.18
+// 1.11
 int UtcDaliImageGetLoadingState01(void)
 {
   TestApplication application;
   tet_infoline("UtcDaliImageGetLoadingState01");
 
-  Image image = Image::New(gTestImageFilename);
+  ResourceImage image = ResourceImage::New(gTestImageFilename);
   DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoading);
   application.SendNotification();
   application.Render(16);
@@ -785,7 +437,7 @@ int UtcDaliImageGetLoadingState01(void)
   END_TEST;
 }
 
-// 1.19
+// 1.12
 int UtcDaliImageGetLoadingState02(void)
 {
   TestApplication application;
@@ -793,12 +445,12 @@ int UtcDaliImageGetLoadingState02(void)
   tet_infoline("UtcDaliImageGetLoadingState02");
 
   // invoke default handle constructor
-  Image image;
+  ResourceImage image;
 
   DALI_TEST_CHECK( !image );
 
   // initialise handle
-  image = Image::New(gTestImageFilename);
+  image = ResourceImage::New(gTestImageFilename);
 
   // Test state == ResourceLoading
   DALI_TEST_CHECK(image.GetLoadingState() == ResourceLoading);
@@ -819,40 +471,40 @@ int UtcDaliImageGetLoadingState02(void)
   END_TEST;
 }
 
-// 1.20
+// 1.13
 int UtcDaliImageGetReleasePolicy(void)
 {
   TestApplication application;
 
   tet_infoline("UtcDaliImageGetReleasePolicy");
 
-  Image image = Image::New(gTestImageFilename, Image::Immediate, Image::Unused);
+  Image image = ResourceImage::New(gTestImageFilename, ResourceImage::IMMEDIATE, Image::UNUSED);
 
   DALI_TEST_CHECK( image );
 
-  DALI_TEST_CHECK( Image::Unused == image.GetReleasePolicy() );
+  DALI_TEST_CHECK( Image::UNUSED == image.GetReleasePolicy() );
 
   END_TEST;
 }
 
-// 1.21
+// 1.14
 int UtcDaliImageGetLoadPolicy(void)
 {
   TestApplication application;
 
   tet_infoline("UtcDaliImageGetLoadPolicy");
 
-  Image image = Image::New(gTestImageFilename, Image::OnDemand, Image::Never);
+  ResourceImage image = ResourceImage::New(gTestImageFilename, ResourceImage::ON_DEMAND, Image::NEVER);
 
   DALI_TEST_CHECK( image );
 
-  DALI_TEST_CHECK( Image::OnDemand == image.GetLoadPolicy());
+  DALI_TEST_CHECK( ResourceImage::ON_DEMAND == image.GetLoadPolicy());
   END_TEST;
 }
 
 static bool SignalLoadFlag = false;
 
-static void SignalLoadHandler(Image image)
+static void SignalLoadHandler(ResourceImage image)
 {
   tet_infoline("Received image load finished signal");
 
@@ -868,7 +520,7 @@ static void SignalUploadedHandler(Image image)
   SignalUploadedFlag = true;
 }
 
-// 1.22
+// 1.15
 int UtcDaliImageSignalLoadingFinished(void)
 {
   TestApplication application;
@@ -877,7 +529,7 @@ int UtcDaliImageSignalLoadingFinished(void)
 
   SignalLoadFlag = false;
 
-  Image image = Image::New(gTestImageFilename);
+  ResourceImage image = ResourceImage::New(gTestImageFilename);
 
   image.LoadingFinishedSignal().Connect( SignalLoadHandler );
   application.SendNotification();
@@ -896,7 +548,7 @@ int UtcDaliImageSignalLoadingFinished(void)
   END_TEST;
 }
 
-// 1.23
+// 1.16
 int UtcDaliImageSignalUploaded(void)
 {
   TestApplication application;
@@ -906,7 +558,7 @@ int UtcDaliImageSignalUploaded(void)
   Vector2 testSize(80.0f, 80.0f);
   application.GetPlatform().SetClosestImageSize(testSize);
 
-  Image image = Image::New(gTestImageFilename);
+  ResourceImage image = ResourceImage::New(gTestImageFilename);
   image.LoadingFinishedSignal().Connect( SignalLoadHandler );
 
   // Load image
@@ -966,15 +618,14 @@ int UtcDaliImageSignalUploaded(void)
   END_TEST;
 }
 
-
-// 1.24
+// 1.17
 int UtcDaliImageDiscard01(void)
 {
   TestApplication application;
   tet_infoline("UtcDaliImageDiscard01 - no actors");
 
   {
-    Image image = Image::New(gTestImageFilename);
+    Image image = ResourceImage::New(gTestImageFilename);
 
     // Load image
     application.SendNotification();
@@ -1006,7 +657,7 @@ int UtcDaliImageDiscard01(void)
   END_TEST;
 }
 
-// 1.25
+// 1.18
 int UtcDaliImageDiscard02(void)
 {
   TestApplication application;
@@ -1020,7 +671,7 @@ int UtcDaliImageDiscard02(void)
         ImageAttributes attrs;
         const Vector2 requestedSize( 40, 30 );
         attrs.SetSize( requestedSize.width, requestedSize.height );
-        Image image = Image::New(gTestImageFilename, attrs);
+        Image image = ResourceImage::New(gTestImageFilename, attrs);
         actor = ImageActor::New(image);
         Stage::GetCurrent().Add(actor);
 
@@ -1065,7 +716,7 @@ int UtcDaliImageDiscard02(void)
   END_TEST;
 }
 
-// 1.26
+// 1.19
 int UtcDaliImageDiscard03(void)
 {
   TestApplication application;
@@ -1074,7 +725,7 @@ int UtcDaliImageDiscard03(void)
   const Vector2 closestImageSize( 1, 1);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
-  Image image = Image::New(gTestImageFilename);
+  Image image = ResourceImage::New(gTestImageFilename);
   ImageActor actor = ImageActor::New(image);
   Stage::GetCurrent().Add(actor);
 
@@ -1145,7 +796,7 @@ int UtcDaliImageContextLoss(void)
 
   tet_infoline("UtcDaliImageContextLoss - Load image with LoadPolicy::Immediate, ReleasePolicy::Never, bitmap discard. Check that the image is re-requested on context regain\n");
 
-  Image image = Image::New("image.png", Image::Immediate, Image::Never);
+  Image image = ResourceImage::New("image.png", ResourceImage::IMMEDIATE, Image::NEVER);
 
   DALI_TEST_CHECK( image );
 

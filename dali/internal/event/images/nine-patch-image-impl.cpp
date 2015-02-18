@@ -135,15 +135,15 @@ namespace
 TypeRegistration mType( typeid( Dali::NinePatchImage ), typeid( Dali::Image ), NULL );
 } // unnamed namespace
 
-NinePatchImagePtr NinePatchImage::New( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
+NinePatchImagePtr NinePatchImage::New( const std::string& filename, const Dali::ImageAttributes& attributes, ReleasePolicy releasePol )
 {
-  Internal::NinePatchImagePtr internal( new NinePatchImage( filename, attributes, loadPol, releasePol ) );
+  Internal::NinePatchImagePtr internal( new NinePatchImage( filename, attributes, releasePol ) );
   internal->Initialize();
   return internal;
 }
 
-NinePatchImage::NinePatchImage( const std::string& filename, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol)
-: Image(Dali::Image::Immediate, Dali::Image::Never),
+NinePatchImage::NinePatchImage( const std::string& filename, const Dali::ImageAttributes& attributes, ReleasePolicy releasePol)
+: ResourceImage( IMAGE_LOAD_POLICY_DEFAULT, releasePol ),
   mParsedBorder(false)
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
@@ -211,7 +211,7 @@ Internal::BitmapImagePtr NinePatchImage::CreateCroppedBitmapImage()
   {
     Pixel::Format pixelFormat = mBitmap->GetPixelFormat();
 
-    cropped = BitmapImage::New( mWidth-2, mHeight-2, pixelFormat, Dali::Image::Immediate, Dali::Image::Never );
+    cropped = BitmapImage::New( mWidth-2, mHeight-2, pixelFormat, Dali::Image::NEVER );
 
     Integration::Bitmap::PackedPixelsProfile* srcProfile = mBitmap->GetPackedPixelsProfile();
     DALI_ASSERT_DEBUG( srcProfile && "Wrong profile for source bitmap");

@@ -32,7 +32,7 @@ NinePatchImage::NinePatchImage()
 }
 
 NinePatchImage::NinePatchImage(Internal::NinePatchImage* internal)
-: Image(internal)
+: ResourceImage(internal)
 {
 }
 
@@ -41,7 +41,7 @@ NinePatchImage::~NinePatchImage()
 }
 
 NinePatchImage::NinePatchImage(const NinePatchImage& handle)
-: Image(handle)
+: ResourceImage(handle)
 {
 }
 
@@ -55,7 +55,7 @@ NinePatchImage NinePatchImage::New( const std::string& filename )
 {
   ImageAttributes defaultAttrs;
 
-  Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename, defaultAttrs, Image::Immediate, Image::Never );
+  Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename, defaultAttrs, Image::NEVER );
   return NinePatchImage(internal.Get());
 }
 

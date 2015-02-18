@@ -19,24 +19,13 @@
 #include <dali/public-api/images/image.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/image-attributes.h>
-#include <dali/public-api/math/vector2.h>
 #include <dali/internal/event/images/image-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/integration-api/platform-abstraction.h>
+
 
 namespace Dali
 {
 
-const char* const Image::SIGNAL_IMAGE_LOADING_FINISHED = "image-loading-finished";
 const char* const Image::SIGNAL_IMAGE_UPLOADED = "uploaded";
-
-Vector2 Image::GetImageSize(const std::string fileName)
-{
-  Vector2 size;
-  Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize(fileName, ImageAttributes::DEFAULT_ATTRIBUTES, size);
-  return size;
-}
 
 Image::Image()
 {
@@ -61,63 +50,6 @@ Image& Image::operator=(const Image& rhs)
   return *this;
 }
 
-Image Image::New(const std::string& filename)
-{
-  Internal::ImagePtr internal = Internal::Image::New( filename,
-                                                      Dali::ImageAttributes::DEFAULT_ATTRIBUTES );
-  return Image(internal.Get());
-}
-
-Image Image::New(const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol)
-{
-  Internal::ImagePtr internal = Internal::Image::New( filename,
-                                                      Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
-                                                      loadPol, releasePol );
-  return Image(internal.Get());
-}
-
-Image Image::New(const std::string& filename, const ImageAttributes& attributes)
-{
-  Internal::ImagePtr internal = Internal::Image::New(filename, attributes);
-  return Image(internal.Get());
-}
-
-Image Image::New(const std::string& filename, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol)
-{
-  Internal::ImagePtr internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
-  return Image(internal.Get());
-}
-
-Image Image::NewDistanceField(const std::string& filename)
-{
-  ImageAttributes attributes = ImageAttributes::NewDistanceField();
-  Internal::ImagePtr internal = Internal::Image::New(filename, attributes);
-  return Image(internal.Get());
-}
-
-Image Image::NewDistanceField(const std::string& filename, LoadPolicy loadPol, ReleasePolicy releasePol)
-{
-  ImageAttributes attributes = ImageAttributes::NewDistanceField();
-  Internal::ImagePtr internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
-  return Image(internal.Get());
-}
-
-Image Image::NewDistanceField(const std::string& filename, const ImageAttributes& attributes)
-{
-  DALI_ASSERT_DEBUG(attributes.IsDistanceField());
-
-  Internal::ImagePtr internal = Internal::Image::New(filename, attributes);
-  return Image(internal.Get());
-}
-
-Image Image::NewDistanceField(const std::string& filename, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol)
-{
-  DALI_ASSERT_DEBUG(attributes.IsDistanceField());
-
-  Internal::ImagePtr internal = Internal::Image::New(filename, attributes, loadPol, releasePol);
-  return Image(internal.Get());
-}
-
 Image Image::New(NativeImage& nativeImg)
 {
   Internal::ImagePtr internal = Internal::Image::New(nativeImg);
@@ -127,26 +59,6 @@ Image Image::New(NativeImage& nativeImg)
 Image Image::DownCast( BaseHandle handle )
 {
   return Image( dynamic_cast<Dali::Internal::Image*>(handle.GetObjectPtr()) );
-}
-
-LoadingState Image::GetLoadingState() const
-{
-  return GetImplementation(*this).GetLoadingState();
-}
-
-ImageAttributes Image::GetAttributes() const
-{
-  return GetImplementation(*this).GetAttributes();
-}
-
-std::string Image::GetFilename() const
-{
-  return GetImplementation(*this).GetFilename();
-}
-
-Image::LoadPolicy Image::GetLoadPolicy() const
-{
-  return GetImplementation(*this).GetLoadPolicy();
 }
 
 Image::ReleasePolicy Image::GetReleasePolicy() const
@@ -162,16 +74,6 @@ unsigned int Image::GetWidth() const
 unsigned int Image::GetHeight() const
 {
   return GetImplementation(*this).GetHeight();
-}
-
-void Image::Reload()
-{
-  GetImplementation(*this).Reload();
-}
-
-Image::ImageSignalType& Image::LoadingFinishedSignal()
-{
-  return GetImplementation(*this).LoadingFinishedSignal();
 }
 
 Image::ImageSignalType& Image::UploadedSignal()

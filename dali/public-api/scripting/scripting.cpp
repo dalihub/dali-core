@@ -20,10 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
-#include <dali/public-api/images/image.h>
+#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/image-attributes.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/images/image-impl.h>
+#include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/images/bitmap-image-impl.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
@@ -97,17 +97,17 @@ const StringEnum< Vector3 > ANCHOR_CONSTANT_TABLE[] =
 };
 const unsigned int ANCHOR_CONSTANT_TABLE_COUNT = sizeof( ANCHOR_CONSTANT_TABLE ) / sizeof( ANCHOR_CONSTANT_TABLE[0] );
 
-const StringEnum< Image::LoadPolicy > IMAGE_LOAD_POLICY_TABLE[] =
+const StringEnum< ResourceImage::LoadPolicy > IMAGE_LOAD_POLICY_TABLE[] =
 {
-  { "IMMEDIATE", Image::Immediate },
-  { "ON_DEMAND", Image::OnDemand  },
+  { "IMMEDIATE", ResourceImage::IMMEDIATE },
+  { "ON_DEMAND", ResourceImage::ON_DEMAND },
 };
 const unsigned int IMAGE_LOAD_POLICY_TABLE_COUNT = sizeof( IMAGE_LOAD_POLICY_TABLE ) / sizeof( IMAGE_LOAD_POLICY_TABLE[0] );
 
 const StringEnum< Image::ReleasePolicy > IMAGE_RELEASE_POLICY_TABLE[] =
 {
-  { "UNUSED", Image::Unused },
-  { "NEVER",  Image::Never  },
+  { "UNUSED", Image::UNUSED },
+  { "NEVER",  Image::NEVER  },
 };
 const unsigned int IMAGE_RELEASE_POLICY_TABLE_COUNT = sizeof( IMAGE_RELEASE_POLICY_TABLE ) / sizeof( IMAGE_RELEASE_POLICY_TABLE[0] );
 
@@ -252,8 +252,8 @@ Image NewImage( const Property::Value& map )
   Image ret;
 
   std::string filename;
-  Image::LoadPolicy loadPolicy       = Dali::Internal::ImageLoadPolicyDefault;
-  Image::ReleasePolicy releasePolicy = Dali::Internal::ImageReleasePolicyDefault;
+  ResourceImage::LoadPolicy loadPolicy    = Dali::Internal::IMAGE_LOAD_POLICY_DEFAULT;
+  Image::ReleasePolicy releasePolicy = Dali::Internal::IMAGE_RELEASE_POLICY_DEFAULT;
   ImageAttributes attributes         = ImageAttributes::New();
 
   if( Property::MAP == map.GetType() )
@@ -270,7 +270,7 @@ Image NewImage( const Property::Value& map )
     {
       DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image load-policy property is not a string" );
       std::string v(map.GetValue(field).Get<std::string>());
-      loadPolicy = GetEnumeration< Image::LoadPolicy >( v, IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
+      loadPolicy = GetEnumeration< ResourceImage::LoadPolicy >( v, IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
     }
 
     field = "release-policy";
@@ -342,12 +342,11 @@ Image NewImage( const Property::Value& map )
         ret = Image( new Internal::BitmapImage(attributes.GetWidth(),
                                                attributes.GetHeight(),
                                                attributes.GetPixelFormat(),
-                                               loadPolicy,
                                                releasePolicy) );
       }
       else if("Image" == s)
       {
-        ret = Image::New(filename, attributes, loadPolicy, releasePolicy);
+        ret = ResourceImage::New(filename, attributes, loadPolicy, releasePolicy);
       }
       else
       {
@@ -356,7 +355,7 @@ Image NewImage( const Property::Value& map )
     }
     else
     {
-      ret = Image::New(filename, attributes, loadPolicy, releasePolicy);
+      ret = ResourceImage::New(filename, attributes, loadPolicy, releasePolicy);
     }
   }
 
@@ -548,7 +547,7 @@ void CreatePropertyMap( Image image, Property::Map& map )
 
   if ( image )
   {
-    std::string imageType( "Image" );
+    std::string imageType( "ResourceImage" );
 
     // Get Type - cannot use TypeRegistry as Image is not a ProxyObject and thus, not registered
     if ( BitmapImage::DownCast( image ) )
@@ -561,13 +560,18 @@ void CreatePropertyMap( Image image, Property::Map& map )
     }
 
     map[ "type" ] = imageType;
-    map[ "filename" ] = image.GetFilename();
-    map[ "load-policy" ] = GetEnumerationName< Image::LoadPolicy >( image.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
     map[ "release-policy" ] = GetEnumerationName< Image::ReleasePolicy >( image.GetReleasePolicy(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
 
-    ImageAttributes attributes( image.GetAttributes() );
-    map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( attributes.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
-    map[ "scaling-mode" ] = GetEnumerationName< ImageAttributes::ScalingMode >( attributes.GetScalingMode(), IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT );
+    ResourceImage resourceImage = ResourceImage::DownCast( image );
+    if( resourceImage )
+    {
+      map[ "filename" ] = resourceImage.GetUrl();
+      map[ "load-policy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
+
+      ImageAttributes attributes( resourceImage.GetAttributes() );
+      map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( attributes.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
+      map[ "scaling-mode" ] = GetEnumerationName< ImageAttributes::ScalingMode >( attributes.GetScalingMode(), IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT );
+    }
 
     int width( image.GetWidth() );
     int height( image.GetHeight() );

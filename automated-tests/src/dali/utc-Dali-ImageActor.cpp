@@ -62,7 +62,7 @@ int UtcDaliImageActorNew01(void)
   TestApplication application;
   tet_infoline("Positive test for Dali::ImageActor::New()");
 
-  Image image = Image::New(TestImageFilename);
+  Image image = ResourceImage::New(TestImageFilename);
   ImageActor actor = ImageActor::New(image);
   Stage::GetCurrent().Add(actor);
 
@@ -82,7 +82,7 @@ int UtcDaliImageActorNew02(void)
   TestApplication application;
   tet_infoline("Negative test for Dali::ImageActor::New()");
 
-  Image image = Image::New("hopefully-this-image-file-does-not-exist");
+  Image image = ResourceImage::New("hopefully-this-image-file-does-not-exist");
   ImageActor actor = ImageActor::New(image);
 
   DALI_TEST_CHECK(actor);
@@ -94,7 +94,7 @@ int UtcDaliImageActorDownCast(void)
   TestApplication application;
   tet_infoline("Testing Dali::ImageActor::DownCast()");
 
-  Image image = Image::New("IncorrectImageName");
+  Image image = ResourceImage::New("IncorrectImageName");
   ImageActor actor1 = ImageActor::New(image);
   Actor anActor = Actor::New();
   anActor.Add(actor1);
@@ -130,7 +130,7 @@ int UtcDaliImageActor9Patch(void)
   TestApplication application;
   tet_infoline("Positive test for Dali::ImageActor:: 9 patch api");
 
-  Image image = Image::New(TestImageFilename);
+  Image image = ResourceImage::New(TestImageFilename);
   ImageActor actor = ImageActor::New(image);
 
   actor.SetStyle(ImageActor::STYLE_NINE_PATCH);
@@ -254,7 +254,7 @@ int UtcDaliImageActorGetCurrentSize02(void)
 
   application.GetPlatform().SetClosestImageSize(initialImageSize);
 
-  Image image = Image::New("image.jpg");
+  Image image = ResourceImage::New("image.jpg");
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
 
@@ -306,7 +306,7 @@ int UtcDaliImageActorGetCurrentSize03(void)
   ImageAttributes attrs;
   const Vector2 requestedSize( 40, 30 );
   attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = Image::New("image.jpg", attrs);
+  Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
 
@@ -359,7 +359,7 @@ int UtcDaliImageActorGetCurrentSize04(void)
   const Vector2 requestedSize( 40, 30 );
   ImageAttributes attrs;
   attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = Image::New("image.jpg", attrs);
+  Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
 
@@ -397,7 +397,7 @@ int UtcDaliImageActorGetCurrentSize04(void)
 
   const Vector2 request2Size( 100, 100 );
   attrs.SetSize( request2Size.width, request2Size.height );
-  Image image2 = Image::New("image2.jpg", attrs);
+  Image image2 = ResourceImage::New("image2.jpg", attrs);
   actor.SetImage(image2);
 
   application.SendNotification(); // Flush update messages
@@ -443,7 +443,7 @@ int UtcDaliImageActorGetCurrentSize05(void)
   ImageAttributes attrs;
   const Vector2 requestedSize( 40, 30 );
   attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = Image::New("image.jpg", attrs);
+  Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
 
@@ -473,7 +473,7 @@ int UtcDaliImageActorGetCurrentSize05(void)
 
   const Vector2 requestedSize2( 100, 100 );
   attrs.SetSize( requestedSize2.width, requestedSize2.height );
-  Image image2 = Image::New("image2.jpg", attrs);
+  Image image2 = ResourceImage::New("image2.jpg", attrs);
   actor.SetImage(image2);
 
   application.SendNotification(); // Flush update messages
@@ -522,7 +522,7 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   ImageAttributes attrs;
   const Vector2 requestedSize( 40, 30 );
   attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = Image::New("image.jpg", attrs);
+  Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
 
@@ -585,7 +585,7 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   ImageAttributes attrs;
   const Vector2 requestedSize( 40, 30 );
   attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = Image::New("image.jpg", attrs);
+  Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
 
@@ -835,7 +835,7 @@ int UtcDaliImageGetStyle(void)
 {
   TestApplication application;
 
-  Image image = Image::New(TestImageFilename);
+  Image image = ResourceImage::New(TestImageFilename);
   ImageActor actor = ImageActor::New(image);
 
   actor.SetStyle(ImageActor::STYLE_NINE_PATCH);
@@ -852,7 +852,7 @@ int UtcDaliImageSetNinePatchBorder(void)
 {
   TestApplication application;
 
-  Image image = Image::New(TestImageFilename);
+  Image image = ResourceImage::New(TestImageFilename);
   ImageActor actor = ImageActor::New(image);
 
   actor.SetStyle(ImageActor::STYLE_NINE_PATCH);
@@ -917,7 +917,7 @@ int UtcDaliImageActorPropertyIndices(void)
 int UtcDaliImageActorImageProperty(void)
 {
   TestApplication application;
-  Image image = Image::New( "MY_PATH" );
+  Image image = ResourceImage::New( "MY_PATH" );
   ImageActor imageActor = ImageActor::New( image );
 
   Stage::GetCurrent().Add( imageActor );
@@ -948,7 +948,7 @@ int UtcDaliImageActorNinePatch01(void)
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
 
-  Image ninePatchImage = Image::New( "blah.#.png" );
+  Image ninePatchImage = ResourceImage::New( "blah.#.png" );
   DALI_TEST_CHECK( ninePatchImage );
 
   ImageActor imageActor = ImageActor::New( ninePatchImage );
@@ -994,7 +994,7 @@ int UtcDaliImageActorNinePatch02(void)
   Integration::ResourcePointer resourcePtr;
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
 
-  Image ninePatchImage = Image::New( "blah.#.png" );
+  Image ninePatchImage = ResourceImage::New( "blah.#.png" );
   DALI_TEST_CHECK( ninePatchImage );
 
   ImageActor imageActor = ImageActor::New( ninePatchImage );
@@ -1041,7 +1041,7 @@ int UtcDaliImageActorNinePatch03(void)
   Integration::ResourcePointer resourcePtr(bitmap); // reference it
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
 
-  Image ninePatchImage = Image::New( "blah.#.png" );
+  Image ninePatchImage = ResourceImage::New( "blah.#.png" );
   DALI_TEST_CHECK( ninePatchImage );
 
   ImageActor imageActor = ImageActor::New();
@@ -1089,7 +1089,7 @@ int UtcDaliImageActorNinePatch04(void)
   Integration::ResourcePointer resourcePtr;
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
 
-  Image ninePatchImage = Image::New( "blah.#.png" );
+  Image ninePatchImage = ResourceImage::New( "blah.#.png" );
   DALI_TEST_CHECK( ninePatchImage );
 
   ImageActor imageActor = ImageActor::New();

@@ -170,7 +170,7 @@ int UtcDaliHitTestAlgorithmWithFunctorOnRenderTask(void)
   RenderTask renderTask[2];
   renderTask[0] = taskList.GetTask( 0u );
 
-  FrameBufferImage frameBufferImage =  FrameBufferImage::New(stageSize.width, stageSize.height, Pixel::A8, Image::Never);
+  FrameBufferImage frameBufferImage =  FrameBufferImage::New(stageSize.width, stageSize.height, Pixel::A8, Image::NEVER);
   renderTask[1] = taskList.CreateTask();
   renderTask[1].SetSourceActor( actor[1] );
   renderTask[1].SetExclusive( true );
