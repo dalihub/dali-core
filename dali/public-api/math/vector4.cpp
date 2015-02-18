@@ -18,15 +18,16 @@
 // CLASS HEADER
 #include <dali/public-api/math/vector4.h>
 
-// EXTERNAL INCLUDES
-#include <math.h>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/internal/render/common/performance-monitor.h>
+
+// EXTERNAL INCLUDES
+#include <math.h>
+#include <iostream>
 
 namespace Dali
 {

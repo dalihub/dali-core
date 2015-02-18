@@ -28,6 +28,9 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/internal/common/buffer-index.h>
 
+/// External Includes
+#include <iostream>
+
 namespace Dali
 {
 
@@ -311,6 +314,7 @@ public:
    * Print the property value using a stream.
    * @param[in] debugStream The output stream.
    * @param[in] bufferIndex The buffer to read from.
+   * @todo Place this far-too-large-to-be-inlined function in a cpp and remove <iostream> header dependency from this file.
    */
   void DebugPrint( std::ostream& debugStream, BufferIndex bufferIndex ) const
   {

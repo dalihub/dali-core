@@ -18,12 +18,13 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <cstddef>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/math-utils.h>
+
+// EXTERNAL INCLUDES
+#include <cstddef>
+#include <algorithm>
 
 /**
  * @brief For DALi internal use asserts are enabled in debug builds.

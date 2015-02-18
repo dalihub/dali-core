@@ -36,7 +36,7 @@ public:
    */
   OwnerPointer()
   {
-    mObject = NULL;
+    mObject = 0;
   }
 
   /**
@@ -103,7 +103,7 @@ public:
    */
   T& operator*()
   {
-    DALI_ASSERT_DEBUG( mObject != NULL );
+    DALI_ASSERT_DEBUG( mObject != 0 );
 
     return *mObject;
   }
@@ -114,7 +114,7 @@ public:
    */
   T& operator*() const
   {
-    DALI_ASSERT_DEBUG( mObject != NULL );
+    DALI_ASSERT_DEBUG( mObject != 0 );
 
     // Pointer semantics: A const pointer does not mean const data.
     return const_cast< T& >( *mObject );
@@ -153,10 +153,10 @@ public:
    */
   void Reset()
   {
-    if ( mObject != NULL )
+    if ( mObject != 0 )
     {
       delete mObject;
-      mObject = NULL;
+      mObject = 0;
     }
   }
 
@@ -167,7 +167,7 @@ public:
   T* Release()
   {
     T* tmp = mObject;
-    mObject = NULL;
+    mObject = 0;
     return tmp;
   }
 
@@ -189,11 +189,11 @@ public:
 
   /**
    * Converts an object handle to a BooleanType.
-   * This is useful for checking whether the handle is NULL.
+   * This is useful for checking whether the handle is null.
    */
   operator BooleanType() const
   {
-    return (mObject != NULL) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : NULL;
+    return (mObject != 0) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : 0;
   }
 
 private:
@@ -213,7 +213,7 @@ private:
   void Init( OwnerPointer& ownerPointer )
   {
     mObject = ownerPointer.mObject;
-    ownerPointer.mObject = NULL;
+    ownerPointer.mObject = 0;
   }
 
   // data

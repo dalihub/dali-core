@@ -18,12 +18,11 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <algorithm>
-#include <iostream>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+
+// EXTERNAL INCLUDES
+#include <iosfwd>
 
 namespace Dali
 {
@@ -526,7 +525,9 @@ DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Vector3& vector
  */
 inline Vector3 Min( const Vector3& a, const Vector3& b )
 {
-  return Vector3( std::min(a.x,b.x), std::min(a.y,b.y), std::min(a.z,b.z) );
+  return Vector3( a.x < b.x ? a.x : b.x ,
+                  a.y < b.y ? a.y : b.y,
+                  a.z < b.z ? a.z : b.z );
 }
 
 /**
@@ -539,7 +540,9 @@ inline Vector3 Min( const Vector3& a, const Vector3& b )
  */
 inline Vector3 Max( const Vector3& a, const Vector3& b )
 {
-  return Vector3( std::max(a.x,b.x), std::max(a.y,b.y), std::max(a.z,b.z) );
+  return Vector3( a.x > b.x ? a.x : b.x,
+                  a.y > b.y ? a.y : b.y,
+                  a.z > b.z ? a.z : b.z );
 }
 
 /**

@@ -71,21 +71,21 @@ public:
 
   /**
    * Retrieve the parent node of a NodeAttachment.
-   * @return The parent node, or NULL if the NodeAttachment has not been added to the scene-graph.
+   * @return The parent node, or null if the NodeAttachment has not been added to the scene-graph.
    */
   Node& GetParent()
   {
-    DALI_ASSERT_DEBUG( mParent != NULL );
+    DALI_ASSERT_DEBUG( mParent != 0 );
     return *mParent;
   }
 
   /**
    * Retrieve the parent node of a NodeAttachment.
-   * @return The parent node, or NULL if the NodeAttachment has not been added to the scene-graph.
+   * @return The parent node, or null if the NodeAttachment has not been added to the scene-graph.
    */
   Node& GetParent() const
   {
-    DALI_ASSERT_DEBUG( mParent != NULL );
+    DALI_ASSERT_DEBUG( mParent != 0 );
     return *mParent;
   }
 
@@ -97,12 +97,12 @@ public:
    */
   bool IsRenderable()
   {
-    return (GetRenderable() != NULL);
+    return (GetRenderable() != 0);
   }
 
   /**
    * Convert an attachment to a renderable attachment.
-   * @return A pointer to the renderable attachment, or NULL.
+   * @return A pointer to the renderable attachment, or null.
    */
   virtual RenderableAttachment* GetRenderable() = 0;
 

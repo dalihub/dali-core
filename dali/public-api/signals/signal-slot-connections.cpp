@@ -45,7 +45,7 @@ SlotObserver* SlotConnection::GetSlotObserver()
 }
 
 SignalConnection::SignalConnection( CallbackBase* callback )
-: mSignalObserver( NULL ),
+: mSignalObserver( 0 ),
   mCallback( callback )
 {
 }
@@ -68,12 +68,12 @@ void SignalConnection::Disconnect( SlotObserver* slotObserver )
   {
     // tell the slot the signal wants to disconnect
     mSignalObserver->SignalDisconnected( slotObserver, mCallback );
-    mSignalObserver = NULL;
+    mSignalObserver = 0;
   }
 
   // we own the callback, SignalObserver is expected to delete the SlotConnection on Disconnected so its pointer to our mCallback is no longer used
   delete mCallback;
-  mCallback = NULL;
+  mCallback = 0;
 }
 
 CallbackBase* SignalConnection::GetCallback()

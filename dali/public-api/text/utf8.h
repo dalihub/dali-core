@@ -29,7 +29,7 @@ namespace Dali
  * @param[in] leadByte The lead byte of a UTF-8 character sequence
  * @return The length of the sequence, or zero if the UTF-8 character is invalid.
  */
-DALI_IMPORT_API size_t Utf8SequenceLength(const unsigned char leadByte);
+DALI_IMPORT_API unsigned int Utf8SequenceLength(const unsigned char leadByte);
 
 } // namespace Dali
 

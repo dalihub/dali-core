@@ -147,7 +147,7 @@ void MessageQueue::EventProcessingStarted()
   mImpl->processingEvents = true;
 }
 
-unsigned int* MessageQueue::ReserveMessageSlot( std::size_t requestedSize, bool updateScene )
+unsigned int* MessageQueue::ReserveMessageSlot( unsigned int requestedSize, bool updateScene )
 {
   DALI_ASSERT_DEBUG( 0 != requestedSize );
 

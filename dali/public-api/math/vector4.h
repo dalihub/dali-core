@@ -18,13 +18,11 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <algorithm>
-#include <iostream>
-#include <math.h>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+
+// EXTERNAL INCLUDES
+#include <iosfwd>
 
 namespace Dali
 {
@@ -47,7 +45,6 @@ struct DALI_IMPORT_API Vector4
 
   /**
    * @brief Default constructor, initializes the vector to 0.
-   *
    */
   Vector4()
   : x(0.0f),
@@ -531,7 +528,10 @@ DALI_IMPORT_API std::ostream& operator<<(std::ostream& o, const Vector4& vector)
  */
 inline Vector4 Min( const Vector4& a, const Vector4& b )
 {
-  return Vector4( std::min(a.x,b.x), std::min(a.y,b.y), std::min(a.z,b.z), std::min(a.w,b.w) );
+  return Vector4( a.x < b.x ? a.x : b.x,
+                  a.y < b.y ? a.y : b.y,
+                  a.z < b.z ? a.z : b.z,
+                  a.w < b.w ? a.w : b.w );
 }
 
 /**
@@ -544,7 +544,10 @@ inline Vector4 Min( const Vector4& a, const Vector4& b )
  */
 inline Vector4 Max( const Vector4& a, const Vector4& b )
 {
-  return Vector4( std::max(a.x,b.x), std::max(a.y,b.y), std::max(a.z,b.z), std::max(a.w,b.w) );
+  return Vector4( a.x > b.x ? a.x : b.x,
+                  a.y > b.y ? a.y : b.y,
+                  a.z > b.z ? a.z : b.z,
+                  a.w > b.w ? a.w : b.w );
 }
 
 /**

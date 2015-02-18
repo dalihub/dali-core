@@ -18,11 +18,6 @@
 // CLASS HEADER
 #include <dali/internal/event/modeling/model-logger.h>
 
-// EXTERNAL INCLUDES
-#include <iostream>
-#include <sstream>
-#include <iomanip>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/modeling/bone.h>
 #include <dali/public-api/modeling/entity.h>
@@ -36,6 +31,11 @@
 #include <dali/internal/event/modeling/mesh-impl.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
 #include <dali/internal/event/modeling/model-impl.h>
+
+// EXTERNAL INCLUDES
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 
 using std::cout;
 using std::endl;

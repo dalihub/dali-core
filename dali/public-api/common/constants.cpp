@@ -22,6 +22,9 @@
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/math/degree.h>
 
+// EXTERNAL INCLUDES
+#include <string>
+
 namespace Dali
 {
 

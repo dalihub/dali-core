@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <iostream>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/math/vector4.h>
 
