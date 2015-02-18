@@ -97,7 +97,7 @@ ImageActorPtr ImageActor::New()
   actor->Initialize();
 
   // Create the attachment
-  actor->mImageAttachment = ImageAttachment::New( *actor->mNode );
+  actor->mImageAttachment = ImageAttachment::New( *actor->mStage, *actor->mNode );
   actor->Attach( *actor->mImageAttachment );
 
   return actor;

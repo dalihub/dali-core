@@ -24,6 +24,12 @@
 namespace Dali
 {
 
+PanGesture::PanGesture()
+: Gesture(Gesture::Pan, Gesture::Clear),
+  numberOfTouches(1)
+{
+}
+
 PanGesture::PanGesture(Gesture::State state)
 : Gesture(Gesture::Pan, state),
   numberOfTouches(1)

@@ -39,7 +39,6 @@ class Node;
 
 /**
  * An attachment for rendering images in various ways.
- * The default geometry scaling mode is ScaleToFill.
  */
 class ImageAttachment : public RenderableAttachment
 {
@@ -50,10 +49,11 @@ public:
 
   /**
    * Create a new ImageAttachment.
+   * @param[in] stage The stage to use for messaging
    * @param[in] parentNode The node to attach a scene-object to.
    * @return A smart-pointer to the newly allocated ImageAttachment.
    */
-  static ImageAttachmentPtr New( const SceneGraph::Node& parentNode );
+  static ImageAttachmentPtr New( Stage& stage, const SceneGraph::Node& parentNode );
 
   /**
    * Sets image rendered by the attachment.
@@ -135,7 +135,6 @@ private:
   /**
    * First stage construction of a ImageAttachment.
    * @param[in] stage Used to send messages to scene-graph.
-   * @param[in] image A pointer to the image to display or NULL to not render anything.
    */
   ImageAttachment(Stage& stage);
 
