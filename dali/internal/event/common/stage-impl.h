@@ -98,6 +98,7 @@ public:
 
   /**
    * @copydoc Dali::Stage::GetCurrent()
+   * @note this version is for internal usage so it does not assert
    */
   static StagePtr GetCurrent();
 
@@ -110,6 +111,16 @@ public:
    * @copydoc Dali::Stage::GetObjectRegistry()
    */
   ObjectRegistry& GetObjectRegistry();
+
+  /**
+   * @copydoc Dali::Internal::ObjectRegistry::RegisterObject
+   */
+  void RegisterObject( Dali::BaseObject* object );
+
+  /**
+   * @copydoc Dali::Internal::ObjectRegistry::UnregisterObject
+   */
+  void UnregisterObject( Dali::BaseObject* object );
 
   /**
    * Retrieve the root actor (not publically accessible).

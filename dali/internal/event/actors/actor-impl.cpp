@@ -2086,6 +2086,7 @@ Actor::Actor( DerivedType derivedType )
 void Actor::Initialize()
 {
   mStage = Stage::GetCurrent();
+  DALI_ASSERT_ALWAYS( mStage && "Stage doesn't exist" );
 
   // Node creation
   SceneGraph::Node* node = CreateNode();
@@ -2095,7 +2096,7 @@ void Actor::Initialize()
 
   OnInitialize();
 
-  RegisterObject();
+  mStage->RegisterObject( this );
 }
 
 Actor::~Actor()
@@ -2122,7 +2123,7 @@ Actor::~Actor()
       mNode = NULL; // Node is about to be destroyed
     }
 
-    UnregisterObject();
+    mStage->UnregisterObject( this );
   }
 
 #ifdef DYNAMICS_SUPPORT
