@@ -18,18 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/update/queue/update-message-queue.h>
 
-// EXTERNAL INCLUDES
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
-#include <boost/thread/mutex.hpp>
-#pragma clang diagnostic pop
-#else
-#include <boost/thread/mutex.hpp>
-#endif // ifdef __clang
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/mutex.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/internal/common/message-buffer.h>
 #include <dali/internal/render/common/performance-monitor.h>
@@ -58,7 +49,7 @@ static const std::size_t MAX_FREE_BUFFER_COUNT = 3; // Allow this number of buff
 typedef vector< MessageBuffer* > MessageBufferQueue;
 typedef MessageBufferQueue::iterator MessageBufferIter;
 
-typedef boost::mutex MessageQueueMutex;
+typedef Dali::Mutex MessageQueueMutex;
 
 } // unnamed namespace
 
@@ -215,7 +206,7 @@ bool MessageQueue::FlushQueue()
   if ( messagesToProcess )
   {
     // queueMutex must be locked whilst accessing processQueue or recycleQueue
-    MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
+    MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
 
     mImpl->processQueue.push_back( mImpl->currentMessageBuffer );
     mImpl->currentMessageBuffer = NULL;
@@ -255,7 +246,7 @@ void MessageQueue::ProcessMessages()
   PERF_MONITOR_START(PerformanceMonitor::PROCESS_MESSAGES);
 
   // queueMutex must be locked whilst accessing queue
-  MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
+  MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
 
   const MessageBufferIter processQueueEndIter = mImpl->processQueue.end();
   for ( MessageBufferIter iter = mImpl->processQueue.begin(); iter != processQueueEndIter ; ++iter )

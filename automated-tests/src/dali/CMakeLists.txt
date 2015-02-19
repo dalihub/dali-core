@@ -56,6 +56,7 @@ SET(TC_SOURCES
         utc-Dali-MeshData.cpp
         utc-Dali-Model.cpp
         utc-Dali-MouseWheelEvent.cpp
+        utc-Dali-Mutex.cpp
         utc-Dali-NinePatchImages.cpp
         utc-Dali-ObjectRegistry.cpp
         utc-Dali-PanGesture.cpp
@@ -127,6 +128,7 @@ INCLUDE_DIRECTORIES(
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
+    -lpthread
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

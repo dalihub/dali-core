@@ -72,8 +72,7 @@ libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            $(DALI_CFLAGS)
 
 libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
-                         -lboost_thread \
-                         -lboost_system
+                         -lpthread
 
 # Create an empty shaderbin dir
 install-data-local:
