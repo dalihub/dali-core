@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/geometry/animatable-mesh.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/modeling/modeling-declarations.h>
 
 namespace Dali
@@ -38,7 +38,7 @@ class AnimatableMesh;
 }
 
 
-class AnimatableMesh : public ProxyObject
+class AnimatableMesh : public Object
 {
 public:
   /**
@@ -148,74 +148,74 @@ public:
   // Intended for internal use only.
   MeshIPtr GetMesh();
 
-public: // Implementation of ProxyObject
+public: // Implementation of Object
   /**
-   * @copydoc Dali::Internal::ProxyObject::Supports()
+   * @copydoc Dali::Internal::Object::Supports()
    */
   virtual bool Supports( Capability capability ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyCount()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
    */
   virtual unsigned int GetDefaultPropertyCount() const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndices()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
    */
   virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
    */
   virtual const char* GetDefaultPropertyName(Property::Index index) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
    */
   virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyWritable()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
    */
   virtual bool IsDefaultPropertyWritable(Property::Index index) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAnimatable()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
    */
   virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAConstraintInput()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
    */
   virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyType()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
    */
   virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::SetDefaultProperty()
+   * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
   virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultProperty()
+   * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
+   * @copydoc Dali::Internal::Object::GetSceneObject()
    */
   virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectAnimatableProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
   virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectInputProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 

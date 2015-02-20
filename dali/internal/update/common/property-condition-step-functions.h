@@ -28,7 +28,7 @@ namespace Dali
 namespace Internal
 {
 
-class ProxyObject;
+class Object;
 class PropertyNotification;
 
 namespace SceneGraph

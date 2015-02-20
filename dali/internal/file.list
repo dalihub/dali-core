@@ -35,12 +35,12 @@ internal_src_files = \
   $(internal_src_dir)/event/animation/path-impl.cpp \
   $(internal_src_dir)/event/common/demangler.cpp \
   $(internal_src_dir)/event/common/notification-manager.cpp \
+  $(internal_src_dir)/event/common/object-impl.cpp \
   $(internal_src_dir)/event/common/object-registry-impl.cpp \
   $(internal_src_dir)/event/common/projection.cpp \
   $(internal_src_dir)/event/common/property-notification-manager.cpp \
   $(internal_src_dir)/event/common/property-conditions-impl.cpp  \
   $(internal_src_dir)/event/common/property-notification-impl.cpp  \
-  $(internal_src_dir)/event/common/proxy-object.cpp \
   $(internal_src_dir)/event/common/stage-impl.cpp \
   $(internal_src_dir)/event/common/system-overlay-impl.cpp \
   $(internal_src_dir)/event/common/thread-local-storage.cpp \

@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/animation/constraint-source.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 
 namespace Dali
 {
@@ -50,8 +50,8 @@ struct Source
 
   /**
    * Create a constraint source from a public handle.
-   * The internal proxy object is not referenced by the Internal::Source; therefore
-   * the owner of this object is responsible for observing the ProxyObject's lifetime.
+   * The internal object is not referenced by the Internal::Source; therefore
+   * the owner of this object is responsible for observing the Object's lifetime.
    */
   Source( Dali::ConstraintSource& source )
   : sourceType( source.sourceType ),
@@ -60,7 +60,7 @@ struct Source
   {
     if ( source.object )
     {
-      object = &dynamic_cast< ProxyObject& > ( GetImplementation(source.object) );
+      object = &dynamic_cast< Object& > ( GetImplementation(source.object) );
     }
   }
 
@@ -68,7 +68,7 @@ struct Source
 
   Property::Index propertyIndex; ///< The index of the source property
 
-  ProxyObject* object; ///< The target object; only valid if sourceType == OBJECT_PROPERTY
+  Object* object; ///< The target object; only valid if sourceType == OBJECT_PROPERTY
 };
 
 } // namespace Internal

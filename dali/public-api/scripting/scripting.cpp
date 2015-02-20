@@ -539,7 +539,7 @@ void CreatePropertyMap( Image image, Property::Map& map )
   {
     std::string imageType( "ResourceImage" );
 
-    // Get Type - cannot use TypeRegistry as Image is not a ProxyObject and thus, not registered
+    // Get Type - cannot use TypeRegistry as Image is not an Object and thus, not registered
     if ( BitmapImage::DownCast( image ) )
     {
       imageType = "BitmapImage";

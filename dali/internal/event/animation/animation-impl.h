@@ -42,7 +42,7 @@ class UpdateManager;
 class Actor;
 class Animation;
 class AnimationPlaylist;
-class ProxyObject;
+class Object;
 class ShaderEffect;
 
 typedef IntrusivePtr<Animation> AnimationPtr;
@@ -246,7 +246,7 @@ public:
    * @param [in] alpha The alpha function to apply.
    * @param [in] period The effect will occur during this time period.
    */
-  void AnimateTo(ProxyObject& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period);
+  void AnimateTo(Object& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period);
 
   /**
    * @copydoc Dali::Animation::AnimateBetween(Property target, KeyFrames& keyFrames)

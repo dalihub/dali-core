@@ -15,7 +15,7 @@
  *
  */
 
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/animation/property-constraint.h>
 #include <dali/internal/event/animation/property-input-accessor.h>
 #include <dali/internal/event/animation/property-input-indexer.h>
@@ -33,7 +33,7 @@ namespace Internal
 namespace SceneGraph
 {
 
-PropertyNotification* PropertyNotification::New(ProxyObject& proxy,
+PropertyNotification* PropertyNotification::New(Object& object,
                                                 Property::Index propertyIndex,
                                                 Property::Type propertyType,
                                                 int componentIndex,
@@ -41,18 +41,18 @@ PropertyNotification* PropertyNotification::New(ProxyObject& proxy,
                                                 RawArgumentContainer& arguments,
                                                 NotifyMode notifyMode)
 {
-  return new PropertyNotification( proxy, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode );
+  return new PropertyNotification( object, propertyIndex, propertyType, componentIndex, condition, arguments, notifyMode );
 }
 
 
-PropertyNotification::PropertyNotification(ProxyObject& proxy,
+PropertyNotification::PropertyNotification(Object& object,
                                            Property::Index propertyIndex,
                                            Property::Type propertyType,
                                            int componentIndex,
                                            ConditionType condition,
                                            RawArgumentContainer& arguments,
                                            NotifyMode notifyMode)
-: mProxy(&proxy),
+: mObject(&object),
   mPropertyIndex(propertyIndex),
   mPropertyType(propertyType),
   mProperty(NULL),
@@ -103,8 +103,8 @@ PropertyNotification::PropertyNotification(ProxyObject& proxy,
     }
   }
 
-  mProperty = mProxy->GetSceneObjectInputProperty( mPropertyIndex );
-  int internalComponentIndex = mProxy->GetPropertyComponentIndex(mPropertyIndex);
+  mProperty = mObject->GetSceneObjectInputProperty( mPropertyIndex );
+  int internalComponentIndex = mObject->GetPropertyComponentIndex(mPropertyIndex);
   if( internalComponentIndex != Property::INVALID_COMPONENT_INDEX )
   {
     // override the one passed in
