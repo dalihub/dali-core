@@ -54,7 +54,7 @@ void tet_printf(const char *format, ...);
 
 /**
  * DALI_TEST_CHECK is a wrapper for tet_result.
- * If the condition evaluates to false, then the function & line number is printed.
+ * If the condition evaluates to false, the test is stopped.
  * @param[in] The boolean expression to check
  */
 #define DALI_TEST_CHECK(condition)                                                        \
@@ -66,6 +66,7 @@ else                                                                            
 {                                                                                         \
   fprintf(stderr, "%s Failed in %s at line %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);    \
   tet_result(TET_FAIL);                                                                   \
+  throw("TET_FAIL");                                                                      \
 }
 
 template <typename Type>
