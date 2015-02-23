@@ -18,13 +18,12 @@
 // CLASS HEADER
 #include <dali/public-api/math/matrix3.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/math/math-utils.h>
-
 // EXTERNAL INCLUDES
 #include <string.h>
 #include <iostream>
 
+// INTERNAL INCLUDES
+#include <dali/public-api/math/math-utils.h>
 
 #define S00 0
 #define S01 1

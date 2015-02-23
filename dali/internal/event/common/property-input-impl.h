@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <iostream>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/math/vector2.h>
@@ -27,9 +30,6 @@
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/internal/common/buffer-index.h>
-
-/// External Includes
-#include <iostream>
 
 namespace Dali
 {
