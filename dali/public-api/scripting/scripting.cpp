@@ -25,7 +25,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
-#include <dali/internal/event/images/bitmap-image-impl.h>
+#include <dali/internal/event/images/buffer-image-impl.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
 
 namespace Dali
@@ -328,14 +328,14 @@ Image NewImage( const Property::Value& map )
                                     pixelFormat,
                                     releasePolicy);
       }
-      else if("BitmapImage" == s)
+      else if("BufferImage" == s)
       {
-        ret = BitmapImage::New(attributes.GetWidth(),
+        ret = BufferImage::New(attributes.GetWidth(),
                                attributes.GetHeight(),
                                pixelFormat,
                                releasePolicy);
       }
-      else if("Image" == s || "ResourceImage" == s)
+      else if("ResourceImage" == s)
       {
         ret = ResourceImage::New(filename, attributes, loadPolicy, releasePolicy);
       }
@@ -541,11 +541,11 @@ void CreatePropertyMap( Image image, Property::Map& map )
     std::string imageType( "ResourceImage" );
 
     // Get Type - cannot use TypeRegistry as Image is not an Object and thus, not registered
-    BitmapImage bitmapImage = BitmapImage::DownCast( image );
-    if ( bitmapImage )
+    BufferImage bufferImage = BufferImage::DownCast( image );
+    if ( bufferImage )
     {
-      imageType = "BitmapImage";
-      map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( bitmapImage.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
+      imageType = "BufferImage";
+      map[ "pixel-format" ] = GetEnumerationName< Pixel::Format >( bufferImage.GetPixelFormat(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
     }
     else if ( FrameBufferImage::DownCast( image ) )
     {

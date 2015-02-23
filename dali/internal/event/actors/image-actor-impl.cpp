@@ -125,7 +125,7 @@ void ImageActor::SetImage( ImagePtr& image )
     NinePatchImage* ninePatchImage = NinePatchImage::DownCast( image.Get() );
     if( ninePatchImage )
     {
-      newImage = ninePatchImage->CreateCroppedBitmapImage();
+      newImage = ninePatchImage->CreateCroppedBufferImage();
       SetStyle( Dali::ImageActor::STYLE_NINE_PATCH );
       SetNinePatchBorder( ninePatchImage->GetStretchBorders(), true );
     }

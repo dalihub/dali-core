@@ -91,9 +91,9 @@ ResourceImage NewResourceImage( const Property::Value& map )
 }
 
 /// Helper method to create ResourceImage using property
-BitmapImage NewBitmapImage( const Property::Value& map )
+BufferImage NewBufferImage( const Property::Value& map )
 {
-  BitmapImage image = BitmapImage::DownCast( NewImage( map ) );
+  BufferImage image = BufferImage::DownCast( NewImage( map ) );
   return image;
 }
 
@@ -516,12 +516,12 @@ int UtcDaliScriptingNewImage(void)
     Image image = NewImage( map );
     DALI_TEST_CHECK( FrameBufferImage::DownCast( image ) );
   }
-  // type BitMapImage
-   map[ "type" ] = "BitmapImage";
+  // type BufferImage
+   map[ "type" ] = "BufferImage";
    {
      Image image = NewImage( map );
-     DALI_TEST_CHECK( BitmapImage::DownCast( image ) );
-     DALI_TEST_CHECK((BitmapImage::DownCast( image )).GetPixelFormat()== Pixel::RGBA8888);
+     DALI_TEST_CHECK( BufferImage::DownCast( image ) );
+     DALI_TEST_CHECK((BufferImage::DownCast( image )).GetPixelFormat()== Pixel::RGBA8888);
    }
 
    // pixel-format
@@ -555,19 +555,19 @@ int UtcDaliScriptingNewImage(void)
          { "COMPRESSED_SRGB8_ALPHA8_ETC2_EAC", Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC },
          { "COMPRESSED_RGB8_ETC1", Pixel::COMPRESSED_RGB8_ETC1 },
          { "COMPRESSED_RGB_PVRTC_4BPPV1", Pixel::COMPRESSED_RGB_PVRTC_4BPPV1 },*/
-         // BitmapImage doesnot support compressed format
+         // BufferImage doesnot support compressed format
      };
 
-     TestEnumStrings< Pixel::Format, BitmapImage >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &BitmapImage::GetPixelFormat, &NewBitmapImage );
+     TestEnumStrings< Pixel::Format, BufferImage >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &BufferImage::GetPixelFormat, &NewBufferImage );
    }
 
   // type Image
-  map[ "type" ] = "Image";
+  map[ "type" ] = "ResourceImage";
   {
     Image image = NewImage( map );
     DALI_TEST_CHECK( ResourceImage::DownCast( image ) );
     DALI_TEST_CHECK( !FrameBufferImage::DownCast( image ) );
-    DALI_TEST_CHECK( !BitmapImage::DownCast( image ) );
+    DALI_TEST_CHECK( !BufferImage::DownCast( image ) );
   }
   END_TEST;
 }
@@ -988,14 +988,14 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( value.GetValue( "height" ).Get< int >(), 400, TEST_LOCATION );
   }
 
-  // BitmapImage
+  // BufferImage
   {
-    Image image = BitmapImage::New( 200, 300, Pixel::A8 );
+    Image image = BufferImage::New( 200, 300, Pixel::A8 );
     Property::Map map;
     CreatePropertyMap( image, map );
     Property::Value value( map );
     DALI_TEST_CHECK( value.HasKey( "type" ) );
-    DALI_TEST_EQUALS( value.GetValue( "type" ).Get< std::string >(), "BitmapImage", TEST_LOCATION );
+    DALI_TEST_EQUALS( value.GetValue( "type" ).Get< std::string >(), "BufferImage", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "pixel-format") );
     DALI_TEST_EQUALS( value.GetValue( "pixel-format" ).Get< std::string >(), "A8", TEST_LOCATION );
   }

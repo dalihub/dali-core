@@ -32,7 +32,7 @@ namespace Pixel
 /**
  * @brief Pixel formats
  *
- * @note: BitmapImage::Update might not work with BGR/BGRA formats!
+ * @note: BufferImage::Update might not work with BGR/BGRA formats!
  */
 enum Format ///< pixel format, default color depth is RGBA 32 bit with alpha
 {

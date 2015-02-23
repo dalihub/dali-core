@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/nine-patch-image.h>
 #include <dali/internal/event/images/resource-image-impl.h>
-#include <dali/internal/event/images/bitmap-image-impl.h>
+#include <dali/internal/event/images/buffer-image-impl.h>
 
 namespace Dali
 {
@@ -107,7 +107,7 @@ public:
    *
    * @return the cropped bitmap.
    */
-  BitmapImagePtr CreateCroppedBitmapImage();
+  BufferImagePtr CreateCroppedBufferImage();
 
 
 protected: // From Resource

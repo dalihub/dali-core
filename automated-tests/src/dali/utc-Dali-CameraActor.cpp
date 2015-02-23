@@ -511,7 +511,7 @@ int UtcDaliCameraActorModelView(void)
   TestApplication application;
   tet_infoline("Testing Dali::CameraActor Test view application");
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -734,7 +734,7 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   application.Render(0);
   application.Render();
   application.SendNotification();
-  Image image = CreateBitmapImage();
+  Image image = CreateBufferImage();
   ImageActor imageActor = ImageActor::New( image );
   imageActor.SetSize(100.0f, 100.0f);
   Stage::GetCurrent().Add(imageActor);
