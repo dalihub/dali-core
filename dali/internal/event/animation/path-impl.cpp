@@ -63,7 +63,7 @@ Path* Path::New()
 }
 
 Path::Path()
-:ProxyObject()
+: Object()
 {
 }
 

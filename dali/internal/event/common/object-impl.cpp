@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>
@@ -44,32 +44,32 @@ namespace Internal
 
 namespace // unnamed namespace
 {
-const int SUPPORTED_CAPABILITIES = Dali::Handle::DYNAMIC_PROPERTIES;  // ProxyObject provides this capability
-typedef Dali::Vector<ProxyObject::Observer*>::Iterator ObserverIter;
-typedef Dali::Vector<ProxyObject::Observer*>::ConstIterator ConstObserverIter;
+const int SUPPORTED_CAPABILITIES = Dali::Handle::DYNAMIC_PROPERTIES;  // Object provides this capability
+typedef Dali::Vector<Object::Observer*>::Iterator ObserverIter;
+typedef Dali::Vector<Object::Observer*>::ConstIterator ConstObserverIter;
 
 #if defined(DEBUG_ENABLED)
-Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_PROXY_OBJECT" );
+Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_OBJECT" );
 #endif
 } // unnamed namespace
 
-ProxyObject::ProxyObject()
+Object::Object()
 : mTypeInfo( NULL ),
   mConstraints( NULL ),
   mPropertyNotifications( NULL )
 {
 }
 
-void ProxyObject::AddObserver(Observer& observer)
+void Object::AddObserver(Observer& observer)
 {
   // make sure an observer doesn't observe the same object twice
-  // otherwise it will get multiple calls to OnSceneObjectAdd(), OnSceneObjectRemove() and ProxyDestroyed()
+  // otherwise it will get multiple calls to OnSceneObjectAdd(), OnSceneObjectRemove() and ObjectDestroyed()
   DALI_ASSERT_DEBUG( mObservers.End() == std::find( mObservers.Begin(), mObservers.End(), &observer));
 
   mObservers.PushBack( &observer );
 }
 
-void ProxyObject::RemoveObserver(Observer& observer)
+void Object::RemoveObserver(Observer& observer)
 {
   // Find the observer...
   const ConstObserverIter endIter =  mObservers.End();
@@ -84,7 +84,7 @@ void ProxyObject::RemoveObserver(Observer& observer)
   DALI_ASSERT_DEBUG(endIter != mObservers.End());
 }
 
-void ProxyObject::OnSceneObjectAdd()
+void Object::OnSceneObjectAdd()
 {
   // Notification for this object's constraints
   if( mConstraints )
@@ -107,7 +107,7 @@ void ProxyObject::OnSceneObjectAdd()
   EnablePropertyNotifications();
 }
 
-void ProxyObject::OnSceneObjectRemove()
+void Object::OnSceneObjectRemove()
 {
   // Notification for this object's constraints
   if( mConstraints )
@@ -130,17 +130,17 @@ void ProxyObject::OnSceneObjectRemove()
   DisablePropertyNotifications();
 }
 
-int ProxyObject::GetPropertyComponentIndex( Property::Index index ) const
+int Object::GetPropertyComponentIndex( Property::Index index ) const
 {
   return Property::INVALID_COMPONENT_INDEX;
 }
 
-bool ProxyObject::Supports( Capability capability ) const
+bool Object::Supports( Capability capability ) const
 {
   return (capability & SUPPORTED_CAPABILITIES);
 }
 
-unsigned int ProxyObject::GetPropertyCount() const
+unsigned int Object::GetPropertyCount() const
 {
   unsigned int count = GetDefaultPropertyCount();
 
@@ -164,7 +164,7 @@ unsigned int ProxyObject::GetPropertyCount() const
   return count;
 }
 
-std::string ProxyObject::GetPropertyName( Property::Index index ) const
+std::string Object::GetPropertyName( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS( index > Property::INVALID_INDEX && "Property index out of bounds" );
 
@@ -194,7 +194,7 @@ std::string ProxyObject::GetPropertyName( Property::Index index ) const
   return "";
 }
 
-Property::Index ProxyObject::GetPropertyIndex(const std::string& name) const
+Property::Index Object::GetPropertyIndex(const std::string& name) const
 {
   Property::Index index = GetDefaultPropertyIndex( name );
 
@@ -225,7 +225,7 @@ Property::Index ProxyObject::GetPropertyIndex(const std::string& name) const
   return index;
 }
 
-bool ProxyObject::IsPropertyWritable( Property::Index index ) const
+bool Object::IsPropertyWritable( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds");
 
@@ -255,7 +255,7 @@ bool ProxyObject::IsPropertyWritable( Property::Index index ) const
   return false;
 }
 
-bool ProxyObject::IsPropertyAnimatable( Property::Index index ) const
+bool Object::IsPropertyAnimatable( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds");
 
@@ -278,7 +278,7 @@ bool ProxyObject::IsPropertyAnimatable( Property::Index index ) const
   return false;
 }
 
-bool ProxyObject::IsPropertyAConstraintInput( Property::Index index ) const
+bool Object::IsPropertyAConstraintInput( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds");
 
@@ -302,7 +302,7 @@ bool ProxyObject::IsPropertyAConstraintInput( Property::Index index ) const
   return false;
 }
 
-Property::Type ProxyObject::GetPropertyType( Property::Index index ) const
+Property::Type Object::GetPropertyType( Property::Index index ) const
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds" );
 
@@ -332,7 +332,7 @@ Property::Type ProxyObject::GetPropertyType( Property::Index index ) const
   return Property::NONE;
 }
 
-void ProxyObject::SetProperty( Property::Index index, const Property::Value& propertyValue )
+void Object::SetProperty( Property::Index index, const Property::Value& propertyValue )
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds" );
 
@@ -370,7 +370,7 @@ void ProxyObject::SetProperty( Property::Index index, const Property::Value& pro
   }
 }
 
-Property::Value ProxyObject::GetProperty(Property::Index index) const
+Property::Value Object::GetProperty(Property::Index index) const
 {
   DALI_ASSERT_ALWAYS( index > Property::INVALID_INDEX && "Property index is out of bounds" );
 
@@ -501,7 +501,7 @@ Property::Value ProxyObject::GetProperty(Property::Index index) const
   return value;
 }
 
-void ProxyObject::GetPropertyIndices( Property::IndexContainer& indices ) const
+void Object::GetPropertyIndices( Property::IndexContainer& indices ) const
 {
   indices.clear();
 
@@ -530,7 +530,7 @@ void ProxyObject::GetPropertyIndices( Property::IndexContainer& indices ) const
   }
 }
 
-Property::Index ProxyObject::RegisterProperty( const std::string& name, const Property::Value& propertyValue)
+Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue)
 {
   // Create a new property
   Dali::Internal::OwnerPointer<PropertyBase> newProperty;
@@ -636,7 +636,7 @@ Property::Index ProxyObject::RegisterProperty( const std::string& name, const Pr
   return index;
 }
 
-Property::Index ProxyObject::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
+Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
 {
   Property::Index index = Property::INVALID_INDEX;
 
@@ -654,7 +654,7 @@ Property::Index ProxyObject::RegisterProperty( const std::string& name, const Pr
   return index;
 }
 
-Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index index,
+Dali::PropertyNotification Object::AddPropertyNotification(Property::Index index,
                                                                 int componentIndex,
                                                                 const Dali::PropertyCondition& condition)
 {
@@ -687,7 +687,7 @@ Dali::PropertyNotification ProxyObject::AddPropertyNotification(Property::Index 
   return propertyNotification;
 }
 
-void ProxyObject::RemovePropertyNotification(Dali::PropertyNotification propertyNotification)
+void Object::RemovePropertyNotification(Dali::PropertyNotification propertyNotification)
 {
   if( mPropertyNotifications )
   {
@@ -707,7 +707,7 @@ void ProxyObject::RemovePropertyNotification(Dali::PropertyNotification property
   }
 }
 
-void ProxyObject::RemovePropertyNotifications()
+void Object::RemovePropertyNotifications()
 {
   if( mPropertyNotifications )
   {
@@ -724,7 +724,7 @@ void ProxyObject::RemovePropertyNotifications()
   }
 }
 
-void ProxyObject::EnablePropertyNotifications()
+void Object::EnablePropertyNotifications()
 {
   if( mPropertyNotifications )
   {
@@ -738,7 +738,7 @@ void ProxyObject::EnablePropertyNotifications()
   }
 }
 
-void ProxyObject::DisablePropertyNotifications()
+void Object::DisablePropertyNotifications()
 {
   if( mPropertyNotifications )
   {
@@ -752,17 +752,17 @@ void ProxyObject::DisablePropertyNotifications()
   }
 }
 
-Dali::ActiveConstraint ProxyObject::ApplyConstraint( Constraint& constraint )
+Dali::ActiveConstraint Object::ApplyConstraint( Constraint& constraint )
 {
   return Dali::ActiveConstraint( DoApplyConstraint( constraint, Dali::Constrainable() ) );
 }
 
-Dali::ActiveConstraint ProxyObject::ApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject )
+Dali::ActiveConstraint Object::ApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject )
 {
   return Dali::ActiveConstraint( DoApplyConstraint( constraint, weightObject ) );
 }
 
-ActiveConstraintBase* ProxyObject::DoApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject )
+ActiveConstraintBase* Object::DoApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject )
 {
   ActiveConstraintBase* activeConstraintImpl = constraint.CreateActiveConstraint();
   DALI_ASSERT_DEBUG( NULL != activeConstraintImpl );
@@ -771,7 +771,7 @@ ActiveConstraintBase* ProxyObject::DoApplyConstraint( Constraint& constraint, Da
 
   if( weightObject )
   {
-    ProxyObject& weightObjectImpl = GetImplementation( weightObject );
+    Object& weightObjectImpl = GetImplementation( weightObject );
     Property::Index weightIndex = weightObjectImpl.GetPropertyIndex( "weight" );
 
     if( Property::INVALID_INDEX != weightIndex )
@@ -791,7 +791,7 @@ ActiveConstraintBase* ProxyObject::DoApplyConstraint( Constraint& constraint, Da
   return activeConstraintImpl;
 }
 
-void ProxyObject::SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
+void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value )
 {
   switch ( entry.type )
   {
@@ -892,7 +892,7 @@ void ProxyObject::SetSceneGraphProperty( Property::Index index, const CustomProp
   }
 }
 
-const TypeInfo* ProxyObject::GetTypeInfo() const
+const TypeInfo* Object::GetTypeInfo() const
 {
   if ( !mTypeInfo )
   {
@@ -909,7 +909,7 @@ const TypeInfo* ProxyObject::GetTypeInfo() const
   return mTypeInfo;
 }
 
-void ProxyObject::RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph )
+void Object::RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph )
 {
   // guard against constraint sending messages during core destruction
   if ( Stage::IsInstalled() )
@@ -922,7 +922,7 @@ void ProxyObject::RemoveConstraint( ActiveConstraint& constraint, bool isInScene
   }
 }
 
-void ProxyObject::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
+void Object::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
 {
   // guard against constraint sending messages during core destruction
   if( mConstraints && Stage::IsInstalled() )
@@ -938,7 +938,7 @@ void ProxyObject::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
   }
 }
 
-void ProxyObject::RemoveConstraints( unsigned int tag )
+void Object::RemoveConstraints( unsigned int tag )
 {
   // guard against constraint sending messages during core destruction
   if( mConstraints && Stage::IsInstalled() )
@@ -962,7 +962,7 @@ void ProxyObject::RemoveConstraints( unsigned int tag )
   }
 }
 
-void ProxyObject::RemoveConstraints()
+void Object::RemoveConstraints()
 {
   // guard against constraint sending messages during core destruction
   if( mConstraints && Stage::IsInstalled() )
@@ -983,15 +983,15 @@ void ProxyObject::RemoveConstraints()
   }
 }
 
-void ProxyObject::SetTypeInfo( const TypeInfo* typeInfo )
+void Object::SetTypeInfo( const TypeInfo* typeInfo )
 {
   mTypeInfo = typeInfo;
 }
 
-ProxyObject::~ProxyObject()
+Object::~Object()
 {
   // Notification for this object's constraints
-  // (note that the ActiveConstraint handles may outlive the ProxyObject)
+  // (note that the ActiveConstraint handles may outlive the Object)
   if( mConstraints )
   {
     const ActiveConstraintConstIter endIter = mConstraints->end();
@@ -1005,14 +1005,14 @@ ProxyObject::~ProxyObject()
   // Notification for observers
   for( ConstObserverIter iter = mObservers.Begin(), endIter =  mObservers.End(); iter != endIter; ++iter)
   {
-    (*iter)->ProxyDestroyed(*this);
+    (*iter)->ObjectDestroyed(*this);
   }
 
   delete mConstraints;
   delete mPropertyNotifications;
 }
 
-CustomProperty* ProxyObject::FindCustomProperty( Property::Index index ) const
+CustomProperty* Object::FindCustomProperty( Property::Index index ) const
 {
   CustomProperty* property( NULL );
   int arrayIndex = index - PROPERTY_CUSTOM_START_INDEX;

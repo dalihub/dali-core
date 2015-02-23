@@ -290,17 +290,17 @@ MeshAttachment::Connector::~Connector()
   }
 }
 
-void MeshAttachment::Connector::SceneObjectAdded( ProxyObject& proxy )
+void MeshAttachment::Connector::SceneObjectAdded( Object& object )
 {
   ConnectNode();
 }
 
-void MeshAttachment::Connector::SceneObjectRemoved( ProxyObject& proxy )
+void MeshAttachment::Connector::SceneObjectRemoved( Object& object )
 {
   ConnectNode();
 }
 
-void MeshAttachment::Connector::ProxyDestroyed( ProxyObject& proxy )
+void MeshAttachment::Connector::ObjectDestroyed( Object& object )
 {
   mActor = NULL;
 

@@ -764,17 +764,17 @@ void RenderTask::Connector::SetActor( Actor* actor )
   }
 }
 
-void RenderTask::Connector::SceneObjectAdded( ProxyObject& proxy )
+void RenderTask::Connector::SceneObjectAdded( Object& object )
 {
   UpdateRenderTask();
 }
 
-void RenderTask::Connector::SceneObjectRemoved( ProxyObject& proxy )
+void RenderTask::Connector::SceneObjectRemoved( Object& object )
 {
   UpdateRenderTask();
 }
 
-void RenderTask::Connector::ProxyDestroyed( ProxyObject& proxy )
+void RenderTask::Connector::ObjectDestroyed( Object& object )
 {
   mActor = NULL;
 

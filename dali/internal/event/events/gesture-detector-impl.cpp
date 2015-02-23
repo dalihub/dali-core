@@ -160,18 +160,18 @@ bool GestureDetector::IsAttached(Actor& actor) const
   return find(mAttachedActors.begin(), mAttachedActors.end(), &actor) != mAttachedActors.end();
 }
 
-void GestureDetector::ProxyDestroyed(ProxyObject& proxy)
+void GestureDetector::ObjectDestroyed(Object& object)
 {
   if ( !mAttachedActors.empty() )
   {
-    GestureDetectorActorContainer::iterator match = find(mAttachedActors.begin(), mAttachedActors.end(), &proxy);
+    GestureDetectorActorContainer::iterator match = find(mAttachedActors.begin(), mAttachedActors.end(), &object);
 
     if ( match != mAttachedActors.end() )
     {
       mAttachedActors.erase(match);
 
       // Notification for derived classes
-      OnActorDestroyed(proxy);
+      OnActorDestroyed(object);
 
       // Unregister from gesture event processor if we do not have any actors
       if ( mAttachedActors.empty() )

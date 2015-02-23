@@ -40,7 +40,7 @@ class UpdateManager;
 
 class Actor;
 class PropertyNotification;
-class ProxyObject;
+class Object;
 class PropertyNotificationManager;
 
 typedef IntrusivePtr<PropertyNotification> PropertyNotificationPtr;
@@ -189,8 +189,8 @@ protected:
 private:
 
   PropertyNotificationManager& mPropertyNotificationManager;  ///< Reference to the property notification manager
-  ProxyObject*                 mProxy;                        ///< Target object, not owned by PropertyNotification.
-  Property::Index              mProxyPropertyIndex;           ///< Target object's property index of interest.
+  Object*                      mObject;                       ///< Target object, not owned by PropertyNotification.
+  Property::Index              mObjectPropertyIndex;          ///< Target object's property index of interest.
   Property::Type               mPropertyType;                 ///< The type of property to evaluate
   int                          mComponentIndex;               ///< Index to a specific component of a complex property such as a Vector
   Dali::PropertyCondition      mCondition;                    ///< The PropertyCondition handle.

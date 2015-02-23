@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/common/type-registry-impl.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 
 using std::find_if;
 
@@ -104,11 +104,11 @@ BaseHandle TypeInfo::CreateInstance() const
     if ( ret )
     {
       BaseObject& handle = ret.GetBaseObject();
-      ProxyObject *proxyObject = dynamic_cast<Internal::ProxyObject*>(&handle);
+      Object *object = dynamic_cast<Internal::Object*>(&handle);
 
-      if ( proxyObject )
+      if ( object )
       {
-        proxyObject->SetTypeInfo( this );
+        object->SetTypeInfo( this );
       }
     }
   }
@@ -276,7 +276,7 @@ const std::string& TypeInfo::GetPropertyName( Property::Index index ) const
     return GetImplementation(base).GetPropertyName( index );
   }
 
-  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
+  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
 }
 
 void TypeInfo::AddActionFunction( const std::string &actionName, Dali::TypeInfo::ActionFunction function )
@@ -406,7 +406,7 @@ bool TypeInfo::IsPropertyWritable( Property::Index index ) const
     }
     else
     {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
     }
   }
 
@@ -433,7 +433,7 @@ Property::Type TypeInfo::GetPropertyType( Property::Index index ) const
     }
     else
     {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
     }
   }
 
@@ -460,7 +460,7 @@ void TypeInfo::SetProperty( BaseObject *object, Property::Index index, const Pro
     }
     else
     {
-      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
+      DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
     }
   }
 }
@@ -504,7 +504,7 @@ Property::Value TypeInfo::GetProperty( const BaseObject *object, Property::Index
     return GetImplementation( base ).GetProperty( object, index );
   }
 
-  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as ProxyObject
+  DALI_ASSERT_ALWAYS( ! "Cannot find property index" ); // use the same assert as Object
 }
 
 Property::Value TypeInfo::GetProperty( const BaseObject *object, const std::string& name ) const

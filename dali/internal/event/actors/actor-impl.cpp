@@ -2226,7 +2226,7 @@ void Actor::ConnectToSceneGraph(int index)
   }
 #endif
 
-  // Notification for ProxyObject::Observers
+  // Notification for Object::Observers
   OnSceneObjectAdd();
 }
 
@@ -2303,7 +2303,7 @@ void Actor::RecursiveDisconnectFromStage( ActorContainer& disconnectionList )
  */
 void Actor::DisconnectFromSceneGraph()
 {
-  // Notification for ProxyObject::Observers
+  // Notification for Object::Observers
   OnSceneObjectRemove();
 
   // Notify attachment
