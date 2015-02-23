@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <typeinfo>   // operator typeid
+#include <cstddef>    // NULL
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -78,14 +79,14 @@ public:
   Any( const Any& any )
   {
     // If container isn't empty then copy the container?
-    if ( 0 != any.mContainer )
+    if ( NULL != any.mContainer )
     {
       mContainer = any.mContainer->mCloneFunc( *any.mContainer );
     }
     else
     {
       // Otherwise mark new container as empty
-      mContainer = 0;
+      mContainer = NULL;
     }
   }
 
@@ -100,7 +101,7 @@ public:
   Any& operator=( const Type& value )
   {
     // If the container is empty then assign the new value
-    if ( 0 == mContainer )
+    if ( NULL == mContainer )
     {
       mContainer = new AnyContainerImpl< Type >( value );
     }
@@ -159,9 +160,9 @@ public:
   const Type& Get() const
   {
 
-    if ( 0 == mContainer )
+    if ( NULL == mContainer )
     {
-      AssertAlways( "Any::Get(). mContainer is null" );
+      AssertAlways( "Any::Get(). mContainer is NULL" );
     }
 
     // Check if the value has the same value than the Any type.
@@ -175,14 +176,14 @@ public:
   /**
    * @brief Return pointer of Type to the value stored
    *
-   * @return pointer to the value or null if no value is contained
+   * @return pointer to the value or NULL if no value is contained
    */
   template<typename Type>
   Type* GetPointer()
   {
-    if( 0 == mContainer )
+    if( NULL == mContainer )
     {
-      return 0;
+      return NULL;
     }
      // Check if the value has the same value than the Any type.
     if( mContainer->GetType() != typeid( Type ) )
@@ -195,14 +196,14 @@ public:
   /**
    * @brief Return pointer of Type to the value stored
    *
-   * @return pointer to the value or null if no value is contained
+   * @return pointer to the value or NULL if no value is contained
    */
   template<typename Type>
   const Type* GetPointer() const
   {
-    if( 0 == mContainer )
+    if( NULL == mContainer )
     {
-      return 0;
+      return NULL;
     }
      // Check if the value has the same value than the Any type.
     if( mContainer->GetType() != typeid( Type ) )
@@ -219,7 +220,7 @@ public:
    */
   bool Empty() const
   {
-    return ( 0 == mContainer ) ? true : false;
+    return ( NULL == mContainer ) ? true : false;
   }
 
   struct AnyContainerBase;    // Forward declaration for typedef
@@ -376,7 +377,7 @@ public:
  */
 
 /**
- * @brief Extract a pointer to the held type of an Any object from a pointer to that Any object (null if empty )
+ * @brief Extract a pointer to the held type of an Any object from a pointer to that Any object (NULL if empty )
  *
  * @param any Pointer to an Any object
  *
@@ -389,7 +390,7 @@ inline Type* AnyCast( Any* any )
 }
 
 /**
- * @brief Extract a const pointer to the held type of an Any object from a pointer to that Any object (null if empty )
+ * @brief Extract a const pointer to the held type of an Any object from a pointer to that Any object (NULL if empty )
  *
  * @param any const Pointer to an Any object
  *

@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstddef>    // NULL
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 
@@ -36,7 +39,7 @@ public:
    */
   OwnerPointer()
   {
-    mObject = 0;
+    mObject = NULL;
   }
 
   /**
@@ -103,7 +106,7 @@ public:
    */
   T& operator*()
   {
-    DALI_ASSERT_DEBUG( mObject != 0 );
+    DALI_ASSERT_DEBUG( mObject != NULL );
 
     return *mObject;
   }
@@ -114,7 +117,7 @@ public:
    */
   T& operator*() const
   {
-    DALI_ASSERT_DEBUG( mObject != 0 );
+    DALI_ASSERT_DEBUG( mObject != NULL );
 
     // Pointer semantics: A const pointer does not mean const data.
     return const_cast< T& >( *mObject );
@@ -153,10 +156,10 @@ public:
    */
   void Reset()
   {
-    if ( mObject != 0 )
+    if ( mObject != NULL )
     {
       delete mObject;
-      mObject = 0;
+      mObject = NULL;
     }
   }
 
@@ -167,7 +170,7 @@ public:
   T* Release()
   {
     T* tmp = mObject;
-    mObject = 0;
+    mObject = NULL;
     return tmp;
   }
 
@@ -189,11 +192,11 @@ public:
 
   /**
    * Converts an object handle to a BooleanType.
-   * This is useful for checking whether the handle is null.
+   * This is useful for checking whether the handle is NULL.
    */
   operator BooleanType() const
   {
-    return (mObject != 0) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : 0;
+    return (mObject != NULL) ? &OwnerPointer::ThisIsSaferThanReturningVoidStar : NULL;
   }
 
 private:
@@ -213,7 +216,7 @@ private:
   void Init( OwnerPointer& ownerPointer )
   {
     mObject = ownerPointer.mObject;
-    ownerPointer.mObject = 0;
+    ownerPointer.mObject = NULL;
   }
 
   // data

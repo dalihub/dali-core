@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstddef>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/functor-delegate.h>
@@ -306,7 +309,7 @@ protected: // Constructors for deriving classes
   typedef void (*Dispatcher)( CallbackBase& base );
 
   /**
-   * @brief Used to destroy mObjectPointer (null if not mObjectPointer is not owned)
+   * @brief Used to destroy mObjectPointer (NULL if not mObjectPointer is not owned)
    */
   typedef void(*Destructor)(void* object);
 
@@ -354,9 +357,9 @@ public: // Data for deriving classes & Dispatchers
   {
     Impl();                               ///< Default constructor
 
-    void* mObjectPointer;                 ///< Object whose member function will be called. Not owned if mDestructorDispatcher is null.
+    void* mObjectPointer;                 ///< Object whose member function will be called. Not owned if mDestructorDispatcher is NULL.
     Dispatcher mMemberFunctionDispatcher; ///< Dispatcher for member functions
-    Destructor mDestructorDispatcher;     ///< Destructor for owned objects. null if mDestructorDispatcher is not owned.
+    Destructor mDestructorDispatcher;     ///< Destructor for owned objects. NULL if mDestructorDispatcher is not owned.
   };
   Impl* mImpl;                            ///< Implementation pointer
 
@@ -1081,7 +1084,7 @@ public:
    */
   CallbackFunctor0( const T& object )
   : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  0, // uses operator() instead of member function
+                  NULL, // uses operator() instead of member function
                   reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher0<T>::Dispatch ),
                   reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
 };
@@ -1121,7 +1124,7 @@ public:
    */
   CallbackFunctor1( const T& object )
   : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  0, // uses operator() instead of member function
+                  NULL, // uses operator() instead of member function
                   reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher1<T,P1>::Dispatch ),
                   reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
 };
@@ -1162,7 +1165,7 @@ public:
    */
   CallbackFunctor2( const T& object )
   : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  0, // uses operator() instead of member function
+                  NULL, // uses operator() instead of member function
                   reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher2<T,P1,P2>::Dispatch ),
                   reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
 };
@@ -1203,7 +1206,7 @@ public:
    */
   CallbackFunctor3( const T& object )
   : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  0, // uses operator() instead of member function
+                  NULL, // uses operator() instead of member function
                   reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher3<T,P1,P2,P3>::Dispatch ),
                   reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
 };
@@ -1245,7 +1248,7 @@ public:
    */
   CallbackFunctorReturn0( const T& object )
   : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  0, // uses operator() instead of member function
+                  NULL, // uses operator() instead of member function
                   reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcherReturn0<T,R>::Dispatch ),
                   reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
 };
@@ -1286,7 +1289,7 @@ public:
    */
   CallbackFunctorReturn1( const T& object )
   : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  0, // uses operator() instead of member function
+                  NULL, // uses operator() instead of member function
                   reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcherReturn1<T,R,P1>::Dispatch ),
                   reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
 };
@@ -1327,7 +1330,7 @@ public:
    */
   CallbackFunctorReturn2( const T& object )
   : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  0, // uses operator() instead of member function
+                  NULL, // uses operator() instead of member function
                   reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcherReturn2<T,R,P1,P2>::Dispatch ),
                   reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
 };
@@ -1368,7 +1371,7 @@ public:
    */
   CallbackFunctorReturn3( const T& object )
   : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
-                  0, // uses operator() instead of member function
+                  NULL, // uses operator() instead of member function
                   reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcherReturn3<T,R,P1,P2,P3>::Dispatch ),
                   reinterpret_cast< CallbackBase::Destructor >( &Destroyer<T>::Delete ) ) { }
 };
