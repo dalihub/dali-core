@@ -25,8 +25,8 @@ namespace Dali
 // CallbackBase
 
 CallbackBase::CallbackBase()
-: mImpl( 0 ),
-  mFunction( 0 )
+: mImpl( NULL ),
+  mFunction( NULL )
 {
 }
 
@@ -36,7 +36,7 @@ CallbackBase::~CallbackBase()
 }
 
 CallbackBase::CallbackBase( Function function )
-: mImpl( 0 ),
+: mImpl( NULL ),
   mFunction( function )
 {
 }
@@ -47,7 +47,7 @@ CallbackBase::CallbackBase( void* object, MemberFunction function, Dispatcher di
   mImpl = new CallbackBase::Impl;
   mImpl->mObjectPointer = object;
   mImpl->mMemberFunctionDispatcher = dispatcher;
-  mImpl->mDestructorDispatcher = 0; // object is not owned
+  mImpl->mDestructorDispatcher = NULL; // object is not owned
 }
 
 CallbackBase::CallbackBase( void* object, MemberFunction function, Dispatcher dispatcher, Destructor destructor )
@@ -72,18 +72,18 @@ void CallbackBase::Reset()
     }
 
     delete mImpl;
-    mImpl = 0;
+    mImpl = NULL;
   }
 
-  mFunction = 0;
+  mFunction = NULL;
 }
 
 // CallbackBase::Impl
 
 CallbackBase::Impl::Impl()
-: mObjectPointer( 0 ),
-  mMemberFunctionDispatcher( 0 ),
-  mDestructorDispatcher( 0 )
+: mObjectPointer( NULL ),
+  mMemberFunctionDispatcher( NULL ),
+  mDestructorDispatcher( NULL )
 {
 }
 

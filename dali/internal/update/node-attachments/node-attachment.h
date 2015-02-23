@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstddef>    // NULL
+
 // INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
 
@@ -71,21 +74,21 @@ public:
 
   /**
    * Retrieve the parent node of a NodeAttachment.
-   * @return The parent node, or null if the NodeAttachment has not been added to the scene-graph.
+   * @return The parent node, or NULL if the NodeAttachment has not been added to the scene-graph.
    */
   Node& GetParent()
   {
-    DALI_ASSERT_DEBUG( mParent != 0 );
+    DALI_ASSERT_DEBUG( mParent != NULL );
     return *mParent;
   }
 
   /**
    * Retrieve the parent node of a NodeAttachment.
-   * @return The parent node, or null if the NodeAttachment has not been added to the scene-graph.
+   * @return The parent node, or NULL if the NodeAttachment has not been added to the scene-graph.
    */
   Node& GetParent() const
   {
-    DALI_ASSERT_DEBUG( mParent != 0 );
+    DALI_ASSERT_DEBUG( mParent != NULL );
     return *mParent;
   }
 
@@ -97,12 +100,12 @@ public:
    */
   bool IsRenderable()
   {
-    return (GetRenderable() != 0);
+    return (GetRenderable() != NULL);
   }
 
   /**
    * Convert an attachment to a renderable attachment.
-   * @return A pointer to the renderable attachment, or null.
+   * @return A pointer to the renderable attachment, or NULL.
    */
   virtual RenderableAttachment* GetRenderable() = 0;
 

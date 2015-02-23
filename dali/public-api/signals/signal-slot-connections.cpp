@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/signals/signal-slot-connections.h>
 
+// EXTERNAL INCLUDES
+#include <cstddef>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/signals/callback.h>
 
@@ -45,7 +48,7 @@ SlotObserver* SlotConnection::GetSlotObserver()
 }
 
 SignalConnection::SignalConnection( CallbackBase* callback )
-: mSignalObserver( 0 ),
+: mSignalObserver( NULL ),
   mCallback( callback )
 {
 }
@@ -68,12 +71,12 @@ void SignalConnection::Disconnect( SlotObserver* slotObserver )
   {
     // tell the slot the signal wants to disconnect
     mSignalObserver->SignalDisconnected( slotObserver, mCallback );
-    mSignalObserver = 0;
+    mSignalObserver = NULL;
   }
 
   // we own the callback, SignalObserver is expected to delete the SlotConnection on Disconnected so its pointer to our mCallback is no longer used
   delete mCallback;
-  mCallback = 0;
+  mCallback = NULL;
 }
 
 CallbackBase* SignalConnection::GetCallback()
