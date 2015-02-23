@@ -18,11 +18,11 @@
  *
  */
 
-// INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-
 // EXTERNAL INCLUDES
 #include <typeinfo>   // operator typeid
+
+// INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {

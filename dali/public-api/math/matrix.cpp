@@ -18,6 +18,11 @@
 // CLASS HEADERS
 #include <dali/public-api/math/matrix.h>
 
+// EXTERNAL INCLUDES
+#include <math.h>
+#include <string.h>
+#include <iostream>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector3.h>
@@ -25,11 +30,6 @@
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/internal/render/common/performance-monitor.h>
-
-// EXTERNAL INCLUDES
-#include <math.h>
-#include <string.h>
-#include <iostream>
 
 namespace
 {
