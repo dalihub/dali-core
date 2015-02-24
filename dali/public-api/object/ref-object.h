@@ -30,7 +30,7 @@ class Value;
 /**
  * @brief Base class for reference counted objects.
  *
- * Typically this should be used with a Boost instrusive pointer,
+ * Typically this should be used with an instrusive pointer,
  * instead of calling Reference() and Unreference() methods directly.
  */
 class DALI_IMPORT_API RefObject
