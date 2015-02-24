@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
 #include <dali/public-api/geometry/animatable-vertex.h>
 #include <dali/public-api/modeling/material.h>
 
@@ -40,7 +40,7 @@ class AnimatableMesh;
  * It is recommended that the vertices of the mesh remain in the bounds -0.5 - 0.5, which
  * will match the actor size boundaries. The origin of the mesh matches the actor's position.
  */
-class DALI_IMPORT_API AnimatableMesh : public Constrainable
+class DALI_IMPORT_API AnimatableMesh : public Handle
 {
 public:
   /**

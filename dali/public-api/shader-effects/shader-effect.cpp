@@ -41,7 +41,7 @@ ShaderEffect::ShaderEffect()
 }
 
 ShaderEffect::ShaderEffect(Internal::ShaderEffect* internal)
-: Constrainable(internal)
+: Handle(internal)
 {
 }
 
@@ -50,7 +50,7 @@ ShaderEffect::~ShaderEffect()
 }
 
 ShaderEffect::ShaderEffect(const ShaderEffect& handle)
-: Constrainable(handle)
+: Handle(handle)
 {
 }
 

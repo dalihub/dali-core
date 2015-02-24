@@ -67,7 +67,7 @@ Actor::~Actor()
 }
 
 Actor::Actor(const Actor& copy)
-: Constrainable(copy)
+: Handle(copy)
 {
 }
 
@@ -610,7 +610,7 @@ DynamicsBody Actor::GetDynamicsBody()
 }
 
 Actor::Actor(Internal::Actor* internal)
-: Constrainable(internal)
+: Handle(internal)
 {
 }
 
