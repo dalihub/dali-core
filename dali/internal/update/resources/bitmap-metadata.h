@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/bitmap.h>
 #include <dali/public-api/images/pixel.h>
-#include <dali/public-api/images/native-image.h>
+#include <dali/public-api/images/native-image-interface.h>
 
 namespace Dali
 {
@@ -39,7 +39,7 @@ public:
    * @param[in] nativeImage The native image to load
    * @return A newly allocated BitmapMetadata
    */
-  static BitmapMetadata New(NativeImagePtr nativeImage);
+  static BitmapMetadata New(NativeImageInterfacePtr nativeImage);
 
   /**
    * Creates a new BitmapMetadata object from a Bitmap
@@ -52,12 +52,12 @@ public:
    * Creates a new BitmapMetadata object from framebuffer metadata
    * @return A newly allocated BitmapMetadata
    */
-  static BitmapMetadata New(unsigned int width, unsigned int height, Pixel::Format pixelFormat);
+  static BitmapMetadata New(unsigned int width, unsigned int height, bool hasAlphaChannel);
 
   /**
    * Constructor
    */
-  BitmapMetadata( unsigned int width, unsigned int height, Pixel::Format pixelFormat, bool opaqueness );
+  BitmapMetadata( unsigned int width, unsigned int height, bool hasAlphaChanne, bool opaqueness );
 
   /**
    * Copy constructor
@@ -78,7 +78,7 @@ public:
    * Updates the metadata with information from the native image
    * @param[in] nativeImage The native image that was updated
    */
-  void Update(NativeImagePtr nativeImage);
+  void Update(NativeImageInterfacePtr nativeImage);
 
   /**
    * Updates the metadata with information from the bitmap
@@ -97,12 +97,6 @@ public:
    * @return height
    */
   unsigned int GetHeight() const;
-
-  /**
-   * Get the pixel format of the image data.
-   * @return the pixel format of the image.
-   */
-  Pixel::Format GetPixelFormat() const;
 
   /**
    * Query whether the texture data has an alpha channel.
@@ -129,11 +123,10 @@ public:
   void SetHeight(unsigned int height);
 
   /**
-   * Set the pixel format of the image data.
-   * @param[in] pixelFormat The pixel format of the image.
+   * Set whether the texture has alpha channel
+   * @param[in] hasAlphaChannel whether the texture has alpha channel
    */
-  void SetPixelFormat(Pixel::Format pixelFormat);
-
+  void SetHasAlphaChannel( bool hasAlphaChannel );
 
   /**
    * Set whether the texture is completely opaque, i.e.
@@ -150,7 +143,7 @@ public:
 private:
   unsigned int  mImageWidth;      ///< width of the original image
   unsigned int  mImageHeight;     ///< height of the original image
-  Pixel::Format mPixelFormat;     ///< Pixel format of the contained image data.
+  bool          mHasAlphaChannel:1; ///< Pixel format of the contained image data.
   bool          mOpaqueness:1;    ///< Whether the bitmap was fully opaque when loaded / updated
   bool          mIsNativeImage:1; ///< Whether the image is native or not
   bool          mIsFramebuffer:1; ///< Whether the image is an FBO

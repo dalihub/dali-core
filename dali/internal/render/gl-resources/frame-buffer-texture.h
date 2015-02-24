@@ -39,6 +39,15 @@ namespace Internal
 class FrameBufferTexture : public Texture
 {
 public:
+
+  /**
+   * Creates a new texture object
+   * @param[in] width       The width (pixels)
+   * @param[in] height      The height (pixels)
+   * @param     context The GL context
+   */
+  FrameBufferTexture(unsigned int width, unsigned int height, Context& context);
+
   /**
    * Creates a new texture object
    * @param[in] width       The width (pixels)
@@ -77,6 +86,7 @@ public:
 protected:
   unsigned int mFrameBufferName;
   unsigned int mRenderBufferName;
+  Pixel::Format mPixelFormat;
 
   /**
    * @copydoc Texture::CreateGlTexture

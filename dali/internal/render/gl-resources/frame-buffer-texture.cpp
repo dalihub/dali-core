@@ -29,11 +29,22 @@ namespace Dali
 namespace Internal
 {
 
+FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, Context& context)
+: Texture( context,
+           width, height,
+           width, height )
+{
+  DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
+
+  mFrameBufferName  = 0;
+  mRenderBufferName = 0;
+}
+
 FrameBufferTexture::FrameBufferTexture(unsigned int width, unsigned int height, Pixel::Format pixelFormat, Context& context)
 : Texture( context,
            width, height,
-           width, height,
-           pixelFormat )
+           width, height ),
+  mPixelFormat( pixelFormat )
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
 

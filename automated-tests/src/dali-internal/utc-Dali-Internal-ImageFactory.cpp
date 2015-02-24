@@ -166,7 +166,7 @@ int UtcDaliImageFactoryUseCachedRequest03(void)
   DALI_TEST_EQUALS( ticket, ticket3, TEST_LOCATION );
 
   // request differs in scaled size - not default size
-  ImageAttributes attr = ImageAttributes::New( 80, 160, Pixel::BGR8888 );
+  ImageAttributes attr = ImageAttributes::New( 80, 160);
   req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
   ResourceTicketPtr ticket4 = imageFactory.Load( *req2.Get() );
   DALI_TEST_CHECK( req != req2 );
@@ -181,10 +181,10 @@ int UtcDaliImageFactoryUseCachedRequest04(void)
 
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
-  ImageAttributes attr = ImageAttributes::New( 80, 160, Pixel::BGR8888 );
+  ImageAttributes attr = ImageAttributes::New( 80, 160 );
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, &attr );
 
-  ImageAttributes attr2 = ImageAttributes::New( 80, 160, Pixel::BGR8888 );
+  ImageAttributes attr2 = ImageAttributes::New( 80, 160 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr2 );
   DALI_TEST_EQUALS( req, req2, TEST_LOCATION );
   END_TEST;

@@ -137,12 +137,6 @@ public:
   virtual bool IsFullyOpaque() const = 0;
 
   /**
-   * Get the pixel format of the image data.
-   * @return the pixel format of the image.
-   */
-  virtual Pixel::Format GetPixelFormat() const;
-
-  /**
    * Sets the texture id.
    * @param id OpenGL texture id
    */
@@ -197,25 +191,21 @@ protected:
    * @param[in] height      The buffer height
    * @param[in] imageWidth  The image width
    * @param[in] imageHeight The image height
-   * @param[in] pixelFormat The pixel format
    */
   Texture( Context&      context,
            unsigned int  width,
            unsigned int  height,
            unsigned int  imageWidth,
-           unsigned int  imageHeight,
-           Pixel::Format pixelFormat );
+           unsigned int  imageHeight );
   /**
    * Constructor.
    * @param[in] context The GL context
    * @param[in] width       Both the buffer width and the image width (they are equal)
    * @param[in] height      Both the buffer height and the image height.
-   * @param[in] pixelFormat The pixel format
    */
   Texture( Context&      context,
            unsigned int  width,
-           unsigned int  height,
-           Pixel::Format pixelFormat );
+           unsigned int  height );
 
   /**
    * Initialize texture for rendering.
@@ -284,9 +274,6 @@ protected:
 
   unsigned int  mImageWidth;   ///< width of the original image (may be smaller than texture width)
   unsigned int  mImageHeight;  ///< height of the original image (may be smaller than texture height)
-
-  Pixel::Format mPixelFormat;  ///< Pixel format of the contained image data.
-
 };
 
 } // namespace Internal

@@ -124,6 +124,7 @@ private:
 private:
   Internal::BitmapCompressedPtr mBitmap;      ///< The Bitmap the Texture was created from (may be NULL)
   ResourcePolicy::Discardable mDiscardPolicy;
+  Pixel::Format  mPixelFormat;
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;

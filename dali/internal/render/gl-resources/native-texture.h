@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/gl-defines.h>
-#include <dali/public-api/images/native-image.h>
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/internal/render/gl-resources/texture.h>
 
 namespace Dali
@@ -46,7 +46,7 @@ public:
    * @param nativeImg         the NativeImage to be used
    * @param context           the GL context
    */
-  NativeTexture(NativeImage* nativeImg, Context& context);
+  NativeTexture(NativeImageInterface* nativeImg, Context& context);
 
   /**
    * Destructor.
@@ -68,12 +68,6 @@ public:
    */
   virtual bool HasAlphaChannel() const;
 
-
-  /**
-   * @copydoc Texture::GetPixelFormat
-   */
-  virtual Pixel::Format GetPixelFormat() const;
-
   /**
    * @copydoc Texture::Init
    */
@@ -93,7 +87,7 @@ protected:
 
 private:
 
-  NativeImagePtr mNativeImage; ///< reference to NativeImage the Texture was created from
+  NativeImageInterfacePtr mNativeImage; ///< reference to NativeImage the Texture was created from
 };
 
 }  //namespace Internal

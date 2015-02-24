@@ -99,7 +99,9 @@
 #include <dali/public-api/images/glyph-image.h>
 #include <dali/public-api/images/image-attributes.h>
 #include <dali/public-api/images/image.h>
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/native-image.h>
+#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/images/pixel.h>
 

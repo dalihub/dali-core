@@ -1024,7 +1024,6 @@ int UtcDaliInternalAllocateBitmapImage01(void)
   DALI_TEST_EQUALS ( imageTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetWidth(), 80, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetHeight(), 80, TEST_LOCATION );
-  DALI_TEST_EQUALS ( imageTicket->GetAttributes().GetPixelFormat(), Pixel::RGB565, TEST_LOCATION );
 
   application.SendNotification(); // Flush update queue
   application.Render(0); // Process message
@@ -1034,7 +1033,6 @@ int UtcDaliInternalAllocateBitmapImage01(void)
   DALI_TEST_EQUALS ( imageTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetWidth(), 80, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetHeight(), 80, TEST_LOCATION );
-  DALI_TEST_EQUALS ( imageTicket->GetAttributes().GetPixelFormat(), Pixel::RGB565, TEST_LOCATION );
 
   Integration::Bitmap* bitmap = resourceClient.GetBitmap(imageTicket);
   DALI_TEST_CHECK ( bitmap != NULL );
@@ -1062,7 +1060,6 @@ int UtcDaliInternalAddBitmapImage01(void)
   DALI_TEST_EQUALS ( imageTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetWidth(), 80, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetHeight(), 80, TEST_LOCATION );
-  DALI_TEST_EQUALS ( imageTicket->GetAttributes().GetPixelFormat(), Pixel::RGB565, TEST_LOCATION );
 
   application.SendNotification(); // Flush update queue
   application.Render(0); // Process message
@@ -1072,7 +1069,6 @@ int UtcDaliInternalAddBitmapImage01(void)
   DALI_TEST_EQUALS ( imageTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetWidth(), 80, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetHeight(), 80, TEST_LOCATION );
-  DALI_TEST_EQUALS ( imageTicket->GetAttributes().GetPixelFormat(), Pixel::RGB565, TEST_LOCATION );
 
   Integration::Bitmap* theBitmap = resourceClient.GetBitmap(imageTicket);
   DALI_TEST_CHECK ( theBitmap != NULL );
@@ -1100,7 +1096,6 @@ int UtcDaliInternalAddBitmapImage02(void)
   DALI_TEST_EQUALS ( imageTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetWidth(), 0, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetHeight(), 0, TEST_LOCATION );
-  DALI_TEST_EQUALS ( imageTicket->GetAttributes().GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
   DALI_TEST_CHECK ( 0 == testTicketObserver.LoadSucceededCalled() ); // Check no message was sent
 
   application.SendNotification(); // Flush update queue
@@ -1110,7 +1105,6 @@ int UtcDaliInternalAddBitmapImage02(void)
   DALI_TEST_EQUALS ( imageTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetWidth(), 0, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetHeight(), 0, TEST_LOCATION );
-  DALI_TEST_EQUALS ( imageTicket->GetAttributes().GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
   DALI_TEST_CHECK ( 0 == testTicketObserver.LoadSucceededCalled() ); // Check no message was sent
 
   Integration::Bitmap* theBitmap = resourceClient.GetBitmap(imageTicket);
@@ -1299,7 +1293,6 @@ int UtcDaliInternalAddFrameBufferImage(void)
 
   DALI_TEST_EQUALS ( imageTicket->GetWidth(),  80, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetHeight(), 80, TEST_LOCATION );
-  DALI_TEST_EQUALS ( imageTicket->GetAttributes().GetPixelFormat(), Pixel::A8, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   DALI_TEST_CHECK ( 0 == testTicketObserver.LoadSucceededCalled() ); // Check no message was sent
 
@@ -1310,7 +1303,6 @@ int UtcDaliInternalAddFrameBufferImage(void)
   DALI_TEST_EQUALS ( imageTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetWidth(), 80, TEST_LOCATION );
   DALI_TEST_EQUALS ( imageTicket->GetHeight(), 80, TEST_LOCATION );
-  DALI_TEST_EQUALS ( imageTicket->GetAttributes().GetPixelFormat(), Pixel::A8, TEST_LOCATION );
   DALI_TEST_CHECK ( 0 == testTicketObserver.LoadSucceededCalled() ); // Check no message was sent
 
   Integration::Bitmap* theBitmap = NULL;

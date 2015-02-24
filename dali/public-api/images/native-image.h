@@ -1,8 +1,8 @@
-#ifndef __DALI_INTEGRATION_NATIVE_IMAGE_H__
-#define __DALI_INTEGRATION_NATIVE_IMAGE_H__
+#ifndef __DALI_NATIVE_IMAGE_H__
+#define __DALI_NATIVE_IMAGE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,93 +19,79 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/pixel.h>
-#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/images/image.h>
+#include <dali/public-api/images/native-image-interface.h>
 
 namespace Dali
 {
 
+namespace Internal DALI_INTERNAL
+{
+class NativeImage;
+}
+
 /**
- * @brief Abstract interface to provide platform-specific support for handling image data.
- *
- * For example, an implementation could use EGL extensions, etc.
+ * @brief NativeImage represents an image resource that can be added to ImageActors.
+ * Its data is provided by native resources, such as shared bitmap memory or pixmap from X11 or ECORE-X11, etc.
  */
-class NativeImage : public Dali::RefObject
+class DALI_IMPORT_API  NativeImage : public Image
 {
 public:
 
   /**
-   * @brief Create the GL resource for the NativeImage.
+   * @brief Constructor with creates an uninitialized NativeImage object.
    *
-   * e.g. For the EglImageKHR extension, this corresponds to calling eglCreateImageKHR()
-   * @pre There is a GL context for the current thread.
-   * @return false If the initialization fails.
+   * Use NativeImage::New(...) to create an initialised object.
    */
-  virtual bool GlExtensionCreate() = 0;
+  NativeImage();
 
   /**
-   * @brief Destroy the GL resource for the NativeImage.
+   * @brief Destructor.
    *
-   * e.g. For the EglImageKHR extension, this corresponds to calling eglDestroyImageKHR()
-   * @pre There is a GL context for the current thread.
+   * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  virtual void GlExtensionDestroy() = 0;
+   ~NativeImage();
+
+   /**
+    * @brief This copy constructor is required for (smart) pointer semantics.
+    *
+    * @param [in] handle A reference to the copied handle
+    */
+   NativeImage( const NativeImage& handle );
 
   /**
-   * @brief Use the NativeImage as a texture for rendering.
+   * @brief This assignment operator is required for (smart) pointer semantics.
    *
-   * @pre There is a GL context for the current thread.
-   * @return A GL error code
+   * @param[in] rhs A reference to the copied handle.
+   * @return A reference to this.
    */
-  virtual unsigned int TargetTexture() = 0;
+  NativeImage& operator=( const NativeImage& rhs );
 
   /**
-   * @brief Called in each NativeTexture::Bind() call to allow implementation specific operations.
+   * @brief Create a new NativeImage, which used native resources.
    *
-   * The correct texture sampler has already been bound before the function gets called.
-   * @pre glAbstraction is being used by context in current thread
+   * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
+   * @param [in] nativeImageInterface An reference to the object of the interface implementation.
+   * @return A handle to a newly allocated object.
    */
-  virtual void PrepareTexture() = 0;
+  static NativeImage New( NativeImageInterface& nativeImageInterface );
 
   /**
-   * @brief Returns the width of the NativeImage.
+   * @brief Downcast an Object handle to NativeImage handle.
    *
-   * @return width
+   * If handle points to a NativeImage object, the downcast produces valid handle.
+   * If not, the returned handle is left unintialized.
+   * @param[in] handle Handle to an object.
+   * @return handle to a NativeImage or an uninitialized handle.
    */
-  virtual unsigned int GetWidth() const = 0;
+  static NativeImage DownCast( BaseHandle handle );
 
-  /**
-   * @brief Returns the height of the NativeImage.
-   *
-   * @return height
-   */
-  virtual unsigned int GetHeight() const = 0;
+public: // Not intended for application developers
 
-  /**
-   * @brief Returns the internal pixel NativeImage::PixelFormat of the NativeImage.
-   *
-   * @return pixel format
-   */
-  virtual Pixel::Format GetPixelFormat() const = 0;
-
-protected:
-
-  /**
-   * @brief A reference counted object may only be deleted by calling Unreference().
-   *
-   * The implementation should destroy the NativeImage resources.
-   */
-  virtual ~NativeImage()
-  {
-  }
+  explicit DALI_INTERNAL NativeImage( Internal::NativeImage* );
 
 };
 
-/**
- * @brief Pointer to Dali::NativeImage
- */
-typedef IntrusivePtr<NativeImage>  NativeImagePtr;
-
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_NATIVE_IMAGE_H__
+#endif // __DALI_NATIVE_IMAGE_H__

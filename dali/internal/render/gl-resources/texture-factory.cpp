@@ -25,12 +25,11 @@
 #include <dali/internal/render/gl-resources/native-texture.h>
 #include <dali/internal/render/gl-resources/frame-buffer-texture.h>
 #include <dali/internal/render/gl-resources/native-frame-buffer-texture.h>
-#include <dali/public-api/images/native-image.h>
 
 
 namespace Dali
 {
-class NativeImage;
+class NativeImageInterface;
 
 namespace Internal
 {
@@ -79,7 +78,7 @@ Internal::Texture* NewBitmapTexture( unsigned int      width,
 }
 
 
-Internal::Texture* NewNativeImageTexture( NativeImage& nativeImg, Context& context )
+Internal::Texture* NewNativeImageTexture( NativeImageInterface& nativeImg, Context& context )
 {
   NativeTexture* texture = new NativeTexture(&nativeImg, context);
   if (!texture->Init())
@@ -104,7 +103,7 @@ Internal::Texture* NewFrameBufferTexture( unsigned int width,
   return texture;
 }
 
-Internal::Texture* NewFrameBufferTexture( NativeImagePtr nativeImage,
+Internal::Texture* NewFrameBufferTexture( NativeImageInterfacePtr nativeImage,
                                           Context& context )
 {
   NativeFrameBufferTexture* texture = new NativeFrameBufferTexture(nativeImage, context);

@@ -36,10 +36,10 @@ CompressedBitmapTexture::CompressedBitmapTexture(Internal::BitmapCompressed* con
           bitmap->GetImageWidth(),
           bitmap->GetImageHeight(),
           bitmap->GetImageWidth(),
-          bitmap->GetImageHeight(),
-          bitmap->GetPixelFormat()),
+          bitmap->GetImageHeight()),
   mBitmap(bitmap),
-  mDiscardPolicy(discardPolicy)
+  mDiscardPolicy(discardPolicy),
+  mPixelFormat( bitmap->GetPixelFormat() )
 {
   DALI_LOG_TRACE_METHOD(Debug::Filter::gImage);
   DALI_LOG_SET_OBJECT_STRING(this, DALI_LOG_GET_OBJECT_STRING(bitmap));
