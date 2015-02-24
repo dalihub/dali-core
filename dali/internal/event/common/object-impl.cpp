@@ -30,7 +30,6 @@
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/property-notification-impl.h>
-#include <dali/internal/event/common/property-index-ranges.h>
 #include <dali/internal/event/common/type-registry-impl.h>
 
 using Dali::Internal::SceneGraph::AnimatableProperty;

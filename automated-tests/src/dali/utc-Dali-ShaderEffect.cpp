@@ -682,7 +682,7 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor(void)
   Property::Index uVecProperty = effect.GetPropertyIndex("uVec3");
 
   Constraint constraint = Constraint::New<Vector3>( uVecProperty,
-                                                    Source(actor, Actor::POSITION),
+                                                    Source(actor, Actor::Property::Position),
                                                     TestConstraintFromPositionToVector3() );
 
   effect.ApplyConstraint(constraint);
@@ -722,12 +722,12 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor2(void)
   Property::Index uVecProperty = effect.GetPropertyIndex("uVec3");
 
   Constraint shaderConstraint = Constraint::New<Vector3>( uVecProperty,
-                                                    Source(actor, Actor::POSITION),
+                                                    Source(actor, Actor::Property::Position),
                                                     TestConstraintFromPositionToVector3() );
 
   effect.ApplyConstraint(shaderConstraint);
 
-  Constraint actorConstraint = Constraint::New<Vector3>( Actor::POSITION,
+  Constraint actorConstraint = Constraint::New<Vector3>( Actor::Property::Position,
                                                          TestConstraintToVector3Double(targetPosition) );
 
   actor.ApplyConstraint(actorConstraint);

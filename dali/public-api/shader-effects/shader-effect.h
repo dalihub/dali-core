@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/property-index-ranges.h>
 
 namespace Dali
 {
@@ -150,6 +151,34 @@ enum GeometryType
 class DALI_IMPORT_API ShaderEffect : public Handle
 {
 public:
+
+  // Default Properties
+  /**
+   * @brief An enumeration of properties belonging to the Path class.
+   * Grid Density defines the spacing of vertex coordinates in world units.
+   * ie a larger actor will have more grids at the same spacing.
+   *
+   *  +---+---+         +---+---+---+
+   *  |   |   |         |   |   |   |
+   *  +---+---+         +---+---+---+
+   *  |   |   |         |   |   |   |
+   *  +---+---+         +---+---+---+
+   *                    |   |   |   |
+   *                    +---+---+---+
+   */
+  struct Property
+  {
+    enum
+    {
+      GridDensity = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "grid-density",   type FLOAT
+      Image,                                            ///< name "image",          type MAP  {"filename":"", "load-policy":...}
+      Program,                                          ///< name "program",        type MAP  {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
+      GeometryHints,                                    ///< name "geometry-hints", type INT  (bitfield) values from enum GeometryHints
+    };
+  };
+
+  static const float DEFAULT_GRID_DENSITY;              ///< The default density is 40 pixels
+
   /**
    * @brief The Extension class is a base class for objects that can be attached to the
    * ShaderEffects as extensions.
@@ -170,25 +199,6 @@ public:
      */
     virtual ~Extension();
   };
-
-  // Default Properties
-  /* Grid Density defines the spacing of vertex coordinates in world units.
-   * ie a larger actor will have more grids at the same spacing.
-   *
-   *  +---+---+         +---+---+---+
-   *  |   |   |         |   |   |   |
-   *  +---+---+         +---+---+---+
-   *  |   |   |         |   |   |   |
-   *  +---+---+         +---+---+---+
-   *                    |   |   |   |
-   *                    +---+---+---+
-   */
-  static const Property::Index GRID_DENSITY;       ///< name "grid-density",   type FLOAT
-  static const Property::Index IMAGE;              ///< name "image",          type MAP; {"filename":"", "load-policy":...}
-  static const Property::Index PROGRAM;            ///< name "program",        type MAP; {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
-  static const Property::Index GEOMETRY_HINTS;     ///< name "geometry-hints", type INT (bitfield) values from enum GeometryHints
-
-  static const float DEFAULT_GRID_DENSITY;         ///< The default density is 40 pixels
 
   /**
    * @brief Hints for rendering/subdividing geometry.

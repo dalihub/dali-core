@@ -17,9 +17,25 @@
 
 // CLASS HEADER
 #include <dali/internal/event/animation/path-impl.h>
+#include <dali/internal/event/common/property-helper.h>
+
+namespace Dali
+{
+
+namespace Internal
+{
 
 namespace
 {
+
+// Properties
+
+//              Name             Type   writable animatable constraint-input  enum for index-checking
+DALI_PROPERTY_TABLE_BEGIN
+DALI_PROPERTY( "points",         ARRAY, true, false, false,   Dali::Path::Property::Points        )
+DALI_PROPERTY( "control-points", ARRAY, true, false, false,   Dali::Path::Property::ControlPoints )
+DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
+
 /**
  * These coefficient arise from the cubic polynomial equations for
  * a bezier curve.
@@ -39,23 +55,7 @@ const float BezierBasisCoeff[] = {  -1.0f,  3.0f, -3.0f, 1.0f,
 
 const Dali::Matrix BezierBasis = Dali::Matrix( BezierBasisCoeff );
 
-const Dali::Internal::PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
-{
-  { "points",         Dali::Property::ARRAY, true, false, false },
-  { "control-points", Dali::Property::ARRAY, true, false, false },
-};
-
-const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( DEFAULT_PROPERTY_DETAILS[0] );
-
-}//Unnamed namespace
-
-namespace Dali
-{
-const Property::Index Path::POINTS              = 0;
-const Property::Index Path::CONTROL_POINTS      = 1;
-
-namespace Internal
-{
+} //Unnamed namespace
 
 Path* Path::New()
 {
@@ -101,11 +101,9 @@ const char* Path::GetDefaultPropertyName(Property::Index index) const
   {
     return DEFAULT_PROPERTY_DETAILS[index].name;
   }
-  else
-  {
-    // index out of range
-    return NULL;
-  }
+
+  // index out of range
+  return NULL;
 }
 
 Property::Index Path::GetDefaultPropertyIndex(const std::string& name) const
@@ -131,40 +129,28 @@ Property::Type Path::GetDefaultPropertyType(Property::Index index) const
   {
     return DEFAULT_PROPERTY_DETAILS[index].type;
   }
-  else
-  {
-    // index out of range
-    return Property::NONE;
-  }
+
+  // index out of range
+  return Property::NONE;
 }
 
 Property::Value Path::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value value;
-  switch ( index )
+  if( index == Dali::Path::Property::Points )
   {
-    case Dali::Path::POINTS:
+    size_t pointCount( mPoint.Size() );
+    for( size_t i( 0 ); i != pointCount; ++i )
     {
-      size_t pointCount( mPoint.Size() );
-      for( size_t i(0); i!=pointCount; ++i )
-      {
-        value.AppendItem( mPoint[i] );
-      }
-      break;
+      value.AppendItem( mPoint[i] );
     }
-    case Dali::Path::CONTROL_POINTS:
+  }
+  else if( index == Dali::Path::Property::ControlPoints )
+  {
+    size_t controlpointCount( mControlPoint.Size() );
+    for( size_t i( 0 ); i != controlpointCount; ++i )
     {
-      size_t controlpointCount( mControlPoint.Size() );
-      for( size_t i(0); i!=controlpointCount; ++i )
-      {
-        value.AppendItem( mControlPoint[i] );
-      }
-      break;
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS(false && "Path::Property is out of bounds");
-      break;
+      value.AppendItem( mControlPoint[i] );
     }
   }
 
@@ -173,38 +159,28 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
 
 void Path::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
 {
-  switch ( index )
+  if( index == Dali::Path::Property::Points )
   {
-    case Dali::Path::POINTS:
-    {
-      Property::Array propertyArray;
-      propertyValue.Get(propertyArray);
+    Property::Array propertyArray;
+    propertyValue.Get(propertyArray);
 
-      size_t propertyArrayCount = propertyArray.size();
-      mPoint.Resize( propertyArrayCount );
-      for( size_t i(0); i!=propertyArrayCount; ++i )
-      {
-        propertyArray[i].Get( mPoint[i]);
-      }
-      break;
-    }
-    case Dali::Path::CONTROL_POINTS:
+    size_t propertyArrayCount = propertyArray.size();
+    mPoint.Resize( propertyArrayCount );
+    for( size_t i(0); i!=propertyArrayCount; ++i )
     {
-      Property::Array propertyArray;
-      propertyValue.Get(propertyArray);
+      propertyArray[i].Get( mPoint[i]);
+    }
+  }
+  else if( index == Dali::Path::Property::ControlPoints )
+  {
+    Property::Array propertyArray;
+    propertyValue.Get(propertyArray);
 
-      size_t propertyArrayCount = propertyArray.size();
-      mControlPoint.Resize( propertyArrayCount );
-      for( size_t i(0); i!=propertyArrayCount; ++i )
-      {
-        propertyArray[i].Get( mControlPoint[i]);
-      }
-      break;
-    }
-    default:
+    size_t propertyArrayCount = propertyArray.size();
+    mControlPoint.Resize( propertyArrayCount );
+    for( size_t i(0); i!=propertyArrayCount; ++i )
     {
-      // no read only properties
-      break;
+      propertyArray[i].Get( mControlPoint[i]);
     }
   }
 }
@@ -215,10 +191,8 @@ bool Path::IsDefaultPropertyWritable(Property::Index index) const
   {
     return DEFAULT_PROPERTY_DETAILS[index].writable;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 bool Path::IsDefaultPropertyAnimatable(Property::Index index) const
@@ -227,10 +201,8 @@ bool Path::IsDefaultPropertyAnimatable(Property::Index index) const
   {
     return DEFAULT_PROPERTY_DETAILS[index].animatable;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 bool Path::IsDefaultPropertyAConstraintInput( Property::Index index ) const
@@ -239,10 +211,8 @@ bool Path::IsDefaultPropertyAConstraintInput( Property::Index index ) const
   {
     return DEFAULT_PROPERTY_DETAILS[index].constraintInput;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 void Path::AddPoint(const Vector3& point )

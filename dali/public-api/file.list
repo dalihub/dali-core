@@ -246,7 +246,7 @@ public_api_core_object_header_files = \
   $(public_api_src_dir)/object/handle.h \
   $(public_api_src_dir)/object/object-registry.h \
   $(public_api_src_dir)/object/property-conditions.h \
-  $(public_api_src_dir)/object/property-index.h \
+  $(public_api_src_dir)/object/property-index-ranges.h \
   $(public_api_src_dir)/object/property-input.h \
   $(public_api_src_dir)/object/property-map.h \
   $(public_api_src_dir)/object/property-notification-declarations.h \

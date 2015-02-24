@@ -136,6 +136,29 @@ const char * GetEnumerationName( T value, const StringEnum< T >* table, unsigned
 }
 
 /**
+ * @brief Chooses the appropriate string for the provided enumeration from the given table.
+ * This is an optimised version that handles enumerations that start at 0 and are linear only.
+ *
+ * @param[in]  value       The enumeration.
+ * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
+ * @param[in]  tableCount  Number of items in the array.
+ *
+ * @return The equivalent enumeration for the given string. Will return NULL if the value does not exist
+ *
+ * @note The caller is NOT responsible for cleaning up the returned pointer as it is statically allocated.
+ */
+template< typename T >
+const char * GetLinearEnumerationName( T value, const StringEnum< T >* table, unsigned int tableCount )
+{
+  if ( value < 0 || value >= (int)tableCount )
+  {
+    return NULL;
+  }
+
+  return table[value].string;
+}
+
+/**
  * @brief Takes a string and returns the appropriate color mode.
  *
  * @param[in] value The input string

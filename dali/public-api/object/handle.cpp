@@ -22,7 +22,6 @@
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-conditions.h>
-#include <dali/public-api/object/property-index.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/object-impl.h>

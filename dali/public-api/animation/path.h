@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/property-index-ranges.h>
 
 namespace Dali
 {
@@ -38,8 +39,18 @@ class DALI_IMPORT_API Path : public Handle
 {
 public:
 
-  static const Property::Index POINTS;               ///< name "points",          type ARRAY of Vector3
-  static const Property::Index CONTROL_POINTS;       ///< name "control-points",  type ARRAY of Vector3
+  /**
+   * @brief An enumeration of properties belonging to the Path class.
+   */
+  struct Property
+  {
+    enum
+    {
+      Points         = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "points",         type Vector3
+      ControlPoints,                                                ///< name "control-points", type Vector3
+    };
+  };
+
   /**
    * @brief Create an initialized Path handle.
    *

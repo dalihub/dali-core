@@ -65,9 +65,18 @@ class DALI_IMPORT_API Layer : public Actor
 {
 public:
 
-  // Default Properties additional to Actor
-  static const Property::Index CLIPPING_ENABLE; ///< name "clipping-enable",  type BOOLEAN
-  static const Property::Index CLIPPING_BOX;    ///< name "clipping-box",     type RECTANGLE
+  /**
+   * @brief An enumeration of properties belonging to the Layer class.
+   * Properties additional to Actor.
+   */
+  struct Property
+  {
+    enum
+    {
+      ClippingEnable = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "clipping-enable",  type Boolean
+      ClippingBox,                                                 ///< name "clipping-box",     type Rectangle
+    };
+  };
 
   /**
    * @brief The sort function type.

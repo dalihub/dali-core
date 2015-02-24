@@ -23,6 +23,7 @@
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
+#include <dali/public-api/object/property-index-ranges.h>
 
 namespace Dali
 {
@@ -44,8 +45,16 @@ class DALI_IMPORT_API ActiveConstraint : public Handle
 {
 public:
 
-  // Default Properties
-  static const Property::Index WEIGHT; ///< Property 0, name "weight", type FLOAT
+  /**
+   * @brief An enumeration of properties belonging to the ActiveConstraint class.
+   */
+  struct Property
+  {
+    enum
+    {
+      Weight     = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "weight", type FLOAT
+    };
+  };
 
   static const float FINAL_WEIGHT;   ///< 1.0f means the constraint is fully-applied, unless weight is still being animated
   static const float DEFAULT_WEIGHT; ///< 1.0f
@@ -91,7 +100,7 @@ public:
    *
    * @return The target property.
    */
-  Property::Index GetTargetProperty();
+  Dali::Property::Index GetTargetProperty();
 
   /**
    * @brief Set the weight of the constraint; this is a value clamped between 0.

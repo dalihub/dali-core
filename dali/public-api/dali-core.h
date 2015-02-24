@@ -125,7 +125,7 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/property-conditions.h>
-#include <dali/public-api/object/property-index.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-map.h>
 #include <dali/public-api/object/property-notification-declarations.h>

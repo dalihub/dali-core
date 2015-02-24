@@ -62,11 +62,20 @@ class DALI_IMPORT_API ImageActor : public RenderableActor
 {
 public:
 
-  // Default Properties additional to RenderableActor
-  static const Property::Index PIXEL_AREA;           ///< name "pixel-area",          type RECTANGLE
-  static const Property::Index STYLE;                ///< name "style",               type STRING
-  static const Property::Index BORDER;               ///< name "border",              type VECTOR4
-  static const Property::Index IMAGE;                ///< name "image",               type MAP {"filename":"", "load-policy":...}
+  /**
+   * @brief An enumeration of properties belonging to the ImageActor class.
+   * Properties additional to RenderableActor.
+   */
+  struct Property
+  {
+    enum
+    {
+      PixelArea = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixel-area",  type RECTANGLE
+      Style,                                                  ///< name "style",       type STRING
+      Border,                                                 ///< name "border",      type VECTOR4
+      Image,                                                  ///< name "image",       type MAP {"filename":"", "load-policy":...}
+    };
+  };
 
   /**
    * @brief Style determines how the Image is rendered.

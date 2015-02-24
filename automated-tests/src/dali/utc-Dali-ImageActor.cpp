@@ -658,10 +658,10 @@ int UtcDaliImageActorDefaultProperties(void)
   ImageActor actor = ImageActor::New( img );
 
   std::vector<Property::Index> indices;
-  indices.push_back(ImageActor::PIXEL_AREA      );
-  indices.push_back(ImageActor::STYLE           );
-  indices.push_back(ImageActor::BORDER          );
-  indices.push_back(ImageActor::IMAGE           );
+  indices.push_back(ImageActor::Property::PixelArea      );
+  indices.push_back(ImageActor::Property::Style           );
+  indices.push_back(ImageActor::Property::Border          );
+  indices.push_back(ImageActor::Property::Image           );
 
   DALI_TEST_CHECK(actor.GetPropertyCount() == ( Actor::New().GetPropertyCount() + indices.size() ) );
 
@@ -677,11 +677,11 @@ int UtcDaliImageActorDefaultProperties(void)
   actor.SetPixelArea(ImageActor::PixelArea( 0, 0, 0, 0 ));
 
   ImageActor::PixelArea area( 1, 2, 3, 4 );
-  actor.SetProperty(ImageActor::PIXEL_AREA, Property::Value(Rect<int>(area)));
+  actor.SetProperty(ImageActor::Property::PixelArea, Property::Value(Rect<int>(area)));
 
-  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(ImageActor::PIXEL_AREA));
+  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(ImageActor::Property::PixelArea));
 
-  Property::Value v = actor.GetProperty(ImageActor::PIXEL_AREA);
+  Property::Value v = actor.GetProperty(ImageActor::Property::PixelArea);
 
   DALI_TEST_CHECK(v.Get<Rect<int> >() == area);
 
@@ -924,7 +924,7 @@ int UtcDaliImageActorImageProperty(void)
   application.SendNotification();
   application.Render();
 
-  Property::Value imageMap = imageActor.GetProperty( ImageActor::IMAGE );
+  Property::Value imageMap = imageActor.GetProperty( ImageActor::Property::Image );
   DALI_TEST_CHECK( imageMap.HasKey( "filename" ) );
   DALI_TEST_EQUALS( imageMap.GetValue( "filename" ).Get< std::string >(), "MY_PATH", TEST_LOCATION );
   END_TEST;

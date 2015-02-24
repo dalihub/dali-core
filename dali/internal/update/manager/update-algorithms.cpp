@@ -35,7 +35,6 @@
 
 #include <dali/integration-api/debug.h>
 
-
 namespace Dali
 {
 
