@@ -48,26 +48,27 @@ class ObjectRegistry;
  * ObjectRegistry registry = Stage::GetObjectRegistry();
  * registry.ObjectCreatedSignal().Connect( ObjectCreatedCallbackFunc );
  *
+ * Signals
+ * | %Signal Name     | Method                       |
+ * |------------------|------------------------------|
+ * | object-created   | @ref ObjectCreatedSignal()   |
+ * | object-destroyed | @ref ObjectDestroyedSignal() |
  */
 class DALI_IMPORT_API ObjectRegistry : public BaseHandle
 {
 public:
-
-  //Signal Names
-  static const char* const SIGNAL_OBJECT_CREATED;   ///< Created signal name
-  static const char* const SIGNAL_OBJECT_DESTROYED; ///< Destroyed signal name
 
   // Typedefs
 
   /**
    * @brief Object created signal
    */
-  typedef Signal<  void (BaseHandle) > ObjectCreatedSignalType;
+  typedef Signal< void ( BaseHandle ) > ObjectCreatedSignalType;
 
   /**
    * @brief Object destroyed signal
    */
-  typedef Signal<  void (const Dali::RefObject*) > ObjectDestroyedSignalType;
+  typedef Signal< void ( const Dali::RefObject* ) > ObjectDestroyedSignalType;
 
   /**
    * @brief Allows the creation of an empty objectRegistry handle.

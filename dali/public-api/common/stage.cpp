@@ -43,10 +43,6 @@ using Internal::Core;
 const Vector4 Stage::DEFAULT_BACKGROUND_COLOR(0.0f, 0.0f, 0.0f, 1.0f);
 const Vector4 Stage::DEBUG_BACKGROUND_COLOR(0.2f, 0.5f, 0.2f, 1.0f);
 
-const char* const Stage::SIGNAL_KEY_EVENT = "key-event";
-const char* const Stage::SIGNAL_EVENT_PROCESSING_FINISHED = "event-processing-finished";
-const char* const Stage::SIGNAL_TOUCHED = "touched";
-
 Stage::Stage()
 {
 }
@@ -73,7 +69,9 @@ Stage::Stage(Internal::Stage* internal)
 
 Stage Stage::GetCurrent()
 {
-  return Stage(Internal::Stage::GetCurrent());
+  Internal::Stage* stage = Internal::Stage::GetCurrent();
+  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+  return Stage( stage );
 }
 
 bool Stage::IsInstalled()

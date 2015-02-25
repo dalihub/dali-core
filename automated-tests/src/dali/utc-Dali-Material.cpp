@@ -129,15 +129,15 @@ int UtcDaliMaterialSettersAndGetters(void)
   material.SetNormalMapFileName("normal-map.png");
   DALI_TEST_EQUALS( material.GetNormalMapFileName(), "normal-map.png", TEST_LOCATION);
 
-  Image diffuseTexture = Image::New("diffuse-texture.png");
+  Image diffuseTexture = ResourceImage::New("diffuse-texture.png");
   material.SetDiffuseTexture(diffuseTexture);
   DALI_TEST_EQUALS( material.GetDiffuseTexture(), diffuseTexture, TEST_LOCATION );
 
-  Image opacityTexture = Image::New("opacity-texture.png");
+  Image opacityTexture = ResourceImage::New("opacity-texture.png");
   material.SetOpacityTexture(opacityTexture);
   DALI_TEST_EQUALS( material.GetOpacityTexture(), opacityTexture, TEST_LOCATION);
 
-  Image normalMap = Image::New("normal-map.png");
+  Image normalMap = ResourceImage::New("normal-map.png");
   material.SetNormalMap(normalMap);
   DALI_TEST_EQUALS( material.GetNormalMap(), normalMap, TEST_LOCATION);
 
@@ -175,7 +175,7 @@ int UtcDaliMaterialStage01(void)
 
   {
     Material material = Material::New("material");
-    Image image = Image::New( "image.png", Image::Immediate, Image::Never );
+    Image image = ResourceImage::New( "image.png", ResourceImage::IMMEDIATE, Image::NEVER );
     DALI_TEST_CHECK(image);
     application.SendNotification();
     application.Render(16);
@@ -258,7 +258,7 @@ int UtcDaliMaterialStage02(void)
   {
     Material material = Material::New("material");
 
-    Image image = Image::New( "image.png", Image::OnDemand, Image::Unused );
+    Image image = ResourceImage::New( "image.png", ResourceImage::ON_DEMAND, Image::UNUSED );
     DALI_TEST_CHECK(image);
     application.SendNotification();
     application.Render(16);

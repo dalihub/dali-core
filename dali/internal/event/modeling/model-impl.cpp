@@ -47,7 +47,17 @@ namespace Internal
 
 namespace
 {
+
+// Signals
+
+const char* const SIGNAL_MODEL_LOADING_FINISHED = "model-loading-finished";
+const char* const SIGNAL_MODEL_SAVING_FINISHED =  "model-saving-finished";
+
 TypeRegistration mType( typeid( Dali::Model ), typeid( Dali::BaseHandle ), NULL );
+
+SignalConnectorType signalConnector1( mType, SIGNAL_MODEL_LOADING_FINISHED, &Model::DoConnectSignal );
+SignalConnectorType signalConnector2( mType, SIGNAL_MODEL_SAVING_FINISHED,  &Model::DoConnectSignal );
+
 } // unnamed namespace
 
 using Dali::Vector4;
@@ -80,6 +90,28 @@ Model::~Model()
   mTicket->RemoveObserver(*this);
 
   UnregisterObject();
+}
+
+bool Model::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
+{
+  bool connected( true );
+  Model* model = dynamic_cast<Model*>(object);
+
+  if( 0 == strcmp( signalName.c_str(), SIGNAL_MODEL_LOADING_FINISHED ) )
+  {
+    model->LoadingFinishedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_MODEL_SAVING_FINISHED ) )
+  {
+    model->SavingFinishedSignal().Connect( tracker, functor );
+  }
+  else
+  {
+    // signalName does not match any signal
+    connected = false;
+  }
+
+  return connected;
 }
 
 void Model::ResourceLoadingFailed(const ResourceTicket& ticket)

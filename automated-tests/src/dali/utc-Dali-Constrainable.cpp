@@ -51,7 +51,7 @@ int UtcDaliConstrainableDownCastNegative(void)
 {
   TestApplication application;
 
-  Image image = Image::New( "temp" );
+  Image image = ResourceImage::New( "temp" );
   Constrainable customHandle1 = Constrainable::DownCast( image );
   DALI_TEST_CHECK( ! customHandle1 );
 

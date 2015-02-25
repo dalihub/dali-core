@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-index.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/active-constraint.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/object/custom-object-internal.h>
 
@@ -45,7 +45,7 @@ Constrainable::Constrainable()
 
 Constrainable Constrainable::DownCast( BaseHandle handle )
 {
-  return Constrainable( dynamic_cast<Dali::Internal::ProxyObject*>(handle.GetObjectPtr()) );
+  return Constrainable( dynamic_cast<Dali::Internal::Object*>(handle.GetObjectPtr()) );
 }
 
 Constrainable::~Constrainable()

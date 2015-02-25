@@ -3259,7 +3259,7 @@ int UtcDaliConstraintInvalidInputProperty(void)
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "mTargetProxy->IsPropertyAConstraintInput( source.propertyIndex )", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "mTargetObject->IsPropertyAConstraintInput( source.propertyIndex )", TEST_LOCATION );
   }
   END_TEST;
 }

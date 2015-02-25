@@ -28,7 +28,7 @@
 #include <dali/internal/event/modeling/mesh-impl.h>
 #include <dali/internal/event/modeling/material-impl.h>
 #include <dali/internal/event/resources/resource-ticket.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 
 namespace Dali
 {
@@ -183,7 +183,7 @@ protected:
   /**
    * Helper class for connecting Nodes to the scene-graph MeshAttachment
    */
-  class Connector : public ProxyObject::Observer
+  class Connector : public Object::Observer
   {
   public:
     /**
@@ -211,22 +211,22 @@ protected:
      */
     void ConnectNode();
 
-  public: // From ProxyObject::Observer
+  public: // From Object::Observer
 
     /**
-     * @copydoc Dali::Internal::ProxyObject::Observer::SceneObjectAdded
+     * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded
      */
-    virtual void SceneObjectAdded( ProxyObject& proxy );
+    virtual void SceneObjectAdded( Object& object );
 
     /**
-     * @copydoc Dali::Internal::ProxyObject::Observer::SceneObjectAdded
+     * @copydoc Dali::Internal::Object::Observer::SceneObjectAdded
      */
-    virtual void SceneObjectRemoved( ProxyObject& proxy );
+    virtual void SceneObjectRemoved( Object& object );
 
     /**
-     * @copydoc Dali::Internal::ProxyObject::Observer::ProxyDestroyed
+     * @copydoc Dali::Internal::Object::Observer::ObjectDestroyed
      */
-    virtual void ProxyDestroyed( ProxyObject& proxy );
+    virtual void ObjectDestroyed( Object& object );
 
   public:
     MeshAttachment& mMeshAttachment; ///< Parent

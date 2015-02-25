@@ -54,6 +54,7 @@
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/light.h>
 #include <dali/public-api/common/loading-state.h>
+#include <dali/public-api/common/mutex.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/view-mode.h>
@@ -98,7 +99,9 @@
 #include <dali/public-api/images/glyph-image.h>
 #include <dali/public-api/images/image-attributes.h>
 #include <dali/public-api/images/image.h>
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/native-image.h>
+#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/nine-patch-image.h>
 #include <dali/public-api/images/pixel.h>
 

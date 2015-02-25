@@ -19,8 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <algorithm>
-#include <iostream>
+#include <iosfwd>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -442,7 +441,7 @@ DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Vector2& vector
  */
 inline Vector2 Min( const Vector2& a, const Vector2& b )
 {
-  return Vector2( std::min(a.x,b.x), std::min(a.y,b.y) );
+  return Vector2( a.x < b.x ? a.x : b.x , a.y < b.y ? a.y : b.y );
 }
 
 /**
@@ -455,7 +454,7 @@ inline Vector2 Min( const Vector2& a, const Vector2& b )
  */
 inline Vector2 Max( const Vector2& a, const Vector2& b )
 {
-  return Vector2( std::max(a.x,b.x), std::max(a.y,b.y) );
+  return Vector2( a.x > b.x ? a.x : b.x , a.y > b.y ? a.y : b.y );
 }
 
 /**

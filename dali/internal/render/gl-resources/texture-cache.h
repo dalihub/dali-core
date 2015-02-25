@@ -38,7 +38,7 @@
 
 namespace Dali
 {
-class NativeImage;
+class NativeImageInterface;
 
 
 namespace Integration
@@ -112,7 +112,7 @@ public:
    * @param[in] id Resource Id of the native image
    * @param[in] nativeImage The native image
    */
-  void AddNativeImage( ResourceId id, NativeImagePtr nativeImage );
+  void AddNativeImage( ResourceId id, NativeImageInterfacePtr nativeImage );
 
   /**
    * Create a framebuffer texture and add it to the texture cache
@@ -128,7 +128,7 @@ public:
    * @param[in] id Resource Id of the native image
    * @param[in] nativeImage The NativeImage
    */
-  void AddFrameBuffer( ResourceId id, NativeImagePtr nativeImage );
+  void AddFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage );
 
   /**
    * Update the texture with a newly loaded bitmap
@@ -267,7 +267,7 @@ protected: // Implements TextureCacheDispatcher
   /**
    * @copydoc TextureCacheDispatcher::DispatchCreateTextureForNativeImage()
    */
-  virtual void DispatchCreateTextureForNativeImage( ResourceId id, NativeImagePtr nativeImage );
+  virtual void DispatchCreateTextureForNativeImage( ResourceId id, NativeImageInterfacePtr nativeImage );
 
   /**
    * @copydoc TextureCacheDispatcher::DispatchCreateTextureForFramebuffer()
@@ -277,7 +277,7 @@ protected: // Implements TextureCacheDispatcher
   /**
    * @copydoc TextureCacheDispatcher::DispatchCreateTextureForFramebuffer()
    */
-  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImagePtr nativeImage );
+  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage );
 
   /**
    * @copydoc TextureCacheDispatcher::DispatchUpdateTexture()

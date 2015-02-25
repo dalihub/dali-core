@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <test-native-image.h>
 
 using std::max;
 using namespace Dali;
@@ -46,7 +47,6 @@ int UtcDaliFrameBufferImageNew01(void)
 
   // invoke default handle constructor
   FrameBufferImage image;
-  Dali::ImageAttributes attributes;
   Vector2 stageSize = Stage::GetCurrent().GetSize();
 
   // initialise handle
@@ -59,11 +59,9 @@ int UtcDaliFrameBufferImageNew01(void)
   application.Render();
   application.SendNotification();
 
-  attributes = image.GetAttributes();
-
   DALI_TEST_CHECK( image );
-  DALI_TEST_EQUALS((float)attributes.GetWidth(), stageSize.width, TEST_LOCATION);
-  DALI_TEST_EQUALS((float)attributes.GetHeight(), stageSize.height, TEST_LOCATION);
+  DALI_TEST_EQUALS((float)image.GetWidth(), stageSize.width, TEST_LOCATION);
+  DALI_TEST_EQUALS((float)image.GetHeight(), stageSize.height, TEST_LOCATION);
 
   image = FrameBufferImage::New(16, 16);      // create framebuffer with dimensions of 16x16
   actor.SetImage(image);
@@ -73,11 +71,28 @@ int UtcDaliFrameBufferImageNew01(void)
   application.Render();
   application.SendNotification();
 
-  attributes = image.GetAttributes();
+  DALI_TEST_CHECK( image );
+  DALI_TEST_EQUALS(image.GetWidth(), 16u, TEST_LOCATION);
+  DALI_TEST_EQUALS(image.GetHeight(), 16u, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliFrameBufferImageNew02(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliFrameBufferImageNew02 - FrameBufferImage::New(NativeImageInterface&)");
+
+  // invoke default handle constructor
+  FrameBufferImage image;
+  TestNativeImagePointer nativeImage = TestNativeImage::New(16, 16);
+
+  DALI_TEST_CHECK( !image );
+
+  // initialise handle
+  image = FrameBufferImage::New(*(nativeImage.Get()));
 
   DALI_TEST_CHECK( image );
-  DALI_TEST_EQUALS(attributes.GetWidth(), 16u, TEST_LOCATION);
-  DALI_TEST_EQUALS(attributes.GetHeight(), 16u, TEST_LOCATION);
   END_TEST;
 }
 

@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
+#include <dali/public-api/images/image-attributes.h>
 
 namespace Dali
 {
@@ -87,7 +88,7 @@ public:
    * used once all actors using it have gone off-stage.
    * @return A handle to a newly allocated object.
    */
-  static EncodedBufferImage New(const uint8_t * const encodedImage, std::size_t encodedImageByteCount, const ImageAttributes& attributes, ReleasePolicy releasePol = Image::Never);
+  static EncodedBufferImage New(const uint8_t * const encodedImage, std::size_t encodedImageByteCount, const ImageAttributes& attributes, ReleasePolicy releasePol = Image::NEVER);
 
   /**
    * @brief Create an initialised image object from an encoded image buffer in memory.

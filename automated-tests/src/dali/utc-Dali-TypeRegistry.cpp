@@ -576,7 +576,7 @@ int UtcDaliTypeRegistryActionViaBaseHandle(void)
 
   std::vector<Property::Value> attributes;
 
-  DALI_TEST_CHECK(hdl.DoAction(Actor::ACTION_SHOW, attributes));
+  DALI_TEST_CHECK(hdl.DoAction("show", attributes));
 
   application.SendNotification();
   application.Render(0);
@@ -1029,7 +1029,7 @@ int UtcDaliLongPressGestureDetectorTypeRegistry(void)
   detector.Attach(actor);
 
   // Connect to signal through type
-  handle.ConnectSignal( &application, LongPressGestureDetector::SIGNAL_LONG_PRESS_DETECTED, functor );
+  handle.ConnectSignal( &application, "long-press-detected", functor );
 
   // Render and notify
   application.SendNotification();
@@ -1067,7 +1067,7 @@ int UtcDaliPanGestureDetectorTypeRegistry(void)
   detector.Attach(actor);
 
   // Connect to signal through type
-  handle.ConnectSignal( &application, PanGestureDetector::SIGNAL_PAN_DETECTED, functor );
+  handle.ConnectSignal( &application, "pan-detected", functor );
 
   // Render and notify
   application.SendNotification();
@@ -1105,7 +1105,7 @@ int UtcDaliPinchGestureDetectorTypeRegistry(void)
   detector.Attach(actor);
 
   // Connect to signal through type
-  handle.ConnectSignal( &application, PinchGestureDetector::SIGNAL_PINCH_DETECTED, functor );
+  handle.ConnectSignal( &application, "pinch-detected", functor );
 
   // Render and notify
   application.SendNotification();
@@ -1141,7 +1141,7 @@ int UtcDaliTapGestureDetectorTypeRegistry(void)
   detector.Attach(actor);
 
   // Connect to signal through type
-  handle.ConnectSignal( &application, TapGestureDetector::SIGNAL_TAP_DETECTED, functor );
+  handle.ConnectSignal( &application, "tap-detected", functor );
 
   // Render and notify
   application.SendNotification();

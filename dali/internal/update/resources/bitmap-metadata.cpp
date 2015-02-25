@@ -31,32 +31,32 @@ namespace Dali
 namespace Internal
 {
 
-BitmapMetadata BitmapMetadata::New(NativeImagePtr nativeImage)
+BitmapMetadata BitmapMetadata::New(NativeImageInterfacePtr nativeImage)
 {
-  return BitmapMetadata(nativeImage->GetWidth(), nativeImage->GetHeight(), nativeImage->GetPixelFormat(), ! Pixel::HasAlpha(nativeImage->GetPixelFormat()));
+  return BitmapMetadata(nativeImage->GetWidth(), nativeImage->GetHeight(), nativeImage->RequiresBlending(), ! nativeImage->RequiresBlending());
 }
 
 BitmapMetadata BitmapMetadata::New(Integration::Bitmap* const bitmap)
 {
-  return BitmapMetadata(bitmap->GetImageWidth(), bitmap->GetImageHeight(), bitmap->GetPixelFormat(), bitmap->IsFullyOpaque());
+  return BitmapMetadata(bitmap->GetImageWidth(), bitmap->GetImageHeight(), Pixel::HasAlpha(bitmap->GetPixelFormat()), bitmap->IsFullyOpaque());
 }
 
 
 BitmapMetadata BitmapMetadata::New(unsigned int width,
                                    unsigned int height,
-                                   Pixel::Format pixelFormat)
+                                   bool hasAlphaChannel)
 {
-  return BitmapMetadata(width, height, pixelFormat, ! Pixel::HasAlpha(pixelFormat) );
+  return BitmapMetadata(width, height, hasAlphaChannel, !hasAlphaChannel );
 }
 
 
 BitmapMetadata::BitmapMetadata( unsigned int width,
                                 unsigned int height,
-                                Pixel::Format pixelFormat,
+                                bool hasAlphaChanne,
                                 bool opaqueness )
 : mImageWidth(width),
   mImageHeight(height),
-  mPixelFormat(pixelFormat),
+  mHasAlphaChannel(hasAlphaChanne),
   mOpaqueness(opaqueness),
   mIsNativeImage(false),
   mIsFramebuffer(false)
@@ -66,7 +66,7 @@ BitmapMetadata::BitmapMetadata( unsigned int width,
 BitmapMetadata::BitmapMetadata( )
 : mImageWidth(0),
   mImageHeight(0),
-  mPixelFormat(Pixel::RGBA8888),
+  mHasAlphaChannel(true),
   mOpaqueness(false),
   mIsNativeImage(false),
   mIsFramebuffer(false)
@@ -76,7 +76,7 @@ BitmapMetadata::BitmapMetadata( )
 BitmapMetadata::BitmapMetadata( const BitmapMetadata& rhs )
 : mImageWidth(rhs.mImageWidth),
   mImageHeight(rhs.mImageHeight),
-  mPixelFormat(rhs.mPixelFormat),
+  mHasAlphaChannel(rhs.mHasAlphaChannel),
   mOpaqueness(rhs.mOpaqueness),
   mIsNativeImage(rhs.mIsNativeImage),
   mIsFramebuffer(rhs.mIsFramebuffer)
@@ -87,19 +87,19 @@ BitmapMetadata& BitmapMetadata::operator=( const BitmapMetadata& rhs )
 {
   mImageWidth = rhs.mImageWidth;
   mImageHeight =rhs.mImageHeight;
-  mPixelFormat = rhs.mPixelFormat;
+  mHasAlphaChannel = rhs.mHasAlphaChannel;
   mOpaqueness = rhs.mOpaqueness;
   mIsNativeImage = rhs.mIsNativeImage;
   mIsFramebuffer = rhs.mIsFramebuffer;
   return *this;
 }
 
-void BitmapMetadata::Update(NativeImagePtr nativeImage)
+void BitmapMetadata::Update(NativeImageInterfacePtr nativeImage)
 {
   mImageWidth  = nativeImage->GetWidth();
   mImageHeight = nativeImage->GetHeight();
-  mPixelFormat = nativeImage->GetPixelFormat();
-  mOpaqueness  = ! Pixel::HasAlpha( mPixelFormat );
+  mHasAlphaChannel = nativeImage->RequiresBlending();
+  mOpaqueness  = ! mHasAlphaChannel;
   mIsNativeImage = true;
 }
 
@@ -107,7 +107,7 @@ void BitmapMetadata::Update(Integration::Bitmap* const bitmap)
 {
   mImageWidth  = bitmap->GetImageWidth();
   mImageHeight = bitmap->GetImageHeight();
-  mPixelFormat = bitmap->GetPixelFormat();
+  mHasAlphaChannel = Pixel::HasAlpha(bitmap->GetPixelFormat());
   mOpaqueness  = bitmap->IsFullyOpaque();
   mIsNativeImage = false;
 }
@@ -122,14 +122,9 @@ unsigned int BitmapMetadata::GetHeight() const
   return mImageHeight;
 }
 
-Pixel::Format BitmapMetadata::GetPixelFormat() const
-{
-  return mPixelFormat;
-}
-
 bool BitmapMetadata::HasAlphaChannel() const
 {
-  return HasAlpha(mPixelFormat);
+  return mHasAlphaChannel;
 }
 
 bool BitmapMetadata::IsFullyOpaque() const
@@ -147,9 +142,9 @@ void BitmapMetadata::SetHeight(unsigned int height)
   mImageHeight = height;
 }
 
-void BitmapMetadata::SetPixelFormat(Pixel::Format pixelFormat)
+void BitmapMetadata::SetHasAlphaChannel( bool hasAlphaChannel )
 {
-  mPixelFormat = pixelFormat;
+  mHasAlphaChannel = hasAlphaChannel;
 }
 
 void BitmapMetadata::SetOpaqueness(bool opaqueness)

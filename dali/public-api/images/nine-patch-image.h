@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/images/image.h>
+#include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/bitmap-image.h>
 #include <dali/public-api/math/rect.h>
 
@@ -47,7 +47,7 @@ class NinePatchImage;
  * to use the cropped BitmapImage - if you don't retain a handle to this object, it will
  * be automatically destroyed.
  */
-class DALI_IMPORT_API NinePatchImage : public Image
+class DALI_IMPORT_API NinePatchImage : public ResourceImage
 {
 public:
   /**

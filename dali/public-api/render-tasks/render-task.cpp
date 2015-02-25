@@ -38,8 +38,6 @@ static bool FullScreenFrameBufferFunction( Vector2& coordinates )
   return true;
 }
 
-const char* const RenderTask::SIGNAL_FINISHED = "finished";
-
 RenderTask::ConstScreenToFrameBufferFunction RenderTask::DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION = DefaultScreenToFrameBufferFunction;
 RenderTask::ConstScreenToFrameBufferFunction RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION        = FullScreenFrameBufferFunction;
 

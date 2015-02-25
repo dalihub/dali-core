@@ -23,7 +23,7 @@
 namespace Dali
 {
 
-size_t Utf8SequenceLength(const unsigned char leadByte)
+unsigned int Utf8SequenceLength(const unsigned char leadByte)
 {
   return Internal::UTF8SequenceLength( leadByte );
 }

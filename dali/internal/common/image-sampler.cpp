@@ -18,7 +18,8 @@
 // CLASS HEADER
 #include <dali/internal/common/image-sampler.h>
 
-#include <iostream>
+// EXTERNAL INCLUDES
+#include <iosfwd>
 
 namespace Dali
 {

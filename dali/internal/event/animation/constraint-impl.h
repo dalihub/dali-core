@@ -33,7 +33,7 @@ namespace Internal
 {
 
 class ActiveConstraintBase;
-class ProxyObject;
+class Object;
 
 /**
  * Constraints are used to constrain a property of an object, after animations have been applied.
@@ -48,7 +48,7 @@ public:
    * Construct a new constraint which targets a property.
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
-   * @param [in] sources The proxy objects which provide parameters for func.
+   * @param [in] sources The objects which provide parameters for func.
    * @param [in] func The constraint function.
    * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
    */

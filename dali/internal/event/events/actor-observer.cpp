@@ -83,22 +83,22 @@ void ActorObserver::ResetActor()
   }
 }
 
-void ActorObserver::SceneObjectRemoved( ProxyObject& proxy )
+void ActorObserver::SceneObjectRemoved( Object& object )
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 
-  if ( mActor == &proxy )
+  if ( mActor == &object )
   {
-    // do not call proxy.RemoveObserver here, proxy is currently iterating through observers... you wouldnt want to upset proxy now would you?
+    // do not call object.RemoveObserver here, object is currently iterating through observers
     mActorDisconnected = true;
   }
 }
 
-void ActorObserver::ProxyDestroyed(ProxyObject& proxy)
+void ActorObserver::ObjectDestroyed(Object& object)
 {
   DALI_LOG_TRACE_METHOD( gLogFilter );
 
-  if ( mActor == &proxy )
+  if ( mActor == &object )
   {
     DALI_LOG_INFO(gLogFilter, Debug::Verbose, "Stop Observing:             %p\n", mActor);
     mActor = NULL;

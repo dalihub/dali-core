@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/animation/animator-connector-base.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/update/common/property-owner.h>
@@ -37,14 +37,14 @@ namespace Internal
 /**
  * AnimatorConnector is used to connect SceneGraph::Animators for newly created scene-graph objects.
  *
- * The scene-graph objects are created by a ProxyObject e.g. Actor is a proxy for SceneGraph::Node.
+ * The scene-graph objects are created by a Object e.g. Actor is a proxy for SceneGraph::Node.
  * AnimatorConnector observes the proxy object, in order to detect when a scene-graph object is created.
  *
  * SceneGraph::Animators weakly reference scene objects, and are automatically deleted when orphaned.
  * Therefore the AnimatorConnector is NOT responsible for disconnecting animators.
  */
 template < typename PropertyType >
-class AnimatorConnector : public AnimatorConnectorBase, public ProxyObject::Observer
+class AnimatorConnector : public AnimatorConnectorBase, public Object::Observer
 {
 public:
 
@@ -53,7 +53,7 @@ public:
 
   /**
    * Construct a new animator connector.
-   * @param[in] proxy The proxy for a scene-graph object to animate.
+   * @param[in] object The object for a scene-graph object to animate.
    * @param[in] propertyIndex The index of a property provided by the object.
    * @param[in] componentIndex Index to a sub component of a property, for use with Vector2, Vector3 and Vector4 (INVALID_PROPERTY_COMPONENTINDEX to use the whole property)
    * @param[in] animatorFunction A function used to animate the property.
@@ -61,14 +61,14 @@ public:
    * @param[in] period The time period of the animator.
    * @return A pointer to a newly allocated animator connector.
    */
-  static AnimatorConnectorBase* New( ProxyObject& proxy,
+  static AnimatorConnectorBase* New( Object& object,
                                      Property::Index propertyIndex,
                                      int componentIndex,
                                      AnimatorFunctionBase* animatorFunction,
                                      AlphaFunction alpha,
                                      const TimePeriod& period )
   {
-    return new AnimatorConnector< PropertyType >( proxy,
+    return new AnimatorConnector< PropertyType >( object,
                                                   propertyIndex,
                                                   componentIndex,
                                                   animatorFunction,
@@ -81,9 +81,9 @@ public:
    */
   virtual ~AnimatorConnector()
   {
-    if( mProxy )
+    if( mObject )
     {
-      mProxy->RemoveObserver( *this );
+      mObject->RemoveObserver( *this );
     }
 
     //If there is not a SceneGraph::Animator, the AnimatorConnector is responsible for deleting the mAnimatorFunction
@@ -104,7 +104,7 @@ public:
     DALI_ASSERT_ALWAYS( mParent == NULL && "AnimationConnector already has a parent" );
     mParent = &parent;
 
-    if( mProxy && mProxy->GetSceneObject() )
+    if( mObject && mObject->GetSceneObject() )
     {
       CreateAnimator();
     }
@@ -115,20 +115,20 @@ private:
   /**
    * Private constructor; see also AnimatorConnector::New().
    */
-  AnimatorConnector( ProxyObject& proxy,
+  AnimatorConnector( Object& object,
                      Property::Index propertyIndex,
                      int componentIndex,
                      Internal::AnimatorFunctionBase* animatorFunction,
                      AlphaFunction alpha,
                      const TimePeriod& period )
   : AnimatorConnectorBase( alpha, period ),
-    mProxy( &proxy ),
+    mObject( &object ),
     mAnimator(0),
     mPropertyIndex( propertyIndex ),
     mComponentIndex( componentIndex ),
     mAnimatorFunction( animatorFunction )
   {
-    proxy.AddObserver( *this );
+    object.AddObserver( *this );
   }
 
   // Undefined
@@ -138,9 +138,9 @@ private:
   AnimatorConnector& operator=( const AnimatorConnector& rhs );
 
   /**
-   * From ProxyObject::Observer
+   * From Object::Observer
    */
-  virtual void SceneObjectAdded( ProxyObject& proxy )
+  virtual void SceneObjectAdded( Object& object )
   {
     //If the animator has not been created yet, create it now.
     if( !mAnimator )
@@ -150,18 +150,18 @@ private:
   }
 
   /**
-   * From ProxyObject::Observer
+   * From Object::Observer
    */
-  virtual void SceneObjectRemoved( ProxyObject& proxy )
+  virtual void SceneObjectRemoved( Object& object )
   {
   }
 
   /**
-   * From ProxyObject::Observer
+   * From Object::Observer
    */
-  virtual void ProxyDestroyed( ProxyObject& proxy )
+  virtual void ObjectDestroyed( Object& object )
   {
-    mProxy = NULL;
+    mObject = NULL;
   }
 
    /**
@@ -176,13 +176,13 @@ private:
     DALI_ASSERT_DEBUG( mParent != NULL );
 
     //Get the PropertyOwner the animator is going to animate
-    const SceneGraph::PropertyOwner* propertyOwner = mProxy->GetSceneObject();
+    const SceneGraph::PropertyOwner* propertyOwner = mObject->GetSceneObject();
 
     //Get SceneGraph::BaseProperty
-    const SceneGraph::PropertyBase* baseProperty = mProxy->GetSceneObjectAnimatableProperty( mPropertyIndex );
+    const SceneGraph::PropertyBase* baseProperty = mObject->GetSceneObjectAnimatableProperty( mPropertyIndex );
 
     //Check if property is a component of another property
-    const int componentIndex = mProxy->GetPropertyComponentIndex( mPropertyIndex );
+    const int componentIndex = mObject->GetPropertyComponentIndex( mPropertyIndex );
     if( componentIndex != Property::INVALID_COMPONENT_INDEX )
     {
       mComponentIndex = componentIndex;
@@ -317,7 +317,7 @@ private:
 
 protected:
 
-  ProxyObject* mProxy; ///< Not owned by the animator connector. Valid until ProxyDestroyed() is called.
+  Object* mObject; ///< Not owned by the animator connector. Valid until ObjectDestroyed() is called.
   SceneGraph::AnimatorBase* mAnimator;
 
   Property::Index mPropertyIndex;

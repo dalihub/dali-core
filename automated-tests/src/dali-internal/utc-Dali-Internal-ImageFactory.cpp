@@ -67,14 +67,14 @@ int UtcDaliImageFactoryUseCachedRequest01(void)
 
   tet_infoline( "UtcDaliImageFactoryCachedRequest01 - Request same image more than once" );
 
-  Image image = Image::New( gTestImageFilename );
+  Image image = ResourceImage::New( gTestImageFilename );
 
   application.SendNotification();
   application.Render();
   DALI_TEST_CHECK( application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
   application.GetPlatform().ResetTrace();
 
-  Image image2 = Image::New( gTestImageFilename );
+  Image image2 = ResourceImage::New( gTestImageFilename );
 
   application.SendNotification();
   application.Render();
@@ -83,7 +83,7 @@ int UtcDaliImageFactoryUseCachedRequest01(void)
   DALI_TEST_CHECK( !application.GetPlatform().WasCalled( TestPlatformAbstraction::LoadResourceFunc ) );
   application.GetPlatform().ResetTrace();
 
-  Image image3 = Image::New( gTestImageFilename );
+  Image image3 = ResourceImage::New( gTestImageFilename );
 
   application.SendNotification();
   application.Render();
@@ -99,7 +99,7 @@ int UtcDaliImageFactoryUseCachedRequest02(void)
   // testing resource deletion when taken off stage
   tet_infoline( "UtcDaliImageFactoryCachedRequest02 - Discard previously requested resource" );
 
-  Image image = Image::New( gTestImageFilename, Image::Immediate, Image::Unused );
+  Image image = ResourceImage::New( gTestImageFilename, ResourceImage::IMMEDIATE, Image::UNUSED );
   ImageActor actor = ImageActor::New( image );
 
   application.SendNotification();
@@ -124,7 +124,7 @@ int UtcDaliImageFactoryUseCachedRequest02(void)
   application.SendNotification();
 
   // Should find stale request in cache, so load image from filesystem
-  Image image2 = Image::New( gTestImageFilename );
+  Image image2 = ResourceImage::New( gTestImageFilename );
 
   application.SendNotification();
   application.Render();
@@ -133,7 +133,7 @@ int UtcDaliImageFactoryUseCachedRequest02(void)
   application.GetPlatform().ResetTrace();
 
   // Resource is reloaded
-  Image image3 = Image::New( gTestImageFilename );
+  Image image3 = ResourceImage::New( gTestImageFilename );
 
   application.SendNotification();
   application.Render();
@@ -166,7 +166,7 @@ int UtcDaliImageFactoryUseCachedRequest03(void)
   DALI_TEST_EQUALS( ticket, ticket3, TEST_LOCATION );
 
   // request differs in scaled size - not default size
-  ImageAttributes attr = ImageAttributes::New( 80, 160, Pixel::BGR8888 );
+  ImageAttributes attr = ImageAttributes::New( 80, 160);
   req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr );
   ResourceTicketPtr ticket4 = imageFactory.Load( *req2.Get() );
   DALI_TEST_CHECK( req != req2 );
@@ -181,10 +181,10 @@ int UtcDaliImageFactoryUseCachedRequest04(void)
 
   ImageFactory& imageFactory  = Internal::ThreadLocalStorage::Get().GetImageFactory();
 
-  ImageAttributes attr = ImageAttributes::New( 80, 160, Pixel::BGR8888 );
+  ImageAttributes attr = ImageAttributes::New( 80, 160 );
   RequestPtr req = imageFactory.RegisterRequest( gTestImageFilename, &attr );
 
-  ImageAttributes attr2 = ImageAttributes::New( 80, 160, Pixel::BGR8888 );
+  ImageAttributes attr2 = ImageAttributes::New( 80, 160 );
   RequestPtr req2 = imageFactory.RegisterRequest( gTestImageFilename, &attr2 );
   DALI_TEST_EQUALS( req, req2, TEST_LOCATION );
   END_TEST;

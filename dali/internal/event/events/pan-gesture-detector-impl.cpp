@@ -61,6 +61,10 @@ PropertyDetails DEFAULT_PROPERTIES[] =
 };
 const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTIES ) / sizeof( DEFAULT_PROPERTIES[0] );
 
+// Signals
+
+const char* const SIGNAL_PAN_DETECTED = "pan-detected";
+
 BaseHandle Create()
 {
   return Dali::PanGestureDetector::New();
@@ -68,7 +72,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::PanGestureDetector), typeid(Dali::GestureDetector), Create );
 
-SignalConnectorType signalConnector1( mType, Dali::PanGestureDetector::SIGNAL_PAN_DETECTED, &PanGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1( mType, SIGNAL_PAN_DETECTED, &PanGestureDetector::DoConnectSignal );
 
 #if defined(DEBUG_ENABLED)
 Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_PAN_GESTURE_DETECTOR");
@@ -291,7 +295,7 @@ bool PanGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerI
   bool connected( true );
   PanGestureDetector* gesture = dynamic_cast<PanGestureDetector*>(object);
 
-  if ( Dali::PanGestureDetector::SIGNAL_PAN_DETECTED  == signalName )
+  if ( 0 == strcmp( signalName.c_str(), SIGNAL_PAN_DETECTED ) )
   {
     gesture->DetectedSignal().Connect( tracker, functor );
   }

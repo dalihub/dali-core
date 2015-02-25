@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstddef>
+#include <algorithm>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>

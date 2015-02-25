@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <stdint.h>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>

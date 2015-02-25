@@ -184,62 +184,62 @@ public:
 public: // properties
 
   /**
-   * copydoc Dali::Internal::ProxyObject
+   * copydoc Dali::Internal::Object
    */
   virtual unsigned int GetDefaultPropertyCount() const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndices()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
    */
   virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
 
   /**
-   * copydoc Dali::Internal::ProxyObject
+   * copydoc Dali::Internal::Object
    */
   virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAConstraintInput()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
    */
   virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
 
   /**
-   * copydoc Dali::Internal::ProxyObject
+   * copydoc Dali::Internal::Object
    */
   virtual Property::Type GetDefaultPropertyType( Property::Index index ) const;
 
   /**
-   * copydoc Dali::Internal::ProxyObject
+   * copydoc Dali::Internal::Object
    */
   virtual const char* GetDefaultPropertyName( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
    */
   virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
 
   /**
-   * copydoc Dali::Internal::ProxyObject
+   * copydoc Dali::Internal::Object
    */
   virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
-   * copydoc Dali::Internal::ProxyObject
+   * copydoc Dali::Internal::Object
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
-   * copydoc Dali::Internal::ProxyObject
+   * copydoc Dali::Internal::Object
    */
   virtual bool IsDefaultPropertyWritable( Property::Index index ) const ;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectAnimatableProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
   virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectInputProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 

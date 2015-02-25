@@ -20,12 +20,12 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/images/native-image.h>
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 
 namespace Dali
 {
-class NativeImage;
+class NativeImageInterface;
 
 namespace Integration
 {
@@ -70,7 +70,7 @@ Internal::Texture* NewBitmapTexture( unsigned int      width,
  * @param[in] context The GL context
  * @return A newly allocated texture
  */
-Internal::Texture* NewNativeImageTexture( NativeImage& nativeImage, Context& context );
+Internal::Texture* NewNativeImageTexture( NativeImageInterface& nativeImage, Context& context );
 
 /**
  * @copydoc FrameBufferTexture::FrameBufferTexture
@@ -85,7 +85,7 @@ Internal::Texture* NewFrameBufferTexture( unsigned int width,
  * @copydoc FrameBufferTexture::FrameBufferTexture
  * @return A newly allocated texture
  */
-Internal::Texture* NewFrameBufferTexture( NativeImagePtr nativeImage, Context& context );
+Internal::Texture* NewFrameBufferTexture( NativeImageInterfacePtr nativeImage, Context& context );
 
 };
 

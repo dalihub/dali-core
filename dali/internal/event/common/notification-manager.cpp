@@ -18,22 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/common/notification-manager.h>
 
-// EXTERNAL INCLUDES
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wall"
-
-#include <boost/thread/mutex.hpp>
-
-#pragma clang diagnostic pop
-#else
-
-#include <boost/thread/mutex.hpp>
-
-#endif // __clang__
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/mutex.h>
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/property-notification-impl.h>
@@ -80,7 +67,7 @@ void MoveElements( InterfaceContainer& from, InterfaceContainer& to )
 }
 }
 
-typedef boost::mutex MessageQueueMutex;
+typedef Dali::Mutex MessageQueueMutex;
 typedef OwnerContainer< MessageBase* > MessageContainer;
 
 struct NotificationManager::Impl
@@ -128,7 +115,7 @@ NotificationManager::~NotificationManager()
 void NotificationManager::QueueCompleteNotification( CompleteNotificationInterface* instance )
 {
   // queueMutex must be locked whilst accessing queues
-  MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
+  MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
 
   mImpl->updateWorkingInterfaceQueue.PushBack( instance );
 }
@@ -138,7 +125,7 @@ void NotificationManager::QueueMessage( MessageBase* message )
   DALI_ASSERT_DEBUG( NULL != message );
 
   // queueMutex must be locked whilst accessing queues
-  MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
+  MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
 
   mImpl->updateWorkingMessageQueue.PushBack( message );
 }
@@ -146,7 +133,7 @@ void NotificationManager::QueueMessage( MessageBase* message )
 void NotificationManager::UpdateCompleted()
 {
   // queueMutex must be locked whilst accessing queues
-  MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
+  MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
   // Move messages from update working queue to completed queue
   // note that in theory its possible for update completed to have last frames
   // events as well still hanging around. we need to keep them as well
@@ -159,7 +146,7 @@ void NotificationManager::UpdateCompleted()
 bool NotificationManager::MessagesToProcess()
 {
   // queueMutex must be locked whilst accessing queues
-  MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
+  MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
 
   return ( 0u < mImpl->updateCompletedMessageQueue.Count() ||
          ( 0u < mImpl->updateCompletedInterfaceQueue.Count() ) );
@@ -169,7 +156,7 @@ void NotificationManager::ProcessMessages()
 {
   // queueMutex must be locked whilst accessing queues
   {
-    MessageQueueMutex::scoped_lock lock( mImpl->queueMutex );
+    MessageQueueMutex::ScopedLock lock( mImpl->queueMutex );
 
     // Move messages from update completed queue to event queue
     // note that in theory its possible for event queue to have

@@ -32,6 +32,10 @@ namespace Internal
 
 namespace
 {
+
+// Signals
+const char* const SIGNAL_TAP_DETECTED = "tap-detected";
+
 BaseHandle Create()
 {
   return Dali::TapGestureDetector::New();
@@ -39,7 +43,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::TapGestureDetector), typeid(Dali::GestureDetector), Create );
 
-SignalConnectorType signalConnector1( mType, Dali::TapGestureDetector::SIGNAL_TAP_DETECTED, &TapGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1( mType, SIGNAL_TAP_DETECTED, &TapGestureDetector::DoConnectSignal );
 
 }
 
@@ -124,7 +128,7 @@ bool TapGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTrackerI
   bool connected( true );
   TapGestureDetector* gesture = dynamic_cast<TapGestureDetector*>(object);
 
-  if ( Dali::TapGestureDetector::SIGNAL_TAP_DETECTED  == signalName )
+  if ( 0 == strcmp( signalName.c_str(), SIGNAL_TAP_DETECTED ) )
   {
     gesture->DetectedSignal().Connect( tracker, functor );
   }

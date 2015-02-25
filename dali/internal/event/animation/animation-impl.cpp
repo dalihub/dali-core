@@ -50,6 +50,16 @@ static bool HIDE_VALUE = false;
 namespace
 {
 
+// Signals
+
+const char* const SIGNAL_FINISHED = "finished";
+
+// Actions
+
+const char* const ACTION_PLAY =     "play";
+const char* const ACTION_STOP =     "stop";
+const char* const ACTION_PAUSE =    "pause";
+
 BaseHandle Create()
 {
   return Dali::Animation::New(0.f);
@@ -57,11 +67,11 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::Animation), typeid(Dali::BaseHandle), Create );
 
-SignalConnectorType signalConnector1( mType, Dali::Animation::SIGNAL_FINISHED, &Animation::DoConnectSignal );
+SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &Animation::DoConnectSignal );
 
-TypeAction action1( mType, Dali::Animation::ACTION_PLAY, &Animation::DoAction );
-TypeAction action2( mType, Dali::Animation::ACTION_STOP, &Animation::DoAction );
-TypeAction action3( mType, Dali::Animation::ACTION_PAUSE, &Animation::DoAction );
+TypeAction action1( mType, ACTION_PLAY, &Animation::DoAction );
+TypeAction action2( mType, ACTION_STOP, &Animation::DoAction );
+TypeAction action3( mType, ACTION_PAUSE, &Animation::DoAction );
 
 const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::Bake );
 const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BakeFinal );
@@ -278,7 +288,7 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Time
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period)
 {
-  ProxyObject& proxy = dynamic_cast<ProxyObject&>( GetImplementation(target.object) );
+  Object& object = dynamic_cast<Object&>( GetImplementation(target.object) );
 
   ExtendDuration( period );
 
@@ -286,7 +296,7 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
   {
     case Property::BOOLEAN:
     {
-      AddAnimatorConnector( AnimatorConnector<bool>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<bool>::New( object,
                                                           target.propertyIndex,
                                                           target.componentIndex,
                                                           new AnimateByBoolean(relativeValue.Get<bool>()),
@@ -297,7 +307,7 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
 
     case Property::FLOAT:
     {
-      AddAnimatorConnector( AnimatorConnector<float>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<float>::New( object,
                                                            target.propertyIndex,
                                                            target.componentIndex,
                                                            new AnimateByFloat(relativeValue.Get<float>()),
@@ -308,7 +318,7 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
 
     case Property::INTEGER:
     {
-      AddAnimatorConnector( AnimatorConnector<int>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<int>::New( object,
                                                          target.propertyIndex,
                                                          target.componentIndex,
                                                          new AnimateByInteger(relativeValue.Get<int>()),
@@ -319,7 +329,7 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
 
     case Property::VECTOR2:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector2>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<Vector2>::New( object,
                                                              target.propertyIndex,
                                                              target.componentIndex,
                                                              new AnimateByVector2(relativeValue.Get<Vector2>()),
@@ -330,7 +340,7 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
 
     case Property::VECTOR3:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector3>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<Vector3>::New( object,
                                                              target.propertyIndex,
                                                              target.componentIndex,
                                                              new AnimateByVector3(relativeValue.Get<Vector3>()),
@@ -341,7 +351,7 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
 
     case Property::VECTOR4:
     {
-      AddAnimatorConnector( AnimatorConnector<Vector4>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<Vector4>::New( object,
                                                              target.propertyIndex,
                                                              target.componentIndex,
                                                              new AnimateByVector4(relativeValue.Get<Vector4>()),
@@ -354,7 +364,7 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
     {
       AngleAxis angleAxis = relativeValue.Get<AngleAxis>();
 
-      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( object,
                                                                 target.propertyIndex,
                                                                 target.componentIndex,
                                                                 new RotateByAngleAxis(angleAxis.angle, angleAxis.axis),
@@ -386,12 +396,12 @@ void Animation::AnimateTo(Property& target, Property::Value& destinationValue, T
 
 void Animation::AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period)
 {
-  ProxyObject& proxy = dynamic_cast<ProxyObject&>( GetImplementation(target.object) );
+  Object& object = dynamic_cast<Object&>( GetImplementation(target.object) );
 
-  AnimateTo( proxy, target.propertyIndex, target.componentIndex, destinationValue, alpha, period );
+  AnimateTo( object, target.propertyIndex, target.componentIndex, destinationValue, alpha, period );
 }
 
-void Animation::AnimateTo(ProxyObject& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period)
+void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIndex, int componentIndex, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period)
 {
   Property::Type type = targetObject.GetPropertyType(targetPropertyIndex);
   if(componentIndex != Property::INVALID_COMPONENT_INDEX)
@@ -540,7 +550,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period, Interpolation interpolation)
 {
-  ProxyObject& proxy = dynamic_cast<ProxyObject&>( GetImplementation(target.object) );
+  Object& object = dynamic_cast<Object&>( GetImplementation(target.object) );
 
   ExtendDuration( period );
 
@@ -551,7 +561,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       const KeyFrameBoolean* kf;
       GetSpecialization(keyFrames, kf);
       KeyFrameBooleanPtr kfCopy = KeyFrameBoolean::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<bool>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<bool>::New( object,
                                                           target.propertyIndex,
                                                           target.componentIndex,
                                                           new KeyFrameBooleanFunctor(kfCopy),
@@ -565,7 +575,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       const KeyFrameNumber* kf;
       GetSpecialization(keyFrames, kf);
       KeyFrameNumberPtr kfCopy = KeyFrameNumber::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<float>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<float>::New( object,
                                                            target.propertyIndex,
                                                            target.componentIndex,
                                                            new KeyFrameNumberFunctor(kfCopy,interpolation),
@@ -579,7 +589,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       const KeyFrameInteger* kf;
       GetSpecialization(keyFrames, kf);
       KeyFrameIntegerPtr kfCopy = KeyFrameInteger::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<int>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<int>::New( object,
                                                          target.propertyIndex,
                                                          target.componentIndex,
                                                          new KeyFrameIntegerFunctor(kfCopy,interpolation),
@@ -593,7 +603,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       const KeyFrameVector2* kf;
       GetSpecialization(keyFrames, kf);
       KeyFrameVector2Ptr kfCopy = KeyFrameVector2::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<Vector2>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<Vector2>::New( object,
                                                              target.propertyIndex,
                                                              target.componentIndex,
                                                              new KeyFrameVector2Functor(kfCopy,interpolation),
@@ -607,7 +617,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       const KeyFrameVector3* kf;
       GetSpecialization(keyFrames, kf);
       KeyFrameVector3Ptr kfCopy = KeyFrameVector3::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<Vector3>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<Vector3>::New( object,
                                                              target.propertyIndex,
                                                              target.componentIndex,
                                                              new KeyFrameVector3Functor(kfCopy,interpolation),
@@ -621,7 +631,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       const KeyFrameVector4* kf;
       GetSpecialization(keyFrames, kf);
       KeyFrameVector4Ptr kfCopy = KeyFrameVector4::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<Vector4>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<Vector4>::New( object,
                                                              target.propertyIndex,
                                                              target.componentIndex,
                                                              new KeyFrameVector4Functor(kfCopy,interpolation),
@@ -635,7 +645,7 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Alph
       const KeyFrameQuaternion* kf;
       GetSpecialization(keyFrames, kf);
       KeyFrameQuaternionPtr kfCopy = KeyFrameQuaternion::Clone(*kf);
-      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( proxy,
+      AddAnimatorConnector( AnimatorConnector<Quaternion>::New( object,
                                                                 target.propertyIndex,
                                                                 target.componentIndex,
                                                                 new KeyFrameQuaternionFunctor(kfCopy),
@@ -691,7 +701,7 @@ bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( true );
   Animation* animation = dynamic_cast<Animation*>(object);
 
-  if ( Dali::Animation::SIGNAL_FINISHED == signalName )
+  if ( 0 == strcmp( signalName.c_str(), SIGNAL_FINISHED ) )
   {
     animation->FinishedSignal().Connect( tracker, functor );
   }
@@ -1087,29 +1097,29 @@ void Animation::Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, f
                                                          TimePeriod(delaySeconds, durationSeconds) ) );
 }
 
-bool Animation::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool Animation::DoAction( BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes )
 {
   bool done = false;
-  Animation* animation = dynamic_cast<Animation*>(object);
+  Animation* animation = dynamic_cast<Animation*>( object );
 
   if( animation )
   {
-    if(Dali::Animation::ACTION_PLAY == actionName)
+    if( 0 == strcmp( actionName.c_str(), ACTION_PLAY ) )
     {
-      if(attributes.size() > 0)
+      if( attributes.size() > 0 )
       {
-        animation->SetDuration(attributes[0].Get<float>());
+        animation->SetDuration( attributes[0].Get<float>() );
       }
 
       animation->Play();
       done = true;
     }
-    else if(Dali::Animation::ACTION_STOP == actionName)
+    else if( 0 == strcmp( actionName.c_str(), ACTION_STOP ) )
     {
       animation->Stop();
       done = true;
     }
-    else if(Dali::Animation::ACTION_PAUSE == actionName)
+    else if( 0 == strcmp( actionName.c_str(), ACTION_PAUSE ) )
     {
       animation->Pause();
       done = true;

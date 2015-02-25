@@ -22,7 +22,7 @@
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/effects/shader-declarations.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/render/shaders/shader.h>
 
@@ -39,11 +39,11 @@ class UpdateManager;
 }
 
 /**
- * An abstract base class for a shader effect proxy.
+ * An abstract base class for a shader effect object.
  * The corresponding scene-graph object is a collection of shader programs,
  * which can apply the same effect to different geometry types.
  */
-class ShaderEffect : public ProxyObject
+class ShaderEffect : public Object
 {
 public:
   typedef Dali::ShaderEffect::UniformCoordinateType UniformCoordinateType;
@@ -132,75 +132,75 @@ public:
    */
   void Disconnect();
 
-public: // Default property extensions from ProxyObject
+public: // Default property extensions from Object
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyCount()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
    */
   virtual unsigned int GetDefaultPropertyCount() const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndices()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
    */
   virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
    */
   virtual const char* GetDefaultPropertyName( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
    */
   virtual Property::Index GetDefaultPropertyIndex( const std::string& name ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyWritable()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
    */
   virtual bool IsDefaultPropertyWritable( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAnimatable()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
    */
   virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAConstraintInput()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
    */
   virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyType()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
    */
   virtual Property::Type GetDefaultPropertyType( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::SetDefaultProperty()
+   * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
   virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultProperty()
+   * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::NotifyScenePropertyInstalled()
+   * @copydoc Dali::Internal::Object::NotifyScenePropertyInstalled()
    */
   virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
+   * @copydoc Dali::Internal::Object::GetSceneObject()
    */
   virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectAnimatableProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
   virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectInputProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 
