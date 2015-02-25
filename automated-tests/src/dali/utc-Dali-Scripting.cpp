@@ -728,15 +728,7 @@ int UtcDaliScriptingNewActorChildren(void)
   child2Map[ "type" ] = "TextActor";
   child2Map[ "position" ] = Vector3::ZAXIS;
 
-  Property::Map grandChildMap;
-  grandChildMap[ "type" ] = "LightActor";
-  grandChildMap[ "position" ] = Vector3::ONE;
-
-  // Add arrays to appropriate maps
-  Property::Array grandChildArray;
-  grandChildArray.push_back( grandChildMap );
   Property::Array childArray;
-  child1Map[ "actors" ] = grandChildArray;
   childArray.push_back( child1Map );
   childArray.push_back( child2Map );
   map[ "actors" ] = childArray;
@@ -756,19 +748,13 @@ int UtcDaliScriptingNewActorChildren(void)
   DALI_TEST_CHECK( child1 );
   DALI_TEST_CHECK( ImageActor::DownCast( child1 ) );
   DALI_TEST_EQUALS( child1.GetCurrentPosition(), Vector3::YAXIS, TEST_LOCATION );
-  DALI_TEST_EQUALS( child1.GetChildCount(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( child1.GetChildCount(), 0u, TEST_LOCATION );
 
   Actor child2 = handle.GetChildAt(1);
   DALI_TEST_CHECK( child2 );
   DALI_TEST_CHECK( TextActor::DownCast( child2 ) );
   DALI_TEST_EQUALS( child2.GetCurrentPosition(), Vector3::ZAXIS, TEST_LOCATION );
   DALI_TEST_EQUALS( child2.GetChildCount(), 0u, TEST_LOCATION );
-
-  Actor grandChild = child1.GetChildAt( 0 );
-  DALI_TEST_CHECK( grandChild );
-  DALI_TEST_CHECK( LightActor::DownCast( grandChild ) );
-  DALI_TEST_EQUALS( grandChild.GetCurrentPosition(), Vector3::ONE, TEST_LOCATION );
-  DALI_TEST_EQUALS( grandChild.GetChildCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Remove( handle );
   END_TEST;
@@ -878,10 +864,9 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     Actor actor = Actor::New();
     Actor child = ImageActor::New();
     Actor grandChild = TextActor::New();
-    Actor grandChild2 = LightActor::New();
+
     actor.Add( child );
     child.Add( grandChild );
-    child.Add( grandChild2 );
 
     Stage::GetCurrent().Add( actor );
     application.SendNotification();
@@ -906,7 +891,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
 
     DALI_TEST_CHECK( childValue.HasKey( "actors" ) );
     Property::Array grandChildren( childValue.GetValue( "actors").Get< Property::Array >() );
-    DALI_TEST_CHECK( grandChildren.size() == 2u );
+    DALI_TEST_CHECK( grandChildren.size() == 1u );
 
     Property::Map grandChildMap( grandChildren[0].Get< Property::Map >() );
     DALI_TEST_CHECK( !grandChildMap.Empty() );
@@ -914,11 +899,6 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_CHECK( grandChildValue.HasKey( "type" ) );
     DALI_TEST_EQUALS( grandChildValue.GetValue( "type" ).Get< std::string >(), "TextActor", TEST_LOCATION );
 
-    Property::Map grandChild2Map( grandChildren[1].Get< Property::Map >() );
-    DALI_TEST_CHECK( !grandChild2Map.Empty() );
-    Property::Value grandChild2Value( grandChild2Map );
-    DALI_TEST_CHECK( grandChild2Value.HasKey( "type" ) );
-    DALI_TEST_EQUALS( grandChild2Value.GetValue( "type" ).Get< std::string >(), "LightActor", TEST_LOCATION );
 
     Stage::GetCurrent().Remove( actor );
   }

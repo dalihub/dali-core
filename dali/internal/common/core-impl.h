@@ -58,7 +58,6 @@ class ResourceClient;
 class ResourceManager;
 class FontFactory;
 class ImageFactory;
-class ModelFactory;
 class ShaderFactory;
 class TouchResampler;
 class EmojiFactory;
@@ -256,12 +255,6 @@ private:  // for use by ThreadLocalStorage
   ImageFactory& GetImageFactory();
 
   /**
-   * Returns the Model factory
-   * @return A reference to the Model factory.
-   */
-  ModelFactory& GetModelFactory();
-
-  /**
    * Returns the Shader factory
    * @return A reference to the Shader binary factory.
    */
@@ -309,7 +302,6 @@ private:
   OwnerPointer<PropertyNotificationManager> mPropertyNotificationManager; ///< For safe signal emmision of property changed notifications
   FontFactory*                              mFontFactory;                 ///< font resource factory
   ImageFactory*                             mImageFactory;                ///< Image resource factory
-  ModelFactory*                             mModelFactory;                ///< Model resource factory
   ShaderFactory*                            mShaderFactory;               ///< Shader resource factory
   ResourceClient*                           mResourceClient;              ///< Asynchronous Resource Loading
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading

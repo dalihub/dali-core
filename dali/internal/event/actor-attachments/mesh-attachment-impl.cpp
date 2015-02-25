@@ -178,19 +178,6 @@ void MeshAttachment::DisconnectMaterial()
   }
 }
 
-void MeshAttachment::SetAffectedByLighting( bool affectedByLighting )
-{
-  // sceneObject is being used in a separate thread; queue a message to set
-  SetAffectedByLightingMessage( mStage->GetUpdateInterface(), *mSceneObject, affectedByLighting );
-
-  mAffectedByLighting = affectedByLighting;
-}
-
-bool MeshAttachment::IsAffectedByLighting()
-{
-  return mAffectedByLighting;
-}
-
 void MeshAttachment::BindBonesToMesh( Internal::ActorPtr rootActor )
 {
   size_t boneIdx = 0;

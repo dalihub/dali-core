@@ -53,7 +53,7 @@ inline void SetOpaqueRenderFlags( RenderList& renderList, bool transparentRender
   // and this renderer does not need depth test against itself (for example a mesh actor)
   // if this layer has got exactly one opaque renderer
   // and this renderer is not interested in depth testing
-  // (i.e. is an image or text and not a model)
+  // (i.e. is an image and not a mesh)
   if ( ( (  renderList.Count() == 1 ) &&
          (  !transparentRenderersExist ) &&
          (  !renderList.GetRenderer( 0 )->RequiresDepthTest() ) ) ||

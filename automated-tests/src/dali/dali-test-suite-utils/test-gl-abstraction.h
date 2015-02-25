@@ -1596,7 +1596,7 @@ public: // TEST FUNCTIONS
       }
     }
 
-    fprintf(stderr, "Not found, printing possible values:" );
+    fprintf(stderr, "Not found, printing possible values:\n" );
     for( ProgramUniformMap::const_iterator program_it = mUniforms.begin();
           program_it != mUniforms.end();
           ++program_it )
@@ -1616,7 +1616,7 @@ public: // TEST FUNCTIONS
         {
           std::stringstream out;
           out << uniform_it->first << ": " << origValue;
-          fprintf(stderr, "%s", out.str().c_str() );
+          fprintf(stderr, "%s\n", out.str().c_str() );
         }
       }
     }

@@ -24,8 +24,6 @@
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/update/modeling/scene-graph-mesh.h>
 #include <dali/internal/update/modeling/scene-graph-material.h>
-#include <dali/internal/update/node-attachments/scene-graph-light-attachment.h>
-#include <dali/internal/update/controllers/light-controller.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/shaders/shader.h>
@@ -40,18 +38,15 @@ namespace Internal
 namespace SceneGraph
 {
 
-MeshRenderer* MeshRenderer::New( RenderDataProvider& dataprovider, LightController& lightController )
+MeshRenderer* MeshRenderer::New( RenderDataProvider& dataprovider )
 {
   MeshRenderer* meshRenderer = new MeshRenderer( dataprovider );
-  meshRenderer->mLightController = &lightController;
 
   return meshRenderer;
 }
 
 MeshRenderer::MeshRenderer( RenderDataProvider& dataprovider )
 : Renderer( dataprovider ),
-  mLightController(NULL),
-  mAffectedByLighting(true),
   mGeometryType(GEOMETRY_TYPE_TEXTURED_MESH),
   mShaderType(SHADER_DEFAULT)
 {
@@ -68,11 +63,6 @@ void MeshRenderer::ResetCustomUniforms()
   }
 
   mRenderMaterialUniforms.ResetCustomUniforms();
-}
-
-void MeshRenderer::SetAffectedByLighting( bool affectedByLighting )
-{
-  mAffectedByLighting = affectedByLighting;
 }
 
 MeshRenderer::~MeshRenderer()
@@ -107,14 +97,6 @@ bool MeshRenderer::RequiresDepthTest() const
 
 bool MeshRenderer::CheckResources()
 {
-  // Early out if the scene is unlit.
-  // There must be at least one light.
-  const unsigned int numberOfLights = mLightController->GetNumberOfLights();
-  if( 0 == numberOfLights && mAffectedByLighting )
-  {
-    return false;
-  }
-
   return true;
 }
 
@@ -141,10 +123,6 @@ void MeshRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& 
       {
         outSubType = SHADER_RIGGED_AND_VERTEX_COLOR;
       }
-      else if( mAffectedByLighting )
-      {
-        outSubType = SHADER_RIGGED_AND_LIT;
-      }
       else
       {
         outSubType = SHADER_RIGGED_AND_EVENLY_LIT;
@@ -156,10 +134,7 @@ void MeshRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& 
       {
         outSubType = SHADER_VERTEX_COLOR;
       }
-      else if( ! mAffectedByLighting )
-      {
-        outSubType = SHADER_EVENLY_LIT;
-      } // else default
+      outSubType = SHADER_EVENLY_LIT;
     }
   }
   if( outType != mGeometryType || outSubType != mShaderType )
@@ -275,95 +250,6 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
   }
 
   material.SetUniforms( mRenderMaterialUniforms, program, mShaderType );
-
-  if( mAffectedByLighting )
-  {
-    // Set light parameters
-    location = mCustomUniform[ mShaderType ][ 3 ].GetUniformLocation( program, "uNumberOfLights" );
-    if( Program::UNIFORM_UNKNOWN != location )
-    {
-      program.SetUniform1i( location, mLightController->GetNumberOfLights() );
-    }
-
-    // Model View IT matrix required for vertex normal lighting calculation
-    location = mCustomUniform[ mShaderType ][ 4 ].GetUniformLocation( program, "uModelViewIT" );
-    if( Program::UNIFORM_UNKNOWN != location )
-    {
-      Matrix3 modelViewInverseTranspose = modelViewMatrix;
-      modelViewInverseTranspose.Invert();
-      modelViewInverseTranspose.Transpose();
-
-      program.SetUniformMatrix3fv( location, 1, modelViewInverseTranspose.AsFloat() );
-    }
-
-    // only one active light supported at the moment (due to performance)
-    //if( numberOfLights > 0 )
-    {
-      Vector2 tempVector2;
-      Vector3 tempVector3;
-
-      Node& lightNode = mLightController->GetLight( 0 );
-
-      LightAttachment& light = dynamic_cast< LightAttachment& >( lightNode.GetAttachment() );
-
-      location = mCustomUniform[ mShaderType ][ 5 ].GetUniformLocation( program, "uLight0.mType" );
-      if( Program::UNIFORM_UNKNOWN != location )
-      {
-        program.SetUniform1i( location, (GLint)light.GetType() );
-      }
-
-      location = mCustomUniform[ mShaderType ][ 6 ].GetUniformLocation( program, "uLight0.mFallOff" );
-      if( Program::UNIFORM_UNKNOWN != location )
-      {
-        tempVector2 = light.GetFallOff();
-        program.SetUniform2f( location, tempVector2.x, tempVector2.y );
-      }
-
-      location = mCustomUniform[ mShaderType ][ 7 ].GetUniformLocation( program, "uLight0.mSpotAngle" );
-      if( Program::UNIFORM_UNKNOWN != location )
-      {
-        tempVector2 = light.GetSpotAngle();
-        program.SetUniform2f( location, tempVector2.x, tempVector2.y );
-      }
-
-      location = mCustomUniform[ mShaderType ][ 8 ].GetUniformLocation( program, "uLight0.mLightPos" );
-      if( Program::UNIFORM_UNKNOWN != location )
-      {
-        // light position in eyespace
-        Vector3 tempVector3( viewMatrix * Vector4(lightNode.GetWorldPosition(bufferIndex)) );
-        program.SetUniform3f( location, tempVector3.x, tempVector3.y, tempVector3.z );
-      }
-
-      location = mCustomUniform[ mShaderType ][ 9 ].GetUniformLocation( program, "uLight0.mLightDir" );
-      if( Program::UNIFORM_UNKNOWN != location )
-      {
-        tempVector3 = light.GetDirection();
-        tempVector3.Normalize();
-        program.SetUniform3f( location, tempVector3.x, tempVector3.y, tempVector3.z );
-      }
-
-      location = mCustomUniform[ mShaderType ][ 10 ].GetUniformLocation( program, "uLight0.mAmbient" );
-      if( Program::UNIFORM_UNKNOWN != location )
-      {
-        tempVector3 = light.GetAmbientColor();
-        program.SetUniform3f( location, tempVector3.r, tempVector3.g, tempVector3.b );
-      }
-
-      location = mCustomUniform[ mShaderType ][ 11 ].GetUniformLocation( program, "uLight0.mDiffuse" );
-      if( Program::UNIFORM_UNKNOWN != location )
-      {
-        tempVector3 = light.GetDiffuseColor();
-        program.SetUniform3f( location, tempVector3.r, tempVector3.g, tempVector3.b );
-      }
-
-      location = mCustomUniform[ mShaderType ][ 12 ].GetUniformLocation( program, "uLight0.mSpecular" );
-      if( Program::UNIFORM_UNKNOWN != location )
-      {
-        tempVector3 = light.GetSpecularColor();
-        program.SetUniform3f( location, tempVector3.r, tempVector3.g, tempVector3.b );
-      }
-    }
-  }
 
   Dali::MeshData::VertexGeometryType vertexGeometry = mesh->GetMeshData(Mesh::RENDER_THREAD).GetVertexGeometryType();
   switch( vertexGeometry )

@@ -122,7 +122,6 @@ ResourceTicketPtr ResourceClient::RequestResource(
       newTicket = imageTicket;
       break;
     }
-    case ResourceModel:       // FALLTHROUGH
     case ResourceTargetImage:
     case ResourceShader:
     case ResourceMesh:
@@ -171,7 +170,6 @@ ResourceTicketPtr ResourceClient::DecodeResource(
 
       // FALLTHROUGH:
       case ResourceNativeImage:
-      case ResourceModel:
       case ResourceTargetImage:
       case ResourceShader:
       case ResourceMesh:

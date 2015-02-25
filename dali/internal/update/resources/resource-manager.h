@@ -37,7 +37,6 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/common/bitmap-upload.h>
 #include <dali/internal/event/text/font-impl.h>
-#include <dali/internal/event/modeling/model-data-impl.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/modeling/internal-mesh-data.h>
@@ -317,20 +316,6 @@ public: // Used by ResourceClient
    * @param[in] loadStatus The status update.
    */
   void HandleAtlasUpdateRequest( ResourceId id, ResourceId atlasId, Integration::LoadStatus loadStatus );
-
-  /********************************************************************************
-   ******************** Event thread object direct interface  *********************
-   ********************************************************************************/
-
-  /**
-   * Called by model implementations which require access to the model
-   * data.
-   * @note Only called from event thread objects - ModelData is not used
-   * by update objects.
-   * @param[in] id - the id of a ModelData resource.
-   * @return the model data or NULL if it has not been loaded.
-   */
-  Internal::ModelDataPtr GetModelData(ResourceId id);
 
   /********************************************************************************
    ******************** Update thread object direct interface  ********************

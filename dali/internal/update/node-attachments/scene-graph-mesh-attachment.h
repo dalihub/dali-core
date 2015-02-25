@@ -145,11 +145,6 @@ public:
   void SetMaterial( const SceneGraph::Material* material );
 
   /**
-   * @copydoc Dali::Internal::MeshAttachment::SetAffectedByLighting(bool);
-   */
-  void SetAffectedByLighting( bool affectedByLighting );
-
-  /**
    * Set the node for the given mesh index and bone index
    */
   void SetBoneNode( Node* boneNode, size_t boneIdx, size_t boneCount );
@@ -210,11 +205,6 @@ private:
   MeshRenderer* mRenderer; ///< Raw-pointer to renderer that is owned by RenderManager
 
   MeshMatBones  mMesh; ///< The mesh used to prepare for rendering, with associated materials and bones
-
-  bool          mAffectedByLighting:1;    ///< lighting mode.
-  bool          mLastLightingState:1;     ///< lighting state used at the last update.
-  bool          mLightInitialized:1;      ///< whether the light state has been transmitted to the mesh renderer
-
 };
 
 // Messages for MeshAttachment
@@ -239,17 +229,6 @@ inline void SetMaterialMessage( EventToUpdate& eventToUpdate, const MeshAttachme
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &MeshAttachment::SetMaterial, material );
-}
-
-inline void SetAffectedByLightingMessage( EventToUpdate& eventToUpdate, const MeshAttachment& attachment, bool affectedByLighting )
-{
-  typedef MessageValue1< MeshAttachment, bool > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &MeshAttachment::SetAffectedByLighting, affectedByLighting );
 }
 
 inline void SetBoneNodeMessage( EventToUpdate& eventToUpdate, const MeshAttachment& attachment, Node* boneNode, size_t boneIdx, size_t boneCount )

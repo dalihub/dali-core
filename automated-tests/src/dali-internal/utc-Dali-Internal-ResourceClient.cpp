@@ -33,7 +33,6 @@
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-observer.h>
 #include <dali/internal/event/images/resource-image-impl.h>
-#include <dali/internal/event/modeling/model-data-impl.h>
 #include <dali/integration-api/resource-cache.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
 #include <dali/internal/render/shaders/shader.h>
@@ -151,29 +150,6 @@ Internal::ResourceTicketPtr CheckLoadBitmap(TestApplication& application, const 
   application.Render();           // Process LoadComplete
   application.SendNotification(); // Process event messages
   DALI_TEST_CHECK( ticket->GetLoadingState() == ResourceLoadingSucceeded );
-  application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
-  req=NULL;
-  application.GetPlatform().ResetTrace();
-
-  return ticket;
-}
-
-Internal::ResourceTicketPtr CheckLoadModel(TestApplication& application, const char* name)
-{
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  Internal::ResourceTicketPtr ticket = resourceClient.RequestResource( Integration::ModelResourceType(), name );
-  ticket->AddObserver(testTicketObserver);
-
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process resource request
-  Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Dali::ModelData modelData = BuildTreeModel();
-  Internal::ModelData& modelDataImpl = GetImplementation(modelData);
-  Integration::ResourcePointer resourcePtr(&modelDataImpl);
-  application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
-  application.Render();           // Process LoadComplete
-  application.SendNotification(); // Process event messages
-  DALI_TEST_CHECK(ticket->GetLoadingState() == ResourceLoadingSucceeded);
   application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
   req=NULL;
   application.GetPlatform().ResetTrace();
@@ -732,176 +708,48 @@ int UtcDaliInternalRequestReloadBitmapRequests03(void)
   END_TEST;
 }
 
-
-int UtcDaliInternalSaveResource01(void)
+/**
+//int UtcDaliInternalSaveResource01(void)//
 {
   TestApplication application;
   tet_infoline("Testing SaveResource() with valid id, and valid filename");
-
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-
-  Dali::ModelData modelData = BuildTreeModel();
   testTicketObserver.Reset();
 
-  Internal::ResourceTicketPtr ticket = resourceClient.RequestResource( Integration::ModelResourceType(), "model.dae" );
-  ticket->AddObserver(testTicketObserver);
-
-  // First, load a model resource
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process resource request
-  Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Internal::ModelData& modelDataImpl = GetImplementation(modelData);
-  Integration::ResourcePointer resourcePtr(&modelDataImpl);
-
-  application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
-  application.Render();           // Process LoadComplete
-  application.SendNotification(); // Process event messages
-  DALI_TEST_CHECK( ticket->GetLoadingState() == ResourceLoadingSucceeded );
-
-  // Try saving it
-  resourceClient.SaveResource( ticket, "model.dali-bin" );
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process save resource request
-
-  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::SaveResourceFunc ) );
-  req = application.GetPlatform().GetRequest();
-  DALI_TEST_CHECK( req->GetType()->id == Integration::ResourceModel );
-  DALI_TEST_CHECK( req->GetPath().compare("model.dali-bin") == 0 );
-
-  // Set up success response
-  application.GetPlatform().SetResourceSaved(req->GetId(), req->GetType()->id);
-  application.Render();           // GetResources --> SaveComplete
-  application.SendNotification(); // Send event messages
-
-  DALI_TEST_CHECK( testTicketObserver.SaveSucceededCalled() == 1 );
-  DALI_TEST_EQUALS( ticket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION )
-;
+  DALI_TEST_CHECK(0);
   END_TEST;
 }
 
 
-int UtcDaliInternalSaveResource02(void)
+//int UtcDaliInternalSaveResource02(void)//
 {
   TestApplication application;
   tet_infoline("Testing SaveResource() with invalid id");
   testTicketObserver.Reset();
 
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-
-  Dali::ModelData modelData = BuildTreeModel();
-
-  Internal::ResourceTicketPtr ticket = resourceClient.RequestResource( Integration::ModelResourceType(), "model.dae" );
-  ticket->AddObserver(testTicketObserver);
-
-  // First, load a model resource
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process resource request
-  Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Internal::ModelData& modelDataImpl = GetImplementation(modelData);
-  Integration::ResourcePointer resourcePtr(&modelDataImpl);
-  application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
-  application.Render();           // Process LoadComplete
-  application.SendNotification(); // Process event messages
-  DALI_TEST_CHECK(ticket->GetLoadingState() == ResourceLoadingSucceeded);
-  application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
-
-  Internal::ResourceTypePath typePath(Integration::ModelResourceType(), "");
-  Internal::ResourceTicketPtr aTicket = new Internal::ResourceTicket( testTicketLifetimeObserver, 2000,  typePath );
-  try
-  {
-    resourceClient.SaveResource( aTicket, "model.dali-bin" ); // Should be outside range of valid resources!
-  }
-  catch (DaliException& e)
-  {
-    // Tests that a negative test of an assertion succeeds
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "mImpl->mTickets.find(ticket->GetId()) != mImpl->mTickets.end()", TEST_LOCATION );
-  }
-
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process save resource request
-
-  // Ensure no request sent to platform abstraction
-  DALI_TEST_CHECK( ! application.GetPlatform().WasCalled(TestPlatformAbstraction::SaveResourceFunc ) );
-  req = application.GetPlatform().GetRequest();
-  DALI_TEST_CHECK ( req == NULL );
+  DALI_TEST_CHECK(0);
   END_TEST;
 }
 
-int UtcDaliInternalSaveResource03(void)
+//int UtcDaliInternalSaveResource03(void)//
 {
   TestApplication application;
   tet_infoline("Testing SaveResource() with invalid id");
   testTicketObserver.Reset();
 
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-
-  Dali::ModelData modelData = BuildTreeModel();
-
-  Internal::ResourceTicketPtr ticket = resourceClient.RequestResource( Integration::ModelResourceType(), "model.dae" );
-  ticket->AddObserver(testTicketObserver);
-
-  // First, load a model resource
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process resource request
-  Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
-  Internal::ModelData& modelDataImpl = GetImplementation(modelData);
-  Integration::ResourcePointer resourcePtr(&modelDataImpl);
-  application.GetPlatform().SetResourceLoaded(req->GetId(), req->GetType()->id, resourcePtr);
-  application.Render();           // Process LoadComplete
-  application.SendNotification(); // Process event messages
-  DALI_TEST_CHECK(ticket->GetLoadingState() == ResourceLoadingSucceeded);
-  application.GetPlatform().DiscardRequest(); // Ensure load request is discarded
-
-  Internal::ResourceTicketPtr aTicket;
-  try
-  {
-    resourceClient.SaveResource( aTicket, "model.dali-bin" ); // Should be outside range of valid resources!
-  }
-  catch (DaliException& e)
-  {
-    // Tests that a negative test of an assertion succeeds
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_EQUALS(e.condition, "ticket", TEST_LOCATION);
-  }
-
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process save resource request
-
-  // Ensure no request sent to platform abstraction
-  DALI_TEST_CHECK( ! application.GetPlatform().WasCalled(TestPlatformAbstraction::SaveResourceFunc ) );
-  req = application.GetPlatform().GetRequest();
-  DALI_TEST_CHECK ( req == NULL );
+  DALI_TEST_CHECK ( 0 );
   END_TEST;
 }
 
 
-int UtcDaliInternalSaveResource04(void)
+//int UtcDaliInternalSaveResource04(void)//
 {
   TestApplication application;
   tet_infoline("Testing SaveResource() with valid id, but invalid filename");
   testTicketObserver.Reset();
-
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-
-  // First, load a model resource
-  Internal::ResourceTicketPtr ticket = CheckLoadModel(application, "model.dae");
-
-  resourceClient.SaveResource( ticket, "model.dali-bin" );
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process save resource request
-
-  // Set up fail response
-  application.GetPlatform().SetResourceSaveFailed(ticket->GetId(), Integration::FailureInvalidPath );
-  application.Render();           // GetResources --> SaveFailed
-  application.SendNotification(); // Send event messages
-
-  DALI_TEST_CHECK( testTicketObserver.SaveSucceededCalled() == 0 );
-  DALI_TEST_CHECK( testTicketObserver.SaveFailedCalled() == 1 );
-  DALI_TEST_EQUALS( ticket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION )
-;
+  DALI_TEST_CHECK( 0 );
   END_TEST;
 }
+*/
 
 int UtcDaliInternalSaveResource05(void)
 {
@@ -1208,14 +1056,11 @@ int UtcDaliInternalGetBitmapImage03(void)
   tet_infoline("Testing GetBitmap() with valid ticket for incorrect type");
 
   Internal::ResourceClient& resourceClient  = Internal::ThreadLocalStorage::Get().GetResourceClient();  Internal::ResourceTicketPtr imageTicket = CheckLoadBitmap( application, "Stuff.png", 100, 100 );
-  Internal::ResourceTicketPtr modelTicket = CheckLoadModel( application, "Stuff.dae");
 
   Integration::Bitmap* theBitmap = NULL;
   theBitmap = resourceClient.GetBitmap(imageTicket);
   DALI_TEST_CHECK( ! theBitmap );
 
-  theBitmap = resourceClient.GetBitmap(modelTicket);
-  DALI_TEST_CHECK( ! theBitmap );
   END_TEST;
 }
 

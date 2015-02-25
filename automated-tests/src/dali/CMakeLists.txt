@@ -44,7 +44,6 @@ SET(TC_SOURCES
         utc-Dali-ImageAttributes.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
-        utc-Dali-LightActor.cpp
         utc-Dali-LocklessBuffer.cpp
         utc-Dali-LongPressGesture.cpp
         utc-Dali-LongPressGestureDetector.cpp
@@ -55,7 +54,6 @@ SET(TC_SOURCES
         utc-Dali-MemoryPoolObjectAllocator.cpp
         utc-Dali-MeshActor.cpp
         utc-Dali-MeshData.cpp
-        utc-Dali-Model.cpp
         utc-Dali-MouseWheelEvent.cpp
         utc-Dali-Mutex.cpp
         utc-Dali-NativeImage.cpp

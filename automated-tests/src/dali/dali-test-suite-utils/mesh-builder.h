@@ -37,7 +37,6 @@ Material ConstructMaterial();
 Mesh ConstructMesh( float sz );
 void AddBone(Dali::BoneContainer& bones, const std::string& name, const Dali::Matrix& offsetMatrix);
 void CreateMeshData(MeshData& meshData);
-Dali::ModelData BuildTreeModel();
 
 }
 
