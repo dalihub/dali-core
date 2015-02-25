@@ -27,7 +27,7 @@
 #include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
@@ -243,7 +243,7 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  * | show              | %SetVisible( true )          |
  * | hide              | %SetVisible( false )         |
  */
-class DALI_IMPORT_API Actor : public Constrainable
+class DALI_IMPORT_API Actor : public Handle
 {
 public:
 

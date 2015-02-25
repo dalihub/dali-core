@@ -754,15 +754,15 @@ void Object::DisablePropertyNotifications()
 
 Dali::ActiveConstraint Object::ApplyConstraint( Constraint& constraint )
 {
-  return Dali::ActiveConstraint( DoApplyConstraint( constraint, Dali::Constrainable() ) );
+  return Dali::ActiveConstraint( DoApplyConstraint( constraint, Dali::Handle() ) );
 }
 
-Dali::ActiveConstraint Object::ApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject )
+Dali::ActiveConstraint Object::ApplyConstraint( Constraint& constraint, Dali::Handle weightObject )
 {
   return Dali::ActiveConstraint( DoApplyConstraint( constraint, weightObject ) );
 }
 
-ActiveConstraintBase* Object::DoApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject )
+ActiveConstraintBase* Object::DoApplyConstraint( Constraint& constraint, Dali::Handle weightObject )
 {
   ActiveConstraintBase* activeConstraintImpl = constraint.CreateActiveConstraint();
   DALI_ASSERT_DEBUG( NULL != activeConstraintImpl );

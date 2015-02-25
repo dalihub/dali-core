@@ -24,7 +24,6 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/constrainable.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-index.h>
@@ -238,7 +237,7 @@ public:
    * @param[in] constraint The constraint to apply.
    * @param[in] weightObject An object with a "weight" float property.
    */
-  Dali::ActiveConstraint ApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject );
+  Dali::ActiveConstraint ApplyConstraint( Constraint& constraint, Dali::Handle weightObject );
 
   /**
    * Remove one constraint from a Object.
@@ -459,7 +458,7 @@ private:
    * @param[in] weightObject An object with a "weight" float property, or an empty handle.
    * @return The new active-constraint which is owned by Object.
    */
-  ActiveConstraintBase* DoApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject );
+  ActiveConstraintBase* DoApplyConstraint( Constraint& constraint, Dali::Handle weightObject );
 
   /**
    * Helper to remove active constraints

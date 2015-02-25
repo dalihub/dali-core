@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/viewport.h>
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
@@ -74,7 +74,7 @@ class RenderTask;
  * |--------------|-----------------------|
  * | finished     | @ref FinishedSignal() |
  */
-class DALI_IMPORT_API RenderTask : public Constrainable
+class DALI_IMPORT_API RenderTask : public Handle
 {
 public:
   /**

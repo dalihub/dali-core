@@ -18,7 +18,6 @@ SET(TC_SOURCES
         utc-Dali-BitmapImage.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-Character.cpp
-        utc-Dali-Constrainable.cpp
         utc-Dali-Constraint.cpp
         utc-Dali-Context.cpp
         utc-Dali-CustomActor.cpp

@@ -128,7 +128,6 @@
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/constrainable.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/public-api/object/property-conditions.h>

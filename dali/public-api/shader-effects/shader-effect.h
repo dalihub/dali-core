@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/active-constraint-declarations.h>
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
 
 namespace Dali
 {
@@ -147,7 +147,7 @@ enum GeometryType
  * with the uniform color "uColor" of the node
  * </B>
  */
-class DALI_IMPORT_API ShaderEffect : public Constrainable
+class DALI_IMPORT_API ShaderEffect : public Handle
 {
 public:
   /**
