@@ -114,7 +114,7 @@ int UtcDaliRenderableActorSetSortModifier(void)
   //Verify through layer SetSortFunction
   gIsActor1SortModifierCorrect = false;
   gIsActor2SortModifierCorrect = false;
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   // create two transparent actors so there is something to sort
   ImageActor actor1 = ImageActor::New( img );
   ImageActor actor2 = ImageActor::New( img );
@@ -183,7 +183,7 @@ int UtcDaliRenderableActorSetCullFace(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetCullFace()");
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
   ImageActor actor2 = ImageActor::New( img );
 
@@ -321,7 +321,7 @@ int UtcDaliRenderableActorSetGetBlendFunc(void)
 
   tet_infoline("Testing Dali::RenderableActor::UtcDaliRenderableActorSetGetBlendFunc()");
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -398,7 +398,7 @@ int UtcDaliRenderableActorSetGetBlendEquation(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetBlendEquation()");
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -447,7 +447,7 @@ int UtcDaliRenderableActorSetGetBlendColor(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetBlendColor()");
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -474,7 +474,7 @@ int UtcDaliRenderableActorSetGetAlpha(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetGetAlpha()");
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
   Stage::GetCurrent().Add( actor );
   application.SendNotification();
@@ -557,7 +557,7 @@ int UtcDaliRenderableActorSetFilterMode(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetFilterMode()");
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
 
   actor.SetSize(100.0f, 100.0f);
@@ -737,7 +737,7 @@ int UtcDaliRenderableActorSetFilterMode(void)
 int UtcDaliRenderableActorSetShaderEffect(void)
 {
   TestApplication application;
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
   Stage::GetCurrent().Add( actor );
 
@@ -826,7 +826,7 @@ int UtcDaliSetShaderEffectRecursively(void)
    *       actor3 textactor
    * imageactor
    */
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor1 = ImageActor::New( img );
   Actor actor2 = Actor::New();
   actor1.Add( actor2 );

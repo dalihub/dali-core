@@ -307,9 +307,9 @@ void ConstraintAppliedCheck::CheckSignalNotReceived()
   }
 }
 
-BitmapImage CreateBitmapImage()
+BufferImage CreateBufferImage()
 {
-  BitmapImage image = BitmapImage::New(4,4,Pixel::RGBA8888);
+  BufferImage image = BufferImage::New(4,4,Pixel::RGBA8888);
 
   PixelBuffer* pixbuf = image.GetBuffer();
 

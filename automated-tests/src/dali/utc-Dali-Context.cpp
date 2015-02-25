@@ -45,9 +45,9 @@ enum TestAttribType
 };
 
 // Create bitmap image
-static BitmapImage CreateBitmapImage()
+static BufferImage CreateBufferImage()
 {
-  BitmapImage image = BitmapImage::New(4,4,Pixel::RGBA8888);
+  BufferImage image = BufferImage::New(4,4,Pixel::RGBA8888);
 
   return image;
 }
@@ -90,7 +90,7 @@ static LightActor CreateLight()
 
 static ImageActor CreateImageActor()
 {
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetName("Test ImageActor");

@@ -2804,9 +2804,9 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
   ids.push_back( 10 );  // third rendered actor
   app.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage imageA = BitmapImage::New(16, 16);
-  BitmapImage imageB = BitmapImage::New(16, 16);
-  BitmapImage imageC = BitmapImage::New(16, 16);
+  BufferImage imageA = BufferImage::New(16, 16);
+  BufferImage imageB = BufferImage::New(16, 16);
+  BufferImage imageC = BufferImage::New(16, 16);
   ImageActor a = ImageActor::New( imageA );
   ImageActor b = ImageActor::New( imageB );
   ImageActor c = ImageActor::New( imageC );
@@ -2861,8 +2861,8 @@ int UtcDaliActorSetDrawModeOverlayHitTest(void)
   TestApplication app;
   tet_infoline(" UtcDaliActorSetDrawModeOverlayHitTest");
 
-  BitmapImage imageA = BitmapImage::New(16, 16);
-  BitmapImage imageB = BitmapImage::New(16, 16);
+  BufferImage imageA = BufferImage::New(16, 16);
+  BufferImage imageB = BufferImage::New(16, 16);
   ImageActor a = ImageActor::New( imageA );
   ImageActor b = ImageActor::New( imageB );
 

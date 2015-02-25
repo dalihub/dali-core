@@ -260,7 +260,7 @@ int UtcDaliLayerSetSortFunction(void)
 {
   tet_infoline("Testing Dali::Layer::SetSortFunction()");
   TestApplication application;
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   // create two transparent actors so there is something to sort
   ImageActor actor = ImageActor::New( img );
   ImageActor actor2 = ImageActor::New( img );

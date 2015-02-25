@@ -94,7 +94,7 @@
 #include <dali/public-api/geometry/spline.h>
 
 #include <dali/public-api/images/atlas.h>
-#include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/distance-field.h>
 #include <dali/public-api/images/encoded-buffer-image.h>
 #include <dali/public-api/images/frame-buffer-image.h>

@@ -396,7 +396,7 @@ struct DefaultFunctionCoverage
 };
 
 
-// Helper to Create bitmap image
-BitmapImage CreateBitmapImage();
+// Helper to Create buffer image
+BufferImage CreateBufferImage();
 
 #endif // __DALI_TEST_SUITE_UTILS_H__

@@ -712,7 +712,7 @@ int UtcDaliMeshActorBlend04(void)
   tet_infoline("Testing Dali::MeshActor::Blend04()");
 
   Material material = ConstructMaterial(1.0f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGBA8888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGBA8888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -730,7 +730,7 @@ int UtcDaliMeshActorBlend05(void)
   tet_infoline("Testing Dali::MeshActor::Blend05()");
 
   Material material = ConstructMaterial(1.0f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGBA8888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGBA8888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -749,7 +749,7 @@ int UtcDaliMeshActorBlend06(void)
   tet_infoline("Testing Dali::MeshActor::Blend()");
 
   Material material = ConstructMaterial(1.0f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGB888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGB888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -793,7 +793,7 @@ int UtcDaliMeshActorBlend08(void)
   tet_infoline("Testing Dali::MeshActor::Blend08()");
 
   Material material = ConstructMaterial(1.0f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGBA8888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGBA8888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -810,7 +810,7 @@ int UtcDaliMeshActorBlend09(void)
   tet_infoline("Testing Dali::MeshActor::Blend08()");
 
   Material material = ConstructMaterial(0.5f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGB888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGB888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -837,7 +837,7 @@ int UtcDaliMeshActorBoneUpdate01(void)
   branch.SetPosition(Vector3(10.0f, 100.0f, 0.0f));
   branch.SetRotation(Quaternion(M_PI*0.2f, Vector3::YAXIS));
 
-  Actor twig = ImageActor::New(CreateBitmapImage());
+  Actor twig = ImageActor::New(CreateBufferImage());
   twig.SetName("twig");
   branch.SetPosition(Vector3(20.0f, 30.0f, 40.0f));
 

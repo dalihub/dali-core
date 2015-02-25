@@ -15,7 +15,7 @@ SET(TC_SOURCES
         utc-Dali-Any.cpp
         utc-Dali-Atlas.cpp
         utc-Dali-BaseHandle.cpp
-        utc-Dali-BitmapImage.cpp
+        utc-Dali-BufferImage.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-Character.cpp
         utc-Dali-Constraint.cpp

@@ -341,7 +341,7 @@ int UtcDaliRenderTaskSetSourceActor(void)
   ids.push_back( 7 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor newActor = ImageActor::New( img );
   newActor.SetSize(1,1);
   stage.Add( newActor );
@@ -404,7 +404,7 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   ids.push_back( expectedTextureId );
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor newActor = ImageActor::New( img );
   newActor.SetSize(1,1);
   task.SetSourceActor( newActor );
@@ -465,7 +465,7 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   ids.push_back( expectedTextureId );
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor newActor = ImageActor::New( img );
   newActor.SetSize(1,1);
   stage.Add( newActor );
@@ -538,7 +538,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   ids.push_back( 10 ); // 10 = actor3
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage img1 = BitmapImage::New( 1,1 );
+  BufferImage img1 = BufferImage::New( 1,1 );
   ImageActor actor1 = ImageActor::New( img1 );
   actor1.SetSize(1,1);
   Stage::GetCurrent().Add( actor1 );
@@ -556,7 +556,7 @@ int UtcDaliRenderTaskSetExclusive(void)
     DALI_TEST_EQUALS( boundTextures[0], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
-  BitmapImage img2 = BitmapImage::New( 1,1 );
+  BufferImage img2 = BufferImage::New( 1,1 );
   ImageActor actor2 = ImageActor::New( img2 );
   actor2.SetSize(1,1);
 
@@ -580,7 +580,7 @@ int UtcDaliRenderTaskSetExclusive(void)
     DALI_TEST_EQUALS( boundTextures[1], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
-  BitmapImage img3 = BitmapImage::New( 1,1 );
+  BufferImage img3 = BufferImage::New( 1,1 );
   ImageActor actor3 = ImageActor::New( img3 );
   actor3.SetSize(1,1);
 
@@ -1130,7 +1130,7 @@ int UtcDaliRenderTaskSignalFinished(void)
 
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  BitmapImage image = BitmapImage::New( 10, 10 );
+  BufferImage image = BufferImage::New( 10, 10 );
   ImageActor rootActor = ImageActor::New( image );
   rootActor.SetSize( 10, 10 );
   Stage::GetCurrent().Add( rootActor );

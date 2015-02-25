@@ -149,7 +149,7 @@ int UtcDaliImageActorPixelArea(void)
   TestApplication application;
   tet_infoline("Positive test for Dali::ImageActor::UtcDaliImageActorPixelArea");
 
-  BitmapImage img = BitmapImage::New( 10, 10 );
+  BufferImage img = BufferImage::New( 10, 10 );
   ImageActor actor = ImageActor::New( img );
 
   DALI_TEST_CHECK( actor.IsPixelAreaSet() == false );
@@ -179,7 +179,7 @@ int UtcDaliImageActorSetSize01(void)
 {
   TestApplication application;
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
 
   ShaderEffect effect = ShaderEffect::New( " ", " ", " ", " ", ShaderEffect::HINT_GRID );
@@ -207,7 +207,7 @@ int UtcDaliImageActorGetCurrentSize01(void)
   tet_infoline("Positive test for Dali::ImageActor::GetCurrentSize");
 
   Vector2 initialImageSize(100, 50);
-  BitmapImage image = BitmapImage::New( initialImageSize.width, initialImageSize.height );
+  BufferImage image = BufferImage::New( initialImageSize.width, initialImageSize.height );
   ImageActor actor = ImageActor::New( image );
   Stage::GetCurrent().Add(actor);
 
@@ -654,7 +654,7 @@ int UtcDaliImageActorDefaultProperties(void)
   TestApplication application;
   tet_infoline("Testing Dali::ImageActor DefaultProperties");
 
-  BitmapImage img = BitmapImage::New( 10, 10 );
+  BufferImage img = BufferImage::New( 10, 10 );
   ImageActor actor = ImageActor::New( img );
 
   std::vector<Property::Index> indices;
@@ -694,7 +694,7 @@ int UtcDaliImageActorUseImageAlpha01(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetUseImageAlpha()");
 
-  BitmapImage image = BitmapImage::New( 100, 50 );
+  BufferImage image = BufferImage::New( 100, 50 );
   ImageActor actor = ImageActor::New( image );
   actor.SetBlendMode( BlendingMode::ON );
   actor.SetSize(100, 50);
@@ -716,7 +716,7 @@ int UtcDaliImageActorUseImageAlpha02(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetUseImageAlpha()");
 
-  BitmapImage image = BitmapImage::New( 100, 50 );
+  BufferImage image = BufferImage::New( 100, 50 );
   ImageActor actor = ImageActor::New( image );
   actor.SetBlendMode( BlendingMode::OFF );
   actor.SetSize(100, 50);
@@ -738,7 +738,7 @@ int UtcDaliImageActorUseImageAlpha03(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetUseImageAlpha()");
 
-  BitmapImage image = BitmapImage::New( 100, 50 );
+  BufferImage image = BufferImage::New( 100, 50 );
   ImageActor actor = ImageActor::New( image );
   actor.SetBlendMode( BlendingMode::AUTO );
   actor.SetColor(Vector4(1.0, 1.0, 1.0, 0.5));
@@ -794,7 +794,7 @@ int UtcDaliImageActorUseImageAlpha05(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetUseImageAlpha()");
 
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGB888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGB888 );
   ImageActor actor = ImageActor::New( image );
   actor.SetBlendMode( BlendingMode::AUTO );
   actor.SetColor(Vector4(1.0, 1.0, 1.0, 1.0));
@@ -815,7 +815,7 @@ int UtcDaliImageActorClearPixelArea(void)
 {
   TestApplication application;
 
-  BitmapImage img = BitmapImage::New( 10, 10 );
+  BufferImage img = BufferImage::New( 10, 10 );
   ImageActor actor = ImageActor::New( img );
 
   DALI_TEST_CHECK( actor.IsPixelAreaSet() == false );
@@ -1124,7 +1124,7 @@ int UtcDaliImageActorGetNaturalSize(void)
   TestApplication application;
 
   // Standard image
-  BitmapImage img = BitmapImage::New( 10, 10 );
+  BufferImage img = BufferImage::New( 10, 10 );
   ImageActor actor = ImageActor::New( img );
 
   DALI_TEST_CHECK( actor.GetNaturalSize().GetVectorXY() == Vector2( 10, 10 ) );

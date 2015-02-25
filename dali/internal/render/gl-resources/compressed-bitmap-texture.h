@@ -23,7 +23,7 @@
 #include <stdint.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>

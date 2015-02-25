@@ -64,7 +64,7 @@ public_api_src_files = \
   $(public_api_src_dir)/images/image.cpp \
   $(public_api_src_dir)/images/image-attributes.cpp \
   $(public_api_src_dir)/images/pixel.cpp \
-  $(public_api_src_dir)/images/bitmap-image.cpp \
+  $(public_api_src_dir)/images/buffer-image.cpp \
   $(public_api_src_dir)/images/frame-buffer-image.cpp \
   $(public_api_src_dir)/images/encoded-buffer-image.cpp \
   $(public_api_src_dir)/images/nine-patch-image.cpp \
@@ -216,7 +216,7 @@ public_api_core_geometry_header_files = \
 
 public_api_core_images_header_files = \
   $(public_api_src_dir)/images/atlas.h \
-  $(public_api_src_dir)/images/bitmap-image.h \
+  $(public_api_src_dir)/images/buffer-image.h \
   $(public_api_src_dir)/images/distance-field.h \
   $(public_api_src_dir)/images/encoded-buffer-image.h \
   $(public_api_src_dir)/images/frame-buffer-image.h \
