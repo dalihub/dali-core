@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.0.29
+Version:    1.0.30
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0
@@ -57,7 +57,7 @@ Integration development package for the OpenGLES Canvas - headers for integratin
 %build
 PREFIX="/usr"
 CXXFLAGS+=" -Wall -g -Os -DNDEBUG -fPIC -fvisibility-inlines-hidden -fdata-sections -ffunction-sections "
-LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread"
+LDFLAGS+=" -Wl,--rpath=$PREFIX/lib -Wl,--as-needed -Wl,--gc-sections -lgcc_s -lgcc -lpthread -Wl,-Bsymbolic-functions "
 
 %ifarch %{arm}
 CXXFLAGS+=" -D_ARCH_ARM_ -mfpu=neon"

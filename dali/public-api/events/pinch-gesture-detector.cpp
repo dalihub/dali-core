@@ -23,9 +23,6 @@
 
 namespace Dali
 {
-
-const char* const PinchGestureDetector::SIGNAL_PINCH_DETECTED = "pinch-detected";
-
 PinchGestureDetector::PinchGestureDetector(Internal::PinchGestureDetector* internal)
 : GestureDetector(internal)
 {

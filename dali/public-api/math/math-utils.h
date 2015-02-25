@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <algorithm> // std::min & max
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
@@ -76,7 +73,9 @@ inline bool IsPowerOfTwo( unsigned int i )
 template< typename T >
 inline const T& Clamp( const T& value, const T& min, const T& max )
 {
-  return std::max( std::min( value, max ), min );
+  const T& constrainedUpper = value < max ? value : max;
+  const T& constrainedUpperAndLower = constrainedUpper > min ? constrainedUpper : min;
+  return  constrainedUpperAndLower;
 }
 
 /**
@@ -89,7 +88,9 @@ inline const T& Clamp( const T& value, const T& min, const T& max )
 template< typename T >
 inline void ClampInPlace( T& value, const T& min, const T& max )
 {
-  value =  std::max( std::min( value, max ), min );
+  const T& constrainedUpper = value < max ? value : max;
+  const T& constrainedUpperAndLower = constrainedUpper > min ? constrainedUpper : min;
+  value = constrainedUpperAndLower;
 }
 
 
@@ -115,29 +116,31 @@ inline const T Lerp( const float offset, const T& low, const T& high )
  * @param[in] b the second value in the range.
  * @return a suitable epsilon
  */
-inline float GetRangedEpsilon(float a, float b)
+inline float GetRangedEpsilon( float a, float b )
 {
-  float abs_f = std::max(fabsf(a), fabsf(b));
-  int abs_i = (int) abs_f;
+  const float absA = fabsf( a );
+  const float absB = fabsf( b );
+  const float absF = absA > absB ? absA : absB;
+  const int absI = absF;
 
   float epsilon = Math::MACHINE_EPSILON_10000;
-  if (abs_f < 0.1f)
+  if (absF < 0.1f)
   {
     return Math::MACHINE_EPSILON_0;
   }
-  else if (abs_i < 2)
+  else if (absI < 2)
   {
     return Math::MACHINE_EPSILON_1;
   }
-  else if (abs_i < 20)
+  else if (absI < 20)
   {
     return Math::MACHINE_EPSILON_10;
   }
-  else if (abs_i < 200)
+  else if (absI < 200)
   {
     return Math::MACHINE_EPSILON_100;
   }
-  else if (abs_i < 2000)
+  else if (absI < 2000)
   {
     return Math::MACHINE_EPSILON_1000;
   }

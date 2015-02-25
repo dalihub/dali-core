@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <math.h>
+#include <iostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>

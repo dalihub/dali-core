@@ -24,9 +24,6 @@
 namespace Dali
 {
 
-const char* const ObjectRegistry::SIGNAL_OBJECT_CREATED = "object-created";
-const char* const ObjectRegistry::SIGNAL_OBJECT_DESTROYED = "object-destroyed";
-
 ObjectRegistry::ObjectRegistry()
 {
 }

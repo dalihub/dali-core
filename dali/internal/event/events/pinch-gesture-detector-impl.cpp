@@ -32,6 +32,11 @@ namespace Internal
 
 namespace
 {
+
+// Signals
+
+const char* const SIGNAL_PINCH_DETECTED = "pinch-detected";
+
 BaseHandle Create()
 {
   return Dali::PinchGestureDetector::New();
@@ -39,7 +44,7 @@ BaseHandle Create()
 
 TypeRegistration mType( typeid(Dali::PinchGestureDetector), typeid(Dali::GestureDetector), Create );
 
-SignalConnectorType signalConnector1( mType, Dali::PinchGestureDetector::SIGNAL_PINCH_DETECTED, &PinchGestureDetector::DoConnectSignal );
+SignalConnectorType signalConnector1( mType, SIGNAL_PINCH_DETECTED, &PinchGestureDetector::DoConnectSignal );
 
 }
 
@@ -71,7 +76,7 @@ bool PinchGestureDetector::DoConnectSignal( BaseObject* object, ConnectionTracke
   bool connected( true );
   PinchGestureDetector* gesture = dynamic_cast<PinchGestureDetector*>(object);
 
-  if ( Dali::PinchGestureDetector::SIGNAL_PINCH_DETECTED == signalName )
+  if ( 0 == strcmp( signalName.c_str(), SIGNAL_PINCH_DETECTED ) )
   {
     gesture->DetectedSignal().Connect( tracker, functor );
   }

@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 
 namespace Dali
 {
@@ -32,7 +32,7 @@ class Actor;
 /**
  * Stores an actor pointer and connects/disconnects to any required signals appropriately when set/unset.
  */
-struct ActorObserver : public ProxyObject::Observer
+struct ActorObserver : public Object::Observer
 {
 public:
 
@@ -78,25 +78,25 @@ private:
 
   /**
    * This will never get called as we do not observe objects that have not been added to the scene.
-   * @param[in] proxy The proxy object.
-   * @see ProxyObject::Observer::SceneObjectAdded()
+   * @param[in] object The object object.
+   * @see Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded(ProxyObject& proxy) { }
+  virtual void SceneObjectAdded(Object& object) { }
 
   /**
    * This will be called when the actor is removed from the stage, we should clear and stop
    * observing it.
-   * @param[in] proxy The proxy object.
-   * @see ProxyObject::Observer::SceneObjectRemoved()
+   * @param[in] object The object object.
+   * @see Object::Observer::SceneObjectRemoved()
    */
-  virtual void SceneObjectRemoved(ProxyObject& proxy);
+  virtual void SceneObjectRemoved(Object& object);
 
   /**
    * This will be called when the actor is destroyed. We should clear the actor.
    * No need to stop observing as the object is being destroyed anyway.
-   * @see ProxyObject::Observer::ProxyDestroyed()
+   * @see Object::Observer::ObjectDestroyed()
    */
-  virtual void ProxyDestroyed(ProxyObject& proxy);
+  virtual void ObjectDestroyed(Object& object);
 
 private:
   Actor* mActor;              ///< Raw pointer to an Actor.

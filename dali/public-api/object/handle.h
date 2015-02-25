@@ -32,6 +32,8 @@
 namespace Dali
 {
 
+class ActiveConstraint;
+class Constraint;
 class PropertyNotification;
 class PropertyCondition;
 
@@ -41,7 +43,7 @@ class Object;
 }
 
 /**
- * @brief Dali::Handle is a handle to an internal property owning Dali object.
+ * @brief Dali::Handle is a handle to an internal property owning Dali object that can have constraints applied to it.
  */
 class DALI_IMPORT_API Handle : public BaseHandle
 {
@@ -85,6 +87,13 @@ public:
   Handle();
 
   /**
+   * @brief Create a new object.
+   *
+   * @return A handle to a newly allocated object.
+   */
+  static Handle New();
+
+  /**
    * @brief Dali::Handle is intended as a base class
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
@@ -115,8 +124,6 @@ public:
    */
   static Handle DownCast( BaseHandle handle );
 
-public:
-
   /**
    * @brief Query whether an handle supports a given capability.
    *
@@ -124,6 +131,8 @@ public:
    * @return True if the capability is supported.
    */
   bool Supports( Capability capability ) const;
+
+  // Properties
 
   /**
    * @brief Query how many properties are provided by an handle.
@@ -307,7 +316,68 @@ public:
    */
   void RemovePropertyNotifications();
 
+  // Constraints
+
+  /**
+   * @brief Constrain one of the properties of an Actor.
+   *
+   * @note The constraint will be copied by the Actor. This means that modifying the apply-time etc.
+   * of the constraint, will not affect actors which are already being constrained.
+   * @pre The Actor has been initialized.
+   * @param[in] constraint The constraint to apply.
+   * @return The active-constraint being applied to the actor.
+   */
+  ActiveConstraint ApplyConstraint( Constraint constraint );
+
+  /**
+   * @brief Constrain one of the properties of an Actor, using a custom weight property.
+   *
+   * This overload is intended to allow a single weight property to be shared by many constraints
+   * e.g. call WeightObject::New() once, and pass the return value into every call to ApplyConstraint().
+   * @pre The Actor has been initialized.
+   * @param[in] constraint The constraint to apply.
+   * @param[in] weightObject An object which is expected to have a float property named "weight".
+   * @return The active-constraint being applied to the actor.
+   */
+  ActiveConstraint ApplyConstraint( Constraint constraint, Handle weightObject );
+
+  /**
+   * @brief Remove one constraint from an Object.
+   *
+   * @pre The Object has been initialized.
+   * @param[in] activeConstraint The active-constraint to remove.
+   */
+  void RemoveConstraint( ActiveConstraint activeConstraint );
+
+  /**
+   * @brief Remove all constraints from an Object.
+   *
+   * @pre The object has been initialized.
+   */
+  void RemoveConstraints();
+
+  /**
+   * @brief Remove all the constraint from the Object with a matching tag.
+   *
+   * @pre The Object has been intialized.
+   * @param[in] tag The tag of the constraints which will be removed
+   */
+  void RemoveConstraints( unsigned int tag );
 };
+
+namespace WeightObject
+{
+
+DALI_IMPORT_API extern const Property::Index WEIGHT; ///< name "weight", type FLOAT
+
+/**
+ * @brief Convenience function to create an object with a custom "weight" property.
+ *
+ * @return A handle to a newly allocated object.
+ */
+DALI_IMPORT_API Handle New();
+
+} // namespace WeightObject
 
 } // namespace Dali
 

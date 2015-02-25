@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string.h>
+#include <iostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/math-utils.h>

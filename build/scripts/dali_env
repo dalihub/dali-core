@@ -47,6 +47,7 @@ my @system_packages = (
     "libfribidi-dev",
     "doxygen",
     "lcov",
+    "libcurl4-gnutls-dev"
 );
 
 # Make best guess as to where this program was run from (note, it is

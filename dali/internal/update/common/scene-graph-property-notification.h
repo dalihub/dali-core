@@ -30,7 +30,7 @@ namespace Dali
 namespace Internal
 {
 
-class ProxyObject;
+class Object;
 class PropertyNotification;
 
 namespace SceneGraph
@@ -58,7 +58,7 @@ public:
 
   /**
    * Construct a new PropertyNotification
-   * @param[in] proxy The proxy for a scene-graph object to inspect.
+   * @param[in] object The event-object for a scene-graph object to inspect.
    * @param[in] propertyIndex The index of a property provided by the object.
    * @param[in] propertyType The type of property we're inspecting.
    * @param[in] componentIndex Index to the component of a complex property such as a Vector
@@ -67,7 +67,7 @@ public:
    * @param[in] notifyMode The notification mode setting
    * @return A new PropertyNotification object.
    */
-  static PropertyNotification* New(ProxyObject& proxy,
+  static PropertyNotification* New(Object& object,
                                    Property::Index propertyIndex,
                                    Property::Type propertyType,
                                    int componentIndex,
@@ -107,7 +107,7 @@ protected:
 
   /**
    * Construct the PropertyNotification
-   * @param[in] proxy The proxy for a scene-graph object to inspect.
+   * @param[in] object The event-object for a scene-graph object to inspect.
    * @param[in] propertyIndex The index of a property provided by the object.
    * @param[in] propertyType The type of property we're inspecting.
    * @param[in] componentIndex Index to the component of a complex property such as a Vector
@@ -115,7 +115,7 @@ protected:
    * @param[in] arguments The arguments which accompany the condition.
    * @param[in] notifyMode The notification mode setting
    */
-  PropertyNotification(ProxyObject& proxy,
+  PropertyNotification(Object& object,
                        Property::Index propertyIndex,
                        Property::Type propertyType,
                        int componentIndex,
@@ -141,7 +141,7 @@ private:
 
 protected:
 
-  ProxyObject* mProxy;                          ///< Not owned by the property notification. Valid until ProxyDestroyed() is called.
+  Object* mObject;                              ///< Not owned by the property notification. Valid until ObjectDestroyed() is called.
   Property::Index mPropertyIndex;               ///< The index of this property.
   Property::Type mPropertyType;                 ///< The type of property this is.
   const PropertyInputImpl* mProperty;           ///< The scene graph property

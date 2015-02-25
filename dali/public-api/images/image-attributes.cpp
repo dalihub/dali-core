@@ -29,15 +29,11 @@ const ImageAttributes ImageAttributes::DEFAULT_ATTRIBUTES;
 struct ImageAttributes::ImageAttributesImpl
 {
   ImageAttributesImpl()
-  :  fieldRadius(4.0f),
-     fieldBorder(4),
-     width(0),
+  :  width(0),
      height(0),
      scaling(ShrinkToFit),
      filtering(Box),
-     pixelformat(Pixel::RGBA8888),
-     mOrientationCorrection(false),
-     isDistanceField(false)
+     mOrientationCorrection(false)
   {
   }
 
@@ -46,15 +42,11 @@ struct ImageAttributes::ImageAttributesImpl
   }
 
   ImageAttributesImpl(const ImageAttributesImpl& rhs)
-  : fieldRadius( rhs.fieldRadius ),
-    fieldBorder( rhs.fieldBorder ),
-    width( rhs.width ),
+  : width( rhs.width ),
     height( rhs.height ),
     scaling( rhs.scaling ),
     filtering( rhs.filtering ),
-    pixelformat( rhs.pixelformat ),
-    mOrientationCorrection( rhs.mOrientationCorrection ),
-    isDistanceField( rhs.isDistanceField )
+    mOrientationCorrection( rhs.mOrientationCorrection )
   {
   }
 
@@ -67,23 +59,16 @@ struct ImageAttributes::ImageAttributesImpl
       scaling = rhs.scaling;
       filtering = rhs.filtering;
 
-      pixelformat = rhs.pixelformat;
       mOrientationCorrection = rhs.mOrientationCorrection;
-      isDistanceField = rhs.isDistanceField;
-      fieldRadius = rhs.fieldRadius;
-      fieldBorder = rhs.fieldBorder;
     }
 
     return *this;
   }
 
-  float         fieldRadius;      ///< The minimum search radius to check for differing pixels
-  int           fieldBorder : 16; ///< The amount of distancefield cells to add around the data (for glow/shadow effects)
   unsigned int  width : 16;       ///< image width in pixels
   unsigned int  height : 16;      ///< image height in pixels
   ScalingMode   scaling : 3;      ///< scaling option, ShrinkToFit is default
   FilterMode    filtering : 3;    ///< filtering option. Box is the default
-  Pixel::Format pixelformat : 5;  ///< pixel format, default is RGBA8888
   bool          mOrientationCorrection : 1; ///< If true, image pixels are reordered according to orientation metadata on load.
   bool          isDistanceField : 1;  ///< true, if the image is a distancefield. Default is false.
 };
@@ -123,11 +108,6 @@ void ImageAttributes::SetSize( const Size& size )
   impl->height = size.height;
 }
 
-void ImageAttributes::SetPixelFormat(Pixel::Format format)
-{
-  impl->pixelformat = format;
-}
-
 void ImageAttributes::SetScalingMode(ScalingMode scale)
 {
   impl->scaling = scale;
@@ -158,11 +138,6 @@ Size ImageAttributes::GetSize() const
   return Size(impl->width, impl->height);
 }
 
-Pixel::Format ImageAttributes::GetPixelFormat() const
-{
-  return impl->pixelformat;
-}
-
 ImageAttributes::ScalingMode ImageAttributes::GetScalingMode() const
 {
   return impl->scaling;
@@ -171,21 +146,6 @@ ImageAttributes::ScalingMode ImageAttributes::GetScalingMode() const
 ImageAttributes::FilterMode ImageAttributes::GetFilterMode() const
 {
   return impl->filtering;
-}
-
-bool ImageAttributes::IsDistanceField() const
-{
-  return impl->isDistanceField;
-}
-
-int ImageAttributes::GetFieldBorder() const
-{
-  return impl->fieldBorder;
-}
-
-float ImageAttributes::GetFieldRadius() const
-{
-  return impl->fieldRadius;
 }
 
 bool ImageAttributes::GetOrientationCorrection() const
@@ -198,30 +158,11 @@ ImageAttributes ImageAttributes::New()
   return ImageAttributes();
 }
 
-ImageAttributes ImageAttributes::New(unsigned int imageWidth, unsigned int imageHeight, Pixel::Format format)
+ImageAttributes ImageAttributes::New(unsigned int imageWidth, unsigned int imageHeight)
 {
   ImageAttributes attributes;
   attributes.impl->width = imageWidth;
   attributes.impl->height = imageHeight;
-  attributes.impl->pixelformat = format;
-  return attributes;
-}
-
-ImageAttributes ImageAttributes::NewDistanceField()
-{
-  ImageAttributes attributes;
-  attributes.impl->isDistanceField = true;
-  attributes.impl->fieldRadius = 4.0f;
-  attributes.impl->fieldBorder = 4;
-  return attributes;
-}
-
-ImageAttributes ImageAttributes::NewDistanceField(float fieldRadius, int fieldBorder)
-{
-  ImageAttributes attributes;
-  attributes.impl->isDistanceField = true;
-  attributes.impl->fieldRadius = fieldRadius;
-  attributes.impl->fieldBorder = fieldBorder;
   return attributes;
 }
 
@@ -253,11 +194,6 @@ bool operator<(const ImageAttributes& a, const ImageAttributes& b)
     return a.impl->mOrientationCorrection < b.impl->mOrientationCorrection;
   }
 
-  if (a.impl->pixelformat != b.impl->pixelformat)
-  {
-    return a.impl->pixelformat < b.impl->pixelformat;
-  }
-
   if (a.impl->scaling != b.impl->scaling)
   {
     return a.impl->scaling < b.impl->scaling;
@@ -266,19 +202,6 @@ bool operator<(const ImageAttributes& a, const ImageAttributes& b)
   if (a.impl->filtering != b.impl->filtering)
   {
     return a.impl->filtering < b.impl->filtering;
-  }
-
-  if (a.impl->isDistanceField && b.impl->isDistanceField)
-  {
-    if (fabs(a.impl->fieldRadius - b.impl->fieldRadius) > Math::MACHINE_EPSILON_0)
-    {
-      return a.impl->fieldRadius < b.impl->fieldRadius;
-    }
-
-    if (a.impl->fieldBorder != b.impl->fieldBorder)
-    {
-      return a.impl->fieldBorder < b.impl->fieldBorder;
-    }
   }
 
   // they are equal
@@ -295,12 +218,8 @@ bool operator==(const ImageAttributes& a, const ImageAttributes& b)
   return a.impl->width                  == b.impl->width       &&
          a.impl->height                 == b.impl->height      &&
          a.impl->mOrientationCorrection == b.impl->mOrientationCorrection &&
-         a.impl->pixelformat            == b.impl->pixelformat &&
          a.impl->scaling                == b.impl->scaling     &&
-         a.impl->filtering              == b.impl->filtering     &&
-         a.impl->isDistanceField  == b.impl->isDistanceField &&
-         fabs(a.impl->fieldRadius -  b.impl->fieldRadius) < Math::MACHINE_EPSILON_0 &&
-         a.impl->fieldBorder      == b.impl->fieldBorder;
+         a.impl->filtering              == b.impl->filtering;
 }
 
 /**

@@ -24,8 +24,6 @@
 namespace Dali
 {
 
-const char* const LongPressGestureDetector::SIGNAL_LONG_PRESS_DETECTED = "long-press-detected";
-
 LongPressGestureDetector::LongPressGestureDetector(Internal::LongPressGestureDetector* internal)
 : GestureDetector(internal)
 {

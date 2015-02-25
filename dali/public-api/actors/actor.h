@@ -27,7 +27,7 @@
 #include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
@@ -227,13 +227,27 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  * Key events are received by an actor once set to grab key events, only one actor can be set as focused.
  *
  * @nosubgrouping
+ *
+ * Signals
+ * | %Signal Name      | Method                       |
+ * |-------------------|------------------------------|
+ * | touched           | @ref TouchedSignal()         |
+ * | hovered           | @ref HoveredSignal()         |
+ * | mouse-wheel-event | @ref MouseWheelEventSignal() |
+ * | on-stage          | @ref OnStageSignal()         |
+ * | off-stage         | @ref OffStageSignal()        |
+ *
+ * Actions
+ * | %Action Name      | %Actor method called         |
+ * |-------------------|------------------------------|
+ * | show              | %SetVisible( true )          |
+ * | hide              | %SetVisible( false )         |
  */
-class DALI_IMPORT_API Actor : public Constrainable
+class DALI_IMPORT_API Actor : public Handle
 {
 public:
 
   // Typedefs
-
   typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                ///< Touch signal type
   typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                ///< Hover signal type
   typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType;///< Mousewheel signal type
@@ -287,21 +301,6 @@ public:
   static const Property::Index DRAW_MODE;             ///< name "draw-mode",             type STRING
   static const Property::Index SIZE_MODE;             ///< name "size-mode",             type STRING
   static const Property::Index SIZE_MODE_FACTOR;      ///< name "size-mode-factor",      type VECTOR3
-  /** @} */
-
-  /// @name Signals
-  /** @{ */
-  static const char* const SIGNAL_TOUCHED;            ///< name "touched",           @see TouchedSignal()
-  static const char* const SIGNAL_HOVERED;            ///< name "hovered",           @see HoveredSignal()
-  static const char* const SIGNAL_MOUSE_WHEEL_EVENT;  ///< name "mouse-wheel-event", @see MouseWheelEventSignal()
-  static const char* const SIGNAL_ON_STAGE;           ///< name "on-stage",          @see OnStageSignal()
-  static const char* const SIGNAL_OFF_STAGE;          ///< name "off-stage",         @see OffStageSignal()
-  /** @} */
-
-  /// @name Actions
-  /** @{ */
-  static const char* const ACTION_SHOW;               ///< name "show",   @see SetVisible()
-  static const char* const ACTION_HIDE;               ///< name "hide",   @see SetVisible()
   /** @} */
 
   // Creation

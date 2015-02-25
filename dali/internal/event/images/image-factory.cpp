@@ -23,6 +23,7 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/common/event-to-update.h>
@@ -257,10 +258,6 @@ bool ImageFactory::CompareAttributes( const Dali::ImageAttributes& requested,
             (requested.GetFilterMode() == actual.GetFilterMode()) ||
             (requested.GetFilterMode() == ImageAttributes::DontCare)
           ) &&
-          (requested.GetPixelFormat() ==  actual.GetPixelFormat()) &&
-          (requested.GetFieldBorder() ==  actual.GetFieldBorder()) &&
-          (fabs(actual.GetFieldRadius() - requested.GetFieldRadius()) <= FLT_EPSILON) &&
-          (requested.IsDistanceField() == actual.IsDistanceField()) &&
           (fabsf(requested.GetWidth()  -  actual.GetWidth())  <= actual.GetWidth()  * mMaxScale) &&
           (fabsf(requested.GetHeight() -  actual.GetHeight()) <= actual.GetHeight() * mMaxScale);
 }
@@ -402,7 +399,7 @@ ResourceTicketPtr ImageFactory::IssueLoadRequest( const std::string& filename, c
   else
   {
     // query image size from file if NULL was provided
-    Vector2 size = Dali::Image::GetImageSize( filename );
+    Vector2 size = Dali::ResourceImage::GetImageSize( filename );
     attributes.SetSize( size.width, size.height );
   }
 

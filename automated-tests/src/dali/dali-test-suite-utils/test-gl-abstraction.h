@@ -22,6 +22,7 @@
 #include <sstream>
 #include <string>
 #include <map>
+#include <cstdio>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>

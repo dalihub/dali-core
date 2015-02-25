@@ -34,6 +34,11 @@ class ActiveConstraintBase;
 
 /**
  * @brief A constraint which is being applied to an object.
+ *
+ * Signals
+ * | %Signal Name | Method                |
+ * |--------------|-----------------------|
+ * | applied      | @ref AppliedSignal()  |
  */
 class DALI_IMPORT_API ActiveConstraint : public Handle
 {
@@ -44,9 +49,6 @@ public:
 
   static const float FINAL_WEIGHT;   ///< 1.0f means the constraint is fully-applied, unless weight is still being animated
   static const float DEFAULT_WEIGHT; ///< 1.0f
-
-  //Signal Names
-  static const char* const SIGNAL_APPLIED; ///< name "applied"
 
   /**
    * @brief Create an uninitialized Constraint; this can be initialized with Constraint::New().

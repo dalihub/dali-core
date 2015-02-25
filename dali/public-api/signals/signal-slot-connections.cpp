@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/signals/signal-slot-connections.h>
 
+// EXTERNAL INCLUDES
+#include <cstddef>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/signals/callback.h>
 

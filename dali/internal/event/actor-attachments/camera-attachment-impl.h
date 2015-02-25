@@ -231,12 +231,12 @@ public:
   const PropertyInputImpl* GetProjectionMatrixProperty() const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectAnimatableProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
   const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectInputProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
   const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 

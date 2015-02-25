@@ -49,6 +49,11 @@ struct TapGesture;
  * @endcode
  *
  * @see TapGesture
+ *
+ * Signals
+ * | %Signal Name | Method                |
+ * |--------------|-----------------------|
+ * | tap-detected | @ref DetectedSignal() |
  */
 class DALI_IMPORT_API TapGestureDetector : public GestureDetector
 {
@@ -58,9 +63,6 @@ public: // Typedefs
    * @brief Signal type for detected signal.
    */
   typedef Signal< void ( Actor, const TapGesture& ) > DetectedSignalType;
-
-  //Signal Names
-  static const char* const SIGNAL_TAP_DETECTED; ///< name "tap-detected"
 
 public: // Creation & Destruction
 

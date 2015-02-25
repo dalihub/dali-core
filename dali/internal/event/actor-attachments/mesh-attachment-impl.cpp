@@ -34,15 +34,13 @@ namespace Dali
 namespace Internal
 {
 
-MeshAttachmentPtr MeshAttachment::New( const SceneGraph::Node& parentNode )
+MeshAttachmentPtr MeshAttachment::New( Stage& stage, const SceneGraph::Node& parentNode )
 {
-  StagePtr stage = Stage::GetCurrent();
-
-  MeshAttachmentPtr attachment( new MeshAttachment( *stage ) );
+  MeshAttachmentPtr attachment( new MeshAttachment( stage ) );
 
   // Transfer object ownership of scene-object to message
   SceneGraph::MeshAttachment* sceneObject = SceneGraph::MeshAttachment::New();
-  AttachToNodeMessage( stage->GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;
@@ -292,17 +290,17 @@ MeshAttachment::Connector::~Connector()
   }
 }
 
-void MeshAttachment::Connector::SceneObjectAdded( ProxyObject& proxy )
+void MeshAttachment::Connector::SceneObjectAdded( Object& object )
 {
   ConnectNode();
 }
 
-void MeshAttachment::Connector::SceneObjectRemoved( ProxyObject& proxy )
+void MeshAttachment::Connector::SceneObjectRemoved( Object& object )
 {
   ConnectNode();
 }
 
-void MeshAttachment::Connector::ProxyDestroyed( ProxyObject& proxy )
+void MeshAttachment::Connector::ObjectDestroyed( Object& object )
 {
   mActor = NULL;
 

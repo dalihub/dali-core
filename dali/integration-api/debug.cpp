@@ -25,10 +25,6 @@
 #include <sstream>
 #include <iomanip>
 
-#ifndef EMSCRIPTEN
-# include <boost/thread/tss.hpp>
-#endif
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/matrix3.h>
@@ -85,28 +81,7 @@ namespace Integration
 namespace Log
 {
 
-typedef LogFunction* LogFunctionPtr; ///< LogFunction pointer
-
-/**
- * This stores a pointer to a log function in thread local storage.
- * The data has to be allocated from the heap because
- * it will automatically be deleted when the thread terminates
- */
-struct ThreadLocalLogging
-{
-  ThreadLocalLogging(LogFunction func)
-  :function(func)
-  {
-  }
-
-  LogFunction function;
-};
-
-#ifndef EMSCRIPTEN // single threaded
-boost::thread_specific_ptr<ThreadLocalLogging> threadLocal;
-#else
-std::auto_ptr<ThreadLocalLogging> threadLocal;
-#endif
+__thread LogFunction gthreadLocalLogFunction = NULL;
 
 /* Forward declarations */
 std::string FormatToString(const char *format, ...);
@@ -114,14 +89,7 @@ std::string ArgListToString(const char *format, va_list args);
 
 void LogMessage(DebugPriority priority, const char* format, ...)
 {
-  ThreadLocalLogging* threadLogging = threadLocal.get();
-  // see if there is a log function for this thread
-  if (!threadLogging)
-  {
-    return;
-  }
-  const LogFunction& logfunction = threadLogging->function;
-  if (!logfunction)
+  if ( !gthreadLocalLogFunction )
   {
     return;
   }
@@ -131,7 +99,7 @@ void LogMessage(DebugPriority priority, const char* format, ...)
   std::string message = ArgListToString(format, arg);
   va_end(arg);
 
-  logfunction(priority,message);
+  gthreadLocalLogFunction(priority,message);
 }
 
 void InstallLogFunction(const LogFunction& logFunction)
@@ -139,14 +107,12 @@ void InstallLogFunction(const LogFunction& logFunction)
   // TLS stores a pointer to an object.
   // It needs to be allocated on the heap, because TLS will destroy it when the thread exits.
 
-  ThreadLocalLogging* logStruct = new ThreadLocalLogging(logFunction);
-
-  threadLocal.reset(logStruct);
+  gthreadLocalLogFunction = logFunction;
 }
 
 void UninstallLogFunction()
 {
-  threadLocal.reset();
+  gthreadLocalLogFunction = NULL;
 }
 
 #ifdef DEBUG_ENABLED

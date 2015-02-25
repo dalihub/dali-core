@@ -39,17 +39,24 @@ namespace Internal
 namespace
 {
 
+// Actions
+
+const char* const ACTION_RAISE =           "raise";
+const char* const ACTION_LOWER =           "lower";
+const char* const ACTION_RAISE_TO_TOP =    "raise-to-top";
+const char* const ACTION_LOWER_TO_BOTTOM = "lower-to-bottom";
+
 BaseHandle Create()
 {
   return Dali::Layer::New();
 }
 
-TypeRegistration mType( typeid(Dali::Layer), typeid(Dali::Actor), Create );
+TypeRegistration mType( typeid( Dali::Layer ), typeid( Dali::Actor ), Create );
 
-TypeAction a1(mType, Dali::Layer::ACTION_RAISE, &Layer::DoAction);
-TypeAction a2(mType, Dali::Layer::ACTION_LOWER, &Layer::DoAction);
-TypeAction a3(mType, Dali::Layer::ACTION_RAISE_TO_TOP, &Layer::DoAction);
-TypeAction a4(mType, Dali::Layer::ACTION_LOWER_TO_BOTTOM, &Layer::DoAction);
+TypeAction a1( mType, ACTION_RAISE, &Layer::DoAction );
+TypeAction a2( mType, ACTION_LOWER, &Layer::DoAction );
+TypeAction a3( mType, ACTION_RAISE_TO_TOP, &Layer::DoAction );
+TypeAction a4( mType, ACTION_LOWER_TO_BOTTOM, &Layer::DoAction );
 
 const PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
 {
@@ -499,29 +506,29 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
   return ret;
 }
 
-bool Layer::DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool Layer::DoAction( BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes )
 {
   bool done = false;
-  Layer* layer = dynamic_cast<Layer*>(object);
+  Layer* layer = dynamic_cast<Layer*>( object );
 
-  if(layer)
+  if( layer )
   {
-    if(Dali::Layer::ACTION_RAISE == actionName)
+    if( 0 == strcmp( actionName.c_str(), ACTION_RAISE ) )
     {
       layer->Raise();
       done = true;
     }
-    else if(Dali::Layer::ACTION_LOWER == actionName)
+    else if( 0 == strcmp( actionName.c_str(), ACTION_LOWER ) )
     {
       layer->Lower();
       done = true;
     }
-    else if(Dali::Layer::ACTION_RAISE_TO_TOP == actionName)
+    else if( 0 == strcmp( actionName.c_str(), ACTION_RAISE_TO_TOP ) )
     {
       layer->RaiseToTop();
       done = true;
     }
-    else if(Dali::Layer::ACTION_LOWER_TO_BOTTOM == actionName)
+    else if( 0 == strcmp( actionName.c_str(), ACTION_LOWER_TO_BOTTOM ) )
     {
       layer->LowerToBottom();
       done = true;

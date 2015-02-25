@@ -51,34 +51,34 @@ struct StringEnum
  * @brief Permissive comparison for string enums.
  *
  * Case insensitive and ignores '_', '-' in either string when comparing.
- * If both strings are empty return true; ie like if(a==b) but not like a.compare(b)
- * @param[in] input The input string
- * @param[in] enumString The enum string
- * @return true if the strings are equal as defined above
+ *
+ * @note If both strings are empty return true;
+ *
+ * @param[in] a The first string
+ * @param[in] b The string to compare
+ * @return true if the strings are equal as defined above. If both empty, then return true.
  */
-DALI_IMPORT_API bool CompareEnums(const std::string& input, const std::string& enumString);
+DALI_IMPORT_API bool CompareEnums( const char * a, const char * b );
 
 /**
  * @brief Set the value if strings pass a permissive compare.
  *
  * @param[in] a The input string
- * @param[in] b The input string
+ * @param[in] b The string to compare
  * @param[in] set The variable to set
  * @param[in] value The value to set
  * @return true if the strings pass the permissive compare
  */
 template <typename T>
-bool SetIfEqual(const std::string& a, const std::string& b, T& set, T value)
+bool SetIfEqual(const char * a, const char * b, T& set, const T& value)
 {
-  if( CompareEnums(a, b ) )
+  if( CompareEnums( a, b ) )
   {
     set = value;
     return true;
   }
-  else
-  {
-    return false;
-  }
+
+  return false;
 }
 
 /**
@@ -91,7 +91,7 @@ bool SetIfEqual(const std::string& a, const std::string& b, T& set, T value)
  * @return The equivalent enumeration for the given string.
  */
 template< typename T >
-T GetEnumeration( const std::string& value, const StringEnum< T >* table, unsigned int tableCount )
+T GetEnumeration( const char * value, const StringEnum< T >* table, unsigned int tableCount )
 {
   T retVal( table->value );
   bool set( false );
@@ -117,23 +117,22 @@ T GetEnumeration( const std::string& value, const StringEnum< T >* table, unsign
  * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
  * @param[in]  tableCount  Number of items in the array.
  *
- * @return The equivalent enumeration for the given string.
+ * @return The equivalent enumeration for the given string. Will return NULL if the value does not exist
+ *
+ * @note The caller is NOT responsible for cleaning up the returned pointer as it is statically allocated.
  */
 template< typename T >
-std::string GetEnumerationName( T value, const StringEnum< T >* table, unsigned int tableCount )
+const char * GetEnumerationName( T value, const StringEnum< T >* table, unsigned int tableCount )
 {
-  std::string string( String::EMPTY );
-
   for ( unsigned int i = 0; i < tableCount; ++i )
   {
     if ( value == table[ i ].value )
     {
-      string = table[ i ].string;
-      break;
+      return table[ i ].string;
     }
   }
 
-  return string;
+  return NULL;
 }
 
 /**

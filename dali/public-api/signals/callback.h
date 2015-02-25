@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstddef>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/functor-delegate.h>

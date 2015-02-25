@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/animation.h>
@@ -36,8 +36,8 @@ namespace Internal
 {
 
 class EventToUpdate;
-typedef Dali::Vector<ProxyObject*>     ProxyObjectContainer;
-typedef ProxyObjectContainer::Iterator ProxyObjectIter;
+typedef Dali::Vector<Object*>     ObjectContainer;
+typedef ObjectContainer::Iterator ObjectIter;
 
 namespace SceneGraph
 {
@@ -50,7 +50,7 @@ class AnimatableProperty;
 /**
  * An abstract base class for active constraints.
  */
-class ActiveConstraintBase : public ProxyObject, public ProxyObject::Observer
+class ActiveConstraintBase : public Object, public Object::Observer
 {
 public:
 
@@ -82,7 +82,7 @@ public:
    * @param[in] weightObject An object with a "weight" float property.
    * @param[in] weightIndex The index of the weight property.
    */
-  void SetCustomWeightObject( ProxyObject& weightObject, Property::Index weightIndex );
+  void SetCustomWeightObject( Object& weightObject, Property::Index weightIndex );
 
   /**
    * Called when the ActiveConstraint is first applied.
@@ -90,7 +90,7 @@ public:
    * @param[in] parent The parent object.
    * @param[in] applyTime The apply-time for this constraint.
    */
-  void FirstApply( ProxyObject& parent, TimePeriod applyTime );
+  void FirstApply( Object& parent, TimePeriod applyTime );
 
   /**
    * Called when the ActiveConstraint is removed.
@@ -116,7 +116,7 @@ public:
    * Retrieve the parent of the active-constraint.
    * @return The parent object, or NULL.
    */
-  ProxyObject* GetParent();
+  Object* GetParent();
 
   /**
    * @copydoc Dali::Internal::Object::Supports()
@@ -189,99 +189,99 @@ public:
    */
   static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
-public: // Default property extensions from ProxyObject
+public: // Default property extensions from Object
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyCount()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
    */
   virtual unsigned int GetDefaultPropertyCount() const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndices()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndices()
    */
   virtual void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyName()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
    */
   virtual const char* GetDefaultPropertyName( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyIndex()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
    */
   virtual Property::Index GetDefaultPropertyIndex( const std::string& name ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyWritable()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
    */
   virtual bool IsDefaultPropertyWritable( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAnimatable()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
    */
   virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::IsDefaultPropertyAConstraintInput()
+   * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
    */
   virtual bool IsDefaultPropertyAConstraintInput( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultPropertyType()
+   * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
    */
   virtual Property::Type GetDefaultPropertyType( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::SetDefaultProperty()
+   * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
   virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetDefaultProperty()
+   * @copydoc Dali::Internal::Object::GetDefaultProperty()
    */
   virtual Property::Value GetDefaultProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObject()
+   * @copydoc Dali::Internal::Object::GetSceneObject()
    */
   virtual const SceneGraph::PropertyOwner* GetSceneObject() const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectAnimatableProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectAnimatableProperty()
    */
   virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const;
 
   /**
-   * @copydoc Dali::Internal::ProxyObject::GetSceneObjectInputProperty()
+   * @copydoc Dali::Internal::Object::GetSceneObjectInputProperty()
    */
   virtual const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const;
 
-public: // ProxyObject::Observer methods
+public: // Object::Observer methods
 
   /**
-   * @copydoc ProxyObject::Observer::SceneObjectAdded()
+   * @copydoc Object::Observer::SceneObjectAdded()
    */
-  virtual void SceneObjectAdded( ProxyObject& proxy );
+  virtual void SceneObjectAdded( Object& object );
 
   /**
-   * @copydoc ProxyObject::Observer::SceneObjectRemoved()
+   * @copydoc Object::Observer::SceneObjectRemoved()
    */
-  virtual void SceneObjectRemoved( ProxyObject& proxy );
+  virtual void SceneObjectRemoved( Object& object );
 
   /**
-   * @copydoc ProxyObject::Observer::ProxyDestroyed()
+   * @copydoc Object::Observer::ObjectDestroyed()
    */
-  virtual void ProxyDestroyed( ProxyObject& proxy );
+  virtual void ObjectDestroyed( Object& object );
 
 private:
 
   /**
-   * Helper to observe a proxy, if not already observing it
+   * Helper to observe an object, if not already observing it
    */
-  void ObserveProxy( ProxyObject& proxy );
+  void ObserveObject( Object& object );
 
   /**
-   * Helper to stop observing proxies
+   * Helper to stop observing objects
    */
   void StopObservation();
 
@@ -306,8 +306,8 @@ protected:
   SourceContainer mSources;
   const unsigned int mSourceCount;
 
-  ProxyObject* mTargetProxy; ///< The proxy-object owns the active-constraint.
-  ProxyObjectContainer mObservedProxies; // We don't observe the same object twice
+  Object* mTargetObject; ///< The object owns the active-constraint.
+  ObjectContainer mObservedObjects; // We don't observe the same object twice
 
   const SceneGraph::ConstraintBase* mSceneGraphConstraint;
 

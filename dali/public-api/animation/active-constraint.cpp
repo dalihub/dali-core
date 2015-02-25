@@ -27,8 +27,6 @@ namespace Dali
 const float ActiveConstraint::FINAL_WEIGHT   = 1.0f;
 const float ActiveConstraint::DEFAULT_WEIGHT = 1.0f;
 
-const char* const ActiveConstraint::SIGNAL_APPLIED = "applied";
-
 ActiveConstraint::ActiveConstraint()
 {
 }

@@ -54,7 +54,7 @@ Image LoadImage( TestApplication& application, GLuint textureId, int width, int 
     const Vector2 closestImageSize( width, height );
     application.GetPlatform().SetClosestImageSize(closestImageSize);
 
-    image = Image::New( filename, Image::Immediate, Image::Never );
+    image = ResourceImage::New( filename, ResourceImage::IMMEDIATE, Image::NEVER );
     free (filename);
   }
   DALI_TEST_CHECK(image);

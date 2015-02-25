@@ -19,7 +19,7 @@
 #include <dali/integration-api/core.h>
 
 // EXTERNAL INCLUDES
-#include <iostream>
+#include <iosfwd>
 #include <stdarg.h>
 
 // INTERNAL INCLUDES

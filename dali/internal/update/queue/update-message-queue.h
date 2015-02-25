@@ -70,7 +70,7 @@ public:
   /**
    * @copydoc Dali::Internal::EventToUpdate::ReserveMessageSlot()
    */
-  virtual unsigned int* ReserveMessageSlot( std::size_t size, bool updateScene );
+  virtual unsigned int* ReserveMessageSlot( unsigned int size, bool updateScene );
 
   /**
    * @copydoc Dali::Internal::EventToUpdate::GetEventBufferIndex()

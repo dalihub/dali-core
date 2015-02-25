@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <iostream>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/math/vector2.h>
@@ -311,6 +314,7 @@ public:
    * Print the property value using a stream.
    * @param[in] debugStream The output stream.
    * @param[in] bufferIndex The buffer to read from.
+   * @todo Place this far-too-large-to-be-inlined function in a cpp and remove <iostream> header dependency from this file.
    */
   void DebugPrint( std::ostream& debugStream, BufferIndex bufferIndex ) const
   {

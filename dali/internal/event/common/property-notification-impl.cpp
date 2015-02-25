@@ -24,7 +24,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/common/property-notification-manager.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
@@ -65,7 +65,7 @@ PropertyNotification::PropertyNotification(UpdateManager& updateManager,
 : mUpdateManager(updateManager),
   mPropertyNotification(NULL),
   mPropertyNotificationManager(propertyNotificationManager),
-  mProxyPropertyIndex(target.propertyIndex),
+  mObjectPropertyIndex(target.propertyIndex),
   mPropertyType(Property::NONE),
   mComponentIndex(componentIndex),
   mCondition(condition),
@@ -86,13 +86,13 @@ PropertyNotification::PropertyNotification(UpdateManager& updateManager,
     ++iter;
   }
 
-  // Observe target proxy and create/destroy notification scene object accordingly.
-  mProxy = dynamic_cast<ProxyObject*>( &GetImplementation(target.object) );
-  if ( mProxy )
+  // Observe target object and create/destroy notification scene object accordingly.
+  mObject = dynamic_cast<Object*>( &GetImplementation(target.object) );
+  if ( mObject )
   {
-    mPropertyType = mProxy->GetPropertyType(mProxyPropertyIndex);
+    mPropertyType = mObject->GetPropertyType(mObjectPropertyIndex);
 
-    int internalComponentIndex = mProxy->GetPropertyComponentIndex(mProxyPropertyIndex);
+    int internalComponentIndex = mObject->GetPropertyComponentIndex(mObjectPropertyIndex);
     if( internalComponentIndex != Property::INVALID_COMPONENT_INDEX )
     {
       // override the one passed in
@@ -100,7 +100,7 @@ PropertyNotification::PropertyNotification(UpdateManager& updateManager,
     }
     if(mComponentIndex != Property::INVALID_COMPONENT_INDEX)
     {
-      Property::Type type = mProxy->GetPropertyType(mProxyPropertyIndex);
+      Property::Type type = mObject->GetPropertyType(mObjectPropertyIndex);
       if( type == Property::VECTOR2
           || type == Property::VECTOR3
           || type == Property::VECTOR4 )
@@ -111,7 +111,7 @@ PropertyNotification::PropertyNotification(UpdateManager& updateManager,
 
     // Check if target scene-object already present, and if so create our notification
     // scene-object
-    const SceneGraph::PropertyOwner* object = mProxy->GetSceneObject();
+    const SceneGraph::PropertyOwner* object = mObject->GetSceneObject();
     if (object)
     {
       CreateSceneObject();
@@ -173,14 +173,14 @@ const Dali::PropertyCondition& PropertyNotification::GetCondition() const
 
 Dali::Handle PropertyNotification::GetTarget() const
 {
-  Dali::Handle handle(mProxy);
+  Dali::Handle handle(mObject);
 
   return handle;
 }
 
 Property::Index PropertyNotification::GetTargetProperty() const
 {
-  return mProxyPropertyIndex;
+  return mObjectPropertyIndex;
 }
 
 void PropertyNotification::SetNotifyMode( NotifyMode mode )
@@ -213,8 +213,8 @@ void PropertyNotification::CreateSceneObject()
   if( !mPropertyNotification )
   {
     // Create a new PropertyNotification, temporarily owned
-    SceneGraph::PropertyNotification* propertyNotification = SceneGraph::PropertyNotification::New( *mProxy,
-                                                                                                    mProxyPropertyIndex,
+    SceneGraph::PropertyNotification* propertyNotification = SceneGraph::PropertyNotification::New( *mObject,
+                                                                                                    mObjectPropertyIndex,
                                                                                                     mPropertyType,
                                                                                                     mComponentIndex,
                                                                                                     GetImplementation(mCondition).type,

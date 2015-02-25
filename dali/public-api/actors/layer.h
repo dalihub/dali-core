@@ -52,6 +52,14 @@ typedef Rect<int> ClippingBox;
  * actors in lower layers cannot obscure actors in higher layers.
  *
  * If depth test is disabled, there is no performance overhead from clearing the depth buffer.
+ *
+ * Actions
+ * | %Action Name    | %Layer method called |
+ * |-----------------|----------------------|
+ * | raise           | @ref Raise()         |
+ * | lower           | @ref Lower()         |
+ * | raise-to-top    | @ref RaiseToTop()    |
+ * | lower-to-bottom | @ref LowerToBottom() |
  */
 class DALI_IMPORT_API Layer : public Actor
 {
@@ -60,12 +68,6 @@ public:
   // Default Properties additional to Actor
   static const Property::Index CLIPPING_ENABLE; ///< name "clipping-enable",  type BOOLEAN
   static const Property::Index CLIPPING_BOX;    ///< name "clipping-box",     type RECTANGLE
-
-  // Action Names
-  static const char* const ACTION_RAISE;           ///< name "raise"
-  static const char* const ACTION_LOWER;           ///< name "lower"
-  static const char* const ACTION_RAISE_TO_TOP;    ///< name "raise-to-top"
-  static const char* const ACTION_LOWER_TO_BOTTOM; ///< name "lower-to-bottom"
 
   /**
    * @brief The sort function type.

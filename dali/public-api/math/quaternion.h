@@ -18,10 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <iostream>
-#include <math.h>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
@@ -136,15 +132,7 @@ public:
    *
    * @return true if this is identity quaternion
    */
-  bool IsIdentity() const
-  {
-    // start from w as its unlikely that any real rotation has w == 1
-    // Uses a relaxed epsilon, as composition of rotation introduces error
-    return ( ( fabsf( mVector.w - 1.0f ) < Math::MACHINE_EPSILON_10 )&&
-             ( fabsf( mVector.x ) < Math::MACHINE_EPSILON_10 )&&
-             ( fabsf( mVector.y ) < Math::MACHINE_EPSILON_10 )&&
-             ( fabsf( mVector.z ) < Math::MACHINE_EPSILON_10 ) );
-  }
+  bool IsIdentity() const;
 
   /**
    * @brief Convert the quaternion to an axis/angle pair.

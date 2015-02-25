@@ -20,7 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/math/rect.h>
+#include <dali/public-api/images/native-image-interface.h>
+#include <dali/public-api/images/pixel.h>
 
 namespace Dali
 {
@@ -88,7 +89,7 @@ public:
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    * @return A handle to a new instance of a FrameBufferImage.
    */
-  static FrameBufferImage New(NativeImage& image);
+  static FrameBufferImage New(NativeImageInterface& image);
 
   /**
    * @brief Create a new FrameBufferImage.
@@ -103,7 +104,7 @@ public:
    * @post When the FrameBufferImage is first used as a render target, an exception may be thrown if the NativeImage cannot be mapped to a texture.
    * @return A handle to a new instance of a FrameBufferImage.
    */
-  static FrameBufferImage New(NativeImage& image, ReleasePolicy releasePolicy);
+  static FrameBufferImage New(NativeImageInterface& image, ReleasePolicy releasePolicy);
 
   /**
    * @brief Downcast an Object handle to FrameBufferImage handle.

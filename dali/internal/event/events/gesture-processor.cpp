@@ -207,22 +207,22 @@ Actor* GestureProcessor::GetCurrentGesturedActor()
   return mGesturedActorDisconnected ? NULL : mCurrentGesturedActor;
 }
 
-void GestureProcessor::SceneObjectRemoved(ProxyObject& proxy)
+void GestureProcessor::SceneObjectRemoved(Object& object)
 {
-  if ( mCurrentGesturedActor == &proxy &&
+  if ( mCurrentGesturedActor == &object &&
       !mGesturedActorDisconnected )
   {
     // Inform deriving classes.
     OnGesturedActorStageDisconnection();
 
-    // do not call proxy.RemoveObserver here, proxy is currently iterating through observers... you wouldnt want to upset proxy now would you?
+    // do not call object.RemoveObserver here, object is currently iterating through observers... you wouldnt want to upset object now would you?
     mGesturedActorDisconnected = true;
   }
 }
 
-void GestureProcessor::ProxyDestroyed(ProxyObject& proxy)
+void GestureProcessor::ObjectDestroyed(Object& object)
 {
-  if ( mCurrentGesturedActor == &proxy )
+  if ( mCurrentGesturedActor == &object )
   {
     // Inform deriving classes.
     OnGesturedActorStageDisconnection();

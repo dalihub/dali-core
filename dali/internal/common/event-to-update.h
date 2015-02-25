@@ -59,7 +59,7 @@ public:
    * @param[in] updateScene A flag, when true denotes that the message will cause the scene-graph node tree to require an update.
    * @return A pointer to the first char allocated for the message.
    */
-  virtual unsigned int* ReserveMessageSlot( std::size_t size, bool updateScene = true ) = 0;
+  virtual unsigned int* ReserveMessageSlot( unsigned int size, bool updateScene = true ) = 0;
 
   /**
    * Retrieve the current event-buffer index.

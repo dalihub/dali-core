@@ -46,15 +46,6 @@
 namespace Dali
 {
 
-const char* const Actor::SIGNAL_TOUCHED = "touched";
-const char* const Actor::SIGNAL_HOVERED = "hovered";
-const char* const Actor::SIGNAL_MOUSE_WHEEL_EVENT = "mouse-wheel-event";
-const char* const Actor::SIGNAL_ON_STAGE = "on-stage";
-const char* const Actor::SIGNAL_OFF_STAGE = "off-stage";
-
-const char* const Actor::ACTION_SHOW = "show";
-const char* const Actor::ACTION_HIDE = "hide";
-
 Actor::Actor()
 {
 }
@@ -76,7 +67,7 @@ Actor::~Actor()
 }
 
 Actor::Actor(const Actor& copy)
-: Constrainable(copy)
+: Handle(copy)
 {
 }
 
@@ -619,7 +610,7 @@ DynamicsBody Actor::GetDynamicsBody()
 }
 
 Actor::Actor(Internal::Actor* internal)
-: Constrainable(internal)
+: Handle(internal)
 {
 }
 

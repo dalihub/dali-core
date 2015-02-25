@@ -89,7 +89,7 @@ void TextureCache::AddBitmap(ResourceId id, Integration::BitmapPtr bitmap)
   mTextures.insert(TexturePair(id, texture));
 }
 
-void TextureCache::AddNativeImage(ResourceId id, NativeImagePtr nativeImage)
+void TextureCache::AddNativeImage(ResourceId id, NativeImageInterfacePtr nativeImage)
 {
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::AddNativeImage(id=%i NativeImg:%p)\n", id, nativeImage.Get());
 
@@ -108,7 +108,7 @@ void TextureCache::AddFrameBuffer( ResourceId id, unsigned int width, unsigned i
   mFramebufferTextures.insert(TexturePair(id, texture));
 }
 
-void TextureCache::AddFrameBuffer( ResourceId id, NativeImagePtr nativeImage )
+void TextureCache::AddFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage )
 {
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::AddFrameBuffer(id=%i width:%u height:%u)\n", id, nativeImage->GetWidth(), nativeImage->GetHeight());
 
@@ -435,12 +435,12 @@ void TextureCache::DispatchCreateTextureForBitmap( ResourceId id, Bitmap* bitmap
   }
 }
 
-void TextureCache::DispatchCreateTextureForNativeImage( ResourceId id, NativeImagePtr nativeImage )
+void TextureCache::DispatchCreateTextureForNativeImage( ResourceId id, NativeImageInterfacePtr nativeImage )
 {
   // NULL, means being shutdown, so ignore msgs
   if( mSceneGraphBuffers != NULL )
   {
-    typedef MessageValue2< TextureCache, ResourceId, NativeImagePtr > DerivedType;
+    typedef MessageValue2< TextureCache, ResourceId, NativeImageInterfacePtr > DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -465,12 +465,12 @@ void TextureCache::DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned 
   }
 }
 
-void TextureCache::DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImagePtr nativeImage )
+void TextureCache::DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage )
 {
   // NULL, means being shutdown, so ignore msgs
   if( mSceneGraphBuffers != NULL )
   {
-    typedef MessageValue2< TextureCache, ResourceId, NativeImagePtr > DerivedType;
+    typedef MessageValue2< TextureCache, ResourceId, NativeImageInterfacePtr > DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );

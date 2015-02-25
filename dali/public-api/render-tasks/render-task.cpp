@@ -38,8 +38,6 @@ static bool FullScreenFrameBufferFunction( Vector2& coordinates )
   return true;
 }
 
-const char* const RenderTask::SIGNAL_FINISHED = "finished";
-
 RenderTask::ConstScreenToFrameBufferFunction RenderTask::DEFAULT_SCREEN_TO_FRAMEBUFFER_FUNCTION = DefaultScreenToFrameBufferFunction;
 RenderTask::ConstScreenToFrameBufferFunction RenderTask::FULLSCREEN_FRAMEBUFFER_FUNCTION        = FullScreenFrameBufferFunction;
 
@@ -64,7 +62,7 @@ RenderTask::~RenderTask()
 }
 
 RenderTask::RenderTask(const RenderTask& handle)
-: Constrainable(handle)
+: Handle(handle)
 {
 }
 
@@ -243,7 +241,7 @@ bool RenderTask::GetInputEnabled() const
 }
 
 RenderTask::RenderTask( Internal::RenderTask* internal )
-: Constrainable(internal)
+: Handle(internal)
 {
 }
 

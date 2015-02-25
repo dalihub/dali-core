@@ -44,17 +44,19 @@ class Model;
  *
  * Use ModelActorFactory::BuildActorTree() to create actors from this model.
  * Use ModelActorFactory::BuildAnimation() to create animations on such actors.
+ *
+ * Signals
+ * | %Signal Name           | Method                       |
+ * |------------------------|------------------------------|
+ * | model-loading-finished | @ref LoadingFinishedSignal() |
+ * | model-saving-finished  | @ref SavingFinishedSignal()  |
  */
 class DALI_IMPORT_API Model : public BaseHandle
 {
 public:
 
-  typedef Signal<void (Model)> ModelSignalType; ///< Signal type
-  typedef Signal<void (Model,bool)> ModelSaveSignalType; ///< Signal type for saving models
-
-  //Signal Names
-  static const char* const SIGNAL_MODEL_LOADING_FINISHED; ///< name "model-loading-finished"
-  static const char* const SIGNAL_MODEL_SAVING_FINISHED;  ///< name "model-saving-finished"
+  typedef Signal< void ( Model ) >       ModelSignalType;     ///< Signal type
+  typedef Signal< void ( Model, bool ) > ModelSaveSignalType; ///< Signal type for saving models
 
 public:
   /**

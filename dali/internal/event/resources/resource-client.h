@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/ref-counted-dali-vector.h>
-#include <dali/public-api/images/native-image.h>
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-lifetime-observer.h>
@@ -191,7 +191,7 @@ public:
    * @param [in] resourceData the NativeImage object
    * @return A ref-counted request object. Keep a copy until the resource is no longer required.
    */
-  ResourceTicketPtr AddNativeImage ( NativeImage& resourceData );
+  ResourceTicketPtr AddNativeImage ( NativeImageInterface& resourceData );
 
   /**
    * Add a framebuffer resource to the resource manager.
@@ -207,7 +207,7 @@ public:
    * @param[in] nativeImage the NativeImage object
    * @return A ref-counted request object. Keep a copy until the resource is no longer required.
    */
-  ImageTicketPtr AddFrameBufferImage ( NativeImage& nativeImage );
+  ImageTicketPtr AddFrameBufferImage ( NativeImageInterface& nativeImage );
 
   /**
    * Request allocation of a texture.

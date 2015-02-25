@@ -309,7 +309,7 @@ void ResourceManager::HandleAddBitmapImageRequest( ResourceId id, BitmapPtr bitm
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForBitmap( id, bitmap.Get() );
 }
 
-void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImagePtr nativeImage)
+void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImageInterfacePtr nativeImage)
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddNativeImageRequest(id:%u)\n", id);
@@ -327,21 +327,21 @@ void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned 
 
   mImpl->oldCompleteRequests.insert(id);
 
-  BitmapMetadata bitmapMetadata = BitmapMetadata::New(width, height, pixelFormat);
+  BitmapMetadata bitmapMetadata = BitmapMetadata::New(width, height, Pixel::HasAlpha(pixelFormat));
   bitmapMetadata.SetIsFramebuffer(true);
   mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, bitmapMetadata));
 
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, width, height, pixelFormat );
 }
 
-void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, NativeImagePtr nativeImage )
+void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, NativeImageInterfacePtr nativeImage )
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddFrameBufferImageRequest(id:%u)\n", id);
 
   mImpl->oldCompleteRequests.insert(id);
 
-  BitmapMetadata bitmapMetadata = BitmapMetadata::New(nativeImage->GetWidth(), nativeImage->GetHeight(), nativeImage->GetPixelFormat());
+  BitmapMetadata bitmapMetadata = BitmapMetadata::New(nativeImage);
   bitmapMetadata.SetIsNativeImage(true);
   bitmapMetadata.SetIsFramebuffer(true);
   mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, bitmapMetadata));
@@ -750,9 +750,7 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
           bitmapWidth  = packedBitmap->GetBufferWidth();
           bitmapHeight = packedBitmap->GetBufferHeight();
         }
-        Pixel::Format pixelFormat = bitmap->GetPixelFormat();
-
-        ImageAttributes attrs = ImageAttributes::New( bitmapWidth, bitmapHeight, pixelFormat ); ///!< Issue #AHC01
+        ImageAttributes attrs = ImageAttributes::New( bitmapWidth, bitmapHeight ); ///!< Issue #AHC01
         UpdateImageTicket (id, attrs);
 
         // Check for reloaded bitmap
@@ -773,9 +771,9 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
 
       case ResourceNativeImage:
       {
-        NativeImagePtr nativeImg( static_cast<NativeImage*>(resource.Get()) );
+        NativeImageInterfacePtr nativeImg( static_cast<NativeImageInterface*>(resource.Get()) );
 
-        ImageAttributes attrs = ImageAttributes::New(nativeImg->GetWidth(), nativeImg->GetHeight(), nativeImg->GetPixelFormat());
+        ImageAttributes attrs = ImageAttributes::New(nativeImg->GetWidth(), nativeImg->GetHeight());
 
         mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, BitmapMetadata::New(nativeImg)));
         mImpl->mTextureCacheDispatcher.DispatchCreateTextureForNativeImage( id, nativeImg );

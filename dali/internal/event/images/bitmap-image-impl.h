@@ -23,6 +23,7 @@
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/bitmap-image.h>
+#include <dali/integration-api/bitmap.h> // For Integration::BitmapPtr
 
 namespace Dali
 {
@@ -53,14 +54,12 @@ public:
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
-   * @param [in] loadPol     controls time of loading a resource from the filesystem (default: load when Image is created).
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   static BitmapImagePtr New( unsigned int width,
                              unsigned int height,
                              Pixel::Format pixelformat,
-                             LoadPolicy loadPol=ImageLoadPolicyDefault,
-                             ReleasePolicy releasePol=ImageReleasePolicyDefault);
+                             ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
    * Create a new BitmapImage, which uses external data source.
@@ -81,7 +80,7 @@ public:
                              unsigned int height,
                              Pixel::Format pixelformat,
                              unsigned int stride,
-                             ReleasePolicy releasePol=ImageReleasePolicyDefault );
+                             ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
    * Create a new BitmapImage.
@@ -92,14 +91,12 @@ public:
    * @param [in] width image width in pixels
    * @param [in] height image height in pixels
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
-   * @param [in] loadPol optionally delay loading until it used (default: immediate loading)
    * @param [in] releasePol optionally release memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
   BitmapImage(unsigned int width,
               unsigned int height,
               Pixel::Format pixelformat,
-              LoadPolicy loadPol=ImageLoadPolicyDefault,
-              ReleasePolicy releasePol=ImageReleasePolicyDefault);
+              ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT);
 
   /**
    * Create a new BitmapImage, which uses external data source.
@@ -120,7 +117,7 @@ public:
               unsigned int height,
               Pixel::Format pixelformat,
               unsigned int stride,
-              ReleasePolicy releasePol=ImageReleasePolicyDefault);
+              ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT);
 
 protected:
   /**

@@ -70,9 +70,6 @@ int UtcDaliImageAttributesLessThan(void)
   imageAttributesHeight.SetSize(Size(1,2));
   DALI_TEST_CHECK(imageAttributes < imageAttributesHeight);
 
-  ImageAttributes imageAttributesFormat;
-  imageAttributesFormat.SetPixelFormat(Pixel::BGRA8888);
-  DALI_TEST_CHECK(imageAttributes < imageAttributesFormat);
 
   ImageAttributes imageAttributesScaling;
   imageAttributesScaling.SetScalingMode(ImageAttributes::FitHeight);

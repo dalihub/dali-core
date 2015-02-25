@@ -45,7 +45,7 @@ EncodedBufferImage EncodedBufferImage::New(const uint8_t * const encodedImage, c
 EncodedBufferImage EncodedBufferImage::New(const uint8_t * const encodedImage, const std::size_t encodedImageByteCount)
 {
   ImageAttributes attributes;
-  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New(encodedImage, encodedImageByteCount, attributes, Dali::Image::Never);
+  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New(encodedImage, encodedImageByteCount, attributes, Dali::Image::NEVER);
   EncodedBufferImage image( internal.Get() );
   return image;
 }

@@ -98,6 +98,7 @@ public:
 
   /**
    * @copydoc Dali::Stage::GetCurrent()
+   * @note this version is for internal usage so it does not assert
    */
   static StagePtr GetCurrent();
 
@@ -110,6 +111,16 @@ public:
    * @copydoc Dali::Stage::GetObjectRegistry()
    */
   ObjectRegistry& GetObjectRegistry();
+
+  /**
+   * @copydoc Dali::Internal::ObjectRegistry::RegisterObject
+   */
+  void RegisterObject( Dali::BaseObject* object );
+
+  /**
+   * @copydoc Dali::Internal::ObjectRegistry::UnregisterObject
+   */
+  void UnregisterObject( Dali::BaseObject* object );
 
   /**
    * Retrieve the root actor (not publically accessible).
@@ -332,7 +343,6 @@ public:
     return mNotificationManager;
   }
 
-
   /**
    * @copydoc Dali::Stage::KeepRendering()
    */
@@ -391,6 +401,17 @@ public:
    * @copydoc Dali::Stage::SceneCreatedSignal()
    */
   Dali::Stage::SceneCreatedSignalType& SceneCreatedSignal();
+
+  /**
+   * Connects a callback function with the object's signals.
+   * @param[in] object The object providing the signal.
+   * @param[in] tracker Used to disconnect the signal.
+   * @param[in] signalName The signal to connect to.
+   * @param[in] functor A newly allocated FunctorDelegate.
+   * @return True if the signal was connected.
+   * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
+   */
+  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
 
 private: // Implementation of ContextNotificationInterface:
 

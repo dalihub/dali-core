@@ -38,18 +38,20 @@ BaseObject::~BaseObject()
 
 void BaseObject::RegisterObject()
 {
-  if( Internal::Stage::IsInstalled() )
+  Internal::Stage* stage = Internal::Stage::GetCurrent();
+  if( stage )
   {
-    Internal::Stage::GetCurrent()->GetObjectRegistry().RegisterObject( this );
+    stage->RegisterObject( this );
   }
 }
 
 void BaseObject::UnregisterObject()
 {
   // Guard to allow handle destruction after Core has been destroyed
-  if( Internal::Stage::IsInstalled() )
+  Internal::Stage* stage = Internal::Stage::GetCurrent();
+  if( stage )
   {
-    Internal::Stage::GetCurrent()->GetObjectRegistry().UnregisterObject( this );
+    stage->UnregisterObject( this );
   }
 }
 

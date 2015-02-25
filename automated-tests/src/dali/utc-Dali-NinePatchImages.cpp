@@ -151,7 +151,7 @@ int UtcDaliNinePatch01(void)
   Integration::ResourcePointer resourcePtr(bitmap);
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
 
-  Image image = Image::New( "blah.#.png" );
+  Image image = ResourceImage::New( "blah.#.png" );
   DALI_TEST_CHECK( image );
 
   tet_infoline("Assign image to ImageActor");
@@ -220,7 +220,7 @@ int UtcDaliNinePatch02(void)
   tet_infoline("Getting resource");
   Integration::ResourcePointer resourcePtr(bitmap);
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
-  Image image = Image::New( "blah.#.png" );
+  Image image = ResourceImage::New( "blah.#.png" );
   DALI_TEST_CHECK( image );
 
   tet_infoline("Assign image to ImageActor");

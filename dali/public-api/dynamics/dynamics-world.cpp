@@ -35,8 +35,6 @@ namespace Dali
 DynamicsWorld::CollisionSignalType STUB_COLLISION_SIGNAL;
 #endif
 
-const char* const DynamicsWorld::SIGNAL_COLLISION = "collision";
-
 DynamicsWorld::DynamicsWorld()
 {
 }

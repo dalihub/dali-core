@@ -26,6 +26,9 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/internal/render/common/performance-monitor.h>
 
+// EXTERNAL INCLUDES
+#include <iostream>
+
 namespace Dali
 {
 using Internal::PerformanceMonitor;
@@ -133,6 +136,16 @@ Quaternion Quaternion::FromAxisAngle(const Vector4 &axis, float angle)
 
 Quaternion::~Quaternion()
 {
+}
+
+bool Quaternion::IsIdentity() const
+{
+  // start from w as its unlikely that any real rotation has w == 1
+  // Uses a relaxed epsilon, as composition of rotation introduces error
+  return ( ( fabsf( mVector.w - 1.0f ) < Math::MACHINE_EPSILON_10 )&&
+           ( fabsf( mVector.x ) < Math::MACHINE_EPSILON_10 )&&
+           ( fabsf( mVector.y ) < Math::MACHINE_EPSILON_10 )&&
+           ( fabsf( mVector.z ) < Math::MACHINE_EPSILON_10 ) );
 }
 
 bool Quaternion::ToAxisAngle(Vector3 &axis, float &angle) const

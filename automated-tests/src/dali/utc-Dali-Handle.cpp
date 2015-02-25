@@ -36,6 +36,15 @@ void handle_test_cleanup(void)
 namespace
 {
 
+/// Allows the creation of a BaseObject
+class BaseObjectType : public BaseObject
+{
+public:
+  BaseObjectType()
+  {
+  }
+};
+
 Handle ImplicitCopyConstructor(Handle passedByValue)
 {
   // object + copy + passedByValue, ref count == 3
@@ -772,6 +781,22 @@ int UtcDaliHandleDownCast(void)
   END_TEST;
 }
 
+int UtcDaliHandleDownCastNegative(void)
+{
+  TestApplication application;
+
+  // BaseObject is NOT an Object, so this DownCast should fail
+  BaseHandle handle( new BaseObjectType );
+  Handle customHandle1 = Handle::DownCast( handle );
+  DALI_TEST_CHECK( ! customHandle1 );
+
+  // A DownCast on an empty handle will also fail
+  Handle empty;
+  Handle customHandle2 = Handle::DownCast( empty );
+  DALI_TEST_CHECK( ! customHandle2 );
+  END_TEST;
+}
+
 int UtcDaliHandleCreateProperty(void)
 {
   TestApplication application;
@@ -1016,5 +1041,31 @@ int UtcDaliHandleRegisterPropertyTypes(void)
 
     DALI_TEST_CHECK( properties[i].animatable != exception );
   }
+  END_TEST;
+}
+
+int UtcDaliHandleCustomProperty(void)
+{
+  TestApplication application;
+
+  Handle handle = Handle::New();
+
+  float startValue(1.0f);
+  Property::Index index = handle.RegisterProperty( "test-property", startValue );
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == startValue );
+
+  handle.SetProperty( index, 5.0f );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == 5.0f );
+  application.Render(0);
+  DALI_TEST_CHECK( handle.GetProperty<float>(index) == 5.0f );
   END_TEST;
 }

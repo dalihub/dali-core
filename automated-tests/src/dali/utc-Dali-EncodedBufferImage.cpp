@@ -775,7 +775,7 @@ int UtcDaliEncodedBufferImageNew01(void)
   Dali::ImageAttributes imageAttributes;
   imageAttributes.SetSize( 720, 1280 );
   imageAttributes.SetScalingMode( Dali::ImageAttributes::FitHeight );
-  image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, imageAttributes, Image::Never );
+  image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, imageAttributes, Image::NEVER );
 
   DALI_TEST_CHECK( image );
 
@@ -785,7 +785,7 @@ int UtcDaliEncodedBufferImageNew01(void)
   DALI_TEST_CHECK( !image2 );
 
   // Trigger image decode to initialise the handle
-  image2 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, imageAttributes, Image::Unused );
+  image2 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, imageAttributes, Image::UNUSED );
 
   DALI_TEST_CHECK( image2 );
   END_TEST;
@@ -810,7 +810,7 @@ int UtcDaliEncodedBufferImageNew02(void)
   try
   {
     // This should throw on the null pointer:
-    image = EncodedBufferImage::New( 0, sEncodedBufferImageDataPNGLength, imageAttributes, Image::Never );
+    image = EncodedBufferImage::New( 0, sEncodedBufferImageDataPNGLength, imageAttributes, Image::NEVER );
     tet_result( TET_FAIL );
   }
   catch (Dali::DaliException& e)
@@ -839,7 +839,7 @@ int UtcDaliEncodedBufferImageNew03(void)
   try
   {
     // This should throw on the zero size:
-    image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, /** Trigger the assertion.*/ 0, imageAttributes, Image::Never );
+    image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, /** Trigger the assertion.*/ 0, imageAttributes, Image::NEVER );
     tet_result( TET_FAIL );
   }
   catch (Dali::DaliException& e)

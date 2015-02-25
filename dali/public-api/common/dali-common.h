@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <cstdio>
 
 #ifdef EMSCRIPTEN
 #include <emscripten/emscripten.h>

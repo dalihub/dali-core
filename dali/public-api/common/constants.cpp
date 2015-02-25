@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/common/constants.h>
 
+// EXTERNAL INCLUDES
+#include <string>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/math/compile-time-math.h>
 #include <dali/public-api/math/degree.h>

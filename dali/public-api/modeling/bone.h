@@ -18,6 +18,8 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>

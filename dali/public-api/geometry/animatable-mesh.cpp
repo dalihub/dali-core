@@ -55,7 +55,7 @@ AnimatableMesh::~AnimatableMesh()
 }
 
 AnimatableMesh::AnimatableMesh(const AnimatableMesh& handle)
-: Constrainable(handle)
+: Handle(handle)
 {
 }
 
@@ -93,7 +93,7 @@ Property AnimatableMesh::GetVertexProperty( unsigned int vertex, Property::Index
 
 
 AnimatableMesh::AnimatableMesh( Internal::AnimatableMesh* internal )
-: Constrainable(internal)
+: Handle(internal)
 {
 }
 

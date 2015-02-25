@@ -57,7 +57,7 @@ BitmapImage& BitmapImage::operator=(const BitmapImage& rhs)
 
 const BitmapImage BitmapImage::WHITE()
 {
-  Internal::BitmapImage* internal = new Internal::BitmapImage(1,1,Pixel::RGBA8888, Immediate, Never);
+  Internal::BitmapImage* internal = new Internal::BitmapImage(1,1,Pixel::RGBA8888, Dali::Image::NEVER);
   PixelBuffer* pBuf = internal->GetBuffer();
   pBuf[0] = pBuf[1] = pBuf[2] = pBuf[3] = 0xFF;
   return BitmapImage(internal);
@@ -72,12 +72,12 @@ BitmapImage BitmapImage::New(unsigned int width, unsigned int height, Pixel::For
   return BitmapImage(internal.Get());
 }
 
-BitmapImage BitmapImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol)
+BitmapImage BitmapImage::New(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol)
 {
   DALI_ASSERT_ALWAYS( 0u != width  && "Invalid BitmapImage width requested" );
   DALI_ASSERT_ALWAYS( 0u != height && "Invalid BitmapImage height requested" );
 
-  Internal::BitmapImagePtr internal = Internal::BitmapImage::New(width, height, pixelformat, loadPol, releasePol);
+  Internal::BitmapImagePtr internal = Internal::BitmapImage::New(width, height, pixelformat, releasePol);
   return BitmapImage(internal.Get());
 }
 

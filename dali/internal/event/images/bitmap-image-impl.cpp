@@ -37,9 +37,9 @@ namespace
 TypeRegistration mType( typeid( Dali::BitmapImage ), typeid( Dali::Image ), NULL );
 } // unnamed namespace
 
-BitmapImagePtr BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol )
+BitmapImagePtr BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol )
 {
-  BitmapImagePtr internal = new BitmapImage( width, height, pixelformat, loadPol, releasePol );
+  BitmapImagePtr internal = new BitmapImage( width, height, pixelformat, releasePol );
   internal->Initialize();
   return internal;
 }
@@ -51,8 +51,8 @@ BitmapImagePtr BitmapImage::New( PixelBuffer* pixBuf, unsigned int width, unsign
   return internal;
 }
 
-BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format pixelformat, LoadPolicy loadPol, ReleasePolicy releasePol)
-: Image(loadPol, releasePol),
+BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol)
+: Image(releasePol),
   mIsDataExternal(false)
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
@@ -67,7 +67,7 @@ BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format 
 }
 
 BitmapImage::BitmapImage(PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol)
-: Image(ImageLoadPolicyDefault, releasePol),
+: Image(releasePol),
   mIsDataExternal(true)
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
@@ -198,7 +198,7 @@ void BitmapImage::Disconnect()
 
   --mConnectionCount;
 
-  if (mConnectionCount == 0 && mReleasePolicy == Dali::Image::Unused)
+  if (mConnectionCount == 0 && mReleasePolicy == Dali::Image::UNUSED)
   {
     mBitmapCached = mResourceClient->GetBitmap(mTicket);
     // release image memory when it's not visible anymore (decrease ref. count of texture)

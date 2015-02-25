@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/event/common/proxy-object.h>
+#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/animation/active-constraint-base.h>
@@ -149,15 +149,15 @@ private:
    */
   void ConnectConstraint()
   {
-    // Should not come here any proxies have been destroyed
-    DALI_ASSERT_DEBUG( NULL != mTargetProxy );
+    // Should not come here any objects have been destroyed
+    DALI_ASSERT_DEBUG( NULL != mTargetObject );
     DALI_ASSERT_DEBUG( mSources.size() == mSourceCount );
 
     // Guard against double connections
     DALI_ASSERT_DEBUG( NULL == mSceneGraphConstraint );
 
     // Short-circuit until the target scene-object exists
-    SceneGraph::PropertyOwner* targetObject = const_cast< SceneGraph::PropertyOwner* >( mTargetProxy->GetSceneObject() );
+    SceneGraph::PropertyOwner* targetObject = const_cast< SceneGraph::PropertyOwner* >( mTargetObject->GetSceneObject() );
     if ( NULL == targetObject )
     {
       return;
@@ -174,7 +174,7 @@ private:
     {
       // Create the SceneGraphConstraint, and connect to the scene-graph
 
-      const SceneGraph::PropertyBase* targetProperty = mTargetProxy->GetSceneObjectAnimatableProperty( mTargetIndex );
+      const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty( mTargetIndex );
 
       // The targetProperty should exist, when targetObject exists
       DALI_ASSERT_ALWAYS( NULL != targetProperty && "Constraint target property does not exist" );
@@ -195,7 +195,7 @@ private:
       // Keep a raw-pointer to the scene-graph constraint
       mSceneGraphConstraint = sceneGraphConstraint;
 
-      // Notify ProxyObject base-class that the scene-graph constraint has been added
+      // Notify Object base-class that the scene-graph constraint has been added
       OnSceneObjectAdd();
     }
   }
@@ -224,7 +224,7 @@ private:
 
         SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( source.object->GetSceneObject() );
 
-        // The property owner will not exist, if the target proxy-object is off-stage
+        // The property owner will not exist, if the target object is off-stage
         if( NULL != owner )
         {
           AddUnique( propertyOwners, owner );
@@ -237,10 +237,10 @@ private:
       }
       else if ( LOCAL_PROPERTY == source.sourceType )
       {
-        DALI_ASSERT_ALWAYS( mTargetProxy->IsPropertyAConstraintInput( source.propertyIndex ) );
+        DALI_ASSERT_ALWAYS( mTargetObject->IsPropertyAConstraintInput( source.propertyIndex ) );
 
-        inputProperty = const_cast< PropertyInputImpl* >( mTargetProxy->GetSceneObjectInputProperty( source.propertyIndex ) );
-        componentIndex = mTargetProxy->GetPropertyComponentIndex( source.propertyIndex );
+        inputProperty = const_cast< PropertyInputImpl* >( mTargetObject->GetSceneObjectInputProperty( source.propertyIndex ) );
+        componentIndex = mTargetObject->GetPropertyComponentIndex( source.propertyIndex );
 
         // The target scene-object should provide this property
         DALI_ASSERT_ALWAYS( NULL != inputProperty && "Constraint source property does not exist" );
@@ -249,21 +249,21 @@ private:
       {
         DALI_ASSERT_ALWAYS( PARENT_PROPERTY == source.sourceType && "Constraint source property type is invalid" );
 
-        ProxyObject* proxyParent = dynamic_cast< Actor& >( *mTargetProxy ).GetParent();
+        Object* objectParent = dynamic_cast< Actor& >( *mTargetObject ).GetParent();
 
-        // This will not exist, if the target proxy-object is off-stage
-        if ( NULL != proxyParent )
+        // This will not exist, if the target object is off-stage
+        if ( NULL != objectParent )
         {
-          DALI_ASSERT_ALWAYS( proxyParent->IsPropertyAConstraintInput( source.propertyIndex ) );
+          DALI_ASSERT_ALWAYS( objectParent->IsPropertyAConstraintInput( source.propertyIndex ) );
 
-          SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( proxyParent->GetSceneObject() );
+          SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( objectParent->GetSceneObject() );
 
-          // The property owner will not exist, if the parent proxy-object is off-stage
+          // The property owner will not exist, if the parent object is off-stage
           if ( NULL != owner )
           {
             AddUnique( propertyOwners, owner );
-            inputProperty = const_cast< PropertyInputImpl* >( proxyParent->GetSceneObjectInputProperty( source.propertyIndex ) );
-            componentIndex = proxyParent->GetPropertyComponentIndex( source.propertyIndex );
+            inputProperty = const_cast< PropertyInputImpl* >( objectParent->GetSceneObjectInputProperty( source.propertyIndex ) );
+            componentIndex = objectParent->GetPropertyComponentIndex( source.propertyIndex );
 
             // The scene-object property should exist, when the property owner exists
             DALI_ASSERT_ALWAYS( NULL != inputProperty && "Constraint source property does not exist" );
@@ -396,15 +396,15 @@ private:
    */
   void ConnectConstraint()
   {
-    // Should not come here any proxies have been destroyed
-    DALI_ASSERT_DEBUG( NULL != mTargetProxy );
+    // Should not come here any objects have been destroyed
+    DALI_ASSERT_DEBUG( NULL != mTargetObject );
     DALI_ASSERT_DEBUG( mSources.size() == mSourceCount );
 
     // Guard against double connections
     DALI_ASSERT_DEBUG( NULL == mSceneGraphConstraint );
 
     // Short-circuit until the target scene-object exists
-    SceneGraph::PropertyOwner* targetObject = const_cast< SceneGraph::PropertyOwner* >( mTargetProxy->GetSceneObject() );
+    SceneGraph::PropertyOwner* targetObject = const_cast< SceneGraph::PropertyOwner* >( mTargetObject->GetSceneObject() );
     if ( NULL == targetObject )
     {
       return;
@@ -421,12 +421,12 @@ private:
     {
       // Create the SceneGraphConstraint, and connect to the scene-graph
 
-      const SceneGraph::PropertyBase* targetProperty = mTargetProxy->GetSceneObjectAnimatableProperty( mTargetIndex );
+      const SceneGraph::PropertyBase* targetProperty = mTargetObject->GetSceneObjectAnimatableProperty( mTargetIndex );
 
       // The targetProperty should exist, when targetObject exists
       DALI_ASSERT_ALWAYS( NULL != targetProperty && "Constraint target property does not exist" );
 
-      const int componentIndex = mTargetProxy->GetPropertyComponentIndex( mTargetIndex );
+      const int componentIndex = mTargetObject->GetPropertyComponentIndex( mTargetIndex );
 
       SceneGraph::ConstraintBase* sceneGraphConstraint( NULL );
 
@@ -504,7 +504,7 @@ private:
       // Keep a raw-pointer to the scene-graph constraint
       mSceneGraphConstraint = sceneGraphConstraint;
 
-      // Notify ProxyObject base-class that the scene-graph constraint has been added
+      // Notify Object base-class that the scene-graph constraint has been added
       OnSceneObjectAdd();
     }
   }
@@ -533,7 +533,7 @@ private:
 
         SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( source.object->GetSceneObject() );
 
-        // The property owner will not exist, if the target proxy-object is off-stage
+        // The property owner will not exist, if the target object is off-stage
         if( NULL != owner )
         {
           AddUnique( propertyOwners, owner );
@@ -546,10 +546,10 @@ private:
       }
       else if ( LOCAL_PROPERTY == source.sourceType )
       {
-        DALI_ASSERT_ALWAYS( mTargetProxy->IsPropertyAConstraintInput( source.propertyIndex ) );
+        DALI_ASSERT_ALWAYS( mTargetObject->IsPropertyAConstraintInput( source.propertyIndex ) );
 
-        inputProperty = const_cast< PropertyInputImpl* >( mTargetProxy->GetSceneObjectInputProperty( source.propertyIndex ) );
-        componentIndex = mTargetProxy->GetPropertyComponentIndex( source.propertyIndex );
+        inputProperty = const_cast< PropertyInputImpl* >( mTargetObject->GetSceneObjectInputProperty( source.propertyIndex ) );
+        componentIndex = mTargetObject->GetPropertyComponentIndex( source.propertyIndex );
 
         // The target scene-object should provide this property
         DALI_ASSERT_ALWAYS( NULL != inputProperty && "Constraint source property does not exist" );
@@ -558,21 +558,21 @@ private:
       {
         DALI_ASSERT_ALWAYS( PARENT_PROPERTY == source.sourceType && "Constraint source property type is invalid" );
 
-        ProxyObject* proxyParent = dynamic_cast< Actor& >( *mTargetProxy ).GetParent();
+        Object* objectParent = dynamic_cast< Actor& >( *mTargetObject ).GetParent();
 
-        // This will not exist, if the target proxy-object is off-stage
-        if ( NULL != proxyParent )
+        // This will not exist, if the target object is off-stage
+        if ( NULL != objectParent )
         {
-          DALI_ASSERT_ALWAYS( proxyParent->IsPropertyAConstraintInput( source.propertyIndex ) );
+          DALI_ASSERT_ALWAYS( objectParent->IsPropertyAConstraintInput( source.propertyIndex ) );
 
-          SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( proxyParent->GetSceneObject() );
+          SceneGraph::PropertyOwner* owner = const_cast< SceneGraph::PropertyOwner* >( objectParent->GetSceneObject() );
 
-          // The property owner will not exist, if the parent proxy-object is off-stage
+          // The property owner will not exist, if the parent object is off-stage
           if ( NULL != owner )
           {
             AddUnique( propertyOwners, owner );
-            inputProperty = const_cast< PropertyInputImpl* >( proxyParent->GetSceneObjectInputProperty( source.propertyIndex ) );
-            componentIndex = proxyParent->GetPropertyComponentIndex( source.propertyIndex );
+            inputProperty = const_cast< PropertyInputImpl* >( objectParent->GetSceneObjectInputProperty( source.propertyIndex ) );
+            componentIndex = objectParent->GetPropertyComponentIndex( source.propertyIndex );
 
             // The scene-object property should exist, when the property owner exists
             DALI_ASSERT_ALWAYS( NULL != inputProperty && "Constraint source property does not exist" );
