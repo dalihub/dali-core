@@ -51,22 +51,6 @@ void tet_printf(const char *format, ...)
   va_end(arg);
 }
 
-/**
- * DALI_TEST_CHECK is a wrapper for tet_result.
- * If the condition evaluates to false, then the function & line number is printed.
- * @param[in] The boolean expression to check
- */
-#define DALI_TEST_CHECK(condition)                                                        \
-if ( (condition) )                                                                        \
-{                                                                                         \
-  tet_result(TET_PASS);                                                                   \
-}                                                                                         \
-else                                                                                      \
-{                                                                                         \
-  fprintf(stderr, "%s Failed in %s at line %d\n", __PRETTY_FUNCTION__, __FILE__, __LINE__);    \
-  tet_result(TET_FAIL);                                                                   \
-}
-
 bool operator==(TimePeriod a, TimePeriod b)
 {
   return Equals(a.durationSeconds, b.durationSeconds) && Equals(a.delaySeconds, b.delaySeconds) ;

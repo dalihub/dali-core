@@ -240,6 +240,10 @@ unsigned int RenderTask::GetRefreshRate() const
 
 bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
 {
+  // If the source node of the render task is invisible we should still render
+  // We want the render task to complete and possible clear colors to happen
+
+  // Check source node
   if ( NULL == mSourceNode ||
        ( !mSourceNode->IsRoot() && NULL == mSourceNode->GetParent() ) )
   {
@@ -249,13 +253,7 @@ bool RenderTask::ReadyToRender( BufferIndex updateBufferIndex )
     return false;
   }
 
-  // Check if the source node (root actor) and all its ancestors are visible.
-  if( !mSourceNode->IsFullyVisible( updateBufferIndex ) )
-  {
-    TASK_LOG_FMT(Debug::General, " =F  No visible source  FC:%d\n", mFrameCounter );
-    return false;
-  }
-
+  // Check camera node
   if ( NULL == mCameraNode ||
        NULL == mCameraNode->GetParent() ||
        !mCameraNode->HasAttachment() )

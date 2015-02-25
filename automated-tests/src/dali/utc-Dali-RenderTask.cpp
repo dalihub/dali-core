@@ -1398,7 +1398,6 @@ int UtcDaliRenderTaskOnce01(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
 
   Stage::GetCurrent().Add(secondRootActor);
-  secondRootActor.SetVisible(false);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true);
   bool finished = false;
@@ -1910,7 +1909,6 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
 
   Stage::GetCurrent().Add(secondRootActor);
-  secondRootActor.SetVisible(false);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
   bool finished = false;
@@ -1919,12 +1917,6 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
-
-  // MAKE SOURCE VISIBLE
-  secondRootActor.SetVisible(true);
-  application.SendNotification();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
@@ -2454,3 +2446,89 @@ int UtcDaliRenderTaskSetScreenToFrameBufferMappingActor(void)
   DALI_TEST_EQUALS( expectedCoordinates , results.actorCoordinates, 0.1f, TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SignalFinished()");
+
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  BitmapImage image = BitmapImage::New( 10, 10 );
+  ImageActor rootActor = ImageActor::New( image );
+  rootActor.SetSize( 10, 10 );
+  rootActor.SetVisible(false);
+  Stage::GetCurrent().Add( rootActor );
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
+  FrameBufferImage frameBufferImage = FrameBufferImage::New( *testNativeImagePtr.Get() );
+
+  // Flush all outstanding messages
+  application.SendNotification();
+  application.Render();
+
+  RenderTask newTask = taskList.CreateTask();
+  newTask.SetCameraActor( offscreenCameraActor );
+  newTask.SetSourceActor( rootActor );
+  newTask.SetInputEnabled( false );
+  newTask.SetClearColor( Vector4( 0.f, 0.f, 0.f, 0.f ) );
+  newTask.SetClearEnabled( true );
+  newTask.SetExclusive( true );
+  newTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
+  newTask.SetTargetFrameBuffer( frameBufferImage );
+
+  // Framebuffer doesn't actually get created until Connected, i.e. by previous line
+
+  bool finished = false;
+  RenderTaskFinished renderTaskFinished( finished );
+  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
+
+  // Flush the queue and render.
+  application.SendNotification();
+
+  // 1 render to process render task, then wait for sync before finished msg is sent
+  // from update to the event thread.
+
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK( !finished );
+
+  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK( lastSyncObj != NULL );
+
+  application.Render();
+  DALI_TEST_EQUALS( (application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
+  application.SendNotification();
+  DALI_TEST_CHECK( !finished );
+
+  application.Render();
+  DALI_TEST_EQUALS( (application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
+  application.SendNotification();
+  DALI_TEST_CHECK( ! finished );
+
+  sync.SetObjectSynced( lastSyncObj, true );
+
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK( !finished );
+
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK( finished );
+  finished = false;
+
+  application.Render(); // Double check no more finished signal
+  application.SendNotification();
+  DALI_TEST_CHECK( ! finished );
+
+  END_TEST;
+}
+
+
