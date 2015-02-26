@@ -2460,7 +2460,7 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
 
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  BitmapImage image = BitmapImage::New( 10, 10 );
+  BufferImage image = BufferImage::New( 10, 10 );
   ImageActor rootActor = ImageActor::New( image );
   rootActor.SetSize( 10, 10 );
   rootActor.SetVisible(false);
