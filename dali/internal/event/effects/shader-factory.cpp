@@ -22,15 +22,22 @@
 #include <sstream>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/dali-hash.h>
+#include <dali/public-api/dali-core-version.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/debug.h>
+#include <dali/internal/common/dali-hash.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 
-// the generated shader strings
+// compile time generated shader strings
 #include "dali-shaders.h"
+
+namespace
+{
+const char* VERSION_SEPARATOR = "-";
+const char* SHADER_SUFFIX = ".dali-bin";
+}
 
 // Use pre-compiler constants in order to utilize string concatenation
 #define SHADER_DEF_USE_BONES    "#define USE_BONES\n"
@@ -60,10 +67,11 @@ ResourceTicketPtr ShaderFactory::Load(const std::string& vertexSource, const std
 
   shaderHash = CalculateHash(vertexSource, fragmentSource);
   std::stringstream stringHash;
+  stringHash << CORE_MAJOR_VERSION << VERSION_SEPARATOR << CORE_MINOR_VERSION << VERSION_SEPARATOR << CORE_MICRO_VERSION << VERSION_SEPARATOR;
   stringHash << shaderHash;
-  std::string filename = DALI_SHADERBIN_DIR;
-  filename += stringHash.str();
-  filename += ".dali-bin";
+  std::string filename;
+  filename.append( stringHash.str() );
+  filename.append( SHADER_SUFFIX );
 
   ShaderResourceType resourceType(shaderHash, vertexSource, fragmentSource);
   ResourceTypePath typePath(resourceType, filename);
