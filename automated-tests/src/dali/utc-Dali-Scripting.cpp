@@ -224,6 +224,15 @@ int UtcDaliScriptingGetAnchorConstant(void)
 {
   TestApplication application;
 
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_TOP_LEFT, GetAnchorConstant( "BACK_TOP_LEFT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_TOP_CENTER, GetAnchorConstant( "BACK_TOP_CENTER" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_TOP_RIGHT, GetAnchorConstant( "BACK_TOP_RIGHT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_CENTER_LEFT, GetAnchorConstant( "BACK_CENTER_LEFT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_CENTER, GetAnchorConstant( "BACK_CENTER" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_CENTER_RIGHT, GetAnchorConstant( "BACK_CENTER_RIGHT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_BOTTOM_LEFT, GetAnchorConstant( "BACK_BOTTOM_LEFT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_BOTTOM_CENTER, GetAnchorConstant( "BACK_BOTTOM_CENTER" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::BACK_BOTTOM_RIGHT, GetAnchorConstant( "BACK_BOTTOM_RIGHT" ), TEST_LOCATION );
   DALI_TEST_EQUALS( Dali::ParentOrigin::TOP_LEFT, GetAnchorConstant( "TOP_LEFT" ), TEST_LOCATION );
   DALI_TEST_EQUALS( Dali::ParentOrigin::TOP_CENTER, GetAnchorConstant( "TOP_CENTER" ), TEST_LOCATION );
   DALI_TEST_EQUALS( Dali::ParentOrigin::TOP_RIGHT, GetAnchorConstant( "TOP_RIGHT" ), TEST_LOCATION );
@@ -233,6 +242,15 @@ int UtcDaliScriptingGetAnchorConstant(void)
   DALI_TEST_EQUALS( Dali::ParentOrigin::BOTTOM_LEFT, GetAnchorConstant( "BOTTOM_LEFT" ), TEST_LOCATION );
   DALI_TEST_EQUALS( Dali::ParentOrigin::BOTTOM_CENTER, GetAnchorConstant( "BOTTOM_CENTER" ), TEST_LOCATION );
   DALI_TEST_EQUALS( Dali::ParentOrigin::BOTTOM_RIGHT, GetAnchorConstant( "BOTTOM_RIGHT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_TOP_LEFT, GetAnchorConstant( "FRONT_TOP_LEFT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_TOP_CENTER, GetAnchorConstant( "FRONT_TOP_CENTER" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_TOP_RIGHT, GetAnchorConstant( "FRONT_TOP_RIGHT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_CENTER_LEFT, GetAnchorConstant( "FRONT_CENTER_LEFT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_CENTER, GetAnchorConstant( "FRONT_CENTER" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_CENTER_RIGHT, GetAnchorConstant( "FRONT_CENTER_RIGHT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_BOTTOM_LEFT, GetAnchorConstant( "FRONT_BOTTOM_LEFT" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_BOTTOM_CENTER, GetAnchorConstant( "FRONT_BOTTOM_CENTER" ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Dali::ParentOrigin::FRONT_BOTTOM_RIGHT, GetAnchorConstant( "FRONT_BOTTOM_RIGHT" ), TEST_LOCATION );
 
   try
   {
@@ -676,8 +694,8 @@ int UtcDaliScriptingNewActorProperties(void)
   }
 
   // Check Anchor point and parent origin STRINGS
-  map[ "parent-origin" ] = "TOP_LEFT";
-  map[ "anchor-point" ] = "CENTER_LEFT";
+  map[ "parent-origin" ] = "BACK_TOP_LEFT";
+  map[ "anchor-point" ] = "FRONT_CENTER_LEFT";
   {
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( handle );
@@ -686,8 +704,8 @@ int UtcDaliScriptingNewActorProperties(void)
     application.SendNotification();
     application.Render();
 
-    DALI_TEST_EQUALS( handle.GetCurrentParentOrigin(), ParentOrigin::TOP_LEFT, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.GetCurrentAnchorPoint(), AnchorPoint::CENTER_LEFT, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentParentOrigin(), ParentOrigin::BACK_TOP_LEFT, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.GetCurrentAnchorPoint(), AnchorPoint::FRONT_CENTER_LEFT, TEST_LOCATION );
 
     Stage::GetCurrent().Remove( handle );
   }
