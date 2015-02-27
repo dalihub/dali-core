@@ -28,22 +28,6 @@
 namespace Dali
 {
 
-const float ParentOrigin::TOP     = 0.0f;
-const float ParentOrigin::BOTTOM  = 1.0f;
-const float ParentOrigin::LEFT    = 0.0f;
-const float ParentOrigin::RIGHT   = 1.0f;
-const float ParentOrigin::MIDDLE  = 0.5f;
-
-const Vector3 ParentOrigin::BACK_TOP_LEFT     (0.0f, 0.0f, 0.0f);
-const Vector3 ParentOrigin::BACK_TOP_CENTER   (0.5f, 0.0f, 0.0f);
-const Vector3 ParentOrigin::BACK_TOP_RIGHT    (1.0f, 0.0f, 0.0f);
-const Vector3 ParentOrigin::BACK_CENTER_LEFT  (0.0f, 0.5f, 0.0f);
-const Vector3 ParentOrigin::BACK_CENTER       (0.5f, 0.5f, 0.0f);
-const Vector3 ParentOrigin::BACK_CENTER_RIGHT (1.0f, 0.5f, 0.0f);
-const Vector3 ParentOrigin::BACK_BOTTOM_LEFT  (0.0f, 1.0f, 0.0f);
-const Vector3 ParentOrigin::BACK_BOTTOM_CENTER(0.5f, 1.0f, 0.0f);
-const Vector3 ParentOrigin::BACK_BOTTOM_RIGHT (1.0f, 1.0f, 0.0f);
-
 const Vector3 ParentOrigin::TOP_LEFT     (0.0f, 0.0f, 0.5f);
 const Vector3 ParentOrigin::TOP_CENTER   (0.5f, 0.0f, 0.5f);
 const Vector3 ParentOrigin::TOP_RIGHT    (1.0f, 0.0f, 0.5f);
@@ -54,33 +38,7 @@ const Vector3 ParentOrigin::BOTTOM_LEFT  (0.0f, 1.0f, 0.5f);
 const Vector3 ParentOrigin::BOTTOM_CENTER(0.5f, 1.0f, 0.5f);
 const Vector3 ParentOrigin::BOTTOM_RIGHT (1.0f, 1.0f, 0.5f);
 
-const Vector3 ParentOrigin::FRONT_TOP_LEFT     (0.0f, 0.0f, 1.0f);
-const Vector3 ParentOrigin::FRONT_TOP_CENTER   (0.5f, 0.0f, 1.0f);
-const Vector3 ParentOrigin::FRONT_TOP_RIGHT    (1.0f, 0.0f, 1.0f);
-const Vector3 ParentOrigin::FRONT_CENTER_LEFT  (0.0f, 0.5f, 1.0f);
-const Vector3 ParentOrigin::FRONT_CENTER       (0.5f, 0.5f, 1.0f);
-const Vector3 ParentOrigin::FRONT_CENTER_RIGHT (1.0f, 0.5f, 1.0f);
-const Vector3 ParentOrigin::FRONT_BOTTOM_LEFT  (0.0f, 1.0f, 1.0f);
-const Vector3 ParentOrigin::FRONT_BOTTOM_CENTER(0.5f, 1.0f, 1.0f);
-const Vector3 ParentOrigin::FRONT_BOTTOM_RIGHT (1.0f, 1.0f, 1.0f);
-
 const Vector3 ParentOrigin::DEFAULT( ParentOrigin::TOP_LEFT );
-
-const float AnchorPoint::TOP     = 0.0f;
-const float AnchorPoint::BOTTOM  = 1.0f;
-const float AnchorPoint::LEFT    = 0.0f;
-const float AnchorPoint::RIGHT   = 1.0f;
-const float AnchorPoint::MIDDLE  = 0.5f;
-
-const Vector3 AnchorPoint::BACK_TOP_LEFT     (0.0f, 0.0f, 0.0f);
-const Vector3 AnchorPoint::BACK_TOP_CENTER   (0.5f, 0.0f, 0.0f);
-const Vector3 AnchorPoint::BACK_TOP_RIGHT    (1.0f, 0.0f, 0.0f);
-const Vector3 AnchorPoint::BACK_CENTER_LEFT  (0.0f, 0.5f, 0.0f);
-const Vector3 AnchorPoint::BACK_CENTER       (0.5f, 0.5f, 0.0f);
-const Vector3 AnchorPoint::BACK_CENTER_RIGHT (1.0f, 0.5f, 0.0f);
-const Vector3 AnchorPoint::BACK_BOTTOM_LEFT  (0.0f, 1.0f, 0.0f);
-const Vector3 AnchorPoint::BACK_BOTTOM_CENTER(0.5f, 1.0f, 0.0f);
-const Vector3 AnchorPoint::BACK_BOTTOM_RIGHT (1.0f, 1.0f, 0.0f);
 
 const Vector3 AnchorPoint::TOP_LEFT     (0.0f, 0.0f, 0.5f);
 const Vector3 AnchorPoint::TOP_CENTER   (0.5f, 0.0f, 0.5f);
@@ -91,16 +49,6 @@ const Vector3 AnchorPoint::CENTER_RIGHT (1.0f, 0.5f, 0.5f);
 const Vector3 AnchorPoint::BOTTOM_LEFT  (0.0f, 1.0f, 0.5f);
 const Vector3 AnchorPoint::BOTTOM_CENTER(0.5f, 1.0f, 0.5f);
 const Vector3 AnchorPoint::BOTTOM_RIGHT (1.0f, 1.0f, 0.5f);
-
-const Vector3 AnchorPoint::FRONT_TOP_LEFT     (0.0f, 0.0f, 1.0f);
-const Vector3 AnchorPoint::FRONT_TOP_CENTER   (0.5f, 0.0f, 1.0f);
-const Vector3 AnchorPoint::FRONT_TOP_RIGHT    (1.0f, 0.0f, 1.0f);
-const Vector3 AnchorPoint::FRONT_CENTER_LEFT  (0.0f, 0.5f, 1.0f);
-const Vector3 AnchorPoint::FRONT_CENTER       (0.5f, 0.5f, 1.0f);
-const Vector3 AnchorPoint::FRONT_CENTER_RIGHT (1.0f, 0.5f, 1.0f);
-const Vector3 AnchorPoint::FRONT_BOTTOM_LEFT  (0.0f, 1.0f, 1.0f);
-const Vector3 AnchorPoint::FRONT_BOTTOM_CENTER(0.5f, 1.0f, 1.0f);
-const Vector3 AnchorPoint::FRONT_BOTTOM_RIGHT (1.0f, 1.0f, 1.0f);
 
 const Vector3 AnchorPoint::DEFAULT( AnchorPoint::CENTER );
 

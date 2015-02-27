@@ -67,15 +67,6 @@ const unsigned int DRAW_MODE_TABLE_COUNT = sizeof( DRAW_MODE_TABLE ) / sizeof( D
 
 const StringEnum< Vector3 > ANCHOR_CONSTANT_TABLE[] =
 {
-  { "BACK_TOP_LEFT",          ParentOrigin::BACK_TOP_LEFT          },
-  { "BACK_TOP_CENTER",        ParentOrigin::BACK_TOP_CENTER        },
-  { "BACK_TOP_RIGHT",         ParentOrigin::BACK_TOP_RIGHT         },
-  { "BACK_CENTER_LEFT",       ParentOrigin::BACK_CENTER_LEFT       },
-  { "BACK_CENTER",            ParentOrigin::BACK_CENTER            },
-  { "BACK_CENTER_RIGHT",      ParentOrigin::BACK_CENTER_RIGHT      },
-  { "BACK_BOTTOM_LEFT",       ParentOrigin::BACK_BOTTOM_LEFT       },
-  { "BACK_BOTTOM_CENTER",     ParentOrigin::BACK_BOTTOM_CENTER     },
-  { "BACK_BOTTOM_RIGHT",      ParentOrigin::BACK_BOTTOM_RIGHT      },
   { "TOP_LEFT",               ParentOrigin::TOP_LEFT               },
   { "TOP_CENTER",             ParentOrigin::TOP_CENTER             },
   { "TOP_RIGHT",              ParentOrigin::TOP_RIGHT              },
@@ -85,15 +76,6 @@ const StringEnum< Vector3 > ANCHOR_CONSTANT_TABLE[] =
   { "BOTTOM_LEFT",            ParentOrigin::BOTTOM_LEFT            },
   { "BOTTOM_CENTER",          ParentOrigin::BOTTOM_CENTER          },
   { "BOTTOM_RIGHT",           ParentOrigin::BOTTOM_RIGHT           },
-  { "FRONT_TOP_LEFT",         ParentOrigin::FRONT_TOP_LEFT         },
-  { "FRONT_TOP_CENTER",       ParentOrigin::FRONT_TOP_CENTER       },
-  { "FRONT_TOP_RIGHT",        ParentOrigin::FRONT_TOP_RIGHT        },
-  { "FRONT_CENTER_LEFT",      ParentOrigin::FRONT_CENTER_LEFT      },
-  { "FRONT_CENTER",           ParentOrigin::FRONT_CENTER           },
-  { "FRONT_CENTER_RIGHT",     ParentOrigin::FRONT_CENTER_RIGHT     },
-  { "FRONT_BOTTOM_LEFT",      ParentOrigin::FRONT_BOTTOM_LEFT      },
-  { "FRONT_BOTTOM_CENTER",    ParentOrigin::FRONT_BOTTOM_CENTER    },
-  { "FRONT_BOTTOM_RIGHT",     ParentOrigin::FRONT_BOTTOM_RIGHT     },
 };
 const unsigned int ANCHOR_CONSTANT_TABLE_COUNT = sizeof( ANCHOR_CONSTANT_TABLE ) / sizeof( ANCHOR_CONSTANT_TABLE[0] );
 
