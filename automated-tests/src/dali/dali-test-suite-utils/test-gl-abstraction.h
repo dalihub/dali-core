@@ -226,6 +226,8 @@ public:
 
   inline void Clear(GLbitfield mask)
   {
+    mClearCount++;
+    mLastClearBitMask = mask;
   }
 
   inline void ClearColor(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha)
@@ -1659,6 +1661,11 @@ public: // TEST FUNCTIONS
     return mLastProgramIdUsed;
   }
 
+  inline GLbitfield GetLastClearMask() const
+  {
+    return mLastClearBitMask;
+  }
+
   enum AttribType
   {
     ATTRIB_UNKNOWN = -1,
@@ -1686,6 +1693,8 @@ public: // TEST FUNCTIONS
 
   inline bool GetProgramBinaryCalled() const { return mGetProgramBinaryCalled; }
 
+  inline unsigned int GetClearCountCalled() const { return mClearCount; }
+
 private:
   GLuint     mCurrentProgram;
   GLuint     mCompileStatus;
@@ -1711,6 +1720,8 @@ private:
   typedef std::map< GLuint, std::string> ShaderSourceMap;
   ShaderSourceMap mShaderSources;
   GLuint     mLastShaderCompiled;
+  GLbitfield mLastClearBitMask;
+  unsigned int mClearCount;
 
   Vector4 mLastBlendColor;
   GLenum  mLastBlendEquationRgb;

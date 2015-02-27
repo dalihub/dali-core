@@ -29,6 +29,7 @@
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
+#include <dali/internal/render/gl-resources/frame-buffer-state-cache.h>
 #include <dali/internal/render/gl-resources/gl-call-debug.h>
 
 namespace Dali
@@ -44,6 +45,16 @@ namespace Internal
 class Context
 {
 public:
+
+  /**
+   * FrameBuffer Clear mode
+   */
+  enum ClearMode
+  {
+    FORCE_CLEAR,        ///< always perform the glClear regardless of current state
+    CHECK_CACHED_VALUES ///< check the Frame buffers cached state to see if a clear is required
+  };
+
   /**
    * Size of the VertexAttributeArray enables
    * GLES specification states that there's minimum of 8
@@ -218,6 +229,8 @@ public:
    */
   void BindFramebuffer(GLenum target, GLuint framebuffer)
   {
+    mFrameBufferStateCache.SetCurrentFrameBuffer( framebuffer );
+
     LOG_GL("BindFramebuffer %d %d\n", target, framebuffer);
     CHECK_GL( mGlAbstraction, mGlAbstraction.BindFramebuffer(target, framebuffer) );
   }
@@ -388,10 +401,16 @@ public:
   /**
    * Wrapper for OpenGL ES 2.0 glClear()
    */
-  void Clear(GLbitfield mask)
+  void Clear(GLbitfield mask, ClearMode mode )
   {
-    LOG_GL("Clear %d\n", mask);
-    CHECK_GL( mGlAbstraction, mGlAbstraction.Clear(mask) );
+    bool forceClear = (mode == FORCE_CLEAR );
+    mask = mFrameBufferStateCache.GetClearMask( mask, forceClear , mScissorTestEnabled );
+
+    if( mask > 0 )
+    {
+      LOG_GL("Clear %d\n", mask);
+      CHECK_GL( mGlAbstraction, mGlAbstraction.Clear( mask ) );
+    }
   }
 
   /**
@@ -590,6 +609,8 @@ public:
    */
   void DeleteFramebuffers(GLsizei n, const GLuint* framebuffers)
   {
+    mFrameBufferStateCache.FrameBuffersDeleted( n, framebuffers );
+
     LOG_GL("DeleteFramebuffers %d %p\n", n, framebuffers);
     CHECK_GL( mGlAbstraction, mGlAbstraction.DeleteFramebuffers(n, framebuffers) );
   }
@@ -679,6 +700,7 @@ public:
    */
   void DrawArrays(GLenum mode, GLint first, GLsizei count)
   {
+    mFrameBufferStateCache.DrawOperation( mColorMask, DepthBufferWriteEnabled(), StencilBufferWriteEnabled() );
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawArrays %x %d %d\n", mode, first, count);
@@ -690,6 +712,7 @@ public:
    */
   void DrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instanceCount)
   {
+    mFrameBufferStateCache.DrawOperation( mColorMask, DepthBufferWriteEnabled(), StencilBufferWriteEnabled() );
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawArraysInstanced %x %d %d %d\n", mode, first, count, instanceCount);
@@ -701,6 +724,7 @@ public:
    */
   void DrawBuffers(GLsizei n, const GLenum* bufs)
   {
+    mFrameBufferStateCache.DrawOperation( mColorMask, DepthBufferWriteEnabled(), StencilBufferWriteEnabled() );
     LOG_GL("DrawBuffers %d %p\n", n, bufs);
     CHECK_GL( mGlAbstraction, mGlAbstraction.DrawBuffers(n, bufs) );
   }
@@ -710,6 +734,8 @@ public:
    */
   void DrawElements(GLenum mode, GLsizei count, GLenum type, const void* indices)
   {
+    mFrameBufferStateCache.DrawOperation( mColorMask, DepthBufferWriteEnabled(), StencilBufferWriteEnabled() );
+
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawElements %x %d %d %p\n", mode, count, type, indices);
@@ -721,6 +747,8 @@ public:
    */
   void DrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const void* indices, GLsizei instanceCount)
   {
+    mFrameBufferStateCache.DrawOperation( mColorMask, DepthBufferWriteEnabled(), StencilBufferWriteEnabled() );
+
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawElementsInstanced %x %d %d %p %d\n", mode, count, type, indices, instanceCount);
@@ -732,6 +760,7 @@ public:
    */
   void DrawRangeElements(GLenum mode, GLuint start, GLuint end, GLsizei count, GLenum type, const void* indices)
   {
+    mFrameBufferStateCache.DrawOperation( mColorMask, DepthBufferWriteEnabled(), StencilBufferWriteEnabled() );
     FlushVertexAttributeLocations();
 
     LOG_GL("DrawRangeElements %x %u %u %d %d %p\n", mode, start, end, count, type, indices);
@@ -855,14 +884,18 @@ public:
 
   /**
    * This method replaces glEnable(GL_DEPTH_TEST) and glDisable(GL_DEPTH_TEST).
+   * Note GL_DEPTH_TEST means enable the depth buffer for writing and or testing.
+   * glDepthMask is used to enable / disable writing to depth buffer.
+   * glDepthFunc us used to control if testing is enabled and how it is performed ( default GL_LESS)
+   *
    * @param[in] enable True if GL_DEPTH_TEST should be enabled.
    */
-  void SetDepthTest(bool enable)
+  void EnableDepthBuffer( bool enable )
   {
     // Avoid unecessary calls to glEnable/glDisable
-    if (enable != mDepthTestEnabled)
+    if( enable != mDepthBufferEnabled )
     {
-      mDepthTestEnabled = enable;
+      mDepthBufferEnabled = enable;
 
       if (enable)
       {
@@ -999,14 +1032,17 @@ public:
 
   /**
    * This method replaces glEnable(GL_STENCIL_TEST) and glDisable(GL_STENCIL_TEST).
+   * Note GL_STENCIL_TEST means enable the stencil buffer for writing and or testing.
+   * glStencilMask is used to control how bits are written to the stencil buffer.
+   * glStencilFunc is used to control if testing is enabled and how it is performed ( default GL_ALWAYS )
    * @param[in] enable True if GL_STENCIL_TEST should be enabled.
    */
-  void SetStencilTest(bool enable)
+  void EnableStencilBuffer(bool enable)
   {
     // Avoid unecessary calls to glEnable/glDisable
-    if (enable != mStencilTestEnabled)
+    if( enable != mStencilBufferEnabled )
     {
-      mStencilTestEnabled = enable;
+      mStencilBufferEnabled = enable;
 
       if (enable)
       {
@@ -1118,6 +1154,8 @@ public:
   {
     LOG_GL("GenFramebuffers %d %p\n", n, framebuffers);
     CHECK_GL( mGlAbstraction, mGlAbstraction.GenFramebuffers(n, framebuffers) );
+
+    mFrameBufferStateCache.FrameBuffersCreated( n, framebuffers );
   }
 
   /**
@@ -1430,6 +1468,8 @@ public:
    */
   void StencilFunc(GLenum func, GLint ref, GLuint mask)
   {
+
+
     LOG_GL("StencilFunc %x %d %d\n", func, ref, mask);
     CHECK_GL( mGlAbstraction, mGlAbstraction.StencilFunc(func, ref, mask) );
   }
@@ -1665,8 +1705,23 @@ public:
     return mRendererCount;
   }
 
-
 private: // Implementation
+
+  /**
+   * @return true if next draw operation will write to depth buffer
+   */
+  bool DepthBufferWriteEnabled() const
+  {
+    return mDepthBufferEnabled && mDepthMaskEnabled;
+  }
+
+  /**
+   * @return true if next draw operation will write to stencil buffer
+   */
+  bool StencilBufferWriteEnabled() const
+  {
+    return mStencilBufferEnabled && ( mStencilMask > 0 );
+  }
 
   /**
    * Flushes vertex attribute location changes to the driver
@@ -1701,14 +1756,14 @@ private: // Data
   bool mColorMask;
   GLuint mStencilMask;
   bool mBlendEnabled;
-  bool mDepthTestEnabled;
+  bool mDepthBufferEnabled;
   bool mDepthMaskEnabled;
   bool mDitherEnabled;
   bool mPolygonOffsetFillEnabled;
   bool mSampleAlphaToCoverageEnabled;
   bool mSampleCoverageEnabled;
   bool mScissorTestEnabled;
-  bool mStencilTestEnabled;
+  bool mStencilBufferEnabled;
   bool mClearColorSet;
 
   // glBindBuffer() state
@@ -1749,6 +1804,7 @@ private: // Data
   unsigned int mFrameCount;       ///< Number of render frames
   unsigned int mCulledCount;      ///< Number of culled renderers per frame
   unsigned int mRendererCount;    ///< Number of image renderers per frame
+  FrameBufferStateCache mFrameBufferStateCache;   ///< frame buffer state cache
 };
 
 } // namespace Internal

@@ -899,3 +899,184 @@ int UtcDaliSetShaderEffectRecursively(void)
   END_TEST;
 }
 
+int UtcDaliRenderableActorTestClearCache01(void)
+{
+  // Testing the framebuffer state caching in frame-buffer-state-caching.cpp
+  TestApplication application;
+
+  tet_infoline("Testing Dali::RenderableActor::ClearCache01()");
+
+  BufferImage img = BufferImage::New( 1,1 );
+  ImageActor actor = ImageActor::New( img );
+
+  actor.SetParentOrigin(ParentOrigin::CENTER);
+  actor.SetAnchorPoint(AnchorPoint::CENTER);
+
+  Stage::GetCurrent().Add(actor);
+
+  /**************************************************************/
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // There should be a single call to Clear
+  DALI_TEST_EQUALS( application.GetGlAbstraction().GetClearCountCalled() , 1u, TEST_LOCATION );
+
+  // the last set clear mask should be COLOR, DEPTH & STENCIL which occurs at the start of each frame
+  GLbitfield mask = application.GetGlAbstraction().GetLastClearMask();
+  DALI_TEST_CHECK( mask & GL_DEPTH_BUFFER_BIT );
+  DALI_TEST_CHECK( mask & GL_STENCIL_BUFFER_BIT );
+  DALI_TEST_CHECK( mask & GL_COLOR_BUFFER_BIT );
+
+  END_TEST;
+}
+
+int UtcDaliRenderableActorTestClearCache02(void)
+{
+  // Testing the framebuffer state caching in frame-buffer-state-caching.cpp
+  TestApplication application;
+
+  tet_infoline("Testing Dali::RenderableActor::ClearCache02()");
+
+  // use RGB so alpha is disabled and the actors are drawn opaque
+  BufferImage img = BufferImage::New( 10,10 ,Pixel::RGB888 );
+
+  // Without caching DALi perform clears in the following places
+  // Root
+  // | glClear #1 ( everything at start of frame )
+  // |
+  // |
+  // | glClear #2 ( start of layer with opaque actors )
+  // | ----> Layer1
+  // |     -> Actor 1 ( opaque )
+  // |     -> Actor 2 ( opaque )
+  // |
+  // |
+  // | glClear  #3 ( start of layer with opaque actors )
+  // |----> Layer 2
+  // |     -> Actor 3 ( opaque )
+  // |     -> Actor 4 ( opaque )
+  //
+  // With caching enabled glClear should only be called twice, at points #1 and #3.
+  // At #1 with depth, color and stencil cleared
+  // At #3 with depth cleared
+  // #2 is not required because the buffer has already been cleared at #1
+
+  Layer layer1 = Layer::New();
+  layer1.Add( ImageActor::New( img ) );
+  layer1.Add( ImageActor::New( img ) );
+
+  Layer layer2 = Layer::New();
+  layer2.Add( ImageActor::New( img ) );
+  layer2.Add( ImageActor::New( img ) );
+
+  Stage::GetCurrent().Add( layer1 );
+  Stage::GetCurrent().Add( layer2 );
+
+  /**************************************************************/
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // There should be a 2 calls to Clear
+  DALI_TEST_EQUALS( application.GetGlAbstraction().GetClearCountCalled() , 2u, TEST_LOCATION );
+
+  // the last set clear mask should be  DEPTH & STENCIL & COLOR
+  GLbitfield mask = application.GetGlAbstraction().GetLastClearMask();
+
+  tet_printf(" clear count = %d \n",  application.GetGlAbstraction().GetClearCountCalled() );
+
+  // The last clear should just be DEPTH BUFFER, not color and stencil which were cleared at the start of the frame
+  DALI_TEST_CHECK( mask & GL_DEPTH_BUFFER_BIT );
+  DALI_TEST_CHECK( ! ( mask & GL_COLOR_BUFFER_BIT ) );
+  DALI_TEST_CHECK( ! ( mask & GL_STENCIL_BUFFER_BIT ) );
+
+  END_TEST;
+}
+
+int UtcDaliRenderableActorTestClearCache03(void)
+{
+  // Testing the framebuffer state caching in frame-buffer-state-caching.cpp
+  TestApplication application;
+
+  tet_infoline("Testing Dali::RenderableActor::ClearCache03()");
+
+  // use RGB so alpha is disabled and the actors are drawn opaque
+  BufferImage img = BufferImage::New( 10,10 ,Pixel::RGB888 );
+
+  // Without caching DALi perform clears in the following places
+  // Root
+  // | 1-## glClear ( COLOR, DEPTH, STENCIL )
+  // |
+  // | ----> Layer1
+  // |     2-##  glClear  ( STENCIL )
+  // |     -> Actor 1 ( stencil )
+  // |     3-##  glClear  ( DEPTH )
+  // |     -> Actor 2 ( opaque )  // need 2 opaque actors to bypass optimisation of turning off depth test
+  // |     -> Actor 3 ( opaque )
+  // |
+  // |
+  // |----> Layer 2
+  // |     4-##  glClear  ( STENCIL )
+  // |     -> Actor 4 ( stencil )
+  // |     5-##  glClear  ( DEPTH )
+  // |     -> Actor 5 ( opaque )  // need 2 opaque actors to bypass optimisation of turning off depth test
+  // |     -> Actor 6 ( opaque )
+  //
+  // With caching enabled glClear will not be called at ## 2 and ## 3 ( because those buffers are already clear).
+  //
+  // @TODO Add further optimisation to look-ahead in the render-list to see if
+  // When performing STENCIL clear, check if there another layer after it.
+  // If there is, combine the STENCIL with a DEPTH clear.
+  //
+
+  Layer layer1 = Layer::New();
+  ImageActor actor1 =  ImageActor::New( img );
+  ImageActor actor2 =  ImageActor::New( img );
+  ImageActor actor3 =  ImageActor::New( img );
+
+  actor2.SetDrawMode( DrawMode::STENCIL );
+
+  layer1.Add( actor1 );
+  layer1.Add( actor2 );
+  layer1.Add( actor3 );
+
+  Layer layer2 = Layer::New();
+  ImageActor actor4 =  ImageActor::New( img );
+  ImageActor actor5 =  ImageActor::New( img );
+  ImageActor actor6 =  ImageActor::New( img );
+
+  actor4.SetDrawMode( DrawMode::STENCIL );
+
+  layer2.Add( actor4 );
+  layer2.Add( actor5 );
+  layer2.Add( actor6 );
+
+  Stage::GetCurrent().Add( layer1 );
+  Stage::GetCurrent().Add( layer2 );
+
+
+  /**************************************************************/
+
+  // Flush the queue and render once
+  application.SendNotification();
+  application.Render();
+
+  // There should be a 3 calls to Clear ( one for everything, one for stencil, one for depth buffer).
+  DALI_TEST_EQUALS( application.GetGlAbstraction().GetClearCountCalled() , 3u, TEST_LOCATION );
+
+  // the last set clear mask should be  DEPTH & STENCIL & COLOR
+  GLbitfield mask = application.GetGlAbstraction().GetLastClearMask();
+
+  tet_printf(" clear count = %d \n",  application.GetGlAbstraction().GetClearCountCalled() );
+  tet_printf(" clear mask  = %x \n",  mask);
+
+  // The last clear should just be DEPTH BUFFER and stencil
+  DALI_TEST_CHECK(  !( mask & GL_COLOR_BUFFER_BIT ) );
+  DALI_TEST_CHECK(  !( mask & GL_STENCIL_BUFFER_BIT ) );
+  DALI_TEST_CHECK(  mask & GL_DEPTH_BUFFER_BIT );
+
+
+  END_TEST;
+}

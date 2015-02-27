@@ -57,6 +57,8 @@ void TestGlAbstraction::Initialize()
   mLastProgramIdUsed = 0;
   mLastUniformIdUsed = 0;
   mLastShaderCompiled = 0;
+  mLastClearBitMask = 0;
+  mClearCount = 0;
 
   mLastBlendEquationRgb   = 0;
   mLastBlendEquationAlpha = 0;

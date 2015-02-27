@@ -129,6 +129,7 @@ internal_src_files = \
   $(internal_src_dir)/render/common/texture-cache-dispatcher.cpp \
   $(internal_src_dir)/render/gl-resources/bitmap-texture.cpp \
   $(internal_src_dir)/render/gl-resources/context.cpp \
+  $(internal_src_dir)/render/gl-resources/frame-buffer-state-cache.cpp \
   $(internal_src_dir)/render/gl-resources/compressed-bitmap-texture.cpp \
   $(internal_src_dir)/render/gl-resources/frame-buffer-texture.cpp \
   $(internal_src_dir)/render/gl-resources/gl-call-debug.cpp \
