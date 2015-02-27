@@ -26,7 +26,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/math/radian.h>
 
-namespace Dali DALI_IMPORT_API
+namespace Dali
 {
 
 /**
@@ -36,44 +36,23 @@ namespace Dali DALI_IMPORT_API
  */
 namespace ParentOrigin
 {
-extern const Vector3 DEFAULT; ///< TOP_LEFT
+const float TOP = 0.0f;
+const float BOTTOM = 1.0f;
+const float LEFT = 0.0f;
+const float RIGHT = 1.0f;
+const float MIDDLE = 0.5f;
 
-extern const float TOP;    ///< 0.0f
-extern const float BOTTOM; ///< 1.0f
-extern const float LEFT;   ///< 0.0f
-extern const float RIGHT;  ///< 1.0f
-extern const float MIDDLE; ///< 0.5f
+const Vector3 TOP_LEFT( 0.0f, 0.0f, 0.5f );
+const Vector3 TOP_CENTER( 0.5f, 0.0f, 0.5f );
+const Vector3 TOP_RIGHT( 1.0f, 0.0f, 0.5f );
+const Vector3 CENTER_LEFT( 0.0f, 0.5f, 0.5f );
+const Vector3 CENTER( 0.5f, 0.5f, 0.5f );
+const Vector3 CENTER_RIGHT( 1.0f, 0.5f, 0.5f );
+const Vector3 BOTTOM_LEFT( 0.0f, 1.0f, 0.5f );
+const Vector3 BOTTOM_CENTER( 0.5f, 1.0f, 0.5f );
+const Vector3 BOTTOM_RIGHT( 1.0f, 1.0f, 0.5f );
 
-extern const Vector3 BACK_TOP_LEFT;      ///< 0.0f, 0.0f, 0.0f
-extern const Vector3 BACK_TOP_CENTER;    ///< 0.5f, 0.0f, 0.0f
-extern const Vector3 BACK_TOP_RIGHT;     ///< 1.0f, 0.0f, 0.0f
-extern const Vector3 BACK_CENTER_LEFT;   ///< 0.0f, 0.5f, 0.0f
-extern const Vector3 BACK_CENTER;        ///< 0.5f, 0.5f, 0.0f
-extern const Vector3 BACK_CENTER_RIGHT;  ///< 1.0f, 0.5f, 0.0f
-extern const Vector3 BACK_BOTTOM_LEFT;   ///< 0.0f, 1.0f, 0.0f
-extern const Vector3 BACK_BOTTOM_CENTER; ///< 0.5f, 1.0f, 0.0f
-extern const Vector3 BACK_BOTTOM_RIGHT;  ///< 1.0f, 1.0f, 0.0f
-
-extern const Vector3 TOP_LEFT;           ///< 0.0f, 0.0f, 0.5f
-extern const Vector3 TOP_CENTER;         ///< 0.5f, 0.0f, 0.5f
-extern const Vector3 TOP_RIGHT;          ///< 1.0f, 0.0f, 0.5f
-extern const Vector3 CENTER_LEFT;        ///< 0.0f, 0.5f, 0.5f
-extern const Vector3 CENTER;             ///< 0.5f, 0.5f, 0.5f
-extern const Vector3 CENTER_RIGHT;       ///< 1.0f, 0.5f, 0.5f
-extern const Vector3 BOTTOM_LEFT;        ///< 0.0f, 1.0f, 0.5f
-extern const Vector3 BOTTOM_CENTER;      ///< 0.5f, 1.0f, 0.5f
-extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
-
-extern const Vector3 FRONT_TOP_LEFT;     ///< 0.0f, 0.0f, 1.0f
-extern const Vector3 FRONT_TOP_CENTER;   ///< 0.5f, 0.0f, 1.0f
-extern const Vector3 FRONT_TOP_RIGHT;    ///< 1.0f, 0.0f, 1.0f
-extern const Vector3 FRONT_CENTER_LEFT;  ///< 0.0f, 0.5f, 1.0f
-extern const Vector3 FRONT_CENTER;       ///< 0.5f, 0.5f, 1.0f
-extern const Vector3 FRONT_CENTER_RIGHT; ///< 1.0f, 0.5f, 1.0f
-extern const Vector3 FRONT_BOTTOM_LEFT;  ///< 0.0f, 1.0f, 1.0f
-extern const Vector3 FRONT_BOTTOM_CENTER;///< 0.5f, 1.0f, 1.0f
-extern const Vector3 FRONT_BOTTOM_RIGHT; ///< 1.0f, 1.0f, 1.0f
-
+const Vector3 DEFAULT( TOP_LEFT );
 }
 
 /**
@@ -83,43 +62,23 @@ extern const Vector3 FRONT_BOTTOM_RIGHT; ///< 1.0f, 1.0f, 1.0f
  */
 namespace AnchorPoint
 {
-extern const float TOP;    ///< 0.0f
-extern const float BOTTOM; ///< 1.0f
-extern const float LEFT;   ///< 0.0f
-extern const float RIGHT;  ///< 1.0f
-extern const float MIDDLE; ///< 0.5f
+const float TOP = 0.0f;
+const float BOTTOM = 1.0f;
+const float LEFT = 0.0f;
+const float RIGHT = 1.0f;
+const float MIDDLE = 0.5f;
 
-extern const Vector3 DEFAULT; ///< CENTER
+const Vector3 TOP_LEFT( 0.0f, 0.0f, 0.5f );
+const Vector3 TOP_CENTER( 0.5f, 0.0f, 0.5f );
+const Vector3 TOP_RIGHT( 1.0f, 0.0f, 0.5f );
+const Vector3 CENTER_LEFT( 0.0f, 0.5f, 0.5f );
+const Vector3 CENTER( 0.5f, 0.5f, 0.5f );
+const Vector3 CENTER_RIGHT( 1.0f, 0.5f, 0.5f );
+const Vector3 BOTTOM_LEFT( 0.0f, 1.0f, 0.5f );
+const Vector3 BOTTOM_CENTER( 0.5f, 1.0f, 0.5f );
+const Vector3 BOTTOM_RIGHT( 1.0f, 1.0f, 0.5f );
 
-extern const Vector3 BACK_TOP_LEFT;      ///< 0.0f, 0.0f, 0.0f
-extern const Vector3 BACK_TOP_CENTER;    ///< 0.5f, 0.0f, 0.0f
-extern const Vector3 BACK_TOP_RIGHT;     ///< 1.0f, 0.0f, 0.0f
-extern const Vector3 BACK_CENTER_LEFT;   ///< 0.0f, 0.5f, 0.0f
-extern const Vector3 BACK_CENTER;        ///< 0.5f, 0.5f, 0.0f
-extern const Vector3 BACK_CENTER_RIGHT;  ///< 1.0f, 0.5f, 0.0f
-extern const Vector3 BACK_BOTTOM_LEFT;   ///< 0.0f, 1.0f, 0.0f
-extern const Vector3 BACK_BOTTOM_CENTER; ///< 0.5f, 1.0f, 0.0f
-extern const Vector3 BACK_BOTTOM_RIGHT;  ///< 1.0f, 1.0f, 0.0f
-
-extern const Vector3 TOP_LEFT;           ///< 0.0f, 0.0f, 0.5f
-extern const Vector3 TOP_CENTER;         ///< 0.5f, 0.0f, 0.5f
-extern const Vector3 TOP_RIGHT;          ///< 1.0f, 0.0f, 0.5f
-extern const Vector3 CENTER_LEFT;        ///< 0.0f, 0.5f, 0.5f
-extern const Vector3 CENTER;             ///< 0.5f, 0.5f, 0.5f
-extern const Vector3 CENTER_RIGHT;       ///< 1.0f, 0.5f, 0.5f
-extern const Vector3 BOTTOM_LEFT;        ///< 0.0f, 1.0f, 0.5f
-extern const Vector3 BOTTOM_CENTER;      ///< 0.5f, 1.0f, 0.5f
-extern const Vector3 BOTTOM_RIGHT;       ///< 1.0f, 1.0f, 0.5f
-
-extern const Vector3 FRONT_TOP_LEFT;     ///< 0.0f, 0.0f, 1.0f
-extern const Vector3 FRONT_TOP_CENTER;   ///< 0.5f, 0.0f, 1.0f
-extern const Vector3 FRONT_TOP_RIGHT;    ///< 1.0f, 0.0f, 1.0f
-extern const Vector3 FRONT_CENTER_LEFT;  ///< 0.0f, 0.5f, 1.0f
-extern const Vector3 FRONT_CENTER;       ///< 0.5f, 0.5f, 1.0f
-extern const Vector3 FRONT_CENTER_RIGHT; ///< 1.0f, 0.5f, 1.0f
-extern const Vector3 FRONT_BOTTOM_LEFT;  ///< 0.0f, 1.0f, 1.0f
-extern const Vector3 FRONT_BOTTOM_CENTER;///< 0.5f, 1.0f, 1.0f
-extern const Vector3 FRONT_BOTTOM_RIGHT; ///< 1.0f, 1.0f, 1.0f
+const Vector3 DEFAULT( CENTER );
 }
 
 
@@ -130,18 +89,18 @@ extern const Vector3 FRONT_BOTTOM_RIGHT; ///< 1.0f, 1.0f, 1.0f
  */
 namespace Color
 {
-extern const Vector4 BLACK;       ///< Pure black (0.0f, 0.0f, 0.0f, 1.0f);
-extern const Vector4 WHITE;       ///< Pure white (1.0f, 1.0f, 1.0f, 1.0f);
+const Vector4 BLACK(0.0f, 0.0f, 0.0f, 1.0f);
+const Vector4 WHITE(1.0f, 1.0f, 1.0f, 1.0f);
 
-extern const Vector4 RED;         ///< Pure red   (1.0f, 0.0f, 0.0f, 1.0f);
-extern const Vector4 GREEN;       ///< Pure green (0.0f, 1.0f, 0.0f, 1.0f);
-extern const Vector4 BLUE;        ///< Pure blue  (0.0f, 0.0f, 1.0f, 1.0f);
+const Vector4 RED(1.0f, 0.0f, 0.0f, 1.0f);
+const Vector4 GREEN(0.0f, 1.0f, 0.0f, 1.0f);
+const Vector4 BLUE(0.0f, 0.0f, 1.0f, 1.0f);
 
-extern const Vector4 YELLOW;      ///< Pure yellow  (1.0f, 1.0f, 0.0f, 1.0f);
-extern const Vector4 MAGENTA;     ///< Pure magenta (1.0f, 0.0f, 1.0f, 1.0f);
-extern const Vector4 CYAN;        ///< Pure cyan    (0.0f, 1.0f, 1.0f, 1.0f);
+const Vector4 YELLOW(1.0f, 1.0f, 0.0f, 1.0f);
+const Vector4 MAGENTA(1.0f, 0.0f, 1.0f, 1.0f);
+const Vector4 CYAN(0.0f, 1.0f, 1.0f, 1.0f);
 
-extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 0.0f, 0.0f, 0.0f);
+const Vector4 TRANSPARENT(0.0f, 0.0f, 0.0f, 0.0f);
 
 } // namespace Color
 
@@ -150,12 +109,12 @@ extern const Vector4 TRANSPARENT; ///< Black transparent (0.0f, 0.0f, 0.0f, 0.0f
  */
 namespace Math
 {
-extern const float MACHINE_EPSILON_0;      ///< Epsilon for values near zero
-extern const float MACHINE_EPSILON_1;      ///< Epsilon for values near 1
-extern const float MACHINE_EPSILON_10;     ///< Epsilon for values near 10
-extern const float MACHINE_EPSILON_100;    ///< Epsilon for values near 100
-extern const float MACHINE_EPSILON_1000;   ///< Epsilon for values near 1000
-extern const float MACHINE_EPSILON_10000;  ///< Epsilon for values near 10000
+DALI_IMPORT_API extern const float MACHINE_EPSILON_0;      ///< Epsilon for values near zero
+DALI_IMPORT_API extern const float MACHINE_EPSILON_1;      ///< Epsilon for values near 1
+DALI_IMPORT_API extern const float MACHINE_EPSILON_10;     ///< Epsilon for values near 10
+DALI_IMPORT_API extern const float MACHINE_EPSILON_100;    ///< Epsilon for values near 100
+DALI_IMPORT_API extern const float MACHINE_EPSILON_1000;   ///< Epsilon for values near 1000
+DALI_IMPORT_API extern const float MACHINE_EPSILON_10000;  ///< Epsilon for values near 10000
 
 // float is preferred to double for performance on ARM targets
 const float PI   = static_cast<float>(M_PI);   ///< Constant representing PI
