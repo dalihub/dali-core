@@ -98,15 +98,6 @@ Material MeshActor::GetMaterial() const
   return GetImplementation(*this).GetMaterial();
 }
 
-void MeshActor::SetAffectedByLighting(bool affectedByLighting)
-{
-}
-
-bool MeshActor::IsAffectedByLighting()
-{
-  return false;
-}
-
 void MeshActor::BindBonesToMesh(Actor rootActor)
 {
   Internal::ActorPtr root(&GetImplementation(rootActor));

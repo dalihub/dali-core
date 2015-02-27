@@ -226,7 +226,6 @@ private:
   const SceneGraph::MeshAttachment* mSceneObject; ///< Not owned
 
   MeshAndCustomMaterial mMesh;
-  bool                  mAffectedByLighting;
   ConnectorList         mConnectors;
 };
 
