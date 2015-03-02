@@ -122,9 +122,10 @@ public_api_core_actors_header_files =  \
   $(public_api_src_dir)/actors/draw-mode.h \
   $(public_api_src_dir)/actors/image-actor.h \
   $(public_api_src_dir)/actors/layer.h \
-  $(public_api_src_dir)/actors/text-actor.h \
   $(public_api_src_dir)/actors/renderable-actor.h \
-  $(public_api_src_dir)/actors/sampling.h
+  $(public_api_src_dir)/actors/renderer.h \
+  $(public_api_src_dir)/actors/sampling.h \
+  $(public_api_src_dir)/actors/text-actor.h
 
 public_api_core_animation_header_files = \
   $(public_api_src_dir)/animation/active-constraint.h \
@@ -186,6 +187,7 @@ public_api_core_events_header_files = \
   $(public_api_src_dir)/events/touch-event.h
 
 public_api_core_geometry_header_files = \
+  $(public_api_src_dir)/geometry/geometry.h \
   $(public_api_src_dir)/geometry/spline.h
 
 public_api_core_images_header_files = \
@@ -225,15 +227,16 @@ public_api_core_object_header_files = \
   $(public_api_src_dir)/object/base-object.h \
   $(public_api_src_dir)/object/handle.h \
   $(public_api_src_dir)/object/object-registry.h \
+  $(public_api_src_dir)/object/property.h \
+  $(public_api_src_dir)/object/property-buffer.h \
   $(public_api_src_dir)/object/property-conditions.h \
   $(public_api_src_dir)/object/property-index-ranges.h \
   $(public_api_src_dir)/object/property-input.h \
   $(public_api_src_dir)/object/property-map.h \
-  $(public_api_src_dir)/object/property-notification-declarations.h \
   $(public_api_src_dir)/object/property-notification.h \
+  $(public_api_src_dir)/object/property-notification-declarations.h \
   $(public_api_src_dir)/object/property-types.h \
   $(public_api_src_dir)/object/property-value.h \
-  $(public_api_src_dir)/object/property.h \
   $(public_api_src_dir)/object/ref-object.h \
   $(public_api_src_dir)/object/type-info.h \
   $(public_api_src_dir)/object/type-registry.h
@@ -243,6 +246,9 @@ public_api_core_render_tasks_header_files = \
   $(public_api_src_dir)/render-tasks/render-task-list.h
 
 public_api_core_shader_effects_header_files = \
+  $(public_api_src_dir)/shader-effects/material.h \
+  $(public_api_src_dir)/shader-effects/sampler.h \
+  $(public_api_src_dir)/shader-effects/shader.h \
   $(public_api_src_dir)/shader-effects/shader-effect.h
 
 public_api_core_scripting_header_files = \

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -182,6 +182,27 @@ void Handle::RemoveConstraints()
 void Handle::RemoveConstraints( unsigned int tag )
 {
   GetImplementation(*this).RemoveConstraints( tag );
+}
+
+std::size_t Handle::AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName )
+{
+  //TODO: MESH_REWORK Milestone 2
+  return 0;
+}
+
+void Handle::RemoveUniformMapping( std::size_t index )
+{
+  //TODO: MESH_REWORK Milestone 2
+}
+
+void Handle::RemoveUniformMapping( const std::string uniformName )
+{
+  //TODO: MESH_REWORK Milestone 2
+}
+
+std::size_t Handle::GetNumberOfUniformMappings() const
+{
+  return 0;
 }
 
 namespace WeightObject

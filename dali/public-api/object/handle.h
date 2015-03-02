@@ -2,7 +2,7 @@
 #define __DALI_HANDLE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -363,6 +363,52 @@ public:
    * @param[in] tag The tag of the constraints which will be removed
    */
   void RemoveConstraints( unsigned int tag );
+
+  /**
+   * @brief Add an uniform mapping
+   *
+   * Uniform mappings can be used to specify that a property value should be provided to the
+   * shader under a uniform name.
+   *
+   * If multiple objects connected to a Renderer provide mappings for the same uniform name,
+   * the value that is set will come from the object with highest precedence according to this list:
+   *   - Renderer (highest precedence)
+   *   - Actor
+   *   - Material
+   *   - Shader
+   *   - Geometry (lowest precedence)
+   *
+   * Mappings in any other objects are ignored.
+   *
+   * If more than one mapping with the same uniform name is added, then the instead of creating a new
+   * mapping this function changes the propertyIndex on the existing one.
+   *
+   * @param[in] propertyIndex Index of a property hold by the object pointed by this handle
+   * @param[in] uniformName Name of the uniform
+   * @return index of the mapping
+   */
+  std::size_t AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName );
+
+  /**
+   * @brief Remove an uniform mapping
+   *
+   * @param[in] index Index of the mapping to remove
+   */
+  void RemoveUniformMapping( std::size_t index );
+
+  /**
+   * @brief Removes the mapping for the given uniform name, if there is any
+   *
+   * @param[in] uniformName Name of a uniform in a mapping
+   */
+  void RemoveUniformMapping( const std::string uniformName );
+
+  /**
+   * @brief Get the number of uniform mappings
+   *
+   * @return The number of uniform mappings on the object pointed by this handle
+   */
+  std::size_t GetNumberOfUniformMappings() const;
 };
 
 namespace WeightObject
