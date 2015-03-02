@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 
 using Dali::Internal::SceneGraph::Shader;
@@ -32,13 +31,7 @@ namespace Internal
 {
 
 RenderableAttachment::RenderableAttachment( Stage& stage )
-: ActorAttachment( stage ),
-  mShaderEffect(),
-  mBlendingOptions(),
-  mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
-  mSortModifier( 0.0f ),
-  mCullFaceMode( CullNone ),
-  mBlendingMode( BlendingMode::AUTO )
+: ActorAttachment( stage )
 {
 }
 
@@ -46,186 +39,15 @@ RenderableAttachment::~RenderableAttachment()
 {
 }
 
-void RenderableAttachment::SetSortModifier(float modifier)
-{
-  // Cache for actor-side getters
-  mSortModifier = modifier;
-
-  // attachment is being used in a separate thread; queue a message to set the value & base value
-  SetSortModifierMessage( mStage->GetUpdateInterface(), GetSceneObject(), modifier );
-}
-
-float RenderableAttachment::GetSortModifier() const
-{
-  // mSortModifier is not animatable; this is the most up-to-date value.
-  return mSortModifier;
-}
-
-void RenderableAttachment::SetCullFace( CullFaceMode mode )
-{
-  // Cache for actor-side getters
-  mCullFaceMode = mode;
-
-  // attachment is being used in a separate thread; queue a message to set the value
-  SetCullFaceMessage( mStage->GetUpdateInterface(), GetSceneObject(), mode );
-}
-
-CullFaceMode RenderableAttachment::GetCullFace() const
-{
-  // mCullFaceMode is not animatable; this is the most up-to-date value.
-  return mCullFaceMode;
-}
-
-void RenderableAttachment::SetBlendMode( BlendingMode::Type mode )
-{
-  mBlendingMode = mode;
-
-  // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingModeMessage( mStage->GetUpdateInterface(), GetSceneObject(), mode );
-}
-
-BlendingMode::Type RenderableAttachment::GetBlendMode() const
-{
-  return mBlendingMode;
-}
-
-void RenderableAttachment::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                                         BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
-{
-  // Cache for actor-side getters
-  mBlendingOptions.SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-
-  // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingOptionsMessage( mStage->GetUpdateInterface(), GetSceneObject(), mBlendingOptions.GetBitmask() );
-}
-
-void RenderableAttachment::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
-                                         BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
-{
-  // These are not animatable, the cached values are up-to-date.
-  srcFactorRgb    = mBlendingOptions.GetBlendSrcFactorRgb();
-  destFactorRgb   = mBlendingOptions.GetBlendDestFactorRgb();
-  srcFactorAlpha  = mBlendingOptions.GetBlendSrcFactorAlpha();
-  destFactorAlpha = mBlendingOptions.GetBlendDestFactorAlpha();
-}
-
-void RenderableAttachment::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
-{
-  mBlendingOptions.SetBlendEquation( equationRgb, equationAlpha );
-
-  // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingOptionsMessage( mStage->GetUpdateInterface(), GetSceneObject(), mBlendingOptions.GetBitmask() );
-}
-
-void RenderableAttachment::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
-{
-  // These are not animatable, the cached values are up-to-date.
-  equationRgb   = mBlendingOptions.GetBlendEquationRgb();
-  equationAlpha = mBlendingOptions.GetBlendEquationAlpha();
-}
-
-void RenderableAttachment::SetBlendColor( const Vector4& color )
-{
-  if( mBlendingOptions.SetBlendColor( color ) )
-  {
-    // attachment is being used in a separate thread; queue a message to set the value
-    SetBlendColorMessage( mStage->GetUpdateInterface(), GetSceneObject(), color );
-  }
-}
-
-const Vector4& RenderableAttachment::GetBlendColor() const
-{
-  const Vector4* optionalColor = mBlendingOptions.GetBlendColor();
-  if( optionalColor )
-  {
-    return *optionalColor;
-  }
-
-  return Vector4::ZERO;
-}
-
-void RenderableAttachment::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
-{
-  mSamplerBitfield = ImageSampler::PackBitfield( minFilter, magFilter );
-
-  SetSamplerMessage( mStage->GetUpdateInterface(), GetSceneObject(), mSamplerBitfield );
-}
-
-void RenderableAttachment::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
-{
-  minFilter = ImageSampler::GetMinifyFilterMode( mSamplerBitfield );
-  magFilter = ImageSampler::GetMagnifyFilterMode( mSamplerBitfield );
-}
-
-void RenderableAttachment::SetShaderEffect(ShaderEffect& effect)
-{
-  if ( OnStage() )
-  {
-    if ( mShaderEffect )
-    {
-      mShaderEffect->Disconnect();
-    }
-
-    mShaderEffect.Reset( &effect );
-
-    const Shader& shader = dynamic_cast<const Shader&>( *mShaderEffect->GetSceneObject() );
-
-    ApplyShaderMessage( mStage->GetUpdateInterface(), GetSceneObject(), shader );
-
-    mShaderEffect->Connect();
-  }
-  else
-  {
-    mShaderEffect = ShaderEffectPtr(&effect);
-  }
-  // Effects can only be applied when the Node is connected to scene-graph
-}
-
-ShaderEffectPtr RenderableAttachment::GetShaderEffect() const
-{
-  return mShaderEffect;
-}
-
-void RenderableAttachment::RemoveShaderEffect()
-{
-  if ( OnStage() )
-  {
-    RemoveShaderMessage( mStage->GetUpdateInterface(), GetSceneObject() );
-
-    // Notify shader effect
-    if (mShaderEffect)
-    {
-      mShaderEffect->Disconnect();
-    }
-  }
-
-  mShaderEffect.Reset();
-}
 
 void RenderableAttachment::OnStageConnection()
 {
-  if ( mShaderEffect )
-  {
-    const Shader& shader = dynamic_cast<const Shader&>( *mShaderEffect->GetSceneObject() );
-
-    ApplyShaderMessage( mStage->GetUpdateInterface(), GetSceneObject(), shader );
-
-    // Notify shader effect
-    mShaderEffect->Connect();
-  }
-
   // For derived classes
   OnStageConnection2();
 }
 
 void RenderableAttachment::OnStageDisconnection()
 {
-  // Notify shader effect
-  if ( mShaderEffect )
-  {
-    mShaderEffect->Disconnect();
-  }
-
   // For derived classes
   OnStageDisconnection2();
 }
