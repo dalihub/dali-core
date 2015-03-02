@@ -24,8 +24,7 @@
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/resources/resource-ticket.h>
-#include <dali/internal/render/shaders/shader.h>
-
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
 {

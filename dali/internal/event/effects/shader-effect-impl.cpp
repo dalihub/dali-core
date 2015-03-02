@@ -31,7 +31,7 @@
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/images/image-impl.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/uniform-meta.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>

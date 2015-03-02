@@ -24,7 +24,7 @@
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/event-to-update.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>

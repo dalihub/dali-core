@@ -35,7 +35,7 @@
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/integration-api/resource-cache.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 

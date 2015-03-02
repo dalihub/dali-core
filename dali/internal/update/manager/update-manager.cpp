@@ -62,7 +62,7 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 #ifdef DYNAMICS_SUPPORT
 #include <dali/integration-api/dynamics/dynamics-world-settings.h>

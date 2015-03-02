@@ -21,7 +21,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
 #include <dali/internal/render/renderers/render-data-provider.h>

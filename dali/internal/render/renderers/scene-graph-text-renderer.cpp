@@ -33,7 +33,7 @@
 #include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
 #include <dali/internal/render/shaders/program.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 
 #if defined(DEBUG_ENABLED)

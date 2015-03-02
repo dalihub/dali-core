@@ -35,7 +35,7 @@
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/renderers/scene-graph-image-renderer.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment-debug.h>
 

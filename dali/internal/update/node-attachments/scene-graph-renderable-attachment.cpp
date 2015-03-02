@@ -27,7 +27,7 @@
 #include <dali/internal/update/resources/resource-tracker.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/common/image-sampler.h>
 
 namespace Dali

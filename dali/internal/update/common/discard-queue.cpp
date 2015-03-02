@@ -25,7 +25,7 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
 {

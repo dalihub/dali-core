@@ -29,7 +29,7 @@
 #include <dali/internal/render/common/vertex.h>
 #include <dali/internal/render/renderers/scene-graph-text-renderer.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/nodes/node.h>

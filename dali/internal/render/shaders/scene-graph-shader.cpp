@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/render/queue/render-queue.h>
