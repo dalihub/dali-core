@@ -378,7 +378,7 @@ bool RenderManager::Render( Integration::RenderStatus& status )
     mImpl->context.ColorMask( true );
     mImpl->context.DepthMask( true );
     mImpl->context.StencilMask( 0xFF ); // 8 bit stencil mask, all 1's
-    mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT );
+    mImpl->context.Clear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT,  Context::FORCE_CLEAR );
 
     // reset the program matrices for all programs once per frame
     // this ensures we will set view and projection matrix once per program per camera
@@ -506,7 +506,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
     mImpl->context.SetScissorTest( true );
     mImpl->context.Scissor( viewportRect.x, viewportRect.y, viewportRect.width, viewportRect.height );
     mImpl->context.ColorMask( true );
-    mImpl->context.Clear( GL_COLOR_BUFFER_BIT );
+    mImpl->context.Clear( GL_COLOR_BUFFER_BIT , Context::CHECK_CACHED_VALUES );
     mImpl->context.SetScissorTest( false );
   }
 
