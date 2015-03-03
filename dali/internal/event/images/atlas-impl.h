@@ -19,8 +19,11 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/images/atlas.h>
+#include <dali/internal/event/images/context-recovery-interface.h>
 #include <dali/internal/event/images/image-impl.h>
+#include <dali/internal/event/images/buffer-image-impl.h>
 
 namespace Dali
 {
@@ -30,14 +33,12 @@ namespace Internal
 
 class ResourceClient;
 
+typedef Dali::Atlas::SizeType SizeType;
+
 /**
- * @brief An Atlas is a large image containing multiple smaller images.
- *
- * Bitmap images must be uploaded at a specified position, to populate the Atlas.
- * The client is reponsible for generating the appropriate geometry (UV coordinates),
- * needed to draw images within the Atlas.
+ * Internal class for Dali::Atlas
  */
-class Atlas : public Image
+class Atlas : public Image, public ContextRecoveryInterface
 {
 public:
 
@@ -46,27 +47,40 @@ public:
    *
    * @pre width & height are greater than zero.
    * The maximum size of the atlas is limited by GL_MAX_TEXTURE_SIZE.
-   * @param [in] width       The atlas width in pixels.
-   * @param [in] height      The atlas height in pixels.
-   * @param [in] pixelFormat The pixel format (rgba 32 bit by default).
+   * @param [in] width          The atlas width in pixels.
+   * @param [in] height         The atlas height in pixels.
+   * @param [in] pixelFormat    The pixel format.
+   * @param [in] recoverContext Whether re-uploading the resource images automatically when regaining the context
    * @return A pointer to a new Atlas.
    */
-  static Atlas* New( std::size_t width,
-                     std::size_t height,
-                     Pixel::Format pixelFormat = Pixel::RGBA8888 );
+  static Atlas* New( SizeType width,
+                     SizeType height,
+                     Pixel::Format pixelFormat,
+                     bool recoverContext);
 
   /**
-   * @brief Upload a buffer image to the atlas.
-   *
-   * @pre The bitmap pixel format must match the Atlas format.
-   * @param [in] bufferImage The buffer image to upload.
-   * @param [in] xOffset Specifies an offset in the x direction within the atlas.
-   * @param [in] yOffset Specifies an offset in the y direction within the atlas.
-   * @return True if the bitmap fits within the atlas at the specified offset.
+   * @copydoc Dali::Atlas::Clear
    */
-  bool Upload( const BufferImage& bufferImage,
-               std::size_t xOffset,
-               std::size_t yOffset );
+  void Clear( const Vector4& color  );
+
+  /**
+   * @copydoc Dali::Atlas::Upload( const BufferImage&, unsigned int, unsigned int )
+   */
+  bool Upload( BufferImage& bufferImage,
+               SizeType xOffset,
+               SizeType yOffset );
+
+  /**
+   * @copydoc Dali::Atlas::Upload( const std::string&, unsigned int, unsigned int )
+   */
+  bool Upload( const std::string& url,
+               SizeType xOffset,
+               SizeType yOffset );
+
+  /**
+   * @copydoc ContextRecoveryInterface::RecoverFromContextLoss
+   */
+  virtual void RecoverFromContextLoss();
 
 protected:
 
@@ -75,13 +89,15 @@ protected:
    *
    * @pre width & height are greater than zero.
    * The maximum size of the atlas is limited by GL_MAX_TEXTURE_SIZE.
-   * @param [in] width       The atlas width in pixels.
-   * @param [in] height      The atlas height in pixels.
-   * @param [in] pixelFormat The pixel format (rgba 32 bit by default).
+   * @param [in] width          The atlas width in pixels.
+   * @param [in] height         The atlas height in pixels.
+   * @param [in] pixelFormat    The pixel format.
+   * @param [in] recoverContext Whether re-uploading the resource images automatically when regaining the context
    */
-  Atlas( std::size_t width,
-         std::size_t height,
-         Pixel::Format pixelFormat );
+  Atlas( SizeType width,
+         SizeType height,
+         Pixel::Format pixelFormat,
+         bool recoverContext);
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -102,12 +118,11 @@ private:
 
   /**
    * Helper for Upload methods
-   * @return True if the bitmap fits within the atlas at the specified offset
+   * @return True if the bitmap has the same pixel format and its size fits within the atlas at the specified offset
    */
-  bool IsWithin( const BufferImage& bufferImage,
-                 std::size_t xOffset,
-                 std::size_t yOffset );
-
+  bool Compatible( Pixel::Format pixelFormat,
+                   SizeType x,
+                   SizeType y );
   /**
    * Helper to create the Atlas resource
    */
@@ -118,11 +133,52 @@ private:
    */
   void ReleaseAtlas();
 
+  /**
+   * Upload a bitmap with the given color to clear the background.
+   */
+  void ClearBackground( const Vector4& color  );
+
+  /**
+   * Clear all the current tiles and resources of the atlas
+   */
+  void ClearCache();
+
+  /**
+   * Load the bitmap data from the url
+   */
+  Integration::BitmapPtr LoadBitmap( const std::string& url );
+
 private:
 
-  ResourceClient& mResourceClient;
+  /**
+   * Record of the url resource in the Atlas.
+   */
+  struct Tile
+  {
+    Tile( SizeType xOffset, SizeType yOffset, const std::string& url )
+    : xOffset( xOffset ), yOffset( yOffset ), url(url)
+    {}
 
-  Pixel::Format mPixelFormat;
+    ~Tile(){};
+
+    SizeType xOffset;   ///< Offset in the x direction within the atlas
+    SizeType yOffset;   ///< Offset in the y direction within the atlas
+    std::string url;    ///< The URL of the resource image file to use
+
+  private:
+    Tile(const Tile& rhs); ///< not defined
+    Tile& operator=(const Tile& rhs); ///< not defined
+  };
+
+private:
+
+  ResourceClient&          mResourceClient;
+  ImageFactory&            mImageFactory;
+  Vector4                  mClearColor;       ///< The background clear color
+  Vector<Tile*>            mTiles;            ///< The url resources, which would recover automatically when regaining context
+  Pixel::Format            mPixelFormat;      ///< The pixel format (rgba 32 bit by default)
+  bool                     mClear:1;          ///< Clear the backgound or not
+  bool                     mRecoverContext:1; ///< Re-upload the url resources or not when regaining context
 };
 
 } // namespace Internal

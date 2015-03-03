@@ -423,6 +423,14 @@ void ResourceManager::HandleUpdateBitmapAreaRequest( ResourceId textureId, const
   }
 }
 
+void ResourceManager::HandleUploadBitmapRequest( ResourceId destId, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset )
+{
+  if( destId && bitmap )
+  {
+    mImpl->mTextureCacheDispatcher.DispatchUpdateTexture( destId, bitmap, xOffset, yOffset );
+  }
+}
+
 void ResourceManager::HandleUploadBitmapRequest( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset )
 {
   if( destId && srcId )

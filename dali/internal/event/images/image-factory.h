@@ -19,8 +19,10 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/event/resources/resource-type-path-id-map.h>
 #include <dali/internal/event/resources/resource-ticket.h>
+#include <dali/internal/event/images/context-recovery-interface.h>
 #include <dali/internal/event/images/image-factory-cache.h>
 
 namespace Dali
@@ -97,6 +99,19 @@ public:
    * @note If an image is still loading, no new load request will be issued.
    */
   void RecoverFromContextLoss();
+
+  /**
+   * Register an object into the context recovery list of  the image factory.
+   * Thus its RecoverFromContextLoss() function would be called when the Stage regaining context.
+   * @param[in] object The object whose RecoverFromContextLoss() function needs to be called to regain the context.
+   */
+  void RegisterForContextRecovery( ContextRecoveryInterface* object  );
+
+  /**
+   * Unregister an object from the context recovery list of the image factory
+   * @param[in] object The object whose RecoverFromContextLoss() function needs to be called to regain the context.
+   */
+  void UnregisterFromContextRecovery( ContextRecoveryInterface* object  );
 
   /**
    * Get resource path used in request.
@@ -215,12 +230,13 @@ private:
   std::size_t GetHashForCachedRequest( const ImageFactoryCache::Request& request );
 
 private:
-  ResourceClient&                        mResourceClient;
-  ImageFactoryCache::RequestPathHashMap  mUrlCache;         ///< A multimap of url hashes and request IDs
-  ImageFactoryCache::RequestIdMap        mRequestCache;     ///< A map of request IDs and request information.
-  ResourceTicketContainer                mTicketsToRelease; ///< List of ticket handles
-  float                                  mMaxScale;         ///< Defines maximum size difference between compatible resources
-  ImageFactoryCache::RequestId           mReqIdCurrent;     ///< Internal counter for Request IDs
+  ResourceClient&                          mResourceClient;
+  ImageFactoryCache::RequestPathHashMap    mUrlCache;         ///< A multimap of url hashes and request IDs
+  ImageFactoryCache::RequestIdMap          mRequestCache;     ///< A map of request IDs and request information.
+  ResourceTicketContainer                  mTicketsToRelease; ///< List of ticket handles
+  Vector<ContextRecoveryInterface*>        mContextRecoveryList; ///< List of the objects who needs context recovery
+  float                                    mMaxScale;         ///< Defines maximum size difference between compatible resources
+  ImageFactoryCache::RequestId             mReqIdCurrent;     ///< Internal counter for Request IDs
 };
 
 } // namespace Internal
