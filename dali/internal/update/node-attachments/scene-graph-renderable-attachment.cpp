@@ -39,17 +39,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-void RenderableAttachment::SetSortModifier(float modifier)
-{
-  // Setting sort modifier makes the node dirty, i.e. we cannot reuse previous frames render items
-  if( mParent )
-  {
-    // only do this if we are on-stage
-    mParent->SetDirtyFlag( SortModifierFlag );
-  }
-  mSortModifier = modifier;
-}
-
 void RenderableAttachment::SetBlendingMode( BlendingMode::Type mode )
 {
   mBlendingMode = mode;
@@ -60,46 +49,6 @@ BlendingMode::Type RenderableAttachment::GetBlendingMode() const
   return mBlendingMode;
 }
 
-void RenderableAttachment::ChangeBlending( BufferIndex updateBufferIndex, bool useBlend )
-{
-  if ( mUseBlend != useBlend )
-  {
-    mUseBlend = useBlend;
-
-    // Enable/disable blending in the next render
-    typedef MessageValue1< Renderer, bool > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, useBlend );
-  }
-}
-
-void RenderableAttachment::SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options )
-{
-  // Blending options are forwarded to renderer in render-thread
-  typedef MessageValue1< Renderer, unsigned int > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetBlendingOptions, options );
-}
-
-void RenderableAttachment::SetBlendColor( BufferIndex updateBufferIndex, const Vector4& color )
-{
-  // Blend color is forwarded to renderer in render-thread
-  typedef MessageValue1< Renderer, Vector4 > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetBlendColor, color );
-}
 
 void RenderableAttachment::PrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager )
 {
@@ -161,34 +110,6 @@ void RenderableAttachment::FollowTracker( Integration::ResourceId id )
   }
 }
 
-void RenderableAttachment::SetCullFace( BufferIndex updateBufferIndex, CullFaceMode mode )
-{
-  DALI_ASSERT_DEBUG(mSceneController);
-  DALI_ASSERT_DEBUG(mode >= CullNone && mode <= CullFrontAndBack);
-
-  mCullFaceMode = mode;
-
-  typedef MessageValue1< Renderer, CullFaceMode > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetCullFace, mode );
-}
-
-void RenderableAttachment::SetSampler( BufferIndex updateBufferIndex, unsigned int samplerBitfield )
-{
-  DALI_ASSERT_DEBUG(mSceneController);
-
-  typedef MessageValue1< Renderer, unsigned int > DerivedType;
-
-  // Reserve some memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-  // Construct message in the render queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetSampler, samplerBitfield );
-}
 
 void RenderableAttachment::SetRecalculateScaleForSize()
 {
@@ -199,29 +120,6 @@ void RenderableAttachment::GetScaleForSize( const Vector3& nodeSize, Vector3& sc
 {
   DoGetScaleForSize( nodeSize, scaling );
   mScaleForSizeDirty = false;
-}
-
-void RenderableAttachment::ApplyShader( BufferIndex updateBufferIndex, Shader* shader )
-{
-  mShader = shader;
-
-  // send the message to renderer
-  SendShaderChangeMessage( updateBufferIndex );
-
-  // tell derived class to do something
-  ShaderChanged( updateBufferIndex );
-}
-
-void RenderableAttachment::RemoveShader( BufferIndex updateBufferIndex )
-{
-  // return to default shader
-  mShader = NULL;
-
-  // send the message to renderer
-  SendShaderChangeMessage( updateBufferIndex );
-
-  // tell derived class to do something
-  ShaderChanged( updateBufferIndex );
 }
 
 bool RenderableAttachment::ResolveVisibility( BufferIndex updateBufferIndex )
@@ -318,6 +216,23 @@ bool RenderableAttachment::IsBlendingOn( BufferIndex updateBufferIndex )
   return blend;
 }
 
+void RenderableAttachment::ChangeBlending( BufferIndex updateBufferIndex, bool useBlend )
+{
+  if ( mUseBlend != useBlend )
+  {
+    mUseBlend = useBlend;
+
+    // Enable/disable blending in the next render
+    typedef MessageValue1< Renderer, bool > DerivedType;
+
+    // Reserve some memory inside the render queue
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, useBlend );
+  }
+}
+
 void RenderableAttachment::PrepareRender( BufferIndex updateBufferIndex )
 {
   // call the derived class first as it might change its state regarding blending
@@ -339,8 +254,7 @@ RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
   mHasSizeAndColorFlag( false ),
   mResourcesReady( false ),
   mFinishedResourceAcquisition( false ),
-  mHasUntrackedResources( false ),
-  mCullFaceMode( CullNone )
+  mHasUntrackedResources( false )
 {
 }
 
@@ -355,12 +269,7 @@ void RenderableAttachment::ConnectToSceneGraph( SceneController& sceneController
   // Chain to derived attachments
   ConnectToSceneGraph2( updateBufferIndex );
 
-  // After derived classes have (potentially) created their renderer
-  Renderer& renderer = GetRenderer();
-  renderer.SetCullFace( mCullFaceMode );
-
-  // set the default shader here as well
-  renderer.SetShader( mShader );
+  // @todo MESH_REWORK: removed: renderer.SetCullFace & renderer.SetShader;
 }
 
 void RenderableAttachment::OnDestroy()
@@ -377,14 +286,17 @@ RenderableAttachment* RenderableAttachment::GetRenderable()
   return this;
 }
 
-void RenderableAttachment::SendShaderChangeMessage( BufferIndex updateBufferIndex )
+void RenderableAttachment::SetSortModifier(float modifier)
 {
-  typedef MessageValue1< Renderer, Shader* > DerivedType;
-  // Reserve memory inside the render queue
-  unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-  // Construct message in the mRenderer queue memory; note that delete should not be called on the return value
-  new (slot) DerivedType( &GetRenderer(), &Renderer::SetShader, mShader );
+  // Setting sort modifier makes the node dirty, i.e. we cannot reuse previous frames render items
+  if( mParent )
+  {
+    // only do this if we are on-stage
+    mParent->SetDirtyFlag( SortModifierFlag );
+  }
+  mSortModifier = modifier;
 }
+
 
 } // namespace SceneGraph
 

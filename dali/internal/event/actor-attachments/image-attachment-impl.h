@@ -255,7 +255,7 @@ private:
   /**
    * @copydoc Dali::Internal::RenderableAttachment::GetSceneObject()
    */
-  virtual const SceneGraph::RenderableAttachment& GetSceneObject() const;
+  const SceneGraph::ImageAttachment& GetSceneObject() const;
 
 protected:
 

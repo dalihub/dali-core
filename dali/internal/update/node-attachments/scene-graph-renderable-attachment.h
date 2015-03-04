@@ -51,22 +51,6 @@ class RenderableAttachment : public NodeAttachment
 public: // API
 
   /**
-   * Set the sort-modifier for the attachment.
-   * @param[in] modifier The depth-sort modifier.
-   */
-  void SetSortModifier(float modifier);
-
-  /**
-   * Retrieve the sort-modifier for the attachment.
-   * @return The sort-modifier.
-   */
-  float GetSortModifier() const
-  {
-    // inlined as its called a lot when sorting transparent renderers
-    return mSortModifier;
-  }
-
-  /**
    * @See Dali::RenderableActor::SetBlendMode().
    */
   void SetBlendingMode( BlendingMode::Type mode );
@@ -75,41 +59,6 @@ public: // API
    * @copydoc Dali::RenderableActor::GetBlendMode().
    */
   BlendingMode::Type GetBlendingMode() const;
-
-  /**
-   * Check if the blending mode has changed - if it has, send message to renderer
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] useBlending True if the renderer should use blending option
-   */
-  void ChangeBlending( BufferIndex updateBufferIndex, bool useBlending );
-
-  /**
-   * Set the blending options. This should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] options A bitmask of blending options.
-   */
-  void SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options );
-
-  /**
-   * Set the blend-color. This should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] color The new blend-color.
-   */
-  void SetBlendColor( BufferIndex updateBufferIndex, const Vector4& color );
-
-  /**
-   * Set the face-culling mode.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] mode The face-culling mode.
-   */
-  void SetCullFace( BufferIndex updateBufferIndex, CullFaceMode mode );
-
-  /**
-   * Set the sampler used to render the texture for this renderable.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] samplerBitfield The image sampler packed options to set.
-   */
-  void SetSampler( BufferIndex updateBufferIndex, unsigned int samplerBitfield );
 
   /**
    * Flag to check if any geometry scaling is needed, inlined as called from update algorithm often
@@ -142,18 +91,6 @@ public: // API
    */
   void GetScaleForSize( const Vector3& nodeSize, Vector3& scaling );
 
-  /**
-   * Apply a shader on the renderable
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] shader to apply.
-   */
-  void ApplyShader( BufferIndex updateBufferIndex, Shader* shader );
-
-  /**
-   * Remove the shader from the renderable
-   * @param[in] updateBufferIndex The current update buffer index.
-   */
-  void RemoveShader( BufferIndex updateBufferIndex );
 
 public: // For use during in the update algorithm only
 
@@ -187,6 +124,13 @@ public: // For use during in the update algorithm only
    * @return true if blending is enabled, false otherwise.
    */
   bool IsBlendingOn( BufferIndex updateBufferIndex );
+
+  /**
+   * Check if the blending mode has changed - if it has, send message to renderer
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] useBlending True if the renderer should use blending option
+   */
+  void ChangeBlending( BufferIndex updateBufferIndex, bool useBlending );
 
   /**
    * Prepare the object for rendering.
@@ -242,17 +186,9 @@ public: // API for derived classes
   virtual bool IsFullyOpaque( BufferIndex updateBufferIndex ) = 0;
 
   /**
-   * Called to notify that the shader might have been changed
-   * The implementation should recalculate geometry and scale based on the
-   * hints from the new shader
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @return Return true if the geometry changed.
-   */
-  virtual void ShaderChanged( BufferIndex updateBufferIndex ) = 0;
-
-  /**
    * Called to notify that the size has been changed
-   * The implementation may tell the renderer to recalculate geometry and scale based on the new size
+   * The implementation may tell the renderer to recalculate scale
+   * based on the new size
    * @param[in] updateBufferIndex The current update buffer index.
    */
   virtual void SizeChanged( BufferIndex updateBufferIndex ) = 0;
@@ -273,6 +209,23 @@ public: // API for derived classes
    * @param[out] scaling factors
    */
   virtual void DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling );
+
+
+  /**
+   * Set the sort-modifier for the attachment.
+   * @param[in] modifier The depth-sort modifier.
+   */
+  void SetSortModifier(float modifier);
+
+  /**
+   * Retrieve the sort-modifier for the attachment.
+   * @return The sort-modifier.
+   */
+  float GetSortModifier() const
+  {
+    // inlined as its called a lot when sorting transparent renderers
+    return mSortModifier;
+  }
 
 protected:
 
@@ -315,12 +268,6 @@ private:
    */
   virtual bool DoPrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager ) = 0;
 
-  /**
-   * Sends the shader to the renderer
-   * @param updateBufferIndex for the message buffer
-   */
-  void SendShaderChangeMessage( BufferIndex updateBufferIndex );
-
   // Undefined
   RenderableAttachment( const RenderableAttachment& );
 
@@ -328,7 +275,6 @@ private:
   RenderableAttachment& operator=( const RenderableAttachment& rhs );
 
 protected:
-
   SceneController* mSceneController;   ///< Used for initializing renderers whilst attached
   Shader*          mShader;            ///< A pointer to the shader
 
@@ -345,33 +291,9 @@ protected:
   bool mResourcesReady:1;              ///< Set during the Update algorithm; true if the attachment has resources ready for the current frame.
   bool mFinishedResourceAcquisition:1; ///< Set during DoPrepareResources; true if ready & all resource acquisition has finished (successfully or otherwise)
   bool mHasUntrackedResources:1;       ///< Set during PrepareResources, true if have tried to follow untracked resources
-  CullFaceMode mCullFaceMode:3;        ///< Cullface mode, 3 bits is enough for 4 values
-
 };
 
 // Messages for RenderableAttachment
-
-inline void SetSortModifierMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, float modifier )
-{
-  typedef MessageValue1< RenderableAttachment, float > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &RenderableAttachment::SetSortModifier, modifier );
-}
-
-inline void SetCullFaceMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, CullFaceMode mode )
-{
-  typedef MessageDoubleBuffered1< RenderableAttachment, CullFaceMode > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &RenderableAttachment::SetCullFace, mode );
-}
 
 inline void SetBlendingModeMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, BlendingMode::Type mode )
 {
@@ -381,62 +303,6 @@ inline void SetBlendingModeMessage( EventToUpdate& eventToUpdate, const Renderab
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &attachment, &RenderableAttachment::SetBlendingMode, mode );
-}
-
-inline void SetBlendingOptionsMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, unsigned int options )
-{
-  typedef MessageDoubleBuffered1< RenderableAttachment, unsigned int > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  new (slot) LocalType( &attachment, &RenderableAttachment::SetBlendingOptions, options );
-}
-
-inline void SetBlendColorMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, const Vector4& color )
-{
-  typedef MessageDoubleBuffered1< RenderableAttachment, Vector4 > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  new (slot) LocalType( &attachment, &RenderableAttachment::SetBlendColor, color );
-}
-
-inline void SetSamplerMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, unsigned int samplerBitfield )
-{
-  typedef MessageDoubleBuffered1< RenderableAttachment, unsigned int > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &RenderableAttachment::SetSampler, samplerBitfield );
-}
-
-inline void ApplyShaderMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, const Shader& constShader )
-{
-  // Update thread can edit the object
-  Shader& shader = const_cast< Shader& >( constShader );
-
-  typedef MessageDoubleBuffered1< RenderableAttachment, Shader* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &RenderableAttachment::ApplyShader, &shader );
-}
-
-inline void RemoveShaderMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment )
-{
-  typedef MessageDoubleBuffered0< RenderableAttachment > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &RenderableAttachment::RemoveShader );
 }
 
 } // namespace SceneGraph

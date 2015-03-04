@@ -75,7 +75,7 @@ Sampler::FilterMode Sampler::GetMinifyFilterMode( BufferIndex bufferIndex )
   return mMinFilter[bufferIndex];
 }
 
-Sampler::FilterMode Sampler::GetMagifyFilterMode( BufferIndex bufferIndex )
+Sampler::FilterMode Sampler::GetMagnifyFilterMode( BufferIndex bufferIndex )
 {
   // @todo MESH_REWORK
   return mMagFilter[bufferIndex];
@@ -91,6 +91,11 @@ Sampler::WrapMode Sampler::GetVWrapMode( BufferIndex bufferIndex )
 {
   // @todo MESH_REWORK
   return mVWrapMode[bufferIndex];
+}
+
+bool Sampler::IsFullyOpaque()
+{
+  return true; // @todo MESH_REWORK - check the actual image. For the moment, pretend it's opaque
 }
 
 } // namespace SceneGraph

@@ -127,7 +127,52 @@ public:
   void SetBorder( BufferIndex updateBufferIndex, const Vector4& border, bool inPixels );
 
   /**
-   * @copydoc RenderableAttachment::ShaderChanged()
+   * Set the blending options. This should only be called from the update-thread.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] options A bitmask of blending options.
+   */
+  void SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options );
+
+  /**
+   * Set the blend-color. This should only be called from the update-thread.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] color The new blend-color.
+   */
+  void SetBlendColor( BufferIndex updateBufferIndex, const Vector4& color );
+
+  /**
+   * Set the face-culling mode.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] mode The face-culling mode.
+   */
+  void SetCullFace( BufferIndex updateBufferIndex, CullFaceMode mode );
+
+  /**
+   * Set the sampler used to render the texture for this renderable.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] samplerBitfield The image sampler packed options to set.
+   */
+  void SetSampler( BufferIndex updateBufferIndex, unsigned int samplerBitfield );
+
+  /**
+   * Apply a shader on the renderable
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] shader to apply.
+   */
+  void ApplyShader( BufferIndex updateBufferIndex, Shader* shader );
+
+  /**
+   * Remove the shader from the renderable
+   * @param[in] updateBufferIndex The current update buffer index.
+   */
+  void RemoveShader( BufferIndex updateBufferIndex );
+
+  /**
+   * Called to notify that the shader might have been changed
+   * The implementation should recalculate geometry and scale based on the
+   * hints from the new shader
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @return Return true if the geometry changed.
    */
   virtual void ShaderChanged( BufferIndex updateBufferIndex );
 
@@ -154,6 +199,11 @@ protected:
   ImageAttachment( unsigned int textureId );
 
 private:
+  /**
+   * Sends the shader to the renderer
+   * @param updateBufferIndex for the message buffer
+   */
+  void SendShaderChangeMessage( BufferIndex updateBufferIndex );
 
   /**
    * @copydoc RenderableAttachment::ConnectToSceneGraph2().
@@ -192,6 +242,7 @@ private: // Data
   bool mIsPixelAreaSet       : 1; ///< Whether pixel area is set, cached for image actor to be able to ask for it
   int  mPreviousRefreshHints : 4; ///< The shader geometry hints, when the vertex buffer was last refreshed, 4 bits is enough as there's 4 flags
   Style mStyle               : 2; ///< rendering style, 2 bits is enough as only 2 values in the enum
+  CullFaceMode mCullFaceMode : 3; ///< Cullface mode, 3 bits is enough for 4 values
 
   BitmapMetadata  mBitmapMetadata;///< The bitmap metadata
   Vector2 mGeometrySize;          ///< The size of the currently used geometry
@@ -253,6 +304,84 @@ inline void SetNinePatchBorderMessage( EventToUpdate& eventToUpdate, const Image
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &ImageAttachment::SetBorder, border, inPixels );
+}
+
+inline void SetSortModifierMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, float modifier )
+{
+  typedef MessageValue1< ImageAttachment, float > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &ImageAttachment::SetSortModifier, modifier );
+}
+
+inline void SetCullFaceMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, CullFaceMode mode )
+{
+  typedef MessageDoubleBuffered1< ImageAttachment, CullFaceMode > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &ImageAttachment::SetCullFace, mode );
+}
+
+inline void SetBlendingOptionsMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, unsigned int options )
+{
+  typedef MessageDoubleBuffered1< ImageAttachment, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &attachment, &ImageAttachment::SetBlendingOptions, options );
+}
+
+inline void SetBlendColorMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, const Vector4& color )
+{
+  typedef MessageDoubleBuffered1< ImageAttachment, Vector4 > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &attachment, &ImageAttachment::SetBlendColor, color );
+}
+
+inline void SetSamplerMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, unsigned int samplerBitfield )
+{
+  typedef MessageDoubleBuffered1< ImageAttachment, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &ImageAttachment::SetSampler, samplerBitfield );
+}
+
+inline void ApplyShaderMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, const Shader& constShader )
+{
+  // Update thread can edit the object
+  Shader& shader = const_cast< Shader& >( constShader );
+
+  typedef MessageDoubleBuffered1< ImageAttachment, Shader* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &ImageAttachment::ApplyShader, &shader );
+}
+
+inline void RemoveShaderMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment )
+{
+  typedef MessageDoubleBuffered0< ImageAttachment > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &ImageAttachment::RemoveShader );
 }
 
 } // namespace SceneGraph

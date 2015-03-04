@@ -161,6 +161,22 @@ public:
   }
 
   /**
+   * @return True if the fragment shader outputs only 1.0 on the alpha channel
+   *
+   * @note Shaders that can output any value on the alpha channel
+   * including 1.0 should return false for this.
+   */
+  bool IsOutputOpaque();
+
+  /**
+   * @return True if the fragment shader can output any value but 1.0 on the alpha channel
+   *
+   * @note Shaders that can output any value on the alpha channel
+   * including 1.0 should return false for this
+   */
+  bool IsOutputTransparent();
+
+  /**
    * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties
    */
   virtual void ResetDefaultProperties( BufferIndex updateBufferIndex )

@@ -96,7 +96,7 @@ public: // SamplerDataProvider interface
    * @param[in] bufferIndex The buffer index to use
    * @return The magnify filter mode
    */
-  virtual FilterMode GetMagifyFilterMode( BufferIndex bufferIndex );
+  virtual FilterMode GetMagnifyFilterMode( BufferIndex bufferIndex );
 
   /**
    * Get the horizontal wrap mode
@@ -111,6 +111,12 @@ public: // SamplerDataProvider interface
    * @return The vertical wrap mode
    */
   virtual WrapMode GetVWrapMode( BufferIndex bufferIndex );
+
+  /**
+   * @return true if the texture is fully opaque.
+   * @todo MESH_REWORK Requires access to ResourceManager::GetBitmapMetadata()
+   */
+  bool IsFullyOpaque();
 
 private:
   std::string mUniformName; ///< The name of the uniform referencing this sampler

@@ -89,12 +89,6 @@ private:
    */
   virtual void OnStageDisconnection2() = 0;
 
-  /**
-   * For derived classes to provide a corresponding scene-graph object
-   * @return The scene-object.
-   */
-  virtual const SceneGraph::RenderableAttachment& GetSceneObject() const = 0;
-
 private: // Data, cached for actor-thread getters
 
 };

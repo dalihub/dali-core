@@ -137,12 +137,11 @@ SceneGraph::ImageAttachment* ImageAttachment::CreateSceneObject()
   return SceneGraph::ImageAttachment::New( 0u );
 }
 
-const SceneGraph::RenderableAttachment& ImageAttachment::GetSceneObject() const
+const SceneGraph::ImageAttachment& ImageAttachment::GetSceneObject() const
 {
   DALI_ASSERT_DEBUG( mSceneObject != NULL );
   return *mSceneObject;
 }
-
 
 void ImageAttachment::SetSortModifier(float modifier)
 {
