@@ -199,9 +199,9 @@ Rect<int> NinePatchImage::GetChildRectangle()
   return mChildRectangle;
 }
 
-Internal::BitmapImagePtr NinePatchImage::CreateCroppedBitmapImage()
+Internal::BufferImagePtr NinePatchImage::CreateCroppedBufferImage()
 {
-  BitmapImagePtr cropped;
+  BufferImagePtr cropped;
 
   if( ! mBitmap )
   {
@@ -211,7 +211,7 @@ Internal::BitmapImagePtr NinePatchImage::CreateCroppedBitmapImage()
   {
     Pixel::Format pixelFormat = mBitmap->GetPixelFormat();
 
-    cropped = BitmapImage::New( mWidth-2, mHeight-2, pixelFormat, Dali::Image::NEVER );
+    cropped = BufferImage::New( mWidth-2, mHeight-2, pixelFormat, Dali::Image::NEVER );
 
     Integration::Bitmap::PackedPixelsProfile* srcProfile = mBitmap->GetPackedPixelsProfile();
     DALI_ASSERT_DEBUG( srcProfile && "Wrong profile for source bitmap");

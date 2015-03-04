@@ -19,7 +19,6 @@
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/controllers/light-controller-impl.h>
 
 namespace Dali
 {
@@ -41,12 +40,10 @@ SceneControllerImpl::SceneControllerImpl( RenderMessageDispatcher& renderMessage
   mTextureCache( textureCache ),
   mCompleteStatusManager( completeStatusManager )
 {
-  mLightController  = new LightControllerImpl;
 }
 
 SceneControllerImpl::~SceneControllerImpl()
 {
-  delete mLightController;
 }
 
 } // namespace SceneGraph

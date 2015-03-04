@@ -76,21 +76,21 @@ inline void ProcessRenderList( const RenderList& renderList,
 
   const unsigned int renderFlags = renderList.GetFlags();
 
-  bool setDepthTest     = ( ( renderFlags & RenderList::DEPTH_TEST ) != 0u );
-  bool depthMask        = ( ( renderFlags & RenderList::DEPTH_WRITE ) != 0u );
+  bool enableDepthBuffer = ( ( renderFlags & RenderList::DEPTH_BUFFER_ENABLED ) != 0u );
+  bool depthMask         = ( ( renderFlags & RenderList::DEPTH_WRITE ) != 0u );
 
-  GLbitfield clearMask  = ( renderFlags & RenderList::DEPTH_CLEAR ) ? GL_DEPTH_BUFFER_BIT : 0u;
+  GLbitfield clearMask   = ( renderFlags & RenderList::DEPTH_CLEAR ) ? GL_DEPTH_BUFFER_BIT : 0u;
 
-  context.SetDepthTest( setDepthTest );
+  context.EnableDepthBuffer( enableDepthBuffer );
   context.DepthMask( depthMask );
 
-  // Stencil testing, writing, and clearing...
-  const bool enableStencilTest(  renderFlags & RenderList::STENCIL_TEST );
+  // Stencil enabled, writing, and clearing...
+  const bool enableStencilBuffer( renderFlags & RenderList::STENCIL_BUFFER_ENABLED );
   const bool enableStencilWrite( renderFlags & RenderList::STENCIL_WRITE );
 
-  context.SetStencilTest( enableStencilTest );
+  context.EnableStencilBuffer( enableStencilBuffer );
 
-  if( enableStencilTest )
+  if( enableStencilBuffer )
   {
     context.StencilFunc( (enableStencilWrite ? GL_ALWAYS : GL_EQUAL), 1, 0xFF );
     context.StencilOp(GL_KEEP, GL_REPLACE, GL_REPLACE);
@@ -105,7 +105,8 @@ inline void ProcessRenderList( const RenderList& renderList,
   // Clear depth and/or stencil buffer.
   if( clearMask )
   {
-    context.Clear( clearMask );
+    // only clear if the depth and/or stencil buffer have been written to after a previous clear
+    context.Clear( clearMask, Context::CHECK_CACHED_VALUES );
   }
 
   size_t count = renderList.Count();

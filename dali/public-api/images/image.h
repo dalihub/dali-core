@@ -150,7 +150,7 @@ public: // Signals
    *
    * It Will be sent after an actor using the image is added to
    * the stage, when such a staged image is reloaded, or when a staged
-   * BitmapImage calls Update().
+   * BufferImage calls Update().
    * @return A signal object to Connect() with.
    */
   ImageSignalType& UploadedSignal();

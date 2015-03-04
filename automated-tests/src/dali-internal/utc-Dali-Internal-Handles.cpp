@@ -60,17 +60,6 @@ int UtcDaliImageActorConstructorRefObject(void)
   END_TEST;
 }
 
-int UtcDaliLightActorConstructorRefObject(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::LightActor::LightActor(Internal::LightActor*) UtcDaliLightActorConstructorRefObject");
-
-  LightActor actor(NULL);
-
-  DALI_TEST_CHECK(!actor);
-  END_TEST;
-}
-
 int UtcDaliMeshActorConstructorRefObject(void)
 {
   TestApplication application;
@@ -82,17 +71,6 @@ int UtcDaliMeshActorConstructorRefObject(void)
   MeshActor* actorPtr = new MeshActor();
   DALI_TEST_CHECK( ! *actorPtr );
   delete actorPtr;
-  END_TEST;
-}
-
-int UtcDaliModelConstructorRefObject(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::Model::Model(Internal::Model*)");
-
-  Model model(NULL);
-
-  DALI_TEST_CHECK(!model);
   END_TEST;
 }
 

@@ -25,27 +25,27 @@
 using std::max;
 using namespace Dali;
 
-void utc_dali_bitmap_image_startup(void)
+void utc_dali_buffer_image_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_bitmap_image_cleanup(void)
+void utc_dali_buffer_image_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
 
-int UtcDaliBitmapImageNew01(void)
+int UtcDaliBufferImageNew01(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageNew01 - BitmapImage::New(unsigned int, unsigned int, Pixel::Format)");
+  tet_infoline("UtcDaliBufferImageNew01 - BufferImage::New(unsigned int, unsigned int, Pixel::Format)");
 
   // invoke default handle constructor
-  BitmapImage image;
+  BufferImage image;
 
   // initialise handle
-  image = BitmapImage::New(16, 16);
+  image = BufferImage::New(16, 16);
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -55,14 +55,14 @@ int UtcDaliBitmapImageNew01(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageNew02(void)
+int UtcDaliBufferImageNew02(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageNew02 - BitmapImage::New(PixelBuffer*, unsigned int, unsigned int, Pixel::Format, unsigned int)");
+  tet_infoline("UtcDaliBufferImageNew02 - BufferImage::New(PixelBuffer*, unsigned int, unsigned int, Pixel::Format, unsigned int)");
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8);
+  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -74,11 +74,11 @@ int UtcDaliBitmapImageNew02(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageNewWithPolicy01(void)
+int UtcDaliBufferImageNewWithPolicy01(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageNewWithPolicy01 - BitmapImage::New(unsigned int, unsigned int, Pixel::Format, LoadPolicy, ReleasePolicy)");
+  tet_infoline("UtcDaliBufferImageNewWithPolicy01 - BufferImage::New(unsigned int, unsigned int, Pixel::Format, LoadPolicy, ReleasePolicy)");
 
   // Force texture id's
   std::vector<GLuint> ids;
@@ -86,10 +86,10 @@ int UtcDaliBitmapImageNewWithPolicy01(void)
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
   // invoke default handle constructor
-  BitmapImage image;
+  BufferImage image;
 
   // initialise handle
-  image = BitmapImage::New(16, 16, Pixel::A8, Image::UNUSED);
+  image = BufferImage::New(16, 16, Pixel::A8, Image::UNUSED);
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -118,11 +118,11 @@ int UtcDaliBitmapImageNewWithPolicy01(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageNewWithPolicy02(void)
+int UtcDaliBufferImageNewWithPolicy02(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageNewWithPolicy02 - BitmapImage::New(PixelBuffer*, unsigned int, unsigned int, Pixel::Format, unsigned int, ReleasePolicy)");
+  tet_infoline("UtcDaliBufferImageNewWithPolicy02 - BufferImage::New(PixelBuffer*, unsigned int, unsigned int, Pixel::Format, unsigned int, ReleasePolicy)");
 
   // Force texture id's
   std::vector<GLuint> ids;
@@ -130,7 +130,7 @@ int UtcDaliBitmapImageNewWithPolicy02(void)
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8, 16, Image::UNUSED);
+  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8, 16, Image::UNUSED);
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -159,12 +159,12 @@ int UtcDaliBitmapImageNewWithPolicy02(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageDownCast(void)
+int UtcDaliBufferImageDownCast(void)
 {
   TestApplication application;
-  tet_infoline("Testing Dali::BitmapImage::DownCast()");
+  tet_infoline("Testing Dali::BufferImage::DownCast()");
 
-  BitmapImage bitmap = BitmapImage::New(1, 1, Dali::Pixel::BGRA8888);
+  BufferImage bitmap = BufferImage::New(1, 1, Dali::Pixel::BGRA8888);
   ImageActor imageActor = ImageActor::New(bitmap);
   application.SendNotification();
   application.Render(16);
@@ -172,16 +172,16 @@ int UtcDaliBitmapImageDownCast(void)
   application.SendNotification();
 
   Image image = imageActor.GetImage();
-  BitmapImage bitmapImage = BitmapImage::DownCast( image );
+  BufferImage bufferImage = BufferImage::DownCast( image );
 
-  DALI_TEST_CHECK(bitmapImage);
+  DALI_TEST_CHECK(bufferImage);
   END_TEST;
 }
 
-int UtcDaliBitmapImageDownCast2(void)
+int UtcDaliBufferImageDownCast2(void)
 {
   TestApplication application;
-  tet_infoline("Testing Dali::BitmapImage::DownCast()");
+  tet_infoline("Testing Dali::BufferImage::DownCast()");
 
   Image image = ResourceImage::New("IncorrectImageName");
   ImageActor imageActor = ImageActor::New(image);
@@ -192,22 +192,22 @@ int UtcDaliBitmapImageDownCast2(void)
 
   Image image1 = imageActor.GetImage();
 
-  BitmapImage bitmapImage = BitmapImage::DownCast( image1 );
-  DALI_TEST_CHECK(!bitmapImage);
+  BufferImage bufferImage = BufferImage::DownCast( image1 );
+  DALI_TEST_CHECK(!bufferImage);
 
   Actor unInitialzedActor;
-  bitmapImage = BitmapImage::DownCast( unInitialzedActor );
-  DALI_TEST_CHECK(!bitmapImage);
+  bufferImage = BufferImage::DownCast( unInitialzedActor );
+  DALI_TEST_CHECK(!bufferImage);
   END_TEST;
 }
 
-int UtcDaliBitmapImageWHITE(void)
+int UtcDaliBufferImageWHITE(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageWHITE - BitmapImage::WHITE()");
+  tet_infoline("UtcDaliBufferImageWHITE - BufferImage::WHITE()");
 
-  BitmapImage image = BitmapImage::WHITE();               // creates a 1x1 RGBA white pixel
+  BufferImage image = BufferImage::WHITE();               // creates a 1x1 RGBA white pixel
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -221,13 +221,13 @@ int UtcDaliBitmapImageWHITE(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageGetBuffer(void)
+int UtcDaliBufferImageGetBuffer(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageGetBuffer");
+  tet_infoline("UtcDaliBufferImageGetBuffer");
 
-  BitmapImage image = BitmapImage::WHITE();               // creates a 1x1 RGBA white pixel
+  BufferImage image = BufferImage::WHITE();               // creates a 1x1 RGBA white pixel
 
   PixelBuffer* buffer = image.GetBuffer();
   application.SendNotification();
@@ -241,13 +241,13 @@ int UtcDaliBitmapImageGetBuffer(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageGetBufferSize(void)
+int UtcDaliBufferImageGetBufferSize(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageGetBufferSize");
+  tet_infoline("UtcDaliBufferImageGetBufferSize");
 
-  BitmapImage image = BitmapImage::WHITE();               // creates a 1x1 RGBA white pixel
+  BufferImage image = BufferImage::WHITE();               // creates a 1x1 RGBA white pixel
   application.SendNotification();
   application.Render();
   application.Render();
@@ -263,13 +263,13 @@ int UtcDaliBitmapImageGetBufferSize(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageGetBufferStride(void)
+int UtcDaliBufferImageGetBufferStride(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageGetBufferStride");
+  tet_infoline("UtcDaliBufferImageGetBufferStride");
 
-  BitmapImage image = BitmapImage::WHITE();               // creates a 1x1 RGBA white pixel
+  BufferImage image = BufferImage::WHITE();               // creates a 1x1 RGBA white pixel
   application.SendNotification();
   application.Render();
   application.Render();
@@ -281,7 +281,7 @@ int UtcDaliBitmapImageGetBufferStride(void)
   DALI_TEST_CHECK( !image.IsDataExternal() );
 
   PixelBuffer* buffer = new PixelBuffer[20 * 16];
-  image = BitmapImage::New(buffer, 16, 16, Pixel::A8, 20);
+  image = BufferImage::New(buffer, 16, 16, Pixel::A8, 20);
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -296,14 +296,14 @@ int UtcDaliBitmapImageGetBufferStride(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageGetPixelFormat(void)
+int UtcDaliBufferImageGetPixelFormat(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageGetPixelFormat");
+  tet_infoline("UtcDaliBufferImageGetPixelFormat");
 
   // Set pixel format to a non-default
-  BitmapImage image = BitmapImage::New( 16, 16, Pixel::A8 );
+  BufferImage image = BufferImage::New( 16, 16, Pixel::A8 );
   application.SendNotification();
   application.Render(16);
   application.Render(16);
@@ -314,14 +314,14 @@ int UtcDaliBitmapImageGetPixelFormat(void)
 }
 
 
-int UtcDaliBitmapImageIsDataExternal(void)
+int UtcDaliBufferImageIsDataExternal(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageIsDataExternal - BitmapImage::IsDataExternal()");
+  tet_infoline("UtcDaliBufferImageIsDataExternal - BufferImage::IsDataExternal()");
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8);
+  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
   application.SendNotification();
   application.Render();
   application.Render();
@@ -342,15 +342,15 @@ static void ImageUploaded(Image image)
 }
 }
 
-int UtcDaliBitmapImageUpdate01(void)
+int UtcDaliBufferImageUpdate01(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageUpdate01 - single empty rect");
+  tet_infoline("UtcDaliBufferImageUpdate01 - single empty rect");
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
 
-  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8);
+  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
   ImageActor actor = ImageActor::New(image);
   Stage::GetCurrent().Add(actor);
   actor.SetVisible(true);
@@ -391,14 +391,14 @@ int UtcDaliBitmapImageUpdate01(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageUpdate02(void)
+int UtcDaliBufferImageUpdate02(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageUpdate02 - Multiple rects");
+  tet_infoline("UtcDaliBufferImageUpdate02 - Multiple rects");
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8);
+  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
   ImageActor actor = ImageActor::New(image);
   Stage::GetCurrent().Add(actor);
   actor.SetVisible(true);
@@ -443,14 +443,14 @@ int UtcDaliBitmapImageUpdate02(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageUploadedSignal01(void)
+int UtcDaliBufferImageUploadedSignal01(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageUploadedSignal - Test that Uploaded signal is sent when image is staged");
+  tet_infoline("UtcDaliBufferImageUploadedSignal - Test that Uploaded signal is sent when image is staged");
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8);
+  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
   SignalReceived = false;
   image.UploadedSignal().Connect( ImageUploaded );
 
@@ -473,14 +473,14 @@ int UtcDaliBitmapImageUploadedSignal01(void)
   END_TEST;
 }
 
-int UtcDaliBitmapImageUploadedSignal02(void)
+int UtcDaliBufferImageUploadedSignal02(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliBitmapImageUploadedSignal - Test that Uploaded signal is sent after Update");
+  tet_infoline("UtcDaliBufferImageUploadedSignal - Test that Uploaded signal is sent after Update");
 
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
-  BitmapImage image = BitmapImage::New(buffer, 16, 16, Pixel::A8);
+  BufferImage image = BufferImage::New(buffer, 16, 16, Pixel::A8);
   SignalReceived = false;
   //ScopedConnection connection =
   image.UploadedSignal().Connect( ImageUploaded );

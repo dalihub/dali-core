@@ -109,20 +109,6 @@ public:
   void DisconnectMaterial( );
 
   /**
-   * Set whether this mesh actor should be affected by lights in the
-   * scene.  If it set to false, then the mesh will be unaffected by
-   * lighting, and will be evenly lit without any shading.
-   * This property is not inherited.
-   * @param[in] affectedByLighting Whether the actor should be lit by the scene lighting.
-   */
-  void SetAffectedByLighting( bool affectedByLighting );
-
-  /**
-   * @return true if the actor is lit by the scene, or false if evenly lit.
-   */
-  bool IsAffectedByLighting();
-
-  /**
    * Search the actor tree for all named bones in the mesh  and connect them.
    * @param[in] rootActor - the root actor of the actor tree.
    */
@@ -240,7 +226,6 @@ private:
   const SceneGraph::MeshAttachment* mSceneObject; ///< Not owned
 
   MeshAndCustomMaterial mMesh;
-  bool                  mAffectedByLighting;
   ConnectorList         mConnectors;
 };
 

@@ -70,10 +70,6 @@ typedef std::map<ResourceId, BitmapMetadata>     BitmapMetadataCache;
 typedef BitmapMetadataCache::iterator            BitmapMetadataIter;
 typedef std::pair<ResourceId, BitmapMetadata>    BitmapMetadataPair;
 
-typedef std::map<ResourceId, ModelDataPtr>       ModelCache;
-typedef ModelCache::iterator                     ModelCacheIter;
-typedef std::pair<ResourceId, ModelDataPtr>      ModelDataPair;
-
 typedef std::map<ResourceId, SceneGraph::Mesh*>  MeshCache;
 typedef MeshCache::iterator                      MeshCacheIter;
 typedef std::pair<ResourceId, SceneGraph::Mesh*> MeshDataPair;
@@ -157,7 +153,6 @@ struct ResourceManager::ResourceManagerImpl
    * This is the resource cache. It's filled/emptied from within Core::Update()
    */
   BitmapMetadataCache mBitmapMetadata;
-  ModelCache          mModels;
   MeshCache           mMeshes;
   ShaderCache         mShaders;
 };
@@ -509,11 +504,6 @@ void ResourceManager::HandleSaveResourceRequest( ResourceId id, const ResourceTy
         resource = GetShaderData(id);
         break;
       }
-      case ResourceModel:
-      {
-        resource = GetModelData(id);
-        break;
-      }
       case ResourceMesh:
       {
         break;
@@ -599,21 +589,6 @@ void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceT
   {
     mImpl->mPlatformAbstraction.CancelLoad(deadId, typeId);
   }
-}
-
-/********************************************************************************
- ******************** Event thread object direct interface  *********************
- ********************************************************************************/
-
-ModelDataPtr ResourceManager::GetModelData(ResourceId id)
-{
-  ModelDataPtr modelData;
-  ModelCacheIter iter = mImpl->mModels.find(id);
-  if(iter != mImpl->mModels.end())
-  {
-    modelData = iter->second;
-  }
-  return modelData;
 }
 
 /********************************************************************************
@@ -793,12 +768,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
         break;
       }
 
-      case ResourceModel:
-      {
-        mImpl->mModels.insert(ModelDataPair(id, static_cast<ModelData*>(resource.Get())));
-        break;
-      }
-
       case ResourceMesh:
       {
         break;
@@ -951,16 +920,6 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
       case ResourceNativeImage:
       case ResourceTargetImage:
         break;
-
-      case ResourceModel:
-      {
-        ModelCacheIter model = mImpl->mModels.find(iter->first);
-        DALI_ASSERT_DEBUG( mImpl->mModels.end() != model );
-
-        // model data is owned through intrusive pointers so no need for discard queue
-        mImpl->mModels.erase( model );
-        break;
-      }
 
       case ResourceMesh:
       {

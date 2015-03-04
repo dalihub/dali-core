@@ -25,7 +25,7 @@
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/actor-attachments/camera-attachment-impl.h>
-#include <dali/internal/event/common/property-index-ranges.h>
+#include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
@@ -35,26 +35,35 @@
 namespace Dali
 {
 
-const Property::Index CameraActor::TYPE                    = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-const Property::Index CameraActor::PROJECTION_MODE         = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 1;
-const Property::Index CameraActor::FIELD_OF_VIEW           = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 2;
-const Property::Index CameraActor::ASPECT_RATIO            = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 3;
-const Property::Index CameraActor::NEAR_PLANE_DISTANCE     = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 4;
-const Property::Index CameraActor::FAR_PLANE_DISTANCE      = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 5;
-const Property::Index CameraActor::LEFT_PLANE_DISTANCE     = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 6;
-const Property::Index CameraActor::RIGHT_PLANE_DISTANCE    = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 7;
-const Property::Index CameraActor::TOP_PLANE_DISTANCE      = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 8;
-const Property::Index CameraActor::BOTTOM_PLANE_DISTANCE   = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 9;
-const Property::Index CameraActor::TARGET_POSITION         = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 10;
-const Property::Index CameraActor::PROJECTION_MATRIX       = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 11;
-const Property::Index CameraActor::VIEW_MATRIX             = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 12;
-const Property::Index CameraActor::INVERT_Y_AXIS           = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 13;
-
 namespace Internal
 {
 
 namespace
 {
+
+// Properties
+
+/**
+ * We want to discourage the use of property strings (minimize string comparisons),
+ * particularly for the default properties.
+ *              Name                     Type   writable animatable constraint-input  enum for index-checking
+ */
+DALI_PROPERTY_TABLE_BEGIN
+DALI_PROPERTY( "type",                   STRING,   true,    false,   true,   Dali::CameraActor::Property::Type                 )
+DALI_PROPERTY( "projection-mode",        STRING,   true,    false,   true,   Dali::CameraActor::Property::ProjectionMode       )
+DALI_PROPERTY( "field-of-view",          FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FieldOfView          )
+DALI_PROPERTY( "aspect-ratio",           FLOAT,    true,    false,   true,   Dali::CameraActor::Property::AspectRatio          )
+DALI_PROPERTY( "near-plane-distance",    FLOAT,    true,    false,   true,   Dali::CameraActor::Property::NearPlaneDistance    )
+DALI_PROPERTY( "far-plane-distance",     FLOAT,    true,    false,   true,   Dali::CameraActor::Property::FarPlaneDistance     )
+DALI_PROPERTY( "left-plane-distance",    FLOAT,    true,    false,   true,   Dali::CameraActor::Property::LeftPlaneDistance    )
+DALI_PROPERTY( "right-plane-distance",   FLOAT,    true,    false,   true,   Dali::CameraActor::Property::RightPlaneDistance   )
+DALI_PROPERTY( "top-plane-distance",     FLOAT,    true,    false,   true,   Dali::CameraActor::Property::TopPlaneDistance     )
+DALI_PROPERTY( "bottom-plane-distance",  FLOAT,    true,    false,   true,   Dali::CameraActor::Property::BottomPlaneDistance  )
+DALI_PROPERTY( "target-position",        VECTOR3,  true,    false,   true,   Dali::CameraActor::Property::TargetPosition       )
+DALI_PROPERTY( "projection-matrix",      MATRIX,   false,   false,   true,   Dali::CameraActor::Property::ProjectionMatrix     )
+DALI_PROPERTY( "view-matrix",            MATRIX,   false,   false,   true,   Dali::CameraActor::Property::ViewMatrix           )
+DALI_PROPERTY( "invert-y-axis",          BOOLEAN,  true,    false,   true,   Dali::CameraActor::Property::InvertYAxis          )
+DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 
 // calculate the far plane distance for a 16bit depth buffer with 4 bits per unit precision
 void CalculateClippingAndZ( float width, float height, float& nearClippingPlane, float& farClippingPlane, float& cameraZ )
@@ -69,44 +78,7 @@ BaseHandle Create()
   return Dali::CameraActor::New();
 }
 
-TypeRegistration mType( typeid(Dali::CameraActor), typeid(Dali::Actor), Create );
-
-const char* DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[] =
-{
-  "type",
-  "projection-mode",
-  "field-of-view",
-  "aspect-ratio",
-  "near-plane-distance",
-  "far-plane-distance",
-  "left-plane-distance",
-  "right-plane-distance",
-  "top-plane-distance",
-  "bottom-plane-distance",
-  "target-position",
-  "projection-matrix",
-  "view-matrix",
-  "invert-y-axis"
-};
-const int DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT = sizeof( DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES ) / sizeof( DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[0] );
-
-const Property::Type DEFAULT_CAMERA_ACTOR_PROPERTY_TYPES[DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT] =
-{
-  Property::STRING,   // "type",
-  Property::STRING,   // "projection-mode",
-  Property::FLOAT,    // "field-of-view",
-  Property::FLOAT,    // "aspect-ratio",
-  Property::FLOAT,    // "near-plane-distance",
-  Property::FLOAT,    // "far-plane-distance",
-  Property::FLOAT,    // "left-plane-distance",
-  Property::FLOAT,    // "right-plane-distance",
-  Property::FLOAT,    // "top-plane-distance",
-  Property::FLOAT,    // "bottom-plane-distance",
-  Property::VECTOR3,  // "target-position",
-  Property::MATRIX,   // "projection-matrix",
-  Property::MATRIX,   // "view-matrix",
-  Property::BOOLEAN,  // "invert-y-axis",
-};
+TypeRegistration mType( typeid( Dali::CameraActor ), typeid( Dali::Actor ), Create );
 
 /**
  * Builds the picking ray in the world reference system from an orthographic camera
@@ -422,17 +394,17 @@ const Matrix& CameraActor::GetProjectionMatrix() const
 
 unsigned int CameraActor::GetDefaultPropertyCount() const
 {
-  return Actor::GetDefaultPropertyCount() + DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT;
+  return Actor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;
 }
 
 void CameraActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
   Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
 
-  indices.reserve( indices.size() + DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT );
+  indices.reserve( indices.size() + DEFAULT_PROPERTY_COUNT );
 
-  int index = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-  for ( int i = 0; i < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT; ++i, ++index )
+  int index = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
+  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
   {
     indices.push_back( index );
   }
@@ -440,58 +412,47 @@ void CameraActor::GetDefaultPropertyIndices( Property::IndexContainer& indices )
 
 bool CameraActor::IsDefaultPropertyWritable( Property::Index index ) const
 {
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return Actor::IsDefaultPropertyWritable(index);
+    return Actor::IsDefaultPropertyWritable( index );
   }
-  else
-  {
-    if( Dali::CameraActor::PROJECTION_MATRIX == index || Dali::CameraActor::VIEW_MATRIX == index )
-    {
-      return false;
-    }
-    else
-    {
-      return true;
-    }
-  }
+
+  return DEFAULT_PROPERTY_DETAILS[index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX].writable;
 }
 
 bool CameraActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 {
-  bool animatable = false; // Our properties are not animatable.
-
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    animatable = Actor::IsDefaultPropertyAnimatable(index);
+    return Actor::IsDefaultPropertyAnimatable( index );
   }
-  return animatable;
+
+  return DEFAULT_PROPERTY_DETAILS[index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX].animatable;
 }
 
 bool CameraActor::IsDefaultPropertyAConstraintInput( Property::Index index ) const
 {
-  bool animatable = true; // Our properties can be used as inputs to constraints.
-
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    animatable = Actor::IsDefaultPropertyAConstraintInput(index);
+    return Actor::IsDefaultPropertyAConstraintInput( index );
   }
-  return animatable;
+
+  return DEFAULT_PROPERTY_DETAILS[index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX].constraintInput;
 }
 
 Property::Type CameraActor::GetDefaultPropertyType( Property::Index index ) const
 {
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return Actor::GetDefaultPropertyType(index);
+    return Actor::GetDefaultPropertyType( index );
   }
   else
   {
-    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+    index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
 
-    if ( ( index >= 0 ) && ( index < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT ) )
+    if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
     {
-      return DEFAULT_CAMERA_ACTOR_PROPERTY_TYPES[index];
+      return DEFAULT_PROPERTY_DETAILS[index].type;
     }
     else
     {
@@ -509,11 +470,11 @@ const char* CameraActor::GetDefaultPropertyName( Property::Index index ) const
   }
   else
   {
-    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+    index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
 
-    if ( ( index >= 0 ) && ( index < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT ) )
+    if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
     {
-      return DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[index];
+      return DEFAULT_PROPERTY_DETAILS[index].name;
     }
     return NULL;
   }
@@ -524,11 +485,11 @@ Property::Index CameraActor::GetDefaultPropertyIndex(const std::string& name) co
   Property::Index index = Property::INVALID_INDEX;
 
   // Look for name in current class' default properties
-  for( int i = 0; i < DEFAULT_CAMERA_ACTOR_PROPERTY_COUNT; ++i )
+  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    if( 0 == strcmp( name.c_str(), DEFAULT_CAMERA_ACTOR_PROPERTY_NAMES[ i ] ) ) // dont want to convert rhs to string
+    if( 0 == strcmp( name.c_str(), DEFAULT_PROPERTY_DETAILS[i].name ) ) // dont want to convert rhs to string
     {
-      index = i + DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+      index = i + DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
       break;
     }
   }
@@ -553,9 +514,9 @@ void CameraActor::SetDefaultProperty( Property::Index index, const Property::Val
     DALI_ASSERT_DEBUG(mCameraAttachment && "where is the camera?");
     switch(index)
     {
-      case Dali::CameraActor::TYPE:
+      case Dali::CameraActor::Property::Type:
       {
-        std::string s(propertyValue.Get<std::string>());
+        std::string s( propertyValue.Get<std::string>() );
         if(s == "LOOK_AT_TARGET")
         {
           mCameraAttachment->SetType(Dali::Camera::LOOK_AT_TARGET);
@@ -570,7 +531,7 @@ void CameraActor::SetDefaultProperty( Property::Index index, const Property::Val
         }
         break;
       }
-      case Dali::CameraActor::PROJECTION_MODE:
+      case Dali::CameraActor::Property::ProjectionMode:
       {
         std::string s(propertyValue.Get<std::string>());
         if(s == "PERSPECTIVE_PROJECTION")
@@ -587,62 +548,62 @@ void CameraActor::SetDefaultProperty( Property::Index index, const Property::Val
         }
         break;
       }
-      case Dali::CameraActor::FIELD_OF_VIEW:
+      case Dali::CameraActor::Property::FieldOfView:
       {
         mCameraAttachment->SetFieldOfView(propertyValue.Get<float>());
         break;
       }
-      case Dali::CameraActor::ASPECT_RATIO:
+      case Dali::CameraActor::Property::AspectRatio:
       {
         mCameraAttachment->SetAspectRatio(propertyValue.Get<float>());
         break;
       }
-      case Dali::CameraActor::LEFT_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::LeftPlaneDistance:
       {
         mCameraAttachment->SetLeftClippingPlane(propertyValue.Get<float>());
         break;
       }
-      case Dali::CameraActor::RIGHT_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::RightPlaneDistance:
       {
         mCameraAttachment->SetRightClippingPlane(propertyValue.Get<float>());
         break;
       }
-      case Dali::CameraActor::TOP_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::TopPlaneDistance:
       {
         mCameraAttachment->SetTopClippingPlane(propertyValue.Get<float>());
         break;
       }
-      case Dali::CameraActor::BOTTOM_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::BottomPlaneDistance:
       {
         mCameraAttachment->SetBottomClippingPlane(propertyValue.Get<float>());
         break;
       }
-      case Dali::CameraActor::NEAR_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::NearPlaneDistance:
       {
         mCameraAttachment->SetNearClippingPlane(propertyValue.Get<float>());
         break;
       }
-      case Dali::CameraActor::FAR_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::FarPlaneDistance:
       {
         mCameraAttachment->SetFarClippingPlane(propertyValue.Get<float>());
         break;
       }
-      case Dali::CameraActor::TARGET_POSITION:
+      case Dali::CameraActor::Property::TargetPosition:
       {
         mCameraAttachment->SetTargetPosition(propertyValue.Get<Vector3>());
         break;
       }
-      case Dali::CameraActor::PROJECTION_MATRIX:
+      case Dali::CameraActor::Property::ProjectionMatrix:
       {
         DALI_LOG_WARNING("projection-matrix property is not animatable \n");
         break;
       }
-      case Dali::CameraActor::VIEW_MATRIX:
+      case Dali::CameraActor::Property::ViewMatrix:
       {
         DALI_LOG_WARNING("view-matrix property is not animatable \n");
         break;
       }
-      case Dali::CameraActor::INVERT_Y_AXIS:
+      case Dali::CameraActor::Property::InvertYAxis:
       {
         mCameraAttachment->SetInvertYAxis(propertyValue.Get<bool>());
         break;
@@ -669,8 +630,7 @@ Property::Value CameraActor::GetDefaultProperty( Property::Index index ) const
     DALI_ASSERT_DEBUG(mCameraAttachment && "where is the camera?");
     switch(index)
     {
-
-      case Dali::CameraActor::TYPE:
+      case Dali::CameraActor::Property::Type:
       {
         if(mCameraAttachment->GetType() == Dali::Camera::LOOK_AT_TARGET)
         {
@@ -687,9 +647,7 @@ Property::Value CameraActor::GetDefaultProperty( Property::Index index ) const
         }
         break;
       }
-
-
-      case Dali::CameraActor::PROJECTION_MODE:
+      case Dali::CameraActor::Property::ProjectionMode:
       {
         if(mCameraAttachment->GetProjectionMode() == Dali::Camera::PERSPECTIVE_PROJECTION)
         {
@@ -706,62 +664,62 @@ Property::Value CameraActor::GetDefaultProperty( Property::Index index ) const
         }
         break;
       }
-      case Dali::CameraActor::FIELD_OF_VIEW:
+      case Dali::CameraActor::Property::FieldOfView:
       {
         ret = mCameraAttachment->GetFieldOfView();
         break;
       }
-      case Dali::CameraActor::ASPECT_RATIO:
+      case Dali::CameraActor::Property::AspectRatio:
       {
         ret = mCameraAttachment->GetAspectRatio();
         break;
       }
-      case Dali::CameraActor::LEFT_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::LeftPlaneDistance:
       {
         ret = mCameraAttachment->GetLeftClippingPlane();
         break;
       }
-      case Dali::CameraActor::RIGHT_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::RightPlaneDistance:
       {
         ret = mCameraAttachment->GetRightClippingPlane();
         break;
       }
-      case Dali::CameraActor::TOP_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::TopPlaneDistance:
       {
         ret = mCameraAttachment->GetTopClippingPlane();
         break;
       }
-      case Dali::CameraActor::BOTTOM_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::BottomPlaneDistance:
       {
         ret = mCameraAttachment->GetBottomClippingPlane();
         break;
       }
-      case Dali::CameraActor::NEAR_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::NearPlaneDistance:
       {
         ret = mCameraAttachment->GetNearClippingPlane();
         break;
       }
-      case Dali::CameraActor::FAR_PLANE_DISTANCE:
+      case Dali::CameraActor::Property::FarPlaneDistance:
       {
         ret = mCameraAttachment->GetFarClippingPlane();
         break;
       }
-      case Dali::CameraActor::TARGET_POSITION:
+      case Dali::CameraActor::Property::TargetPosition:
       {
         ret = mCameraAttachment->GetTargetPosition();
         break;
       }
-      case Dali::CameraActor::PROJECTION_MATRIX:
+      case Dali::CameraActor::Property::ProjectionMatrix:
       {
         ret = mCameraAttachment->GetProjectionMatrix();
         break;
       }
-      case Dali::CameraActor::VIEW_MATRIX:
+      case Dali::CameraActor::Property::ViewMatrix:
       {
         ret = mCameraAttachment->GetViewMatrix();
         break;
       }
-      case Dali::CameraActor::INVERT_Y_AXIS:
+      case Dali::CameraActor::Property::InvertYAxis:
       {
         ret = mCameraAttachment->GetInvertYAxis();
         break;
@@ -817,12 +775,12 @@ const PropertyInputImpl* CameraActor::GetSceneObjectInputProperty( Property::Ind
   {
     switch( index )
     {
-      case Dali::CameraActor::PROJECTION_MATRIX:
+      case Dali::CameraActor::Property::ProjectionMatrix:
       {
         property = mCameraAttachment->GetProjectionMatrixProperty();
         break;
       }
-      case Dali::CameraActor::VIEW_MATRIX:
+      case Dali::CameraActor::Property::ViewMatrix:
       {
         property = mCameraAttachment->GetViewMatrixProperty();
         break;

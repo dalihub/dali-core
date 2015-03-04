@@ -253,16 +253,16 @@ int UtcDaliAnimatableMeshGetPropertyIndex01(void)
   tet_infoline("Testing Dali::AnimatableMesh::operator[]");
   AnimatableMesh mesh = CreateMesh();
 
-  Property::Index i = mesh.GetPropertyIndex(0, AnimatableVertex::POSITION );
+  Property::Index i = mesh.GetPropertyIndex(0, AnimatableVertex::Property::Position );
   DALI_TEST_EQUALS( i, 0*3+0, TEST_LOCATION );
 
-  i = mesh.GetPropertyIndex(5, AnimatableVertex::POSITION );
+  i = mesh.GetPropertyIndex(5, AnimatableVertex::Property::Position );
   DALI_TEST_EQUALS( i, 5*3+0, TEST_LOCATION );
 
-  i = mesh.GetPropertyIndex(7, AnimatableVertex::COLOR );
+  i = mesh.GetPropertyIndex(7, AnimatableVertex::Property::Color );
   DALI_TEST_EQUALS( i, 7*3+1, TEST_LOCATION );
 
-  i = mesh.GetPropertyIndex(9, AnimatableVertex::TEXTURE_COORDS );
+  i = mesh.GetPropertyIndex(9, AnimatableVertex::Property::TextureCoords );
   DALI_TEST_EQUALS( i, 9*3+2, TEST_LOCATION );
   END_TEST;
 }
@@ -275,7 +275,7 @@ int UtcDaliAnimatableMeshGetPropertyIndex02(void)
   AnimatableMesh mesh = CreateMesh();
   try
   {
-    Property::Index i = mesh.GetPropertyIndex(12, AnimatableVertex::POSITION );
+    Property::Index i = mesh.GetPropertyIndex(12, AnimatableVertex::Property::Position );
     DALI_TEST_CHECK( i==0 );
   }
   catch (Dali::DaliException& e)
@@ -294,7 +294,7 @@ int UtcDaliAnimatableMeshGetPropertyIndex03(void)
   AnimatableMesh mesh = CreateMesh();
   try
   {
-    Property::Index i = mesh.GetPropertyIndex(12, AnimatableVertex::COLOR );
+    Property::Index i = mesh.GetPropertyIndex(12, AnimatableVertex::Property::Color );
     DALI_TEST_CHECK( i==0 );
   }
   catch (Dali::DaliException& e)
@@ -313,7 +313,7 @@ int UtcDaliAnimatableMeshGetPropertyIndex04(void)
   AnimatableMesh mesh = CreateMesh();
   try
   {
-    Property::Index i = mesh.GetPropertyIndex(12342343, AnimatableVertex::TEXTURE_COORDS );
+    Property::Index i = mesh.GetPropertyIndex(12342343, AnimatableVertex::Property::TextureCoords );
     DALI_TEST_CHECK( i==0 );
   }
   catch (Dali::DaliException& e)
@@ -380,8 +380,8 @@ int UtcDaliAnimatableMeshAnimateVertex01(void)
     mesh[1].SetPosition(Vector3(100.0f, 300.0f, 0.0f));
 
     Animation anim = Animation::New(1);
-    anim.AnimateBy(mesh.GetVertexProperty(0, AnimatableVertex::POSITION), Vector3(  0.0f, 100.0f, 0.0f));
-    anim.AnimateTo(mesh.GetVertexProperty(1, AnimatableVertex::POSITION), Vector3(100.0f,   0.0f, 0.0f));
+    anim.AnimateBy(mesh.GetVertexProperty(0, AnimatableVertex::Property::Position), Vector3(  0.0f, 100.0f, 0.0f));
+    anim.AnimateTo(mesh.GetVertexProperty(1, AnimatableVertex::Property::Position), Vector3(100.0f,   0.0f, 0.0f));
     anim.Play();
 
     application.SendNotification();

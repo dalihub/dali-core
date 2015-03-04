@@ -516,13 +516,6 @@ int UtcDaliTypeRegistryCreateDaliObjects(void)
   Stage::GetCurrent().Add( ca );
   application.Render();
 
-  type = registry.GetTypeInfo( "LightActor" );
-  DALI_TEST_CHECK( type );
-  LightActor la = LightActor::DownCast(type.CreateInstance());
-  DALI_TEST_CHECK( la );
-  Stage::GetCurrent().Add( la );
-  application.Render();
-
   // animations
   type = registry.GetTypeInfo( "Animation" );
   DALI_TEST_CHECK( type );

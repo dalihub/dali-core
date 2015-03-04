@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/modeling/model-impl.h>
 #include <dali/internal/event/modeling/animatable-mesh-impl.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
 
@@ -33,7 +32,6 @@ using Internal::MaterialIPtr;
 
 namespace Internal
 {
-
 
 namespace
 {
@@ -86,29 +84,6 @@ MeshActorPtr MeshActor::New(Dali::AnimatableMesh mesh)
   return actor;
 }
 
-
-MeshActorPtr MeshActor::New(ModelDataPtr modelData, Dali::Entity entity)
-{
-  MeshActorPtr actor = MeshActor::New();
-
-  actor->SetName(entity.GetName());
-
-  DALI_ASSERT_ALWAYS(entity.NumberOfMeshes() == 1 && "Dali does not support multiple meshes per node in the model");
-
-  actor->SetMesh(modelData, entity.GetMeshByIndex(0)); // only use the first mesh
-
-  Matrix transform(entity.GetTransformMatrix());
-  Vector3 position;
-  Quaternion rotation;
-  Vector3 scale;
-  transform.GetTransformComponents(position, rotation, scale);
-  actor->SetPosition(position);
-  actor->SetRotation(rotation);
-  actor->SetScale(scale);
-
-  return actor;
-}
-
 MeshActor::MeshActor()
 : RenderableActor()
 {
@@ -136,18 +111,6 @@ void MeshActor::SetMesh( MeshIPtr meshPtr )
   mMeshAttachment->SetMesh( meshPtr, meshPtr->GetResourceId(), meshPtr->GetBones(),  meshPtr->GetMaterial() );
 }
 
-// Used by Internal::ModelActorFactory
-void MeshActor::SetMesh(ModelDataPtr modelData, unsigned int meshIndex)
-{
-  ResourceTicketPtr meshTicket = modelData->GetMeshTicket(meshIndex);
-  const Dali::MeshData& meshData = modelData->GetMesh(meshIndex);
-  Dali::Material material = meshData.GetMaterial();
-  DALI_ASSERT_ALWAYS( material && "No material found" );
-  MaterialIPtr matPtr = &GetImplementation(material);
-
-  mMeshAttachment->SetMesh(meshTicket, meshData.GetBones(), matPtr);
-}
-
 void MeshActor::SetMaterial(const Dali::Material material)
 {
   MaterialIPtr materialPtr = const_cast<Internal::Material*>(&GetImplementation(material));
@@ -166,16 +129,6 @@ Dali::Material MeshActor::GetMaterial() const
   }
 
   return material;
-}
-
-void MeshActor::SetAffectedByLighting(bool affectedByLighting)
-{
-  mMeshAttachment->SetAffectedByLighting( affectedByLighting );
-}
-
-bool MeshActor::IsAffectedByLighting()
-{
-  return mMeshAttachment->IsAffectedByLighting();
 }
 
 void MeshActor::BindBonesToMesh(Internal::ActorPtr rootActor)

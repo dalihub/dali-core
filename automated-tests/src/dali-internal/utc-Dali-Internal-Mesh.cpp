@@ -81,31 +81,6 @@ Mesh CreateMesh( TestApplication& application )
   return publicMesh;
 }
 
-Model CreateModel(TestApplication& application)
-{
-  TestPlatformAbstraction& platform = application.GetPlatform();
-
-  // Raise a request
-  Model model = Model::New("Tree");
-
-  application.SendNotification();
-  application.Render();
-
-  Dali::ModelData modelData = BuildTreeModel();
-  Integration::ResourceRequest* request = platform.GetRequest(); // Return modelData
-  if(request)
-  {
-    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, Integration::ResourcePointer(&(modelData.GetBaseObject())));
-  }
-  application.Render();           // This will perform the GetResources() to get the model data
-  application.SendNotification(); // This will handle model loaded (triggering mesh allocation)
-  application.Render();           // This will allocate meshes in update manager
-  application.SendNotification();
-
-  return model;
-}
-
-
 Internal::MeshData& GetStagedMeshData( unsigned int resourceId )
 {
     // ResourceManager::GetMesh() will give us the scene graph mesh from resource id
@@ -145,7 +120,6 @@ void TestMeshDiscard( ResourcePolicy::DataRetention policy, bool expectedDiscard
   MeshActor actor = MeshActor::New( publicMesh );
   std::string name = "AMeshActor";
   actor.SetName(name);
-  actor.SetAffectedByLighting(false);
   Stage::GetCurrent().Add(actor);
 
   // render it
@@ -167,69 +141,6 @@ void TestMeshDiscard( ResourcePolicy::DataRetention policy, bool expectedDiscard
     DALI_TEST_CHECK( internalFaces.size() == 0 );
   }
 }
-
-
-
-void TestModelDiscard( ResourcePolicy::DataRetention policy, bool expectedDiscardResult )
-{
-  TestApplication application( TestApplication::DEFAULT_SURFACE_WIDTH,
-                               TestApplication::DEFAULT_SURFACE_HEIGHT,
-                               TestApplication::DEFAULT_HORIZONTAL_DPI,
-                               TestApplication::DEFAULT_VERTICAL_DPI,
-                               policy );
-
-  // run through startup, clearing all requests/messages
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-
-  unsigned int nextResourceId = GetNextResourceId(application);
-  Model model = CreateModel(application);
-
-  // 2 resource id's should be generated, 1st for the model, 2nd for the only mesh
-  Internal::MeshData& meshData = GetStagedMeshData(nextResourceId+1);
-
-  // Check that the vertex data is allocated
-  const Internal::MeshData::VertexContainer& internalVertices = meshData.GetVertices();
-  const Internal::MeshData::FaceIndices& internalFaces = meshData.GetFaces();
-  DALI_TEST_CHECK( meshData.GetVertexCount() > 0 );
-  DALI_TEST_CHECK( meshData.GetFaceCount() > 0 );
-  DALI_TEST_CHECK( internalVertices.size() > 0 );
-  DALI_TEST_CHECK( internalFaces.size() > 0 );
-
-  // Create an actor that will render the mesh
-  Actor actor = ModelActorFactory::BuildActorTree(model, ""); // model should be loaded
-  Light light = Light::New("KeyLight");
-  light.SetFallOff(Vector2(10000.0f, 10000.0f));
-  LightActor keyLightActor = LightActor::New();
-  keyLightActor.SetParentOrigin(ParentOrigin::CENTER);
-  keyLightActor.SetPosition(200.0f, 500.0f, 300.0f);
-  keyLightActor.SetName(light.GetName());
-  keyLightActor.SetLight(light);
-  keyLightActor.SetActive(true);
-  Stage::GetCurrent().Add(keyLightActor);
-  Stage::GetCurrent().Add(actor);
-
-  // render it
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-
-  // Check that the vertex data has been discarded
-  DALI_TEST_CHECK( meshData.GetVertexCount() > 0 );
-  DALI_TEST_CHECK( meshData.GetFaceCount() > 0 );
-  if( expectedDiscardResult == false )
-  {
-    DALI_TEST_CHECK( internalVertices.size() > 0 );
-    DALI_TEST_CHECK( internalFaces.size() > 0 );
-  }
-  else
-  {
-    DALI_TEST_CHECK( internalVertices.size() == 0 );
-    DALI_TEST_CHECK( internalFaces.size() == 0 );
-  }
-}
-
 
 } // anon namespace
 
@@ -252,26 +163,5 @@ int utcDaliInternalMeshDiscard03(void)
 {
   tet_infoline("Test that internal mesh data is not discarded after rendering with policy=RETAIN_MESH");
   TestMeshDiscard( ResourcePolicy::DALI_RETAINS_MESH_DATA, false /* Not discarded */);
-  END_TEST;
-}
-
-int utcDaliInternalModelDiscard01(void)
-{
-  tet_infoline("Test that model's internal mesh data is discarded after rendering with policy=DISCARD_ALL");
-  TestModelDiscard( ResourcePolicy::DALI_DISCARDS_ALL_DATA, true /* Not discarded */);
-  END_TEST;
-}
-
-int utcDaliInternalModelDiscard02(void)
-{
-  tet_infoline("Test that model's internal mesh data is not discarded after rendering with policy=RETAIN_ALL");
-  TestModelDiscard( ResourcePolicy::DALI_RETAINS_ALL_DATA, false /* Not discarded */);
-  END_TEST;
-}
-
-int utcDaliInternalModelDiscard03(void)
-{
-  tet_infoline("Test that model's internal mesh data is not discarded after rendering with policy=RETAIN_MESH");
-  TestModelDiscard( ResourcePolicy::DALI_RETAINS_MESH_DATA, false /* Not discarded */);
   END_TEST;
 }

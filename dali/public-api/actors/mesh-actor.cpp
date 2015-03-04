@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/mesh-actor-impl.h>
-#include <dali/internal/event/modeling/model-impl.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
 #include <dali/internal/event/modeling/animatable-mesh-impl.h>
 
@@ -98,16 +97,6 @@ void MeshActor::SetMaterial(Material material)
 Material MeshActor::GetMaterial() const
 {
   return GetImplementation(*this).GetMaterial();
-}
-
-void MeshActor::SetAffectedByLighting(bool affectedByLighting)
-{
-  GetImplementation(*this).SetAffectedByLighting(affectedByLighting);
-}
-
-bool MeshActor::IsAffectedByLighting()
-{
-  return GetImplementation(*this).IsAffectedByLighting();
 }
 
 void MeshActor::BindBonesToMesh(Actor rootActor)

@@ -71,7 +71,7 @@ public:
    * @param lightController to get the light information
    * @return The newly allocated MeshRenderer.
    */
-  static MeshRenderer* New( RenderDataProvider& dataprovider, LightController& lightController );
+  static MeshRenderer* New( RenderDataProvider& dataprovider);
 
   /**
    * Retrieve the mesh information for the next frame.
@@ -87,11 +87,6 @@ public:
    * Called when the shader has changed; mCustomUniform should be reset.
    */
   void ResetCustomUniforms();
-
-  /**
-   * Set whether the renderer should be affected by scene lighting, or evenly lit
-   */
-  void SetAffectedByLighting( bool affectedByLighting );
 
   /**
    * Virtual destructor
@@ -157,8 +152,6 @@ private:
 private:
 
   MeshInfo         mMeshInfo[2];          ///< Double-buffered for update/render in separate threads.
-  LightController* mLightController;      ///< required to get the lights from the scene.
-  bool             mAffectedByLighting;   ///< Whether the scene lights should be used
   GeometryType     mGeometryType;         ///< Records last geometry type
   ShaderSubTypes   mShaderType;           ///< Records last shader type
 

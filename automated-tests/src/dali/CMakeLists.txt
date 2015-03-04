@@ -15,7 +15,7 @@ SET(TC_SOURCES
         utc-Dali-Any.cpp
         utc-Dali-Atlas.cpp
         utc-Dali-BaseHandle.cpp
-        utc-Dali-BitmapImage.cpp
+        utc-Dali-BufferImage.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-Constraint.cpp
         utc-Dali-Context.cpp
@@ -29,6 +29,7 @@ SET(TC_SOURCES
         utc-Dali-DynamicsWorld.cpp
         utc-Dali-DynamicsWorldConfig.cpp
         utc-Dali-EncodedBufferImage.cpp
+        utc-Dali-FixedSizeMemoryPool.cpp
         utc-Dali-FrameBufferImage.cpp
         utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
@@ -40,7 +41,6 @@ SET(TC_SOURCES
         utc-Dali-ImageAttributes.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
-        utc-Dali-LightActor.cpp
         utc-Dali-LocklessBuffer.cpp
         utc-Dali-LongPressGesture.cpp
         utc-Dali-LongPressGestureDetector.cpp
@@ -48,9 +48,9 @@ SET(TC_SOURCES
         utc-Dali-MathUtils.cpp
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp
+        utc-Dali-MemoryPoolObjectAllocator.cpp
         utc-Dali-MeshActor.cpp
         utc-Dali-MeshData.cpp
-        utc-Dali-Model.cpp
         utc-Dali-MouseWheelEvent.cpp
         utc-Dali-Mutex.cpp
         utc-Dali-NativeImage.cpp

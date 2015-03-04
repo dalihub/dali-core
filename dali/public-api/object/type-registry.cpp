@@ -21,9 +21,8 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/property-index.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/internal/event/common/type-registry-impl.h>
-#include <dali/internal/event/common/property-index-ranges.h>
 
 namespace Dali
 {

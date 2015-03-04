@@ -74,10 +74,10 @@ Rect<int> NinePatchImage::GetChildRectangle()
   return GetImplementation(*this).GetChildRectangle();
 }
 
-BitmapImage NinePatchImage::CreateCroppedBitmapImage()
+BufferImage NinePatchImage::CreateCroppedBufferImage()
 {
-  Internal::BitmapImagePtr internal = GetImplementation(*this).CreateCroppedBitmapImage();
-  return BitmapImage(internal.Get());
+  Internal::BufferImagePtr internal = GetImplementation(*this).CreateCroppedBufferImage();
+  return BufferImage(internal.Get());
 }
 
 

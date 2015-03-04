@@ -378,7 +378,7 @@ int UtcDaliHitTestAlgorithmStencil(void)
   stage.Add( layer );
 
   // Create a stencil and add that to the layer
-  Actor stencil = ImageActor::New(Dali::BitmapImage::WHITE() );
+  Actor stencil = ImageActor::New(Dali::BufferImage::WHITE() );
   stencil.SetAnchorPoint( AnchorPoint::TOP_LEFT );
   stencil.SetParentOrigin( ParentOrigin::TOP_LEFT );
   stencil.SetSize( 50.0f, 50.0f );

@@ -68,14 +68,14 @@ Context::Context(Integration::GlAbstraction& glAbstraction)
   mColorMask(true),
   mStencilMask(0xFF),
   mBlendEnabled(false),
-  mDepthTestEnabled(false),
+  mDepthBufferEnabled(false),
   mDepthMaskEnabled(false),
   mDitherEnabled(true), // This the only GL capability which defaults to true
   mPolygonOffsetFillEnabled(false),
   mSampleAlphaToCoverageEnabled(false),
   mSampleCoverageEnabled(false),
   mScissorTestEnabled(false),
-  mStencilTestEnabled(false),
+  mStencilBufferEnabled(false),
   mClearColorSet(false),
   mBoundArrayBufferId(0),
   mBoundElementArrayBufferId(0),
@@ -225,7 +225,7 @@ void Context::ResetGlState()
   mBlendEnabled = false;
   mGlAbstraction.Disable(GL_BLEND);
 
-  mDepthTestEnabled = false;
+  mDepthBufferEnabled = false;
   mGlAbstraction.Disable(GL_DEPTH_TEST);
 
   mDepthMaskEnabled = false;
@@ -246,7 +246,7 @@ void Context::ResetGlState()
   mScissorTestEnabled = false;
   mGlAbstraction.Disable(GL_SCISSOR_TEST);
 
-  mStencilTestEnabled = false;
+  mStencilBufferEnabled = false;
   mGlAbstraction.Disable(GL_STENCIL_TEST);
 
   mBoundArrayBufferId = 0;
@@ -301,6 +301,8 @@ void Context::ResetGlState()
   mViewPort.x = mViewPort.y = mViewPort.width = mViewPort.height = 0;
 
   ResetVertexAttributeState();
+
+  mFrameBufferStateCache.Reset();
 }
 
 #ifdef DEBUG_ENABLED
@@ -323,14 +325,14 @@ void Context::PrintCurrentState()
                 "----------------- Context State END -----------------\n",
                 mBlendEnabled ? "Enabled" : "Disabled",
                 cullFaceModes[ mCullFaceMode ],
-                mDepthTestEnabled ? "Enabled" : "Disabled",
+                mDepthBufferEnabled ? "Enabled" : "Disabled",
                 mDepthMaskEnabled ? "Enabled" : "Disabled",
                 mDitherEnabled ? "Enabled" : "Disabled",
                 mPolygonOffsetFillEnabled ? "Enabled" : "Disabled",
                 mSampleAlphaToCoverageEnabled ? "Enabled" : "Disabled",
                 mSampleCoverageEnabled ? "Enabled" : "Disabled",
                 mScissorTestEnabled ? "Enabled" : "Disabled",
-                mStencilTestEnabled ? "Enabled" : "Disabled");
+                mStencilBufferEnabled ? "Enabled" : "Disabled");
 }
 
 #endif // DALI_CONTEXT_LOGGING

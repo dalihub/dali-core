@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/native-image-interface.h>
-#include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>

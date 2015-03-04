@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_BITMAP_IMAGE_H__
-#define __DALI_INTERNAL_BITMAP_IMAGE_H__
+#ifndef __DALI_INTERNAL_BUFFER_IMAGE_H__
+#define __DALI_INTERNAL_BUFFER_IMAGE_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -19,11 +19,11 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/ref-object.h>
-#include <dali/internal/event/images/image-impl.h>
-#include <dali/public-api/images/image.h>
-#include <dali/public-api/images/bitmap-image.h>
 #include <dali/integration-api/bitmap.h> // For Integration::BitmapPtr
+#include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/images/buffer-image.h>
+#include <dali/public-api/images/image.h>
+#include <dali/internal/event/images/image-impl.h>
 
 namespace Dali
 {
@@ -31,22 +31,22 @@ namespace Dali
 namespace Internal
 {
 
-class BitmapImage;
-typedef IntrusivePtr<BitmapImage> BitmapImagePtr;
+class BufferImage;
+typedef IntrusivePtr<BufferImage> BufferImagePtr;
 
 class ResourceClient;
 class ResourceManager;
 
 /**
- * BitmapImage represents an image resource that can be added to actors etc.
+ * BufferImage represents an image resource that can be added to actors etc.
  * Its pixel buffer data is provided by the application developer.
  * Pixel buffer memory allocation can be handled by dali or application.
  */
-class BitmapImage : public Image
+class BufferImage : public Image
 {
 public:
   /**
-   * Create a new BitmapImage.
+   * Create a new BufferImage.
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
    * For better performance and portability use power of two dimensions.
@@ -56,18 +56,18 @@ public:
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  static BitmapImagePtr New( unsigned int width,
+  static BufferImagePtr New( unsigned int width,
                              unsigned int height,
                              Pixel::Format pixelformat,
                              ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
-   * Create a new BitmapImage, which uses external data source.
+   * Create a new BufferImage, which uses external data source.
    * Pixel buffer has to be allocated by application.
    * Application holds ownership of the buffer.
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
-   * @note  in case releasePol is "OffStage", application has to call Image::BufferUpdated() whenever image is re-added to the stage
+   * @note  in case releasePol is "OffStage", application has to call Update() whenever image is re-added to the stage
    * @param [in] pixBuf      pixel buffer. has to be allocated by application.
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels
@@ -75,7 +75,7 @@ public:
    * @param [in] stride      the internal stride of the pixelbuffer in pixels
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  static BitmapImagePtr New( PixelBuffer* pixBuf,
+  static BufferImagePtr New( Integration::PixelBuffer* pixBuf,
                              unsigned int width,
                              unsigned int height,
                              Pixel::Format pixelformat,
@@ -83,7 +83,7 @@ public:
                              ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
   /**
-   * Create a new BitmapImage.
+   * Create a new BufferImage.
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
    * For better performance use power of two dimensions.
@@ -93,18 +93,18 @@ public:
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
    * @param [in] releasePol optionally release memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  BitmapImage(unsigned int width,
+  BufferImage(unsigned int width,
               unsigned int height,
               Pixel::Format pixelformat,
               ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT);
 
   /**
-   * Create a new BitmapImage, which uses external data source.
+   * Create a new BufferImage, which uses external data source.
    * Pixel buffer has to be allocated by application.
    * Application holds ownership of the buffer.
    * For better performance and portability use power of two dimensions.
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
-   * @note  in case releasePol is "OffStage", application has to call Image::BufferUpdated() whenever image is re-added to the stage
+   * @note  in case releasePol is "OffStage", application has to call Update() whenever image is re-added to the stage
    * @param [in] pixBuf      pixel buffer. has to be allocated by application.
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels
@@ -112,7 +112,7 @@ public:
    * @param [in] stride      the internal stride of the pixelbuffer in pixels
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  BitmapImage(PixelBuffer* pixBuf,
+  BufferImage(Integration::PixelBuffer* pixBuf,
               unsigned int width,
               unsigned int height,
               Pixel::Format pixelformat,
@@ -123,7 +123,7 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~BitmapImage();
+  virtual ~BufferImage();
 
 public:
   /**
@@ -133,17 +133,17 @@ public:
   void Update (RectArea& updateArea);
 
   /**
-   * @copydoc Dali::BitmapImage::IsDataExternal
+   * @copydoc Dali::BufferImage::IsDataExternal
    */
   bool IsDataExternal() const;
 
   /**
    * Returns the pixel buffer of the Image.
    * The application developer can write to the buffer.
-   * Upload the modified contents with BufferUpdated.
+   * Upload the modified contents with Update().
    * @return the pixel buffer
    */
-  PixelBuffer* GetBuffer();
+  Integration::PixelBuffer* GetBuffer();
 
   /**
    * Returns buffer size in bytes.
@@ -193,24 +193,24 @@ protected:
 /**
  * Helper methods for public API.
  */
-inline Internal::BitmapImage& GetImplementation(Dali::BitmapImage& image)
+inline Internal::BufferImage& GetImplementation(Dali::BufferImage& image)
 {
-  DALI_ASSERT_ALWAYS( image && "BitmapImage handle is empty" );
+  DALI_ASSERT_ALWAYS( image && "BufferImage handle is empty" );
 
   BaseObject& handle = image.GetBaseObject();
 
-  return static_cast<Internal::BitmapImage&>(handle);
+  return static_cast<Internal::BufferImage&>(handle);
 }
 
-inline const Internal::BitmapImage& GetImplementation(const Dali::BitmapImage& image)
+inline const Internal::BufferImage& GetImplementation(const Dali::BufferImage& image)
 {
-  DALI_ASSERT_ALWAYS( image && "BitmapImage handle is empty" );
+  DALI_ASSERT_ALWAYS( image && "BufferImage handle is empty" );
 
   const BaseObject& handle = image.GetBaseObject();
 
-  return static_cast<const Internal::BitmapImage&>(handle);
+  return static_cast<const Internal::BufferImage&>(handle);
 }
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_BITMAP_IMAGE_H__
+#endif // __DALI_INTERNAL_BUFFER_IMAGE_H__

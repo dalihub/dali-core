@@ -21,23 +21,28 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/common/property-index-ranges.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
+#include <dali/internal/event/common/property-helper.h>
+#include <dali/internal/event/common/stage-impl.h>
 
 using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace Dali
 {
 
-const Property::Index Layer::CLIPPING_ENABLE = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-const Property::Index Layer::CLIPPING_BOX    = Internal::DEFAULT_ACTOR_PROPERTY_MAX_COUNT + 1;
-
 namespace Internal
 {
 
 namespace
 {
+
+// Properties
+
+//              Name                Type      writable animatable constraint-input  enum for index-checking
+DALI_PROPERTY_TABLE_BEGIN
+DALI_PROPERTY( "clipping-enable",   BOOLEAN,    true,    false,   true,   Dali::Layer::Property::ClippingEnable )
+DALI_PROPERTY( "clipping-box",      RECTANGLE,  true,    false,   true,   Dali::Layer::Property::ClippingBox    )
+DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 
 // Actions
 
@@ -57,14 +62,6 @@ TypeAction a1( mType, ACTION_RAISE, &Layer::DoAction );
 TypeAction a2( mType, ACTION_LOWER, &Layer::DoAction );
 TypeAction a3( mType, ACTION_RAISE_TO_TOP, &Layer::DoAction );
 TypeAction a4( mType, ACTION_LOWER_TO_BOTTOM, &Layer::DoAction );
-
-const PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
-{
- // Name                     Type              writable animatable constraint-input
- { "clipping-enable",     Property::BOOLEAN,    true,    false,   true  },  // CLIPPING_ENABLE
- { "clipping-box",        Property::RECTANGLE,  true,    false,   true  },  // CLIPPING_BOX
-};
-const int DEFAULT_LAYER_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( DEFAULT_PROPERTY_DETAILS[0] );
 
 } // unnamed namespace
 
@@ -329,16 +326,16 @@ const SceneGraph::Layer& Layer::GetSceneLayerOnStage() const
 
 unsigned int Layer::GetDefaultPropertyCount() const
 {
-  return Actor::GetDefaultPropertyCount() + DEFAULT_LAYER_PROPERTY_COUNT;
+  return Actor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;
 }
 
 void Layer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
   Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
-  indices.reserve( indices.size() + DEFAULT_LAYER_PROPERTY_COUNT );
+  indices.reserve( indices.size() + DEFAULT_PROPERTY_COUNT );
 
-  int index = DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
-  for ( int i = 0; i < DEFAULT_LAYER_PROPERTY_COUNT; ++i, ++index )
+  int index = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
+  for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
   {
     indices.push_back( index );
   }
@@ -346,78 +343,66 @@ void Layer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 
 bool Layer::IsDefaultPropertyWritable( Property::Index index ) const
 {
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return Actor::IsDefaultPropertyWritable(index);
+    return Actor::IsDefaultPropertyWritable( index );
   }
-  else
-  {
-    return true; // all properties writable, no need to lookup the table
-  }
+
+  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX ].writable;
 }
 
 bool Layer::IsDefaultPropertyAnimatable( Property::Index index ) const
 {
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return Actor::IsDefaultPropertyAnimatable(index);
+    return Actor::IsDefaultPropertyAnimatable( index );
   }
-  else
-  {
-    return false; // all properties non animateable, no need to lookup the table
-  }
+
+  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX ].animatable;
 }
 
 bool Layer::IsDefaultPropertyAConstraintInput( Property::Index index ) const
 {
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return Actor::IsDefaultPropertyAConstraintInput(index);
+    return Actor::IsDefaultPropertyAConstraintInput( index );
   }
-  return true; // our properties can be used as an input to a constraint, no need to lookup the table
+
+  return DEFAULT_PROPERTY_DETAILS[ index - DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX ].constraintInput;
 }
 
 Property::Type Layer::GetDefaultPropertyType( Property::Index index ) const
 {
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return Actor::GetDefaultPropertyType(index);
+    return Actor::GetDefaultPropertyType( index );
   }
-  else
-  {
-    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
 
-    if ( ( index >= 0 ) && ( index < DEFAULT_LAYER_PROPERTY_COUNT ) )
-    {
-      return DEFAULT_PROPERTY_DETAILS[index].type;
-    }
-    else
-    {
-      // index out-of-bounds
-      return Property::NONE;
-    }
+  index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
+
+  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
+  {
+    return DEFAULT_PROPERTY_DETAILS[index].type;
   }
+
+  // index out-of-bounds
+  return Property::NONE;
 }
 
 const char* Layer::GetDefaultPropertyName( Property::Index index ) const
 {
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return Actor::GetDefaultPropertyName(index);
+    return Actor::GetDefaultPropertyName( index );
   }
-  else
-  {
-    index -= DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
 
-    if ( ( index >= 0 ) && ( index < DEFAULT_LAYER_PROPERTY_COUNT ) )
-    {
-      return DEFAULT_PROPERTY_DETAILS[index].name;
-    }
-    else
-    {
-      return NULL;
-    }
+  index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
+  if ( ( index >= 0 ) && ( index < DEFAULT_PROPERTY_COUNT ) )
+  {
+    return DEFAULT_PROPERTY_DETAILS[index].name;
   }
+
+  return NULL;
 }
 
 Property::Index Layer::GetDefaultPropertyIndex(const std::string& name) const
@@ -425,12 +410,12 @@ Property::Index Layer::GetDefaultPropertyIndex(const std::string& name) const
   Property::Index index = Property::INVALID_INDEX;
 
   // Look for name in current class' default properties
-  for( int i = 0; i < DEFAULT_LAYER_PROPERTY_COUNT; ++i )
+  for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
+    const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[i];
     if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
     {
-      index = i + DEFAULT_ACTOR_PROPERTY_MAX_COUNT;
+      index = i + DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
       break;
     }
   }
@@ -445,20 +430,20 @@ Property::Index Layer::GetDefaultPropertyIndex(const std::string& name) const
 
 void Layer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    Actor::SetDefaultProperty(index, propertyValue);
+    Actor::SetDefaultProperty( index, propertyValue );
   }
   else
   {
-    switch(index)
+    switch( index )
     {
-      case Dali::Layer::CLIPPING_ENABLE:
+      case Dali::Layer::Property::ClippingEnable:
       {
         SetClipping( propertyValue.Get<bool>() );
         break;
       }
-      case Dali::Layer::CLIPPING_BOX:
+      case Dali::Layer::Property::ClippingBox:
       {
         Rect<int> clippingBox( propertyValue.Get<Rect<int> >() );
         SetClippingBox( clippingBox.x, clippingBox.y, clippingBox.width, clippingBox.height );
@@ -466,7 +451,7 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
       }
       default:
       {
-        DALI_LOG_WARNING("Unknown property (%d)\n", index);
+        DALI_LOG_WARNING( "Unknown property (%d)\n", index );
         break;
       }
     } // switch(index)
@@ -477,27 +462,27 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
 Property::Value Layer::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value ret;
-  if(index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
+  if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    ret = Actor::GetDefaultProperty(index);
+    ret = Actor::GetDefaultProperty( index );
   }
   else
   {
-    switch(index)
+    switch( index )
     {
-      case Dali::Layer::CLIPPING_ENABLE:
+      case Dali::Layer::Property::ClippingEnable:
       {
         ret = mIsClipping;
         break;
       }
-      case Dali::Layer::CLIPPING_BOX:
+      case Dali::Layer::Property::ClippingBox:
       {
         ret = mClippingBox;
         break;
       }
       default:
       {
-        DALI_LOG_WARNING("Unknown property (%d)\n", index);
+        DALI_LOG_WARNING( "Unknown property (%d)\n", index );
         break;
       }
     } // switch(index)

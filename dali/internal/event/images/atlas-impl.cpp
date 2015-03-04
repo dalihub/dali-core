@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/images/bitmap-image-impl.h>
+#include <dali/internal/event/images/buffer-image-impl.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/integration-api/bitmap.h>
 
@@ -43,7 +43,7 @@ Atlas* Atlas::New( std::size_t width,
   return new Atlas( width, height, pixelFormat );
 }
 
-bool Atlas::Upload( const BitmapImage& bitmapImage,
+bool Atlas::Upload( const BufferImage& bufferImage,
                     std::size_t xOffset,
                     std::size_t yOffset )
 {
@@ -51,10 +51,10 @@ bool Atlas::Upload( const BitmapImage& bitmapImage,
 
   AllocateAtlas();
 
-  if( IsWithin(bitmapImage, xOffset, yOffset) )
+  if( IsWithin(bufferImage, xOffset, yOffset) )
   {
     ResourceId destId = GetResourceId();
-    ResourceId srcId = bitmapImage.GetResourceId();
+    ResourceId srcId = bufferImage.GetResourceId();
 
     if( destId && srcId )
     {
@@ -105,20 +105,20 @@ void Atlas::Disconnect()
   }
 }
 
-bool Atlas::IsWithin( const BitmapImage& bitmapImage,
+bool Atlas::IsWithin( const BufferImage& bufferImage,
                       std::size_t xOffset,
                       std::size_t yOffset )
 {
   bool within(false);
 
-  if( mPixelFormat != bitmapImage.GetPixelFormat() )
+  if( mPixelFormat != bufferImage.GetPixelFormat() )
   {
-    DALI_LOG_ERROR( "Pixel format %d does not match Atlas format %d\n", bitmapImage.GetPixelFormat(), mPixelFormat );
+    DALI_LOG_ERROR( "Pixel format %d does not match Atlas format %d\n", bufferImage.GetPixelFormat(), mPixelFormat );
   }
   else
   {
-    const unsigned int width  = bitmapImage.GetWidth();
-    const unsigned int height = bitmapImage.GetHeight();
+    const unsigned int width  = bufferImage.GetWidth();
+    const unsigned int height = bufferImage.GetHeight();
 
     if( xOffset < mWidth  &&
         yOffset < mHeight &&

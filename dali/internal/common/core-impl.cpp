@@ -40,7 +40,6 @@
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/event/images/image-factory.h>
-#include <dali/internal/event/modeling/model-factory.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/touch/touch-resampler.h>
@@ -94,7 +93,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mResourcePostProcessQueue(),
   mNotificationManager(NULL),
   mImageFactory(NULL),
-  mModelFactory(NULL),
   mShaderFactory(NULL),
   mIsActive(true),
   mProcessingEvent(false)
@@ -160,7 +158,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
 
   mImageFactory = new ImageFactory( *mResourceClient );
-  mModelFactory = new ModelFactory(*mResourceClient);
   mShaderFactory = new ShaderFactory(*mResourceClient);
   mShaderFactory->LoadDefaultShaders();
 
@@ -194,7 +191,6 @@ Core::~Core()
   delete mGestureEventProcessor;
   delete mNotificationManager;
   delete mImageFactory;
-  delete mModelFactory;
   delete mShaderFactory;
   delete mResourceClient;
   delete mResourceManager;
@@ -419,11 +415,6 @@ ResourceClient& Core::GetResourceClient()
 ImageFactory& Core::GetImageFactory()
 {
   return *(mImageFactory);
-}
-
-ModelFactory& Core::GetModelFactory()
-{
-  return *(mModelFactory);
 }
 
 ShaderFactory& Core::GetShaderFactory()

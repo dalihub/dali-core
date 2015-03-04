@@ -56,15 +56,15 @@ public:
                      Pixel::Format pixelFormat = Pixel::RGBA8888 );
 
   /**
-   * @brief Upload a bitmap to the atlas.
+   * @brief Upload a buffer image to the atlas.
    *
    * @pre The bitmap pixel format must match the Atlas format.
-   * @param [in] bitmap The bitmap to upload.
+   * @param [in] bufferImage The buffer image to upload.
    * @param [in] xOffset Specifies an offset in the x direction within the atlas.
    * @param [in] yOffset Specifies an offset in the y direction within the atlas.
    * @return True if the bitmap fits within the atlas at the specified offset.
    */
-  bool Upload( const BitmapImage& bitmap,
+  bool Upload( const BufferImage& bufferImage,
                std::size_t xOffset,
                std::size_t yOffset );
 
@@ -104,7 +104,7 @@ private:
    * Helper for Upload methods
    * @return True if the bitmap fits within the atlas at the specified offset
    */
-  bool IsWithin( const BitmapImage& bitmapImage,
+  bool IsWithin( const BufferImage& bufferImage,
                  std::size_t xOffset,
                  std::size_t yOffset );
 

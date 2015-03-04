@@ -18,10 +18,6 @@
 // CLASS HEADER
 #include <dali/integration-api/core.h>
 
-// EXTERNAL INCLUDES
-#include <iosfwd>
-#include <stdarg.h>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/events/event.h>

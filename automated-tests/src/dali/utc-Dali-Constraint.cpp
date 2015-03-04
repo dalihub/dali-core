@@ -1812,20 +1812,20 @@ int UtcDaliConstraintNewLocalInput(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Apply constraint with a local input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    LocalSource( Actor::COLOR ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    LocalSource( Actor::Property::Color ),
                                                     MoveAwayWithFadeConstraint(distanceWhenFullyTransparent) );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
@@ -1838,9 +1838,9 @@ int UtcDaliConstraintNewLocalInput(void)
 
     application.SendNotification();
     application.Render(0);
-    DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), ( startValue - Vector3(0.0f, 0.0f, progress*distanceWhenFullyTransparent) ), POSITION_EPSILON, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), ( startValue - Vector3(0.0f, 0.0f, progress*distanceWhenFullyTransparent) ), POSITION_EPSILON, TEST_LOCATION );
   }
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), ( startValue - Vector3(0.0f, 0.0f, distanceWhenFullyTransparent) ), POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), ( startValue - Vector3(0.0f, 0.0f, distanceWhenFullyTransparent) ), POSITION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1863,26 +1863,26 @@ int UtcDaliConstraintNewParentInput(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Apply constraint with a parent input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    ParentSource( Actor::SIZE ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    ParentSource( Actor::Property::Size ),
                                                     TestBottomRightAlignConstraint() );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), parentStartSize,         TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), parent.GetCurrentSize(), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), parentStartSize,         TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), parent.GetCurrentSize(), TEST_LOCATION );
 
   // Gradually shrink the parent; the actor should move inwards
 
@@ -1894,10 +1894,10 @@ int UtcDaliConstraintNewParentInput(void)
     application.SendNotification();
     application.Render(0);
 
-    DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), size,                    POSITION_EPSILON, TEST_LOCATION );
-    DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), parent.GetCurrentSize(), POSITION_EPSILON, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), size,                    POSITION_EPSILON, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), parent.GetCurrentSize(), POSITION_EPSILON, TEST_LOCATION );
   }
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), Vector3::ZERO, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), Vector3::ZERO, POSITION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1924,30 +1924,30 @@ int UtcDaliConstraintNewInput1(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Apply constraint with a parent input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( sibling1, Actor::POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    Source( sibling1, Actor::Property::Position ),
                                                     MeanPositionConstraint1() );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), sibling1.GetCurrentPosition(), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), sibling1.GetCurrentPosition(), TEST_LOCATION );
 
   // Check that nothing has changed after a couple of buffer swaps
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), sibling1.GetCurrentPosition(), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), sibling1.GetCurrentPosition(), TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), sibling1.GetCurrentPosition(), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), sibling1.GetCurrentPosition(), TEST_LOCATION );
   END_TEST;
 }
 
@@ -1984,31 +1984,31 @@ int UtcDaliConstraintNewInput2(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Apply constraint with a parent input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( sibling1, Actor::POSITION ),
-                                                    Source( sibling2, Actor::POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    Source( sibling1, Actor::Property::Position ),
+                                                    Source( sibling2, Actor::Property::Position ),
                                                     MeanPositionConstraint2() );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
 
   // Check that nothing has changed after a couple of buffer swaps
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2050,32 +2050,32 @@ int UtcDaliConstraintNewInput3(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Apply constraint with a parent input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( sibling1, Actor::POSITION ),
-                                                    Source( sibling2, Actor::POSITION ),
-                                                    Source( sibling3, Actor::POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    Source( sibling1, Actor::Property::Position ),
+                                                    Source( sibling2, Actor::Property::Position ),
+                                                    Source( sibling3, Actor::Property::Position ),
                                                     MeanPositionConstraint3() );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
 
   // Check that nothing has changed after a couple of buffer swaps
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2119,33 +2119,33 @@ int UtcDaliConstraintNewInput4(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Apply constraint with a parent input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( sibling1, Actor::POSITION ),
-                                                    Source( sibling2, Actor::POSITION ),
-                                                    ParentSource( Actor::POSITION ),
-                                                    Source( sibling3, Actor::POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    Source( sibling1, Actor::Property::Position ),
+                                                    Source( sibling2, Actor::Property::Position ),
+                                                    ParentSource( Actor::Property::Position ),
+                                                    Source( sibling3, Actor::Property::Position ),
                                                     MeanPositionConstraint4() );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
 
   // Check that nothing has changed after a couple of buffer swaps
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2194,34 +2194,34 @@ int UtcDaliConstraintNewInput5(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Apply constraint with a parent input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( sibling1, Actor::POSITION ),
-                                                    Source( sibling2, Actor::POSITION ),
-                                                    ParentSource( Actor::POSITION ),
-                                                    Source( sibling3, Actor::POSITION ),
-                                                    Source( sibling4, Actor::POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    Source( sibling1, Actor::Property::Position ),
+                                                    Source( sibling2, Actor::Property::Position ),
+                                                    ParentSource( Actor::Property::Position ),
+                                                    Source( sibling3, Actor::Property::Position ),
+                                                    Source( sibling4, Actor::Property::Position ),
                                                     MeanPositionConstraint5() );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
 
   // Check that nothing has changed after a couple of buffer swaps
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2275,35 +2275,35 @@ int UtcDaliConstraintNewInput6(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Apply constraint with a parent input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( child, Actor::POSITION ),
-                                                    Source( sibling1, Actor::POSITION ),
-                                                    Source( sibling2, Actor::POSITION ),
-                                                    ParentSource( Actor::POSITION ),
-                                                    Source( sibling3, Actor::POSITION ),
-                                                    Source( sibling4, Actor::POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    Source( child, Actor::Property::Position ),
+                                                    Source( sibling1, Actor::Property::Position ),
+                                                    Source( sibling2, Actor::Property::Position ),
+                                                    ParentSource( Actor::Property::Position ),
+                                                    Source( sibling3, Actor::Property::Position ),
+                                                    Source( sibling4, Actor::Property::Position ),
                                                     MeanPositionConstraint6() );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
 
   // Check that nothing has changed after a couple of buffer swaps
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), meanValue, POSITION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), meanValue, POSITION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2343,7 +2343,7 @@ int UtcDaliConstraintSetApplyTime(void)
   // Build constraint
 
   Vector4 targetColor(Color::BLACK);
-  Constraint constraint = Constraint::New<Vector4>( Actor::COLOR, TestColorConstraint(targetColor) );
+  Constraint constraint = Constraint::New<Vector4>( Actor::Property::Color, TestColorConstraint(targetColor) );
   DALI_TEST_EQUALS(constraint.GetApplyTime(), TimePeriod(0.0f), TEST_LOCATION);
 
   float applySeconds(7.0f);
@@ -2400,7 +2400,7 @@ int UtcDaliConstraintGetApplyTime(void)
 {
   TestApplication application;
 
-  Constraint constraint = Constraint::New<Vector4>( Actor::COLOR, TestConstraint() );
+  Constraint constraint = Constraint::New<Vector4>( Actor::Property::Color, TestConstraint() );
   DALI_TEST_EQUALS(constraint.GetApplyTime(), TimePeriod(0.0f), TEST_LOCATION);
 
   float applySeconds(7.0f);
@@ -2419,7 +2419,7 @@ int UtcDaliConstraintSetAlphaFunction(void)
   Vector3 startValue( Vector3::ZERO );
   Vector3 targetValue(100.0f, 100.0f, 100.0f);
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
                                                     TestConstraintVector3( targetValue ) );
 
   // Test the alpha-function itself
@@ -2434,42 +2434,42 @@ int UtcDaliConstraintSetAlphaFunction(void)
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   constraint.SetApplyTime( 10.0f );
   actor.ApplyConstraint( constraint );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.1f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.2f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.2f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.3f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.3f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.4f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.4f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.5f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.5f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.6f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.6f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.7f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.7f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.8f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.8f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue) * 0.9f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue) * 0.9f, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue), TEST_LOCATION );
 
   // Check that the constrained value is stable
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue), TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue), TEST_LOCATION );
 
   // Remove the constraint
 
@@ -2478,11 +2478,11 @@ int UtcDaliConstraintSetAlphaFunction(void)
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
 
   // Change to non-linear alpha and retest
 
@@ -2495,23 +2495,23 @@ int UtcDaliConstraintSetAlphaFunction(void)
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
 
-  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::POSITION ).x > startValue.x );
-  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::POSITION ).y > startValue.y );
-  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::POSITION ).z > startValue.z );
+  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::Property::Position ).x > startValue.x );
+  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::Property::Position ).y > startValue.y );
+  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::Property::Position ).z > startValue.z );
 
   Vector3 lessThanTenPercentProgress( (targetValue - startValue) * 0.09f );
-  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::POSITION ).x < lessThanTenPercentProgress.x );
-  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::POSITION ).y < lessThanTenPercentProgress.y );
-  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::POSITION ).z < lessThanTenPercentProgress.z );
+  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::Property::Position ).x < lessThanTenPercentProgress.x );
+  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::Property::Position ).y < lessThanTenPercentProgress.y );
+  DALI_TEST_CHECK( actor.GetProperty<Vector3>( Actor::Property::Position ).z < lessThanTenPercentProgress.z );
 
   application.Render(static_cast<unsigned int>(9000.0f/*9 seconds*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue), TEST_LOCATION );
 
   // Check that the constrained value is stable
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue), TEST_LOCATION );
   application.Render(static_cast<unsigned int>(1000.0f/*1 second*/));
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::POSITION ), (targetValue - startValue), TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), (targetValue - startValue), TEST_LOCATION );
   END_TEST;
 }
 
@@ -2519,7 +2519,7 @@ int UtcDaliConstraintGetAlphaFunction(void)
 {
   TestApplication application;
 
-  Constraint constraint = Constraint::New<Vector4>( Actor::COLOR, TestConstraint() );
+  Constraint constraint = Constraint::New<Vector4>( Actor::Property::Color, TestConstraint() );
 
   AlphaFunction func = constraint.GetAlphaFunction();
   DALI_TEST_EQUALS(func(0.5f), 0.5f, TEST_LOCATION); // Default is Linear
@@ -2535,7 +2535,7 @@ int UtcDaliConstraintSetRemoveAction(void)
 
   // Build constraint, with "Discard" remove action
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, TestPositionConstraint(targetPosition) );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position, TestPositionConstraint(targetPosition) );
   DALI_TEST_EQUALS((unsigned int)constraint.GetRemoveAction(), (unsigned int)Constraint::Bake, TEST_LOCATION);
 
   constraint.SetRemoveAction(Constraint::Discard);
@@ -2586,7 +2586,7 @@ int UtcDaliConstraintGetRemoveAction(void)
 {
   TestApplication application;
 
-  Constraint constraint = Constraint::New<Vector4>( Actor::COLOR, TestConstraint() );
+  Constraint constraint = Constraint::New<Vector4>( Actor::Property::Color, TestConstraint() );
   DALI_TEST_EQUALS((unsigned int)constraint.GetRemoveAction(), (unsigned int)Constraint::Bake, TEST_LOCATION);
 
   constraint.SetRemoveAction(Constraint::Discard);
@@ -2609,7 +2609,7 @@ int UtcDaliConstraintImmediateRemoveDuringApply(void)
 
   // Build constraint
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, TestPositionConstraint(targetPosition) );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position, TestPositionConstraint(targetPosition) );
   DALI_TEST_EQUALS((unsigned int)constraint.GetRemoveAction(), (unsigned int)Constraint::Bake, TEST_LOCATION);
 
   float applySeconds(4.0f);
@@ -2664,8 +2664,8 @@ int UtcDaliConstraintActorSize(void)
 
   // Build constraint, to make child 20% of parent size
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                    ParentSource( Actor::SIZE ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size,
+                                                    ParentSource( Actor::Property::Size ),
                                                     TestRelativeConstraintVector3(0.2f) );
   // Apply to a child actor
 
@@ -2684,7 +2684,7 @@ int UtcDaliConstraintActorSize(void)
 
   float durationSeconds(10.0f);
   Animation animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(parent, Actor::SIZE), targetParentSize );
+  animation.AnimateTo( Property(parent, Actor::Property::Size), targetParentSize );
   animation.Play();
 
   application.SendNotification();
@@ -2721,8 +2721,8 @@ int UtcDaliConstraintActorSizeWidth(void)
 
   // Build constraint, to make child 20% of parent width
 
-  Constraint constraint = Constraint::New<float>( Actor::SIZE_WIDTH,
-                                                  ParentSource( Actor::SIZE_WIDTH ),
+  Constraint constraint = Constraint::New<float>( Actor::Property::SizeWidth,
+                                                  ParentSource( Actor::Property::SizeWidth ),
                                                   TestRelativeConstraintFloat(0.2f) );
   // Apply to a child actor
 
@@ -2741,7 +2741,7 @@ int UtcDaliConstraintActorSizeWidth(void)
 
   float durationSeconds(10.0f);
   Animation animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(parent, Actor::SIZE), targetParentSize );
+  animation.AnimateTo( Property(parent, Actor::Property::Size), targetParentSize );
   animation.Play();
 
   application.SendNotification();
@@ -2791,8 +2791,8 @@ int UtcDaliConstraintActorSizeHeight(void)
 
   // Build constraint, to make child 20% of parent height
 
-  Constraint constraint = Constraint::New<float>( Actor::SIZE_HEIGHT,
-                                                  ParentSource( Actor::SIZE_HEIGHT ),
+  Constraint constraint = Constraint::New<float>( Actor::Property::SizeHeight,
+                                                  ParentSource( Actor::Property::SizeHeight ),
                                                   TestRelativeConstraintFloat(0.2f) );
   // Apply to a child actor
 
@@ -2811,7 +2811,7 @@ int UtcDaliConstraintActorSizeHeight(void)
 
   float durationSeconds(10.0f);
   Animation animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(parent, Actor::SIZE), targetParentSize );
+  animation.AnimateTo( Property(parent, Actor::Property::Size), targetParentSize );
   animation.Play();
 
   application.SendNotification();
@@ -2861,8 +2861,8 @@ int UtcDaliConstraintActorSizeDepth(void)
 
   // Build constraint, to make child 20% of parent height
 
-  Constraint constraint = Constraint::New<float>( Actor::SIZE_DEPTH,
-                                                  ParentSource( Actor::SIZE_DEPTH ),
+  Constraint constraint = Constraint::New<float>( Actor::Property::SizeDepth,
+                                                  ParentSource( Actor::Property::SizeDepth ),
                                                   TestRelativeConstraintFloat(0.2f) );
   // Apply to a child actor
 
@@ -2881,7 +2881,7 @@ int UtcDaliConstraintActorSizeDepth(void)
 
   float durationSeconds(10.0f);
   Animation animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(parent, Actor::SIZE), targetParentSize );
+  animation.AnimateTo( Property(parent, Actor::Property::Size), targetParentSize );
   animation.Play();
 
   application.SendNotification();
@@ -2968,8 +2968,8 @@ int UtcDaliConstraintInputWorldPosition(void)
   // Build constraint, to make actor track the world-position of another actor
   // Note that the world-position is always from the previous frame, so the tracking actor will lag behind
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION,
-                                                    Source( child, Actor::WORLD_POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
+                                                    Source( child, Actor::Property::WorldPosition ),
                                                     EqualToConstraint() );
 
   trackingActor.ApplyConstraint( constraint );
@@ -3045,8 +3045,8 @@ int UtcDaliConstraintInputWorldRotation(void)
   // Build constraint, to make actor track the world-rotation of another actor
   // Note that the world-rotation is always from the previous frame, so the tracking actor will lag behind
 
-  Constraint constraint = Constraint::New<Quaternion>( Actor::ROTATION,
-                                                       Source( child, Actor::WORLD_ROTATION ),
+  Constraint constraint = Constraint::New<Quaternion>( Actor::Property::Rotation,
+                                                       Source( child, Actor::Property::WorldRotation ),
                                                        EqualToQuaternion() );
 
   trackingActor.ApplyConstraint( constraint );
@@ -3123,8 +3123,8 @@ int UtcDaliConstraintInputWorldScale(void)
   // Build constraint, to make actor track the world-scale of another actor
   // Note that the world-scale is always from the previous frame, so the tracking actor will lag behind
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                                    Source( child, Actor::WORLD_SCALE ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Scale,
+                                                    Source( child, Actor::Property::WorldScale ),
                                                     EqualToConstraint() );
 
   trackingActor.ApplyConstraint( constraint );
@@ -3201,8 +3201,8 @@ int UtcDaliConstraintInputWorldColor(void)
   // Build constraint, to make actor track the world-color of another actor
   // Note that the world-color is always from the previous frame, so the tracking actor will lag behind
 
-  Constraint constraint = Constraint::New<Vector4>( Actor::COLOR,
-                                                    Source( child, Actor::WORLD_COLOR ),
+  Constraint constraint = Constraint::New<Vector4>( Actor::Property::Color,
+                                                    Source( child, Actor::Property::WorldColor ),
                                                     EqualToVector4() );
 
   trackingActor.ApplyConstraint( constraint );
@@ -3247,7 +3247,7 @@ int UtcDaliConstraintInvalidInputProperty(void)
 {
   TestApplication application;
   Actor actor = Actor::New();
-  Constraint constraint = Constraint::New<Vector3>( Actor::POSITION, LocalSource( PROPERTY_REGISTRATION_START_INDEX ), EqualToConstraint() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position, LocalSource( PROPERTY_REGISTRATION_START_INDEX ), EqualToConstraint() );
 
   Stage::GetCurrent().Add( actor );
 
@@ -3284,7 +3284,7 @@ int UtcDaliBuiltinConstraintParentSize(void)
 
   // Apply constraint
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), EqualToConstraint() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), EqualToConstraint() );
   actor.ApplyConstraint( constraint );
 
   application.SendNotification();
@@ -3338,7 +3338,7 @@ int UtcDaliBuiltinConstraintParentSizeRelative(void)
 
   // Apply constraint
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE, ParentSource( Actor::SIZE ), RelativeToConstraint( scale ) );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, ParentSource( Actor::Property::Size ), RelativeToConstraint( scale ) );
   actor.ApplyConstraint( constraint );
 
   application.SendNotification();
@@ -3396,9 +3396,9 @@ int UtcDaliBuiltinConstraintScaleToFitConstraint(void)
 
   // Apply constraint
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                                    LocalSource( Actor::SIZE ),
-                                                    ParentSource( Actor::SIZE ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Scale,
+                                                    LocalSource( Actor::Property::Size ),
+                                                    ParentSource( Actor::Property::Size ),
                                                     ScaleToFitConstraint() );
   actor.ApplyConstraint( constraint );
 
@@ -3453,9 +3453,9 @@ int UtcDaliBuiltinConstraintScaleToFitKeepAspectRatio(void)
 
   // Apply constraint
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                                    LocalSource( Actor::SIZE ),
-                                                    ParentSource( Actor::SIZE ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Scale,
+                                                    LocalSource( Actor::Property::Size ),
+                                                    ParentSource( Actor::Property::Size ),
                                                     ScaleToFitKeepAspectRatioConstraint() );
   actor.ApplyConstraint( constraint );
 
@@ -3501,9 +3501,9 @@ int UtcDaliBuiltinConstraintScaleToFillXYKeepAspectRatio(void)
 
   // Apply constraint
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::SCALE,
-                                                    LocalSource( Actor::SIZE ),
-                                                    ParentSource( Actor::SIZE ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Scale,
+                                                    LocalSource( Actor::Property::Size ),
+                                                    ParentSource( Actor::Property::Size ),
                                                     ScaleToFillXYKeepAspectRatioConstraint() );
   actor.ApplyConstraint( constraint );
 
@@ -3549,8 +3549,8 @@ int UtcDaliBuiltinConstraintEqualToConstraint(void)
 
   // Apply constraint - actor1 size == actor2 position
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                    Source( actor1, Actor::POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size,
+                                                    Source( actor1, Actor::Property::Position ),
                                                     EqualToConstraint() );
   constraint.SetRemoveAction( Constraint::Discard );
   actor2.ApplyConstraint( constraint );
@@ -3586,8 +3586,8 @@ int UtcDaliBuiltinConstraintEqualToConstraint(void)
   DALI_TEST_EQUALS( actor1.GetCurrentOpacity(), startOpacity, TEST_LOCATION );
   DALI_TEST_EQUALS( actor2.GetCurrentOpacity(), startOpacity, TEST_LOCATION );
 
-  Constraint constraint2 = Constraint::New<float>( Actor::COLOR_ALPHA,
-                                                  Source( actor1, Actor::COLOR_ALPHA ),
+  Constraint constraint2 = Constraint::New<float>( Actor::Property::ColorAlpha,
+                                                  Source( actor1, Actor::Property::ColorAlpha ),
                                                   EqualToConstraint() );
   constraint2.SetRemoveAction( Constraint::Discard );
   actor2.ApplyConstraint( constraint2 );
@@ -3610,8 +3610,8 @@ int UtcDaliBuiltinConstraintEqualToConstraint(void)
   DALI_TEST_CHECK( actor1.GetCurrentColor() == Color::GREEN );
   DALI_TEST_CHECK( actor2.GetCurrentColor() == Color::RED );
 
-  Constraint constraint3 = Constraint::New<Vector4>( Actor::COLOR,
-                                                    Source( actor1, Actor::COLOR ),
+  Constraint constraint3 = Constraint::New<Vector4>( Actor::Property::Color,
+                                                    Source( actor1, Actor::Property::Color ),
                                                     EqualToConstraint() );
   constraint3.SetRemoveAction( Constraint::Discard );
   actor2.ApplyConstraint( constraint3 );
@@ -3632,8 +3632,8 @@ int UtcDaliBuiltinConstraintEqualToConstraint(void)
   DALI_TEST_EQUALS( actor1.GetCurrentRotation(), q1, 0.01, TEST_LOCATION );
   DALI_TEST_EQUALS( actor2.GetCurrentRotation(), q2, 0.01, TEST_LOCATION );
 
-  Constraint constraint4 = Constraint::New<Quaternion>( Actor::ROTATION,
-                                                    Source( actor1, Actor::ROTATION ),
+  Constraint constraint4 = Constraint::New<Quaternion>( Actor::Property::Rotation,
+                                                    Source( actor1, Actor::Property::Rotation ),
                                                     EqualToConstraint() );
   constraint4.SetRemoveAction( Constraint::Discard );
   actor2.ApplyConstraint( constraint4 );
@@ -3680,8 +3680,8 @@ int UtcDaliBuiltinConstraintRelativeToConstraint(void)
 
   RelativeToConstraint( 0.f );
   Vector3 scale( 0.5, 0.6, 0.7 );
-  Constraint constraint = Constraint::New<Vector3>( Actor::SIZE,
-                                                    Source( actor1, Actor::POSITION ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size,
+                                                    Source( actor1, Actor::Property::Position ),
                                                     RelativeToConstraint( scale ) );
   constraint.SetRemoveAction( Constraint::Discard );
   actor2.ApplyConstraint( constraint );
@@ -3717,8 +3717,8 @@ int UtcDaliBuiltinConstraintRelativeToConstraint(void)
   DALI_TEST_EQUALS( actor1.GetCurrentOpacity(), startOpacity, TEST_LOCATION );
   DALI_TEST_EQUALS( actor2.GetCurrentOpacity(), startOpacity, TEST_LOCATION );
 
-  Constraint constraint2 = Constraint::New<float>( Actor::COLOR_ALPHA,
-                                                  Source( actor1, Actor::COLOR_ALPHA ),
+  Constraint constraint2 = Constraint::New<float>( Actor::Property::ColorAlpha,
+                                                  Source( actor1, Actor::Property::ColorAlpha ),
                                                   RelativeToConstraintFloat(scale2) );
   constraint2.SetRemoveAction( Constraint::Discard );
   actor2.ApplyConstraint(constraint2);

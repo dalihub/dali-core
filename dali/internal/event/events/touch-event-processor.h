@@ -78,6 +78,13 @@ private:
   // Undefined
   TouchEventProcessor& operator=(const TouchEventProcessor& rhs);
 
+  /**
+   * Called by some actor-observers when the observed actor is disconnected.
+   *
+   * @param[in]  actor  The actor that has been disconnected.
+   */
+  void OnObservedActorDisconnected( Actor* actor );
+
 private:
 
   Stage& mStage; ///< Used to deliver touch events

@@ -25,18 +25,15 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/geometry/mesh.h>
-#include <dali/public-api/modeling/entity.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/modeling/material-impl.h>
-#include <dali/internal/event/modeling/model-data-impl.h>
 #include <dali/internal/event/actor-attachments/mesh-attachment-impl.h>
 #include <dali/internal/event/actors/renderable-actor-impl.h>
 
 namespace Dali
 {
 class Mesh;
-class Entity;
 
 
 namespace Internal
@@ -66,14 +63,6 @@ public:
    */
   static MeshActorPtr New(Dali::AnimatableMesh mesh);
 
-  /**
-   * Create an intialised mesh actor from a model entity
-   * @param[in] modelData Scene graph object
-   * @param[in] entity in a model
-   * @return A smart-pointer to a newly allocated mesh actor
-   */
-  static MeshActorPtr New(ModelDataPtr modelData, Dali::Entity entity);
-
 public:
 
   /**
@@ -95,13 +84,6 @@ public:
   void SetMesh(MeshIPtr meshPtr);
 
   /**
-   * Set the given mesh to this actor
-   * @param[in] modelData The model data
-   * @param[in] meshIndex The mesh index from the model
-   */
-  void SetMesh(ModelDataPtr modelData, unsigned int meshIndex);
-
-  /**
    * @copydoc Dali::MeshActor::SetMaterial(Material material)
    */
   void SetMaterial(const Dali::Material material);
@@ -111,21 +93,6 @@ public:
    * @return The material
    */
   Dali::Material GetMaterial() const;
-
-  /**
-   * Set whether this mesh actor should be affected by lights in the
-   * scene.  If it set to false, then the mesh will be unaffected by
-   * lighting, and will be evenly lit without any shading.
-   * This property is not inherited.
-   * @param[in] affectedByLighting Whether the actor should be lit by the scene lighting.
-   */
-  void SetAffectedByLighting(bool affectedByLighting);
-
-  /**
-   * Get whether the actor is lit by scene or evenly lit
-   * @return true if lit by scene, false if evenly lit
-   */
-  bool IsAffectedByLighting();
 
   /**
    * Search the actor tree for all named bones in the mesh array and connect them.

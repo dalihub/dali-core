@@ -18,12 +18,8 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-map.h>
 
-// EXTERNAL INCLUDES
-#include <vector>
-
 // INTERNAL INCLUDES
-#include <dali/public-api/common/constants.h>
-#include <dali/public-api/object/property.h>
+#include <dali/public-api/common/vector-wrapper.h>
 
 namespace Dali
 {

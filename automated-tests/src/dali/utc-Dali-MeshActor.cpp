@@ -96,41 +96,6 @@ int UtcDaliMeshActorNew01(void)
   END_TEST;
 }
 
-int UtcDaliMeshActorNew02(void)
-{
-  TestApplication application;
-  TestPlatformAbstraction& platform = application.GetPlatform();
-
-  tet_infoline("Testing Dali::MeshActor::New()");
-
-  std::string modelName("AModel");
-  Dali::ModelData modelData = Dali::ModelData::New(modelName);
-  Dali::Entity rootEntity = Dali::Entity::New("root");
-  modelData.SetRootEntity(rootEntity);
-  rootEntity.SetType(Dali::Entity::OBJECT);
-
-  Model model = Model::New("Fake model");
-
-  // Run Core - will query using TestPlatformAbstraction::GetResources().
-  application.SendNotification();
-  application.Render();
-
-  Integration::ResourceRequest* request = platform.GetRequest();
-  if(request)
-  {
-    platform.SetResourceLoaded(request->GetId(), request->GetType()->id, Integration::ResourcePointer(&(modelData.GetBaseObject())));
-  }
-
-  application.Render();
-  application.SendNotification();
-
-  Actor actor = ModelActorFactory::BuildActorTree(model, ""); // model should be loaded
-
-  DALI_TEST_CHECK(model.GetLoadingState() == ResourceLoadingSucceeded);
-  DALI_TEST_CHECK(actor);
-  DALI_TEST_CHECK(actor.GetName().compare("root") == 0);
-  END_TEST;
-}
 
 int UtcDaliMeshActorNew03(void)
 {
@@ -551,77 +516,6 @@ int UtcDaliMeshActorGetMaterial02(void)
   END_TEST;
 }
 
-int UtcDaliMeshActorSetLighting01(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::MeshActor::GetLighting()");
-
-  Mesh mesh = NewMesh();
-
-  MeshActor actor = MeshActor::New(mesh);
-  Stage::GetCurrent().Add(actor);
-
-  // Mesh actors should be lit by default
-  DALI_TEST_EQUALS(actor.IsAffectedByLighting(), true, TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliMeshActorSetLighting02(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::MeshActor::SetLighting()");
-
-  Mesh mesh = NewMesh();
-  MeshActor actor = MeshActor::New(mesh);
-  Stage::GetCurrent().Add(actor);
-
-  application.SendNotification();
-  application.Render();
-  application.Render();
-  application.SendNotification();
-
-  Light light = Light::New("KeyLight");
-  light.SetFallOff(Vector2(10000.0f, 10000.0f));
-  LightActor keyLightActor = LightActor::New();
-  keyLightActor.SetParentOrigin(ParentOrigin::CENTER);
-  keyLightActor.SetPosition(200.0f, 500.0f, 300.0f);
-  keyLightActor.SetName(light.GetName());
-
-  Stage::GetCurrent().Add(keyLightActor);
-  keyLightActor.SetLight(light);
-  keyLightActor.SetActive(true);
-
-  actor.SetAffectedByLighting(true);
-  DALI_TEST_EQUALS(actor.IsAffectedByLighting(), true, TEST_LOCATION);
-
-  // Test rendering to ensure that the correct shader setup is used in renderer
-  // (check in debugger or via coverage)
-  application.Render(1);
-  application.SendNotification();
-  application.Render(1);
-  application.SendNotification();
-  application.Render(1);
-  application.SendNotification();
-  application.Render(1);
-  application.SendNotification();
-  application.Render(1);
-
-  actor.SetAffectedByLighting(false);
-  DALI_TEST_EQUALS(actor.IsAffectedByLighting(), false, TEST_LOCATION);
-
-  // Test rendering to ensure that the correct shader setup is used in renderer
-  // (check in debugger or via coverage)
-  application.Render(1);
-  application.SendNotification();
-  application.Render(1);
-  application.SendNotification();
-  application.Render(1);
-  application.SendNotification();
-  application.Render(1);
-  application.SendNotification();
-  application.Render(1);
-  END_TEST;
-}
 
 namespace
 {
@@ -655,7 +549,6 @@ static void TestBlending( TestApplication& application, Material material, float
   MeshActor actor = MeshActor::New(mesh);
   Stage::GetCurrent().Add(actor);
 
-  actor.SetAffectedByLighting(false);
   actor.SetBlendMode(blendingMode);
   actor.SetOpacity(actorOpacity);
 
@@ -712,7 +605,7 @@ int UtcDaliMeshActorBlend04(void)
   tet_infoline("Testing Dali::MeshActor::Blend04()");
 
   Material material = ConstructMaterial(1.0f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGBA8888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGBA8888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -730,7 +623,7 @@ int UtcDaliMeshActorBlend05(void)
   tet_infoline("Testing Dali::MeshActor::Blend05()");
 
   Material material = ConstructMaterial(1.0f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGBA8888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGBA8888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -749,7 +642,7 @@ int UtcDaliMeshActorBlend06(void)
   tet_infoline("Testing Dali::MeshActor::Blend()");
 
   Material material = ConstructMaterial(1.0f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGB888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGB888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -793,7 +686,7 @@ int UtcDaliMeshActorBlend08(void)
   tet_infoline("Testing Dali::MeshActor::Blend08()");
 
   Material material = ConstructMaterial(1.0f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGBA8888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGBA8888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -810,7 +703,7 @@ int UtcDaliMeshActorBlend09(void)
   tet_infoline("Testing Dali::MeshActor::Blend08()");
 
   Material material = ConstructMaterial(0.5f, 1.0f);
-  BitmapImage image = BitmapImage::New( 100, 50, Pixel::RGB888 );
+  BufferImage image = BufferImage::New( 100, 50, Pixel::RGB888 );
   material.SetDiffuseTexture( image );
   application.SendNotification();
   application.Render(0);
@@ -819,79 +712,9 @@ int UtcDaliMeshActorBlend09(void)
   END_TEST;
 }
 
-int UtcDaliMeshActorBoneUpdate01(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::MeshActor::BoneUpdate01()");
-
-  // Set up a mesh with bones.
-  // animate bones
-  // ensure bone actor's world matrix is updated
-
-  Actor trunk = Actor::New();
-  trunk.SetName("trunk");
-  trunk.SetPosition(Vector3(100.0f, 200.0f, 300.0f));
-  trunk.SetRotation(Quaternion(M_PI*0.3f, Vector3::XAXIS));
-  Actor branch = Actor::New();
-  branch.SetName("branch");
-  branch.SetPosition(Vector3(10.0f, 100.0f, 0.0f));
-  branch.SetRotation(Quaternion(M_PI*0.2f, Vector3::YAXIS));
-
-  Actor twig = ImageActor::New(CreateBitmapImage());
-  twig.SetName("twig");
-  branch.SetPosition(Vector3(20.0f, 30.0f, 40.0f));
-
-  Actor bug = Actor::New(); // Not a bone
-  bug.SetName("bug");
-  bug.SetPosition(Vector3(10.0f, 10.0f, 10.0f));
-
-  Stage::GetCurrent().Add(trunk);
-  trunk.Add(branch);
-  branch.Add(twig);
-  twig.Add(bug);
-
-  MeshData meshData;
-  CreateMeshData(meshData); // Created with named bones (as above)
-  Mesh mesh = Mesh::New(meshData);
-  MeshActor meshActor = MeshActor::New(mesh);
-  Stage::GetCurrent().Add(meshActor);
-
-  meshActor.BindBonesToMesh(Stage::GetCurrent().GetRootLayer());
-
-  application.SendNotification();
-  application.Render(0);
-  application.Render();
-  application.SendNotification();
-
-  // How to test?
-  // Need to see what bone actor's node has set as world matrix.
-
-  Animation anim = Animation::New(1.0f);
-  anim.RotateBy(trunk, Radian(M_PI*0.5f), Vector3::ZAXIS);
-  anim.Play();
-  application.SendNotification();
-  application.Render(500);
-  application.SendNotification();
-  application.Render(500);
-  application.SendNotification();
-  application.Render(10);
-
-  // All bones have moved.
-  // Check that their world matrix has been updated: ( Isn't IDENTITY )
-  DALI_TEST_CHECK( ! application.GetGlAbstraction().CheckUniformValue("uModelMatrix", Matrix::IDENTITY ) );
-
-  Matrix worldMatrix;
-  GLuint programId, uniformId;
-  DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformIds("uModelMatrix", programId, uniformId) );
-  DALI_TEST_CHECK( application.GetGlAbstraction().GetUniformValue( programId, uniformId, worldMatrix) );
-
-  // But also check that property is calculated as needed:
-  Matrix calcWorldMatrix = twig.GetCurrentWorldMatrix();
-  DALI_TEST_CHECK( Matrix::IDENTITY != calcWorldMatrix );
-  DALI_TEST_CHECK( worldMatrix == calcWorldMatrix );
-  END_TEST;
-
-}
+// Test that bones update the mesh's bone transform uniforms
+// (Removed old test - wasn't checking the above information, but instead the property
+// info, which is tested elsewhere)
 
 int UtcDaliMeshActorIndices(void)
 {

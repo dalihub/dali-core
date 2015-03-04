@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/native-image-interface.h>
-#include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/common/ref-counted-dali-vector.h>
 
 #include <dali/integration-api/bitmap.h>
@@ -35,7 +35,6 @@
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/modeling/model-data-impl.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/modeling/internal-mesh-data.h>
@@ -295,20 +294,6 @@ public: // Used by ResourceClient
    * Resource ticket has been discarded, throw away the actual resource
    */
   void HandleDiscardResourceRequest( ResourceId id, Integration::ResourceTypeId typeId );
-
-  /********************************************************************************
-   ******************** Event thread object direct interface  *********************
-   ********************************************************************************/
-
-  /**
-   * Called by model implementations which require access to the model
-   * data.
-   * @note Only called from event thread objects - ModelData is not used
-   * by update objects.
-   * @param[in] id - the id of a ModelData resource.
-   * @return the model data or NULL if it has not been loaded.
-   */
-  Internal::ModelDataPtr GetModelData(ResourceId id);
 
   /********************************************************************************
    ******************** Update thread object direct interface  ********************

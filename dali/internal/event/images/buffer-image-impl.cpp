@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/images/bitmap-image-impl.h>
+#include <dali/internal/event/images/buffer-image-impl.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
@@ -34,24 +34,24 @@ namespace Internal
 
 namespace
 {
-TypeRegistration mType( typeid( Dali::BitmapImage ), typeid( Dali::Image ), NULL );
+TypeRegistration mType( typeid( Dali::BufferImage ), typeid( Dali::Image ), NULL );
 } // unnamed namespace
 
-BitmapImagePtr BitmapImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol )
+BufferImagePtr BufferImage::New( unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol )
 {
-  BitmapImagePtr internal = new BitmapImage( width, height, pixelformat, releasePol );
+  BufferImagePtr internal = new BufferImage( width, height, pixelformat, releasePol );
   internal->Initialize();
   return internal;
 }
 
-BitmapImagePtr BitmapImage::New( PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol )
+BufferImagePtr BufferImage::New( PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol )
 {
-  BitmapImagePtr internal = new BitmapImage( pixBuf, width, height, pixelformat, stride, releasePol );
+  BufferImagePtr internal = new BufferImage( pixBuf, width, height, pixelformat, stride, releasePol );
   internal->Initialize();
   return internal;
 }
 
-BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol)
+BufferImage::BufferImage(unsigned int width, unsigned int height, Pixel::Format pixelformat, ReleasePolicy releasePol)
 : Image(releasePol),
   mIsDataExternal(false)
 {
@@ -66,7 +66,7 @@ BitmapImage::BitmapImage(unsigned int width, unsigned int height, Pixel::Format 
   mTicket->AddObserver(*this);
 }
 
-BitmapImage::BitmapImage(PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol)
+BufferImage::BufferImage(PixelBuffer* pixBuf, unsigned int width, unsigned int height, Pixel::Format pixelformat, unsigned int stride, ReleasePolicy releasePol)
 : Image(releasePol),
   mIsDataExternal(true)
 {
@@ -81,11 +81,11 @@ BitmapImage::BitmapImage(PixelBuffer* pixBuf, unsigned int width, unsigned int h
   mTicket->AddObserver(*this);
 }
 
-BitmapImage::~BitmapImage()
+BufferImage::~BufferImage()
 {
 }
 
-void BitmapImage::Update( RectArea& updateArea )
+void BufferImage::Update( RectArea& updateArea )
 {
   if (mTicket)
   {
@@ -99,7 +99,7 @@ void BitmapImage::Update( RectArea& updateArea )
   }
   else if (mIsDataExternal && mBitmapCached)
   {
-    // previously freed up resource memory, dali was informed about external BitmapImage put back on screen
+    // previously freed up resource memory, dali was informed about external BufferImage put back on screen
     Integration::Bitmap* bitmap = mBitmapCached.Get();
     mTicket.Reset((mResourceClient->AddBitmapImage(bitmap)).Get());
 
@@ -107,12 +107,12 @@ void BitmapImage::Update( RectArea& updateArea )
   }
 }
 
-bool BitmapImage::IsDataExternal() const
+bool BufferImage::IsDataExternal() const
 {
   return mIsDataExternal;
 }
 
-PixelBuffer* BitmapImage::GetBuffer()
+PixelBuffer* BufferImage::GetBuffer()
 {
   PixelBuffer* buffer = NULL;
 
@@ -125,7 +125,7 @@ PixelBuffer* BitmapImage::GetBuffer()
   return buffer;
 }
 
-unsigned int BitmapImage::GetBufferSize() const
+unsigned int BufferImage::GetBufferSize() const
 {
   unsigned int bufferSize = 0;
 
@@ -138,7 +138,7 @@ unsigned int BitmapImage::GetBufferSize() const
   return bufferSize;
 }
 
-unsigned int BitmapImage::GetBufferStride() const
+unsigned int BufferImage::GetBufferStride() const
 {
   unsigned int bufferStride = 0;
 
@@ -154,7 +154,7 @@ unsigned int BitmapImage::GetBufferStride() const
   return bufferStride;
 }
 
-Pixel::Format BitmapImage::GetPixelFormat() const
+Pixel::Format BufferImage::GetPixelFormat() const
 {
   Pixel::Format format( Pixel::RGBA8888 );
 
@@ -168,11 +168,11 @@ Pixel::Format BitmapImage::GetPixelFormat() const
   return format;
 }
 
-void BitmapImage::Connect()
+void BufferImage::Connect()
 {
   ++mConnectionCount;
 
-  // application owns bitmap buffer, don't do anything. BufferUpdated() has to be called manually.
+  // application owns bitmap buffer, don't do anything. Update() has to be called manually.
   if (mIsDataExternal)
   {
     return;
@@ -189,7 +189,7 @@ void BitmapImage::Connect()
   }
 }
 
-void BitmapImage::Disconnect()
+void BufferImage::Disconnect()
 {
   if (!mTicket)
   {
@@ -207,7 +207,7 @@ void BitmapImage::Disconnect()
   }
 }
 
-Integration::Bitmap * BitmapImage::GetBitmap() const
+Integration::Bitmap * BufferImage::GetBitmap() const
 {
   Integration::Bitmap* bitmap = NULL;
 

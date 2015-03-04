@@ -126,23 +126,6 @@ struct TestLayerCallback
   bool& mSignalVerified;
 };
 
-struct TestLightActorCallback
-{
-  TestLightActorCallback(bool& signalReceived)
-  : mSignalVerified(signalReceived)
-  {
-  }
-  void operator()(BaseHandle object)
-  {
-    tet_infoline("Verifying TestLightActorCallback()");
-    LightActor actor = LightActor::DownCast(object);
-    if(actor)
-    {
-      mSignalVerified = true;
-    }
-  }
-  bool& mSignalVerified;
-};
 
 struct TestMeshActorCallback
 {
@@ -162,16 +145,17 @@ struct TestMeshActorCallback
   bool& mSignalVerified;
 };
 
-struct TestModelCallback
+
+struct TestTextActorCallback
 {
-  TestModelCallback(bool& signalReceived)
+  TestTextActorCallback(bool& signalReceived)
   : mSignalVerified(signalReceived)
   {
   }
   void operator()(BaseHandle object)
   {
-    tet_infoline("Verifying TestModelCallback()");
-    Model actor = Model::DownCast(object);
+    tet_infoline("Verifying TestTextActorCallback()");
+    TextActor actor = TextActor::DownCast(object);
     if(actor)
     {
       mSignalVerified = true;
@@ -341,30 +325,6 @@ int UtcDaliObjectRegistrySignalLayerCreated(void)
   END_TEST;
 }
 
-int UtcDaliObjectRegistrySignalLightActorCreated(void)
-{
-  TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
-
-  bool verified = false;
-  TestLightActorCallback test(verified);
-
-  Dali::RefObject* objectPointer = NULL;
-  TestObjectDestroyedCallback test2(verified, objectPointer);
-
-  registry.ObjectCreatedSignal().Connect(&application, test);
-  registry.ObjectDestroyedSignal().Connect(&application, test2);
-
-  {
-    LightActor actor = LightActor::New();
-    DALI_TEST_CHECK( test.mSignalVerified );
-
-    verified = false;
-    objectPointer = actor.GetObjectPtr();
-  }
-  DALI_TEST_CHECK( test.mSignalVerified );
-  END_TEST;
-}
 
 int UtcDaliObjectRegistrySignalMeshActorCreated(void)
 {
@@ -395,30 +355,6 @@ int UtcDaliObjectRegistrySignalMeshActorCreated(void)
   END_TEST;
 }
 
-int UtcDaliObjectRegistrySignalModelCreated(void)
-{
-  TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
-
-  bool verified = false;
-  TestModelCallback test(verified);
-
-  Dali::RefObject* objectPointer = NULL;
-  TestObjectDestroyedCallback test2(verified, objectPointer);
-
-  registry.ObjectCreatedSignal().Connect(&application, test);
-  registry.ObjectDestroyedSignal().Connect(&application, test2);
-
-  {
-    Model model = Model::New("blah");
-    DALI_TEST_CHECK( test.mSignalVerified );
-
-    verified = false;
-    objectPointer = model.GetObjectPtr();
-  }
-  DALI_TEST_CHECK( test.mSignalVerified );
-  END_TEST;
-}
 
 int UtcDaliObjectRegistrySignalAnimationCreated(void)
 {
