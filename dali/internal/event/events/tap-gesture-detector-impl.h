@@ -51,10 +51,9 @@ public: // Creation
   /**
    * Create a new gesture detector with the specified parameters.
    * @param[in]  tapsRequired     The number of taps required.
-   * @param[in]  touchesRequired  The number of touches required.
    * @return A smart-pointer to the newly allocated detector.
    */
-  static TapGestureDetectorPtr New(unsigned int tapsRequired, unsigned int touchesRequired);
+  static TapGestureDetectorPtr New( unsigned int tapsRequired );
 
   /**
    * Construct a new GestureDetector.
@@ -64,25 +63,35 @@ public: // Creation
   /**
    * Construct a new GestureDetector with the specified parameters.
    * @param[in]  tapsRequired     The number of taps required.
-   * @param[in]  touchesRequired  The number of touches required.
    */
-  TapGestureDetector(unsigned int tapsRequired, unsigned int touchesRequired);
+  TapGestureDetector( unsigned int tapsRequired );
 
 public:
 
-  /**
-   * @copydoc Dali::TapGestureDetector::SetTapsRequired(unsigned int)
-   */
-  void SetTapsRequired(unsigned int taps);
   /**
    * @copydoc Dali::TapGestureDetector::SetTouchesRequired(unsigned int)
    */
   void SetTouchesRequired(unsigned int touches);
 
   /**
-   * @copydoc Dali::TapGestureDetector::GetTapsRequired()
+   * @copydoc Dali::TapGestureDetector::SetMinimumTapsRequired()
    */
-  unsigned int GetTapsRequired() const;
+  void SetMinimumTapsRequired( unsigned int minTaps );
+
+  /**
+   * @copydoc Dali::TapGestureDetector::SetMaximumTapsRequired()
+   */
+  void SetMaximumTapsRequired( unsigned int maxTaps );
+
+  /**
+   * @copydoc Dali::TapGestureDetector::GetMinimumTapsRequired()
+   */
+  unsigned int GetMinimumTapsRequired() const;
+
+  /**
+   * @copydoc Dali::TapGestureDetector::SetMaximumTapsRequired()
+   */
+  unsigned int GetMaximumTapsRequired() const;
 
   /**
    * @copydoc Dali::TapGestureDetector::GetTouchesRequired()
@@ -154,7 +163,8 @@ private:
 
   Dali::TapGestureDetector::DetectedSignalType mDetectedSignal;
 
-  unsigned int mTapsRequired;
+  unsigned int mMinimumTapsRequired;
+  unsigned int mMaximumTapsRequired;
   unsigned int mTouchesRequired;
 };
 

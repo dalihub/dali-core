@@ -158,15 +158,19 @@ void TapGestureProcessor::AddGestureDetector( TapGestureDetector* gestureDetecto
 
   mGestureDetectors.push_back(gestureDetector);
 
-  unsigned int tapsRequired = gestureDetector->GetTapsRequired();
-  unsigned int touchesRequired = gestureDetector->GetTouchesRequired();
+  const unsigned int minTapsRequired = gestureDetector->GetMinimumTapsRequired();
+  const unsigned int maxTapsRequired = gestureDetector->GetMaximumTapsRequired();
+  const unsigned int touchesRequired = gestureDetector->GetTouchesRequired();
+
+  DALI_ASSERT_ALWAYS( minTapsRequired <= maxTapsRequired && "Minimum taps requested is greater than the maximum requested" );
 
   if (firstRegistration)
   {
     // If this is the first tap gesture detector that has been added, then our minimum and maximum
     // requirements are the same as each other.
 
-    mMinTapsRequired = mMaxTapsRequired = tapsRequired;
+    mMinTapsRequired = minTapsRequired;
+    mMaxTapsRequired = maxTapsRequired;
     mMinTouchesRequired = mMaxTouchesRequired = touchesRequired;
 
     Integration::TapGestureRequest request;
@@ -182,8 +186,10 @@ void TapGestureProcessor::AddGestureDetector( TapGestureDetector* gestureDetecto
     // minimum and maximums and see if our gesture detection requirements have changed, if they
     // have, then we should ask the adaptor to update its detection policy.
 
-    unsigned int minTaps = mMinTapsRequired < tapsRequired ? mMinTapsRequired : tapsRequired;
-    unsigned int maxTaps = mMaxTapsRequired > tapsRequired ? mMaxTapsRequired : tapsRequired;
+    // This is quicker than calling UpdateDetection as there is no need to iterate through the container
+
+    unsigned int minTaps = mMinTapsRequired < minTapsRequired ? mMinTapsRequired : minTapsRequired;
+    unsigned int maxTaps = mMaxTapsRequired > maxTapsRequired ? mMaxTapsRequired : maxTapsRequired;
     unsigned int minTouches = mMinTouchesRequired < touchesRequired ? mMinTouchesRequired : touchesRequired;
     unsigned int maxTouches = mMaxTouchesRequired > touchesRequired ? mMaxTouchesRequired : touchesRequired;
 
@@ -226,6 +232,11 @@ void TapGestureProcessor::GestureDetectorUpdated( TapGestureDetector* gestureDet
 {
   DALI_ASSERT_DEBUG(find(mGestureDetectors.begin(), mGestureDetectors.end(), gestureDetector) != mGestureDetectors.end());
 
+  const unsigned int minTapsRequired = gestureDetector->GetMinimumTapsRequired();
+  const unsigned int maxTapsRequired = gestureDetector->GetMaximumTapsRequired();
+
+  DALI_ASSERT_ALWAYS( minTapsRequired <= maxTapsRequired && "Minimum taps requested is greater than the maximum requested" );
+
   UpdateDetection();
 }
 
@@ -242,11 +253,12 @@ void TapGestureProcessor::UpdateDetection()
   {
     TapGestureDetector* detector(*iter);
 
-    unsigned int tapsRequired = detector->GetTapsRequired();
-    unsigned int touchesRequired = detector->GetTouchesRequired();
+    const unsigned int minTapsRequired = detector->GetMinimumTapsRequired();
+    const unsigned int maxTapsRequired = detector->GetMaximumTapsRequired();
+    const unsigned int touchesRequired = detector->GetTouchesRequired();
 
-    minTaps = tapsRequired < minTaps ? tapsRequired : minTaps;
-    maxTaps = tapsRequired > maxTaps ? tapsRequired : maxTaps;
+    minTaps = minTapsRequired < minTaps ? minTapsRequired : minTaps;
+    maxTaps = maxTapsRequired > maxTaps ? maxTapsRequired : maxTaps;
     minTouches = touchesRequired < minTouches ? touchesRequired : minTouches;
     maxTouches = touchesRequired > maxTouches ? touchesRequired : maxTouches;
   }
@@ -269,7 +281,7 @@ bool TapGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor
 
   TapGestureDetector* tapDetector ( static_cast< TapGestureDetector* >( detector ) );
 
-  return ( tapDetector->GetTapsRequired() == mCurrentTapEvent->numberOfTaps ) &&
+  return ( ( tapDetector->GetMinimumTapsRequired() <= mCurrentTapEvent->numberOfTaps ) && ( tapDetector->GetMaximumTapsRequired() >= mCurrentTapEvent->numberOfTaps ) ) &&
          ( tapDetector->GetTouchesRequired() == mCurrentTapEvent->numberOfTouches );
 }
 
