@@ -154,13 +154,13 @@ int UtcDaliTapGestureDetectorNew(void)
 
   TapGestureDetector detector = TapGestureDetector::New();
   DALI_TEST_CHECK(detector);
-  DALI_TEST_EQUALS(1u, detector.GetTapsRequired(), TEST_LOCATION);
-  DALI_TEST_EQUALS(1u, detector.GetTouchesRequired(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, detector.GetMinimumTapsRequired(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, detector.GetMaximumTapsRequired(), TEST_LOCATION);
 
-  TapGestureDetector detector2 = TapGestureDetector::New(5u, 5u);
+  TapGestureDetector detector2 = TapGestureDetector::New( 5u );
   DALI_TEST_CHECK(detector2);
-  DALI_TEST_EQUALS(5u, detector2.GetTapsRequired(), TEST_LOCATION);
-  DALI_TEST_EQUALS(5u, detector2.GetTouchesRequired(), TEST_LOCATION);
+  DALI_TEST_EQUALS(5u, detector2.GetMinimumTapsRequired(), TEST_LOCATION);
+  DALI_TEST_EQUALS(5u, detector2.GetMaximumTapsRequired(), TEST_LOCATION);
 
   //Scoped test to test destructor
   {
@@ -231,13 +231,17 @@ int UtcDaliTapGestureSetTapsRequired(void)
 
   TapGestureDetector detector = TapGestureDetector::New();
 
-  unsigned int taps = 3;
+  const unsigned int minTaps = 3;
+  const unsigned int maxTaps = 7;
 
-  DALI_TEST_CHECK(taps != detector.GetTapsRequired());
+  DALI_TEST_CHECK( minTaps != detector.GetMinimumTapsRequired() );
+  DALI_TEST_CHECK( maxTaps != detector.GetMaximumTapsRequired() );
 
-  detector.SetTapsRequired(taps);
+  detector.SetMinimumTapsRequired( minTaps );
+  detector.SetMaximumTapsRequired( maxTaps );
 
-  DALI_TEST_EQUALS(taps, detector.GetTapsRequired(), TEST_LOCATION);
+  DALI_TEST_EQUALS( minTaps, detector.GetMinimumTapsRequired(), TEST_LOCATION );
+  DALI_TEST_EQUALS( maxTaps, detector.GetMaximumTapsRequired(), TEST_LOCATION );
 
   // Attach an actor and change the required touches
 
@@ -256,13 +260,47 @@ int UtcDaliTapGestureSetTapsRequired(void)
   detector.Attach(actor);
   detector.DetectedSignal().Connect( &application, functor );
 
+  // Ensure signal is emitted if minimum taps received
+  application.ProcessEvent(GenerateTap(Gesture::Possible, minTaps, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, minTaps, 1u, Vector2(50.0f, 50.0f)));
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( minTaps, data.receivedGesture.numberOfTaps, TEST_LOCATION );
+  data.Reset();
+
+  // Ensure signal is emitted if maximum taps received
+  application.ProcessEvent(GenerateTap(Gesture::Possible, maxTaps, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, maxTaps, 1u, Vector2(50.0f, 50.0f)));
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_EQUALS( maxTaps, data.receivedGesture.numberOfTaps, TEST_LOCATION );
+  data.Reset();
+
+  // Ensure signal is NOT emitted if outside the range
+  application.ProcessEvent(GenerateTap(Gesture::Possible, minTaps - 1, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, minTaps - 1, 1u, Vector2(50.0f, 50.0f)));
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+  application.ProcessEvent(GenerateTap(Gesture::Possible, maxTaps + 1, 1u, Vector2(50.0f, 50.0f)));
+  application.ProcessEvent(GenerateTap(Gesture::Started, maxTaps + 1, 1u, Vector2(50.0f, 50.0f)));
+  DALI_TEST_EQUALS( false, data.functorCalled, TEST_LOCATION );
+  data.Reset();
+
   TestGestureManager& gestureManager = application.GetGestureManager();
   gestureManager.Initialize();
 
-  detector.SetTapsRequired(4);
+  detector.SetMinimumTapsRequired(4);
 
   // Gesture detection should have been updated only
   DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UpdateType), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::RegisterType), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
+
+  // Reset values
+  gestureManager.Initialize();
+
+  detector.SetMaximumTapsRequired(maxTaps);
+
+  // Gesture detection should NOT have been updated
+  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UpdateType), TEST_LOCATION);
   DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::RegisterType), TEST_LOCATION);
   DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
 
@@ -277,33 +315,36 @@ int UtcDaliTapGestureSetTapsRequired(void)
   DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UpdateType), TEST_LOCATION);
   DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::RegisterType), TEST_LOCATION);
   DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
+
+  // Reset values
+  gestureManager.Initialize();
+
+  // Delete the second detector so that our detection is updated again
+  secondDetector.Reset();
+  DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UpdateType), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::RegisterType), TEST_LOCATION);
+  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
+
+  // Set the minimum to be greater than the maximum, should Assert
+  try
+  {
+    detector.SetMinimumTapsRequired( maxTaps );
+    detector.SetMaximumTapsRequired( minTaps );
+    DALI_TEST_CHECK( false ); // Should not get here
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_CHECK( true );
+  }
+
   END_TEST;
 }
 
-int UtcDaliTapGestureGetTapsRequired(void)
+int UtcDaliTapGestureSetTapsRequiredMinMaxCheck(void)
 {
   TestApplication application;
 
-  TapGestureDetector detector = TapGestureDetector::New();
-  DALI_TEST_EQUALS(1u, detector.GetTapsRequired(), TEST_LOCATION);
-  END_TEST;
-}
-
-int UtcDaliTapGestureSetTouchesRequired(void)
-{
-  TestApplication application;
-
-  TapGestureDetector detector = TapGestureDetector::New();
-
-  unsigned int max = 3;
-
-  DALI_TEST_CHECK(max != detector.GetTouchesRequired());
-
-  detector.SetTouchesRequired(max);
-
-  DALI_TEST_EQUALS(max, detector.GetTouchesRequired(), TEST_LOCATION);
-
-  // Attach an actor and change the maximum touches
+  // Attach an actor and change the required touches
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
@@ -314,42 +355,31 @@ int UtcDaliTapGestureSetTouchesRequired(void)
   application.SendNotification();
   application.Render();
 
-  SignalData data;
-  GestureReceivedFunctor functor(data);
+  // Set the minimum to be greater than the maximum, should Assert
 
-  detector.Attach(actor);
-  detector.DetectedSignal().Connect( &application, functor );
+  try
+  {
+    TapGestureDetector detector = TapGestureDetector::New();
+    detector.SetMinimumTapsRequired( 7u );
+    detector.SetMaximumTapsRequired( 3u );
+    detector.Attach(actor);
+    DALI_TEST_CHECK( false ); // Should not get here
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_CHECK( true );
+  }
 
-  TestGestureManager& gestureManager = application.GetGestureManager();
-  gestureManager.Initialize();
-
-  detector.SetTouchesRequired(4);
-
-  // Gesture detection should have been updated only
-  DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UpdateType), TEST_LOCATION);
-  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::RegisterType), TEST_LOCATION);
-  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
-
-  // Reset values
-  gestureManager.Initialize();
-
-  // Create a second gesture detector that requires even less maximum touches
-  TapGestureDetector secondDetector = TapGestureDetector::New();
-  secondDetector.Attach(actor);
-
-  // Gesture detection should have been updated
-  DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UpdateType), TEST_LOCATION);
-  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::RegisterType), TEST_LOCATION);
-  DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliTapGestureGetTouchesRequired(void)
+int UtcDaliTapGestureGetTapsRequired(void)
 {
   TestApplication application;
 
   TapGestureDetector detector = TapGestureDetector::New();
-  DALI_TEST_EQUALS(1u, detector.GetTouchesRequired(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, detector.GetMinimumTapsRequired(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, detector.GetMaximumTapsRequired(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -745,9 +775,7 @@ int UtcDaliTapGestureSignalReceptionMultipleGestureDetectors(void)
     // Reset gestureManager statistics
     gestureManager.Initialize();
 
-    TapGestureDetector secondDetector = TapGestureDetector::New();
-    secondDetector.SetTapsRequired(2);
-    secondDetector.SetTouchesRequired(2);
+    TapGestureDetector secondDetector = TapGestureDetector::New( 2 );
     secondDetector.Attach(second);
     secondDetector.DetectedSignal().Connect(&application, functor);
 
@@ -756,8 +784,8 @@ int UtcDaliTapGestureSignalReceptionMultipleGestureDetectors(void)
     DALI_TEST_EQUALS(false, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
 
     // Tap within second actor's area
-    application.ProcessEvent(GenerateTap(Gesture::Possible, 2u, 2u, Vector2(150.0f, 10.0f)));
-    application.ProcessEvent(GenerateTap(Gesture::Started, 2u, 2u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Possible, 2u, 1u, Vector2(150.0f, 10.0f)));
+    application.ProcessEvent(GenerateTap(Gesture::Started, 2u, 1u, Vector2(150.0f, 10.0f)));
     DALI_TEST_EQUALS(true, data.functorCalled, TEST_LOCATION);
     DALI_TEST_EQUALS(true, second == data.tappedActor, TEST_LOCATION);
 

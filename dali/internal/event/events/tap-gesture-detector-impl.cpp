@@ -33,6 +33,9 @@ namespace Internal
 namespace
 {
 
+const unsigned int DEFAULT_TAPS_REQUIRED = 1u;
+const unsigned int DEFAULT_TOUCHES_REQUIRED = 1u;
+
 // Signals
 const char* const SIGNAL_TAP_DETECTED = "tap-detected";
 
@@ -52,22 +55,24 @@ TapGestureDetectorPtr TapGestureDetector::New()
   return new TapGestureDetector;
 }
 
-TapGestureDetectorPtr TapGestureDetector::New(unsigned int tapsRequired, unsigned int touchesRequired)
+TapGestureDetectorPtr TapGestureDetector::New( unsigned int tapsRequired )
 {
-  return new TapGestureDetector(tapsRequired, touchesRequired);
+  return new TapGestureDetector( tapsRequired );
 }
 
 TapGestureDetector::TapGestureDetector()
-: GestureDetector(Gesture::Tap),
-  mTapsRequired(1),
-  mTouchesRequired(1)
+: GestureDetector( Gesture::Tap ),
+  mMinimumTapsRequired( DEFAULT_TAPS_REQUIRED ),
+  mMaximumTapsRequired( DEFAULT_TAPS_REQUIRED ),
+  mTouchesRequired( DEFAULT_TOUCHES_REQUIRED )
 {
 }
 
-TapGestureDetector::TapGestureDetector(unsigned int tapsRequired, unsigned int touchesRequired)
-: GestureDetector(Gesture::Tap),
-  mTapsRequired(tapsRequired),
-  mTouchesRequired(touchesRequired)
+TapGestureDetector::TapGestureDetector( unsigned int tapsRequired )
+: GestureDetector( Gesture::Tap ),
+  mMinimumTapsRequired( tapsRequired ),
+  mMaximumTapsRequired( tapsRequired ),
+  mTouchesRequired( DEFAULT_TOUCHES_REQUIRED )
 {
 }
 
@@ -75,15 +80,26 @@ TapGestureDetector::~TapGestureDetector()
 {
 }
 
-void TapGestureDetector::SetTapsRequired(unsigned int taps)
+void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
 {
-  DALI_ASSERT_ALWAYS(taps > 0 && "Can only set a positive number of taps" );
-
-  if (mTapsRequired != taps)
+  if ( mMinimumTapsRequired != taps )
   {
-    mTapsRequired = taps;
+    mMinimumTapsRequired = taps;
 
-    if (!mAttachedActors.empty())
+    if ( !mAttachedActors.empty() )
+    {
+      mGestureEventProcessor.GestureDetectorUpdated(this);
+    }
+  }
+}
+
+void TapGestureDetector::SetMaximumTapsRequired(unsigned int taps)
+{
+  if ( mMaximumTapsRequired != taps )
+  {
+    mMaximumTapsRequired = taps;
+
+    if ( !mAttachedActors.empty() )
     {
       mGestureEventProcessor.GestureDetectorUpdated(this);
     }
@@ -92,8 +108,6 @@ void TapGestureDetector::SetTapsRequired(unsigned int taps)
 
 void TapGestureDetector::SetTouchesRequired(unsigned int touches)
 {
-  DALI_ASSERT_ALWAYS(touches > 0 && "Can only set a positive number of touches" );
-
   if (mTouchesRequired != touches)
   {
     mTouchesRequired = touches;
@@ -105,9 +119,14 @@ void TapGestureDetector::SetTouchesRequired(unsigned int touches)
   }
 }
 
-unsigned int TapGestureDetector::GetTapsRequired() const
+unsigned int TapGestureDetector::GetMinimumTapsRequired() const
 {
-  return mTapsRequired;
+  return mMinimumTapsRequired;
+}
+
+unsigned int TapGestureDetector::GetMaximumTapsRequired() const
+{
+  return mMaximumTapsRequired;
 }
 
 unsigned int TapGestureDetector::GetTouchesRequired() const
