@@ -193,7 +193,7 @@ int UtcDaliShaderEffectMethodNew04(void)
                                                        fragmentShaderPrefix, FragmentSourceUsingExtensions,
                                                        GEOMETRY_TYPE_IMAGE, ShaderEffect::HINT_NONE );
 
-    BitmapImage image = CreateBitmapImage();
+    BufferImage image = CreateBufferImage();
     ImageActor actor = ImageActor::New( image );
     actor.SetSize( 100.0f, 100.0f );
     actor.SetName("TestImageFilenameActor");
@@ -325,7 +325,7 @@ int UtcDaliShaderEffectMethodSetUniformFloat(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uFloat", 1.0f );
 
@@ -351,7 +351,7 @@ int UtcDaliShaderEffectMethodSetUniformVector2(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec2", Vector2( 2.0f, 3.0f ) );
 
@@ -377,7 +377,7 @@ int UtcDaliShaderEffectMethodSetUniformVector3(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec3", Vector3( 4.0f, 5.0f, 6.0f ) );
 
@@ -403,7 +403,7 @@ int UtcDaliShaderEffectMethodSetUniformVector4(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec4", Vector4( 7.0f, 8.0f, 9.0f, 10.0f ) );
 
@@ -429,7 +429,7 @@ int UtcDaliShaderEffectMethodSetUniformMatrix(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uModelView", Matrix::IDENTITY );
 
@@ -455,7 +455,7 @@ int UtcDaliShaderEffectMethodSetUniformMatrix3(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   Matrix3 matIdentity(1.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f);
   effect.SetUniform( "uMatrix3", matIdentity );
@@ -480,7 +480,7 @@ int UtcDaliShaderEffectMethodSetUniformViewport(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
@@ -525,7 +525,7 @@ int UtcDaliShaderEffectMethodSetEffectImage(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetEffectImage(image);
 
@@ -554,7 +554,7 @@ int UtcDaliShaderEffectMethodSetEffectImageAndDelete(void)
 
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
 
-  BitmapImage effectImage = CreateBitmapImage();
+  BufferImage effectImage = CreateBufferImage();
   effect.SetEffectImage(effectImage);
 
   ImageActor actor = ImageActor::New();
@@ -622,7 +622,7 @@ int UtcDaliShaderEffectMethodApplyConstraint(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) );
 
@@ -668,7 +668,7 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec3", Vector3( 50.0f, 25.0f, 0.0f ) );
 
@@ -682,7 +682,7 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor(void)
   Property::Index uVecProperty = effect.GetPropertyIndex("uVec3");
 
   Constraint constraint = Constraint::New<Vector3>( uVecProperty,
-                                                    Source(actor, Actor::POSITION),
+                                                    Source(actor, Actor::Property::Position),
                                                     TestConstraintFromPositionToVector3() );
 
   effect.ApplyConstraint(constraint);
@@ -708,7 +708,7 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor2(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec3", Vector3( 50.0f, 25.0f, 0.0f ) );
 
@@ -722,12 +722,12 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor2(void)
   Property::Index uVecProperty = effect.GetPropertyIndex("uVec3");
 
   Constraint shaderConstraint = Constraint::New<Vector3>( uVecProperty,
-                                                    Source(actor, Actor::POSITION),
+                                                    Source(actor, Actor::Property::Position),
                                                     TestConstraintFromPositionToVector3() );
 
   effect.ApplyConstraint(shaderConstraint);
 
-  Constraint actorConstraint = Constraint::New<Vector3>( Actor::POSITION,
+  Constraint actorConstraint = Constraint::New<Vector3>( Actor::Property::Position,
                                                          TestConstraintToVector3Double(targetPosition) );
 
   actor.ApplyConstraint(actorConstraint);
@@ -750,7 +750,7 @@ int UtcDaliShaderEffectMethodApplyConstraintCallback(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) );
 
@@ -822,7 +822,7 @@ int UtcDaliShaderEffectMethodRemoveConstraints(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) );
 
@@ -868,7 +868,7 @@ int UtcDaliShaderEffectMethodRemoveConstraints2(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
 
   effect.SetUniform( "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) );
 
@@ -941,7 +941,7 @@ int UtcDaliShaderEffectMethodCreateExtension2(void)
     ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
     DALI_TEST_CHECK( effect );
 
-    BitmapImage image = CreateBitmapImage();
+    BufferImage image = CreateBufferImage();
 
     effect.SetUniform( "uFloat", 1.0f );
 
@@ -1020,7 +1020,7 @@ int UtcDaliShaderBinaries(void)
   ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
   DALI_TEST_CHECK( effect );
 
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetName("TestImageFilenameActor");
@@ -1105,7 +1105,7 @@ int UtcDaliShaderEffectFromProperties01(void)
   TestPlatformAbstraction& platform = application.GetPlatform();
   platform.SetResourceLoaded(request->GetId(), request->GetType()->id, resourcePtr);
 
-  BitmapImage image(CreateBitmapImage());
+  BufferImage image(CreateBufferImage());
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetName("TestImageFilenameActor");

@@ -53,7 +53,7 @@ inline void SetOpaqueRenderFlags( RenderList& renderList, bool transparentRender
   // and this renderer does not need depth test against itself (for example a mesh actor)
   // if this layer has got exactly one opaque renderer
   // and this renderer is not interested in depth testing
-  // (i.e. is an image or text and not a model)
+  // (i.e. is an image and not a mesh)
   if ( ( (  renderList.Count() == 1 ) &&
          (  !transparentRenderersExist ) &&
          (  !renderList.GetRenderer( 0 )->RequiresDepthTest() ) ) ||
@@ -67,7 +67,7 @@ inline void SetOpaqueRenderFlags( RenderList& renderList, bool transparentRender
   else
   {
     // Prepare for rendering multiple opaque objects
-    unsigned int flags = RenderList::DEPTH_TEST | RenderList::DEPTH_WRITE | RenderList::DEPTH_CLEAR; // clear depth buffer, draw over the previously rendered layers;
+    unsigned int flags = RenderList::DEPTH_BUFFER_ENABLED | RenderList::DEPTH_WRITE | RenderList::DEPTH_CLEAR; // clear depth buffer, draw over the previously rendered layers;
 
     renderList.ClearFlags();
     renderList.SetFlags(flags);
@@ -75,7 +75,7 @@ inline void SetOpaqueRenderFlags( RenderList& renderList, bool transparentRender
 
   if( stencilRenderablesExist )
   {
-    renderList.SetFlags( RenderList::STENCIL_TEST );
+    renderList.SetFlags( RenderList::STENCIL_BUFFER_ENABLED );
   }
 }
 
@@ -98,12 +98,12 @@ inline void SetTransparentRenderFlags( RenderList& renderList, bool opaqueRender
     // objects should be rendered with depth test on to avoid background objects
     // appearing in front of opaque foreground objects.
 
-    renderList.SetFlags( RenderList::DEPTH_TEST );
+    renderList.SetFlags( RenderList::DEPTH_BUFFER_ENABLED );
   }
 
   if( stencilRenderablesExist )
   {
-    renderList.SetFlags( RenderList::STENCIL_TEST );
+    renderList.SetFlags( RenderList::STENCIL_BUFFER_ENABLED );
   }
 }
 
@@ -117,7 +117,7 @@ inline void SetOverlayRenderFlags( RenderList& renderList, bool stencilRenderabl
 {
   if(stencilRenderablesExist)
   {
-    renderList.SetFlags(RenderList::STENCIL_TEST);
+    renderList.SetFlags(RenderList::STENCIL_BUFFER_ENABLED);
   }
 }
 
@@ -128,7 +128,7 @@ inline void SetOverlayRenderFlags( RenderList& renderList, bool stencilRenderabl
 inline void SetStencilRenderFlags( RenderList& renderList )
 {
   renderList.ClearFlags();
-  renderList.SetFlags(RenderList::STENCIL_CLEAR | RenderList::STENCIL_WRITE | RenderList::STENCIL_TEST);
+  renderList.SetFlags(RenderList::STENCIL_CLEAR | RenderList::STENCIL_WRITE | RenderList::STENCIL_BUFFER_ENABLED );
 }
 
 /**

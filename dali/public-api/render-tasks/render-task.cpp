@@ -62,7 +62,7 @@ RenderTask::~RenderTask()
 }
 
 RenderTask::RenderTask(const RenderTask& handle)
-: Constrainable(handle)
+: Handle(handle)
 {
 }
 
@@ -241,7 +241,7 @@ bool RenderTask::GetInputEnabled() const
 }
 
 RenderTask::RenderTask( Internal::RenderTask* internal )
-: Constrainable(internal)
+: Handle(internal)
 {
 }
 

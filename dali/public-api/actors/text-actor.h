@@ -60,31 +60,40 @@ class DALI_IMPORT_API TextActor : public RenderableActor
 {
 public:
 
-  typedef Signal< void (TextActor) > TextSignalType;     ///< Text available signal type
+  /**
+   * @brief An enumeration of properties belonging to the TextActor class.
+   * Properties additional to RenderableActor.
+   */
+  struct Property
+  {
+    enum
+    {
+      Text = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "text"                     type String
+      Font,                                              ///< name "font"                     type String
+      FontStyle,                                         ///< name "font-style"               type String
+      OutlineEnable,                                     ///< name "outline-enable"           type Boolean
+      OutlineColor,                                      ///< name "outline-color"            type Vector4
+      OutlineThicknessWidth,                             ///< name "outline-thickness-width"  type Vector2
+      SmoothEdge,                                        ///< name "smooth-edge"              type Float
+      GlowEnable,                                        ///< name "glow-enable"              type Boolean
+      GlowColor,                                         ///< name "glow-color"               type Vector4
+      GlowIntensity,                                     ///< name "glow-intensity"           type Float
+      ShadowEnable,                                      ///< name "shadow-enable"            type Boolean
+      ShadowColor,                                       ///< name "shadow-color"             type Vector4
+      ShadowOffset,                                      ///< name "shadow-offset"            type Vector2
+      ItalicsAngle,                                      ///< name "italics-angle"            type Float
+      Underline,                                         ///< name "underline"                type Boolean
+      Weight,                                            ///< name "weight"                   type Integer
+      FontDetectionAutomatic,                            ///< name "font-detection-automatic" type Boolean
+      GradientColor,                                     ///< name "gradient-color"           type Vector4
+      GradientStartPoint,                                ///< name "gradient-start-point"     type Vector2
+      GradientEndPoint,                                  ///< name "gradient-end-point"       type Vector2
+      ShadowSize,                                        ///< name "shadow-size"              type Float
+      TextColor,                                         ///< name "text-color"               type Vector4
+    };
+  };
 
-  // Default Properties; additional to RenderableActor properties
-  static const Property::Index TEXT;                              ///< name "text"                     type STRING
-  static const Property::Index FONT;                              ///< name "font"                     type STRING
-  static const Property::Index FONT_STYLE;                        ///< name "font-style"               type STRING
-  static const Property::Index OUTLINE_ENABLE;                    ///< name "outline-enable"           type BOOLEAN
-  static const Property::Index OUTLINE_COLOR;                     ///< name "outline-color"            type VECTOR4
-  static const Property::Index OUTLINE_THICKNESS_WIDTH;           ///< name "outline-thickness-width"  type VECTOR2
-  static const Property::Index SMOOTH_EDGE;                       ///< name "smooth-edge"              type FLOAT
-  static const Property::Index GLOW_ENABLE;                       ///< name "glow-enable"              type BOOLEAN
-  static const Property::Index GLOW_COLOR;                        ///< name "glow-color"               type VECTOR4
-  static const Property::Index GLOW_INTENSITY;                    ///< name "glow-intensity"           type FLOAT
-  static const Property::Index SHADOW_ENABLE;                     ///< name "shadow-enable"            type BOOLEAN
-  static const Property::Index SHADOW_COLOR;                      ///< name "shadow-color"             type VECTOR4
-  static const Property::Index SHADOW_OFFSET;                     ///< name "shadow-offset"            type VECTOR2
-  static const Property::Index ITALICS_ANGLE;                     ///< name "italics-angle"            type FLOAT
-  static const Property::Index UNDERLINE;                         ///< name "underline"                type BOOLEAN
-  static const Property::Index WEIGHT;                            ///< name "weight"                   type INTEGER
-  static const Property::Index FONT_DETECTION_AUTOMATIC;          ///< name "font-detection-automatic" type BOOLEAN
-  static const Property::Index GRADIENT_COLOR;                    ///< name "gradient-color"           type VECTOR4
-  static const Property::Index GRADIENT_START_POINT;              ///< name "gradient-start-point"     type VECTOR2
-  static const Property::Index GRADIENT_END_POINT;                ///< name "gradient-end-point"       type VECTOR2
-  static const Property::Index SHADOW_SIZE;                       ///< name "shadow-size"              type FLOAT
-  static const Property::Index TEXT_COLOR;                        ///< name "text-color"               type VECTOR4
+  typedef Signal< void (TextActor) > TextSignalType;     ///< Text available signal type
 
   /**
    * @brief Create an uninitialized TextActor handle.

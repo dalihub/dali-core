@@ -59,10 +59,7 @@ MeshAttachment* MeshAttachment::New()
 
 MeshAttachment::MeshAttachment()
 : RenderableAttachment( true ), // scale enabled
-  mRenderer( NULL ),
-  mAffectedByLighting(true),
-  mLastLightingState(true),
-  mLightInitialized(false)
+  mRenderer( NULL )
 {
 }
 
@@ -81,7 +78,7 @@ void MeshAttachment::ConnectToSceneGraph2( BufferIndex updateBufferIndex )
   DALI_ASSERT_DEBUG( NULL != mSceneController );
 
   // Create main renderer, passing ownership to the render-thread
-  mRenderer = MeshRenderer::New( *mParent, mSceneController->GetLightController() );
+  mRenderer = MeshRenderer::New( *mParent );
   mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
 }
 
@@ -151,11 +148,6 @@ void MeshAttachment::SetMesh( ResourceId meshId, const SceneGraph::Material* mat
 void MeshAttachment::SetMaterial( const SceneGraph::Material* material )
 {
   mMesh.material = material;
-}
-
-void MeshAttachment::SetAffectedByLighting( bool affectedByLighting )
-{
-  mAffectedByLighting = affectedByLighting;
 }
 
 void MeshAttachment::SetBoneNode( Node* node, size_t boneIdx, size_t boneCount )
@@ -228,21 +220,6 @@ bool MeshAttachment::DoPrepareResources( BufferIndex updateBufferIndex, Resource
 void MeshAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG(mSceneController);
-  RenderQueue& renderQueue = mSceneController->GetRenderQueue();
-
-  if( !mLightInitialized || ( mAffectedByLighting != mLastLightingState ) )
-  {
-    mLastLightingState = mAffectedByLighting;
-    mLightInitialized = true;
-
-    typedef MessageValue1< MeshRenderer, bool > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = renderQueue.ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( mRenderer, &MeshRenderer::SetAffectedByLighting, mAffectedByLighting );
-  }
 
   // Provide renderer with ModelIT matrix, mesh, material, and bone transforms for the next frame
   MeshRenderer::MeshInfo& meshInfo = mRenderer->GetMeshInfo( updateBufferIndex );

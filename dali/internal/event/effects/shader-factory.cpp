@@ -32,10 +32,8 @@
 // the generated shader strings
 #include "dali-shaders.h"
 
-
 // Use pre-compiler constants in order to utilize string concatenation
 #define SHADER_DEF_USE_BONES    "#define USE_BONES\n"
-#define SHADER_DEF_USE_LIGHTING "#define USE_LIGHTING\n"
 #define SHADER_DEF_USE_COLOR    "#define USE_COLOR\n"
 #define SHADER_DEF_USE_GRADIENT "#define USE_GRADIENT\n"
 
@@ -130,20 +128,10 @@ void ShaderFactory::LoadDefaultShaders()
   mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE_GLOW, TextDistanceFieldOutlineGlowVertex, TextDistanceFieldOutlineGlowFragment, false );
 
   // Untextured meshes
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_DEFAULT,
-                                      UntexturedMeshVertex,
-                                      std::string( SHADER_DEF_USE_LIGHTING ) + UntexturedMeshFragment,
-                                      false );
-
   mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_EVENLY_LIT,
                                       UntexturedMeshVertex,
                                       UntexturedMeshFragment,
                                       false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_RIGGED_AND_LIT,
-                                      std::string( SHADER_DEF_USE_BONES ) + UntexturedMeshVertex,
-                                      std::string( SHADER_DEF_USE_LIGHTING ) + UntexturedMeshFragment,
-                                      true );
 
   mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
                                       std::string( SHADER_DEF_USE_BONES ) + UntexturedMeshVertex,
@@ -161,20 +149,10 @@ void ShaderFactory::LoadDefaultShaders()
                                       false );
 
   // Textured meshes
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_DEFAULT,
-                                      TexturedMeshVertex,
-                                      std::string( SHADER_DEF_USE_LIGHTING ) + TexturedMeshFragment,
-                                      false );
-
   mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_EVENLY_LIT,
                                       TexturedMeshVertex,
                                       TexturedMeshFragment,
                                       false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_LIT,
-                                      std::string( SHADER_DEF_USE_BONES ) + TexturedMeshVertex,
-                                      std::string( SHADER_DEF_USE_LIGHTING ) + TexturedMeshFragment,
-                                      true );
 
   mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
                                       std::string( SHADER_DEF_USE_BONES ) + TexturedMeshVertex,

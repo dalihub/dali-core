@@ -771,28 +771,28 @@ int UtcDaliTextActorDefaultProperties(void)
   TextActor actor = TextActor::New("@");
 
   std::vector<Property::Index> indices ;
-  indices.push_back(TextActor::TEXT                     );
-  indices.push_back(TextActor::FONT                     );
-  indices.push_back(TextActor::FONT_STYLE               );
-  indices.push_back(TextActor::OUTLINE_ENABLE           );
-  indices.push_back(TextActor::OUTLINE_COLOR            );
-  indices.push_back(TextActor::OUTLINE_THICKNESS_WIDTH  );
-  indices.push_back(TextActor::SMOOTH_EDGE              );
-  indices.push_back(TextActor::GLOW_ENABLE              );
-  indices.push_back(TextActor::GLOW_COLOR               );
-  indices.push_back(TextActor::GLOW_INTENSITY           );
-  indices.push_back(TextActor::SHADOW_ENABLE            );
-  indices.push_back(TextActor::SHADOW_COLOR             );
-  indices.push_back(TextActor::SHADOW_OFFSET            );
-  indices.push_back(TextActor::ITALICS_ANGLE            );
-  indices.push_back(TextActor::UNDERLINE                );
-  indices.push_back(TextActor::WEIGHT                   );
-  indices.push_back(TextActor::FONT_DETECTION_AUTOMATIC );
-  indices.push_back(TextActor::GRADIENT_COLOR           );
-  indices.push_back(TextActor::GRADIENT_START_POINT     );
-  indices.push_back(TextActor::GRADIENT_END_POINT       );
-  indices.push_back(TextActor::SHADOW_SIZE              );
-  indices.push_back(TextActor::TEXT_COLOR               );
+  indices.push_back(TextActor::Property::Text                    );
+  indices.push_back(TextActor::Property::Font                    );
+  indices.push_back(TextActor::Property::FontStyle               );
+  indices.push_back(TextActor::Property::OutlineEnable           );
+  indices.push_back(TextActor::Property::OutlineColor            );
+  indices.push_back(TextActor::Property::OutlineThicknessWidth   );
+  indices.push_back(TextActor::Property::SmoothEdge              );
+  indices.push_back(TextActor::Property::GlowEnable              );
+  indices.push_back(TextActor::Property::GlowColor               );
+  indices.push_back(TextActor::Property::GlowIntensity           );
+  indices.push_back(TextActor::Property::ShadowEnable            );
+  indices.push_back(TextActor::Property::ShadowColor             );
+  indices.push_back(TextActor::Property::ShadowOffset            );
+  indices.push_back(TextActor::Property::ItalicsAngle            );
+  indices.push_back(TextActor::Property::Underline               );
+  indices.push_back(TextActor::Property::Weight                  );
+  indices.push_back(TextActor::Property::FontDetectionAutomatic  );
+  indices.push_back(TextActor::Property::GradientColor           );
+  indices.push_back(TextActor::Property::GradientStartPoint      );
+  indices.push_back(TextActor::Property::GradientEndPoint        );
+  indices.push_back(TextActor::Property::ShadowSize              );
+  indices.push_back(TextActor::Property::TextColor               );
 
   DALI_TEST_CHECK(actor.GetPropertyCount() == ( Actor::New().GetPropertyCount() + indices.size() ) );
 
@@ -808,8 +808,8 @@ int UtcDaliTextActorDefaultProperties(void)
   actor.SetUnderline(false);
   DALI_TEST_CHECK(actor.GetUnderline() != true);
 
-  actor.SetProperty(TextActor::UNDERLINE, Property::Value(true));
-  Property::Value v = actor.GetProperty(TextActor::UNDERLINE);
+  actor.SetProperty(TextActor::Property::Underline, Property::Value(true));
+  Property::Value v = actor.GetProperty(TextActor::Property::Underline);
   DALI_TEST_CHECK(v.GetType() == Property::BOOLEAN);
 
   DALI_TEST_CHECK(v.Get<bool>() == true);
@@ -1016,7 +1016,7 @@ int UtcDaliTextActorAutomaticSizeSetAnimation(void)
   // animate size, from this point onwards text actor no longer uses the "natural" size of the text
   Animation sizeAnim = Animation::New( 0.1f ); // 0.1 seconds
   Vector3 animationTargetSize( 20.0f, 30.0f, 0.0f );
-  sizeAnim.AnimateTo( Property( actor, Actor::SIZE ), animationTargetSize );
+  sizeAnim.AnimateTo( Property( actor, Actor::Property::Size ), animationTargetSize );
   sizeAnim.Play();
 
   // set some more text

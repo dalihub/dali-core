@@ -24,10 +24,8 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/object/constrainable.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
-#include <dali/public-api/object/property-index.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/internal/common/owner-container.h>
@@ -35,7 +33,6 @@
 #include <dali/internal/event/common/custom-property.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/property-base.h>
-
 
 namespace Dali
 {
@@ -50,18 +47,6 @@ class PropertyCondition;
 class PropertyInputImpl;
 class Stage;
 class TypeInfo;
-
-/**
- * @brief Structure for setting up default properties and their details.
- */
-struct PropertyDetails
-{
-  const char* name;         ///< The name of the property.
-  Property::Type type;      ///< The property type.
-  bool writable:1;          ///< Whether the property is writable
-  bool animatable:1;        ///< Whether the property is animatable.
-  bool constraintInput:1;   ///< Whether the property can be used as an input to a constraint.
-};
 
 namespace SceneGraph
 {
@@ -238,7 +223,7 @@ public:
    * @param[in] constraint The constraint to apply.
    * @param[in] weightObject An object with a "weight" float property.
    */
-  Dali::ActiveConstraint ApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject );
+  Dali::ActiveConstraint ApplyConstraint( Constraint& constraint, Dali::Handle weightObject );
 
   /**
    * Remove one constraint from a Object.
@@ -459,7 +444,7 @@ private:
    * @param[in] weightObject An object with a "weight" float property, or an empty handle.
    * @return The new active-constraint which is owned by Object.
    */
-  ActiveConstraintBase* DoApplyConstraint( Constraint& constraint, Dali::Constrainable weightObject );
+  ActiveConstraintBase* DoApplyConstraint( Constraint& constraint, Dali::Handle weightObject );
 
   /**
    * Helper to remove active constraints

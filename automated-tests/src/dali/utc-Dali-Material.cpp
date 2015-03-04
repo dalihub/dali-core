@@ -205,7 +205,6 @@ int UtcDaliMaterialStage01(void)
     {
       MeshActor meshActor = MeshActor::New(mesh);
       meshActor.SetSize(100, 100);
-      meshActor.SetAffectedByLighting(false);
       Stage::GetCurrent().Add(meshActor);
       application.SendNotification();
       application.Render();
@@ -285,7 +284,6 @@ int UtcDaliMaterialStage02(void)
     {
       MeshActor meshActor = MeshActor::New(mesh);
       meshActor.SetSize(100, 100);
-      meshActor.SetAffectedByLighting(false);
       Stage::GetCurrent().Add(meshActor);
       application.SendNotification();
       application.Render();

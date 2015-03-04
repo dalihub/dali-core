@@ -99,11 +99,6 @@ ImageFactory& ThreadLocalStorage::GetImageFactory()
   return mCore->GetImageFactory();
 }
 
-ModelFactory& ThreadLocalStorage::GetModelFactory()
-{
-  return mCore->GetModelFactory();
-}
-
 FontFactory& ThreadLocalStorage::GetFontFactory()
 {
   return mCore->GetFontFactory();

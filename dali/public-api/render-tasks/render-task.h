@@ -20,7 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/viewport.h>
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
@@ -74,18 +75,27 @@ class RenderTask;
  * |--------------|-----------------------|
  * | finished     | @ref FinishedSignal() |
  */
-class DALI_IMPORT_API RenderTask : public Constrainable
+class DALI_IMPORT_API RenderTask : public Handle
 {
 public:
+
+  /**
+   * @brief An enumeration of properties belonging to the RenderTask class.
+   */
+  struct Property
+  {
+    enum
+    {
+      ViewportPosition = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "viewport-position", type Vector2
+      ViewportSize,                                                   ///< name "viewport-size",     type Vector2
+      ClearColor,                                                     ///< name "clear-color",       type Vector4
+    };
+  };
+
   /**
    * @brief Typedef for signals sent by this class.
    */
   typedef Signal< void (RenderTask& source) > RenderTaskSignalType;
-
-  // Default Properties
-  static const Property::Index VIEWPORT_POSITION;    ///< Property  0, name "viewport-position",   type VECTOR2
-  static const Property::Index VIEWPORT_SIZE;        ///< Property  1, name "viewport-size",       type VECTOR2
-  static const Property::Index CLEAR_COLOR;          ///< Property  2, name "clear-color",         type VECTOR4
 
   /**
    * @brief A pointer to a function for converting screen to frame-buffer coordinates.

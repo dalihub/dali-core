@@ -19,22 +19,23 @@
 #include <dali/internal/event/effects/shader-effect-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/internal/event/common/property-helper.h>
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/images/image-impl.h>
-#include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/render/shaders/uniform-meta.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
+#include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/update/manager/update-manager.h>
 #include "dali-shaders.h"
 
 using Dali::Internal::SceneGraph::UpdateManager;
@@ -48,26 +49,21 @@ using std::string;
 namespace Dali
 {
 
-const Property::Index ShaderEffect::GRID_DENSITY        = 0;
-const Property::Index ShaderEffect::IMAGE               = 1;
-const Property::Index ShaderEffect::PROGRAM             = 2;
-const Property::Index ShaderEffect::GEOMETRY_HINTS      = 3;
-
 namespace Internal
 {
 
 namespace
 {
-const PropertyDetails DEFAULT_PROPERTY_DETAILS[] =
-{
- // Name               Type            writable animatable constraint-input
- { "grid-density",   Property::FLOAT,   true,    false,   false  }, // GRID_DENSITY
- { "image",          Property::MAP,     true,    false,   false  }, // IMAGE
- { "program",        Property::MAP,     true,    false,   false  }, // PROGRAM
- { "geometry-hints", Property::INTEGER, true,    false,   false  }, // GEOMETRY_HINTS
-};
 
-const int DEFAULT_PROPERTY_COUNT = sizeof( DEFAULT_PROPERTY_DETAILS ) / sizeof( DEFAULT_PROPERTY_DETAILS[0] );
+// Properties
+
+//              Name             Type   writable animatable constraint-input  enum for index-checking
+DALI_PROPERTY_TABLE_BEGIN
+DALI_PROPERTY( "grid-density",   FLOAT,   true,    false,   false,   Dali::ShaderEffect::Property::GridDensity   )
+DALI_PROPERTY( "image",          MAP,     true,    false,   false,   Dali::ShaderEffect::Property::Image         )
+DALI_PROPERTY( "program",        MAP,     true,    false,   false,   Dali::ShaderEffect::Property::Program       )
+DALI_PROPERTY( "geometry-hints", INTEGER, true,    false,   false,   Dali::ShaderEffect::Property::GeometryHints )
+DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 BaseHandle Create()
 {
@@ -412,10 +408,8 @@ const char* ShaderEffect::GetDefaultPropertyName(Property::Index index) const
   {
     return DEFAULT_PROPERTY_DETAILS[index].name;
   }
-  else
-  {
-    return NULL;
-  }
+
+  return NULL;
 }
 
 Property::Index ShaderEffect::GetDefaultPropertyIndex(const std::string& name) const
@@ -434,22 +428,21 @@ Property::Index ShaderEffect::GetDefaultPropertyIndex(const std::string& name) c
   }
 
   return index;
-
 }
 
 bool ShaderEffect::IsDefaultPropertyWritable(Property::Index index) const
 {
-  return true; // all properties are writable
+  return DEFAULT_PROPERTY_DETAILS[ index ].writable;
 }
 
 bool ShaderEffect::IsDefaultPropertyAnimatable(Property::Index index) const
 {
-  return false; // all properties are non animatable
+  return DEFAULT_PROPERTY_DETAILS[ index ].animatable;
 }
 
 bool ShaderEffect::IsDefaultPropertyAConstraintInput( Property::Index index ) const
 {
-  return false; // all properties cannot be used as constraint input
+  return DEFAULT_PROPERTY_DETAILS[ index ].constraintInput;
 }
 
 Property::Type ShaderEffect::GetDefaultPropertyType(Property::Index index) const
@@ -458,24 +451,22 @@ Property::Type ShaderEffect::GetDefaultPropertyType(Property::Index index) const
   {
     return DEFAULT_PROPERTY_DETAILS[index].type;
   }
-  else
-  {
-    // index out of range...return Property::NONE
-    return Property::NONE;
-  }
+
+  // index out of range...return Property::NONE
+  return Property::NONE;
 }
 
 void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
   switch ( index )
   {
-    case Dali::ShaderEffect::GRID_DENSITY:
+    case Dali::ShaderEffect::Property::GridDensity:
     {
       SetGridDensityMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, propertyValue.Get<float>() );
       break;
     }
 
-    case Dali::ShaderEffect::IMAGE:
+    case Dali::ShaderEffect::Property::Image:
     {
       Dali::Image img(Scripting::NewImage( propertyValue ));
       if(img)
@@ -489,7 +480,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
       break;
     }
 
-    case Dali::ShaderEffect::PROGRAM:
+    case Dali::ShaderEffect::Property::Program:
     {
       std::string vertexPrefix   = GetShader("vertex-prefix", propertyValue);
       std::string fragmentPrefix = GetShader("fragment-prefix", propertyValue);
@@ -529,7 +520,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
       break;
     }
 
-    case Dali::ShaderEffect::GEOMETRY_HINTS:
+    case Dali::ShaderEffect::Property::GeometryHints:
     {
       Dali::ShaderEffect::GeometryHints hint = Dali::ShaderEffect::HINT_NONE;
       Property::Value geometryHintsValue   = propertyValue.GetValue("geometry-hints");

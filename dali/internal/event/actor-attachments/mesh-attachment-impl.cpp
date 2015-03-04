@@ -50,8 +50,7 @@ MeshAttachmentPtr MeshAttachment::New( Stage& stage, const SceneGraph::Node& par
 
 MeshAttachment::MeshAttachment( Stage& stage )
 : RenderableAttachment( stage ),
-  mSceneObject( NULL ),
-  mAffectedByLighting( true )
+  mSceneObject( NULL )
 {
 }
 
@@ -176,19 +175,6 @@ void MeshAttachment::DisconnectMaterial()
   {
     mMesh.mMaterial->Disconnect();
   }
-}
-
-void MeshAttachment::SetAffectedByLighting( bool affectedByLighting )
-{
-  // sceneObject is being used in a separate thread; queue a message to set
-  SetAffectedByLightingMessage( mStage->GetUpdateInterface(), *mSceneObject, affectedByLighting );
-
-  mAffectedByLighting = affectedByLighting;
-}
-
-bool MeshAttachment::IsAffectedByLighting()
-{
-  return mAffectedByLighting;
 }
 
 void MeshAttachment::BindBonesToMesh( Internal::ActorPtr rootActor )

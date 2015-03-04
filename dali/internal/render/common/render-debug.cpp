@@ -80,7 +80,7 @@ void PrintRenderList( const RenderList& list )
   {
     debugStream << " with:";
 
-    if( flags & RenderList::DEPTH_TEST )
+    if( flags & RenderList::DEPTH_BUFFER_ENABLED )
     {
       debugStream << " DEPTH_TEST";
     }
@@ -95,7 +95,7 @@ void PrintRenderList( const RenderList& list )
       debugStream << " DEPTH_CLEAR";
     }
 
-    if( flags & RenderList::STENCIL_TEST )
+    if( flags & RenderList::STENCIL_BUFFER_ENABLED )
     {
       debugStream << " STENCIL_TEST";
     }

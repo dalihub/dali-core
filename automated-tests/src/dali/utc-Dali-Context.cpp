@@ -45,9 +45,9 @@ enum TestAttribType
 };
 
 // Create bitmap image
-static BitmapImage CreateBitmapImage()
+static BufferImage CreateBufferImage()
 {
-  BitmapImage image = BitmapImage::New(4,4,Pixel::RGBA8888);
+  BufferImage image = BufferImage::New(4,4,Pixel::RGBA8888);
 
   return image;
 }
@@ -67,30 +67,16 @@ static MeshActor CreateMeshActor()
 
   Mesh mesh = Mesh::New(meshData);
   MeshActor actor = MeshActor::New(mesh);
+
   actor.SetName("Test MeshActor");
 
   return actor;
 }
 
-static LightActor CreateLight()
-{
-  Light light = Light::New("Light");
-  light.SetType( POINT );
-  light.SetAmbientColor( Vector3( 0.22f, 0.33f, 0.44f ) );
-  light.SetDiffuseColor( Vector3( 0.55f, 0.66f, 0.77f) );
-  light.SetSpecularColor( Vector3( 0.88f, 0.99f, 0.11f) );
-  LightActor lightActor = LightActor::New();
-  lightActor.SetParentOrigin( ParentOrigin::CENTER );
-  lightActor.SetPosition( 0.f, 0.f, 100.0f );
-  lightActor.SetLight( light );
-  lightActor.SetName( light.GetName() );
-
-  return lightActor;
-}
 
 static ImageActor CreateImageActor()
 {
-  BitmapImage image = CreateBitmapImage();
+  BufferImage image = CreateBufferImage();
   ImageActor actor = ImageActor::New( image );
   actor.SetSize( 100.0f, 100.0f );
   actor.SetName("Test ImageActor");
@@ -187,11 +173,7 @@ int UtcDaliContextVertexAttribImageAndModelRendering(void)
   // clear the flag to say they've changed
   application.GetGlAbstraction().ClearVertexAttribArrayChanged();
 
-  // create a test light, image and mesh actor. (meshes won't render without light)
-
-  LightActor lightActor(CreateLight());
-  Stage::GetCurrent().Add(lightActor);
-  lightActor.SetActive(true);
+  // create a test image and mesh actor.
 
   MeshActor meshActor(CreateMeshActor());
   Stage::GetCurrent().Add(meshActor);

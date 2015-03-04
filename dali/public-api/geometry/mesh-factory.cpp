@@ -105,5 +105,41 @@ Dali::MeshData NewPlane(const float width, const float height, const int xSteps,
   return meshData;
 }
 
+Dali::MeshData NewPath( Dali::Path path, const unsigned int resolution )
+{
+  MeshData meshData;
+  meshData.SetHasNormals(false);
+  meshData.SetHasTextureCoords(false);
+
+  if( resolution != 0 )
+  {
+    size_t vertexCount(resolution+1);
+    MeshData::VertexContainer vertex(vertexCount);
+
+    float sampleDelta = 1.0f/(float)resolution;
+    Vector3 tangent;
+    for( size_t i(0); i!=vertexCount; ++i )
+    {
+      //Sample path to get the vertex position
+      Vector3* vertexPosition = reinterpret_cast<Vector3*>(&vertex[i].x);
+      path.Sample( i*sampleDelta, *vertexPosition, tangent );
+    }
+
+    //Generate indices. Each vertex is connected to the next
+    size_t indexCount(resolution*2);
+    MeshData::FaceIndices index(indexCount);
+    unsigned int nIndex = 0;
+    for( size_t i(0); i!=indexCount; i+=2 )
+    {
+      index[i] = nIndex;
+      index[i+1] = ++nIndex;
+    }
+
+    meshData.SetLineData(vertex, index, Dali::Material::New("PathMat"));
+  }
+
+  return meshData;
+}
+
 } // MeshFactory
 } // Dali

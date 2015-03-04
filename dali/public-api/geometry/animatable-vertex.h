@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/property.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
@@ -49,10 +50,19 @@ class DALI_IMPORT_API AnimatableVertex
 {
 public:
 
-  // Default Properties
-  static const Property::Index POSITION;        ///< Property 0, name prefix "position-",        type VECTOR3
-  static const Property::Index COLOR;           ///< Property 1, name prefix "color-",           type VECTOR4
-  static const Property::Index TEXTURE_COORDS;  ///< Property 2, name prefix "texture-coords-",  type VECTOR2
+  /**
+   * @brief An enumeration of properties belonging to the AnimatableVertex class.
+   * Note: These are used by animatable mesh also.
+   */
+  struct Property
+  {
+    enum
+    {
+      Position      = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name prefix "position-",        type VECTOR3
+      Color,                                                       ///< name prefix "color-",           type VECTOR4
+      TextureCoords,                                               ///< name prefix "texture-coords-",  type VECTOR2
+    };
+  };
 
   /**
    * @brief Destructor

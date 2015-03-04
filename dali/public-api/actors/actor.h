@@ -27,7 +27,8 @@
 #include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
-#include <dali/public-api/object/constrainable.h>
+#include <dali/public-api/object/handle.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
@@ -62,7 +63,6 @@ struct Vector4;
 typedef std::vector<Actor> ActorContainer;
 typedef ActorContainer::iterator ActorIter; ///< Iterator for Dali::ActorContainer
 typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for Dali::ActorContainer
-
 
 
 /**
@@ -243,65 +243,72 @@ typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for D
  * | show              | %SetVisible( true )          |
  * | hide              | %SetVisible( false )         |
  */
-class DALI_IMPORT_API Actor : public Constrainable
+class DALI_IMPORT_API Actor : public Handle
 {
 public:
 
+  /**
+   * @brief An enumeration of properties belonging to the Actor class.
+   */
+  struct Property
+  {
+    enum
+    {
+      ParentOrigin = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parent-origin",         type Vector3
+      ParentOriginX,                                     ///< name "parent-origin-x",       type Float
+      ParentOriginY,                                     ///< name "parent-origin-y",       type Float
+      ParentOriginZ,                                     ///< name "parent-origin-z",       type Float
+      AnchorPoint,                                       ///< name "anchor-point",          type Vector3
+      AnchorPointX,                                      ///< name "anchor-point-x",        type Float
+      AnchorPointY,                                      ///< name "anchor-point-y",        type Float
+      AnchorPointZ,                                      ///< name "anchor-point-z",        type Float
+      Size,                                              ///< name "size",                  type Vector3
+      SizeWidth,                                         ///< name "size-width",            type Float
+      SizeHeight,                                        ///< name "size-height",           type Float
+      SizeDepth,                                         ///< name "size-depth",            type Float
+      Position,                                          ///< name "position",              type Vector3
+      PositionX,                                         ///< name "position-x",            type Float
+      PositionY,                                         ///< name "position-y",            type Float
+      PositionZ,                                         ///< name "position-z",            type Float
+      WorldPosition,                                     ///< name "world-position",        type Vector3  (read-only)
+      WorldPositionX,                                    ///< name "world-position-x",      type Float    (read-only)
+      WorldPositionY,                                    ///< name "world-position-y",      type Float    (read-only)
+      WorldPositionZ,                                    ///< name "world-position-z",      type Float    (read-only)
+      Rotation,                                          ///< name "rotation",              type Rotation
+      WorldRotation,                                     ///< name "world-rotation",        type Rotation (read-only)
+      Scale,                                             ///< name "scale",                 type Vector3
+      ScaleX,                                            ///< name "scale-x",               type Float
+      ScaleY,                                            ///< name "scale-y",               type Float
+      ScaleZ,                                            ///< name "scale-z",               type Float
+      WorldScale,                                        ///< name "world-scale",           type Vector3  (read-only)
+      Visible,                                           ///< name "visible",               type Boolean
+      Color,                                             ///< name "color",                 type Vector4
+      ColorRed,                                          ///< name "color-red",             type Float
+      ColorGreen,                                        ///< name "color-green",           type Float
+      ColorBlue,                                         ///< name "color-blue",            type Float
+      ColorAlpha,                                        ///< name "color-alpha",           type Float
+      WorldColor,                                        ///< name "world-color",           type Vector4  (read-only)
+      WorldMatrix,                                       ///< name "world-matrix",          type Matrix   (read-only)
+      Name,                                              ///< name "name",                  type String
+      Sensitive,                                         ///< name "sensitive",             type Boolean
+      LeaveRequired,                                     ///< name "leave-required",        type Boolean
+      InheritRotation,                                   ///< name "inherit-rotation",      type Boolean
+      InheritScale,                                      ///< name "inherit-scale",         type Boolean
+      ColorMode,                                         ///< name "color-mode",            type String
+      PositionInheritance,                               ///< name "position-inheritance",  type String
+      DrawMode,                                          ///< name "draw-mode",             type String
+      SizeMode,                                          ///< name "size-mode",             type String
+      SizeModeFactor,                                    ///< name "size-mode-factor",      type Vector3
+    };
+  };
+
   // Typedefs
-  typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                ///< Touch signal type
-  typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                ///< Hover signal type
-  typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType;///< Mousewheel signal type
+
+  typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                 ///< Touch signal type
+  typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                 ///< Hover signal type
+  typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType; ///< Mousewheel signal type
   typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type
   typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type
-
-  /// @name Properties
-  /** @{ */
-  static const Property::Index PARENT_ORIGIN;         ///< name "parent-origin",         type VECTOR3
-  static const Property::Index PARENT_ORIGIN_X;       ///< name "parent-origin-x",       type FLOAT
-  static const Property::Index PARENT_ORIGIN_Y;       ///< name "parent-origin-y",       type FLOAT
-  static const Property::Index PARENT_ORIGIN_Z;       ///< name "parent-origin-z",       type FLOAT
-  static const Property::Index ANCHOR_POINT;          ///< name "anchor-point",          type VECTOR3
-  static const Property::Index ANCHOR_POINT_X;        ///< name "anchor-point-x",        type FLOAT
-  static const Property::Index ANCHOR_POINT_Y;        ///< name "anchor-point-y",        type FLOAT
-  static const Property::Index ANCHOR_POINT_Z;        ///< name "anchor-point-z",        type FLOAT
-  static const Property::Index SIZE;                  ///< name "size",                  type VECTOR3
-  static const Property::Index SIZE_WIDTH;            ///< name "size-width",            type FLOAT
-  static const Property::Index SIZE_HEIGHT;           ///< name "size-height",           type FLOAT
-  static const Property::Index SIZE_DEPTH;            ///< name "size-depth",            type FLOAT
-  static const Property::Index POSITION;              ///< name "position",              type VECTOR3
-  static const Property::Index POSITION_X;            ///< name "position-x",            type FLOAT
-  static const Property::Index POSITION_Y;            ///< name "position-y",            type FLOAT
-  static const Property::Index POSITION_Z;            ///< name "position-z",            type FLOAT
-  static const Property::Index WORLD_POSITION;        ///< name "world-position",        type VECTOR3 (read-only)
-  static const Property::Index WORLD_POSITION_X;      ///< name "world-position-x",      type FLOAT (read-only)
-  static const Property::Index WORLD_POSITION_Y;      ///< name "world-position-y",      type FLOAT (read-only)
-  static const Property::Index WORLD_POSITION_Z;      ///< name "world-position-z",      type FLOAT (read-only)
-  static const Property::Index ROTATION;              ///< name "rotation",              type ROTATION
-  static const Property::Index WORLD_ROTATION;        ///< name "world-rotation",        type ROTATION (read-only)
-  static const Property::Index SCALE;                 ///< name "scale",                 type VECTOR3
-  static const Property::Index SCALE_X;               ///< name "scale-x",               type FLOAT
-  static const Property::Index SCALE_Y;               ///< name "scale-y",               type FLOAT
-  static const Property::Index SCALE_Z;               ///< name "scale-z",               type FLOAT
-  static const Property::Index WORLD_SCALE;           ///< name "world-scale",           type VECTOR3 (read-only)
-  static const Property::Index VISIBLE;               ///< name "visible",               type BOOLEAN
-  static const Property::Index COLOR;                 ///< name "color",                 type VECTOR4
-  static const Property::Index COLOR_RED;             ///< name "color-red",             type FLOAT
-  static const Property::Index COLOR_GREEN;           ///< name "color-green",           type FLOAT
-  static const Property::Index COLOR_BLUE;            ///< name "color-blue",            type FLOAT
-  static const Property::Index COLOR_ALPHA;           ///< name "color-alpha",           type FLOAT
-  static const Property::Index WORLD_COLOR;           ///< name "world-color",           type VECTOR4 (read-only)
-  static const Property::Index WORLD_MATRIX;          ///< name "world-matrix",          type MATRIX (read-only)
-  static const Property::Index NAME;                  ///< name "name",                  type STRING
-  static const Property::Index SENSITIVE;             ///< name "sensitive",             type BOOLEAN
-  static const Property::Index LEAVE_REQUIRED;        ///< name "leave-required",        type BOOLEAN
-  static const Property::Index INHERIT_ROTATION;      ///< name "inherit-rotation",      type BOOLEAN
-  static const Property::Index INHERIT_SCALE;         ///< name "inherit-scale",         type BOOLEAN
-  static const Property::Index COLOR_MODE;            ///< name "color-mode",            type STRING
-  static const Property::Index POSITION_INHERITANCE;  ///< name "position-inheritance",  type STRING
-  static const Property::Index DRAW_MODE;             ///< name "draw-mode",             type STRING
-  static const Property::Index SIZE_MODE;             ///< name "size-mode",             type STRING
-  static const Property::Index SIZE_MODE_FACTOR;      ///< name "size-mode-factor",      type VECTOR3
-  /** @} */
 
   // Creation
 

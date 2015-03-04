@@ -19,7 +19,7 @@
 #include <dali/public-api/images/glyph-image.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/text/text-style.h>
 #include <dali/integration-api/platform-abstraction.h>
@@ -113,13 +113,13 @@ GlyphImage GlyphImage::New( const Character& character, const TextStyle& style )
       // TODO: support more text decoration features: outline, glow, shadow, underline, ...
       const std::size_t width = bitmapPtr->GetImageWidth();
       const std::size_t height = bitmapPtr->GetImageHeight();
-      BitmapImage bitmapImage = BitmapImage::New( width, height, Pixel::RGBA8888 );
+      BufferImage bufferImage = BufferImage::New( width, height, Pixel::RGBA8888 );
 
       // Point the source bitmap buffer.
       unsigned char* src = bitmapPtr->GetBuffer();
 
       // Point the destination image buffer.
-      unsigned char* dst = bitmapImage.GetBuffer();
+      unsigned char* dst = bufferImage.GetBuffer();
 
       //Retrieve the color from the text style.
       const Vector4& color = style.GetTextColor();
@@ -141,9 +141,9 @@ GlyphImage GlyphImage::New( const Character& character, const TextStyle& style )
         }
       }
 
-      bitmapImage.Update();
+      bufferImage.Update();
 
-      image = bitmapImage;
+      image = bufferImage;
     }
   }
 

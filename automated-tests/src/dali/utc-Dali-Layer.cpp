@@ -260,7 +260,7 @@ int UtcDaliLayerSetSortFunction(void)
 {
   tet_infoline("Testing Dali::Layer::SetSortFunction()");
   TestApplication application;
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   // create two transparent actors so there is something to sort
   ImageActor actor = ImageActor::New( img );
   ImageActor actor2 = ImageActor::New( img );
@@ -442,8 +442,8 @@ int UtcDaliLayerDefaultProperties(void)
   Layer actor = Layer::New();
 
   std::vector<Property::Index> indices ;
-  indices.push_back(Layer::CLIPPING_ENABLE );
-  indices.push_back(Layer::CLIPPING_BOX    );
+  indices.push_back(Layer::Property::ClippingEnable);
+  indices.push_back(Layer::Property::ClippingBox);
 
   DALI_TEST_CHECK(actor.GetPropertyCount() == ( Actor::New().GetPropertyCount() + indices.size() ) );
 
@@ -461,11 +461,11 @@ int UtcDaliLayerDefaultProperties(void)
   ClippingBox testBox(10,20,30,40);
   DALI_TEST_CHECK(actor.GetClippingBox() != testBox);
 
-  actor.SetProperty(Layer::CLIPPING_BOX, Property::Value(Rect<int>(testBox)));
+  actor.SetProperty(Layer::Property::ClippingBox, Property::Value(Rect<int>(testBox)));
 
-  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::CLIPPING_BOX)) ;
+  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::Property::ClippingBox)) ;
 
-  Property::Value v = actor.GetProperty(Layer::CLIPPING_BOX);
+  Property::Value v = actor.GetProperty(Layer::Property::ClippingBox);
 
   DALI_TEST_CHECK(v.Get<Rect<int> >() == testBox);
 

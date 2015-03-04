@@ -33,8 +33,6 @@ namespace Dali
 namespace Internal
 {
 
-
-
 namespace // unnamed namespace
 {
 

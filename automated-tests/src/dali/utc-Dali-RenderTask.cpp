@@ -341,7 +341,7 @@ int UtcDaliRenderTaskSetSourceActor(void)
   ids.push_back( 7 );
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor newActor = ImageActor::New( img );
   newActor.SetSize(1,1);
   stage.Add( newActor );
@@ -404,7 +404,7 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   ids.push_back( expectedTextureId );
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor newActor = ImageActor::New( img );
   newActor.SetSize(1,1);
   task.SetSourceActor( newActor );
@@ -465,7 +465,7 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   ids.push_back( expectedTextureId );
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage img = BitmapImage::New( 1,1 );
+  BufferImage img = BufferImage::New( 1,1 );
   ImageActor newActor = ImageActor::New( img );
   newActor.SetSize(1,1);
   stage.Add( newActor );
@@ -538,7 +538,7 @@ int UtcDaliRenderTaskSetExclusive(void)
   ids.push_back( 10 ); // 10 = actor3
   application.GetGlAbstraction().SetNextTextureIds( ids );
 
-  BitmapImage img1 = BitmapImage::New( 1,1 );
+  BufferImage img1 = BufferImage::New( 1,1 );
   ImageActor actor1 = ImageActor::New( img1 );
   actor1.SetSize(1,1);
   Stage::GetCurrent().Add( actor1 );
@@ -556,7 +556,7 @@ int UtcDaliRenderTaskSetExclusive(void)
     DALI_TEST_EQUALS( boundTextures[0], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
-  BitmapImage img2 = BitmapImage::New( 1,1 );
+  BufferImage img2 = BufferImage::New( 1,1 );
   ImageActor actor2 = ImageActor::New( img2 );
   actor2.SetSize(1,1);
 
@@ -580,7 +580,7 @@ int UtcDaliRenderTaskSetExclusive(void)
     DALI_TEST_EQUALS( boundTextures[1], 8u/*unique to actor1*/, TEST_LOCATION );
   }
 
-  BitmapImage img3 = BitmapImage::New( 1,1 );
+  BufferImage img3 = BufferImage::New( 1,1 );
   ImageActor actor3 = ImageActor::New( img3 );
   actor3.SetSize(1,1);
 
@@ -938,7 +938,7 @@ int UtcDaliRenderTaskSetViewportPosition(void)
 
   // Set by Property test
   Vector2 newPosition2(32.0f, 32.0f);
-  task.SetProperty( RenderTask::VIEWPORT_POSITION, newPosition2 );
+  task.SetProperty( RenderTask::Property::ViewportPosition, newPosition2 );
 
   // Update
   application.SendNotification();
@@ -948,7 +948,7 @@ int UtcDaliRenderTaskSetViewportPosition(void)
 
   Vector2 newPosition3(64.0f, 0.0f);
   Animation animation = Animation::New(1.0f);
-  animation.AnimateTo( Property( task, RenderTask::VIEWPORT_POSITION ), newPosition3, AlphaFunctions::Linear );
+  animation.AnimateTo( Property( task, RenderTask::Property::ViewportPosition ), newPosition3, AlphaFunctions::Linear );
   animation.Play();
 
   // Perform 1000ms worth of updates at which point animation should have completed.
@@ -986,7 +986,7 @@ int UtcDaliRenderTaskSetViewportSize(void)
 
   // Set by Property test
   Vector2 newSize2(50.0f, 50.0f);
-  task.SetProperty( RenderTask::VIEWPORT_SIZE, newSize2 );
+  task.SetProperty( RenderTask::Property::ViewportSize, newSize2 );
 
   // Update
   application.SendNotification();
@@ -996,7 +996,7 @@ int UtcDaliRenderTaskSetViewportSize(void)
 
   Vector2 newSize3(10.0f, 10.0f);
   Animation animation = Animation::New(1.0f);
-  animation.AnimateTo( Property( task, RenderTask::VIEWPORT_SIZE ), newSize3, AlphaFunctions::Linear );
+  animation.AnimateTo( Property( task, RenderTask::Property::ViewportSize ), newSize3, AlphaFunctions::Linear );
   animation.Play();
 
   // Perform 1000ms worth of updates at which point animation should have completed.
@@ -1027,7 +1027,7 @@ int UtcDaliRenderTaskSetClearColor(void)
 
   DALI_TEST_EQUALS( task.GetClearColor(), testColor, TEST_LOCATION );
 
-  task.SetProperty( RenderTask::CLEAR_COLOR, testColor2 );
+  task.SetProperty( RenderTask::Property::ClearColor, testColor2 );
 
   // Wait a frame.
   Wait(application);
@@ -1130,7 +1130,7 @@ int UtcDaliRenderTaskSignalFinished(void)
 
   Stage::GetCurrent().Add( offscreenCameraActor );
 
-  BitmapImage image = BitmapImage::New( 10, 10 );
+  BufferImage image = BufferImage::New( 10, 10 );
   ImageActor rootActor = ImageActor::New( image );
   rootActor.SetSize( 10, 10 );
   Stage::GetCurrent().Add( rootActor );
@@ -1398,7 +1398,6 @@ int UtcDaliRenderTaskOnce01(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
 
   Stage::GetCurrent().Add(secondRootActor);
-  secondRootActor.SetVisible(false);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true);
   bool finished = false;
@@ -1910,7 +1909,6 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
 
   Stage::GetCurrent().Add(secondRootActor);
-  secondRootActor.SetVisible(false);
 
   RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
   bool finished = false;
@@ -1919,12 +1917,6 @@ int UtcDaliRenderTaskOnceNoSync01(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
-
-  // MAKE SOURCE VISIBLE
-  secondRootActor.SetVisible(true);
-  application.SendNotification();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
 
@@ -2454,3 +2446,89 @@ int UtcDaliRenderTaskSetScreenToFrameBufferMappingActor(void)
   DALI_TEST_EQUALS( expectedCoordinates , results.actorCoordinates, 0.1f, TEST_LOCATION );
   END_TEST;
 }
+
+int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SignalFinished()");
+
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  BufferImage image = BufferImage::New( 10, 10 );
+  ImageActor rootActor = ImageActor::New( image );
+  rootActor.SetSize( 10, 10 );
+  rootActor.SetVisible(false);
+  Stage::GetCurrent().Add( rootActor );
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  NativeImageInterfacePtr testNativeImagePtr = TestNativeImage::New(10, 10);
+  FrameBufferImage frameBufferImage = FrameBufferImage::New( *testNativeImagePtr.Get() );
+
+  // Flush all outstanding messages
+  application.SendNotification();
+  application.Render();
+
+  RenderTask newTask = taskList.CreateTask();
+  newTask.SetCameraActor( offscreenCameraActor );
+  newTask.SetSourceActor( rootActor );
+  newTask.SetInputEnabled( false );
+  newTask.SetClearColor( Vector4( 0.f, 0.f, 0.f, 0.f ) );
+  newTask.SetClearEnabled( true );
+  newTask.SetExclusive( true );
+  newTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
+  newTask.SetTargetFrameBuffer( frameBufferImage );
+
+  // Framebuffer doesn't actually get created until Connected, i.e. by previous line
+
+  bool finished = false;
+  RenderTaskFinished renderTaskFinished( finished );
+  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
+
+  // Flush the queue and render.
+  application.SendNotification();
+
+  // 1 render to process render task, then wait for sync before finished msg is sent
+  // from update to the event thread.
+
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK( !finished );
+
+  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK( lastSyncObj != NULL );
+
+  application.Render();
+  DALI_TEST_EQUALS( (application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
+  application.SendNotification();
+  DALI_TEST_CHECK( !finished );
+
+  application.Render();
+  DALI_TEST_EQUALS( (application.GetUpdateStatus() & Integration::KeepUpdating::RENDER_TASK_SYNC), Integration::KeepUpdating::RENDER_TASK_SYNC, TEST_LOCATION );
+  application.SendNotification();
+  DALI_TEST_CHECK( ! finished );
+
+  sync.SetObjectSynced( lastSyncObj, true );
+
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK( !finished );
+
+  application.Render();
+  application.SendNotification();
+  DALI_TEST_CHECK( finished );
+  finished = false;
+
+  application.Render(); // Double check no more finished signal
+  application.SendNotification();
+  DALI_TEST_CHECK( ! finished );
+
+  END_TEST;
+}
+
+

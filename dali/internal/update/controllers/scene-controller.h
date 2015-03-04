@@ -28,7 +28,6 @@ class CompleteStatusManager;
 namespace SceneGraph
 {
 
-class LightController;
 class CameraController;
 class RenderMessageDispatcher;
 class RenderQueue;
@@ -55,12 +54,6 @@ public:
   virtual ~SceneController()
   {
   }
-
-  /**
-   * Get the light controller
-   * @return  reference to a light controller
-   */
-  virtual LightController& GetLightController() = 0;
 
   /**
    * Return the render message dispatcher

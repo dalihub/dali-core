@@ -63,7 +63,7 @@ public:
   {
     mActor = Actor::New();
     Stage::GetCurrent().Add( mActor );
-    mNotification = mActor.AddPropertyNotification( Actor::POSITION_X, GreaterThanCondition(100.0f) );
+    mNotification = mActor.AddPropertyNotification( Actor::Property::PositionX, GreaterThanCondition(100.0f) );
     mNotification.NotifySignal().Connect( this, &TestClass::OnPropertyNotify );
   }
 
@@ -128,7 +128,7 @@ int UtcDaliPropertyNotificationDownCast(void)
   tet_infoline(" UtcDaliPropertyNotificationDownCast");
 
   Actor actor = Actor::New();
-  PropertyNotification notification = actor.AddPropertyNotification(Actor::POSITION_X, GreaterThanCondition(100.0f));
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::PositionX, GreaterThanCondition(100.0f));
   BaseHandle handle = notification;
   PropertyNotification notificationHandle;
 
@@ -152,7 +152,7 @@ int UtcDaliPropertyNotificationDownCastNegative(void)
   Actor somethingElse = Actor::New();
 
   Actor actor = Actor::New();
-  actor.AddPropertyNotification(Actor::POSITION_X, GreaterThanCondition(100.0f));
+  actor.AddPropertyNotification(Actor::Property::PositionX, GreaterThanCondition(100.0f));
   BaseHandle handle = somethingElse;
   PropertyNotification notificationHandle;
 
@@ -168,7 +168,7 @@ int UtcDaliAddPropertyNotification(void)
 
   Actor actor = Actor::New();
 
-  PropertyNotification notification = actor.AddPropertyNotification(Actor::POSITION_X, GreaterThanCondition(100.0f));
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::PositionX, GreaterThanCondition(100.0f));
   DALI_TEST_CHECK( notification );
   END_TEST;
 }
@@ -273,7 +273,7 @@ int UtcDaliPropertyNotificationGetCondition(void)
   Actor actor = Actor::New();
 
   PropertyCondition condition = GreaterThanCondition(100.0f);
-  PropertyNotification notification = actor.AddPropertyNotification(Actor::POSITION_X, condition);
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::PositionX, condition);
   DALI_TEST_CHECK( condition == notification.GetCondition() );
   END_TEST;
 }
@@ -308,7 +308,7 @@ int UtcDaliPropertyNotificationGetConditionConst(void)
   Actor actor = Actor::New();
 
   PropertyCondition condition = GreaterThanCondition(100.0f);
-  PropertyNotification notification = actor.AddPropertyNotification(Actor::POSITION_X, condition);
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::PositionX, condition);
   PropertyNotificationConstWrapper notificationConst(notification);
   const PropertyCondition& conditionReference1 = notificationConst.GetCondition();
   const PropertyCondition& conditionReference2 = notificationConst.GetCondition();
@@ -326,7 +326,7 @@ int UtcDaliPropertyNotificationGetTarget(void)
   Actor actor = Actor::New();
   Actor actor2 = Actor::New();
 
-  PropertyNotification notification = actor.AddPropertyNotification(Actor::POSITION_X,
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::PositionX,
                                                                     GreaterThanCondition(100.0f));
   Actor targetActor = Actor::DownCast( notification.GetTarget() );
 
@@ -341,11 +341,11 @@ int UtcDaliPropertyNotificationGetProperty(void)
 
   Actor actor = Actor::New();
 
-  PropertyNotification notification = actor.AddPropertyNotification(Actor::POSITION_X,
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::PositionX,
                                                                     GreaterThanCondition(100.0f));
   Property::Index targetProperty = notification.GetTargetProperty();
 
-  DALI_TEST_EQUALS( targetProperty, Actor::POSITION_X, TEST_LOCATION );
+  DALI_TEST_EQUALS( targetProperty, Actor::Property::PositionX, TEST_LOCATION );
   END_TEST;
 }
 
@@ -356,7 +356,7 @@ int UtcDaliPropertyNotificationGetNotifyMode(void)
 
   Actor actor = Actor::New();
 
-  PropertyNotification notification = actor.AddPropertyNotification(Actor::POSITION_X,
+  PropertyNotification notification = actor.AddPropertyNotification(Actor::Property::PositionX,
                                                                     GreaterThanCondition(100.0f));
   notification.SetNotifyMode(PropertyNotification::NotifyOnChanged);
   PropertyNotification::NotifyMode notifyMode = notification.GetNotifyMode();
@@ -373,7 +373,7 @@ int UtcDaliPropertyNotificationGreaterThan(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION_X, GreaterThanCondition(100.0f) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::PositionX, GreaterThanCondition(100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
@@ -408,7 +408,7 @@ int UtcDaliPropertyNotificationLessThan(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION_X, LessThanCondition(100.0f ) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::PositionX, LessThanCondition(100.0f ) );
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(200.0f, 0.0f, 0.0f));
@@ -443,7 +443,7 @@ int UtcDaliPropertyNotificationInside(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION_X, InsideCondition(100.0f, 200.0f) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::PositionX, InsideCondition(100.0f, 200.0f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
@@ -478,7 +478,7 @@ int UtcDaliPropertyNotificationOutside(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION_X, OutsideCondition(100.0f, 200.0f) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::PositionX, OutsideCondition(100.0f, 200.0f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(150.0f, 0.0f, 0.0f));
@@ -513,13 +513,13 @@ int UtcDaliPropertyNotificationVectorComponentGreaterThan(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, GreaterThanCondition(100.0f) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::Position, 0, GreaterThanCondition(100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::POSITION, 1, GreaterThanCondition(100.0f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Position, 1, GreaterThanCondition(100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::POSITION, 2, GreaterThanCondition(100.0f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Position, 2, GreaterThanCondition(100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::COLOR, 3, GreaterThanCondition(0.5f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Color, 3, GreaterThanCondition(0.5f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
@@ -562,13 +562,13 @@ int UtcDaliPropertyNotificationVectorComponentLessThan(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, LessThanCondition(-100.0f) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::Position, 0, LessThanCondition(-100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::POSITION, 1, LessThanCondition(-100.0f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Position, 1, LessThanCondition(-100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::POSITION, 2, LessThanCondition(-100.0f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Position, 2, LessThanCondition(-100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::COLOR, 3, LessThanCondition(0.5f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Color, 3, LessThanCondition(0.5f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   actor.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
@@ -611,13 +611,13 @@ int UtcDaliPropertyNotificationVectorComponentInside(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, InsideCondition(-100.0f, 100.0f) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::Position, 0, InsideCondition(-100.0f, 100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::POSITION, 1, InsideCondition(-100.0f, 100.0f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Position, 1, InsideCondition(-100.0f, 100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::POSITION, 2, InsideCondition(-100.0f, 100.0f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Position, 2, InsideCondition(-100.0f, 100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::COLOR, 3, InsideCondition(0.25f, 0.75f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Color, 3, InsideCondition(0.25f, 0.75f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   // set outside all conditions
@@ -661,13 +661,13 @@ int UtcDaliPropertyNotificationVectorComponentOutside(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, OutsideCondition(-100.0f, 100.0f) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::Position, 0, OutsideCondition(-100.0f, 100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::POSITION, 1, OutsideCondition(-100.0f, 100.0f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Position, 1, OutsideCondition(-100.0f, 100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::POSITION, 2, OutsideCondition(-100.0f, 100.0f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Position, 2, OutsideCondition(-100.0f, 100.0f) );
   notification.NotifySignal().Connect( &TestCallback );
-  notification = actor.AddPropertyNotification( Actor::COLOR, 3, OutsideCondition(0.25f, 0.75f) );
+  notification = actor.AddPropertyNotification( Actor::Property::Color, 3, OutsideCondition(0.25f, 0.75f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   // set inside all conditions
@@ -779,7 +779,7 @@ int UtcDaliPropertyNotificationStep(void)
 
   const float step = 100.0f;
   // float
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, StepCondition(step, 50.0f) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::Position, 0, StepCondition(step, 50.0f) );
   notification.NotifySignal().Connect( &TestCallback );
 
   // set initial position
@@ -824,7 +824,7 @@ int UtcDaliPropertyNotificationVariableStep(void)
     values.push_back(i * averageStep + (i % 2 == 0 ? -(averageStep * 0.2f) : (averageStep * 0.2f)));
   }
   // float
-  PropertyNotification notification = actor.AddPropertyNotification( Actor::POSITION, 0, VariableStepCondition(values) );
+  PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::Position, 0, VariableStepCondition(values) );
   notification.NotifySignal().Connect( &TestCallback );
 
   // set initial position lower than first position in list
@@ -856,13 +856,13 @@ int UtcDaliPropertyNotificationOrder(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
   // this should complete in first frame
-  PropertyNotification notification1 = actor.AddPropertyNotification( Actor::POSITION_X, GreaterThanCondition(90.0f) );
+  PropertyNotification notification1 = actor.AddPropertyNotification( Actor::Property::PositionX, GreaterThanCondition(90.0f) );
   notification1.NotifySignal().Connect( &TestCallback );
   // this should complete in second frame
-  PropertyNotification notification2 = actor.AddPropertyNotification( Actor::POSITION_X, GreaterThanCondition(150.0f) );
+  PropertyNotification notification2 = actor.AddPropertyNotification( Actor::Property::PositionX, GreaterThanCondition(150.0f) );
   notification2.NotifySignal().Connect( &TestCallback2 );
   Animation animation = Animation::New( 0.032f ); // finishes in 32 ms
-  animation.AnimateTo( Property(actor, Actor::POSITION ), Vector3( 200.0f, 0.0f, 0.0f ), AlphaFunctions::Linear );
+  animation.AnimateTo( Property(actor, Actor::Property::Position ), Vector3( 200.0f, 0.0f, 0.0f ), AlphaFunctions::Linear );
   animation.Play();
 
   // flush the queue

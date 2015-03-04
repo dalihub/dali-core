@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/images/bitmap-image.h>
+#include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/math/rect.h>
 
 namespace Dali
@@ -40,11 +40,11 @@ class NinePatchImage;
  * area.
  *
  * The class offers an API to read the stretch area and child area, but it does not
- * remove the border from it's bitmap. An API can be used to obtain a BitmapImage with
+ * remove the border from it's bitmap. An API can be used to obtain a BufferImage with
  * the border removed.
  *
  * Adding this image to an ImageActor using an Image handle will automatically convert
- * to use the cropped BitmapImage - if you don't retain a handle to this object, it will
+ * to use the cropped BufferImage - if you don't retain a handle to this object, it will
  * be automatically destroyed.
  */
 class DALI_IMPORT_API NinePatchImage : public ResourceImage
@@ -115,12 +115,12 @@ public:
   Rect<int> GetChildRectangle();
 
   /**
-   * Creates a bitmap image from the bitmap with the 1 pixel border cropped off.
+   * Creates a buffer image from the bitmap with the 1 pixel border cropped off.
    * This does not change the internal bitmap.
    *
-   * @return The cropped BitmapImage
+   * @return The cropped BufferImage
    */
-  BitmapImage CreateCroppedBitmapImage();
+  BufferImage CreateCroppedBufferImage();
 
 public: // Not intended for application developers
 

@@ -42,7 +42,6 @@
 #include <dali/internal/event/text/font-factory.h>
 #include <dali/internal/event/images/image-factory.h>
 #include <dali/internal/event/images/emoji-factory.h>
-#include <dali/internal/event/modeling/model-factory.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/touch/touch-resampler.h>
@@ -97,7 +96,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mNotificationManager(NULL),
   mFontFactory(NULL),
   mImageFactory(NULL),
-  mModelFactory(NULL),
   mShaderFactory(NULL),
   mEmojiFactory(NULL),
   mIsActive(true),
@@ -165,7 +163,6 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
 
   mFontFactory = new FontFactory(*mResourceClient);
   mImageFactory = new ImageFactory( *mResourceClient );
-  mModelFactory = new ModelFactory(*mResourceClient);
   mShaderFactory = new ShaderFactory(*mResourceClient);
   mShaderFactory->LoadDefaultShaders();
   mEmojiFactory = new EmojiFactory();
@@ -201,7 +198,6 @@ Core::~Core()
   delete mNotificationManager;
   delete mFontFactory;
   delete mImageFactory;
-  delete mModelFactory;
   delete mShaderFactory;
   delete mResourceClient;
   delete mResourceManager;
@@ -437,11 +433,6 @@ FontFactory& Core::GetFontFactory()
 ImageFactory& Core::GetImageFactory()
 {
   return *(mImageFactory);
-}
-
-ModelFactory& Core::GetModelFactory()
-{
-  return *(mModelFactory);
 }
 
 ShaderFactory& Core::GetShaderFactory()

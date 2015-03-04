@@ -19,21 +19,31 @@
 #include <dali/public-api/object/handle.h>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/animation/active-constraint.h>
+#include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-notification.h>
+#include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/object/custom-object-internal.h>
 #include <dali/integration-api/debug.h>
 
 namespace Dali
 {
 
-Handle::Handle(Dali::Internal::Object* handle)
-  : BaseHandle(handle)
+Handle::Handle( Dali::Internal::Object* handle )
+: BaseHandle(handle)
 {
 }
 
+
 Handle::Handle()
 {
+}
+
+Handle Handle::New()
+{
+  return Handle( Internal::CustomObject::New() );
 }
 
 Handle::~Handle()
@@ -148,5 +158,46 @@ void Handle::RemovePropertyNotifications()
 {
   GetImplementation(*this).RemovePropertyNotifications();
 }
+
+ActiveConstraint Handle::ApplyConstraint( Constraint constraint )
+{
+  return GetImplementation(*this).ApplyConstraint( GetImplementation( constraint ) );
+}
+
+ActiveConstraint Handle::ApplyConstraint( Constraint constraint, Handle weightObject )
+{
+  return GetImplementation(*this).ApplyConstraint( GetImplementation( constraint ), weightObject );
+}
+
+void Handle::RemoveConstraint(ActiveConstraint activeConstraint)
+{
+  GetImplementation(*this).RemoveConstraint( activeConstraint );
+}
+
+void Handle::RemoveConstraints()
+{
+  GetImplementation(*this).RemoveConstraints();
+}
+
+void Handle::RemoveConstraints( unsigned int tag )
+{
+  GetImplementation(*this).RemoveConstraints( tag );
+}
+
+namespace WeightObject
+{
+
+const Property::Index WEIGHT = PROPERTY_CUSTOM_START_INDEX;
+
+Handle New()
+{
+  Handle handle = Handle::New();
+
+  handle.RegisterProperty( "weight", 0.0f );
+
+  return handle;
+}
+
+} // namespace WeightObject
 
 } // namespace Dali

@@ -29,7 +29,6 @@ attribute mediump vec4    aBoneIndices;
 void main()
 {
   mediump vec4 vertexPosition = vec4(aPosition, 1.0);
-  mediump float lightIntensity;
 
 #ifdef USE_BONES
   if(uBoneCount > 0)
@@ -98,86 +97,13 @@ uniform lowp  vec4    uColor;
 varying highp vec4    vVertex;
 varying highp vec3    vNormal;
 
-#ifdef USE_LIGHTING
-struct Light
-{
-  int           mType;                      // 0=AMBIENT,1=DIRECTIONAL,2=SPOT,3=POINT
-  highp   vec2  mFallOff;                   // x,y = falloff start, falloff end
-  mediump vec2  mSpotAngle;                 // x,y   = inner cone and outer cone
-  mediump vec3  mLightPos;                  // position
-  mediump vec3  mLightDir;                  // directional (for direction/spot lights)
-  lowp    vec3  mAmbient;                   // ambient component of the light's color
-  lowp    vec3  mDiffuse;                   // diffuse component of the light's color
-  lowp    vec3  mSpecular;                  // specular component of the light's color
-};
-
-uniform         int   uNumberOfLights;
-uniform Light         uLight0;
-
-lowp vec3 lightColor;
-lowp vec3 specularColor;
-
-void calculateLight(Light light)
-{
-  // Ensure that the varying vertex position doesn't lose precision
-  highp vec3 lightVector = light.mLightPos - vVertex.xyz;
-  mediump vec3 N = normalize(vNormal);
-  mediump vec3 L = normalize(lightVector);
-  // TODO: for directional light, should use mLightDir for light direction not lightVector
-  mediump float NdotL = dot(N, L);
-
-  mediump vec3 color = light.mAmbient * uMaterial.mAmbient.rgb;
-  color += light.mDiffuse * uMaterial.mDiffuse.rgb * abs(NdotL);
-
-  // Attenuation
-  highp float attenuation = 1.0;      // requires highp
-  if (light.mType >= 2)
-  {
-    attenuation -= smoothstep(light.mFallOff.x, light.mFallOff.y, length(lightVector));
-  }
-
-  // TODO spotlights
-
-  // add color to cumulative light total. TODO: don't attenuate directional light
-  lightColor += color * attenuation;
-
-  if (light.mType != 0 && NdotL > 0.0 && light.mType != 0)
-  {
-    // Specular highlight
-    highp vec3 E = normalize(vVertex.xyz);
-    highp vec3 R = reflect(L, N);
-    highp float specular = pow(max(dot(R, E), 0.0), uMaterial.mShininess);
-    specularColor += uMaterial.mSpecular.rgb * light.mSpecular * specular * attenuation;
-  }
-}
-#endif
-
 void main()
 {
   // sample the texture for the initial color
   mediump vec4 fragColor = texture2D(sTexture, vTexCoord);
 
-#ifdef USE_LIGHTING
-
-  // apply lighting and material properties
-  specularColor = vec3(0.0);
-  lightColor = vec3(0.0);
-
-  // @TODO conditionally compile different shaders for different number of lights
-  if( uNumberOfLights > 0 )
-  {
-    calculateLight(uLight0);
-  }
-
-  fragColor.rgb *= lightColor;
-  fragColor.rgb += specularColor;
-
-#else
-
   // apply material properties
   fragColor.rgb *= (uMaterial.mAmbient + uMaterial.mDiffuse).rgb;
-
-#endif
 
   // apply material alpha/opacity to alpha channel
   fragColor.a *= uMaterial.mOpacity * uMaterial.mDiffuse.a;

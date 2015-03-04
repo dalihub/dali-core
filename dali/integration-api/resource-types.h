@@ -45,7 +45,6 @@ enum ResourceTypeId
   ResourceNativeImage,
   ResourceTargetImage,
   ResourceShader,
-  ResourceModel,
   ResourceMesh,
   ResourceText
 };
@@ -403,44 +402,6 @@ private:
 
   // Undefined copy constructor.
   TextResourceType& operator=(const TextResourceType& rhs);
-};
-
-/**
- * ModelResourceType describes a model resource, which can be requested
- * from PlatformAbstraction::LoadResource()
- */
-struct ModelResourceType : public ResourceType
-{
-  /**
-   * Constructor.
-   */
-  ModelResourceType()
-    : ResourceType(ResourceModel)
-  {
-  }
-
-  /**
-   * Destructor.
-   */
-  virtual ~ModelResourceType()
-  {
-  }
-
-  /**
-   * @copydoc ResourceType::Clone
-   */
-  virtual ResourceType* Clone() const
-  {
-    return new ModelResourceType();
-  }
-
-private:
-
-  // Undefined copy constructor.
-  ModelResourceType(const ModelResourceType& typePath);
-
-  // Undefined assignment operator.
-  ModelResourceType& operator=(const ModelResourceType& rhs);
 };
 
 

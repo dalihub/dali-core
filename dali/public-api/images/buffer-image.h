@@ -1,5 +1,5 @@
-#ifndef __DALI_BITMAP_IMAGE_H__
-#define __DALI_BITMAP_IMAGE_H__
+#ifndef __DALI_BUFFER_IMAGE_H__
+#define __DALI_BUFFER_IMAGE_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -29,7 +29,7 @@ namespace Dali
 
 namespace Internal DALI_INTERNAL
 {
-class BitmapImage;
+class BufferImage;
 }
 
 typedef unsigned char         PixelBuffer;  ///< pixel data buffer
@@ -37,7 +37,7 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h)
 
 
 /**
- * @brief BitmapImage represents an image resource that can be added to ImageActors.
+ * @brief BufferImage represents an image resource that can be added to ImageActors.
  * Its pixel buffer data is provided by the application developer.
  *
  * Care should be taken with pixel data allocated by the application,
@@ -63,18 +63,18 @@ typedef Rect<unsigned int>    RectArea;     ///< rectangular area (x,y,w,h)
  * If the image is opaque and blending is not required, then the user
  * should call ImageActor::SetUseImageAlpha(false) on the containing actor.
  */
-class DALI_IMPORT_API BitmapImage : public Image
+class DALI_IMPORT_API BufferImage : public Image
 {
 public:
   /**
-   * @brief Constructor which creates an uninitialized BitmapImage object.
+   * @brief Constructor which creates an uninitialized BufferImage object.
    *
-   * Use BitmapImage::New(...) to create an initialised object.
+   * Use BufferImage::New(...) to create an initialised object.
    */
-  BitmapImage();
+  BufferImage();
 
   /**
-   * @brief Create a new BitmapImage.
+   * @brief Create a new BufferImage.
    *
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
@@ -86,14 +86,14 @@ public:
    * @param [in] width       image width in pixels
    * @param [in] height      image height in pixels
    * @param [in] pixelformat the pixel format (rgba 32 bit by default)
-   * @return a handle to a new instance of BitmapImage
+   * @return a handle to a new instance of BufferImage
    */
-  static BitmapImage New(unsigned int width,
+  static BufferImage New(unsigned int width,
                          unsigned int height,
                          Pixel::Format pixelformat=Pixel::RGBA8888);
 
   /**
-   * @brief Create a new BitmapImage.
+   * @brief Create a new BufferImage.
    *
    * Also a pixel buffer for image data is allocated.
    * Dali has ownership of the buffer.
@@ -105,15 +105,15 @@ public:
    * @param [in] height         Image height in pixels
    * @param [in] pixelFormat    The pixel format
    * @param [in] releasePolicy  Optionally release memory when image is not visible on screen.
-   * @return a handle to a new instance of BitmapImage
+   * @return a handle to a new instance of BufferImage
    */
-  static BitmapImage New(unsigned int  width,
+  static BufferImage New(unsigned int  width,
                          unsigned int  height,
                          Pixel::Format pixelFormat,
                          ReleasePolicy releasePolicy);
 
   /**
-   * @brief Create a new BitmapImage, which uses an external data source.
+   * @brief Create a new BufferImage, which uses an external data source.
    *
    * The PixelBuffer has to be allocated by application.
    *
@@ -131,16 +131,16 @@ public:
    * @param [in] height       image height in pixels
    * @param [in] pixelFormat  the pixel format (rgba 32 bit by default)
    * @param [in] stride       the internal stride of the pixelbuffer in pixels
-   * @return a handle to a new instance of BitmapImage
+   * @return a handle to a new instance of BufferImage
    */
-  static BitmapImage New(PixelBuffer*  pixelBuffer,
+  static BufferImage New(PixelBuffer*  pixelBuffer,
                          unsigned int  width,
                          unsigned int  height,
                          Pixel::Format pixelFormat=Pixel::RGBA8888,
                          unsigned int  stride=0);
 
   /**
-   * @brief Create a new BitmapImage, which uses an external data source.
+   * @brief Create a new BufferImage, which uses an external data source.
    *
    * The PixelBuffer has to be allocated by application.
    *
@@ -153,7 +153,7 @@ public:
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE.
    *
    * @note in case releasePolicy is "Unused", application has to call
-   * BitmapImage::Update() whenever image is re-added to the stage
+   * BufferImage::Update() whenever image is re-added to the stage
    *
    * @pre width & height are greater than zero
    * @param [in] pixelBuffer   pixel buffer. has to be allocated by application.
@@ -162,9 +162,9 @@ public:
    * @param [in] pixelFormat   the pixel format
    * @param [in] stride        the internal stride of the pixelbuffer in pixels
    * @param [in] releasePolicy optionally relase memory when image is not visible on screen.
-   * @return a handle to a new instance of BitmapImage
+   * @return a handle to a new instance of BufferImage
    */
-  static BitmapImage New(PixelBuffer*  pixelBuffer,
+  static BufferImage New(PixelBuffer*  pixelBuffer,
                          unsigned int  width,
                          unsigned int  height,
                          Pixel::Format pixelFormat,
@@ -172,29 +172,29 @@ public:
                          ReleasePolicy releasePolicy);
 
   /**
-   * @brief Downcast an Object handle to BitmapImage.
+   * @brief Downcast an Object handle to BufferImage.
    *
-   * If handle points to a BitmapImage the downcast produces valid
+   * If handle points to a BufferImage the downcast produces valid
    * handle. If not the returned handle is left uninitialized.
    *
    * @param[in] handle to An object
-   * @return handle to a BitmapImage or an uninitialized handle
+   * @return handle to a BufferImage or an uninitialized handle
    */
-  static BitmapImage DownCast( BaseHandle handle );
+  static BufferImage DownCast( BaseHandle handle );
 
   /**
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  ~BitmapImage();
+  ~BufferImage();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @param [in] handle A reference to the copied handle
    */
-  BitmapImage(const BitmapImage& handle);
+  BufferImage(const BufferImage& handle);
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -202,7 +202,7 @@ public:
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
-  BitmapImage& operator=(const BitmapImage& rhs);
+  BufferImage& operator=(const BufferImage& rhs);
 
   /**
    * @brief White pixel as image data.
@@ -210,7 +210,7 @@ public:
    * Can be used to create solid color actors.
    * @return 1 white pixel with 32 bit colordepth
    */
-  static const BitmapImage WHITE();
+  static const BufferImage WHITE();
 
 public:
   /**
@@ -241,7 +241,7 @@ public:
   unsigned int GetBufferStride() const;
 
   /**
-   * @brief Returns the pixel format of the contained bitmap
+   * @brief Returns the pixel format of the contained buffer
    *
    * @return the pixel format
    */
@@ -259,7 +259,7 @@ public:
    * image after calling this method until the SignalUploaded has been
    * successfully received.
    *
-   * @note: BitmapImage::Update might not work with BGR/BGRA formats!
+   * @note: BufferImage::Update might not work with BGR/BGRA formats!
    * @note: Some GPUs may not support Non power of two buffer updates (for
    * example C110/SGX540)
    */
@@ -272,7 +272,7 @@ public:
   void Update( RectArea updateArea );
 
   /**
-   * @brief Returns whether BitmapImage uses external data source or not.
+   * @brief Returns whether BufferImage uses external data source or not.
    *
    * If not, dali holds ownership of the PixelBuffer, otherwise the application
    * is responsible for freeing it.
@@ -286,9 +286,9 @@ public:
 
 public: // Not intended for application developers
 
-  explicit DALI_INTERNAL BitmapImage(Internal::BitmapImage*);
+  explicit DALI_INTERNAL BufferImage(Internal::BufferImage*);
 };
 
 } // namespace Dali
 
-#endif // __DALI_BITMAP_IMAGE_H__
+#endif // __DALI_BUFFER_IMAGE_H__

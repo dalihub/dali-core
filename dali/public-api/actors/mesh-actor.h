@@ -134,28 +134,6 @@ public:
   Material GetMaterial() const;
 
   /**
-   * @brief Set whether this mesh actor should be affected by lights in the scene.
-   *
-   * If it is set to false, then the mesh will be unaffected by
-   * lighting, and will be drawn with flat lighting, applying
-   * the material's diffuse & ambient colors and the actor's color to the
-   * material texture. If it is set to true, and there are no lights in the
-   * scene, the mesh will not be drawn.
-   *
-   * @note This property is not inherited.
-   * @note The default value is true.
-   * @param[in] affectedByLighting Whether the actor should be lit by the scene lighting.
-   */
-  void SetAffectedByLighting(bool affectedByLighting);
-
-  /**
-   * @brief Get the lighting status.
-   *
-   * @return true if the actor is affected by the scene lighting, or false if its evenly lit.
-   */
-  bool IsAffectedByLighting();
-
-  /**
    * @brief Search the actor tree for all named bones in the mesh and connect them.
    *
    * @param[in] rootActor The root actor of the actor tree.

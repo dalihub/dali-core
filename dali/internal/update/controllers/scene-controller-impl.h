@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/update/controllers/scene-controller.h>
-#include <dali/internal/update/controllers/light-controller.h>
 
 namespace Dali
 {
@@ -62,11 +61,6 @@ public:
 public:  // from SceneController
 
   /**
-   * @copydoc SceneController::GetLightController()
-   */
-  virtual LightController& GetLightController() { return *mLightController; }
-
-  /**
    * @copydoc SceneController::GetRenderMessageDispatcher()
    */
   virtual RenderMessageDispatcher& GetRenderMessageDispatcher() { return mRenderMessageDispatcher; }
@@ -101,7 +95,6 @@ private:
 
 private:
 
-  LightController*         mLightController;       ///< light controller
   RenderMessageDispatcher& mRenderMessageDispatcher;    ///< Used for passing messages to the render-thread
   RenderQueue&             mRenderQueue;           ///< render queue
   DiscardQueue&            mDiscardQueue;          ///< discard queue
