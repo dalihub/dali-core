@@ -1,5 +1,5 @@
-#ifndef __DALI_MEMORY_POOL_OBJECT_ALLOCATOR_H__
-#define __DALI_MEMORY_POOL_OBJECT_ALLOCATOR_H__
+#ifndef __DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H__
+#define __DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -19,9 +19,12 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/fixed-size-memory-pool.h>
+#include <dali/internal/common/fixed-size-memory-pool.h>
 
 namespace Dali
+{
+
+namespace Internal
 {
 
 /**
@@ -107,6 +110,8 @@ private:
 
 };
 
+} // namespace Internal
+
 } // namespace Dali
 
-#endif /* __DALI_MEMORY_POOL_OBJECT_ALLOCATOR_H__ */
+#endif /* __DALI_INTERNAL_MEMORY_POOL_OBJECT_ALLOCATOR_H__ */
