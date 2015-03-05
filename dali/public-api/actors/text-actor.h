@@ -68,28 +68,28 @@ public:
   {
     enum
     {
-      Text = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "text"                     type String
-      Font,                                              ///< name "font"                     type String
-      FontStyle,                                         ///< name "font-style"               type String
-      OutlineEnable,                                     ///< name "outline-enable"           type Boolean
-      OutlineColor,                                      ///< name "outline-color"            type Vector4
-      OutlineThicknessWidth,                             ///< name "outline-thickness-width"  type Vector2
-      SmoothEdge,                                        ///< name "smooth-edge"              type Float
-      GlowEnable,                                        ///< name "glow-enable"              type Boolean
-      GlowColor,                                         ///< name "glow-color"               type Vector4
-      GlowIntensity,                                     ///< name "glow-intensity"           type Float
-      ShadowEnable,                                      ///< name "shadow-enable"            type Boolean
-      ShadowColor,                                       ///< name "shadow-color"             type Vector4
-      ShadowOffset,                                      ///< name "shadow-offset"            type Vector2
-      ItalicsAngle,                                      ///< name "italics-angle"            type Float
-      Underline,                                         ///< name "underline"                type Boolean
-      Weight,                                            ///< name "weight"                   type Integer
-      FontDetectionAutomatic,                            ///< name "font-detection-automatic" type Boolean
-      GradientColor,                                     ///< name "gradient-color"           type Vector4
-      GradientStartPoint,                                ///< name "gradient-start-point"     type Vector2
-      GradientEndPoint,                                  ///< name "gradient-end-point"       type Vector2
-      ShadowSize,                                        ///< name "shadow-size"              type Float
-      TextColor,                                         ///< name "text-color"               type Vector4
+      TEXT = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "text"                     type String
+      FONT,                                              ///< name "font"                     type String
+      FONT_STYLE,                                        ///< name "font-style"               type String
+      OUTLINE_ENABLE,                                    ///< name "outline-enable"           type Boolean
+      OUTLINE_COLOR,                                     ///< name "outline-color"            type Vector4
+      OUTLINE_THICKNESS_WIDTH,                           ///< name "outline-thickness-width"  type Vector2
+      SMOOTH_EDGE,                                       ///< name "smooth-edge"              type Float
+      GLOW_ENABLE,                                       ///< name "glow-enable"              type Boolean
+      GLOW_COLOR,                                        ///< name "glow-color"               type Vector4
+      GLOW_INTENSITY,                                    ///< name "glow-intensity"           type Float
+      SHADOW_ENABLE,                                     ///< name "shadow-enable"            type Boolean
+      SHADOW_COLOR,                                      ///< name "shadow-color"             type Vector4
+      SHADOW_OFFSET,                                     ///< name "shadow-offset"            type Vector2
+      ITALICS_ANGLE,                                     ///< name "italics-angle"            type Float
+      UNDERLINE,                                         ///< name "underline"                type Boolean
+      WEIGHT,                                            ///< name "weight"                   type Integer
+      FONT_DETECTION_AUTOMATIC,                          ///< name "font-detection-automatic" type Boolean
+      GRADIENT_COLOR,                                    ///< name "gradient-color"           type Vector4
+      GRADIENT_START_POINT,                              ///< name "gradient-start-point"     type Vector2
+      GRADIENT_END_POINT,                                ///< name "gradient-end-point"       type Vector2
+      SHADOW_SIZE,                                       ///< name "shadow-size"              type Float
+      TEXT_COLOR,                                        ///< name "text-color"               type Vector4
     };
   };
 
