@@ -147,7 +147,7 @@ internal_src_files = \
   $(internal_src_dir)/update/animation/scene-graph-constraint-base.cpp \
   $(internal_src_dir)/update/common/discard-queue.cpp \
   $(internal_src_dir)/update/common/property-base.cpp \
-  $(internal_src_dir)/update/common/property-buffer.cpp \
+  $(internal_src_dir)/update/common/scene-graph-property-buffer.cpp \
   $(internal_src_dir)/update/common/property-condition-functions.cpp \
   $(internal_src_dir)/update/common/property-condition-step-functions.cpp \
   $(internal_src_dir)/update/common/property-condition-variable-step-functions.cpp \

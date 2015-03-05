@@ -48,7 +48,7 @@ public:
    * Set the material for the renderer
    * @param[in] material The material this renderer will use
    */
-  void SetMaterial(const Material& material);
+  void SetMaterial(const Material* material);
 
   /**
    * Get the material of this renderer
@@ -60,7 +60,7 @@ public:
    * Set the geometry for the renderer
    * @param[in] geometry The geometry this renderer will use
    */
-  void SetGeometry(const Geometry& geometry);
+  void SetGeometry(const Geometry* geometry);
 
   /**
    * Get the geometry of this renderer
@@ -85,6 +85,41 @@ private:
   const Geometry* mGeometry; ///< The geometry this renderer uses. (Not owned)
   int mDepthIndex;     ///< Used only in PrepareRenderInstructions
 };
+
+// Messages for RendererAttachment
+
+inline void SetMaterialMessage( EventToUpdate& eventToUpdate, const RendererAttachment& attachment, const Material& material )
+{
+  typedef MessageValue1< RendererAttachment, const Material* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &RendererAttachment::SetMaterial, &material );
+}
+
+inline void SetGeometryMessage( EventToUpdate& eventToUpdate, const RendererAttachment& attachment, const Geometry& geometry )
+{
+  typedef MessageValue1< RendererAttachment, const Geometry* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &RendererAttachment::SetGeometry, &geometry );
+}
+
+inline void SetDepthIndexMessage( EventToUpdate& eventToUpdate, const RendererAttachment& attachment, int depthIndex )
+{
+  typedef MessageValue1< RendererAttachment, int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &RendererAttachment::SetDepthIndex, depthIndex );
+}
 
 } // namespace SceneGraph
 } // namespace Internal

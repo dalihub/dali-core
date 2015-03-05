@@ -24,6 +24,8 @@
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
+#include <dali/internal/update/geometry/scene-graph-geometry.h>
+#include <dali/internal/update/effects/scene-graph-material.h>
 
 namespace Dali
 {
@@ -52,6 +54,8 @@ class DiscardQueue
 public:
 
   typedef OwnerContainer< Shader* > ShaderQueue;
+  typedef OwnerContainer< Geometry* > GeometryQueue;
+  typedef OwnerContainer< Material* > MaterialQueue;
 
   /**
    * Create a new DiscardQueue.
@@ -81,6 +85,18 @@ public:
    * @param[in] attachment The discarded attachment; DiscardQueue takes ownership.
    */
   void Add( BufferIndex updateBufferIndex, NodeAttachment* attachment );
+
+  /**
+   * Adds an unwanted geometry to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render
+   */
+  void Add( BufferIndex updateBufferIndex, Geometry* geometry );
+
+  /**
+   * Adds an unwanted material to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render.
+   */
+  void Add( BufferIndex updateBufferIndex, Material* material );
 
   /**
    * Adds an unwanted shader to the discard queue.
@@ -114,11 +130,15 @@ private:
   NodeOwnerContainer           mNodeQueue0;
   NodeAttachmentOwnerContainer mAttachmentQueue0;
   ShaderQueue                  mShaderQueue0;
+  GeometryQueue                mGeometryQueue0;
+  MaterialQueue                mMaterialQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
   NodeAttachmentOwnerContainer mAttachmentQueue1;
   ShaderQueue                  mShaderQueue1;
+  GeometryQueue                mGeometryQueue1;
+  MaterialQueue                mMaterialQueue1;
 };
 
 } // namespace SceneGraph

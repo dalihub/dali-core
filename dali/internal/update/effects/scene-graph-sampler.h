@@ -18,6 +18,7 @@
  */
 
 #include <dali/public-api/shader-effects/sampler.h>
+#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/render/renderers/sampler-data-provider.h>
@@ -127,6 +128,56 @@ private:
   DoubleBuffered<WrapMode> mUWrapMode;      ///< The horizontal wrap mode
   DoubleBuffered<WrapMode> mVWrapMode;      ///< The vertical wrap mode
 };
+
+inline void SetUniformNameMessage( EventToUpdate& eventToUpdate, const Sampler& sampler, const std::string& name )
+{
+  typedef MessageValue1< Sampler, std::string > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &sampler, &Sampler::SetUniformName, name );
+}
+
+} // namespace SceneGraph
+
+// Declare enum as a message parameter type outside the SceneGraph namespace
+template <> struct ParameterType< SceneGraph::Sampler::FilterMode > : public BasicType< SceneGraph::Sampler::FilterMode > {};
+
+namespace SceneGraph
+{
+
+inline void SetFilterModeMessage( EventToUpdate& eventToUpdate, const Sampler& sampler, Sampler::FilterMode minFilter, Sampler::FilterMode magFilter )
+{
+  typedef MessageDoubleBuffered2< Sampler, Sampler::FilterMode, Sampler::FilterMode > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &sampler, &Sampler::SetFilterMode, minFilter, magFilter );
+}
+
+} // namespace SceneGraph
+
+// Declare enum as a message parameter type
+template <> struct ParameterType< SceneGraph::Sampler::WrapMode > : public BasicType< SceneGraph::Sampler::WrapMode > {};
+
+namespace SceneGraph
+{
+
+inline void SetWrapModeMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, SceneGraph::Sampler::WrapMode horizontalWrap, SceneGraph::Sampler::WrapMode verticalWrap )
+{
+  typedef MessageDoubleBuffered2< Sampler, Sampler::WrapMode, Sampler::WrapMode > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &sampler, &Sampler::SetWrapMode, horizontalWrap, verticalWrap );
+}
+
 
 } // namespace SceneGraph
 } // namespace Internal

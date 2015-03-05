@@ -47,10 +47,13 @@ void Sampler::SetUniformName( const std::string& samplerName )
 
 void Sampler::SetTextureId( ResourceId textureId )
 {
+  mTextureId = textureId;
 }
 
 void Sampler::SetFilterMode( BufferIndex bufferIndex, FilterMode minFilter, FilterMode magFilter )
 {
+  mMinFilter[bufferIndex] = minFilter;
+  mMagFilter[bufferIndex] = magFilter;
 }
 
 void Sampler::SetWrapMode( BufferIndex bufferIndex, WrapMode uWrap, WrapMode vWrap )

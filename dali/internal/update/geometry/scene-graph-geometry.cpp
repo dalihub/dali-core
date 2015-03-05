@@ -26,26 +26,56 @@ namespace SceneGraph
 Geometry::Geometry()
 : mGeometryType(Dali::Geometry::TRIANGLES)
 {
+  // @todo MESH_REWORK Remove this code when we have working property buffers
+  // @todo It's also the wrong place to do this temporary work
+  PropertyBuffer* vertexPropertyBuffer = PropertyBuffer::NewQuadVertices();
+  mVertexBuffers.PushBack( vertexPropertyBuffer );
+
+  mIndexBuffer = PropertyBuffer::NewQuadIndices();
 }
 
 Geometry::~Geometry()
 {
+  // @todo Inform renderers of deletion of buffers?
 }
 
-void Geometry::AddVertexBuffer( PropertyBuffer vertexBuffer )
+void Geometry::AddVertexBuffer( PropertyBuffer* vertexBuffer )
 {
+  mVertexBuffers.PushBack( vertexBuffer );
 }
 
-void Geometry::RemoveVertexBuffer( PropertyBuffer vertexBuffer )
+void Geometry::RemoveVertexBuffer( PropertyBuffer* vertexBuffer )
 {
+  DALI_ASSERT_DEBUG( NULL != vertexBuffer );
+
+  // Find the object and destroy it
+  for ( OwnerContainer< PropertyBuffer* >::Iterator iter = mVertexBuffers.Begin(); iter != mVertexBuffers.End(); ++iter )
+  {
+    PropertyBuffer* current = *iter;
+    if ( current == vertexBuffer )
+    {
+      mVertexBuffers.Erase( iter );
+      return;
+    }
+  }
+
+  DALI_ASSERT_DEBUG(false);
 }
 
-void Geometry::SetIndexBuffer( PropertyBuffer indexBuffer )
+void Geometry::SetIndexBuffer( PropertyBuffer* indexBuffer )
 {
+  mIndexBuffer = indexBuffer;
+}
+
+void Geometry::ClearIndexBuffer()
+{
+  // @todo Actually delete, or put on Discard Queue and tell Renderer in render thread?
+  mIndexBuffer.Reset();
 }
 
 void Geometry::SetGeometryType( Geometry::GeometryType geometryType )
 {
+  mGeometryType = geometryType;
 }
 
 const Geometry::VertexBuffers& Geometry::GetVertexBuffers()
@@ -55,7 +85,7 @@ const Geometry::VertexBuffers& Geometry::GetVertexBuffers()
 
 const PropertyBuffer& Geometry::GetIndexBuffer()
 {
-  return mIndexBuffer;
+  return *mIndexBuffer.Get();
 }
 
 Geometry::GeometryType Geometry::GetGeometryType( )

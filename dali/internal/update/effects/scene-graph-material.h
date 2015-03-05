@@ -20,6 +20,7 @@
 #include <dali/public-api/actors/renderable-actor.h> // For CullFaceMode
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/blending-options.h>
+#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/render/renderers/material-data-provider.h>
@@ -64,13 +65,13 @@ public:
    * Add a sampler (image + sampler modes) to the material
    * @param[in] sampler A sampler to add
    */
-  void AddSampler( Sampler* sampler );
+  void AddSampler( const Sampler* sampler );
 
   /**
    * Remove a sampler (image + sampler modes) from the material
    * @param[in] sampler A sampler to remove
    */
-  void RemoveSampler( Sampler* sampler );
+  void RemoveSampler( const Sampler* sampler );
 
   /**
    * Get the samplers this material uses.
@@ -78,40 +79,46 @@ public:
    */
   const Samplers& GetSamplers() const;
 
-  /**
-   * Set the face culling mode for geometry used by this material
-   * @param[in] mode The face culling mode to use
-   */
-  void SetFaceCulling( BufferIndex updateBufferIndex, Dali::CullFaceMode mode );
-
-  /**
-   * Get the face culling mode
-   * @return the face culling mdoe
-   */
-  CullFaceMode GetFaceCulling() const ;
-
-  // @note Blending mode is per actor, not per material (requires actor color)
-
-  /**
-   * Set the blending options. This should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] options A bitmask of blending options.
-   */
-  void SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options );
-
-  /**
-   * Set the blend-color. This should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] color The new blend-color.
-   */
-  void SetBlendColor( BufferIndex updateBufferIndex, const Vector4& color );
-
 private:
   Shader* mShader;
   Samplers mSamplers; // Not owned (though who does?)
-  Dali::CullFaceMode mCullFaceMode:3;
-  BlendingOptions mBlendingOptions;
+
+  // @todo MESH_REWORK add property values for cull face mode, blending options, blend color
+  // Add getters/setters?
 };
+
+inline void SetShaderMessage( EventToUpdate& eventToUpdate, const Material& material, Shader& shader )
+{
+  typedef MessageValue1< Material, Shader* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &material, &Material::SetShader, &shader );
+}
+
+inline void AddSamplerMessage( EventToUpdate& eventToUpdate, const Material& material, const Sampler& sampler )
+{
+  typedef MessageValue1< Material, const Sampler* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &material, &Material::AddSampler, &sampler );
+}
+
+inline void RemoveSamplerMessage( EventToUpdate& eventToUpdate, const Material& material, const Sampler& sampler )
+{
+  typedef MessageValue1< Material, const Sampler* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &material, &Material::RemoveSampler, &sampler );
+}
 
 } // namespace SceneGraph
 } // namespace Internal

@@ -28,9 +28,7 @@ namespace SceneGraph
 {
 
 Material::Material()
-: mShader(NULL),
-  mCullFaceMode( CullNone ),
-  mBlendingOptions()
+: mShader(NULL)
 {
 }
 
@@ -47,12 +45,12 @@ Shader* Material::GetShader()
   return mShader;
 }
 
-void Material::AddSampler( Sampler* sampler )
+void Material::AddSampler( const Sampler* sampler )
 {
   // @todo MESH_REWORK
 }
 
-void Material::RemoveSampler( Sampler* sampler )
+void Material::RemoveSampler( const Sampler* sampler )
 {
   // @todo MESH_REWORK
 }
@@ -63,26 +61,6 @@ const Material::Samplers& Material::GetSamplers() const
   return mSamplers;
 }
 
-void Material::SetFaceCulling( BufferIndex updateBufferIndex, Dali::CullFaceMode mode )
-{
-  // @todo MESH_REWORK
-}
-
-CullFaceMode Material::GetFaceCulling() const
-{
-  // @todo MESH_REWORK
-  return mCullFaceMode;
-}
-
-void Material::SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options )
-{
-  // @todo MESH_REWORK
-}
-
-void Material::SetBlendColor( BufferIndex updateBufferIndex, const Vector4& color )
-{
-  // @todo MESH_REWORK
-}
 
 
 } // namespace SceneGraph

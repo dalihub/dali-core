@@ -1,6 +1,3 @@
-#ifndef DALI_INTERNAL_SCENE_GRAPH_PROPERTY_BUFFER_H
-#define DALI_INTERNAL_SCENE_GRAPH_PROPERTY_BUFFER_H
-
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -17,6 +14,8 @@
  * limitations under the License.
  */
 
+#include "scene-graph-property-buffer.h"
+
 namespace Dali
 {
 namespace Internal
@@ -24,25 +23,15 @@ namespace Internal
 namespace SceneGraph
 {
 
-class PropertyBuffer
+PropertyBuffer::PropertyBuffer()
 {
-public:
-  /**
-   * Constructor
-   */
-  PropertyBuffer();
+}
 
-  /**
-   * Destructor
-   */
-  ~PropertyBuffer();
+PropertyBuffer::~PropertyBuffer()
+{
+}
 
-private:
-  // Data
-};
 
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali
-
-#endif // DALI_INTERNAL_SCENE_GRAPH_PROPERTY_BUFFER_H

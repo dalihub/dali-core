@@ -21,17 +21,23 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
+
 #include <dali/integration-api/resource-declarations.h>
+
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/event-to-update.h>
-#include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/node-attachments/node-attachment.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/update/animation/scene-graph-animation.h>
-#include <dali/internal/update/common/scene-graph-property-notification.h>
-#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/common/type-abstraction-enums.h>
+
+#include <dali/internal/update/animation/scene-graph-animation.h>
+#include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/internal/update/common/scene-graph-property-notification.h>
+#include <dali/internal/update/geometry/scene-graph-geometry.h>
+#include <dali/internal/update/effects/scene-graph-material.h>
+#include <dali/internal/update/node-attachments/node-attachment.h>
+#include <dali/internal/update/nodes/node.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
+
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
 {
@@ -256,6 +262,31 @@ public:
    * @param[in] notifyMode The notification mode.
    */
   void PropertyNotificationSetNotify( PropertyNotification* propertyNotification, PropertyNotification::NotifyMode notifyMode );
+
+
+  /**
+   * Add a geometry to the scene graph
+   * @param[in] geometry The geometry to add
+   */
+  void AddGeometry( Geometry* geometry );
+
+  /**
+   * Remove a geometry from the scene graph
+   * @param[in] geometry The geometry to remove
+   */
+  void RemoveGeometry( Geometry* geometry );
+
+  /**
+   * Add a material to the scene graph
+   * @param[in] material The material to add
+   */
+  void AddMaterial( Material* material );
+
+  /**
+   * Remove a material from the scene graph
+   * @param[in] material The material to remove
+   */
+  void RemoveMaterial( Material* material );
 
   // Shaders
 
@@ -619,6 +650,53 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::PropertyNotificationSetNotify, propertyNotification, notifyMode );
 }
+
+inline void AddGeometryMessage( UpdateManager& manager, Geometry& geometry )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer< Geometry > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddGeometry, &geometry );
+}
+
+// The render thread can safely change the Geometry
+inline void RemoveGeometryMessage( UpdateManager& manager, Geometry& geometry )
+{
+  typedef MessageValue1< UpdateManager, Geometry* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveGeometry, &geometry );
+}
+
+inline void AddMaterialMessage( UpdateManager& manager, Material& material )
+{
+  typedef MessageValue1< UpdateManager, OwnerPointer< Material > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AddMaterial, &material );
+}
+
+// The render thread can safely change the Material
+inline void RemoveMaterialMessage( UpdateManager& manager, Material& material )
+{
+  typedef MessageValue1< UpdateManager, Material* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::RemoveMaterial, &material );
+}
+
 
 // The render thread can safely change the Shader
 inline void AddShaderMessage( UpdateManager& manager, Shader& shader )

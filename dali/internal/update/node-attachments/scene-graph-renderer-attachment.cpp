@@ -37,10 +37,10 @@ RendererAttachment::~RendererAttachment()
   mGeometry=NULL;
 }
 
-void RendererAttachment::SetMaterial(const Material& material)
+void RendererAttachment::SetMaterial(const Material* material)
 {
   // @todo MESH_REWORK
-  mMaterial = &material;
+  mMaterial = material;
 }
 
 const Material& RendererAttachment::GetMaterial() const
@@ -48,10 +48,10 @@ const Material& RendererAttachment::GetMaterial() const
   return *mMaterial;
 }
 
-void RendererAttachment::SetGeometry(const Geometry& geometry)
+void RendererAttachment::SetGeometry(const Geometry* geometry)
 {
   // @todo MESH_REWORK
-  mGeometry = &geometry;
+  mGeometry = geometry;
 }
 
 const Geometry& RendererAttachment::GetGeometry() const

@@ -38,23 +38,25 @@
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/update/manager/prepare-render-algorithms.h>
-#include <dali/internal/update/manager/process-render-tasks.h>
-#include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
-#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
-#include <dali/internal/update/manager/sorted-layers.h>
-#include <dali/internal/update/manager/update-algorithms.h>
-#include <dali/internal/update/queue/update-message-queue.h>
-#include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
+#include <dali/internal/update/effects/scene-graph-material.h>
+#include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/update/manager/prepare-render-algorithms.h>
+#include <dali/internal/update/manager/process-render-tasks.h>
+#include <dali/internal/update/manager/sorted-layers.h>
+#include <dali/internal/update/manager/update-algorithms.h>
+#include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/internal/update/queue/update-message-queue.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task.h>
+#include <dali/internal/update/render-tasks/scene-graph-render-task-list.h>
+#include <dali/internal/update/resources/resource-manager.h>
+#include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/touch/touch-resampler.h>
 
 #include <dali/internal/render/common/render-instruction-container.h>
@@ -123,6 +125,14 @@ void DestroyNodeSet( std::set<Node*>& nodeSet )
 }
 
 } //namespace
+
+typedef OwnerContainer< Geometry* >            GeometryContainer;
+typedef GeometryContainer::Iterator            GeometryIter;
+typedef GeometryContainer::ConstIterator       GeometryConstIter;
+
+typedef OwnerContainer< Material* >            MaterialContainer;
+typedef MaterialContainer::Iterator            MaterialIter;
+typedef MaterialContainer::ConstIterator       MaterialConstIter;
 
 typedef OwnerContainer< Shader* >              ShaderContainer;
 typedef ShaderContainer::Iterator              ShaderIter;
@@ -257,6 +267,9 @@ struct UpdateManager::Impl
 
   AnimationContainer                  animations;                    ///< A container of owned animations
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
+
+  GeometryContainer                   geometries;                    ///< A container of geometries
+  MaterialContainer                   materials;                     ///< A container of materials
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
@@ -519,6 +532,67 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
   propertyNotification->SetNotifyMode( notifyMode );
 }
 
+
+void UpdateManager::AddGeometry( Geometry* geometry )
+{
+  DALI_ASSERT_DEBUG( NULL != geometry );
+  mImpl->geometries.PushBack( geometry );
+}
+
+void UpdateManager::RemoveGeometry( Geometry* geometry )
+{
+  DALI_ASSERT_DEBUG(geometry != NULL);
+
+  GeometryContainer& geometries = mImpl->geometries;
+
+  // Find the geometry and destroy it
+  for ( GeometryIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  {
+    Geometry& current = **iter;
+    if ( &current == geometry )
+    {
+      // Transfer ownership to the discard queue
+      // This keeps the geometry alive, until the render-thread has finished with it
+      mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), geometries.Release( iter ) );
+
+      return;
+    }
+  }
+
+  // Should not reach here
+  DALI_ASSERT_DEBUG(false);
+}
+
+void UpdateManager::AddMaterial( Material* material )
+{
+  DALI_ASSERT_DEBUG( NULL != material );
+
+  mImpl->materials.PushBack( material );
+}
+
+void UpdateManager::RemoveMaterial( Material* material )
+{
+  DALI_ASSERT_DEBUG(material != NULL);
+
+  MaterialContainer& materials = mImpl->materials;
+
+  // Find the material and destroy it
+  for ( MaterialIter iter = materials.Begin(); iter != materials.End(); ++iter )
+  {
+    Material& current = **iter;
+    if ( &current == material )
+    {
+      // Transfer ownership to the discard queue
+      // This keeps the material alive, until the render-thread has finished with it
+      mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), materials.Release( iter ) );
+
+      return;
+    }
+  }
+  // Should not reach here
+  DALI_ASSERT_DEBUG(false);
+}
+
 void UpdateManager::AddShader( Shader* shader )
 {
   DALI_ASSERT_DEBUG( NULL != shader );
@@ -542,7 +616,7 @@ void UpdateManager::AddShader( Shader* shader )
   shader->Initialize( mImpl->renderQueue, mImpl->sceneController->GetTextureCache() );
 }
 
-void UpdateManager::RemoveShader(Shader* shader)
+void UpdateManager::RemoveShader( Shader* shader )
 {
   DALI_ASSERT_DEBUG(shader != NULL);
 
@@ -694,6 +768,18 @@ void UpdateManager::ResetProperties()
     (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
+  // Reset animatable material properties to base values
+  for (MaterialIter iter = mImpl->materials.Begin(); iter != mImpl->materials.End(); ++iter)
+  {
+    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+  }
+
+  // Reset animatable geometry properties to base values
+  for (GeometryIter iter = mImpl->geometries.Begin(); iter != mImpl->geometries.End(); ++iter)
+  {
+    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+  }
+
   // Reset animatable shader properties to base values
   for (ShaderIter iter = mImpl->shaders.Begin(); iter != mImpl->shaders.End(); ++iter)
   {
@@ -805,6 +891,21 @@ void UpdateManager::ApplyConstraints()
   {
     RenderTask& task = **iter;
     mImpl->activeConstraints += ConstrainPropertyOwner( task, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  }
+
+  // Constrain Materials and geometries
+  MaterialContainer& materials = mImpl->materials;
+  for ( MaterialIter iter = materials.Begin(); iter != materials.End(); ++iter )
+  {
+    Material& material = **iter;
+    mImpl->activeConstraints += ConstrainPropertyOwner( material, mSceneGraphBuffers.GetUpdateBufferIndex() );
+  }
+
+  GeometryContainer& geometries = mImpl->geometries;
+  for ( GeometryIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
+  {
+    Geometry& geometry = **iter;
+    mImpl->activeConstraints += ConstrainPropertyOwner( geometry, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   // constrain shaders... (in construction order)

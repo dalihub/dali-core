@@ -38,7 +38,12 @@ public:
   /**
    * Constructor
    */
-  UniformMap;
+  UniformMap();
+
+  /**
+   * Destructor
+   */
+  ~UniformMap();
 
 private:
   // data
