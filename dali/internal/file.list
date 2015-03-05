@@ -147,6 +147,7 @@ internal_src_files = \
   $(internal_src_dir)/update/animation/scene-graph-constraint-base.cpp \
   $(internal_src_dir)/update/common/discard-queue.cpp \
   $(internal_src_dir)/update/common/property-base.cpp \
+  $(internal_src_dir)/update/common/property-buffer.cpp \
   $(internal_src_dir)/update/common/property-condition-functions.cpp \
   $(internal_src_dir)/update/common/property-condition-step-functions.cpp \
   $(internal_src_dir)/update/common/property-condition-variable-step-functions.cpp \
@@ -155,6 +156,9 @@ internal_src_files = \
   $(internal_src_dir)/update/common/scene-graph-property-notification.cpp \
   $(internal_src_dir)/update/controllers/render-message-dispatcher.cpp \
   $(internal_src_dir)/update/controllers/scene-controller-impl.cpp \
+  $(internal_src_dir)/update/effects/scene-graph-material.cpp \
+  $(internal_src_dir)/update/effects/scene-graph-sampler.cpp \
+  $(internal_src_dir)/update/geometry/scene-graph-geometry.cpp \
   $(internal_src_dir)/update/gestures/pan-gesture-profiling.cpp \
   $(internal_src_dir)/update/gestures/scene-graph-pan-gesture.cpp \
   $(internal_src_dir)/update/queue/update-message-queue.cpp \
@@ -170,6 +174,7 @@ internal_src_files = \
   $(internal_src_dir)/update/node-attachments/scene-graph-image-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-renderable-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-text-attachment.cpp \
+  $(internal_src_dir)/update/node-attachments/scene-graph-renderer-attachment.cpp \
   $(internal_src_dir)/update/nodes/node.cpp \
   $(internal_src_dir)/update/nodes/node-messages.cpp \
   $(internal_src_dir)/update/nodes/scene-graph-layer.cpp \

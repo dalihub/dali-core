@@ -57,8 +57,6 @@ protected:
    * Virtual destructor, this is an interface, no deletion through this interface
    */
   virtual ~RenderDataProvider() { }
-
-
 };
 
 } // SceneGraph
