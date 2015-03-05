@@ -18,14 +18,18 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
+// Internal headers are allowed here
+
+#include <dali/internal/common/memory-pool-object-allocator.h>
+
 using namespace Dali;
 
-void utc_dali_memorypoolobjectallocator_startup(void)
+void utc_dali_internal_memorypoolobjectallocator_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_memorypoolobjectallocator_cleanup(void)
+void utc_dali_internal_memorypoolobjectallocator_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
@@ -98,7 +102,7 @@ private:
 int UtcDaliMemoryPoolObjectAllocatorObjectAllocation(void)
 {
 
-  MemoryPoolObjectAllocator< MemoryPoolObjectAllocatorTestObject > allocator;
+  Internal::MemoryPoolObjectAllocator< MemoryPoolObjectAllocatorTestObject > allocator;
 
   // Allocate an object
   MemoryPoolObjectAllocatorTestObject* testObject1 = allocator.Allocate();
@@ -139,7 +143,7 @@ int UtcDaliMemoryPoolObjectAllocatorObjectAllocation(void)
 
 int UtcDaliMemoryPoolObjectAllocatorObjectRawAllocation(void)
 {
-  MemoryPoolObjectAllocator< MemoryPoolObjectAllocatorTestObject > allocator;
+  Internal::MemoryPoolObjectAllocator< MemoryPoolObjectAllocatorTestObject > allocator;
 
   MemoryPoolObjectAllocatorTestObject* testObject = new ( allocator.AllocateRaw() ) MemoryPoolObjectAllocatorTestObject();
   DALI_TEST_CHECK( testObject );
@@ -161,7 +165,7 @@ int UtcDaliMemoryPoolObjectAllocatorObjectRawAllocation(void)
 
 int UtcDaliMemoryPoolObjectAllocatorObjectAllocationPOD(void)
 {
-  MemoryPoolObjectAllocator< bool > allocator;
+  Internal::MemoryPoolObjectAllocator< bool > allocator;
 
   bool* testObject1 = allocator.Allocate();
   DALI_TEST_CHECK( testObject1 );
