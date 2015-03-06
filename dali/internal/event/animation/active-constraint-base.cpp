@@ -45,7 +45,7 @@ namespace // unnamed namespace
 //              Name        Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "weight",    FLOAT,   true,     true,    true,   Dali::ActiveConstraint::Property::WEIGHT )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 // Signals
 

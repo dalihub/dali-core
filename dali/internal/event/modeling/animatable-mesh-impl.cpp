@@ -43,7 +43,7 @@ DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "position",        VECTOR3,  true,    true,     true,    Dali::AnimatableVertex::Property::POSITION       )
 DALI_PROPERTY( "vertex-color",    VECTOR4,  true,    true,     true,    Dali::AnimatableVertex::Property::COLOR          )
 DALI_PROPERTY( "texture-coords",  VECTOR2,  true,    true,     true,    Dali::AnimatableVertex::Property::TEXTURE_COORDS )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 } // namespace
 

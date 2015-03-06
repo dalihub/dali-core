@@ -52,7 +52,7 @@ public:
   {
     enum
     {
-      WEIGHT = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "weight", type FLOAT
+      WEIGHT = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "weight", type float
     };
   };
 
