@@ -1,5 +1,5 @@
-#ifndef __DALI_FIXED_SIZE_MEMORY_POOL_H__
-#define __DALI_FIXED_SIZE_MEMORY_POOL_H__
+#ifndef __DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H__
+#define __DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -23,6 +23,9 @@
 #include <cstddef>
 
 namespace Dali
+{
+
+namespace Internal
 {
 
 /**
@@ -91,7 +94,8 @@ private:
 
 };
 
+} // namespace Internal
 
 } // namespace Dali
 
-#endif /* __DALI_FIXED_SIZE_MEMORY_POOL_H__ */
+#endif /* __DALI_INTERNAL_FIXED_SIZE_MEMORY_POOL_H__ */

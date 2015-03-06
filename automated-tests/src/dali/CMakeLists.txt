@@ -48,7 +48,6 @@ SET(TC_SOURCES
         utc-Dali-MathUtils.cpp
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp
-        utc-Dali-MemoryPoolObjectAllocator.cpp
         utc-Dali-MeshActor.cpp
         utc-Dali-MeshData.cpp
         utc-Dali-MouseWheelEvent.cpp

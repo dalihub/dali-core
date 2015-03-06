@@ -35,7 +35,7 @@ enum PropertyRanges
   DEFAULT_ACTOR_PROPERTY_START_INDEX            = 0,          ///< Start index for Actor (and other base classes).
   DEFAULT_ACTOR_PROPERTY_MAX_COUNT              = 10000,      ///< Actor range: 0 to 9999
 
-  DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX   = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< For non-Actor objects.
+  DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX   = DEFAULT_ACTOR_PROPERTY_START_INDEX,         ///< For non-Actor objects.
 
   DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX    = DEFAULT_ACTOR_PROPERTY_START_INDEX + DEFAULT_ACTOR_PROPERTY_MAX_COUNT, ///< Property start index for classes deriving directly from Actor.
 

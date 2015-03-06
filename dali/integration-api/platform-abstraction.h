@@ -190,6 +190,14 @@ public:
    */
   virtual DynamicsFactory* GetDynamicsFactory() = 0;
 
+  /**
+   * Load a shader binary file into a buffer
+   * @param[in] filename The shader binary filename to load
+   * @param[out] buffer  A buffer to receive the file.
+   * @result             true if the file is loaded.
+   */
+  virtual bool LoadShaderBinFile( const std::string& filename, std::vector< unsigned char >& buffer ) const = 0;
+
 }; // class PlatformAbstraction
 
 } // namespace Integration

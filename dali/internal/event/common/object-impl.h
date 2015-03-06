@@ -500,4 +500,3 @@ inline const Internal::Object& GetImplementation(const Dali::Handle& object)
 } // namespace Dali
 
 #endif // __DALI_INTERNAL_OBJECT_H__
-

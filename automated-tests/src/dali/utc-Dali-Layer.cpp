@@ -442,8 +442,8 @@ int UtcDaliLayerDefaultProperties(void)
   Layer actor = Layer::New();
 
   std::vector<Property::Index> indices ;
-  indices.push_back(Layer::Property::ClippingEnable);
-  indices.push_back(Layer::Property::ClippingBox);
+  indices.push_back(Layer::Property::CLIPPING_ENABLE);
+  indices.push_back(Layer::Property::CLIPPING_BOX);
 
   DALI_TEST_CHECK(actor.GetPropertyCount() == ( Actor::New().GetPropertyCount() + indices.size() ) );
 
@@ -461,11 +461,11 @@ int UtcDaliLayerDefaultProperties(void)
   ClippingBox testBox(10,20,30,40);
   DALI_TEST_CHECK(actor.GetClippingBox() != testBox);
 
-  actor.SetProperty(Layer::Property::ClippingBox, Property::Value(Rect<int>(testBox)));
+  actor.SetProperty(Layer::Property::CLIPPING_BOX, Property::Value(Rect<int>(testBox)));
 
-  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::Property::ClippingBox)) ;
+  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::Property::CLIPPING_BOX)) ;
 
-  Property::Value v = actor.GetProperty(Layer::Property::ClippingBox);
+  Property::Value v = actor.GetProperty(Layer::Property::CLIPPING_BOX);
 
   DALI_TEST_CHECK(v.Get<Rect<int> >() == testBox);
 

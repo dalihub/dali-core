@@ -36,37 +36,37 @@ AnimatableVertex::~AnimatableVertex()
 
 void AnimatableVertex::SetPosition(const Vector3& position)
 {
-  mMesh.SetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::Position), Dali::Property::Value(position) );
+  mMesh.SetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::POSITION), Dali::Property::Value(position) );
 }
 
 void AnimatableVertex::SetColor(const Vector4& color)
 {
-  mMesh.SetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::Color), Dali::Property::Value(color) );
+  mMesh.SetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::COLOR), Dali::Property::Value(color) );
 }
 
 void AnimatableVertex::SetTextureCoords(const Vector2& textureCoords)
 {
-  mMesh.SetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::TextureCoords), Dali::Property::Value(textureCoords) );
+  mMesh.SetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::TEXTURE_COORDS), Dali::Property::Value(textureCoords) );
 }
 
 Vector3 AnimatableVertex::GetCurrentPosition()
 {
   Vector3 position;
-  mMesh.GetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::Position) ).Get(position);
+  mMesh.GetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::POSITION) ).Get(position);
   return position;
 }
 
 Vector4 AnimatableVertex::GetCurrentColor()
 {
   Vector4 color;
-  mMesh.GetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::Color) ).Get(color);
+  mMesh.GetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::COLOR) ).Get(color);
   return color;
 }
 
 Vector2 AnimatableVertex::GetCurrentTextureCoords()
 {
   Vector2 textureCoords;
-  mMesh.GetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::TextureCoords) ).Get(textureCoords);
+  mMesh.GetProperty( mMesh.GetVertexPropertyIndex(mVertex, Property::TEXTURE_COORDS) ).Get(textureCoords);
   return textureCoords;
 }
 

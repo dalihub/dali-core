@@ -32,8 +32,8 @@ namespace
 
 //              Name             Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "points",         ARRAY, true, false, false,   Dali::Path::Property::Points        )
-DALI_PROPERTY( "control-points", ARRAY, true, false, false,   Dali::Path::Property::ControlPoints )
+DALI_PROPERTY( "points",         ARRAY, true, false, false,   Dali::Path::Property::POINTS         )
+DALI_PROPERTY( "control-points", ARRAY, true, false, false,   Dali::Path::Property::CONTROL_POINTS )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
 
 /**
@@ -137,7 +137,7 @@ Property::Type Path::GetDefaultPropertyType(Property::Index index) const
 Property::Value Path::GetDefaultProperty( Property::Index index ) const
 {
   Property::Value value;
-  if( index == Dali::Path::Property::Points )
+  if( index == Dali::Path::Property::POINTS )
   {
     size_t pointCount( mPoint.Size() );
     for( size_t i( 0 ); i != pointCount; ++i )
@@ -145,7 +145,7 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
       value.AppendItem( mPoint[i] );
     }
   }
-  else if( index == Dali::Path::Property::ControlPoints )
+  else if( index == Dali::Path::Property::CONTROL_POINTS )
   {
     size_t controlpointCount( mControlPoint.Size() );
     for( size_t i( 0 ); i != controlpointCount; ++i )
@@ -159,7 +159,7 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
 
 void Path::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
 {
-  if( index == Dali::Path::Property::Points )
+  if( index == Dali::Path::Property::POINTS )
   {
     Property::Array propertyArray;
     propertyValue.Get(propertyArray);
@@ -171,7 +171,7 @@ void Path::SetDefaultProperty(Property::Index index, const Property::Value& prop
       propertyArray[i].Get( mPoint[i]);
     }
   }
-  else if( index == Dali::Path::Property::ControlPoints )
+  else if( index == Dali::Path::Property::CONTROL_POINTS )
   {
     Property::Array propertyArray;
     propertyValue.Get(propertyArray);
@@ -493,5 +493,3 @@ size_t Path::GetPointCount() const
 
 } // Internal
 } // Dali
-
-

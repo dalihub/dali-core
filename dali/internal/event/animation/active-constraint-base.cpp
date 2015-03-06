@@ -44,7 +44,7 @@ namespace // unnamed namespace
 
 //              Name        Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "weight",    FLOAT,   true,     true,    true,   Dali::ActiveConstraint::Property::Weight )
+DALI_PROPERTY( "weight",    FLOAT,   true,     true,    true,   Dali::ActiveConstraint::Property::WEIGHT )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
 
 // Signals
@@ -144,7 +144,7 @@ void ActiveConstraintBase::FirstApply( Object& parent, TimePeriod applyTime )
     // Automatically animate (increase) the weight, until the constraint is fully applied
     mApplyAnimation = Dali::Animation::New( applyTime.delaySeconds + applyTime.durationSeconds );
     Dali::ActiveConstraint self( this );
-    mApplyAnimation.AnimateTo( Property( self, Dali::ActiveConstraint::Property::Weight ), Dali::ActiveConstraint::FINAL_WEIGHT, mAlphaFunction, applyTime );
+    mApplyAnimation.AnimateTo( Property( self, Dali::ActiveConstraint::Property::WEIGHT ), Dali::ActiveConstraint::FINAL_WEIGHT, mAlphaFunction, applyTime );
     mApplyAnimation.Play();
 
     // Chain "Finish" to "Applied" signal
@@ -372,7 +372,7 @@ Property::Type ActiveConstraintBase::GetDefaultPropertyType( Property::Index ind
 
 void ActiveConstraintBase::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  if( Dali::ActiveConstraint::Property::Weight == index )
+  if( Dali::ActiveConstraint::Property::WEIGHT == index )
   {
     SetWeight( propertyValue.Get<float>() );
   }
@@ -382,7 +382,7 @@ Property::Value ActiveConstraintBase::GetDefaultProperty( Property::Index index 
 {
   Property::Value value;
 
-  if( Dali::ActiveConstraint::Property::Weight == index )
+  if( Dali::ActiveConstraint::Property::WEIGHT == index )
   {
     value = GetCurrentWeight();
   }

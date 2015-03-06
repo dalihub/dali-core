@@ -59,10 +59,10 @@ namespace
 
 //              Name             Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "grid-density",   FLOAT,   true,    false,   false,   Dali::ShaderEffect::Property::GridDensity   )
-DALI_PROPERTY( "image",          MAP,     true,    false,   false,   Dali::ShaderEffect::Property::Image         )
-DALI_PROPERTY( "program",        MAP,     true,    false,   false,   Dali::ShaderEffect::Property::Program       )
-DALI_PROPERTY( "geometry-hints", INTEGER, true,    false,   false,   Dali::ShaderEffect::Property::GeometryHints )
+DALI_PROPERTY( "grid-density",   FLOAT,   true,    false,   false,   Dali::ShaderEffect::Property::GRID_DENSITY   )
+DALI_PROPERTY( "image",          MAP,     true,    false,   false,   Dali::ShaderEffect::Property::IMAGE          )
+DALI_PROPERTY( "program",        MAP,     true,    false,   false,   Dali::ShaderEffect::Property::PROGRAM        )
+DALI_PROPERTY( "geometry-hints", INTEGER, true,    false,   false,   Dali::ShaderEffect::Property::GEOMETRY_HINTS )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 BaseHandle Create()
@@ -450,13 +450,13 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
 {
   switch ( index )
   {
-    case Dali::ShaderEffect::Property::GridDensity:
+    case Dali::ShaderEffect::Property::GRID_DENSITY:
     {
       SetGridDensityMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, propertyValue.Get<float>() );
       break;
     }
 
-    case Dali::ShaderEffect::Property::Image:
+    case Dali::ShaderEffect::Property::IMAGE:
     {
       Dali::Image img(Scripting::NewImage( propertyValue ));
       if(img)
@@ -470,7 +470,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
       break;
     }
 
-    case Dali::ShaderEffect::Property::Program:
+    case Dali::ShaderEffect::Property::PROGRAM:
     {
       std::string vertexPrefix   = GetShader("vertex-prefix", propertyValue);
       std::string fragmentPrefix = GetShader("fragment-prefix", propertyValue);
@@ -506,7 +506,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
       break;
     }
 
-    case Dali::ShaderEffect::Property::GeometryHints:
+    case Dali::ShaderEffect::Property::GEOMETRY_HINTS:
     {
       Dali::ShaderEffect::GeometryHints hint = Dali::ShaderEffect::HINT_NONE;
       Property::Value geometryHintsValue   = propertyValue.GetValue("geometry-hints");

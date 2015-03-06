@@ -18,14 +18,18 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 
+// Internal headers are allowed here
+
+#include <dali/internal/common/fixed-size-memory-pool.h>
+
 using namespace Dali;
 
-void utc_dali_fixedsizememorypool_startup(void)
+void utc_dali_internal_fixedsizememorypool_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void utc_dali_fixedsizememorypool_cleanup(void)
+void utc_dali_internal_fixedsizememorypool_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
@@ -84,7 +88,7 @@ int UtcDaliFixedSizeMemoryPoolCreate(void)
   gTestObjectMethod = 0;
   gTestObjectDataAccess = 0;
 
-  FixedSizeMemoryPool memoryPool( TypeSizeWithAlignment< TestObject >::size );
+  Internal::FixedSizeMemoryPool memoryPool( Internal::TypeSizeWithAlignment< TestObject >::size );
 
   TestObject* testObject1 = new (memoryPool.Allocate()) TestObject();
   DALI_TEST_CHECK( testObject1 );
@@ -115,7 +119,7 @@ int UtcDaliFixedSizeMemoryPoolStressTest(void)
 
   const unsigned int numObjects = 1024 * 1024;
 
-  FixedSizeMemoryPool memoryPool( TypeSizeWithAlignment< TestObject >::size, initialCapacity, maximumCapacity );
+  Internal::FixedSizeMemoryPool memoryPool( Internal::TypeSizeWithAlignment< TestObject >::size, initialCapacity, maximumCapacity );
 
   Dali::Vector<TestObject*> objects;
   objects.Reserve( numObjects );

@@ -58,9 +58,9 @@ public:
   {
     enum
     {
-      Position      = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name prefix "position-",        type VECTOR3
-      Color,                                                       ///< name prefix "color-",           type VECTOR4
-      TextureCoords,                                               ///< name prefix "texture-coords-",  type VECTOR2
+      POSITION      = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name prefix "position-",        type VECTOR3
+      COLOR,                                                       ///< name prefix "color-",           type VECTOR4
+      TEXTURE_COORDS,                                              ///< name prefix "texture-coords-",  type VECTOR2
     };
   };
 

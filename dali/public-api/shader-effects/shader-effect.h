@@ -67,9 +67,9 @@ class ShaderEffect;
  */
 enum GeometryType
 {
-  GEOMETRY_TYPE_IMAGE = 0x01,         ///< image, with flat color or texture
-  GEOMETRY_TYPE_UNTEXTURED_MESH = 0x02,///< Complex meshes, with flat color
-  GEOMETRY_TYPE_TEXTURED_MESH = 0x04, ///< Complex meshes, with texture
+  GEOMETRY_TYPE_IMAGE = 0x01,           ///< image, with flat color or texture
+  GEOMETRY_TYPE_UNTEXTURED_MESH = 0x02, ///< Complex meshes, with flat color
+  GEOMETRY_TYPE_TEXTURED_MESH = 0x04,   ///< Complex meshes, with texture
   GEOMETRY_TYPE_LAST = 0x08
 };
 
@@ -137,10 +137,10 @@ public:
   {
     enum
     {
-      GridDensity = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "grid-density",   type FLOAT
-      Image,                                            ///< name "image",          type MAP  {"filename":"", "load-policy":...}
-      Program,                                          ///< name "program",        type MAP  {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
-      GeometryHints,                                    ///< name "geometry-hints", type INT  (bitfield) values from enum GeometryHints
+      GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "grid-density",   type FLOAT
+      IMAGE,                                             ///< name "image",          type MAP  {"filename":"", "load-policy":...}
+      PROGRAM,                                           ///< name "program",        type MAP  {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
+      GEOMETRY_HINTS                                     ///< name "geometry-hints", type INTEGER (bitfield) values from enum GeometryHints
     };
   };
 

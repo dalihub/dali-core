@@ -86,9 +86,9 @@ public:
   {
     enum
     {
-      ViewportPosition = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "viewport-position", type Vector2
-      ViewportSize,                                                   ///< name "viewport-size",     type Vector2
-      ClearColor,                                                     ///< name "clear-color",       type Vector4
+      VIEWPORT_POSITION = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "viewport-position", type VECTOR2
+      VIEWPORT_SIZE,                                                   ///< name "viewport-size",     type VECTOR2
+      CLEAR_COLOR,                                                     ///< name "clear-color",       type VECTOR4
     };
   };
 
