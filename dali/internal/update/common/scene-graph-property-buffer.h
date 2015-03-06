@@ -17,6 +17,9 @@
  * limitations under the License.
  */
 
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/math/vector4.h>
+
 namespace Dali
 {
 namespace Internal
@@ -44,7 +47,11 @@ public:
   ~PropertyBuffer();
 
 private:
-  // Data
+
+  // @todo MESH_REWORK - TEMPORARY TYPES - REMOVE WHEN WE HAVE WORKING BUFFERS
+  typedef Dali::Vector< char > CharBuffer;
+  CharBuffer  mData;
+  std::size_t mVertexSize;
 };
 
 } // namespace SceneGraph

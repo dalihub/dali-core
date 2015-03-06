@@ -31,6 +31,36 @@ PropertyBuffer::~PropertyBuffer()
 {
 }
 
+//@todo MESH_REWORK Remove when we have working property buffers
+PropertyBuffer* PropertyBuffer::NewQuadVertices()
+{
+  PropertyBuffer* propertyBuffer = new PropertyBuffer();
+  propertyBuffer->mVertexSize = sizeof(Vector4);
+  propertyBuffer->mData.Resize( propertyBuffer->mVertexSize * 4 );
+  Vector4* vertices = reinterpret_cast<Vector4*>(propertyBuffer->mData[0]);
+
+  vertices[ 0 ] = Vector4( -0.5f, -0.5f, 1.0f, 0.0f );
+  vertices[ 1 ] = Vector4(  0.5f, -0.5f, 1.0f, 1.0f );
+  vertices[ 2 ] = Vector4( -0.5f,  0.5f, 0.0f, 0.0f );
+  vertices[ 3 ] = Vector4(  0.5f,  0.5f, 0.0f, 1.0f );
+
+  return propertyBuffer;
+}
+
+//@todo MESH_REWORK Remove when we have working property buffers
+PropertyBuffer* PropertyBuffer::NewQuadIndices()
+{
+  PropertyBuffer* propertyBuffer = new PropertyBuffer();
+
+  propertyBuffer->mVertexSize = sizeof( unsigned short );
+  propertyBuffer->mData.Resize( propertyBuffer->mVertexSize * 6 );
+  unsigned short* indices = reinterpret_cast<unsigned short*>(propertyBuffer->mData[0]);
+
+  indices[0] = 0;  indices[1] = 3;  indices[2] = 1;
+  indices[3] = 0;  indices[4] = 2;  indices[5] = 3;
+
+  return propertyBuffer;
+}
 
 } // namespace SceneGraph
 } // namespace Internal

@@ -19,6 +19,7 @@
 
 #include <dali/public-api/geometry/geometry.h>
 #include <dali/internal/common/event-to-update.h>
+#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
@@ -101,7 +102,12 @@ public: // GeometryDataProvider
 private:
   VertexBuffers mVertexBuffers; ///< The vertex buffers
   OwnerPointer<PropertyBuffer> mIndexBuffer;  ///< The index buffer if required
-  GeometryType mGeometryType;   ///< The type of geometry (tris/lines etc)
+
+private: // Properties
+  AnimatableProperty<Vector3> mCenter;
+  AnimatableProperty<Vector3> mHalfExtents;
+  GeometryType                mGeometryType;   ///< The type of geometry (tris/lines etc)
+  AnimatableProperty<bool>    mRequiresDepthTest;
 };
 
 inline void AddVertexBufferMessage( EventToUpdate& eventToUpdate, const Geometry& geometry, PropertyBuffer& vertexBuffer )
