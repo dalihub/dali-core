@@ -173,7 +173,7 @@ public:
       GRID_DENSITY = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "grid-density",   type FLOAT
       IMAGE,                                             ///< name "image",          type MAP  {"filename":"", "load-policy":...}
       PROGRAM,                                           ///< name "program",        type MAP  {"vertex-prefix":"","fragment-prefix":"","vertex":"","fragment":""}
-      GEOMETRY_HINTS                                     ///< name "geometry-hints", type INT  (bitfield) values from enum GeometryHints
+      GEOMETRY_HINTS                                     ///< name "geometry-hints", type INTEGER (bitfield) values from enum GeometryHints
     };
   };
 

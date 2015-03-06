@@ -46,8 +46,8 @@ public:
   {
     enum
     {
-      POINTS         = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "points",         type Vector3
-      CONTROL_POINTS,                                               ///< name "control-points", type Vector3
+      POINTS         = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "points",         type VECTOR3
+      CONTROL_POINTS,                                               ///< name "control-points", type VECTOR3
     };
   };
 
