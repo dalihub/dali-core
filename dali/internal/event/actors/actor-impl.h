@@ -423,10 +423,10 @@ public:
   void SetZ(float z);
 
   /**
-   * Move an actor relative to its existing position.
+   * Translate an actor relative to its existing position.
    * @param[in] distance The actor will move by this distance.
    */
-  void MoveBy(const Vector3& distance);
+  void TranslateBy(const Vector3& distance);
 
   /**
    * Retrieve the position of the Actor.
@@ -451,17 +451,17 @@ public:
   PositionInheritanceMode GetPositionInheritanceMode() const;
 
   /**
-   * Sets the rotation of the Actor.
-   * @param [in] angleRadians The new rotation angle in radians.
-   * @param [in] axis The new axis of rotation.
+   * Sets the orientation of the Actor.
+   * @param [in] angleRadians The new orientation angle in radians.
+   * @param [in] axis The new axis of orientation.
    */
-  void SetRotation(const Radian& angleRadians, const Vector3& axis);
+  void SetOrientation(const Radian& angleRadians, const Vector3& axis);
 
   /**
-   * Sets the rotation of the Actor.
-   * @param [in] rotation The new rotation.
+   * Sets the orientation of the Actor.
+   * @param [in] orientation The new orientation.
    */
-  void SetRotation(const Quaternion& rotation);
+  void SetOrientation(const Quaternion& orientation);
 
   /**
    * Rotate an actor around its existing rotation axis.
@@ -477,23 +477,23 @@ public:
   void RotateBy(const Quaternion& relativeRotation);
 
   /**
-   * Retreive the Actor's rotation.
-   * @return the rotation.
+   * Retreive the Actor's orientation.
+   * @return the orientation.
    */
-  const Quaternion& GetCurrentRotation() const;
+  const Quaternion& GetCurrentOrientation() const;
 
   /**
    * Set whether a child actor inherits it's parent's orientation. Default is to inherit.
-   * Switching this off means that using SetRotation() sets the actor's world orientation.
+   * Switching this off means that using SetOrientation() sets the actor's world orientation.
    * @param[in] inherit - true if the actor should inherit orientation, false otherwise.
    */
-  void SetInheritRotation(bool inherit);
+  void SetInheritOrientation(bool inherit);
 
   /**
    * Returns whether the actor inherit's it's parent's orientation.
    * @return true if the actor inherit's it's parent orientation, false if it uses world orientation.
    */
-  bool IsRotationInherited() const;
+  bool IsOrientationInherited() const;
 
   /**
    * @brief Defines how a child actors size is affected by its parents size.
@@ -522,9 +522,9 @@ public:
   const Vector3& GetSizeModeFactor() const;
 
   /**
-   * @copydoc Dali::Actor::GetCurrentWorldRotation()
+   * @copydoc Dali::Actor::GetCurrentWorldOrientation()
    */
-  const Quaternion& GetCurrentWorldRotation() const;
+  const Quaternion& GetCurrentWorldOrientation() const;
 
   /**
    * Sets a scale factor applied to an actor.
@@ -615,12 +615,6 @@ public:
    * @param [in] opacity The new opacity.
    */
   void SetOpacity(float opacity);
-
-  /**
-   * Apply a relative opacity change to an actor.
-   * @param[in] relativeOpacity The opacity to combine with the actors existing opacity.
-   */
-  void OpacityBy(float relativeOpacity);
 
   /**
    * Retrieve the actor's opacity.
@@ -729,12 +723,6 @@ public:
    * @param [in] blue The new blue value.
    */
   void SetColorBlue( float blue );
-
-  /**
-   * Apply a relative color change to an actor.
-   * @param[in] relativeColor The color to combine with the actors existing color.
-   */
-  void ColorBy(const Vector4& relativeColor);
 
   /**
    * Retrieve the actor's color.
@@ -1377,7 +1365,7 @@ protected:
   bool mDerivedRequiresHover                       : 1; ///< Whether the derived actor type requires hover event signals
   bool mDerivedRequiresMouseWheelEvent             : 1; ///< Whether the derived actor type requires mouse wheel event signals
   bool mOnStageSignalled                           : 1; ///< Set to true before OnStageConnection signal is emitted, and false before OnStageDisconnection
-  bool mInheritRotation                            : 1; ///< Cached: Whether the parent's rotation should be inherited.
+  bool mInheritOrientation                         : 1; ///< Cached: Whether the parent's orientation should be inherited.
   bool mInheritScale                               : 1; ///< Cached: Whether the parent's scale should be inherited.
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited

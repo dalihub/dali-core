@@ -274,8 +274,8 @@ public:
       WORLD_POSITION_X,                                   ///< name "world-position-x",      type float      (read-only)
       WORLD_POSITION_Y,                                   ///< name "world-position-y",      type float      (read-only)
       WORLD_POSITION_Z,                                   ///< name "world-position-z",      type float      (read-only)
-      ROTATION,                                           ///< name "rotation",              type Quaternion
-      WORLD_ROTATION,                                     ///< name "world-rotation",        type Quaternion (read-only)
+      ORIENTATION,                                        ///< name "orientation",           type Quaternion
+      WORLD_ORIENTATION,                                  ///< name "world-orientation",     type Quaternion (read-only)
       SCALE,                                              ///< name "scale",                 type Vector3
       SCALE_X,                                            ///< name "scale-x",               type float
       SCALE_Y,                                            ///< name "scale-y",               type float
@@ -292,7 +292,7 @@ public:
       NAME,                                               ///< name "name",                  type std::string
       SENSITIVE,                                          ///< name "sensitive",             type bool
       LEAVE_REQUIRED,                                     ///< name "leave-required",        type bool
-      INHERIT_ROTATION,                                   ///< name "inherit-rotation",      type bool
+      INHERIT_ORIENTATION,                                ///< name "inherit-orientation",   type bool
       INHERIT_SCALE,                                      ///< name "inherit-scale",         type bool
       COLOR_MODE,                                         ///< name "color-mode",            type std::string
       POSITION_INHERITANCE,                               ///< name "position-inheritance",  type std::string
@@ -552,7 +552,7 @@ public:
    * bottom-right corner.  The default anchor point is
    * Dali::AnchorPoint::CENTER (0.5, 0.5, 0.5).
    * An actor position is the distance between its parent-origin, and this anchor-point.
-   * An actor's rotation is centered around its anchor-point.
+   * An actor's orientation is the rotation from its default orientation, the rotation is centered around its anchor-point.
    * @see Dali::AnchorPoint for predefined anchor point values
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentAnchorPoint().
@@ -704,12 +704,12 @@ public:
   void SetZ(float z);
 
   /**
-   * @brief Move an actor relative to its existing position.
+   * @brief Translate an actor relative to its existing position.
    *
    * @pre The actor has been initialized.
    * @param[in] distance The actor will move by this distance.
    */
-  void MoveBy(const Vector3& distance);
+  void TranslateBy(const Vector3& distance);
 
   /**
    * @brief Retrieve the position of the Actor.
@@ -749,42 +749,43 @@ public:
   PositionInheritanceMode GetPositionInheritanceMode() const;
 
   /**
-   * @brief Sets the rotation of the Actor.
+   * @brief Sets the orientation of the Actor.
    *
-   * An actor's rotation is centered around its anchor point.
+   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
-   * @param [in] angle The new rotation angle in degrees.
-   * @param [in] axis The new axis of rotation.
+   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
+   * @param [in] angle The new orientation angle in degrees.
+   * @param [in] axis The new axis of orientation.
    */
-  void SetRotation(const Degree& angle, const Vector3& axis);
+  void SetOrientation(const Degree& angle, const Vector3& axis);
 
   /**
-   * @brief Sets the rotation of the Actor.
+   * @brief Sets the orientation of the Actor.
    *
-   * An actor's rotation is centered around its anchor point.
+   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
-   * @param [in] angle The new rotation angle in radians.
-   * @param [in] axis The new axis of rotation.
+   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
+   * @param [in] angle The new orientation angle in radians.
+   * @param [in] axis The new axis of orientation.
    */
-  void SetRotation(const Radian& angle, const Vector3& axis);
+  void SetOrientation(const Radian& angle, const Vector3& axis);
 
   /**
-   * @brief Sets the rotation of the Actor.
+   * @brief Sets the orientation of the Actor.
    *
+   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
-   * @param [in] rotation The new rotation.
+   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
+   * @param [in] orientation The new orientation.
    */
-  void SetRotation(const Quaternion& rotation);
+  void SetOrientation(const Quaternion& orientation);
 
   /**
    * @brief Apply a relative rotation to an actor.
    *
    * @pre The actor has been initialized.
-   * @param[in] angle The angle to the rotation to combine with the existing rotation.
-   * @param[in] axis The axis of the rotation to combine with the existing rotation.
+   * @param[in] angle The angle to the rotation to combine with the existing orientation.
+   * @param[in] axis The axis of the rotation to combine with the existing orientation.
    */
   void RotateBy(const Degree& angle, const Vector3& axis);
 
@@ -792,8 +793,8 @@ public:
    * @brief Apply a relative rotation to an actor.
    *
    * @pre The actor has been initialized.
-   * @param[in] angle The angle to the rotation to combine with the existing rotation.
-   * @param[in] axis The axis of the rotation to combine with the existing rotation.
+   * @param[in] angle The angle to the rotation to combine with the existing orientation.
+   * @param[in] axis The axis of the rotation to combine with the existing orientation.
    */
   void RotateBy(const Radian& angle, const Vector3& axis);
 
@@ -801,28 +802,28 @@ public:
    * @brief Apply a relative rotation to an actor.
    *
    * @pre The actor has been initialized.
-   * @param[in] relativeRotation The rotation to combine with the existing rotation.
+   * @param[in] relativeRotation The rotation to combine with the existing orientation.
    */
   void RotateBy(const Quaternion& relativeRotation);
 
   /**
-   * @brief Retreive the Actor's rotation.
+   * @brief Retreive the Actor's orientation.
    *
    * @pre The Actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetRotation().
-   * @return The current rotation.
+   * @note This property can be animated; the return value may not match the value written with SetOrientation().
+   * @return The current orientation.
    */
-  Quaternion GetCurrentRotation() const;
+  Quaternion GetCurrentOrientation() const;
 
   /**
    * @brief Set whether a child actor inherits it's parent's orientation.
    *
    * Default is to inherit.
-   * Switching this off means that using SetRotation() sets the actor's world orientation.
+   * Switching this off means that using SetOrientation() sets the actor's world orientation.
    * @pre The Actor has been initialized.
    * @param[in] inherit - true if the actor should inherit orientation, false otherwise.
    */
-  void SetInheritRotation(bool inherit);
+  void SetInheritOrientation(bool inherit);
 
   /**
    * @brief Returns whether the actor inherit's it's parent's orientation.
@@ -830,16 +831,16 @@ public:
    * @pre The Actor has been initialized.
    * @return true if the actor inherit's it's parent orientation, false if it uses world orientation.
    */
-  bool IsRotationInherited() const;
+  bool IsOrientationInherited() const;
 
   /**
-   * @brief Retrieve the world-rotation of the Actor.
+   * @brief Retrieve the world-orientation of the Actor.
    *
-   * @note The actor will not have a world-rotation, unless it has previously been added to the stage.
+   * @note The actor will not have a world-orientation, unless it has previously been added to the stage.
    * @pre The Actor has been initialized.
-   * @return The Actor's current rotation in the world.
+   * @return The Actor's current orientation in the world.
    */
-  Quaternion GetCurrentWorldRotation() const;
+  Quaternion GetCurrentWorldOrientation() const;
 
   /**
    * @brief Set the scale factor applied to an actor.
@@ -1011,14 +1012,6 @@ public:
   void SetOpacity(float opacity);
 
   /**
-   * @brief Apply a relative opacity change to an actor.
-   *
-   * @pre The actor has been initialized.
-   * @param[in] relativeOpacity The opacity to combine with the actors existing opacity.
-   */
-  void OpacityBy(float relativeOpacity);
-
-  /**
    * @brief Retrieve the actor's opacity.
    *
    * @pre The actor has been initialized.
@@ -1036,14 +1029,6 @@ public:
    * @param [in] color The new color.
    */
   void SetColor(const Vector4& color);
-
-  /**
-   * @brief Apply a relative color change to an actor.
-   *
-   * @pre The actor has been initialized.
-   * @param[in] relativeColor The color to combine with the actors existing color.
-   */
-  void ColorBy(const Vector4& relativeColor);
 
   /**
    * @brief Retrieve the actor's color.

@@ -246,9 +246,9 @@ void Actor::SetZ(float z)
   GetImplementation(*this).SetZ(z);
 }
 
-void Actor::MoveBy(const Vector3& distance)
+void Actor::TranslateBy(const Vector3& distance)
 {
-  GetImplementation(*this).MoveBy(distance);
+  GetImplementation(*this).TranslateBy(distance);
 }
 
 Vector3 Actor::GetCurrentPosition() const
@@ -271,19 +271,19 @@ PositionInheritanceMode Actor::GetPositionInheritanceMode() const
   return GetImplementation(*this).GetPositionInheritanceMode();
 }
 
-void Actor::SetRotation(const Degree& angle, const Vector3& axis)
+void Actor::SetOrientation(const Degree& angle, const Vector3& axis)
 {
-  GetImplementation(*this).SetRotation(Radian(angle), axis);
+  GetImplementation(*this).SetOrientation(Radian(angle), axis);
 }
 
-void Actor::SetRotation(const Radian& angle, const Vector3& axis)
+void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
 {
-  GetImplementation(*this).SetRotation(angle, axis);
+  GetImplementation(*this).SetOrientation(angle, axis);
 }
 
-void Actor::SetRotation(const Quaternion& rotation)
+void Actor::SetOrientation(const Quaternion& orientation)
 {
-  GetImplementation(*this).SetRotation(rotation);
+  GetImplementation(*this).SetOrientation(orientation);
 }
 
 void Actor::RotateBy(const Degree& angle, const Vector3& axis)
@@ -301,24 +301,24 @@ void Actor::RotateBy(const Quaternion& relativeRotation)
   GetImplementation(*this).RotateBy(relativeRotation);
 }
 
-Quaternion Actor::GetCurrentRotation() const
+Quaternion Actor::GetCurrentOrientation() const
 {
-  return GetImplementation(*this).GetCurrentRotation();
+  return GetImplementation(*this).GetCurrentOrientation();
 }
 
-void Actor::SetInheritRotation(bool inherit)
+void Actor::SetInheritOrientation(bool inherit)
 {
-  GetImplementation(*this).SetInheritRotation(inherit);
+  GetImplementation(*this).SetInheritOrientation(inherit);
 }
 
-bool Actor::IsRotationInherited() const
+bool Actor::IsOrientationInherited() const
 {
-  return GetImplementation(*this).IsRotationInherited();
+  return GetImplementation(*this).IsOrientationInherited();
 }
 
-Quaternion Actor::GetCurrentWorldRotation() const
+Quaternion Actor::GetCurrentWorldOrientation() const
 {
-  return GetImplementation(*this).GetCurrentWorldRotation();
+  return GetImplementation(*this).GetCurrentWorldOrientation();
 }
 
 void Actor::SetScale(float scale)
@@ -401,11 +401,6 @@ void Actor::SetOpacity(float opacity)
   GetImplementation(*this).SetOpacity(opacity);
 }
 
-void Actor::OpacityBy(float relativeOpacity)
-{
-  GetImplementation(*this).OpacityBy(relativeOpacity);
-}
-
 float Actor::GetCurrentOpacity() const
 {
   return GetImplementation(*this).GetCurrentOpacity();
@@ -414,11 +409,6 @@ float Actor::GetCurrentOpacity() const
 void Actor::SetColor(const Vector4& color)
 {
   GetImplementation(*this).SetColor(color);
-}
-
-void Actor::ColorBy(const Vector4& relativeColor)
-{
-  GetImplementation(*this).ColorBy(relativeColor);
 }
 
 Vector4 Actor::GetCurrentColor() const

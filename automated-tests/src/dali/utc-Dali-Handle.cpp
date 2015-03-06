@@ -296,7 +296,7 @@ int UtcDaliHandleIsPropertyWritable(void)
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::POSITION_X ) );
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::POSITION_Y ) );
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::POSITION_Z ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ORIENTATION ) );
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SCALE ) );
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SCALE_X ) );
   DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SCALE_Y ) );
@@ -310,7 +310,7 @@ int UtcDaliHandleIsPropertyWritable(void)
 
   // World-properties are not writable:
   DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_POSITION ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_ROTATION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_ORIENTATION ) );
   DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_SCALE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_COLOR ) );
   DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_POSITION_X ) );
@@ -344,7 +344,7 @@ int UtcDaliHandleIsPropertyAnimatable(void)
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::POSITION_X ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::POSITION_Y ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::POSITION_Z ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ORIENTATION ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SCALE ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SCALE_X ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SCALE_Y ) );
@@ -358,7 +358,7 @@ int UtcDaliHandleIsPropertyAnimatable(void)
 
   // World-properties can not be animated
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_POSITION ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_ROTATION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_ORIENTATION ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_SCALE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_COLOR ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_POSITION_X ) );
@@ -391,7 +391,7 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_X ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_Y ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_Z ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ORIENTATION ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SCALE ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SCALE_X ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SCALE_Y ) );
@@ -403,7 +403,7 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_BLUE ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_ALPHA ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_POSITION ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_ORIENTATION ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_SCALE ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_COLOR ) );
   DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_POSITION_X ) );
@@ -414,7 +414,7 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::NAME ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::SENSITIVE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::LEAVE_REQUIRED ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::INHERIT_ROTATION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::INHERIT_ORIENTATION ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::INHERIT_SCALE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_MODE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_INHERITANCE ) );
@@ -437,7 +437,7 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::ANCHOR_POINT ) );
   DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::SIZE ) );
   DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::POSITION ) );
-  DALI_TEST_CHECK( Property::ROTATION == actor.GetPropertyType( Actor::Property::ROTATION ) );
+  DALI_TEST_CHECK( Property::ROTATION == actor.GetPropertyType( Actor::Property::ORIENTATION ) );
   DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::SCALE ) );
   DALI_TEST_CHECK( Property::BOOLEAN  == actor.GetPropertyType( Actor::Property::VISIBLE ) );
   DALI_TEST_CHECK( Property::VECTOR4  == actor.GetPropertyType( Actor::Property::COLOR ) );

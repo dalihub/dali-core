@@ -620,7 +620,7 @@ void Property::Value::Get(AngleAxis& angleAxisValue) const
 {
   DALI_ASSERT_ALWAYS( Property::ROTATION == GetType() && "Property type invalid" );
 
-  // Rotations have two representations
+  // Orientations have two representations
   DALI_ASSERT_DEBUG( typeid(Quaternion) == mImpl->mValue.GetType() ||
                      typeid(AngleAxis)  == mImpl->mValue.GetType() );
 
@@ -642,7 +642,7 @@ void Property::Value::Get(Quaternion& quaternionValue) const
 {
   DALI_ASSERT_DEBUG( Property::ROTATION == GetType() && "Property type invalid" );
 
-  // Rotations have two representations
+  // Orientations have two representations
   DALI_ASSERT_DEBUG( typeid(Quaternion) == mImpl->mValue.GetType() ||
                typeid(AngleAxis)  == mImpl->mValue.GetType() );
 

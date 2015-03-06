@@ -50,7 +50,7 @@ class DynamicsShape;
  * detected and responded to in signal handlers.
  *
  * DALi will update the physics simulation after animations and constraints, thus dynamics forces
- * will override positions and rotations applied by animations and constrints.
+ * will override positions and orientations applied by animations and constrints.
  *
  * Here is an example illustrating the basic steps to initialise the simulation and
  * add a rigid body.

@@ -819,10 +819,10 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
   target.SetPosition(targetPosition);
 
   Constraint cameraOrientationConstraint =
-    Constraint::New<Quaternion> ( Actor::Property::ROTATION,
+    Constraint::New<Quaternion> ( Actor::Property::ORIENTATION,
                                   Source( target, Actor::Property::WORLD_POSITION ),
                                   Source( freeLookCameraActor,  Actor::Property::WORLD_POSITION ),
-                                  Source( target, Actor::Property::WORLD_ROTATION ),
+                                  Source( target, Actor::Property::WORLD_ORIENTATION ),
                                   &LookAt );
   freeLookCameraActor.ApplyConstraint( cameraOrientationConstraint );
 
@@ -881,10 +881,10 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
   target.SetPosition(targetPosition);
 
   Constraint cameraOrientationConstraint =
-    Constraint::New<Quaternion> ( Actor::Property::ROTATION,
+    Constraint::New<Quaternion> ( Actor::Property::ORIENTATION,
                                   Source( target, Actor::Property::WORLD_POSITION ),
                                   Source( freeLookCameraActor,  Actor::Property::WORLD_POSITION ),
-                                  Source( target, Actor::Property::WORLD_ROTATION ),
+                                  Source( target, Actor::Property::WORLD_ORIENTATION ),
                                   &LookAt );
   freeLookCameraActor.ApplyConstraint( cameraOrientationConstraint );
 
@@ -949,7 +949,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
 
   Quaternion cameraOrientation( Radian(Degree(180.f)), Vector3::YAXIS );
   freeLookCameraActor.SetPosition(cameraOffset);
-  freeLookCameraActor.SetRotation(cameraOrientation);
+  freeLookCameraActor.SetOrientation(cameraOrientation);
 
   Actor cameraAnchor = Actor::New();
   cameraAnchor.Add(freeLookCameraActor);
@@ -960,7 +960,7 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews03(void)
     Quaternion rotation(Radian(Degree(angle)), Vector3::YAXIS);
 
     freeLookCameraActor.SetPosition( rotation.Rotate( cameraOffset ) );
-    cameraAnchor.SetRotation( rotation );
+    cameraAnchor.SetOrientation( rotation );
 
     application.SendNotification();
     application.Render();
