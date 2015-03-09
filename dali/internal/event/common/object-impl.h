@@ -29,9 +29,9 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/internal/common/owner-container.h>
-#include <dali/internal/event/common/custom-property.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
+#include <dali/internal/event/common/property-metadata.h>
 #include <dali/internal/update/common/property-base.h>
 
 namespace Dali
@@ -325,7 +325,14 @@ protected:
    * @param index
    * @return pointer to the property
    */
-  CustomProperty* FindCustomProperty( Property::Index index ) const;
+  CustomPropertyMetadata* FindCustomProperty( Property::Index index ) const;
+
+  /**
+   * Helper to find animatable property
+   * @param index
+   * @return pointer to the property
+   */
+  AnimatablePropertyMetadata* FindAnimatableProperty( Property::Index index ) const;
 
 private: // Default property extensions for derived classes
 
@@ -418,7 +425,7 @@ private: // Default property extensions for derived classes
    * @param [in] name The name allocated to this custom property.
    * @param [in] index The index allocated to this custom property.
    */
-  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
+  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const
   { }
 
 private:
@@ -453,12 +460,28 @@ private:
   void RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph );
 
   /**
+   * Get the value of the property.
+   * @param [in] entry An entry from the property lookup container.
+   * @return The new value of the property.
+   */
+  Property::Value GetPropertyValue( const PropertyMetadata* entry ) const;
+
+  /**
    * Set the value of scene graph property.
    * @param [in] index The index of the property.
-   * @param [in] entry An entry from the CustomPropertyLookup.
+   * @param [in] entry An entry from the property lookup container.
    * @param [in] value The new value of the property.
    */
-  virtual void SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
+  virtual void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value );
+
+  /**
+   * Helper to register a scene-graph property
+   * @param [in] name The name of the property.
+   * @param [in] index The index of the property
+   * @param [in] value The value of the property.
+   * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
+   */
+  Property::Index RegisterSceneGraphProperty(const std::string& name, Property::Index index, const Property::Value& propertyValue) const;
 
 protected:
   /**
@@ -492,8 +515,9 @@ private:
 
 private:
 
-  typedef OwnerContainer<CustomProperty*> CustomPropertyLookup;
-  CustomPropertyLookup mCustomProperties; ///< Used for accessing custom Node properties
+  typedef OwnerContainer<PropertyMetadata*> PropertyMetadataLookup;
+  mutable PropertyMetadataLookup mCustomProperties; ///< Used for accessing custom Node properties
+  mutable PropertyMetadataLookup mAnimatableProperties; ///< Used for accessing animatable Node properties
   mutable TypeInfo const *  mTypeInfo; ///< The type-info for this object, mutable so it can be lazy initialized from const method if it is required
 
   Dali::Vector<Observer*> mObservers;

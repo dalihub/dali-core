@@ -124,6 +124,14 @@ public:
   void AddProperty( const std::string& name, Property::Index index, Property::Type type, Dali::TypeInfo::SetPropertyFunction setFunc, Dali::TypeInfo::GetPropertyFunction getFunc );
 
   /**
+   * Adds an animatable property to the type.
+   * @param[in] name The name of the property.
+   * @param[in] index The index of the property
+   * @param[in] type The Property::Type.
+   */
+  void AddAnimatableProperty( const std::string& name, Property::Index index, Property::Type type );
+
+  /**
    * Do an action on base object
    * @param [in] object The base object to act upon
    * @param [in] actionName The name of the desired action
