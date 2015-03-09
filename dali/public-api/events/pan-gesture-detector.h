@@ -68,13 +68,13 @@ public:
   {
     enum
     {
-      SCREEN_POSITION = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, ///< name "screen-position",     type VECTOR2
-      SCREEN_DISPLACEMENT,                                             ///< name "screen-displacement", type VECTOR2
-      SCREEN_VELOCITY,                                                 ///< name "screen-velocity",     type VECTOR2
-      LOCAL_POSITION,                                                  ///< name "local-position",      type VECTOR2
-      LOCAL_DISPLACEMENT,                                              ///< name "local-displacement",  type VECTOR2
-      LOCAL_VELOCITY,                                                  ///< name "local-velocity",      type VECTOR2
-      PANNING,                                                         ///< name "panning",             type BOOLEAN
+      SCREEN_POSITION = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX, ///< name "screen-position",     type Vector2
+      SCREEN_DISPLACEMENT,                                             ///< name "screen-displacement", type Vector2
+      SCREEN_VELOCITY,                                                 ///< name "screen-velocity",     type Vector2
+      LOCAL_POSITION,                                                  ///< name "local-position",      type Vector2
+      LOCAL_DISPLACEMENT,                                              ///< name "local-displacement",  type Vector2
+      LOCAL_VELOCITY,                                                  ///< name "local-velocity",      type Vector2
+      PANNING,                                                         ///< name "panning",             type bool
     };
   };
 

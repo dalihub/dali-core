@@ -219,14 +219,14 @@ DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
  *
  * @param[in] map The property value map with the following valid fields:
  * @code
- * "filename":       type STRING
- * "load-policy"     type STRING (enum)
- * "release-policy"  type STRING (enum)
- * "width"           type FLOAT
- * "height"          type FLOAT
- * "pixel-format"    type STRING (enum)
- * "scaling-mode"    type STRING (enum)
- * "type"            type STRING (FrameBufferImage|BufferImage|ResourceImage(default))
+ * "filename":       type std::string
+ * "load-policy"     type std::string (enum)
+ * "release-policy"  type std::string (enum)
+ * "width"           type float
+ * "height"          type float
+ * "pixel-format"    type std::string (enum)
+ * "scaling-mode"    type std::string (enum)
+ * "type"            type std::string (FrameBufferImage|BufferImage|ResourceImage(default))
  * @endcode
  * Some fields are optional and some only pertain to a specific type.
  *
@@ -241,26 +241,26 @@ DALI_IMPORT_API Image NewImage( const Property::Value& map );
  * @code
  * // a program can be specified as string or a filename.
  * // some fields may be ignored depending on the geometry-type
- * "program":        type MAP
+ * "program":        type Map
  * {
- *   "vertex":                  type STRING
- *   "fragment":                type STRING
- *   "vertex-prefix":           type STRING
- *   "fragment-prefix":         type STRING
- *   "text-vertex":             type STRING
- *   "text-fragment":           type STRING
- *   "vertex-filename":         type STRING
- *   "fragment-filename":       type STRING
- *   "vertex-prefix-filename":  type STRING
- *   "fragment-prefix-filename":type STRING
- *   "text-vertex-filename":    type STRING
- *   "text-fragment-filename":  type STRING
- *   "geometry-type":           type STRING (enum)
- *   "geometry-hints":          type STRING (enum)
+ *   "vertex":                   type std::string
+ *   "fragment":                 type std::string
+ *   "vertex-prefix":            type std::string
+ *   "fragment-prefix":          type std::string
+ *   "text-vertex":              type std::string
+ *   "text-fragment":            type std::string
+ *   "vertex-filename":          type std::string
+ *   "fragment-filename":        type std::string
+ *   "vertex-prefix-filename":   type std::string
+ *   "fragment-prefix-filename": type std::string
+ *   "text-vertex-filename":     type std::string
+ *   "text-fragment-filename":   type std::string
+ *   "geometry-type":            type std::string (enum)
+ *   "geometry-hints":           type std::string (enum)
  * }
  * // uniforms must be specified to be registered
- * "uUniform1":       type FLOAT,
- * "uUniform2":       type FLOAT,  etc
+ * "uUniform1":       type float,
+ * "uUniform2":       type float, etc
  * @endcode
  *
  * @return a pointer to a newly created object.
