@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/constraint-source.h>
-#include <dali/public-api/animation/interpolator-functions.h>
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
@@ -51,7 +50,7 @@ class DALI_IMPORT_API Constraint : public BaseHandle
 {
 public:
 
-  typedef Any AnyFunction; ///< Generic function pointer for constraint and interpolator functions
+  typedef Any AnyFunction; ///< Generic function pointer for constraint
 
   /**
    * @brief The action that will happen when the constraint is removed.
@@ -80,7 +79,6 @@ public:
    * @brief Create a constraint which targets a property.
    *
    * The templated parameter P, is the type of the property to constrain.
-   * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
    * @param [in] func A function which returns the constrained property value.
    * @return The new constraint.
@@ -91,35 +89,13 @@ public:
   {
     return New( target,
                 PropertyTypes::Get<P>(),
-                func,
-                GetDefaultInterpolator( PropertyTypes::Get<P>() ) );
+                func );
   }
 
   /**
    * @brief Create a constraint which targets a property.
    *
    * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] func A function which returns the constrained property value.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint NewWithInterpolator( Property::Index target,
-                                         boost::function<P (const P& current)> func,
-                                         boost::function<P (const P&, const P&, float)> interpolator )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                func,
-                interpolator );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] func A function which returns the constrained property value.
@@ -133,38 +109,13 @@ public:
     return New( target,
                 PropertyTypes::Get<P>(),
                 source1,
-                func,
-                GetDefaultInterpolator( PropertyTypes::Get<P>() ) );
+                func );
   }
 
   /**
    * @brief Create a constraint which targets a property.
    *
    * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint NewWithInterpolator( Property::Index target,
-                                         ConstraintSource source1,
-                                         boost::function<P (const P& current, const PropertyInput& input1)> func,
-                                         boost::function<P (const P&, const P&, float)> interpolator )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                func,
-                interpolator );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
@@ -181,41 +132,13 @@ public:
                 PropertyTypes::Get<P>(),
                 source1,
                 source2,
-                func,
-                GetDefaultInterpolator(PropertyTypes::Get<P>()) );
+                func );
   }
 
   /**
    * @brief Create a constraint which targets a property.
    *
    * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint NewWithInterpolator( Property::Index target,
-                                         ConstraintSource source1,
-                                         ConstraintSource source2,
-                                         boost::function<P (const P& current, const PropertyInput& input1, const PropertyInput& input2)> func,
-                                         boost::function<P (const P&, const P&, float)> interpolator )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                func,
-                interpolator );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
@@ -235,44 +158,13 @@ public:
                 source1,
                 source2,
                 source3,
-                func,
-                GetDefaultInterpolator(PropertyTypes::Get<P>()) );
+                func );
   }
 
   /**
    * @brief Create a constraint which targets a property.
    *
    * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint NewWithInterpolator( Property::Index target,
-                                         ConstraintSource source1,
-                                         ConstraintSource source2,
-                                         ConstraintSource source3,
-                                         boost::function<P (const P& current, const PropertyInput& input1, const PropertyInput& input2, const PropertyInput& input3)> func,
-                                         boost::function<P (const P&, const P&, float)> interpolator )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                source3,
-                func,
-                interpolator );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
@@ -299,51 +191,13 @@ public:
                 source2,
                 source3,
                 source4,
-                func,
-                GetDefaultInterpolator(PropertyTypes::Get<P>()) );
+                func );
   }
 
   /**
    * @brief Create a constraint which targets a property.
    *
    * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint NewWithInterpolator( Property::Index target,
-                                         ConstraintSource source1,
-                                         ConstraintSource source2,
-                                         ConstraintSource source3,
-                                         ConstraintSource source4,
-                                         boost::function<P (const P& current,
-                                                            const PropertyInput& input1,
-                                                            const PropertyInput& input2,
-                                                            const PropertyInput& input3,
-                                                            const PropertyInput& input4)> func,
-                                         boost::function<P (const P&, const P&, float)> interpolator )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                source3,
-                source4,
-                func,
-                interpolator );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
@@ -374,55 +228,13 @@ public:
                 source3,
                 source4,
                 source5,
-                func,
-                GetDefaultInterpolator(PropertyTypes::Get<P>()) );
+                func );
   }
 
   /**
    * @brief Create a constraint which targets a property.
    *
    * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint NewWithInterpolator( Property::Index target,
-                                         ConstraintSource source1,
-                                         ConstraintSource source2,
-                                         ConstraintSource source3,
-                                         ConstraintSource source4,
-                                         ConstraintSource source5,
-                                         boost::function<P (const P& current,
-                                                            const PropertyInput& input1,
-                                                            const PropertyInput& input2,
-                                                            const PropertyInput& input3,
-                                                            const PropertyInput& input4,
-                                                            const PropertyInput& input5)> func,
-                                         boost::function<P (const P&, const P&, float)> interpolator )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                source3,
-                source4,
-                source5,
-                func,
-                interpolator );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * Animation will be performed using the default interpolator.
    * @param [in] target The index of the property to constrain.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
@@ -457,52 +269,7 @@ public:
                 source4,
                 source5,
                 source6,
-                func,
-                GetDefaultInterpolator(PropertyTypes::Get<P>()) );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
-   * @param [in] source6 The source of a property; the current value will be passed as the 7th parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint NewWithInterpolator( Property::Index target,
-                                         ConstraintSource source1,
-                                         ConstraintSource source2,
-                                         ConstraintSource source3,
-                                         ConstraintSource source4,
-                                         ConstraintSource source5,
-                                         ConstraintSource source6,
-                                         boost::function<P (const P& current,
-                                                            const PropertyInput& input1,
-                                                            const PropertyInput& input2,
-                                                            const PropertyInput& input3,
-                                                            const PropertyInput& input4,
-                                                            const PropertyInput& input5,
-                                                            const PropertyInput& input6)> func,
-                                         boost::function<P (const P&, const P&, float)> interpolator )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                source3,
-                source4,
-                source5,
-                source6,
-                func,
-                interpolator );
+                func );
   }
 
   /**
@@ -613,13 +380,11 @@ private: // Not intended for use by Application developers
    * @param [in] target The index of the property to constrain.
    * @param [in] targetType The type of the constrained property.
    * @param [in] func The constraint function.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
    * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
-                         AnyFunction func,
-                         AnyFunction interpolator );
+                         AnyFunction func );
 
   /**
    * @brief Construct a new constraint which targets a property.
@@ -628,14 +393,12 @@ private: // Not intended for use by Application developers
    * @param [in] targetType The type of the constrained property.
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] func The constraint function.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
    * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
                          ConstraintSource source1,
-                         AnyFunction func,
-                         AnyFunction interpolator );
+                         AnyFunction func );
 
   /**
    * @brief Construct a new constraint which targets a property.
@@ -645,15 +408,13 @@ private: // Not intended for use by Application developers
    * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
    * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
    * @param [in] func The constraint function.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
    * @return The new constraint.
    */
   static Constraint New( Property::Index target,
                          Property::Type targetType,
                          ConstraintSource source1,
                          ConstraintSource source2,
-                         AnyFunction func,
-                         AnyFunction interpolator );
+                         AnyFunction func );
 
   /**
    * @brief Construct a new constraint which targets a property.
@@ -664,7 +425,6 @@ private: // Not intended for use by Application developers
    * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
    * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
    * @param [in] func The constraint function.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
    * @return The new constraint.
    */
   static Constraint New( Property::Index target,
@@ -672,8 +432,7 @@ private: // Not intended for use by Application developers
                          ConstraintSource source1,
                          ConstraintSource source2,
                          ConstraintSource source3,
-                         AnyFunction func,
-                         AnyFunction interpolator );
+                         AnyFunction func );
 
   /**
    * @brief Construct a new constraint which targets a property.
@@ -685,7 +444,6 @@ private: // Not intended for use by Application developers
    * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
    * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
    * @param [in] func The constraint function.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
    * @return The new constraint.
    */
   static Constraint New( Property::Index target,
@@ -694,8 +452,7 @@ private: // Not intended for use by Application developers
                          ConstraintSource source2,
                          ConstraintSource source3,
                          ConstraintSource source4,
-                         AnyFunction func,
-                         AnyFunction interpolator );
+                         AnyFunction func );
 
   /**
    * @brief Construct a new constraint which targets a property.
@@ -708,7 +465,6 @@ private: // Not intended for use by Application developers
    * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
    * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
    * @param [in] func The constraint function.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
    * @return The new constraint.
    */
   static Constraint New( Property::Index target,
@@ -718,8 +474,7 @@ private: // Not intended for use by Application developers
                          ConstraintSource source3,
                          ConstraintSource source4,
                          ConstraintSource source5,
-                         AnyFunction func,
-                         AnyFunction interpolator );
+                         AnyFunction func );
 
   /**
    * @brief Construct a new constraint which targets a property.
@@ -733,7 +488,6 @@ private: // Not intended for use by Application developers
    * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
    * @param [in] source6 The source of a property; the current value will be passed as the 7th parameter of func.
    * @param [in] func The constraint function.
-   * @param [in] interpolator A function used to interpolate between the start value, and the value returned by func.
    * @return The new constraint.
    */
   static Constraint New( Property::Index target,
@@ -744,8 +498,7 @@ private: // Not intended for use by Application developers
                          ConstraintSource source4,
                          ConstraintSource source5,
                          ConstraintSource source6,
-                         AnyFunction func,
-                         AnyFunction interpolator );
+                         AnyFunction func );
 };
 
 } // namespace Dali

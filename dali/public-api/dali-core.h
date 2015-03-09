@@ -40,7 +40,6 @@
 #include <dali/public-api/animation/constraint-source.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/animation/interpolator-functions.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/animation/path.h>
 #include <dali/public-api/animation/time-period.h>

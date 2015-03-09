@@ -16,7 +16,6 @@ public_api_src_files = \
   $(public_api_src_dir)/animation/alpha-functions.cpp \
   $(public_api_src_dir)/animation/constraint.cpp \
   $(public_api_src_dir)/animation/constraint-source.cpp \
-  $(public_api_src_dir)/animation/interpolator-functions.cpp \
   $(public_api_src_dir)/animation/key-frames.cpp \
   $(public_api_src_dir)/animation/path.cpp \
   $(public_api_src_dir)/animation/time-period.cpp \
@@ -144,7 +143,6 @@ public_api_core_animation_header_files = \
   $(public_api_src_dir)/animation/constraints.h \
   $(public_api_src_dir)/animation/constraint-functions.h \
   $(public_api_src_dir)/animation/constraint-source.h \
-  $(public_api_src_dir)/animation/interpolator-functions.h \
   $(public_api_src_dir)/animation/key-frames.h \
   $(public_api_src_dir)/animation/path.h \
   $(public_api_src_dir)/animation/time-period.h

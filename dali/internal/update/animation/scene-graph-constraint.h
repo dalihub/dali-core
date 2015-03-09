@@ -25,9 +25,11 @@
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/signals/callback.h>
 #include <dali/internal/event/animation/property-constraint-ptr.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/animation/interpolator-functions.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/render/common/performance-monitor.h>
 
@@ -57,14 +59,12 @@ public:
    * @param[in] targetProperty The target property.
    * @param[in] ownerSet A set of property owners; func is connected to the properties provided by these objects.
    * @param[in] func The function to calculate the final constrained value.
-   * @param[in] interpolator The function to interpolate between start & final value.
    * @param[in] customWeight A custom weight property, or NULL if the constraint is using its own.
    * @return A smart-pointer to a newly allocated constraint.
    */
   static ConstraintBase* New( const PropertyBase& targetProperty,
                               PropertyOwnerContainer& ownerContainer,
                               ConstraintFunctionPtr func,
-                              InterpolatorFunc interpolator,
                               const AnimatableProperty<float>* customWeight )
   {
     // Scene-graph thread can edit these objects
@@ -73,7 +73,6 @@ public:
     return new Constraint< PropertyType, PropertyAccessorType >( property,
                                                                  ownerContainer,
                                                                  func,
-                                                                 interpolator,
                                                                  customWeight );
   }
 
@@ -82,6 +81,7 @@ public:
    */
   virtual ~Constraint()
   {
+    delete mInterpolator;
   }
 
   /**
@@ -129,8 +129,9 @@ public:
            ! Equals( Dali::ActiveConstraint::FINAL_WEIGHT, (*mWeightInput)[updateBufferIndex] ) )
       {
         // Constraint is not fully-applied; interpolation between start & final values
-        mTargetProperty.Set( updateBufferIndex,
-                             mInterpolator( current, mFunc->Apply( updateBufferIndex, current ), (*mWeightInput)[updateBufferIndex] ) );
+        mTargetProperty.Set(
+            updateBufferIndex,
+            CallbackBase::ExecuteReturn< PropertyType, const PropertyType&, const PropertyType&, float >( *mInterpolator, current, mFunc->Apply( updateBufferIndex, current ), (*mWeightInput)[updateBufferIndex] ));
       }
       else
       {
@@ -161,12 +162,11 @@ private:
   Constraint( PropertyBase& targetProperty,
               PropertyOwnerContainer& ownerContainer,
               ConstraintFunctionPtr func,
-              InterpolatorFunc interpolator,
               const AnimatableProperty<float>* customWeight )
   : ConstraintBase( ownerContainer ),
     mTargetProperty( &targetProperty ),
     mFunc( func ),
-    mInterpolator( interpolator ),
+    mInterpolator( GetDefaultInterpolator( PropertyTypes::Get< PropertyType >() ) ),
     mWeightInput( customWeight ? customWeight : &mWeight)
   {
   }
@@ -193,7 +193,7 @@ protected:
 
   ConstraintFunctionPtr mFunc;
 
-  InterpolatorFunc mInterpolator;
+  CallbackBase* mInterpolator;
 
   const AnimatableProperty<float>* mWeightInput;
 };

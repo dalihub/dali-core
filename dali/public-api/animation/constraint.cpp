@@ -99,23 +99,20 @@ unsigned int Constraint::GetTag() const
 
 Constraint Constraint::New( Property::Index target,
                             Property::Type targetType,
-                            AnyFunction func,
-                            AnyFunction interpolator )
+                            AnyFunction func )
 {
   Internal::SourceContainer sources; // empty
 
   return Constraint( new Internal::Constraint( target,
                                                targetType,
                                                sources,
-                                               func,
-                                               interpolator ) );
+                                               func ) );
 }
 
 Constraint Constraint::New( Property::Index target,
                             Property::Type targetType,
                             ConstraintSource source1,
-                            AnyFunction func,
-                            AnyFunction interpolator )
+                            AnyFunction func )
 {
   Internal::SourceContainer sources;
   sources.push_back( Internal::Source( source1 ) );
@@ -123,16 +120,14 @@ Constraint Constraint::New( Property::Index target,
   return Constraint( new Internal::Constraint( target,
                                                targetType,
                                                sources,
-                                               func,
-                                               interpolator ) );
+                                               func ) );
 }
 
 Constraint Constraint::New( Property::Index target,
                             Property::Type targetType,
                             ConstraintSource source1,
                             ConstraintSource source2,
-                            AnyFunction func,
-                            AnyFunction interpolator )
+                            AnyFunction func )
 {
   Internal::SourceContainer sources;
   sources.push_back( Internal::Source( source1 ) );
@@ -141,8 +136,7 @@ Constraint Constraint::New( Property::Index target,
   return Constraint( new Internal::Constraint( target,
                                                targetType,
                                                sources,
-                                               func,
-                                               interpolator ) );
+                                               func ) );
 }
 
 Constraint Constraint::New( Property::Index target,
@@ -150,8 +144,7 @@ Constraint Constraint::New( Property::Index target,
                             ConstraintSource source1,
                             ConstraintSource source2,
                             ConstraintSource source3,
-                            AnyFunction func,
-                            AnyFunction interpolator )
+                            AnyFunction func )
 {
   Internal::SourceContainer sources;
   sources.push_back( Internal::Source( source1 ) );
@@ -161,8 +154,7 @@ Constraint Constraint::New( Property::Index target,
   return Constraint( new Internal::Constraint( target,
                                                targetType,
                                                sources,
-                                               func,
-                                               interpolator ) );
+                                               func ) );
 }
 
 Constraint Constraint::New( Property::Index target,
@@ -171,8 +163,7 @@ Constraint Constraint::New( Property::Index target,
                             ConstraintSource source2,
                             ConstraintSource source3,
                             ConstraintSource source4,
-                            AnyFunction func,
-                            AnyFunction interpolator )
+                            AnyFunction func )
 {
   Internal::SourceContainer sources;
   sources.push_back( Internal::Source( source1 ) );
@@ -183,8 +174,7 @@ Constraint Constraint::New( Property::Index target,
   return Constraint( new Internal::Constraint( target,
                                                targetType,
                                                sources,
-                                               func,
-                                               interpolator ) );
+                                               func ) );
 }
 
 Constraint Constraint::New( Property::Index target,
@@ -194,8 +184,7 @@ Constraint Constraint::New( Property::Index target,
                             ConstraintSource source3,
                             ConstraintSource source4,
                             ConstraintSource source5,
-                            AnyFunction func,
-                            AnyFunction interpolator )
+                            AnyFunction func )
 {
   Internal::SourceContainer sources;
   sources.push_back( Internal::Source( source1 ) );
@@ -207,8 +196,7 @@ Constraint Constraint::New( Property::Index target,
   return Constraint( new Internal::Constraint( target,
                                                targetType,
                                                sources,
-                                               func,
-                                               interpolator ) );
+                                               func ) );
 }
 
 Constraint Constraint::New( Property::Index target,
@@ -219,8 +207,7 @@ Constraint Constraint::New( Property::Index target,
                             ConstraintSource source4,
                             ConstraintSource source5,
                             ConstraintSource source6,
-                            AnyFunction func,
-                            AnyFunction interpolator )
+                            AnyFunction func )
 {
   Internal::SourceContainer sources;
   sources.push_back( Internal::Source( source1 ) );
@@ -233,8 +220,7 @@ Constraint Constraint::New( Property::Index target,
   return Constraint( new Internal::Constraint( target,
                                                targetType,
                                                sources,
-                                               func,
-                                               interpolator ) );
+                                               func ) );
 }
 
 Constraint Constraint::DownCast( BaseHandle handle )
