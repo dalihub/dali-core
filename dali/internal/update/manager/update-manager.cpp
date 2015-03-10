@@ -586,6 +586,7 @@ void UpdateManager::RemoveMaterial( Material* material )
       // This keeps the material alive, until the render-thread has finished with it
       mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), materials.Release( iter ) );
 
+      materials.Erase(iter);
       return;
     }
   }

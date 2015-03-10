@@ -18,13 +18,20 @@
  */
 
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/common/owner-container.h>
+#include <dali/internal/common/owner-pointer.h>
 
 namespace Dali
 {
 namespace Internal
 {
+class Context;
+class Program;
+class GpuBuffer;
+
 namespace SceneGraph
 {
+class GeometryDataProvider;
 
 /**
  * This class encapsulates the GPU buffers. It is used to upload vertex data
@@ -34,28 +41,105 @@ namespace SceneGraph
 class RenderGeometry
 {
 public:
-  typedef OwnerContainer< GPUBuffer* > GPUBuffers;
+  typedef OwnerContainer< GpuBuffer* > GpuBuffers;
 
   /**
-   * Constructor
+   * Constructor. Creates a render geometry object with no GPU buffers.
    */
-  RenderGeometry();
+  RenderGeometry( );
 
   /**
    * Destructor
    */
+  ~RenderGeometry();
 
-  void UploadVertexData();
+  /**
+   * Called on Gl Context created
+   */
+  void GlContextCreated( Context& context );
 
-  void BindBuffers();
+  /**
+   * Called on Gl Context destroyed.
+   */
+  void GlContextDestroyed();
 
-  void EnableVertexAttributes( Program& progam );
+  /**
+   * Upload the geometry if it has changed, set up the attributes and perform
+   * the Draw call corresponding to the geometry type
+   * @param[in] context The GL context
+   * @param[in] program The shader program to query for attribute locations
+   * @param[in] bufferIndex The current buffer index
+   * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
+   */
+  void UploadAndDraw(Context* context,
+                     Program& program,
+                     BufferIndex bufferIndex,
+                     const GeometryDataProvider& geometryDataProvider );
 
-  void DisableVertexAttributes( Program& program );
+  /**
+   * Tell the object that the geometry has been updated.
+   * It will be uploaded on the next UploadAndDraw call.
+   */
+  void GeometryUpdated();
+
+  /**
+   * Upload the vertex data if it needs uploading.
+   * @param[in] context The GL context
+   * @param[in] bufferIndex The current buffer index
+   * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
+   */
+  void UploadVertexData( Context* context,
+                         BufferIndex bufferIndex,
+                         const GeometryDataProvider& geometryDataProvider );
+
 
 private:
-  GPUBuffers mGpuBuffers;
-  AttributeDataProvider& mAttributeDataProvider;
+  /**
+   * Perform the upload of the geometry
+   * @param[in] context The GL context
+   * @param[in] bufferIndex The current buffer index
+   * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
+   */
+  void DoUpload( Context* context,
+                 BufferIndex bufferIndex,
+                 const GeometryDataProvider& geometryDataProvider );
+
+  /**
+   * Bind the geometry buffers
+   */
+  void BindBuffers();
+
+  /**
+   * Enable the vertex attributes for each vertex buffer from the corresponding
+   * shader program.
+   * @param[in] context The GL context
+   * @param[in] program The shader program to query for attribute locations
+   */
+  void EnableVertexAttributes( Context* context, Program& progam );
+
+  /**
+   * Disable the vertex attributes for each vertex buffer from the corresponding
+   * shader program.
+   * @param[in] context The GL context
+   * @param[in] program The shader program to query for attribute locations
+   */
+  void DisableVertexAttributes( Context* context, Program& program );
+
+  /**
+   * Perform the correct draw call corresponding to the geometry type
+   * @param[in] context The GL context
+   * @param[in] bufferIndex The current buffer index
+   * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
+   */
+  void Draw( Context* context,
+             BufferIndex bufferIndex,
+             const GeometryDataProvider& geometry );
+
+private:
+  GpuBuffers mVertexBuffers;
+  OwnerPointer< GpuBuffer > mIndexBuffer;
+
+  bool mDataNeedsUploading;
 };
 
 } // namespace SceneGraph

@@ -35,7 +35,7 @@
 #include <dali/integration-api/debug.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
-#include <dali/internal/render/renderers/render-data-provider.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
 
 namespace Dali
 {
@@ -85,11 +85,13 @@ static const int RenderableUpdateFlags = TransformFlag | SortModifierFlag | Chil
 
 /**
  * Node is the base class for all nodes in the Scene Graph.
- * Each node provides a transformation which applies to the node and its children.
- * Node data is double-buffered. This allows an update thread to modify node data, without interferring
- * with another thread reading the values from the previous update traversal.
+ *
+ * Each node provides a transformation which applies to the node and
+ * its children.  Node data is double-buffered. This allows an update
+ * thread to modify node data, without interferring with another
+ * thread reading the values from the previous update traversal.
  */
-class Node : public PropertyOwner, public RenderDataProvider
+class Node : public PropertyOwner, public NodeDataProvider
 {
 public:
 
@@ -979,10 +981,10 @@ protected:
    */
   Node();
 
-private: // from RenderDataProvider
+private: // from NodeDataProvider
 
   /**
-   * @copydoc RenderDataProvider::GetModelMatrix
+   * @copydoc NodeDataProvider::GetModelMatrix
    */
   virtual const Matrix& GetModelMatrix( unsigned int bufferId )
   {
@@ -990,7 +992,7 @@ private: // from RenderDataProvider
   }
 
   /**
-   * @copydoc RenderDataProvider::GetRenderColor
+   * @copydoc NodeDataProvider::GetRenderColor
    */
   virtual const Vector4& GetRenderColor( unsigned int bufferId )
   {

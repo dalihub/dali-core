@@ -168,15 +168,45 @@ GLint Program::GetAttribLocation( AttribType type )
 {
   DALI_ASSERT_DEBUG(type != ATTRIB_UNKNOWN);
 
-  if( mAttribLocations[ type ] == ATTRIB_UNKNOWN )
+  return GetCustomAttributeLocation( type );
+}
+
+unsigned int Program::RegisterCustomAttribute( const std::string& name )
+{
+  unsigned int index = 0;
+  // find the value from cache
+  for( ;index < mAttributeLocations.size(); ++index )
   {
-    GLint loc = CHECK_GL( mGlAbstraction, mGlAbstraction.GetAttribLocation( mProgramId, gStdAttribs[type] ) );
-    mAttribLocations[ type ] = loc;
-    LOG_GL( "GetAttribLocation(program=%d,%s) = %d\n", mProgramId, gStdAttribs[type], mAttribLocations[type] );
+    if( mAttributeLocations[ index ].first == name )
+    {
+      // name found so return index
+      return index;
+    }
+  }
+  // if we get here, index is one past end so push back the new name
+  mAttributeLocations.push_back( std::make_pair( name, ATTRIB_UNKNOWN ) );
+  return index;
+}
+
+GLint Program::GetCustomAttributeLocation( unsigned int attributeIndex )
+{
+  // debug check that index is within name cache
+  DALI_ASSERT_DEBUG( mAttributeLocations.size() > attributeIndex );
+
+  // check if we have already queried the location of the attribute
+  GLint location = mAttributeLocations[ attributeIndex ].second;
+
+  if( location == ATTRIB_UNKNOWN )
+  {
+    location = CHECK_GL( mGlAbstraction, mGlAbstraction.GetAttribLocation( mProgramId, mAttributeLocations[ attributeIndex ].first.c_str() ) );
+
+    mAttributeLocations[ attributeIndex ].second = location;
+    LOG_GL( "GetAttributeLocation(program=%d,%s) = %d\n", mProgramId, mAttributeLocations[ attributeIndex ].first.c_str(), mAttributeLocations[ attributeIndex ].second );
   }
 
-  return mAttribLocations[type];
+  return location;
 }
+
 
 unsigned int Program::RegisterUniform( const std::string& name )
 {
@@ -442,6 +472,13 @@ Program::Program( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bo
   mProgramData(shaderData),
   mModifiesGeometry( modifiesGeometry )
 {
+  // reserve space for standard attributes
+  mAttributeLocations.reserve( ATTRIB_TYPE_LAST );
+  for( int i=0; i<ATTRIB_TYPE_LAST; ++i )
+  {
+    RegisterCustomAttribute( gStdAttribs[i] );
+  }
+
   // reserve space for standard uniforms
   mUniformLocations.reserve( UNIFORM_TYPE_LAST );
   // reset built in uniform names in cache
@@ -655,9 +692,9 @@ void Program::FreeShaders()
 void Program::ResetAttribsUniformCache()
 {
   // reset attribute locations
-  for( unsigned i = 0; i < ATTRIB_TYPE_LAST; ++i )
+  for( unsigned i = 0; i < mAttributeLocations.size() ; ++i )
   {
-    mAttribLocations[ i ] = ATTRIB_UNKNOWN;
+    mAttributeLocations[ i ].second = ATTRIB_UNKNOWN;
   }
 
   // reset all gl uniform locations

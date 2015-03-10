@@ -35,7 +35,7 @@ class GpuBuffer;
 
 namespace SceneGraph
 {
-class RenderDataProvider;
+class NodeDataProvider;
 
 /**
  * Used to render an image.
@@ -61,7 +61,7 @@ public:
    * @param dataprovider to render
    * @return The newly allocated ImageRenderer.
    */
-  static ImageRenderer* New( RenderDataProvider& dataprovider );
+  static ImageRenderer* New( NodeDataProvider& dataprovider );
 
   /**
    * Virtual destructor
@@ -199,13 +199,13 @@ private:
   /**
    * Private constructor. @see New()
    */
-  ImageRenderer(RenderDataProvider& dataprovider);
+  ImageRenderer( NodeDataProvider& dataprovider );
 
   // Undefined
-  ImageRenderer(const ImageRenderer&);
+  ImageRenderer( const ImageRenderer& );
 
   // Undefined
-  ImageRenderer& operator=(const ImageRenderer& rhs);
+  ImageRenderer& operator=( const ImageRenderer& rhs );
 
 private:
 

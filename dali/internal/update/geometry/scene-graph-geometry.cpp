@@ -76,24 +76,30 @@ void Geometry::ClearIndexBuffer()
   mIndexBuffer.Reset();
 }
 
-void Geometry::SetGeometryType( Geometry::GeometryType geometryType )
+void Geometry::SetGeometryType( BufferIndex bufferIndex, Geometry::GeometryType geometryType )
 {
-  mGeometryType = geometryType;
+  mGeometryType[bufferIndex] = geometryType;
 }
 
-const Geometry::VertexBuffers& Geometry::GetVertexBuffers()
+const GeometryDataProvider::VertexBuffers& Geometry::GetVertexBuffers() const
 {
   return mVertexBuffers;
 }
 
-const PropertyBuffer& Geometry::GetIndexBuffer()
+const PropertyBuffer* Geometry::GetIndexBuffer() const
 {
-  return *mIndexBuffer.Get();
+  return mIndexBuffer.Get();
 }
 
-Geometry::GeometryType Geometry::GetGeometryType( )
+Geometry::GeometryType Geometry::GetGeometryType( BufferIndex bufferIndex) const
 {
-  return mGeometryType;
+  int geometryType = mGeometryType[ bufferIndex ];
+  return static_cast< GeometryDataProvider::GeometryType > ( geometryType );
+}
+
+bool Geometry::GetRequiresDepthTest( BufferIndex bufferIndex ) const
+{
+  return mRequiresDepthTest.GetBoolean( bufferIndex );
 }
 
 } // namespace SceneGraph

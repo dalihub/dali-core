@@ -1,7 +1,8 @@
-#ifndef __DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H__
-#define __DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H__
+#ifndef __DALI_INTERNAL_SCENE_GRAPH_NODE_DATA_PROVIDER_H__
+#define __DALI_INTERNAL_SCENE_GRAPH_NODE_DATA_PROVIDER_H__
+
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,14 +31,14 @@ namespace SceneGraph
 /**
  * An interface to provide data for a Renderer
  */
-class RenderDataProvider
+class NodeDataProvider
 {
 public:
 
   /**
    * Constructor. Nothing to do as a pure interface.
    */
-  RenderDataProvider() { }
+  NodeDataProvider() { }
 
   /**
    * @param bufferId to use
@@ -56,11 +57,11 @@ protected:
   /**
    * Virtual destructor, this is an interface, no deletion through this interface
    */
-  virtual ~RenderDataProvider() { }
+  virtual ~NodeDataProvider() { }
 };
 
 } // SceneGraph
 } // Internal
 } // Dali
 
-#endif // __DALI_INTERNAL_SCENE_GRAPH_RENDER_DATA_PROVIDER_H__
+#endif // __DALI_INTERNAL_SCENE_GRAPH_NODE_DATA_PROVIDER_H__

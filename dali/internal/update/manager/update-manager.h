@@ -31,13 +31,17 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
-#include <dali/internal/update/geometry/scene-graph-geometry.h>
-#include <dali/internal/update/effects/scene-graph-material.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 #include <dali/internal/render/shaders/scene-graph-shader.h>
+
+//@todo MESH_REWORK Move messages to a separate file to avoid having dependent headers
+// pollute core & slow the build down.
+#include <dali/internal/update/geometry/scene-graph-geometry.h>
+#include <dali/internal/update/effects/scene-graph-material.h>
+
 
 namespace Dali
 {

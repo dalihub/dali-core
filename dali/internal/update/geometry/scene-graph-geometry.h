@@ -22,7 +22,9 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/common/property-boolean.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
+#include <dali/internal/render/data-providers/geometry-data-provider.h>
 
 namespace Dali
 {
@@ -35,12 +37,9 @@ namespace SceneGraph
  * This scene graph object is a property owner. It describes a geometry using a
  * number of PropertyBuffers acting as Vertex buffers.
  */
-class Geometry : public PropertyOwner
+class Geometry : public PropertyOwner, public GeometryDataProvider
 {
 public:
-  typedef Dali::Geometry::GeometryType GeometryType;
-
-  typedef OwnerContainer< PropertyBuffer* > VertexBuffers;
 
   /**
    * Constructor
@@ -79,35 +78,46 @@ public:
    * Set the type of geometry to draw (Points, Lines, Triangles, etc)
    * @param[in] geometryType The geometry type
    */
-  void SetGeometryType( GeometryType geometryType );
+  void SetGeometryType( BufferIndex bufferIndex, GeometryType geometryType );
 
 public: // GeometryDataProvider
   /**
    * Get the vertex buffers of the geometry
    * @return A const reference to the vertex buffers
    */
-  virtual const VertexBuffers& GetVertexBuffers();
+  virtual const GeometryDataProvider::VertexBuffers& GetVertexBuffers() const;
 
   /**
    * Get the index buffer of the geometry
-   * @return A const reference to the index buffer
+   * @return A const pointer to the index buffer if it exists, or NULL if it doesn't.
    */
-  virtual const PropertyBuffer& GetIndexBuffer();
+  virtual const PropertyBuffer* GetIndexBuffer() const;
 
   /**
    * Get the type of geometry to draw
    */
-  virtual GeometryType GetGeometryType( );
+  virtual GeometryType GetGeometryType( BufferIndex bufferIndex ) const;
+
+    /**
+   * Returns true if this geometry requires depth testing, e.g. if it is
+   * a set of vertices with z != 0
+   */
+  virtual bool GetRequiresDepthTest( BufferIndex bufferIndex ) const;
 
 private:
   VertexBuffers mVertexBuffers; ///< The vertex buffers
   OwnerPointer<PropertyBuffer> mIndexBuffer;  ///< The index buffer if required
 
 private: // Properties
-  AnimatableProperty<Vector3> mCenter;
-  AnimatableProperty<Vector3> mHalfExtents;
-  GeometryType                mGeometryType;   ///< The type of geometry (tris/lines etc)
-  AnimatableProperty<bool>    mRequiresDepthTest;
+  //DoubleBufferedProperty<Vector3>       mCenter;
+  //DoubleBufferedProperty<Vector3>       mHalfExtents;
+  //DoubleBufferedProperty<GeometryType>  mGeometryType;   ///< The type of geometry (tris/lines etc)
+  //DoubleBufferedProperty<bool>          mRequiresDepthTest;
+
+  AnimatableProperty<Vector3>  mCenter;
+  AnimatableProperty<Vector3>  mHalfExtents;
+  AnimatableProperty<int>      mGeometryType;   ///< The type of geometry (tris/lines etc)
+  PropertyBoolean              mRequiresDepthTest;
 };
 
 inline void AddVertexBufferMessage( EventToUpdate& eventToUpdate, const Geometry& geometry, PropertyBuffer& vertexBuffer )
@@ -164,7 +174,7 @@ namespace SceneGraph
 
 inline void SetGeometryTypeMessage( EventToUpdate& eventToUpdate, const Geometry& geometry, SceneGraph::Geometry::GeometryType geometryType )
 {
-  typedef MessageValue1< Geometry, SceneGraph::Geometry::GeometryType > LocalType;
+  typedef MessageDoubleBuffered1< Geometry, SceneGraph::Geometry::GeometryType > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );

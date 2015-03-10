@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 
+#include <dali/public-api/common/dali-vector.h>
+
 namespace Dali
 {
 namespace Internal
@@ -28,7 +30,7 @@ class SamplerDataProvider;
 class MaterialDataProvider
 {
 public:
-  typedef Dali::Vector< SamplerDataProvider* > Samplers;
+  typedef Dali::Vector< const SamplerDataProvider* > Samplers;
 
   /**
    * Construtor
@@ -41,7 +43,7 @@ public:
    * Returns the list of samplers that this material provides
    * @return The list of samplers
    */
-  const Samplers& GetSamplers();
+  virtual const Samplers& GetSamplers() const = 0;
 
 protected:
   /**

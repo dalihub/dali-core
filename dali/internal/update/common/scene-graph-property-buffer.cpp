@@ -35,8 +35,8 @@ PropertyBuffer::~PropertyBuffer()
 PropertyBuffer* PropertyBuffer::NewQuadVertices()
 {
   PropertyBuffer* propertyBuffer = new PropertyBuffer();
-  propertyBuffer->mVertexSize = sizeof(Vector4);
-  propertyBuffer->mData.Resize( propertyBuffer->mVertexSize * 4 );
+  propertyBuffer->mElementSize = sizeof(Vector4);
+  propertyBuffer->mData.Resize( propertyBuffer->mElementSize * 4 );
   Vector4* vertices = reinterpret_cast<Vector4*>(propertyBuffer->mData[0]);
 
   vertices[ 0 ] = Vector4( -0.5f, -0.5f, 1.0f, 0.0f );
@@ -52,8 +52,8 @@ PropertyBuffer* PropertyBuffer::NewQuadIndices()
 {
   PropertyBuffer* propertyBuffer = new PropertyBuffer();
 
-  propertyBuffer->mVertexSize = sizeof( unsigned short );
-  propertyBuffer->mData.Resize( propertyBuffer->mVertexSize * 6 );
+  propertyBuffer->mElementSize = sizeof( unsigned short );
+  propertyBuffer->mData.Resize( propertyBuffer->mElementSize * 6 );
   unsigned short* indices = reinterpret_cast<unsigned short*>(propertyBuffer->mData[0]);
 
   indices[0] = 0;  indices[1] = 3;  indices[2] = 1;
@@ -61,6 +61,25 @@ PropertyBuffer* PropertyBuffer::NewQuadIndices()
 
   return propertyBuffer;
 }
+
+std::size_t PropertyBuffer::GetDataSize( BufferIndex bufferIndex ) const
+{
+  // @todo MESH_REWORK mData should be double buffered
+  return mData.Count();
+}
+
+std::size_t PropertyBuffer::GetElementSize( BufferIndex bufferIndex ) const
+{
+  // @todo MESH_REWORK mElementSize should be double buffered
+  return mElementSize;
+}
+
+const void* PropertyBuffer::GetData( BufferIndex bufferIndex ) const
+{
+  // @todo MESH_REWORK mData should be double buffered
+  return reinterpret_cast< const void* >(mData[0]);
+}
+
 
 } // namespace SceneGraph
 } // namespace Internal

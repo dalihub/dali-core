@@ -18,7 +18,8 @@
 #include "scene-graph-material.h"
 
 // INTERNAL HEADERS
-#include <dali/internal/render/renderers/sampler-data-provider.h>
+#include <dali/internal/render/data-providers/sampler-data-provider.h>
+#include <dali/internal/update/effects/scene-graph-sampler.h>
 
 namespace Dali
 {
@@ -28,7 +29,8 @@ namespace SceneGraph
 {
 
 Material::Material()
-: mShader(NULL)
+: mShader(NULL),
+  mColor( Color::WHITE )
 {
 }
 
@@ -38,6 +40,7 @@ Material::~Material()
 
 void Material::SetShader( Shader* shader )
 {
+  mShader = shader;
 }
 
 Shader* Material::GetShader()
@@ -47,21 +50,29 @@ Shader* Material::GetShader()
 
 void Material::AddSampler( const Sampler* sampler )
 {
-  // @todo MESH_REWORK
+  const SamplerDataProvider* sdp = static_cast< const SamplerDataProvider*>( sampler );
+  mSamplers.PushBack( sdp );
 }
 
 void Material::RemoveSampler( const Sampler* sampler )
 {
-  // @todo MESH_REWORK
+  const SamplerDataProvider* samplerDataProvider = sampler;
+
+  for( Samplers::Iterator iter = mSamplers.Begin(); iter != mSamplers.End(); ++iter )
+  {
+    if( *iter == samplerDataProvider )
+    {
+      mSamplers.Erase(iter);
+      return;
+    }
+  }
+  DALI_ASSERT_DEBUG( 0 && "Sampler not found" );
 }
 
 const Material::Samplers& Material::GetSamplers() const
 {
-  // @todo MESH_REWORK
   return mSamplers;
 }
-
-
 
 } // namespace SceneGraph
 } // namespace Internal

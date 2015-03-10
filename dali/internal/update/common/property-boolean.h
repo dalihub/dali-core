@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/math/boolean.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-types.h>
@@ -117,10 +116,10 @@ private:
   PropertyBoolean& operator=(const PropertyBoolean& rhs);
 
 public:
-  boolean mValue; ///< The property value
+  bool mValue; ///< The property value
 
 private:
-  boolean mDirtyFlag;
+  bool mDirtyFlag;
 };
 
 } // namespace SceneGraph

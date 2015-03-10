@@ -134,6 +134,8 @@ internal_src_files = \
   $(internal_src_dir)/render/gl-resources/texture-factory.cpp \
   $(internal_src_dir)/render/gl-resources/texture-cache.cpp \
   $(internal_src_dir)/render/queue/render-queue.cpp \
+  $(internal_src_dir)/render/renderers/render-geometry.cpp \
+  $(internal_src_dir)/render/renderers/render-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-image-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer-debug.cpp \
@@ -173,8 +175,8 @@ internal_src_files = \
   $(internal_src_dir)/update/node-attachments/scene-graph-camera-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-image-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-renderable-attachment.cpp \
-  $(internal_src_dir)/update/node-attachments/scene-graph-text-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-renderer-attachment.cpp \
+  $(internal_src_dir)/update/node-attachments/scene-graph-text-attachment.cpp \
   $(internal_src_dir)/update/nodes/node.cpp \
   $(internal_src_dir)/update/nodes/node-messages.cpp \
   $(internal_src_dir)/update/nodes/scene-graph-layer.cpp \

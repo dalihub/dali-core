@@ -19,7 +19,10 @@
 
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/controllers/render-message-dispatcher.h>
+#include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
+#include <dali/internal/render/data-providers/uniform-map-provider.h>
 
 namespace Dali
 {
@@ -29,11 +32,18 @@ namespace SceneGraph
 {
 class Material;
 class Geometry;
+class NewRenderer;
 
 
-class RendererAttachment : public RenderableAttachment, public PropertyOwner
+class RendererAttachment : public RenderableAttachment, public PropertyOwner, public UniformMapProvider
 {
 public:
+  /**
+   * Create a new renderer attachment.
+   * @return The newly allocated RendererAttachment
+   */
+  static RendererAttachment* New();
+
   /**
    * Constructor
    */
@@ -46,9 +56,10 @@ public:
 
   /**
    * Set the material for the renderer
+   * @param[in] bufferIndex The current frame's buffer index
    * @param[in] material The material this renderer will use
    */
-  void SetMaterial(const Material* material);
+  void SetMaterial( BufferIndex bufferIndex, const Material* material);
 
   /**
    * Get the material of this renderer
@@ -58,9 +69,10 @@ public:
 
   /**
    * Set the geometry for the renderer
+   * @param[in] bufferIndex The current frame's buffer index
    * @param[in] geometry The geometry this renderer will use
    */
-  void SetGeometry(const Geometry* geometry);
+  void SetGeometry( BufferIndex bufferIndex, const Geometry* geometry);
 
   /**
    * Get the geometry of this renderer
@@ -80,9 +92,54 @@ public:
    */
   int GetDepthIndex() const ;
 
+protected: // From RenderableAttachment
+  /**
+   * @copydoc RenderableAttachment::GetRenderer().
+   */
+  virtual Renderer& GetRenderer();
+
+  /**
+   * @copydoc RenderableAttachment::GetRenderer().
+   */
+  virtual const Renderer& GetRenderer() const;
+
+  /**
+   * @copydoc RenderableAttachment::DoPrepareRender()
+   */
+  virtual void DoPrepareRender( BufferIndex updateBufferIndex );
+
+  /**
+   * @copydoc RenderableAttachment::IsFullyOpaque()
+   */
+  virtual bool IsFullyOpaque( BufferIndex updateBufferIndex );
+
+  /**
+   * @copydoc RenderableAttachment::SizeChanged()
+   */
+  virtual void SizeChanged( BufferIndex updateBufferIndex );
+
+  /**
+   * @copydoc RenderableAttachment::ConnectToSceneGraph2().
+   */
+  virtual void ConnectToSceneGraph2( BufferIndex updateBufferIndex );
+
+  /**
+   * @copydoc RenderableAttachment::OnDestroy2().
+   */
+  virtual void OnDestroy2();
+
+  /**
+   * @copydoc RenderableAttachment::DoPrepareResources()
+   */
+  virtual bool DoPrepareResources( BufferIndex updateBufferIndex,
+                                   ResourceManager& resourceManager );
+
 private:
+  NewRenderer* mRenderer; ///< Raw pointer to the new renderer (that's owned by RenderManager)
+
   const Material* mMaterial; ///< The material this renderer uses. (Not owned)
   const Geometry* mGeometry; ///< The geometry this renderer uses. (Not owned)
+
   int mDepthIndex;     ///< Used only in PrepareRenderInstructions
 };
 
@@ -90,7 +147,7 @@ private:
 
 inline void SetMaterialMessage( EventToUpdate& eventToUpdate, const RendererAttachment& attachment, const Material& material )
 {
-  typedef MessageValue1< RendererAttachment, const Material* > LocalType;
+  typedef MessageDoubleBuffered1< RendererAttachment, const Material* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
@@ -101,7 +158,7 @@ inline void SetMaterialMessage( EventToUpdate& eventToUpdate, const RendererAtta
 
 inline void SetGeometryMessage( EventToUpdate& eventToUpdate, const RendererAttachment& attachment, const Geometry& geometry )
 {
-  typedef MessageValue1< RendererAttachment, const Geometry* > LocalType;
+  typedef MessageDoubleBuffered1< RendererAttachment, const Geometry* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );

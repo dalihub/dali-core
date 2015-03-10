@@ -18,10 +18,12 @@
  */
 
 #include <dali/public-api/shader-effects/sampler.h>
+#include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/event-to-update.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/render/renderers/sampler-data-provider.h>
+#include <dali/internal/update/resources/bitmap-metadata.h>
+#include <dali/internal/render/data-providers/sampler-data-provider.h>
 
 #include <string>
 
@@ -52,13 +54,16 @@ public:
    * Set the uniform name of this sampler. This allows the shader to find the
    * GL index of this sampler.
    */
-  void SetUniformName( const std::string& samplerName );
+  void SetUnitName( const std::string& unitName );
 
   /**
-   * Set the texture identity of this sampler
+   * Set the texture identity of this sampler (needs to double buffer this value because
+   * it can be read through the data provider interface in the render thread )
+   * @param[in] bufferIndex The buffer index to use
    * @param[in] textureId The identity of the texture
+   * @param[in] bitmapMetadata The metadata for the texture
    */
-  void SetTextureId( ResourceId textureId );
+  void SetTexture( BufferIndex bufferIndex, Integration::ResourceId textureId, const BitmapMetadata& bitmapMetadata );
 
   /**
    * Set the filter modes for minify and magnify filters
@@ -73,60 +78,82 @@ public:
    */
   void SetWrapMode( BufferIndex bufferIndex, WrapMode uWrap, WrapMode vWrap );
 
-public: // SamplerDataProvider interface
   /**
-   *
+   * @param[in] bufferIndex The buffer index to use
+   * @return true if this sampler affects transparency of the material
+   * @note this should only be called from Update thread
    */
-  const std::string& GetUniformName();
+  bool AffectsTransparency( BufferIndex bufferIndex ) const;
+
+  /**
+   * @param[in] bufferIndex The buffer index to use
+   * @return true if the texture is fully opaque
+   * @note this should only be called from Update thread
+   */
+  bool IsFullyOpaque( BufferIndex bufferIndex ) const;
+
+
+public: // SamplerDataProvider interface - called from RenderThread
+  /**
+   * Get the texture unit uniform name
+   * @return the name of the texture unit uniform
+   */
+  virtual const std::string& GetUnitName();
 
   /**
    * Get the texture ID
+   * @param[in] bufferIndex The buffer index to use
    * @return the identity of the associated texture
    */
-  virtual ResourceId GetTextureId();
+  virtual Integration::ResourceId GetTextureId(BufferIndex buffer) const;
 
   /**
    * Get the filter mode
    * @param[in] bufferIndex The buffer index to use
    * @return The minify filter mode
    */
-  virtual FilterMode GetMinifyFilterMode( BufferIndex bufferIndex );
+  virtual FilterMode GetMinifyFilterMode( BufferIndex bufferIndex ) const;
 
   /**
    * Get the filter mode
    * @param[in] bufferIndex The buffer index to use
    * @return The magnify filter mode
    */
-  virtual FilterMode GetMagnifyFilterMode( BufferIndex bufferIndex );
+  virtual FilterMode GetMagnifyFilterMode( BufferIndex bufferIndex ) const;
 
   /**
    * Get the horizontal wrap mode
    * @param[in] bufferIndex The buffer index to use
    * @return The horizontal wrap mode
    */
-  virtual WrapMode GetUWrapMode( BufferIndex bufferIndex );
+  virtual WrapMode GetUWrapMode( BufferIndex bufferIndex ) const;
 
   /**
    * Get the vertical wrap mode
    * @param[in] bufferIndex The buffer index to use
    * @return The vertical wrap mode
    */
-  virtual WrapMode GetVWrapMode( BufferIndex bufferIndex );
-
-  /**
-   * @return true if the texture is fully opaque.
-   * @todo MESH_REWORK Requires access to ResourceManager::GetBitmapMetadata()
-   */
-  bool IsFullyOpaque();
+  virtual WrapMode GetVWrapMode( BufferIndex bufferIndex ) const;
 
 private:
-  std::string mUniformName; ///< The name of the uniform referencing this sampler
-  ResourceId mTextureId;    ///< The identity of the associated texture
+  std::string mUnitName; ///< The name of the uniform of the texture unit
 
+  // @todo MESH_REWORK Need these to automatically copy
+  // new value into old value on frame change
+
+  ResourceId mTextureId[2]; ///< The identity of the associated texture for this frame (Can be read from RenderThread)
+
+  BitmapMetadata mBitmapMetadata[2]; /// The meta data of the associated texture for this frame (Not needed in RenderThread)
+
+  // @todo MESH_REWORK These need to be non-animatable properties (that also copy
+  // new values into old on frame change ) that can be read in RenderThread
   DoubleBuffered<FilterMode> mMinFilter;    ///< The minify filter
   DoubleBuffered<FilterMode> mMagFilter;    ///< The magnify filter
   DoubleBuffered<WrapMode> mUWrapMode;      ///< The horizontal wrap mode
   DoubleBuffered<WrapMode> mVWrapMode;      ///< The vertical wrap mode
+
+  // Note, this is only called from UpdateThread
+  DoubleBuffered<bool>     mAffectsTransparency; ///< If this sampler affects renderer transparency
 };
 
 inline void SetUniformNameMessage( EventToUpdate& eventToUpdate, const Sampler& sampler, const std::string& name )
@@ -137,7 +164,7 @@ inline void SetUniformNameMessage( EventToUpdate& eventToUpdate, const Sampler& 
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &sampler, &Sampler::SetUniformName, name );
+  new (slot) LocalType( &sampler, &Sampler::SetUnitName, name );
 }
 
 } // namespace SceneGraph

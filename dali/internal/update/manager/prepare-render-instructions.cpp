@@ -49,6 +49,8 @@ namespace SceneGraph
  */
 inline void SetOpaqueRenderFlags( RenderList& renderList, bool transparentRenderersExist, bool stencilRenderablesExist, bool depthTestDisabled )
 {
+  //@todo MESH_REWORK Move RequiresDepthTest from render thread object to update thread object
+
   // Special optimization if depth test is disabled or if only one opaque rendered in the layer (for example background image)
   // and this renderer does not need depth test against itself (e.g. mesh)
   // and if this layer has got exactly one opaque renderer

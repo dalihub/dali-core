@@ -21,9 +21,10 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/event-to-update.h>
+#include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/render/renderers/material-data-provider.h>
+#include <dali/internal/render/data-providers/material-data-provider.h>
 
 namespace Dali
 {
@@ -37,7 +38,6 @@ class Shader;
 class Material : public PropertyOwner, public MaterialDataProvider
 {
 public:
-  typedef Dali::Vector< Sampler* > Samplers;
 
   /**
    * Constructor
@@ -77,11 +77,13 @@ public:
    * Get the samplers this material uses.
    * @return the samplers
    */
-  const Samplers& GetSamplers() const;
+  virtual const Samplers& GetSamplers() const;
 
 private:
   Shader* mShader;
-  Samplers mSamplers; // Not owned (though who does?)
+  Samplers mSamplers; // Not owned ( @todo MESH_REWORK though who does?)
+
+  AnimatableProperty<Vector4> mColor;
 
   // @todo MESH_REWORK add property values for cull face mode, blending options, blend color
   // Add getters/setters?

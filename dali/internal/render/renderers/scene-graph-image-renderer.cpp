@@ -114,9 +114,9 @@ namespace Internal
 namespace SceneGraph
 {
 
-ImageRenderer* ImageRenderer::New( RenderDataProvider& dataprovider )
+ImageRenderer* ImageRenderer::New( NodeDataProvider& dataProvider )
 {
-  return new ImageRenderer( dataprovider );
+  return new ImageRenderer( dataProvider );
 }
 
 ImageRenderer::~ImageRenderer()
@@ -925,8 +925,8 @@ void ImageRenderer::GenerateMeshIndices(GLushort* indices, int rectanglesX, int 
   }
 }
 
-ImageRenderer::ImageRenderer( RenderDataProvider& dataprovider )
-: Renderer( dataprovider ),
+ImageRenderer::ImageRenderer( NodeDataProvider& dataProvider )
+: Renderer( dataProvider ),
   mTexture( NULL ),
   mBorder( 0.45, 0.45, 0.1, 0.1 ),
   mPixelArea(),

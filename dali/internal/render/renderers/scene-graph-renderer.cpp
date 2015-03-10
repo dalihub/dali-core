@@ -24,7 +24,7 @@
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-debug.h>
-#include <dali/internal/render/renderers/render-data-provider.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/public-api/actors/blending.h>
 #include <dali/internal/common/image-sampler.h>
 
@@ -252,7 +252,7 @@ void Renderer::Render( BufferIndex bufferIndex,
   DoRender( bufferIndex, *program, modelViewMatrix, viewMatrix );
 }
 
-Renderer::Renderer( RenderDataProvider& dataprovider )
+Renderer::Renderer( NodeDataProvider& dataprovider )
 : mDataProvider( dataprovider ),
   mContext( NULL ),
 

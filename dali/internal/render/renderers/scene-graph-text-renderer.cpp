@@ -52,7 +52,7 @@ namespace Internal
 namespace SceneGraph
 {
 
-TextRenderer* TextRenderer::New( RenderDataProvider& dataprovider )
+TextRenderer* TextRenderer::New( NodeDataProvider& dataprovider )
 {
   return new TextRenderer( dataprovider );
 }
@@ -523,7 +523,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
 
 }
 
-TextRenderer::TextRenderer( RenderDataProvider& dataprovider )
+TextRenderer::TextRenderer( NodeDataProvider& dataprovider )
 : Renderer( dataprovider ),
   mTexture( NULL ),
   mTextColor( NULL ),

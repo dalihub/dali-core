@@ -220,7 +220,6 @@ void TypeInfo::GetSignals(Dali::TypeInfo::NameContainer& ret) const
 void TypeInfo::GetProperties( Dali::TypeInfo::NameContainer& ret ) const
 {
   Property::IndexContainer indices;
-
   GetPropertyIndices(indices);
 
   ret.reserve(indices.size());

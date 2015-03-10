@@ -23,10 +23,8 @@
 
 namespace Dali
 {
-
 namespace Internal
 {
-
 class Context;
 
 namespace SceneGraph
@@ -59,4 +57,3 @@ void ProcessRenderInstruction( const SceneGraph::RenderInstruction& instruction,
 } // namespace Dali
 
 #endif // __DALI_INTERNAL_RENDER_ALGORITHMS_H__
-

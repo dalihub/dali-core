@@ -27,27 +27,30 @@ namespace Internal
 namespace SceneGraph
 {
 
-Sampler::Sampler( const std::string& samplerName )
-: mUniformName( samplerName ),
-  mTextureId( 0 ),
+Sampler::Sampler( const std::string& unitName )
+: mUnitName( unitName ),
   mMinFilter( Dali::Sampler::DEFAULT ),
   mMagFilter( Dali::Sampler::DEFAULT ),
   mUWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
   mVWrapMode( Dali::Sampler::CLAMP_TO_EDGE )
 {
+  mTextureId[0] = 0;
+  mTextureId[1] = 0;
 }
 
 Sampler::~Sampler()
 {
 }
 
-void Sampler::SetUniformName( const std::string& samplerName )
+void Sampler::SetUnitName( const std::string& unitName )
 {
+  mUnitName = unitName;
 }
 
-void Sampler::SetTextureId( ResourceId textureId )
+void Sampler::SetTexture( BufferIndex bufferIndex, Integration::ResourceId textureId, const BitmapMetadata& metadata )
 {
-  mTextureId = textureId;
+  mTextureId[bufferIndex] = textureId;
+  mBitmapMetadata[bufferIndex] = metadata;
 }
 
 void Sampler::SetFilterMode( BufferIndex bufferIndex, FilterMode minFilter, FilterMode magFilter )
@@ -60,45 +63,44 @@ void Sampler::SetWrapMode( BufferIndex bufferIndex, WrapMode uWrap, WrapMode vWr
 {
 }
 
-const std::string& Sampler::GetUniformName()
+const std::string& Sampler::GetUnitName()
 {
-  // @todo MESH_REWORK
-  return mUniformName;
+  return mUnitName;
 }
 
-Integration::ResourceId Sampler::GetTextureId()
+Integration::ResourceId Sampler::GetTextureId( BufferIndex bufferIndex ) const
 {
-  // @todo MESH_REWORK
-  return mTextureId;
+  return mTextureId[bufferIndex];
 }
 
-Sampler::FilterMode Sampler::GetMinifyFilterMode( BufferIndex bufferIndex )
+Sampler::FilterMode Sampler::GetMinifyFilterMode( BufferIndex bufferIndex ) const
 {
-  // @todo MESH_REWORK
   return mMinFilter[bufferIndex];
 }
 
-Sampler::FilterMode Sampler::GetMagnifyFilterMode( BufferIndex bufferIndex )
+Sampler::FilterMode Sampler::GetMagnifyFilterMode( BufferIndex bufferIndex ) const
 {
-  // @todo MESH_REWORK
   return mMagFilter[bufferIndex];
 }
 
-Sampler::WrapMode Sampler::GetUWrapMode( BufferIndex bufferIndex )
+Sampler::WrapMode Sampler::GetUWrapMode( BufferIndex bufferIndex ) const
 {
-  // @todo MESH_REWORK
   return mUWrapMode[bufferIndex];
 }
 
-Sampler::WrapMode Sampler::GetVWrapMode( BufferIndex bufferIndex )
+Sampler::WrapMode Sampler::GetVWrapMode( BufferIndex bufferIndex ) const
 {
-  // @todo MESH_REWORK
   return mVWrapMode[bufferIndex];
 }
 
-bool Sampler::IsFullyOpaque()
+bool Sampler::AffectsTransparency( BufferIndex bufferIndex ) const
 {
-  return true; // @todo MESH_REWORK - check the actual image. For the moment, pretend it's opaque
+  return mAffectsTransparency[bufferIndex] ;
+}
+
+bool Sampler::IsFullyOpaque( BufferIndex bufferIndex ) const
+{
+  return mBitmapMetadata[bufferIndex].IsFullyOpaque();
 }
 
 } // namespace SceneGraph

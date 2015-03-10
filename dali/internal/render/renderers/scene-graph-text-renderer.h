@@ -39,7 +39,6 @@ class TextParameters;
 namespace SceneGraph
 {
 
-class RenderDataProvider;
 class TextureCache;
 
 /**
@@ -54,7 +53,7 @@ public:
    * @param dataprovider to render
    * @return The newly allocated TextRenderer
    */
-  static TextRenderer* New( RenderDataProvider& dataprovider );
+  static TextRenderer* New( NodeDataProvider& dataprovider );
 
   /**
    * Virtual destructor
@@ -168,7 +167,7 @@ private:
   /**
    * Private constructor. @see New()
    */
-  TextRenderer( RenderDataProvider& dataprovider );
+  TextRenderer( NodeDataProvider& dataprovider );
 
   // Undefined
   TextRenderer( const TextRenderer& copy );

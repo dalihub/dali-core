@@ -18,7 +18,7 @@
  */
 
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/math/vector4.h>
+#include <dali/internal/common/buffer-index.h>
 
 namespace Dali
 {
@@ -46,12 +46,30 @@ public:
    */
   ~PropertyBuffer();
 
+  /**
+   * Get the size of the property buffer in bytes
+   * @return the size in bytes
+   */
+  std::size_t GetDataSize( BufferIndex bufferIndex ) const;
+
+  /**
+   * Get the size of an element of the buffer in bytes
+   * @return the element size in bytes
+   */
+  std::size_t GetElementSize( BufferIndex bufferIndex ) const;
+
+  /**
+   * Get the property buffer data
+   * @return the property buffer's data array
+   */
+  const void* GetData( BufferIndex bufferIndex ) const;
+
 private:
 
   // @todo MESH_REWORK - TEMPORARY TYPES - REMOVE WHEN WE HAVE WORKING BUFFERS
   typedef Dali::Vector< char > CharBuffer;
   CharBuffer  mData;
-  std::size_t mVertexSize;
+  std::size_t mElementSize;
 };
 
 } // namespace SceneGraph

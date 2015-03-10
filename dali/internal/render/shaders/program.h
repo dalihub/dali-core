@@ -155,6 +155,20 @@ public:
   GLint GetAttribLocation( AttribType type );
 
   /**
+   * Register an attribute name in our local cache
+   * @param [in] name attribute name
+   * @return the index of the attribute name in local cache
+   */
+  unsigned int RegisterCustomAttribute( const std::string& name );
+
+  /**
+   * Gets the location of a pre-registered attribute.
+   * @param [in] attributeIndex of the attribute in local cache
+   * @return the index of the attribute in the GL program
+   */
+  GLint GetCustomAttributeLocation( unsigned int attributeIndex );
+
+  /**
    * Register a uniform name in our local cache
    * @param [in] name uniform name
    * @return the index of the uniform name in local cache
@@ -360,7 +374,7 @@ private:  // Data
   Integration::ShaderDataPtr mProgramData;    ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
-  GLint mAttribLocations[ ATTRIB_TYPE_LAST ]; ///< attribute location cache
+  std::vector< std::pair< std::string, GLint > > mAttributeLocations; ///< attribute location cache
   std::vector< std::pair< std::string, GLint > > mUniformLocations; ///< uniform location cache
 
   // uniform value caching
