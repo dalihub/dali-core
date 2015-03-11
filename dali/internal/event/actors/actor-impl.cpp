@@ -444,44 +444,6 @@ ActorPtr Actor::FindChildByName(const std::string& actorName)
   return child;
 }
 
-Dali::Actor Actor::FindChildByAlias(const std::string& actorAlias)
-{
-  Dali::Actor child = DoGetChildByAlias(actorAlias);
-
-  // If not found then search by name.
-  if (!child)
-  {
-    Internal::ActorPtr child_ptr = FindChildByName(actorAlias);
-    if (child_ptr)
-    {
-      child = Dali::Actor(child_ptr.Get());
-    }
-  }
-
-  return child;
-}
-
-Dali::Actor Actor::DoGetChildByAlias(const std::string& actorAlias)
-{
-  Dali::Actor child = GetChildByAlias(actorAlias);
-
-  if (!child && mChildren )
-  {
-    ActorIter end = mChildren->end();
-    for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
-    {
-      child = GetImplementation(*iter).DoGetChildByAlias(actorAlias);
-
-      if (child)
-      {
-        break;
-      }
-    }
-  }
-
-  return child;
-}
-
 ActorPtr Actor::FindChildById(const unsigned int id)
 {
   ActorPtr child = 0;

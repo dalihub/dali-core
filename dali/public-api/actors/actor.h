@@ -502,18 +502,6 @@ public:
   Actor FindChildByName(const std::string& actorName);
 
   /**
-   * @brief Search through this actor's hierarchy for an actor with the given name or alias.
-   *
-   * Actors can customize this function to provide actors with preferred alias'
-   * For example 'previous' could return the last selected child.
-   * If no aliased actor is found then FindChildByName() is called.
-   * @pre The Actor has been initialized.
-   * @param[in] actorAlias the name of the actor to find
-   * @return A handle to the actor if found, or an empty handle if not.
-   */
-  Actor FindChildByAlias(const std::string& actorAlias);
-
-  /**
    * @brief Search through this actor's hierarchy for an actor with the given unique ID.
    *
    * The actor itself is also considered in the search
