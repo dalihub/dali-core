@@ -26,7 +26,6 @@
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
-#include <dali/internal/event/animation/active-constraint-base.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/property-notification-impl.h>
@@ -86,17 +85,6 @@ void Object::RemoveObserver(Observer& observer)
 
 void Object::OnSceneObjectAdd()
 {
-  // Notification for this object's constraints
-  if( mConstraints )
-  {
-    const ActiveConstraintConstIter endIter = mConstraints->end();
-    for ( ActiveConstraintIter iter = mConstraints->begin(); endIter != iter; ++iter )
-    {
-      ActiveConstraintBase& baseConstraint = GetImplementation( *iter );
-      baseConstraint.OnParentSceneObjectAdded();
-    }
-  }
-
   // Notification for observers
   for( ConstObserverIter iter = mObservers.Begin(),  endIter =  mObservers.End(); iter != endIter; ++iter)
   {
@@ -109,17 +97,6 @@ void Object::OnSceneObjectAdd()
 
 void Object::OnSceneObjectRemove()
 {
-  // Notification for this object's constraints
-  if( mConstraints )
-  {
-    const ActiveConstraintConstIter endIter = mConstraints->end();
-    for ( ActiveConstraintIter iter = mConstraints->begin(); endIter != iter; ++iter )
-    {
-      ActiveConstraintBase& baseConstraint = GetImplementation( *iter );
-      baseConstraint.OnParentSceneObjectRemoved();
-    }
-  }
-
   // Notification for observers
   for( ConstObserverIter iter = mObservers.Begin(), endIter = mObservers.End(); iter != endIter; ++iter )
   {
@@ -787,45 +764,6 @@ void Object::DisablePropertyNotifications()
   }
 }
 
-Dali::ActiveConstraint Object::ApplyConstraint( Constraint& constraint )
-{
-  return Dali::ActiveConstraint( DoApplyConstraint( constraint, Dali::Handle() ) );
-}
-
-Dali::ActiveConstraint Object::ApplyConstraint( Constraint& constraint, Dali::Handle weightObject )
-{
-  return Dali::ActiveConstraint( DoApplyConstraint( constraint, weightObject ) );
-}
-
-ActiveConstraintBase* Object::DoApplyConstraint( Constraint& constraint, Dali::Handle weightObject )
-{
-  ActiveConstraintBase* activeConstraintImpl = constraint.CreateActiveConstraint();
-  DALI_ASSERT_DEBUG( NULL != activeConstraintImpl );
-
-  Dali::ActiveConstraint activeConstraint( activeConstraintImpl );
-
-  if( weightObject )
-  {
-    Object& weightObjectImpl = GetImplementation( weightObject );
-    Property::Index weightIndex = weightObjectImpl.GetPropertyIndex( "weight" );
-
-    if( Property::INVALID_INDEX != weightIndex )
-    {
-      activeConstraintImpl->SetCustomWeightObject( weightObjectImpl, weightIndex );
-    }
-  }
-
-  if( !mConstraints )
-  {
-    mConstraints = new ActiveConstraintContainer;
-  }
-  mConstraints->push_back( activeConstraint );
-
-  activeConstraintImpl->FirstApply( *this, constraint.GetApplyTime() );
-
-  return activeConstraintImpl;
-}
-
 Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
 {
   Property::Value value;
@@ -1052,56 +990,23 @@ const TypeInfo* Object::GetTypeInfo() const
   return mTypeInfo;
 }
 
-void Object::RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph )
+void Object::ApplyConstraint( ConstraintBase& constraint )
 {
-  // guard against constraint sending messages during core destruction
-  if ( Stage::IsInstalled() )
+  if( !mConstraints )
   {
-    if( isInScenegraph )
-    {
-      ActiveConstraintBase& baseConstraint = GetImplementation( constraint );
-      baseConstraint.BeginRemove();
-    }
+    mConstraints = new ConstraintContainer;
   }
+  mConstraints->push_back( Dali::Constraint( &constraint ) );
 }
 
-void Object::RemoveConstraint( Dali::ActiveConstraint activeConstraint )
+void Object::RemoveConstraint( ConstraintBase& constraint )
 {
-  // guard against constraint sending messages during core destruction
-  if( mConstraints && Stage::IsInstalled() )
+  DALI_ASSERT_DEBUG( mConstraints );
+
+  ConstraintIter it( std::find( mConstraints->begin(), mConstraints->end(), Dali::Constraint( &constraint ) ) );
+  if( it != mConstraints->end() )
   {
-    bool isInSceneGraph( NULL != GetSceneObject() );
-
-    ActiveConstraintIter it( std::find( mConstraints->begin(), mConstraints->end(), activeConstraint ) );
-    if( it !=  mConstraints->end() )
-    {
-      RemoveConstraint( *it, isInSceneGraph );
-      mConstraints->erase( it );
-    }
-  }
-}
-
-void Object::RemoveConstraints( unsigned int tag )
-{
-  // guard against constraint sending messages during core destruction
-  if( mConstraints && Stage::IsInstalled() )
-  {
-    bool isInSceneGraph( NULL != GetSceneObject() );
-
-    ActiveConstraintIter iter( mConstraints->begin() );
-    while(iter != mConstraints->end() )
-    {
-      ActiveConstraintBase& constraint = GetImplementation( *iter );
-      if( constraint.GetTag() == tag )
-      {
-        RemoveConstraint( *iter, isInSceneGraph );
-        iter = mConstraints->erase( iter );
-      }
-      else
-      {
-        ++iter;
-      }
-    }
+    mConstraints->erase( it );
   }
 }
 
@@ -1114,15 +1019,43 @@ void Object::RemoveConstraints()
     const SceneGraph::PropertyOwner* propertyOwner = GetSceneObject();
     if ( NULL != propertyOwner )
     {
-      const ActiveConstraintConstIter endIter = mConstraints->end();
-      for ( ActiveConstraintIter iter = mConstraints->begin(); endIter != iter; ++iter )
+      const ConstraintConstIter endIter = mConstraints->end();
+      for ( ConstraintIter iter = mConstraints->begin(); endIter != iter; ++iter )
       {
-        RemoveConstraint( *iter, true );
+        GetImplementation( *iter ).RemoveInternal();
       }
     }
 
     delete mConstraints;
     mConstraints = NULL;
+  }
+}
+
+void Object::RemoveConstraints( unsigned int tag )
+{
+  // guard against constraint sending messages during core destruction
+  if( mConstraints && Stage::IsInstalled() )
+  {
+    ConstraintIter iter( mConstraints->begin() );
+    while(iter != mConstraints->end() )
+    {
+      ConstraintBase& constraint = GetImplementation( *iter );
+      if( constraint.GetTag() == tag )
+      {
+        GetImplementation( *iter ).RemoveInternal();
+        iter = mConstraints->erase( iter );
+      }
+      else
+      {
+        ++iter;
+      }
+    }
+
+    if ( mConstraints->empty() )
+    {
+      delete mConstraints;
+      mConstraints = NULL;
+    }
   }
 }
 
@@ -1133,18 +1066,6 @@ void Object::SetTypeInfo( const TypeInfo* typeInfo )
 
 Object::~Object()
 {
-  // Notification for this object's constraints
-  // (note that the ActiveConstraint handles may outlive the Object)
-  if( mConstraints )
-  {
-    const ActiveConstraintConstIter endIter = mConstraints->end();
-    for ( ActiveConstraintIter iter = mConstraints->begin(); endIter != iter; ++iter )
-    {
-      ActiveConstraintBase& baseConstraint = GetImplementation( *iter );
-      baseConstraint.OnParentDestroyed();
-    }
-  }
-
   // Notification for observers
   for( ConstObserverIter iter = mObservers.Begin(), endIter =  mObservers.End(); iter != endIter; ++iter)
   {

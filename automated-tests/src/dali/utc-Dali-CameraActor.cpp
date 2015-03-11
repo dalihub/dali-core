@@ -754,11 +754,13 @@ int UtcDaliCameraActorReadProjectionMatrix(void)
   Property::Index projectionMatrixPropertyIndex = shaderEffect.GetPropertyIndex(SHADER_LIGHT_CAMERA_PROJECTION_MATRIX_PROPERTY_NAME);
   Property::Index viewMatrixPropertyIndex = shaderEffect.GetPropertyIndex(SHADER_LIGHT_CAMERA_VIEW_MATRIX_PROPERTY_NAME);
 
-  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( projectionMatrixPropertyIndex, Source( camera, CameraActor::Property::PROJECTION_MATRIX ), EqualToConstraint());
-  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( viewMatrixPropertyIndex, Source( camera, CameraActor::Property::VIEW_MATRIX ), EqualToConstraint());
+  Constraint projectionMatrixConstraint = Constraint::New<Dali::Matrix>( shaderEffect, projectionMatrixPropertyIndex, EqualToConstraint() );
+  projectionMatrixConstraint.AddSource( Source( camera, CameraActor::Property::PROJECTION_MATRIX ) );
+  Constraint viewMatrixConstraint = Constraint::New<Dali::Matrix>( shaderEffect, viewMatrixPropertyIndex, EqualToConstraint());
+  viewMatrixConstraint.AddSource( Source( camera, CameraActor::Property::VIEW_MATRIX ) );
 
-  shaderEffect.ApplyConstraint(projectionMatrixConstraint);
-  shaderEffect.ApplyConstraint(viewMatrixConstraint);
+  projectionMatrixConstraint.Apply();
+  viewMatrixConstraint.Apply();
 
   application.SendNotification();
   application.Render();
@@ -780,7 +782,9 @@ int UtcDaliCameraActorAnimatedProperties(void)
   actor.SetSize(100.0f, 100.0f);
   Stage::GetCurrent().Add(actor);
 
-  actor.ApplyConstraint(Constraint::New<Dali::Vector3>( Actor::Property::POSITION, Source( camera, Actor::Property::POSITION), EqualToConstraint()));
+  Constraint constraint = Constraint::New<Dali::Vector3>( actor, Actor::Property::POSITION, EqualToConstraint());
+  constraint.AddSource( Source( camera, Actor::Property::POSITION) );
+  constraint.Apply();
 
   camera.SetPosition(100.0f, 200.0f, 300.0f);
   application.SendNotification();
@@ -818,13 +822,11 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews01(void)
   target.SetParentOrigin(ParentOrigin::CENTER);
   target.SetPosition(targetPosition);
 
-  Constraint cameraOrientationConstraint =
-    Constraint::New<Quaternion> ( Actor::Property::ORIENTATION,
-                                  Source( target, Actor::Property::WORLD_POSITION ),
-                                  Source( freeLookCameraActor,  Actor::Property::WORLD_POSITION ),
-                                  Source( target, Actor::Property::WORLD_ORIENTATION ),
-                                  &LookAt );
-  freeLookCameraActor.ApplyConstraint( cameraOrientationConstraint );
+  Constraint cameraOrientationConstraint = Constraint::New<Quaternion> ( freeLookCameraActor, Actor::Property::ORIENTATION, &LookAt );
+  cameraOrientationConstraint.AddSource( Source( target, Actor::Property::WORLD_POSITION ) );
+  cameraOrientationConstraint.AddSource( Source( freeLookCameraActor,  Actor::Property::WORLD_POSITION ) );
+  cameraOrientationConstraint.AddSource( Source( target, Actor::Property::WORLD_ORIENTATION ) );
+  cameraOrientationConstraint.Apply();
 
   CameraActor lookAtCameraActor = CameraActor::New(stageSize);
   lookAtCameraActor.SetType(Camera::LOOK_AT_TARGET);
@@ -880,13 +882,11 @@ int UtcDaliCameraActorCheckLookAtAndFreeLookViews02(void)
   target.SetParentOrigin(ParentOrigin::CENTER);
   target.SetPosition(targetPosition);
 
-  Constraint cameraOrientationConstraint =
-    Constraint::New<Quaternion> ( Actor::Property::ORIENTATION,
-                                  Source( target, Actor::Property::WORLD_POSITION ),
-                                  Source( freeLookCameraActor,  Actor::Property::WORLD_POSITION ),
-                                  Source( target, Actor::Property::WORLD_ORIENTATION ),
-                                  &LookAt );
-  freeLookCameraActor.ApplyConstraint( cameraOrientationConstraint );
+  Constraint cameraOrientationConstraint = Constraint::New<Quaternion> ( freeLookCameraActor, Actor::Property::ORIENTATION, &LookAt );
+  cameraOrientationConstraint.AddSource( Source( target, Actor::Property::WORLD_POSITION ) );
+  cameraOrientationConstraint.AddSource( Source( freeLookCameraActor,  Actor::Property::WORLD_POSITION ) );
+  cameraOrientationConstraint.AddSource( Source( target, Actor::Property::WORLD_ORIENTATION ) );
+  cameraOrientationConstraint.Apply();
 
   CameraActor lookAtCameraActor = CameraActor::New(stageSize);
   lookAtCameraActor.SetType(Camera::LOOK_AT_TARGET);

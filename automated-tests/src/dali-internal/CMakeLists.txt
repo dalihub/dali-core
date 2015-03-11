@@ -15,7 +15,6 @@ SET(TC_SOURCES
         utc-Dali-Internal-ResourceClient.cpp
         utc-Dali-Internal-Image-Culling.cpp
         utc-Dali-Internal-Text-Culling.cpp
-        utc-Dali-Internal-Constraint.cpp
         utc-Dali-Internal-FixedSizeMemoryPool.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-RelayoutController.cpp

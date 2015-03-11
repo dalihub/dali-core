@@ -40,7 +40,6 @@
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/animation/animator-connector.h>
 #include <dali/internal/event/animation/constraint-impl.h>
-#include <dali/internal/event/animation/active-constraint-impl.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
@@ -113,9 +112,8 @@ const int ANIMATION_MEMORY_SIZE(
   sizeof( Internal::AnimatorConnector<float> ) +
   sizeof( Internal::SceneGraph::Animation ) );
 const int CONSTRAINT_MEMORY_SIZE(
-  sizeof( Internal::Constraint ) +
-  sizeof( Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> > ) +
-  sizeof( Internal::ActiveConstraint<float> ) );
+  sizeof( Internal::Constraint<float> ) +
+  sizeof( Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> > ) );
 const int ACTOR_MEMORY_SIZE(
   sizeof( Internal::Actor ) +
   sizeof( Internal::ActorAttachment ) +

@@ -59,10 +59,8 @@ Debug::Filter* gUpdateFilter = Debug::Filter::New(Debug::Concise, false, "LOG_UP
  * @param updateBufferIndex buffer index to use
  * @return The number of constraints that are still being applied
  */
-unsigned int ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex )
+void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex )
 {
-  unsigned int activeCount = 0;
-
   ConstraintOwnerContainer& constraints = propertyOwner.GetConstraints();
 
   const ConstraintIter endIter = constraints.End();
@@ -70,15 +68,7 @@ unsigned int ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex u
   {
     ConstraintBase& constraint = **iter;
     constraint.Apply( updateBufferIndex );
-
-    if( constraint.mWeight[updateBufferIndex] < 1.0f )
-    {
-      // this constraint is still being applied
-      ++activeCount;
-    }
   }
-
-  return activeCount;
 }
 
 /**
@@ -87,9 +77,9 @@ unsigned int ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex u
  * @param updateBufferIndex buffer index to use
  * @return number of active constraints
  */
-unsigned int ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
+void ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
 {
-  unsigned int activeCount = ConstrainPropertyOwner( node, updateBufferIndex );
+  ConstrainPropertyOwner( node, updateBufferIndex );
 
   /**
    *  Constrain the children next
@@ -99,9 +89,8 @@ unsigned int ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
   for ( NodeIter iter = children.Begin(); iter != endIter; ++iter )
   {
     Node& child = **iter;
-    activeCount += ConstrainNodes( child, updateBufferIndex );
+    ConstrainNodes( child, updateBufferIndex );
   }
-  return activeCount;
 }
 
 /******************************************************************************

@@ -6,7 +6,6 @@ SET(RPM_NAME "core-${PKG_NAME}-tests")
 SET(CAPI_LIB "dali")
 
 SET(TC_SOURCES
-        utc-Dali-ActiveConstraint.cpp
         utc-Dali-Actor.cpp
         utc-Dali-AlphaFunctions.cpp
         utc-Dali-AngleAxis.cpp
@@ -18,7 +17,6 @@ SET(TC_SOURCES
         utc-Dali-BufferImage.cpp
         utc-Dali-CameraActor.cpp
         utc-Dali-Character.cpp
-        utc-Dali-Constraint.cpp
         utc-Dali-Context.cpp
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp

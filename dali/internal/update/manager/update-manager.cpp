@@ -179,7 +179,6 @@ struct UpdateManager::Impl
     dynamicsChanged( false ),
     keepRenderingSeconds( 0.0f ),
     animationFinishedDuringUpdate( false ),
-    activeConstraints( 0 ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
     previousUpdateScene( false ),
     frameCounter( 0 ),
@@ -278,7 +277,6 @@ struct UpdateManager::Impl
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
 
-  unsigned int                        activeConstraints;             ///< number of active constraints from previous frame
   int                                 nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
   bool                                previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
 
@@ -847,8 +845,6 @@ void UpdateManager::ApplyConstraints()
 {
   PERF_MONITOR_START(PerformanceMonitor::APPLY_CONSTRAINTS);
 
-  mImpl->activeConstraints = 0;
-
   // constrain custom objects... (in construction order)
   OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
 
@@ -856,18 +852,18 @@ void UpdateManager::ApplyConstraints()
   for ( OwnerContainer< PropertyOwner* >::Iterator iter = customObjects.Begin(); endIter != iter; ++iter )
   {
     PropertyOwner& object = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( object, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    ConstrainPropertyOwner( object, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   // constrain nodes... (in Depth First traversal order)
   if ( mImpl->root )
   {
-    mImpl->activeConstraints += ConstrainNodes( *(mImpl->root), mSceneGraphBuffers.GetUpdateBufferIndex() );
+    ConstrainNodes( *(mImpl->root), mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   if ( mImpl->systemLevelRoot )
   {
-    mImpl->activeConstraints += ConstrainNodes( *(mImpl->systemLevelRoot), mSceneGraphBuffers.GetUpdateBufferIndex() );
+    ConstrainNodes( *(mImpl->systemLevelRoot), mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   // constrain other property-owners after nodes as they are more likely to depend on a node's
@@ -885,7 +881,7 @@ void UpdateManager::ApplyConstraints()
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter )
   {
     RenderTask& task = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( task, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    ConstrainPropertyOwner( task, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   // Constrain render-tasks
@@ -894,7 +890,7 @@ void UpdateManager::ApplyConstraints()
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(); iter != tasks.End(); ++iter )
   {
     RenderTask& task = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( task, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    ConstrainPropertyOwner( task, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   // constrain meshes (in construction order)
@@ -902,7 +898,7 @@ void UpdateManager::ApplyConstraints()
   for ( AnimatableMeshIter iter = meshes.Begin(); iter != meshes.End(); ++iter )
   {
     AnimatableMesh& mesh = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( mesh, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    ConstrainPropertyOwner( mesh, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   // constrain shaders... (in construction order)
@@ -911,7 +907,7 @@ void UpdateManager::ApplyConstraints()
   for ( ShaderIter iter = shaders.Begin(); iter != shaders.End(); ++iter )
   {
     Shader& shader = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( shader, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    ConstrainPropertyOwner( shader, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   PERF_MONITOR_END(PerformanceMonitor::APPLY_CONSTRAINTS);
@@ -1017,7 +1013,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   const bool gestureUpdated = ProcessGestures( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
   const bool updateScene =                                            // The scene-graph requires an update if..
-      mImpl->activeConstraints != 0 ||                                // ..constraints were active in previous frame OR
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||              // ..nodes were dirty in previous frame OR
       IsAnimationRunning() ||                                         // ..at least one animation is running OR
       mImpl->dynamicsChanged ||                                       // ..there was a change in the dynamics simulation OR
