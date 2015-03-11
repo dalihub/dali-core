@@ -8,6 +8,7 @@ public_api_src_files = \
   $(public_api_src_dir)/actors/custom-actor-impl.cpp \
   $(public_api_src_dir)/actors/image-actor.cpp \
   $(public_api_src_dir)/actors/layer.cpp \
+  $(public_api_src_dir)/actors/renderer.cpp \
   $(public_api_src_dir)/actors/text-actor.cpp \
   $(public_api_src_dir)/actors/renderable-actor.cpp \
   $(public_api_src_dir)/animation/active-constraint.cpp \
@@ -48,6 +49,7 @@ public_api_src_files = \
   $(public_api_src_dir)/events/tap-gesture-detector.cpp \
   $(public_api_src_dir)/events/touch-point.cpp \
   $(public_api_src_dir)/events/touch-event.cpp \
+  $(public_api_src_dir)/geometry/geometry.cpp \
   $(public_api_src_dir)/geometry/spline.cpp \
   $(public_api_src_dir)/images/atlas.cpp \
   $(public_api_src_dir)/images/distance-field.cpp \
@@ -77,6 +79,7 @@ public_api_src_files = \
   $(public_api_src_dir)/object/base-object.cpp \
   $(public_api_src_dir)/object/object-registry.cpp \
   $(public_api_src_dir)/object/property.cpp \
+  $(public_api_src_dir)/object/property-buffer.cpp \
   $(public_api_src_dir)/object/property-conditions.cpp \
   $(public_api_src_dir)/object/property-input.cpp \
   $(public_api_src_dir)/object/property-map.cpp \
@@ -86,6 +89,9 @@ public_api_src_files = \
   $(public_api_src_dir)/object/ref-object.cpp \
   $(public_api_src_dir)/render-tasks/render-task.cpp \
   $(public_api_src_dir)/render-tasks/render-task-list.cpp \
+  $(public_api_src_dir)/shader-effects/material.cpp \
+  $(public_api_src_dir)/shader-effects/sampler.cpp \
+  $(public_api_src_dir)/shader-effects/shader.cpp \
   $(public_api_src_dir)/shader-effects/shader-effect.cpp \
   $(public_api_src_dir)/scripting/scripting.cpp \
   $(public_api_src_dir)/signals/callback.cpp \
