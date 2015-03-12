@@ -129,7 +129,7 @@ private:
    * Set the uniforms from properties according to the uniform map
    * @param[in] program The shader program on which to set the uniforms.
    */
-  void SetUniforms( Program& program );
+  void SetUniforms( BufferIndex bufferIndex, Program& program );
 
   /**
    * Bind the material textures in the samplers and setup the samplers

@@ -27,6 +27,8 @@ namespace Dali
 Renderer Renderer::New( Geometry& geometry, Material& material )
 {
   Internal::RendererPtr renderer = Internal::Renderer::New(  );
+  renderer->SetGeometry( GetImplementation(geometry) );
+  renderer->SetMaterial( GetImplementation(material) );
   return Renderer( renderer.Get() );
 }
 

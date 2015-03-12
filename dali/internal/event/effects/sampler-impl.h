@@ -31,6 +31,10 @@ namespace Dali
 {
 namespace Internal
 {
+namespace SceneGraph
+{
+class Sampler;
+}
 
 class Sampler;
 typedef IntrusivePtr<Sampler> SamplerPtr;
@@ -47,7 +51,7 @@ public:
    * Create a new Sampler.
    * @return A smart-pointer to the newly allocated Sampler.
    */
-  static SamplerPtr New();
+  static SamplerPtr New( const std::string& textureUnitUniformName );
 
   /**
    * @copydoc Dali::Sampler::SetUniformName()
@@ -175,9 +179,16 @@ public: // Functions from Connectable
 private:
   Sampler();
 
+  /**
+   * Second stage initialization
+   */
+  void Initialize( const std::string& textureUnitUniformName );
+
+
 private: // data
   //TODO: MESH_REWORK : change to ObjectConnector
   ImageConnector mImageConnector;
+  SceneGraph::Sampler* mSceneObject;
 };
 
 } // namespace Internal

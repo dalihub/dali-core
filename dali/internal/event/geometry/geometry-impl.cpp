@@ -21,7 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -47,7 +48,9 @@ const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> GEOMETRY_IMPL = { DEFAULT_PROPERT
 
 GeometryPtr Geometry::New()
 {
-  return GeometryPtr( new Geometry() );
+  GeometryPtr geometry( new Geometry() );
+  geometry->Initialize();
+  return geometry;
 }
 
 std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
@@ -213,9 +216,19 @@ void Geometry::Disconnect()
 }
 
 Geometry::Geometry()
+: mSceneObject( NULL )
 {
 }
 
+void Geometry::Initialize()
+{
+  StagePtr stage = Stage::GetCurrent();
+  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+
+  mSceneObject = new SceneGraph::Geometry();
+  SceneGraph::AddMessage( stage->GetUpdateManager(), stage->GetUpdateManager().GetGeometryOwner(), *mSceneObject );
+}
+
+
 } // namespace Internal
 } // namespace Dali
-

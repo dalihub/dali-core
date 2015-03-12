@@ -22,7 +22,9 @@
 #include <dali/public-api/shader-effects/material.h> // Dali::Internal::Material
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/update/effects/scene-graph-sampler.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -53,12 +55,20 @@ const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> MATERIAL_IMPL = { DEFAULT_PROPERT
 
 MaterialPtr Material::New()
 {
-  return MaterialPtr( new Material() );
+  MaterialPtr material( new Material() );
+  material->Initialize();
+  return material;
 }
 
 void Material::SetShader( Shader& shader )
 {
+  DALI_ASSERT_DEBUG( mSceneObject )
   mShaderConnector.Set( shader, OnStage() );
+
+  StagePtr stage = Stage::GetCurrent();
+
+  const SceneGraph::Shader& sceneGraphShader = dynamic_cast<const SceneGraph::Shader&>( *shader.GetSceneObject() );
+  SceneGraph::SetShaderMessage( stage->GetUpdateInterface(), *mSceneObject, sceneGraphShader );
 }
 
 void Material::AddSampler( Sampler& sampler )
@@ -66,6 +76,11 @@ void Material::AddSampler( Sampler& sampler )
   SamplerConnector connector;
   connector.Set( sampler, OnStage() );
   mSamplerConnectors.push_back( connector );
+
+  StagePtr stage = Stage::GetCurrent();
+
+  const SceneGraph::Sampler& sceneGraphSampler = dynamic_cast<const SceneGraph::Sampler&>( *sampler.GetSceneObject() );
+  SceneGraph::AddSamplerMessage( stage->GetUpdateInterface(), *mSceneObject, sceneGraphSampler );
 }
 
 std::size_t Material::GetNumberOfSamplers() const
@@ -267,9 +282,18 @@ void Material::Disconnect()
 }
 
 Material::Material()
+: mSceneObject( NULL )
 {
+}
+
+void Material::Initialize()
+{
+  StagePtr stage = Stage::GetCurrent();
+  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+
+  mSceneObject = new SceneGraph::Material();
+  AddMessage( stage->GetUpdateManager(), stage->GetUpdateManager().GetMaterialOwner(), *mSceneObject );
 }
 
 } // namespace Internal
 } // namespace Dali
-

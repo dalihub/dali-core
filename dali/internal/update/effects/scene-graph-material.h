@@ -53,13 +53,13 @@ public:
    * Set the shader effect for this material
    * @param[in] shader The shader effect to use
    */
-  void SetShader( Shader* shader );
+  void SetShader( const Shader* shader );
 
   /**
    * Get the shader effect of this material
    * @return the shader effect;
    */
-  Shader* GetShader();
+  const Shader* GetShader() const;
 
   /**
    * Add a sampler (image + sampler modes) to the material
@@ -80,8 +80,8 @@ public:
   virtual const Samplers& GetSamplers() const;
 
 private:
-  Shader* mShader;
-  Samplers mSamplers; // Not owned ( @todo MESH_REWORK though who does?)
+  const Shader* mShader;
+  Samplers mSamplers; // Not owned
 
   AnimatableProperty<Vector4> mColor;
 
@@ -89,9 +89,9 @@ private:
   // Add getters/setters?
 };
 
-inline void SetShaderMessage( EventToUpdate& eventToUpdate, const Material& material, Shader& shader )
+inline void SetShaderMessage( EventToUpdate& eventToUpdate, const Material& material, const Shader& shader )
 {
-  typedef MessageValue1< Material, Shader* > LocalType;
+  typedef MessageValue1< Material, const Shader* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );

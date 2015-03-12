@@ -267,10 +267,10 @@ struct UpdateManager::Impl
   AnimationContainer                  animations;                    ///< A container of owned animations
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
 
-  ObjectOwnerContainer<Geometry*>     geometries;                    ///< A container of geometries
-  ObjectOwnerContainer<Material*>     materials;                     ///< A container of materials
-  ObjectOwnerContainer<Sampler*>      samplers;                      ///< A container of samplers
-  ObjectOwnerContainer<PropertyBuffer*> propertyBuffers;             ///< A container of property buffers
+  ObjectOwnerContainer<Geometry>      geometries;                    ///< A container of geometries
+  ObjectOwnerContainer<Material>      materials;                     ///< A container of materials
+  ObjectOwnerContainer<Sampler>       samplers;                      ///< A container of samplers
+  ObjectOwnerContainer<PropertyBuffer> propertyBuffers;             ///< A container of property buffers
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
@@ -533,22 +533,22 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
   propertyNotification->SetNotifyMode( notifyMode );
 }
 
-ObjectOwnerContainer<Geometry*>& UpdateManager::GetGeometryOwner()
+ObjectOwnerContainer<Geometry>& UpdateManager::GetGeometryOwner()
 {
   return mImpl->geometries;
 }
 
-ObjectOwnerContainer<Material*>& UpdateManager::GetMaterialOwner()
+ObjectOwnerContainer<Material>& UpdateManager::GetMaterialOwner()
 {
   return mImpl->materials;
 }
 
-ObjectOwnerContainer<Sampler*>& UpdateManager::GetSamplerOwner()
+ObjectOwnerContainer<Sampler>& UpdateManager::GetSamplerOwner()
 {
   return mImpl->samplers;
 }
 
-ObjectOwnerContainer<PropertyBuffer*>& UpdateManager::GetPropertyBufferOwner()
+ObjectOwnerContainer<PropertyBuffer>& UpdateManager::GetPropertyBufferOwner()
 {
   return mImpl->propertyBuffers;
 }

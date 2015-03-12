@@ -25,11 +25,16 @@
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
+#include <dali/internal/event/resources/resource-ticket.h> // Dali::Internal::ResourceTicketPtr
 
 namespace Dali
 {
 namespace Internal
 {
+namespace SceneGraph
+{
+class Shader;
+}
 
 class Shader;
 typedef IntrusivePtr<Shader> ShaderPtr;
@@ -150,10 +155,18 @@ public: // Functions from Connectable
 private: // implementation
   Shader();
 
+  /**
+   * Second stage initialization
+   */
+  void Initialize( const std::string& vertexShader, const std::string& fragmentShader );
+
 private: // unimplemented methods
   Shader( const Shader& );
   Shader& operator=( const Shader& );
 
+private:
+  SceneGraph::Shader* mSceneObject;
+  ResourceTicketPtr mTicket;
 };
 
 } // namespace Internal

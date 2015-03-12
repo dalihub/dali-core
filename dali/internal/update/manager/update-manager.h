@@ -272,28 +272,28 @@ public:
    *
    * @return The geometry owner
    */
-  ObjectOwnerContainer<Geometry*>& GetGeometryOwner();
+  ObjectOwnerContainer< Geometry >& GetGeometryOwner();
 
   /**
    * @brief Get the material owner
    *
    * @return The material owner
    */
-  ObjectOwnerContainer<Material*>& GetMaterialOwner();
+  ObjectOwnerContainer< Material >& GetMaterialOwner();
 
   /**
    * @brief Get the sampler owner
    *
    * @return The sampler owner
    */
-  ObjectOwnerContainer<Sampler*>& GetSamplerOwner();
+  ObjectOwnerContainer< Sampler >& GetSamplerOwner();
 
   /**
    * @brief Get the property buffer owner
    *
    * @return The property buffer owner
    */
-  ObjectOwnerContainer<PropertyBuffer*>& GetPropertyBufferOwner();
+  ObjectOwnerContainer< PropertyBuffer >& GetPropertyBufferOwner();
 
 
   // Shaders

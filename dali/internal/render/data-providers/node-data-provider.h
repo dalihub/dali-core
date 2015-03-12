@@ -52,8 +52,13 @@ public:
    */
   virtual const Vector4& GetRenderColor( unsigned int bufferId ) = 0;
 
-protected:
+  /**
+   * @param[in] bufferIndex The buffer index to use
+   * @return the actor size
+   */
+  virtual const Vector3& GetRenderSize( unsigned int bufferIndex ) = 0;
 
+protected:
   /**
    * Virtual destructor, this is an interface, no deletion through this interface
    */

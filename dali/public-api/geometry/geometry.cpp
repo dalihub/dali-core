@@ -26,8 +26,8 @@ namespace Dali
 
 Geometry Geometry::New()
 {
-  Internal::GeometryPtr renderer = Internal::Geometry::New();
-  return Geometry( renderer.Get() );
+  Internal::GeometryPtr geometry = Internal::Geometry::New();
+  return Geometry( geometry.Get() );
 }
 
 Geometry::Geometry()

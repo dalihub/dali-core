@@ -24,10 +24,10 @@
 namespace Dali
 {
 
-Sampler Sampler::New( Image& image, const std::string& uniformName )
+Sampler Sampler::New( Image& image, const std::string& textureUnitUniformName )
 {
-  //TODO: MESH_REWORK
-  Internal::SamplerPtr sampler = Internal::Sampler::New();
+  Internal::SamplerPtr sampler = Internal::Sampler::New(textureUnitUniformName);
+  sampler->SetImage( GetImplementation( image ) );
   return Sampler( sampler.Get() );
 }
 
@@ -81,4 +81,3 @@ Sampler::Sampler(Internal::Sampler* pointer)
 }
 
 } //namespace Dali
-

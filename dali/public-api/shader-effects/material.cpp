@@ -30,6 +30,8 @@ Material Material::New( Shader shader )
 {
   // TODO: MESH_REWORK
   Internal::MaterialPtr material = Internal::Material::New();
+  material->SetShader( GetImplementation(shader) );
+
   return Material( material.Get() );
 }
 

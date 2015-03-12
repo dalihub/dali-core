@@ -174,4 +174,3 @@ Renderer::Renderer()
 
 } // namespace Internal
 } // namespace Dali
-

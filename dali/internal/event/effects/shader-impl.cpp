@@ -19,10 +19,16 @@
 #include <dali/internal/event/effects/shader-impl.h> // Dali::Internal::Shader
 
 // INTERNAL INCLUDES
-#include <dali/public-api/shader-effects/shader.h> // Dali::Internal::Shader
+#include <dali/public-api/shader-effects/shader.h> // Dali::Shader
+#include <dali/public-api/shader-effects/shader-effect.h> // Dali::ShaderEffect::GeometryHints // TODO: MESH_REWORK REMOVE
+
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/effects/shader-factory.h>
+#include <dali/internal/event/resources/resource-ticket.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -50,7 +56,9 @@ ShaderPtr Shader::New( const std::string& vertexShader,
 {
   //TODO: MESH_REWORK
   DALI_ASSERT_ALWAYS(false && "MESH REWORK");
-  return ShaderPtr( new Shader() );
+  ShaderPtr shader( new Shader() );
+  shader->Initialize( vertexShader, fragmentShader );
+  return shader;
 }
 
 unsigned int Shader::GetDefaultPropertyCount() const
@@ -155,6 +163,28 @@ Shader::Shader()
 {
 }
 
+void Shader::Initialize( const std::string& vertexSource, const std::string& fragmentSource )
+{
+  StagePtr stage = Stage::GetCurrent();
+  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+
+  Dali::ShaderEffect::GeometryHints hint = Dali::ShaderEffect::HINT_NONE;
+  mSceneObject = new SceneGraph::Shader(hint);
+
+  // Add to update manager
+  SceneGraph::UpdateManager& updateManager = stage->GetUpdateManager();
+  AddShaderMessage( updateManager, *mSceneObject );
+
+  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+  ShaderFactory& shaderFactory = tls.GetShaderFactory();
+  size_t shaderHash;
+
+  mTicket = ResourceTicketPtr( shaderFactory.Load(vertexSource, fragmentSource, shaderHash) );
+
+  // Add shader program to scene-object using a message to the UpdateManager
+  SetShaderProgramMessage( updateManager, *mSceneObject, GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, mTicket->GetId(), shaderHash, false );
+
+}
+
 } // namespace Internal
 } // namespace Dali
-

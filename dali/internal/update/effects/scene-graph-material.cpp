@@ -38,12 +38,12 @@ Material::~Material()
 {
 }
 
-void Material::SetShader( Shader* shader )
+void Material::SetShader( const Shader* shader )
 {
   mShader = shader;
 }
 
-Shader* Material::GetShader()
+const Shader* Material::GetShader() const
 {
   return mShader;
 }

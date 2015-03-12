@@ -61,9 +61,8 @@ public:
    * it can be read through the data provider interface in the render thread )
    * @param[in] bufferIndex The buffer index to use
    * @param[in] textureId The identity of the texture
-   * @param[in] bitmapMetadata The metadata for the texture
    */
-  void SetTexture( BufferIndex bufferIndex, Integration::ResourceId textureId, const BitmapMetadata& bitmapMetadata );
+  void SetTexture( BufferIndex bufferIndex, Integration::ResourceId textureId );
 
   /**
    * Set the filter modes for minify and magnify filters
@@ -156,57 +155,61 @@ private:
   DoubleBuffered<bool>     mAffectsTransparency; ///< If this sampler affects renderer transparency
 };
 
-inline void SetUniformNameMessage( EventToUpdate& eventToUpdate, const Sampler& sampler, const std::string& name )
+} // namespace SceneGraph
+
+inline void SetUnitNameMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, const std::string& name )
 {
-  typedef MessageValue1< Sampler, std::string > LocalType;
+  typedef MessageValue1< SceneGraph::Sampler, std::string > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &sampler, &Sampler::SetUnitName, name );
+  new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetUnitName, name );
 }
 
-} // namespace SceneGraph
+
+inline void SetTextureMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, unsigned int resourceId )
+{
+  typedef MessageDoubleBuffered1< SceneGraph::Sampler, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetTexture, resourceId );
+}
 
 // Declare enum as a message parameter type outside the SceneGraph namespace
 template <> struct ParameterType< SceneGraph::Sampler::FilterMode > : public BasicType< SceneGraph::Sampler::FilterMode > {};
 
-namespace SceneGraph
-{
 
-inline void SetFilterModeMessage( EventToUpdate& eventToUpdate, const Sampler& sampler, Sampler::FilterMode minFilter, Sampler::FilterMode magFilter )
+inline void SetFilterModeMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, SceneGraph::Sampler::FilterMode minFilter, SceneGraph::Sampler::FilterMode magFilter )
 {
-  typedef MessageDoubleBuffered2< Sampler, Sampler::FilterMode, Sampler::FilterMode > LocalType;
+  typedef MessageDoubleBuffered2< SceneGraph::Sampler, SceneGraph::Sampler::FilterMode, SceneGraph::Sampler::FilterMode > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &sampler, &Sampler::SetFilterMode, minFilter, magFilter );
+  new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetFilterMode, minFilter, magFilter );
 }
-
-} // namespace SceneGraph
 
 // Declare enum as a message parameter type
 template <> struct ParameterType< SceneGraph::Sampler::WrapMode > : public BasicType< SceneGraph::Sampler::WrapMode > {};
 
-namespace SceneGraph
-{
 
 inline void SetWrapModeMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, SceneGraph::Sampler::WrapMode horizontalWrap, SceneGraph::Sampler::WrapMode verticalWrap )
 {
-  typedef MessageDoubleBuffered2< Sampler, Sampler::WrapMode, Sampler::WrapMode > LocalType;
+  typedef MessageDoubleBuffered2< SceneGraph::Sampler, SceneGraph::Sampler::WrapMode, SceneGraph::Sampler::WrapMode > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &sampler, &Sampler::SetWrapMode, horizontalWrap, verticalWrap );
+  new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetWrapMode, horizontalWrap, verticalWrap );
 }
 
-
-} // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali
 

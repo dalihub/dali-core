@@ -47,10 +47,13 @@ void Sampler::SetUnitName( const std::string& unitName )
   mUnitName = unitName;
 }
 
-void Sampler::SetTexture( BufferIndex bufferIndex, Integration::ResourceId textureId, const BitmapMetadata& metadata )
+void Sampler::SetTexture( BufferIndex bufferIndex, Integration::ResourceId textureId )
 {
   mTextureId[bufferIndex] = textureId;
-  mBitmapMetadata[bufferIndex] = metadata;
+
+  // @todo MESH_REWORK
+  //const BitmapMetadata& metadata  - get it from ResourceManager
+  //mBitmapMetadata[bufferIndex] = metadata;
 }
 
 void Sampler::SetFilterMode( BufferIndex bufferIndex, FilterMode minFilter, FilterMode magFilter )

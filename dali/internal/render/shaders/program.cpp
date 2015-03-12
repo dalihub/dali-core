@@ -114,7 +114,8 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
   "uShadowSmoothing",     // UNIFORM_SHADOW_SMOOTHING
   "uGradientColor",       // UNIFORM_GRADIENT_COLOR
   "uGradientLine",        // UNIFORM_GRADIENT_LINE
-  "uInvTextSize"          // UNIFORM_INVERSE_TEXT_SIZE
+  "uInvTextSize",         // UNIFORM_INVERSE_TEXT_SIZE
+  "uSize"                 // UNIFORM_SIZE
 };
 
 }  // <unnamed> namespace

@@ -34,6 +34,10 @@ namespace Dali
 {
 namespace Internal
 {
+namespace SceneGraph
+{
+class Geometry;
+}
 
 class Geometry;
 typedef IntrusivePtr<Geometry> GeometryPtr;
@@ -193,6 +197,11 @@ public: // Functions from Connectable
 private: // implementation
   Geometry();
 
+  /**
+   * Second stage initialization of the Geometry
+   */
+  void Initialize();
+
 private: // unimplemented methods
   Geometry( const Geometry& );
   Geometry& operator=( const Geometry& );
@@ -202,6 +211,7 @@ private: // data
   typedef std::vector< PropertyBufferConnector > PropertyBufferConnectorContainer;
   PropertyBufferConnectorContainer mVertexBufferConnectors; ///< Vector of connectors that hold the property buffers used by this geometry
   PropertyBufferConnector mIndexBufferConnector;            ///< Connector that holds the index buffer used by this geometry
+  SceneGraph::Geometry* mSceneObject;
 };
 
 } // namespace Internal

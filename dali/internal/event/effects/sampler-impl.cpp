@@ -22,7 +22,9 @@
 #include <dali/public-api/shader-effects/sampler.h> // Dali::Internal::Sampler
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/update/effects/scene-graph-sampler.h> // Dali::Internal::SceneGraph::Sampler
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -47,21 +49,30 @@ const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SAMPLER_IMPL = { DEFAULT_PROPERTY
 
 } // unnamed namespace
 
-SamplerPtr Sampler::New()
+SamplerPtr Sampler::New( const std::string& textureUnitUniformName )
 {
-  return SamplerPtr( new Sampler() );
+  SamplerPtr sampler( new Sampler() );
+  sampler->Initialize( textureUnitUniformName );
+  return sampler;
 }
 
 void Sampler::SetUniformName( const std::string& name )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+// TODO: MESH_REWORK - change method to SetUnitName (or SetTextureUnitUniformName)
+  StagePtr stage = Stage::GetCurrent();
+  SetUnitNameMessage( stage->GetUpdateInterface(), *mSceneObject, name);
 }
 
 void Sampler::SetImage( Image& image )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  // TODO: MESH_REWORK - should probably review this comment
+
+  StagePtr stage = Stage::GetCurrent();
+
+  unsigned int resourceId = image.GetResourceId();
+
+  // sceneObject is being used in a separate thread; queue a message to set
+  SetTextureMessage( stage->GetUpdateInterface(), *mSceneObject, resourceId );
 }
 
 void Sampler::SetFilterMode( Dali::Sampler::FilterMode minFilter, Dali::Sampler::FilterMode magFilter )
@@ -183,9 +194,19 @@ void Sampler::Disconnect()
 }
 
 Sampler::Sampler()
+: mSceneObject( NULL )
 {
 }
 
+void Sampler::Initialize( const std::string& textureUnitUniformName )
+{
+  StagePtr stage = Stage::GetCurrent();
+  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+
+  mSceneObject = new SceneGraph::Sampler( textureUnitUniformName );
+  AddMessage( stage->GetUpdateManager(), stage->GetUpdateManager().GetSamplerOwner(), *mSceneObject );
+}
+
+
 } // namespace Internal
 } // namespace Dali
-

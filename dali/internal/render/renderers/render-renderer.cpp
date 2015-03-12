@@ -19,6 +19,7 @@
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/render/data-providers/geometry-data-provider.h>
 #include <dali/internal/render/data-providers/material-data-provider.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/sampler-data-provider.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
@@ -102,7 +103,7 @@ void NewRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Mat
 {
   BindTextures( bufferIndex, program, mMaterialDataProvider->GetSamplers() );
 
-  SetUniforms( program );
+  SetUniforms( bufferIndex, program );
 
   mRenderGeometry.UploadAndDraw( mContext, program, bufferIndex, *mGeometryDataProvider );
 }
@@ -116,9 +117,17 @@ void NewRenderer::GlCleanup()
 {
 }
 
-void NewRenderer::SetUniforms( Program& program )
+void NewRenderer::SetUniforms( BufferIndex bufferIndex, Program& program )
 {
   // @todo MESH_REWORK Implement uniform map
+
+  // @todo Base class is currently setting MVP, Color etc.
+  GLint sizeLoc = program.GetUniformLocation( Program::UNIFORM_SIZE );
+  if( -1 != sizeLoc )
+  {
+    Vector3 size = mDataProvider.GetRenderSize( bufferIndex );
+    program.SetUniform3f( sizeLoc, size.x, size.y, size.z );
+  }
 }
 
 void NewRenderer::BindTextures(

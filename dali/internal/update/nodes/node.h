@@ -999,6 +999,12 @@ private: // from NodeDataProvider
     return GetWorldColor( bufferId );
   }
 
+  virtual const Vector3& GetRenderSize( unsigned int bufferId )
+  {
+    return GetSize( bufferId );
+  }
+
+
 private:
 
   // Undefined

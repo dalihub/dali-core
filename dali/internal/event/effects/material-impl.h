@@ -36,6 +36,11 @@ namespace Dali
 {
 namespace Internal
 {
+namespace SceneGraph
+{
+class Material;
+}
+
 
 class Material;
 typedef IntrusivePtr<Material> MaterialPtr;
@@ -231,6 +236,11 @@ public: // Functions from Connectable
 private: // implementation
   Material();
 
+  /**
+   * Second stage initialization
+   */
+  void Initialize();
+
 private: // unimplemented methods
   Material( const Material& );
   Material& operator=( const Material& );
@@ -243,6 +253,7 @@ private: //data
   typedef std::vector< SamplerConnector > SamplerConnectorContainer;
   SamplerConnectorContainer mSamplerConnectors; ///< Vector of connectors that hold the samplers used by this material
 
+  SceneGraph::Material* mSceneObject;
 };
 
 } // namespace Internal
