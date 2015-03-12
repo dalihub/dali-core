@@ -31,16 +31,12 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
+#include <dali/internal/update/manager/object-owner-container.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 
 #include <dali/internal/render/shaders/scene-graph-shader.h>
-
-//@todo MESH_REWORK Move messages to a separate file to avoid having dependent headers
-// pollute core & slow the build down.
-#include <dali/internal/update/geometry/scene-graph-geometry.h>
-#include <dali/internal/update/effects/scene-graph-material.h>
 
 
 namespace Dali
@@ -80,6 +76,10 @@ class RenderTaskList;
 class RenderQueue;
 class DynamicsWorld;
 class TextureCache;
+class Geometry;
+class PropertyBuffer;
+class Material;
+class Sampler;
 
 /**
  * UpdateManager holds a scene graph i.e. a tree of nodes.
@@ -267,30 +267,34 @@ public:
    */
   void PropertyNotificationSetNotify( PropertyNotification* propertyNotification, PropertyNotification::NotifyMode notifyMode );
 
+  /**
+   * @brief Get the geometry owner
+   *
+   * @return The geometry owner
+   */
+  ObjectOwnerContainer<Geometry*>& GetGeometryOwner();
 
   /**
-   * Add a geometry to the scene graph
-   * @param[in] geometry The geometry to add
+   * @brief Get the material owner
+   *
+   * @return The material owner
    */
-  void AddGeometry( Geometry* geometry );
+  ObjectOwnerContainer<Material*>& GetMaterialOwner();
 
   /**
-   * Remove a geometry from the scene graph
-   * @param[in] geometry The geometry to remove
+   * @brief Get the sampler owner
+   *
+   * @return The sampler owner
    */
-  void RemoveGeometry( Geometry* geometry );
+  ObjectOwnerContainer<Sampler*>& GetSamplerOwner();
 
   /**
-   * Add a material to the scene graph
-   * @param[in] material The material to add
+   * @brief Get the property buffer owner
+   *
+   * @return The property buffer owner
    */
-  void AddMaterial( Material* material );
+  ObjectOwnerContainer<PropertyBuffer*>& GetPropertyBufferOwner();
 
-  /**
-   * Remove a material from the scene graph
-   * @param[in] material The material to remove
-   */
-  void RemoveMaterial( Material* material );
 
   // Shaders
 
@@ -655,51 +659,6 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
   new (slot) LocalType( &manager, &UpdateManager::PropertyNotificationSetNotify, propertyNotification, notifyMode );
 }
 
-inline void AddGeometryMessage( UpdateManager& manager, Geometry& geometry )
-{
-  typedef MessageValue1< UpdateManager, OwnerPointer< Geometry > > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddGeometry, &geometry );
-}
-
-// The render thread can safely change the Geometry
-inline void RemoveGeometryMessage( UpdateManager& manager, Geometry& geometry )
-{
-  typedef MessageValue1< UpdateManager, Geometry* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveGeometry, &geometry );
-}
-
-inline void AddMaterialMessage( UpdateManager& manager, Material& material )
-{
-  typedef MessageValue1< UpdateManager, OwnerPointer< Material > > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddMaterial, &material );
-}
-
-// The render thread can safely change the Material
-inline void RemoveMaterialMessage( UpdateManager& manager, Material& material )
-{
-  typedef MessageValue1< UpdateManager, Material* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveMaterial, &material );
-}
 
 
 // The render thread can safely change the Shader
@@ -841,6 +800,29 @@ inline void TerminateDynamicsWorldMessage(UpdateManager& manager)
 }
 
 #endif // DYNAMICS_SUPPORT
+
+
+template< typename T >
+inline void AddMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
+{
+  typedef MessageValue1< ObjectOwnerContainer<T>, OwnerPointer< T > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Add, &object );
+}
+
+template< typename T >
+inline void RemoveMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
+{
+  typedef MessageValue1< ObjectOwnerContainer<T>, OwnerPointer< T > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Remove, &object );
+}
 
 } // namespace SceneGraph
 

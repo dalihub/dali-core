@@ -19,6 +19,7 @@
 
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/update/common/property-owner.h>
 
 namespace Dali
 {
@@ -27,7 +28,7 @@ namespace Internal
 namespace SceneGraph
 {
 
-class PropertyBuffer
+class PropertyBuffer : public PropertyOwner
 {
 public:
   //@todo MESH_REWORK Remove when we have working property buffers

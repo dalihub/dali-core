@@ -63,7 +63,7 @@ void Sampler::SetWrapMode( BufferIndex bufferIndex, WrapMode uWrap, WrapMode vWr
 {
 }
 
-const std::string& Sampler::GetUnitName()
+const std::string& Sampler::GetUnitName() const
 {
   return mUnitName;
 }

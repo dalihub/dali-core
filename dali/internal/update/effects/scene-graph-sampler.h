@@ -98,7 +98,7 @@ public: // SamplerDataProvider interface - called from RenderThread
    * Get the texture unit uniform name
    * @return the name of the texture unit uniform
    */
-  virtual const std::string& GetUnitName();
+  virtual const std::string& GetUnitName() const;
 
   /**
    * Get the texture ID

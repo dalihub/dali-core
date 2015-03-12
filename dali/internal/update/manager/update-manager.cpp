@@ -39,11 +39,14 @@
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/internal/update/common/scene-graph-property-buffer.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller-impl.h>
 #include <dali/internal/update/effects/scene-graph-material.h>
+#include <dali/internal/update/effects/scene-graph-sampler.h>
 #include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/gestures/scene-graph-pan-gesture.h>
+#include <dali/internal/update/manager/object-owner-container.h>
 #include <dali/internal/update/manager/prepare-render-algorithms.h>
 #include <dali/internal/update/manager/process-render-tasks.h>
 #include <dali/internal/update/manager/sorted-layers.h>
@@ -126,14 +129,6 @@ void DestroyNodeSet( std::set<Node*>& nodeSet )
 
 } //namespace
 
-typedef OwnerContainer< Geometry* >            GeometryContainer;
-typedef GeometryContainer::Iterator            GeometryIter;
-typedef GeometryContainer::ConstIterator       GeometryConstIter;
-
-typedef OwnerContainer< Material* >            MaterialContainer;
-typedef MaterialContainer::Iterator            MaterialIter;
-typedef MaterialContainer::ConstIterator       MaterialConstIter;
-
 typedef OwnerContainer< Shader* >              ShaderContainer;
 typedef ShaderContainer::Iterator              ShaderIter;
 typedef ShaderContainer::ConstIterator         ShaderConstIter;
@@ -179,6 +174,10 @@ struct UpdateManager::Impl
     systemLevelTaskList ( completeStatusManager ),
     root( NULL ),
     systemLevelRoot( NULL ),
+    geometries( sceneGraphBuffers, discardQueue ),
+    materials( sceneGraphBuffers, discardQueue ),
+    samplers( sceneGraphBuffers, discardQueue ),
+    propertyBuffers( sceneGraphBuffers, discardQueue ),
     messageQueue( renderController, sceneGraphBuffers ),
     dynamicsChanged( false ),
     keepRenderingSeconds( 0.0f ),
@@ -268,8 +267,10 @@ struct UpdateManager::Impl
   AnimationContainer                  animations;                    ///< A container of owned animations
   PropertyNotificationContainer       propertyNotifications;         ///< A container of owner property notifications.
 
-  GeometryContainer                   geometries;                    ///< A container of geometries
-  MaterialContainer                   materials;                     ///< A container of materials
+  ObjectOwnerContainer<Geometry*>     geometries;                    ///< A container of geometries
+  ObjectOwnerContainer<Material*>     materials;                     ///< A container of materials
+  ObjectOwnerContainer<Sampler*>      samplers;                      ///< A container of samplers
+  ObjectOwnerContainer<PropertyBuffer*> propertyBuffers;             ///< A container of property buffers
 
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
@@ -532,66 +533,24 @@ void UpdateManager::PropertyNotificationSetNotify( PropertyNotification* propert
   propertyNotification->SetNotifyMode( notifyMode );
 }
 
-
-void UpdateManager::AddGeometry( Geometry* geometry )
+ObjectOwnerContainer<Geometry*>& UpdateManager::GetGeometryOwner()
 {
-  DALI_ASSERT_DEBUG( NULL != geometry );
-  mImpl->geometries.PushBack( geometry );
+  return mImpl->geometries;
 }
 
-void UpdateManager::RemoveGeometry( Geometry* geometry )
+ObjectOwnerContainer<Material*>& UpdateManager::GetMaterialOwner()
 {
-  DALI_ASSERT_DEBUG(geometry != NULL);
-
-  GeometryContainer& geometries = mImpl->geometries;
-
-  // Find the geometry and destroy it
-  for ( GeometryIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
-  {
-    Geometry& current = **iter;
-    if ( &current == geometry )
-    {
-      // Transfer ownership to the discard queue
-      // This keeps the geometry alive, until the render-thread has finished with it
-      mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), geometries.Release( iter ) );
-
-      return;
-    }
-  }
-
-  // Should not reach here
-  DALI_ASSERT_DEBUG(false);
+  return mImpl->materials;
 }
 
-void UpdateManager::AddMaterial( Material* material )
+ObjectOwnerContainer<Sampler*>& UpdateManager::GetSamplerOwner()
 {
-  DALI_ASSERT_DEBUG( NULL != material );
-
-  mImpl->materials.PushBack( material );
+  return mImpl->samplers;
 }
 
-void UpdateManager::RemoveMaterial( Material* material )
+ObjectOwnerContainer<PropertyBuffer*>& UpdateManager::GetPropertyBufferOwner()
 {
-  DALI_ASSERT_DEBUG(material != NULL);
-
-  MaterialContainer& materials = mImpl->materials;
-
-  // Find the material and destroy it
-  for ( MaterialIter iter = materials.Begin(); iter != materials.End(); ++iter )
-  {
-    Material& current = **iter;
-    if ( &current == material )
-    {
-      // Transfer ownership to the discard queue
-      // This keeps the material alive, until the render-thread has finished with it
-      mImpl->discardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), materials.Release( iter ) );
-
-      materials.Erase(iter);
-      return;
-    }
-  }
-  // Should not reach here
-  DALI_ASSERT_DEBUG(false);
+  return mImpl->propertyBuffers;
 }
 
 void UpdateManager::AddShader( Shader* shader )
@@ -712,6 +671,8 @@ void UpdateManager::ResetProperties()
 {
   PERF_MONITOR_START(PerformanceMonitor::RESET_PROPERTIES);
 
+  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
+
   // Clear the "animations finished" flag; This should be set if any (previously playing) animation is stopped
   mImpl->animationFinishedDuringUpdate = false;
 
@@ -739,7 +700,7 @@ void UpdateManager::ResetProperties()
   for( std::set<Node*>::iterator iter = mImpl->activeDisconnectedNodes.begin(); mImpl->activeDisconnectedNodes.end() != iter; iter = mImpl->activeDisconnectedNodes.begin() )
   {
     Node* node = *iter;
-    node->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+    node->ResetToBaseValues( bufferIndex );
     node->SetActive( false );
 
     // Move everything from activeDisconnectedNodes to disconnectedNodes (no need to reset again)
@@ -752,7 +713,7 @@ void UpdateManager::ResetProperties()
 
   for (RenderTaskList::RenderTaskContainer::ConstIterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter)
   {
-    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+    (*iter)->ResetToBaseValues( bufferIndex );
   }
 
   // Reset render-task list properties to base values.
@@ -760,31 +721,25 @@ void UpdateManager::ResetProperties()
 
   for (RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(); iter != tasks.End(); ++iter)
   {
-    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+    (*iter)->ResetToBaseValues( bufferIndex );
   }
 
   // Reset custom object properties to base values
   for (OwnerContainer<PropertyOwner*>::Iterator iter = mImpl->customObjects.Begin(); iter != mImpl->customObjects.End(); ++iter)
   {
-    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+    (*iter)->ResetToBaseValues( bufferIndex );
   }
 
-  // Reset animatable material properties to base values
-  for (MaterialIter iter = mImpl->materials.Begin(); iter != mImpl->materials.End(); ++iter)
-  {
-    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
-  }
+  mImpl->materials.ResetToBaseValues( bufferIndex );
+  mImpl->geometries.ResetToBaseValues( bufferIndex );
+  mImpl->propertyBuffers.ResetToBaseValues( bufferIndex );
+  mImpl->samplers.ResetToBaseValues( bufferIndex );
 
-  // Reset animatable geometry properties to base values
-  for (GeometryIter iter = mImpl->geometries.Begin(); iter != mImpl->geometries.End(); ++iter)
-  {
-    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
-  }
 
   // Reset animatable shader properties to base values
   for (ShaderIter iter = mImpl->shaders.Begin(); iter != mImpl->shaders.End(); ++iter)
   {
-    (*iter)->ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+    (*iter)->ResetToBaseValues( bufferIndex );
   }
 
   PERF_MONITOR_END(PerformanceMonitor::RESET_PROPERTIES);
@@ -844,6 +799,8 @@ void UpdateManager::ApplyConstraints()
 {
   PERF_MONITOR_START(PerformanceMonitor::APPLY_CONSTRAINTS);
 
+  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
+
   mImpl->activeConstraints = 0;
 
   // constrain custom objects... (in construction order)
@@ -853,18 +810,18 @@ void UpdateManager::ApplyConstraints()
   for ( OwnerContainer< PropertyOwner* >::Iterator iter = customObjects.Begin(); endIter != iter; ++iter )
   {
     PropertyOwner& object = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( object, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    mImpl->activeConstraints += ConstrainPropertyOwner( object, bufferIndex );
   }
 
   // constrain nodes... (in Depth First traversal order)
   if ( mImpl->root )
   {
-    mImpl->activeConstraints += ConstrainNodes( *(mImpl->root), mSceneGraphBuffers.GetUpdateBufferIndex() );
+    mImpl->activeConstraints += ConstrainNodes( *(mImpl->root), bufferIndex );
   }
 
   if ( mImpl->systemLevelRoot )
   {
-    mImpl->activeConstraints += ConstrainNodes( *(mImpl->systemLevelRoot), mSceneGraphBuffers.GetUpdateBufferIndex() );
+    mImpl->activeConstraints += ConstrainNodes( *(mImpl->systemLevelRoot), bufferIndex );
   }
 
   // constrain other property-owners after nodes as they are more likely to depend on a node's
@@ -882,7 +839,7 @@ void UpdateManager::ApplyConstraints()
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter )
   {
     RenderTask& task = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( task, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    mImpl->activeConstraints += ConstrainPropertyOwner( task, bufferIndex );
   }
 
   // Constrain render-tasks
@@ -891,23 +848,14 @@ void UpdateManager::ApplyConstraints()
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(); iter != tasks.End(); ++iter )
   {
     RenderTask& task = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( task, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    mImpl->activeConstraints += ConstrainPropertyOwner( task, bufferIndex );
   }
 
   // Constrain Materials and geometries
-  MaterialContainer& materials = mImpl->materials;
-  for ( MaterialIter iter = materials.Begin(); iter != materials.End(); ++iter )
-  {
-    Material& material = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( material, mSceneGraphBuffers.GetUpdateBufferIndex() );
-  }
-
-  GeometryContainer& geometries = mImpl->geometries;
-  for ( GeometryIter iter = geometries.Begin(); iter != geometries.End(); ++iter )
-  {
-    Geometry& geometry = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( geometry, mSceneGraphBuffers.GetUpdateBufferIndex() );
-  }
+  mImpl->activeConstraints += mImpl->materials.ConstrainObjects( bufferIndex );
+  mImpl->activeConstraints += mImpl->geometries.ConstrainObjects( bufferIndex );
+  mImpl->activeConstraints += mImpl->samplers.ConstrainObjects( bufferIndex );
+  mImpl->activeConstraints += mImpl->propertyBuffers.ConstrainObjects( bufferIndex );
 
   // constrain shaders... (in construction order)
   ShaderContainer& shaders = mImpl->shaders;
@@ -915,7 +863,7 @@ void UpdateManager::ApplyConstraints()
   for ( ShaderIter iter = shaders.Begin(); iter != shaders.End(); ++iter )
   {
     Shader& shader = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( shader, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    mImpl->activeConstraints += ConstrainPropertyOwner( shader, bufferIndex );
   }
 
   PERF_MONITOR_END(PerformanceMonitor::APPLY_CONSTRAINTS);
@@ -926,12 +874,12 @@ void UpdateManager::ProcessPropertyNotifications()
   PropertyNotificationContainer &notifications = mImpl->propertyNotifications;
   PropertyNotificationIter iter = notifications.Begin();
 
+  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
+
   while ( iter != notifications.End() )
   {
     PropertyNotification* notification = *iter;
-
-    bool valid = notification->Check( mSceneGraphBuffers.GetUpdateBufferIndex() );
-
+    bool valid = notification->Check( bufferIndex );
     if(valid)
     {
       mImpl->notificationManager.QueueMessage( PropertyChangedMessage( mImpl->propertyNotifier, notification, notification->GetValidity() ) );
@@ -980,14 +928,16 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   // Measure the time spent in UpdateManager::Update
   PERF_MONITOR_START(PerformanceMonitor::UPDATE);
 
+  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
+
   // Update the frame time delta on the render thread.
   mImpl->renderManager.SetFrameDeltaTime(elapsedSeconds);
 
   // 1) Clear nodes/resources which were previously discarded
-  mImpl->discardQueue.Clear( mSceneGraphBuffers.GetUpdateBufferIndex() );
+  mImpl->discardQueue.Clear( bufferIndex );
 
   // 2) Grab any loaded resources
-  bool resourceChanged = mImpl->resourceManager.UpdateCache( mSceneGraphBuffers.GetUpdateBufferIndex() );
+  bool resourceChanged = mImpl->resourceManager.UpdateCache( bufferIndex );
 
   // 3) Process Touches & Gestures
   mImpl->touchResampler.Update();
@@ -1014,7 +964,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   mImpl->messageQueue.ProcessMessages();
 
   // 6) Post Process Ids of resources updated by renderer
-  mImpl->resourceManager.PostProcessResources( mSceneGraphBuffers.GetUpdateBufferIndex() );
+  mImpl->resourceManager.PostProcessResources( bufferIndex );
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // renderer lists if the scene was updated in the previous frame.
@@ -1050,8 +1000,8 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     // 13) Prepare for the next render
     PERF_MONITOR_START(PerformanceMonitor::PREPARE_RENDERABLES);
 
-    PrepareRenderables( mSceneGraphBuffers.GetUpdateBufferIndex(), mImpl->sortedLayers );
-    PrepareRenderables( mSceneGraphBuffers.GetUpdateBufferIndex(), mImpl->systemLevelSortedLayers );
+    PrepareRenderables( bufferIndex, mImpl->sortedLayers );
+    PrepareRenderables( bufferIndex, mImpl->systemLevelSortedLayers );
     PERF_MONITOR_END(PerformanceMonitor::PREPARE_RENDERABLES);
 
     PERF_MONITOR_START(PerformanceMonitor::PROCESS_RENDER_TASKS);
@@ -1063,7 +1013,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
     if ( NULL != mImpl->root )
     {
-      ProcessRenderTasks(  mSceneGraphBuffers.GetUpdateBufferIndex(),
+      ProcessRenderTasks(  bufferIndex,
                            mImpl->completeStatusManager,
                            mImpl->taskList,
                            *mImpl->root,
@@ -1074,7 +1024,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
       // Process the system-level RenderTasks last
       if ( NULL != mImpl->systemLevelRoot )
       {
-        ProcessRenderTasks(  mSceneGraphBuffers.GetUpdateBufferIndex(),
+        ProcessRenderTasks(  bufferIndex,
                              mImpl->completeStatusManager,
                              mImpl->systemLevelTaskList,
                              *mImpl->systemLevelRoot,
@@ -1097,7 +1047,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     renderTask.UpdateState();
 
     if( renderTask.IsWaitingToRender() &&
-        renderTask.ReadyToRender(mSceneGraphBuffers.GetUpdateBufferIndex()) /*avoid updating forever when source actor is off-stage*/ )
+        renderTask.ReadyToRender( bufferIndex ) /*avoid updating forever when source actor is off-stage*/ )
     {
       mImpl->renderTaskWaiting = true; // keep update/render threads alive
     }
