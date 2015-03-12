@@ -187,6 +187,47 @@ void ImageFactory::RecoverFromContextLoss()
       }
     }
   }
+
+  Vector< ContextRecoveryInterface* >::ConstIterator end = mContextRecoveryList.End();
+  for( Vector< ContextRecoveryInterface* >::Iterator iter = mContextRecoveryList.Begin();
+      iter != end; iter++)
+  {
+    (*iter)->RecoverFromContextLoss();
+  }
+}
+
+
+void ImageFactory::RegisterForContextRecovery( ContextRecoveryInterface* object  )
+{
+  bool exist( false );
+  // To avoid registering the same object again
+  Vector< ContextRecoveryInterface* >::ConstIterator end = mContextRecoveryList.End();
+  for( Vector< ContextRecoveryInterface* >::Iterator iter = mContextRecoveryList.Begin();
+          iter != end; iter++)
+  {
+    if( object == *(iter) )
+    {
+      exist = true;
+      break;
+    }
+  }
+  if( !exist )
+  {
+    mContextRecoveryList.PushBack( object );
+  }
+}
+void ImageFactory::UnregisterFromContextRecovery( ContextRecoveryInterface* object  )
+{
+  Vector< ContextRecoveryInterface* >::ConstIterator end = mContextRecoveryList.End();
+  for( Vector< ContextRecoveryInterface* >::Iterator iter = mContextRecoveryList.Begin();
+        iter != end; iter++ )
+  {
+    if( object == *(iter) )
+    {
+      iter = mContextRecoveryList.Erase( iter );
+      break;
+    }
+  }
 }
 
 const std::string& ImageFactory::GetRequestPath( const ImageFactoryCache::RequestPtr& request ) const

@@ -102,51 +102,51 @@ namespace // unnamed namespace
  *              Name                   Type   writable animatable constraint-input  enum for index-checking
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "parent-origin",        VECTOR3,  true,    false,   true,   Dali::Actor::Property::ParentOrigin        )
-DALI_PROPERTY( "parent-origin-x",      FLOAT,    true,    false,   true,   Dali::Actor::Property::ParentOriginX       )
-DALI_PROPERTY( "parent-origin-y",      FLOAT,    true,    false,   true,   Dali::Actor::Property::ParentOriginY       )
-DALI_PROPERTY( "parent-origin-z",      FLOAT,    true,    false,   true,   Dali::Actor::Property::ParentOriginZ       )
-DALI_PROPERTY( "anchor-point",         VECTOR3,  true,    false,   true,   Dali::Actor::Property::AnchorPoint         )
-DALI_PROPERTY( "anchor-point-x",       FLOAT,    true,    false,   true,   Dali::Actor::Property::AnchorPointX        )
-DALI_PROPERTY( "anchor-point-y",       FLOAT,    true,    false,   true,   Dali::Actor::Property::AnchorPointY        )
-DALI_PROPERTY( "anchor-point-z",       FLOAT,    true,    false,   true,   Dali::Actor::Property::AnchorPointZ        )
-DALI_PROPERTY( "size",                 VECTOR3,  true,    true,    true,   Dali::Actor::Property::Size                )
-DALI_PROPERTY( "size-width",           FLOAT,    true,    true,    true,   Dali::Actor::Property::SizeWidth           )
-DALI_PROPERTY( "size-height",          FLOAT,    true,    true,    true,   Dali::Actor::Property::SizeHeight          )
-DALI_PROPERTY( "size-depth",           FLOAT,    true,    true,    true,   Dali::Actor::Property::SizeDepth           )
-DALI_PROPERTY( "position",             VECTOR3,  true,    true,    true,   Dali::Actor::Property::Position            )
-DALI_PROPERTY( "position-x",           FLOAT,    true,    true,    true,   Dali::Actor::Property::PositionX           )
-DALI_PROPERTY( "position-y",           FLOAT,    true,    true,    true,   Dali::Actor::Property::PositionY           )
-DALI_PROPERTY( "position-z",           FLOAT,    true,    true,    true,   Dali::Actor::Property::PositionZ           )
-DALI_PROPERTY( "world-position",       VECTOR3,  false,   false,   true,   Dali::Actor::Property::WorldPosition       )
-DALI_PROPERTY( "world-position-x",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WorldPositionX      )
-DALI_PROPERTY( "world-position-y",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WorldPositionY      )
-DALI_PROPERTY( "world-position-z",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WorldPositionZ      )
-DALI_PROPERTY( "rotation",             ROTATION, true,    true,    true,   Dali::Actor::Property::Rotation            )
-DALI_PROPERTY( "world-rotation",       ROTATION, false,   false,   true,   Dali::Actor::Property::WorldRotation       )
-DALI_PROPERTY( "scale",                VECTOR3,  true,    true,    true,   Dali::Actor::Property::Scale               )
-DALI_PROPERTY( "scale-x",              FLOAT,    true,    true,    true,   Dali::Actor::Property::ScaleX              )
-DALI_PROPERTY( "scale-y",              FLOAT,    true,    true,    true,   Dali::Actor::Property::ScaleY              )
-DALI_PROPERTY( "scale-z",              FLOAT,    true,    true,    true,   Dali::Actor::Property::ScaleZ              )
-DALI_PROPERTY( "world-scale",          VECTOR3,  false,   false,   true,   Dali::Actor::Property::WorldScale          )
-DALI_PROPERTY( "visible",              BOOLEAN,  true,    true,    true,   Dali::Actor::Property::Visible             )
-DALI_PROPERTY( "color",                VECTOR4,  true,    true,    true,   Dali::Actor::Property::Color               )
-DALI_PROPERTY( "color-red",            FLOAT,    true,    true,    true,   Dali::Actor::Property::ColorRed            )
-DALI_PROPERTY( "color-green",          FLOAT,    true,    true,    true,   Dali::Actor::Property::ColorGreen          )
-DALI_PROPERTY( "color-blue",           FLOAT,    true,    true,    true,   Dali::Actor::Property::ColorBlue           )
-DALI_PROPERTY( "color-alpha",          FLOAT,    true,    true,    true,   Dali::Actor::Property::ColorAlpha          )
-DALI_PROPERTY( "world-color",          VECTOR4,  false,   false,   true,   Dali::Actor::Property::WorldColor          )
-DALI_PROPERTY( "world-matrix",         MATRIX,   false,   false,   true,   Dali::Actor::Property::WorldMatrix         )
-DALI_PROPERTY( "name",                 STRING,   true,    false,   false,  Dali::Actor::Property::Name                )
-DALI_PROPERTY( "sensitive",            BOOLEAN,  true,    false,   false,  Dali::Actor::Property::Sensitive           )
-DALI_PROPERTY( "leave-required",       BOOLEAN,  true,    false,   false,  Dali::Actor::Property::LeaveRequired       )
-DALI_PROPERTY( "inherit-rotation",     BOOLEAN,  true,    false,   false,  Dali::Actor::Property::InheritRotation     )
-DALI_PROPERTY( "inherit-scale",        BOOLEAN,  true,    false,   false,  Dali::Actor::Property::InheritScale        )
-DALI_PROPERTY( "color-mode",           STRING,   true,    false,   false,  Dali::Actor::Property::ColorMode           )
-DALI_PROPERTY( "position-inheritance", STRING,   true,    false,   false,  Dali::Actor::Property::PositionInheritance )
-DALI_PROPERTY( "draw-mode",            STRING,   true,    false,   false,  Dali::Actor::Property::DrawMode            )
-DALI_PROPERTY( "size-mode",            STRING,   true,    false,   false,  Dali::Actor::Property::SizeMode            )
-DALI_PROPERTY( "size-mode-factor",     VECTOR3,  true,    false,   false,  Dali::Actor::Property::SizeModeFactor      )
+DALI_PROPERTY( "parent-origin",        VECTOR3,  true,    false,   true,   Dali::Actor::Property::PARENT_ORIGIN        )
+DALI_PROPERTY( "parent-origin-x",      FLOAT,    true,    false,   true,   Dali::Actor::Property::PARENT_ORIGIN_X      )
+DALI_PROPERTY( "parent-origin-y",      FLOAT,    true,    false,   true,   Dali::Actor::Property::PARENT_ORIGIN_Y      )
+DALI_PROPERTY( "parent-origin-z",      FLOAT,    true,    false,   true,   Dali::Actor::Property::PARENT_ORIGIN_Z      )
+DALI_PROPERTY( "anchor-point",         VECTOR3,  true,    false,   true,   Dali::Actor::Property::ANCHOR_POINT         )
+DALI_PROPERTY( "anchor-point-x",       FLOAT,    true,    false,   true,   Dali::Actor::Property::ANCHOR_POINT_X       )
+DALI_PROPERTY( "anchor-point-y",       FLOAT,    true,    false,   true,   Dali::Actor::Property::ANCHOR_POINT_Y       )
+DALI_PROPERTY( "anchor-point-z",       FLOAT,    true,    false,   true,   Dali::Actor::Property::ANCHOR_POINT_Z       )
+DALI_PROPERTY( "size",                 VECTOR3,  true,    true,    true,   Dali::Actor::Property::SIZE                 )
+DALI_PROPERTY( "size-width",           FLOAT,    true,    true,    true,   Dali::Actor::Property::SIZE_WIDTH           )
+DALI_PROPERTY( "size-height",          FLOAT,    true,    true,    true,   Dali::Actor::Property::SIZE_HEIGHT          )
+DALI_PROPERTY( "size-depth",           FLOAT,    true,    true,    true,   Dali::Actor::Property::SIZE_DEPTH           )
+DALI_PROPERTY( "position",             VECTOR3,  true,    true,    true,   Dali::Actor::Property::POSITION             )
+DALI_PROPERTY( "position-x",           FLOAT,    true,    true,    true,   Dali::Actor::Property::POSITION_X           )
+DALI_PROPERTY( "position-y",           FLOAT,    true,    true,    true,   Dali::Actor::Property::POSITION_Y           )
+DALI_PROPERTY( "position-z",           FLOAT,    true,    true,    true,   Dali::Actor::Property::POSITION_Z           )
+DALI_PROPERTY( "world-position",       VECTOR3,  false,   false,   true,   Dali::Actor::Property::WORLD_POSITION       )
+DALI_PROPERTY( "world-position-x",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WORLD_POSITION_X     )
+DALI_PROPERTY( "world-position-y",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WORLD_POSITION_Y     )
+DALI_PROPERTY( "world-position-z",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WORLD_POSITION_Z     )
+DALI_PROPERTY( "rotation",             ROTATION, true,    true,    true,   Dali::Actor::Property::ROTATION             )
+DALI_PROPERTY( "world-rotation",       ROTATION, false,   false,   true,   Dali::Actor::Property::WORLD_ROTATION       )
+DALI_PROPERTY( "scale",                VECTOR3,  true,    true,    true,   Dali::Actor::Property::SCALE                )
+DALI_PROPERTY( "scale-x",              FLOAT,    true,    true,    true,   Dali::Actor::Property::SCALE_X              )
+DALI_PROPERTY( "scale-y",              FLOAT,    true,    true,    true,   Dali::Actor::Property::SCALE_Y              )
+DALI_PROPERTY( "scale-z",              FLOAT,    true,    true,    true,   Dali::Actor::Property::SCALE_Z              )
+DALI_PROPERTY( "world-scale",          VECTOR3,  false,   false,   true,   Dali::Actor::Property::WORLD_SCALE          )
+DALI_PROPERTY( "visible",              BOOLEAN,  true,    true,    true,   Dali::Actor::Property::VISIBLE              )
+DALI_PROPERTY( "color",                VECTOR4,  true,    true,    true,   Dali::Actor::Property::COLOR                )
+DALI_PROPERTY( "color-red",            FLOAT,    true,    true,    true,   Dali::Actor::Property::COLOR_RED            )
+DALI_PROPERTY( "color-green",          FLOAT,    true,    true,    true,   Dali::Actor::Property::COLOR_GREEN          )
+DALI_PROPERTY( "color-blue",           FLOAT,    true,    true,    true,   Dali::Actor::Property::COLOR_BLUE           )
+DALI_PROPERTY( "color-alpha",          FLOAT,    true,    true,    true,   Dali::Actor::Property::COLOR_ALPHA          )
+DALI_PROPERTY( "world-color",          VECTOR4,  false,   false,   true,   Dali::Actor::Property::WORLD_COLOR          )
+DALI_PROPERTY( "world-matrix",         MATRIX,   false,   false,   true,   Dali::Actor::Property::WORLD_MATRIX         )
+DALI_PROPERTY( "name",                 STRING,   true,    false,   false,  Dali::Actor::Property::NAME                 )
+DALI_PROPERTY( "sensitive",            BOOLEAN,  true,    false,   false,  Dali::Actor::Property::SENSITIVE            )
+DALI_PROPERTY( "leave-required",       BOOLEAN,  true,    false,   false,  Dali::Actor::Property::LEAVE_REQUIRED       )
+DALI_PROPERTY( "inherit-rotation",     BOOLEAN,  true,    false,   false,  Dali::Actor::Property::INHERIT_ROTATION     )
+DALI_PROPERTY( "inherit-scale",        BOOLEAN,  true,    false,   false,  Dali::Actor::Property::INHERIT_SCALE        )
+DALI_PROPERTY( "color-mode",           STRING,   true,    false,   false,  Dali::Actor::Property::COLOR_MODE           )
+DALI_PROPERTY( "position-inheritance", STRING,   true,    false,   false,  Dali::Actor::Property::POSITION_INHERITANCE )
+DALI_PROPERTY( "draw-mode",            STRING,   true,    false,   false,  Dali::Actor::Property::DRAW_MODE            )
+DALI_PROPERTY( "size-mode",            STRING,   true,    false,   false,  Dali::Actor::Property::SIZE_MODE            )
+DALI_PROPERTY( "size-mode-factor",     VECTOR3,  true,    false,   false,  Dali::Actor::Property::SIZE_MODE_FACTOR     )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -441,44 +441,6 @@ ActorPtr Actor::FindChildByName(const std::string& actorName)
       }
     }
   }
-  return child;
-}
-
-Dali::Actor Actor::FindChildByAlias(const std::string& actorAlias)
-{
-  Dali::Actor child = DoGetChildByAlias(actorAlias);
-
-  // If not found then search by name.
-  if (!child)
-  {
-    Internal::ActorPtr child_ptr = FindChildByName(actorAlias);
-    if (child_ptr)
-    {
-      child = Dali::Actor(child_ptr.Get());
-    }
-  }
-
-  return child;
-}
-
-Dali::Actor Actor::DoGetChildByAlias(const std::string& actorAlias)
-{
-  Dali::Actor child = GetChildByAlias(actorAlias);
-
-  if (!child && mChildren )
-  {
-    ActorIter end = mChildren->end();
-    for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
-    {
-      child = GetImplementation(*iter).DoGetChildByAlias(actorAlias);
-
-      if (child)
-      {
-        break;
-      }
-    }
-  }
-
   return child;
 }
 
@@ -2397,223 +2359,223 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 {
   switch ( index )
   {
-    case Dali::Actor::Property::ParentOrigin:
+    case Dali::Actor::Property::PARENT_ORIGIN:
     {
       SetParentOrigin( property.Get<Vector3>() );
       break;
     }
 
-    case Dali::Actor::Property::ParentOriginX:
+    case Dali::Actor::Property::PARENT_ORIGIN_X:
     {
       SetParentOriginX( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::ParentOriginY:
+    case Dali::Actor::Property::PARENT_ORIGIN_Y:
     {
       SetParentOriginY( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::ParentOriginZ:
+    case Dali::Actor::Property::PARENT_ORIGIN_Z:
     {
       SetParentOriginZ( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::AnchorPoint:
+    case Dali::Actor::Property::ANCHOR_POINT:
     {
       SetAnchorPoint( property.Get<Vector3>() );
       break;
     }
 
-    case Dali::Actor::Property::AnchorPointX:
+    case Dali::Actor::Property::ANCHOR_POINT_X:
     {
       SetAnchorPointX( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::AnchorPointY:
+    case Dali::Actor::Property::ANCHOR_POINT_Y:
     {
       SetAnchorPointY( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::AnchorPointZ:
+    case Dali::Actor::Property::ANCHOR_POINT_Z:
     {
       SetAnchorPointZ( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::Size:
+    case Dali::Actor::Property::SIZE:
     {
       SetSize( property.Get<Vector3>() );
       break;
     }
 
-    case Dali::Actor::Property::SizeWidth:
+    case Dali::Actor::Property::SIZE_WIDTH:
     {
       SetWidth( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::SizeHeight:
+    case Dali::Actor::Property::SIZE_HEIGHT:
     {
       SetHeight( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::SizeDepth:
+    case Dali::Actor::Property::SIZE_DEPTH:
     {
       SetDepth( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::Position:
+    case Dali::Actor::Property::POSITION:
     {
       SetPosition( property.Get<Vector3>() );
       break;
     }
 
-    case Dali::Actor::Property::PositionX:
+    case Dali::Actor::Property::POSITION_X:
     {
       SetX( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::PositionY:
+    case Dali::Actor::Property::POSITION_Y:
     {
       SetY( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::PositionZ:
+    case Dali::Actor::Property::POSITION_Z:
     {
       SetZ( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::Rotation:
+    case Dali::Actor::Property::ROTATION:
     {
       SetRotation( property.Get<Quaternion>() );
       break;
     }
 
-    case Dali::Actor::Property::Scale:
+    case Dali::Actor::Property::SCALE:
     {
       SetScale( property.Get<Vector3>() );
       break;
     }
 
-    case Dali::Actor::Property::ScaleX:
+    case Dali::Actor::Property::SCALE_X:
     {
       SetScaleX( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::ScaleY:
+    case Dali::Actor::Property::SCALE_Y:
     {
       SetScaleY( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::ScaleZ:
+    case Dali::Actor::Property::SCALE_Z:
     {
       SetScaleZ( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::Visible:
+    case Dali::Actor::Property::VISIBLE:
     {
       SetVisible( property.Get<bool>() );
       break;
     }
 
-    case Dali::Actor::Property::Color:
+    case Dali::Actor::Property::COLOR:
     {
       SetColor( property.Get<Vector4>() );
       break;
     }
 
-    case Dali::Actor::Property::ColorRed:
+    case Dali::Actor::Property::COLOR_RED:
     {
       SetColorRed( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::ColorGreen:
+    case Dali::Actor::Property::COLOR_GREEN:
     {
       SetColorGreen( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::ColorBlue:
+    case Dali::Actor::Property::COLOR_BLUE:
     {
       SetColorBlue( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::ColorAlpha:
+    case Dali::Actor::Property::COLOR_ALPHA:
     {
       SetOpacity( property.Get<float>() );
       break;
     }
 
-    case Dali::Actor::Property::Name:
+    case Dali::Actor::Property::NAME:
     {
       SetName( property.Get<std::string>() );
       break;
     }
 
-    case Dali::Actor::Property::Sensitive:
+    case Dali::Actor::Property::SENSITIVE:
     {
       SetSensitive( property.Get<bool>() );
       break;
     }
 
-    case Dali::Actor::Property::LeaveRequired:
+    case Dali::Actor::Property::LEAVE_REQUIRED:
     {
       SetLeaveRequired( property.Get<bool>() );
       break;
     }
 
-    case Dali::Actor::Property::InheritRotation:
+    case Dali::Actor::Property::INHERIT_ROTATION:
     {
       SetInheritRotation( property.Get<bool>() );
       break;
     }
 
-    case Dali::Actor::Property::InheritScale:
+    case Dali::Actor::Property::INHERIT_SCALE:
     {
       SetInheritScale( property.Get<bool>() );
       break;
     }
 
-    case Dali::Actor::Property::ColorMode:
+    case Dali::Actor::Property::COLOR_MODE:
     {
       SetColorMode( Scripting::GetColorMode( property.Get<std::string>() ) );
       break;
     }
 
-    case Dali::Actor::Property::PositionInheritance:
+    case Dali::Actor::Property::POSITION_INHERITANCE:
     {
       SetPositionInheritanceMode( Scripting::GetPositionInheritanceMode( property.Get<std::string>() ) );
       break;
     }
 
-    case Dali::Actor::Property::DrawMode:
+    case Dali::Actor::Property::DRAW_MODE:
     {
       SetDrawMode( Scripting::GetDrawMode( property.Get<std::string>() ) );
       break;
     }
 
-    case Dali::Actor::Property::SizeMode:
+    case Dali::Actor::Property::SIZE_MODE:
     {
       SetSizeMode( Scripting::GetEnumeration< SizeMode >( property.Get<std::string>().c_str(), SizeModeTable, SizeModeTableCount ) );
       break;
     }
 
-    case Dali::Actor::Property::SizeModeFactor:
+    case Dali::Actor::Property::SIZE_MODE_FACTOR:
     {
       SetSizeModeFactor( property.Get<Vector3>() );
       break;
@@ -2747,271 +2709,271 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 
   switch ( index )
   {
-    case Dali::Actor::Property::ParentOrigin:
+    case Dali::Actor::Property::PARENT_ORIGIN:
     {
       value = GetCurrentParentOrigin();
       break;
     }
 
-    case Dali::Actor::Property::ParentOriginX:
+    case Dali::Actor::Property::PARENT_ORIGIN_X:
     {
       value = GetCurrentParentOrigin().x;
       break;
     }
 
-    case Dali::Actor::Property::ParentOriginY:
+    case Dali::Actor::Property::PARENT_ORIGIN_Y:
     {
       value = GetCurrentParentOrigin().y;
       break;
     }
 
-    case Dali::Actor::Property::ParentOriginZ:
+    case Dali::Actor::Property::PARENT_ORIGIN_Z:
     {
       value = GetCurrentParentOrigin().z;
       break;
     }
 
-    case Dali::Actor::Property::AnchorPoint:
+    case Dali::Actor::Property::ANCHOR_POINT:
     {
       value = GetCurrentAnchorPoint();
       break;
     }
 
-    case Dali::Actor::Property::AnchorPointX:
+    case Dali::Actor::Property::ANCHOR_POINT_X:
     {
       value = GetCurrentAnchorPoint().x;
       break;
     }
 
-    case Dali::Actor::Property::AnchorPointY:
+    case Dali::Actor::Property::ANCHOR_POINT_Y:
     {
       value = GetCurrentAnchorPoint().y;
       break;
     }
 
-    case Dali::Actor::Property::AnchorPointZ:
+    case Dali::Actor::Property::ANCHOR_POINT_Z:
     {
       value = GetCurrentAnchorPoint().z;
       break;
     }
 
-    case Dali::Actor::Property::Size:
+    case Dali::Actor::Property::SIZE:
     {
       value = GetCurrentSize();
       break;
     }
 
-    case Dali::Actor::Property::SizeWidth:
+    case Dali::Actor::Property::SIZE_WIDTH:
     {
       value = GetCurrentSize().width;
       break;
     }
 
-    case Dali::Actor::Property::SizeHeight:
+    case Dali::Actor::Property::SIZE_HEIGHT:
     {
       value = GetCurrentSize().height;
       break;
     }
 
-    case Dali::Actor::Property::SizeDepth:
+    case Dali::Actor::Property::SIZE_DEPTH:
     {
       value = GetCurrentSize().depth;
       break;
     }
 
-    case Dali::Actor::Property::Position:
+    case Dali::Actor::Property::POSITION:
     {
       value = GetCurrentPosition();
       break;
     }
 
-    case Dali::Actor::Property::PositionX:
+    case Dali::Actor::Property::POSITION_X:
     {
       value = GetCurrentPosition().x;
       break;
     }
 
-    case Dali::Actor::Property::PositionY:
+    case Dali::Actor::Property::POSITION_Y:
     {
       value = GetCurrentPosition().y;
       break;
     }
 
-    case Dali::Actor::Property::PositionZ:
+    case Dali::Actor::Property::POSITION_Z:
     {
       value = GetCurrentPosition().z;
       break;
     }
 
-    case Dali::Actor::Property::WorldPosition:
+    case Dali::Actor::Property::WORLD_POSITION:
     {
       value = GetCurrentWorldPosition();
       break;
     }
 
-    case Dali::Actor::Property::WorldPositionX:
+    case Dali::Actor::Property::WORLD_POSITION_X:
     {
       value = GetCurrentWorldPosition().x;
       break;
     }
 
-    case Dali::Actor::Property::WorldPositionY:
+    case Dali::Actor::Property::WORLD_POSITION_Y:
     {
       value = GetCurrentWorldPosition().y;
       break;
     }
 
-    case Dali::Actor::Property::WorldPositionZ:
+    case Dali::Actor::Property::WORLD_POSITION_Z:
     {
       value = GetCurrentWorldPosition().z;
       break;
     }
 
-    case Dali::Actor::Property::Rotation:
+    case Dali::Actor::Property::ROTATION:
     {
       value = GetCurrentRotation();
       break;
     }
 
-    case Dali::Actor::Property::WorldRotation:
+    case Dali::Actor::Property::WORLD_ROTATION:
     {
       value = GetCurrentWorldRotation();
       break;
     }
 
-    case Dali::Actor::Property::Scale:
+    case Dali::Actor::Property::SCALE:
     {
       value = GetCurrentScale();
       break;
     }
 
-    case Dali::Actor::Property::ScaleX:
+    case Dali::Actor::Property::SCALE_X:
     {
       value = GetCurrentScale().x;
       break;
     }
 
-    case Dali::Actor::Property::ScaleY:
+    case Dali::Actor::Property::SCALE_Y:
     {
       value = GetCurrentScale().y;
       break;
     }
 
-    case Dali::Actor::Property::ScaleZ:
+    case Dali::Actor::Property::SCALE_Z:
     {
       value = GetCurrentScale().z;
       break;
     }
 
-    case Dali::Actor::Property::WorldScale:
+    case Dali::Actor::Property::WORLD_SCALE:
     {
       value = GetCurrentWorldScale();
       break;
     }
 
-    case Dali::Actor::Property::Visible:
+    case Dali::Actor::Property::VISIBLE:
     {
       value = IsVisible();
       break;
     }
 
-    case Dali::Actor::Property::Color:
+    case Dali::Actor::Property::COLOR:
     {
       value = GetCurrentColor();
       break;
     }
 
-    case Dali::Actor::Property::ColorRed:
+    case Dali::Actor::Property::COLOR_RED:
     {
       value = GetCurrentColor().r;
       break;
     }
 
-    case Dali::Actor::Property::ColorGreen:
+    case Dali::Actor::Property::COLOR_GREEN:
     {
       value = GetCurrentColor().g;
       break;
     }
 
-    case Dali::Actor::Property::ColorBlue:
+    case Dali::Actor::Property::COLOR_BLUE:
     {
       value = GetCurrentColor().b;
       break;
     }
 
-    case Dali::Actor::Property::ColorAlpha:
+    case Dali::Actor::Property::COLOR_ALPHA:
     {
       value = GetCurrentColor().a;
       break;
     }
 
-    case Dali::Actor::Property::WorldColor:
+    case Dali::Actor::Property::WORLD_COLOR:
     {
       value = GetCurrentWorldColor();
       break;
     }
 
-    case Dali::Actor::Property::WorldMatrix:
+    case Dali::Actor::Property::WORLD_MATRIX:
     {
       value = GetCurrentWorldMatrix();
       break;
     }
 
-    case Dali::Actor::Property::Name:
+    case Dali::Actor::Property::NAME:
     {
       value = GetName();
       break;
     }
 
-    case Dali::Actor::Property::Sensitive:
+    case Dali::Actor::Property::SENSITIVE:
     {
       value = IsSensitive();
       break;
     }
 
-    case Dali::Actor::Property::LeaveRequired:
+    case Dali::Actor::Property::LEAVE_REQUIRED:
     {
       value = GetLeaveRequired();
       break;
     }
 
-    case Dali::Actor::Property::InheritRotation:
+    case Dali::Actor::Property::INHERIT_ROTATION:
     {
       value = IsRotationInherited();
       break;
     }
 
-    case Dali::Actor::Property::InheritScale:
+    case Dali::Actor::Property::INHERIT_SCALE:
     {
       value = IsScaleInherited();
       break;
     }
 
-    case Dali::Actor::Property::ColorMode:
+    case Dali::Actor::Property::COLOR_MODE:
     {
       value = Scripting::GetColorMode( GetColorMode() );
       break;
     }
 
-    case Dali::Actor::Property::PositionInheritance:
+    case Dali::Actor::Property::POSITION_INHERITANCE:
     {
       value = Scripting::GetPositionInheritanceMode( GetPositionInheritanceMode() );
       break;
     }
 
-    case Dali::Actor::Property::DrawMode:
+    case Dali::Actor::Property::DRAW_MODE:
     {
       value = Scripting::GetDrawMode( GetDrawMode() );
       break;
     }
 
-    case Dali::Actor::Property::SizeMode:
+    case Dali::Actor::Property::SIZE_MODE:
     {
       value = Scripting::GetLinearEnumerationName< SizeMode >( GetSizeMode(), SizeModeTable, SizeModeTableCount );
       break;
     }
 
-    case Dali::Actor::Property::SizeModeFactor:
+    case Dali::Actor::Property::SIZE_MODE_FACTOR:
     {
       value = GetSizeModeFactor();
       break;
@@ -3061,79 +3023,79 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
   {
     switch ( index )
     {
-      case Dali::Actor::Property::Size:
+      case Dali::Actor::Property::SIZE:
         property = &mNode->mSize;
         break;
 
-      case Dali::Actor::Property::SizeWidth:
+      case Dali::Actor::Property::SIZE_WIDTH:
         property = &mNode->mSize;
         break;
 
-      case Dali::Actor::Property::SizeHeight:
+      case Dali::Actor::Property::SIZE_HEIGHT:
         property = &mNode->mSize;
         break;
 
-      case Dali::Actor::Property::SizeDepth:
+      case Dali::Actor::Property::SIZE_DEPTH:
         property = &mNode->mSize;
         break;
 
-      case Dali::Actor::Property::Position:
+      case Dali::Actor::Property::POSITION:
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::PositionX:
+      case Dali::Actor::Property::POSITION_X:
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::PositionY:
+      case Dali::Actor::Property::POSITION_Y:
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::PositionZ:
+      case Dali::Actor::Property::POSITION_Z:
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::Rotation:
+      case Dali::Actor::Property::ROTATION:
         property = &mNode->mRotation;
         break;
 
-      case Dali::Actor::Property::Scale:
+      case Dali::Actor::Property::SCALE:
         property = &mNode->mScale;
         break;
 
-      case Dali::Actor::Property::ScaleX:
+      case Dali::Actor::Property::SCALE_X:
         property = &mNode->mScale;
         break;
 
-      case Dali::Actor::Property::ScaleY:
+      case Dali::Actor::Property::SCALE_Y:
         property = &mNode->mScale;
         break;
 
-      case Dali::Actor::Property::ScaleZ:
+      case Dali::Actor::Property::SCALE_Z:
         property = &mNode->mScale;
         break;
 
-      case Dali::Actor::Property::Visible:
+      case Dali::Actor::Property::VISIBLE:
         property = &mNode->mVisible;
         break;
 
-      case Dali::Actor::Property::Color:
+      case Dali::Actor::Property::COLOR:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::ColorRed:
+      case Dali::Actor::Property::COLOR_RED:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::ColorGreen:
+      case Dali::Actor::Property::COLOR_GREEN:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::ColorBlue:
+      case Dali::Actor::Property::COLOR_BLUE:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::ColorAlpha:
+      case Dali::Actor::Property::COLOR_ALPHA:
         property = &mNode->mColor;
         break;
 
@@ -3165,143 +3127,143 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
   {
     switch ( index )
     {
-      case Dali::Actor::Property::ParentOrigin:
+      case Dali::Actor::Property::PARENT_ORIGIN:
         property = &mNode->mParentOrigin;
         break;
 
-      case Dali::Actor::Property::ParentOriginX:
+      case Dali::Actor::Property::PARENT_ORIGIN_X:
         property = &mNode->mParentOrigin;
         break;
 
-      case Dali::Actor::Property::ParentOriginY:
+      case Dali::Actor::Property::PARENT_ORIGIN_Y:
         property = &mNode->mParentOrigin;
         break;
 
-      case Dali::Actor::Property::ParentOriginZ:
+      case Dali::Actor::Property::PARENT_ORIGIN_Z:
         property = &mNode->mParentOrigin;
         break;
 
-      case Dali::Actor::Property::AnchorPoint:
+      case Dali::Actor::Property::ANCHOR_POINT:
         property = &mNode->mAnchorPoint;
         break;
 
-      case Dali::Actor::Property::AnchorPointX:
+      case Dali::Actor::Property::ANCHOR_POINT_X:
         property = &mNode->mAnchorPoint;
         break;
 
-      case Dali::Actor::Property::AnchorPointY:
+      case Dali::Actor::Property::ANCHOR_POINT_Y:
         property = &mNode->mAnchorPoint;
         break;
 
-      case Dali::Actor::Property::AnchorPointZ:
+      case Dali::Actor::Property::ANCHOR_POINT_Z:
         property = &mNode->mAnchorPoint;
         break;
 
-      case Dali::Actor::Property::Size:
+      case Dali::Actor::Property::SIZE:
         property = &mNode->mSize;
         break;
 
-      case Dali::Actor::Property::SizeWidth:
+      case Dali::Actor::Property::SIZE_WIDTH:
         property = &mNode->mSize;
         break;
 
-      case Dali::Actor::Property::SizeHeight:
+      case Dali::Actor::Property::SIZE_HEIGHT:
         property = &mNode->mSize;
         break;
 
-      case Dali::Actor::Property::SizeDepth:
+      case Dali::Actor::Property::SIZE_DEPTH:
         property = &mNode->mSize;
         break;
 
-      case Dali::Actor::Property::Position:
+      case Dali::Actor::Property::POSITION:
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::PositionX:
+      case Dali::Actor::Property::POSITION_X:
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::PositionY:
+      case Dali::Actor::Property::POSITION_Y:
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::PositionZ:
+      case Dali::Actor::Property::POSITION_Z:
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::WorldPosition:
+      case Dali::Actor::Property::WORLD_POSITION:
         property = &mNode->mWorldPosition;
         break;
 
-      case Dali::Actor::Property::WorldPositionX:
+      case Dali::Actor::Property::WORLD_POSITION_X:
         property = &mNode->mWorldPosition;
         break;
 
-      case Dali::Actor::Property::WorldPositionY:
+      case Dali::Actor::Property::WORLD_POSITION_Y:
         property = &mNode->mWorldPosition;
         break;
 
-      case Dali::Actor::Property::WorldPositionZ:
+      case Dali::Actor::Property::WORLD_POSITION_Z:
         property = &mNode->mWorldPosition;
         break;
 
-      case Dali::Actor::Property::Rotation:
+      case Dali::Actor::Property::ROTATION:
         property = &mNode->mRotation;
         break;
 
-      case Dali::Actor::Property::WorldRotation:
+      case Dali::Actor::Property::WORLD_ROTATION:
         property = &mNode->mWorldRotation;
         break;
 
-      case Dali::Actor::Property::Scale:
+      case Dali::Actor::Property::SCALE:
         property = &mNode->mScale;
         break;
 
-      case Dali::Actor::Property::ScaleX:
+      case Dali::Actor::Property::SCALE_X:
         property = &mNode->mScale;
         break;
 
-      case Dali::Actor::Property::ScaleY:
+      case Dali::Actor::Property::SCALE_Y:
         property = &mNode->mScale;
         break;
 
-      case Dali::Actor::Property::ScaleZ:
+      case Dali::Actor::Property::SCALE_Z:
         property = &mNode->mScale;
         break;
 
-      case Dali::Actor::Property::WorldScale:
+      case Dali::Actor::Property::WORLD_SCALE:
         property = &mNode->mWorldScale;
         break;
 
-      case Dali::Actor::Property::Visible:
+      case Dali::Actor::Property::VISIBLE:
         property = &mNode->mVisible;
         break;
 
-      case Dali::Actor::Property::Color:
+      case Dali::Actor::Property::COLOR:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::ColorRed:
+      case Dali::Actor::Property::COLOR_RED:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::ColorGreen:
+      case Dali::Actor::Property::COLOR_GREEN:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::ColorBlue:
+      case Dali::Actor::Property::COLOR_BLUE:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::ColorAlpha:
+      case Dali::Actor::Property::COLOR_ALPHA:
         property = &mNode->mColor;
         break;
 
-      case Dali::Actor::Property::WorldColor:
+      case Dali::Actor::Property::WORLD_COLOR:
         property = &mNode->mWorldColor;
         break;
 
-      case Dali::Actor::Property::WorldMatrix:
+      case Dali::Actor::Property::WORLD_MATRIX:
         property = &mNode->mWorldMatrix;
         break;
 
@@ -3319,43 +3281,43 @@ int Actor::GetPropertyComponentIndex( Property::Index index ) const
 
   switch ( index )
   {
-    case Dali::Actor::Property::ParentOriginX:
-    case Dali::Actor::Property::AnchorPointX:
-    case Dali::Actor::Property::SizeWidth:
-    case Dali::Actor::Property::PositionX:
-    case Dali::Actor::Property::WorldPositionX:
-    case Dali::Actor::Property::ScaleX:
-    case Dali::Actor::Property::ColorRed:
+    case Dali::Actor::Property::PARENT_ORIGIN_X:
+    case Dali::Actor::Property::ANCHOR_POINT_X:
+    case Dali::Actor::Property::SIZE_WIDTH:
+    case Dali::Actor::Property::POSITION_X:
+    case Dali::Actor::Property::WORLD_POSITION_X:
+    case Dali::Actor::Property::SCALE_X:
+    case Dali::Actor::Property::COLOR_RED:
     {
       componentIndex = 0;
       break;
     }
 
-    case Dali::Actor::Property::ParentOriginY:
-    case Dali::Actor::Property::AnchorPointY:
-    case Dali::Actor::Property::SizeHeight:
-    case Dali::Actor::Property::PositionY:
-    case Dali::Actor::Property::WorldPositionY:
-    case Dali::Actor::Property::ScaleY:
-    case Dali::Actor::Property::ColorGreen:
+    case Dali::Actor::Property::PARENT_ORIGIN_Y:
+    case Dali::Actor::Property::ANCHOR_POINT_Y:
+    case Dali::Actor::Property::SIZE_HEIGHT:
+    case Dali::Actor::Property::POSITION_Y:
+    case Dali::Actor::Property::WORLD_POSITION_Y:
+    case Dali::Actor::Property::SCALE_Y:
+    case Dali::Actor::Property::COLOR_GREEN:
     {
       componentIndex = 1;
       break;
     }
 
-    case Dali::Actor::Property::ParentOriginZ:
-    case Dali::Actor::Property::AnchorPointZ:
-    case Dali::Actor::Property::SizeDepth:
-    case Dali::Actor::Property::PositionZ:
-    case Dali::Actor::Property::WorldPositionZ:
-    case Dali::Actor::Property::ScaleZ:
-    case Dali::Actor::Property::ColorBlue:
+    case Dali::Actor::Property::PARENT_ORIGIN_Z:
+    case Dali::Actor::Property::ANCHOR_POINT_Z:
+    case Dali::Actor::Property::SIZE_DEPTH:
+    case Dali::Actor::Property::POSITION_Z:
+    case Dali::Actor::Property::WORLD_POSITION_Z:
+    case Dali::Actor::Property::SCALE_Z:
+    case Dali::Actor::Property::COLOR_BLUE:
     {
       componentIndex = 2;
       break;
     }
 
-    case Dali::Actor::Property::ColorAlpha:
+    case Dali::Actor::Property::COLOR_ALPHA:
     {
       componentIndex = 3;
       break;

@@ -16,14 +16,12 @@ public_api_src_files = \
   $(public_api_src_dir)/animation/alpha-functions.cpp \
   $(public_api_src_dir)/animation/constraint.cpp \
   $(public_api_src_dir)/animation/constraint-source.cpp \
-  $(public_api_src_dir)/animation/interpolator-functions.cpp \
   $(public_api_src_dir)/animation/key-frames.cpp \
   $(public_api_src_dir)/animation/path.cpp \
   $(public_api_src_dir)/animation/time-period.cpp \
   $(public_api_src_dir)/common/constants.cpp \
   $(public_api_src_dir)/common/dali-common.cpp \
   $(public_api_src_dir)/common/dali-vector.cpp \
-  $(public_api_src_dir)/common/fixed-size-memory-pool.cpp \
   $(public_api_src_dir)/common/mutex.cpp \
   $(public_api_src_dir)/common/stage.cpp \
   $(public_api_src_dir)/dynamics/dynamics-body.cpp \
@@ -145,7 +143,6 @@ public_api_core_animation_header_files = \
   $(public_api_src_dir)/animation/constraints.h \
   $(public_api_src_dir)/animation/constraint-functions.h \
   $(public_api_src_dir)/animation/constraint-source.h \
-  $(public_api_src_dir)/animation/interpolator-functions.h \
   $(public_api_src_dir)/animation/key-frames.h \
   $(public_api_src_dir)/animation/path.h \
   $(public_api_src_dir)/animation/time-period.h
@@ -155,12 +152,10 @@ public_api_core_common_header_files = \
   $(public_api_src_dir)/common/constants.h \
   $(public_api_src_dir)/common/dali-common.h \
   $(public_api_src_dir)/common/dali-vector.h \
-  $(public_api_src_dir)/common/fixed-size-memory-pool.h \
   $(public_api_src_dir)/common/intrusive-ptr.h \
   $(public_api_src_dir)/common/loading-state.h \
   $(public_api_src_dir)/common/mutex.h \
   $(public_api_src_dir)/common/map-wrapper.h \
-  $(public_api_src_dir)/common/memory-pool-object-allocator.h \
   $(public_api_src_dir)/common/ref-counted-dali-vector.h \
   $(public_api_src_dir)/common/set-wrapper.h \
   $(public_api_src_dir)/common/scoped-pointer.h \
@@ -256,7 +251,8 @@ public_api_core_object_header_files = \
   $(public_api_src_dir)/object/property.h \
   $(public_api_src_dir)/object/ref-object.h \
   $(public_api_src_dir)/object/type-info.h \
-  $(public_api_src_dir)/object/type-registry.h
+  $(public_api_src_dir)/object/type-registry.h \
+  $(public_api_src_dir)/object/type-registry-helper.h
 
 public_api_core_render_tasks_header_files = \
   $(public_api_src_dir)/render-tasks/render-task.h \

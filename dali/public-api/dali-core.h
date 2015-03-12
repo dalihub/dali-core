@@ -40,7 +40,6 @@
 #include <dali/public-api/animation/constraint-source.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
-#include <dali/public-api/animation/interpolator-functions.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/animation/path.h>
 #include <dali/public-api/animation/time-period.h>
@@ -49,10 +48,8 @@
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/common/fixed-size-memory-pool.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/loading-state.h>
-#include <dali/public-api/common/memory-pool-object-allocator.h>
 #include <dali/public-api/common/mutex.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/common/vector-wrapper.h>

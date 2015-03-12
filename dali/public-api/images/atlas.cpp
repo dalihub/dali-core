@@ -25,25 +25,38 @@
 namespace Dali
 {
 
-Atlas Atlas::New( std::size_t width,
-                  std::size_t height,
-                  Pixel::Format pixelFormat )
+Atlas Atlas::New( SizeType width,
+                  SizeType height,
+                  Pixel::Format pixelFormat,
+                  bool recoverContext )
 {
   DALI_ASSERT_ALWAYS( 0u != width  && "Invalid Atlas width requested" );
   DALI_ASSERT_ALWAYS( 0u != height && "Invalid Atlas height requested" );
 
-  return Atlas( Internal::Atlas::New( width, height, pixelFormat ) );
+  return Atlas( Internal::Atlas::New( width, height, pixelFormat, recoverContext ) );
 }
 
 Atlas::Atlas()
 {
 }
 
-bool Atlas::Upload( const BufferImage& bufferImage,
-                    std::size_t xOffset,
-                    std::size_t yOffset )
+void Atlas::Clear( const Vector4& color  )
+{
+  GetImplementation( *this ).Clear( color );
+}
+
+bool Atlas::Upload( BufferImage bufferImage,
+                    SizeType xOffset,
+                    SizeType yOffset )
 {
   return GetImplementation(*this).Upload( GetImplementation(bufferImage), xOffset, yOffset );
+}
+
+bool Atlas::Upload( const std::string& url,
+                    SizeType xOffset,
+                    SizeType yOffset )
+{
+  return GetImplementation(*this).Upload( url, xOffset, yOffset );
 }
 
 Atlas Atlas::DownCast( BaseHandle handle )

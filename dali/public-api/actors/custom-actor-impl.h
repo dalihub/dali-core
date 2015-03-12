@@ -178,17 +178,6 @@ public:
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event) = 0;
 
   /**
-   * @brief Called to find a child by an alias.
-   *
-   * If an alias for a child exists, return the child otherwise return an empty handle.
-   * For example 'previous' could return the last selected child.
-   * @pre The Actor has been initialized.
-   * @param[in] actorAlias the name of the actor to find
-   * @return A handle to the actor if found, or an empty handle if not.
-   */
-  virtual Dali::Actor GetChildByAlias(const std::string& actorAlias) = 0;
-
-  /**
    * Return the natural size of the actor
    *
    * @return The actor's natural size

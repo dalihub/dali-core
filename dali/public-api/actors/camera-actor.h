@@ -78,20 +78,20 @@ public:
   {
     enum
     {
-      Type = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "type",                  type String
-      ProjectionMode,                                    ///< name "projection-mode",       type String
-      FieldOfView,                                       ///< name "field-of-view",         type Float
-      AspectRatio,                                       ///< name "aspect-ratio",          type Float
-      NearPlaneDistance,                                 ///< name "near-plane-distance",   type Float
-      FarPlaneDistance,                                  ///< name "far-plane-distance",    type Float
-      LeftPlaneDistance,                                 ///< name "left-plane-distance",   type Float
-      RightPlaneDistance,                                ///< name "right-plane-distance",  type Float
-      TopPlaneDistance,                                  ///< name "top-plane-distance",    type Float
-      BottomPlaneDistance,                               ///< name "bottom-plane-distance", type Float
-      TargetPosition,                                    ///< name "target-position",       type Vector3
-      ProjectionMatrix,                                  ///< name "projection-matrix",     type Matrix
-      ViewMatrix,                                        ///< name "view-matrix",           type Matrix
-      InvertYAxis,                                       ///< name "invert-y-axis",         type Boolean
+      TYPE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "type",                  type std::string
+      PROJECTION_MODE,                                   ///< name "projection-mode",       type std::string
+      FIELD_OF_VIEW,                                     ///< name "field-of-view",         type float
+      ASPECT_RATIO,                                      ///< name "aspect-ratio",          type float
+      NEAR_PLANE_DISTANCE,                               ///< name "near-plane-distance",   type float
+      FAR_PLANE_DISTANCE,                                ///< name "far-plane-distance",    type float
+      LEFT_PLANE_DISTANCE,                               ///< name "left-plane-distance",   type float
+      RIGHT_PLANE_DISTANCE,                              ///< name "right-plane-distance",  type float
+      TOP_PLANE_DISTANCE,                                ///< name "top-plane-distance",    type float
+      BOTTOM_PLANE_DISTANCE,                             ///< name "bottom-plane-distance", type float
+      TARGET_POSITION,                                   ///< name "target-position",       type Vector3
+      PROJECTION_MATRIX,                                 ///< name "projection-matrix",     type Matrix
+      VIEW_MATRIX,                                       ///< name "view-matrix",           type Matrix
+      INVERT_Y_AXIS,                                     ///< name "invert-y-axis",         type bool
     };
   };
 

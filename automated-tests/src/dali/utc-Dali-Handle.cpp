@@ -247,7 +247,7 @@ int UtcDaliHandleGetPropertyName(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( "parent-origin" == actor.GetPropertyName( Actor::Property::ParentOrigin ) );
+  DALI_TEST_CHECK( "parent-origin" == actor.GetPropertyName( Actor::Property::PARENT_ORIGIN ) );
 
   // Register a dynamic property
   std::string name("this-name-should-match");
@@ -263,7 +263,7 @@ int UtcDaliHandleGetPropertyIndex(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( Actor::Property::ParentOrigin == actor.GetPropertyIndex("parent-origin") );
+  DALI_TEST_CHECK( Actor::Property::PARENT_ORIGIN == actor.GetPropertyIndex("parent-origin") );
 
   // Register a dynamic property
   std::string name("this-name-should-match");
@@ -280,42 +280,42 @@ int UtcDaliHandleIsPropertyWritable(void)
   Actor actor = Actor::New();
 
   // Actor properties which are writable:
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ParentOrigin ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ParentOriginX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ParentOriginY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ParentOriginZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::AnchorPoint ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::AnchorPointX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::AnchorPointY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::AnchorPointZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::Size ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SizeWidth  ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SizeHeight ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SizeDepth  ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::Position ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::PositionX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::PositionY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::PositionZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::Rotation ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::Scale ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ScaleX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ScaleY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ScaleZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::Visible ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::Color ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ColorRed ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ColorGreen ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ColorBlue ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ColorAlpha ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::PARENT_ORIGIN ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::PARENT_ORIGIN_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::PARENT_ORIGIN_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::PARENT_ORIGIN_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ANCHOR_POINT ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ANCHOR_POINT_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ANCHOR_POINT_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ANCHOR_POINT_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SIZE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SIZE_WIDTH  ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SIZE_HEIGHT ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SIZE_DEPTH  ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::POSITION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::POSITION_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::POSITION_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::POSITION_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SCALE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SCALE_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SCALE_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::SCALE_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::VISIBLE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::COLOR ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::COLOR_RED ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::COLOR_GREEN ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::COLOR_BLUE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyWritable( Actor::Property::COLOR_ALPHA ) );
 
   // World-properties are not writable:
-  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WorldPosition ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WorldRotation ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WorldScale ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WorldColor ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WorldPositionX ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WorldPositionY ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WorldPositionZ ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_POSITION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_ROTATION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_SCALE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_COLOR ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_POSITION_X ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_POSITION_Y ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyWritable( Actor::Property::WORLD_POSITION_Z ) );
 
   END_TEST;
 }
@@ -328,42 +328,42 @@ int UtcDaliHandleIsPropertyAnimatable(void)
   Actor actor = Actor::New();
 
   // Actor properties which are animatable:
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::ParentOrigin ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::ParentOriginX ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::ParentOriginY ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::ParentOriginZ ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::AnchorPoint ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::AnchorPointX ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::AnchorPointY ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::AnchorPointZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::Size ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SizeWidth  ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SizeHeight ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SizeDepth  ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::Position ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::PositionX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::PositionY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::PositionZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::Rotation ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::Scale ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ScaleX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ScaleY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ScaleZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::Visible ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::Color ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ColorRed ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ColorGreen ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ColorBlue ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ColorAlpha ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::PARENT_ORIGIN ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::PARENT_ORIGIN_X ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::PARENT_ORIGIN_Y ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::PARENT_ORIGIN_Z ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::ANCHOR_POINT ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::ANCHOR_POINT_X ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::ANCHOR_POINT_Y ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::ANCHOR_POINT_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SIZE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SIZE_WIDTH  ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SIZE_HEIGHT ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SIZE_DEPTH  ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::POSITION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::POSITION_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::POSITION_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::POSITION_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SCALE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SCALE_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SCALE_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::SCALE_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::VISIBLE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::COLOR ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::COLOR_RED ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::COLOR_GREEN ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::COLOR_BLUE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAnimatable( Actor::Property::COLOR_ALPHA ) );
 
   // World-properties can not be animated
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WorldPosition ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WorldRotation ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WorldScale ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WorldColor ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WorldPositionX ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WorldPositionY ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WorldPositionZ ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_POSITION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_ROTATION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_SCALE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_COLOR ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_POSITION_X ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_POSITION_Y ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAnimatable( Actor::Property::WORLD_POSITION_Z ) );
 
   END_TEST;
 }
@@ -375,52 +375,52 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   Actor actor = Actor::New();
 
   // Actor properties which can be used as a constraint input:
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ParentOrigin ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ParentOriginX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ParentOriginY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ParentOriginZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::AnchorPoint ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::AnchorPointX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::AnchorPointY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::AnchorPointZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::Size ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SizeWidth  ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SizeHeight ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SizeDepth  ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::Position ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::PositionX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::PositionY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::PositionZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::Rotation ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::Scale ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ScaleX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ScaleY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ScaleZ ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::Visible ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::Color ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ColorRed ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ColorGreen ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ColorBlue ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ColorAlpha ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WorldPosition ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WorldRotation ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WorldScale ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WorldColor ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WorldPositionX ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WorldPositionY ) );
-  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WorldPositionZ ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::PARENT_ORIGIN ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::PARENT_ORIGIN_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::PARENT_ORIGIN_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::PARENT_ORIGIN_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ANCHOR_POINT ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ANCHOR_POINT_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ANCHOR_POINT_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ANCHOR_POINT_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SIZE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SIZE_WIDTH  ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SIZE_HEIGHT ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SIZE_DEPTH  ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::POSITION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SCALE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SCALE_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SCALE_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::SCALE_Z ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::VISIBLE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_RED ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_GREEN ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_BLUE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_ALPHA ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_POSITION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_ROTATION ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_SCALE ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_COLOR ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_POSITION_X ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_POSITION_Y ) );
+  DALI_TEST_CHECK( true == actor.IsPropertyAConstraintInput( Actor::Property::WORLD_POSITION_Z ) );
 
   // Actor properties that cannot be used as a constraint input
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::Name ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::Sensitive ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::LeaveRequired ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::InheritRotation ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::InheritScale ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::ColorMode ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::PositionInheritance ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::DrawMode ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::SizeMode ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::SizeModeFactor ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::NAME ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::SENSITIVE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::LEAVE_REQUIRED ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::INHERIT_ROTATION ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::INHERIT_SCALE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_MODE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_INHERITANCE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::DRAW_MODE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::SIZE_MODE ) );
+  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::SIZE_MODE_FACTOR ) );
 
   END_TEST;
 }
@@ -433,14 +433,14 @@ int UtcDaliHandleGetPropertyType(void)
   unsigned int unsingedIntTest = 33;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::ParentOrigin ) );
-  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::AnchorPoint ) );
-  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::Size ) );
-  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::Position ) );
-  DALI_TEST_CHECK( Property::ROTATION == actor.GetPropertyType( Actor::Property::Rotation ) );
-  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::Scale ) );
-  DALI_TEST_CHECK( Property::BOOLEAN  == actor.GetPropertyType( Actor::Property::Visible ) );
-  DALI_TEST_CHECK( Property::VECTOR4  == actor.GetPropertyType( Actor::Property::Color ) );
+  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::PARENT_ORIGIN ) );
+  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::ANCHOR_POINT ) );
+  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::SIZE ) );
+  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::POSITION ) );
+  DALI_TEST_CHECK( Property::ROTATION == actor.GetPropertyType( Actor::Property::ROTATION ) );
+  DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::SCALE ) );
+  DALI_TEST_CHECK( Property::BOOLEAN  == actor.GetPropertyType( Actor::Property::VISIBLE ) );
+  DALI_TEST_CHECK( Property::VECTOR4  == actor.GetPropertyType( Actor::Property::COLOR ) );
 
   // Register some dynamic properties
   Property::Index boolIndex     = actor.RegisterProperty( "bool-property",     bool(true) );
@@ -706,13 +706,13 @@ int UtcDaliHandleSetProperty01(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( ParentOrigin::TOP_LEFT == actor.GetProperty( Actor::Property::ParentOrigin ).Get<Vector3>() );
+  DALI_TEST_CHECK( ParentOrigin::TOP_LEFT == actor.GetProperty( Actor::Property::PARENT_ORIGIN ).Get<Vector3>() );
 
-  actor.SetProperty( Actor::Property::ParentOrigin, ParentOrigin::CENTER );
+  actor.SetProperty( Actor::Property::PARENT_ORIGIN, ParentOrigin::CENTER );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_CHECK( ParentOrigin::CENTER == actor.GetProperty( Actor::Property::ParentOrigin ).Get<Vector3>() );
+  DALI_TEST_CHECK( ParentOrigin::CENTER == actor.GetProperty( Actor::Property::PARENT_ORIGIN ).Get<Vector3>() );
   END_TEST;
 }
 
@@ -723,10 +723,10 @@ int UtcDaliHandleSetProperty02(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK( !actor.IsPropertyWritable( Actor::Property::WorldPosition ) );
+  DALI_TEST_CHECK( !actor.IsPropertyWritable( Actor::Property::WORLD_POSITION ) );
 
   // World position is not writable so this is a no-op and should not crash
-  actor.SetProperty( Actor::Property::WorldPosition, Vector3(1,2,3) );
+  actor.SetProperty( Actor::Property::WORLD_POSITION, Vector3(1,2,3) );
 
   END_TEST;
 }
@@ -737,7 +737,7 @@ int UtcDaliHandleRegisterProperty(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  DALI_TEST_CHECK( ParentOrigin::TOP_LEFT == actor.GetProperty( Actor::Property::ParentOrigin ).Get<Vector3>() );
+  DALI_TEST_CHECK( ParentOrigin::TOP_LEFT == actor.GetProperty( Actor::Property::PARENT_ORIGIN ).Get<Vector3>() );
 
   END_TEST;
 }
@@ -749,13 +749,13 @@ int UtcDaliHandleGetProperty(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_CHECK( ParentOrigin::TOP_LEFT == actor.GetProperty( Actor::Property::ParentOrigin   ).Get<Vector3>() );
-  DALI_TEST_CHECK( AnchorPoint::CENTER    == actor.GetProperty( Actor::Property::AnchorPoint    ).Get<Vector3>() );
-  DALI_TEST_CHECK( Vector3::ZERO          == actor.GetProperty( Actor::Property::Size            ).Get<Vector3>() );
-  DALI_TEST_CHECK( Vector3::ZERO          == actor.GetProperty( Actor::Property::Position        ).Get<Vector3>() );
-  DALI_TEST_CHECK( Vector3::ONE           == actor.GetProperty( Actor::Property::Scale           ).Get<Vector3>() );
-  DALI_TEST_CHECK( true                   == actor.GetProperty( Actor::Property::Visible         ).Get<bool>() );
-  DALI_TEST_CHECK( Color::WHITE           == actor.GetProperty( Actor::Property::Color           ).Get<Vector4>() );
+  DALI_TEST_CHECK( ParentOrigin::TOP_LEFT == actor.GetProperty( Actor::Property::PARENT_ORIGIN   ).Get<Vector3>() );
+  DALI_TEST_CHECK( AnchorPoint::CENTER    == actor.GetProperty( Actor::Property::ANCHOR_POINT    ).Get<Vector3>() );
+  DALI_TEST_CHECK( Vector3::ZERO          == actor.GetProperty( Actor::Property::SIZE            ).Get<Vector3>() );
+  DALI_TEST_CHECK( Vector3::ZERO          == actor.GetProperty( Actor::Property::POSITION        ).Get<Vector3>() );
+  DALI_TEST_CHECK( Vector3::ONE           == actor.GetProperty( Actor::Property::SCALE           ).Get<Vector3>() );
+  DALI_TEST_CHECK( true                   == actor.GetProperty( Actor::Property::VISIBLE         ).Get<bool>() );
+  DALI_TEST_CHECK( Color::WHITE           == actor.GetProperty( Actor::Property::COLOR           ).Get<Vector4>() );
   END_TEST;
 }
 

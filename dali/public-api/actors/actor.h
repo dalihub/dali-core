@@ -254,51 +254,51 @@ public:
   {
     enum
     {
-      ParentOrigin = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parent-origin",         type Vector3
-      ParentOriginX,                                     ///< name "parent-origin-x",       type Float
-      ParentOriginY,                                     ///< name "parent-origin-y",       type Float
-      ParentOriginZ,                                     ///< name "parent-origin-z",       type Float
-      AnchorPoint,                                       ///< name "anchor-point",          type Vector3
-      AnchorPointX,                                      ///< name "anchor-point-x",        type Float
-      AnchorPointY,                                      ///< name "anchor-point-y",        type Float
-      AnchorPointZ,                                      ///< name "anchor-point-z",        type Float
-      Size,                                              ///< name "size",                  type Vector3
-      SizeWidth,                                         ///< name "size-width",            type Float
-      SizeHeight,                                        ///< name "size-height",           type Float
-      SizeDepth,                                         ///< name "size-depth",            type Float
-      Position,                                          ///< name "position",              type Vector3
-      PositionX,                                         ///< name "position-x",            type Float
-      PositionY,                                         ///< name "position-y",            type Float
-      PositionZ,                                         ///< name "position-z",            type Float
-      WorldPosition,                                     ///< name "world-position",        type Vector3  (read-only)
-      WorldPositionX,                                    ///< name "world-position-x",      type Float    (read-only)
-      WorldPositionY,                                    ///< name "world-position-y",      type Float    (read-only)
-      WorldPositionZ,                                    ///< name "world-position-z",      type Float    (read-only)
-      Rotation,                                          ///< name "rotation",              type Rotation
-      WorldRotation,                                     ///< name "world-rotation",        type Rotation (read-only)
-      Scale,                                             ///< name "scale",                 type Vector3
-      ScaleX,                                            ///< name "scale-x",               type Float
-      ScaleY,                                            ///< name "scale-y",               type Float
-      ScaleZ,                                            ///< name "scale-z",               type Float
-      WorldScale,                                        ///< name "world-scale",           type Vector3  (read-only)
-      Visible,                                           ///< name "visible",               type Boolean
-      Color,                                             ///< name "color",                 type Vector4
-      ColorRed,                                          ///< name "color-red",             type Float
-      ColorGreen,                                        ///< name "color-green",           type Float
-      ColorBlue,                                         ///< name "color-blue",            type Float
-      ColorAlpha,                                        ///< name "color-alpha",           type Float
-      WorldColor,                                        ///< name "world-color",           type Vector4  (read-only)
-      WorldMatrix,                                       ///< name "world-matrix",          type Matrix   (read-only)
-      Name,                                              ///< name "name",                  type String
-      Sensitive,                                         ///< name "sensitive",             type Boolean
-      LeaveRequired,                                     ///< name "leave-required",        type Boolean
-      InheritRotation,                                   ///< name "inherit-rotation",      type Boolean
-      InheritScale,                                      ///< name "inherit-scale",         type Boolean
-      ColorMode,                                         ///< name "color-mode",            type String
-      PositionInheritance,                               ///< name "position-inheritance",  type String
-      DrawMode,                                          ///< name "draw-mode",             type String
-      SizeMode,                                          ///< name "size-mode",             type String
-      SizeModeFactor,                                    ///< name "size-mode-factor",      type Vector3
+      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parent-origin",         type Vector3
+      PARENT_ORIGIN_X,                                    ///< name "parent-origin-x",       type float
+      PARENT_ORIGIN_Y,                                    ///< name "parent-origin-y",       type float
+      PARENT_ORIGIN_Z,                                    ///< name "parent-origin-z",       type float
+      ANCHOR_POINT,                                       ///< name "anchor-point",          type Vector3
+      ANCHOR_POINT_X,                                     ///< name "anchor-point-x",        type float
+      ANCHOR_POINT_Y,                                     ///< name "anchor-point-y",        type float
+      ANCHOR_POINT_Z,                                     ///< name "anchor-point-z",        type float
+      SIZE,                                               ///< name "size",                  type Vector3
+      SIZE_WIDTH,                                         ///< name "size-width",            type float
+      SIZE_HEIGHT,                                        ///< name "size-height",           type float
+      SIZE_DEPTH,                                         ///< name "size-depth",            type float
+      POSITION,                                           ///< name "position",              type Vector3
+      POSITION_X,                                         ///< name "position-x",            type float
+      POSITION_Y,                                         ///< name "position-y",            type float
+      POSITION_Z,                                         ///< name "position-z",            type float
+      WORLD_POSITION,                                     ///< name "world-position",        type Vector3    (read-only)
+      WORLD_POSITION_X,                                   ///< name "world-position-x",      type float      (read-only)
+      WORLD_POSITION_Y,                                   ///< name "world-position-y",      type float      (read-only)
+      WORLD_POSITION_Z,                                   ///< name "world-position-z",      type float      (read-only)
+      ROTATION,                                           ///< name "rotation",              type Quaternion
+      WORLD_ROTATION,                                     ///< name "world-rotation",        type Quaternion (read-only)
+      SCALE,                                              ///< name "scale",                 type Vector3
+      SCALE_X,                                            ///< name "scale-x",               type float
+      SCALE_Y,                                            ///< name "scale-y",               type float
+      SCALE_Z,                                            ///< name "scale-z",               type float
+      WORLD_SCALE,                                        ///< name "world-scale",           type Vector3    (read-only)
+      VISIBLE,                                            ///< name "visible",               type bool
+      COLOR,                                              ///< name "color",                 type Vector4
+      COLOR_RED,                                          ///< name "color-red",             type float
+      COLOR_GREEN,                                        ///< name "color-green",           type float
+      COLOR_BLUE,                                         ///< name "color-blue",            type float
+      COLOR_ALPHA,                                        ///< name "color-alpha",           type float
+      WORLD_COLOR,                                        ///< name "world-color",           type Vector4    (read-only)
+      WORLD_MATRIX,                                       ///< name "world-matrix",          type Matrix     (read-only)
+      NAME,                                               ///< name "name",                  type std::string
+      SENSITIVE,                                          ///< name "sensitive",             type bool
+      LEAVE_REQUIRED,                                     ///< name "leave-required",        type bool
+      INHERIT_ROTATION,                                   ///< name "inherit-rotation",      type bool
+      INHERIT_SCALE,                                      ///< name "inherit-scale",         type bool
+      COLOR_MODE,                                         ///< name "color-mode",            type std::string
+      POSITION_INHERITANCE,                               ///< name "position-inheritance",  type std::string
+      DRAW_MODE,                                          ///< name "draw-mode",             type std::string
+      SIZE_MODE,                                          ///< name "size-mode",             type std::string
+      SIZE_MODE_FACTOR,                                   ///< name "size-mode-factor",      type Vector3
     };
   };
 
@@ -500,18 +500,6 @@ public:
    * @return A handle to the actor if found, or an empty handle if not.
    */
   Actor FindChildByName(const std::string& actorName);
-
-  /**
-   * @brief Search through this actor's hierarchy for an actor with the given name or alias.
-   *
-   * Actors can customize this function to provide actors with preferred alias'
-   * For example 'previous' could return the last selected child.
-   * If no aliased actor is found then FindChildByName() is called.
-   * @pre The Actor has been initialized.
-   * @param[in] actorAlias the name of the actor to find
-   * @return A handle to the actor if found, or an empty handle if not.
-   */
-  Actor FindChildByAlias(const std::string& actorAlias);
 
   /**
    * @brief Search through this actor's hierarchy for an actor with the given unique ID.

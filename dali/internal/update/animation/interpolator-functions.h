@@ -2,7 +2,7 @@
 #define __DALI_INTERPOLATOR_FUNCTIONS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,23 +21,30 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/property.h>
+#include <dali/public-api/signals/callback.h>
 
 namespace Dali
 {
 
-/**
- * @brief Any interpolator function.
- */
-typedef Any AnyInterpolator;
+namespace Internal
+{
+
+namespace SceneGraph
+{
 
 /**
  * @brief Retrieve an interpolator function for a property.
  *
- * This can be cast to boost::function<P (const P&, const P&, float)> where P corresponds to the property type.
  * @param[in] type The property type for which to get an interpolator
  * @return The interpolator function.
+ *
+ * @note This returns dynamically allocated memory. The caller is responsible for deleting it.
  */
-AnyInterpolator DALI_IMPORT_API GetDefaultInterpolator(Property::Type type);
+CallbackBase* GetDefaultInterpolator( Property::Type type );
+
+} // namespace Internal
+
+} //namespace SceneGraph
 
 } // namespace Dali
 

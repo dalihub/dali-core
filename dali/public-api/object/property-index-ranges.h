@@ -32,19 +32,19 @@ namespace Dali
  */
 enum PropertyRanges
 {
-  DEFAULT_ACTOR_PROPERTY_START_INDEX            = 0,          ///< Start index for Actor (and other base classes).
-  DEFAULT_ACTOR_PROPERTY_MAX_COUNT              = 10000,      ///< Actor range: 0 to 9999
+  DEFAULT_OBJECT_PROPERTY_START_INDEX           = 0,          ///< For all objects deriving from Handle (including Actors).
 
-  DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX   = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< For non-Actor objects.
+  DEFAULT_ACTOR_PROPERTY_START_INDEX            = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< Start index for Actor.
+  DEFAULT_ACTOR_PROPERTY_MAX_COUNT              = 10000,      ///< Actor range: 0 to 9999
 
   DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX    = DEFAULT_ACTOR_PROPERTY_START_INDEX + DEFAULT_ACTOR_PROPERTY_MAX_COUNT, ///< Property start index for classes deriving directly from Actor.
 
   DEFAULT_PROPERTY_MAX_COUNT_PER_DERIVATION     = 10000,      ///< Second-level and onwards derived objects should increment their start index by this.
 
-  DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< Used by PanGestureDetector.
+  DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX,  ///< Used by PanGestureDetector.
 
   PROPERTY_REGISTRATION_START_INDEX             = 10000000,   ///< The index when registering a property should start from this number.
-  DEFAULT_PROPERTY_MAX_COUNT                    = PROPERTY_REGISTRATION_START_INDEX,          ///< Default Property Range: 0 to 9999999
+  DEFAULT_PROPERTY_MAX_COUNT                    = PROPERTY_REGISTRATION_START_INDEX,           ///< Default Property Range: 0 to 9999999
 
   PROPERTY_REGISTRATION_MAX_INDEX               = 19999999,   ///< The maximum index supported when registering a property
   PROPERTY_CUSTOM_START_INDEX                   = 50000000,   ///< The index at which custom properties start

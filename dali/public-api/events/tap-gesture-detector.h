@@ -36,7 +36,7 @@ struct TapGesture;
  * @brief This class emits a signal when a tap gesture occurs that meets the requirements set by the
  * application.
  *
- * See TapGestureDetector::SetTapsRequired and TapGestureDetector::SetTouchesRequired.
+ * See TapGestureDetector::SetTapsRequired
  *
  * A Tap Gesture is a discrete gesture, which means it does not have any state information attached
  * to it.  Please see TapGesture for more information.
@@ -49,6 +49,8 @@ struct TapGesture;
  * @endcode
  *
  * @see TapGesture
+ *
+ * @note Multi-touch taps are not currently supported. However, multiple taps (double & triple tap etc.) ARE supported.
  *
  * Signals
  * | %Signal Name | Method                |
@@ -84,11 +86,10 @@ public: // Creation & Destruction
   /**
    * @brief Create an initialized TapGestureDetector with the specified parameters.
    *
-   * @param[in]  tapsRequired     The number of taps required.
-   * @param[in]  touchesRequired  The number of touches required.
+   * @param[in]  tapsRequired     The minimum & maximum number of taps required.
    * @return A handle to a newly allocated Dali resource.
    */
-  static TapGestureDetector New(unsigned int tapsRequired, unsigned int touchesRequired);
+  static TapGestureDetector New( unsigned int tapsRequired );
 
   /**
    * @brief Downcast an Object handle to TapGestureDetector handle.
@@ -125,42 +126,42 @@ public: // Creation & Destruction
 public: // Setters
 
   /**
-   * @brief Set the number of taps required.
+   * @brief Set the minimum number of taps required.
    *
    * The tap count is the number of times a user should "tap" the screen.
-   * @param[in]  taps  Taps required.
+   * @param[in]  minimumTaps  The minimum taps required.
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
    */
-  void SetTapsRequired(unsigned int taps);
+  void SetMinimumTapsRequired( unsigned int minimumTaps );
 
   /**
-   * @brief Set the number of touches required.
+   * @brief Set the maximum number of taps required.
    *
-   * The number of touches corresponds to the number of fingers a user has on the screen.
-   * @param[in]  touches  Touches required.
+   * The tap count is the number of times a user should "tap" the screen.
+   * @param[in]  maximumTaps  The maximum taps required.
    * @pre The gesture detector has been initialized.
    * @note The default is '1'.
    */
-  void SetTouchesRequired(unsigned int touches);
+  void SetMaximumTapsRequired( unsigned int maximumTaps );
 
 public: // Getters
 
   /**
-   * @brief Retrieves the number of taps required.
+   * @brief Retrieves the minimum number of taps required.
    *
-   * @return The taps required.
+   * @return The minimum taps required.
    * @pre The gesture detector has been initialized.
    */
-  unsigned int GetTapsRequired() const;
+  unsigned int GetMinimumTapsRequired() const;
 
   /**
-   * @brief Retrieves the number of touches required.
+   * @brief Retrieves the maximum number of taps required.
    *
-   * @return The number of touches required.
+   * @return The maximum taps required.
    * @pre The gesture detector has been initialized.
    */
-  unsigned int GetTouchesRequired() const;
+  unsigned int GetMaximumTapsRequired() const;
 
 public: // Signals
 

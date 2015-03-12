@@ -51,10 +51,10 @@ namespace // For internal properties
 
 //              Name                 Type     writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "viewport-position",  VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::ViewportPosition )
-DALI_PROPERTY( "viewport-size",      VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::ViewportSize     )
-DALI_PROPERTY( "clear-color",        VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::ClearColor       )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
+DALI_PROPERTY( "viewport-position",  VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_POSITION )
+DALI_PROPERTY( "viewport-size",      VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_SIZE     )
+DALI_PROPERTY( "clear-color",        VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::CLEAR_COLOR       )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 // Signals
 
@@ -524,17 +524,17 @@ void RenderTask::SetDefaultProperty( Property::Index index, const Property::Valu
 {
   switch ( index )
   {
-    case Dali::RenderTask::Property::ViewportPosition:
+    case Dali::RenderTask::Property::VIEWPORT_POSITION:
     {
       SetViewportPosition( property.Get<Vector2>() );
       break;
     }
-    case Dali::RenderTask::Property::ViewportSize:
+    case Dali::RenderTask::Property::VIEWPORT_SIZE:
     {
       SetViewportSize( property.Get<Vector2>() );
       break;
     }
-    case Dali::RenderTask::Property::ClearColor:
+    case Dali::RenderTask::Property::CLEAR_COLOR:
     {
       SetClearColor( property.Get<Vector4>() );
       break;
@@ -554,17 +554,17 @@ Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
   switch ( index )
   {
 
-    case Dali::RenderTask::Property::ViewportPosition:
+    case Dali::RenderTask::Property::VIEWPORT_POSITION:
     {
       value = GetCurrentViewportPosition();
       break;
     }
-    case Dali::RenderTask::Property::ViewportSize:
+    case Dali::RenderTask::Property::VIEWPORT_SIZE:
     {
       value = GetCurrentViewportSize();
       break;
     }
-    case Dali::RenderTask::Property::ClearColor:
+    case Dali::RenderTask::Property::CLEAR_COLOR:
     {
       value = GetClearColor();
       break;
@@ -596,15 +596,15 @@ const SceneGraph::PropertyBase* RenderTask::GetSceneObjectAnimatableProperty( Pr
   {
     switch ( index )
     {
-      case Dali::RenderTask::Property::ViewportPosition:
+      case Dali::RenderTask::Property::VIEWPORT_POSITION:
         property = &mSceneObject->mViewportPosition;
         break;
 
-      case Dali::RenderTask::Property::ViewportSize:
+      case Dali::RenderTask::Property::VIEWPORT_SIZE:
         property = &mSceneObject->mViewportSize;
         break;
 
-      case Dali::RenderTask::Property::ClearColor:
+      case Dali::RenderTask::Property::CLEAR_COLOR:
         property = &mSceneObject->mClearColor;
         break;
 
@@ -623,15 +623,15 @@ const PropertyInputImpl* RenderTask::GetSceneObjectInputProperty( Property::Inde
   {
     switch ( index )
     {
-      case Dali::RenderTask::Property::ViewportPosition:
+      case Dali::RenderTask::Property::VIEWPORT_POSITION:
         property = &mSceneObject->mViewportPosition;
         break;
 
-      case Dali::RenderTask::Property::ViewportSize:
+      case Dali::RenderTask::Property::VIEWPORT_SIZE:
         property = &mSceneObject->mViewportSize;
         break;
 
-      case Dali::RenderTask::Property::ClearColor:
+      case Dali::RenderTask::Property::CLEAR_COLOR:
         property = &mSceneObject->mViewportSize;
         break;
 

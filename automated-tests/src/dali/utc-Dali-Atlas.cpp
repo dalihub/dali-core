@@ -24,6 +24,27 @@
 
 using namespace Dali;
 
+namespace
+{
+static const char* gTestImageFilename = "icon_wrt.png";
+
+void PrepareResourceImage( TestApplication& application, unsigned int imageHeight, unsigned int imageWidth, Pixel::Format pixelFormat )
+{
+  TestPlatformAbstraction& platform = application.GetPlatform();
+  platform.SetClosestImageSize(Vector2( 16, 16));
+
+  Integration::Bitmap* bitmap = Integration::Bitmap::New( Integration::Bitmap::BITMAP_2D_PACKED_PIXELS, ResourcePolicy::RETAIN );
+  Integration::PixelBuffer* pixbuffer = bitmap->GetPackedPixelsProfile()->ReserveBuffer( pixelFormat, imageWidth, imageHeight, imageWidth, imageHeight );
+  unsigned int bytesPerPixel = GetBytesPerPixel(  pixelFormat );
+  unsigned int initialColor = 0xFF;
+  memset( pixbuffer, initialColor, imageHeight*imageWidth*bytesPerPixel);
+
+  Integration::ResourcePointer resourcePtr(bitmap);
+  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
+}
+
+}
+
 void utc_dali_atlas_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -51,6 +72,7 @@ int UtcDaliAtlasNew01(void)
   END_TEST;
 }
 
+
 // 1.2
 int UtcDaliAtlasUpload01(void)
 {
@@ -62,8 +84,10 @@ int UtcDaliAtlasUpload01(void)
   // Using correct pixel format
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
   BufferImage image = BufferImage::New( buffer, 16, 16, Pixel::RGBA8888 );
-
   DALI_TEST_CHECK( atlas.Upload( image, 0, 0 ) );
+
+  PrepareResourceImage( application, 16, 16, Pixel::RGBA8888 );
+  DALI_TEST_CHECK( atlas.Upload( gTestImageFilename, 0, 0 ) );
 
   END_TEST;
 }
@@ -79,8 +103,10 @@ int UtcDaliAtlasUpload02(void)
   // Using INCORRECT pixel format
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
   BufferImage image = BufferImage::New( buffer, 16, 16, Pixel::A8 );
-
   DALI_TEST_CHECK( !atlas.Upload( image, 0, 0 ) );
+
+  PrepareResourceImage( application, 16, 16, Pixel::A8 );
+  DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename, 0, 0 ) );
 
   END_TEST;
 }
@@ -96,8 +122,10 @@ int UtcDaliAtlasUpload03(void)
   // Using image too big for atlas
   PixelBuffer* buffer = new PixelBuffer[16 * 16];
   BufferImage image = BufferImage::New( buffer, 16, 16, Pixel::RGBA8888 );
-
   DALI_TEST_CHECK( !atlas.Upload( image, 0, 0 ) );
+
+  PrepareResourceImage( application, 16, 16, Pixel::RGBA8888 );
+  DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename, 0, 0 ) );
 
   END_TEST;
 }
@@ -118,6 +146,12 @@ int UtcDaliAtlasUpload04(void)
   DALI_TEST_CHECK( atlas.Upload( image, 16,  0 ) );
   DALI_TEST_CHECK( atlas.Upload( image,  0, 16 ) );
   DALI_TEST_CHECK( atlas.Upload( image, 16, 16 ) );
+
+  PrepareResourceImage( application, 16, 16, Pixel::RGBA8888 );
+  DALI_TEST_CHECK( atlas.Upload( gTestImageFilename,  0,  0 ) );
+  DALI_TEST_CHECK( atlas.Upload( gTestImageFilename, 16,  0 ) );
+  DALI_TEST_CHECK( atlas.Upload( gTestImageFilename,  0, 16 ) );
+  DALI_TEST_CHECK( atlas.Upload( gTestImageFilename, 16, 16 ) );
 
   END_TEST;
 }
@@ -140,6 +174,15 @@ int UtcDaliAtlasUpload05(void)
   DALI_TEST_CHECK( !atlas.Upload( image, 99,  0 ) );
   DALI_TEST_CHECK( !atlas.Upload( image,  0, 99 ) );
   DALI_TEST_CHECK( !atlas.Upload( image, 99, 99 ) );
+
+  PrepareResourceImage( application, 16, 16, Pixel::RGBA8888 );
+
+  DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename,  0, 17 ) );
+  DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename, 17,  0 ) );
+  DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename, 17, 17 ) );
+  DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename, 99,  0 ) );
+  DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename,  0, 99 ) );
+  DALI_TEST_CHECK( !atlas.Upload( gTestImageFilename, 99, 99 ) );
 
   END_TEST;
 }

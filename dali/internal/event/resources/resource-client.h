@@ -258,6 +258,15 @@ public:
   void UploadBitmap( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
 
   /**
+   * Upload a bitmap to a texture
+   * @param[in] destId The destination texture ID
+   * @param[in] bitmap The pointer pointing to the bitmap to upload
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void UploadBitmap( ResourceId destId, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset);
+
+  /**
    * Update the mesh used by ticket
    * @note Should use same mechanism as update manager
    * @param[in] ticket The ticket holding the mesh data

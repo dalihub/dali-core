@@ -6,7 +6,6 @@
 		<filesystem path="/usr/lib/*" label="_" />
 		<filesystem path="/opt/usr/share/dali" label="dali" type="transmutable" />
 		<filesystem path="/opt/usr/share/dali/core" label="dali" type="transmutable" />
-		<filesystem path="/opt/usr/share/dali/core/shaderbin" label="dali" type="transmutable" />
 		<filesystem path="/opt/usr/share/dali/glyphcache" label="dali" type="transmutable" />
 	</assign>
 	<request>

@@ -39,9 +39,9 @@ TapGestureDetector TapGestureDetector::New()
   return TapGestureDetector(internal.Get());
 }
 
-TapGestureDetector TapGestureDetector::New(unsigned int tapsRequired, unsigned int touchesRequired)
+TapGestureDetector TapGestureDetector::New(unsigned int tapsRequired )
 {
-  Internal::TapGestureDetectorPtr internal = Internal::TapGestureDetector::New(tapsRequired, touchesRequired);
+  Internal::TapGestureDetectorPtr internal = Internal::TapGestureDetector::New( tapsRequired );
 
   return TapGestureDetector(internal.Get());
 }
@@ -66,24 +66,24 @@ TapGestureDetector& TapGestureDetector::operator=(const TapGestureDetector& rhs)
   return *this;
 }
 
-void TapGestureDetector::SetTapsRequired(unsigned int taps)
+void TapGestureDetector::SetMinimumTapsRequired(unsigned int taps)
 {
-  GetImplementation(*this).SetTapsRequired(taps);
+  GetImplementation(*this).SetMinimumTapsRequired(taps);
 }
 
-void TapGestureDetector::SetTouchesRequired(unsigned int touches)
+void TapGestureDetector::SetMaximumTapsRequired(unsigned int taps)
 {
-  GetImplementation(*this).SetTouchesRequired(touches);
+  GetImplementation(*this).SetMaximumTapsRequired(taps);
 }
 
-unsigned int TapGestureDetector::GetTapsRequired() const
+unsigned int TapGestureDetector::GetMinimumTapsRequired() const
 {
-  return GetImplementation(*this).GetTapsRequired();
+  return GetImplementation(*this).GetMinimumTapsRequired();
 }
 
-unsigned int TapGestureDetector::GetTouchesRequired() const
+unsigned int TapGestureDetector::GetMaximumTapsRequired() const
 {
-  return GetImplementation(*this).GetTouchesRequired();
+  return GetImplementation(*this).GetMaximumTapsRequired();
 }
 
 TapGestureDetector::DetectedSignalType& TapGestureDetector::DetectedSignal()

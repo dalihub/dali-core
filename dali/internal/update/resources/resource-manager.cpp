@@ -402,7 +402,7 @@ void ResourceManager::HandleLoadShaderRequest( ResourceId id, const ResourceType
   {
     ShaderDataPtr shaderData(new ShaderData(shaderType->vertexShader, shaderType->fragmentShader));
 
-    mImpl->mPlatformAbstraction.LoadFile(typePath.path, shaderData->GetBuffer());
+    mImpl->mPlatformAbstraction.LoadShaderBinFile(typePath.path, shaderData->GetBuffer());
 
     // Add the ID to the completed set
     mImpl->newCompleteRequests.insert(id);
@@ -420,6 +420,14 @@ void ResourceManager::HandleUpdateBitmapAreaRequest( ResourceId textureId, const
   if( textureId )
   {
     mImpl->mTextureCacheDispatcher.DispatchUpdateTextureArea( textureId, area );
+  }
+}
+
+void ResourceManager::HandleUploadBitmapRequest( ResourceId destId, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset )
+{
+  if( destId && bitmap )
+  {
+    mImpl->mTextureCacheDispatcher.DispatchUpdateTexture( destId, bitmap, xOffset, yOffset );
   }
 }
 
