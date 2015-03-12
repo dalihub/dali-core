@@ -82,9 +82,10 @@ public:
   /**
    * @brief Creates a new Sampler object
    *
+   * @param[in] image Image used by this sampler
    * @param[in] uniformName String with the name of the uniform
    */
-  static Sampler New( const std::string& uniformName );
+  static Sampler New( Image& image, const std::string& uniformName );
 
   /**
    * @brief Default constructor, creates an empty handle
@@ -123,7 +124,7 @@ public:
    *
    * @param[in] image Image used by this sampler
    */
-  void SetImage( Image image );
+  void SetImage( Image& image );
 
   /**
    * @brief Set the filter modes for this sampler
@@ -132,7 +133,7 @@ public:
    * and MAGNIFICATION_FILTER
    *
    * @param[in] minFilter The minification filter that will be used
-   * @param[in] minFilter The magnification filter that will be used
+   * @param[in] magFilter The magnification filter that will be used
    */
   void SetFilterMode( FilterMode minFilter, FilterMode magFilter );
 
@@ -161,7 +162,7 @@ public:
    *
    * @param [in] pointer A pointer to a newly allocated Sampler
    */
-  explicit DALI_INTERNAL Sampler(Internal::Sampler* pointer);
+  explicit DALI_INTERNAL Sampler( Internal::Sampler* pointer );
 };
 
 } //namespace Dali

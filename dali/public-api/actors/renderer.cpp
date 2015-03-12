@@ -24,7 +24,7 @@
 namespace Dali
 {
 
-Renderer Renderer::New( Geometry geometry, Material material )
+Renderer Renderer::New( Geometry& geometry, Material& material )
 {
   Internal::RendererPtr renderer = Internal::Renderer::New(  );
   return Renderer( renderer.Get() );
@@ -49,12 +49,12 @@ Renderer& Renderer::operator=( const Renderer& handle )
   return *this;
 }
 
-void Renderer::SetGeometry( Geometry geometry )
+void Renderer::SetGeometry( Geometry& geometry )
 {
   GetImplementation(*this).SetGeometry( GetImplementation(geometry) );
 }
 
-void Renderer::SetMaterial( Material material )
+void Renderer::SetMaterial( Material& material )
 {
   GetImplementation(*this).SetMaterial( GetImplementation(material) );
 }

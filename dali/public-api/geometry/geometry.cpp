@@ -49,7 +49,7 @@ Geometry& Geometry::operator=( const Geometry& handle )
   return *this;
 }
 
-std::size_t Geometry::AddVertexBuffer( PropertyBuffer vertexBuffer )
+std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
   return GetImplementation(*this).AddVertexBuffer( GetImplementation( vertexBuffer ) );
 }
@@ -64,7 +64,7 @@ void Geometry::RemoveVertexBuffer( std::size_t index )
   GetImplementation(*this).RemoveVertexBuffer( index );
 }
 
-void Geometry::SetIndexBuffer( PropertyBuffer indexBuffer )
+void Geometry::SetIndexBuffer( PropertyBuffer& indexBuffer )
 {
   GetImplementation(*this).SetIndexBuffer( GetImplementation( indexBuffer ) );
 }

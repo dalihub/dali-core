@@ -59,7 +59,7 @@ public:
    * @param[in] geometry Geometry to be used by this renderer
    * @param[in] material Material to be used by this renderer
    */
-  static Renderer New( Geometry geometry, Material material );
+  static Renderer New( Geometry& geometry, Material& material );
 
   /**
    * @brief Default constructor, creates an empty handle
@@ -91,14 +91,14 @@ public:
    *
    * @param[in] geometry The geometry to be used by this renderer
    */
-  void SetGeometry( Geometry geometry );
+  void SetGeometry( Geometry& geometry );
 
   /**
    * @brief Sets the material to be used by this renderer
    *
    * @param[in] material The material to be used by this renderer
    */
-  void SetMaterial( Material material );
+  void SetMaterial( Material& material );
 
   /**
    * @brief Set the depth index of this renderer

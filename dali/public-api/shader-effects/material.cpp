@@ -28,6 +28,7 @@ namespace Dali
 
 Material Material::New( Shader shader )
 {
+  // TODO: MESH_REWORK
   Internal::MaterialPtr material = Internal::Material::New();
   return Material( material.Get() );
 }
@@ -45,18 +46,18 @@ Material::Material( const Material& handle )
 {
 }
 
-Material& Material::operator=( Material& handle )
+Material& Material::operator=( const Material& handle )
 {
   BaseHandle::operator=( handle );
   return *this;
 }
 
-void Material::SetShader( Shader shader )
+void Material::SetShader( Shader& shader )
 {
   GetImplementation(*this).SetShader( GetImplementation( shader ) );
 }
 
-void Material::AddSampler( Sampler sampler )
+void Material::AddSampler( Sampler& sampler )
 {
   GetImplementation(*this).AddSampler( GetImplementation( sampler ) );
 }

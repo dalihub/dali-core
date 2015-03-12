@@ -24,8 +24,9 @@
 namespace Dali
 {
 
-Sampler Sampler::New( const std::string& uniformName )
+Sampler Sampler::New( Image& image, const std::string& uniformName )
 {
+  //TODO: MESH_REWORK
   Internal::SamplerPtr sampler = Internal::Sampler::New();
   return Sampler( sampler.Get() );
 }
@@ -54,7 +55,7 @@ void Sampler::SetUniformName( const std::string& name )
   GetImplementation(*this).SetUniformName( name );
 }
 
-void Sampler::SetImage( Image image )
+void Sampler::SetImage( Image& image )
 {
   GetImplementation(*this).SetImage( GetImplementation( image ) );
 }

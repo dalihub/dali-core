@@ -31,6 +31,7 @@
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/actors/actor-declarations.h>
+#include <dali/internal/event/actors/renderer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 
@@ -53,6 +54,7 @@ class Actor;
 class ActorGestureData;
 class Animation;
 class RenderTask;
+class Renderer;
 struct DynamicsData;
 
 typedef IntrusivePtr<Actor>                   ActorPtr;
@@ -742,6 +744,31 @@ public:
    * @copydoc Dali::Actor::GetCurrentWorldColor()
    */
   const Vector4& GetCurrentWorldColor() const;
+
+  /**
+   * @copydoc Dali::Actor::AddRenderer()
+   */
+  unsigned int AddRenderer( Renderer& renderer );
+
+  /**
+   * @copydoc Dali::Actor::GetRendererCount()
+   */
+  unsigned int GetRendererCount() const;
+
+  /**
+   * @copydoc Dali::Actor::GetRendererAt()
+   */
+  Renderer& GetRendererAt( unsigned int index );
+
+  /**
+   * @copydoc Dali::Actor::RemoveRenderer()
+   */
+  void RemoveRenderer( Renderer& renderer );
+
+  /**
+   * @copydoc Dali::Actor::RemoveRenderer()
+   */
+  void RemoveRenderer( unsigned int index );
 
 #ifdef DYNAMICS_SUPPORT
 

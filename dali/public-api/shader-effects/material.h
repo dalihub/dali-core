@@ -112,21 +112,21 @@ public:
    *
    * @param[in] handle Handle to an object
    */
-  Material& operator=( Material& handle );
+  Material& operator=( const Material& handle );
 
   /**
    * @brief Sets the Shader used by this material
    *
    * @param[in] shader Handle to a shader
    */
-  void SetShader( Shader shader );
+  void SetShader( Shader& shader );
 
   /**
    * @brief Add a sampler to this material
    *
    * param[in] sampler The sampler to add to this material
    */
-  void AddSampler( Sampler sampler );
+  void AddSampler( Sampler& sampler );
 
   /**
    * @brief Get the number of samplers
@@ -270,7 +270,7 @@ public:
    *
    * @param [in] pointer A pointer to a newly allocated Material
    */
-  explicit DALI_INTERNAL Material(Internal::Material* pointer);
+  explicit DALI_INTERNAL Material( Internal::Material* pointer );
 };
 
 } //namespace Dali

@@ -13,6 +13,7 @@ internal_src_files = \
   $(internal_src_dir)/event/actor-attachments/camera-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/image-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/renderable-attachment-impl.cpp \
+  $(internal_src_dir)/event/actor-attachments/renderer-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/text-attachment-impl.cpp \
   $(internal_src_dir)/event/actors/actor-impl.cpp \
   $(internal_src_dir)/event/actors/custom-actor-internal.cpp \
@@ -45,9 +46,9 @@ internal_src_files = \
   $(internal_src_dir)/event/common/type-registry-impl.cpp \
   $(internal_src_dir)/event/effects/material-impl.cpp \
   $(internal_src_dir)/event/effects/sampler-impl.cpp \
-  $(internal_src_dir)/event/effects/shader-impl.cpp \
   $(internal_src_dir)/event/effects/shader-effect-impl.cpp \
   $(internal_src_dir)/event/effects/shader-factory.cpp \
+  $(internal_src_dir)/event/effects/shader-impl.cpp \
   $(internal_src_dir)/event/events/actor-gesture-data.cpp \
   $(internal_src_dir)/event/events/actor-observer.cpp \
   $(internal_src_dir)/event/events/event-processor.cpp \

@@ -105,7 +105,7 @@ public:
    * @return Index of the newly added buffer, can be used with RemoveVertexBuffer to remove
    *         this buffer if no longer required
    */
-  std::size_t AddVertexBuffer( PropertyBuffer vertexBuffer );
+  std::size_t AddVertexBuffer( PropertyBuffer& vertexBuffer );
 
   /**
    * @brief Retrieve the number of vertex buffers that have been added to this geometry
@@ -133,7 +133,7 @@ public:
    *
    * @param[in] indexBuffer PropertyBuffer to be used as a source of indices for the geometry
    */
-  void SetIndexBuffer( PropertyBuffer indexBuffer );
+  void SetIndexBuffer( PropertyBuffer& indexBuffer );
 
   /**
    * @brief Set the type of primitives this geometry contains
@@ -175,7 +175,7 @@ public:
    *
    * @param [in] pointer A pointer to a newly allocated Geometry
    */
-  explicit DALI_INTERNAL Geometry(Internal::Geometry* pointer);
+  explicit DALI_INTERNAL Geometry( Internal::Geometry* pointer );
 };
 
 } //namespace Dali

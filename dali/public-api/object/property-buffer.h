@@ -159,7 +159,7 @@ public:
    *
    * @param [in] pointer A pointer to a newly allocated PropertyBuffer
    */
-  explicit DALI_INTERNAL PropertyBuffer(Internal::PropertyBuffer* pointer);
+  explicit DALI_INTERNAL PropertyBuffer( Internal::PropertyBuffer* pointer );
 };
 
 } // namespace Dali

@@ -218,7 +218,7 @@ ShaderEffect::ShaderEffect( UpdateManager& updateManager, Dali::ShaderEffect::Ge
   mConnectionCount (0),
   mGeometryHints( hints )
 {
-  mSceneObject = new Shader( hints );
+  mSceneObject = new SceneGraph::Shader( hints );
   DALI_ASSERT_DEBUG( NULL != mSceneObject );
 
   // Transfer shader ownership to a scene message
