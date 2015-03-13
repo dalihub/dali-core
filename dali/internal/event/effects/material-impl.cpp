@@ -169,6 +169,11 @@ const Vector4& Material::GetBlendColor() const
   return Color::WHITE;
 }
 
+const SceneGraph::Material* Material::GetMaterialSceneObject() const
+{
+  return mSceneObject;
+}
+
 unsigned int Material::GetDefaultPropertyCount() const
 {
   return MATERIAL_IMPL.GetDefaultPropertyCount();

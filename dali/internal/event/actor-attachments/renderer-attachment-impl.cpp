@@ -33,7 +33,7 @@ RendererAttachmentPtr RendererAttachment::New( Stage& stage, const SceneGraph::N
   RendererAttachmentPtr attachment( new RendererAttachment( stage ) );
 
   // Transfer object ownership of scene-object to message
-  SceneGraph::RendererAttachment* sceneObject = CreateSceneObject();
+  SceneGraph::RendererAttachment* sceneObject = renderer.GetRendererSceneObject();
   AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing

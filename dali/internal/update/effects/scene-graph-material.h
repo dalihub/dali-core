@@ -59,7 +59,7 @@ public:
    * Get the shader effect of this material
    * @return the shader effect;
    */
-  const Shader* GetShader() const;
+  virtual Shader* GetShader() const;
 
   /**
    * Add a sampler (image + sampler modes) to the material

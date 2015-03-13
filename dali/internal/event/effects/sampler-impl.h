@@ -78,6 +78,13 @@ public:
    */
   void SetAffectsTransparency( bool affectsTransparency );
 
+  /**
+   * @brief Get the sampler scene object
+   *
+   * @return the sampler scene object
+   */
+  const SceneGraph::Sampler* GetSamplerSceneObject() const;
+
 public: // Default property extensions from Object
 
   /**

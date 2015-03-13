@@ -23,6 +23,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/common/discard-queue.h>
+#include <dali/internal/update/controllers/scene-controller.h>
 
 namespace Dali
 {
@@ -53,9 +54,20 @@ public:
    * @param[in] discardQueue Queue to discard objects that might still be in use in the render thread.
    **/
   ObjectOwnerContainer( SceneGraphBuffers& sceneGraphBuffers, DiscardQueue& discardQueue )
-  : mSceneGraphBuffers( sceneGraphBuffers ),
+  : mSceneController( NULL ),
+    mSceneGraphBuffers( sceneGraphBuffers ),
     mDiscardQueue( discardQueue )
   {
+  }
+
+  /**
+   * @brief Set the SceneController on this owner
+   *
+   * @param[in] sceneController The SceneController
+   **/
+  void SetSceneController( SceneController& sceneController )
+  {
+    mSceneController = &sceneController;
   }
 
   /**
@@ -68,6 +80,9 @@ public:
     DALI_ASSERT_DEBUG( pointer && "Pointer should not be null" );
 
     mObjectContainer.PushBack( pointer );
+
+    // @todo MESH_REWORK FIX ME NOW!
+    //pointer->ConnectToSceneGraph(*mSceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   /**
@@ -86,6 +101,7 @@ public:
     DALI_ASSERT_DEBUG( match != mObjectContainer.End() && "Should always find a match" );
 
     mDiscardQueue.Add( mSceneGraphBuffers.GetUpdateBufferIndex(), mObjectContainer.Release( match ) );
+    pointer->DisconnectFromSceneGraph(*mSceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   /**
@@ -120,6 +136,7 @@ public:
   }
 
 private:
+  SceneController* mSceneController;      ///< SceneControler used to send messages
   ObjectContainer mObjectContainer;       ///< Container for the objects owned
   SceneGraphBuffers& mSceneGraphBuffers;  ///< Reference to a SceneGraphBuffers to get the indexBuffer
   DiscardQueue& mDiscardQueue;            ///< Discard queue used for removed objects

@@ -53,6 +53,7 @@
 #include <dali/internal/update/manager/update-algorithms.h>
 #include <dali/internal/update/manager/update-manager-debug.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
+#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/queue/update-message-queue.h>
@@ -174,7 +175,7 @@ struct UpdateManager::Impl
     systemLevelTaskList ( completeStatusManager ),
     root( NULL ),
     systemLevelRoot( NULL ),
-    geometries( sceneGraphBuffers, discardQueue ),
+    geometries(  sceneGraphBuffers, discardQueue ),
     materials( sceneGraphBuffers, discardQueue ),
     samplers( sceneGraphBuffers, discardQueue ),
     propertyBuffers( sceneGraphBuffers, discardQueue ),
@@ -190,6 +191,11 @@ struct UpdateManager::Impl
     renderTaskWaiting( false )
   {
     sceneController = new SceneControllerImpl( renderMessageDispatcher, renderQueue, discardQueue, textureCache, completeStatusManager );
+
+    geometries.SetSceneController( *sceneController );
+    materials.SetSceneController( *sceneController );
+    propertyBuffers.SetSceneController( *sceneController );
+    samplers.SetSceneController( *sceneController );
   }
 
   ~Impl()
@@ -423,6 +429,7 @@ void UpdateManager::DestroyNode( Node* node )
   node->OnDestroy();
 }
 
+//@todo MESH_REWORK Extend to allow arbitrary scene objects to connect to each other
 void UpdateManager::AttachToNode( Node* node, NodeAttachment* attachment )
 {
   DALI_ASSERT_DEBUG( node != NULL );
@@ -431,6 +438,11 @@ void UpdateManager::AttachToNode( Node* node, NodeAttachment* attachment )
   // attach node to attachment first so that parent is known by the time attachment is connected
   node->Attach( *attachment ); // node takes ownership
   attachment->ConnectToSceneGraph( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
+}
+
+void UpdateManager::AttachToSceneGraph( RendererAttachment* renderer )
+{
+  renderer->AttachToSceneGraph( *(mImpl->sceneController), mSceneGraphBuffers.GetUpdateBufferIndex() );
 }
 
 void UpdateManager::AddObject( PropertyOwner* object )

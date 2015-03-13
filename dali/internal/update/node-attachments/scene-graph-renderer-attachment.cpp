@@ -23,6 +23,22 @@
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 
+#if defined(DEBUG_ENABLED)
+Debug::Filter* gImageAttachmentLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SCENE_GRAPH_IMAGE_ATTACHMENT");
+
+#define ATTACHMENT_LOG(level)                                                 \
+  DALI_LOG_INFO(gImageAttachmentLogFilter, level, "SceneGraph::ImageAttachment::%s: this:%p\n", __FUNCTION__, this)
+#define ATTACHMENT_LOG_FMT(level, format, args...) \
+  DALI_LOG_INFO(gImageAttachmentLogFilter, level, "SceneGraph::ImageAttachment::%s: this:%p " format, __FUNCTION__, this, ## args)
+
+#else
+
+#define ATTACHMENT_LOG(level)
+#define ATTACHMENT_LOG_FMT(level, format, args...)
+
+#endif
+
+
 namespace Dali
 {
 namespace Internal
@@ -56,6 +72,7 @@ void RendererAttachment::SetMaterial( BufferIndex updateBufferIndex, const Mater
   mMaterial = material;
 
   // Tell renderer about a new provider
+  if( mRenderer )
   {
     typedef MessageValue1< NewRenderer, const MaterialDataProvider*> DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
@@ -73,6 +90,7 @@ void RendererAttachment::SetGeometry( BufferIndex updateBufferIndex, const Geome
   mGeometry = geometry;
 
   // Tell renderer about a new provider
+  if( mRenderer )
   {
     typedef MessageValue1< NewRenderer, const GeometryDataProvider*> DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
@@ -121,24 +139,31 @@ bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
     opaque = mParent->GetWorldColor( updateBufferIndex ).a >= FULLY_OPAQUE;
   }
 
-  // Require that all affecting samplers are opaque
-  unsigned int opaqueCount=0;
-  unsigned int affectingCount=0;
-  const Material::Samplers& samplers = mMaterial->GetSamplers();
-  for( Material::Samplers::ConstIterator iter = samplers.Begin();
-       iter != samplers.End(); ++iter )
+  if( mMaterial != NULL )
   {
-    const Sampler* sampler = static_cast<const Sampler*>(*iter);
-    if( sampler->AffectsTransparency( updateBufferIndex ) )
+    // Require that all affecting samplers are opaque
+    unsigned int opaqueCount=0;
+    unsigned int affectingCount=0;
+
+    const Material::Samplers& samplers = mMaterial->GetSamplers();
+    for( Material::Samplers::ConstIterator iter = samplers.Begin();
+         iter != samplers.End(); ++iter )
     {
-      affectingCount++;
-      if( sampler->IsFullyOpaque( updateBufferIndex ) )
+      const Sampler* sampler = static_cast<const Sampler*>(*iter);
+      if( sampler != NULL )
       {
-        opaqueCount++;
+        if( sampler->AffectsTransparency( updateBufferIndex ) )
+        {
+          affectingCount++;
+          if( sampler->IsFullyOpaque( updateBufferIndex ) )
+          {
+            opaqueCount++;
+          }
+        }
       }
     }
+    opaque = (opaqueCount == affectingCount);
   }
-  opaque = (opaqueCount == affectingCount);
 
   return opaque;
 }
@@ -146,6 +171,11 @@ bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
 void RendererAttachment::SizeChanged( BufferIndex updateBufferIndex )
 {
   // Do nothing.
+}
+
+void RendererAttachment::AttachToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex )
+{
+  mSceneController = &sceneController;
 }
 
 void RendererAttachment::ConnectToSceneGraph2( BufferIndex updateBufferIndex )

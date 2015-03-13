@@ -68,6 +68,13 @@ public:
    */
   void SetDepthIndex( int depthIndex );
 
+  /**
+   * @brief Get the scene graph object ( the node attachment )
+   *
+   * @return the scene object
+   */
+  SceneGraph::RendererAttachment* GetRendererSceneObject();
+
 public: // Default property extensions from Object
 
   /**
@@ -169,6 +176,8 @@ public: // Functions from Connectable
 private: // implementation
   Renderer();
 
+  void Initialize();
+
 private: // unimplemented methods
   Renderer( const Renderer& );
   Renderer& operator=( const Renderer& );
@@ -177,7 +186,7 @@ private: // data
   SceneGraph::RendererAttachment* mSceneObject;
   ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
   ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
-
+  bool mOnStage;
 };
 
 } // namespace Internal

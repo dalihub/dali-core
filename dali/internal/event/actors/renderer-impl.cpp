@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/renderer.h> // Dali::Renderer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 
 namespace Dali
@@ -45,17 +46,23 @@ const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERT
 
 RendererPtr Renderer::New()
 {
-  return RendererPtr( new Renderer() );
+  RendererPtr rendererPtr( new Renderer() );
+  rendererPtr->Initialize();
+  return rendererPtr;
 }
 
 void Renderer::SetGeometry( Geometry& geometry )
 {
   mGeometryConnector.Set( geometry, OnStage() );
+  const SceneGraph::Geometry* geometrySceneObject = geometry.GetGeometrySceneObject();
+  SetGeometryMessage( Stage::GetCurrent()->GetUpdateInterface(), *mSceneObject, *geometrySceneObject );
 }
 
 void Renderer::SetMaterial( Material& material )
 {
   mMaterialConnector.Set( material, OnStage() );
+  const SceneGraph::Material* materialSceneObject = material.GetMaterialSceneObject();
+  SetMaterialMessage( Stage::GetCurrent()->GetUpdateInterface(), *mSceneObject, *materialSceneObject );
 }
 
 void Renderer::SetDepthIndex( int depthIndex )
@@ -63,6 +70,11 @@ void Renderer::SetDepthIndex( int depthIndex )
   //SceneGraph::NodePropertyMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, &mNode->mPosition, &AnimatableProperty<Vector3>::Bake, position );
   // TODO: MESH_REWORK
   DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+}
+
+SceneGraph::RendererAttachment* Renderer::GetRendererSceneObject()
+{
+  return mSceneObject;
 }
 
 unsigned int Renderer::GetDefaultPropertyCount() const
@@ -151,8 +163,8 @@ int Renderer::GetPropertyComponentIndex( Property::Index index ) const
 bool Renderer::OnStage() const
 {
   // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  return false;
+  //DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  return mOnStage;
 }
 
 void Renderer::Connect()
@@ -160,6 +172,7 @@ void Renderer::Connect()
   // TODO: MESH_REWORK : check this
   mGeometryConnector.OnStageConnect();
   mMaterialConnector.OnStageConnect();
+  mOnStage = true;
 }
 
 void Renderer::Disconnect()
@@ -167,12 +180,24 @@ void Renderer::Disconnect()
   // TODO: MESH_REWORK : check this
   mGeometryConnector.OnStageDisconnect();
   mMaterialConnector.OnStageDisconnect();
+  mOnStage = false;
 }
 
 Renderer::Renderer()
-: mSceneObject(NULL)
+: mSceneObject(NULL),
+  mOnStage(false)
 {
 }
+
+void Renderer::Initialize()
+{
+  // Transfer object ownership of scene-object to message
+  mSceneObject = SceneGraph::RendererAttachment::New();
+
+  // Send message to update to connect to scene graph:
+  AttachToSceneGraphMessage( Stage::GetCurrent()->GetUpdateManager(), mSceneObject );
+}
+
 
 } // namespace Internal
 } // namespace Dali

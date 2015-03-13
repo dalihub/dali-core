@@ -44,9 +44,10 @@ void Material::SetShader( const Shader* shader )
   // Need to inform renderer in render thread about this shader
 }
 
-const Shader* Material::GetShader() const
+Shader* Material::GetShader() const
 {
-  return mShader;
+  // @todo - Fix this - move shader setup to the Renderer connect to stage... or summit
+  return const_cast<Shader*>(mShader);
 }
 
 void Material::AddSampler( const Sampler* sampler )

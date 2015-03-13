@@ -243,7 +243,7 @@ void RenderableAttachment::PrepareRender( BufferIndex updateBufferIndex )
 }
 
 RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
-: mSceneController(NULL),
+: mSceneController(NULL), //@todo MESH_REWORK Pass in where required rather than store
   mShader( NULL ),
   mTrackedResources(),
   mSortModifier( 0.0f ),

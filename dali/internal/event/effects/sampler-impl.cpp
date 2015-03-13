@@ -93,6 +93,11 @@ void Sampler::SetAffectsTransparency( bool affectsTransparency )
   DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
 }
 
+const SceneGraph::Sampler* Sampler::GetSamplerSceneObject() const
+{
+  return mSceneObject;
+}
+
 unsigned int Sampler::GetDefaultPropertyCount() const
 {
   return SAMPLER_IMPL.GetDefaultPropertyCount();

@@ -196,12 +196,12 @@ void RenderGeometry::Draw( Context* context, BufferIndex bufferIndex, const Geom
   {
     case Dali::Geometry::TRIANGLES:
     {
-      context->DrawElements(GL_TRIANGLES, numIndices/3, GL_UNSIGNED_SHORT, 0);
+      context->DrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
       break;
     }
     case Dali::Geometry::LINES:
     {
-      context->DrawElements(GL_LINES, numIndices/2, GL_UNSIGNED_SHORT, 0);
+      context->DrawElements(GL_LINES, numIndices, GL_UNSIGNED_SHORT, 0);
       break;
     }
     case Dali::Geometry::POINTS:

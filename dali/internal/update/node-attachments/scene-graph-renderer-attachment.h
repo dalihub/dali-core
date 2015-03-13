@@ -92,6 +92,11 @@ public:
    */
   int GetDepthIndex() const ;
 
+  /**
+   * Initial setup on attaching to the scene graph
+   */
+  void AttachToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex );
+
 protected: // From RenderableAttachment
   /**
    * @copydoc RenderableAttachment::GetRenderer().
@@ -118,7 +123,7 @@ protected: // From RenderableAttachment
    */
   virtual void SizeChanged( BufferIndex updateBufferIndex );
 
-  /**
+/**
    * @copydoc RenderableAttachment::ConnectToSceneGraph2().
    */
   virtual void ConnectToSceneGraph2( BufferIndex updateBufferIndex );

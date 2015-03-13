@@ -54,6 +54,13 @@ public:
                         const std::string& fragmentShader,
                         Dali::Shader::ShaderHints hints );
 
+  /**
+   * @brief Get the shader scene object
+   *
+   * @return the shader scene object
+   */
+  const SceneGraph::Shader* GetShaderSceneObject() const;
+
 public: // Default property extensions from Object
 
   /**

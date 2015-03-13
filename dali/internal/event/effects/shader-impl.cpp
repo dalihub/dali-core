@@ -60,6 +60,11 @@ ShaderPtr Shader::New( const std::string& vertexShader,
   return shader;
 }
 
+const SceneGraph::Shader* Shader::GetShaderSceneObject() const
+{
+  return mSceneObject;
+}
+
 unsigned int Shader::GetDefaultPropertyCount() const
 {
   return SHADER_IMPL.GetDefaultPropertyCount();

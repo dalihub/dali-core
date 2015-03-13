@@ -25,6 +25,7 @@ namespace Internal
 namespace SceneGraph
 {
 class SamplerDataProvider;
+class Shader;
 
 
 class MaterialDataProvider
@@ -38,6 +39,12 @@ public:
   MaterialDataProvider()
   {
   }
+
+  /**
+   * Returns the shader
+   * @return The shader
+   */
+  virtual Shader* GetShader() const = 0;
 
   /**
    * Returns the list of samplers that this material provides

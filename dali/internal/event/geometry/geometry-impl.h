@@ -96,6 +96,13 @@ public:
    */
   bool GetRequiresDepthTesting() const;
 
+  /**
+   * @brief Get the geometry scene object
+   *
+   * @return the geometry scene object
+   */
+  const SceneGraph::Geometry* GetGeometrySceneObject() const;
+
 public: // Default property extensions from Object
 
   /**

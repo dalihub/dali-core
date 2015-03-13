@@ -27,6 +27,7 @@
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/public-api/actors/blending.h>
 #include <dali/internal/common/image-sampler.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 namespace Dali
 {
@@ -158,7 +159,13 @@ void Renderer::Render( BufferIndex bufferIndex,
 {
   DALI_ASSERT_DEBUG( mContext && "Renderer::Render. Renderer not initialised!! (mContext == NULL)." );
 
-  // @todo
+  // @todo MESH_REWORK Fix when merging! :D
+  NewRenderer* renderer = dynamic_cast<NewRenderer*>(this);
+  if( renderer )
+  {
+    // Get the shader from the material:
+    mShader = renderer->mMaterialDataProvider->GetShader();
+  }
 
   // if mShader is NULL it means we're set to default
   if( !mShader )

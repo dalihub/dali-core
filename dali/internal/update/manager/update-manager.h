@@ -38,7 +38,6 @@
 
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
-
 namespace Dali
 {
 
@@ -80,6 +79,7 @@ class Geometry;
 class PropertyBuffer;
 class Material;
 class Sampler;
+class RendererAttachment;
 
 /**
  * UpdateManager holds a scene graph i.e. a tree of nodes.
@@ -204,6 +204,12 @@ public:
    * @param[in] attachment The object to attach.
    */
   void AttachToNode( Node* node, NodeAttachment* attachment );
+
+  /**
+   * Attach a renderer to the scene graph
+   */
+  void AttachToSceneGraph( RendererAttachment* renderer );
+
 
   /**
    * Add a newly created object.
@@ -555,6 +561,17 @@ inline void AttachToNodeMessage( UpdateManager& manager, const Node& constParent
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AttachToNode, &parent, attachment );
+}
+
+inline void AttachToSceneGraphMessage( UpdateManager& manager, RendererAttachment* renderer )
+{
+  typedef MessageValue1< UpdateManager, RendererAttachment* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.GetEventToUpdate().ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AttachToSceneGraph, renderer );
 }
 
 inline void AddObjectMessage( UpdateManager& manager, PropertyOwner* object )

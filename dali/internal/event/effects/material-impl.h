@@ -135,6 +135,13 @@ public:
    */
   const Vector4& GetBlendColor() const;
 
+  /**
+   * @brief Get the material scene object
+   *
+   * @return the material scene object
+   */
+  const SceneGraph::Material* GetMaterialSceneObject() const;
+
 public: // Default property extensions from Object
 
   /**

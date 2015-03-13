@@ -71,6 +71,13 @@ public:
    */
   Dali::Property::Index GetPropertyIndex( const std::string name, std::size_t index );
 
+  /**
+   * @brief Get the propertyBuffer scene object
+   *
+   * @return the propertyBuffer scene object
+   */
+  const SceneGraph::PropertyBuffer* GetPropertyBufferSceneObject() const;
+
 public: // Default property extensions from Object
 
   /**

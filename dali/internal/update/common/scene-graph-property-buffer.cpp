@@ -37,12 +37,12 @@ PropertyBuffer* PropertyBuffer::NewQuadVertices()
   PropertyBuffer* propertyBuffer = new PropertyBuffer();
   propertyBuffer->mElementSize = sizeof(Vector4);
   propertyBuffer->mData.Resize( propertyBuffer->mElementSize * 4 );
-  Vector4* vertices = reinterpret_cast<Vector4*>(propertyBuffer->mData[0]);
+  Vector4* vertices = reinterpret_cast<Vector4*>(&propertyBuffer->mData[0]);
 
-  vertices[ 0 ] = Vector4( -0.5f, -0.5f, 1.0f, 0.0f );
-  vertices[ 1 ] = Vector4(  0.5f, -0.5f, 1.0f, 1.0f );
-  vertices[ 2 ] = Vector4( -0.5f,  0.5f, 0.0f, 0.0f );
-  vertices[ 3 ] = Vector4(  0.5f,  0.5f, 0.0f, 1.0f );
+  vertices[ 0 ] = Vector4( -0.5f, -0.5f, 0.0f, 0.0f );
+  vertices[ 1 ] = Vector4(  0.5f, -0.5f, 1.0f, 0.0f );
+  vertices[ 2 ] = Vector4( -0.5f,  0.5f, 0.0f, 1.0f );
+  vertices[ 3 ] = Vector4(  0.5f,  0.5f, 1.0f, 1.0f );
 
   return propertyBuffer;
 }
@@ -54,7 +54,7 @@ PropertyBuffer* PropertyBuffer::NewQuadIndices()
 
   propertyBuffer->mElementSize = sizeof( unsigned short );
   propertyBuffer->mData.Resize( propertyBuffer->mElementSize * 6 );
-  unsigned short* indices = reinterpret_cast<unsigned short*>(propertyBuffer->mData[0]);
+  unsigned short* indices = reinterpret_cast<unsigned short*>(&propertyBuffer->mData[0]);
 
   indices[0] = 0;  indices[1] = 3;  indices[2] = 1;
   indices[3] = 0;  indices[4] = 2;  indices[5] = 3;
@@ -77,7 +77,7 @@ std::size_t PropertyBuffer::GetElementSize( BufferIndex bufferIndex ) const
 const void* PropertyBuffer::GetData( BufferIndex bufferIndex ) const
 {
   // @todo MESH_REWORK mData should be double buffered
-  return reinterpret_cast< const void* >(mData[0]);
+  return reinterpret_cast< const void* >(&mData[0]);
 }
 
 

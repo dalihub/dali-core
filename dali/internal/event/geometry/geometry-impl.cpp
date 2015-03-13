@@ -101,6 +101,11 @@ bool Geometry::GetRequiresDepthTesting() const
   return false;
 }
 
+const SceneGraph::Geometry* Geometry::GetGeometrySceneObject() const
+{
+  return mSceneObject;
+}
+
 unsigned int Geometry::GetDefaultPropertyCount() const
 {
   return GEOMETRY_IMPL.GetDefaultPropertyCount();

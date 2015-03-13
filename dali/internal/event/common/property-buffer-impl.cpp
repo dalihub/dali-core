@@ -22,6 +22,7 @@
 #include <dali/public-api/object/property-buffer.h>     // Dali::Internal::PropertyBuffer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
 
 namespace Dali
@@ -74,6 +75,11 @@ Dali::Property::Index PropertyBuffer::GetPropertyIndex( const std::string name, 
   //TODO: MESH_REWORK
   DALI_ASSERT_ALWAYS( false && "MESH_REWORK" );
   return 0;
+}
+
+const SceneGraph::PropertyBuffer* PropertyBuffer::GetPropertyBufferSceneObject() const
+{
+  return mSceneObject;
 }
 
 unsigned int PropertyBuffer::GetDefaultPropertyCount() const

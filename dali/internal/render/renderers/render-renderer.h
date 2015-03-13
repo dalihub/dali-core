@@ -179,11 +179,14 @@ private:
                                            const SamplerDataProvider& sampler );
 
 
-private:
+public:
+  // @todo MESH_REWORK Make private - add getters
   //const NodeDataProvider&     mNodeDataProvider;
   //const ShaderDataProvider&   mShaderDataProvider;
   const MaterialDataProvider* mMaterialDataProvider;
   const GeometryDataProvider* mGeometryDataProvider;
+
+private:
 
   RenderGeometry mRenderGeometry;
 
