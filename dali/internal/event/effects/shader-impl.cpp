@@ -55,7 +55,7 @@ ShaderPtr Shader::New( const std::string& vertexShader,
                        Dali::Shader::ShaderHints hints )
 {
   //TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS(false && "MESH REWORK");
+  //DALI_ASSERT_ALWAYS(false && "MESH REWORK");
   ShaderPtr shader( new Shader() );
   shader->Initialize( vertexShader, fragmentShader );
   return shader;
@@ -126,7 +126,7 @@ const SceneGraph::PropertyOwner* Shader::GetPropertyOwner() const
 
 const SceneGraph::PropertyOwner* Shader::GetSceneObject() const
 {
-  return SHADER_IMPL.GetSceneObject();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyBase* Shader::GetSceneObjectAnimatableProperty( Property::Index index ) const

@@ -41,6 +41,7 @@ Material::~Material()
 void Material::SetShader( const Shader* shader )
 {
   mShader = shader;
+  // Need to inform renderer in render thread about this shader
 }
 
 const Shader* Material::GetShader() const

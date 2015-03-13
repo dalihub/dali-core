@@ -32,6 +32,10 @@ namespace Dali
 {
 namespace Internal
 {
+namespace SceneGraph
+{
+class RendererAttachment;
+}
 
 class Renderer;
 typedef IntrusivePtr<Renderer> RendererPtr;
@@ -170,6 +174,7 @@ private: // unimplemented methods
   Renderer& operator=( const Renderer& );
 
 private: // data
+  SceneGraph::RendererAttachment* mSceneObject;
   ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
   ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
 

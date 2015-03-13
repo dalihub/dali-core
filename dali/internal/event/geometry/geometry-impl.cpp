@@ -166,7 +166,7 @@ const SceneGraph::PropertyOwner* Geometry::GetPropertyOwner() const
 
 const SceneGraph::PropertyOwner* Geometry::GetSceneObject() const
 {
-  return GEOMETRY_IMPL.GetSceneObject();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyBase* Geometry::GetSceneObjectAnimatableProperty( Property::Index index ) const

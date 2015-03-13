@@ -158,7 +158,7 @@ const SceneGraph::PropertyOwner* Sampler::GetPropertyOwner() const
 
 const SceneGraph::PropertyOwner* Sampler::GetSceneObject() const
 {
-  return SAMPLER_IMPL.GetSceneObject();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyBase* Sampler::GetSceneObjectAnimatableProperty( Property::Index index ) const

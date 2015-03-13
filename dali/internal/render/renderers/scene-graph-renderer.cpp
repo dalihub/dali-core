@@ -158,6 +158,8 @@ void Renderer::Render( BufferIndex bufferIndex,
 {
   DALI_ASSERT_DEBUG( mContext && "Renderer::Render. Renderer not initialised!! (mContext == NULL)." );
 
+  // @todo
+
   // if mShader is NULL it means we're set to default
   if( !mShader )
   {

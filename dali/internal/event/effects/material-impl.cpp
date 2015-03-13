@@ -234,7 +234,7 @@ const SceneGraph::PropertyOwner* Material::GetPropertyOwner() const
 
 const SceneGraph::PropertyOwner* Material::GetSceneObject() const
 {
-  return MATERIAL_IMPL.GetSceneObject();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyBase* Material::GetSceneObjectAnimatableProperty( Property::Index index ) const
@@ -255,8 +255,8 @@ int Material::GetPropertyComponentIndex( Property::Index index ) const
 bool Material::OnStage() const
 {
   // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  return false;
+  //DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  return mSceneObject != NULL;
 }
 
 void Material::Connect()

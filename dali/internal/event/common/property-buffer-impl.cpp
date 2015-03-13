@@ -22,7 +22,7 @@
 #include <dali/public-api/object/property-buffer.h>     // Dali::Internal::PropertyBuffer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-
+#include <dali/internal/update/common/scene-graph-property-buffer.h>
 
 namespace Dali
 {
@@ -141,7 +141,7 @@ const SceneGraph::PropertyOwner* PropertyBuffer::GetPropertyOwner() const
 
 const SceneGraph::PropertyOwner* PropertyBuffer::GetSceneObject() const
 {
-  return PROPERTY_BUFFER_IMPL.GetSceneObject();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyBase* PropertyBuffer::GetSceneObjectAnimatableProperty( Property::Index index ) const
@@ -177,9 +177,9 @@ void PropertyBuffer::Disconnect()
 }
 
 PropertyBuffer::PropertyBuffer()
+: mSceneObject(NULL)
 {
 }
 
 } // namespace Internal
 } // namespace Dali
-

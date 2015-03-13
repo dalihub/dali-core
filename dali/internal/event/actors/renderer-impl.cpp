@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/renderer.h> // Dali::Renderer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
+#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 
 namespace Dali
 {
@@ -129,7 +130,7 @@ const SceneGraph::PropertyOwner* Renderer::GetPropertyOwner() const
 
 const SceneGraph::PropertyOwner* Renderer::GetSceneObject() const
 {
-  return RENDERER_IMPL.GetSceneObject();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty( Property::Index index ) const
@@ -169,6 +170,7 @@ void Renderer::Disconnect()
 }
 
 Renderer::Renderer()
+: mSceneObject(NULL)
 {
 }
 

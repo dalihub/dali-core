@@ -181,13 +181,6 @@ struct ObjectImplHelper
     return 0;
   }
 
-  const SceneGraph::PropertyOwner* GetSceneObject() const
-  {
-    // TODO: MESH_REWORK
-    DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-    return 0;
-  }
-
   const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const
   {
     // TODO: MESH_REWORK
@@ -218,4 +211,3 @@ struct ObjectImplHelper
 } // namespace Dali
 
 #endif // DALI_INTERNAL_OBJECT_IMPL_HELPER_H
-
