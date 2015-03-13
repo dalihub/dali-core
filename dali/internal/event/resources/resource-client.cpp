@@ -432,6 +432,17 @@ void ResourceClient::UploadBitmap( ResourceId destId, ResourceId srcId, std::siz
                               yOffset );
 }
 
+
+void ResourceClient::UploadBitmap( ResourceId destId,Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset)
+{
+  RequestUploadBitmapMessage( mUpdateManager.GetEventToUpdate(),
+                              mResourceManager,
+                              destId,
+                              bitmap,
+                              xOffset,
+                              yOffset );
+}
+
 void ResourceClient::UpdateMesh( ResourceTicketPtr ticket, const Dali::MeshData& meshData )
 {
   DALI_ASSERT_DEBUG( ticket );

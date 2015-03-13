@@ -123,6 +123,7 @@ internal_src_files = \
   $(internal_src_dir)/render/shaders/program-controller.cpp \
   $(internal_src_dir)/render/shaders/shader.cpp \
   \
+  $(internal_src_dir)/update/animation/interpolator-functions.cpp \
   $(internal_src_dir)/update/animation/scene-graph-animation.cpp \
   $(internal_src_dir)/update/animation/scene-graph-constraint-base.cpp \
   $(internal_src_dir)/update/common/discard-queue.cpp \

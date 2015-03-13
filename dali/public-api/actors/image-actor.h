@@ -70,10 +70,10 @@ public:
   {
     enum
     {
-      PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixel-area",  type RECTANGLE
-      STYLE,                                                   ///< name "style",       type STRING
-      BORDER,                                                  ///< name "border",      type VECTOR4
-      IMAGE,                                                   ///< name "image",       type MAP {"filename":"", "load-policy":...}
+      PIXEL_AREA = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "pixel-area",  type Rect<int>
+      STYLE,                                                   ///< name "style",       type std::string
+      BORDER,                                                  ///< name "border",      type Vector4
+      IMAGE,                                                   ///< name "image",       type Map {"filename":"", "load-policy":...}
     };
   };
 

@@ -34,7 +34,7 @@ namespace
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "points",         ARRAY, true, false, false,   Dali::Path::Property::POINTS         )
 DALI_PROPERTY( "control-points", ARRAY, true, false, false,   Dali::Path::Property::CONTROL_POINTS )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 /**
  * These coefficient arise from the cubic polynomial equations for

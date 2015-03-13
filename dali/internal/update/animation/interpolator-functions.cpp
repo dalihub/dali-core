@@ -15,17 +15,15 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <boost/function.hpp>
-
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/interpolator-functions.h>
+#include <dali/internal/update/animation/interpolator-functions.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
+
 
 namespace
 {
@@ -96,63 +94,69 @@ Dali::Matrix3 LerpMatrix3( const Dali::Matrix3& current, const Dali::Matrix3& ta
 namespace Dali
 {
 
-AnyInterpolator GetDefaultInterpolator( Property::Type type )
+namespace Internal
 {
-  AnyInterpolator function;
+
+namespace SceneGraph
+{
+
+CallbackBase* GetDefaultInterpolator( Property::Type type )
+{
+  CallbackBase* function = NULL;
 
   switch ( type )
   {
     case Property::BOOLEAN:
     {
-      function = boost::function<bool (const bool&, const bool&, float)>( &LerpBoolean );
+      function = MakeCallback( LerpBoolean );
       break;
     }
 
     case Property::FLOAT:
     {
-      function = boost::function<float (const float&, const float&, float)>( &LerpFloat );
+      function = MakeCallback( LerpFloat );
       break;
     }
 
     case Property::INTEGER:
     {
-      function = boost::function<int (const int&, const int&, float)>( &LerpInteger );
+      function = MakeCallback( LerpInteger );
       break;
     }
 
     case Property::VECTOR2:
     {
-      function = boost::function<Vector2 (const Vector2&, const Vector2&, float)>( &LerpVector2 );
+      function = MakeCallback( LerpVector2 );
       break;
     }
 
     case Property::VECTOR3:
     {
-      function = boost::function<Vector3 (const Vector3&, const Vector3&, float)>( &LerpVector3 );
+      function = MakeCallback( LerpVector3 );
       break;
     }
 
     case Property::VECTOR4:
     {
-      function = boost::function<Vector4 (const Vector4&, const Vector4&, float)>( &LerpVector4 );
+      function = MakeCallback( LerpVector4 );
       break;
     }
 
     case Property::ROTATION:
     {
-      function = boost::function<Quaternion (const Quaternion&, const Quaternion&, float)>( &SlerpQuaternion );
+      function = MakeCallback( SlerpQuaternion );
       break;
     }
 
     case Property::MATRIX3:
     {
-      function = boost::function<Matrix3 (const Matrix3&, const Matrix3&, float)>(&LerpMatrix3);
+      function = MakeCallback( LerpMatrix3 );
       break;
     }
 
     case Property::MATRIX:
     {
-      function = boost::function<Matrix (const Matrix&, const Matrix&, float)>(&LerpMatrix);
+      function = MakeCallback( LerpMatrix );
       break;
     }
 
@@ -163,5 +167,8 @@ AnyInterpolator GetDefaultInterpolator( Property::Type type )
   return function;
 }
 
+} // namespace SceneGraph
+
+} // namespace Internal
 
 } // namespace Dali

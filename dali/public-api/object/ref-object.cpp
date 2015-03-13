@@ -115,7 +115,7 @@ void RefObject::Unreference()
 #if defined __aarch64__
 
   asm volatile(
-  "1:\ldxr   %w[newValue], %[address] \n\t"
+  "1:\tldxr   %w[newValue], %[address] \n\t"
       "sub   %w[newValue], %w[newValue], %[one] \n\t"
       "stxr  w2,  %w[newValue], %[address] \n\t"
       "cbnz  w2,  1b \n\t"

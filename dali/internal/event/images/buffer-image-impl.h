@@ -21,9 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/bitmap.h> // For Integration::BitmapPtr
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/images/buffer-image.h>
-#include <dali/public-api/images/image.h>
 #include <dali/internal/event/images/image-impl.h>
+#include <dali/public-api/images/image.h>
+#include <dali/public-api/images/buffer-image.h>
 
 namespace Dali
 {
@@ -75,7 +75,7 @@ public:
    * @param [in] stride      the internal stride of the pixelbuffer in pixels
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  static BufferImagePtr New( Integration::PixelBuffer* pixBuf,
+  static BufferImagePtr New( PixelBuffer* pixBuf,
                              unsigned int width,
                              unsigned int height,
                              Pixel::Format pixelformat,
@@ -112,7 +112,7 @@ public:
    * @param [in] stride      the internal stride of the pixelbuffer in pixels
    * @param [in] releasePol  optionally relase memory when image is not visible on screen (default: keep image data until Image object is alive).
    */
-  BufferImage(Integration::PixelBuffer* pixBuf,
+  BufferImage(PixelBuffer* pixBuf,
               unsigned int width,
               unsigned int height,
               Pixel::Format pixelformat,
@@ -143,7 +143,7 @@ public:
    * Upload the modified contents with Update().
    * @return the pixel buffer
    */
-  Integration::PixelBuffer* GetBuffer();
+  PixelBuffer* GetBuffer();
 
   /**
    * Returns buffer size in bytes.

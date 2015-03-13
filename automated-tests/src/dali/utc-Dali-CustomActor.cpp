@@ -169,20 +169,6 @@ struct TestCustomActor : public CustomActorImpl
   {
     AddToCallStacks("OnKeyInputFocusLost");
   }
-  virtual Actor GetChildByAlias(const std::string& actorAlias)
-  {
-    AddToCallStacks("GetChildByAlias");
-
-    if ("found" == actorAlias)
-    {
-      return Actor::New();
-    }
-    else
-    {
-      return Actor();
-    }
-  }
-
   virtual Vector3 GetNaturalSize()
   {
     return Vector3( 0.0f, 0.0f, 0.0f );
@@ -480,11 +466,6 @@ public:
   }
   virtual void OnKeyInputFocusLost()
   {
-  }
-
-  virtual Actor GetChildByAlias(const std::string& actorAlias)
-  {
-    return Actor();
   }
 
   virtual Vector3 GetNaturalSize()
@@ -1586,27 +1567,6 @@ int UtcDaliCustomActorOnMouseWheelEvent(void)
 
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnMouseWheelEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliCustomActorFindChildByAlias(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::CustomActor::GetChildByAlias()");
-
-  TestCustomActor custom = TestCustomActor::New();
-  DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-
-  custom.Add(Actor::New());
-
-  DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-
-  DALI_TEST_CHECK( !custom.FindChildByAlias("not-found") );
-
-  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "GetChildByAlias", custom.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-
-  DALI_TEST_CHECK( custom.FindChildByAlias("found") );
   END_TEST;
 }
 

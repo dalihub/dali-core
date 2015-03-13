@@ -242,11 +242,6 @@ struct MyTestCustomActor : public CustomActorImpl
   virtual void OnKeyInputFocusLost()
   {
   }
-  virtual Actor GetChildByAlias(const std::string& actorAlias)
-  {
-    return Actor::New();
-  }
-
   virtual Vector3 GetNaturalSize()
   {
     return Vector3( 0.0f, 0.0f, 0.0f );

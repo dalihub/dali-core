@@ -148,12 +148,6 @@ Actor Actor::FindChildByName(const std::string& actorName)
   return Actor(child.Get());
 }
 
-Actor Actor::FindChildByAlias(const std::string& actorAlias)
-{
-  Actor child = GetImplementation(*this).FindChildByAlias(actorAlias);
-  return child;
-}
-
 Actor Actor::FindChildById(const unsigned int id)
 {
   Internal::ActorPtr child = GetImplementation(*this).FindChildById(id);

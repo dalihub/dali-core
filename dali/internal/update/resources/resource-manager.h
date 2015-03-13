@@ -260,6 +260,15 @@ public: // Used by ResourceClient
   /**
    * Upload a bitmap to a position within a specified texture
    * @param[in] destId The destination texture ID
+   * @param[in] bitmap The pointer pointing to the bitmap data to upload
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void HandleUploadBitmapRequest( ResourceId destId, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset );
+
+  /**
+   * Upload a bitmap to a position within a specified texture
+   * @param[in] destId The destination texture ID
    * @param[in] srcId The resource ID of the bitmap to upload
    * @param [in] xOffset Specifies an offset in the x direction within the texture
    * @param [in] yOffset Specifies an offset in the y direction within the texture
@@ -362,7 +371,6 @@ public:
   /********************************************************************************
    ********************************* Private Methods  *****************************
    ********************************************************************************/
-private:
 
   /**
    * Sends notification messages for load sucess & failure,
@@ -546,6 +554,22 @@ inline void RequestUpdateBitmapAreaMessage( EventToUpdate& eventToUpdate,
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUpdateBitmapAreaRequest, id, area );
+}
+
+inline void RequestUploadBitmapMessage( EventToUpdate& eventToUpdate,
+                                        ResourceManager& manager,
+                                        ResourceId destId,
+                                        Integration::BitmapPtr bitmap,
+                                        std::size_t xOffset,
+                                        std::size_t yOffset )
+{
+  typedef MessageValue4< ResourceManager, ResourceId, Integration::BitmapPtr , std::size_t, std::size_t > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &ResourceManager::HandleUploadBitmapRequest, destId, bitmap, xOffset, yOffset );
 }
 
 inline void RequestUploadBitmapMessage( EventToUpdate& eventToUpdate,

@@ -224,11 +224,6 @@ public:
   ActorPtr FindChildByName(const std::string& actorName);
 
   /**
-   * @copydoc Dali::Actor::FindChildByAlias
-   */
-  Dali::Actor FindChildByAlias(const std::string& actorAlias);
-
-  /**
    * @copydoc Dali::Actor::FindChildById
    */
   ActorPtr FindChildById(const unsigned int id);
@@ -1339,24 +1334,6 @@ private:
    * @return True if the event should be consumed.
    */
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event) { return false; }
-
-  /**
-   * For use in derived class
-   * If an alias for a child exists, return the child otherwise return an empty handle.
-   * For example 'previous' could return the last selected child.
-   * @pre The Actor has been initialized.
-   * @param[in] actorAlias the name of the actor to find
-   * @return A handle to the actor if found, or an empty handle if not.
-   */
-  virtual Dali::Actor GetChildByAlias(const std::string& actorAlias) { return Dali::Actor(); }
-
-  /**
-   * Support function for FindChildByAlias
-   * @pre The Actor has been initialized.
-   * @param[in] actorAlias the name of the aliased actor to find
-   * @return A handle to the actor if found, or an empty handle if not.
-   */
-  Dali::Actor DoGetChildByAlias(const std::string& actorAlias);
 
 protected:
 

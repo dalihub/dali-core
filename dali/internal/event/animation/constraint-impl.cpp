@@ -33,21 +33,6 @@
 #include <dali/public-api/math/matrix.h>
 #include <dali/public-api/math/matrix3.h>
 
-namespace
-{
-// Constraint Interpolation function prototypes
-typedef boost::function<bool (const bool& start, const bool& target, float progress)> BoolInterpolator;
-typedef boost::function<float (const float& start, const float& target, float progress)> FloatInterpolator;
-typedef boost::function<int (const int& start, const int& target, float progress)> IntegerInterpolator;
-typedef boost::function<Dali::Vector2 (const Dali::Vector2& current, const Dali::Vector2& target, float progress)> Vector2Interpolator;
-typedef boost::function<Dali::Vector3 (const Dali::Vector3& current, const Dali::Vector3& target, float progress)> Vector3Interpolator;
-typedef boost::function<Dali::Vector4 (const Dali::Vector4& current, const Dali::Vector4& target, float progress)> Vector4Interpolator;
-typedef boost::function<Dali::Quaternion (const Dali::Quaternion& current, const Dali::Quaternion& target, float progress)> QuaternionInterpolator;
-typedef boost::function<Dali::Matrix3 (const Dali::Matrix3& current, const Dali::Matrix3& target, float progress)> Matrix3Interpolator;
-typedef boost::function<Dali::Matrix (const Dali::Matrix& current, const Dali::Matrix& target, float progress)> MatrixInterpolator;
-
-}
-
 namespace Dali
 {
 
@@ -144,8 +129,7 @@ PropertyConstraintBase<P>* CreatePropertyConstraint( Constraint::AnyFunction& fu
 Constraint::Constraint( Property::Index targetIndex,
                         Property::Type targetType,
                         SourceContainer& sources,
-                        AnyFunction& func,
-                        AnyFunction& interpolator )
+                        AnyFunction& func )
 : mApplyTime( 0.0f )
 {
   switch ( targetType )
@@ -156,8 +140,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<bool>::New( targetIndex,
                                                                                        sources,
-                                                                                       funcPtr,
-                                                                                       AnyCast< BoolInterpolator >( interpolator ) ) );
+                                                                                       funcPtr ) );
       break;
     }
 
@@ -167,8 +150,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<float>::New( targetIndex,
                                                                                         sources,
-                                                                                        funcPtr,
-                                                                                        AnyCast< FloatInterpolator >( interpolator ) ) );
+                                                                                        funcPtr ) );
       break;
     }
 
@@ -178,8 +160,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<int>::New( targetIndex,
                                                                                       sources,
-                                                                                      funcPtr,
-                                                                                      AnyCast< IntegerInterpolator >( interpolator ) ) );
+                                                                                      funcPtr ) );
       break;
     }
 
@@ -189,8 +170,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Vector2>::New( targetIndex,
                                                                                           sources,
-                                                                                          funcPtr,
-                                                                                          AnyCast< Vector2Interpolator >( interpolator ) ) );
+                                                                                          funcPtr ) );
       break;
     }
 
@@ -200,8 +180,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Vector3>::New( targetIndex,
                                                                                           sources,
-                                                                                          funcPtr,
-                                                                                          AnyCast< Vector3Interpolator >( interpolator ) ) );
+                                                                                          funcPtr ) );
       break;
     }
 
@@ -211,8 +190,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Vector4>::New( targetIndex,
                                                                                           sources,
-                                                                                          funcPtr,
-                                                                                          AnyCast< Vector4Interpolator >( interpolator ) ) );
+                                                                                          funcPtr ) );
       break;
     }
 
@@ -222,8 +200,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Quaternion>::New( targetIndex,
                                                                                              sources,
-                                                                                             funcPtr,
-                                                                                             AnyCast< QuaternionInterpolator >( interpolator ) ) );
+                                                                                             funcPtr ) );
       break;
     }
 
@@ -233,8 +210,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Matrix>::New( targetIndex,
                                                                                          sources,
-                                                                                         funcPtr,
-                                                                                         AnyCast< MatrixInterpolator >( interpolator ) ) );
+                                                                                         funcPtr ) );
       break;
     }
 
@@ -244,8 +220,7 @@ Constraint::Constraint( Property::Index targetIndex,
 
       mActiveConstraintTemplate = Dali::ActiveConstraint( ActiveConstraint<Matrix3>::New( targetIndex,
                                                                                           sources,
-                                                                                          funcPtr,
-                                                                                          AnyCast< Matrix3Interpolator >( interpolator ) ) );
+                                                                                          funcPtr ) );
       break;
     }
 

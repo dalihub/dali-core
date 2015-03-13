@@ -159,14 +159,6 @@ private:
   }
 
   /**
-   * @copydoc Internal::Actor::GetChildByAlias
-   */
-  virtual Dali::Actor GetChildByAlias(const std::string& actorAlias)
-  {
-    return mImpl->GetChildByAlias(actorAlias);
-  }
-
-  /**
    * @copydoc Internal::Actor::GetNaturalSize
    */
   virtual Vector3 GetNaturalSize() const

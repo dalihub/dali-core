@@ -2623,35 +2623,6 @@ int UtcDaliActorFindChildByName(void)
   END_TEST;
 }
 
-int UtcDaliActorFindChildByAlias(void)
-{
-  tet_infoline("Testing Dali::Actor::FindChildByAlias()");
-  TestApplication application;
-
-  Actor parent = Actor::New();
-  parent.SetName( "parent" );
-  Actor first  = Actor::New();
-  first .SetName( "first" );
-  Actor second = Actor::New();
-  second.SetName( "second" );
-
-  parent.Add(first);
-  first.Add(second);
-
-  Actor found = parent.FindChildByAlias( "foo" );
-  DALI_TEST_CHECK( !found );
-
-  found = parent.FindChildByAlias( "parent" );
-  DALI_TEST_CHECK( found == parent );
-
-  found = parent.FindChildByAlias( "first" );
-  DALI_TEST_CHECK( found == first );
-
-  found = parent.FindChildByAlias( "second" );
-  DALI_TEST_CHECK( found == second );
-  END_TEST;
-}
-
 int UtcDaliActorFindChildById(void)
 {
   tet_infoline("Testing Dali::Actor::UtcDaliActorFindChildById()");
