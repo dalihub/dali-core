@@ -254,6 +254,7 @@ private: //data
   SamplerConnectorContainer mSamplerConnectors; ///< Vector of connectors that hold the samplers used by this material
 
   SceneGraph::Material* mSceneObject;
+  bool mOnStage;
 };
 
 } // namespace Internal

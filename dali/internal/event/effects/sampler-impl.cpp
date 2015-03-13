@@ -178,23 +178,26 @@ int Sampler::GetPropertyComponentIndex( Property::Index index ) const
 
 bool Sampler::OnStage() const
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  return false;
+  return mOnStage;
 }
 
 void Sampler::Connect()
 {
+  mOnStage = true;
+
   mImageConnector.OnStageConnect();
 }
 
 void Sampler::Disconnect()
 {
+  mOnStage = false;
+
   mImageConnector.OnStageDisconnect();
 }
 
 Sampler::Sampler()
-: mSceneObject( NULL )
+: mSceneObject( NULL ),
+  mOnStage( false )
 {
 }
 

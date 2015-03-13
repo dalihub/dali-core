@@ -55,7 +55,6 @@ ShaderPtr Shader::New( const std::string& vertexShader,
                        Dali::Shader::ShaderHints hints )
 {
   //TODO: MESH_REWORK
-  //DALI_ASSERT_ALWAYS(false && "MESH REWORK");
   ShaderPtr shader( new Shader() );
   shader->Initialize( vertexShader, fragmentShader );
   return shader;
@@ -146,20 +145,22 @@ int Shader::GetPropertyComponentIndex( Property::Index index ) const
 
 bool Shader::OnStage() const
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  return false;
+  return mOnStage;
 }
 
 void Shader::Connect()
 {
+  mOnStage = true;
 }
 
 void Shader::Disconnect()
 {
+  mOnStage = false;
 }
 
 Shader::Shader()
+: mSceneObject( NULL ),
+  mOnStage( false )
 {
 }
 

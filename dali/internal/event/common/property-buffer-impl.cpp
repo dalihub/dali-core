@@ -161,23 +161,22 @@ int PropertyBuffer::GetPropertyComponentIndex( Property::Index index ) const
 
 bool PropertyBuffer::OnStage() const
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  return false;
+  return mOnStage;
 }
 
 void PropertyBuffer::Connect()
 {
-  // TODO: MESH_REWORK
+  mOnStage = true;
 }
 
 void PropertyBuffer::Disconnect()
 {
-  // TODO: MESH_REWORK
+  mOnStage = false;
 }
 
 PropertyBuffer::PropertyBuffer()
-: mSceneObject(NULL)
+: mSceneObject(NULL),
+  mOnStage( false )
 {
 }
 

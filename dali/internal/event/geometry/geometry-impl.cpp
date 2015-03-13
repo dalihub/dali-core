@@ -186,13 +186,13 @@ int Geometry::GetPropertyComponentIndex( Property::Index index ) const
 
 bool Geometry::OnStage() const
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  return false;
+  return mOnStage;
 }
 
 void Geometry::Connect()
 {
+  mOnStage = true;
+
   PropertyBufferConnectorContainer::const_iterator end = mVertexBufferConnectors.end();
   for( PropertyBufferConnectorContainer::iterator it = mVertexBufferConnectors.begin();
        it < end;
@@ -205,6 +205,8 @@ void Geometry::Connect()
 
 void Geometry::Disconnect()
 {
+  mOnStage = false;
+
   PropertyBufferConnectorContainer::const_iterator end = mVertexBufferConnectors.end();
   for( PropertyBufferConnectorContainer::iterator it = mVertexBufferConnectors.begin();
        it < end;
@@ -216,7 +218,8 @@ void Geometry::Disconnect()
 }
 
 Geometry::Geometry()
-: mSceneObject( NULL )
+: mSceneObject( NULL ),
+  mOnStage( false )
 {
 }
 

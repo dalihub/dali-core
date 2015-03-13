@@ -167,6 +167,7 @@ private: // unimplemented methods
 private:
   SceneGraph::Shader* mSceneObject;
   ResourceTicketPtr mTicket;
+  bool mOnStage;
 };
 
 } // namespace Internal

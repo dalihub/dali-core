@@ -212,6 +212,7 @@ private: // data
   PropertyBufferConnectorContainer mVertexBufferConnectors; ///< Vector of connectors that hold the property buffers used by this geometry
   PropertyBufferConnector mIndexBufferConnector;            ///< Connector that holds the index buffer used by this geometry
   SceneGraph::Geometry* mSceneObject;
+  bool mOnStage;
 };
 
 } // namespace Internal

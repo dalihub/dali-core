@@ -189,6 +189,7 @@ private: // data
   //TODO: MESH_REWORK : change to ObjectConnector
   ImageConnector mImageConnector;
   SceneGraph::Sampler* mSceneObject;
+  bool mOnStage;
 };
 
 } // namespace Internal

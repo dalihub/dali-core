@@ -178,6 +178,7 @@ private: // unimplemented methods
 
 private: // data
   SceneGraph::PropertyBuffer* mSceneObject;
+  bool mOnStage;
 };
 
 } // namespace Internal
