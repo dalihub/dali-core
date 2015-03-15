@@ -161,6 +161,27 @@ public:
    */
   virtual void JoinLoaderThreads() = 0;
 
+  // Font Queries
+
+  /**
+   * Called by Dali to retrieve the default font family & style for the platform.
+   * Multi-threading note: this method will be called from the main thread only i.e. not
+   * from within the Core::Render() method.
+   * @param[out] The default font family.
+   * @param[out] The default font style.
+   */
+  virtual void GetDefaultFontDescription( std::string& family, std::string& style ) const = 0;
+
+  /**
+   * Called by Dali to retrieve the default font size for the platform.
+   * This is an accessibility size, which is mapped to a UI Control specific point-size in stylesheets.
+   * For example if zero the smallest size, this could potentially map to TextLabel point-size 8.
+   * Multi-threading note: this method will be called from the main thread only i.e. not
+   * from within the Core::Render() method.
+   * @return The default font size.
+   */
+  virtual int GetDefaultFontSize() const = 0;
+
   /**
    * Sets horizontal and vertical pixels per inch value that is used by the display
    * @param[in] dpiHorizontal horizontal dpi value

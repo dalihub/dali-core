@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <stdint.h>
 #include <cstring>
+#include <string>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/set-wrapper.h>
@@ -133,6 +134,16 @@ public:
   virtual bool IsLoading();
 
   /**
+   * @copydoc PlatformAbstraction::GetDefaultFontFamily()
+   */
+  virtual void GetDefaultFontDescription( std::string& family, std::string& style ) const;
+
+  /**
+   * @copydoc PlatformAbstraction::GetDefaultFontSize()
+   */
+  virtual int GetDefaultFontSize() const;
+
+  /**
    * @copydoc PlatformAbstraction::SetDpi()
    */
   virtual void SetDpi (unsigned int dpiHorizontal, unsigned int dpiVertical);
@@ -221,6 +232,9 @@ private:
   size_t                        mSeconds;
   size_t                        mMicroSeconds;
   bool                          mIsLoadingResult;
+  std::string                   mGetDefaultFontFamilyResult;
+  std::string                   mGetDefaultFontStyleResult;
+  int                           mGetDefaultFontSizeResult;
   Resources                     mResources;
   Integration::ResourceRequest* mRequest;
   Vector2                       mSize;

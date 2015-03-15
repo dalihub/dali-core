@@ -163,6 +163,25 @@ bool TestPlatformAbstraction::IsLoading()
 }
 
 /**
+ * @copydoc PlatformAbstraction::GetDefaultFontDescription()
+ */
+void TestPlatformAbstraction::GetDefaultFontDescription( std::string& family, std::string& style ) const
+{
+  mTrace.PushCall("GetDefaultFontFamily", "");
+  family = mGetDefaultFontFamilyResult;
+  style = mGetDefaultFontStyleResult;
+}
+
+/**
+ * @copydoc PlatformAbstraction::GetDefaultFontSize()
+ */
+int TestPlatformAbstraction::GetDefaultFontSize() const
+{
+  mTrace.PushCall("GetDefaultFontSize", "");
+  return mGetDefaultFontSizeResult;
+}
+
+/**
  * @copydoc PlatformAbstraction::SetDpi()
  */
 void TestPlatformAbstraction::SetDpi (unsigned int dpiHorizontal, unsigned int dpiVertical)
