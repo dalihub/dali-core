@@ -67,6 +67,12 @@ NativeImage::~NativeImage()
 {
 }
 
+void NativeImage::CreateGlTexture()
+{
+  ResourceClient& resourceClient = ThreadLocalStorage::Get().GetResourceClient();
+  resourceClient.CreateGlTexture( GetResourceId() );
+}
+
 } // namespace Internal
 
 } // namespace Dali

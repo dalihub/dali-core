@@ -266,6 +266,11 @@ public:
    * @return The bitmap, or NULL if the ticket did not reference a bitmap
    */
   Integration::Bitmap* GetBitmap(ResourceTicketPtr ticket);
+   /**
+    * @brief Trigger asynchronous creation of GL texture to back resource immediately.
+    * @param[in] id The resource ID to allocate a GL texture for.
+    */
+   void CreateGlTexture( ResourceId id );
 
 public: // From ResourceTicketLifetimeObserver.
 

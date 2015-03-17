@@ -599,6 +599,11 @@ void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceT
   }
 }
 
+void ResourceManager::HandleCreateGlTextureRequest(ResourceId id)
+{
+  mImpl->mTextureCacheDispatcher.DispatchCreateGlTexture( id );
+}
+
 /********************************************************************************
  ******************** Update thread object direct interface  ********************
  ********************************************************************************/

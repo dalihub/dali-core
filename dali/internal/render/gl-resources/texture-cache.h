@@ -131,6 +131,12 @@ public:
   void AddFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage );
 
   /**
+   * Create GL texture eagerly right now instead of waiting for first use.
+   * @param[in] id The resource id corresponding to the texture.
+   */
+  void CreateGlTexture( ResourceId id );
+
+  /**
    * Update the texture with a newly loaded bitmap
    * @param[in] id Resource Id of the bitmap
    * @param[in] bitmap The bitmap
@@ -258,6 +264,11 @@ protected: // Implements TextureCacheDispatcher
    * @copydoc TextureCacheDispatcher::DispatchCreateTextureForNativeImage()
    */
   virtual void DispatchCreateTextureForNativeImage( ResourceId id, NativeImageInterfacePtr nativeImage );
+
+  /**
+   * @copydoc TextureCacheDispatcher::DispatchCreateGlTexture()
+   */
+  virtual void DispatchCreateGlTexture( ResourceId id );
 
   /**
    * @copydoc TextureCacheDispatcher::DispatchCreateTextureForFramebuffer()

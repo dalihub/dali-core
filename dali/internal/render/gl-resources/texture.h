@@ -206,14 +206,13 @@ protected:
   Texture( Context&      context,
            unsigned int  width,
            unsigned int  height );
-
+public:
   /**
    * Initialize texture for rendering.
    * @return true on success
    */
   virtual bool CreateGlTexture() = 0;
 
-public:
   /**
    * Destructor.
    * Delete the GL texture associated with it.

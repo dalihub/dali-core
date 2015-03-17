@@ -68,6 +68,19 @@ public:
   NativeImage& operator=( const NativeImage& rhs );
 
   /**
+   * @brief Trigger asynchronous creation of backing GL texture immediately.
+   *
+   * The normal policy is for a GL texture to created lazily when needed.
+   * This function forces the allocation of a texture to happen at the earliest
+   * opportunity.
+   *
+   * @note If the application loses its GL context, native images may lose their
+   * GL textures. This function can be called again after context regain to force
+   * the creation of the GL texture if still needed.
+   */
+  void CreateGlTexture();
+
+  /**
    * @brief Create a new NativeImage, which used native resources.
    *
    * The maximum size of the image is limited by GL_MAX_TEXTURE_SIZE

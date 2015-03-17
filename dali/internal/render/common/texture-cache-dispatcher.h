@@ -119,6 +119,12 @@ public:
   virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage ) = 0;
 
   /**
+   * @brief Create GL texture for native image resource.
+   * @param[in] id The resource id.
+   */
+  virtual void DispatchCreateGlTexture( ResourceId id ) = 0;
+
+  /**
    * Dispatch a message to update the texture.
    * May be called from Update thread
    * @param[in] id Resource Id of the texture
