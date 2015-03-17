@@ -22,7 +22,7 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
 
@@ -200,56 +200,56 @@ private: // Data
 
 // Messages for ImageAttachment
 
-inline void SetTextureIdMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, unsigned int id )
+inline void SetTextureIdMessage( EventThreadServices& eventThreadServices, const ImageAttachment& attachment, unsigned int id )
 {
   typedef MessageDoubleBuffered1< ImageAttachment, unsigned int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &ImageAttachment::SetTextureId, id );
 }
 
-inline void SetPixelAreaMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, const Dali::ImageActor::PixelArea& area )
+inline void SetPixelAreaMessage( EventThreadServices& eventThreadServices, const ImageAttachment& attachment, const Dali::ImageActor::PixelArea& area )
 {
   typedef MessageDoubleBuffered1< ImageAttachment, Dali::ImageActor::PixelArea > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &ImageAttachment::SetPixelArea, area );
 }
 
-inline void ClearPixelAreaMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment )
+inline void ClearPixelAreaMessage( EventThreadServices& eventThreadServices, const ImageAttachment& attachment )
 {
   typedef Message< ImageAttachment > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &ImageAttachment::ClearPixelArea );
 }
 
-inline void SetStyleMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, Dali::ImageActor::Style style )
+inline void SetStyleMessage( EventThreadServices& eventThreadServices, const ImageAttachment& attachment, Dali::ImageActor::Style style )
 {
   typedef MessageValue1< ImageAttachment, Dali::ImageActor::Style > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &ImageAttachment::SetStyle, style );
 }
 
-inline void SetNinePatchBorderMessage( EventToUpdate& eventToUpdate, const ImageAttachment& attachment, const Vector4& border, bool inPixels )
+inline void SetNinePatchBorderMessage( EventThreadServices& eventThreadServices, const ImageAttachment& attachment, const Vector4& border, bool inPixels )
 {
   typedef MessageDoubleBuffered2< ImageAttachment, Vector4, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &ImageAttachment::SetBorder, border, inPixels );

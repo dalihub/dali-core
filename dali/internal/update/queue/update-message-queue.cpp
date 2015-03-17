@@ -22,6 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/mutex.h>
 #include <dali/integration-api/render-controller.h>
+#include <dali/internal/common/message.h>
 #include <dali/internal/common/message-buffer.h>
 #include <dali/internal/render/common/performance-monitor.h>
 
@@ -131,7 +132,7 @@ struct MessageQueue::Impl
   MessageBufferQueue       freeQueue;            ///< buffers from the recycleQueue; can be used without locking
 };
 
-MessageQueue::MessageQueue( RenderController& controller, const SceneGraphBuffers& buffers )
+MessageQueue::MessageQueue( Integration::RenderController& controller, const SceneGraph::SceneGraphBuffers& buffers )
 : mImpl(NULL)
 {
   mImpl = new Impl( controller, buffers );
@@ -191,11 +192,6 @@ unsigned int* MessageQueue::ReserveMessageSlot( unsigned int requestedSize, bool
   }
 
   return mImpl->currentMessageBuffer->ReserveMessageSlot( requestedSize );
-}
-
-BufferIndex MessageQueue::GetEventBufferIndex() const
-{
-  return mImpl->sceneGraphBuffers.GetEventBufferIndex();
 }
 
 bool MessageQueue::FlushQueue()

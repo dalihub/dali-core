@@ -146,7 +146,7 @@ CameraActorPtr CameraActor::New( const Size& size )
   actor->SetName("DefaultCamera");
 
   // Create the attachment
-  actor->mCameraAttachment = CameraAttachment::New( *actor->mNode );
+  actor->mCameraAttachment = CameraAttachment::New( actor->GetEventThreadServices(), *actor->mNode );
 
   actor->Attach(*actor->mCameraAttachment);
 
@@ -261,7 +261,7 @@ void CameraActor::SetPerspectiveProjection( const Size& size, const Vector2& ste
   {
     if( Stage::IsInstalled() )
     {
-      const Size& stageSize = mStage->GetSize();
+      const Size& stageSize = Stage::GetCurrent()->GetSize();
 
       width = stageSize.width;
       height = stageSize.height;
@@ -335,7 +335,7 @@ bool CameraActor::BuildPickingRay( const Vector2& screenCoordinates,
   {
     // Build a picking ray in the world reference system.
     // ray starts from the camera world position
-    rayOrigin = mNode->GetWorldPosition( mStage->GetEventBufferIndex() );
+    rayOrigin = mNode->GetWorldPosition( GetEventThreadServices().GetEventBufferIndex() );
     rayOrigin.w = 1.0f;
 
     // Transform the touch point from the screen coordinate system to the world coordinates system.

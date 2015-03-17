@@ -114,7 +114,7 @@ CustomObject::~CustomObject()
   {
     if( NULL != mUpdateObject )
     {
-      RemoveObjectMessage( Stage::GetCurrent()->GetUpdateManager(), mUpdateObject );
+      RemoveObjectMessage( GetEventThreadServices().GetUpdateManager(), mUpdateObject );
       mUpdateObject = NULL; // object is about to be destroyed
     }
   }
@@ -125,7 +125,7 @@ CustomObject::CustomObject()
   PropertyOwner* updateObject = PropertyOwner::New();
 
   // Pass ownership to the update-thread
-  AddObjectMessage( Stage::GetCurrent()->GetUpdateManager(), updateObject );
+  AddObjectMessage( GetEventThreadServices().GetUpdateManager(), updateObject );
 
   // Keep as const since this should only be modified from update-thread
   mUpdateObject = updateObject;

@@ -34,6 +34,7 @@ struct Vector3;
 
 namespace Internal
 {
+class EventThreadServices;
 
 namespace SceneGraph
 {
@@ -101,15 +102,15 @@ public:
 
   /**
    * Called when the associated actor is added to the stage
-   * @param[in] stage Reference to the stage
+   * @param[in] eventThreadServices Object that can send messages to scene graph
    */
-  void Connect(Stage& stage);
+  void Connect( EventThreadServices& eventThreadServices );
 
   /**
    * Called when the associated actor is removed from the stage
-   * @param[in] stage Reference to the stage
+   * @param[in] eventThreadServices Object that can send messages to scene graph
    */
-  void Disconnect(Stage& stage);
+  void Disconnect( EventThreadServices& eventThreadServices );
 
   SceneGraph::DynamicsJoint* GetSceneObject() const;
 

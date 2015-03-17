@@ -24,7 +24,7 @@
 // INTERNAL HEADERS
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/common/event-thread-services.h>
 
 namespace Dali
 {
@@ -66,12 +66,12 @@ private:
 
 // Messages for DynamicsSphereShape
 
-inline void InitializeDynamicsSphereShapeMessage( EventToUpdate& eventToUpdate, const DynamicsSphereShape& shape, const float radius )
+inline void InitializeDynamicsSphereShapeMessage( EventThreadServices& eventThreadServices, const DynamicsSphereShape& shape, const float radius )
 {
   typedef MessageValue1< DynamicsSphereShape, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &shape, &DynamicsSphereShape::Initialize, radius );

@@ -20,9 +20,10 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/node-attachments/scene-graph-mesh-attachment.h>
 #include <dali/internal/update/modeling/scene-graph-material.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/nodes/node.h>
 
 using Dali::Internal::MeshIPtr;
@@ -34,13 +35,13 @@ namespace Dali
 namespace Internal
 {
 
-MeshAttachmentPtr MeshAttachment::New( Stage& stage, const SceneGraph::Node& parentNode )
+MeshAttachmentPtr MeshAttachment::New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode )
 {
-  MeshAttachmentPtr attachment( new MeshAttachment( stage ) );
+  MeshAttachmentPtr attachment( new MeshAttachment( eventThreadServices ) );
 
   // Transfer object ownership of scene-object to message
   SceneGraph::MeshAttachment* sceneObject = SceneGraph::MeshAttachment::New();
-  AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( eventThreadServices.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;
@@ -48,8 +49,8 @@ MeshAttachmentPtr MeshAttachment::New( Stage& stage, const SceneGraph::Node& par
   return attachment;
 }
 
-MeshAttachment::MeshAttachment( Stage& stage )
-: RenderableAttachment( stage ),
+MeshAttachment::MeshAttachment( EventThreadServices& eventThreadServices )
+: RenderableAttachment( eventThreadServices ),
   mSceneObject( NULL )
 {
 }
@@ -90,7 +91,7 @@ void MeshAttachment::SetMesh( const MeshIPtr        meshPtr,
   const SceneGraph::Material* materialSceneObject = material->GetSceneObject();
 
   // sceneObject is being used in a separate thread; queue a message to set
-  SetMeshMessage( mStage->GetUpdateInterface(), *mSceneObject, meshId, materialSceneObject, boneCount );
+  SetMeshMessage( GetEventThreadServices(), *mSceneObject, meshId, materialSceneObject, boneCount );
 }
 
 void MeshAttachment::SetMesh( const ResourceTicketPtr ticket,
@@ -145,7 +146,7 @@ void MeshAttachment::SetMaterial( MaterialIPtr material )
   if ( OnStage() )
   {
     // sceneObject is being used in a separate thread; queue a message to set
-    SetMaterialMessage( mStage->GetUpdateInterface(), *mSceneObject, materialSceneObject );
+    SetMaterialMessage( GetEventThreadServices(), *mSceneObject, materialSceneObject );
   }
 }
 
@@ -224,7 +225,7 @@ void MeshAttachment::OnStageConnection2()
   DALI_ASSERT_DEBUG( materialSceneObject );
 
   // And that the scene object has a connection to each material
-  SetMaterialMessage( mStage->GetUpdateInterface(), sceneObject, materialSceneObject );
+  SetMaterialMessage( GetEventThreadServices(), sceneObject, materialSceneObject );
 
   // Ensure all staged bones are reconnected
   for(ConnectorList::Iterator iter=mConnectors.Begin(); iter != mConnectors.End(); ++iter)
@@ -249,7 +250,7 @@ void MeshAttachment::SetBoneNode( SceneGraph::Node* node, size_t boneIdx )
 {
   size_t boneCount = mMesh.mBoneNames.size();
 
-  SetBoneNodeMessage( mStage->GetUpdateInterface(), *mSceneObject, node, boneIdx, boneCount );
+  SetBoneNodeMessage( GetEventThreadServices(), *mSceneObject, node, boneIdx, boneCount );
 }
 
 // Helper class for connecting Nodes to the scene-graph MeshAttachment

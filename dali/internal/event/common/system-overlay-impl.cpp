@@ -21,9 +21,10 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
+#include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
 #include <dali/internal/event/actor-attachments/camera-attachment-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 
 namespace Dali
@@ -32,9 +33,9 @@ namespace Dali
 namespace Internal
 {
 
-SystemOverlay* SystemOverlay::New( Stage& stage )
+SystemOverlay* SystemOverlay::New( EventThreadServices& eventThreadServices )
 {
-  SystemOverlay* overlay = new SystemOverlay( stage );
+  SystemOverlay* overlay = new SystemOverlay( eventThreadServices );
 
   overlay->Initialize();
 
@@ -70,7 +71,7 @@ RenderTaskList& SystemOverlay::GetOverlayRenderTasks()
 {
   if ( !mOverlayRenderTaskList )
   {
-    mOverlayRenderTaskList = RenderTaskList::New( mStage.GetUpdateManager(), *this, true/*system-overlay*/ );
+    mOverlayRenderTaskList = RenderTaskList::New( mEventThreadServices, *this, true/*system-overlay*/ );
   }
 
   return *mOverlayRenderTaskList;
@@ -111,15 +112,15 @@ CameraActor& SystemOverlay::GetDefaultCameraActor()
   return *mDefaultCameraActor;
 }
 
-SystemOverlay::SystemOverlay( Stage& stage )
-: mStage( stage )
+SystemOverlay::SystemOverlay( EventThreadServices& eventThreadServices )
+: mEventThreadServices( eventThreadServices )
 {
 }
 
 void SystemOverlay::Initialize()
 {
   // Create the ordered list of layers
-  mLayerList = LayerList::New( mStage, true/*system layers*/ );
+  mLayerList = LayerList::New( mEventThreadServices.GetUpdateManager(), true/*system layers*/ );
 }
 
 void SystemOverlay::CreateRootLayer()
@@ -127,7 +128,7 @@ void SystemOverlay::CreateRootLayer()
   // Lazy initialization; SystemOverlay may never be used
   if ( !mRootLayer )
   {
-    mRootLayer = Layer::NewRoot( mStage, *mLayerList, mStage.GetUpdateManager(), true/*system layer*/ );
+    mRootLayer = Layer::NewRoot( *mLayerList, mEventThreadServices.GetUpdateManager(), true/*system layer*/ );
     mRootLayer->SetName("SystemOverlayRoot");
     mRootLayer->SetSize( mSize.width, mSize.height );
   }

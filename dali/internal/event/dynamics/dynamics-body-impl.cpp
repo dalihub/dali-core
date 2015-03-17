@@ -239,20 +239,20 @@ Actor& DynamicsBody::GetActor() const
   return mActor;
 }
 
-void DynamicsBody::Connect(Stage& stage)
+void DynamicsBody::Connect( EventThreadServices& eventThreadServices )
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s - %s\n", __PRETTY_FUNCTION__, mName.c_str());
 
-  ConnectMessage( stage.GetUpdateInterface(), *(GetSceneObject()) );
+  ConnectMessage( eventThreadServices, *(GetSceneObject()) );
 }
 
-void DynamicsBody::Disconnect(Stage& stage)
+void DynamicsBody::Disconnect( EventThreadServices& eventThreadServices )
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s - %s\n", __PRETTY_FUNCTION__, mName.c_str());
 
-  if( stage.IsInstalled() )
+  if( eventThreadServices.IsCoreRunning() )
   {
-    DisconnectMessage( stage.GetUpdateInterface(), *(GetSceneObject()) );
+    DisconnectMessage( eventThreadServices, *(GetSceneObject()) );
   }
 }
 

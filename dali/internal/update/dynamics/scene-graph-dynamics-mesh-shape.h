@@ -24,7 +24,7 @@
 // INTERNAL HEADERS
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/common/event-thread-services.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/update/modeling/scene-graph-mesh-declarations.h>
 
@@ -74,12 +74,12 @@ private:
   Integration::ResourceId mMeshId;
 }; // class DynamicsMeshShape
 
-inline void InitializeDynamicsMeshShapeMessage( EventToUpdate& eventToUpdate, const DynamicsMeshShape& shape )
+inline void InitializeDynamicsMeshShapeMessage( EventThreadServices& eventThreadServices, const DynamicsMeshShape& shape )
 {
   typedef Message< DynamicsMeshShape > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &shape, &DynamicsMeshShape::Initialize );

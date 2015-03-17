@@ -29,8 +29,8 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/internal/common/owner-container.h>
-#include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/custom-property.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/property-base.h>
 
@@ -42,6 +42,7 @@ class PropertyNotification;
 namespace Internal
 {
 class Constraint;
+class EventThreadServices;
 class Handle;
 class PropertyCondition;
 class PropertyInputImpl;
@@ -458,6 +459,36 @@ private:
    * @param [in] value The new value of the property.
    */
   virtual void SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
+
+protected:
+  /**
+   * Get the event thread services object - used for sending messages to the scene graph
+   * Assert if called from the wrong thread.
+   * This is intentionally inline for performance reasons.
+   *
+   * @return The event thread services object
+   */
+  inline EventThreadServices& GetEventThreadServices()
+  {
+    DALI_ASSERT_DEBUG( EventThreadServices::IsCoreRunning() );
+    return mEventThreadServices;
+  }
+
+  /**
+   * Get the event thread services object - used for sending messages to the scene graph
+   * Assert if called from the wrong thread
+   * This is intentionally inline for performance reasons.
+   *
+   * @return The event thread services object
+   */
+  inline const EventThreadServices& GetEventThreadServices() const
+  {
+    DALI_ASSERT_DEBUG( EventThreadServices::IsCoreRunning() );
+    return mEventThreadServices;
+  }
+
+private:
+  EventThreadServices& mEventThreadServices;
 
 private:
 

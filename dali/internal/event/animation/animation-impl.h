@@ -563,26 +563,26 @@ public: // For connecting animators to animations
   }
 
   /**
-   * Retrieve the UpdateManager associated with this animation.
-   * @return The UpdateManager.
+   * Retrieve the event thread services object
+   * @return The interface for sending messages to the scene graph
    */
-  SceneGraph::UpdateManager& GetUpdateManager()
+  EventThreadServices& GetEventThreadServices()
   {
-    return mUpdateManager;
+    return mEventThreadServices;
   }
 
 protected:
 
   /**
    * Construct a new Animation.
-   * @param[in] updateManager The UpdateManager associated with this animation.
+   * @param[in] eventThreadServices The interface for sending messages to the scene graph
    * @param[in] playlist The list of currently playing animations.
    * @param[in] durationSeconds The duration of the animation in seconds.
    * @param[in] endAction The action to perform when the animation ends.
    * @param[in] disconnectAction The action to perform when the property owner of an animator is disconnected.
    * @param[in] defaultAlpha The default alpha function to apply to animators.
    */
-  Animation( SceneGraph::UpdateManager& updateManager,
+  Animation( EventThreadServices& eventThreadServices,
              AnimationPlaylist& playlist,
              float durationSeconds,
              EndAction endAction,
@@ -624,8 +624,7 @@ private:
   Animation& operator=(const Animation& rhs);
 
 private:
-
-  SceneGraph::UpdateManager& mUpdateManager;
+  EventThreadServices& mEventThreadServices;
   AnimationPlaylist& mPlaylist;
 
   const SceneGraph::Animation* mAnimation;

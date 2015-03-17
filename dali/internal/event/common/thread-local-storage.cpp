@@ -114,11 +114,6 @@ StagePtr ThreadLocalStorage::GetCurrentStage()
   return mCore->GetCurrentStage();
 }
 
-EventToUpdate& ThreadLocalStorage::GetEventToUpdate()
-{
-  return GetUpdateManager().GetEventToUpdate();
-}
-
 GestureEventProcessor& ThreadLocalStorage::GetGestureEventProcessor()
 {
   return mCore->GetGestureEventProcessor();

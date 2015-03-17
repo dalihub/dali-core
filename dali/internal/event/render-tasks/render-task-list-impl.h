@@ -31,7 +31,7 @@ namespace Dali
 namespace Internal
 {
 
-class EventToUpdate;
+class EventThreadServices;
 class RenderTaskDefaults;
 
 namespace SceneGraph
@@ -52,12 +52,12 @@ public:
 
   /**
    * Create a RenderTaskList.
-   * @param[in] updateManager Used for creating render-tasks in the scene graph.
+   * @param[in] eventServices Used for sending message to the scene graph.
    * @param[in] defaults Provides the default source & camera actors.
    * @param[in] systemLevel True if this is the LayerList for actors added via the SystemLevel::Add().
    * @return A newly allocated RenderTaskList; the caller takes ownership.
    */
-  static RenderTaskList* New( SceneGraph::UpdateManager& updateManager, RenderTaskDefaults& defaults, bool systemLevel );
+  static RenderTaskList* New( EventThreadServices& eventServices, RenderTaskDefaults& defaults, bool systemLevel );
 
   /**
    * @copydoc Dali::RenderTaskList::CreateTask()
@@ -106,11 +106,11 @@ protected:
 
   /**
    * Construct a new RenderTaskList.
-   * @param[in] eventToUpdate Used for creating render-tasks in the scene graph.
+   * @param[in] eventThreadServices Used for creating render-tasks in the scene graph.
    * @param[in] defaults Provides the default source & camera actors.
    * @param[in] systemLevel True if this is the system-level list.
    */
-  RenderTaskList( EventToUpdate& eventToUpdate, RenderTaskDefaults& defaults, bool systemLevel );
+  RenderTaskList( EventThreadServices& eventThreadServices, RenderTaskDefaults& defaults, bool systemLevel );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -131,7 +131,7 @@ private: // from CompleteNotificationInterface
 
 private:
 
-  EventToUpdate& mEventToUpdate;
+  EventThreadServices& mEventThreadServices;
   RenderTaskDefaults& mDefaults;
 
   bool mIsSystemLevel; ///< True if the layers are added via the SystemLevel API

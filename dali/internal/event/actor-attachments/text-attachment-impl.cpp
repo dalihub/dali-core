@@ -31,9 +31,9 @@ namespace Dali
 namespace Internal
 {
 
-TextAttachmentPtr TextAttachment::New( Stage& stage, const SceneGraph::Node& parentNode, const Integration::TextArray& text, FontPointer font )
+TextAttachmentPtr TextAttachment::New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode, const Integration::TextArray& text, FontPointer font )
 {
-  TextAttachmentPtr attachment( new TextAttachment( stage ) );
+  TextAttachmentPtr attachment( new TextAttachment( eventThreadServices ) );
 
   // Second-phase construction
 
@@ -43,7 +43,7 @@ TextAttachmentPtr TextAttachment::New( Stage& stage, const SceneGraph::Node& par
   // Transfer object ownership of scene-object to message
   SceneGraph::TextAttachment* sceneObject = SceneGraph::TextAttachment::New();
 
-  AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( eventThreadServices.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;
@@ -53,8 +53,8 @@ TextAttachmentPtr TextAttachment::New( Stage& stage, const SceneGraph::Node& par
   return attachment;
 }
 
-TextAttachment::TextAttachment( Stage& stage )
-: RenderableAttachment( stage ),
+TextAttachment::TextAttachment( EventThreadServices& eventThreadServices )
+: RenderableAttachment( eventThreadServices ),
   mSceneObject( NULL ),
   mTextRequestHelper( *this ),
   mTextColor( NULL ),
@@ -122,7 +122,7 @@ void TextAttachment::SetTextColor( const Vector4& color )
 
   if( sendMessage )
   {
-    SetTextColorMessage( mStage->GetUpdateInterface(), *mSceneObject, clampedColor );
+    SetTextColorMessage( GetEventThreadServices(), *mSceneObject, clampedColor );
   }
 }
 
@@ -149,7 +149,7 @@ void TextAttachment::ResetTextColor()
     delete mTextColor;
     mTextColor = NULL;
 
-    SetTextColorMessage( mStage->GetUpdateInterface(), *mSceneObject, TextStyle::DEFAULT_TEXT_COLOR );
+    SetTextColorMessage( GetEventThreadServices(), *mSceneObject, TextStyle::DEFAULT_TEXT_COLOR );
   }
 }
 
@@ -283,7 +283,7 @@ void TextAttachment::SetOutline( bool enable, const Vector4& color, const Vector
   {
     mStyle.SetOutline( enable, color, thickness );
 
-    SetOutlineMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, thickness );
+    SetOutlineMessage( GetEventThreadServices(), *mSceneObject, enable, color, thickness );
   }
 }
 
@@ -304,7 +304,7 @@ void TextAttachment::ResetOutline()
   {
     mStyle.Reset( TextStyle::OUTLINE );
 
-    SetOutlineMessage( mStage->GetUpdateInterface(), *mSceneObject, false, TextStyle::DEFAULT_OUTLINE_COLOR, TextStyle::DEFAULT_OUTLINE_THICKNESS );
+    SetOutlineMessage( GetEventThreadServices(), *mSceneObject, false, TextStyle::DEFAULT_OUTLINE_COLOR, TextStyle::DEFAULT_OUTLINE_THICKNESS );
   }
 }
 
@@ -317,7 +317,7 @@ void TextAttachment::SetGlow( bool enable, const Vector4& color, float intensity
   {
     mStyle.SetGlow( enable, color, intensity );
 
-    SetGlowMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, intensity );
+    SetGlowMessage( GetEventThreadServices(), *mSceneObject, enable, color, intensity );
   }
 }
 
@@ -338,7 +338,7 @@ void TextAttachment::ResetGlow()
   {
     mStyle.Reset( TextStyle::GLOW );
 
-    SetGlowMessage( mStage->GetUpdateInterface(), *mSceneObject, false, TextStyle::DEFAULT_GLOW_COLOR, TextStyle::DEFAULT_GLOW_INTENSITY );
+    SetGlowMessage( GetEventThreadServices(), *mSceneObject, false, TextStyle::DEFAULT_GLOW_COLOR, TextStyle::DEFAULT_GLOW_INTENSITY );
   }
 }
 
@@ -363,7 +363,7 @@ void TextAttachment::SetShadow( bool enable, const Vector4& color, const Vector2
     shadowOffset = Min( shadowOffset, maxOffset );
     shadowOffset = Max( shadowOffset, -maxOffset );
     shadowOffset *= unitPointSize / fontPointSize;
-    SetDropShadowMessage( mStage->GetUpdateInterface(), *mSceneObject, enable, color, shadowOffset, shadowSize );
+    SetDropShadowMessage( GetEventThreadServices(), *mSceneObject, enable, color, shadowOffset, shadowSize );
   }
 }
 
@@ -396,7 +396,7 @@ void TextAttachment::ResetShadow()
     shadowOffset = Min( shadowOffset, maxOffset );
     shadowOffset = Max( shadowOffset, -maxOffset );
     shadowOffset *= unitPointSize / fontPointSize;
-    SetDropShadowMessage( mStage->GetUpdateInterface(), *mSceneObject, false, TextStyle::DEFAULT_SHADOW_COLOR, shadowOffset, shadowSize );
+    SetDropShadowMessage( GetEventThreadServices(), *mSceneObject, false, TextStyle::DEFAULT_SHADOW_COLOR, shadowOffset, shadowSize );
   }
 }
 
@@ -408,7 +408,7 @@ void TextAttachment::SetGradient( const Vector4& color, const Vector2& startPoin
       ( mStyle.GetGradientEndPoint() != endPoint ) )
   {
     mStyle.SetGradient( true, color, startPoint, endPoint );
-    SetGradientMessage( mStage->GetUpdateInterface(), *mSceneObject, color, startPoint, endPoint );
+    SetGradientMessage( GetEventThreadServices(), *mSceneObject, color, startPoint, endPoint );
   }
 }
 
@@ -433,7 +433,7 @@ void TextAttachment::ResetGradient()
   {
     mStyle.Reset( TextStyle::GRADIENT );
 
-    SetGradientMessage( mStage->GetUpdateInterface(), *mSceneObject, TextStyle::DEFAULT_GRADIENT_COLOR, TextStyle::DEFAULT_GRADIENT_START_POINT, TextStyle::DEFAULT_GRADIENT_END_POINT );
+    SetGradientMessage( GetEventThreadServices(), *mSceneObject, TextStyle::DEFAULT_GRADIENT_COLOR, TextStyle::DEFAULT_GRADIENT_START_POINT, TextStyle::DEFAULT_GRADIENT_END_POINT );
   }
 }
 
@@ -532,7 +532,7 @@ void TextAttachment::CalculateWeightedSmoothing( TextStyle::Weight weight, float
   weightedSmoothing = std::max( 0.0f, weightedSmoothing );
   weightedSmoothing = std::min( 1.0f, weightedSmoothing );
 
-  SetSmoothEdgeMessage( mStage->GetUpdateInterface(), *mSceneObject, weightedSmoothing );
+  SetSmoothEdgeMessage( GetEventThreadServices(), *mSceneObject, weightedSmoothing );
 }
 
 void TextAttachment::TextureResized( const TextureIdList& oldTextureIds, unsigned int newTextureId )
@@ -606,7 +606,6 @@ void TextAttachment::SetTextChanges()
     // remember the texture id, so we can detect atlas resizes / splits
     mTextureId = mVertexBuffer->mTextureId;
 
-    EventToUpdate& eventToUpdate(  mStage->GetUpdateInterface() );
     const SceneGraph::TextAttachment& attachment( *mSceneObject );
 
     if( mTextChanged  || mFontChanged )
@@ -614,11 +613,11 @@ void TextAttachment::SetTextChanges()
       DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "TextAttachment::SetTextChanges() Sending VertexBuffer to attachment:%p  textureId:%d\n", &attachment, mVertexBuffer->mTextureId);
 
       // release the vertex buffer to pass  ownership to the scene-graph-text-attachment
-      SetTextVertexBufferMessage( eventToUpdate, attachment, *mVertexBuffer.Release() );
+      SetTextVertexBufferMessage( GetEventThreadServices(), attachment, *mVertexBuffer.Release() );
 
       if( mFontChanged )
       {
-        SetTextFontSizeMessage( eventToUpdate, attachment, mFont->GetPixelSize() );
+        SetTextFontSizeMessage( GetEventThreadServices(), attachment, mFont->GetPixelSize() );
       }
     }
   }

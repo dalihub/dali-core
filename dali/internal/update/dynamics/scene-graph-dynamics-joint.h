@@ -21,7 +21,7 @@
 // INTERNAL HEADERS
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/common/event-thread-services.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/quaternion.h>
 
@@ -106,12 +106,12 @@ private:
 
 // Messages for DynamicsJoint
 
-inline void InitializeDynamicsJointMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, const DynamicsBody& bodyA, const DynamicsBody& bodyB, const Vector3& offsetA , const Vector3& offsetB )
+inline void InitializeDynamicsJointMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, const DynamicsBody& bodyA, const DynamicsBody& bodyB, const Vector3& offsetA , const Vector3& offsetB )
 {
   typedef MessageValue4< DynamicsJoint, DynamicsBody*, DynamicsBody*, Vector3, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::Initialize,
@@ -121,122 +121,122 @@ inline void InitializeDynamicsJointMessage( EventToUpdate& eventToUpdate, const 
                         offsetB );
 }
 
-inline void SetLimitMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, int axisIndex, float lowerLimit, float upperLimit )
+inline void SetLimitMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, int axisIndex, float lowerLimit, float upperLimit )
 {
   typedef MessageValue3< DynamicsJoint, int, float, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::SetLimit, axisIndex, lowerLimit, upperLimit );
 }
 
-inline void SetEnableSpringMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, int axisIndex, bool flag )
+inline void SetEnableSpringMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, int axisIndex, bool flag )
 {
   typedef MessageValue2< DynamicsJoint, int, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::EnableSpring, axisIndex, flag );
 }
 
-inline void SetSpringStiffnessMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, int axisIndex, float stiffness )
+inline void SetSpringStiffnessMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, int axisIndex, float stiffness )
 {
   typedef MessageValue2< DynamicsJoint, int, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::SetSpringStiffness, axisIndex, stiffness );
 }
 
-inline void SetSpringDampingMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, int axisIndex, float damping )
+inline void SetSpringDampingMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, int axisIndex, float damping )
 {
   typedef MessageValue2< DynamicsJoint, int, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::SetSpringDamping, axisIndex, damping );
 }
 
-inline void SetSpringCenterPointMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, int axisIndex, float ratio )
+inline void SetSpringCenterPointMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, int axisIndex, float ratio )
 {
   typedef MessageValue2< DynamicsJoint, int, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::SetSpringCenterPoint, axisIndex, ratio );
 }
 
-inline void SetEnableMotorMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, int axisIndex, bool flag )
+inline void SetEnableMotorMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, int axisIndex, bool flag )
 {
   typedef MessageValue2< DynamicsJoint, int, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::EnableMotor, axisIndex, flag );
 }
 
-inline void SetMotorVelocityMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, int axisIndex, float velocity )
+inline void SetMotorVelocityMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, int axisIndex, float velocity )
 {
   typedef MessageValue2< DynamicsJoint, int, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::SetMotorVelocity, axisIndex, velocity );
 }
 
-inline void SetMotorForceMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint, int axisIndex, float force )
+inline void SetMotorForceMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint, int axisIndex, float force )
 {
   typedef MessageValue2< DynamicsJoint, int, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::SetMotorForce, axisIndex, force );
 }
 
-inline void ConnectJointMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint )
+inline void ConnectJointMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint )
 {
   typedef Message< DynamicsJoint > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::Connect );
 }
 
-inline void DisconnectJointMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint )
+inline void DisconnectJointMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint )
 {
   typedef Message< DynamicsJoint > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::Disconnect );
 }
 
-inline void DeleteJointMessage( EventToUpdate& eventToUpdate, const DynamicsJoint& joint )
+inline void DeleteJointMessage( EventThreadServices& eventThreadServices, const DynamicsJoint& joint )
 {
   typedef Message< DynamicsJoint > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &joint, &DynamicsJoint::Delete );

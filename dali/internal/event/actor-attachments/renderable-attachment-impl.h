@@ -141,9 +141,9 @@ protected:
 
   /**
    * Protected constructor; only base classes are instantiatable.
-   * @param[in] stage Used to send messages to scene-graph.
+   * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
    */
-  RenderableAttachment( Stage& stage );
+  RenderableAttachment( EventThreadServices& eventThreadServices );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()

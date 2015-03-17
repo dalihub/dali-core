@@ -303,26 +303,26 @@ ActorPtr DynamicsJoint::GetActor( const bool first ) const
   return Stage::GetCurrent()->GetDynamicsWorld()->GetMappedActor( body->GetSceneObject() );
 }
 
-void DynamicsJoint::Connect(Stage& stage)
+void DynamicsJoint::Connect( EventThreadServices& eventThreadServices )
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
 
   if( !mInitialized )
   {
-    InitializeDynamicsJointMessage( stage.GetUpdateInterface(), *mDynamicsJoint, *(mBodyA->GetSceneObject()), *(mBodyB->GetSceneObject()), mOffsetA, mOffsetB );
+    InitializeDynamicsJointMessage( eventThreadServices, *mDynamicsJoint, *(mBodyA->GetSceneObject()), *(mBodyB->GetSceneObject()), mOffsetA, mOffsetB );
     mInitialized = true;
   }
 
-  ConnectJointMessage( stage.GetUpdateInterface(), *(GetSceneObject()) );
+  ConnectJointMessage( eventThreadServices, *(GetSceneObject()) );
 }
 
-void DynamicsJoint::Disconnect(Stage& stage)
+void DynamicsJoint::Disconnect( EventThreadServices& eventThreadServices )
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
 
-  if( stage.IsInstalled() )
+  if( eventThreadServices.IsCoreRunning() )
   {
-    DisconnectJointMessage( stage.GetUpdateInterface(), *(GetSceneObject()) );
+    DisconnectJointMessage( eventThreadServices, *(GetSceneObject()) );
   }
 }
 

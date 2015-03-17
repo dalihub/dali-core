@@ -48,18 +48,18 @@ DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 } // namespace
 
 AnimatableMesh::AnimatableMesh(
-  SceneGraph::UpdateManager& updateManager,
+  EventThreadServices& eventThreadServices,
   SceneGraph::AnimatableMesh* sceneObject,
   MeshIPtr mesh,
   int numberOfVertices )
-: mUpdateManager( updateManager ),
+: mEventThreadServices(eventThreadServices),
   mSceneObject( sceneObject ),
   mMesh( mesh ),
   mNumberOfVertices( numberOfVertices ),
   mPropertyCount( numberOfVertices * DEFAULT_PROPERTY_COUNT )
 {
   // Transfer animatable ownership to a scene message
-  AddAnimatableMeshMessage( mUpdateManager, *mSceneObject );
+  AddAnimatableMeshMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject );
 }
 
 AnimatableMeshPtr AnimatableMesh::New(
@@ -95,7 +95,6 @@ AnimatableMeshPtr AnimatableMesh::New(
   }
 
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  SceneGraph::UpdateManager& updateManager = tls.GetUpdateManager();
   ResourceManager& resourceManager = tls.GetResourceManager();
 
   Dali::MeshData meshData;
@@ -118,8 +117,10 @@ AnimatableMeshPtr AnimatableMesh::New(
   // Create the scene object
   SceneGraph::AnimatableMesh* sceneObject = new SceneGraph::AnimatableMesh( resourceManager, mesh->GetResourceId(), meshData.GetVertices() );
 
+  Stage* stage = Stage::GetCurrent();
+
   // Create the event object
-  AnimatableMeshPtr animatableMeshPtr( new AnimatableMesh( updateManager, sceneObject, mesh, meshData.GetVertexCount() ) );
+  AnimatableMeshPtr animatableMeshPtr( new AnimatableMesh( *stage, sceneObject, mesh, meshData.GetVertexCount() ) );
 
   return animatableMeshPtr;
 }
@@ -131,7 +132,7 @@ AnimatableMesh::~AnimatableMesh()
   {
     if( mSceneObject )
     {
-      RemoveAnimatableMeshMessage( mUpdateManager, *mSceneObject );
+      RemoveAnimatableMeshMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject );
     }
   }
 }
@@ -151,38 +152,32 @@ Property::Index AnimatableMesh::GetVertexPropertyIndex(
 
 void AnimatableMesh::SetPosition( unsigned int vertexIndex, const Vector3& position)
 {
-  StagePtr stage = Stage::GetCurrent();
-  BakeVertexPositionMessage( stage->GetUpdateInterface(), *mSceneObject, vertexIndex, position );
+  BakeVertexPositionMessage( mEventThreadServices, *mSceneObject, vertexIndex, position );
 }
 
 void AnimatableMesh::SetColor( unsigned int vertexIndex, const Vector4& color)
 {
-  StagePtr stage = Stage::GetCurrent();
-  BakeVertexColorMessage( stage->GetUpdateInterface(), *mSceneObject, vertexIndex, color );
+  BakeVertexColorMessage( mEventThreadServices, *mSceneObject, vertexIndex, color );
 }
 
 void AnimatableMesh::SetTextureCoords( unsigned int vertexIndex, const Vector2& coords)
 {
-  StagePtr stage = Stage::GetCurrent();
-  BakeVertexTextureCoordsMessage( stage->GetUpdateInterface(), *mSceneObject, vertexIndex, coords );
+  BakeVertexTextureCoordsMessage( mEventThreadServices, *mSceneObject, vertexIndex, coords );
 }
 
 const Vector3& AnimatableMesh::GetCurrentPosition( unsigned int vertexIndex) const
 {
-  StagePtr stage = Stage::GetCurrent();
-  return mSceneObject->GetPosition(stage->GetEventBufferIndex(), vertexIndex);
+  return mSceneObject->GetPosition(mEventThreadServices.GetEventBufferIndex(), vertexIndex);
 }
 
 const Vector4& AnimatableMesh::GetCurrentColor( unsigned int vertexIndex) const
 {
-  StagePtr stage = Stage::GetCurrent();
-  return mSceneObject->GetColor(stage->GetEventBufferIndex(), vertexIndex);
+  return mSceneObject->GetColor(mEventThreadServices.GetEventBufferIndex(), vertexIndex);
 }
 
 const Vector2& AnimatableMesh::GetCurrentTextureCoords( unsigned int vertexIndex) const
 {
-  StagePtr stage = Stage::GetCurrent();
-  return mSceneObject->GetTextureCoords(stage->GetEventBufferIndex(), vertexIndex);
+  return mSceneObject->GetTextureCoords(mEventThreadServices.GetEventBufferIndex(), vertexIndex);
 }
 
 MeshIPtr AnimatableMesh::GetMesh()

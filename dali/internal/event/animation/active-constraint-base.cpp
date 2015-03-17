@@ -22,9 +22,9 @@
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/common/event-to-update.h>
-#include <dali/internal/event/animation/animation-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
+#include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
@@ -63,9 +63,8 @@ SignalConnectorType signalConnector1( mType, SIGNAL_APPLIED, &ActiveConstraintBa
 
 } // unnamed namespace
 
-ActiveConstraintBase::ActiveConstraintBase( EventToUpdate& eventToUpdate, Property::Index targetPropertyIndex, SourceContainer& sources, unsigned int sourceCount )
-: mEventToUpdate( eventToUpdate ),
-  mTargetPropertyIndex( targetPropertyIndex ),
+ActiveConstraintBase::ActiveConstraintBase( Property::Index targetPropertyIndex, SourceContainer& sources, unsigned int sourceCount )
+: mTargetPropertyIndex( targetPropertyIndex ),
   mSources( sources ),
   mSourceCount( sourceCount ),
   mTargetObject( NULL ),
@@ -200,7 +199,7 @@ void ActiveConstraintBase::BeginRemove()
     OnSceneObjectRemove();
 
     // Remove from scene-graph
-    RemoveConstraintMessage( mEventToUpdate, *propertyOwner, *(mSceneGraphConstraint) );
+    RemoveConstraintMessage( GetEventThreadServices(), *propertyOwner, *(mSceneGraphConstraint) );
 
     // mSceneGraphConstraint will be deleted in update-thread, remove dangling pointer
     mSceneGraphConstraint = NULL;
@@ -231,7 +230,7 @@ void ActiveConstraintBase::SetWeight( float weight )
 {
   if ( mSceneGraphConstraint )
   {
-    BakeWeightMessage( mEventToUpdate, *mSceneGraphConstraint, weight );
+    BakeWeightMessage( GetEventThreadServices(), *mSceneGraphConstraint, weight );
   }
   else
   {
@@ -245,7 +244,7 @@ float ActiveConstraintBase::GetCurrentWeight() const
 
   if ( mSceneGraphConstraint )
   {
-    currentWeight = mSceneGraphConstraint->GetWeight( mEventToUpdate.GetEventBufferIndex() );
+    currentWeight = mSceneGraphConstraint->GetWeight( GetEventThreadServices().GetEventBufferIndex() );
   }
 
   return currentWeight;
@@ -441,14 +440,14 @@ void ActiveConstraintBase::SceneObjectRemoved( Object& object )
   if ( mSceneGraphConstraint )
   {
     // Preserve the previous weight
-    mOffstageWeight = mSceneGraphConstraint->GetWeight( mEventToUpdate.GetEventBufferIndex() );
+    mOffstageWeight = mSceneGraphConstraint->GetWeight( GetEventThreadServices().GetEventBufferIndex() );
 
     const SceneGraph::PropertyOwner* propertyOwner = mTargetObject ? mTargetObject->GetSceneObject() : NULL;
 
     if( propertyOwner )
     {
       // Remove from scene-graph
-      RemoveConstraintMessage( mEventToUpdate, *propertyOwner, *(mSceneGraphConstraint) );
+      RemoveConstraintMessage( GetEventThreadServices(), *propertyOwner, *(mSceneGraphConstraint) );
     }
 
     // mSceneGraphConstraint will be deleted in update-thread, remove dangling pointer

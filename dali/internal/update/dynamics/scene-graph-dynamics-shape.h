@@ -21,7 +21,7 @@
 // INTERNAL HEADERS
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/common/event-thread-services.h>
 
 namespace Dali
 {
@@ -77,12 +77,12 @@ protected:
 
 }; // class DynamicsCubeShape
 
-inline void DeleteShapeMessage( EventToUpdate& eventToUpdate, const DynamicsShape& shape )
+inline void DeleteShapeMessage( EventThreadServices& eventThreadServices, const DynamicsShape& shape )
 {
   typedef Message< DynamicsShape > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &shape, &DynamicsShape::Delete );

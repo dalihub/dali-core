@@ -19,9 +19,9 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/owner-container.h>
+#include <dali/internal/event/common/event-thread-services.h>
 
 namespace Dali
 {
@@ -108,18 +108,18 @@ private:
 
 // Messages for RenderTaskList
 
-inline void AddTaskMessage( EventToUpdate& eventToUpdate, RenderTaskList& list, RenderTask& task )
+inline void AddTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, RenderTask& task )
 {
   typedef MessageValue1< RenderTaskList, RenderTask* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &list, &RenderTaskList::AddTask, &task );
 }
 
-inline void RemoveTaskMessage( EventToUpdate& eventToUpdate, RenderTaskList& list, const RenderTask& constTask )
+inline void RemoveTaskMessage( EventThreadServices& eventThreadServices, RenderTaskList& list, const RenderTask& constTask )
 {
   // Scene graph thread can destroy this object.
   RenderTask& task = const_cast< RenderTask& >( constTask );
@@ -127,7 +127,7 @@ inline void RemoveTaskMessage( EventToUpdate& eventToUpdate, RenderTaskList& lis
   typedef MessageValue1< RenderTaskList, RenderTask* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &list, &RenderTaskList::RemoveTask, &task );

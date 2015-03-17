@@ -27,7 +27,7 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-types.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-base.h>
@@ -1998,14 +1998,14 @@ private:
 // Messages for AnimatableProperty<T>
 
 template <class T>
-void BakeMessage( EventToUpdate& eventToUpdate,
+void BakeMessage( EventThreadServices& eventThreadServices,
                   const SceneGraph::AnimatableProperty<T>& property,
                   typename ParameterType< T >::PassingType newValue )
 {
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, T > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2014,14 +2014,14 @@ void BakeMessage( EventToUpdate& eventToUpdate,
 }
 
 template <class T>
-void BakeRelativeMessage( EventToUpdate& eventToUpdate,
+void BakeRelativeMessage( EventThreadServices& eventThreadServices,
                           const SceneGraph::AnimatableProperty<T>& property,
                           const T& delta )
 {
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, const T& > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2030,14 +2030,14 @@ void BakeRelativeMessage( EventToUpdate& eventToUpdate,
 }
 
 template <class T>
-void SetXComponentMessage( EventToUpdate& eventToUpdate,
+void SetXComponentMessage( EventThreadServices& eventThreadServices,
                            const SceneGraph::AnimatableProperty<T>& property,
                            typename ParameterType< float >::PassingType newValue )
 {
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2046,14 +2046,14 @@ void SetXComponentMessage( EventToUpdate& eventToUpdate,
 }
 
 template <class T>
-void SetYComponentMessage( EventToUpdate& eventToUpdate,
+void SetYComponentMessage( EventThreadServices& eventThreadServices,
                            const SceneGraph::AnimatableProperty<T>& property,
                            typename ParameterType< float >::PassingType newValue )
 {
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2062,14 +2062,14 @@ void SetYComponentMessage( EventToUpdate& eventToUpdate,
 }
 
 template <class T>
-void SetZComponentMessage( EventToUpdate& eventToUpdate,
+void SetZComponentMessage( EventThreadServices& eventThreadServices,
                            const SceneGraph::AnimatableProperty<T>& property,
                            typename ParameterType< float >::PassingType newValue )
 {
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
@@ -2078,14 +2078,14 @@ void SetZComponentMessage( EventToUpdate& eventToUpdate,
 }
 
 template <class T>
-void SetWComponentMessage( EventToUpdate& eventToUpdate,
+void SetWComponentMessage( EventThreadServices& eventThreadServices,
                            const SceneGraph::AnimatableProperty<T>& property,
                            typename ParameterType< float >::PassingType newValue )
 {
   typedef MessageDoubleBuffered1< SceneGraph::AnimatableProperty<T>, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &property,
