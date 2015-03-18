@@ -77,7 +77,6 @@ SET(TC_SOURCES
         utc-Dali-Scripting.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
-        utc-Dali-Spline.cpp
         utc-Dali-Stage.cpp
         utc-Dali-TapGesture.cpp
         utc-Dali-TapGestureDetector.cpp
