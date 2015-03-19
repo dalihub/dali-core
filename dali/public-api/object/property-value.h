@@ -118,14 +118,14 @@ public:
   Value(const Rect<int>& vectorValue);
 
   /**
-   * @brief Create an rotation property value.
+   * @brief Create an orientation property value.
    *
    * @param [in] angleAxis An angle-axis representing the rotation.
    */
   Value(const AngleAxis& angleAxis);
 
   /**
-   * @brief Create an rotation property value.
+   * @brief Create an orientation property value.
    *
    * @param [in] quaternion A quaternion representing the rotation.
    */

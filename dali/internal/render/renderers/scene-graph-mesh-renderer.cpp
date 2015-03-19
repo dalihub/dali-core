@@ -134,7 +134,10 @@ void MeshRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& 
       {
         outSubType = SHADER_VERTEX_COLOR;
       }
-      outSubType = SHADER_EVENLY_LIT;
+      else
+      {
+        outSubType = SHADER_EVENLY_LIT;
+      }
     }
   }
   if( outType != mGeometryType || outSubType != mShaderType )

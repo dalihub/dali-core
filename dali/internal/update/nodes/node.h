@@ -364,8 +364,8 @@ public:
   /**
    * Sets the position of the node derived from the position of all its parents.
    * This method should only be called when the parent's world position is up-to-date.
-   * With a non-central anchor-point, the local rotation and scale affects the world position.
-   * Therefore the world rotation & scale must be updated before the world position.
+   * With a non-central anchor-point, the local orientation and scale affects the world position.
+   * Therefore the world orientation & scale must be updated before the world position.
    * @pre The node has a parent.
    * @param[in] updateBufferIndex The current update buffer index.
    */
@@ -383,10 +383,10 @@ public:
         finalPosition *= mParent->GetSize(updateBufferIndex);
         finalPosition += mPosition[updateBufferIndex];
         finalPosition *= mParent->GetWorldScale(updateBufferIndex);
-        const Quaternion& parentWorldRotation = mParent->GetWorldRotation(updateBufferIndex);
-        if(!parentWorldRotation.IsIdentity())
+        const Quaternion& parentWorldOrientation = mParent->GetWorldOrientation(updateBufferIndex);
+        if(!parentWorldOrientation.IsIdentity())
         {
-          finalPosition *= parentWorldRotation;
+          finalPosition *= parentWorldOrientation;
         }
 
         // check if a node needs to be offsetted locally (only applies when AnchorPoint is not central)
@@ -420,12 +420,12 @@ public:
             scale.z = -scale.z;
           }
 
-          // If the anchor-point is not central, then position is affected by the local rotation & scale
+          // If the anchor-point is not central, then position is affected by the local orientation & scale
           localOffset *= scale;
-          const Quaternion& localWorldRotation = mWorldRotation[updateBufferIndex];
-          if(!localWorldRotation.IsIdentity())
+          const Quaternion& localWorldOrientation = mWorldOrientation[updateBufferIndex];
+          if(!localWorldOrientation.IsIdentity())
           {
-            localOffset *= localWorldRotation;
+            localOffset *= localWorldOrientation;
           }
           finalPosition += localOffset;
         }
@@ -496,101 +496,101 @@ public:
   }
 
   /**
-   * Retrieve the local rotation of the node, relative to its parent.
+   * Retrieve the local orientation of the node, relative to its parent.
    * @param[in] bufferIndex The buffer to read from.
-   * @return The local rotation.
+   * @return The local orientation.
    */
-  const Quaternion& GetRotation(BufferIndex bufferIndex) const
+  const Quaternion& GetOrientation(BufferIndex bufferIndex) const
   {
-    return mRotation[bufferIndex];
+    return mOrientation[bufferIndex];
   }
 
   /**
-   * Sets both the local & base rotations of the node.
+   * Sets both the local & base orientations of the node.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] rotation The new local & base rotation.
+   * @param[in] orientation The new local & base orientation.
    */
-  void BakeRotation(BufferIndex updateBufferIndex, const Quaternion& rotation)
+  void BakeOrientation(BufferIndex updateBufferIndex, const Quaternion& orientation)
   {
-    mRotation.Bake( updateBufferIndex, rotation );
+    mOrientation.Bake( updateBufferIndex, orientation );
   }
 
   /**
-   * Sets the rotation of the node derived from the rotation of all its parents.
+   * Sets the orientation of the node derived from the rotation of all its parents.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] rotation The world rotation.
+   * @param[in] orientation The world orientation.
    */
-  void SetWorldRotation( BufferIndex updateBufferIndex, const Quaternion& rotation )
+  void SetWorldOrientation( BufferIndex updateBufferIndex, const Quaternion& orientation )
   {
-    mWorldRotation.Set( updateBufferIndex, rotation );
+    mWorldOrientation.Set( updateBufferIndex, orientation );
   }
 
   /**
-   * Sets the rotation of the node derived from the rotation of all its parents.
-   * This method should only be called when the parents world rotation is up-to-date.
+   * Sets the orientation of the node derived from the rotation of all its parents.
+   * This method should only be called when the parents world orientation is up-to-date.
    * @pre The node has a parent.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void InheritWorldRotation( BufferIndex updateBufferIndex )
+  void InheritWorldOrientation( BufferIndex updateBufferIndex )
   {
     DALI_ASSERT_DEBUG(mParent != NULL);
 
-    const Quaternion& localRotation = mRotation[updateBufferIndex];
+    const Quaternion& localOrientation = mOrientation[updateBufferIndex];
 
-    if(localRotation.IsIdentity())
+    if(localOrientation.IsIdentity())
     {
-      mWorldRotation.Set( updateBufferIndex, mParent->GetWorldRotation(updateBufferIndex) );
+      mWorldOrientation.Set( updateBufferIndex, mParent->GetWorldOrientation(updateBufferIndex) );
     }
     else
     {
-      Quaternion finalRotation( mParent->GetWorldRotation(updateBufferIndex) );
-      finalRotation *= localRotation;
-      mWorldRotation.Set( updateBufferIndex, finalRotation );
+      Quaternion finalOrientation( mParent->GetWorldOrientation(updateBufferIndex) );
+      finalOrientation *= localOrientation;
+      mWorldOrientation.Set( updateBufferIndex, finalOrientation );
     }
   }
 
   /**
-   * Copies the previous inherited rotation, if this changed in the previous frame.
-   * This method should be called instead of InheritWorldRotation i.e. if the inherited rotation
+   * Copies the previous inherited orientation, if this changed in the previous frame.
+   * This method should be called instead of InheritWorldOrientation i.e. if the inherited orientation
    * does not need to be recalculated in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void CopyPreviousWorldRotation( BufferIndex updateBufferIndex )
+  void CopyPreviousWorldOrientation( BufferIndex updateBufferIndex )
   {
-    mWorldRotation.CopyPrevious( updateBufferIndex );
+    mWorldOrientation.CopyPrevious( updateBufferIndex );
   }
 
   /**
-   * Retrieve the rotation of the node derived from the rotation of all its parents.
+   * Retrieve the orientation of the node derived from the rotation of all its parents.
    * @param[in] bufferIndex The buffer to read from.
    * @return The world rotation.
    */
-  const Quaternion& GetWorldRotation( BufferIndex bufferIndex ) const
+  const Quaternion& GetWorldOrientation( BufferIndex bufferIndex ) const
   {
-    return mWorldRotation[bufferIndex];
+    return mWorldOrientation[bufferIndex];
   }
 
   /**
-   * Set whether the Node inherits rotation.
-   * @param[in] inherit True if the parent rotation is inherited.
+   * Set whether the Node inherits orientation.
+   * @param[in] inherit True if the parent orientation is inherited.
    */
-  void SetInheritRotation(bool inherit)
+  void SetInheritOrientation(bool inherit)
   {
-    if (inherit != mInheritRotation)
+    if (inherit != mInheritOrientation)
     {
-      mInheritRotation = inherit;
+      mInheritOrientation = inherit;
 
       SetDirtyFlag(TransformFlag);
     }
   }
 
   /**
-   * Query whether the node inherits rotation from its parent.
-   * @return True if the parent rotation is inherited.
+   * Query whether the node inherits orientation from its parent.
+   * @return True if the parent orientation is inherited.
    */
-  bool IsRotationInherited() const
+  bool IsOrientationInherited() const
   {
-    return mInheritRotation;
+    return mInheritOrientation;
   }
 
   /**
@@ -1102,18 +1102,18 @@ public: // Default properties
 
   AnimatableProperty<Vector3>    mSize;          ///< Size is provided for layouting
   AnimatableProperty<Vector3>    mPosition;      ///< Local transform; distance between parent-origin & anchor-point
-  AnimatableProperty<Quaternion> mRotation;      ///< Local transform; rotation relative to parent node
+  AnimatableProperty<Quaternion> mOrientation;   ///< Local transform; rotation relative to parent node
   AnimatableProperty<Vector3>    mScale;         ///< Local transform; scale relative to parent node
   AnimatableProperty<bool>       mVisible;       ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<Vector4>    mColor;         ///< Color can be inherited from the Node hierarchy
 
   // Inherited properties; read-only from public API
 
-  InheritedVector3    mWorldPosition; ///< Full inherited position
-  InheritedQuaternion mWorldRotation; ///< Full inherited rotation
-  InheritedVector3    mWorldScale;    ///< Full inherited scale
-  InheritedMatrix     mWorldMatrix;   ///< Full inherited world matrix
-  InheritedColor      mWorldColor;    ///< Full inherited color
+  InheritedVector3    mWorldPosition;     ///< Full inherited position
+  InheritedQuaternion mWorldOrientation;  ///< Full inherited orientation
+  InheritedVector3    mWorldScale;        ///< Full inherited scale
+  InheritedMatrix     mWorldMatrix;       ///< Full inherited world matrix
+  InheritedColor      mWorldColor;        ///< Full inherited color
 
 protected:
 
@@ -1131,7 +1131,7 @@ protected:
   int  mDirtyFlags:10;                               ///< A composite set of flags for each of the Node properties
 
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
-  bool mInheritRotation:1;                           ///< Whether the parent's rotation should be inherited.
+  bool mInheritOrientation:1;                        ///< Whether the parent's orientation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
   bool mTransmitGeometryScaling:1;                   ///< Whether geometry scaling should be applied to world transform.
   bool mInhibitLocalTransform:1;                     ///< whether local transform should be applied.
@@ -1148,7 +1148,7 @@ protected:
 
 // Messages for Node
 
-inline void SetInheritRotationMessage( EventToUpdate& eventToUpdate, const Node& node, bool inherit )
+inline void SetInheritOrientationMessage( EventToUpdate& eventToUpdate, const Node& node, bool inherit )
 {
   typedef MessageValue1< Node, bool > LocalType;
 
@@ -1156,7 +1156,7 @@ inline void SetInheritRotationMessage( EventToUpdate& eventToUpdate, const Node&
   unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetInheritRotation, inherit );
+  new (slot) LocalType( &node, &Node::SetInheritOrientation, inherit );
 }
 
 inline void SetSizeModeMessage( EventToUpdate& eventToUpdate, const Node& node, SizeMode mode )
