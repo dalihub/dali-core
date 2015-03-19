@@ -190,7 +190,7 @@ void RenderGeometry::Draw( Context* context, BufferIndex bufferIndex, const Geom
 
   if( indexBuffer )
   {
-    numIndices = indexBuffer->GetDataSize(bufferIndex) / indexBuffer->GetElementSize(bufferIndex);
+    numIndices = /* TODO: MESH_REWORK remove this 2, should implement unsigned short properties  */ 2 * indexBuffer->GetDataSize(bufferIndex) / indexBuffer->GetElementSize(bufferIndex);
   }
 
   switch(type)

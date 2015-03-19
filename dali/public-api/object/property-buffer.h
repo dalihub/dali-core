@@ -73,7 +73,7 @@ public:
    * @param[in] size The number of elements in the property buffer
    * @return Handle to a newly allocated PropertyBuffer
    */
-  static PropertyBuffer New( Type type, Dali::Property::Map bufferFormat, std::size_t size );
+  static PropertyBuffer New( Type type, Dali::Property::Map& bufferFormat, std::size_t size );
 
   /**
    * @brief Default constructor, creates an empty handle

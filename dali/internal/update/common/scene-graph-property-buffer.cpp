@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "scene-graph-property-buffer.h"
+#include <dali/internal/update/common/scene-graph-property-buffer.h>
 
 namespace Dali
 {
@@ -23,7 +23,27 @@ namespace Internal
 namespace SceneGraph
 {
 
+namespace PropertyBufferMetadata
+{
+
+unsigned int Format::GetComponentOffset( unsigned int index ) const
+{
+  DALI_ASSERT_DEBUG( index >= 0 && index < components.size() && "Index not within the correct boundaries." );
+  return index > 0 ? components[index-1u].accumulatedSize : 0;
+}
+
+unsigned int Format::GetElementSize() const
+{
+  unsigned int numComponents = components.size();
+  return numComponents ? components.back().accumulatedSize : 0;
+}
+
+} // namespace PropertyBufferMetadata
+
+
 PropertyBuffer::PropertyBuffer()
+: mRenderBufferData( NULL ),
+  mSize(0u)
 {
 }
 
@@ -31,53 +51,42 @@ PropertyBuffer::~PropertyBuffer()
 {
 }
 
-//@todo MESH_REWORK Remove when we have working property buffers
-PropertyBuffer* PropertyBuffer::NewQuadVertices()
-{
-  PropertyBuffer* propertyBuffer = new PropertyBuffer();
-  propertyBuffer->mElementSize = sizeof(Vector4);
-  propertyBuffer->mData.Resize( propertyBuffer->mElementSize * 4 );
-  Vector4* vertices = reinterpret_cast<Vector4*>(&propertyBuffer->mData[0]);
-
-  vertices[ 0 ] = Vector4( -0.5f, -0.5f, 0.0f, 0.0f );
-  vertices[ 1 ] = Vector4(  0.5f, -0.5f, 1.0f, 0.0f );
-  vertices[ 2 ] = Vector4( -0.5f,  0.5f, 0.0f, 1.0f );
-  vertices[ 3 ] = Vector4(  0.5f,  0.5f, 1.0f, 1.0f );
-
-  return propertyBuffer;
-}
-
-//@todo MESH_REWORK Remove when we have working property buffers
-PropertyBuffer* PropertyBuffer::NewQuadIndices()
-{
-  PropertyBuffer* propertyBuffer = new PropertyBuffer();
-
-  propertyBuffer->mElementSize = sizeof( unsigned short );
-  propertyBuffer->mData.Resize( propertyBuffer->mElementSize * 6 );
-  unsigned short* indices = reinterpret_cast<unsigned short*>(&propertyBuffer->mData[0]);
-
-  indices[0] = 0;  indices[1] = 3;  indices[2] = 1;
-  indices[3] = 0;  indices[4] = 2;  indices[5] = 3;
-
-  return propertyBuffer;
-}
-
 std::size_t PropertyBuffer::GetDataSize( BufferIndex bufferIndex ) const
 {
-  // @todo MESH_REWORK mData should be double buffered
-  return mData.Count();
+  DALI_ASSERT_DEBUG( mFormat && "Format must have been set!" );
+
+  // @todo MESH_REWORK mData should be double buffered?
+  return mFormat->components.back().accumulatedSize * mSize;
 }
 
 std::size_t PropertyBuffer::GetElementSize( BufferIndex bufferIndex ) const
 {
-  // @todo MESH_REWORK mElementSize should be double buffered
-  return mElementSize;
+  DALI_ASSERT_DEBUG( mFormat && "Format must have been set!" );
+
+  // @todo MESH_REWORK mData should be double buffered?
+  return mFormat->GetElementSize();
+}
+
+void PropertyBuffer::SetFormat( PropertyBufferMetadata::Format* format )
+{
+  mFormat = format;
+}
+
+//TODO:: MESH_REWORK  Remove this, should be a property
+void PropertyBuffer::SetSize( unsigned int size )
+{
+  mSize = size;
+}
+
+void PropertyBuffer::SetData( BufferType* data )
+{
+  mBufferData = data;
 }
 
 const void* PropertyBuffer::GetData( BufferIndex bufferIndex ) const
 {
   // @todo MESH_REWORK mData should be double buffered
-  return reinterpret_cast< const void* >(&mData[0]);
+  return reinterpret_cast< const void* >(&(*mBufferData.Get())[0]);
 }
 
 void PropertyBuffer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )

@@ -17,9 +17,9 @@
  * limitations under the License.
  */
 
-#include <dali/public-api/common/dali-vector.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/event/common/event-thread-services.h>
 
 namespace Dali
 {
@@ -29,14 +29,51 @@ namespace SceneGraph
 {
 class SceneController;
 
+namespace PropertyBufferMetadata
+{
+/**
+ * Structure that holds name and size of a component in the PropertyBuffer.
+ */
+struct Component
+{
+  std::string name;
+  unsigned int accumulatedSize;
+};
+
+/**
+ * Structure that holds the meta-data of the format of PropertyBuffer.
+ */
+struct Format
+{
+  std::vector<Component> components;
+
+  /**
+   * @brief Get the offset of a component within an element
+   *
+   * @pre index must be within 0 and components.Size()-1
+   *
+   * @return The offset for a component within an element
+   */
+  unsigned int GetComponentOffset( unsigned int index ) const;
+
+  /**
+   * @brief Get the size of an element
+   *
+   * @return The size of an element
+   */
+  unsigned int GetElementSize() const;
+};
+
+} // PropertyBufferMetadata
+
 class PropertyBuffer : public PropertyOwner
 {
 public:
-  //@todo MESH_REWORK Remove when we have working property buffers
-  static PropertyBuffer* NewQuadVertices();
 
-  //@todo MESH_REWORK Remove when we have working property buffers
-  static PropertyBuffer* NewQuadIndices();
+  /**
+   * Type for the data contained in the buffer
+   */
+  typedef Dali::Vector< char > BufferType;
 
   /**
    * Constructor
@@ -61,6 +98,21 @@ public:
   std::size_t GetElementSize( BufferIndex bufferIndex ) const;
 
   /**
+   * Set the format of the buffer
+   * @param[in] format The format for the PropertyBuffer
+   */
+  void SetFormat( PropertyBufferMetadata::Format* format );
+
+  /**
+   * Set the data of the PropertyBuffer
+   * @param[in] data The new data of the PropertyBuffer
+   */
+  void SetData( BufferType* data );
+
+  //TODO:: MESH_REWORK  Remove this, should be a property
+  void SetSize( unsigned int size );
+
+  /**
    * Get the property buffer data
    * @return the property buffer's data array
    */
@@ -80,12 +132,53 @@ public:
   void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
 private:
+  OwnerPointer<PropertyBufferMetadata::Format> mFormat; ///< Format of the buffer
+  OwnerPointer<BufferType> mBufferData; ///< Data
+  BufferType* mRenderBufferData;
 
-  // @todo MESH_REWORK - TEMPORARY TYPES - REMOVE WHEN WE HAVE WORKING BUFFERS
-  typedef Dali::Vector< char > CharBuffer;
-  CharBuffer  mData;
-  std::size_t mElementSize;
+  //TODO: MESH_REWORK should be double buffered property
+  unsigned int mSize; ///< Size of the buffer
 };
+
+inline void SetFormatMessage( EventThreadServices& eventThreadServices,
+                              const PropertyBuffer& propertyBuffer,
+                              PropertyBufferMetadata::Format* format )
+{
+  typedef MessageValue1< PropertyBuffer, OwnerPointer<PropertyBufferMetadata::Format> > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &propertyBuffer, &PropertyBuffer::SetFormat, format );
+}
+
+//TODO:: MESH_REWORK  Remove this, should be a property
+inline void SetSizeMessage( EventThreadServices& eventThreadServices,
+                            const PropertyBuffer& propertyBuffer,
+                            unsigned int size )
+{
+  typedef MessageValue1< PropertyBuffer, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &propertyBuffer, &PropertyBuffer::SetSize, size );
+}
+
+inline void SetDataMessage( EventThreadServices& eventThreadServices,
+                            const PropertyBuffer& propertyBuffer,
+                            PropertyBuffer::BufferType* data )
+{
+  typedef MessageValue1< PropertyBuffer, OwnerPointer<PropertyBuffer::BufferType> > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &propertyBuffer, &PropertyBuffer::SetData, data );
+}
 
 } // namespace SceneGraph
 } // namespace Internal

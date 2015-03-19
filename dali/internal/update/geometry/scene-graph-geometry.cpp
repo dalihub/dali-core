@@ -29,12 +29,6 @@ Geometry::Geometry()
   mGeometryType(Dali::Geometry::TRIANGLES),
   mRequiresDepthTest(false)
 {
-  // @todo MESH_REWORK Remove this code when we have working property buffers
-  // @todo It's also the wrong place to do this temporary work
-  PropertyBuffer* vertexPropertyBuffer = PropertyBuffer::NewQuadVertices();
-  mVertexBuffers.PushBack( vertexPropertyBuffer );
-
-  mIndexBuffer = PropertyBuffer::NewQuadIndices();
 
   // Observe our own PropertyOwner's uniform map
   AddUniformMapObserver( *this );

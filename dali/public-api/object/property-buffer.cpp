@@ -26,10 +26,15 @@
 namespace Dali
 {
 
-PropertyBuffer PropertyBuffer::New( Type type, Dali::Property::Map bufferFormat, std::size_t size )
+PropertyBuffer PropertyBuffer::New( Type type, Dali::Property::Map& bufferFormat, std::size_t size )
 {
-  Internal::PropertyBufferPtr renderer = Internal::PropertyBuffer::New();
-  return PropertyBuffer( renderer.Get() );
+  Internal::PropertyBufferPtr propertyBuffer = Internal::PropertyBuffer::New();
+
+  propertyBuffer->SetType( type );
+  propertyBuffer->SetFormat( bufferFormat );
+  propertyBuffer->SetSize( size );
+
+  return PropertyBuffer( propertyBuffer.Get() );
 }
 
 PropertyBuffer::PropertyBuffer()
