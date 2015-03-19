@@ -1172,7 +1172,7 @@ public:
   /**
    * @brief Sets whether the actor should be focusable by keyboard navigation.
    *
-   * The default is true.
+   * The default is false.
    * @pre The Actor has been initialized.
    * @param[in] focusable - true if the actor should be focusable by keyboard navigation,
    * false otherwise.
