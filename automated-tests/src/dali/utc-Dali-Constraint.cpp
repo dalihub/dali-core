@@ -2981,7 +2981,7 @@ int UtcDaliConstraintInputWorldPosition(void)
 
   // Move the actors and try again
   Vector3 relativePosition( 5, 5, 5 );
-  parent.MoveBy( relativePosition );
+  parent.TranslateBy( relativePosition );
 
   application.SendNotification();
   application.Render(0);
@@ -3017,36 +3017,36 @@ int UtcDaliConstraintInputWorldRotation(void)
   Actor parent = Actor::New();
   Radian rotationAngle( Degree(90.0f) );
   Quaternion rotation( rotationAngle, Vector3::YAXIS );
-  parent.SetRotation( rotation );
+  parent.SetOrientation( rotation );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetRotation( rotation );
+  child.SetOrientation( rotation );
   parent.Add( child );
 
   Actor trackingActor = Actor::New();
   Stage::GetCurrent().Add( trackingActor );
 
   // The actors should not have a world rotation yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentRotation(), rotation, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentRotation(), rotation, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( trackingActor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( trackingActor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
   Quaternion previousRotation( rotationAngle * 2.0f, Vector3::YAXIS );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), previousRotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), previousRotation, 0.001, TEST_LOCATION );
 
   // Build constraint, to make actor track the world-rotation of another actor
   // Note that the world-rotation is always from the previous frame, so the tracking actor will lag behind
 
-  Constraint constraint = Constraint::New<Quaternion>( Actor::Property::ROTATION,
-                                                       Source( child, Actor::Property::WORLD_ROTATION ),
+  Constraint constraint = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
+                                                       Source( child, Actor::Property::WORLD_ORIENTATION ),
                                                        EqualToQuaternion() );
 
   trackingActor.ApplyConstraint( constraint );
@@ -3054,7 +3054,7 @@ int UtcDaliConstraintInputWorldRotation(void)
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( trackingActor.GetCurrentRotation(), previousRotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( trackingActor.GetCurrentOrientation(), previousRotation, 0.001, TEST_LOCATION );
 
   // Rotate the actors and try again
   parent.RotateBy( rotation );
@@ -3062,27 +3062,27 @@ int UtcDaliConstraintInputWorldRotation(void)
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentRotation(), rotation * rotation, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentRotation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentOrientation(), rotation * rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
 
   // The tracking actor lags behind
-  DALI_TEST_EQUALS( trackingActor.GetCurrentRotation(), previousRotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( trackingActor.GetCurrentOrientation(), previousRotation, 0.001, TEST_LOCATION );
 
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
   previousRotation = Quaternion( rotationAngle * 3.0f, Vector3::YAXIS );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), previousRotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), previousRotation, 0.001, TEST_LOCATION );
 
   // Allow the tracking actor to catch up
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentRotation(), rotation * rotation, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentRotation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentOrientation(), rotation * rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
 
   // The tracking actor catches up!
-  DALI_TEST_EQUALS( trackingActor.GetCurrentRotation(), previousRotation, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), previousRotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( trackingActor.GetCurrentOrientation(), previousRotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), previousRotation, 0.001, TEST_LOCATION );
   END_TEST;
 }
 
@@ -3624,22 +3624,22 @@ int UtcDaliBuiltinConstraintEqualToConstraint(void)
   //
   Quaternion q1 = Quaternion( Math::PI_2, Vector3::XAXIS );
   Quaternion q2 = Quaternion( Math::PI_4, Vector3::YAXIS );
-  actor1.SetRotation( q1 );
-  actor2.SetRotation( q2 );
+  actor1.SetOrientation( q1 );
+  actor2.SetOrientation( q2 );
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor1.GetCurrentRotation(), q1, 0.01, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor2.GetCurrentRotation(), q2, 0.01, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor1.GetCurrentOrientation(), q1, 0.01, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentOrientation(), q2, 0.01, TEST_LOCATION );
 
-  Constraint constraint4 = Constraint::New<Quaternion>( Actor::Property::ROTATION,
-                                                    Source( actor1, Actor::Property::ROTATION ),
+  Constraint constraint4 = Constraint::New<Quaternion>( Actor::Property::ORIENTATION,
+                                                    Source( actor1, Actor::Property::ORIENTATION ),
                                                     EqualToConstraint() );
   constraint4.SetRemoveAction( Constraint::Discard );
   actor2.ApplyConstraint( constraint4 );
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor2.GetCurrentRotation(), q1, 0.01, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetCurrentOrientation(), q1, 0.01, TEST_LOCATION );
 
   //
   // Check Matrix3 variant

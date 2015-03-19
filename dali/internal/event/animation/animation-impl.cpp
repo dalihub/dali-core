@@ -765,7 +765,7 @@ void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward,
   {
     //Rotation animation
     AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
-                                                              Dali::Actor::Property::ROTATION,
+                                                              Dali::Actor::Property::ORIENTATION,
                                                               Property::INVALID_COMPONENT_INDEX,
                                                               new PathRotationFunctor( pathCopy, forward ),
                                                               alpha,
@@ -832,7 +832,7 @@ void Animation::RotateBy(Actor& actor, Radian angle, const Vector3& axis, AlphaF
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
-                                                            Dali::Actor::Property::ROTATION,
+                                                            Dali::Actor::Property::ORIENTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
                                                             new RotateByAngleAxis(angle, axis),
                                                             alpha,
@@ -884,7 +884,7 @@ void Animation::RotateTo(Actor& actor, const Quaternion& rotation, AlphaFunction
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
-                                                            Dali::Actor::Property::ROTATION,
+                                                            Dali::Actor::Property::ORIENTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
                                                             new RotateToQuaternion(rotation),
                                                             alpha,

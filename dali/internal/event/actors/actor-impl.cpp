@@ -122,8 +122,8 @@ DALI_PROPERTY( "world-position",       VECTOR3,  false,   false,   true,   Dali:
 DALI_PROPERTY( "world-position-x",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WORLD_POSITION_X     )
 DALI_PROPERTY( "world-position-y",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WORLD_POSITION_Y     )
 DALI_PROPERTY( "world-position-z",     FLOAT,    false,   false,   true,   Dali::Actor::Property::WORLD_POSITION_Z     )
-DALI_PROPERTY( "rotation",             ROTATION, true,    true,    true,   Dali::Actor::Property::ROTATION             )
-DALI_PROPERTY( "world-rotation",       ROTATION, false,   false,   true,   Dali::Actor::Property::WORLD_ROTATION       )
+DALI_PROPERTY( "orientation",          ROTATION, true,    true,    true,   Dali::Actor::Property::ORIENTATION          )
+DALI_PROPERTY( "world-orientation",    ROTATION, false,   false,   true,   Dali::Actor::Property::WORLD_ORIENTATION    )
 DALI_PROPERTY( "scale",                VECTOR3,  true,    true,    true,   Dali::Actor::Property::SCALE                )
 DALI_PROPERTY( "scale-x",              FLOAT,    true,    true,    true,   Dali::Actor::Property::SCALE_X              )
 DALI_PROPERTY( "scale-y",              FLOAT,    true,    true,    true,   Dali::Actor::Property::SCALE_Y              )
@@ -140,7 +140,7 @@ DALI_PROPERTY( "world-matrix",         MATRIX,   false,   false,   true,   Dali:
 DALI_PROPERTY( "name",                 STRING,   true,    false,   false,  Dali::Actor::Property::NAME                 )
 DALI_PROPERTY( "sensitive",            BOOLEAN,  true,    false,   false,  Dali::Actor::Property::SENSITIVE            )
 DALI_PROPERTY( "leave-required",       BOOLEAN,  true,    false,   false,  Dali::Actor::Property::LEAVE_REQUIRED       )
-DALI_PROPERTY( "inherit-rotation",     BOOLEAN,  true,    false,   false,  Dali::Actor::Property::INHERIT_ROTATION     )
+DALI_PROPERTY( "inherit-orientation",  BOOLEAN,  true,    false,   false,  Dali::Actor::Property::INHERIT_ORIENTATION  )
 DALI_PROPERTY( "inherit-scale",        BOOLEAN,  true,    false,   false,  Dali::Actor::Property::INHERIT_SCALE        )
 DALI_PROPERTY( "color-mode",           STRING,   true,    false,   false,  Dali::Actor::Property::COLOR_MODE           )
 DALI_PROPERTY( "position-inheritance", STRING,   true,    false,   false,  Dali::Actor::Property::POSITION_INHERITANCE )
@@ -615,7 +615,7 @@ void Actor::SetZ(float z)
   }
 }
 
-void Actor::MoveBy(const Vector3& distance)
+void Actor::TranslateBy(const Vector3& distance)
 {
   if( NULL != mNode )
   {
@@ -663,22 +663,22 @@ PositionInheritanceMode Actor::GetPositionInheritanceMode() const
   return mPositionInheritanceMode;
 }
 
-void Actor::SetRotation(const Radian& angle, const Vector3& axis)
+void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
 {
   Vector4 normalizedAxis(axis.x, axis.y, axis.z, 0.0f);
   normalizedAxis.Normalize();
 
-  Quaternion rotation(Quaternion::FromAxisAngle(normalizedAxis, angle));
+  Quaternion orientation(Quaternion::FromAxisAngle(normalizedAxis, angle));
 
-  SetRotation(rotation);
+  SetOrientation(orientation);
 }
 
-void Actor::SetRotation(const Quaternion& rotation)
+void Actor::SetOrientation(const Quaternion& orientation)
 {
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, &mNode->mRotation, &AnimatableProperty<Quaternion>::Bake, rotation );
+    SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, &mNode->mOrientation, &AnimatableProperty<Quaternion>::Bake, orientation );
   }
 }
 
@@ -687,7 +687,7 @@ void Actor::RotateBy(const Radian& angle, const Vector3& axis)
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, &mNode->mRotation, &AnimatableProperty<Quaternion>::BakeRelative, Quaternion(angle, axis) );
+    SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, &mNode->mOrientation, &AnimatableProperty<Quaternion>::BakeRelative, Quaternion(angle, axis) );
   }
 }
 
@@ -696,27 +696,27 @@ void Actor::RotateBy(const Quaternion& relativeRotation)
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, &mNode->mRotation, &AnimatableProperty<Quaternion>::BakeRelative, relativeRotation );
+    SceneGraph::NodePropertyMessage<Quaternion>::Send( mStage->GetUpdateManager(), mNode, &mNode->mOrientation, &AnimatableProperty<Quaternion>::BakeRelative, relativeRotation );
   }
 }
 
-const Quaternion& Actor::GetCurrentRotation() const
+const Quaternion& Actor::GetCurrentOrientation() const
 {
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; copy the value from the previous update
-    return mNode->GetRotation(mStage->GetEventBufferIndex());
+    return mNode->GetOrientation(mStage->GetEventBufferIndex());
   }
 
   return Quaternion::IDENTITY;
 }
 
-const Quaternion& Actor::GetCurrentWorldRotation() const
+const Quaternion& Actor::GetCurrentWorldOrientation() const
 {
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; copy the value from the previous update
-    return mNode->GetWorldRotation( mStage->GetEventBufferIndex() );
+    return mNode->GetWorldOrientation( mStage->GetEventBufferIndex() );
   }
 
   return Quaternion::IDENTITY;
@@ -849,11 +849,11 @@ Matrix Actor::GetCurrentWorldMatrix() const
   if( NULL != mNode )
   {
     // World matrix is no longer updated unless there is something observing the node.
-    // Need to calculate it from node's world position, rotation and scale:
+    // Need to calculate it from node's world position, orientation and scale:
     BufferIndex updateBufferIndex = mStage->GetEventBufferIndex();
     Matrix worldMatrix(false);
     worldMatrix.SetTransformComponents( mNode->GetWorldScale( updateBufferIndex ),
-                                        mNode->GetWorldRotation( updateBufferIndex ),
+                                        mNode->GetWorldOrientation( updateBufferIndex ),
                                         mNode->GetWorldPosition( updateBufferIndex ) );
     return worldMatrix;
   }
@@ -887,15 +887,6 @@ void Actor::SetOpacity(float opacity)
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
     SceneGraph::NodePropertyComponentMessage<Vector4>::Send( mStage->GetUpdateManager(), mNode, &mNode->mColor, &AnimatableProperty<Vector4>::BakeW, opacity );
-  }
-}
-
-void Actor::OpacityBy(float relativeOpacity)
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyComponentMessage<Vector4>::Send( mStage->GetUpdateManager(), mNode, &mNode->mColor, &AnimatableProperty<Vector4>::BakeWRelative, relativeOpacity );
   }
 }
 
@@ -956,15 +947,6 @@ void Actor::SetColorBlue( float blue )
   }
 }
 
-void Actor::ColorBy(const Vector4& relativeColor)
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value & base value
-    SceneGraph::NodePropertyMessage<Vector4>::Send( mStage->GetUpdateManager(), mNode, &mNode->mColor, &AnimatableProperty<Vector4>::BakeRelative, relativeColor );
-  }
-}
-
 const Vector4& Actor::GetCurrentColor() const
 {
   if( NULL != mNode )
@@ -976,20 +958,20 @@ const Vector4& Actor::GetCurrentColor() const
   return Color::WHITE;
 }
 
-void Actor::SetInheritRotation(bool inherit)
+void Actor::SetInheritOrientation(bool inherit)
 {
   // non animateable so keep local copy
-  mInheritRotation = inherit;
+  mInheritOrientation = inherit;
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value
-    SetInheritRotationMessage( mStage->GetUpdateInterface(), *mNode, inherit );
+    SetInheritOrientationMessage( mStage->GetUpdateInterface(), *mNode, inherit );
   }
 }
 
-bool Actor::IsRotationInherited() const
+bool Actor::IsOrientationInherited() const
 {
-  return mInheritRotation;
+  return mInheritOrientation;
 }
 
 void Actor::SetSizeMode(SizeMode mode)
@@ -1614,7 +1596,7 @@ bool Actor::ScreenToLocal( const Matrix& viewMatrix,
   // Calculate the ModelView matrix
   Matrix modelView(false/*don't init*/);
   // need to use the components as world matrix is only updated for actors that need it
-  modelView.SetTransformComponents( mNode->GetWorldScale(bufferIndex), mNode->GetWorldRotation(bufferIndex), mNode->GetWorldPosition(bufferIndex) );
+  modelView.SetTransformComponents( mNode->GetWorldScale(bufferIndex), mNode->GetWorldOrientation(bufferIndex), mNode->GetWorldPosition(bufferIndex) );
   Matrix::Multiply(modelView, modelView, viewMatrix);
 
   // Calculate the inverted ModelViewProjection matrix; this will be used for 2 unprojects
@@ -1764,7 +1746,7 @@ bool Actor::RayActorTest( const Vector4& rayOrigin, const Vector4& rayDir, Vecto
     // Calculate the inverse of Model matrix
     Matrix invModelMatrix(false/*don't init*/);
     // need to use the components as world matrix is only updated for actors that need it
-    invModelMatrix.SetInverseTransformComponents( mNode->GetWorldScale(bufferIndex), mNode->GetWorldRotation(bufferIndex), mNode->GetWorldPosition(bufferIndex) );
+    invModelMatrix.SetInverseTransformComponents( mNode->GetWorldScale(bufferIndex), mNode->GetWorldOrientation(bufferIndex), mNode->GetWorldPosition(bufferIndex) );
 
     Vector4 rayOriginLocal(invModelMatrix * rayOrigin);
     Vector4 rayDirLocal(invModelMatrix * rayDir - invModelMatrix.GetTranslation());
@@ -1995,7 +1977,7 @@ Actor::Actor( DerivedType derivedType )
   mDerivedRequiresHover( false ),
   mDerivedRequiresMouseWheelEvent( false ),
   mOnStageSignalled( false ),
-  mInheritRotation( true ),
+  mInheritOrientation( true ),
   mInheritScale( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
@@ -2455,9 +2437,9 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::Actor::Property::ROTATION:
+    case Dali::Actor::Property::ORIENTATION:
     {
-      SetRotation( property.Get<Quaternion>() );
+      SetOrientation( property.Get<Quaternion>() );
       break;
     }
 
@@ -2539,9 +2521,9 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::Actor::Property::INHERIT_ROTATION:
+    case Dali::Actor::Property::INHERIT_ORIENTATION:
     {
-      SetInheritRotation( property.Get<bool>() );
+      SetInheritOrientation( property.Get<bool>() );
       break;
     }
 
@@ -2829,15 +2811,15 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
       break;
     }
 
-    case Dali::Actor::Property::ROTATION:
+    case Dali::Actor::Property::ORIENTATION:
     {
-      value = GetCurrentRotation();
+      value = GetCurrentOrientation();
       break;
     }
 
-    case Dali::Actor::Property::WORLD_ROTATION:
+    case Dali::Actor::Property::WORLD_ORIENTATION:
     {
-      value = GetCurrentWorldRotation();
+      value = GetCurrentWorldOrientation();
       break;
     }
 
@@ -2937,9 +2919,9 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
       break;
     }
 
-    case Dali::Actor::Property::INHERIT_ROTATION:
+    case Dali::Actor::Property::INHERIT_ORIENTATION:
     {
-      value = IsRotationInherited();
+      value = IsOrientationInherited();
       break;
     }
 
@@ -3055,8 +3037,8 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
         property = &mNode->mPosition;
         break;
 
-      case Dali::Actor::Property::ROTATION:
-        property = &mNode->mRotation;
+      case Dali::Actor::Property::ORIENTATION:
+        property = &mNode->mOrientation;
         break;
 
       case Dali::Actor::Property::SCALE:
@@ -3207,12 +3189,12 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
         property = &mNode->mWorldPosition;
         break;
 
-      case Dali::Actor::Property::ROTATION:
-        property = &mNode->mRotation;
+      case Dali::Actor::Property::ORIENTATION:
+        property = &mNode->mOrientation;
         break;
 
-      case Dali::Actor::Property::WORLD_ROTATION:
-        property = &mNode->mWorldRotation;
+      case Dali::Actor::Property::WORLD_ORIENTATION:
+        property = &mNode->mWorldOrientation;
         break;
 
       case Dali::Actor::Property::SCALE:

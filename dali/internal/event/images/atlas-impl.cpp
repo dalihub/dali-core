@@ -82,25 +82,23 @@ bool Atlas::Upload( const std::string& url,
 {
   bool uploadSuccess( false );
 
-  ResourceId destId = GetResourceId();
+  Integration::BitmapPtr bitmap = LoadBitmap( url );
 
-  if( destId )
+  if( bitmap && Compatible(bitmap->GetPixelFormat(), xOffset + bitmap->GetImageWidth(), yOffset + bitmap->GetImageHeight()) )
   {
-    Integration::BitmapPtr bitmap = LoadBitmap( url );
-
-    if( bitmap && Compatible(bitmap->GetPixelFormat(), xOffset + bitmap->GetImageWidth(), yOffset + bitmap->GetImageHeight()) )
+    AllocateAtlas();
+    ResourceId destId = GetResourceId();
+    if( destId )
     {
-      AllocateAtlas();
       mResourceClient.UploadBitmap( destId, bitmap, xOffset, yOffset  );
+      uploadSuccess = true;
 
       if( mRecoverContext )
       {
         mTiles.PushBack( new Tile(xOffset, yOffset, url) );
       }
-      uploadSuccess = true;
     }
   }
-
   return uploadSuccess;
 }
 

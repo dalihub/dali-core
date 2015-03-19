@@ -913,7 +913,7 @@ int UtcDaliActorSetPosition01(void)
   application.Render();
   DALI_TEST_EQUALS( Vector3( 1.0f, 1.1f, 1.2f ), actor.GetCurrentPosition(), TEST_LOCATION );
 
-  actor.MoveBy( Vector3( 0.1f, 0.1f, 0.1f ) );
+  actor.TranslateBy( Vector3( 0.1f, 0.1f, 0.1f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1031,7 +1031,7 @@ int UtcDaliActorSetZ(void)
   END_TEST;
 }
 
-int UtcDaliActorMoveBy(void)
+int UtcDaliActorTranslateBy(void)
 {
   TestApplication application;
 
@@ -1048,7 +1048,7 @@ int UtcDaliActorMoveBy(void)
 
   DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
 
-  actor.MoveBy(vector);
+  actor.TranslateBy(vector);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1381,25 +1381,25 @@ int UtcDaliActorSizeMode(void)
   END_TEST;
 }
 
-// SetRotation(float angleRadians, Vector3 axis)
-int UtcDaliActorSetRotation01(void)
+// SetOrientation(float angleRadians, Vector3 axis)
+int UtcDaliActorSetOrientation01(void)
 {
   TestApplication application;
 
   Quaternion rotation(0.785f, Vector3(1.0f, 1.0f, 0.0f));
   Actor actor = Actor::New();
 
-  actor.SetRotation(rotation);
+  actor.SetOrientation(rotation);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliActorSetRotation02(void)
+int UtcDaliActorSetOrientation02(void)
 {
   TestApplication application;
 
@@ -1408,29 +1408,29 @@ int UtcDaliActorSetRotation02(void)
   float angle = 0.785f;
   Vector3 axis(1.0f, 1.0f, 0.0f);
 
-  actor.SetRotation(Radian( angle ), axis);
+  actor.SetOrientation(Radian( angle ), axis);
   Quaternion rotation( angle, axis );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Add( actor );
   actor.RotateBy( Degree( 360 ), axis);
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
-  actor.SetRotation( Degree( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
+  actor.SetOrientation( Degree( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
   Quaternion result( 0, Vector3( 1.0f, 0.0f, 0.0f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( result, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS( result, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
-  actor.SetRotation(Radian( angle ), axis);
+  actor.SetOrientation(Radian( angle ), axis);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -1448,7 +1448,7 @@ int UtcDaliActorRotateBy01(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.25f, Vector3::ZAXIS), actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(M_PI*0.25f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Add( actor );
 
@@ -1456,7 +1456,7 @@ int UtcDaliActorRotateBy01(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -1474,31 +1474,31 @@ int UtcDaliActorRotateBy02(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   actor.RotateBy(rotation);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliActorGetCurrentRotation(void)
+int UtcDaliActorGetCurrentOrientation(void)
 {
   TestApplication application;
   Actor actor = Actor::New();
 
   Quaternion rotation(0.785f, Vector3(1.0f, 1.0f, 0.0f));
-  actor.SetRotation(rotation);
+  actor.SetOrientation(rotation);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliActorGetCurrentWorldRotation(void)
+int UtcDaliActorGetCurrentWorldOrientation(void)
 {
   tet_infoline("Testing Actor::GetCurrentWorldRotation");
   TestApplication application;
@@ -1506,36 +1506,36 @@ int UtcDaliActorGetCurrentWorldRotation(void)
   Actor parent = Actor::New();
   Radian rotationAngle( Degree(90.0f) );
   Quaternion rotation( rotationAngle, Vector3::YAXIS );
-  parent.SetRotation( rotation );
+  parent.SetOrientation( rotation );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetRotation( rotation );
+  child.SetOrientation( rotation );
   parent.Add( child );
 
   // The actors should not have a world rotation yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentRotation(), rotation, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentRotation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
 
   // The actors should have a world rotation now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
 
   // turn off child rotation inheritance
-  child.SetInheritRotation( false );
-  DALI_TEST_EQUALS( child.IsRotationInherited(), false, TEST_LOCATION );
+  child.SetInheritOrientation( false );
+  DALI_TEST_EQUALS( child.IsOrientationInherited(), false, TEST_LOCATION );
   application.SendNotification();
   application.Render(0);
 
   // The actors should have a world rotation now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), rotation, 0.001, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1777,7 +1777,7 @@ int UtcDaliActorSetOpacity(void)
   DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.4f, TEST_LOCATION );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.OpacityBy( 0.1f );
+  actor.SetOpacity( actor.GetCurrentOpacity() + 0.1f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1795,7 +1795,7 @@ int UtcDaliActorSetOpacity(void)
   DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.9f, TEST_LOCATION );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.OpacityBy( -0.9f );
+  actor.SetOpacity( actor.GetCurrentOpacity() - 0.9f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1855,7 +1855,7 @@ int UtcDaliActorSetColor(void)
   application.Render();
   DALI_TEST_CHECK(color == actor.GetCurrentColor());
 
-  actor.ColorBy( Vector4( -0.4f, -0.5f, -0.6f, -0.4f ) );
+  actor.SetColor( actor.GetCurrentColor() + Vector4( -0.4f, -0.5f, -0.6f, -0.4f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1868,7 +1868,7 @@ int UtcDaliActorSetColor(void)
   application.Render();
   DALI_TEST_EQUALS( color, actor.GetCurrentColor(),  TEST_LOCATION );
 
-  actor.ColorBy( Vector4( 1.1f, 1.1f, 1.1f, 1.1f ) );
+  actor.SetColor( actor.GetCurrentColor() + Vector4( 1.1f, 1.1f, 1.1f, 1.1f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -2922,7 +2922,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetRotation( parentRotation );
+  parent.SetOrientation( parentRotation );
   parent.SetScale( parentScale );
   Stage::GetCurrent().Add( parent );
 
@@ -2933,7 +2933,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Quaternion childRotation( childRotationAngle, Vector3::YAXIS );
   Vector3 childScale( 2.0f, 2.0f, 2.0f );
   child.SetPosition( childPosition );
-  child.SetRotation( childRotation );
+  child.SetOrientation( childRotation );
   child.SetScale( childScale );
   parent.Add( child );
 
@@ -2976,7 +2976,7 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetRotation( parentRotation );
+  parent.SetOrientation( parentRotation );
   parent.SetScale( parentScale );
   Stage::GetCurrent().Add( parent );
 
@@ -3134,8 +3134,8 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "world-position-x",         Actor::Property::WORLD_POSITION_X,         Property::FLOAT       },
   { "world-position-y",         Actor::Property::WORLD_POSITION_Y,         Property::FLOAT       },
   { "world-position-z",         Actor::Property::WORLD_POSITION_Z,         Property::FLOAT       },
-  { "rotation",                 Actor::Property::ROTATION,                 Property::ROTATION    },
-  { "world-rotation",           Actor::Property::WORLD_ROTATION,           Property::ROTATION    },
+  { "orientation",              Actor::Property::ORIENTATION,              Property::ROTATION    },
+  { "world-orientation",        Actor::Property::WORLD_ORIENTATION,        Property::ROTATION    },
   { "scale",                    Actor::Property::SCALE,                    Property::VECTOR3     },
   { "scale-x",                  Actor::Property::SCALE_X,                  Property::FLOAT       },
   { "scale-y",                  Actor::Property::SCALE_Y,                  Property::FLOAT       },
@@ -3152,7 +3152,7 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "name",                     Actor::Property::NAME,                     Property::STRING      },
   { "sensitive",                Actor::Property::SENSITIVE,                Property::BOOLEAN     },
   { "leave-required",           Actor::Property::LEAVE_REQUIRED,           Property::BOOLEAN     },
-  { "inherit-rotation",         Actor::Property::INHERIT_ROTATION,         Property::BOOLEAN     },
+  { "inherit-orientation",      Actor::Property::INHERIT_ORIENTATION,      Property::BOOLEAN     },
   { "inherit-scale",            Actor::Property::INHERIT_SCALE,            Property::BOOLEAN     },
   { "color-mode",               Actor::Property::COLOR_MODE,               Property::STRING      },
   { "position-inheritance",     Actor::Property::POSITION_INHERITANCE,     Property::STRING      },

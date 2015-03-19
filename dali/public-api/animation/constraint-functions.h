@@ -39,64 +39,64 @@ namespace LocalConstraint
 /**
  * @brief A function which constrains a Vector3 property, based on the local properties of an Actor.
  *
- * @param[in] size     The actor's current size.
- * @param[in] position The actor's current position.
- * @param[in] scale    The actor's current rotation.
- * @param[in] rotation The actor's current scale.
- * @param[in] color    The actor's current color.
+ * @param[in] size        The actor's current size.
+ * @param[in] position    The actor's current position.
+ * @param[in] orientation The actor's current orientation.
+ * @param[in] scale       The actor's current scale.
+ * @param[in] color       The actor's current color.
  * @return The constrained property value.
  */
 typedef boost::function<Vector3 (const Vector3&    size,
                                  const Vector3&    position,
-                                 const Quaternion& rotation,
+                                 const Quaternion& orientation,
                                  const Vector3&    scale,
                                  const Vector4&    color)> Vector3Function;
 
 /**
  * @brief A function which constrains a Vector4 property, based on the local properties of an Actor.
  *
- * @param[in] size     The actor's current size.
- * @param[in] position The actor's current position.
- * @param[in] scale    The actor's current rotation.
- * @param[in] rotation The actor's current scale.
- * @param[in] color    The actor's current color.
+ * @param[in] size        The actor's current size.
+ * @param[in] position    The actor's current position.
+ * @param[in] orientation The actor's current orientation.
+ * @param[in] scale       The actor's current scale.
+ * @param[in] color       The actor's current color.
  * @return The constrained property value.
  */
 typedef boost::function<Vector4 (const Vector3&    size,
                                  const Vector3&    position,
-                                 const Quaternion& rotation,
+                                 const Quaternion& orientation,
                                  const Vector3&    scale,
                                  const Vector4&    color)> Vector4Function;
 
 /**
  * @brief A function which constrains a Quaternion property, based on the local properties of an Actor.
  *
- * @param[in] size     The actor's current size.
- * @param[in] position The actor's current position.
- * @param[in] scale    The actor's current rotation.
- * @param[in] rotation The actor's current scale.
- * @param[in] color    The actor's current color.
+ * @param[in] size        The actor's current size.
+ * @param[in] position    The actor's current position.
+ * @param[in] orientation The actor's current orientation.
+ * @param[in] scale       The actor's current scale.
+ * @param[in] color       The actor's current color.
  * @return The constrained property value.
  */
 typedef boost::function<Quaternion (const Vector3&    size,
                                     const Vector3&    position,
-                                    const Quaternion& rotation,
+                                    const Quaternion& orientation,
                                     const Vector3&    scale,
                                     const Vector4&    color)> QuaternionFunction;
 
 /**
  * @brief A function which constrains a boolean property, based on the local properties of an Actor.
  *
- * @param[in] size     The actor's current size.
- * @param[in] position The actor's current position.
- * @param[in] scale    The actor's current rotation.
- * @param[in] rotation The actor's current scale.
- * @param[in] color    The actor's current color.
+ * @param[in] size        The actor's current size.
+ * @param[in] position    The actor's current position.
+ * @param[in] orientation The actor's current orientation.
+ * @param[in] scale       The actor's current scale.
+ * @param[in] color       The actor's current color.
  * @return The constrained property value.
  */
 typedef boost::function<bool (const Vector3&    size,
                               const Vector3&    position,
-                              const Quaternion& rotation,
+                              const Quaternion& orientation,
                               const Vector3&    scale,
                               const Vector4&    color)> BoolFunction;
 
@@ -116,7 +116,7 @@ namespace ParentConstraint
  * @param[in] anchorPoint The actor's current anchor-point.
  * @param[in] parentSize The parent's current size.
  * @param[in] parentPosition The parent's current position.
- * @param[in] parentRotation The parent's current rotation.
+ * @param[in] parentOrientation The parent's current orientation.
  * @param[in] parentScale The parent's current scale.
  * @return The constrained property value.
  */
@@ -125,7 +125,7 @@ typedef boost::function<Vector3 (const Vector3&    current,
                                  const Vector3&    anchorPoint,
                                  const Vector3&    parentSize,
                                  const Vector3&    parentPosition,
-                                 const Quaternion& parentRotation,
+                                 const Quaternion& parentOrientation,
                                  const Vector3&    parentScale)> Vector3Function;
 
 /**
@@ -136,7 +136,7 @@ typedef boost::function<Vector3 (const Vector3&    current,
  * @param[in] anchorPoint The actor's current anchor-point.
  * @param[in] parentSize The parent's current size.
  * @param[in] parentPosition The parent's current position.
- * @param[in] parentRotation The parent's current rotation.
+ * @param[in] parentOrientation The parent's current orientation.
  * @param[in] parentScale The parent's current scale.
  * @return The constrained property value.
  */
@@ -145,7 +145,7 @@ typedef boost::function<Vector4 (const Vector4&    current,
                                  const Vector3&    anchorPoint,
                                  const Vector3&    parentSize,
                                  const Vector3&    parentPosition,
-                                 const Quaternion& parentRotation,
+                                 const Quaternion& parentOrientation,
                                  const Vector3&    parentScale)> Vector4Function;
 
 /**
@@ -155,7 +155,7 @@ typedef boost::function<Vector4 (const Vector4&    current,
  * @param[in] anchorPoint The actor's current anchor-point.
  * @param[in] parentSize The parent's current size.
  * @param[in] parentPosition The parent's current position.
- * @param[in] parentRotation The parent's current rotation.
+ * @param[in] parentOrientation The parent's current orientation.
  * @param[in] parentScale The parent's current scale.
  * @return The constrained property value.
  */
@@ -164,7 +164,7 @@ typedef boost::function<Quaternion (const Quaternion& current,
                                     const Vector3&    anchorPoint,
                                     const Vector3&    parentSize,
                                     const Vector3&    parentPosition,
-                                    const Quaternion& parentRotation,
+                                    const Quaternion& parentOrientation,
                                     const Vector3&    parentScale)> QuaternionFunction;
 
 /**
@@ -175,7 +175,7 @@ typedef boost::function<Quaternion (const Quaternion& current,
  * @param[in] anchorPoint The actor's current anchor-point.
  * @param[in] parentSize The parent's current size.
  * @param[in] parentPosition The parent's current position.
- * @param[in] parentRotation The parent's current rotation.
+ * @param[in] parentOrientation The parent's current orientation.
  * @param[in] parentScale The parent's current scale.
  * @return The constrained property value.
  */
@@ -184,7 +184,7 @@ typedef boost::function<bool (const bool&       current,
                               const Vector3&    anchorPoint,
                               const Vector3&    parentSize,
                               const Vector3&    parentPosition,
-                              const Quaternion& parentRotation,
+                              const Quaternion& parentOrientation,
                               const Vector3&    parentScale)> BoolFunction;
 
 } // ParentConstraint

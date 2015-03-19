@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ int UtcDaliMutexMultiThread(void)
   {
     Mutex::ScopedLock lock( *gGlobalValueMutex );
     DALI_TEST_EQUALS( true, gGlobalValueMutex->IsLocked(), TEST_LOCATION );
-    pthread_create(&thread1, NULL, &WorkerThread1, NULL );
+    pthread_create( &thread1, NULL, &WorkerThread1, NULL );
     // wait till the thread is in run state
     while( RUN != gWorkerThreadState )
     {
@@ -117,6 +117,8 @@ int UtcDaliMutexMultiThread(void)
     usleep( 1 ); // 1 microsecond
   }
   DALI_TEST_EQUALS( false, gGlobalValueMutex->IsLocked(), TEST_LOCATION );
+  void* exitValue;
+  pthread_join( thread1, &exitValue );
 
   END_TEST;
 }

@@ -59,10 +59,10 @@ enum ProjectionMode
  * There are two types of camera actor, FREE_LOOK and LOOK_AT_TARGET. By default
  * the camera actor will be FREE_LOOK.
  *
- * A FREE_LOOK camera uses actor's rotation to control where the camera is looking.
+ * A FREE_LOOK camera uses actor's orientation to control where the camera is looking.
  * If no additional rotations are specified, the camera looks in the negative Z direction.
  *
- * For LOOK_AT_TARGET the actor's rotation is ignored, instead the camera looks at TARGET_POSITION
+ * For LOOK_AT_TARGET the actor's orientation is ignored, instead the camera looks at TARGET_POSITION
  * in world coordinates.
  *
  */

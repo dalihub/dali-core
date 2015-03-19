@@ -19,7 +19,7 @@
 #include <dali/internal/common/fixed-size-memory-pool.h>
 
 // INTERNAL HEADERS
-#include <dali/public-api/dali-core.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {

@@ -139,7 +139,7 @@ sub create_setenv
 # You can then source this script by using
 # \$ . setenv
 #
-# Use DESKTOP_PREFIX when running configure in dali/build/slp:
+# Use DESKTOP_PREFIX when running configure in dali/build/tizen:
 # \$ CXXFLAGS="-g -O0" ./configure --prefix=\$DESKTOP_PREFIX
 
 export DESKTOP_PREFIX=$install_path

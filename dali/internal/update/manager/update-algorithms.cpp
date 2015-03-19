@@ -160,13 +160,13 @@ inline void UpdateRootNodeTransformValues( Layer& rootNode, int nodeDirtyFlags, 
   if ( nodeDirtyFlags & TransformFlag )
   {
     rootNode.SetWorldPosition( updateBufferIndex, rootNode.GetPosition( updateBufferIndex ) );
-    rootNode.SetWorldRotation( updateBufferIndex, rootNode.GetRotation( updateBufferIndex ) );
+    rootNode.SetWorldOrientation( updateBufferIndex, rootNode.GetOrientation( updateBufferIndex ) );
     rootNode.SetWorldScale   ( updateBufferIndex, rootNode.GetScale   ( updateBufferIndex ) );
   }
   else
   {
     // Copy previous value, in case they changed in the previous frame
-    rootNode.CopyPreviousWorldRotation( updateBufferIndex );
+    rootNode.CopyPreviousWorldOrientation( updateBufferIndex );
     rootNode.CopyPreviousWorldScale( updateBufferIndex );
     rootNode.CopyPreviousWorldPosition( updateBufferIndex );
   }
@@ -226,13 +226,13 @@ inline void UpdateNodeTransformValues( Node& node, int& nodeDirtyFlags, BufferIn
 
     // With a non-central anchor-point, the world rotation and scale affects the world position.
     // Therefore the world rotation & scale must be updated before the world position.
-    if( node.IsRotationInherited() )
+    if( node.IsOrientationInherited() )
     {
-      node.InheritWorldRotation( updateBufferIndex );
+      node.InheritWorldOrientation( updateBufferIndex );
     }
     else
     {
-      node.SetWorldRotation( updateBufferIndex, node.GetRotation( updateBufferIndex ) );
+      node.SetWorldOrientation( updateBufferIndex, node.GetOrientation( updateBufferIndex ) );
     }
 
     if( node.IsScaleInherited() )
@@ -249,7 +249,7 @@ inline void UpdateNodeTransformValues( Node& node, int& nodeDirtyFlags, BufferIn
   else
   {
     // Copy inherited values, if those changed in the previous frame
-    node.CopyPreviousWorldRotation( updateBufferIndex );
+    node.CopyPreviousWorldOrientation( updateBufferIndex );
     node.CopyPreviousWorldScale( updateBufferIndex );
     node.CopyPreviousWorldPosition( updateBufferIndex );
     node.CopyPreviousSize( updateBufferIndex );
@@ -265,14 +265,14 @@ inline void UpdateNodeWorldMatrix( Node &node, int nodeDirtyFlags, BufferIndex u
     {
       node.SetWorldMatrix( updateBufferIndex,
                            node.GetWorldScale(updateBufferIndex),
-                           node.GetWorldRotation(updateBufferIndex) / node.GetRotation(updateBufferIndex),
+                           node.GetWorldOrientation(updateBufferIndex) / node.GetOrientation(updateBufferIndex),
                            node.GetWorldPosition(updateBufferIndex) - node.GetPosition(updateBufferIndex) );
     }
     else
     {
       node.SetWorldMatrix( updateBufferIndex,
                            node.GetWorldScale(updateBufferIndex),
-                           node.GetWorldRotation(updateBufferIndex),
+                           node.GetWorldOrientation(updateBufferIndex),
                            node.GetWorldPosition(updateBufferIndex) );
     }
   }
@@ -299,14 +299,14 @@ inline void UpdateNodeWorldMatrix( Node& node, RenderableAttachment& updatedRend
       {
         node.SetWorldMatrix( updateBufferIndex,
                              node.GetWorldScale(updateBufferIndex) * scaling,
-                             node.GetWorldRotation(updateBufferIndex) / node.GetRotation(updateBufferIndex),
+                             node.GetWorldOrientation(updateBufferIndex) / node.GetOrientation(updateBufferIndex),
                              node.GetWorldPosition(updateBufferIndex) - node.GetPosition(updateBufferIndex) );
       }
       else
       {
         node.SetWorldMatrix( updateBufferIndex,
                              node.GetWorldScale(updateBufferIndex) * scaling,
-                             node.GetWorldRotation(updateBufferIndex),
+                             node.GetWorldOrientation(updateBufferIndex),
                              node.GetWorldPosition(updateBufferIndex) );
       }
     }
@@ -317,14 +317,14 @@ inline void UpdateNodeWorldMatrix( Node& node, RenderableAttachment& updatedRend
       {
         node.SetWorldMatrix( updateBufferIndex,
                              node.GetWorldScale(updateBufferIndex),
-                             node.GetWorldRotation(updateBufferIndex) / node.GetRotation(updateBufferIndex),
+                             node.GetWorldOrientation(updateBufferIndex) / node.GetOrientation(updateBufferIndex),
                              node.GetWorldPosition(updateBufferIndex) - node.GetPosition(updateBufferIndex) );
       }
       else
       {
         node.SetWorldMatrix( updateBufferIndex,
                              node.GetWorldScale(updateBufferIndex),
-                             node.GetWorldRotation(updateBufferIndex),
+                             node.GetWorldOrientation(updateBufferIndex),
                              node.GetWorldPosition(updateBufferIndex) );
       }
     }
