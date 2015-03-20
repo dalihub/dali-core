@@ -24,6 +24,8 @@
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/integration-api/platform-abstraction.h>
 
+#include <string.h>
+
 namespace Dali
 {
 namespace Internal

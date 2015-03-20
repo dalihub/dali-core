@@ -22,8 +22,8 @@
 #include <boost/function.hpp>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -81,9 +81,7 @@ public:
                                     SourceContainer& sources,
                                     ConstraintFunctionPtr func )
   {
-    ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-
-    return new ActiveConstraint< PropertyType >( tls.GetEventToUpdate(), targetIndex, sources, sources.size(), func );
+    return new ActiveConstraint< PropertyType >( targetIndex, sources, sources.size(), func );
   }
 
   /**
@@ -103,8 +101,7 @@ public:
 
     ConstraintFunctionPtr funcPtr( mUserFunction->Clone() );
 
-    clone = new ActiveConstraint< PropertyType >( mEventToUpdate,
-                                                  mTargetIndex,
+    clone = new ActiveConstraint< PropertyType >( mTargetIndex,
                                                   mSources,
                                                   mSourceCount,
                                                   funcPtr );
@@ -121,12 +118,11 @@ private:
   /**
    * Private constructor; see also ActiveConstraint::New().
    */
-  ActiveConstraint( EventToUpdate& eventToUpdate,
-                    Property::Index targetIndex,
+  ActiveConstraint( Property::Index targetIndex,
                     SourceContainer& sources,
                     unsigned int sourceCount,
                     ConstraintFunctionPtr& func )
-  : ActiveConstraintBase( eventToUpdate, targetIndex, sources, sourceCount ),
+  : ActiveConstraintBase( targetIndex, sources, sourceCount ),
     mTargetIndex( targetIndex ),
     mUserFunction( func )
   {
@@ -183,7 +179,7 @@ private:
       sceneGraphConstraint->SetRemoveAction( mRemoveAction );
 
       // object is being used in a separate thread; queue a message to apply the constraint
-      ApplyConstraintMessage( Stage::GetCurrent()->GetUpdateInterface(), *targetObject, *sceneGraphConstraint );
+      ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
 
       // Keep a raw-pointer to the scene-graph constraint
       mSceneGraphConstraint = sceneGraphConstraint;
@@ -320,9 +316,7 @@ public:
                                     SourceContainer& sources,
                                     ConstraintFunctionPtr func )
   {
-    ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-
-    return new ActiveConstraint< float >( tls.GetEventToUpdate(), targetIndex, sources, sources.size(), func );
+    return new ActiveConstraint< float >( targetIndex, sources, sources.size(), func );
   }
 
   /**
@@ -342,8 +336,7 @@ public:
 
     ConstraintFunctionPtr funcPtr( mUserFunction->Clone() );
 
-    clone = new ActiveConstraint< float >( mEventToUpdate,
-                                           mTargetIndex,
+    clone = new ActiveConstraint< float >( mTargetIndex,
                                            mSources,
                                            mSourceCount,
                                            funcPtr );
@@ -360,12 +353,11 @@ private:
   /**
    * Private constructor; see also ActiveConstraint::New().
    */
-  ActiveConstraint( EventToUpdate& eventToUpdate,
-                    Property::Index targetIndex,
+  ActiveConstraint( Property::Index targetIndex,
                     SourceContainer& sources,
                     unsigned int sourceCount,
                     ConstraintFunctionPtr& func )
-  : ActiveConstraintBase( eventToUpdate, targetIndex, sources, sourceCount ),
+  : ActiveConstraintBase( targetIndex, sources, sourceCount ),
     mTargetIndex( targetIndex ),
     mUserFunction( func )
   {
@@ -484,7 +476,7 @@ private:
       sceneGraphConstraint->SetRemoveAction( mRemoveAction );
 
         // object is being used in a separate thread; queue a message to apply the constraint
-      ApplyConstraintMessage( Stage::GetCurrent()->GetUpdateInterface(), *targetObject, *sceneGraphConstraint );
+      ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
 
       // Keep a raw-pointer to the scene-graph constraint
       mSceneGraphConstraint = sceneGraphConstraint;

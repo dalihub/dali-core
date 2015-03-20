@@ -27,6 +27,8 @@
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>
 
+#include <string.h> // for memset()
+
 namespace Dali
 {
 

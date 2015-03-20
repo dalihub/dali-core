@@ -33,7 +33,7 @@ namespace Internal
 
 class LayerList;
 class RenderTaskList;
-class Stage;
+class EventThreadServices;
 
 /**
  * Implementation of Dali::Integration::SystemOverlay
@@ -44,10 +44,10 @@ public:
 
   /**
    * Create the SystemOverlay; This should only be done once for each Dali core.
-   * @param[in] stage A reference to the stage.
+   * @param[in] eventThreadServices to send messaged to scene graph.
    * @return The newly allocated SystemOverlay.
    */
-  static SystemOverlay* New( Stage& stage );
+  static SystemOverlay* New( EventThreadServices& eventThreadServices );
 
   /**
    * Non-virtual destructor; not intended as a base class.
@@ -100,9 +100,9 @@ private:
 
   /**
    * Protected constructor; see also SystemOverlay::New().
-   * @param[in] stage A reference to the stage.
+   * @param[in] eventThreadServices to send messaged to the scene graph.
    */
-  SystemOverlay( Stage& stage );
+  SystemOverlay( EventThreadServices& eventThreadServices );
 
   /**
    * Second-phase construction.
@@ -121,7 +121,7 @@ private:
 
 private:
 
-  Stage& mStage;
+  EventThreadServices& mEventThreadServices;
 
   Vector2 mSize;
 

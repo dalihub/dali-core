@@ -95,7 +95,7 @@ TextActorPtr TextActor::New( const Integration::TextArray& utfCodes, const TextA
   actor->Initialize();
 
   //create the attachment
-  actor->mTextAttachment = TextAttachment::New( *actor->mStage, *actor->mNode, Integration::TextArray(), fontPtr );
+  actor->mTextAttachment = TextAttachment::New( actor->GetEventThreadServices(), *actor->mNode, Integration::TextArray(), fontPtr );
   actor->Attach(*actor->mTextAttachment);
 
   // Note: SetTextStyle() MUST be called before SetText(), to ensure

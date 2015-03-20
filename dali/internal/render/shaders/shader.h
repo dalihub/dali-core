@@ -20,16 +20,22 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
+
+#include <dali/integration-api/shader-data.h>
+
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/common/type-abstraction-enums.h>
+
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/effects/shader-declarations.h>
+
+#include <dali/internal/update/common/property-owner.h>
+
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
 #include <dali/internal/render/common/render-manager.h>
-#include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/event/effects/shader-declarations.h>
-#include <dali/integration-api/shader-data.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
-#include <dali/internal/common/type-abstraction-enums.h>
+
 
 namespace Dali
 {
@@ -337,11 +343,11 @@ private: // Data
 };
 
 // Messages for Shader, to be processed in Update thread.
-void SetTextureIdMessage( EventToUpdate& eventToUpdate, const Shader& shader, Integration::ResourceId textureId );
-void SetGridDensityMessage( EventToUpdate& eventToUpdate, const Shader& shader, float density );
-void SetHintsMessage( EventToUpdate& eventToUpdate, const Shader& shader, Dali::ShaderEffect::GeometryHints hint );
-void InstallUniformMetaMessage( EventToUpdate& eventToUpdate, const Shader& shader, UniformMeta& meta );
-void SetCoordinateTypeMessage( EventToUpdate& eventToUpdate, const Shader& shader, unsigned int index, Dali::ShaderEffect::UniformCoordinateType type );
+void SetTextureIdMessage( EventThreadServices& eventThreadServices, const Shader& shader, Integration::ResourceId textureId );
+void SetGridDensityMessage( EventThreadServices& eventThreadServices, const Shader& shader, float density );
+void SetHintsMessage( EventThreadServices& eventThreadServices, const Shader& shader, Dali::ShaderEffect::GeometryHints hint );
+void InstallUniformMetaMessage( EventThreadServices& eventThreadServices, const Shader& shader, UniformMeta& meta );
+void SetCoordinateTypeMessage( EventThreadServices& eventThreadServices, const Shader& shader, unsigned int index, Dali::ShaderEffect::UniformCoordinateType type );
 
 } // namespace SceneGraph
 

@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 
@@ -201,89 +201,89 @@ private:
 
 };
 
-inline void SetTextVertexBufferMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, TextVertexBuffer& buffer)
+inline void SetTextVertexBufferMessage( EventThreadServices& eventThreadServices, const TextAttachment& attachment, TextVertexBuffer& buffer)
 {
   typedef MessageDoubleBuffered1< TextAttachment, OwnerPointer< TextVertexBuffer> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetTextVertexBuffer, &buffer );
 }
 
-inline void SetTextFontSizeMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, float pixelSize )
+inline void SetTextFontSizeMessage( EventThreadServices& eventThreadServices, const TextAttachment& attachment, float pixelSize )
 {
   typedef MessageDoubleBuffered1< TextAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetTextFontSize, pixelSize );
 }
 
-inline void SetGradientMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
+inline void SetGradientMessage( EventThreadServices& eventThreadServices, const TextAttachment& attachment, const Vector4& color, const Vector2& startPoint, const Vector2& endPoint )
 {
   typedef MessageDoubleBuffered3< TextAttachment, Vector4, Vector2, Vector2 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetGradient, color, startPoint, endPoint );
 }
 
-inline void SetTextColorMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, const Vector4& color )
+inline void SetTextColorMessage( EventThreadServices& eventThreadServices, const TextAttachment& attachment, const Vector4& color )
 {
   typedef MessageDoubleBuffered1< TextAttachment, Vector4 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetTextColor, color );
 }
 
-inline void SetOutlineMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, bool enable, const Vector4& color, const Vector2& params )
+inline void SetOutlineMessage( EventThreadServices& eventThreadServices, const TextAttachment& attachment, bool enable, const Vector4& color, const Vector2& params )
 {
   typedef MessageDoubleBuffered3< TextAttachment, bool, Vector4, Vector2 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetOutline, enable, color, params );
 }
 
-inline void SetGlowMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, bool enable, const Vector4& color, float params )
+inline void SetGlowMessage( EventThreadServices& eventThreadServices, const TextAttachment& attachment, bool enable, const Vector4& color, float params )
 {
   typedef MessageDoubleBuffered3< TextAttachment, bool, Vector4, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetGlow, enable, color, params );
 }
 
-inline void SetDropShadowMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, bool enable, const Vector4& color, const Vector2& offset, const float size )
+inline void SetDropShadowMessage( EventThreadServices& eventThreadServices, const TextAttachment& attachment, bool enable, const Vector4& color, const Vector2& offset, const float size )
 {
   typedef MessageDoubleBuffered4< TextAttachment, bool, Vector4, Vector2, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetDropShadow, enable, color, offset, size );
 }
 
-inline void SetSmoothEdgeMessage( EventToUpdate& eventToUpdate, const TextAttachment& attachment, float params )
+inline void SetSmoothEdgeMessage( EventThreadServices& eventThreadServices, const TextAttachment& attachment, float params )
 {
   typedef MessageDoubleBuffered1< TextAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &TextAttachment::SetSmoothEdge, params );

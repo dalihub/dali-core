@@ -22,7 +22,7 @@
 #include <dali/internal/event/modeling/material-impl.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 
 namespace Dali
 {
@@ -229,45 +229,45 @@ private:
 
 // Messages for Material
 
-inline void SetPropertiesMessage( EventToUpdate& eventToUpdate, const Material& material, const MaterialProperties& properties )
+inline void SetPropertiesMessage( EventThreadServices& eventThreadServices, const Material& material, const MaterialProperties& properties )
 {
   typedef MessageValue1< Material, MaterialProperties > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::SetProperties, properties );
 }
 
-inline void SetDiffuseTextureMessage( EventToUpdate& eventToUpdate, const Material& material, ResourceId id )
+inline void SetDiffuseTextureMessage( EventThreadServices& eventThreadServices, const Material& material, ResourceId id )
 {
   typedef MessageValue1< Material, ResourceId > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::SetDiffuseTextureId, id );
 }
 
-inline void SetOpacityTextureMessage( EventToUpdate& eventToUpdate, const Material& material, ResourceId id )
+inline void SetOpacityTextureMessage( EventThreadServices& eventThreadServices, const Material& material, ResourceId id )
 {
   typedef MessageValue1< Material, ResourceId > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::SetOpacityTextureId, id );
 }
 
-inline void SetNormalMapMessage( EventToUpdate& eventToUpdate, const Material& material, ResourceId id )
+inline void SetNormalMapMessage( EventThreadServices& eventThreadServices, const Material& material, ResourceId id )
 {
   typedef MessageValue1< Material, ResourceId > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::SetNormalMapId, id );

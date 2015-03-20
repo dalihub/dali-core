@@ -29,6 +29,8 @@ namespace Dali
 namespace Internal
 {
 class AnimatableMesh;
+class EventThreadServices;
+
 typedef IntrusivePtr<AnimatableMesh> AnimatableMeshPtr;
 
 namespace SceneGraph
@@ -43,12 +45,12 @@ class AnimatableMesh : public Object
 public:
   /**
    * Constructor
-   * @param[in] updateManager
+   * @param[in] eventThreadServices Used to send messages to scene graph
    * @param[in] sceneObject - pointer to a newly created scene object
    * @param[in] mesh - pointer to a newly created Mesh object
    * @param[in] numberOfVertices - The number of vertices to create
    */
-  AnimatableMesh( SceneGraph::UpdateManager& updateManager,
+  AnimatableMesh( EventThreadServices& eventThreadServices,
                   SceneGraph::AnimatableMesh* sceneObject,
                   MeshIPtr mesh,
                   int numberOfVertices );
@@ -224,7 +226,7 @@ private:
   AnimatableMesh operator=(const AnimatableMesh& rhs);
 
 private:
-  SceneGraph::UpdateManager&  mUpdateManager; ///< The update manager
+  EventThreadServices& mEventThreadServices;        ///< The object used to send messages to scene graph
   SceneGraph::AnimatableMesh* mSceneObject;   ///< The mesh property owner
   MeshIPtr                    mMesh;          ///< The mesh ticket holder
 

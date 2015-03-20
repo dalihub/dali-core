@@ -25,6 +25,7 @@
 #include <dali/integration-api/context-notifier.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/actors/layer-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/object-registry-impl.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
@@ -70,7 +71,7 @@ class RenderTaskList;
 /**
  * Implementation of Stage
  */
-class Stage : public BaseObject, public RenderTaskDefaults, public Integration::ContextNotifierInterface
+class Stage : public BaseObject, public RenderTaskDefaults, public Integration::ContextNotifierInterface, public EventThreadServices
 {
 public:
 
@@ -113,42 +114,10 @@ public:
   ObjectRegistry& GetObjectRegistry();
 
   /**
-   * @copydoc Dali::Internal::ObjectRegistry::RegisterObject
-   */
-  void RegisterObject( Dali::BaseObject* object );
-
-  /**
-   * @copydoc Dali::Internal::ObjectRegistry::UnregisterObject
-   */
-  void UnregisterObject( Dali::BaseObject* object );
-
-  /**
    * Retrieve the root actor (not publically accessible).
    * @return The root actor.
    */
   Layer& GetRootActor();
-
-  /**
-   * Retrieve the UpdateManager associated with this Stage
-   * @return The UpdateManager.
-   */
-  SceneGraph::UpdateManager& GetUpdateManager();
-
-  /**
-   * Helper for actors, to retrieve the current Event buffer index.
-   * @return The buffer index.
-   */
-  BufferIndex GetEventBufferIndex() const
-  {
-    // inlined as its called often from event thread
-    return mUpdateManager.GetEventBufferIndex();
-  }
-
-  /**
-   * Retrieve the interface for accessing update-thread data.
-   * @return The EventToUpdate interface.
-   */
-  EventToUpdate& GetUpdateInterface();
 
   /**
    * Returns the animation playlist.
@@ -424,6 +393,33 @@ private: // Implementation of ContextNotificationInterface:
    * @copydoc Dali::Integration::NotifyContextRegained();
    */
   virtual void NotifyContextRegained();
+
+public: // Implementation of EventThreadServices
+
+  /**
+   * @copydoc EventThreadServices::RegisterObject
+   */
+  virtual void RegisterObject( BaseObject* object);
+
+  /**
+   * @copydoc EventThreadServices::UnregisterObject
+   */
+  virtual void UnregisterObject( BaseObject* object);
+
+  /**
+   * @copydoc EventThreadServices::GetUpdateManager
+   */
+  virtual SceneGraph::UpdateManager& GetUpdateManager();
+
+  /**
+   * @copydoc EventThreadServices::ReserveMessageSlot
+   */
+  virtual unsigned int* ReserveMessageSlot( std::size_t size, bool updateScene );
+
+  /**
+   * @copydoc EventThreadServices::GetEventBufferIndex
+   */
+  virtual BufferIndex GetEventBufferIndex() const;
 
 private:
 

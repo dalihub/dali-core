@@ -26,7 +26,6 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/notification-manager.h>
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/common/dali-hash.h>

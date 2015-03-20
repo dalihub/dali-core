@@ -22,7 +22,7 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
@@ -250,23 +250,23 @@ private:
 
 // Messages for ConstraintBase
 
-inline void  BakeWeightMessage( EventToUpdate& eventToUpdate, const ConstraintBase& constraint, float weight )
+inline void  BakeWeightMessage( EventThreadServices& eventThreadServices, const ConstraintBase& constraint, float weight )
 {
   typedef MessageDoubleBuffered1< ConstraintBase, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &constraint, &ConstraintBase::BakeWeight, weight );
 }
 
-inline void  SetRemoveActionMessage( EventToUpdate& eventToUpdate, const ConstraintBase& constraint, Dali::Constraint::RemoveAction removeAction )
+inline void  SetRemoveActionMessage( EventThreadServices& eventThreadServices, const ConstraintBase& constraint, Dali::Constraint::RemoveAction removeAction )
 {
   typedef MessageValue1< ConstraintBase, Dali::Constraint::RemoveAction > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &constraint, &ConstraintBase::SetRemoveAction, removeAction );

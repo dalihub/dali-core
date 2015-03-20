@@ -18,9 +18,6 @@
 // CLASS HEADER
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 
-// INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
-
 namespace Dali
 {
 
@@ -30,16 +27,6 @@ namespace Internal
 bool ActorAttachment::OnStage() const
 {
   return mIsOnStage;
-}
-
-ActorAttachment::ActorAttachment( Stage& stage )
-: mStage( &stage ),
-  mIsOnStage( false )
-{
-}
-
-ActorAttachment::~ActorAttachment()
-{
 }
 
 /**
@@ -62,6 +49,16 @@ void ActorAttachment::Disconnect()
   OnStageDisconnection();
 
   mIsOnStage = false;
+}
+
+ActorAttachment::ActorAttachment( EventThreadServices& eventThreadServices )
+: mEventThreadServices( eventThreadServices ),
+  mIsOnStage( false )
+{
+}
+
+ActorAttachment::~ActorAttachment()
+{
 }
 
 } // namespace Internal

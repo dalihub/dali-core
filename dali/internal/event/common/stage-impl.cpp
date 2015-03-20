@@ -92,17 +92,17 @@ void Stage::Initialize()
   mObjectRegistry = ObjectRegistry::New();
 
   // Create the ordered list of layers
-  mLayerList = LayerList::New( *this, false/*not system-level*/ );
+  mLayerList = LayerList::New( mUpdateManager, false/*not system-level*/ );
 
   // The stage owns the default layer
-  mRootLayer = Layer::NewRoot( *this, *mLayerList, mUpdateManager, false/*not system-level*/ );
+  mRootLayer = Layer::NewRoot( *mLayerList, mUpdateManager, false/*not system-level*/ );
   mRootLayer->SetName("RootLayer");
 
   // Create the default camera actor first; this is needed by the RenderTaskList
   CreateDefaultCameraActor();
 
   // Create the list of render-tasks
-  mRenderTaskList = RenderTaskList::New( mUpdateManager, *this, false/*not system-level*/ );
+  mRenderTaskList = RenderTaskList::New( *this, *this, false/*not system-level*/ );
 
   // Create the default render-task
   Dali::RenderTask defaultRenderTask = mRenderTaskList->CreateTask();
@@ -162,16 +162,6 @@ void Stage::UnregisterObject( Dali::BaseObject* object )
 Layer& Stage::GetRootActor()
 {
   return *mRootLayer;
-}
-
-SceneGraph::UpdateManager& Stage::GetUpdateManager()
-{
-  return mUpdateManager;
-}
-
-EventToUpdate& Stage::GetUpdateInterface()
-{
-  return mUpdateManager.GetEventToUpdate();
 }
 
 AnimationPlaylist& Stage::GetAnimationPlaylist()
@@ -643,6 +633,21 @@ Stage::Stage( AnimationPlaylist& playlist,
 #endif
   mSystemOverlay(NULL)
 {
+}
+
+SceneGraph::UpdateManager& Stage::GetUpdateManager()
+{
+  return mUpdateManager;
+}
+
+unsigned int* Stage::ReserveMessageSlot( std::size_t size, bool updateScene )
+{
+  return mUpdateManager.ReserveMessageSlot( size, updateScene );
+}
+
+BufferIndex Stage::GetEventBufferIndex() const
+{
+  return mUpdateManager.GetEventBufferIndex();
 }
 
 Stage::~Stage()
