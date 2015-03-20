@@ -18,6 +18,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/integration-api/bitmap.h>
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
 
 using namespace Dali;
@@ -306,10 +307,8 @@ int UtcDaliImageActorGetCurrentSize03(void)
   const Vector2 closestImageSize( 80, 45);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
-  ImageAttributes attrs;
-  const Vector2 requestedSize( 40, 30 );
-  attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = ResourceImage::New("image.jpg", attrs);
+  Vector2 requestedSize( 40, 30 );
+  Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
   actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
@@ -360,10 +359,8 @@ int UtcDaliImageActorGetCurrentSize04(void)
   const Vector2 closestImageSize( 80, 45);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
-  const Vector2 requestedSize( 40, 30 );
-  ImageAttributes attrs;
-  attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = ResourceImage::New("image.jpg", attrs);
+  Vector2 requestedSize( 40, 30 );
+  Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
   actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
@@ -401,8 +398,7 @@ int UtcDaliImageActorGetCurrentSize04(void)
   application.GetPlatform().SetClosestImageSize(image2ClosestSize);
 
   const Vector2 request2Size( 100, 100 );
-  attrs.SetSize( request2Size.width, request2Size.height );
-  Image image2 = ResourceImage::New("image2.jpg", attrs);
+  Image image2 = ResourceImage::New("image.jpg", ImageDimensions( request2Size.x, request2Size.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   actor.SetImage(image2);
 
   application.SendNotification(); // Flush update messages
@@ -445,10 +441,8 @@ int UtcDaliImageActorGetCurrentSize05(void)
   Vector2 closestImageSize( 80, 45);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
-  ImageAttributes attrs;
-  const Vector2 requestedSize( 40, 30 );
-  attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = ResourceImage::New("image.jpg", attrs);
+  Vector2 requestedSize( 40, 30 );
+  Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
   actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
@@ -478,8 +472,7 @@ int UtcDaliImageActorGetCurrentSize05(void)
   application.GetPlatform().SetClosestImageSize(image2ClosestSize);
 
   const Vector2 requestedSize2( 100, 100 );
-  attrs.SetSize( requestedSize2.width, requestedSize2.height );
-  Image image2 = ResourceImage::New("image2.jpg", attrs);
+  Image image2 = ResourceImage::New("image.jpg", ImageDimensions( requestedSize2.x, requestedSize2.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   actor.SetImage(image2);
 
   application.SendNotification(); // Flush update messages
@@ -525,10 +518,8 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   Vector2 closestImageSize( 80, 45);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
-  ImageAttributes attrs;
-  const Vector2 requestedSize( 40, 30 );
-  attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = ResourceImage::New("image.jpg", attrs);
+  Vector2 requestedSize( 40, 30 );
+  Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
   actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
@@ -589,10 +580,8 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   Vector2 closestImageSize( 80, 45);
   application.GetPlatform().SetClosestImageSize(closestImageSize);
 
-  ImageAttributes attrs;
-  const Vector2 requestedSize( 40, 30 );
-  attrs.SetSize( requestedSize.width, requestedSize.height );
-  Image image = ResourceImage::New("image.jpg", attrs);
+  Vector2 requestedSize( 40, 30 );
+  Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
   actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);

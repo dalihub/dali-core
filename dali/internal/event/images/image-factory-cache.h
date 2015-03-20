@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/internal/event/resources/resource-client.h>
-#include <dali/public-api/images/image-attributes.h>
+#include <dali/internal/common/image-attributes.h>
 
 // EXTERNAL INCLUDES
 

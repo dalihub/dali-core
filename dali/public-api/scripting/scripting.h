@@ -225,7 +225,9 @@ DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
  * "width"           type float
  * "height"          type float
  * "pixel-format"    type std::string (enum)
- * "scaling-mode"    type std::string (enum)
+ * "fitting-mode"    type std::string (enum)
+ * "sampling-mode"   type std::string (enum)
+ * "orientation"     type bool
  * "type"            type std::string (FrameBufferImage|BufferImage|ResourceImage(default))
  * @endcode
  * Some fields are optional and some only pertain to a specific type.

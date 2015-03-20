@@ -23,7 +23,7 @@
 #include <test-native-image.h>
 
 // Internal headers are allowed here
-
+#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
 #include <dali/internal/update/resources/resource-manager.h>
@@ -37,10 +37,10 @@
 #include <dali/internal/render/gl-resources/texture-declarations.h>
 #include <dali/internal/render/shaders/shader.h>
 #include <dali/internal/common/owner-pointer.h>
-#include <dali/public-api/shader-effects/shader-effect.h>
-
+#include <dali/internal/common/image-attributes.h>
 
 using namespace Dali;
+
 #include <mesh-builder.h>
 
 namespace
@@ -116,7 +116,7 @@ static TestTicketLifetimeObserver testTicketLifetimeObserver;
 
 Internal::ImagePtr LoadImage(TestApplication& application, char* name)
 {
-  Internal::ResourceImagePtr image = Internal::ResourceImage::New( name, Dali::ImageAttributes::DEFAULT_ATTRIBUTES );
+  Internal::ResourceImagePtr image = Internal::ResourceImage::New( name, Internal::ImageAttributes::DEFAULT_ATTRIBUTES );
   application.SendNotification(); // Flush update messages
   application.Render();           // Process resource request
   Integration::ResourceRequest* req = application.GetPlatform().GetRequest();
@@ -136,8 +136,7 @@ Internal::ImagePtr LoadImage(TestApplication& application, char* name)
 Internal::ResourceTicketPtr CheckLoadBitmap(TestApplication& application, const char* name, int w, int h)
 {
   Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  ImageAttributes attr;
-  Integration::BitmapResourceType bitmapRequest(attr);
+  Integration::BitmapResourceType bitmapRequest;
   Internal::ResourceTicketPtr ticket = resourceClient.RequestResource( bitmapRequest, name );
   ticket->AddObserver(testTicketObserver);
   application.SendNotification(); // Flush update messages
@@ -178,8 +177,7 @@ int UtcDaliInternalRequestResourceBitmapRequests01(void)
   tet_infoline("Testing bitmap requests");
 
   Internal::ResourceManager& resourceManager = Internal::ThreadLocalStorage::Get().GetResourceManager();
-  ImageAttributes attr;
-  Integration::BitmapResourceType bitmapRequest (attr);
+  Integration::BitmapResourceType bitmapRequest;
   Internal::ResourceId id(0);
 
   testTicketObserver.Reset();
@@ -267,8 +265,7 @@ int UtcDaliInternalRequestResourceBitmapRequests02(void)
   tet_infoline("Testing bitmap request ticket discard before load complete");
 
   Internal::ResourceManager& resourceManager = Internal::ThreadLocalStorage::Get().GetResourceManager();
-  ImageAttributes attr;
-  Integration::BitmapResourceType bitmapRequest (attr);
+  Integration::BitmapResourceType bitmapRequest;
   Internal::ResourceId id(0);
 
   testTicketObserver.Reset();
@@ -331,8 +328,7 @@ int UtcDaliInternalRequestResourceBitmapRequests03(void)
   tet_infoline("Load bitmap that doesn't exist, followed by ticket discard. Expect LoadingFailed");
 
   Internal::ResourceManager& resourceManager = Internal::ThreadLocalStorage::Get().GetResourceManager();
-  ImageAttributes attr;
-  Integration::BitmapResourceType bitmapRequest (attr);
+  Integration::BitmapResourceType bitmapRequest;
   Internal::ResourceId id(0);
 
   testTicketObserver.Reset();
@@ -478,8 +474,7 @@ int UtcDaliInternalRequestReloadBitmapRequests02(void)
   tet_infoline("Testing bitmap reload during first load");
 
   Internal::ResourceManager& resourceManager = Internal::ThreadLocalStorage::Get().GetResourceManager();
-  ImageAttributes attr;
-  Integration::BitmapResourceType bitmapRequest (attr);
+  Integration::BitmapResourceType bitmapRequest;
   Internal::ResourceId id(0);
 
   testTicketObserver.Reset();
@@ -592,8 +587,7 @@ int UtcDaliInternalRequestReloadBitmapRequests03(void)
   tet_infoline("Testing bitmap reload at end of first load");
 
   Internal::ResourceManager& resourceManager = Internal::ThreadLocalStorage::Get().GetResourceManager();
-  ImageAttributes attr;
-  Integration::BitmapResourceType bitmapRequest (attr);
+  Integration::BitmapResourceType bitmapRequest;
   Internal::ResourceId id(0);
 
   testTicketObserver.Reset();

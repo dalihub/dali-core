@@ -16,12 +16,14 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/images/image-attributes.h>
+#include <dali/internal/common/image-attributes.h>
 
 // EXTERNAL INCLUDES
 #include <cmath>
 
 namespace Dali
+{
+namespace Internal
 {
 
 const ImageAttributes ImageAttributes::DEFAULT_ATTRIBUTES;
@@ -31,8 +33,8 @@ struct ImageAttributes::ImageAttributesImpl
   ImageAttributesImpl()
   :  width(0),
      height(0),
-     scaling(ShrinkToFit),
-     filtering(Box),
+     scaling(Dali::FittingMode::SHRINK_TO_FIT),
+     filtering(SamplingMode::BOX),
      mOrientationCorrection(false)
   {
   }
@@ -108,7 +110,7 @@ void ImageAttributes::SetSize( const Size& size )
   impl->height = size.height;
 }
 
-void ImageAttributes::SetScalingMode(ScalingMode scale)
+void ImageAttributes::SetScalingMode( ScalingMode scale )
 {
   impl->scaling = scale;
 }
@@ -121,6 +123,15 @@ void ImageAttributes::SetFilterMode( FilterMode filtering )
 void ImageAttributes::SetOrientationCorrection(const bool enabled)
 {
   impl->mOrientationCorrection = enabled;
+}
+
+void ImageAttributes::Reset( ImageDimensions dimensions, ScalingMode scaling, FilterMode sampling, bool orientationCorrection )
+{
+  impl->width = dimensions.GetWidth();
+  impl->height = dimensions.GetHeight();
+  impl->scaling = scaling;
+  impl->filtering = sampling;
+  impl->mOrientationCorrection = orientationCorrection;
 }
 
 unsigned int ImageAttributes::GetWidth() const
@@ -232,4 +243,5 @@ bool operator!=(const ImageAttributes& a, const ImageAttributes& b)
   return !(a == b);
 }
 
+} // namespace Internal
 } // namespace Dali

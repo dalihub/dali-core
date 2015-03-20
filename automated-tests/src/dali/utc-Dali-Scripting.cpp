@@ -54,9 +54,9 @@ const StringEnum< int > DRAW_MODE_VALUES[] =
 const unsigned int DRAW_MODE_VALUES_COUNT = sizeof( DRAW_MODE_VALUES ) / sizeof( DRAW_MODE_VALUES[0] );
 
 
-//////////////////////////////////////////////////////////////////////////////
-// Helpers for string to enum comparisons for Image and ImageAttributes
-//////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+// Helpers for string to enum comparisons for Image and Image loading parameters
+////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Template to check enumerations of type T, with a class of type X
@@ -95,13 +95,6 @@ BufferImage NewBufferImage( const Property::Value& map )
 {
   BufferImage image = BufferImage::DownCast( NewImage( map ) );
   return image;
-}
-
-/// Helper method to create ImageAttributes using an Image
-ImageAttributes NewImageAttributes( const Property::Value& map )
-{
-  ResourceImage image = ResourceImage::DownCast( NewImage( map ) );
-  return image.GetAttributes();
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -343,25 +336,25 @@ int UtcDaliScriptingNewImageNegative(void)
     DALI_TEST_ASSERT( e, "value.GetType()", TEST_LOCATION );
   }
 
-  // Invalid pixel-format
+  // Invalid fitting-mode
   try
   {
     Property::Map map;
-    map[ "pixel-format" ] = Vector3::ZERO;
+    map[ "fitting-mode" ] = Vector3::ZERO;
     Image image = NewImage( map );
-    tet_result( TET_FAIL );
+    DALI_TEST_EQUALS( "Expected exception to be thrown", "But exception was not thrown", TEST_LOCATION );
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "map.GetValue(field).GetType()", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "value.GetType() == Property::STRING", TEST_LOCATION );
 
     // Invalid value
     try
     {
       Property::Map map;
-      map[ "pixel-format" ] = "INVALID";
+      map[ "fitting-mode" ] = "INVALID";
       Image image = NewImage( map );
-      tet_result( TET_FAIL );
+      DALI_TEST_EQUALS( "Expected exception to be thrown", "But exception was not thrown", TEST_LOCATION );
     }
     catch ( DaliException& e )
     {
@@ -373,26 +366,39 @@ int UtcDaliScriptingNewImageNegative(void)
   try
   {
     Property::Map map;
-    map[ "scaling-mode" ] = Vector3::ZERO;
+    map[ "sampling-mode" ] = Vector3::ZERO;
     Image image = NewImage( map );
-    tet_result( TET_FAIL );
+    DALI_TEST_EQUALS( "Expected exception to be thrown", "But exception was not thrown", TEST_LOCATION );
   }
   catch ( DaliException& e )
   {
-    DALI_TEST_ASSERT( e, "map.GetValue(field).GetType()", TEST_LOCATION );
+    DALI_TEST_ASSERT( e, "value.GetType() == Property::STRING", TEST_LOCATION );
 
     // Invalid value
     try
     {
       Property::Map map;
-      map[ "scaling-mode" ] = "INVALID";
+      map[ "sampling-mode" ] = "INVALID";
       Image image = NewImage( map );
-      tet_result( TET_FAIL );
+      DALI_TEST_EQUALS( "Expected exception to be thrown", "But exception was not thrown", TEST_LOCATION );
     }
     catch ( DaliException& e )
     {
       DALI_TEST_ASSERT( e, "!\"Unknown", TEST_LOCATION );
     }
+  }
+
+  // Invalid orientation-correction
+  try
+  {
+    Property::Map map;
+    map[ "orientation" ] = Vector3::ZERO;
+    Image image = NewImage( map );
+    DALI_TEST_EQUALS( "Expected exception to be thrown", "But exception was not thrown", TEST_LOCATION );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "value.GetType() == Property::BOOLEAN", TEST_LOCATION );
   }
 
   // Invalid type
@@ -420,6 +426,33 @@ int UtcDaliScriptingNewImageNegative(void)
       DALI_TEST_ASSERT( e, "!\"Unknown", TEST_LOCATION );
     }
   }
+
+  // Invalid pixel-format
+  try
+  {
+    Property::Map map;
+    map[ "pixel-format" ] = Vector3::ZERO;
+    Image image = NewImage( map );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "map.GetValue(field).GetType()", TEST_LOCATION );
+
+    // Invalid value
+    try
+    {
+      Property::Map map;
+      map[ "pixel-format" ] = "INVALID";
+      Image image = NewImage( map );
+      tet_result( TET_FAIL );
+    }
+    catch ( DaliException& e )
+    {
+      DALI_TEST_ASSERT( e, "!\"Unknown", TEST_LOCATION );
+    }
+  }
+
   END_TEST;
 }
 
@@ -445,7 +478,7 @@ int UtcDaliScriptingNewImage(void)
         { "IMMEDIATE", ResourceImage::IMMEDIATE },
         { "ON_DEMAND", ResourceImage::ON_DEMAND }
     };
-    TestEnumStrings< ResourceImage::LoadPolicy, ResourceImage >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &ResourceImage::GetLoadPolicy, &NewResourceImage );
+   TestEnumStrings< ResourceImage::LoadPolicy, ResourceImage >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &ResourceImage::GetLoadPolicy, &NewResourceImage );
   }
 
   // release-policy
@@ -478,19 +511,6 @@ int UtcDaliScriptingNewImage(void)
   }
 
   //map.erase( map.end() - 2, map.end() );
-
-  // scaling-mode
-  map[ "scaling-mode" ] = "";
-  {
-    const StringEnum< int > values[] =
-    {
-        { "SHRINK_TO_FIT", ImageAttributes::ShrinkToFit },
-        { "SCALE_TO_FILL", ImageAttributes::ScaleToFill },
-        { "FIT_WIDTH", ImageAttributes::FitWidth },
-        { "FIT_HEIGHT", ImageAttributes::FitHeight },
-    };
-    TestEnumStrings< ImageAttributes::ScalingMode, ImageAttributes >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &ImageAttributes::GetScalingMode, &NewImageAttributes );
-  }
 
   // type FrameBufferImage
   map[ "type" ] = "FrameBufferImage";
@@ -537,7 +557,7 @@ int UtcDaliScriptingNewImage(void)
          { "COMPRESSED_SRGB8_ALPHA8_ETC2_EAC", Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC },
          { "COMPRESSED_RGB8_ETC1", Pixel::COMPRESSED_RGB8_ETC1 },
          { "COMPRESSED_RGB_PVRTC_4BPPV1", Pixel::COMPRESSED_RGB_PVRTC_4BPPV1 },*/
-         // BufferImage doesnot support compressed format
+         // BufferImage does not support compressed formats
      };
 
      TestEnumStrings< Pixel::Format, BufferImage >( map, values, ( sizeof( values ) / sizeof ( values[0] ) ), &BufferImage::GetPixelFormat, &NewBufferImage );
@@ -890,18 +910,13 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( value.GetValue( "load-policy" ).Get< std::string >(), "IMMEDIATE", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "release-policy") );
     DALI_TEST_EQUALS( value.GetValue( "release-policy" ).Get< std::string >(), "NEVER", TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "scaling-mode") );
-    DALI_TEST_EQUALS( value.GetValue( "scaling-mode" ).Get< std::string >(), "SHRINK_TO_FIT", TEST_LOCATION );
     DALI_TEST_CHECK( !value.HasKey( "width" ) );
     DALI_TEST_CHECK( !value.HasKey( "height" ) );
   }
 
   // Change values
   {
-    ImageAttributes attributes;
-    attributes.SetScalingMode( ImageAttributes::FitWidth );
-    attributes.SetSize( 300, 400 );
-    Image image = ResourceImage::New( "MY_PATH", attributes, ResourceImage::ON_DEMAND, Image::UNUSED );
+    ResourceImage image = ResourceImage::New( "MY_PATH", ResourceImage::ON_DEMAND, Image::UNUSED, ImageDimensions( 300, 400 ), FittingMode::FIT_WIDTH );
 
     Property::Map map;
     CreatePropertyMap( image, map );
@@ -916,8 +931,6 @@ int UtcDaliScriptingCreatePropertyMapImage(void)
     DALI_TEST_EQUALS( value.GetValue( "load-policy" ).Get< std::string >(), "ON_DEMAND", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "release-policy") );
     DALI_TEST_EQUALS( value.GetValue( "release-policy" ).Get< std::string >(), "UNUSED", TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "scaling-mode") );
-    DALI_TEST_EQUALS( value.GetValue( "scaling-mode" ).Get< std::string >(), "FIT_WIDTH", TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "width" ) );
     DALI_TEST_EQUALS( value.GetValue( "width" ).Get< int >(), 300, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "height" ) );

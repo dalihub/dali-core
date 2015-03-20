@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/integration-api/bitmap.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
 
