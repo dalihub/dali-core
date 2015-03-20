@@ -20,10 +20,11 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/animation.h>
-#include <dali/internal/update/animation/scene-graph-animator.h>
+
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/animation/scene-graph-animator.h>
 
 namespace Dali
 {
@@ -319,122 +320,122 @@ namespace SceneGraph
 
 // Messages for Animation
 
-inline void SetDurationMessage( EventToUpdate& eventToUpdate, const Animation& animation, float durationSeconds )
+inline void SetDurationMessage( EventThreadServices& eventThreadServices, const Animation& animation, float durationSeconds )
 {
   typedef MessageValue1< Animation, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetDuration, durationSeconds );
 }
 
-inline void SetLoopingMessage( EventToUpdate& eventToUpdate, const Animation& animation, bool looping )
+inline void SetLoopingMessage( EventThreadServices& eventThreadServices, const Animation& animation, bool looping )
 {
   typedef MessageValue1< Animation, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetLooping, looping );
 }
 
-inline void SetEndActionMessage( EventToUpdate& eventToUpdate, const Animation& animation, Dali::Animation::EndAction action )
+inline void SetEndActionMessage( EventThreadServices& eventThreadServices, const Animation& animation, Dali::Animation::EndAction action )
 {
   typedef MessageValue1< Animation, Dali::Animation::EndAction > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetEndAction, action );
 }
 
-inline void SetDisconnectActionMessage( EventToUpdate& eventToUpdate, const Animation& animation, Dali::Animation::EndAction action )
+inline void SetDisconnectActionMessage( EventThreadServices& eventThreadServices, const Animation& animation, Dali::Animation::EndAction action )
 {
   typedef MessageValue1< Animation, Dali::Animation::EndAction > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetDisconnectAction, action );
 }
 
-inline void SetCurrentProgressMessage( EventToUpdate& eventToUpdate, const Animation& animation, float progress )
+inline void SetCurrentProgressMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
 {
   typedef MessageValue1< Animation, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetCurrentProgress, progress );
 }
 
-inline void SetSpeedFactorMessage( EventToUpdate& eventToUpdate, const Animation& animation, float factor )
+inline void SetSpeedFactorMessage( EventThreadServices& eventThreadServices, const Animation& animation, float factor )
 {
   typedef MessageValue1< Animation, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetSpeedFactor, factor );
 }
 
-inline void SetPlayRangeMessage( EventToUpdate& eventToUpdate, const Animation& animation, const Vector2& range )
+inline void SetPlayRangeMessage( EventThreadServices& eventThreadServices, const Animation& animation, const Vector2& range )
 {
   typedef MessageValue1< Animation, Vector2 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::SetPlayRange, range );
 }
 
-inline void PlayAnimationMessage( EventToUpdate& eventToUpdate, const Animation& animation )
+inline void PlayAnimationMessage( EventThreadServices& eventThreadServices, const Animation& animation )
 {
   typedef Message< Animation > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::Play );
 }
 
-inline void PlayAnimationFromMessage( EventToUpdate& eventToUpdate, const Animation& animation, float progress )
+inline void PlayAnimationFromMessage( EventThreadServices& eventThreadServices, const Animation& animation, float progress )
 {
   typedef MessageValue1< Animation,float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::PlayFrom, progress );
 }
 
-inline void PauseAnimationMessage( EventToUpdate& eventToUpdate, const Animation& animation )
+inline void PauseAnimationMessage( EventThreadServices& eventThreadServices, const Animation& animation )
 {
   typedef Message< Animation > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::Pause );
 }
 
-inline void AddAnimatorMessage( EventToUpdate& eventToUpdate, const Animation& animation, AnimatorBase& animator )
+inline void AddAnimatorMessage( EventThreadServices& eventThreadServices, const Animation& animation, AnimatorBase& animator )
 {
   typedef MessageValue1< Animation, OwnerPointer<AnimatorBase> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &animation, &Animation::AddAnimator, &animator );

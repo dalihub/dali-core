@@ -154,34 +154,34 @@ private:
   ResourceId mMeshId;                ///< The resource id of the scene graph mesh
 };
 
-inline void BakeVertexPositionMessage( EventToUpdate& eventToUpdate, const SceneGraph::AnimatableMesh& mesh, unsigned int vertex, const Vector3& position )
+inline void BakeVertexPositionMessage( EventThreadServices& eventThreadServices, const SceneGraph::AnimatableMesh& mesh, unsigned int vertex, const Vector3& position )
 {
   typedef MessageDoubleBuffered2< SceneGraph::AnimatableMesh, unsigned int, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &mesh, &SceneGraph::AnimatableMesh::BakePosition, vertex, position );
 }
 
-inline void BakeVertexColorMessage( EventToUpdate& eventToUpdate, const SceneGraph::AnimatableMesh& mesh, unsigned int vertex, const Vector4& color )
+inline void BakeVertexColorMessage( EventThreadServices& eventThreadServices, const SceneGraph::AnimatableMesh& mesh, unsigned int vertex, const Vector4& color )
 {
   typedef MessageDoubleBuffered2< SceneGraph::AnimatableMesh, unsigned int, Vector4 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &mesh, &SceneGraph::AnimatableMesh::BakeColor, vertex, color );
 }
 
-inline void BakeVertexTextureCoordsMessage( EventToUpdate& eventToUpdate, const SceneGraph::AnimatableMesh& mesh, unsigned int vertex, const Vector2& coords )
+inline void BakeVertexTextureCoordsMessage( EventThreadServices& eventThreadServices, const SceneGraph::AnimatableMesh& mesh, unsigned int vertex, const Vector2& coords )
 {
   typedef MessageDoubleBuffered2< SceneGraph::AnimatableMesh, unsigned int, Vector2 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &mesh, &SceneGraph::AnimatableMesh::BakeTextureCoords, vertex, coords );

@@ -114,6 +114,18 @@ DynamicsWorld::~DynamicsWorld()
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
 }
 
+DynamicsWorldPtr DynamicsWorld::Get()
+{
+  DynamicsWorldPtr world;
+
+  StagePtr stage = Stage::GetCurrent();
+  if( stage != NULL )
+  {
+    world = stage->GetDynamicsWorld();
+  }
+  return world;
+}
+
 bool DynamicsWorld::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor )
 {
   bool connected( true );

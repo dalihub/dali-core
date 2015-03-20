@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_EVENT_TO_UPDATE_H__
-#define __DALI_INTERNAL_EVENT_TO_UPDATE_H__
+#ifndef __DALI_INTERNAL_EVENT_THREAD_SERVICES_H__
+#define __DALI_INTERNAL_EVENT_THREAD_SERVICES_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -18,38 +18,60 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstddef>
+
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/message.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 
 namespace Dali
 {
 
+class BaseObject;
+
 namespace Internal
 {
 
+namespace SceneGraph
+{
+class UpdateManager;
+}
+
 /**
- * Abstract interface for accessing update-thread data from the event-thread.
- * Used for queueing messages during the event-thread for the next update.
+ * Abstract interface of services for event-thread objects.
+ * Used for registering objects, queueing messages during the event-thread for the next update.
  * Allows the event-thread to read double-buffered property values.
  */
-class EventToUpdate
+class EventThreadServices
 {
 public:
 
   /**
    * Virtual destructor
    */
-  virtual ~EventToUpdate()
-  {
-  }
+  virtual ~EventThreadServices()
+  { }
 
   /**
-   * Called by the event-thread to signal that FlushQueue will be called
-   * e.g. when it has finished event processing.
+   * @brief Registers the object as created with the Object registry.
+   *
+   * @param[in] object to register
    */
-  virtual void EventProcessingStarted() = 0;
+  virtual void RegisterObject( BaseObject* object) = 0;
+
+  /**
+   * @brief Unregisters the object from Object registry.
+   *
+   * @param[in] object to unregister
+   */
+  virtual void UnregisterObject( BaseObject* object) = 0;
+
+  /**
+   * @brief Get a reference to the UpdateManager
+   *
+   * @return the update manager
+   */
+  virtual SceneGraph::UpdateManager& GetUpdateManager() = 0;
 
   /**
    * Reserve space for another message in the queue; this must then be initialized by the caller.
@@ -59,24 +81,21 @@ public:
    * @param[in] updateScene A flag, when true denotes that the message will cause the scene-graph node tree to require an update.
    * @return A pointer to the first char allocated for the message.
    */
-  virtual unsigned int* ReserveMessageSlot( unsigned int size, bool updateScene = true ) = 0;
+  virtual unsigned int* ReserveMessageSlot( std::size_t size, bool updateScene = true ) = 0;
 
   /**
-   * Retrieve the current event-buffer index.
+   * @return the current event-buffer index.
    */
   virtual BufferIndex GetEventBufferIndex() const  = 0;
 
   /**
-   * Flush the set of messages, which were previously stored with QueueMessage().
-   * Calls to this thread-safe method should be minimized, to avoid thread blocking.
-   *
-   * @return True if there are messages to process.
+   * @return true if core is still running and we can send messages
    */
-  virtual bool FlushQueue() = 0;
+  static bool IsCoreRunning();
 };
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_EVENT_TO_UPDATE_H__
+#endif // __DALI_INTERNAL_EVENT_THREAD_SERVICES_H__

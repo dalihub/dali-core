@@ -26,7 +26,6 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
 
 namespace Dali
 {
@@ -107,4 +106,3 @@ public:
 } // namespace Dali
 
 #endif // __DALI_INTERNAL_UNIFORM_META_H__
-

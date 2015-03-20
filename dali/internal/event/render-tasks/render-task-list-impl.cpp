@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/render-tasks/render-task-defaults.h>
 #include <dali/internal/event/render-tasks/render-task-impl.h>
@@ -43,11 +43,11 @@ namespace Dali
 namespace Internal
 {
 
-RenderTaskList* RenderTaskList::New( UpdateManager& updateManager, RenderTaskDefaults& defaults, bool systemLevel )
+RenderTaskList* RenderTaskList::New( EventThreadServices& eventServices, RenderTaskDefaults& defaults, bool systemLevel )
 {
-  RenderTaskList* taskList = new RenderTaskList( updateManager.GetEventToUpdate(), defaults, systemLevel );
+  RenderTaskList* taskList = new RenderTaskList( eventServices, defaults, systemLevel );
 
-  taskList->Initialize( updateManager );
+  taskList->Initialize( eventServices.GetUpdateManager() );
 
   return taskList;
 }
@@ -65,7 +65,7 @@ Dali::RenderTask RenderTaskList::CreateTask()
     DALI_ASSERT_DEBUG( NULL != sceneObject );
 
     // Pass ownership to SceneGraph::RenderTaskList
-    AddTaskMessage( mEventToUpdate, *mSceneObject, *sceneObject );
+    AddTaskMessage( mEventThreadServices, *mSceneObject, *sceneObject );
   }
 
   // Set the default source & camera actors
@@ -89,7 +89,7 @@ void RenderTaskList::RemoveTask( Dali::RenderTask task )
         DALI_ASSERT_DEBUG( NULL != sceneObject );
 
         // Send a message to remove the scene-graph RenderTask
-        RemoveTaskMessage( mEventToUpdate, *mSceneObject, *sceneObject );
+        RemoveTaskMessage( mEventThreadServices, *mSceneObject, *sceneObject );
 
         // The scene-graph RenderTask will be destroyed soon; discard the raw-pointer
         taskImpl.DiscardSceneObject();
@@ -113,8 +113,8 @@ Dali::RenderTask RenderTaskList::GetTask( unsigned int index ) const
   return mTasks[index];
 }
 
-RenderTaskList::RenderTaskList( EventToUpdate& eventToUpdate, RenderTaskDefaults& defaults, bool systemLevel )
-: mEventToUpdate( eventToUpdate ),
+RenderTaskList::RenderTaskList( EventThreadServices& eventThreadServices, RenderTaskDefaults& defaults, bool systemLevel )
+: mEventThreadServices( eventThreadServices ),
   mDefaults( defaults ),
   mIsSystemLevel( systemLevel ),
   mSceneObject( NULL )

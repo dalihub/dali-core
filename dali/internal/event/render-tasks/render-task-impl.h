@@ -32,7 +32,7 @@ namespace Internal
 
 class Actor;
 class CameraActor;
-class EventToUpdate;
+class EventThreadServices;
 
 namespace SceneGraph
 {
@@ -334,10 +334,9 @@ protected:
 
   /**
    * Construct a new RenderTask.
-   * @param[in] eventToUpdate Used to send messages to the update-thread.
    * @param[in] isSystemLevel Whether the RenderTask is on the system level task list.
    */
-  RenderTask( EventToUpdate& eventToUpdate, bool isSystemLevel );
+  RenderTask( bool isSystemLevel );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -414,8 +413,6 @@ protected:
   };
 
 private:
-
-  EventToUpdate& mEventToUpdate;
 
   SceneGraph::RenderTask* mSceneObject; ///< Raw-pointer to the scene-graph object; not owned.
 

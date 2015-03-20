@@ -29,6 +29,7 @@ internal_src_files = \
   $(internal_src_dir)/event/animation/key-frames-impl.cpp \
   $(internal_src_dir)/event/animation/path-impl.cpp \
   $(internal_src_dir)/event/common/demangler.cpp \
+  $(internal_src_dir)/event/common/event-thread-services.cpp \
   $(internal_src_dir)/event/common/notification-manager.cpp \
   $(internal_src_dir)/event/common/object-impl.cpp \
   $(internal_src_dir)/event/common/object-registry-impl.cpp \

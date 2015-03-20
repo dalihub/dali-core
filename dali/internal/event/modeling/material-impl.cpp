@@ -21,10 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/internal/update/modeling/scene-graph-material.h>
-#include <dali/internal/common/event-to-update.h>
-#include <dali/internal/event/images/image-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/images/image-impl.h>
 
 namespace Dali
 {
@@ -85,16 +84,15 @@ MaterialProperties& MaterialProperties::operator=(const MaterialProperties& rhs)
 
 Material* Material::New(const std::string& name)
 {
-  return new Material(name);
+  return new Material(*Stage::GetCurrent(), name);
 }
 
-Material::Material(const std::string& name)
-  : mName(name),
-    mProperties(),
-    mSceneObject(NULL),
-    mEventToUpdate(NULL),
-    mUpdateManager(NULL),
-    mConnectionCount(0)
+Material::Material(EventThreadServices& eventThreadServices, const std::string& name)
+: mName(name),
+  mProperties(),
+  mEventThreadServices( eventThreadServices ),
+  mSceneObject(NULL),
+  mConnectionCount(0)
 {
 }
 
@@ -103,25 +101,13 @@ Material::~Material()
   if ( mSceneObject &&
        Stage::IsInstalled()/*Guard to allow handle destruction after Core has been destroyed*/ )
   {
-    RemoveMaterialMessage( *mUpdateManager, mSceneObject );
+    RemoveMaterialMessage( mEventThreadServices.GetUpdateManager(), mSceneObject );
   }
 }
 
 SceneGraph::Material* Material::CreateSceneObject()
 {
   DALI_ASSERT_DEBUG( mSceneObject == NULL );
-
-  if(mEventToUpdate == NULL)
-  {
-    EventToUpdate& eventToUpdate = ThreadLocalStorage::Get().GetEventToUpdate();
-    mEventToUpdate = &eventToUpdate;
-  }
-
-  if(mUpdateManager == NULL)
-  {
-    SceneGraph::UpdateManager& updateManager = ThreadLocalStorage::Get().GetUpdateManager();
-    mUpdateManager = &updateManager;
-  }
 
   mSceneObject = SceneGraph::Material::New(this);
   if( mDiffuseImage )
@@ -136,7 +122,7 @@ SceneGraph::Material* Material::CreateSceneObject()
   {
     mSceneObject->SetNormalMapId( GetImplementation(mNormalMap).GetResourceId() );
   }
-  AddMaterialMessage( *mUpdateManager, mSceneObject );
+  AddMaterialMessage( mEventThreadServices.GetUpdateManager(), mSceneObject );
 
   return mSceneObject;
 }
@@ -212,38 +198,34 @@ void Material::SendPropertiesToSceneObject()
 {
   if( mSceneObject != NULL )
   {
-    DALI_ASSERT_DEBUG( mEventToUpdate != NULL );
-    if( mEventToUpdate != NULL )
-    {
-      SetPropertiesMessage( *mEventToUpdate, *mSceneObject, mProperties );
-    }
+    SetPropertiesMessage( mEventThreadServices, *mSceneObject, mProperties );
   }
 }
 
 void Material::SendDiffuseImageToSceneObject(Dali::Image image)
 {
-  if( image && mSceneObject != NULL && mEventToUpdate != NULL )
+  if( image && mSceneObject != NULL )
   {
     ResourceId id = GetImplementation(image).GetResourceId();
-    SetDiffuseTextureMessage( *mEventToUpdate, *mSceneObject, id );
+    SetDiffuseTextureMessage( mEventThreadServices, *mSceneObject, id );
   }
 }
 
 void Material::SendOpacityImageToSceneObject(Dali::Image image)
 {
-  if( image && mSceneObject != NULL && mEventToUpdate != NULL )
+  if( image && mSceneObject != NULL )
   {
     ResourceId id = GetImplementation(image).GetResourceId();
-    SetOpacityTextureMessage( *mEventToUpdate, *mSceneObject, id );
+    SetOpacityTextureMessage( mEventThreadServices, *mSceneObject, id );
   }
 }
 
 void Material::SendNormalMapToSceneObject(Dali::Image image)
 {
-  if( image && mSceneObject != NULL && mEventToUpdate != NULL )
+  if( image && mSceneObject != NULL )
   {
     ResourceId id = GetImplementation(image).GetResourceId();
-    SetNormalMapMessage( *mEventToUpdate, *mSceneObject, id );
+    SetNormalMapMessage( mEventThreadServices, *mSceneObject, id );
   }
 }
 

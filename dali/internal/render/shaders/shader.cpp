@@ -466,56 +466,56 @@ void Shader::SetUniforms( Context& context,
 
 // Messages
 
-void SetTextureIdMessage( EventToUpdate& eventToUpdate, const Shader& shader, Integration::ResourceId textureId )
+void SetTextureIdMessage( EventThreadServices& eventThreadServices, const Shader& shader, Integration::ResourceId textureId )
 {
   typedef MessageDoubleBuffered1< Shader, Integration::ResourceId > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &shader, &Shader::ForwardTextureId, textureId );
 }
 
-void SetGridDensityMessage( EventToUpdate& eventToUpdate, const Shader& shader, float density )
+void SetGridDensityMessage( EventThreadServices& eventThreadServices, const Shader& shader, float density )
 {
   typedef MessageDoubleBuffered1< Shader, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &shader, &Shader::ForwardGridDensity, density );
 }
 
-void SetHintsMessage( EventToUpdate& eventToUpdate, const Shader& shader, Dali::ShaderEffect::GeometryHints hint )
+void SetHintsMessage( EventThreadServices& eventThreadServices, const Shader& shader, Dali::ShaderEffect::GeometryHints hint )
 {
   typedef MessageDoubleBuffered1< Shader, Dali::ShaderEffect::GeometryHints > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &shader, &Shader::ForwardHints, hint );
 }
 
-void InstallUniformMetaMessage( EventToUpdate& eventToUpdate, const Shader& shader, UniformMeta& meta )
+void InstallUniformMetaMessage( EventThreadServices& eventThreadServices, const Shader& shader, UniformMeta& meta )
 {
   typedef MessageDoubleBuffered1< Shader, UniformMeta* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &shader, &Shader::ForwardUniformMeta, &meta );
 }
 
-void SetCoordinateTypeMessage( EventToUpdate& eventToUpdate, const Shader& shader, unsigned int index, Dali::ShaderEffect::UniformCoordinateType type )
+void SetCoordinateTypeMessage( EventThreadServices& eventThreadServices, const Shader& shader, unsigned int index, Dali::ShaderEffect::UniformCoordinateType type )
 {
   typedef MessageDoubleBuffered2< Shader, unsigned int, Dali::ShaderEffect::UniformCoordinateType > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &shader, &Shader::ForwardCoordinateType, index, type );

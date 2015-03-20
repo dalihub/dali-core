@@ -53,7 +53,8 @@ Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_OBJ
 } // unnamed namespace
 
 Object::Object()
-: mTypeInfo( NULL ),
+: mEventThreadServices( *Stage::GetCurrent() ),
+  mTypeInfo( NULL ),
   mConstraints( NULL ),
   mPropertyNotifications( NULL )
 {
@@ -402,7 +403,7 @@ Property::Value Object::GetProperty(Property::Index index) const
     }
     else
     {
-      BufferIndex bufferIndex( Stage::GetCurrent()->GetEventBufferIndex() );
+      BufferIndex bufferIndex( GetEventThreadServices().GetEventBufferIndex() );
 
       switch ( custom->type )
       {
@@ -620,7 +621,7 @@ Property::Index Object::RegisterProperty( const std::string& name, const Propert
     mCustomProperties.PushBack( new CustomProperty( name, propertyValue.GetType(), property ) );
 
     // queue a message to add the property
-    InstallCustomPropertyMessage( Stage::GetCurrent()->GetUpdateInterface(), *scenePropertyOwner, newProperty.Release() ); // Message takes ownership
+    InstallCustomPropertyMessage( GetEventThreadServices(), *scenePropertyOwner, newProperty.Release() ); // Message takes ownership
 
     // notify the derived class (optional) method in case it needs to do some more work on the new property
     // note! have to use the local pointer as OwnerPointer now points to NULL as it handed over its ownership
@@ -800,7 +801,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<bool>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<bool>() );
+      BakeMessage<bool>( GetEventThreadServices(), *property, value.Get<bool>() );
       break;
     }
 
@@ -810,7 +811,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<float>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<float>() );
+      BakeMessage<float>( GetEventThreadServices(), *property, value.Get<float>() );
       break;
     }
 
@@ -820,7 +821,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<int>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<int>() );
+      BakeMessage<int>( GetEventThreadServices(), *property, value.Get<int>() );
       break;
     }
 
@@ -830,7 +831,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Vector2>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector2>() );
+      BakeMessage<Vector2>( GetEventThreadServices(), *property, value.Get<Vector2>() );
       break;
     }
 
@@ -840,7 +841,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Vector3>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector3>() );
+      BakeMessage<Vector3>( GetEventThreadServices(), *property, value.Get<Vector3>() );
       break;
     }
 
@@ -850,7 +851,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Vector4>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Vector4>() );
+      BakeMessage<Vector4>( GetEventThreadServices(), *property, value.Get<Vector4>() );
       break;
     }
 
@@ -860,7 +861,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Quaternion>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Quaternion>() );
+      BakeMessage<Quaternion>( GetEventThreadServices(), *property, value.Get<Quaternion>() );
       break;
     }
 
@@ -870,7 +871,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Matrix>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Matrix>() );
+      BakeMessage<Matrix>( GetEventThreadServices(), *property, value.Get<Matrix>() );
       break;
     }
 
@@ -880,7 +881,7 @@ void Object::SetSceneGraphProperty( Property::Index index, const CustomProperty&
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Matrix3>( Stage::GetCurrent()->GetUpdateInterface(), *property, value.Get<Matrix3>() );
+      BakeMessage<Matrix3>( GetEventThreadServices(), *property, value.Get<Matrix3>() );
       break;
     }
 

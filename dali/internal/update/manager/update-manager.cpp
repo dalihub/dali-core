@@ -323,11 +323,6 @@ UpdateManager::~UpdateManager()
   delete mImpl;
 }
 
-EventToUpdate& UpdateManager::GetEventToUpdate()
-{
-  return mImpl->messageQueue;
-}
-
 void UpdateManager::InstallRoot( SceneGraph::Layer* layer, bool systemLevel )
 {
   DALI_ASSERT_DEBUG( layer->IsLayer() );
@@ -700,6 +695,21 @@ void UpdateManager::RemoveGesture( PanGesture* gesture )
   }
   // Should not reach here
   DALI_ASSERT_DEBUG(false);
+}
+
+unsigned int* UpdateManager::ReserveMessageSlot( std::size_t size, bool updateScene )
+{
+  return mImpl->messageQueue.ReserveMessageSlot( size, updateScene );
+}
+
+void UpdateManager::EventProcessingStarted()
+{
+  mImpl->messageQueue.EventProcessingStarted();
+}
+
+bool UpdateManager::FlushQueue()
+{
+  return mImpl->messageQueue.FlushQueue();
 }
 
 void UpdateManager::ResetNodeProperty( Node& node )

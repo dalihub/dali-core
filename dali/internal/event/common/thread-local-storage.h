@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/stage-def.h>
 
 namespace Dali
 {
@@ -40,7 +40,6 @@ class ResourceClient;
 class ResourceManager;
 class ImageFactory;
 class ShaderFactory;
-class EventToUpdate;
 class GestureEventProcessor;
 
 namespace SceneGraph
@@ -136,15 +135,9 @@ public:
 
   /**
    * Returns the current stage.
-   * @return A smart-pointer to the current stage.
+   * @return A pointer to the current stage.
    */
   StagePtr GetCurrentStage();
-
-  /**
-   * Return the message controller
-   * @return A reference to the message controller
-   */
-  EventToUpdate& GetEventToUpdate();
 
   /**
    * Returns the gesture event processor.
