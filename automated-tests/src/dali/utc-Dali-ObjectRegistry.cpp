@@ -145,25 +145,6 @@ struct TestMeshActorCallback
   bool& mSignalVerified;
 };
 
-
-struct TestTextActorCallback
-{
-  TestTextActorCallback(bool& signalReceived)
-  : mSignalVerified(signalReceived)
-  {
-  }
-  void operator()(BaseHandle object)
-  {
-    tet_infoline("Verifying TestTextActorCallback()");
-    TextActor actor = TextActor::DownCast(object);
-    if(actor)
-    {
-      mSignalVerified = true;
-    }
-  }
-  bool& mSignalVerified;
-};
-
 struct TestAnimationCallback
 {
   TestAnimationCallback(bool& signalReceived)

@@ -706,13 +706,8 @@ int UtcDaliScriptingNewActorChildren(void)
   child1Map[ "type" ] = "ImageActor";
   child1Map[ "position" ] = Vector3::YAXIS;
 
-  Property::Map child2Map;
-  child2Map[ "type" ] = "TextActor";
-  child2Map[ "position" ] = Vector3::ZAXIS;
-
   Property::Array childArray;
   childArray.push_back( child1Map );
-  childArray.push_back( child2Map );
   map[ "actors" ] = childArray;
 
   // Create
@@ -724,19 +719,13 @@ int UtcDaliScriptingNewActorChildren(void)
   application.Render();
 
   DALI_TEST_EQUALS( handle.GetCurrentPosition(), Vector3::XAXIS, TEST_LOCATION );
-  DALI_TEST_EQUALS( handle.GetChildCount(), 2u, TEST_LOCATION );
+  DALI_TEST_EQUALS( handle.GetChildCount(), 1u, TEST_LOCATION );
 
   Actor child1 = handle.GetChildAt(0);
   DALI_TEST_CHECK( child1 );
   DALI_TEST_CHECK( ImageActor::DownCast( child1 ) );
   DALI_TEST_EQUALS( child1.GetCurrentPosition(), Vector3::YAXIS, TEST_LOCATION );
   DALI_TEST_EQUALS( child1.GetChildCount(), 0u, TEST_LOCATION );
-
-  Actor child2 = handle.GetChildAt(1);
-  DALI_TEST_CHECK( child2 );
-  DALI_TEST_CHECK( TextActor::DownCast( child2 ) );
-  DALI_TEST_EQUALS( child2.GetCurrentPosition(), Vector3::ZAXIS, TEST_LOCATION );
-  DALI_TEST_EQUALS( child2.GetChildCount(), 0u, TEST_LOCATION );
 
   Stage::GetCurrent().Remove( handle );
   END_TEST;

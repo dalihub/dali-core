@@ -29,7 +29,6 @@ SET(TC_SOURCES
         utc-Dali-DynamicsWorld.cpp
         utc-Dali-DynamicsWorldConfig.cpp
         utc-Dali-EncodedBufferImage.cpp
-        utc-Dali-FixedSizeMemoryPool.cpp
         utc-Dali-FrameBufferImage.cpp
         utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
