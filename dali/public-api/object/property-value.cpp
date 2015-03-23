@@ -975,5 +975,108 @@ int Property::Value::GetSize() const
   return ret;
 }
 
+std::ostream& operator<< (std::ostream& stream, const Property::Value& value )
+{
+
+  const Property::Value::Impl& impl( *value.mImpl );
+
+  switch( impl.mType )
+  {
+    case Dali::Property::STRING:
+    {
+      stream <<  AnyCast<std::string>(impl.mValue).c_str();
+      break;
+    }
+    case Dali::Property::VECTOR2:
+    {
+      stream << AnyCast<Vector2>(impl.mValue);
+      break;
+    }
+    case Dali::Property::VECTOR3:
+    {
+      stream << AnyCast<Vector3>(impl.mValue);
+      break;
+    }
+    case Dali::Property::VECTOR4:
+    {
+      stream << AnyCast<Vector4>(impl.mValue);
+      break;
+    }
+    case Dali::Property::MATRIX:
+    {
+      stream << AnyCast<Matrix>(impl.mValue);
+      break;
+    }
+    case Dali::Property::BOOLEAN:
+    {
+      stream << AnyCast<bool>(impl.mValue);
+      break;
+    }
+    case Dali::Property::FLOAT:
+    {
+      stream << AnyCast<float>(impl.mValue);
+      break;
+    }
+    case Dali::Property::INTEGER:
+    {
+       stream << AnyCast<int>(impl.mValue);
+       break;
+    }
+    case Dali::Property::UNSIGNED_INTEGER:
+    {
+      stream << AnyCast<unsigned int>(impl.mValue);
+      break;
+    }
+    case Dali::Property::RECTANGLE:
+    {
+      Dali::Rect<int> rect; // Propery Value rectangles are currently integer based
+      value.Get( rect );
+      stream << rect;
+      break;
+    }
+    case Dali::Property::MATRIX3:
+    {
+      stream << AnyCast<Matrix3>(impl.mValue);
+      break;
+    }
+    case Dali::Property::ROTATION:
+    {
+      // @todo this may change to Quaternion
+      Dali::Quaternion q;
+      value.Get( q );
+      Dali::Vector4 v4 = q.EulerAngles();
+      stream << v4;
+      break;
+    }
+
+    case Dali::Property::ARRAY:
+    {
+      // @todo Need to think about the best way to support array
+      // E.g Do we want to create a JSON style array like:
+      // [ {"property-name-0":"property-value-0", "property-name-1":"property-value-1"} ]
+      stream << "ARRAY unsupported";
+      break;
+    }
+    case Dali::Property::MAP:
+    {
+      Dali::Property::Map map;
+      value.Get( map );
+      stream << "Map containing " << map.Count() << " elements";
+      break;
+    }
+    case Dali::Property::TYPE_COUNT:
+    {
+      stream << "unsupported TYPE_COUNT";
+      break;
+    }
+    default:
+    {
+      stream << "unsupported type = " << value.GetType();
+      break;
+    }
+  }
+  return stream;
+}
+
 
 } // namespace Dali

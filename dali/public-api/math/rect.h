@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <math.h>
+#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/math-utils.h>
@@ -263,6 +264,44 @@ inline bool Rect<float>::IsEmpty() const
           ||
           fabsf(height) <= GetRangedEpsilon(height, height));
 }
+
+/**
+ * @brief Convert the value of the rectangle into a string and insert in to an output stream.
+ *
+ * @param [in] stream The output stream operator.
+ * @param [in] rectangle the rectangle to output
+ * @return The output stream operator.
+ */
+inline std::ostream& operator<< (std::ostream& stream, const Rect<int>& rectangle)
+{
+  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+}
+
+/**
+ * @brief Convert the value of the rectangle into a string and insert in to an output stream.
+ *
+ * @param [in] stream The output stream operator.
+ * @param [in] rectangle the rectangle to output
+ * @return The output stream operator.
+ */
+inline std::ostream& operator<< (std::ostream& stream, const Rect<unsigned int>& rectangle)
+{
+  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+}
+
+/**
+ * @brief Convert the value of the rectangle into a string and insert in to an output stream.
+ *
+ * @param [in] stream The output stream operator.
+ * @param [in] rectangle the rectangle to output
+ * @return The output stream operator.
+ */
+inline std::ostream& operator<< (std::ostream& stream, const Rect<float>& rectangle)
+{
+  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+}
+
+
 
 } // namespace Dali
 

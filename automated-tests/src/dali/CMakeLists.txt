@@ -65,6 +65,7 @@ SET(TC_SOURCES
         utc-Dali-Pixel.cpp
         utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyNotification.cpp
+        utc-Dali-PropertyValue.cpp
         utc-Dali-Quaternion.cpp
         utc-Dali-Radian.cpp
         utc-Dali-Random.cpp
