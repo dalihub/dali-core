@@ -18,6 +18,7 @@ public_api_src_files = \
   $(public_api_src_dir)/animation/constraint-source.cpp \
   $(public_api_src_dir)/animation/key-frames.cpp \
   $(public_api_src_dir)/animation/path.cpp \
+  $(public_api_src_dir)/animation/path-constraint.cpp \
   $(public_api_src_dir)/animation/time-period.cpp \
   $(public_api_src_dir)/common/constants.cpp \
   $(public_api_src_dir)/common/dali-common.cpp \
@@ -144,6 +145,7 @@ public_api_core_animation_header_files = \
   $(public_api_src_dir)/animation/constraint-source.h \
   $(public_api_src_dir)/animation/key-frames.h \
   $(public_api_src_dir)/animation/path.h \
+  $(public_api_src_dir)/animation/path-constraint.h \
   $(public_api_src_dir)/animation/time-period.h
 
 public_api_core_common_header_files = \
