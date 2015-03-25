@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <boost/function.hpp>
 #include <string>
 
 // INTERNAL INCLUDES
