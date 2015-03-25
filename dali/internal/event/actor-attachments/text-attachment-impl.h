@@ -36,7 +36,6 @@ namespace Dali
 
 namespace Internal
 {
-
 class TextParameters;
 
 namespace SceneGraph
@@ -54,13 +53,13 @@ public:
 
   /**
    * Create a new TextAttachment.
-   * @param[in] stage The stage to use for messaging
+   * @param[in] eventThreadServices Used for messaging to and reading from the SceneGraph
    * @param[in] parentNode The node to attach a scene-object to.
    * @param [in] text The text which will be displayed.
    * @param [in] font The font which will be used for the text.
    * @return A smart-pointer to the newly allocated TextAttachment.
    */
-  static TextAttachmentPtr New( Stage& stage, const SceneGraph::Node& parentNode, const Integration::TextArray& text, FontPointer font );
+  static TextAttachmentPtr New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode, const Integration::TextArray& text, FontPointer font );
 
   /**
    * Set the text label displayed by the attachment
@@ -348,9 +347,9 @@ private:
 
   /**
    * First stage construction of a TextAttachment.
-   * @param[in] stage Used to send messages to scene-graph.
+   * @param[in] eventThreadServices Used to send messages to scene-graph.
    */
-  TextAttachment( Stage& stage );
+  TextAttachment( EventThreadServices& eventThreadServices );
 
   /**
    * @copydoc Dali::Internal::RenderableAttachment::OnStageConnection2()

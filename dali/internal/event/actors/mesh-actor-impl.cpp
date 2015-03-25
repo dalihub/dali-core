@@ -53,7 +53,7 @@ MeshActorPtr MeshActor::New()
   actor->Initialize();
 
   // Create the attachment
-  actor->mMeshAttachment = MeshAttachment::New( *actor->mStage, *actor->mNode );
+  actor->mMeshAttachment = MeshAttachment::New( actor->GetEventThreadServices(), *actor->mNode );
   actor->Attach(*actor->mMeshAttachment);
   actor->SetCullFace( Dali::CullBack );
 

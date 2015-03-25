@@ -347,6 +347,21 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
   }
 }
 
+void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index index, Property::Type type )
+{
+  RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                        PairFinder< Property::Index, RegisteredPropertyPair>(index) );
+
+  if ( iter == mRegisteredProperties.end() )
+  {
+    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, NULL, NULL, name ) ) );
+  }
+  else
+  {
+    DALI_ASSERT_ALWAYS( ! "Property index already added to Type" );
+  }
+}
+
 unsigned int TypeInfo::GetPropertyCount() const
 {
   unsigned int count( mRegisteredProperties.size() );
@@ -395,7 +410,14 @@ bool TypeInfo::IsPropertyWritable( Property::Index index ) const
 
   if ( iter != mRegisteredProperties.end() )
   {
-    writable = iter->second.setFunc ? true : false;
+    if( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
+    {
+      writable = true; // animatable property is writable
+    }
+    else
+    {
+      writable = iter->second.setFunc ? true : false;
+    }
   }
   else
   {

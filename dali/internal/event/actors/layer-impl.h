@@ -60,13 +60,12 @@ public:
 
   /**
    * Create a new root layer; this is typically owned by the stage.
-   * @param[in] stage The owning stage.
    * @param[in] layerList The layer will be added to this ordered list.
    * @param[in] manager The update manager to install a root node with.
    * @param[in] systemLevel True if using the SystemOverlay API; see Integration::GetSystemOverlay() for more details.
    * @return A smart-pointer to the newly allocated Actor.
    */
-  static LayerPtr NewRoot( Stage& stage, LayerList& layerList, SceneGraph::UpdateManager& manager, bool systemLevel );
+  static LayerPtr NewRoot( LayerList& layerList, SceneGraph::UpdateManager& manager, bool systemLevel );
 
   /**
    * @copydoc Dali::Internal::Actor::OnInitialize

@@ -48,7 +48,7 @@ const SceneGraph::PropertyOwner* CustomObject::GetSceneObject() const
 
 const PropertyBase* CustomObject::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  CustomProperty* custom = FindCustomProperty( index );
+  CustomPropertyMetadata* custom = FindCustomProperty( index );
   DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
   return custom->GetSceneGraphProperty();
 }
@@ -114,7 +114,7 @@ CustomObject::~CustomObject()
   {
     if( NULL != mUpdateObject )
     {
-      RemoveObjectMessage( Stage::GetCurrent()->GetUpdateManager(), mUpdateObject );
+      RemoveObjectMessage( GetEventThreadServices().GetUpdateManager(), mUpdateObject );
       mUpdateObject = NULL; // object is about to be destroyed
     }
   }
@@ -125,7 +125,7 @@ CustomObject::CustomObject()
   PropertyOwner* updateObject = PropertyOwner::New();
 
   // Pass ownership to the update-thread
-  AddObjectMessage( Stage::GetCurrent()->GetUpdateManager(), updateObject );
+  AddObjectMessage( GetEventThreadServices().GetUpdateManager(), updateObject );
 
   // Keep as const since this should only be modified from update-thread
   mUpdateObject = updateObject;

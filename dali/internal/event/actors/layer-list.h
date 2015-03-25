@@ -27,8 +27,12 @@ namespace Dali
 namespace Internal
 {
 
+namespace SceneGraph
+{
+class UpdateManager;
+}
+
 class Layer;
-class Stage;
 
 /**
  * An ordered list of layers.
@@ -42,10 +46,10 @@ public:
 
   /**
    * Create a new list of layers.
-   * @param[in] stage A reference to the stage.
+   * @param[in] updateManager A reference to the update manager.
    * @param[in] systemLevel True if the layers are added via the SystemOverlay API.
    */
-  static LayerList* New( Stage& stage, bool systemLevel );
+  static LayerList* New( SceneGraph::UpdateManager& updateManager, bool systemLevel );
 
   /**
    * Non-virtual destructor; not suitable as a base class.
@@ -131,10 +135,10 @@ private:
 
   /**
    * Protected constructor; see also LayerList::New().
-   * @param[in] stage A reference to the stage.
+   * @param[in] updateManager to send messages.
    * @param[in] systemLevel True if the layers are added via the SystemOverlay API.
    */
-  LayerList( Stage& stage, bool systemLevel );
+  LayerList( SceneGraph::UpdateManager& updateManager, bool systemLevel );
 
   /**
    * A private helper method to set the depth for each layer.
@@ -145,7 +149,7 @@ private:
 
 private:
 
-  Stage& mStage;
+  SceneGraph::UpdateManager& mUpdateManager;
 
   bool mIsSystemLevel; ///< True if the layers are added via the SystemOverlay API.
 

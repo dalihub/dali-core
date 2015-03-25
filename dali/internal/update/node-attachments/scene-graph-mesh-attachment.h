@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 #include <dali/internal/update/modeling/bone-transforms.h>
@@ -209,34 +209,34 @@ private:
 
 // Messages for MeshAttachment
 
-inline void SetMeshMessage( EventToUpdate& eventToUpdate, const MeshAttachment& attachment, ResourceId meshId, const Material* material, std::size_t boneCount )
+inline void SetMeshMessage( EventThreadServices& eventThreadServices, const MeshAttachment& attachment, ResourceId meshId, const Material* material, std::size_t boneCount )
 {
   typedef MessageValue3< MeshAttachment, ResourceId, const Material*, std::size_t > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &MeshAttachment::SetMesh, meshId, material, boneCount );
 }
 
-inline void SetMaterialMessage( EventToUpdate& eventToUpdate, const MeshAttachment& attachment, const Material* material )
+inline void SetMaterialMessage( EventThreadServices& eventThreadServices, const MeshAttachment& attachment, const Material* material )
 {
   typedef MessageValue1< MeshAttachment, const Material* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &MeshAttachment::SetMaterial, material );
 }
 
-inline void SetBoneNodeMessage( EventToUpdate& eventToUpdate, const MeshAttachment& attachment, Node* boneNode, size_t boneIdx, size_t boneCount )
+inline void SetBoneNodeMessage( EventThreadServices& eventThreadServices, const MeshAttachment& attachment, Node* boneNode, size_t boneIdx, size_t boneCount )
 {
   typedef MessageValue3< MeshAttachment, Node*, size_t, size_t > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &MeshAttachment::SetBoneNode, boneNode, boneIdx, boneCount );

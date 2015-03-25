@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/common/event-to-update.h>
 
 namespace Dali
 {
@@ -33,29 +33,29 @@ namespace SceneGraph
 
 // Messages for PropertyOwner
 
-inline void InstallCustomPropertyMessage( EventToUpdate& eventToUpdate, const PropertyOwner& owner, PropertyBase* property )
+inline void InstallCustomPropertyMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, PropertyBase* property )
 {
   typedef MessageValue1< PropertyOwner, OwnerPointer<PropertyBase> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &owner, &PropertyOwner::InstallCustomProperty, property );
 }
 
-inline void ApplyConstraintMessage( EventToUpdate& eventToUpdate, const PropertyOwner& owner, ConstraintBase& constraint )
+inline void ApplyConstraintMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, ConstraintBase& constraint )
 {
   typedef MessageValue1< PropertyOwner, OwnerPointer<ConstraintBase> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &owner, &PropertyOwner::ApplyConstraint, &constraint );
 }
 
-inline void RemoveConstraintMessage( EventToUpdate& eventToUpdate, const PropertyOwner& owner, const ConstraintBase& constConstraint )
+inline void RemoveConstraintMessage( EventThreadServices& eventThreadServices, const PropertyOwner& owner, const ConstraintBase& constConstraint )
 {
   // The update-thread can modify this object.
   ConstraintBase& constraint = const_cast< ConstraintBase& >( constConstraint );
@@ -63,7 +63,7 @@ inline void RemoveConstraintMessage( EventToUpdate& eventToUpdate, const Propert
   typedef MessageValue1< PropertyOwner, ConstraintBase* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &owner, &PropertyOwner::RemoveConstraint, &constraint );

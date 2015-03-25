@@ -75,7 +75,7 @@ LayerPtr Layer::New()
   return layer;
 }
 
-LayerPtr Layer::NewRoot( Stage& stage, LayerList& layerList, UpdateManager& manager, bool systemLevel )
+LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager, bool systemLevel )
 {
   LayerPtr root( new Layer( Actor::ROOT_LAYER ) );
 
@@ -85,9 +85,6 @@ LayerPtr Layer::NewRoot( Stage& stage, LayerList& layerList, UpdateManager& mana
 
   // Keep a raw pointer to the layer node.
   root->mNode = layer;
-
-  // stage must be set for the root layer
-  root->mStage = &stage;
 
   // root actor is immediately considered to be on-stage
   root->mIsOnStage = true;
@@ -212,7 +209,7 @@ void Layer::SetClipping(bool enabled)
     mIsClipping = enabled;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), mIsClipping );
+    SetClippingMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mIsClipping );
   }
 }
 
@@ -228,10 +225,10 @@ void Layer::SetClippingBox(int x, int y, int width, int height)
 
     // Convert mClippingBox to GL based coordinates (from bottom-left)
     ClippingBox clippingBox( mClippingBox );
-    clippingBox.y = mStage->GetSize().height - clippingBox.y - clippingBox.height;
+    clippingBox.y = Stage::GetCurrent()->GetSize().height - clippingBox.y - clippingBox.height;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingBoxMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), clippingBox );
+    SetClippingBoxMessage( GetEventThreadServices(), GetSceneLayerOnStage(), clippingBox );
   }
 }
 
@@ -243,7 +240,7 @@ void Layer::SetDepthTestDisabled( bool disable )
 
     // Send message .....
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetDepthTestDisabledMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), mDepthTestDisabled );
+    SetDepthTestDisabledMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mDepthTestDisabled );
   }
 }
 
@@ -259,7 +256,7 @@ void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
     mSortFunction = function;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetSortFunctionMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), mSortFunction );
+    SetSortFunctionMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mSortFunction );
   }
 }
 

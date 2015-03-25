@@ -24,7 +24,7 @@
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/common/event-thread-services.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/public-api/math/vector3.h>
 
@@ -200,23 +200,23 @@ private:
 
 // Messages for DynamicsWorld
 
-inline void SetGravityMessage( EventToUpdate& eventToUpdate, const DynamicsWorld& world, const Vector3& gravity )
+inline void SetGravityMessage( EventThreadServices& eventThreadServices, const DynamicsWorld& world, const Vector3& gravity )
 {
   typedef MessageValue1< DynamicsWorld, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &world, &DynamicsWorld::SetGravity, gravity );
 }
 
-inline void SetRootActorMessage( EventToUpdate& eventToUpdate, const DynamicsWorld& world, const Node* node )
+inline void SetRootActorMessage( EventThreadServices& eventThreadServices, const DynamicsWorld& world, const Node* node )
 {
   typedef MessageValue1< DynamicsWorld, Node* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &world, &DynamicsWorld::SetNode, const_cast<Node*>(node) );

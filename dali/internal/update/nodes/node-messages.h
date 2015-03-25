@@ -81,23 +81,23 @@ public:
    * Create a message.
    * @note The node is expected to be const in the thread which sends this message.
    * However it can be modified when Process() is called in a different thread.
-   * @param[in] updateManager The update-manager.
+   * @param[in] eventThreadServices The object used to send messages to the scene graph
    * @param[in] node The node.
    * @param[in] property The property to bake.
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the property.
    */
-  static void Send( UpdateManager& updateManager,
+  static void Send( EventThreadServices& eventThreadServices,
                     const Node* node,
                     const AnimatableProperty<P>* property,
                     MemberFunction member,
                     typename ParameterType< P >::PassingType value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = updateManager.GetEventToUpdate().ReserveMessageSlot( sizeof( NodePropertyMessage ) );
+    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodePropertyMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) NodePropertyMessage( updateManager, node, property, member, value );
+    new (slot) NodePropertyMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
   }
 
   /**
@@ -168,23 +168,23 @@ public:
    * Send a message.
    * @note The node is expected to be const in the thread which sends this message.
    * However it can be modified when Process() is called in a different thread.
-   * @param[in] updateManager The update-manager.
+   * @param[in] eventThreadServices The object used to send messages to the scene graph
    * @param[in] node The node.
    * @param[in] property The property to bake.
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
    */
-  static void Send( UpdateManager& updateManager,
+  static void Send( EventThreadServices& eventThreadServices,
                     const Node* node,
                     const AnimatableProperty<P>* property,
                     MemberFunction member,
                     float value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = updateManager.GetEventToUpdate().ReserveMessageSlot( sizeof( NodePropertyComponentMessage ) );
+    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( NodePropertyComponentMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) NodePropertyComponentMessage( updateManager, node, property, member, value );
+    new (slot) NodePropertyComponentMessage( eventThreadServices.GetUpdateManager(), node, property, member, value );
   }
 
   /**

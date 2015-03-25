@@ -62,12 +62,12 @@ public:
 
   /**
    * Create an initialised MeshAttachment.
-   * @param[in] stage The stage to use for messaging
+   * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
    * @param[in] parentNode The node to attach a scene-object to.
    * This will not be displayed until a mesh is added with SetMesh().
    * @return A handle to a newly allocated Dali resource.
    */
-  static MeshAttachmentPtr New( Stage& stage, const SceneGraph::Node& parentNode );
+  static MeshAttachmentPtr New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode );
 
   /**
    * Set the mesh to be rendererd by this attachment
@@ -139,9 +139,9 @@ private:
 
   /**
    * First stage construction of a MeshAttachment.
-   * @param[in] stage Used to send messages to scene-graph.
+   * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
    */
-  MeshAttachment( Stage& stage );
+  MeshAttachment( EventThreadServices& eventThreadServices );
 
   /**
    * @copydoc Dali::Internal::RenderableAttachment::OnStageConnection2()

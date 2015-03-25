@@ -37,7 +37,6 @@
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/common/render-manager.h>
 #include <dali/internal/update/common/discard-queue.h>
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/event/text/font-factory.h>
 #include <dali/internal/event/images/image-factory.h>
@@ -152,11 +151,10 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
                                        textureCache,
                                       *mTouchResampler );
 
-  mResourceClient = new ResourceClient( *mResourceManager, *mUpdateManager, dataRetentionPolicy );
-
   mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager ) );
-
   mStage->Initialize();
+
+  mResourceClient = new ResourceClient( *mResourceManager, *mStage, dataRetentionPolicy );
 
   mGestureEventProcessor = new GestureEventProcessor(*mStage, gestureManager, mRenderController);
   mEventProcessor = new EventProcessor(*mStage, *mNotificationManager, *mGestureEventProcessor);
@@ -316,10 +314,8 @@ void Core::ProcessEvents()
 
   mProcessingEvent = true;
 
-  EventToUpdate& eventToUpdate = mUpdateManager->GetEventToUpdate();
-
   // Signal that any messages received will be flushed soon
-  eventToUpdate.EventProcessingStarted();
+  mUpdateManager->EventProcessingStarted();
 
   mEventProcessor->ProcessEvents();
 
@@ -338,7 +334,7 @@ void Core::ProcessEvents()
     mFontFactory->SendTextRequests();
 
     // Flush any queued messages for the update-thread
-    const bool messagesToProcess = eventToUpdate.FlushQueue();
+    const bool messagesToProcess = mUpdateManager->FlushQueue();
 
     // Check if the touch or gestures require updates.
     const bool touchNeedsUpdate = mTouchResampler->NeedsUpdate();

@@ -20,7 +20,7 @@
 
 // INTERNAL HEADERS
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/common/event-thread-services.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/update/common/double-buffered.h>
@@ -188,177 +188,177 @@ private:
 
 // Messages for DynamicsBody
 
-inline void InitializeDynamicsBodyMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, Integration::DynamicsBodySettings* settings, const DynamicsShape& shape )
+inline void InitializeDynamicsBodyMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, Integration::DynamicsBodySettings* settings, const DynamicsShape& shape )
 {
   typedef MessageValue2< DynamicsBody, Integration::DynamicsBodySettings*, DynamicsShape* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::Initialize, settings, &const_cast<DynamicsShape&>(shape) );
 }
 
-inline void SetMassMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, float mass )
+inline void SetMassMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, float mass )
 {
   typedef MessageValue1< DynamicsBody, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::SetMass, mass );
 }
 
-inline void SetElasticityMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, float elasticity )
+inline void SetElasticityMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, float elasticity )
 {
   typedef MessageValue1< DynamicsBody, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::SetElasticity, elasticity );
 }
 
-inline void SetLinearVelocityMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, const Vector3& velocity )
+inline void SetLinearVelocityMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, const Vector3& velocity )
 {
   typedef MessageValue1< DynamicsBody, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::SetLinearVelocity, velocity );
 }
 
-inline void SetAngularVelocityMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, const Vector3& velocity )
+inline void SetAngularVelocityMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, const Vector3& velocity )
 {
   typedef MessageValue1< DynamicsBody, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::SetAngularVelocity, velocity );
 }
 
-inline void SetKinematicMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, bool flag )
+inline void SetKinematicMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, bool flag )
 {
   typedef MessageValue1< DynamicsBody, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::SetKinematic, flag );
 }
 
-inline void SetSleepEnabledMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, bool flag )
+inline void SetSleepEnabledMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, bool flag )
 {
   typedef MessageValue1< DynamicsBody, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::SetSleepEnabled, flag );
 }
 
-inline void WakeUpMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body )
+inline void WakeUpMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body )
 {
   typedef Message< DynamicsBody > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::WakeUp );
 }
 
-inline void AddAnchorMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, unsigned int index, const DynamicsBody& anchorBody, bool collisions )
+inline void AddAnchorMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, unsigned int index, const DynamicsBody& anchorBody, bool collisions )
 {
   typedef MessageValue3< DynamicsBody, unsigned int, const DynamicsBody*, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::AddAnchor, index, &anchorBody, collisions );
 }
 
-inline void ConserveVolumeMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, bool flag )
+inline void ConserveVolumeMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, bool flag )
 {
   typedef MessageValue1< DynamicsBody, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::ConserveVolume, flag );
 }
 
-inline void ConserveShapeMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, bool flag )
+inline void ConserveShapeMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, bool flag )
 {
   typedef MessageValue1< DynamicsBody, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::ConserveShape, flag );
 }
 
-inline void SetCollisionGroupMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, short int collisionGroup )
+inline void SetCollisionGroupMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, short int collisionGroup )
 {
   typedef MessageValue1< DynamicsBody, short int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::SetCollisionGroup, collisionGroup );
 }
 
-inline void SetCollisionMaskMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body, short int collisionMask )
+inline void SetCollisionMaskMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body, short int collisionMask )
 {
   typedef MessageValue1< DynamicsBody, short int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::SetCollisionMask, collisionMask );
 }
 
-inline void ConnectMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body )
+inline void ConnectMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body )
 {
   typedef Message< DynamicsBody > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::Connect );
 }
 
-inline void DisconnectMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body )
+inline void DisconnectMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body )
 {
   typedef Message< DynamicsBody > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::Disconnect );
 }
 
-inline void DeleteBodyMessage( EventToUpdate& eventToUpdate, const DynamicsBody& body )
+inline void DeleteBodyMessage( EventThreadServices& eventThreadServices, const DynamicsBody& body )
 {
   typedef Message< DynamicsBody > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &body, &DynamicsBody::Delete );

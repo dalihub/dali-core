@@ -22,6 +22,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <cstdlib>
 #include <sstream>
 #include <iomanip>
 

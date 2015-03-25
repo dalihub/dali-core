@@ -19,7 +19,7 @@
 #include <dali/internal/event/actor-attachments/renderable-attachment-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 
@@ -31,8 +31,8 @@ namespace Dali
 namespace Internal
 {
 
-RenderableAttachment::RenderableAttachment( Stage& stage )
-: ActorAttachment( stage ),
+RenderableAttachment::RenderableAttachment( EventThreadServices& eventThreadServices )
+: ActorAttachment( eventThreadServices ),
   mShaderEffect(),
   mBlendingOptions(),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
@@ -52,7 +52,7 @@ void RenderableAttachment::SetSortModifier(float modifier)
   mSortModifier = modifier;
 
   // attachment is being used in a separate thread; queue a message to set the value & base value
-  SetSortModifierMessage( mStage->GetUpdateInterface(), GetSceneObject(), modifier );
+  SetSortModifierMessage( GetEventThreadServices(), GetSceneObject(), modifier );
 }
 
 float RenderableAttachment::GetSortModifier() const
@@ -67,7 +67,7 @@ void RenderableAttachment::SetCullFace( CullFaceMode mode )
   mCullFaceMode = mode;
 
   // attachment is being used in a separate thread; queue a message to set the value
-  SetCullFaceMessage( mStage->GetUpdateInterface(), GetSceneObject(), mode );
+  SetCullFaceMessage( GetEventThreadServices(), GetSceneObject(), mode );
 }
 
 CullFaceMode RenderableAttachment::GetCullFace() const
@@ -81,7 +81,7 @@ void RenderableAttachment::SetBlendMode( BlendingMode::Type mode )
   mBlendingMode = mode;
 
   // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingModeMessage( mStage->GetUpdateInterface(), GetSceneObject(), mode );
+  SetBlendingModeMessage( GetEventThreadServices(), GetSceneObject(), mode );
 }
 
 BlendingMode::Type RenderableAttachment::GetBlendMode() const
@@ -96,7 +96,7 @@ void RenderableAttachment::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   Bl
   mBlendingOptions.SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 
   // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingOptionsMessage( mStage->GetUpdateInterface(), GetSceneObject(), mBlendingOptions.GetBitmask() );
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
 void RenderableAttachment::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
@@ -114,7 +114,7 @@ void RenderableAttachment::SetBlendEquation( BlendingEquation::Type equationRgb,
   mBlendingOptions.SetBlendEquation( equationRgb, equationAlpha );
 
   // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingOptionsMessage( mStage->GetUpdateInterface(), GetSceneObject(), mBlendingOptions.GetBitmask() );
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
 void RenderableAttachment::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
@@ -129,7 +129,7 @@ void RenderableAttachment::SetBlendColor( const Vector4& color )
   if( mBlendingOptions.SetBlendColor( color ) )
   {
     // attachment is being used in a separate thread; queue a message to set the value
-    SetBlendColorMessage( mStage->GetUpdateInterface(), GetSceneObject(), color );
+    SetBlendColorMessage( GetEventThreadServices(), GetSceneObject(), color );
   }
 }
 
@@ -148,7 +148,7 @@ void RenderableAttachment::SetFilterMode( FilterMode::Type minFilter, FilterMode
 {
   mSamplerBitfield = ImageSampler::PackBitfield( minFilter, magFilter );
 
-  SetSamplerMessage( mStage->GetUpdateInterface(), GetSceneObject(), mSamplerBitfield );
+  SetSamplerMessage( GetEventThreadServices(), GetSceneObject(), mSamplerBitfield );
 }
 
 void RenderableAttachment::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
@@ -170,7 +170,7 @@ void RenderableAttachment::SetShaderEffect(ShaderEffect& effect)
 
     const Shader& shader = dynamic_cast<const Shader&>( *mShaderEffect->GetSceneObject() );
 
-    ApplyShaderMessage( mStage->GetUpdateInterface(), GetSceneObject(), shader );
+    ApplyShaderMessage( GetEventThreadServices(), GetSceneObject(), shader );
 
     mShaderEffect->Connect();
   }
@@ -190,7 +190,7 @@ void RenderableAttachment::RemoveShaderEffect()
 {
   if ( OnStage() )
   {
-    RemoveShaderMessage( mStage->GetUpdateInterface(), GetSceneObject() );
+    RemoveShaderMessage( GetEventThreadServices(), GetSceneObject() );
 
     // Notify shader effect
     if (mShaderEffect)
@@ -208,7 +208,7 @@ void RenderableAttachment::OnStageConnection()
   {
     const Shader& shader = dynamic_cast<const Shader&>( *mShaderEffect->GetSceneObject() );
 
-    ApplyShaderMessage( mStage->GetUpdateInterface(), GetSceneObject(), shader );
+    ApplyShaderMessage( GetEventThreadServices(), GetSceneObject(), shader );
 
     // Notify shader effect
     mShaderEffect->Connect();

@@ -32,8 +32,8 @@
 #include <dali/integration-api/resource-cache.h>
 #include <dali/integration-api/shader-data.h>
 
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/common/bitmap-upload.h>
 #include <dali/internal/event/text/font-impl.h>
@@ -458,7 +458,7 @@ private:
 // picked-up by the update thread in its main loop and executed on that in
 // submission order.
 
-inline void RequestLoadResourceMessage( EventToUpdate& eventToUpdate,
+inline void RequestLoadResourceMessage( EventThreadServices& eventThreadServices,
                                         ResourceManager& manager,
                                         ResourceId id,
                                         const ResourceTypePath& typePath,
@@ -467,13 +467,13 @@ inline void RequestLoadResourceMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue3< ResourceManager, ResourceId, ResourceTypePath, Integration::LoadResourcePriority > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleLoadResourceRequest, id, typePath, priority );
 }
 
-inline void RequestDecodeResourceMessage( EventToUpdate& eventToUpdate,
+inline void RequestDecodeResourceMessage( EventThreadServices& eventThreadServices,
                                           ResourceManager& manager,
                                           const ResourceId id,
                                           /// We use typePath instead of the raw type for ownership and to enable copying of a concrete type.
@@ -484,13 +484,13 @@ inline void RequestDecodeResourceMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue4< ResourceManager, ResourceId, ResourceTypePath, RequestBufferPtr, Integration::LoadResourcePriority > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleDecodeResourceRequest, id, typePath, buffer, priority );
 }
 
-inline void RequestAddBitmapImageMessage( EventToUpdate& eventToUpdate,
+inline void RequestAddBitmapImageMessage( EventThreadServices& eventThreadServices,
                                           ResourceManager& manager,
                                           ResourceId id,
                                           Integration::Bitmap* resourceData )
@@ -498,13 +498,13 @@ inline void RequestAddBitmapImageMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, Integration::BitmapPtr > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAddBitmapImageRequest, id, resourceData );
 }
 
-inline void RequestAddNativeImageMessage( EventToUpdate& eventToUpdate,
+inline void RequestAddNativeImageMessage( EventThreadServices& eventThreadServices,
                                           ResourceManager& manager,
                                           ResourceId id,
                                           NativeImageInterfacePtr resourceData )
@@ -512,13 +512,13 @@ inline void RequestAddNativeImageMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, NativeImageInterfacePtr > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAddNativeImageRequest, id, resourceData );
 }
 
-inline void RequestAddFrameBufferImageMessage( EventToUpdate& eventToUpdate,
+inline void RequestAddFrameBufferImageMessage( EventThreadServices& eventThreadServices,
                                                ResourceManager& manager,
                                                ResourceId id,
                                                unsigned int width,
@@ -528,13 +528,13 @@ inline void RequestAddFrameBufferImageMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue4< ResourceManager, ResourceId, unsigned int, unsigned int, Pixel::Format > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAddFrameBufferImageRequest, id, width, height, pixelFormat );
 }
 
-inline void RequestAddFrameBufferImageMessage( EventToUpdate& eventToUpdate,
+inline void RequestAddFrameBufferImageMessage( EventThreadServices& eventThreadServices,
                                                ResourceManager& manager,
                                                ResourceId id,
                                                NativeImageInterfacePtr resourceData )
@@ -542,43 +542,43 @@ inline void RequestAddFrameBufferImageMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, NativeImageInterfacePtr > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAddFrameBufferImageRequest, id, resourceData );
 }
 
-inline void RequestAllocateTextureMessage(EventToUpdate& eventToUpdate,
-                                               ResourceManager& manager,
-                                               ResourceId id,
-                                               unsigned int width,
-                                               unsigned int height,
-                                               Pixel::Format pixelFormat)
+inline void RequestAllocateTextureMessage( EventThreadServices& eventThreadServices,
+                                           ResourceManager& manager,
+                                           ResourceId id,
+                                           unsigned int width,
+                                           unsigned int height,
+                                           Pixel::Format pixelFormat)
 {
   typedef MessageValue4< ResourceManager, ResourceId, unsigned int, unsigned int, Pixel::Format > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAllocateTextureRequest, id, width, height, pixelFormat );
 }
 
-inline void RequestUpdateTextureMessage(EventToUpdate& eventToUpdate,
-                                               ResourceManager& manager,
-                                               ResourceId id,
-                                               BitmapUploadArray uploadArray )
+inline void RequestUpdateTextureMessage( EventThreadServices& eventThreadServices,
+                                         ResourceManager& manager,
+                                         ResourceId id,
+                                         BitmapUploadArray uploadArray )
 {
   typedef MessageValue2< ResourceManager, ResourceId, BitmapUploadArray > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUpdateTextureRequest, id, uploadArray );
 }
 
-inline void RequestAllocateMeshMessage( EventToUpdate& eventToUpdate,
+inline void RequestAllocateMeshMessage( EventThreadServices& eventThreadServices,
                                         ResourceManager& manager,
                                         ResourceId id,
                                         OwnerPointer<MeshData>& meshData )
@@ -586,13 +586,13 @@ inline void RequestAllocateMeshMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, OwnerPointer<MeshData> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAllocateMeshRequest, id, meshData.Release() );
 }
 
-inline void RequestAllocateFontMessage( EventToUpdate& eventToUpdate,
+inline void RequestAllocateFontMessage( EventThreadServices& eventThreadServices,
                                         ResourceManager& manager,
                                         ResourceId id,
                                         const std::string& familyNameAndStyle)
@@ -600,13 +600,13 @@ inline void RequestAllocateFontMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, std::string > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAllocateFontRequest, id, familyNameAndStyle );
 }
 
-inline void RequestLoadShaderMessage( EventToUpdate& eventToUpdate,
+inline void RequestLoadShaderMessage( EventThreadServices& eventThreadServices,
                                       ResourceManager& manager,
                                       ResourceId id,
                                       const ResourceTypePath& typePath )
@@ -614,13 +614,13 @@ inline void RequestLoadShaderMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, ResourceTypePath > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleLoadShaderRequest, id, typePath );
 }
 
-inline void RequestUpdateBitmapAreaMessage( EventToUpdate& eventToUpdate,
+inline void RequestUpdateBitmapAreaMessage( EventThreadServices& eventThreadServices,
                                             ResourceManager& manager,
                                             ResourceId id,
                                             const Dali::RectArea& area )
@@ -628,13 +628,13 @@ inline void RequestUpdateBitmapAreaMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, Dali::RectArea > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUpdateBitmapAreaRequest, id, area );
 }
 
-inline void RequestUploadBitmapMessage( EventToUpdate& eventToUpdate,
+inline void RequestUploadBitmapMessage( EventThreadServices& eventThreadServices,
                                         ResourceManager& manager,
                                         ResourceId destId,
                                         Integration::BitmapPtr bitmap,
@@ -644,13 +644,13 @@ inline void RequestUploadBitmapMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue4< ResourceManager, ResourceId, Integration::BitmapPtr , std::size_t, std::size_t > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUploadBitmapRequest, destId, bitmap, xOffset, yOffset );
 }
 
-inline void RequestUploadBitmapMessage( EventToUpdate& eventToUpdate,
+inline void RequestUploadBitmapMessage( EventThreadServices& eventThreadServices,
                                         ResourceManager& manager,
                                         ResourceId destId,
                                         ResourceId srcId,
@@ -660,13 +660,13 @@ inline void RequestUploadBitmapMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue4< ResourceManager, ResourceId, ResourceId, std::size_t, std::size_t > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleUploadBitmapRequest, destId, srcId, xOffset, yOffset );
 }
 
-inline void RequestUpdateMeshMessage( EventToUpdate& eventToUpdate,
+inline void RequestUpdateMeshMessage( EventThreadServices& eventThreadServices,
                                       ResourceManager& manager,
                                       ResourceId id,
                                       const Dali::MeshData& meshData,
@@ -674,7 +674,7 @@ inline void RequestUpdateMeshMessage( EventToUpdate& eventToUpdate,
 {
   typedef MessageDoubleBuffered2< ResourceManager, ResourceId, OwnerPointer< MeshData > > LocalType;
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   MeshData* internalMeshData = new MeshData( meshData, discardable, false );
 
@@ -682,7 +682,7 @@ inline void RequestUpdateMeshMessage( EventToUpdate& eventToUpdate,
   new (slot) LocalType( &manager, &ResourceManager::HandleUpdateMeshRequest, id, internalMeshData );
 }
 
-inline void RequestReloadResourceMessage( EventToUpdate& eventToUpdate,
+inline void RequestReloadResourceMessage( EventThreadServices& eventThreadServices,
                                           ResourceManager& manager,
                                           ResourceId id,
                                           const ResourceTypePath& typePath,
@@ -692,13 +692,13 @@ inline void RequestReloadResourceMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue4< ResourceManager, ResourceId, ResourceTypePath, Integration::LoadResourcePriority, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ), false );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ), false );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleReloadResourceRequest, id, typePath, priority, resetFinishedStatus );
 }
 
-inline void RequestSaveResourceMessage( EventToUpdate& eventToUpdate,
+inline void RequestSaveResourceMessage( EventThreadServices& eventThreadServices,
                                         ResourceManager& manager,
                                         ResourceId id,
                                         const ResourceTypePath& typePath )
@@ -706,13 +706,13 @@ inline void RequestSaveResourceMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, ResourceTypePath > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleSaveResourceRequest, id, typePath );
 }
 
-inline void RequestDiscardResourceMessage( EventToUpdate& eventToUpdate,
+inline void RequestDiscardResourceMessage( EventThreadServices& eventThreadServices,
                                            ResourceManager& manager,
                                            ResourceId id,
                                            Integration::ResourceTypeId typeId )
@@ -720,13 +720,13 @@ inline void RequestDiscardResourceMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue2< ResourceManager, ResourceId, Integration::ResourceTypeId > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleDiscardResourceRequest, id, typeId );
 }
 
-inline void RequestAtlasUpdateMessage( EventToUpdate& eventToUpdate,
+inline void RequestAtlasUpdateMessage( EventThreadServices& eventThreadServices,
                                        ResourceManager& manager,
                                        ResourceId id,
                                        ResourceId atlasId,
@@ -735,7 +735,7 @@ inline void RequestAtlasUpdateMessage( EventToUpdate& eventToUpdate,
   typedef MessageValue3< ResourceManager, ResourceId, ResourceId, Integration::LoadStatus > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAtlasUpdateRequest, id, atlasId, loadStatus );

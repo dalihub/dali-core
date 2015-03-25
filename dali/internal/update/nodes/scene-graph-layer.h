@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/layer.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment-declarations.h>
 
@@ -209,12 +209,12 @@ private:
  * @param[in] layer The layer
  * @param[in] function The new sort-function.
  */
-inline void SetSortFunctionMessage( EventToUpdate& eventToUpdate, const Layer& layer, Dali::Layer::SortFunctionType function )
+inline void SetSortFunctionMessage( EventThreadServices& eventThreadServices, const Layer& layer, Dali::Layer::SortFunctionType function )
 {
   typedef MessageValue1< Layer, Dali::Layer::SortFunctionType > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &layer, &Layer::SetSortFunction, function );
@@ -225,12 +225,12 @@ inline void SetSortFunctionMessage( EventToUpdate& eventToUpdate, const Layer& l
  * @param[in] layer The layer
  * @param[in] enabled True if clipping is enabled
  */
-inline void SetClippingMessage( EventToUpdate& eventToUpdate, const Layer& layer, bool enabled )
+inline void SetClippingMessage( EventThreadServices& eventThreadServices, const Layer& layer, bool enabled )
 {
   typedef MessageValue1< Layer, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &layer, &Layer::SetClipping, enabled );
@@ -241,12 +241,12 @@ inline void SetClippingMessage( EventToUpdate& eventToUpdate, const Layer& layer
  * @param[in] layer The layer
  * @param[in] clippingbox The clipping box
  */
-inline void SetClippingBoxMessage( EventToUpdate& eventToUpdate, const Layer& layer, const Dali::ClippingBox& clippingbox )
+inline void SetClippingBoxMessage( EventThreadServices& eventThreadServices, const Layer& layer, const Dali::ClippingBox& clippingbox )
 {
   typedef MessageValue1< Layer, Dali::ClippingBox > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &layer, &Layer::SetClippingBox, clippingbox );
@@ -260,12 +260,12 @@ inline void SetClippingBoxMessage( EventToUpdate& eventToUpdate, const Layer& la
  * @param[in] layer The layer
  * @param[in] disable \e true disables depth test. \e false sets the default behaviour.
  */
-inline void SetDepthTestDisabledMessage( EventToUpdate& eventToUpdate, const Layer& layer, bool disable )
+inline void SetDepthTestDisabledMessage( EventThreadServices& eventThreadServices, const Layer& layer, bool disable )
 {
   typedef MessageValue1< Layer, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &layer, &Layer::SetDepthTestDisabled, disable );

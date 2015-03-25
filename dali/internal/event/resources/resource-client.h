@@ -34,7 +34,6 @@
 
 namespace Dali
 {
-
 class NativeImage;
 
 namespace Integration
@@ -45,14 +44,11 @@ class GlyphSet;
 
 namespace Internal
 {
+class EventThreadServices;
 class ResourceManager;
 class NotificationManager;
 class GlyphLoadObserver;
 
-namespace SceneGraph
-{
-class UpdateManager;
-}
 
 typedef Integration::ResourceId ResourceId;
 
@@ -78,10 +74,11 @@ public:
    * Create a resource client.
    * There should exactly one of these objects per Dali Core.
    * @param[in] resourceManager The resource manager
-   * @param[in] updateManager The update manager
+   * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
+   * @param[in] dataRetentionPolicy The data retention policy of the current application
    */
   ResourceClient( ResourceManager& resourceManager,
-                  SceneGraph::UpdateManager& updateManager,
+                  EventThreadServices& eventThreadServices,
                   ResourcePolicy::DataRetention dataRetentionPolicy );
 
   /**
@@ -367,7 +364,7 @@ public: // Message methods
 
 private:
   ResourceManager& mResourceManager;          ///< The resource manager
-  SceneGraph::UpdateManager& mUpdateManager;  ///< update manager
+  EventThreadServices& mEventThreadServices;        ///< Interface to send messages through
 
 private:
   struct Impl;

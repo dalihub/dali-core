@@ -19,9 +19,10 @@
 #include <dali/internal/event/actor-attachments/image-attachment-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
 
 namespace Dali
 {
@@ -29,13 +30,13 @@ namespace Dali
 namespace Internal
 {
 
-ImageAttachmentPtr ImageAttachment::New( Stage& stage, const SceneGraph::Node& parentNode )
+ImageAttachmentPtr ImageAttachment::New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode )
 {
-  ImageAttachmentPtr attachment( new ImageAttachment( stage ) );
+  ImageAttachmentPtr attachment( new ImageAttachment( eventThreadServices ) );
 
   // Transfer object ownership of scene-object to message
   SceneGraph::ImageAttachment* sceneObject = CreateSceneObject();
-  AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( eventThreadServices.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;
@@ -43,8 +44,8 @@ ImageAttachmentPtr ImageAttachment::New( Stage& stage, const SceneGraph::Node& p
   return attachment;
 }
 
-ImageAttachment::ImageAttachment( Stage& stage )
-: RenderableAttachment(stage),
+ImageAttachment::ImageAttachment( EventThreadServices& eventThreadServices )
+: RenderableAttachment(eventThreadServices),
   mSceneObject(NULL),
   mPixelArea(0,0,0,0),
   mStyle(Dali::ImageActor::STYLE_QUAD),
@@ -71,7 +72,7 @@ void ImageAttachment::SetImage( ImagePtr& image )
     unsigned int resourceId = (image) ? image->GetResourceId() : 0u;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetTextureIdMessage( mStage->GetUpdateInterface(), *mSceneObject, resourceId );
+    SetTextureIdMessage( GetEventThreadServices(), *mSceneObject, resourceId );
   }
 }
 
@@ -90,7 +91,7 @@ void ImageAttachment::SetPixelArea(const PixelArea& pixelArea)
     mIsPixelAreaSet = true;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetPixelAreaMessage( mStage->GetUpdateInterface(), *mSceneObject, mPixelArea );
+    SetPixelAreaMessage( GetEventThreadServices(), *mSceneObject, mPixelArea );
   }
 }
 
@@ -100,7 +101,7 @@ void ImageAttachment::ClearPixelArea()
   mIsPixelAreaSet = false;
 
   // sceneObject is being used in a separate thread; queue a message to set
-  ClearPixelAreaMessage( mStage->GetUpdateInterface(), *mSceneObject );
+  ClearPixelAreaMessage( GetEventThreadServices(), *mSceneObject );
 }
 
 void ImageAttachment::SetStyle(Style style)
@@ -109,7 +110,7 @@ void ImageAttachment::SetStyle(Style style)
   mStyle = style;
 
   // sceneObject is being used in a separate thread; queue a message to set
-  SetStyleMessage( mStage->GetUpdateInterface(), *mSceneObject, style );
+  SetStyleMessage( GetEventThreadServices(), *mSceneObject, style );
 }
 
 void ImageAttachment::SetNinePatchBorder(const Vector4& border, bool inPixels)
@@ -119,7 +120,7 @@ void ImageAttachment::SetNinePatchBorder(const Vector4& border, bool inPixels)
   mBorderInPixels = inPixels;
 
   // sceneObject is being used in a separate thread; queue a message to set
-  SetNinePatchBorderMessage( mStage->GetUpdateInterface(), *mSceneObject, border, inPixels );
+  SetNinePatchBorderMessage( GetEventThreadServices(), *mSceneObject, border, inPixels );
 }
 
 SceneGraph::ImageAttachment* ImageAttachment::CreateSceneObject()
@@ -136,14 +137,14 @@ void ImageAttachment::OnStageConnection2()
   unsigned int resourceId = (image) ? image->GetResourceId() : 0u;
   if ( 0u != resourceId )
   {
-    SetTextureIdMessage( mStage->GetUpdateInterface(), *mSceneObject, resourceId );
+    SetTextureIdMessage( GetEventThreadServices(), *mSceneObject, resourceId );
   }
 }
 
 void ImageAttachment::OnStageDisconnection2()
 {
   // Remove resource ID when scene-graph attachment is disconnected
-  SetTextureIdMessage( mStage->GetUpdateInterface(), *mSceneObject, 0u );
+  SetTextureIdMessage( GetEventThreadServices(), *mSceneObject, 0u );
 
   mImageConnectable.OnStageDisconnect();
 }

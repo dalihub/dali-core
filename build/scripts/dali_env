@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+use Config;
 use Cwd;
 use Cwd 'abs_path';
 use File::Basename;
@@ -49,6 +50,34 @@ my @system_packages = (
     "lcov",
     "libcurl4-gnutls-dev"
 );
+
+# Some packages like require building from source
+my @source_pkgs = (
+
+    {"name" => "v8",
+     "force-rebuild" => 0,
+     "use_depot_tools" => 1,
+     "repo" => "https://chromium.googlesource.com/v8/v8.git",
+     "depot_tools_repo" => "https://chromium.googlesource.com/chromium/tools/depot_tools.git",
+
+     # original version used with DALi is 3.25.19. 3.32.7 is the latest we can use before
+     # upgrading DALi to use  c++0x or c++11
+     "version" => " 3.32.7", "make" => "make -j8 library=shared", "build-mode" =>"debug" }
+);
+
+### Detect any http proxy, part of v8 installation requires this information
+my $http_proxy_port;
+my $http_proxy_ip;
+
+if( exists $ENV{http_proxy} )
+{
+  # string  split into 3 items  http, //ip, port
+  my @http_proxy_info =  split( /:/,$ENV{http_proxy}, );
+
+  $http_proxy_ip =  @http_proxy_info[1];
+  $http_proxy_ip =~ s/[\/]//g;;  # remove forward slashes
+  $http_proxy_port =  @http_proxy_info[2];
+}
 
 # Make best guess as to where this program was run from (note, it is
 # always possible to override the location of $0 by the calling
@@ -190,6 +219,20 @@ sub check_system_packages
     }
 }
 
+sub check_source_packages
+{
+    my $pkgref;
+
+    foreach $pkgref (@source_pkgs)
+    {
+        my $pkg = $pkgref->{"name"};
+        if($pkg eq "v8")
+        {
+            install_v8( $pkgref );
+        }
+    }
+}
+
 ################################################################################
 
 sub create_link
@@ -205,6 +248,270 @@ sub create_link
        system("sudo ln -s $link.0 $link");
     }
 }
+
+################################################################################
+# Helper to run and print out the command being run and quit if it fails
+#
+sub run_command
+{
+  my $command = $_[0];
+  my $ret;
+  print("Running: $command\n");
+  $ret = system("$command");
+  if($ret >> 8) { die "$command failed \n"; }
+}
+
+################################################################################
+# later versions of v8 (post mid 2014) require googles depot_tools to build.
+#
+sub install_google_depot_tools
+{
+
+####
+# clone the depo_tools into the source directory and set the path up
+####
+    my $v8 = $_[0];
+
+    my $depot_tools_directory = $src_path . "/depot_tools";
+    my $depot_tools_repo = $v8->{"depot_tools_repo"};
+
+    # clear the directory if exists
+    rmtree( $depot_tools_directory );
+
+    # clone the depot tools
+    run_command( "git clone " . $depot_tools_repo. " " . $depot_tools_directory );
+
+    # add it the the path
+    $ENV{PATH} = "$ENV{PATH}:$depot_tools_directory";
+
+    # need to setup a config file for the proxy
+    create_boto_config_file( $v8 , $depot_tools_directory );
+
+    # set the config location as an environment variable ( used by scripts depot_tools)
+    $ENV{NO_AUTH_BOTO_CONFIG}="$src_path/depot_tools/.boto";
+
+    # change to depot tools directory
+    chdir( $depot_tools_directory );
+
+    # fetch v8
+    run_command("fetch --nohooks v8");
+
+}
+
+
+################################################################################
+# later versions of v8 use boto, which currently requires having proxy manually set
+#
+sub create_boto_config_file
+{
+    my $v8 = $_[0];
+    my $depot_tools_directory = $_[1];
+    print(" depot_tools directory = $depot_tools_directory\n");
+
+    print("Configuring boto with http proxy IP = ". $http_proxy_ip . ", Port = " . $http_proxy_port . "\n");
+
+# Create the proxy info for the boto file
+my $fileContents = <<"END";
+[Boto]
+debug = 0
+num_retries = 2
+
+proxy = $http_proxy_ip
+proxy_port = $http_proxy_port
+END
+      # Place the config file in the depot tools folder
+    my $filename = $depot_tools_directory . "/" . ".boto";
+    print("Creating Boto config file with proxy settings to file ". $filename . "\n");
+    my $fh;
+    open( $fh, '>',  $filename );
+    print { $fh } $fileContents;
+    close( $fh );
+
+    # export the environment variable
+    run_command("gclient config https://gclient.googlecode.com/svn/trunk/gclient");
+
+    run_command("gclient runhooks");
+
+
+
+}
+################################################################################
+# We need a specific version of V8 to work with DALi
+# - Check a txt file in dali-env to see if v8 needs upgrading (checks gcc version too)
+# - Clones the source
+# - builds dependencies (v8 automatically clones it's GYP build system)
+# - Builds it
+# - Create a package file
+# It is cloned, then built from source, we create a package file for it, then
+# it's copied into dali-env
+sub install_v8
+{
+    my $v8 = $_[0];
+    my $ret;
+    my $v8Version = $v8->{"version"} ;
+    print( "Checking if V8 ". $v8Version. " is installed \n");
+
+####
+# Check currently installed version
+# We create a text file with v8 and gcc version in the filename to compare with
+# Version file is stored as "v8_2.3.4_installed_built_with_gcc_4_8_3.txt"
+####
+    # get the gcc version, so if the compiler is updated v8 is re-built
+    # note: v8 requires gcc version GCC >= 4.6
+    my $gccVersion = `gcc --version | grep ^gcc | sed 's/^.* //g'`;
+    chomp( $gccVersion );
+    my $versionTextFile = $src_path . "/v8_" . $v8Version. "_" . $v8->{"build-mode"} . "_installed_built_with_gcc_". $gccVersion .".txt";
+
+    # use stat to see if file exists
+    my @install_stats = stat $versionTextFile;
+    if( (scalar(@install_stats)) && $v8->{"force-rebuild"} != 1 )
+    {
+      print("Correct V8 version installed\n");
+      return;
+    }
+    else
+    {
+      # delete older versions of the version file first ( otherwise when downgrading it thinks version is still installed)
+      system( "rm " . $src_path . "/v8_*.txt  >/dev/null 2>&1");
+    }
+
+
+####
+# Clone the v8 source repository and checkout the version we want
+####
+    # Need to clone it from repo
+    my $v8_source_directory;
+
+
+
+    # newer version of v8 use depot_tools with gclient, git cloned builds do not work
+    if( $v8->{"use_depot_tools"} == 1)
+    {
+      install_google_depot_tools( $v8 );
+
+      # v8 is checkout out under depot_tools path
+      $v8_source_directory = $src_path . "/depot_tools/v8";
+    }
+    else
+    {
+      $v8_source_directory = $src_path . "/v8";
+
+      # delete the old v8 source directpry if exists
+      rmtree( $v8_source_directory );
+
+      # clone the repository
+      run_command( "git clone " . $v8->{"repo"} . " " . $v8_source_directory );
+    }
+
+    # change to the source directoy for the checkout
+    chdir( $v8_source_directory );
+
+    # checkout the version DALi is compatible with
+    run_command( "git checkout ". $v8Version );
+
+####
+# Run make dependencies then make for the specific target
+####
+    if( $v8->{"use_depot_tools"} == 1)
+    {
+      run_command("gclient sync");
+    }
+    else
+    {
+      run_command("make dependencies");
+    }
+
+    # assemble the make command
+    my $makeCommand = $v8->{"make"};
+
+    # need to append architecture and build mode, e.g. x64.debug
+    my $buildTarget;
+    if( $Config{use64bitint} ) {
+       print("Building 64 bit version of V8\n");
+       $buildTarget= "x64." . $v8->{"build-mode"}
+    }
+    else{
+      print("Building 32 bit version of V8\n");
+       $buildTarget= "ia32." . $v8->{"build-mode"}
+    }
+    $makeCommand .= " " . $buildTarget;
+    print("Running: $makeCommand\n");
+    run_command( $makeCommand );
+
+####
+# Manually install the library / header files
+####
+
+    # Need to manually install (make install not available on v8 )
+    my $libSourceDir = "$v8_source_directory/out/$buildTarget/lib.target/";
+    my $headerSourceDir = "$v8_source_directory/include/";
+
+    my $libDestinationDir = $install_path . "/lib/";
+    my $headerDestinationDir = $install_path . "/include/v8/";
+
+    # delete any current v8 libs
+    system( "rm " . $libDestinationDir . "libv8*");
+    system( "rm " . $libDestinationDir . "libicu*");
+
+
+    # copy the library and header files
+    dircopy( $libSourceDir, $libDestinationDir);
+    dircopy( $headerSourceDir, $headerDestinationDir);
+
+
+    # Copy libv8.so to libv8.so.version (  e.g. libv8.so.1.2.4)
+    my $v8SoFile = $libDestinationDir . "libv8.so";
+    my $v8SoVersionFile = $libDestinationDir . "libv8.so." . $v8Version;
+    move( $v8SoFile, $v8SoVersionFile );
+
+    # symlink the libv8.so.1.2.3 to libv8.so
+    symlink( $v8SoVersionFile, $v8SoFile );
+    print( "source dir = " . $libSourceDir . " dest dir ". $libDestinationDir . " \n" );
+
+
+####
+# Create the package file in,
+# we keep the library files and header files in v8 sub-directories
+####
+my $fileContents = <<"END";
+prefix=$install_path
+exec_prefix=\${prefix}
+apiversion=$v8Version
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include/v8
+
+Name: v8 JavaScript engine - runtime library
+Description: V8 is Google's open source JavaScript engine.
+Version: \${apiversion}
+Libs: -L\${libdir} -lv8 -licuuc -licui18n
+Cflags: -I\${includedir}
+END
+
+  my $filename = $install_path . "/lib/pkgconfig/" . "v8.pc";
+  print("writing to file ". $filename . "\n");
+  my $fh;
+  if( open( $fh, '>',  $filename ) )
+  {
+    print { $fh } $fileContents;
+    close( $fh );
+  }
+  else
+  {
+    die "failed to create " . $filename ."\n";
+  }
+
+  print("Installed V8 " .$v8Version . " OK\n");
+
+#####
+#
+####
+      my $versionFile;
+      open( $versionFile, '>',  $versionTextFile );
+      close( $versionFile );
+      print("Installing V8 version $v8Version\n");
+
+}
+
 
 ################################################################################
 #                                       MAIN
@@ -230,6 +537,10 @@ if($opt_create)
     create_link();
 
     create_env();
+
+    # do this after source directory structure created in create_env
+    check_source_packages();
+
     create_setenv();
 }
 elsif($opt_setenv)

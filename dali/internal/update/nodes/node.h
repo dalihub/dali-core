@@ -26,7 +26,6 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-vector3.h>
@@ -1148,122 +1147,122 @@ protected:
 
 // Messages for Node
 
-inline void SetInheritOrientationMessage( EventToUpdate& eventToUpdate, const Node& node, bool inherit )
+inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetInheritOrientation, inherit );
 }
 
-inline void SetSizeModeMessage( EventToUpdate& eventToUpdate, const Node& node, SizeMode mode )
+inline void SetSizeModeMessage( EventThreadServices& eventThreadServices, const Node& node, SizeMode mode )
 {
   typedef MessageValue1< Node, SizeMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetSizeMode, mode );
 }
 
-inline void SetSizeModeFactorMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& factor )
+inline void SetSizeModeFactorMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& factor )
 {
   typedef MessageValue1< Node, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetSizeModeFactor, factor );
 }
 
-inline void SetInitialVolumeMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& initialVolume )
+inline void SetInitialVolumeMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& initialVolume )
 {
   typedef MessageValue1< Node, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetInitialVolume, initialVolume );
 }
 
-inline void SetTransmitGeometryScalingMessage( EventToUpdate& eventToUpdate, const Node& node, bool transmitGeometryScaling )
+inline void SetTransmitGeometryScalingMessage( EventThreadServices& eventThreadServices, const Node& node, bool transmitGeometryScaling )
 {
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetTransmitGeometryScaling, transmitGeometryScaling );
 }
 
-inline void SetParentOriginMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& origin )
+inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& origin )
 {
   typedef MessageValue1< Node, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetParentOrigin, origin );
 }
 
-inline void SetAnchorPointMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& anchor )
+inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& anchor )
 {
   typedef MessageValue1< Node, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetAnchorPoint, anchor );
 }
 
-inline void SetPositionInheritanceModeMessage( EventToUpdate& eventToUpdate, const Node& node, PositionInheritanceMode mode )
+inline void SetPositionInheritanceModeMessage( EventThreadServices& eventThreadServices, const Node& node, PositionInheritanceMode mode )
 {
   typedef MessageValue1< Node, PositionInheritanceMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetPositionInheritanceMode, mode );
 }
 
-inline void SetInheritScaleMessage( EventToUpdate& eventToUpdate, const Node& node, bool inherit )
+inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetInheritScale, inherit );
 }
 
-inline void SetColorModeMessage( EventToUpdate& eventToUpdate, const Node& node, ColorMode colorMode )
+inline void SetColorModeMessage( EventThreadServices& eventThreadServices, const Node& node, ColorMode colorMode )
 {
   typedef MessageValue1< Node, ColorMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetColorMode, colorMode );
 }
 
-inline void SetDrawModeMessage( EventToUpdate& eventToUpdate, const Node& node, DrawMode::Type drawMode )
+inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const Node& node, DrawMode::Type drawMode )
 {
   typedef MessageValue1< Node, DrawMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetDrawMode, drawMode );

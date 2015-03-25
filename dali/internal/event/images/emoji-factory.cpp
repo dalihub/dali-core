@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <sstream>
-#include <climits>
+#include <limits>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/platform-abstraction.h>

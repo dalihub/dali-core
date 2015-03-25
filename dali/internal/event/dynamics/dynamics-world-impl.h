@@ -79,6 +79,11 @@ private:
   DynamicsWorld& operator=(const DynamicsWorld&);
 
 public:
+  /**
+   * Singleton getter
+   * @return A pointer to the dynamics world if it is installed
+   */
+  static DynamicsWorldPtr Get();
 
   /**
    * Connects a callback function with the object's signals.

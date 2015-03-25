@@ -34,7 +34,7 @@ class Image;
 namespace Internal
 {
 class Material;
-class EventToUpdate;
+class EventThreadServices;
 
 typedef std::vector<Dali::Material>       MaterialContainer;
 typedef MaterialContainer::iterator       MaterialIter;
@@ -118,7 +118,10 @@ public:
 
   static Material* New(const std::string& name);
 
-  Material(const std::string& name);
+  /**
+   * Constructor
+   */
+  Material(EventThreadServices& eventThreadServices, const std::string& name);
 
 private:
   /**
@@ -384,10 +387,9 @@ private:
   std::string        mNormalMapName;     ///< Normap map file name
 
 private:
-  SceneGraph::Material*       mSceneObject;               ///< The associated scene graph object
-  EventToUpdate*              mEventToUpdate;             ///< Used to send messages to update-thread
-  SceneGraph::UpdateManager*  mUpdateManager;             ///< The Update manager
-  unsigned int                mConnectionCount;           ///< Number of on-stage meshes connected to this material
+  EventThreadServices& mEventThreadServices; ///< Used to send messages to update-thread
+  SceneGraph::Material* mSceneObject; ///< The associated scene graph object
+  unsigned int mConnectionCount; ///< Number of on-stage meshes connected to this material
 }; // class Material
 
 } // namespace Internal

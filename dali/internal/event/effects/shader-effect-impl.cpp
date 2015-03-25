@@ -204,17 +204,16 @@ std::string GetShader(const std::string& field, const Property::Value& property)
 
 ShaderEffectPtr ShaderEffect::New( Dali::ShaderEffect::GeometryHints hints )
 {
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  UpdateManager& updateManager = tls.GetUpdateManager();
+  Stage* stage = Stage::GetCurrent();
 
-  ShaderEffectPtr shaderEffect( new ShaderEffect( updateManager, hints ) );
+  ShaderEffectPtr shaderEffect( new ShaderEffect( *stage, hints ) );
   shaderEffect->RegisterObject();
 
   return shaderEffect;
 }
 
-ShaderEffect::ShaderEffect( UpdateManager& updateManager, Dali::ShaderEffect::GeometryHints hints )
-: mUpdateManager( updateManager ),
+ShaderEffect::ShaderEffect( EventThreadServices& eventThreadServices, Dali::ShaderEffect::GeometryHints hints )
+: mEventThreadServices( eventThreadServices ),
   mConnectionCount (0),
   mGeometryHints( hints )
 {
@@ -222,7 +221,7 @@ ShaderEffect::ShaderEffect( UpdateManager& updateManager, Dali::ShaderEffect::Ge
   DALI_ASSERT_DEBUG( NULL != mSceneObject );
 
   // Transfer shader ownership to a scene message
-  AddShaderMessage( mUpdateManager, *mSceneObject );
+  AddShaderMessage( eventThreadServices.GetUpdateManager(), *mSceneObject );
 }
 
 ShaderEffect::~ShaderEffect()
@@ -233,7 +232,7 @@ ShaderEffect::~ShaderEffect()
     // Remove scene-object using a message to the UpdateManager
     if( mSceneObject )
     {
-      RemoveShaderMessage( mUpdateManager, *mSceneObject );
+      RemoveShaderMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject );
     }
     UnregisterObject();
   }
@@ -259,7 +258,7 @@ void ShaderEffect::SetEffectImage( Dali::Image image )
   if (!image)
   {
     // mSceneShader can be in a separate thread; queue a setter message
-    SetTextureIdMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, 0 );
+    SetTextureIdMessage( mEventThreadServices, *mSceneObject, 0 );
   }
   else
   {
@@ -269,7 +268,7 @@ void ShaderEffect::SetEffectImage( Dali::Image image )
       GetImplementation(mImage).Connect();
     }
     // mSceneShader can be in a separate thread; queue a setter message
-    SetTextureIdMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, GetImplementation(mImage).GetResourceId() );
+    SetTextureIdMessage( mEventThreadServices, *mSceneObject, GetImplementation(mImage).GetResourceId() );
   }
 }
 
@@ -296,7 +295,7 @@ void ShaderEffect::SetUniform( const std::string& name, Property::Value value, U
   if( uniformCoordinateType != mCoordinateTypes[ metaIndex ] )
   {
     mCoordinateTypes[ metaIndex ] = uniformCoordinateType;
-    SetCoordinateTypeMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, metaIndex, uniformCoordinateType );
+    SetCoordinateTypeMessage( mEventThreadServices, *mSceneObject, metaIndex, uniformCoordinateType );
   }
 }
 
@@ -358,7 +357,7 @@ void ShaderEffect::SendProgramMessage( GeometryType geometryType, ShaderSubTypes
   DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(geometryType %d subType:%d ticket.id:%d)\n", geometryType, subType, ticket->GetId() );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( mUpdateManager, *mSceneObject, geometryType, subType, ticket->GetId(), shaderHash, modifiesGeometry );
+  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, geometryType, subType, ticket->GetId(), shaderHash, modifiesGeometry );
 
   mTickets.push_back(ticket);       // add ticket to collection to keep it alive.
 }
@@ -372,7 +371,7 @@ void ShaderEffect::Connect()
     GetImplementation(mImage).Connect();
 
     // Image may have changed resource due to load/release policy. Ensure correct texture ID is set on scene graph object
-    SetTextureIdMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, GetImplementation(mImage).GetResourceId() );
+    SetTextureIdMessage( mEventThreadServices, *mSceneObject, GetImplementation(mImage).GetResourceId() );
   }
 }
 
@@ -462,7 +461,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
   {
     case Dali::ShaderEffect::Property::GRID_DENSITY:
     {
-      SetGridDensityMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, propertyValue.Get<float>() );
+      SetGridDensityMessage( mEventThreadServices, *mSceneObject, propertyValue.Get<float>() );
       break;
     }
 
@@ -559,7 +558,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
         DALI_ASSERT_ALWAYS(!"Geometry hint unknown" );
       }
 
-      SetHintsMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, hint );
+      SetHintsMessage( mEventThreadServices, *mSceneObject, hint );
 
       break;
     }
@@ -578,14 +577,14 @@ Property::Value ShaderEffect::GetDefaultProperty(Property::Index /*index*/) cons
   return Property::Value();
 }
 
-void ShaderEffect::NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
+void ShaderEffect::NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const
 {
   // Warning - the property is added to the Shader object in the Update thread and the meta-data is added in the Render thread (through a secondary message)
 
   // mSceneObject requires metadata for each custom property (uniform)
   UniformMeta* meta = UniformMeta::New( name, newProperty, Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );
   // mSceneObject is being used in a separate thread; queue a message to add the property
-  InstallUniformMetaMessage( mUpdateManager.GetEventToUpdate(), *mSceneObject, *meta ); // Message takes ownership
+  InstallUniformMetaMessage( mEventThreadServices, *mSceneObject, *meta ); // Message takes ownership
 }
 
 const SceneGraph::PropertyOwner* ShaderEffect::GetSceneObject() const
@@ -595,9 +594,9 @@ const SceneGraph::PropertyOwner* ShaderEffect::GetSceneObject() const
 
 const PropertyBase* ShaderEffect::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  CustomProperty* custom = FindCustomProperty( index );
-  DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
-  return custom->GetSceneGraphProperty();
+  PropertyMetadata* property = index >= PROPERTY_CUSTOM_START_INDEX ? static_cast<PropertyMetadata*>(FindCustomProperty( index )) : static_cast<PropertyMetadata*>(FindAnimatableProperty( index ));
+  DALI_ASSERT_ALWAYS( property && "Property index is invalid" );
+  return property->GetSceneGraphProperty();
 }
 
 const PropertyInputImpl* ShaderEffect::GetSceneObjectInputProperty( Property::Index index ) const
