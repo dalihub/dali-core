@@ -2991,7 +2991,13 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
     return property;
   }
 
-  if ( static_cast<unsigned int>(index) >= DEFAULT_PROPERTY_MAX_COUNT )
+  if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
+  {
+    AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
+    DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
+    property = animatable->GetSceneGraphProperty();
+  }
+  else if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
     CustomPropertyMetadata* custom = FindCustomProperty( index );
     DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
@@ -3096,7 +3102,13 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
     return property;
   }
 
-  if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
+  if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
+  {
+    AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
+    DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
+    property = animatable->GetSceneGraphProperty();
+  }
+  else if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
     CustomPropertyMetadata* custom = FindCustomProperty( index );
     DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
