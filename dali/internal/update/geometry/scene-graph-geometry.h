@@ -23,6 +23,8 @@
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-boolean.h>
+#include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/update/common/scene-graph-connection-observers.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
 #include <dali/internal/render/data-providers/geometry-data-provider.h>
 
@@ -32,12 +34,13 @@ namespace Internal
 {
 namespace SceneGraph
 {
+class SceneController;
 
 /**
  * This scene graph object is a property owner. It describes a geometry using a
  * number of PropertyBuffers acting as Vertex buffers.
  */
-class Geometry : public PropertyOwner, public GeometryDataProvider
+class Geometry : public PropertyOwner, public GeometryDataProvider, public UniformMap::Observer
 {
 public:
 
@@ -49,7 +52,7 @@ public:
   /**
    * Destructor
    */
-  ~Geometry();
+  virtual ~Geometry();
 
   /**
    * Add a property buffer to be used as a vertex buffer
@@ -80,6 +83,37 @@ public:
    */
   void SetGeometryType( BufferIndex bufferIndex, GeometryType geometryType );
 
+  /**
+   * Connect the object to the scene graph
+   *
+   * @param[in] sceneController The scene controller - used for sending messages to render thread
+   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   */
+  void ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+
+  /**
+   * Disconnect the object from the scene graph
+   * @param[in] sceneController The scene controller - used for sending messages to render thread
+   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   */
+  void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+
+  /**
+   * @copydoc ConnectionObservers::AddObserver
+   */
+  void AddConnectionObserver(ConnectionObservers::Observer& observer);
+
+  /**
+   * @copydoc ConnectionObservers::RemoveObserver
+   */
+  void RemoveConnectionObserver(ConnectionObservers::Observer& observer);
+
+public: // UniformMap::Observer
+  /**
+   * @copydoc UniformMap::Observer::UniformMappingsChanged
+   */
+  virtual void UniformMappingsChanged( const UniformMap& mappings );
+
 public: // GeometryDataProvider
   /**
    * Get the vertex buffers of the geometry
@@ -98,7 +132,7 @@ public: // GeometryDataProvider
    */
   virtual GeometryType GetGeometryType( BufferIndex bufferIndex ) const;
 
-    /**
+  /**
    * Returns true if this geometry requires depth testing, e.g. if it is
    * a set of vertices with z != 0
    */
@@ -107,15 +141,12 @@ public: // GeometryDataProvider
 private:
   VertexBuffers mVertexBuffers; ///< The vertex buffers
   OwnerPointer<PropertyBuffer> mIndexBuffer;  ///< The index buffer if required
+  ConnectionObservers mConnectionObservers;
 
-private: // Properties
-  //DoubleBufferedProperty<Vector3>       mCenter;
-  //DoubleBufferedProperty<Vector3>       mHalfExtents;
-  //DoubleBufferedProperty<GeometryType>  mGeometryType;   ///< The type of geometry (tris/lines etc)
-  //DoubleBufferedProperty<bool>          mRequiresDepthTest;
-
+public: // Properties
   AnimatableProperty<Vector3>  mCenter;
   AnimatableProperty<Vector3>  mHalfExtents;
+
   AnimatableProperty<int>      mGeometryType;   ///< The type of geometry (tris/lines etc)
   PropertyBoolean              mRequiresDepthTest;
 };

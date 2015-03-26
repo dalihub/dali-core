@@ -24,8 +24,10 @@
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
+#include <dali/internal/update/common/scene-graph-property-buffer.h>
 #include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/effects/scene-graph-material.h>
+#include <dali/internal/update/effects/scene-graph-sampler.h>
 
 namespace Dali
 {
@@ -42,6 +44,7 @@ class Node;
 class RenderQueue;
 class Shader;
 
+
 /**
  * DiscardQueue is used to cleanup nodes & resources when no longer in use.
  * Unwanted objects are added here during UpdateManager::Update().
@@ -56,6 +59,8 @@ public:
   typedef OwnerContainer< Shader* > ShaderQueue;
   typedef OwnerContainer< Geometry* > GeometryQueue;
   typedef OwnerContainer< Material* > MaterialQueue;
+  typedef OwnerContainer< Sampler* > SamplerQueue;
+  typedef OwnerContainer< PropertyBuffer* > PropertyBufferQueue;
 
   /**
    * Create a new DiscardQueue.
@@ -96,7 +101,19 @@ public:
    * Adds an unwanted material to the discard queue.
    * A message will be sent to clean up GL resources in the next Render.
    */
+  void Add( BufferIndex updateBufferIndex, PropertyBuffer* material );
+
+  /**
+   * Adds an unwanted material to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render.
+   */
   void Add( BufferIndex updateBufferIndex, Material* material );
+
+  /**
+   * Adds an unwanted material to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render.
+   */
+  void Add( BufferIndex updateBufferIndex, Sampler* material );
 
   /**
    * Adds an unwanted shader to the discard queue.
@@ -132,6 +149,8 @@ private:
   ShaderQueue                  mShaderQueue0;
   GeometryQueue                mGeometryQueue0;
   MaterialQueue                mMaterialQueue0;
+  SamplerQueue                 mSamplerQueue0;
+  PropertyBufferQueue          mPropertyBufferQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
@@ -139,6 +158,8 @@ private:
   ShaderQueue                  mShaderQueue1;
   GeometryQueue                mGeometryQueue1;
   MaterialQueue                mMaterialQueue1;
+  SamplerQueue                 mSamplerQueue1;
+  PropertyBufferQueue          mPropertyBufferQueue1;
 };
 
 } // namespace SceneGraph

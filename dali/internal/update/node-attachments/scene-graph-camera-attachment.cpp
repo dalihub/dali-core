@@ -177,12 +177,22 @@ CameraAttachment* CameraAttachment::New()
   return new CameraAttachment();
 }
 
-void CameraAttachment::ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex )
+void CameraAttachment::Initialize( SceneController& sceneController, BufferIndex updateBufferIndex )
 {
   // do nothing
 }
 
 void CameraAttachment::OnDestroy()
+{
+  // do nothing
+}
+
+void CameraAttachment::ConnectedToSceneGraph()
+{
+  // do nothing
+}
+
+void CameraAttachment::DisconnectedFromSceneGraph()
 {
   // do nothing
 }

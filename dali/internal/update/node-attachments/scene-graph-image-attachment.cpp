@@ -69,7 +69,7 @@ ImageAttachment::ImageAttachment( unsigned int textureId )
 {
 }
 
-void ImageAttachment::ConnectToSceneGraph2( BufferIndex updateBufferIndex )
+void ImageAttachment::Initialize2( BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG( NULL != mSceneController );
 
@@ -106,6 +106,16 @@ void ImageAttachment::OnDestroy2()
   // Request deletion in the next Render
   mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mImageRenderer );
   mImageRenderer = NULL;
+}
+
+void ImageAttachment::ConnectedToSceneGraph()
+{
+  // Do nothing
+}
+
+void ImageAttachment::DisconnectedFromSceneGraph()
+{
+  // Do nothing
 }
 
 ImageAttachment::~ImageAttachment()

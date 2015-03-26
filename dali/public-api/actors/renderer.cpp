@@ -53,11 +53,13 @@ Renderer& Renderer::operator=( const Renderer& handle )
 
 void Renderer::SetGeometry( Geometry& geometry )
 {
+  DALI_ASSERT_ALWAYS( geometry && "Geometry handle not initialized" );
   GetImplementation(*this).SetGeometry( GetImplementation(geometry) );
 }
 
 void Renderer::SetMaterial( Material& material )
 {
+  DALI_ASSERT_ALWAYS( material && "Material handle not initialized" );
   GetImplementation(*this).SetMaterial( GetImplementation(material) );
 }
 

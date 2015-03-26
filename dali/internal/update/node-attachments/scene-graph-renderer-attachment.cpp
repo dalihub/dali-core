@@ -17,11 +17,13 @@
 #include "scene-graph-renderer-attachment.h"
 #include <dali/internal/update/effects/scene-graph-material.h>
 #include <dali/internal/update/effects/scene-graph-sampler.h>
+#include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-renderer.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gImageAttachmentLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_SCENE_GRAPH_IMAGE_ATTACHMENT");
@@ -38,6 +40,12 @@ Debug::Filter* gImageAttachmentLogFilter = Debug::Filter::New(Debug::NoLogging, 
 
 #endif
 
+
+namespace // unnamed namespace
+{
+const int REGENERATE_UNIFORM_MAP = 2;
+const int COPY_UNIFORM_MAP       = 1;
+}
 
 namespace Dali
 {
@@ -57,19 +65,59 @@ RendererAttachment::RendererAttachment()
   mRenderer(NULL),
   mMaterial(NULL),
   mGeometry(NULL),
+  mRegenerateUniformMap(REGENERATE_UNIFORM_MAP),
   mDepthIndex(0)
 {
+  // Observe our own PropertyOwner's uniform map
+  AddUniformMapObserver( *this );
 }
+
 
 RendererAttachment::~RendererAttachment()
 {
+  mMaterial->RemoveConnectionObserver(*this);
+  mGeometry->RemoveConnectionObserver(*this);
+
   mMaterial=NULL;
   mGeometry=NULL;
 }
 
+void RendererAttachment::Initialize2( BufferIndex updateBufferIndex )
+{
+  DALI_ASSERT_DEBUG( mSceneController );
+}
+
+void RendererAttachment::OnDestroy2()
+{
+}
+
+void RendererAttachment::ConnectedToSceneGraph()
+{
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+  mParent->AddUniformMapObserver( *this );
+
+  DALI_ASSERT_DEBUG( mParent != NULL );
+  mRenderer = NewRenderer::New( *mParent, *this, mGeometry, mMaterial );
+  mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
+}
+
+void RendererAttachment::DisconnectedFromSceneGraph()
+{
+  mRegenerateUniformMap = 0;
+  mParent->RemoveUniformMapObserver( *this );
+
+  DALI_ASSERT_DEBUG( mSceneController );
+  mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mRenderer );
+  mRenderer = NULL;
+}
+
 void RendererAttachment::SetMaterial( BufferIndex updateBufferIndex, const Material* material)
 {
-  mMaterial = material;
+  DALI_ASSERT_DEBUG( material != NULL && "Material pointer is NULL" );
+
+  mMaterial = const_cast<Material*>(material); // Need this to be non-const to add observer only.
+  mMaterial->AddConnectionObserver( *this );
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
   // Tell renderer about a new provider
   if( mRenderer )
@@ -87,7 +135,11 @@ const Material& RendererAttachment::GetMaterial() const
 
 void RendererAttachment::SetGeometry( BufferIndex updateBufferIndex, const Geometry* geometry)
 {
-  mGeometry = geometry;
+  DALI_ASSERT_DEBUG( geometry != NULL && "Geometry pointer is NULL");
+
+  mGeometry = const_cast<Geometry*>(geometry); // Need this to be non-const to add observer only
+  mGeometry->AddConnectionObserver( *this ); // Observe geometry connections / uniform mapping changes
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
   // Tell renderer about a new provider
   if( mRenderer )
@@ -103,17 +155,10 @@ const Geometry& RendererAttachment::GetGeometry() const
   return *mGeometry;
 }
 
-void RendererAttachment::SetDepthIndex( int index )
+int RendererAttachment::GetDepthIndex(BufferIndex bufferIndex) const
 {
-  // @todo MESH_REWORK
-  mDepthIndex = index;
+  return mDepthIndex[bufferIndex];
 }
-
-int RendererAttachment::GetDepthIndex() const
-{
-  return mDepthIndex;
-}
-
 
 Renderer& RendererAttachment::GetRenderer()
 {
@@ -125,9 +170,75 @@ const Renderer& RendererAttachment::GetRenderer() const
   return *mRenderer;
 }
 
+// Uniform maps are checked in the following priority order:
+//   Renderer (this object)
+//   Actor
+//   Material
+//   Samplers
+//   Shader
+//   Geometry
+//   VertexBuffers
 void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
 {
-  // Do nothing
+  if( mRegenerateUniformMap > 0)
+  {
+    if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
+    {
+      DALI_ASSERT_DEBUG( mGeometry != NULL && "No geometry available in DoPrepareRender()" );
+      DALI_ASSERT_DEBUG( mMaterial != NULL && "No geometry available in DoPrepareRender()" );
+
+      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
+      localMap.Resize(0);
+
+      const UniformMap& rendererUniformMap = PropertyOwner::GetUniformMap();
+      AddMappings( localMap, rendererUniformMap );
+
+      const UniformMap& actorUniformMap = mParent->GetUniformMap();
+      AddMappings( localMap, actorUniformMap );
+
+      AddMappings( localMap, mMaterial->GetUniformMap() );
+      const MaterialDataProvider::Samplers& samplers = mMaterial->GetSamplers();
+      for( MaterialDataProvider::Samplers::ConstIterator iter = samplers.Begin(), end = samplers.End();
+           iter != end ;
+           ++iter )
+      {
+        const SceneGraph::Sampler* sampler = static_cast<const SceneGraph::Sampler*>( *iter );
+        AddMappings( localMap, sampler->GetUniformMap() );
+      }
+
+      AddMappings( localMap, mMaterial->GetShader()->GetUniformMap() );
+
+      AddMappings( localMap, mGeometry->GetUniformMap() );
+
+      const GeometryDataProvider::VertexBuffers& vertexBuffers = mGeometry->GetVertexBuffers();
+      for( GeometryDataProvider::VertexBuffers::ConstIterator iter = vertexBuffers.Begin(), end = vertexBuffers.End() ;
+           iter != end ;
+           ++iter )
+      {
+        AddMappings( localMap, (*iter)->GetUniformMap() );
+      }
+
+      mUniformMapChanged[updateBufferIndex] = true;
+    }
+    else if( mRegenerateUniformMap == COPY_UNIFORM_MAP )
+    {
+      // Copy old map into current map
+      CollectedUniformMap& localMap = mCollectedUniformMap[ updateBufferIndex ];
+      CollectedUniformMap& oldMap = mCollectedUniformMap[ 1-updateBufferIndex ];
+
+      localMap.Resize( oldMap.Count() );
+
+      unsigned int index=0;
+      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter )
+      {
+        localMap[index] = *iter;
+      }
+
+      mUniformMapChanged[updateBufferIndex] = true;
+    }
+
+    mRegenerateUniformMap--;
+  }
 }
 
 bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
@@ -173,25 +284,6 @@ void RendererAttachment::SizeChanged( BufferIndex updateBufferIndex )
   // Do nothing.
 }
 
-void RendererAttachment::AttachToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex )
-{
-  mSceneController = &sceneController;
-}
-
-void RendererAttachment::ConnectToSceneGraph2( BufferIndex updateBufferIndex )
-{
-  DALI_ASSERT_DEBUG( mSceneController );
-  mRenderer = NewRenderer::New( *mParent, mGeometry, mMaterial );
-  mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
-}
-
-void RendererAttachment::OnDestroy2()
-{
-  DALI_ASSERT_DEBUG( mSceneController );
-  mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mRenderer );
-  mRenderer = NULL;
-}
-
 bool RendererAttachment::DoPrepareResources(
   BufferIndex updateBufferIndex,
   ResourceManager& resourceManager )
@@ -203,7 +295,11 @@ bool RendererAttachment::DoPrepareResources(
   bool ready = false;
   mFinishedResourceAcquisition = false;
 
-  if( mGeometry && mMaterial )
+  // Can only be considered ready when all the scene graph objects are connected to the renderer
+  if( ( mGeometry ) &&
+      ( mGeometry->GetVertexBuffers().Count() > 0 ) &&
+      ( mMaterial ) &&
+      ( mMaterial->GetShader() != NULL ) )
   {
     unsigned int completeCount = 0;
     unsigned int neverCount = 0;
@@ -250,7 +346,82 @@ bool RendererAttachment::DoPrepareResources(
     ready = ( completeCount + frameBufferCount >= samplers.Count() ) ;
     mFinishedResourceAcquisition = ( completeCount + neverCount >= samplers.Count() );
   }
+
   return ready;
+}
+
+void RendererAttachment::ConnectionsChanged( PropertyOwner& object )
+{
+  // One of our child objects has changed it's connections. Ensure the uniform
+  // map gets regenerated during PrepareRender
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+}
+
+void RendererAttachment::ConnectedUniformMapChanged()
+{
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+}
+
+void RendererAttachment::UniformMappingsChanged( const UniformMap& mappings )
+{
+  // The mappings are either from PropertyOwner base class, or the Actor
+  mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+}
+
+bool RendererAttachment::GetUniformMapChanged( BufferIndex bufferIndex ) const
+{
+  return mUniformMapChanged[bufferIndex];
+}
+
+const CollectedUniformMap& RendererAttachment::GetUniformMap( BufferIndex bufferIndex ) const
+{
+  return mCollectedUniformMap[ bufferIndex ];
+}
+
+void RendererAttachment::AddMappings( CollectedUniformMap& localMap, const UniformMap& uniformMap )
+{
+  // Iterate thru uniformMap.
+  //   Any maps that aren't in localMap should be added in a single step
+  CollectedUniformMap newUniformMappings;
+
+  for( unsigned int i=0, count=uniformMap.Count(); i<count; ++i )
+  {
+    UniformPropertyMapping::Hash nameHash = uniformMap[i].uniformNameHash;
+    bool found = false;
+
+    for( CollectedUniformMap::Iterator iter = localMap.Begin() ; iter != localMap.End() ; ++iter )
+    {
+      const UniformPropertyMapping* map = (*iter);
+      if( map->uniformNameHash == nameHash )
+      {
+        if( map->uniformName == uniformMap[i].uniformName )
+        {
+          found = true;
+          break;
+        }
+      }
+    }
+    if( !found )
+    {
+      // it's a new mapping. Add raw ptr to temporary list
+      newUniformMappings.PushBack( &uniformMap[i] );
+    }
+  }
+
+  if( newUniformMappings.Count() > 0 )
+  {
+    localMap.Reserve( localMap.Count() + newUniformMappings.Count() );
+
+    for( CollectedUniformMap::Iterator iter = newUniformMappings.Begin(),
+           end = newUniformMappings.End() ;
+         iter != end ;
+         ++iter )
+    {
+      const UniformPropertyMapping* map = (*iter);
+      localMap.PushBack( map );
+    }
+    //@todo MESH_REWORK Use memcpy to copy ptrs from one array to the other
+  }
 }
 
 

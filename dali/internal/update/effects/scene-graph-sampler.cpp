@@ -106,6 +106,14 @@ bool Sampler::IsFullyOpaque( BufferIndex bufferIndex ) const
   return mBitmapMetadata[bufferIndex].IsFullyOpaque();
 }
 
+void Sampler::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+{
+}
+
+void Sampler::DisconnectFromSceneGraph(SceneController& sceneController, BufferIndex bufferIndex)
+{
+}
+
 } // namespace SceneGraph
 } // namespace Internal
 } // namespace Dali

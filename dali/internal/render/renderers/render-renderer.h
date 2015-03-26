@@ -20,6 +20,7 @@
 
 #include <dali/integration-api/resource-declarations.h> // For resource id
 #include <dali/internal/render/data-providers/material-data-provider.h>
+#include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
@@ -28,14 +29,17 @@ namespace Dali
 {
 namespace Internal
 {
+class PropertyInputImpl;
+
 namespace SceneGraph
 {
-class NodeDataProvider;
-class ShaderDataProvider;
-class SamplerDataProvider;
-class MaterialDataProvider;
 class GeometryDataProvider;
+class MaterialDataProvider;
+class NodeDataProvider;
 class RenderGeometry;
+class SamplerDataProvider;
+class ShaderDataProvider;
+class UniformMapDataProvider;
 
 /**
  * The new geometry renderer.
@@ -44,25 +48,32 @@ class RenderGeometry;
  */
 class NewRenderer : public Renderer
 {
+private:
+  struct UniformIndexMap;
+
 public:
   typedef Integration::ResourceId ResourceId;
 
   /**
    * Create a new renderer instance
    * @param[in] nodeDataProvider The node data provider
-   * @param[in] geoemtryDataProvider The geometry data provider
+   * @param[in] uniformMapDataProvider The uniform map data provider
+   * @param[in] geometryDataProvider The geometry data provider
    * @param[in] materialDataProvider The material data provider
    */
   static NewRenderer* New( NodeDataProvider& nodeDataProvider,
+                           const UniformMapDataProvider& uniformMapDataProvider,
                            const GeometryDataProvider* geometryDataProvider,
                            const MaterialDataProvider* materialDataProvider );
   /**
    * Constructor.
    * @param[in] nodeDataProvider The node data provider
-   * @param[in] geoemtryDataProvider The geometry data provider
+   * @param[in] uniformMapDataProvider The uniform map data provider
+   * @param[in] geometryDataProvider The geometry data provider
    * @param[in] materialDataProvider The material data provider
    */
   NewRenderer( NodeDataProvider& nodeDataProvider,
+               const UniformMapDataProvider& uniformMapDataProvider,
                const GeometryDataProvider* geometryDataProvider,
                const MaterialDataProvider* materialDataProvider );
 
@@ -105,6 +116,11 @@ public: // Implementation of Renderer
                                    const Matrix& modelViewProjectionMatrix );
 
   /**
+   * @copydoc SceneGraph::Renderer::DoSetUniforms()
+   */
+  virtual void DoSetUniforms(Shader* shader, Context* context, Program* program, BufferIndex bufferIndex, unsigned int programIndex, ShaderSubTypes subType );
+
+  /**
    * @copydoc SceneGraph::Renderer::DoRender()
    */
   virtual void DoRender( BufferIndex bufferIndex,
@@ -130,6 +146,11 @@ private:
    * @param[in] program The shader program on which to set the uniforms.
    */
   void SetUniforms( BufferIndex bufferIndex, Program& program );
+
+  /**
+   * Set the program uniform in the map from the mapped property
+   */
+  void SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map );
 
   /**
    * Bind the material textures in the samplers and setup the samplers
@@ -183,6 +204,7 @@ public:
   // @todo MESH_REWORK Make private - add getters
   //const NodeDataProvider&     mNodeDataProvider;
   //const ShaderDataProvider&   mShaderDataProvider;
+  const UniformMapDataProvider& mUniformMapDataProvider;
   const MaterialDataProvider* mMaterialDataProvider;
   const GeometryDataProvider* mGeometryDataProvider;
 
@@ -198,6 +220,15 @@ private:
 
   typedef Dali::Vector< TextureUnitUniformIndex > TextureUnitUniforms;
   TextureUnitUniforms mTextureUnitUniforms;
+
+  struct UniformIndexMap
+  {
+    unsigned int uniformIndex; // The index of the cached location in the Program
+    const PropertyInputImpl* propertyValue;
+  };
+
+  typedef Dali::Vector< UniformIndexMap > UniformIndexMappings;
+  UniformIndexMappings mUniformIndexMap;
 };
 
 

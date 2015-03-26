@@ -17,24 +17,67 @@
  * limitations under the License.
  */
 
+#include <dali/internal/common/owner-container.h>
+#include <dali/internal/common/dali-hash.h>
+
+#include <string>
+
 namespace Dali
 {
 namespace Internal
 {
+class PropertyInputImpl;
+
 namespace SceneGraph
 {
 
 /**
- * The uniform map is generated on stage change, e.g when renderers, materials, geometry,
- * actors etc are added/removed from the stage.
+ * The uniform map is used to map a uniform name to a property value.
+ */
+class UniformPropertyMapping
+{
+public:
+  typedef unsigned long Hash;
+
+  /**
+   * Constructor
+   */
+  UniformPropertyMapping( const std::string& theUniformName, const PropertyInputImpl* thePropertyPtr )
+  : propertyPtr( thePropertyPtr ),
+    uniformName( theUniformName ),
+    uniformNameHash( Dali::CalculateHash( theUniformName ) )
+  {
+  }
+
+  UniformPropertyMapping()
+  : propertyPtr( NULL ),
+    uniformName( "" ),
+    uniformNameHash( 0 )
+  {
+  }
+
+
+  const PropertyInputImpl* propertyPtr;
+  std::string uniformName;
+  Hash uniformNameHash;
+};
+
+/**
+ * The UniformMap class is used to map uniform names to property values. It is available
+ * in all of the classes responsible for rendering:
+ * Actor, Renderer, Geometry, PropertyBuffer, Material, Sampler, Shader.
  *
- * It computes a list of uniform strings to property value addresses that is needed
- * for the Renderer to match once against Program uniforms; subsequent render calls do
- * not need to re-generate the match, instead using the uniform index.
+ * It can be observed for changes to the mapping table.
  */
 class UniformMap
 {
 public:
+  class Observer
+  {
+  public:
+    virtual void UniformMappingsChanged(const UniformMap& mappings) = 0;
+  };
+
   /**
    * Constructor
    */
@@ -45,9 +88,62 @@ public:
    */
   ~UniformMap();
 
+  /**
+   * Add an observer that watches for changes in the mappings
+   */
+  void AddObserver( Observer& observer );
+
+  /**
+   * Remove an observer
+   */
+  void RemoveObserver( Observer& observer );
+
+  /**
+   * Add a map to the mappings table.
+   */
+  void Add( UniformPropertyMapping* map );
+
+  /**
+   * Remove a map from the mappings table
+   */
+  void Remove( const std::string& uniformName );
+
+  /**
+   * Find a property given the uniform name.
+   * @return The address of the property if it's in the map, or NULL otherwise.
+   */
+  const PropertyInputImpl* Find( const std::string& uniformName );
+
+  /**
+   * Get the count of uniforms in the map
+   * @return The number of uniform mappings
+   */
+  unsigned int Count() const;
+
+  /**
+   * @pre index must be in the range 0 :: Count()-1
+   * @param[in] index The index of the element to fetch
+   * @return reference to the element in the map
+   */
+  const UniformPropertyMapping& operator[]( unsigned int index ) const;
+
 private:
-  // data
+  /**
+   * Helper to call the observers when the mappings have changed
+   */
+  void MappingChanged();
+
+private:
+  typedef OwnerContainer< UniformPropertyMapping* > UniformMapContainer;
+  typedef UniformMapContainer::Iterator UniformMapIter;
+  typedef Dali::Vector< Observer* > Observers;
+  typedef Observers::Iterator ObserversIter;
+
+  UniformMapContainer mUniformMaps; // Owner container of uniform maps
+
+  Observers mObservers;
 };
+
 
 } // namespace SceneGraph
 } // namespace Internal

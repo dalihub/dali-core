@@ -22,12 +22,18 @@
 #include <dali/public-api/object/property.h> // Dali::Property
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
 #include <dali/internal/event/common/property-helper.h> // Dali::Internal::PropertyDetails
+#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/update/common/property-owner-messages.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
 namespace Internal
 {
 class PropertyMetadata;
+class AnimatablePropertyMetadata;
+class CustomPropertyMetadata;
 class PropertyInputImpl;
 
 namespace SceneGraph
@@ -39,6 +45,11 @@ class PropertyOwner;
 
 } // namespace SceneGraph
 
+// Typedefs to allow object methods to be passed via parameter
+typedef AnimatablePropertyMetadata* (Object::*FindAnimatablePropertyMethod)( Property::Index index ) const;
+typedef CustomPropertyMetadata* (Object::*FindCustomPropertyMethod)( Property::Index index ) const;
+
+
 /**
  * Helper template class to be used by class that implement Object
  *
@@ -49,7 +60,6 @@ class PropertyOwner;
  * MyObjectImpl::GetDefaultPropertyCount();
  * </pre>
  */
-
 template<int DEFAULT_PROPERTY_COUNT>
 struct ObjectImplHelper
 {
@@ -85,6 +95,10 @@ struct ObjectImplHelper
   Property::Index GetDefaultPropertyIndex( const std::string& name ) const
   {
     Property::Index index = Property::INVALID_INDEX;
+
+    //@todo MESH_REWORK - Are we assuming that the index into the array is the
+    // same as the enumerated property? if enumIndex in the table was no longer
+    // debug only, wouldn't need to make this assumption.
 
     // Look for name in default properties
     for( unsigned int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
@@ -148,50 +162,144 @@ struct ObjectImplHelper
     return type;
   }
 
-  void SetDefaultProperty( Property::Index index,
-                           const Property::Value& property ) const
+  // Get the (animatable) scene graph property. (All registered scene graph properties are animatable)
+  const SceneGraph::PropertyBase* GetRegisteredSceneGraphProperty(
+    const Object* object,
+    FindAnimatablePropertyMethod findAnimatablePropertyMethod,
+    FindCustomPropertyMethod findCustomPropertyMethod,
+    Property::Index index ) const
   {
-    // TODO: MESH_REWORK
-    DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+    const SceneGraph::PropertyBase* property = NULL;
+    if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
+    {
+      AnimatablePropertyMetadata* animatable = (object->*findAnimatablePropertyMethod)( index );
+      DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
+      property = animatable->GetSceneGraphProperty();
+    }
+    else if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      CustomPropertyMetadata* custom = (object->*findCustomPropertyMethod)( index );
+      DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
+      property = custom->GetSceneGraphProperty();
+    }
+    return property;
   }
 
-  void SetSceneGraphProperty( Property::Index index,
+  void SetSceneGraphProperty( EventThreadServices& eventThreadServices,
+                              const Object* object,
+                              Property::Index index,
                               const PropertyMetadata& entry,
                               const Property::Value& value ) const
   {
-    // TODO: MESH_REWORK
-    DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  }
+    const SceneGraph::PropertyOwner* sceneObject = object->GetSceneObject();
 
-  Property::Value GetDefaultProperty( Property::Index index ) const
-  {
-    Property::Value value;
+    switch ( entry.type )
+    {
+      case Property::BOOLEAN:
+      {
+        const SceneGraph::AnimatableProperty<bool>* property = dynamic_cast< const SceneGraph::AnimatableProperty<bool>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
 
-    // TODO: MESH_REWORK
-    DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<bool>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<bool>::Bake, value.Get<bool>() );
 
-    return value;
-  }
+        break;
+      }
 
-  const SceneGraph::PropertyOwner* GetPropertyOwner() const
-  {
-    // TODO: MESH_REWORK
-    DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-    return 0;
-  }
+      case Property::FLOAT:
+      {
+        const SceneGraph::AnimatableProperty<float>* property = dynamic_cast< const SceneGraph::AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
 
-  const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const
-  {
-    // TODO: MESH_REWORK
-    DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-    return 0;
-  }
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<float>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<float>::Bake, value.Get<float>() );
 
-  const PropertyInputImpl* GetSceneObjectInputProperty( Property::Index index ) const
-  {
-    // TODO: MESH_REWORK
-    DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-    return 0;
+        break;
+      }
+
+      case Property::INTEGER:
+      {
+        const SceneGraph::AnimatableProperty<int>* property = dynamic_cast< const SceneGraph::AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<int>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<int>::Bake, value.Get<int>() );
+
+        break;
+      }
+
+      case Property::VECTOR2:
+      {
+        const SceneGraph::AnimatableProperty<Vector2>* property = dynamic_cast< const SceneGraph::AnimatableProperty<Vector2>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<Vector2>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector2>::Bake, value.Get<Vector2>() );
+
+        break;
+      }
+
+      case Property::VECTOR3:
+      {
+        const SceneGraph::AnimatableProperty<Vector3>* property = dynamic_cast< const SceneGraph::AnimatableProperty<Vector3>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<Vector3>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector3>::Bake, value.Get<Vector3>() );
+
+        break;
+      }
+
+      case Property::VECTOR4:
+      {
+        const SceneGraph::AnimatableProperty<Vector4>* property = dynamic_cast< const SceneGraph::AnimatableProperty<Vector4>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<Vector4>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector4>::Bake, value.Get<Vector4>() );
+
+        break;
+      }
+
+      case Property::ROTATION:
+      {
+        const SceneGraph::AnimatableProperty<Quaternion>* property = dynamic_cast< const SceneGraph::AnimatableProperty<Quaternion>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<Quaternion>::Send( eventThreadServices, sceneObject, property,&SceneGraph::AnimatableProperty<Quaternion>::Bake,  value.Get<Quaternion>() );
+
+        break;
+      }
+
+      case Property::MATRIX:
+      {
+        const SceneGraph::AnimatableProperty<Matrix>* property = dynamic_cast< const SceneGraph::AnimatableProperty<Matrix>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<Matrix>::Send( eventThreadServices, sceneObject, property,&SceneGraph::AnimatableProperty<Matrix>::Bake,  value.Get<Matrix>() );
+
+        break;
+      }
+
+      case Property::MATRIX3:
+      {
+        const SceneGraph::AnimatableProperty<Matrix3>* property = dynamic_cast< const SceneGraph::AnimatableProperty<Matrix3>* >( entry.GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        // property is being used in a separate thread; queue a message to set the property
+        SceneGraph::PropertyMessage<Matrix3>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Matrix3>::Bake,  value.Get<Matrix3>() );
+
+        break;
+      }
+
+      default:
+      {
+        DALI_ASSERT_ALWAYS( false && "Property type enumeration out of bounds" ); // should not come here
+        break;
+      }
+    }
   }
 
   int GetPropertyComponentIndex( Property::Index index ) const
@@ -200,7 +308,6 @@ struct ObjectImplHelper
     DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
     return 0;
   }
-
 };
 
 

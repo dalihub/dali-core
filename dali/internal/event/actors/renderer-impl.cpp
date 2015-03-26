@@ -22,8 +22,9 @@
 #include <dali/public-api/actors/renderer.h> // Dali::Renderer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -55,6 +56,7 @@ void Renderer::SetGeometry( Geometry& geometry )
 {
   mGeometryConnector.Set( geometry, OnStage() );
   const SceneGraph::Geometry* geometrySceneObject = geometry.GetGeometrySceneObject();
+
   SetGeometryMessage( GetEventThreadServices(), *mSceneObject, *geometrySceneObject );
 }
 
@@ -67,9 +69,18 @@ void Renderer::SetMaterial( Material& material )
 
 void Renderer::SetDepthIndex( int depthIndex )
 {
-  //SceneGraph::NodePropertyMessage<Vector3>::Send( mStage->GetUpdateManager(), mNode, &mNode->mPosition, &AnimatableProperty<Vector3>::Bake, position );
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  SceneGraph::PropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mDepthIndex, &SceneGraph::AnimatableProperty<int>::Bake, depthIndex );
+}
+
+int Renderer::GetCurrentDepthIndex() const
+{
+  int depthIndex = 0;
+  if( mSceneObject )
+  {
+    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
+    depthIndex = mSceneObject->mDepthIndex[bufferIndex];
+  }
+  return depthIndex;
 }
 
 SceneGraph::RendererAttachment* Renderer::GetRendererSceneObject()
@@ -120,24 +131,41 @@ Property::Type Renderer::GetDefaultPropertyType( Property::Index index ) const
 void Renderer::SetDefaultProperty( Property::Index index,
                                    const Property::Value& propertyValue )
 {
-  RENDERER_IMPL.SetDefaultProperty( index, propertyValue );
+  switch( index )
+  {
+    case Dali::Renderer::Property::DEPTH_INDEX:
+    {
+      SetDepthIndex( propertyValue.Get<int>() );
+    }
+    break;
+  }
 }
 
 void Renderer::SetSceneGraphProperty( Property::Index index,
                                       const PropertyMetadata& entry,
                                       const Property::Value& value )
 {
-  RENDERER_IMPL.SetSceneGraphProperty( index, entry, value );
+  RENDERER_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
+  OnPropertySet(index, value);
 }
 
 Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
 {
-  return RENDERER_IMPL.GetDefaultProperty( index );
+  Property::Value value;
+  switch( index )
+  {
+    case Dali::Renderer::Property::DEPTH_INDEX:
+    {
+      value = GetCurrentDepthIndex();
+    }
+    break;
+  }
+  return value;
 }
 
 const SceneGraph::PropertyOwner* Renderer::GetPropertyOwner() const
 {
-  return RENDERER_IMPL.GetPropertyOwner();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyOwner* Renderer::GetSceneObject() const
@@ -147,29 +175,75 @@ const SceneGraph::PropertyOwner* Renderer::GetSceneObject() const
 
 const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  return RENDERER_IMPL.GetSceneObjectAnimatableProperty( index );
+  DALI_ASSERT_ALWAYS( IsPropertyAnimatable(index) && "Property is not animatable" );
+  const SceneGraph::PropertyBase* property = NULL;
+
+  if( OnStage() )
+  {
+    property = RENDERER_IMPL.GetRegisteredSceneGraphProperty(
+      this,
+      &Renderer::FindAnimatableProperty,
+      &Renderer::FindCustomProperty,
+      index );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      switch(index)
+      {
+        case Dali::Renderer::Property::DEPTH_INDEX:
+        {
+          property = &mSceneObject->mDepthIndex;
+        }
+        break;
+      }
+    }
+  }
+
+  return property;
 }
 
 const PropertyInputImpl* Renderer::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  return RENDERER_IMPL.GetSceneObjectInputProperty( index );
+  const PropertyInputImpl* property = NULL;
+
+  if( OnStage() )
+  {
+    const SceneGraph::PropertyBase* baseProperty =
+      RENDERER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                     &Renderer::FindAnimatableProperty,
+                                                     &Renderer::FindCustomProperty,
+                                                     index );
+    property = static_cast<const PropertyInputImpl*>( baseProperty );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      switch(index)
+      {
+        case Dali::Renderer::Property::DEPTH_INDEX:
+        {
+          property = &mSceneObject->mDepthIndex;
+        }
+        break;
+      }
+    }
+  }
+
+  return property;
 }
 
 int Renderer::GetPropertyComponentIndex( Property::Index index ) const
 {
-  return RENDERER_IMPL.GetPropertyComponentIndex( index );
+  return Property::INVALID_COMPONENT_INDEX;
 }
 
 bool Renderer::OnStage() const
 {
-  // TODO: MESH_REWORK
-  //DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
   return mOnStage;
 }
 
 void Renderer::Connect()
 {
-  // TODO: MESH_REWORK : check this
+  // @todo: MESH_REWORK : check this
   mGeometryConnector.OnStageConnect();
   mMaterialConnector.OnStageConnect();
   mOnStage = true;
@@ -177,7 +251,7 @@ void Renderer::Connect()
 
 void Renderer::Disconnect()
 {
-  // TODO: MESH_REWORK : check this
+  // @todo: MESH_REWORK : check this
   mGeometryConnector.OnStageDisconnect();
   mMaterialConnector.OnStageDisconnect();
   mOnStage = false;
@@ -191,13 +265,20 @@ Renderer::Renderer()
 
 void Renderer::Initialize()
 {
+  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
+  EventThreadServices& eventThreadServices = GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+
   // Transfer object ownership of scene-object to message
   mSceneObject = SceneGraph::RendererAttachment::New();
 
   // Send message to update to connect to scene graph:
-  AttachToSceneGraphMessage( Stage::GetCurrent()->GetUpdateManager(), mSceneObject );
+  AttachToSceneGraphMessage( updateManager, mSceneObject );
 }
 
+Renderer::~Renderer()
+{
+}
 
 } // namespace Internal
 } // namespace Dali

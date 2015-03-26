@@ -22,7 +22,7 @@
 #include <dali/public-api/shader-effects/material.h> // Dali::Internal::Material
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/update/effects/scene-graph-material.h>
 #include <dali/internal/update/effects/scene-graph-sampler.h>
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -213,24 +213,130 @@ Property::Type Material::GetDefaultPropertyType( Property::Index index ) const
 void Material::SetDefaultProperty( Property::Index index,
                                    const Property::Value& propertyValue )
 {
-  MATERIAL_IMPL.SetDefaultProperty( index, propertyValue );
+  switch( index )
+  {
+    case Dali::Material::Property::COLOR:
+    {
+      SceneGraph::PropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, propertyValue.Get<Vector4>() );
+      break;
+    }
+    case Dali::Material::Property::FACE_CULLING_MODE:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_MODE:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLEND_EQUATION:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_SRC_FACTOR_RGB:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_DEST_FACTOR_RGB:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLEND_COLOR:
+    {
+      SceneGraph::PropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, propertyValue.Get<Vector4>() );
+      break;
+    }
+  }
 }
 
 void Material::SetSceneGraphProperty( Property::Index index,
                                       const PropertyMetadata& entry,
                                       const Property::Value& value )
 {
-  MATERIAL_IMPL.SetSceneGraphProperty( index, entry, value );
+  MATERIAL_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
+  OnPropertySet(index, value);
 }
 
 Property::Value Material::GetDefaultProperty( Property::Index index ) const
 {
-  return MATERIAL_IMPL.GetDefaultProperty( index );
+  BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
+  Property::Value value;
+
+  switch( index )
+  {
+    case Dali::Material::Property::COLOR:
+    {
+      if( mSceneObject )
+      {
+        value = mSceneObject->mColor[bufferIndex];
+      }
+      break;
+    }
+    case Dali::Material::Property::FACE_CULLING_MODE:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_MODE:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLEND_EQUATION:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_SRC_FACTOR_RGB:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_DEST_FACTOR_RGB:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      break;
+    }
+    case Dali::Material::Property::BLEND_COLOR:
+    {
+      if( mSceneObject )
+      {
+        value = mSceneObject->mBlendColor[bufferIndex];
+      }
+      break;
+    }
+  }
+
+  return value;
 }
 
 const SceneGraph::PropertyOwner* Material::GetPropertyOwner() const
 {
-  return MATERIAL_IMPL.GetPropertyOwner();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyOwner* Material::GetSceneObject() const
@@ -240,17 +346,120 @@ const SceneGraph::PropertyOwner* Material::GetSceneObject() const
 
 const SceneGraph::PropertyBase* Material::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  return MATERIAL_IMPL.GetSceneObjectAnimatableProperty( index );
+  DALI_ASSERT_ALWAYS( IsPropertyAnimatable( index ) && "Property is not animatable" );
+
+  const SceneGraph::PropertyBase* property = NULL;
+
+  if( OnStage() )
+  {
+    property = MATERIAL_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                              &Material::FindAnimatableProperty,
+                                                              &Material::FindCustomProperty,
+                                                              index );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      switch(index)
+      {
+        case Dali::Material::Property::COLOR:
+        {
+          property = &mSceneObject->mColor;
+          break;
+        }
+        case Dali::Material::Property::BLEND_COLOR:
+        {
+          property = &mSceneObject->mBlendColor;
+          break;
+        }
+        default:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Property is not animatable");
+          break;
+        }
+      }
+    }
+  }
+
+  return property;
 }
 
 const PropertyInputImpl* Material::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  return MATERIAL_IMPL.GetSceneObjectInputProperty( index );
+  const PropertyInputImpl* property = NULL;
+
+  if( OnStage() )
+  {
+    const SceneGraph::PropertyBase* baseProperty =
+      MATERIAL_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                     &Material::FindAnimatableProperty,
+                                                     &Material::FindCustomProperty,
+                                                     index );
+    property = static_cast<const PropertyInputImpl*>( baseProperty );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      switch(index)
+      {
+        case Dali::Material::Property::COLOR:
+        {
+          property = &mSceneObject->mColor;
+          break;
+        }
+        case Dali::Material::Property::FACE_CULLING_MODE:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+          break;
+        }
+        case Dali::Material::Property::BLENDING_MODE:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+          break;
+        }
+        case Dali::Material::Property::BLEND_EQUATION:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+          break;
+        }
+        case Dali::Material::Property::BLENDING_SRC_FACTOR_RGB:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+          break;
+        }
+        case Dali::Material::Property::BLENDING_DEST_FACTOR_RGB:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+          break;
+        }
+        case Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+          break;
+        }
+        case Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+          break;
+        }
+        case Dali::Material::Property::BLEND_COLOR:
+        {
+          property = &mSceneObject->mBlendColor;
+          break;
+        }
+        default:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Property cannot be a constraint input");
+          break;
+        }
+      }
+    }
+  }
+
+  return property;
 }
 
 int Material::GetPropertyComponentIndex( Property::Index index ) const
 {
-  return MATERIAL_IMPL.GetPropertyComponentIndex( index );
+  return Property::INVALID_COMPONENT_INDEX;
 }
 
 bool Material::OnStage() const
@@ -292,11 +501,23 @@ Material::Material()
 
 void Material::Initialize()
 {
-  StagePtr stage = Stage::GetCurrent();
-  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+  EventThreadServices& eventThreadServices = GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+
+  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
 
   mSceneObject = new SceneGraph::Material();
-  AddMessage( stage->GetUpdateManager(), stage->GetUpdateManager().GetMaterialOwner(), *mSceneObject );
+  AddMessage( updateManager, updateManager.GetMaterialOwner(), *mSceneObject );
+}
+
+Material::~Material()
+{
+  if( EventThreadServices::IsCoreRunning() )
+  {
+    EventThreadServices& eventThreadServices = GetEventThreadServices();
+    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+    RemoveMessage( updateManager, updateManager.GetMaterialOwner(), *mSceneObject );
+  }
 }
 
 } // namespace Internal

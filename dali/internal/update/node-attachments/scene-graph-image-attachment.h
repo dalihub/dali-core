@@ -206,14 +206,24 @@ private:
   void SendShaderChangeMessage( BufferIndex updateBufferIndex );
 
   /**
-   * @copydoc RenderableAttachment::ConnectToSceneGraph2().
+   * @copydoc RenderableAttachment::Initialize2().
    */
-  virtual void ConnectToSceneGraph2( BufferIndex updateBufferIndex );
+  virtual void Initialize2( BufferIndex updateBufferIndex );
 
   /**
    * @copydoc RenderableAttachment::OnDestroy2().
    */
   virtual void OnDestroy2();
+
+  /**
+   * @copydoc NodeAttachment::ConnectedToSceneGraph()
+   */
+  virtual void ConnectedToSceneGraph();
+
+  /**
+   * @copydoc NodeAttachment::DisconnectedFromSceneGraph()
+   */
+  virtual void DisconnectedFromSceneGraph();
 
   /**
    * @copydoc RenderableAttachment::DoPrepareResources()

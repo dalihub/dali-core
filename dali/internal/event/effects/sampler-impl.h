@@ -191,6 +191,11 @@ private:
    */
   void Initialize( const std::string& textureUnitUniformName );
 
+protected:
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~Sampler();
 
 private: // data
   //TODO: MESH_REWORK : change to ObjectConnector

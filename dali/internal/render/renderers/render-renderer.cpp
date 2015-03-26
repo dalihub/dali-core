@@ -17,6 +17,9 @@
 #include "render-renderer.h"
 
 #include <dali/internal/common/image-sampler.h>
+#include <dali/internal/event/common/property-input-impl.h>
+#include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/render/data-providers/geometry-data-provider.h>
 #include <dali/internal/render/data-providers/material-data-provider.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
@@ -34,17 +37,20 @@ namespace SceneGraph
 {
 
 NewRenderer* NewRenderer::New( NodeDataProvider& nodeDataProvider,
+                               const UniformMapDataProvider& uniformMapDataProvider,
                                const GeometryDataProvider* geometryDataProvider,
                                const MaterialDataProvider* materialDataProvider)
 {
-  return new NewRenderer(nodeDataProvider, geometryDataProvider, materialDataProvider);
+  return new NewRenderer(nodeDataProvider, uniformMapDataProvider, geometryDataProvider, materialDataProvider);
 }
 
 
 NewRenderer::NewRenderer( NodeDataProvider& nodeDataProvider,
+                          const UniformMapDataProvider& uniformMapDataProvider,
                           const GeometryDataProvider* geometryDataProvider,
                           const MaterialDataProvider* materialDataProvider)
 : Renderer( nodeDataProvider ),
+  mUniformMapDataProvider( uniformMapDataProvider ),
   //mShaderDataProvider( shaderDataProvider ), //@todo Add in after merge with parent class
   mMaterialDataProvider( materialDataProvider ),
   mGeometryDataProvider( geometryDataProvider )
@@ -60,6 +66,7 @@ NewRenderer::~NewRenderer()
 void NewRenderer::SetGeometryDataProvider( const GeometryDataProvider* geometryDataProvider )
 {
   mGeometryDataProvider = geometryDataProvider;
+  mRenderGeometry.GeometryUpdated();
 }
 
 void NewRenderer::SetMaterialDataProvider( const MaterialDataProvider* materialDataProvider )
@@ -99,6 +106,12 @@ bool NewRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& m
   return false;
 }
 
+void NewRenderer::DoSetUniforms( Shader* shader, Context* context, Program* program, BufferIndex bufferIndex, unsigned int programIndex, ShaderSubTypes subType )
+{
+  // Do nothing, we're going to set up the uniforms with our own code instead
+}
+
+
 void NewRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
   BindTextures( bufferIndex, program, mMaterialDataProvider->GetSamplers() );
@@ -119,14 +132,109 @@ void NewRenderer::GlCleanup()
 
 void NewRenderer::SetUniforms( BufferIndex bufferIndex, Program& program )
 {
-  // @todo MESH_REWORK Implement uniform map
+  // Check if the map has changed
+  if( mUniformMapDataProvider.GetUniformMapChanged( bufferIndex ) )
+  {
+    const CollectedUniformMap& uniformMap = mUniformMapDataProvider.GetUniformMap( bufferIndex );
 
-  // @todo Base class is currently setting MVP, Color etc.
+    unsigned int numberOfMaps = uniformMap.Count();
+    mUniformIndexMap.Clear(); // Clear contents, but keep memory if we don't change size
+    mUniformIndexMap.Resize( numberOfMaps );
+
+    // Remap uniform indexes to property value addresses
+
+    for( unsigned int mapIndex = 0 ; mapIndex < numberOfMaps ; ++mapIndex )
+    {
+      mUniformIndexMap[mapIndex].propertyValue = uniformMap[mapIndex]->propertyPtr;
+      mUniformIndexMap[mapIndex].uniformIndex = program.RegisterUniform( uniformMap[mapIndex]->uniformName );
+    }
+  }
+
+  // Set uniforms in local map
+  for( UniformIndexMappings::Iterator iter = mUniformIndexMap.Begin(),
+         end = mUniformIndexMap.End() ;
+       iter != end ;
+       ++iter )
+  {
+    SetUniformFromProperty( bufferIndex, program, *iter );
+  }
+
+  // @todo MESH_REWORK On merge, copy code from renderer to setup standard matrices and color
+
   GLint sizeLoc = program.GetUniformLocation( Program::UNIFORM_SIZE );
   if( -1 != sizeLoc )
   {
     Vector3 size = mDataProvider.GetRenderSize( bufferIndex );
     program.SetUniform3f( sizeLoc, size.x, size.y, size.z );
+  }
+}
+
+void NewRenderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& program, UniformIndexMap& map )
+{
+  GLint location = program.GetUniformLocation(map.uniformIndex);
+  if( Program::UNIFORM_UNKNOWN != location )
+  {
+    // switch based on property type to use correct GL uniform setter
+    switch ( map.propertyValue->GetType() )
+    {
+      case Property::INTEGER:
+      {
+        program.SetUniform1i( location, map.propertyValue->GetInteger( bufferIndex ) );
+        break;
+      }
+      case Property::FLOAT:
+      {
+        program.SetUniform1f( location, map.propertyValue->GetFloat( bufferIndex ) );
+        break;
+      }
+      case Property::VECTOR2:
+      {
+        Vector2 value( map.propertyValue->GetVector2( bufferIndex ) );
+        program.SetUniform2f( location, value.x, value.y );
+        break;
+      }
+
+      case Property::VECTOR3:
+      {
+        Vector3 value( map.propertyValue->GetVector3( bufferIndex ) );
+        program.SetUniform3f( location, value.x, value.y, value.z );
+        break;
+      }
+
+      case Property::VECTOR4:
+      {
+        Vector4 value( map.propertyValue->GetVector4( bufferIndex ) );
+        program.SetUniform4f( location, value.x, value.y, value.z, value.w );
+        break;
+      }
+
+      case Property::ROTATION:
+      {
+        Quaternion value( map.propertyValue->GetQuaternion( bufferIndex ) );
+        program.SetUniform4f( location, value.mVector.x, value.mVector.y, value.mVector.z, value.mVector.w );
+        break;
+      }
+
+      case Property::MATRIX:
+      {
+        const Matrix& value = map.propertyValue->GetMatrix(bufferIndex);
+        program.SetUniformMatrix4fv(location, 1, value.AsFloat() );
+        break;
+      }
+
+      case Property::MATRIX3:
+      {
+        const Matrix3& value = map.propertyValue->GetMatrix3(bufferIndex);
+        program.SetUniformMatrix3fv(location, 1, value.AsFloat() );
+        break;
+      }
+
+      default:
+      {
+        // Other property types are ignored
+        break;
+      }
+    }
   }
 }
 

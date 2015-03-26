@@ -22,7 +22,6 @@
 #include <dali/public-api/shader-effects/sampler.h> // Dali::Internal::Sampler
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/effects/scene-graph-sampler.h> // Dali::Internal::SceneGraph::Sampler
 #include <dali/internal/update/manager/update-manager.h>
 
@@ -136,26 +135,84 @@ Property::Type Sampler::GetDefaultPropertyType( Property::Index index ) const
 }
 
 void Sampler::SetDefaultProperty( Property::Index index,
-                                   const Property::Value& propertyValue )
+                                  const Property::Value& propertyValue )
 {
-  SAMPLER_IMPL.SetDefaultProperty( index, propertyValue );
+  switch( index )
+  {
+    case Dali::Sampler::Property::MINIFICATION_FILTER:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Sampler::Property::MAGNIGICATION_FILTER:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Sampler::Property::U_WRAP:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Sampler::Property::V_WRAP:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Sampler::Property::AFFECTS_TRANSPARENCY:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+  }
 }
 
 void Sampler::SetSceneGraphProperty( Property::Index index,
                                      const PropertyMetadata& entry,
                                      const Property::Value& value )
 {
-  SAMPLER_IMPL.SetSceneGraphProperty( index, entry, value );
+  SAMPLER_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
+  OnPropertySet(index, value);
 }
 
 Property::Value Sampler::GetDefaultProperty( Property::Index index ) const
 {
-  return SAMPLER_IMPL.GetDefaultProperty( index );
+  Property::Value value;
+
+  switch( index )
+  {
+    case Dali::Sampler::Property::MINIFICATION_FILTER:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Sampler::Property::MAGNIGICATION_FILTER:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Sampler::Property::U_WRAP:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Sampler::Property::V_WRAP:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Sampler::Property::AFFECTS_TRANSPARENCY:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+  }
+  return value;
 }
 
 const SceneGraph::PropertyOwner* Sampler::GetPropertyOwner() const
 {
-  return SAMPLER_IMPL.GetPropertyOwner();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyOwner* Sampler::GetSceneObject() const
@@ -165,17 +222,79 @@ const SceneGraph::PropertyOwner* Sampler::GetSceneObject() const
 
 const SceneGraph::PropertyBase* Sampler::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  return SAMPLER_IMPL.GetSceneObjectAnimatableProperty( index );
+  DALI_ASSERT_ALWAYS( IsPropertyAnimatable( index ) && "Property is not animatable" );
+
+  const SceneGraph::PropertyBase* property = NULL;
+
+  if( OnStage() )
+  {
+    property = SAMPLER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                             &Sampler::FindAnimatableProperty,
+                                                             &Sampler::FindCustomProperty,
+                                                             index );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      // No animatable default props
+      DALI_ASSERT_ALWAYS( 0 && "Property is not animatable" );
+    }
+  }
+
+  return property;
 }
 
 const PropertyInputImpl* Sampler::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  return SAMPLER_IMPL.GetSceneObjectInputProperty( index );
+  const PropertyInputImpl* property = NULL;
+
+  if( OnStage() )
+  {
+    const SceneGraph::PropertyBase* baseProperty =
+      SAMPLER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                    &Sampler::FindAnimatableProperty,
+                                                    &Sampler::FindCustomProperty,
+                                                    index );
+    property = static_cast<const PropertyInputImpl*>( baseProperty );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      switch( index )
+      {
+        case Dali::Sampler::Property::MINIFICATION_FILTER:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          break;
+        }
+        case Dali::Sampler::Property::MAGNIGICATION_FILTER:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          break;
+        }
+        case Dali::Sampler::Property::U_WRAP:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          break;
+        }
+        case Dali::Sampler::Property::V_WRAP:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          break;
+        }
+        case Dali::Sampler::Property::AFFECTS_TRANSPARENCY:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          break;
+        }
+      }
+    }
+  }
+
+  return property;
 }
 
 int Sampler::GetPropertyComponentIndex( Property::Index index ) const
 {
-  return SAMPLER_IMPL.GetPropertyComponentIndex( index );
+  return Property::INVALID_COMPONENT_INDEX;
 }
 
 bool Sampler::OnStage() const
@@ -205,13 +324,24 @@ Sampler::Sampler()
 
 void Sampler::Initialize( const std::string& textureUnitUniformName )
 {
-  StagePtr stage = Stage::GetCurrent();
-  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+  EventThreadServices& eventThreadServices = GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+
+  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
 
   mSceneObject = new SceneGraph::Sampler( textureUnitUniformName );
-  AddMessage( stage->GetUpdateManager(), stage->GetUpdateManager().GetSamplerOwner(), *mSceneObject );
+  AddMessage( updateManager, updateManager.GetSamplerOwner(), *mSceneObject );
 }
 
+Sampler::~Sampler()
+{
+  if( EventThreadServices::IsCoreRunning() )
+  {
+    EventThreadServices& eventThreadServices = GetEventThreadServices();
+    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+    RemoveMessage( updateManager, updateManager.GetSamplerOwner(), *mSceneObject );
+  }
+}
 
 } // namespace Internal
 } // namespace Dali

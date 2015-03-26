@@ -24,7 +24,7 @@
 
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-#include <dali/internal/event/common/stage-impl.h>
+
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/resources/resource-ticket.h>
@@ -108,24 +108,54 @@ Property::Type Shader::GetDefaultPropertyType( Property::Index index ) const
 void Shader::SetDefaultProperty( Property::Index index,
                                  const Property::Value& propertyValue )
 {
-  SHADER_IMPL.SetDefaultProperty( index, propertyValue );
+  switch(index)
+  {
+    case Dali::Shader::Property::PROGRAM:
+    {
+      // @todo MESH_REWORK Set program again?
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Shader::Property::SHADER_HINTS:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+  }
 }
 
 void Shader::SetSceneGraphProperty( Property::Index index,
                                     const PropertyMetadata& entry,
                                     const Property::Value& value )
 {
-  SHADER_IMPL.SetSceneGraphProperty( index, entry, value );
+  SHADER_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
+  OnPropertySet(index, value);
 }
 
 Property::Value Shader::GetDefaultProperty( Property::Index index ) const
 {
-  return SHADER_IMPL.GetDefaultProperty( index );
+  Property::Value value;
+
+  switch(index)
+  {
+    case Dali::Shader::Property::PROGRAM:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Shader::Property::SHADER_HINTS:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+  }
+
+  return value;
 }
 
 const SceneGraph::PropertyOwner* Shader::GetPropertyOwner() const
 {
-  return SHADER_IMPL.GetPropertyOwner();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyOwner* Shader::GetSceneObject() const
@@ -135,12 +165,52 @@ const SceneGraph::PropertyOwner* Shader::GetSceneObject() const
 
 const SceneGraph::PropertyBase* Shader::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  return SHADER_IMPL.GetSceneObjectAnimatableProperty( index );
+  DALI_ASSERT_ALWAYS( IsPropertyAnimatable( index ) && "Property is not animatable" );
+  const SceneGraph::PropertyBase* property = NULL;
+
+  if( OnStage() )
+  {
+    property = SHADER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                            &Shader::FindAnimatableProperty,
+                                                            &Shader::FindCustomProperty,
+                                                            index );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Property is not animatable" );
+    }
+  }
+
+  return property;
 }
 
 const PropertyInputImpl* Shader::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  return SHADER_IMPL.GetSceneObjectInputProperty( index );
+  const PropertyInputImpl* property = NULL;
+
+  if( OnStage() )
+  {
+    const SceneGraph::PropertyBase* baseProperty =
+      SHADER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                   &Shader::FindAnimatableProperty,
+                                                   &Shader::FindCustomProperty,
+                                                   index );
+    property = static_cast<const PropertyInputImpl*>( baseProperty );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      if( index == Dali::Shader::Property::SHADER_HINTS )
+      {
+        // @todo MESH_REWORK - return the property
+      }
+      else
+      {
+        DALI_ASSERT_ALWAYS( 0 && "Property is not a valid constraint input" );
+      }
+    }
+  }
+
+  return property;
 }
 
 int Shader::GetPropertyComponentIndex( Property::Index index ) const
@@ -171,14 +241,14 @@ Shader::Shader()
 
 void Shader::Initialize( const std::string& vertexSource, const std::string& fragmentSource )
 {
-  StagePtr stage = Stage::GetCurrent();
-  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
+  EventThreadServices& eventThreadServices = GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
   Dali::ShaderEffect::GeometryHints hint = Dali::ShaderEffect::HINT_NONE;
   mSceneObject = new SceneGraph::Shader(hint);
 
   // Add to update manager
-  SceneGraph::UpdateManager& updateManager = stage->GetUpdateManager();
   AddShaderMessage( updateManager, *mSceneObject );
 
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
@@ -189,8 +259,18 @@ void Shader::Initialize( const std::string& vertexSource, const std::string& fra
 
   // Add shader program to scene-object using a message to the UpdateManager
   SetShaderProgramMessage( updateManager, *mSceneObject, GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, mTicket->GetId(), shaderHash, false );
-
 }
+
+Shader::~Shader()
+{
+  if( EventThreadServices::IsCoreRunning() )
+  {
+    EventThreadServices& eventThreadServices = GetEventThreadServices();
+    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+    RemoveShaderMessage( updateManager, *mSceneObject);
+  }
+}
+
 
 } // namespace Internal
 } // namespace Dali

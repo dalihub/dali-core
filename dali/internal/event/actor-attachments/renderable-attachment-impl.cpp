@@ -39,7 +39,6 @@ RenderableAttachment::~RenderableAttachment()
 {
 }
 
-
 void RenderableAttachment::OnStageConnection()
 {
   // For derived classes

@@ -209,6 +209,12 @@ private: // implementation
    */
   void Initialize();
 
+protected:
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~Geometry();
+
 private: // unimplemented methods
   Geometry( const Geometry& );
   Geometry& operator=( const Geometry& );

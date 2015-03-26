@@ -56,11 +56,13 @@ Material& Material::operator=( const Material& handle )
 
 void Material::SetShader( Shader& shader )
 {
+  DALI_ASSERT_ALWAYS( shader && "Shader handle is uninitialized" );
   GetImplementation(*this).SetShader( GetImplementation( shader ) );
 }
 
 void Material::AddSampler( Sampler& sampler )
 {
+  DALI_ASSERT_ALWAYS( sampler && "Sampler handle is uninitialized" );
   GetImplementation(*this).AddSampler( GetImplementation( sampler ) );
 }
 

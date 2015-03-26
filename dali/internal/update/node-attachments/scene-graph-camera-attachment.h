@@ -73,14 +73,24 @@ public:
   static CameraAttachment* New();
 
   /**
-   * @copydoc NodeAttachment::ConnectToSceneGraph().
+   * @copydoc NodeAttachment::Initialize().
    */
-  virtual void ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex );
+  virtual void Initialize( SceneController& sceneController, BufferIndex updateBufferIndex );
 
   /**
    * @copydoc NodeAttachment::OnDestroy().
    */
   virtual void OnDestroy();
+
+  /**
+   * @copydoc NodeAttachment::ConnectedToSceneGraph()
+   */
+  virtual void ConnectedToSceneGraph();
+
+  /**
+   * @copydoc NodeAttachment::DisconnectedFromSceneGraph()
+   */
+  virtual void DisconnectedFromSceneGraph();
 
   /**
    * Virtual destructor

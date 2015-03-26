@@ -97,22 +97,23 @@ void RenderGeometry::DoUpload(
   BufferIndex bufferIndex,
   const GeometryDataProvider& geometry)
 {
-  // @todo MESH_REWORK Add support for multiple vertex buffers and attrs
-
   // Vertex buffer
   const Geometry::VertexBuffers& vertexBuffers = geometry.GetVertexBuffers();
   DALI_ASSERT_DEBUG( vertexBuffers.Count() > 0 && "Need vertex buffers to upload" );
 
-  PropertyBuffer* firstVertexBuffer = vertexBuffers[0];
+  for( unsigned int i=0; i<vertexBuffers.Count(); ++i)
+  {
+    PropertyBuffer* vertexBuffer = vertexBuffers[i];
 
-  // @todo MESH_REWORK STATIC_DRAW or DYNAMIC_DRAW depends on property buffer type (static / animated)
-  GpuBuffer* vertexGpuBuffer = new GpuBuffer( *context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+    // @todo MESH_REWORK STATIC_DRAW or DYNAMIC_DRAW depends on property buffer type (static / animated)
+    GpuBuffer* vertexGpuBuffer = new GpuBuffer( *context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
 
-  std::size_t dataSize = firstVertexBuffer->GetDataSize( bufferIndex );
-  vertexGpuBuffer->UpdateDataBuffer( dataSize, firstVertexBuffer->GetData( bufferIndex ) );
-  vertexGpuBuffer->SetStride( firstVertexBuffer->GetElementSize( bufferIndex ) );
+    std::size_t dataSize = vertexBuffer->GetDataSize( bufferIndex );
+    vertexGpuBuffer->UpdateDataBuffer( dataSize, vertexBuffer->GetData( bufferIndex ) );
+    vertexGpuBuffer->SetStride( vertexBuffer->GetElementSize( bufferIndex ) );
 
-  mVertexBuffers.PushBack( vertexGpuBuffer );
+    mVertexBuffers.PushBack( vertexGpuBuffer );
+  }
 
   // Index buffer
   const PropertyBuffer* indexBuffer = geometry.GetIndexBuffer();
@@ -120,7 +121,7 @@ void RenderGeometry::DoUpload(
   {
     GpuBuffer* indexGpuBuffer = new GpuBuffer( *context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
 
-    dataSize = indexBuffer->GetDataSize( bufferIndex );
+    unsigned int dataSize = indexBuffer->GetDataSize( bufferIndex );
     indexGpuBuffer->UpdateDataBuffer( dataSize, indexBuffer->GetData( bufferIndex ) );
 
     mIndexBuffer.Reset();

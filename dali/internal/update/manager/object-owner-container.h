@@ -81,8 +81,7 @@ public:
 
     mObjectContainer.PushBack( pointer );
 
-    // @todo MESH_REWORK FIX ME NOW!
-    //pointer->ConnectToSceneGraph(*mSceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
+    pointer->ConnectToSceneGraph(*mSceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
 
   /**

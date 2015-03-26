@@ -23,6 +23,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
 #include <dali/integration-api/debug.h>
@@ -166,6 +167,12 @@ private:
    * @return \e true if it is. Otherwise \e false.
    */
   virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix ) = 0;
+
+  /**
+   * Called from Render prior to DoRender().
+   * @todo MESH_REWORK Remove after merge
+   */
+  virtual void DoSetUniforms(Shader* shader, Context* context, Program* program, BufferIndex bufferIndex, unsigned int programIndex, ShaderSubTypes subType );
 
   /**
    * Called from Render; implemented in derived classes.

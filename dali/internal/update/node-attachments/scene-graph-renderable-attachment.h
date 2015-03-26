@@ -48,6 +48,47 @@ class Shader;
  */
 class RenderableAttachment : public NodeAttachment
 {
+protected:
+  /**
+   * Protected constructor; only derived classes can be instantiated.
+   * @param usesGeometryScaling should be false if the derived class does not need geometry scaling
+   */
+  RenderableAttachment( bool usesGeometryScaling );
+
+  /**
+   * Virtual destructor, no deletion through this interface
+   */
+  virtual ~RenderableAttachment();
+
+private: // From NodeAttachment
+
+  /**
+   * @copydoc NodeAttachment::Initialize().
+   */
+  virtual void Initialize( SceneController& sceneController, BufferIndex updateBufferIndex );
+
+  /**
+   * @copydoc NodeAttachment::OnDestroy().
+   */
+  virtual void OnDestroy();
+
+  /**
+   * @copydoc NodeAttachment::GetRenderable()
+   */
+  virtual RenderableAttachment* GetRenderable();
+
+public: // Connection API for derived classes
+  /**
+   * Chained from RenderableAttachment::Initialize()
+   */
+  virtual void Initialize2( BufferIndex updateBufferIndex ) = 0;
+
+  /**
+   * Chained from RenderableAttachment::OnDestroy()
+   */
+  virtual void OnDestroy2() = 0;
+
+
 public: // API
 
   /**
@@ -110,15 +151,6 @@ public: // For use during in the update algorithm only
   }
 
   /**
-   * Check whether the attachment has been marked as ready to render
-   * @param[out] ready TRUE if the attachment has resources to render
-   * @param[out] complete TRUE if the attachment's resources are complete
-   * (e.g. image has finished loading, framebuffer is ready to render, native image
-   * framebuffer has been rendered)
-   */
-  void GetReadyAndComplete(bool& ready, bool& complete) const;
-
-  /**
    * Query whether the attachment has blending enabled.
    * @param[in] updateBufferIndex The current update buffer index.
    * @return true if blending is enabled, false otherwise.
@@ -131,6 +163,30 @@ public: // For use during in the update algorithm only
    * @param[in] useBlending True if the renderer should use blending option
    */
   void ChangeBlending( BufferIndex updateBufferIndex, bool useBlending );
+
+  /**
+   * Prepare the object resources.
+   * This must be called by the UpdateManager before calling PrepareRender, for each frame.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] resourceManager The resource manager.
+   */
+  void PrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager );
+
+  /**
+   * If the resource is being tracked, then follow it. ( Further ready tests will use this
+   * list ) Otherwise, if it's not complete, set mHasUntrackedResources.
+   * @param[in] The resource id
+   */
+  void FollowTracker( Integration::ResourceId id );
+
+  /**
+   * Check whether the attachment has been marked as ready to render
+   * @param[out] ready TRUE if the attachment has resources to render
+   * @param[out] complete TRUE if the attachment's resources are complete
+   * (e.g. image has finished loading, framebuffer is ready to render, native image
+   * framebuffer has been rendered)
+   */
+  void GetReadyAndComplete(bool& ready, bool& complete) const;
 
   /**
    * Prepare the object for rendering.
@@ -159,21 +215,6 @@ public: // API for derived classes
   virtual const Renderer& GetRenderer() const = 0;
 
   /**
-   * Prepare the object resources.
-   * This must be called by the UpdateManager before calling PrepareRender, for each frame.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] resourceManager The resource manager.
-   */
-  void PrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager );
-
-  /**
-   * If the resource is being tracked, then follow it. ( Further ready tests will use this
-   * list ) Otherwise, if it's not complete, set mHasUntrackedResources.
-   * @param[in] The resource id
-   */
-  void FollowTracker( Integration::ResourceId id );
-
-  /**
    * @copydoc RenderableAttachment::PrepareRender()
    */
   virtual void DoPrepareRender( BufferIndex updateBufferIndex ) = 0;
@@ -192,16 +233,6 @@ public: // API for derived classes
    * @param[in] updateBufferIndex The current update buffer index.
    */
   virtual void SizeChanged( BufferIndex updateBufferIndex ) = 0;
-
-  /**
-   * Chained from NodeAttachment::ConnectToSceneGraph()
-   */
-  virtual void ConnectToSceneGraph2( BufferIndex updateBufferIndex ) = 0;
-
-  /**
-   * Chained from NodeAttachment::OnDestroy()
-   */
-  virtual void OnDestroy2() = 0;
 
   /**
    * Retrieve the scale-for-size for given node size. Default implementation returns Vector3::ZERO
@@ -226,36 +257,6 @@ public: // API for derived classes
     // inlined as its called a lot when sorting transparent renderers
     return mSortModifier;
   }
-
-protected:
-
-  /**
-   * Protected constructor; only base classes can be instantiated.
-   * @param usesGeometryScaling should be false if the derived class does not need geometry scaling
-   */
-  RenderableAttachment( bool usesGeometryScaling );
-
-  /**
-   * Virtual destructor, no deletion through this interface
-   */
-  virtual ~RenderableAttachment();
-
-private: // From NodeAttachment
-
-  /**
-   * @copydoc NodeAttachment::ConnectToSceneGraph().
-   */
-  virtual void ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex );
-
-  /**
-   * @copydoc NodeAttachment::DisconnectFromSceneGraph().
-   */
-  virtual void OnDestroy();
-
-  /**
-   * @copydoc NodeAttachment::GetRenderable()
-   */
-  virtual RenderableAttachment* GetRenderable();
 
 private:
 

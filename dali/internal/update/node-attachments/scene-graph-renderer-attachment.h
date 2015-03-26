@@ -20,10 +20,12 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/common/animatable-property.h>
+#include <dali/internal/update/common/scene-graph-connection-observers.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
-#include <dali/internal/render/data-providers/uniform-map-provider.h>
+#include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 
 namespace Dali
 {
@@ -35,8 +37,29 @@ class Material;
 class Geometry;
 class NewRenderer;
 
+/**
+ * The renderer attachment is the SceneGraph equivalent of Dali::Renderer. It is used to create an instance of a geometry and material for rendering, and is attached to an actor.
+ *
+ * It observes it's children (Material and Geometry) for connection change and for uniform map change, and observer's it's actor parent for uniform map change - this allows it to re-generate the uniform maps used by its RenderThread equivalent class.
+ *
+ * Lifetime and ownership
+ * It is created when a Dali::Renderer is created, and sent to UpdateManager. At this point
+ * Initialize is called on the object, but ownership is NOT taken by UpdateManager.
 
-class RendererAttachment : public RenderableAttachment, public PropertyOwner, public UniformMapProvider
+ * When a Dali::Renderer is added to an actor, then this object becomes the node attachment
+ * for that actor, and the node takes ownership. It will create the Render::NewRenderer object
+ * in the Update thread on reciept of the connection message.
+
+ * When it's not attached to an actor, it is still possible to send messages to this
+ * object, to, e.g., set the material, or a property.
+ *
+ * @todo MESH_REWORK On merge with RenderableAttachment, change owner of all attachments to UpdateManager.
+ */
+class RendererAttachment : public RenderableAttachment,
+                           public PropertyOwner,
+                           public UniformMapDataProvider,
+                           public UniformMap::Observer,
+                           public ConnectionObservers::Observer
 {
 public:
   /**
@@ -54,6 +77,26 @@ public:
    * Destructor
    */
   virtual ~RendererAttachment();
+
+  /**
+   * @copydoc RenderableAttachment::Initialize2().
+   */
+  virtual void Initialize2( BufferIndex updateBufferIndex );
+
+  /**
+   * @copydoc RenderableAttachment::OnDestroy2().
+   */
+  virtual void OnDestroy2();
+
+  /**
+   * @copydoc NodeAttachment::ConnectedToSceneGraph()
+   */
+  virtual void ConnectedToSceneGraph();
+
+  /**
+   * @copydoc NodeAttachment::DisconnectedFromSceneGraph()
+   */
+  virtual void DisconnectedFromSceneGraph();
 
   /**
    * Set the material for the renderer
@@ -82,21 +125,10 @@ public:
   const Geometry& GetGeometry() const;
 
   /**
-   * Set the depth index
-   * @param[in] index The depth index to use
-   */
-  void SetDepthIndex( int index );
-
-  /**
    * Get the depth index
-   * @return The depth index to use
+   * @return The depth index of the renderer attachment in the current frame
    */
-  int GetDepthIndex() const ;
-
-  /**
-   * Initial setup on attaching to the scene graph
-   */
-  void AttachToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex );
+  int GetDepthIndex( BufferIndex bufferIndex ) const ;
 
 protected: // From RenderableAttachment
   /**
@@ -124,29 +156,59 @@ protected: // From RenderableAttachment
    */
   virtual void SizeChanged( BufferIndex updateBufferIndex );
 
-/**
-   * @copydoc RenderableAttachment::ConnectToSceneGraph2().
-   */
-  virtual void ConnectToSceneGraph2( BufferIndex updateBufferIndex );
-
-  /**
-   * @copydoc RenderableAttachment::OnDestroy2().
-   */
-  virtual void OnDestroy2();
-
   /**
    * @copydoc RenderableAttachment::DoPrepareResources()
    */
   virtual bool DoPrepareResources( BufferIndex updateBufferIndex,
                                    ResourceManager& resourceManager );
 
+protected: // From ConnectionObserver
+  /**
+   * @copydoc ConnectionObservers::Observer::ConnectionsChanged
+   */
+  virtual void ConnectionsChanged(PropertyOwner& object);
+
+  /**
+   * @copydoc ConnectionObservers::Observer::ConnectedUniformMapChanged
+   */
+  virtual void ConnectedUniformMapChanged();
+
+protected: // From UniformMap::Observer
+  /**
+   * @copydoc UniformMap::Observer::UniformMappingsChanged
+   */
+  virtual void UniformMappingsChanged( const UniformMap& mappings );
+
+protected: // From UniformMapDataProvider
+  /**
+   * @copydoc UniformMapDataProvider::GetUniformMapChanged
+   */
+  virtual bool GetUniformMapChanged( BufferIndex bufferIndex ) const;
+
+  /**
+   * @copydoc UniformMapDataProvider::GetUniformMap
+   */
+  virtual const CollectedUniformMap& GetUniformMap( BufferIndex bufferIndex ) const;
+
+private:
+  /**
+   * Add any new mappings from map into the current map.
+   * This doesn't override any existing mappings.
+   */
+  void AddMappings( CollectedUniformMap& localMap, const UniformMap& map );
+
 private:
   NewRenderer* mRenderer; ///< Raw pointer to the new renderer (that's owned by RenderManager)
 
-  const Material* mMaterial; ///< The material this renderer uses. (Not owned)
-  const Geometry* mGeometry; ///< The geometry this renderer uses. (Not owned)
+  Material* mMaterial; ///< The material this renderer uses. (Not owned)
+  Geometry* mGeometry; ///< The geometry this renderer uses. (Not owned)
 
-  int mDepthIndex;     ///< Used only in PrepareRenderInstructions
+  CollectedUniformMap mCollectedUniformMap[2];
+  bool mUniformMapChanged[2]; ///< Records if the uniform map has been altered this frame
+  int mRegenerateUniformMap;  ///< 2 if the map should be regenerated, 1 if it should be copied.
+public: // Properties
+
+  AnimatableProperty<int> mDepthIndex; ///< Used only in PrepareRenderInstructions
 };
 
 // Messages for RendererAttachment
@@ -171,17 +233,6 @@ inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const 
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &RendererAttachment::SetGeometry, &geometry );
-}
-
-inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const RendererAttachment& attachment, int depthIndex )
-{
-  typedef MessageValue1< RendererAttachment, int > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &RendererAttachment::SetDepthIndex, depthIndex );
 }
 
 } // namespace SceneGraph

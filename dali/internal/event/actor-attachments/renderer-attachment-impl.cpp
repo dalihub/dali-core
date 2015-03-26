@@ -33,14 +33,25 @@ RendererAttachmentPtr RendererAttachment::New( EventThreadServices& eventThreadS
 {
   RendererAttachmentPtr attachment( new RendererAttachment( eventThreadServices ) );
 
-  // Transfer object ownership of scene-object to message
+  if( attachment )
+  {
+    attachment->Initialize( eventThreadServices, parentNode, renderer );
+  }
+  return attachment;
+}
+
+void RendererAttachment::Initialize( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode, Renderer& renderer )
+{
   SceneGraph::RendererAttachment* sceneObject = renderer.GetRendererSceneObject();
+
+  // Takes ownership of scene object
   AttachToNodeMessage( eventThreadServices.GetUpdateManager(), parentNode, sceneObject );
 
-  // Keep raw pointer for message passing
-  attachment->mSceneObject = sceneObject;
+  // Connect to renderer
+  mRendererConnector.Set( renderer, false );
 
-  return attachment;
+  // Keep raw pointer for message passing
+  mSceneObject = sceneObject;
 }
 
 RendererAttachment::RendererAttachment( EventThreadServices& eventThreadServices )
@@ -53,17 +64,11 @@ RendererAttachment::~RendererAttachment()
 {
 }
 
-SceneGraph::RendererAttachment* RendererAttachment::CreateSceneObject()
-{
-  return SceneGraph::RendererAttachment::New();
-}
-
 const SceneGraph::RendererAttachment& RendererAttachment::GetSceneObject() const
 {
   DALI_ASSERT_DEBUG( mSceneObject != NULL );
   return *mSceneObject;
 }
-
 
 void RendererAttachment::OnStageConnection2()
 {
@@ -74,8 +79,6 @@ void RendererAttachment::OnStageDisconnection2()
 {
   mRendererConnector.OnStageDisconnect();
 }
-
-
 
 } // namespace Internal
 

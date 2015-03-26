@@ -66,7 +66,7 @@ TextAttachment::TextAttachment()
   DALI_LOG_INFO(gTextFilter, Debug::General, "TextAttachment::constructor(this=%p)\n", this);
 }
 
-void TextAttachment::ConnectToSceneGraph2( BufferIndex updateBufferIndex )
+void TextAttachment::Initialize2( BufferIndex updateBufferIndex )
 {
   DALI_ASSERT_DEBUG( NULL != mSceneController );
 
@@ -84,6 +84,16 @@ void TextAttachment::OnDestroy2()
   // Request deletion in the next Render
   mSceneController->GetRenderMessageDispatcher().RemoveRenderer( *mTextRenderer );
   mTextRenderer = NULL;
+}
+
+void TextAttachment::ConnectedToSceneGraph()
+{
+  // Do nothing
+}
+
+void TextAttachment::DisconnectedFromSceneGraph()
+{
+  // Do nothing
 }
 
 TextAttachment::~TextAttachment()

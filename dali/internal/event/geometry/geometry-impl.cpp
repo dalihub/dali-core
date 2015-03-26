@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -149,24 +148,83 @@ Property::Type Geometry::GetDefaultPropertyType( Property::Index index ) const
 void Geometry::SetDefaultProperty( Property::Index index,
                                    const Property::Value& propertyValue )
 {
-  GEOMETRY_IMPL.SetDefaultProperty( index, propertyValue );
+  switch( index )
+  {
+    case Dali::Geometry::Property::GEOMETRY_TYPE :
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Geometry::Property::GEOMETRY_CENTER :
+    {
+      SceneGraph::PropertyMessage<Vector3>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mCenter, &SceneGraph::AnimatableProperty<Vector3>::Bake, propertyValue.Get<Vector3>() );
+      break;
+    }
+
+    case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
+    {
+      SceneGraph::PropertyMessage<Vector3>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mHalfExtents, &SceneGraph::AnimatableProperty<Vector3>::Bake, propertyValue.Get<Vector3>() );
+      break;
+    }
+
+    case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+  }
 }
 
 void Geometry::SetSceneGraphProperty( Property::Index index,
                                       const PropertyMetadata& entry,
                                       const Property::Value& value )
 {
-  GEOMETRY_IMPL.SetSceneGraphProperty( index, entry, value );
+  GEOMETRY_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
 }
 
 Property::Value Geometry::GetDefaultProperty( Property::Index index ) const
 {
-  return GEOMETRY_IMPL.GetDefaultProperty( index );
+  BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
+  Property::Value value;
+
+  switch( index )
+  {
+    case Dali::Geometry::Property::GEOMETRY_TYPE :
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+    case Dali::Geometry::Property::GEOMETRY_CENTER :
+    {
+      if( mSceneObject )
+      {
+        value = mSceneObject->mCenter[bufferIndex];
+      }
+      break;
+    }
+
+    case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
+    {
+      if( mSceneObject )
+      {
+        value = mSceneObject->mHalfExtents[bufferIndex];
+      }
+      break;
+    }
+
+    case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+  }
+
+  return value;
 }
 
 const SceneGraph::PropertyOwner* Geometry::GetPropertyOwner() const
 {
-  return GEOMETRY_IMPL.GetPropertyOwner();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyOwner* Geometry::GetSceneObject() const
@@ -176,12 +234,88 @@ const SceneGraph::PropertyOwner* Geometry::GetSceneObject() const
 
 const SceneGraph::PropertyBase* Geometry::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  return GEOMETRY_IMPL.GetSceneObjectAnimatableProperty( index );
+  const SceneGraph::PropertyBase* property = NULL;
+
+  if( OnStage() )
+  {
+    property = GEOMETRY_IMPL.GetRegisteredSceneGraphProperty ( this,
+                                                               &Geometry::FindAnimatableProperty,
+                                                               &Geometry::FindCustomProperty,
+                                                               index );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      switch(index)
+      {
+        case Dali::Geometry::Property::GEOMETRY_CENTER :
+        {
+          property = &mSceneObject->mCenter;
+          break;
+        }
+        case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
+        {
+          property = &mSceneObject->mHalfExtents;
+          break;
+        }
+        default:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Property is not animatable" );
+          break;
+        }
+      }
+    }
+  }
+  return property;
 }
 
 const PropertyInputImpl* Geometry::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  return GEOMETRY_IMPL.GetSceneObjectInputProperty( index );
+  const PropertyInputImpl* property = NULL;
+
+  if( OnStage() )
+  {
+    const SceneGraph::PropertyBase* baseProperty =
+      GEOMETRY_IMPL.GetRegisteredSceneGraphProperty ( this,
+                                                      &Geometry::FindAnimatableProperty,
+                                                      &Geometry::FindCustomProperty,
+                                                      index );
+
+    property = static_cast<const PropertyInputImpl*>( baseProperty );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      switch(index)
+      {
+        case Dali::Geometry::Property::GEOMETRY_TYPE :
+        {
+          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          break;
+        }
+        case Dali::Geometry::Property::GEOMETRY_CENTER :
+        {
+          property = &mSceneObject->mCenter;
+          break;
+        }
+        case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
+        {
+          property = &mSceneObject->mHalfExtents;
+          break;
+        }
+        case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
+        {
+          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          break;
+        }
+        default:
+        {
+          DALI_ASSERT_ALWAYS( 0 && "Property cannot be a constraint input");
+          break;
+        }
+      }
+    }
+  }
+
+  return property;
 }
 
 int Geometry::GetPropertyComponentIndex( Property::Index index ) const
@@ -230,11 +364,24 @@ Geometry::Geometry()
 
 void Geometry::Initialize()
 {
-  StagePtr stage = Stage::GetCurrent();
-  DALI_ASSERT_ALWAYS( stage && "Stage doesn't exist" );
+  EventThreadServices& eventThreadServices = GetEventThreadServices();
+  SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+
+  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
 
   mSceneObject = new SceneGraph::Geometry();
-  SceneGraph::AddMessage( stage->GetUpdateManager(), stage->GetUpdateManager().GetGeometryOwner(), *mSceneObject );
+  AddMessage( updateManager, updateManager.GetGeometryOwner(), *mSceneObject );
+}
+
+Geometry::~Geometry()
+{
+  if( EventThreadServices::IsCoreRunning() )
+  {
+    EventThreadServices& eventThreadServices = GetEventThreadServices();
+    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+
+    RemoveMessage( updateManager, updateManager.GetGeometryOwner(), *mSceneObject );
+  }
 }
 
 

@@ -184,25 +184,14 @@ void Handle::RemoveConstraints( unsigned int tag )
   GetImplementation(*this).RemoveConstraints( tag );
 }
 
-std::size_t Handle::AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName )
+void Handle::AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName )
 {
-  //TODO: MESH_REWORK Milestone 2
-  return 0;
-}
-
-void Handle::RemoveUniformMapping( std::size_t index )
-{
-  //TODO: MESH_REWORK Milestone 2
+  GetImplementation(*this).AddUniformMapping( propertyIndex, uniformName );
 }
 
 void Handle::RemoveUniformMapping( const std::string uniformName )
 {
-  //TODO: MESH_REWORK Milestone 2
-}
-
-std::size_t Handle::GetNumberOfUniformMappings() const
-{
-  return 0;
+  GetImplementation(*this).RemoveUniformMapping( uniformName );
 }
 
 namespace WeightObject

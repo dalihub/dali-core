@@ -1,6 +1,3 @@
-#ifndef DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_PROVIDER_H
-#define DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_PROVIDER_H
-
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
@@ -15,47 +12,33 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-#include <dali/integration-api/resource-declarations.h>
-#include <dali/internal/common/buffer-index.h>
+// CLASS HEADER
+#include <dali/internal/update/common/property-owner-messages.h>
 
 namespace Dali
 {
+
 namespace Internal
 {
+
 namespace SceneGraph
 {
 
-/**
- * This class maps uniform names to property value pointers.
- * After the first string lookup, it caches the uniform location to avoid
- * further lookups.
- */
-class UniformMapProvider
+// Messages for a property owner
+
+PropertyMessageBase::PropertyMessageBase()
 {
-public:
-  /**
-   * Constructor
-   */
-  UniformMapProvider()
-  {
-  }
+}
 
-  // @todo Force material color?
-
-protected:
-
-  /**
-   * No deletion through this interface
-   */
-  virtual ~UniformMapProvider()
-  {
-  }
-};
+PropertyMessageBase::~PropertyMessageBase()
+{
+}
 
 } // namespace SceneGraph
-} // namespace Internal
-} // namespace Dali
 
-#endif // DALI_INTERNAL_SCENE_GRAPH_UNIFORM_MAP_PROVIDER_H
+} // namespace Internal
+
+} // namespace Dali

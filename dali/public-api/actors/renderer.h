@@ -103,11 +103,22 @@ public:
   /**
    * @brief Set the depth index of this renderer
    *
-   * Renderer with higher depth indices are rendered in front of other with smaller values
+   * Renderer with higher depth indices are rendered in front of other renderers with smaller values
    *
    * @param[in] depthIndex The depth index of this renderer
    */
   void SetDepthIndex( int depthIndex );
+
+  //@todo No interface to remove geometry / material? I guess you have to throw away
+  // this renderer if you don't want it to work any more...
+
+  /**
+   * @brief Get the depth index of this renderer
+   *
+   * @sa SetDepthIndex()
+   * @return the depth index
+   */
+  int GetDepthIndex();
 
 public:
   /**

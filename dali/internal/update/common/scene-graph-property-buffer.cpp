@@ -80,6 +80,13 @@ const void* PropertyBuffer::GetData( BufferIndex bufferIndex ) const
   return reinterpret_cast< const void* >(&mData[0]);
 }
 
+void PropertyBuffer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+{
+}
+
+void PropertyBuffer::DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+{
+}
 
 } // namespace SceneGraph
 } // namespace Internal

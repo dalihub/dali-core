@@ -248,6 +248,12 @@ private: // implementation
    */
   void Initialize();
 
+protected:
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~Material();
+
 private: // unimplemented methods
   Material( const Material& );
   Material& operator=( const Material& );

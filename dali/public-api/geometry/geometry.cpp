@@ -51,6 +51,7 @@ Geometry& Geometry::operator=( const Geometry& handle )
 
 std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
 {
+  DALI_ASSERT_ALWAYS( vertexBuffer && "VertexBuffer is not initialized ");
   return GetImplementation(*this).AddVertexBuffer( GetImplementation( vertexBuffer ) );
 }
 
@@ -66,6 +67,7 @@ void Geometry::RemoveVertexBuffer( std::size_t index )
 
 void Geometry::SetIndexBuffer( PropertyBuffer& indexBuffer )
 {
+  DALI_ASSERT_ALWAYS( indexBuffer && "indexBuffer is not initialized ");
   GetImplementation(*this).SetIndexBuffer( GetImplementation( indexBuffer ) );
 }
 

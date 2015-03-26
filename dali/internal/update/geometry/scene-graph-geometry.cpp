@@ -35,16 +35,23 @@ Geometry::Geometry()
   mVertexBuffers.PushBack( vertexPropertyBuffer );
 
   mIndexBuffer = PropertyBuffer::NewQuadIndices();
+
+  // Observe our own PropertyOwner's uniform map
+  AddUniformMapObserver( *this );
 }
 
 Geometry::~Geometry()
 {
   // @todo Inform renderers of deletion of buffers?
+
+  // could remove self from own uniform map observer, but it's about to be destroyed.
 }
 
 void Geometry::AddVertexBuffer( PropertyBuffer* vertexBuffer )
 {
   mVertexBuffers.PushBack( vertexBuffer );
+  vertexBuffer->AddUniformMapObserver(*this);
+  mConnectionObservers.ConnectionsChanged(*this);
 }
 
 void Geometry::RemoveVertexBuffer( PropertyBuffer* vertexBuffer )
@@ -57,7 +64,9 @@ void Geometry::RemoveVertexBuffer( PropertyBuffer* vertexBuffer )
     PropertyBuffer* current = *iter;
     if ( current == vertexBuffer )
     {
+      vertexBuffer->RemoveUniformMapObserver(*this);
       mVertexBuffers.Erase( iter );
+      mConnectionObservers.ConnectionsChanged(*this);
       return;
     }
   }
@@ -67,13 +76,18 @@ void Geometry::RemoveVertexBuffer( PropertyBuffer* vertexBuffer )
 
 void Geometry::SetIndexBuffer( PropertyBuffer* indexBuffer )
 {
-  mIndexBuffer = indexBuffer;
+  if( mIndexBuffer.Get() != indexBuffer )
+  {
+    mIndexBuffer = indexBuffer;
+    mConnectionObservers.ConnectionsChanged(*this);
+  }
 }
 
 void Geometry::ClearIndexBuffer()
 {
   // @todo Actually delete, or put on Discard Queue and tell Renderer in render thread?
   mIndexBuffer.Reset();
+  mConnectionObservers.ConnectionsChanged(*this);
 }
 
 void Geometry::SetGeometryType( BufferIndex bufferIndex, Geometry::GeometryType geometryType )
@@ -100,6 +114,31 @@ Geometry::GeometryType Geometry::GetGeometryType( BufferIndex bufferIndex) const
 bool Geometry::GetRequiresDepthTest( BufferIndex bufferIndex ) const
 {
   return mRequiresDepthTest.GetBoolean( bufferIndex );
+}
+
+void Geometry::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+{
+}
+
+void Geometry::DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+{
+}
+
+void Geometry::AddConnectionObserver( ConnectionObservers::Observer& observer )
+{
+  mConnectionObservers.Add(observer);
+}
+
+void Geometry::RemoveConnectionObserver( ConnectionObservers::Observer& observer )
+{
+  mConnectionObservers.Remove(observer);
+}
+
+void Geometry::UniformMappingsChanged( const UniformMap& mappings )
+{
+  // Our uniform map, or that of one of the watched children has changed.
+  // Inform connected observers.
+  mConnectionObservers.ConnectedUniformMapChanged();
 }
 
 } // namespace SceneGraph

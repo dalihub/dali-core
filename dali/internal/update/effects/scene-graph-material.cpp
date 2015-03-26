@@ -29,9 +29,12 @@ namespace SceneGraph
 {
 
 Material::Material()
-: mShader(NULL),
-  mColor( Color::WHITE )
+: mColor( Color::WHITE ),
+  mBlendColor( Color::WHITE ),
+  mShader(NULL)
 {
+  // Observe own property-owner's uniform map
+  AddUniformMapObserver( *this );
 }
 
 Material::~Material()
@@ -41,12 +44,13 @@ Material::~Material()
 void Material::SetShader( const Shader* shader )
 {
   mShader = shader;
-  // Need to inform renderer in render thread about this shader
+  // @todo inform NewRenderer about this shader
+  mConnectionObservers.ConnectionsChanged(*this);
 }
 
 Shader* Material::GetShader() const
 {
-  // @todo - Fix this - move shader setup to the Renderer connect to stage... or summit
+  // @todo - Fix this - move shader setup to the Renderer connect to stage...
   return const_cast<Shader*>(mShader);
 }
 
@@ -54,26 +58,64 @@ void Material::AddSampler( const Sampler* sampler )
 {
   const SamplerDataProvider* sdp = static_cast< const SamplerDataProvider*>( sampler );
   mSamplers.PushBack( sdp );
+
+  mConnectionObservers.ConnectionsChanged(*this);
 }
 
 void Material::RemoveSampler( const Sampler* sampler )
 {
   const SamplerDataProvider* samplerDataProvider = sampler;
+  bool found = false;
 
-  for( Samplers::Iterator iter = mSamplers.Begin(); iter != mSamplers.End(); ++iter )
+  Samplers::Iterator iter = mSamplers.Begin();
+  for( ; iter != mSamplers.End(); ++iter )
   {
     if( *iter == samplerDataProvider )
     {
-      mSamplers.Erase(iter);
-      return;
+      found = true;
+      break;
     }
   }
-  DALI_ASSERT_DEBUG( 0 && "Sampler not found" );
+
+  if( found )
+  {
+    mSamplers.Erase(iter);
+    mConnectionObservers.ConnectionsChanged(*this);
+  }
+  else
+  {
+    DALI_ASSERT_DEBUG( 0 && "Sampler not found" );
+  }
 }
 
 const Material::Samplers& Material::GetSamplers() const
 {
   return mSamplers;
+}
+
+void Material::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+{
+}
+
+void Material::DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
+{
+}
+
+void Material::AddConnectionObserver( ConnectionObservers::Observer& observer )
+{
+  mConnectionObservers.Add(observer);
+}
+
+void Material::RemoveConnectionObserver( ConnectionObservers::Observer& observer )
+{
+  mConnectionObservers.Remove(observer);
+}
+
+void Material::UniformMappingsChanged( const UniformMap& mappings )
+{
+  // Our uniform map, or that of one of the watched children has changed.
+  // Inform connected observers.
+  mConnectionObservers.ConnectedUniformMapChanged();
 }
 
 } // namespace SceneGraph

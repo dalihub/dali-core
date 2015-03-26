@@ -22,8 +22,9 @@
 #include <dali/public-api/object/property-buffer.h>     // Dali::Internal::PropertyBuffer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
+#include <dali/internal/update/manager/update-manager.h>
+// @todo MESH_REWORK remove this comment - Don't include "stage.h" - use GetEventThreadServices() instead.
 
 namespace Dali
 {
@@ -123,26 +124,53 @@ Property::Type PropertyBuffer::GetDefaultPropertyType( Property::Index index ) c
 }
 
 void PropertyBuffer::SetDefaultProperty( Property::Index index,
-                                   const Property::Value& propertyValue )
+                                         const Property::Value& propertyValue )
 {
-  PROPERTY_BUFFER_IMPL.SetDefaultProperty( index, propertyValue );
+  switch( index )
+  {
+    case Dali::PropertyBuffer::Property::SIZE:
+    {
+      SetSize( propertyValue.Get<int>() );
+      break;
+    }
+    case Dali::PropertyBuffer::Property::BUFFER_FORMAT:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+  }
 }
 
 void PropertyBuffer::SetSceneGraphProperty( Property::Index index,
                                             const PropertyMetadata& entry,
                                             const Property::Value& value )
 {
-  PROPERTY_BUFFER_IMPL.SetSceneGraphProperty( index, entry, value );
+  PROPERTY_BUFFER_IMPL.SetSceneGraphProperty( GetEventThreadServices(), this, index, entry, value );
 }
 
 Property::Value PropertyBuffer::GetDefaultProperty( Property::Index index ) const
 {
-  return PROPERTY_BUFFER_IMPL.GetDefaultProperty( index );
+  Property::Value value;
+
+  switch( index )
+  {
+    case Dali::PropertyBuffer::Property::SIZE:
+    {
+      value = static_cast<int>( GetSize() ); // @todo MESH_REWORK Add a size_t type to PropertyValue
+      break;
+    }
+    case Dali::PropertyBuffer::Property::BUFFER_FORMAT:
+    {
+      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      break;
+    }
+  }
+  return value;
 }
 
 const SceneGraph::PropertyOwner* PropertyBuffer::GetPropertyOwner() const
 {
-  return PROPERTY_BUFFER_IMPL.GetPropertyOwner();
+  return mSceneObject;
 }
 
 const SceneGraph::PropertyOwner* PropertyBuffer::GetSceneObject() const
@@ -152,12 +180,50 @@ const SceneGraph::PropertyOwner* PropertyBuffer::GetSceneObject() const
 
 const SceneGraph::PropertyBase* PropertyBuffer::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  return PROPERTY_BUFFER_IMPL.GetSceneObjectAnimatableProperty( index );
+  DALI_ASSERT_ALWAYS( IsPropertyAnimatable(index) && "Property is not animatable" );
+  const SceneGraph::PropertyBase* property = NULL;
+
+  if( OnStage() )
+  {
+    property = PROPERTY_BUFFER_IMPL.GetRegisteredSceneGraphProperty(
+      this,
+      &PropertyBuffer::FindAnimatableProperty,
+      &PropertyBuffer::FindCustomProperty,
+      index );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      DALI_ASSERT_ALWAYS( 0 && "Property is not animatable" );
+    }
+  }
+
+  return property;
 }
 
 const PropertyInputImpl* PropertyBuffer::GetSceneObjectInputProperty( Property::Index index ) const
 {
-  return PROPERTY_BUFFER_IMPL.GetSceneObjectInputProperty( index );
+  const PropertyInputImpl* property = NULL;
+
+  if( OnStage() )
+  {
+    const SceneGraph::PropertyBase* baseProperty =
+      PROPERTY_BUFFER_IMPL.GetRegisteredSceneGraphProperty( this,
+                                                            &PropertyBuffer::FindAnimatableProperty,
+                                                            &PropertyBuffer::FindCustomProperty,
+                                                            index );
+    property = static_cast<const PropertyInputImpl*>( baseProperty );
+
+    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
+    {
+      if( index == Dali::PropertyBuffer::Property::SIZE )
+      {
+        // @todo MESH_REWORK
+        DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      }
+    }
+  }
+
+  return property;
 }
 
 int PropertyBuffer::GetPropertyComponentIndex( Property::Index index ) const

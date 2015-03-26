@@ -167,6 +167,12 @@ private: // implementation
    */
   void Initialize( const std::string& vertexShader, const std::string& fragmentShader );
 
+protected:
+  /**
+   * A reference counted object may only be deleted by calling Unreference()
+   */
+  virtual ~Shader();
+
 private: // unimplemented methods
   Shader( const Shader& );
   Shader& operator=( const Shader& );

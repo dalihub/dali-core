@@ -33,6 +33,7 @@ namespace Internal
 {
 namespace SceneGraph
 {
+class SceneController;
 
 class Sampler : public PropertyOwner, public SamplerDataProvider
 {
@@ -133,6 +134,21 @@ public: // SamplerDataProvider interface - called from RenderThread
    * @return The vertical wrap mode
    */
   virtual WrapMode GetVWrapMode( BufferIndex bufferIndex ) const;
+
+  /**
+   * Connect the object to the scene graph
+   *
+   * @param[in] sceneController The scene controller - used for sending messages to render thread
+   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   */
+  void ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+
+  /**
+   * Disconnect the object from the scene graph
+   * @param[in] sceneController The scene controller - used for sending messages to render thread
+   * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
+   */
+  void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
 private:
   std::string mUnitName; ///< The name of the uniform of the texture unit

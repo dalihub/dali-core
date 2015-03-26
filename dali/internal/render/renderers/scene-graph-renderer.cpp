@@ -254,11 +254,16 @@ void Renderer::Render( BufferIndex bufferIndex,
     program->SetUniform1f( loc, frametime );
   }
 
-  // set custom uniforms
-  mShader->SetUniforms( *mContext, *program, bufferIndex, programIndex, subType );
+  DoSetUniforms(mShader, mContext, program, bufferIndex, programIndex, subType );
 
   // subclass rendering and actual draw call
   DoRender( bufferIndex, *program, modelViewMatrix, viewMatrix );
+}
+
+// can be overridden by deriving class
+void Renderer::DoSetUniforms(Shader* shader, Context* context, Program* program, BufferIndex bufferIndex, unsigned int programIndex, ShaderSubTypes subType )
+{
+  shader->SetUniforms( *context, *program, bufferIndex, programIndex, subType );
 }
 
 Renderer::Renderer( NodeDataProvider& dataprovider )

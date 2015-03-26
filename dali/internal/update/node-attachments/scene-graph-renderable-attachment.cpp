@@ -39,6 +39,45 @@ namespace Internal
 namespace SceneGraph
 {
 
+RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
+: mSceneController(NULL), //@todo MESH_REWORK Pass in where required rather than store
+  mShader( NULL ),
+  mTrackedResources(),
+  mSortModifier( 0.0f ),
+  mBlendingMode( Dali::RenderableActor::DEFAULT_BLENDING_MODE ),
+  mUsesGeometryScaling( usesGeometryScaling ),
+  mScaleForSizeDirty( true ),
+  mUseBlend( false ),
+  mHasSizeAndColorFlag( false ),
+  mResourcesReady( false ),
+  mFinishedResourceAcquisition( false ),
+  mHasUntrackedResources( false )
+{
+}
+
+RenderableAttachment::~RenderableAttachment()
+{
+}
+
+void RenderableAttachment::Initialize( SceneController& sceneController, BufferIndex updateBufferIndex )
+{
+  mSceneController = &sceneController;
+
+  // Chain to derived attachments
+  Initialize2( updateBufferIndex );
+
+  // @todo MESH_REWORK: removed: renderer.SetCullFace & renderer.SetShader;
+}
+
+void RenderableAttachment::OnDestroy()
+{
+  // Chain to derived attachments
+  OnDestroy2();
+
+  // SceneController is no longer valid
+  mSceneController = NULL;
+}
+
 void RenderableAttachment::SetBlendingMode( BlendingMode::Type mode )
 {
   mBlendingMode = mode;
@@ -47,6 +86,97 @@ void RenderableAttachment::SetBlendingMode( BlendingMode::Type mode )
 BlendingMode::Type RenderableAttachment::GetBlendingMode() const
 {
   return mBlendingMode;
+}
+
+void RenderableAttachment::SetRecalculateScaleForSize()
+{
+  mScaleForSizeDirty = true;
+}
+
+void RenderableAttachment::GetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
+{
+  DoGetScaleForSize( nodeSize, scaling );
+  mScaleForSizeDirty = false;
+}
+
+bool RenderableAttachment::ResolveVisibility( BufferIndex updateBufferIndex )
+{
+  mHasSizeAndColorFlag = false;
+  const Vector4& color = mParent->GetWorldColor( updateBufferIndex );
+  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
+  {
+    const float MAX_NODE_SIZE = float(1u<<30);
+    const Vector3& size = mParent->GetSize( updateBufferIndex );
+    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&  // width is greater than a very small number
+        ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
+    {
+      if( ( size.width < MAX_NODE_SIZE ) &&             // width is smaller than the maximum allowed size
+          ( size.height < MAX_NODE_SIZE ) )             // height is smaller than the maximum allowed size
+      {
+        mHasSizeAndColorFlag = true;
+      }
+      else
+      {
+        DALI_LOG_ERROR("Actor size should not be bigger than %f.\n", MAX_NODE_SIZE );
+        DALI_LOG_ACTOR_TREE( mParent );
+      }
+    }
+  }
+  return mHasSizeAndColorFlag;
+}
+
+bool RenderableAttachment::IsBlendingOn( BufferIndex updateBufferIndex )
+{
+  // Check whether blending needs to be disabled / enabled
+  bool blend = false;
+  switch( mBlendingMode )
+  {
+    case BlendingMode::OFF:
+    {
+      // No blending.
+      blend = false;
+      break;
+    }
+    case BlendingMode::AUTO:
+    {
+      // Blending if the node is not fully opaque only.
+      blend = !IsFullyOpaque( updateBufferIndex );
+      break;
+    }
+    case BlendingMode::ON:
+    {
+      // Blending always.
+      blend = true;
+      break;
+    }
+    default:
+    {
+      DALI_ASSERT_ALWAYS( !"RenderableAttachment::PrepareRender. Wrong blending mode" );
+    }
+  }
+  return blend;
+}
+
+void RenderableAttachment::ChangeBlending( BufferIndex updateBufferIndex, bool useBlend )
+{
+  if ( mUseBlend != useBlend )
+  {
+    mUseBlend = useBlend;
+
+    // Enable/disable blending in the next render
+    typedef MessageValue1< Renderer, bool > DerivedType;
+
+    // Reserve some memory inside the render queue
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, useBlend );
+  }
+}
+
+void RenderableAttachment::DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
+{
+  scaling = Vector3::ONE;
 }
 
 
@@ -111,48 +241,6 @@ void RenderableAttachment::FollowTracker( Integration::ResourceId id )
 }
 
 
-void RenderableAttachment::SetRecalculateScaleForSize()
-{
-  mScaleForSizeDirty = true;
-}
-
-void RenderableAttachment::GetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
-{
-  DoGetScaleForSize( nodeSize, scaling );
-  mScaleForSizeDirty = false;
-}
-
-bool RenderableAttachment::ResolveVisibility( BufferIndex updateBufferIndex )
-{
-  mHasSizeAndColorFlag = false;
-  const Vector4& color = mParent->GetWorldColor( updateBufferIndex );
-  if( color.a > FULLY_TRANSPARENT )               // not fully transparent
-  {
-    const float MAX_NODE_SIZE = float(1u<<30);
-    const Vector3& size = mParent->GetSize( updateBufferIndex );
-    if( ( size.width > Math::MACHINE_EPSILON_1000 ) &&  // width is greater than a very small number
-        ( size.height > Math::MACHINE_EPSILON_1000 ) )  // height is greater than a very small number
-    {
-      if( ( size.width < MAX_NODE_SIZE ) &&             // width is smaller than the maximum allowed size
-          ( size.height < MAX_NODE_SIZE ) )             // height is smaller than the maximum allowed size
-      {
-        mHasSizeAndColorFlag = true;
-      }
-      else
-      {
-        DALI_LOG_ERROR("Actor size should not be bigger than %f.\n", MAX_NODE_SIZE );
-        DALI_LOG_ACTOR_TREE( mParent );
-      }
-    }
-  }
-  return mHasSizeAndColorFlag;
-}
-
-void RenderableAttachment::DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
-{
-  scaling = Vector3::ONE;
-}
-
 void RenderableAttachment::GetReadyAndComplete(bool& ready, bool& complete) const
 {
   ready = mResourcesReady;
@@ -184,54 +272,6 @@ void RenderableAttachment::GetReadyAndComplete(bool& ready, bool& complete) cons
   }
 }
 
-bool RenderableAttachment::IsBlendingOn( BufferIndex updateBufferIndex )
-{
-  // Check whether blending needs to be disabled / enabled
-  bool blend = false;
-  switch( mBlendingMode )
-  {
-    case BlendingMode::OFF:
-    {
-      // No blending.
-      blend = false;
-      break;
-    }
-    case BlendingMode::AUTO:
-    {
-      // Blending if the node is not fully opaque only.
-      blend = !IsFullyOpaque( updateBufferIndex );
-      break;
-    }
-    case BlendingMode::ON:
-    {
-      // Blending always.
-      blend = true;
-      break;
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS( !"RenderableAttachment::PrepareRender. Wrong blending mode" );
-    }
-  }
-  return blend;
-}
-
-void RenderableAttachment::ChangeBlending( BufferIndex updateBufferIndex, bool useBlend )
-{
-  if ( mUseBlend != useBlend )
-  {
-    mUseBlend = useBlend;
-
-    // Enable/disable blending in the next render
-    typedef MessageValue1< Renderer, bool > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, useBlend );
-  }
-}
 
 void RenderableAttachment::PrepareRender( BufferIndex updateBufferIndex )
 {
@@ -242,44 +282,6 @@ void RenderableAttachment::PrepareRender( BufferIndex updateBufferIndex )
   ChangeBlending( updateBufferIndex, blend );
 }
 
-RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
-: mSceneController(NULL), //@todo MESH_REWORK Pass in where required rather than store
-  mShader( NULL ),
-  mTrackedResources(),
-  mSortModifier( 0.0f ),
-  mBlendingMode( Dali::RenderableActor::DEFAULT_BLENDING_MODE ),
-  mUsesGeometryScaling( usesGeometryScaling ),
-  mScaleForSizeDirty( true ),
-  mUseBlend( false ),
-  mHasSizeAndColorFlag( false ),
-  mResourcesReady( false ),
-  mFinishedResourceAcquisition( false ),
-  mHasUntrackedResources( false )
-{
-}
-
-RenderableAttachment::~RenderableAttachment()
-{
-}
-
-void RenderableAttachment::ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex )
-{
-  mSceneController = &sceneController;
-
-  // Chain to derived attachments
-  ConnectToSceneGraph2( updateBufferIndex );
-
-  // @todo MESH_REWORK: removed: renderer.SetCullFace & renderer.SetShader;
-}
-
-void RenderableAttachment::OnDestroy()
-{
-  // Chain to derived attachments
-  OnDestroy2();
-
-  // SceneController is no longer valid
-  mSceneController = NULL;
-}
 
 RenderableAttachment* RenderableAttachment::GetRenderable()
 {

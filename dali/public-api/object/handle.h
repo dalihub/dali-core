@@ -385,16 +385,8 @@ public:
    *
    * @param[in] propertyIndex Index of a property hold by the object pointed by this handle
    * @param[in] uniformName Name of the uniform
-   * @return index of the mapping
    */
-  std::size_t AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName );
-
-  /**
-   * @brief Remove an uniform mapping
-   *
-   * @param[in] index Index of the mapping to remove
-   */
-  void RemoveUniformMapping( std::size_t index );
+  void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName );
 
   /**
    * @brief Removes the mapping for the given uniform name, if there is any
@@ -402,13 +394,6 @@ public:
    * @param[in] uniformName Name of a uniform in a mapping
    */
   void RemoveUniformMapping( const std::string uniformName );
-
-  /**
-   * @brief Get the number of uniform mappings
-   *
-   * @return The number of uniform mappings on the object pointed by this handle
-   */
-  std::size_t GetNumberOfUniformMappings() const;
 };
 
 namespace WeightObject
