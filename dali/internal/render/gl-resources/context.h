@@ -282,8 +282,6 @@ public:
 
       LOG_GL("BindTexture GL_TEXTURE_2D %d\n", texture);
       CHECK_GL( mGlAbstraction, mGlAbstraction.BindTexture(GL_TEXTURE_2D, texture) );
-
-      INCREASE_COUNTER(PerformanceMonitor::TEXTURE_STATE_CHANGES);
     }
   }
 

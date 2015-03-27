@@ -121,7 +121,6 @@ internal_src_files = \
   $(internal_src_dir)/event/text/generator/text-vertex-generator.cpp \
   \
   $(internal_src_dir)/render/common/culling-algorithms.cpp \
-  $(internal_src_dir)/render/common/performance-monitor.cpp \
   $(internal_src_dir)/render/common/render-algorithms.cpp \
   $(internal_src_dir)/render/common/render-debug.cpp \
   $(internal_src_dir)/render/common/render-instruction.cpp \
