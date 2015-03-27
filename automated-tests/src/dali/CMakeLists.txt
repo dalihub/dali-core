@@ -23,9 +23,7 @@ SET(TC_SOURCES
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp
         utc-Dali-DistanceField.cpp
-        utc-Dali-DynamicsBody.cpp
         utc-Dali-DynamicsBodyConfig.cpp
-        utc-Dali-DynamicsJoint.cpp
         utc-Dali-DynamicsShape.cpp
         utc-Dali-DynamicsWorld.cpp
         utc-Dali-DynamicsWorldConfig.cpp
