@@ -20,9 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/blending-options.h>
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/common/type-abstraction-enums.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
@@ -295,12 +295,12 @@ protected:
 
 // Messages for RenderableAttachment
 
-inline void SetBlendingModeMessage( EventToUpdate& eventToUpdate, const RenderableAttachment& attachment, BlendingMode::Type mode )
+inline void SetBlendingModeMessage( EventThreadServices& eventThreadServices, const RenderableAttachment& attachment, BlendingMode::Type mode )
 {
   typedef MessageValue1< RenderableAttachment, BlendingMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   new (slot) LocalType( &attachment, &RenderableAttachment::SetBlendingMode, mode );
 }

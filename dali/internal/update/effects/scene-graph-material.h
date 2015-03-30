@@ -20,7 +20,7 @@
 #include <dali/public-api/actors/renderable-actor.h> // For CullFaceMode
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/blending-options.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
@@ -89,34 +89,34 @@ private:
   // Add getters/setters?
 };
 
-inline void SetShaderMessage( EventToUpdate& eventToUpdate, const Material& material, const Shader& shader )
+inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, const Shader& shader )
 {
   typedef MessageValue1< Material, const Shader* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::SetShader, &shader );
 }
 
-inline void AddSamplerMessage( EventToUpdate& eventToUpdate, const Material& material, const Sampler& sampler )
+inline void AddSamplerMessage( EventThreadServices& eventThreadServices, const Material& material, const Sampler& sampler )
 {
   typedef MessageValue1< Material, const Sampler* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::AddSampler, &sampler );
 }
 
-inline void RemoveSamplerMessage( EventToUpdate& eventToUpdate, const Material& material, const Sampler& sampler )
+inline void RemoveSamplerMessage( EventThreadServices& eventThreadServices, const Material& material, const Sampler& sampler )
 {
   typedef MessageValue1< Material, const Sampler* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::RemoveSampler, &sampler );

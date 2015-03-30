@@ -142,7 +142,7 @@ void RepositionActorWithAngle(TestApplication& application, Actor actor, float x
 
   drawTrace.Reset();
   actor.SetPosition( x, y, 0.0f);
-  actor.SetRotation( Degree(angle), Vector3::ZAXIS );
+  actor.SetOrientation( Degree(angle), Vector3::ZAXIS );
   application.SendNotification();
   application.Render(16);
   if( inside )

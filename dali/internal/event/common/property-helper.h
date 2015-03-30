@@ -100,4 +100,3 @@ struct PropertyDetails
 } // namespace Dali
 
 #endif // __DALI_PROPERTY_HELPER_H__
-

@@ -22,7 +22,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/actors/camera-actor.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/common/animatable-property.h>
@@ -268,146 +268,146 @@ public:  // PROPERTIES
 
 // Messages for CameraAttachment
 
-inline void SetTypeMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, Dali::Camera::Type parameter )
+inline void SetTypeMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, Dali::Camera::Type parameter )
 {
   typedef MessageValue1< CameraAttachment, Dali::Camera::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetType, parameter );
 }
 
-inline void SetProjectionModeMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, Dali::Camera::ProjectionMode parameter )
+inline void SetProjectionModeMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, Dali::Camera::ProjectionMode parameter )
 {
   typedef MessageValue1< CameraAttachment, Dali::Camera::ProjectionMode > LocalProjectionMode;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalProjectionMode ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalProjectionMode ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalProjectionMode( &attachment, &CameraAttachment::SetProjectionMode, parameter );
 }
 
 
-inline void SetFieldOfViewMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetFieldOfViewMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
 {
   typedef MessageValue1< CameraAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetFieldOfView, parameter );
 }
 
-inline void SetAspectRatioMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetAspectRatioMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
 {
   typedef MessageValue1< CameraAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetAspectRatio, parameter );
 }
 
-inline void SetStereoBiasMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, const Vector2& parameter )
+inline void SetStereoBiasMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, const Vector2& parameter )
 {
   typedef MessageValue1< CameraAttachment, Vector2 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetStereoBias, parameter );
 }
 
-inline void SetLeftClippingPlaneMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetLeftClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
 {
   typedef MessageValue1< CameraAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetLeftClippingPlane, parameter );
 }
 
-inline void SetRightClippingPlaneMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetRightClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
 {
   typedef MessageValue1< CameraAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetRightClippingPlane, parameter );
 }
 
-inline void SetTopClippingPlaneMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetTopClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
 {
   typedef MessageValue1< CameraAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetTopClippingPlane, parameter );
 }
 
-inline void SetBottomClippingPlaneMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetBottomClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
 {
   typedef MessageValue1< CameraAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetBottomClippingPlane, parameter );
 }
 
-inline void SetNearClippingPlaneMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetNearClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
 {
   typedef MessageValue1< CameraAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetNearClippingPlane, parameter );
 }
 
-inline void SetFarClippingPlaneMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, float parameter )
+inline void SetFarClippingPlaneMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, float parameter )
 {
   typedef MessageValue1< CameraAttachment, float > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetFarClippingPlane, parameter );
 }
 
-inline void SetTargetPositionMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, const Vector3& parameter )
+inline void SetTargetPositionMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, const Vector3& parameter )
 {
   typedef MessageValue1< CameraAttachment, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetTargetPosition, parameter );
 }
 
 
-inline void SetInvertYAxisMessage( EventToUpdate& eventToUpdate, const CameraAttachment& attachment, bool parameter )
+inline void SetInvertYAxisMessage( EventThreadServices& eventThreadServices, const CameraAttachment& attachment, bool parameter )
 {
   typedef MessageValue1< CameraAttachment, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &CameraAttachment::SetInvertYAxis, parameter );

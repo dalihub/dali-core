@@ -39,10 +39,10 @@ namespace
 
 //              Name           Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "pixel-area",   RECTANGLE, true,    false,   true,    Dali::ImageActor::Property::PixelArea )
-DALI_PROPERTY( "style",        STRING,    true,    false,   true,    Dali::ImageActor::Property::Style     )
-DALI_PROPERTY( "border",       VECTOR4,   true,    false,   true,    Dali::ImageActor::Property::Border    )
-DALI_PROPERTY( "image",        MAP,       true,    false,   false,   Dali::ImageActor::Property::Image     )
+DALI_PROPERTY( "pixel-area",   RECTANGLE, true,    false,   true,    Dali::ImageActor::Property::PIXEL_AREA )
+DALI_PROPERTY( "style",        STRING,    true,    false,   true,    Dali::ImageActor::Property::STYLE      )
+DALI_PROPERTY( "border",       VECTOR4,   true,    false,   true,    Dali::ImageActor::Property::BORDER     )
+DALI_PROPERTY( "image",        MAP,       true,    false,   false,   Dali::ImageActor::Property::IMAGE      )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 
 BaseHandle Create()
@@ -93,7 +93,7 @@ ImageActorPtr ImageActor::New()
   actor->Initialize();
 
   // Create the attachment
-  actor->mImageAttachment = ImageAttachment::New( *actor->mStage, *actor->mNode );
+  actor->mImageAttachment = ImageAttachment::New( actor->GetEventThreadServices(), *actor->mNode );
   actor->Attach( *actor->mImageAttachment );
 
   return actor;
@@ -101,6 +101,7 @@ ImageActorPtr ImageActor::New()
 
 void ImageActor::OnInitialize()
 {
+  SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
 }
 
 void ImageActor::SetImage( ImagePtr& image )
@@ -171,6 +172,7 @@ void ImageActor::ClearPixelArea()
     {
       mInternalSetSize = true;
       SetSize( image->GetNaturalSize() );
+      SetPreferredSize( GetTargetSize().GetVectorXY() );
       mInternalSetSize = false;
     }
   }
@@ -212,6 +214,8 @@ ImageActor::ImageActor()
   mUsingNaturalSize(true),
   mInternalSetSize(false)
 {
+  // Size negotiate disabled by default, so turn it on for this actor
+  SetRelayoutEnabled( true );
 }
 
 ImageActor::~ImageActor()
@@ -224,6 +228,7 @@ void ImageActor::SetNaturalSize()
   {
     mInternalSetSize = true;
     SetSize( CalculateNaturalSize() );
+    SetPreferredSize( GetTargetSize().GetVectorXY() );
     mInternalSetSize = false;
   }
 }
@@ -411,22 +416,22 @@ void ImageActor::SetDefaultProperty( Property::Index index, const Property::Valu
   {
     switch(index)
     {
-      case Dali::ImageActor::Property::PixelArea:
+      case Dali::ImageActor::Property::PIXEL_AREA:
       {
         SetPixelArea(propertyValue.Get<Rect<int> >());
         break;
       }
-      case Dali::ImageActor::Property::Style:
+      case Dali::ImageActor::Property::STYLE:
       {
         SetStyle( StyleEnum( propertyValue.Get<std::string>() ) );
         break;
       }
-      case Dali::ImageActor::Property::Border:
+      case Dali::ImageActor::Property::BORDER:
       {
         SetNinePatchBorder( propertyValue.Get<Vector4>(), true /*in pixels*/ );
         break;
       }
-      case Dali::ImageActor::Property::Image:
+      case Dali::ImageActor::Property::IMAGE:
       {
         Dali::Image img = Scripting::NewImage( propertyValue );
         if(img)
@@ -461,23 +466,23 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
   {
     switch( index )
     {
-      case Dali::ImageActor::Property::PixelArea:
+      case Dali::ImageActor::Property::PIXEL_AREA:
       {
         Rect<int> r = GetPixelArea();
         ret = r;
         break;
       }
-      case Dali::ImageActor::Property::Style:
+      case Dali::ImageActor::Property::STYLE:
       {
         ret = StyleString( GetStyle() );
         break;
       }
-      case Dali::ImageActor::Property::Border:
+      case Dali::ImageActor::Property::BORDER:
       {
         ret = GetNinePatchBorder();
         break;
       }
-      case Dali::ImageActor::Property::Image:
+      case Dali::ImageActor::Property::IMAGE:
       {
         Property::Map map;
         Scripting::CreatePropertyMap( Dali::Image( mImageAttachment->GetImage().Get() ), map );

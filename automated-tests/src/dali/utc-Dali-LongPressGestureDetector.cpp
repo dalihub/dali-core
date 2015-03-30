@@ -530,7 +530,7 @@ int UtcDaliLongPressGestureSignalReceptionRotatedActor(void)
 
   Actor actor = Actor::New();
   actor.SetSize(100.0f, 100.0f);
-  actor.SetRotation(Dali::Degree(90.0f), Vector3::ZAXIS);
+  actor.SetOrientation(Dali::Degree(90.0f), Vector3::ZAXIS);
   Stage::GetCurrent().Add(actor);
 
   // Render and notify
@@ -553,7 +553,7 @@ int UtcDaliLongPressGestureSignalReceptionRotatedActor(void)
   DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.screenPoint, 0.1, TEST_LOCATION);
 
   // Rotate actor again and render
-  actor.SetRotation(Dali::Degree(180.0f), Vector3::ZAXIS);
+  actor.SetOrientation(Dali::Degree(180.0f), Vector3::ZAXIS);
   application.SendNotification();
   application.Render();
 
@@ -567,7 +567,7 @@ int UtcDaliLongPressGestureSignalReceptionRotatedActor(void)
   DALI_TEST_EQUALS( Vector2(5.0f, 5.0f), data.receivedGesture.screenPoint, 0.1, TEST_LOCATION);
 
   // Rotate actor again and render
-  actor.SetRotation(Dali::Degree(90.0f), Vector3::YAXIS);
+  actor.SetOrientation(Dali::Degree(90.0f), Vector3::YAXIS);
   application.SendNotification();
   application.Render();
 
@@ -596,7 +596,7 @@ int UtcDaliLongPressGestureSignalReceptionChildHit(void)
   child.SetSize(100.0f, 100.0f);
   child.SetAnchorPoint(AnchorPoint::CENTER);
   child.SetParentOrigin(ParentOrigin::CENTER);
-  child.SetRotation(Dali::Degree(90.0f), Vector3::ZAXIS);
+  child.SetOrientation(Dali::Degree(90.0f), Vector3::ZAXIS);
   parent.Add(child);
 
   TouchEventFunctor touchFunctor;

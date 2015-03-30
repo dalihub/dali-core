@@ -54,20 +54,20 @@ int UtcDaliConstraintNewInput1OffStage(void)
    */
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::POSITION ), startValue, TEST_LOCATION );
 
   // Apply constraint with a parent input property
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Position,
-                                                    Source( sibling1, Actor::Property::Position ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::POSITION,
+                                                    Source( sibling1, Actor::Property::POSITION ),
                                                     EqualToConstraint() );
 
   actor.ApplyConstraint( constraint );
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::POSITION ), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), Vector3(1.0f, 2.0f, 3.0f)/*from sibling1*/, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3(1.0f, 2.0f, 3.0f)/*from sibling1*/, TEST_LOCATION );
   DALI_TEST_EQUALS( 1u, ConstraintBase::GetCurrentInstanceCount(), TEST_LOCATION );
   DALI_TEST_EQUALS( 1u, ConstraintBase::GetTotalInstanceCount(),   TEST_LOCATION );
 
@@ -78,7 +78,7 @@ int UtcDaliConstraintNewInput1OffStage(void)
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), Vector3(2.0f, 2.0f, 2.0f)/*from SetPosition*/, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3(2.0f, 2.0f, 2.0f)/*from SetPosition*/, TEST_LOCATION );
   DALI_TEST_EQUALS( 0u/*should have been removed*/, ConstraintBase::GetCurrentInstanceCount(), TEST_LOCATION );
   DALI_TEST_EQUALS( 1u, ConstraintBase::GetTotalInstanceCount(), TEST_LOCATION );
 
@@ -89,10 +89,9 @@ int UtcDaliConstraintNewInput1OffStage(void)
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::Position ), Vector3(1.0f, 2.0f, 3.0f)/*from sibling1*/, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<Vector3>( Actor::Property::POSITION ), Vector3(1.0f, 2.0f, 3.0f)/*from sibling1*/, TEST_LOCATION );
   DALI_TEST_EQUALS( 1u, ConstraintBase::GetCurrentInstanceCount(), TEST_LOCATION );
   DALI_TEST_EQUALS( 2u/*recreated once*/, ConstraintBase::GetTotalInstanceCount(), TEST_LOCATION );
 
   END_TEST;
 }
-

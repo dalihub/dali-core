@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <ostream>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/math/rect.h>
@@ -39,6 +42,8 @@ class Matrix;
 class DALI_IMPORT_API Property::Value
 {
 public:
+
+  friend std::ostream& operator<< (std::ostream& ouputStream, const Property::Value& value);
 
   /**
    * @brief Default constructor.
@@ -118,14 +123,14 @@ public:
   Value(const Rect<int>& vectorValue);
 
   /**
-   * @brief Create an rotation property value.
+   * @brief Create an orientation property value.
    *
    * @param [in] angleAxis An angle-axis representing the rotation.
    */
   Value(const AngleAxis& angleAxis);
 
   /**
-   * @brief Create an rotation property value.
+   * @brief Create an orientation property value.
    *
    * @param [in] quaternion A quaternion representing the rotation.
    */
@@ -416,6 +421,16 @@ private:
   struct DALI_INTERNAL Impl;
   Impl* mImpl; ///< Pointer to the implementation
 };
+
+/**
+ * @brief Convert the value of the property into a string and append to an output stream.
+ *
+ * @param [in] ouputStream The output stream operator.
+ * @param [in] value The value to insert
+ * @return The output stream operator.
+ */
+DALI_IMPORT_API std::ostream& operator<< (std::ostream& ouputStream, const Property::Value& value);
+
 
 } // namespace Dali
 

@@ -33,7 +33,6 @@
 
 namespace Dali
 {
-
 class NativeImage;
 
 namespace Integration
@@ -44,14 +43,11 @@ class GlyphSet;
 
 namespace Internal
 {
+class EventThreadServices;
 class ResourceManager;
 class NotificationManager;
 class GlyphLoadObserver;
 
-namespace SceneGraph
-{
-class UpdateManager;
-}
 
 typedef Integration::ResourceId ResourceId;
 
@@ -77,10 +73,11 @@ public:
    * Create a resource client.
    * There should exactly one of these objects per Dali Core.
    * @param[in] resourceManager The resource manager
-   * @param[in] updateManager The update manager
+   * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
+   * @param[in] dataRetentionPolicy The data retention policy of the current application
    */
   ResourceClient( ResourceManager& resourceManager,
-                  SceneGraph::UpdateManager& updateManager,
+                  EventThreadServices& eventThreadServices,
                   ResourcePolicy::DataRetention dataRetentionPolicy );
 
   /**
@@ -251,6 +248,15 @@ public:
   void UploadBitmap( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset );
 
   /**
+   * Upload a bitmap to a texture
+   * @param[in] destId The destination texture ID
+   * @param[in] bitmap The pointer pointing to the bitmap to upload
+   * @param [in] xOffset Specifies an offset in the x direction within the texture
+   * @param [in] yOffset Specifies an offset in the y direction within the texture
+   */
+  void UploadBitmap( ResourceId destId, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset);
+
+  /**
    * Find Bitmap by ticket.
    * @pre ticket has to identify a Bitmap
    * @param[in] ticket The ticket returned from AllocateBitmapImage() or AddBitmapImage()
@@ -343,7 +349,7 @@ public: // Message methods
 
 private:
   ResourceManager& mResourceManager;          ///< The resource manager
-  SceneGraph::UpdateManager& mUpdateManager;  ///< update manager
+  EventThreadServices& mEventThreadServices;        ///< Interface to send messages through
 
 private:
   struct Impl;

@@ -43,13 +43,13 @@ namespace
 
 //              Name                  Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "screen-position",     VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::ScreenPosition     )
-DALI_PROPERTY( "screen-displacement", VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::ScreenDisplacement )
-DALI_PROPERTY( "screen-velocity",     VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::ScreenVelocity     )
-DALI_PROPERTY( "local-position",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LocalPosition      )
-DALI_PROPERTY( "local-displacement",  VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LocalDisplacement  )
-DALI_PROPERTY( "local-velocity",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LocalVelocity      )
-DALI_PROPERTY( "panning",             BOOLEAN, false, false, true,   Dali::PanGestureDetector::Property::Panning            )
+DALI_PROPERTY( "screen-position",     VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_POSITION     )
+DALI_PROPERTY( "screen-displacement", VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_DISPLACEMENT )
+DALI_PROPERTY( "screen-velocity",     VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::SCREEN_VELOCITY     )
+DALI_PROPERTY( "local-position",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_POSITION      )
+DALI_PROPERTY( "local-displacement",  VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_DISPLACEMENT  )
+DALI_PROPERTY( "local-velocity",      VECTOR2, false, false, true,   Dali::PanGestureDetector::Property::LOCAL_VELOCITY      )
+DALI_PROPERTY( "panning",             BOOLEAN, false, false, true,   Dali::PanGestureDetector::Property::PANNING             )
 DALI_PROPERTY_TABLE_END( DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -406,7 +406,7 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
 
   switch ( index )
   {
-    case Dali::PanGestureDetector::Property::ScreenPosition:
+    case Dali::PanGestureDetector::Property::SCREEN_POSITION:
     {
       if(mSceneObject)
       {
@@ -419,7 +419,7 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       break;
     }
 
-    case Dali::PanGestureDetector::Property::ScreenDisplacement:
+    case Dali::PanGestureDetector::Property::SCREEN_DISPLACEMENT:
     {
       if(mSceneObject)
       {
@@ -432,7 +432,7 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       break;
     }
 
-    case Dali::PanGestureDetector::Property::ScreenVelocity:
+    case Dali::PanGestureDetector::Property::SCREEN_VELOCITY:
     {
       if(mSceneObject)
       {
@@ -445,7 +445,7 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       break;
     }
 
-    case Dali::PanGestureDetector::Property::LocalPosition:
+    case Dali::PanGestureDetector::Property::LOCAL_POSITION:
     {
       if(mSceneObject)
       {
@@ -458,7 +458,7 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       break;
     }
 
-    case Dali::PanGestureDetector::Property::LocalDisplacement:
+    case Dali::PanGestureDetector::Property::LOCAL_DISPLACEMENT:
     {
       if(mSceneObject)
       {
@@ -471,7 +471,7 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       break;
     }
 
-    case Dali::PanGestureDetector::Property::LocalVelocity:
+    case Dali::PanGestureDetector::Property::LOCAL_VELOCITY:
     {
       if(mSceneObject)
       {
@@ -484,7 +484,7 @@ Property::Value PanGestureDetector::GetDefaultProperty(Property::Index index) co
       break;
     }
 
-    case Dali::PanGestureDetector::Property::Panning:
+    case Dali::PanGestureDetector::Property::PANNING:
     {
       if(mSceneObject)
       {
@@ -533,7 +533,7 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
 
   if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
-    CustomProperty* custom = FindCustomProperty( index );
+    CustomPropertyMetadata* custom = FindCustomProperty( index );
     DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
     property = custom->GetSceneGraphProperty();
   }
@@ -541,43 +541,43 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
   {
     switch ( index )
     {
-      case Dali::PanGestureDetector::Property::ScreenPosition:
+      case Dali::PanGestureDetector::Property::SCREEN_POSITION:
       {
         property = &mSceneObject->GetScreenPositionProperty();
         break;
       }
 
-      case Dali::PanGestureDetector::Property::ScreenDisplacement:
+      case Dali::PanGestureDetector::Property::SCREEN_DISPLACEMENT:
       {
         property = &mSceneObject->GetScreenDisplacementProperty();
         break;
       }
 
-      case Dali::PanGestureDetector::Property::ScreenVelocity:
+      case Dali::PanGestureDetector::Property::SCREEN_VELOCITY:
       {
         property = &mSceneObject->GetScreenVelocityProperty();
         break;
       }
 
-      case Dali::PanGestureDetector::Property::LocalPosition:
+      case Dali::PanGestureDetector::Property::LOCAL_POSITION:
       {
         property = &mSceneObject->GetLocalPositionProperty();
         break;
       }
 
-      case Dali::PanGestureDetector::Property::LocalDisplacement:
+      case Dali::PanGestureDetector::Property::LOCAL_DISPLACEMENT:
       {
         property = &mSceneObject->GetLocalDisplacementProperty();
         break;
       }
 
-      case Dali::PanGestureDetector::Property::LocalVelocity:
+      case Dali::PanGestureDetector::Property::LOCAL_VELOCITY:
       {
         property = &mSceneObject->GetLocalVelocityProperty();
         break;
       }
 
-      case Dali::PanGestureDetector::Property::Panning:
+      case Dali::PanGestureDetector::Property::PANNING:
       {
         property = &mSceneObject->GetPanningProperty();
         break;

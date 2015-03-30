@@ -43,10 +43,10 @@ namespace
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "program",       MAP,              true, false,  false,  Dali::Shader::Property::PROGRAM )
-DALI_PROPERTY( "shader-hints",  UNSIGNED_INTEGER, true, false,  true,   Dali::Shader::Property::SHADER_HINTS )
-DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
+  DALI_PROPERTY( "shader-hints",  UNSIGNED_INTEGER, true, false,  true,   Dali::Shader::Property::SHADER_HINTS )
+  DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
-const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SHADER_IMPL = { DEFAULT_PROPERTY_DETAILS };
+  const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SHADER_IMPL = { DEFAULT_PROPERTY_DETAILS };
 
 } // unnamed namespace
 
@@ -106,14 +106,14 @@ Property::Type Shader::GetDefaultPropertyType( Property::Index index ) const
 }
 
 void Shader::SetDefaultProperty( Property::Index index,
-                                   const Property::Value& propertyValue )
+                                 const Property::Value& propertyValue )
 {
   SHADER_IMPL.SetDefaultProperty( index, propertyValue );
 }
 
 void Shader::SetSceneGraphProperty( Property::Index index,
-                                      const CustomProperty& entry,
-                                      const Property::Value& value )
+                                    const PropertyMetadata& entry,
+                                    const Property::Value& value )
 {
   SHADER_IMPL.SetSceneGraphProperty( index, entry, value );
 }

@@ -53,11 +53,11 @@ public:
 
   /**
    * Create a new ImageAttachment.
-   * @param[in] stage The stage to use for messaging
+   * @param[in] eventThreadServices to use
    * @param[in] parentNode The node to attach a scene-object to.
    * @return A smart-pointer to the newly allocated ImageAttachment.
    */
-  static ImageAttachmentPtr New( Stage& stage, const SceneGraph::Node& parentNode );
+  static ImageAttachmentPtr New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode );
 
   /**
    * Sets image rendered by the attachment.
@@ -232,9 +232,9 @@ private:
 
   /**
    * First stage construction of a ImageAttachment.
-   * @param[in] stage Used to send messages to scene-graph.
+   * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
    */
-  ImageAttachment(Stage& stage);
+  ImageAttachment( EventThreadServices& eventThreadServices );
 
   /**
    * Creates the corresponding scene-graph ImageAttachment.

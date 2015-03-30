@@ -22,9 +22,9 @@
 #include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/common/event-to-update.h>
-#include <dali/internal/event/animation/animation-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-helper.h>
+#include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
@@ -44,8 +44,8 @@ namespace // unnamed namespace
 
 //              Name        Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "weight",    FLOAT,   true,     true,    true,   Dali::ActiveConstraint::Property::Weight )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
+DALI_PROPERTY( "weight",    FLOAT,   true,     true,    true,   Dali::ActiveConstraint::Property::WEIGHT )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 // Signals
 
@@ -63,9 +63,8 @@ SignalConnectorType signalConnector1( mType, SIGNAL_APPLIED, &ActiveConstraintBa
 
 } // unnamed namespace
 
-ActiveConstraintBase::ActiveConstraintBase( EventToUpdate& eventToUpdate, Property::Index targetPropertyIndex, SourceContainer& sources, unsigned int sourceCount )
-: mEventToUpdate( eventToUpdate ),
-  mTargetPropertyIndex( targetPropertyIndex ),
+ActiveConstraintBase::ActiveConstraintBase( Property::Index targetPropertyIndex, SourceContainer& sources, unsigned int sourceCount )
+: mTargetPropertyIndex( targetPropertyIndex ),
   mSources( sources ),
   mSourceCount( sourceCount ),
   mTargetObject( NULL ),
@@ -144,7 +143,7 @@ void ActiveConstraintBase::FirstApply( Object& parent, TimePeriod applyTime )
     // Automatically animate (increase) the weight, until the constraint is fully applied
     mApplyAnimation = Dali::Animation::New( applyTime.delaySeconds + applyTime.durationSeconds );
     Dali::ActiveConstraint self( this );
-    mApplyAnimation.AnimateTo( Property( self, Dali::ActiveConstraint::Property::Weight ), Dali::ActiveConstraint::FINAL_WEIGHT, mAlphaFunction, applyTime );
+    mApplyAnimation.AnimateTo( Property( self, Dali::ActiveConstraint::Property::WEIGHT ), Dali::ActiveConstraint::FINAL_WEIGHT, mAlphaFunction, applyTime );
     mApplyAnimation.Play();
 
     // Chain "Finish" to "Applied" signal
@@ -200,7 +199,7 @@ void ActiveConstraintBase::BeginRemove()
     OnSceneObjectRemove();
 
     // Remove from scene-graph
-    RemoveConstraintMessage( mEventToUpdate, *propertyOwner, *(mSceneGraphConstraint) );
+    RemoveConstraintMessage( GetEventThreadServices(), *propertyOwner, *(mSceneGraphConstraint) );
 
     // mSceneGraphConstraint will be deleted in update-thread, remove dangling pointer
     mSceneGraphConstraint = NULL;
@@ -231,7 +230,7 @@ void ActiveConstraintBase::SetWeight( float weight )
 {
   if ( mSceneGraphConstraint )
   {
-    BakeWeightMessage( mEventToUpdate, *mSceneGraphConstraint, weight );
+    BakeWeightMessage( GetEventThreadServices(), *mSceneGraphConstraint, weight );
   }
   else
   {
@@ -245,7 +244,7 @@ float ActiveConstraintBase::GetCurrentWeight() const
 
   if ( mSceneGraphConstraint )
   {
-    currentWeight = mSceneGraphConstraint->GetWeight( mEventToUpdate.GetEventBufferIndex() );
+    currentWeight = mSceneGraphConstraint->GetWeight( GetEventThreadServices().GetEventBufferIndex() );
   }
 
   return currentWeight;
@@ -372,7 +371,7 @@ Property::Type ActiveConstraintBase::GetDefaultPropertyType( Property::Index ind
 
 void ActiveConstraintBase::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  if( Dali::ActiveConstraint::Property::Weight == index )
+  if( Dali::ActiveConstraint::Property::WEIGHT == index )
   {
     SetWeight( propertyValue.Get<float>() );
   }
@@ -382,7 +381,7 @@ Property::Value ActiveConstraintBase::GetDefaultProperty( Property::Index index 
 {
   Property::Value value;
 
-  if( Dali::ActiveConstraint::Property::Weight == index )
+  if( Dali::ActiveConstraint::Property::WEIGHT == index )
   {
     value = GetCurrentWeight();
   }
@@ -441,14 +440,14 @@ void ActiveConstraintBase::SceneObjectRemoved( Object& object )
   if ( mSceneGraphConstraint )
   {
     // Preserve the previous weight
-    mOffstageWeight = mSceneGraphConstraint->GetWeight( mEventToUpdate.GetEventBufferIndex() );
+    mOffstageWeight = mSceneGraphConstraint->GetWeight( GetEventThreadServices().GetEventBufferIndex() );
 
     const SceneGraph::PropertyOwner* propertyOwner = mTargetObject ? mTargetObject->GetSceneObject() : NULL;
 
     if( propertyOwner )
     {
       // Remove from scene-graph
-      RemoveConstraintMessage( mEventToUpdate, *propertyOwner, *(mSceneGraphConstraint) );
+      RemoveConstraintMessage( GetEventThreadServices(), *propertyOwner, *(mSceneGraphConstraint) );
     }
 
     // mSceneGraphConstraint will be deleted in update-thread, remove dangling pointer

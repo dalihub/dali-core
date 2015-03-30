@@ -19,7 +19,7 @@
 #include <dali/internal/event/actor-attachments/renderable-attachment-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
 
 using Dali::Internal::SceneGraph::Shader;
@@ -30,8 +30,8 @@ namespace Dali
 namespace Internal
 {
 
-RenderableAttachment::RenderableAttachment( Stage& stage )
-: ActorAttachment( stage )
+RenderableAttachment::RenderableAttachment( EventThreadServices& eventThreadServices )
+: ActorAttachment( eventThreadServices )
 {
 }
 

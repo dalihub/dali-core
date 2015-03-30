@@ -153,7 +153,7 @@ void Geometry::SetDefaultProperty( Property::Index index,
 }
 
 void Geometry::SetSceneGraphProperty( Property::Index index,
-                                      const CustomProperty& entry,
+                                      const PropertyMetadata& entry,
                                       const Property::Value& value )
 {
   GEOMETRY_IMPL.SetSceneGraphProperty( index, entry, value );

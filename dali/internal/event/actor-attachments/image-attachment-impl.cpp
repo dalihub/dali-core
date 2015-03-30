@@ -19,9 +19,10 @@
 #include <dali/internal/event/actor-attachments/image-attachment-impl.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
@@ -31,13 +32,13 @@ namespace Dali
 namespace Internal
 {
 
-ImageAttachmentPtr ImageAttachment::New( Stage& stage, const SceneGraph::Node& parentNode )
+ImageAttachmentPtr ImageAttachment::New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode )
 {
-  ImageAttachmentPtr attachment( new ImageAttachment( stage ) );
+  ImageAttachmentPtr attachment( new ImageAttachment( eventThreadServices ) );
 
   // Transfer object ownership of scene-object to message
   SceneGraph::ImageAttachment* sceneObject = CreateSceneObject();
-  AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( eventThreadServices.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;
@@ -45,8 +46,8 @@ ImageAttachmentPtr ImageAttachment::New( Stage& stage, const SceneGraph::Node& p
   return attachment;
 }
 
-ImageAttachment::ImageAttachment( Stage& stage )
-: RenderableAttachment(stage),
+ImageAttachment::ImageAttachment( EventThreadServices& eventThreadServices )
+: RenderableAttachment(eventThreadServices),
   mSceneObject(NULL),
   mPixelArea(0,0,0,0),
   mStyle(Dali::ImageActor::STYLE_QUAD),
@@ -81,7 +82,7 @@ void ImageAttachment::SetImage( ImagePtr& image )
     unsigned int resourceId = (image) ? image->GetResourceId() : 0u;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetTextureIdMessage( mStage->GetUpdateInterface(), *mSceneObject, resourceId );
+    SetTextureIdMessage( GetEventThreadServices(), *mSceneObject, resourceId );
   }
 }
 
@@ -100,7 +101,7 @@ void ImageAttachment::SetPixelArea(const PixelArea& pixelArea)
     mIsPixelAreaSet = true;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetPixelAreaMessage( mStage->GetUpdateInterface(), *mSceneObject, mPixelArea );
+    SetPixelAreaMessage( GetEventThreadServices(), *mSceneObject, mPixelArea );
   }
 }
 
@@ -110,7 +111,7 @@ void ImageAttachment::ClearPixelArea()
   mIsPixelAreaSet = false;
 
   // sceneObject is being used in a separate thread; queue a message to set
-  ClearPixelAreaMessage( mStage->GetUpdateInterface(), *mSceneObject );
+  ClearPixelAreaMessage( GetEventThreadServices(), *mSceneObject );
 }
 
 void ImageAttachment::SetStyle(Style style)
@@ -119,7 +120,7 @@ void ImageAttachment::SetStyle(Style style)
   mStyle = style;
 
   // sceneObject is being used in a separate thread; queue a message to set
-  SetStyleMessage( mStage->GetUpdateInterface(), *mSceneObject, style );
+  SetStyleMessage( GetEventThreadServices(), *mSceneObject, style );
 }
 
 void ImageAttachment::SetNinePatchBorder(const Vector4& border, bool inPixels)
@@ -129,7 +130,7 @@ void ImageAttachment::SetNinePatchBorder(const Vector4& border, bool inPixels)
   mBorderInPixels = inPixels;
 
   // sceneObject is being used in a separate thread; queue a message to set
-  SetNinePatchBorderMessage( mStage->GetUpdateInterface(), *mSceneObject, border, inPixels );
+  SetNinePatchBorderMessage( GetEventThreadServices(), *mSceneObject, border, inPixels );
 }
 
 SceneGraph::ImageAttachment* ImageAttachment::CreateSceneObject()
@@ -149,7 +150,7 @@ void ImageAttachment::SetSortModifier(float modifier)
   mSortModifier = modifier;
 
   // attachment is being used in a separate thread; queue a message to set the value & base value
-  SetSortModifierMessage( mStage->GetUpdateInterface(), GetSceneObject(), modifier );
+  SetSortModifierMessage( GetEventThreadServices(), GetSceneObject(), modifier );
 }
 
 float ImageAttachment::GetSortModifier() const
@@ -164,7 +165,7 @@ void ImageAttachment::SetCullFace( CullFaceMode mode )
   mCullFaceMode = mode;
 
   // attachment is being used in a separate thread; queue a message to set the value
-  SetCullFaceMessage( mStage->GetUpdateInterface(), GetSceneObject(), mode );
+  SetCullFaceMessage( GetEventThreadServices(), GetSceneObject(), mode );
 }
 
 CullFaceMode ImageAttachment::GetCullFace() const
@@ -178,7 +179,7 @@ void ImageAttachment::SetBlendMode( BlendingMode::Type mode )
   mBlendingMode = mode;
 
   // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingModeMessage( mStage->GetUpdateInterface(), GetSceneObject(), mode );
+  SetBlendingModeMessage( GetEventThreadServices(), GetSceneObject(), mode );
 }
 
 BlendingMode::Type ImageAttachment::GetBlendMode() const
@@ -193,7 +194,7 @@ void ImageAttachment::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   Blendin
   mBlendingOptions.SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
 
   // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingOptionsMessage( mStage->GetUpdateInterface(), GetSceneObject(), mBlendingOptions.GetBitmask() );
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
 void ImageAttachment::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
@@ -211,7 +212,7 @@ void ImageAttachment::SetBlendEquation( BlendingEquation::Type equationRgb, Blen
   mBlendingOptions.SetBlendEquation( equationRgb, equationAlpha );
 
   // attachment is being used in a separate thread; queue a message to set the value
-  SetBlendingOptionsMessage( mStage->GetUpdateInterface(), GetSceneObject(), mBlendingOptions.GetBitmask() );
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetSceneObject(), mBlendingOptions.GetBitmask() );
 }
 
 void ImageAttachment::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
@@ -226,7 +227,7 @@ void ImageAttachment::SetBlendColor( const Vector4& color )
   if( mBlendingOptions.SetBlendColor( color ) )
   {
     // attachment is being used in a separate thread; queue a message to set the value
-    SetBlendColorMessage( mStage->GetUpdateInterface(), GetSceneObject(), color );
+    SetBlendColorMessage( GetEventThreadServices(), GetSceneObject(), color );
   }
 }
 
@@ -245,7 +246,7 @@ void ImageAttachment::SetFilterMode( FilterMode::Type minFilter, FilterMode::Typ
 {
   mSamplerBitfield = ImageSampler::PackBitfield( minFilter, magFilter );
 
-  SetSamplerMessage( mStage->GetUpdateInterface(), GetSceneObject(), mSamplerBitfield );
+  SetSamplerMessage( GetEventThreadServices(), GetSceneObject(), mSamplerBitfield );
 }
 
 void ImageAttachment::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
@@ -268,7 +269,7 @@ void ImageAttachment::SetShaderEffect(ShaderEffect& effect)
 
     const SceneGraph::Shader& shader = dynamic_cast<const SceneGraph::Shader&>( *mShaderEffect->GetSceneObject() );
 
-    ApplyShaderMessage( mStage->GetUpdateInterface(), GetSceneObject(), shader );
+    ApplyShaderMessage( GetEventThreadServices(), GetSceneObject(), shader );
 
     mShaderEffect->Connect();
   }
@@ -288,7 +289,7 @@ void ImageAttachment::RemoveShaderEffect()
 {
   if ( OnStage() )
   {
-    RemoveShaderMessage( mStage->GetUpdateInterface(), GetSceneObject() );
+    RemoveShaderMessage( GetEventThreadServices(), GetSceneObject() );
 
     // Notify shader effect
     if (mShaderEffect)
@@ -307,7 +308,7 @@ void ImageAttachment::OnStageConnection2()
   {
     const SceneGraph::Shader& shader = dynamic_cast<const SceneGraph::Shader&>( *mShaderEffect->GetSceneObject() );
 
-    ApplyShaderMessage( mStage->GetUpdateInterface(), GetSceneObject(), shader );
+    ApplyShaderMessage( GetEventThreadServices(), GetSceneObject(), shader );
 
     // Notify shader effect
     mShaderEffect->Connect();
@@ -320,7 +321,7 @@ void ImageAttachment::OnStageConnection2()
   unsigned int resourceId = (image) ? image->GetResourceId() : 0u;
   if ( 0u != resourceId )
   {
-    SetTextureIdMessage( mStage->GetUpdateInterface(), *mSceneObject, resourceId );
+    SetTextureIdMessage( GetEventThreadServices(), *mSceneObject, resourceId );
   }
 }
 
@@ -333,7 +334,7 @@ void ImageAttachment::OnStageDisconnection2()
   }
 
   // Remove resource ID when scene-graph attachment is disconnected
-  SetTextureIdMessage( mStage->GetUpdateInterface(), *mSceneObject, 0u );
+  SetTextureIdMessage( GetEventThreadServices(), *mSceneObject, 0u );
 
   mImageConnectable.OnStageDisconnect();
 }

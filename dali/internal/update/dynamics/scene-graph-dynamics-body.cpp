@@ -273,7 +273,7 @@ void DynamicsBody::SetNodePositionAndRotation(const Vector3& position, const Qua
 
   const BufferIndex bufferIndex( mWorld.GetBufferIndex() );
   mNode.BakePosition(bufferIndex, scaledPosition);
-  mNode.BakeRotation(bufferIndex, rotation);
+  mNode.BakeOrientation(bufferIndex, rotation);
 
   if( Dali::DynamicsBodyConfig::RIGID == mBody->GetType() )
   {

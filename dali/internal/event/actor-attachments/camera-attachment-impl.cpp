@@ -20,7 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 
 namespace Dali
@@ -29,15 +30,13 @@ namespace Dali
 namespace Internal
 {
 
-CameraAttachmentPtr CameraAttachment::New( const SceneGraph::Node& parentNode )
+CameraAttachmentPtr CameraAttachment::New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode )
 {
-  StagePtr stage = Stage::GetCurrent();
-
-  CameraAttachmentPtr attachment( new CameraAttachment( *stage ) );
+  CameraAttachmentPtr attachment( new CameraAttachment( eventThreadServices ) );
 
   // Transfer object ownership of scene-object to message
   SceneGraph::CameraAttachment* sceneObject = CreateSceneObject();
-  AttachToNodeMessage( stage->GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( eventThreadServices.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;
@@ -45,8 +44,8 @@ CameraAttachmentPtr CameraAttachment::New( const SceneGraph::Node& parentNode )
   return attachment;
 }
 
-CameraAttachment::CameraAttachment( Stage& stage )
-: ActorAttachment( stage ),
+CameraAttachment::CameraAttachment( EventThreadServices& eventThreadServices )
+: ActorAttachment( eventThreadServices ),
   mSceneObject( NULL ),
   mType( SceneGraph::CameraAttachment::DEFAULT_TYPE ),
   mProjectionMode( SceneGraph::CameraAttachment::DEFAULT_MODE ),
@@ -80,7 +79,7 @@ void CameraAttachment::SetType(Dali::Camera::Type type)
     mType = type;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetTypeMessage( mStage->GetUpdateInterface(), *mSceneObject, type );
+    SetTypeMessage( GetEventThreadServices(), *mSceneObject, type );
   }
 }
 
@@ -96,7 +95,7 @@ void CameraAttachment::SetProjectionMode(Dali::Camera::ProjectionMode projection
     mProjectionMode = projectionMode;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetProjectionModeMessage( mStage->GetUpdateInterface(), *mSceneObject, projectionMode );
+    SetProjectionModeMessage( GetEventThreadServices(), *mSceneObject, projectionMode );
   }
 }
 
@@ -112,7 +111,7 @@ void CameraAttachment::SetFieldOfView( float fieldOfView )
     mFieldOfView = fieldOfView;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetFieldOfViewMessage( mStage->GetUpdateInterface(), *mSceneObject, fieldOfView );
+    SetFieldOfViewMessage( GetEventThreadServices(), *mSceneObject, fieldOfView );
   }
 }
 
@@ -128,7 +127,7 @@ void CameraAttachment::SetAspectRatio( float aspectRatio )
     mAspectRatio = aspectRatio;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetAspectRatioMessage( mStage->GetUpdateInterface(), *mSceneObject, aspectRatio );
+    SetAspectRatioMessage( GetEventThreadServices(), *mSceneObject, aspectRatio );
   }
 }
 
@@ -144,7 +143,7 @@ void CameraAttachment::SetStereoBias(const Vector2& stereoBias)
     mStereoBias = stereoBias;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetStereoBiasMessage( mStage->GetUpdateInterface(), *mSceneObject, stereoBias );
+    SetStereoBiasMessage( GetEventThreadServices(), *mSceneObject, stereoBias );
   }
 }
 
@@ -160,7 +159,7 @@ void CameraAttachment::SetLeftClippingPlane( float leftClippingPlane )
     mLeftClippingPlane = leftClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetLeftClippingPlaneMessage( mStage->GetUpdateInterface(), *mSceneObject, leftClippingPlane );
+    SetLeftClippingPlaneMessage( GetEventThreadServices(), *mSceneObject, leftClippingPlane );
   }
 }
 
@@ -176,7 +175,7 @@ void CameraAttachment::SetRightClippingPlane( float rightClippingPlane )
     mRightClippingPlane = rightClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetRightClippingPlaneMessage( mStage->GetUpdateInterface(), *mSceneObject, rightClippingPlane );
+    SetRightClippingPlaneMessage( GetEventThreadServices(), *mSceneObject, rightClippingPlane );
   }
 }
 
@@ -192,7 +191,7 @@ void CameraAttachment::SetTopClippingPlane( float topClippingPlane )
     mTopClippingPlane = topClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetTopClippingPlaneMessage( mStage->GetUpdateInterface(), *mSceneObject, topClippingPlane );
+    SetTopClippingPlaneMessage( GetEventThreadServices(), *mSceneObject, topClippingPlane );
   }
 }
 
@@ -208,7 +207,7 @@ void CameraAttachment::SetBottomClippingPlane( float bottomClippingPlane )
     mBottomClippingPlane = bottomClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetBottomClippingPlaneMessage( mStage->GetUpdateInterface(), *mSceneObject, bottomClippingPlane );
+    SetBottomClippingPlaneMessage( GetEventThreadServices(), *mSceneObject, bottomClippingPlane );
   }
 }
 
@@ -224,7 +223,7 @@ void CameraAttachment::SetNearClippingPlane( float nearClippingPlane )
     mNearClippingPlane = nearClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetNearClippingPlaneMessage( mStage->GetUpdateInterface(), *mSceneObject, nearClippingPlane );
+    SetNearClippingPlaneMessage( GetEventThreadServices(), *mSceneObject, nearClippingPlane );
   }
 }
 
@@ -240,7 +239,7 @@ void CameraAttachment::SetFarClippingPlane( float farClippingPlane )
     mFarClippingPlane = farClippingPlane;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetFarClippingPlaneMessage( mStage->GetUpdateInterface(), *mSceneObject, farClippingPlane );
+    SetFarClippingPlaneMessage( GetEventThreadServices(), *mSceneObject, farClippingPlane );
   }
 }
 
@@ -255,7 +254,7 @@ void CameraAttachment::SetTargetPosition( Vector3 targetPosition )
   {
     mTargetPosition = targetPosition;
 
-    SetTargetPositionMessage( mStage->GetUpdateInterface(),  *mSceneObject, targetPosition );
+    SetTargetPositionMessage( GetEventThreadServices(),  *mSceneObject, targetPosition );
   }
 }
 
@@ -271,7 +270,7 @@ void CameraAttachment::SetInvertYAxis( bool invertYAxis )
     mInvertYAxis = invertYAxis;
 
     // sceneObject is being used in a separate thread; queue a message to set
-    SetInvertYAxisMessage( mStage->GetUpdateInterface(), *mSceneObject, invertYAxis );
+    SetInvertYAxisMessage( GetEventThreadServices(), *mSceneObject, invertYAxis );
   }
 }
 
@@ -284,21 +283,21 @@ const Matrix& CameraAttachment::GetViewMatrix() const
 {
   const SceneGraph::CameraAttachment& sceneObject = *mSceneObject;
 
-  return sceneObject.GetViewMatrix( mStage->GetEventBufferIndex() );
+  return sceneObject.GetViewMatrix( GetEventThreadServices().GetEventBufferIndex() );
 }
 
 const Matrix& CameraAttachment::GetProjectionMatrix() const
 {
   const SceneGraph::CameraAttachment& sceneObject = *mSceneObject;
 
-  return sceneObject.GetProjectionMatrix( mStage->GetEventBufferIndex() );
+  return sceneObject.GetProjectionMatrix( GetEventThreadServices().GetEventBufferIndex() );
 }
 
 const Matrix& CameraAttachment::GetInverseViewProjectionMatrix() const
 {
   const SceneGraph::CameraAttachment& sceneObject = *mSceneObject;
 
-  return sceneObject.GetInverseViewProjectionMatrix( mStage->GetEventBufferIndex() );
+  return sceneObject.GetInverseViewProjectionMatrix( GetEventThreadServices().GetEventBufferIndex() );
 }
 
 const PropertyInputImpl* CameraAttachment::GetViewMatrixProperty() const

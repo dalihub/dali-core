@@ -17,6 +17,7 @@
  * limitations under the License.
  */
 
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
@@ -150,34 +151,34 @@ private:
 
 // Messages for RendererAttachment
 
-inline void SetMaterialMessage( EventToUpdate& eventToUpdate, const RendererAttachment& attachment, const Material& material )
+inline void SetMaterialMessage( EventThreadServices& eventThreadServices, const RendererAttachment& attachment, const Material& material )
 {
   typedef MessageDoubleBuffered1< RendererAttachment, const Material* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &RendererAttachment::SetMaterial, &material );
 }
 
-inline void SetGeometryMessage( EventToUpdate& eventToUpdate, const RendererAttachment& attachment, const Geometry& geometry )
+inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const RendererAttachment& attachment, const Geometry& geometry )
 {
   typedef MessageDoubleBuffered1< RendererAttachment, const Geometry* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &RendererAttachment::SetGeometry, &geometry );
 }
 
-inline void SetDepthIndexMessage( EventToUpdate& eventToUpdate, const RendererAttachment& attachment, int depthIndex )
+inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const RendererAttachment& attachment, int depthIndex )
 {
   typedef MessageValue1< RendererAttachment, int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &RendererAttachment::SetDepthIndex, depthIndex );

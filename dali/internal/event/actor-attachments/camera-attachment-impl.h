@@ -51,10 +51,11 @@ class CameraAttachment : public ActorAttachment
 public:
   /**
    * Create an initialised CameraAttachment.
+   * @param[in] eventThreadServices to use
    * @param[in] parentNode The node to attach a scene-object to.
    * @return A handle to a newly allocated Dali resource.
    */
-  static CameraAttachmentPtr New( const SceneGraph::Node& parentNode );
+  static CameraAttachmentPtr New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode );
 
   /**
    * @copydoc Dali::Camera::SetType
@@ -245,9 +246,9 @@ private:
 
   /**
    * First stage construction of a CameraAttachment.
-   * @param[in] stage Used to send messages to scene-graph.
+   * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
    */
-  CameraAttachment( Stage& stage );
+  CameraAttachment( EventThreadServices& eventThreadServices );
 
   /**
    * Creates the corresponding scene-graph CameraAttachment.

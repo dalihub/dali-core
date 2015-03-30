@@ -32,18 +32,6 @@
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 
-#include <dali/public-api/dynamics/dynamics-body.h>
-#include <dali/public-api/dynamics/dynamics-joint.h>
-#include <dali/public-api/dynamics/dynamics-body-config.h>
-
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
-#include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
-#include <dali/internal/event/dynamics/dynamics-body-impl.h>
-#include <dali/internal/event/dynamics/dynamics-joint-impl.h>
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#endif
-
 namespace Dali
 {
 
@@ -149,12 +137,6 @@ Actor Actor::FindChildByName(const std::string& actorName)
   return Actor(child.Get());
 }
 
-Actor Actor::FindChildByAlias(const std::string& actorAlias)
-{
-  Actor child = GetImplementation(*this).FindChildByAlias(actorAlias);
-  return child;
-}
-
 Actor Actor::FindChildById(const unsigned int id)
 {
   Internal::ActorPtr child = GetImplementation(*this).FindChildById(id);
@@ -208,9 +190,9 @@ void Actor::SetSize(const Vector3& size)
   GetImplementation(*this).SetSize(size);
 }
 
-Vector3 Actor::GetSize() const
+Vector3 Actor::GetTargetSize() const
 {
-  return GetImplementation(*this).GetSize();
+  return GetImplementation(*this).GetTargetSize();
 }
 
 Vector3 Actor::GetCurrentSize() const
@@ -253,9 +235,9 @@ void Actor::SetZ(float z)
   GetImplementation(*this).SetZ(z);
 }
 
-void Actor::MoveBy(const Vector3& distance)
+void Actor::TranslateBy(const Vector3& distance)
 {
-  GetImplementation(*this).MoveBy(distance);
+  GetImplementation(*this).TranslateBy(distance);
 }
 
 Vector3 Actor::GetCurrentPosition() const
@@ -278,19 +260,19 @@ PositionInheritanceMode Actor::GetPositionInheritanceMode() const
   return GetImplementation(*this).GetPositionInheritanceMode();
 }
 
-void Actor::SetRotation(const Degree& angle, const Vector3& axis)
+void Actor::SetOrientation(const Degree& angle, const Vector3& axis)
 {
-  GetImplementation(*this).SetRotation(Radian(angle), axis);
+  GetImplementation(*this).SetOrientation(Radian(angle), axis);
 }
 
-void Actor::SetRotation(const Radian& angle, const Vector3& axis)
+void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
 {
-  GetImplementation(*this).SetRotation(angle, axis);
+  GetImplementation(*this).SetOrientation(angle, axis);
 }
 
-void Actor::SetRotation(const Quaternion& rotation)
+void Actor::SetOrientation(const Quaternion& orientation)
 {
-  GetImplementation(*this).SetRotation(rotation);
+  GetImplementation(*this).SetOrientation(orientation);
 }
 
 void Actor::RotateBy(const Degree& angle, const Vector3& axis)
@@ -308,24 +290,24 @@ void Actor::RotateBy(const Quaternion& relativeRotation)
   GetImplementation(*this).RotateBy(relativeRotation);
 }
 
-Quaternion Actor::GetCurrentRotation() const
+Quaternion Actor::GetCurrentOrientation() const
 {
-  return GetImplementation(*this).GetCurrentRotation();
+  return GetImplementation(*this).GetCurrentOrientation();
 }
 
-void Actor::SetInheritRotation(bool inherit)
+void Actor::SetInheritOrientation(bool inherit)
 {
-  GetImplementation(*this).SetInheritRotation(inherit);
+  GetImplementation(*this).SetInheritOrientation(inherit);
 }
 
-bool Actor::IsRotationInherited() const
+bool Actor::IsOrientationInherited() const
 {
-  return GetImplementation(*this).IsRotationInherited();
+  return GetImplementation(*this).IsOrientationInherited();
 }
 
-Quaternion Actor::GetCurrentWorldRotation() const
+Quaternion Actor::GetCurrentWorldOrientation() const
 {
-  return GetImplementation(*this).GetCurrentWorldRotation();
+  return GetImplementation(*this).GetCurrentWorldOrientation();
 }
 
 void Actor::SetScale(float scale)
@@ -408,11 +390,6 @@ void Actor::SetOpacity(float opacity)
   GetImplementation(*this).SetOpacity(opacity);
 }
 
-void Actor::OpacityBy(float relativeOpacity)
-{
-  GetImplementation(*this).OpacityBy(relativeOpacity);
-}
-
 float Actor::GetCurrentOpacity() const
 {
   return GetImplementation(*this).GetCurrentOpacity();
@@ -421,11 +398,6 @@ float Actor::GetCurrentOpacity() const
 void Actor::SetColor(const Vector4& color)
 {
   GetImplementation(*this).SetColor(color);
-}
-
-void Actor::ColorBy(const Vector4& relativeColor)
-{
-  GetImplementation(*this).ColorBy(relativeColor);
 }
 
 Vector4 Actor::GetCurrentColor() const
@@ -493,6 +465,135 @@ bool Actor::IsKeyboardFocusable() const
   return GetImplementation(*this).IsKeyboardFocusable();
 }
 
+void Actor::SetRelayoutEnabled( bool enabled )
+{
+  GetImplementation(*this).SetRelayoutEnabled( enabled );
+}
+
+bool Actor::IsRelayoutEnabled() const
+{
+  return GetImplementation(*this).IsRelayoutEnabled();
+}
+
+void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
+{
+  GetImplementation(*this).SetResizePolicy( policy, dimension );
+}
+
+ResizePolicy Actor::GetResizePolicy( Dimension dimension ) const
+{
+  return GetImplementation(*this).GetResizePolicy( dimension );
+}
+
+void Actor::SetSizeScalePolicy( SizeScalePolicy policy )
+{
+  GetImplementation(*this).SetSizeScalePolicy( policy );
+}
+
+SizeScalePolicy Actor::GetSizeScalePolicy() const
+{
+  return GetImplementation(*this).GetSizeScalePolicy();
+}
+
+void Actor::SetDimensionDependency( Dimension dimension, Dimension dependency )
+{
+  GetImplementation(*this).SetDimensionDependency( dimension, dependency );
+}
+
+Dimension Actor::GetDimensionDependency( Dimension dimension )
+{
+  return GetImplementation(*this).GetDimensionDependency( dimension );
+}
+
+float Actor::GetHeightForWidth( float width )
+{
+  return GetImplementation(*this).GetHeightForWidth( width );
+}
+
+float Actor::GetWidthForHeight( float height )
+{
+  return GetImplementation(*this).GetWidthForHeight( height );
+}
+
+float Actor::GetRelayoutSize( Dimension dimension ) const
+{
+  return GetImplementation(*this).GetRelayoutSize( dimension );
+}
+
+void Actor::RelayoutRequestTree()
+{
+  GetImplementation(*this).RelayoutRequestTree();
+}
+
+void Actor::PropagateRelayoutFlags()
+{
+  GetImplementation(*this).PropagateRelayoutFlags();
+}
+
+void Actor::SetPadding( const Padding& padding )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  Vector2 widthPadding( padding.left, padding.right );
+  impl.SetPadding( widthPadding, WIDTH );
+
+  Vector2 heightPadding( padding.bottom, padding.top );
+  impl.SetPadding( heightPadding, HEIGHT );
+}
+
+void Actor::GetPadding( Padding& paddingOut ) const
+{
+  const Internal::Actor& impl = GetImplementation(*this);
+
+  Vector2 widthPadding = impl.GetPadding( WIDTH );
+  Vector2 heightPadding = impl.GetPadding( HEIGHT );
+
+  paddingOut.left = widthPadding.x;
+  paddingOut.right = widthPadding.y;
+  paddingOut.bottom = heightPadding.x;
+  paddingOut.top = heightPadding.y;
+}
+
+void Actor::SetPreferredSize( const Vector2& size )
+{
+  GetImplementation(*this).SetPreferredSize( size );
+}
+
+Vector2 Actor::GetPreferredSize() const
+{
+  return GetImplementation(*this).GetPreferredSize();
+}
+
+void Actor::SetMinimumSize( const Vector2& size )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  impl.SetMinimumSize( size.x, WIDTH );
+  impl.SetMinimumSize( size.y, HEIGHT );
+}
+
+Vector2 Actor::GetMinimumSize()
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  return Vector2( impl.GetMinimumSize( WIDTH ), impl.GetMinimumSize( HEIGHT ) );
+}
+
+void Actor::SetMaximumSize( const Vector2& size )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  impl.SetMaximumSize( size.x, WIDTH );
+  impl.SetMaximumSize( size.y, HEIGHT );
+}
+
+Vector2 Actor::GetMaximumSize()
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  return Vector2( impl.GetMaximumSize( WIDTH ), impl.GetMaximumSize( HEIGHT ) );
+}
+
 Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
@@ -543,96 +644,9 @@ void Actor::RemoveRenderer( unsigned int index )
   GetImplementation(*this).RemoveRenderer( index );
 }
 
-DynamicsBody Actor::EnableDynamics(DynamicsBodyConfig bodyConfig)
+Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 {
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsBodyConfig& internal = GetImplementation(bodyConfig);
-
-  Internal::DynamicsBodyPtr body( GetImplementation(*this).EnableDynamics( &internal ) );
-
-  return DynamicsBody( body.Get() );
-#else
-  return DynamicsBody();
-#endif
-}
-
-DynamicsJoint Actor::AddDynamicsJoint( Actor attachedActor, const Vector3& offset )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::ActorPtr internalActor( &GetImplementation(attachedActor) );
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).AddDynamicsJoint( internalActor, offset) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-DynamicsJoint Actor::AddDynamicsJoint( Actor attachedActor, const Vector3& offsetA, const Vector3& offsetB )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::ActorPtr internalActor( &GetImplementation(attachedActor) );
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).AddDynamicsJoint( internalActor, offsetA, offsetB) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-int Actor::GetNumberOfJoints() const
-{
-#ifdef DYNAMICS_SUPPORT
-  return GetImplementation(*this).GetNumberOfJoints();
-#else
-  return int();
-#endif
-}
-
-DynamicsJoint Actor::GetDynamicsJointByIndex( const int index )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).GetDynamicsJointByIndex( index ) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-DynamicsJoint Actor::GetDynamicsJoint( Actor attachedActor )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).GetDynamicsJoint( &GetImplementation(attachedActor) ) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-void Actor::RemoveDynamicsJoint( DynamicsJoint joint )
-{
-#ifdef DYNAMICS_SUPPORT
-  GetImplementation(*this).RemoveDynamicsJoint( &GetImplementation(joint) );
-#endif
-}
-
-void Actor::DisableDynamics()
-{
-#ifdef DYNAMICS_SUPPORT
-  GetImplementation(*this).DisableDynamics();
-#endif
-}
-
-DynamicsBody Actor::GetDynamicsBody()
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsBodyPtr internal(GetImplementation(*this).GetDynamicsBody());
-  return DynamicsBody( internal.Get() );
-#else
-  return DynamicsBody();
-#endif
+  return GetImplementation(*this).OnRelayoutSignal();
 }
 
 Actor::Actor(Internal::Actor* internal)

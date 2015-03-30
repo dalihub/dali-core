@@ -88,16 +88,6 @@ fi
 
 AM_CONDITIONAL([DYNAMICS_SUPPORT], [test x$dynamics_support = xyes])
 
-AC_ARG_ENABLE([performance-monitor],
-              [AC_HELP_STRING([--enable-performance-monitor],
-                              [Enables the performance monitor output])],
-              [enable_performance_monitor=$enableval],
-              [enable_performance_monitor=no])
-
-if test "x$enable_performance_monitor" = "xyes"; then
-  DALI_CFLAGS="$DALI_CFLAGS -DPERFORMANCE_MONITOR_ENABLED"
-fi
-
 if test x$DALI_DATA_RW_DIR != x; then
   dataReadWriteDir=$DALI_DATA_RW_DIR
 else
@@ -136,7 +126,6 @@ Configuration
 -------------
   Prefix:                           $prefix
   Debug Build:                      $enable_debug
-  Performance Monitor:              $enable_performance_monitor
   Data Dir (Read/Write):            $dataReadWriteDir
   Data Dir (Read Only):             $dataReadOnlyDir
   Emscripten:                       $enable_emscripten

@@ -21,12 +21,11 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
-#include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
@@ -51,10 +50,10 @@ namespace // For internal properties
 
 //              Name                 Type     writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "viewport-position",  VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::ViewportPosition )
-DALI_PROPERTY( "viewport-size",      VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::ViewportSize     )
-DALI_PROPERTY( "clear-color",        VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::ClearColor       )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
+DALI_PROPERTY( "viewport-position",  VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_POSITION )
+DALI_PROPERTY( "viewport-size",      VECTOR2,    true,    true,    true,    Dali::RenderTask::Property::VIEWPORT_SIZE     )
+DALI_PROPERTY( "clear-color",        VECTOR4,    true,    true,    true,    Dali::RenderTask::Property::CLEAR_COLOR       )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 // Signals
 
@@ -68,7 +67,7 @@ SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &RenderTask::DoCon
 
 RenderTask* RenderTask::New( bool isSystemLevel )
 {
-  RenderTask* task( new RenderTask( ThreadLocalStorage::Get().GetEventToUpdate(), isSystemLevel ) );
+  RenderTask* task( new RenderTask( isSystemLevel ) );
 
   return task;
 }
@@ -92,7 +91,7 @@ void RenderTask::SetExclusive( bool exclusive )
     if ( mSceneObject )
     {
       // mSceneObject is being used in a separate thread; queue a message to set the value
-      SetExclusiveMessage( mEventToUpdate, *mSceneObject, mExclusive );
+      SetExclusiveMessage( GetEventThreadServices(), *mSceneObject, mExclusive );
     }
   }
 }
@@ -147,7 +146,7 @@ void RenderTask::SetTargetFrameBuffer( Dali::FrameBufferImage image )
       }
 
       // mSceneObject is being used in a separate thread; queue a message to set the value
-      SetFrameBufferIdMessage( mEventToUpdate, *mSceneObject, resourceId );
+      SetFrameBufferIdMessage( GetEventThreadServices(), *mSceneObject, resourceId );
     }
     else
     {
@@ -184,26 +183,22 @@ Actor* RenderTask::GetScreenToFrameBufferMappingActor() const
 
 void RenderTask::SetViewportPosition(const Vector2& value)
 {
-  StagePtr stage = Stage::GetCurrent();
-  BakeViewportPositionMessage( stage->GetUpdateInterface(), *mSceneObject, value );
+  BakeViewportPositionMessage( GetEventThreadServices(), *mSceneObject, value );
 }
 
 Vector2 RenderTask::GetCurrentViewportPosition() const
 {
-  StagePtr stage = Stage::GetCurrent();
-  return mSceneObject->GetViewportPosition(stage->GetEventBufferIndex());
+  return mSceneObject->GetViewportPosition( GetEventThreadServices().GetEventBufferIndex() );
 }
 
 void RenderTask::SetViewportSize(const Vector2& value)
 {
-  StagePtr stage = Stage::GetCurrent();
-  BakeViewportSizeMessage( stage->GetUpdateInterface(), *mSceneObject, value );
+  BakeViewportSizeMessage( GetEventThreadServices(), *mSceneObject, value );
 }
 
 Vector2 RenderTask::GetCurrentViewportSize() const
 {
-  StagePtr stage = Stage::GetCurrent();
-  return mSceneObject->GetViewportSize(stage->GetEventBufferIndex());
+  return mSceneObject->GetViewportSize( GetEventThreadServices().GetEventBufferIndex() );
 }
 
 void RenderTask::SetViewport( const Viewport& viewport )
@@ -214,7 +209,7 @@ void RenderTask::SetViewport( const Viewport& viewport )
 
 void RenderTask::GetViewport( Viewport& viewPort ) const
 {
-  BufferIndex bufferIndex = Stage::GetCurrent()->GetEventBufferIndex();
+  BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
 
   if(!mSceneObject->GetViewportEnabled( bufferIndex ))
   {
@@ -252,16 +247,14 @@ void RenderTask::SetClearColor( const Vector4& color )
     if ( mSceneObject )
     {
       // mSceneObject is being used in a separate thread; queue a message to set the value
-      StagePtr stage = Stage::GetCurrent();
-      BakeClearColorMessage( stage->GetUpdateInterface(), *mSceneObject, color );
+      BakeClearColorMessage( GetEventThreadServices(), *mSceneObject, color );
     }
   }
 }
 
 const Vector4& RenderTask::GetClearColor() const
 {
-  StagePtr stage = Stage::GetCurrent();
-  return mSceneObject->GetClearColor(stage->GetEventBufferIndex());
+  return mSceneObject->GetClearColor( GetEventThreadServices().GetEventBufferIndex() );
 }
 
 void RenderTask::SetClearEnabled( bool enabled )
@@ -273,7 +266,7 @@ void RenderTask::SetClearEnabled( bool enabled )
     if ( mSceneObject )
     {
       // mSceneObject is being used in a separate thread; queue a message to set the value
-      SetClearEnabledMessage( mEventToUpdate, *mSceneObject, mClearEnabled );
+      SetClearEnabledMessage( GetEventThreadServices(), *mSceneObject, mClearEnabled );
     }
   }
 }
@@ -292,7 +285,7 @@ void RenderTask::SetCullMode( bool mode )
     if ( mSceneObject )
     {
       // mSceneObject is being used in a separate thread; queue a message to set the value
-      SetCullModeMessage( mEventToUpdate, *mSceneObject, mCullMode );
+      SetCullModeMessage( GetEventThreadServices(), *mSceneObject, mCullMode );
     }
   }
 }
@@ -314,7 +307,7 @@ void RenderTask::SetRefreshRate( unsigned int refreshRate )
   if ( mSceneObject )
   {
     // mSceneObject is being used in a separate thread; queue a message to set the value
-    SetRefreshRateMessage( mEventToUpdate, *mSceneObject, refreshRate );
+    SetRefreshRateMessage( GetEventThreadServices(), *mSceneObject, refreshRate );
   }
 }
 
@@ -416,14 +409,14 @@ SceneGraph::RenderTask* RenderTask::CreateSceneObject()
   }
 
   // mSceneObject is being used in a separate thread; queue a message to set the value
-  SetFrameBufferIdMessage( mEventToUpdate, *mSceneObject, resourceId );
+  SetFrameBufferIdMessage( GetEventThreadServices(), *mSceneObject, resourceId );
 
   // Send messages to set other properties that may have changed since last time we were on stage
-  SetExclusiveMessage( mEventToUpdate, *mSceneObject, mExclusive );
-  SetClearColorMessage(  mEventToUpdate, *mSceneObject, mClearColor );
-  SetClearEnabledMessage(  mEventToUpdate, *mSceneObject, mClearEnabled );
-  SetCullModeMessage(  mEventToUpdate, *mSceneObject, mCullMode );
-  SetRefreshRateMessage(  mEventToUpdate, *mSceneObject, mRefreshRate );
+  SetExclusiveMessage( GetEventThreadServices(), *mSceneObject, mExclusive );
+  SetClearColorMessage(  GetEventThreadServices(), *mSceneObject, mClearColor );
+  SetClearEnabledMessage(  GetEventThreadServices(), *mSceneObject, mClearEnabled );
+  SetCullModeMessage(  GetEventThreadServices(), *mSceneObject, mCullMode );
+  SetRefreshRateMessage(  GetEventThreadServices(), *mSceneObject, mRefreshRate );
 
   // Caller takes ownership
   return mSceneObject;
@@ -524,17 +517,17 @@ void RenderTask::SetDefaultProperty( Property::Index index, const Property::Valu
 {
   switch ( index )
   {
-    case Dali::RenderTask::Property::ViewportPosition:
+    case Dali::RenderTask::Property::VIEWPORT_POSITION:
     {
       SetViewportPosition( property.Get<Vector2>() );
       break;
     }
-    case Dali::RenderTask::Property::ViewportSize:
+    case Dali::RenderTask::Property::VIEWPORT_SIZE:
     {
       SetViewportSize( property.Get<Vector2>() );
       break;
     }
-    case Dali::RenderTask::Property::ClearColor:
+    case Dali::RenderTask::Property::CLEAR_COLOR:
     {
       SetClearColor( property.Get<Vector4>() );
       break;
@@ -554,17 +547,17 @@ Property::Value RenderTask::GetDefaultProperty(Property::Index index) const
   switch ( index )
   {
 
-    case Dali::RenderTask::Property::ViewportPosition:
+    case Dali::RenderTask::Property::VIEWPORT_POSITION:
     {
       value = GetCurrentViewportPosition();
       break;
     }
-    case Dali::RenderTask::Property::ViewportSize:
+    case Dali::RenderTask::Property::VIEWPORT_SIZE:
     {
       value = GetCurrentViewportSize();
       break;
     }
-    case Dali::RenderTask::Property::ClearColor:
+    case Dali::RenderTask::Property::CLEAR_COLOR:
     {
       value = GetClearColor();
       break;
@@ -596,15 +589,15 @@ const SceneGraph::PropertyBase* RenderTask::GetSceneObjectAnimatableProperty( Pr
   {
     switch ( index )
     {
-      case Dali::RenderTask::Property::ViewportPosition:
+      case Dali::RenderTask::Property::VIEWPORT_POSITION:
         property = &mSceneObject->mViewportPosition;
         break;
 
-      case Dali::RenderTask::Property::ViewportSize:
+      case Dali::RenderTask::Property::VIEWPORT_SIZE:
         property = &mSceneObject->mViewportSize;
         break;
 
-      case Dali::RenderTask::Property::ClearColor:
+      case Dali::RenderTask::Property::CLEAR_COLOR:
         property = &mSceneObject->mClearColor;
         break;
 
@@ -623,15 +616,15 @@ const PropertyInputImpl* RenderTask::GetSceneObjectInputProperty( Property::Inde
   {
     switch ( index )
     {
-      case Dali::RenderTask::Property::ViewportPosition:
+      case Dali::RenderTask::Property::VIEWPORT_POSITION:
         property = &mSceneObject->mViewportPosition;
         break;
 
-      case Dali::RenderTask::Property::ViewportSize:
+      case Dali::RenderTask::Property::VIEWPORT_SIZE:
         property = &mSceneObject->mViewportSize;
         break;
 
-      case Dali::RenderTask::Property::ClearColor:
+      case Dali::RenderTask::Property::CLEAR_COLOR:
         property = &mSceneObject->mViewportSize;
         break;
 
@@ -693,9 +686,8 @@ bool RenderTask::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface
   return connected;
 }
 
-RenderTask::RenderTask( EventToUpdate& eventToUpdate, bool isSystemLevel )
-: mEventToUpdate( eventToUpdate ),
-  mSceneObject( NULL ),
+RenderTask::RenderTask( bool isSystemLevel )
+: mSceneObject( NULL ),
   mSourceConnector( Connector::SOURCE_CONNECTOR, *this ),
   mCameraConnector( Connector::CAMERA_CONNECTOR, *this ),
   mMappingConnector( Connector::MAPPING_CONNECTOR, *this  ),
@@ -790,11 +782,11 @@ void RenderTask::Connector::UpdateRenderTask()
     //the mapping node is not used in the scene graph
     if ( SOURCE_CONNECTOR == mType )
     {
-      SetSourceNodeMessage( mRenderTask.mEventToUpdate, *(mRenderTask.mSceneObject), node );
+      SetSourceNodeMessage( mRenderTask.GetEventThreadServices(), *(mRenderTask.mSceneObject), node );
     }
     else if( CAMERA_CONNECTOR == mType )
     {
-      SetCameraNodeMessage( mRenderTask.mEventToUpdate, *(mRenderTask.mSceneObject), node );
+      SetCameraNodeMessage( mRenderTask.GetEventThreadServices(), *(mRenderTask.mSceneObject), node );
     }
   }
 }

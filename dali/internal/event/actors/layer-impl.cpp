@@ -40,8 +40,8 @@ namespace
 
 //              Name                Type      writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "clipping-enable",   BOOLEAN,    true,    false,   true,   Dali::Layer::Property::ClippingEnable )
-DALI_PROPERTY( "clipping-box",      RECTANGLE,  true,    false,   true,   Dali::Layer::Property::ClippingBox    )
+DALI_PROPERTY( "clipping-enable",   BOOLEAN,    true,    false,   true,   Dali::Layer::Property::CLIPPING_ENABLE )
+DALI_PROPERTY( "clipping-box",      RECTANGLE,  true,    false,   true,   Dali::Layer::Property::CLIPPING_BOX    )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 
 // Actions
@@ -75,7 +75,7 @@ LayerPtr Layer::New()
   return layer;
 }
 
-LayerPtr Layer::NewRoot( Stage& stage, LayerList& layerList, UpdateManager& manager, bool systemLevel )
+LayerPtr Layer::NewRoot( LayerList& layerList, UpdateManager& manager, bool systemLevel )
 {
   LayerPtr root( new Layer( Actor::ROOT_LAYER ) );
 
@@ -85,9 +85,6 @@ LayerPtr Layer::NewRoot( Stage& stage, LayerList& layerList, UpdateManager& mana
 
   // Keep a raw pointer to the layer node.
   root->mNode = layer;
-
-  // stage must be set for the root layer
-  root->mStage = &stage;
 
   // root actor is immediately considered to be on-stage
   root->mIsOnStage = true;
@@ -112,6 +109,8 @@ Layer::Layer( Actor::DerivedType type )
   mTouchConsumed(false),
   mHoverConsumed(false)
 {
+  // Size negotiate disabled by default, so turn it on for this actor
+  SetRelayoutEnabled( true );
 }
 
 void Layer::OnInitialize()
@@ -212,7 +211,7 @@ void Layer::SetClipping(bool enabled)
     mIsClipping = enabled;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), mIsClipping );
+    SetClippingMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mIsClipping );
   }
 }
 
@@ -228,10 +227,10 @@ void Layer::SetClippingBox(int x, int y, int width, int height)
 
     // Convert mClippingBox to GL based coordinates (from bottom-left)
     ClippingBox clippingBox( mClippingBox );
-    clippingBox.y = mStage->GetSize().height - clippingBox.y - clippingBox.height;
+    clippingBox.y = Stage::GetCurrent()->GetSize().height - clippingBox.y - clippingBox.height;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingBoxMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), clippingBox );
+    SetClippingBoxMessage( GetEventThreadServices(), GetSceneLayerOnStage(), clippingBox );
   }
 }
 
@@ -243,7 +242,7 @@ void Layer::SetDepthTestDisabled( bool disable )
 
     // Send message .....
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetDepthTestDisabledMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), mDepthTestDisabled );
+    SetDepthTestDisabledMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mDepthTestDisabled );
   }
 }
 
@@ -259,7 +258,7 @@ void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
     mSortFunction = function;
 
     // layerNode is being used in a separate thread; queue a message to set the value
-    SetSortFunctionMessage( mStage->GetUpdateInterface(), GetSceneLayerOnStage(), mSortFunction );
+    SetSortFunctionMessage( GetEventThreadServices(), GetSceneLayerOnStage(), mSortFunction );
   }
 }
 
@@ -438,12 +437,12 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
   {
     switch( index )
     {
-      case Dali::Layer::Property::ClippingEnable:
+      case Dali::Layer::Property::CLIPPING_ENABLE:
       {
         SetClipping( propertyValue.Get<bool>() );
         break;
       }
-      case Dali::Layer::Property::ClippingBox:
+      case Dali::Layer::Property::CLIPPING_BOX:
       {
         Rect<int> clippingBox( propertyValue.Get<Rect<int> >() );
         SetClippingBox( clippingBox.x, clippingBox.y, clippingBox.width, clippingBox.height );
@@ -470,12 +469,12 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
   {
     switch( index )
     {
-      case Dali::Layer::Property::ClippingEnable:
+      case Dali::Layer::Property::CLIPPING_ENABLE:
       {
         ret = mIsClipping;
         break;
       }
-      case Dali::Layer::Property::ClippingBox:
+      case Dali::Layer::Property::CLIPPING_BOX:
       {
         ret = mClippingBox;
         break;
@@ -526,4 +525,3 @@ bool Layer::DoAction( BaseObject* object, const std::string& actionName, const s
 } // namespace Internal
 
 } // namespace Dali
-

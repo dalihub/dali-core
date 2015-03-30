@@ -26,7 +26,6 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/notification-manager.h>
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/common/dali-hash.h>
@@ -185,6 +184,47 @@ void ImageFactory::RecoverFromContextLoss()
         // Ensure the finished status is reset
         mResourceClient.ReloadResource( ticket->GetId(), true );
       }
+    }
+  }
+
+  Vector< ContextRecoveryInterface* >::ConstIterator end = mContextRecoveryList.End();
+  for( Vector< ContextRecoveryInterface* >::Iterator iter = mContextRecoveryList.Begin();
+      iter != end; iter++)
+  {
+    (*iter)->RecoverFromContextLoss();
+  }
+}
+
+
+void ImageFactory::RegisterForContextRecovery( ContextRecoveryInterface* object  )
+{
+  bool exist( false );
+  // To avoid registering the same object again
+  Vector< ContextRecoveryInterface* >::ConstIterator end = mContextRecoveryList.End();
+  for( Vector< ContextRecoveryInterface* >::Iterator iter = mContextRecoveryList.Begin();
+          iter != end; iter++)
+  {
+    if( object == *(iter) )
+    {
+      exist = true;
+      break;
+    }
+  }
+  if( !exist )
+  {
+    mContextRecoveryList.PushBack( object );
+  }
+}
+void ImageFactory::UnregisterFromContextRecovery( ContextRecoveryInterface* object  )
+{
+  Vector< ContextRecoveryInterface* >::ConstIterator end = mContextRecoveryList.End();
+  for( Vector< ContextRecoveryInterface* >::Iterator iter = mContextRecoveryList.Begin();
+        iter != end; iter++ )
+  {
+    if( object == *(iter) )
+    {
+      iter = mContextRecoveryList.Erase( iter );
+      break;
     }
   }
 }

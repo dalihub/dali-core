@@ -27,7 +27,7 @@ namespace Dali
 namespace Internal
 {
 
-class Stage;
+class EventThreadServices;
 
 /**
  * An abstract base class for attachments, such a renderable objects and lights.
@@ -57,9 +57,9 @@ protected:
 
   /**
    * Construct a new attachment.
-   * @param[in] stage Used to send messages to scene-graph.
+   * @param[in] eventThreadServices Used for messaging to and reading from scene-graph.
    */
-  ActorAttachment( Stage& stage );
+  ActorAttachment( EventThreadServices& eventThreadServices );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -85,10 +85,31 @@ private:
   virtual void OnStageDisconnection() = 0;
 
 protected:
+  /**
+   * For use in message sending to and property reading from the scene graph
+   * Inlined for speed
+   * @return The EventThreadServices object
+   */
+  inline EventThreadServices& GetEventThreadServices()
+  {
+    return mEventThreadServices;
+  }
 
-  Stage* mStage; ///< Used to send messages to scene-graph; valid until Core destruction
+  /**
+   * For use in message sending to and property reading from the scene graph
+   * Inlined for speed
+   */
+  inline const EventThreadServices& GetEventThreadServices() const
+  {
+    return mEventThreadServices;
+  }
 
+private:
+  EventThreadServices& mEventThreadServices; ///< Used to send messages to scene-graph; valid until Core destruction
+
+protected:
   bool mIsOnStage : 1; ///< Flag to identify whether the attachment is on-stage
+
 };
 
 } // namespace Internal

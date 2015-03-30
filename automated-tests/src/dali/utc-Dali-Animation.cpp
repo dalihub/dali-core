@@ -643,7 +643,7 @@ int UtcDaliAnimationSetSpeedFactor(void)
   KeyFrames keyframes = KeyFrames::New();
   keyframes.Add( 0.0f, initialPosition);
   keyframes.Add( 1.0f, targetPosition );
-  animation.AnimateBetween( Property(actor, Actor::Property::Position), keyframes, AlphaFunctions::Linear);
+  animation.AnimateBetween( Property(actor, Actor::Property::POSITION), keyframes, AlphaFunctions::Linear);
 
   //Set speed to be x2
   animation.SetSpeedFactor(2.0f);
@@ -1193,7 +1193,7 @@ int UtcDaliAnimationPlayRange(void)
   keyframes.Add( 0.0f , Vector3(0.0f,0.0f,0.0f ) );
   keyframes.Add( 1.0f , Vector3(100.0f,100.0f,100.0f ) );
 
-  animation.AnimateBetween( Property( actor, Actor::Property::Position), keyframes );
+  animation.AnimateBetween( Property( actor, Actor::Property::POSITION), keyframes );
 
   // Set range between 0.4 and 0.8
   animation.SetPlayRange( Vector2(0.4f,0.8f) );
@@ -3035,7 +3035,7 @@ int UtcDaliAnimationAnimateByActorPosition(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(20.0f, 20.0f, 20.0f);
   Vector3 relativePosition(targetPosition - startPosition);
-  animation.AnimateBy(Property(actor, Actor::Property::Position), relativePosition);
+  animation.AnimateBy(Property(actor, Actor::Property::POSITION), relativePosition);
 
   Vector3 ninetyFivePercentProgress(startPosition + relativePosition*0.95f);
 
@@ -3087,7 +3087,7 @@ int UtcDaliAnimationAnimateByActorPositionAlphaFunction(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(20.0f, 20.0f, 20.0f);
   Vector3 relativePosition(targetPosition - startPosition);
-  animation.AnimateBy(Property(actor, Actor::Property::Position), relativePosition, AlphaFunctions::EaseOut);
+  animation.AnimateBy(Property(actor, Actor::Property::POSITION), relativePosition, AlphaFunctions::EaseOut);
 
   Vector3 ninetyFivePercentProgress(startPosition + relativePosition*0.95f);
 
@@ -3145,7 +3145,7 @@ int UtcDaliAnimationAnimateByActorPositionTimePeriod(void)
   Vector3 targetPosition(20.0f, 20.0f, 20.0f);
   Vector3 relativePosition(targetPosition - startPosition);
   float delay = 0.5f;
-  animation.AnimateBy(Property(actor, Actor::Property::Position),
+  animation.AnimateBy(Property(actor, Actor::Property::POSITION),
                       relativePosition,
                       TimePeriod(delay, durationSeconds - delay));
 
@@ -3200,7 +3200,7 @@ int UtcDaliAnimationAnimateByActorPositionAlphaFunctionTimePeriod(void)
   Vector3 targetPosition(20.0f, 20.0f, 20.0f);
   Vector3 relativePosition(targetPosition - startPosition);
   float delay = 0.5f;
-  animation.AnimateBy(Property(actor, Actor::Property::Position),
+  animation.AnimateBy(Property(actor, Actor::Property::POSITION),
                       relativePosition,
                       AlphaFunctions::Linear,
                       TimePeriod(delay, durationSeconds - delay));
@@ -4638,12 +4638,12 @@ int UtcDaliAnimationAnimateToActorParentOrigin(void)
 
   try
   {
-    animation.AnimateTo( Property(actor, Actor::Property::ParentOrigin), targetParentOrigin );
+    animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN), targetParentOrigin );
   }
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4656,7 +4656,7 @@ int UtcDaliAnimationAnimateToActorParentOriginX(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.0f);
   DALI_TEST_EQUALS( actor.GetCurrentParentOrigin().x, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ParentOriginX), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PARENT_ORIGIN_X), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -4665,12 +4665,12 @@ int UtcDaliAnimationAnimateToActorParentOriginX(void)
 
   try
   {
-    animation.AnimateTo( Property(actor, Actor::Property::ParentOriginX), targetX );
+    animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_X), targetX );
   }
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4683,7 +4683,7 @@ int UtcDaliAnimationAnimateToActorParentOriginY(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.0f);
   DALI_TEST_EQUALS( actor.GetCurrentParentOrigin().y, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ParentOriginY), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PARENT_ORIGIN_Y), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -4692,12 +4692,12 @@ int UtcDaliAnimationAnimateToActorParentOriginY(void)
 
   try
   {
-    animation.AnimateTo( Property(actor, Actor::Property::ParentOriginY), targetY );
+    animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_Y), targetY );
   }
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4710,7 +4710,7 @@ int UtcDaliAnimationAnimateToActorParentOriginZ(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.5f);
   DALI_TEST_EQUALS( actor.GetCurrentParentOrigin().z, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ParentOriginZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PARENT_ORIGIN_Z), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -4719,12 +4719,12 @@ int UtcDaliAnimationAnimateToActorParentOriginZ(void)
 
   try
   {
-    animation.AnimateTo( Property(actor, Actor::Property::ParentOriginZ), targetZ );
+    animation.AnimateTo( Property(actor, Actor::Property::PARENT_ORIGIN_Z), targetZ );
   }
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4744,12 +4744,12 @@ int UtcDaliAnimationAnimateToActorAnchorPoint(void)
 
   try
   {
-    animation.AnimateTo( Property(actor, Actor::Property::AnchorPoint), targetAnchorPoint);
+    animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT), targetAnchorPoint);
   }
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4762,7 +4762,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointX(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.5f);
   DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint().x, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::AnchorPointX), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ANCHOR_POINT_X), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -4771,12 +4771,12 @@ int UtcDaliAnimationAnimateToActorAnchorPointX(void)
 
   try
   {
-    animation.AnimateTo( Property(actor, Actor::Property::AnchorPointX), targetX );
+    animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_X), targetX );
   }
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4789,7 +4789,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointY(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.5f);
   DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint().y, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::AnchorPointY), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ANCHOR_POINT_Y), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -4798,12 +4798,12 @@ int UtcDaliAnimationAnimateToActorAnchorPointY(void)
 
   try
   {
-    animation.AnimateTo( Property(actor, Actor::Property::AnchorPointY), targetY );
+    animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_Y), targetY );
   }
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4816,7 +4816,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointZ(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.5f);
   DALI_TEST_EQUALS( actor.GetCurrentAnchorPoint().z, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::AnchorPointZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ANCHOR_POINT_Z), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -4825,12 +4825,12 @@ int UtcDaliAnimationAnimateToActorAnchorPointZ(void)
 
   try
   {
-    animation.AnimateTo( Property(actor, Actor::Property::AnchorPointZ), targetZ );
+    animation.AnimateTo( Property(actor, Actor::Property::ANCHOR_POINT_Z), targetZ );
   }
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4847,7 +4847,7 @@ int UtcDaliAnimationAnimateToActorSize(void)
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetSize(100.0f, 100.0f, 100.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::Size), targetSize );
+  animation.AnimateTo( Property(actor, Actor::Property::SIZE), targetSize );
 
   Vector3 ninetyNinePercentProgress(targetSize * 0.99f);
 
@@ -4883,7 +4883,7 @@ int UtcDaliAnimationAnimateToActorSize(void)
 
   // Repeat with a different (ease-in) alpha function
   animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(actor, Actor::Property::Size), targetSize, AlphaFunctions::EaseIn);
+  animation.AnimateTo( Property(actor, Actor::Property::SIZE), targetSize, AlphaFunctions::EaseIn);
   animation.FinishedSignal().Connect(&application, finishCheck);
   animation.Play();
 
@@ -4921,7 +4921,7 @@ int UtcDaliAnimationAnimateToActorSize(void)
   // Repeat with a delay
   float delay = 0.5f;
   animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(actor, Actor::Property::Size), targetSize, AlphaFunctions::Linear, TimePeriod(delay, durationSeconds - delay));
+  animation.AnimateTo( Property(actor, Actor::Property::SIZE), targetSize, AlphaFunctions::Linear, TimePeriod(delay, durationSeconds - delay));
   animation.FinishedSignal().Connect(&application, finishCheck);
   animation.Play();
 
@@ -4951,13 +4951,13 @@ int UtcDaliAnimationAnimateToActorSizeWidth(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.0f);
   DALI_TEST_EQUALS( actor.GetCurrentSize().width, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeWidth), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetWidth(10.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::SizeWidth), targetWidth );
+  animation.AnimateTo( Property(actor, Actor::Property::SIZE_WIDTH), targetWidth );
 
   float fiftyPercentProgress(startValue + (targetWidth - startValue)*0.5f);
 
@@ -4975,7 +4975,7 @@ int UtcDaliAnimationAnimateToActorSizeWidth(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().width, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeWidth), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -4984,7 +4984,7 @@ int UtcDaliAnimationAnimateToActorSizeWidth(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().width, targetWidth, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeWidth), targetWidth, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_WIDTH), targetWidth, TEST_LOCATION );
   END_TEST;
 }
 
@@ -4996,13 +4996,13 @@ int UtcDaliAnimationAnimateToActorSizeHeight(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.0f);
   DALI_TEST_EQUALS( actor.GetCurrentSize().height, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeHeight), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetHeight(-10.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::SizeHeight), targetHeight );
+  animation.AnimateTo( Property(actor, Actor::Property::SIZE_HEIGHT), targetHeight );
 
   float fiftyPercentProgress(startValue + (targetHeight - startValue)*0.5f);
 
@@ -5020,7 +5020,7 @@ int UtcDaliAnimationAnimateToActorSizeHeight(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().height, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeHeight), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5029,7 +5029,7 @@ int UtcDaliAnimationAnimateToActorSizeHeight(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().height, targetHeight, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeHeight), targetHeight, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_HEIGHT), targetHeight, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5041,13 +5041,13 @@ int UtcDaliAnimationAnimateToActorSizeDepth(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.0f);
   DALI_TEST_EQUALS( actor.GetCurrentSize().depth, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeDepth), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetDepth(-10.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::SizeDepth), targetDepth );
+  animation.AnimateTo( Property(actor, Actor::Property::SIZE_DEPTH), targetDepth );
 
   float fiftyPercentProgress(startValue + (targetDepth - startValue)*0.5f);
 
@@ -5065,7 +5065,7 @@ int UtcDaliAnimationAnimateToActorSizeDepth(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().depth, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeDepth), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5074,7 +5074,7 @@ int UtcDaliAnimationAnimateToActorSizeDepth(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentSize().depth, targetDepth, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SizeDepth), targetDepth, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SIZE_DEPTH), targetDepth, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5090,7 +5090,7 @@ int UtcDaliAnimationAnimateToActorPosition(void)
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(200.0f, 200.0f, 200.0f);
-  animation.AnimateTo(Property(actor, Actor::Property::Position), targetPosition);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition);
 
   Vector3 seventyFivePercentProgress(targetPosition * 0.75f);
 
@@ -5127,15 +5127,15 @@ int UtcDaliAnimationAnimateToActorPositionX(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.0f);
   DALI_TEST_EQUALS( actor.GetCurrentPosition().x, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetX(1.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::PositionX), targetX );
+  animation.AnimateTo( Property(actor, Actor::Property::POSITION_X), targetX );
 
   float fiftyPercentProgress(startValue + (targetX - startValue)*0.5f);
 
@@ -5153,9 +5153,9 @@ int UtcDaliAnimationAnimateToActorPositionX(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().x, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5164,9 +5164,9 @@ int UtcDaliAnimationAnimateToActorPositionX(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().x, targetX, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), targetX, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), targetX, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5178,15 +5178,15 @@ int UtcDaliAnimationAnimateToActorPositionY(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.0f);
   DALI_TEST_EQUALS( actor.GetCurrentPosition().y, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetY(10.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::PositionY), targetY );
+  animation.AnimateTo( Property(actor, Actor::Property::POSITION_Y), targetY );
 
   float fiftyPercentProgress(startValue + (targetY - startValue)*0.5f);
 
@@ -5204,9 +5204,9 @@ int UtcDaliAnimationAnimateToActorPositionY(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().y, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5215,9 +5215,9 @@ int UtcDaliAnimationAnimateToActorPositionY(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().y, targetY, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), targetY, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), targetY, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5229,15 +5229,15 @@ int UtcDaliAnimationAnimateToActorPositionZ(void)
   Stage::GetCurrent().Add(actor);
   float startValue(0.0f);
   DALI_TEST_EQUALS( actor.GetCurrentPosition().z, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetZ(-5.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::PositionZ), targetZ );
+  animation.AnimateTo( Property(actor, Actor::Property::POSITION_Z), targetZ );
 
   float fiftyPercentProgress(startValue + (targetZ - startValue)*0.5f);
 
@@ -5255,9 +5255,9 @@ int UtcDaliAnimationAnimateToActorPositionZ(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().z, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5266,9 +5266,9 @@ int UtcDaliAnimationAnimateToActorPositionZ(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentPosition().z, targetZ, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::PositionZ), targetZ, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::POSITION_Z), targetZ, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5284,7 +5284,7 @@ int UtcDaliAnimationAnimateToActorPositionAlphaFunction(void)
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(200.0f, 200.0f, 200.0f);
-  animation.AnimateTo(Property(actor, Actor::Property::Position), targetPosition, AlphaFunctions::EaseIn);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunctions::EaseIn);
 
   Vector3 seventyFivePercentProgress(targetPosition * 0.75f);
 
@@ -5334,7 +5334,7 @@ int UtcDaliAnimationAnimateToActorPositionTimePeriod(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(200.0f, 200.0f, 200.0f);
   float delay = 0.5f;
-  animation.AnimateTo( Property(actor, Actor::Property::Position),
+  animation.AnimateTo( Property(actor, Actor::Property::POSITION),
                        targetPosition,
                        TimePeriod( delay, durationSeconds - delay ) );
 
@@ -5386,7 +5386,7 @@ int UtcDaliAnimationAnimateToActorPositionAlphaFunctionTimePeriod(void)
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetPosition(200.0f, 200.0f, 200.0f);
   float delay = 0.5f;
-  animation.AnimateTo( Property(actor, Actor::Property::Position),
+  animation.AnimateTo( Property(actor, Actor::Property::POSITION),
                        targetPosition,
                        AlphaFunctions::Linear,
                        TimePeriod( delay, durationSeconds - delay ) );
@@ -5431,16 +5431,16 @@ int UtcDaliAnimationAnimateToActorRotationAngleAxis(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   Degree targetRotationDegrees(90.0f);
   Radian targetRotationRadians(targetRotationDegrees);
-  animation.AnimateTo( Property(actor, Actor::Property::Rotation), AngleAxis(targetRotationRadians, Vector3::YAXIS) );
+  animation.AnimateTo( Property(actor, Actor::Property::ORIENTATION), AngleAxis(targetRotationRadians, Vector3::YAXIS) );
 
   // Start the animation
   animation.Play();
@@ -5455,7 +5455,7 @@ int UtcDaliAnimationAnimateToActorRotationAngleAxis(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -5463,7 +5463,7 @@ int UtcDaliAnimationAnimateToActorRotationAngleAxis(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -5471,7 +5471,7 @@ int UtcDaliAnimationAnimateToActorRotationAngleAxis(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -5479,7 +5479,7 @@ int UtcDaliAnimationAnimateToActorRotationAngleAxis(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5488,9 +5488,9 @@ int UtcDaliAnimationAnimateToActorRotationQuaternion(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -5498,7 +5498,7 @@ int UtcDaliAnimationAnimateToActorRotationQuaternion(void)
   Degree targetRotationDegrees(90.0f);
   Radian targetRotationRadians(targetRotationDegrees);
   Quaternion targetRotation(targetRotationRadians, Vector3::YAXIS);
-  animation.AnimateTo( Property(actor, Actor::Property::Rotation), targetRotation );
+  animation.AnimateTo( Property(actor, Actor::Property::ORIENTATION), targetRotation );
 
   // Start the animation
   animation.Play();
@@ -5513,7 +5513,7 @@ int UtcDaliAnimationAnimateToActorRotationQuaternion(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -5521,7 +5521,7 @@ int UtcDaliAnimationAnimateToActorRotationQuaternion(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -5529,7 +5529,7 @@ int UtcDaliAnimationAnimateToActorRotationQuaternion(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -5537,7 +5537,7 @@ int UtcDaliAnimationAnimateToActorRotationQuaternion(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5546,16 +5546,16 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunction(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   Degree targetRotationDegrees(90.0f);
   Radian targetRotationRadians(targetRotationDegrees);
-  animation.AnimateTo( Property(actor, Actor::Property::Rotation), AngleAxis(targetRotationDegrees, Vector3::YAXIS), AlphaFunctions::EaseIn);
+  animation.AnimateTo( Property(actor, Actor::Property::ORIENTATION), AngleAxis(targetRotationDegrees, Vector3::YAXIS), AlphaFunctions::EaseIn);
 
   // Start the animation
   animation.Play();
@@ -5570,7 +5570,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunction(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -5578,7 +5578,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunction(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -5586,7 +5586,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunction(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -5594,7 +5594,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunction(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5603,9 +5603,9 @@ int UtcDaliAnimationAnimateToActorRotationTimePeriod(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -5613,7 +5613,7 @@ int UtcDaliAnimationAnimateToActorRotationTimePeriod(void)
   Degree targetRotationDegrees(90.0f);
   Radian targetRotationRadians(targetRotationDegrees);
   float delay(0.1f);
-  animation.AnimateTo( Property(actor, Actor::Property::Rotation), AngleAxis(targetRotationDegrees, Vector3::YAXIS), TimePeriod(delay, durationSeconds - delay));
+  animation.AnimateTo( Property(actor, Actor::Property::ORIENTATION), AngleAxis(targetRotationDegrees, Vector3::YAXIS), TimePeriod(delay, durationSeconds - delay));
 
   // Start the animation
   animation.Play();
@@ -5629,7 +5629,7 @@ int UtcDaliAnimationAnimateToActorRotationTimePeriod(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   float progress = max(0.0f, 0.25f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * progress, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * progress, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -5638,7 +5638,7 @@ int UtcDaliAnimationAnimateToActorRotationTimePeriod(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.5f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * progress, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * progress, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -5647,7 +5647,7 @@ int UtcDaliAnimationAnimateToActorRotationTimePeriod(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.75f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * progress, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * progress, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -5655,7 +5655,7 @@ int UtcDaliAnimationAnimateToActorRotationTimePeriod(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5664,9 +5664,9 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunctionTimePeriod(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -5674,7 +5674,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunctionTimePeriod(void)
   Degree targetRotationDegrees(90.0f);
   Radian targetRotationRadians(targetRotationDegrees);
   float delay(0.1f);
-  animation.AnimateTo( Property(actor, Actor::Property::Rotation), AngleAxis(targetRotationDegrees, Vector3::YAXIS), AlphaFunctions::EaseIn, TimePeriod(delay, durationSeconds - delay));
+  animation.AnimateTo( Property(actor, Actor::Property::ORIENTATION), AngleAxis(targetRotationDegrees, Vector3::YAXIS), AlphaFunctions::EaseIn, TimePeriod(delay, durationSeconds - delay));
 
   // Start the animation
   animation.Play();
@@ -5690,7 +5690,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunctionTimePeriod(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   float progress = max(0.0f, 0.25f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -5699,7 +5699,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunctionTimePeriod(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.5f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -5708,7 +5708,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunctionTimePeriod(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.75f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -5716,7 +5716,7 @@ int UtcDaliAnimationAnimateToActorRotationAlphaFunctionTimePeriod(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5732,7 +5732,7 @@ int UtcDaliAnimationAnimateToActorScale(void)
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   Vector3 targetScale(2.0f, 2.0f, 2.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::Scale), targetScale );
+  animation.AnimateTo( Property(actor, Actor::Property::SCALE), targetScale );
 
   Vector3 ninetyNinePercentProgress(Vector3::ONE + (targetScale - Vector3::ONE)*0.99f);
 
@@ -5768,7 +5768,7 @@ int UtcDaliAnimationAnimateToActorScale(void)
 
   // Repeat with a different (ease-in) alpha function
   animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(actor, Actor::Property::Scale), targetScale, AlphaFunctions::EaseIn);
+  animation.AnimateTo( Property(actor, Actor::Property::SCALE), targetScale, AlphaFunctions::EaseIn);
   animation.FinishedSignal().Connect(&application, finishCheck);
   animation.Play();
 
@@ -5806,7 +5806,7 @@ int UtcDaliAnimationAnimateToActorScale(void)
   // Repeat with a delay
   float delay = 0.5f;
   animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(actor, Actor::Property::Scale), targetScale, AlphaFunctions::Linear, TimePeriod(delay, durationSeconds - delay));
+  animation.AnimateTo( Property(actor, Actor::Property::SCALE), targetScale, AlphaFunctions::Linear, TimePeriod(delay, durationSeconds - delay));
   animation.FinishedSignal().Connect(&application, finishCheck);
   animation.Play();
 
@@ -5836,15 +5836,15 @@ int UtcDaliAnimationAnimateToActorScaleX(void)
   Stage::GetCurrent().Add(actor);
   float startValue(1.0f);
   DALI_TEST_EQUALS( actor.GetCurrentScale().x, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetX(10.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::ScaleX), targetX );
+  animation.AnimateTo( Property(actor, Actor::Property::SCALE_X), targetX );
 
   float fiftyPercentProgress(startValue + (targetX - startValue)*0.5f);
 
@@ -5862,9 +5862,9 @@ int UtcDaliAnimationAnimateToActorScaleX(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentScale().x, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5873,9 +5873,9 @@ int UtcDaliAnimationAnimateToActorScaleX(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentScale().x, targetX, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), targetX, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), targetX, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), startValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5887,15 +5887,15 @@ int UtcDaliAnimationAnimateToActorScaleY(void)
   Stage::GetCurrent().Add(actor);
   float startValue(1.0f);
   DALI_TEST_EQUALS( actor.GetCurrentScale().y, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetY(1000.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::ScaleY), targetY );
+  animation.AnimateTo( Property(actor, Actor::Property::SCALE_Y), targetY );
 
   float fiftyPercentProgress(startValue + (targetY - startValue)*0.5f);
 
@@ -5913,9 +5913,9 @@ int UtcDaliAnimationAnimateToActorScaleY(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentScale().y, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), startValue, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5924,9 +5924,9 @@ int UtcDaliAnimationAnimateToActorScaleY(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentScale().y, targetY, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), targetY, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), targetY, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), startValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5938,15 +5938,15 @@ int UtcDaliAnimationAnimateToActorScaleZ(void)
   Stage::GetCurrent().Add(actor);
   float startValue(1.0f);
   DALI_TEST_EQUALS( actor.GetCurrentScale().z, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetZ(-1000.0f);
-  animation.AnimateTo( Property(actor, Actor::Property::ScaleZ), targetZ );
+  animation.AnimateTo( Property(actor, Actor::Property::SCALE_Z), targetZ );
 
   float fiftyPercentProgress(startValue + (targetZ - startValue)*0.5f);
 
@@ -5964,9 +5964,9 @@ int UtcDaliAnimationAnimateToActorScaleZ(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentScale().z, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -5975,9 +5975,9 @@ int UtcDaliAnimationAnimateToActorScaleZ(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentScale().z, targetZ, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleX), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleY), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ScaleZ), targetZ, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_X), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Y), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::SCALE_Z), targetZ, TEST_LOCATION );
   END_TEST;
 }
 
@@ -5993,7 +5993,7 @@ int UtcDaliAnimationAnimateToActorColor(void)
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   Vector4 targetColor(Color::RED);
-  animation.AnimateTo( Property(actor, Actor::Property::Color), targetColor );
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR), targetColor );
 
   Vector4 tenPercentProgress(Vector4(1.0f, 0.9f, 0.9f, 1.0f));
   Vector4 twentyPercentProgress(Vector4(1.0f, 0.8f, 0.8f, 1.0f));
@@ -6030,7 +6030,7 @@ int UtcDaliAnimationAnimateToActorColor(void)
 
   // Repeat with a different (ease-in) alpha function
   animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(actor, Actor::Property::Color), targetColor, AlphaFunctions::EaseIn);
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR), targetColor, AlphaFunctions::EaseIn);
   animation.FinishedSignal().Connect(&application, finishCheck);
   animation.Play();
 
@@ -6068,7 +6068,7 @@ int UtcDaliAnimationAnimateToActorColor(void)
   // Repeat with a shorter animator duration
   float animatorDuration = 0.5f;
   animation = Animation::New(durationSeconds);
-  animation.AnimateTo( Property(actor, Actor::Property::Color), targetColor, AlphaFunctions::Linear, TimePeriod(animatorDuration));
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR), targetColor, AlphaFunctions::Linear, TimePeriod(animatorDuration));
   animation.FinishedSignal().Connect(&application, finishCheck);
   animation.Play();
 
@@ -6106,16 +6106,16 @@ int UtcDaliAnimationAnimateToActorColorRed(void)
   Stage::GetCurrent().Add(actor);
   float startValue(1.0f);
   DALI_TEST_EQUALS( actor.GetCurrentColor().r, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetRed(0.5f);
-  animation.AnimateTo( Property(actor, Actor::Property::ColorRed), targetRed );
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR_RED), targetRed );
 
   float fiftyPercentProgress(startValue + (targetRed - startValue)*0.5f);
 
@@ -6133,10 +6133,10 @@ int UtcDaliAnimationAnimateToActorColorRed(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentColor().r, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue,           TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -6145,10 +6145,10 @@ int UtcDaliAnimationAnimateToActorColorRed(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentColor().r, targetRed, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   targetRed,  TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   targetRed,  TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -6160,16 +6160,16 @@ int UtcDaliAnimationAnimateToActorColorGreen(void)
   Stage::GetCurrent().Add(actor);
   float startValue(1.0f);
   DALI_TEST_EQUALS( actor.GetCurrentColor().g, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetGreen(0.5f);
-  animation.AnimateTo( Property(actor, Actor::Property::ColorGreen), targetGreen );
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR_GREEN), targetGreen );
 
   float fiftyPercentProgress(startValue + (targetGreen - startValue)*0.5f);
 
@@ -6187,10 +6187,10 @@ int UtcDaliAnimationAnimateToActorColorGreen(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentColor().g, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue,           TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -6199,10 +6199,10 @@ int UtcDaliAnimationAnimateToActorColorGreen(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentColor().g, targetGreen, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue,  TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), targetGreen, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue,  TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue,  TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue,  TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), targetGreen, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue,  TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue,  TEST_LOCATION );
   END_TEST;
 }
 
@@ -6214,16 +6214,16 @@ int UtcDaliAnimationAnimateToActorColorBlue(void)
   Stage::GetCurrent().Add(actor);
   float startValue(1.0f);
   DALI_TEST_EQUALS( actor.GetCurrentColor().b, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetBlue(0.5f);
-  animation.AnimateTo( Property(actor, Actor::Property::ColorBlue), targetBlue );
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR_BLUE), targetBlue );
 
   float fiftyPercentProgress(startValue + (targetBlue - startValue)*0.5f);
 
@@ -6241,10 +6241,10 @@ int UtcDaliAnimationAnimateToActorColorBlue(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentColor().b, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue,           TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -6253,10 +6253,10 @@ int UtcDaliAnimationAnimateToActorColorBlue(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentColor().b, targetBlue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  targetBlue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  targetBlue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
   END_TEST;
 }
 
@@ -6268,16 +6268,16 @@ int UtcDaliAnimationAnimateToActorColorAlpha(void)
   Stage::GetCurrent().Add(actor);
   float startValue(1.0f);
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
   Animation animation = Animation::New(durationSeconds);
   float targetAlpha(0.5f);
-  animation.AnimateTo( Property(actor, Actor::Property::ColorAlpha), targetAlpha );
+  animation.AnimateTo( Property(actor, Actor::Property::COLOR_ALPHA), targetAlpha );
 
   float fiftyPercentProgress(startValue + (targetAlpha - startValue)*0.5f);
 
@@ -6295,10 +6295,10 @@ int UtcDaliAnimationAnimateToActorColorAlpha(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, fiftyPercentProgress, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue,           TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), fiftyPercentProgress, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue,           TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), fiftyPercentProgress, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
@@ -6307,10 +6307,10 @@ int UtcDaliAnimationAnimateToActorColorAlpha(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, targetAlpha, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue,  TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue,  TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue,  TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), targetAlpha, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue,  TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue,  TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue,  TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), targetAlpha, TEST_LOCATION );
   END_TEST;
 }
 
@@ -6501,10 +6501,10 @@ int UtcDaliAnimationAnimateBetweenActorColorAlpha(void)
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -6518,7 +6518,7 @@ int UtcDaliAnimationAnimateBetweenActorColorAlpha(void)
   keyFrames.Add(0.8f, 0.7f);
   keyFrames.Add(1.0f, 0.9f);
 
-  animation.AnimateBetween( Property(actor, Actor::Property::ColorAlpha), keyFrames );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR_ALPHA), keyFrames );
 
   // Start the animation
   animation.Play();
@@ -6534,50 +6534,50 @@ int UtcDaliAnimationAnimateBetweenActorColorAlpha(void)
 
   application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 10% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.3f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.3f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.3f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 30% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.25f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.25f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.25f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 40% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.0f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.0f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*400.0f)/* 80% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.7f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.7f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.7f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 90% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.8f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.8f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.8f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*100.0f)+1/* 100% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.9f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.9f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.9f, 0.01f, TEST_LOCATION );
 
   // We did expect the animation to finish
@@ -6596,10 +6596,10 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaCubic(void)
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -6613,7 +6613,7 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaCubic(void)
   keyFrames.Add(0.8f, 0.7f);
   keyFrames.Add(1.0f, 0.9f);
 
-  animation.AnimateBetween( Property(actor, Actor::Property::ColorAlpha), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR_ALPHA), keyFrames, Animation::Cubic );
 
   // Start the animation
   animation.Play();
@@ -6629,50 +6629,50 @@ int UtcDaliAnimationAnimateBetweenActorColorAlphaCubic(void)
 
   application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 10% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.36f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.36f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.36f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 30% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.21f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.21f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.21f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 40% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.0f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.0f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*400.0f)/* 80% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.7f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.7f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.7f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 90% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.76f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.76f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.76f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*100.0f)+1/* 100% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.9f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.9f, 0.01f, TEST_LOCATION );
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, 0.9f, 0.01f, TEST_LOCATION );
 
   // We did expect the animation to finish
@@ -6691,10 +6691,10 @@ int UtcDaliAnimationAnimateBetweenActorColor(void)
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -6705,7 +6705,7 @@ int UtcDaliAnimationAnimateBetweenActorColor(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::Color), keyFrames );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames );
 
   // Start the animation
   animation.Play();
@@ -6717,38 +6717,38 @@ int UtcDaliAnimationAnimateBetweenActorColor(void)
   application.Render(0);
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.1f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.2f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.3f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.4f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.1f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.2f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.3f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.4f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.5f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.9f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.8f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.7f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.6f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.9f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.8f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.7f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.6f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.95f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.90f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.85f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.80f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.95f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.90f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.85f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.80f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 1.0f, 0.01f, TEST_LOCATION );
 
   // We did expect the animation to finish
 
@@ -6766,10 +6766,10 @@ int UtcDaliAnimationAnimateBetweenActorColorCubic(void)
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -6780,7 +6780,7 @@ int UtcDaliAnimationAnimateBetweenActorColorCubic(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::Color), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, Animation::Cubic );
 
   // Start the animation
   animation.Play();
@@ -6792,38 +6792,38 @@ int UtcDaliAnimationAnimateBetweenActorColorCubic(void)
   application.Render(0);
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.1f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.2f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.3f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.4f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.1f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.2f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.3f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.4f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.55f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.525f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.506f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.4875f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.55f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.525f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.506f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.4875f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.9f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.8f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.7f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.6f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.9f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.8f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.7f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.6f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.99375f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.925f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.85625f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.7875f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.99375f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.925f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.85625f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.7875f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 1.0f, 0.01f, TEST_LOCATION );
 
   // We did expect the animation to finish
 
@@ -6837,7 +6837,7 @@ int UtcDaliAnimationAnimateBetweenActorVisible(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetRotation(aa.angle, aa.axis);
+  actor.SetOrientation(aa.angle, aa.axis);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -6856,7 +6856,7 @@ int UtcDaliAnimationAnimateBetweenActorVisible(void)
   keyFrames.Add(0.8f, false);
   keyFrames.Add(1.0f, true);
 
-  animation.AnimateBetween( Property(actor, Actor::Property::Visible), keyFrames );
+  animation.AnimateBetween( Property(actor, Actor::Property::VISIBLE), keyFrames );
 
   // Start the animation
   animation.Play();
@@ -6882,7 +6882,7 @@ int UtcDaliAnimationAnimateBetweenActorVisibleCubic(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetRotation(aa.angle, aa.axis);
+  actor.SetOrientation(aa.angle, aa.axis);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -6902,7 +6902,7 @@ int UtcDaliAnimationAnimateBetweenActorVisibleCubic(void)
   keyFrames.Add(1.0f, true);
 
   //Cubic interpolation for boolean values should be ignored
-  animation.AnimateBetween( Property(actor, Actor::Property::Visible), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::VISIBLE), keyFrames, Animation::Cubic );
 
   // Start the animation
   animation.Play();
@@ -6928,13 +6928,13 @@ int UtcDaliAnimationAnimateBetweenActorRotation01(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetRotation(aa.angle, aa.axis);
+  actor.SetOrientation(aa.angle, aa.axis);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
   application.Render(0);
   Quaternion start(Radian(aa.angle), aa.axis);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), start, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), start, 0.001f, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -6943,7 +6943,7 @@ int UtcDaliAnimationAnimateBetweenActorRotation01(void)
   KeyFrames keyFrames = KeyFrames::New();
   keyFrames.Add(0.0f, AngleAxis(Degree(60), Vector3::ZAXIS));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::Rotation), keyFrames );
+  animation.AnimateBetween( Property(actor, Actor::Property::ORIENTATION), keyFrames );
 
   // Start the animation
   animation.Play();
@@ -6960,7 +6960,7 @@ int UtcDaliAnimationAnimateBetweenActorRotation01(void)
 
   Quaternion check = Quaternion::FromAxisAngle(Vector4::ZAXIS, Radian(Degree(60)));
 
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
   finishCheck.CheckSignalReceived();
   END_TEST;
 }
@@ -6971,13 +6971,13 @@ int UtcDaliAnimationAnimateBetweenActorRotation02(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetRotation(aa.angle, aa.axis);
+  actor.SetOrientation(aa.angle, aa.axis);
   application.SendNotification();
   application.Render(0);
   Stage::GetCurrent().Add(actor);
 
   Quaternion start(Radian(aa.angle), aa.axis);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), start, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), start, 0.001f, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -6988,7 +6988,7 @@ int UtcDaliAnimationAnimateBetweenActorRotation02(void)
   keyFrames.Add(0.5f, AngleAxis(Degree(120), Vector3::XAXIS));
   keyFrames.Add(1.0f, AngleAxis(Degree(120), Vector3::YAXIS));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::Rotation), keyFrames );
+  animation.AnimateBetween( Property(actor, Actor::Property::ORIENTATION), keyFrames );
 
   // Start the animation
   animation.Play();
@@ -7002,27 +7002,27 @@ int UtcDaliAnimationAnimateBetweenActorRotation02(void)
   finishCheck.CheckSignalNotReceived();
 
   Quaternion check(Radian(Degree(60)), Vector3::XAXIS);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
   application.SendNotification();
   check = Quaternion::FromAxisAngle(Vector4::XAXIS, Radian(Degree(90)));
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
   application.SendNotification();
   check = Quaternion::FromAxisAngle(Vector4::XAXIS, Radian(Degree(120)));
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   application.SendNotification();
   check = Quaternion::FromAxisAngle(Vector4(0.5f, 0.5f, 0.0f, 0.0f), Radian(Degree(101.5)));
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
   application.SendNotification();
   check = Quaternion::FromAxisAngle(Vector4::YAXIS, Radian(Degree(120)));
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   // We did expect the animation to finish
 
@@ -7036,13 +7036,13 @@ int UtcDaliAnimationAnimateBetweenActorRotation01Cubic(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetRotation(aa.angle, aa.axis);
+  actor.SetOrientation(aa.angle, aa.axis);
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
   application.Render(0);
   Quaternion start(Radian(aa.angle), aa.axis);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), start, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), start, 0.001f, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7052,7 +7052,7 @@ int UtcDaliAnimationAnimateBetweenActorRotation01Cubic(void)
   keyFrames.Add(0.0f, AngleAxis(Degree(60), Vector3::ZAXIS));
 
   //Cubic interpolation should be ignored for quaternions
-  animation.AnimateBetween( Property(actor, Actor::Property::Rotation), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::ORIENTATION), keyFrames, Animation::Cubic );
 
   // Start the animation
   animation.Play();
@@ -7069,7 +7069,7 @@ int UtcDaliAnimationAnimateBetweenActorRotation01Cubic(void)
 
   Quaternion check = Quaternion::FromAxisAngle(Vector4::ZAXIS, Radian(Degree(60)));
 
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
   finishCheck.CheckSignalReceived();
   END_TEST;
 }
@@ -7080,13 +7080,13 @@ int UtcDaliAnimationAnimateBetweenActorRotation02Cubic(void)
 
   Actor actor = Actor::New();
   AngleAxis aa(Degree(90), Vector3::XAXIS);
-  actor.SetRotation(aa.angle, aa.axis);
+  actor.SetOrientation(aa.angle, aa.axis);
   application.SendNotification();
   application.Render(0);
   Stage::GetCurrent().Add(actor);
 
   Quaternion start(Radian(aa.angle), aa.axis);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), start, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), start, 0.001f, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7098,7 +7098,7 @@ int UtcDaliAnimationAnimateBetweenActorRotation02Cubic(void)
   keyFrames.Add(1.0f, AngleAxis(Degree(120), Vector3::YAXIS));
 
   //Cubic interpolation should be ignored for quaternions
-  animation.AnimateBetween( Property(actor, Actor::Property::Rotation), keyFrames, Animation::Cubic );
+  animation.AnimateBetween( Property(actor, Actor::Property::ORIENTATION), keyFrames, Animation::Cubic );
 
   // Start the animation
   animation.Play();
@@ -7112,27 +7112,27 @@ int UtcDaliAnimationAnimateBetweenActorRotation02Cubic(void)
   finishCheck.CheckSignalNotReceived();
 
   Quaternion check(Radian(Degree(60)), Vector3::XAXIS);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
   application.SendNotification();
   check = Quaternion::FromAxisAngle(Vector4::XAXIS, Radian(Degree(90)));
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
   application.SendNotification();
   check = Quaternion::FromAxisAngle(Vector4::XAXIS, Radian(Degree(120)));
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   application.SendNotification();
   check = Quaternion::FromAxisAngle(Vector4(0.5f, 0.5f, 0.0f, 0.0f), Radian(Degree(101.5)));
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
   application.SendNotification();
   check = Quaternion::FromAxisAngle(Vector4::YAXIS, Radian(Degree(120)));
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), check, 0.001f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), check, 0.001f, TEST_LOCATION );
 
   // We did expect the animation to finish
 
@@ -7430,9 +7430,9 @@ int UtcDaliAnimationRotateByDegreeVector3(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7454,7 +7454,7 @@ int UtcDaliAnimationRotateByDegreeVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7462,7 +7462,7 @@ int UtcDaliAnimationRotateByDegreeVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7470,7 +7470,7 @@ int UtcDaliAnimationRotateByDegreeVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7478,7 +7478,7 @@ int UtcDaliAnimationRotateByDegreeVector3(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7487,9 +7487,9 @@ int UtcDaliAnimationRotateByRadianVector3(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7511,7 +7511,7 @@ int UtcDaliAnimationRotateByRadianVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7519,7 +7519,7 @@ int UtcDaliAnimationRotateByRadianVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7527,7 +7527,7 @@ int UtcDaliAnimationRotateByRadianVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7535,7 +7535,7 @@ int UtcDaliAnimationRotateByRadianVector3(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7544,9 +7544,9 @@ int UtcDaliAnimationRotateByDegreeVector3Alpha(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7568,7 +7568,7 @@ int UtcDaliAnimationRotateByDegreeVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7576,7 +7576,7 @@ int UtcDaliAnimationRotateByDegreeVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7584,7 +7584,7 @@ int UtcDaliAnimationRotateByDegreeVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7592,7 +7592,7 @@ int UtcDaliAnimationRotateByDegreeVector3Alpha(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7601,9 +7601,9 @@ int UtcDaliAnimationRotateByRadianVector3Alpha(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7625,7 +7625,7 @@ int UtcDaliAnimationRotateByRadianVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7633,7 +7633,7 @@ int UtcDaliAnimationRotateByRadianVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7641,7 +7641,7 @@ int UtcDaliAnimationRotateByRadianVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7649,7 +7649,7 @@ int UtcDaliAnimationRotateByRadianVector3Alpha(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7658,9 +7658,9 @@ int UtcDaliAnimationRotateByDegreeVector3AlphaFloat2(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7684,7 +7684,7 @@ int UtcDaliAnimationRotateByDegreeVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   float progress = max(0.0f, 0.25f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7693,7 +7693,7 @@ int UtcDaliAnimationRotateByDegreeVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.5f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7702,7 +7702,7 @@ int UtcDaliAnimationRotateByDegreeVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.75f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7710,7 +7710,7 @@ int UtcDaliAnimationRotateByDegreeVector3AlphaFloat2(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7720,9 +7720,9 @@ int UtcDaliAnimationRotateByRadianVector3AlphaFloat2(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7746,7 +7746,7 @@ int UtcDaliAnimationRotateByRadianVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   float progress = max(0.0f, 0.25f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7755,7 +7755,7 @@ int UtcDaliAnimationRotateByRadianVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.5f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7764,7 +7764,7 @@ int UtcDaliAnimationRotateByRadianVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.75f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7772,7 +7772,7 @@ int UtcDaliAnimationRotateByRadianVector3AlphaFloat2(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(relativeRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7781,9 +7781,9 @@ int UtcDaliAnimationRotateToDegreeVector3(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7805,7 +7805,7 @@ int UtcDaliAnimationRotateToDegreeVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7813,7 +7813,7 @@ int UtcDaliAnimationRotateToDegreeVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7821,7 +7821,7 @@ int UtcDaliAnimationRotateToDegreeVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7829,7 +7829,7 @@ int UtcDaliAnimationRotateToDegreeVector3(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7838,9 +7838,9 @@ int UtcDaliAnimationRotateToRadianVector3(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7862,7 +7862,7 @@ int UtcDaliAnimationRotateToRadianVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7870,7 +7870,7 @@ int UtcDaliAnimationRotateToRadianVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7878,7 +7878,7 @@ int UtcDaliAnimationRotateToRadianVector3(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7886,7 +7886,7 @@ int UtcDaliAnimationRotateToRadianVector3(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7895,9 +7895,9 @@ int UtcDaliAnimationRotateToQuaternion(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7920,7 +7920,7 @@ int UtcDaliAnimationRotateToQuaternion(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.25f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7928,7 +7928,7 @@ int UtcDaliAnimationRotateToQuaternion(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.5f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7936,7 +7936,7 @@ int UtcDaliAnimationRotateToQuaternion(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * 0.75f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -7944,7 +7944,7 @@ int UtcDaliAnimationRotateToQuaternion(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -7953,9 +7953,9 @@ int UtcDaliAnimationRotateToDegreeVector3Alpha(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -7977,7 +7977,7 @@ int UtcDaliAnimationRotateToDegreeVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -7985,7 +7985,7 @@ int UtcDaliAnimationRotateToDegreeVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -7993,7 +7993,7 @@ int UtcDaliAnimationRotateToDegreeVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -8001,7 +8001,7 @@ int UtcDaliAnimationRotateToDegreeVector3Alpha(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -8010,9 +8010,9 @@ int UtcDaliAnimationRotateToRadianVector3Alpha(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -8034,7 +8034,7 @@ int UtcDaliAnimationRotateToRadianVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -8042,7 +8042,7 @@ int UtcDaliAnimationRotateToRadianVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -8050,7 +8050,7 @@ int UtcDaliAnimationRotateToRadianVector3Alpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -8058,7 +8058,7 @@ int UtcDaliAnimationRotateToRadianVector3Alpha(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -8067,9 +8067,9 @@ int UtcDaliAnimationRotateToQuaternionAlpha(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -8092,7 +8092,7 @@ int UtcDaliAnimationRotateToQuaternionAlpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.25f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -8100,7 +8100,7 @@ int UtcDaliAnimationRotateToQuaternionAlpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.5f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -8108,7 +8108,7 @@ int UtcDaliAnimationRotateToQuaternionAlpha(void)
   // We didn't expect the animation to finish yet
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(0.75f), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -8116,7 +8116,7 @@ int UtcDaliAnimationRotateToQuaternionAlpha(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -8125,9 +8125,9 @@ int UtcDaliAnimationRotateToDegreeVector3AlphaFloat2(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -8151,7 +8151,7 @@ int UtcDaliAnimationRotateToDegreeVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   float progress = max(0.0f, 0.25f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -8160,7 +8160,7 @@ int UtcDaliAnimationRotateToDegreeVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.5f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -8169,7 +8169,7 @@ int UtcDaliAnimationRotateToDegreeVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.75f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -8177,7 +8177,7 @@ int UtcDaliAnimationRotateToDegreeVector3AlphaFloat2(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -8186,9 +8186,9 @@ int UtcDaliAnimationRotateToRadianVector3AlphaFloat2(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -8212,7 +8212,7 @@ int UtcDaliAnimationRotateToRadianVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   float progress = max(0.0f, 0.25f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -8221,7 +8221,7 @@ int UtcDaliAnimationRotateToRadianVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.5f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -8230,7 +8230,7 @@ int UtcDaliAnimationRotateToRadianVector3AlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.75f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -8238,7 +8238,7 @@ int UtcDaliAnimationRotateToRadianVector3AlphaFloat2(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -8247,9 +8247,9 @@ int UtcDaliAnimationRotateToQuaternionAlphaFloat2(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRotation(Quaternion(0.0f, Vector3::YAXIS));
+  actor.SetOrientation(Quaternion(0.0f, Vector3::YAXIS));
   Stage::GetCurrent().Add(actor);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(0.0f, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -8274,7 +8274,7 @@ int UtcDaliAnimationRotateToQuaternionAlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   float progress = max(0.0f, 0.25f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
@@ -8283,7 +8283,7 @@ int UtcDaliAnimationRotateToQuaternionAlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.5f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
@@ -8292,7 +8292,7 @@ int UtcDaliAnimationRotateToQuaternionAlphaFloat2(void)
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
   progress = max(0.0f, 0.75f - delay) / (1.0f - delay);
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians * AlphaFunctions::EaseIn(progress), Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
@@ -8300,7 +8300,7 @@ int UtcDaliAnimationRotateToQuaternionAlphaFloat2(void)
   // We did expect the animation to finish
   application.SendNotification();
   finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), Quaternion(targetRotationRadians, Vector3::YAXIS), ROTATION_EPSILON, TEST_LOCATION );
   END_TEST;
 }
 
@@ -8657,121 +8657,6 @@ int UtcDaliAnimationShowHideAtEnd(void)
   END_TEST;
 }
 
-int UtcDaliAnimationOpacityBy(void)
-{
-  TestApplication application;
-  Actor actor = Actor::New();
-  float startingOpacity(0.5f);
-  actor.SetOpacity(startingOpacity);
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), startingOpacity, TEST_LOCATION );
-  Stage::GetCurrent().Add(actor);
-
-  // Build the animation
-  float durationSeconds(1.0f);
-  Animation animation = Animation::New(durationSeconds);
-  float relativeOpacity(-0.5f); // target of zero
-  animation.OpacityBy(actor, relativeOpacity);
-
-  float seventyFivePercentProgress((1.0f - 0.75f) * startingOpacity);
-
-  // Start the animation
-  animation.Play();
-
-  bool signalReceived(false);
-  AnimationFinishCheck finishCheck(signalReceived);
-  animation.FinishedSignal().Connect(&application, finishCheck);
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*750.0f)/* 75% progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), seventyFivePercentProgress, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
-
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), startingOpacity+relativeOpacity, TEST_LOCATION );
-
-  // Reset everything
-  finishCheck.Reset();
-  actor.SetOpacity(startingOpacity);
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), startingOpacity, TEST_LOCATION );
-
-  // Repeat with a different (ease-in) alpha function
-  animation = Animation::New(durationSeconds);
-  animation.OpacityBy(actor, relativeOpacity, AlphaFunctions::EaseIn);
-  animation.FinishedSignal().Connect(&application, finishCheck);
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*750.0f)/* 75% progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-
-  // The opacity should reduce less, than with a linear alpha function
-  float current(actor.GetCurrentOpacity());
-  DALI_TEST_CHECK( current < 1.0f );
-  DALI_TEST_CHECK( current > seventyFivePercentProgress );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*250.0f) + 1u/*just beyond the animation duration*/);
-
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), startingOpacity+relativeOpacity, TEST_LOCATION );
-
-  // Reset everything
-  finishCheck.Reset();
-  actor.SetOpacity(startingOpacity);
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), startingOpacity, TEST_LOCATION );
-
-  // Repeat with a delay
-  float delay = 0.5f;
-  animation = Animation::New(durationSeconds);
-  animation.OpacityBy(actor, relativeOpacity, AlphaFunctions::Linear, delay, durationSeconds - delay);
-  animation.FinishedSignal().Connect(&application, finishCheck);
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*500.0f)/* 50% animation progress, 0% animator progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), startingOpacity, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*500.0f*0.75)/* 7/8 animation progress, 3/4 animator progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), seventyFivePercentProgress, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*500.0f*0.25) + 1u/*just beyond the animation duration*/);
-
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentOpacity(), startingOpacity+relativeOpacity, TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliAnimationOpacityTo(void)
 {
   TestApplication application;
@@ -8873,126 +8758,6 @@ int UtcDaliAnimationOpacityTo(void)
   application.SendNotification();
   finishCheck.CheckSignalReceived();
   DALI_TEST_EQUALS( actor.GetCurrentOpacity(), targetOpacity, TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliAnimationColorBy(void)
-{
-  TestApplication application;
-
-  Actor actor = Actor::New();
-  actor.SetColor(Color::BLACK);
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentColor(), Color::BLACK, TEST_LOCATION );
-  Stage::GetCurrent().Add(actor);
-
-  // Build the animation
-  float durationSeconds(1.0f);
-  Animation animation = Animation::New(durationSeconds);
-  Vector4 targetColor(Color::GREEN);
-  Vector4 relativeColor(Color::GREEN); // Note the alpha is automatically clamped <= 1.0f in world color
-  animation.ColorBy(actor, relativeColor);
-
-  Vector4 tenPercentProgress(Vector4(0.0f, 0.1f, 0.0f, 1.0f));
-  Vector4 twentyPercentProgress(Vector4(0.0f, 0.2f, 0.0f, 1.0f));
-
-  // Start the animation
-  animation.Play();
-
-  bool signalReceived(false);
-  AnimationFinishCheck finishCheck(signalReceived);
-  animation.FinishedSignal().Connect(&application, finishCheck);
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 10% progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldColor(), tenPercentProgress, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*900.0f) + 1u/*just beyond the animation duration*/);
-
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldColor(), targetColor, TEST_LOCATION );
-
-  // Reset everything
-  finishCheck.Reset();
-  actor.SetColor(Color::BLACK);
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentWorldColor(), Color::BLACK, TEST_LOCATION );
-
-  // Repeat with a different (ease-in) alpha function
-  animation = Animation::New(durationSeconds);
-  animation.ColorBy(actor, relativeColor, AlphaFunctions::EaseIn);
-  animation.FinishedSignal().Connect(&application, finishCheck);
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 10% progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-
-  // The color should have changed less, than with a linear alpha function
-  Vector4 current(actor.GetCurrentWorldColor());
-  DALI_TEST_CHECK( current.x == 0.0f ); // doesn't change
-  DALI_TEST_CHECK( current.y > 0.0f );
-  DALI_TEST_CHECK( current.y < tenPercentProgress.y );
-  DALI_TEST_CHECK( current.z == 0.0f ); // doesn't change
-  DALI_TEST_CHECK( current.w == 1.0f ); // doesn't change
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*900.0f) + 1u/*just beyond the animation duration*/);
-
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldColor(), targetColor, TEST_LOCATION );
-
-  // Reset everything
-  finishCheck.Reset();
-  actor.SetColor(Color::BLACK);
-  application.SendNotification();
-  application.Render(0);
-  DALI_TEST_EQUALS( actor.GetCurrentWorldColor(), Color::BLACK, TEST_LOCATION );
-
-  // Repeat with a shorter animator duration
-  float animatorDuration = 0.5f;
-  animation = Animation::New(durationSeconds);
-  animation.ColorBy(actor, relativeColor, AlphaFunctions::Linear, 0, animatorDuration);
-  animation.FinishedSignal().Connect(&application, finishCheck);
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*100.0f)/* 10% animation progress, 20% animator progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldColor(), twentyPercentProgress, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*400.0f)/* 50% animation progress, 100% animator progress */);
-
-  // We didn't expect the animation to finish yet
-  application.SendNotification();
-  finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldColor(), targetColor, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*500.0f) + 1u/*just beyond the animation duration*/);
-
-  // We did expect the animation to finish
-  application.SendNotification();
-  finishCheck.CheckSignalReceived();
-  DALI_TEST_EQUALS( actor.GetCurrentWorldColor(), targetColor, TEST_LOCATION );
   END_TEST;
 }
 
@@ -9373,10 +9138,10 @@ int UtcDaliAnimationAnimateBetweenActorColorTimePeriod(void)
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -9387,7 +9152,7 @@ int UtcDaliAnimationAnimateBetweenActorColorTimePeriod(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::Color), keyFrames, TimePeriod( 1.0f) );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, TimePeriod( 1.0f) );
 
   // Start the animation
   animation.Play();
@@ -9399,38 +9164,38 @@ int UtcDaliAnimationAnimateBetweenActorColorTimePeriod(void)
   application.Render(0);
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.1f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.2f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.3f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.4f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.1f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.2f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.3f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.4f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.5f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.9f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.8f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.7f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.6f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.9f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.8f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.7f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.6f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.95f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.90f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.85f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.80f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.95f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.90f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.85f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.80f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 1.0f, 0.01f, TEST_LOCATION );
 
   // We did expect the animation to finish
 
@@ -9448,10 +9213,10 @@ int UtcDaliAnimationAnimateBetweenActorColorFunction(void)
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -9462,7 +9227,7 @@ int UtcDaliAnimationAnimateBetweenActorColorFunction(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::Color), keyFrames, AlphaFunctions::Linear );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, AlphaFunctions::Linear );
 
   // Start the animation
   animation.Play();
@@ -9474,38 +9239,38 @@ int UtcDaliAnimationAnimateBetweenActorColorFunction(void)
   application.Render(0);
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.1f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.2f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.3f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.4f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.1f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.2f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.3f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.4f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.5f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.9f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.8f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.7f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.6f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.9f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.8f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.7f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.6f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.95f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.90f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.85f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.80f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.95f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.90f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.85f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.80f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 1.0f, 0.01f, TEST_LOCATION );
 
   // We did expect the animation to finish
 
@@ -9523,10 +9288,10 @@ int UtcDaliAnimationAnimateBetweenActorColorFunctionTimePeriod(void)
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS( actor.GetCurrentColor().a, startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  startValue, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  startValue, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), startValue, TEST_LOCATION );
 
   // Build the animation
   float durationSeconds(1.0f);
@@ -9537,7 +9302,7 @@ int UtcDaliAnimationAnimateBetweenActorColorFunctionTimePeriod(void)
   keyFrames.Add(0.5f, Vector4(0.9f, 0.8f, 0.7f, 0.6f));
   keyFrames.Add(1.0f, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
 
-  animation.AnimateBetween( Property(actor, Actor::Property::Color), keyFrames, AlphaFunctions::Linear, TimePeriod( 1.0f) );
+  animation.AnimateBetween( Property(actor, Actor::Property::COLOR), keyFrames, AlphaFunctions::Linear, TimePeriod( 1.0f) );
 
   // Start the animation
   animation.Play();
@@ -9549,38 +9314,38 @@ int UtcDaliAnimationAnimateBetweenActorColorFunctionTimePeriod(void)
   application.Render(0);
   application.SendNotification();
   finishCheck.CheckSignalNotReceived();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.1f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.2f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.3f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.4f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.1f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.2f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.3f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.4f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.5f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.5f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.5f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.9f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.8f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.7f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.6f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.9f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.8f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.7f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.6f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   0.95f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 0.90f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  0.85f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 0.80f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   0.95f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 0.90f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  0.85f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 0.80f, 0.01f, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
   application.SendNotification();
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorRed),   1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorGreen), 1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorBlue),  1.0f, 0.01f, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::ColorAlpha), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_RED),   1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_GREEN), 1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_BLUE),  1.0f, 0.01f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty<float>(Actor::Property::COLOR_ALPHA), 1.0f, 0.01f, TEST_LOCATION );
 
   // We did expect the animation to finish
 
@@ -9633,7 +9398,7 @@ int UtcDaliAnimationUpdateManager(void)
   actor.ApplyConstraint( constraint );
 
   // Apply animation to actor
-  animation.AnimateTo( Property(actor, Actor::Property::Position), Vector3( 100.f, 90.f, 80.f ), AlphaFunctions::Linear );
+  animation.AnimateTo( Property(actor, Actor::Property::POSITION), Vector3( 100.f, 90.f, 80.f ), AlphaFunctions::Linear );
 
   animation.Play();
 
@@ -9667,9 +9432,9 @@ int UtcDaliAnimationSignalOrder(void)
   animation2.FinishedSignal().Connect( &application, AnimationFinishCheck( signal2Received ) );
 
   // Apply animations to actor
-  animation1.AnimateTo( Property(actor, Actor::Property::Position), Vector3( 3.0f, 2.0f, 1.0f ), AlphaFunctions::Linear );
+  animation1.AnimateTo( Property(actor, Actor::Property::POSITION), Vector3( 3.0f, 2.0f, 1.0f ), AlphaFunctions::Linear );
   animation1.Play();
-  animation2.AnimateTo( Property(actor, Actor::Property::Size ), Vector3( 10.0f, 20.0f, 30.0f ), AlphaFunctions::Linear );
+  animation2.AnimateTo( Property(actor, Actor::Property::SIZE ), Vector3( 10.0f, 20.0f, 30.0f ), AlphaFunctions::Linear );
   animation2.Play();
 
   DALI_TEST_EQUALS( signal1Received, false, TEST_LOCATION );
@@ -9808,35 +9573,35 @@ int UtcDaliAnimationPath(void)
   path.Sample( 0.0f, position, tangent );
   rotation = Quaternion( Vector3::XAXIS, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), rotation, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
   application.SendNotification();
   path.Sample( 0.25f, position, tangent );
   rotation = Quaternion( Vector3::XAXIS, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), rotation, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
   application.SendNotification();
   path.Sample( 0.5f, position, tangent );
   rotation = Quaternion( Vector3::XAXIS, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), rotation, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
   application.SendNotification();
   path.Sample( 0.75f, position, tangent );
   rotation = Quaternion( Vector3::XAXIS, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), rotation, TEST_LOCATION );
 
   application.Render(static_cast<unsigned int>(durationSeconds*250.0f)+1/* 100% progress */);
   application.SendNotification();
   path.Sample( 1.0f, position, tangent );
   rotation = Quaternion( Vector3::XAXIS, tangent );
   DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetCurrentRotation(), rotation, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetCurrentOrientation(), rotation, TEST_LOCATION );
 
   finishCheck.CheckSignalReceived();
   END_TEST;

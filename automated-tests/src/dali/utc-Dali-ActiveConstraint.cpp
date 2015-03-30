@@ -59,7 +59,7 @@ int UtcDaliConstraintGetTargetObject(void)
 
   // Apply a constraint to an actor
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, TestConstraintVector3() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE, TestConstraintVector3() );
 
   Actor actor = Actor::New();
 
@@ -90,7 +90,7 @@ int UtcDaliConstraintGetTargetProperty(void)
 
   // Apply a constraint to an actor
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, TestConstraintVector3() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE, TestConstraintVector3() );
 
   Actor actor = Actor::New();
 
@@ -100,7 +100,7 @@ int UtcDaliConstraintGetTargetProperty(void)
 
   Property::Index index = active.GetTargetProperty();
 
-  DALI_TEST_CHECK( Actor::Property::Size == index );
+  DALI_TEST_CHECK( Actor::Property::SIZE == index );
   END_TEST;
 }
 
@@ -110,7 +110,7 @@ int UtcDaliConstraintSetWeight(void)
 
   // Apply a constraint to an actor
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, TestConstraintVector3() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE, TestConstraintVector3() );
 
   Actor actor = Actor::New();
   Stage::GetCurrent().Add( actor );
@@ -158,7 +158,7 @@ int UtcDaliConstraintGetCurrentWeight(void)
 
   // Apply a constraint to an actor
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, TestConstraintVector3() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE, TestConstraintVector3() );
 
   Actor actor = Actor::New();
 
@@ -176,7 +176,7 @@ int UtcDaliConstraintSignalApplied(void)
 
   // Apply a constraint to an actor
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, TestConstraintVector3() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE, TestConstraintVector3() );
 
   float duration( 10.0f );
   constraint.SetApplyTime( duration );
@@ -226,7 +226,7 @@ int UtcDaliConstraintRemove(void)
 
   // Apply a constraint to an actor
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, TestConstraintVector3() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE, TestConstraintVector3() );
 
   float duration( 1.0f );
   constraint.SetApplyTime( duration );
@@ -274,7 +274,7 @@ int UtcDaliConstraintRemove(void)
   DALI_TEST_CHECK( startSize == actor.GetCurrentSize() );
 
   // Try setting the weight after removal
-  active.SetProperty( ActiveConstraint::Property::Weight, 0.5f );
+  active.SetProperty( ActiveConstraint::Property::WEIGHT, 0.5f );
   application.SendNotification();
   application.Render(static_cast<unsigned int>(1000.0f));
   DALI_TEST_CHECK( 0.5f == active.GetCurrentWeight() );
@@ -284,7 +284,7 @@ int UtcDaliConstraintRemove(void)
 int UtcDaliConstraintCallback(void)
 {
   TestApplication application;
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, TestConstraintVector3() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE, TestConstraintVector3() );
   constraint.SetApplyTime(2.0f);
   Actor actor = Actor::New();
   ActiveConstraint active = actor.ApplyConstraint( constraint );
@@ -305,7 +305,7 @@ int UtcDaliConstraintProperties(void)
 {
   TestApplication application;
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size, TestConstraintVector3() );
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE, TestConstraintVector3() );
   Actor actor = Actor::New();
   ActiveConstraint active = actor.ApplyConstraint( constraint );
 

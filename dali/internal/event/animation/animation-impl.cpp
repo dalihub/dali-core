@@ -67,12 +67,12 @@ BaseHandle Create()
   return Dali::Animation::New(0.f);
 }
 
-TypeRegistration mType( typeid(Dali::Animation), typeid(Dali::BaseHandle), Create );
+TypeRegistration mType( typeid( Dali::Animation ), typeid( Dali::BaseHandle ), Create );
 
 SignalConnectorType signalConnector1( mType, SIGNAL_FINISHED, &Animation::DoConnectSignal );
 
-TypeAction action1( mType, ACTION_PLAY, &Animation::DoAction );
-TypeAction action2( mType, ACTION_STOP, &Animation::DoAction );
+TypeAction action1( mType, ACTION_PLAY,  &Animation::DoAction );
+TypeAction action2( mType, ACTION_STOP,  &Animation::DoAction );
 TypeAction action3( mType, ACTION_PAUSE, &Animation::DoAction );
 
 const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::Bake );
@@ -84,12 +84,11 @@ const Dali::Animation::Interpolation DEFAULT_INTERPOLATION( Dali::Animation::Lin
 
 AnimationPtr Animation::New(float durationSeconds)
 {
-  ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  UpdateManager& updateManager = tls.GetUpdateManager();
+  Stage* stage = Stage::GetCurrent();
 
-  AnimationPlaylist& playlist = Stage::GetCurrent()->GetAnimationPlaylist();
+  AnimationPlaylist& playlist = stage->GetAnimationPlaylist();
 
-  AnimationPtr animation = new Animation( updateManager, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, Dali::AlphaFunctions::Linear );
+  AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, Dali::AlphaFunctions::Linear );
 
   // Second-phase construction
   animation->Initialize();
@@ -97,8 +96,8 @@ AnimationPtr Animation::New(float durationSeconds)
   return animation;
 }
 
-Animation::Animation( UpdateManager& updateManager, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )
-: mUpdateManager( updateManager ),
+Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )
+: mEventThreadServices( eventThreadServices ),
   mPlaylist( playlist ),
   mAnimation( NULL ),
   mNotificationCount( 0 ),
@@ -149,7 +148,7 @@ void Animation::CreateSceneObject()
   mAnimation = animation;
 
   // Transfer animation ownership to the update manager through a message
-  AddAnimationMessage( mUpdateManager, animation );
+  AddAnimationMessage( mEventThreadServices.GetUpdateManager(), animation );
 }
 
 void Animation::DestroySceneObject()
@@ -157,7 +156,7 @@ void Animation::DestroySceneObject()
   if ( mAnimation != NULL )
   {
     // Remove animation using a message to the update manager
-    RemoveAnimationMessage( mUpdateManager, *mAnimation );
+    RemoveAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
     mAnimation = NULL;
   }
 }
@@ -168,7 +167,7 @@ void Animation::SetDuration(float seconds)
   mDurationSeconds = seconds;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetDurationMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, seconds );
+  SetDurationMessage( mEventThreadServices, *mAnimation, seconds );
 }
 
 float Animation::GetDuration() const
@@ -183,7 +182,7 @@ void Animation::SetLooping(bool looping)
   mIsLooping = looping;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetLoopingMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, looping );
+  SetLoopingMessage( mEventThreadServices, *mAnimation, looping );
 }
 
 bool Animation::IsLooping() const
@@ -198,7 +197,7 @@ void Animation::SetEndAction(EndAction action)
   mEndAction = action;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetEndActionMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, action );
+  SetEndActionMessage( mEventThreadServices, *mAnimation, action );
 }
 
 Dali::Animation::EndAction Animation::GetEndAction() const
@@ -213,7 +212,7 @@ void Animation::SetDisconnectAction(EndAction action)
   mDisconnectAction = action;
 
   // mAnimation is being used in a separate thread; queue a message to set the value
-  SetDisconnectActionMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, action );
+  SetDisconnectActionMessage( mEventThreadServices, *mAnimation, action );
 }
 
 Dali::Animation::EndAction Animation::GetDisconnectAction() const
@@ -228,7 +227,7 @@ void Animation::Play()
   mPlaylist.OnPlay( *this );
 
   // mAnimation is being used in a separate thread; queue a Play message
-  PlayAnimationMessage( mUpdateManager.GetEventToUpdate(), *mAnimation );
+  PlayAnimationMessage( mEventThreadServices, *mAnimation );
 }
 
 void Animation::PlayFrom( float progress )
@@ -239,20 +238,20 @@ void Animation::PlayFrom( float progress )
     mPlaylist.OnPlay( *this );
 
     // mAnimation is being used in a separate thread; queue a Play message
-    PlayAnimationFromMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
+    PlayAnimationFromMessage( mEventThreadServices, *mAnimation, progress );
   }
 }
 
 void Animation::Pause()
 {
   // mAnimation is being used in a separate thread; queue a Pause message
-  PauseAnimationMessage( mUpdateManager.GetEventToUpdate(), *mAnimation );
+  PauseAnimationMessage( mEventThreadServices, *mAnimation );
 }
 
 void Animation::Stop()
 {
   // mAnimation is being used in a separate thread; queue a Stop message
-  StopAnimationMessage( mUpdateManager, *mAnimation );
+  StopAnimationMessage( mEventThreadServices.GetUpdateManager(), *mAnimation );
 }
 
 void Animation::Clear()
@@ -467,7 +466,7 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::VECTOR3:
     {
-      if ( Dali::Actor::Property::Size == targetPropertyIndex )
+      if ( Dali::Actor::Property::SIZE == targetPropertyIndex )
       {
         // Test whether this is actually an Actor
         Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
@@ -754,7 +753,7 @@ void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward,
 
   //Position animation
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::Property::Position,
+                                                         Dali::Actor::Property::POSITION,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new PathPositionFunctor( pathCopy ),
                                                          alpha,
@@ -765,7 +764,7 @@ void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward,
   {
     //Rotation animation
     AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
-                                                              Dali::Actor::Property::Rotation,
+                                                              Dali::Actor::Property::ORIENTATION,
                                                               Property::INVALID_COMPONENT_INDEX,
                                                               new PathRotationFunctor( pathCopy, forward ),
                                                               alpha,
@@ -788,7 +787,7 @@ void Animation::MoveBy(Actor& actor, const Vector3& displacement, AlphaFunction 
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::Property::Position,
+                                                         Dali::Actor::Property::POSITION,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateByVector3(displacement),
                                                          alpha,
@@ -810,7 +809,7 @@ void Animation::MoveTo(Actor& actor, const Vector3& position, AlphaFunction alph
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::Property::Position,
+                                                         Dali::Actor::Property::POSITION,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateToVector3(position),
                                                          alpha,
@@ -832,7 +831,7 @@ void Animation::RotateBy(Actor& actor, Radian angle, const Vector3& axis, AlphaF
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
-                                                            Dali::Actor::Property::Rotation,
+                                                            Dali::Actor::Property::ORIENTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
                                                             new RotateByAngleAxis(angle, axis),
                                                             alpha,
@@ -884,7 +883,7 @@ void Animation::RotateTo(Actor& actor, const Quaternion& rotation, AlphaFunction
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Quaternion>::New( actor,
-                                                            Dali::Actor::Property::Rotation,
+                                                            Dali::Actor::Property::ORIENTATION,
                                                             Property::INVALID_COMPONENT_INDEX,
                                                             new RotateToQuaternion(rotation),
                                                             alpha,
@@ -906,7 +905,7 @@ void Animation::ScaleBy(Actor& actor, const Vector3& scale, AlphaFunction alpha,
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::Property::Scale,
+                                                         Dali::Actor::Property::SCALE,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateByVector3(scale),
                                                          alpha,
@@ -928,7 +927,7 @@ void Animation::ScaleTo(Actor& actor, const Vector3& scale, AlphaFunction alpha,
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::Property::Scale,
+                                                         Dali::Actor::Property::SCALE,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateToVector3(scale),
                                                          alpha,
@@ -940,7 +939,7 @@ void Animation::Show(Actor& actor, float delaySeconds)
   ExtendDuration( TimePeriod(delaySeconds, 0) );
 
   AddAnimatorConnector( AnimatorConnector<bool>::New( actor,
-                                                      Dali::Actor::Property::Visible,
+                                                      Dali::Actor::Property::VISIBLE,
                                                       Property::INVALID_COMPONENT_INDEX,
                                                       new AnimateToBoolean(SHOW_VALUE),
                                                       AlphaFunctions::Default,
@@ -952,7 +951,7 @@ void Animation::Hide(Actor& actor, float delaySeconds)
   ExtendDuration( TimePeriod(delaySeconds, 0) );
 
   AddAnimatorConnector( AnimatorConnector<bool>::New( actor,
-                                                      Dali::Actor::Property::Visible,
+                                                      Dali::Actor::Property::VISIBLE,
                                                       Property::INVALID_COMPONENT_INDEX,
                                                       new AnimateToBoolean(HIDE_VALUE),
                                                       AlphaFunctions::Default,
@@ -974,7 +973,7 @@ void Animation::OpacityBy(Actor& actor, float opacity, AlphaFunction alpha, floa
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Vector4>::New( actor,
-                                                         Dali::Actor::Property::Color,
+                                                         Dali::Actor::Property::COLOR,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateByOpacity(opacity),
                                                          alpha,
@@ -996,7 +995,7 @@ void Animation::OpacityTo(Actor& actor, float opacity, AlphaFunction alpha, floa
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Vector4>::New( actor,
-                                                         Dali::Actor::Property::Color,
+                                                         Dali::Actor::Property::COLOR,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateToOpacity(opacity),
                                                          alpha,
@@ -1018,7 +1017,7 @@ void Animation::ColorBy(Actor& actor, const Vector4& color, AlphaFunction alpha,
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Vector4>::New( actor,
-                                                         Dali::Actor::Property::Color,
+                                                         Dali::Actor::Property::COLOR,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateByVector4(color),
                                                          alpha,
@@ -1040,7 +1039,7 @@ void Animation::ColorTo(Actor& actor, const Vector4& color, AlphaFunction alpha,
   ExtendDuration( TimePeriod(delaySeconds, durationSeconds) );
 
   AddAnimatorConnector( AnimatorConnector<Vector4>::New( actor,
-                                                         Dali::Actor::Property::Color,
+                                                         Dali::Actor::Property::COLOR,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateToVector4(color),
                                                          alpha,
@@ -1067,7 +1066,7 @@ void Animation::Resize(Actor& actor, float width, float height, AlphaFunction al
   actor.NotifySizeAnimation( *this, targetSize );
 
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::Property::Size,
+                                                         Dali::Actor::Property::SIZE,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateToVector3(targetSize),
                                                          alpha,
@@ -1092,7 +1091,7 @@ void Animation::Resize(Actor& actor, const Vector3& size, AlphaFunction alpha, f
   actor.NotifySizeAnimation( *this, size );
 
   AddAnimatorConnector( AnimatorConnector<Vector3>::New( actor,
-                                                         Dali::Actor::Property::Size,
+                                                         Dali::Actor::Property::SIZE,
                                                          Property::INVALID_COMPONENT_INDEX,
                                                          new AnimateToVector3(size),
                                                          alpha,
@@ -1136,7 +1135,7 @@ void Animation::SetCurrentProgress(float progress)
   if( mAnimation && progress >= mPlayRange.x && progress <= mPlayRange.y )
   {
     // mAnimation is being used in a separate thread; queue a message to set the current progress
-    SetCurrentProgressMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, progress );
+    SetCurrentProgressMessage( mEventThreadServices, *mAnimation, progress );
   }
 }
 
@@ -1165,7 +1164,7 @@ void Animation::SetSpeedFactor( float factor )
   if( mAnimation )
   {
     mSpeedFactor = factor;
-    SetSpeedFactorMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, factor );
+    SetSpeedFactorMessage( mEventThreadServices, *mAnimation, factor );
   }
 }
 
@@ -1190,7 +1189,7 @@ void Animation::SetPlayRange( const Vector2& range)
     mPlayRange = orderedRange;
 
     // mAnimation is being used in a separate thread; queue a message to set play range
-    SetPlayRangeMessage( mUpdateManager.GetEventToUpdate(), *mAnimation, orderedRange );
+    SetPlayRangeMessage( mEventThreadServices, *mAnimation, orderedRange );
   }
 }
 

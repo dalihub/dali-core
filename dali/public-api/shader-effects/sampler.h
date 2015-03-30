@@ -71,11 +71,11 @@ public:
   {
     enum
     {
-      MINIFICATION_FILTER = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX,  ///< name "minification-filter",  type STRING
-      MAGNIGICATION_FILTER,                                               ///< name "magnification-filter", type STRING
-      U_WRAP,                                                             ///< name "u-wrap",               type STRING
-      V_WRAP,                                                             ///< name "v-wrap",               type STRING
-      AFFECTS_TRANSPARENCY,                                               ///< name "affects-transparency", type BOOLEAN
+      MINIFICATION_FILTER = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "minification-filter",  type STRING
+      MAGNIGICATION_FILTER,                                       ///< name "magnification-filter", type STRING
+      U_WRAP,                                                     ///< name "u-wrap",               type STRING
+      V_WRAP,                                                     ///< name "v-wrap",               type STRING
+      AFFECTS_TRANSPARENCY,                                       ///< name "affects-transparency", type BOOLEAN
     };
   };
 

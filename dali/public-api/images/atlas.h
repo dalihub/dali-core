@@ -18,6 +18,10 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <stdint.h>
+
+// INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/buffer-image.h>
@@ -33,12 +37,23 @@ class Atlas;
 /**
  * @brief An Atlas is a large image containing multiple smaller images.
  *
- * Bitmap images must be uploaded at a specified position, to populate the Atlas.
- * The client is reponsible for generating the appropriate geometry (UV coordinates),
- * needed to draw images within the Atlas.
+ * Buffer image and resource image( by providing the url ) are supported for uploading.
+ * Images must be uploaded at a specified position, to populate the Atlas.
+ * The client is responsible for generating the appropriate geometry (UV coordinates) needed to draw images within the Atlas.
+ *
+ * For context recovery after loss:
+ * By default, the atlas will re-upload the resource images automatically,
+ * while the buffer images are left to the client to upload again by connecting to the Stage::ContextRegainedSignal().
+ * If resource and buffer images are mixed and they overlap inside the atlas, the recovered contents may be incorrect.
+ * In these case, switch off the context recovery by calling SetContextRecovery( false ),
+ * and upload both buffer images and resource image to the atlas in order to restore the atlas.
  */
 class DALI_IMPORT_API Atlas : public Image
 {
+public:
+
+  typedef uint32_t SizeType;
+
 public:
 
   /**
@@ -46,14 +61,16 @@ public:
    *
    * @pre width & height are greater than zero.
    * The maximum size of the atlas is limited by GL_MAX_TEXTURE_SIZE.
-   * @param [in] width       The atlas width in pixels.
-   * @param [in] height      The atlas height in pixels.
-   * @param [in] pixelFormat The pixel format (rgba 32 bit by default).
+   * @param [in] width          The atlas width in pixels.
+   * @param [in] height         The atlas height in pixels.
+   * @param [in] pixelFormat    The pixel format (rgba 32 bit by default).
+   * @param [in] recoverContext Whether re-uploading the resource images automatically when regaining the context( true by default )
    * @return A handle to a new Atlas.
    */
-  static Atlas New( std::size_t width,
-                    std::size_t height,
-                    Pixel::Format pixelFormat = Pixel::RGBA8888 );
+  static Atlas New( SizeType width,
+                    SizeType height,
+                    Pixel::Format pixelFormat = Pixel::RGBA8888,
+                    bool recoverContext = true );
 
   /**
    * @brief Create an empty handle.
@@ -63,18 +80,39 @@ public:
   Atlas();
 
   /**
-   * @brief Upload a bitmap to the atlas.
+   * @brief Clear the Atlas with the given color
    *
-   * @pre The bitmap pixel format must match the Atlas format.
+   * @note The Atlas does not clear itself automatically during construction.
+   * Application should call this clear function to avoid getting garbage pixels in the atlas.
+   * By calling Clear, all the current uploaded image information will be lost.
+   * @param [in] color The color used to clear the Atlas.
+   */
+  void Clear( const Vector4& color  );
+
+  /**
+   * @brief Upload a buffer image to the atlas.
+   *
+   * @pre The pixel format of this buffer image must match the Atlas format.
    * @param [in] bufferImage The buffer image to upload.
    * @param [in] xOffset Specifies an offset in the x direction within the atlas.
    * @param [in] yOffset Specifies an offset in the y direction within the atlas.
-   * @return True if the bitmap fits within the atlas at the specified offset.
+   * @return True if the image has compatible pixel format and fits within the atlas at the specified offset.
    */
-  bool Upload( const BufferImage& bufferImage,
-               std::size_t xOffset,
-               std::size_t yOffset );
+  bool Upload( BufferImage bufferImage,
+               SizeType xOffset,
+               SizeType yOffset );
 
+  /**
+   * @brief Upload a resource image to atlas
+   *
+   * @param [in] url The URL of the resource image file to use
+   * @param [in] xOffset Specifies an offset in the x direction within the atlas.
+   * @param [in] yOffset Specifies an offset in the y direction within the atlas.
+   * @return True if the image has compatible pixel format and fits within the atlas at the specified offset.
+   */
+  bool Upload( const std::string& url,
+               SizeType xOffset,
+               SizeType yOffset );
   /**
    * @brief Downcast an Object handle to Atlas.
    *

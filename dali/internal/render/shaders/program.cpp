@@ -153,7 +153,6 @@ void Program::Use()
     {
       LOG_GL( "UseProgram(%d)\n", mProgramId );
       CHECK_GL( mGlAbstraction, mGlAbstraction.UseProgram(mProgramId) );
-      INCREASE_COUNTER(PerformanceMonitor::SHADER_STATE_CHANGES);
 
       mCache.SetCurrentProgram( this );
     }
@@ -527,16 +526,14 @@ void Program::Load()
     {
       DALI_LOG_ERROR("Failed to load program binary \n");
 
-      char* szLog = NULL;
       GLint nLength;
       CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramiv( mProgramId, GL_INFO_LOG_LENGTH, &nLength) );
       if(nLength > 0)
       {
-        szLog = new char[ nLength ];
-        CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramInfoLog( mProgramId, nLength, &nLength, szLog ) );
-        DALI_LOG_ERROR( "Program Link Error: %s\n", szLog );
-
-        delete [] szLog;
+        Dali::Vector< char > szLog;
+        szLog.Reserve( nLength ); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
+        CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramInfoLog( mProgramId, nLength, &nLength, szLog.Begin() ) );
+        DALI_LOG_ERROR( "Program Link Error: %s\n", szLog.Begin() );
       }
     }
     else
@@ -631,7 +628,7 @@ bool Program::CompileShader( GLenum shaderType, GLuint& shaderId, const char* sr
     if(nLength > 0)
     {
       Dali::Vector< char > szLog;
-      szLog.Resize( nLength );
+      szLog.Reserve( nLength ); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
       mGlAbstraction.GetShaderInfoLog( shaderId, nLength, &nLength, szLog.Begin() );
       DALI_LOG_ERROR( "Shader Compiler Error: %s\n", szLog.Begin() );
     }
@@ -660,7 +657,7 @@ void Program::Link()
     if(nLength > 0)
     {
       Dali::Vector< char > szLog;
-      szLog.Resize( nLength );
+      szLog.Reserve( nLength ); // Don't call Resize as we don't want to initialise the data, just reserve a buffer
       mGlAbstraction.GetProgramInfoLog( mProgramId, nLength, &nLength, szLog.Begin() );
       DALI_LOG_ERROR( "Shader Link Error: %s\n", szLog.Begin() );
     }

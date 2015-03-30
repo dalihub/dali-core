@@ -309,10 +309,10 @@ private:
 
     DALI_ASSERT_DEBUG( mAnimator != NULL );
 
-    //Add the new SceneGraph::Animator to its correspondent SceneGraph::Animation via message to UpdateManager
+    // Add the new SceneGraph::Animator to its correspondent SceneGraph::Animation via message
     const SceneGraph::Animation* animation = mParent->GetSceneObject();
     DALI_ASSERT_DEBUG( NULL != animation );
-    AddAnimatorMessage( mParent->GetUpdateManager().GetEventToUpdate(), *animation, *mAnimator );
+    AddAnimatorMessage( mParent->GetEventThreadServices(), *animation, *mAnimator );
   }
 
 protected:

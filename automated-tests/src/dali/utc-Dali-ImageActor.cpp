@@ -181,6 +181,7 @@ int UtcDaliImageActorSetSize01(void)
 
   BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
+  actor.SetRelayoutEnabled( false );
 
   ShaderEffect effect = ShaderEffect::New( " ", " ", " ", " ", ShaderEffect::HINT_GRID );
   actor.SetShaderEffect( effect );
@@ -209,6 +210,7 @@ int UtcDaliImageActorGetCurrentSize01(void)
   Vector2 initialImageSize(100, 50);
   BufferImage image = BufferImage::New( initialImageSize.width, initialImageSize.height );
   ImageActor actor = ImageActor::New( image );
+  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -256,6 +258,7 @@ int UtcDaliImageActorGetCurrentSize02(void)
 
   Image image = ResourceImage::New("image.jpg");
   ImageActor actor = ImageActor::New( image );
+  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -308,6 +311,7 @@ int UtcDaliImageActorGetCurrentSize03(void)
   attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
+  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -361,6 +365,7 @@ int UtcDaliImageActorGetCurrentSize04(void)
   attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
+  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -445,6 +450,7 @@ int UtcDaliImageActorGetCurrentSize05(void)
   attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
+  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -524,6 +530,7 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
+  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -587,6 +594,7 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   attrs.SetSize( requestedSize.width, requestedSize.height );
   Image image = ResourceImage::New("image.jpg", attrs);
   ImageActor actor = ImageActor::New( image );
+  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -658,10 +666,10 @@ int UtcDaliImageActorDefaultProperties(void)
   ImageActor actor = ImageActor::New( img );
 
   std::vector<Property::Index> indices;
-  indices.push_back(ImageActor::Property::PixelArea      );
-  indices.push_back(ImageActor::Property::Style           );
-  indices.push_back(ImageActor::Property::Border          );
-  indices.push_back(ImageActor::Property::Image           );
+  indices.push_back(ImageActor::Property::PIXEL_AREA      );
+  indices.push_back(ImageActor::Property::STYLE           );
+  indices.push_back(ImageActor::Property::BORDER          );
+  indices.push_back(ImageActor::Property::IMAGE           );
 
   DALI_TEST_CHECK(actor.GetPropertyCount() == ( Actor::New().GetPropertyCount() + indices.size() ) );
 
@@ -677,11 +685,11 @@ int UtcDaliImageActorDefaultProperties(void)
   actor.SetPixelArea(ImageActor::PixelArea( 0, 0, 0, 0 ));
 
   ImageActor::PixelArea area( 1, 2, 3, 4 );
-  actor.SetProperty(ImageActor::Property::PixelArea, Property::Value(Rect<int>(area)));
+  actor.SetProperty(ImageActor::Property::PIXEL_AREA, Property::Value(Rect<int>(area)));
 
-  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(ImageActor::Property::PixelArea));
+  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(ImageActor::Property::PIXEL_AREA));
 
-  Property::Value v = actor.GetProperty(ImageActor::Property::PixelArea);
+  Property::Value v = actor.GetProperty(ImageActor::Property::PIXEL_AREA);
 
   DALI_TEST_CHECK(v.Get<Rect<int> >() == area);
 
@@ -924,7 +932,7 @@ int UtcDaliImageActorImageProperty(void)
   application.SendNotification();
   application.Render();
 
-  Property::Value imageMap = imageActor.GetProperty( ImageActor::Property::Image );
+  Property::Value imageMap = imageActor.GetProperty( ImageActor::Property::IMAGE );
   DALI_TEST_CHECK( imageMap.HasKey( "filename" ) );
   DALI_TEST_EQUALS( imageMap.GetValue( "filename" ).Get< std::string >(), "MY_PATH", TEST_LOCATION );
   END_TEST;

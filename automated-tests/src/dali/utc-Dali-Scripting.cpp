@@ -629,7 +629,7 @@ int UtcDaliScriptingNewActorProperties(void)
   map[ "leave-required" ] = true;
   map[ "position-inheritance" ] = "DONT_INHERIT_POSITION";
   map[ "draw-mode" ] = "STENCIL";
-  map[ "inherit-rotation" ] = false;
+  map[ "inherit-orientation" ] = false;
   map[ "inherit-scale" ] = false;
 
   // Default properties
@@ -652,7 +652,7 @@ int UtcDaliScriptingNewActorProperties(void)
     DALI_TEST_EQUALS( handle.GetLeaveRequired(), true, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetPositionInheritanceMode(), DONT_INHERIT_POSITION, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.GetDrawMode(), DrawMode::STENCIL, TEST_LOCATION );
-    DALI_TEST_EQUALS( handle.IsRotationInherited(), false, TEST_LOCATION );
+    DALI_TEST_EQUALS( handle.IsOrientationInherited(), false, TEST_LOCATION );
     DALI_TEST_EQUALS( handle.IsScaleInherited(), false, TEST_LOCATION );
 
     Stage::GetCurrent().Remove( handle );
@@ -788,7 +788,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetParentOrigin( ParentOrigin::TOP_RIGHT );
     actor.SetSensitive( false );
     actor.SetLeaveRequired( true );
-    actor.SetInheritRotation( false );
+    actor.SetInheritOrientation( false );
     actor.SetInheritScale( false );
     actor.SetSizeMode( USE_OWN_SIZE );
     actor.SetSizeModeFactor( Vector3::ONE );
@@ -822,8 +822,8 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     DALI_TEST_EQUALS( value.GetValue( "sensitive" ).Get< bool >(), false, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "leave-required" ) );
     DALI_TEST_EQUALS( value.GetValue( "leave-required" ).Get< bool >(), true, TEST_LOCATION );
-    DALI_TEST_CHECK( value.HasKey( "inherit-rotation" ) );
-    DALI_TEST_EQUALS( value.GetValue( "inherit-rotation" ).Get< bool >(), false, TEST_LOCATION );
+    DALI_TEST_CHECK( value.HasKey( "inherit-orientation" ) );
+    DALI_TEST_EQUALS( value.GetValue( "inherit-orientation" ).Get< bool >(), false, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "inherit-scale" ) );
     DALI_TEST_EQUALS( value.GetValue( "inherit-scale" ).Get< bool >(), false, TEST_LOCATION );
     DALI_TEST_CHECK( value.HasKey( "size-mode-factor" ) );

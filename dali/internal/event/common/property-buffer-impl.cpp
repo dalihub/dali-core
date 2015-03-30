@@ -129,8 +129,8 @@ void PropertyBuffer::SetDefaultProperty( Property::Index index,
 }
 
 void PropertyBuffer::SetSceneGraphProperty( Property::Index index,
-                                      const CustomProperty& entry,
-                                      const Property::Value& value )
+                                            const PropertyMetadata& entry,
+                                            const Property::Value& value )
 {
   PROPERTY_BUFFER_IMPL.SetSceneGraphProperty( index, entry, value );
 }

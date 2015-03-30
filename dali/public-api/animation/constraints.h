@@ -288,28 +288,28 @@ struct SourceWidthFixedHeight
 /**
  * @brief Constraint function to aim a camera at a target.
  *
- * Constraint which sets camera's rotation given camera world position
+ * Constraint which sets camera's orientation given camera world position
  * and a target world position.  Uses target's up vector to orient the
  * constrained actor along the vector between camera position and
  * target position.
  *
- * @param[in] current The current rotation property value
+ * @param[in] current The current orientation property value
  * @param[in] targetPosition World position of target
  * @param[in] cameraPosition World position of camera
- * @param[in] targetRotation World rotation of the target
+ * @param[in] targetOrientation World orientation of the target
  * @return The orientation of the camera
  */
 inline Quaternion LookAt( const Quaternion& current,
                           const PropertyInput& targetPosition,
                           const PropertyInput& cameraPosition,
-                          const PropertyInput& targetRotation )
+                          const PropertyInput& targetOrientation )
 {
   Vector3 vForward = targetPosition.GetVector3() - cameraPosition.GetVector3();
   vForward.Normalize();
 
-  const Quaternion& targetRotationQ = targetRotation.GetQuaternion();
+  const Quaternion& targetOrientationQ = targetOrientation.GetQuaternion();
 
-  Vector3 targetY(targetRotationQ.Rotate(Vector3::YAXIS));
+  Vector3 targetY(targetOrientationQ.Rotate(Vector3::YAXIS));
   targetY.Normalize();
 
   // Camera Right vector is perpendicular to forward & target up

@@ -58,8 +58,8 @@ public:
   {
     enum
     {
-      SIZE = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX, ///< name "size",           type UNSIGNED_INT
-      BUFFER_FORMAT,                                      ///< name "buffer-format",  type MAP
+      SIZE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "size",           type UNSIGNED_INT
+      BUFFER_FORMAT,                              ///< name "buffer-format",  type MAP
     };
   };
 

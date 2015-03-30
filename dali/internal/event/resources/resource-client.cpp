@@ -23,11 +23,11 @@
 #include <dali/integration-api/resource-request.h>
 #include <dali/integration-api/debug.h>
 
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/text/resource/glyph-load-observer.h>
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/update/manager/update-manager.h>
 
 
 namespace Dali
@@ -61,10 +61,10 @@ struct ResourceClient::Impl
 };
 
 ResourceClient::ResourceClient( ResourceManager& resourceManager,
-                                SceneGraph::UpdateManager& updateManager,
+                                EventThreadServices& eventThreadServices,
                                 ResourcePolicy::DataRetention dataRetentionPolicy)
 : mResourceManager(resourceManager),
-  mUpdateManager(updateManager)
+  mEventThreadServices(eventThreadServices)
 {
   mImpl = new ResourceClient::Impl(dataRetentionPolicy);
   mResourceManager.SetClient(*this);
@@ -135,7 +135,7 @@ ResourceTicketPtr ResourceClient::RequestResource(
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: RequestResource(path:%s type.id:%d) newId:%u\n", path.c_str(), type.id, newId);
 
-  RequestLoadResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, typePath, priority );
+  RequestLoadResourceMessage( mEventThreadServices, mResourceManager, newId, typePath, priority );
   return newTicket;
 }
 
@@ -182,7 +182,7 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
       DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: DecodeResource( type.id:%d ) newId:%u\n", type.id, newId);
 
-      RequestDecodeResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, typePath, buffer, priority );
+      RequestDecodeResourceMessage( mEventThreadServices, mResourceManager, newId, typePath, buffer, priority );
     }
   }
   return newTicket;
@@ -202,7 +202,7 @@ ResourceTicketPtr ResourceClient::LoadShader( ShaderResourceType& type,
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: LoadShader(path:%s) newId:%u\n", path.c_str(), newId);
 
-  RequestLoadShaderMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, typePath );
+  RequestLoadShaderMessage( mEventThreadServices, mResourceManager, newId, typePath );
   return newTicket;
 }
 
@@ -222,7 +222,7 @@ bool ResourceClient::ReloadResource( ResourceId id, bool resetFinishedStatus, Lo
     DALI_ASSERT_DEBUG(ticket && "Null ticket for tracked resource request." );
     const ResourceTypePath * const typePathPtr = &ticket->GetTypePath();
     DALI_ASSERT_DEBUG( typePathPtr );
-    RequestReloadResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, id, *typePathPtr, priority, resetFinishedStatus );
+    RequestReloadResourceMessage( mEventThreadServices, mResourceManager, id, *typePathPtr, priority, resetFinishedStatus );
   }
   else
   {
@@ -243,12 +243,12 @@ void ResourceClient::SaveResource( ResourceTicketPtr ticket, const std::string& 
     if( 0 != url.length() )
     {
       ResourceTypePath typePath( *(typePathPtr->type), url );
-      RequestSaveResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, ticket->GetId(), typePath );
+      RequestSaveResourceMessage( mEventThreadServices, mResourceManager, ticket->GetId(), typePath );
     }
     else
     {
       ResourceTypePath typePath( *typePathPtr );
-      RequestSaveResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, ticket->GetId(), typePath );
+      RequestSaveResourceMessage( mEventThreadServices, mResourceManager, ticket->GetId(), typePath );
     }
   }
 }
@@ -312,7 +312,7 @@ ImageTicketPtr ResourceClient::AddBitmapImage(Bitmap* bitmap)
   mImpl->mBitmaps[newId] = bitmap;
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddBitmapImage() New id = %u\n", newId);
-  RequestAddBitmapImageMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, bitmap );
+  RequestAddBitmapImageMessage( mEventThreadServices, mResourceManager, newId, bitmap );
 
   return newTicket;
 }
@@ -333,7 +333,7 @@ ResourceTicketPtr ResourceClient::AddNativeImage ( NativeImageInterface& resourc
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddNativeImage() New id = %u\n", newId);
 
-  RequestAddNativeImageMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, &resourceData );
+  RequestAddNativeImageMessage( mEventThreadServices, mResourceManager, newId, &resourceData );
 
   return newTicket;
 }
@@ -354,7 +354,7 @@ ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigne
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddFrameBufferImage() New id = %u\n", newId);
-  RequestAddFrameBufferImageMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, width, height, pixelFormat );
+  RequestAddFrameBufferImageMessage( mEventThreadServices, mResourceManager, newId, width, height, pixelFormat );
 
   return newTicket;
 }
@@ -375,7 +375,7 @@ ImageTicketPtr ResourceClient::AddFrameBufferImage ( NativeImageInterface& nativ
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddFrameBufferImage() New id = %u\n", newId);
-  RequestAddFrameBufferImageMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, &nativeImage );
+  RequestAddFrameBufferImageMessage( mEventThreadServices, mResourceManager, newId, &nativeImage );
 
   return newTicket;
 }
@@ -399,7 +399,7 @@ ResourceTicketPtr ResourceClient::AllocateTexture( unsigned int width,
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AllocateTexture() New id = %u\n", newId);
 
-  RequestAllocateTextureMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, newId, width, height, pixelformat );
+  RequestAllocateTextureMessage( mEventThreadServices, mResourceManager, newId, width, height, pixelformat );
 
   return newTicket;
 }
@@ -407,22 +407,33 @@ ResourceTicketPtr ResourceClient::AllocateTexture( unsigned int width,
 void ResourceClient::UpdateTexture(  ResourceId id,
                                      BitmapUploadArray uploadArray )
 {
-  RequestUpdateTextureMessage(  mUpdateManager.GetEventToUpdate(), mResourceManager, id, uploadArray );
+  RequestUpdateTextureMessage(  mEventThreadServices, mResourceManager, id, uploadArray );
 }
 
 void ResourceClient::UpdateBitmapArea( ResourceTicketPtr ticket, RectArea& updateArea )
 {
   DALI_ASSERT_DEBUG( ticket );
 
-  RequestUpdateBitmapAreaMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, ticket->GetId(), updateArea );
+  RequestUpdateBitmapAreaMessage( mEventThreadServices, mResourceManager, ticket->GetId(), updateArea );
 }
 
 void ResourceClient::UploadBitmap( ResourceId destId, ResourceId srcId, std::size_t xOffset, std::size_t yOffset )
 {
-  RequestUploadBitmapMessage( mUpdateManager.GetEventToUpdate(),
+  RequestUploadBitmapMessage( mEventThreadServices,
                               mResourceManager,
                               destId,
                               srcId,
+                              xOffset,
+                              yOffset );
+}
+
+
+void ResourceClient::UploadBitmap( ResourceId destId,Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset)
+{
+  RequestUploadBitmapMessage( mEventThreadServices,
+                              mResourceManager,
+                              destId,
+                              bitmap,
                               xOffset,
                               yOffset );
 }
@@ -448,7 +459,7 @@ void ResourceClient::SetGlyphLoadObserver( GlyphLoadObserver* glyphLoadedInterfa
 
 void ResourceClient::UpdateAtlasStatus( ResourceId id, ResourceId atlasId, Integration::LoadStatus loadStatus )
 {
-  RequestAtlasUpdateMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, id, atlasId, loadStatus );
+  RequestAtlasUpdateMessage( mEventThreadServices, mResourceManager, id, atlasId, loadStatus );
 }
 
 /********************************************************************************
@@ -469,7 +480,7 @@ void ResourceClient::ResourceTicketDiscarded(const ResourceTicket& ticket)
   (void)erased; // Avoid "unused variable erased" in release builds
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: ResourceTicketDiscarded() deadId = %u\n", deadId);
-  RequestDiscardResourceMessage( mUpdateManager.GetEventToUpdate(), mResourceManager, deadId, typePath.type->id );
+  RequestDiscardResourceMessage( mEventThreadServices, mResourceManager, deadId, typePath.type->id );
 }
 
 /********************************************************************************

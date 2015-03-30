@@ -186,7 +186,7 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::NotifyScenePropertyInstalled()
    */
-  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
+  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObject()
@@ -207,8 +207,10 @@ protected:
 
   /**
    * Protected constructor.
+   * @param[in] eventThreadServices the interface to use for sending messages to the update thread
+   * @param[in] hints Geometry hints
    */
-  ShaderEffect( SceneGraph::UpdateManager& updateManager, Dali::ShaderEffect::GeometryHints hints );
+  ShaderEffect( EventThreadServices& eventThreadServices, Dali::ShaderEffect::GeometryHints hints );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -222,8 +224,7 @@ private:
   ShaderEffect& operator=( const ShaderEffect& rhs );
 
 private: // Data
-
-  SceneGraph::UpdateManager& mUpdateManager;///< reference to the update manager
+  EventThreadServices& mEventThreadServices; ///< Event thread services, for sending messages
   SceneGraph::Shader* mSceneObject;         ///< pointer to the scene shader, should not be changed on this thread
   Dali::Image mImage;                       ///< Client-side handle for the effect image
   IntrusivePtr<Dali::ShaderEffect::Extension> mExtension;

@@ -18,7 +18,7 @@
  */
 
 #include <dali/public-api/geometry/geometry.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
@@ -120,45 +120,45 @@ private: // Properties
   PropertyBoolean              mRequiresDepthTest;
 };
 
-inline void AddVertexBufferMessage( EventToUpdate& eventToUpdate, const Geometry& geometry, PropertyBuffer& vertexBuffer )
+inline void AddVertexBufferMessage( EventThreadServices& eventThreadServices , const Geometry& geometry, PropertyBuffer& vertexBuffer )
 {
   typedef MessageValue1< Geometry, OwnerPointer<PropertyBuffer> > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &geometry, &Geometry::AddVertexBuffer, &vertexBuffer );
 }
 
-inline void RemoveVertexBufferMessage( EventToUpdate& eventToUpdate, const Geometry& geometry, PropertyBuffer& vertexBuffer )
+inline void RemoveVertexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, PropertyBuffer& vertexBuffer )
 {
   typedef MessageValue1< Geometry, PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &geometry, &Geometry::RemoveVertexBuffer, &vertexBuffer );
 }
 
-inline void SetIndexBufferMessage( EventToUpdate& eventToUpdate, const Geometry& geometry, PropertyBuffer& indexBuffer )
+inline void SetIndexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, PropertyBuffer& indexBuffer )
 {
   typedef MessageValue1< Geometry, OwnerPointer< PropertyBuffer > > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &geometry, &Geometry::SetIndexBuffer, &indexBuffer );
 }
 
-inline void ClearIndexBufferMessage( EventToUpdate& eventToUpdate, const Geometry& geometry )
+inline void ClearIndexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry )
 {
   typedef Message< Geometry > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &geometry, &Geometry::ClearIndexBuffer );
@@ -172,12 +172,12 @@ template <> struct ParameterType< SceneGraph::Geometry::GeometryType > : public 
 namespace SceneGraph
 {
 
-inline void SetGeometryTypeMessage( EventToUpdate& eventToUpdate, const Geometry& geometry, SceneGraph::Geometry::GeometryType geometryType )
+inline void SetGeometryTypeMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, SceneGraph::Geometry::GeometryType geometryType )
 {
   typedef MessageDoubleBuffered1< Geometry, SceneGraph::Geometry::GeometryType > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &geometry, &Geometry::SetGeometryType, geometryType );

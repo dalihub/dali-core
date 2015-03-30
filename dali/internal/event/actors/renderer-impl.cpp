@@ -38,7 +38,7 @@ namespace
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "depth-index", INTEGER,  true, true, true, Dali::Renderer::Property::DEPTH_INDEX )
-DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX )
+DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
 
@@ -55,14 +55,14 @@ void Renderer::SetGeometry( Geometry& geometry )
 {
   mGeometryConnector.Set( geometry, OnStage() );
   const SceneGraph::Geometry* geometrySceneObject = geometry.GetGeometrySceneObject();
-  SetGeometryMessage( Stage::GetCurrent()->GetUpdateInterface(), *mSceneObject, *geometrySceneObject );
+  SetGeometryMessage( GetEventThreadServices(), *mSceneObject, *geometrySceneObject );
 }
 
 void Renderer::SetMaterial( Material& material )
 {
   mMaterialConnector.Set( material, OnStage() );
   const SceneGraph::Material* materialSceneObject = material.GetMaterialSceneObject();
-  SetMaterialMessage( Stage::GetCurrent()->GetUpdateInterface(), *mSceneObject, *materialSceneObject );
+  SetMaterialMessage( GetEventThreadServices(), *mSceneObject, *materialSceneObject );
 }
 
 void Renderer::SetDepthIndex( int depthIndex )
@@ -124,7 +124,7 @@ void Renderer::SetDefaultProperty( Property::Index index,
 }
 
 void Renderer::SetSceneGraphProperty( Property::Index index,
-                                      const CustomProperty& entry,
+                                      const PropertyMetadata& entry,
                                       const Property::Value& value )
 {
   RENDERER_IMPL.SetSceneGraphProperty( index, entry, value );

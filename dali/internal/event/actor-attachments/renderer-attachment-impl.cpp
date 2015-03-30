@@ -19,8 +19,9 @@
 #include <dali/internal/event/actor-attachments/renderer-attachment-impl.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
-#include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
 {
@@ -28,13 +29,13 @@ namespace Dali
 namespace Internal
 {
 
-RendererAttachmentPtr RendererAttachment::New( Stage& stage, const SceneGraph::Node& parentNode, Renderer& renderer )
+RendererAttachmentPtr RendererAttachment::New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode, Renderer& renderer )
 {
-  RendererAttachmentPtr attachment( new RendererAttachment( stage ) );
+  RendererAttachmentPtr attachment( new RendererAttachment( eventThreadServices ) );
 
   // Transfer object ownership of scene-object to message
   SceneGraph::RendererAttachment* sceneObject = renderer.GetRendererSceneObject();
-  AttachToNodeMessage( stage.GetUpdateManager(), parentNode, sceneObject );
+  AttachToNodeMessage( eventThreadServices.GetUpdateManager(), parentNode, sceneObject );
 
   // Keep raw pointer for message passing
   attachment->mSceneObject = sceneObject;
@@ -42,8 +43,8 @@ RendererAttachmentPtr RendererAttachment::New( Stage& stage, const SceneGraph::N
   return attachment;
 }
 
-RendererAttachment::RendererAttachment( Stage& stage )
-: RenderableAttachment(stage),
+RendererAttachment::RendererAttachment( EventThreadServices& eventThreadServices )
+: RenderableAttachment(eventThreadServices),
   mSceneObject(NULL)
 {
 }

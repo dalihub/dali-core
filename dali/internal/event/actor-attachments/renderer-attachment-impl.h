@@ -47,12 +47,12 @@ public:
 
   /**
    * Create a new RendererAttachment.
-   * @param[in] stage The stage to use for messaging
+   * @param[in] eventThreadServices Used for messaging to and reading from the SceneGraph
    * @param[in] parentNode The node to attach a scene-object to.
    * @poaram[in] renderer The renderer for this attachment
    * @return A smart-pointer to the newly allocated RendererAttachment.
    */
-  static RendererAttachmentPtr New( Stage& stage, const SceneGraph::Node& parentNode, Renderer& renderer );
+  static RendererAttachmentPtr New( EventThreadServices& eventThreadServices, const SceneGraph::Node& parentNode, Renderer& renderer );
 
   /**
    * Get the renderer
@@ -68,9 +68,9 @@ private:
 
   /**
    * First stage construction of a RendererAttachment.
-   * @param[in] stage Used to send messages to scene-graph.
+   * @param[in] eventThreadServices Used for messaging to and reading from the SceneGraph
    */
-  RendererAttachment(Stage& stage);
+  RendererAttachment( EventThreadServices& eventThreadServices );
 
   /**
    * Creates the corresponding scene-graph RendererAttachment.

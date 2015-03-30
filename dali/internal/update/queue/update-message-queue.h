@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 
 namespace Dali
@@ -33,17 +32,21 @@ class RenderController;
 
 namespace Internal
 {
-
 class MessageBase;
+
+namespace SceneGraph
+{
+class SceneGraphBuffers;
+}
+
 
 namespace Update
 {
 
 /**
  * Used by UpdateManager to receive messages from the event-thread.
- * The event-thread uses the EventToUpdate interface to queue messages for the next update.
  */
-class MessageQueue: public EventToUpdate
+class MessageQueue
 {
 public:
 
@@ -56,31 +59,28 @@ public:
                 const SceneGraph::SceneGraphBuffers& sceneGraphBuffers );
 
   /**
-   * Virtual destructor
+   * Destructor
    */
-  virtual ~MessageQueue();
-
-  // From EventToUpdate interface
+  ~MessageQueue();
 
   /**
-   * @copydoc Dali::Internal::EventToUpdate::EventProcessingStarted()
+   * Inform the queue that event processing has started
    */
-  virtual void EventProcessingStarted();
+  void EventProcessingStarted();
 
   /**
-   * @copydoc Dali::Internal::EventToUpdate::ReserveMessageSlot()
+   * Reserve space for a message
+   * @param[in] size the message size with respect to the size of type 'char'
+   * @param[in] updateScene If set to true, denotes that the message will cause the scene graph node tree to require an update
+   * @return A pointer to the first char allocated for the message
    */
-  virtual unsigned int* ReserveMessageSlot( unsigned int size, bool updateScene );
+  unsigned int* ReserveMessageSlot( unsigned int size, bool updateScene );
 
   /**
-   * @copydoc Dali::Internal::EventToUpdate::GetEventBufferIndex()
+   * Flushes the message queue
+   * @return true if there are messages to process
    */
-  virtual BufferIndex GetEventBufferIndex() const;
-
-  /**
-   * @copydoc Dali::Internal::EventToUpdate::FlushQueue()
-   */
-  virtual bool FlushQueue();
+  bool FlushQueue();
 
   // Exclusive to UpdateManager
 
@@ -108,6 +108,12 @@ private:
    * @param[in] minorQueue The queue to process.
    */
   void ProcessMinorQueue( char* minorQueue );
+
+private:
+
+  // Not copyable:
+  MessageQueue ( const MessageQueue& rhs );
+  MessageQueue& operator=( const MessageQueue& rhs );
 
 private:
 

@@ -19,7 +19,6 @@
  */
 
 // EXTERNAL INCLUDES
-#include <boost/function.hpp>
 #include <string>
 
 // INTERNAL INCLUDES
@@ -43,9 +42,6 @@ class Renderer;
 class Animation;
 class Constraint;
 struct Degree;
-class DynamicsBody;
-class DynamicsBodyConfig;
-class DynamicsJoint;
 class Quaternion;
 class Layer;
 struct Radian;
@@ -64,6 +60,7 @@ typedef std::vector<Actor> ActorContainer;
 typedef ActorContainer::iterator ActorIter; ///< Iterator for Dali::ActorContainer
 typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for Dali::ActorContainer
 
+typedef Rect<float> Padding;      ///< Padding definition
 
 /**
  * @brief Actor is the primary object with which Dali applications interact.
@@ -254,51 +251,61 @@ public:
   {
     enum
     {
-      ParentOrigin = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parent-origin",         type Vector3
-      ParentOriginX,                                     ///< name "parent-origin-x",       type Float
-      ParentOriginY,                                     ///< name "parent-origin-y",       type Float
-      ParentOriginZ,                                     ///< name "parent-origin-z",       type Float
-      AnchorPoint,                                       ///< name "anchor-point",          type Vector3
-      AnchorPointX,                                      ///< name "anchor-point-x",        type Float
-      AnchorPointY,                                      ///< name "anchor-point-y",        type Float
-      AnchorPointZ,                                      ///< name "anchor-point-z",        type Float
-      Size,                                              ///< name "size",                  type Vector3
-      SizeWidth,                                         ///< name "size-width",            type Float
-      SizeHeight,                                        ///< name "size-height",           type Float
-      SizeDepth,                                         ///< name "size-depth",            type Float
-      Position,                                          ///< name "position",              type Vector3
-      PositionX,                                         ///< name "position-x",            type Float
-      PositionY,                                         ///< name "position-y",            type Float
-      PositionZ,                                         ///< name "position-z",            type Float
-      WorldPosition,                                     ///< name "world-position",        type Vector3  (read-only)
-      WorldPositionX,                                    ///< name "world-position-x",      type Float    (read-only)
-      WorldPositionY,                                    ///< name "world-position-y",      type Float    (read-only)
-      WorldPositionZ,                                    ///< name "world-position-z",      type Float    (read-only)
-      Rotation,                                          ///< name "rotation",              type Rotation
-      WorldRotation,                                     ///< name "world-rotation",        type Rotation (read-only)
-      Scale,                                             ///< name "scale",                 type Vector3
-      ScaleX,                                            ///< name "scale-x",               type Float
-      ScaleY,                                            ///< name "scale-y",               type Float
-      ScaleZ,                                            ///< name "scale-z",               type Float
-      WorldScale,                                        ///< name "world-scale",           type Vector3  (read-only)
-      Visible,                                           ///< name "visible",               type Boolean
-      Color,                                             ///< name "color",                 type Vector4
-      ColorRed,                                          ///< name "color-red",             type Float
-      ColorGreen,                                        ///< name "color-green",           type Float
-      ColorBlue,                                         ///< name "color-blue",            type Float
-      ColorAlpha,                                        ///< name "color-alpha",           type Float
-      WorldColor,                                        ///< name "world-color",           type Vector4  (read-only)
-      WorldMatrix,                                       ///< name "world-matrix",          type Matrix   (read-only)
-      Name,                                              ///< name "name",                  type String
-      Sensitive,                                         ///< name "sensitive",             type Boolean
-      LeaveRequired,                                     ///< name "leave-required",        type Boolean
-      InheritRotation,                                   ///< name "inherit-rotation",      type Boolean
-      InheritScale,                                      ///< name "inherit-scale",         type Boolean
-      ColorMode,                                         ///< name "color-mode",            type String
-      PositionInheritance,                               ///< name "position-inheritance",  type String
-      DrawMode,                                          ///< name "draw-mode",             type String
-      SizeMode,                                          ///< name "size-mode",             type String
-      SizeModeFactor,                                    ///< name "size-mode-factor",      type Vector3
+      PARENT_ORIGIN = DEFAULT_ACTOR_PROPERTY_START_INDEX, ///< name "parent-origin",         type Vector3
+      PARENT_ORIGIN_X,                                    ///< name "parent-origin-x",       type float
+      PARENT_ORIGIN_Y,                                    ///< name "parent-origin-y",       type float
+      PARENT_ORIGIN_Z,                                    ///< name "parent-origin-z",       type float
+      ANCHOR_POINT,                                       ///< name "anchor-point",          type Vector3
+      ANCHOR_POINT_X,                                     ///< name "anchor-point-x",        type float
+      ANCHOR_POINT_Y,                                     ///< name "anchor-point-y",        type float
+      ANCHOR_POINT_Z,                                     ///< name "anchor-point-z",        type float
+      SIZE,                                               ///< name "size",                  type Vector3
+      SIZE_WIDTH,                                         ///< name "size-width",            type float
+      SIZE_HEIGHT,                                        ///< name "size-height",           type float
+      SIZE_DEPTH,                                         ///< name "size-depth",            type float
+      POSITION,                                           ///< name "position",              type Vector3
+      POSITION_X,                                         ///< name "position-x",            type float
+      POSITION_Y,                                         ///< name "position-y",            type float
+      POSITION_Z,                                         ///< name "position-z",            type float
+      WORLD_POSITION,                                     ///< name "world-position",        type Vector3    (read-only)
+      WORLD_POSITION_X,                                   ///< name "world-position-x",      type float      (read-only)
+      WORLD_POSITION_Y,                                   ///< name "world-position-y",      type float      (read-only)
+      WORLD_POSITION_Z,                                   ///< name "world-position-z",      type float      (read-only)
+      ORIENTATION,                                        ///< name "orientation",           type Quaternion
+      WORLD_ORIENTATION,                                  ///< name "world-orientation",     type Quaternion (read-only)
+      SCALE,                                              ///< name "scale",                 type Vector3
+      SCALE_X,                                            ///< name "scale-x",               type float
+      SCALE_Y,                                            ///< name "scale-y",               type float
+      SCALE_Z,                                            ///< name "scale-z",               type float
+      WORLD_SCALE,                                        ///< name "world-scale",           type Vector3    (read-only)
+      VISIBLE,                                            ///< name "visible",               type bool
+      COLOR,                                              ///< name "color",                 type Vector4
+      COLOR_RED,                                          ///< name "color-red",             type float
+      COLOR_GREEN,                                        ///< name "color-green",           type float
+      COLOR_BLUE,                                         ///< name "color-blue",            type float
+      COLOR_ALPHA,                                        ///< name "color-alpha",           type float
+      WORLD_COLOR,                                        ///< name "world-color",           type Vector4    (read-only)
+      WORLD_MATRIX,                                       ///< name "world-matrix",          type Matrix     (read-only)
+      NAME,                                               ///< name "name",                  type std::string
+      SENSITIVE,                                          ///< name "sensitive",             type bool
+      LEAVE_REQUIRED,                                     ///< name "leave-required",        type bool
+      INHERIT_ORIENTATION,                                ///< name "inherit-orientation",   type bool
+      INHERIT_SCALE,                                      ///< name "inherit-scale",         type bool
+      COLOR_MODE,                                         ///< name "color-mode",            type std::string
+      POSITION_INHERITANCE,                               ///< name "position-inheritance",  type std::string
+      DRAW_MODE,                                          ///< name "draw-mode",             type std::string
+      SIZE_MODE,                                          ///< name "size-mode",             type std::string
+      SIZE_MODE_FACTOR,                                   ///< name "size-mode-factor",      type Vector3
+      RELAYOUT_ENABLED,                                   ///< name "relayout-enabled",      type Boolean
+      WIDTH_RESIZE_POLICY,                                ///< name "width-resize-policy",   type String
+      HEIGHT_RESIZE_POLICY,                               ///< name "height-resize-policy",  type String
+      SIZE_SCALE_POLICY,                                  ///< name "size-scale-policy",     type String
+      WIDTH_FOR_HEIGHT,                                   ///< name "width-for-height",      type Boolean
+      HEIGHT_FOR_WIDTH,                                   ///< name "height-for-width",      type Boolean
+      PADDING,                                            ///< name "padding",               type Vector4
+      MINIMUM_SIZE,                                       ///< name "minimum-size",          type Vector2
+      MAXIMUM_SIZE,                                       ///< name "maximum-size",          type Vector2
+      PREFERRED_SIZE                                      ///< name "preferred-size",        type Vector2
     };
   };
 
@@ -309,6 +316,7 @@ public:
   typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType; ///< Mousewheel signal type
   typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type
   typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type
+  typedef Signal< void (Actor) > OnRelayoutSignalType; ///< Called when the actor is relaid out
 
   // Creation
 
@@ -502,18 +510,6 @@ public:
   Actor FindChildByName(const std::string& actorName);
 
   /**
-   * @brief Search through this actor's hierarchy for an actor with the given name or alias.
-   *
-   * Actors can customize this function to provide actors with preferred alias'
-   * For example 'previous' could return the last selected child.
-   * If no aliased actor is found then FindChildByName() is called.
-   * @pre The Actor has been initialized.
-   * @param[in] actorAlias the name of the actor to find
-   * @return A handle to the actor if found, or an empty handle if not.
-   */
-  Actor FindChildByAlias(const std::string& actorAlias);
-
-  /**
    * @brief Search through this actor's hierarchy for an actor with the given unique ID.
    *
    * The actor itself is also considered in the search
@@ -564,7 +560,7 @@ public:
    * bottom-right corner.  The default anchor point is
    * Dali::AnchorPoint::CENTER (0.5, 0.5, 0.5).
    * An actor position is the distance between its parent-origin, and this anchor-point.
-   * An actor's rotation is centered around its anchor-point.
+   * An actor's orientation is the rotation from its default orientation, the rotation is centered around its anchor-point.
    * @see Dali::AnchorPoint for predefined anchor point values
    * @pre The Actor has been initialized.
    * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentAnchorPoint().
@@ -637,7 +633,7 @@ public:
    * @note This return is the value that was set using SetSize or the target size of an animation
    * @return The actor's current size.
    */
-  Vector3 GetSize() const;
+  Vector3 GetTargetSize() const;
 
   /**
    * @brief Retrieve the actor's size.
@@ -716,12 +712,12 @@ public:
   void SetZ(float z);
 
   /**
-   * @brief Move an actor relative to its existing position.
+   * @brief Translate an actor relative to its existing position.
    *
    * @pre The actor has been initialized.
    * @param[in] distance The actor will move by this distance.
    */
-  void MoveBy(const Vector3& distance);
+  void TranslateBy(const Vector3& distance);
 
   /**
    * @brief Retrieve the position of the Actor.
@@ -761,42 +757,43 @@ public:
   PositionInheritanceMode GetPositionInheritanceMode() const;
 
   /**
-   * @brief Sets the rotation of the Actor.
+   * @brief Sets the orientation of the Actor.
    *
-   * An actor's rotation is centered around its anchor point.
+   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
-   * @param [in] angle The new rotation angle in degrees.
-   * @param [in] axis The new axis of rotation.
+   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
+   * @param [in] angle The new orientation angle in degrees.
+   * @param [in] axis The new axis of orientation.
    */
-  void SetRotation(const Degree& angle, const Vector3& axis);
+  void SetOrientation(const Degree& angle, const Vector3& axis);
 
   /**
-   * @brief Sets the rotation of the Actor.
+   * @brief Sets the orientation of the Actor.
    *
-   * An actor's rotation is centered around its anchor point.
+   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
-   * @param [in] angle The new rotation angle in radians.
-   * @param [in] axis The new axis of rotation.
+   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
+   * @param [in] angle The new orientation angle in radians.
+   * @param [in] axis The new axis of orientation.
    */
-  void SetRotation(const Radian& angle, const Vector3& axis);
+  void SetOrientation(const Radian& angle, const Vector3& axis);
 
   /**
-   * @brief Sets the rotation of the Actor.
+   * @brief Sets the orientation of the Actor.
    *
+   * An actor's orientation is the rotation from its default orientation, and the rotation is centered around its anchor-point.
    * @pre The Actor has been initialized.
-   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentRotation().
-   * @param [in] rotation The new rotation.
+   * @note This is an asynchronous method; the value written may not match a value subsequently read with GetCurrentOrientation().
+   * @param [in] orientation The new orientation.
    */
-  void SetRotation(const Quaternion& rotation);
+  void SetOrientation(const Quaternion& orientation);
 
   /**
    * @brief Apply a relative rotation to an actor.
    *
    * @pre The actor has been initialized.
-   * @param[in] angle The angle to the rotation to combine with the existing rotation.
-   * @param[in] axis The axis of the rotation to combine with the existing rotation.
+   * @param[in] angle The angle to the rotation to combine with the existing orientation.
+   * @param[in] axis The axis of the rotation to combine with the existing orientation.
    */
   void RotateBy(const Degree& angle, const Vector3& axis);
 
@@ -804,8 +801,8 @@ public:
    * @brief Apply a relative rotation to an actor.
    *
    * @pre The actor has been initialized.
-   * @param[in] angle The angle to the rotation to combine with the existing rotation.
-   * @param[in] axis The axis of the rotation to combine with the existing rotation.
+   * @param[in] angle The angle to the rotation to combine with the existing orientation.
+   * @param[in] axis The axis of the rotation to combine with the existing orientation.
    */
   void RotateBy(const Radian& angle, const Vector3& axis);
 
@@ -813,28 +810,28 @@ public:
    * @brief Apply a relative rotation to an actor.
    *
    * @pre The actor has been initialized.
-   * @param[in] relativeRotation The rotation to combine with the existing rotation.
+   * @param[in] relativeRotation The rotation to combine with the existing orientation.
    */
   void RotateBy(const Quaternion& relativeRotation);
 
   /**
-   * @brief Retreive the Actor's rotation.
+   * @brief Retreive the Actor's orientation.
    *
    * @pre The Actor has been initialized.
-   * @note This property can be animated; the return value may not match the value written with SetRotation().
-   * @return The current rotation.
+   * @note This property can be animated; the return value may not match the value written with SetOrientation().
+   * @return The current orientation.
    */
-  Quaternion GetCurrentRotation() const;
+  Quaternion GetCurrentOrientation() const;
 
   /**
    * @brief Set whether a child actor inherits it's parent's orientation.
    *
    * Default is to inherit.
-   * Switching this off means that using SetRotation() sets the actor's world orientation.
+   * Switching this off means that using SetOrientation() sets the actor's world orientation.
    * @pre The Actor has been initialized.
    * @param[in] inherit - true if the actor should inherit orientation, false otherwise.
    */
-  void SetInheritRotation(bool inherit);
+  void SetInheritOrientation(bool inherit);
 
   /**
    * @brief Returns whether the actor inherit's it's parent's orientation.
@@ -842,16 +839,16 @@ public:
    * @pre The Actor has been initialized.
    * @return true if the actor inherit's it's parent orientation, false if it uses world orientation.
    */
-  bool IsRotationInherited() const;
+  bool IsOrientationInherited() const;
 
   /**
-   * @brief Retrieve the world-rotation of the Actor.
+   * @brief Retrieve the world-orientation of the Actor.
    *
-   * @note The actor will not have a world-rotation, unless it has previously been added to the stage.
+   * @note The actor will not have a world-orientation, unless it has previously been added to the stage.
    * @pre The Actor has been initialized.
-   * @return The Actor's current rotation in the world.
+   * @return The Actor's current orientation in the world.
    */
-  Quaternion GetCurrentWorldRotation() const;
+  Quaternion GetCurrentWorldOrientation() const;
 
   /**
    * @brief Set the scale factor applied to an actor.
@@ -927,58 +924,6 @@ public:
   bool IsScaleInherited() const;
 
   /**
-   * @brief Defines how a child actor's size is affected by its parent's size.
-   *
-   * The default is to ignore the parent's size and use the size property of this actor.
-   *
-   * If USE_OWN_SIZE is used, this option is bypassed and the actor's size
-   *     property is used.
-   *
-   * If SIZE_EQUAL_TO_PARENT is used, this actor's size will be equal to that
-   *     of its parent. The actor's size property is ignored.
-   *
-   * If SIZE_RELATIVE_TO_PARENT is used, this actor's size will be based on
-   *     its parent's size by multiplying the parent size by
-   *     SizeModeFactor.
-   *
-   * If SIZE_FIXED_OFFSET_FROM_PARENT is used, this actor's size will be based on
-   *     its parent's size plus SizeModeFactor.
-   *
-   * @pre The Actor has been initialized.
-   * @param[in] mode The size relative to parent mode to use.
-   */
-  void SetSizeMode(const SizeMode mode);
-
-  /**
-   * @brief Returns the actor's mode for modifying its size relative to its parent.
-   *
-   * @pre The Actor has been initialized.
-   * @return The mode used.
-   */
-  SizeMode GetSizeMode() const;
-
-  /**
-   * @brief Sets the relative to parent size factor of the actor.
-   *
-   * This factor is only used when SizeMode is set to either:
-   * SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
-   * This actor's size is set to the actor's parent size multipled by or added to this factor,
-   * depending on SideMode (See SetSizeMode).
-   *
-   * @pre The Actor has been initialized.
-   * @param [in] factor A Vector3 representing the relative factor to be applied to each axis.
-   */
-  void SetSizeModeFactor(const Vector3& factor);
-
-  /**
-   * @brief Retrieve the relative to parent size factor of the actor.
-   *
-   * @pre The Actor has been initialized.
-   * @return The Actor's current relative size factor.
-   */
-  Vector3 GetSizeModeFactor() const;
-
-  /**
    * @brief Retrieves the world-matrix of the actor.
    *
    * @note The actor will not have a world-matrix, unless it has previously been added to the stage.
@@ -1023,14 +968,6 @@ public:
   void SetOpacity(float opacity);
 
   /**
-   * @brief Apply a relative opacity change to an actor.
-   *
-   * @pre The actor has been initialized.
-   * @param[in] relativeOpacity The opacity to combine with the actors existing opacity.
-   */
-  void OpacityBy(float relativeOpacity);
-
-  /**
    * @brief Retrieve the actor's opacity.
    *
    * @pre The actor has been initialized.
@@ -1048,14 +985,6 @@ public:
    * @param [in] color The new color.
    */
   void SetColor(const Vector4& color);
-
-  /**
-   * @brief Apply a relative color change to an actor.
-   *
-   * @pre The actor has been initialized.
-   * @param[in] relativeColor The color to combine with the actors existing color.
-   */
-  void ColorBy(const Vector4& relativeColor);
 
   /**
    * @brief Retrieve the actor's color.
@@ -1199,7 +1128,7 @@ public:
   /**
    * @brief Sets whether the actor should be focusable by keyboard navigation.
    *
-   * The default is true.
+   * The default is false.
    * @pre The Actor has been initialized.
    * @param[in] focusable - true if the actor should be focusable by keyboard navigation,
    * false otherwise.
@@ -1213,6 +1142,215 @@ public:
    * @return true if the actor is focusable by keyboard navigation, false if not.
    */
   bool IsKeyboardFocusable() const;
+
+  // SIZE NEGOTIATION
+
+  /**
+   * @brief Set if the actor should do relayout in size negotiation or not.
+   *
+   * @param[in] enabled Flag to specify if actor should do relayout or not.
+   */
+  void SetRelayoutEnabled( bool enabled );
+
+  /**
+   * @brief Is the actor included in relayout or not.
+   *
+   * @return Return if the actor is involved in size negotiation or not.
+   */
+  bool IsRelayoutEnabled() const;
+
+  /**
+   * Set the resize policy to be used for the given dimension(s)
+   *
+   * @param[in] policy The resize policy to use
+   * @param[in] dimension The dimension(s) to set policy for. Can be a bitfield of multiple dimensions.
+   */
+  void SetResizePolicy( ResizePolicy policy, Dimension dimension );
+
+  /**
+   * Return the resize policy used for a single dimension
+   *
+   * @param[in] dimension The dimension to get policy for
+   * @return Return the dimension resize policy
+   */
+  ResizePolicy GetResizePolicy( Dimension dimension ) const;
+
+  /**
+   * @brief Set the policy to use when setting size with size negotiation. Defaults to USE_SIZE_SET.
+   *
+   * @param[in] policy The policy to use for when the size is set
+   */
+  void SetSizeScalePolicy( SizeScalePolicy policy );
+
+  /**
+   * @brief Return the size set policy in use
+   *
+   * @return Return the size set policy
+   */
+  SizeScalePolicy GetSizeScalePolicy() const;
+
+  /**
+   * @brief Defines how a child actor's size is affected by its parent's size.
+   *
+   * The default is to ignore the parent's size and use the size property of this actor.
+   *
+   * If USE_OWN_SIZE is used, this option is bypassed and the actor's size
+   *     property is used.
+   *
+   * If SIZE_RELATIVE_TO_PARENT is used, this actor's size will be based on
+   *     its parent's size by multiplying the parent size by
+   *     SizeModeFactor.
+   *
+   * If SIZE_FIXED_OFFSET_FROM_PARENT is used, this actor's size will be based on
+   *     its parent's size plus SizeModeFactor.
+   *
+   * @pre The Actor has been initialized.
+   * @param[in] mode The size relative to parent mode to use.
+   */
+  void SetSizeMode( const SizeMode mode );
+
+  /**
+   * @brief Returns the actor's mode for modifying its size relative to its parent.
+   *
+   * @pre The Actor has been initialized.
+   * @return The mode used.
+   */
+  SizeMode GetSizeMode() const;
+
+  /**
+   * @brief Sets the relative to parent size factor of the actor.
+   *
+   * This factor is only used when SizeMode is set to either:
+   * SIZE_RELATIVE or SIZE_FIXED_OFFSET.
+   * This actor's size is set to the actor's size multipled by or added to this factor,
+   * depending on SideMode (See SetSizeMode).
+   *
+   * @pre The Actor has been initialized.
+   * @param [in] factor A Vector3 representing the relative factor to be applied to each axis.
+   */
+  void SetSizeModeFactor( const Vector3& factor );
+
+  /**
+   * @brief Retrieve the relative to parent size factor of the actor.
+   *
+   * @pre The Actor has been initialized.
+   * @return The Actor's current relative size factor.
+   */
+  Vector3 GetSizeModeFactor() const;
+
+  /**
+   * @brief This method specifies a dependency between dimensions. Will set resize policy on the actor for
+   * the given dimension to be DIMENSION_DEPENDENCY.
+   *
+   * @param[in] dimension The dimension to set the dependency on
+   * @param[in] dependency The dependency to set on the dimension
+   */
+  void SetDimensionDependency( Dimension dimension, Dimension dependency );
+
+  /**
+   * @brief Return the dependecy for a dimension
+   *
+   * @param[in] dimension The dimension to return the dependency for
+   * @return Return the dependency
+   */
+  Dimension GetDimensionDependency( Dimension dimension );
+
+  /**
+   * @brief Calculate the height of the actor given a width
+   *
+   * @param width Width to use
+   * @return Return the height based on the width
+   */
+  float GetHeightForWidth( float width );
+
+  /**
+   * @brief Calculate the width of the actor given a height
+   *
+   * @param height Height to use
+   * @return Return the width based on the height
+   */
+  float GetWidthForHeight( float height );
+
+  /**
+   * Return the value of negotiated dimension for the given dimension
+   *
+   * @param dimension The dimension to retrieve
+   * @return Return the value of the negotiated dimension
+   */
+  float GetRelayoutSize( Dimension dimension ) const;
+
+  /**
+   * @brief Request to relayout of all actors in the sub-tree below the given actor.
+   *
+   * This flags the actor and all actors below it for relayout. The actual
+   * relayout is performed at the end of the frame. This means that multiple calls to relayout
+   * will not cause multiple relayouts to occur.
+   */
+  void RelayoutRequestTree();
+
+  /**
+   * @brief Force propagate relayout flags through the tree. This actor and all actors
+   * dependent on it will have their relayout flags reset.
+   *
+   * This is useful for resetting layout flags during the layout process.
+   */
+  void PropagateRelayoutFlags();
+
+  /**
+   * @brief Set the padding for use in layout
+   *
+   * @param[in] padding Padding for the actor
+   */
+  void SetPadding( const Padding& padding );
+
+  /**
+   * Return the value of the padding
+   *
+   * @param paddingOut The returned padding data
+   */
+  void GetPadding( Padding& paddingOut ) const;
+
+  /**
+   * @brief Set the preferred size for size negotiation
+   *
+   * @param[in] size The preferred size to set
+   */
+  void SetPreferredSize( const Vector2& size );
+
+  /**
+   * @brief Return the preferred size used for size negotiation
+   *
+   * @return Return the preferred size
+   */
+  Vector2 GetPreferredSize() const;
+
+  /**
+   * @brief Set the minimum size an actor can be assigned in size negotiation
+   *
+   * @param[in] size The minimum size
+   */
+  void SetMinimumSize( const Vector2& size );
+
+  /**
+   * @brief Return the minimum relayout size
+   *
+   * @return Return the mininmum size
+   */
+  Vector2 GetMinimumSize();
+
+  /**
+   * @brief Set the maximum size an actor can be assigned in size negotiation
+   *
+   * @param[in] size The maximum size
+   */
+  void SetMaximumSize( const Vector2& size );
+
+  /**
+   * @brief Return the maximum relayout size
+   *
+   * @return Return the maximum size
+   */
+  Vector2 GetMaximumSize();
 
 public: // Signals
 
@@ -1323,7 +1461,7 @@ public: // Renderer
    *
    * @pre The index must be between 0 and GetRendererCount()-1
    *
-   * @param[in] renderer Renderer to add to the actor
+   * @param[in] index The index of the renderer to fetch
    * @return The renderer at the specified index
    */
   Renderer GetRendererAt( unsigned int index );
@@ -1343,89 +1481,12 @@ public: // Renderer
    * @param[in] index Index of the renderer that is to be removed
    */
   void RemoveRenderer( unsigned int index );
-
-public: // Dynamics
-
   /**
-   * @brief Enable dynamics for this actor.
+   * @brief This signal is emitted after the size has been set on the actor during relayout
    *
-   * The actor will behave as a rigid/soft body in the simulation
-   * @pre The actor is not already acting as a DynamicsBody and IsDynamicsRoot() returns false
-   *
-   * @param [in] bodyConfig The DynamicsBodyConfig specifying the dynamics properties for this actor in the dynamics world.
-   * @return The DynamicsBody
+   * @return Return the signal
    */
-  DynamicsBody EnableDynamics(DynamicsBodyConfig bodyConfig);
-
-  /**
-   * @brief Add a joint constraint to this actor.
-   *
-   * @param[in] attachedActor The other actor in the joint
-   * @param[in] offset        The offset (relative to this actor) of the origin of the joint
-   * @return                  The new joint
-   * @pre Both actors are dynamics enabled actors (IE Actor::EnableDynamics()) has been invoked for both actors).
-   * @post If the two actors are already connected by a joint, The existing joint is returned
-   *       and offset is ignored.
-   */
-  DynamicsJoint AddDynamicsJoint( Actor attachedActor, const Vector3& offset );
-
-  /**
-   * @brief Add a joint constraint to this actor.
-   *
-   * @param[in] attachedActor The other actor in the joint
-   * @param[in] offsetA       The offset (relative to this actor) of the origin of the joint
-   * @param[in] offsetB       The offset (relative to attachedActor) of the origin of the joint
-   * @return                  The new joint
-   * @pre Both actors are dynamics enabled actors (IE Actor::EnableDynamics()) has been invoked for both actors).
-   * @post If the two actors are already connected by a joint, The existing joint is returned
-   *       and offset is ignored.
-   */
-  DynamicsJoint AddDynamicsJoint( Actor attachedActor, const Vector3& offsetA, const Vector3& offsetB );
-
-  /**
-   * @brief Get the number of DynamicsJoint objects added to this actor.
-   *
-   * @return The number of DynamicsJoint objects added to this actor
-   */
-  int GetNumberOfJoints() const;
-
-  /**
-   * @brief Get a joint by index.
-   *
-   * @param[in] index The index of the joint.
-   *                  Use GetNumberOfJoints to get the valid range of indices.
-   * @return The joint.
-   */
-  DynamicsJoint GetDynamicsJointByIndex( const int index );
-
-  /**
-   * @brief Get the joint between this actor and attachedActor.
-   *
-   * @param[in] attachedActor The other actor in the joint
-   * @return The joint.
-   */
-  DynamicsJoint GetDynamicsJoint( Actor attachedActor );
-
-  /**
-   * @brief Remove a joint from this actor
-   *
-   * @param[in] joint The joint to be removed
-   */
-  void RemoveDynamicsJoint( DynamicsJoint joint );
-
-  /**
-   * @brief Disable dynamics for this actor.
-   *
-   * The actor will be detached from the DynamicsBody/DynamicsJoint associated with it through EnableDynamics
-   */
-  void DisableDynamics();
-
-  /**
-   * @brief Get the associated DynamicsBody.
-   *
-   * @return A DynamicsBody
-   */
-  DynamicsBody GetDynamicsBody();
+  OnRelayoutSignalType& OnRelayoutSignal();
 
 public: // Not intended for application developers
 

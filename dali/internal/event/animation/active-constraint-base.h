@@ -35,7 +35,7 @@ namespace Dali
 namespace Internal
 {
 
-class EventToUpdate;
+class EventThreadServices;
 typedef Dali::Vector<Object*>     ObjectContainer;
 typedef ObjectContainer::Iterator ObjectIter;
 
@@ -64,7 +64,7 @@ public:
    * @param[in] sources The sources of the input properties.
    * @param[in] sourceCount The original number of sources; this may not match sources.size() if objects have died.
    */
-  ActiveConstraintBase( EventToUpdate& messageController, Property::Index targetPropertyIndex, SourceContainer& sources, unsigned int sourceCount );
+  ActiveConstraintBase( Property::Index targetPropertyIndex, SourceContainer& sources, unsigned int sourceCount );
 
   /**
    * Virtual destructor.
@@ -299,9 +299,6 @@ private:
   virtual void ConnectConstraint() = 0;
 
 protected:
-
-  EventToUpdate& mEventToUpdate;
-
   Property::Index mTargetPropertyIndex;
   SourceContainer mSources;
   const unsigned int mSourceCount;

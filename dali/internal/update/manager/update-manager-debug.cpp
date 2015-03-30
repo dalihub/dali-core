@@ -52,7 +52,7 @@ void PrintNodes( const Node& node, BufferIndex updateBufferIndex, int level )
   const Vector3& position = node.GetPosition(updateBufferIndex);
   const Vector3& scale = node.GetScale(updateBufferIndex);
   const Vector3& fullPos = node.GetWorldPosition(updateBufferIndex);
-  const Quaternion& rotation = node.GetRotation(updateBufferIndex);
+  const Quaternion& rotation = node.GetOrientation(updateBufferIndex);
   Vector3 axis;
   float angle;
   rotation.ToAxisAngle(axis, angle);
@@ -108,12 +108,12 @@ void PrintNodeTree( const Node& node, BufferIndex bufferIndex, std::string inden
             << " Anchor: "       << node.GetAnchorPoint()
             << " Size: "         << node.GetSize(bufferIndex)
             << " Pos: "          << node.GetPosition(bufferIndex)
-            << " Rot: "          << node.GetRotation(bufferIndex)
+            << " Ori: "          << node.GetOrientation(bufferIndex)
             << " Scale: "        << node.GetScale(bufferIndex)
             << " Color: "        << node.GetColor(bufferIndex)
             << " Visible: "      << node.IsVisible(bufferIndex)
             << " World Pos: "    << node.GetWorldPosition(bufferIndex)
-            << " World Rot: "    << node.GetWorldRotation(bufferIndex)
+            << " World Ori: "    << node.GetWorldOrientation(bufferIndex)
             << " World Scale: "  << node.GetWorldScale(bufferIndex)
             << " World Color: "  << node.GetWorldColor(bufferIndex)
             << " World Matrix: " << node.GetWorldMatrix(bufferIndex)

@@ -35,7 +35,6 @@ namespace SceneGraph
 
 const PositionInheritanceMode Node::DEFAULT_POSITION_INHERITANCE_MODE( INHERIT_PARENT_POSITION );
 const ColorMode Node::DEFAULT_COLOR_MODE( USE_OWN_MULTIPLY_PARENT_ALPHA );
-const SizeMode Node::DEFAULT_SIZE_MODE( USE_OWN_SIZE );
 
 Node* Node::New()
 {
@@ -47,12 +46,12 @@ Node::Node()
   mAnchorPoint( AnchorPoint::DEFAULT ),
   mSize(),     // zero initialized by default
   mPosition(), // zero initialized by default
-  mRotation(), // initialized to identity by default
+  mOrientation(), // initialized to identity by default
   mScale( Vector3::ONE ),
   mVisible( true ),
   mColor( Color::WHITE ),
   mWorldPosition(), // zero initialized by default
-  mWorldRotation(), // initialized to identity by default
+  mWorldOrientation(), // initialized to identity by default
   mWorldScale( Vector3::ONE ),
   mWorldMatrix(),
   mWorldColor( Color::WHITE ),
@@ -60,17 +59,15 @@ Node::Node()
   mExclusiveRenderTask( NULL ),
   mAttachment( NULL ),
   mChildren(),
-  mSizeModeFactor( Vector3::ONE ),
   mDirtyFlags(AllFlags),
   mIsRoot( false ),
-  mInheritRotation( true ),
+  mInheritOrientation( true ),
   mInheritScale( true ),
   mInhibitLocalTransform( false ),
   mIsActive( true ),
   mDrawMode( DrawMode::NORMAL ),
   mPositionInheritanceMode( DEFAULT_POSITION_INHERITANCE_MODE ),
-  mColorMode( DEFAULT_COLOR_MODE ),
-  mSizeMode( DEFAULT_SIZE_MODE )
+  mColorMode( DEFAULT_COLOR_MODE )
 {
 }
 
@@ -165,7 +162,7 @@ int Node::GetDirtyFlags() const
     // Check whether the transform related properties have changed
     if( !sizeFlag            ||
         !mPosition.IsClean() ||
-        !mRotation.IsClean() ||
+        !mOrientation.IsClean() ||
         !mScale.IsClean()    ||
         mParentOrigin.InputChanged() || // parent origin and anchor point rarely change
         mAnchorPoint.InputChanged() )
@@ -203,7 +200,7 @@ void Node::ResetDefaultProperties( BufferIndex updateBufferIndex )
   // Reset default properties
   mSize.ResetToBaseValue( updateBufferIndex );
   mPosition.ResetToBaseValue( updateBufferIndex );
-  mRotation.ResetToBaseValue( updateBufferIndex );
+  mOrientation.ResetToBaseValue( updateBufferIndex );
   mScale.ResetToBaseValue( updateBufferIndex );
   mVisible.ResetToBaseValue( updateBufferIndex );
   mColor.ResetToBaseValue( updateBufferIndex );

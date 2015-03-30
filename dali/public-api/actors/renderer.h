@@ -49,7 +49,7 @@ public:
   {
     enum
     {
-      DEPTH_INDEX = DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX,  ///< name "depth-index",  type INTEGER
+      DEPTH_INDEX = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "depth-index",  type INTEGER
     };
   };
 

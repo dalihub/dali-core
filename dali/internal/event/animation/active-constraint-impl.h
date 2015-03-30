@@ -22,8 +22,8 @@
 #include <boost/function.hpp>
 
 // INTERNAL INCLUDES
-#include <dali/internal/common/event-to-update.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -69,24 +69,19 @@ public:
   typedef SceneGraph::Constraint< PropertyType, PropertyAccessor<PropertyType> > SceneGraphConstraint;
   typedef const SceneGraph::AnimatableProperty<PropertyType>* ScenePropertyPtr;
   typedef typename PropertyConstraintPtr<PropertyType>::Type ConstraintFunctionPtr;
-  typedef boost::function< PropertyType (const PropertyType&, const PropertyType&, float) > InterpolatorFunction;
 
   /**
    * Construct a new active-constraint.
    * @param[in] targetIndex The index of the property to constrain.
    * @param[in] sources The sources of the input properties passed to func.
    * @param[in] func The constraint function.
-   * @param[in] interpolator The interpolator function.
    * @return A newly allocated active-constraint.
    */
   static ActiveConstraintBase* New( Property::Index targetIndex,
                                     SourceContainer& sources,
-                                    ConstraintFunctionPtr func,
-                                    InterpolatorFunction interpolator )
+                                    ConstraintFunctionPtr func )
   {
-    ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-
-    return new ActiveConstraint< PropertyType >( tls.GetEventToUpdate(), targetIndex, sources, sources.size(), func, interpolator );
+    return new ActiveConstraint< PropertyType >( targetIndex, sources, sources.size(), func );
   }
 
   /**
@@ -106,12 +101,10 @@ public:
 
     ConstraintFunctionPtr funcPtr( mUserFunction->Clone() );
 
-    clone = new ActiveConstraint< PropertyType >( mEventToUpdate,
-                                                  mTargetIndex,
+    clone = new ActiveConstraint< PropertyType >( mTargetIndex,
                                                   mSources,
                                                   mSourceCount,
-                                                  funcPtr,
-                                                  mInterpolatorFunction );
+                                                  funcPtr );
 
     clone->SetAlphaFunction(mAlphaFunction);
     clone->SetRemoveAction(mRemoveAction);
@@ -125,16 +118,13 @@ private:
   /**
    * Private constructor; see also ActiveConstraint::New().
    */
-  ActiveConstraint( EventToUpdate& eventToUpdate,
-                    Property::Index targetIndex,
+  ActiveConstraint( Property::Index targetIndex,
                     SourceContainer& sources,
                     unsigned int sourceCount,
-                    ConstraintFunctionPtr& func,
-                    InterpolatorFunction& interpolator )
-  : ActiveConstraintBase( eventToUpdate, targetIndex, sources, sourceCount ),
+                    ConstraintFunctionPtr& func )
+  : ActiveConstraintBase( targetIndex, sources, sourceCount ),
     mTargetIndex( targetIndex ),
-    mUserFunction( func ),
-    mInterpolatorFunction( interpolator )
+    mUserFunction( func )
   {
   }
 
@@ -183,14 +173,13 @@ private:
       SceneGraph::ConstraintBase* sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
                                                                                      propertyOwners,
                                                                                      func,
-                                                                                     mInterpolatorFunction,
                                                                                      mCustomWeight );
       DALI_ASSERT_DEBUG( NULL != sceneGraphConstraint );
       sceneGraphConstraint->SetInitialWeight( mOffstageWeight );
       sceneGraphConstraint->SetRemoveAction( mRemoveAction );
 
       // object is being used in a separate thread; queue a message to apply the constraint
-      ApplyConstraintMessage( Stage::GetCurrent()->GetUpdateInterface(), *targetObject, *sceneGraphConstraint );
+      ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
 
       // Keep a raw-pointer to the scene-graph constraint
       mSceneGraphConstraint = sceneGraphConstraint;
@@ -304,7 +293,6 @@ protected:
   Property::Index mTargetIndex;
 
   ConstraintFunctionPtr mUserFunction;
-  InterpolatorFunction mInterpolatorFunction;
 };
 
 /**
@@ -316,24 +304,19 @@ class ActiveConstraint<float> : public ActiveConstraintBase
 public:
 
   typedef typename PropertyConstraintPtr<float>::Type ConstraintFunctionPtr;
-  typedef boost::function< float (const float&, const float&, float) > InterpolatorFunction;
 
   /**
    * Construct a new active-constraint.
    * @param[in] targetIndex The index of the property to constrain.
    * @param[in] sources The sources of the input properties passed to func.
    * @param[in] func The constraint function.
-   * @param[in] interpolator The interpolator function.
    * @return A newly allocated active-constraint.
    */
   static ActiveConstraintBase* New( Property::Index targetIndex,
                                     SourceContainer& sources,
-                                    ConstraintFunctionPtr func,
-                                    InterpolatorFunction interpolator )
+                                    ConstraintFunctionPtr func )
   {
-    ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-
-    return new ActiveConstraint< float >( tls.GetEventToUpdate(), targetIndex, sources, sources.size(), func, interpolator );
+    return new ActiveConstraint< float >( targetIndex, sources, sources.size(), func );
   }
 
   /**
@@ -353,12 +336,10 @@ public:
 
     ConstraintFunctionPtr funcPtr( mUserFunction->Clone() );
 
-    clone = new ActiveConstraint< float >( mEventToUpdate,
-                                           mTargetIndex,
+    clone = new ActiveConstraint< float >( mTargetIndex,
                                            mSources,
                                            mSourceCount,
-                                           funcPtr,
-                                           mInterpolatorFunction );
+                                           funcPtr );
 
     clone->SetAlphaFunction(mAlphaFunction);
     clone->SetRemoveAction(mRemoveAction);
@@ -372,16 +353,13 @@ private:
   /**
    * Private constructor; see also ActiveConstraint::New().
    */
-  ActiveConstraint( EventToUpdate& eventToUpdate,
-                    Property::Index targetIndex,
+  ActiveConstraint( Property::Index targetIndex,
                     SourceContainer& sources,
                     unsigned int sourceCount,
-                    ConstraintFunctionPtr& func,
-                    InterpolatorFunction& interpolator )
-  : ActiveConstraintBase( eventToUpdate, targetIndex, sources, sourceCount ),
+                    ConstraintFunctionPtr& func )
+  : ActiveConstraintBase( targetIndex, sources, sourceCount ),
     mTargetIndex( targetIndex ),
-    mUserFunction( func ),
-    mInterpolatorFunction( interpolator )
+    mUserFunction( func )
   {
   }
 
@@ -440,7 +418,6 @@ private:
         sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty,
                                                            propertyOwners,
                                                            func,
-                                                           mInterpolatorFunction,
                                                            mCustomWeight );
       }
       else
@@ -454,17 +431,17 @@ private:
           if ( 0 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mCustomWeight );
           }
           else if ( 1 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mCustomWeight );
           }
           else if ( 2 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector3> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mCustomWeight );
           }
         }
         else if ( PropertyTypes::Get< Vector4 >() == targetProperty->GetType() )
@@ -474,22 +451,22 @@ private:
           if ( 0 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mCustomWeight );
           }
           else if ( 1 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mCustomWeight );
           }
           else if ( 2 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorZ<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mCustomWeight );
           }
           else if ( 3 == componentIndex )
           {
             typedef SceneGraph::Constraint< float, PropertyComponentAccessorW<Vector4> > SceneGraphConstraint;
-            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mInterpolatorFunction, mCustomWeight );
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func, mCustomWeight );
           }
         }
       }
@@ -499,7 +476,7 @@ private:
       sceneGraphConstraint->SetRemoveAction( mRemoveAction );
 
         // object is being used in a separate thread; queue a message to apply the constraint
-      ApplyConstraintMessage( Stage::GetCurrent()->GetUpdateInterface(), *targetObject, *sceneGraphConstraint );
+      ApplyConstraintMessage( GetEventThreadServices(), *targetObject, *sceneGraphConstraint );
 
       // Keep a raw-pointer to the scene-graph constraint
       mSceneGraphConstraint = sceneGraphConstraint;
@@ -613,7 +590,6 @@ protected:
   Property::Index mTargetIndex;
 
   ConstraintFunctionPtr mUserFunction;
-  InterpolatorFunction mInterpolatorFunction;
 };
 
 } // namespace Internal

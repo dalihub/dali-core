@@ -65,10 +65,8 @@ void Material::SetShader( Shader& shader )
   DALI_ASSERT_DEBUG( mSceneObject )
   mShaderConnector.Set( shader, OnStage() );
 
-  StagePtr stage = Stage::GetCurrent();
-
   const SceneGraph::Shader& sceneGraphShader = dynamic_cast<const SceneGraph::Shader&>( *shader.GetSceneObject() );
-  SceneGraph::SetShaderMessage( stage->GetUpdateInterface(), *mSceneObject, sceneGraphShader );
+  SceneGraph::SetShaderMessage( GetEventThreadServices(), *mSceneObject, sceneGraphShader );
 }
 
 void Material::AddSampler( Sampler& sampler )
@@ -77,10 +75,8 @@ void Material::AddSampler( Sampler& sampler )
   connector.Set( sampler, OnStage() );
   mSamplerConnectors.push_back( connector );
 
-  StagePtr stage = Stage::GetCurrent();
-
   const SceneGraph::Sampler& sceneGraphSampler = dynamic_cast<const SceneGraph::Sampler&>( *sampler.GetSceneObject() );
-  SceneGraph::AddSamplerMessage( stage->GetUpdateInterface(), *mSceneObject, sceneGraphSampler );
+  SceneGraph::AddSamplerMessage( GetEventThreadServices(), *mSceneObject, sceneGraphSampler );
 }
 
 std::size_t Material::GetNumberOfSamplers() const
@@ -221,7 +217,7 @@ void Material::SetDefaultProperty( Property::Index index,
 }
 
 void Material::SetSceneGraphProperty( Property::Index index,
-                                      const CustomProperty& entry,
+                                      const PropertyMetadata& entry,
                                       const Property::Value& value )
 {
   MATERIAL_IMPL.SetSceneGraphProperty( index, entry, value );

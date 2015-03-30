@@ -59,20 +59,17 @@ SamplerPtr Sampler::New( const std::string& textureUnitUniformName )
 void Sampler::SetUniformName( const std::string& name )
 {
 // TODO: MESH_REWORK - change method to SetUnitName (or SetTextureUnitUniformName)
-  StagePtr stage = Stage::GetCurrent();
-  SetUnitNameMessage( stage->GetUpdateInterface(), *mSceneObject, name);
+  SetUnitNameMessage( GetEventThreadServices(), *mSceneObject, name);
 }
 
 void Sampler::SetImage( Image& image )
 {
   // TODO: MESH_REWORK - should probably review this comment
 
-  StagePtr stage = Stage::GetCurrent();
-
   unsigned int resourceId = image.GetResourceId();
 
   // sceneObject is being used in a separate thread; queue a message to set
-  SetTextureMessage( stage->GetUpdateInterface(), *mSceneObject, resourceId );
+  SetTextureMessage( GetEventThreadServices(), *mSceneObject, resourceId );
 }
 
 void Sampler::SetFilterMode( Dali::Sampler::FilterMode minFilter, Dali::Sampler::FilterMode magFilter )
@@ -145,8 +142,8 @@ void Sampler::SetDefaultProperty( Property::Index index,
 }
 
 void Sampler::SetSceneGraphProperty( Property::Index index,
-                                      const CustomProperty& entry,
-                                      const Property::Value& value )
+                                     const PropertyMetadata& entry,
+                                     const Property::Value& value )
 {
   SAMPLER_IMPL.SetSceneGraphProperty( index, entry, value );
 }

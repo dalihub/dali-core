@@ -114,11 +114,6 @@ StagePtr ThreadLocalStorage::GetCurrentStage()
   return mCore->GetCurrentStage();
 }
 
-EventToUpdate& ThreadLocalStorage::GetEventToUpdate()
-{
-  return GetUpdateManager().GetEventToUpdate();
-}
-
 GestureEventProcessor& ThreadLocalStorage::GetGestureEventProcessor()
 {
   return mCore->GetGestureEventProcessor();
@@ -127,6 +122,11 @@ GestureEventProcessor& ThreadLocalStorage::GetGestureEventProcessor()
 EmojiFactory& ThreadLocalStorage::GetEmojiFactory()
 {
   return mCore->GetEmojiFactory();
+}
+
+RelayoutController& ThreadLocalStorage::GetRelayoutController()
+{
+  return mCore->GetRelayoutController();
 }
 
 } // namespace Internal

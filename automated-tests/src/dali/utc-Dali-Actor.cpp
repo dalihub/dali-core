@@ -44,7 +44,6 @@ namespace
 const Scripting::StringEnum< int > SIZE_MODE_VALUES[] =
 {
   { "USE_OWN_SIZE",                  USE_OWN_SIZE                  },
-  { "SIZE_EQUAL_TO_PARENT",          SIZE_EQUAL_TO_PARENT          },
   { "SIZE_RELATIVE_TO_PARENT",       SIZE_RELATIVE_TO_PARENT       },
   { "SIZE_FIXED_OFFSET_FROM_PARENT", SIZE_FIXED_OFFSET_FROM_PARENT },
 };
@@ -843,19 +842,19 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   Actor actor = Actor::New();
   Vector3 vector(100.0f, 100.0f, 20.0f);
 
-  DALI_TEST_CHECK(vector != actor.GetSize());
+  DALI_TEST_CHECK(vector != actor.GetTargetSize());
   DALI_TEST_CHECK(vector != actor.GetCurrentSize());
 
   actor.SetSize(vector);
 
-  DALI_TEST_CHECK(vector == actor.GetSize());
+  DALI_TEST_CHECK(vector == actor.GetTargetSize());
   DALI_TEST_CHECK(vector != actor.GetCurrentSize());
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_CHECK(vector == actor.GetSize());
+  DALI_TEST_CHECK(vector == actor.GetTargetSize());
   DALI_TEST_CHECK(vector == actor.GetCurrentSize());
 
   // Animation
@@ -863,9 +862,9 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   const float durationSeconds = 2.0f;
   Animation animation = Animation::New( durationSeconds );
   const Vector3 targetValue( 10.0f, 20.0f, 30.0f );
-  animation.AnimateTo( Property( actor, Actor::Property::Size ), targetValue );
+  animation.AnimateTo( Property( actor, Actor::Property::SIZE ), targetValue );
 
-  DALI_TEST_CHECK( actor.GetSize() == targetValue );
+  DALI_TEST_CHECK( actor.GetTargetSize() == targetValue );
 
   // Start the animation
   animation.Play();
@@ -873,7 +872,7 @@ int UtcDaliActorGetCurrentSizeImmediate(void)
   application.SendNotification();
   application.Render( static_cast<unsigned int>( durationSeconds * 1000.0f ) );
 
-  DALI_TEST_CHECK( actor.GetSize() == targetValue );
+  DALI_TEST_CHECK( actor.GetTargetSize() == targetValue );
 
   END_TEST;
 }
@@ -913,7 +912,7 @@ int UtcDaliActorSetPosition01(void)
   application.Render();
   DALI_TEST_EQUALS( Vector3( 1.0f, 1.1f, 1.2f ), actor.GetCurrentPosition(), TEST_LOCATION );
 
-  actor.MoveBy( Vector3( 0.1f, 0.1f, 0.1f ) );
+  actor.TranslateBy( Vector3( 0.1f, 0.1f, 0.1f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1031,7 +1030,7 @@ int UtcDaliActorSetZ(void)
   END_TEST;
 }
 
-int UtcDaliActorMoveBy(void)
+int UtcDaliActorTranslateBy(void)
 {
   TestApplication application;
 
@@ -1048,7 +1047,7 @@ int UtcDaliActorMoveBy(void)
 
   DALI_TEST_CHECK(vector == actor.GetCurrentPosition());
 
-  actor.MoveBy(vector);
+  actor.TranslateBy(vector);
 
   // flush the queue and render once
   application.SendNotification();
@@ -1174,232 +1173,25 @@ int UtcDaliActorInheritPosition(void)
   END_TEST;
 }
 
-int UtcDaliActorSizeMode(void)
-{
-  tet_infoline("Testing Actor::SetSizeMode");
-  TestApplication application;
-
-  // Create a parent and a child.
-  Actor parent = Actor::New();
-  parent.SetParentOrigin( ParentOrigin::CENTER );
-  parent.SetAnchorPoint( AnchorPoint::CENTER );
-  Vector3 parentPosition( 0.0f, 0.0f, 0.0f );
-  parent.SetPosition( parentPosition );
-  parent.SetSize( 10.0f, 20.0f, 40.0f );
-  parent.SetSizeMode( USE_OWN_SIZE );
-  Stage::GetCurrent().Add( parent );
-
-  Actor child = Actor::New();
-  child.SetParentOrigin( ParentOrigin::CENTER );
-  child.SetAnchorPoint( AnchorPoint::CENTER );
-  Vector3 childPosition( 0.0f, 0.0f, 0.0f );
-  child.SetPosition( childPosition );
-  child.SetSize( 1.0f, 2.0f, 4.0f );
-  child.SetSizeMode( USE_OWN_SIZE );
-  parent.Add( child );
-
-  // Flush the queue and render once.
-  application.SendNotification();
-  application.Render();
-
-  // Test USE_OWN_SIZE uses the user-set size value.
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 1.0f, 2.0f, 4.0f ), TEST_LOCATION );
-  // Render and check again to ensure double-buffering does not cause old value to reappear.
-  application.Render();
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 1.0f, 2.0f, 4.0f ), TEST_LOCATION );
-
-  // Test SIZE_EQUAL_TO_PARENT overrides size with the parents size.
-  child.SetSizeMode( SIZE_EQUAL_TO_PARENT );
-
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 10.0f, 20.0f, 40.0f ), TEST_LOCATION );
-  // Render and check again to ensure double-buffering does not cause old value to reappear.
-  application.Render();
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 10.0f, 20.0f, 40.0f ), TEST_LOCATION );
-
-  // Test SIZE_RELATIVE_TO_PARENT overrides size with parents size * SizeModeFactor.
-  child.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
-
-  application.SendNotification();
-  application.Render();
-  // First check without setting a relative factor, to confirm that the default factor (of 1.0f) is used.
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 10.0f, 20.0f, 40.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  // Render and check again to ensure double-buffering does not cause old value to reappear.
-  application.Render();
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 10.0f, 20.0f, 40.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Set an arbitary relative factor to check against.
-  child.SetSizeModeFactor( Vector3( 2.0f, 3.0f, 4.0f ) );
-
-  application.SendNotification();
-  application.Render();
-  // Check with a valid relative factor.
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 20.0f, 60.0f, 160.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  // Render and check again to ensure double-buffering does not cause old value to reappear.
-  application.Render();
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 20.0f, 60.0f, 160.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Test SIZE_FIXED_OFFSET_FROM_PARENT overrides size with parents size + SizeModeFactor.
-  child.SetSizeMode( SIZE_FIXED_OFFSET_FROM_PARENT );
-
-  application.SendNotification();
-  application.Render();
-  // Check with a valid relative factor.
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 12.0f, 23.0f, 44.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  // Render and check again to ensure double-buffering does not cause old value to reappear.
-  application.Render();
-  DALI_TEST_EQUALS( child.GetCurrentSize(), Vector3( 12.0f, 23.0f, 44.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  application.SendNotification();
-
-  // Test the calculation order in update by having a parent with a size-relative
-  // factor and a rotation rotate a child anchored to one of the parents corners.
-  //       .---. c
-  //   .-----. |          .-----.    The new child is parented from the top-left of its parent.
-  //   |   '-|-'  ----->  |     |    We rotate the parent to confirm that the relative size calculation is
-  //   |  p  |    Rotate  |   .-|-.  done before rotation. If it wasn't, the childs resultant
-  //   '-----'    parent  '-----' |  world-position would be incorrect.
-  //                90°       '---'
-  //
-  // Create a new parent and child, and a root parent which the parent can grab relative size from.
-  Actor rootParent = Actor::New();
-  rootParent.SetParentOrigin( ParentOrigin::CENTER );
-  rootParent.SetAnchorPoint( AnchorPoint::CENTER );
-  rootParent.SetPosition( Vector3( 0.0f, 0.0f, 0.0f ) );
-  rootParent.SetSize( 10.0f, 10.0f, 10.0f );
-  rootParent.SetSizeMode( USE_OWN_SIZE );
-  Stage::GetCurrent().Add( rootParent );
-
-  Actor newParent = Actor::New();
-  newParent.SetParentOrigin( ParentOrigin::CENTER );
-  newParent.SetAnchorPoint( AnchorPoint::CENTER );
-  newParent.SetPosition( Vector3( 0.0f, 0.0f, 0.0f ) );
-  newParent.SetSize( 10.0f, 10.0f, 10.0f );
-  newParent.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
-  newParent.SetSizeModeFactor( Vector3( 0.5f, 0.5f, 0.5f ) );
-  rootParent.Add( newParent );
-
-  Actor newChild = Actor::New();
-  newChild.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-  newChild.SetAnchorPoint( AnchorPoint::CENTER );
-  newChild.SetPosition( Vector3( 0.0f, 0.0f, 0.0f ) );
-  newChild.SetSize( 1.0f, 1.0f, 1.0f );
-  newChild.SetSizeMode( USE_OWN_SIZE );
-  newParent.Add( newChild );
-
-  // Set up the rotation by 90 degrees on Z.
-  newParent.RotateBy( Radian( M_PI * 0.5f ), Vector3::ZAXIS );
-
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( newParent.GetCurrentSize(), Vector3( 5.0f, 5.0f, 5.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( newParent.GetCurrentWorldPosition(), Vector3( 0.0f, 0.0f, 0.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  DALI_TEST_EQUALS( newChild.GetCurrentWorldPosition(), Vector3( 2.5f, 2.5f, 0.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Test changing the parents size to check the child's size is updated.
-  Actor newParent2 = Actor::New();
-  newParent2.SetParentOrigin( ParentOrigin::CENTER );
-  newParent2.SetAnchorPoint( AnchorPoint::CENTER );
-  newParent2.SetPosition( Vector3( 0.0f, 0.0f, 0.0f ) );
-  newParent2.SetSize( 10.0f, 10.0f, 10.0f );
-  newParent2.SetSizeMode( USE_OWN_SIZE );
-  rootParent.Add( newParent2 );
-
-  Actor newChild2 = Actor::New();
-  newChild2.SetParentOrigin( ParentOrigin::TOP_RIGHT );
-  newChild2.SetAnchorPoint( AnchorPoint::CENTER );
-  newChild2.SetPosition( Vector3( 0.0f, 0.0f, 0.0f ) );
-  newChild2.SetSize( Vector3::ONE );
-  newChild2.SetSizeMode( SIZE_RELATIVE_TO_PARENT );
-  newChild2.SetSizeModeFactor( Vector3( 0.5f, 0.5f, 0.5f ) );
-  newParent2.Add( newChild2 );
-
-  // Check the child has no size yet.
-  DALI_TEST_EQUALS( newChild2.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
-
-  // Check the child now has a relative size to the parent.
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( newChild2.GetCurrentSize(), Vector3( 5.0f, 5.0f, 5.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Change the parent's size and check the child's size changes also.
-  newParent2.SetSize( 100.0f, 100.0f, 100.0f );
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( newChild2.GetCurrentSize(), Vector3( 50.0f, 50.0f, 50.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  // Confirm the child's size is still correct on the next frame.
-  application.Render();
-  DALI_TEST_EQUALS( newChild2.GetCurrentSize(), Vector3( 50.0f, 50.0f, 50.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Text that reparenting a child causes its size to update relative to its new parent.
-  Actor newParent3 = Actor::New();
-  newParent3.SetParentOrigin( ParentOrigin::CENTER );
-  newParent3.SetAnchorPoint( AnchorPoint::CENTER );
-  newParent3.SetPosition( Vector3( 0.0f, 0.0f, 0.0f ) );
-  newParent3.SetSize( 400.0f, 400.0f, 400.0f );
-  newParent3.SetSizeMode( USE_OWN_SIZE );
-  rootParent.Add( newParent3 );
-
-  // Reparent the child but don't update yet. Check it still has its old size.
-  newParent3.Add( newChild2 );
-  DALI_TEST_EQUALS( newChild2.GetCurrentSize(), Vector3( 50.0f, 50.0f, 50.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Check the child's size has updated based on the new parent.
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( newChild2.GetCurrentSize(), Vector3( 200.0f, 200.0f, 200.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-  // Confirm the child's size is still correct on the next frame.
-  application.Render();
-  DALI_TEST_EQUALS( newChild2.GetCurrentSize(), Vector3( 200.0f, 200.0f, 200.0f ), Math::MACHINE_EPSILON_1000, TEST_LOCATION );
-
-  // Properties:
-  // Test setting and getting the SizeMode property (by string).
-  Actor propertyActor = Actor::New();
-  propertyActor.SetParentOrigin( ParentOrigin::CENTER );
-  propertyActor.SetAnchorPoint( AnchorPoint::CENTER );
-  propertyActor.SetPosition( Vector3::ZERO );
-  propertyActor.SetSize( Vector3::ONE );
-  propertyActor.SetSizeMode( USE_OWN_SIZE );
-
-  // Loop through each SizeMode enumeration.
-  for( unsigned int propertyIndex = 0; propertyIndex < SIZE_MODE_VALUES_COUNT; ++propertyIndex )
-  {
-    Property::Value inValue = SIZE_MODE_VALUES[ propertyIndex ].string;
-    propertyActor.SetProperty( Actor::Property::SizeMode, inValue );
-    std::string outString = propertyActor.GetProperty( Actor::Property::SizeMode ).Get< std::string >();
-    DALI_TEST_EQUALS( inValue.Get< std::string >(), outString, TEST_LOCATION );
-  }
-
-  // Test setting and getting the SizeModeFactor property.
-  Vector3 testPropertySizeModeFactor( 1.0f, 2.0f, 3.0f );
-  Property::Value inValueFactor = testPropertySizeModeFactor;
-  propertyActor.SetProperty( Actor::Property::SizeModeFactor, inValueFactor );
-  Vector3 outValueFactor = propertyActor.GetProperty( Actor::Property::SizeModeFactor ).Get< Vector3 >();
-  DALI_TEST_EQUALS( testPropertySizeModeFactor, outValueFactor, TEST_LOCATION );
-
-  END_TEST;
-}
-
-// SetRotation(float angleRadians, Vector3 axis)
-int UtcDaliActorSetRotation01(void)
+// SetOrientation(float angleRadians, Vector3 axis)
+int UtcDaliActorSetOrientation01(void)
 {
   TestApplication application;
 
   Quaternion rotation(0.785f, Vector3(1.0f, 1.0f, 0.0f));
   Actor actor = Actor::New();
 
-  actor.SetRotation(rotation);
+  actor.SetOrientation(rotation);
 
   // flush the queue and render once
   application.SendNotification();
   application.Render();
 
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliActorSetRotation02(void)
+int UtcDaliActorSetOrientation02(void)
 {
   TestApplication application;
 
@@ -1408,29 +1200,29 @@ int UtcDaliActorSetRotation02(void)
   float angle = 0.785f;
   Vector3 axis(1.0f, 1.0f, 0.0f);
 
-  actor.SetRotation(Radian( angle ), axis);
+  actor.SetOrientation(Radian( angle ), axis);
   Quaternion rotation( angle, axis );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Add( actor );
   actor.RotateBy( Degree( 360 ), axis);
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
-  actor.SetRotation( Degree( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
+  actor.SetOrientation( Degree( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
   Quaternion result( 0, Vector3( 1.0f, 0.0f, 0.0f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS( result, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS( result, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
-  actor.SetRotation(Radian( angle ), axis);
+  actor.SetOrientation(Radian( angle ), axis);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -1448,7 +1240,7 @@ int UtcDaliActorRotateBy01(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.25f, Vector3::ZAXIS), actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(M_PI*0.25f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Add( actor );
 
@@ -1456,7 +1248,7 @@ int UtcDaliActorRotateBy01(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -1474,31 +1266,31 @@ int UtcDaliActorRotateBy02(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   actor.RotateBy(rotation);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliActorGetCurrentRotation(void)
+int UtcDaliActorGetCurrentOrientation(void)
 {
   TestApplication application;
   Actor actor = Actor::New();
 
   Quaternion rotation(0.785f, Vector3(1.0f, 1.0f, 0.0f));
-  actor.SetRotation(rotation);
+  actor.SetOrientation(rotation);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(rotation, actor.GetCurrentRotation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliActorGetCurrentWorldRotation(void)
+int UtcDaliActorGetCurrentWorldOrientation(void)
 {
   tet_infoline("Testing Actor::GetCurrentWorldRotation");
   TestApplication application;
@@ -1506,36 +1298,36 @@ int UtcDaliActorGetCurrentWorldRotation(void)
   Actor parent = Actor::New();
   Radian rotationAngle( Degree(90.0f) );
   Quaternion rotation( rotationAngle, Vector3::YAXIS );
-  parent.SetRotation( rotation );
+  parent.SetOrientation( rotation );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
-  child.SetRotation( rotation );
+  child.SetOrientation( rotation );
   parent.Add( child );
 
   // The actors should not have a world rotation yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);
 
-  DALI_TEST_EQUALS( parent.GetCurrentRotation(), rotation, 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentRotation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentOrientation(), rotation, 0.001, TEST_LOCATION );
 
   // The actors should have a world rotation now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion( rotationAngle * 2.0f, Vector3::YAXIS ), 0.001, TEST_LOCATION );
 
   // turn off child rotation inheritance
-  child.SetInheritRotation( false );
-  DALI_TEST_EQUALS( child.IsRotationInherited(), false, TEST_LOCATION );
+  child.SetInheritOrientation( false );
+  DALI_TEST_EQUALS( child.IsOrientationInherited(), false, TEST_LOCATION );
   application.SendNotification();
   application.Render(0);
 
   // The actors should have a world rotation now
-  DALI_TEST_EQUALS( parent.GetCurrentWorldRotation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldRotation(), rotation, 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion( rotationAngle, Vector3::YAXIS ), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), rotation, 0.001, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1777,7 +1569,7 @@ int UtcDaliActorSetOpacity(void)
   DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.4f, TEST_LOCATION );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.OpacityBy( 0.1f );
+  actor.SetOpacity( actor.GetCurrentOpacity() + 0.1f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1795,7 +1587,7 @@ int UtcDaliActorSetOpacity(void)
   DALI_TEST_EQUALS(actor.GetCurrentOpacity(), 0.9f, TEST_LOCATION );
 
   // change opacity, actor is on stage to change is not immediate
-  actor.OpacityBy( -0.9f );
+  actor.SetOpacity( actor.GetCurrentOpacity() - 0.9f );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1855,7 +1647,7 @@ int UtcDaliActorSetColor(void)
   application.Render();
   DALI_TEST_CHECK(color == actor.GetCurrentColor());
 
-  actor.ColorBy( Vector4( -0.4f, -0.5f, -0.6f, -0.4f ) );
+  actor.SetColor( actor.GetCurrentColor() + Vector4( -0.4f, -0.5f, -0.6f, -0.4f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1868,7 +1660,7 @@ int UtcDaliActorSetColor(void)
   application.Render();
   DALI_TEST_EQUALS( color, actor.GetCurrentColor(),  TEST_LOCATION );
 
-  actor.ColorBy( Vector4( 1.1f, 1.1f, 1.1f, 1.1f ) );
+  actor.SetColor( actor.GetCurrentColor() + Vector4( 1.1f, 1.1f, 1.1f, 1.1f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -2056,7 +1848,7 @@ int UtcDaliActorApplyConstraint(void)
 
   Actor actor = Actor::New();
 
-  Constraint constraint = Constraint::New<Vector4>( Actor::Property::Color, TestConstraint() );
+  Constraint constraint = Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraint() );
   actor.ApplyConstraint(constraint);
 
   DALI_TEST_CHECK( gTestConstraintCalled == false );
@@ -2083,8 +1875,8 @@ int UtcDaliActorApplyConstraintAppliedCallback(void)
   parent.SetSize( parentSize );
   Stage::GetCurrent().Add( parent );
 
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::Size,
-                                                    Source( parent, Actor::Property::Size ),
+  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE,
+                                                    Source( parent, Actor::Property::SIZE ),
                                                     EqualToConstraint() );
 
   // Create some child actors
@@ -2117,9 +1909,9 @@ int UtcDaliActorApplyConstraintAppliedCallback(void)
   activeConstraint3.AppliedSignal().Connect( TestConstraintCallback3 );
 
   // Check event-side size
-  DALI_TEST_EQUALS( child1.GetSize(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child2.GetSize(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child3.GetSize(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( child1.GetTargetSize(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( child2.GetTargetSize(), Vector3::ZERO, TEST_LOCATION );
+  DALI_TEST_EQUALS( child3.GetTargetSize(), Vector3::ZERO, TEST_LOCATION );
 
   DALI_TEST_EQUALS( child1.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
   DALI_TEST_EQUALS( child2.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
@@ -2275,7 +2067,7 @@ int UtcDaliActorRemoveConstraints(void)
 
   Actor actor = Actor::New();
 
-  Constraint constraint = Constraint::New<Vector4>( Actor::Property::Color, TestConstraint() );
+  Constraint constraint = Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraint() );
   actor.ApplyConstraint(constraint);
   actor.RemoveConstraints();
 
@@ -2304,8 +2096,8 @@ int UtcDaliActorRemoveConstraint(void)
   // 1. Apply Constraint1 and Constraint2, and test...
   unsigned int result1 = 0u;
   unsigned int result2 = 0u;
-  ActiveConstraint activeConstraint1 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::Color, TestConstraintRef<Vector4>(result1, 1) ) );
-  ActiveConstraint activeConstraint2 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::Color, TestConstraintRef<Vector4>(result2, 2) ) );
+  ActiveConstraint activeConstraint1 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1) ) );
+  ActiveConstraint activeConstraint2 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result2, 2) ) );
 
   Stage::GetCurrent().Add( actor );
   // flush the queue and render once
@@ -2331,7 +2123,7 @@ int UtcDaliActorRemoveConstraint(void)
   // 3. Re-Apply Constraint1 and test...
   result1 = 0;
   result2 = 0;
-  activeConstraint1 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::Color, TestConstraintRef<Vector4>(result1, 1) ) );
+  activeConstraint1 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1) ) );
   // make color property dirty, which will trigger constraints to be reapplied.
   actor.SetColor( Color::WHITE );
   // flush the queue and render once
@@ -2381,12 +2173,12 @@ int UtcDaliActorRemoveConstraintTag(void)
   unsigned int result2 = 0u;
 
   unsigned constraint1Tag = 1u;
-  Constraint constraint1 = Constraint::New<Vector4>( Actor::Property::Color, TestConstraintRef<Vector4>(result1, 1) );
+  Constraint constraint1 = Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1) );
   constraint1.SetTag( constraint1Tag );
   actor.ApplyConstraint( constraint1 );
 
   unsigned constraint2Tag = 2u;
-  Constraint constraint2 = Constraint::New<Vector4>( Actor::Property::Color, TestConstraintRef<Vector4>(result2, 2) );
+  Constraint constraint2 = Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result2, 2) );
   constraint2.SetTag( constraint2Tag );
   actor.ApplyConstraint( constraint2 );
 
@@ -2623,35 +2415,6 @@ int UtcDaliActorFindChildByName(void)
   END_TEST;
 }
 
-int UtcDaliActorFindChildByAlias(void)
-{
-  tet_infoline("Testing Dali::Actor::FindChildByAlias()");
-  TestApplication application;
-
-  Actor parent = Actor::New();
-  parent.SetName( "parent" );
-  Actor first  = Actor::New();
-  first .SetName( "first" );
-  Actor second = Actor::New();
-  second.SetName( "second" );
-
-  parent.Add(first);
-  first.Add(second);
-
-  Actor found = parent.FindChildByAlias( "foo" );
-  DALI_TEST_CHECK( !found );
-
-  found = parent.FindChildByAlias( "parent" );
-  DALI_TEST_CHECK( found == parent );
-
-  found = parent.FindChildByAlias( "first" );
-  DALI_TEST_CHECK( found == first );
-
-  found = parent.FindChildByAlias( "second" );
-  DALI_TEST_CHECK( found == second );
-  END_TEST;
-}
-
 int UtcDaliActorFindChildById(void)
 {
   tet_infoline("Testing Dali::Actor::UtcDaliActorFindChildById()");
@@ -2870,8 +2633,10 @@ int UtcDaliActorSetDrawModeOverlayHitTest(void)
   Stage::GetCurrent().Add(a);
   Stage::GetCurrent().Add(b);
 
-  a.SetSize(Vector2(100.0f, 100.0f));
-  b.SetSize(Vector2(100.0f, 100.0f));
+  a.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+  a.SetPreferredSize(Vector2(100.0f, 100.0f));
+  b.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+  b.SetPreferredSize(Vector2(100.0f, 100.0f));
 
   // position b overlapping a. (regular non-overlays)
   // hit test at point 'x'
@@ -2951,7 +2716,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetRotation( parentRotation );
+  parent.SetOrientation( parentRotation );
   parent.SetScale( parentScale );
   Stage::GetCurrent().Add( parent );
 
@@ -2962,7 +2727,7 @@ int UtcDaliActorGetCurrentWorldMatrix(void)
   Quaternion childRotation( childRotationAngle, Vector3::YAXIS );
   Vector3 childScale( 2.0f, 2.0f, 2.0f );
   child.SetPosition( childPosition );
-  child.SetRotation( childRotation );
+  child.SetOrientation( childRotation );
   child.SetScale( childScale );
   parent.Add( child );
 
@@ -3005,13 +2770,13 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
   Quaternion parentRotation(rotationAngle, Vector3::ZAXIS);
   Vector3 parentScale( 1.0f, 2.0f, 3.0f );
   parent.SetPosition( parentPosition );
-  parent.SetRotation( parentRotation );
+  parent.SetOrientation( parentRotation );
   parent.SetScale( parentScale );
   Stage::GetCurrent().Add( parent );
 
   Actor child = Actor::New();
   child.SetParentOrigin(ParentOrigin::CENTER);
-  Constraint posConstraint = Constraint::New<Vector3>( Actor::Property::Position, Source( parent, Actor::Property::WorldMatrix), PositionComponentConstraint() );
+  Constraint posConstraint = Constraint::New<Vector3>( Actor::Property::POSITION, Source( parent, Actor::Property::WORLD_MATRIX), PositionComponentConstraint() );
   child.ApplyConstraint(posConstraint);
 
   Stage::GetCurrent().Add( child );
@@ -3143,51 +2908,61 @@ struct PropertyStringIndex
 
 const PropertyStringIndex PROPERTY_TABLE[] =
 {
-  { "parent-origin",            Actor::Property::ParentOrigin,           Property::VECTOR3     },
-  { "parent-origin-x",          Actor::Property::ParentOriginX,          Property::FLOAT       },
-  { "parent-origin-y",          Actor::Property::ParentOriginY,          Property::FLOAT       },
-  { "parent-origin-z",          Actor::Property::ParentOriginZ,          Property::FLOAT       },
-  { "anchor-point",             Actor::Property::AnchorPoint,            Property::VECTOR3     },
-  { "anchor-point-x",           Actor::Property::AnchorPointX,           Property::FLOAT       },
-  { "anchor-point-y",           Actor::Property::AnchorPointY,           Property::FLOAT       },
-  { "anchor-point-z",           Actor::Property::AnchorPointZ,           Property::FLOAT       },
-  { "size",                     Actor::Property::Size,                   Property::VECTOR3     },
-  { "size-width",               Actor::Property::SizeWidth,              Property::FLOAT       },
-  { "size-height",              Actor::Property::SizeHeight,             Property::FLOAT       },
-  { "size-depth",               Actor::Property::SizeDepth,              Property::FLOAT       },
-  { "position",                 Actor::Property::Position,               Property::VECTOR3     },
-  { "position-x",               Actor::Property::PositionX,              Property::FLOAT       },
-  { "position-y",               Actor::Property::PositionY,              Property::FLOAT       },
-  { "position-z",               Actor::Property::PositionZ,              Property::FLOAT       },
-  { "world-position",           Actor::Property::WorldPosition,          Property::VECTOR3     },
-  { "world-position-x",         Actor::Property::WorldPositionX,         Property::FLOAT       },
-  { "world-position-y",         Actor::Property::WorldPositionY,         Property::FLOAT       },
-  { "world-position-z",         Actor::Property::WorldPositionZ,         Property::FLOAT       },
-  { "rotation",                 Actor::Property::Rotation,               Property::ROTATION    },
-  { "world-rotation",           Actor::Property::WorldRotation,          Property::ROTATION    },
-  { "scale",                    Actor::Property::Scale,                  Property::VECTOR3     },
-  { "scale-x",                  Actor::Property::ScaleX,                 Property::FLOAT       },
-  { "scale-y",                  Actor::Property::ScaleY,                 Property::FLOAT       },
-  { "scale-z",                  Actor::Property::ScaleZ,                 Property::FLOAT       },
-  { "world-scale",              Actor::Property::WorldScale,             Property::VECTOR3     },
-  { "visible",                  Actor::Property::Visible,                Property::BOOLEAN     },
-  { "color",                    Actor::Property::Color,                  Property::VECTOR4     },
-  { "color-red",                Actor::Property::ColorRed,               Property::FLOAT       },
-  { "color-green",              Actor::Property::ColorGreen,             Property::FLOAT       },
-  { "color-blue",               Actor::Property::ColorBlue,              Property::FLOAT       },
-  { "color-alpha",              Actor::Property::ColorAlpha,             Property::FLOAT       },
-  { "world-color",              Actor::Property::WorldColor,             Property::VECTOR4     },
-  { "world-matrix",             Actor::Property::WorldMatrix,            Property::MATRIX      },
-  { "name",                     Actor::Property::Name,                   Property::STRING      },
-  { "sensitive",                Actor::Property::Sensitive,              Property::BOOLEAN     },
-  { "leave-required",           Actor::Property::LeaveRequired,          Property::BOOLEAN     },
-  { "inherit-rotation",         Actor::Property::InheritRotation,        Property::BOOLEAN     },
-  { "inherit-scale",            Actor::Property::InheritScale,           Property::BOOLEAN     },
-  { "color-mode",               Actor::Property::ColorMode,              Property::STRING      },
-  { "position-inheritance",     Actor::Property::PositionInheritance,    Property::STRING      },
-  { "draw-mode",                Actor::Property::DrawMode,               Property::STRING      },
-  { "size-mode",                Actor::Property::SizeMode,               Property::STRING      },
-  { "size-mode-factor",         Actor::Property::SizeModeFactor,         Property::VECTOR3     },
+  { "parent-origin",            Actor::Property::PARENT_ORIGIN,            Property::VECTOR3     },
+  { "parent-origin-x",          Actor::Property::PARENT_ORIGIN_X,          Property::FLOAT       },
+  { "parent-origin-y",          Actor::Property::PARENT_ORIGIN_Y,          Property::FLOAT       },
+  { "parent-origin-z",          Actor::Property::PARENT_ORIGIN_Z,          Property::FLOAT       },
+  { "anchor-point",             Actor::Property::ANCHOR_POINT,             Property::VECTOR3     },
+  { "anchor-point-x",           Actor::Property::ANCHOR_POINT_X,           Property::FLOAT       },
+  { "anchor-point-y",           Actor::Property::ANCHOR_POINT_Y,           Property::FLOAT       },
+  { "anchor-point-z",           Actor::Property::ANCHOR_POINT_Z,           Property::FLOAT       },
+  { "size",                     Actor::Property::SIZE,                     Property::VECTOR3     },
+  { "size-width",               Actor::Property::SIZE_WIDTH,               Property::FLOAT       },
+  { "size-height",              Actor::Property::SIZE_HEIGHT,              Property::FLOAT       },
+  { "size-depth",               Actor::Property::SIZE_DEPTH,               Property::FLOAT       },
+  { "position",                 Actor::Property::POSITION,                 Property::VECTOR3     },
+  { "position-x",               Actor::Property::POSITION_X,               Property::FLOAT       },
+  { "position-y",               Actor::Property::POSITION_Y,               Property::FLOAT       },
+  { "position-z",               Actor::Property::POSITION_Z,               Property::FLOAT       },
+  { "world-position",           Actor::Property::WORLD_POSITION,           Property::VECTOR3     },
+  { "world-position-x",         Actor::Property::WORLD_POSITION_X,         Property::FLOAT       },
+  { "world-position-y",         Actor::Property::WORLD_POSITION_Y,         Property::FLOAT       },
+  { "world-position-z",         Actor::Property::WORLD_POSITION_Z,         Property::FLOAT       },
+  { "orientation",              Actor::Property::ORIENTATION,              Property::ROTATION    },
+  { "world-orientation",        Actor::Property::WORLD_ORIENTATION,        Property::ROTATION    },
+  { "scale",                    Actor::Property::SCALE,                    Property::VECTOR3     },
+  { "scale-x",                  Actor::Property::SCALE_X,                  Property::FLOAT       },
+  { "scale-y",                  Actor::Property::SCALE_Y,                  Property::FLOAT       },
+  { "scale-z",                  Actor::Property::SCALE_Z,                  Property::FLOAT       },
+  { "world-scale",              Actor::Property::WORLD_SCALE,              Property::VECTOR3     },
+  { "visible",                  Actor::Property::VISIBLE,                  Property::BOOLEAN     },
+  { "color",                    Actor::Property::COLOR,                    Property::VECTOR4     },
+  { "color-red",                Actor::Property::COLOR_RED,                Property::FLOAT       },
+  { "color-green",              Actor::Property::COLOR_GREEN,              Property::FLOAT       },
+  { "color-blue",               Actor::Property::COLOR_BLUE,               Property::FLOAT       },
+  { "color-alpha",              Actor::Property::COLOR_ALPHA,              Property::FLOAT       },
+  { "world-color",              Actor::Property::WORLD_COLOR,              Property::VECTOR4     },
+  { "world-matrix",             Actor::Property::WORLD_MATRIX,             Property::MATRIX      },
+  { "name",                     Actor::Property::NAME,                     Property::STRING      },
+  { "sensitive",                Actor::Property::SENSITIVE,                Property::BOOLEAN     },
+  { "leave-required",           Actor::Property::LEAVE_REQUIRED,           Property::BOOLEAN     },
+  { "inherit-orientation",      Actor::Property::INHERIT_ORIENTATION,      Property::BOOLEAN     },
+  { "inherit-scale",            Actor::Property::INHERIT_SCALE,            Property::BOOLEAN     },
+  { "color-mode",               Actor::Property::COLOR_MODE,               Property::STRING      },
+  { "position-inheritance",     Actor::Property::POSITION_INHERITANCE,     Property::STRING      },
+  { "draw-mode",                Actor::Property::DRAW_MODE,                Property::STRING      },
+  { "size-mode",                Actor::Property::SIZE_MODE,                Property::STRING      },
+  { "size-mode-factor",         Actor::Property::SIZE_MODE_FACTOR,         Property::VECTOR3     },
+  { "relayout-enabled",         Actor::Property::RELAYOUT_ENABLED,         Property::BOOLEAN     },
+  { "width-resize-policy",      Actor::Property::WIDTH_RESIZE_POLICY,      Property::STRING      },
+  { "height-resize-policy",     Actor::Property::HEIGHT_RESIZE_POLICY,     Property::STRING      },
+  { "size-scale-policy",        Actor::Property::SIZE_SCALE_POLICY,        Property::STRING      },
+  { "width-for-height",         Actor::Property::WIDTH_FOR_HEIGHT,         Property::BOOLEAN     },
+  { "height-for-width",         Actor::Property::HEIGHT_FOR_WIDTH,         Property::BOOLEAN     },
+  { "padding",                  Actor::Property::PADDING,                  Property::VECTOR4     },
+  { "minimum-size",             Actor::Property::MINIMUM_SIZE,             Property::VECTOR2     },
+  { "maximum-size",             Actor::Property::MAXIMUM_SIZE,             Property::VECTOR2     },
+  { "preferred-size",           Actor::Property::PREFERRED_SIZE,           Property::VECTOR2     },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
 } // unnamed namespace
@@ -3205,5 +2980,145 @@ int UtcDaliActorProperties(void)
     DALI_TEST_EQUALS( actor.GetPropertyIndex( PROPERTY_TABLE[i].name ), PROPERTY_TABLE[i].index, TEST_LOCATION );
     DALI_TEST_EQUALS( actor.GetPropertyType( PROPERTY_TABLE[i].index ), PROPERTY_TABLE[i].type, TEST_LOCATION );
   }
+  END_TEST;
+}
+
+int UtcDaliRelayoutProperties_RelayoutEnabled(void)
+{
+  TestApplication app;
+
+  Actor actor = Actor::New();
+
+  // Defaults
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::RELAYOUT_ENABLED ).Get< bool >(), false, TEST_LOCATION );
+
+  // Set relayout disabled
+  actor.SetProperty( Actor::Property::RELAYOUT_ENABLED, false );
+
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::RELAYOUT_ENABLED ).Get< bool >(), false, TEST_LOCATION );
+
+  // Set relayout enabled
+  actor.SetProperty( Actor::Property::RELAYOUT_ENABLED, true );
+
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::RELAYOUT_ENABLED ).Get< bool >(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRelayoutProperties_ResizePolicies(void)
+{
+  TestApplication app;
+
+  Actor actor = Actor::New();
+
+  // Defaults
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_RESIZE_POLICY ).Get< std::string >(), "FIXED", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), "FIXED", TEST_LOCATION );
+
+  // Set resize policy for all dimensions
+  actor.SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
+  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i)
+  {
+    DALI_TEST_EQUALS( actor.GetResizePolicy( static_cast< Dimension >( 1 << i ) ), USE_NATURAL_SIZE, TEST_LOCATION );
+  }
+
+  // Set individual dimensions
+  const char* const widthPolicy = "FILL_TO_PARENT";
+  const char* const heightPolicy = "FIXED";
+
+  actor.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, widthPolicy );
+  actor.SetProperty( Actor::Property::HEIGHT_RESIZE_POLICY, heightPolicy );
+
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_RESIZE_POLICY ).Get< std::string >(), widthPolicy, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), heightPolicy, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRelayoutProperties_SizeScalePolicy(void)
+{
+  TestApplication app;
+
+  Actor actor = Actor::New();
+
+  // Defaults
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_SCALE_POLICY ).Get< std::string >(), "USE_SIZE_SET", TEST_LOCATION );
+
+  // Set
+  const char* const policy1 = "FIT_WITH_ASPECT_RATIO";
+  const char* const policy2 = "FILL_WITH_ASPECT_RATIO";
+
+  actor.SetProperty( Actor::Property::SIZE_SCALE_POLICY, policy1 );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_SCALE_POLICY ).Get< std::string >(), policy1, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::SIZE_SCALE_POLICY, policy2 );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::SIZE_SCALE_POLICY ).Get< std::string >(), policy2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRelayoutProperties_DimensionDependency(void)
+{
+  TestApplication app;
+
+  Actor actor = Actor::New();
+
+  // Defaults
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_FOR_HEIGHT ).Get< bool >(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_FOR_WIDTH ).Get< bool >(), false, TEST_LOCATION );
+
+  // Set
+  actor.SetProperty( Actor::Property::WIDTH_FOR_HEIGHT, true );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_FOR_HEIGHT ).Get< bool >(), true, TEST_LOCATION );
+
+  actor.SetProperty( Actor::Property::HEIGHT_FOR_WIDTH, true );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_FOR_WIDTH ).Get< bool >(), true, TEST_LOCATION );
+
+  // Test setting another resize policy
+  actor.SetProperty( Actor::Property::WIDTH_RESIZE_POLICY, "FIXED" );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_FOR_HEIGHT ).Get< bool >(), false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRelayoutProperties_Padding(void)
+{
+  TestApplication app;
+
+  Actor actor = Actor::New();
+
+  // Data
+  Vector4 padding( 1.0f, 2.0f, 3.0f, 4.0f );
+
+  // PADDING
+  actor.SetProperty( Actor::Property::PADDING, padding );
+  Vector4 paddingResult = actor.GetProperty( Actor::Property::PADDING ).Get< Vector4 >();
+
+  DALI_TEST_EQUALS( paddingResult, padding, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRelayoutProperties_MinimumMaximumSize(void)
+{
+  TestApplication app;
+
+  Actor actor = Actor::New();
+
+  // Data
+  Vector2 minSize( 1.0f, 2.0f );
+
+  actor.SetProperty( Actor::Property::MINIMUM_SIZE, minSize );
+  Vector2 resultMin = actor.GetProperty( Actor::Property::MINIMUM_SIZE ).Get< Vector2 >();
+
+  DALI_TEST_EQUALS( resultMin, minSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
+  Vector2 maxSize( 3.0f, 4.0f );
+
+  actor.SetProperty( Actor::Property::MAXIMUM_SIZE, maxSize );
+  Vector2 resultMax = actor.GetProperty( Actor::Property::MAXIMUM_SIZE ).Get< Vector2 >();
+
+  DALI_TEST_EQUALS( resultMax, maxSize, Math::MACHINE_EPSILON_0, TEST_LOCATION );
+
   END_TEST;
 }

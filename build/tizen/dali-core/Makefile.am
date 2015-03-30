@@ -58,13 +58,11 @@ dali-shaders.cpp: $(dali_shaders_script) $(dali_shaders_dir)/*.txt
 dali_core_includes = \
         -I../../..
 
-daliShaderbinDir  = ${dataReadWriteDir}/core/shaderbin/
 daliGlyphCacheDir = ${dataReadWriteDir}/glyphcache/
 
 libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            -DDALI_DATA_RW_DIR="\"${daliReadWriteDir}\"" \
                            -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
-                           -DDALI_SHADERBIN_DIR="\"${daliShaderbinDir}\"" \
                            -DDALI_GLYPH_CACHE_DIR="\"${daliGlyphCacheDir}\"" \
                            -DDALI_EMOTICON_DIR="\"${emoticons_dir}\"" \
                            -Werror -Wall -Wfloat-equal \
@@ -73,10 +71,6 @@ libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
 
 libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
                          -lpthread
-
-# Create an empty shaderbin dir
-install-data-local:
-	$(MKDIR_P) ${DESTDIR}/${daliShaderbinDir}
 
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
@@ -103,6 +97,7 @@ publicapishadereffectsdir = $(publicapidir)/shader-effects
 publicapisignalsdir = $(publicapidir)/signals
 publicapitextdir = $(publicapidir)/text
 publicapiscriptingdir = $(publicapidir)/scripting
+publicapisizenegotiationdir = $(publicapidir)/size-negotiation
 
 publicapi_HEADERS = $(public_api_header_files)
 publicapiactors_HEADERS = $(public_api_core_actors_header_files)
@@ -117,6 +112,7 @@ publicapimodeling_HEADERS = $(public_api_core_modeling_header_files)
 publicapirendertasks_HEADERS = $(public_api_core_render_tasks_header_files)
 publicapiobject_HEADERS = $(public_api_core_object_header_files)
 publicapiscripting_HEADERS = $(public_api_core_scripting_header_files)
+publicapisizenegotiation_HEADERS = $(public_api_core_size_negotiation_header_files)
 publicapishadereffects_HEADERS = $(public_api_core_shader_effects_header_files)
 publicapisignals_HEADERS = $(public_api_core_signals_header_files)
 publicapitext_HEADERS = $(public_api_core_text_header_files)

@@ -26,7 +26,7 @@
 #include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-vector3.h>
@@ -98,7 +98,6 @@ public:
   // Defaults
   static const PositionInheritanceMode DEFAULT_POSITION_INHERITANCE_MODE;
   static const ColorMode DEFAULT_COLOR_MODE;
-  static const SizeMode DEFAULT_SIZE_MODE;
 
   // Creation methods
 
@@ -366,8 +365,8 @@ public:
   /**
    * Sets the position of the node derived from the position of all its parents.
    * This method should only be called when the parent's world position is up-to-date.
-   * With a non-central anchor-point, the local rotation and scale affects the world position.
-   * Therefore the world rotation & scale must be updated before the world position.
+   * With a non-central anchor-point, the local orientation and scale affects the world position.
+   * Therefore the world orientation & scale must be updated before the world position.
    * @pre The node has a parent.
    * @param[in] updateBufferIndex The current update buffer index.
    */
@@ -385,10 +384,10 @@ public:
         finalPosition *= mParent->GetSize(updateBufferIndex);
         finalPosition += mPosition[updateBufferIndex];
         finalPosition *= mParent->GetWorldScale(updateBufferIndex);
-        const Quaternion& parentWorldRotation = mParent->GetWorldRotation(updateBufferIndex);
-        if(!parentWorldRotation.IsIdentity())
+        const Quaternion& parentWorldOrientation = mParent->GetWorldOrientation(updateBufferIndex);
+        if(!parentWorldOrientation.IsIdentity())
         {
-          finalPosition *= parentWorldRotation;
+          finalPosition *= parentWorldOrientation;
         }
 
         // check if a node needs to be offsetted locally (only applies when AnchorPoint is not central)
@@ -418,12 +417,12 @@ public:
             scale.z = -scale.z;
           }
 
-          // If the anchor-point is not central, then position is affected by the local rotation & scale
+          // If the anchor-point is not central, then position is affected by the local orientation & scale
           localOffset *= scale;
-          const Quaternion& localWorldRotation = mWorldRotation[updateBufferIndex];
-          if(!localWorldRotation.IsIdentity())
+          const Quaternion& localWorldOrientation = mWorldOrientation[updateBufferIndex];
+          if(!localWorldOrientation.IsIdentity())
           {
-            localOffset *= localWorldRotation;
+            localOffset *= localWorldOrientation;
           }
           finalPosition += localOffset;
         }
@@ -494,146 +493,101 @@ public:
   }
 
   /**
-   * Retrieve the local rotation of the node, relative to its parent.
+   * Retrieve the local orientation of the node, relative to its parent.
    * @param[in] bufferIndex The buffer to read from.
-   * @return The local rotation.
+   * @return The local orientation.
    */
-  const Quaternion& GetRotation(BufferIndex bufferIndex) const
+  const Quaternion& GetOrientation(BufferIndex bufferIndex) const
   {
-    return mRotation[bufferIndex];
+    return mOrientation[bufferIndex];
   }
 
   /**
-   * Sets both the local & base rotations of the node.
+   * Sets both the local & base orientations of the node.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] rotation The new local & base rotation.
+   * @param[in] orientation The new local & base orientation.
    */
-  void BakeRotation(BufferIndex updateBufferIndex, const Quaternion& rotation)
+  void BakeOrientation(BufferIndex updateBufferIndex, const Quaternion& orientation)
   {
-    mRotation.Bake( updateBufferIndex, rotation );
+    mOrientation.Bake( updateBufferIndex, orientation );
   }
 
   /**
-   * Sets the rotation of the node derived from the rotation of all its parents.
+   * Sets the orientation of the node derived from the rotation of all its parents.
    * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] rotation The world rotation.
+   * @param[in] orientation The world orientation.
    */
-  void SetWorldRotation( BufferIndex updateBufferIndex, const Quaternion& rotation )
+  void SetWorldOrientation( BufferIndex updateBufferIndex, const Quaternion& orientation )
   {
-    mWorldRotation.Set( updateBufferIndex, rotation );
+    mWorldOrientation.Set( updateBufferIndex, orientation );
   }
 
   /**
-   * Sets the rotation of the node derived from the rotation of all its parents.
-   * This method should only be called when the parents world rotation is up-to-date.
+   * Sets the orientation of the node derived from the rotation of all its parents.
+   * This method should only be called when the parents world orientation is up-to-date.
    * @pre The node has a parent.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void InheritWorldRotation( BufferIndex updateBufferIndex )
+  void InheritWorldOrientation( BufferIndex updateBufferIndex )
   {
     DALI_ASSERT_DEBUG(mParent != NULL);
 
-    const Quaternion& localRotation = mRotation[updateBufferIndex];
+    const Quaternion& localOrientation = mOrientation[updateBufferIndex];
 
-    if(localRotation.IsIdentity())
+    if(localOrientation.IsIdentity())
     {
-      mWorldRotation.Set( updateBufferIndex, mParent->GetWorldRotation(updateBufferIndex) );
+      mWorldOrientation.Set( updateBufferIndex, mParent->GetWorldOrientation(updateBufferIndex) );
     }
     else
     {
-      Quaternion finalRotation( mParent->GetWorldRotation(updateBufferIndex) );
-      finalRotation *= localRotation;
-      mWorldRotation.Set( updateBufferIndex, finalRotation );
+      Quaternion finalOrientation( mParent->GetWorldOrientation(updateBufferIndex) );
+      finalOrientation *= localOrientation;
+      mWorldOrientation.Set( updateBufferIndex, finalOrientation );
     }
   }
 
   /**
-   * Copies the previous inherited rotation, if this changed in the previous frame.
-   * This method should be called instead of InheritWorldRotation i.e. if the inherited rotation
+   * Copies the previous inherited orientation, if this changed in the previous frame.
+   * This method should be called instead of InheritWorldOrientation i.e. if the inherited orientation
    * does not need to be recalculated in the current frame.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  void CopyPreviousWorldRotation( BufferIndex updateBufferIndex )
+  void CopyPreviousWorldOrientation( BufferIndex updateBufferIndex )
   {
-    mWorldRotation.CopyPrevious( updateBufferIndex );
+    mWorldOrientation.CopyPrevious( updateBufferIndex );
   }
 
   /**
-   * Retrieve the rotation of the node derived from the rotation of all its parents.
+   * Retrieve the orientation of the node derived from the rotation of all its parents.
    * @param[in] bufferIndex The buffer to read from.
    * @return The world rotation.
    */
-  const Quaternion& GetWorldRotation( BufferIndex bufferIndex ) const
+  const Quaternion& GetWorldOrientation( BufferIndex bufferIndex ) const
   {
-    return mWorldRotation[bufferIndex];
+    return mWorldOrientation[bufferIndex];
   }
 
   /**
-   * Set whether the Node inherits rotation.
-   * @param[in] inherit True if the parent rotation is inherited.
+   * Set whether the Node inherits orientation.
+   * @param[in] inherit True if the parent orientation is inherited.
    */
-  void SetInheritRotation(bool inherit)
+  void SetInheritOrientation(bool inherit)
   {
-    if (inherit != mInheritRotation)
+    if (inherit != mInheritOrientation)
     {
-      mInheritRotation = inherit;
+      mInheritOrientation = inherit;
 
       SetDirtyFlag(TransformFlag);
     }
   }
 
   /**
-   * Query whether the node inherits rotation from its parent.
-   * @return True if the parent rotation is inherited.
+   * Query whether the node inherits orientation from its parent.
+   * @return True if the parent orientation is inherited.
    */
-  bool IsRotationInherited() const
+  bool IsOrientationInherited() const
   {
-    return mInheritRotation;
-  }
-
-  /**
-   * @brief Defines how a child actor's size is affected by its parent's size.
-   * @param[in] mode The size relative to parent mode to use.
-   */
-  void SetSizeMode( SizeMode mode )
-  {
-    if ( mode != mSizeMode )
-    {
-      mSizeMode = mode;
-
-      SetDirtyFlag( TransformFlag );
-    }
-  }
-
-  /**
-   * Query how the child actor's size is affected by its parent's size.
-   * @return The size relative to parent mode in use.
-   */
-  SizeMode GetSizeMode() const
-  {
-    return mSizeMode;
-  }
-
-  /**
-   * Sets the factor of the parents size used for the child actor.
-   * Note: Only used for certain SizeModes.
-   * @param[in] factor The vector to multiply the parents size by to get the childs size.
-   */
-  void SetSizeModeFactor( const Vector3& factor )
-  {
-    mSizeModeFactor = factor;
-
-    SetDirtyFlag( TransformFlag );
-  }
-
-  /**
-   * Gets the factor of the parents size used for the child actor.
-   * Note: Only used for certain SizeModes.
-   * @return The vector being used to multiply the parents size by to get the childs size.
-   */
-  const Vector3& GetSizeModeFactor() const
-  {
-    return mSizeModeFactor;
+    return mInheritOrientation;
   }
 
   /**
@@ -1034,18 +988,18 @@ public: // Default properties
 
   AnimatableProperty<Vector3>    mSize;          ///< Size is provided for layouting
   AnimatableProperty<Vector3>    mPosition;      ///< Local transform; distance between parent-origin & anchor-point
-  AnimatableProperty<Quaternion> mRotation;      ///< Local transform; rotation relative to parent node
+  AnimatableProperty<Quaternion> mOrientation;   ///< Local transform; rotation relative to parent node
   AnimatableProperty<Vector3>    mScale;         ///< Local transform; scale relative to parent node
   AnimatableProperty<bool>       mVisible;       ///< Visibility can be inherited from the Node hierachy
   AnimatableProperty<Vector4>    mColor;         ///< Color can be inherited from the Node hierarchy
 
   // Inherited properties; read-only from public API
 
-  InheritedVector3    mWorldPosition; ///< Full inherited position
-  InheritedQuaternion mWorldRotation; ///< Full inherited rotation
-  InheritedVector3    mWorldScale;    ///< Full inherited scale
-  InheritedMatrix     mWorldMatrix;   ///< Full inherited world matrix
-  InheritedColor      mWorldColor;    ///< Full inherited color
+  InheritedVector3    mWorldPosition;     ///< Full inherited position
+  InheritedQuaternion mWorldOrientation;  ///< Full inherited orientation
+  InheritedVector3    mWorldScale;        ///< Full inherited scale
+  InheritedMatrix     mWorldMatrix;       ///< Full inherited world matrix
+  InheritedColor      mWorldColor;        ///< Full inherited color
 
 protected:
 
@@ -1055,13 +1009,12 @@ protected:
   NodeAttachmentOwner mAttachment;                   ///< Optional owned attachment
   NodeContainer       mChildren;                     ///< Container of children; not owned
 
-  Vector3             mSizeModeFactor;               ///< Factor of parent size. Used for certain SizeModes.
 
   // flags, compressed to bitfield
   int  mDirtyFlags:10;                               ///< A composite set of flags for each of the Node properties
 
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
-  bool mInheritRotation:1;                           ///< Whether the parent's rotation should be inherited.
+  bool mInheritOrientation:1;                        ///< Whether the parent's orientation should be inherited.
   bool mInheritScale:1;                              ///< Whether the parent's scale should be inherited.
   bool mInhibitLocalTransform:1;                     ///< whether local transform should be applied.
   bool mIsActive:1;                                  ///< When a Node is marked "active" it has been disconnected, and its properties have not been modified
@@ -1069,7 +1022,6 @@ protected:
   DrawMode::Type          mDrawMode:2;               ///< How the Node and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode:2;///< Determines how position is inherited, 2 bits is enough
   ColorMode               mColorMode:2;              ///< Determines whether mWorldColor is inherited, 2 bits is enough
-  SizeMode                mSizeMode:2;               ///< Determines how the actors parent affects the actors size.
 
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
@@ -1077,100 +1029,80 @@ protected:
 
 // Messages for Node
 
-inline void SetInheritRotationMessage( EventToUpdate& eventToUpdate, const Node& node, bool inherit )
+inline void SetInheritOrientationMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetInheritRotation, inherit );
+  new (slot) LocalType( &node, &Node::SetInheritOrientation, inherit );
 }
 
-inline void SetSizeModeMessage( EventToUpdate& eventToUpdate, const Node& node, SizeMode mode )
-{
-  typedef MessageValue1< Node, SizeMode > LocalType;
 
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
 
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetSizeMode, mode );
-}
-
-inline void SetSizeModeFactorMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& factor )
+inline void SetParentOriginMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& origin )
 {
   typedef MessageValue1< Node, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &node, &Node::SetSizeModeFactor, factor );
-}
-
-inline void SetParentOriginMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& origin )
-{
-  typedef MessageValue1< Node, Vector3 > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetParentOrigin, origin );
 }
 
-inline void SetAnchorPointMessage( EventToUpdate& eventToUpdate, const Node& node, const Vector3& anchor )
+inline void SetAnchorPointMessage( EventThreadServices& eventThreadServices, const Node& node, const Vector3& anchor )
 {
   typedef MessageValue1< Node, Vector3 > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetAnchorPoint, anchor );
 }
 
-inline void SetPositionInheritanceModeMessage( EventToUpdate& eventToUpdate, const Node& node, PositionInheritanceMode mode )
+inline void SetPositionInheritanceModeMessage( EventThreadServices& eventThreadServices, const Node& node, PositionInheritanceMode mode )
 {
   typedef MessageValue1< Node, PositionInheritanceMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetPositionInheritanceMode, mode );
 }
 
-inline void SetInheritScaleMessage( EventToUpdate& eventToUpdate, const Node& node, bool inherit )
+inline void SetInheritScaleMessage( EventThreadServices& eventThreadServices, const Node& node, bool inherit )
 {
   typedef MessageValue1< Node, bool > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetInheritScale, inherit );
 }
 
-inline void SetColorModeMessage( EventToUpdate& eventToUpdate, const Node& node, ColorMode colorMode )
+inline void SetColorModeMessage( EventThreadServices& eventThreadServices, const Node& node, ColorMode colorMode )
 {
   typedef MessageValue1< Node, ColorMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetColorMode, colorMode );
 }
 
-inline void SetDrawModeMessage( EventToUpdate& eventToUpdate, const Node& node, DrawMode::Type drawMode )
+inline void SetDrawModeMessage( EventThreadServices& eventThreadServices, const Node& node, DrawMode::Type drawMode )
 {
   typedef MessageValue1< Node, DrawMode::Type > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &node, &Node::SetDrawMode, drawMode );

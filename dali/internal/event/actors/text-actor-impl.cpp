@@ -43,28 +43,28 @@ namespace
 
 //              Name                       Type   writable animatable constraint-input  enum for index-checking
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "text",                     STRING,    true,    false,   true,   Dali::TextActor::Property::Text                   )
-DALI_PROPERTY( "font",                     STRING,    true,    false,   true,   Dali::TextActor::Property::Font                   )
-DALI_PROPERTY( "font-style",               STRING,    true,    false,   true,   Dali::TextActor::Property::FontStyle              )
-DALI_PROPERTY( "outline-enable",           BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::OutlineEnable          )
-DALI_PROPERTY( "outline-color",            VECTOR4,   true,    false,   true,   Dali::TextActor::Property::OutlineColor           )
-DALI_PROPERTY( "outline-thickness-width",  VECTOR2,   true,    false,   true,   Dali::TextActor::Property::OutlineThicknessWidth  )
-DALI_PROPERTY( "smooth-edge",              FLOAT,     true,    false,   true,   Dali::TextActor::Property::SmoothEdge             )
-DALI_PROPERTY( "glow-enable",              BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::GlowEnable             )
-DALI_PROPERTY( "glow-color",               VECTOR4,   true,    false,   true,   Dali::TextActor::Property::GlowColor              )
-DALI_PROPERTY( "glow-intensity",           FLOAT,     true,    false,   true,   Dali::TextActor::Property::GlowIntensity          )
-DALI_PROPERTY( "shadow-enable",            BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::ShadowEnable           )
-DALI_PROPERTY( "shadow-color",             VECTOR4,   true,    false,   true,   Dali::TextActor::Property::ShadowColor            )
-DALI_PROPERTY( "shadow-offset",            VECTOR2,   true,    false,   true,   Dali::TextActor::Property::ShadowOffset           )
-DALI_PROPERTY( "italics-angle",            FLOAT,     true,    false,   true,   Dali::TextActor::Property::ItalicsAngle           )
-DALI_PROPERTY( "underline",                BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::Underline              )
-DALI_PROPERTY( "weight",                   INTEGER,   true,    false,   true,   Dali::TextActor::Property::Weight                 )
-DALI_PROPERTY( "font-detection-automatic", BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::FontDetectionAutomatic )
-DALI_PROPERTY( "gradient-color",           VECTOR4,   true,    false,   true,   Dali::TextActor::Property::GradientColor          )
-DALI_PROPERTY( "gradient-start-point",     VECTOR2,   true,    false,   true,   Dali::TextActor::Property::GradientStartPoint     )
-DALI_PROPERTY( "gradient-end-point",       VECTOR2,   true,    false,   true,   Dali::TextActor::Property::GradientEndPoint       )
-DALI_PROPERTY( "shadow-size",              FLOAT,     true,    false,   true,   Dali::TextActor::Property::ShadowSize             )
-DALI_PROPERTY( "text-color",               VECTOR4,   true,    false,   true,   Dali::TextActor::Property::TextColor              )
+DALI_PROPERTY( "text",                     STRING,    true,    false,   true,   Dali::TextActor::Property::TEXT                     )
+DALI_PROPERTY( "font",                     STRING,    true,    false,   true,   Dali::TextActor::Property::FONT                     )
+DALI_PROPERTY( "font-style",               STRING,    true,    false,   true,   Dali::TextActor::Property::FONT_STYLE               )
+DALI_PROPERTY( "outline-enable",           BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::OUTLINE_ENABLE           )
+DALI_PROPERTY( "outline-color",            VECTOR4,   true,    false,   true,   Dali::TextActor::Property::OUTLINE_COLOR            )
+DALI_PROPERTY( "outline-thickness-width",  VECTOR2,   true,    false,   true,   Dali::TextActor::Property::OUTLINE_THICKNESS_WIDTH  )
+DALI_PROPERTY( "smooth-edge",              FLOAT,     true,    false,   true,   Dali::TextActor::Property::SMOOTH_EDGE              )
+DALI_PROPERTY( "glow-enable",              BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::GLOW_ENABLE              )
+DALI_PROPERTY( "glow-color",               VECTOR4,   true,    false,   true,   Dali::TextActor::Property::GLOW_COLOR               )
+DALI_PROPERTY( "glow-intensity",           FLOAT,     true,    false,   true,   Dali::TextActor::Property::GLOW_INTENSITY           )
+DALI_PROPERTY( "shadow-enable",            BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::SHADOW_ENABLE            )
+DALI_PROPERTY( "shadow-color",             VECTOR4,   true,    false,   true,   Dali::TextActor::Property::SHADOW_COLOR             )
+DALI_PROPERTY( "shadow-offset",            VECTOR2,   true,    false,   true,   Dali::TextActor::Property::SHADOW_OFFSET            )
+DALI_PROPERTY( "italics-angle",            FLOAT,     true,    false,   true,   Dali::TextActor::Property::ITALICS_ANGLE            )
+DALI_PROPERTY( "underline",                BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::UNDERLINE                )
+DALI_PROPERTY( "weight",                   INTEGER,   true,    false,   true,   Dali::TextActor::Property::WEIGHT                   )
+DALI_PROPERTY( "font-detection-automatic", BOOLEAN,   true,    false,   true,   Dali::TextActor::Property::FONT_DETECTION_AUTOMATIC )
+DALI_PROPERTY( "gradient-color",           VECTOR4,   true,    false,   true,   Dali::TextActor::Property::GRADIENT_COLOR           )
+DALI_PROPERTY( "gradient-start-point",     VECTOR2,   true,    false,   true,   Dali::TextActor::Property::GRADIENT_START_POINT     )
+DALI_PROPERTY( "gradient-end-point",       VECTOR2,   true,    false,   true,   Dali::TextActor::Property::GRADIENT_END_POINT       )
+DALI_PROPERTY( "shadow-size",              FLOAT,     true,    false,   true,   Dali::TextActor::Property::SHADOW_SIZE              )
+DALI_PROPERTY( "text-color",               VECTOR4,   true,    false,   true,   Dali::TextActor::Property::TEXT_COLOR               )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -95,7 +95,7 @@ TextActorPtr TextActor::New( const Integration::TextArray& utfCodes, const TextA
   actor->Initialize();
 
   //create the attachment
-  actor->mTextAttachment = TextAttachment::New( *actor->mStage, *actor->mNode, Integration::TextArray(), fontPtr );
+  actor->mTextAttachment = TextAttachment::New( actor->GetEventThreadServices(), *actor->mNode, Integration::TextArray(), fontPtr );
   actor->Attach(*actor->mTextAttachment);
 
   // Note: SetTextStyle() MUST be called before SetText(), to ensure
@@ -694,26 +694,26 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
   {
     switch(index)
     {
-      case Dali::TextActor::Property::Text:
+      case Dali::TextActor::Property::TEXT:
       {
         SetText( GetTextArray( Dali::Text( propertyValue.Get<std::string>() ) ) );
         break;
       }
-      case Dali::TextActor::Property::Font:
+      case Dali::TextActor::Property::FONT:
       {
         SetFont( *Font::New( propertyValue.Get<std::string>(),
                            mTextAttachment->GetFont().GetStyle(),
                            PointSize( mTextAttachment->GetFont().GetPointSize() ) ) );
         break;
       }
-      case Dali::TextActor::Property::FontStyle:
+      case Dali::TextActor::Property::FONT_STYLE:
       {
         SetFont( *Font::New( mTextAttachment->GetFont().GetName(),
                            propertyValue.Get<std::string>(),
                            PointSize( mTextAttachment->GetFont().GetPointSize() ) ) );
         break;
       }
-      case Dali::TextActor::Property::OutlineEnable:
+      case Dali::TextActor::Property::OUTLINE_ENABLE:
       {
         Vector4 color;
         Vector2 thickness;
@@ -721,7 +721,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetOutline( propertyValue.Get<bool>(), color, thickness );
         break;
       }
-      case Dali::TextActor::Property::OutlineColor:
+      case Dali::TextActor::Property::OUTLINE_COLOR:
       {
         Vector4 color;
         Vector2 thickness;
@@ -729,7 +729,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetOutline( mTextAttachment->GetOutline(), propertyValue.Get<Vector4>(), thickness );
         break;
       }
-      case Dali::TextActor::Property::OutlineThicknessWidth:
+      case Dali::TextActor::Property::OUTLINE_THICKNESS_WIDTH:
       {
         Vector4 color;
         Vector2 thickness;
@@ -737,12 +737,12 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetOutline( mTextAttachment->GetOutline(), color, propertyValue.Get<Vector2>() );
         break;
       }
-      case Dali::TextActor::Property::SmoothEdge:
+      case Dali::TextActor::Property::SMOOTH_EDGE:
       {
         mTextAttachment->SetSmoothEdge( propertyValue.Get<float>());
         break;
       }
-      case Dali::TextActor::Property::GlowEnable:
+      case Dali::TextActor::Property::GLOW_ENABLE:
       {
         Vector4 color;
         float intensity;
@@ -750,7 +750,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetGlow( propertyValue.Get<bool>(), color, intensity );
         break;
       }
-      case Dali::TextActor::Property::GlowColor:
+      case Dali::TextActor::Property::GLOW_COLOR:
       {
         Vector4 color;
         float intensity;
@@ -758,7 +758,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetGlow( mTextAttachment->GetGlow(), propertyValue.Get<Vector4>(), intensity );
         break;
       }
-      case Dali::TextActor::Property::GlowIntensity:
+      case Dali::TextActor::Property::GLOW_INTENSITY:
       {
         Vector4 color;
         float intensity;
@@ -766,7 +766,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetGlow(mTextAttachment->GetGlow(), color, propertyValue.Get<float>());
         break;
       }
-      case Dali::TextActor::Property::ShadowEnable:
+      case Dali::TextActor::Property::SHADOW_ENABLE:
       {
         Vector4 color;
         Vector2 offset;
@@ -775,7 +775,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetShadow( propertyValue.Get<bool>(), color, offset, size );
         break;
       }
-      case Dali::TextActor::Property::ShadowColor:
+      case Dali::TextActor::Property::SHADOW_COLOR:
       {
         Vector4 color;
         Vector2 offset;
@@ -784,7 +784,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetShadow( mTextAttachment->GetShadow(), propertyValue.Get<Vector4>(), offset, size );
         break;
       }
-      case Dali::TextActor::Property::ShadowOffset:
+      case Dali::TextActor::Property::SHADOW_OFFSET:
       {
         Vector4 color;
         Vector2 offset;
@@ -793,7 +793,7 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetShadow( mTextAttachment->GetShadow(), color, propertyValue.Get<Vector2>(), size );
         break;
       }
-      case Dali::TextActor::Property::ShadowSize:
+      case Dali::TextActor::Property::SHADOW_SIZE:
       {
         Vector4 color;
         Vector2 offset;
@@ -802,42 +802,42 @@ void TextActor::SetDefaultProperty( Property::Index index, const Property::Value
         mTextAttachment->SetShadow( mTextAttachment->GetShadow(), color, offset, propertyValue.Get<float>() );
         break;
       }
-      case Dali::TextActor::Property::ItalicsAngle:
+      case Dali::TextActor::Property::ITALICS_ANGLE:
       {
         SetItalics( Radian( propertyValue.Get<float>() ) ) ;
         break;
       }
-      case Dali::TextActor::Property::Underline:
+      case Dali::TextActor::Property::UNDERLINE:
       {
         SetUnderline( propertyValue.Get<bool>(), 0.f, 0.f ) ;
         break;
       }
-      case Dali::TextActor::Property::Weight:
+      case Dali::TextActor::Property::WEIGHT:
       {
         mTextAttachment->SetWeight( static_cast<TextStyle::Weight>( propertyValue.Get<int>() ) ) ;
         break;
       }
-      case Dali::TextActor::Property::FontDetectionAutomatic:
+      case Dali::TextActor::Property::FONT_DETECTION_AUTOMATIC:
       {
         mFontDetection = propertyValue.Get<bool>()  ;
         break;
       }
-      case Dali::TextActor::Property::GradientColor:
+      case Dali::TextActor::Property::GRADIENT_COLOR:
       {
         mTextAttachment->SetGradient( propertyValue.Get<Vector4>(), mTextAttachment->GetGradientStartPoint(), mTextAttachment->GetGradientEndPoint() );
         break;
       }
-      case Dali::TextActor::Property::GradientStartPoint:
+      case Dali::TextActor::Property::GRADIENT_START_POINT:
       {
         mTextAttachment->SetGradient( mTextAttachment->GetGradientColor(), propertyValue.Get<Vector2>(), mTextAttachment->GetGradientEndPoint() );
         break;
       }
-      case Dali::TextActor::Property::GradientEndPoint:
+      case Dali::TextActor::Property::GRADIENT_END_POINT:
       {
         mTextAttachment->SetGradient( mTextAttachment->GetGradientColor(), mTextAttachment->GetGradientStartPoint(), propertyValue.Get<Vector2>() );
         break;
       }
-      case Dali::TextActor::Property::TextColor:
+      case Dali::TextActor::Property::TEXT_COLOR:
       {
         mTextAttachment->SetTextColor( propertyValue.Get<Vector4>() );
         break;
@@ -863,27 +863,27 @@ Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
   {
     switch( index )
     {
-      case Dali::TextActor::Property::Text:
+      case Dali::TextActor::Property::TEXT:
       {
         ret = GetText();
         break;
       }
-      case Dali::TextActor::Property::Font:
+      case Dali::TextActor::Property::FONT:
       {
         ret = mTextAttachment->GetFont().GetName();
         break;
       }
-      case Dali::TextActor::Property::FontStyle:
+      case Dali::TextActor::Property::FONT_STYLE:
       {
         ret = mTextAttachment->GetFont().GetStyle();
         break;
       }
-      case Dali::TextActor::Property::OutlineEnable:
+      case Dali::TextActor::Property::OUTLINE_ENABLE:
       {
         ret = mTextAttachment->GetOutline();
         break;
       }
-      case Dali::TextActor::Property::OutlineColor:
+      case Dali::TextActor::Property::OUTLINE_COLOR:
       {
         Vector4 color;
         Vector2 thickness;
@@ -891,7 +891,7 @@ Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
         ret = color;
         break;
       }
-      case Dali::TextActor::Property::OutlineThicknessWidth:
+      case Dali::TextActor::Property::OUTLINE_THICKNESS_WIDTH:
       {
         Vector4 color;
         Vector2 thickness;
@@ -899,17 +899,17 @@ Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
         ret = thickness;
         break;
       }
-      case Dali::TextActor::Property::SmoothEdge:
+      case Dali::TextActor::Property::SMOOTH_EDGE:
       {
         ret = mTextAttachment->GetSmoothEdge();
         break;
       }
-      case Dali::TextActor::Property::GlowEnable:
+      case Dali::TextActor::Property::GLOW_ENABLE:
       {
         ret = mTextAttachment->GetGlow();
         break;
       }
-      case Dali::TextActor::Property::GlowColor:
+      case Dali::TextActor::Property::GLOW_COLOR:
       {
         Vector4 color;
         float intensity( 0.0f );
@@ -917,7 +917,7 @@ Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
         ret  = color;
         break;
       }
-      case Dali::TextActor::Property::GlowIntensity:
+      case Dali::TextActor::Property::GLOW_INTENSITY:
       {
         Vector4 color;
         float intensity( 0.0f );
@@ -925,12 +925,12 @@ Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
         ret = intensity;
         break;
       }
-      case Dali::TextActor::Property::ShadowEnable:
+      case Dali::TextActor::Property::SHADOW_ENABLE:
       {
         ret = mTextAttachment->GetShadow();
         break;
       }
-      case Dali::TextActor::Property::ShadowColor:
+      case Dali::TextActor::Property::SHADOW_COLOR:
       {
         Vector4 color;
         Vector2 offset;
@@ -939,7 +939,7 @@ Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
         ret = color;
         break;
       }
-      case Dali::TextActor::Property::ShadowOffset:
+      case Dali::TextActor::Property::SHADOW_OFFSET:
       {
         Vector4 color;
         Vector2 offset;
@@ -948,7 +948,7 @@ Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
         ret = offset;
         break;
       }
-      case Dali::TextActor::Property::ShadowSize:
+      case Dali::TextActor::Property::SHADOW_SIZE:
       {
         Vector4 color;
         Vector2 offset;
@@ -957,42 +957,42 @@ Property::Value TextActor::GetDefaultProperty( Property::Index index ) const
         ret = size;
         break;
       }
-      case Dali::TextActor::Property::ItalicsAngle:
+      case Dali::TextActor::Property::ITALICS_ANGLE:
       {
         ret = static_cast<float>( mTextAttachment->GetItalics() ) ;
         break;
       }
-      case Dali::TextActor::Property::Underline:
+      case Dali::TextActor::Property::UNDERLINE:
       {
         ret = mTextAttachment->GetUnderline() ;
         break;
       }
-      case Dali::TextActor::Property::Weight:
+      case Dali::TextActor::Property::WEIGHT:
       {
         ret = static_cast<int>( mTextAttachment->GetWeight() );
         break;
       }
-      case Dali::TextActor::Property::FontDetectionAutomatic:
+      case Dali::TextActor::Property::FONT_DETECTION_AUTOMATIC:
       {
         ret = mFontDetection;
         break;
       }
-      case Dali::TextActor::Property::GradientColor:
+      case Dali::TextActor::Property::GRADIENT_COLOR:
       {
         ret = mTextAttachment->GetGradientColor();
         break;
       }
-      case Dali::TextActor::Property::GradientStartPoint:
+      case Dali::TextActor::Property::GRADIENT_START_POINT:
       {
         ret = mTextAttachment->GetGradientStartPoint();
         break;
       }
-      case Dali::TextActor::Property::GradientEndPoint:
+      case Dali::TextActor::Property::GRADIENT_END_POINT:
       {
         ret = mTextAttachment->GetGradientEndPoint();
         break;
       }
-      case Dali::TextActor::Property::TextColor:
+      case Dali::TextActor::Property::TEXT_COLOR:
       {
         ret = mTextAttachment->GetTextColor();
         break;

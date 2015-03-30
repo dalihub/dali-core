@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/layer-impl.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -61,9 +60,9 @@ template<class InputIterator> InputIterator Find( InputIterator first, InputIter
 
 } // unnamed namespace
 
-LayerList* LayerList::New( Stage& stage, bool systemLevel )
+LayerList* LayerList::New( SceneGraph::UpdateManager& updateManager, bool systemLevel )
 {
-  return new LayerList( stage, systemLevel );
+  return new LayerList( updateManager, systemLevel );
 }
 
 LayerList::~LayerList()
@@ -235,8 +234,8 @@ void LayerList::MoveLayerBelow( const Layer& layer, const Layer& target )
   }
 }
 
-LayerList::LayerList( Stage& stage, bool systemLevel )
-: mStage( stage ),
+LayerList::LayerList( SceneGraph::UpdateManager& updateManager, bool systemLevel )
+: mUpdateManager( updateManager ),
   mIsSystemLevel( systemLevel )
 {
 }
@@ -256,7 +255,7 @@ void LayerList::SetLayerDepths()
   }
 
   // Layers are being used in a separate thread; queue a message to set order
-  SetLayerDepthsMessage( mStage.GetUpdateManager(), layers, mIsSystemLevel );
+  SetLayerDepthsMessage( mUpdateManager, layers, mIsSystemLevel );
 }
 
 } // namespace Internal

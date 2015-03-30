@@ -16,12 +16,15 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/common/fixed-size-memory-pool.h>
+#include <dali/internal/common/fixed-size-memory-pool.h>
 
 // INTERNAL HEADERS
-#include <dali/public-api/dali-core.h>
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
+{
+
+namespace Internal
 {
 
 /**
@@ -125,8 +128,6 @@ struct FixedSizeMemoryPool::Impl
   void* mDeletedObjects;              ///< Pointer to the head of the list of deleted objects. The addresses are stored in the allocated memory blocks.
 };
 
-
-
 FixedSizeMemoryPool::FixedSizeMemoryPool( SizeType fixedSize, SizeType initialCapacity, SizeType maximumBlockCapacity )
 {
   mImpl = new Impl( fixedSize, initialCapacity, maximumBlockCapacity );
@@ -167,5 +168,7 @@ void FixedSizeMemoryPool::Free( void* memory )
   *( reinterpret_cast< void** >( memory ) ) = mImpl->mDeletedObjects;
   mImpl->mDeletedObjects = memory;
 }
+
+} // namespace Internal
 
 } // namespace Dali

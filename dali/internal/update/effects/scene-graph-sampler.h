@@ -19,7 +19,7 @@
 
 #include <dali/public-api/shader-effects/sampler.h>
 #include <dali/integration-api/resource-declarations.h>
-#include <dali/internal/common/event-to-update.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
@@ -157,24 +157,24 @@ private:
 
 } // namespace SceneGraph
 
-inline void SetUnitNameMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, const std::string& name )
+inline void SetUnitNameMessage( EventThreadServices& eventThreadServices, const SceneGraph::Sampler& sampler, const std::string& name )
 {
   typedef MessageValue1< SceneGraph::Sampler, std::string > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetUnitName, name );
 }
 
 
-inline void SetTextureMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, unsigned int resourceId )
+inline void SetTextureMessage( EventThreadServices& eventThreadServices, const SceneGraph::Sampler& sampler, unsigned int resourceId )
 {
   typedef MessageDoubleBuffered1< SceneGraph::Sampler, unsigned int > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetTexture, resourceId );
@@ -184,12 +184,12 @@ inline void SetTextureMessage( EventToUpdate& eventToUpdate, const SceneGraph::S
 template <> struct ParameterType< SceneGraph::Sampler::FilterMode > : public BasicType< SceneGraph::Sampler::FilterMode > {};
 
 
-inline void SetFilterModeMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, SceneGraph::Sampler::FilterMode minFilter, SceneGraph::Sampler::FilterMode magFilter )
+inline void SetFilterModeMessage( EventThreadServices& eventThreadServices, const SceneGraph::Sampler& sampler, SceneGraph::Sampler::FilterMode minFilter, SceneGraph::Sampler::FilterMode magFilter )
 {
   typedef MessageDoubleBuffered2< SceneGraph::Sampler, SceneGraph::Sampler::FilterMode, SceneGraph::Sampler::FilterMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetFilterMode, minFilter, magFilter );
@@ -199,12 +199,12 @@ inline void SetFilterModeMessage( EventToUpdate& eventToUpdate, const SceneGraph
 template <> struct ParameterType< SceneGraph::Sampler::WrapMode > : public BasicType< SceneGraph::Sampler::WrapMode > {};
 
 
-inline void SetWrapModeMessage( EventToUpdate& eventToUpdate, const SceneGraph::Sampler& sampler, SceneGraph::Sampler::WrapMode horizontalWrap, SceneGraph::Sampler::WrapMode verticalWrap )
+inline void SetWrapModeMessage( EventThreadServices& eventThreadServices, const SceneGraph::Sampler& sampler, SceneGraph::Sampler::WrapMode horizontalWrap, SceneGraph::Sampler::WrapMode verticalWrap )
 {
   typedef MessageDoubleBuffered2< SceneGraph::Sampler, SceneGraph::Sampler::WrapMode, SceneGraph::Sampler::WrapMode > LocalType;
 
   // Reserve some memory inside the message queue
-  unsigned int* slot = eventToUpdate.ReserveMessageSlot( sizeof( LocalType ) );
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetWrapMode, horizontalWrap, verticalWrap );

@@ -333,7 +333,6 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
     {
       const GLsizei vertexCount = mVertexBuffer->GetBufferSize() / sizeof(Vertex2D); // compiler will optimize this to >> if possible
       mContext->DrawArrays( GL_TRIANGLE_STRIP, 0, vertexCount );
-      DRAW_ARRAY_RECORD( vertexCount );
       break;
     }
     case GRID_QUAD:
@@ -343,7 +342,6 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
       const GLsizei indexCount = mIndexBuffer->GetBufferSize() / sizeof(GLushort); // compiler will optimize this to >> if possible
       mIndexBuffer->Bind();
       mContext->DrawElements( GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0 );
-      DRAW_ELEMENT_RECORD( indexCount );
       break;
     }
   }

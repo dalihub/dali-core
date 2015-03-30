@@ -111,7 +111,7 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::SetSceneGraphProperty()
    */
-  virtual void SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
+  virtual void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value );
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
