@@ -31,18 +31,6 @@
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 
-#include <dali/public-api/dynamics/dynamics-body.h>
-#include <dali/public-api/dynamics/dynamics-joint.h>
-#include <dali/public-api/dynamics/dynamics-body-config.h>
-
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
-#include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
-#include <dali/internal/event/dynamics/dynamics-body-impl.h>
-#include <dali/internal/event/dynamics/dynamics-joint-impl.h>
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#endif
-
 namespace Dali
 {
 
@@ -499,98 +487,6 @@ Actor::OnStageSignalType& Actor::OnStageSignal()
 Actor::OffStageSignalType& Actor::OffStageSignal()
 {
   return GetImplementation(*this).OffStageSignal();
-}
-
-DynamicsBody Actor::EnableDynamics(DynamicsBodyConfig bodyConfig)
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsBodyConfig& internal = GetImplementation(bodyConfig);
-
-  Internal::DynamicsBodyPtr body( GetImplementation(*this).EnableDynamics( &internal ) );
-
-  return DynamicsBody( body.Get() );
-#else
-  return DynamicsBody();
-#endif
-}
-
-DynamicsJoint Actor::AddDynamicsJoint( Actor attachedActor, const Vector3& offset )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::ActorPtr internalActor( &GetImplementation(attachedActor) );
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).AddDynamicsJoint( internalActor, offset) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-DynamicsJoint Actor::AddDynamicsJoint( Actor attachedActor, const Vector3& offsetA, const Vector3& offsetB )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::ActorPtr internalActor( &GetImplementation(attachedActor) );
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).AddDynamicsJoint( internalActor, offsetA, offsetB) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-int Actor::GetNumberOfJoints() const
-{
-#ifdef DYNAMICS_SUPPORT
-  return GetImplementation(*this).GetNumberOfJoints();
-#else
-  return int();
-#endif
-}
-
-DynamicsJoint Actor::GetDynamicsJointByIndex( const int index )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).GetDynamicsJointByIndex( index ) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-DynamicsJoint Actor::GetDynamicsJoint( Actor attachedActor )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).GetDynamicsJoint( &GetImplementation(attachedActor) ) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-void Actor::RemoveDynamicsJoint( DynamicsJoint joint )
-{
-#ifdef DYNAMICS_SUPPORT
-  GetImplementation(*this).RemoveDynamicsJoint( &GetImplementation(joint) );
-#endif
-}
-
-void Actor::DisableDynamics()
-{
-#ifdef DYNAMICS_SUPPORT
-  GetImplementation(*this).DisableDynamics();
-#endif
-}
-
-DynamicsBody Actor::GetDynamicsBody()
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsBodyPtr internal(GetImplementation(*this).GetDynamicsBody());
-  return DynamicsBody( internal.Get() );
-#else
-  return DynamicsBody();
-#endif
 }
 
 Actor::Actor(Internal::Actor* internal)

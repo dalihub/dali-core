@@ -42,9 +42,6 @@ class Actor;
 class Animation;
 class Constraint;
 struct Degree;
-class DynamicsBody;
-class DynamicsBodyConfig;
-class DynamicsJoint;
 class Quaternion;
 class Layer;
 struct Radian;
@@ -1270,89 +1267,6 @@ public: // Signals
    * @return The signal
    */
   OffStageSignalType& OffStageSignal();
-
-public: // Dynamics
-
-  /**
-   * @brief Enable dynamics for this actor.
-   *
-   * The actor will behave as a rigid/soft body in the simulation
-   * @pre The actor is not already acting as a DynamicsBody and IsDynamicsRoot() returns false
-   *
-   * @param [in] bodyConfig The DynamicsBodyConfig specifying the dynamics properties for this actor in the dynamics world.
-   * @return The DynamicsBody
-   */
-  DynamicsBody EnableDynamics(DynamicsBodyConfig bodyConfig);
-
-  /**
-   * @brief Add a joint constraint to this actor.
-   *
-   * @param[in] attachedActor The other actor in the joint
-   * @param[in] offset        The offset (relative to this actor) of the origin of the joint
-   * @return                  The new joint
-   * @pre Both actors are dynamics enabled actors (IE Actor::EnableDynamics()) has been invoked for both actors).
-   * @post If the two actors are already connected by a joint, The existing joint is returned
-   *       and offset is ignored.
-   */
-  DynamicsJoint AddDynamicsJoint( Actor attachedActor, const Vector3& offset );
-
-  /**
-   * @brief Add a joint constraint to this actor.
-   *
-   * @param[in] attachedActor The other actor in the joint
-   * @param[in] offsetA       The offset (relative to this actor) of the origin of the joint
-   * @param[in] offsetB       The offset (relative to attachedActor) of the origin of the joint
-   * @return                  The new joint
-   * @pre Both actors are dynamics enabled actors (IE Actor::EnableDynamics()) has been invoked for both actors).
-   * @post If the two actors are already connected by a joint, The existing joint is returned
-   *       and offset is ignored.
-   */
-  DynamicsJoint AddDynamicsJoint( Actor attachedActor, const Vector3& offsetA, const Vector3& offsetB );
-
-  /**
-   * @brief Get the number of DynamicsJoint objects added to this actor.
-   *
-   * @return The number of DynamicsJoint objects added to this actor
-   */
-  int GetNumberOfJoints() const;
-
-  /**
-   * @brief Get a joint by index.
-   *
-   * @param[in] index The index of the joint.
-   *                  Use GetNumberOfJoints to get the valid range of indices.
-   * @return The joint.
-   */
-  DynamicsJoint GetDynamicsJointByIndex( const int index );
-
-  /**
-   * @brief Get the joint between this actor and attachedActor.
-   *
-   * @param[in] attachedActor The other actor in the joint
-   * @return The joint.
-   */
-  DynamicsJoint GetDynamicsJoint( Actor attachedActor );
-
-  /**
-   * @brief Remove a joint from this actor
-   *
-   * @param[in] joint The joint to be removed
-   */
-  void RemoveDynamicsJoint( DynamicsJoint joint );
-
-  /**
-   * @brief Disable dynamics for this actor.
-   *
-   * The actor will be detached from the DynamicsBody/DynamicsJoint associated with it through EnableDynamics
-   */
-  void DisableDynamics();
-
-  /**
-   * @brief Get the associated DynamicsBody.
-   *
-   * @return A DynamicsBody
-   */
-  DynamicsBody GetDynamicsBody();
 
 public: // Not intended for application developers
 
