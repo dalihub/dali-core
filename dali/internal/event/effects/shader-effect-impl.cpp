@@ -563,7 +563,7 @@ Property::Value ShaderEffect::GetDefaultProperty(Property::Index /*index*/) cons
   return Property::Value();
 }
 
-void ShaderEffect::NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index )
+void ShaderEffect::NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const
 {
   // Warning - the property is added to the Shader object in the Update thread and the meta-data is added in the Render thread (through a secondary message)
 
@@ -580,9 +580,9 @@ const SceneGraph::PropertyOwner* ShaderEffect::GetSceneObject() const
 
 const PropertyBase* ShaderEffect::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  CustomProperty* custom = FindCustomProperty( index );
-  DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
-  return custom->GetSceneGraphProperty();
+  PropertyMetadata* property = index >= PROPERTY_CUSTOM_START_INDEX ? static_cast<PropertyMetadata*>(FindCustomProperty( index )) : static_cast<PropertyMetadata*>(FindAnimatableProperty( index ));
+  DALI_ASSERT_ALWAYS( property && "Property index is invalid" );
+  return property->GetSceneGraphProperty();
 }
 
 const PropertyInputImpl* ShaderEffect::GetSceneObjectInputProperty( Property::Index index ) const

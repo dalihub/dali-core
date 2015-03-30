@@ -279,6 +279,30 @@ public:
                         TypeInfo::SetPropertyFunction setFunc, TypeInfo::GetPropertyFunction getFunc );
 };
 
+/**
+ * @brief Register an animatable property for the given type.
+ */
+class DALI_IMPORT_API AnimatablePropertyRegistration
+{
+public:
+
+  /**
+   * @brief This constructor registers the animatable property with the registered type.
+   *
+   * This constructor is for scene-graph only properties where the
+   * value of the property can be retrieved and set via specified
+   * functions.
+   *
+   * @param [in] registered The TypeRegistration object
+   * @param [in] name The name of the property
+   * @param [in] index The property index. Must be a value between ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX and ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX inclusive.
+   * @param [in] type The property value type.
+   *
+   * @pre "registered" must be registered with the TypeRegistry.
+   */
+  AnimatablePropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
+};
+
 } // namespace Dali
 
 #endif // header

@@ -22,6 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
+#include <dali/public-api/actors/actor-enumerations.h>
 
 namespace Dali
 {
@@ -35,11 +36,14 @@ class Actor;
 class Animation;
 class CustomActor;
 class CustomActorImpl;
+class RelayoutContainer;
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
 struct MouseWheelEvent;
+struct Vector2;
 struct Vector3;
+
 
 /**
  * @brief Pointer to Dali::CustomActorImpl object.
@@ -178,11 +182,91 @@ public:
   virtual bool OnMouseWheelEvent(const MouseWheelEvent& event) = 0;
 
   /**
+   * @brief Called after the size negotiation has been finished for this control.
+   *
+   * The control is expected to assign this given size to itself/its children.
+   *
+   * Should be overridden by derived classes if they need to layout
+   * actors differently after certain operations like add or remove
+   * actors, resize or after changing specific properties.
+   *
+   * Note! As this function is called from inside the size negotiation algorithm, you cannot
+   * call RequestRelayout (the call would just be ignored)
+   *
+   * @param[in]      size       The allocated size.
+   * @param[in,out]  container  The control should add actors to this container that it is not able
+   *                            to allocate a size for.
+   */
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container ) = 0;
+
+  /**
+   * @brief Notification for deriving classes
+   *
+   * @param[in] policy The policy being set
+   * @param[in] dimension The dimension the policy is being set for
+   */
+  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension ) = 0;
+
+  /**
    * Return the natural size of the actor
    *
    * @return The actor's natural size
    */
   virtual Vector3 GetNaturalSize() = 0;
+
+  /**
+   * @brief Calculate the size for a child
+   *
+   * @param[in] child The child actor to calculate the size for
+   * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
+   * @return Return the calculated size for the given dimension
+   */
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension ) = 0;
+
+  /**
+   * @brief This method is called during size negotiation when a height is required for a given width.
+   *
+   * Derived classes should override this if they wish to customize the height returned.
+   *
+   * @param width to use.
+   * @return the height based on the width.
+   */
+  virtual float GetHeightForWidth( float width ) = 0;
+
+  /**
+   * @brief This method is called during size negotiation when a width is required for a given height.
+   *
+   * Derived classes should override this if they wish to customize the width returned.
+   *
+   * @param height to use.
+   * @return the width based on the width.
+   */
+  virtual float GetWidthForHeight( float height ) = 0;
+
+  /**
+   * @brief Determine if this actor is dependent on it's children for relayout
+   *
+   * @param dimension The dimension(s) to check for
+   * @return Return if the actor is dependent on it's children
+   */
+  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS ) = 0;
+
+  /**
+   * @brief Virtual method to notify deriving classes that relayout dependencies have been
+   * met and the size for this object is about to be calculated for the given dimension
+   *
+   * @param dimension The dimension that is about to be calculated
+   */
+  virtual void OnCalculateRelayoutSize( Dimension dimension ) = 0;
+
+  /**
+   * @brief Virtual method to notify deriving classes that the size for a dimension
+   * has just been negotiated
+   *
+   * @param[in] size The new size for the given dimension
+   * @param[in] dimension The dimension that was just negotiated
+   */
+  virtual void OnLayoutNegotiated( float size, Dimension dimension ) = 0;
 
 protected: // For derived classes
 
@@ -203,6 +287,35 @@ protected: // For derived classes
    * @param[in] requiresMouseWheelEvents True if the OnMouseWheelEvent() callback is required.
    */
   void SetRequiresMouseWheelEvents(bool requiresMouseWheelEvents);
+
+  /**
+   * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
+   *
+   * This method can also be called from a derived class every time it needs a different size.
+   * At the end of event processing, the relayout process starts and
+   * all controls which requested Relayout will have their sizes (re)negotiated.
+   *
+   * @note RelayoutRequest() can be called multiple times; the size negotiation is still
+   * only performed once, i.e. there is no need to keep track of this in the calling side.
+   */
+  void RelayoutRequest();
+
+  /**
+   * @brief Calculate the size for a child using the base actor object
+   *
+   * @param[in] child The child actor to calculate the size for
+   * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
+   * @return Return the calculated size for the given dimension
+   */
+  float CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension );
+
+  /**
+   * @brief Determine if this actor is dependent on it's children for relayout from the base class
+   *
+   * @param dimension The dimension(s) to check for
+   * @return Return if the actor is dependent on it's children
+   */
+  bool RelayoutDependentOnChildrenBase( Dimension dimension = ALL_DIMENSIONS );
 
 public: // Not intended for application developers
 

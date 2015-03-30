@@ -17,6 +17,7 @@ public_api_src_files = \
   $(public_api_src_dir)/animation/constraint-source.cpp \
   $(public_api_src_dir)/animation/key-frames.cpp \
   $(public_api_src_dir)/animation/path.cpp \
+  $(public_api_src_dir)/animation/path-constraint.cpp \
   $(public_api_src_dir)/animation/time-period.cpp \
   $(public_api_src_dir)/common/constants.cpp \
   $(public_api_src_dir)/common/dali-common.cpp \
@@ -52,7 +53,6 @@ public_api_src_files = \
   $(public_api_src_dir)/geometry/mesh-data.cpp \
   $(public_api_src_dir)/geometry/mesh-factory.cpp \
   $(public_api_src_dir)/geometry/mesh.cpp \
-  $(public_api_src_dir)/geometry/spline.cpp \
   $(public_api_src_dir)/images/atlas.cpp \
   $(public_api_src_dir)/images/distance-field.cpp \
   $(public_api_src_dir)/images/image.cpp \
@@ -135,6 +135,7 @@ public_api_core_animation_header_files = \
   $(public_api_src_dir)/animation/constraint-source.h \
   $(public_api_src_dir)/animation/key-frames.h \
   $(public_api_src_dir)/animation/path.h \
+  $(public_api_src_dir)/animation/path-constraint.h \
   $(public_api_src_dir)/animation/time-period.h
 
 public_api_core_common_header_files = \
@@ -186,8 +187,7 @@ public_api_core_geometry_header_files = \
   $(public_api_src_dir)/geometry/cloth.h \
   $(public_api_src_dir)/geometry/mesh.h \
   $(public_api_src_dir)/geometry/mesh-data.h \
-  $(public_api_src_dir)/geometry/mesh-factory.h \
-  $(public_api_src_dir)/geometry/spline.h
+  $(public_api_src_dir)/geometry/mesh-factory.h
 
 public_api_core_images_header_files = \
   $(public_api_src_dir)/images/atlas.h \
@@ -252,6 +252,9 @@ public_api_core_shader_effects_header_files = \
 
 public_api_core_scripting_header_files = \
   $(public_api_src_dir)/scripting/scripting.h
+
+public_api_core_size_negotiation_header_files = \
+  $(public_api_src_dir)/size-negotiation/relayout-container.h
 
 public_api_core_signals_header_files = \
   $(public_api_src_dir)/signals/base-signal.h \

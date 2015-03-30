@@ -48,7 +48,7 @@ const SceneGraph::PropertyOwner* CustomObject::GetSceneObject() const
 
 const PropertyBase* CustomObject::GetSceneObjectAnimatableProperty( Property::Index index ) const
 {
-  CustomProperty* custom = FindCustomProperty( index );
+  CustomPropertyMetadata* custom = FindCustomProperty( index );
   DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
   return custom->GetSceneGraphProperty();
 }

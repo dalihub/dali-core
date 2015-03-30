@@ -59,6 +59,7 @@ class ResourceManager;
 class ImageFactory;
 class ShaderFactory;
 class TouchResampler;
+class RelayoutController;
 
 namespace SceneGraph
 {
@@ -258,6 +259,12 @@ private:  // for use by ThreadLocalStorage
    */
   GestureEventProcessor& GetGestureEventProcessor();
 
+  /**
+   * Return the relayout controller
+   * @Return Return a reference to the relayout controller
+   */
+  RelayoutController& GetRelayoutController();
+
 private:
 
   /**
@@ -291,6 +298,7 @@ private:
   ResourceClient*                           mResourceClient;              ///< Asynchronous Resource Loading
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   TouchResampler*                           mTouchResampler;              ///< Resamples touches to correct frame rate.
+  IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
 
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()

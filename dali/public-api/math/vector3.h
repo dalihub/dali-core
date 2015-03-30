@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <iosfwd>
+#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>

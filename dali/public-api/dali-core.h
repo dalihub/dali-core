@@ -41,6 +41,7 @@
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/animation/path.h>
+#include <dali/public-api/animation/path-constraint.h>
 #include <dali/public-api/animation/time-period.h>
 
 #include <dali/public-api/common/compile-time-assert.h>
@@ -84,7 +85,6 @@
 #include <dali/public-api/geometry/cloth.h>
 #include <dali/public-api/geometry/mesh.h>
 #include <dali/public-api/geometry/mesh-factory.h>
-#include <dali/public-api/geometry/spline.h>
 
 #include <dali/public-api/images/atlas.h>
 #include <dali/public-api/images/buffer-image.h>
@@ -148,6 +148,8 @@
 #include <dali/public-api/signals/slot-delegate.h>
 
 #include <dali/public-api/shader-effects/shader-effect.h>
+
+#include <dali/public-api/size-negotiation/relayout-container.h>
 
 #include <dali/public-api/dali-core-version.h>
 

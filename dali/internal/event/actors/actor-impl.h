@@ -29,6 +29,7 @@
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/viewport.h>
 #include <dali/internal/event/common/object-impl.h>
+#include <dali/public-api/size-negotiation/relayout-container.h>
 #include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
@@ -55,10 +56,10 @@ class Animation;
 class RenderTask;
 struct DynamicsData;
 
-typedef IntrusivePtr<Actor>                   ActorPtr;
-typedef Dali::ActorContainer                  ActorContainer; // Store handles to return via public-api
-typedef ActorContainer::iterator              ActorIter;
-typedef ActorContainer::const_iterator        ActorConstIter;
+typedef IntrusivePtr< Actor > ActorPtr;
+typedef Dali::ActorContainer ActorContainer; // Store handles to return via public-api
+typedef ActorContainer::iterator ActorIter;
+typedef ActorContainer::const_iterator ActorConstIter;
 
 /**
  * Actor is the primary object which Dali applications interact with.
@@ -72,6 +73,42 @@ typedef ActorContainer::const_iterator        ActorConstIter;
  */
 class Actor : public Object
 {
+public:
+
+  /**
+   * @brief Struct to hold an actor and a dimension
+   */
+  struct ActorDimensionPair
+  {
+    /**
+     * @brief Constructor
+     *
+     * @param[in] newActor The actor to assign
+     * @param[in] newDimension The dimension to assign
+     */
+    ActorDimensionPair( Actor* newActor, Dimension newDimension )
+    : actor( newActor ),
+      dimension( newDimension )
+    {
+    }
+
+    /**
+     * @brief Equality operator
+     *
+     * @param[in] lhs The left hand side argument
+     * @param[in] rhs The right hand side argument
+     */
+    bool operator== ( const ActorDimensionPair& rhs )
+    {
+      return ( actor == rhs.actor ) && ( dimension == rhs.dimension );
+    }
+
+    Actor* actor;           ///< The actor to hold
+    Dimension dimension;    ///< The dimension to hold
+  };
+
+  typedef std::vector< ActorDimensionPair > ActorDimensionStack;
+
 public:
 
   /**
@@ -90,7 +127,7 @@ public:
    * Set the name of the actor.
    * @param[in] name The new name.
    */
-  void SetName(const std::string& name);
+  void SetName( const std::string& name );
 
   /**
    * @copydoc Dali::Actor::GetId
@@ -104,7 +141,7 @@ public:
    * @pre The actor does not already have an attachment.
    * @param[in] attachment The object to attach.
    */
-  void Attach(ActorAttachment& attachment);
+  void Attach( ActorAttachment& attachment );
 
   /**
    * Retreive the object attached to an actor.
@@ -161,7 +198,7 @@ public:
    * @param [in] child The child.
    * @post The child will be referenced by its parent.
    */
-  void Add(Actor& child);
+  void Add( Actor& child );
 
   /**
    * Inserts a child Actor to this Actor's child list
@@ -171,14 +208,14 @@ public:
    * @param [in] child The child.
    * @post The child will be referenced by its parent.
    */
-  void Insert(unsigned int index, Actor& child);
+  void Insert( unsigned int index, Actor& child );
 
   /**
    * Removes a child Actor from this Actor.
    * @param [in] child The child.
    * @post The child will be unreferenced.
    */
-  void Remove(Actor& child);
+  void Remove( Actor& child );
 
   /**
    * @copydoc Dali::Actor::Unparent
@@ -194,7 +231,7 @@ public:
   /**
    * @copydoc Dali::Actor::GetChildAt
    */
-  Dali::Actor GetChildAt(unsigned int index) const;
+  Dali::Actor GetChildAt( unsigned int index ) const;
 
   /**
    * Retrieve the Actor's children.
@@ -221,12 +258,12 @@ public:
   /**
    * @copydoc Dali::Actor::FindChildByName
    */
-  ActorPtr FindChildByName(const std::string& actorName);
+  ActorPtr FindChildByName( const std::string& actorName );
 
   /**
    * @copydoc Dali::Actor::FindChildById
    */
-  ActorPtr FindChildById(const unsigned int id);
+  ActorPtr FindChildById( const unsigned int id );
 
   /**
    * Retrieve the parent of an Actor.
@@ -244,7 +281,7 @@ public:
    * @param [in] width  The new width.
    * @param [in] height The new height.
    */
-  void SetSize(float width, float height);
+  void SetSize( float width, float height );
 
   /**
    * Sets the size of an actor.
@@ -254,7 +291,7 @@ public:
    * @param [in] height The size of the actor along the y-axis.
    * @param [in] depth The size of the actor along the z-axis.
    */
-  void SetSize(float width, float height, float depth);
+  void SetSize( float width, float height, float depth );
 
   /**
    * Sets the size of an actor.
@@ -262,7 +299,7 @@ public:
    * This does not interfere with the actors scale factor.
    * @param [in] size The new size.
    */
-  void SetSize(const Vector2& size);
+  void SetSize( const Vector2& size );
 
   /**
    * Sets the size of an actor.
@@ -270,7 +307,7 @@ public:
    * This does not interfere with the actors scale factor.
    * @param [in] size The new size.
    */
-  void SetSize(const Vector3& size);
+  void SetSize( const Vector3& size );
 
   /**
    * Set the width component of the Actor's size.
@@ -295,7 +332,7 @@ public:
    * This size will be the size set or if animating then the target size.
    * @return The Actor's size.
    */
-  const Vector3& GetSize() const;
+  const Vector3& GetTargetSize() const;
 
   /**
    * Retrieve the Actor's size from update side.
@@ -319,7 +356,7 @@ public:
    * An actor position is the distance between this origin, and the actors anchor-point.
    * @param [in] origin The new parent-origin.
    */
-  void SetParentOrigin(const Vector3& origin);
+  void SetParentOrigin( const Vector3& origin );
 
   /**
    * Set the x component of the parent-origin
@@ -353,7 +390,7 @@ public:
    * An actor's rotation is centered around its anchor-point.
    * @param [in] anchorPoint The new anchor-point.
    */
-  void SetAnchorPoint(const Vector3& anchorPoint);
+  void SetAnchorPoint( const Vector3& anchorPoint );
 
   /**
    * Set the x component of the anchor-point.
@@ -386,7 +423,7 @@ public:
    * @param [in] x The new x position
    * @param [in] y The new y position
    */
-  void SetPosition(float x, float y);
+  void SetPosition( float x, float y );
 
   /**
    * Sets the position of the Actor.
@@ -395,38 +432,38 @@ public:
    * @param [in] y The new y position
    * @param [in] z The new z position
    */
-  void SetPosition(float x, float y, float z);
+  void SetPosition( float x, float y, float z );
 
   /**
    * Sets the position of the Actor.
    * The coordinates are relative to the Actor's parent.
    * @param [in] position The new position.
    */
-  void SetPosition(const Vector3& position);
+  void SetPosition( const Vector3& position );
 
   /**
    * Set the position of an actor along the X-axis.
    * @param [in] x The new x position
    */
-  void SetX(float x);
+  void SetX( float x );
 
   /**
    * Set the position of an actor along the Y-axis.
    * @param [in] y The new y position.
    */
-  void SetY(float y);
+  void SetY( float y );
 
   /**
    * Set the position of an actor along the Z-axis.
    * @param [in] z The new z position
    */
-  void SetZ(float z);
+  void SetZ( float z );
 
   /**
    * Translate an actor relative to its existing position.
    * @param[in] distance The actor will move by this distance.
    */
-  void TranslateBy(const Vector3& distance);
+  void TranslateBy( const Vector3& distance );
 
   /**
    * Retrieve the position of the Actor.
@@ -455,26 +492,26 @@ public:
    * @param [in] angleRadians The new orientation angle in radians.
    * @param [in] axis The new axis of orientation.
    */
-  void SetOrientation(const Radian& angleRadians, const Vector3& axis);
+  void SetOrientation( const Radian& angleRadians, const Vector3& axis );
 
   /**
    * Sets the orientation of the Actor.
    * @param [in] orientation The new orientation.
    */
-  void SetOrientation(const Quaternion& orientation);
+  void SetOrientation( const Quaternion& orientation );
 
   /**
    * Rotate an actor around its existing rotation axis.
    * @param[in] angleRadians The angle to the rotation to combine with the existing rotation.
    * @param[in] axis The axis of the rotation to combine with the existing rotation.
    */
-  void RotateBy(const Radian& angleRadians, const Vector3& axis);
+  void RotateBy( const Radian& angleRadians, const Vector3& axis );
 
   /**
    * Apply a relative rotation to an actor.
    * @param[in] relativeRotation The rotation to combine with the actors existing rotation.
    */
-  void RotateBy(const Quaternion& relativeRotation);
+  void RotateBy( const Quaternion& relativeRotation );
 
   /**
    * Retreive the Actor's orientation.
@@ -487,7 +524,7 @@ public:
    * Switching this off means that using SetOrientation() sets the actor's world orientation.
    * @param[in] inherit - true if the actor should inherit orientation, false otherwise.
    */
-  void SetInheritOrientation(bool inherit);
+  void SetInheritOrientation( bool inherit );
 
   /**
    * Returns whether the actor inherit's it's parent's orientation.
@@ -499,7 +536,7 @@ public:
    * @brief Defines how a child actors size is affected by its parents size.
    * @param[in] mode The size relative to parent mode to use.
    */
-  void SetSizeMode(SizeMode mode);
+  void SetSizeMode( SizeMode mode );
 
   /**
    * Query how the child actors size is affected by its parents size.
@@ -512,7 +549,7 @@ public:
    * Note: Only used if SizeMode is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
    * @param[in] factor The vector to multiply the parents size by to get the childs size.
    */
-  void SetSizeModeFactor(const Vector3& factor);
+  void SetSizeModeFactor( const Vector3& factor );
 
   /**
    * Gets the factor of the parents size used for the child actor.
@@ -530,7 +567,7 @@ public:
    * Sets a scale factor applied to an actor.
    * @param [in] scale The scale factor applied on all axes.
    */
-  void SetScale(float scale);
+  void SetScale( float scale );
 
   /**
    * Sets a scale factor applied to an actor.
@@ -538,13 +575,13 @@ public:
    * @param [in] scaleY The scale factor applied along the y-axis.
    * @param [in] scaleZ The scale factor applied along the z-axis.
    */
-  void SetScale(float scaleX, float scaleY, float scaleZ);
+  void SetScale( float scaleX, float scaleY, float scaleZ );
 
   /**
    * Sets a scale factor applied to an actor.
    * @param [in] scale A vector representing the scale factor for each axis.
    */
-  void SetScale(const Vector3& scale);
+  void SetScale( const Vector3& scale );
 
   /**
    * Set the x component of the scale factor.
@@ -568,7 +605,7 @@ public:
    * Apply a relative scale to an actor.
    * @param[in] relativeScale The scale to combine with the actors existing scale.
    */
-  void ScaleBy(const Vector3& relativeScale);
+  void ScaleBy( const Vector3& relativeScale );
 
   /**
    * Retrieve the scale factor applied to an actor.
@@ -602,7 +639,7 @@ public:
    * Sets the visibility flag of an actor.
    * @param [in] visible The new visibility flag.
    */
-  void SetVisible(bool visible);
+  void SetVisible( bool visible );
 
   /**
    * Retrieve the visibility flag of an actor.
@@ -614,7 +651,7 @@ public:
    * Sets the opacity of an actor.
    * @param [in] opacity The new opacity.
    */
-  void SetOpacity(float opacity);
+  void SetOpacity( float opacity );
 
   /**
    * Retrieve the actor's opacity.
@@ -642,7 +679,7 @@ public:
    * @note If an actor's sensitivity is set to false, then it's children will not emit a touch or hover event signal either.
    * @param[in]  sensitive  true to enable emission of the touch or hover event signals, false otherwise.
    */
-  void SetSensitive(bool sensitive)
+  void SetSensitive( bool sensitive )
   {
     mSensitive = sensitive;
   }
@@ -670,7 +707,7 @@ public:
   /**
    * @copydoc Dali::Actor::SetOverlay
    */
-  void SetOverlay(bool enable);
+  void SetOverlay( bool enable );
 
   /**
    * @copydoc Dali::Actor::IsOverlay
@@ -682,7 +719,7 @@ public:
    * The default value is for it not to transmit scaling.
    * @param[in] transmitGeometryScaling True to transmit scaling.
    */
-  void SetTransmitGeometryScaling(bool transmitGeometryScaling);
+  void SetTransmitGeometryScaling( bool transmitGeometryScaling );
 
   /**
    * Get the TransmitGeometryScaling property for this actor.
@@ -697,14 +734,14 @@ public:
    *
    * @param[in] volume the volume of the model and it's children
    */
-  void SetInitialVolume(const Vector3& volume);
+  void SetInitialVolume( const Vector3& volume );
 
   /**
    * Sets the actor's color.  The final color of actor depends on its color mode.
    * This final color is applied to the drawable elements of an actor.
    * @param [in] color The new color.
    */
-  void SetColor(const Vector4& color);
+  void SetColor( const Vector4& color );
 
   /**
    * Set the red component of the color.
@@ -735,7 +772,7 @@ public:
    * Color mode specifies whether Actor uses its own color or inherits its parent color
    * @param [in] colorMode to use.
    */
-  void SetColorMode(ColorMode colorMode);
+  void SetColorMode( ColorMode colorMode );
 
   /**
    * Returns the actor's color mode.
@@ -748,6 +785,436 @@ public:
    */
   const Vector4& GetCurrentWorldColor() const;
 
+public:
+
+  // Size negotiation virtual functions
+
+  /**
+   * @brief Called after the size negotiation has been finished for this control.
+   *
+   * The control is expected to assign this given size to itself/its children.
+   *
+   * Should be overridden by derived classes if they need to layout
+   * actors differently after certain operations like add or remove
+   * actors, resize or after changing specific properties.
+   *
+   * Note! As this function is called from inside the size negotiation algorithm, you cannot
+   * call RequestRelayout (the call would just be ignored)
+   *
+   * @param[in]      size       The allocated size.
+   * @param[in,out]  container  The control should add actors to this container that it is not able
+   *                            to allocate a size for.
+   */
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
+  {
+  }
+
+  /**
+   * @brief Notification for deriving classes when the resize policy is set
+   *
+   * @param[in] policy The policy being set
+   * @param[in] dimension The dimension the policy is being set for
+   */
+  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension ) {}
+
+  /**
+   * @brief Virtual method to notify deriving classes that relayout dependencies have been
+   * met and the size for this object is about to be calculated for the given dimension
+   *
+   * @param dimension The dimension that is about to be calculated
+   */
+  virtual void OnCalculateRelayoutSize( Dimension dimension );
+
+  /**
+   * @brief Virtual method to notify deriving classes that the size for a dimension
+   * has just been negotiated
+   *
+   * @param[in] size The new size for the given dimension
+   * @param[in] dimension The dimension that was just negotiated
+   */
+  virtual void OnLayoutNegotiated( float size, Dimension dimension );
+
+  /**
+   * @brief Determine if this actor is dependent on it's children for relayout
+   *
+   * @param dimension The dimension(s) to check for
+   * @return Return if the actor is dependent on it's children
+   */
+  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @brief Determine if this actor is dependent on it's children for relayout.
+   *
+   * Called from deriving classes
+   *
+   * @param dimension The dimension(s) to check for
+   * @return Return if the actor is dependent on it's children
+   */
+  virtual bool RelayoutDependentOnChildrenBase( Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @brief Calculate the size for a child
+   *
+   * @param[in] child The child actor to calculate the size for
+   * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
+   * @return Return the calculated size for the given dimension
+   */
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension );
+
+  /**
+   * @brief This method is called during size negotiation when a height is required for a given width.
+   *
+   * Derived classes should override this if they wish to customize the height returned.
+   *
+   * @param width to use.
+   * @return the height based on the width.
+   */
+  virtual float GetHeightForWidth( float width );
+
+  /**
+   * @brief This method is called during size negotiation when a width is required for a given height.
+   *
+   * Derived classes should override this if they wish to customize the width returned.
+   *
+   * @param height to use.
+   * @return the width based on the width.
+   */
+  virtual float GetWidthForHeight( float height );
+
+public:
+
+  // Size negotiation
+
+  /**
+   * @brief Called by the RelayoutController to negotiate the size of an actor.
+   *
+   * The size allocated by the the algorithm is passed in which the
+   * actor must adhere to.  A container is passed in as well which
+   * the actor should populate with actors it has not / or does not
+   * need to handle in its size negotiation.
+   *
+   * @param[in]      size       The allocated size.
+   * @param[in,out]  container  The container that holds actors that are fed back into the
+   *                            RelayoutController algorithm.
+   */
+  void NegotiateSize( const Vector2& size, RelayoutContainer& container );
+
+  /**
+   * @copydoc Dali::Actor::SetResizePolicy()
+   */
+  void SetResizePolicy( ResizePolicy policy, Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @copydoc Dali::Actor::GetResizePolicy()
+   */
+  ResizePolicy GetResizePolicy( Dimension dimension ) const;
+
+  /**
+   * @copydoc Dali::Actor::SetSizeScalePolicy()
+   */
+  void SetSizeScalePolicy( SizeScalePolicy policy );
+
+  /**
+   * @copydoc Dali::Actor::GetSizeScalePolicy()
+   */
+  SizeScalePolicy GetSizeScalePolicy() const;
+
+  /**
+   * @copydoc Dali::Actor::SetDimensionDependency()
+   */
+  void SetDimensionDependency( Dimension dimension, Dimension dependency );
+
+  /**
+   * @copydoc Dali::Actor::GetDimensionDependency()
+   */
+  Dimension GetDimensionDependency( Dimension dimension ) const;
+
+  /**
+   * @copydoc Dali::Actor::SetRelayoutEnabled()
+   */
+  void SetRelayoutEnabled( bool relayoutEnabled );
+
+  /**
+   * @copydoc Dali::Actor::IsRelayoutEnabled()
+   */
+  bool IsRelayoutEnabled() const;
+
+  /**
+   * @brief Mark an actor as having it's layout dirty
+   *
+   * @param dirty Whether to mark actor as dirty or not
+   * @param dimension The dimension(s) to mark as dirty
+   */
+  void SetLayoutDirty( bool dirty, Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @brief Return if any of an actor's dimensions are marked as dirty
+   *
+   * @param dimension The dimension(s) to check
+   * @return Return if any of the requested dimensions are dirty
+   */
+  bool IsLayoutDirty( Dimension dimension = ALL_DIMENSIONS ) const;
+
+  /**
+   * @brief Returns if relayout is enabled and the actor is not dirty
+   *
+   * @return Return if it is possible to relayout the actor
+   */
+  bool RelayoutPossible( Dimension dimension = ALL_DIMENSIONS ) const;
+
+  /**
+   * @brief Returns if relayout is enabled and the actor is dirty
+   *
+   * @return Return if it is required to relayout the actor
+   */
+  bool RelayoutRequired( Dimension dimension = ALL_DIMENSIONS ) const;
+
+  /**
+   * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
+   *
+   * This method is automatically called from OnStageConnection(), OnChildAdd(),
+   * OnChildRemove(), SetSizePolicy(), SetMinimumSize() and SetMaximumSize().
+   *
+   * This method can also be called from a derived class every time it needs a different size.
+   * At the end of event processing, the relayout process starts and
+   * all controls which requested Relayout will have their sizes (re)negotiated.
+   *
+   * @note RelayoutRequest() can be called multiple times; the size negotiation is still
+   * only performed once, i.e. there is no need to keep track of this in the calling side.
+   */
+  void RelayoutRequest( Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @brief Request to relayout of all actors in the sub-tree below the given actor.
+   *
+   * This flags the actor and all actors below it for relayout. The actual
+   * relayout is performed at the end of the frame. This means that multiple calls to relayout
+   * will not cause multiple relayouts to occur.
+   */
+  void RelayoutRequestTree();
+
+  /*
+   * @copydoc Dali::Actor::PropagateRelayoutFlags
+   */
+  void PropagateRelayoutFlags();
+
+  /**
+   * @brief Determine if this actor is dependent on it's parent for relayout
+   *
+   * @param dimension The dimension(s) to check for
+   * @return Return if the actor is dependent on it's parent
+   */
+  bool RelayoutDependentOnParent( Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @brief Determine if this actor has another dimension depedent on the specified one
+   *
+   * @param dimension The dimension to check for
+   * @param dependentDimension The dimension to check for dependency with
+   * @return Return if the actor is dependent on this dimension
+   */
+  bool RelayoutDependentOnDimension( Dimension dimension, Dimension dependentDimension );
+
+  /**
+   * Negotiate sizes for a control in all dimensions
+   *
+   * @param[in] allocatedSize The size constraint that the control must respect
+   */
+  void NegotiateDimensions( const Vector2& allocatedSize );
+
+  /**
+   * Negotiate size for a specific dimension
+   *
+   * The algorithm adopts a recursive dependency checking approach. Meaning, that wherever dependencies
+   * are found, e.g. an actor dependent on its parent, the dependency will be calculated first with NegotiatedDimension and
+   * LayoutDimensionNegotiated flags being filled in on the actor.
+   *
+   * @post All actors that exist in the dependency chain connected to the given actor will have had their NegotiatedDimensions
+   * calculated and set as well as the LayoutDimensionNegotiated flags.
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @param[in] allocatedSize The size constraint that the actor must respect
+   */
+  void NegotiateDimension( Dimension dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack );
+
+  /**
+   * @brief Calculate the size of a dimension
+   *
+   * @param[in] dimension The dimension to calculate the size for
+   * @param[in] maximumSize The upper bounds on the size
+   * @return Return the calculated size for the dimension
+   */
+  float CalculateSize( Dimension dimension, const Vector2& maximumSize );
+
+  /**
+   * @brief Constain a dimension given the relayout constraints on this actor
+   *
+   * @param[in] size The size to constrain
+   * @param[in] dimension The dimension the size exists in
+   * @return Return the constrained size
+   */
+  float ConstrainDimension( float size, Dimension dimension );
+
+  /**
+   * Negotiate a dimension based on the size of the parent
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @return Return the negotiated size
+   */
+  float NegotiateFromParent( Dimension dimension );
+
+  /**
+   * Negotiate a dimension based on the size of the parent. Fitting inside.
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @return Return the negotiated size
+   */
+  float NegotiateFromParentFit( Dimension dimension );
+
+  /**
+   * Negotiate a dimension based on the size of the parent. Flooding the whole space.
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @return Return the negotiated size
+   */
+  float NegotiateFromParentFlood( Dimension dimension );
+
+  /**
+   * @brief Negotiate a dimension based on the size of the children
+   *
+   * @param[in] dimension The dimension to negotiate on
+   * @return Return the negotiated size
+   */
+  float NegotiateFromChildren( Dimension dimension );
+
+  /**
+   * Set the negotiated dimension value for the given dimension(s)
+   *
+   * @param negotiatedDimension The value to set
+   * @param dimension The dimension(s) to set the value for
+   */
+  void SetNegotiatedDimension( float negotiatedDimension, Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * Return the value of negotiated dimension for the given dimension
+   *
+   * @param dimension The dimension to retrieve
+   * @return Return the value of the negotiated dimension
+   */
+  float GetNegotiatedDimension( Dimension dimension ) const;
+
+  /**
+   * @brief Set the padding for a dimension
+   *
+   * @param[in] padding Padding for the dimension. X = start (e.g. left, bottom), y = end (e.g. right, top)
+   * @param[in] dimension The dimension to set
+   */
+  void SetPadding( const Vector2& padding, Dimension dimension );
+
+  /**
+   * Return the value of padding for the given dimension
+   *
+   * @param dimension The dimension to retrieve
+   * @return Return the value of padding for the dimension
+   */
+  Vector2 GetPadding( Dimension dimension ) const;
+
+  /**
+   * Return the actor size for a given dimension
+   *
+   * @param[in] dimension The dimension to retrieve the size for
+   * @return Return the size for the given dimension
+   */
+  float GetSize( Dimension dimension ) const;
+
+  /**
+   * Return the natural size of the actor for a given dimension
+   *
+   * @param[in] dimension The dimension to retrieve the size for
+   * @return Return the natural size for the given dimension
+   */
+  float GetNaturalSize( Dimension dimension ) const;
+
+  /**
+   * @brief Return the amount of size allocated for relayout
+   *
+   * May include padding
+   *
+   * @param[in] dimension The dimension to retrieve
+   * @return Return the size
+   */
+  float GetRelayoutSize( Dimension dimension ) const;
+
+  /**
+   * @brief If the size has been negotiated return that else return normal size
+   *
+   * @param[in] dimension The dimension to retrieve
+   * @return Return the size
+   */
+  float GetLatestSize( Dimension dimension ) const;
+
+  /**
+   * Apply the negotiated size to the actor
+   *
+   * @param[in] container The container to fill with actors that require further relayout
+   */
+  void SetNegotiatedSize( RelayoutContainer& container );
+
+  /**
+   * @brief Flag the actor as having it's layout dimension negotiated.
+   *
+   * @param[in] negotiated The status of the flag to set.
+   * @param[in] dimension The dimension to set the flag for
+   */
+  void SetLayoutNegotiated( bool negotiated, Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @brief Test whether the layout dimension for this actor has been negotiated or not.
+   *
+   * @param[in] dimension The dimension to determine the value of the flag for
+   * @return Return if the layout dimension is negotiated or not.
+   */
+  bool IsLayoutNegotiated( Dimension dimension = ALL_DIMENSIONS ) const;
+
+  /**
+   * @brief Calculate the size for a child
+   *
+   * @param[in] child The child actor to calculate the size for
+   * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
+   * @return Return the calculated size for the given dimension
+   */
+  float CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension );
+
+  /**
+   * @copydoc Dali::Actor::SetPreferredSize
+   */
+  void SetPreferredSize( const Vector2& size );
+
+  /**
+   * @copydoc Dali::Actor::GetPreferredSize
+   */
+  Vector2 GetPreferredSize() const;
+
+  /**
+   * @copydoc Dali::Actor::SetMinimumSize
+   */
+  void SetMinimumSize( float size, Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @copydoc Dali::Actor::GetMinimumSize
+   */
+  float GetMinimumSize( Dimension dimension ) const;
+
+  /**
+   * @copydoc Dali::Actor::SetMaximumSize
+   */
+  void SetMaximumSize( float size, Dimension dimension = ALL_DIMENSIONS );
+
+  /**
+   * @copydoc Dali::Actor::GetMaximumSize
+   */
+  float GetMaximumSize( Dimension dimension ) const;
+
 #ifdef DYNAMICS_SUPPORT
 
   // Dynamics
@@ -756,7 +1223,7 @@ public:
   void DisableDynamics();
 
   /// @copydoc Dali::Actor::EnableDynamics(Dali::DynamicsBodyConfig)
-  DynamicsBodyPtr  EnableDynamics(DynamicsBodyConfigPtr bodyConfig);
+  DynamicsBodyPtr EnableDynamics(DynamicsBodyConfigPtr bodyConfig);
 
   /// @copydoc Dali::Actor::GetDynamicsBody
   DynamicsBodyPtr GetDynamicsBody() const;
@@ -844,7 +1311,7 @@ public:
    * @param[in] screenY The screen Y-coordinate.
    * @return True if the conversion succeeded.
    */
-  bool ScreenToLocal(float& localX, float& localY, float screenX, float screenY) const;
+  bool ScreenToLocal( float& localX, float& localY, float screenX, float screenY ) const;
 
   /**
    * Converts screen coordinates into the actor's coordinate system.
@@ -856,7 +1323,7 @@ public:
    * @param[in] screenY The screen Y-coordinate.
    * @return True if the conversion succeeded.
    */
-  bool ScreenToLocal(RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY) const;
+  bool ScreenToLocal( RenderTask& renderTask, float& localX, float& localY, float screenX, float screenY ) const;
 
   /**
    * Converts from the actor's coordinate system to screen coordinates.
@@ -896,7 +1363,10 @@ public:
    * @param[out] distance The distance from the hit point to the camera.
    * @return True if the ray intersects the actor's geometry.
    */
-  bool RayActorTest( const Vector4& rayOrigin, const Vector4& rayDir, Vector4& hitPointLocal, float& distance ) const;
+  bool RayActorTest( const Vector4& rayOrigin,
+                     const Vector4& rayDir,
+                     Vector4& hitPointLocal,
+                     float& distance ) const;
 
   /**
    * Sets whether the actor should receive a notification when touch or hover motion events leave
@@ -907,7 +1377,7 @@ public:
    *
    * @param[in]  required  Should be set to true if a Leave event is required
    */
-  void SetLeaveRequired(bool required);
+  void SetLeaveRequired( bool required );
 
   /**
    * This returns whether the actor requires touch or hover events whenever touch or hover motion events leave
@@ -976,21 +1446,21 @@ public:
    * @param[in] event The touch event.
    * @return True if the event was consumed.
    */
-  bool EmitTouchEventSignal(const TouchEvent& event);
+  bool EmitTouchEventSignal( const TouchEvent& event );
 
   /**
    * Used by the EventProcessor to emit hover event signals.
    * @param[in] event The hover event.
    * @return True if the event was consumed.
    */
-  bool EmitHoverEventSignal(const HoverEvent& event);
+  bool EmitHoverEventSignal( const HoverEvent& event );
 
   /**
    * Used by the EventProcessor to emit mouse wheel event signals.
    * @param[in] event The mouse wheel event.
    * @return True if the event was consumed.
    */
-  bool EmitMouseWheelEventSignal(const MouseWheelEvent& event);
+  bool EmitMouseWheelEventSignal( const MouseWheelEvent& event );
 
   /**
    * @copydoc Dali::Actor::TouchedSignal()
@@ -1018,6 +1488,11 @@ public:
   Dali::Actor::OffStageSignalType& OffStageSignal();
 
   /**
+   * @copydoc Dali::Actor::OnRelayoutSignal()
+   */
+  Dali::Actor::OnRelayoutSignalType& OnRelayoutSignal();
+
+  /**
    * Connects a callback function with the object's signals.
    * @param[in] object The object providing the signal.
    * @param[in] tracker Used to disconnect the signal.
@@ -1026,7 +1501,10 @@ public:
    * @return True if the signal was connected.
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
-  static bool DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tracker, const std::string& signalName, FunctorDelegate* functor );
+  static bool DoConnectSignal( BaseObject* object,
+                               ConnectionTrackerInterface* tracker,
+                               const std::string& signalName,
+                               FunctorDelegate* functor );
 
   /**
    * Performs actions as requested using the action name.
@@ -1035,9 +1513,12 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if the action was done.
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes);
+  static bool DoAction( BaseObject* object,
+                        const std::string& actionName,
+                        const std::vector< Property::Value >& attributes );
 
-public:  // For Animation
+public:
+  // For Animation
 
   /**
    * This should only be called by Animation, when the actor is resized using Animation::Resize().
@@ -1045,22 +1526,21 @@ public:  // For Animation
    * @param[in] animation The animation that resized the actor
    * @param[in] targetSize The new target size of the actor
    */
-  void NotifySizeAnimation( Animation& animation, const Vector3& targetSize);
+  void NotifySizeAnimation( Animation& animation, const Vector3& targetSize );
 
   /**
    * For use in derived classes.
    * This should only be called by Animation, when the actor is resized using Animation::Resize().
    */
-  virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize) {}
+  virtual void OnSizeAnimation( Animation& animation, const Vector3& targetSize )
+  {
+  }
 
 protected:
 
   enum DerivedType
   {
-    BASIC,
-    RENDERABLE,
-    LAYER,
-    ROOT_LAYER
+    BASIC, RENDERABLE, LAYER, ROOT_LAYER
   };
 
   /**
@@ -1073,7 +1553,7 @@ protected:
   /**
    * Second-phase constructor. Must be called immediately after creating a new Actor;
    */
-  void Initialize(void);
+  void Initialize( void );
 
   /**
    * A reference counted object may only be deleted by calling Unreference()
@@ -1099,7 +1579,7 @@ protected:
    * Connect the Node associated with this Actor to the scene-graph.
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void ConnectToSceneGraph(int index = -1);
+  void ConnectToSceneGraph( int index = -1 );
 
   /**
    * Helper for ConnectToStage, to notify a connected actor through the public API.
@@ -1143,7 +1623,8 @@ protected:
    */
   float CalculateSizeZ( const Vector2& size ) const;
 
-public: // Default property extensions from Object
+public:
+  // Default property extensions from Object
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyCount()
@@ -1158,22 +1639,22 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyName()
    */
-  virtual const char* GetDefaultPropertyName(Property::Index index) const;
+  virtual const char* GetDefaultPropertyName( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyIndex()
    */
-  virtual Property::Index GetDefaultPropertyIndex(const std::string& name) const;
+  virtual Property::Index GetDefaultPropertyIndex( const std::string& name ) const;
 
   /**
    * @copydoc Dali::Internal::Object::IsDefaultPropertyWritable()
    */
-  virtual bool IsDefaultPropertyWritable(Property::Index index) const;
+  virtual bool IsDefaultPropertyWritable( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::IsDefaultPropertyAnimatable()
    */
-  virtual bool IsDefaultPropertyAnimatable(Property::Index index) const;
+  virtual bool IsDefaultPropertyAnimatable( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::IsDefaultPropertyAConstraintInput()
@@ -1183,17 +1664,17 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::GetDefaultPropertyType()
    */
-  virtual Property::Type GetDefaultPropertyType(Property::Index index) const;
+  virtual Property::Type GetDefaultPropertyType( Property::Index index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::SetDefaultProperty()
    */
-  virtual void SetDefaultProperty(Property::Index index, const Property::Value& propertyValue);
+  virtual void SetDefaultProperty( Property::Index index, const Property::Value& propertyValue );
 
   /**
    * @copydoc Dali::Internal::Object::SetSceneGraphProperty()
    */
-  virtual void SetSceneGraphProperty( Property::Index index, const CustomProperty& entry, const Property::Value& value );
+  virtual void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value );
 
   /**
    * @copydoc Dali::Internal::Object::GetDefaultProperty()
@@ -1231,17 +1712,17 @@ private:
   Actor();
 
   // Undefined
-  Actor(const Actor&);
+  Actor( const Actor& );
 
   // Undefined
-  Actor& operator=(const Actor& rhs);
+  Actor& operator=( const Actor& rhs );
 
   /**
    * Set the actors parent.
    * @param[in] parent The new parent.
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void SetParent(Actor* parent, int index = -1);
+  void SetParent( Actor* parent, int index = -1 );
 
   /**
    * Helper to create a Node for this Actor.
@@ -1253,51 +1734,67 @@ private:
   /**
    * For use in derived classes, called after Initialize()
    */
-  virtual void OnInitialize() {}
+  virtual void OnInitialize()
+  {
+  }
 
   /**
    * For use in internal derived classes.
    * This is called during ConnectToStage(), after the actor has finished adding its node to the scene-graph.
    * The derived class must not modify the actor hierachy (Add/Remove children) during this callback.
    */
-  virtual void OnStageConnectionInternal() {}
+  virtual void OnStageConnectionInternal()
+  {
+  }
 
   /**
    * For use in internal derived classes.
    * This is called during DisconnectFromStage(), before the actor removes its node from the scene-graph.
    * The derived class must not modify the actor hierachy (Add/Remove children) during this callback.
    */
-  virtual void OnStageDisconnectionInternal() {}
+  virtual void OnStageDisconnectionInternal()
+  {
+  }
 
   /**
    * For use in external (CustomActor) derived classes.
    * This is called after the atomic ConnectToStage() traversal has been completed.
    */
-  virtual void OnStageConnectionExternal() {}
+  virtual void OnStageConnectionExternal()
+  {
+  }
 
   /**
    * For use in external (CustomActor) derived classes.
    * This is called after the atomic DisconnectFromStage() traversal has been completed.
    */
-  virtual void OnStageDisconnectionExternal() {}
+  virtual void OnStageDisconnectionExternal()
+  {
+  }
 
   /**
    * For use in derived classes; this is called after Add() has added a child.
    * @param[in] child The child that was added.
    */
-  virtual void OnChildAdd( Actor& child ) {}
+  virtual void OnChildAdd( Actor& child )
+  {
+  }
 
   /**
    * For use in derived classes; this is called after Remove() has removed a child.
    * @param[in] child The child that was removed.
    */
-  virtual void OnChildRemove( Actor& child ) {}
+  virtual void OnChildRemove( Actor& child )
+  {
+  }
 
   /**
    * For use in derived classes.
    * This is called after SizeSet() has been called.
    */
-  virtual void OnSizeSet(const Vector3& targetSize) {}
+  virtual void OnSizeSet( const Vector3& targetSize )
+  {
+  }
 
   /**
    * For use in derived classes.
@@ -1305,7 +1802,10 @@ private:
    * @param[in] event The touch event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnTouchEvent(const TouchEvent& event) { return false; }
+  virtual bool OnTouchEvent( const TouchEvent& event )
+  {
+    return false;
+  }
 
   /**
    * For use in derived classes.
@@ -1313,7 +1813,10 @@ private:
    * @param[in] event The hover event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnHoverEvent(const HoverEvent& event) { return false; }
+  virtual bool OnHoverEvent( const HoverEvent& event )
+  {
+    return false;
+  }
 
   /**
    * For use in derived classes.
@@ -1321,24 +1824,43 @@ private:
    * @param[in] event The mouse event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event) { return false; }
+  virtual bool OnMouseWheelEvent( const MouseWheelEvent& event )
+  {
+    return false;
+  }
+
+  /**
+   * @brief Ensure the relayout data is allocated
+   */
+  void EnsureRelayoutData() const;
+
+  /**
+   * @brief Apply the size set policy to the input size
+   *
+   * @param[in] size The size to apply the policy to
+   * @return Return the adjusted size
+   */
+  Vector2 ApplySizeSetPolicy( const Vector2 size );
 
 protected:
 
-  StagePtr                mStage;        ///< Used to send messages to Node; valid until Core destruction
-  Actor*                  mParent;       ///< Each actor (except the root) can have one parent
-  ActorContainer*         mChildren;     ///< Container of referenced actors
-  const SceneGraph::Node* mNode;         ///< Not owned
-  Vector3*                mParentOrigin; ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
-  Vector3*                mAnchorPoint;  ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
+  StagePtr mStage;                ///< Used to send messages to Node; valid until Core destruction
+  Actor* mParent;                 ///< Each actor (except the root) can have one parent
+  ActorContainer* mChildren;      ///< Container of referenced actors
+  const SceneGraph::Node* mNode;  ///< Not owned
+  Vector3* mParentOrigin;         ///< NULL means ParentOrigin::DEFAULT. ParentOrigin is non-animatable
+  Vector3* mAnchorPoint;          ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
+
+  struct RelayoutData;
+  mutable RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
 
 #ifdef DYNAMICS_SUPPORT
-  DynamicsData*           mDynamicsData; ///< optional physics data
+  DynamicsData* mDynamicsData; ///< optional physics data
 #endif
 
-  ActorGestureData*       mGestureData;  ///< Optional Gesture data. Only created when actor requires gestures
+  ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
 
-  ActorAttachmentPtr      mAttachment;   ///< Optional referenced attachment
+  ActorAttachmentPtr mAttachment;   ///< Optional referenced attachment
 
   // Signals
   Dali::Actor::TouchSignalType             mTouchedSignal;
@@ -1346,9 +1868,9 @@ protected:
   Dali::Actor::MouseWheelEventSignalType   mMouseWheelEventSignal;
   Dali::Actor::OnStageSignalType           mOnStageSignal;
   Dali::Actor::OffStageSignalType          mOffStageSignal;
+  Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
 
-  Vector3         mSize;      ///< Event-side storage for size (not a pointer as most actors will have a size)
-  Vector3         mSizeModeFactor; ///< Factor of parent size used for certain SizeModes.
+  Vector3         mTargetSize;      ///< Event-side storage for size (not a pointer as most actors will have a size)
 
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
@@ -1370,12 +1892,11 @@ protected:
   DrawMode::Type mDrawMode                         : 2; ///< Cached: How the actor and its children should be drawn
   PositionInheritanceMode mPositionInheritanceMode : 2; ///< Cached: Determines how position is inherited
   ColorMode mColorMode                             : 2; ///< Cached: Determines whether mWorldColor is inherited
-  SizeMode mSizeMode                               : 2; ///< Cached: Determines how the actors parent affects the actors size.
 
 private:
 
-  static ActorContainer mNullChildren; ///< Empty container (shared by all actors, returned by GetChildren() const)
-  static unsigned int   mActorCounter; ///< A counter to track the actor instance creation
+  static ActorContainer mNullChildren;  ///< Empty container (shared by all actors, returned by GetChildren() const)
+  static unsigned int mActorCounter;    ///< A counter to track the actor instance creation
 
 };
 
@@ -1383,22 +1904,22 @@ private:
 
 // Helpers for public-api forwarding methods
 
-inline Internal::Actor& GetImplementation(Dali::Actor& actor)
+inline Internal::Actor& GetImplementation( Dali::Actor& actor )
 {
-  DALI_ASSERT_ALWAYS(actor && "Actor handle is empty");
+  DALI_ASSERT_ALWAYS( actor && "Actor handle is empty" );
 
   BaseObject& handle = actor.GetBaseObject();
 
-  return static_cast<Internal::Actor&>(handle);
+  return static_cast< Internal::Actor& >( handle );
 }
 
-inline const Internal::Actor& GetImplementation(const Dali::Actor& actor)
+inline const Internal::Actor& GetImplementation( const Dali::Actor& actor )
 {
-  DALI_ASSERT_ALWAYS(actor && "Actor handle is empty");
+  DALI_ASSERT_ALWAYS( actor && "Actor handle is empty" );
 
   const BaseObject& handle = actor.GetBaseObject();
 
-  return static_cast<const Internal::Actor&>(handle);
+  return static_cast< const Internal::Actor& >( handle );
 }
 
 } // namespace Dali

@@ -22,9 +22,7 @@ SET(TC_SOURCES
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp
         utc-Dali-DistanceField.cpp
-        utc-Dali-DynamicsBody.cpp
         utc-Dali-DynamicsBodyConfig.cpp
-        utc-Dali-DynamicsJoint.cpp
         utc-Dali-DynamicsShape.cpp
         utc-Dali-DynamicsWorld.cpp
         utc-Dali-DynamicsWorldConfig.cpp
@@ -62,6 +60,7 @@ SET(TC_SOURCES
         utc-Dali-Pixel.cpp
         utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyNotification.cpp
+        utc-Dali-PropertyValue.cpp
         utc-Dali-Quaternion.cpp
         utc-Dali-Radian.cpp
         utc-Dali-Random.cpp
@@ -74,7 +73,6 @@ SET(TC_SOURCES
         utc-Dali-Scripting.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
-        utc-Dali-Spline.cpp
         utc-Dali-Stage.cpp
         utc-Dali-TapGesture.cpp
         utc-Dali-TapGestureDetector.cpp

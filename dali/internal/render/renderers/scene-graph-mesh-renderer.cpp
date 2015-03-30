@@ -260,19 +260,16 @@ void MeshRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
     case Dali::MeshData::TRIANGLES:
     {
       mContext->DrawElements(GL_TRIANGLES, mesh->GetFaceIndexCount(Mesh::RENDER_THREAD), GL_UNSIGNED_SHORT, 0);
-      DRAW_ELEMENT_RECORD(mesh->GetFaceIndexCount());
       break;
     }
     case Dali::MeshData::LINES:
     {
       mContext->DrawElements(GL_LINES, mesh->GetFaceIndexCount(Mesh::RENDER_THREAD), GL_UNSIGNED_SHORT, 0);
-      DRAW_ELEMENT_RECORD(mesh->GetFaceIndexCount());
       break;
     }
     case Dali::MeshData::POINTS:
     {
       mContext->DrawArrays(GL_POINTS, 0, mesh->GetFaceIndexCount(Mesh::RENDER_THREAD) );
-      DRAW_ARRAY_RECORD(mesh->GetFaceIndexCount());
       break;
     }
   }

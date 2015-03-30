@@ -187,7 +187,7 @@ public: // Default property extensions from Object
   /**
    * @copydoc Dali::Internal::Object::NotifyScenePropertyInstalled()
    */
-  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index );
+  virtual void NotifyScenePropertyInstalled( const SceneGraph::PropertyBase& newProperty, const std::string& name, unsigned int index ) const;
 
   /**
    * @copydoc Dali::Internal::Object::GetSceneObject()

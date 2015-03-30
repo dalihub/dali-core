@@ -18,7 +18,6 @@
 #include <iostream>
 
 #include <stdlib.h>
-#include <boost/bind.hpp>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 

@@ -114,6 +114,11 @@ GestureEventProcessor& ThreadLocalStorage::GetGestureEventProcessor()
   return mCore->GetGestureEventProcessor();
 }
 
+RelayoutController& ThreadLocalStorage::GetRelayoutController()
+{
+  return mCore->GetRelayoutController();
+}
+
 } // namespace Internal
 
 } // namespace Dali

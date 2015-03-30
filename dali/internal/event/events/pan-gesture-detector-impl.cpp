@@ -533,7 +533,7 @@ const PropertyInputImpl* PanGestureDetector::GetSceneObjectInputProperty( Proper
 
   if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
   {
-    CustomProperty* custom = FindCustomProperty( index );
+    CustomPropertyMetadata* custom = FindCustomProperty( index );
     DALI_ASSERT_ALWAYS( custom && "Property index is invalid" );
     property = custom->GetSceneGraphProperty();
   }

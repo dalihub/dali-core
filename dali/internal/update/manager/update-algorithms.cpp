@@ -186,44 +186,6 @@ inline void UpdateNodeTransformValues( Node& node, int& nodeDirtyFlags, BufferIn
   // If the transform values need to be reinherited
   if( nodeDirtyFlags & TransformFlag )
   {
-    // Handle size relative to parent modes.
-    // This must be delt with before rotation/translation as otherwise anything
-    // anchored to a corner of this child would appear at the wrong position.
-    // The size dirty flag is modified if the size is being overridden.
-    // Note: Switch is in order of use-case commonality.
-    switch( node.GetSizeMode() )
-    {
-      case USE_OWN_SIZE:
-      {
-        // Completely ignore the parents size.
-        break;
-      }
-
-      case SIZE_EQUAL_TO_PARENT:
-      {
-        // Set the nodes size to that of the parent.
-        node.SetSize( updateBufferIndex, node.GetParent()->GetSize( updateBufferIndex ) );
-        nodeDirtyFlags |= SizeFlag;
-        break;
-      }
-
-      case SIZE_RELATIVE_TO_PARENT:
-      {
-        // Set the nodes size to the parents multiplied by a user defined value.
-        node.SetSize( updateBufferIndex, node.GetSizeModeFactor() * node.GetParent()->GetSize( updateBufferIndex ) );
-        nodeDirtyFlags |= SizeFlag;
-        break;
-      }
-
-      case SIZE_FIXED_OFFSET_FROM_PARENT:
-      {
-        // Set the nodes size to the parents plus a user defined value.
-        node.SetSize( updateBufferIndex, node.GetSizeModeFactor() + node.GetParent()->GetSize( updateBufferIndex ) );
-        nodeDirtyFlags |= SizeFlag;
-        break;
-      }
-    }
-
     // With a non-central anchor-point, the world rotation and scale affects the world position.
     // Therefore the world rotation & scale must be updated before the world position.
     if( node.IsOrientationInherited() )

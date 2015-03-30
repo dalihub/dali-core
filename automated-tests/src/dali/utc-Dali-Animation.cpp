@@ -4643,7 +4643,7 @@ int UtcDaliAnimationAnimateToActorParentOrigin(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4670,7 +4670,7 @@ int UtcDaliAnimationAnimateToActorParentOriginX(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4697,7 +4697,7 @@ int UtcDaliAnimationAnimateToActorParentOriginY(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4724,7 +4724,7 @@ int UtcDaliAnimationAnimateToActorParentOriginZ(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4749,7 +4749,7 @@ int UtcDaliAnimationAnimateToActorAnchorPoint(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4776,7 +4776,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointX(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4803,7 +4803,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointY(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -4830,7 +4830,7 @@ int UtcDaliAnimationAnimateToActorAnchorPointZ(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "IsPropertyAnimatable(index)", TEST_LOCATION);
+    DALI_TEST_ASSERT(e, "IsPropertyAnimatable( index )", TEST_LOCATION);
   }
   END_TEST;
 }

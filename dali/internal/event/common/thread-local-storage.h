@@ -41,6 +41,7 @@ class ResourceManager;
 class ImageFactory;
 class ShaderFactory;
 class GestureEventProcessor;
+class RelayoutController;
 
 namespace SceneGraph
 {
@@ -144,6 +145,12 @@ public:
    * @return A reference to the gesture event processor.
    */
   GestureEventProcessor& GetGestureEventProcessor();
+
+  /**
+   * Return the relayout controller
+   * @Return Return a reference to the relayout controller
+   */
+  RelayoutController& GetRelayoutController();
 
 private:
 
