@@ -139,7 +139,7 @@ public:
   virtual void OnSizeSet(const Vector3& targetSize) = 0;
 
   /**
-   * @brief Called when the owning actor's size is animated e.g. using Animation::Resize().
+   * @brief Called when the owning actor's size is animated e.g. using Animation::AnimateTo( Property( actor, Actor::Property::SIZE ), ... ).
    *
    * @param[in] animation The object which is animating the owning actor.
    * @param[in] targetSize The target size. Note that this target size may not match the size returned via Actor::GetSize().
