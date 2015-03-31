@@ -138,8 +138,7 @@ ImageActor CreateLoadingImage(TestApplication& application, std::string filename
   application.Render(16);
   DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
   ImageActor actor = ImageActor::New(image);
-  actor.SetPreferredSize( Vector2( 80, 80 ) );
-  actor.SetResizePolicy( FIXED, ALL_DIMENSIONS );
+  actor.SetSize( 80, 80 );
   application.SendNotification();
   application.Render(16);
   return actor;

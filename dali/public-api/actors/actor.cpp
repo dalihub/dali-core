@@ -30,6 +30,7 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
+#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 namespace Dali
 {
@@ -171,22 +172,50 @@ Vector3 Actor::GetCurrentAnchorPoint() const
 
 void Actor::SetSize(float width, float height)
 {
-  GetImplementation(*this).SetSize(width, height);
+  if( IsRelayoutEnabled() )
+  {
+    GetImplementation(*this).SetPreferredSize( Vector2( width, height ) );
+  }
+  else
+  {
+    GetImplementation(*this).SetSize(width, height);
+  }
 }
 
 void Actor::SetSize(float width, float height, float depth)
 {
-  GetImplementation(*this).SetSize(width, height, depth);
+  if( IsRelayoutEnabled() )
+  {
+    GetImplementation(*this).SetPreferredSize( Vector2( width, height ) );
+  }
+  else
+  {
+    GetImplementation(*this).SetSize(width, height, depth);
+  }
 }
 
 void Actor::SetSize(const Vector2& size)
 {
-  GetImplementation(*this).SetSize(size);
+  if( IsRelayoutEnabled() )
+  {
+    GetImplementation(*this).SetPreferredSize( size );
+  }
+  else
+  {
+    GetImplementation(*this).SetSize( size );
+  }
 }
 
 void Actor::SetSize(const Vector3& size)
 {
-  GetImplementation(*this).SetSize(size);
+  if( IsRelayoutEnabled() )
+  {
+    GetImplementation(*this).SetPreferredSize( size.GetVectorXY() );
+  }
+  else
+  {
+    GetImplementation(*this).SetSize( size );
+  }
 }
 
 Vector3 Actor::GetTargetSize() const
@@ -349,16 +378,6 @@ bool Actor::IsScaleInherited() const
   return GetImplementation(*this).IsScaleInherited();
 }
 
-void Actor::SetSizeMode(SizeMode mode)
-{
-  GetImplementation(*this).SetSizeMode(mode);
-}
-
-SizeMode Actor::GetSizeMode() const
-{
-  return GetImplementation(*this).GetSizeMode();
-}
-
 void Actor::SetSizeModeFactor(const Vector3& factor)
 {
   GetImplementation(*this).SetSizeModeFactor(factor);
@@ -494,16 +513,6 @@ SizeScalePolicy Actor::GetSizeScalePolicy() const
   return GetImplementation(*this).GetSizeScalePolicy();
 }
 
-void Actor::SetDimensionDependency( Dimension dimension, Dimension dependency )
-{
-  GetImplementation(*this).SetDimensionDependency( dimension, dependency );
-}
-
-Dimension Actor::GetDimensionDependency( Dimension dimension )
-{
-  return GetImplementation(*this).GetDimensionDependency( dimension );
-}
-
 float Actor::GetHeightForWidth( float width )
 {
   return GetImplementation(*this).GetHeightForWidth( width );
@@ -551,16 +560,6 @@ void Actor::GetPadding( Padding& paddingOut ) const
   paddingOut.right = widthPadding.y;
   paddingOut.bottom = heightPadding.x;
   paddingOut.top = heightPadding.y;
-}
-
-void Actor::SetPreferredSize( const Vector2& size )
-{
-  GetImplementation(*this).SetPreferredSize( size );
-}
-
-Vector2 Actor::GetPreferredSize() const
-{
-  return GetImplementation(*this).GetPreferredSize();
 }
 
 void Actor::SetMinimumSize( const Vector2& size )
