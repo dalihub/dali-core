@@ -40,6 +40,7 @@
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
@@ -3396,7 +3397,19 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
   if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
   {
     AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
+    if( !animatable )
+    {
+      const TypeInfo* typeInfo( GetTypeInfo() );
+      if ( typeInfo )
+      {
+        if( Property::INVALID_INDEX != RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, Property::Value( typeInfo->GetPropertyType( index ) ) ) )
+        {
+          animatable = FindAnimatableProperty( index );
+        }
+      }
+    }
     DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
+
     property = animatable->GetSceneGraphProperty();
   }
   else if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
@@ -3507,7 +3520,19 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
   if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
   {
     AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
+    if( !animatable )
+    {
+      const TypeInfo* typeInfo( GetTypeInfo() );
+      if ( typeInfo )
+      {
+        if( Property::INVALID_INDEX != RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, Property::Value( typeInfo->GetPropertyType( index ) ) ) )
+        {
+          animatable = FindAnimatableProperty( index );
+        }
+      }
+    }
     DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
+
     property = animatable->GetSceneGraphProperty();
   }
   else if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
