@@ -201,7 +201,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<bool>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<bool>::Bake, value.Get<bool>() );
+        SceneGraph::AnimatablePropertyMessage<bool>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<bool>::Bake, value.Get<bool>() );
 
         break;
       }
@@ -212,7 +212,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<float>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<float>::Bake, value.Get<float>() );
+        SceneGraph::AnimatablePropertyMessage<float>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<float>::Bake, value.Get<float>() );
 
         break;
       }
@@ -223,7 +223,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<int>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<int>::Bake, value.Get<int>() );
+        SceneGraph::AnimatablePropertyMessage<int>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<int>::Bake, value.Get<int>() );
 
         break;
       }
@@ -234,7 +234,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<Vector2>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector2>::Bake, value.Get<Vector2>() );
+        SceneGraph::AnimatablePropertyMessage<Vector2>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector2>::Bake, value.Get<Vector2>() );
 
         break;
       }
@@ -245,7 +245,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<Vector3>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector3>::Bake, value.Get<Vector3>() );
+        SceneGraph::AnimatablePropertyMessage<Vector3>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector3>::Bake, value.Get<Vector3>() );
 
         break;
       }
@@ -256,7 +256,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<Vector4>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector4>::Bake, value.Get<Vector4>() );
+        SceneGraph::AnimatablePropertyMessage<Vector4>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Vector4>::Bake, value.Get<Vector4>() );
 
         break;
       }
@@ -267,7 +267,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<Quaternion>::Send( eventThreadServices, sceneObject, property,&SceneGraph::AnimatableProperty<Quaternion>::Bake,  value.Get<Quaternion>() );
+        SceneGraph::AnimatablePropertyMessage<Quaternion>::Send( eventThreadServices, sceneObject, property,&SceneGraph::AnimatableProperty<Quaternion>::Bake,  value.Get<Quaternion>() );
 
         break;
       }
@@ -278,7 +278,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<Matrix>::Send( eventThreadServices, sceneObject, property,&SceneGraph::AnimatableProperty<Matrix>::Bake,  value.Get<Matrix>() );
+        SceneGraph::AnimatablePropertyMessage<Matrix>::Send( eventThreadServices, sceneObject, property,&SceneGraph::AnimatableProperty<Matrix>::Bake,  value.Get<Matrix>() );
 
         break;
       }
@@ -289,7 +289,7 @@ struct ObjectImplHelper
         DALI_ASSERT_DEBUG( NULL != property );
 
         // property is being used in a separate thread; queue a message to set the property
-        SceneGraph::PropertyMessage<Matrix3>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Matrix3>::Bake,  value.Get<Matrix3>() );
+        SceneGraph::AnimatablePropertyMessage<Matrix3>::Send( eventThreadServices, sceneObject, property, &SceneGraph::AnimatableProperty<Matrix3>::Bake,  value.Get<Matrix3>() );
 
         break;
       }

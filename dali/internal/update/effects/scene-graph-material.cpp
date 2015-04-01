@@ -18,6 +18,7 @@
 #include "scene-graph-material.h"
 
 // INTERNAL HEADERS
+#include <dali/public-api/shader-effects/material.h>
 #include <dali/internal/render/data-providers/sampler-data-provider.h>
 #include <dali/internal/update/effects/scene-graph-sampler.h>
 
@@ -31,6 +32,7 @@ namespace SceneGraph
 Material::Material()
 : mColor( Color::WHITE ),
   mBlendColor( Color::WHITE ),
+  mFaceCullingMode(Dali::Material::NONE),
   mShader(NULL)
 {
   // Observe own property-owner's uniform map
@@ -116,6 +118,13 @@ void Material::UniformMappingsChanged( const UniformMap& mappings )
   // Our uniform map, or that of one of the watched children has changed.
   // Inform connected observers.
   mConnectionObservers.ConnectedUniformMapChanged();
+}
+
+void Material::ResetDefaultProperties( BufferIndex updateBufferIndex )
+{
+  mColor.ResetToBaseValue( updateBufferIndex );
+  mBlendColor.ResetToBaseValue( updateBufferIndex );
+  mFaceCullingMode.CopyPrevious( updateBufferIndex );
 }
 
 } // namespace SceneGraph

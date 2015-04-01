@@ -56,6 +56,8 @@ public:
 
   /**
    * Get the complete map of uniforms to property value addresses
+   * (The map is double buffered - it can be retrieved through this interface)
+   *
    * @param[in] bufferIndex The bufferIndex
    * @return the uniform map
    */

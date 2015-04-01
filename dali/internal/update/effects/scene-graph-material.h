@@ -22,7 +22,7 @@
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/double-buffered.h>
+#include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/scene-graph-connection-observers.h>
 #include <dali/internal/update/common/uniform-map.h>
@@ -108,16 +108,22 @@ public: // MaterialDataProvider implementation
    */
   virtual const Samplers& GetSamplers() const;
 
-
 public: // UniformMap::Observer
   /**
    * @copydoc UniformMap::Observer::UniformMappingsChanged
    */
   virtual void UniformMappingsChanged( const UniformMap& mappings );
 
+public: // PropertyOwner implementation
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
+   */
+  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
+
 public: // Property data
   AnimatableProperty<Vector4> mColor;
   AnimatableProperty<Vector4> mBlendColor;
+  DoubleBufferedProperty<int> mFaceCullingMode;
 
 private:
   const Shader* mShader;

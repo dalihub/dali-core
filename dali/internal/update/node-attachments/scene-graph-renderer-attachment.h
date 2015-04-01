@@ -204,8 +204,10 @@ private:
   Geometry* mGeometry; ///< The geometry this renderer uses. (Not owned)
 
   CollectedUniformMap mCollectedUniformMap[2];
-  bool mUniformMapChanged[2]; ///< Records if the uniform map has been altered this frame
   int mRegenerateUniformMap;  ///< 2 if the map should be regenerated, 1 if it should be copied.
+  bool mUniformMapChanged[2]; ///< Records if the uniform map has been altered this frame
+  bool mResendChildPointers;
+
 public: // Properties
 
   AnimatableProperty<int> mDepthIndex; ///< Used only in PrepareRenderInstructions

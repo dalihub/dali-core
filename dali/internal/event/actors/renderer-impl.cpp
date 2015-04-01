@@ -69,7 +69,7 @@ void Renderer::SetMaterial( Material& material )
 
 void Renderer::SetDepthIndex( int depthIndex )
 {
-  SceneGraph::PropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mDepthIndex, &SceneGraph::AnimatableProperty<int>::Bake, depthIndex );
+  SceneGraph::AnimatablePropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mDepthIndex, &SceneGraph::AnimatableProperty<int>::Bake, depthIndex );
 }
 
 int Renderer::GetCurrentDepthIndex() const

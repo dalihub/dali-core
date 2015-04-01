@@ -63,8 +63,6 @@ void Sampler::SetUniformName( const std::string& name )
 
 void Sampler::SetImage( Image& image )
 {
-  // TODO: MESH_REWORK - should probably review this comment
-
   unsigned int resourceId = image.GetResourceId();
 
   // sceneObject is being used in a separate thread; queue a message to set
@@ -73,8 +71,6 @@ void Sampler::SetImage( Image& image )
 
 void Sampler::SetFilterMode( Dali::Sampler::FilterMode minFilter, Dali::Sampler::FilterMode magFilter )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
 }
 
 void Sampler::SetWrapMode( Dali::Sampler::WrapMode uWrap, Dali::Sampler::WrapMode vWrap )

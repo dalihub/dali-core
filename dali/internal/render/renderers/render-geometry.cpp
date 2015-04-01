@@ -103,7 +103,7 @@ void RenderGeometry::DoUpload(
 
   for( unsigned int i=0; i<vertexBuffers.Count(); ++i)
   {
-    PropertyBuffer* vertexBuffer = vertexBuffers[i];
+    const PropertyBuffer* vertexBuffer = vertexBuffers[i];
 
     // @todo MESH_REWORK STATIC_DRAW or DYNAMIC_DRAW depends on property buffer type (static / animated)
     GpuBuffer* vertexGpuBuffer = new GpuBuffer( *context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );

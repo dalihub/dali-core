@@ -21,6 +21,7 @@
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/double-buffered.h>
+#include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
 #include <dali/internal/render/data-providers/sampler-data-provider.h>
@@ -160,15 +161,13 @@ private:
 
   BitmapMetadata mBitmapMetadata[2]; /// The meta data of the associated texture for this frame (Not needed in RenderThread)
 
-  // @todo MESH_REWORK These need to be non-animatable properties (that also copy
-  // new values into old on frame change ) that can be read in RenderThread
-  DoubleBuffered<FilterMode> mMinFilter;    ///< The minify filter
-  DoubleBuffered<FilterMode> mMagFilter;    ///< The magnify filter
-  DoubleBuffered<WrapMode> mUWrapMode;      ///< The horizontal wrap mode
-  DoubleBuffered<WrapMode> mVWrapMode;      ///< The vertical wrap mode
+  DoubleBufferedProperty<int> mMinFilter;    ///< The minify filter
+  DoubleBufferedProperty<int> mMagFilter;    ///< The magnify filter
+  DoubleBufferedProperty<int> mUWrapMode;    ///< The horizontal wrap mode
+  DoubleBufferedProperty<int> mVWrapMode;    ///< The vertical wrap mode
 
   // Note, this is only called from UpdateThread
-  DoubleBuffered<bool>     mAffectsTransparency; ///< If this sampler affects renderer transparency
+  DoubleBufferedProperty<bool>     mAffectsTransparency; ///< If this sampler affects renderer transparency
 };
 
 } // namespace SceneGraph

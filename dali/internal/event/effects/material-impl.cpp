@@ -91,8 +91,10 @@ void Material::RemoveSampler( std::size_t index )
 
 void Material::SetFaceCullingMode( Dali::Material::FaceCullingMode cullingMode )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  if( NULL != mSceneObject )
+  {
+    SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mFaceCullingMode, &SceneGraph::DoubleBufferedProperty<int>::Set, static_cast<int>(cullingMode) );
+  }
 }
 
 void Material::SetBlendMode( BlendingMode::Type mode )
@@ -154,15 +156,15 @@ void Material::GetBlendEquation( BlendingEquation::Type& equationRgb,
 
 void Material::SetBlendColor( const Vector4& color )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  if( mSceneObject )
+  {
+    SceneGraph::AnimatablePropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, color );
+  }
 }
 
 const Vector4& Material::GetBlendColor() const
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  return Color::WHITE;
+  return mSceneObject->mBlendColor[ GetEventThreadServices().GetEventBufferIndex() ];
 }
 
 const SceneGraph::Material* Material::GetMaterialSceneObject() const
@@ -217,12 +219,12 @@ void Material::SetDefaultProperty( Property::Index index,
   {
     case Dali::Material::Property::COLOR:
     {
-      SceneGraph::PropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, propertyValue.Get<Vector4>() );
+      SceneGraph::AnimatablePropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, propertyValue.Get<Vector4>() );
       break;
     }
     case Dali::Material::Property::FACE_CULLING_MODE:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mFaceCullingMode, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
       break;
     }
     case Dali::Material::Property::BLENDING_MODE:
@@ -257,7 +259,7 @@ void Material::SetDefaultProperty( Property::Index index,
     }
     case Dali::Material::Property::BLEND_COLOR:
     {
-      SceneGraph::PropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, propertyValue.Get<Vector4>() );
+      SceneGraph::AnimatablePropertyMessage<Vector4>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendColor, &SceneGraph::AnimatableProperty<Vector4>::Bake, propertyValue.Get<Vector4>() );
       break;
     }
   }
@@ -288,7 +290,10 @@ Property::Value Material::GetDefaultProperty( Property::Index index ) const
     }
     case Dali::Material::Property::FACE_CULLING_MODE:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      if( mSceneObject )
+      {
+        value = mSceneObject->mFaceCullingMode[bufferIndex];
+      }
       break;
     }
     case Dali::Material::Property::BLENDING_MODE:
@@ -407,7 +412,7 @@ const PropertyInputImpl* Material::GetSceneObjectInputProperty( Property::Index 
         }
         case Dali::Material::Property::FACE_CULLING_MODE:
         {
-          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+          property = &mSceneObject->mFaceCullingMode;
           break;
         }
         case Dali::Material::Property::BLENDING_MODE:

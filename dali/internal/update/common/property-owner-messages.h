@@ -23,6 +23,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <string>
 
@@ -37,32 +38,36 @@ class PropertyOwner;
 
 // Property Messages for PropertyOwner
 
-class PropertyMessageBase : public MessageBase
+/**
+ * A base class for property owner property messages.
+ * (For future optimization - see NodeMessageBase & Node.SetActive())
+ */
+class PropertyOwnerMessageBase : public MessageBase
 {
 public:
 
   /**
    * Create a message.
    */
-  PropertyMessageBase();
+  PropertyOwnerMessageBase();
 
   /**
    * Virtual destructor
    */
-  virtual ~PropertyMessageBase();
+  virtual ~PropertyOwnerMessageBase();
 
 private:
 
   // Undefined
-  PropertyMessageBase(const PropertyMessageBase&);
-  PropertyMessageBase& operator=(const PropertyMessageBase& rhs);
+  PropertyOwnerMessageBase(const PropertyOwnerMessageBase&);
+  PropertyOwnerMessageBase& operator=(const PropertyOwnerMessageBase& rhs);
 };
 
 /**
  * Templated message which bakes a property.
  */
 template< typename P >
-class PropertyMessage : public PropertyMessageBase
+class AnimatablePropertyMessage : public PropertyOwnerMessageBase
 {
 public:
 
@@ -72,7 +77,7 @@ public:
    * Create a message.
    * @note The scene object is expected to be const in the thread which sends this message.
    * However it can be modified when Process() is called in a different thread.
-   * @param[in] updateManager The update-manager.
+   * @param[in] eventThreadServices The object used to send messages to the scene graph
    * @param[in] sceneObject The property owner scene object
    * @param[in] property The property to bake.
    * @param[in] member The member function of the object.
@@ -85,16 +90,16 @@ public:
                     typename ParameterType< P >::PassingType value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( PropertyMessage ) );
+    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( AnimatablePropertyMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) PropertyMessage( sceneObject, property, member, value );
+    new (slot) AnimatablePropertyMessage( sceneObject, property, member, value );
   }
 
   /**
    * Virtual destructor
    */
-  virtual ~PropertyMessage()
+  virtual ~AnimatablePropertyMessage()
   {
   }
 
@@ -117,11 +122,11 @@ private:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the property.
    */
-  PropertyMessage( const PropertyOwner* sceneObject,
-                   const AnimatableProperty<P>* property,
-                   MemberFunction member,
-                   typename ParameterType< P >::PassingType value )
-  : PropertyMessageBase(),
+  AnimatablePropertyMessage( const PropertyOwner* sceneObject,
+                             const AnimatableProperty<P>* property,
+                             MemberFunction member,
+                             typename ParameterType< P >::PassingType value )
+  : PropertyOwnerMessageBase(),
     mSceneObject( const_cast< PropertyOwner* >( sceneObject ) ),
     mProperty( const_cast< AnimatableProperty<P>* >( property ) ),
     mMemberFunction( member ),
@@ -141,7 +146,7 @@ private:
  * Templated message which bakes a property.
  */
 template< typename P >
-class PropertyComponentMessage : public PropertyMessageBase
+class AnimatablePropertyComponentMessage : public PropertyOwnerMessageBase
 {
 public:
 
@@ -164,16 +169,16 @@ public:
                     float value )
   {
     // Reserve some memory inside the message queue
-    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( PropertyComponentMessage ) );
+    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( AnimatablePropertyComponentMessage ) );
 
     // Construct message in the message queue memory; note that delete should not be called on the return value
-    new (slot) PropertyComponentMessage( sceneObject, property, member, value );
+    new (slot) AnimatablePropertyComponentMessage( sceneObject, property, member, value );
   }
 
   /**
    * Virtual destructor
    */
-  virtual ~PropertyComponentMessage()
+  virtual ~AnimatablePropertyComponentMessage()
   {
   }
 
@@ -196,11 +201,11 @@ private:
    * @param[in] member The member function of the object.
    * @param[in] value The new value of the X,Y,Z or W component.
   */
-  PropertyComponentMessage( const PropertyOwner* sceneObject,
-                            const AnimatableProperty<P>* property,
-                            MemberFunction member,
-                            float value )
-  : PropertyMessageBase(),
+  AnimatablePropertyComponentMessage( const PropertyOwner* sceneObject,
+                                      const AnimatableProperty<P>* property,
+                                      MemberFunction member,
+                                      float value )
+  : PropertyOwnerMessageBase(),
     mSceneObject( const_cast< PropertyOwner* >( sceneObject ) ),
     mProperty( const_cast< AnimatableProperty<P>* >( property ) ),
     mMemberFunction( member ),
@@ -213,6 +218,85 @@ private:
   AnimatableProperty<P>* mProperty;
   MemberFunction mMemberFunction;
   float mParam;
+};
+
+
+/**
+ * Template class for sending messages to double buffered properties in a PropertyOwner
+ */
+template< typename P >
+class DoubleBufferedPropertyMessage : public PropertyOwnerMessageBase
+{
+public:
+
+  typedef void(DoubleBufferedProperty<P>::*MemberFunction)( BufferIndex, typename ParameterType< P >::PassingType );
+
+  /**
+   * Create a message.
+   * @note The scene object is expected to be const in the thread which sends this message.
+   * However it can be modified when Process() is called in a different thread.
+   * @param[in] eventThreadServices The object used to send messages to the scene graph
+   * @param[in] sceneObject The property owner scene object
+   * @param[in] property The property to set.
+   * @param[in] member The member function of the object.
+   * @param[in] value The new value of the property.
+   */
+  static void Send( EventThreadServices& eventThreadServices,
+                    const PropertyOwner* sceneObject,
+                    const DoubleBufferedProperty<P>* property,
+                    MemberFunction member,
+                    typename ParameterType< P >::PassingType value )
+  {
+    // Reserve some memory inside the message queue
+    unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( DoubleBufferedPropertyMessage ) );
+
+    // Construct message in the message queue memory; note that delete should not be called on the return value
+    new (slot) DoubleBufferedPropertyMessage( sceneObject, property, member, value );
+  }
+
+  /**
+   * Virtual destructor
+   */
+  virtual ~DoubleBufferedPropertyMessage()
+  {
+  }
+
+  /**
+   * @copydoc MessageBase::Process
+   */
+  virtual void Process( BufferIndex updateBufferIndex )
+  {
+    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+  }
+
+private:
+
+  /**
+   * Create a message.
+   * @note The property owner is expected to be const in the thread which sends this message.
+   * However it can be modified when Process() is called in a different thread.
+   * @param[in] sceneObject the property owner scene object
+   * @param[in] property The property to set.
+   * @param[in] member The member function of the object.
+   * @param[in] value The new value of the property.
+   */
+  DoubleBufferedPropertyMessage( const PropertyOwner* sceneObject,
+                                 const DoubleBufferedProperty<P>* property,
+                                 MemberFunction member,
+                                 typename ParameterType< P >::PassingType value )
+  : PropertyOwnerMessageBase(),
+    mSceneObject( const_cast< PropertyOwner* >( sceneObject ) ),
+    mProperty( const_cast< DoubleBufferedProperty<P>* >( property ) ),
+    mMemberFunction( member ),
+    mParam( value )
+  {
+  }
+
+private:
+  PropertyOwner* mSceneObject;
+  DoubleBufferedProperty<P>* mProperty;
+  MemberFunction mMemberFunction;
+  typename ParameterType< P >::HolderType mParam;
 };
 
 

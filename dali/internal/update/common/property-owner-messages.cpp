@@ -29,11 +29,11 @@ namespace SceneGraph
 
 // Messages for a property owner
 
-PropertyMessageBase::PropertyMessageBase()
+PropertyOwnerMessageBase::PropertyOwnerMessageBase()
 {
 }
 
-PropertyMessageBase::~PropertyMessageBase()
+PropertyOwnerMessageBase::~PropertyOwnerMessageBase()
 {
 }
 

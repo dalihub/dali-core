@@ -32,7 +32,8 @@ Sampler::Sampler( const std::string& unitName )
   mMinFilter( Dali::Sampler::DEFAULT ),
   mMagFilter( Dali::Sampler::DEFAULT ),
   mUWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
-  mVWrapMode( Dali::Sampler::CLAMP_TO_EDGE )
+  mVWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
+  mAffectsTransparency( false )
 {
   mTextureId[0] = 0;
   mTextureId[1] = 0;
@@ -78,22 +79,22 @@ Integration::ResourceId Sampler::GetTextureId( BufferIndex bufferIndex ) const
 
 Sampler::FilterMode Sampler::GetMinifyFilterMode( BufferIndex bufferIndex ) const
 {
-  return mMinFilter[bufferIndex];
+  return static_cast<Sampler::FilterMode>(mMinFilter[bufferIndex]);
 }
 
 Sampler::FilterMode Sampler::GetMagnifyFilterMode( BufferIndex bufferIndex ) const
 {
-  return mMagFilter[bufferIndex];
+  return static_cast<Sampler::FilterMode>(mMagFilter[bufferIndex]);
 }
 
 Sampler::WrapMode Sampler::GetUWrapMode( BufferIndex bufferIndex ) const
 {
-  return mUWrapMode[bufferIndex];
+  return static_cast<Sampler::WrapMode>(mUWrapMode[bufferIndex]);
 }
 
 Sampler::WrapMode Sampler::GetVWrapMode( BufferIndex bufferIndex ) const
 {
-  return mVWrapMode[bufferIndex];
+  return static_cast<Sampler::WrapMode>(mVWrapMode[bufferIndex]);
 }
 
 bool Sampler::AffectsTransparency( BufferIndex bufferIndex ) const

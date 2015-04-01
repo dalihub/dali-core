@@ -39,7 +39,7 @@ class GeometryDataProvider
 {
 public:
   typedef Dali::Geometry::GeometryType GeometryType;
-  typedef OwnerContainer< PropertyBuffer* > VertexBuffers;
+  typedef Dali::Vector< const PropertyBuffer* > VertexBuffers;
 
   /**
    * Constructor. Nothing to do as a pure interface.
@@ -48,12 +48,14 @@ public:
 
 public: // GeometryDataProvider
   /**
+   * @todo MESH_REWORK FIX ME Don't get objects through this interface. Send via message instead
    * Get the vertex buffers of the geometry
    * @return A const reference to the vertex buffers
    */
   virtual const VertexBuffers& GetVertexBuffers() const = 0;
 
   /**
+   * @todo MESH_REWORK FIX ME Don't get objects through this interface. Send via message instead
    * Get the index buffer of the geometry
    * @return A const reference to the index buffer
    */
@@ -69,7 +71,7 @@ public: // GeometryDataProvider
    * Returns true if this geometry requires depth testing, e.g. if it is
    * a set of vertices with z != 0
    */
-  virtual bool GetRequiresDepthTest( BufferIndex bufferIndex ) const = 0;
+  virtual bool GetRequiresDepthTesting( BufferIndex bufferIndex ) const = 0;
 
 protected:
 

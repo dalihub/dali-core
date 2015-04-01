@@ -66,8 +66,12 @@ RendererAttachment::RendererAttachment()
   mMaterial(NULL),
   mGeometry(NULL),
   mRegenerateUniformMap(REGENERATE_UNIFORM_MAP),
+  mResendChildPointers(false),
   mDepthIndex(0)
 {
+  mUniformMapChanged[0]=false;
+  mUniformMapChanged[1]=false;
+
   // Observe our own PropertyOwner's uniform map
   AddUniformMapObserver( *this );
 }
@@ -239,6 +243,13 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
 
     mRegenerateUniformMap--;
   }
+
+  if( mResendChildPointers )
+  {
+    //@todo MESH_REWORK If the children have changed, then supply the NewRenderer with the
+    // new children. (Rather than accessing through the DataProvider interface)
+    mResendChildPointers = false;
+  }
 }
 
 bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
@@ -355,6 +366,9 @@ void RendererAttachment::ConnectionsChanged( PropertyOwner& object )
   // One of our child objects has changed it's connections. Ensure the uniform
   // map gets regenerated during PrepareRender
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
+
+  // Ensure the child object pointers get re-sent to the renderer
+  mResendChildPointers = true;
 }
 
 void RendererAttachment::ConnectedUniformMapChanged()

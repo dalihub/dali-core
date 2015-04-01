@@ -21,6 +21,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>
+#include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/property-boolean.h>
 #include <dali/internal/update/common/uniform-map.h>
@@ -57,19 +58,19 @@ public:
   /**
    * Add a property buffer to be used as a vertex buffer
    */
-  void AddVertexBuffer( PropertyBuffer* vertexBuffer );
+  void AddVertexBuffer( const PropertyBuffer* vertexBuffer );
 
   /**
    * Remove a property buffer to be used as a vertex buffer
    * @param[in] vertexBuffer the associated vertex buffer to remove
    */
-  void RemoveVertexBuffer( PropertyBuffer* vertexBuffer );
+  void RemoveVertexBuffer( const PropertyBuffer* vertexBuffer );
 
   /**
    * Set the buffer to be used as a source of indices for the geometry
    * @param[in] indexBuffer the Property buffer describing the indexes for Line, Triangle tyes.
    */
-  void SetIndexBuffer( PropertyBuffer* indexBuffer );
+  void SetIndexBuffer( const PropertyBuffer* indexBuffer );
 
   /**
    * Clear the index buffer if it is no longer required, e.g. if changing geometry type
@@ -136,24 +137,29 @@ public: // GeometryDataProvider
    * Returns true if this geometry requires depth testing, e.g. if it is
    * a set of vertices with z != 0
    */
-  virtual bool GetRequiresDepthTest( BufferIndex bufferIndex ) const;
+  virtual bool GetRequiresDepthTesting( BufferIndex bufferIndex ) const;
+
+protected: // From PropertyOwner
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
+   */
+  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
 private:
   VertexBuffers mVertexBuffers; ///< The vertex buffers
-  OwnerPointer<PropertyBuffer> mIndexBuffer;  ///< The index buffer if required
+  const PropertyBuffer* mIndexBuffer;  ///< The index buffer if required
   ConnectionObservers mConnectionObservers;
 
 public: // Properties
   AnimatableProperty<Vector3>  mCenter;
   AnimatableProperty<Vector3>  mHalfExtents;
-
-  AnimatableProperty<int>      mGeometryType;   ///< The type of geometry (tris/lines etc)
-  PropertyBoolean              mRequiresDepthTest;
+  DoubleBufferedProperty<int>  mGeometryType;
+  DoubleBufferedProperty<bool> mRequiresDepthTest;
 };
 
-inline void AddVertexBufferMessage( EventThreadServices& eventThreadServices , const Geometry& geometry, PropertyBuffer& vertexBuffer )
+inline void AddVertexBufferMessage( EventThreadServices& eventThreadServices , const Geometry& geometry, const PropertyBuffer& vertexBuffer )
 {
-  typedef MessageValue1< Geometry, OwnerPointer<PropertyBuffer> > LocalType;
+  typedef MessageValue1< Geometry, const PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -162,9 +168,9 @@ inline void AddVertexBufferMessage( EventThreadServices& eventThreadServices , c
   new (slot) LocalType( &geometry, &Geometry::AddVertexBuffer, &vertexBuffer );
 }
 
-inline void RemoveVertexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, PropertyBuffer& vertexBuffer )
+inline void RemoveVertexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, const PropertyBuffer& vertexBuffer )
 {
-  typedef MessageValue1< Geometry, PropertyBuffer* > LocalType;
+  typedef MessageValue1< Geometry, const PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -173,9 +179,9 @@ inline void RemoveVertexBufferMessage( EventThreadServices& eventThreadServices,
   new (slot) LocalType( &geometry, &Geometry::RemoveVertexBuffer, &vertexBuffer );
 }
 
-inline void SetIndexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, PropertyBuffer& indexBuffer )
+inline void SetIndexBufferMessage( EventThreadServices& eventThreadServices, const Geometry& geometry, const PropertyBuffer& indexBuffer )
 {
-  typedef MessageValue1< Geometry, OwnerPointer< PropertyBuffer > > LocalType;
+  typedef MessageValue1< Geometry, const PropertyBuffer* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

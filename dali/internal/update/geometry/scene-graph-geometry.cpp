@@ -47,24 +47,26 @@ Geometry::~Geometry()
   // could remove self from own uniform map observer, but it's about to be destroyed.
 }
 
-void Geometry::AddVertexBuffer( PropertyBuffer* vertexBuffer )
+void Geometry::AddVertexBuffer( const PropertyBuffer* vertexBuffer )
 {
   mVertexBuffers.PushBack( vertexBuffer );
-  vertexBuffer->AddUniformMapObserver(*this);
+  PropertyBuffer* theVertexBuffer = const_cast<PropertyBuffer*>(vertexBuffer);
+  theVertexBuffer->AddUniformMapObserver(*this);
   mConnectionObservers.ConnectionsChanged(*this);
 }
 
-void Geometry::RemoveVertexBuffer( PropertyBuffer* vertexBuffer )
+void Geometry::RemoveVertexBuffer( const PropertyBuffer* vertexBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != vertexBuffer );
 
   // Find the object and destroy it
-  for ( OwnerContainer< PropertyBuffer* >::Iterator iter = mVertexBuffers.Begin(); iter != mVertexBuffers.End(); ++iter )
+  for ( VertexBuffers::Iterator iter = mVertexBuffers.Begin(); iter != mVertexBuffers.End(); ++iter )
   {
-    PropertyBuffer* current = *iter;
+    const PropertyBuffer* current = *iter;
     if ( current == vertexBuffer )
     {
-      vertexBuffer->RemoveUniformMapObserver(*this);
+      PropertyBuffer* theVertexBuffer = const_cast<PropertyBuffer*>(vertexBuffer);
+      theVertexBuffer->RemoveUniformMapObserver(*this);
       mVertexBuffers.Erase( iter );
       mConnectionObservers.ConnectionsChanged(*this);
       return;
@@ -74,9 +76,9 @@ void Geometry::RemoveVertexBuffer( PropertyBuffer* vertexBuffer )
   DALI_ASSERT_DEBUG(false);
 }
 
-void Geometry::SetIndexBuffer( PropertyBuffer* indexBuffer )
+void Geometry::SetIndexBuffer( const PropertyBuffer* indexBuffer )
 {
-  if( mIndexBuffer.Get() != indexBuffer )
+  if( mIndexBuffer != indexBuffer )
   {
     mIndexBuffer = indexBuffer;
     mConnectionObservers.ConnectionsChanged(*this);
@@ -86,7 +88,7 @@ void Geometry::SetIndexBuffer( PropertyBuffer* indexBuffer )
 void Geometry::ClearIndexBuffer()
 {
   // @todo Actually delete, or put on Discard Queue and tell Renderer in render thread?
-  mIndexBuffer.Reset();
+  mIndexBuffer = 0;
   mConnectionObservers.ConnectionsChanged(*this);
 }
 
@@ -102,7 +104,7 @@ const GeometryDataProvider::VertexBuffers& Geometry::GetVertexBuffers() const
 
 const PropertyBuffer* Geometry::GetIndexBuffer() const
 {
-  return mIndexBuffer.Get();
+  return mIndexBuffer;
 }
 
 Geometry::GeometryType Geometry::GetGeometryType( BufferIndex bufferIndex) const
@@ -111,9 +113,20 @@ Geometry::GeometryType Geometry::GetGeometryType( BufferIndex bufferIndex) const
   return static_cast< GeometryDataProvider::GeometryType > ( geometryType );
 }
 
-bool Geometry::GetRequiresDepthTest( BufferIndex bufferIndex ) const
+bool Geometry::GetRequiresDepthTesting( BufferIndex bufferIndex ) const
 {
   return mRequiresDepthTest.GetBoolean( bufferIndex );
+}
+
+void Geometry::ResetDefaultProperties( BufferIndex updateBufferIndex )
+{
+  // Reset the animated properties
+  mCenter.ResetToBaseValue( updateBufferIndex );
+  mHalfExtents.ResetToBaseValue( updateBufferIndex );
+
+  // Age the double buffered properties
+  mGeometryType.CopyPrevious(updateBufferIndex);
+  mRequiresDepthTest.CopyPrevious(updateBufferIndex);
 }
 
 void Geometry::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )

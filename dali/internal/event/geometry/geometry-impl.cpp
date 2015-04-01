@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
+#include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -57,6 +58,11 @@ std::size_t Geometry::AddVertexBuffer( PropertyBuffer& vertexBuffer )
   PropertyBufferConnector connector;
   connector.Set( vertexBuffer, OnStage() );
   mVertexBufferConnectors.push_back( connector );
+
+  const SceneGraph::PropertyBuffer& sceneGraphPropertyBuffer = dynamic_cast<const SceneGraph::PropertyBuffer&>( *vertexBuffer.GetSceneObject() );
+
+  SceneGraph::AddVertexBufferMessage( GetEventThreadServices(), *mSceneObject, sceneGraphPropertyBuffer );
+
   return mVertexBufferConnectors.size() - 1u;
 }
 
@@ -73,30 +79,40 @@ void Geometry::RemoveVertexBuffer( std::size_t index )
 void Geometry::SetIndexBuffer( PropertyBuffer& indexBuffer )
 {
   mIndexBufferConnector.Set( indexBuffer, OnStage() );
+
+  const SceneGraph::PropertyBuffer& sceneGraphPropertyBuffer = dynamic_cast<const SceneGraph::PropertyBuffer&>( *indexBuffer.GetSceneObject() );
+
+  SceneGraph::SetIndexBufferMessage( GetEventThreadServices(), *mSceneObject, sceneGraphPropertyBuffer );
 }
 
 void Geometry::SetGeometryType( Dali::Geometry::GeometryType geometryType )
 {
-  //TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "MESH REWORK" );
+  if( NULL != mSceneObject )
+  {
+    SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mGeometryType, &SceneGraph::DoubleBufferedProperty<int>::Set, static_cast<int>(geometryType) );
+  }
 }
 
 Dali::Geometry::GeometryType Geometry::GetGeometryType() const
 {
-  //TODO: MESH_REWORK
-  return Dali::Geometry::TRIANGLES;
+  return mSceneObject->GetGeometryType(GetEventThreadServices().GetEventBufferIndex());
 }
 
 void Geometry::SetRequiresDepthTesting( bool requiresDepthTest )
 {
-  //TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "MESH REWORK" );
+  if( NULL != mSceneObject )
+  {
+    SceneGraph::DoubleBufferedPropertyMessage<bool>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mRequiresDepthTest, &SceneGraph::DoubleBufferedProperty<bool>::Set, static_cast<int>(requiresDepthTest) );
+  }
 }
 
 bool Geometry::GetRequiresDepthTesting() const
 {
-  //TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "MESH REWORK" );
+  if( mSceneObject )
+  {
+    // mSceneObject is being used in a separate thread; copy the value from the previous update
+    return mSceneObject->GetRequiresDepthTesting(GetEventThreadServices().GetEventBufferIndex());
+  }
   return false;
 }
 
@@ -152,24 +168,24 @@ void Geometry::SetDefaultProperty( Property::Index index,
   {
     case Dali::Geometry::Property::GEOMETRY_TYPE :
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mGeometryType, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
       break;
     }
     case Dali::Geometry::Property::GEOMETRY_CENTER :
     {
-      SceneGraph::PropertyMessage<Vector3>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mCenter, &SceneGraph::AnimatableProperty<Vector3>::Bake, propertyValue.Get<Vector3>() );
+      SceneGraph::AnimatablePropertyMessage<Vector3>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mCenter, &SceneGraph::AnimatableProperty<Vector3>::Bake, propertyValue.Get<Vector3>() );
       break;
     }
 
     case Dali::Geometry::Property::GEOMETRY_HALF_EXTENTS :
     {
-      SceneGraph::PropertyMessage<Vector3>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mHalfExtents, &SceneGraph::AnimatableProperty<Vector3>::Bake, propertyValue.Get<Vector3>() );
+      SceneGraph::AnimatablePropertyMessage<Vector3>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mHalfExtents, &SceneGraph::AnimatableProperty<Vector3>::Bake, propertyValue.Get<Vector3>() );
       break;
     }
 
     case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      SceneGraph::DoubleBufferedPropertyMessage<bool>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mRequiresDepthTest, &SceneGraph::DoubleBufferedProperty<bool>::Set, propertyValue.Get<bool>() );
       break;
     }
   }
@@ -191,7 +207,10 @@ Property::Value Geometry::GetDefaultProperty( Property::Index index ) const
   {
     case Dali::Geometry::Property::GEOMETRY_TYPE :
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      if( mSceneObject )
+      {
+        value = mSceneObject->mGeometryType[bufferIndex];
+      }
       break;
     }
     case Dali::Geometry::Property::GEOMETRY_CENTER :
@@ -214,7 +233,10 @@ Property::Value Geometry::GetDefaultProperty( Property::Index index ) const
 
     case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      if( mSceneObject )
+      {
+        value = mSceneObject->mRequiresDepthTest[bufferIndex];
+      }
       break;
     }
   }
@@ -288,7 +310,7 @@ const PropertyInputImpl* Geometry::GetSceneObjectInputProperty( Property::Index 
       {
         case Dali::Geometry::Property::GEOMETRY_TYPE :
         {
-          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          property = &mSceneObject->mGeometryType;
           break;
         }
         case Dali::Geometry::Property::GEOMETRY_CENTER :
@@ -303,7 +325,7 @@ const PropertyInputImpl* Geometry::GetSceneObjectInputProperty( Property::Index 
         }
         case Dali::Geometry::Property::REQUIRES_DEPTH_TEST :
         {
-          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          property = &mSceneObject->mRequiresDepthTest;
           break;
         }
         default:

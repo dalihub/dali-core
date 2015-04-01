@@ -41,12 +41,15 @@ public:
   }
 
   /**
+   * @todo MESH_REWORK FIX ME Don't get objects through this interface. Send via message instead
+   *
    * Returns the shader
    * @return The shader
    */
   virtual Shader* GetShader() const = 0;
 
   /**
+   * @todo MESH_REWORK FIX ME Don't get objects through this interface. Send via message instead
    * Returns the list of samplers that this material provides
    * @return The list of samplers
    */
