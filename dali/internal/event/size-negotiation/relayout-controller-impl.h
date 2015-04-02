@@ -105,6 +105,13 @@ public:
    */
   void SetEnabled( bool enabled );
 
+  /**
+   * @brief Return true if the relayout controller is currently performing a relayout
+   *
+   * @return Return true if the relayout controller is currently performing a relayout
+   */
+  bool IsPerformingRelayout() const;
+
 public: // CALLBACKS
 
   /**
@@ -190,6 +197,7 @@ private:
   bool mRelayoutConnection : 1;         ///< Whether EventProcessingFinishedSignal signal is connected.
   bool mRelayoutFlag : 1;               ///< Relayout flag to avoid unnecessary calls
   bool mEnabled : 1;                    ///< Initially disabled. Must be enabled at some point.
+  bool mPerformingRelayout : 1;         ///< The relayout controller is currently performing a relayout
 
 };
 

@@ -533,27 +533,15 @@ public:
   bool IsOrientationInherited() const;
 
   /**
-   * @brief Defines how a child actors size is affected by its parents size.
-   * @param[in] mode The size relative to parent mode to use.
-   */
-  void SetSizeMode( SizeMode mode );
-
-  /**
-   * Query how the child actors size is affected by its parents size.
-   * @return The size relative to parent mode in use.
-   */
-  SizeMode GetSizeMode() const;
-
-  /**
    * Sets the factor of the parents size used for the child actor.
-   * Note: Only used if SizeMode is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
+   * Note: Only used if ResizePolicy is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
    * @param[in] factor The vector to multiply the parents size by to get the childs size.
    */
   void SetSizeModeFactor( const Vector3& factor );
 
   /**
    * Gets the factor of the parents size used for the child actor.
-   * Note: Only used if SizeMode is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
+   * Note: Only used if ResizePolicy is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
    * @return The vector being used to multiply the parents size by to get the childs size.
    */
   const Vector3& GetSizeModeFactor() const;
@@ -1186,12 +1174,16 @@ public:
   float CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension );
 
   /**
-   * @copydoc Dali::Actor::SetPreferredSize
+   * @brief Set the preferred size for size negotiation
+   *
+   * @param[in] size The preferred size to set
    */
   void SetPreferredSize( const Vector2& size );
 
   /**
-   * @copydoc Dali::Actor::GetPreferredSize
+   * @brief Return the preferred size used for size negotiation
+   *
+   * @return Return the preferred size
    */
   Vector2 GetPreferredSize() const;
 

@@ -117,7 +117,8 @@ RelayoutController::RelayoutController()
   mRelayoutStack( new MemoryPoolRelayoutContainer( mRelayoutInfoAllocator ) ),
   mRelayoutConnection( false ),
   mRelayoutFlag( false ),
-  mEnabled( false )
+  mEnabled( false ),
+  mPerformingRelayout( false )
 {
   // Make space for 32 controls to avoid having to copy construct a lot in the beginning
   mRelayoutStack->Reserve( 32 );
@@ -413,6 +414,8 @@ void RelayoutController::Relayout()
   // Only do something when requested
   if( mRelayoutFlag )
   {
+    mPerformingRelayout = true;
+
     // Clear the flag as we're now doing the relayout
     mRelayoutFlag = false;
 
@@ -469,6 +472,8 @@ void RelayoutController::Relayout()
 
       PRINT_HIERARCHY;
     }
+
+    mPerformingRelayout = false;
   }
   // should not disconnect the signal as that causes some control size negotiations to not work correctly
   // this algorithm needs more optimization as well
@@ -477,6 +482,11 @@ void RelayoutController::Relayout()
 void RelayoutController::SetEnabled( bool enabled )
 {
   mEnabled = enabled;
+}
+
+bool RelayoutController::IsPerformingRelayout() const
+{
+  return mPerformingRelayout;
 }
 
 void RelayoutController::FindAndZero( const RawActorList& list, const Dali::RefObject* object )

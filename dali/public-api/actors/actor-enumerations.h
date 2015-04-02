@@ -47,16 +47,6 @@ enum PositionInheritanceMode
 };
 
 /**
- * @brief Actor size relative to parent mode.
- */
-enum SizeMode
-{
-  USE_OWN_SIZE,                            ///< The mode is bypassed. The size Vector3 will be used as normal.
-  SIZE_RELATIVE_TO_PARENT,                 ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ).
-  SIZE_FIXED_OFFSET_FROM_PARENT            ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ).
-};
-
-/**
  * @brief Dimensions for layout
  */
 enum Dimension
@@ -75,10 +65,12 @@ enum ResizePolicy
 {
   FIXED,                 ///< Size is fixed as set by SetSize
   USE_NATURAL_SIZE,      ///< Size is to use the actor's natural size
-  USE_ASSIGNED_SIZE,     ///< The size will be assigned to the actor
   FILL_TO_PARENT,        ///< Size is to fill up to the actor's parent's bounds. Aspect ratio not maintained.
+  SIZE_RELATIVE_TO_PARENT,        ///< The actors size will be ( ParentSize * SizeRelativeToParentFactor ).
+  SIZE_FIXED_OFFSET_FROM_PARENT,  ///< The actors size will be ( ParentSize + SizeRelativeToParentFactor ).
   FIT_TO_CHILDREN,       ///< Size will adjust to wrap around all children
-  DIMENSION_DEPENDENCY   ///< One dimension is dependent on the other
+  DIMENSION_DEPENDENCY,  ///< One dimension is dependent on the other
+  USE_ASSIGNED_SIZE      ///< The size will be assigned to the actor
 };
 
 /**

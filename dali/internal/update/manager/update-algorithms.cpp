@@ -174,8 +174,7 @@ inline void UpdateRootNodeTransformValues( Layer& rootNode, int nodeDirtyFlags, 
 
 /**
  * Updates transform values for the given node if the transform flag is dirty.
- * This includes applying a new size should the SizeMode require it.
- * Note that this will cause the size dirty flag to be set. This is why we pass
+  * Note that this will cause the size dirty flag to be set. This is why we pass
  * the dirty flags in by reference.
  * @param[in]     node The node to update
  * @param[in,out] nodeDirtyFlags A reference to the dirty flags, these may be modified by this function

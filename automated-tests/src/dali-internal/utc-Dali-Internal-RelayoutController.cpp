@@ -456,7 +456,7 @@ int UtcDaliRelayoutController_Relayout_Dependency(void)
 
   // Add a child
   Actor child = NewRelayoutActor( true, true, FILL_TO_PARENT, FIXED );
-  child.SetDimensionDependency( HEIGHT, WIDTH );
+  child.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
   parent.Add( child );
 
   // Run the test

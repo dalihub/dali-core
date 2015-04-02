@@ -171,7 +171,6 @@ void ImageActor::ClearPixelArea()
     {
       mInternalSetSize = true;
       SetSize( image->GetNaturalSize() );
-      SetPreferredSize( GetTargetSize().GetVectorXY() );
       mInternalSetSize = false;
     }
   }
@@ -227,7 +226,6 @@ void ImageActor::SetNaturalSize()
   {
     mInternalSetSize = true;
     SetSize( CalculateNaturalSize() );
-    SetPreferredSize( GetTargetSize().GetVectorXY() );
     mInternalSetSize = false;
   }
 }
