@@ -527,15 +527,21 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
       break;
     }
 
-    case Property::FLOAT:
-    {
-      newProperty = new AnimatableProperty<float>( propertyValue.Get<float>() );
-      break;
-    }
-
     case Property::INTEGER:
     {
       newProperty = new AnimatableProperty<int>( propertyValue.Get<int>() );
+      break;
+    }
+
+    case Property::UNSIGNED_INTEGER:
+    {
+      newProperty = new AnimatableProperty<unsigned int>( propertyValue.Get<unsigned int>() );
+      break;
+    }
+
+    case Property::FLOAT:
+    {
+      newProperty = new AnimatableProperty<float>( propertyValue.Get<float>() );
       break;
     }
 
@@ -575,7 +581,6 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
       break;
     }
 
-    case Property::UNSIGNED_INTEGER:
     case Property::RECTANGLE:
     case Property::STRING:
     case Property::ARRAY:
@@ -789,18 +794,27 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
         break;
       }
 
-      case Property::FLOAT:
+      case Property::INTEGER:
       {
-        const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         value = (*property)[ bufferIndex ];
         break;
       }
 
-      case Property::INTEGER:
+      case Property::UNSIGNED_INTEGER:
       {
-        const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry->GetSceneGraphProperty() );
+        const AnimatableProperty<unsigned int>* property = dynamic_cast< const AnimatableProperty<unsigned int>* >( entry->GetSceneGraphProperty() );
+        DALI_ASSERT_DEBUG( NULL != property );
+
+        value = (*property)[ bufferIndex ];
+        break;
+      }
+
+      case Property::FLOAT:
+      {
+        const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
         value = (*property)[ bufferIndex ];
@@ -886,16 +900,6 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
       break;
     }
 
-    case Property::FLOAT:
-    {
-      const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<float>( GetEventThreadServices(), *property, value.Get<float>() );
-      break;
-    }
-
     case Property::INTEGER:
     {
       const AnimatableProperty<int>* property = dynamic_cast< const AnimatableProperty<int>* >( entry.GetSceneGraphProperty() );
@@ -903,6 +907,26 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
 
       // property is being used in a separate thread; queue a message to set the property
       BakeMessage<int>( GetEventThreadServices(), *property, value.Get<int>() );
+      break;
+    }
+
+    case Property::UNSIGNED_INTEGER:
+    {
+      const AnimatableProperty<unsigned int>* property = dynamic_cast< const AnimatableProperty<unsigned int>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<unsigned int>( GetEventThreadServices(), *property, value.Get<unsigned int>() );
+      break;
+    }
+
+    case Property::FLOAT:
+    {
+      const AnimatableProperty<float>* property = dynamic_cast< const AnimatableProperty<float>* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      BakeMessage<float>( GetEventThreadServices(), *property, value.Get<float>() );
       break;
     }
 

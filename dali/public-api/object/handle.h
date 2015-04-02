@@ -213,6 +213,7 @@ public:
    *       - Property::BOOLEAN
    *       - Property::FLOAT
    *       - Property::INTEGER
+   *       - Property::UNSIGNED_INTEGER
    *       - Property::VECTOR2
    *       - Property::VECTOR3
    *       - Property::VECTOR4
@@ -235,6 +236,7 @@ public:
    *       - Property::BOOLEAN
    *       - Property::FLOAT
    *       - Property::INTEGER
+   *       - Property::UNSIGNED_INTEGER
    *       - Property::VECTOR2
    *       - Property::VECTOR3
    *       - Property::VECTOR4

@@ -48,11 +48,14 @@ void KeyFrames::CreateKeyFramesSpec(Property::Type type)
     case Property::BOOLEAN:
       mKeyFrames = Internal::KeyFrameBoolean::New();
       break;
-    case Property::FLOAT:
-      mKeyFrames = Internal::KeyFrameNumber::New();
-      break;
     case Property::INTEGER:
       mKeyFrames = Internal::KeyFrameInteger::New();
+      break;
+    case Property::UNSIGNED_INTEGER:
+      mKeyFrames = Internal::KeyFrameUnsignedInteger::New();
+      break;
+    case Property::FLOAT:
+      mKeyFrames = Internal::KeyFrameNumber::New();
       break;
     case Property::VECTOR2:
       mKeyFrames = Internal::KeyFrameVector2::New();
@@ -97,16 +100,22 @@ void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)
       kf->AddKeyFrame(time, value.Get<bool>(), alpha);
       break;
     }
-    case Property::FLOAT:
-    {
-      Internal::KeyFrameNumber* kf = static_cast<Internal::KeyFrameNumber*>(mKeyFrames.Get());
-      kf->AddKeyFrame(time, value.Get<float>(), alpha);
-      break;
-    }
     case Property::INTEGER:
     {
       Internal::KeyFrameInteger* kf = static_cast<Internal::KeyFrameInteger*>(mKeyFrames.Get());
       kf->AddKeyFrame(time, value.Get<int>(), alpha);
+      break;
+    }
+    case Property::UNSIGNED_INTEGER:
+    {
+      Internal::KeyFrameUnsignedInteger* kf = static_cast<Internal::KeyFrameUnsignedInteger*>(mKeyFrames.Get());
+      kf->AddKeyFrame(time, value.Get<unsigned int>(), alpha);
+      break;
+    }
+    case Property::FLOAT:
+    {
+      Internal::KeyFrameNumber* kf = static_cast<Internal::KeyFrameNumber*>(mKeyFrames.Get());
+      kf->AddKeyFrame(time, value.Get<float>(), alpha);
       break;
     }
     case Property::VECTOR2:
@@ -146,5 +155,3 @@ KeyFrameSpec* KeyFrames::GetKeyFramesBase() const
 
 } // Internal
 } // Dali
-
-

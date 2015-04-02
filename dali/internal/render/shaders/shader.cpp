@@ -351,14 +351,24 @@ void Shader::SetUniforms( Context& context,
         // switch based on property type to use correct GL uniform setter
         switch ( property.GetType() )
         {
-          case Property::FLOAT :
+          case Property::BOOLEAN :
           {
-            program.SetUniform1f( loc, property.GetFloat( bufferIndex ) );
+            program.SetUniform1i( loc, property.GetBoolean( bufferIndex ) );
             break;
           }
           case Property::INTEGER :
           {
             program.SetUniform1i( loc, property.GetInteger( bufferIndex ) );
+            break;
+          }
+          case Property::UNSIGNED_INTEGER :
+          {
+            program.SetUniform1i( loc, property.GetUnsignedInteger( bufferIndex ) );
+            break;
+          }
+          case Property::FLOAT :
+          {
+            program.SetUniform1f( loc, property.GetFloat( bufferIndex ) );
             break;
           }
           case Property::VECTOR2 :
@@ -450,9 +460,15 @@ void Shader::SetUniforms( Context& context,
             break;
           }
 
-          default :
+          case Property::NONE:
+          case Property::ROTATION:
+          case Property::STRING:
+          case Property::RECTANGLE:
+          case Property::MAP:
+          case Property::ARRAY:
+          case Property::TYPE_COUNT:
           {
-            // Only float and Vector properties are passed as uniforms; other types are ignored.
+            DALI_ASSERT_ALWAYS( 0 && "Invalid property type for a uniform" );
             break;
           }
         }
