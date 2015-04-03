@@ -44,8 +44,7 @@ namespace Internal
   DALI_COMPILE_TIME_ASSERT( ( Toolkit::objectType::Property::enumIndex - Toolkit::objectType::PROPERTY_START_INDEX ) == count );
 
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectType, text, valueType, enumIndex) \
-  AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, Toolkit::objectType::AnimatableProperty::enumIndex, Property::valueType ); \
-  DALI_COMPILE_TIME_ASSERT( ( Toolkit::objectType::AnimatableProperty::enumIndex - Toolkit::objectType::ANIMATABLE_PROPERTY_START_INDEX ) == count );
+  AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, Toolkit::objectType::Property::enumIndex, Property::valueType );
 
 #define DALI_SIGNAL_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectType, text, textVariable ) \
   const char* const textVariable = text; \

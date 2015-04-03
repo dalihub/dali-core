@@ -61,6 +61,7 @@ class ImageFactory;
 class ShaderFactory;
 class TouchResampler;
 class EmojiFactory;
+class RelayoutController;
 
 namespace SceneGraph
 {
@@ -272,6 +273,12 @@ private:  // for use by ThreadLocalStorage
    */
   EmojiFactory& GetEmojiFactory();
 
+  /**
+   * Return the relayout controller
+   * @Return Return a reference to the relayout controller
+   */
+  RelayoutController& GetRelayoutController();
+
 private:
 
   /**
@@ -307,6 +314,7 @@ private:
   ResourceManager*                          mResourceManager;             ///< Asynchronous Resource Loading
   TouchResampler*                           mTouchResampler;              ///< Resamples touches to correct frame rate.
   EmojiFactory*                             mEmojiFactory;                ///< Emoji resource factory.
+  IntrusivePtr< RelayoutController >        mRelayoutController;          ///< Size negotiation relayout controller
 
   bool                                      mIsActive         : 1;        ///< Whether Core is active or suspended
   bool                                      mProcessingEvent  : 1;        ///< True during ProcessEvents()

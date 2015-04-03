@@ -334,6 +334,15 @@ protected:
    */
   AnimatablePropertyMetadata* FindAnimatableProperty( Property::Index index ) const;
 
+  /**
+   * Helper to register a scene-graph property
+   * @param [in] name The name of the property.
+   * @param [in] index The index of the property
+   * @param [in] value The value of the property.
+   * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
+   */
+  Property::Index RegisterSceneGraphProperty(const std::string& name, Property::Index index, const Property::Value& propertyValue) const;
+
 private: // Default property extensions for derived classes
 
   /**
@@ -473,15 +482,6 @@ private:
    * @param [in] value The new value of the property.
    */
   virtual void SetSceneGraphProperty( Property::Index index, const PropertyMetadata& entry, const Property::Value& value );
-
-  /**
-   * Helper to register a scene-graph property
-   * @param [in] name The name of the property.
-   * @param [in] index The index of the property
-   * @param [in] value The value of the property.
-   * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
-   */
-  Property::Index RegisterSceneGraphProperty(const std::string& name, Property::Index index, const Property::Value& propertyValue) const;
 
 protected:
   /**

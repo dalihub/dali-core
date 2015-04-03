@@ -30,18 +30,7 @@
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
-
-#include <dali/public-api/dynamics/dynamics-body.h>
-#include <dali/public-api/dynamics/dynamics-joint.h>
-#include <dali/public-api/dynamics/dynamics-body-config.h>
-
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
-#include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
-#include <dali/internal/event/dynamics/dynamics-body-impl.h>
-#include <dali/internal/event/dynamics/dynamics-joint-impl.h>
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#endif
+#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 namespace Dali
 {
@@ -183,27 +172,55 @@ Vector3 Actor::GetCurrentAnchorPoint() const
 
 void Actor::SetSize(float width, float height)
 {
-  GetImplementation(*this).SetSize(width, height);
+  if( IsRelayoutEnabled() )
+  {
+    GetImplementation(*this).SetPreferredSize( Vector2( width, height ) );
+  }
+  else
+  {
+    GetImplementation(*this).SetSize(width, height);
+  }
 }
 
 void Actor::SetSize(float width, float height, float depth)
 {
-  GetImplementation(*this).SetSize(width, height, depth);
+  if( IsRelayoutEnabled() )
+  {
+    GetImplementation(*this).SetPreferredSize( Vector2( width, height ) );
+  }
+  else
+  {
+    GetImplementation(*this).SetSize(width, height, depth);
+  }
 }
 
 void Actor::SetSize(const Vector2& size)
 {
-  GetImplementation(*this).SetSize(size);
+  if( IsRelayoutEnabled() )
+  {
+    GetImplementation(*this).SetPreferredSize( size );
+  }
+  else
+  {
+    GetImplementation(*this).SetSize( size );
+  }
 }
 
 void Actor::SetSize(const Vector3& size)
 {
-  GetImplementation(*this).SetSize(size);
+  if( IsRelayoutEnabled() )
+  {
+    GetImplementation(*this).SetPreferredSize( size.GetVectorXY() );
+  }
+  else
+  {
+    GetImplementation(*this).SetSize( size );
+  }
 }
 
-Vector3 Actor::GetSize() const
+Vector3 Actor::GetTargetSize() const
 {
-  return GetImplementation(*this).GetSize();
+  return GetImplementation(*this).GetTargetSize();
 }
 
 Vector3 Actor::GetCurrentSize() const
@@ -361,16 +378,6 @@ bool Actor::IsScaleInherited() const
   return GetImplementation(*this).IsScaleInherited();
 }
 
-void Actor::SetSizeMode(SizeMode mode)
-{
-  GetImplementation(*this).SetSizeMode(mode);
-}
-
-SizeMode Actor::GetSizeMode() const
-{
-  return GetImplementation(*this).GetSizeMode();
-}
-
 void Actor::SetSizeModeFactor(const Vector3& factor)
 {
   GetImplementation(*this).SetSizeModeFactor(factor);
@@ -476,6 +483,115 @@ bool Actor::IsKeyboardFocusable() const
   return GetImplementation(*this).IsKeyboardFocusable();
 }
 
+void Actor::SetRelayoutEnabled( bool enabled )
+{
+  GetImplementation(*this).SetRelayoutEnabled( enabled );
+}
+
+bool Actor::IsRelayoutEnabled() const
+{
+  return GetImplementation(*this).IsRelayoutEnabled();
+}
+
+void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
+{
+  GetImplementation(*this).SetResizePolicy( policy, dimension );
+}
+
+ResizePolicy Actor::GetResizePolicy( Dimension dimension ) const
+{
+  return GetImplementation(*this).GetResizePolicy( dimension );
+}
+
+void Actor::SetSizeScalePolicy( SizeScalePolicy policy )
+{
+  GetImplementation(*this).SetSizeScalePolicy( policy );
+}
+
+SizeScalePolicy Actor::GetSizeScalePolicy() const
+{
+  return GetImplementation(*this).GetSizeScalePolicy();
+}
+
+float Actor::GetHeightForWidth( float width )
+{
+  return GetImplementation(*this).GetHeightForWidth( width );
+}
+
+float Actor::GetWidthForHeight( float height )
+{
+  return GetImplementation(*this).GetWidthForHeight( height );
+}
+
+float Actor::GetRelayoutSize( Dimension dimension ) const
+{
+  return GetImplementation(*this).GetRelayoutSize( dimension );
+}
+
+void Actor::RelayoutRequestTree()
+{
+  GetImplementation(*this).RelayoutRequestTree();
+}
+
+void Actor::PropagateRelayoutFlags()
+{
+  GetImplementation(*this).PropagateRelayoutFlags();
+}
+
+void Actor::SetPadding( const Padding& padding )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  Vector2 widthPadding( padding.left, padding.right );
+  impl.SetPadding( widthPadding, WIDTH );
+
+  Vector2 heightPadding( padding.bottom, padding.top );
+  impl.SetPadding( heightPadding, HEIGHT );
+}
+
+void Actor::GetPadding( Padding& paddingOut ) const
+{
+  const Internal::Actor& impl = GetImplementation(*this);
+
+  Vector2 widthPadding = impl.GetPadding( WIDTH );
+  Vector2 heightPadding = impl.GetPadding( HEIGHT );
+
+  paddingOut.left = widthPadding.x;
+  paddingOut.right = widthPadding.y;
+  paddingOut.bottom = heightPadding.x;
+  paddingOut.top = heightPadding.y;
+}
+
+void Actor::SetMinimumSize( const Vector2& size )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  impl.SetMinimumSize( size.x, WIDTH );
+  impl.SetMinimumSize( size.y, HEIGHT );
+}
+
+Vector2 Actor::GetMinimumSize()
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  return Vector2( impl.GetMinimumSize( WIDTH ), impl.GetMinimumSize( HEIGHT ) );
+}
+
+void Actor::SetMaximumSize( const Vector2& size )
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  impl.SetMaximumSize( size.x, WIDTH );
+  impl.SetMaximumSize( size.y, HEIGHT );
+}
+
+Vector2 Actor::GetMaximumSize()
+{
+  Internal::Actor& impl = GetImplementation(*this);
+
+  return Vector2( impl.GetMaximumSize( WIDTH ), impl.GetMaximumSize( HEIGHT ) );
+}
+
 Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
@@ -501,96 +617,9 @@ Actor::OffStageSignalType& Actor::OffStageSignal()
   return GetImplementation(*this).OffStageSignal();
 }
 
-DynamicsBody Actor::EnableDynamics(DynamicsBodyConfig bodyConfig)
+Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()
 {
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsBodyConfig& internal = GetImplementation(bodyConfig);
-
-  Internal::DynamicsBodyPtr body( GetImplementation(*this).EnableDynamics( &internal ) );
-
-  return DynamicsBody( body.Get() );
-#else
-  return DynamicsBody();
-#endif
-}
-
-DynamicsJoint Actor::AddDynamicsJoint( Actor attachedActor, const Vector3& offset )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::ActorPtr internalActor( &GetImplementation(attachedActor) );
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).AddDynamicsJoint( internalActor, offset) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-DynamicsJoint Actor::AddDynamicsJoint( Actor attachedActor, const Vector3& offsetA, const Vector3& offsetB )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::ActorPtr internalActor( &GetImplementation(attachedActor) );
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).AddDynamicsJoint( internalActor, offsetA, offsetB) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-int Actor::GetNumberOfJoints() const
-{
-#ifdef DYNAMICS_SUPPORT
-  return GetImplementation(*this).GetNumberOfJoints();
-#else
-  return int();
-#endif
-}
-
-DynamicsJoint Actor::GetDynamicsJointByIndex( const int index )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).GetDynamicsJointByIndex( index ) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-DynamicsJoint Actor::GetDynamicsJoint( Actor attachedActor )
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsJointPtr joint( GetImplementation(*this).GetDynamicsJoint( &GetImplementation(attachedActor) ) );
-
-  return DynamicsJoint( joint.Get() );
-#else
-  return DynamicsJoint();
-#endif
-}
-
-void Actor::RemoveDynamicsJoint( DynamicsJoint joint )
-{
-#ifdef DYNAMICS_SUPPORT
-  GetImplementation(*this).RemoveDynamicsJoint( &GetImplementation(joint) );
-#endif
-}
-
-void Actor::DisableDynamics()
-{
-#ifdef DYNAMICS_SUPPORT
-  GetImplementation(*this).DisableDynamics();
-#endif
-}
-
-DynamicsBody Actor::GetDynamicsBody()
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsBodyPtr internal(GetImplementation(*this).GetDynamicsBody());
-  return DynamicsBody( internal.Get() );
-#else
-  return DynamicsBody();
-#endif
+  return GetImplementation(*this).OnRelayoutSignal();
 }
 
 Actor::Actor(Internal::Actor* internal)

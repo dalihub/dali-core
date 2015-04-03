@@ -43,6 +43,7 @@ class FontFactory;
 class ShaderFactory;
 class GestureEventProcessor;
 class EmojiFactory;
+class RelayoutController;
 
 namespace SceneGraph
 {
@@ -158,6 +159,12 @@ public:
    * @return a reference to the Emoji factory.
    */
   EmojiFactory& GetEmojiFactory();
+
+  /**
+   * Return the relayout controller
+   * @Return Return a reference to the relayout controller
+   */
+  RelayoutController& GetRelayoutController();
 
 private:
 

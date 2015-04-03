@@ -152,7 +152,6 @@ void Program::Use()
     {
       LOG_GL( "UseProgram(%d)\n", mProgramId );
       CHECK_GL( mGlAbstraction, mGlAbstraction.UseProgram(mProgramId) );
-      INCREASE_COUNTER(PerformanceMonitor::SHADER_STATE_CHANGES);
 
       mCache.SetCurrentProgram( this );
     }

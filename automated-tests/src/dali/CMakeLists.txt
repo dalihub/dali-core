@@ -23,9 +23,7 @@ SET(TC_SOURCES
         utc-Dali-CustomActor.cpp
         utc-Dali-Degree.cpp
         utc-Dali-DistanceField.cpp
-        utc-Dali-DynamicsBody.cpp
         utc-Dali-DynamicsBodyConfig.cpp
-        utc-Dali-DynamicsJoint.cpp
         utc-Dali-DynamicsShape.cpp
         utc-Dali-DynamicsWorld.cpp
         utc-Dali-DynamicsWorldConfig.cpp
@@ -65,6 +63,7 @@ SET(TC_SOURCES
         utc-Dali-Pixel.cpp
         utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyNotification.cpp
+        utc-Dali-PropertyValue.cpp
         utc-Dali-Quaternion.cpp
         utc-Dali-Radian.cpp
         utc-Dali-Random.cpp

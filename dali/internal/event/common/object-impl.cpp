@@ -401,13 +401,13 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
     if(!animatableProperty)
     {
       const TypeInfo* typeInfo( GetTypeInfo() );
-      if (typeInfo && Property::INVALID_INDEX == RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, propertyValue))
-      {
-        DALI_LOG_ERROR("Cannot register property\n");
-      }
-      else
+      if (!typeInfo)
       {
         DALI_LOG_ERROR("Cannot find property index\n");
+      }
+      else if ( Property::INVALID_INDEX == RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, propertyValue ) )
+      {
+        DALI_LOG_ERROR("Cannot register property\n");
       }
     }
     else
@@ -630,7 +630,7 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     }
     else
     {
-      mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( propertyValue.GetType(), property ) );
+      mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, propertyValue.GetType(), property ) );
     }
 
     // queue a message to add the property
@@ -681,6 +681,23 @@ Dali::PropertyNotification Object::AddPropertyNotification(Property::Index index
     if ( index <= PROPERTY_REGISTRATION_MAX_INDEX )
     {
       DALI_ASSERT_ALWAYS( false && "Property notification added to event side only property." );
+    }
+    else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
+    {
+      // check whether the animatable property is registered already, if not then register one.
+      AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
+      if( !animatable )
+      {
+        const TypeInfo* typeInfo( GetTypeInfo() );
+        if ( typeInfo )
+        {
+          if( Property::INVALID_INDEX != RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, Property::Value( typeInfo->GetPropertyType( index ) ) ) )
+          {
+            animatable = FindAnimatableProperty( index );
+          }
+        }
+      }
+      DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
     }
     else if ( mCustomProperties.Count() > 0 )
     {
@@ -1154,16 +1171,15 @@ CustomPropertyMetadata* Object::FindCustomProperty( Property::Index index ) cons
 
 AnimatablePropertyMetadata* Object::FindAnimatableProperty( Property::Index index ) const
 {
-  AnimatablePropertyMetadata* property( NULL );
-  int arrayIndex = index - ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX;
-  if( arrayIndex >= 0 )
+  for ( int arrayIndex = 0; arrayIndex < (int)mAnimatableProperties.Count(); arrayIndex++ )
   {
-    if( arrayIndex < (int)mAnimatableProperties.Count() )
+    AnimatablePropertyMetadata* property = static_cast<AnimatablePropertyMetadata*>( mAnimatableProperties[ arrayIndex ] );
+    if( property->index == index )
     {
-      property = static_cast<AnimatablePropertyMetadata*>(mAnimatableProperties[ arrayIndex ]);
+      return property;
     }
   }
-  return property;
+  return NULL;
 }
 
 } // namespace Internal

@@ -516,7 +516,6 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
 
   const GLsizei indexCount = mIndexBuffer->GetBufferSize() / sizeof(GLushort); // compiler will optimize this to >> if possible
   mContext->DrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, (void *) 0);
-  DRAW_ELEMENT_RECORD( indexCount );
 
   mContext->DisableVertexAttributeArray( positionLoc );
   mContext->DisableVertexAttributeArray( texCoordLoc );

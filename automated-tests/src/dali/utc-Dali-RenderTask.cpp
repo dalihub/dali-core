@@ -1230,17 +1230,14 @@ int UtcDaliRenderTaskContinuous01(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                     Input,    Expected  Input, Expected, KeepUpdating
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false, true ) );
-  application.GetPlatform().ClearReadyResources();
-
   DALI_TEST_CHECK( UpdateRender(application,  drawTrace, false,   finished, false, false ) );
+  application.GetPlatform().ClearReadyResources();
 
   // ADD SOURCE ACTOR TO STAGE - expect continuous renders to start, no finished signal
   Stage::GetCurrent().Add(secondRootActor);
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                  Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application,  drawTrace, true,    finished, false, false ) );
   END_TEST;
 }
@@ -1277,17 +1274,15 @@ int UtcDaliRenderTaskContinuous02(void)
   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
   application.SendNotification();
 
-  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
-  application.GetPlatform().ClearReadyResources();
+  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected, KeepUpdating
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, false ) );
+  application.GetPlatform().ClearReadyResources();
 
   // MAKE SOURCE ACTOR VISIBLE - expect continuous renders to start, no finished signal
   secondRootActor.SetVisible(true);
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
   END_TEST;
 }
@@ -1321,16 +1316,14 @@ int UtcDaliRenderTaskContinuous03(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
-  application.GetPlatform().ClearReadyResources();
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, false ) );
+  application.GetPlatform().ClearReadyResources();
 
   // ADD CAMERA ACTOR TO STAGE - expect continuous renders to start, no finished signal
   Stage::GetCurrent().Add( offscreenCameraActor );
   application.SendNotification();
 
   // CONTINUE PROCESS/RENDER                 Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
   END_TEST;
 }
@@ -1655,7 +1648,6 @@ int UtcDaliRenderTaskOnce05(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
@@ -1725,12 +1717,10 @@ int UtcDaliRenderTaskOnce06(void)
 
   application.SendNotification();
 
-  // Expect 2 frames to be drawn.
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj == NULL );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
   newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
@@ -1800,7 +1790,6 @@ int UtcDaliRenderTaskOnce07(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
@@ -2123,7 +2112,6 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
@@ -2180,7 +2168,6 @@ int UtcDaliRenderTaskOnceNoSync06(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,
@@ -2237,7 +2224,6 @@ int UtcDaliRenderTaskOnceNoSync07(void)
   application.SendNotification();
 
   // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
 
   // CHANGE TO RENDER ONCE,

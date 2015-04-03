@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <math.h>
+#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/math-utils.h>
@@ -49,10 +50,10 @@ struct Rect
   /**
    * @brief Constructor.
    *
-   * @param [in] x       x coordinate
-   * @param [in] y       y coordinate
-   * @param [in] width   width
-   * @param [in] height  height
+   * @param [in] x       x coordinate (or left)
+   * @param [in] y       y coordinate (or right)
+   * @param [in] width   width (or bottom)
+   * @param [in] height  height (or top)
    */
   Rect(T x, T y, T width, T height)
   : x(x),
@@ -200,10 +201,29 @@ struct Rect
 
 public:   // Data
 
-  T x;      ///< X position of the rectangle
-  T y;      ///< Y position of the rectangle
-  T width;  ///< width of the rectangle
-  T height; ///< height of the rectangle
+  union
+  {
+    T x;      ///< X position of the rectangle
+    T left;   ///< The left value
+  };
+
+  union
+  {
+    T y;      ///< Y position of the rectangle
+    T right;  ///< The right value
+  };
+
+  union
+  {
+    T width;  ///< width of the rectangle
+    T bottom; ///< The bottom value
+  };
+
+  union
+  {
+    T height; ///< height of the rectangle
+    T top;    ///< The top value
+  };
 };
 
 /**
@@ -263,6 +283,44 @@ inline bool Rect<float>::IsEmpty() const
           ||
           fabsf(height) <= GetRangedEpsilon(height, height));
 }
+
+/**
+ * @brief Convert the value of the rectangle into a string and insert in to an output stream.
+ *
+ * @param [in] stream The output stream operator.
+ * @param [in] rectangle the rectangle to output
+ * @return The output stream operator.
+ */
+inline std::ostream& operator<< (std::ostream& stream, const Rect<int>& rectangle)
+{
+  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+}
+
+/**
+ * @brief Convert the value of the rectangle into a string and insert in to an output stream.
+ *
+ * @param [in] stream The output stream operator.
+ * @param [in] rectangle the rectangle to output
+ * @return The output stream operator.
+ */
+inline std::ostream& operator<< (std::ostream& stream, const Rect<unsigned int>& rectangle)
+{
+  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+}
+
+/**
+ * @brief Convert the value of the rectangle into a string and insert in to an output stream.
+ *
+ * @param [in] stream The output stream operator.
+ * @param [in] rectangle the rectangle to output
+ * @return The output stream operator.
+ */
+inline std::ostream& operator<< (std::ostream& stream, const Rect<float>& rectangle)
+{
+  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
+}
+
+
 
 } // namespace Dali
 

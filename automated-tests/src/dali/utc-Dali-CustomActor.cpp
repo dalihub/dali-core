@@ -174,6 +174,42 @@ struct TestCustomActor : public CustomActorImpl
     return Vector3( 0.0f, 0.0f, 0.0f );
   }
 
+  virtual float GetHeightForWidth( float width )
+  {
+    return 0.0f;
+  }
+
+  virtual float GetWidthForHeight( float height )
+  {
+    return 0.0f;
+  }
+
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
+  {
+  }
+
+  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+  {
+  }
+
+  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  {
+  }
+
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+  {
+    return 0.0f;
+  }
+
+  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  {
+  }
+
+  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS )
+  {
+    return false;
+  }
+
   void SetDaliProperty(std::string s)
   {
     Self().SetProperty(mDaliProperty, s) ;
@@ -472,6 +508,42 @@ public:
   {
     return Vector3( 0.0f, 0.0f, 0.0f );
   }
+
+  virtual float GetHeightForWidth( float width )
+  {
+    return 0.0f;
+  }
+
+  virtual float GetWidthForHeight( float height )
+  {
+    return 0.0f;
+  }
+
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
+  {
+  }
+
+  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+  {
+  }
+
+  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  {
+  }
+
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+  {
+    return 0.0f;
+  }
+
+  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  {
+  }
+
+  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS )
+  {
+    return false;
+  }
 };
 
 } ; // namespace Impl
@@ -614,6 +686,28 @@ public:
   virtual Vector3 GetNaturalSize()
   {
     return Vector3( 0.0f, 0.0f, 0.0f );
+  }
+
+  virtual float GetHeightForWidth( float width )
+  {
+    return 0.0f;
+  }
+
+  virtual float GetWidthForHeight( float height )
+  {
+    return 0.0f;
+  }
+
+  virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
+  {
+  }
+
+  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  {
+  }
+
+  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  {
   }
 
 private:
@@ -1463,18 +1557,12 @@ int UtcDaliCustomActorOnSizeAnimation(void)
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
   Animation anim = Animation::New( 1.0f );
-  anim.Resize( custom, Vector3( 8.0f, 9.0f, 10.0f ) );
+  anim.AnimateTo( Property( custom, Actor::Property::SIZE ), Vector3( 8.0f, 9.0f, 10.0f ) );
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
   DALI_TEST_EQUALS( 8.0f, custom.GetTargetSize().width, TEST_LOCATION );
   DALI_TEST_EQUALS( 9.0f, custom.GetTargetSize().height, TEST_LOCATION );
   DALI_TEST_EQUALS( 10.0f, custom.GetTargetSize().depth, TEST_LOCATION );
-
-  anim.Resize( custom, 1.0f, 2.0f );
-  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( 1.0f, custom.GetTargetSize().width, TEST_LOCATION );
-  DALI_TEST_EQUALS( 2.0f, custom.GetTargetSize().height, TEST_LOCATION );
   END_TEST;
 }
 

@@ -124,6 +124,11 @@ EmojiFactory& ThreadLocalStorage::GetEmojiFactory()
   return mCore->GetEmojiFactory();
 }
 
+RelayoutController& ThreadLocalStorage::GetRelayoutController()
+{
+  return mCore->GetRelayoutController();
+}
+
 } // namespace Internal
 
 } // namespace Dali

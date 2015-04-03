@@ -100,6 +100,7 @@ ImageActorPtr ImageActor::New()
 
 void ImageActor::OnInitialize()
 {
+  SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
 }
 
 void ImageActor::SetImage( ImagePtr& image )
@@ -211,6 +212,8 @@ ImageActor::ImageActor()
   mUsingNaturalSize(true),
   mInternalSetSize(false)
 {
+  // Size negotiate disabled by default, so turn it on for this actor
+  SetRelayoutEnabled( true );
 }
 
 ImageActor::~ImageActor()
