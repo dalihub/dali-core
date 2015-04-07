@@ -21,6 +21,7 @@
 #include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/resources/resource-manager.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/queue/render-queue.h>
 #include <dali/internal/render/renderers/render-renderer.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
@@ -66,7 +67,7 @@ RendererAttachment::RendererAttachment()
   mMaterial(NULL),
   mGeometry(NULL),
   mRegenerateUniformMap(REGENERATE_UNIFORM_MAP),
-  mResendChildPointers(false),
+  mResendDataProviders(false),
   mDepthIndex(0)
 {
   mUniformMapChanged[0]=false;
@@ -101,7 +102,16 @@ void RendererAttachment::ConnectedToSceneGraph()
   mParent->AddUniformMapObserver( *this );
 
   DALI_ASSERT_DEBUG( mParent != NULL );
-  mRenderer = NewRenderer::New( *mParent, *this, mGeometry, mMaterial );
+
+  RenderDataProvider* dataProvider = new RenderDataProvider( *mGeometry,
+                                                             *mMaterial,
+                                                             *this,
+                                                             *mMaterial->GetShader(),
+                                                             mGeometry->GetIndexBuffer(),
+                                                             mGeometry->GetVertexBuffers(),
+                                                             mMaterial->GetSamplers() );
+
+  mRenderer = NewRenderer::New( *mParent, dataProvider );
   mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
 }
 
@@ -123,13 +133,7 @@ void RendererAttachment::SetMaterial( BufferIndex updateBufferIndex, const Mater
   mMaterial->AddConnectionObserver( *this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
-  // Tell renderer about a new provider
-  if( mRenderer )
-  {
-    typedef MessageValue1< NewRenderer, const MaterialDataProvider*> DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &NewRenderer::SetMaterialDataProvider, material );
-  }
+  mResendDataProviders = true;
 }
 
 const Material& RendererAttachment::GetMaterial() const
@@ -145,13 +149,7 @@ void RendererAttachment::SetGeometry( BufferIndex updateBufferIndex, const Geome
   mGeometry->AddConnectionObserver( *this ); // Observe geometry connections / uniform mapping changes
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
-  // Tell renderer about a new provider
-  if( mRenderer )
-  {
-    typedef MessageValue1< NewRenderer, const GeometryDataProvider*> DerivedType;
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-    new (slot) DerivedType( mRenderer, &NewRenderer::SetGeometryDataProvider, geometry );
-  }
+  mResendDataProviders = true;
 }
 
 const Geometry& RendererAttachment::GetGeometry() const
@@ -201,8 +199,8 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
       AddMappings( localMap, actorUniformMap );
 
       AddMappings( localMap, mMaterial->GetUniformMap() );
-      const MaterialDataProvider::Samplers& samplers = mMaterial->GetSamplers();
-      for( MaterialDataProvider::Samplers::ConstIterator iter = samplers.Begin(), end = samplers.End();
+      const RenderDataProvider::Samplers& samplers = mMaterial->GetSamplers();
+      for( RenderDataProvider::Samplers::ConstIterator iter = samplers.Begin(), end = samplers.End();
            iter != end ;
            ++iter )
       {
@@ -244,11 +242,24 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
     mRegenerateUniformMap--;
   }
 
-  if( mResendChildPointers )
+  if( mResendDataProviders )
   {
-    //@todo MESH_REWORK If the children have changed, then supply the NewRenderer with the
-    // new children. (Rather than accessing through the DataProvider interface)
-    mResendChildPointers = false;
+    RenderDataProvider* dataProvider = new RenderDataProvider( *mGeometry,
+                                                               *mMaterial,
+                                                               *this,
+                                                               *mMaterial->GetShader(),
+                                                               mGeometry->GetIndexBuffer(),
+                                                               mGeometry->GetVertexBuffers(),
+                                                               mMaterial->GetSamplers() );
+
+    // Tell renderer about a new provider
+    // @todo MESH_REWORK Should we instead create a new renderer when these change?
+
+    typedef MessageValue1< NewRenderer, OwnerPointer<RenderDataProvider> > DerivedType;
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+    new (slot) DerivedType( mRenderer, &NewRenderer::SetRenderDataProvider, dataProvider );
+
+    mResendDataProviders = false;
   }
 }
 
@@ -267,8 +278,8 @@ bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
     unsigned int opaqueCount=0;
     unsigned int affectingCount=0;
 
-    const Material::Samplers& samplers = mMaterial->GetSamplers();
-    for( Material::Samplers::ConstIterator iter = samplers.Begin();
+    const RenderDataProvider::Samplers& samplers = mMaterial->GetSamplers();
+    for( RenderDataProvider::Samplers::ConstIterator iter = samplers.Begin();
          iter != samplers.End(); ++iter )
     {
       const Sampler* sampler = static_cast<const Sampler*>(*iter);
@@ -316,8 +327,8 @@ bool RendererAttachment::DoPrepareResources(
     unsigned int neverCount = 0;
     unsigned int frameBufferCount = 0;
 
-    const Material::Samplers& samplers = mMaterial->GetSamplers();
-    for( Material::Samplers::ConstIterator iter = samplers.Begin();
+    const RenderDataProvider::Samplers& samplers = mMaterial->GetSamplers();
+    for( RenderDataProvider::Samplers::ConstIterator iter = samplers.Begin();
          iter != samplers.End(); ++iter )
     {
       const Sampler* sampler = static_cast<const Sampler*>(*iter);
@@ -368,7 +379,7 @@ void RendererAttachment::ConnectionsChanged( PropertyOwner& object )
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
   // Ensure the child object pointers get re-sent to the renderer
-  mResendChildPointers = true;
+  mResendDataProviders = true;
 }
 
 void RendererAttachment::ConnectedUniformMapChanged()

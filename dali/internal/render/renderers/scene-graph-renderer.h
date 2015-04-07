@@ -190,7 +190,7 @@ private:
 
 protected:
 
-  NodeDataProvider& mDataProvider;
+  NodeDataProvider& mDataProvider;        // @todo MESH_REWORK rename to mNodeDataProvider. Shouldn't it be const?
 
   Context* mContextDELETEME; // TODO: MESH_REWORK DELETE THIS
   TextureCache* mTextureCacheDELETEME; // TODO: MESH_REWORK DELETE THIS

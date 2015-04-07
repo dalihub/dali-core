@@ -50,10 +50,10 @@ namespace
  * @param[in]  localPoint        Relative to the actor attached to the detector.
  */
 void EmitTapSignal(
-    Actor* actor,
-    const GestureDetectorContainer& gestureDetectors,
-    const Integration::TapGestureEvent& tapEvent,
-    Vector2 localPoint)
+  Actor* actor,
+  const GestureDetectorContainer& gestureDetectors,
+  const Integration::TapGestureEvent& tapEvent,
+  Vector2 localPoint)
 {
   TapGesture tap;
   tap.time = tapEvent.time;

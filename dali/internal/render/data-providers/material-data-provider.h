@@ -27,33 +27,19 @@ namespace SceneGraph
 class SamplerDataProvider;
 class Shader;
 
-
+/**
+ * Interface to provide data of the material to the renderer.
+ * This interface must not be used to pass object pointers.
+ */
 class MaterialDataProvider
 {
 public:
-  typedef Dali::Vector< const SamplerDataProvider* > Samplers;
-
   /**
    * Construtor
    */
   MaterialDataProvider()
   {
   }
-
-  /**
-   * @todo MESH_REWORK FIX ME Don't get objects through this interface. Send via message instead
-   *
-   * Returns the shader
-   * @return The shader
-   */
-  virtual Shader* GetShader() const = 0;
-
-  /**
-   * @todo MESH_REWORK FIX ME Don't get objects through this interface. Send via message instead
-   * Returns the list of samplers that this material provides
-   * @return The list of samplers
-   */
-  virtual const Samplers& GetSamplers() const = 0;
 
 protected:
   /**

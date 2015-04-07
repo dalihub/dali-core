@@ -19,8 +19,8 @@
  */
 
 #include <dali/integration-api/resource-declarations.h> // For resource id
-#include <dali/internal/render/data-providers/material-data-provider.h>
-#include <dali/internal/render/data-providers/uniform-map-data-provider.h>
+#include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/texture-units.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
 #include <dali/internal/render/renderers/render-geometry.h>
@@ -33,13 +33,6 @@ class PropertyInputImpl;
 
 namespace SceneGraph
 {
-class GeometryDataProvider;
-class MaterialDataProvider;
-class NodeDataProvider;
-class RenderGeometry;
-class SamplerDataProvider;
-class ShaderDataProvider;
-class UniformMapDataProvider;
 
 /**
  * The new geometry renderer.
@@ -57,39 +50,23 @@ public:
   /**
    * Create a new renderer instance
    * @param[in] nodeDataProvider The node data provider
-   * @param[in] uniformMapDataProvider The uniform map data provider
-   * @param[in] geometryDataProvider The geometry data provider
-   * @param[in] materialDataProvider The material data provider
+   * @param[in] dataProviders The data providers for the renderer
    */
-  static NewRenderer* New( NodeDataProvider& nodeDataProvider,
-                           const UniformMapDataProvider& uniformMapDataProvider,
-                           const GeometryDataProvider* geometryDataProvider,
-                           const MaterialDataProvider* materialDataProvider );
+  static NewRenderer* New( NodeDataProvider& nodeDataProvider, RenderDataProvider* dataProviders );
   /**
    * Constructor.
    * @param[in] nodeDataProvider The node data provider
-   * @param[in] uniformMapDataProvider The uniform map data provider
-   * @param[in] geometryDataProvider The geometry data provider
-   * @param[in] materialDataProvider The material data provider
+   * @param[in] dataProviders The data providers for the renderer
    */
-  NewRenderer( NodeDataProvider& nodeDataProvider,
-               const UniformMapDataProvider& uniformMapDataProvider,
-               const GeometryDataProvider* geometryDataProvider,
-               const MaterialDataProvider* materialDataProvider );
+  NewRenderer( NodeDataProvider& nodeDataProvider, RenderDataProvider* dataProviders );
 
   virtual ~NewRenderer();
 
   /**
-   * Change the geometry data provider of the renderer
-   * @param[in] geoemtryDataProvider The geometry data provider
+   * Change the data providers of the renderer
+   * @param[in] dataProviders The data providers
    */
-  void SetGeometryDataProvider( const GeometryDataProvider* geometryDataProvider );
-
-  /**
-   * Change the material data provider of the renderer
-   * @param[in] materialDataProvider The material data provider
-   */
-  void SetMaterialDataProvider( const MaterialDataProvider* materialDataProvider );
+  void SetRenderDataProvider( RenderDataProvider* dataProviders );
 
 public: // Implementation of Renderer
   /**
@@ -165,7 +142,7 @@ private:
   void BindTextures( TextureCache& textureCache,
                      BufferIndex bufferIndex,
                      Program& program,
-                     const MaterialDataProvider::Samplers& samplers );
+                     const RenderDataProvider::Samplers& samplers );
 
   /**
    * Bind a material texture to a texture unit, and set the sampler's texture uniform
@@ -206,17 +183,10 @@ private:
   unsigned int GetTextureUnitUniformIndex( Program& program,
                                            const SamplerDataProvider& sampler );
 
-
-public:
-  // @todo MESH_REWORK Make private - add getters
-  //const NodeDataProvider&     mNodeDataProvider;
-  //const ShaderDataProvider&   mShaderDataProvider;
-  const UniformMapDataProvider& mUniformMapDataProvider;
-  const MaterialDataProvider* mMaterialDataProvider;
-  const GeometryDataProvider* mGeometryDataProvider;
+public: //@todo MESH_REWORK make private after merge with SceneGraph::Renderer
+  OwnerPointer< RenderDataProvider > mRenderDataProvider;
 
 private:
-
   RenderGeometry mRenderGeometry;
 
   struct TextureUnitUniformIndex

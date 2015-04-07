@@ -20,6 +20,7 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 
 namespace Dali
 {
@@ -31,6 +32,7 @@ class GpuBuffer;
 
 namespace SceneGraph
 {
+class RenderDataProvider;
 class GeometryDataProvider;
 
 /**
@@ -69,12 +71,12 @@ public:
    * @param[in] context The GL context
    * @param[in] program The shader program to query for attribute locations
    * @param[in] bufferIndex The current buffer index
-   * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
+   * @param[in] dataProviders The data providers (to fetch geometry from)
    */
   void UploadAndDraw(Context& context,
                      Program& program,
                      BufferIndex bufferIndex,
-                     const GeometryDataProvider& geometryDataProvider );
+                     const RenderDataProvider* dataProviders );
 
   /**
    * Tell the object that the geometry has been updated.
@@ -90,19 +92,18 @@ public:
    */
   void UploadVertexData( Context& context,
                          BufferIndex bufferIndex,
-                         const GeometryDataProvider& geometryDataProvider );
-
+                         const RenderDataProvider* dataProviders );
 
 private:
   /**
    * Perform the upload of the geometry
    * @param[in] context The GL context
    * @param[in] bufferIndex The current buffer index
-   * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
+   * @param[in] dataProviders The data providers (to fetch geometry from)
    */
   void DoUpload( Context& context,
                  BufferIndex bufferIndex,
-                 const GeometryDataProvider& geometryDataProvider );
+                 const RenderDataProvider* dataProviders );
 
   /**
    * Bind the geometry buffers
@@ -129,11 +130,11 @@ private:
    * Perform the correct draw call corresponding to the geometry type
    * @param[in] context The GL context
    * @param[in] bufferIndex The current buffer index
-   * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
+   * @param[in] dataProviders The data providers (to fetch geometry from)
    */
   void Draw( Context& context,
              BufferIndex bufferIndex,
-             const GeometryDataProvider& geometry );
+             const RenderDataProvider* dataProviders );
 
 private:
   GpuBuffers mVertexBuffers;

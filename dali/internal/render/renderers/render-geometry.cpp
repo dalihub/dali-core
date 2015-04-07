@@ -19,6 +19,7 @@
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/shaders/program.h>
@@ -65,12 +66,12 @@ void RenderGeometry::UploadAndDraw(
   Context& context,
   Program& program,
   BufferIndex bufferIndex,
-  const GeometryDataProvider& geometryDataProvider )
+  const RenderDataProvider* dataProviders )
 {
-  UploadVertexData( context, bufferIndex, geometryDataProvider );
+  UploadVertexData( context, bufferIndex, dataProviders );
   BindBuffers();
   EnableVertexAttributes( context, program );
-  Draw( context, bufferIndex, geometryDataProvider );
+  Draw( context, bufferIndex, dataProviders );
   DisableVertexAttributes( context, program );
 }
 
@@ -82,11 +83,11 @@ void RenderGeometry::GeometryUpdated()
 void RenderGeometry::UploadVertexData(
   Context& context,
   BufferIndex bufferIndex,
-  const GeometryDataProvider& geometry )
+  const RenderDataProvider* dataProviders )
 {
   if( mDataNeedsUploading ) // @todo Or if any of the property buffers are dirty
   {
-    DoUpload( context, bufferIndex, geometry );
+    DoUpload( context, bufferIndex, dataProviders );
 
     mDataNeedsUploading = false;
   }
@@ -95,10 +96,11 @@ void RenderGeometry::UploadVertexData(
 void RenderGeometry::DoUpload(
   Context& context,
   BufferIndex bufferIndex,
-  const GeometryDataProvider& geometry)
+  const RenderDataProvider* dataProvider )
 {
   // Vertex buffer
-  const Geometry::VertexBuffers& vertexBuffers = geometry.GetVertexBuffers();
+  RenderDataProvider::VertexBuffers vertexBuffers = dataProvider->GetVertexBuffers();
+
   DALI_ASSERT_DEBUG( vertexBuffers.Count() > 0 && "Need vertex buffers to upload" );
 
   for( unsigned int i=0; i<vertexBuffers.Count(); ++i)
@@ -116,7 +118,7 @@ void RenderGeometry::DoUpload(
   }
 
   // Index buffer
-  const PropertyBuffer* indexBuffer = geometry.GetIndexBuffer();
+  const PropertyBuffer* indexBuffer = dataProvider->GetIndexBuffer();
   if( indexBuffer )
   {
     GpuBuffer* indexGpuBuffer = new GpuBuffer( context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
@@ -181,13 +183,14 @@ void RenderGeometry::DisableVertexAttributes( Context& context, Program& program
   context.DisableVertexAttributeArray( textureCoordsLoc );
 }
 
-void RenderGeometry::Draw( Context& context, BufferIndex bufferIndex, const GeometryDataProvider& geometry )
+void RenderGeometry::Draw( Context& context, BufferIndex bufferIndex, const RenderDataProvider* dataProvider )
 {
+  const GeometryDataProvider& geometry = dataProvider->GetGeometry();
+  const PropertyBuffer* indexBuffer = dataProvider->GetIndexBuffer();
+
   GeometryDataProvider::GeometryType type = geometry.GetGeometryType( bufferIndex );
 
   unsigned int numIndices = 0;
-  const PropertyBuffer* indexBuffer = geometry.GetIndexBuffer();
-
   if( indexBuffer )
   {
     numIndices = /* TODO: MESH_REWORK remove this 2, should implement unsigned short properties  */ 2 * indexBuffer->GetDataSize(bufferIndex) / indexBuffer->GetElementSize(bufferIndex);

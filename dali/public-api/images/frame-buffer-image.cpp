@@ -32,7 +32,7 @@ FrameBufferImage::FrameBufferImage()
 }
 
 FrameBufferImage::FrameBufferImage(Internal::FrameBufferImage* internal)
-  : Image(internal)
+: Image(internal)
 {
 }
 

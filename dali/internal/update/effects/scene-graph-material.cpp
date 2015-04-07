@@ -69,7 +69,7 @@ void Material::RemoveSampler( const Sampler* sampler )
   const SamplerDataProvider* samplerDataProvider = sampler;
   bool found = false;
 
-  Samplers::Iterator iter = mSamplers.Begin();
+  RenderDataProvider::Samplers::Iterator iter = mSamplers.Begin();
   for( ; iter != mSamplers.End(); ++iter )
   {
     if( *iter == samplerDataProvider )
@@ -90,7 +90,7 @@ void Material::RemoveSampler( const Sampler* sampler )
   }
 }
 
-const Material::Samplers& Material::GetSamplers() const
+const RenderDataProvider::Samplers& Material::GetSamplers() const
 {
   return mSamplers;
 }

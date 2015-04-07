@@ -115,19 +115,19 @@ public: // UniformMap::Observer
    */
   virtual void UniformMappingsChanged( const UniformMap& mappings );
 
-public: // GeometryDataProvider
   /**
    * Get the vertex buffers of the geometry
    * @return A const reference to the vertex buffers
    */
-  virtual const GeometryDataProvider::VertexBuffers& GetVertexBuffers() const;
+  const GeometryDataProvider::VertexBuffers& GetVertexBuffers() const;
 
   /**
    * Get the index buffer of the geometry
    * @return A const pointer to the index buffer if it exists, or NULL if it doesn't.
    */
-  virtual const PropertyBuffer* GetIndexBuffer() const;
+  const PropertyBuffer* GetIndexBuffer() const;
 
+public: // GeometryDataProvider
   /**
    * Get the type of geometry to draw
    */

@@ -19,15 +19,10 @@
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/uniform-map.h>
-#include <dali/internal/update/common/uniform-map.h>
-#include <dali/internal/render/data-providers/geometry-data-provider.h>
-#include <dali/internal/render/data-providers/material-data-provider.h>
-#include <dali/internal/render/data-providers/node-data-provider.h>
-#include <dali/internal/render/data-providers/sampler-data-provider.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/program.h>
-
 
 namespace Dali
 {
@@ -37,23 +32,16 @@ namespace SceneGraph
 {
 
 NewRenderer* NewRenderer::New( NodeDataProvider& nodeDataProvider,
-                               const UniformMapDataProvider& uniformMapDataProvider,
-                               const GeometryDataProvider* geometryDataProvider,
-                               const MaterialDataProvider* materialDataProvider)
+                               RenderDataProvider* dataProvider )
 {
-  return new NewRenderer(nodeDataProvider, uniformMapDataProvider, geometryDataProvider, materialDataProvider);
+  return new NewRenderer(nodeDataProvider, dataProvider);
 }
 
 
 NewRenderer::NewRenderer( NodeDataProvider& nodeDataProvider,
-                          const UniformMapDataProvider& uniformMapDataProvider,
-                          const GeometryDataProvider* geometryDataProvider,
-                          const MaterialDataProvider* materialDataProvider)
+                          RenderDataProvider* dataProvider )
 : Renderer( nodeDataProvider ),
-  mUniformMapDataProvider( uniformMapDataProvider ),
-  //mShaderDataProvider( shaderDataProvider ), //@todo Add in after merge with parent class
-  mMaterialDataProvider( materialDataProvider ),
-  mGeometryDataProvider( geometryDataProvider )
+  mRenderDataProvider( dataProvider )
 {
 }
 
@@ -61,19 +49,11 @@ NewRenderer::~NewRenderer()
 {
 }
 
-// @todo MESH_REWORK Should we consider changing the providers, or should we instead
-// create a new renderer when these change?
-void NewRenderer::SetGeometryDataProvider( const GeometryDataProvider* geometryDataProvider )
+void NewRenderer::SetRenderDataProvider( RenderDataProvider* dataProvider )
 {
-  mGeometryDataProvider = geometryDataProvider;
+  mRenderDataProvider = dataProvider;
   mRenderGeometry.GeometryUpdated();
 }
-
-void NewRenderer::SetMaterialDataProvider( const MaterialDataProvider* materialDataProvider )
-{
-  mMaterialDataProvider = materialDataProvider;
-}
-
 
 // Note - this is currently called from UpdateThread, PrepareRenderInstructions,
 // as an optimisation.
@@ -114,11 +94,11 @@ void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, Shad
 
 void NewRenderer::DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
-  BindTextures( textureCache, bufferIndex, program, mMaterialDataProvider->GetSamplers() );
+  BindTextures( textureCache, bufferIndex, program, mRenderDataProvider->GetSamplers() );
 
   SetUniforms( bufferIndex, program );
 
-  mRenderGeometry.UploadAndDraw( context, program, bufferIndex, *mGeometryDataProvider );
+  mRenderGeometry.UploadAndDraw( context, program, bufferIndex, mRenderDataProvider.Get() );
 }
 
 void NewRenderer::GlContextDestroyed()
@@ -133,16 +113,19 @@ void NewRenderer::GlCleanup()
 void NewRenderer::SetUniforms( BufferIndex bufferIndex, Program& program )
 {
   // Check if the map has changed
-  if( mUniformMapDataProvider.GetUniformMapChanged( bufferIndex ) )
+  DALI_ASSERT_DEBUG( mRenderDataProvider && "No Uniform map data provider available" );
+
+  const UniformMapDataProvider& uniformMapDataProvider = mRenderDataProvider->GetUniformMap();
+
+  if( uniformMapDataProvider.GetUniformMapChanged( bufferIndex ) )
   {
-    const CollectedUniformMap& uniformMap = mUniformMapDataProvider.GetUniformMap( bufferIndex );
+    const CollectedUniformMap& uniformMap = uniformMapDataProvider.GetUniformMap( bufferIndex );
 
     unsigned int numberOfMaps = uniformMap.Count();
     mUniformIndexMap.Clear(); // Clear contents, but keep memory if we don't change size
     mUniformIndexMap.Resize( numberOfMaps );
 
     // Remap uniform indexes to property value addresses
-
     for( unsigned int mapIndex = 0 ; mapIndex < numberOfMaps ; ++mapIndex )
     {
       mUniformIndexMap[mapIndex].propertyValue = uniformMap[mapIndex]->propertyPtr;
@@ -239,15 +222,15 @@ void NewRenderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& prog
 }
 
 void NewRenderer::BindTextures(
-    TextureCache& textureCache,
-    BufferIndex bufferIndex,
-    Program& program,
-    const MaterialDataProvider::Samplers& samplers )
+  TextureCache& textureCache,
+  BufferIndex bufferIndex,
+  Program& program,
+  const RenderDataProvider::Samplers& samplers )
 {
   // @todo MESH_REWORK Write a cache of texture units to commonly used sampler textures
   unsigned int textureUnit = 0;
 
-  for( MaterialDataProvider::Samplers::Iterator iter = samplers.Begin();
+  for( RenderDataProvider::Samplers::Iterator iter = samplers.Begin();
        iter != samplers.End();
        ++iter )
   {

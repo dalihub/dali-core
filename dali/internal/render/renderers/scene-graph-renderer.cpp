@@ -164,7 +164,7 @@ void Renderer::Render( Context& context,
   if( renderer )
   {
     // Get the shader from the material:
-    mShader = renderer->mMaterialDataProvider->GetShader();
+    mShader = &renderer->mRenderDataProvider->GetShader();
   }
 
   // if mShader is NULL it means we're set to default
@@ -254,6 +254,7 @@ void Renderer::Render( Context& context,
     program->SetUniform1f( loc, frametime );
   }
 
+  //@todo MESH_REWORK Remove after removing ImageRenderer
   DoSetUniforms(context, bufferIndex, mShader, program, programIndex, subType );
 
   // subclass rendering and actual draw call
