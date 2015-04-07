@@ -57,7 +57,6 @@ public:
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
-   * @param[in] context to use
    * @param[in] textureCache to use
    */
   void Initialize( Context& context, TextureCache& textureCache );
@@ -111,6 +110,8 @@ public:
 
   /**
    * Called to render during RenderManager::Render().
+   * @param[in] context The context used for rendering
+   * @param[in] textureCache The texture cache used to get textures
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] defaultShader in case there is no custom shader
    * @param[in] modelViewMatrix The model-view matrix.
@@ -119,7 +120,9 @@ public:
    * @param[in] frametime The elapsed time between the last two updates.
    * @param[in] cull Whether to frustum cull this renderer
    */
-  void Render( BufferIndex bufferIndex,
+  void Render( Context& context,
+               TextureCache& textureCache,
+               BufferIndex bufferIndex,
                Shader& defaultShader,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
@@ -166,28 +169,31 @@ private:
    * @param[in] modelViewProjectionMatrix The MVP matrix.
    * @return \e true if it is. Otherwise \e false.
    */
-  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix ) = 0;
+  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix ) = 0;
 
   /**
    * Called from Render prior to DoRender().
    * @todo MESH_REWORK Remove after merge
    */
-  virtual void DoSetUniforms(Shader* shader, Context* context, Program* program, BufferIndex bufferIndex, unsigned int programIndex, ShaderSubTypes subType );
+  virtual void DoSetUniforms(Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType );
 
   /**
    * Called from Render; implemented in derived classes.
+   * @param[in] context The context used for rendering
+   * @param[in] textureCache The texture cache used to get textures
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] program to use.
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    */
-  virtual void DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix ) = 0;
+  virtual void DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix ) = 0;
 
 protected:
 
   NodeDataProvider& mDataProvider;
-  Context* mContext;
-  TextureCache* mTextureCache;
+
+  Context* mContextDELETEME; // TODO: MESH_REWORK DELETE THIS
+  TextureCache* mTextureCacheDELETEME; // TODO: MESH_REWORK DELETE THIS
   Shader* mShader;
   unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 

@@ -61,7 +61,7 @@ TextRenderer::~TextRenderer()
 {
   if(mTextureId > 0)
   {
-    mTextureCache->RemoveObserver(mTextureId, this);
+    mTextureCacheDELETEME->RemoveObserver(mTextureId, this);
   }
 
   GlCleanup();
@@ -91,7 +91,7 @@ void TextRenderer::SetTextureId( ResourceId textureId )
 
   if(mTextureId > 0)
   {
-    mTextureCache->RemoveObserver(mTextureId, this);
+    mTextureCacheDELETEME->RemoveObserver(mTextureId, this);
   }
 
   mTextureId = textureId;
@@ -99,7 +99,7 @@ void TextRenderer::SetTextureId( ResourceId textureId )
 
   if(textureId > 0)
   {
-    mTextureCache->AddObserver(textureId, this);
+    mTextureCacheDELETEME->AddObserver(textureId, this);
   }
 }
 
@@ -164,14 +164,15 @@ void TextRenderer::SetVertexData( TextVertexBuffer* vertexData )
   {
     SetTextureId(vertexData->mTextureId);
 
+    DALI_ASSERT_DEBUG(mContextDELETEME);
     if ( !mVertexBuffer )
     {
-      mVertexBuffer = new GpuBuffer( *mContext, GpuBuffer::ARRAY_BUFFER, GpuBuffer::DYNAMIC_DRAW );
+      mVertexBuffer = new GpuBuffer( *mContextDELETEME, GpuBuffer::ARRAY_BUFFER, GpuBuffer::DYNAMIC_DRAW );
     }
 
     if ( !mIndexBuffer )
     {
-      mIndexBuffer = new GpuBuffer( *mContext, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+      mIndexBuffer = new GpuBuffer( *mContextDELETEME, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
     }
 
     mVertexBuffer->UpdateDataBuffer( vertexData->mVertices.size() * sizeof(TextVertex2D), &vertexData->mVertices[0] );
@@ -280,7 +281,7 @@ bool TextRenderer::CheckResources()
 
   if( mTexture == NULL )
   {
-    mTexture = mTextureCache->GetTexture( mTextureId );
+    mTexture = mTextureCacheDELETEME->GetTexture( mTextureId );
 
     if( mTexture == NULL )
     {
@@ -331,22 +332,22 @@ void TextRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& 
   }
 }
 
-bool TextRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
+bool TextRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
 {
-  mContext->IncrementRendererCount();
+  context.IncrementRendererCount();
 
   Rect<float> boundingBox(mGeometryExtent.width*-0.5f, mGeometryExtent.height*-0.5f, mGeometryExtent.width, mGeometryExtent.height);
   DEBUG_BOUNDING_BOX( *mContext, boundingBox, modelViewProjectionMatrix );
 
   if(Is2dBoxOutsideClipSpace( modelMatrix, modelViewProjectionMatrix, boundingBox ) )
   {
-    mContext->IncrementCulledCount();
+    context.IncrementCulledCount();
     return true;
   }
   return false;
 }
 
-void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
+void TextRenderer::DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
   DALI_ASSERT_DEBUG( NULL != mTexture && "TextRenderer::DoRender. mTexture == NULL." );
   if( NULL == mTexture )
@@ -357,7 +358,7 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
 
   DALI_LOG_INFO( gTextFilter, Debug::General, "TextRenderer::DoRender(this: %p) textureId:%d\n", this, mTextureId );
 
-  mTextureCache->BindTexture( mTexture, mTextureId, GL_TEXTURE_2D, TEXTURE_UNIT_TEXT );
+  mTextureCacheDELETEME->BindTexture( mTexture, mTextureId, GL_TEXTURE_2D, TEXTURE_UNIT_TEXT );
   if( mTexture->GetTextureId() == 0 )
   {
     return; // early out if we haven't got a GL texture yet (e.g. due to context loss)
@@ -501,8 +502,8 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
   const GLint positionLoc = program.GetAttribLocation(Program::ATTRIB_POSITION);
   const GLint texCoordLoc = program.GetAttribLocation(Program::ATTRIB_TEXCOORD);
 
-  mContext->EnableVertexAttributeArray( positionLoc );
-  mContext->EnableVertexAttributeArray( texCoordLoc );
+  context.EnableVertexAttributeArray( positionLoc );
+  context.EnableVertexAttributeArray( texCoordLoc );
 
   // bind the buffers
   DALI_ASSERT_DEBUG( mVertexBuffer->BufferIsValid() );
@@ -511,14 +512,14 @@ void TextRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Ma
   mIndexBuffer->Bind();
 
   TextVertex2D* v = 0;
-  mContext->VertexAttribPointer(positionLoc,  2, GL_FLOAT, GL_FALSE, sizeof(TextVertex2D), &v->mX);
-  mContext->VertexAttribPointer(texCoordLoc,  4, GL_FLOAT, GL_FALSE, sizeof(TextVertex2D), &v->mU);
+  context.VertexAttribPointer(positionLoc,  2, GL_FLOAT, GL_FALSE, sizeof(TextVertex2D), &v->mX);
+  context.VertexAttribPointer(texCoordLoc,  4, GL_FLOAT, GL_FALSE, sizeof(TextVertex2D), &v->mU);
 
   const GLsizei indexCount = mIndexBuffer->GetBufferSize() / sizeof(GLushort); // compiler will optimize this to >> if possible
-  mContext->DrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, (void *) 0);
+  context.DrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, (void *) 0);
 
-  mContext->DisableVertexAttributeArray( positionLoc );
-  mContext->DisableVertexAttributeArray( texCoordLoc );
+  context.DisableVertexAttributeArray( positionLoc );
+  context.DisableVertexAttributeArray( texCoordLoc );
 
 }
 

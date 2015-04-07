@@ -110,8 +110,8 @@ namespace SceneGraph
 
 void Renderer::Initialize( Context& context, TextureCache& textureCache )
 {
-  mContext = &context;
-  mTextureCache = &textureCache;
+  mContextDELETEME = &context;
+  mTextureCacheDELETEME = &textureCache;
 }
 
 Renderer::~Renderer()
@@ -149,7 +149,9 @@ void Renderer::SetSampler( unsigned int samplerBitfield )
   mSamplerBitfield = samplerBitfield;
 }
 
-void Renderer::Render( BufferIndex bufferIndex,
+void Renderer::Render( Context& context,
+                       TextureCache& textureCache,
+                       BufferIndex bufferIndex,
                        Shader& defaultShader,
                        const Matrix& modelViewMatrix,
                        const Matrix& viewMatrix,
@@ -157,8 +159,6 @@ void Renderer::Render( BufferIndex bufferIndex,
                        float frametime,
                        bool cull )
 {
-  DALI_ASSERT_DEBUG( mContext && "Renderer::Render. Renderer not initialised!! (mContext == NULL)." );
-
   // @todo MESH_REWORK Fix when merging! :D
   NewRenderer* renderer = dynamic_cast<NewRenderer*>(this);
   if( renderer )
@@ -189,18 +189,18 @@ void Renderer::Render( BufferIndex bufferIndex,
   ShaderSubTypes subType=SHADER_DEFAULT;
   ResolveGeometryTypes( bufferIndex, geometryType, subType );
   unsigned int programIndex = 0;
-  Program* program = mShader->GetProgram( *mContext, geometryType, subType, programIndex );
+  Program* program = mShader->GetProgram( context, geometryType, subType, programIndex );
   if( !program )
   {
     // if program is NULL it means this is a custom shader with non matching geometry type so we need to use default shaders program
-    program = defaultShader.GetProgram( *mContext, geometryType, subType, programIndex );
+    program = defaultShader.GetProgram( context, geometryType, subType, programIndex );
     DALI_ASSERT_ALWAYS( program && "Default shader is missing a geometry type!!" );
   }
 
   // Check culling (does not need the program to be in use)
   if( cull && ! program->ModifiesGeometry() )
   {
-    if( IsOutsideClipSpace( modelMatrix, gModelViewProjectionMatrix ) )
+    if( IsOutsideClipSpace( context, modelMatrix, gModelViewProjectionMatrix ) )
     {
       // don't do any further gl state changes as this renderer is not visible
       return;
@@ -211,30 +211,30 @@ void Renderer::Render( BufferIndex bufferIndex,
   program->Use();
 
   // Enables/disables blending mode.
-  mContext->SetBlend( mUseBlend );
+  context.SetBlend( mUseBlend );
 
   // Set face culling mode
-  mContext->CullFace( mCullFaceMode );
+  context.CullFace( mCullFaceMode );
 
   // Set the blend color
   const Vector4* const customColor = mBlendingOptions.GetBlendColor();
   if( customColor )
   {
-    mContext->SetCustomBlendColor( *customColor );
+    context.SetCustomBlendColor( *customColor );
   }
   else
   {
-    mContext->SetDefaultBlendColor();
+    context.SetDefaultBlendColor();
   }
 
   // Set blend source & destination factors
-  mContext->BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
+  context.BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
                                mBlendingOptions.GetBlendDestFactorRgb(),
                                mBlendingOptions.GetBlendSrcFactorAlpha(),
                                mBlendingOptions.GetBlendDestFactorAlpha() );
 
   // Set blend equations
-  mContext->BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
+  context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
                                    mBlendingOptions.GetBlendEquationAlpha() );
 
   // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
@@ -254,23 +254,22 @@ void Renderer::Render( BufferIndex bufferIndex,
     program->SetUniform1f( loc, frametime );
   }
 
-  DoSetUniforms(mShader, mContext, program, bufferIndex, programIndex, subType );
+  DoSetUniforms(context, bufferIndex, mShader, program, programIndex, subType );
 
   // subclass rendering and actual draw call
-  DoRender( bufferIndex, *program, modelViewMatrix, viewMatrix );
+  DoRender( context, textureCache, bufferIndex, *program, modelViewMatrix, viewMatrix );
 }
 
 // can be overridden by deriving class
-void Renderer::DoSetUniforms(Shader* shader, Context* context, Program* program, BufferIndex bufferIndex, unsigned int programIndex, ShaderSubTypes subType )
+void Renderer::DoSetUniforms(Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType )
 {
-  shader->SetUniforms( *context, *program, bufferIndex, programIndex, subType );
+  shader->SetUniforms( context, *program, bufferIndex, programIndex, subType );
 }
 
 Renderer::Renderer( NodeDataProvider& dataprovider )
 : mDataProvider( dataprovider ),
-  mContext( NULL ),
-
-  mTextureCache( NULL ),
+  mContextDELETEME(NULL),
+  mTextureCacheDELETEME( NULL ),
   mShader( NULL ),
   mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
   mUseBlend( false ),

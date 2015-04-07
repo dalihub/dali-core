@@ -479,6 +479,7 @@ void RenderManager::DoRender( RenderInstruction& instruction, Shader& defaultSha
 
   Render::ProcessRenderInstruction( instruction,
                                     mImpl->context,
+                                    mImpl->textureCache,
                                     defaultShader,
                                     mImpl->renderBufferIndex,
                                     elapsedTime );

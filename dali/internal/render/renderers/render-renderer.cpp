@@ -100,25 +100,25 @@ void NewRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& o
   // Do nothing
 }
 
-bool NewRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
+bool NewRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
 {
   // @todo MESH_REWORK Add clipping
   return false;
 }
 
-void NewRenderer::DoSetUniforms( Shader* shader, Context* context, Program* program, BufferIndex bufferIndex, unsigned int programIndex, ShaderSubTypes subType )
+void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType )
 {
   // Do nothing, we're going to set up the uniforms with our own code instead
 }
 
 
-void NewRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
+void NewRenderer::DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
-  BindTextures( bufferIndex, program, mMaterialDataProvider->GetSamplers() );
+  BindTextures( textureCache, bufferIndex, program, mMaterialDataProvider->GetSamplers() );
 
   SetUniforms( bufferIndex, program );
 
-  mRenderGeometry.UploadAndDraw( mContext, program, bufferIndex, *mGeometryDataProvider );
+  mRenderGeometry.UploadAndDraw( context, program, bufferIndex, *mGeometryDataProvider );
 }
 
 void NewRenderer::GlContextDestroyed()
@@ -239,9 +239,10 @@ void NewRenderer::SetUniformFromProperty( BufferIndex bufferIndex, Program& prog
 }
 
 void NewRenderer::BindTextures(
-  BufferIndex bufferIndex,
-  Program& program,
-  const MaterialDataProvider::Samplers& samplers )
+    TextureCache& textureCache,
+    BufferIndex bufferIndex,
+    Program& program,
+    const MaterialDataProvider::Samplers& samplers )
 {
   // @todo MESH_REWORK Write a cache of texture units to commonly used sampler textures
   unsigned int textureUnit = 0;
@@ -252,12 +253,12 @@ void NewRenderer::BindTextures(
   {
     const SamplerDataProvider* sampler = *iter;
     ResourceId textureId = sampler->GetTextureId(bufferIndex);
-    Texture* texture = mTextureCache->GetTexture( textureId );
+    Texture* texture = textureCache.GetTexture( textureId );
     if( texture != NULL )
     {
       unsigned int textureUnitUniformIndex = GetTextureUnitUniformIndex( program, *sampler );
       TextureUnit theTextureUnit = static_cast<TextureUnit>(textureUnit);
-      BindTexture( program, textureId, texture, theTextureUnit, textureUnitUniformIndex );
+      BindTexture( textureCache, program, textureId, texture, theTextureUnit, textureUnitUniformIndex );
       ApplySampler( bufferIndex, texture, theTextureUnit, *sampler );
     }
 
@@ -266,17 +267,16 @@ void NewRenderer::BindTextures(
 }
 
 void NewRenderer::BindTexture(
-  Program& program,
-  ResourceId id,
-  Texture* texture,
-  TextureUnit textureUnit,
-  unsigned int textureUnitUniformIndex )
+    TextureCache& textureCache,
+    Program& program,
+    ResourceId id,
+    Texture* texture,
+    TextureUnit textureUnit,
+    unsigned int textureUnitUniformIndex )
 {
-  DALI_ASSERT_DEBUG( NULL != mTextureCache );
-
   if( texture != NULL )
   {
-    mTextureCache->BindTexture( texture, id, GL_TEXTURE_2D, textureUnit );
+    textureCache.BindTexture( texture, id, GL_TEXTURE_2D, textureUnit );
 
     // Set sampler uniform location for the texture
     GLint textureUnitLoc = program.GetUniformLocation( textureUnitUniformIndex );

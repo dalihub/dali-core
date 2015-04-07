@@ -123,7 +123,7 @@ ImageRenderer::~ImageRenderer()
 {
   if ( mTextureId > 0 )
   {
-    mTextureCache->RemoveObserver(mTextureId, this);
+    mTextureCacheDELETEME->RemoveObserver(mTextureId, this);
   }
 
   GlCleanup();
@@ -133,7 +133,7 @@ void ImageRenderer::SetTextureId( ResourceId textureId )
 {
   if ( mTextureId > 0 )
   {
-    mTextureCache->RemoveObserver(mTextureId, this);
+    mTextureCacheDELETEME->RemoveObserver(mTextureId, this);
   }
 
   mTextureId = textureId;
@@ -141,7 +141,7 @@ void ImageRenderer::SetTextureId( ResourceId textureId )
 
   if ( textureId > 0 )
   {
-    mTextureCache->AddObserver(textureId, this);
+    mTextureCacheDELETEME->AddObserver(textureId, this);
   }
 }
 
@@ -206,7 +206,7 @@ bool ImageRenderer::CheckResources()
 {
   if( mTexture == NULL )
   {
-    mTexture = mTextureCache->GetTexture( mTextureId );
+    mTexture = mTextureCacheDELETEME->GetTexture( mTextureId );
   }
 
   if( mTexture == NULL )
@@ -222,7 +222,7 @@ bool ImageRenderer::CheckResources()
 
   Integration::ResourceId shaderTextureId =  mShader->GetTextureIdToRender() ;
 
-  if( shaderTextureId &&  mTextureCache->GetTexture( shaderTextureId ) == NULL )
+  if( shaderTextureId &&  mTextureCacheDELETEME->GetTexture( shaderTextureId ) == NULL )
   {
     return false;
   }
@@ -236,9 +236,9 @@ void ImageRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType&
   outSubType = SHADER_DEFAULT;
 }
 
-bool ImageRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
+bool ImageRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
 {
-  mContext->IncrementRendererCount();
+  context.IncrementRendererCount();
 
   Rect<float> boundingBox( mGeometrySize.x * -0.5f, mGeometrySize.y * -0.5f, mGeometrySize.x, mGeometrySize.y );
 
@@ -246,13 +246,13 @@ bool ImageRenderer::IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix&
 
   if(Is2dBoxOutsideClipSpace( modelMatrix, modelViewProjectionMatrix, boundingBox ) )
   {
-    mContext->IncrementCulledCount();
+    context.IncrementCulledCount();
     return true;
   }
   return false;
 }
 
-void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
+void ImageRenderer::DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {
   DALI_LOG_INFO( gImageRenderFilter, Debug::Verbose, "DoRender() textureId=%d  texture:%p\n", mTextureId, mTexture);
 
@@ -266,7 +266,7 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
 
   DALI_ASSERT_DEBUG( mVertexBuffer );
 
-  mTextureCache->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, TEXTURE_UNIT_IMAGE );
+  mTextureCacheDELETEME->BindTexture( mTexture, mTextureId,  GL_TEXTURE_2D, TEXTURE_UNIT_IMAGE );
 
   if( mTexture->GetTextureId() == 0 )
   {
@@ -311,18 +311,18 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
 
   if ( positionLoc != -1 )
   {
-    mContext->EnableVertexAttributeArray( positionLoc );
+    context.EnableVertexAttributeArray( positionLoc );
 
     const int stride = 4 * sizeof(float);
-    mContext->VertexAttribPointer( positionLoc, 2, GL_FLOAT, GL_FALSE, stride, 0 );
+    context.VertexAttribPointer( positionLoc, 2, GL_FLOAT, GL_FALSE, stride, 0 );
   }
 
   if ( texCoordLoc != -1 )
   {
-    mContext->EnableVertexAttributeArray( texCoordLoc );
+    context.EnableVertexAttributeArray( texCoordLoc );
 
     const int stride = 4 * sizeof(float);
-    mContext->VertexAttribPointer( texCoordLoc, 2, GL_FLOAT, GL_FALSE, stride, (const void*) (sizeof(float)*2) );
+    context.VertexAttribPointer( texCoordLoc, 2, GL_FLOAT, GL_FALSE, stride, (const void*) (sizeof(float)*2) );
   }
 
   switch(mMeshType)
@@ -332,7 +332,7 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
     case NINE_PATCH_NO_CENTER:
     {
       const GLsizei vertexCount = mVertexBuffer->GetBufferSize() / sizeof(Vertex2D); // compiler will optimize this to >> if possible
-      mContext->DrawArrays( GL_TRIANGLE_STRIP, 0, vertexCount );
+      context.DrawArrays( GL_TRIANGLE_STRIP, 0, vertexCount );
       break;
     }
     case GRID_QUAD:
@@ -341,28 +341,28 @@ void ImageRenderer::DoRender( BufferIndex bufferIndex, Program& program, const M
     {
       const GLsizei indexCount = mIndexBuffer->GetBufferSize() / sizeof(GLushort); // compiler will optimize this to >> if possible
       mIndexBuffer->Bind();
-      mContext->DrawElements( GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0 );
+      context.DrawElements( GL_TRIANGLES, indexCount, GL_UNSIGNED_SHORT, 0 );
       break;
     }
   }
 
   if ( positionLoc != -1 )
   {
-    mContext->DisableVertexAttributeArray( positionLoc );
+    context.DisableVertexAttributeArray( positionLoc );
   }
 
   if ( texCoordLoc != -1 )
   {
-    mContext->DisableVertexAttributeArray( texCoordLoc );
+    context.DisableVertexAttributeArray( texCoordLoc );
   }
 }
 
-void ImageRenderer::UpdateVertexBuffer( GLsizeiptr size, const GLvoid *data )
+void ImageRenderer::UpdateVertexBuffer( Context& context, GLsizeiptr size, const GLvoid *data )
 {
   // create/destroy if needed/not needed.
   if ( size && !mVertexBuffer )
   {
-    mVertexBuffer = new GpuBuffer( *mContext, GpuBuffer::ARRAY_BUFFER, GpuBuffer::DYNAMIC_DRAW );
+    mVertexBuffer = new GpuBuffer( context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::DYNAMIC_DRAW );
   }
   else if ( !size && mVertexBuffer )
   {
@@ -376,12 +376,12 @@ void ImageRenderer::UpdateVertexBuffer( GLsizeiptr size, const GLvoid *data )
   }
 }
 
-void ImageRenderer::UpdateIndexBuffer( GLsizeiptr size, const GLvoid *data )
+void ImageRenderer::UpdateIndexBuffer( Context& context, GLsizeiptr size, const GLvoid *data )
 {
   // create/destroy if needed/not needed.
   if ( size && !mIndexBuffer )
   {
-    mIndexBuffer = new GpuBuffer( *mContext, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+    mIndexBuffer = new GpuBuffer( context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
   }
   else if ( !size && mIndexBuffer )
   {
@@ -479,8 +479,8 @@ void ImageRenderer::SetQuadMeshData( Texture* texture, const Vector2& size, cons
 
   texture->MapUV( sizeof(verts)/sizeof(Vertex2D), verts, pixelArea );
 
-  UpdateVertexBuffer( sizeof(verts), verts );
-  UpdateIndexBuffer( 0, NULL );
+  UpdateVertexBuffer( *mContextDELETEME, sizeof(verts), verts );
+  UpdateIndexBuffer( *mContextDELETEME, 0, NULL );
 }
 
 void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size, const Vector4& border, bool borderInPixels, const PixelArea* pixelArea, bool noCenter )
@@ -620,7 +620,7 @@ void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size,
     const size_t vertsSize = sizeof( vertsWithCenter );
     const unsigned int vertexCount = vertsSize / sizeof( vertsWithCenter[0] );
     texture->MapUV( vertexCount, vertsWithCenter, pixelArea );
-    UpdateVertexBuffer( vertsSize, vertsWithCenter );
+    UpdateVertexBuffer( *mContextDELETEME, vertsSize, vertsWithCenter );
   }
   else
   {
@@ -701,10 +701,10 @@ void ImageRenderer::SetNinePatchMeshData( Texture* texture, const Vector2& size,
     const size_t vertsSize = sizeof( vertsWithNoCenter );
     const unsigned int vertexCount = vertsSize / sizeof( vertsWithNoCenter[0] );
     texture->MapUV( vertexCount, vertsWithNoCenter, pixelArea );
-    UpdateVertexBuffer( vertsSize, vertsWithNoCenter );
+    UpdateVertexBuffer( *mContextDELETEME, vertsSize, vertsWithNoCenter );
   }
   // not using an index buffer
-  UpdateIndexBuffer( 0, NULL );
+  UpdateIndexBuffer( *mContextDELETEME, 0, NULL );
 
 }
 
@@ -893,8 +893,8 @@ void ImageRenderer::SetGridMeshData( Texture* texture, const Vector2& size, cons
 
   texture->MapUV( totalVertices, vertices, pixelArea );
 
-  UpdateVertexBuffer( totalVertices * sizeof(Vertex2D) , vertices );
-  UpdateIndexBuffer( totalIndices * sizeof(GLushort), indices );
+  UpdateVertexBuffer( *mContextDELETEME, totalVertices * sizeof(Vertex2D) , vertices );
+  UpdateIndexBuffer( *mContextDELETEME, totalIndices * sizeof(GLushort), indices );
 
   delete[] vertices;
   delete[] indices;

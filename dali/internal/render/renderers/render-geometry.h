@@ -71,7 +71,7 @@ public:
    * @param[in] bufferIndex The current buffer index
    * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
    */
-  void UploadAndDraw(Context* context,
+  void UploadAndDraw(Context& context,
                      Program& program,
                      BufferIndex bufferIndex,
                      const GeometryDataProvider& geometryDataProvider );
@@ -88,7 +88,7 @@ public:
    * @param[in] bufferIndex The current buffer index
    * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
    */
-  void UploadVertexData( Context* context,
+  void UploadVertexData( Context& context,
                          BufferIndex bufferIndex,
                          const GeometryDataProvider& geometryDataProvider );
 
@@ -100,7 +100,7 @@ private:
    * @param[in] bufferIndex The current buffer index
    * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
    */
-  void DoUpload( Context* context,
+  void DoUpload( Context& context,
                  BufferIndex bufferIndex,
                  const GeometryDataProvider& geometryDataProvider );
 
@@ -115,7 +115,7 @@ private:
    * @param[in] context The GL context
    * @param[in] program The shader program to query for attribute locations
    */
-  void EnableVertexAttributes( Context* context, Program& progam );
+  void EnableVertexAttributes( Context& context, Program& progam );
 
   /**
    * Disable the vertex attributes for each vertex buffer from the corresponding
@@ -123,7 +123,7 @@ private:
    * @param[in] context The GL context
    * @param[in] program The shader program to query for attribute locations
    */
-  void DisableVertexAttributes( Context* context, Program& program );
+  void DisableVertexAttributes( Context& context, Program& program );
 
   /**
    * Perform the correct draw call corresponding to the geometry type
@@ -131,7 +131,7 @@ private:
    * @param[in] bufferIndex The current buffer index
    * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
    */
-  void Draw( Context* context,
+  void Draw( Context& context,
              BufferIndex bufferIndex,
              const GeometryDataProvider& geometry );
 

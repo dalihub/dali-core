@@ -52,6 +52,7 @@ namespace Render
  */
 inline void ProcessRenderList( const RenderList& renderList,
                                Context& context,
+                               SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
                                BufferIndex bufferIndex,
                                float frameTime,
@@ -119,12 +120,13 @@ inline void ProcessRenderList( const RenderList& renderList,
     SceneGraph::Renderer* renderer = const_cast< SceneGraph::Renderer* >( item.GetRenderer() );
     const Matrix& modelViewMatrix = item.GetModelViewMatrix();
 
-    renderer->Render( bufferIndex, defaultShader, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode );
+    renderer->Render( context, textureCache, bufferIndex, defaultShader, modelViewMatrix, viewMatrix, projectionMatrix, frameTime, cullMode );
   }
 }
 
 void ProcessRenderInstruction( const RenderInstruction& instruction,
                                Context& context,
+                               SceneGraph::TextureCache& textureCache,
                                SceneGraph::Shader& defaultShader,
                                BufferIndex bufferIndex,
                                float frameTime )
@@ -148,7 +150,7 @@ void ProcessRenderInstruction( const RenderInstruction& instruction,
       if(  renderList &&
           !renderList->IsEmpty() )
       {
-        ProcessRenderList( *renderList, context, defaultShader, bufferIndex, frameTime, *viewMatrix, *projectionMatrix, instruction.mCullMode );
+        ProcessRenderList( *renderList, context, textureCache, defaultShader, bufferIndex, frameTime, *viewMatrix, *projectionMatrix, instruction.mCullMode );
       }
     }
   }

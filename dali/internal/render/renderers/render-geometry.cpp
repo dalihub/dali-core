@@ -62,7 +62,7 @@ void RenderGeometry::GlContextDestroyed()
 }
 
 void RenderGeometry::UploadAndDraw(
-  Context* context,
+  Context& context,
   Program& program,
   BufferIndex bufferIndex,
   const GeometryDataProvider& geometryDataProvider )
@@ -80,7 +80,7 @@ void RenderGeometry::GeometryUpdated()
 }
 
 void RenderGeometry::UploadVertexData(
-  Context* context,
+  Context& context,
   BufferIndex bufferIndex,
   const GeometryDataProvider& geometry )
 {
@@ -93,7 +93,7 @@ void RenderGeometry::UploadVertexData(
 }
 
 void RenderGeometry::DoUpload(
-  Context* context,
+  Context& context,
   BufferIndex bufferIndex,
   const GeometryDataProvider& geometry)
 {
@@ -106,7 +106,7 @@ void RenderGeometry::DoUpload(
     const PropertyBuffer* vertexBuffer = vertexBuffers[i];
 
     // @todo MESH_REWORK STATIC_DRAW or DYNAMIC_DRAW depends on property buffer type (static / animated)
-    GpuBuffer* vertexGpuBuffer = new GpuBuffer( *context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+    GpuBuffer* vertexGpuBuffer = new GpuBuffer( context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
 
     std::size_t dataSize = vertexBuffer->GetDataSize( bufferIndex );
     vertexGpuBuffer->UpdateDataBuffer( dataSize, vertexBuffer->GetData( bufferIndex ) );
@@ -119,7 +119,7 @@ void RenderGeometry::DoUpload(
   const PropertyBuffer* indexBuffer = geometry.GetIndexBuffer();
   if( indexBuffer )
   {
-    GpuBuffer* indexGpuBuffer = new GpuBuffer( *context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+    GpuBuffer* indexGpuBuffer = new GpuBuffer( context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
 
     unsigned int dataSize = indexBuffer->GetDataSize( bufferIndex );
     indexGpuBuffer->UpdateDataBuffer( dataSize, indexBuffer->GetData( bufferIndex ) );
@@ -142,7 +142,7 @@ void RenderGeometry::BindBuffers()
   }
 }
 
-void RenderGeometry::EnableVertexAttributes( Context* context, Program& program )
+void RenderGeometry::EnableVertexAttributes( Context& context, Program& program )
 {
   // @todo Loop thru the array of vertex buffers
   // @todo Use AttributeDataProvider to get the attrs and enable them
@@ -152,36 +152,36 @@ void RenderGeometry::EnableVertexAttributes( Context* context, Program& program 
   unsigned int gpuBufferIndex = 0;
 
   GLint positionLoc = program.GetAttribLocation( Program::ATTRIB_POSITION );
-  context->VertexAttribPointer( positionLoc,
+  context.VertexAttribPointer( positionLoc,
                                 2,         // 2D position
                                 GL_FLOAT,
                                 GL_FALSE,  // Not normalized
                                 mVertexBuffers[gpuBufferIndex]->GetStride(),
                                 &vertex->x );
 
-  context->EnableVertexAttributeArray( positionLoc );
+  context.EnableVertexAttributeArray( positionLoc );
 
   GLint textureCoordsLoc = program.GetAttribLocation( Program::ATTRIB_TEXCOORD );
-  context->VertexAttribPointer( textureCoordsLoc,
+  context.VertexAttribPointer( textureCoordsLoc,
                                 2,         // Texture Coords = U, V
                                 GL_FLOAT,
                                 GL_FALSE,
                                 mVertexBuffers[gpuBufferIndex]->GetStride(),
                                 &vertex->z );
-  context->EnableVertexAttributeArray( textureCoordsLoc );
+  context.EnableVertexAttributeArray( textureCoordsLoc );
 }
 
-void RenderGeometry::DisableVertexAttributes( Context* context, Program& program )
+void RenderGeometry::DisableVertexAttributes( Context& context, Program& program )
 {
   // @todo Loop thru the array of vertex buffers
   // @todo Use AttributeDataProvider to get the attrs and disable them
   GLint positionLoc = program.GetAttribLocation( Program::ATTRIB_POSITION );
   GLint textureCoordsLoc = program.GetAttribLocation( Program::ATTRIB_TEXCOORD );
-  context->DisableVertexAttributeArray( positionLoc );
-  context->DisableVertexAttributeArray( textureCoordsLoc );
+  context.DisableVertexAttributeArray( positionLoc );
+  context.DisableVertexAttributeArray( textureCoordsLoc );
 }
 
-void RenderGeometry::Draw( Context* context, BufferIndex bufferIndex, const GeometryDataProvider& geometry )
+void RenderGeometry::Draw( Context& context, BufferIndex bufferIndex, const GeometryDataProvider& geometry )
 {
   GeometryDataProvider::GeometryType type = geometry.GetGeometryType( bufferIndex );
 
@@ -197,12 +197,12 @@ void RenderGeometry::Draw( Context* context, BufferIndex bufferIndex, const Geom
   {
     case Dali::Geometry::TRIANGLES:
     {
-      context->DrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
+      context.DrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, 0);
       break;
     }
     case Dali::Geometry::LINES:
     {
-      context->DrawElements(GL_LINES, numIndices, GL_UNSIGNED_SHORT, 0);
+      context.DrawElements(GL_LINES, numIndices, GL_UNSIGNED_SHORT, 0);
       break;
     }
     case Dali::Geometry::POINTS:
@@ -216,7 +216,7 @@ void RenderGeometry::Draw( Context* context, BufferIndex bufferIndex, const Geom
         numVertices = firstVertexBuffer->GetBufferSize() / stride;
       }
 
-      context->DrawArrays(GL_POINTS, 0, numVertices );
+      context.DrawArrays(GL_POINTS, 0, numVertices );
       break;
     }
     default:

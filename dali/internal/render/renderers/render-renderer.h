@@ -112,18 +112,21 @@ public: // Implementation of Renderer
   /**
    * @copydoc SceneGraph::Renderer::IsOutsideClipSpace()
    */
-  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix,
+  virtual bool IsOutsideClipSpace( Context& context,
+                                   const Matrix& modelMatrix,
                                    const Matrix& modelViewProjectionMatrix );
 
   /**
    * @copydoc SceneGraph::Renderer::DoSetUniforms()
    */
-  virtual void DoSetUniforms(Shader* shader, Context* context, Program* program, BufferIndex bufferIndex, unsigned int programIndex, ShaderSubTypes subType );
+  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType );
 
   /**
    * @copydoc SceneGraph::Renderer::DoRender()
    */
-  virtual void DoRender( BufferIndex bufferIndex,
+  virtual void DoRender( Context& context,
+                         TextureCache& textureCache,
+                         BufferIndex bufferIndex,
                          Program& program,
                          const Matrix& modelViewMatrix,
                          const Matrix& viewMatrix );
@@ -154,24 +157,28 @@ private:
 
   /**
    * Bind the material textures in the samplers and setup the samplers
+   * @param[in] textureCache The texture cache
    * @param[in] bufferIndex The buffer index
    * @param[in] program The shader program
    * @param[in] samplers The samplers to bind
    */
-  void BindTextures( BufferIndex bufferIndex,
+  void BindTextures( TextureCache& textureCache,
+                     BufferIndex bufferIndex,
                      Program& program,
                      const MaterialDataProvider::Samplers& samplers );
 
   /**
    * Bind a material texture to a texture unit, and set the sampler's texture uniform
    * to that texture unit.
+   * @param[in] textureCache The texture cache
    * @param[in] program The shader program
    * @param[in] id The resource id of the texture to bind
    * @param[in] texture The texture to bind
    * @param[in] textureUnit The texture unit index to use
    * @param[in] nameIndex The index of the texture uniform in the program
    */
-  void BindTexture( Program& program,
+  void BindTexture( TextureCache& textureCache,
+                    Program& program,
                     ResourceId id,
                     Texture* texture,
                     TextureUnit textureUnit,

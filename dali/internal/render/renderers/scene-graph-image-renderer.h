@@ -123,12 +123,12 @@ public:
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::IsOutsideClipSpace()
    */
-  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix );
+  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix );
 
   /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::DoRender()
    */
-  virtual void DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
+  virtual void DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix );
 
 protected: // TextureObserver implementation
 
@@ -141,12 +141,12 @@ private:
   /**
    * Helper to update the vertex buffer.
    */
-  void UpdateVertexBuffer( GLsizeiptr size, const GLvoid *data );
+  void UpdateVertexBuffer( Context& context, GLsizeiptr size, const GLvoid *data );
 
   /**
    * Helper to update the index buffer.
    */
-  void UpdateIndexBuffer( GLsizeiptr size, const GLvoid *data );
+  void UpdateIndexBuffer( Context& context, GLsizeiptr size, const GLvoid *data );
 
   /**
    * Helper to generate mesh data when required
