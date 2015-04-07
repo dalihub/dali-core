@@ -40,15 +40,6 @@ void utc_dali_actor_cleanup(void)
 
 namespace
 {
-// Enumeration properties to test:
-const Scripting::StringEnum< int > SIZE_MODE_VALUES[] =
-{
-  { "USE_OWN_SIZE",                  USE_OWN_SIZE                  },
-  { "SIZE_RELATIVE_TO_PARENT",       SIZE_RELATIVE_TO_PARENT       },
-  { "SIZE_FIXED_OFFSET_FROM_PARENT", SIZE_FIXED_OFFSET_FROM_PARENT },
-};
-const unsigned int SIZE_MODE_VALUES_COUNT = sizeof( SIZE_MODE_VALUES ) / sizeof( SIZE_MODE_VALUES[0] );
-
 bool gTouchCallBackCalled=false;
 bool gTouchCallBack2Called=false;
 bool gHoverCallBackCalled=false;
@@ -2633,10 +2624,8 @@ int UtcDaliActorSetDrawModeOverlayHitTest(void)
   Stage::GetCurrent().Add(a);
   Stage::GetCurrent().Add(b);
 
-  a.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-  a.SetPreferredSize(Vector2(100.0f, 100.0f));
-  b.SetResizePolicy( FIXED, ALL_DIMENSIONS );
-  b.SetPreferredSize(Vector2(100.0f, 100.0f));
+  a.SetSize( 100.0f, 100.0f );
+  b.SetSize( 100.0f, 100.0f );
 
   // position b overlapping a. (regular non-overlays)
   // hit test at point 'x'
@@ -2951,7 +2940,6 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "color-mode",               Actor::Property::COLOR_MODE,               Property::STRING      },
   { "position-inheritance",     Actor::Property::POSITION_INHERITANCE,     Property::STRING      },
   { "draw-mode",                Actor::Property::DRAW_MODE,                Property::STRING      },
-  { "size-mode",                Actor::Property::SIZE_MODE,                Property::STRING      },
   { "size-mode-factor",         Actor::Property::SIZE_MODE_FACTOR,         Property::VECTOR3     },
   { "relayout-enabled",         Actor::Property::RELAYOUT_ENABLED,         Property::BOOLEAN     },
   { "width-resize-policy",      Actor::Property::WIDTH_RESIZE_POLICY,      Property::STRING      },
@@ -2962,7 +2950,6 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "padding",                  Actor::Property::PADDING,                  Property::VECTOR4     },
   { "minimum-size",             Actor::Property::MINIMUM_SIZE,             Property::VECTOR2     },
   { "maximum-size",             Actor::Property::MAXIMUM_SIZE,             Property::VECTOR2     },
-  { "preferred-size",           Actor::Property::PREFERRED_SIZE,           Property::VECTOR2     },
 };
 const unsigned int PROPERTY_TABLE_COUNT = sizeof( PROPERTY_TABLE ) / sizeof( PROPERTY_TABLE[0] );
 } // unnamed namespace

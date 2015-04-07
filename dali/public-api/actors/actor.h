@@ -294,7 +294,6 @@ public:
       COLOR_MODE,                                         ///< name "color-mode",            type std::string
       POSITION_INHERITANCE,                               ///< name "position-inheritance",  type std::string
       DRAW_MODE,                                          ///< name "draw-mode",             type std::string
-      SIZE_MODE,                                          ///< name "size-mode",             type std::string
       SIZE_MODE_FACTOR,                                   ///< name "size-mode-factor",      type Vector3
       RELAYOUT_ENABLED,                                   ///< name "relayout-enabled",      type Boolean
       WIDTH_RESIZE_POLICY,                                ///< name "width-resize-policy",   type String
@@ -305,7 +304,6 @@ public:
       PADDING,                                            ///< name "padding",               type Vector4
       MINIMUM_SIZE,                                       ///< name "minimum-size",          type Vector2
       MAXIMUM_SIZE,                                       ///< name "maximum-size",          type Vector2
-      PREFERRED_SIZE                                      ///< name "preferred-size",        type Vector2
     };
   };
 
@@ -1190,40 +1188,12 @@ public:
   SizeScalePolicy GetSizeScalePolicy() const;
 
   /**
-   * @brief Defines how a child actor's size is affected by its parent's size.
-   *
-   * The default is to ignore the parent's size and use the size property of this actor.
-   *
-   * If USE_OWN_SIZE is used, this option is bypassed and the actor's size
-   *     property is used.
-   *
-   * If SIZE_RELATIVE_TO_PARENT is used, this actor's size will be based on
-   *     its parent's size by multiplying the parent size by
-   *     SizeModeFactor.
-   *
-   * If SIZE_FIXED_OFFSET_FROM_PARENT is used, this actor's size will be based on
-   *     its parent's size plus SizeModeFactor.
-   *
-   * @pre The Actor has been initialized.
-   * @param[in] mode The size relative to parent mode to use.
-   */
-  void SetSizeMode( const SizeMode mode );
-
-  /**
-   * @brief Returns the actor's mode for modifying its size relative to its parent.
-   *
-   * @pre The Actor has been initialized.
-   * @return The mode used.
-   */
-  SizeMode GetSizeMode() const;
-
-  /**
    * @brief Sets the relative to parent size factor of the actor.
    *
-   * This factor is only used when SizeMode is set to either:
-   * SIZE_RELATIVE or SIZE_FIXED_OFFSET.
+   * This factor is only used when ResizePolicy is set to either:
+   * SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
    * This actor's size is set to the actor's size multipled by or added to this factor,
-   * depending on SideMode (See SetSizeMode).
+   * depending on ResizePolicy (See SetResizePolicy).
    *
    * @pre The Actor has been initialized.
    * @param [in] factor A Vector3 representing the relative factor to be applied to each axis.
@@ -1237,23 +1207,6 @@ public:
    * @return The Actor's current relative size factor.
    */
   Vector3 GetSizeModeFactor() const;
-
-  /**
-   * @brief This method specifies a dependency between dimensions. Will set resize policy on the actor for
-   * the given dimension to be DIMENSION_DEPENDENCY.
-   *
-   * @param[in] dimension The dimension to set the dependency on
-   * @param[in] dependency The dependency to set on the dimension
-   */
-  void SetDimensionDependency( Dimension dimension, Dimension dependency );
-
-  /**
-   * @brief Return the dependecy for a dimension
-   *
-   * @param[in] dimension The dimension to return the dependency for
-   * @return Return the dependency
-   */
-  Dimension GetDimensionDependency( Dimension dimension );
 
   /**
    * @brief Calculate the height of the actor given a width
@@ -1309,20 +1262,6 @@ public:
    * @param paddingOut The returned padding data
    */
   void GetPadding( Padding& paddingOut ) const;
-
-  /**
-   * @brief Set the preferred size for size negotiation
-   *
-   * @param[in] size The preferred size to set
-   */
-  void SetPreferredSize( const Vector2& size );
-
-  /**
-   * @brief Return the preferred size used for size negotiation
-   *
-   * @return Return the preferred size
-   */
-  Vector2 GetPreferredSize() const;
 
   /**
    * @brief Set the minimum size an actor can be assigned in size negotiation

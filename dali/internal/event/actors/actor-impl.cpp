@@ -40,6 +40,7 @@
 #include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
+#include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
@@ -78,7 +79,7 @@ ActorContainer Actor::mNullChildren;
 struct Actor::RelayoutData
 {
   RelayoutData()
-      : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( USE_SIZE_SET ), sizeMode( USE_OWN_SIZE ), relayoutEnabled( false ), insideRelayout( false )
+      : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
   {
     // Set size negotiation defaults
     for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
@@ -113,7 +114,6 @@ struct Actor::RelayoutData
   Vector2 preferredSize;                               ///< The preferred size of the actor
 
   SizeScalePolicy sizeSetPolicy :3;            ///< Policy to apply when setting size. Enough room for the enum
-  SizeMode sizeMode :2;                        ///< Determines how the actors parent affects the actors size
 
   bool relayoutEnabled :1;                   ///< Flag to specify if this actor should be included in size negotiation or not (defaults to true)
   bool insideRelayout :1;                    ///< Locking flag to prevent recursive relayouts on size set
@@ -195,7 +195,6 @@ DALI_PROPERTY( "inherit-scale", BOOLEAN, true, false, false, Dali::Actor::Proper
 DALI_PROPERTY( "color-mode", STRING, true, false, false, Dali::Actor::Property::COLOR_MODE )
 DALI_PROPERTY( "position-inheritance", STRING, true, false, false, Dali::Actor::Property::POSITION_INHERITANCE )
 DALI_PROPERTY( "draw-mode", STRING, true, false, false, Dali::Actor::Property::DRAW_MODE )
-DALI_PROPERTY( "size-mode", STRING, true, false, false, Dali::Actor::Property::SIZE_MODE )
 DALI_PROPERTY( "size-mode-factor", VECTOR3, true, false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
 DALI_PROPERTY( "relayout-enabled", BOOLEAN, true, false, false, Dali::Actor::Property::RELAYOUT_ENABLED )
 DALI_PROPERTY( "width-resize-policy", STRING, true, false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
@@ -206,7 +205,6 @@ DALI_PROPERTY( "height-for-width", BOOLEAN, true, false, false, Dali::Actor::Pro
 DALI_PROPERTY( "padding", VECTOR4, true, false, false, Dali::Actor::Property::PADDING )
 DALI_PROPERTY( "minimum-size", VECTOR2, true, false, false, Dali::Actor::Property::MINIMUM_SIZE )
 DALI_PROPERTY( "maximum-size", VECTOR2, true, false, false, Dali::Actor::Property::MAXIMUM_SIZE )
-DALI_PROPERTY( "preferred-size", VECTOR2, true, false, false, Dali::Actor::Property::PREFERRED_SIZE )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -224,17 +222,14 @@ const char* const ACTION_HIDE = "hide";
 
 // Enumeration to / from string conversion tables
 
-DALI_ENUM_TO_STRING_TABLE_BEGIN( SizeMode )DALI_ENUM_TO_STRING( USE_OWN_SIZE )
-DALI_ENUM_TO_STRING( SIZE_RELATIVE_TO_PARENT )
-DALI_ENUM_TO_STRING( SIZE_FIXED_OFFSET_FROM_PARENT )
-DALI_ENUM_TO_STRING_TABLE_END( SizeMode )
-
 DALI_ENUM_TO_STRING_TABLE_BEGIN( ResizePolicy )DALI_ENUM_TO_STRING( FIXED )
 DALI_ENUM_TO_STRING( USE_NATURAL_SIZE )
-DALI_ENUM_TO_STRING( USE_ASSIGNED_SIZE )
 DALI_ENUM_TO_STRING( FILL_TO_PARENT )
+DALI_ENUM_TO_STRING( SIZE_RELATIVE_TO_PARENT )
+DALI_ENUM_TO_STRING( SIZE_FIXED_OFFSET_FROM_PARENT )
 DALI_ENUM_TO_STRING( FIT_TO_CHILDREN )
 DALI_ENUM_TO_STRING( DIMENSION_DEPENDENCY )
+DALI_ENUM_TO_STRING( USE_ASSIGNED_SIZE )
 DALI_ENUM_TO_STRING_TABLE_END( ResizePolicy )
 
 DALI_ENUM_TO_STRING_TABLE_BEGIN( SizeScalePolicy )DALI_ENUM_TO_STRING( USE_SIZE_SET )
@@ -1130,25 +1125,11 @@ bool Actor::IsOrientationInherited() const
   return mInheritOrientation;
 }
 
-void Actor::SetSizeMode( SizeMode mode )
-{
-  EnsureRelayoutData();
-
-  mRelayoutData->sizeMode = mode;
-}
-
 void Actor::SetSizeModeFactor( const Vector3& factor )
 {
   EnsureRelayoutData();
 
   mRelayoutData->sizeModeFactor = factor;
-}
-
-SizeMode Actor::GetSizeMode() const
-{
-  EnsureRelayoutData();
-
-  return mRelayoutData->sizeMode;
 }
 
 const Vector3& Actor::GetSizeModeFactor() const
@@ -1284,6 +1265,19 @@ void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
     }
   }
 
+  if( policy == DIMENSION_DEPENDENCY )
+  {
+    if( dimension & WIDTH )
+    {
+      SetDimensionDependency( WIDTH, HEIGHT );
+    }
+
+    if( dimension & HEIGHT )
+    {
+      SetDimensionDependency( HEIGHT, WIDTH );
+    }
+  }
+
   OnSetResizePolicy( policy, dimension );
 
   // Trigger relayout on this control
@@ -1329,7 +1323,6 @@ void Actor::SetDimensionDependency( Dimension dimension, Dimension dependency )
     if( dimension & ( 1 << i ) )
     {
       mRelayoutData->dimensionDependencies[ i ] = dependency;
-      mRelayoutData->resizePolicies[ i ] = DIMENSION_DEPENDENCY;
     }
   }
 }
@@ -2815,12 +2808,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::Actor::Property::SIZE_MODE:
-    {
-      SetSizeMode( Scripting::GetEnumeration< SizeMode >( property.Get< std::string >().c_str(), SizeModeTable, SizeModeTableCount ) );
-      break;
-    }
-
     case Dali::Actor::Property::SIZE_MODE_FACTOR:
     {
       SetSizeModeFactor( property.Get< Vector3 >() );
@@ -2855,7 +2842,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     {
       if( property.Get< bool >() )
       {
-        SetDimensionDependency( WIDTH, HEIGHT );
+        SetResizePolicy( DIMENSION_DEPENDENCY, WIDTH );
       }
       break;
     }
@@ -2864,7 +2851,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     {
       if( property.Get< bool >() )
       {
-        SetDimensionDependency( HEIGHT, WIDTH );
+        SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
       }
       break;
     }
@@ -2890,13 +2877,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       Vector2 size = property.Get< Vector2 >();
       SetMaximumSize( size.x, WIDTH );
       SetMaximumSize( size.y, HEIGHT );
-      break;
-    }
-
-    case Dali::Actor::Property::PREFERRED_SIZE:
-    {
-      Vector2 size = property.Get< Vector2 >();
-      SetPreferredSize( size );
       break;
     }
 
@@ -3286,12 +3266,6 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
       break;
     }
 
-    case Dali::Actor::Property::SIZE_MODE:
-    {
-      value = Scripting::GetLinearEnumerationName< SizeMode >( GetSizeMode(), SizeModeTable, SizeModeTableCount );
-      break;
-    }
-
     case Dali::Actor::Property::SIZE_MODE_FACTOR:
     {
       value = GetSizeModeFactor();
@@ -3354,12 +3328,6 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
       break;
     }
 
-    case Dali::Actor::Property::PREFERRED_SIZE:
-    {
-      value = GetPreferredSize();
-      break;
-    }
-
     default:
     {
       DALI_ASSERT_ALWAYS( false && "Actor Property index invalid" ); // should not come here
@@ -3396,7 +3364,19 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
   if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
   {
     AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
+    if( !animatable )
+    {
+      const TypeInfo* typeInfo( GetTypeInfo() );
+      if ( typeInfo )
+      {
+        if( Property::INVALID_INDEX != RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, Property::Value( typeInfo->GetPropertyType( index ) ) ) )
+        {
+          animatable = FindAnimatableProperty( index );
+        }
+      }
+    }
     DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
+
     property = animatable->GetSceneGraphProperty();
   }
   else if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
@@ -3507,7 +3487,19 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
   if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
   {
     AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
+    if( !animatable )
+    {
+      const TypeInfo* typeInfo( GetTypeInfo() );
+      if ( typeInfo )
+      {
+        if( Property::INVALID_INDEX != RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, Property::Value( typeInfo->GetPropertyType( index ) ) ) )
+        {
+          animatable = FindAnimatableProperty( index );
+        }
+      }
+    }
     DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
+
     property = animatable->GetSceneGraphProperty();
   }
   else if ( index >= DEFAULT_PROPERTY_MAX_COUNT )
@@ -3808,7 +3800,7 @@ bool Actor::RelayoutDependentOnParent( Dimension dimension )
     if( ( dimension & ( 1 << i ) ) )
     {
       const ResizePolicy resizePolicy = GetResizePolicy( static_cast< Dimension >( 1 << i ) );
-      if( resizePolicy == FILL_TO_PARENT )
+      if( resizePolicy == FILL_TO_PARENT || resizePolicy == SIZE_RELATIVE_TO_PARENT || resizePolicy == SIZE_FIXED_OFFSET_FROM_PARENT )
       {
         return true;
       }
@@ -3951,9 +3943,9 @@ float Actor::CalculateChildSize( const Dali::Actor& child, Dimension dimension )
 float Actor::CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension )
 {
   // Fill to parent, taking size mode factor into account
-  switch( child.GetSizeMode() )
+  switch( child.GetResizePolicy( dimension ) )
   {
-    case USE_OWN_SIZE:
+    case FILL_TO_PARENT:
     {
       return GetLatestSize( dimension );
     }
@@ -4081,6 +4073,8 @@ float Actor::CalculateSize( Dimension dimension, const Vector2& maximumSize )
     }
 
     case FILL_TO_PARENT:
+    case SIZE_RELATIVE_TO_PARENT:
+    case SIZE_FIXED_OFFSET_FROM_PARENT:
     {
       return NegotiateFromParent( dimension );
     }
@@ -4376,6 +4370,16 @@ void Actor::OnLayoutNegotiated( float size, Dimension dimension )
 void Actor::SetPreferredSize( const Vector2& size )
 {
   EnsureRelayoutData();
+
+  if( size.width > 0.0f )
+  {
+    SetResizePolicy( FIXED, WIDTH );
+  }
+
+  if( size.height > 0.0f )
+  {
+    SetResizePolicy( FIXED, HEIGHT );
+  }
 
   mRelayoutData->preferredSize = size;
 

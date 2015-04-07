@@ -779,7 +779,6 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
     actor.SetLeaveRequired( true );
     actor.SetInheritOrientation( false );
     actor.SetInheritScale( false );
-    actor.SetSizeMode( USE_OWN_SIZE );
     actor.SetSizeModeFactor( Vector3::ONE );
 
     Stage::GetCurrent().Add( actor );
