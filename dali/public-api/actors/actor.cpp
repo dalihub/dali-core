@@ -172,50 +172,22 @@ Vector3 Actor::GetCurrentAnchorPoint() const
 
 void Actor::SetSize(float width, float height)
 {
-  if( IsRelayoutEnabled() )
-  {
-    GetImplementation(*this).SetPreferredSize( Vector2( width, height ) );
-  }
-  else
-  {
-    GetImplementation(*this).SetSize(width, height);
-  }
+  GetImplementation(*this).SetSize(width, height);
 }
 
 void Actor::SetSize(float width, float height, float depth)
 {
-  if( IsRelayoutEnabled() )
-  {
-    GetImplementation(*this).SetPreferredSize( Vector2( width, height ) );
-  }
-  else
-  {
-    GetImplementation(*this).SetSize(width, height, depth);
-  }
+  GetImplementation(*this).SetSize(width, height, depth);
 }
 
 void Actor::SetSize(const Vector2& size)
 {
-  if( IsRelayoutEnabled() )
-  {
-    GetImplementation(*this).SetPreferredSize( size );
-  }
-  else
-  {
-    GetImplementation(*this).SetSize( size );
-  }
+  GetImplementation(*this).SetSize( size );
 }
 
 void Actor::SetSize(const Vector3& size)
 {
-  if( IsRelayoutEnabled() )
-  {
-    GetImplementation(*this).SetPreferredSize( size.GetVectorXY() );
-  }
-  else
-  {
-    GetImplementation(*this).SetSize( size );
-  }
+  GetImplementation(*this).SetSize( size );
 }
 
 Vector3 Actor::GetTargetSize() const

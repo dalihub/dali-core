@@ -302,12 +302,26 @@ public:
   void SetSize( const Vector2& size );
 
   /**
+   * Sets the update size for an actor.
+   *
+   * @param[in] size The size to set.
+   */
+  void SetSizeInternal( const Vector2& size );
+
+  /**
    * Sets the size of an actor.
    * ActorAttachments attached to the actor, can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * @param [in] size The new size.
    */
   void SetSize( const Vector3& size );
+
+  /**
+   * Sets the update size for an actor.
+   *
+   * @param[in] size The size to set.
+   */
+  void SetSizeInternal( const Vector3& size );
 
   /**
    * Set the width component of the Actor's size.
