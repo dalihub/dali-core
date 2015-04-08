@@ -148,6 +148,7 @@ internal_src_files = \
   $(internal_src_dir)/render/queue/render-queue.cpp \
   $(internal_src_dir)/render/renderers/render-geometry.cpp \
   $(internal_src_dir)/render/renderers/render-renderer.cpp \
+  $(internal_src_dir)/render/renderers/render-renderer-property-buffer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-image-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer-debug.cpp \

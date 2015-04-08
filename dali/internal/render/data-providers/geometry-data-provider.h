@@ -20,6 +20,7 @@
 #include <dali/public-api/geometry/geometry.h>
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/owner-container.h>
+#include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 
 namespace Dali
 {
@@ -39,7 +40,7 @@ class GeometryDataProvider
 {
 public:
   typedef Dali::Geometry::GeometryType GeometryType;
-  typedef Dali::Vector< const PropertyBuffer* > VertexBuffers;
+  typedef Dali::Vector< const PropertyBufferDataProvider* > VertexBuffers;
 
   /**
    * Constructor. Nothing to do as a pure interface.

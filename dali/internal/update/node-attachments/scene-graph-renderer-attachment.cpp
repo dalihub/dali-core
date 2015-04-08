@@ -217,7 +217,8 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
            iter != end ;
            ++iter )
       {
-        AddMappings( localMap, (*iter)->GetUniformMap() );
+        const SceneGraph::PropertyBuffer* vertexBuffer = static_cast<const SceneGraph::PropertyBuffer*>( *iter );
+        AddMappings( localMap, vertexBuffer->GetUniformMap() );
       }
 
       mUniformMapChanged[updateBufferIndex] = true;

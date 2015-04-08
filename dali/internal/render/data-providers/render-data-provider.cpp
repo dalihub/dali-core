@@ -29,7 +29,7 @@ RenderDataProvider::RenderDataProvider(
   const MaterialDataProvider&   materialDataProvider,
   const UniformMapDataProvider& uniformMapDataProvider,
   Shader&                       shader,
-  const PropertyBuffer*         indexBuffer,
+  const PropertyBufferDataProvider* indexBuffer,
   const VertexBuffers&          vertexBuffers,
   const Samplers&               samplers )
 
@@ -87,12 +87,12 @@ Shader& RenderDataProvider::GetShader() const
   return *mShader;
 }
 
-void RenderDataProvider::SetIndexBuffer( const PropertyBuffer* indexBuffer )
+void RenderDataProvider::SetIndexBuffer( const PropertyBufferDataProvider* indexBuffer )
 {
   mIndexBuffer = indexBuffer;
 }
 
-const PropertyBuffer* RenderDataProvider::GetIndexBuffer() const
+const PropertyBufferDataProvider* RenderDataProvider::GetIndexBuffer() const
 {
   return mIndexBuffer;
 }

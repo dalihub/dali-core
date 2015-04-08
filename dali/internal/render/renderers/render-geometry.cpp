@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "render-geometry.h"
+#include <dali/internal/render/renderers/render-geometry.h>
 
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/update/geometry/scene-graph-geometry.h>
@@ -32,7 +32,8 @@ namespace SceneGraph
 {
 
 RenderGeometry::RenderGeometry()
-: mDataNeedsUploading( true )
+: mDataNeedsUploading( true ),
+  mShaderChanged( true )
 {
 }
 
@@ -47,19 +48,6 @@ void RenderGeometry::GlContextCreated( Context& context )
 
 void RenderGeometry::GlContextDestroyed()
 {
-  for( GpuBuffers::Iterator iter=mVertexBuffers.Begin(); iter != mVertexBuffers.End(); ++iter )
-  {
-    GpuBuffer* gpuBuffer = *iter;
-    if( gpuBuffer )
-    {
-      gpuBuffer->GlContextDestroyed();
-    }
-  }
-
-  if( mIndexBuffer )
-  {
-    mIndexBuffer->GlContextDestroyed();
-  }
 }
 
 void RenderGeometry::UploadAndDraw(
@@ -69,10 +57,27 @@ void RenderGeometry::UploadAndDraw(
   const RenderDataProvider* dataProviders )
 {
   UploadVertexData( context, bufferIndex, dataProviders );
-  BindBuffers();
-  EnableVertexAttributes( context, program );
+
+  for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
+  {
+    mVertexBuffers[i]->BindBuffer( context, program );
+    mVertexBuffers[i]->EnableVertexAttributes( context, bufferIndex, program );
+  }
+
+  if( mIndexBuffer )
+  {
+    mIndexBuffer->BindBuffer( context, program );
+  }
+
+//  BindBuffers( context, bufferIndex, program );
+//  EnableVertexAttributes( context, bufferIndex, program );
   Draw( context, bufferIndex, dataProviders );
-  DisableVertexAttributes( context, program );
+
+  for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
+  {
+    mVertexBuffers[i]->DisableVertexAttributes( context, bufferIndex, program );
+  }
+  //DisableVertexAttributes( context, bufferIndex, program );
 }
 
 void RenderGeometry::GeometryUpdated()
@@ -105,88 +110,62 @@ void RenderGeometry::DoUpload(
 
   for( unsigned int i=0; i<vertexBuffers.Count(); ++i)
   {
-    const PropertyBuffer* vertexBuffer = vertexBuffers[i];
+    const PropertyBufferDataProvider* vertexBuffer = vertexBuffers[i];
 
-    // @todo MESH_REWORK STATIC_DRAW or DYNAMIC_DRAW depends on property buffer type (static / animated)
-    GpuBuffer* vertexGpuBuffer = new GpuBuffer( context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+    RenderPropertyBuffer* propertyBuffer = new RenderPropertyBuffer( *vertexBuffer, false );
 
-    std::size_t dataSize = vertexBuffer->GetDataSize( bufferIndex );
-    vertexGpuBuffer->UpdateDataBuffer( dataSize, vertexBuffer->GetData( bufferIndex ) );
-    vertexGpuBuffer->SetStride( vertexBuffer->GetElementSize( bufferIndex ) );
+    propertyBuffer->DoUpload( context, bufferIndex );
 
-    mVertexBuffers.PushBack( vertexGpuBuffer );
+    mVertexBuffers.PushBack( propertyBuffer );
   }
 
   // Index buffer
-  const PropertyBuffer* indexBuffer = dataProvider->GetIndexBuffer();
+  const PropertyBufferDataProvider* indexBuffer = dataProvider->GetIndexBuffer();
   if( indexBuffer )
   {
-    GpuBuffer* indexGpuBuffer = new GpuBuffer( context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
+    mIndexBuffer = new RenderPropertyBuffer( *indexBuffer, true );
 
-    unsigned int dataSize = indexBuffer->GetDataSize( bufferIndex );
-    indexGpuBuffer->UpdateDataBuffer( dataSize, indexBuffer->GetData( bufferIndex ) );
-
-    mIndexBuffer.Reset();
-    mIndexBuffer = indexGpuBuffer;
+    mIndexBuffer->DoUpload( context, bufferIndex );
   }
 }
 
-void RenderGeometry::BindBuffers()
+void RenderGeometry::BindBuffers( Context& context, BufferIndex bufferIndex, Program& program )
 {
-  for( GpuBuffers::Iterator iter=mVertexBuffers.Begin(); iter != mVertexBuffers.End(); ++iter )
+  for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
   {
-    (*iter)->Bind();
+    mVertexBuffers[i]->BindBuffer( context, program );
   }
 
   if( mIndexBuffer )
   {
-    mIndexBuffer->Bind();
+    mIndexBuffer->BindBuffer( context, program );
   }
 }
 
-void RenderGeometry::EnableVertexAttributes( Context& context, Program& program )
+void RenderGeometry::EnableVertexAttributes( Context& context, BufferIndex bufferIndex, Program& program )
 {
-  // @todo Loop thru the array of vertex buffers
-  // @todo Use AttributeDataProvider to get the attrs and enable them
-  // Need mapping from gpu buffers index to a particular attributes
-  Vector4 *vertex=0;
-
-  unsigned int gpuBufferIndex = 0;
-
-  GLint positionLoc = program.GetAttribLocation( Program::ATTRIB_POSITION );
-  context.VertexAttribPointer( positionLoc,
-                                2,         // 2D position
-                                GL_FLOAT,
-                                GL_FALSE,  // Not normalized
-                                mVertexBuffers[gpuBufferIndex]->GetStride(),
-                                &vertex->x );
-
-  context.EnableVertexAttributeArray( positionLoc );
-
-  GLint textureCoordsLoc = program.GetAttribLocation( Program::ATTRIB_TEXCOORD );
-  context.VertexAttribPointer( textureCoordsLoc,
-                                2,         // Texture Coords = U, V
-                                GL_FLOAT,
-                                GL_FALSE,
-                                mVertexBuffers[gpuBufferIndex]->GetStride(),
-                                &vertex->z );
-  context.EnableVertexAttributeArray( textureCoordsLoc );
+  OwnerContainer< RenderPropertyBuffer* >::Iterator it = mVertexBuffers.Begin();
+  OwnerContainer< RenderPropertyBuffer* >::ConstIterator end = mVertexBuffers.End();
+  for( ; it != end; ++it )
+  {
+    (*it)->EnableVertexAttributes( context, bufferIndex, program );
+  }
 }
 
-void RenderGeometry::DisableVertexAttributes( Context& context, Program& program )
+void RenderGeometry::DisableVertexAttributes( Context& context, BufferIndex bufferIndex, Program& program )
 {
-  // @todo Loop thru the array of vertex buffers
-  // @todo Use AttributeDataProvider to get the attrs and disable them
-  GLint positionLoc = program.GetAttribLocation( Program::ATTRIB_POSITION );
-  GLint textureCoordsLoc = program.GetAttribLocation( Program::ATTRIB_TEXCOORD );
-  context.DisableVertexAttributeArray( positionLoc );
-  context.DisableVertexAttributeArray( textureCoordsLoc );
+  OwnerContainer< RenderPropertyBuffer* >::Iterator it = mVertexBuffers.Begin();
+  OwnerContainer< RenderPropertyBuffer* >::ConstIterator end = mVertexBuffers.End();
+  for( ; it != end; ++it )
+  {
+    (*it)->DisableVertexAttributes( context, bufferIndex, program );
+  }
 }
 
 void RenderGeometry::Draw( Context& context, BufferIndex bufferIndex, const RenderDataProvider* dataProvider )
 {
   const GeometryDataProvider& geometry = dataProvider->GetGeometry();
-  const PropertyBuffer* indexBuffer = dataProvider->GetIndexBuffer();
+  const PropertyBufferDataProvider* indexBuffer = dataProvider->GetIndexBuffer();
 
   GeometryDataProvider::GeometryType type = geometry.GetGeometryType( bufferIndex );
 
@@ -210,15 +189,9 @@ void RenderGeometry::Draw( Context& context, BufferIndex bufferIndex, const Rend
     }
     case Dali::Geometry::POINTS:
     {
-      GpuBuffer* firstVertexBuffer = mVertexBuffers[0];
+      const PropertyBufferDataProvider* firstVertexBuffer = dataProvider->GetVertexBuffers()[0];
 
-      unsigned int numVertices = 0;
-      GLuint stride = firstVertexBuffer->GetStride();
-      if( stride != 0 )
-      {
-        numVertices = firstVertexBuffer->GetBufferSize() / stride;
-      }
-
+      unsigned int numVertices = firstVertexBuffer->GetElementCount( bufferIndex );
       context.DrawArrays(GL_POINTS, 0, numVertices );
       break;
     }

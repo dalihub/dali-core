@@ -22,6 +22,7 @@
 #include <dali/internal/render/data-providers/material-data-provider.h>
 #include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/data-providers/sampler-data-provider.h>
+#include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 #include <dali/internal/render/data-providers/uniform-map-data-provider.h>
 
 namespace Dali
@@ -45,7 +46,7 @@ class Shader;
 class RenderDataProvider
 {
 public:
-  typedef Dali::Vector< const PropertyBuffer* > VertexBuffers;
+  typedef Dali::Vector< const PropertyBufferDataProvider* > VertexBuffers;
   typedef Dali::Vector< const SamplerDataProvider* > Samplers;
 
   /**
@@ -55,7 +56,7 @@ public:
                       const MaterialDataProvider&   mMaterialDataProvider,
                       const UniformMapDataProvider& mUniformMapDataProvider,
                       Shader&                       mShader,
-                      const PropertyBuffer*         mIndexBuffer,
+                      const PropertyBufferDataProvider* mIndexBuffer,
                       const VertexBuffers&          mVertexBuffers,
                       const Samplers&               mSamplers );
 
@@ -116,13 +117,13 @@ public:
    * Set the index buffer
    * @param[in] indexBuffer the index buffer to set
    */
-  void SetIndexBuffer( const PropertyBuffer* indexBuffer );
+  void SetIndexBuffer( const PropertyBufferDataProvider* indexBuffer );
 
   /**
    * Get the index buffer of the geometry
    * @return A const reference to the index buffer
    */
-  const PropertyBuffer* GetIndexBuffer() const;
+  const PropertyBufferDataProvider* GetIndexBuffer() const;
 
   /**
    * Set the vertex buffers
@@ -153,7 +154,7 @@ private:
   const MaterialDataProvider*   mMaterialDataProvider;
   const UniformMapDataProvider* mUniformMapDataProvider;
   Shader*                       mShader;
-  const PropertyBuffer*         mIndexBuffer;
+  const PropertyBufferDataProvider* mIndexBuffer;
   VertexBuffers                 mVertexBuffers;
   Samplers                      mSamplers;
 };

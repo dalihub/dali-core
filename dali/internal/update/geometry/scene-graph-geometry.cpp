@@ -54,20 +54,18 @@ void Geometry::RemoveVertexBuffer( const PropertyBuffer* vertexBuffer )
   DALI_ASSERT_DEBUG( NULL != vertexBuffer );
 
   // Find the object and destroy it
-  for ( VertexBuffers::Iterator iter = mVertexBuffers.Begin(); iter != mVertexBuffers.End(); ++iter )
-  {
-    const PropertyBuffer* current = *iter;
-    if ( current == vertexBuffer )
-    {
-      PropertyBuffer* theVertexBuffer = const_cast<PropertyBuffer*>(vertexBuffer);
-      theVertexBuffer->RemoveUniformMapObserver(*this);
-      mVertexBuffers.Erase( iter );
-      mConnectionObservers.ConnectionsChanged(*this);
-      return;
-    }
-  }
+  VertexBuffers::Iterator match = std::find( mVertexBuffers.Begin(),
+                                             mVertexBuffers.End(),
+                                             vertexBuffer );
 
-  DALI_ASSERT_DEBUG(false);
+  DALI_ASSERT_DEBUG( mVertexBuffers.End() != match );
+  if( mVertexBuffers.End() != match )
+  {
+    PropertyBuffer* theVertexBuffer = const_cast<PropertyBuffer*>(vertexBuffer);
+    theVertexBuffer->RemoveUniformMapObserver(*this);
+    mVertexBuffers.Erase( match );
+    mConnectionObservers.ConnectionsChanged(*this);
+  }
 }
 
 void Geometry::SetIndexBuffer( const PropertyBuffer* indexBuffer )
