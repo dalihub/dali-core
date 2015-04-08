@@ -23,6 +23,7 @@
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/common/property-owner.h>
+#include <dali/internal/update/common/scene-graph-connection-observers.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
 #include <dali/internal/render/data-providers/sampler-data-provider.h>
 
@@ -85,6 +86,12 @@ public:
    * @note this should only be called from Update thread
    */
   bool AffectsTransparency( BufferIndex bufferIndex ) const;
+
+  /**
+   * Sets whether the associated texture is fully opaque or not.
+   * @param[in] fullyOpaque true if it's fully opaque
+   */
+  void SetFullyOpaque( bool fullyOpaque );
 
   /**
    * @param[in] bufferIndex The buffer index to use
@@ -150,17 +157,26 @@ public: // SamplerDataProvider interface - called from RenderThread
    * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
    */
   void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
+  /**
+   * @copydoc ConnectionObservers::AddObserver
+   */
+  void AddConnectionObserver(ConnectionObservers::Observer& observer);
+
+  /**
+   * @copydoc ConnectionObservers::RemoveObserver
+   */
+  void RemoveConnectionObserver(ConnectionObservers::Observer& observer);
+
+public: // PropertyOwner implementation
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
+   */
+  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
 private:
   std::string mUnitName; ///< The name of the uniform of the texture unit
 
-  // @todo MESH_REWORK Need these to automatically copy
-  // new value into old value on frame change
-
-  ResourceId mTextureId[2]; ///< The identity of the associated texture for this frame (Can be read from RenderThread)
-
-  BitmapMetadata mBitmapMetadata[2]; /// The meta data of the associated texture for this frame (Not needed in RenderThread)
-
+  DoubleBufferedProperty<unsigned int> mTextureId;
   DoubleBufferedProperty<int> mMinFilter;    ///< The minify filter
   DoubleBufferedProperty<int> mMagFilter;    ///< The magnify filter
   DoubleBufferedProperty<int> mUWrapMode;    ///< The horizontal wrap mode
@@ -168,6 +184,9 @@ private:
 
   // Note, this is only called from UpdateThread
   DoubleBufferedProperty<bool>     mAffectsTransparency; ///< If this sampler affects renderer transparency
+
+  ConnectionObservers mConnectionObservers; ///< Connection observers that will be informed when textures change.
+  bool mFullyOpaque; // Update only flag - no need for double buffering
 };
 
 } // namespace SceneGraph

@@ -99,7 +99,7 @@ void RendererAttachment::OnDestroy2()
 void RendererAttachment::ConnectedToSceneGraph()
 {
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
-  mParent->AddUniformMapObserver( *this );
+  mParent->AddUniformMapObserver( *this ); // Watch actor's uniform maps
 
   DALI_ASSERT_DEBUG( mParent != NULL );
 
@@ -334,12 +334,16 @@ bool RendererAttachment::DoPrepareResources(
       const Sampler* sampler = static_cast<const Sampler*>(*iter);
 
       ResourceId textureId = sampler->GetTextureId( updateBufferIndex );
+      BitmapMetadata metaData = resourceManager.GetBitmapMetadata( textureId );
+
+      Sampler* mutableSampler = const_cast<Sampler*>(sampler);
+      mutableSampler->SetFullyOpaque( metaData.IsFullyOpaque() );
+
       switch( completeStatusManager.GetStatus( textureId ) )
       {
         case CompleteStatusManager::NOT_READY:
         {
           ready = false;
-          BitmapMetadata metaData = resourceManager.GetBitmapMetadata( textureId );
           if( metaData.GetIsFramebuffer() )
           {
             frameBufferCount++;

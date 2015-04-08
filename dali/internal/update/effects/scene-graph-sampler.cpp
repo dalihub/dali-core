@@ -29,14 +29,14 @@ namespace SceneGraph
 
 Sampler::Sampler( const std::string& unitName )
 : mUnitName( unitName ),
+  mTextureId( 0u ),
   mMinFilter( Dali::Sampler::DEFAULT ),
   mMagFilter( Dali::Sampler::DEFAULT ),
   mUWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
   mVWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
-  mAffectsTransparency( false )
+  mAffectsTransparency( false ),
+  mFullyOpaque(true)
 {
-  mTextureId[0] = 0;
-  mTextureId[1] = 0;
 }
 
 Sampler::~Sampler()
@@ -50,11 +50,11 @@ void Sampler::SetUnitName( const std::string& unitName )
 
 void Sampler::SetTexture( BufferIndex bufferIndex, Integration::ResourceId textureId )
 {
-  mTextureId[bufferIndex] = textureId;
-
-  // @todo MESH_REWORK
-  //const BitmapMetadata& metadata  - get it from ResourceManager
-  //mBitmapMetadata[bufferIndex] = metadata;
+  if( mTextureId[bufferIndex] != textureId )
+  {
+    mTextureId.Set( bufferIndex, textureId );
+    mConnectionObservers.ConnectionsChanged(*this);
+  }
 }
 
 void Sampler::SetFilterMode( BufferIndex bufferIndex, FilterMode minFilter, FilterMode magFilter )
@@ -102,9 +102,14 @@ bool Sampler::AffectsTransparency( BufferIndex bufferIndex ) const
   return mAffectsTransparency[bufferIndex] ;
 }
 
+void Sampler::SetFullyOpaque( bool fullyOpaque )
+{
+  mFullyOpaque = fullyOpaque;
+}
+
 bool Sampler::IsFullyOpaque( BufferIndex bufferIndex ) const
 {
-  return mBitmapMetadata[bufferIndex].IsFullyOpaque();
+  return mFullyOpaque;
 }
 
 void Sampler::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
@@ -113,6 +118,26 @@ void Sampler::ConnectToSceneGraph( SceneController& sceneController, BufferIndex
 
 void Sampler::DisconnectFromSceneGraph(SceneController& sceneController, BufferIndex bufferIndex)
 {
+}
+
+void Sampler::AddConnectionObserver( ConnectionObservers::Observer& observer )
+{
+  mConnectionObservers.Add(observer);
+}
+
+void Sampler::RemoveConnectionObserver( ConnectionObservers::Observer& observer )
+{
+  mConnectionObservers.Remove(observer);
+}
+
+void Sampler::ResetDefaultProperties( BufferIndex bufferIndex )
+{
+  mTextureId.CopyPrevious( bufferIndex );
+  mMinFilter.CopyPrevious( bufferIndex );
+  mMagFilter.CopyPrevious( bufferIndex );
+  mUWrapMode.CopyPrevious( bufferIndex );
+  mVWrapMode.CopyPrevious( bufferIndex );
+  mAffectsTransparency.CopyPrevious( bufferIndex );
 }
 
 } // namespace SceneGraph

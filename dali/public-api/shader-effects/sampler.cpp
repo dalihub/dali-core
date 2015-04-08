@@ -27,7 +27,8 @@ namespace Dali
 Sampler Sampler::New( Image& image, const std::string& textureUnitUniformName )
 {
   Internal::SamplerPtr sampler = Internal::Sampler::New(textureUnitUniformName);
-  sampler->SetImage( GetImplementation( image ) );
+  Internal::ImagePtr imagePtr = &GetImplementation( image );
+  sampler->SetImage( imagePtr );
   return Sampler( sampler.Get() );
 }
 
@@ -57,7 +58,8 @@ void Sampler::SetUniformName( const std::string& name )
 
 void Sampler::SetImage( Image& image )
 {
-  GetImplementation(*this).SetImage( GetImplementation( image ) );
+  Internal::ImagePtr imagePtr = &GetImplementation( image );
+  GetImplementation(*this).SetImage( imagePtr );
 }
 
 void Sampler::SetFilterMode( FilterMode minFilter, FilterMode magFilter )

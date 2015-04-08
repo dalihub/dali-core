@@ -235,119 +235,6 @@ private:
 };
 
 
-
-/**
- * A float doubleBuffered property of a scene-graph object.
- */
-template <>
-class DoubleBufferedProperty<float> : public DoubleBufferedPropertyBase
-{
-public:
-
-  /**
-   * Create a doubleBuffered property.
-   * @param[in] initialValue The initial value of the property.
-   */
-  DoubleBufferedProperty( float initialValue )
-  : mValue( initialValue )
-  {
-  }
-
-  /**
-   * Virtual destructor.
-   */
-  virtual ~DoubleBufferedProperty()
-  {
-  }
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
-   */
-  virtual Dali::Property::Type GetType() const
-  {
-    return Dali::PropertyTypes::Get<float>();
-  }
-
-  /**
-   * @copydoc Dali::Internal::SceneGraph::DoubleBufferedPropertyBase::CopyPrevious()
-   */
-  virtual void CopyPrevious( BufferIndex updateBufferIndex )
-  {
-    if( DoubleBufferedPropertyFlags::SET_FLAG == mDirtyFlags)
-    {
-      mValue[ updateBufferIndex ] = mValue[ 1-updateBufferIndex ];
-      mDirtyFlags = ( mDirtyFlags >> 1 );
-    }
-  }
-
-  /**
-   * @copydoc Dali::Internal::PropertyInputImpl::GetFloat()
-   */
-  virtual const float& GetFloat( BufferIndex bufferIndex ) const
-  {
-    return mValue[ bufferIndex ];
-  }
-
-  /**
-   * Set the property value. This will persist for the current frame, and will
-   * be copied to the other buffer next frame (unless it is set again)
-   * @param[in] bufferIndex The buffer to write.
-   * @param[in] value The new property value.
-   */
-  void Set(BufferIndex bufferIndex, float value)
-  {
-    mValue[bufferIndex] = value;
-    OnSet();
-  }
-
-  /**
-   * @copydoc Dali::SceneGraph::DoubleBufferedProperty::Get()
-   */
-  float& Get(size_t bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * @copydoc Dali::SceneGraph::DoubleBufferedProperty::Get()
-   */
-  const float& Get(size_t bufferIndex) const
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  float& operator[](size_t bufferIndex)
-  {
-    return mValue[bufferIndex];
-  }
-
-  /**
-   * Retrieve the property value.
-   * @param[in] bufferIndex The buffer to read.
-   * @return The property value.
-   */
-  const float& operator[](size_t bufferIndex) const
-  {
-    return mValue[bufferIndex];
-  }
-
-private:
-  // Undefined
-  DoubleBufferedProperty(const DoubleBufferedProperty& property);
-
-  // Undefined
-  DoubleBufferedProperty& operator=(const DoubleBufferedProperty& rhs);
-
-private:
-  DoubleBuffered<float> mValue; ///< The double-buffered property value
-};
-
-
 /**
  * A double buffered integer property of a scene-graph object.
  */
@@ -462,6 +349,236 @@ private:
 
 private:
   DoubleBuffered<int> mValue; ///< The double-buffered property value
+};
+
+
+/**
+ * A double buffered unsigned integer property of a scene-graph object.
+ */
+template <>
+class DoubleBufferedProperty<unsigned int> : public DoubleBufferedPropertyBase
+{
+public:
+  typedef unsigned int OwnType;
+
+  /**
+   * Create a double buffered property.
+   * @param [in] initialValue The initial value of the property.
+   */
+  DoubleBufferedProperty( OwnType initialValue )
+  : mValue( initialValue )
+  {
+  }
+
+  /**
+   * Virtual destructor.
+   */
+  virtual ~DoubleBufferedProperty()
+  {
+  }
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
+   */
+  virtual Dali::Property::Type GetType() const
+  {
+    return Dali::PropertyTypes::Get<OwnType>();
+  }
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::DoubleBufferedPropertyBase::CopyPrevious()
+   */
+  virtual void CopyPrevious( BufferIndex updateBufferIndex )
+  {
+    if( DoubleBufferedPropertyFlags::SET_FLAG == mDirtyFlags)
+    {
+      mValue[ updateBufferIndex ] = mValue[ 1-updateBufferIndex ];
+      mDirtyFlags = ( mDirtyFlags >> 1 );
+    }
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetInteger()
+   */
+  virtual const OwnType& GetUnsignedInteger( BufferIndex bufferIndex ) const
+  {
+    return mValue[ bufferIndex ];
+  }
+
+  /**
+   * Set the property value. This will persist for the current frame, and will
+   * be copied to the other buffer next frame (unless it is set again)
+   * @param[in] bufferIndex The buffer to write.
+   * @param[in] value The new property value.
+   */
+  void Set(BufferIndex bufferIndex, OwnType value)
+  {
+    // check if the value actually changed to avoid dirtying nodes unnecessarily
+    if( mValue[bufferIndex] != value )
+    {
+      mValue[bufferIndex] = value;
+
+      OnSet();
+    }
+  }
+
+  /**
+   * @copydoc Dali::SceneGraph::DoubleBufferedProperty::Get()
+   */
+  OwnType& Get(size_t bufferIndex)
+  {
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::SceneGraph::DoubleBufferedProperty::Get()
+   */
+  const OwnType& Get(size_t bufferIndex) const
+  {
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * Retrieve the property value.
+   * @param[in] bufferIndex The buffer to read.
+   * @return The property value.
+   */
+  OwnType& operator[](size_t bufferIndex)
+  {
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * Retrieve the property value.
+   * @param[in] bufferIndex The buffer to read.
+   * @return The property value.
+   */
+  const OwnType& operator[](size_t bufferIndex) const
+  {
+    return mValue[bufferIndex];
+  }
+
+private:
+  // Undefined
+  DoubleBufferedProperty(const DoubleBufferedProperty& property);
+
+  // Undefined
+  DoubleBufferedProperty& operator=(const DoubleBufferedProperty& rhs);
+
+private:
+  DoubleBuffered<OwnType> mValue; ///< The double-buffered property value
+};
+
+
+/**
+ * A float doubleBuffered property of a scene-graph object.
+ */
+template <>
+class DoubleBufferedProperty<float> : public DoubleBufferedPropertyBase
+{
+public:
+
+  /**
+   * Create a doubleBuffered property.
+   * @param[in] initialValue The initial value of the property.
+   */
+  DoubleBufferedProperty( float initialValue )
+  : mValue( initialValue )
+  {
+  }
+
+  /**
+   * Virtual destructor.
+   */
+  virtual ~DoubleBufferedProperty()
+  {
+  }
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyBase::GetType()
+   */
+  virtual Dali::Property::Type GetType() const
+  {
+    return Dali::PropertyTypes::Get<float>();
+  }
+
+  /**
+   * @copydoc Dali::Internal::SceneGraph::DoubleBufferedPropertyBase::CopyPrevious()
+   */
+  virtual void CopyPrevious( BufferIndex updateBufferIndex )
+  {
+    if( DoubleBufferedPropertyFlags::SET_FLAG == mDirtyFlags)
+    {
+      mValue[ updateBufferIndex ] = mValue[ 1-updateBufferIndex ];
+      mDirtyFlags = ( mDirtyFlags >> 1 );
+    }
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInputImpl::GetFloat()
+   */
+  virtual const float& GetFloat( BufferIndex bufferIndex ) const
+  {
+    return mValue[ bufferIndex ];
+  }
+
+  /**
+   * Set the property value. This will persist for the current frame, and will
+   * be copied to the other buffer next frame (unless it is set again)
+   * @param[in] bufferIndex The buffer to write.
+   * @param[in] value The new property value.
+   */
+  void Set(BufferIndex bufferIndex, float value)
+  {
+    mValue[bufferIndex] = value;
+    OnSet();
+  }
+
+  /**
+   * @copydoc Dali::SceneGraph::DoubleBufferedProperty::Get()
+   */
+  float& Get(size_t bufferIndex)
+  {
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * @copydoc Dali::SceneGraph::DoubleBufferedProperty::Get()
+   */
+  const float& Get(size_t bufferIndex) const
+  {
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * Retrieve the property value.
+   * @param[in] bufferIndex The buffer to read.
+   * @return The property value.
+   */
+  float& operator[](size_t bufferIndex)
+  {
+    return mValue[bufferIndex];
+  }
+
+  /**
+   * Retrieve the property value.
+   * @param[in] bufferIndex The buffer to read.
+   * @return The property value.
+   */
+  const float& operator[](size_t bufferIndex) const
+  {
+    return mValue[bufferIndex];
+  }
+
+private:
+  // Undefined
+  DoubleBufferedProperty(const DoubleBufferedProperty& property);
+
+  // Undefined
+  DoubleBufferedProperty& operator=(const DoubleBufferedProperty& rhs);
+
+private:
+  DoubleBuffered<float> mValue; ///< The double-buffered property value
 };
 
 /**

@@ -61,12 +61,15 @@ void Sampler::SetUniformName( const std::string& name )
   SetUnitNameMessage( GetEventThreadServices(), *mSceneObject, name);
 }
 
-void Sampler::SetImage( Image& image )
+void Sampler::SetImage( ImagePtr& image )
 {
-  unsigned int resourceId = image.GetResourceId();
+  // Keep a reference to the image object
+  mImageConnector.Set( image, OnStage() );
 
   // sceneObject is being used in a separate thread; queue a message to set
+  unsigned int resourceId = image->GetResourceId();
   SetTextureMessage( GetEventThreadServices(), *mSceneObject, resourceId );
+
 }
 
 void Sampler::SetFilterMode( Dali::Sampler::FilterMode minFilter, Dali::Sampler::FilterMode magFilter )

@@ -24,8 +24,6 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class SamplerDataProvider;
-class Shader;
 
 /**
  * Interface to provide data of the material to the renderer.

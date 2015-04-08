@@ -39,7 +39,7 @@ class Shader;
 class ConnectionObserver;
 class SceneController;
 
-class Material : public PropertyOwner, public MaterialDataProvider, public UniformMap::Observer
+class Material : public PropertyOwner, public MaterialDataProvider, public UniformMap::Observer, public ConnectionObservers::Observer
 {
 public:
   /**
@@ -113,6 +113,18 @@ public: // UniformMap::Observer
    * @copydoc UniformMap::Observer::UniformMappingsChanged
    */
   virtual void UniformMappingsChanged( const UniformMap& mappings );
+
+public: // ConnectionObserver::Observer
+
+  /**
+   * @copydoc ConnectionObservers::ConnectionsChanged
+   */
+  virtual void ConnectionsChanged( PropertyOwner& owner );
+
+  /**
+   * @copydoc ConnectionObservers::ConnectedUniformMapChanged
+   */
+  virtual void ConnectedUniformMapChanged( );
 
 public: // PropertyOwner implementation
   /**

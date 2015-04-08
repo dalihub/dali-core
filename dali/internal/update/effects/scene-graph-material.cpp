@@ -46,7 +46,8 @@ Material::~Material()
 void Material::SetShader( const Shader* shader )
 {
   mShader = shader;
-  // @todo inform NewRenderer about this shader
+  // Inform NewRenderer about this shader: (Will force a re-load of the
+  // shader from the data providers)
   mConnectionObservers.ConnectionsChanged(*this);
 }
 
@@ -60,6 +61,10 @@ void Material::AddSampler( const Sampler* sampler )
 {
   const SamplerDataProvider* sdp = static_cast< const SamplerDataProvider*>( sampler );
   mSamplers.PushBack( sdp );
+
+  Sampler* mutableSampler = const_cast<Sampler*>(sampler);
+  mutableSampler->AddConnectionObserver( *this );
+  mutableSampler->AddUniformMapObserver( *this );
 
   mConnectionObservers.ConnectionsChanged(*this);
 }
@@ -81,6 +86,9 @@ void Material::RemoveSampler( const Sampler* sampler )
 
   if( found )
   {
+    Sampler* mutableSampler = const_cast<Sampler*>(sampler);
+    mutableSampler->RemoveConnectionObserver( *this );
+    mutableSampler->RemoveUniformMapObserver( *this );
     mSamplers.Erase(iter);
     mConnectionObservers.ConnectionsChanged(*this);
   }
@@ -117,6 +125,16 @@ void Material::UniformMappingsChanged( const UniformMap& mappings )
 {
   // Our uniform map, or that of one of the watched children has changed.
   // Inform connected observers.
+  mConnectionObservers.ConnectedUniformMapChanged();
+}
+
+void Material::ConnectionsChanged( PropertyOwner& owner )
+{
+  mConnectionObservers.ConnectionsChanged(*this);
+}
+
+void Material::ConnectedUniformMapChanged( )
+{
   mConnectionObservers.ConnectedUniformMapChanged();
 }
 

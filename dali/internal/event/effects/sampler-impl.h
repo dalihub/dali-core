@@ -61,7 +61,7 @@ public:
   /**
    * @copydoc Dali::Sampler::SetImage()
    */
-  void SetImage( Image& image );
+  void SetImage( ImagePtr& image );
 
   /**
    * @copydoc Dali::Sampler::SetFilterMode()
