@@ -2,7 +2,7 @@
 #define __DALI_HASH__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,31 +17,32 @@
  * limitations under the License.
  *
  */
+
+// EXTERNAL INCLUDES
 #include <string>
+
+//INTERNAL INCLUDES
+#include <dali/public-api/common/dali-common.h>
 
 namespace Dali
 {
 
-
 /**
- * @brief Create a hash code for the string
+ * @brief Create a hash code for a string
  * @param toHash string to hash
  * @return hash code
  */
-unsigned long CalculateHash(const std::string& toHash);
-
+DALI_IMPORT_API std::size_t CalculateHash( const std::string& toHash );
 
 /**
- * @brief Create a hash code for 2 strings combined
+ * @brief Create a hash code for 2 strings combined.
+ * Allows a hash to be calculated without concatenating the strings and allocating any memory.
  * @param string1 first string
  * @param string2 second string
  * @return hash code
  */
-unsigned long CalculateHash(const std::string& string1, const std::string& string2);
-
-
-
+DALI_IMPORT_API std::size_t CalculateHash( const std::string& string1, const std::string& string2 );
 
 } // namespace Dali
 
-#endif // header
+#endif // __DALI_HASH__

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,47 +16,46 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/common/dali-hash.h>
-
+#include <dali/public-api/common/hash.h>
 
 namespace Dali
 {
 
-namespace //un-named namespace
+namespace //unnamed namespace
 {
+
 /*
  * djb2 (http://www.cse.yorku.ca/~oz/hash.html)
  */
-const unsigned long INITIAL_HASH_VALUE = 5381;
+const std::size_t INITIAL_HASH_VALUE = 5381;
 
-inline void HashShader( const char* string, unsigned long& hash )
+inline void HashString( const char* string, std::size_t& hash )
 {
   while( int c = *string++ )
   {
     hash = hash * 33 + c;
   }
 }
-} // un-named namespace
 
-unsigned long CalculateHash(const std::string& toHash)
+} // unnamed namespace
+
+std::size_t CalculateHash( const std::string& toHash)
 {
-  unsigned long hash = INITIAL_HASH_VALUE;
+  std::size_t hash( INITIAL_HASH_VALUE );
 
-  HashShader( toHash.c_str(), hash );
+  HashString( toHash.c_str(), hash );
 
   return hash;
 }
 
-unsigned long CalculateHash(const std::string& string1, const std::string& string2)
+std::size_t CalculateHash( const std::string& string1, const std::string& string2 )
 {
-  unsigned long hash = INITIAL_HASH_VALUE;
+  std::size_t hash( INITIAL_HASH_VALUE );
 
-  HashShader( string1.c_str(), hash);
-  HashShader( string2.c_str(), hash );
+  HashString( string1.c_str(), hash);
+  HashString( string2.c_str(), hash );
+
   return hash;
 }
-
-
-
 
 } // namespace Dali

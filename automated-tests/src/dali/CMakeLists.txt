@@ -29,6 +29,7 @@ SET(TC_SOURCES
         utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
+        utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
         utc-Dali-HoverProcessing.cpp
         utc-Dali-Image.cpp
