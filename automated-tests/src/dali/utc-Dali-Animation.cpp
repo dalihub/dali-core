@@ -8843,10 +8843,9 @@ struct UpdateManagerTestConstraint
   {
   }
 
-  Vector3 operator()(const Vector3& current)
+  void operator()( Vector3& current, const PropertyInputContainer& /* inputs */)
   {
     mApplication.SendNotification();  // Process events
-    return current;
   }
 
   TestApplication& mApplication;
@@ -8868,8 +8867,8 @@ int UtcDaliAnimationUpdateManager(void)
 
   Vector3 startValue(1.0f, 1.0f, 1.0f);
   Property::Index index = actor.RegisterProperty( "test-property", startValue );
-  Constraint constraint = Constraint::New<Vector3>( index, UpdateManagerTestConstraint( application ) );
-  actor.ApplyConstraint( constraint );
+  Constraint constraint = Constraint::New<Vector3>( actor, index, UpdateManagerTestConstraint( application ) );
+  constraint.Apply();
 
   // Apply animation to actor
   animation.AnimateTo( Property(actor, Actor::Property::POSITION), Vector3( 100.f, 90.f, 80.f ), AlphaFunctions::Linear );

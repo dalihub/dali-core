@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 
@@ -51,7 +50,6 @@ namespace Dali
  */
 #define DALI_COMPOSE_SHADER(STR) #STR
 
-class Constraint;
 class Image;
 struct Vector2;
 struct Vector3;

@@ -58,9 +58,9 @@ struct TestConstraintToVector3
   {
   }
 
-  Vector3 operator()(const Vector3& current)
+  void operator()( Vector3& current, const PropertyInputContainer& /* inputs */ )
   {
-    return mTarget;
+    current = mTarget;
   }
 
   Vector3 mTarget;
@@ -72,10 +72,9 @@ struct TestConstraintFromPositionToVector3
   {
   }
 
-  Vector3 operator()(const Vector3& current, const PropertyInput& position)
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-
-    return position.GetVector3();
+    current = inputs[0]->GetVector3();
   }
 };
 
@@ -86,9 +85,9 @@ struct TestConstraintToVector3Double
   {
   }
 
-  Vector3 operator()(const Vector3& current)
+  void operator()( Vector3& current, const PropertyInputContainer& /* inputs */ )
   {
-    return mTarget * 2.0f;
+    current = mTarget * 2.0f;
   }
 
   Vector3 mTarget;
@@ -618,10 +617,8 @@ int UtcDaliShaderEffectMethodApplyConstraint(void)
       application.GetGlAbstraction().CheckUniformValue(
           "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) ) );
 
-  Constraint constraint = Constraint::New<Vector3>( uVecProperty,
-                                                    TestConstraintToVector3(Vector3(4.0f, 9.0f, 16.0f)) );
-
-  effect.ApplyConstraint(constraint);
+  Constraint constraint = Constraint::New<Vector3>( effect, uVecProperty, TestConstraintToVector3(Vector3(4.0f, 9.0f, 16.0f)) );
+  constraint.Apply();
 
   application.SendNotification();
   application.Render();
@@ -657,11 +654,9 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor(void)
 
   Property::Index uVecProperty = effect.GetPropertyIndex("uVec3");
 
-  Constraint constraint = Constraint::New<Vector3>( uVecProperty,
-                                                    Source(actor, Actor::Property::POSITION),
-                                                    TestConstraintFromPositionToVector3() );
-
-  effect.ApplyConstraint(constraint);
+  Constraint constraint = Constraint::New<Vector3>( effect, uVecProperty, TestConstraintFromPositionToVector3() );
+  constraint.AddSource( Source( actor, Actor::Property::POSITION ) );
+  constraint.Apply();
 
   application.SendNotification();
   application.Render();
@@ -697,16 +692,12 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor2(void)
 
   Property::Index uVecProperty = effect.GetPropertyIndex("uVec3");
 
-  Constraint shaderConstraint = Constraint::New<Vector3>( uVecProperty,
-                                                    Source(actor, Actor::Property::POSITION),
-                                                    TestConstraintFromPositionToVector3() );
+  Constraint shaderConstraint = Constraint::New<Vector3>( effect, uVecProperty, TestConstraintFromPositionToVector3() );
+  shaderConstraint.AddSource( Source(actor, Actor::Property::POSITION) );
+  shaderConstraint.Apply();
 
-  effect.ApplyConstraint(shaderConstraint);
-
-  Constraint actorConstraint = Constraint::New<Vector3>( Actor::Property::POSITION,
-                                                         TestConstraintToVector3Double(targetPosition) );
-
-  actor.ApplyConstraint(actorConstraint);
+  Constraint actorConstraint = Constraint::New<Vector3>( actor, Actor::Property::POSITION, TestConstraintToVector3Double(targetPosition) );
+  actorConstraint.Apply();
 
   application.SendNotification();
   application.Render();
@@ -715,78 +706,6 @@ int UtcDaliShaderEffectMethodApplyConstraintFromActor2(void)
   DALI_TEST_CHECK(
       application.GetGlAbstraction().CheckUniformValue(
           "uVec3", targetPosition * 2.0f ) );
-  END_TEST;
-}
-
-int UtcDaliShaderEffectMethodApplyConstraintCallback(void)
-{
-  // Test whether Shader's uniform can be constrained to a stationary constraint.
-  TestApplication application;
-
-  ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
-  DALI_TEST_CHECK( effect );
-
-  BufferImage image = CreateBufferImage();
-
-  effect.SetUniform( "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) );
-
-  ImageActor actor = ImageActor::New( image );
-  actor.SetSize( 100.0f, 100.0f );
-  actor.SetName("TestImageFilenameActor");
-  actor.SetShaderEffect(effect);
-  Stage::GetCurrent().Add(actor);
-
-  Property::Index uVecProperty = effect.GetPropertyIndex("uVec3");
-
-  application.SendNotification();
-  application.Render();
-
-  // Test effects of SetUniform...
-  DALI_TEST_CHECK(
-      application.GetGlAbstraction().CheckUniformValue(
-          "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) ) );
-
-  Constraint constraint = Constraint::New<Vector3>( uVecProperty,
-                                                    TestConstraintToVector3(Vector3(4.0f, 9.0f, 16.0f)) );
-
-  constraint.SetApplyTime( 10.0f );
-
-  bool constraintCheck( false );
-  ConstraintAppliedCheck appliedCheck( constraintCheck );
-
-  // We should receive the "Applied" signal after 10 seconds
-  ActiveConstraint active = effect.ApplyConstraint(constraint);
-  active.AppliedSignal().Connect( &application, appliedCheck );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(1000.0f)); // 1 elapsed second
-
-  // Check signal has not fired
-  application.SendNotification();
-  appliedCheck.CheckSignalNotReceived();
-
-  application.Render(static_cast<unsigned int>(4000.0f)); // 5 elapsed seconds
-
-  // Check signal has not fired
-  application.SendNotification();
-  appliedCheck.CheckSignalNotReceived();
-
-  application.Render(static_cast<unsigned int>(5000.0f - 1.0f)); // <10 elapsed seconds
-
-  // Check signal has not fired
-  application.SendNotification();
-  appliedCheck.CheckSignalNotReceived();
-
-  application.Render(static_cast<unsigned int>(2.0f)); // >10 elapsed seconds
-
-  // Signal should have fired
-  application.SendNotification();
-  appliedCheck.CheckSignalReceived();
-
-  // Test effects of Constraint.
-  DALI_TEST_CHECK(
-      application.GetGlAbstraction().CheckUniformValue(
-          "uVec3", Vector3( 4.0f, 9.0f, 16.0f ) ) );
   END_TEST;
 }
 
@@ -818,10 +737,8 @@ int UtcDaliShaderEffectMethodRemoveConstraints(void)
       application.GetGlAbstraction().CheckUniformValue(
           "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) ) );
 
-  Constraint constraint = Constraint::New<Vector3>( uVecProperty,
-                                                    TestConstraintToVector3(Vector3(4.0f, 9.0f, 16.0f)) );
-
-  effect.ApplyConstraint(constraint);
+  Constraint constraint = Constraint::New<Vector3>( effect, uVecProperty, TestConstraintToVector3(Vector3(4.0f, 9.0f, 16.0f)) );
+  constraint.Apply();
 
   // Remove the constraints
   effect.RemoveConstraints();
@@ -864,10 +781,8 @@ int UtcDaliShaderEffectMethodRemoveConstraints2(void)
       application.GetGlAbstraction().CheckUniformValue(
           "uVec3", Vector3( 1.0f, 2.0f, 3.0f ) ) );
 
-  Constraint constraint = Constraint::New<Vector3>( uVecProperty,
-                                                    TestConstraintToVector3(Vector3(4.0f, 9.0f, 16.0f)) );
-
-  effect.ApplyConstraint(constraint);
+  Constraint constraint = Constraint::New<Vector3>( effect, uVecProperty, TestConstraintToVector3(Vector3(4.0f, 9.0f, 16.0f)) );
+  constraint.Apply();
 
   application.SendNotification();
   application.Render();

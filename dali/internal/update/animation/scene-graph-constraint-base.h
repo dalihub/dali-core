@@ -92,36 +92,6 @@ public:
   }
 
   /**
-   * Bake the weight property.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] weight The new weight.
-   */
-  void BakeWeight( BufferIndex updateBufferIndex, float weight )
-  {
-    mWeight.Bake( updateBufferIndex, weight );
-  }
-
-  /**
-   * Set the initial weight.
-   * @pre The constraint has not been connected to the scene-graph.
-   * @param[in] weight The new weight.
-   */
-  void SetInitialWeight( float weight )
-  {
-    mWeight.SetInitial( weight );
-  }
-
-  /**
-   * Retrieve the weight property.
-   * @param[in] bufferIndex The buffer index to read from.
-   * @return The current weight.
-   */
-  float GetWeight( BufferIndex bufferIndex ) const
-  {
-    return mWeight[ bufferIndex ];
-  }
-
-  /**
    * Constrain the associated scene object.
    * @param[in] updateBufferIndex The current update buffer index.
    */
@@ -227,10 +197,6 @@ private:
    */
   virtual void OnDisconnect() = 0;
 
-public:
-
-  AnimatableProperty<float> mWeight; ///< The constraint is "fully-applied" when weight = 1
-
 protected:
 
   RemoveAction mRemoveAction;
@@ -249,17 +215,6 @@ private:
 };
 
 // Messages for ConstraintBase
-
-inline void  BakeWeightMessage( EventThreadServices& eventThreadServices, const ConstraintBase& constraint, float weight )
-{
-  typedef MessageDoubleBuffered1< ConstraintBase, float > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &constraint, &ConstraintBase::BakeWeight, weight );
-}
 
 inline void  SetRemoveActionMessage( EventThreadServices& eventThreadServices, const ConstraintBase& constraint, Dali::Constraint::RemoveAction removeAction )
 {

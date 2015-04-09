@@ -10,7 +10,6 @@ public_api_src_files = \
   $(public_api_src_dir)/actors/layer.cpp \
   $(public_api_src_dir)/actors/mesh-actor.cpp \
   $(public_api_src_dir)/actors/renderable-actor.cpp \
-  $(public_api_src_dir)/animation/active-constraint.cpp \
   $(public_api_src_dir)/animation/animation.cpp \
   $(public_api_src_dir)/animation/alpha-functions.cpp \
   $(public_api_src_dir)/animation/constraint.cpp \
@@ -125,13 +124,10 @@ public_api_core_actors_header_files =  \
   $(public_api_src_dir)/actors/sampling.h
 
 public_api_core_animation_header_files = \
-  $(public_api_src_dir)/animation/active-constraint.h \
-  $(public_api_src_dir)/animation/active-constraint-declarations.h \
   $(public_api_src_dir)/animation/alpha-functions.h \
   $(public_api_src_dir)/animation/animation.h \
   $(public_api_src_dir)/animation/constraint.h \
   $(public_api_src_dir)/animation/constraints.h \
-  $(public_api_src_dir)/animation/constraint-functions.h \
   $(public_api_src_dir)/animation/constraint-source.h \
   $(public_api_src_dir)/animation/key-frames.h \
   $(public_api_src_dir)/animation/path.h \

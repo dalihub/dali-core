@@ -337,7 +337,7 @@ inline void DALI_TEST_PRINT_ASSERT( DaliException& e )
 struct ConstraintAppliedCheck
 {
   ConstraintAppliedCheck( bool& signalReceived );
-  void operator()( ActiveConstraint& constraint );
+  void operator()( Constraint& constraint );
   void Reset();
   void CheckSignalReceived();
   void CheckSignalNotReceived();

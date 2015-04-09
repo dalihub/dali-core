@@ -22,10 +22,9 @@ internal_src_files = \
   $(internal_src_dir)/event/actors/mesh-actor-impl.cpp \
   $(internal_src_dir)/event/actors/camera-actor-impl.cpp \
   $(internal_src_dir)/event/actors/renderable-actor-impl.cpp \
-  $(internal_src_dir)/event/animation/active-constraint-base.cpp \
   $(internal_src_dir)/event/animation/animation-impl.cpp \
   $(internal_src_dir)/event/animation/animation-playlist.cpp \
-  $(internal_src_dir)/event/animation/constraint-impl.cpp \
+  $(internal_src_dir)/event/animation/constraint-base.cpp \
   $(internal_src_dir)/event/animation/key-frames-impl.cpp \
   $(internal_src_dir)/event/animation/path-impl.cpp \
   $(internal_src_dir)/event/animation/path-constraint-impl.cpp \
@@ -126,7 +125,6 @@ internal_src_files = \
   $(internal_src_dir)/render/shaders/program-controller.cpp \
   $(internal_src_dir)/render/shaders/shader.cpp \
   \
-  $(internal_src_dir)/update/animation/interpolator-functions.cpp \
   $(internal_src_dir)/update/animation/scene-graph-animation.cpp \
   $(internal_src_dir)/update/animation/scene-graph-constraint-base.cpp \
   $(internal_src_dir)/update/common/discard-queue.cpp \

@@ -48,6 +48,33 @@ public:
   }
 
   /**
+   * Copy constructor
+   */
+  PropertyInputIndexer( const PropertyInputIndexer& other )
+  : mBufferIndex( other.mBufferIndex ),
+    mInput( other.mInput )
+  {
+  }
+
+  /**
+   * Assignment operator
+   */
+  PropertyInputIndexer& operator=( const PropertyInputIndexer& other )
+  {
+    mBufferIndex = other.mBufferIndex;
+    mInput = other.mInput;
+
+    return *this;
+  }
+
+  /**
+   * Virtual Destructor
+   */
+  virtual ~PropertyInputIndexer()
+  {
+  }
+
+  /**
    * @copydoc Dali::Internal::PropertyInput::GetType()
    */
   virtual Property::Type GetType() const
@@ -127,7 +154,7 @@ public:
     return mInput->GetConstraintInputQuaternion( mBufferIndex );
   }
 
-private:
+public:
 
   unsigned int mBufferIndex;
   const AccessorType* mInput;

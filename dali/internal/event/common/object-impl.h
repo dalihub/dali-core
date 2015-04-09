@@ -19,13 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property.h>
+#include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-notification.h>
 #include <dali/internal/common/owner-container.h>
@@ -41,7 +41,7 @@ class PropertyNotification;
 
 namespace Internal
 {
-class Constraint;
+class ConstraintBase;
 class EventThreadServices;
 class Handle;
 class PropertyCondition;
@@ -55,9 +55,9 @@ class PropertyBase;
 class PropertyOwner;
 }
 
-typedef std::vector< Dali::ActiveConstraint >     ActiveConstraintContainer;
-typedef ActiveConstraintContainer::iterator       ActiveConstraintIter;
-typedef ActiveConstraintContainer::const_iterator ActiveConstraintConstIter;
+typedef std::vector< Dali::Constraint >     ConstraintContainer;
+typedef ConstraintContainer::iterator       ConstraintIter;
+typedef ConstraintContainer::const_iterator ConstraintConstIter;
 
 /**
  * A base class for objects which optionally provide properties.
@@ -214,23 +214,16 @@ public:
   // Constraints
 
   /**
-   * Apply a constraint to a Object.
+   * Apply a constraint to an Object.
    * @param[in] constraint The constraint to apply.
    */
-  Dali::ActiveConstraint ApplyConstraint( Constraint& constraint );
+  void ApplyConstraint( ConstraintBase& constraint );
 
   /**
-   * Apply a constraint to a Object.
-   * @param[in] constraint The constraint to apply.
-   * @param[in] weightObject An object with a "weight" float property.
+   * Remove one constraint from an Object.
+   * @param[in] constraint The constraint to remove.
    */
-  Dali::ActiveConstraint ApplyConstraint( Constraint& constraint, Dali::Handle weightObject );
-
-  /**
-   * Remove one constraint from a Object.
-   * @param[in] activeConstraint The active constraint to remove.
-   */
-  void RemoveConstraint( Dali::ActiveConstraint activeConstraint );
+  void RemoveConstraint( ConstraintBase& constraint );
 
   /**
    * Remove all constraints from a Object.
@@ -456,19 +449,6 @@ private:
   void DisablePropertyNotifications();
 
   /**
-   * Helper for ApplyConstraint overloads.
-   * @param[in] constraint The constraint to apply.
-   * @param[in] weightObject An object with a "weight" float property, or an empty handle.
-   * @return The new active-constraint which is owned by Object.
-   */
-  ActiveConstraintBase* DoApplyConstraint( Constraint& constraint, Dali::Handle weightObject );
-
-  /**
-   * Helper to remove active constraints
-   */
-  void RemoveConstraint( ActiveConstraint& constraint, bool isInScenegraph );
-
-  /**
    * Get the value of the property.
    * @param [in] entry An entry from the property lookup container.
    * @return The new value of the property.
@@ -522,7 +502,7 @@ private:
 
   Dali::Vector<Observer*> mObservers;
 
-  ActiveConstraintContainer* mConstraints;               ///< Container of owned active-constraints.
+  ConstraintContainer* mConstraints;               ///< Container of owned -constraints.
 
   typedef std::vector< Dali::PropertyNotification >     PropertyNotificationContainer;
   typedef PropertyNotificationContainer::iterator       PropertyNotificationContainerIter;

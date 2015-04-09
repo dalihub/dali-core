@@ -134,8 +134,8 @@ bool PropertyNotification::Check( BufferIndex bufferIndex )
   if ( Property::INVALID_COMPONENT_INDEX != mComponentIndex )
   {
     // Evaluate Condition
-    const PropertyInputComponentAccessor component( mProperty, mComponentIndex );
-    const PropertyInputIndexer< PropertyInputComponentAccessor > input( bufferIndex, &component );
+    const PropertyInputAccessor component( mProperty, mComponentIndex );
+    const PropertyInputIndexer< PropertyInputAccessor > input( bufferIndex, &component );
     currentValid = mConditionFunction(input, mArguments);
   }
   else
