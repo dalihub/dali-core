@@ -188,24 +188,24 @@ struct TestCustomActor : public CustomActorImpl
   {
   }
 
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
   {
   }
 
-  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
   {
   }
 
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
   {
     return 0.0f;
   }
 
-  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
   {
   }
 
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS )
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS )
   {
     return false;
   }
@@ -523,24 +523,24 @@ public:
   {
   }
 
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
   {
   }
 
-  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
   {
   }
 
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
   {
     return 0.0f;
   }
 
-  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
   {
   }
 
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS )
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS )
   {
     return false;
   }
@@ -702,11 +702,11 @@ public:
   {
   }
 
-  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
   {
   }
 
-  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
   {
   }
 

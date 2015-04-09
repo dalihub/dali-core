@@ -66,6 +66,35 @@ using Dali::Internal::SceneGraph::PropertyBase;
 
 namespace Dali
 {
+namespace ResizePolicy
+{
+
+namespace
+{
+DALI_ENUM_TO_STRING_TABLE_BEGIN( Type )DALI_ENUM_TO_STRING( FIXED )
+DALI_ENUM_TO_STRING( USE_NATURAL_SIZE )
+DALI_ENUM_TO_STRING( FILL_TO_PARENT )
+DALI_ENUM_TO_STRING( SIZE_RELATIVE_TO_PARENT )
+DALI_ENUM_TO_STRING( SIZE_FIXED_OFFSET_FROM_PARENT )
+DALI_ENUM_TO_STRING( FIT_TO_CHILDREN )
+DALI_ENUM_TO_STRING( DIMENSION_DEPENDENCY )
+DALI_ENUM_TO_STRING( USE_ASSIGNED_SIZE )
+DALI_ENUM_TO_STRING_TABLE_END( Type )
+
+} // unnamed namespace
+} // ResizePolicy
+
+namespace SizeScalePolicy
+{
+namespace
+{
+// Enumeration to / from string conversion tables
+DALI_ENUM_TO_STRING_TABLE_BEGIN( Type )DALI_ENUM_TO_STRING( USE_SIZE_SET )
+DALI_ENUM_TO_STRING( FIT_WITH_ASPECT_RATIO )
+DALI_ENUM_TO_STRING( FILL_WITH_ASPECT_RATIO )
+DALI_ENUM_TO_STRING_TABLE_END( Type )
+} // unnamed namespace
+} // SizeScalePolicy
 
 namespace Internal
 {
@@ -79,41 +108,41 @@ ActorContainer Actor::mNullChildren;
 struct Actor::RelayoutData
 {
   RelayoutData()
-      : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
+      : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( SizeScalePolicy::USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
   {
     // Set size negotiation defaults
-    for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      resizePolicies[ i ] = FIXED;
+      resizePolicies[ i ] = ResizePolicy::FIXED;
       negotiatedDimensions[ i ] = 0.0f;
       dimensionNegotiated[ i ] = false;
       dimensionDirty[ i ] = false;
-      dimensionDependencies[ i ] = ALL_DIMENSIONS;
+      dimensionDependencies[ i ] = Dimension::ALL_DIMENSIONS;
       dimensionPadding[ i ] = Vector2( 0.0f, 0.0f );
       minimumSize[ i ] = 0.0f;
       maximumSize[ i ] = FLT_MAX;
     }
   }
 
-  ResizePolicy resizePolicies[ DIMENSION_COUNT ];      ///< Resize policies
+  ResizePolicy::Type resizePolicies[ Dimension::DIMENSION_COUNT ];      ///< Resize policies
 
-  Dimension dimensionDependencies[ DIMENSION_COUNT ];  ///< A list of dimension dependencies
+  Dimension::Type dimensionDependencies[ Dimension::DIMENSION_COUNT ];  ///< A list of dimension dependencies
 
-  Vector2 dimensionPadding[ DIMENSION_COUNT ];         ///< Padding for each dimension. X = start (e.g. left, bottom), y = end (e.g. right, top)
+  Vector2 dimensionPadding[ Dimension::DIMENSION_COUNT ];         ///< Padding for each dimension. X = start (e.g. left, bottom), y = end (e.g. right, top)
 
-  float negotiatedDimensions[ DIMENSION_COUNT ];       ///< Storage for when a dimension is negotiated but before set on actor
+  float negotiatedDimensions[ Dimension::DIMENSION_COUNT ];       ///< Storage for when a dimension is negotiated but before set on actor
 
-  float minimumSize[ DIMENSION_COUNT ];                ///< The minimum size an actor can be
-  float maximumSize[ DIMENSION_COUNT ];                ///< The maximum size an actor can be
+  float minimumSize[ Dimension::DIMENSION_COUNT ];                ///< The minimum size an actor can be
+  float maximumSize[ Dimension::DIMENSION_COUNT ];                ///< The maximum size an actor can be
 
-  bool dimensionNegotiated[ DIMENSION_COUNT ];         ///< Has the dimension been negotiated
-  bool dimensionDirty[ DIMENSION_COUNT ];              ///< Flags indicating whether the layout dimension is dirty or not
+  bool dimensionNegotiated[ Dimension::DIMENSION_COUNT ];         ///< Has the dimension been negotiated
+  bool dimensionDirty[ Dimension::DIMENSION_COUNT ];              ///< Flags indicating whether the layout dimension is dirty or not
 
   Vector3 sizeModeFactor;                              ///< Factor of size used for certain SizeModes
 
   Vector2 preferredSize;                               ///< The preferred size of the actor
 
-  SizeScalePolicy sizeSetPolicy :3;            ///< Policy to apply when setting size. Enough room for the enum
+  SizeScalePolicy::Type sizeSetPolicy :3;            ///< Policy to apply when setting size. Enough room for the enum
 
   bool relayoutEnabled :1;                   ///< Flag to specify if this actor should be included in size negotiation or not (defaults to true)
   bool insideRelayout :1;                    ///< Locking flag to prevent recursive relayouts on size set
@@ -220,23 +249,6 @@ const char* const SIGNAL_OFF_STAGE = "off-stage";
 const char* const ACTION_SHOW = "show";
 const char* const ACTION_HIDE = "hide";
 
-// Enumeration to / from string conversion tables
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( ResizePolicy )DALI_ENUM_TO_STRING( FIXED )
-DALI_ENUM_TO_STRING( USE_NATURAL_SIZE )
-DALI_ENUM_TO_STRING( FILL_TO_PARENT )
-DALI_ENUM_TO_STRING( SIZE_RELATIVE_TO_PARENT )
-DALI_ENUM_TO_STRING( SIZE_FIXED_OFFSET_FROM_PARENT )
-DALI_ENUM_TO_STRING( FIT_TO_CHILDREN )
-DALI_ENUM_TO_STRING( DIMENSION_DEPENDENCY )
-DALI_ENUM_TO_STRING( USE_ASSIGNED_SIZE )
-DALI_ENUM_TO_STRING_TABLE_END( ResizePolicy )
-
-DALI_ENUM_TO_STRING_TABLE_BEGIN( SizeScalePolicy )DALI_ENUM_TO_STRING( USE_SIZE_SET )
-DALI_ENUM_TO_STRING( FIT_WITH_ASPECT_RATIO )
-DALI_ENUM_TO_STRING( FILL_WITH_ASPECT_RATIO )
-DALI_ENUM_TO_STRING_TABLE_END( SizeScalePolicy )
-
 BaseHandle CreateActor()
 {
   return Dali::Actor::New();
@@ -259,16 +271,16 @@ TypeAction a2( mType, ACTION_HIDE, &Actor::DoAction );
  * @param[in] dimension The dimension to extract
  * @return Return the value for the dimension
  */
-float GetDimensionValue( const Vector2& values, Dimension dimension )
+float GetDimensionValue( const Vector2& values, Dimension::Type dimension )
 {
   switch( dimension )
   {
-    case WIDTH:
+    case Dimension::WIDTH:
     {
       return values.width;
     }
 
-    case HEIGHT:
+    case Dimension::HEIGHT:
     {
       return values.height;
     }
@@ -289,7 +301,7 @@ float GetDimensionValue( const Vector2& values, Dimension dimension )
  * @param[in] dimension The dimension to extract
  * @return Return the value for the dimension
  */
-float GetDimensionValue( const Vector3& values, Dimension dimension )
+float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
 {
   return GetDimensionValue( values.GetVectorXY(), dimension );
 }
@@ -727,6 +739,8 @@ void Actor::SetPosition( float x, float y, float z )
 
 void Actor::SetPosition( const Vector3& position )
 {
+  mTargetPosition = position;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -736,6 +750,8 @@ void Actor::SetPosition( const Vector3& position )
 
 void Actor::SetX( float x )
 {
+  mTargetPosition.x = x;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -745,6 +761,8 @@ void Actor::SetX( float x )
 
 void Actor::SetY( float y )
 {
+  mTargetPosition.y = y;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -754,6 +772,8 @@ void Actor::SetY( float y )
 
 void Actor::SetZ( float z )
 {
+  mTargetPosition.z = z;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -763,6 +783,8 @@ void Actor::SetZ( float z )
 
 void Actor::TranslateBy( const Vector3& distance )
 {
+  mTargetPosition += distance;
+
   if( NULL != mNode )
   {
     // mNode is being used in a separate thread; queue a message to set the value & base value
@@ -779,6 +801,11 @@ const Vector3& Actor::GetCurrentPosition() const
   }
 
   return Vector3::ZERO;
+}
+
+const Vector3& Actor::GetTargetPosition() const
+{
+  return mTargetPosition;
 }
 
 const Vector3& Actor::GetCurrentWorldPosition() const
@@ -1265,11 +1292,11 @@ Vector3 Actor::GetNaturalSize() const
   return Vector3( 0.0f, 0.0f, 0.0f );
 }
 
-void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
+void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -1277,16 +1304,16 @@ void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
     }
   }
 
-  if( policy == DIMENSION_DEPENDENCY )
+  if( policy == ResizePolicy::DIMENSION_DEPENDENCY )
   {
-    if( dimension & WIDTH )
+    if( dimension & Dimension::WIDTH )
     {
-      SetDimensionDependency( WIDTH, HEIGHT );
+      SetDimensionDependency( Dimension::WIDTH, Dimension::HEIGHT );
     }
 
-    if( dimension & HEIGHT )
+    if( dimension & Dimension::HEIGHT )
     {
-      SetDimensionDependency( HEIGHT, WIDTH );
+      SetDimensionDependency( Dimension::HEIGHT, Dimension::WIDTH );
     }
   }
 
@@ -1296,12 +1323,12 @@ void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
   RelayoutRequest();
 }
 
-ResizePolicy Actor::GetResizePolicy( Dimension dimension ) const
+ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
 {
   EnsureRelayoutData();
 
   // If more than one dimension is requested, just return the first one found
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
@@ -1309,28 +1336,28 @@ ResizePolicy Actor::GetResizePolicy( Dimension dimension ) const
     }
   }
 
-  return FIXED;   // Default
+  return ResizePolicy::FIXED;   // Default
 }
 
-void Actor::SetSizeScalePolicy( SizeScalePolicy policy )
+void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
 {
   EnsureRelayoutData();
 
   mRelayoutData->sizeSetPolicy = policy;
 }
 
-SizeScalePolicy Actor::GetSizeScalePolicy() const
+SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
 {
   EnsureRelayoutData();
 
   return mRelayoutData->sizeSetPolicy;
 }
 
-void Actor::SetDimensionDependency( Dimension dimension, Dimension dependency )
+void Actor::SetDimensionDependency( Dimension::Type dimension, Dimension::Type dependency )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -1339,12 +1366,12 @@ void Actor::SetDimensionDependency( Dimension dimension, Dimension dependency )
   }
 }
 
-Dimension Actor::GetDimensionDependency( Dimension dimension ) const
+Dimension::Type Actor::GetDimensionDependency( Dimension::Type dimension ) const
 {
   EnsureRelayoutData();
 
   // If more than one dimension is requested, just return the first one found
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
@@ -1352,7 +1379,7 @@ Dimension Actor::GetDimensionDependency( Dimension dimension ) const
     }
   }
 
-  return ALL_DIMENSIONS;   // Default
+  return Dimension::ALL_DIMENSIONS;   // Default
 }
 
 void Actor::SetRelayoutEnabled( bool relayoutEnabled )
@@ -1374,11 +1401,11 @@ bool Actor::IsRelayoutEnabled() const
   return mRelayoutData && mRelayoutData->relayoutEnabled;
 }
 
-void Actor::SetLayoutDirty( bool dirty, Dimension dimension )
+void Actor::SetLayoutDirty( bool dirty, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -1387,11 +1414,11 @@ void Actor::SetLayoutDirty( bool dirty, Dimension dimension )
   }
 }
 
-bool Actor::IsLayoutDirty( Dimension dimension ) const
+bool Actor::IsLayoutDirty( Dimension::Type dimension ) const
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionDirty[ i ] )
     {
@@ -1402,14 +1429,14 @@ bool Actor::IsLayoutDirty( Dimension dimension ) const
   return false;
 }
 
-bool Actor::RelayoutPossible( Dimension dimension ) const
+bool Actor::RelayoutPossible( Dimension::Type dimension ) const
 {
   EnsureRelayoutData();
 
   return mRelayoutData->relayoutEnabled && !IsLayoutDirty( dimension );
 }
 
-bool Actor::RelayoutRequired( Dimension dimension ) const
+bool Actor::RelayoutRequired( Dimension::Type dimension ) const
 {
   EnsureRelayoutData();
 
@@ -2837,19 +2864,19 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      SetResizePolicy( Scripting::GetEnumeration< ResizePolicy >( property.Get< std::string >().c_str(), ResizePolicyTable, ResizePolicyTableCount ), WIDTH );
+      SetResizePolicy( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount ), Dimension::WIDTH );
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      SetResizePolicy( Scripting::GetEnumeration< ResizePolicy >( property.Get< std::string >().c_str(), ResizePolicyTable, ResizePolicyTableCount ), HEIGHT );
+      SetResizePolicy( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount ), Dimension::HEIGHT );
       break;
     }
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      SetSizeScalePolicy( Scripting::GetEnumeration< SizeScalePolicy >( property.Get< std::string >().c_str(), SizeScalePolicyTable, SizeScalePolicyTableCount ) );
+      SetSizeScalePolicy( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SizeScalePolicy::TypeTable, SizeScalePolicy::TypeTableCount ) );
       break;
     }
 
@@ -2857,7 +2884,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     {
       if( property.Get< bool >() )
       {
-        SetResizePolicy( DIMENSION_DEPENDENCY, WIDTH );
+        SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::WIDTH );
       }
       break;
     }
@@ -2866,7 +2893,7 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     {
       if( property.Get< bool >() )
       {
-        SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
+        SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
       }
       break;
     }
@@ -2874,24 +2901,24 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
     case Dali::Actor::Property::PADDING:
     {
       Vector4 padding = property.Get< Vector4 >();
-      SetPadding( Vector2( padding.x, padding.y ), WIDTH );
-      SetPadding( Vector2( padding.z, padding.w ), HEIGHT );
+      SetPadding( Vector2( padding.x, padding.y ), Dimension::WIDTH );
+      SetPadding( Vector2( padding.z, padding.w ), Dimension::HEIGHT );
       break;
     }
 
     case Dali::Actor::Property::MINIMUM_SIZE:
     {
       Vector2 size = property.Get< Vector2 >();
-      SetMinimumSize( size.x, WIDTH );
-      SetMinimumSize( size.y, HEIGHT );
+      SetMinimumSize( size.x, Dimension::WIDTH );
+      SetMinimumSize( size.y, Dimension::HEIGHT );
       break;
     }
 
     case Dali::Actor::Property::MAXIMUM_SIZE:
     {
       Vector2 size = property.Get< Vector2 >();
-      SetMaximumSize( size.x, WIDTH );
-      SetMaximumSize( size.y, HEIGHT );
+      SetMaximumSize( size.x, Dimension::WIDTH );
+      SetMaximumSize( size.y, Dimension::HEIGHT );
       break;
     }
 
@@ -3295,51 +3322,51 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName< ResizePolicy >( GetResizePolicy( WIDTH ), ResizePolicyTable, ResizePolicyTableCount );
+      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::WIDTH ), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount );
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName< ResizePolicy >( GetResizePolicy( HEIGHT ), ResizePolicyTable, ResizePolicyTableCount );
+      value = Scripting::GetLinearEnumerationName< ResizePolicy::Type >( GetResizePolicy( Dimension::HEIGHT ), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount );
       break;
     }
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      value = Scripting::GetLinearEnumerationName< SizeScalePolicy >( GetSizeScalePolicy(), SizeScalePolicyTable, SizeScalePolicyTableCount );
+      value = Scripting::GetLinearEnumerationName< SizeScalePolicy::Type >( GetSizeScalePolicy(), SizeScalePolicy::TypeTable, SizeScalePolicy::TypeTableCount );
       break;
     }
 
     case Dali::Actor::Property::WIDTH_FOR_HEIGHT:
     {
-      value = ( GetResizePolicy( WIDTH ) == DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( WIDTH ) == HEIGHT );
+      value = ( GetResizePolicy( Dimension::WIDTH ) == ResizePolicy::DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( Dimension::WIDTH ) == Dimension::HEIGHT );
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_FOR_WIDTH:
     {
-      value = ( GetResizePolicy( HEIGHT ) == DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( HEIGHT ) == WIDTH );
+      value = ( GetResizePolicy( Dimension::HEIGHT ) == ResizePolicy::DIMENSION_DEPENDENCY ) && ( GetDimensionDependency( Dimension::HEIGHT ) == Dimension::WIDTH );
       break;
     }
 
     case Dali::Actor::Property::PADDING:
     {
-      Vector2 widthPadding = GetPadding( WIDTH );
-      Vector2 heightPadding = GetPadding( HEIGHT );
+      Vector2 widthPadding = GetPadding( Dimension::WIDTH );
+      Vector2 heightPadding = GetPadding( Dimension::HEIGHT );
       value = Vector4( widthPadding.x, widthPadding.y, heightPadding.x, heightPadding.y );
       break;
     }
 
     case Dali::Actor::Property::MINIMUM_SIZE:
     {
-      value = Vector2( GetMinimumSize( WIDTH ), GetMinimumSize( HEIGHT ) );
+      value = Vector2( GetMinimumSize( Dimension::WIDTH ), GetMinimumSize( Dimension::HEIGHT ) );
       break;
     }
 
     case Dali::Actor::Property::MAXIMUM_SIZE:
     {
-      value = Vector2( GetMaximumSize( WIDTH ), GetMaximumSize( HEIGHT ) );
+      value = Vector2( GetMaximumSize( Dimension::WIDTH ), GetMaximumSize( Dimension::HEIGHT ) );
       break;
     }
 
@@ -3807,15 +3834,15 @@ void Actor::EnsureRelayoutData() const
   }
 }
 
-bool Actor::RelayoutDependentOnParent( Dimension dimension )
+bool Actor::RelayoutDependentOnParent( Dimension::Type dimension )
 {
   // Check if actor is dependent on parent
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
-      const ResizePolicy resizePolicy = GetResizePolicy( static_cast< Dimension >( 1 << i ) );
-      if( resizePolicy == FILL_TO_PARENT || resizePolicy == SIZE_RELATIVE_TO_PARENT || resizePolicy == SIZE_FIXED_OFFSET_FROM_PARENT )
+      const ResizePolicy::Type resizePolicy = GetResizePolicy( static_cast< Dimension::Type >( 1 << i ) );
+      if( resizePolicy == ResizePolicy::FILL_TO_PARENT || resizePolicy == ResizePolicy::SIZE_RELATIVE_TO_PARENT || resizePolicy == ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT )
       {
         return true;
       }
@@ -3825,18 +3852,18 @@ bool Actor::RelayoutDependentOnParent( Dimension dimension )
   return false;
 }
 
-bool Actor::RelayoutDependentOnChildren( Dimension dimension )
+bool Actor::RelayoutDependentOnChildren( Dimension::Type dimension )
 {
   // Check if actor is dependent on children
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
-      const ResizePolicy resizePolicy = GetResizePolicy( static_cast< Dimension >( 1 << i ) );
+      const ResizePolicy::Type resizePolicy = GetResizePolicy( static_cast< Dimension::Type >( 1 << i ) );
       switch( resizePolicy )
       {
-        case FIT_TO_CHILDREN:
-        case USE_NATURAL_SIZE:      // i.e. For things that calculate their size based on children
+        case ResizePolicy::FIT_TO_CHILDREN:
+        case ResizePolicy::USE_NATURAL_SIZE:      // i.e. For things that calculate their size based on children
         {
           return true;
         }
@@ -3852,28 +3879,28 @@ bool Actor::RelayoutDependentOnChildren( Dimension dimension )
   return false;
 }
 
-bool Actor::RelayoutDependentOnChildrenBase( Dimension dimension )
+bool Actor::RelayoutDependentOnChildrenBase( Dimension::Type dimension )
 {
   return Actor::RelayoutDependentOnChildren( dimension );
 }
 
-bool Actor::RelayoutDependentOnDimension( Dimension dimension, Dimension dependentDimension )
+bool Actor::RelayoutDependentOnDimension( Dimension::Type dimension, Dimension::Type dependentDimension )
 {
   // Check each possible dimension and see if it is dependent on the input one
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
-      return mRelayoutData->resizePolicies[ i ] == DIMENSION_DEPENDENCY && mRelayoutData->dimensionDependencies[ i ] == dependentDimension;
+      return mRelayoutData->resizePolicies[ i ] == ResizePolicy::DIMENSION_DEPENDENCY && mRelayoutData->dimensionDependencies[ i ] == dependentDimension;
     }
   }
 
   return false;
 }
 
-void Actor::SetNegotiatedDimension( float negotiatedDimension, Dimension dimension )
+void Actor::SetNegotiatedDimension( float negotiatedDimension, Dimension::Type dimension )
 {
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -3882,10 +3909,10 @@ void Actor::SetNegotiatedDimension( float negotiatedDimension, Dimension dimensi
   }
 }
 
-float Actor::GetNegotiatedDimension( Dimension dimension ) const
+float Actor::GetNegotiatedDimension( Dimension::Type dimension ) const
 {
   // If more than one dimension is requested, just return the first one found
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
@@ -3896,11 +3923,11 @@ float Actor::GetNegotiatedDimension( Dimension dimension ) const
   return 0.0f;   // Default
 }
 
-void Actor::SetPadding( const Vector2& padding, Dimension dimension )
+void Actor::SetPadding( const Vector2& padding, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -3909,12 +3936,12 @@ void Actor::SetPadding( const Vector2& padding, Dimension dimension )
   }
 }
 
-Vector2 Actor::GetPadding( Dimension dimension ) const
+Vector2 Actor::GetPadding( Dimension::Type dimension ) const
 {
   EnsureRelayoutData();
 
   // If more than one dimension is requested, just return the first one found
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) )
     {
@@ -3925,9 +3952,9 @@ Vector2 Actor::GetPadding( Dimension dimension ) const
   return Vector2( 0.0f, 0.0f );   // Default
 }
 
-void Actor::SetLayoutNegotiated( bool negotiated, Dimension dimension )
+void Actor::SetLayoutNegotiated( bool negotiated, Dimension::Type dimension )
 {
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -3936,9 +3963,9 @@ void Actor::SetLayoutNegotiated( bool negotiated, Dimension dimension )
   }
 }
 
-bool Actor::IsLayoutNegotiated( Dimension dimension ) const
+bool Actor::IsLayoutNegotiated( Dimension::Type dimension ) const
 {
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionNegotiated[ i ] )
     {
@@ -3949,28 +3976,28 @@ bool Actor::IsLayoutNegotiated( Dimension dimension ) const
   return false;
 }
 
-float Actor::CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+float Actor::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
 {
   // Could be overridden in derived classes.
   return CalculateChildSizeBase( child, dimension );
 }
 
-float Actor::CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension )
+float Actor::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
 {
   // Fill to parent, taking size mode factor into account
   switch( child.GetResizePolicy( dimension ) )
   {
-    case FILL_TO_PARENT:
+    case ResizePolicy::FILL_TO_PARENT:
     {
       return GetLatestSize( dimension );
     }
 
-    case SIZE_RELATIVE_TO_PARENT:
+    case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
     {
       return GetLatestSize( dimension ) * GetDimensionValue( child.GetSizeModeFactor(), dimension );
     }
 
-    case SIZE_FIXED_OFFSET_FROM_PARENT:
+    case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
     {
       return GetLatestSize( dimension ) + GetDimensionValue( child.GetSizeModeFactor(), dimension );
     }
@@ -4010,19 +4037,19 @@ float Actor::GetWidthForHeight( float height )
   return width;
 }
 
-float Actor::GetLatestSize( Dimension dimension ) const
+float Actor::GetLatestSize( Dimension::Type dimension ) const
 {
   return IsLayoutNegotiated( dimension ) ? GetNegotiatedDimension( dimension ) : GetSize( dimension );
 }
 
-float Actor::GetRelayoutSize( Dimension dimension ) const
+float Actor::GetRelayoutSize( Dimension::Type dimension ) const
 {
   Vector2 padding = GetPadding( dimension );
 
   return GetLatestSize( dimension ) + padding.x + padding.y;
 }
 
-float Actor::NegotiateFromParent( Dimension dimension )
+float Actor::NegotiateFromParent( Dimension::Type dimension )
 {
   Actor* parent = GetParent();
   if( parent )
@@ -4035,9 +4062,8 @@ float Actor::NegotiateFromParent( Dimension dimension )
   return 0.0f;
 }
 
-float Actor::NegotiateFromChildren( Dimension dimension )
+float Actor::NegotiateFromChildren( Dimension::Type dimension )
 {
-  float minDimensionPoint = 0.0f;
   float maxDimensionPoint = 0.0f;
 
   for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
@@ -4048,70 +4074,69 @@ float Actor::NegotiateFromChildren( Dimension dimension )
     if( !childImpl.RelayoutDependentOnParent( dimension ) )
     {
       // Calculate the min and max points that the children range across
-      float childPosition = GetDimensionValue( childImpl.GetCurrentPosition(), dimension );
+      float childPosition = GetDimensionValue( childImpl.GetTargetPosition(), dimension );
       float dimensionSize = childImpl.GetRelayoutSize( dimension );
-      minDimensionPoint = std::min( minDimensionPoint, childPosition - dimensionSize * 0.5f );
-      maxDimensionPoint = std::max( maxDimensionPoint, childPosition + dimensionSize * 0.5f );
+      maxDimensionPoint = std::max( maxDimensionPoint, childPosition + dimensionSize );
     }
   }
 
-  return maxDimensionPoint - minDimensionPoint;
+  return maxDimensionPoint;
 }
 
-float Actor::GetSize( Dimension dimension ) const
+float Actor::GetSize( Dimension::Type dimension ) const
 {
   return GetDimensionValue( GetTargetSize(), dimension );
 }
 
-float Actor::GetNaturalSize( Dimension dimension ) const
+float Actor::GetNaturalSize( Dimension::Type dimension ) const
 {
   return GetDimensionValue( GetNaturalSize(), dimension );
 }
 
-float Actor::CalculateSize( Dimension dimension, const Vector2& maximumSize )
+float Actor::CalculateSize( Dimension::Type dimension, const Vector2& maximumSize )
 {
   switch( GetResizePolicy( dimension ) )
   {
-    case USE_NATURAL_SIZE:
+    case ResizePolicy::USE_NATURAL_SIZE:
     {
       return GetNaturalSize( dimension );
     }
 
-    case FIXED:
+    case ResizePolicy::FIXED:
     {
       return GetDimensionValue( GetPreferredSize(), dimension );
     }
 
-    case USE_ASSIGNED_SIZE:
+    case ResizePolicy::USE_ASSIGNED_SIZE:
     {
       return GetDimensionValue( maximumSize, dimension );
     }
 
-    case FILL_TO_PARENT:
-    case SIZE_RELATIVE_TO_PARENT:
-    case SIZE_FIXED_OFFSET_FROM_PARENT:
+    case ResizePolicy::FILL_TO_PARENT:
+    case ResizePolicy::SIZE_RELATIVE_TO_PARENT:
+    case ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT:
     {
       return NegotiateFromParent( dimension );
     }
 
-    case FIT_TO_CHILDREN:
+    case ResizePolicy::FIT_TO_CHILDREN:
     {
       return NegotiateFromChildren( dimension );
     }
 
-    case DIMENSION_DEPENDENCY:
+    case ResizePolicy::DIMENSION_DEPENDENCY:
     {
-      const Dimension dimensionDependency = GetDimensionDependency( dimension );
+      const Dimension::Type dimensionDependency = GetDimensionDependency( dimension );
 
       // Custom rules
-      if( dimension == WIDTH && dimensionDependency == HEIGHT )
+      if( dimension == Dimension::WIDTH && dimensionDependency == Dimension::HEIGHT )
       {
-        return GetWidthForHeight( GetNegotiatedDimension( HEIGHT ) );
+        return GetWidthForHeight( GetNegotiatedDimension( Dimension::HEIGHT ) );
       }
 
-      if( dimension == HEIGHT && dimensionDependency == WIDTH )
+      if( dimension == Dimension::HEIGHT && dimensionDependency == Dimension::WIDTH )
       {
-        return GetHeightForWidth( GetNegotiatedDimension( WIDTH ) );
+        return GetHeightForWidth( GetNegotiatedDimension( Dimension::WIDTH ) );
       }
 
       break;
@@ -4126,7 +4151,7 @@ float Actor::CalculateSize( Dimension dimension, const Vector2& maximumSize )
   return 0.0f;  // Default
 }
 
-float Actor::ConstrainDimension( float size, Dimension dimension )
+float Actor::ConstrainDimension( float size, Dimension::Type dimension )
 {
   const float minSize = GetMinimumSize( dimension );
   const float maxSize = GetMaximumSize( dimension );
@@ -4134,7 +4159,7 @@ float Actor::ConstrainDimension( float size, Dimension dimension )
   return std::max( minSize, std::min( size, maxSize ) );
 }
 
-void Actor::NegotiateDimension( Dimension dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack )
+void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack )
 {
   // Check if it needs to be negotiated
   if( IsLayoutDirty( dimension ) && !IsLayoutNegotiated( dimension ) )
@@ -4157,9 +4182,9 @@ void Actor::NegotiateDimension( Dimension dimension, const Vector2& allocatedSiz
       recursionStack.push_back( ActorDimensionPair( this, dimension ) );
 
       // Dimension dependency check
-      for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+      for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
       {
-        Dimension dimensionToCheck = static_cast< Dimension >( 1 << i );
+        Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
 
         if( RelayoutDependentOnDimension( dimension, dimensionToCheck ) )
         {
@@ -4218,9 +4243,9 @@ void Actor::NegotiateDimensions( const Vector2& allocatedSize )
   // Negotiate all dimensions that require it
   ActorDimensionStack recursionStack;
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
-    const Dimension dimension = static_cast< Dimension >( 1 << i );
+    const Dimension::Type dimension = static_cast< Dimension::Type >( 1 << i );
 
     // Negotiate
     NegotiateDimension( dimension, allocatedSize, recursionStack );
@@ -4231,12 +4256,12 @@ Vector2 Actor::ApplySizeSetPolicy( const Vector2 size )
 {
   switch( mRelayoutData->sizeSetPolicy )
   {
-    case USE_SIZE_SET:
+    case SizeScalePolicy::USE_SIZE_SET:
     {
       return size;
     }
 
-    case FIT_WITH_ASPECT_RATIO:
+    case SizeScalePolicy::FIT_WITH_ASPECT_RATIO:
     {
       // Scale size to fit within the original size bounds, keeping the natural size aspect ratio
       const Vector3 naturalSize = GetNaturalSize();
@@ -4262,7 +4287,7 @@ Vector2 Actor::ApplySizeSetPolicy( const Vector2 size )
       break;
     }
 
-    case FILL_WITH_ASPECT_RATIO:
+    case SizeScalePolicy::FILL_WITH_ASPECT_RATIO:
     {
       // Scale size to fill the original size bounds, keeping the natural size aspect ratio. Potentially exceeding the original bounds.
       const Vector3 naturalSize = GetNaturalSize();
@@ -4298,7 +4323,7 @@ Vector2 Actor::ApplySizeSetPolicy( const Vector2 size )
 void Actor::SetNegotiatedSize( RelayoutContainer& container )
 {
   // Do the set actor size
-  Vector2 negotiatedSize( GetLatestSize( WIDTH ), GetLatestSize( HEIGHT ) );
+  Vector2 negotiatedSize( GetLatestSize( Dimension::WIDTH ), GetLatestSize( Dimension::HEIGHT ) );
 
   // Adjust for size set policy
   negotiatedSize = ApplySizeSetPolicy( negotiatedSize );
@@ -4344,7 +4369,7 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
   }
 }
 
-void Actor::RelayoutRequest( Dimension dimension )
+void Actor::RelayoutRequest( Dimension::Type dimension )
 {
   Internal::RelayoutController* relayoutController = Internal::RelayoutController::Get();
   if( relayoutController )
@@ -4374,11 +4399,11 @@ void Actor::PropagateRelayoutFlags()
   }
 }
 
-void Actor::OnCalculateRelayoutSize( Dimension dimension )
+void Actor::OnCalculateRelayoutSize( Dimension::Type dimension )
 {
 }
 
-void Actor::OnLayoutNegotiated( float size, Dimension dimension )
+void Actor::OnLayoutNegotiated( float size, Dimension::Type dimension )
 {
 }
 
@@ -4388,12 +4413,12 @@ void Actor::SetPreferredSize( const Vector2& size )
 
   if( size.width > 0.0f )
   {
-    SetResizePolicy( FIXED, WIDTH );
+    SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
   }
 
   if( size.height > 0.0f )
   {
-    SetResizePolicy( FIXED, HEIGHT );
+    SetResizePolicy( ResizePolicy::FIXED, Dimension::HEIGHT );
   }
 
   mRelayoutData->preferredSize = size;
@@ -4408,11 +4433,11 @@ Vector2 Actor::GetPreferredSize() const
   return mRelayoutData->preferredSize;
 }
 
-void Actor::SetMinimumSize( float size, Dimension dimension )
+void Actor::SetMinimumSize( float size, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -4423,11 +4448,11 @@ void Actor::SetMinimumSize( float size, Dimension dimension )
   RelayoutRequest();
 }
 
-float Actor::GetMinimumSize( Dimension dimension ) const
+float Actor::GetMinimumSize( Dimension::Type dimension ) const
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -4438,11 +4463,11 @@ float Actor::GetMinimumSize( Dimension dimension ) const
   return 0.0f;  // Default
 }
 
-void Actor::SetMaximumSize( float size, Dimension dimension )
+void Actor::SetMaximumSize( float size, Dimension::Type dimension )
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
@@ -4453,11 +4478,11 @@ void Actor::SetMaximumSize( float size, Dimension dimension )
   RelayoutRequest();
 }
 
-float Actor::GetMaximumSize( Dimension dimension ) const
+float Actor::GetMaximumSize( Dimension::Type dimension ) const
 {
   EnsureRelayoutData();
 
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {

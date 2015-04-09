@@ -205,7 +205,7 @@ public:
    * @param[in] policy The policy being set
    * @param[in] dimension The dimension the policy is being set for
    */
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension ) = 0;
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) = 0;
 
   /**
    * Return the natural size of the actor
@@ -221,7 +221,7 @@ public:
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
    * @return Return the calculated size for the given dimension
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension ) = 0;
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) = 0;
 
   /**
    * @brief This method is called during size negotiation when a height is required for a given width.
@@ -249,7 +249,7 @@ public:
    * @param dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children
    */
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS ) = 0;
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) = 0;
 
   /**
    * @brief Virtual method to notify deriving classes that relayout dependencies have been
@@ -257,7 +257,7 @@ public:
    *
    * @param dimension The dimension that is about to be calculated
    */
-  virtual void OnCalculateRelayoutSize( Dimension dimension ) = 0;
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) = 0;
 
   /**
    * @brief Virtual method to notify deriving classes that the size for a dimension
@@ -266,7 +266,7 @@ public:
    * @param[in] size The new size for the given dimension
    * @param[in] dimension The dimension that was just negotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension dimension ) = 0;
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) = 0;
 
 protected: // For derived classes
 
@@ -307,7 +307,7 @@ protected: // For derived classes
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
    * @return Return the calculated size for the given dimension
    */
-  float CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension );
+  float CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension );
 
   /**
    * @brief Determine if this actor is dependent on it's children for relayout from the base class
@@ -315,7 +315,7 @@ protected: // For derived classes
    * @param dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children
    */
-  bool RelayoutDependentOnChildrenBase( Dimension dimension = ALL_DIMENSIONS );
+  bool RelayoutDependentOnChildrenBase( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
 public: // Not intended for application developers
 

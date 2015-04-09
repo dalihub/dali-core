@@ -169,7 +169,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnSetResizePolicy
    */
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
   {
     mImpl->OnSetResizePolicy( policy, dimension );
   }
@@ -185,7 +185,7 @@ private:
   /**
    * @copydoc Internal::Actor::CalculateChildSize
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
   {
     return mImpl->CalculateChildSize( child, dimension );
   }
@@ -209,7 +209,7 @@ private:
   /**
    * @copydoc Internal::Actor::RelayoutDependentOnChildren
    */
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS )
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS )
   {
     return mImpl->RelayoutDependentOnChildren( dimension );
   }
@@ -217,7 +217,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnCalculateRelayoutSize
    */
-  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
   {
     return mImpl->OnCalculateRelayoutSize( dimension );
   }
@@ -225,7 +225,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnLayoutNegotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
   {
     return mImpl->OnLayoutNegotiated( size, dimension );
   }

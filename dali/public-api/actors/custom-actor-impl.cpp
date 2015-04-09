@@ -88,12 +88,12 @@ void CustomActorImpl::RelayoutRequest()
   mOwner->RelayoutRequest();
 }
 
-float CustomActorImpl::CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension )
+float CustomActorImpl::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
 {
   return mOwner->CalculateChildSizeBase( child, dimension );
 }
 
-bool CustomActorImpl::RelayoutDependentOnChildrenBase( Dimension dimension )
+bool CustomActorImpl::RelayoutDependentOnChildrenBase( Dimension::Type dimension )
 {
   return mOwner->RelayoutDependentOnChildrenBase( dimension );
 }

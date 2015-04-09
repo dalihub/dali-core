@@ -465,22 +465,22 @@ bool Actor::IsRelayoutEnabled() const
   return GetImplementation(*this).IsRelayoutEnabled();
 }
 
-void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
+void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
   GetImplementation(*this).SetResizePolicy( policy, dimension );
 }
 
-ResizePolicy Actor::GetResizePolicy( Dimension dimension ) const
+ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
 {
   return GetImplementation(*this).GetResizePolicy( dimension );
 }
 
-void Actor::SetSizeScalePolicy( SizeScalePolicy policy )
+void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
 {
   GetImplementation(*this).SetSizeScalePolicy( policy );
 }
 
-SizeScalePolicy Actor::GetSizeScalePolicy() const
+SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
 {
   return GetImplementation(*this).GetSizeScalePolicy();
 }
@@ -495,7 +495,7 @@ float Actor::GetWidthForHeight( float height )
   return GetImplementation(*this).GetWidthForHeight( height );
 }
 
-float Actor::GetRelayoutSize( Dimension dimension ) const
+float Actor::GetRelayoutSize( Dimension::Type dimension ) const
 {
   return GetImplementation(*this).GetRelayoutSize( dimension );
 }
@@ -515,18 +515,18 @@ void Actor::SetPadding( const Padding& padding )
   Internal::Actor& impl = GetImplementation(*this);
 
   Vector2 widthPadding( padding.left, padding.right );
-  impl.SetPadding( widthPadding, WIDTH );
+  impl.SetPadding( widthPadding, Dimension::WIDTH );
 
   Vector2 heightPadding( padding.bottom, padding.top );
-  impl.SetPadding( heightPadding, HEIGHT );
+  impl.SetPadding( heightPadding, Dimension::HEIGHT );
 }
 
 void Actor::GetPadding( Padding& paddingOut ) const
 {
   const Internal::Actor& impl = GetImplementation(*this);
 
-  Vector2 widthPadding = impl.GetPadding( WIDTH );
-  Vector2 heightPadding = impl.GetPadding( HEIGHT );
+  Vector2 widthPadding = impl.GetPadding( Dimension::WIDTH );
+  Vector2 heightPadding = impl.GetPadding( Dimension::HEIGHT );
 
   paddingOut.left = widthPadding.x;
   paddingOut.right = widthPadding.y;
@@ -538,30 +538,30 @@ void Actor::SetMinimumSize( const Vector2& size )
 {
   Internal::Actor& impl = GetImplementation(*this);
 
-  impl.SetMinimumSize( size.x, WIDTH );
-  impl.SetMinimumSize( size.y, HEIGHT );
+  impl.SetMinimumSize( size.x, Dimension::WIDTH );
+  impl.SetMinimumSize( size.y, Dimension::HEIGHT );
 }
 
 Vector2 Actor::GetMinimumSize()
 {
   Internal::Actor& impl = GetImplementation(*this);
 
-  return Vector2( impl.GetMinimumSize( WIDTH ), impl.GetMinimumSize( HEIGHT ) );
+  return Vector2( impl.GetMinimumSize( Dimension::WIDTH ), impl.GetMinimumSize( Dimension::HEIGHT ) );
 }
 
 void Actor::SetMaximumSize( const Vector2& size )
 {
   Internal::Actor& impl = GetImplementation(*this);
 
-  impl.SetMaximumSize( size.x, WIDTH );
-  impl.SetMaximumSize( size.y, HEIGHT );
+  impl.SetMaximumSize( size.x, Dimension::WIDTH );
+  impl.SetMaximumSize( size.y, Dimension::HEIGHT );
 }
 
 Vector2 Actor::GetMaximumSize()
 {
   Internal::Actor& impl = GetImplementation(*this);
 
-  return Vector2( impl.GetMaximumSize( WIDTH ), impl.GetMaximumSize( HEIGHT ) );
+  return Vector2( impl.GetMaximumSize( Dimension::WIDTH ), impl.GetMaximumSize( Dimension::HEIGHT ) );
 }
 
 Actor::TouchSignalType& Actor::TouchedSignal()
