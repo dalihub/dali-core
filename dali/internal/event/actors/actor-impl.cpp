@@ -1385,7 +1385,6 @@ bool Actor::RelayoutRequired( Dimension dimension ) const
 
 unsigned int Actor::AddRenderer( Renderer& renderer )
 {
-  //TODO: MESH_REWORK : Check this
   //TODO: MESH_REWORK : Add support for multiple renderers
   if ( ! mAttachment )
   {
@@ -1397,7 +1396,6 @@ unsigned int Actor::AddRenderer( Renderer& renderer )
 
 unsigned int Actor::GetRendererCount() const
 {
-  //TODO: MESH_REWORK : Check this
   //TODO: MESH_REWORK : Add support for multiple renderers
   RendererAttachment* attachment = dynamic_cast<RendererAttachment*>(mAttachment.Get());
   return attachment ? 1u : 0u;
@@ -1405,7 +1403,6 @@ unsigned int Actor::GetRendererCount() const
 
 Renderer& Actor::GetRendererAt( unsigned int index )
 {
-  //TODO: MESH_REWORK : Check this
   //TODO: MESH_REWORK : Add support for multiple renderers
   DALI_ASSERT_DEBUG( index == 0 && "Only one renderer is supported." );
 
@@ -1418,14 +1415,12 @@ Renderer& Actor::GetRendererAt( unsigned int index )
 
 void Actor::RemoveRenderer( Renderer& renderer )
 {
-  //TODO: MESH_REWORK : Check this
   //TODO: MESH_REWORK : Add support for multiple renderers
   mAttachment = NULL;
 }
 
 void Actor::RemoveRenderer( unsigned int index )
 {
-  //TODO: MESH_REWORK : Check this
   //TODO: MESH_REWORK : Add support for multiple renderers
   mAttachment = NULL;
 }

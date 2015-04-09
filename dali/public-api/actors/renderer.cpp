@@ -45,6 +45,11 @@ Renderer::Renderer( const Renderer& handle )
 {
 }
 
+Renderer Renderer::DownCast( BaseHandle handle )
+{
+  return Renderer( dynamic_cast<Dali::Internal::Renderer*>(handle.GetObjectPtr()));
+}
+
 Renderer& Renderer::operator=( const Renderer& handle )
 {
   BaseHandle::operator=( handle );

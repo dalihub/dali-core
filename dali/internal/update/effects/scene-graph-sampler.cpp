@@ -27,14 +27,14 @@ namespace Internal
 namespace SceneGraph
 {
 
-Sampler::Sampler( const std::string& unitName )
-: mUnitName( unitName ),
-  mTextureId( 0u ),
-  mMinFilter( Dali::Sampler::DEFAULT ),
+Sampler::Sampler( const std::string& textureUnitUniformName )
+: mMinFilter( Dali::Sampler::DEFAULT ),
   mMagFilter( Dali::Sampler::DEFAULT ),
   mUWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
   mVWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
   mAffectsTransparency( false ),
+  mTextureUnitUniformName( textureUnitUniformName ),
+  mTextureId( 0u ),
   mFullyOpaque(true)
 {
 }
@@ -43,9 +43,9 @@ Sampler::~Sampler()
 {
 }
 
-void Sampler::SetUnitName( const std::string& unitName )
+void Sampler::SetTextureUnitUniformName( const std::string& textureUnitUniformName )
 {
-  mUnitName = unitName;
+  mTextureUnitUniformName = textureUnitUniformName;
 }
 
 void Sampler::SetTexture( BufferIndex bufferIndex, Integration::ResourceId textureId )
@@ -67,9 +67,9 @@ void Sampler::SetWrapMode( BufferIndex bufferIndex, WrapMode uWrap, WrapMode vWr
 {
 }
 
-const std::string& Sampler::GetUnitName() const
+const std::string& Sampler::GetTextureUnitUniformName() const
 {
-  return mUnitName;
+  return mTextureUnitUniformName;
 }
 
 Integration::ResourceId Sampler::GetTextureId( BufferIndex bufferIndex ) const

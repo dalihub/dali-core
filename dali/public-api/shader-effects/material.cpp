@@ -48,6 +48,11 @@ Material::Material( const Material& handle )
 {
 }
 
+Material Material::DownCast( BaseHandle handle )
+{
+  return Material( dynamic_cast<Dali::Internal::Material*>(handle.GetObjectPtr()));
+}
+
 Material& Material::operator=( const Material& handle )
 {
   BaseHandle::operator=( handle );

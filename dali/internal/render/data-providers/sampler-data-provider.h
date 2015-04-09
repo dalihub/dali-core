@@ -46,7 +46,7 @@ public:
    * Get the sampler's texture unit uniform name
    * @return The texture unit uniform name
    */
-  virtual const std::string& GetUnitName() const = 0;
+  virtual const std::string& GetTextureUnitUniformName() const = 0;
 
   /**
    * Get the texture identity associated with the sampler

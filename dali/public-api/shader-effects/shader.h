@@ -124,6 +124,15 @@ public:
   Shader( const Shader& handle );
 
   /**
+   * @brief Downcast to a shader handle.
+   *
+   * If not a shader the returned shader handle is left uninitialized.
+   * @param[in] handle to an object
+   * @return shader handle or an uninitialized handle
+   */
+  static Shader DownCast( BaseHandle handle );
+
+  /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
    * @param[in] handle Handle to an object

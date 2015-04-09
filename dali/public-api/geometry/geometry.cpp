@@ -43,6 +43,11 @@ Geometry::Geometry( const Geometry& handle )
 {
 }
 
+Geometry Geometry::DownCast( BaseHandle handle )
+{
+  return Geometry( dynamic_cast<Dali::Internal::Geometry*>(handle.GetObjectPtr()));
+}
+
 Geometry& Geometry::operator=( const Geometry& handle )
 {
   BaseHandle::operator=( handle );

@@ -91,6 +91,15 @@ public:
   Geometry( const Geometry& handle );
 
   /**
+   * @brief Downcast to a geometry.
+   *
+   * If not the returned handle is left uninitialized.
+   * @param[in] handle to an object
+   * @return geometry handle or an uninitialized handle
+   */
+  static Geometry DownCast( BaseHandle handle );
+
+  /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
    * @param[in] handle Handle to an object

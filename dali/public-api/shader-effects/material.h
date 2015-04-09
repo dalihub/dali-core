@@ -86,7 +86,7 @@ public:
   /**
    * @brief Creates a new Material object
    *
-   * @return An handle to a newly allocated Material
+   * @return A handle to a newly allocated Material
    */
   static Material New( Shader shader );
 
@@ -106,6 +106,15 @@ public:
    * @param[in] handle Handle to an object
    */
   Material( const Material& handle );
+
+  /**
+   * @brief Downcast to a material handle.
+   *
+   * If handle is not a material, the returned handle is left uninitialized.
+   * @param[in] handle to an object
+   * @return material handle or an uninitialized handle
+   */
+  static Material DownCast( BaseHandle handle );
 
   /**
    * @brief Assignment operator, changes this handle to point at the same object

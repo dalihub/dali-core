@@ -22,53 +22,57 @@ using namespace Dali;
 
 #include <mesh-builder.h>
 
-void material_test_startup(void)
+void renderer_test_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void material_test_cleanup(void)
+void renderer_test_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
 
-int UtcDaliMaterialNew01(void)
+
+int UtcDaliRendererNew01(void)
 {
   TestApplication application;
 
-  Shader shader = Shader::New("vertexSrc", "fragmentSrc");
-  Material material = Material::New(shader);
+  Geometry geometry = CreateQuadGeometry();
+  Material material = CreateMaterial(1.0f);
+  Renderer renderer = Renderer::New(geometry, material);
 
-  DALI_TEST_EQUALS( (bool)material, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( (bool)renderer, true, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliMaterialNew02(void)
+int UtcDaliRendererNew02(void)
 {
   TestApplication application;
-  Material material;
-  DALI_TEST_EQUALS( (bool)material, false, TEST_LOCATION );
+  Renderer renderer;
+  DALI_TEST_EQUALS( (bool)renderer, false, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliMaterialDownCast01(void)
+int UtcDaliRendererDownCast01(void)
 {
   TestApplication application;
-  Shader shader = Shader::New("vertexSrc", "fragmentSrc");
-  Material material = Material::New(shader);
 
-  BaseHandle handle(material);
-  Material material2 = Material::DownCast(handle);
-  DALI_TEST_EQUALS( (bool)material2, true, TEST_LOCATION );
+  Geometry geometry = CreateQuadGeometry();
+  Material material = CreateMaterial(1.0f);
+  Renderer renderer = Renderer::New(geometry, material);
+
+  BaseHandle handle(renderer);
+  Renderer renderer2 = Renderer::DownCast(handle);
+  DALI_TEST_EQUALS( (bool)renderer2, true, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliMaterialDownCast02(void)
+int UtcDaliRendererDownCast02(void)
 {
   TestApplication application;
 
   Handle handle = Handle::New(); // Create a custom object
-  Material material = Material::DownCast(handle);
-  DALI_TEST_EQUALS( (bool)material, false, TEST_LOCATION );
+  Renderer renderer = Renderer::DownCast(handle);
+  DALI_TEST_EQUALS( (bool)renderer, false, TEST_LOCATION );
   END_TEST;
 }

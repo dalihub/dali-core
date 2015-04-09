@@ -45,6 +45,11 @@ Shader::Shader( const Shader& handle )
 {
 }
 
+Shader Shader::DownCast( BaseHandle handle )
+{
+  return Shader( dynamic_cast<Dali::Internal::Shader*>(handle.GetObjectPtr()));
+}
+
 Shader& Shader::operator=( const Shader& handle )
 {
   BaseHandle::operator=( handle );

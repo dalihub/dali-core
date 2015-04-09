@@ -10,7 +10,6 @@ SET(TC_SOURCES
         utc-Dali-Actor.cpp
         utc-Dali-AlphaFunctions.cpp
         utc-Dali-AngleAxis.cpp
-        utc-Dali-AnimatableMesh.cpp
         utc-Dali-Animation.cpp
         utc-Dali-Any.cpp
         utc-Dali-Atlas.cpp
@@ -31,6 +30,7 @@ SET(TC_SOURCES
         utc-Dali-Font.cpp
         utc-Dali-FontParameters.cpp
         utc-Dali-FrameBufferImage.cpp
+        utc-Dali-Geometry.cpp
         utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
@@ -48,8 +48,7 @@ SET(TC_SOURCES
         utc-Dali-MathUtils.cpp
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp
-        utc-Dali-MeshActor.cpp
-        utc-Dali-MeshData.cpp
+        utc-Dali-MeshMaterial.cpp
         utc-Dali-MouseWheelEvent.cpp
         utc-Dali-Mutex.cpp
         utc-Dali-NativeImage.cpp
@@ -61,6 +60,7 @@ SET(TC_SOURCES
         utc-Dali-PinchGesture.cpp
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-Pixel.cpp
+        utc-Dali-PropertyBuffer.cpp
         utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyNotification.cpp
         utc-Dali-PropertyValue.cpp
@@ -68,12 +68,14 @@ SET(TC_SOURCES
         utc-Dali-Radian.cpp
         utc-Dali-Random.cpp
         utc-Dali-Rect.cpp
+        utc-Dali-Renderer.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
-        utc-Dali-RenderableActor.cpp
         utc-Dali-ResourceImage.cpp
-        utc-Dali-ShaderEffect.cpp
+        utc-Dali-Sampler.cpp
         utc-Dali-Scripting.cpp
+        utc-Dali-Shader.cpp
+        utc-Dali-ShaderEffect.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
         utc-Dali-Stage.cpp

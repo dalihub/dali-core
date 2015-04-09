@@ -55,10 +55,9 @@ SamplerPtr Sampler::New( const std::string& textureUnitUniformName )
   return sampler;
 }
 
-void Sampler::SetUniformName( const std::string& name )
+void Sampler::SetTextureUnitUniformName( const std::string& name )
 {
-// TODO: MESH_REWORK - change method to SetUnitName (or SetTextureUnitUniformName)
-  SetUnitNameMessage( GetEventThreadServices(), *mSceneObject, name);
+  SetTextureUnitUniformNameMessage( GetEventThreadServices(), *mSceneObject, name);
 }
 
 void Sampler::SetImage( ImagePtr& image )
@@ -69,23 +68,30 @@ void Sampler::SetImage( ImagePtr& image )
   // sceneObject is being used in a separate thread; queue a message to set
   unsigned int resourceId = image->GetResourceId();
   SetTextureMessage( GetEventThreadServices(), *mSceneObject, resourceId );
-
 }
 
 void Sampler::SetFilterMode( Dali::Sampler::FilterMode minFilter, Dali::Sampler::FilterMode magFilter )
 {
+  if( NULL != mSceneObject )
+  {
+    SetFilterModeMessage( GetEventThreadServices(), *mSceneObject, minFilter, magFilter );
+  }
 }
 
 void Sampler::SetWrapMode( Dali::Sampler::WrapMode uWrap, Dali::Sampler::WrapMode vWrap )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  if( NULL != mSceneObject )
+  {
+    SetWrapModeMessage( GetEventThreadServices(), *mSceneObject, uWrap, vWrap );
+  }
 }
 
 void Sampler::SetAffectsTransparency( bool affectsTransparency )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  if( NULL != mSceneObject )
+  {
+    SceneGraph::DoubleBufferedPropertyMessage<bool>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mAffectsTransparency, &SceneGraph::DoubleBufferedProperty<bool>::Set, affectsTransparency );
+  }
 }
 
 const SceneGraph::Sampler* Sampler::GetSamplerSceneObject() const
@@ -140,27 +146,27 @@ void Sampler::SetDefaultProperty( Property::Index index,
   {
     case Dali::Sampler::Property::MINIFICATION_FILTER:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mMinFilter, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
       break;
     }
     case Dali::Sampler::Property::MAGNIGICATION_FILTER:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mMagFilter, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
       break;
     }
     case Dali::Sampler::Property::U_WRAP:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mUWrapMode, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
       break;
     }
     case Dali::Sampler::Property::V_WRAP:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mVWrapMode, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
       break;
     }
     case Dali::Sampler::Property::AFFECTS_TRANSPARENCY:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      SceneGraph::DoubleBufferedPropertyMessage<bool>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mAffectsTransparency, &SceneGraph::DoubleBufferedProperty<bool>::Set, propertyValue.Get<bool>() );
       break;
     }
   }
@@ -176,33 +182,34 @@ void Sampler::SetSceneGraphProperty( Property::Index index,
 
 Property::Value Sampler::GetDefaultProperty( Property::Index index ) const
 {
+  BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
   Property::Value value;
 
   switch( index )
   {
     case Dali::Sampler::Property::MINIFICATION_FILTER:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      value = mSceneObject->mMinFilter[bufferIndex];
       break;
     }
     case Dali::Sampler::Property::MAGNIGICATION_FILTER:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      value = mSceneObject->mMagFilter[bufferIndex];
       break;
     }
     case Dali::Sampler::Property::U_WRAP:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      value = mSceneObject->mUWrapMode[bufferIndex];
       break;
     }
     case Dali::Sampler::Property::V_WRAP:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      value = mSceneObject->mVWrapMode[bufferIndex];
       break;
     }
     case Dali::Sampler::Property::AFFECTS_TRANSPARENCY:
     {
-      DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+      value = mSceneObject->mAffectsTransparency[bufferIndex];
       break;
     }
   }
@@ -261,27 +268,27 @@ const PropertyInputImpl* Sampler::GetSceneObjectInputProperty( Property::Index i
       {
         case Dali::Sampler::Property::MINIFICATION_FILTER:
         {
-          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          property = &mSceneObject->mMinFilter;
           break;
         }
         case Dali::Sampler::Property::MAGNIGICATION_FILTER:
         {
-          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          property = &mSceneObject->mMagFilter;
           break;
         }
         case Dali::Sampler::Property::U_WRAP:
         {
-          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          property = &mSceneObject->mUWrapMode;
           break;
         }
         case Dali::Sampler::Property::V_WRAP:
         {
-          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          property = &mSceneObject->mVWrapMode;
           break;
         }
         case Dali::Sampler::Property::AFFECTS_TRANSPARENCY:
         {
-          DALI_ASSERT_ALWAYS( 0 && "MESH_REWORK" );
+          property = &mSceneObject->mAffectsTransparency;
           break;
         }
       }

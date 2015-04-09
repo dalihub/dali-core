@@ -61,20 +61,6 @@ int UtcDaliImageActorConstructorRefObject(void)
   END_TEST;
 }
 
-int UtcDaliMeshActorConstructorRefObject(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::MeshActor::MeshActor(Internal::MeshActor*)");
-
-  MeshActor actor(NULL);
-  DALI_TEST_CHECK(!actor);
-
-  MeshActor* actorPtr = new MeshActor();
-  DALI_TEST_CHECK( ! *actorPtr );
-  delete actorPtr;
-  END_TEST;
-}
-
 int UtcDaliTextActorConstructorRefObject(void)
 {
   TestApplication application;

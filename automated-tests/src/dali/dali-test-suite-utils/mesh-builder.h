@@ -22,21 +22,9 @@
 namespace Dali
 {
 
-void AddVertex( MeshData::VertexContainer& verts, Vector3 V, Vector2 UV );
-void SetNormal( MeshData::VertexContainer& verts, size_t vertIdx, Vector3 normal );
-void SetBone( MeshData::VertexContainer& verts, size_t vertIdx, size_t index, size_t boneIndex, float weight);
-void SetBones(MeshData::VertexContainer& verts);
-void ConstructBones(BoneContainer& bones);
-void CopyVertex( MeshData::Vertex& vert, Vector3& vector );
-void AddTriangle( MeshData::VertexContainer& verts,
-                  MeshData::FaceIndices& faces,
-                  size_t v0, size_t v1, size_t v2 );
-void ConstructVertices( MeshData::VertexContainer& vertices, float sz );
-void ConstructFaces(MeshData::VertexContainer& vertices, MeshData::FaceIndices& faces);
-Material ConstructMaterial();
-Mesh ConstructMesh( float sz );
-void AddBone(Dali::BoneContainer& bones, const std::string& name, const Dali::Matrix& offsetMatrix);
-void CreateMeshData(MeshData& meshData);
+Material CreateMaterial(float opacity);
+
+Geometry CreateQuadGeometry();
 
 }
 

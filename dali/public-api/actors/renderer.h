@@ -79,6 +79,15 @@ public:
   Renderer( const Renderer& handle );
 
   /**
+   * @brief Downcast to a renderer handle.
+   *
+   * If not a renderer the returned renderer handle is left uninitialized.
+   * @param[in] handle to an object
+   * @return renderer handle or an uninitialized handle
+   */
+  static Renderer DownCast( BaseHandle handle );
+
+  /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
    * @param[in] handle Handle to an object

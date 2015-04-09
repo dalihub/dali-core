@@ -22,53 +22,57 @@ using namespace Dali;
 
 #include <mesh-builder.h>
 
-void material_test_startup(void)
+void geometry_test_startup(void)
 {
   test_return_value = TET_UNDEF;
 }
 
-void material_test_cleanup(void)
+void geometry_test_cleanup(void)
 {
   test_return_value = TET_PASS;
 }
 
-int UtcDaliMaterialNew01(void)
+namespace
+{
+}
+
+
+int UtcDaliGeometryNew01(void)
 {
   TestApplication application;
 
-  Shader shader = Shader::New("vertexSrc", "fragmentSrc");
-  Material material = Material::New(shader);
+  Geometry geometry = Geometry::New();
 
-  DALI_TEST_EQUALS( (bool)material, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( (bool)geometry, true, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliMaterialNew02(void)
+int UtcDaliGeometryNew02(void)
 {
   TestApplication application;
-  Material material;
-  DALI_TEST_EQUALS( (bool)material, false, TEST_LOCATION );
+  Geometry geometry;
+  DALI_TEST_EQUALS( (bool)geometry, false, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliMaterialDownCast01(void)
+int UtcDaliGeometryDownCast01(void)
 {
   TestApplication application;
-  Shader shader = Shader::New("vertexSrc", "fragmentSrc");
-  Material material = Material::New(shader);
 
-  BaseHandle handle(material);
-  Material material2 = Material::DownCast(handle);
-  DALI_TEST_EQUALS( (bool)material2, true, TEST_LOCATION );
+  Geometry geometry = Geometry::New();
+
+  BaseHandle handle(geometry);
+  Geometry geometry2 = Geometry::DownCast(handle);
+  DALI_TEST_EQUALS( (bool)geometry2, true, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliMaterialDownCast02(void)
+int UtcDaliGeometryDownCast02(void)
 {
   TestApplication application;
 
   Handle handle = Handle::New(); // Create a custom object
-  Material material = Material::DownCast(handle);
-  DALI_TEST_EQUALS( (bool)material, false, TEST_LOCATION );
+  Geometry geometry = Geometry::DownCast(handle);
+  DALI_TEST_EQUALS( (bool)geometry, false, TEST_LOCATION );
   END_TEST;
 }

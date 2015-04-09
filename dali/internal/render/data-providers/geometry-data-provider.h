@@ -49,20 +49,6 @@ public:
 
 public: // GeometryDataProvider
   /**
-   * @todo MESH_REWORK FIX ME Don't get objects through this interface. Send via message instead
-   * Get the vertex buffers of the geometry
-   * @return A const reference to the vertex buffers
-   */
-  virtual const VertexBuffers& GetVertexBuffers() const = 0;
-
-  /**
-   * @todo MESH_REWORK FIX ME Don't get objects through this interface. Send via message instead
-   * Get the index buffer of the geometry
-   * @return A const reference to the index buffer
-   */
-  virtual const PropertyBuffer* GetIndexBuffer() const = 0;
-
-  /**
    * Get the type of geometry to draw
    */
   virtual GeometryType GetGeometryType( BufferIndex bufferIndex ) const = 0;
@@ -70,7 +56,7 @@ public: // GeometryDataProvider
   /**
    * @todo MESH_REWORK - Should only use this in Update Sorting algorithm
    * Returns true if this geometry requires depth testing, e.g. if it is
-   * a set of vertices with z != 0
+   * a set of vertices with differing z values.
    */
   virtual bool GetRequiresDepthTesting( BufferIndex bufferIndex ) const = 0;
 

@@ -45,6 +45,11 @@ Sampler::Sampler( const Sampler& handle )
 {
 }
 
+Sampler Sampler::DownCast( BaseHandle handle )
+{
+  return Sampler( dynamic_cast<Dali::Internal::Sampler*>(handle.GetObjectPtr()));
+}
+
 Sampler& Sampler::operator=( const Sampler& handle )
 {
   BaseHandle::operator=( handle );
@@ -53,7 +58,7 @@ Sampler& Sampler::operator=( const Sampler& handle )
 
 void Sampler::SetUniformName( const std::string& name )
 {
-  GetImplementation(*this).SetUniformName( name );
+  GetImplementation(*this).SetTextureUnitUniformName( name );
 }
 
 void Sampler::SetImage( Image& image )

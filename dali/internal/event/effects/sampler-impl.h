@@ -56,7 +56,7 @@ public:
   /**
    * @copydoc Dali::Sampler::SetUniformName()
    */
-  void SetUniformName( const std::string& name );
+  void SetTextureUnitUniformName( const std::string& name );
 
   /**
    * @copydoc Dali::Sampler::SetImage()

@@ -50,6 +50,11 @@ PropertyBuffer::PropertyBuffer( const PropertyBuffer& handle )
 {
 }
 
+PropertyBuffer PropertyBuffer::DownCast( BaseHandle handle )
+{
+  return PropertyBuffer( dynamic_cast<Dali::Internal::PropertyBuffer*>(handle.GetObjectPtr()));
+}
+
 PropertyBuffer& PropertyBuffer::operator=( const PropertyBuffer& handle )
 {
   BaseHandle::operator=( handle );

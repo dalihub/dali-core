@@ -311,7 +311,7 @@ unsigned int NewRenderer::GetTextureUnitUniformIndex(
   {
     TextureUnitUniformIndex textureUnitUniformIndex;
     textureUnitUniformIndex.sampler = &sampler;
-    textureUnitUniformIndex.index = program.RegisterUniform( sampler.GetUnitName() );
+    textureUnitUniformIndex.index = program.RegisterUniform( sampler.GetTextureUnitUniformName() );
     mTextureUnitUniforms.PushBack( textureUnitUniformIndex );
     uniformIndex = textureUnitUniformIndex.index;
   }

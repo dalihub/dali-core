@@ -105,6 +105,15 @@ public:
   Sampler( const Sampler& handle );
 
   /**
+   * @brief Downcast to a sampler handle.
+   *
+   * If not the returned handle is left uninitialized.
+   * @param[in] handle to An object
+   * @return handle or an uninitialized handle
+   */
+  static Sampler DownCast( BaseHandle handle );
+
+  /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
    * @param[in] handle Handle to an object

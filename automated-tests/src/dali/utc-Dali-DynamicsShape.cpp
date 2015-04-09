@@ -197,39 +197,6 @@ int UtcDaliDynamicsShapeNewCylinder(void)
   END_TEST;
 }
 
-int UtcDaliDynamicsShapeNewMesh(void)
-{
-#if !defined(DYNAMICS_SUPPORT)
-  tet_infoline("No dynamics support compiled\n");
-  return 0;
-#endif
-  tet_infoline("UtcDaliDynamicsShapeNewMesh - DynamicsShape::NewMesh");
-
-  TestApplication application;
-
-  // start up
-  application.SendNotification();
-  application.Render();
-  application.Render();
-
-  DynamicsWorldConfig worldConfig(DynamicsWorldConfig::New());
-  DynamicsWorld world( Stage::GetCurrent().InitializeDynamics(worldConfig) );
-
-  if( world )
-  {
-    DynamicsShape shape( DynamicsShape::NewMesh( Cloth::New(10.0f, 10.0f, 10, 10)) );
-
-    DALI_TEST_CHECK( shape );
-    DALI_TEST_CHECK( DynamicsShape::MESH == shape.GetType() );
-  }
-  else
-  {
-    // cannot create dynamics world, log failure and exit
-    DALI_TEST_CHECK( false );
-  }
-  END_TEST;
-}
-
 int UtcDaliDynamicsShapeNewSphere(void)
 {
 #if !defined(DYNAMICS_SUPPORT)

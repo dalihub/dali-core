@@ -57,7 +57,7 @@ public:
    * Set the uniform name of this sampler. This allows the shader to find the
    * GL index of this sampler.
    */
-  void SetUnitName( const std::string& unitName );
+  void SetTextureUnitUniformName( const std::string& textureUnitUniformName );
 
   /**
    * Set the texture identity of this sampler (needs to double buffer this value because
@@ -106,7 +106,7 @@ public: // SamplerDataProvider interface - called from RenderThread
    * Get the texture unit uniform name
    * @return the name of the texture unit uniform
    */
-  virtual const std::string& GetUnitName() const;
+  virtual const std::string& GetTextureUnitUniformName() const;
 
   /**
    * Get the texture ID
@@ -173,25 +173,23 @@ public: // PropertyOwner implementation
    */
   virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
+public: // Properties
+  DoubleBufferedProperty<int>  mMinFilter;    ///< The minify filter
+  DoubleBufferedProperty<int>  mMagFilter;    ///< The magnify filter
+  DoubleBufferedProperty<int>  mUWrapMode;    ///< The horizontal wrap mode
+  DoubleBufferedProperty<int>  mVWrapMode;    ///< The vertical wrap mode
+  DoubleBufferedProperty<bool> mAffectsTransparency; ///< If this sampler affects renderer transparency
+
 private:
-  std::string mUnitName; ///< The name of the uniform of the texture unit
-
+  std::string mTextureUnitUniformName; ///< The name of the uniform of the texture unit
   DoubleBufferedProperty<unsigned int> mTextureId;
-  DoubleBufferedProperty<int> mMinFilter;    ///< The minify filter
-  DoubleBufferedProperty<int> mMagFilter;    ///< The magnify filter
-  DoubleBufferedProperty<int> mUWrapMode;    ///< The horizontal wrap mode
-  DoubleBufferedProperty<int> mVWrapMode;    ///< The vertical wrap mode
-
-  // Note, this is only called from UpdateThread
-  DoubleBufferedProperty<bool>     mAffectsTransparency; ///< If this sampler affects renderer transparency
-
   ConnectionObservers mConnectionObservers; ///< Connection observers that will be informed when textures change.
   bool mFullyOpaque; // Update only flag - no need for double buffering
 };
 
 } // namespace SceneGraph
 
-inline void SetUnitNameMessage( EventThreadServices& eventThreadServices, const SceneGraph::Sampler& sampler, const std::string& name )
+inline void SetTextureUnitUniformNameMessage( EventThreadServices& eventThreadServices, const SceneGraph::Sampler& sampler, const std::string& name )
 {
   typedef MessageValue1< SceneGraph::Sampler, std::string > LocalType;
 
@@ -199,7 +197,7 @@ inline void SetUnitNameMessage( EventThreadServices& eventThreadServices, const 
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetUnitName, name );
+  new (slot) LocalType( &sampler, &SceneGraph::Sampler::SetTextureUnitUniformName, name );
 }
 
 

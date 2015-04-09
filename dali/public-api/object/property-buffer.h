@@ -93,6 +93,15 @@ public:
   PropertyBuffer( const PropertyBuffer& handle );
 
   /**
+   * @brief Downcast to a property buffer handle.
+   *
+   * If not a property buffer the returned property buffer handle is left uninitialized.
+   * @param[in] handle to an object
+   * @return property buffer handle or an uninitialized handle
+   */
+  static PropertyBuffer DownCast( BaseHandle handle );
+
+  /**
    * @brief Assignment operator, changes this handle to point at the same object
    *
    * @param[in] handle Handle to an object
