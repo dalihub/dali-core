@@ -35,8 +35,6 @@
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/common/bitmap-upload.h>
-#include <dali/internal/event/text/font-impl.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/modeling/internal-mesh-data.h>
@@ -239,23 +237,11 @@ public: // Used by ResourceClient
   void HandleAllocateTextureRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat );
 
   /**
-   * Upload an array of bitmaps to a texture.
-   * @param[in] id The resource id
-   * @param[in] uploadArray  bitmap upload array.
-   */
-  void HandleUpdateTextureRequest( ResourceId id,  const BitmapUploadArray& uploadArray );
-
-  /**
    * Requests allocation of a mesh resource
    * @param[in] id The resource id
    * @param[in] meshData The mesh data
    */
   void HandleAllocateMeshRequest (ResourceId id, MeshData* meshData);
-
-  /**
-   * Requests allocation of a font resource
-   */
-  void HandleAllocateFontRequest(ResourceId id, const std::string& familyNameAndStyle);
 
   /**
    * Load a shader program from a file
@@ -318,14 +304,6 @@ public: // Used by ResourceClient
    */
   void HandleDiscardResourceRequest( ResourceId id, Integration::ResourceTypeId typeId );
 
-  /**
-   * Update font texture atlas status
-   * @param[in] id         The resource id
-   * @param[in] atlasId    texture ID of the atlas
-   * @param[in] loadStatus The status update.
-   */
-  void HandleAtlasUpdateRequest( ResourceId id, ResourceId atlasId, Integration::LoadStatus loadStatus );
-
   /********************************************************************************
    ******************** Update thread object direct interface  ********************
    ********************************************************************************/
@@ -365,21 +343,6 @@ public: // Used by ResourceClient
    */
   Integration::ShaderDataPtr GetShaderData(ResourceId id);
 
-  /**
-   * Check if current set of glyph requests on given atlas have finished loading
-   * @param[in] id Request Id of the text atlas texture
-   * @return true if the current set of glyph requests have all completed, false
-   * if there are outstanding glyph requests that haven't finished.
-   */
-  bool IsAtlasLoaded(ResourceId id);
-
-  /**
-   * Check the load status of a given atlas.
-   * @param[in] id Request Id of the text atlas texture
-   * @return LoadStatus
-   */
-  Integration::LoadStatus GetAtlasLoadStatus( ResourceId atlasId );
-
   /********************************************************************************
    ************************* ResourceCache Implementation  ************************
    ********************************************************************************/
@@ -408,19 +371,6 @@ public:
   /********************************************************************************
    ********************************* Private Methods  *****************************
    ********************************************************************************/
-private:
-
-  /**
-   * @param[in] id Resource id to clear
-   * @param[in] typePath Glyphs to be loaded, and cleared beforehand
-   */
-  void ClearRequestedGlyphArea( ResourceId id, const ResourceTypePath& typePath );
-
-  /**
-   * Sends loaded glyphs to texture atlas for uploading
-   * @param[in] glyphSet Loaded glyphs
-   */
-  void UploadGlyphsToTexture( const Integration::GlyphSet& glyphSet );
 
   /**
    * Sends notification messages for load sucess & failure,
@@ -564,20 +514,6 @@ inline void RequestAllocateTextureMessage( EventThreadServices& eventThreadServi
   new (slot) LocalType( &manager, &ResourceManager::HandleAllocateTextureRequest, id, width, height, pixelFormat );
 }
 
-inline void RequestUpdateTextureMessage( EventThreadServices& eventThreadServices,
-                                         ResourceManager& manager,
-                                         ResourceId id,
-                                         BitmapUploadArray uploadArray )
-{
-  typedef MessageValue2< ResourceManager, ResourceId, BitmapUploadArray > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleUpdateTextureRequest, id, uploadArray );
-}
-
 inline void RequestAllocateMeshMessage( EventThreadServices& eventThreadServices,
                                         ResourceManager& manager,
                                         ResourceId id,
@@ -590,20 +526,6 @@ inline void RequestAllocateMeshMessage( EventThreadServices& eventThreadServices
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAllocateMeshRequest, id, meshData.Release() );
-}
-
-inline void RequestAllocateFontMessage( EventThreadServices& eventThreadServices,
-                                        ResourceManager& manager,
-                                        ResourceId id,
-                                        const std::string& familyNameAndStyle)
-{
-  typedef MessageValue2< ResourceManager, ResourceId, std::string > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleAllocateFontRequest, id, familyNameAndStyle );
 }
 
 inline void RequestLoadShaderMessage( EventThreadServices& eventThreadServices,
@@ -724,21 +646,6 @@ inline void RequestDiscardResourceMessage( EventThreadServices& eventThreadServi
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleDiscardResourceRequest, id, typeId );
-}
-
-inline void RequestAtlasUpdateMessage( EventThreadServices& eventThreadServices,
-                                       ResourceManager& manager,
-                                       ResourceId id,
-                                       ResourceId atlasId,
-                                       Integration::LoadStatus loadStatus )
-{
-  typedef MessageValue3< ResourceManager, ResourceId, ResourceId, Integration::LoadStatus > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleAtlasUpdateRequest, id, atlasId, loadStatus );
 }
 
 } // namespace Internal

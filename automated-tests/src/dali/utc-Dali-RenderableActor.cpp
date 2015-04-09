@@ -38,7 +38,6 @@ void renderable_actor_cleanup(void)
 namespace
 {
 
-static const char* TestTextHelloWorld = "Hello World";
 static bool gIsActor1SortModifierCorrect;
 static bool gIsActor2SortModifierCorrect;
 const float gActor1SortModifierValue = 96.0f;
@@ -63,10 +62,10 @@ int UtcDaliRenderableActorDownCast(void)
 
   tet_infoline("Testing Dali::RenderableActor::DownCast()");
 
-  TextActor textActor = TextActor::New(TestTextHelloWorld);
+  ImageActor imageActor = ImageActor::New();
 
   Actor anActor = Actor::New();
-  anActor.Add( textActor );
+  anActor.Add( imageActor );
 
   Actor child = anActor.GetChildAt(0);
   RenderableActor renderableActor = RenderableActor::DownCast( child );
@@ -98,7 +97,7 @@ int UtcDaliRenderableActorSetSortModifier(void)
 
   float val = -500.0f;
 
-  TextActor actor = TextActor::New(TestTextHelloWorld);
+  ImageActor actor = ImageActor::New();
   Stage::GetCurrent().Add(actor);
 
   actor.SetSortModifier( val );
@@ -149,7 +148,7 @@ int UtcDaliRenderableActorGetSortModifier(void)
 
   tet_infoline("Testing Dali::RenderableActor::GetSortModifier()");
 
-  TextActor actor = TextActor::New(TestTextHelloWorld);
+  ImageActor actor = ImageActor::New();
   Stage::GetCurrent().Add(actor);
 
   DALI_TEST_EQUALS(actor.GetSortModifier(), 0.0f, TEST_LOCATION);
@@ -164,7 +163,7 @@ int UtcDaliRenderableActorSetGetBlendMode(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetBlendMode() / Dali::RenderableActor::GetBlendMode()");
 
-  TextActor actor = TextActor::New(TestTextHelloWorld);
+  ImageActor actor = ImageActor::New();
 
   actor.SetBlendMode( BlendingMode::OFF );
   DALI_TEST_CHECK( BlendingMode::OFF == actor.GetBlendMode() );
@@ -299,10 +298,6 @@ int UtcDaliRenderableActorGetCullFace(void)
   TestApplication application;
 
   tet_infoline("Testing Dali::RenderableActor::GetCullFace()");
-
-  TextActor textActor = TextActor::New(TestTextHelloWorld);
-
-  DALI_TEST_CHECK( CullNone == textActor.GetCullFace() );
 
   ImageActor imageActor = ImageActor::New();
 
@@ -508,7 +503,7 @@ int UtcDaliRenderableActorSetGetFilterModes(void)
 
   tet_infoline("Testing Dali::RenderableActor::SetFilterMode() / Dali::RenderableActor::GetFilterMode()");
 
-  TextActor actor = TextActor::New(TestTextHelloWorld);
+  ImageActor actor = ImageActor::New();
 
   FilterMode::Type minifyFilter = FilterMode::NEAREST;
   FilterMode::Type magnifyFilter = FilterMode::NEAREST;
@@ -776,7 +771,7 @@ int UtcDaliRenderableActorSetShaderEffect(void)
 int UtcDaliRenderableActorGetShaderEffect(void)
 {
   TestApplication application;
-  TextActor actor = TextActor::New();
+  ImageActor actor = ImageActor::New();
 
   ShaderEffect effect = ShaderEffect::New("UtcDaliRenderableActorGetShaderEffect-VertexSource", "UtcDaliRenderableActorGetShaderEffect-FragmentSource" );
   actor.SetShaderEffect(effect);
@@ -788,7 +783,7 @@ int UtcDaliRenderableActorGetShaderEffect(void)
 int UtcDaliRenderableActorRemoveShaderEffect01(void)
 {
   TestApplication application;
-  TextActor actor = TextActor::New();
+  ImageActor actor = ImageActor::New();
 
   ShaderEffect defaultEffect = actor.GetShaderEffect();
 
@@ -806,7 +801,7 @@ int UtcDaliRenderableActorRemoveShaderEffect01(void)
 int UtcDaliRenderableActorRemoveShaderEffect02(void)
 {
   TestApplication application;
-  TextActor actor = TextActor::New();
+  ImageActor actor = ImageActor::New();
 
   ShaderEffect defaultEffect = actor.GetShaderEffect();
 
@@ -823,8 +818,8 @@ int UtcDaliSetShaderEffectRecursively(void)
    * create a tree
    *                 actor1
    *           actor2       actor4
-   *       actor3 textactor
-   * imageactor
+   *       actor3 imageactor1
+   * imageactor2
    */
   BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor1 = ImageActor::New( img );
@@ -832,10 +827,10 @@ int UtcDaliSetShaderEffectRecursively(void)
   actor1.Add( actor2 );
   Actor actor3 = Actor::New();
   actor2.Add( actor3 );
-  TextActor textactor = TextActor::New( "Foo" );
-  actor2.Add( textactor );
-  ImageActor imageactor = ImageActor::New( img );
-  actor3.Add( imageactor );
+  ImageActor imageactor1 = ImageActor::New( img );
+  actor2.Add( imageactor1 );
+  ImageActor imageactor2 = ImageActor::New( img );
+  actor3.Add( imageactor2 );
   Actor actor4 = Actor::New();
   actor1.Add( actor4 );
   Stage::GetCurrent().Add( actor1 );
@@ -856,12 +851,12 @@ int UtcDaliSetShaderEffectRecursively(void)
   effect = ShaderEffect::New(vertexShader, fragmentShader );
 
   DALI_TEST_CHECK( effect != actor1.GetShaderEffect() );
-  DALI_TEST_CHECK( effect != textactor.GetShaderEffect() );
-  DALI_TEST_CHECK( effect != imageactor.GetShaderEffect() );
+  DALI_TEST_CHECK( effect != imageactor1.GetShaderEffect() );
+  DALI_TEST_CHECK( effect != imageactor2.GetShaderEffect() );
 
   SetShaderEffectRecursively( actor1, effect );
-  DALI_TEST_CHECK( effect == textactor.GetShaderEffect() );
-  DALI_TEST_CHECK( effect == imageactor.GetShaderEffect() );
+  DALI_TEST_CHECK( effect == imageactor1.GetShaderEffect() );
+  DALI_TEST_CHECK( effect == imageactor2.GetShaderEffect() );
 
   // flush the queue and render once
   application.SendNotification();
@@ -882,8 +877,8 @@ int UtcDaliSetShaderEffectRecursively(void)
 
   // remove partially
   RemoveShaderEffectRecursively( actor3 );
-  DALI_TEST_CHECK( effect == textactor.GetShaderEffect() );
-  DALI_TEST_CHECK( effect != imageactor.GetShaderEffect() );
+  DALI_TEST_CHECK( effect == imageactor1.GetShaderEffect() );
+  DALI_TEST_CHECK( effect != imageactor2.GetShaderEffect() );
 
   // test with empty actor just to check it does not crash
   Actor empty;

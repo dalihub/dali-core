@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
 #include <dali/internal/render/gl-resources/texture.h>
-#include <dali/internal/common/bitmap-upload.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/render/gl-resources/texture-cache.h>
@@ -73,22 +72,6 @@ public:
    * Destructor.
    */
   virtual ~BitmapTexture();
-
-public: // Message interface
-
-  /**
-   * Upload an array of bitmaps
-   * @param bitmapArray array of bitmap items
-   */
-  void UploadBitmapArray( const BitmapUploadArray& bitmapArray);
-
-  /**
-   * Clear an array of areas from bitmap to the given color
-   * @param[in] areaArray Array of rects to clear
-   * @param[in] blockSize Size of block to clear
-   * @param[in] color Clear color
-   */
-  void ClearAreas( const BitmapClearArray& areaArray, std::size_t blockSize, uint32_t color );
 
   /**
    * Retrieve the bitmap
@@ -189,14 +172,6 @@ private:
   // Changes scope, should be at end of class
   DALI_LOG_OBJECT_STRING_DECLARATION;
 };
-
-//
-// Upload bitmap array message
-//
-inline MessageBase* UploadBitmapArrayMessage( BitmapTexture& texture, const BitmapUploadArray& bitmapArray )
-{
-  return new MessageValue1< BitmapTexture, BitmapUploadArray >( &texture, &BitmapTexture::UploadBitmapArray, bitmapArray );
-}
 
 }  //namespace Internal
 

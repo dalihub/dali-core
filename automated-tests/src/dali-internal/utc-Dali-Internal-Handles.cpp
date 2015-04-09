@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/integration-api/glyph-set.h>
 
 #include <dali-test-suite-utils.h>
 
@@ -79,7 +78,7 @@ int UtcDaliTextActorConstructorRefObject(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::TextActor::TextActor(Internal::TextActor*)");
-  TextActor actor(NULL);
+  ImageActor actor(NULL);
   DALI_TEST_CHECK(!actor);
   END_TEST;
 }

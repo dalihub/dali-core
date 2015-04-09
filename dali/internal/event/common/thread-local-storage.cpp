@@ -99,11 +99,6 @@ ImageFactory& ThreadLocalStorage::GetImageFactory()
   return mCore->GetImageFactory();
 }
 
-FontFactory& ThreadLocalStorage::GetFontFactory()
-{
-  return mCore->GetFontFactory();
-}
-
 ShaderFactory& ThreadLocalStorage::GetShaderFactory()
 {
   return mCore->GetShaderFactory();
@@ -117,11 +112,6 @@ StagePtr ThreadLocalStorage::GetCurrentStage()
 GestureEventProcessor& ThreadLocalStorage::GetGestureEventProcessor()
 {
   return mCore->GetGestureEventProcessor();
-}
-
-EmojiFactory& ThreadLocalStorage::GetEmojiFactory()
-{
-  return mCore->GetEmojiFactory();
 }
 
 RelayoutController& ThreadLocalStorage::GetRelayoutController()

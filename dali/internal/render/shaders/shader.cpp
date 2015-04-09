@@ -84,10 +84,6 @@ inline unsigned int GetGeometryTypeIndex(GeometryType type)
   {
     index = Log<GEOMETRY_TYPE_IMAGE>::value;
   }
-  else if ( type & GEOMETRY_TYPE_TEXT )
-  {
-    index = Log<GEOMETRY_TYPE_TEXT>::value;
-  }
   else if ( type & GEOMETRY_TYPE_UNTEXTURED_MESH )
   {
     index = Log<GEOMETRY_TYPE_UNTEXTURED_MESH>::value;
@@ -257,7 +253,7 @@ void Shader::SetProgram( GeometryType geometryType,
   }
 
   const unsigned int geometryIndex = GetGeometryTypeIndex( geometryType );
-  if(geometryType != GEOMETRY_TYPE_TEXT && subType == SHADER_SUBTYPE_ALL)
+  if(subType == SHADER_SUBTYPE_ALL)
   {
     mPrograms[geometryIndex].Resize(1);
     mPrograms[geometryIndex][theSubType] = program;

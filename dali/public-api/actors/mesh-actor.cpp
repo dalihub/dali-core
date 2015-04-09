@@ -19,6 +19,7 @@
 #include <dali/public-api/actors/mesh-actor.h>
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/mesh-actor-impl.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
 #include <dali/internal/event/modeling/animatable-mesh-impl.h>

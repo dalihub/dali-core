@@ -162,15 +162,6 @@ int UtcDaliShaderEffectMethodNew02(void)
   END_TEST;
 }
 
-int UtcDaliShaderEffectMethodNew03(void)
-{
-  TestApplication application;
-
-  ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource, VertexSource, FragmentSource, ShaderEffect::HINT_NONE );
-  DALI_TEST_CHECK(effect);
-  END_TEST;
-}
-
 int UtcDaliShaderEffectMethodNew04(void)
 {
   TestApplication application;
@@ -244,21 +235,6 @@ int UtcDaliShaderEffectMethodNew05(void)
 
   END_TEST;
 }
-
-int UtcDaliShaderEffectMethodNew06(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::ShaderEffect::New() with shader sources for different geometry types");
-
-  ShaderEffect effect = ShaderEffect::New( "imageVertexShader", "imageFragmentShader",
-                                           "textVertexShader", "textFragmentShader",
-                                           "texturedMeshVertexShader", "texturedMeshFragmentShader",
-                                           "meshVertexShader", "meshFragmentShader",
-                                           ShaderEffect::HINT_NONE );
-  DALI_TEST_CHECK(effect);
-  END_TEST;
-}
-
 
 int UtcDaliShaderEffectMethodDownCast(void)
 {

@@ -242,7 +242,7 @@ inline void UpdateNodeWorldMatrix( Node& node, RenderableAttachment& updatedRend
   {
     if( updatedRenderable.UsesGeometryScaling() )
     {
-      // scaling, i.e. Text or Mesh
+      // scaling, i.e. Mesh
       Vector3 scaling;
       updatedRenderable.GetScaleForSize( node.GetSize( updateBufferIndex ), scaling );
       if( node.GetInhibitLocalTransform() )

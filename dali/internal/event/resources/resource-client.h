@@ -24,13 +24,12 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/ref-counted-dali-vector.h>
 #include <dali/public-api/images/native-image-interface.h>
-#include <dali/integration-api/glyph-set.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-lifetime-observer.h>
-#include <dali/internal/common/bitmap-upload.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/update/modeling/internal-mesh-data.h>
+#include <dali/integration-api/bitmap.h>
 
 namespace Dali
 {
@@ -39,7 +38,6 @@ class NativeImage;
 namespace Integration
 {
 class Bitmap;
-class GlyphSet;
 }
 
 namespace Internal
@@ -47,7 +45,6 @@ namespace Internal
 class EventThreadServices;
 class ResourceManager;
 class NotificationManager;
-class GlyphLoadObserver;
 
 
 typedef Integration::ResourceId ResourceId;
@@ -224,15 +221,6 @@ public:
                                      Pixel::Format pixelformat );
 
   /**
-   * Update a texture with an array of bitmaps.
-   * Typically used to upload multiple glyph bitmaps to a texture.
-   * @param[in] id texture resource id
-   * @param[in] uploadArray the upload array
-   */
-  void UpdateTexture( ResourceId id,
-                      BitmapUploadArray uploadArray );
-
-  /**
    * Requests allocation of a mesh resource
    * @param[in] meshData representing the mesh; ownership is taken.
    */
@@ -278,20 +266,6 @@ public:
    * @return The bitmap, or NULL if the ticket did not reference a bitmap
    */
   Integration::Bitmap* GetBitmap(ResourceTicketPtr ticket);
-
-  /**
-   * Set the glyph load observer
-   * @param glyphLoadedInterface pointer to an object which supports the glyphLoadedInterface
-   */
-  void SetGlyphLoadObserver( GlyphLoadObserver* glyphLoadedInterface );
-
-  /**
-   * Update atlas status
-   * @param id The ticket resource Id
-   * @param atlasId The atlas texture Id
-   * @param loadStatus The status update
-   */
-  void UpdateAtlasStatus( ResourceId id, ResourceId atlasId, Integration::LoadStatus loadStatus );
 
 public: // From ResourceTicketLifetimeObserver.
 
@@ -344,14 +318,6 @@ public: // Message methods
    * @param[in] id The resource id of the failed resource
    */
   void NotifySavingFailed( ResourceId id );
-
-  /**
-   * Notify associated glyph loader observer that a glyph set is loading
-   * @param[in] id The resource id of the loaded id
-   * @param[in] glyphSet The loading glyph set
-   * @param[in] loadStatus The current load status
-   */
-  void NotifyGlyphSetLoaded( ResourceId id, const Integration::GlyphSet& glyphSet, Integration::LoadStatus loadStatus );
 
   /**
    * Finds ImageTicket which belongs to resource identified by id and updates the cached size and pixelformat
@@ -410,11 +376,6 @@ inline MessageBase* SavingSucceededMessage( ResourceClient& client, ResourceId i
 inline MessageBase* SavingFailedMessage( ResourceClient& client, ResourceId id )
 {
   return new MessageValue1< ResourceClient, ResourceId  >( &client, &ResourceClient::NotifySavingFailed, id );
-}
-
-inline MessageBase* LoadingGlyphSetSucceededMessage( ResourceClient& client, ResourceId id, const Integration::GlyphSetPointer& glyphSet, Integration::LoadStatus loadStatus )
-{
-  return new MessageValue3< ResourceClient, ResourceId, Integration::GlyphSet, Integration::LoadStatus >( &client, &ResourceClient::NotifyGlyphSetLoaded, id, *glyphSet, loadStatus );
 }
 
 } // namespace Internal

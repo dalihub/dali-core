@@ -21,7 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/integration-api/resource-request.h>
-#include <dali/public-api/text/font-parameters.h>
 
 namespace Dali
 {
