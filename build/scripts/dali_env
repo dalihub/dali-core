@@ -46,6 +46,7 @@ my @system_packages = (
     "libgif-dev",
     "libturbojpeg",
     "libfribidi-dev",
+    "libharfbuzz-dev",
     "doxygen",
     "lcov",
     "libcurl4-gnutls-dev"
