@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/math/quaternion.h>
 
+// EXTERNAL INCLUDES
+#include <ostream>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/math/degree.h>
@@ -25,9 +28,6 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/internal/render/common/performance-monitor.h>
-
-// EXTERNAL INCLUDES
-#include <iostream>
 
 namespace Dali
 {

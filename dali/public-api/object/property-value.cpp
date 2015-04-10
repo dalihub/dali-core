@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/public-api/object/property-value.h>
 
+// EXTERNAL INCLUDES
+#include <ostream>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/math/angle-axis.h>
