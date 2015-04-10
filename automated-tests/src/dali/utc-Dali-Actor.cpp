@@ -76,10 +76,9 @@ static bool gTestConstraintCalled;
 
 struct TestConstraint
 {
-  Vector4 operator()(const Vector4&    color)
+  void operator()( Vector4& color, const PropertyInputContainer& /* inputs */ )
   {
     gTestConstraintCalled = true;
-    return Vector4(color.x, color.y, color.z, 0.1f);
   }
 };
 
@@ -97,33 +96,14 @@ struct TestConstraintRef
   {
   }
 
-  T operator()(const T&    current)
+  void operator()( T& current, const PropertyInputContainer& /* inputs */ )
   {
     mResultRef = mValue;
-    return current;
   }
 
   unsigned int& mResultRef;
   unsigned int mValue;
 };
-
-bool wasConstraintCallbackCalled1 = false;
-void TestConstraintCallback1( ActiveConstraint& constraint )
-{
-  wasConstraintCallbackCalled1 = true;
-}
-
-bool wasConstraintCallbackCalled2 = false;
-void TestConstraintCallback2( ActiveConstraint& constraint )
-{
-  wasConstraintCallbackCalled2 = true;
-}
-
-bool wasConstraintCallbackCalled3 = false;
-void TestConstraintCallback3( ActiveConstraint& constraint )
-{
-  wasConstraintCallbackCalled3 = true;
-}
 
 static bool TestCallback(Actor actor, const TouchEvent& event)
 {
@@ -174,14 +154,12 @@ struct PositionComponentConstraint
 {
   PositionComponentConstraint(){}
 
-  Vector3 operator()(const Vector3& current, const PropertyInput& property)
+  void operator()( Vector3& pos, const PropertyInputContainer& inputs )
   {
-    const Matrix& m = property.GetMatrix();
-    Vector3 pos;
+    const Matrix& m = inputs[0]->GetMatrix();
     Vector3 scale;
     Quaternion rot;
     m.GetTransformComponents(pos, rot, scale);
-    return pos;
   }
 };
 
@@ -1830,225 +1808,6 @@ int UtcDaliActorIsKeyboardFocusable(void)
   END_TEST;
 }
 
-
-int UtcDaliActorApplyConstraint(void)
-{
-  TestApplication application;
-
-  gTestConstraintCalled = false;
-
-  Actor actor = Actor::New();
-
-  Constraint constraint = Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraint() );
-  actor.ApplyConstraint(constraint);
-
-  DALI_TEST_CHECK( gTestConstraintCalled == false );
-  // add to stage
-  Stage::GetCurrent().Add( actor );
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_CHECK( gTestConstraintCalled == true );
-  END_TEST;
-}
-
-
-int UtcDaliActorApplyConstraintAppliedCallback(void)
-{
-  TestApplication application;
-
-  // Build a reusable constraint
-
-  Actor parent = Actor::New();
-  Vector3 parentSize( 100.0f, 100.0f, 100.0f );
-  parent.SetSize( parentSize );
-  Stage::GetCurrent().Add( parent );
-
-  Constraint constraint = Constraint::New<Vector3>( Actor::Property::SIZE,
-                                                    Source( parent, Actor::Property::SIZE ),
-                                                    EqualToConstraint() );
-
-  // Create some child actors
-
-  Actor child1 = Actor::New();
-  parent.Add( child1 );
-
-  Actor child2 = Actor::New();
-  parent.Add( child2 );
-
-  Actor child3 = Actor::New();
-  parent.Add( child3 );
-
-  // Apply constraint with different timings - everything should be finished after 10 seconds
-
-  wasConstraintCallbackCalled1 = false;
-  wasConstraintCallbackCalled2 = false;
-  wasConstraintCallbackCalled3 = false;
-
-  constraint.SetApplyTime( 5.0f );
-  ActiveConstraint activeConstraint1 = child1.ApplyConstraint( constraint );
-  activeConstraint1.AppliedSignal().Connect( TestConstraintCallback1 );
-
-  constraint.SetApplyTime( 10.0f );
-  ActiveConstraint activeConstraint2 = child2.ApplyConstraint( constraint );
-  activeConstraint2.AppliedSignal().Connect( TestConstraintCallback2 );
-
-  constraint.SetApplyTime( TimePeriod( 2.0f/*delay*/, 5.0f/*duration*/ ) );
-  ActiveConstraint activeConstraint3 = child3.ApplyConstraint( constraint );
-  activeConstraint3.AppliedSignal().Connect( TestConstraintCallback3 );
-
-  // Check event-side size
-  DALI_TEST_EQUALS( child1.GetTargetSize(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child2.GetTargetSize(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child3.GetTargetSize(), Vector3::ZERO, TEST_LOCATION );
-
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), Vector3::ZERO, TEST_LOCATION );
-
-  application.SendNotification();
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 1 elapsed second
-
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize*0.20f, TEST_LOCATION ); // 1 /  5 * 100 = 20%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.10f, TEST_LOCATION ); // 1 / 10 * 100 = 10%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize*0.00f, TEST_LOCATION ); // 0%
-
-  // Check signals have not fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 2 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize*0.40f, TEST_LOCATION ); // 2 /  5 * 100 = 40%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.20f, TEST_LOCATION ); // 2 / 10 * 100 = 20%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize*0.00f, TEST_LOCATION ); // 0%
-
-  // Check signals have not fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 3 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize*0.60f, TEST_LOCATION ); // 3 /  5 * 100 = 60%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.30f, TEST_LOCATION ); // 3 / 10 * 100 = 30%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize*0.20f, TEST_LOCATION ); // (3 - 2) / 5 * 100 = 20%
-
-  // Check signals have not fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 4 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize*0.80f, TEST_LOCATION ); // 4 /  5 * 100 = 80%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.40f, TEST_LOCATION ); // 4 / 10 * 100 = 40%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize*0.40f, TEST_LOCATION ); // (4 - 2) / 5 * 100 = 40%
-
-  // Check signals have not fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 5 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize,       TEST_LOCATION ); // 5 /  5 * 100 = 100%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.50f, TEST_LOCATION ); // 5 / 10 * 100 = 50%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize*0.60f, TEST_LOCATION ); // (5 - 2) / 5 * 100 = 60%
-
-  // Check signals have not fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 6 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100% (signal 1 should fire)
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.60f, TEST_LOCATION ); // 6 / 10 * 100 = 60%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize*0.80f, TEST_LOCATION ); // (6 - 2) / 5 * 100 = 80%
-
-  // 1st signal should have fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, true, TEST_LOCATION );
-  wasConstraintCallbackCalled1 = false;
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 7 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.70f, TEST_LOCATION ); // 7 / 10 * 100 = 70%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize,       TEST_LOCATION ); // (7 - 2) / 5 * 100 = 100%
-
-  // Check signals have not fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 8 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.80f, TEST_LOCATION ); // 8 / 10 * 100 = 80%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100% (signal 3 should fire)
-
-  // 3rd signal should have fired
-  application.SendNotification();
-
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, true, TEST_LOCATION );
-  wasConstraintCallbackCalled3 = false;
-
-  application.Render(static_cast<unsigned int>(1000.0f)); // 9 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize*0.90f, TEST_LOCATION ); // 9 / 10 * 100 = 90%
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100%
-
-  // Check signals have not fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(static_cast<unsigned int>(1000.0f + 1.0f)); // over 10 elapsed seconds
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100%
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100% (signal 2 should fire)
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize,       TEST_LOCATION ); // Past 100%
-
-  // 2nd signal should have fired
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, true, TEST_LOCATION );
-  wasConstraintCallbackCalled2 = false;
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  // Check that nothing has changed after a couple of buffer swaps
-
-  application.Render(0);
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize, TEST_LOCATION );
-
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-
-  application.Render(0);
-  DALI_TEST_EQUALS( child1.GetCurrentSize(), parentSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( child2.GetCurrentSize(), parentSize, TEST_LOCATION );
-  DALI_TEST_EQUALS( child3.GetCurrentSize(), parentSize, TEST_LOCATION );
-
-  application.SendNotification();
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled1, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled2, false, TEST_LOCATION );
-  DALI_TEST_EQUALS( wasConstraintCallbackCalled3, false, TEST_LOCATION );
-  END_TEST;
-}
-
 int UtcDaliActorRemoveConstraints(void)
 {
   tet_infoline(" UtcDaliActorRemoveConstraints");
@@ -2058,14 +1817,14 @@ int UtcDaliActorRemoveConstraints(void)
 
   Actor actor = Actor::New();
 
-  Constraint constraint = Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraint() );
-  actor.ApplyConstraint(constraint);
+  Constraint constraint = Constraint::New<Vector4>( actor, Actor::Property::COLOR, TestConstraint() );
+  constraint.Apply();
   actor.RemoveConstraints();
 
   DALI_TEST_CHECK( gTestConstraintCalled == false );
 
   Stage::GetCurrent().Add( actor );
-  actor.ApplyConstraint(constraint);
+  constraint.Apply();
 
   // flush the queue and render once
   application.SendNotification();
@@ -2074,81 +1833,6 @@ int UtcDaliActorRemoveConstraints(void)
   actor.RemoveConstraints();
 
   DALI_TEST_CHECK( gTestConstraintCalled == true );
-  END_TEST;
-}
-
-int UtcDaliActorRemoveConstraint(void)
-{
-  tet_infoline(" UtcDaliActorRemoveConstraint");
-  TestApplication application;
-
-  Actor actor = Actor::New();
-
-  // 1. Apply Constraint1 and Constraint2, and test...
-  unsigned int result1 = 0u;
-  unsigned int result2 = 0u;
-  ActiveConstraint activeConstraint1 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1) ) );
-  ActiveConstraint activeConstraint2 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result2, 2) ) );
-
-  Stage::GetCurrent().Add( actor );
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( result1, 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( result2, 2u, TEST_LOCATION );
-
-  // 2. Remove Constraint1 and test...
-  result1 = 0;
-  result2 = 0;
-  actor.RemoveConstraint(activeConstraint1);
-  // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetColor( Color::WHITE );
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( result1, 0u, TEST_LOCATION );  ///< constraint 1 should not apply now.
-  DALI_TEST_EQUALS( result2, 2u, TEST_LOCATION );
-
-  // 3. Re-Apply Constraint1 and test...
-  result1 = 0;
-  result2 = 0;
-  activeConstraint1 = actor.ApplyConstraint( Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1) ) );
-  // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetColor( Color::WHITE );
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( result1, 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( result2, 2u, TEST_LOCATION );
-
-  // 2. Remove Constraint2 and test...
-  result1 = 0;
-  result2 = 0;
-  actor.RemoveConstraint(activeConstraint2);
-  // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetColor( Color::WHITE );
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( result1, 1u, TEST_LOCATION );
-  DALI_TEST_EQUALS( result2, 0u, TEST_LOCATION ); ///< constraint 2 should not apply now.
-
-  // 2. Remove Constraint1 as well and test...
-  result1 = 0;
-  result2 = 0;
-  actor.RemoveConstraint(activeConstraint1);
-  // make color property dirty, which will trigger constraints to be reapplied.
-  actor.SetColor( Color::WHITE );
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-
-  DALI_TEST_EQUALS( result1, 0u, TEST_LOCATION ); ///< constraint 1 should not apply now.
-  DALI_TEST_EQUALS( result2, 0u, TEST_LOCATION ); ///< constraint 2 should not apply now.
   END_TEST;
 }
 
@@ -2164,14 +1848,14 @@ int UtcDaliActorRemoveConstraintTag(void)
   unsigned int result2 = 0u;
 
   unsigned constraint1Tag = 1u;
-  Constraint constraint1 = Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1) );
+  Constraint constraint1 = Constraint::New<Vector4>( actor, Actor::Property::COLOR, TestConstraintRef<Vector4>(result1, 1) );
   constraint1.SetTag( constraint1Tag );
-  actor.ApplyConstraint( constraint1 );
+  constraint1.Apply();
 
   unsigned constraint2Tag = 2u;
-  Constraint constraint2 = Constraint::New<Vector4>( Actor::Property::COLOR, TestConstraintRef<Vector4>(result2, 2) );
+  Constraint constraint2 = Constraint::New<Vector4>( actor, Actor::Property::COLOR, TestConstraintRef<Vector4>(result2, 2) );
   constraint2.SetTag( constraint2Tag );
-  actor.ApplyConstraint( constraint2 );
+  constraint2.Apply();
 
   Stage::GetCurrent().Add( actor );
   // flush the queue and render once
@@ -2197,7 +1881,7 @@ int UtcDaliActorRemoveConstraintTag(void)
   // 3. Re-Apply Constraint1 and test...
   result1 = 0;
   result2 = 0;
-  actor.ApplyConstraint( constraint1 );
+  constraint1.Apply();
   // make color property dirty, which will trigger constraints to be reapplied.
   actor.SetColor( Color::WHITE );
   // flush the queue and render once
@@ -2765,8 +2449,9 @@ int UtcDaliActorConstrainedToWorldMatrix(void)
 
   Actor child = Actor::New();
   child.SetParentOrigin(ParentOrigin::CENTER);
-  Constraint posConstraint = Constraint::New<Vector3>( Actor::Property::POSITION, Source( parent, Actor::Property::WORLD_MATRIX), PositionComponentConstraint() );
-  child.ApplyConstraint(posConstraint);
+  Constraint posConstraint = Constraint::New<Vector3>( child, Actor::Property::POSITION, PositionComponentConstraint() );
+  posConstraint.AddSource( Source( parent, Actor::Property::WORLD_MATRIX ) );
+  posConstraint.Apply();
 
   Stage::GetCurrent().Add( child );
 

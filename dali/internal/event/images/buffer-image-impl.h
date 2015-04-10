@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/integration-api/bitmap.h> // For Integration::BitmapPtr
 #include <dali/public-api/object/ref-object.h>
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/public-api/images/image.h>

@@ -31,7 +31,7 @@ namespace Internal
 template <class P>
 struct PropertyConstraintPtr
 {
-  typedef OwnerPointer< PropertyConstraintBase<P> > Type;
+  typedef OwnerPointer< PropertyConstraint<P> > Type;
 };
 
 } // namespace Internal

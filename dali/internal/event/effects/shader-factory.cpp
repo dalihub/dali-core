@@ -120,21 +120,6 @@ void ShaderFactory::LoadDefaultShaders()
 
   mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_IMAGE, SHADER_DEFAULT, ImageVertex, ImageFragment, false );
 
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXT, SHADER_DEFAULT, TextDistanceFieldVertex, TextDistanceFieldFragment, false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT,
-                                      std::string( SHADER_DEF_USE_GRADIENT ) + TextDistanceFieldVertex,
-                                      std::string( SHADER_DEF_USE_GRADIENT ) + TextDistanceFieldFragment,
-                                      false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_GLOW, TextDistanceFieldGlowVertex, TextDistanceFieldGlowFragment, false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_SHADOW, TextDistanceFieldShadowVertex, TextDistanceFieldShadowFragment, false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE, TextDistanceFieldOutlineVertex, TextDistanceFieldOutlineFragment, false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXT, SHADER_GRADIENT_OUTLINE_GLOW, TextDistanceFieldOutlineGlowVertex, TextDistanceFieldOutlineGlowFragment, false );
-
   // Untextured meshes
   mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_EVENLY_LIT,
                                       UntexturedMeshVertex,

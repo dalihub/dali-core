@@ -170,7 +170,7 @@ void ImageActor::ClearPixelArea()
     if( image )
     {
       mInternalSetSize = true;
-      SetSize( image->GetNaturalSize() );
+      SetSizeInternal( image->GetNaturalSize() );
       mInternalSetSize = false;
     }
   }
@@ -225,7 +225,7 @@ void ImageActor::SetNaturalSize()
   if( mUsingNaturalSize )
   {
     mInternalSetSize = true;
-    SetSize( CalculateNaturalSize() );
+    SetSizeInternal( CalculateNaturalSize() );
     mInternalSetSize = false;
   }
 }

@@ -126,13 +126,6 @@ void PropertyOwner::ResetToBaseValues( BufferIndex updateBufferIndex )
     (*iter)->ResetToBaseValue( updateBufferIndex );
   }
 
-  // Reset constraint weights
-  const ConstraintIter constraintEndIter = mConstraints.End();
-  for( ConstraintIter iter = mConstraints.Begin(); constraintEndIter != iter; ++iter )
-  {
-    (*iter)->mWeight.ResetToBaseValue( updateBufferIndex );
-  }
-
   // Notification for derived classes, to reset default properties
   ResetDefaultProperties( updateBufferIndex );
 }
@@ -151,7 +144,6 @@ void PropertyOwner::ApplyConstraint( ConstraintBase* constraint )
 
 void PropertyOwner::RemoveConstraint( ConstraintBase* constraint )
 {
-  // Reset constraint weights
   const ConstraintIter constraintEndIter = mConstraints.End();
   for( ConstraintIter iter = mConstraints.Begin(); constraintEndIter != iter; ++iter )
   {

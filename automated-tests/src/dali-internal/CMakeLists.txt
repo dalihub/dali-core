@@ -6,16 +6,11 @@ SET(RPM_NAME "core-${PKG_NAME}-tests")
 SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
-        utc-Dali-Internal-Character.cpp
-        utc-Dali-Internal-Font.cpp
         utc-Dali-Internal-Handles.cpp
         utc-Dali-Internal-ImageFactory.cpp
         utc-Dali-Internal-Mesh.cpp
-        utc-Dali-Internal-Text.cpp
         utc-Dali-Internal-ResourceClient.cpp
         utc-Dali-Internal-Image-Culling.cpp
-        utc-Dali-Internal-Text-Culling.cpp
-        utc-Dali-Internal-Constraint.cpp
         utc-Dali-Internal-FixedSizeMemoryPool.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-RelayoutController.cpp

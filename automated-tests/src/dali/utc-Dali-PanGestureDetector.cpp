@@ -157,22 +157,16 @@ struct PanConstraint
 {
   PanConstraint( ConstraintData& data ) : constraintData(data) { }
 
-  Vector3 operator()(const Vector3&       current,
-                     const PropertyInput& screenPositionProperty,
-                     const PropertyInput& screenDisplacementProperty,
-                     const PropertyInput& screenVelocityProperty,
-                     const PropertyInput& localPositionProperty,
-                     const PropertyInput& localDisplacementProperty,
-                     const PropertyInput& localVelocityProperty)
+  void operator()( Vector3& current, const PropertyInputContainer& inputs )
   {
-    constraintData.screenPosition = screenPositionProperty.GetVector2();
-    constraintData.screenDisplacement = screenDisplacementProperty.GetVector2();
-    constraintData.screenVelocity = screenVelocityProperty.GetVector2();
-    constraintData.localPosition = localPositionProperty.GetVector2();
-    constraintData.localDisplacement = localDisplacementProperty.GetVector2();
-    constraintData.localVelocity = localVelocityProperty.GetVector2();
+    constraintData.screenPosition = inputs[0]->GetVector2();
+    constraintData.screenDisplacement = inputs[1]->GetVector2();
+    constraintData.screenVelocity = inputs[2]->GetVector2();
+    constraintData.localPosition = inputs[3]->GetVector2();
+    constraintData.localDisplacement = inputs[4]->GetVector2();
+    constraintData.localVelocity = inputs[5]->GetVector2();
     constraintData.called = true;
-    return Vector3::ZERO;
+    current = Vector3::ZERO;
   }
 
   ConstraintData& constraintData;
@@ -2085,13 +2079,14 @@ int UtcDaliPanGestureNoPredictionNoSmoothing(void)
   Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
 
   ConstraintData constraintData;
-  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::Property::SCREEN_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ),
-                                                             PanConstraint( constraintData ) ) );
+  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.Apply();
 
   // Render and notify
   application.SendNotification();
@@ -2130,13 +2125,14 @@ int UtcDaliPanGestureNoPredictionSmoothing(void)
   Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
 
   ConstraintData constraintData;
-  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::Property::SCREEN_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ),
-                                                             PanConstraint( constraintData ) ) );
+  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.Apply();
 
   // Render and notify
   application.SendNotification();
@@ -2176,13 +2172,14 @@ int UtcDaliPanGesturePredictionNoSmoothing(void)
   Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
 
   ConstraintData constraintData;
-  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::Property::SCREEN_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ),
-                                                             PanConstraint( constraintData ) ) );
+  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.Apply();
 
   // Render and notify
   application.SendNotification();
@@ -2222,13 +2219,14 @@ int UtcDaliPanGesturePredictionSmoothing(void)
   Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
 
   ConstraintData constraintData;
-  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::Property::SCREEN_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ),
-                                                             PanConstraint( constraintData ) ) );
+  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.Apply();
 
   // Render and notify
   application.SendNotification();
@@ -2269,13 +2267,14 @@ int UtcDaliPanGestureSetProperties(void)
   Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
 
   ConstraintData constraintData;
-  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::Property::SCREEN_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ),
-                                                             PanConstraint( constraintData ) ) );
+  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.Apply();
 
   // Render and notify
   application.SendNotification();
@@ -2329,13 +2328,14 @@ int UtcDaliPanGestureSetPropertiesAlreadyPanning(void)
   Property::Index property = actor.RegisterProperty( "Dummy Property", Vector3::ZERO );
 
   ConstraintData constraintData;
-  actor.ApplyConstraint( Constraint::New<Vector3>( property, Source( detector, PanGestureDetector::Property::SCREEN_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_POSITION ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ),
-                                                             Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ),
-                                                             PanConstraint( constraintData ) ) );
+  Constraint constraint = Constraint::New<Vector3>( actor, property, PanConstraint( constraintData ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::SCREEN_VELOCITY ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_POSITION ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_DISPLACEMENT ) );
+  constraint.AddSource( Source( detector, PanGestureDetector::Property::LOCAL_VELOCITY ) );
+  constraint.Apply();
 
   // Render and notify
   application.SendNotification();

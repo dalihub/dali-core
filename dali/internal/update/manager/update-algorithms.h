@@ -41,17 +41,15 @@ class RenderQueue;
  * Recursively apply the constraints on the nodes.
  * @param[in] node to constraint.
  * @param[in] updateBufferIndex The current update buffer index.
- * @return number of active constraints.
- */
-unsigned int ConstrainNodes( Node& node, BufferIndex updateBufferIndex );
+  */
+void ConstrainNodes( Node& node, BufferIndex updateBufferIndex );
 
 /**
  * Constrain the local properties of the PropertyOwner.
  * @param[in] propertyOwner The PropertyOwner to constrain
  * @param[in] updateBufferIndex The current update buffer index.
- * @return The number of active constraints.
  */
-unsigned int ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex );
+void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex );
 
 /**
  * Update a tree of nodes, and attached objects.

@@ -26,21 +26,18 @@
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
-#include <dali/internal/event/actors/text-actor-impl.h>
 #include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/actors/mesh-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/camera-attachment-impl.h>
-#include <dali/internal/event/actor-attachments/text-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/image-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/mesh-attachment-impl.h>
 
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/animation/animator-connector.h>
 #include <dali/internal/event/animation/constraint-impl.h>
-#include <dali/internal/event/animation/active-constraint-impl.h>
 #include <dali/internal/update/animation/property-accessor.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
 #include <dali/internal/update/animation/scene-graph-constraint.h>
@@ -48,7 +45,6 @@
 
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/internal/event/images/image-factory-cache.h>
-#include <dali/internal/common/text-parameters.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
 #include <dali/internal/event/modeling/material-impl.h>
 
@@ -66,7 +62,6 @@
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-mesh-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-text-attachment.h>
 
 #include <dali/internal/update/resources/bitmap-metadata.h>
 
@@ -74,7 +69,6 @@
 
 #include <dali/internal/render/renderers/render-material.h>
 #include <dali/internal/render/renderers/scene-graph-image-renderer.h>
-#include <dali/internal/render/renderers/scene-graph-text-renderer.h>
 #include <dali/internal/render/renderers/scene-graph-mesh-renderer.h>
 
 using Dali::Internal::GestureEventProcessor;
@@ -113,9 +107,8 @@ const int ANIMATION_MEMORY_SIZE(
   sizeof( Internal::AnimatorConnector<float> ) +
   sizeof( Internal::SceneGraph::Animation ) );
 const int CONSTRAINT_MEMORY_SIZE(
-  sizeof( Internal::Constraint ) +
-  sizeof( Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> > ) +
-  sizeof( Internal::ActiveConstraint<float> ) );
+  sizeof( Internal::Constraint<float> ) +
+  sizeof( Internal::SceneGraph::Constraint<float, Internal::PropertyAccessor<float> > ) );
 const int ACTOR_MEMORY_SIZE(
   sizeof( Internal::Actor ) +
   sizeof( Internal::ActorAttachment ) +
@@ -126,13 +119,6 @@ const int CAMERA_ACTOR_MEMORY_SIZE(
   sizeof( Internal::CameraAttachment ) +
   sizeof( Internal::SceneGraph::Node ) +
   sizeof( Internal::SceneGraph::CameraAttachment ) );
-const int TEXT_ACTOR_MEMORY_SIZE(
-  sizeof( Internal::TextActor ) +
-  sizeof( Internal::TextAttachment ) +
-  sizeof( Internal::SceneGraph::Node ) +
-  sizeof( Internal::SceneGraph::TextAttachment ) +
-  sizeof( Internal::TextParameters ) +
-  sizeof( Internal::SceneGraph::TextRenderer ) );
 const int MESH_ACTOR_MEMORY_SIZE(
   sizeof( Internal::MeshActor ) +
   sizeof( Internal::MeshAttachment ) +

@@ -31,14 +31,12 @@ namespace Internal
 class ActorAttachment;
 class CameraAttachment;
 class ImageAttachment;
-class TextAttachment;
 class MeshAttachment;
 
 typedef IntrusivePtr<ActorAttachment>  ActorAttachmentPtr;
 typedef IntrusivePtr<CameraAttachment> CameraAttachmentPtr;
 typedef IntrusivePtr<ImageAttachment>  ImageAttachmentPtr;
 typedef IntrusivePtr<MeshAttachment>   MeshAttachmentPtr;
-typedef IntrusivePtr<TextAttachment>   TextAttachmentPtr;
 
 } // namespace Internal
 

@@ -9,9 +9,7 @@ public_api_src_files = \
   $(public_api_src_dir)/actors/image-actor.cpp \
   $(public_api_src_dir)/actors/layer.cpp \
   $(public_api_src_dir)/actors/mesh-actor.cpp \
-  $(public_api_src_dir)/actors/text-actor.cpp \
   $(public_api_src_dir)/actors/renderable-actor.cpp \
-  $(public_api_src_dir)/animation/active-constraint.cpp \
   $(public_api_src_dir)/animation/animation.cpp \
   $(public_api_src_dir)/animation/alpha-functions.cpp \
   $(public_api_src_dir)/animation/constraint.cpp \
@@ -63,7 +61,6 @@ public_api_src_files = \
   $(public_api_src_dir)/images/frame-buffer-image.cpp \
   $(public_api_src_dir)/images/encoded-buffer-image.cpp \
   $(public_api_src_dir)/images/nine-patch-image.cpp \
-  $(public_api_src_dir)/images/glyph-image.cpp \
   $(public_api_src_dir)/images/resource-image.cpp \
   $(public_api_src_dir)/images/native-image.cpp \
   $(public_api_src_dir)/math/angle-axis.cpp \
@@ -104,13 +101,6 @@ public_api_src_files = \
   $(public_api_src_dir)/signals/functor-delegate.cpp \
   $(public_api_src_dir)/object/type-info.cpp \
   $(public_api_src_dir)/object/type-registry.cpp \
-  $(public_api_src_dir)/text/character.cpp \
-  $(public_api_src_dir)/text/font.cpp \
-  $(public_api_src_dir)/text/font-parameters.cpp \
-  $(public_api_src_dir)/text/text.cpp \
-  $(public_api_src_dir)/text/text-actor-parameters.cpp \
-  $(public_api_src_dir)/text/text-style.cpp \
-  $(public_api_src_dir)/text/utf8.cpp \
   $(public_api_src_dir)/dali-core-version.cpp
 
 # Add public header files here
@@ -130,18 +120,14 @@ public_api_core_actors_header_files =  \
   $(public_api_src_dir)/actors/image-actor.h \
   $(public_api_src_dir)/actors/layer.h \
   $(public_api_src_dir)/actors/mesh-actor.h \
-  $(public_api_src_dir)/actors/text-actor.h \
   $(public_api_src_dir)/actors/renderable-actor.h \
   $(public_api_src_dir)/actors/sampling.h
 
 public_api_core_animation_header_files = \
-  $(public_api_src_dir)/animation/active-constraint.h \
-  $(public_api_src_dir)/animation/active-constraint-declarations.h \
   $(public_api_src_dir)/animation/alpha-functions.h \
   $(public_api_src_dir)/animation/animation.h \
   $(public_api_src_dir)/animation/constraint.h \
   $(public_api_src_dir)/animation/constraints.h \
-  $(public_api_src_dir)/animation/constraint-functions.h \
   $(public_api_src_dir)/animation/constraint-source.h \
   $(public_api_src_dir)/animation/key-frames.h \
   $(public_api_src_dir)/animation/path.h \
@@ -205,7 +191,6 @@ public_api_core_images_header_files = \
   $(public_api_src_dir)/images/distance-field.h \
   $(public_api_src_dir)/images/encoded-buffer-image.h \
   $(public_api_src_dir)/images/frame-buffer-image.h \
-  $(public_api_src_dir)/images/glyph-image.h \
   $(public_api_src_dir)/images/image.h \
   $(public_api_src_dir)/images/image-attributes.h \
   $(public_api_src_dir)/images/native-image-interface.h \
@@ -277,12 +262,3 @@ public_api_core_signals_header_files = \
   $(public_api_src_dir)/signals/signal-slot-connections.h \
   $(public_api_src_dir)/signals/signal-slot-observers.h \
   $(public_api_src_dir)/signals/slot-delegate.h
-
-public_api_core_text_header_files = \
-  $(public_api_src_dir)/text/character.h \
-  $(public_api_src_dir)/text/font.h \
-  $(public_api_src_dir)/text/font-parameters.h \
-  $(public_api_src_dir)/text/text.h \
-  $(public_api_src_dir)/text/text-actor-parameters.h \
-  $(public_api_src_dir)/text/text-style.h \
-  $(public_api_src_dir)/text/utf8.h

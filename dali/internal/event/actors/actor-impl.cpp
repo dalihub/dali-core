@@ -415,11 +415,6 @@ void Actor::Add( Actor& child )
       {
         RelayoutRequest();
       }
-
-      if( child.RelayoutDependentOnParent() )
-      {
-        child.RelayoutRequest();
-      }
     }
   }
 }
@@ -1171,12 +1166,29 @@ void Actor::SetSize( const Vector2& size )
   SetSize( Vector3( size.width, size.height, CalculateSizeZ( size ) ) );
 }
 
+void Actor::SetSizeInternal( const Vector2& size )
+{
+  SetSizeInternal( Vector3( size.width, size.height, CalculateSizeZ( size ) ) );
+}
+
 float Actor::CalculateSizeZ( const Vector2& size ) const
 {
   return std::min( size.width, size.height );
 }
 
 void Actor::SetSize( const Vector3& size )
+{
+  if( IsRelayoutEnabled() && !mRelayoutData->insideRelayout )
+  {
+    SetPreferredSize( size.GetVectorXY() );
+  }
+  else
+  {
+    SetSizeInternal( size );
+  }
+}
+
+void Actor::SetSizeInternal( const Vector3& size )
 {
   if( NULL != mNode )
   {
@@ -2374,6 +2386,9 @@ void Actor::ConnectToSceneGraph( int index )
     ConnectDynamics();
   }
 #endif
+
+  // Request relayout on all actors that are added to the scenegraph
+  RelayoutRequest();
 
   // Notification for Object::Observers
   OnSceneObjectAdd();

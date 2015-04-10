@@ -18,18 +18,13 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <boost/function.hpp>
-
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/signals/callback.h>
 #include <dali/internal/event/animation/property-constraint-ptr.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/animation/interpolator-functions.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/render/common/performance-monitor.h>
 
@@ -52,28 +47,24 @@ class Constraint : public ConstraintBase
 public:
 
   typedef typename PropertyConstraintPtr< PropertyType >::Type ConstraintFunctionPtr;
-  typedef boost::function< PropertyType (const PropertyType&, const PropertyType&, float progress) > InterpolatorFunc;
 
   /**
    * Create a new scene-graph constraint.
    * @param[in] targetProperty The target property.
    * @param[in] ownerSet A set of property owners; func is connected to the properties provided by these objects.
    * @param[in] func The function to calculate the final constrained value.
-   * @param[in] customWeight A custom weight property, or NULL if the constraint is using its own.
    * @return A smart-pointer to a newly allocated constraint.
    */
   static ConstraintBase* New( const PropertyBase& targetProperty,
                               PropertyOwnerContainer& ownerContainer,
-                              ConstraintFunctionPtr func,
-                              const AnimatableProperty<float>* customWeight )
+                              ConstraintFunctionPtr func )
   {
     // Scene-graph thread can edit these objects
     PropertyBase& property = const_cast< PropertyBase& >( targetProperty );
 
     return new Constraint< PropertyType, PropertyAccessorType >( property,
                                                                  ownerContainer,
-                                                                 func,
-                                                                 customWeight );
+                                                                 func );
   }
 
   /**
@@ -81,7 +72,6 @@ public:
    */
   virtual ~Constraint()
   {
-    delete mInterpolator;
   }
 
   /**
@@ -97,8 +87,7 @@ public:
     }
 
     if ( ! mTargetProperty.IsClean() ||
-           mFunc->InputsChanged()    ||
-         ! mWeightInput->IsClean() )
+           mFunc->InputsChanged() )
     {
       return true;
     }
@@ -117,33 +106,20 @@ public:
       return; // Early-out when property owners have been disconnected
     }
 
-    bool firstApply( mFirstApply );
-
     if ( mFunc->InputsInitialized() &&
          ApplyNeeded() )
     {
-      const PropertyType& current = mTargetProperty.Get( updateBufferIndex );
+      PropertyType current = mTargetProperty.Get( updateBufferIndex );
+      mFunc->Apply( updateBufferIndex, current );
 
-      // FINAL_WEIGHT means the constraint is fully-applied, unless weight is still being animated
-      if ( ( ! firstApply && ! mWeightInput->IsClean() ) || // We should not rely on the flag state of weight-input on first apply
-           ! Equals( Dali::ActiveConstraint::FINAL_WEIGHT, (*mWeightInput)[updateBufferIndex] ) )
+      // Optionally bake the final value
+      if ( Dali::Constraint::Bake == mRemoveAction )
       {
-        // Constraint is not fully-applied; interpolation between start & final values
-        mTargetProperty.Set(
-            updateBufferIndex,
-            CallbackBase::ExecuteReturn< PropertyType, const PropertyType&, const PropertyType&, float >( *mInterpolator, current, mFunc->Apply( updateBufferIndex, current ), (*mWeightInput)[updateBufferIndex] ));
+        mTargetProperty.Bake( updateBufferIndex, current );
       }
       else
       {
-        // Constraint is fully-applied; optionally bake the final value
-        if ( Dali::Constraint::Bake == mRemoveAction )
-        {
-          mTargetProperty.Bake( updateBufferIndex, mFunc->Apply( updateBufferIndex, current ) );
-        }
-        else
-        {
-          mTargetProperty.Set( updateBufferIndex, mFunc->Apply( updateBufferIndex, current ) );
-        }
+        mTargetProperty.Set( updateBufferIndex, current );
       }
 
       INCREASE_COUNTER(PerformanceMonitor::CONSTRAINTS_APPLIED);
@@ -161,13 +137,10 @@ private:
    */
   Constraint( PropertyBase& targetProperty,
               PropertyOwnerContainer& ownerContainer,
-              ConstraintFunctionPtr func,
-              const AnimatableProperty<float>* customWeight )
+              ConstraintFunctionPtr func )
   : ConstraintBase( ownerContainer ),
     mTargetProperty( &targetProperty ),
-    mFunc( func ),
-    mInterpolator( GetDefaultInterpolator( PropertyTypes::Get< PropertyType >() ) ),
-    mWeightInput( customWeight ? customWeight : &mWeight)
+    mFunc( func )
   {
   }
 
@@ -192,10 +165,6 @@ protected:
   PropertyAccessorType mTargetProperty; ///< Raw-pointer to the target property. Not owned.
 
   ConstraintFunctionPtr mFunc;
-
-  CallbackBase* mInterpolator;
-
-  const AnimatableProperty<float>* mWeightInput;
 };
 
 } // namespace SceneGraph
