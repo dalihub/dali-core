@@ -18,13 +18,14 @@
 // CLASS HEADER
 #include <dali/internal/event/images/encoded-buffer-image-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for memcpy
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/integration-api/platform-abstraction.h>
-
-#include <string.h>
 
 namespace Dali
 {

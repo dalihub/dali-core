@@ -17,6 +17,11 @@
 
 // CLASS HEADER
 #include <dali/internal/event/animation/path-impl.h>
+
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
+// INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
 
 namespace Dali

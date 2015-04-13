@@ -19,8 +19,8 @@
 #include <dali/public-api/math/matrix.h>
 
 // EXTERNAL INCLUDES
-#include <math.h>
-#include <string.h>
+#include <cmath>
+#include <cstring> // for memcpy
 #include <ostream>
 
 // INTERNAL INCLUDES

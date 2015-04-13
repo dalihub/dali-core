@@ -19,8 +19,7 @@
 #include <dali/public-api/common/dali-vector.h>
 
 // EXTERNAL INCLUDES
-#include <stdlib.h>
-#include <memory.h>
+#include <cstring> // for memcpy & memmove
 
 namespace Dali
 {

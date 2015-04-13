@@ -22,6 +22,7 @@
 #include <cmath>
 #include <algorithm>
 #include <cfloat>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 

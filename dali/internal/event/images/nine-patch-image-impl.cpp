@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for memcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/integration-api/bitmap.h>

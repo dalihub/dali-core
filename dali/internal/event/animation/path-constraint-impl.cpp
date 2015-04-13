@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/animation/path-constraint-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/animation/constraint.h>

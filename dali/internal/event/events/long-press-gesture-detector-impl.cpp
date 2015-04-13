@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include "long-press-gesture-detector-impl.h"
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/events/long-press-gesture.h>
 #include <dali/public-api/object/type-registry.h>

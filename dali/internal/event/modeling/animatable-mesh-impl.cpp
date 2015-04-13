@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/modeling/animatable-mesh-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>

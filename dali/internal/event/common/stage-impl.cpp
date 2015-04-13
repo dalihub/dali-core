@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 #include <algorithm>
 #include <cmath>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/system-overlay.h>

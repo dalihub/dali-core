@@ -19,7 +19,7 @@
 #include <dali/public-api/math/matrix3.h>
 
 // EXTERNAL INCLUDES
-#include <string.h>
+#include <cstring> // for memcpy
 #include <ostream>
 
 // INTERNAL INCLUDES
