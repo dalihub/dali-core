@@ -292,7 +292,6 @@ public:
       POSITION_INHERITANCE,                               ///< name "position-inheritance",  type std::string
       DRAW_MODE,                                          ///< name "draw-mode",             type std::string
       SIZE_MODE_FACTOR,                                   ///< name "size-mode-factor",      type Vector3
-      RELAYOUT_ENABLED,                                   ///< name "relayout-enabled",      type Boolean
       WIDTH_RESIZE_POLICY,                                ///< name "width-resize-policy",   type String
       HEIGHT_RESIZE_POLICY,                               ///< name "height-resize-policy",  type String
       SIZE_SCALE_POLICY,                                  ///< name "size-scale-policy",     type String
@@ -1147,20 +1146,6 @@ public:
   // SIZE NEGOTIATION
 
   /**
-   * @brief Set if the actor should do relayout in size negotiation or not.
-   *
-   * @param[in] enabled Flag to specify if actor should do relayout or not.
-   */
-  void SetRelayoutEnabled( bool enabled );
-
-  /**
-   * @brief Is the actor included in relayout or not.
-   *
-   * @return Return if the actor is involved in size negotiation or not.
-   */
-  bool IsRelayoutEnabled() const;
-
-  /**
    * Set the resize policy to be used for the given dimension(s)
    *
    * @param[in] policy The resize policy to use
@@ -1234,15 +1219,6 @@ public:
    * @return Return the value of the negotiated dimension
    */
   float GetRelayoutSize( Dimension::Type dimension ) const;
-
-  /**
-   * @brief Request to relayout of all actors in the sub-tree below the given actor.
-   *
-   * This flags the actor and all actors below it for relayout. The actual
-   * relayout is performed at the end of the frame. This means that multiple calls to relayout
-   * will not cause multiple relayouts to occur.
-   */
-  void RelayoutRequestTree();
 
   /**
    * @brief Force propagate relayout flags through the tree. This actor and all actors

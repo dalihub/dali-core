@@ -89,11 +89,6 @@ Image ImageActor::GetImage()
   return Dali::Image( imagePtr.Get() );
 }
 
-void ImageActor::SetToNaturalSize()
-{
-  GetImplementation(*this).SetToNaturalSize();
-}
-
 void ImageActor::SetPixelArea(const PixelArea& pixelArea)
 {
   GetImplementation(*this).SetPixelArea(pixelArea);

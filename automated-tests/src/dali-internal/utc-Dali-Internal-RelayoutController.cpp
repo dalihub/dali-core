@@ -75,8 +75,6 @@ Actor NewRelayoutActor( bool expectedWidthDirty, bool expectedHeightDirty, Resiz
 {
   Actor actor = Actor::New();
 
-  actor.SetRelayoutEnabled( true );
-
   actor.SetResizePolicy( widthPolicy, Dimension::WIDTH );
   actor.SetResizePolicy( heightPolicy, Dimension::HEIGHT );
 
@@ -140,7 +138,6 @@ int UtcDaliRelayoutControllerRequestRelayout(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRelayoutEnabled( true );
 
   Internal::Actor& actorImpl = GetImplementation( actor );
 
@@ -148,7 +145,7 @@ int UtcDaliRelayoutControllerRequestRelayout(void)
   Internal::RelayoutController* controller = Internal::RelayoutController::Get();
   controller->RequestRelayout( actor );
 
-  DALI_TEST_CHECK( actorImpl.IsLayoutDirty() );
+  DALI_TEST_CHECK( !actorImpl.IsLayoutDirty() );
 
   END_TEST;
 }
@@ -470,7 +467,6 @@ int UtcDaliRelayoutControllerRequestRelayoutTree(void)
   TestApplication application;
 
   Actor actor = Actor::New();
-  actor.SetRelayoutEnabled( true );
 
   Internal::Actor& actorImpl = GetImplementation( actor );
 
@@ -483,7 +479,7 @@ int UtcDaliRelayoutControllerRequestRelayoutTree(void)
   // Request default enable (false)
   controller->RequestRelayoutTree( actor );
 
-  DALI_TEST_CHECK( actorImpl.IsLayoutDirty() );
+  DALI_TEST_CHECK( !actorImpl.IsLayoutDirty() );
 
   END_TEST;
 }

@@ -56,13 +56,11 @@ struct TestCustomActor : public CustomActorImpl
    * Constructor
    */
   TestCustomActor()
-  : CustomActorImpl( true ), // requires touch
+  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS | DISABLE_SIZE_NEGOTIATION ) ),
     mDaliProperty( Property::INVALID_INDEX ),
     mSizeSet( Vector3::ZERO ),
     mTargetSize( Vector3::ZERO )
   {
-    SetRequiresMouseWheelEvents(true);
-    SetRequiresHoverEvents(true);
   }
 
   /**
@@ -451,7 +449,7 @@ public:
    * Constructor
    */
   SimpleTestCustomActor()
-  : CustomActorImpl( true ) // requires touch
+  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | DISABLE_SIZE_NEGOTIATION ) )
   {
   }
 

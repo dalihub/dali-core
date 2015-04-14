@@ -2627,7 +2627,6 @@ const PropertyStringIndex PROPERTY_TABLE[] =
   { "position-inheritance",     Actor::Property::POSITION_INHERITANCE,     Property::STRING      },
   { "draw-mode",                Actor::Property::DRAW_MODE,                Property::STRING      },
   { "size-mode-factor",         Actor::Property::SIZE_MODE_FACTOR,         Property::VECTOR3     },
-  { "relayout-enabled",         Actor::Property::RELAYOUT_ENABLED,         Property::BOOLEAN     },
   { "width-resize-policy",      Actor::Property::WIDTH_RESIZE_POLICY,      Property::STRING      },
   { "height-resize-policy",     Actor::Property::HEIGHT_RESIZE_POLICY,     Property::STRING      },
   { "size-scale-policy",        Actor::Property::SIZE_SCALE_POLICY,        Property::STRING      },
@@ -2653,28 +2652,6 @@ int UtcDaliActorProperties(void)
     DALI_TEST_EQUALS( actor.GetPropertyIndex( PROPERTY_TABLE[i].name ), PROPERTY_TABLE[i].index, TEST_LOCATION );
     DALI_TEST_EQUALS( actor.GetPropertyType( PROPERTY_TABLE[i].index ), PROPERTY_TABLE[i].type, TEST_LOCATION );
   }
-  END_TEST;
-}
-
-int UtcDaliRelayoutProperties_RelayoutEnabled(void)
-{
-  TestApplication app;
-
-  Actor actor = Actor::New();
-
-  // Defaults
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::RELAYOUT_ENABLED ).Get< bool >(), false, TEST_LOCATION );
-
-  // Set relayout disabled
-  actor.SetProperty( Actor::Property::RELAYOUT_ENABLED, false );
-
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::RELAYOUT_ENABLED ).Get< bool >(), false, TEST_LOCATION );
-
-  // Set relayout enabled
-  actor.SetProperty( Actor::Property::RELAYOUT_ENABLED, true );
-
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::RELAYOUT_ENABLED ).Get< bool >(), true, TEST_LOCATION );
-
   END_TEST;
 }
 
