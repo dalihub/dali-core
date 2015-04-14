@@ -103,25 +103,10 @@ const SceneGraph::PropertyBuffer* PropertyBuffer::GetPropertyBufferSceneObject()
 
 void PropertyBuffer::SetType( Dali::PropertyBuffer::Type type )
 {
-  DALI_ASSERT_DEBUG( !mTypeSet && "Type of property buffer can only be set once." );
+  DALI_ASSERT_DEBUG( mType == Dali::PropertyBuffer::TYPE_COUNT && "Type can only be set once." );
+  DALI_ASSERT_DEBUG( type != Dali::PropertyBuffer::TYPE_COUNT && "Type must be set to a valid value." );
 
-  switch(type)
-  {
-    case  Dali::PropertyBuffer::STATIC:
-    {
-      mIsAnimatable = false;
-      break;
-    }
-    case  Dali::PropertyBuffer::ANIMATABLE:
-    {
-      mIsAnimatable = true;
-      break;
-    }
-  }
-
-#ifdef DEBUG_ENABLED
-  mTypeSet = true;
-#endif // DEBUG_ENABLED
+  mType = type;
 }
 
 void PropertyBuffer::SetFormat( Dali::Property::Map& format )
@@ -306,11 +291,8 @@ PropertyBuffer::PropertyBuffer()
 : mSceneObject( NULL ),
   mBufferFormat( NULL ),
   mSize( 0 ),
-  mIsAnimatable( false ),
+  mType( Dali::PropertyBuffer::TYPE_COUNT ),
   mOnStage( false )
-#ifdef DEBUG_ENABLED
-  , mTypeSet( false )
-#endif
 {
 }
 
@@ -342,7 +324,7 @@ void PropertyBuffer::FormatChanged()
     // Get the name
     bufferFormat->components[i].name = component.first;
 
-    // Get the size
+    // Get the size ( enums are stored in the map as int )
     Property::Type type = Property::Type( component.second.Get<int>() );
     elementSize += GetPropertyImplementationSize( type );
 
@@ -392,11 +374,6 @@ unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
       size = sizeof( PropertyImplementationType< Property::BOOLEAN >::Type );
       break;
     }
-    case Property::FLOAT:
-    {
-      size = sizeof( PropertyImplementationType< Property::FLOAT >::Type );
-      break;
-    }
     case Property::INTEGER:
     {
       size = sizeof( PropertyImplementationType< Property::INTEGER >::Type );
@@ -405,6 +382,17 @@ unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
     case Property::UNSIGNED_INTEGER:
     {
       size = sizeof( PropertyImplementationType< Property::UNSIGNED_INTEGER >::Type );
+      break;
+    }
+    // TODO : MESH_REWORK : uncoment this code
+//    case Property::UNSIGNED_SHORT:
+//    {
+//      size = sizeof( PropertyImplementationType< Property::UNSIGNED_SHORT >::Type );
+//      break;
+//    }
+    case Property::FLOAT:
+    {
+      size = sizeof( PropertyImplementationType< Property::FLOAT >::Type );
       break;
     }
     case Property::VECTOR2:

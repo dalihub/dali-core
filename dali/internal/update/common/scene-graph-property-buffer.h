@@ -18,8 +18,9 @@
  */
 
 #include <dali/internal/common/buffer-index.h>
-#include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/update/common/double-buffered-property.h>
+#include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>
 
 namespace Dali
@@ -82,22 +83,34 @@ public:
   virtual ~PropertyBuffer();
 
   /**
-   * Set the format of the buffer
+   * @brief Set the format of the buffer
+   *
+   * This function takes ownership of the pointer
+   *
    * @param[in] format The format for the PropertyBuffer
    */
   void SetFormat( PropertyBufferMetadata::Format* format );
 
   /**
-   * Set the data of the PropertyBuffer
+   * @brief Set the data of the PropertyBuffer
+   *
+   * This function takes ownership of the pointer
+   *
+   * @param[in] bufferIndex Index for double buffered values
    * @param[in] data The new data of the PropertyBuffer
    */
-  void SetData( PropertyBufferDataProvider::BufferType* data );
-
-  //TODO:: MESH_REWORK  Remove this, should be a property
-  void SetSize( unsigned int size );
+  void SetData( BufferIndex bufferIndex, PropertyBufferDataProvider::BufferType* data );
 
   /**
-   * Connect the object to the scene graph
+   * @brief Set the number of elements
+   *
+   * @param[in] bufferIndex Index for double buffered values
+   * @param[in] size The number of elements
+   */
+  void SetSize( BufferIndex bufferIndex, unsigned int size );
+
+  /**
+   * @brief Connect the object to the scene graph
    *
    * @param[in] sceneController The scene controller - used for sending messages to render thread
    * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
@@ -105,7 +118,7 @@ public:
   void ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
   /**
-   * Disconnect the object from the scene graph
+   * @brief Disconnect the object from the scene graph
    */
   void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
@@ -161,13 +174,18 @@ public: // PropertyBufferDataProvider
    */
   virtual unsigned int GetGpuBufferId( BufferIndex bufferIndex ) const;
 
+protected: // From PropertyOwner
+  /**
+   * @copydoc Dali::Internal::SceneGraph::PropertyOwner::ResetDefaultProperties()
+   */
+  virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
+
 private:
   OwnerPointer<PropertyBufferMetadata::Format> mFormat; ///< Format of the buffer
-  OwnerPointer<PropertyBufferDataProvider::BufferType> mBufferData; ///< Data
-  PropertyBufferDataProvider::BufferType* mRenderBufferData;
 
-  //TODO: MESH_REWORK should be double buffered property
-  unsigned int mSize; ///< Size of the buffer
+  DoubleBuffered< OwnerPointer<PropertyBufferDataProvider::BufferType> > mBufferData; ///< Data
+
+  DoubleBufferedProperty<unsigned int>  mSize; ///< Number of Elements in the buffer
 };
 
 inline void SetFormatMessage( EventThreadServices& eventThreadServices,
@@ -183,12 +201,11 @@ inline void SetFormatMessage( EventThreadServices& eventThreadServices,
   new (slot) LocalType( &propertyBuffer, &PropertyBuffer::SetFormat, format );
 }
 
-//TODO:: MESH_REWORK  Remove this, should be a property
 inline void SetSizeMessage( EventThreadServices& eventThreadServices,
                             const PropertyBuffer& propertyBuffer,
                             unsigned int size )
 {
-  typedef MessageValue1< PropertyBuffer, unsigned int > LocalType;
+  typedef MessageDoubleBuffered1 < PropertyBuffer, unsigned int > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
@@ -201,7 +218,7 @@ inline void SetDataMessage( EventThreadServices& eventThreadServices,
                             const PropertyBuffer& propertyBuffer,
                             PropertyBuffer::BufferType* data )
 {
-  typedef MessageValue1< PropertyBuffer, OwnerPointer<PropertyBuffer::BufferType> > LocalType;
+  typedef MessageDoubleBuffered1< PropertyBuffer, OwnerPointer<PropertyBuffer::BufferType> > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

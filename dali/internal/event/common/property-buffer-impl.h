@@ -237,18 +237,11 @@ private: // data
 
   Property::Map mFormat;  ///< Format of the property buffer
   const SceneGraph::PropertyBufferMetadata::Format* mBufferFormat;  ///< Metadata for the format of the property buffer
-
-  unsigned int mSize; ///< Size of the buffer
-  bool mIsAnimatable; ///< Flag to know if the property buffer is animatable
-
-  Dali::Vector< char > mBuffer;
+  unsigned int mSize; ///< Number of elements in the buffer
+  Dali::PropertyBuffer::Type mType; ///< Type of propertyBuffer
+  Dali::Vector< char > mBuffer; // Data of the property-buffer
 
   bool mOnStage;  ///< Flag to know if the object is on stage
-
-#ifdef DEBUG_ENABLED
-private:
-  bool mTypeSet; // used to ensure the type doesn't change at runtime
-#endif // DEBUG_ENABLED
 };
 
 /**

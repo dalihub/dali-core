@@ -37,6 +37,37 @@ class PropertyBuffer;
 
 /**
  * @brief PropertyBuffer is a handle to an object that contains a buffer of structured properties
+ *
+ * PropertyBuffers can be used to provide data to Geometry objects.
+ *
+ * Example:
+ *
+ *  const float halfQuadSize = .5f;
+ *  struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
+ *  TexturedQuadVertex texturedQuadVertexData[4] = {
+ *    { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
+ *    { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
+ *    { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
+ *    { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
+ *
+ *  Property::Map texturedQuadVertexFormat;
+ *  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+ *  texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
+ *  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( PropertyBuffer::STATIC, texturedQuadVertexFormat, 4 );
+ *  texturedQuadVertices.SetData(texturedQuadVertexData);
+ *
+ *  // Create indices
+ *  unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+ *  Property::Map indexFormat;
+ *  indexFormat["indices"] = Property::UNSIGNED_INTEGER;
+ *  PropertyBuffer indices = PropertyBuffer::New( PropertyBuffer::STATIC, indexFormat, 6 );
+ *  indices.SetData(indexData);
+ *
+ *  // Create the geometry object
+ *  Geometry texturedQuadGeometry = Geometry::New();
+ *  texturedQuadGeometry.AddVertexBuffer( texturedQuadVertices );
+ *  texturedQuadGeometry.SetIndexBuffer( indices );
+ *
  */
 class DALI_IMPORT_API PropertyBuffer : public Handle
 {
@@ -49,6 +80,7 @@ public:
   {
     STATIC,     ///< The property buffer properties will not be animatable
     ANIMATABLE, ///< The property buffer properties will be animatable
+    TYPE_COUNT, ///< Number of different types
   };
 
   /**

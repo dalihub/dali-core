@@ -250,12 +250,12 @@ void NewRenderer::BindTextures(
 }
 
 void NewRenderer::BindTexture(
-    TextureCache& textureCache,
-    Program& program,
-    ResourceId id,
-    Texture* texture,
-    TextureUnit textureUnit,
-    unsigned int textureUnitUniformIndex )
+  TextureCache& textureCache,
+  Program& program,
+  ResourceId id,
+  Texture* texture,
+  TextureUnit textureUnit,
+  unsigned int textureUnitUniformIndex )
 {
   if( texture != NULL )
   {

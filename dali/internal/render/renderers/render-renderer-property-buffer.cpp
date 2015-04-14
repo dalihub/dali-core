@@ -26,10 +26,13 @@ namespace Internal
 namespace SceneGraph
 {
 
-RenderPropertyBuffer::RenderPropertyBuffer( const PropertyBufferDataProvider& propertyBufferDataProvider, bool isIndexBuffer )
+RenderPropertyBuffer::RenderPropertyBuffer( const PropertyBufferDataProvider& propertyBufferDataProvider,
+                                            GpuBuffer::Target gpuBufferTarget,
+                                            GpuBuffer::Usage gpuBufferUsage )
 : mDataProvider( propertyBufferDataProvider ),
   mGpuBuffer( NULL ),
-  mIsIndexBuffer( isIndexBuffer )
+  mGpuBufferTarget( gpuBufferTarget ),
+  mGpuBufferUsage( gpuBufferUsage )
 {
 }
 
@@ -37,7 +40,7 @@ RenderPropertyBuffer::~RenderPropertyBuffer()
 {
 }
 
-void RenderPropertyBuffer::DoUpload( Context& context, BufferIndex bufferIndex )
+void RenderPropertyBuffer::Upload( Context& context, BufferIndex bufferIndex )
 {
   bool hasGpuBuffer = NULL != mGpuBuffer;
 
@@ -49,30 +52,15 @@ void RenderPropertyBuffer::DoUpload( Context& context, BufferIndex bufferIndex )
 //    mGpuBuffer /*= gpuBufferCache.GetGpuBuffer( gpuBufferId ) */;
     (void )gpuBufferId;
 
-    if( mIsIndexBuffer )
-    {
-      mGpuBuffer = new GpuBuffer( context, GpuBuffer::ELEMENT_ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
-    }
-    else
-    {
-      mGpuBuffer = new GpuBuffer( context, GpuBuffer::ARRAY_BUFFER, GpuBuffer::STATIC_DRAW );
-    }
+    mGpuBuffer = new GpuBuffer( context, mGpuBufferTarget, mGpuBufferUsage );
   }
 
   // Update the GpuBuffer
   if ( ! hasGpuBuffer || mDataProvider.HasDataChanged( bufferIndex ) )
   {
-    if( mIsIndexBuffer )
-    {
-      unsigned int dataSize = mDataProvider.GetDataSize( bufferIndex );
-      mGpuBuffer->UpdateDataBuffer( dataSize, &(mDataProvider.GetData( bufferIndex )[0]) );
-    }
-    else
-    {
-      std::size_t dataSize = mDataProvider.GetDataSize( bufferIndex );
-      mGpuBuffer->UpdateDataBuffer( dataSize, &(mDataProvider.GetData( bufferIndex )[0]) );
-      mGpuBuffer->SetStride( mDataProvider.GetElementSize( bufferIndex ) );
-    }
+    std::size_t dataSize = mDataProvider.GetDataSize( bufferIndex );
+    mGpuBuffer->UpdateDataBuffer( dataSize, &(mDataProvider.GetData( bufferIndex )[0]) );
+    mGpuBuffer->SetStride( mDataProvider.GetElementSize( bufferIndex ) );
   }
 }
 

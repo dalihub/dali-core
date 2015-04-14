@@ -115,9 +115,9 @@ public:
   virtual unsigned int GetElementCount( BufferIndex bufferIndex ) const = 0;
 
   /**
-   * Get if of the GPU buffer associated with this propertyBuffer
+   * Get Id of the GPU buffer associated with this propertyBuffer
    * @param[in] bufferIndex Index to access double buffered values
-   * @return the element size in bytes
+   * @return the Id
    */
   virtual unsigned int GetGpuBufferId( BufferIndex bufferIndex ) const = 0;
 

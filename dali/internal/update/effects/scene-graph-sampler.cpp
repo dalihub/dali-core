@@ -59,8 +59,8 @@ void Sampler::SetTexture( BufferIndex bufferIndex, Integration::ResourceId textu
 
 void Sampler::SetFilterMode( BufferIndex bufferIndex, FilterMode minFilter, FilterMode magFilter )
 {
-  mMinFilter[bufferIndex] = minFilter;
-  mMagFilter[bufferIndex] = magFilter;
+  mMinFilter.Set(bufferIndex, minFilter);
+  mMagFilter.Set(bufferIndex, magFilter);
 }
 
 void Sampler::SetWrapMode( BufferIndex bufferIndex, WrapMode uWrap, WrapMode vWrap )

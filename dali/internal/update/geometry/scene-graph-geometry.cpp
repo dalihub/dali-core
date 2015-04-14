@@ -53,9 +53,10 @@ void Geometry::RemoveVertexBuffer( PropertyBuffer* vertexBuffer )
   DALI_ASSERT_DEBUG( NULL != vertexBuffer );
 
   // Find the object and destroy it
-  Vector<PropertyBuffer*>::Iterator match = std::find( mVertexBuffers.Begin(),
-                                                       mVertexBuffers.End(),
-                                                       vertexBuffer );
+  Vector<PropertyBuffer*>::Iterator match = std::find(
+    mVertexBuffers.Begin(),
+    mVertexBuffers.End(),
+    vertexBuffer );
 
   DALI_ASSERT_DEBUG( mVertexBuffers.End() != match );
   if( mVertexBuffers.End() != match )
@@ -89,7 +90,7 @@ void Geometry::ClearIndexBuffer()
 
 void Geometry::SetGeometryType( BufferIndex bufferIndex, Geometry::GeometryType geometryType )
 {
-  mGeometryType[bufferIndex] = geometryType;
+  mGeometryType.Set( bufferIndex, geometryType);
 }
 
 Vector<PropertyBuffer*>& Geometry::GetVertexBuffers()

@@ -22,6 +22,7 @@
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/render/data-providers/property-buffer-data-provider.h>
+#include <dali/internal/render/gl-resources/gpu-buffer.h>
 
 namespace Dali
 {
@@ -29,7 +30,6 @@ namespace Internal
 {
 class Context;
 class Program;
-class GpuBuffer;
 
 namespace SceneGraph
 {
@@ -47,8 +47,12 @@ public:
   /**
    * Constructor. Creates a render geometry object with no GPU buffers.
    * @param[in] propertyBufferDataProvider The property-buffer  data provider (to fetch geometry from)
+   * @param[in] gpuBufferTarget Type of target for the gpu-buffer
+   * @param[in] gpuBufferUsage Type of target for the gpu-buffer
    */
-  RenderPropertyBuffer( const PropertyBufferDataProvider& propertyBufferDataProvider, bool isIndexBuffer );
+  RenderPropertyBuffer( const PropertyBufferDataProvider& propertyBufferDataProvider,
+                        GpuBuffer::Target gpuBufferTarget,
+                        GpuBuffer::Usage gpuBufferUsage );
 
   /**
    * Destructor
@@ -60,7 +64,7 @@ public:
    * @param[in] context The GL context
    * @param[in] bufferIndex The current buffer index
    */
-  void DoUpload( Context& context, BufferIndex bufferIndex );
+  void Upload( Context& context, BufferIndex bufferIndex );
 
   /**
    * Bind the geometry buffers
@@ -100,9 +104,10 @@ private: // implementation
 private:
   const PropertyBufferDataProvider& mDataProvider;  ///< Data provider used by this property buffer
   Vector<GLint> mAttributesLocation;                ///< Location of the attributes for the property buffer in this renderer.
-  GpuBuffer* mGpuBuffer;                            ///< Pointer to the GpuBuffer associated with this RenderPropertyBuffer
 
-  bool mIsIndexBuffer;
+  GpuBuffer* mGpuBuffer;                            ///< Pointer to the GpuBuffer associated with this RenderPropertyBuffer
+  GpuBuffer::Target mGpuBufferTarget;               ///< The type of GPU buffer to create
+  GpuBuffer::Usage mGpuBufferUsage;                 ///< The type of usage the  GPU buffer will have
 };
 
 } // namespace SceneGraph

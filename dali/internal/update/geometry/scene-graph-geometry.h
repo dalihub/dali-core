@@ -28,6 +28,7 @@
 #include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
 #include <dali/internal/render/data-providers/geometry-data-provider.h>
+#include <dali/internal/render/data-providers/render-data-provider.h>
 
 namespace Dali
 {
@@ -80,6 +81,7 @@ public:
 
   /**
    * Set the type of geometry to draw (Points, Lines, Triangles, etc)
+   * @param[in] bufferIndex Index for double buffered values
    * @param[in] geometryType The geometry type
    */
   void SetGeometryType( BufferIndex bufferIndex, GeometryType geometryType );
@@ -130,12 +132,14 @@ public: // UniformMap::Observer
 public: // GeometryDataProvider
   /**
    * Get the type of geometry to draw
+   * @param[in] bufferIndex Index for double buffered values
    */
   virtual GeometryType GetGeometryType( BufferIndex bufferIndex ) const;
 
   /**
    * Returns true if this geometry requires depth testing, e.g. if it is
    * a set of vertices with z != 0
+   * @param[in] bufferIndex Index for double buffered values
    */
   virtual bool GetRequiresDepthTesting( BufferIndex bufferIndex ) const;
 

@@ -42,7 +42,7 @@ unsigned int Format::GetElementSize() const
 
 
 PropertyBuffer::PropertyBuffer()
-: mRenderBufferData( NULL ),
+: mBufferData(NULL),
   mSize(0u)
 {
 }
@@ -56,18 +56,14 @@ void PropertyBuffer::SetFormat( PropertyBufferMetadata::Format* format )
   mFormat = format;
 }
 
-//TODO:: MESH_REWORK  Remove this, should be a property
-void PropertyBuffer::SetSize( unsigned int size )
+void PropertyBuffer::SetSize( BufferIndex bufferIndex, unsigned int size )
 {
-  mSize = size;
+  mSize.Set(bufferIndex, size);
 }
 
-void PropertyBuffer::SetData( PropertyBufferDataProvider::BufferType* data )
+void PropertyBuffer::SetData(  BufferIndex bufferIndex, PropertyBufferDataProvider::BufferType* data )
 {
-  mBufferData = data;
-
-  // TODO: MESH_REWORK FIX THIS, should go through aging or message
-  mRenderBufferData = data;
+  mBufferData[bufferIndex] = data;
 }
 
 void PropertyBuffer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
@@ -127,18 +123,16 @@ size_t PropertyBuffer::GetAttributeOffset( BufferIndex bufferIndex, unsigned int
 
 const PropertyBufferDataProvider::BufferType& PropertyBuffer::GetData( BufferIndex bufferIndex ) const
 {
-  DALI_ASSERT_DEBUG( mRenderBufferData && "Should have some data.");
+  DALI_ASSERT_DEBUG( mBufferData[bufferIndex] && "Should have some data.");
 
-  //TODO: MESH_REWORK Should check the correct buffer index
-  return *mRenderBufferData;
+  return *mBufferData[bufferIndex];
 }
 
 std::size_t PropertyBuffer::GetDataSize( BufferIndex bufferIndex ) const
 {
   DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
 
-  //TODO: MESH_REWORK mSize should be double buffered
-  return mFormat->GetElementSize() * mSize;
+  return mFormat->GetElementSize() * mSize[ bufferIndex ];
 }
 
 std::size_t PropertyBuffer::GetElementSize( BufferIndex bufferIndex ) const
@@ -148,7 +142,7 @@ std::size_t PropertyBuffer::GetElementSize( BufferIndex bufferIndex ) const
 
 unsigned int PropertyBuffer::GetElementCount( BufferIndex bufferIndex ) const
 {
-  return mSize;
+  return mSize[bufferIndex];
 }
 
 unsigned int PropertyBuffer::GetGpuBufferId( BufferIndex bufferIndex ) const
@@ -159,6 +153,14 @@ unsigned int PropertyBuffer::GetGpuBufferId( BufferIndex bufferIndex ) const
   return 0;
 }
 
+void PropertyBuffer::ResetDefaultProperties( BufferIndex updateBufferIndex )
+{
+  // Age the double buffered properties
+  mSize.CopyPrevious(updateBufferIndex);
+
+  // Update double buffered value
+  mBufferData.CopyPrevious(updateBufferIndex);
+}
 
 } // namespace SceneGraph
 } // namespace Internal
