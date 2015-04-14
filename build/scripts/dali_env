@@ -32,6 +32,7 @@ use Pod::Usage;
 # this script will attempt to install them for you.
 my @system_packages = (
     "automake",
+    "cmake",
     "g++",
     "pkg-config",
     "libtool",
