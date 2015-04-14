@@ -2688,10 +2688,10 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), "FIXED", TEST_LOCATION );
 
   // Set resize policy for all dimensions
-  actor.SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i)
+  actor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i)
   {
-    DALI_TEST_EQUALS( actor.GetResizePolicy( static_cast< Dimension >( 1 << i ) ), USE_NATURAL_SIZE, TEST_LOCATION );
+    DALI_TEST_EQUALS( actor.GetResizePolicy( static_cast< Dimension::Type >( 1 << i ) ), ResizePolicy::USE_NATURAL_SIZE, TEST_LOCATION );
   }
 
   // Set individual dimensions

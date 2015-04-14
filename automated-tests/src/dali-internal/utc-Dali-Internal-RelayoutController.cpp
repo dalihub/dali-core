@@ -55,8 +55,8 @@ void CheckResults( Actor root )
 
   Internal::Actor& rootImpl = GetImplementation( root );
 
-  DALI_TEST_CHECK( rootImpl.IsLayoutDirty( WIDTH ) == expectedWidthDirty );
-  DALI_TEST_CHECK( rootImpl.IsLayoutDirty( HEIGHT ) == expectedHeightDirty );
+  DALI_TEST_CHECK( rootImpl.IsLayoutDirty( Dimension::WIDTH ) == expectedWidthDirty );
+  DALI_TEST_CHECK( rootImpl.IsLayoutDirty( Dimension::HEIGHT ) == expectedHeightDirty );
 
   for( unsigned int i = 0, numChildren = root.GetChildCount(); i < numChildren; ++i )
   {
@@ -71,14 +71,14 @@ void CheckResults( Actor root )
  *
  * @return Return the new actor
  */
-Actor NewRelayoutActor( bool expectedWidthDirty, bool expectedHeightDirty, ResizePolicy widthPolicy, ResizePolicy heightPolicy )
+Actor NewRelayoutActor( bool expectedWidthDirty, bool expectedHeightDirty, ResizePolicy::Type widthPolicy, ResizePolicy::Type heightPolicy )
 {
   Actor actor = Actor::New();
 
   actor.SetRelayoutEnabled( true );
 
-  actor.SetResizePolicy( widthPolicy, WIDTH );
-  actor.SetResizePolicy( heightPolicy, HEIGHT );
+  actor.SetResizePolicy( widthPolicy, Dimension::WIDTH );
+  actor.SetResizePolicy( heightPolicy, Dimension::HEIGHT );
 
   // Expected results for this actor
   actor.RegisterProperty( EXPECTED_WIDTH_DIRTY, expectedWidthDirty, Property::READ_WRITE );
@@ -92,7 +92,7 @@ Actor NewRelayoutActor( bool expectedWidthDirty, bool expectedHeightDirty, Resiz
  *
  * @return Return the new actor
  */
-Actor NewRelayoutRootActor( bool requestWidth, bool requestHeight, bool expectedWidthDirty, bool expectedHeightDirty, ResizePolicy widthPolicy, ResizePolicy heightPolicy )
+Actor NewRelayoutRootActor( bool requestWidth, bool requestHeight, bool expectedWidthDirty, bool expectedHeightDirty, ResizePolicy::Type widthPolicy, ResizePolicy::Type heightPolicy )
 {
   Actor actor = NewRelayoutActor( expectedWidthDirty, expectedHeightDirty, widthPolicy, heightPolicy );
 
@@ -115,7 +115,7 @@ void TestTree( TestApplication& application, Actor root, Actor entryPoint = Acto
   const bool widthRequest = root.GetProperty( root.GetPropertyIndex( REQUEST_WIDTH ) ).Get< bool >();
   const bool heightRequest = root.GetProperty( root.GetPropertyIndex( REQUEST_HEIGHT ) ).Get< bool >();
 
-  const Dimension dimensions = Dimension( ( ( widthRequest ) ? WIDTH : 0 ) | ( ( heightRequest ) ? HEIGHT : 0 ) );
+  const Dimension::Type dimensions = Dimension::Type( ( ( widthRequest ) ? Dimension::WIDTH : 0 ) | ( ( heightRequest ) ? Dimension::HEIGHT : 0 ) );
 
   controller->RequestRelayout( ( entryPoint ) ? entryPoint : root, dimensions );
 
@@ -158,7 +158,7 @@ int UtcDaliRelayoutController_Relayout_SingleActor(void)
   TestApplication application;
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, FIXED, FIXED );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::FIXED, ResizePolicy::FIXED );
 
   TestTree( application, parent );
 
@@ -173,10 +173,10 @@ int UtcDaliRelayoutController_Relayout_FixedParent(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, FIXED, FIXED );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::FIXED, ResizePolicy::FIXED );
 
   // Add a child
-  Actor child = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor child = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   parent.Add( child );
 
   TestTree( application, parent );
@@ -192,10 +192,10 @@ int UtcDaliRelayoutController_Relayout_NaturalParent(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, USE_NATURAL_SIZE, USE_NATURAL_SIZE );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::USE_NATURAL_SIZE, ResizePolicy::USE_NATURAL_SIZE );
 
   // Add a child
-  Actor child = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor child = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   parent.Add( child );
 
   // Run the test
@@ -212,10 +212,10 @@ int UtcDaliRelayoutController_Relayout_FillParent(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, FILL_TO_PARENT, FILL_TO_PARENT );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::FILL_TO_PARENT, ResizePolicy::FILL_TO_PARENT );
 
   // Add a child
-  Actor child = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor child = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   parent.Add( child );
 
   // Run the test
@@ -232,10 +232,10 @@ int UtcDaliRelayoutController_Relayout_FitParent(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, FIT_TO_CHILDREN, FIT_TO_CHILDREN );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::FIT_TO_CHILDREN, ResizePolicy::FIT_TO_CHILDREN );
 
   // Add a child
-  Actor child = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor child = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   parent.Add( child );
 
   // Run the test
@@ -252,10 +252,10 @@ int UtcDaliRelayoutController_Relayout_DepParent1(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, DIMENSION_DEPENDENCY, FIT_TO_CHILDREN );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::DIMENSION_DEPENDENCY, ResizePolicy::FIT_TO_CHILDREN );
 
   // Add a child
-  Actor child = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor child = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   parent.Add( child );
 
   // Run the test
@@ -272,9 +272,9 @@ int UtcDaliRelayoutController_Relayout_DepParent2(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, FIT_TO_CHILDREN, DIMENSION_DEPENDENCY );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::FIT_TO_CHILDREN, ResizePolicy::DIMENSION_DEPENDENCY );
 
-  Actor child = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor child = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   parent.Add( child );
 
 
@@ -292,10 +292,10 @@ int UtcDaliRelayoutController_Relayout_Child1(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, FIT_TO_CHILDREN, FIT_TO_CHILDREN );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::FIT_TO_CHILDREN, ResizePolicy::FIT_TO_CHILDREN );
 
   // Add a child
-  Actor child = NewRelayoutActor( true, true, FIXED, FIXED );
+  Actor child = NewRelayoutActor( true, true, ResizePolicy::FIXED, ResizePolicy::FIXED );
   parent.Add( child );
 
   // Run the test
@@ -312,10 +312,10 @@ int UtcDaliRelayoutController_Relayout_Child2(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, false, false, FIXED, FIXED );
+  Actor parent = NewRelayoutRootActor( true, true, false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
 
   // Add a child
-  Actor child = NewRelayoutActor( true, true, FIXED, FIXED );
+  Actor child = NewRelayoutActor( true, true, ResizePolicy::FIXED, ResizePolicy::FIXED );
   parent.Add( child );
 
   // Run the test
@@ -332,30 +332,30 @@ int UtcDaliRelayoutController_Relayout_Complex1(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, true, true, FIXED, FIXED );
+  Actor parent = NewRelayoutRootActor( true, true, true, true, ResizePolicy::FIXED, ResizePolicy::FIXED );
 
   // Add children
-  Actor child1 = NewRelayoutActor( true, false, FILL_TO_PARENT, FIXED );
+  Actor child1 = NewRelayoutActor( true, false, ResizePolicy::FILL_TO_PARENT, ResizePolicy::FIXED );
   parent.Add( child1 );
 
-  Actor child2 = NewRelayoutActor( false, true, FIXED, FILL_TO_PARENT );
+  Actor child2 = NewRelayoutActor( false, true, ResizePolicy::FIXED, ResizePolicy::FILL_TO_PARENT );
   parent.Add( child2 );
 
-  Actor child3 = NewRelayoutActor( false, false, USE_NATURAL_SIZE, FIXED );
+  Actor child3 = NewRelayoutActor( false, false, ResizePolicy::USE_NATURAL_SIZE, ResizePolicy::FIXED );
   parent.Add( child3 );
 
   // Grand children 1
-  Actor grandChild1_1 = NewRelayoutActor( true, false, FILL_TO_PARENT, FIXED );
+  Actor grandChild1_1 = NewRelayoutActor( true, false, ResizePolicy::FILL_TO_PARENT, ResizePolicy::FIXED );
   child1.Add( grandChild1_1 );
 
-  Actor grandChild1_2 = NewRelayoutActor( false, false, FIXED, FILL_TO_PARENT );
+  Actor grandChild1_2 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FILL_TO_PARENT );
   child1.Add( grandChild1_2 );
 
   // Grand children 2
-  Actor grandChild2_1 = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor grandChild2_1 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   child2.Add( grandChild2_1 );
 
-  Actor grandChild2_2 = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor grandChild2_2 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   child2.Add( grandChild2_2 );
 
   // Run the test
@@ -372,30 +372,30 @@ int UtcDaliRelayoutController_Relayout_Complex2(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, false, true, false, FIXED, FIXED );
+  Actor parent = NewRelayoutRootActor( true, false, true, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
 
   // Add children
-  Actor child1 = NewRelayoutActor( true, false, FILL_TO_PARENT, FIXED );
+  Actor child1 = NewRelayoutActor( true, false, ResizePolicy::FILL_TO_PARENT, ResizePolicy::FIXED );
   parent.Add( child1 );
 
-  Actor child2 = NewRelayoutActor( false, false, FIXED, FILL_TO_PARENT );
+  Actor child2 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FILL_TO_PARENT );
   parent.Add( child2 );
 
-  Actor child3 = NewRelayoutActor( false, false, USE_NATURAL_SIZE, FIXED );
+  Actor child3 = NewRelayoutActor( false, false, ResizePolicy::USE_NATURAL_SIZE, ResizePolicy::FIXED );
   parent.Add( child3 );
 
   // Grand children 1
-  Actor grandChild1_1 = NewRelayoutActor( true, false, FILL_TO_PARENT, FIXED );
+  Actor grandChild1_1 = NewRelayoutActor( true, false, ResizePolicy::FILL_TO_PARENT, ResizePolicy::FIXED );
   child1.Add( grandChild1_1 );
 
-  Actor grandChild1_2 = NewRelayoutActor( false, false, FIXED, FILL_TO_PARENT );
+  Actor grandChild1_2 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FILL_TO_PARENT );
   child1.Add( grandChild1_2 );
 
   // Grand children 2
-  Actor grandChild2_1 = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor grandChild2_1 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   child2.Add( grandChild2_1 );
 
-  Actor grandChild2_2 = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor grandChild2_2 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   child2.Add( grandChild2_2 );
 
   // Run the test
@@ -412,30 +412,30 @@ int UtcDaliRelayoutController_Relayout_Complex3(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( false, true, false, true, FIXED, FIXED );
+  Actor parent = NewRelayoutRootActor( false, true, false, true, ResizePolicy::FIXED, ResizePolicy::FIXED );
 
   // Add children
-  Actor child1 = NewRelayoutActor( false, false, FILL_TO_PARENT, FIXED );
+  Actor child1 = NewRelayoutActor( false, false, ResizePolicy::FILL_TO_PARENT, ResizePolicy::FIXED );
   parent.Add( child1 );
 
-  Actor child2 = NewRelayoutActor( false, true, FIXED, FILL_TO_PARENT );
+  Actor child2 = NewRelayoutActor( false, true, ResizePolicy::FIXED, ResizePolicy::FILL_TO_PARENT );
   parent.Add( child2 );
 
-  Actor child3 = NewRelayoutActor( false, false, USE_NATURAL_SIZE, FIXED );
+  Actor child3 = NewRelayoutActor( false, false, ResizePolicy::USE_NATURAL_SIZE, ResizePolicy::FIXED );
   parent.Add( child3 );
 
   // Grand children 1
-  Actor grandChild1_1 = NewRelayoutActor( false, false, FILL_TO_PARENT, FIXED );
+  Actor grandChild1_1 = NewRelayoutActor( false, false, ResizePolicy::FILL_TO_PARENT, ResizePolicy::FIXED );
   child1.Add( grandChild1_1 );
 
-  Actor grandChild1_2 = NewRelayoutActor( false, false, FIXED, FILL_TO_PARENT );
+  Actor grandChild1_2 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FILL_TO_PARENT );
   child1.Add( grandChild1_2 );
 
   // Grand children 2
-  Actor grandChild2_1 = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor grandChild2_1 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   child2.Add( grandChild2_1 );
 
-  Actor grandChild2_2 = NewRelayoutActor( false, false, FIXED, FIXED );
+  Actor grandChild2_2 = NewRelayoutActor( false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
   child2.Add( grandChild2_2 );
 
   // Run the test
@@ -452,11 +452,11 @@ int UtcDaliRelayoutController_Relayout_Dependency(void)
   controller->SetEnabled( false );
 
   // Construct scene
-  Actor parent = NewRelayoutRootActor( true, true, false, false, FIXED, FIXED );
+  Actor parent = NewRelayoutRootActor( true, true, false, false, ResizePolicy::FIXED, ResizePolicy::FIXED );
 
   // Add a child
-  Actor child = NewRelayoutActor( true, true, FILL_TO_PARENT, FIXED );
-  child.SetResizePolicy( DIMENSION_DEPENDENCY, HEIGHT );
+  Actor child = NewRelayoutActor( true, true, ResizePolicy::FILL_TO_PARENT, ResizePolicy::FIXED );
+  child.SetResizePolicy( ResizePolicy::DIMENSION_DEPENDENCY, Dimension::HEIGHT );
   parent.Add( child );
 
   // Run the test

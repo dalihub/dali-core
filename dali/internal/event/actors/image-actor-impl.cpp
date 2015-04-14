@@ -103,7 +103,7 @@ ImageActorPtr ImageActor::New()
 
 void ImageActor::OnInitialize()
 {
-  SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
+  SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 }
 
 void ImageActor::SetImage( ImagePtr& image )
