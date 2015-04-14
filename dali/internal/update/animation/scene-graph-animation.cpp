@@ -57,8 +57,6 @@ Animation::~Animation()
 
 void Animation::SetDuration(float durationSeconds)
 {
-  DALI_ASSERT_DEBUG(durationSeconds > 0.0f);
-
   mDurationSeconds = durationSeconds;
 }
 
