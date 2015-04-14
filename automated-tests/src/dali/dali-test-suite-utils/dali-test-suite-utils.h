@@ -140,13 +140,13 @@ inline bool CompareType<Quaternion>(Quaternion q1, Quaternion q2, float epsilon)
 template <>
 inline bool CompareType<Radian>(Radian q1, Radian q2, float epsilon)
 {
-  return CompareType<float>(float(q1), float(q2), epsilon);
+  return CompareType<float>(q1.radian, q2.radian, epsilon);
 }
 
 template <>
 inline bool CompareType<Degree>(Degree q1, Degree q2, float epsilon)
 {
-  return CompareType<float>(float(q1), float(q2), epsilon);
+  return CompareType<float>(q1.degree, q2.degree, epsilon);
 }
 
 bool operator==(TimePeriod a, TimePeriod b);

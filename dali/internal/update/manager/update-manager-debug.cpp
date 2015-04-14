@@ -54,9 +54,8 @@ void PrintNodes( const Node& node, BufferIndex updateBufferIndex, int level )
   const Vector3& fullPos = node.GetWorldPosition(updateBufferIndex);
   const Quaternion& rotation = node.GetOrientation(updateBufferIndex);
   Vector3 axis;
-  float angle;
+  Radian angle;
   rotation.ToAxisAngle(axis, angle);
-  angle = angle * 180.0f / Math::PI;
 
   std::string nodeName= DALI_LOG_GET_OBJECT_STRING((&node));
 
@@ -68,9 +67,9 @@ void PrintNodes( const Node& node, BufferIndex updateBufferIndex, int level )
     oss << std::setprecision(2) << std::setiosflags(mask)
         << std::setw(level*2) << std::setfill(' ') << "";
     oss << "Node "  << nodeName << " " << &node
-        << "  Pos (" << position.x << ", " << position.y << ", " << position.z << ")"
-        << "  FullPos (" << fullPos.x << ", " << fullPos.y << ", " << fullPos.z << ")"
-        << "  Rot (" << angle << "deg <" << axis.x << ", " << axis.y << ", " << axis.z << ">)"
+        << "  Position (" << position.x << ", " << position.y << ", " << position.z << ")"
+        << "  WorldPosition (" << fullPos.x << ", " << fullPos.y << ", " << fullPos.z << ")"
+        << "  Orientation (" << Degree(angle).degree << "degrees <" << axis.x << ", " << axis.y << ", " << axis.z << ">)"
         << "  Scale (" << scale.x << ", " << scale.y << ", " << scale.z << ")"
         << std::endl;
 

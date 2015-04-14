@@ -21,10 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/time-period.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/degree.h>
-#include <dali/public-api/math/radian.h>
-#include <dali/public-api/math/vector2.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>

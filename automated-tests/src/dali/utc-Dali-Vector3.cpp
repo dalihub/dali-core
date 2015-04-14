@@ -487,7 +487,7 @@ int UtcDaliVector3Rotate(void)
   TestApplication application;
 
   Vector3 vec3(Vector3::YAXIS);
-  Quaternion rotation(Math::PI_2, Vector3::ZAXIS);
+  Quaternion rotation( Dali::ANGLE_90, Vector3::ZAXIS );
   Vector3 result(-Vector3::XAXIS);
   vec3 *= rotation;
   DALI_TEST_EQUALS( vec3, result, 0.001, TEST_LOCATION );

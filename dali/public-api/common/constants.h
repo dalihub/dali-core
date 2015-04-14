@@ -24,7 +24,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/math/radian.h>
 
 namespace Dali
 {
@@ -117,9 +116,11 @@ DALI_IMPORT_API extern const float MACHINE_EPSILON_1000;   ///< Epsilon for valu
 DALI_IMPORT_API extern const float MACHINE_EPSILON_10000;  ///< Epsilon for values near 10000
 
 // float is preferred to double for performance on ARM targets
-static const float PI   = static_cast<float>(M_PI);   ///< Constant representing PI
-static const float PI_2 = static_cast<float>(M_PI_2); ///< Constant representing PI/2
-static const float PI_4 = static_cast<float>(M_PI_4); ///< Constant representing PI/4
+static const float PI   = static_cast<float>(M_PI);       ///< Constant representing PI
+static const float PI_2 = static_cast<float>(M_PI_2);     ///< Constant representing PI/2
+static const float PI_4 = static_cast<float>(M_PI_4);     ///< Constant representing PI/4
+static const float PI_OVER_180 = Dali::Math::PI/180.0f;   ///< Constant used to convert degree to radian
+static const float ONE80_OVER_PI = 180.0f/Dali::Math::PI; ///< Constant used to convert radian to degree
 
 } // namespace Math
 

@@ -521,12 +521,12 @@ bool PanGestureProcessor::CheckGestureDetector( GestureDetector* detector, Actor
         if ( displacement.y >= 0.0f )
         {
           // Quadrant 2
-          angle += Math::PI;
+          angle.radian += Math::PI;
         }
         else
         {
           // Quadrant 3
-          angle -= Math::PI;
+          angle.radian -= Math::PI;
         }
       }
 

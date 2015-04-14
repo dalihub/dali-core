@@ -93,8 +93,8 @@ inline void Interpolate (Quaternion& result, const Quaternion& a, const Quaterni
 
 inline void Interpolate (AngleAxis& result, const AngleAxis& a, const AngleAxis& b, float progress)
 {
-  Quaternion q1(Radian(a.angle), a.axis);
-  Quaternion q2(Radian(b.angle), b.axis);
+  Quaternion q1(a.angle, a.axis);
+  Quaternion q2(b.angle, b.axis);
 
   Quaternion iq = Quaternion::Slerp(q1, q2, progress);
   iq.ToAxisAngle(result.axis, result.angle);
