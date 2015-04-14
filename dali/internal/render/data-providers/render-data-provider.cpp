@@ -24,22 +24,12 @@ namespace Internal
 namespace SceneGraph
 {
 
-RenderDataProvider::RenderDataProvider(
-  const GeometryDataProvider&   geometryDataProvider,
-  const MaterialDataProvider&   materialDataProvider,
-  const UniformMapDataProvider& uniformMapDataProvider,
-  Shader&                       shader,
-  const PropertyBufferDataProvider* indexBuffer,
-  const VertexBuffers&          vertexBuffers,
-  const Samplers&               samplers )
-
-: mGeometryDataProvider( &geometryDataProvider ),
-  mMaterialDataProvider( &materialDataProvider ),
-  mUniformMapDataProvider( &uniformMapDataProvider ),
-  mShader( &shader ),
-  mIndexBuffer( indexBuffer ),
-  mVertexBuffers( vertexBuffers ),
-  mSamplers( samplers )
+RenderDataProvider::RenderDataProvider()
+: mGeometryDataProvider( NULL ),
+  mMaterialDataProvider( NULL ),
+  mUniformMapDataProvider( NULL ),
+  mShader( NULL ),
+  mIndexBuffer( NULL )
 {
 }
 

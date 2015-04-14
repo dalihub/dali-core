@@ -103,13 +103,7 @@ void RendererAttachment::ConnectedToSceneGraph()
 
   DALI_ASSERT_DEBUG( mParent != NULL );
 
-  RenderDataProvider* dataProvider = new RenderDataProvider( *mGeometry,
-                                                             *mMaterial,
-                                                             *this,
-                                                             *mMaterial->GetShader(),
-                                                             mGeometry->GetIndexBuffer(),
-                                                             mGeometry->GetVertexBuffers(),
-                                                             mMaterial->GetSamplers() );
+  RenderDataProvider* dataProvider = NewRenderDataProvider();
 
   mRenderer = NewRenderer::New( *mParent, dataProvider );
   mSceneController->GetRenderMessageDispatcher().AddRenderer( *mRenderer );
@@ -125,34 +119,34 @@ void RendererAttachment::DisconnectedFromSceneGraph()
   mRenderer = NULL;
 }
 
-void RendererAttachment::SetMaterial( BufferIndex updateBufferIndex, const Material* material)
+void RendererAttachment::SetMaterial( BufferIndex updateBufferIndex, Material* material)
 {
   DALI_ASSERT_DEBUG( material != NULL && "Material pointer is NULL" );
 
-  mMaterial = const_cast<Material*>(material); // Need this to be non-const to add observer only.
+  mMaterial = material;
   mMaterial->AddConnectionObserver( *this );
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
   mResendDataProviders = true;
 }
 
-const Material& RendererAttachment::GetMaterial() const
+Material& RendererAttachment::GetMaterial()
 {
   return *mMaterial;
 }
 
-void RendererAttachment::SetGeometry( BufferIndex updateBufferIndex, const Geometry* geometry)
+void RendererAttachment::SetGeometry( BufferIndex updateBufferIndex, Geometry* geometry)
 {
   DALI_ASSERT_DEBUG( geometry != NULL && "Geometry pointer is NULL");
 
-  mGeometry = const_cast<Geometry*>(geometry); // Need this to be non-const to add observer only
+  mGeometry = geometry;
   mGeometry->AddConnectionObserver( *this ); // Observe geometry connections / uniform mapping changes
   mRegenerateUniformMap = REGENERATE_UNIFORM_MAP;
 
   mResendDataProviders = true;
 }
 
-const Geometry& RendererAttachment::GetGeometry() const
+Geometry& RendererAttachment::GetGeometry()
 {
   return *mGeometry;
 }
@@ -199,12 +193,12 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
       AddMappings( localMap, actorUniformMap );
 
       AddMappings( localMap, mMaterial->GetUniformMap() );
-      const RenderDataProvider::Samplers& samplers = mMaterial->GetSamplers();
-      for( RenderDataProvider::Samplers::ConstIterator iter = samplers.Begin(), end = samplers.End();
+      Vector<Sampler*>& samplers = mMaterial->GetSamplers();
+      for( Vector<Sampler*>::ConstIterator iter = samplers.Begin(), end = samplers.End();
            iter != end ;
            ++iter )
       {
-        const SceneGraph::Sampler* sampler = static_cast<const SceneGraph::Sampler*>( *iter );
+        const SceneGraph::Sampler* sampler = (*iter);
         AddMappings( localMap, sampler->GetUniformMap() );
       }
 
@@ -212,13 +206,19 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
 
       AddMappings( localMap, mGeometry->GetUniformMap() );
 
-      const GeometryDataProvider::VertexBuffers& vertexBuffers = mGeometry->GetVertexBuffers();
-      for( GeometryDataProvider::VertexBuffers::ConstIterator iter = vertexBuffers.Begin(), end = vertexBuffers.End() ;
+      Vector<PropertyBuffer*>& vertexBuffers = mGeometry->GetVertexBuffers();
+      for( Vector<PropertyBuffer*>::ConstIterator iter = vertexBuffers.Begin(), end = vertexBuffers.End() ;
            iter != end ;
            ++iter )
       {
-        const SceneGraph::PropertyBuffer* vertexBuffer = static_cast<const SceneGraph::PropertyBuffer*>( *iter );
+        const SceneGraph::PropertyBuffer* vertexBuffer = *iter;
         AddMappings( localMap, vertexBuffer->GetUniformMap() );
+      }
+
+      PropertyBuffer* indexBuffer = mGeometry->GetIndexBuffer();
+      if( indexBuffer )
+      {
+        AddMappings( localMap, indexBuffer->GetUniformMap() );
       }
 
       mUniformMapChanged[updateBufferIndex] = true;
@@ -245,13 +245,7 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
 
   if( mResendDataProviders )
   {
-    RenderDataProvider* dataProvider = new RenderDataProvider( *mGeometry,
-                                                               *mMaterial,
-                                                               *this,
-                                                               *mMaterial->GetShader(),
-                                                               mGeometry->GetIndexBuffer(),
-                                                               mGeometry->GetVertexBuffers(),
-                                                               mMaterial->GetSamplers() );
+    RenderDataProvider* dataProvider = NewRenderDataProvider();
 
     // Tell renderer about a new provider
     // @todo MESH_REWORK Should we instead create a new renderer when these change?
@@ -259,7 +253,6 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
     typedef MessageValue1< NewRenderer, OwnerPointer<RenderDataProvider> > DerivedType;
     unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
     new (slot) DerivedType( mRenderer, &NewRenderer::SetRenderDataProvider, dataProvider );
-
     mResendDataProviders = false;
   }
 }
@@ -279,11 +272,11 @@ bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
     unsigned int opaqueCount=0;
     unsigned int affectingCount=0;
 
-    const RenderDataProvider::Samplers& samplers = mMaterial->GetSamplers();
-    for( RenderDataProvider::Samplers::ConstIterator iter = samplers.Begin();
+    Vector<Sampler*>& samplers = mMaterial->GetSamplers();
+    for( Vector<Sampler*>::ConstIterator iter = samplers.Begin();
          iter != samplers.End(); ++iter )
     {
-      const Sampler* sampler = static_cast<const Sampler*>(*iter);
+      const Sampler* sampler = *iter;
       if( sampler != NULL )
       {
         if( sampler->AffectsTransparency( updateBufferIndex ) )
@@ -328,17 +321,16 @@ bool RendererAttachment::DoPrepareResources(
     unsigned int neverCount = 0;
     unsigned int frameBufferCount = 0;
 
-    const RenderDataProvider::Samplers& samplers = mMaterial->GetSamplers();
-    for( RenderDataProvider::Samplers::ConstIterator iter = samplers.Begin();
+    Vector<Sampler*>& samplers = mMaterial->GetSamplers();
+    for( Vector<Sampler*>::ConstIterator iter = samplers.Begin();
          iter != samplers.End(); ++iter )
     {
-      const Sampler* sampler = static_cast<const Sampler*>(*iter);
+      Sampler* sampler = *iter;
 
       ResourceId textureId = sampler->GetTextureId( updateBufferIndex );
       BitmapMetadata metaData = resourceManager.GetBitmapMetadata( textureId );
 
-      Sampler* mutableSampler = const_cast<Sampler*>(sampler);
-      mutableSampler->SetFullyOpaque( metaData.IsFullyOpaque() );
+      sampler->SetFullyOpaque( metaData.IsFullyOpaque() );
 
       switch( completeStatusManager.GetStatus( textureId ) )
       {
@@ -454,6 +446,36 @@ void RendererAttachment::AddMappings( CollectedUniformMap& localMap, const Unifo
   }
 }
 
+RenderDataProvider* RendererAttachment::NewRenderDataProvider()
+{
+  RenderDataProvider* dataProvider = new RenderDataProvider();
+
+  dataProvider->mGeometryDataProvider = mGeometry;
+  dataProvider->mMaterialDataProvider = mMaterial;
+  dataProvider->mUniformMapDataProvider = this;
+  dataProvider->mShader = mMaterial->GetShader();
+  dataProvider->mIndexBuffer = mGeometry->GetIndexBuffer();
+
+  Vector<PropertyBuffer*>& vertexBuffers = mGeometry->GetVertexBuffers();
+  dataProvider->mVertexBuffers.Reserve( vertexBuffers.Count() );
+
+  for( Vector<PropertyBuffer*>::Iterator iter = vertexBuffers.Begin() ;
+       iter != vertexBuffers.End();
+       ++iter )
+  {
+    dataProvider->mVertexBuffers.PushBack(*iter); // Convert from derived type to base type
+  }
+
+  Vector<Sampler*>& samplers = mMaterial->GetSamplers();
+  dataProvider->mSamplers.Reserve( samplers.Count() );
+  for( Vector<Sampler*>::Iterator iter = samplers.Begin() ;
+       iter != samplers.End();
+       ++iter )
+  {
+    dataProvider->mSamplers.PushBack(*iter); // Convert from derived type to base type
+  }
+  return dataProvider;
+}
 
 
 } // namespace SceneGraph

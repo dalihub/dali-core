@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_SCENE_GRAPH_CONNECTION_H
-#define DALI_INTERNAL_SCENE_GRAPH_CONNECTION_H
+#ifndef DALI_INTERNAL_SCENE_GRAPH_CONNECTION_CHANGE_PROPAGATOR_H
+#define DALI_INTERNAL_SCENE_GRAPH_CONNECTION_CHANGE_PROPAGATOR_H
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -31,7 +31,7 @@ class PropertyOwner;
  * This class maintains a list of observers that are informed when
  * it's owner changes it's connections.
  */
-class ConnectionObservers
+class ConnectionChangePropagator
 {
 public:
   class Observer
@@ -53,12 +53,12 @@ public:
   /**
    * Constructor
    */
-  ConnectionObservers();
+  ConnectionChangePropagator();
 
   /**
    * Destructor
    */
-  ~ConnectionObservers();
+  ~ConnectionChangePropagator();
 
   /**
    * Add an observer
@@ -94,4 +94,4 @@ private:
 } // Internal
 } // Dali
 
-#endif // DALI_INTERNAL_SCENE_GRAPH_CONNECTION_H
+#endif // DALI_INTERNAL_SCENE_GRAPH_CONNECTION_CHANGE_PROPAGATOR_H

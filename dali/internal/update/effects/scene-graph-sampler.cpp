@@ -120,12 +120,12 @@ void Sampler::DisconnectFromSceneGraph(SceneController& sceneController, BufferI
 {
 }
 
-void Sampler::AddConnectionObserver( ConnectionObservers::Observer& observer )
+void Sampler::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
   mConnectionObservers.Add(observer);
 }
 
-void Sampler::RemoveConnectionObserver( ConnectionObservers::Observer& observer )
+void Sampler::RemoveConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
   mConnectionObservers.Remove(observer);
 }

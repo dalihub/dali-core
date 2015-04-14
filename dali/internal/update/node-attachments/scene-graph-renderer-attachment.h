@@ -21,7 +21,7 @@
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/property-owner.h>
 #include <dali/internal/update/common/animatable-property.h>
-#include <dali/internal/update/common/scene-graph-connection-observers.h>
+#include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/update/controllers/render-message-dispatcher.h>
 #include <dali/internal/update/controllers/scene-controller.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
@@ -59,7 +59,7 @@ class RendererAttachment : public RenderableAttachment,
                            public PropertyOwner,
                            public UniformMapDataProvider,
                            public UniformMap::Observer,
-                           public ConnectionObservers::Observer
+                           public ConnectionChangePropagator::Observer
 {
 public:
   /**
@@ -103,26 +103,26 @@ public:
    * @param[in] bufferIndex The current frame's buffer index
    * @param[in] material The material this renderer will use
    */
-  void SetMaterial( BufferIndex bufferIndex, const Material* material);
+  void SetMaterial( BufferIndex bufferIndex, Material* material);
 
   /**
    * Get the material of this renderer
    * @return the material this renderer uses
    */
-  const Material& GetMaterial() const;
+  Material& GetMaterial();
 
   /**
    * Set the geometry for the renderer
    * @param[in] bufferIndex The current frame's buffer index
    * @param[in] geometry The geometry this renderer will use
    */
-  void SetGeometry( BufferIndex bufferIndex, const Geometry* geometry);
+  void SetGeometry( BufferIndex bufferIndex, Geometry* geometry);
 
   /**
    * Get the geometry of this renderer
    * @return the geometry this renderer uses
    */
-  const Geometry& GetGeometry() const;
+  Geometry& GetGeometry();
 
   /**
    * Get the depth index
@@ -199,6 +199,12 @@ private:
    */
   void AddMappings( CollectedUniformMap& localMap, const UniformMap& map );
 
+  /**
+   * Create a new render data provider
+   * @return the new (initialized) data provider
+   */
+  RenderDataProvider* NewRenderDataProvider();
+
 private:
   NewRenderer* mRenderer; ///< Raw pointer to the new renderer (that's owned by RenderManager)
 
@@ -219,24 +225,24 @@ public: // Properties
 
 inline void SetMaterialMessage( EventThreadServices& eventThreadServices, const RendererAttachment& attachment, const Material& material )
 {
-  typedef MessageDoubleBuffered1< RendererAttachment, const Material* > LocalType;
+  typedef MessageDoubleBuffered1< RendererAttachment, Material* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &RendererAttachment::SetMaterial, &material );
+  new (slot) LocalType( &attachment, &RendererAttachment::SetMaterial, const_cast<Material*>(&material) );
 }
 
 inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const RendererAttachment& attachment, const Geometry& geometry )
 {
-  typedef MessageDoubleBuffered1< RendererAttachment, const Geometry* > LocalType;
+  typedef MessageDoubleBuffered1< RendererAttachment, Geometry* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &attachment, &RendererAttachment::SetGeometry, &geometry );
+  new (slot) LocalType( &attachment, &RendererAttachment::SetGeometry, const_cast<Geometry*>(&geometry) );
 }
 
 } // namespace SceneGraph

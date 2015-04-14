@@ -24,9 +24,9 @@
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/scene-graph-connection-observers.h>
+#include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/update/common/uniform-map.h>
-#include <dali/internal/render/data-providers/render-data-provider.h>
+#include <dali/internal/render/data-providers/material-data-provider.h>
 
 namespace Dali
 {
@@ -39,7 +39,7 @@ class Shader;
 class ConnectionObserver;
 class SceneController;
 
-class Material : public PropertyOwner, public MaterialDataProvider, public UniformMap::Observer, public ConnectionObservers::Observer
+class Material : public PropertyOwner, public MaterialDataProvider, public UniformMap::Observer, public ConnectionChangePropagator::Observer
 {
 public:
   /**
@@ -56,19 +56,19 @@ public:
    * Set the shader effect for this material
    * @param[in] shader The shader effect to use
    */
-  void SetShader( const Shader* shader );
+  void SetShader( Shader* shader );
 
   /**
    * Add a sampler (image + sampler modes) to the material
    * @param[in] sampler A sampler to add
    */
-  void AddSampler( const Sampler* sampler );
+  void AddSampler( Sampler* sampler );
 
   /**
    * Remove a sampler (image + sampler modes) from the material
    * @param[in] sampler A sampler to remove
    */
-  void RemoveSampler( const Sampler* sampler );
+  void RemoveSampler( Sampler* sampler );
 
   /**
    * Connect the object to the scene graph
@@ -86,27 +86,27 @@ public:
   void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
   /**
-   * @copydoc ConnectionObservers::AddObserver
+   * @copydoc ConnectionChangePropagator::AddObserver
    */
-  void AddConnectionObserver(ConnectionObservers::Observer& observer);
+  void AddConnectionObserver(ConnectionChangePropagator::Observer& observer);
 
   /**
-   * @copydoc ConnectionObservers::RemoveObserver
+   * @copydoc ConnectionChangePropagator::RemoveObserver
    */
-  void RemoveConnectionObserver(ConnectionObservers::Observer& observer);
+  void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer);
 
-public: // MaterialDataProvider implementation
+public:
   /**
    * Get the shader effect of this material
    * @return the shader effect;
    */
-  virtual Shader* GetShader() const;
+  Shader* GetShader() const;
 
   /**
    * Get the samplers this material uses.
    * @return the samplers
    */
-  virtual const RenderDataProvider::Samplers& GetSamplers() const;
+  Vector<Sampler*>& GetSamplers();
 
 public: // UniformMap::Observer
   /**
@@ -114,15 +114,15 @@ public: // UniformMap::Observer
    */
   virtual void UniformMappingsChanged( const UniformMap& mappings );
 
-public: // ConnectionObserver::Observer
+public: // ConnectionChangePropagator::Observer
 
   /**
-   * @copydoc ConnectionObservers::ConnectionsChanged
+   * @copydoc ConnectionChangePropagator::ConnectionsChanged
    */
   virtual void ConnectionsChanged( PropertyOwner& owner );
 
   /**
-   * @copydoc ConnectionObservers::ConnectedUniformMapChanged
+   * @copydoc ConnectionChangePropagator::ConnectedUniformMapChanged
    */
   virtual void ConnectedUniformMapChanged( );
 
@@ -138,9 +138,9 @@ public: // Property data
   DoubleBufferedProperty<int> mFaceCullingMode;
 
 private:
-  const Shader* mShader;
-  RenderDataProvider::Samplers mSamplers; // Not owned
-  ConnectionObservers mConnectionObservers;
+  Shader* mShader;
+  Vector<Sampler*> mSamplers; // Not owned
+  ConnectionChangePropagator mConnectionObservers;
 
   // @todo MESH_REWORK add property values for cull face mode, blending options, blend color
   // Add getters/setters?
@@ -148,35 +148,35 @@ private:
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, const Shader& shader )
 {
-  typedef MessageValue1< Material, const Shader* > LocalType;
+  typedef MessageValue1< Material, Shader* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &material, &Material::SetShader, &shader );
+  new (slot) LocalType( &material, &Material::SetShader, const_cast<Shader*>(&shader) );
 }
 
 inline void AddSamplerMessage( EventThreadServices& eventThreadServices, const Material& material, const Sampler& sampler )
 {
-  typedef MessageValue1< Material, const Sampler* > LocalType;
+  typedef MessageValue1< Material, Sampler* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &material, &Material::AddSampler, &sampler );
+  new (slot) LocalType( &material, &Material::AddSampler, const_cast<Sampler*>(&sampler) );
 }
 
-inline void RemoveSamplerMessage( EventThreadServices& eventThreadServices, const Material& material, const Sampler& sampler )
+inline void RemoveSamplerMessage( EventThreadServices& eventThreadServices, const Material& material, Sampler& sampler )
 {
-  typedef MessageValue1< Material, const Sampler* > LocalType;
+  typedef MessageValue1< Material, Sampler* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &material, &Material::RemoveSampler, &sampler );
+  new (slot) LocalType( &material, &Material::RemoveSampler, const_cast<Sampler*>(&sampler) );
 }
 
 } // namespace SceneGraph

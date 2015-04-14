@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-#include "scene-graph-connection-observers.h"
+#include "scene-graph-connection-change-propagator.h"
 
 namespace Dali
 {
@@ -23,15 +23,15 @@ namespace Internal
 namespace SceneGraph
 {
 
-ConnectionObservers::ConnectionObservers()
+ConnectionChangePropagator::ConnectionChangePropagator()
 {
 }
 
-ConnectionObservers::~ConnectionObservers()
+ConnectionChangePropagator::~ConnectionChangePropagator()
 {
 }
 
-void ConnectionObservers::Add(Observer& observer)
+void ConnectionChangePropagator::Add(Observer& observer)
 {
   bool foundObserver = false;
   for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
@@ -48,7 +48,7 @@ void ConnectionObservers::Add(Observer& observer)
   }
 }
 
-void ConnectionObservers::Remove(Observer& observer)
+void ConnectionChangePropagator::Remove(Observer& observer)
 {
   for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
   {
@@ -60,7 +60,7 @@ void ConnectionObservers::Remove(Observer& observer)
   }
 }
 
-void ConnectionObservers::ConnectionsChanged(PropertyOwner& object)
+void ConnectionChangePropagator::ConnectionsChanged(PropertyOwner& object)
 {
   // Inform observers that the object's children have changed
   for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )
@@ -70,7 +70,7 @@ void ConnectionObservers::ConnectionsChanged(PropertyOwner& object)
   }
 }
 
-void ConnectionObservers::ConnectedUniformMapChanged()
+void ConnectionChangePropagator::ConnectedUniformMapChanged()
 {
   // Inform observers that the object's uniform map has changed
   for( ObserversIterator iter = mObservers.Begin(); iter != mObservers.End(); ++iter )

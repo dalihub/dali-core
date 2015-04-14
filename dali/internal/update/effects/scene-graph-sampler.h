@@ -23,7 +23,7 @@
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/common/double-buffered-property.h>
 #include <dali/internal/update/common/property-owner.h>
-#include <dali/internal/update/common/scene-graph-connection-observers.h>
+#include <dali/internal/update/common/scene-graph-connection-change-propagator.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
 #include <dali/internal/render/data-providers/sampler-data-provider.h>
 
@@ -157,15 +157,16 @@ public: // SamplerDataProvider interface - called from RenderThread
    * @param[in] bufferIndex The current buffer index - used for sending messages to render thread
    */
   void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
-  /**
-   * @copydoc ConnectionObservers::AddObserver
-   */
-  void AddConnectionObserver(ConnectionObservers::Observer& observer);
 
   /**
-   * @copydoc ConnectionObservers::RemoveObserver
+   * @copydoc ConnectionChangePropagator::AddObserver
    */
-  void RemoveConnectionObserver(ConnectionObservers::Observer& observer);
+  void AddConnectionObserver(ConnectionChangePropagator::Observer& observer);
+
+  /**
+   * @copydoc ConnectionChangePropagator::RemoveObserver
+   */
+  void RemoveConnectionObserver(ConnectionChangePropagator::Observer& observer);
 
 public: // PropertyOwner implementation
   /**
@@ -183,7 +184,7 @@ public: // Properties
 private:
   std::string mTextureUnitUniformName; ///< The name of the uniform of the texture unit
   DoubleBufferedProperty<unsigned int> mTextureId;
-  ConnectionObservers mConnectionObservers; ///< Connection observers that will be informed when textures change.
+  ConnectionChangePropagator mConnectionObservers; ///< Connection observers that will be informed when textures change.
   bool mFullyOpaque; // Update only flag - no need for double buffering
 };
 

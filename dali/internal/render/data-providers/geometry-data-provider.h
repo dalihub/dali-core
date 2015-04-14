@@ -31,16 +31,12 @@ namespace SceneGraph
 class PropertyBuffer;
 
 /**
- * An interface to provide geometry data, such as the vertex buffers
- * and index buffers (if present).  It provides a means of getting the
- * vertex attribute meta data and vertex data from each buffer.  It
- * provides the geometry type;
+ * An interface to provide geometry properties to the render thread.
  */
 class GeometryDataProvider
 {
 public:
   typedef Dali::Geometry::GeometryType GeometryType;
-  typedef Dali::Vector< const PropertyBufferDataProvider* > VertexBuffers;
 
   /**
    * Constructor. Nothing to do as a pure interface.

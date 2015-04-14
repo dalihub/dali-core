@@ -70,7 +70,7 @@ void UniformMap::MappingChanged()
   }
 }
 
-//
+// @todo MESH_REWORK Benchmark and test
 // The uniform map can never grow beyond the limits of GL - so really, the
 // map size is likely to be small; if retaining an unsorted map proves to be
 // slow, then it should be changed to perform an insertion sort.

@@ -43,7 +43,7 @@ Material::~Material()
 {
 }
 
-void Material::SetShader( const Shader* shader )
+void Material::SetShader( Shader* shader )
 {
   mShader = shader;
   // Inform NewRenderer about this shader: (Will force a re-load of the
@@ -54,42 +54,29 @@ void Material::SetShader( const Shader* shader )
 Shader* Material::GetShader() const
 {
   // @todo - Fix this - move shader setup to the Renderer connect to stage...
-  return const_cast<Shader*>(mShader);
+  return mShader;
 }
 
-void Material::AddSampler( const Sampler* sampler )
+void Material::AddSampler( Sampler* sampler )
 {
-  const SamplerDataProvider* sdp = static_cast< const SamplerDataProvider*>( sampler );
-  mSamplers.PushBack( sdp );
+  mSamplers.PushBack( sampler );
 
-  Sampler* mutableSampler = const_cast<Sampler*>(sampler);
-  mutableSampler->AddConnectionObserver( *this );
-  mutableSampler->AddUniformMapObserver( *this );
+  sampler->AddConnectionObserver( *this );
+  sampler->AddUniformMapObserver( *this );
 
   mConnectionObservers.ConnectionsChanged(*this);
 }
 
-void Material::RemoveSampler( const Sampler* sampler )
+void Material::RemoveSampler( Sampler* sampler )
 {
-  const SamplerDataProvider* samplerDataProvider = sampler;
-  bool found = false;
+  Vector<Sampler*>::Iterator match = std::find( mSamplers.Begin(), mSamplers.End(), sampler );
 
-  RenderDataProvider::Samplers::Iterator iter = mSamplers.Begin();
-  for( ; iter != mSamplers.End(); ++iter )
+  DALI_ASSERT_DEBUG( mSamplers.End() != match );
+  if( mSamplers.End() != match )
   {
-    if( *iter == samplerDataProvider )
-    {
-      found = true;
-      break;
-    }
-  }
-
-  if( found )
-  {
-    Sampler* mutableSampler = const_cast<Sampler*>(sampler);
-    mutableSampler->RemoveConnectionObserver( *this );
-    mutableSampler->RemoveUniformMapObserver( *this );
-    mSamplers.Erase(iter);
+    sampler->RemoveConnectionObserver( *this );
+    sampler->RemoveUniformMapObserver( *this );
+    mSamplers.Erase( match );
     mConnectionObservers.ConnectionsChanged(*this);
   }
   else
@@ -98,7 +85,7 @@ void Material::RemoveSampler( const Sampler* sampler )
   }
 }
 
-const RenderDataProvider::Samplers& Material::GetSamplers() const
+Vector<Sampler*>& Material::GetSamplers()
 {
   return mSamplers;
 }
@@ -111,12 +98,12 @@ void Material::DisconnectFromSceneGraph( SceneController& sceneController, Buffe
 {
 }
 
-void Material::AddConnectionObserver( ConnectionObservers::Observer& observer )
+void Material::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
   mConnectionObservers.Add(observer);
 }
 
-void Material::RemoveConnectionObserver( ConnectionObservers::Observer& observer )
+void Material::RemoveConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
   mConnectionObservers.Remove(observer);
 }

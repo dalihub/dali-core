@@ -41,38 +41,37 @@ Geometry::~Geometry()
   // could remove self from own uniform map observer, but it's about to be destroyed.
 }
 
-void Geometry::AddVertexBuffer( const PropertyBuffer* vertexBuffer )
+void Geometry::AddVertexBuffer( PropertyBuffer* vertexBuffer )
 {
   mVertexBuffers.PushBack( vertexBuffer );
-  PropertyBuffer* theVertexBuffer = const_cast<PropertyBuffer*>(vertexBuffer);
-  theVertexBuffer->AddUniformMapObserver(*this);
+  vertexBuffer->AddUniformMapObserver(*this);
   mConnectionObservers.ConnectionsChanged(*this);
 }
 
-void Geometry::RemoveVertexBuffer( const PropertyBuffer* vertexBuffer )
+void Geometry::RemoveVertexBuffer( PropertyBuffer* vertexBuffer )
 {
   DALI_ASSERT_DEBUG( NULL != vertexBuffer );
 
   // Find the object and destroy it
-  VertexBuffers::Iterator match = std::find( mVertexBuffers.Begin(),
-                                             mVertexBuffers.End(),
-                                             vertexBuffer );
+  Vector<PropertyBuffer*>::Iterator match = std::find( mVertexBuffers.Begin(),
+                                                       mVertexBuffers.End(),
+                                                       vertexBuffer );
 
   DALI_ASSERT_DEBUG( mVertexBuffers.End() != match );
   if( mVertexBuffers.End() != match )
   {
-    PropertyBuffer* theVertexBuffer = const_cast<PropertyBuffer*>(vertexBuffer);
-    theVertexBuffer->RemoveUniformMapObserver(*this);
+    vertexBuffer->RemoveUniformMapObserver(*this);
     mVertexBuffers.Erase( match );
     mConnectionObservers.ConnectionsChanged(*this);
   }
 }
 
-void Geometry::SetIndexBuffer( const PropertyBuffer* indexBuffer )
+void Geometry::SetIndexBuffer( PropertyBuffer* indexBuffer )
 {
   if( mIndexBuffer != indexBuffer )
   {
     mIndexBuffer = indexBuffer;
+    indexBuffer->AddUniformMapObserver(*this);
     mConnectionObservers.ConnectionsChanged(*this);
   }
 }
@@ -80,6 +79,10 @@ void Geometry::SetIndexBuffer( const PropertyBuffer* indexBuffer )
 void Geometry::ClearIndexBuffer()
 {
   // @todo Actually delete, or put on Discard Queue and tell Renderer in render thread?
+  if( mIndexBuffer )
+  {
+    mIndexBuffer->RemoveUniformMapObserver(*this);
+  }
   mIndexBuffer = 0;
   mConnectionObservers.ConnectionsChanged(*this);
 }
@@ -89,12 +92,12 @@ void Geometry::SetGeometryType( BufferIndex bufferIndex, Geometry::GeometryType 
   mGeometryType[bufferIndex] = geometryType;
 }
 
-const GeometryDataProvider::VertexBuffers& Geometry::GetVertexBuffers() const
+Vector<PropertyBuffer*>& Geometry::GetVertexBuffers()
 {
   return mVertexBuffers;
 }
 
-const PropertyBuffer* Geometry::GetIndexBuffer() const
+PropertyBuffer* Geometry::GetIndexBuffer()
 {
   return mIndexBuffer;
 }
@@ -129,12 +132,12 @@ void Geometry::DisconnectFromSceneGraph( SceneController& sceneController, Buffe
 {
 }
 
-void Geometry::AddConnectionObserver( ConnectionObservers::Observer& observer )
+void Geometry::AddConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
   mConnectionObservers.Add(observer);
 }
 
-void Geometry::RemoveConnectionObserver( ConnectionObservers::Observer& observer )
+void Geometry::RemoveConnectionObserver( ConnectionChangePropagator::Observer& observer )
 {
   mConnectionObservers.Remove(observer);
 }

@@ -51,14 +51,10 @@ public:
 
   /**
    * Constructor.
+   * The RendererAttachment that creates this object will initialize the members
+   * directly.
    */
-  RenderDataProvider( const GeometryDataProvider&   mGeometryDataProvider,
-                      const MaterialDataProvider&   mMaterialDataProvider,
-                      const UniformMapDataProvider& mUniformMapDataProvider,
-                      Shader&                       mShader,
-                      const PropertyBufferDataProvider* mIndexBuffer,
-                      const VertexBuffers&          mVertexBuffers,
-                      const Samplers&               mSamplers );
+  RenderDataProvider();
 
   /**
    * Destructor
@@ -157,6 +153,9 @@ private:
   const PropertyBufferDataProvider* mIndexBuffer;
   VertexBuffers                 mVertexBuffers;
   Samplers                      mSamplers;
+
+// Give RendererAttachment access to our private data to reduce copying vectors on construction.
+  friend class RendererAttachment;
 };
 
 } // SceneGraph
