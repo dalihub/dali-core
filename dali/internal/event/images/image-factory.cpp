@@ -23,12 +23,12 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/hash.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/common/dali-hash.h>
 
 // EXTERNAL INCLUDES
 #include <float.h>

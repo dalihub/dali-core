@@ -69,7 +69,7 @@ public:
    * @param[in] actor The actor to request relayout on
    * @param[in] dimension The dimension(s) to request the relayout on. Defaults to all dimensions
    */
-  void RequestRelayout( Dali::Actor& actor, Dimension dimension = ALL_DIMENSIONS );
+  void RequestRelayout( Dali::Actor& actor, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @brief Request to relayout of all actors in the sub-tree below the given actor.
@@ -91,7 +91,7 @@ public:
    * @param[in] actor The actor to propagate from
    * @param[in] dimension The dimension to propagate on
    */
-  void PropagateFlags( Dali::Actor& actor, Dimension dimension = ALL_DIMENSIONS );
+  void PropagateFlags( Dali::Actor& actor, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @brief Relayouts all actors that have been marked as dirty
@@ -163,7 +163,7 @@ private:
    * @param[in] topOfSubTreeStack The top of the sub tree that this actor is in
    * @param[in] potentialRedundantSubRoots Actors collected as potentially already being included in relayout
    */
-  void PropagateAll( Dali::Actor& actor, Dimension dimension, Dali::ActorContainer& topOfSubTreeStack, Dali::ActorContainer& potentialRedundantSubRoots );
+  void PropagateAll( Dali::Actor& actor, Dimension::Type dimension, Dali::ActorContainer& topOfSubTreeStack, Dali::ActorContainer& potentialRedundantSubRoots );
 
   /**
    * Queue an actor on the relayout container

@@ -18,16 +18,17 @@
 // CLASS HEADER
 #include <dali/internal/event/images/atlas-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for memset()
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-
 #include <dali/internal/event/images/image-factory.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>
 
-#include <string.h> // for memset()
 
 namespace Dali
 {

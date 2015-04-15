@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <algorithm>
+#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/thread-local-storage.h>

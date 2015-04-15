@@ -19,9 +19,9 @@
 #include <dali/integration-api/debug.h>
 
 // EXTERNAL INCLUDES
-#include <stdio.h>
-#include <stdarg.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdarg>
+#include <cstring>
 #include <cstdlib>
 #include <sstream>
 #include <iomanip>

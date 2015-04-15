@@ -1162,7 +1162,7 @@ public:
    * @param[in] policy The resize policy to use
    * @param[in] dimension The dimension(s) to set policy for. Can be a bitfield of multiple dimensions.
    */
-  void SetResizePolicy( ResizePolicy policy, Dimension dimension );
+  void SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
 
   /**
    * Return the resize policy used for a single dimension
@@ -1170,27 +1170,27 @@ public:
    * @param[in] dimension The dimension to get policy for
    * @return Return the dimension resize policy
    */
-  ResizePolicy GetResizePolicy( Dimension dimension ) const;
+  ResizePolicy::Type GetResizePolicy( Dimension::Type dimension ) const;
 
   /**
-   * @brief Set the policy to use when setting size with size negotiation. Defaults to USE_SIZE_SET.
+   * @brief Set the policy to use when setting size with size negotiation. Defaults to SizeScalePolicy::USE_SIZE_SET.
    *
    * @param[in] policy The policy to use for when the size is set
    */
-  void SetSizeScalePolicy( SizeScalePolicy policy );
+  void SetSizeScalePolicy( SizeScalePolicy::Type policy );
 
   /**
    * @brief Return the size set policy in use
    *
    * @return Return the size set policy
    */
-  SizeScalePolicy GetSizeScalePolicy() const;
+  SizeScalePolicy::Type GetSizeScalePolicy() const;
 
   /**
    * @brief Sets the relative to parent size factor of the actor.
    *
    * This factor is only used when ResizePolicy is set to either:
-   * SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
+   * ResizePolicy::SIZE_RELATIVE_TO_PARENT or ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT.
    * This actor's size is set to the actor's size multipled by or added to this factor,
    * depending on ResizePolicy (See SetResizePolicy).
    *
@@ -1229,7 +1229,7 @@ public:
    * @param dimension The dimension to retrieve
    * @return Return the value of the negotiated dimension
    */
-  float GetRelayoutSize( Dimension dimension ) const;
+  float GetRelayoutSize( Dimension::Type dimension ) const;
 
   /**
    * @brief Request to relayout of all actors in the sub-tree below the given actor.

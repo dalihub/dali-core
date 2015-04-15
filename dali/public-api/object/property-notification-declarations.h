@@ -18,8 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <boost/function.hpp>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -34,11 +32,6 @@ class PropertyNotification;
  * @brief Signal type for Dali::PropertyNotification::NotifySignal().
  */
 typedef Signal< void (PropertyNotification& source) > PropertyNotifySignalType;
-
-/**
- * @brief Function signature for Dali::PropertyNotification::NotifySignal() signal callbacks.
- */
-typedef boost::function<void (PropertyNotification& source)> PropertyNotifyCallbackType;
 
 } // namespace Dali
 

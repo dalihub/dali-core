@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/actors/image-actor-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
@@ -100,7 +103,7 @@ ImageActorPtr ImageActor::New()
 
 void ImageActor::OnInitialize()
 {
-  SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
+  SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 }
 
 void ImageActor::SetImage( ImagePtr& image )

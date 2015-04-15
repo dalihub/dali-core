@@ -18,10 +18,6 @@
 // CLASS HEADER
 #include <dali/internal/event/common/type-registry-impl.h>
 
-// EXTERNAL INCLUDES
-#include <string.h>
-#include <sstream>
-
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/public-api/object/type-registry.h>

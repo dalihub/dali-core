@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <ostream>
+#include <iosfwd>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
