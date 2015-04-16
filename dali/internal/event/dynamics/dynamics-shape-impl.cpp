@@ -42,7 +42,7 @@ DynamicsShape::~DynamicsShape()
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
   if( mDynamicsShape && Stage::IsInstalled() )
   {
-    DeleteShapeMessage( Stage::GetCurrent()->GetUpdateInterface(), *mDynamicsShape );
+    DeleteShapeMessage( *( Stage::GetCurrent() ), *mDynamicsShape );
   }
 }
 

@@ -18,13 +18,13 @@
  *
  */
 
-// BASE CLASS HEADERS
+// CLASS HEADERS
 #include <dali/internal/update/dynamics/scene-graph-dynamics-shape.h>
 
-// INTERNAL HEADERS
+// INTERNAL INCLUDES
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-thread-services.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/update/modeling/scene-graph-mesh-declarations.h>
 

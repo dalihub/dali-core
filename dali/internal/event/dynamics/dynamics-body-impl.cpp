@@ -61,7 +61,7 @@ DynamicsBody::DynamicsBody(const std::string& name, DynamicsBodyConfigPtr config
 
   Integration::DynamicsBodySettings* settings( new Integration::DynamicsBodySettings(*config->GetSettings()) ); // copy settings
   SceneGraph::DynamicsShape* sceneShape( mShape->GetSceneObject() );
-  InitializeDynamicsBodyMessage( stage->GetUpdateInterface(), *mDynamicsBody, settings, *sceneShape );
+  InitializeDynamicsBodyMessage( *stage, *mDynamicsBody, settings, *sceneShape );
 
   SetMass( config->GetMass() );
   SetElasticity( config->GetElasticity() );
@@ -78,8 +78,8 @@ DynamicsBody::DynamicsBody(const std::string& name, DynamicsBodyConfigPtr config
     }
   }
 
-  SetCollisionGroupMessage( stage->GetUpdateInterface(), *mDynamicsBody, collisionGroup );
-  SetCollisionMaskMessage( stage->GetUpdateInterface(), *mDynamicsBody, collisionMask );
+  SetCollisionGroupMessage( *stage, *mDynamicsBody, collisionGroup );
+  SetCollisionMaskMessage( *stage, *mDynamicsBody, collisionMask );
 
   world->MapActor(mDynamicsBody, actor);
 }
@@ -90,7 +90,7 @@ DynamicsBody::~DynamicsBody()
 
   if( Stage::IsInstalled() )
   {
-    DeleteBodyMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()) );
+    DeleteBodyMessage( *( Stage::GetCurrent() ), *(GetSceneObject()) );
 
     DynamicsWorldPtr world( Stage::GetCurrent()->GetDynamicsWorld() );
 
@@ -127,7 +127,7 @@ void DynamicsBody::SetMass(const float mass)
     mMass = mass;
     if( !IsKinematic() )
     {
-      SetMassMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), mMass );
+      SetMassMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), mMass );
     }
   }
 }
@@ -142,13 +142,13 @@ void DynamicsBody::SetElasticity(const float elasticity)
   if( fabsf(mElasticity - elasticity) >= GetRangedEpsilon(mElasticity, elasticity) )
   {
     mElasticity = elasticity;
-    SetElasticityMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), mElasticity );
+    SetElasticityMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), mElasticity );
   }
 }
 
 void DynamicsBody::SetLinearVelocity(const Vector3& velocity)
 {
-  SetLinearVelocityMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), velocity );
+  SetLinearVelocityMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), velocity );
 }
 
 Vector3 DynamicsBody::GetCurrentLinearVelocity() const
@@ -158,7 +158,7 @@ Vector3 DynamicsBody::GetCurrentLinearVelocity() const
 
 void DynamicsBody::SetAngularVelocity(const Vector3& velocity)
 {
-  SetAngularVelocityMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), velocity );
+  SetAngularVelocityMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), velocity );
 }
 
 Vector3 DynamicsBody::GetCurrentAngularVelocity() const
@@ -173,20 +173,20 @@ void DynamicsBody::SetKinematic( const bool flag )
     // kinematic objects have zero mass
     if( flag && ( ! EqualsZero( mMass ) ) )
     {
-      SetMassMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), 0.0f );
+      SetMassMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), 0.0f );
     }
 
     mKinematic = flag;
-    SetKinematicMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), flag );
+    SetKinematicMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), flag );
 
     if( !flag && ( ! EqualsZero( mMass ) ) )
     {
-      SetMassMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), mMass );
+      SetMassMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), mMass );
     }
 
     if( !flag )
     {
-      SetSleepEnabledMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), mSleepEnabled );
+      SetSleepEnabledMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), mSleepEnabled );
     }
   }
 }
@@ -204,7 +204,7 @@ void DynamicsBody::SetSleepEnabled( const bool flag )
 
     if( !IsKinematic() )
     {
-      SetSleepEnabledMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), flag );
+      SetSleepEnabledMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), flag );
     }
   }
 }
@@ -216,22 +216,22 @@ bool DynamicsBody::GetSleepEnabled() const
 
 void DynamicsBody::WakeUp()
 {
-  WakeUpMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()) );
+  WakeUpMessage( *( Stage::GetCurrent() ), *(GetSceneObject()) );
 }
 
 void DynamicsBody::AddAnchor(const unsigned int index, DynamicsBodyPtr body, const bool collisions)
 {
-  AddAnchorMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), index, *(body->GetSceneObject()), collisions );
+  AddAnchorMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), index, *(body->GetSceneObject()), collisions );
 }
 
 void DynamicsBody::ConserveVolume(const bool flag)
 {
-  ConserveVolumeMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), flag );
+  ConserveVolumeMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), flag );
 }
 
 void DynamicsBody::ConserveShape(const bool flag)
 {
-  ConserveShapeMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), flag );
+  ConserveShapeMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), flag );
 }
 
 Actor& DynamicsBody::GetActor() const
