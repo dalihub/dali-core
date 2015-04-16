@@ -91,6 +91,12 @@ AnimationPtr Animation::New(float durationSeconds)
 
   AnimationPlaylist& playlist = stage->GetAnimationPlaylist();
 
+  if( durationSeconds < 0.0f )
+  {
+    DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
+    durationSeconds = 0.0f;
+  }
+
   AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, Dali::AlphaFunctions::Linear );
 
   // Second-phase construction
@@ -166,6 +172,12 @@ void Animation::DestroySceneObject()
 
 void Animation::SetDuration(float seconds)
 {
+  if( seconds < 0.0f )
+  {
+    DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
+    seconds = 0.0f;
+  }
+
   // Cache for public getters
   mDurationSeconds = seconds;
 
