@@ -2,7 +2,7 @@
 #define __DALI_ANGLE_AXIS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/degree.h>
+#include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector3.h>
 
 namespace Dali
@@ -33,13 +34,15 @@ struct Radian;
  * This is slightly easier to understand than quaternions for handling rotations
  * of objects. Both elements should be non-zero to correctly describe a rotation.
  */
-struct DALI_IMPORT_API AngleAxis
+struct AngleAxis
 {
   /**
    * @brief Create an angle-axis pair.
-   *
    */
-  AngleAxis();
+  AngleAxis()
+  : angle(0.0f),
+    axis(0.0f, 0.0f, 0.0f)
+  { }
 
   /**
    * @brief Create an angle-axis pair.
@@ -47,7 +50,10 @@ struct DALI_IMPORT_API AngleAxis
    * @param[in] initialAngle The initial angle in degrees.
    * @param[in] initialAxis The initial axis.
    */
-  AngleAxis( Degree initialAngle, Vector3 initialAxis );
+  AngleAxis( Degree initialAngle, Vector3 initialAxis )
+  : angle( initialAngle ),
+    axis( initialAxis )
+  { }
 
   /**
    * @brief Create an angle-axis pair.
@@ -55,11 +61,17 @@ struct DALI_IMPORT_API AngleAxis
    * @param[in] initialAngle The initial angle in radians.
    * @param[in] initialAxis The initial axis.
    */
-  AngleAxis( Radian initialAngle, Vector3 initialAxis );
+  AngleAxis( Radian initialAngle, Vector3 initialAxis )
+  : angle( initialAngle ),
+    axis( initialAxis )
+  { }
 
-  Degree angle; ///< The angle in degrees
+  Radian angle; ///< The angle in radians
   Vector3 axis; ///< The axis
+
 };
+
+// compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
 
 } // namespace Dali
 

@@ -2,7 +2,7 @@
 #define __DALI_DEGREE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,13 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <ostream>
+
 // INTERNAL INCLUDES
+#include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/math-utils.h>
 
 namespace Dali
 {
@@ -31,81 +36,87 @@ struct Radian;
  *
  * This reduces ambiguity when using methods which accept angles in degrees or radians.
  */
-struct DALI_IMPORT_API Degree
+struct Degree
 {
+  /**
+   * @brief default constructor, initialises to 0.
+   */
+  Degree()
+  : degree( 0.f )
+  { }
+
   /**
    * @brief Create an angle in degrees.
    *
    * @param[in] value The initial value in degrees.
    */
-  explicit Degree( float value );
+  explicit Degree( float value )
+  : degree( value )
+  { }
 
   /**
-   * @brief Create an angle in degrees from an angle in radians.
+   * @brief Create an angle in degrees from a Radian.
    *
-   * @param[in] value The initial value in radians.
+   * @param[in] value The initial value in Radians.
    */
-  Degree( const Radian& value );
+  DALI_EXPORT_API Degree( Radian value );
 
-  /**
-   * @brief Compare equality between two degrees.
-   *
-   * @param[in] rhs Degree to compare to
-   * @return true if the value is identical
-   */
-  bool operator==( const Degree& rhs ) const;
+public:
 
-  /**
-   * @brief Compare inequality between two degrees.
-   *
-   * @param[in] rhs Degree to compare to
-   * @return true if the value is not identical
-   */
-  bool operator!=( const Degree& rhs ) const;
-
-  /**
-   * @brief Compare two degrees.
-   *
-   * @param[in] rhs Degree to compare to
-   * @return true if this is less than the value
-   */
-  bool operator<( const Degree& rhs ) const;
-
-  /**
-   * @brief Assign an angle from a float value.
-   *
-   * @param[in] value Float value in degrees
-   * @return a reference to this
-   */
-  Degree& operator=( const float value );
-
-  /**
-   * @brief Assign an angle in radians to a Degree.
-   *
-   * @param[in] rhs Radian to get the value from
-   * @return a reference to this
-   */
-  Degree& operator=( const Radian& rhs );
-
-  /**
-   * @brief Cast operator to const float reference
-   */
-  operator const float&() const;
-
-  /**
-   * @brief Cast operator to float reference.
-   */
-  operator float&();
-
-private:
   // member data
-  float mValue; ///< The value in degrees
+  float degree; ///< The value in degrees
 
-  /**
-   * @brief Disable the default constructor.
-   */
-  Degree();
 };
+
+// compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
+
+/**
+ * @brief Compare equality between two degrees.
+ *
+ * @param[in] lhs Degree to compare
+ * @param[in] rhs Degree to compare to
+ * @return true if the values are identical
+ */
+inline bool operator==( const Degree& lhs, const Degree& rhs )
+{
+  return fabsf( lhs.degree - rhs.degree ) < Math::MACHINE_EPSILON_1000; // expect degree angles to be between 0 and 1000
+}
+
+/**
+ * @brief Compare inequality between two degrees.
+ *
+ * @param[in] lhs Degree to compare
+ * @param[in] rhs Degree to compare to
+ * @return true if the values are not identical
+ */
+inline bool operator!=( const Degree& lhs, const Degree& rhs )
+{
+  return !( operator==( lhs, rhs ) );
+}
+
+/**
+ * @brief Clamp a radian value
+ * @param angle to clamp
+ * @param min value
+ * @param max value
+ * @return the resulting radian
+ */
+inline Degree Clamp( Degree angle, float min, float max )
+{
+  return Degree( Clamp<float>( angle.degree, min, max ) );
+}
+
+/**
+ * @brief Stream a degree value
+ * @param [in] ostream The output stream to use.
+ * @param [in] angle in Degree.
+ * @return The output stream.
+ */
+inline std::ostream& operator<<( std::ostream& ostream, Degree angle )
+{
+  ostream << angle.degree;
+  return ostream;
+}
 
 } // namespace Dali
 

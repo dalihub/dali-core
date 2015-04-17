@@ -155,7 +155,7 @@ CameraActorPtr CameraActor::New( const Size& size )
 
   // By default Actors face in the positive Z direction in world space
   // CameraActors should face in the negative Z direction, towards the other actors
-  actor->SetOrientation( Quaternion( Math::PI, Vector3::YAXIS ) );
+  actor->SetOrientation( Quaternion( Dali::ANGLE_180, Vector3::YAXIS ) );
 
   return actor;
 }

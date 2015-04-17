@@ -293,7 +293,7 @@ int UtcDaliPropertyValueConstructors02(void)
   value = Property::Value( AngleAxis( Radian(Math::PI_2), Vector3::XAXIS  ));
   value.Get(aa);
   Quaternion r8(Radian(Degree(aa.angle)), aa.axis);
-  DALI_TEST_EQUALS(r8, Quaternion(Math::PI_2, Vector3::XAXIS), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(r8, Quaternion(Radian(Math::PI_2), Vector3::XAXIS), 0.001, TEST_LOCATION);
 
   std::string s = "no";
   value = Property::Value("yes");

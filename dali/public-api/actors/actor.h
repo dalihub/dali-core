@@ -2,7 +2,7 @@
 #define __DALI_ACTOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
+#include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
@@ -38,12 +39,9 @@ class Actor;
 }
 
 class Actor;
-class Animation;
-class Constraint;
 struct Degree;
 class Quaternion;
 class Layer;
-struct Radian;
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
@@ -762,7 +760,10 @@ public:
    * @param [in] angle The new orientation angle in degrees.
    * @param [in] axis The new axis of orientation.
    */
-  void SetOrientation(const Degree& angle, const Vector3& axis);
+  void SetOrientation( const Degree& angle, const Vector3& axis )
+  {
+    SetOrientation( Radian( angle ), axis );
+  }
 
   /**
    * @brief Sets the orientation of the Actor.
@@ -792,7 +793,10 @@ public:
    * @param[in] angle The angle to the rotation to combine with the existing orientation.
    * @param[in] axis The axis of the rotation to combine with the existing orientation.
    */
-  void RotateBy(const Degree& angle, const Vector3& axis);
+  void RotateBy( const Degree& angle, const Vector3& axis )
+  {
+    RotateBy( Radian( angle ), axis );
+  }
 
   /**
    * @brief Apply a relative rotation to an actor.

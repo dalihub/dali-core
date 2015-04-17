@@ -51,10 +51,9 @@ int UtcDaliQuaternionCtor02(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Quaternion r(M_PI/2.0f, Vector4(1.0f, 2.0f, 3.0f, M_PI/3.0f));
+  Quaternion r( Radian(Math::PI_2), Vector3( 1.0f, 2.0f, 3.0f ));
 
   // This will be normalised:
-  DALI_TEST_EQUALS(r.AsVector().w,  0.707f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(r.AsVector().x,  0.189f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(r.AsVector().y,  0.378f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(r.AsVector().z,  0.567f, 0.001, TEST_LOCATION);
@@ -67,19 +66,19 @@ int UtcDaliQuaternionCtor03(void)
   TestApplication application; // Reset all test adapter return codes
 
   // Test from euler angles
-  Quaternion e1(Radian(Degree(45)), 0.0f, 0.0f);
+  Quaternion e1( Radian(Degree(45)), Radian(0.0f), Radian(0.0f) );
   Vector4 r1(0.383f, 0.0f, 0.0f, 0.924f);
 
-  Quaternion e2(0.0f, Radian(Degree(75)), 0.0f);
+  Quaternion e2( Radian(0.0f), Radian(Degree(75)), Radian(0.0f) );
   Vector4 r2(0.0f, 0.609f, 0.0f, 0.793f);
 
-  Quaternion e3(0.0f, 0.0f, Radian(Degree(135)));
+  Quaternion e3( Radian(0.0f), Radian(0.0f), Radian(Degree(135)) );
   Vector4 r3(0.0f, 0.0f, 0.924f, 0.383f);
 
-  Quaternion e4(Radian(Degree(71)), Radian(Degree(36)), Radian(Degree(27)));
+  Quaternion e4(Radian(Degree(71)), Radian(Degree(36)), Radian(Degree(27)) );
   Vector4 r4(0.478f, 0.374f, 0.006f, 0.795f);
 
-  Quaternion e5(Radian(Degree(-31)), Radian(Degree(-91)), Radian(Degree(-173)));
+  Quaternion e5(Radian(Degree(-31)), Radian(Degree(-91)), Radian(Degree(-173)) );
   Vector4 r5(-0.697f, 0.145f, -0.686f, -0.149f);
 
   DALI_TEST_EQUALS(e1.AsVector(), r1, 0.001, TEST_LOCATION);
@@ -91,27 +90,15 @@ int UtcDaliQuaternionCtor03(void)
 }
 
 
-int UtcDaliQuaternionFromAxisAngle(void)
-{
-  TestApplication application; // Reset all test adapter return codes
-
-  Quaternion q = Quaternion::FromAxisAngle(Vector4(1.0f, 2.0f, 3.0f, M_PI/3.0f), M_PI/2.0f);
-
-  Quaternion r(0.707f, 0.189f, 0.378f, 0.567f);
-
-  DALI_TEST_EQUALS(q, r, 0.001, TEST_LOCATION);
-  END_TEST;
-}
-
 int UtcDaliQuaternionToAxisAngle01(void)
 {
   TestApplication application; // Reset all test adapter return codes
   Quaternion q(0.932f, 1.1f, 3.4f, 2.7f);
-  float angle;
+  Radian angle;
   Vector3 axis;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(angle,  0.74f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian,  0.74f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.x, 3.03f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.y, 9.38f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.z, 7.45f, 0.01f, TEST_LOCATION);
@@ -122,15 +109,14 @@ int UtcDaliQuaternionToAxisAngle02(void)
 {
   TestApplication application; // Reset all test adapter return codes
   Quaternion q(0.932f, 1.1f, 3.4f, 2.7f);
-  float angle;
-  Vector4 axis;
+  Radian angle;
+  Vector3 axis;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(angle,  0.74f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian,  0.74f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.x, 3.03f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.y, 9.38f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.z, 7.45f, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(axis.w, 0.0f, 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -139,11 +125,11 @@ int UtcDaliQuaternionToAxisAngle03(void)
 {
   TestApplication application; // Reset all test adapter return codes
   Quaternion q(1, 2, 3, 4);
-  float angle;
+  Radian angle;
   Vector3 axis;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(angle,  0.0f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian,  0.0f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.x, 0.0f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.y, 0.0f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.z, 0.0f, 0.01f, TEST_LOCATION);
@@ -154,15 +140,14 @@ int UtcDaliQuaternionToAxisAngle04(void)
 {
   TestApplication application; // Reset all test adapter return codes
   Quaternion q(1, 2, 3, 4);
-  float angle;
-  Vector4 axis;
+  Radian angle;
+  Vector3 axis;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(angle,  0.0f, 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian,  0.0f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.x, 0.0f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.y, 0.0f, 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.z, 0.0f, 0.01f, TEST_LOCATION);
-  DALI_TEST_EQUALS(axis.w, 0.0f, 0.01f, TEST_LOCATION);
   END_TEST;
 }
 
@@ -200,7 +185,7 @@ int UtcDaliQuaternionToMatrix01(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Quaternion q(0.69813, Vector4(1.0f, 0.0f, 0.0f, 0.0f)); // 40 degree rotation around X axis
+  Quaternion q( Radian(0.69813), Vector3(1.0f, 0.0f, 0.0f) ); // 40 degree rotation around X axis
 
   // Result calculated using a different maths library (with appropriate row/col ordering)
 
@@ -220,7 +205,7 @@ int UtcDaliQuaternionToMatrix02(void)
   TestApplication application; // Reset all test adapter return codes
 
   // rotation around arbitrary axis
-  Quaternion q2(-1.23918f, Vector4(7.0f, -13.0f, 11.0f, 0.0f));
+  Quaternion q2( Radian(-1.23918f), Vector3(7.0f, -13.0f, 11.0f) );
 
   float els[] = {  0.423f, -0.746f, -0.514f,  0.00f,
                    0.384f,  0.662f, -0.644f,  0.00f,
@@ -775,7 +760,7 @@ int UtcDaliQuaternionExp03(void)
 {
   TestApplication app;
 
-  Quaternion q(0.0f, Vector3(5.0f, 6.0f, 7.0f));
+  Quaternion q( Radian( 0.0f ), Vector3(5.0f, 6.0f, 7.0f) );
 
   // q.w is non-zero. Should assert.
   try
@@ -794,7 +779,7 @@ int UtcDaliQuaternionExp03(void)
 int UtcDaliQuaternionLog01(void)
 {
   TestApplication application; // Reset all test adapter return codes
-  Quaternion q(Math::PI*0.73f, Vector3(2,3,4));
+  Quaternion q( Radian( Math::PI*0.73f ), Vector3(2,3,4) );
   Quaternion q2 = q;
   q2.Normalize();
 
@@ -848,8 +833,8 @@ int UtcDaliQuaternionSlerp01(void)
 {
   TestApplication application;
 
-  Quaternion q1(M_PI/4.0f, Vector4(0.0f, 0.0f, 1.0f, 0.0f));
-  Quaternion q2(-M_PI/4.0f, Vector4(0.0f, 0.0f, 1.0f, 0.0f));
+  Quaternion q1(Radian(M_PI/4.0f), Vector3(0.0f, 0.0f, 1.0f));
+  Quaternion q2(Radian(-M_PI/4.0f), Vector3(0.0f, 0.0f, 1.0f));
 
   Quaternion q = Quaternion::Slerp(q1, q2, 0.0f);
   DALI_TEST_EQUALS(q, q1, 0.001, TEST_LOCATION);
@@ -859,11 +844,11 @@ int UtcDaliQuaternionSlerp01(void)
 
   // @ 25%, will be at M_PI/8
   q = Quaternion::Slerp(q1, q2, 0.25f);
-  Vector4 axis;
-  float angle;
+  Vector3 axis;
+  Radian angle;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(angle, Math::PI/8.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian, Math::PI/8.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.x, 0.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.y, 0.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.z, 1.0f, 0.001, TEST_LOCATION);
@@ -876,8 +861,8 @@ int UtcDaliQuaternionSlerp02(void)
 {
   TestApplication application;
 
-  Quaternion q1(M_PI/6, Vector3(0.0f, 0.0f, 1.0f));
-  Quaternion q2(M_PI/2, Vector3(0.0f, 0.0f, 1.0f));
+  Quaternion q1( Dali::ANGLE_30, Vector3(0.0f, 0.0f, 1.0f));
+  Quaternion q2( Dali::ANGLE_90, Vector3(0.0f, 0.0f, 1.0f));
 
   Quaternion q = Quaternion::Slerp(q1, q2, 0.0f);
 
@@ -890,7 +875,7 @@ int UtcDaliQuaternionSlerp02(void)
   // @ 50%, will be at M_PI/3 around z
   q = Quaternion::Slerp(q1, q2, 0.5f);
 
-  Quaternion r( M_PI/3, Vector3( 0.0f, 0.0f, 1.0f));
+  Quaternion r( Dali::ANGLE_120, Vector3( 0.0f, 0.0f, 1.0f));
   DALI_TEST_EQUALS( q, r, 0.001, TEST_LOCATION );
   END_TEST;
 }
@@ -910,8 +895,8 @@ int UtcDaliQuaternionSlerp03(void)
   DALI_TEST_EQUALS(q,  q2, 0.001, TEST_LOCATION);
 
   q = Quaternion::Slerp(q1, q2, 0.05f);
-  Vector4 axis;
-  float angle;
+  Vector3 axis;
+  Radian angle;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, true, TEST_LOCATION);
 
@@ -937,11 +922,11 @@ int UtcDaliQuaternionSlerp04(void)
   DALI_TEST_EQUALS(q,  q2, 0.001, TEST_LOCATION);
 
   q = Quaternion::Slerp(q1, q2, 0.5f);
-  Vector4 axis;
-  float angle;
+  Vector3 axis;
+  Radian angle;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(angle, float(Radian(Degree(125))), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian, float(Radian(Degree(125))), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.x,  0.0f, 0.01, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.y,  0.0f, 0.01, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.z,  1.0f, 0.01, TEST_LOCATION);
@@ -954,8 +939,8 @@ int UtcDaliQuaternionSlerpNoInvert01(void)
 {
   TestApplication application;
 
-  Quaternion q1(M_PI/4.0f, Vector4(0.0f, 0.0f, 1.0f, 0.0f));
-  Quaternion q2(-M_PI/4.0f, Vector4(0.0f, 0.0f, 1.0f, 0.0f));
+  Quaternion q1( Dali::ANGLE_45, Vector3(0.0f, 0.0f, 1.0f));
+  Quaternion q2(-Dali::ANGLE_45, Vector3(0.0f, 0.0f, 1.0f));
 
   Quaternion q = Quaternion::SlerpNoInvert(q1, q2, 0.0f);
   DALI_TEST_EQUALS(q, q1, 0.001, TEST_LOCATION);
@@ -965,11 +950,11 @@ int UtcDaliQuaternionSlerpNoInvert01(void)
 
   // @ 25%, will be at M_PI/8
   q = Quaternion::SlerpNoInvert(q1, q2, 0.25f);
-  Vector4 axis;
-  float angle;
+  Vector3 axis;
+  Radian angle;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(angle, Math::PI/8.0f, 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian, Math::PI/8.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.x, 0.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.y, 0.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.z, 1.0f, 0.001, TEST_LOCATION);
@@ -991,11 +976,11 @@ int UtcDaliQuaternionSlerpNoInvert02(void)
   DALI_TEST_EQUALS(q,  q2, 0.001, TEST_LOCATION);
 
   q = Quaternion::SlerpNoInvert(q1, q2, 0.5f);
-  Vector4 axis;
-  float angle;
+  Vector3 axis;
+  Radian angle;
   bool converted = q.ToAxisAngle(axis, angle);
   DALI_TEST_EQUALS(converted, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(angle, float(Radian(Degree(125))), 0.01f, TEST_LOCATION);
+  DALI_TEST_EQUALS(angle.radian, float(Radian(Degree(125))), 0.01f, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.x,  0.0f, 0.01, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.y,  0.0f, 0.01, TEST_LOCATION);
   DALI_TEST_EQUALS(axis.z,  1.0f, 0.01, TEST_LOCATION);
@@ -1019,7 +1004,7 @@ int UtcDaliQuaternionSquad(void)
 
   // Don't know what actual value should be, but can make some informed guesses.
   q = Quaternion::Squad(q1, q2, q1out, q2in, 0.5f);
-  float angle;
+  Radian angle;
   Vector3 axis;
   q.Normalize();
   q.ToAxisAngle(axis, angle);
@@ -1029,7 +1014,7 @@ int UtcDaliQuaternionSquad(void)
     q = -q; // Might get negative quat
     q.ToAxisAngle(axis, angle);
   }
-  float deg = Degree(Radian(angle));
+  float deg = Degree(angle).degree;
   DALI_TEST_CHECK(deg >= 0 && deg <= 90);
   DALI_TEST_CHECK(axis.y > 0);
   DALI_TEST_CHECK(axis.z > 0);
@@ -1040,8 +1025,8 @@ int UtcDaliAngleBetween(void)
 {
   TestApplication application; // Reset all test adapter return codes
 
-  Quaternion q1(Radian(Degree(45)), 0.0f, 0.0f);
-  Quaternion q2(Radian(Degree(47)), 0.0f, 0.0f);
+  Quaternion q1( ANGLE_45, ANGLE_0, ANGLE_0 );
+  Quaternion q2(Radian(Degree(47)), ANGLE_0, ANGLE_0 );
   DALI_TEST_EQUALS(Quaternion::AngleBetween(q1, q2), fabsf(Radian(Degree(45)) - Radian(Degree(47))), 0.001f, TEST_LOCATION);
 
   Quaternion q3(Radian(Degree(80)), Vector3::YAXIS);
@@ -1080,7 +1065,7 @@ int UtcDaliQuaternionOStreamOperator(void)
 
   std::ostringstream oss;
 
-  Quaternion quaternion(M_PI, Vector3::YAXIS);
+  Quaternion quaternion( Dali::ANGLE_180, Vector3::YAXIS );
 
   oss << quaternion;
 

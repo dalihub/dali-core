@@ -2,7 +2,7 @@
 #define __DALI_RADIAN_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,58 +18,49 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <ostream>
+
 // INTERNAL INCLUDES
+#include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/math/math-utils.h>
+#include <dali/public-api/math/degree.h>
 
 namespace Dali
 {
-
-struct Degree;
 
 /**
  * @brief An angle in radians.
  *
  * This reduces ambiguity when using methods which accept angles in degrees or radians.
  */
-struct DALI_IMPORT_API Radian
+struct Radian
 {
+  /**
+   * @brief default constructor, initialises to 0.
+   */
+  Radian()
+  : radian( 0.f )
+  { }
+
   /**
    * @brief Create an angle in radians.
    *
    * @param[in] value The initial value in radians.
    */
-  explicit Radian( float value );
+  explicit Radian( float value )
+  : radian( value )
+  { }
 
   /**
    * @brief Create an angle in radians from an angle in degrees.
    *
-   * @param[in] value The initial value in degrees.
+   * @param[in] degree The initial value in degrees.
    */
-  Radian( const Degree& value );
-
-  /**
-   * @brief Compare equality between two radians.
-   *
-   * @param[in] rhs Radian to compare to
-   * @return true if the value is identical
-   */
-  bool operator==( const Radian& rhs ) const;
-
-  /**
-   * @brief Compare inequality between two radians.
-   *
-   * @param[in] rhs Radian to compare to
-   * @return true if the value is not identical
-   */
-  bool operator!=( const Radian& rhs ) const;
-
-  /**
-   * @brief Compare two radians.
-   *
-   * @param[in] rhs Radian to compare to
-   * @return true if this is less than the value
-   */
-  bool operator<( const Radian& rhs ) const;
+  Radian( Degree degree )
+  : radian( degree.degree * Math::PI_OVER_180 )
+  { }
 
   /**
    * @brief Assign an angle from a float value.
@@ -77,33 +68,243 @@ struct DALI_IMPORT_API Radian
    * @param[in] value Float value in radians
    * @return a reference to this object
    */
-  Radian& operator=( const float value );
+  Radian& operator=( float value )
+  {
+    radian = value;
+    return *this;
+  }
 
   /**
-   * @brief Assign an angle in degrees to a Radian.
+   * @brief Assign an angle from a Degree value.
    *
-   * @param[in] rhs Degree to get the value from
+   * @param[in] degree The value in degrees.
    * @return a reference to this object
    */
-  Radian& operator=( const Degree& rhs );
+  Radian& operator=( Degree degree )
+  {
+    radian = degree.degree * Math::PI_OVER_180;
+    return *this;
+  }
 
   /**
-   * @brief Cast operator to const float reference.
+   * @brief Conversion to float
+   * @return the float value of this Radian
    */
-  operator const float&() const;
+  operator float() const
+  {
+    return radian;
+  }
 
-  /**
-   * @brief Cast operator to float reference.
-   */
-  operator float&();
+public:
 
-private:
   // member data
-  float mValue; ///< The value in radians
+  float radian; ///< The value in radians
 
-  // disable default constructor
-  Radian();
 };
+
+// compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
+
+// useful constant angles
+static const Radian ANGLE_360 = Radian( Math::PI * 2.00f ); ///< 360 degree turn in radians
+static const Radian ANGLE_315 = Radian( Math::PI * 1.75f ); ///< 315 degree turn in radians
+static const Radian ANGLE_270 = Radian( Math::PI * 1.50f  );///< 270 degree turn in radians
+static const Radian ANGLE_225 = Radian( Math::PI * 1.25f ); ///< 225 degree turn in radians
+static const Radian ANGLE_180 = Radian( Math::PI         ); ///< 180 degree turn in radians
+static const Radian ANGLE_135 = Radian( Math::PI * 0.75f ); ///< 135 degree turn in radians
+static const Radian ANGLE_120 = Radian( Math::PI / 3.00f ); ///< 120 degree turn in radians
+static const Radian ANGLE_90  = Radian( Math::PI_2 );       ///< 90 degree turn in radians
+static const Radian ANGLE_45  = Radian( Math::PI_4 );       ///< 45 degree turn in radians
+static const Radian ANGLE_30  = Radian( Math::PI / 6.00f ); ///< 30 degree turn in radians
+static const Radian ANGLE_0   = Radian( 0.0f );             ///< 0 degree turn in radians
+
+/**
+ * @brief Compare equality between two radians.
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Radian to compare to
+ * @return true if the values are identical
+ */
+inline bool operator==( Radian lhs, Radian rhs )
+{
+  return fabsf( lhs.radian - rhs.radian ) < Math::MACHINE_EPSILON_10; // expect Radian angles to be between 0 and 10 (multiplies of Math::PI)
+}
+
+/**
+ * @brief Compare inequality between two radians.
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Radian to compare to
+ * @return true if the values are not identical
+ */
+inline bool operator!=( Radian lhs, Radian rhs )
+{
+  return !( operator==( lhs, rhs ) );
+}
+
+/**
+ * @brief Compare equality between a radian and degree.
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Degree to compare to
+ * @return true if the values are identical
+ */
+inline bool operator==( Radian lhs, Degree rhs )
+{
+  return fabsf( lhs.radian - Radian( rhs ).radian ) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
+}
+
+/**
+ * @brief Compare inequality between a radian and a degree.
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Degree to compare to
+ * @return true if the values are not identical
+ */
+inline bool operator!=( Radian lhs, Degree rhs )
+{
+  return !( operator==( lhs, rhs ) );
+}
+
+/**
+ * @brief Compare equality between a degree and a radian.
+ *
+ * @param[in] lhs Degree to compare
+ * @param[in] rhs Radian to compare to
+ * @return true if the values are identical
+ */
+inline bool operator==( Degree lhs, Radian rhs )
+{
+  return fabsf( Radian( lhs ).radian - rhs.radian ) < Math::MACHINE_EPSILON_100; // expect Degree angles to be between 0 and 999
+}
+
+/**
+ * @brief Compare inequality between a degree and a radian.
+ *
+ * @param[in] lhs Degree to compare
+ * @param[in] rhs Radian to compare to
+ * @return true if the values are not identical
+ */
+inline bool operator!=( Degree lhs, Radian rhs )
+{
+  return !( operator==( lhs, rhs ) );
+}
+
+/**
+ * @brief Compare greater than between two radians
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Radian to compare to
+ * @return true if lhs is greater than rhs
+ */
+inline bool operator>( Radian lhs, Radian rhs )
+{
+  return lhs.radian > rhs.radian;
+}
+
+/**
+ * @brief Compare greater than between a radian and a degree.
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Degree to compare to
+ * @return true if lhs is greater than rhs
+ */
+inline bool operator>( Radian lhs, Degree rhs )
+{
+  return lhs.radian > Radian(rhs).radian;
+}
+
+/**
+ * @brief Compare greater than between a radian and a degree.
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Degree to compare to
+ * @return true if lhs is greater than rhs
+ */
+inline bool operator>( Degree lhs, Radian rhs )
+{
+  return Radian(lhs).radian > rhs.radian;
+}
+
+/**
+ * @brief Compare less than between two radians.
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Radian to compare to
+ * @return true if lhs is less than rhs
+ */
+inline bool operator<( Radian lhs, Radian rhs )
+{
+  return lhs.radian < rhs.radian;
+}
+
+/**
+ * @brief Compare less than between a radian and a degree.
+ *
+ * @param[in] lhs Radian to compare
+ * @param[in] rhs Degree to compare to
+ * @return true if lhs is less than rhs
+ */
+inline bool operator<( Radian lhs, Degree rhs )
+{
+  return lhs.radian < Radian(rhs).radian;
+}
+
+/**
+ * @brief Compare less than between a degree and a radian.
+ *
+ * @param[in] lhs Degree to compare
+ * @param[in] rhs Radian to compare to
+ * @return true if lhs is less than rhs
+ */
+inline bool operator<( Degree lhs, Radian rhs )
+{
+  return Radian(lhs).radian < rhs.radian;
+}
+
+/**
+ * @brief Multiply Radian with a float
+ *
+ * @param[in] lhs Radian to multiply
+ * @param[in] rhs float to multiply
+ * @return result of the multiplication
+ */
+inline Radian operator*( Radian lhs, float rhs )
+{
+  return Radian( lhs.radian * rhs );
+}
+
+/**
+ * @brief Negate the radian
+ * @return The negative angle
+ */
+inline Radian operator-( Radian in )
+{
+   return Radian( -in.radian );
+}
+
+/**
+ * @brief Clamp a radian value
+ * @param angle to clamp
+ * @param min value
+ * @param max value
+ * @return the resulting radian
+ */
+inline Radian Clamp( Radian angle, float min, float max )
+{
+  return Radian( Clamp<float>( angle.radian, min, max ) );
+}
+
+/**
+ * @brief Stream a radian value
+ * @param [in] ostream The output stream to use.
+ * @param [in] angle in Radian.
+ * @return The output stream.
+ */
+inline std::ostream& operator<<( std::ostream& ostream, Radian angle )
+{
+  ostream << angle.radian;
+  return ostream;
+}
 
 } // namespace Dali
 

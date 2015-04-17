@@ -1147,7 +1147,7 @@ int UtcDaliActorSetOrientation01(void)
 {
   TestApplication application;
 
-  Quaternion rotation(0.785f, Vector3(1.0f, 1.0f, 0.0f));
+  Quaternion rotation( Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
   Actor actor = Actor::New();
 
   actor.SetOrientation(rotation);
@@ -1166,10 +1166,10 @@ int UtcDaliActorSetOrientation02(void)
 
   Actor actor = Actor::New();
 
-  float angle = 0.785f;
+  Radian angle( 0.785f );
   Vector3 axis(1.0f, 1.0f, 0.0f);
 
-  actor.SetOrientation(Radian( angle ), axis);
+  actor.SetOrientation( angle, axis);
   Quaternion rotation( angle, axis );
   // flush the queue and render once
   application.SendNotification();
@@ -1181,13 +1181,13 @@ int UtcDaliActorSetOrientation02(void)
   DALI_TEST_EQUALS(rotation, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   actor.SetOrientation( Degree( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
-  Quaternion result( 0, Vector3( 1.0f, 0.0f, 0.0f ) );
+  Quaternion result( Radian( 0 ), Vector3( 1.0f, 0.0f, 0.0f ) );
   // flush the queue and render once
   application.SendNotification();
   application.Render();
   DALI_TEST_EQUALS( result, actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
-  actor.SetOrientation(Radian( angle ), axis);
+  actor.SetOrientation( angle, axis);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
@@ -1204,20 +1204,20 @@ int UtcDaliActorRotateBy01(void)
 
   Actor actor = Actor::New();
 
-  float angle = M_PI * 0.25f;
-  actor.RotateBy(Radian( angle ), Vector3::ZAXIS);
+  Radian angle( M_PI * 0.25f );
+  actor.RotateBy(( angle ), Vector3::ZAXIS);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.25f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion( angle, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Add( actor );
 
-  actor.RotateBy(Radian( angle ), Vector3::ZAXIS);
+  actor.RotateBy( angle, Vector3::ZAXIS);
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(angle * 2.0f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
 
   Stage::GetCurrent().Remove( actor );
   END_TEST;
@@ -1230,7 +1230,8 @@ int UtcDaliActorRotateBy02(void)
 
   Actor actor = Actor::New();
 
-  Quaternion rotation(M_PI*0.25f, Vector3::ZAXIS);
+  Radian angle( M_PI * 0.25f );
+  Quaternion rotation(angle, Vector3::ZAXIS);
   actor.RotateBy(rotation);
   // flush the queue and render once
   application.SendNotification();
@@ -1241,7 +1242,7 @@ int UtcDaliActorRotateBy02(void)
   // flush the queue and render once
   application.SendNotification();
   application.Render();
-  DALI_TEST_EQUALS(Quaternion(M_PI*0.5f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
+  DALI_TEST_EQUALS(Quaternion(angle * 2.0f, Vector3::ZAXIS), actor.GetCurrentOrientation(), 0.001, TEST_LOCATION);
   END_TEST;
 }
 
@@ -1250,7 +1251,7 @@ int UtcDaliActorGetCurrentOrientation(void)
   TestApplication application;
   Actor actor = Actor::New();
 
-  Quaternion rotation(0.785f, Vector3(1.0f, 1.0f, 0.0f));
+  Quaternion rotation(Radian(0.785f), Vector3(1.0f, 1.0f, 0.0f));
   actor.SetOrientation(rotation);
   // flush the queue and render once
   application.SendNotification();
@@ -1275,8 +1276,8 @@ int UtcDaliActorGetCurrentWorldOrientation(void)
   parent.Add( child );
 
   // The actors should not have a world rotation yet
-  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
-  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion(0.0f, Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( parent.GetCurrentWorldOrientation(), Quaternion(Radian(0.0f), Vector3::YAXIS), 0.001, TEST_LOCATION );
+  DALI_TEST_EQUALS( child.GetCurrentWorldOrientation(), Quaternion(Radian(0.0f), Vector3::YAXIS), 0.001, TEST_LOCATION );
 
   application.SendNotification();
   application.Render(0);

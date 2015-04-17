@@ -64,13 +64,11 @@ public_api_src_files = \
   $(public_api_src_dir)/images/nine-patch-image.cpp \
   $(public_api_src_dir)/images/resource-image.cpp \
   $(public_api_src_dir)/images/native-image.cpp \
-  $(public_api_src_dir)/math/angle-axis.cpp \
   $(public_api_src_dir)/math/compile-time-math.cpp \
   $(public_api_src_dir)/math/degree.cpp \
   $(public_api_src_dir)/math/matrix.cpp \
   $(public_api_src_dir)/math/matrix3.cpp \
   $(public_api_src_dir)/math/quaternion.cpp \
-  $(public_api_src_dir)/math/radian.cpp \
   $(public_api_src_dir)/math/vector2.cpp \
   $(public_api_src_dir)/math/vector3.cpp \
   $(public_api_src_dir)/math/vector4.cpp \
