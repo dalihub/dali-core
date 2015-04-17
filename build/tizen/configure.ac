@@ -117,6 +117,7 @@ AC_CONFIG_FILES([
  dali-core/Makefile
  dali-core.pc
  ../../automated-tests/CMakeLists.txt
+ ../../automated-tests/src/dali/CMakeLists.txt
 ])
 
 AC_OUTPUT

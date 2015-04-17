@@ -37,8 +37,6 @@ class RenderTaskList;
 struct Vector2;
 struct Vector3;
 struct Vector4;
-class DynamicsWorld;
-class DynamicsWorldConfig;
 struct KeyEvent;
 struct TouchEvent;
 struct WheelEvent;
@@ -211,35 +209,6 @@ public:
    * @return The object registry.
    */
   ObjectRegistry GetObjectRegistry() const;
-
-  // Dynamics
-
-  /**
-   * @brief Initialise the dynamics simulation and create a DynamicsWorld object.
-   *
-   * Only one instance of DynamicsWorld will be created, so calling this method multiple times
-   * will return the same DynamicsWorld object.
-   * @param[in] config A DynamicsWorldConfig object describing the required capabilities of the dynamics world.
-   * @return A handle to the world object of the dynamics simulation, or an empty handle if Dynamics capable
-   *         of supporting the requirement in config is not available on the platform.
-   */
-  DynamicsWorld InitializeDynamics(DynamicsWorldConfig config);
-
-  /**
-   * @brief Get a handle to the world object of the dynamics simulation.
-   *
-   * @return A handle to the world object of the dynamics simulation
-   */
-  DynamicsWorld GetDynamicsWorld();
-
-  /**
-   * @brief Terminate the dynamics simulation.
-   *
-   * Calls Actor::DisableDynamics on all dynamics enabled actors,
-   * all handles to any DynamicsBody or DynamicsJoint objects held by applications
-   * will become detached from their actors and the simulation therefore should be discarded.
-   */
-  void TerminateDynamics();
 
   // Rendering
 

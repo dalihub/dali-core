@@ -178,7 +178,6 @@ internal_dynamics_src_files = \
   $(internal_src_dir)/event/dynamics/dynamics-cube-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-cylinder-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-joint-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-notifier.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-mesh-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-sphere-shape-impl.cpp \

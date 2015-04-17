@@ -300,7 +300,7 @@ ActorPtr DynamicsJoint::GetActor( const bool first ) const
 {
   DynamicsBodyPtr body( first ? mBodyA : mBodyB );
 
-  return Stage::GetCurrent()->GetDynamicsWorld()->GetMappedActor( body->GetSceneObject() );
+  return DynamicsWorld::Get()->GetMappedActor( body->GetSceneObject() );
 }
 
 void DynamicsJoint::Connect( EventThreadServices& eventThreadServices )

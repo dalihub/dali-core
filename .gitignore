@@ -33,6 +33,7 @@ BROWSE
 *.creator
 *.creator.user
 /automated-tests/CMakeLists.txt
+/automated-tests/src/dali/CMakeLists.txt
 /docs/generated/*
 /build/tizen/doc
 /build/tizen/.cov

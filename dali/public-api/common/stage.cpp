@@ -26,15 +26,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/object/object-registry.h>
 
-#include <dali/devel-api/dynamics/dynamics-world.h>
-#include <dali/devel-api/dynamics/dynamics-world-config.h>
-
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
-#include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#endif
-
 namespace Dali
 {
 
@@ -134,33 +125,6 @@ ObjectRegistry Stage::GetObjectRegistry() const
   Internal::ObjectRegistry& internal = Internal::Stage::GetCurrent()->GetObjectRegistry();
 
   return ObjectRegistry(&internal);
-}
-
-DynamicsWorld Stage::InitializeDynamics(DynamicsWorldConfig config)
-{
-#ifdef DYNAMICS_SUPPORT
-  Internal::DynamicsWorldConfigPtr configImpl( &(GetImplementation(config)) );
-
-  return DynamicsWorld( GetImplementation(*this).InitializeDynamics(configImpl).Get() );
-#else
-  return DynamicsWorld();
-#endif
-}
-
-DynamicsWorld Stage::GetDynamicsWorld()
-{
-#ifdef DYNAMICS_SUPPORT
-  return DynamicsWorld( GetImplementation(*this).GetDynamicsWorld().Get() );
-#else
-  return DynamicsWorld();
-#endif
-}
-
-void Stage::TerminateDynamics()
-{
-#ifdef DYNAMICS_SUPPORT
-  GetImplementation(*this).TerminateDynamics();
-#endif
 }
 
 void Stage::KeepRendering( float durationSeconds )

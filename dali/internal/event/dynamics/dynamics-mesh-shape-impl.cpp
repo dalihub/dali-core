@@ -37,8 +37,7 @@ DynamicsMeshShape::DynamicsMeshShape(Mesh& mesh)
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
 
-  StagePtr stage( Stage::GetCurrent() );
-  DynamicsWorldPtr world( stage->GetDynamicsWorld() );
+  DynamicsWorldPtr world( DynamicsWorld::Get() );
   DALI_ASSERT_ALWAYS( world && "No Dynamics World !");
   ResourceManager& resourceManager( ThreadLocalStorage::Get().GetResourceManager() );
 
@@ -46,7 +45,7 @@ DynamicsMeshShape::DynamicsMeshShape(Mesh& mesh)
   mDynamicsShape = meshShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsMeshShapeMessage( *stage, *meshShape );
+  InitializeDynamicsMeshShapeMessage( *Stage::GetCurrent(), *meshShape );
 }
 
 DynamicsMeshShape::~DynamicsMeshShape()

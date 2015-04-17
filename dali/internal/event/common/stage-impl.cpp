@@ -40,13 +40,6 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#include <dali/integration-api/dynamics/dynamics-factory-intf.h>
-#include <dali/integration-api/dynamics/dynamics-world-settings.h>
-#endif
-
 using Dali::Internal::SceneGraph::Node;
 
 namespace Dali
@@ -473,47 +466,6 @@ void Stage::SetDpi(Vector2 dpi)
   mDpi = dpi;
 }
 
-#ifdef DYNAMICS_SUPPORT
-
-DynamicsNotifier& Stage::GetDynamicsNotifier()
-{
-  return mDynamicsNotifier;
-}
-
-DynamicsWorldPtr Stage::InitializeDynamics(DynamicsWorldConfigPtr config)
-{
-  if( !mDynamicsFactory )
-  {
-    mDynamicsFactory = ThreadLocalStorage::Get().GetPlatformAbstraction().GetDynamicsFactory();
-  }
-
-  if( mDynamicsFactory && !mDynamicsWorld )
-  {
-    if( mDynamicsFactory->InitializeDynamics( *(config->GetSettings()) ) )
-    {
-      mDynamicsWorld = DynamicsWorld::New();
-      mDynamicsWorld->Initialize( *this, *mDynamicsFactory, config );
-    }
-  }
-  return mDynamicsWorld;
-}
-
-DynamicsWorldPtr Stage::GetDynamicsWorld()
-{
-  return mDynamicsWorld;
-}
-
-void Stage::TerminateDynamics()
-{
-  if( mDynamicsWorld )
-  {
-    mDynamicsWorld->Terminate(*this);
-    mDynamicsWorld = NULL;
-  }
-}
-
-#endif // DYNAMICS_SUPPORT
-
 void Stage::KeepRendering( float durationSeconds )
 {
   // Send message to keep rendering
@@ -648,9 +600,6 @@ Stage::Stage( AnimationPlaylist& playlist,
   mBackgroundColor(Dali::Stage::DEFAULT_BACKGROUND_COLOR),
   mViewMode( MONO ),
   mStereoBase( DEFAULT_STEREO_BASE ),
-#ifdef DYNAMICS_SUPPORT
-  mDynamicsFactory(NULL),
-#endif
   mSystemOverlay(NULL)
 {
 }
