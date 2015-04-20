@@ -22,7 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/animation/key-frames.h>
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/internal/event/animation/progress-value.h>
 #include <dali/internal/event/animation/key-frame-channel.h>
 

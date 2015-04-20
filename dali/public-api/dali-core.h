@@ -31,7 +31,7 @@
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/actors/sampling.h>
 
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/constraint-source.h>
 #include <dali/public-api/animation/constraint.h>

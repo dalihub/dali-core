@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property-value.h>
 #include <dali/public-api/object/property-types.h>

@@ -1392,7 +1392,7 @@ int UtcDaliRenderTaskSetViewportPosition(void)
 
   Vector2 newPosition3(64.0f, 0.0f);
   Animation animation = Animation::New(1.0f);
-  animation.AnimateTo( Property( task, RenderTask::Property::VIEWPORT_POSITION ), newPosition3, AlphaFunctions::Linear );
+  animation.AnimateTo( Property( task, RenderTask::Property::VIEWPORT_POSITION ), newPosition3, AlphaFunction::LINEAR );
   animation.Play();
 
   // Perform 1000ms worth of updates at which point animation should have completed.
@@ -1440,7 +1440,7 @@ int UtcDaliRenderTaskSetViewportSize(void)
 
   Vector2 newSize3(10.0f, 10.0f);
   Animation animation = Animation::New(1.0f);
-  animation.AnimateTo( Property( task, RenderTask::Property::VIEWPORT_SIZE ), newSize3, AlphaFunctions::Linear );
+  animation.AnimateTo( Property( task, RenderTask::Property::VIEWPORT_SIZE ), newSize3, AlphaFunction::LINEAR );
   animation.Play();
 
   // Perform 1000ms worth of updates at which point animation should have completed.

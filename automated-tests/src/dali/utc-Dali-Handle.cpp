@@ -489,7 +489,7 @@ int UtcDaliHandleNonAnimtableProperties(void)
 
   try
   {
-    animation.AnimateBy(Property(actor, nonAnimStringIndex), relativeValue, AlphaFunctions::EaseIn);
+    animation.AnimateBy(Property(actor, nonAnimStringIndex), relativeValue, AlphaFunction::EASE_IN);
     animation.Play();
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds*0100.0f)/* some progress */);

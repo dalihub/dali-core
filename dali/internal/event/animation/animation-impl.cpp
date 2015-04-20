@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
@@ -81,6 +81,7 @@ TypeAction action3( mType, ACTION_PAUSE, &Animation::DoAction );
 const Dali::Animation::EndAction DEFAULT_END_ACTION( Dali::Animation::Bake );
 const Dali::Animation::EndAction DEFAULT_DISCONNECT_ACTION( Dali::Animation::BakeFinal );
 const Dali::Animation::Interpolation DEFAULT_INTERPOLATION( Dali::Animation::Linear );
+const Dali::AlphaFunction DEFAULT_ALPHA_FUNCTION( Dali::AlphaFunction::DEFAULT );
 
 } // anon namespace
 
@@ -97,7 +98,7 @@ AnimationPtr Animation::New(float durationSeconds)
     durationSeconds = 0.0f;
   }
 
-  AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, Dali::AlphaFunctions::Linear );
+  AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION );
 
   // Second-phase construction
   animation->Initialize();
@@ -289,17 +290,17 @@ void Animation::Clear()
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue)
 {
-  AnimateBy(target, relativeValue, AlphaFunctions::Default, mDurationSeconds);
+  AnimateBy(target, relativeValue, mDefaultAlpha, TimePeriod(mDurationSeconds));
 }
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha)
 {
-  AnimateBy(target, relativeValue, alpha, mDurationSeconds);
+  AnimateBy(target, relativeValue, alpha, TimePeriod(mDurationSeconds));
 }
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue, TimePeriod period)
 {
-  AnimateBy(target, relativeValue, AlphaFunctions::Default, period);
+  AnimateBy(target, relativeValue, mDefaultAlpha, period);
 }
 
 void Animation::AnimateBy(Property& target, Property::Value& relativeValue, AlphaFunction alpha, TimePeriod period)
@@ -408,17 +409,17 @@ void Animation::AnimateBy(Property& target, Property::Value& relativeValue, Alph
 
 void Animation::AnimateTo(Property& target, Property::Value& destinationValue)
 {
-  AnimateTo(target, destinationValue, AlphaFunctions::Default, mDurationSeconds);
+  AnimateTo(target, destinationValue, mDefaultAlpha, TimePeriod(mDurationSeconds));
 }
 
 void Animation::AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha)
 {
-  AnimateTo(target, destinationValue, alpha, mDurationSeconds);
+  AnimateTo(target, destinationValue, alpha, TimePeriod(mDurationSeconds));
 }
 
 void Animation::AnimateTo(Property& target, Property::Value& destinationValue, TimePeriod period)
 {
-  AnimateTo(target, destinationValue, AlphaFunctions::Default, period);
+  AnimateTo(target, destinationValue, mDefaultAlpha, period);
 }
 
 void Animation::AnimateTo(Property& target, Property::Value& destinationValue, AlphaFunction alpha, TimePeriod period)
@@ -553,12 +554,12 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames)
 {
-  AnimateBetween(target, keyFrames, mDefaultAlpha, mDurationSeconds, DEFAULT_INTERPOLATION );
+  AnimateBetween(target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION );
 }
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Interpolation interpolation )
 {
-  AnimateBetween(target, keyFrames, mDefaultAlpha, mDurationSeconds, interpolation );
+  AnimateBetween(target, keyFrames, mDefaultAlpha, TimePeriod(mDurationSeconds), interpolation );
 }
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, TimePeriod period)
@@ -573,12 +574,12 @@ void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, Time
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha)
 {
-  AnimateBetween(target, keyFrames, alpha, mDurationSeconds, DEFAULT_INTERPOLATION);
+  AnimateBetween(target, keyFrames, alpha, TimePeriod(mDurationSeconds), DEFAULT_INTERPOLATION);
 }
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, Interpolation interpolation)
 {
-  AnimateBetween(target, keyFrames, alpha, mDurationSeconds, interpolation);
+  AnimateBetween(target, keyFrames, alpha, TimePeriod(mDurationSeconds), interpolation);
 }
 
 void Animation::AnimateBetween(Property target, const KeyFrames& keyFrames, AlphaFunction alpha, TimePeriod period)
@@ -783,12 +784,12 @@ void Animation::AddAnimatorConnector( AnimatorConnectorBase* connector )
 
 void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward )
 {
-  Animate( actor, path, forward, mDefaultAlpha, TimePeriod(0.0f,GetDuration()) );
+  Animate( actor, path, forward, mDefaultAlpha, TimePeriod(mDurationSeconds) );
 }
 
 void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward, AlphaFunction alpha )
 {
-  Animate( actor, path, forward, alpha, TimePeriod(0.0f,GetDuration()) );
+  Animate( actor, path, forward, alpha, TimePeriod(mDurationSeconds) );
 }
 
 void Animation::Animate( Actor& actor, const Path& path, const Vector3& forward, TimePeriod period )
@@ -831,7 +832,7 @@ void Animation::Show(Actor& actor, float delaySeconds)
                                                       Dali::Actor::Property::VISIBLE,
                                                       Property::INVALID_COMPONENT_INDEX,
                                                       new AnimateToBoolean(SHOW_VALUE),
-                                                      AlphaFunctions::Default,
+                                                      mDefaultAlpha,
                                                       TimePeriod(delaySeconds, 0.0f/*immediate*/) ) );
 }
 
@@ -843,7 +844,7 @@ void Animation::Hide(Actor& actor, float delaySeconds)
                                                       Dali::Actor::Property::VISIBLE,
                                                       Property::INVALID_COMPONENT_INDEX,
                                                       new AnimateToBoolean(HIDE_VALUE),
-                                                      AlphaFunctions::Default,
+                                                      mDefaultAlpha,
                                                       TimePeriod(delaySeconds, 0.0f/*immediate*/) ) );
 }
 

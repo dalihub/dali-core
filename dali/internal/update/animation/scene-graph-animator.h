@@ -24,9 +24,10 @@
 #include <dali/internal/event/animation/path-impl.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/common/property-base.h>
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
 #include <dali/public-api/animation/time-period.h>
+#include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/math/radian.h>
@@ -67,7 +68,7 @@ public:
   AnimatorBase()
   : mDurationSeconds(1.0f),
     mInitialDelaySeconds(0.0f),
-    mAlphaFunc(AlphaFunctions::Linear),
+    mAlphaFunction(AlphaFunction::DEFAULT),
     mDisconnectAction(Dali::Animation::BakeFinal),
     mActive(false),
     mEnabled(true)
@@ -125,18 +126,146 @@ public:
    * Set the alpha function for an animator.
    * @param [in] alphaFunc The alpha function to apply to the animation progress.
    */
-  void SetAlphaFunc(AlphaFunc alphaFunc)
+  void SetAlphaFunction(const AlphaFunction& alphaFunction)
   {
-    mAlphaFunc = alphaFunc;
+    mAlphaFunction = alphaFunction;
   }
 
   /**
    * Retrieve the alpha function of an animator.
    * @return The function.
    */
-  AlphaFunc GetAlphaFunc() const
+  AlphaFunction GetAlphaFunction() const
   {
-    return mAlphaFunc;
+    return mAlphaFunction;
+  }
+
+  /*
+   * Applies the alpha function to the specified progress
+   * @param[in] Current progress
+   * @return The progress after the alpha function has been aplied
+   */
+  float ApplyAlphaFunction( float progress ) const
+  {
+    float result = progress;
+
+    AlphaFunction::Mode alphaFunctionMode( mAlphaFunction.GetMode() );
+    if( alphaFunctionMode == AlphaFunction::BUILTIN_FUNCTION )
+    {
+      switch(mAlphaFunction.GetBuiltinFunction())
+      {
+        case AlphaFunction::DEFAULT:
+        case AlphaFunction::LINEAR:
+        {
+          break;
+        }
+        case AlphaFunction::REVERSE:
+        {
+          result = 1.0f-progress;
+          break;
+        }
+        case AlphaFunction::EASE_IN_SQUARE:
+        {
+          result = progress * progress;
+          break;
+        }
+        case AlphaFunction::EASE_OUT_SQUARE:
+        {
+          result = 1.0f - (1.0f-progress) * (1.0f-progress);
+          break;
+        }
+        case AlphaFunction::EASE_IN:
+        {
+          result = progress * progress * progress;
+          break;
+        }
+        case AlphaFunction::EASE_OUT:
+        {
+          result = (progress-1.0f) * (progress-1.0f) * (progress-1.0f) + 1.0f;
+          break;
+        }
+        case AlphaFunction::EASE_IN_OUT:
+        {
+          result = progress*progress*(3.0f-2.0f*progress);
+          break;
+        }
+        case AlphaFunction::EASE_IN_SINE:
+        {
+          result = -1.0f * cosf(progress * Math::PI_2) + 1.0f;
+          break;
+        }
+        case AlphaFunction::EASE_OUT_SINE:
+        {
+          result = sinf(progress * Math::PI_2);
+          break;
+        }
+        case AlphaFunction::EASE_IN_OUT_SINE:
+        {
+          result = -0.5f * (cosf(Math::PI * progress) - 1.0f);
+          break;
+        }
+        case AlphaFunction::BOUNCE:
+        {
+          result = sinf(progress * Math::PI);
+          break;
+        }
+        case AlphaFunction::SIN:
+        {
+          result = 0.5f - cosf(progress * 2.0f * Math::PI) * 0.5f;
+          break;
+        }
+        case AlphaFunction::EASE_OUT_BACK:
+        {
+          const float sqrt2 = 1.70158f;
+          progress -= 1.0f;
+          result = 1.0f + progress * progress * ( ( sqrt2 + 1.0f ) * progress + sqrt2 );
+          break;
+        }
+        default:
+          break;
+      }
+    }
+    else if(  alphaFunctionMode == AlphaFunction::CUSTOM_FUNCTION )
+    {
+      AlphaFunctionPrototype customFunction = mAlphaFunction.GetCustomFunction();
+      if( customFunction )
+      {
+        result = customFunction(progress);
+      }
+    }
+    else
+    {
+      //If progress is very close to 0 or very close to 1 we don't need to evaluate the curve as the result will
+      //be almost 0 or almost 1 respectively
+      if( ( progress > Math::MACHINE_EPSILON_1 ) && ((1.0f - progress) > Math::MACHINE_EPSILON_1) )
+      {
+        Dali::Vector4 controlPoints = mAlphaFunction.GetBezierControlPoints();
+
+        static const float tolerance = 0.001f;  //10 iteration max
+
+        //Perform a binary search on the curve
+        float lowerBound(0.0f);
+        float upperBound(1.0f);
+        float currentT(0.5f);
+        float currentX = EvaluateCubicBezier( controlPoints.x, controlPoints.z, currentT);
+        while( fabs( progress - currentX ) > tolerance )
+        {
+          if( progress > currentX )
+          {
+            lowerBound = currentT;
+          }
+          else
+          {
+            upperBound = currentT;
+          }
+          currentT = (upperBound+lowerBound)*0.5f;
+          currentX = EvaluateCubicBezier( controlPoints.x, controlPoints.z, currentT);
+        }
+        result = EvaluateCubicBezier( controlPoints.y, controlPoints.w, currentT);
+      }
+    }
+
+    return result;
   }
 
   /**
@@ -204,10 +333,23 @@ public:
 
 protected:
 
+  /**
+   * Helper function to evaluate a cubic bezier curve assuming first point is at 0.0 and last point is at 1.0
+   * @param[in] p0 First control point of the bezier curve
+   * @param[in] p1 Second control point of the bezier curve
+   * @param[in] t A floating point value between 0.0 and 1.0
+   * @return Value of the curve at progress t
+   */
+  inline float EvaluateCubicBezier( float p0, float p1, float t ) const
+  {
+    float tSquare = t*t;
+    return 3.0f*(1.0f-t)*(1.0f-t)*t*p0 + 3.0f*(1.0f-t)*tSquare*p1 + tSquare*t;
+  }
+
   float mDurationSeconds;
   float mInitialDelaySeconds;
 
-  AlphaFunc mAlphaFunc;
+  AlphaFunction mAlphaFunction;
 
   Dali::Animation::EndAction mDisconnectAction;     ///< EndAction to apply when target object gets disconnected from the stage.
   bool mActive:1;                                   ///< Animator is "active" while it's running.
@@ -243,7 +385,7 @@ public:
                                                const_cast<PropertyBase*>( &property ),
                                                animatorFunction );
 
-    animator->SetAlphaFunc( alphaFunction );
+    animator->SetAlphaFunction( alphaFunction );
     animator->SetInitialDelay( timePeriod.delaySeconds );
     animator->SetDuration( timePeriod.durationSeconds );
 
@@ -305,7 +447,8 @@ public:
    */
   virtual void Update( BufferIndex bufferIndex, float progress, bool bake )
   {
-    float alpha = mAlphaFunc( progress );
+    float alpha = ApplyAlphaFunction(progress);
+
     const PropertyType& current = mPropertyAccessor.Get( bufferIndex );
 
     const PropertyType result = (*mAnimatorFunction)( alpha, current );
