@@ -19,8 +19,7 @@
 #include <dali/public-api/images/resource-image.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/image-attributes.h>
-#include <dali/public-api/math/vector2.h>
+#include <dali/internal/common/image-attributes.h>
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/integration-api/platform-abstraction.h>
@@ -28,10 +27,11 @@
 namespace Dali
 {
 
-Vector2 ResourceImage::GetImageSize( const std::string& url )
+ImageDimensions ResourceImage::GetImageSize( const std::string& url )
 {
-  Vector2 size;
-  Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( url, ImageAttributes::DEFAULT_ATTRIBUTES, size );
+  const Internal::ImageAttributes& attribs = Internal::ImageAttributes::DEFAULT_ATTRIBUTES;
+  const ImageDimensions desiredSize = ImageDimensions( attribs.GetWidth(), attribs.GetHeight() );
+  const ImageDimensions size = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( url, desiredSize, attribs.GetScalingMode(), attribs.GetFilterMode(), attribs.GetOrientationCorrection() );
   return size;
 }
 
@@ -58,31 +58,38 @@ ResourceImage& ResourceImage::operator=( const ResourceImage& rhs )
   return *this;
 }
 
-ResourceImage ResourceImage::New( const std::string& url )
+ResourceImage ResourceImage::New( const std::string& url, bool orientationCorrection )
 {
-  Internal::ResourceImagePtr internal = Internal::ResourceImage::New( url,
-                                                         Dali::ImageAttributes::DEFAULT_ATTRIBUTES );
-  return ResourceImage(internal.Get());
+  Internal::ImageAttributes attributes = Internal::ImageAttributes::DEFAULT_ATTRIBUTES;
+  attributes.SetOrientationCorrection( orientationCorrection );
+  return ResourceImage( Internal::ResourceImage::New( url, attributes ).Get() );
 }
 
-ResourceImage ResourceImage::New( const std::string& url, LoadPolicy loadPol, ReleasePolicy releasePol )
+ResourceImage ResourceImage::New( const std::string& url, LoadPolicy loadPol, ReleasePolicy releasePol, bool orientationCorrection )
 {
-  Internal::ResourceImagePtr internal = Internal::ResourceImage::New( url,
-                                                         Dali::ImageAttributes::DEFAULT_ATTRIBUTES,
-                                                         loadPol, releasePol );
-  return ResourceImage(internal.Get());
+  Internal::ImageAttributes attributes = Internal::ImageAttributes::DEFAULT_ATTRIBUTES;
+  attributes.SetOrientationCorrection( orientationCorrection );
+  return ResourceImage( Internal::ResourceImage::New( url, attributes, loadPol, releasePol ).Get() );
 }
 
-ResourceImage ResourceImage::New( const std::string& url, const ImageAttributes& attributes )
+ResourceImage ResourceImage::New( const std::string& url, ImageDimensions size, FittingMode::Type scalingMode, SamplingMode::Type samplingMode, bool orientationCorrection )
 {
-  Internal::ResourceImagePtr internal = Internal::ResourceImage::New( url, attributes );
-  return ResourceImage(internal.Get());
+  Internal::ImageAttributes attributes = Internal::ImageAttributes::DEFAULT_ATTRIBUTES;
+  attributes.SetSize( Size( size.GetWidth(), size.GetHeight() ) );
+  attributes.SetScalingMode( scalingMode );
+  attributes.SetFilterMode( samplingMode );
+  attributes.SetOrientationCorrection( orientationCorrection );
+  return ResourceImage( Internal::ResourceImage::New( url, attributes ).Get() );
 }
 
-ResourceImage ResourceImage::New( const std::string& url, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
+ResourceImage ResourceImage::New( const std::string& url, LoadPolicy loadPol, ReleasePolicy releasePol, ImageDimensions size, FittingMode::Type scalingMode, SamplingMode::Type samplingMode, bool orientationCorrection )
 {
-  Internal::ResourceImagePtr internal = Internal::ResourceImage::New( url, attributes, loadPol, releasePol );
-  return ResourceImage(internal.Get());
+  Internal::ImageAttributes attributes = Internal::ImageAttributes::DEFAULT_ATTRIBUTES;
+  attributes.SetSize( Size( size.GetWidth(), size.GetHeight() ) );
+  attributes.SetScalingMode( scalingMode );
+  attributes.SetFilterMode( samplingMode );
+  attributes.SetOrientationCorrection( orientationCorrection );
+  return ResourceImage( Internal::ResourceImage::New( url, attributes, loadPol, releasePol ).Get() );
 }
 
 ResourceImage ResourceImage::DownCast( BaseHandle handle )
@@ -108,11 +115,6 @@ std::string ResourceImage::GetUrl() const
 void ResourceImage::Reload()
 {
   GetImplementation(*this).Reload();
-}
-
-ImageAttributes ResourceImage::GetAttributes() const
-{
-  return GetImplementation(*this).GetAttributes();
 }
 
 ResourceImage::ResourceImageSignal& ResourceImage::LoadingFinishedSignal()

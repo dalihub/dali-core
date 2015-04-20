@@ -19,8 +19,10 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/integration-api/bitmap.h>
+
 #include <dali/integration-api/resource-cache.h>
+#include <dali/integration-api/bitmap.h> ///@todo Remove this include (a bunch of stuff needs to include it though)
+#include <dali/public-api/images/image-operations.h>
 
 namespace Dali
 {
@@ -28,7 +30,6 @@ namespace Dali
 namespace Integration
 {
 
-class Bitmap;
 class DynamicsFactory;
 
 
@@ -63,7 +64,7 @@ public:
    * to cooperate with other apps and reduce the chance of this one being
    * force-killed in a low memory situation.
    */
-  virtual void Suspend() {} ///!ToDo: Make pure virtual once dali-adaptor patch is in place = 0;
+  virtual void Suspend() = 0;
 
   /**
    * Tell the platform abstraction that Dali is resuming from a pause, such as
@@ -71,35 +72,53 @@ public:
    * It is time to wake up sleeping background threads and recreate memory
    * caches and other temporary data.
    */
-  virtual void Resume() {} ///!ToDo: Make pure virtual once dali-adaptor patch is in place = 0;
+  virtual void Resume() = 0;
 
   // Resource Loading
 
   /**
-   * Determine the size of an image the resource loaders will provide when given the same
-   * image attributes.
+   * @brief Determine the size of an image the resource loaders will provide when
+   * given the same image loading parameters.
+   *
    * This is a synchronous request.
    * This function is used to determine the size of an image before it has loaded.
    * @param[in] filename name of the image.
-   * @param[in] attributes The attributes used to load the image
-   * @param[out] closestSize Size of the image that will be loaded.
+   * @param[in] size The requested size for the image.
+   * @param[in] fittingMode The method to use to map the source image to the desired
+   * dimensions.
+   * @param[in] samplingMode The image filter to use if the image needs to be
+   * downsampled to the requested size.
+   * @param[in] orientationCorrection Whether to use image metadata to rotate or
+   * flip the image, e.g., from portrait to landscape.
+   * @return dimensions that image will have if it is loaded with given parameters.
    */
-  virtual void GetClosestImageSize( const std::string& filename,
-                                    const ImageAttributes& attributes,
-                                    Vector2& closestSize ) = 0;
+  virtual ImageDimensions GetClosestImageSize( const std::string& filename,
+                                               ImageDimensions size = ImageDimensions( 0, 0 ),
+                                               FittingMode::Type fittingMode = FittingMode::SHRINK_TO_FIT,
+                                               SamplingMode::Type samplingMode = SamplingMode::BOX,
+                                               bool orientationCorrection = true) = 0;
 
   /**
-   * Determine the size of an image the resource loaders will provide when given the same
-   * image attributes.
+   @brief Determine the size of an image the resource loaders will provide when
+   * given the same image loading parameters.
+   *
    * This is a synchronous request.
    * This function is used to determine the size of an image before it has loaded.
-   * @param[in] resourceBuffer A pointer to an encoded image buffer
-   * @param[in] attributes The attributes used to load the image
-   * @param[out] closestSize Size of the image that will be loaded.
+   * @param[in] filename name of the image.
+   * @param[in] size The requested size for the image.
+   * @param[in] fittingMode The method to use to map the source image to the desired
+   * dimensions.
+   * @param[in] samplingMode The image filter to use if the image needs to be
+   * downsampled to the requested size.
+   * @param[in] orientationCorrection Whether to use image metadata to rotate or
+   * flip the image, e.g., from portrait to landscape.
+   * @return dimensions that image will have if it is loaded with given parameters.
    */
-  virtual void GetClosestImageSize( ResourcePointer resourceBuffer,
-                                    const ImageAttributes& attributes,
-                                    Vector2& closestSize ) = 0;
+  virtual ImageDimensions GetClosestImageSize( ResourcePointer resourceBuffer,
+                                               ImageDimensions size = ImageDimensions( 0, 0 ),
+                                               FittingMode::Type fittingMode = FittingMode::SHRINK_TO_FIT,
+                                               SamplingMode::Type samplingMode = SamplingMode::BOX,
+                                               bool orientationCorrection = true) = 0;
 
   /**
    * Request a resource from the native filesystem. This is an asynchronous request.
@@ -129,6 +148,7 @@ public:
    * This is an asynchronous request.
    */
   virtual void SaveResource(const ResourceRequest& request) = 0;
+
   /**
    * Cancel an ongoing LoadResource() request.
    * Multi-threading note: this method will be called from the main thread only i.e. not

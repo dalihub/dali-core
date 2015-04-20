@@ -764,7 +764,7 @@ int UtcDaliEncodedBufferImageNew01(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliEncodedBufferImageNew01() - EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount, const ImageAttributes& attributes, const ReleasePolicy releasePol )");
+  tet_infoline( "UtcDaliEncodedBufferImageNew01() - EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type scalingMode, SamplingMode::Type samplingMode, ReleasePolicy releasePol, bool orientationCorrection )" );
 
   // Invoke default handle constructor for the Image base class:
   Image image;
@@ -772,10 +772,7 @@ int UtcDaliEncodedBufferImageNew01(void)
   DALI_TEST_CHECK( !image );
 
   // Trigger image decode to initialise the handle
-  Dali::ImageAttributes imageAttributes;
-  imageAttributes.SetSize( 720, 1280 );
-  imageAttributes.SetScalingMode( Dali::ImageAttributes::FitHeight );
-  image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, imageAttributes, Image::NEVER );
+  image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::NEVER );
 
   DALI_TEST_CHECK( image );
 
@@ -785,7 +782,7 @@ int UtcDaliEncodedBufferImageNew01(void)
   DALI_TEST_CHECK( !image2 );
 
   // Trigger image decode to initialise the handle
-  image2 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, imageAttributes, Image::UNUSED );
+  image2 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::UNUSED );
 
   DALI_TEST_CHECK( image2 );
   END_TEST;
@@ -796,7 +793,7 @@ int UtcDaliEncodedBufferImageNew02(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliEncodedBufferImageNew02() - EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount, const ImageAttributes& attributes, const ReleasePolicy releasePol )");
+  tet_infoline( "UtcDaliEncodedBufferImageNew02() - EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount )" );
 
   // Invoke default handle constructor for the Image base class:
   Image image;
@@ -804,13 +801,10 @@ int UtcDaliEncodedBufferImageNew02(void)
   DALI_TEST_CHECK( !image );
 
   // Trigger image decode to initialise the handle
-  Dali::ImageAttributes imageAttributes;
-  imageAttributes.SetSize( 720, 1280 );
-  imageAttributes.SetScalingMode( Dali::ImageAttributes::FitHeight );
   try
   {
     // This should throw on the null pointer:
-    image = EncodedBufferImage::New( 0, sEncodedBufferImageDataPNGLength, imageAttributes, Image::NEVER );
+    image = EncodedBufferImage::New( 0, sEncodedBufferImageDataPNGLength );
     tet_result( TET_FAIL );
   }
   catch (Dali::DaliException& e)
@@ -827,7 +821,7 @@ int UtcDaliEncodedBufferImageNew03(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliEncodedBufferImageNew03() - EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount, const ImageAttributes& attributes, const ReleasePolicy releasePol )");
+  tet_infoline( "UtcDaliEncodedBufferImageNew03() - EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount )" );
 
   // Invoke default handle constructor for the Image base class:
   Image image;
@@ -835,11 +829,10 @@ int UtcDaliEncodedBufferImageNew03(void)
   DALI_TEST_CHECK( !image );
 
   // Trigger image decode to initialise the handle
-  Dali::ImageAttributes imageAttributes;
   try
   {
     // This should throw on the zero size:
-    image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, /** Trigger the assertion.*/ 0, imageAttributes, Image::NEVER );
+    image = EncodedBufferImage::New( sEncodedBufferImageDataPNG, /** Trigger the assertion.*/ 0 );
     tet_result( TET_FAIL );
   }
   catch (Dali::DaliException& e)

@@ -25,13 +25,14 @@
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/images/image-factory.h>
 #include <dali/internal/event/resources/resource-ticket.h>
+#include <dali/internal/common/image-attributes.h>
 
 using namespace Dali;
 
 using Internal::ResourceTicketPtr;
 using Internal::ImageFactory;
 using Internal::ImageFactoryCache::RequestPtr;
-
+using Internal::ImageAttributes;
 
 namespace
 {

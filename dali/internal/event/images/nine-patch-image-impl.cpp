@@ -138,40 +138,35 @@ namespace
 TypeRegistration mType( typeid( Dali::NinePatchImage ), typeid( Dali::Image ), NULL );
 } // unnamed namespace
 
-NinePatchImagePtr NinePatchImage::New( const std::string& filename, const Dali::ImageAttributes& attributes, ReleasePolicy releasePol )
+NinePatchImagePtr NinePatchImage::New( const std::string& filename, const ImageAttributes& attributes, ReleasePolicy releasePol )
 {
   Internal::NinePatchImagePtr internal( new NinePatchImage( filename, attributes, releasePol ) );
   internal->Initialize();
   return internal;
 }
 
-NinePatchImage::NinePatchImage( const std::string& filename, const Dali::ImageAttributes& attributes, ReleasePolicy releasePol)
+NinePatchImage::NinePatchImage( const std::string& filename, const ImageAttributes& attributes, ReleasePolicy releasePol )
 : ResourceImage( IMAGE_LOAD_POLICY_DEFAULT, releasePol ),
   mParsedBorder(false)
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
-  mResourceClient = &tls.GetResourceClient();
 
-  Integration::PlatformAbstraction& platformAbstraction = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
-
-  Vector2 closestSize;
-  platformAbstraction.GetClosestImageSize( filename, attributes, closestSize );
-  ImageAttributes loadedAttrs;
-  loadedAttrs.SetSize( closestSize );
-  mWidth = closestSize.width;
-  mHeight = closestSize.height;
-
-  Integration::BitmapResourceType resourceType( loadedAttrs );
+  Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
+  Integration::BitmapResourceType resourceType( ImageDimensions::FromFloatVec2( attributes.GetSize() ), attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
 
   // Note, bitmap is only destroyed when the image is destroyed.
-  Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously(resourceType, filename);
+  Integration::ResourcePointer resource = platformAbstraction.LoadResourceSynchronously( resourceType, filename );
   if( resource )
   {
     mBitmap = static_cast<Integration::Bitmap*>( resource.Get());
+    mWidth = mBitmap->GetImageWidth();
+    mHeight = mBitmap->GetImageHeight();
   }
   else
   {
     mBitmap.Reset();
+    mWidth = 0;
+    mHeight = 0;
   }
 }
 

@@ -104,7 +104,7 @@ ResourceTicketPtr ResourceClient::RequestResource(
       const BitmapResourceType& bitmapResource = static_cast <const BitmapResourceType&> (type);
       // image tickets will cache the requested parameters, which are updated on successful loading
       ImageTicket* imageTicket = new ImageTicket(*this, newId, typePath);
-      imageTicket->mAttributes = bitmapResource.imageAttributes;
+      imageTicket->mAttributes.Reset( bitmapResource.size, bitmapResource.scalingMode, bitmapResource.samplingMode, bitmapResource.orientationCorrection );
       newTicket = imageTicket;
       break;
     }
@@ -114,7 +114,7 @@ ResourceTicketPtr ResourceClient::RequestResource(
       const NativeImageResourceType& nativeResource = static_cast <const NativeImageResourceType&> (type);
       // image tickets will cache the requested parameters, which are updated on successful loading
       ImageTicket* imageTicket = new ImageTicket(*this, newId, typePath);
-      imageTicket->mAttributes = nativeResource.imageAttributes;
+      imageTicket->mAttributes.SetSize( nativeResource.imageDimensions.GetWidth(), nativeResource.imageDimensions.GetHeight() );
       newTicket = imageTicket;
       break;
     }
@@ -158,7 +158,7 @@ ResourceTicketPtr ResourceClient::DecodeResource(
         const BitmapResourceType& bitmapResource = static_cast <const BitmapResourceType&> ( type );
         // Image tickets will cache the requested parameters, which are updated on successful loading
         ImageTicket* imageTicket = new ImageTicket( *this, newId, typePath );
-        imageTicket->mAttributes = bitmapResource.imageAttributes;
+        imageTicket->mAttributes.Reset( bitmapResource.size, bitmapResource.scalingMode, bitmapResource.samplingMode, bitmapResource.orientationCorrection );;
         newTicket = imageTicket;
         break;
       }
@@ -295,8 +295,8 @@ ImageTicketPtr ResourceClient::AddBitmapImage(Bitmap* bitmap)
 
   const ResourceId newId = ++(mImpl->mNextId);
 
-  Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New(bitmap->GetImageWidth(), bitmap->GetImageHeight());
-  BitmapResourceType bitmapResourceType(imageAttributes); // construct first as no copy ctor (needed to bind ref to object)
+  ImageAttributes imageAttributes = ImageAttributes::New(bitmap->GetImageWidth(), bitmap->GetImageHeight());
+  BitmapResourceType bitmapResourceType( ImageDimensions::FromFloatVec2( imageAttributes.GetSize() ) ); // construct first as no copy ctor (needed to bind ref to object)
   ResourceTypePath typePath(bitmapResourceType, "");
   newTicket = new ImageTicket(*this, newId, typePath);
   newTicket->mAttributes = imageAttributes;
@@ -340,8 +340,8 @@ ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigne
 
   const ResourceId newId = ++(mImpl->mNextId);
 
-  Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New(width, height);
-  RenderTargetResourceType renderTargetResourceType(imageAttributes) ; // construct first as no copy ctor (needed to bind ref to object)
+  ImageAttributes imageAttributes = ImageAttributes::New(width, height);
+  RenderTargetResourceType renderTargetResourceType( ImageDimensions( width, height ) ); // construct first as no copy ctor (needed to bind ref to object)
   ResourceTypePath typePath(renderTargetResourceType, "");
   newTicket = new ImageTicket(*this, newId, typePath);
   newTicket->mAttributes = imageAttributes;
@@ -361,8 +361,8 @@ ImageTicketPtr ResourceClient::AddFrameBufferImage ( NativeImageInterface& nativ
 
   const ResourceId newId = ++(mImpl->mNextId);
 
-  Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New(nativeImage.GetWidth(), nativeImage.GetHeight() );
-  RenderTargetResourceType renderTargetResourceType(imageAttributes); // construct first as no copy ctor (needed to bind ref to object)
+  ImageAttributes imageAttributes = ImageAttributes::New( nativeImage.GetWidth(), nativeImage.GetHeight() );
+  RenderTargetResourceType renderTargetResourceType( ImageDimensions( nativeImage.GetWidth(), nativeImage.GetHeight() ) ); // construct first as no copy ctor (needed to bind ref to object)
   ResourceTypePath typePath(renderTargetResourceType, "");
   newTicket = new ImageTicket(*this, newId, typePath);
   newTicket->mAttributes = imageAttributes;
@@ -384,8 +384,8 @@ ResourceTicketPtr ResourceClient::AllocateTexture( unsigned int width,
   ImageTicketPtr newTicket;
   const ResourceId newId = ++(mImpl->mNextId);
 
-  Dali::ImageAttributes imageAttributes = Dali::ImageAttributes::New( width, height);
-  BitmapResourceType bitmapResourceType(imageAttributes); // construct first as no copy ctor (needed to bind ref to object)
+  ImageAttributes imageAttributes = ImageAttributes::New( width, height);
+  BitmapResourceType bitmapResourceType( ImageDimensions( width, height ) ); // construct first as no copy ctor (needed to bind ref to object)
   ResourceTypePath typePath(bitmapResourceType, "");
   newTicket = new ImageTicket(*this, newId, typePath);
 
@@ -584,7 +584,7 @@ void ResourceClient::NotifySavingFailed( ResourceId id )
   }
 }
 
-void ResourceClient::UpdateImageTicket( ResourceId id, const Dali::ImageAttributes& imageAttributes ) ///!< Issue #AHC01
+void ResourceClient::UpdateImageTicket( ResourceId id, const ImageAttributes& imageAttributes ) ///!< Issue #AHC01
 {
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: UpdateImageTicket(id:%u)\n", id);
 

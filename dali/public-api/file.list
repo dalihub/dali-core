@@ -56,7 +56,6 @@ public_api_src_files = \
   $(public_api_src_dir)/images/atlas.cpp \
   $(public_api_src_dir)/images/distance-field.cpp \
   $(public_api_src_dir)/images/image.cpp \
-  $(public_api_src_dir)/images/image-attributes.cpp \
   $(public_api_src_dir)/images/pixel.cpp \
   $(public_api_src_dir)/images/buffer-image.cpp \
   $(public_api_src_dir)/images/frame-buffer-image.cpp \
@@ -192,7 +191,7 @@ public_api_core_images_header_files = \
   $(public_api_src_dir)/images/encoded-buffer-image.h \
   $(public_api_src_dir)/images/frame-buffer-image.h \
   $(public_api_src_dir)/images/image.h \
-  $(public_api_src_dir)/images/image-attributes.h \
+  $(public_api_src_dir)/images/image-operations.h \
   $(public_api_src_dir)/images/native-image-interface.h \
   $(public_api_src_dir)/images/nine-patch-image.h \
   $(public_api_src_dir)/images/pixel.h \
@@ -210,10 +209,12 @@ public_api_core_math_header_files = \
   $(public_api_src_dir)/math/radian.h \
   $(public_api_src_dir)/math/random.h \
   $(public_api_src_dir)/math/rect.h \
+  $(public_api_src_dir)/math/uint-16-pair.h \
   $(public_api_src_dir)/math/vector2.h \
   $(public_api_src_dir)/math/vector3.h \
   $(public_api_src_dir)/math/vector4.h \
   $(public_api_src_dir)/math/viewport.h
+
 
 public_api_core_modeling_header_files =  \
   $(public_api_src_dir)/modeling/bone.h \

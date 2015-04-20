@@ -23,7 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/images/image-attributes.h>
+#include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/math/uint-16-pair.h>
 
 namespace Dali
 {
@@ -32,6 +33,8 @@ namespace Internal DALI_INTERNAL
 {
 class EncodedBufferImage;
 }
+
+typedef Uint16Pair ImageDimensions;
 
 
 /**
@@ -82,13 +85,16 @@ public:
    * discard it as soon as the function returns.
    * @param [in] encodedImageByteCount The size in bytes of the buffer pointed to
    * by encodedImage.
-   * @param [in] attributes Requested parameters for loading (size, scaling etc.).
+   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
    * @param [in] releasePol The ReleasePolicy to apply to Image. If the Unused
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * policy is set, a reload will not be possible, so the Image should never be
    * used once all actors using it have gone off-stage.
    * @return A handle to a newly allocated object.
    */
-  static EncodedBufferImage New(const uint8_t * const encodedImage, std::size_t encodedImageByteCount, const ImageAttributes& attributes, ReleasePolicy releasePol = Image::NEVER);
+  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount, ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode, ReleasePolicy releasePol = Image::NEVER, bool orientationCorrection = true );
 
   /**
    * @brief Create an initialised image object from an encoded image buffer in memory.
@@ -105,7 +111,7 @@ public:
    * by encodedImage.
    * @return A handle to a newly allocated object.
    */
-  static EncodedBufferImage New(const uint8_t * const encodedImage, std::size_t encodedImageByteCount);
+  static EncodedBufferImage New( const uint8_t * const encodedImage, std::size_t encodedImageByteCount );
 
   /**
    * @brief Downcast an Object handle to EncodedBufferImage.

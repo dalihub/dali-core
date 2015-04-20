@@ -78,7 +78,7 @@ int UtcDaliResourceImageNew02(void)
 {
   TestApplication application;
 
-  tet_infoline("UtcDaliREsourceImageNew02 - ResourceImage::New(const std::string&, const ImageAttributes&)");
+  tet_infoline("UtcDaliREsourceImageNew02 - ResourceImage New( const std::string& url, ImageDimensions size, FittingMode scalingMode, SamplingMode samplingMode, bool orientationCorrection = true )");
 
   // invoke default handle constructor
   ResourceImage image;
@@ -86,10 +86,7 @@ int UtcDaliResourceImageNew02(void)
   DALI_TEST_CHECK( !image );
 
   // initialise handle
-  Dali::ImageAttributes imageAttributes;
-  imageAttributes.SetSize(128, 256);
-  imageAttributes.SetScalingMode(Dali::ImageAttributes::FitHeight);
-  image = ResourceImage::New(gTestImageFilename, imageAttributes);
+  image = ResourceImage::New(gTestImageFilename, ImageDimensions( 128, 256 ), FittingMode::FIT_HEIGHT );
 
   DALI_TEST_CHECK( image );
   END_TEST;
@@ -359,10 +356,10 @@ int UtcDaliResourceImageGetImageSize(void)
   Vector2 testSize(8.0f, 16.0f);
   platform.SetClosestImageSize(testSize);
 
-  Vector2 size = ResourceImage::GetImageSize(gTestImageFilename);
+  const ImageDimensions size = ResourceImage::GetImageSize(gTestImageFilename);
 
   DALI_TEST_CHECK( application.GetPlatform().GetTrace().FindMethod("GetClosestImageSize"));
-  DALI_TEST_EQUALS( size, testSize, TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector2( size.GetX(), size.GetY() ), testSize, TEST_LOCATION);
   END_TEST;
 }
 

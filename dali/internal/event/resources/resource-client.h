@@ -319,14 +319,14 @@ public: // Message methods
    */
   void NotifySavingFailed( ResourceId id );
 
-  /**
-   * Finds ImageTicket which belongs to resource identified by id and updates the cached size and pixelformat
-   * with the data from texture.
-   * !!! NOTE, this will replace the whole ImageAttributes member of the ticket, not just the three properties mentioned !!!
+ /**
+   * Finds ImageTicket which belongs to resource identified by id and updates the cached
+   * attributes with a new set which contains the actual width and height of the loaded
+   * image but has undefined values for all other fields.
    * @param id The resource id to find the ticket of
    * @param imageAttributes The image attributes to assign to the ticket
    */
-  void UpdateImageTicket( ResourceId id, const Dali::ImageAttributes& imageAttributes ); ///!< Issue #AHC01
+  void UpdateImageTicket( ResourceId id, const ImageAttributes& imageAttributes ); ///!< Issue #AHC01
 
 private:
   ResourceManager& mResourceManager;          ///< The resource manager
@@ -337,9 +337,9 @@ private:
   Impl* mImpl;
 };
 
-inline MessageBase* UpdateImageTicketMessage( ResourceClient& client, ResourceId id, const Dali::ImageAttributes& attrs )
+inline MessageBase* UpdateImageTicketMessage( ResourceClient& client, ResourceId id, const ImageAttributes& attrs )
 {
-  return new MessageValue2< ResourceClient, ResourceId, Dali::ImageAttributes >(
+  return new MessageValue2< ResourceClient, ResourceId, ImageAttributes >(
     &client, &ResourceClient::UpdateImageTicket, id, attrs );
 }
 

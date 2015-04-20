@@ -34,7 +34,6 @@ SET(TC_SOURCES
         utc-Dali-HoverProcessing.cpp
         utc-Dali-Image.cpp
         utc-Dali-ImageActor.cpp
-        utc-Dali-ImageAttributes.cpp
         utc-Dali-KeyEvent.cpp
         utc-Dali-Layer.cpp
         utc-Dali-LocklessBuffer.cpp

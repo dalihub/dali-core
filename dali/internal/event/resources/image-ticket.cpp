@@ -17,7 +17,6 @@
 
 // CLASS HEADER
 #include <dali/internal/event/resources/image-ticket.h>
-#include <dali/public-api/images/image-attributes.h>
 
 namespace Dali
 {

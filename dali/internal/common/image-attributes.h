@@ -1,5 +1,5 @@
-#ifndef __DALI_IMAGE_ATTRIBUTES_H__
-#define __DALI_IMAGE_ATTRIBUTES_H__
+#ifndef __DALI_INTERNAL_IMAGE_ATTRIBUTES_H__
+#define __DALI_INTERNAL_IMAGE_ATTRIBUTES_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -18,15 +18,19 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <stdint.h>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/images/pixel.h>
+#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 
 namespace Dali
 {
-
-class ImageAttributes;
+namespace Internal
+{
 
 /**
  * @brief Describes Image properties like dimensions and pixel format and
@@ -74,13 +78,7 @@ public:
    * desired image rectangle specified using ImageAttributes.SetSize().
    * All scaling modes preserve the aspect ratio of the image contents.
    */
-  enum ScalingMode
-  {
-    ShrinkToFit, ///< Fit full image inside desired width & height, potentially not filling one of either the desired image width or height with pixels.
-    ScaleToFill, ///< Image fills whole desired width & height with image data. The image is centred in the desired dimensions, exactly touching in one dimension, with image regions outside the other desired dimension cropped away.
-    FitWidth,    ///< Image fills whole width. Height is scaled proportionately to maintain aspect ratio.
-    FitHeight    ///< Image fills whole height. Width is scaled proportionately to maintain aspect ratio.
-  };
+  typedef Dali::FittingMode::Type ScalingMode;
 
   /**
    * @brief Filtering options, used when resizing images on load to sample original pixels.
@@ -93,23 +91,7 @@ public:
    * ScalingMode, but all other filter modes do if the desired dimensions are
    * `<=` the raw dimensions of the image file.
    */
-  enum FilterMode
-  {
-    Box,            ///< Iteratively box filter to generate an image of 1/2, 1/4, 1/8, ... width and height and
-                    ///  approximately the desired size, then if the ScaleToFill scaling mode is enabled, cut away the
-                    ///  top/bottom or left/right borders of the image to match the aspect ratio of desired dimensions.
-                    ///  This is the default.
-    Nearest,        ///< For each output pixel, read one input pixel.
-    Linear,         ///< For each output pixel, read a quad of four input pixels and write a weighted average of them.
-    BoxThenNearest, ///< Iteratively box filter to generate an image of 1/2, 1/4, 1/8, ... width and height and
-                    ///  approximately the desired size, then for each output pixel, read one pixel from the last level
-                    ///  of box filtering.
-    BoxThenLinear,  ///< Iteratively box filter to almost the right size, then for each output pixel, read four pixels
-                    ///  from the last level of box filtering and write their weighted average.
-    NoFilter,       ///< No filtering is performed. If the ScaleToFill scaling mode is enabled, the borders of the
-                    ///  image may be trimmed to match the aspect ratio of the desired dimensions.
-    DontCare        ///< For when the client strongly prefers a cache-hit. Defaults to Box.
-  };
+  typedef Dali::SamplingMode::Type FilterMode;
 
   static const ImageAttributes DEFAULT_ATTRIBUTES; ///< Default attributes have no size
 
@@ -183,7 +165,7 @@ public:
    * By default, ShrinkToFit is set.
    * @param [in] scalingMode The desired scaling mode
    */
-  void SetScalingMode(ScalingMode scalingMode);
+  void SetScalingMode( ScalingMode scalingMode );
 
   /**
    * @brief Setter for the FilterMode.
@@ -210,6 +192,15 @@ public:
    *                     transform the pixels of the image as laid-out in memory.
    */
   void SetOrientationCorrection(bool enabled);
+
+  /**
+   * @brief Change all members in one operation.
+   * @param[in] dimensions width and height
+   * @param[in] scaling Scaling mode for resizing loads.
+   * @param[in] sampling Sampling mode.
+   * @param[in] orientation Orientation correction toggle.
+   */
+  void Reset( ImageDimensions dimensions = ImageDimensions(0, 0), ScalingMode scaling = ScalingMode(), FilterMode sampling = FilterMode(), bool orientationCorrection = true );
 
 
   /**
@@ -315,6 +306,7 @@ DALI_IMPORT_API bool operator==(const ImageAttributes& a, const ImageAttributes&
  */
 DALI_IMPORT_API bool operator!=(const ImageAttributes& a, const ImageAttributes& b);
 
+} // namespace Internal
 } // namespace Dali
 
-#endif // __DALI_IMAGE_ATTRIBUTES_H__
+#endif // __DALI_INTERNAL_IMAGE_ATTRIBUTES_H__

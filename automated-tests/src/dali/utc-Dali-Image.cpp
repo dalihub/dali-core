@@ -19,6 +19,7 @@
 #include <algorithm>
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/integration-api/bitmap.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
 
@@ -104,10 +105,7 @@ int UtcDaliImageGetWidthHeight(void)
   DALI_TEST_EQUALS( image1.GetWidth(), testSize.width, TEST_LOCATION );
   DALI_TEST_EQUALS( image1.GetHeight(), testSize.height, TEST_LOCATION );
 
-  Dali::ImageAttributes imageAttributes;
-  imageAttributes.SetSize(128, 256);
-  imageAttributes.SetScalingMode(Dali::ImageAttributes::FitHeight);
-  Image image2 = ResourceImage::New(gTestImageFilename, imageAttributes);
+  Image image2 = ResourceImage::New( gTestImageFilename, ImageDimensions(128, 256), FittingMode::SCALE_TO_FILL, SamplingMode::DEFAULT );
   DALI_TEST_EQUALS( image2.GetWidth(), 128u, TEST_LOCATION );
   DALI_TEST_EQUALS( image2.GetHeight(), 256u, TEST_LOCATION );
 
@@ -243,10 +241,7 @@ int UtcDaliImageDiscard02(void)
     {
       ImageActor actor;
       {
-        ImageAttributes attrs;
-        const Vector2 requestedSize( 40, 30 );
-        attrs.SetSize( requestedSize.width, requestedSize.height );
-        Image image = ResourceImage::New(gTestImageFilename, attrs);
+        Image image = ResourceImage::New(gTestImageFilename, ImageDimensions( 40, 30 ) );
         actor = ImageActor::New(image);
         Stage::GetCurrent().Add(actor);
 
