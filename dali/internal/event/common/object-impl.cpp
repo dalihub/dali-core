@@ -1001,12 +1001,14 @@ void Object::ApplyConstraint( ConstraintBase& constraint )
 
 void Object::RemoveConstraint( ConstraintBase& constraint )
 {
-  DALI_ASSERT_DEBUG( mConstraints );
-
-  ConstraintIter it( std::find( mConstraints->begin(), mConstraints->end(), Dali::Constraint( &constraint ) ) );
-  if( it != mConstraints->end() )
+  // NULL if the Constraint sources are destroyed before Constraint::Apply()
+  if( mConstraints )
   {
-    mConstraints->erase( it );
+    ConstraintIter it( std::find( mConstraints->begin(), mConstraints->end(), Dali::Constraint( &constraint ) ) );
+    if( it != mConstraints->end() )
+    {
+      mConstraints->erase( it );
+    }
   }
 }
 
