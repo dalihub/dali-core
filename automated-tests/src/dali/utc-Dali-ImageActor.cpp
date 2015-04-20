@@ -182,7 +182,6 @@ int UtcDaliImageActorSetSize01(void)
 
   BufferImage img = BufferImage::New( 1,1 );
   ImageActor actor = ImageActor::New( img );
-  actor.SetRelayoutEnabled( false );
 
   ShaderEffect effect = ShaderEffect::New( " ", " ", GEOMETRY_TYPE_IMAGE, ShaderEffect::HINT_GRID );
   actor.SetShaderEffect( effect );
@@ -211,7 +210,6 @@ int UtcDaliImageActorGetCurrentSize01(void)
   Vector2 initialImageSize(100, 50);
   BufferImage image = BufferImage::New( initialImageSize.width, initialImageSize.height );
   ImageActor actor = ImageActor::New( image );
-  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification();
@@ -239,11 +237,6 @@ int UtcDaliImageActorGetCurrentSize01(void)
   // natural size is not used as setsize is called
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
-  actor.SetToNaturalSize();
-  application.SendNotification();
-  application.Render(9);
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2( area.width, area.height ), TEST_LOCATION );
-
   END_TEST;
 }
 
@@ -259,7 +252,6 @@ int UtcDaliImageActorGetCurrentSize02(void)
 
   Image image = ResourceImage::New("image.jpg");
   ImageActor actor = ImageActor::New( image );
-  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -291,10 +283,6 @@ int UtcDaliImageActorGetCurrentSize02(void)
   application.Render();
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
-  actor.SetToNaturalSize();
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), initialImageSize, TEST_LOCATION );
   END_TEST;
 }
 
@@ -310,7 +298,6 @@ int UtcDaliImageActorGetCurrentSize03(void)
   Vector2 requestedSize( 40, 30 );
   Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
-  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -334,19 +321,6 @@ int UtcDaliImageActorGetCurrentSize03(void)
 
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
 
-  // Test that setting a size on the actor can be 'undone' with SetNaturalSize()
-  Vector2 size(200.0f, 200.0f);
-  actor.SetSize(size);
-
-  // flush the queue and render once
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
-
-  actor.SetToNaturalSize();
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
   END_TEST;
 }
 
@@ -362,7 +336,6 @@ int UtcDaliImageActorGetCurrentSize04(void)
   Vector2 requestedSize( 40, 30 );
   Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
-  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -424,11 +397,6 @@ int UtcDaliImageActorGetCurrentSize04(void)
   // Ensure the actor size is kept
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), size, TEST_LOCATION );
 
-  actor.SetToNaturalSize();
-  application.SendNotification();
-  application.Render();
-  // Ensure the actor size gets the new image's natural size
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), request2Size, TEST_LOCATION );
   END_TEST;
 }
 
@@ -444,7 +412,6 @@ int UtcDaliImageActorGetCurrentSize05(void)
   Vector2 requestedSize( 40, 30 );
   Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
-  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -521,7 +488,6 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   Vector2 requestedSize( 40, 30 );
   Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
-  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -583,7 +549,6 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   Vector2 requestedSize( 40, 30 );
   Image image = ResourceImage::New("image.jpg", ImageDimensions( requestedSize.x, requestedSize.y ), FittingMode::DEFAULT, SamplingMode::DEFAULT );
   ImageActor actor = ImageActor::New( image );
-  actor.SetRelayoutEnabled( false );
   Stage::GetCurrent().Add(actor);
 
   application.SendNotification(); // Flush update messages
@@ -630,13 +595,8 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   application.Render();           // Process LoadComplete
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(100, 100), TEST_LOCATION );
 
-  // Use natural size - expect actor to change to pixel area
-  actor.SetToNaturalSize();
-  application.SendNotification(); // Process event messages
-  application.Render();           // Process LoadComplete
-  DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(40, 40), TEST_LOCATION );
-
   // Clearing pixel area should change actor size to image size
+  actor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
   actor.ClearPixelArea();
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete

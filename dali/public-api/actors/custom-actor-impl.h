@@ -23,6 +23,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/math/compile-time-math.h>
 
 namespace Dali
 {
@@ -270,23 +271,25 @@ public:
 
 protected: // For derived classes
 
+  // Flags for the constructor
+  enum ActorFlags
+  {
+    ACTOR_BEHAVIOUR_NONE          = 0,
+    DISABLE_SIZE_NEGOTIATION      = 1 << 0,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
+    REQUIRES_TOUCH_EVENTS         = 1 << 1,     ///< True if the OnTouchEvent() callback is required.
+    REQUIRES_HOVER_EVENTS         = 1 << 2,     ///< True if the OnHoverEvent() callback is required.
+    REQUIRES_MOUSE_WHEEL_EVENTS   = 1 << 3,     ///< True if the OnMouseWheelEvent() callback is required.
+
+    LAST_ACTOR_FLAG                             ///< Special marker for last actor flag
+  };
+
+  static const int ACTOR_FLAG_COUNT = Log< LAST_ACTOR_FLAG - 1 >::value + 1;      ///< Value for deriving classes to continue on the flag enum
+
   /**
    * @brief Create a CustomActorImpl.
-   * @param[in] requiresTouchEvents True if the OnTouchEvent() callback is required.
+   * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
-  CustomActorImpl(bool requiresTouchEvents);
-
-  /**
-   * @brief Set whether the custom actor requires hover events.
-   * @param[in] requiresHoverEvents True if the OnHoverEvent() callback is required.
-   */
-  void SetRequiresHoverEvents(bool requiresHoverEvents);
-
-  /**
-   * @brief Set whether the custom actor requires mouse wheel events.
-   * @param[in] requiresMouseWheelEvents True if the OnMouseWheelEvent() callback is required.
-   */
-  void SetRequiresMouseWheelEvents(bool requiresMouseWheelEvents);
+  CustomActorImpl( ActorFlags flags );
 
   /**
    * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
@@ -354,12 +357,16 @@ public: // Not intended for application developers
    */
   bool RequiresMouseWheelEvents() const;
 
+  /**
+   * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
+   * @return Return true if relayout is enabled on the custom actor
+   */
+  bool IsRelayoutEnabled() const;
+
 private:
 
-  Internal::CustomActor* mOwner;  ///< Internal owner of this custom actor implementation
-  bool mRequiresTouchEvents;      ///< Whether the OnTouchEvent() callback is required
-  bool mRequiresHoverEvents;      ///< Whether the OnHoverEvent() callback is required
-  bool mRequiresMouseWheelEvents; ///< Whether the OnMouseWheelEvent() callback is required
+  Internal::CustomActor* mOwner;        ///< Internal owner of this custom actor implementation
+  ActorFlags mFlags :ACTOR_FLAG_COUNT;  ///< ActorFlags flags to determine behaviour
 };
 
 } // namespace Dali

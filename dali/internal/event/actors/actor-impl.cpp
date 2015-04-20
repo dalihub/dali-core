@@ -226,7 +226,6 @@ DALI_PROPERTY( "color-mode", STRING, true, false, false, Dali::Actor::Property::
 DALI_PROPERTY( "position-inheritance", STRING, true, false, false, Dali::Actor::Property::POSITION_INHERITANCE )
 DALI_PROPERTY( "draw-mode", STRING, true, false, false, Dali::Actor::Property::DRAW_MODE )
 DALI_PROPERTY( "size-mode-factor", VECTOR3, true, false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
-DALI_PROPERTY( "relayout-enabled", BOOLEAN, true, false, false, Dali::Actor::Property::RELAYOUT_ENABLED )
 DALI_PROPERTY( "width-resize-policy", STRING, true, false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
 DALI_PROPERTY( "height-resize-policy", STRING, true, false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY )
 DALI_PROPERTY( "size-scale-policy", STRING, true, false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
@@ -1317,6 +1316,9 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
       SetDimensionDependency( Dimension::HEIGHT, Dimension::WIDTH );
     }
   }
+
+  // If calling SetResizePolicy, assume we want relayout enabled
+  SetRelayoutEnabled( true );
 
   OnSetResizePolicy( policy, dimension );
 
@@ -2857,12 +2859,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::Actor::Property::RELAYOUT_ENABLED:
-    {
-      SetRelayoutEnabled( property.Get< bool >() );
-      break;
-    }
-
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
       SetResizePolicy( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount ), Dimension::WIDTH );
@@ -3312,12 +3308,6 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::Actor::Property::SIZE_MODE_FACTOR:
     {
       value = GetSizeModeFactor();
-      break;
-    }
-
-    case Dali::Actor::Property::RELAYOUT_ENABLED:
-    {
-      value = IsRelayoutEnabled();
       break;
     }
 
@@ -4152,7 +4142,7 @@ float Actor::CalculateSize( Dimension::Type dimension, const Vector2& maximumSiz
   return 0.0f;  // Default
 }
 
-float Actor::ConstrainDimension( float size, Dimension::Type dimension )
+float Actor::ClampDimension( float size, Dimension::Type dimension )
 {
   const float minSize = GetMinimumSize( dimension );
   const float maxSize = GetMaximumSize( dimension );
@@ -4220,7 +4210,7 @@ void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& alloca
       OnCalculateRelayoutSize( dimension );
 
       // All dependencies checked, calculate the size and set negotiated flag
-      const float newSize = ConstrainDimension( CalculateSize( dimension, allocatedSize ), dimension );
+      const float newSize = ClampDimension( CalculateSize( dimension, allocatedSize ), dimension );
 
       SetNegotiatedDimension( newSize, dimension );
       SetLayoutNegotiated( true, dimension );
@@ -4377,16 +4367,6 @@ void Actor::RelayoutRequest( Dimension::Type dimension )
   {
     Dali::Actor self( this );
     relayoutController->RequestRelayout( self, dimension );
-  }
-}
-
-void Actor::RelayoutRequestTree()
-{
-  Internal::RelayoutController* relayoutController = Internal::RelayoutController::Get();
-  if( relayoutController )
-  {
-    Dali::Actor self( this );
-    relayoutController->RequestRelayoutTree( self );
   }
 }
 

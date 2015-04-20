@@ -444,16 +444,6 @@ bool Actor::IsKeyboardFocusable() const
   return GetImplementation(*this).IsKeyboardFocusable();
 }
 
-void Actor::SetRelayoutEnabled( bool enabled )
-{
-  GetImplementation(*this).SetRelayoutEnabled( enabled );
-}
-
-bool Actor::IsRelayoutEnabled() const
-{
-  return GetImplementation(*this).IsRelayoutEnabled();
-}
-
 void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
   GetImplementation(*this).SetResizePolicy( policy, dimension );
@@ -487,11 +477,6 @@ float Actor::GetWidthForHeight( float height )
 float Actor::GetRelayoutSize( Dimension::Type dimension ) const
 {
   return GetImplementation(*this).GetRelayoutSize( dimension );
-}
-
-void Actor::RelayoutRequestTree()
-{
-  GetImplementation(*this).RelayoutRequestTree();
 }
 
 void Actor::PropagateRelayoutFlags()

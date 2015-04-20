@@ -131,7 +131,8 @@ void ImageActor::SetImage( ImagePtr& image )
   }
   // set the actual image (normal or 9 patch) and natural size based on that
   mImageAttachment->SetImage( newImage );
-  SetNaturalSize();
+
+  RelayoutRequest();
 }
 
 ImagePtr ImageActor::GetImage()
@@ -139,18 +140,11 @@ ImagePtr ImageActor::GetImage()
   return mImageAttachment->GetImage();
 }
 
-void ImageActor::SetToNaturalSize()
-{
-  mUsingNaturalSize = true;
-
-  SetNaturalSize();
-}
-
 void ImageActor::SetPixelArea( const PixelArea& pixelArea )
 {
   mImageAttachment->SetPixelArea( pixelArea );
 
-  SetNaturalSize();
+  RelayoutRequest();
 }
 
 const ImageActor::PixelArea& ImageActor::GetPixelArea() const
@@ -167,16 +161,7 @@ void ImageActor::ClearPixelArea()
 {
   mImageAttachment->ClearPixelArea();
 
-  if( mUsingNaturalSize )
-  {
-    ImagePtr image = mImageAttachment->GetImage();
-    if( image )
-    {
-      mInternalSetSize = true;
-      SetSizeInternal( image->GetNaturalSize() );
-      mInternalSetSize = false;
-    }
-  }
+  RelayoutRequest();
 }
 
 void ImageActor::SetStyle( Style style )
@@ -211,26 +196,12 @@ RenderableAttachment& ImageActor::GetRenderableAttachment() const
 }
 
 ImageActor::ImageActor()
-: RenderableActor(),
-  mUsingNaturalSize(true),
-  mInternalSetSize(false)
+: RenderableActor()
 {
-  // Size negotiate disabled by default, so turn it on for this actor
-  SetRelayoutEnabled( true );
 }
 
 ImageActor::~ImageActor()
 {
-}
-
-void ImageActor::SetNaturalSize()
-{
-  if( mUsingNaturalSize )
-  {
-    mInternalSetSize = true;
-    SetSizeInternal( CalculateNaturalSize() );
-    mInternalSetSize = false;
-  }
 }
 
 Vector3 ImageActor::GetNaturalSize() const
@@ -260,19 +231,6 @@ Vector2 ImageActor::CalculateNaturalSize() const
   }
 
   return size;
-}
-
-void ImageActor::OnSizeSet( const Vector3& targetSize )
-{
-  if( !mInternalSetSize )
-  {
-    mUsingNaturalSize = false;
-  }
-}
-
-void ImageActor::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
-{
-  mUsingNaturalSize = false;
 }
 
 void ImageActor::OnStageConnectionInternal()

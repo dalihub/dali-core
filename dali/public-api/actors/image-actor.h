@@ -46,8 +46,6 @@ class ImageActor;
  * Setting a size on the ImageActor, e.g through the SetSize api or through an animation will
  * stop the natural size being used.
  *
- * Such a set size can be changed back to the image's size by calling SetToNaturalSize().
- *
  * If a pixel area is set on an ImageActor with natural size, the actor size will change
  * to match the pixel area. If a pixel area is set on an ImageActor that has had it's size set,
  * then the size doesn't change, and the partial image will be stretched to fill the set size.
@@ -247,18 +245,6 @@ public:
    * @return The image.
    */
   Image GetImage();
-
-  /**
-   * @brief Tell the image actor to use the natural size of the current image
-   * or future images.
-   *
-   * Calling SetSize on this actor or animating the size of the actor
-   * overrides this behaviour.
-   *
-   * @post The image actor uses the natural image size after an image
-   * has been loaded.
-   */
-  void SetToNaturalSize();
 
   /**
    * @brief Set a region of the image to display, in pixels.
