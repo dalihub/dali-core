@@ -2853,6 +2853,9 @@ int UtcDaliActorGetRelayoutSize(void)
 
   Actor actor = Actor::New();
 
+  // Add actor to stage
+  Stage::GetCurrent().Add( actor );
+
   DALI_TEST_EQUALS( actor.GetRelayoutSize( Dimension::WIDTH ), 0.0f, TEST_LOCATION );
 
   actor.SetResizePolicy( ResizePolicy::FIXED, Dimension::WIDTH );
@@ -2951,7 +2954,6 @@ int UtcDaliActorOnRelayoutSignal(void)
   Actor actor = Actor::New();
   actor.SetName( "actor" );
   actor.OnRelayoutSignal().Connect( OnRelayoutCallback );
-  actor.SetRelayoutEnabled( true );
 
   // Sanity check
   DALI_TEST_CHECK( gOnRelayoutCallBackCalled == 0 );
