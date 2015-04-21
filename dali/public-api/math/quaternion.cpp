@@ -543,7 +543,7 @@ std::ostream& operator<<( std::ostream& o, const Quaternion& quaternion )
   Radian angleRadians;
 
   quaternion.ToAxisAngle( axis, angleRadians );
-  Degree degrees = Radian( angleRadians );
+  Degree degrees( angleRadians );
 
   return o << "[ Axis: [" << axis.x << ", " << axis.y << ", " << axis.z << "], Angle: " << degrees.degree << " degrees ]";
 }
