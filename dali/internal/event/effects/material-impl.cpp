@@ -99,15 +99,18 @@ void Material::SetFaceCullingMode( Dali::Material::FaceCullingMode cullingMode )
 
 void Material::SetBlendMode( BlendingMode::Type mode )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  mBlendingMode = mode;
+
+  if( NULL != mSceneObject )
+  {
+    SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendingMode, &SceneGraph::DoubleBufferedProperty<int>::Set, static_cast<int>(mode) );
+  }
 }
 
+// @todo MESH_REWORK API change, or store here
 BlendingMode::Type Material::GetBlendMode() const
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
-  return BlendingMode::AUTO;
+  return mBlendingMode;
 }
 
 void Material::SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba )
@@ -229,7 +232,10 @@ void Material::SetDefaultProperty( Property::Index index,
     }
     case Dali::Material::Property::BLENDING_MODE:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      if( mSceneObject )
+      {
+        SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mBlendingMode, &SceneGraph::DoubleBufferedProperty<int>::Set, propertyValue.Get<int>() );
+      }
       break;
     }
     case Dali::Material::Property::BLEND_EQUATION:
@@ -298,7 +304,10 @@ Property::Value Material::GetDefaultProperty( Property::Index index ) const
     }
     case Dali::Material::Property::BLENDING_MODE:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      if( mSceneObject )
+      {
+        value = mSceneObject->mBlendingMode[bufferIndex];
+      }
       break;
     }
     case Dali::Material::Property::BLEND_EQUATION:

@@ -17,6 +17,7 @@
  */
 
 #include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/actors/blending.h>
 
 namespace Dali
 {
@@ -38,6 +39,44 @@ public:
   MaterialDataProvider()
   {
   }
+
+  virtual const Vector4& GetBlendColor( BufferIndex bufferIndex ) const = 0;
+
+  /**
+   * Get the RGB source factor
+   * @return the RGB source factor
+   */
+  virtual BlendingFactor::Type GetBlendSrcFactorRgb( BufferIndex bufferIndex ) const = 0;
+
+  /**
+   * Get the Alpha source factor
+   * @return the Alpha source factor
+   */
+  virtual BlendingFactor::Type GetBlendSrcFactorAlpha( BufferIndex bufferIndex ) const = 0;
+
+  /**
+   * Get the RGB destination factor
+   * @return the RGB destination factor
+   */
+  virtual BlendingFactor::Type GetBlendDestFactorRgb( BufferIndex bufferIndex ) const = 0;
+
+  /**
+   * Get the Alpha destination factor
+   * @return the Alpha destination factor
+   */
+  virtual BlendingFactor::Type GetBlendDestFactorAlpha( BufferIndex bufferIndex ) const = 0;
+
+  /**
+   * Get the RGB blending equation
+   * @return the RGB blending equation
+   */
+  virtual BlendingEquation::Type GetBlendEquationRgb( BufferIndex bufferIndex ) const = 0;
+
+  /**
+   * Get the Alpha blending equation
+   * @return the Alpha blending equation
+   */
+  virtual BlendingEquation::Type GetBlendEquationAlpha( BufferIndex bufferIndex ) const = 0;
 
 protected:
   /**

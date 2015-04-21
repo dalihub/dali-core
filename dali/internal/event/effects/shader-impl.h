@@ -165,7 +165,7 @@ private: // implementation
   /**
    * Second stage initialization
    */
-  void Initialize( const std::string& vertexShader, const std::string& fragmentShader );
+  void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::ShaderHints hints );
 
 protected:
   /**

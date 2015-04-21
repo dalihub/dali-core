@@ -693,7 +693,19 @@ bool UpdateManager::FlushQueue()
 
 void UpdateManager::ResetNodeProperty( Node& node )
 {
-  node.ResetToBaseValues( mSceneGraphBuffers.GetUpdateBufferIndex() );
+  BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
+
+  node.ResetToBaseValues( bufferIndex );
+
+  // @todo MESH_REWORK Only perform this step for RendererAttachments - consider
+  // storing them again? Split out to separate scene graph object owned by UpdateManager
+  // It is after all, a property owner, and always requires resetting...
+  // The depth index should not be an animatable property... and probably not even
+  // a constraint input? (Double buffering will slow down the sort algorithm slightly)
+  if( node.HasAttachment() )
+  {
+    node.GetAttachment().ResetToBaseValues( bufferIndex );
+  }
 }
 
 void UpdateManager::ResetProperties()

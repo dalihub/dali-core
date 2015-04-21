@@ -19,8 +19,11 @@
 
 // INTERNAL HEADERS
 #include <dali/public-api/shader-effects/material.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/render/data-providers/sampler-data-provider.h>
 #include <dali/internal/update/effects/scene-graph-sampler.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
+#include <dali/public-api/actors/blending.h>
 
 namespace Dali
 {
@@ -33,7 +36,15 @@ Material::Material()
 : mColor( Color::WHITE ),
   mBlendColor( Color::WHITE ),
   mFaceCullingMode(Dali::Material::NONE),
-  mShader(NULL)
+  mBlendingMode(Dali::BlendingMode::AUTO),
+  mBlendFuncSrcFactorRgb(DEFAULT_BLENDING_SRC_FACTOR_RGB),
+  mBlendFuncSrcFactorAlpha(DEFAULT_BLENDING_SRC_FACTOR_ALPHA),
+  mBlendFuncDestFactorRgb(DEFAULT_BLENDING_DEST_FACTOR_RGB),
+  mBlendFuncDestFactorAlpha(DEFAULT_BLENDING_SRC_FACTOR_ALPHA),
+  mBlendEquationRgb(DEFAULT_BLENDING_EQUATION_RGB),
+  mBlendEquationAlpha(DEFAULT_BLENDING_EQUATION_ALPHA),
+  mShader(NULL),
+  mBlendingEnabled(false)
 {
   // Observe own property-owner's uniform map
   AddUniformMapObserver( *this );
@@ -85,9 +96,105 @@ void Material::RemoveSampler( Sampler* sampler )
   }
 }
 
+void Material::PrepareRender( BufferIndex bufferIndex )
+{
+  mBlendingEnabled[bufferIndex] = false; // The best default
+
+  switch(mBlendingMode[bufferIndex])
+  {
+    case BlendingMode::OFF:
+    {
+      mBlendingEnabled[bufferIndex] = false;
+      break;
+    }
+    case BlendingMode::ON:
+    {
+      mBlendingEnabled[bufferIndex] = true;
+      break;
+    }
+    case BlendingMode::AUTO:
+    {
+      bool opaque = true;
+
+      //  @todo: MESH_REWORK - Change hints for new SceneGraphShader
+      if( mShader->GeometryHintEnabled( Dali::ShaderEffect::HINT_BLENDING ) )
+      {
+        opaque = false;
+      }
+
+      if( opaque )
+      {
+        // Require that all affecting samplers are opaque
+        unsigned int opaqueCount=0;
+        unsigned int affectingCount=0;
+
+        for( Vector<Sampler*>::ConstIterator iter = mSamplers.Begin();
+             iter != mSamplers.End(); ++iter )
+        {
+          const Sampler* sampler = *iter;
+          if( sampler != NULL )
+          {
+            if( sampler->AffectsTransparency( bufferIndex ) )
+            {
+              affectingCount++;
+              if( sampler->IsFullyOpaque( bufferIndex ) )
+              {
+                opaqueCount++;
+              }
+            }
+          }
+        }
+        opaque = (opaqueCount == affectingCount);
+      }
+
+      mBlendingEnabled[bufferIndex] = ! opaque;
+    }
+  }
+}
+
 Vector<Sampler*>& Material::GetSamplers()
 {
   return mSamplers;
+}
+
+bool Material::GetBlendingEnabled( BufferIndex bufferIndex ) const
+{
+  return mBlendingEnabled[bufferIndex];
+}
+
+const Vector4& Material::GetBlendColor(BufferIndex bufferIndex) const
+{
+  return mBlendColor[bufferIndex];
+}
+
+BlendingFactor::Type Material::GetBlendSrcFactorRgb( BufferIndex bufferIndex ) const
+{
+  return static_cast<Dali::BlendingFactor::Type>(mBlendFuncSrcFactorRgb[bufferIndex]);
+}
+
+BlendingFactor::Type Material::GetBlendSrcFactorAlpha( BufferIndex bufferIndex ) const
+{
+  return static_cast<Dali::BlendingFactor::Type>(mBlendFuncSrcFactorAlpha[bufferIndex]);
+}
+
+BlendingFactor::Type Material::GetBlendDestFactorRgb( BufferIndex bufferIndex ) const
+{
+  return static_cast<Dali::BlendingFactor::Type>(mBlendFuncDestFactorRgb[bufferIndex]);
+}
+
+BlendingFactor::Type Material::GetBlendDestFactorAlpha( BufferIndex bufferIndex ) const
+{
+  return static_cast<Dali::BlendingFactor::Type>(mBlendFuncDestFactorAlpha[bufferIndex]);
+}
+
+BlendingEquation::Type Material::GetBlendEquationRgb( BufferIndex bufferIndex ) const
+{
+  return static_cast<Dali::BlendingEquation::Type>(mBlendEquationRgb[bufferIndex]);
+}
+
+BlendingEquation::Type Material::GetBlendEquationAlpha( BufferIndex bufferIndex ) const
+{
+  return static_cast<Dali::BlendingEquation::Type>(mBlendEquationAlpha[bufferIndex]);
 }
 
 void Material::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
@@ -130,6 +237,14 @@ void Material::ResetDefaultProperties( BufferIndex updateBufferIndex )
   mColor.ResetToBaseValue( updateBufferIndex );
   mBlendColor.ResetToBaseValue( updateBufferIndex );
   mFaceCullingMode.CopyPrevious( updateBufferIndex );
+
+  mBlendingMode.CopyPrevious( updateBufferIndex );
+  mBlendFuncSrcFactorRgb.CopyPrevious( updateBufferIndex );
+  mBlendFuncSrcFactorAlpha.CopyPrevious( updateBufferIndex );
+  mBlendFuncDestFactorRgb.CopyPrevious( updateBufferIndex );
+  mBlendFuncDestFactorAlpha.CopyPrevious( updateBufferIndex );
+  mBlendEquationRgb.CopyPrevious( updateBufferIndex );
+  mBlendEquationAlpha.CopyPrevious( updateBufferIndex );
 }
 
 } // namespace SceneGraph

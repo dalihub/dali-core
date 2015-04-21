@@ -122,6 +122,12 @@ public:
   // Update methods
 
   /**
+   * Called to reset attachment's properties to base values.
+   * Attachments without properties should not override this method
+   */
+  virtual void ResetToBaseValues(BufferIndex bufferIndex) { }
+
+  /**
    * Called when the attachment or it's owning node is flagged as dirty during scene graph updates.
    * Allows derived classes to perform extra processing
    * @param[in] updateBufferIndex The current update buffer index.

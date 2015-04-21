@@ -89,7 +89,12 @@ void Geometry::SetGeometryType( Dali::Geometry::GeometryType geometryType )
 {
   if( NULL != mSceneObject )
   {
-    SceneGraph::DoubleBufferedPropertyMessage<int>::Send( GetEventThreadServices(), mSceneObject, &mSceneObject->mGeometryType, &SceneGraph::DoubleBufferedProperty<int>::Set, static_cast<int>(geometryType) );
+    SceneGraph::DoubleBufferedPropertyMessage<int>::Send(
+      GetEventThreadServices(),
+      mSceneObject,
+      &mSceneObject->mGeometryType,
+      &SceneGraph::DoubleBufferedProperty<int>::Set,
+      static_cast<int>(geometryType) );
   }
 }
 

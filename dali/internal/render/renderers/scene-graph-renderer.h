@@ -175,7 +175,19 @@ private:
    * Called from Render prior to DoRender().
    * @todo MESH_REWORK Remove after merge
    */
-  virtual void DoSetUniforms(Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType );
+  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType );
+
+  /**
+   * Called from Render prior to DoRender(). Default method to set CullFaceMode
+   * @todo MESH_REWORK Remove after merge
+   */
+  virtual void DoSetCullFaceMode( Context& context, BufferIndex bufferIndex );
+
+  /**
+   * Called from Render prior to DoRender(). Default method to set blending options
+   * @todo MESH_REWORK Remove after merge
+   */
+  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex );
 
   /**
    * Called from Render; implemented in derived classes.
@@ -197,10 +209,10 @@ protected:
   Shader* mShader;
   unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 
+  bool mUseBlend:1;                 ///< True if blending should be enabled, 1 bit is enough
 private:
 
   BlendingOptions mBlendingOptions;
-  bool mUseBlend:1;                 ///< True if blending should be enabled, 1 bit is enough
   CullFaceMode mCullFaceMode:3;     ///< cullface enum, 3 bits is enough
 };
 

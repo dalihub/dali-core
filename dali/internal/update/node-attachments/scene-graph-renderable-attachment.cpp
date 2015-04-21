@@ -65,8 +65,6 @@ void RenderableAttachment::Initialize( SceneController& sceneController, BufferI
 
   // Chain to derived attachments
   Initialize2( updateBufferIndex );
-
-  // @todo MESH_REWORK: removed: renderer.SetCullFace & renderer.SetShader;
 }
 
 void RenderableAttachment::OnDestroy()
@@ -76,16 +74,6 @@ void RenderableAttachment::OnDestroy()
 
   // SceneController is no longer valid
   mSceneController = NULL;
-}
-
-void RenderableAttachment::SetBlendingMode( BlendingMode::Type mode )
-{
-  mBlendingMode = mode;
-}
-
-BlendingMode::Type RenderableAttachment::GetBlendingMode() const
-{
-  return mBlendingMode;
 }
 
 void RenderableAttachment::SetRecalculateScaleForSize()
@@ -125,60 +113,10 @@ bool RenderableAttachment::ResolveVisibility( BufferIndex updateBufferIndex )
   return mHasSizeAndColorFlag;
 }
 
-bool RenderableAttachment::IsBlendingOn( BufferIndex updateBufferIndex )
-{
-  // Check whether blending needs to be disabled / enabled
-  bool blend = false;
-  switch( mBlendingMode )
-  {
-    case BlendingMode::OFF:
-    {
-      // No blending.
-      blend = false;
-      break;
-    }
-    case BlendingMode::AUTO:
-    {
-      // Blending if the node is not fully opaque only.
-      blend = !IsFullyOpaque( updateBufferIndex );
-      break;
-    }
-    case BlendingMode::ON:
-    {
-      // Blending always.
-      blend = true;
-      break;
-    }
-    default:
-    {
-      DALI_ASSERT_ALWAYS( !"RenderableAttachment::PrepareRender. Wrong blending mode" );
-    }
-  }
-  return blend;
-}
-
-void RenderableAttachment::ChangeBlending( BufferIndex updateBufferIndex, bool useBlend )
-{
-  if ( mUseBlend != useBlend )
-  {
-    mUseBlend = useBlend;
-
-    // Enable/disable blending in the next render
-    typedef MessageValue1< Renderer, bool > DerivedType;
-
-    // Reserve some memory inside the render queue
-    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
-
-    // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, useBlend );
-  }
-}
-
 void RenderableAttachment::DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling )
 {
   scaling = Vector3::ONE;
 }
-
 
 void RenderableAttachment::PrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager )
 {
@@ -272,16 +210,29 @@ void RenderableAttachment::GetReadyAndComplete(bool& ready, bool& complete) cons
   }
 }
 
-
 void RenderableAttachment::PrepareRender( BufferIndex updateBufferIndex )
 {
   // call the derived class first as it might change its state regarding blending
   DoPrepareRender( updateBufferIndex );
 
-  bool blend = IsBlendingOn( updateBufferIndex );
-  ChangeBlending( updateBufferIndex, blend );
-}
+  // @todo MESH_REWORK Remove remainder of method after removing ImageAttachment
 
+  bool blend = !IsFullyOpaque( updateBufferIndex );
+
+  if ( mUseBlend != blend )
+  {
+    mUseBlend = blend;
+
+    // Enable/disable blending in the next render
+    typedef MessageValue1< Renderer, bool > DerivedType;
+
+    // Reserve some memory inside the render queue
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+
+    // Construct message in the render queue memory; note that delete should not be called on the return value
+    new (slot) DerivedType( &GetRenderer(), &Renderer::SetUseBlend, blend );
+  }
+}
 
 RenderableAttachment* RenderableAttachment::GetRenderable()
 {

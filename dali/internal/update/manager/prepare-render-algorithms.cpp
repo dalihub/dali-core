@@ -70,7 +70,6 @@ void PrepareRenderables( BufferIndex updateBufferIndex, RenderableAttachmentCont
 
 void PrepareRenderables( BufferIndex updateBufferIndex, SortedLayerPointers& sortedLayers )
 {
-
   const SortedLayersIter endIter = sortedLayers.end();
 
   for ( SortedLayersIter iter = sortedLayers.begin(); iter != endIter; ++iter )

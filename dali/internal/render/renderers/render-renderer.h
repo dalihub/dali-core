@@ -97,6 +97,16 @@ public: // Implementation of Renderer
   virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType );
 
   /**
+   * @copydoc SceneGraph::Renderer::DoSetCullFaceMode
+   */
+  virtual void DoSetCullFaceMode(Context& context, BufferIndex bufferIndex );
+
+  /**
+   * @copydoc SceneGraph::Renderer::DoSetBlending
+   */
+  virtual void DoSetBlending(Context& context, BufferIndex bufferIndex );
+
+  /**
    * @copydoc SceneGraph::Renderer::DoRender()
    */
   virtual void DoRender( Context& context,

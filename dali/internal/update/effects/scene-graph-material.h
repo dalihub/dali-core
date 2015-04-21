@@ -71,6 +71,58 @@ public:
   void RemoveSampler( Sampler* sampler );
 
   /**
+   * Prepare the material for rendering.
+   *
+   * Determine whether blending is enabled for this material, and store the result.
+   * @param[in] bufferIndex The current buffer index
+   */
+  void PrepareRender( BufferIndex bufferIndex );
+
+  /**
+   * Return true if the material requires blending
+   * @return true if the material requires blending
+   */
+  bool GetBlendingEnabled( BufferIndex bufferIndex ) const;
+
+public: // Implementation of MaterialDataProvider
+
+  /**
+   * @copydoc MaterialDataProvider::GetBlendColor
+   */
+  virtual const Vector4& GetBlendColor(BufferIndex bufferIndex) const;
+
+  /**
+   * @copydoc MaterialDataProvider::GetBlendSrcFactorRgb
+   */
+  virtual BlendingFactor::Type GetBlendSrcFactorRgb(BufferIndex bufferIndex) const;
+
+  /**
+   * @copydoc MaterialDataProvider::GetBlendSrcFactorAlpha
+   */
+  virtual BlendingFactor::Type GetBlendSrcFactorAlpha( BufferIndex bufferIndex ) const;
+
+  /**
+   * @copydoc MaterialDataProvider::GetBlendDestFactorRgb
+   */
+  virtual BlendingFactor::Type GetBlendDestFactorRgb( BufferIndex bufferIndex ) const;
+
+  /**
+   * @copydoc MaterialDataProvider::GetBlendDestFactorAlpha
+   */
+  virtual BlendingFactor::Type GetBlendDestFactorAlpha( BufferIndex bufferIndex ) const;
+
+  /**
+   * @copydoc MaterialDataProvider::GetBlendEquationRgb
+   */
+  virtual BlendingEquation::Type GetBlendEquationRgb( BufferIndex bufferIndex ) const;
+
+  /**
+   * @copydoc MaterialDataProvider::GetBlendEquationAlpha
+   */
+  virtual BlendingEquation::Type GetBlendEquationAlpha( BufferIndex bufferIndex ) const;
+
+public: // Implementation of ObjectOwnerContainer template methods
+  /**
    * Connect the object to the scene graph
    *
    * @param[in] sceneController The scene controller - used for sending messages to render thread
@@ -85,6 +137,7 @@ public:
    */
   void DisconnectFromSceneGraph( SceneController& sceneController, BufferIndex bufferIndex );
 
+public: // Implementation of ConnectionChangePropagator
   /**
    * @copydoc ConnectionChangePropagator::AddObserver
    */
@@ -136,14 +189,21 @@ public: // Property data
   AnimatableProperty<Vector4> mColor;
   AnimatableProperty<Vector4> mBlendColor;
   DoubleBufferedProperty<int> mFaceCullingMode;
+  DoubleBufferedProperty<int> mBlendingMode;
+
+  // @todo MESH_REWORK Consider storing only mBlendingOptions bitmask
+  DoubleBufferedProperty<int> mBlendFuncSrcFactorRgb;
+  DoubleBufferedProperty<int> mBlendFuncSrcFactorAlpha;
+  DoubleBufferedProperty<int> mBlendFuncDestFactorRgb;
+  DoubleBufferedProperty<int> mBlendFuncDestFactorAlpha;
+  DoubleBufferedProperty<int> mBlendEquationRgb;
+  DoubleBufferedProperty<int> mBlendEquationAlpha;
 
 private:
   Shader* mShader;
   Vector<Sampler*> mSamplers; // Not owned
   ConnectionChangePropagator mConnectionObservers;
-
-  // @todo MESH_REWORK add property values for cull face mode, blending options, blend color
-  // Add getters/setters?
+  DoubleBuffered<bool> mBlendingEnabled; // The output of the current blending mode and sampler properties
 };
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, const Shader& shader )

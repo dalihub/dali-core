@@ -151,20 +151,6 @@ public: // For use during in the update algorithm only
   }
 
   /**
-   * Query whether the attachment has blending enabled.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @return true if blending is enabled, false otherwise.
-   */
-  bool IsBlendingOn( BufferIndex updateBufferIndex );
-
-  /**
-   * Check if the blending mode has changed - if it has, send message to renderer
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] useBlending True if the renderer should use blending option
-   */
-  void ChangeBlending( BufferIndex updateBufferIndex, bool useBlending );
-
-  /**
    * Prepare the object resources.
    * This must be called by the UpdateManager before calling PrepareRender, for each frame.
    * @param[in] updateBufferIndex The current update buffer index.
@@ -215,6 +201,15 @@ public: // API for derived classes
   virtual const Renderer& GetRenderer() const = 0;
 
   /**
+   * Prepare the object resources.
+   * This must be called by the UpdateManager before calling PrepareRender, for each frame.
+   * @param[in] updateBufferIndex The current buffer index.
+   * @param[in] resourceManager The resource manager.
+   * @return True if resources are ready, false will prevent PrepareRender being called for this attachment.
+   */
+  virtual bool DoPrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager ) = 0;
+
+  /**
    * @copydoc RenderableAttachment::PrepareRender()
    */
   virtual void DoPrepareRender( BufferIndex updateBufferIndex ) = 0;
@@ -259,15 +254,6 @@ public: // API for derived classes
   }
 
 private:
-
-  /**
-   * Prepare the object resources.
-   * This must be called by the UpdateManager before calling PrepareRender, for each frame.
-   * @param[in] updateBufferIndex The current buffer index.
-   * @param[in] resourceManager The resource manager.
-   * @return True if resources are ready, false will prevent PrepareRender being called for this attachment.
-   */
-  virtual bool DoPrepareResources( BufferIndex updateBufferIndex, ResourceManager& resourceManager ) = 0;
 
   // Undefined
   RenderableAttachment( const RenderableAttachment& );

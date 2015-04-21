@@ -420,27 +420,55 @@ void ImageAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
   }
 }
 
+void RenderableAttachment::SetBlendingMode( BlendingMode::Type mode )
+{
+  mBlendingMode = mode;
+}
+
+BlendingMode::Type RenderableAttachment::GetBlendingMode() const
+{
+  return mBlendingMode;
+}
+
 bool ImageAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
 {
-  /**
-   * Fully opaque when...
-   *   1) not using the alpha channel from the image data
-   *   2) the inherited color is not transparent nor semi-transparent
-   *   3) the shader doesn't require blending
-   */
-  bool opaque = mBitmapMetadata.IsFullyOpaque();
+  bool fullyOpaque = true;
 
-  if ( opaque && mParent )
+  switch( mBlendingMode )
   {
-    opaque = ( mParent->GetWorldColor(updateBufferIndex).a >= FULLY_OPAQUE );
-
-    if ( opaque && mShader != NULL )
+    case BlendingMode::OFF:
     {
-      opaque = !PreviousHintEnabled( Dali::ShaderEffect::HINT_BLENDING );
+      fullyOpaque = true;
+      break;
+    }
+    case BlendingMode::ON:
+    {
+      // Blending always.
+      fullyOpaque = false;
+      break;
+    }
+    case BlendingMode::AUTO:
+    {
+      /**
+       * Fully opaque when...
+       *   1) not using the alpha channel from the image data
+       *   2) the inherited color is not transparent nor semi-transparent
+       *   3) the shader doesn't require blending
+       */
+      fullyOpaque = mBitmapMetadata.IsFullyOpaque();
+
+      if ( fullyOpaque && mParent )
+      {
+        fullyOpaque = ( mParent->GetWorldColor(updateBufferIndex).a >= FULLY_OPAQUE );
+
+        if ( fullyOpaque && mShader != NULL )
+        {
+          fullyOpaque = !PreviousHintEnabled( Dali::ShaderEffect::HINT_BLENDING );
+        }
+      }
     }
   }
-
-  return opaque;
+  return fullyOpaque;
 }
 
 void ImageAttachment::SendShaderChangeMessage( BufferIndex updateBufferIndex )

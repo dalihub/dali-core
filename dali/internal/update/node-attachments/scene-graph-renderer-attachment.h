@@ -125,10 +125,28 @@ public:
   Geometry& GetGeometry();
 
   /**
-   * Get the depth index
+   * Set the depth index
+   * @param[in] bufferIndex The buffer index
+   * @param[in] depthIndex the new depth index to use
+   */
+  void SetDepthIndex( BufferIndex bufferIndex, int depthIndex );
+
+  /**
+   * Get the depth index.
+   * Inlined, as called from sort algorithm
    * @return The depth index of the renderer attachment in the current frame
    */
-  int GetDepthIndex( BufferIndex bufferIndex ) const ;
+  int GetDepthIndex( BufferIndex bufferIndex ) const
+  {
+    return mDepthIndex[bufferIndex];
+  }
+
+
+protected: // From NodeAttachment
+  /**
+   * @copydoc NodeAttachment::ResetToBaseValues
+   */
+  virtual void ResetToBaseValues( BufferIndex updateBufferIndex );
 
 protected: // From RenderableAttachment
   /**
@@ -140,6 +158,12 @@ protected: // From RenderableAttachment
    * @copydoc RenderableAttachment::GetRenderer().
    */
   virtual const Renderer& GetRenderer() const;
+
+  /**
+   * @copydoc RenderableAttachment::DoPrepareResources()
+   */
+  virtual bool DoPrepareResources( BufferIndex updateBufferIndex,
+                                   ResourceManager& resourceManager );
 
   /**
    * @copydoc RenderableAttachment::DoPrepareRender()
@@ -155,12 +179,6 @@ protected: // From RenderableAttachment
    * @copydoc RenderableAttachment::SizeChanged()
    */
   virtual void SizeChanged( BufferIndex updateBufferIndex );
-
-  /**
-   * @copydoc RenderableAttachment::DoPrepareResources()
-   */
-  virtual bool DoPrepareResources( BufferIndex updateBufferIndex,
-                                   ResourceManager& resourceManager );
 
 protected: // From ConnectionObserver
   /**
@@ -243,6 +261,17 @@ inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const 
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &attachment, &RendererAttachment::SetGeometry, const_cast<Geometry*>(&geometry) );
+}
+
+inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const RendererAttachment& attachment, int depthIndex )
+{
+  typedef MessageDoubleBuffered1< RendererAttachment, int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &attachment, &RendererAttachment::SetDepthIndex, depthIndex );
 }
 
 } // namespace SceneGraph

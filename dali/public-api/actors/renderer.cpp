@@ -73,6 +73,11 @@ void Renderer::SetDepthIndex( int depthIndex )
   GetImplementation(*this).SetDepthIndex( depthIndex );
 }
 
+int Renderer::GetCurrentDepthIndex()
+{
+  return GetImplementation(*this).GetCurrentDepthIndex();
+}
+
 Renderer::Renderer( Internal::Renderer* pointer )
 : Handle( pointer )
 {

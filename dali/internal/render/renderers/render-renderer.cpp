@@ -91,6 +91,31 @@ void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, Shad
   // Do nothing, we're going to set up the uniforms with our own code instead
 }
 
+void NewRenderer::DoSetCullFaceMode( Context& context, BufferIndex bufferIndex )
+{
+}
+
+void NewRenderer::DoSetBlending( Context& context, BufferIndex bufferIndex )
+{
+  context.SetBlend(mUseBlend); // @todo MESH_REWORK Should use a RendererDataProvider
+
+  if( mUseBlend )
+  {
+    const MaterialDataProvider& material = mRenderDataProvider->GetMaterial();
+
+    context.SetCustomBlendColor( material.GetBlendColor( bufferIndex ) );
+
+    // Set blend source & destination factors
+    context.BlendFuncSeparate( material.GetBlendSrcFactorRgb( bufferIndex ),
+                               material.GetBlendDestFactorRgb( bufferIndex ),
+                               material.GetBlendSrcFactorAlpha( bufferIndex ),
+                               material.GetBlendDestFactorAlpha( bufferIndex ) );
+
+    // Set blend equations
+    context.BlendEquationSeparate( material.GetBlendEquationRgb( bufferIndex ),
+                                   material.GetBlendEquationAlpha( bufferIndex ) );
+  }
+}
 
 void NewRenderer::DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix )
 {

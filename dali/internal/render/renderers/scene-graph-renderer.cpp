@@ -210,32 +210,9 @@ void Renderer::Render( Context& context,
   // Take the program into use so we can send uniforms to it
   program->Use();
 
-  // Enables/disables blending mode.
-  context.SetBlend( mUseBlend );
+  DoSetCullFaceMode( context, bufferIndex );
 
-  // Set face culling mode
-  context.CullFace( mCullFaceMode );
-
-  // Set the blend color
-  const Vector4* const customColor = mBlendingOptions.GetBlendColor();
-  if( customColor )
-  {
-    context.SetCustomBlendColor( *customColor );
-  }
-  else
-  {
-    context.SetDefaultBlendColor();
-  }
-
-  // Set blend source & destination factors
-  context.BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
-                               mBlendingOptions.GetBlendDestFactorRgb(),
-                               mBlendingOptions.GetBlendSrcFactorAlpha(),
-                               mBlendingOptions.GetBlendDestFactorAlpha() );
-
-  // Set blend equations
-  context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
-                                   mBlendingOptions.GetBlendEquationAlpha() );
+  DoSetBlending( context, bufferIndex );
 
   // Ignore missing uniforms - custom shaders and flat color shaders don't have SAMPLER
   // set projection and view matrix if program has not yet received them yet this frame
@@ -265,6 +242,42 @@ void Renderer::Render( Context& context,
 void Renderer::DoSetUniforms(Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType )
 {
   shader->SetUniforms( context, *program, bufferIndex, programIndex, subType );
+}
+
+// can be overridden by deriving class
+void Renderer::DoSetCullFaceMode(Context& context, BufferIndex bufferIndex )
+{
+  // Set face culling mode
+  context.CullFace( mCullFaceMode );
+}
+
+// can be overridden by deriving class
+void Renderer::DoSetBlending(Context& context, BufferIndex bufferIndex )
+{
+  // Enables/disables blending mode.
+  context.SetBlend( mUseBlend );
+
+  // Set the blend color
+  const Vector4* const customColor = mBlendingOptions.GetBlendColor();
+  if( customColor )
+  {
+    context.SetCustomBlendColor( *customColor );
+  }
+  else
+  {
+    context.SetDefaultBlendColor();
+  }
+
+  // Set blend source & destination factors
+  context.BlendFuncSeparate( mBlendingOptions.GetBlendSrcFactorRgb(),
+                             mBlendingOptions.GetBlendDestFactorRgb(),
+                             mBlendingOptions.GetBlendSrcFactorAlpha(),
+                             mBlendingOptions.GetBlendDestFactorAlpha() );
+
+  // Set blend equations
+  context.BlendEquationSeparate( mBlendingOptions.GetBlendEquationRgb(),
+                                 mBlendingOptions.GetBlendEquationAlpha() );
+
 }
 
 Renderer::Renderer( NodeDataProvider& dataprovider )

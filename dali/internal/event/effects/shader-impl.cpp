@@ -56,7 +56,7 @@ ShaderPtr Shader::New( const std::string& vertexShader,
 {
   //TODO: MESH_REWORK
   ShaderPtr shader( new Shader() );
-  shader->Initialize( vertexShader, fragmentShader );
+  shader->Initialize( vertexShader, fragmentShader, hints );
   return shader;
 }
 
@@ -239,14 +239,34 @@ Shader::Shader()
 {
 }
 
-void Shader::Initialize( const std::string& vertexSource, const std::string& fragmentSource )
+void Shader::Initialize(
+  const std::string& vertexSource,
+  const std::string& fragmentSource,
+  Dali::Shader::ShaderHints hints )
 {
   DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
-  Dali::ShaderEffect::GeometryHints hint = Dali::ShaderEffect::HINT_NONE;
-  mSceneObject = new SceneGraph::Shader(hint);
+  // @todo MESH_REWORK - Pass hints directly to a new scene graph shader
+  int effectHint = Dali::ShaderEffect::HINT_NONE;
+  if( hints & Dali::Shader::HINT_OUTPUT_IS_TRANSPARENT )
+  {
+    effectHint |= Dali::ShaderEffect::HINT_BLENDING;
+  }
+
+  if( hints & Dali::Shader::HINT_REQUIRES_SELF_DEPTH_TEST )
+  {
+    effectHint |= Dali::ShaderEffect::HINT_DEPTH_BUFFER;
+  }
+
+  if( (hints & Dali::Shader::HINT_MODIFIES_GEOMETRY) == 0x0 )
+  {
+    effectHint |= Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY;
+  }
+  Dali::ShaderEffect::GeometryHints shaderEffectHint = static_cast<Dali::ShaderEffect::GeometryHints>( effectHint );
+
+  mSceneObject = new SceneGraph::Shader(shaderEffectHint);
 
   // Add to update manager
   AddShaderMessage( updateManager, *mSceneObject );

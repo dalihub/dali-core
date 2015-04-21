@@ -267,6 +267,8 @@ private: //data
   SamplerConnectorContainer mSamplerConnectors; ///< Vector of connectors that hold the samplers used by this material
 
   SceneGraph::Material* mSceneObject;
+
+  BlendingMode::Type mBlendingMode; ///< Local store
   bool mOnStage;
 };
 

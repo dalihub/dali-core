@@ -151,9 +151,23 @@ Geometry& RendererAttachment::GetGeometry()
   return *mGeometry;
 }
 
-int RendererAttachment::GetDepthIndex(BufferIndex bufferIndex) const
+void RendererAttachment::SetDepthIndex( BufferIndex updateBufferIndex, int depthIndex )
 {
-  return mDepthIndex[bufferIndex];
+  mDepthIndex.Bake(updateBufferIndex, depthIndex);
+
+  if( mParent )
+  {
+    // only do this if we are on-stage
+    mParent->SetDirtyFlag( SortModifierFlag );
+  }
+
+  // @todo MESH_REWORK Change SortTransparentRenderItems to use GetDepthIndex instead
+  mSortModifier = depthIndex;
+}
+
+void RendererAttachment::ResetToBaseValues( BufferIndex updateBufferIndex )
+{
+  mDepthIndex.ResetToBaseValue( updateBufferIndex );
 }
 
 Renderer& RendererAttachment::GetRenderer()
@@ -166,6 +180,99 @@ const Renderer& RendererAttachment::GetRenderer() const
   return *mRenderer;
 }
 
+// Called by ProcessRenderTasks after DoPrepareRender
+bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
+{
+  bool opaque = false;
+
+  if( mParent )
+  {
+    opaque = mParent->GetWorldColor( updateBufferIndex ).a >= FULLY_OPAQUE;
+  }
+
+  if( opaque && mMaterial != NULL )
+  {
+    // Calculated by material in PrepareRender step
+    opaque = ! mMaterial->GetBlendingEnabled( updateBufferIndex );
+  }
+
+  return opaque;
+}
+
+void RendererAttachment::SizeChanged( BufferIndex updateBufferIndex )
+{
+  // Do nothing.
+}
+
+bool RendererAttachment::DoPrepareResources(
+  BufferIndex updateBufferIndex,
+  ResourceManager& resourceManager )
+{
+  DALI_ASSERT_DEBUG( mSceneController );
+
+  CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
+  bool ready = false;
+  mFinishedResourceAcquisition = false;
+
+  // Can only be considered ready when all the scene graph objects are connected to the renderer
+  if( ( mGeometry ) &&
+      ( mGeometry->GetVertexBuffers().Count() > 0 ) &&
+      ( mMaterial ) &&
+      ( mMaterial->GetShader() != NULL ) )
+  {
+    unsigned int completeCount = 0;
+    unsigned int neverCount = 0;
+    unsigned int frameBufferCount = 0;
+
+    Vector<Sampler*>& samplers = mMaterial->GetSamplers();
+    for( Vector<Sampler*>::ConstIterator iter = samplers.Begin();
+         iter != samplers.End(); ++iter )
+    {
+      Sampler* sampler = *iter;
+
+      ResourceId textureId = sampler->GetTextureId( updateBufferIndex );
+      BitmapMetadata metaData = resourceManager.GetBitmapMetadata( textureId );
+
+      sampler->SetFullyOpaque( metaData.IsFullyOpaque() );
+
+      switch( completeStatusManager.GetStatus( textureId ) )
+      {
+        case CompleteStatusManager::NOT_READY:
+        {
+          ready = false;
+          if( metaData.GetIsFramebuffer() )
+          {
+            frameBufferCount++;
+          }
+          FollowTracker( textureId ); // @todo MESH_REWORK Trackers per sampler rather than per actor?
+        }
+        break;
+
+        case CompleteStatusManager::COMPLETE:
+        {
+          completeCount++;
+        }
+        break;
+
+        case CompleteStatusManager::NEVER:
+        {
+          neverCount++;
+        }
+        break;
+      }
+    }
+
+    // We are ready if all samplers are complete, or those that aren't are framebuffers
+    // We are complete if all samplers are either complete or will never complete
+
+    ready = ( completeCount + frameBufferCount >= samplers.Count() ) ;
+    mFinishedResourceAcquisition = ( completeCount + neverCount >= samplers.Count() );
+  }
+
+  return ready;
+}
+
+
 // Uniform maps are checked in the following priority order:
 //   Renderer (this object)
 //   Actor
@@ -176,6 +283,9 @@ const Renderer& RendererAttachment::GetRenderer() const
 //   VertexBuffers
 void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
 {
+  // @todo MESH_REWORK - call DoPrepareRender on all scene objects? in caller class?
+  mMaterial->PrepareRender( updateBufferIndex );
+
   if( mRegenerateUniformMap > 0)
   {
     if( mRegenerateUniformMap == REGENERATE_UNIFORM_MAP)
@@ -257,117 +367,6 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
   }
 }
 
-bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
-{
-  bool opaque = false;
-
-  if( mParent )
-  {
-    opaque = mParent->GetWorldColor( updateBufferIndex ).a >= FULLY_OPAQUE;
-  }
-
-  if( mMaterial != NULL )
-  {
-    // Require that all affecting samplers are opaque
-    unsigned int opaqueCount=0;
-    unsigned int affectingCount=0;
-
-    Vector<Sampler*>& samplers = mMaterial->GetSamplers();
-    for( Vector<Sampler*>::ConstIterator iter = samplers.Begin();
-         iter != samplers.End(); ++iter )
-    {
-      const Sampler* sampler = *iter;
-      if( sampler != NULL )
-      {
-        if( sampler->AffectsTransparency( updateBufferIndex ) )
-        {
-          affectingCount++;
-          if( sampler->IsFullyOpaque( updateBufferIndex ) )
-          {
-            opaqueCount++;
-          }
-        }
-      }
-    }
-    opaque = (opaqueCount == affectingCount);
-  }
-
-  return opaque;
-}
-
-void RendererAttachment::SizeChanged( BufferIndex updateBufferIndex )
-{
-  // Do nothing.
-}
-
-bool RendererAttachment::DoPrepareResources(
-  BufferIndex updateBufferIndex,
-  ResourceManager& resourceManager )
-{
-  DALI_ASSERT_DEBUG( mSceneController );
-
-  CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
-
-  bool ready = false;
-  mFinishedResourceAcquisition = false;
-
-  // Can only be considered ready when all the scene graph objects are connected to the renderer
-  if( ( mGeometry ) &&
-      ( mGeometry->GetVertexBuffers().Count() > 0 ) &&
-      ( mMaterial ) &&
-      ( mMaterial->GetShader() != NULL ) )
-  {
-    unsigned int completeCount = 0;
-    unsigned int neverCount = 0;
-    unsigned int frameBufferCount = 0;
-
-    Vector<Sampler*>& samplers = mMaterial->GetSamplers();
-    for( Vector<Sampler*>::ConstIterator iter = samplers.Begin();
-         iter != samplers.End(); ++iter )
-    {
-      Sampler* sampler = *iter;
-
-      ResourceId textureId = sampler->GetTextureId( updateBufferIndex );
-      BitmapMetadata metaData = resourceManager.GetBitmapMetadata( textureId );
-
-      sampler->SetFullyOpaque( metaData.IsFullyOpaque() );
-
-      switch( completeStatusManager.GetStatus( textureId ) )
-      {
-        case CompleteStatusManager::NOT_READY:
-        {
-          ready = false;
-          if( metaData.GetIsFramebuffer() )
-          {
-            frameBufferCount++;
-          }
-          FollowTracker( textureId ); // @todo MESH_REWORK Trackers per sampler rather than per actor?
-        }
-        break;
-
-        case CompleteStatusManager::COMPLETE:
-        {
-          completeCount++;
-        }
-        break;
-
-        case CompleteStatusManager::NEVER:
-        {
-          neverCount++;
-        }
-        break;
-      }
-    }
-
-    // We are ready if all samplers are complete, or those that aren't are framebuffers
-    // We are complete if all samplers are either complete or will never complete
-
-    ready = ( completeCount + frameBufferCount >= samplers.Count() ) ;
-    mFinishedResourceAcquisition = ( completeCount + neverCount >= samplers.Count() );
-  }
-
-  return ready;
-}
 
 void RendererAttachment::ConnectionsChanged( PropertyOwner& object )
 {
