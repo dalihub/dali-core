@@ -198,7 +198,7 @@ public:
 
     if( current != previous )
     {
-      delete previous;
+      delete current;
     }
 
     current = previous;
