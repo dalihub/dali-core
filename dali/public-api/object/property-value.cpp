@@ -299,7 +299,18 @@ Property::Value::Value(const Value& value)
 
     case Property::ROTATION:
     {
-      mImpl = new Impl( value.Get<Quaternion>() );
+      // Orientations have two representations
+      DALI_ASSERT_DEBUG( typeid(Quaternion) == value.mImpl->mValue.GetType() ||
+                         typeid(AngleAxis)  == value.mImpl->mValue.GetType() );
+
+      if ( typeid(Quaternion) == value.mImpl->mValue.GetType() )
+      {
+        mImpl = new Impl( value.Get<Quaternion>() );
+      }
+      else
+      {
+        mImpl = new Impl( value.Get<AngleAxis>() );
+      }
       break;
     }
 
@@ -501,7 +512,18 @@ Property::Value& Property::Value::operator=(const Property::Value& value)
 
     case Property::ROTATION:
     {
-      mImpl->mValue = value.Get<Quaternion>();
+      // Orientations have two representations
+      DALI_ASSERT_DEBUG( typeid(Quaternion) == value.mImpl->mValue.GetType() ||
+                         typeid(AngleAxis)  == value.mImpl->mValue.GetType() );
+
+      if ( typeid(Quaternion) == value.mImpl->mValue.GetType() )
+      {
+        mImpl = new Impl( value.Get<Quaternion>() );
+      }
+      else
+      {
+        mImpl = new Impl( value.Get<AngleAxis>() );
+      }
       break;
     }
 
