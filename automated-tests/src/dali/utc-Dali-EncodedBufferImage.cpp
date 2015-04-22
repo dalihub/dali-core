@@ -811,7 +811,6 @@ int UtcDaliEncodedBufferImageNew02(void)
   {
     // Tests that a negative test of an assertion succeeds
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "encodedImage && \"Null image pointer passed-in for decoding from memory.\"", TEST_LOCATION);
   }
   END_TEST;
 }
@@ -839,7 +838,6 @@ int UtcDaliEncodedBufferImageNew03(void)
   {
     // Tests that a negative test of an assertion succeeds
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "encodedImageByteCount > 0U && \"Zero size passed for image resource in memory buffer.\"", TEST_LOCATION);
   }
   END_TEST;
 }
