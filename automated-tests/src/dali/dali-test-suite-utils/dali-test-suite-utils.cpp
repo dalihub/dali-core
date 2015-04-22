@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,11 +15,14 @@
  *
  */
 
+// CLASS HEADER
+#include "dali-test-suite-utils.h"
+
+// EXTERNAL INCLUDES
+#include <ostream>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
-#include <stdarg.h>
-
-#include "dali-test-suite-utils.h"
 
 using namespace Dali;
 
@@ -56,9 +59,21 @@ bool operator==(TimePeriod a, TimePeriod b)
   return Equals(a.durationSeconds, b.durationSeconds) && Equals(a.delaySeconds, b.delaySeconds) ;
 }
 
-std::ostream& operator<< (std::ostream& o, const TimePeriod value)
+std::ostream& operator<<( std::ostream& ostream, TimePeriod value )
 {
-  return o << "( Duration:" << value.durationSeconds << " Delay:" << value.delaySeconds << ")";
+  return ostream << "( Duration:" << value.durationSeconds << " Delay:" << value.delaySeconds << ")";
+}
+
+std::ostream& operator<<( std::ostream& ostream, Radian angle )
+{
+  ostream << angle.radian;
+  return ostream;
+}
+
+std::ostream& operator<<( std::ostream& ostream, Degree angle )
+{
+  ostream << angle.degree;
+  return ostream;
 }
 
 void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const char* location)

@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <ostream>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
@@ -104,18 +101,6 @@ inline bool operator!=( const Degree& lhs, const Degree& rhs )
 inline Degree Clamp( Degree angle, float min, float max )
 {
   return Degree( Clamp<float>( angle.degree, min, max ) );
-}
-
-/**
- * @brief Stream a degree value
- * @param [in] ostream The output stream to use.
- * @param [in] angle in Degree.
- * @return The output stream.
- */
-inline std::ostream& operator<<( std::ostream& ostream, Degree angle )
-{
-  ostream << angle.degree;
-  return ostream;
 }
 
 } // namespace Dali

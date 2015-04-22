@@ -243,7 +243,7 @@ bool PanGestureDetector::CheckAngleAllowed( Radian angle ) const
 
       DALI_LOG_INFO( gLogFilter, Debug::General,
                      "AngleToCheck: %.2f, CompareWith: %.2f, Threshold: %.2f\n",
-                     Degree(angle.radian), Degree(angleAllowed), Degree(threshold) );
+                     Degree(angle), Degree(angleAllowed), Degree(threshold) );
 
       float relativeAngle( fabsf( WrapInDomain( angle - angleAllowed, -Math::PI, Math::PI ) ) );
       if ( relativeAngle <= threshold )

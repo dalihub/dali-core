@@ -18,9 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <ostream>
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/constants.h>
 #include <dali/public-api/common/dali-common.h>
@@ -292,18 +289,6 @@ inline Radian operator-( Radian in )
 inline Radian Clamp( Radian angle, float min, float max )
 {
   return Radian( Clamp<float>( angle.radian, min, max ) );
-}
-
-/**
- * @brief Stream a radian value
- * @param [in] ostream The output stream to use.
- * @param [in] angle in Radian.
- * @return The output stream.
- */
-inline std::ostream& operator<<( std::ostream& ostream, Radian angle )
-{
-  ostream << angle.radian;
-  return ostream;
 }
 
 } // namespace Dali
