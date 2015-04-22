@@ -71,11 +71,14 @@ typedef std::vector<AngleAxis>                          ProgressAngleAxisContain
 typedef ProgressValue<bool>                             ProgressBoolean;
 typedef std::vector<ProgressBoolean>                    ProgressBooleanContainer;
 
-typedef ProgressValue<float>                            ProgressNumber;
-typedef std::vector<ProgressNumber>                     ProgressNumberContainer;
-
 typedef ProgressValue<int>                              ProgressInteger;
 typedef std::vector<ProgressInteger>                    ProgressIntegerContainer;
+
+typedef ProgressValue<unsigned int>                     ProgressUnsignedInteger;
+typedef std::vector<ProgressUnsignedInteger>            ProgressUnsignedIntegerContainer;
+
+typedef ProgressValue<float>                            ProgressNumber;
+typedef std::vector<ProgressNumber>                     ProgressNumberContainer;
 
 typedef ProgressValue<Vector2>                          ProgressVector2;
 typedef std::vector<ProgressVector2>                    ProgressVector2Container;
@@ -106,14 +109,19 @@ inline void Interpolate (bool& result, bool a, bool b, float progress)
   result = progress < 0.5f ? a : b;
 }
 
-inline void Interpolate (float& result, float a, float b, float progress)
-{
-  result = a + (b-a) * progress;
-}
-
 inline void Interpolate (int& result, int a, int b, float progress)
 {
   result = static_cast<int>(a + (b - a) * progress + 0.5f);
+}
+
+inline void Interpolate (unsigned int& result, unsigned int a, unsigned int b, float progress)
+{
+  result = static_cast<unsigned int>(a + (b - a) * progress + 0.5f);
+}
+
+inline void Interpolate (float& result, float a, float b, float progress)
+{
+  result = a + (b-a) * progress;
 }
 
 inline void Interpolate (Vector2& result, const Vector2& a,  const Vector2& b, float progress)
@@ -145,6 +153,15 @@ inline void CubicInterpolate( int& result, int p0, int p1, int p2, int p3, float
   float a1 = (p2-p0)*0.5f;
 
   result = static_cast<int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + p1 + 0.5f );
+}
+
+inline void CubicInterpolate( unsigned int& result, unsigned int p0, unsigned int p1, unsigned int p2, unsigned int p3, float progress )
+{
+  float a3 = p3*0.5f - p2*1.5f + p1*1.5f - p0*0.5f;
+  float a2 = p0 - p1*2.5f + p2*2.0f - p3*0.5f;
+  float a1 = (p2-p0)*0.5f;
+
+  result = static_cast<unsigned int>( a3*progress*progress*progress + a2*progress*progress + a1*progress + p1 + 0.5f );
 }
 
 inline void CubicInterpolate( float& result, float p0, float p1, float  p2, float  p3, float progress )

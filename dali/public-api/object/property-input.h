@@ -75,6 +75,14 @@ public:
   virtual const int& GetInteger() const = 0;
 
   /**
+   * @brief Retrieve an integer value.
+   *
+   * @pre GetType() returns Property::UNSIGNED_INTEGER.
+   * @return The integer value.
+   */
+  virtual const unsigned int& GetUnsignedInteger() const = 0;
+
+  /**
    * @brief Retrieve a Vector2 value.
    *
    * @pre GetType() returns Property::VECTOR2.

@@ -91,19 +91,27 @@ public:
   }
 
   /**
-   * @copydoc Dali::Internal::PropertyInput::GetFloat()
-   */
-  virtual const float& GetFloat() const
-  {
-    return mInput->GetConstraintInputFloat( mBufferIndex );
-  }
-
-  /**
    * @copydoc Dali::Internal::PropertyInput::GetInteger()
    */
   virtual const int& GetInteger() const
   {
     return mInput->GetConstraintInputInteger( mBufferIndex );
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInput::GetUnsignedInteger()
+   */
+  virtual const unsigned int& GetUnsignedInteger() const
+  {
+    return mInput->GetConstraintInputUnsignedInteger( mBufferIndex );
+  }
+
+  /**
+   * @copydoc Dali::Internal::PropertyInput::GetFloat()
+   */
+  virtual const float& GetFloat() const
+  {
+    return mInput->GetConstraintInputFloat( mBufferIndex );
   }
 
   /**

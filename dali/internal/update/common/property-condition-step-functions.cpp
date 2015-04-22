@@ -46,14 +46,19 @@ ConditionFunction Step::GetFunction(Property::Type valueType)
 
   switch(valueType)
   {
-    case Property::FLOAT:
-    {
-      function = EvalFloat;
-      break;
-    }
     case Property::INTEGER:
     {
       function = EvalInteger;
+      break;
+    }
+    case Property::UNSIGNED_INTEGER:
+    {
+      function = EvalUnsignedInteger;
+      break;
+    }
+    case Property::FLOAT:
+    {
+      function = EvalFloat;
       break;
     }
     case Property::VECTOR2:
@@ -99,11 +104,6 @@ bool Step::Evaluate( const float propertyValue, PropertyNotification::RawArgumen
   return false;
 }
 
-bool Step::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
-{
-  const float propertyValue = value.GetFloat();
-  return Evaluate( propertyValue, arg );
-}
 
 bool Step::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
@@ -111,6 +111,17 @@ bool Step::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::
   return Evaluate( propertyValue, arg );
 }
 
+bool Step::EvalUnsignedInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+{
+  const float propertyValue = static_cast<float>( value.GetUnsignedInteger() );
+  return Evaluate( propertyValue, arg );
+}
+
+bool Step::EvalFloat( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
+{
+  const float propertyValue = value.GetFloat();
+  return Evaluate( propertyValue, arg );
+}
 bool Step::EvalVector2( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float propertyValue = value.GetVector2().LengthSquared();

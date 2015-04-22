@@ -60,13 +60,6 @@ public:
   Value(bool boolValue);
 
   /**
-   * @brief Create a float property value.
-   *
-   * @param [in] floatValue A floating-point value.
-   */
-  Value(float floatValue);
-
-  /**
    * @brief Create an integer property value.
    *
    * @param [in] integerValue An integer value.
@@ -76,9 +69,16 @@ public:
   /**
    * @brief Create an unsigned integer property value.
    *
-   * @param [in] unsignedIntegerValue An unsinged integer value.
+   * @param [in] unsignedIntegerValue An unsigned integer value.
    */
   Value(unsigned int unsignedIntegerValue);
+
+  /**
+   * @brief Create a float property value.
+   *
+   * @param [in] floatValue A floating-point value.
+   */
+  Value(float floatValue);
 
   /**
    * @brief Create a Vector2 property value.
