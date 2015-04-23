@@ -24,7 +24,8 @@ namespace SceneGraph
 {
 
 Geometry::Geometry()
-: mCenter(),
+: mIndexBuffer( NULL ),
+  mCenter(),
   mHalfExtents(),
   mGeometryType(Dali::Geometry::TRIANGLES),
   mRequiresDepthTest(false)
