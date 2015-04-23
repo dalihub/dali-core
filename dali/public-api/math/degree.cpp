@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,62 +19,14 @@
 #include <dali/public-api/math/degree.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/math-utils.h>
 #include <dali/public-api/math/radian.h>
-
-namespace
-{
-const float ONE80_OVER_PI = 180.0f/Dali::Math::PI;
-}
 
 namespace Dali
 {
 
-Degree::Degree( float value )
-: mValue( value )
+Degree::Degree( Radian radian )
+: degree( radian * Math::ONE80_OVER_PI )
 {
-}
-
-Degree::Degree( const Radian& radian )
-: mValue( radian * ONE80_OVER_PI )
-{
-}
-
-bool Degree::operator==( const Degree& rhs ) const
-{
-  return fabsf( mValue - rhs.mValue ) < GetRangedEpsilon( mValue, rhs.mValue );
-}
-
-bool Degree::operator!=( const Degree& rhs ) const
-{
-  return !(this->operator==(rhs));
-}
-
-bool Degree::operator<( const Degree& rhs ) const
-{
-  return mValue < rhs.mValue;
-}
-
-Degree& Degree::operator=( const float value )
-{
-  mValue = value;
-  return *this;
-}
-
-Degree& Degree::operator=( const Radian& rhs )
-{
-  mValue = rhs * ONE80_OVER_PI;
-  return *this;
-}
-
-Degree::operator const float&() const
-{
-  return mValue;
-}
-
-Degree::operator float&()
-{
-  return mValue;
 }
 
 } // namespace Dali

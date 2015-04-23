@@ -2,7 +2,7 @@
 #define __DALI_ACTOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
+#include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
@@ -38,12 +39,9 @@ class Actor;
 }
 
 class Actor;
-class Animation;
-class Constraint;
 struct Degree;
 class Quaternion;
 class Layer;
-struct Radian;
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
@@ -294,7 +292,6 @@ public:
       POSITION_INHERITANCE,                               ///< name "position-inheritance",  type std::string
       DRAW_MODE,                                          ///< name "draw-mode",             type std::string
       SIZE_MODE_FACTOR,                                   ///< name "size-mode-factor",      type Vector3
-      RELAYOUT_ENABLED,                                   ///< name "relayout-enabled",      type Boolean
       WIDTH_RESIZE_POLICY,                                ///< name "width-resize-policy",   type String
       HEIGHT_RESIZE_POLICY,                               ///< name "height-resize-policy",  type String
       SIZE_SCALE_POLICY,                                  ///< name "size-scale-policy",     type String
@@ -762,7 +759,10 @@ public:
    * @param [in] angle The new orientation angle in degrees.
    * @param [in] axis The new axis of orientation.
    */
-  void SetOrientation(const Degree& angle, const Vector3& axis);
+  void SetOrientation( const Degree& angle, const Vector3& axis )
+  {
+    SetOrientation( Radian( angle ), axis );
+  }
 
   /**
    * @brief Sets the orientation of the Actor.
@@ -792,7 +792,10 @@ public:
    * @param[in] angle The angle to the rotation to combine with the existing orientation.
    * @param[in] axis The axis of the rotation to combine with the existing orientation.
    */
-  void RotateBy(const Degree& angle, const Vector3& axis);
+  void RotateBy( const Degree& angle, const Vector3& axis )
+  {
+    RotateBy( Radian( angle ), axis );
+  }
 
   /**
    * @brief Apply a relative rotation to an actor.
@@ -1143,20 +1146,6 @@ public:
   // SIZE NEGOTIATION
 
   /**
-   * @brief Set if the actor should do relayout in size negotiation or not.
-   *
-   * @param[in] enabled Flag to specify if actor should do relayout or not.
-   */
-  void SetRelayoutEnabled( bool enabled );
-
-  /**
-   * @brief Is the actor included in relayout or not.
-   *
-   * @return Return if the actor is involved in size negotiation or not.
-   */
-  bool IsRelayoutEnabled() const;
-
-  /**
    * Set the resize policy to be used for the given dimension(s)
    *
    * @param[in] policy The resize policy to use
@@ -1230,15 +1219,6 @@ public:
    * @return Return the value of the negotiated dimension
    */
   float GetRelayoutSize( Dimension::Type dimension ) const;
-
-  /**
-   * @brief Request to relayout of all actors in the sub-tree below the given actor.
-   *
-   * This flags the actor and all actors below it for relayout. The actual
-   * relayout is performed at the end of the frame. This means that multiple calls to relayout
-   * will not cause multiple relayouts to occur.
-   */
-  void RelayoutRequestTree();
 
   /**
    * @brief Force propagate relayout flags through the tree. This actor and all actors

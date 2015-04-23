@@ -45,7 +45,7 @@ DynamicsCylinderShape::DynamicsCylinderShape(const float radius, const float len
   mDynamicsShape = cylinderShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsCylinderShapeMessage( stage->GetUpdateInterface(), *cylinderShape, radius, length );
+  InitializeDynamicsCylinderShapeMessage( *stage, *cylinderShape, radius, length );
 }
 
 DynamicsCylinderShape::~DynamicsCylinderShape()

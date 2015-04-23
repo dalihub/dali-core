@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,11 +38,9 @@ void CustomActorImpl::OnPropertySet( Property::Index index, Property::Value prop
 {
 }
 
-CustomActorImpl::CustomActorImpl(bool requiresTouchEvents)
+CustomActorImpl::CustomActorImpl( ActorFlags flags )
 : mOwner(NULL),
-  mRequiresTouchEvents(requiresTouchEvents),
-  mRequiresHoverEvents(false),
-  mRequiresMouseWheelEvents(false)
+  mFlags( flags )
 {
 }
 
@@ -60,27 +58,22 @@ Internal::CustomActor* CustomActorImpl::GetOwner() const
 
 bool CustomActorImpl::RequiresTouchEvents() const
 {
-  return mRequiresTouchEvents;
+  return ( mFlags & REQUIRES_TOUCH_EVENTS );
 }
 
 bool CustomActorImpl::RequiresHoverEvents() const
 {
-  return mRequiresHoverEvents;
-}
-
-void CustomActorImpl::SetRequiresHoverEvents(bool requiresHoverEvents)
-{
-  mRequiresHoverEvents = requiresHoverEvents;
+  return ( mFlags & REQUIRES_HOVER_EVENTS );
 }
 
 bool CustomActorImpl::RequiresMouseWheelEvents() const
 {
-  return mRequiresMouseWheelEvents;
+  return ( mFlags & REQUIRES_MOUSE_WHEEL_EVENTS );
 }
 
-void CustomActorImpl::SetRequiresMouseWheelEvents(bool requiresMouseWheelEvents)
+bool CustomActorImpl::IsRelayoutEnabled() const
 {
-  mRequiresMouseWheelEvents = requiresMouseWheelEvents;
+  return ( mFlags & DISABLE_SIZE_NEGOTIATION ) == 0;
 }
 
 void CustomActorImpl::RelayoutRequest()

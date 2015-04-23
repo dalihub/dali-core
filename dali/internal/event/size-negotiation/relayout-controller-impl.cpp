@@ -69,7 +69,7 @@ void PrintChildren( Dali::Actor actor, int level )
 
   output << ", Dirty: (" << ( GetImplementation( actor ).IsLayoutDirty( Dimension::WIDTH ) ? "TRUE" : "FALSE" ) << "," << ( GetImplementation( actor ).IsLayoutDirty( Dimension::HEIGHT ) ? "TRUE" : "FALSE" ) << ")";
   output << ", Negotiated: (" << ( GetImplementation( actor ).IsLayoutNegotiated( Dimension::WIDTH ) ? "TRUE" : "FALSE" ) << "," << ( GetImplementation( actor ).IsLayoutNegotiated( Dimension::HEIGHT ) ? "TRUE" : "FALSE" ) << ")";
-  output << ", Enabled: " << ( actor.IsRelayoutEnabled() ? "TRUE" : "FALSE" );
+  output << ", Enabled: " << ( GetImplementation( actor ).IsRelayoutEnabled() ? "TRUE" : "FALSE" );
 
   output << ", (" << actor.GetObjectPtr() << ")" << std::endl;
 
@@ -213,7 +213,7 @@ void RelayoutController::RequestRelayoutTree( Dali::Actor& actor )
   {
     // If parent is not in relayout we are at the top of a new sub-tree
     Dali::Actor parent = actor.GetParent();
-    if( !parent || !parent.IsRelayoutEnabled() )
+    if( !parent || !GetImplementation( parent ).IsRelayoutEnabled() )
     {
       AddRequest( actor );
     }

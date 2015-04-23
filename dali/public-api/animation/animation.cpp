@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,10 +21,6 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/time-period.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/degree.h>
-#include <dali/public-api/math/radian.h>
-#include <dali/public-api/math/vector2.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>

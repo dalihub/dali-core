@@ -42,6 +42,7 @@ CustomActor::CustomActor(CustomActorImpl& extension)
   mDerivedRequiresTouch = extension.RequiresTouchEvents();
   mDerivedRequiresHover = extension.RequiresHoverEvents();
   mDerivedRequiresMouseWheelEvent = extension.RequiresMouseWheelEvents();
+  SetRelayoutEnabled( extension.IsRelayoutEnabled() );
 }
 
 CustomActor::~CustomActor()

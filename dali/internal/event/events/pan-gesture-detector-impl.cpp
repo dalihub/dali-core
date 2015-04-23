@@ -70,15 +70,6 @@ SignalConnectorType signalConnector1( mType, SIGNAL_PAN_DETECTED, &PanGestureDet
 
 #if defined(DEBUG_ENABLED)
 Integration::Log::Filter* gLogFilter  = Integration::Log::Filter::New(Debug::NoLogging, false, "LOG_PAN_GESTURE_DETECTOR");
-
-/**
- * When debugging, helper for converting radians to degrees.
- */
-inline float RadiansToDegrees( float radian )
-{
-  return radian * 180.0f / Math::PI;
-}
-
 #endif
 
 /**
@@ -180,7 +171,7 @@ void PanGestureDetector::AddAngle( Radian angle, Radian threshold )
 
   angle = WrapInDomain( angle, -Math::PI, Math::PI );
 
-  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Angle Added: %.2f, Threshold: %.2f\n", RadiansToDegrees(angle), RadiansToDegrees(threshold) );
+  DALI_LOG_INFO( gLogFilter, Debug::Concise, "Angle Added: %.2f, Threshold: %.2f\n", Degree(angle), Degree(threshold) );
 
   AngleThresholdPair pair( angle, threshold );
   mAngleContainer.push_back( pair );
@@ -252,7 +243,7 @@ bool PanGestureDetector::CheckAngleAllowed( Radian angle ) const
 
       DALI_LOG_INFO( gLogFilter, Debug::General,
                      "AngleToCheck: %.2f, CompareWith: %.2f, Threshold: %.2f\n",
-                     RadiansToDegrees(angle), RadiansToDegrees(angleAllowed), RadiansToDegrees(threshold) );
+                     Degree(angle), Degree(angleAllowed), Degree(threshold) );
 
       float relativeAngle( fabsf( WrapInDomain( angle - angleAllowed, -Math::PI, Math::PI ) ) );
       if ( relativeAngle <= threshold )

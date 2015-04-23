@@ -38,6 +38,42 @@ void utc_dali_render_task_cleanup(void)
   test_return_value = TET_PASS;
 }
 
+/**
+ * APIs:
+ *
+ * Constructor, Destructor, DownCast, New, copy constructor, assignment operator
+ *
+ * SetSourceActor                      2+ve, 1-ve
+ * GetSourceActor                      1+ve, 1-ve
+ * SetExclusive                        2+ve, 0-ve
+ * IsExclusive                         2+ve, 0-ve
+ * SetInputEnabled                     1+ve, 0-ve
+ * GetInputEnabled                     1+ve, 0-ve
+ * SetCameraActor                      1+ve, 1-ve
+ * GetCameraActor                      1+ve, 1-ve
+ * SetTargetFrameBuffer                1+ve, 1-ve
+ * GetTargetFrameBuffer                1+ve, 1-ve
+ * SetScreenToFrameBufferFunction      1+ve, 1-ve
+ * GetScreenToFrameBufferFunction      1+ve, 1-ve
+ * SetScreenToFrameBufferMappingActor  1+ve, 1-ve
+ * GetScreenToFrameBufferMappingActor  1+ve, 1-ve
+ * SetViewportPosition                 1+ve
+ * GetCurrentViewportPosition          1+ve
+ * SetViewportSize                     1+ve
+ * GetCurrentViewportSize              1+ve
+ * SetViewport                         2+ve, 1-ve
+ * GetViewport                         2+ve, 1-ve
+ * SetClearColor                       1+ve, 1-ve
+ * GetClearColor                       1+ve, 1-ve
+ * SetClearEnabled                     1+ve, 1-ve
+ * GetClearEnabled                     1+ve, 1-ve
+ * SetCullMode
+ * GetCullMode
+ * SetRefreshRate                      Many
+ * GetRefreshRate                      1+ve
+ * FinishedSignal                      1+ve
+ */
+
 namespace // unnamed namespace
 {
 
@@ -193,7 +229,7 @@ RenderTask CreateRenderTask(TestApplication& application,
     frameBufferImage = FrameBufferImage::New( 10, 10 );
   }
 
-  // Don't draw output framebuffer
+  // Don't draw output framebuffer // '
 
   RenderTask newTask = taskList.CreateTask();
   newTask.SetCameraActor( offscreenCamera );
@@ -268,10 +304,10 @@ bool IsActorHittableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType t
     {
       // Check whether the actor is visible and not fully transparent.
       if( actor.IsVisible()
-       && actor.GetCurrentWorldColor().a > 0.01f) // not FULLY_TRANSPARENT
+          && actor.GetCurrentWorldColor().a > 0.01f) // not FULLY_TRANSPARENT
       {
 
-          hittable = true;
+        hittable = true;
       }
       break;
     }
@@ -301,7 +337,7 @@ bool IsActorHittableFunction(Actor actor, Dali::HitTestAlgorithm::TraverseType t
 /****************************************************************************************************/
 /****************************************************************************************************/
 
-int UtcDaliRenderTaskDownCast(void)
+int UtcDaliRenderTaskDownCast01(void)
 {
   TestApplication application;
 
@@ -320,11 +356,92 @@ int UtcDaliRenderTaskDownCast(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetSourceActor(void)
+int UtcDaliRenderTaskDownCast02(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::SetSourceActor()");
+  tet_infoline("Testing RenderTask::DownCast()");
+
+  Actor actor = Actor::New();
+
+  RenderTask task = RenderTask::DownCast( actor );
+  DALI_TEST_CHECK( ! task );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetSourceActorN(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::SetSourceActor() Negative - try with empty actor handle");
+  Stage stage = Stage::GetCurrent();
+
+  Actor srcActor;
+
+  RenderTaskList taskList = stage.GetRenderTaskList();
+  RenderTask renderTask = taskList.CreateTask();
+  renderTask.SetSourceActor(srcActor);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( ! renderTask.GetSourceActor() );
+  END_TEST;
+}
+
+
+int UtcDaliRenderTaskSetSourceActorP01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that setting a non-renderable actor stops existing source actor being rendered ");
+
+  Stage stage = Stage::GetCurrent();
+
+  const std::vector<GLuint>& boundTextures = application.GetGlAbstraction().GetBoundTextures( GL_TEXTURE0 );
+
+  RenderTaskList taskList = stage.GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask( 0u );
+
+  Actor actor = task.GetSourceActor();
+  DALI_TEST_CHECK( actor );
+
+  std::vector<GLuint> ids;
+  ids.push_back( 7 );
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  BufferImage img = BufferImage::New( 1,1 );
+  ImageActor newActor = ImageActor::New( img );
+  newActor.SetSize(1,1);
+  stage.Add( newActor );
+
+  Actor nonRenderableActor = Actor::New();
+  stage.Add( nonRenderableActor );
+
+  // Stop the newActor from being rendered by changing the source actor
+  DALI_TEST_CHECK( nonRenderableActor );
+  task.SetSourceActor( nonRenderableActor );
+  DALI_TEST_CHECK( task.GetSourceActor() != actor );
+  DALI_TEST_CHECK( task.GetSourceActor() == nonRenderableActor );
+
+  // Update & Render nothing!
+  application.GetGlAbstraction().ClearBoundTextures();
+  application.SendNotification();
+  application.Render();
+
+  // Check that nothing was rendered
+  DALI_TEST_EQUALS( boundTextures.size(), 0u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+int UtcDaliRenderTaskSetSourceActorP02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetSourceActor() Positive - check that switching source from a non-renderable to a renderable actor causes the texture to be drawn");
 
   Stage stage = Stage::GetCurrent();
 
@@ -408,7 +525,7 @@ int UtcDaliRenderTaskSetSourceActorOffStage(void)
   ImageActor newActor = ImageActor::New( img );
   newActor.SetSize(1,1);
   task.SetSourceActor( newActor );
-  // Don't add newActor to stage yet
+  // Don't add newActor to stage yet   //'
 
   // Update & Render with the actor initially off-stage
   application.GetGlAbstraction().ClearBoundTextures();
@@ -503,11 +620,11 @@ int UtcDaliRenderTaskSetSourceActorEmpty(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskGetSourceActor(void)
+int UtcDaliRenderTaskGetSourceActorP01(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::GetSourceActor()");
+  tet_infoline("Testing RenderTask::GetSourceActor() Check the default render task has a valid source actor");
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
@@ -522,11 +639,48 @@ int UtcDaliRenderTaskGetSourceActor(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskGetSourceActorP02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetSourceActor() Create a new render task, Add a new actor to the stage and set it as the source of the new render task. Get its source actor and check that it is equivalent to what was set.");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask task = taskList.CreateTask();
+  Actor actor = Actor::New();
+  Stage::GetCurrent().Add(actor);
+  task.SetSourceActor( actor );
+
+  DALI_TEST_EQUALS( actor, task.GetSourceActor(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetSourceActorN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetSourceActor() Try with empty handle");
+
+  RenderTask task;
+  try
+  {
+    Actor actor = task.GetSourceActor();
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
 int UtcDaliRenderTaskSetExclusive(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::SetExclusive()");
+  tet_infoline("Testing RenderTask::SetExclusive() Check that exclusion works");
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
@@ -659,11 +813,72 @@ int UtcDaliRenderTaskSetExclusive(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskIsExclusive(void)
+int UtcDaliRenderTaskSetExclusive02(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::IsExclusive()");
+  tet_infoline("Testing RenderTask::SetExclusive() Check that changing from exclusive to not-exclusive works");
+
+  std::vector<GLuint> ids;
+  ids.push_back( 8 ); // 8 = actor1
+  application.GetGlAbstraction().SetNextTextureIds( ids );
+
+  BufferImage img1 = BufferImage::New( 1,1 );
+  ImageActor actor1 = ImageActor::New( img1 );
+  actor1.SetSize(1,1);
+  Stage::GetCurrent().Add( actor1 );
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask task = taskList.CreateTask();
+
+  task.SetSourceActor( actor1 );
+  task.SetExclusive(true); // Actor should only render once
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = gl.GetDrawTrace();
+  drawTrace.Enable(true);
+
+  // Update & Render actor1
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 1, TEST_LOCATION );
+
+  // Set task to non-exclusive - actor1 should render twice:
+  drawTrace.Reset();
+  task.SetExclusive(false);
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( drawTrace.CountMethod("DrawArrays"), 2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetExclusiveN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetExclusive() on empty handle");
+
+  RenderTask task;
+  try
+  {
+    task.SetExclusive(true);
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskIsExclusive01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::IsExclusive() Check default values are non-exclusive");
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
@@ -673,6 +888,44 @@ int UtcDaliRenderTaskIsExclusive(void)
 
   RenderTask newTask = taskList.CreateTask();
   DALI_TEST_CHECK( false == newTask.IsExclusive() );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskIsExclusive02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::IsExclusive() Check the getter returns set values");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  // Not exclusive is the default
+  RenderTask newTask = taskList.CreateTask();
+  DALI_TEST_EQUALS( newTask.IsExclusive(), false, TEST_LOCATION );
+
+  newTask.SetExclusive(true);
+  DALI_TEST_EQUALS( newTask.IsExclusive(), true, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskIsExclusiveN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::IsExclusive() on empty handle");
+
+  RenderTask task;
+  try
+  {
+    bool x = task.IsExclusive();
+    x=x;
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
   END_TEST;
 }
 
@@ -706,14 +959,18 @@ int UtcDaliRenderTaskGetInputEnabled(void)
 
   // Input is enabled by default
   RenderTask task = taskList.GetTask( 0u );
-  DALI_TEST_CHECK( true == task.GetInputEnabled() );
+  DALI_TEST_EQUALS( true, task.GetInputEnabled(), TEST_LOCATION );
 
   RenderTask newTask = taskList.CreateTask();
-  DALI_TEST_CHECK( true == newTask.GetInputEnabled() );
+  DALI_TEST_EQUALS( true, newTask.GetInputEnabled(), TEST_LOCATION );
+
+  newTask.SetInputEnabled(false);
+  DALI_TEST_EQUALS( false, newTask.GetInputEnabled(), TEST_LOCATION );
+
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetCameraActor(void)
+int UtcDaliRenderTaskSetCameraActorP(void)
 {
   TestApplication application;
 
@@ -723,19 +980,42 @@ int UtcDaliRenderTaskSetCameraActor(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  Actor actor = task.GetCameraActor();
-  DALI_TEST_CHECK( actor );
+  Actor defaultCameraActor = task.GetCameraActor();
+  DALI_TEST_CHECK( defaultCameraActor );
 
-  CameraActor newActor = CameraActor::New();
-  DALI_TEST_CHECK( newActor );
+  CameraActor newCameraActor = CameraActor::New();
+  DALI_TEST_CHECK( newCameraActor );
 
-  task.SetCameraActor( newActor );
-  DALI_TEST_CHECK( task.GetCameraActor() != actor );
-  DALI_TEST_CHECK( task.GetCameraActor() == newActor );
+  task.SetCameraActor( newCameraActor );
+  DALI_TEST_CHECK( task.GetCameraActor() != defaultCameraActor );
+  DALI_TEST_EQUALS( task.GetCameraActor(), newCameraActor, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliRenderTaskGetCameraActor(void)
+
+int UtcDaliRenderTaskSetCameraActorN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetCameraActor() with empty actor handle");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask( 0u );
+
+  Actor actor = task.GetCameraActor();
+  DALI_TEST_CHECK( actor );
+
+  CameraActor cameraActor;
+
+  task.SetCameraActor( cameraActor );
+  DALI_TEST_EQUALS( (bool)task.GetCameraActor(), false, TEST_LOCATION );
+  DALI_TEST_EQUALS( task.GetCameraActor(), cameraActor, TEST_LOCATION );
+  END_TEST;
+}
+
+
+int UtcDaliRenderTaskGetCameraActorP(void)
 {
   TestApplication application;
 
@@ -745,15 +1025,34 @@ int UtcDaliRenderTaskGetCameraActor(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  Actor actor = task.GetCameraActor();
+  CameraActor actor = task.GetCameraActor();
   DALI_TEST_CHECK( actor );
-
-  RenderTask newTask = taskList.CreateTask();
-  DALI_TEST_CHECK( actor == newTask.GetCameraActor() );
+  DALI_TEST_EQUALS( actor.GetProjectionMode(), Dali::Camera::PERSPECTIVE_PROJECTION, TEST_LOCATION );
+  DALI_TEST_GREATER( actor.GetFieldOfView(), 0.0f, TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetTargetFrameBuffer(void)
+int UtcDaliRenderTaskGetCameraActorN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetCameraActor() with empty handle");
+  RenderTask task;
+
+  try
+  {
+    Actor actor = task.GetCameraActor();
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetTargetFrameBufferP(void)
 {
   TestApplication application;
 
@@ -763,18 +1062,43 @@ int UtcDaliRenderTaskSetTargetFrameBuffer(void)
 
   RenderTask task = taskList.GetTask( 0u );
 
-  // By default render-tasks do not render off-screen
-  FrameBufferImage image = task.GetTargetFrameBuffer();
-  DALI_TEST_CHECK( !image );
-
   FrameBufferImage newImage = FrameBufferImage::New();
-
   task.SetTargetFrameBuffer( newImage );
   DALI_TEST_CHECK( task.GetTargetFrameBuffer() == newImage );
   END_TEST;
 }
 
-int UtcDaliRenderTaskGetTargetFrameBuffer(void)
+int UtcDaliRenderTaskSetTargetFrameBufferN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetTargetFrameBuffer()");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask task = taskList.GetTask( 0u );
+  FrameBufferImage newImage; // Empty handle
+  task.SetTargetFrameBuffer( newImage );
+  DALI_TEST_EQUALS( (bool)task.GetTargetFrameBuffer(), false, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetTargetFrameBufferP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetTargetFrameBuffer()");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+
+  RenderTask newTask = taskList.CreateTask();
+  FrameBufferImage fb = FrameBufferImage::New(128, 128, Pixel::RGBA8888);
+  newTask.SetTargetFrameBuffer( fb );
+  DALI_TEST_EQUALS( newTask.GetTargetFrameBuffer(), fb, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetTargetFrameBufferN(void)
 {
   TestApplication application;
 
@@ -788,12 +1112,10 @@ int UtcDaliRenderTaskGetTargetFrameBuffer(void)
   FrameBufferImage image = task.GetTargetFrameBuffer();
   DALI_TEST_CHECK( !image );
 
-  RenderTask newTask = taskList.CreateTask();
-  DALI_TEST_CHECK( !newTask.GetTargetFrameBuffer() );
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetScreenToFrameBufferFunction(void)
+int UtcDaliRenderTaskSetScreenToFrameBufferFunctionP(void)
 {
   TestApplication application;
 
@@ -822,7 +1144,26 @@ int UtcDaliRenderTaskSetScreenToFrameBufferFunction(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskGetScreenToFrameBufferFunction(void)
+int UtcDaliRenderTaskSetScreenToFrameBufferFunctionN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetScreenToFrameBufferFunction()");
+
+  RenderTask task; // Empty handle
+  try
+  {
+    task.SetScreenToFrameBufferFunction( TestScreenToFrameBufferFunction );
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetScreenToFrameBufferFunctionP(void)
 {
   TestApplication application;
 
@@ -841,8 +1182,28 @@ int UtcDaliRenderTaskGetScreenToFrameBufferFunction(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskGetScreenToFrameBufferFunctionN(void)
+{
+  TestApplication application;
 
-int UtcDaliRenderTaskGetScreenToFrameBufferMappingActor(void)
+  tet_infoline("Testing RenderTask::GetScreenToFrameBufferFunction() on empty handle");
+
+  RenderTask task;
+  try
+  {
+    RenderTask::ScreenToFrameBufferFunction func = task.GetScreenToFrameBufferFunction();
+    func=func;
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+
+int UtcDaliRenderTaskGetScreenToFrameBufferMappingActorP(void)
 {
   TestApplication application;
   tet_infoline("Testing RenderTask::GetScreenToFrameBufferMappingActor ");
@@ -852,11 +1213,100 @@ int UtcDaliRenderTaskGetScreenToFrameBufferMappingActor(void)
   Actor mappingActor = Actor::New();
   renderTask.SetScreenToFrameBufferMappingActor(mappingActor);
 
-  DALI_TEST_CHECK( mappingActor == renderTask.GetScreenToFrameBufferMappingActor() );
+  DALI_TEST_EQUALS( mappingActor, renderTask.GetScreenToFrameBufferMappingActor(), TEST_LOCATION );
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetViewport(void)
+
+int UtcDaliRenderTaskGetScreenToFrameBufferMappingActorN(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::GetScreenToFrameBufferMappingActor with empty task handle");
+
+  RenderTask task;
+  try
+  {
+    Actor mappingActor;
+    task.SetScreenToFrameBufferMappingActor(mappingActor);
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetScreenToFrameBufferMappingActor02N(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask::GetScreenToFrameBufferMappingActor with empty task handle");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask renderTask = taskList.CreateTask();
+  Actor actor;
+  renderTask.SetScreenToFrameBufferMappingActor(actor);
+
+  DALI_TEST_EQUALS( (bool)renderTask.GetScreenToFrameBufferMappingActor(), false, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetViewportP01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetViewport() on default task");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask task = taskList.GetTask( 0u );
+  Viewport viewport = task.GetViewport();
+
+  // By default the viewport should match the stage width/height
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Viewport expectedViewport( 0, 0, stageSize.width, stageSize.height );
+  DALI_TEST_CHECK( viewport == expectedViewport );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetViewportP02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetViewport() on new task");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask task = taskList.CreateTask();
+  Viewport viewport = task.GetViewport();
+
+  // By default the viewport should match the stage width/height
+  Vector2 stageSize = Stage::GetCurrent().GetSize();
+  Viewport expectedViewport( 0, 0, stageSize.width, stageSize.height );
+  DALI_TEST_CHECK( viewport == expectedViewport );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetViewportN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetViewport() on empty handle");
+
+  RenderTask task;
+  try
+  {
+    Viewport viewport = task.GetViewport();
+    viewport = viewport;
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+
+int UtcDaliRenderTaskSetViewportP(void)
 {
   TestApplication application;
 
@@ -865,15 +1315,7 @@ int UtcDaliRenderTaskSetViewport(void)
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
   RenderTask task = taskList.GetTask( 0u );
-
-  Viewport viewport = task.GetViewport();
-
-  // By default the viewport should match the stage width/height
-
   Vector2 stageSize = Stage::GetCurrent().GetSize();
-  Viewport expectedViewport( 0, 0, stageSize.width, stageSize.height );
-  DALI_TEST_CHECK( viewport == expectedViewport );
-
   Viewport newViewport( 0, 0, stageSize.width * 0.5f, stageSize.height * 0.5f );
   task.SetViewport( newViewport );
 
@@ -885,28 +1327,30 @@ int UtcDaliRenderTaskSetViewport(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskGetViewport(void)
+int UtcDaliRenderTaskSetViewportN(void)
 {
   TestApplication application;
 
-  tet_infoline("Testing RenderTask::GetViewport()");
+  tet_infoline("Testing RenderTask::SetViewport()");
 
   RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
 
-  RenderTask task = taskList.GetTask( 0u );
+  RenderTask task;
+  try
+  {
+    Vector2 stageSize = Stage::GetCurrent().GetSize();
+    Viewport newViewport( 0, 0, stageSize.width * 0.5f, stageSize.height * 0.5f );
+    task.SetViewport( newViewport );
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
 
-  Viewport viewport = task.GetViewport();
-
-  // By default the viewport should match the stage width/height
-
-  Vector2 stageSize = Stage::GetCurrent().GetSize();
-  Viewport expectedViewport( 0, 0, stageSize.width, stageSize.height );
-  DALI_TEST_CHECK( viewport == expectedViewport );
-
-  RenderTask newTask = taskList.CreateTask();
-  DALI_TEST_CHECK( newTask.GetViewport() == expectedViewport );
   END_TEST;
 }
+
 
 int UtcDaliRenderTaskSetViewportPosition(void)
 {
@@ -1006,7 +1450,7 @@ int UtcDaliRenderTaskSetViewportSize(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetClearColor(void)
+int UtcDaliRenderTaskSetClearColorP(void)
 {
   TestApplication application;
 
@@ -1036,7 +1480,26 @@ int UtcDaliRenderTaskSetClearColor(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskGetClearColor(void)
+int UtcDaliRenderTaskSetClearColorN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetClearColor() on empty handle");
+
+  RenderTask task;
+  try
+  {
+    task.SetClearColor( Vector4::ZERO );
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetClearColorP(void)
 {
   TestApplication application;
 
@@ -1048,7 +1511,27 @@ int UtcDaliRenderTaskGetClearColor(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskSetClearEnabled(void)
+int UtcDaliRenderTaskGetClearColorN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetClearColor()");
+
+  RenderTask task;
+  try
+  {
+    Vector4 color = task.GetClearColor();
+    color = color;
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetClearEnabledP(void)
 {
   TestApplication application;
 
@@ -1067,7 +1550,26 @@ int UtcDaliRenderTaskSetClearEnabled(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskGetClearEnabled(void)
+int UtcDaliRenderTaskSetClearEnabledN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetClearEnabled() with empty handle");
+
+  RenderTask task;
+  try
+  {
+    task.SetClearEnabled(true);
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetClearEnabledP(void)
 {
   TestApplication application;
 
@@ -1079,6 +1581,96 @@ int UtcDaliRenderTaskGetClearEnabled(void)
   DALI_TEST_CHECK( !task.GetClearEnabled() ); // defaults to false
   END_TEST;
 }
+
+
+int UtcDaliRenderTaskGetClearEnabledN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetClearEnabled() with empty handle");
+
+  RenderTask task;
+  try
+  {
+    bool x = task.GetClearEnabled();
+    x=x;
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetCullModeP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetCullMode()");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask task = taskList.GetTask( 0u );
+  DALI_TEST_EQUALS( task.GetCullMode(), true, TEST_LOCATION );
+
+  task.SetCullMode( false );
+
+  DALI_TEST_EQUALS( task.GetCullMode(), false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskSetCullModeN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::SetCullMode() on empty handle");
+
+  RenderTask task;
+  try
+  {
+    task.SetCullMode( false );
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetCullModeP(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetCullMode()");
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask task = taskList.GetTask( 0u );
+  DALI_TEST_EQUALS( task.GetCullMode(), true, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskGetCullModeN(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask::GetCullMode() with empty handle");
+
+  RenderTask task;
+  try
+  {
+    bool x = task.GetCullMode();
+    x=x;
+  }
+  catch (Dali::DaliException(e))
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT(e, "RenderTask handle is empty", TEST_LOCATION);
+  }
+  END_TEST;
+}
+
 
 int UtcDaliRenderTaskSetRefreshRate(void)
 {
@@ -1530,8 +2122,17 @@ int UtcDaliRenderTaskOnce03(void)
   application.GetPlatform().ClearReadyResources();
 
   sync.SetObjectSynced( lastSyncObj, true );
+
+  // Expect: No draw - we've just drawn our render task once, above. No finished signal -
+  // we won't read the gl sync until the next frame. Continue rendering - we're waiting for
+  // the sync
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true  ) );
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
+
+  // Expect: 1 final draw - this Update doesn't update the scene, hence render instructions
+  // from last frame but 1 are still present.
+  // Finished signal should be true - we've just done the sync.
+  // Should now stop rendering and updating - nothing left to do.
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,   finished, true, false  ) );
 
   END_TEST;
 }
@@ -1861,6 +2462,7 @@ int UtcDaliRenderTaskOnce08(void)
   tet_printf("  FailImageLoad\n");
 
   FailImageLoad(application, imageRequestId); // Need to run Update again for this to complete
+
   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) ); // nothing to draw
   application.SendNotification();
 
@@ -1868,8 +2470,11 @@ int UtcDaliRenderTaskOnce08(void)
   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
   DALI_TEST_CHECK( lastSyncObj != NULL );
 
+  sync.SetObjectSynced( lastSyncObj, true );
+
   // Expect finished signal, as all resources are complete
-  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,   finished, true, false ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
 
   END_TEST;
 }

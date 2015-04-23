@@ -25,11 +25,15 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/images/image-attributes.h>
+#include <dali/public-api/images/image-operations.h>
+#include <dali/public-api/math/uint-16-pair.h>
+#include <dali/public-api/math/vector2.h>
 #include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {
+
+typedef Uint16Pair ImageDimensions;
 
 namespace Integration
 {
@@ -90,11 +94,20 @@ struct BitmapResourceType : public ResourceType
 {
   /**
    * Constructor.
-   * @param[in] attribs parameters for image loading request
+   * @param[in] size The requested size for the bitmap.
+   * @param[in] scalingMode The method to use to map the source bitmap to the desired
+   * dimensions.
+   * @param[in] samplingMode The filter to use if the bitmap needs to be downsampled
+   * to the requested size.
+   * @param[in] orientationCorrection Whether to use bitmap metadata to rotate or
+   * flip the bitmap, e.g., from portrait to landscape.
    */
-  BitmapResourceType(const ImageAttributes& attribs)
+  BitmapResourceType( ImageDimensions size = ImageDimensions( 0, 0 ),
+                      FittingMode::Type scalingMode = FittingMode::DEFAULT,
+                      SamplingMode::Type samplingMode = SamplingMode::DEFAULT,
+                      bool orientationCorrection = true )
   : ResourceType(ResourceBitmap),
-    imageAttributes(attribs) {}
+    size(size), scalingMode(scalingMode), samplingMode(samplingMode), orientationCorrection(orientationCorrection) {}
 
   /**
    * Destructor.
@@ -106,13 +119,16 @@ struct BitmapResourceType : public ResourceType
    */
   virtual ResourceType* Clone() const
   {
-    return new BitmapResourceType(imageAttributes);
+    return new BitmapResourceType( size, scalingMode, samplingMode, orientationCorrection );
   }
 
   /**
    * Attributes are copied from the request.
    */
-  ImageAttributes imageAttributes;
+  ImageDimensions size;
+  FittingMode::Type scalingMode;
+  SamplingMode::Type samplingMode;
+  bool orientationCorrection;
 
 private:
 
@@ -138,11 +154,11 @@ struct NativeImageResourceType : public ResourceType
 
   /**
    * Constructor.
-   * @param[in] attribs parameters for image loading request
+   * @param[in] dimensions Width and Height to allocate for image.
    */
-  NativeImageResourceType(const ImageAttributes& attribs)
+  NativeImageResourceType( ImageDimensions dimensions )
   : ResourceType(ResourceNativeImage),
-    imageAttributes(attribs) {}
+    imageDimensions(dimensions) {}
 
   /**
    * Destructor.
@@ -154,13 +170,13 @@ struct NativeImageResourceType : public ResourceType
   */
   virtual ResourceType* Clone() const
   {
-    return new NativeImageResourceType(imageAttributes);
+    return new NativeImageResourceType(imageDimensions);
   }
 
   /**
    * Attributes are copied from the request (if supplied).
    */
-  ImageAttributes imageAttributes;
+  ImageDimensions imageDimensions;
 
 private:
 
@@ -185,11 +201,11 @@ struct RenderTargetResourceType : public ResourceType
 
   /**
    * Constructor.
-   * @param[in] attribs parameters for image loading request
+   * @param[in] dims Width and Height to allocate for image.
    */
-  RenderTargetResourceType(const ImageAttributes& attribs)
+  RenderTargetResourceType( ImageDimensions dims )
   : ResourceType(ResourceTargetImage),
-    imageAttributes(attribs) {}
+    imageDimensions(dims) {}
 
   /**
    * Destructor.
@@ -201,13 +217,13 @@ struct RenderTargetResourceType : public ResourceType
    */
   virtual ResourceType* Clone() const
   {
-    return new RenderTargetResourceType(imageAttributes);
+    return new RenderTargetResourceType(imageDimensions);
   }
 
   /**
-   * Attributes are copied from the request.
+   * Image size is copied from the request.
    */
-  ImageAttributes imageAttributes;
+  ImageDimensions imageDimensions;
 
 private:
 

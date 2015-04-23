@@ -6,6 +6,7 @@ internal_src_files = \
   $(internal_src_dir)/common/internal-constants.cpp \
   $(internal_src_dir)/common/message-buffer.cpp \
   $(internal_src_dir)/common/image-sampler.cpp \
+  $(internal_src_dir)/common/image-attributes.cpp \
   $(internal_src_dir)/common/fixed-size-memory-pool.cpp \
   \
   $(internal_src_dir)/event/actor-attachments/actor-attachment-impl.cpp \

@@ -18,10 +18,10 @@
  *
  */
 
-// INTERNAL HEADERS
+// INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-thread-services.h>
 #include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/update/common/double-buffered.h>
 #include <dali/internal/update/modeling/scene-graph-mesh-declarations.h>

@@ -26,6 +26,7 @@
 #include "test-render-controller.h"
 #include <dali/public-api/common/dali-common.h>
 #include <dali/integration-api/resource-policies.h>
+#include <dali/integration-api/debug.h>
 
 namespace Dali
 {
@@ -63,7 +64,7 @@ public:
 
   void Initialize();
   virtual ~TestApplication();
-  static void LogMessage(Dali::Integration::Log::DebugPriority level, std::string& message);
+  static void LogMessage( Dali::Integration::Log::DebugPriority level, std::string& message );
   Dali::Integration::Core& GetCore();
   TestPlatformAbstraction& GetPlatform();
   TestRenderController& GetRenderController();

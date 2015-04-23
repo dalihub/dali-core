@@ -79,11 +79,6 @@ public:
   ImagePtr GetImage();
 
   /**
-   * @copydoc Dali::ImageActor::SetToNaturalSize()
-   */
-  void SetToNaturalSize();
-
-  /**
    * @copydoc Dali::ImageActor::SetPixelArea()
    */
   void SetPixelArea( const PixelArea& pixelArea );
@@ -210,27 +205,11 @@ protected:
 private:
 
   /**
-   * Helper to set the actor to the image's natural size
-   */
-  void SetNaturalSize();
-
-  /**
    * Calculate the natural size of this image actor
    *
    * @return Return the natural size as a Vector2
    */
   Vector2 CalculateNaturalSize() const;
-
-  /**
-   * From Actor.
-   * This is called after SizeSet() has been called.
-   */
-  virtual void OnSizeSet( const Vector3& targetSize );
-
-  /**
-   * @copydoc Actor::OnSizeAnimation( Animation& animation, const Vector3& targetSize )
-   */
-  virtual void OnSizeAnimation(Animation& animation, const Vector3& targetSize);
 
   /**
    * From Actor; used to trigger fade-in animations.
@@ -245,10 +224,6 @@ private:
 private:
 
   ImageAttachmentPtr mImageAttachment; ///< Used to display the image (holds a pointer to currently showed Image)
-
-  // flags, compressed to bitfield (uses only 1 byte)
-  bool mUsingNaturalSize:1;      ///< True only when the actor is using
-  bool mInternalSetSize:1;       ///< True whilst setting size internally, false at all other times
 
 };
 

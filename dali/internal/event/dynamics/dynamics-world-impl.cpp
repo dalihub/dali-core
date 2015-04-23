@@ -18,22 +18,22 @@
 // CLASS HEADER
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
 
-// EXTERNAL HEADERS
+// EXTERNAL INCLUDES
+#include <cstring>
 
-// INTERNAL HEADERS
+// INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/dynamics/dynamics-collision-data.h>
 #include <dali/integration-api/dynamics/dynamics-world-settings.h>
-
-#include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/dynamics/dynamics-body-impl.h>
 #include <dali/internal/event/dynamics/dynamics-collision-impl.h>
 #include <dali/internal/event/dynamics/dynamics-joint-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-body.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
+#include <dali/public-api/object/type-registry.h>
 
 namespace Dali
 {
@@ -150,7 +150,7 @@ void DynamicsWorld::SetGravity(const Vector3& gravity)
   {
     mGravity = gravity;
 
-    SetGravityMessage( Stage::GetCurrent()->GetUpdateInterface(), *mDynamicsWorld, mGravity );
+    SetGravityMessage( *( Stage::GetCurrent() ), *mDynamicsWorld, mGravity );
   }
 }
 
@@ -190,7 +190,7 @@ void DynamicsWorld::SetRootActor(ActorPtr rootActor)
     {
       if( mRootActor->OnStage() )
       {
-        SetRootActorMessage( Stage::GetCurrent()->GetUpdateInterface(), *mDynamicsWorld, static_cast<const SceneGraph::Node*>(mRootActor->GetSceneObject()) );
+        SetRootActorMessage( *( Stage::GetCurrent() ), *mDynamicsWorld, static_cast<const SceneGraph::Node*>(mRootActor->GetSceneObject()) );
       }
 
       mRootActor->OnStageSignal().Connect( mSlotDelegate, &DynamicsWorld::RootOnStage );
@@ -210,14 +210,14 @@ void DynamicsWorld::RootOnStage( Dali::Actor actor )
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
 
-  SetRootActorMessage( Stage::GetCurrent()->GetUpdateInterface(), *mDynamicsWorld, static_cast<const SceneGraph::Node*>(mRootActor->GetSceneObject()) );
+  SetRootActorMessage( *( Stage::GetCurrent() ), *mDynamicsWorld, static_cast<const SceneGraph::Node*>(mRootActor->GetSceneObject()) );
 }
 
 void DynamicsWorld::RootOffStage( Dali::Actor actor )
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s\n", __PRETTY_FUNCTION__);
 
-  SetRootActorMessage( Stage::GetCurrent()->GetUpdateInterface(), *mDynamicsWorld, static_cast<const SceneGraph::Node*>(NULL) );
+  SetRootActorMessage( *( Stage::GetCurrent() ), *mDynamicsWorld, static_cast<const SceneGraph::Node*>(NULL) );
 }
 
 Dali::DynamicsWorld::CollisionSignalType& DynamicsWorld::CollisionSignal()

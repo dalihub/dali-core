@@ -92,10 +92,10 @@ int UtcDaliMatrixOrthoNormalize0(void)
   for (int i=0;i<1000;++i)
   {
     float f = i;
-    Vector4 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f), 0.0f);
+    Vector3 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f) );
     axis.Normalize();
 
-    m.SetTransformComponents( Vector3::ONE, Quaternion(1.0f, axis), Vector3::ZERO );
+    m.SetTransformComponents( Vector3::ONE, Quaternion(Radian(1.0f), axis), Vector3::ZERO );
     m.OrthoNormalize();
   }
 
@@ -118,13 +118,13 @@ int UtcDaliMatrixOrthoNormalize1(void)
   for (int i=0;i<1000;++i)
   {
     float f = i;
-    Vector4 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f), 0.0f);
+    Vector3 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f));
     axis.Normalize();
     Vector3 center(10.0f, 15.0f, 5.0f);
 
     Matrix m0;
     m0.SetIdentity();
-    m0.SetTransformComponents( Vector3::ONE, Quaternion(1.0f, axis), center );
+    m0.SetTransformComponents( Vector3::ONE, Quaternion(Radian(1.0f), axis), center );
 
     Matrix m1(m0);
     m1.OrthoNormalize();
@@ -145,13 +145,13 @@ int UtcDaliMatrixInvert01(void)
   for (int i=0;i<1000;++i)
   {
     float f = i;
-    Vector4 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f), 0.0f);
+    Vector3 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f));
     axis.Normalize();
     Vector3 center(f, cosf(f) * 100.0f, cosf(f*0.5f) * 50.0f);
 
     Matrix m0;
     m0.SetIdentity();
-    m0.SetTransformComponents( Vector3::ONE, Quaternion(1.0f, axis), center );
+    m0.SetTransformComponents( Vector3::ONE, Quaternion(Radian(1.0f), axis), center );
 
     Matrix m1(m0);
     m1.Invert();
@@ -184,13 +184,13 @@ int UtcDaliMatrixInvertTransform01(void)
   for (int i=0;i<1000;++i)
   {
     float f = i;
-    Vector4 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f), 0.0f);
+    Vector3 axis(cosf(f*0.001f), cosf(f*0.02f), cosf(f*0.03f));
     axis.Normalize();
     Vector3 center(f, cosf(f) * 100.0f, cosf(f*0.5f) * 50.0f);
 
     Matrix m0;
     m0.SetIdentity();
-    m0.SetTransformComponents( Vector3::ONE, Quaternion(1.0f, axis), center );
+    m0.SetTransformComponents( Vector3::ONE, Quaternion(Radian(1.0f), axis), center );
 
     Matrix m1;
     m0.InvertTransform(m1);
@@ -635,8 +635,8 @@ int UtcDaliMatrixSetTransformComponents01(void)
 
           Matrix m1(rotation1);
           Matrix result1(false);
-          Vector4 vForward4(vForward.x, vForward.y, vForward.z, 0.0f);
-          result1.SetTransformComponents( Vector3::ONE, Quaternion(Radian(Degree(angle)), vForward4), Vector3::ZERO );
+          Vector3 vForward3(vForward.x, vForward.y, vForward.z);
+          result1.SetTransformComponents( Vector3::ONE, Quaternion(Radian(Degree(angle)), vForward3), Vector3::ZERO );
 
           DALI_TEST_EQUALS(m1, result1, 0.001, TEST_LOCATION);
 

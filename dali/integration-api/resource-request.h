@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/resource-types.h>
+#include <dali/public-api/object/ref-object.h>
 
 namespace Dali
 {

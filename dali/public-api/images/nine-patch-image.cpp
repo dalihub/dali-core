@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <dali/public-api/images/nine-patch-image.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/image-attributes.h>
+#include <dali/internal/common/image-attributes.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 
@@ -53,7 +53,7 @@ NinePatchImage& NinePatchImage::operator=(const NinePatchImage& rhs)
 
 NinePatchImage NinePatchImage::New( const std::string& filename )
 {
-  ImageAttributes defaultAttrs;
+  Internal::ImageAttributes defaultAttrs;
 
   Internal::NinePatchImagePtr internal = Internal::NinePatchImage::New( filename, defaultAttrs, Image::NEVER );
   return NinePatchImage(internal.Get());

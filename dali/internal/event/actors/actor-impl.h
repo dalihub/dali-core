@@ -939,12 +939,16 @@ public:
   Dimension::Type GetDimensionDependency( Dimension::Type dimension ) const;
 
   /**
-   * @copydoc Dali::Actor::SetRelayoutEnabled()
+   * @brief Set the size negotiation relayout enabled on this actor
+   *
+   * @param[in] relayoutEnabled Boolean to enable or disable relayout
    */
   void SetRelayoutEnabled( bool relayoutEnabled );
 
   /**
-   * @copydoc Dali::Actor::IsRelayoutEnabled()
+   * @brief Return if relayout is enabled
+   *
+   * @return Return if relayout is enabled or not for this actor
    */
   bool IsRelayoutEnabled() const;
 
@@ -992,15 +996,6 @@ public:
    * only performed once, i.e. there is no need to keep track of this in the calling side.
    */
   void RelayoutRequest( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
-
-  /**
-   * @brief Request to relayout of all actors in the sub-tree below the given actor.
-   *
-   * This flags the actor and all actors below it for relayout. The actual
-   * relayout is performed at the end of the frame. This means that multiple calls to relayout
-   * will not cause multiple relayouts to occur.
-   */
-  void RelayoutRequestTree();
 
   /*
    * @copydoc Dali::Actor::PropagateRelayoutFlags
@@ -1056,13 +1051,13 @@ public:
   float CalculateSize( Dimension::Type dimension, const Vector2& maximumSize );
 
   /**
-   * @brief Constain a dimension given the relayout constraints on this actor
+   * @brief Clamp a dimension given the relayout constraints on this actor
    *
    * @param[in] size The size to constrain
    * @param[in] dimension The dimension the size exists in
-   * @return Return the constrained size
+   * @return Return the clamped size
    */
-  float ConstrainDimension( float size, Dimension::Type dimension );
+  float ClampDimension( float size, Dimension::Type dimension );
 
   /**
    * Negotiate a dimension based on the size of the parent

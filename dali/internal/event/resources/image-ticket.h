@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/public-api/images/image.h>
+#include <dali/internal/common/image-attributes.h>
 
 namespace Dali
 {
@@ -61,7 +62,7 @@ public:
    * If requested width or height was 0, they are replaced by concrete dimensions.
    * @return a copy of the image attributes
    */
-  const Dali::ImageAttributes& GetAttributes() const { return mAttributes;}
+  const ImageAttributes& GetAttributes() const { return mAttributes;}
 
   /**
    * Get the width of an image.
@@ -107,7 +108,7 @@ private:
    * Contains actual values only after the image has finished loading.
    * If requested width or height was 0, the natural size is used.
    */
-  Dali::ImageAttributes mAttributes;
+  ImageAttributes mAttributes;
 
   /*
    * ResourceClient needs to set dimensions and pixelformat.

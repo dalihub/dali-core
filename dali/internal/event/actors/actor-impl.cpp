@@ -226,7 +226,6 @@ DALI_PROPERTY( "color-mode", STRING, true, false, false, Dali::Actor::Property::
 DALI_PROPERTY( "position-inheritance", STRING, true, false, false, Dali::Actor::Property::POSITION_INHERITANCE )
 DALI_PROPERTY( "draw-mode", STRING, true, false, false, Dali::Actor::Property::DRAW_MODE )
 DALI_PROPERTY( "size-mode-factor", VECTOR3, true, false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
-DALI_PROPERTY( "relayout-enabled", BOOLEAN, true, false, false, Dali::Actor::Property::RELAYOUT_ENABLED )
 DALI_PROPERTY( "width-resize-policy", STRING, true, false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
 DALI_PROPERTY( "height-resize-policy", STRING, true, false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY )
 DALI_PROPERTY( "size-scale-policy", STRING, true, false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
@@ -839,10 +838,10 @@ PositionInheritanceMode Actor::GetPositionInheritanceMode() const
 
 void Actor::SetOrientation( const Radian& angle, const Vector3& axis )
 {
-  Vector4 normalizedAxis( axis.x, axis.y, axis.z, 0.0f );
+  Vector3 normalizedAxis( axis.x, axis.y, axis.z );
   normalizedAxis.Normalize();
 
-  Quaternion orientation( Quaternion::FromAxisAngle( normalizedAxis, angle ) );
+  Quaternion orientation( angle, normalizedAxis );
 
   SetOrientation( orientation );
 }
@@ -1317,6 +1316,9 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
       SetDimensionDependency( Dimension::HEIGHT, Dimension::WIDTH );
     }
   }
+
+  // If calling SetResizePolicy, assume we want relayout enabled
+  SetRelayoutEnabled( true );
 
   OnSetResizePolicy( policy, dimension );
 
@@ -2857,12 +2859,6 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
       break;
     }
 
-    case Dali::Actor::Property::RELAYOUT_ENABLED:
-    {
-      SetRelayoutEnabled( property.Get< bool >() );
-      break;
-    }
-
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
       SetResizePolicy( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount ), Dimension::WIDTH );
@@ -2949,17 +2945,6 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
       break;
     }
 
-    case Property::FLOAT:
-    {
-      const AnimatableProperty< float >* property = dynamic_cast< const AnimatableProperty< float >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<float>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<float>::Bake, value.Get<float>() );
-
-      break;
-    }
-
     case Property::INTEGER:
     {
       const AnimatableProperty< int >* property = dynamic_cast< const AnimatableProperty< int >* >( entry.GetSceneGraphProperty() );
@@ -2967,6 +2952,28 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
 
       // property is being used in a separate thread; queue a message to set the property
       SceneGraph::NodePropertyMessage<int>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<int>::Bake, value.Get<int>() );
+
+      break;
+    }
+
+    case Property::UNSIGNED_INTEGER:
+    {
+      const AnimatableProperty< unsigned int >* property = dynamic_cast< const AnimatableProperty< unsigned int >* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<unsigned int>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<unsigned int>::Bake, value.Get<unsigned int>() );
+
+      break;
+    }
+
+    case Property::FLOAT:
+    {
+      const AnimatableProperty< float >* property = dynamic_cast< const AnimatableProperty< float >* >( entry.GetSceneGraphProperty() );
+      DALI_ASSERT_DEBUG( NULL != property );
+
+      // property is being used in a separate thread; queue a message to set the property
+      SceneGraph::NodePropertyMessage<float>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<float>::Bake, value.Get<float>() );
 
       break;
     }
@@ -3312,12 +3319,6 @@ Property::Value Actor::GetDefaultProperty( Property::Index index ) const
     case Dali::Actor::Property::SIZE_MODE_FACTOR:
     {
       value = GetSizeModeFactor();
-      break;
-    }
-
-    case Dali::Actor::Property::RELAYOUT_ENABLED:
-    {
-      value = IsRelayoutEnabled();
       break;
     }
 
@@ -4152,7 +4153,7 @@ float Actor::CalculateSize( Dimension::Type dimension, const Vector2& maximumSiz
   return 0.0f;  // Default
 }
 
-float Actor::ConstrainDimension( float size, Dimension::Type dimension )
+float Actor::ClampDimension( float size, Dimension::Type dimension )
 {
   const float minSize = GetMinimumSize( dimension );
   const float maxSize = GetMaximumSize( dimension );
@@ -4220,7 +4221,7 @@ void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& alloca
       OnCalculateRelayoutSize( dimension );
 
       // All dependencies checked, calculate the size and set negotiated flag
-      const float newSize = ConstrainDimension( CalculateSize( dimension, allocatedSize ), dimension );
+      const float newSize = ClampDimension( CalculateSize( dimension, allocatedSize ), dimension );
 
       SetNegotiatedDimension( newSize, dimension );
       SetLayoutNegotiated( true, dimension );
@@ -4377,16 +4378,6 @@ void Actor::RelayoutRequest( Dimension::Type dimension )
   {
     Dali::Actor self( this );
     relayoutController->RequestRelayout( self, dimension );
-  }
-}
-
-void Actor::RelayoutRequestTree()
-{
-  Internal::RelayoutController* relayoutController = Internal::RelayoutController::Get();
-  if( relayoutController )
-  {
-    Dali::Actor self( this );
-    relayoutController->RequestRelayoutTree( self );
   }
 }
 

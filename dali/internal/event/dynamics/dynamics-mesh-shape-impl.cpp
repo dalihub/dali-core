@@ -46,7 +46,7 @@ DynamicsMeshShape::DynamicsMeshShape(Mesh& mesh)
   mDynamicsShape = meshShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsMeshShapeMessage( stage->GetUpdateInterface(), *meshShape );
+  InitializeDynamicsMeshShapeMessage( *stage, *meshShape );
 }
 
 DynamicsMeshShape::~DynamicsMeshShape()

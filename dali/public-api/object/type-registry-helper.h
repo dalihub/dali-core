@@ -2,7 +2,7 @@
 #define __DALI_TYPE_REGISTRY_HELPER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,20 +39,20 @@ namespace Internal
 #define DALI_TOKEN_PASTE_EXPAND( x, y ) x ## y
 #define DALI_TOKEN_PASTE( x, y ) DALI_TOKEN_PASTE_EXPAND(x, y)
 
-#define DALI_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectType, text, valueType, enumIndex ) \
-  PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, Toolkit::objectType::Property::enumIndex, Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
-  DALI_COMPILE_TIME_ASSERT( ( Toolkit::objectType::Property::enumIndex - Toolkit::objectType::PROPERTY_START_INDEX ) == count );
+#define DALI_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex ) \
+  PropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Property::valueType, &objectType::SetProperty, &objectType::GetProperty ); \
+  DALI_COMPILE_TIME_ASSERT( ( objectNamespace::objectType::Property::enumIndex - objectNamespace::objectType::PROPERTY_START_INDEX ) == count );
 
-#define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectType, text, valueType, enumIndex) \
-  AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, Toolkit::objectType::Property::enumIndex, Property::valueType );
+#define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
+  AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Property::valueType );
 
-#define DALI_SIGNAL_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectType, text, textVariable ) \
+#define DALI_SIGNAL_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, textVariable ) \
   const char* const textVariable = text; \
-  SignalConnectorType DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &Toolkit::Internal::objectType::DoConnectSignal );
+  SignalConnectorType DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoConnectSignal );
 
-#define DALI_ACTION_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectType, text, textVariable ) \
+#define DALI_ACTION_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, textVariable ) \
   const char* const textVariable = text; \
-  TypeAction DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &Toolkit::Internal::objectType::DoAction );
+  TypeAction DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoAction );
 
 // For use within implementations:
 
@@ -62,17 +62,17 @@ namespace Internal
 #define DALI_TYPE_REGISTRATION_BEGIN_CREATE( thisType, baseType, createFunction, createAtStartup ) \
   TypeRegistration typeRegistration( typeid( thisType ), typeid( baseType ), createFunction, createAtStartup );
 
-#define DALI_PROPERTY_REGISTRATION( objectType, text, valueType, enumIndex ) \
-  DALI_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectType, text, valueType, enumIndex )
+#define DALI_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
+  DALI_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex )
 
-#define DALI_ANIMATABLE_PROPERTY_REGISTRATION( objectType, text, valueType, enumIndex ) \
-  DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectType, text, valueType, enumIndex )
+#define DALI_ANIMATABLE_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
+  DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex )
 
-#define DALI_SIGNAL_REGISTRATION( objectType, text, textVariable ) \
-  DALI_SIGNAL_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectType, text, textVariable )
+#define DALI_SIGNAL_REGISTRATION( objectNamespace, objectType, text, textVariable ) \
+  DALI_SIGNAL_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable )
 
-#define DALI_ACTION_REGISTRATION( objectType, text, textVariable ) \
-  DALI_ACTION_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectType, text, textVariable )
+#define DALI_ACTION_REGISTRATION( objectNamespace, objectType, text, textVariable ) \
+  DALI_ACTION_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable )
 
 #define DALI_TYPE_REGISTRATION_END( ) // Empty for now, can be used to perform checks.
 

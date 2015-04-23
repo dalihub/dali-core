@@ -112,8 +112,6 @@ Layer::Layer( Actor::DerivedType type )
   mTouchConsumed(false),
   mHoverConsumed(false)
 {
-  // Size negotiate disabled by default, so turn it on for this actor
-  SetRelayoutEnabled( true );
 }
 
 void Layer::OnInitialize()
