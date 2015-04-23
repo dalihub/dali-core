@@ -266,7 +266,9 @@ public:
    */
   virtual void Process( BufferIndex updateBufferIndex )
   {
-    (mProperty->*mMemberFunction)( updateBufferIndex, mParam );
+    DALI_ASSERT_DEBUG( mProperty && "Message does not have an object" );
+    (mProperty->*mMemberFunction)( updateBufferIndex,
+                                   ParameterType< P >::PassObject( mParam ) );
   }
 
 private:

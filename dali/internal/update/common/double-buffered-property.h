@@ -27,6 +27,7 @@
 #include <dali/public-api/object/property-input.h>
 #include <dali/public-api/object/property-types.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/type-abstraction.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/property-input-impl.h>
 #include <dali/internal/update/common/double-buffered.h>
@@ -125,7 +126,7 @@ public:
    * Create an doubleBuffered property.
    * @param [in] initialValue The initial value of the property.
    */
-  DoubleBufferedPropertyImpl( T initialValue )
+  DoubleBufferedPropertyImpl( typename ParameterType<T>::PassingType initialValue )
   : mValue( initialValue )
   {
   }
@@ -163,7 +164,7 @@ public:
    * @param[in] bufferIndex The buffer to write.
    * @param[in] value The new property value.
    */
-  void Set(BufferIndex bufferIndex, T value)
+  void Set(BufferIndex bufferIndex, typename ParameterType<T>::PassingType value )
   {
     // check if the value actually changed to avoid dirtying nodes unnecessarily
     if( mValue[bufferIndex] != value )
@@ -283,7 +284,7 @@ public:
   /**
    * Constructor
    */
-  DoubleBufferedProperty( Vector2 value ) : DoubleBufferedPropertyImpl( value ) {};
+  DoubleBufferedProperty( const Vector2& value ) : DoubleBufferedPropertyImpl( value ) {};
 
   /**
    * copydoc PropertyInputImpl::GetVector2
@@ -301,7 +302,7 @@ public:
   /**
    * Constructor
    */
-  DoubleBufferedProperty( Vector3 value ) : DoubleBufferedPropertyImpl( value ) {};
+  DoubleBufferedProperty( const Vector3& value ) : DoubleBufferedPropertyImpl( value ) {};
 
   /**
    * copydoc PropertyInputImpl::GetVector3
@@ -319,7 +320,7 @@ public:
   /**
    * Constructor
    */
-  DoubleBufferedProperty( Vector4 value ) : DoubleBufferedPropertyImpl( value ) {};
+  DoubleBufferedProperty( const Vector4& value ) : DoubleBufferedPropertyImpl( value ) {};
 
   /**
    * copydoc PropertyInputImpl::GetVector4
@@ -337,7 +338,7 @@ public:
   /**
    * Constructor
    */
-  DoubleBufferedProperty( Quaternion value ) : DoubleBufferedPropertyImpl( value ) {};
+  DoubleBufferedProperty( const Quaternion& value ) : DoubleBufferedPropertyImpl( value ) {};
 
   /**
    * copydoc PropertyInputImpl::GetQuaternion
@@ -355,7 +356,7 @@ public:
   /**
    * Constructor
    */
-  DoubleBufferedProperty( Matrix3 value ) : DoubleBufferedPropertyImpl( value ) {};
+  DoubleBufferedProperty( const Matrix3& value ) : DoubleBufferedPropertyImpl( value ) {};
 
   /**
    * copydoc PropertyInputImpl::GetMatrix3
@@ -373,7 +374,7 @@ public:
   /**
    * Constructor
    */
-  DoubleBufferedProperty( Matrix value ) : DoubleBufferedPropertyImpl( value ) {};
+  DoubleBufferedProperty( const Matrix& value ) : DoubleBufferedPropertyImpl( value ) {};
 
   /**
    * copydoc PropertyInputImpl::GetMatrix
