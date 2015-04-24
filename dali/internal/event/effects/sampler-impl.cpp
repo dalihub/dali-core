@@ -66,8 +66,14 @@ void Sampler::SetImage( ImagePtr& image )
   mImageConnector.Set( image, OnStage() );
 
   // sceneObject is being used in a separate thread; queue a message to set
-  unsigned int resourceId = image->GetResourceId();
-  SetTextureMessage( GetEventThreadServices(), *mSceneObject, resourceId );
+  if( mOnStage )
+  {
+    unsigned int resourceId = image->GetResourceId();
+    if( resourceId != 0 )
+    {
+      SetTextureMessage( GetEventThreadServices(), *mSceneObject, resourceId );
+    }
+  }
 }
 
 void Sampler::SetFilterMode( Dali::Sampler::FilterMode minFilter, Dali::Sampler::FilterMode magFilter )
@@ -313,6 +319,10 @@ void Sampler::Connect()
   mOnStage = true;
 
   mImageConnector.OnStageConnect();
+
+  // sceneObject is being used in a separate thread; queue a message to set
+  unsigned int resourceId = mImageConnector.Get()->GetResourceId();
+  SetTextureMessage( GetEventThreadServices(), *mSceneObject, resourceId );
 }
 
 void Sampler::Disconnect()
