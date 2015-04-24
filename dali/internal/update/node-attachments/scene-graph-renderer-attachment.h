@@ -36,6 +36,7 @@ namespace SceneGraph
 class Material;
 class Geometry;
 class NewRenderer;
+struct RendererWithSortAttributes;
 
 /**
  * The renderer attachment is the SceneGraph equivalent of Dali::Renderer. It is used to create an instance of a geometry and material for rendering, and is attached to an actor.
@@ -131,22 +132,26 @@ public:
    */
   void SetDepthIndex( BufferIndex bufferIndex, int depthIndex );
 
-  /**
-   * Get the depth index.
-   * Inlined, as called from sort algorithm
-   * @return The depth index of the renderer attachment in the current frame
-   */
-  int GetDepthIndex( BufferIndex bufferIndex ) const
-  {
-    return mDepthIndex[bufferIndex];
-  }
-
-
 protected: // From NodeAttachment
   /**
    * @copydoc NodeAttachment::ResetToBaseValues
    */
   virtual void ResetToBaseValues( BufferIndex updateBufferIndex );
+
+  /**
+   * @param[in] bufferIndex The buffer index
+   */
+  virtual int GetDepthIndex( BufferIndex bufferIndex )
+  {
+    return mDepthIndex[bufferIndex];
+  }
+
+  /**
+   * Write the attachment's sort attributes to the passed in reference.
+   * @param[in] bufferIndex The buffer index
+   * @param[out] sortAttributes
+   */
+  virtual void SetSortAttributes( BufferIndex bufferIndex, RendererWithSortAttributes& sortAttributes );
 
 protected: // From RenderableAttachment
   /**

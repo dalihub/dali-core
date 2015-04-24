@@ -83,15 +83,28 @@ public:
    */
   const Matrix& GetModelViewMatrix() const;
 
+  /**
+   * Retrieve the depth index
+   */
+  int GetDepthIndex() const
+  {
+    return mDepthIndex;
+  }
+
+  /**
+   * Set the depth index
+   */
+  void SetDepthIndex( int depthIndex );
+
 private:
 
   // RenderItems should not be copied as they are heavy
   RenderItem( const RenderItem& item );
-  RenderItem& operator=( const RenderItem& item );
+  RenderItem& operator = ( const RenderItem& item );
 
+  Matrix    mModelViewMatrix;
   Renderer* mRenderer;
-  Matrix mModelViewMatrix;
-
+  int       mDepthIndex;
 };
 
 } // namespace SceneGraph

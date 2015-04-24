@@ -31,8 +31,9 @@ namespace SceneGraph
 {
 
 RenderItem::RenderItem()
-: mRenderer( NULL ),
-  mModelViewMatrix( false )
+: mModelViewMatrix( false ),
+  mRenderer( NULL ),
+  mDepthIndex(0)
 {
 }
 
@@ -63,6 +64,11 @@ Matrix& RenderItem::GetModelViewMatrix()
 const Matrix& RenderItem::GetModelViewMatrix() const
 {
   return mModelViewMatrix;
+}
+
+void RenderItem::SetDepthIndex( int depthIndex )
+{
+  mDepthIndex = depthIndex;
 }
 
 } // namespace SceneGraph

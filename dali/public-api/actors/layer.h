@@ -81,14 +81,9 @@ public:
   /**
    * @brief The sort function type.
    *
-   * The position value is the actor translation from camera.
-   * The sortModifier is the user value that can be used to sort coplanar actors/nodes. This value is
-   * the one set by calling RenderableActor::SetSortModifier().
-   *
-   * A high return value means that the actor will be positioned further away by the sort algorithm.
-   * @see RenderableActor::SetSortModifier
+   * @param[in] position this is the actor translation from camera.
    */
-  typedef float (*SortFunctionType)(const Vector3& position, float sortModifier);
+  typedef float (*SortFunctionType)( const Vector3& position );
 
   /**
    * @brief Create an empty Layer handle.
@@ -294,10 +289,9 @@ public:
    * We return a negative z value as in our translation, a low z means that it should
    * be sorted further away and a high z means that it should be closer.
    * @param[in] position     position of actor in view space
-   * @param[in] sortModifier additional sort modifer
    * @return depth
    */
-  static float ZValue(const Vector3& position, float sortModifier);
+  static float ZValue(const Vector3& position );
 
   /**
    * @brief This allows the user to specify the sort function that the layer should use.
@@ -307,7 +301,7 @@ public:
    *
    * A function of the following type should be used:
    * @code
-   *  float YourSortFunction(const Vector3& position, float sortModifier);
+   *  float YourSortFunction(const Vector3& position);
    * @endcode
    *
    * @note If the sort function returns a low number, the actor the data applies to will be

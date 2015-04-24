@@ -18,6 +18,7 @@
 #include <dali/internal/update/effects/scene-graph-material.h>
 #include <dali/internal/update/effects/scene-graph-sampler.h>
 #include <dali/internal/update/common/uniform-map.h>
+#include <dali/internal/update/manager/prepare-render-instructions.h>
 #include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/resources/resource-manager.h>
@@ -151,18 +152,22 @@ Geometry& RendererAttachment::GetGeometry()
   return *mGeometry;
 }
 
+void RendererAttachment::SetSortAttributes( BufferIndex bufferIndex, RendererWithSortAttributes& sortAttributes )
+{
+  sortAttributes.shader = mMaterial->GetShader();
+  sortAttributes.material = mMaterial;
+  sortAttributes.geometry = mGeometry;
+}
+
 void RendererAttachment::SetDepthIndex( BufferIndex updateBufferIndex, int depthIndex )
 {
   mDepthIndex.Bake(updateBufferIndex, depthIndex);
 
   if( mParent )
   {
-    // only do this if we are on-stage
+    // only do this if we are on-stage. Ensures the render lists are re-sorted
     mParent->SetDirtyFlag( SortModifierFlag );
   }
-
-  // @todo MESH_REWORK Change SortTransparentRenderItems to use GetDepthIndex instead
-  mSortModifier = depthIndex;
 }
 
 void RendererAttachment::ResetToBaseValues( BufferIndex updateBufferIndex )

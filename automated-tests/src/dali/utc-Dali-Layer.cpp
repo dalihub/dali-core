@@ -250,7 +250,7 @@ int UtcDaliLayerGetClippingBox(void)
 
 static int gTestSortFunctionCalled;
 
-static float TestSortFunction(const Vector3& /*position*/, float /*sortModifier*/)
+static float TestSortFunction(const Vector3& /*position*/)
 {
   ++gTestSortFunctionCalled;
   return 0.0f;

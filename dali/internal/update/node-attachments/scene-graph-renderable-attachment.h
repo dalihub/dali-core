@@ -41,6 +41,8 @@ namespace SceneGraph
 {
 class Renderer;
 class Shader;
+class SortAttributes;
+struct RendererWithSortAttributes;
 
 /**
  * RenderableAttachments are responsible for preparing textures, meshes, matrices etc. during the Update.
@@ -236,7 +238,6 @@ public: // API for derived classes
    */
   virtual void DoGetScaleForSize( const Vector3& nodeSize, Vector3& scaling );
 
-
   /**
    * Set the sort-modifier for the attachment.
    * @param[in] modifier The depth-sort modifier.
@@ -244,14 +245,23 @@ public: // API for derived classes
   void SetSortModifier(float modifier);
 
   /**
-   * Retrieve the sort-modifier for the attachment.
-   * @return The sort-modifier.
+   * Get the depth index for the attachment
+   * @param[in] bufferIndex The current update buffer index.
    */
-  float GetSortModifier() const
+  virtual int GetDepthIndex(BufferIndex bufferIndex)
   {
-    // inlined as its called a lot when sorting transparent renderers
-    return mSortModifier;
+    return static_cast<int>( mSortModifier );
   }
+
+  /**
+   * Write the attachment's sort attributes to the passed in reference
+   * @todo MESH_REWORK Consider removing this after merge with scene-graph-renderer-attachment,
+   * and allowing PrepareRenderInstruction to read directly from this object
+   *
+   * @param[in] bufferIndex The current update buffer index.
+   * @param[out] sortAttributes
+   */
+  virtual void SetSortAttributes( BufferIndex bufferIndex, RendererWithSortAttributes& sortAttributes );
 
 private:
 
