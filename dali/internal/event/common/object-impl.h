@@ -300,7 +300,7 @@ protected:
 
   /**
    * For use in derived classes.
-   * This is called after a non animatable custom property is set.
+   * This is called after a property is set.
    * @param [in] index The index of the property.
    * @param [in] propertyValue The value of the property.
    */

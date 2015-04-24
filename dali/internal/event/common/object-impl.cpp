@@ -355,6 +355,8 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
 {
   DALI_ASSERT_ALWAYS(index > Property::INVALID_INDEX && "Property index is out of bounds" );
 
+  bool propertySet( true );
+
   if ( index < DEFAULT_PROPERTY_MAX_COUNT )
   {
     SetDefaultProperty( index, propertyValue );
@@ -362,14 +364,7 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
   else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     const TypeInfo* typeInfo( GetTypeInfo() );
-    if ( typeInfo )
-    {
-      typeInfo->SetProperty( this, index, propertyValue );
-    }
-    else
-    {
-      DALI_LOG_ERROR("Cannot find property index\n");
-    }
+    typeInfo->SetProperty( this, index, propertyValue );
   }
   else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
@@ -378,13 +373,10 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
     if(!animatableProperty)
     {
       const TypeInfo* typeInfo( GetTypeInfo() );
-      if (!typeInfo)
-      {
-        DALI_LOG_ERROR("Cannot find property index\n");
-      }
-      else if ( Property::INVALID_INDEX == RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, propertyValue ) )
+      if ( Property::INVALID_INDEX == RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, propertyValue ) )
       {
         DALI_LOG_ERROR("Cannot register property\n");
+        propertySet = false;
       }
     }
     else
@@ -406,14 +398,25 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
       else if( custom->IsWritable() )
       {
         custom->value = propertyValue;
-        OnPropertySet(index, propertyValue);
       }
-      // trying to set value on read only property is no-op
+      else
+      {
+        // trying to set value on read only property is no-op
+        propertySet = false;
+      }
     }
     else
     {
       DALI_LOG_ERROR("Invalid property index\n");
+      propertySet = false;
     }
+  }
+
+  // Let derived classes know that a property has been set
+  // TODO: We should not call this for read-only properties, SetDefaultProperty() && TypeInfo::SetProperty() should return a bool, which would be true if the property is set
+  if ( propertySet )
+  {
+    OnPropertySet(index, propertyValue);
   }
 }
 
