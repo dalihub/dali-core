@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/animation/path-constraint-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/animation/constraint.h>
@@ -192,26 +195,23 @@ void PathConstraint::Apply( Property source, Property target, const Vector3& for
 
   if( propertyType == Dali::Property::VECTOR3)
   {
-    //If property is Vector3, contraint its value to the position of the path
-
-    Dali::Constraint constraint = Dali::Constraint::New<Vector3>( target.propertyIndex,
-                                                                  Source(source.object, source.propertyIndex ),
-                                                                  PathConstraintFunctor( mPath, mRange ) );
+    // If property is Vector3, constrain its value to the position of the path
+    Dali::Constraint constraint = Dali::Constraint::New<Vector3>( target.object, target.propertyIndex, PathConstraintFunctor( mPath, mRange ) );
+    constraint.AddSource( Source(source.object, source.propertyIndex ) );
 
     constraint.SetTag( reinterpret_cast<size_t>( this ) );
     constraint.SetRemoveAction( Dali::Constraint::Discard );
-    target.object.ApplyConstraint(constraint);
+    constraint.Apply();
   }
   else if( propertyType == Dali::Property::ROTATION )
   {
-    //If property is Rotation, constraint its value to align the forward vector to the tangent of the path
-    Dali::Constraint constraint = Dali::Constraint::New<Quaternion>( target.propertyIndex,
-                                                                     Source(source.object, source.propertyIndex ),
-                                                                     PathConstraintFunctor( mPath, mRange,forward) );
+    // If property is Rotation, constrain its value to align the forward vector to the tangent of the path
+    Dali::Constraint constraint = Dali::Constraint::New<Quaternion>( target.object, target.propertyIndex, PathConstraintFunctor( mPath, mRange,forward) );
+    constraint.AddSource( Source(source.object, source.propertyIndex ) );
 
     constraint.SetTag( reinterpret_cast<size_t>( this ) );
     constraint.SetRemoveAction( Dali::Constraint::Discard );
-    target.object.ApplyConstraint(constraint);
+    constraint.Apply();
   }
 
   //Add the object to the list of observed objects if it is not there already

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/internal/common/image-attributes.h>
 #include <dali/internal/event/images/encoded-buffer-image-impl.h>
 
 namespace Dali
@@ -35,17 +36,23 @@ EncodedBufferImage::EncodedBufferImage(Internal::EncodedBufferImage* internal)
 {
 }
 
-EncodedBufferImage EncodedBufferImage::New(const uint8_t * const encodedImage, const std::size_t encodedImageByteCount, const ImageAttributes& attributes, const ReleasePolicy releasePol)
+EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedImage,
+                                            std::size_t encodedImageByteCount,
+                                            ImageDimensions size, FittingMode::Type fittingMode, SamplingMode::Type samplingMode,
+                                            ReleasePolicy releasePol,
+                                            bool orientationCorrection )
 {
-  Internal::EncodedBufferImagePtr internal=Internal::EncodedBufferImage::New(encodedImage, encodedImageByteCount, attributes, releasePol);
+  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New( encodedImage, encodedImageByteCount, size, fittingMode, samplingMode, orientationCorrection, releasePol );
   EncodedBufferImage image(internal.Get());
   return image;
 }
 
-EncodedBufferImage EncodedBufferImage::New(const uint8_t * const encodedImage, const std::size_t encodedImageByteCount)
+EncodedBufferImage EncodedBufferImage::New( const uint8_t * const encodedImage, const std::size_t encodedImageByteCount )
 {
-  ImageAttributes attributes;
-  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New(encodedImage, encodedImageByteCount, attributes, Dali::Image::NEVER);
+  ImageDimensions size(0, 0);
+  FittingMode::Type fittingMode = FittingMode::DEFAULT;
+  SamplingMode::Type samplingMode = SamplingMode::DEFAULT;
+  Internal::EncodedBufferImagePtr internal = Internal::EncodedBufferImage::New( encodedImage, encodedImageByteCount, size, fittingMode, samplingMode, true, Dali::Image::NEVER );
   EncodedBufferImage image( internal.Get() );
   return image;
 }
@@ -59,12 +66,12 @@ EncodedBufferImage::~EncodedBufferImage()
 {
 }
 
-EncodedBufferImage::EncodedBufferImage(const EncodedBufferImage& handle)
+EncodedBufferImage::EncodedBufferImage( const EncodedBufferImage& handle )
 : Image(handle)
 {
 }
 
-EncodedBufferImage& EncodedBufferImage::operator=(const EncodedBufferImage& rhs)
+EncodedBufferImage& EncodedBufferImage::operator=( const EncodedBufferImage& rhs )
 {
   BaseHandle::operator=(rhs);
   return *this;

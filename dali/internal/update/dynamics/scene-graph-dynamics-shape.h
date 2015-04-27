@@ -18,10 +18,13 @@
  *
  */
 
-// INTERNAL HEADERS
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
+// EXTERNAL INCLUDES
+#include <new>
+
+// INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-thread-services.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/dynamics/dynamics-declarations.h>
 
 namespace Dali
 {

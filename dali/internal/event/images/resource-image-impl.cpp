@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/images/resource-image-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
@@ -68,7 +71,7 @@ ResourceImagePtr ResourceImage::New()
   return image;
 }
 
-ResourceImagePtr ResourceImage::New( const std::string& url, const Dali::ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
+ResourceImagePtr ResourceImage::New( const std::string& url, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol )
 {
   ResourceImagePtr image;
   if( IsNinePatch( url ) )
@@ -129,7 +132,7 @@ bool ResourceImage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterf
   return connected;
 }
 
-const Dali::ImageAttributes& ResourceImage::GetAttributes() const
+const ImageAttributes& ResourceImage::GetAttributes() const
 {
   if( mTicket )
   {

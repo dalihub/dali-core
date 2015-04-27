@@ -130,4 +130,5 @@ Configuration
   Data Dir (Read Only):             $dataReadOnlyDir
   Emscripten:                       $enable_emscripten
   Backtrace:                        $enable_backtrace
+  Dynamics:                         $dynamics_support
 "

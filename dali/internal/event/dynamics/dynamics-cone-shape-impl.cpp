@@ -45,7 +45,7 @@ DynamicsConeShape::DynamicsConeShape(const float radius, const float length)
   mDynamicsShape = coneShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsConeShapeMessage( stage->GetUpdateInterface(), *coneShape, radius, length );
+  InitializeDynamicsConeShapeMessage( *stage, *coneShape, radius, length );
 }
 
 DynamicsConeShape::~DynamicsConeShape()

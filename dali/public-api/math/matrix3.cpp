@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,8 @@
 #include <dali/public-api/math/matrix3.h>
 
 // EXTERNAL INCLUDES
-#include <string.h>
-#include <iostream>
+#include <cstring> // for memcpy
+#include <ostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/math-utils.h>

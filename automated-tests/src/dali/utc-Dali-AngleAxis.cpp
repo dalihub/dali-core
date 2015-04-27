@@ -51,7 +51,7 @@ int UtcDaliAngleAxisNew02(void)
   Degree d(75.0f);
   AngleAxis a(d, Vector3::XAXIS);
 
-  DALI_TEST_EQUALS(a.angle, d, 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(a.angle, Radian(d), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(a.axis, Vector3::XAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }
@@ -65,7 +65,7 @@ int UtcDaliAngleAxisNew03(void)
   AngleAxis a(r, Vector3::ZAXIS);
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
-  DALI_TEST_EQUALS(a.angle, Degree(Radian(Math::PI_2)), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(a.angle, Radian(Math::PI_2), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(a.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }
@@ -80,7 +80,7 @@ int UtcDaliAngleAxisAssign(void)
   AngleAxis b = a;
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
-  DALI_TEST_EQUALS(b.angle, Degree(Radian(Math::PI_2)), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(b.angle, Radian(Math::PI_2), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }
@@ -94,7 +94,7 @@ int UtcDaliAngleAxisCopy(void)
   AngleAxis b(a);
 
   // AngleAxis stores its angle as a degree, so should only do degree comparison.
-  DALI_TEST_EQUALS(b.angle, Degree(Radian(Math::PI_2)), 0.001f, TEST_LOCATION);
+  DALI_TEST_EQUALS(b.angle, Radian(Math::PI_2), 0.001f, TEST_LOCATION);
   DALI_TEST_EQUALS(b.axis, Vector3::ZAXIS, 0.001f, TEST_LOCATION);
   END_TEST;
 }

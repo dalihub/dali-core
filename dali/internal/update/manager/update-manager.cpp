@@ -55,7 +55,6 @@
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-text-attachment.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/update/queue/update-message-queue.h>
@@ -185,7 +184,6 @@ struct UpdateManager::Impl
     dynamicsChanged( false ),
     keepRenderingSeconds( 0.0f ),
     animationFinishedDuringUpdate( false ),
-    activeConstraints( 0 ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
     previousUpdateScene( false ),
     frameCounter( 0 ),
@@ -292,7 +290,6 @@ struct UpdateManager::Impl
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
 
-  unsigned int                        activeConstraints;             ///< number of active constraints from previous frame
   int                                 nodeDirtyFlags;                ///< cumulative node dirty flags from previous frame
   bool                                previousUpdateScene;           ///< True if the scene was updated in the previous frame (otherwise it was optimized out)
 
@@ -436,8 +433,7 @@ void UpdateManager::AttachToNode( Node* node, NodeAttachment* attachment )
   node->Attach( *attachment ); // node takes ownership
 
   // @todo MESH_REWORK Remove after merge of SceneGraph::RenderableAttachment and SceneGraph::RendererAttachment
-  if( dynamic_cast<SceneGraph::ImageAttachment*>( attachment ) != NULL ||
-      dynamic_cast<SceneGraph::TextAttachment*>( attachment ) != NULL )
+  if( dynamic_cast<SceneGraph::ImageAttachment*>( attachment ) != NULL )
   {
     attachment->Initialize( *mImpl->sceneController, mSceneGraphBuffers.GetUpdateBufferIndex() );
   }
@@ -834,8 +830,6 @@ void UpdateManager::ApplyConstraints()
 
   BufferIndex bufferIndex = mSceneGraphBuffers.GetUpdateBufferIndex();
 
-  mImpl->activeConstraints = 0;
-
   // constrain custom objects... (in construction order)
   OwnerContainer< PropertyOwner* >& customObjects = mImpl->customObjects;
 
@@ -843,18 +837,18 @@ void UpdateManager::ApplyConstraints()
   for ( OwnerContainer< PropertyOwner* >::Iterator iter = customObjects.Begin(); endIter != iter; ++iter )
   {
     PropertyOwner& object = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( object, bufferIndex );
+    ConstrainPropertyOwner( object, bufferIndex );
   }
 
   // constrain nodes... (in Depth First traversal order)
   if ( mImpl->root )
   {
-    mImpl->activeConstraints += ConstrainNodes( *(mImpl->root), bufferIndex );
+    ConstrainNodes( *(mImpl->root), bufferIndex );
   }
 
   if ( mImpl->systemLevelRoot )
   {
-    mImpl->activeConstraints += ConstrainNodes( *(mImpl->systemLevelRoot), bufferIndex );
+    ConstrainNodes( *(mImpl->systemLevelRoot), bufferIndex );
   }
 
   // constrain other property-owners after nodes as they are more likely to depend on a node's
@@ -872,7 +866,7 @@ void UpdateManager::ApplyConstraints()
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = systemLevelTasks.Begin(); iter != systemLevelTasks.End(); ++iter )
   {
     RenderTask& task = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( task, bufferIndex );
+    ConstrainPropertyOwner( task, bufferIndex );
   }
 
   // Constrain render-tasks
@@ -881,14 +875,14 @@ void UpdateManager::ApplyConstraints()
   for ( RenderTaskList::RenderTaskContainer::ConstIterator iter = tasks.Begin(); iter != tasks.End(); ++iter )
   {
     RenderTask& task = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( task, bufferIndex );
+    ConstrainPropertyOwner( task, bufferIndex );
   }
 
   // Constrain Materials and geometries
-  mImpl->activeConstraints += mImpl->materials.ConstrainObjects( bufferIndex );
-  mImpl->activeConstraints += mImpl->geometries.ConstrainObjects( bufferIndex );
-  mImpl->activeConstraints += mImpl->samplers.ConstrainObjects( bufferIndex );
-  mImpl->activeConstraints += mImpl->propertyBuffers.ConstrainObjects( bufferIndex );
+  mImpl->materials.ConstrainObjects( bufferIndex );
+  mImpl->geometries.ConstrainObjects( bufferIndex );
+  mImpl->samplers.ConstrainObjects( bufferIndex );
+  mImpl->propertyBuffers.ConstrainObjects( bufferIndex );
 
   // constrain shaders... (in construction order)
   ShaderContainer& shaders = mImpl->shaders;
@@ -896,7 +890,7 @@ void UpdateManager::ApplyConstraints()
   for ( ShaderIter iter = shaders.Begin(); iter != shaders.End(); ++iter )
   {
     Shader& shader = **iter;
-    mImpl->activeConstraints += ConstrainPropertyOwner( shader, bufferIndex );
+    ConstrainPropertyOwner( shader, bufferIndex );
   }
 
   PERF_MONITOR_END(PerformanceMonitor::APPLY_CONSTRAINTS);
@@ -977,7 +971,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   const bool gestureUpdated = ProcessGestures( lastVSyncTimeMilliseconds, nextVSyncTimeMilliseconds );
 
   const bool updateScene =                                            // The scene-graph requires an update if..
-      mImpl->activeConstraints != 0 ||                                // ..constraints were active in previous frame OR
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||              // ..nodes were dirty in previous frame OR
       IsAnimationRunning() ||                                         // ..at least one animation is running OR
       mImpl->dynamicsChanged ||                                       // ..there was a change in the dynamics simulation OR

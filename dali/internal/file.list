@@ -5,9 +5,8 @@ internal_src_files = \
   $(internal_src_dir)/common/core-impl.cpp \
   $(internal_src_dir)/common/internal-constants.cpp \
   $(internal_src_dir)/common/message-buffer.cpp \
-  $(internal_src_dir)/common/text-parameters.cpp \
   $(internal_src_dir)/common/image-sampler.cpp \
-  $(internal_src_dir)/common/dali-hash.cpp \
+  $(internal_src_dir)/common/image-attributes.cpp \
   $(internal_src_dir)/common/fixed-size-memory-pool.cpp \
   \
   $(internal_src_dir)/event/actor-attachments/actor-attachment-impl.cpp \
@@ -15,20 +14,17 @@ internal_src_files = \
   $(internal_src_dir)/event/actor-attachments/image-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/renderable-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/renderer-attachment-impl.cpp \
-  $(internal_src_dir)/event/actor-attachments/text-attachment-impl.cpp \
   $(internal_src_dir)/event/actors/actor-impl.cpp \
   $(internal_src_dir)/event/actors/custom-actor-internal.cpp \
   $(internal_src_dir)/event/actors/image-actor-impl.cpp \
   $(internal_src_dir)/event/actors/layer-impl.cpp \
   $(internal_src_dir)/event/actors/layer-list.cpp \
   $(internal_src_dir)/event/actors/renderer-impl.cpp \
-  $(internal_src_dir)/event/actors/text-actor-impl.cpp \
   $(internal_src_dir)/event/actors/camera-actor-impl.cpp \
   $(internal_src_dir)/event/actors/renderable-actor-impl.cpp \
-  $(internal_src_dir)/event/animation/active-constraint-base.cpp \
   $(internal_src_dir)/event/animation/animation-impl.cpp \
   $(internal_src_dir)/event/animation/animation-playlist.cpp \
-  $(internal_src_dir)/event/animation/constraint-impl.cpp \
+  $(internal_src_dir)/event/animation/constraint-base.cpp \
   $(internal_src_dir)/event/animation/key-frames-impl.cpp \
   $(internal_src_dir)/event/animation/path-impl.cpp \
   $(internal_src_dir)/event/animation/path-constraint-impl.cpp \
@@ -85,7 +81,6 @@ internal_src_files = \
   $(internal_src_dir)/event/images/image-factory.cpp \
   $(internal_src_dir)/event/images/image-factory-cache.cpp \
   $(internal_src_dir)/event/images/nine-patch-image-impl.cpp \
-  $(internal_src_dir)/event/images/emoji-factory.cpp \
   $(internal_src_dir)/event/images/resource-image-impl.cpp \
   $(internal_src_dir)/event/images/native-image-impl.cpp \
   $(internal_src_dir)/event/object/custom-object-internal.cpp \
@@ -98,30 +93,6 @@ internal_src_files = \
   $(internal_src_dir)/event/resources/resource-type-path.cpp \
   $(internal_src_dir)/event/size-negotiation/memory-pool-relayout-container.cpp \
   $(internal_src_dir)/event/size-negotiation/relayout-controller-impl.cpp \
-  $(internal_src_dir)/event/text/character-impl.cpp \
-  $(internal_src_dir)/event/text/glyph-metric.cpp \
-  $(internal_src_dir)/event/text/font-layout.cpp \
-  $(internal_src_dir)/event/text/font-factory.cpp \
-  $(internal_src_dir)/event/text/font-impl.cpp \
-  $(internal_src_dir)/event/text/font-metrics.cpp \
-  $(internal_src_dir)/event/text/text-format.cpp \
-  $(internal_src_dir)/event/text/text-request-helper.cpp \
-  $(internal_src_dir)/event/text/text-impl.cpp \
-  $(internal_src_dir)/event/text/utf8-impl.cpp \
-  $(internal_src_dir)/event/text/glyph-status/glyph-status.cpp \
-  $(internal_src_dir)/event/text/glyph-status/glyph-status-container.cpp \
-  $(internal_src_dir)/event/text/glyph-status/debug/glyph-status-container-debug.cpp \
-  $(internal_src_dir)/event/text/atlas/texture-atlas.cpp \
-  $(internal_src_dir)/event/text/atlas/atlas-size.cpp \
-  $(internal_src_dir)/event/text/atlas/atlas-ranking.cpp \
-  $(internal_src_dir)/event/text/atlas/atlas-rank-generator.cpp \
-  $(internal_src_dir)/event/text/atlas/debug/atlas-debug.cpp \
-  $(internal_src_dir)/event/text/atlas/glyph-atlas.cpp \
-  $(internal_src_dir)/event/text/atlas/glyph-atlas-manager.cpp \
-  $(internal_src_dir)/event/text/resource/glyph-resource-manager.cpp \
-  $(internal_src_dir)/event/text/resource/glyph-resource-request.cpp \
-  $(internal_src_dir)/event/text/resource/debug/glyph-resource-debug.cpp \
-  $(internal_src_dir)/event/text/generator/text-vertex-generator.cpp \
   \
   $(internal_src_dir)/render/common/culling-algorithms.cpp \
   $(internal_src_dir)/render/common/render-algorithms.cpp \
@@ -152,13 +123,11 @@ internal_src_files = \
   $(internal_src_dir)/render/renderers/scene-graph-image-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer-debug.cpp \
-  $(internal_src_dir)/render/renderers/scene-graph-text-renderer.cpp \
   $(internal_src_dir)/render/shaders/custom-uniform.cpp \
   $(internal_src_dir)/render/shaders/program.cpp \
   $(internal_src_dir)/render/shaders/program-controller.cpp \
   $(internal_src_dir)/render/shaders/scene-graph-shader.cpp \
   \
-  $(internal_src_dir)/update/animation/interpolator-functions.cpp \
   $(internal_src_dir)/update/animation/scene-graph-animation.cpp \
   $(internal_src_dir)/update/animation/scene-graph-constraint-base.cpp \
   $(internal_src_dir)/update/common/discard-queue.cpp \
@@ -193,14 +162,12 @@ internal_src_files = \
   $(internal_src_dir)/update/node-attachments/scene-graph-image-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-renderable-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-renderer-attachment.cpp \
-  $(internal_src_dir)/update/node-attachments/scene-graph-text-attachment.cpp \
   $(internal_src_dir)/update/nodes/node.cpp \
   $(internal_src_dir)/update/nodes/node-messages.cpp \
   $(internal_src_dir)/update/nodes/scene-graph-layer.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task-list.cpp \
   $(internal_src_dir)/update/resources/bitmap-metadata.cpp \
-  $(internal_src_dir)/update/resources/atlas-request-status.cpp \
   $(internal_src_dir)/update/resources/resource-manager.cpp \
   $(internal_src_dir)/update/resources/resource-tracker.cpp \
   $(internal_src_dir)/update/resources/sync-resource-tracker.cpp \

@@ -2,7 +2,7 @@
 #define __DALI_RECT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -291,36 +291,11 @@ inline bool Rect<float>::IsEmpty() const
  * @param [in] rectangle the rectangle to output
  * @return The output stream operator.
  */
-inline std::ostream& operator<< (std::ostream& stream, const Rect<int>& rectangle)
+template< typename T >
+inline std::ostream& operator<< (std::ostream& stream, const Rect<T>& rectangle)
 {
   return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
 }
-
-/**
- * @brief Convert the value of the rectangle into a string and insert in to an output stream.
- *
- * @param [in] stream The output stream operator.
- * @param [in] rectangle the rectangle to output
- * @return The output stream operator.
- */
-inline std::ostream& operator<< (std::ostream& stream, const Rect<unsigned int>& rectangle)
-{
-  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
-}
-
-/**
- * @brief Convert the value of the rectangle into a string and insert in to an output stream.
- *
- * @param [in] stream The output stream operator.
- * @param [in] rectangle the rectangle to output
- * @return The output stream operator.
- */
-inline std::ostream& operator<< (std::ostream& stream, const Rect<float>& rectangle)
-{
-  return stream << "[" << rectangle.x << ", " << rectangle.y << ", " << rectangle.width << ", " << rectangle.height << "]";
-}
-
-
 
 } // namespace Dali
 

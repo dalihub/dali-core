@@ -181,8 +181,8 @@ private:
    * @param [in] actual    The actual attributes
    * @return True if the attributes are compatible
    */
-  bool CompareAttributes( const Dali::ImageAttributes& requested,
-                          const Dali::ImageAttributes& actual ) const;
+  bool CompareAttributes( const ImageAttributes& requested,
+                          const ImageAttributes& actual ) const;
 
   /**
    * Inserts a new request to the request cache and url cache.

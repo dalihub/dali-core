@@ -2,7 +2,7 @@
 #define __DALI_SHADER_EFFECT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 
@@ -51,7 +50,6 @@ namespace Dali
  */
 #define DALI_COMPOSE_SHADER(STR) #STR
 
-class Constraint;
 class Image;
 struct Vector2;
 struct Vector3;
@@ -68,10 +66,9 @@ class ShaderEffect;
 enum GeometryType
 {
   GEOMETRY_TYPE_IMAGE = 0x01,           ///< image, with flat color or texture
-  GEOMETRY_TYPE_TEXT = 0x02,            ///< text, with flat color or texture
-  GEOMETRY_TYPE_UNTEXTURED_MESH = 0x04, ///< Complex meshes, with flat color
-  GEOMETRY_TYPE_TEXTURED_MESH = 0x08,   ///< Complex meshes, with texture
-  GEOMETRY_TYPE_LAST = 0x10
+  GEOMETRY_TYPE_UNTEXTURED_MESH = 0x02, ///< Complex meshes, with flat color
+  GEOMETRY_TYPE_TEXTURED_MESH = 0x04,   ///< Complex meshes, with texture
+  GEOMETRY_TYPE_LAST = 0x08
 };
 
 /**
@@ -109,38 +106,6 @@ enum GeometryType
  * uniform   sampler2D sEffect;
  * uniform   vec4      uColor;
  * varying   vec2      vTexCoord;
- * </pre>
- * and for text:
- * <pre>
- * \#extension GL_OES_standard_derivatives : enable
- * uniform   mediump sampler2D sTexture;
- * uniform   lowp    vec4      uColor;
- * uniform   lowp    vec4      uTextColor;
- * uniform   mediump float     uSmoothing;
- * varying   mediump vec2      vTexCoord;
- * </pre>
- * and the custom shader is expected to output the fragment color.
- * The basic fragment shader for images would contain:
- * <pre>
- * void main()
- * {
- *   gl_FragColor = texture2D( sTexture, vTexCoord ) * uColor;
- * }
- * </pre>
- * and for text::
- * <pre>
- *  void main()
- *  {
- *    // sample distance field
- *    mediump float distance = texture2D(sTexture, vTexCoord).a;
- *    mediump float smoothWidth = fwidth(distance);
- *    // set fragment color
- *    lowp vec4 color = uTextColor;
- *    // adjust alpha by sampled distance
- *    color.a *= smoothstep(uSmoothing - smoothWidth, uSmoothing + smoothWidth, distance);
- *    // fragment color multiplied with uColor.
- *    glFragColor = color * uColor;
- *  }
  * </pre>
  * <BR>
  * <B>
@@ -266,44 +231,6 @@ public:
                                     const std::string& fragmentShader,
                                     GeometryType type = GeometryType(GEOMETRY_TYPE_IMAGE),
                                     GeometryHints hints = GeometryHints(HINT_NONE) );
-
-  /**
-   * @brief Create ShaderEffect.
-   * @param imageVertexShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param imageFragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param textVertexShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param textFragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param hints GeometryHints to define the geometry of the rendered object
-   * @return A handle to a shader effect
-   */
-  static ShaderEffect New( const std::string& imageVertexShader,
-                           const std::string& imageFragmentShader,
-                           const std::string& textVertexShader,
-                           const std::string& textFragmentShader,
-                           GeometryHints hints = GeometryHints(HINT_NONE) );
-
-  /**
-   * @brief Create ShaderEffect.
-   * @param imageVertexShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param imageFragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param textVertexShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param textFragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param texturedMeshVertexShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param texturedMeshFragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param meshVertexShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param meshFragmentShader code for the effect. If you pass in an empty string, the default version will be used
-   * @param hints GeometryHints to define the geometry of the rendered object
-   * @return A handle to a shader effect
-   */
-  static ShaderEffect New( const std::string& imageVertexShader,
-                           const std::string& imageFragmentShader,
-                           const std::string& textVertexShader,
-                           const std::string& textFragmentShader,
-                           const std::string& texturedMeshVertexShader,
-                           const std::string& texturedMeshFragmentShader,
-                           const std::string& meshVertexShader,
-                           const std::string& meshFragmentShader,
-                           GeometryHints hints = GeometryHints(HINT_NONE) );
 
   /**
    * @brief Downcast an Object handle to ShaderEffect.

@@ -46,7 +46,6 @@ namespace Internal
 // value types used by messages
 template <> struct ParameterType< ColorMode > : public BasicType< ColorMode > {};
 template <> struct ParameterType< PositionInheritanceMode > : public BasicType< PositionInheritanceMode > {};
-template <> struct ParameterType< SizeMode > : public BasicType< SizeMode > {};
 
 namespace SceneGraph
 {

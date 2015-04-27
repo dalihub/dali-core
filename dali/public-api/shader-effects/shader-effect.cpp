@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,40 +79,6 @@ ShaderEffect ShaderEffect::NewWithPrefix( const std::string& vertexShaderPrefix,
   Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
 
   internal->SetPrograms( type, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
-
-  return ShaderEffect( internal.Get() );
-}
-
-ShaderEffect ShaderEffect::New( const std::string& imageVertexShader,
-                                const std::string& imageFragmentShader,
-                                const std::string& textVertexShader,
-                                const std::string& textFragmentShader,
-                                GeometryHints hints)
-{
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
-
-  internal->SetPrograms( GEOMETRY_TYPE_IMAGE, imageVertexShader, imageFragmentShader );
-  internal->SetPrograms( GEOMETRY_TYPE_TEXT, textVertexShader, textFragmentShader );
-
-  return ShaderEffect( internal.Get() );
-}
-
-ShaderEffect ShaderEffect::New( const std::string& imageVertexShader,
-                                const std::string& imageFragmentShader,
-                                const std::string& textVertexShader,
-                                const std::string& textFragmentShader,
-                                const std::string& texturedMeshVertexShader,
-                                const std::string& texturedMeshFragmentShader,
-                                const std::string& meshVertexShader,
-                                const std::string& meshFragmentShader,
-                                GeometryHints hints)
-{
-  Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
-
-  internal->SetPrograms( GEOMETRY_TYPE_IMAGE, imageVertexShader, imageFragmentShader );
-  internal->SetPrograms( GEOMETRY_TYPE_TEXT, textVertexShader, textFragmentShader );
-  internal->SetPrograms( GEOMETRY_TYPE_TEXTURED_MESH, texturedMeshVertexShader, texturedMeshFragmentShader );
-  internal->SetPrograms( GEOMETRY_TYPE_UNTEXTURED_MESH, meshVertexShader, meshFragmentShader );
 
   return ShaderEffect( internal.Get() );
 }

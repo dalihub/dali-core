@@ -89,10 +89,6 @@ WrapperStrings customShaderWrappers [] =
     CustomImagePostfixVertex, CustomImagePostfixFragment
   },
   {
-    CustomTextDistanceFieldPrefixVertex, CustomTextDistanceFieldPrefixFragment,
-    CustomTextDistanceFieldPostfixVertex, CustomTextDistanceFieldPostfixFragment
-  },
-  {
     CustomUntexturedMeshPrefixVertex, CustomUntexturedMeshPrefixFragment,
     CustomUntexturedMeshPostfixVertex, CustomUntexturedMeshPostfixFragment
   },
@@ -138,19 +134,14 @@ void WrapAndSetProgram( Internal::ShaderEffect& effect,
         index = 0;
         break;
       }
-      case GEOMETRY_TYPE_TEXT:
+      case GEOMETRY_TYPE_UNTEXTURED_MESH:
       {
         index = 1;
         break;
       }
-      case GEOMETRY_TYPE_UNTEXTURED_MESH:
-      {
-        index = 2;
-        break;
-      }
       case GEOMETRY_TYPE_TEXTURED_MESH:
       {
-        index = 3;
+        index = 2;
         break;
       }
       case GEOMETRY_TYPE_LAST:
@@ -339,7 +330,6 @@ void ShaderEffect::SetPrograms( GeometryType geometryType,
   }
 
   WrapAndSetProgram( *this, geometryType, GEOMETRY_TYPE_IMAGE, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
-  WrapAndSetProgram( *this, geometryType, GEOMETRY_TYPE_TEXT, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
   WrapAndSetProgram( *this, geometryType, GEOMETRY_TYPE_TEXTURED_MESH, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
   WrapAndSetProgram( *this, geometryType, GEOMETRY_TYPE_UNTEXTURED_MESH, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
 }
@@ -497,10 +487,6 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
         if(s == "GEOMETRY_TYPE_IMAGE")
         {
           geometryType  = GEOMETRY_TYPE_IMAGE;
-        }
-        else if (s == "GEOMETRY_TYPE_TEXT")
-        {
-          geometryType  = GEOMETRY_TYPE_TEXT;
         }
         else if( s == "GEOMETRY_TYPE_UNTEXTURED_MESH")
         {

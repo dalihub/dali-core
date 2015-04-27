@@ -26,22 +26,18 @@
 #include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/common/set-wrapper.h>
 #include <dali/public-api/math/vector2.h>
-#include <dali/public-api/images/image-attributes.h>
 
-#include <dali/integration-api/glyph-set.h>
 #include <dali/integration-api/debug.h>
 
 #include <dali/internal/common/message.h>
+#include <dali/internal/common/image-attributes.h>
 
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/resources/resource-type-path.h>
 #include <dali/internal/event/resources/resource-client.h>
-#include <dali/internal/event/text/font-impl.h>
-#include <dali/internal/event/text/atlas/atlas-size.h>
 
 #include <dali/internal/update/common/discard-queue.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
-#include <dali/internal/update/resources/atlas-request-status.h>
 #include <dali/internal/render/queue/render-queue.h>
 
 #include <dali/internal/render/common/texture-cache-dispatcher.h>
@@ -140,8 +136,6 @@ struct ResourceManager::ResourceManagerImpl
   DeadRequestContainer deadRequests;
   LiveRequestContainer saveRequests;          ///< copy of id's being saved (must also be in newCompleteRequests or oldCompleteRequests)
   LiveRequestContainer completeSaveRequests;  ///< successful save ids are moved from saveRequests to here
-
-  AtlasRequestStatus atlasStatus; ///< load status of text atlases
 
   /**
    * This is the resource cache. It's filled/emptied from within Core::Update()
@@ -268,11 +262,6 @@ void ResourceManager::HandleLoadResourceRequest( ResourceId id, const ResourceTy
   // Add ID to the loading set
   mImpl->loadingRequests.insert(id);
 
-  // Update atlas status if this request is a text request
-  mImpl->atlasStatus.CheckAndSaveTextRequest(id, typePath);
-
-  ClearRequestedGlyphArea(id, typePath);
-
   // Make the load request last
   mImpl->mPlatformAbstraction.LoadResource(ResourceRequest(id, *typePath.type, typePath.path, priority));
 }
@@ -284,13 +273,6 @@ void ResourceManager::HandleDecodeResourceRequest(
   Integration::LoadResourcePriority priority )
 {
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleDecodeResourceRequest(id:%u, buffer.size:%u, type.id:%u)\n", id, buffer->GetVector().Size(), typePath.type->id);
-
-  // We would update atlas status and clear the glyph area if text were supported and this request was a text request:
-  if( typePath.type->id == ResourceText )
-  {
-    DALI_LOG_WARNING("Decoding from memory buffers not supported for Text resources.");
-    return;
-  }
 
   // Add ID to the loading set
   mImpl->loadingRequests.insert(id);
@@ -355,11 +337,6 @@ void ResourceManager::HandleAllocateTextureRequest( ResourceId id, unsigned int 
 
   mImpl->oldCompleteRequests.insert(id);
   mImpl->mTextureCacheDispatcher.DispatchCreateTexture( id, width, height, pixelFormat, true /* true = clear the texture */ );
-}
-
-void ResourceManager::HandleUpdateTextureRequest( ResourceId id,  const BitmapUploadArray& uploadArray )
-{
-  mImpl->mTextureCacheDispatcher.DispatchUploadBitmapArrayToTexture( id, uploadArray );
 }
 
 void ResourceManager::HandleLoadShaderRequest( ResourceId id, const ResourceTypePath& typePath )
@@ -488,10 +465,6 @@ void ResourceManager::HandleSaveResourceRequest( ResourceId id, const ResourceTy
         break;
       }
 
-      case ResourceText:
-      {
-        break;
-      }
     }
 
     if( resource ) // i.e. if it's a saveable resource
@@ -574,12 +547,6 @@ void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceT
     mImpl->mPlatformAbstraction.CancelLoad(deadId, typeId);
   }
 }
-
-void ResourceManager::HandleAtlasUpdateRequest( ResourceId id, ResourceId atlasId, LoadStatus loadStatus )
-{
-  mImpl->atlasStatus.Update(id, atlasId, loadStatus );
-}
-
 /********************************************************************************
  ******************** Update thread object direct interface  ********************
  ********************************************************************************/
@@ -657,16 +624,6 @@ ShaderDataPtr ResourceManager::GetShaderData(ResourceId id)
     shaderData = iter->second;
   }
   return shaderData;
-}
-
-bool ResourceManager::IsAtlasLoaded(ResourceId id)
-{
-  return mImpl->atlasStatus.IsLoadComplete(id);
-}
-
-LoadStatus ResourceManager::GetAtlasLoadStatus( ResourceId atlasId )
-{
-  return mImpl->atlasStatus.GetLoadStatus( atlasId );
 }
 
 /********************************************************************************
@@ -754,16 +711,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
         break;
       }
 
-      case ResourceText:
-      {
-        /* here we return a vector of Characters (glyph data + bitmap)*/
-        GlyphSetPointer glyphSet = static_cast<GlyphSet*>(resource.Get());
-        DALI_ASSERT_DEBUG( glyphSet );
-        UploadGlyphsToTexture(*glyphSet);
-        mImpl->atlasStatus.Update(id, glyphSet->GetAtlasResourceId(), loadStatus );
-        SendToClient( LoadingGlyphSetSucceededMessage( *mImpl->mResourceClient, id, glyphSet, loadStatus) );
-        break;
-      }
     }
 
     // Let ResourceClient know that the resource manager has loaded something that its clients might want to hear about:
@@ -852,63 +799,6 @@ void ResourceManager::SaveFailed(ResourceId id, ResourceFailure failure)
  ********************************* Private Methods  *****************************
  ********************************************************************************/
 
-void ResourceManager::ClearRequestedGlyphArea( ResourceId id, const ResourceTypePath& typePath )
-{
-  if( typePath.type->id == ResourceText )
-  {
-    const TextResourceType *textResourceType = static_cast<const TextResourceType*>(typePath.type);
-    ResourceId atlasId = textResourceType->mTextureAtlasId;
-
-    BitmapClearArray clearAreas;
-
-    float blockSize = GlyphAtlasSize::GetBlockSize();
-    // Get x, y from each character:
-    for( TextResourceType::CharacterList::const_iterator iter = textResourceType->mCharacterList.begin(),
-           end = textResourceType->mCharacterList.end() ;
-         iter != end ; iter ++ )
-    {
-      Vector2 clearArea( iter->xPosition, iter->yPosition );
-      clearAreas.push_back(clearArea);
-    }
-
-    mImpl->mTextureCacheDispatcher.DispatchClearAreas( atlasId, clearAreas, blockSize, 0x00 );
-  }
-}
-
-void ResourceManager::UploadGlyphsToTexture( const GlyphSet& glyphSet )
-{
-  // the glyphset contains an array of bitmap / characters .
-  // This function uploads the bitmaps to the associated texture atlas
-
-  const GlyphSet::CharacterList& charList( glyphSet.GetCharacterList() );
-  BitmapUploadArray uploadArray;
-
-  for(std::size_t i = 0, count = charList.size() ; i < count; i++ )
-  {
-    const GlyphSet::Character& character( charList[i] );
-
-    // grab a pointer to the bitmap
-    Bitmap* bitmap( character.first.Get() );
-
-    // create a bitmap upload object, then add it to the array
-    BitmapUpload upload( bitmap->ReleaseBuffer(),               // Inform the bitmap we're taking ownership of it's pixel buffer.
-                         character.second.xPosition,            // x position in the texture to which upload the bitmap
-                         character.second.yPosition,            // y position in the texture to which upload the bitmap
-                         bitmap->GetImageWidth(),              // bitmap width
-                         bitmap->GetImageHeight(),             // bitmap height
-                         BitmapUpload::DISCARD_PIXEL_DATA );    // tell the the texture to delete the bitmap pixel buffer when it's done
-
-    uploadArray.push_back( upload );
-  }
-
-  ResourceId textureId = glyphSet.GetAtlasResourceId();
-  if( IsResourceLoaded( textureId ) )
-  {
-    mImpl->mTextureCacheDispatcher.DispatchUploadBitmapArrayToTexture( textureId, uploadArray );
-  }
-}
-
-
 void ResourceManager::NotifyTickets()
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
@@ -970,11 +860,6 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
       case ResourceTargetImage:
         break;
 
-      case ResourceText:
-      {
-        break;
-      }
-
       case ResourceShader:
       {
         ShaderCacheIter shaderIter = mImpl->mShaders.find(iter->first);
@@ -984,8 +869,6 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
         break;
       }
     }
-
-    mImpl->atlasStatus.Remove(iter->first);
 
     // Erase the item and increment the iterator
     mImpl->deadRequests.erase(iter++);

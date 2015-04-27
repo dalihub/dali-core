@@ -45,7 +45,7 @@ DynamicsCapsuleShape::DynamicsCapsuleShape(const float radius, const float lengt
   mDynamicsShape = capsuleShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsCapsuleShapeMessage( stage->GetUpdateInterface(), *capsuleShape, radius, length );
+  InitializeDynamicsCapsuleShapeMessage( *stage, *capsuleShape, radius, length );
 }
 
 DynamicsCapsuleShape::~DynamicsCapsuleShape()

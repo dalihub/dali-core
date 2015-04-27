@@ -2,7 +2,7 @@
 #define __DALI_IMAGE_ACTOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -45,8 +45,6 @@ class ImageActor;
  * this is the natural size.
  * Setting a size on the ImageActor, e.g through the SetSize api or through an animation will
  * stop the natural size being used.
- *
- * Such a set size can be changed back to the image's size by calling SetToNaturalSize().
  *
  * If a pixel area is set on an ImageActor with natural size, the actor size will change
  * to match the pixel area. If a pixel area is set on an ImageActor that has had it's size set,
@@ -247,18 +245,6 @@ public:
    * @return The image.
    */
   Image GetImage();
-
-  /**
-   * @brief Tell the image actor to use the natural size of the current image
-   * or future images.
-   *
-   * Calling SetSize on this actor or animating the size of the actor
-   * overrides this behaviour.
-   *
-   * @post The image actor uses the natural image size after an image
-   * has been loaded.
-   */
-  void SetToNaturalSize();
 
   /**
    * @brief Set a region of the image to display, in pixels.

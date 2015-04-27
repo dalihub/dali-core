@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,8 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/images/resource-image.h>
-#include <dali/public-api/images/image-attributes.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/internal/common/image-attributes.h>
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/event/images/buffer-image-impl.h>
@@ -111,8 +111,8 @@ const StringEnum< Pixel::Format > PIXEL_FORMAT_TABLE[] =
   { "BGRA8888",                                     Pixel::BGRA8888                                     },
   { "COMPRESSED_R11_EAC",                           Pixel::COMPRESSED_R11_EAC                           },
   { "COMPRESSED_SIGNED_R11_EAC",                    Pixel::COMPRESSED_SIGNED_R11_EAC                    },
-  { "COMPRESSED_RG11_EAC",                          Pixel::COMPRESSED_RG11_EAC                          },
   { "COMPRESSED_SIGNED_RG11_EAC",                   Pixel::COMPRESSED_SIGNED_RG11_EAC                   },
+  { "COMPRESSED_RG11_EAC",                          Pixel::COMPRESSED_RG11_EAC                          },
   { "COMPRESSED_RGB8_ETC2",                         Pixel::COMPRESSED_RGB8_ETC2                         },
   { "COMPRESSED_SRGB8_ETC2",                        Pixel::COMPRESSED_SRGB8_ETC2                        },
   { "COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2",     Pixel::COMPRESSED_RGB8_PUNCHTHROUGH_ALPHA1_ETC2     },
@@ -124,14 +124,26 @@ const StringEnum< Pixel::Format > PIXEL_FORMAT_TABLE[] =
 };
 const unsigned int PIXEL_FORMAT_TABLE_COUNT = sizeof( PIXEL_FORMAT_TABLE ) / sizeof( PIXEL_FORMAT_TABLE[0] );
 
-const StringEnum< ImageAttributes::ScalingMode > IMAGE_SCALING_MODE_TABLE[] =
+const StringEnum< FittingMode::Type > IMAGE_FITTING_MODE_TABLE[] =
 {
-  { "SHRINK_TO_FIT", ImageAttributes::ShrinkToFit },
-  { "SCALE_TO_FILL", ImageAttributes::ScaleToFill },
-  { "FIT_WIDTH",     ImageAttributes::FitWidth    },
-  { "FIT_HEIGHT",    ImageAttributes::FitHeight   },
+  { "SHRINK_TO_FIT", FittingMode::SHRINK_TO_FIT },
+  { "SCALE_TO_FILL", FittingMode::SCALE_TO_FILL },
+  { "FIT_WIDTH",     FittingMode::FIT_WIDTH    },
+  { "FIT_HEIGHT",    FittingMode::FIT_HEIGHT   },
 };
-const unsigned int IMAGE_SCALING_MODE_TABLE_COUNT = sizeof( IMAGE_SCALING_MODE_TABLE ) / sizeof( IMAGE_SCALING_MODE_TABLE[0] );
+const unsigned int IMAGE_FITTING_MODE_TABLE_COUNT = sizeof( IMAGE_FITTING_MODE_TABLE ) / sizeof( IMAGE_FITTING_MODE_TABLE[0] );
+
+const StringEnum< SamplingMode::Type > IMAGE_SAMPLING_MODE_TABLE[] =
+{
+  { "BOX",              SamplingMode::BOX            },
+  { "NEAREST",          SamplingMode::NEAREST        },
+  { "LINEAR",           SamplingMode::LINEAR         },
+  { "BOX_THEN_NEAREST", SamplingMode::BOX_THEN_NEAREST },
+  { "BOX_THEN_LINEAR",  SamplingMode::BOX_THEN_LINEAR  },
+  { "NO_FILTER",        SamplingMode::NO_FILTER       },
+  { "DONT_CARE",        SamplingMode::DONT_CARE       },
+};
+const unsigned int IMAGE_SAMPLING_MODE_TABLE_COUNT = sizeof( IMAGE_SAMPLING_MODE_TABLE ) / sizeof( IMAGE_SAMPLING_MODE_TABLE[0] );
 
 } // unnamed namespace
 
@@ -226,7 +238,7 @@ Image NewImage( const Property::Value& map )
   std::string filename;
   ResourceImage::LoadPolicy loadPolicy    = Dali::Internal::IMAGE_LOAD_POLICY_DEFAULT;
   Image::ReleasePolicy releasePolicy = Dali::Internal::IMAGE_RELEASE_POLICY_DEFAULT;
-  ImageAttributes attributes         = ImageAttributes::New();
+  Internal::ImageAttributes attributes = Internal::ImageAttributes::New();
 
   if( Property::MAP == map.GetType() )
   {
@@ -253,50 +265,78 @@ Image NewImage( const Property::Value& map )
       releasePolicy = GetEnumeration< Image::ReleasePolicy >( v.c_str(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
     }
 
-    if( map.HasKey("width") && map.HasKey("height") )
+    // Width and height can be set individually. Dali derives the unspecified
+    // dimension from the aspect ratio of the raw image.
+    unsigned int width = 0, height = 0;
+
+    field = "width";
+    if( map.HasKey( field ) )
     {
-      Property::Value &value = map.GetValue("width");
-      unsigned int w = 0, h = 0;
+      Property::Value &value = map.GetValue( field );
+
       // handle floats and integer the same for json script
-      if( value.GetType() == Property::FLOAT)
+      if( value.GetType() == Property::FLOAT )
       {
-        w = static_cast<unsigned int>( value.Get<float>() );
+        width = static_cast<unsigned int>( value.Get<float>() );
       }
       else
       {
-        DALI_ASSERT_ALWAYS(value.GetType() == Property::INTEGER && "Image width property is not a number" );
-        w = value.Get<int>();
+        DALI_ASSERT_ALWAYS( value.GetType() == Property::INTEGER && "Image width property is not a number" );
+        width = value.Get<int>();
       }
-
-      value = map.GetValue("height");
-      if( value.GetType() == Property::FLOAT)
-      {
-        h = static_cast<unsigned int>( value.Get<float>() );
-      }
-      else
-      {
-        DALI_ASSERT_ALWAYS(value.GetType() == Property::INTEGER && "Image width property is not a number" );
-        h = value.Get<int>();
-      }
-
-      attributes.SetSize( w, h );
     }
+
+    field = "height";
+    if( map.HasKey( field ) )
+    {
+      Property::Value &value = map.GetValue( field );
+      if( value.GetType() == Property::FLOAT )
+      {
+        height = static_cast<unsigned int>( value.Get<float>() );
+      }
+      else
+      {
+        DALI_ASSERT_ALWAYS( value.GetType() == Property::INTEGER && "Image width property is not a number" );
+        height = value.Get<int>();
+      }
+    }
+
+    attributes.SetSize( width, height );
 
     field = "pixel-format";
     Pixel::Format pixelFormat = Pixel::RGBA8888;
     if( map.HasKey(field) )
     {
-      DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
-      std::string s(map.GetValue(field).Get<std::string>());
+      DALI_ASSERT_ALWAYS( map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
+      std::string s( map.GetValue(field).Get<std::string>() );
       pixelFormat = GetEnumeration< Pixel::Format >( s.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
     }
 
-    field = "scaling-mode";
-    if( map.HasKey(field) )
+    field = "fitting-mode";
+    if( map.HasKey( field ) )
     {
-      DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
-      std::string s(map.GetValue(field).Get<std::string>());
-      attributes.SetScalingMode( GetEnumeration< ImageAttributes::ScalingMode >( s.c_str(), IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT ) );
+      Property::Value& value = map.GetValue( field );
+      DALI_ASSERT_ALWAYS( value.GetType() == Property::STRING && "Image fitting-mode property is not a string" );
+      std::string s( value.Get<std::string>() );
+      attributes.SetScalingMode( GetEnumeration< FittingMode::Type >( s.c_str(), IMAGE_FITTING_MODE_TABLE, IMAGE_FITTING_MODE_TABLE_COUNT ) );
+    }
+
+    field = "sampling-mode";
+    if( map.HasKey( field ) )
+    {
+      Property::Value& value = map.GetValue( field );
+      DALI_ASSERT_ALWAYS( value.GetType() == Property::STRING && "Image sampling-mode property is not a string" );
+      std::string s( value.Get<std::string>() );
+      attributes.SetFilterMode( GetEnumeration< SamplingMode::Type >( s.c_str(), IMAGE_SAMPLING_MODE_TABLE, IMAGE_SAMPLING_MODE_TABLE_COUNT ) );
+    }
+
+    field = "orientation";
+    if( map.HasKey( field ) )
+    {
+      Property::Value& value = map.GetValue( field );
+      DALI_ASSERT_ALWAYS( value.GetType() == Property::BOOLEAN && "Image orientation property is not a boolean" );
+      bool b = value.Get<bool>();
+      attributes.SetOrientationCorrection( b );
     }
 
     if( map.HasKey("type") )
@@ -319,7 +359,7 @@ Image NewImage( const Property::Value& map )
       }
       else if("ResourceImage" == s)
       {
-        ret = ResourceImage::New(filename, attributes, loadPolicy, releasePolicy);
+        ret = ResourceImage::New( filename, loadPolicy, releasePolicy, ImageDimensions( attributes.GetSize().x, attributes.GetSize().y ), attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
       }
       else
       {
@@ -328,7 +368,7 @@ Image NewImage( const Property::Value& map )
     }
     else
     {
-      ret = ResourceImage::New(filename, attributes, loadPolicy, releasePolicy);
+      ret = ResourceImage::New( filename, loadPolicy, releasePolicy, ImageDimensions( attributes.GetSize().x, attributes.GetSize().y ), attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
     }
   }
 
@@ -542,9 +582,6 @@ void CreatePropertyMap( Image image, Property::Map& map )
     {
       map[ "filename" ] = resourceImage.GetUrl();
       map[ "load-policy" ] = GetEnumerationName< ResourceImage::LoadPolicy >( resourceImage.GetLoadPolicy(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
-
-      ImageAttributes attributes( resourceImage.GetAttributes() );
-      map[ "scaling-mode" ] = GetEnumerationName< ImageAttributes::ScalingMode >( attributes.GetScalingMode(), IMAGE_SCALING_MODE_TABLE, IMAGE_SCALING_MODE_TABLE_COUNT );
     }
 
     int width( image.GetWidth() );

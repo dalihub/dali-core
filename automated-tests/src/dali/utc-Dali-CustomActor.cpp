@@ -56,13 +56,11 @@ struct TestCustomActor : public CustomActorImpl
    * Constructor
    */
   TestCustomActor()
-  : CustomActorImpl( true ), // requires touch
+  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS | DISABLE_SIZE_NEGOTIATION ) ),
     mDaliProperty( Property::INVALID_INDEX ),
     mSizeSet( Vector3::ZERO ),
     mTargetSize( Vector3::ZERO )
   {
-    SetRequiresMouseWheelEvents(true);
-    SetRequiresHoverEvents(true);
   }
 
   /**
@@ -188,24 +186,24 @@ struct TestCustomActor : public CustomActorImpl
   {
   }
 
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
   {
   }
 
-  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
   {
   }
 
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
   {
     return 0.0f;
   }
 
-  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
   {
   }
 
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS )
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS )
   {
     return false;
   }
@@ -451,7 +449,7 @@ public:
    * Constructor
    */
   SimpleTestCustomActor()
-  : CustomActorImpl( true ) // requires touch
+  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | DISABLE_SIZE_NEGOTIATION ) )
   {
   }
 
@@ -523,24 +521,24 @@ public:
   {
   }
 
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension )
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
   {
   }
 
-  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
   {
   }
 
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension )
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
   {
     return 0.0f;
   }
 
-  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
   {
   }
 
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS )
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS )
   {
     return false;
   }
@@ -702,11 +700,11 @@ public:
   {
   }
 
-  virtual void OnLayoutNegotiated( float size, Dimension dimension )
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension )
   {
   }
 
-  virtual void OnCalculateRelayoutSize( Dimension dimension )
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
   {
   }
 
@@ -1557,18 +1555,12 @@ int UtcDaliCustomActorOnSizeAnimation(void)
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
   Animation anim = Animation::New( 1.0f );
-  anim.Resize( custom, Vector3( 8.0f, 9.0f, 10.0f ) );
+  anim.AnimateTo( Property( custom, Actor::Property::SIZE ), Vector3( 8.0f, 9.0f, 10.0f ) );
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
   DALI_TEST_EQUALS( 8.0f, custom.GetTargetSize().width, TEST_LOCATION );
   DALI_TEST_EQUALS( 9.0f, custom.GetTargetSize().height, TEST_LOCATION );
   DALI_TEST_EQUALS( 10.0f, custom.GetTargetSize().depth, TEST_LOCATION );
-
-  anim.Resize( custom, 1.0f, 2.0f );
-  DALI_TEST_EQUALS( 2, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnSizeAnimation", custom.GetMethodsCalled()[ 1 ], TEST_LOCATION );
-  DALI_TEST_EQUALS( 1.0f, custom.GetTargetSize().width, TEST_LOCATION );
-  DALI_TEST_EQUALS( 2.0f, custom.GetTargetSize().height, TEST_LOCATION );
   END_TEST;
 }
 

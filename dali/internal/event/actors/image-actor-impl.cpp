@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/actors/image-actor-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/scripting/scripting.h>
@@ -101,7 +104,7 @@ ImageActorPtr ImageActor::New()
 
 void ImageActor::OnInitialize()
 {
-  SetResizePolicy( USE_NATURAL_SIZE, ALL_DIMENSIONS );
+  SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
 }
 
 void ImageActor::SetImage( ImagePtr& image )
@@ -129,7 +132,8 @@ void ImageActor::SetImage( ImagePtr& image )
   }
   // set the actual image (normal or 9 patch) and natural size based on that
   mImageAttachment->SetImage( newImage );
-  SetNaturalSize();
+
+  RelayoutRequest();
 }
 
 ImagePtr ImageActor::GetImage()
@@ -137,18 +141,11 @@ ImagePtr ImageActor::GetImage()
   return mImageAttachment->GetImage();
 }
 
-void ImageActor::SetToNaturalSize()
-{
-  mUsingNaturalSize = true;
-
-  SetNaturalSize();
-}
-
 void ImageActor::SetPixelArea( const PixelArea& pixelArea )
 {
   mImageAttachment->SetPixelArea( pixelArea );
 
-  SetNaturalSize();
+  RelayoutRequest();
 }
 
 const ImageActor::PixelArea& ImageActor::GetPixelArea() const
@@ -165,17 +162,7 @@ void ImageActor::ClearPixelArea()
 {
   mImageAttachment->ClearPixelArea();
 
-  if( mUsingNaturalSize )
-  {
-    ImagePtr image = mImageAttachment->GetImage();
-    if( image )
-    {
-      mInternalSetSize = true;
-      SetSize( image->GetNaturalSize() );
-      SetPreferredSize( GetTargetSize().GetVectorXY() );
-      mInternalSetSize = false;
-    }
-  }
+  RelayoutRequest();
 }
 
 void ImageActor::SetStyle( Style style )
@@ -210,27 +197,12 @@ RenderableAttachment& ImageActor::GetRenderableAttachment() const
 }
 
 ImageActor::ImageActor()
-: RenderableActor(),
-  mUsingNaturalSize(true),
-  mInternalSetSize(false)
+: RenderableActor()
 {
-  // Size negotiate disabled by default, so turn it on for this actor
-  SetRelayoutEnabled( true );
 }
 
 ImageActor::~ImageActor()
 {
-}
-
-void ImageActor::SetNaturalSize()
-{
-  if( mUsingNaturalSize )
-  {
-    mInternalSetSize = true;
-    SetSize( CalculateNaturalSize() );
-    SetPreferredSize( GetTargetSize().GetVectorXY() );
-    mInternalSetSize = false;
-  }
 }
 
 Vector3 ImageActor::GetNaturalSize() const
@@ -260,19 +232,6 @@ Vector2 ImageActor::CalculateNaturalSize() const
   }
 
   return size;
-}
-
-void ImageActor::OnSizeSet( const Vector3& targetSize )
-{
-  if( !mInternalSetSize )
-  {
-    mUsingNaturalSize = false;
-  }
-}
-
-void ImageActor::OnSizeAnimation(Animation& animation, const Vector3& targetSize)
-{
-  mUsingNaturalSize = false;
 }
 
 void ImageActor::OnStageConnectionInternal()

@@ -20,6 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <string>
+#include <cstring> // for memcpy & memset
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/compile-time-math.h>

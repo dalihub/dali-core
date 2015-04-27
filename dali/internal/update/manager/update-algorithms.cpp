@@ -59,10 +59,8 @@ Debug::Filter* gUpdateFilter = Debug::Filter::New(Debug::Concise, false, "LOG_UP
  * @param updateBufferIndex buffer index to use
  * @return The number of constraints that are still being applied
  */
-unsigned int ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex )
+void ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex updateBufferIndex )
 {
-  unsigned int activeCount = 0;
-
   ConstraintOwnerContainer& constraints = propertyOwner.GetConstraints();
 
   const ConstraintIter endIter = constraints.End();
@@ -70,15 +68,7 @@ unsigned int ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex u
   {
     ConstraintBase& constraint = **iter;
     constraint.Apply( updateBufferIndex );
-
-    if( constraint.mWeight[updateBufferIndex] < 1.0f )
-    {
-      // this constraint is still being applied
-      ++activeCount;
-    }
   }
-
-  return activeCount;
 }
 
 /**
@@ -87,9 +77,9 @@ unsigned int ConstrainPropertyOwner( PropertyOwner& propertyOwner, BufferIndex u
  * @param updateBufferIndex buffer index to use
  * @return number of active constraints
  */
-unsigned int ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
+void ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
 {
-  unsigned int activeCount = ConstrainPropertyOwner( node, updateBufferIndex );
+  ConstrainPropertyOwner( node, updateBufferIndex );
 
   /**
    *  Constrain the children next
@@ -99,9 +89,8 @@ unsigned int ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
   for ( NodeIter iter = children.Begin(); iter != endIter; ++iter )
   {
     Node& child = **iter;
-    activeCount += ConstrainNodes( child, updateBufferIndex );
+    ConstrainNodes( child, updateBufferIndex );
   }
-  return activeCount;
 }
 
 /******************************************************************************
@@ -155,8 +144,7 @@ inline void UpdateRootNodeTransformValues( Layer& rootNode, int nodeDirtyFlags, 
 
 /**
  * Updates transform values for the given node if the transform flag is dirty.
- * This includes applying a new size should the SizeMode require it.
- * Note that this will cause the size dirty flag to be set. This is why we pass
+  * Note that this will cause the size dirty flag to be set. This is why we pass
  * the dirty flags in by reference.
  * @param[in]     node The node to update
  * @param[in,out] nodeDirtyFlags A reference to the dirty flags, these may be modified by this function
@@ -235,6 +223,7 @@ inline void UpdateNodeWorldMatrix( Node& node, RenderableAttachment& updatedRend
   {
     if( updatedRenderable.UsesGeometryScaling() )
     {
+      // TODO: MESH_REWORK : remove scale for size
       Vector3 scaling;
       updatedRenderable.GetScaleForSize( node.GetSize( updateBufferIndex ), scaling );
       if( node.GetInhibitLocalTransform() )

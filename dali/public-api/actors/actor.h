@@ -2,7 +2,7 @@
 #define __DALI_ACTOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,9 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/animation/active-constraint-declarations.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
+#include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
@@ -39,12 +39,9 @@ class Actor;
 
 class Actor;
 class Renderer;
-class Animation;
-class Constraint;
 struct Degree;
 class Quaternion;
 class Layer;
-struct Radian;
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
@@ -294,9 +291,7 @@ public:
       COLOR_MODE,                                         ///< name "color-mode",            type std::string
       POSITION_INHERITANCE,                               ///< name "position-inheritance",  type std::string
       DRAW_MODE,                                          ///< name "draw-mode",             type std::string
-      SIZE_MODE,                                          ///< name "size-mode",             type std::string
       SIZE_MODE_FACTOR,                                   ///< name "size-mode-factor",      type Vector3
-      RELAYOUT_ENABLED,                                   ///< name "relayout-enabled",      type Boolean
       WIDTH_RESIZE_POLICY,                                ///< name "width-resize-policy",   type String
       HEIGHT_RESIZE_POLICY,                               ///< name "height-resize-policy",  type String
       SIZE_SCALE_POLICY,                                  ///< name "size-scale-policy",     type String
@@ -305,7 +300,6 @@ public:
       PADDING,                                            ///< name "padding",               type Vector4
       MINIMUM_SIZE,                                       ///< name "minimum-size",          type Vector2
       MAXIMUM_SIZE,                                       ///< name "maximum-size",          type Vector2
-      PREFERRED_SIZE                                      ///< name "preferred-size",        type Vector2
     };
   };
 
@@ -765,7 +759,10 @@ public:
    * @param [in] angle The new orientation angle in degrees.
    * @param [in] axis The new axis of orientation.
    */
-  void SetOrientation(const Degree& angle, const Vector3& axis);
+  void SetOrientation( const Degree& angle, const Vector3& axis )
+  {
+    SetOrientation( Radian( angle ), axis );
+  }
 
   /**
    * @brief Sets the orientation of the Actor.
@@ -795,7 +792,10 @@ public:
    * @param[in] angle The angle to the rotation to combine with the existing orientation.
    * @param[in] axis The axis of the rotation to combine with the existing orientation.
    */
-  void RotateBy(const Degree& angle, const Vector3& axis);
+  void RotateBy( const Degree& angle, const Vector3& axis )
+  {
+    RotateBy( Radian( angle ), axis );
+  }
 
   /**
    * @brief Apply a relative rotation to an actor.
@@ -1146,26 +1146,12 @@ public:
   // SIZE NEGOTIATION
 
   /**
-   * @brief Set if the actor should do relayout in size negotiation or not.
-   *
-   * @param[in] enabled Flag to specify if actor should do relayout or not.
-   */
-  void SetRelayoutEnabled( bool enabled );
-
-  /**
-   * @brief Is the actor included in relayout or not.
-   *
-   * @return Return if the actor is involved in size negotiation or not.
-   */
-  bool IsRelayoutEnabled() const;
-
-  /**
    * Set the resize policy to be used for the given dimension(s)
    *
    * @param[in] policy The resize policy to use
    * @param[in] dimension The dimension(s) to set policy for. Can be a bitfield of multiple dimensions.
    */
-  void SetResizePolicy( ResizePolicy policy, Dimension dimension );
+  void SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension );
 
   /**
    * Return the resize policy used for a single dimension
@@ -1173,57 +1159,29 @@ public:
    * @param[in] dimension The dimension to get policy for
    * @return Return the dimension resize policy
    */
-  ResizePolicy GetResizePolicy( Dimension dimension ) const;
+  ResizePolicy::Type GetResizePolicy( Dimension::Type dimension ) const;
 
   /**
-   * @brief Set the policy to use when setting size with size negotiation. Defaults to USE_SIZE_SET.
+   * @brief Set the policy to use when setting size with size negotiation. Defaults to SizeScalePolicy::USE_SIZE_SET.
    *
    * @param[in] policy The policy to use for when the size is set
    */
-  void SetSizeScalePolicy( SizeScalePolicy policy );
+  void SetSizeScalePolicy( SizeScalePolicy::Type policy );
 
   /**
    * @brief Return the size set policy in use
    *
    * @return Return the size set policy
    */
-  SizeScalePolicy GetSizeScalePolicy() const;
-
-  /**
-   * @brief Defines how a child actor's size is affected by its parent's size.
-   *
-   * The default is to ignore the parent's size and use the size property of this actor.
-   *
-   * If USE_OWN_SIZE is used, this option is bypassed and the actor's size
-   *     property is used.
-   *
-   * If SIZE_RELATIVE_TO_PARENT is used, this actor's size will be based on
-   *     its parent's size by multiplying the parent size by
-   *     SizeModeFactor.
-   *
-   * If SIZE_FIXED_OFFSET_FROM_PARENT is used, this actor's size will be based on
-   *     its parent's size plus SizeModeFactor.
-   *
-   * @pre The Actor has been initialized.
-   * @param[in] mode The size relative to parent mode to use.
-   */
-  void SetSizeMode( const SizeMode mode );
-
-  /**
-   * @brief Returns the actor's mode for modifying its size relative to its parent.
-   *
-   * @pre The Actor has been initialized.
-   * @return The mode used.
-   */
-  SizeMode GetSizeMode() const;
+  SizeScalePolicy::Type GetSizeScalePolicy() const;
 
   /**
    * @brief Sets the relative to parent size factor of the actor.
    *
-   * This factor is only used when SizeMode is set to either:
-   * SIZE_RELATIVE or SIZE_FIXED_OFFSET.
+   * This factor is only used when ResizePolicy is set to either:
+   * ResizePolicy::SIZE_RELATIVE_TO_PARENT or ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT.
    * This actor's size is set to the actor's size multipled by or added to this factor,
-   * depending on SideMode (See SetSizeMode).
+   * depending on ResizePolicy (See SetResizePolicy).
    *
    * @pre The Actor has been initialized.
    * @param [in] factor A Vector3 representing the relative factor to be applied to each axis.
@@ -1237,23 +1195,6 @@ public:
    * @return The Actor's current relative size factor.
    */
   Vector3 GetSizeModeFactor() const;
-
-  /**
-   * @brief This method specifies a dependency between dimensions. Will set resize policy on the actor for
-   * the given dimension to be DIMENSION_DEPENDENCY.
-   *
-   * @param[in] dimension The dimension to set the dependency on
-   * @param[in] dependency The dependency to set on the dimension
-   */
-  void SetDimensionDependency( Dimension dimension, Dimension dependency );
-
-  /**
-   * @brief Return the dependecy for a dimension
-   *
-   * @param[in] dimension The dimension to return the dependency for
-   * @return Return the dependency
-   */
-  Dimension GetDimensionDependency( Dimension dimension );
 
   /**
    * @brief Calculate the height of the actor given a width
@@ -1277,16 +1218,7 @@ public:
    * @param dimension The dimension to retrieve
    * @return Return the value of the negotiated dimension
    */
-  float GetRelayoutSize( Dimension dimension ) const;
-
-  /**
-   * @brief Request to relayout of all actors in the sub-tree below the given actor.
-   *
-   * This flags the actor and all actors below it for relayout. The actual
-   * relayout is performed at the end of the frame. This means that multiple calls to relayout
-   * will not cause multiple relayouts to occur.
-   */
-  void RelayoutRequestTree();
+  float GetRelayoutSize( Dimension::Type dimension ) const;
 
   /**
    * @brief Force propagate relayout flags through the tree. This actor and all actors
@@ -1309,20 +1241,6 @@ public:
    * @param paddingOut The returned padding data
    */
   void GetPadding( Padding& paddingOut ) const;
-
-  /**
-   * @brief Set the preferred size for size negotiation
-   *
-   * @param[in] size The preferred size to set
-   */
-  void SetPreferredSize( const Vector2& size );
-
-  /**
-   * @brief Return the preferred size used for size negotiation
-   *
-   * @return Return the preferred size
-   */
-  Vector2 GetPreferredSize() const;
 
   /**
    * @brief Set the minimum size an actor can be assigned in size negotiation

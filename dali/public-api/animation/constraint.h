@@ -2,7 +2,7 @@
 #define __DALI_CONSTRAINT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,45 +18,249 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <boost/function.hpp>
-
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/alpha-functions.h>
 #include <dali/public-api/animation/constraint-source.h>
-#include <dali/public-api/object/any.h>
-#include <dali/public-api/object/handle.h>
+#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/property-input.h>
+#include <dali/public-api/signals/callback.h>
 
 namespace Dali
 {
-struct TimePeriod;
+
+class Handle;
 
 namespace Internal DALI_INTERNAL
 {
-class Constraint;
+class ConstraintBase;
 }
+
+typedef Vector< PropertyInput* > PropertyInputContainer;
 
 /**
  * @brief An abstract base class for Constraints.
- * This can be used to constrain a property of an actor, after animations have been applied.
+ *
+ * This can be used to constrain a property of an object, after animations have been applied.
  * Constraints are applied in the following order:
  *   - Constraints are applied to on-stage actors in a depth-first traversal.
- *   - For each actor, the constraints are applied in the same order as the calls to Actor::ApplyConstraint().
+ *   - For each actor, the constraints are applied in the same order as the calls to Apply().
  *   - Constraints are not applied to off-stage actors.
+ *
+ * Create a constraint using one of the New methods depending on the type of callback function used.
+ * Try to use a C function unless some data needs to be stored, otherwise functors and class methods
+ * are also supported.
+ *
+ * A constraint can be applied to an object in the following manner:
+ *
+ * @code
+ * Handle handle = CreateMyObject();
+ * Constraint constraint = Constraint::New< Vector3 >( handle, CONSTRAINING_PROPERTY_INDEX, &MyFunction );
+ * constraint.AddSource( LocalSource( INPUT_PROPERTY_INDEX ) );
+ * constraint.Apply();
+ * @endcode
  */
 class DALI_IMPORT_API Constraint : public BaseHandle
 {
 public:
 
-  typedef Any AnyFunction; ///< Generic function pointer for constraint
+  /**
+   * @brief Template for the Function that is called by the Constraint system.
+   *
+   * Supports:
+   *  - C style functions
+   *  - Static member methods of an object
+   *  - Member functions of a particular class
+   *  - Functors of a particular class
+   *  - If a functor or method is provided, then a copy of the object is made.
+   *
+   * The expected signature of the callback should be:
+   * @code
+   *   void Function( P&, const PropertyInputContainer& );
+   * @endcode
+   *
+   * The P& parameter is an in,out parameter which stores the current value of the property. The callback
+   * should change this value to the desired one. The PropertyInputContainer is a const reference to the property inputs
+   * added to the Constraint in the order they were added via AddSource().
+   *
+   * @tparam  P  The property type to constrain.
+   */
+  template< typename P >
+  class Function : public CallbackBase
+  {
+  public:
+
+    /**
+     * @brief Constructor which connects to the provided C function (or a static member function).
+     *
+     * The expected signature of the function is:
+     * @code
+     *   void MyFunction( P&, const PropertyInputContainer& );
+     * @endcode
+     *
+     * @param[in]  function  The function to call.
+     */
+    Function( void( *function )( P&, const PropertyInputContainer& ) )
+    : CallbackBase( reinterpret_cast< CallbackBase::Function >( function ) ),
+      mCopyConstructorDispatcher( NULL )
+    {
+    }
+
+    /**
+     * @brief Constructor which copies a function object and connects to the functor of that object.
+     *
+     * The function object should have a functor with the following signature:
+     * @code
+     *   void operator()( P&, const PropertyInputContainer& );
+     * @endcode
+     *
+     * @param[in]  object  The object to copy.
+     *
+     * @tparam  T  The type of the object.
+     */
+    template< class T >
+    Function( const T& object )
+    : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
+                    NULL, // uses operator() instead of member function
+                    reinterpret_cast< CallbackBase::Dispatcher >( &FunctorDispatcher2< T, P&, const PropertyInputContainer& >::Dispatch ),
+                    reinterpret_cast< CallbackBase::Destructor >( &Destroyer< T >::Delete ) ),
+      mCopyConstructorDispatcher( reinterpret_cast< CopyConstructorDispatcher >( &ObjectCopyConstructorDispatcher< T >::Copy ) )
+    {
+    }
+
+    /**
+     * @brief Constructor which copies a function object and allows a connection to a member method.
+     *
+     * The object should have a method with the signature:
+     * @code
+     *   void MyObject::MyMethod( P&, const PropertyInputContainer& );
+     * @endcode
+     *
+     * @param[in]  object          The object to copy.
+     * @param[in]  memberFunction  The member function to call. This has to be a member of the same class.
+     *
+     * @tparam  T  The type of the object.
+     */
+    template< class T >
+    Function( const T& object, void ( T::*memberFunction ) ( P&, const PropertyInputContainer& ) )
+    : CallbackBase( reinterpret_cast< void* >( new T( object ) ), // copy the object
+                    reinterpret_cast< CallbackBase::MemberFunction >( memberFunction ),
+                    reinterpret_cast< CallbackBase::Dispatcher >( &Dispatcher2< T, P&, const PropertyInputContainer& >::Dispatch ),
+                    reinterpret_cast< CallbackBase::Destructor >( &Destroyer< T >::Delete ) ),
+      mCopyConstructorDispatcher( reinterpret_cast< CopyConstructorDispatcher >( &ObjectCopyConstructorDispatcher< T >::Copy ) )
+    {
+    }
+
+    /**
+     * @brief Clones the Function object.
+     *
+     * The object, if held by this object, is also copied.
+     *
+     * @return A pointer to a newly-allocation Function.
+     */
+    CallbackBase* Clone()
+    {
+      CallbackBase* callback = NULL;
+      if ( mImpl && mImpl->mObjectPointer && mCopyConstructorDispatcher )
+      {
+        callback = new Function( mCopyConstructorDispatcher( reinterpret_cast< UndefinedClass* >( mImpl->mObjectPointer ) ) /* Copy the object */,
+                                 mMemberFunction,
+                                 mImpl->mMemberFunctionDispatcher,
+                                 mImpl->mDestructorDispatcher,
+                                 mCopyConstructorDispatcher );
+      }
+      else
+      {
+        callback = new Function( mFunction );
+      }
+      return callback;
+    }
+
+  private:
+
+    /**
+     * @brief Must not be declared.
+     *
+     * This is used so that no optimisations are done by the compiler when using void*.
+     */
+    class UndefinedClass;
+
+    /**
+     * @brief Used to call the function to copy the stored object
+     */
+    typedef UndefinedClass* (*CopyConstructorDispatcher) ( UndefinedClass* object );
+
+    /**
+     * @brief Copies the actual object in Constraint::Function.
+     *
+     * @tparam  T  The type of the object.
+     */
+    template< class T >
+    struct ObjectCopyConstructorDispatcher
+    {
+      /**
+       * @brief Copy the object stored in Constraint::Function.
+       *
+       * @param[in]  object  The object to copy.
+       *
+       * @return Newly allocated clone of the object.
+       */
+      static UndefinedClass* Copy( const UndefinedClass* object )
+      {
+        T* copy = new T( *( reinterpret_cast< const T* >( object ) ) );
+        return reinterpret_cast< UndefinedClass* >( copy );
+      }
+    };
+
+    /**
+     * @brief Undefined copy constructor
+     */
+    Function( const Function& );
+
+    /**
+     * @brief Undefined assignment operator
+     */
+    Function& operator=( const Function& );
+
+    /**
+     * @brief Constructor used when copying the stored object.
+     *
+     * @param[in]  object                     A newly copied object
+     * @param[in]  memberFunction             The member function of the object.
+     * @param[in]  dispatcher                 Used to call the actual object.
+     * @param[in]  destructor                 Used to delete the owned object.
+     * @param[in]  copyConstructorDispatcher  Used to create a copy of the owned object.
+     */
+    Function( void* object,
+              CallbackBase::MemberFunction memberFunction,
+              CallbackBase::Dispatcher dispatcher,
+              CallbackBase::Destructor destructor,
+              CopyConstructorDispatcher copyConstructorDispatcher )
+    : CallbackBase( object, memberFunction, dispatcher, destructor ),
+      mCopyConstructorDispatcher( copyConstructorDispatcher )
+    {
+    }
+
+    /**
+     * @brief Constructor used when copying a simple stored function.
+     *
+     * @param[in]  function   The function to call.
+     */
+    Function( CallbackBase::Function function )
+    : CallbackBase( function ),
+      mCopyConstructorDispatcher( NULL )
+    {
+    }
+
+    // Data
+
+    CopyConstructorDispatcher mCopyConstructorDispatcher; ///< Function to call to copy the stored object
+  };
 
   /**
    * @brief The action that will happen when the constraint is removed.
    *
-   * Constraints can be applied gradually; see SetApplyTime() for more details.
-   * When a constraint is fully-applied the final value may be "baked" i.e. saved permanently.
+   * The final value may be "baked" i.e. saved permanently.
    * Alternatively the constrained value may be discarded when the constraint is removed.
    */
   enum RemoveAction
@@ -65,7 +269,6 @@ public:
     Discard ///< When the constraint is removed, the constrained value is discarded.
   };
 
-  static const AlphaFunction DEFAULT_ALPHA_FUNCTION; ///< AlphaFunctions::Linear
   static const RemoveAction  DEFAULT_REMOVE_ACTION;  ///< Bake
 
   /**
@@ -76,211 +279,103 @@ public:
   Constraint();
 
   /**
-   * @brief Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property using a function or a static class member.
    *
-   * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] func A function which returns the constrained property value.
+   * The expected signature, for a Vector3 type for example, of the function is:
+   * @code
+   *   void MyFunction( Vector3&, const PropertyInputContainer& );
+   * @endcode
+   *
+   * Create the constraint with this function as follows:
+   * @code
+   *   Constraint constraint = Constraint::New< Vector3 >( handle, CONSTRAINING_PROPERTY_INDEX, &MyFunction );
+   * @endcode
+   *
+   * @param[in]  handle       The handle to the property-owning object.
+   * @param[in]  targetIndex  The index of the property to constrain.
+   * @param[in]  function     The function to call to set the constrained property value.
    * @return The new constraint.
+   *
+   * @tparam P The type of the property to constrain.
    */
-  template <class P>
-  static Constraint New( Property::Index target,
-                         boost::function<P (const P& current)> func )
+  template< class P >
+  static Constraint New( Handle handle, Property::Index targetIndex, void( *function )( P&, const PropertyInputContainer& ) )
   {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                func );
+    CallbackBase* callback = new Constraint::Function< P >( function );
+    return New( handle, targetIndex, PropertyTypes::Get< P >(), callback );
   }
 
   /**
-   * @brief Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property using a functor object.
    *
-   * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] func A function which returns the constrained property value.
+   * The expected structure, for a Vector3 type for example, of the functor object is:
+   * @code
+   *   struct MyObject
+   *   {
+   *     void operator() ( Vector3&, const PropertyInputContainer& );
+   *   };
+   * @endcode
+   *
+   * Create the constraint with this object as follows:
+   * @code
+   *   Constraint constraint = Constraint::New< Vector3 >( handle, CONSTRAINING_PROPERTY_INDEX, MyObject() );
+   * @endcode
+   *
+   * @param[in]  handle       The handle to the property-owning object.
+   * @param[in]  targetIndex  The index of the property to constrain.
+   * @param[in]  object       The functor object whose functor is called to set the constrained property value.
    * @return The new constraint.
+   *
+   * @tparam P The type of the property to constrain.
+   * @tparam T The type of the object.
    */
-  template <class P>
-  static Constraint New( Property::Index target,
-                         ConstraintSource source1,
-                         boost::function<P (const P& current, const PropertyInput& input1)> func )
+  template< class P, class T >
+  static Constraint New( Handle handle, Property::Index targetIndex, const T& object )
   {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                func );
+    CallbackBase* function = new Constraint::Function< P >( object );
+    return New( handle, targetIndex, PropertyTypes::Get< P >(), function );
   }
 
   /**
-   * @brief Create a constraint which targets a property.
+   * @brief Create a constraint which targets a property using an object method.
    *
-   * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] func A function which returns the constrained property value.
+   * The expected structure, for a Vector3 type for example, of the object is:
+   * @code
+   *   struct MyObject
+   *   {
+   *     void MyMethod( Vector3&, const PropertyInputContainer& );
+   *   };
+   * @endcode
+   *
+   * Create the constraint with this object as follows:
+   * @code
+   *   Constraint constraint = Constraint::New< Vector3 >( handle, CONSTRAINING_PROPERTY_INDEX, MyObject(), &MyObject::MyMethod );
+   * @endcode
+   *
+   * @param[in]  handle          The handle to the property-owning object.
+   * @param[in]  targetIndex     The index of the property to constrain.
+   * @param[in]  object          The object whose member function is called to set the constrained property value.
+   * @param[in]  memberFunction  The member function to call to set the constrained property value.
    * @return The new constraint.
+   *
+   * @tparam P The type of the property to constrain.
+   * @tparam T The type of the object.
    */
-  template <class P>
-  static Constraint New( Property::Index target,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         boost::function<P (const P& current, const PropertyInput& input1, const PropertyInput& input2)> func )
+  template< class P, class T >
+  static Constraint New( Handle handle, Property::Index targetIndex, const T& object, void ( T::*memberFunction ) ( P&, const PropertyInputContainer& ) )
   {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                func );
+    CallbackBase* function = new Constraint::Function< P >( object, memberFunction );
+    return New( handle, targetIndex, PropertyTypes::Get< P >(), function );
   }
 
   /**
-   * @brief Create a constraint which targets a property.
+   * @brief Creates a clones of this constraint for another object.
    *
-   * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] func A function which returns the constrained property value.
+   * @param[in]  handle  The handle to the property-owning object this constraint is to be cloned for.
+   *
    * @return The new constraint.
    */
-  template <class P>
-  static Constraint New( Property::Index target,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         ConstraintSource source3,
-                         boost::function<P (const P& current, const PropertyInput& input1, const PropertyInput& input2, const PropertyInput& input3)> func )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                source3,
-                func );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint New( Property::Index target,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         ConstraintSource source3,
-                         ConstraintSource source4,
-                         boost::function<P (const P& current,
-                                            const PropertyInput& input1,
-                                            const PropertyInput& input2,
-                                            const PropertyInput& input3,
-                                            const PropertyInput& input4)> func )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                source3,
-                source4,
-                func );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint New( Property::Index target,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         ConstraintSource source3,
-                         ConstraintSource source4,
-                         ConstraintSource source5,
-                         boost::function<P (const P& current,
-                                            const PropertyInput& input1,
-                                            const PropertyInput& input2,
-                                            const PropertyInput& input3,
-                                            const PropertyInput& input4,
-                                            const PropertyInput& input5)> func )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                source3,
-                source4,
-                source5,
-                func );
-  }
-
-  /**
-   * @brief Create a constraint which targets a property.
-   *
-   * The templated parameter P, is the type of the property to constrain.
-   * @param [in] target The index of the property to constrain.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
-   * @param [in] source6 The source of a property; the current value will be passed as the 7th parameter of func.
-   * @param [in] func A function which returns the constrained property value.
-   * @return The new constraint.
-   */
-  template <class P>
-  static Constraint New( Property::Index target,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         ConstraintSource source3,
-                         ConstraintSource source4,
-                         ConstraintSource source5,
-                         ConstraintSource source6,
-                         boost::function<P (const P& current,
-                                            const PropertyInput& input1,
-                                            const PropertyInput& input2,
-                                            const PropertyInput& input3,
-                                            const PropertyInput& input4,
-                                            const PropertyInput& input5,
-                                            const PropertyInput& input6)> func )
-  {
-    return New( target,
-                PropertyTypes::Get<P>(),
-                source1,
-                source2,
-                source3,
-                source4,
-                source5,
-                source6,
-                func );
-  }
-
-  /**
-   * @brief Downcast an Object handle to Constraint handle.
-   *
-   * If handle points to a Constraint object the
-   * downcast produces valid handle. If not the returned handle is left uninitialized.
-   * @param[in] handle to An object
-   * @return handle to a Constraint object or an uninitialized handle
-   */
-  static Constraint DownCast( BaseHandle handle );
+  Constraint Clone( Handle handle );
 
   /**
    * @brief Destructor
@@ -292,9 +387,9 @@ public:
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
-   * @param [in] handle A reference to the copied handle
+   * @param [in]  constraint  A reference to the copied handle
    */
-  Constraint(const Constraint& handle);
+  Constraint( const Constraint& constraint );
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -302,36 +397,52 @@ public:
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
-  Constraint& operator=(const Constraint& rhs);
+  Constraint& operator=( const Constraint& rhs );
 
   /**
-   * @brief Set the time taken for the constraint to be fully applied.
+   * @brief Downcast an Object handle to Constraint handle.
    *
-   * The default is zero, meaning that the constraint is applied immediately.
-   * @param [in] timePeriod The constraint will be applied during this time period.
+   * If handle points to a Constraint object the
+   * downcast produces valid handle. If not the returned handle is left uninitialized.
+   * @param[in]  baseHandle  to An object
+   * @return handle to a Constraint object or an uninitialized handle
    */
-  void SetApplyTime( TimePeriod timePeriod );
+  static Constraint DownCast( BaseHandle baseHandle );
 
   /**
-   * @brief Retrieve the time taken for the constraint to be fully applied.
+   * @brief Adds a constraint source to the constraint
    *
-   * @return The apply time.
+   * @param[in] source The constraint source input to add
    */
-  TimePeriod GetApplyTime() const;
+  void AddSource( ConstraintSource source );
 
   /**
-   * @brief Set the alpha function for a constraint; the default is AlphaFunctions::Linear.
+   * @brief Applies this constraint.
    *
-   * @param [in] func The alpha function to use when applying/removing the constraint.
+   * @pre The constraint must be initialized
+   * @pre The target object must still be alive
+   * @pre The source inputs should not have been destroyed
    */
-  void SetAlphaFunction( AlphaFunction func );
+  void Apply();
 
   /**
-   * @brief Retrieve the alpha function of a constraint.
-   *
-   * @return The function.
+   * @brief Removes this constraint.
    */
-  AlphaFunction GetAlphaFunction();
+  void Remove();
+
+  /**
+   * @brief Retrieve the object which this constraint is targeting.
+   *
+   * @return The target object.
+   */
+  Handle GetTargetObject();
+
+  /**
+   * @brief Retrieve the property which this constraint is targeting.
+   *
+   * @return The target property.
+   */
+  Dali::Property::Index GetTargetProperty();
 
   /**
    * @brief Set whether the constraint will "bake" a value when fully-applied.
@@ -370,135 +481,20 @@ public: // Not intended for use by Application developers
    * @brief This constructor is used by Dali New() methods
    * @param [in] constraint A pointer to a newly allocated Dali resource
    */
-  explicit DALI_INTERNAL Constraint( Internal::Constraint* constraint );
+  explicit DALI_INTERNAL Constraint( Internal::ConstraintBase* constraint );
 
 private: // Not intended for use by Application developers
 
   /**
    * @brief Construct a new constraint which targets a property.
    *
-   * @param [in] target The index of the property to constrain.
-   * @param [in] targetType The type of the constrained property.
-   * @param [in] func The constraint function.
+   * @param[in]  handle       The handle to the property-owning object.
+   * @param[in]  targetIndex  The index of the property to constrain.
+   * @param[in]  targetType   Type The type of the constrained property.
+   * @param[in]  function     The constraint function.
    * @return The new constraint.
    */
-  static Constraint New( Property::Index target,
-                         Property::Type targetType,
-                         AnyFunction func );
-
-  /**
-   * @brief Construct a new constraint which targets a property.
-   *
-   * @param [in] target The index of the property to constrain.
-   * @param [in] targetType The type of the constrained property.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] func The constraint function.
-   * @return The new constraint.
-   */
-  static Constraint New( Property::Index target,
-                         Property::Type targetType,
-                         ConstraintSource source1,
-                         AnyFunction func );
-
-  /**
-   * @brief Construct a new constraint which targets a property.
-   *
-   * @param [in] target The index of the property to constrain.
-   * @param [in] targetType The type of the constrained property.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] func The constraint function.
-   * @return The new constraint.
-   */
-  static Constraint New( Property::Index target,
-                         Property::Type targetType,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         AnyFunction func );
-
-  /**
-   * @brief Construct a new constraint which targets a property.
-   *
-   * @param [in] target The index of the property to constrain.
-   * @param [in] targetType The type of the constrained property.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] func The constraint function.
-   * @return The new constraint.
-   */
-  static Constraint New( Property::Index target,
-                         Property::Type targetType,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         ConstraintSource source3,
-                         AnyFunction func );
-
-  /**
-   * @brief Construct a new constraint which targets a property.
-   *
-   * @param [in] target The index of the property to constrain.
-   * @param [in] targetType The type of the constrained property.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] func The constraint function.
-   * @return The new constraint.
-   */
-  static Constraint New( Property::Index target,
-                         Property::Type targetType,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         ConstraintSource source3,
-                         ConstraintSource source4,
-                         AnyFunction func );
-
-  /**
-   * @brief Construct a new constraint which targets a property.
-   *
-   * @param [in] target The index of the property to constrain.
-   * @param [in] targetType The type of the constrained property.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
-   * @param [in] func The constraint function.
-   * @return The new constraint.
-   */
-  static Constraint New( Property::Index target,
-                         Property::Type targetType,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         ConstraintSource source3,
-                         ConstraintSource source4,
-                         ConstraintSource source5,
-                         AnyFunction func );
-
-  /**
-   * @brief Construct a new constraint which targets a property.
-   *
-   * @param [in] target The index of the property to constrain.
-   * @param [in] targetType The type of the constrained property.
-   * @param [in] source1 The source of a property; the current value will be passed as the 2nd parameter of func.
-   * @param [in] source2 The source of a property; the current value will be passed as the 3rd parameter of func.
-   * @param [in] source3 The source of a property; the current value will be passed as the 4th parameter of func.
-   * @param [in] source4 The source of a property; the current value will be passed as the 5th parameter of func.
-   * @param [in] source5 The source of a property; the current value will be passed as the 6th parameter of func.
-   * @param [in] source6 The source of a property; the current value will be passed as the 7th parameter of func.
-   * @param [in] func The constraint function.
-   * @return The new constraint.
-   */
-  static Constraint New( Property::Index target,
-                         Property::Type targetType,
-                         ConstraintSource source1,
-                         ConstraintSource source2,
-                         ConstraintSource source3,
-                         ConstraintSource source4,
-                         ConstraintSource source5,
-                         ConstraintSource source6,
-                         AnyFunction func );
+  static Constraint New( Handle handle, Property::Index targetIndex, Property::Type targetType, CallbackBase* function );
 };
 
 } // namespace Dali

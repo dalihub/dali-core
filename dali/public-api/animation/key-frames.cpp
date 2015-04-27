@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
 #include <dali/public-api/animation/key-frames.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/internal/event/animation/key-frames-impl.h>
@@ -64,7 +64,7 @@ Property::Type KeyFrames::GetType() const
 
 void KeyFrames::Add(float time, Property::Value value)
 {
-  Add(time, value, AlphaFunctions::Linear);
+  Add(time, value, AlphaFunction::DEFAULT);
 }
 
 void KeyFrames::Add(float time, Property::Value value, AlphaFunction alpha)

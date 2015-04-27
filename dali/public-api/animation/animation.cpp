@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,12 +19,8 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/degree.h>
-#include <dali/public-api/math/radian.h>
-#include <dali/public-api/math/vector2.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
@@ -253,141 +249,6 @@ void Animation::Animate( Actor actor, Path path, const Vector3& forward, AlphaFu
   GetImplementation(*this).Animate(GetImplementation(actor), GetImplementation( path ), forward, alpha, period );
 }
 
-void Animation::MoveBy(Actor actor, float x, float y, float z)
-{
-  GetImplementation(*this).MoveBy(GetImplementation(actor), x, y, z);
-}
-
-void Animation::MoveBy(Actor actor, Vector3 displacement, AlphaFunction alpha)
-{
-  GetImplementation(*this).MoveBy(GetImplementation(actor), displacement, alpha);
-}
-
-void Animation::MoveBy(Actor actor, Vector3 displacement, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).MoveBy(GetImplementation(actor), displacement, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::MoveTo(Actor actor, float x, float y, float z)
-{
-  GetImplementation(*this).MoveTo(GetImplementation(actor), x, y, z);
-}
-
-void Animation::MoveTo(Actor actor, Vector3 position, AlphaFunction alpha)
-{
-  GetImplementation(*this).MoveTo(GetImplementation(actor), position, alpha);
-}
-
-void Animation::MoveTo(Actor actor, Vector3 position, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).MoveTo(GetImplementation(actor), position, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::RotateBy(Actor actor, Degree angle, Vector3 axis)
-{
-  GetImplementation(*this).RotateBy(GetImplementation(actor), Radian(angle), axis);
-}
-
-void Animation::RotateBy(Actor actor, Radian angle, Vector3 axis)
-{
-  GetImplementation(*this).RotateBy(GetImplementation(actor), angle, axis);
-}
-
-void Animation::RotateBy(Actor actor, Degree angle, Vector3 axis, AlphaFunction alpha)
-{
-  GetImplementation(*this).RotateBy(GetImplementation(actor), Radian(angle), axis, alpha);
-}
-
-void Animation::RotateBy(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha)
-{
-  GetImplementation(*this).RotateBy(GetImplementation(actor), angle, axis, alpha);
-}
-
-void Animation::RotateBy(Actor actor, Degree angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).RotateBy(GetImplementation(actor), Radian(angle), axis, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::RotateBy(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).RotateBy(GetImplementation(actor), angle, axis, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::RotateTo(Actor actor, Degree angle, Vector3 axis)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), Radian(angle), axis);
-}
-
-void Animation::RotateTo(Actor actor, Radian angle, Vector3 axis)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), angle, axis);
-}
-
-void Animation::RotateTo(Actor actor, Quaternion rotation)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), rotation);
-}
-
-void Animation::RotateTo(Actor actor, Degree angle, Vector3 axis, AlphaFunction alpha)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), Radian(angle), axis, alpha);
-}
-
-void Animation::RotateTo(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), angle, axis, alpha);
-}
-
-void Animation::RotateTo(Actor actor, Quaternion rotation, AlphaFunction alpha)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), rotation, alpha);
-}
-
-void Animation::RotateTo(Actor actor, Degree angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), Radian(angle), axis, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::RotateTo(Actor actor, Radian angle, Vector3 axis, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), angle, axis, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::RotateTo(Actor actor, Quaternion rotation, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).RotateTo(GetImplementation(actor), rotation, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::ScaleBy(Actor actor, float x, float y, float z)
-{
-  GetImplementation(*this).ScaleBy(GetImplementation(actor), x, y, z);
-}
-
-void Animation::ScaleBy(Actor actor, Vector3 scale, AlphaFunction alpha)
-{
-  GetImplementation(*this).ScaleBy(GetImplementation(actor), scale, alpha);
-}
-
-void Animation::ScaleBy(Actor actor, Vector3 scale, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).ScaleBy(GetImplementation(actor), scale, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::ScaleTo(Actor actor, float x, float y, float z)
-{
-  GetImplementation(*this).ScaleTo(GetImplementation(actor), x, y, z);
-}
-
-void Animation::ScaleTo(Actor actor, Vector3 scale, AlphaFunction alpha)
-{
-  GetImplementation(*this).ScaleTo(GetImplementation(actor), scale, alpha);
-}
-
-void Animation::ScaleTo(Actor actor, Vector3 scale, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).ScaleTo(GetImplementation(actor), scale, alpha, delaySeconds, durationSeconds);
-}
-
 void Animation::Show(Actor actor, float delaySeconds)
 {
   GetImplementation(*this).Show(GetImplementation(actor), delaySeconds);
@@ -396,96 +257,6 @@ void Animation::Show(Actor actor, float delaySeconds)
 void Animation::Hide(Actor actor, float delaySeconds)
 {
   GetImplementation(*this).Hide(GetImplementation(actor), delaySeconds);
-}
-
-void Animation::OpacityBy(Actor actor, float opacity)
-{
-  GetImplementation(*this).OpacityBy(GetImplementation(actor), opacity);
-}
-
-void Animation::OpacityBy(Actor actor, float opacity, AlphaFunction alpha)
-{
-  GetImplementation(*this).OpacityBy(GetImplementation(actor), opacity, alpha);
-}
-
-void Animation::OpacityBy(Actor actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).OpacityBy(GetImplementation(actor), opacity, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::OpacityTo(Actor actor, float opacity)
-{
-  GetImplementation(*this).OpacityTo(GetImplementation(actor), opacity);
-}
-
-void Animation::OpacityTo(Actor actor, float opacity, AlphaFunction alpha)
-{
-  GetImplementation(*this).OpacityTo(GetImplementation(actor), opacity, alpha);
-}
-
-void Animation::OpacityTo(Actor actor, float opacity, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).OpacityTo(GetImplementation(actor), opacity, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::ColorBy(Actor actor, Vector4 color)
-{
-  GetImplementation(*this).ColorBy(GetImplementation(actor), color);
-}
-
-void Animation::ColorBy(Actor actor, Vector4 color, AlphaFunction alpha)
-{
-  GetImplementation(*this).ColorBy(GetImplementation(actor), color, alpha);
-}
-
-void Animation::ColorBy(Actor actor, Vector4 color, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).ColorBy(GetImplementation(actor), color, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::ColorTo(Actor actor, Vector4 color)
-{
-  GetImplementation(*this).ColorTo(GetImplementation(actor), color);
-}
-
-void Animation::ColorTo(Actor actor, Vector4 color, AlphaFunction alpha)
-{
-  GetImplementation(*this).ColorTo(GetImplementation(actor), color, alpha);
-}
-
-void Animation::ColorTo(Actor actor, Vector4 color, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).ColorTo(GetImplementation(actor), color, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::Resize(Actor actor, float width, float height)
-{
-  GetImplementation(*this).Resize(GetImplementation(actor), width, height);
-}
-
-void Animation::Resize(Actor actor, float width, float height, AlphaFunction alpha)
-{
-  GetImplementation(*this).Resize(GetImplementation(actor), width, height, alpha);
-}
-
-void Animation::Resize(Actor actor,float width, float height, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).Resize(GetImplementation(actor), width, height, alpha, delaySeconds, durationSeconds);
-}
-
-void Animation::Resize(Actor actor, Vector3 size)
-{
-  GetImplementation(*this).Resize(GetImplementation(actor), size);
-}
-
-void Animation::Resize(Actor actor, Vector3 size, AlphaFunction alpha)
-{
-  GetImplementation(*this).Resize(GetImplementation(actor), size, alpha);
-}
-
-void Animation::Resize(Actor actor, Vector3 size, AlphaFunction alpha, float delaySeconds, float durationSeconds)
-{
-  GetImplementation(*this).Resize(GetImplementation(actor), size, alpha, delaySeconds, durationSeconds);
 }
 
 void Animation::SetCurrentProgress( float progress )

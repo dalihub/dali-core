@@ -2,7 +2,7 @@
 #define __DALI_SCRIPTING_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -225,7 +225,9 @@ DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
  * "width"           type float
  * "height"          type float
  * "pixel-format"    type std::string (enum)
- * "scaling-mode"    type std::string (enum)
+ * "fitting-mode"    type std::string (enum)
+ * "sampling-mode"   type std::string (enum)
+ * "orientation"     type bool
  * "type"            type std::string (FrameBufferImage|BufferImage|ResourceImage(default))
  * @endcode
  * Some fields are optional and some only pertain to a specific type.

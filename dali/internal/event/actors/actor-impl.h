@@ -88,7 +88,7 @@ public:
      * @param[in] newActor The actor to assign
      * @param[in] newDimension The dimension to assign
      */
-    ActorDimensionPair( Actor* newActor, Dimension newDimension )
+    ActorDimensionPair( Actor* newActor, Dimension::Type newDimension )
     : actor( newActor ),
       dimension( newDimension )
     {
@@ -106,7 +106,7 @@ public:
     }
 
     Actor* actor;           ///< The actor to hold
-    Dimension dimension;    ///< The dimension to hold
+    Dimension::Type dimension;    ///< The dimension to hold
   };
 
   typedef std::vector< ActorDimensionPair > ActorDimensionStack;
@@ -304,12 +304,26 @@ public:
   void SetSize( const Vector2& size );
 
   /**
+   * Sets the update size for an actor.
+   *
+   * @param[in] size The size to set.
+   */
+  void SetSizeInternal( const Vector2& size );
+
+  /**
    * Sets the size of an actor.
    * ActorAttachments attached to the actor, can be scaled to fit within this area.
    * This does not interfere with the actors scale factor.
    * @param [in] size The new size.
    */
   void SetSize( const Vector3& size );
+
+  /**
+   * Sets the update size for an actor.
+   *
+   * @param[in] size The size to set.
+   */
+  void SetSizeInternal( const Vector3& size );
 
   /**
    * Set the width component of the Actor's size.
@@ -475,6 +489,13 @@ public:
   const Vector3& GetCurrentPosition() const;
 
   /**
+   * Retrieve the target position of the Actor.
+   * The coordinates are relative to the Actor's parent.
+   * @return the Actor's position.
+   */
+  const Vector3& GetTargetPosition() const;
+
+  /**
    * @copydoc Dali::Actor::GetCurrentWorldPosition()
    */
   const Vector3& GetCurrentWorldPosition() const;
@@ -535,27 +556,15 @@ public:
   bool IsOrientationInherited() const;
 
   /**
-   * @brief Defines how a child actors size is affected by its parents size.
-   * @param[in] mode The size relative to parent mode to use.
-   */
-  void SetSizeMode( SizeMode mode );
-
-  /**
-   * Query how the child actors size is affected by its parents size.
-   * @return The size relative to parent mode in use.
-   */
-  SizeMode GetSizeMode() const;
-
-  /**
    * Sets the factor of the parents size used for the child actor.
-   * Note: Only used if SizeMode is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
+   * Note: Only used if ResizePolicy is ResizePolicy::SIZE_RELATIVE_TO_PARENT or ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT.
    * @param[in] factor The vector to multiply the parents size by to get the childs size.
    */
   void SetSizeModeFactor( const Vector3& factor );
 
   /**
    * Gets the factor of the parents size used for the child actor.
-   * Note: Only used if SizeMode is SIZE_RELATIVE_TO_PARENT or SIZE_FIXED_OFFSET_FROM_PARENT.
+   * Note: Only used if ResizePolicy is ResizePolicy::SIZE_RELATIVE_TO_PARENT or ResizePolicy::SIZE_FIXED_OFFSET_FROM_PARENT.
    * @return The vector being used to multiply the parents size by to get the childs size.
    */
   const Vector3& GetSizeModeFactor() const;
@@ -795,7 +804,7 @@ public:
    * @param[in] policy The policy being set
    * @param[in] dimension The dimension the policy is being set for
    */
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension ) {}
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) {}
 
   /**
    * @brief Virtual method to notify deriving classes that relayout dependencies have been
@@ -803,7 +812,7 @@ public:
    *
    * @param dimension The dimension that is about to be calculated
    */
-  virtual void OnCalculateRelayoutSize( Dimension dimension );
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension );
 
   /**
    * @brief Virtual method to notify deriving classes that the size for a dimension
@@ -812,7 +821,7 @@ public:
    * @param[in] size The new size for the given dimension
    * @param[in] dimension The dimension that was just negotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension dimension );
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension );
 
   /**
    * @brief Determine if this actor is dependent on it's children for relayout
@@ -820,7 +829,7 @@ public:
    * @param dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children
    */
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS );
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @brief Determine if this actor is dependent on it's children for relayout.
@@ -830,7 +839,7 @@ public:
    * @param dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children
    */
-  virtual bool RelayoutDependentOnChildrenBase( Dimension dimension = ALL_DIMENSIONS );
+  virtual bool RelayoutDependentOnChildrenBase( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @brief Calculate the size for a child
@@ -839,7 +848,7 @@ public:
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
    * @return Return the calculated size for the given dimension
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension );
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension );
 
   /**
    * @brief This method is called during size negotiation when a height is required for a given width.
@@ -882,40 +891,44 @@ public:
   /**
    * @copydoc Dali::Actor::SetResizePolicy()
    */
-  void SetResizePolicy( ResizePolicy policy, Dimension dimension = ALL_DIMENSIONS );
+  void SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @copydoc Dali::Actor::GetResizePolicy()
    */
-  ResizePolicy GetResizePolicy( Dimension dimension ) const;
+  ResizePolicy::Type GetResizePolicy( Dimension::Type dimension ) const;
 
   /**
    * @copydoc Dali::Actor::SetSizeScalePolicy()
    */
-  void SetSizeScalePolicy( SizeScalePolicy policy );
+  void SetSizeScalePolicy( SizeScalePolicy::Type policy );
 
   /**
    * @copydoc Dali::Actor::GetSizeScalePolicy()
    */
-  SizeScalePolicy GetSizeScalePolicy() const;
+  SizeScalePolicy::Type GetSizeScalePolicy() const;
 
   /**
    * @copydoc Dali::Actor::SetDimensionDependency()
    */
-  void SetDimensionDependency( Dimension dimension, Dimension dependency );
+  void SetDimensionDependency( Dimension::Type dimension, Dimension::Type dependency );
 
   /**
    * @copydoc Dali::Actor::GetDimensionDependency()
    */
-  Dimension GetDimensionDependency( Dimension dimension ) const;
+  Dimension::Type GetDimensionDependency( Dimension::Type dimension ) const;
 
   /**
-   * @copydoc Dali::Actor::SetRelayoutEnabled()
+   * @brief Set the size negotiation relayout enabled on this actor
+   *
+   * @param[in] relayoutEnabled Boolean to enable or disable relayout
    */
   void SetRelayoutEnabled( bool relayoutEnabled );
 
   /**
-   * @copydoc Dali::Actor::IsRelayoutEnabled()
+   * @brief Return if relayout is enabled
+   *
+   * @return Return if relayout is enabled or not for this actor
    */
   bool IsRelayoutEnabled() const;
 
@@ -925,7 +938,7 @@ public:
    * @param dirty Whether to mark actor as dirty or not
    * @param dimension The dimension(s) to mark as dirty
    */
-  void SetLayoutDirty( bool dirty, Dimension dimension = ALL_DIMENSIONS );
+  void SetLayoutDirty( bool dirty, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @brief Return if any of an actor's dimensions are marked as dirty
@@ -933,21 +946,21 @@ public:
    * @param dimension The dimension(s) to check
    * @return Return if any of the requested dimensions are dirty
    */
-  bool IsLayoutDirty( Dimension dimension = ALL_DIMENSIONS ) const;
+  bool IsLayoutDirty( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) const;
 
   /**
    * @brief Returns if relayout is enabled and the actor is not dirty
    *
    * @return Return if it is possible to relayout the actor
    */
-  bool RelayoutPossible( Dimension dimension = ALL_DIMENSIONS ) const;
+  bool RelayoutPossible( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) const;
 
   /**
    * @brief Returns if relayout is enabled and the actor is dirty
    *
    * @return Return if it is required to relayout the actor
    */
-  bool RelayoutRequired( Dimension dimension = ALL_DIMENSIONS ) const;
+  bool RelayoutRequired( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) const;
 
   /**
    * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
@@ -962,16 +975,7 @@ public:
    * @note RelayoutRequest() can be called multiple times; the size negotiation is still
    * only performed once, i.e. there is no need to keep track of this in the calling side.
    */
-  void RelayoutRequest( Dimension dimension = ALL_DIMENSIONS );
-
-  /**
-   * @brief Request to relayout of all actors in the sub-tree below the given actor.
-   *
-   * This flags the actor and all actors below it for relayout. The actual
-   * relayout is performed at the end of the frame. This means that multiple calls to relayout
-   * will not cause multiple relayouts to occur.
-   */
-  void RelayoutRequestTree();
+  void RelayoutRequest( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /*
    * @copydoc Dali::Actor::PropagateRelayoutFlags
@@ -984,7 +988,7 @@ public:
    * @param dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's parent
    */
-  bool RelayoutDependentOnParent( Dimension dimension = ALL_DIMENSIONS );
+  bool RelayoutDependentOnParent( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @brief Determine if this actor has another dimension depedent on the specified one
@@ -993,7 +997,7 @@ public:
    * @param dependentDimension The dimension to check for dependency with
    * @return Return if the actor is dependent on this dimension
    */
-  bool RelayoutDependentOnDimension( Dimension dimension, Dimension dependentDimension );
+  bool RelayoutDependentOnDimension( Dimension::Type dimension, Dimension::Type dependentDimension );
 
   /**
    * Negotiate sizes for a control in all dimensions
@@ -1015,7 +1019,7 @@ public:
    * @param[in] dimension The dimension to negotiate on
    * @param[in] allocatedSize The size constraint that the actor must respect
    */
-  void NegotiateDimension( Dimension dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack );
+  void NegotiateDimension( Dimension::Type dimension, const Vector2& allocatedSize, ActorDimensionStack& recursionStack );
 
   /**
    * @brief Calculate the size of a dimension
@@ -1024,16 +1028,16 @@ public:
    * @param[in] maximumSize The upper bounds on the size
    * @return Return the calculated size for the dimension
    */
-  float CalculateSize( Dimension dimension, const Vector2& maximumSize );
+  float CalculateSize( Dimension::Type dimension, const Vector2& maximumSize );
 
   /**
-   * @brief Constain a dimension given the relayout constraints on this actor
+   * @brief Clamp a dimension given the relayout constraints on this actor
    *
    * @param[in] size The size to constrain
    * @param[in] dimension The dimension the size exists in
-   * @return Return the constrained size
+   * @return Return the clamped size
    */
-  float ConstrainDimension( float size, Dimension dimension );
+  float ClampDimension( float size, Dimension::Type dimension );
 
   /**
    * Negotiate a dimension based on the size of the parent
@@ -1041,7 +1045,7 @@ public:
    * @param[in] dimension The dimension to negotiate on
    * @return Return the negotiated size
    */
-  float NegotiateFromParent( Dimension dimension );
+  float NegotiateFromParent( Dimension::Type dimension );
 
   /**
    * Negotiate a dimension based on the size of the parent. Fitting inside.
@@ -1049,7 +1053,7 @@ public:
    * @param[in] dimension The dimension to negotiate on
    * @return Return the negotiated size
    */
-  float NegotiateFromParentFit( Dimension dimension );
+  float NegotiateFromParentFit( Dimension::Type dimension );
 
   /**
    * Negotiate a dimension based on the size of the parent. Flooding the whole space.
@@ -1057,7 +1061,7 @@ public:
    * @param[in] dimension The dimension to negotiate on
    * @return Return the negotiated size
    */
-  float NegotiateFromParentFlood( Dimension dimension );
+  float NegotiateFromParentFlood( Dimension::Type dimension );
 
   /**
    * @brief Negotiate a dimension based on the size of the children
@@ -1065,7 +1069,7 @@ public:
    * @param[in] dimension The dimension to negotiate on
    * @return Return the negotiated size
    */
-  float NegotiateFromChildren( Dimension dimension );
+  float NegotiateFromChildren( Dimension::Type dimension );
 
   /**
    * Set the negotiated dimension value for the given dimension(s)
@@ -1073,7 +1077,7 @@ public:
    * @param negotiatedDimension The value to set
    * @param dimension The dimension(s) to set the value for
    */
-  void SetNegotiatedDimension( float negotiatedDimension, Dimension dimension = ALL_DIMENSIONS );
+  void SetNegotiatedDimension( float negotiatedDimension, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * Return the value of negotiated dimension for the given dimension
@@ -1081,7 +1085,7 @@ public:
    * @param dimension The dimension to retrieve
    * @return Return the value of the negotiated dimension
    */
-  float GetNegotiatedDimension( Dimension dimension ) const;
+  float GetNegotiatedDimension( Dimension::Type dimension ) const;
 
   /**
    * @brief Set the padding for a dimension
@@ -1089,7 +1093,7 @@ public:
    * @param[in] padding Padding for the dimension. X = start (e.g. left, bottom), y = end (e.g. right, top)
    * @param[in] dimension The dimension to set
    */
-  void SetPadding( const Vector2& padding, Dimension dimension );
+  void SetPadding( const Vector2& padding, Dimension::Type dimension );
 
   /**
    * Return the value of padding for the given dimension
@@ -1097,7 +1101,7 @@ public:
    * @param dimension The dimension to retrieve
    * @return Return the value of padding for the dimension
    */
-  Vector2 GetPadding( Dimension dimension ) const;
+  Vector2 GetPadding( Dimension::Type dimension ) const;
 
   /**
    * Return the actor size for a given dimension
@@ -1105,7 +1109,7 @@ public:
    * @param[in] dimension The dimension to retrieve the size for
    * @return Return the size for the given dimension
    */
-  float GetSize( Dimension dimension ) const;
+  float GetSize( Dimension::Type dimension ) const;
 
   /**
    * Return the natural size of the actor for a given dimension
@@ -1113,7 +1117,7 @@ public:
    * @param[in] dimension The dimension to retrieve the size for
    * @return Return the natural size for the given dimension
    */
-  float GetNaturalSize( Dimension dimension ) const;
+  float GetNaturalSize( Dimension::Type dimension ) const;
 
   /**
    * @brief Return the amount of size allocated for relayout
@@ -1123,7 +1127,7 @@ public:
    * @param[in] dimension The dimension to retrieve
    * @return Return the size
    */
-  float GetRelayoutSize( Dimension dimension ) const;
+  float GetRelayoutSize( Dimension::Type dimension ) const;
 
   /**
    * @brief If the size has been negotiated return that else return normal size
@@ -1131,7 +1135,7 @@ public:
    * @param[in] dimension The dimension to retrieve
    * @return Return the size
    */
-  float GetLatestSize( Dimension dimension ) const;
+  float GetLatestSize( Dimension::Type dimension ) const;
 
   /**
    * Apply the negotiated size to the actor
@@ -1146,7 +1150,7 @@ public:
    * @param[in] negotiated The status of the flag to set.
    * @param[in] dimension The dimension to set the flag for
    */
-  void SetLayoutNegotiated( bool negotiated, Dimension dimension = ALL_DIMENSIONS );
+  void SetLayoutNegotiated( bool negotiated, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @brief Test whether the layout dimension for this actor has been negotiated or not.
@@ -1154,7 +1158,7 @@ public:
    * @param[in] dimension The dimension to determine the value of the flag for
    * @return Return if the layout dimension is negotiated or not.
    */
-  bool IsLayoutNegotiated( Dimension dimension = ALL_DIMENSIONS ) const;
+  bool IsLayoutNegotiated( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) const;
 
   /**
    * @brief Calculate the size for a child
@@ -1163,37 +1167,42 @@ public:
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
    * @return Return the calculated size for the given dimension
    */
-  float CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension );
+  float CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension );
 
   /**
-   * @copydoc Dali::Actor::SetPreferredSize
+   * @brief Set the preferred size for size negotiation
+   *
+   * @param[in] size The preferred size to set
    */
   void SetPreferredSize( const Vector2& size );
 
   /**
-   * @copydoc Dali::Actor::GetPreferredSize
+   * @brief Return the preferred size used for size negotiation
+   *
+   * @return Return the preferred size
    */
   Vector2 GetPreferredSize() const;
 
   /**
    * @copydoc Dali::Actor::SetMinimumSize
    */
-  void SetMinimumSize( float size, Dimension dimension = ALL_DIMENSIONS );
+  void SetMinimumSize( float size, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @copydoc Dali::Actor::GetMinimumSize
    */
-  float GetMinimumSize( Dimension dimension ) const;
+  float GetMinimumSize( Dimension::Type dimension ) const;
 
   /**
    * @copydoc Dali::Actor::SetMaximumSize
    */
-  void SetMaximumSize( float size, Dimension dimension = ALL_DIMENSIONS );
+  void SetMaximumSize( float size, Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
   /**
    * @copydoc Dali::Actor::GetMaximumSize
    */
-  float GetMaximumSize( Dimension dimension ) const;
+  float GetMaximumSize( Dimension::Type dimension ) const;
+  
   /**
    * @copydoc Dali::Actor::AddRenderer()
    */
@@ -1874,7 +1883,8 @@ protected:
   Dali::Actor::OffStageSignalType          mOffStageSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
 
-  Vector3         mTargetSize;      ///< Event-side storage for size (not a pointer as most actors will have a size)
+  Vector3         mTargetSize;       ///< Event-side storage for size (not a pointer as most actors will have a size)
+  Vector3         mTargetPosition;   ///< Event-side storage for position (not a pointer as most actors will have a position)
 
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved

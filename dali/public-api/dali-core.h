@@ -2,7 +2,7 @@
 #define __DALI_CORE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -29,14 +29,10 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/actors/renderer.h>
-#include <dali/public-api/actors/text-actor.h>
 #include <dali/public-api/actors/sampling.h>
 
-#include <dali/public-api/animation/active-constraint-declarations.h>
-#include <dali/public-api/animation/active-constraint.h>
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/animation.h>
-#include <dali/public-api/animation/constraint-functions.h>
 #include <dali/public-api/animation/constraint-source.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
@@ -88,9 +84,8 @@
 #include <dali/public-api/images/distance-field.h>
 #include <dali/public-api/images/encoded-buffer-image.h>
 #include <dali/public-api/images/frame-buffer-image.h>
-#include <dali/public-api/images/glyph-image.h>
-#include <dali/public-api/images/image-attributes.h>
 #include <dali/public-api/images/image.h>
+#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/images/resource-image.h>
@@ -105,6 +100,7 @@
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/random.h>
 #include <dali/public-api/math/rect.h>
+#include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
@@ -149,13 +145,6 @@
 
 
 #include <dali/public-api/size-negotiation/relayout-container.h>
-
-#include <dali/public-api/text/font-parameters.h>
-#include <dali/public-api/text/font.h>
-#include <dali/public-api/text/text-actor-parameters.h>
-#include <dali/public-api/text/text-style.h>
-#include <dali/public-api/text/text.h>
-#include <dali/public-api/text/utf8.h>
 
 #include <dali/public-api/dali-core-version.h>
 

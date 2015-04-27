@@ -67,9 +67,9 @@ void PrintChildren( Dali::Actor actor, int level )
 
   output << " - Pos: " << actor.GetCurrentPosition() << " Size: " << actor.GetTargetSize();
 
-  output << ", Dirty: (" << ( GetImplementation( actor ).IsLayoutDirty( WIDTH ) ? "TRUE" : "FALSE" ) << "," << ( GetImplementation( actor ).IsLayoutDirty( HEIGHT ) ? "TRUE" : "FALSE" ) << ")";
-  output << ", Negotiated: (" << ( GetImplementation( actor ).IsLayoutNegotiated( WIDTH ) ? "TRUE" : "FALSE" ) << "," << ( GetImplementation( actor ).IsLayoutNegotiated( HEIGHT ) ? "TRUE" : "FALSE" ) << ")";
-  output << ", Enabled: " << ( actor.IsRelayoutEnabled() ? "TRUE" : "FALSE" );
+  output << ", Dirty: (" << ( GetImplementation( actor ).IsLayoutDirty( Dimension::WIDTH ) ? "TRUE" : "FALSE" ) << "," << ( GetImplementation( actor ).IsLayoutDirty( Dimension::HEIGHT ) ? "TRUE" : "FALSE" ) << ")";
+  output << ", Negotiated: (" << ( GetImplementation( actor ).IsLayoutNegotiated( Dimension::WIDTH ) ? "TRUE" : "FALSE" ) << "," << ( GetImplementation( actor ).IsLayoutNegotiated( Dimension::HEIGHT ) ? "TRUE" : "FALSE" ) << ")";
+  output << ", Enabled: " << ( GetImplementation( actor ).IsRelayoutEnabled() ? "TRUE" : "FALSE" );
 
   output << ", (" << actor.GetObjectPtr() << ")" << std::endl;
 
@@ -117,7 +117,8 @@ RelayoutController::RelayoutController()
   mRelayoutStack( new MemoryPoolRelayoutContainer( mRelayoutInfoAllocator ) ),
   mRelayoutConnection( false ),
   mRelayoutFlag( false ),
-  mEnabled( false )
+  mEnabled( false ),
+  mPerformingRelayout( false )
 {
   // Make space for 32 controls to avoid having to copy construct a lot in the beginning
   mRelayoutStack->Reserve( 32 );
@@ -136,7 +137,7 @@ void RelayoutController::QueueActor( Dali::Actor& actor, RelayoutContainer& acto
   }
 }
 
-void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension dimension )
+void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension::Type dimension )
 {
   if( !mEnabled )
   {
@@ -149,12 +150,12 @@ void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension dimensio
   topOfSubTreeStack.push_back( actor );
 
   // Propagate on all dimensions
-  for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
     {
       // Do the propagation
-      PropagateAll( actor, static_cast< Dimension >( 1 << i ), topOfSubTreeStack, potentialRedundantSubRoots );
+      PropagateAll( actor, static_cast< Dimension::Type >( 1 << i ), topOfSubTreeStack, potentialRedundantSubRoots );
     }
   }
 
@@ -212,7 +213,7 @@ void RelayoutController::RequestRelayoutTree( Dali::Actor& actor )
   {
     // If parent is not in relayout we are at the top of a new sub-tree
     Dali::Actor parent = actor.GetParent();
-    if( !parent || !parent.IsRelayoutEnabled() )
+    if( !parent || !GetImplementation( parent ).IsRelayoutEnabled() )
     {
       AddRequest( actor );
     }
@@ -231,7 +232,7 @@ void RelayoutController::RequestRelayoutTree( Dali::Actor& actor )
   }
 }
 
-void RelayoutController::PropagateAll( Dali::Actor& actor, Dimension dimension, Dali::ActorContainer& topOfSubTreeStack, Dali::ActorContainer& potentialRedundantSubRoots )
+void RelayoutController::PropagateAll( Dali::Actor& actor, Dimension::Type dimension, Dali::ActorContainer& topOfSubTreeStack, Dali::ActorContainer& potentialRedundantSubRoots )
 {
   // Only set dirty flag if doing relayout and not already marked as dirty
   Actor& actorImpl = GetImplementation( actor );
@@ -243,9 +244,9 @@ void RelayoutController::PropagateAll( Dali::Actor& actor, Dimension dimension, 
 
     // Check for dimension dependecy: width for height/height for width etc
     // Check each possible dimension and see if it is dependent on the input one
-    for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      Dimension dimensionToCheck = static_cast< Dimension >( 1 << i );
+      Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
 
       if( actorImpl.RelayoutDependentOnDimension( dimension, dimensionToCheck ) &&
           !actorImpl.IsLayoutDirty( dimensionToCheck ) )
@@ -305,7 +306,7 @@ void RelayoutController::PropagateAll( Dali::Actor& actor, Dimension dimension, 
 }
 
 
-void RelayoutController::PropagateFlags( Dali::Actor& actor, Dimension dimension )
+void RelayoutController::PropagateFlags( Dali::Actor& actor, Dimension::Type dimension )
 {
   // Only set dirty flag if doing relayout and not already marked as dirty
   Actor& actorImpl = GetImplementation( actor );
@@ -317,9 +318,9 @@ void RelayoutController::PropagateFlags( Dali::Actor& actor, Dimension dimension
 
     // Check for dimension dependecy: width for height/height for width etc
     // Check each possible dimension and see if it is dependent on the input one
-    for( unsigned int i = 0; i < DIMENSION_COUNT; ++i )
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      Dimension dimensionToCheck = static_cast< Dimension >( 1 << i );
+      Dimension::Type dimensionToCheck = static_cast< Dimension::Type >( 1 << i );
 
       if( actorImpl.RelayoutDependentOnDimension( dimension, dimensionToCheck ) )
       {
@@ -413,6 +414,8 @@ void RelayoutController::Relayout()
   // Only do something when requested
   if( mRelayoutFlag )
   {
+    mPerformingRelayout = true;
+
     // Clear the flag as we're now doing the relayout
     mRelayoutFlag = false;
 
@@ -469,6 +472,8 @@ void RelayoutController::Relayout()
 
       PRINT_HIERARCHY;
     }
+
+    mPerformingRelayout = false;
   }
   // should not disconnect the signal as that causes some control size negotiations to not work correctly
   // this algorithm needs more optimization as well
@@ -477,6 +482,11 @@ void RelayoutController::Relayout()
 void RelayoutController::SetEnabled( bool enabled )
 {
   mEnabled = enabled;
+}
+
+bool RelayoutController::IsPerformingRelayout() const
+{
+  return mPerformingRelayout;
 }
 
 void RelayoutController::FindAndZero( const RawActorList& list, const Dali::RefObject* object )

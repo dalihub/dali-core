@@ -2,7 +2,7 @@
 #define __DALI_CUSTOM_ACTOR_IMPL_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor-enumerations.h>
+#include <dali/public-api/math/compile-time-math.h>
 
 namespace Dali
 {
@@ -139,7 +140,7 @@ public:
   virtual void OnSizeSet(const Vector3& targetSize) = 0;
 
   /**
-   * @brief Called when the owning actor's size is animated e.g. using Animation::Resize().
+   * @brief Called when the owning actor's size is animated e.g. using Animation::AnimateTo( Property( actor, Actor::Property::SIZE ), ... ).
    *
    * @param[in] animation The object which is animating the owning actor.
    * @param[in] targetSize The target size. Note that this target size may not match the size returned via Actor::GetSize().
@@ -205,7 +206,7 @@ public:
    * @param[in] policy The policy being set
    * @param[in] dimension The dimension the policy is being set for
    */
-  virtual void OnSetResizePolicy( ResizePolicy policy, Dimension dimension ) = 0;
+  virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension ) = 0;
 
   /**
    * Return the natural size of the actor
@@ -221,7 +222,7 @@ public:
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
    * @return Return the calculated size for the given dimension
    */
-  virtual float CalculateChildSize( const Dali::Actor& child, Dimension dimension ) = 0;
+  virtual float CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension ) = 0;
 
   /**
    * @brief This method is called during size negotiation when a height is required for a given width.
@@ -249,7 +250,7 @@ public:
    * @param dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children
    */
-  virtual bool RelayoutDependentOnChildren( Dimension dimension = ALL_DIMENSIONS ) = 0;
+  virtual bool RelayoutDependentOnChildren( Dimension::Type dimension = Dimension::ALL_DIMENSIONS ) = 0;
 
   /**
    * @brief Virtual method to notify deriving classes that relayout dependencies have been
@@ -257,7 +258,7 @@ public:
    *
    * @param dimension The dimension that is about to be calculated
    */
-  virtual void OnCalculateRelayoutSize( Dimension dimension ) = 0;
+  virtual void OnCalculateRelayoutSize( Dimension::Type dimension ) = 0;
 
   /**
    * @brief Virtual method to notify deriving classes that the size for a dimension
@@ -266,27 +267,29 @@ public:
    * @param[in] size The new size for the given dimension
    * @param[in] dimension The dimension that was just negotiated
    */
-  virtual void OnLayoutNegotiated( float size, Dimension dimension ) = 0;
+  virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) = 0;
 
 protected: // For derived classes
 
+  // Flags for the constructor
+  enum ActorFlags
+  {
+    ACTOR_BEHAVIOUR_NONE          = 0,
+    DISABLE_SIZE_NEGOTIATION      = 1 << 0,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
+    REQUIRES_TOUCH_EVENTS         = 1 << 1,     ///< True if the OnTouchEvent() callback is required.
+    REQUIRES_HOVER_EVENTS         = 1 << 2,     ///< True if the OnHoverEvent() callback is required.
+    REQUIRES_MOUSE_WHEEL_EVENTS   = 1 << 3,     ///< True if the OnMouseWheelEvent() callback is required.
+
+    LAST_ACTOR_FLAG                             ///< Special marker for last actor flag
+  };
+
+  static const int ACTOR_FLAG_COUNT = Log< LAST_ACTOR_FLAG - 1 >::value + 1;      ///< Value for deriving classes to continue on the flag enum
+
   /**
    * @brief Create a CustomActorImpl.
-   * @param[in] requiresTouchEvents True if the OnTouchEvent() callback is required.
+   * @param[in] flags Bitfield of ActorFlags to define behaviour
    */
-  CustomActorImpl(bool requiresTouchEvents);
-
-  /**
-   * @brief Set whether the custom actor requires hover events.
-   * @param[in] requiresHoverEvents True if the OnHoverEvent() callback is required.
-   */
-  void SetRequiresHoverEvents(bool requiresHoverEvents);
-
-  /**
-   * @brief Set whether the custom actor requires mouse wheel events.
-   * @param[in] requiresMouseWheelEvents True if the OnMouseWheelEvent() callback is required.
-   */
-  void SetRequiresMouseWheelEvents(bool requiresMouseWheelEvents);
+  CustomActorImpl( ActorFlags flags );
 
   /**
    * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
@@ -307,7 +310,7 @@ protected: // For derived classes
    * @param[in] dimension The dimension to calculate the size for. E.g. width or height.
    * @return Return the calculated size for the given dimension
    */
-  float CalculateChildSizeBase( const Dali::Actor& child, Dimension dimension );
+  float CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension );
 
   /**
    * @brief Determine if this actor is dependent on it's children for relayout from the base class
@@ -315,7 +318,7 @@ protected: // For derived classes
    * @param dimension The dimension(s) to check for
    * @return Return if the actor is dependent on it's children
    */
-  bool RelayoutDependentOnChildrenBase( Dimension dimension = ALL_DIMENSIONS );
+  bool RelayoutDependentOnChildrenBase( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
 public: // Not intended for application developers
 
@@ -354,12 +357,16 @@ public: // Not intended for application developers
    */
   bool RequiresMouseWheelEvents() const;
 
+  /**
+   * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
+   * @return Return true if relayout is enabled on the custom actor
+   */
+  bool IsRelayoutEnabled() const;
+
 private:
 
-  Internal::CustomActor* mOwner;  ///< Internal owner of this custom actor implementation
-  bool mRequiresTouchEvents;      ///< Whether the OnTouchEvent() callback is required
-  bool mRequiresHoverEvents;      ///< Whether the OnHoverEvent() callback is required
-  bool mRequiresMouseWheelEvents; ///< Whether the OnMouseWheelEvent() callback is required
+  Internal::CustomActor* mOwner;        ///< Internal owner of this custom actor implementation
+  ActorFlags mFlags :ACTOR_FLAG_COUNT;  ///< ActorFlags flags to determine behaviour
 };
 
 } // namespace Dali

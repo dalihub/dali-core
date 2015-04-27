@@ -103,18 +103,6 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
   "uTimeDelta",           // UNIFORM_TIME_DELTA
   "sOpacityTexture",      // UNIFORM_SAMPLER_OPACITY
   "sNormalMapTexture",    // UNIFORM_SAMPLER_NORMAL_MAP
-  "uTextColor",           // UNIFORM_TEXT_COLOR
-  "uSmoothing",           // UNIFORM_SMOOTHING
-  "uOutline",             // UNIFORM_OUTLINE
-  "uOutlineColor",        // UNIFORM_OUTLINE_COLOR
-  "uGlow",                // UNIFORM_GLOW
-  "uGlowColor",           // UNIFORM_GLOW_COLOR
-  "uShadow",              // UNIFORM_SHADOW
-  "uShadowColor",         // UNIFORM_SHADOW_COLOR
-  "uShadowSmoothing",     // UNIFORM_SHADOW_SMOOTHING
-  "uGradientColor",       // UNIFORM_GRADIENT_COLOR
-  "uGradientLine",        // UNIFORM_GRADIENT_LINE
-  "uInvTextSize",         // UNIFORM_INVERSE_TEXT_SIZE
   "uSize"                 // UNIFORM_SIZE
 };
 

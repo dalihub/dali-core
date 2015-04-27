@@ -70,7 +70,7 @@ DynamicsJoint::~DynamicsJoint()
 
   if( Stage::IsInstalled() )
   {
-    DeleteJointMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()) );
+    DeleteJointMessage( *( Stage::GetCurrent() ), *(GetSceneObject()) );
   }
 }
 
@@ -97,7 +97,7 @@ void DynamicsJoint::SetLinearLimit(const int axisIndex, const float lowerLimit, 
 
   if( valueChanged )
   {
-    SetLimitMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), axisIndex, lowerLimit, upperLimit );
+    SetLimitMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), axisIndex, lowerLimit, upperLimit );
   }
 }
 
@@ -123,7 +123,7 @@ void DynamicsJoint::SetAngularLimit(const int  axisIndex, const Radian& lowerLim
 
   if( valueChanged )
   {
-    SetLimitMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), axisIndex, lowerLimit, upperLimit );
+    SetLimitMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), axisIndex, lowerLimit, upperLimit );
   }
 }
 
@@ -152,7 +152,7 @@ void DynamicsJoint::EnableSpring(const int axisIndex, const bool flag)
 
   if( 0 != valueChanged )
   {
-    SetEnableSpringMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), valueChanged, flag );
+    SetEnableSpringMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), valueChanged, flag );
   }
 }
 
@@ -174,7 +174,7 @@ void DynamicsJoint::DynamicsJoint::SetSpringStiffness(const int  axisIndex, cons
 
   if( 0 != valueChanged )
   {
-    SetSpringStiffnessMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), valueChanged, stiffness );
+    SetSpringStiffnessMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), valueChanged, stiffness );
   }
 }
 
@@ -198,7 +198,7 @@ void DynamicsJoint::SetSpringDamping(const int axisIndex, const float damping)
 
   if( 0 != valueChanged )
   {
-    SetSpringDampingMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), valueChanged, clampedDamping );
+    SetSpringDampingMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), valueChanged, clampedDamping );
   }
 }
 
@@ -220,7 +220,7 @@ void DynamicsJoint::DynamicsJoint::SetSpringCenterPoint(const int  axisIndex, co
 
   if( 0 != valueChanged )
   {
-    SetSpringCenterPointMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), valueChanged, ratio );
+    SetSpringCenterPointMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), valueChanged, ratio );
   }
 }
 
@@ -248,7 +248,7 @@ void DynamicsJoint::EnableMotor(const int  axisIndex, const bool flag)
 
   if( valueChanged )
   {
-    SetEnableMotorMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), axisIndex, flag );
+    SetEnableMotorMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), axisIndex, flag );
   }
 }
 
@@ -270,7 +270,7 @@ void DynamicsJoint::SetMotorVelocity(const int  axisIndex, const float velocity)
 
   if( valueChanged )
   {
-    SetMotorVelocityMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), axisIndex, velocity );
+    SetMotorVelocityMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), axisIndex, velocity );
   }
 }
 
@@ -292,7 +292,7 @@ void DynamicsJoint::SetMotorForce(const int  axisIndex, const float force)
 
   if( valueChanged )
   {
-    SetMotorForceMessage( Stage::GetCurrent()->GetUpdateInterface(), *(GetSceneObject()), axisIndex, force );
+    SetMotorForceMessage( *( Stage::GetCurrent() ), *(GetSceneObject()), axisIndex, force );
   }
 }
 

@@ -122,16 +122,13 @@ public:
    *
    * @param[in] bufferIndex Buffer index for double buffered values.
    **/
-  unsigned int ConstrainObjects( BufferIndex bufferIndex )
+  void ConstrainObjects( BufferIndex bufferIndex )
   {
-    unsigned int numberOfConstrainedObjects = 0;
-
     for ( Iterator iter = mObjectContainer.Begin(); iter != mObjectContainer.End(); ++iter)
     {
       Type* object = (*iter);
-      numberOfConstrainedObjects += ConstrainPropertyOwner( *object, bufferIndex );
+      ConstrainPropertyOwner( *object, bufferIndex );
     }
-    return numberOfConstrainedObjects;
   }
 
 private:

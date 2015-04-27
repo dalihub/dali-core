@@ -63,8 +63,8 @@ int UtcDaliRadianComparison01(void)
   Radian radian4( Math::PI_2 );
   Degree degree0( 180.0f );
 
-  DALI_TEST_CHECK( radian3 == degree0 );
-  DALI_TEST_CHECK( radian4 != degree0 );
+  DALI_TEST_CHECK( radian3 == Radian(degree0) );
+  DALI_TEST_CHECK( radian4 != Radian(degree0) );
 
   // Comparison with float
   Radian radian5( Math::PI_2 );
@@ -83,16 +83,16 @@ int UtcDaliRadianCastOperators01(void)
 
   Radian radian0( Math::PI );
 
-  const float& value0( radian0 );
+  const float& value0( radian0.radian );
   DALI_TEST_EQUALS( value0, Math::PI, 0.001f, TEST_LOCATION );
 
   radian0 = Math::PI_2;
   DALI_TEST_EQUALS( value0, Math::PI_2, 0.001f, TEST_LOCATION );
 
-  float& value1( radian0 );
+  float value1( radian0 );
   DALI_TEST_EQUALS( value1, Math::PI_2, 0.001f, TEST_LOCATION );
 
-  value1 = Math::PI;
+  radian0 = Math::PI;
   DALI_TEST_EQUALS( float(radian0), Math::PI, 0.001f, TEST_LOCATION );
   END_TEST;
 }
@@ -106,9 +106,10 @@ int UtcDaliRadianCastOperatorEquals(void)
   Radian b(Math::PI_2);
   Radian c(Math::PI);
 
-  DALI_TEST_EQUALS(a == a, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(a == b, true, TEST_LOCATION);
-  DALI_TEST_EQUALS(a == c, false, TEST_LOCATION);
+  DALI_TEST_EQUALS( a == a, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( a == b, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( a == c, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( Degree(c) == c, true, TEST_LOCATION );
   END_TEST;
 }
 
@@ -120,9 +121,10 @@ int UtcDaliRadianCastOperatorNotEquals(void)
   Radian b(Math::PI_2);
   Radian c(Math::PI);
 
-  DALI_TEST_EQUALS(a != a, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(a != b, false, TEST_LOCATION);
-  DALI_TEST_EQUALS(a != c, true, TEST_LOCATION);
+  DALI_TEST_EQUALS( a != a, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( a != b, false, TEST_LOCATION );
+  DALI_TEST_EQUALS( a != c, true, TEST_LOCATION );
+  DALI_TEST_EQUALS( Degree(a) != c, true, TEST_LOCATION );
   END_TEST;
 }
 
@@ -148,8 +150,13 @@ int UtcDaliRadianCastOperatorLessThan(void)
   DALI_TEST_EQUALS(d < b, false, TEST_LOCATION);
   DALI_TEST_EQUALS(e < b, true, TEST_LOCATION);
 
-  DALI_TEST_EQUALS(Radian(Math::PI_2) < Degree(180.0f), true,  TEST_LOCATION);
-  DALI_TEST_EQUALS(Radian(Math::PI_2) < Degree(90.0f),  false, TEST_LOCATION);
-  DALI_TEST_EQUALS(Radian(Math::PI_2) < Degree(45.0f),  false, TEST_LOCATION);
+  DALI_TEST_EQUALS( Radian(Math::PI_2) < Degree(180.0f), true,  TEST_LOCATION);
+  DALI_TEST_EQUALS( Radian(Math::PI_2) < Degree(90.0f),  false, TEST_LOCATION);
+  DALI_TEST_EQUALS( Radian(Math::PI_2) > Degree(45.0f),  true,  TEST_LOCATION);
+
+  DALI_TEST_EQUALS( Degree(180.0f) > Radian(Math::PI_2), true,  TEST_LOCATION);
+  DALI_TEST_EQUALS( Degree(90.0f)  > Radian(Math::PI_2), false, TEST_LOCATION);
+  DALI_TEST_EQUALS( Degree(45.0f)  < Radian(Math::PI_2), true,  TEST_LOCATION);
+
   END_TEST;
 }

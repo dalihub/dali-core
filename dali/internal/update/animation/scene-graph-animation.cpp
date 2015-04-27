@@ -33,10 +33,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-float DefaultAlphaFunc(float progress)
-{
-  return progress; // linear
-}
 
 Animation::Animation( float durationSeconds, float speedFactor, const Vector2& playRange, bool isLooping, Dali::Animation::EndAction endAction, Dali::Animation::EndAction disconnectAction )
 : mDurationSeconds(durationSeconds),
@@ -57,8 +53,6 @@ Animation::~Animation()
 
 void Animation::SetDuration(float durationSeconds)
 {
-  DALI_ASSERT_DEBUG(durationSeconds > 0.0f);
-
   mDurationSeconds = durationSeconds;
 }
 

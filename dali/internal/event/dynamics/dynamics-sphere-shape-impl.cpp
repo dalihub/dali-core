@@ -43,7 +43,7 @@ DynamicsSphereShape::DynamicsSphereShape(const float radius)
   mDynamicsShape = sphereShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsSphereShapeMessage( stage->GetUpdateInterface(), *sphereShape, radius );
+  InitializeDynamicsSphereShapeMessage( *stage, *sphereShape, radius );
 }
 
 DynamicsSphereShape::~DynamicsSphereShape()

@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/actors/layer-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
@@ -109,8 +112,6 @@ Layer::Layer( Actor::DerivedType type )
   mTouchConsumed(false),
   mHoverConsumed(false)
 {
-  // Size negotiate disabled by default, so turn it on for this actor
-  SetRelayoutEnabled( true );
 }
 
 void Layer::OnInitialize()

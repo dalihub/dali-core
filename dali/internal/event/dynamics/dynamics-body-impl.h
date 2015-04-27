@@ -18,12 +18,14 @@
  *
  */
 
-// BASE CLASS HEADER
+// CLASS HEADER
 #include <dali/public-api/object/base-object.h>
 
-// INTERNAL HEADERS
+// INTERNAL INCLUDES
+#include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/public-api/dynamics/dynamics-body.h>
+
 
 namespace Dali
 {
@@ -134,13 +136,13 @@ public:
    * Called when the associated actor is added to the stage
    * @param[in] eventThreadServices Object that can send messages to scene graph
    */
-  void Connect(EventThreadServices& eventThreadServices );
+  void Connect( EventThreadServices& eventThreadServices );
 
   /**
    * Called when the associated actor is removed from the stage
    * @param[in] eventThreadServices Object that can send messages to scene graph
    */
-  void Disconnect(EventThreadServices& eventThreadServices );
+  void Disconnect( EventThreadServices& eventThreadServices );
 
   SceneGraph::DynamicsBody* GetSceneObject()
   {

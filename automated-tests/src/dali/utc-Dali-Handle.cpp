@@ -331,7 +331,6 @@ int UtcDaliHandleIsPropertyAConstraintInput(void)
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::COLOR_MODE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::POSITION_INHERITANCE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::DRAW_MODE ) );
-  DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::SIZE_MODE ) );
   DALI_TEST_CHECK( false == actor.IsPropertyAConstraintInput( Actor::Property::SIZE_MODE_FACTOR ) );
 
   END_TEST;
@@ -358,6 +357,7 @@ int UtcDaliHandleGetPropertyType(void)
   Property::Index boolIndex     = actor.RegisterProperty( "bool-property",     bool(true) );
   Property::Index floatIndex    = actor.RegisterProperty( "float-property",    float(123.0f) );
   Property::Index intIndex      = actor.RegisterProperty( "int-property",      123 );
+  Property::Index unsignedIntIndex = actor.RegisterProperty( "unsigned-int-property", 456u );
   Property::Index vector2Index  = actor.RegisterProperty( "vector2-property",  Vector2(1.0f, 2.0f) );
   Property::Index vector3Index  = actor.RegisterProperty( "vector3-property",  Vector3(1.0f, 2.0f, 3.0f) );
   Property::Index vector4Index  = actor.RegisterProperty( "vector4-property",  Vector4(1.0f, 2.0f, 3.0f, 4.0f) );
@@ -366,6 +366,7 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK( Property::BOOLEAN  == actor.GetPropertyType( boolIndex ) );
   DALI_TEST_CHECK( Property::FLOAT    == actor.GetPropertyType( floatIndex ) );
   DALI_TEST_CHECK( Property::INTEGER  == actor.GetPropertyType( intIndex ) );
+  DALI_TEST_CHECK( Property::UNSIGNED_INTEGER  == actor.GetPropertyType( unsignedIntIndex ) );
   DALI_TEST_CHECK( Property::VECTOR2  == actor.GetPropertyType( vector2Index ) );
   DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( vector3Index ) );
   DALI_TEST_CHECK( Property::VECTOR4  == actor.GetPropertyType( vector4Index ) );
@@ -488,7 +489,7 @@ int UtcDaliHandleNonAnimtableProperties(void)
 
   try
   {
-    animation.AnimateBy(Property(actor, nonAnimStringIndex), relativeValue, AlphaFunctions::EaseIn);
+    animation.AnimateBy(Property(actor, nonAnimStringIndex), relativeValue, AlphaFunction::EASE_IN);
     animation.Play();
     application.SendNotification();
     application.Render(static_cast<unsigned int>(durationSeconds*0100.0f)/* some progress */);
@@ -741,7 +742,7 @@ int UtcDaliHandleRegisterPropertyTypes(void)
     { "Property::BOOLEAN",          true,              true  },
     { "Property::FLOAT",            1.0f,              true  },
     { "Property::INTEGER",          1,                 true  },
-    { "Property::UNSIGNED_INTEGER", 1u,                false },
+    { "Property::UNSIGNED_INTEGER", 1u,                true  },
     { "Property::VECTOR2",          Vector2::ONE,      true  },
     { "Property::VECTOR3",          Vector3::ONE,      true  },
     { "Property::VECTOR4",          Vector4::ONE,      true  },
@@ -753,6 +754,7 @@ int UtcDaliHandleRegisterPropertyTypes(void)
     { "Property::ARRAY",            array,             false },
     { "Property::MAP",              map,               false },
   };
+
   unsigned int numOfProperties( sizeof( properties ) / sizeof( properties[0] ) );
 
   for ( unsigned int i = 0; i < numOfProperties; ++i )

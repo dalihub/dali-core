@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/images/image-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>

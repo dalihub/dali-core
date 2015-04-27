@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_NOTIFICATION_DECLARATIONS_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <boost/function.hpp>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
@@ -34,11 +32,6 @@ class PropertyNotification;
  * @brief Signal type for Dali::PropertyNotification::NotifySignal().
  */
 typedef Signal< void (PropertyNotification& source) > PropertyNotifySignalType;
-
-/**
- * @brief Function signature for Dali::PropertyNotification::NotifySignal() signal callbacks.
- */
-typedef boost::function<void (PropertyNotification& source)> PropertyNotifyCallbackType;
 
 } // namespace Dali
 

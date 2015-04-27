@@ -25,11 +25,10 @@
 #include <dali/public-api/common/loading-state.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/signals/dali-signal.h>
+#include <dali/public-api/images/image-operations.h>
 
 namespace Dali
 {
-struct Vector2;
-class ImageAttributes;
 
 namespace Internal DALI_INTERNAL
 {
@@ -45,7 +44,8 @@ class ResourceImage;
  * the ResourceImage is created with IMMEDIATE loading policy or a compatible resource is found in cache.
  * In case of loading images ON_DEMAND, resource loading will only be attempted if the associated ImageActor
  * is put on Stage.
- * Custom loading requests can be made by providing an ImageAttributes object to ResourceImage::New().
+ * Scaling of images to a desired smaller size can be requested by providing desired dimensions,
+ * scaling mode and filter mode to to ResourceImage::New().
  *
  * <i>LoadPolicies</i>
  * - IMMEDIATE: acquire image resource when creating ResourceImage.
@@ -55,16 +55,15 @@ class ResourceImage;
  * If the same image is created more than once with conflicting policies, LoadPolicy "IMMEDIATE" overrides "ON_DEMAND".
  *
  * <i>Custom load requests</i>
- * Size, scaling mode, orientation compensation can be set when requesting an image.
- * See ImageAttributes for more details.
+ * Size, scaling mode, filter mode, and orientation compensation can be set when requesting an image.
  *
  * <i>Compatible resources</i>
  *
  * Before loading a new ResourceImage the internal image resource cache is checked by dali.
  * If there is an image already loaded in memory and is deemed "compatible" with the requested image,
  * that resource is reused.
- * This happens for example if a loaded image exists with the same URL, and the difference between both
- * of the dimensions is less than 50%.
+ * This happens for example if a loaded image exists with the same URL, scaling and filtering modes,
+ * and the difference between both of the dimensions is less than a few pixels.
  *
  * <i>Reloading images</i>
  *
@@ -112,7 +111,7 @@ public:
    * @param [in] url The URL of the image file.
    * @return The width and height in pixels of the image.
    */
-  static Vector2 GetImageSize( const std::string& url );
+  static ImageDimensions GetImageSize( const std::string& url );
 
   /**
    * @brief Constructor which creates an empty ResourceImage object.
@@ -144,12 +143,22 @@ public:
   ResourceImage& operator=( const ResourceImage& rhs );
 
   /**
+   * @name ResourceImageFactoryFunctions
+   * Create ResourceImage object instances using these functions.
+   */
+  ///@{
+
+  /**
    * @brief Create an initialised ResourceImage object.
    *
+   * Uses defaults for all options.
+   *
+   * @sa Dali::FittingMode::Type Dali::SamplingMode::Type
    * @param [in] url The URL of the image file to use.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @return A handle to a newly allocated object
    */
-  static ResourceImage New( const std::string& url );
+  static ResourceImage New( const std::string& url, bool orientationCorrection = true );
 
   /**
    * @brief Create an initialised ResourceImage object.
@@ -157,29 +166,48 @@ public:
    * @param [in] url The URL of the image file to use.
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
    * @param [in] releasePol The ReleasePolicy to apply to Image.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @return A handle to a newly allocated object
    */
-  static ResourceImage New( const std::string& url, LoadPolicy loadPol, ReleasePolicy releasePol );
+  static ResourceImage New( const std::string& url, LoadPolicy loadPol, ReleasePolicy releasePol, bool orientationCorrection = true );
 
   /**
    * @brief Create an initialised ResourceImage object.
    *
    * @param [in] url The URL of the image file to use.
-   * @param [in] attributes Requested parameters for loading (size, scaling etc.).
+   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @return A handle to a newly allocated object
    */
-  static ResourceImage New( const std::string& url, const ImageAttributes& attributes );
+  static ResourceImage New( const std::string& url,
+                            ImageDimensions size,
+                            FittingMode::Type fittingMode = FittingMode::DEFAULT,
+                            SamplingMode::Type samplingMode = SamplingMode::DEFAULT,
+                            bool orientationCorrection = true );
 
   /**
    * @brief Create an initialised ResourceImage object.
    *
    * @param [in] url The URL of the image file to use.
-   * @param [in] attributes Requested parameters for loading (size, scaling etc.).
    * @param [in] loadPol    The LoadPolicy to apply when loading the image resource.
    * @param [in] releasePol The ReleasePolicy to apply to Image.
+   * @param [in] size The width and height to fit the loaded image to.
+   * @param [in] fittingMode The method used to fit the shape of the image before loading to the shape defined by the size parameter.
+   * @param [in] samplingMode The filtering method used when sampling pixels from the input image while fitting it to desired size.
+   * @param [in] orientationCorrection Reorient the image to respect any orientation metadata in its header.
    * @return A handle to a newly allocated object
    */
-  static ResourceImage New( const std::string& url, const ImageAttributes& attributes, LoadPolicy loadPol, ReleasePolicy releasePol );
+  static ResourceImage New( const std::string& url,
+                            LoadPolicy loadPol,
+                            ReleasePolicy releasePol,
+                            ImageDimensions size,
+                            FittingMode::Type fittingMode = FittingMode::DEFAULT,
+                            SamplingMode::Type samplingMode = SamplingMode::DEFAULT,
+                            bool orientationCorrection = true );
+
+  ///@}
 
   /**
    * @brief Downcast an Object handle to ResourceImage handle.
@@ -217,22 +245,12 @@ public:
   /**
    * @brief Reload image from filesystem.
    *
-   * The set ImageAttributes are used when requesting the image again.
-   * @note if Image is offstage and OnDemand policy is set, reload request is ignored.
+   * The original set of image loading attributes (requested dimensions, scaling
+   * mode and filter mode) are used when requesting the image again.
+   * @note If image is offstage and OnDemand policy is set, the reload request is
+   * ignored.
    */
   void Reload();
-
-  /**
-   * @brief Get the attributes of an image.
-   *
-   * Only to be used after the image has finished loading.
-   * (Ticket's LoadingSucceeded callback was called)
-   * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
-   * Connect to SignalLoadingFinished or use GetLoadingState to make sure this value is actual.
-   * @pre image should be loaded
-   * @return a copy of the attributes
-   */
-  ImageAttributes GetAttributes() const;
 
 public: // Signals
 

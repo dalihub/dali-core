@@ -18,12 +18,15 @@
  *
  */
 
-// INTERNAL HEADERS
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
+// EXTERNAL INCLUDES
+#include <new>
+
+// INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-thread-services.h>
-#include <dali/public-api/math/vector3.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/public-api/math/quaternion.h>
+#include <dali/public-api/math/vector3.h>
 
 class btGeneric6DofSpringConstraint;
 

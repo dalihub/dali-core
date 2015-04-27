@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_VALUE_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // EXTERNAL INCLUDES
-#include <ostream>
+#include <iosfwd>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property.h>
@@ -60,13 +60,6 @@ public:
   Value(bool boolValue);
 
   /**
-   * @brief Create a float property value.
-   *
-   * @param [in] floatValue A floating-point value.
-   */
-  Value(float floatValue);
-
-  /**
    * @brief Create an integer property value.
    *
    * @param [in] integerValue An integer value.
@@ -76,9 +69,16 @@ public:
   /**
    * @brief Create an unsigned integer property value.
    *
-   * @param [in] unsignedIntegerValue An unsinged integer value.
+   * @param [in] unsignedIntegerValue An unsigned integer value.
    */
   Value(unsigned int unsignedIntegerValue);
+
+  /**
+   * @brief Create a float property value.
+   *
+   * @param [in] floatValue A floating-point value.
+   */
+  Value(float floatValue);
 
   /**
    * @brief Create a Vector2 property value.

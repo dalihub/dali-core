@@ -19,7 +19,6 @@
 #include <dali/public-api/object/handle.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/active-constraint.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-notification.h>
@@ -157,21 +156,6 @@ void Handle::RemovePropertyNotification( Dali::PropertyNotification propertyNoti
 void Handle::RemovePropertyNotifications()
 {
   GetImplementation(*this).RemovePropertyNotifications();
-}
-
-ActiveConstraint Handle::ApplyConstraint( Constraint constraint )
-{
-  return GetImplementation(*this).ApplyConstraint( GetImplementation( constraint ) );
-}
-
-ActiveConstraint Handle::ApplyConstraint( Constraint constraint, Handle weightObject )
-{
-  return GetImplementation(*this).ApplyConstraint( GetImplementation( constraint ), weightObject );
-}
-
-void Handle::RemoveConstraint(ActiveConstraint activeConstraint)
-{
-  GetImplementation(*this).RemoveConstraint( activeConstraint );
 }
 
 void Handle::RemoveConstraints()

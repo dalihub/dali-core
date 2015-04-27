@@ -18,6 +18,9 @@
 // CLASS HEADER
 #include <dali/internal/event/events/tap-gesture-detector-impl.h>
 
+// EXTERNAL INCLUDES
+#include <cstring> // for strcmp
+
 // INTERNAL INCLUDES
 #include <dali/public-api/events/tap-gesture.h>
 #include <dali/public-api/object/type-registry.h>

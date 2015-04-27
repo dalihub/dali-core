@@ -18,14 +18,14 @@
  *
  */
 
-// INTERNAL HEADERS
-#include <dali/public-api/common/map-wrapper.h>
-#include <dali/internal/common/owner-pointer.h>
-#include <dali/internal/common/owner-container.h>
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
+// INTERNAL INCLUDES
 #include <dali/internal/common/message.h>
-#include <dali/internal/common/event-thread-services.h>
+#include <dali/internal/common/owner-container.h>
+#include <dali/internal/common/owner-pointer.h>
+#include <dali/internal/event/common/event-thread-services.h>
+#include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/public-api/common/map-wrapper.h>
 #include <dali/public-api/math/vector3.h>
 
 namespace Dali

@@ -45,7 +45,7 @@ DynamicsCubeShape::DynamicsCubeShape(const Vector3& dimensions)
   mDynamicsShape = cubeShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsCubeShapeMessage( stage->GetUpdateInterface(), *cubeShape, dimensions );
+  InitializeDynamicsCubeShapeMessage( *stage, *cubeShape, dimensions );
 }
 
 DynamicsCubeShape::~DynamicsCubeShape()

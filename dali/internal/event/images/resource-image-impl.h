@@ -25,6 +25,7 @@
 #include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/internal/event/images/image-factory-cache.h>
+#include <dali/integration-api/debug.h> // For DALI_LOG_OBJECT_STRING_DECLARATION
 
 namespace Dali
 {
@@ -63,7 +64,7 @@ public:
    * @return a pointer to a newly created object.
    */
   static ResourceImagePtr New( const std::string& url,
-                          const Dali::ImageAttributes& attributes,
+                          const ImageAttributes& attributes,
                           LoadPolicy loadPol = IMAGE_LOAD_POLICY_DEFAULT,
                           ReleasePolicy releasePol = IMAGE_RELEASE_POLICY_DEFAULT );
 
@@ -101,7 +102,7 @@ public:
    * If requested width or height was 0, they are replaced by concrete dimensions.
    * @return a copy of the attributes
    */
-  const Dali::ImageAttributes& GetAttributes() const;
+  const ImageAttributes& GetAttributes() const;
 
   /**
    * @copydoc Dali::ResourceImage::GetUrl()

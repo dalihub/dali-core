@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/math/degree.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
 
@@ -31,6 +30,7 @@
 #include <dali/internal/event/actors/renderer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
+#include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
 
 namespace Dali
 {
@@ -182,12 +182,12 @@ void Actor::SetSize(float width, float height, float depth)
 
 void Actor::SetSize(const Vector2& size)
 {
-  GetImplementation(*this).SetSize(size);
+  GetImplementation(*this).SetSize( size );
 }
 
 void Actor::SetSize(const Vector3& size)
 {
-  GetImplementation(*this).SetSize(size);
+  GetImplementation(*this).SetSize( size );
 }
 
 Vector3 Actor::GetTargetSize() const
@@ -260,11 +260,6 @@ PositionInheritanceMode Actor::GetPositionInheritanceMode() const
   return GetImplementation(*this).GetPositionInheritanceMode();
 }
 
-void Actor::SetOrientation(const Degree& angle, const Vector3& axis)
-{
-  GetImplementation(*this).SetOrientation(Radian(angle), axis);
-}
-
 void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
 {
   GetImplementation(*this).SetOrientation(angle, axis);
@@ -273,11 +268,6 @@ void Actor::SetOrientation(const Radian& angle, const Vector3& axis)
 void Actor::SetOrientation(const Quaternion& orientation)
 {
   GetImplementation(*this).SetOrientation(orientation);
-}
-
-void Actor::RotateBy(const Degree& angle, const Vector3& axis)
-{
-  GetImplementation(*this).RotateBy(Radian(angle), axis);
 }
 
 void Actor::RotateBy(const Radian& angle, const Vector3& axis)
@@ -348,16 +338,6 @@ void Actor::SetInheritScale( bool inherit )
 bool Actor::IsScaleInherited() const
 {
   return GetImplementation(*this).IsScaleInherited();
-}
-
-void Actor::SetSizeMode(SizeMode mode)
-{
-  GetImplementation(*this).SetSizeMode(mode);
-}
-
-SizeMode Actor::GetSizeMode() const
-{
-  return GetImplementation(*this).GetSizeMode();
 }
 
 void Actor::SetSizeModeFactor(const Vector3& factor)
@@ -465,44 +445,24 @@ bool Actor::IsKeyboardFocusable() const
   return GetImplementation(*this).IsKeyboardFocusable();
 }
 
-void Actor::SetRelayoutEnabled( bool enabled )
-{
-  GetImplementation(*this).SetRelayoutEnabled( enabled );
-}
-
-bool Actor::IsRelayoutEnabled() const
-{
-  return GetImplementation(*this).IsRelayoutEnabled();
-}
-
-void Actor::SetResizePolicy( ResizePolicy policy, Dimension dimension )
+void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
 {
   GetImplementation(*this).SetResizePolicy( policy, dimension );
 }
 
-ResizePolicy Actor::GetResizePolicy( Dimension dimension ) const
+ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
 {
   return GetImplementation(*this).GetResizePolicy( dimension );
 }
 
-void Actor::SetSizeScalePolicy( SizeScalePolicy policy )
+void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
 {
   GetImplementation(*this).SetSizeScalePolicy( policy );
 }
 
-SizeScalePolicy Actor::GetSizeScalePolicy() const
+SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
 {
   return GetImplementation(*this).GetSizeScalePolicy();
-}
-
-void Actor::SetDimensionDependency( Dimension dimension, Dimension dependency )
-{
-  GetImplementation(*this).SetDimensionDependency( dimension, dependency );
-}
-
-Dimension Actor::GetDimensionDependency( Dimension dimension )
-{
-  return GetImplementation(*this).GetDimensionDependency( dimension );
 }
 
 float Actor::GetHeightForWidth( float width )
@@ -515,14 +475,9 @@ float Actor::GetWidthForHeight( float height )
   return GetImplementation(*this).GetWidthForHeight( height );
 }
 
-float Actor::GetRelayoutSize( Dimension dimension ) const
+float Actor::GetRelayoutSize( Dimension::Type dimension ) const
 {
   return GetImplementation(*this).GetRelayoutSize( dimension );
-}
-
-void Actor::RelayoutRequestTree()
-{
-  GetImplementation(*this).RelayoutRequestTree();
 }
 
 void Actor::PropagateRelayoutFlags()
@@ -535,18 +490,18 @@ void Actor::SetPadding( const Padding& padding )
   Internal::Actor& impl = GetImplementation(*this);
 
   Vector2 widthPadding( padding.left, padding.right );
-  impl.SetPadding( widthPadding, WIDTH );
+  impl.SetPadding( widthPadding, Dimension::WIDTH );
 
   Vector2 heightPadding( padding.bottom, padding.top );
-  impl.SetPadding( heightPadding, HEIGHT );
+  impl.SetPadding( heightPadding, Dimension::HEIGHT );
 }
 
 void Actor::GetPadding( Padding& paddingOut ) const
 {
   const Internal::Actor& impl = GetImplementation(*this);
 
-  Vector2 widthPadding = impl.GetPadding( WIDTH );
-  Vector2 heightPadding = impl.GetPadding( HEIGHT );
+  Vector2 widthPadding = impl.GetPadding( Dimension::WIDTH );
+  Vector2 heightPadding = impl.GetPadding( Dimension::HEIGHT );
 
   paddingOut.left = widthPadding.x;
   paddingOut.right = widthPadding.y;
@@ -554,44 +509,34 @@ void Actor::GetPadding( Padding& paddingOut ) const
   paddingOut.top = heightPadding.y;
 }
 
-void Actor::SetPreferredSize( const Vector2& size )
-{
-  GetImplementation(*this).SetPreferredSize( size );
-}
-
-Vector2 Actor::GetPreferredSize() const
-{
-  return GetImplementation(*this).GetPreferredSize();
-}
-
 void Actor::SetMinimumSize( const Vector2& size )
 {
   Internal::Actor& impl = GetImplementation(*this);
 
-  impl.SetMinimumSize( size.x, WIDTH );
-  impl.SetMinimumSize( size.y, HEIGHT );
+  impl.SetMinimumSize( size.x, Dimension::WIDTH );
+  impl.SetMinimumSize( size.y, Dimension::HEIGHT );
 }
 
 Vector2 Actor::GetMinimumSize()
 {
   Internal::Actor& impl = GetImplementation(*this);
 
-  return Vector2( impl.GetMinimumSize( WIDTH ), impl.GetMinimumSize( HEIGHT ) );
+  return Vector2( impl.GetMinimumSize( Dimension::WIDTH ), impl.GetMinimumSize( Dimension::HEIGHT ) );
 }
 
 void Actor::SetMaximumSize( const Vector2& size )
 {
   Internal::Actor& impl = GetImplementation(*this);
 
-  impl.SetMaximumSize( size.x, WIDTH );
-  impl.SetMaximumSize( size.y, HEIGHT );
+  impl.SetMaximumSize( size.x, Dimension::WIDTH );
+  impl.SetMaximumSize( size.y, Dimension::HEIGHT );
 }
 
 Vector2 Actor::GetMaximumSize()
 {
   Internal::Actor& impl = GetImplementation(*this);
 
-  return Vector2( impl.GetMaximumSize( WIDTH ), impl.GetMaximumSize( HEIGHT ) );
+  return Vector2( impl.GetMaximumSize( Dimension::WIDTH ), impl.GetMaximumSize( Dimension::HEIGHT ) );
 }
 
 Actor::TouchSignalType& Actor::TouchedSignal()

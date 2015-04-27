@@ -23,12 +23,13 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/hash.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/update/resources/resource-manager.h>
-#include <dali/internal/common/dali-hash.h>
+#include <dali/internal/common/image-attributes.h>
 
 // EXTERNAL INCLUDES
 #include <float.h>
@@ -148,8 +149,18 @@ ResourceTicketPtr ImageFactory::Reload( Request& request )
       return ticket;
     }
 
-    Vector2 size;
-    Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( request.url, *request.attributes, size );
+    ImageDimensions closestSize;
+    if( request.attributes )
+    {
+      closestSize = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().
+          GetClosestImageSize( request.url, ImageDimensions( request.attributes->GetSize().width, request.attributes->GetSize().width ),
+                               request.attributes->GetScalingMode(), request.attributes->GetFilterMode(), request.attributes->GetOrientationCorrection() );
+    }
+    else
+    {
+      closestSize = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction().GetClosestImageSize( request.url );
+    }
+    Vector2 size( closestSize.GetX(), closestSize.GetY() );
 
     const ImageAttributes& attrib = static_cast<ImageTicket*>(ticket.Get())->GetAttributes();
 
@@ -273,7 +284,13 @@ void ImageFactory::GetImageSize( const ImageFactoryCache::RequestPtr& request, c
   {
     // not loaded so either loading or not yet loaded, ask platform abstraction
     Integration::PlatformAbstraction& platformAbstraction = Internal::ThreadLocalStorage::Get().GetPlatformAbstraction();
-    platformAbstraction.GetClosestImageSize( GetRequestPath( request ), GetRequestAttributes( request ), size );
+
+    const ImageAttributes& attributes = GetRequestAttributes( request );
+    const ImageDimensions closestSize = platformAbstraction.GetClosestImageSize( GetRequestPath( request ),
+                                                                                   ImageDimensions( attributes.GetSize().width, attributes.GetSize().width ),
+                                                                                   attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
+    size[0] = closestSize.GetX();
+    size[1] = closestSize.GetY();
   }
 }
 
@@ -288,15 +305,15 @@ void ImageFactory::FlushReleaseQueue()
   mTicketsToRelease.clear();
 }
 
-bool ImageFactory::CompareAttributes( const Dali::ImageAttributes& requested,
-                                      const Dali::ImageAttributes& actual ) const
+bool ImageFactory::CompareAttributes( const ImageAttributes& requested,
+                                      const ImageAttributes& actual ) const
 {
   // do not load image resource again if there is a similar resource loaded:
   // see explanation in image.h of what is deemed compatible
   return (requested.GetScalingMode() ==  actual.GetScalingMode()) &&
           (
             (requested.GetFilterMode() == actual.GetFilterMode()) ||
-            (requested.GetFilterMode() == ImageAttributes::DontCare)
+            (requested.GetFilterMode() == SamplingMode::DONT_CARE)
           ) &&
           (fabsf(requested.GetWidth()  -  actual.GetWidth())  <= actual.GetWidth()  * mMaxScale) &&
           (fabsf(requested.GetHeight() -  actual.GetHeight()) <= actual.GetHeight() * mMaxScale);
@@ -430,20 +447,27 @@ ResourceTicketPtr ImageFactory::FindCompatibleResource( const std::string& filen
 
 ResourceTicketPtr ImageFactory::IssueLoadRequest( const std::string& filename, const ImageAttributes* attr )
 {
-  ImageAttributes attributes;
+  ImageDimensions dimensions;
+  FittingMode::Type fittingMode = FittingMode::DEFAULT;
+  SamplingMode::Type samplingMode = SamplingMode::DEFAULT;
+  bool orientation = true;
 
   if( attr )
   {
-    attributes = *attr;
+    dimensions = ImageDimensions::FromFloatVec2( attr->GetSize() );
+    fittingMode = attr->GetScalingMode();
+    samplingMode = attr->GetFilterMode();
+    orientation = attr->GetOrientationCorrection();
   }
   else
   {
     // query image size from file if NULL was provided
-    Vector2 size = Dali::ResourceImage::GetImageSize( filename );
-    attributes.SetSize( size.width, size.height );
+    dimensions = Dali::ResourceImage::GetImageSize( filename );
+    ///@ToDo: This is weird and pointless: we introduce a synchronous load of the image header on the event thread here to learn the image's on-disk dimensions to pass on to the resource system,
+    ///       but the default behaviour of the resource system when no dimensions are provided is to use exactly these on-disk dimensions when it eventually does the full load and decode.
   }
 
-  BitmapResourceType resourceType( attributes );
+  BitmapResourceType resourceType( dimensions, fittingMode, samplingMode, orientation );
   ResourceTicketPtr ticket = mResourceClient.RequestResource( resourceType, filename );
   return ticket;
 }

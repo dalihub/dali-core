@@ -264,7 +264,7 @@ void DynamicsBody::GetNodePositionAndRotation(Vector3& position, Quaternion& rot
 {
   const BufferIndex bufferIndex = mWorld.GetBufferIndex();
   position = mNode.GetPosition(bufferIndex) / mWorld.GetWorldScale();
-  rotation = mNode.GetRotation(bufferIndex);
+  rotation = mNode.GetOrientation(bufferIndex);
 }
 
 void DynamicsBody::SetNodePositionAndRotation(const Vector3& position, const Quaternion& rotation)
