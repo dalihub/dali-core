@@ -9,11 +9,8 @@ Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires:       boost-thread
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
-BuildRequires:  boost-devel
-BuildRequires:  boost-thread
 
 %description
 The OpenGLES Canvas Core Library provides a 3D scene graph
