@@ -305,7 +305,7 @@ int UtcDaliMaterialSetBlendMode03(void)
 {
   TestApplication application;
 
-  tet_infoline("Test setting the blend mode to auto with a transparent color renders with blending enabled");
+  tet_infoline("Test setting the blend mode to auto with a transparent material color renders with blending enabled");
 
   Geometry geometry = CreateQuadGeometry();
   Material material = CreateMaterial(0.5f);
@@ -363,6 +363,70 @@ int UtcDaliMaterialSetBlendMode04(void)
   END_TEST;
 }
 
+int UtcDaliMaterialSetBlendMode04b(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the blend mode to auto with an opaque material color and a transparent actor color renders with blending enabled");
+
+  Geometry geometry = CreateQuadGeometry();
+  Material material = CreateMaterial(1.0f);
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  actor.SetColor( Vector4(1.0f, 0.0f, 1.0f, 0.5f) );
+  Stage::GetCurrent().Add(actor);
+
+  material.SetBlendMode(BlendingMode::AUTO);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialSetBlendMode04c(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test setting the blend mode to auto with an opaque material color and an opaque actor color renders with blending disabled");
+
+  Geometry geometry = CreateQuadGeometry();
+  Material material = CreateMaterial(1.0f);
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  actor.SetColor( Color::MAGENTA );
+  Stage::GetCurrent().Add(actor);
+
+  material.SetBlendMode(BlendingMode::AUTO);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+  DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
 int UtcDaliMaterialSetBlendMode05(void)
 {
   TestApplication application;
@@ -391,6 +455,106 @@ int UtcDaliMaterialSetBlendMode05(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialSetBlendMode06(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the blend mode to auto with an opaque color and an image without an alpha channel and a shader with the hint OUTPUT_IS_TRANSPARENT renders with blending enabled");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_TRANSPARENT );
+  Material material = Material::New(shader);
+  material.SetProperty(Material::Property::COLOR, Color::WHITE);
+
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  material.SetBlendMode(BlendingMode::AUTO);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialSetBlendMode07(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the blend mode to auto with a transparent color and an image without an alpha channel and a shader with the hint OUTPUT_IS_OPAQUE renders with blending disabled");
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
+  Material material = Material::New(shader);
+  material.SetProperty(Material::Property::COLOR, Color::TRANSPARENT);
+
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  material.SetBlendMode(BlendingMode::AUTO);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+  DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialSetBlendMode08(void)
+{
+  TestApplication application;
+  tet_infoline("Test setting the blend mode to auto with an opaque color and an image with an alpha channel and a shader with the hint OUTPUT_IS_OPAQUE renders with blending disabled");
+
+  Geometry geometry = CreateQuadGeometry();
+  Shader shader = Shader::New( "vertexSrc", "fragmentSrc", Shader::HINT_OUTPUT_IS_OPAQUE );
+  Material material = Material::New(shader);
+  material.SetProperty(Material::Property::COLOR, Color::WHITE);
+  BufferImage image = BufferImage::New( 50, 50, Pixel::RGBA8888 );
+  Sampler sampler = Sampler::New( image, "sTexture" );
+  material.AddSampler( sampler );
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  material.SetBlendMode(BlendingMode::AUTO);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+
+  application.SendNotification();
+  application.Render();
+
+  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  std::ostringstream blendStr;
+  blendStr << GL_BLEND;
+  DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
 
   END_TEST;
 }

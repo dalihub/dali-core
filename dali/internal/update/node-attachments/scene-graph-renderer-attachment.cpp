@@ -185,15 +185,30 @@ bool RendererAttachment::IsFullyOpaque( BufferIndex updateBufferIndex )
 {
   bool opaque = false;
 
-  if( mParent )
+  if( mMaterial != NULL )
   {
-    opaque = mParent->GetWorldColor( updateBufferIndex ).a >= FULLY_OPAQUE;
-  }
-
-  if( opaque && mMaterial != NULL )
-  {
-    // Calculated by material in PrepareRender step
-    opaque = ! mMaterial->GetBlendingEnabled( updateBufferIndex );
+    Material::BlendPolicy blendPolicy = mMaterial->GetBlendPolicy();
+    switch( blendPolicy )
+    {
+      case Material::OPAQUE:
+      {
+        opaque = true;
+        break;
+      }
+      case Material::TRANSPARENT:
+      {
+        opaque = false;
+        break;
+      }
+      case Material::USE_ACTOR_COLOR:
+      {
+        if( mParent )
+        {
+          opaque = mParent->GetWorldColor( updateBufferIndex ).a >= FULLY_OPAQUE;
+        }
+        break;
+      }
+    }
   }
 
   return opaque;

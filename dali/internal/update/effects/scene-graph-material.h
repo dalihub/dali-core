@@ -43,6 +43,17 @@ class Material : public PropertyOwner, public MaterialDataProvider, public Unifo
 {
 public:
   /**
+   * This enum defines the outputs of the PrepareRender step, and is used
+   * by the Renderer to determine final opacity.
+   */
+  enum BlendPolicy
+  {
+    OPAQUE,          ///< If the renderer should always be opaque
+    TRANSPARENT,     ///< If the renderer should always be transparent
+    USE_ACTOR_COLOR  ///< If the renderer should determine opacity using the actor color
+  };
+
+  /**
    * Constructor
    */
   Material();
@@ -79,13 +90,14 @@ public:
   void PrepareRender( BufferIndex bufferIndex );
 
   /**
-   * Return true if the material requires blending
-   * @return true if the material requires blending
+   * Return the blend policy ( a combination of all the different shader hints, color, samper and image properties ).
+   * This should only be called from the update thread
+   * @return The material's blend policy
    */
-  bool GetBlendingEnabled( BufferIndex bufferIndex ) const;
+  BlendPolicy GetBlendPolicy() const;
 
   /**
-   * Set the blending options. This should only be called from the update-thread.
+   * Set the blending options. This should only be called from the update thread.
    * @param[in] updateBufferIndex The current update buffer index.
    * @param[in] options A bitmask of blending options.
    */
@@ -203,7 +215,7 @@ private:
   Shader* mShader;
   Vector<Sampler*> mSamplers; // Not owned
   ConnectionChangePropagator mConnectionObservers;
-  DoubleBuffered<int> mBlendingEnabled; // The output of the current blending mode and sampler properties
+  BlendPolicy mBlendPolicy; ///< The blend policy as determined by PrepareRender
 };
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, const Shader& shader )
