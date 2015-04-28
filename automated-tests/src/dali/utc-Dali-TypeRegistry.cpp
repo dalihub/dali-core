@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1082,7 +1082,6 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
 
   // Check the animatable property name
   DALI_TEST_EQUALS( customActor.GetPropertyName( animatablePropertyIndex ), animatablePropertyName, TEST_LOCATION );
-//  DALI_TEST_EQUALS( typeInfo.GetPropertyName( animatablePropertyIndex ), animatablePropertyName, TEST_LOCATION );
 
   // Check the animatable property index
   DALI_TEST_EQUALS( customActor.GetPropertyIndex( animatablePropertyName ), animatablePropertyIndex, TEST_LOCATION );
@@ -1095,7 +1094,7 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   typeInfo.GetPropertyIndices( indices );
   DALI_TEST_EQUALS( indices.size(), 1u, TEST_LOCATION );
 
-  // Ensure indices returned from actor and customActor differ by three
+  // Ensure indices returned from actor and customActor differ by one
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );
   unsigned int actorIndices = indices.size();
@@ -1131,6 +1130,168 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationN(void)
   catch ( DaliException& e )
   {
     DALI_TEST_ASSERT( e, "( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  // Check property count before property registration
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( typeid(MyTestCustomActor) );
+  DALI_TEST_CHECK( typeInfo );
+  BaseHandle handle = typeInfo.CreateInstance();
+  DALI_TEST_CHECK( handle );
+  Actor customActor = Actor::DownCast( handle );
+  DALI_TEST_CHECK( customActor );
+
+  unsigned int customPropertyCount( customActor.GetPropertyCount() );
+
+  // Register animatable property
+  std::string animatablePropertyName( "animatable-prop-1" );
+  int animatablePropertyIndex( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
+  Property::Type animatablePropertyType( Property::VECTOR2 );
+  AnimatablePropertyRegistration animatableProperty1( customType1, animatablePropertyName, animatablePropertyIndex, animatablePropertyType );
+
+  // Check property count after registration
+  DALI_TEST_EQUALS( customPropertyCount + 1u, customActor.GetPropertyCount(), TEST_LOCATION );
+
+  // Set the animatable property value
+  customActor.SetProperty( animatablePropertyIndex, Vector2(25.0f, 50.0f) );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check the animatable property value
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( animatablePropertyIndex ), Vector2(25.0f, 50.0f), TEST_LOCATION );
+
+  // Check the animatable property name
+  DALI_TEST_EQUALS( customActor.GetPropertyName( animatablePropertyIndex ), animatablePropertyName, TEST_LOCATION );
+
+  // Check the animatable property index
+  DALI_TEST_EQUALS( customActor.GetPropertyIndex( animatablePropertyName ), animatablePropertyIndex, TEST_LOCATION );
+
+  // Check the animatable property type
+  DALI_TEST_EQUALS( customActor.GetPropertyType( animatablePropertyIndex ), animatablePropertyType, TEST_LOCATION );
+
+  // Check property count of type-info is 1
+  Property::IndexContainer indices;
+  typeInfo.GetPropertyIndices( indices );
+  DALI_TEST_EQUALS( indices.size(), 1u, TEST_LOCATION );
+
+  // Register animatable property components
+  std::string animatablePropertyComponentName1( "animatable-prop-1-x" );
+  int animatablePropertyComponentIndex1( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1 );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent1( customType1, animatablePropertyComponentName1, animatablePropertyComponentIndex1, animatablePropertyIndex, 0 );
+
+  std::string animatablePropertyComponentName2( "animatable-prop-1-y" );
+  int animatablePropertyComponentIndex2( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 2 );
+  AnimatablePropertyComponentRegistration animatablePropertyComponent2( customType1, animatablePropertyComponentName2, animatablePropertyComponentIndex2, animatablePropertyIndex, 1 );
+
+  // Check property count after registration
+  DALI_TEST_EQUALS( customPropertyCount + 3u, customActor.GetPropertyCount(), TEST_LOCATION );
+
+  // Check the animatable property component value
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex1 ), 25.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex2 ), 50.0f, TEST_LOCATION );
+
+  // Set the animatable property component value
+  customActor.SetProperty( animatablePropertyComponentIndex1, 150.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check the animatable property value
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( animatablePropertyIndex ), Vector2(150.0f, 50.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex1 ), 150.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex2 ), 50.0f, TEST_LOCATION );
+
+  // Set the animatable property component value
+  customActor.SetProperty( animatablePropertyComponentIndex2, 225.0f );
+
+  // Render and notify
+  application.SendNotification();
+  application.Render();
+
+  // Check the animatable property value
+  DALI_TEST_EQUALS( customActor.GetProperty< Vector2 >( animatablePropertyIndex ), Vector2(150.0f, 225.0f), TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex1 ), 150.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( customActor.GetProperty< float >( animatablePropertyComponentIndex2 ), 225.0f, TEST_LOCATION );
+
+  // Ensure indices returned from actor and customActor differ by three
+  Actor actor = Actor::New();
+  actor.GetPropertyIndices( indices );
+  unsigned int actorIndices = indices.size();
+  customActor.GetPropertyIndices( indices );
+  unsigned int customActorIndices = indices.size();
+  DALI_TEST_EQUALS( actorIndices + 3u, customActorIndices, TEST_LOCATION ); // Custom property + registered property
+
+  END_TEST;
+}
+
+int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationN(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  // Register animatable property with the type of Vector2
+  int animatablePropertyIndex1( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX );
+  AnimatablePropertyRegistration animatableProperty1( customType1, "animatable-prop-1", animatablePropertyIndex1, Property::VECTOR2 );
+
+  // Attempt to register an animatable property component out-of-bounds index (less than)
+  try
+  {
+    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatable-prop-1-x", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX - 1, animatablePropertyIndex1, 0 );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )", TEST_LOCATION );
+  }
+
+  // Attempt to register an animatable property component out-of-bounds index (greater than)
+  try
+  {
+    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatable-prop-1-x", ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX + 1, animatablePropertyIndex1, 0 );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )", TEST_LOCATION );
+  }
+
+  // Register an animatable property component
+  AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatable-prop-1-x", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 1, animatablePropertyIndex1, 0 );
+
+  // Attempt to register another animatable property component with the same component index
+  try
+  {
+    AnimatablePropertyComponentRegistration propertyComponent2( customType1, "animatable-prop-1-y", ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 2, animatablePropertyIndex1, 0 );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "Property component already registered", TEST_LOCATION );
+  }
+
+  // Register animatable property with the type of boolean
+  int animatablePropertyIndex2( ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX + 2 );
+  AnimatablePropertyRegistration animatableProperty2( customType1, "animatable-prop-2", animatablePropertyIndex2, Property::BOOLEAN );
+
+  // Attempt to register an animatable property component for the above property with boolean type
+  try
+  {
+    AnimatablePropertyComponentRegistration propertyComponent1( customType1, "animatable-prop-2-x", animatablePropertyIndex2 + 1, animatablePropertyIndex2, 0 );
+    tet_result( TET_FAIL );
+  }
+  catch ( DaliException& e )
+  {
+    DALI_TEST_ASSERT( e, "Base property does not support component", TEST_LOCATION );
   }
 
   END_TEST;
