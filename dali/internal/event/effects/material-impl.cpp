@@ -39,13 +39,14 @@ namespace
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "color",                           VECTOR4,  true, true,   true, Dali::Material::Property::COLOR )
-DALI_PROPERTY( "face-culling-mode",               STRING,   true, false,  true, Dali::Material::Property::FACE_CULLING_MODE )
-DALI_PROPERTY( "blending-mode",                   STRING,   true, false,  true, Dali::Material::Property::BLENDING_MODE )
-DALI_PROPERTY( "blend-equation",                  STRING,   true, false,  true, Dali::Material::Property::BLEND_EQUATION )
-DALI_PROPERTY( "source-blend-factor-rgb",         STRING,   true, false,  true, Dali::Material::Property::BLENDING_SRC_FACTOR_RGB )
-DALI_PROPERTY( "destination-blend-factor-rgb",    STRING,   true, false,  true, Dali::Material::Property::BLENDING_DEST_FACTOR_RGB )
-DALI_PROPERTY( "source-blend-factor-alpha",       STRING,   true, false,  true, Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA )
-DALI_PROPERTY( "destination-blend-factor-alpha",  STRING,   true, false,  true, Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA )
+DALI_PROPERTY( "face-culling-mode",               STRING,   true, false,  false, Dali::Material::Property::FACE_CULLING_MODE )
+DALI_PROPERTY( "blending-mode",                   STRING,   true, false,  false, Dali::Material::Property::BLENDING_MODE )
+DALI_PROPERTY( "blend-equation-rgb",                  STRING,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_RGB )
+DALI_PROPERTY( "blend-equation-alpha",                  STRING,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_ALPHA )
+DALI_PROPERTY( "source-blend-factor-rgb",         STRING,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_RGB )
+DALI_PROPERTY( "destination-blend-factor-rgb",    STRING,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_RGB )
+DALI_PROPERTY( "source-blend-factor-alpha",       STRING,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA )
+DALI_PROPERTY( "destination-blend-factor-alpha",  STRING,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA )
 DALI_PROPERTY( "blend-color",                     VECTOR4,  true, true,   true, Dali::Material::Property::BLEND_COLOR )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
@@ -107,7 +108,6 @@ void Material::SetBlendMode( BlendingMode::Type mode )
   }
 }
 
-// @todo MESH_REWORK API change, or store here
 BlendingMode::Type Material::GetBlendMode() const
 {
   return mBlendingMode;
@@ -115,8 +115,8 @@ BlendingMode::Type Material::GetBlendMode() const
 
 void Material::SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  mBlendingOptions.SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
+  SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
 }
 
 void Material::SetBlendFunc( BlendingFactor::Type srcFactorRgb,
@@ -124,8 +124,8 @@ void Material::SetBlendFunc( BlendingFactor::Type srcFactorRgb,
                              BlendingFactor::Type srcFactorAlpha,
                              BlendingFactor::Type destFactorAlpha )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  mBlendingOptions.SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+  SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
 }
 
 void Material::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,
@@ -133,28 +133,31 @@ void Material::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,
                              BlendingFactor::Type& srcFactorAlpha,
                              BlendingFactor::Type& destFactorAlpha ) const
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  srcFactorRgb    = mBlendingOptions.GetBlendSrcFactorRgb();
+  destFactorRgb   = mBlendingOptions.GetBlendDestFactorRgb();
+  srcFactorAlpha  = mBlendingOptions.GetBlendSrcFactorAlpha();
+  destFactorAlpha = mBlendingOptions.GetBlendDestFactorAlpha();
 }
 
 void Material::SetBlendEquation( BlendingEquation::Type equationRgba )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  mBlendingOptions.SetBlendEquation( equationRgba, equationRgba );
+  SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
 }
 
 void Material::SetBlendEquation( BlendingEquation::Type equationRgb,
                                  BlendingEquation::Type equationAlpha )
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  mBlendingOptions.SetBlendEquation( equationRgb, equationAlpha );
+  SetBlendingOptionsMessage( GetEventThreadServices(), *mSceneObject, mBlendingOptions.GetBitmask() );
 }
 
 void Material::GetBlendEquation( BlendingEquation::Type& equationRgb,
                                  BlendingEquation::Type& equationAlpha ) const
 {
-  // TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "TODO: MESH_REWORK" );
+  // These are not animatable, the cached values are up-to-date.
+  equationRgb   = mBlendingOptions.GetBlendEquationRgb();
+  equationAlpha = mBlendingOptions.GetBlendEquationAlpha();
 }
 
 void Material::SetBlendColor( const Vector4& color )
@@ -238,29 +241,68 @@ void Material::SetDefaultProperty( Property::Index index,
       }
       break;
     }
-    case Dali::Material::Property::BLEND_EQUATION:
+    case Dali::Material::Property::BLEND_EQUATION_RGB:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingEquation::Type alphaEquation = mBlendingOptions.GetBlendEquationAlpha();
+      mBlendingOptions.SetBlendEquation( static_cast<BlendingEquation::Type>(propertyValue.Get<int>()), alphaEquation );
+      break;
+    }
+    case Dali::Material::Property::BLEND_EQUATION_ALPHA:
+    {
+      BlendingEquation::Type rgbEquation = mBlendingOptions.GetBlendEquationRgb();
+      mBlendingOptions.SetBlendEquation( rgbEquation, static_cast<BlendingEquation::Type>(propertyValue.Get<int>()) );
       break;
     }
     case Dali::Material::Property::BLENDING_SRC_FACTOR_RGB:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingFactor::Type srcFactorRgb;
+      BlendingFactor::Type destFactorRgb;
+      BlendingFactor::Type srcFactorAlpha;
+      BlendingFactor::Type destFactorAlpha;
+      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+      SetBlendFunc( static_cast<BlendingFactor::Type>(propertyValue.Get<int>()),
+                    destFactorRgb,
+                    srcFactorAlpha,
+                    destFactorAlpha );
       break;
     }
     case Dali::Material::Property::BLENDING_DEST_FACTOR_RGB:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingFactor::Type srcFactorRgb;
+      BlendingFactor::Type destFactorRgb;
+      BlendingFactor::Type srcFactorAlpha;
+      BlendingFactor::Type destFactorAlpha;
+      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+      SetBlendFunc( srcFactorRgb,
+                    static_cast<BlendingFactor::Type>(propertyValue.Get<int>()),
+                    srcFactorAlpha,
+                    destFactorAlpha );
       break;
     }
     case Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingFactor::Type srcFactorRgb;
+      BlendingFactor::Type destFactorRgb;
+      BlendingFactor::Type srcFactorAlpha;
+      BlendingFactor::Type destFactorAlpha;
+      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+      SetBlendFunc( srcFactorRgb,
+                    destFactorRgb,
+                    static_cast<BlendingFactor::Type>(propertyValue.Get<int>()),
+                    destFactorAlpha );
       break;
     }
     case Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingFactor::Type srcFactorRgb;
+      BlendingFactor::Type destFactorRgb;
+      BlendingFactor::Type srcFactorAlpha;
+      BlendingFactor::Type destFactorAlpha;
+      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+      SetBlendFunc( srcFactorRgb,
+                    destFactorRgb,
+                    srcFactorAlpha,
+                    static_cast<BlendingFactor::Type>(propertyValue.Get<int>()) );
       break;
     }
     case Dali::Material::Property::BLEND_COLOR:
@@ -310,29 +352,54 @@ Property::Value Material::GetDefaultProperty( Property::Index index ) const
       }
       break;
     }
-    case Dali::Material::Property::BLEND_EQUATION:
+    case Dali::Material::Property::BLEND_EQUATION_RGB:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      value = static_cast<int>( mBlendingOptions.GetBlendEquationRgb() );
+      break;
+    }
+    case Dali::Material::Property::BLEND_EQUATION_ALPHA:
+    {
+      value = static_cast<int>( mBlendingOptions.GetBlendEquationAlpha() );
       break;
     }
     case Dali::Material::Property::BLENDING_SRC_FACTOR_RGB:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingFactor::Type srcFactorRgb;
+      BlendingFactor::Type destFactorRgb;
+      BlendingFactor::Type srcFactorAlpha;
+      BlendingFactor::Type destFactorAlpha;
+      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+      value = static_cast<int>( srcFactorRgb );
       break;
     }
     case Dali::Material::Property::BLENDING_DEST_FACTOR_RGB:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingFactor::Type srcFactorRgb;
+      BlendingFactor::Type destFactorRgb;
+      BlendingFactor::Type srcFactorAlpha;
+      BlendingFactor::Type destFactorAlpha;
+      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+      value = static_cast<int>( destFactorRgb );
       break;
     }
     case Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingFactor::Type srcFactorRgb;
+      BlendingFactor::Type destFactorRgb;
+      BlendingFactor::Type srcFactorAlpha;
+      BlendingFactor::Type destFactorAlpha;
+      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+      value = static_cast<int>( srcFactorAlpha );
       break;
     }
     case Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA:
     {
-      DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
+      BlendingFactor::Type srcFactorRgb;
+      BlendingFactor::Type destFactorRgb;
+      BlendingFactor::Type srcFactorAlpha;
+      BlendingFactor::Type destFactorAlpha;
+      GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+      value = static_cast<int>( destFactorAlpha );
       break;
     }
     case Dali::Material::Property::BLEND_COLOR:
@@ -422,36 +489,6 @@ const PropertyInputImpl* Material::GetSceneObjectInputProperty( Property::Index 
         case Dali::Material::Property::FACE_CULLING_MODE:
         {
           property = &mSceneObject->mFaceCullingMode;
-          break;
-        }
-        case Dali::Material::Property::BLENDING_MODE:
-        {
-          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
-          break;
-        }
-        case Dali::Material::Property::BLEND_EQUATION:
-        {
-          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
-          break;
-        }
-        case Dali::Material::Property::BLENDING_SRC_FACTOR_RGB:
-        {
-          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
-          break;
-        }
-        case Dali::Material::Property::BLENDING_DEST_FACTOR_RGB:
-        {
-          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
-          break;
-        }
-        case Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA:
-        {
-          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
-          break;
-        }
-        case Dali::Material::Property::BLENDING_DEST_FACTOR_ALPHA:
-        {
-          DALI_ASSERT_ALWAYS( 0 && "Mesh Rework" );
           break;
         }
         case Dali::Material::Property::BLEND_COLOR:

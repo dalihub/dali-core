@@ -32,7 +32,7 @@ Sampler::Sampler( const std::string& textureUnitUniformName )
   mMagFilter( Dali::Sampler::DEFAULT ),
   mUWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
   mVWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
-  mAffectsTransparency( false ),
+  mAffectsTransparency( true ),
   mTextureUnitUniformName( textureUnitUniformName ),
   mTextureId( 0u ),
   mFullyOpaque(true)

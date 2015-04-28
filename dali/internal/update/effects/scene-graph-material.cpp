@@ -20,8 +20,9 @@
 // INTERNAL HEADERS
 #include <dali/public-api/shader-effects/material.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
-#include <dali/internal/render/data-providers/sampler-data-provider.h>
+#include <dali/internal/common/internal-constants.h>
 #include <dali/internal/update/effects/scene-graph-sampler.h>
+#include <dali/internal/render/data-providers/sampler-data-provider.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/public-api/actors/blending.h>
 
@@ -37,12 +38,7 @@ Material::Material()
   mBlendColor( Color::WHITE ),
   mFaceCullingMode(Dali::Material::NONE),
   mBlendingMode(Dali::BlendingMode::AUTO),
-  mBlendFuncSrcFactorRgb(DEFAULT_BLENDING_SRC_FACTOR_RGB),
-  mBlendFuncSrcFactorAlpha(DEFAULT_BLENDING_SRC_FACTOR_ALPHA),
-  mBlendFuncDestFactorRgb(DEFAULT_BLENDING_DEST_FACTOR_RGB),
-  mBlendFuncDestFactorAlpha(DEFAULT_BLENDING_SRC_FACTOR_ALPHA),
-  mBlendEquationRgb(DEFAULT_BLENDING_EQUATION_RGB),
-  mBlendEquationAlpha(DEFAULT_BLENDING_EQUATION_ALPHA),
+  mBlendingOptions(DEFAULT_BLENDING_EQUATION_ALPHA),
   mShader(NULL),
   mBlendingEnabled(false)
 {
@@ -124,6 +120,12 @@ void Material::PrepareRender( BufferIndex bufferIndex )
 
       if( opaque )
       {
+        // Check the material color:
+        opaque = ( mColor[ bufferIndex ].a >= FULLY_OPAQUE );
+      }
+
+      if( opaque )
+      {
         // Require that all affecting samplers are opaque
         unsigned int opaqueCount=0;
         unsigned int affectingCount=0;
@@ -162,6 +164,11 @@ bool Material::GetBlendingEnabled( BufferIndex bufferIndex ) const
   return mBlendingEnabled[bufferIndex];
 }
 
+void Material::SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options )
+{
+  mBlendingOptions.Set( updateBufferIndex, options );
+}
+
 const Vector4& Material::GetBlendColor(BufferIndex bufferIndex) const
 {
   return mBlendColor[bufferIndex];
@@ -169,32 +176,44 @@ const Vector4& Material::GetBlendColor(BufferIndex bufferIndex) const
 
 BlendingFactor::Type Material::GetBlendSrcFactorRgb( BufferIndex bufferIndex ) const
 {
-  return static_cast<Dali::BlendingFactor::Type>(mBlendFuncSrcFactorRgb[bufferIndex]);
+  BlendingOptions blendingOptions;
+  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
+  return blendingOptions.GetBlendSrcFactorRgb();
 }
 
 BlendingFactor::Type Material::GetBlendSrcFactorAlpha( BufferIndex bufferIndex ) const
 {
-  return static_cast<Dali::BlendingFactor::Type>(mBlendFuncSrcFactorAlpha[bufferIndex]);
+  BlendingOptions blendingOptions;
+  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
+  return blendingOptions.GetBlendSrcFactorAlpha();
 }
 
 BlendingFactor::Type Material::GetBlendDestFactorRgb( BufferIndex bufferIndex ) const
 {
-  return static_cast<Dali::BlendingFactor::Type>(mBlendFuncDestFactorRgb[bufferIndex]);
+  BlendingOptions blendingOptions;
+  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
+  return blendingOptions.GetBlendDestFactorRgb();
 }
 
 BlendingFactor::Type Material::GetBlendDestFactorAlpha( BufferIndex bufferIndex ) const
 {
-  return static_cast<Dali::BlendingFactor::Type>(mBlendFuncDestFactorAlpha[bufferIndex]);
+  BlendingOptions blendingOptions;
+  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
+  return blendingOptions.GetBlendDestFactorAlpha();
 }
 
 BlendingEquation::Type Material::GetBlendEquationRgb( BufferIndex bufferIndex ) const
 {
-  return static_cast<Dali::BlendingEquation::Type>(mBlendEquationRgb[bufferIndex]);
+  BlendingOptions blendingOptions;
+  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
+  return blendingOptions.GetBlendEquationRgb();
 }
 
 BlendingEquation::Type Material::GetBlendEquationAlpha( BufferIndex bufferIndex ) const
 {
-  return static_cast<Dali::BlendingEquation::Type>(mBlendEquationAlpha[bufferIndex]);
+  BlendingOptions blendingOptions;
+  blendingOptions.SetBitmask( mBlendingOptions[ bufferIndex ] );
+  return blendingOptions.GetBlendEquationAlpha();
 }
 
 void Material::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
@@ -239,12 +258,7 @@ void Material::ResetDefaultProperties( BufferIndex updateBufferIndex )
   mFaceCullingMode.CopyPrevious( updateBufferIndex );
 
   mBlendingMode.CopyPrevious( updateBufferIndex );
-  mBlendFuncSrcFactorRgb.CopyPrevious( updateBufferIndex );
-  mBlendFuncSrcFactorAlpha.CopyPrevious( updateBufferIndex );
-  mBlendFuncDestFactorRgb.CopyPrevious( updateBufferIndex );
-  mBlendFuncDestFactorAlpha.CopyPrevious( updateBufferIndex );
-  mBlendEquationRgb.CopyPrevious( updateBufferIndex );
-  mBlendEquationAlpha.CopyPrevious( updateBufferIndex );
+  mBlendingOptions.CopyPrevious( updateBufferIndex );
 }
 
 } // namespace SceneGraph

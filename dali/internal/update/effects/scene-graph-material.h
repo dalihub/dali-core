@@ -84,6 +84,13 @@ public:
    */
   bool GetBlendingEnabled( BufferIndex bufferIndex ) const;
 
+  /**
+   * Set the blending options. This should only be called from the update-thread.
+   * @param[in] updateBufferIndex The current update buffer index.
+   * @param[in] options A bitmask of blending options.
+   */
+  void SetBlendingOptions( BufferIndex updateBufferIndex, unsigned int options );
+
 public: // Implementation of MaterialDataProvider
 
   /**
@@ -190,20 +197,13 @@ public: // Property data
   AnimatableProperty<Vector4> mBlendColor;
   DoubleBufferedProperty<int> mFaceCullingMode;
   DoubleBufferedProperty<int> mBlendingMode;
-
-  // @todo MESH_REWORK Consider storing only mBlendingOptions bitmask
-  DoubleBufferedProperty<int> mBlendFuncSrcFactorRgb;
-  DoubleBufferedProperty<int> mBlendFuncSrcFactorAlpha;
-  DoubleBufferedProperty<int> mBlendFuncDestFactorRgb;
-  DoubleBufferedProperty<int> mBlendFuncDestFactorAlpha;
-  DoubleBufferedProperty<int> mBlendEquationRgb;
-  DoubleBufferedProperty<int> mBlendEquationAlpha;
+  DoubleBufferedProperty<int> mBlendingOptions;
 
 private:
   Shader* mShader;
   Vector<Sampler*> mSamplers; // Not owned
   ConnectionChangePropagator mConnectionObservers;
-  DoubleBuffered<bool> mBlendingEnabled; // The output of the current blending mode and sampler properties
+  DoubleBuffered<int> mBlendingEnabled; // The output of the current blending mode and sampler properties
 };
 
 inline void SetShaderMessage( EventThreadServices& eventThreadServices, const Material& material, const Shader& shader )
@@ -238,6 +238,17 @@ inline void RemoveSamplerMessage( EventThreadServices& eventThreadServices, cons
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &material, &Material::RemoveSampler, const_cast<Sampler*>(&sampler) );
 }
+
+inline void SetBlendingOptionsMessage( EventThreadServices& eventThreadServices, const Material& material, unsigned int options )
+{
+  typedef MessageDoubleBuffered1< Material, unsigned int > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  new (slot) LocalType( &material, &Material::SetBlendingOptions, options );
+}
+
 
 } // namespace SceneGraph
 } // namespace Internal

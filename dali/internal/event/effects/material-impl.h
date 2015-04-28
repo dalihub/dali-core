@@ -31,6 +31,7 @@
 #include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
 #include <dali/internal/event/effects/sampler-impl.h> // Dali::Internal::Sampler
 #include <dali/internal/event/effects/shader-impl.h> // Dali::Internal::Shader
+#include <dali/internal/common/blending-options.h>
 
 namespace Dali
 {
@@ -269,6 +270,7 @@ private: //data
   SceneGraph::Material* mSceneObject;
 
   BlendingMode::Type mBlendingMode; ///< Local store
+  BlendingOptions mBlendingOptions; ///< Local copy of blending options bitmask
   bool mOnStage;
 };
 

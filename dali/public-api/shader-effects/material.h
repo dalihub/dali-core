@@ -69,7 +69,8 @@ public:
       COLOR = DEFAULT_OBJECT_PROPERTY_START_INDEX,  ///< name "color",                          type VECTOR4
       FACE_CULLING_MODE,                            ///< name "face-culling-mode",              type STRING
       BLENDING_MODE,                                ///< name "blending-mode",                  type STRING
-      BLEND_EQUATION,                               ///< name "blend-equation",                 type STRING
+      BLEND_EQUATION_RGB,                           ///< name "blend-equation-rgb",             type STRING
+      BLEND_EQUATION_ALPHA,                         ///< name "blend-equation-alpha",           type STRING
       BLENDING_SRC_FACTOR_RGB,                      ///< name "source-blend-factor-rgb",        type STRING
       BLENDING_DEST_FACTOR_RGB,                     ///< name "destination-blend-factor-rgb",   type STRING
       BLENDING_SRC_FACTOR_ALPHA,                    ///< name "source-blend-factor-alpha",      type STRING
