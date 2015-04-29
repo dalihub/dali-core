@@ -93,6 +93,15 @@ void RenderGeometry::UploadVertexData(
 
     mDataNeedsUploading = false;
   }
+
+  for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
+  {
+    mVertexBuffers[i]->Upload( context, bufferIndex );
+  }
+  if( mIndexBuffer )
+  {
+    mIndexBuffer->Upload( context, bufferIndex );
+  }
 }
 
 void RenderGeometry::DoUpload(
@@ -114,8 +123,6 @@ void RenderGeometry::DoUpload(
       GpuBuffer::ARRAY_BUFFER,
       GpuBuffer::STATIC_DRAW ); // TODO: MESH_REWORK: change this for animated meshes
 
-    propertyBuffer->Upload( context, bufferIndex );
-
     mVertexBuffers.PushBack( propertyBuffer );
   }
 
@@ -127,8 +134,6 @@ void RenderGeometry::DoUpload(
       *indexBuffer,
       GpuBuffer::ELEMENT_ARRAY_BUFFER,
       GpuBuffer::STATIC_DRAW ); // TODO: MESH_REWORK: change this for animated meshes
-
-    mIndexBuffer->Upload( context, bufferIndex );
   }
 }
 

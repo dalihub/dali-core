@@ -64,6 +64,7 @@ void PropertyBuffer::SetSize( BufferIndex bufferIndex, unsigned int size )
 void PropertyBuffer::SetData(  BufferIndex bufferIndex, PropertyBufferDataProvider::BufferType* data )
 {
   mBufferData[bufferIndex] = data;
+  mDataChanged[bufferIndex] = true;
 }
 
 void PropertyBuffer::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )
@@ -76,9 +77,7 @@ void PropertyBuffer::DisconnectFromSceneGraph( SceneController& sceneController,
 
 bool PropertyBuffer::HasDataChanged( BufferIndex bufferIndex ) const
 {
-  //TODO: MESH_REWORK fix this
-  DALI_ASSERT_DEBUG(false && "FIX THIS");
-  return true;
+  return mDataChanged[ bufferIndex ];
 }
 
 unsigned int PropertyBuffer::GetAttributeCount( BufferIndex bufferIndex ) const
@@ -160,6 +159,9 @@ void PropertyBuffer::ResetDefaultProperties( BufferIndex updateBufferIndex )
 
   // Update double buffered value
   mBufferData.CopyPrevious(updateBufferIndex);
+
+  // The flag should be reset each frame
+  mDataChanged[updateBufferIndex] = false;
 }
 
 } // namespace SceneGraph

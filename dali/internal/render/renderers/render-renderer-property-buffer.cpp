@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
+// CLASS HEADERS
 #include <dali/internal/render/renderers/render-renderer-property-buffer.h>
 
+// INTERNAL INCLUDES
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/shaders/program.h>
 

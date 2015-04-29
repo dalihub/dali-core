@@ -184,6 +184,7 @@ private:
   OwnerPointer<PropertyBufferMetadata::Format> mFormat; ///< Format of the buffer
 
   DoubleBuffered< OwnerPointer<PropertyBufferDataProvider::BufferType> > mBufferData; ///< Data
+  DoubleBuffered< bool > mDataChanged; ///< Flag to know if data has changed in a frame
 
   DoubleBufferedProperty<unsigned int>  mSize; ///< Number of Elements in the buffer
 };
