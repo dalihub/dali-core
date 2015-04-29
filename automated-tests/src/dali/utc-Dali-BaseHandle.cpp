@@ -341,7 +341,7 @@ int UtcDaliBaseHandleDoAction(void)
   DALI_TEST_EQUALS(animation.GetDuration(), durationSeconds, TEST_LOCATION);
 
   Vector3 targetPosition(100.0f, 100.0f, 100.0f);
-  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunctions::Linear);
+  animation.AnimateTo(Property(actor, Actor::Property::POSITION), targetPosition, AlphaFunction::LINEAR);
 
   // Set the new duration to be 2 seconds
   float newDurationSeconds(2.0f);

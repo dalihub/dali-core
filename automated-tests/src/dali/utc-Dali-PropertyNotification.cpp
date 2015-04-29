@@ -861,7 +861,7 @@ int UtcDaliPropertyNotificationOrder(void)
   PropertyNotification notification2 = actor.AddPropertyNotification( Actor::Property::POSITION_X, GreaterThanCondition(150.0f) );
   notification2.NotifySignal().Connect( &TestCallback2 );
   Animation animation = Animation::New( 0.032f ); // finishes in 32 ms
-  animation.AnimateTo( Property(actor, Actor::Property::POSITION ), Vector3( 200.0f, 0.0f, 0.0f ), AlphaFunctions::Linear );
+  animation.AnimateTo( Property(actor, Actor::Property::POSITION ), Vector3( 200.0f, 0.0f, 0.0f ), AlphaFunction::LINEAR );
   animation.Play();
 
   // flush the queue

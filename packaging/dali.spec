@@ -1,6 +1,6 @@
 Name:       dali
 Summary:    The OpenGLES Canvas Core Library
-Version:    1.0.39
+Version:    1.0.40
 Release:    1
 Group:      System/Libraries
 License:    Apache-2.0
@@ -9,11 +9,8 @@ Source0:    %{name}-%{version}.tar.gz
 
 Requires(post): /sbin/ldconfig
 Requires(postun): /sbin/ldconfig
-Requires:       boost-thread
 BuildRequires:  pkgconfig
 BuildRequires:  gawk
-BuildRequires:  boost-devel
-BuildRequires:  boost-thread
 
 %description
 The OpenGLES Canvas Core Library provides a 3D scene graph

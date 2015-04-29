@@ -34,7 +34,7 @@ struct DALI_IMPORT_API TimePeriod
    *
    * @param [in] durationSeconds The duration of the time period in seconds.
    */
-  TimePeriod(float durationSeconds);
+  explicit TimePeriod(float durationSeconds);
 
   /**
    * @brief Create a time period.

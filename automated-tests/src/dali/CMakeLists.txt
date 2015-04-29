@@ -7,7 +7,7 @@ SET(CAPI_LIB "dali")
 
 SET(TC_SOURCES
         utc-Dali-Actor.cpp
-        utc-Dali-AlphaFunctions.cpp
+        utc-Dali-AlphaFunction.cpp
         utc-Dali-AngleAxis.cpp
         utc-Dali-AnimatableMesh.cpp
         utc-Dali-Animation.cpp

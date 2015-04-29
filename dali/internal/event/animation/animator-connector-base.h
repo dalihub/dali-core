@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/common/owner-container.h>
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/public-api/common/dali-common.h>
 

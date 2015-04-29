@@ -19,7 +19,7 @@
 #include <dali/public-api/animation/animation.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/animation/alpha-functions.h>
+#include <dali/public-api/animation/alpha-function.h>
 #include <dali/public-api/animation/time-period.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
