@@ -180,7 +180,7 @@ void RenderGeometry::Draw( Context& context, BufferIndex bufferIndex, const Rend
   unsigned int numIndices = 0;
   if( indexBuffer )
   {
-    numIndices = /* TODO: MESH_REWORK remove this 2, should implement unsigned short properties  */ 2 * indexBuffer->GetDataSize(bufferIndex) / indexBuffer->GetElementSize(bufferIndex);
+    numIndices = indexBuffer->GetDataSize(bufferIndex) / indexBuffer->GetElementSize(bufferIndex);
   }
 
   switch(type)
