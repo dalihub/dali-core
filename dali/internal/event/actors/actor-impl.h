@@ -234,18 +234,6 @@ public:
   Dali::Actor GetChildAt( unsigned int index ) const;
 
   /**
-   * Retrieve the Actor's children.
-   * @return A copy of the container of children.
-   */
-  ActorContainer GetChildren();
-
-  /**
-   * Retrieve the Actor's children.
-   * @return A const reference to the container of children.
-   */
-  const ActorContainer& GetChildren() const;
-
-  /**
    * Retrieve a reference to Actor's children.
    * @note Not for public use.
    * @return A reference to the container of children.

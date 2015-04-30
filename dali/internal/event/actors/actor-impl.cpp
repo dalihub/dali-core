@@ -557,28 +557,6 @@ Dali::Actor Actor::GetChildAt( unsigned int index ) const
   return ( ( mChildren ) ? ( *mChildren )[ index ] : Dali::Actor() );
 }
 
-ActorContainer Actor::GetChildren()
-{
-  if( NULL != mChildren )
-  {
-    return *mChildren;
-  }
-
-  // return copy of mNullChildren
-  return mNullChildren;
-}
-
-const ActorContainer& Actor::GetChildren() const
-{
-  if( NULL != mChildren )
-  {
-    return *mChildren;
-  }
-
-  // return const reference to mNullChildren
-  return mNullChildren;
-}
-
 ActorPtr Actor::FindChildByName( const std::string& actorName )
 {
   ActorPtr child = 0;
