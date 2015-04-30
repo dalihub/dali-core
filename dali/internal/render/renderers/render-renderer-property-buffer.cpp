@@ -63,11 +63,11 @@ void RenderPropertyBuffer::Upload( Context& context, BufferIndex bufferIndex )
     std::size_t dataSize = mDataProvider.GetDataSize( bufferIndex );
 
     const void *data = &(mDataProvider.GetData( bufferIndex )[0]);
+    Vector<unsigned short> ushortData;
 
     // Index buffer needs to be unsigned short which is not supported by the property system
     if( mGpuBufferTarget == GpuBuffer::ELEMENT_ARRAY_BUFFER )
     {
-      Vector<unsigned short> ushortData;
       ushortData.Resize( dataSize );
       const unsigned int* unsignedData = static_cast<const unsigned int*>(data);
       for( unsigned int i = 0; i < dataSize; ++i )
