@@ -357,7 +357,7 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
       localMap.Resize( oldMap.Count() );
 
       unsigned int index=0;
-      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter )
+      for( CollectedUniformMap::Iterator iter = oldMap.Begin(), end = oldMap.End() ; iter != end ; ++iter, ++index )
       {
         localMap[index] = *iter;
       }
