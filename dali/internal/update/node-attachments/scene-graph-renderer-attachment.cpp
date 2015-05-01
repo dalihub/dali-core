@@ -254,7 +254,6 @@ bool RendererAttachment::DoPrepareResources(
       {
         case CompleteStatusManager::NOT_READY:
         {
-          ready = false;
           if( metaData.GetIsFramebuffer() )
           {
             frameBufferCount++;

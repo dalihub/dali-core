@@ -44,11 +44,9 @@ RenderPropertyBuffer::~RenderPropertyBuffer()
 
 void RenderPropertyBuffer::Upload( Context& context, BufferIndex bufferIndex )
 {
-  bool hasGpuBuffer = NULL != mGpuBuffer;
-
   // Check if we have a gpu-buffer
   unsigned int gpuBufferId = 0; // TODO: MESH_REWORK FIX THIS  mDataProvider.GetGpuBufferId( bufferIndex );
-  if ( ! hasGpuBuffer )
+  if ( ! mGpuBuffer )
   {
     // TODO: MESH_REWORK
 //    mGpuBuffer /*= gpuBufferCache.GetGpuBuffer( gpuBufferId ) */;
@@ -58,9 +56,10 @@ void RenderPropertyBuffer::Upload( Context& context, BufferIndex bufferIndex )
   }
 
   // Update the GpuBuffer
-  if ( ! hasGpuBuffer || mDataProvider.HasDataChanged( bufferIndex ) )
+  if ( mGpuBuffer || mDataProvider.HasDataChanged( bufferIndex ) )
   {
     std::size_t dataSize = mDataProvider.GetDataSize( bufferIndex );
+    DALI_ASSERT_DEBUG( dataSize && "No data in the property buffer!" );
 
     const void *data = &(mDataProvider.GetData( bufferIndex )[0]);
     Vector<unsigned short> ushortData;
@@ -70,7 +69,8 @@ void RenderPropertyBuffer::Upload( Context& context, BufferIndex bufferIndex )
     {
       ushortData.Resize( dataSize );
       const unsigned int* unsignedData = static_cast<const unsigned int*>(data);
-      for( unsigned int i = 0; i < dataSize; ++i )
+      unsigned int numberOfElements = dataSize / sizeof(unsigned int);
+      for( unsigned int i = 0; i < numberOfElements; ++i )
       {
         ushortData[i] = unsignedData[i];
       }

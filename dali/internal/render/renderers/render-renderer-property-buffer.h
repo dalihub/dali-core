@@ -105,7 +105,7 @@ private:
   const PropertyBufferDataProvider& mDataProvider;  ///< Data provider used by this property buffer
   Vector<GLint> mAttributesLocation;                ///< Location of the attributes for the property buffer in this renderer.
 
-  GpuBuffer* mGpuBuffer;                            ///< Pointer to the GpuBuffer associated with this RenderPropertyBuffer
+  OwnerPointer<GpuBuffer> mGpuBuffer;               ///< Pointer to the GpuBuffer associated with this RenderPropertyBuffer
   GpuBuffer::Target mGpuBufferTarget;               ///< The type of GPU buffer to create
   GpuBuffer::Usage mGpuBufferUsage;                 ///< The type of usage the  GPU buffer will have
 };
