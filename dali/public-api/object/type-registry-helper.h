@@ -46,6 +46,9 @@ namespace Internal
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, valueType, enumIndex) \
   AnimatablePropertyRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, Property::valueType );
 
+#define DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex) \
+  AnimatablePropertyComponentRegistration DALI_TOKEN_PASTE( property, count ) ( typeRegistrationObject, text, objectNamespace::objectType::Property::enumIndex, objectNamespace::objectType::Property::baseEnumIndex, componentIndex );
+
 #define DALI_SIGNAL_REGISTRATION_INTERNAL( count, typeRegistrationObject, objectNamespace, objectType, text, textVariable ) \
   const char* const textVariable = text; \
   SignalConnectorType DALI_TOKEN_PASTE( signalConnector, count ) ( typeRegistrationObject, text, &objectNamespace::Internal::objectType::DoConnectSignal );
@@ -67,6 +70,9 @@ namespace Internal
 
 #define DALI_ANIMATABLE_PROPERTY_REGISTRATION( objectNamespace, objectType, text, valueType, enumIndex ) \
   DALI_ANIMATABLE_PROPERTY_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, valueType, enumIndex )
+
+#define DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION( objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex ) \
+  DALI_ANIMATABLE_PROPERTY_COMPONENT_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, enumIndex, baseEnumIndex, componentIndex )
 
 #define DALI_SIGNAL_REGISTRATION( objectNamespace, objectType, text, textVariable ) \
   DALI_SIGNAL_REGISTRATION_INTERNAL( __COUNTER__, typeRegistration, objectNamespace, objectType, text, textVariable )

@@ -2,7 +2,7 @@
 #define __DALI_PROPERTY_INPUT_ACCESSOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -130,8 +130,18 @@ public:
     // Invalid index is ok
     if ( mComponentIndex < 0 )
     {
-      // Not a Vector3 or Vector4 component, expecting float type
+      // Not a Vector2, Vector3 or Vector4 component, expecting float type
       return mInput->GetConstraintInputFloat( updateBufferIndex );
+    }
+    else if ( PropertyTypes::Get< Vector2 >() == mInput->GetType() )
+    {
+      if ( 0 == mComponentIndex )
+      {
+        return mInput->GetConstraintInputVector2( updateBufferIndex ).x;
+      }
+
+      DALI_ASSERT_DEBUG( 1 == mComponentIndex && "Invalid Vector2 component index" );
+      return mInput->GetConstraintInputVector2( updateBufferIndex ).y;
     }
     else if ( PropertyTypes::Get< Vector3 >() == mInput->GetType() )
     {
@@ -159,7 +169,7 @@ public:
     }
     else if ( 2 == mComponentIndex )
     {
-      return mInput->GetConstraintInputVector4( updateBufferIndex ).y;
+      return mInput->GetConstraintInputVector4( updateBufferIndex ).z;
     }
 
     DALI_ASSERT_DEBUG( 3 == mComponentIndex && "Invalid Vector4 component index" );

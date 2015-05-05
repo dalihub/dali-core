@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -72,6 +72,29 @@ struct PropertyNameFinder
 private:
 
   const std::string& mFind;
+};
+
+/**
+ * Functor to find a matching property component index
+ */
+template <typename T>
+struct PropertyComponentFinder
+{
+  PropertyComponentFinder( Dali::Property::Index basePropertyIndex, const int find )
+  : mBasePropertyIndex( basePropertyIndex ),
+    mFind( find )
+  {
+  }
+
+  bool operator()(const T &p) const
+  {
+    return ( p.second.basePropertyIndex == mBasePropertyIndex && p.second.componentIndex == mFind );
+  }
+
+private:
+
+  Dali::Property::Index mBasePropertyIndex;
+  const int mFind;
 };
 
 } // namespace anon
@@ -338,7 +361,7 @@ void TypeInfo::AddProperty( const std::string& name, Property::Index index, Prop
 
     if ( iter == mRegisteredProperties.end() )
     {
-      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, setFunc, getFunc, name ) ) );
+      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, setFunc, getFunc, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
     }
     else
     {
@@ -354,12 +377,37 @@ void TypeInfo::AddAnimatableProperty( const std::string& name, Property::Index i
 
   if ( iter == mRegisteredProperties.end() )
   {
-    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, NULL, NULL, name ) ) );
+    mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, NULL, NULL, name, Property::INVALID_INDEX, Property::INVALID_COMPONENT_INDEX ) ) );
   }
   else
   {
     DALI_ASSERT_ALWAYS( ! "Property index already added to Type" );
   }
+}
+
+void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex )
+{
+  Property::Type type = GetPropertyType( baseIndex );
+  DALI_ASSERT_ALWAYS( ( type == Property::VECTOR2 || type == Property::VECTOR3 || type == Property::VECTOR4 ) && "Base property does not support component" );
+
+  bool success = false;
+
+  RegisteredPropertyContainer::iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                        PairFinder< Property::Index, RegisteredPropertyPair>(index) );
+
+  if ( iter == mRegisteredProperties.end() )
+  {
+    iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                    PropertyComponentFinder< RegisteredPropertyPair >( baseIndex, componentIndex ) );
+
+    if ( iter == mRegisteredProperties.end() )
+    {
+      mRegisteredProperties.push_back( RegisteredPropertyPair( index, RegisteredProperty( type, NULL, NULL, name, baseIndex, componentIndex ) ) );
+      success = true;
+    }
+  }
+
+  DALI_ASSERT_ALWAYS( success && "Property component already registered" );
 }
 
 unsigned int TypeInfo::GetPropertyCount() const
@@ -399,6 +447,52 @@ Property::Index TypeInfo::GetPropertyIndex( const std::string& name ) const
   }
 
   return index;
+}
+
+Property::Index TypeInfo::GetBasePropertyIndex( Property::Index index ) const
+{
+  Property::Index basePropertyIndex = Property::INVALID_INDEX;
+
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+
+  if ( iter != mRegisteredProperties.end() )
+  {
+    basePropertyIndex = iter->second.basePropertyIndex;
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      basePropertyIndex = GetImplementation(base).GetBasePropertyIndex( index );
+    }
+  }
+
+  return basePropertyIndex;
+}
+
+int TypeInfo::GetComponentIndex( Property::Index index ) const
+{
+  int componentIndex = Property::INVALID_COMPONENT_INDEX;
+
+  RegisteredPropertyContainer::const_iterator iter = find_if( mRegisteredProperties.begin(), mRegisteredProperties.end(),
+                                                          PairFinder< Property::Index, RegisteredPropertyPair >( index ) );
+
+  if ( iter != mRegisteredProperties.end() )
+  {
+    componentIndex = iter->second.componentIndex;
+  }
+  else
+  {
+    Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
+    if ( base )
+    {
+      componentIndex = GetImplementation(base).GetComponentIndex( index );
+    }
+  }
+
+  return componentIndex;
 }
 
 bool TypeInfo::IsPropertyWritable( Property::Index index ) const

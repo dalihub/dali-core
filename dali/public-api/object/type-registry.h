@@ -303,6 +303,33 @@ public:
   AnimatablePropertyRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
 };
 
+/**
+ * @brief Register a component of animatable property for the given component index.
+ */
+class DALI_IMPORT_API AnimatablePropertyComponentRegistration
+{
+public:
+
+  /**
+   * @brief This constructor registers a component of an animatable property where
+   * the base animatable property must be a property that supports property component
+   * (i.e. Vector2, Vector3 or Vector4) and the base animatable property must have
+   * been registered.
+   *
+   * This constructor is for a component of scene-graph only properties where the
+   * value of the property can be retrieved and set via specified functions.
+   *
+   * @param [in] registered The TypeRegistration object
+   * @param [in] name The name of the component
+   * @param [in] index The property index. Must be a value between ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX and ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX inclusive.
+   * @param [in] baseIndex The index of the base animatable property. Must be a value between ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX and ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX inclusive.
+   * @param [in] componentIndex The index of the component (e.g. 0 for the x component of a Vector2 property and 1 for the y component of a Vector2 property).
+   *
+   * @pre "registered" must be registered with the TypeRegistry.
+   */
+  AnimatablePropertyComponentRegistration( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
+};
+
 } // namespace Dali
 
 #endif // header
