@@ -67,6 +67,12 @@ void Sampler::SetImage( Image& image )
   GetImplementation(*this).SetImage( imagePtr );
 }
 
+Image Sampler::GetImage() const
+{
+  Internal::ImagePtr imagePtr( GetImplementation(*this).GetImage() );
+  return Dali::Image( imagePtr.Get() );
+}
+
 void Sampler::SetFilterMode( FilterMode minFilter, FilterMode magFilter )
 {
   GetImplementation(*this).SetFilterMode( minFilter, magFilter );

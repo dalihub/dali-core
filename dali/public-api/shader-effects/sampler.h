@@ -136,6 +136,14 @@ public:
   void SetImage( Image& image );
 
   /**
+   * @brief Retrieve the image used by this sampler
+   *
+   * If no image is assigned, an empty handle is returned
+   * @return The image.
+   */
+  Image GetImage() const;
+
+  /**
    * @brief Set the filter modes for this sampler
    *
    * Calling this function sets the properties MINIFICATION_FILTER

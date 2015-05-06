@@ -76,6 +76,11 @@ void Sampler::SetImage( ImagePtr& image )
   }
 }
 
+ImagePtr Sampler::GetImage() const
+{
+  return mImageConnector.Get();
+}
+
 void Sampler::SetFilterMode( Dali::Sampler::FilterMode minFilter, Dali::Sampler::FilterMode magFilter )
 {
   if( NULL != mSceneObject )

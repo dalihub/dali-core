@@ -64,6 +64,11 @@ public:
   void SetImage( ImagePtr& image );
 
   /**
+   * @copydoc Dali::Sampler::GetImage()
+   */
+  ImagePtr GetImage() const;
+
+  /**
    * @copydoc Dali::Sampler::SetFilterMode()
    */
   void SetFilterMode( Dali::Sampler::FilterMode minFilter, Dali::Sampler::FilterMode magFilter );
