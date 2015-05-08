@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_INFO_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -132,6 +132,16 @@ public:
   void AddAnimatableProperty( const std::string& name, Property::Index index, Property::Type type );
 
   /**
+   * Adds a component of an animatable property to the type.
+   * The animatable property must have been type-registered and must be a Vector2, Vector3 or Vector4 type.
+   * @param[in] name The name of the component.
+   * @param[in] index The index of the property
+   * @param[in] baseIndex The index of the base animatable property
+   * @param[in] component The index The index of the component.
+   */
+  void AddAnimatablePropertyComponent( const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
+
+  /**
    * Do an action on base object
    * @param [in] object The base object to act upon
    * @param [in] actionName The name of the desired action
@@ -163,6 +173,20 @@ public:
    * @return The index associated with that name.
    */
   Property::Index GetPropertyIndex( const std::string& name ) const;
+
+  /**
+   * Given a property index, retrieve the index of its base property.
+   * @param[in] index The index of the property.
+   * @return The index of the base property associated with the given property index.
+   */
+  Property::Index GetBasePropertyIndex( Property::Index index ) const;
+
+  /**
+   * Given a property index, retrieve its component index.
+   * @param[in] index The index of the property.
+   * @return The component index associated with that property index.
+   */
+  int GetComponentIndex( Property::Index index ) const;
 
   /**
    * Checks if there is a setter for the property. If there is then it is writable.
@@ -218,15 +242,19 @@ private:
     : type( Property::NONE ),
       setFunc( NULL ),
       getFunc( NULL ),
-      name()
+      name(),
+      basePropertyIndex(Property::INVALID_INDEX),
+      componentIndex(Property::INVALID_COMPONENT_INDEX)
     {
     }
 
-    RegisteredProperty( Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, const std::string& propName )
+    RegisteredProperty( Property::Type propType, Dali::TypeInfo::SetPropertyFunction set, Dali::TypeInfo::GetPropertyFunction get, const std::string& propName, Property::Index basePropertyIndex, int componentIndex )
     : type( propType ),
       setFunc( set ),
       getFunc( get ),
-      name( propName )
+      name( propName ),
+      basePropertyIndex(basePropertyIndex),
+      componentIndex(componentIndex)
     {
     }
 
@@ -234,6 +262,8 @@ private:
     Dali::TypeInfo::SetPropertyFunction setFunc;
     Dali::TypeInfo::GetPropertyFunction getFunc;
     std::string name;
+    Property::Index basePropertyIndex;
+    int componentIndex;
   };
 
   typedef std::pair<std::string, Dali::TypeInfo::SignalConnectorFunction > ConnectionPair;

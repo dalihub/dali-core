@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_ANIMATABLE_PROPERTY_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -899,6 +899,32 @@ public:
   }
 
   /**
+   * Set the property value. This will only persist for the current frame; the property
+   * will be reset with the base value, at the beginning of the next frame.
+   * @param[in] bufferIndex The buffer to write.
+   * @param[in] value The new X value.
+   */
+  void SetX(BufferIndex bufferIndex, float value)
+  {
+    mValue[bufferIndex].x = value;
+
+    OnSet();
+  }
+
+  /**
+   * Set the property value. This will only persist for the current frame; the property
+   * will be reset with the base value, at the beginning of the next frame.
+   * @param[in] bufferIndex The buffer to write.
+   * @param[in] value The new Y value.
+   */
+  void SetY(BufferIndex bufferIndex, float value)
+  {
+    mValue[bufferIndex].y = value;
+
+    OnSet();
+  }
+
+  /**
    * Change the property value by a relative amount.
    * @param[in] bufferIndex The buffer to write.
    * @param[in] delta The property will change by this amount.
@@ -906,6 +932,30 @@ public:
   void SetRelative(BufferIndex bufferIndex, const Vector2& delta)
   {
     mValue[bufferIndex] += delta;
+
+    OnSet();
+  }
+
+  /**
+   * Change the X value by a relative amount.
+   * @param[in] bufferIndex The buffer to write.
+   * @param[in] delta The X value will change by this amount.
+   */
+  void SetXRelative(BufferIndex bufferIndex, float delta)
+  {
+    mValue[bufferIndex].x += delta;
+
+    OnSet();
+  }
+
+  /**
+   * Change the Y value by a relative amount.
+   * @param[in] bufferIndex The buffer to write.
+   * @param[in] delta The Y value will change by this amount.
+   */
+  void SetYRelative(BufferIndex bufferIndex, float delta)
+  {
+    mValue[bufferIndex].y += delta;
 
     OnSet();
   }
@@ -960,6 +1010,32 @@ public:
   }
 
   /**
+   * Set both the X value & base X value.
+   * @param[in] bufferIndex The buffer to write for the property value.
+   * @param[in] value The new property value.
+   */
+  void BakeX(BufferIndex bufferIndex, float value)
+  {
+    mValue[bufferIndex].x = value;
+    mBaseValue.x = value;
+
+    OnBake();
+  }
+
+  /**
+   * Set both the Y value & base Y value.
+   * @param[in] bufferIndex The buffer to write for the property value.
+   * @param[in] value The new property value.
+   */
+  void BakeY(BufferIndex bufferIndex, float value)
+  {
+    mValue[bufferIndex].y = value;
+    mBaseValue.y = value;
+
+    OnBake();
+  }
+
+  /**
    * Change the property value & base value by a relative amount.
    * @param[in] bufferIndex The buffer to write for the local property value.
    * @param[in] delta The property will change by this amount.
@@ -968,6 +1044,32 @@ public:
   {
     mValue[bufferIndex] += delta;
     mBaseValue = mValue[bufferIndex];
+
+    OnBake();
+  }
+
+  /**
+   * Change the X value & base X value by a relative amount.
+   * @param[in] bufferIndex The buffer to write for the local property value.
+   * @param[in] delta The X value will change by this amount.
+   */
+  void BakeXRelative(BufferIndex bufferIndex, float delta)
+  {
+    mValue[bufferIndex].x += delta;
+    mBaseValue.x = mValue[bufferIndex].x;
+
+    OnBake();
+  }
+
+  /**
+   * Change the Y value & base Y value by a relative amount.
+   * @param[in] bufferIndex The buffer to write for the local property value.
+   * @param[in] delta The Y value will change by this amount.
+   */
+  void BakeYRelative(BufferIndex bufferIndex, float delta)
+  {
+    mValue[bufferIndex].y += delta;
+    mBaseValue.y = mValue[bufferIndex].y;
 
     OnBake();
   }

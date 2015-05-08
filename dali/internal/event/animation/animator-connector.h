@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ANIMATOR_CONNECTOR_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -205,10 +205,46 @@ private:
     else
     {
       ///Animating a component of the property
-
-      //Vector3
-      if ( PropertyTypes::Get< Vector3 >() == baseProperty->GetType() )
+      if ( PropertyTypes::Get< Vector2 >() == baseProperty->GetType() )
       {
+        // Animate float component of Vector2 property
+
+        // Cast to AnimatableProperty of type Vector2
+        const SceneGraph::AnimatableProperty<Vector2>* animatableProperty = dynamic_cast< const SceneGraph::AnimatableProperty<Vector2>* >( baseProperty );
+
+        //Dynamic cast will fail if BaseProperty is not a Vector2 AnimatableProperty
+        DALI_ASSERT_DEBUG( animatableProperty != NULL && "Animating non-animatable property" );
+
+        switch( mComponentIndex )
+        {
+          case 0:
+          {
+            mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorX<Vector2> >::New( *propertyOwner,
+                                                                                                 *animatableProperty,
+                                                                                                 mAnimatorFunction,
+                                                                                                 mAlphaFunction,
+                                                                                                 mTimePeriod );
+            break;
+          }
+          case 1:
+          {
+            mAnimator = SceneGraph::Animator< float, PropertyComponentAccessorY<Vector2> >::New( *propertyOwner,
+                                                                                                 *animatableProperty,
+                                                                                                 mAnimatorFunction,
+                                                                                                 mAlphaFunction,
+                                                                                                 mTimePeriod );
+            break;
+          }
+          default:
+          {
+            break;
+          }
+        }
+      }
+      else if ( PropertyTypes::Get< Vector3 >() == baseProperty->GetType() )
+      {
+        // Animate float component of Vector3 property
+
         // Cast to AnimatableProperty of type Vector3
         const SceneGraph::AnimatableProperty<Vector3>* animatableProperty = dynamic_cast< const SceneGraph::AnimatableProperty<Vector3>* >( baseProperty );
 
