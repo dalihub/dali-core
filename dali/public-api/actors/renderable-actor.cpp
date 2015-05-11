@@ -81,11 +81,6 @@ BlendingMode::Type RenderableActor::GetBlendMode() const
   return GetImplementation(*this).GetBlendMode();
 }
 
-void RenderableActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba )
-{
-  GetImplementation(*this).SetBlendFunc( srcFactorRgba, destFactorRgba );
-}
-
 void RenderableActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
                                     BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
 {
@@ -96,31 +91,6 @@ void RenderableActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   Blendi
                                     BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
 {
   GetImplementation(*this).GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-}
-
-void RenderableActor::SetBlendEquation( BlendingEquation::Type equationRgba )
-{
-  GetImplementation(*this).SetBlendEquation( equationRgba );
-}
-
-void RenderableActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
-{
-  GetImplementation(*this).SetBlendEquation( equationRgb, equationAlpha );
-}
-
-void RenderableActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
-{
-  GetImplementation(*this).GetBlendEquation( equationRgb, equationAlpha );
-}
-
-void RenderableActor::SetBlendColor( const Vector4& color )
-{
-  GetImplementation(*this).SetBlendColor( color );
-}
-
-const Vector4& RenderableActor::GetBlendColor() const
-{
-  return GetImplementation(*this).GetBlendColor();
 }
 
 void RenderableActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
