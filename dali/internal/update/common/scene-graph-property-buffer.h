@@ -39,7 +39,8 @@ namespace PropertyBufferMetadata
 struct Component
 {
   std::string name;
-  unsigned int accumulatedSize;
+  unsigned int offset;
+  unsigned int size;
 };
 
 /**
@@ -48,22 +49,7 @@ struct Component
 struct Format
 {
   std::vector<Component> components;
-
-  /**
-   * @brief Get the offset of a component within an element
-   *
-   * @pre index must be within 0 and components.Size()-1
-   *
-   * @return The offset for a component within an element
-   */
-  unsigned int GetComponentOffset( unsigned int index ) const;
-
-  /**
-   * @brief Get the size of an element
-   *
-   * @return The size of an element
-   */
-  unsigned int GetElementSize() const;
+  unsigned int size;
 };
 
 } // PropertyBufferMetadata

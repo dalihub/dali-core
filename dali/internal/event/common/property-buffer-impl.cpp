@@ -49,6 +49,175 @@ DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> PROPERTY_BUFFER_IMPL = { DEFAULT_PROPERTY_DETAILS };
 
+unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
+{
+  unsigned int size = 0u;
+
+  switch( propertyType )
+  {
+    case Property::NONE:
+    case Property::TYPE_COUNT:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    {
+      DALI_ASSERT_ALWAYS( "No size for properties with no type, or dynamic sizes" );
+      break;
+    }
+    case Property::BOOLEAN:
+    {
+      size = sizeof( PropertyImplementationType< Property::BOOLEAN >::Type );
+      break;
+    }
+    case Property::INTEGER:
+    {
+      size = sizeof( PropertyImplementationType< Property::INTEGER >::Type );
+      break;
+    }
+    case Property::UNSIGNED_INTEGER:
+    {
+      size = sizeof( PropertyImplementationType< Property::UNSIGNED_INTEGER >::Type );
+      break;
+    }
+    case Property::FLOAT:
+    {
+      size = sizeof( PropertyImplementationType< Property::FLOAT >::Type );
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      size = sizeof( PropertyImplementationType< Property::VECTOR2 >::Type );
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      size = sizeof( PropertyImplementationType< Property::VECTOR3 >::Type );
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      size = sizeof( PropertyImplementationType< Property::VECTOR4 >::Type );
+      break;
+    }
+    case Property::MATRIX3:
+    {
+      size = sizeof( PropertyImplementationType< Property::MATRIX3 >::Type );
+      break;
+    }
+    case Property::MATRIX:
+    {
+      size = sizeof( PropertyImplementationType< Property::MATRIX >::Type );
+      break;
+    }
+    case Property::RECTANGLE:
+    {
+      size = sizeof( PropertyImplementationType< Property::RECTANGLE >::Type );
+      break;
+    }
+    case Property::ROTATION:
+    {
+      size = sizeof( PropertyImplementationType< Property::ROTATION >::Type );
+      break;
+    }
+  }
+
+  return size;
+}
+
+/**
+ * Calculate the alignment requirements of a type
+ *
+ * This is used to calculate the memory alignment requirements of a type
+ * It creates a structure with a dummy char and a member of the type we want to check
+ * this will cause the second member to be aligned by it's alignment requirement.
+ */
+template<Property::Type type>
+struct PropertyImplementationTypeAlignment
+{
+  // Create a structure that forces alignment of the data type
+  struct TestStructure
+  {
+    char oneChar;  ///< Member with sizeof() == 1
+    typename PropertyImplementationType<type>::Type data;
+  };
+  enum { VALUE = offsetof( TestStructure, data ) };
+};
+
+unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
+{
+  unsigned int alignment = 0u;
+
+  switch( propertyType )
+  {
+    case Property::NONE:
+    case Property::TYPE_COUNT:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    {
+      DALI_ASSERT_ALWAYS( "No size for properties with no type, or dynamic sizes" );
+      break;
+    }
+    case Property::BOOLEAN:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::BOOLEAN >::VALUE );
+      break;
+    }
+    case Property::INTEGER:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::INTEGER >::VALUE );
+      break;
+    }
+    case Property::UNSIGNED_INTEGER:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::UNSIGNED_INTEGER >::VALUE );
+      break;
+    }
+    case Property::FLOAT:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::FLOAT >::VALUE );
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::VECTOR2 >::VALUE );
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::VECTOR3 >::VALUE );
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::VECTOR4 >::VALUE );
+      break;
+    }
+    case Property::MATRIX3:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::MATRIX3 >::VALUE );
+      break;
+    }
+    case Property::MATRIX:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::MATRIX >::VALUE );
+      break;
+    }
+    case Property::RECTANGLE:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::RECTANGLE >::VALUE );
+      break;
+    }
+    case Property::ROTATION:
+    {
+      alignment = sizeof( PropertyImplementationTypeAlignment< Property::ROTATION >::VALUE );
+      break;
+    }
+  }
+
+  return alignment;
+}
+
 } // unnamed namespace
 
 PropertyBufferPtr PropertyBuffer::New()
@@ -316,7 +485,9 @@ void PropertyBuffer::FormatChanged()
   Format* bufferFormat = new Format();
   bufferFormat->components.resize( numComponents );
 
-  unsigned int elementSize = 0;
+  unsigned int currentAlignment = 0u;
+  unsigned int maxAlignmentRequired = 0u;
+
   for( size_t i = 0u; i < numComponents; ++i )
   {
     StringValuePair component = mFormat.GetPair( i );
@@ -324,13 +495,44 @@ void PropertyBuffer::FormatChanged()
     // Get the name
     bufferFormat->components[i].name = component.first;
 
-    // Get the size ( enums are stored in the map as int )
+    // enums are stored in the map as int
     Property::Type type = Property::Type( component.second.Get<int>() );
-    elementSize += GetPropertyImplementationSize( type );
 
-    // write the accumulatedSize
-    bufferFormat->components[i].accumulatedSize = elementSize;
+    // Get the size and alignment
+    unsigned int elementSize = GetPropertyImplementationSize( type );
+    unsigned int elementAlignment = GetPropertyImplementationAlignment( type );
+
+    // check if current alignment is compatible with new member
+    if( unsigned int offset = currentAlignment % elementAlignment )
+    {
+      // Not compatible, realign
+      currentAlignment = currentAlignment + elementSize - offset;
+    }
+
+    // write to the format
+    bufferFormat->components[i].size = elementSize;
+    bufferFormat->components[i].offset = currentAlignment;
+
+    // update offset
+    currentAlignment += elementSize;
+
+    // update max alignment requirement
+    if( elementAlignment > maxAlignmentRequired )
+    {
+      maxAlignmentRequired = elementAlignment;
+    }
+
   }
+
+  // Check the alignment for the maxAlignment required to calculate the size of the format
+  if( unsigned int offset = currentAlignment % maxAlignmentRequired )
+  {
+    // Not compatible, realign
+    currentAlignment = currentAlignment + maxAlignmentRequired - offset;
+  }
+
+  // Set the format size
+  bufferFormat->size = currentAlignment;
 
   mBufferFormat = bufferFormat;
 
@@ -349,90 +551,9 @@ void PropertyBuffer::SizeChanged()
   // Check if format and size have been set yet
   if( mBufferFormat != NULL )
   {
-    unsigned int bufferSize = mBufferFormat->GetElementSize() * mSize;
+    unsigned int bufferSize = mBufferFormat->size * mSize;
     mBuffer.Resize( bufferSize );
   }
-}
-
-unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
-{
-  unsigned int size = 0u;
-
-  switch( propertyType )
-  {
-    case Property::NONE:
-    case Property::TYPE_COUNT:
-    case Property::STRING:
-    case Property::ARRAY:
-    case Property::MAP:
-    {
-      DALI_ASSERT_ALWAYS( "No size for properties with no type, or dynamic sizes" );
-      break;
-    }
-    case Property::BOOLEAN:
-    {
-      size = sizeof( PropertyImplementationType< Property::BOOLEAN >::Type );
-      break;
-    }
-    case Property::INTEGER:
-    {
-      size = sizeof( PropertyImplementationType< Property::INTEGER >::Type );
-      break;
-    }
-    case Property::UNSIGNED_INTEGER:
-    {
-      size = sizeof( PropertyImplementationType< Property::UNSIGNED_INTEGER >::Type );
-      break;
-    }
-    // TODO : MESH_REWORK : uncoment this code
-//    case Property::UNSIGNED_SHORT:
-//    {
-//      size = sizeof( PropertyImplementationType< Property::UNSIGNED_SHORT >::Type );
-//      break;
-//    }
-    case Property::FLOAT:
-    {
-      size = sizeof( PropertyImplementationType< Property::FLOAT >::Type );
-      break;
-    }
-    case Property::VECTOR2:
-    {
-      size = sizeof( PropertyImplementationType< Property::VECTOR2 >::Type );
-      break;
-    }
-    case Property::VECTOR3:
-    {
-      size = sizeof( PropertyImplementationType< Property::VECTOR3 >::Type );
-      break;
-    }
-    case Property::VECTOR4:
-    {
-      size = sizeof( PropertyImplementationType< Property::VECTOR4 >::Type );
-      break;
-    }
-    case Property::MATRIX3:
-    {
-      size = sizeof( PropertyImplementationType< Property::MATRIX3 >::Type );
-      break;
-    }
-    case Property::MATRIX:
-    {
-      size = sizeof( PropertyImplementationType< Property::MATRIX >::Type );
-      break;
-    }
-    case Property::RECTANGLE:
-    {
-      size = sizeof( PropertyImplementationType< Property::RECTANGLE >::Type );
-      break;
-    }
-    case Property::ROTATION:
-    {
-      size = sizeof( PropertyImplementationType< Property::ROTATION >::Type );
-      break;
-    }
-  }
-
-  return size;
 }
 
 } // namespace Internal

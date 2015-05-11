@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <utility> // std::pair
+
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
@@ -262,15 +265,6 @@ template<> struct PropertyImplementationType< Property::MATRIX3 > { typedef Matr
 template<> struct PropertyImplementationType< Property::MATRIX > { typedef Matrix Type; };
 template<> struct PropertyImplementationType< Property::RECTANGLE > { typedef Rect<int> Type; };
 template<> struct PropertyImplementationType< Property::ROTATION > { typedef Quaternion Type; };
-
-/**
- * Get the size of the implementation of a Property::Type
- *
- * @param[in] propertyType Property::Type used to check the size
- *
- * @return Size given by sizeof for the implementation this propertyType
- */
-unsigned int GetPropertyImplementationSize( Property::Type& propertyType );
 
 } // namespace Internal
 

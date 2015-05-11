@@ -23,24 +23,6 @@ namespace Internal
 namespace SceneGraph
 {
 
-namespace PropertyBufferMetadata
-{
-
-unsigned int Format::GetComponentOffset( unsigned int index ) const
-{
-  DALI_ASSERT_DEBUG( index >= 0 && index < components.size() && "Index not within the correct boundaries." );
-  return index > 0 ? components[index-1u].accumulatedSize : 0;
-}
-
-unsigned int Format::GetElementSize() const
-{
-  unsigned int numComponents = components.size();
-  return numComponents ? components.back().accumulatedSize : 0;
-}
-
-} // namespace PropertyBufferMetadata
-
-
 PropertyBuffer::PropertyBuffer()
 : mBufferData(NULL),
   mSize(0u)
@@ -96,28 +78,14 @@ size_t PropertyBuffer::GetAttributeSize( BufferIndex bufferIndex, unsigned int i
 {
   DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
 
-  size_t size = mFormat->components[index].accumulatedSize;
-
-  if ( index > 0 )
-  {
-    size -= mFormat->components[index - 1].accumulatedSize;
-  }
-
-  return size;
+  return mFormat->components[index].size;
 }
 
 size_t PropertyBuffer::GetAttributeOffset( BufferIndex bufferIndex, unsigned int index ) const
 {
   DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
 
-  size_t offset = 0;
-
-  if ( index > 0 )
-  {
-    offset = mFormat->components[index - 1].accumulatedSize;
-  }
-
-  return offset;
+  return mFormat->components[index].offset;
 }
 
 const PropertyBufferDataProvider::BufferType& PropertyBuffer::GetData( BufferIndex bufferIndex ) const
@@ -131,12 +99,12 @@ std::size_t PropertyBuffer::GetDataSize( BufferIndex bufferIndex ) const
 {
   DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
 
-  return mFormat->GetElementSize() * mSize[ bufferIndex ];
+  return mFormat->size * mSize[ bufferIndex ];
 }
 
 std::size_t PropertyBuffer::GetElementSize( BufferIndex bufferIndex ) const
 {
-  return mFormat->GetElementSize();
+  return mFormat->size;
 }
 
 unsigned int PropertyBuffer::GetElementCount( BufferIndex bufferIndex ) const
