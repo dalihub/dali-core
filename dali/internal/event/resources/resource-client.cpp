@@ -17,7 +17,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/resources/resource-client.h>
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 
 #include <dali/integration-api/resource-request.h>
 #include <dali/integration-api/debug.h>

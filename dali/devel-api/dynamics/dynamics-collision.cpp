@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/dynamics/dynamics-collision.h>
+#include <dali/devel-api/dynamics/dynamics-collision.h>
 
 // INTERNAL HEADERS
 #include <dali/internal/event/actors/actor-impl.h>

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/dynamics/dynamics-shape.h>
+#include <dali/devel-api/dynamics/dynamics-shape.h>
 
 // INTERNAL HEADERS
 #include <dali/internal/event/modeling/mesh-impl.h>

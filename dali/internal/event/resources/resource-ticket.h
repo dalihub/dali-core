@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/common/loading-state.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/internal/event/resources/resource-type-path.h>

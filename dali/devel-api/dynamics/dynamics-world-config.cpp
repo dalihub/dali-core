@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/dynamics/dynamics-world-config.h>
+#include <dali/devel-api/dynamics/dynamics-world-config.h>
 
 // INTERNAL HEADERS
 #ifdef DYNAMICS_SUPPORT

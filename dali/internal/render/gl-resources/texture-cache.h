@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/math/rect.h>

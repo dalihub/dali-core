@@ -25,7 +25,7 @@
 #include <dali/public-api/object/base-handle.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/dynamics/dynamics-shape.h>
+#include <dali/devel-api/dynamics/dynamics-shape.h>
 
 namespace Dali
 {

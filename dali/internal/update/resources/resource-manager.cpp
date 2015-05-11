@@ -23,8 +23,8 @@
 #include <typeinfo>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/map-wrapper.h>
-#include <dali/public-api/common/set-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/public-api/math/vector2.h>
 
 #include <dali/integration-api/debug.h>

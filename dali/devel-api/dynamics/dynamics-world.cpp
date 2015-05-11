@@ -16,10 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/dynamics/dynamics-world.h>
+#include <dali/devel-api/dynamics/dynamics-world.h>
 
 // INTERNAL HEADERS
-#include <dali/public-api/dynamics/dynamics-shape.h>
+#include <dali/devel-api/dynamics/dynamics-shape.h>
 #include <dali/internal/event/actors/actor-impl.h>
 
 #ifdef DYNAMICS_SUPPORT

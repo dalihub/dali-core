@@ -1,4 +1,6 @@
-# Add local source files here
+#
+# Add public-api source files here
+#
 
 public_api_src_files = \
   $(public_api_src_dir)/actors/actor.cpp \
@@ -25,13 +27,6 @@ public_api_src_files = \
   $(public_api_src_dir)/common/hash.cpp \
   $(public_api_src_dir)/common/mutex.cpp \
   $(public_api_src_dir)/common/stage.cpp \
-  $(public_api_src_dir)/dynamics/dynamics-body.cpp \
-  $(public_api_src_dir)/dynamics/dynamics-body-config.cpp \
-  $(public_api_src_dir)/dynamics/dynamics-collision.cpp \
-  $(public_api_src_dir)/dynamics/dynamics-joint.cpp \
-  $(public_api_src_dir)/dynamics/dynamics-shape.cpp \
-  $(public_api_src_dir)/dynamics/dynamics-world.cpp \
-  $(public_api_src_dir)/dynamics/dynamics-world-config.cpp \
   $(public_api_src_dir)/events/gesture.cpp \
   $(public_api_src_dir)/events/gesture-detector.cpp \
   $(public_api_src_dir)/events/hit-test-algorithm.cpp \
@@ -103,7 +98,10 @@ public_api_src_files = \
   $(public_api_src_dir)/object/type-registry.cpp \
   $(public_api_src_dir)/dali-core-version.cpp
 
+
+#
 # Add public header files here
+#
 
 public_api_header_files = \
   $(public_api_src_dir)/dali-core.h \
@@ -144,23 +142,12 @@ public_api_core_common_header_files = \
   $(public_api_src_dir)/common/intrusive-ptr.h \
   $(public_api_src_dir)/common/loading-state.h \
   $(public_api_src_dir)/common/mutex.h \
-  $(public_api_src_dir)/common/map-wrapper.h \
   $(public_api_src_dir)/common/ref-counted-dali-vector.h \
-  $(public_api_src_dir)/common/set-wrapper.h \
   $(public_api_src_dir)/common/scoped-pointer.h \
   $(public_api_src_dir)/common/stage.h \
   $(public_api_src_dir)/common/type-traits.h \
   $(public_api_src_dir)/common/vector-wrapper.h \
   $(public_api_src_dir)/common/view-mode.h
-
-public_api_core_dynamics_header_files = \
-  $(public_api_src_dir)/dynamics/dynamics-body.h \
-  $(public_api_src_dir)/dynamics/dynamics-body-config.h \
-  $(public_api_src_dir)/dynamics/dynamics-collision.h \
-  $(public_api_src_dir)/dynamics/dynamics-joint.h \
-  $(public_api_src_dir)/dynamics/dynamics-shape.h \
-  $(public_api_src_dir)/dynamics/dynamics-world.h \
-  $(public_api_src_dir)/dynamics/dynamics-world-config.h
 
 public_api_core_events_header_files = \
   $(public_api_src_dir)/events/gesture.h \

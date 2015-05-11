@@ -26,8 +26,8 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/object/object-registry.h>
 
-#include <dali/public-api/dynamics/dynamics-world.h>
-#include <dali/public-api/dynamics/dynamics-world-config.h>
+#include <dali/devel-api/dynamics/dynamics-world.h>
+#include <dali/devel-api/dynamics/dynamics-world-config.h>
 
 #ifdef DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-declarations.h>

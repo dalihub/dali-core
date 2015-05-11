@@ -25,7 +25,7 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/math/vector3.h>
 
 namespace Dali

@@ -134,6 +134,7 @@ exit 0
 %defattr(-,root,root,-)
 %{_libdir}/pkgconfig/*.pc
 %{dev_include_path}/%{name}/public-api/*
+%{dev_include_path}/%{name}/devel-api/*
 
 %files integration-devel
 %defattr(-,root,root,-)

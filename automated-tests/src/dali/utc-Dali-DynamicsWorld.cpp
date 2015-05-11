@@ -20,6 +20,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <test-dynamics.h>
+#include <dali/devel-api/dynamics/dynamics.h>
 
 using namespace Dali;
 

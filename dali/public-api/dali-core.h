@@ -53,14 +53,6 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/view-mode.h>
 
-#include <dali/public-api/dynamics/dynamics-body.h>
-#include <dali/public-api/dynamics/dynamics-body-config.h>
-#include <dali/public-api/dynamics/dynamics-collision.h>
-#include <dali/public-api/dynamics/dynamics-joint.h>
-#include <dali/public-api/dynamics/dynamics-shape.h>
-#include <dali/public-api/dynamics/dynamics-world-config.h>
-#include <dali/public-api/dynamics/dynamics-world.h>
-
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/events/hit-test-algorithm.h>

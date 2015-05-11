@@ -25,6 +25,9 @@ include ../../../dali/internal/file.list
 public_api_src_dir = ../../../dali/public-api
 include ../../../dali/public-api/file.list
 
+devel_api_src_dir = ../../../dali/devel-api
+include ../../../dali/devel-api/file.list
+
 platform_abstraction_src_dir = ../../../dali/integration-api
 include ../../../dali/integration-api/file.list
 
@@ -33,7 +36,8 @@ include ../../../dali/integration-api/file.list
 src_files = $(internal_src_files) \
             $(effects_src_files) \
             $(platform_abstraction_src_files) \
-            $(public_api_src_files)
+            $(public_api_src_files) \
+            $(devel_api_src_files)
 
 if DYNAMICS_SUPPORT
 src_files += $(internal_dynamics_src_files)
@@ -78,11 +82,23 @@ platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
 platformabstractiondynamics_HEADERS = $(platform_abstraction_dynamics_header_files)
 
+#devel api (used by adaptor / toolkit
+develapidir = $(devincludepath)/dali/devel-api
+develapiactorsdir = $(develapidir)/actors
+develapicommondir = $(develapidir)/common
+develapidynamicsdir = $(develapidir)/dynamics
+
+develapi_HEADERS = $(devel_api_header_files)
+develapicommon_HEADERS = $(devel_api_core_common_header_files)
+develapidynamics_HEADERS = $(devel_api_core_dynamics_header_files)
+
+
+
+#public api
 publicapidir = $(devincludepath)/dali/public-api
 publicapiactorsdir = $(publicapidir)/actors
 publicapianimationdir = $(publicapidir)/animation
 publicapicommondir = $(publicapidir)/common
-publicapidynamicsdir = $(publicapidir)/dynamics
 publicapieventsdir = $(publicapidir)/events
 publicapigeometrydir = $(publicapidir)/geometry
 publicapiimagesdir = $(publicapidir)/images
@@ -100,7 +116,6 @@ publicapi_HEADERS = $(public_api_header_files)
 publicapiactors_HEADERS = $(public_api_core_actors_header_files)
 publicapianimation_HEADERS = $(public_api_core_animation_header_files)
 publicapicommon_HEADERS = $(public_api_core_common_header_files)
-publicapidynamics_HEADERS = $(public_api_core_dynamics_header_files)
 publicapievents_HEADERS = $(public_api_core_events_header_files)
 publicapigeometry_HEADERS = $(public_api_core_geometry_header_files)
 publicapiimages_HEADERS = $(public_api_core_images_header_files)
