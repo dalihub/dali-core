@@ -423,7 +423,7 @@ void TestPlaneOfImages(TestApplication& application, float z)
 
   // Create a grid of 9 x 9 actors; only the central 3x3 are in viewport
 
-  ActorContainer actors;
+  std::vector< Actor > actors;
   for( int i = 0; i < NUM_ROWS*NUM_COLS; i++ )
   {
     GLuint textureId = TEXTURE_ID_OFFSET+i;

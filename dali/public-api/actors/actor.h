@@ -22,7 +22,6 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/actors/actor-enumerations.h>
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/math/radian.h>
@@ -49,13 +48,6 @@ struct MouseWheelEvent;
 struct Vector2;
 struct Vector3;
 struct Vector4;
-
-/**
- * @brief Actor container.
- */
-typedef std::vector<Actor> ActorContainer;
-typedef ActorContainer::iterator ActorIter; ///< Iterator for Dali::ActorContainer
-typedef ActorContainer::const_iterator ActorConstIter; ///< Const iterator for Dali::ActorContainer
 
 typedef Rect<float> Padding;      ///< Padding definition
 
