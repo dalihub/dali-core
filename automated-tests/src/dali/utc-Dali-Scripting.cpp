@@ -727,7 +727,7 @@ int UtcDaliScriptingNewActorChildren(void)
   child1Map[ "position" ] = Vector3::YAXIS;
 
   Property::Array childArray;
-  childArray.push_back( child1Map );
+  childArray.PushBack( child1Map );
   map[ "actors" ] = childArray;
 
   // Create
@@ -869,7 +869,7 @@ int UtcDaliScriptingCreatePropertyMapActor(void)
 
     DALI_TEST_CHECK( value.HasKey( "actors" ) );
     Property::Array children( value.GetValue( "actors").Get< Property::Array >() );
-    DALI_TEST_CHECK( !children.empty() );
+    DALI_TEST_CHECK( !children.Empty() );
     Property::Map childMap( children[0].Get< Property::Map >() );
     DALI_TEST_CHECK( !childMap.Empty() );
     Property::Value childValue( childMap );

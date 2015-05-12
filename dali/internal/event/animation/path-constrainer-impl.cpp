@@ -24,6 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-array.h>
 
 namespace Dali
 {
@@ -122,8 +123,7 @@ Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) con
   }
   else if( index == Dali::PathConstrainer::Property::POINTS )
   {
-    Property::Array propertyArray;
-    value = Property::Value(propertyArray);
+    value = Property::Value(Property::ARRAY);
     const Dali::Vector<Vector3>& point = mPath->GetPoints();
     size_t pointCount( point.Size() );
     for( size_t i( 0 ); i != pointCount; ++i )
@@ -133,8 +133,7 @@ Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) con
   }
   else if( index == Dali::PathConstrainer::Property::CONTROL_POINTS )
   {
-    Property::Array propertyArray;
-    value = Property::Value(propertyArray);
+    value = Property::Value(Property::ARRAY);
     const Dali::Vector<Vector3>& point = mPath->GetControlPoints();
     size_t pointCount( point.Size() );
     for( size_t i( 0 ); i != pointCount; ++i )
@@ -154,29 +153,23 @@ void PathConstrainer::SetDefaultProperty(Property::Index index, const Property::
   }
   else if( index == Dali::PathConstrainer::Property::POINTS  )
   {
-    Property::Array propertyArray;
-    propertyValue.Get(propertyArray);
-
-    size_t propertyArrayCount = propertyArray.size();
+    size_t propertyArrayCount = propertyValue.GetSize();
     Dali::Vector<Vector3> point;
     point.Resize( propertyArrayCount );
-    for( size_t i(0); i!=propertyArrayCount; ++i )
+    for( size_t i(0); i != propertyArrayCount; ++i )
     {
-      propertyArray[i].Get( point[i]);
+      propertyValue.GetItem(i).Get( point[i] );
     }
     mPath->SetPoints( point );
   }
   else if( index == Dali::PathConstrainer::Property::CONTROL_POINTS )
   {
-    Property::Array propertyArray;
-    propertyValue.Get(propertyArray);
-
-    size_t propertyArrayCount = propertyArray.size();
+    size_t propertyArrayCount = propertyValue.GetSize();
     Dali::Vector<Vector3> point;
     point.Resize( propertyArrayCount );
-    for( size_t i(0); i!=propertyArrayCount; ++i )
+    for( size_t i(0); i != propertyArrayCount; ++i )
     {
-      propertyArray[i].Get( point[i]);
+      propertyValue.GetItem(i).Get( point[i] );
     }
     mPath->SetControlPoints( point );
   }

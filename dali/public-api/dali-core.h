@@ -118,6 +118,7 @@
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/object-registry.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-input.h>

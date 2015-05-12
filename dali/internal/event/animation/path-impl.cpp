@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
+#include <dali/public-api/object/property-array.h>
 
 namespace Dali
 {
@@ -173,7 +174,7 @@ void Path::SetDefaultProperty(Property::Index index, const Property::Value& prop
     Property::Array propertyArray;
     propertyValue.Get(propertyArray);
 
-    size_t propertyArrayCount = propertyArray.size();
+    size_t propertyArrayCount = propertyArray.Size();
     mPoint.Resize( propertyArrayCount );
     for( size_t i(0); i!=propertyArrayCount; ++i )
     {
@@ -185,7 +186,7 @@ void Path::SetDefaultProperty(Property::Index index, const Property::Value& prop
     Property::Array propertyArray;
     propertyValue.Get(propertyArray);
 
-    size_t propertyArrayCount = propertyArray.size();
+    size_t propertyArrayCount = propertyArray.Size();
     mControlPoint.Resize( propertyArrayCount );
     for( size_t i(0); i!=propertyArrayCount; ++i )
     {

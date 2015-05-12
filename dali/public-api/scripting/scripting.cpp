@@ -22,6 +22,7 @@
 #include <dali/public-api/actors/actor.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/internal/common/image-attributes.h>
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
@@ -469,9 +470,9 @@ Actor NewActor( const Property::Map& map )
         // Create children
 
         Property::Array actorArray = value.Get< Property::Array >();
-        for ( Property::Array::iterator arrayIter = actorArray.begin(), arrayEndIter = actorArray.end(); arrayIter != arrayEndIter; ++arrayIter )
+        for ( size_t i = 0; i < actorArray.Size(); ++i)
         {
-          actor.Add( NewActor( arrayIter->Get< Property::Map >() ) );
+          actor.Add( NewActor( actorArray[i].Get< Property::Map >() ) );
         }
       }
       else if ( key == "signals" )
@@ -547,7 +548,7 @@ void CreatePropertyMap( Actor actor, Property::Map& map )
       {
         Property::Map childMap;
         CreatePropertyMap( actor.GetChildAt( child ), childMap );
-        childArray.push_back( childMap );
+        childArray.PushBack( childMap );
       }
       map[ "actors" ] = childArray;
     }

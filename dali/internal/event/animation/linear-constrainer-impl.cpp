@@ -116,8 +116,7 @@ Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) c
   Property::Value value;
   if( index == Dali::LinearConstrainer::Property::VALUE )
   {
-    Property::Array propertyArray;
-    value = Property::Value(propertyArray);
+    value = Property::Value(Property::ARRAY);
     size_t count( mValue.Size() );
     for( size_t i( 0 ); i != count; ++i )
     {
@@ -126,8 +125,7 @@ Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) c
   }
   else if( index == Dali::LinearConstrainer::Property::PROGRESS )
   {
-    Property::Array propertyArray;
-    value = Property::Value(propertyArray);
+    value = Property::Value(Property::ARRAY);
     size_t count( mValue.Size() );
     for( size_t i( 0 ); i != count; ++i )
     {
@@ -142,26 +140,20 @@ void LinearConstrainer::SetDefaultProperty(Property::Index index, const Property
 {
   if( index == Dali::LinearConstrainer::Property::VALUE  )
   {
-    Property::Array propertyArray;
-    propertyValue.Get(propertyArray);
-
-    size_t propertyArrayCount = propertyArray.size();
+    size_t propertyArrayCount = propertyValue.GetSize();
     mValue.Resize( propertyArrayCount );
-    for( size_t i(0); i!=propertyArrayCount; ++i )
+    for( size_t i(0); i != propertyArrayCount; ++i )
     {
-      propertyArray[i].Get( mValue[i]);
+      propertyValue.GetItem(i).Get( mValue[i] );
     }
   }
   else if( index == Dali::LinearConstrainer::Property::PROGRESS  )
   {
-    Property::Array propertyArray;
-    propertyValue.Get(propertyArray);
-
-    size_t propertyArrayCount = propertyArray.size();
+    size_t propertyArrayCount = propertyValue.GetSize();
     mProgress.Resize( propertyArrayCount );
-    for( size_t i(0); i!=propertyArrayCount; ++i )
+    for( size_t i(0); i != propertyArrayCount; ++i )
     {
-      propertyArray[i].Get( mProgress[i]);
+      propertyValue.GetItem(i).Get( mProgress[i] );
     }
   }
 }

@@ -47,13 +47,13 @@ static void SetupPathConstrainer( Dali::PathConstrainer& PathConstrainer)
   PathConstrainer.SetProperty( Dali::PathConstrainer::Property::FORWARD, Vector3(1.0f,0.0f,0.0f) );
 
   Dali::Property::Array points;
-  points.resize(3);
+  points.Resize(3);
   points[0] = Vector3( 30.0,  80.0, 0.0);
   points[1] = Vector3( 70.0, 120.0, 0.0);
   points[2] = Vector3(100.0, 100.0, 0.0);
   PathConstrainer.SetProperty( Dali::PathConstrainer::Property::POINTS, points );
 
-  points.resize(4);
+  points.Resize(4);
   points[0] = Vector3( 39.0,  90.0, 0.0);
   points[1] = Vector3( 56.0, 119.0, 0.0);
   points[2] = Vector3( 78.0, 120.0, 0.0);
@@ -64,7 +64,7 @@ static void SetupPathConstrainer( Dali::PathConstrainer& PathConstrainer)
 static void SetupLinearConstrainerUniformProgress( Dali::LinearConstrainer& linearConstrainer)
 {
   Dali::Property::Array points;
-  points.resize(3);
+  points.Resize(3);
   points[0] = 0.0f;
   points[1] = 1.0f;
   points[2] = 0.0f;
@@ -74,7 +74,7 @@ static void SetupLinearConstrainerUniformProgress( Dali::LinearConstrainer& line
 static void SetupLinearConstrainerNonUniformProgress( Dali::LinearConstrainer& linearConstrainer)
 {
   Dali::Property::Array points;
-  points.resize(3);
+  points.Resize(3);
   points[0] = 0.0f;
   points[1] = 1.0f;
   points[2] = 0.0f;
