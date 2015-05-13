@@ -207,12 +207,12 @@ HitActor HitTestWithinLayer( Actor& actor,
   if( actor.GetChildCount() > 0 )
   {
     childHit.distance = std::numeric_limits<float>::max();
-    Dali::ActorContainer& children = actor.GetChildrenInternal();
+    ActorContainer& children = actor.GetChildrenInternal();
 
     // Hit test ALL children and calculate their distance.
     bool parentIsRenderable = actor.IsRenderable();
 
-    for (Dali::ActorIter iter = children.begin(), endIter = children.end(); iter != endIter; ++iter)
+    for( ActorIter iter = children.begin(), endIter = children.end(); iter != endIter; ++iter )
     {
       // Descend tree only if...
       if ( !iter->IsLayer() &&    // Child is NOT a layer, hit testing current layer only or Child is not a layer and we've inherited the stencil draw mode

@@ -101,7 +101,6 @@ namespace Internal
 {
 
 unsigned int Actor::mActorCounter = 0;
-ActorContainer Actor::mNullChildren;
 
 /**
  * Struct to collect relayout variables
@@ -109,7 +108,7 @@ ActorContainer Actor::mNullChildren;
 struct Actor::RelayoutData
 {
   RelayoutData()
-      : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( SizeScalePolicy::USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
+  : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( SizeScalePolicy::USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
   {
     // Set size negotiation defaults
     for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )

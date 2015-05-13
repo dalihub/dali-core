@@ -58,12 +58,9 @@ dali-shaders.cpp: $(dali_shaders_script) $(dali_shaders_dir)/*.txt
 dali_core_includes = \
         -I../../..
 
-daliGlyphCacheDir = ${dataReadWriteDir}/glyphcache/
-
 libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            -DDALI_DATA_RW_DIR="\"${daliReadWriteDir}\"" \
                            -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
-                           -DDALI_GLYPH_CACHE_DIR="\"${daliGlyphCacheDir}\"" \
                            -DDALI_EMOTICON_DIR="\"${emoticons_dir}\"" \
                            -Werror -Wall -Wfloat-equal \
                            $(dali_core_includes) \
