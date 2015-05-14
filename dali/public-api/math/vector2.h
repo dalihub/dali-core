@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 
 namespace Dali
 {
@@ -504,6 +505,9 @@ DALI_IMPORT_API Size FitScaleToFill( const Size& target, const Size& source );
  * @return target scaled inside source
  */
 DALI_IMPORT_API Size ShrinkInside( const Size& target, const Size& source );
+
+// Allow Vector2 to be treated as a POD type
+template <> struct TypeTraits< Vector2 > : public BasicTypes< Vector2 > { enum { IS_TRIVIAL_TYPE = true }; };
 
 } // namespace Dali
 

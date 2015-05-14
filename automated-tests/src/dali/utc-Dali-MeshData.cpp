@@ -51,8 +51,8 @@ int UtcDaliMeshDataSetData(void)
   Material customMaterial = ConstructMaterial();
   meshData.SetData(vertices, faces, bones, customMaterial);
 
-  DALI_TEST_GREATER(meshData.GetVertexCount(), 0u, TEST_LOCATION);
-  DALI_TEST_GREATER(meshData.GetFaceCount(), 0u, TEST_LOCATION);
+  DALI_TEST_GREATER(meshData.GetVertexCount(), size_t(0), TEST_LOCATION);
+  DALI_TEST_GREATER(meshData.GetFaceCount(), size_t(0), TEST_LOCATION);
 
   const MeshData::FaceIndices& faces2 = meshData.GetFaces();
   const MeshData::VertexContainer& verts2 = meshData.GetVertices();

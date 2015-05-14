@@ -20,7 +20,7 @@
 
 // EXTERNAL INCLUDES
 #include <cstdarg>
-#include <iosfwd>
+#include <iostream>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
@@ -308,16 +308,19 @@ void DALI_TEST_EQUALS( const char* str1, const std::string &str2, const char* lo
  * @param[in] value2 The second value
  * @param[in] location The TEST_LOCATION macro should be used here
  */
-void DALI_TEST_GREATER(unsigned int value1, unsigned int value2, const char* location);
-
-/**
- * Test whether one float value is greater than another.
- * Test succeeds if value1 > value2
- * @param[in] value1 The first value
- * @param[in] value2 The second value
- * @param[in] location The TEST_LOCATION macro should be used here
- */
-void DALI_TEST_GREATER( float value1, float value2, const char* location);
+template< typename T >
+void DALI_TEST_GREATER( T value1, T value2, const char* location)
+{
+  if (!(value1 > value2))
+  {
+    std::cerr << location << ", checking " << value1 <<" > " << value2 << "\n";
+    tet_result(TET_FAIL);
+  }
+  else
+  {
+    tet_result(TET_PASS);
+  }
+}
 
 /**
  * Test whether the assertion condition that failed and thus triggered the

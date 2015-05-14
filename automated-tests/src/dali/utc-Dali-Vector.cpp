@@ -1255,6 +1255,82 @@ int UtcDaliVectorIntEraseRangeAssert(void)
   END_TEST;
 }
 
+int UtcDaliVectorVector2P(void)
+{
+  tet_infoline("Testing Dali::Vector< Vector2 >");
+
+  Vector< Vector2 > classvector;
+  DALI_TEST_EQUALS( ZERO, classvector.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( ZERO, classvector.Capacity(), TEST_LOCATION );
+
+  classvector.PushBack( Vector2() );
+
+  DALI_TEST_EQUALS( 1u, classvector.Count(), TEST_LOCATION );
+  DALI_TEST_GREATER( classvector.Capacity(), ZERO, TEST_LOCATION );
+
+  classvector.PushBack( Vector2( 0.1f, 0.2f ) );
+
+  DALI_TEST_EQUALS( 2u, classvector.Count(), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Vector2(), classvector[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2( 0.1f, 0.2f ), classvector[ 1 ], TEST_LOCATION );
+
+  tet_result(TET_PASS); // for now
+  END_TEST;
+}
+
+int UtcDaliVectorVector3P(void)
+{
+  tet_infoline("Testing Dali::Vector< Vector3 >");
+
+  Vector< Vector3 > classvector;
+  DALI_TEST_EQUALS( ZERO, classvector.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( ZERO, classvector.Capacity(), TEST_LOCATION );
+
+  classvector.PushBack( Vector3() );
+
+  DALI_TEST_EQUALS( 1u, classvector.Count(), TEST_LOCATION );
+  DALI_TEST_GREATER( classvector.Capacity(), ZERO, TEST_LOCATION );
+
+  classvector.PushBack( Vector3( 0.1f, 0.2f, 0.3f ) );
+
+  DALI_TEST_EQUALS( 2u, classvector.Count(), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Vector3(), classvector[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3( 0.1f, 0.2f, 0.3f ), classvector[ 1 ], TEST_LOCATION );
+
+  tet_result(TET_PASS); // for now
+  END_TEST;
+}
+
+int UtcDaliVectorMatrixP(void)
+{
+  tet_infoline("Testing Dali::Vector< Matrix >");
+
+  Vector< Matrix > classvector;
+  DALI_TEST_EQUALS( ZERO, classvector.Count(), TEST_LOCATION );
+  DALI_TEST_EQUALS( ZERO, classvector.Capacity(), TEST_LOCATION );
+
+  classvector.PushBack( Matrix() );
+
+  DALI_TEST_EQUALS( 1u, classvector.Count(), TEST_LOCATION );
+  DALI_TEST_GREATER( classvector.Capacity(), ZERO, TEST_LOCATION );
+
+  classvector.PushBack( Matrix::IDENTITY );
+
+  DALI_TEST_EQUALS( 2u, classvector.Count(), TEST_LOCATION );
+
+  DALI_TEST_EQUALS( Matrix(), classvector[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( Matrix::IDENTITY, classvector[ 1 ], TEST_LOCATION );
+
+  tet_result(TET_PASS); // for now
+  END_TEST;
+}
+
+/*
+ * this does not compile at the moment
+ * Vector< Actor > classvector; this does not compile yet either
+ *
 namespace
 {
 
@@ -1275,13 +1351,11 @@ struct ComplexType
 
 } // anonymous namespace
 
-
-int UtcDaliVectorComplex(void)
+int UtcDaliVectorComplex( void)
 {
-  tet_infoline("Testing Dali::Vector< int* > exception handling");
+  tet_infoline("Testing Dali::Vector< ComplexType > ");
 
-  // this does not compile at the moment
-/*  Vector< ComplexType > classvector;
+  Vector< ComplexType > classvector;
   DALI_TEST_EQUALS( ZERO, classvector.Count(), TEST_LOCATION );
   DALI_TEST_EQUALS( ZERO, classvector.Capacity(), TEST_LOCATION );
 
@@ -1291,8 +1365,7 @@ int UtcDaliVectorComplex(void)
   DALI_TEST_EQUALS( true, gConstructorCalled, TEST_LOCATION );
   classvector.Clear();
   DALI_TEST_EQUALS( true, gDestructorCalled, TEST_LOCATION );
-*/
-//  Vector< Actor > classvector; this does not compile yet either
   tet_result(TET_PASS); // for now
   END_TEST;
 }
+*/

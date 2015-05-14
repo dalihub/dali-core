@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 
 namespace Dali
 {
@@ -559,6 +560,9 @@ inline Vector4 Max( const Vector4& a, const Vector4& b )
  * @return     a vector containing the clamped components of v
  */
 DALI_IMPORT_API Vector4 Clamp( const Vector4& v, const float& min, const float& max );
+
+// Allow Vector4 to be treated as a POD type
+template <> struct TypeTraits< Vector4 > : public BasicTypes< Vector4 > { enum { IS_TRIVIAL_TYPE = true }; };
 
 } // namespace Dali
 
