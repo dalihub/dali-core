@@ -266,6 +266,8 @@ template<> struct PropertyImplementationType< Property::MATRIX > { typedef Matri
 template<> struct PropertyImplementationType< Property::RECTANGLE > { typedef Rect<int> Type; };
 template<> struct PropertyImplementationType< Property::ROTATION > { typedef Quaternion Type; };
 
+unsigned int GetPropertyImplementationSize( Property::Type& propertyType );
+
 } // namespace Internal
 
 // Helpers for public-api forwarding methods

@@ -81,6 +81,13 @@ size_t PropertyBuffer::GetAttributeSize( BufferIndex bufferIndex, unsigned int i
   return mFormat->components[index].size;
 }
 
+Property::Type PropertyBuffer::GetAttributeType( BufferIndex bufferIndex, unsigned int index ) const
+{
+  DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
+
+  return mFormat->components[index].type;
+}
+
 size_t PropertyBuffer::GetAttributeOffset( BufferIndex bufferIndex, unsigned int index ) const
 {
   DALI_ASSERT_DEBUG( mFormat && "Format should be set ");
@@ -101,6 +108,7 @@ std::size_t PropertyBuffer::GetDataSize( BufferIndex bufferIndex ) const
 
   return mFormat->size * mSize[ bufferIndex ];
 }
+
 
 std::size_t PropertyBuffer::GetElementSize( BufferIndex bufferIndex ) const
 {

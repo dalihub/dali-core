@@ -41,6 +41,7 @@ struct Component
   std::string name;
   unsigned int offset;
   unsigned int size;
+  Property::Type type;
 };
 
 /**
@@ -129,6 +130,11 @@ public: // PropertyBufferDataProvider
    * @copydoc PropertyBufferDataProvider::GetAttributeSize( BufferIndex bufferIndex, unsigned int index )
    */
   virtual size_t GetAttributeSize( BufferIndex bufferIndex, unsigned int index ) const;
+
+  /**
+   * @copydoc PropertyBufferDataProvider::GetAttributeType( BufferIndex bufferIndex, unsigned int index )
+   */
+  virtual Property::Type GetAttributeType( BufferIndex bufferIndex, unsigned int index ) const;
 
   /**
    * @copydoc PropertyBufferDataProvider::GetAttributeOffset( BufferIndex bufferIndex, unsigned int index )

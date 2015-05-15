@@ -18,8 +18,110 @@
 #include <dali/internal/render/renderers/render-renderer-property-buffer.h>
 
 // INTERNAL INCLUDES
+#include <dali/internal/event/common/property-buffer-impl.h>  // Dali::Internal::PropertyBuffer
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 #include <dali/internal/render/shaders/program.h>
+
+namespace
+{
+
+using namespace Dali;
+using Dali::Property;
+using Dali::Internal::PropertyImplementationType;
+
+Dali::GLenum GetPropertyImplementationSize( Property::Type& propertyType )
+{
+  Dali::GLenum type = GL_BYTE;
+
+  switch( propertyType )
+  {
+    case Property::NONE:
+    case Property::TYPE_COUNT:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    {
+      DALI_ASSERT_ALWAYS( "No type for properties with no type, or dynamic sizes" );
+      break;
+    }
+    case Property::BOOLEAN:
+    {
+      DALI_ASSERT_ALWAYS( "" );
+      type = GL_BYTE;
+      break;
+    }
+    case Property::INTEGER:
+    {
+      type = GL_SHORT;
+      break;
+    }
+    case Property::UNSIGNED_INTEGER:
+    {
+      type = sizeof( PropertyImplementationType< Property::UNSIGNED_INTEGER >::Type );
+      break;
+    }
+    case Property::FLOAT:
+    {
+      type = sizeof( PropertyImplementationType< Property::FLOAT >::Type );
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      type = sizeof( PropertyImplementationType< Property::VECTOR2 >::Type );
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      type = sizeof( PropertyImplementationType< Property::VECTOR3 >::Type );
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      type = sizeof( PropertyImplementationType< Property::VECTOR4 >::Type );
+      break;
+    }
+    case Property::MATRIX3:
+    {
+      type = sizeof( PropertyImplementationType< Property::MATRIX3 >::Type );
+      break;
+    }
+    case Property::MATRIX:
+    {
+      type = sizeof( PropertyImplementationType< Property::MATRIX >::Type );
+      break;
+    }
+    case Property::RECTANGLE:
+    {
+      type = sizeof( PropertyImplementationType< Property::RECTANGLE >::Type );
+      break;
+    }
+    case Property::ROTATION:
+    {
+      type = sizeof( PropertyImplementationType< Property::ROTATION >::Type );
+      break;
+    }
+  }
+
+  return type;
+}
+
+void UploadAttribute( Dali::Internal::Context& context,
+                      Dali::GLint attributeLocation,
+                      Dali::GLint attributeSize,
+                      size_t attributeOffset,
+                      Dali::Property::Type attributeType,
+                      Dali::GLsizei elementSize )
+{
+  // TODO: MESH_REWORK  Matrices need multiple calls to this function
+  context.VertexAttribPointer( attributeLocation,
+                               attributeSize  / sizeof(Dali::Internal::GetPropertyImplementationSize(attributeType)),
+                               GL_FLOAT, // TODO: MESH_REWORK get the correct type
+                               GL_FALSE,  // Not normalized
+                               elementSize,
+                               (void*)attributeOffset );
+}
+
+}  // unnamed namespace
 
 namespace Dali
 {
@@ -110,14 +212,14 @@ void RenderPropertyBuffer::EnableVertexAttributes( Context& context, BufferIndex
 
       GLint attributeSize = mDataProvider.GetAttributeSize( bufferIndex, i );
       size_t attributeOffset = mDataProvider.GetAttributeOffset( bufferIndex, i );
+      Property::Type attributeType = mDataProvider.GetAttributeType( bufferIndex, i );
 
-      // TODO: MESH_REWORK  Matrices need multiple calls to this function
-      context.VertexAttribPointer( attributeLocation,
-                                   attributeSize  / sizeof(float), // TODO: MESH_REWORK get the correct type
-                                   GL_FLOAT, // TODO: MESH_REWORK get the correct type
-                                   GL_FALSE,  // Not normalized
-                                   elementSize,
-                                   (void*)attributeOffset );
+      UploadAttribute( context,
+                       attributeLocation,
+                       attributeSize,
+                       attributeOffset,
+                       attributeType,
+                       elementSize );
     }
   }
 }

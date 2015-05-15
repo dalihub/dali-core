@@ -49,81 +49,6 @@ DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> PROPERTY_BUFFER_IMPL = { DEFAULT_PROPERTY_DETAILS };
 
-unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
-{
-  unsigned int size = 0u;
-
-  switch( propertyType )
-  {
-    case Property::NONE:
-    case Property::TYPE_COUNT:
-    case Property::STRING:
-    case Property::ARRAY:
-    case Property::MAP:
-    {
-      DALI_ASSERT_ALWAYS( "No size for properties with no type, or dynamic sizes" );
-      break;
-    }
-    case Property::BOOLEAN:
-    {
-      size = sizeof( PropertyImplementationType< Property::BOOLEAN >::Type );
-      break;
-    }
-    case Property::INTEGER:
-    {
-      size = sizeof( PropertyImplementationType< Property::INTEGER >::Type );
-      break;
-    }
-    case Property::UNSIGNED_INTEGER:
-    {
-      size = sizeof( PropertyImplementationType< Property::UNSIGNED_INTEGER >::Type );
-      break;
-    }
-    case Property::FLOAT:
-    {
-      size = sizeof( PropertyImplementationType< Property::FLOAT >::Type );
-      break;
-    }
-    case Property::VECTOR2:
-    {
-      size = sizeof( PropertyImplementationType< Property::VECTOR2 >::Type );
-      break;
-    }
-    case Property::VECTOR3:
-    {
-      size = sizeof( PropertyImplementationType< Property::VECTOR3 >::Type );
-      break;
-    }
-    case Property::VECTOR4:
-    {
-      size = sizeof( PropertyImplementationType< Property::VECTOR4 >::Type );
-      break;
-    }
-    case Property::MATRIX3:
-    {
-      size = sizeof( PropertyImplementationType< Property::MATRIX3 >::Type );
-      break;
-    }
-    case Property::MATRIX:
-    {
-      size = sizeof( PropertyImplementationType< Property::MATRIX >::Type );
-      break;
-    }
-    case Property::RECTANGLE:
-    {
-      size = sizeof( PropertyImplementationType< Property::RECTANGLE >::Type );
-      break;
-    }
-    case Property::ROTATION:
-    {
-      size = sizeof( PropertyImplementationType< Property::ROTATION >::Type );
-      break;
-    }
-  }
-
-  return size;
-}
-
 /**
  * Calculate the alignment requirements of a type
  *
@@ -512,6 +437,7 @@ void PropertyBuffer::FormatChanged()
     // write to the format
     bufferFormat->components[i].size = elementSize;
     bufferFormat->components[i].offset = currentAlignment;
+    bufferFormat->components[i].type = type;
 
     // update offset
     currentAlignment += elementSize;
@@ -555,6 +481,82 @@ void PropertyBuffer::SizeChanged()
     mBuffer.Resize( bufferSize );
   }
 }
+
+unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
+{
+  unsigned int size = 0u;
+
+  switch( propertyType )
+  {
+    case Property::NONE:
+    case Property::TYPE_COUNT:
+    case Property::STRING:
+    case Property::ARRAY:
+    case Property::MAP:
+    {
+      DALI_ASSERT_ALWAYS( "No size for properties with no type, or dynamic sizes" );
+      break;
+    }
+    case Property::BOOLEAN:
+    {
+      size = sizeof( PropertyImplementationType< Property::BOOLEAN >::Type );
+      break;
+    }
+    case Property::INTEGER:
+    {
+      size = sizeof( PropertyImplementationType< Property::INTEGER >::Type );
+      break;
+    }
+    case Property::UNSIGNED_INTEGER:
+    {
+      size = sizeof( PropertyImplementationType< Property::UNSIGNED_INTEGER >::Type );
+      break;
+    }
+    case Property::FLOAT:
+    {
+      size = sizeof( PropertyImplementationType< Property::FLOAT >::Type );
+      break;
+    }
+    case Property::VECTOR2:
+    {
+      size = sizeof( PropertyImplementationType< Property::VECTOR2 >::Type );
+      break;
+    }
+    case Property::VECTOR3:
+    {
+      size = sizeof( PropertyImplementationType< Property::VECTOR3 >::Type );
+      break;
+    }
+    case Property::VECTOR4:
+    {
+      size = sizeof( PropertyImplementationType< Property::VECTOR4 >::Type );
+      break;
+    }
+    case Property::MATRIX3:
+    {
+      size = sizeof( PropertyImplementationType< Property::MATRIX3 >::Type );
+      break;
+    }
+    case Property::MATRIX:
+    {
+      size = sizeof( PropertyImplementationType< Property::MATRIX >::Type );
+      break;
+    }
+    case Property::RECTANGLE:
+    {
+      size = sizeof( PropertyImplementationType< Property::RECTANGLE >::Type );
+      break;
+    }
+    case Property::ROTATION:
+    {
+      size = sizeof( PropertyImplementationType< Property::ROTATION >::Type );
+      break;
+    }
+  }
+
+  return size;
+}
+
 
 } // namespace Internal
 } // namespace Dali

@@ -21,6 +21,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/property.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/common/buffer-index.h>
 
@@ -77,6 +78,14 @@ public:
    * @return the byte size of the attribute
    */
   virtual size_t GetAttributeSize( BufferIndex bufferIndex, unsigned int index ) const = 0;
+
+  /**
+   * Get the type of an attribute
+   * @param[in] bufferIndex Index to access double buffered values
+   * @param[in] index Index of the attribute
+   * @return the type of the attribute
+   */
+  virtual Property::Type GetAttributeType( BufferIndex bufferIndex, unsigned int index ) const = 0;
 
   /**
    * Get the byte offset of an attribute
