@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/modeling/material.h>
+#include <dali/devel-api/modeling/material.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/modeling/material-impl.h>

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/events/hit-test-algorithm.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/events/hit-test-algorithm-impl.h>

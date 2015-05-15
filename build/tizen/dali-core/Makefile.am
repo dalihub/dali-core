@@ -85,12 +85,27 @@ platformabstractiondynamics_HEADERS = $(platform_abstraction_dynamics_header_fil
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
 develapiactorsdir = $(develapidir)/actors
+develapianimationdir = $(develapidir)/animation
 develapicommondir = $(develapidir)/common
 develapidynamicsdir = $(develapidir)/dynamics
+develapieventsdir = $(develapidir)/events
+develapigeometrydir = $(develapidir)/geometry
+develapiimagesdir = $(develapidir)/images
+develapimodelingdir = $(develapidir)/modeling
+develapiobjectdir = $(develapidir)/object
+develapiscriptingdir = $(develapidir)/scripting
 
 develapi_HEADERS = $(devel_api_header_files)
+develapiactors_HEADERS = $(devel_api_core_actors_header_files)
+develapianimation_HEADERS = $(devel_api_core_animation_header_files)
 develapicommon_HEADERS = $(devel_api_core_common_header_files)
 develapidynamics_HEADERS = $(devel_api_core_dynamics_header_files)
+develapievents_HEADERS = $(devel_api_core_events_header_files)
+develapigeometry_HEADERS = $(devel_api_core_geometry_header_files)
+develapiimages_HEADERS = $(devel_api_core_images_header_files)
+develapimodeling_HEADERS = $(devel_api_core_modeling_header_files)
+develapiobject_HEADERS = $(devel_api_core_object_header_files)
+develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
 
 
 
@@ -100,16 +115,13 @@ publicapiactorsdir = $(publicapidir)/actors
 publicapianimationdir = $(publicapidir)/animation
 publicapicommondir = $(publicapidir)/common
 publicapieventsdir = $(publicapidir)/events
-publicapigeometrydir = $(publicapidir)/geometry
 publicapiimagesdir = $(publicapidir)/images
 publicapimathdir = $(publicapidir)/math
-publicapimodelingdir = $(publicapidir)/modeling
 publicapiobjectdir = $(publicapidir)/object
 publicapirendertasksdir = $(publicapidir)/render-tasks
 publicapishadereffectsdir = $(publicapidir)/shader-effects
 publicapisignalsdir = $(publicapidir)/signals
-publicapitextdir = $(publicapidir)/text
-publicapiscriptingdir = $(publicapidir)/scripting
+
 publicapisizenegotiationdir = $(publicapidir)/size-negotiation
 
 publicapi_HEADERS = $(public_api_header_files)
@@ -117,17 +129,13 @@ publicapiactors_HEADERS = $(public_api_core_actors_header_files)
 publicapianimation_HEADERS = $(public_api_core_animation_header_files)
 publicapicommon_HEADERS = $(public_api_core_common_header_files)
 publicapievents_HEADERS = $(public_api_core_events_header_files)
-publicapigeometry_HEADERS = $(public_api_core_geometry_header_files)
 publicapiimages_HEADERS = $(public_api_core_images_header_files)
 publicapimath_HEADERS = $(public_api_core_math_header_files)
-publicapimodeling_HEADERS = $(public_api_core_modeling_header_files)
 publicapirendertasks_HEADERS = $(public_api_core_render_tasks_header_files)
 publicapiobject_HEADERS = $(public_api_core_object_header_files)
-publicapiscripting_HEADERS = $(public_api_core_scripting_header_files)
 publicapisizenegotiation_HEADERS = $(public_api_core_size_negotiation_header_files)
 publicapishadereffects_HEADERS = $(public_api_core_shader_effects_header_files)
 publicapisignals_HEADERS = $(public_api_core_signals_header_files)
-publicapitext_HEADERS = $(public_api_core_text_header_files)
 
 CLEANFILES = dali-shaders.cpp \
              dali-shaders.h

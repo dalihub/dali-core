@@ -23,7 +23,7 @@
 
 // BASE CLASS INCLUDES
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/geometry/cloth.h>
+#include <dali/devel-api/geometry/cloth.h>
 
 namespace Dali
 {

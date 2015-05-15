@@ -17,8 +17,8 @@
 
 #include "mesh-factory.h"
 
-#include <dali/public-api/geometry/mesh-data.h>
-#include <dali/public-api/modeling/material.h>
+#include <dali/devel-api/geometry/mesh-data.h>
+#include <dali/devel-api/modeling/material.h>
 
 namespace Dali
 {

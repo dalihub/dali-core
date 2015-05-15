@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/geometry/cloth.h>
+#include <dali/devel-api/geometry/cloth.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
 
 namespace Dali

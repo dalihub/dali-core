@@ -23,8 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/handle.h>
-#include <dali/public-api/actors/mesh-actor.h>
-#include <dali/public-api/geometry/mesh.h>
+#include <dali/devel-api/actors/mesh-actor.h>
+#include <dali/devel-api/geometry/mesh.h>
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/modeling/material-impl.h>

@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/actors/mesh-actor.h>
+#include <dali/devel-api/actors/mesh-actor.h>
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/debug.h>

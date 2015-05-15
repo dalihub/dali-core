@@ -23,7 +23,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/object/base-handle.h>
-#include <dali/public-api/geometry/mesh.h>
+#include <dali/devel-api/geometry/mesh.h>
 
 namespace Dali
 {

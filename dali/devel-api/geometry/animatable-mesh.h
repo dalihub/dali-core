@@ -21,8 +21,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/handle.h>
-#include <dali/public-api/geometry/animatable-vertex.h>
-#include <dali/public-api/modeling/material.h>
+#include <dali/devel-api/geometry/animatable-vertex.h>
+#include <dali/devel-api/modeling/material.h>
 
 namespace Dali
 {

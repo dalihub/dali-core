@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>

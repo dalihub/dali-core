@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/modeling/bone.h>
+#include <dali/devel-api/modeling/bone.h>
 
 namespace Dali
 {

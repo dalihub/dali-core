@@ -23,9 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
-#include <dali/public-api/common/ref-counted-dali-vector.h>
+#include <dali/devel-api/common/ref-counted-dali-vector.h>
 
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>

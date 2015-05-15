@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/common/mutex.h>
+#include <dali/devel-api/common/mutex.h>
 
 // EXTERNAL INCLUDES
 #include <pthread.h>

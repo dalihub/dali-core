@@ -15,8 +15,8 @@
  *
  */
 
-#include <dali/public-api/geometry/animatable-vertex.h>
-#include <dali/public-api/geometry/animatable-mesh.h>
+#include <dali/devel-api/geometry/animatable-vertex.h>
+#include <dali/devel-api/geometry/animatable-mesh.h>
 #include <dali/internal/event/modeling/animatable-mesh-impl.h>
 
 namespace Dali

@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/geometry/mesh-data.h>
+#include <dali/devel-api/geometry/mesh-data.h>
 
 namespace Dali
 {

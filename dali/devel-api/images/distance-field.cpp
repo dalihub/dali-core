@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/images/distance-field.h>
+#include <dali/devel-api/images/distance-field.h>
 
 // EXTERNAL INCLUDES
 #include <algorithm>

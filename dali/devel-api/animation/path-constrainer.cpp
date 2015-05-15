@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/animation/path-constrainer.h>
+#include <dali/devel-api/animation/path-constrainer.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/animation/path-constrainer-impl.h>

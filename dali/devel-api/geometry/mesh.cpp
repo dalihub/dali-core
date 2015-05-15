@@ -16,12 +16,12 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/geometry/mesh.h>
+#include <dali/devel-api/geometry/mesh.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/modeling/mesh-impl.h>
 #include <dali/internal/event/modeling/material-impl.h>
-#include <dali/public-api/geometry/mesh-factory.h>
+#include <dali/devel-api/geometry/mesh-factory.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector3.h>
 

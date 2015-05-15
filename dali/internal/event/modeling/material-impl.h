@@ -24,7 +24,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/modeling/material.h>
+#include <dali/devel-api/modeling/material.h>
 #include <dali/public-api/object/base-object.h>
 
 namespace Dali

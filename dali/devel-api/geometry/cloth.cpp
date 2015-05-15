@@ -16,10 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/geometry/cloth.h>
+#include <dali/devel-api/geometry/cloth.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/geometry/mesh-factory.h>
+#include <dali/devel-api/geometry/mesh-factory.h>
 #include <dali/internal/event/modeling/cloth-impl.h>
 
 namespace Dali

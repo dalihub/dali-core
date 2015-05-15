@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/images/atlas.h>
+#include <dali/devel-api/images/atlas.h>
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/images/atlas-impl.h>

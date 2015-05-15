@@ -19,8 +19,8 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/geometry/mesh.h>
-#include <dali/public-api/modeling/material.h>
+#include <dali/devel-api/geometry/mesh.h>
+#include <dali/devel-api/modeling/material.h>
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>

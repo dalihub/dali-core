@@ -23,7 +23,7 @@
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>

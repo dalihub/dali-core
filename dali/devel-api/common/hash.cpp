@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/common/hash.h>
+#include <dali/devel-api/common/hash.h>
 
 namespace Dali
 {

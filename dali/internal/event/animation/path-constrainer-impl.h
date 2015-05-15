@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/animation/constrainer.h>
-#include <dali/public-api/animation/path-constrainer.h>
+#include <dali/devel-api/animation/path-constrainer.h>
 #include <dali/public-api/math/math-utils.h>
 #include <dali/internal/event/animation/path-impl.h>
 

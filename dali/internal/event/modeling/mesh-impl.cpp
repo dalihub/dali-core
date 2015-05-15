@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/matrix.h>
-#include <dali/public-api/geometry/mesh.h>
+#include <dali/devel-api/geometry/mesh.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/modeling/material-impl.h>

@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/images/image-connector.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>

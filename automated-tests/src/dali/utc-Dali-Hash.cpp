@@ -17,7 +17,7 @@
 
 #include <string>
 #include <stdlib.h>
-#include <dali/public-api/common/hash.h>
+#include <dali/devel-api/common/hash.h>
 #include <dali-test-suite-utils.h>
 
 void utc_dali_hash_startup(void)

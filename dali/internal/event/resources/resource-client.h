@@ -22,8 +22,8 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/ref-counted-dali-vector.h>
-#include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/common/ref-counted-dali-vector.h>
+#include <dali/devel-api/images/native-image-interface.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-lifetime-observer.h>

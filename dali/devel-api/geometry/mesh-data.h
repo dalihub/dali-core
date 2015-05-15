@@ -22,8 +22,8 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/modeling/bone.h>
-#include <dali/public-api/modeling/material.h>
+#include <dali/devel-api/modeling/bone.h>
+#include <dali/devel-api/modeling/material.h>
 
 
 // DECLARATION FILES

@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali/integration-api/bitmap.h>
+#include <dali/devel-api/images/atlas.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
 

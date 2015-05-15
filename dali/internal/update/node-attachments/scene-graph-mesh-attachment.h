@@ -26,7 +26,7 @@
 #include <dali/internal/update/modeling/bone-transforms.h>
 #include <dali/internal/event/actor-attachments/mesh-attachment-impl.h>
 #include <dali/internal/event/actors/mesh-actor-impl.h>
-#include <dali/public-api/geometry/mesh.h>
+#include <dali/devel-api/geometry/mesh.h>
 #include <dali/public-api/math/matrix.h>
 
 namespace Dali

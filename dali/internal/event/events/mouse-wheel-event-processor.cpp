@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/events/mouse-wheel-event.h>
-#include <dali/public-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/integration-api/events/mouse-wheel-event-integ.h>
 #include <dali/internal/event/common/stage-impl.h>

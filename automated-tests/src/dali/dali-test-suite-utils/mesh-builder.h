@@ -18,6 +18,7 @@
  */
 
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/geometry/mesh.h>
 
 namespace Dali
 {
