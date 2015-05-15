@@ -22,6 +22,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
+
 #include <dali/internal/common/memory-pool-object-allocator.h>
 #include <dali/internal/event/size-negotiation/memory-pool-relayout-container.h>
 
@@ -162,7 +163,7 @@ private:
    * @param[in] topOfSubTreeStack The top of the sub tree that this actor is in
    * @param[in] potentialRedundantSubRoots Actors collected as potentially already being included in relayout
    */
-  void PropagateAll( Dali::Actor& actor, Dimension::Type dimension, std::vector< Dali::Actor >& topOfSubTreeStack, std::vector< Dali::Actor >& potentialRedundantSubRoots );
+  void PropagateAll( Dali::Actor& actor, Dimension::Type dimension, Dali::ActorContainer& topOfSubTreeStack, Dali::ActorContainer& potentialRedundantSubRoots );
 
   /**
    * Queue an actor on the relayout container

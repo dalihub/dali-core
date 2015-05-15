@@ -36,7 +36,7 @@ ConnectionTracker::~ConnectionTracker()
 
 void ConnectionTracker::DisconnectAll()
 {
-  std::size_t size = mConnections.Size();
+  std::size_t size = mConnections.size();
 
   for( std::size_t i = 0; i< size; ++i )
   {
@@ -48,18 +48,18 @@ void ConnectionTracker::DisconnectAll()
     delete connection;
   }
 
-  mConnections.Clear();
+  mConnections.clear();
 }
 
 void ConnectionTracker::SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
 {
   SlotConnection* connection = new SlotConnection( slotObserver, callback );
-  mConnections.PushBack( connection );
+  mConnections.push_back( connection );
 }
 
 void ConnectionTracker::SignalDisconnected( SlotObserver* signal, CallbackBase* callback )
 {
-  std::size_t size = mConnections.Size();
+  std::size_t size = mConnections.size();
 
   for( std::size_t i = 0; i< size; ++i )
   {
@@ -69,7 +69,7 @@ void ConnectionTracker::SignalDisconnected( SlotObserver* signal, CallbackBase* 
     if( connection->GetCallback() == callback )
     {
       // Remove from connection list
-      mConnections.Erase( mConnections.Begin() + i );
+      mConnections.erase( mConnections.begin() + i );
 
       // Delete connection
       delete connection;
@@ -84,7 +84,7 @@ void ConnectionTracker::SignalDisconnected( SlotObserver* signal, CallbackBase* 
 
 std::size_t ConnectionTracker::GetConnectionCount() const
 {
-  return mConnections.Size();
+  return mConnections.size();
 }
 
 } // namespace Dali

@@ -150,6 +150,21 @@ public:
   /**
    * @brief Specify the pixel arithmetic used when the actor is blended.
    *
+   * @param[in] srcFactorRgba Specifies how the red, green, blue, and alpha source blending factors are computed.
+   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
+   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
+   * GL_CONSTANT_ALPHA, GL_ONE_MINUS_CONSTANT_ALPHA, and GL_SRC_ALPHA_SATURATE.
+   *
+   * @param[in] destFactorRgba Specifies how the red, green, blue, and alpha destination blending factors are computed.
+   * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
+   * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
+   * GL_CONSTANT_ALPHA, and GL_ONE_MINUS_CONSTANT_ALPHA.
+   */
+  void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
+
+  /**
+   * @brief Specify the pixel arithmetic used when the actor is blended.
+   *
    * @param[in] srcFactorRgb Specifies how the red, green, and blue source blending factors are computed.
    * The options are BlendingFactor::ZERO, ONE, SRC_COLOR, ONE_MINUS_SRC_COLOR, DST_COLOR, ONE_MINUS_DST_COLOR,
    * SRC_ALPHA, ONE_MINUS_SRC_ALPHA, DST_ALPHA, ONE_MINUS_DST_ALPHA, CONSTANT_COLOR, ONE_MINUS_CONSTANT_COLOR,
@@ -179,6 +194,45 @@ public:
    */
   void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
                      BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
+
+  /**
+   * @brief Specify the equation used when the actor is blended.
+   *
+   * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
+   * @param[in] equationRgba The equation used for combining red, green, blue, and alpha components.
+   */
+  void SetBlendEquation( BlendingEquation::Type equationRgba );
+
+  /**
+   * @brief Specify the equation used when the actor is blended.
+   *
+   * @param[in] equationRgb The equation used for combining red, green, and blue components.
+   * @param[in] equationAlpha The equation used for combining the alpha component.
+   * The options are BlendingEquation::ADD, SUBTRACT, or REVERSE_SUBTRACT.
+   */
+  void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
+
+  /**
+   * @brief Query the equation used when the actor is blended.
+   *
+   * @param[out] equationRgb The equation used for combining red, green, and blue components.
+   * @param[out] equationAlpha The equation used for combining the alpha component.
+   */
+  void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
+
+  /**
+   * @brief Specify the color used when the actor is blended; the default is Vector4::ZERO.
+   *
+   * @param[in] color The blend color.
+   */
+  void SetBlendColor( const Vector4& color );
+
+  /**
+   * @brief Query the color used when the actor is blended.
+   *
+   * @return The blend color.
+   */
+  const Vector4& GetBlendColor() const;
 
   /**
    * @brief Sets the filtering mode.

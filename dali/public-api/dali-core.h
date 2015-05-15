@@ -37,9 +37,8 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/animation/key-frames.h>
-#include <dali/public-api/animation/linear-constrainer.h>
 #include <dali/public-api/animation/path.h>
-#include <dali/public-api/animation/path-constrainer.h>
+#include <dali/public-api/animation/path-constraint.h>
 #include <dali/public-api/animation/time-period.h>
 
 #include <dali/public-api/common/compile-time-assert.h>

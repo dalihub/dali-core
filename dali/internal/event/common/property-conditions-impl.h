@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PROPERTY_CONDITIONS_H__
 
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -54,15 +54,15 @@ public:
     VariableStep          ///< Similar to step, except user can define a list of steps from reference value
   };
 
-  /**
-   * Constructor
-   */
+  typedef Dali::PropertyCondition::ArgumentContainer ArgumentContainer;
+  typedef Dali::PropertyCondition::ArgumentIter ArgumentIter;
+  typedef Dali::PropertyCondition::ArgumentConstIter ArgumentConstIter;
+
   PropertyCondition();
 
-  /**
-   * Virtual destructor
-   */
   virtual ~PropertyCondition();
+
+private:
 
 private:
 
@@ -74,8 +74,8 @@ private:
 
 public:
 
-  Type type;                     ///< The condition Type.
-  Dali::Vector<float> arguments; ///< The condition Arguments.
+  Type type;                        ///< The condition Type.
+  ArgumentContainer arguments;      ///< The condition Arguments.
 
 };
 

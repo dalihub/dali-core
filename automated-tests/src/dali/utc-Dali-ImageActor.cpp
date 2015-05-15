@@ -153,8 +153,12 @@ int UtcDaliImageActorPixelArea(void)
   BufferImage img = BufferImage::New( 10, 10 );
   ImageActor actor = ImageActor::New( img );
 
+  DALI_TEST_CHECK( actor.IsPixelAreaSet() == false );
+
   ImageActor::PixelArea area( 1, 2, 3, 4 );
   actor.SetPixelArea( area );
+
+  DALI_TEST_CHECK( actor.IsPixelAreaSet() == true );
 
   DALI_TEST_EQUALS( 1, actor.GetPixelArea().x, TEST_LOCATION );
   DALI_TEST_EQUALS( 2, actor.GetPixelArea().y, TEST_LOCATION );
@@ -162,6 +166,7 @@ int UtcDaliImageActorPixelArea(void)
   DALI_TEST_EQUALS( 4, actor.GetPixelArea().height, TEST_LOCATION );
 
   ImageActor actor2 = ImageActor::New( img, ImageActor::PixelArea( 5, 6, 7, 8 ) );
+  DALI_TEST_CHECK( actor2.IsPixelAreaSet() == true );
 
   DALI_TEST_EQUALS( 5, actor2.GetPixelArea().x, TEST_LOCATION );
   DALI_TEST_EQUALS( 6, actor2.GetPixelArea().y, TEST_LOCATION );
@@ -519,7 +524,7 @@ int UtcDaliImageActorNaturalPixelAreaSize01(void)
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(100, 100), TEST_LOCATION );
 
   // Clear the pixel area. Expect the whole image to be shown, filling the set size.
-  actor.SetPixelArea( ImageActor::PixelArea( 0, 0, image.GetWidth(), image.GetHeight()) );
+  actor.ClearPixelArea();
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(100, 100), TEST_LOCATION );
@@ -573,7 +578,7 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), Vector2(30, 30), TEST_LOCATION );
 
   // Clear the pixel area. Expect the whole image to be shown, changing actor size
-  actor.SetPixelArea( ImageActor::PixelArea( 0, 0, image.GetWidth(), image.GetHeight()) );
+  actor.ClearPixelArea();
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
@@ -592,7 +597,7 @@ int UtcDaliImageActorNaturalPixelAreaSize02(void)
 
   // Clearing pixel area should change actor size to image size
   actor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
-  actor.SetPixelArea( ImageActor::PixelArea( 0, 0, image.GetWidth(), image.GetHeight()) );
+  actor.ClearPixelArea();
   application.SendNotification(); // Process event messages
   application.Render();           // Process LoadComplete
   DALI_TEST_EQUALS( Vector2(actor.GetCurrentSize()), requestedSize, TEST_LOCATION );
@@ -760,6 +765,26 @@ int UtcDaliImageActorUseImageAlpha05(void)
   const TraceCallStack& callTrace = application.GetGlAbstraction().GetCullFaceTrace();
   DALI_TEST_EQUALS( BlendDisabled( callTrace ), false, TEST_LOCATION );
   DALI_TEST_EQUALS( BlendEnabled( callTrace), false, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliImageActorClearPixelArea(void)
+{
+  TestApplication application;
+
+  BufferImage img = BufferImage::New( 10, 10 );
+  ImageActor actor = ImageActor::New( img );
+
+  DALI_TEST_CHECK( actor.IsPixelAreaSet() == false );
+
+  ImageActor::PixelArea area( 1, 2, 3, 4 );
+  actor.SetPixelArea( area );
+
+  DALI_TEST_CHECK( actor.IsPixelAreaSet() == true );
+
+  actor.ClearPixelArea();
+
+  DALI_TEST_CHECK( actor.IsPixelAreaSet() == false );
   END_TEST;
 }
 

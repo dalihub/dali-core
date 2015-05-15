@@ -183,7 +183,7 @@ int UtcDaliAnimationAssignmentOperatorP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationSetDurationP(void)
+int UtcDaliAnimationSetDuratioN(void)
 {
   TestApplication application;
 
@@ -260,7 +260,7 @@ int UtcDaliAnimationSetDurationN(void)
   END_TEST;
 }
 
-int UtcDaliAnimationGetDurationP(void)
+int UtcDaliAnimationGetDuratioN(void)
 {
   TestApplication application;
 
@@ -437,7 +437,7 @@ int UtcDaliAnimationSetEndActioN(void)
   END_TEST;
 }
 
-int UtcDaliAnimationGetEndActionP(void)
+int UtcDaliAnimationGetEndActioN(void)
 {
   TestApplication application;
 
@@ -453,7 +453,7 @@ int UtcDaliAnimationGetEndActionP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationSetDisconnectActionP(void)
+int UtcDaliAnimationSetDisconnectActioN(void)
 {
   TestApplication application;
   Stage stage( Stage::GetCurrent() );
@@ -565,7 +565,7 @@ int UtcDaliAnimationSetDisconnectActionP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationGetDisconnectActionP(void)
+int UtcDaliAnimationGetDisconnectActioN(void)
 {
   TestApplication application;
   Animation animation = Animation::New(1.0f);
@@ -580,7 +580,7 @@ int UtcDaliAnimationGetDisconnectActionP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationSetDefaultAlphaFunctionP(void)
+int UtcDaliAnimationSetDefaultAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -594,7 +594,7 @@ int UtcDaliAnimationSetDefaultAlphaFunctionP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationGetDefaultAlphaFunctionP(void)
+int UtcDaliAnimationGetDefaultAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -1646,7 +1646,7 @@ int UtcDaliAnimationStoP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationStopSetPositionP(void)
+int UtcDaliAnimationStopSetPositioN(void)
 {
   // Test that Animation::Stop & Actor::SetPosition can be used in conjunction
   // i.e. to check that the animation does not interfere with the position set.
@@ -1787,7 +1787,7 @@ int UtcDaliAnimationFinishedSignalP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByBooleanP(void)
+int UtcDaliAnimationAnimateByBooleaN(void)
 {
   TestApplication application;
 
@@ -1870,7 +1870,7 @@ int UtcDaliAnimationAnimateByBooleanP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByBooleanAlphaFunctionP(void)
+int UtcDaliAnimationAnimateByBooleanAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -2126,7 +2126,7 @@ int UtcDaliAnimationAnimateByFloatP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByFloatAlphaFunctionP(void)
+int UtcDaliAnimationAnimateByFloatAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -2356,7 +2356,7 @@ int UtcDaliAnimationAnimateByIntegerP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByIntegerAlphaFunctionP(void)
+int UtcDaliAnimationAnimateByIntegerAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -2586,7 +2586,7 @@ int UtcDaliAnimationAnimateByVector2P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByVector2AlphaFunctionP(void)
+int UtcDaliAnimationAnimateByVector2AlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -2817,7 +2817,7 @@ int UtcDaliAnimationAnimateByVector3P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByVector3AlphaFunctionP(void)
+int UtcDaliAnimationAnimateByVector3AlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -3049,7 +3049,7 @@ int UtcDaliAnimationAnimateByVector4P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByVector4AlphaFunctionP(void)
+int UtcDaliAnimationAnimateByVector4AlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -3230,7 +3230,7 @@ int UtcDaliAnimationAnimateByVector4AlphaFunctionTimePeriodP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByActorPositionP(void)
+int UtcDaliAnimationAnimateByActorPositioN(void)
 {
   TestApplication application;
 
@@ -3282,7 +3282,7 @@ int UtcDaliAnimationAnimateByActorPositionP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByActorPositionAlphaFunctionP(void)
+int UtcDaliAnimationAnimateByActorPositionAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -3450,7 +3450,7 @@ int UtcDaliAnimationAnimateByActorPositionAlphaFunctionTimePeriodP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByActorOrientationP(void)
+int UtcDaliAnimationAnimateByActorOrientatioN(void)
 {
   TestApplication application;
 
@@ -3507,7 +3507,7 @@ int UtcDaliAnimationAnimateByActorOrientationP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateByActorOrientationAlphaFunctionP(void)
+int UtcDaliAnimationAnimateByActorOrientationAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -3735,7 +3735,7 @@ int UtcDaliAnimationAnimateByActorScaleP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToBooleanP(void)
+int UtcDaliAnimationAnimateToBooleaN(void)
 {
   TestApplication application;
 
@@ -3817,7 +3817,7 @@ int UtcDaliAnimationAnimateToBooleanP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToBooleanAlphaFunctionP(void)
+int UtcDaliAnimationAnimateToBooleanAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -4070,7 +4070,7 @@ int UtcDaliAnimationAnimateToFloatP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToFloatAlphaFunctionP(void)
+int UtcDaliAnimationAnimateToFloatAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -4276,7 +4276,7 @@ int UtcDaliAnimationAnimateToIntegerP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToIntegerAlphaFunctionP(void)
+int UtcDaliAnimationAnimateToIntegerAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -4482,7 +4482,7 @@ int UtcDaliAnimationAnimateToVector2P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToVector2AlphaFunctionP(void)
+int UtcDaliAnimationAnimateToVector2AlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -4689,7 +4689,7 @@ int UtcDaliAnimationAnimateToVector3P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToVector3AlphaFunctionP(void)
+int UtcDaliAnimationAnimateToVector3AlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -4957,7 +4957,7 @@ int UtcDaliAnimationAnimateToVector4P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToVector4AlphaFunctionP(void)
+int UtcDaliAnimationAnimateToVector4AlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -5120,7 +5120,7 @@ int UtcDaliAnimationAnimateToVector4AlphaFunctionTimePeriodP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorParentOriginP(void)
+int UtcDaliAnimationAnimateToActorParentOrigiN(void)
 {
   TestApplication application;
 
@@ -5685,7 +5685,7 @@ int UtcDaliAnimationAnimateToActorSizeWidthHeightP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorPositionP(void)
+int UtcDaliAnimationAnimateToActorPositioN(void)
 {
   TestApplication application;
 
@@ -5879,7 +5879,7 @@ int UtcDaliAnimationAnimateToActorPositionZP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorPositionAlphaFunctionP(void)
+int UtcDaliAnimationAnimateToActorPositionAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -6090,7 +6090,7 @@ int UtcDaliAnimationAnimateToActorOrientationAngleAxisP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorOrientationQuaternionP(void)
+int UtcDaliAnimationAnimateToActorOrientationQuaternioN(void)
 {
   TestApplication application;
 
@@ -6148,7 +6148,7 @@ int UtcDaliAnimationAnimateToActorOrientationQuaternionP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorOrientationAlphaFunctionP(void)
+int UtcDaliAnimationAnimateToActorOrientationAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -6759,7 +6759,7 @@ int UtcDaliAnimationAnimateToActorColorRedP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateToActorColorGreenP(void)
+int UtcDaliAnimationAnimateToActorColorGreeN(void)
 {
   TestApplication application;
 
@@ -7738,7 +7738,7 @@ int UtcDaliAnimationAnimateBetweenActorOrientation02CubicP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateBetweenActorColorAlphaFunctionP(void)
+int UtcDaliAnimationAnimateBetweenActorColorAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -8275,7 +8275,7 @@ int UtcDaliAnimationAnimateP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationAnimateAlphaFunctionP(void)
+int UtcDaliAnimationAnimateAlphaFunctioN(void)
 {
   TestApplication application;
 
@@ -8794,7 +8794,7 @@ int UtcDaliAnimationSignalOrderP(void)
   END_TEST;
 }
 
-int UtcDaliAnimationExtendDurationP(void)
+int UtcDaliAnimationExtendDuratioN(void)
 {
   TestApplication application;
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,27 +57,33 @@ PropertyNotificationPtr PropertyNotification::New(Property& target,
   return propertyNotification;
 }
 
-PropertyNotification::PropertyNotification( UpdateManager& updateManager,
-                                            PropertyNotificationManager& propertyNotificationManager,
-                                            Property& target,
-                                            int componentIndex,
-                                            const Dali::PropertyCondition& condition )
-: mUpdateManager( updateManager ),
-  mPropertyNotification( NULL ),
-  mPropertyNotificationManager( propertyNotificationManager ),
-  mObjectPropertyIndex( target.propertyIndex ),
-  mPropertyType( Property::NONE ),
-  mComponentIndex( componentIndex ),
-  mCondition( condition ),
-  mNotifyMode( Dali::PropertyNotification::NotifyOnTrue ),
-  mNotifyResult( false )
+PropertyNotification::PropertyNotification(UpdateManager& updateManager,
+                                           PropertyNotificationManager& propertyNotificationManager,
+                                           Property& target,
+                                           int componentIndex,
+                                           const Dali::PropertyCondition& condition)
+: mUpdateManager(updateManager),
+  mPropertyNotification(NULL),
+  mPropertyNotificationManager(propertyNotificationManager),
+  mObjectPropertyIndex(target.propertyIndex),
+  mPropertyType(Property::NONE),
+  mComponentIndex(componentIndex),
+  mCondition(condition),
+  mNotifyMode(Dali::PropertyNotification::NotifyOnTrue),
+  mNotifyResult(false)
 {
-  const Internal::PropertyCondition& conditionImpl = GetImplementation( condition );
+  // Set condition arguments (as simple vector of floats)
+  PropertyCondition::ArgumentContainer arguments = GetImplementation(condition).arguments;
+  PropertyCondition::ArgumentConstIter iter = arguments.begin();
 
-  Dali::Vector<float>::SizeType count = conditionImpl.arguments.Count();
-  for( Dali::Vector<float>::SizeType index = 0; index < count; ++index )
+  while( iter != arguments.end() )
   {
-    mRawConditionArgs.PushBack( conditionImpl.arguments[ index ] );
+    const Property::Value& value = *iter;
+    float floatValue;
+    value.Get(floatValue);
+
+    mRawConditionArgs.PushBack( floatValue );
+    ++iter;
   }
 
   // Observe target object and create/destroy notification scene object accordingly.

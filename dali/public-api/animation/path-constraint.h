@@ -1,5 +1,5 @@
-#ifndef __DALI_PATH_CONSTRAINER_H__
-#define __DALI_PATH_CONSTRAINER_H__
+#ifndef __DALI_PATH_CONSTRAINT_H__
+#define __DALI_PATH_CONSTRAINT_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -18,9 +18,6 @@
  *
  */
 
-//EXTERNAL INCLUDES
-#include <cfloat> //For FLT_MAX
-
 // INTERNAL INCLUDES
 #include <dali/public-api/animation/path.h>
 #include <dali/public-api/object/handle.h>
@@ -31,71 +28,69 @@ namespace Dali
 
 namespace Internal DALI_INTERNAL
 {
-  class PathConstrainer;
+class PathConstraint;
 }
 /**
  * @brief
  *
- * PathConstrainer applies constraints to objects to follow a path.
+ * PathConstraint applies constraints to objects to follow a path.
  * A Vector3 property will be constrained to the position of the path and a Rotation property will be constrained to follow
  * the tangent of the path given a forward vector in object's local space.
  *
  */
-class DALI_IMPORT_API PathConstrainer : public Handle
+class DALI_IMPORT_API PathConstraint : public Handle
 {
 public:
 
   /**
-   * @brief An enumeration of properties belonging to the PathConstrainer class.
+   * @brief An enumeration of properties belonging to the PathConstraint class.
    */
   struct Property
   {
     enum
     {
-      FORWARD   =  DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "forward" type Vector3
-      POINTS,                                           ///< name "points" type Array of Vector3
-      CONTROL_POINTS                                    ///< name "control-points" type Array of Vector3
+      RANGE   =  DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "range" type Vector2
     };
   };
 
   /**
-   * @brief Create an initialized PathConstrainer handle.
+   * @brief Create an initialized PathConstraint handle.
    *
    * @return a handle to a newly allocated Dali resource.
    */
-  static PathConstrainer New();
+  static PathConstraint New( Dali::Path path, const Vector2& range );
 
   /**
-   * @brief Downcast an Object handle to PathConstrainer handle.
+   * @brief Downcast an Object handle to PathConstraint handle.
    *
-   * If handle points to a PathConstrainer object the downcast produces
+   * If handle points to a PathConstraint object the downcast produces
    * valid handle. If not the returned handle is left uninitialized.
    * @param[in] handle to An object
-   * @return handle to a PathConstrainer object or an uninitialized handle
+   * @return handle to a PathConstraint object or an uninitialized handle
    */
-  static PathConstrainer DownCast( BaseHandle handle );
+  static PathConstraint DownCast( BaseHandle handle );
 
   /**
-   * @brief Create an uninitialized PathConstrainer handle.
+   * @brief Create an uninitialized PathConstraint handle.
    *
-   * This can be initialized with PathConstrainer::New(). Calling member
+   * This can be initialized with PathConstraint::New(). Calling member
    * functions with an uninitialized Dali::Object is not allowed.
    */
-  PathConstrainer();
+  PathConstraint();
 
   /**
    * @brief Destructor
    *
    * This is non-virtual since derived Handle types must not contain data or virtual methods.
    */
-  ~PathConstrainer();
+  ~PathConstraint();
 
   /**
    * @brief This copy constructor is required for (smart) pointer semantics.
    *
    * @param [in] handle A reference to the copied handle
    */
-  PathConstrainer(const PathConstrainer& handle);
+  PathConstraint(const PathConstraint& handle);
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -103,34 +98,33 @@ public:
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
-  PathConstrainer& operator=(const PathConstrainer& rhs);
+  PathConstraint& operator=(const PathConstraint& rhs);
 
   /**
    * @brief Applies the path constraint to the target property
    *
-   * @param[in] target Property to be constrained
    * @param[in] source Property used as parameter for the path
-   * @param[in] range The range of values in the source property which will be mapped to [0,1]
-   * @param[in] wrap Wrapping domain. Source property will be wrapped in the domain [wrap.x,wrap.y] before mapping to [0,1]
+   * @param[in] target Property to be constrained
+   * @param[in] forward Vector in object's local space which will be aligned to the tangent of the path (only needed for Rotation properties)
    */
-  void Apply( Dali::Property target, Dali::Property source, const Vector2& range, const Vector2& wrap = Vector2(-FLT_MAX, FLT_MAX) );
+  void Apply( Dali::Property source, Dali::Property target, const Vector3& forward = Vector3() );
 
   /**
    * @brief Removes the path constraint in the target object
    *
-   * @param[in] target A handle to an object constrained by the PathConstrainer
-   */
-  void Remove( Dali::Handle& target );
+   * @param[in] target A handle to an object constrained by the PathConstraint
+  */
+  void Remove( Dali::Handle target );
 
 public: // Not intended for application developers
   /**
    * @brief This constructor is used by Dali::New() methods.
    *
-   * @param[in] pathConstrainer A pointer to an internal PathConstrainer resource
+   * @param[in] path A pointer to an internal path resource
    */
-  explicit DALI_INTERNAL PathConstrainer(Internal::PathConstrainer* pathConstrainer);
+  explicit DALI_INTERNAL PathConstraint(Internal::PathConstraint* path);
 };
 
 } // namespace Dali
 
-#endif // __DALI_PATH_CONSTRAINER_H__
+#endif // __DALI_KEY_FRAMES_H__

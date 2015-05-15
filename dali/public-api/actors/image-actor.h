@@ -267,6 +267,23 @@ public:
   PixelArea GetPixelArea() const;
 
   /**
+   * @brief Query whether a pixel area has been set.
+   *
+   * @pre image must be initialized.
+   * @return True if a pixel area has been set.
+   */
+  bool IsPixelAreaSet() const;
+
+  /**
+   * @brief Remove any pixel areas specified with SetPixelArea; the entire image will be displayed.
+   *
+   * The actor size will change to that of the Image unless a custom size was set, e.g. via
+   * Actor::SetSize().
+   * @pre image must be initialized.
+   */
+  void ClearPixelArea();
+
+  /**
    * @brief Set how the image is rendered; the default is STYLE_QUAD.
    *
    * @pre image must be initialized.

@@ -19,6 +19,7 @@
  */
 
 // INTERNAL INCLUDES
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/public-api/math/rect.h>

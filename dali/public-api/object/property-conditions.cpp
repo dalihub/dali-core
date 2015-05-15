@@ -36,92 +36,86 @@ PropertyCondition::~PropertyCondition()
 
 }
 
-PropertyCondition::PropertyCondition( const PropertyCondition& handle )
+PropertyCondition::PropertyCondition(const PropertyCondition& handle)
 : BaseHandle(handle)
 {
 }
 
-PropertyCondition& PropertyCondition::operator=( const PropertyCondition& rhs )
+PropertyCondition& PropertyCondition::operator=(const PropertyCondition& rhs)
 {
   BaseHandle::operator=(rhs);
   return *this;
 }
 
-std::size_t PropertyCondition::GetArgumentCount() const
+PropertyCondition::ArgumentContainer PropertyCondition::GetArguments()
 {
-  return GetImplementation(*this).arguments.Count();
+  return GetImplementation(*this).arguments;
 }
 
-float PropertyCondition::GetArgument( std::size_t index ) const
+const PropertyCondition::ArgumentContainer& PropertyCondition::GetArguments() const
 {
-  return GetImplementation(*this).arguments[ index ];
+  return GetImplementation(*this).arguments;
 }
 
-PropertyCondition LessThanCondition( float arg )
+PropertyCondition LessThanCondition(float arg)
 {
   PropertyCondition condition;
-  Internal::PropertyCondition& impl = GetImplementation( condition );
-  impl.type = Internal::PropertyCondition::LessThan;
-  impl.arguments.PushBack( arg );
+  GetImplementation(condition).type = Internal::PropertyCondition::LessThan;
+  GetImplementation(condition).arguments.push_back(Property::Value(arg));
 
   return condition;
 }
 
-PropertyCondition GreaterThanCondition( float arg )
+PropertyCondition GreaterThanCondition(float arg)
 {
   PropertyCondition condition;
-  Internal::PropertyCondition& impl = GetImplementation( condition );
-  impl.type = Internal::PropertyCondition::GreaterThan;
-  impl.arguments.PushBack( arg );
+  GetImplementation(condition).type = Internal::PropertyCondition::GreaterThan;
+  GetImplementation(condition).arguments.push_back(Property::Value(arg));
 
   return condition;
 }
 
-PropertyCondition InsideCondition( float arg0, float arg1 )
+PropertyCondition InsideCondition(float arg0, float arg1)
 {
   PropertyCondition condition;
-  Internal::PropertyCondition& impl = GetImplementation( condition );
-  impl.type = Internal::PropertyCondition::Inside;
-  impl.arguments.PushBack( arg0 );
-  impl.arguments.PushBack( arg1 );
+  GetImplementation(condition).type = Internal::PropertyCondition::Inside;
+  GetImplementation(condition).arguments.push_back(Property::Value(arg0));
+  GetImplementation(condition).arguments.push_back(Property::Value(arg1));
 
   return condition;
 }
 
-PropertyCondition OutsideCondition( float arg0, float arg1 )
+PropertyCondition OutsideCondition(float arg0, float arg1)
 {
   PropertyCondition condition;
-  Internal::PropertyCondition& impl = GetImplementation( condition );
-  impl.type = Internal::PropertyCondition::Outside;
-  impl.arguments.PushBack( arg0 );
-  impl.arguments.PushBack( arg1 );
+  GetImplementation(condition).type = Internal::PropertyCondition::Outside;
+  GetImplementation(condition).arguments.push_back(Property::Value(arg0));
+  GetImplementation(condition).arguments.push_back(Property::Value(arg1));
 
   return condition;
 }
 
-PropertyCondition StepCondition( float stepAmount, float referenceValue )
+PropertyCondition StepCondition(float stepAmount, float referenceValue)
 {
   PropertyCondition condition;
-  Internal::PropertyCondition& impl = GetImplementation( condition );
-  impl.type = Internal::PropertyCondition::Step;
-  impl.arguments.PushBack( referenceValue );
-  impl.arguments.PushBack( 1.0f / stepAmount );
-  impl.arguments.PushBack( 0.0f ); // current step
+  GetImplementation(condition).type = Internal::PropertyCondition::Step;
+  GetImplementation(condition).arguments.push_back(Property::Value(referenceValue));
+  GetImplementation(condition).arguments.push_back(Property::Value(1.0f / stepAmount));
+  GetImplementation(condition).arguments.push_back(Property::Value(0.0f)); // current step
 
   return condition;
 }
 
-PropertyCondition VariableStepCondition( const Dali::Vector<float>& stepAmount )
+PropertyCondition VariableStepCondition(const std::vector<float>& stepAmount)
 {
   PropertyCondition condition;
-  Internal::PropertyCondition& impl = GetImplementation( condition );
-  impl.type = Internal::PropertyCondition::VariableStep;
-  impl.arguments.PushBack( 0.0f ); // current step
-  Dali::Vector<float>::SizeType count = stepAmount.Count();
-  impl.arguments.PushBack( float( count ) ); // store number of steps
-  for( Dali::Vector<float>::SizeType index = 0; index < count; ++index )
+  GetImplementation(condition).type = Internal::PropertyCondition::VariableStep;
+  GetImplementation(condition).arguments.push_back(Property::Value(0.0f)); // current step
+  int size = stepAmount.size();
+  GetImplementation(condition).arguments.push_back(Property::Value(static_cast<float>(size))); // store number of steps
+  for( std::vector<float>::const_iterator it = stepAmount.begin(), endIt = stepAmount.end(); it != endIt; ++it )
   {
-    impl.arguments.PushBack( stepAmount[index] );
+    GetImplementation(condition).arguments.push_back(Property::Value( *it ));
   }
 
   return condition;

@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/dali-vector.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/signals/connection-tracker-interface.h>
 
 namespace Dali
@@ -75,7 +75,7 @@ private:
 
 private:
 
-  Dali::Vector< SlotConnection* > mConnections; ///< Vector of connection pointers
+  std::vector< SlotConnection* > mConnections; ///< Vector of connection pointers
 };
 
 } // namespace Dali

@@ -99,6 +99,16 @@ ImageActor::PixelArea ImageActor::GetPixelArea() const
   return GetImplementation(*this).GetPixelArea();
 }
 
+bool ImageActor::IsPixelAreaSet() const
+{
+  return GetImplementation(*this).IsPixelAreaSet();
+}
+
+void ImageActor::ClearPixelArea()
+{
+  GetImplementation(*this).ClearPixelArea();
+}
+
 void ImageActor::SetStyle(Style style)
 {
   GetImplementation(*this).SetStyle(style);
