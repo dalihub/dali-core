@@ -290,6 +290,8 @@ protected: // For derived classes
    */
   CustomActorImpl( ActorFlags flags );
 
+  // Size negotiation helpers
+
   /**
    * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
    *
@@ -301,6 +303,20 @@ protected: // For derived classes
    * only performed once, i.e. there is no need to keep track of this in the calling side.
    */
   void RelayoutRequest();
+
+  /**
+   * @brief provides the Actor implementation of GetHeightForWidth
+   * @param width to use.
+   * @return the height based on the width.
+   */
+  float GetHeightForWidthBase( float width );
+
+  /**
+   * @brief provides the Actor implementation of GetWidthForHeight
+   * @param height to use.
+   * @return the width based on the height.
+   */
+  float GetWidthForHeightBase( float height );
 
   /**
    * @brief Calculate the size for a child using the base actor object

@@ -81,6 +81,16 @@ void CustomActorImpl::RelayoutRequest()
   mOwner->RelayoutRequest();
 }
 
+float CustomActorImpl::GetHeightForWidthBase( float width )
+{
+  return mOwner->GetHeightForWidthBase( width );
+}
+
+float CustomActorImpl::GetWidthForHeightBase( float height )
+{
+  return mOwner->GetWidthForHeightBase( height );
+}
+
 float CustomActorImpl::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
 {
   return mOwner->CalculateChildSizeBase( child, dimension );
