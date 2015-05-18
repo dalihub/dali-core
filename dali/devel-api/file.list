@@ -38,8 +38,7 @@ devel_api_core_common_header_files = \
   $(devel_api_src_dir)/common/map-wrapper.h \
   $(devel_api_src_dir)/common/mutex.h \
   $(devel_api_src_dir)/common/ref-counted-dali-vector.h \
-  $(devel_api_src_dir)/common/scoped-pointer.h \
-  $(devel_api_src_dir)/common/set-wrapper.h
+    $(devel_api_src_dir)/common/set-wrapper.h
 
 devel_api_core_dynamics_header_files = \
   $(devel_api_src_dir)/dynamics/dynamics.h \
