@@ -25,6 +25,7 @@ namespace SceneGraph
 
 PropertyBuffer::PropertyBuffer()
 : mBufferData(NULL),
+  mDataChanged(false),
   mSize(0u)
 {
 }

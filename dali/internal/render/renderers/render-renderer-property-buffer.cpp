@@ -158,7 +158,7 @@ void RenderPropertyBuffer::Upload( Context& context, BufferIndex bufferIndex )
   }
 
   // Update the GpuBuffer
-  if ( mGpuBuffer || mDataProvider.HasDataChanged( bufferIndex ) )
+  if ( mGpuBuffer && mDataProvider.HasDataChanged( bufferIndex ) )
   {
     std::size_t dataSize = mDataProvider.GetDataSize( bufferIndex );
     DALI_ASSERT_DEBUG( dataSize && "No data in the property buffer!" );

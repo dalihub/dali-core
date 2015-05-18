@@ -214,10 +214,12 @@ public:
 
   inline void BufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage)
   {
+     mBufferDataCalls.push_back(size);
   }
 
   inline void BufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data)
   {
+     mBufferSubDataCalls.push_back(size);
   }
 
   inline GLenum CheckFramebufferStatus(GLenum target)
@@ -1696,9 +1698,19 @@ public: // TEST FUNCTIONS
 
   inline unsigned int GetClearCountCalled() const { return mClearCount; }
 
+  typedef std::vector<size_t> BufferDataCalls;
+  inline const BufferDataCalls& GetBufferDataCalls() const { return mBufferDataCalls; }
+  inline void ResetBufferDataCalls() { mBufferDataCalls.clear(); }
+
+  typedef std::vector<size_t> BufferSubDataCalls;
+  inline const BufferSubDataCalls& GetBufferSubDataCalls() const { return mBufferSubDataCalls; }
+  inline void ResetBufferSubDataCalls() { mBufferSubDataCalls.clear(); }
+
 private:
   GLuint     mCurrentProgram;
   GLuint     mCompileStatus;
+  BufferDataCalls mBufferDataCalls;
+  BufferSubDataCalls mBufferSubDataCalls;
   GLuint     mLinkStatus;
   GLint      mGetAttribLocationResult;
   GLenum     mGetErrorResult;
