@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/integration-api/bitmap.h>
 #include <dali/public-api/images/pixel.h>
-#include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/images/native-image-interface.h>
 
 namespace Dali
 {

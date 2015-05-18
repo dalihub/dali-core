@@ -708,63 +708,18 @@ int UtcDaliPropertyConditionGetArguments(void)
   tet_infoline(" UtcDaliPropertyConditionGetArguments");
 
   PropertyCondition condition = GreaterThanCondition( 50.0f );
-  PropertyCondition::ArgumentContainer arguments = condition.GetArguments();
 
-  DALI_TEST_EQUALS( arguments.size(), 1u, TEST_LOCATION );
-  Property::Value value = arguments[0];
-  DALI_TEST_EQUALS( value.Get<float>(), 50.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( condition.GetArgumentCount(), 1u, TEST_LOCATION );
+  float value = condition.GetArgument( 0 );
+  DALI_TEST_EQUALS( value, 50.0f, TEST_LOCATION );
 
   condition = InsideCondition( 125.0f, 250.0f );
-  arguments = condition.GetArguments();
 
-  DALI_TEST_EQUALS( arguments.size(), 2u, TEST_LOCATION );
-  Property::Value value1 = arguments[0];
-  Property::Value value2 = arguments[1];
-  DALI_TEST_EQUALS( value1.Get<float>(), 125.0f, TEST_LOCATION );
-  DALI_TEST_EQUALS( value2.Get<float>(), 250.0f, TEST_LOCATION );
-  END_TEST;
-}
-
-namespace
-{
-
-class PropertyConditionConstWrapper
-{
-public:
-
-  PropertyConditionConstWrapper(PropertyCondition propertyCondition)
-  :mPropertyCondition(propertyCondition)
-  {
-
-  }
-
-  /**
-   * Returns const reference to property arguments.
-   * @return const reference.
-   */
-  const PropertyCondition::ArgumentContainer& GetArguments() const
-  {
-    return mPropertyCondition.GetArguments();
-  }
-
-  PropertyCondition mPropertyCondition;
-};
-} // anon namespace
-
-int UtcDaliPropertyConditionGetArgumentsConst(void)
-{
-  TestApplication application;
-  tet_infoline(" UtcDaliPropertyConditionGetArgumentsConst");
-
-  PropertyCondition condition = GreaterThanCondition( 50.0f );
-  PropertyConditionConstWrapper conditionConst(condition);
-  const PropertyCondition::ArgumentContainer& argumentsRef1 = conditionConst.GetArguments();
-  const PropertyCondition::ArgumentContainer& argumentsRef2 = conditionConst.GetArguments();
-
-  DALI_TEST_CHECK( (&argumentsRef1) == (&argumentsRef2) );
-  DALI_TEST_EQUALS( argumentsRef1.size(), 1u, TEST_LOCATION );
-  Property::Value value = argumentsRef1[0];
-  DALI_TEST_EQUALS( value.Get<float>(), 50.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( condition.GetArgumentCount(), 2u, TEST_LOCATION );
+  float value1 = condition.GetArgument( 0 );
+  float value2 = condition.GetArgument( 1 );
+  DALI_TEST_EQUALS( value1, 125.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( value2, 250.0f, TEST_LOCATION );
   END_TEST;
 }
 
@@ -814,13 +769,13 @@ int UtcDaliPropertyNotificationVariableStep(void)
   Actor actor = Actor::New();
   Stage::GetCurrent().Add(actor);
 
-  std::vector<float> values;
+  Dali::Vector<float> values;
 
   const float averageStep = 100.0f;
 
   for( int i = 1 ; i < 10 ; i++ )
   {
-    values.push_back(i * averageStep + (i % 2 == 0 ? -(averageStep * 0.2f) : (averageStep * 0.2f)));
+    values.PushBack(i * averageStep + (i % 2 == 0 ? -(averageStep * 0.2f) : (averageStep * 0.2f)));
   }
   // float
   PropertyNotification notification = actor.AddPropertyNotification( Actor::Property::POSITION, 0, VariableStepCondition(values) );
@@ -830,7 +785,7 @@ int UtcDaliPropertyNotificationVariableStep(void)
   actor.SetPosition(Vector3(values[0] - averageStep, 0.0f, 0.0f));
   Wait(application, DEFAULT_WAIT_PERIOD);
 
-  for( unsigned int i = 0 ; i < values.size() - 1 ; ++i )
+  for( unsigned int i = 0 ; i < values.Count() - 1 ; ++i )
   {
     gCallBackCalled = false;
     // set position half way between the current values

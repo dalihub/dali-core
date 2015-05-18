@@ -150,6 +150,7 @@ NinePatchImage::NinePatchImage( const std::string& filename, const ImageAttribut
   mParsedBorder(false)
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
+  mResourceClient = &tls.GetResourceClient();
 
   Integration::PlatformAbstraction& platformAbstraction = tls.GetPlatformAbstraction();
   Integration::BitmapResourceType resourceType( ImageDimensions::FromFloatVec2( attributes.GetSize() ), attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );

@@ -468,7 +468,7 @@ void Shader::SetUniforms( Context& context,
           case Property::ARRAY:
           case Property::TYPE_COUNT:
           {
-            DALI_ASSERT_ALWAYS( 0 && "Invalid property type for a uniform" );
+            DALI_LOG_ERROR( "Invalid property type for a uniform" );
             break;
           }
         }

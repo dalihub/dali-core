@@ -24,6 +24,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/math-utils.h>
 
 /**
@@ -357,7 +358,7 @@ private:
  *
  * @param type of the data that the vector holds.
  */
-template< class T, bool IsTrivialType = __has_trivial_destructor(T) && __has_trivial_copy(T) >
+template< class T, bool IsTrivialType = TypeTraits<T>::IS_TRIVIAL_TYPE == true >
 class Vector : public VectorAlgorithms< IsTrivialType >
 {
 public: // API

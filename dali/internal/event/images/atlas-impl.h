@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/public-api/images/atlas.h>
+#include <dali/devel-api/images/atlas.h>
 #include <dali/internal/event/images/context-recovery-interface.h>
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/internal/event/images/buffer-image-impl.h>

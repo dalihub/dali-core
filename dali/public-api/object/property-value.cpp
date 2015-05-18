@@ -33,6 +33,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/quaternion.h>
 #include <dali/public-api/object/property-map.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-types.h>
 #include <dali/integration-api/debug.h>
 
@@ -802,22 +803,15 @@ Property::Value& Property::Value::GetItem(const int index) const
 
     case Property::ARRAY:
     {
-      int i = 0;
       Property::Array *container = AnyCast<Property::Array>(&(mImpl->mValue));
 
       DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
       if(container)
       {
-        DALI_ASSERT_ALWAYS(index < static_cast<int>(container->size()) && "Property array index invalid");
+        DALI_ASSERT_ALWAYS(index < static_cast<int>(container->Size()) && "Property array index invalid");
         DALI_ASSERT_ALWAYS(index >= 0 && "Property array index invalid");
 
-        for(Property::Array::iterator iter = container->begin(); iter != container->end(); ++iter)
-        {
-          if(i++ == index)
-          {
-            return *iter;
-          }
-        }
+        return (*container)[index];
       }
     }
     break;
@@ -881,7 +875,7 @@ void Property::Value::SetItem(const int index, const Property::Value &value)
     case Property::ARRAY:
     {
       Property::Array *container = AnyCast<Property::Array>(&(mImpl->mValue));
-      if( container && index < static_cast<int>(container->size()) )
+      if( container && index < static_cast<int>(container->Size()) )
       {
         (*container)[index] = value;
       }
@@ -917,8 +911,8 @@ int Property::Value::AppendItem(const Property::Value &value)
 
   if(container)
   {
-    container->push_back(value);
-    return container->size() - 1;
+    container->PushBack(value);
+    return container->Size() - 1;
   }
   else
   {
@@ -948,7 +942,7 @@ int Property::Value::GetSize() const
       Property::Array *container = AnyCast<Property::Array>(&(mImpl->mValue));
       if(container)
       {
-        ret = container->size();
+        ret = container->Size();
       }
     }
     break;

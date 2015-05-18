@@ -22,6 +22,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include "signal-helper.h"
 
 using namespace Dali;
 
@@ -37,860 +38,6 @@ void utc_dali_signal_templates_cleanup(void)
 
 namespace {
 
-class TestButton
-{
-public:
-
-  TestButton( unsigned int id )
-  : mId(id)
-  {
-  }
-
-  void Press()
-  {
-    mPanelDown.Emit( *this );
-  }
-
-  void Release()
-  {
-    mPanelUp.Emit( *this );
-  }
-
-  typedef Signal< void (TestButton&) > PanelDownSignal;
-  typedef Signal< void (TestButton&) > PanelUpSignal;
-
-  PanelDownSignal& DownSignal()
-  {
-    return mPanelDown;
-  }
-
-  PanelUpSignal& SignalUp()
-  {
-    return mPanelUp;
-  }
-
-  int GetId()
-  {
-    return mId;
-  }
-
-private:
-
-  int mId;
-  PanelDownSignal mPanelDown;
-  PanelUpSignal   mPanelUp;
-};
-
-class TestApp : public ConnectionTracker
-{
-public:
-
-  TestApp()
-  : mButtonPressed( false ),
-    mVoidFunctionCalled( false )
-  {
-  }
-
-  void OnButtonPress( TestButton& button )
-  {
-    mButtonPressed = true;
-    mButtonId = button.GetId();
-  }
-
-  void OnButtonRelease( TestButton& button )
-  {
-    mButtonPressed = false;
-    mButtonId = button.GetId();
-  }
-
-  int GetButtonPressedId()
-  {
-    return mButtonId;
-  }
-
-  bool BoolReturnTestFalse()
-  {
-    return false;
-  }
-
-  bool BoolReturnTestTrue()
-  {
-    return true;
-  }
-
-  void VoidFunction()
-  {
-    mVoidFunctionCalled = true;
-  }
-
-  bool mButtonPressed;
-  bool mVoidFunctionCalled;
-  int mButtonId;
-};
-
-class TestSignals
-{
-public:
-
-  // Void return, no parameters
-  typedef Signal<void ()> VoidRetNoParamSignal;
-
-  // Void return, 1 value parameter
-  typedef Signal<void (int)> VoidRet1ValueParamSignal;
-
-  // Void return, 1 reference parameter
-  typedef Signal< void (int&)> VoidRet1RefParamSignal;
-
-  // Void return, 2 value parameters
-  typedef Signal<void (int, int)> VoidRet2ValueParamSignal;
-
-  // bool return, 1 value parameter
-  typedef Signal< bool (float)> BoolRet1ValueParamSignal;
-
-  // bool return, 2 value parameter
-  typedef Signal<bool (float, int) > BoolRet2ValueParamSignal;
-
-  // int return, 2 value parameter
-  typedef Signal<int (float, int)> IntRet2ValueParamSignal;
-
-  // float return, 0 parameters
-  typedef Signal< float () > FloatRet0ParamSignal;
-
-  // float return, 2 value parameters
-  typedef Signal<float (float, float) > FloatRet2ValueParamSignal;
-
-  // void return, 3 value parameters
-  typedef Signal<void (float, float, float) > VoidSignalTypeFloatValue3;
-
-  // float return, 3 value parameters
-  typedef Signal<float (float, float, float) > FloatSignalTypeFloatValue3;
-
-  VoidRetNoParamSignal&       SignalVoidNone()    { return mSignalVoid0;  }
-  VoidRet1RefParamSignal&     SignalVoid1Ref()    { return mSignalVoid1R; }
-  VoidRet1ValueParamSignal&   SignalVoid1Value()  { return mSignalVoid1V; }
-  VoidRet2ValueParamSignal&   SignalVoid2Value()  { return mSignalVoid2V; }
-
-  BoolRet1ValueParamSignal&   SignalBool1Value()  { return mSignalBool1V;  }
-  BoolRet2ValueParamSignal&   SignalBool2Value()  { return mSignalBool2V;  }
-  IntRet2ValueParamSignal&    SignalInt2Value()   { return mSignalInt2V;   }
-  FloatRet0ParamSignal&       SignalFloat0()      { return mSignalFloat0;  }
-  FloatRet2ValueParamSignal&  SignalFloat2Value() { return mSignalFloat2V; }
-
-  VoidSignalTypeFloatValue3&  VoidSignalFloatValue3()  { return mVoidSignalFloatValue3;  }
-  FloatSignalTypeFloatValue3& FloatSignalFloatValue3() { return mFloatSignalFloatValue3; }
-
-  TestSignals()
-  {
-  }
-
-  void CheckNoConnections()
-  {
-    DALI_TEST_EQUALS( mSignalVoid0.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mSignalVoid1R.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mSignalVoid1V.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mSignalVoid2V.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mSignalBool1V.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mSignalBool2V.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mSignalInt2V.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mSignalFloat0.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mSignalFloat2V.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mVoidSignalFloatValue3.GetConnectionCount(), 0u, TEST_LOCATION );
-    DALI_TEST_EQUALS( mFloatSignalFloatValue3.GetConnectionCount(), 0u, TEST_LOCATION );
-  }
-
-  void EmitVoidSignalVoid()
-  {
-    mSignalVoid0.Emit();
-  }
-
-  void EmitVoidSignalIntRef(int& ref)
-  {
-    mSignalVoid1R.Emit(ref);
-  }
-
-  void EmitVoidSignalIntValue(int p1)
-  {
-    mSignalVoid1V.Emit(p1);
-  }
-
-  void EmitVoidSignalIntValueIntValue(int p1, int p2)
-  {
-    mSignalVoid2V.Emit(p1,p2);
-  }
-
-  bool EmitBoolSignalFloatValue(float p1)
-  {
-    return mSignalBool1V.Emit(p1);
-  }
-
-  bool EmitBoolSignalFloatValueIntValue(float p1, int p2)
-  {
-    return mSignalBool2V.Emit(p1, p2);
-  }
-
-  int EmitIntSignalFloatValueIntValue(float p1, int p2)
-  {
-    return mSignalInt2V.Emit(p1, p2);
-  }
-
-  float EmitFloat2VSignal(float p1, float p2)
-  {
-    return mSignalFloat2V.Emit(p1, p2);
-  }
-
-  float EmitFloat0Signal()
-  {
-    return mSignalFloat0.Emit();
-  }
-
-  void EmitVoidSignalFloatValue3(float p1, float p2, float p3)
-  {
-    mVoidSignalFloatValue3.Emit(p1, p2, p3);
-  }
-
-  float EmitFloatSignalFloatValue3(float p1, float p2, float p3)
-  {
-    return mFloatSignalFloatValue3.Emit(p1, p2, p3);
-  }
-
-private:
-
-  VoidRetNoParamSignal         mSignalVoid0;
-  VoidRet1RefParamSignal       mSignalVoid1R;
-  VoidRet1ValueParamSignal     mSignalVoid1V;
-  VoidRet2ValueParamSignal     mSignalVoid2V;
-  BoolRet1ValueParamSignal     mSignalBool1V;
-  BoolRet2ValueParamSignal     mSignalBool2V;
-  IntRet2ValueParamSignal      mSignalInt2V;
-  FloatRet0ParamSignal         mSignalFloat0;
-  FloatRet2ValueParamSignal    mSignalFloat2V;
-  VoidSignalTypeFloatValue3    mVoidSignalFloatValue3;
-  FloatSignalTypeFloatValue3   mFloatSignalFloatValue3;
-};
-
-/**
- * A helper class with various slots
- */
-class TestSlotHandler : public ConnectionTracker
-{
-public:
-
-  TestSlotHandler()
-  : mIntParam1( 0 ),
-    mIntParam2( 0 ),
-    mIntParam3( 0 ),
-    mFloatParam1( 0.0f ),
-    mFloatParam2( 0.0f ),
-    mFloatParam3( 0.0f ),
-    mBoolReturn( false ),
-    mIntReturn( 0 ),
-    mFloatReturn( 0.0f ),
-    mHandled( false ),
-    mHandledCount( 0 )
-  {
-  }
-
-  void Reset()
-  {
-    mIntParam1 = 0;
-    mIntParam2 = 0;
-    mIntParam3 = 0;
-    mFloatParam1 = 0.0f;
-    mFloatParam2 = 0.0f;
-    mFloatParam3 = 0.0f;
-    mBoolReturn = false;
-    mIntReturn = 0;
-    mFloatReturn = 0.0f;
-    mHandled = false;
-  }
-
-  void VoidSlotVoid()
-  {
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  void VoidSlotIntRef( int& p1 )
-  {
-    mIntParam1 = p1;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  void VoidSlotIntValue( int p1 )
-  {
-    mIntParam1 = p1;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  void VoidDuplicateSlotIntValue( int p1 )
-  {
-    mIntParam2 = p1;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  void VoidSlotIntValueIntValue( int p1, int p2 )
-  {
-    mIntParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  bool BoolSlotFloatValue( float p1 )
-  {
-    mFloatParam1 = p1;
-    mHandled = true;
-    ++mHandledCount;
-    return mBoolReturn;
-  }
-
-  bool BoolSlotFloatValueIntValue( float p1, int p2 )
-  {
-    mFloatParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-    ++mHandledCount;
-    return mBoolReturn;
-  }
-
-  int IntSlotFloatValueIntValue( float p1, int p2 )
-  {
-    mFloatParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-    ++mHandledCount;
-    return mIntReturn;
-  }
-
-  float FloatSlotVoid()
-  {
-    mHandled = true;
-    ++mHandledCount;
-    return mFloatReturn;
-  }
-
-  float FloatSlotFloatValueFloatValue( float p1, float p2 )
-  {
-    mFloatParam1 = p1;
-    mFloatParam2 = p2;
-    mHandled = true;
-    ++mHandledCount;
-    return mFloatReturn;
-  }
-
-  void VoidSlotFloatValue3( float p1, float p2, float p3 )
-  {
-    mFloatParam1 = p1;
-    mFloatParam2 = p2;
-    mFloatParam3 = p3;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  float FloatSlotFloatValue3( float p1, float p2, float p3 )
-  {
-    mFloatParam1 = p1;
-    mFloatParam2 = p2;
-    mFloatParam3 = p3;
-    mHandled = true;
-    ++mHandledCount;
-    return mFloatReturn;
-  }
-
-  int mIntParam1, mIntParam2, mIntParam3;
-  float mFloatParam1, mFloatParam2, mFloatParam3;
-  bool mBoolReturn;
-  int mIntReturn;
-  float mFloatReturn;
-  bool mHandled;
-  int mHandledCount;
-};
-
-/**
- * A version of TestSlotHandler which disconnects during the callback
- */
-class TestSlotDisconnector : public ConnectionTracker
-{
-public:
-
-  TestSlotDisconnector()
-  : mIntParam1( 0 ),
-    mIntParam2( 0 ),
-    mIntParam3( 0 ),
-    mFloatParam1( 0.0f ),
-    mFloatParam2( 0.0f ),
-    mBoolReturn( false ),
-    mIntReturn( 0 ),
-    mFloatReturn( 0.0f ),
-    mHandled( false )
-  {
-  }
-
-  void Reset()
-  {
-    mIntParam1 = 0;
-    mIntParam2 = 0;
-    mIntParam3 = 0;
-    mFloatParam1 = 0.0f;
-    mFloatParam2 = 0.0f;
-    mBoolReturn = false;
-    mIntReturn = 0;
-    mFloatReturn = 0.0f;
-    mHandled = false;
-  }
-
-  void VoidConnectVoid( TestSignals::VoidRetNoParamSignal& signal )
-  {
-    mVoidSignalVoid = &signal;
-    signal.Connect( this, &TestSlotDisconnector::VoidSlotVoid );
-  }
-
-  void VoidSlotVoid()
-  {
-    mVoidSignalVoid->Disconnect( this, &TestSlotDisconnector::VoidSlotVoid );
-    mHandled = true;
-  }
-
-  void VoidConnectIntRef( TestSignals::VoidRet1RefParamSignal& signal )
-  {
-    mVoidSignalIntRef = &signal;
-    signal.Connect( this, &TestSlotDisconnector::VoidSlotIntRef );
-  }
-
-  void VoidSlotIntRef( int& p1 )
-  {
-    mVoidSignalIntRef->Disconnect( this, &TestSlotDisconnector::VoidSlotIntRef );
-    mIntParam1 = p1;
-    mHandled = true;
-  }
-
-  void VoidSlotIntValue( int p1 )
-  {
-    mIntParam1 = p1;
-    mHandled = true;
-  }
-
-  void VoidSlotIntValueIntValue( int p1, int p2 )
-  {
-    mIntParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-  }
-
-  bool BoolSlotFloatValue( float p1 )
-  {
-    mFloatParam1 = p1;
-    mHandled = true;
-    return mBoolReturn;
-  }
-
-  bool BoolSlotFloatValueIntValue( float p1, int p2 )
-  {
-    mFloatParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-    return mBoolReturn;
-  }
-
-  int IntSlotFloatValueIntValue( float p1, int p2 )
-  {
-    mFloatParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-    return mIntReturn;
-  }
-
-  float FloatSlotVoid()
-  {
-    mHandled = true;
-    return mFloatReturn;
-  }
-
-  float FloatSlotFloatValueFloatValue( float p1, float p2 )
-  {
-    mFloatParam1 = p1;
-    mFloatParam2 = p2;
-    mHandled = true;
-    return mFloatReturn;
-  }
-
-  TestSignals::VoidRetNoParamSignal*   mVoidSignalVoid;
-  TestSignals::VoidRet1RefParamSignal* mVoidSignalIntRef;
-
-  int mIntParam1, mIntParam2, mIntParam3;
-  float mFloatParam1, mFloatParam2;
-  bool mBoolReturn;
-  int mIntReturn;
-  float mFloatReturn;
-  bool mHandled;
-};
-
-/**
- * A more complicated version of TestSlotDisconnector, which disconnects some but not all callbacks
- */
-class TestSlotMultiDisconnector : public ConnectionTracker
-{
-public:
-
-  static const int NUM_SLOTS = 10;
-
-  TestSlotMultiDisconnector()
-  : mVoidSignalVoid( NULL )
-  {
-    Reset();
-  }
-
-  void Reset()
-  {
-    for( int i=0; i<NUM_SLOTS; ++i )
-    {
-      mSlotHandled[i] = false;
-    }
-  }
-
-  void ConnectAll( TestSignals::VoidRetNoParamSignal& signal )
-  {
-    mVoidSignalVoid = &signal;
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot0 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot1 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot2 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot3 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot4 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot5 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot6 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot7 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot8 );
-    signal.Connect( this, &TestSlotMultiDisconnector::Slot9 );
-  }
-
-  void Slot0()
-  {
-    mSlotHandled[0] = true;
-  }
-
-  void Slot1()
-  {
-    mSlotHandled[1] = true;
-  }
-
-  void Slot2()
-  {
-    mSlotHandled[2] = true;
-  }
-
-  void Slot3()
-  {
-    mSlotHandled[3] = true;
-
-    // Disconnect the odd numbered lots, because we can
-    mVoidSignalVoid->Disconnect( this, &TestSlotMultiDisconnector::Slot1 );
-    mVoidSignalVoid->Disconnect( this, &TestSlotMultiDisconnector::Slot3 );
-    mVoidSignalVoid->Disconnect( this, &TestSlotMultiDisconnector::Slot5 );
-    mVoidSignalVoid->Disconnect( this, &TestSlotMultiDisconnector::Slot7 );
-    mVoidSignalVoid->Disconnect( this, &TestSlotMultiDisconnector::Slot9 );
-  }
-
-  void Slot4()
-  {
-    mSlotHandled[4] = true;
-  }
-
-  void Slot5()
-  {
-    mSlotHandled[5] = true;
-  }
-
-  void Slot6()
-  {
-    mSlotHandled[6] = true;
-  }
-
-  void Slot7()
-  {
-    mSlotHandled[7] = true;
-  }
-
-  void Slot8()
-  {
-    mSlotHandled[8] = true;
-  }
-
-  void Slot9()
-  {
-    mSlotHandled[9] = true;
-  }
-
-  TestSignals::VoidRetNoParamSignal* mVoidSignalVoid;
-
-  bool mSlotHandled[NUM_SLOTS];
-};
-
-
-/**
- * A version of TestSlotHandler which disconnects during the callback
- */
-class TestEmitDuringCallback : public ConnectionTracker
-{
-public:
-
-  TestEmitDuringCallback()
-  : mVoidSignalVoid( NULL ),
-    mHandled( false )
-  {
-  }
-
-  void VoidConnectVoid( TestSignals::VoidRetNoParamSignal& signal )
-  {
-    mVoidSignalVoid = &signal;
-    signal.Connect( this, &TestEmitDuringCallback::VoidSlotVoid );
-  }
-
-  void VoidSlotVoid()
-  {
-    // Emitting during Emit is very bad!
-    mVoidSignalVoid->Emit();
-
-    mHandled = true;
-  }
-
-  TestSignals::VoidRetNoParamSignal* mVoidSignalVoid;
-
-  bool mHandled;
-};
-
-
-/**
- * A version of TestSlotHandler which uses SlotDelegate
- */
-class TestSlotDelegateHandler // This does not inherit from ConnectionTrackerInterface!
-{
-public:
-
-  TestSlotDelegateHandler()
-  : mSlotDelegate( this ),
-    mIntParam1( 0 ),
-    mIntParam2( 0 ),
-    mIntParam3( 0 ),
-    mFloatParam1( 0.0f ),
-    mFloatParam2( 0.0f ),
-    mFloatParam3( 0.0f ),
-    mBoolReturn( false ),
-    mIntReturn( 0 ),
-    mFloatReturn( 0.0f ),
-    mHandled( false ),
-    mHandledCount( 0 )
-  {
-  }
-
-  void Reset()
-  {
-    mIntParam1 = 0;
-    mIntParam2 = 0;
-    mIntParam3 = 0;
-    mFloatParam1 = 0.0f;
-    mFloatParam2 = 0.0f;
-    mFloatParam3 = 0.0f;
-    mBoolReturn = false;
-    mIntReturn = 0;
-    mFloatReturn = 0.0f;
-    mHandled = false;
-  }
-
-  void VoidSlotVoid()
-  {
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  void VoidSlotIntRef( int& p1 )
-  {
-    mIntParam1 = p1;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  void VoidSlotIntValue( int p1 )
-  {
-    mIntParam1 = p1;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  void VoidDuplicateSlotIntValue( int p1 )
-  {
-    mIntParam2 = p1;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  void VoidSlotIntValueIntValue( int p1, int p2 )
-  {
-    mIntParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  bool BoolSlotFloatValue( float p1 )
-  {
-    mFloatParam1 = p1;
-    mHandled = true;
-    ++mHandledCount;
-    return mBoolReturn;
-  }
-
-  bool BoolSlotFloatValueIntValue( float p1, int p2 )
-  {
-    mFloatParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-    ++mHandledCount;
-    return mBoolReturn;
-  }
-
-  int IntSlotFloatValueIntValue( float p1, int p2 )
-  {
-    mFloatParam1 = p1;
-    mIntParam2 = p2;
-    mHandled = true;
-    ++mHandledCount;
-    return mIntReturn;
-  }
-
-  float FloatSlotVoid()
-  {
-    mHandled = true;
-    ++mHandledCount;
-    return mFloatReturn;
-  }
-
-  float FloatSlotFloatValueFloatValue( float p1, float p2 )
-  {
-    mFloatParam1 = p1;
-    mFloatParam2 = p2;
-    mHandled = true;
-    ++mHandledCount;
-    return mFloatReturn;
-  }
-
-  void VoidSlotFloatValue3( float p1, float p2, float p3 )
-  {
-    mFloatParam1 = p1;
-    mFloatParam2 = p2;
-    mFloatParam3 = p3;
-    mHandled = true;
-    ++mHandledCount;
-  }
-
-  float FloatSlotFloatValue3( float p1, float p2, float p3 )
-  {
-    mFloatParam1 = p1;
-    mFloatParam2 = p2;
-    mFloatParam3 = p3;
-    mHandled = true;
-    ++mHandledCount;
-    return mFloatReturn;
-  }
-
-  SlotDelegate<TestSlotDelegateHandler> mSlotDelegate;
-
-  int mIntParam1, mIntParam2, mIntParam3;
-  float mFloatParam1, mFloatParam2, mFloatParam3;
-  bool mBoolReturn;
-  int mIntReturn;
-  float mFloatReturn;
-  bool mHandled;
-  int mHandledCount;
-};
-
-/**
- * Test that reimplmenting ConnectionTrackerInterface actually works.
- * This basic connection tracker only allows one callback to be connected.
- */
-class TestBasicConnectionTrackerInterface : public ConnectionTrackerInterface
-{
-public:
-
-  TestBasicConnectionTrackerInterface()
-  : mCallbackHandled( false ),
-    mCallback( NULL ),
-    mSlotObserver( NULL )
-  {
-  }
-
-  ~TestBasicConnectionTrackerInterface()
-  {
-    if( mSlotObserver && mCallback )
-    {
-      // Notify signal since the slot has been destroyed
-      mSlotObserver->SlotDisconnected( mCallback );
-      // mCallback and mSlotObserver are not owned
-    }
-  }
-
-  /**
-   * An example slot
-   */
-  void VoidSlotVoid()
-  {
-    mCallbackHandled = true;
-  }
-
-  /**
-   * @copydoc ConnectionTrackerInterface::GetConnectionCount
-   */
-  virtual std::size_t GetConnectionCount() const
-  {
-    if( mCallback )
-    {
-      return 1u;
-    }
-
-    return 0u;
-  }
-
-  /**
-   * @copydoc ConnectionTrackerInterface::SignalConnected
-   */
-  virtual void SignalConnected( SlotObserver* slotObserver, CallbackBase* callback )
-  {
-    DALI_ASSERT_ALWAYS( NULL == mCallback && "Only one connection supported!" );
-
-    mCallback = callback;
-    mSlotObserver = slotObserver;
-  }
-
-  /**
-   * @copydoc ConnectionTrackerInterface::SignalDisconnected
-   */
-  virtual void SignalDisconnected( SlotObserver* slotObserver, CallbackBase* callback )
-  {
-    if( mSlotObserver == slotObserver )
-    {
-      mSlotObserver = NULL;
-      mCallback = NULL;
-      // mCallback and mSlotObserver are not owned
-    }
-  }
-
-private:
-
-  TestBasicConnectionTrackerInterface( const TestBasicConnectionTrackerInterface& );            ///< undefined copy constructor
-  TestBasicConnectionTrackerInterface& operator=( const TestBasicConnectionTrackerInterface& ); ///< undefined assignment operator
-
-public:
-
-  bool mCallbackHandled;
-
-private:
-
-  CallbackBase* mCallback;     ///< callback, has ownership
-  SlotObserver* mSlotObserver; ///< a pointer to the slot observer (not owned)
-};
-
 
 bool wasStaticVoidCallbackVoidCalled  = false;
 bool wasStaticFloatCallbackVoidCalled = false;
@@ -900,24 +47,28 @@ bool wasStaticFloatCallbackFloatValueFloatValueCalled = false;
 float staticFloatValue1 = 0.0f;
 float staticFloatValue2 = 0.0f;
 
-static void StaticVoidCallbackVoid()
+void StaticVoidCallbackVoid()
 {
   wasStaticVoidCallbackVoidCalled = true;
 }
 
-static float StaticFloatCallbackVoid()
+void AlternativeVoidCallbackVoid()
+{
+}
+
+float StaticFloatCallbackVoid()
 {
   wasStaticFloatCallbackVoidCalled = true;
   return 7.0f;
 }
 
-static void StaticVoidCallbackIntValue( int value )
+void StaticVoidCallbackIntValue( int value )
 {
   wasStaticVoidCallbackIntValueCalled = true;
   staticIntValue = value;
 }
 
-static float StaticFloatCallbackFloatValueFloatValue( float value1, float value2 )
+float StaticFloatCallbackFloatValueFloatValue( float value1, float value2 )
 {
   wasStaticFloatCallbackFloatValueFloatValueCalled = true;
   staticFloatValue1 = value1;
@@ -928,88 +79,367 @@ static float StaticFloatCallbackFloatValueFloatValue( float value1, float value2
 } // anon namespace
 
 
-int UtcDaliSignalEmptyCheck(void)
+
+/*******************************************
+ *
+ * Start of Utc test cases.
+ * Test cases performed in order of API listed in dali-signal.h
+ * UtcDaliSignal + FunctionName + P=positive test, N = Negative test
+ *
+ */
+
+int UtcDaliSignalEmptyP(void)
 {
-  // Test that Empty() check works before & after signal connection
+  TestApplication app; // Create core for debug logging
+
+  // Test that Empty() is true, when no slots connected to the signal
 
   {
     TestSignals::VoidRetNoParamSignal signal;
     DALI_TEST_CHECK( signal.Empty() );
+  }
+
+  // Test that Empty() is true, when a slot has connected and disconnected
+  {
+    TestSignals::VoidRetNoParamSignal signal;
     TestSlotHandler handler;
     signal.Connect( &handler, &TestSlotHandler::VoidSlotVoid );
-    DALI_TEST_CHECK( ! signal.Empty() );
+    signal.Disconnect( &handler, &TestSlotHandler::VoidSlotVoid );
+    DALI_TEST_CHECK( signal.Empty() );
   }
 
-  {
-    TestSignals::VoidRet1ValueParamSignal signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    TestSlotHandler handler;
-    signal.Connect( &handler, &TestSlotHandler::VoidSlotIntValue );
-    DALI_TEST_CHECK( ! signal.Empty() );
-  }
+  END_TEST;
+}
 
-  {
-    TestSignals::VoidRet1RefParamSignal signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    TestSlotHandler handler;
-    signal.Connect( &handler, &TestSlotHandler::VoidSlotIntRef );
-    DALI_TEST_CHECK( ! signal.Empty() );
-  }
+int UtcDaliSignalEmptyN(void)
+{
+  TestApplication app; // Create core for debug logging
 
-  {
-    TestSignals::VoidRet2ValueParamSignal signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    TestSlotHandler handler;
-    signal.Connect( &handler, &TestSlotHandler::VoidSlotIntValueIntValue );
-    DALI_TEST_CHECK( ! signal.Empty() );
-  }
+  // Test that Empty() is false after signal connection
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotHandler handler;
+  signal.Connect( &handler, &TestSlotHandler::VoidSlotVoid );
+  DALI_TEST_CHECK( ! signal.Empty() );
 
-  {
-    TestSignals::BoolRet1ValueParamSignal signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    TestSlotHandler handler;
-    signal.Connect( &handler, &TestSlotHandler::BoolSlotFloatValue );
-    DALI_TEST_CHECK( ! signal.Empty() );
-  }
+  END_TEST;
+}
 
-  {
-    TestSignals::BoolRet2ValueParamSignal signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    TestSlotHandler handler;
-    signal.Connect( &handler, &TestSlotHandler::BoolSlotFloatValueIntValue );
-    DALI_TEST_CHECK( ! signal.Empty() );
-  }
+int UtcDaliSignalGetConnectionCountP(void)
+{
+  TestApplication app; // Create core for debug logging
 
-  {
-    TestSignals::IntRet2ValueParamSignal signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    TestSlotHandler handler;
-    signal.Connect( &handler, &TestSlotHandler::IntSlotFloatValueIntValue );
-    DALI_TEST_CHECK( ! signal.Empty() );
-  }
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotHandler handler;
+  signal.Connect( &handler, &TestSlotHandler::VoidSlotVoid );
+  DALI_TEST_CHECK( signal.GetConnectionCount() == 1 );
 
-  {
-    TestSignals::FloatRet0ParamSignal signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    TestSlotHandler handler;
-    signal.Connect( &handler, &TestSlotHandler::FloatSlotVoid );
-    DALI_TEST_CHECK( ! signal.Empty() );
-  }
+  TestSlotHandler handler2;
+  signal.Connect( &handler2, &TestSlotHandler::VoidSlotVoid );
+  DALI_TEST_CHECK( signal.GetConnectionCount() == 2 );
 
+  END_TEST;
+}
+
+int UtcDaliSignalGetConnectionCountN(void)
+{
+  TestApplication app; // Create core for debug logging
+  TestSignals::VoidRetNoParamSignal signal;
+  DALI_TEST_CHECK( signal.GetConnectionCount() == 0 );
+  END_TEST;
+}
+
+/**
+ * there are 5 different connection functions
+ * we go through them here in order of definition in dali-signal.h
+ */
+int UtcDaliSignalConnectP01(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // test static function: void Connect( void (*func)() )
+  TestSignals::VoidRetNoParamSignal signal;
+  signal.Connect( StaticVoidCallbackVoid );
+  DALI_TEST_CHECK( ! signal.Empty() );
+
+
+  END_TEST;
+}
+
+int UtcDaliSignalConnectN01(void)
+{
+  // difficult to perform a negative test on Connect as no checks are performed
+  // when creating a callback for a null function ( during Connect).
+  // so we test an assert on Emit
+  TestApplication app; // Create core for debug logging
+
+  TestSignals::VoidRetNoParamSignal signal;
+  signal.Connect( NULL );
+  try
   {
-    TestSignals::FloatRet2ValueParamSignal signal;
-    DALI_TEST_CHECK( signal.Empty() );
-    TestSlotHandler handler;
-    signal.Connect(&handler, &TestSlotHandler::FloatSlotFloatValueFloatValue);
-    DALI_TEST_CHECK( ! signal.Empty() );
+    signal.Emit();
+  }
+  catch (Dali::DaliException& e)
+  {
+    // Tests that a negative test of an assertion succeeds
+    DALI_TEST_PRINT_ASSERT( e );
+    tet_result(TET_PASS);
   }
   END_TEST;
 }
 
+
+int UtcDaliSignalConnectP02(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // test member function: Connect( X* obj, void (X::*func)() ))
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotHandler handler;
+  signal.Connect( &handler, &TestSlotHandler::VoidSlotVoid );
+  DALI_TEST_CHECK( ! signal.Empty() );
+  signal.Emit();
+  DALI_TEST_CHECK( handler.mHandled == true );
+  END_TEST;
+}
+
+int UtcDaliSignalConnectN02(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  TestSignals::VoidRetNoParamSignal signal;
+  try
+  {
+    // test member function: Connect( X* obj, void (X::*func)() )) with NULL object
+    signal.Connect( static_cast<TestSlotHandler*>(NULL), &TestSlotHandler::VoidSlotVoid );
+  }
+  catch (Dali::DaliException& e)
+  {
+    // Tests that a negative test of an assertion succeeds
+    DALI_TEST_PRINT_ASSERT( e );
+    tet_result(TET_PASS);
+  }
+  END_TEST;
+}
+
+
+int UtcDaliSignalConnectP03(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // test slot delegate: Connect( SlotDelegate<X>& delegate, void (X::*func)() )
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotDelegateHandler handler;
+  signal.Connect( handler.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotVoid );
+  DALI_TEST_CHECK( ! signal.Empty() );
+  signal.Emit();
+  DALI_TEST_CHECK( handler.mHandled == true );
+
+  END_TEST;
+}
+
+int UtcDaliSignalConnectN03(void)
+{
+  TestApplication app; // Create core for debug logging
+  // the delegate is passed by reference, so you can't pass null.
+  tet_result( TET_PASS );
+  END_TEST;
+}
+
+int UtcDaliSignalConnectP04(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  //  test function object: Connect( ConnectionTrackerInterface* connectionTracker, const X& func )
+  TestSlotHandler handler;
+  TestSignals::VoidRetNoParamSignal signal;
+  bool functorCalled(false);
+  TestFunctor functor( functorCalled );
+  signal.Connect( &handler, functor );
+  DALI_TEST_CHECK( ! signal.Empty() );
+  signal.Emit();
+  DALI_TEST_CHECK( functorCalled == true );
+
+  END_TEST;
+}
+
+int UtcDaliSignalConnectN04(void)
+{
+  // for negative test we try to connect a null connection tracker to the signal
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotHandler *nullHandler( NULL );
+  try
+  {
+    signal.Connect( nullHandler , &TestSlotHandler::VoidSlotVoid  );
+  }
+  catch (Dali::DaliException& e)
+  {
+    // Tests that a negative test of an assertion succeeds
+    DALI_TEST_PRINT_ASSERT( e );
+    tet_result( TET_PASS );
+  }
+
+  END_TEST;
+
+}
+
+int UtcDaliSignalConnectP05(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // test function object using FunctorDelegate.
+  // :Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
+  TestSlotHandler handler;
+  TestSignals::VoidRetNoParamSignal signal;
+  bool functorDelegateCalled(false);
+  signal.Connect( &handler, FunctorDelegate::New( VoidFunctorVoid(functorDelegateCalled) ));
+  DALI_TEST_CHECK( ! signal.Empty() );
+  signal.Emit();
+  DALI_TEST_CHECK( functorDelegateCalled == true );
+
+  END_TEST;
+}
+
+int UtcDaliSignalConnectN05(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // for negative test we try to connect a null connection tracker to the signal
+  // :Connect( ConnectionTrackerInterface == NULL, FunctorDelegate* delegate )
+  TestSlotHandler *nullHandler( NULL );
+  TestSignals::VoidRetNoParamSignal signal;
+  bool functorDelegateCalled(false);
+  try
+  {
+    signal.Connect( nullHandler, FunctorDelegate::New( VoidFunctorVoid(functorDelegateCalled) ));
+  }
+  catch (Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    tet_result( TET_PASS );
+  }
+  END_TEST;
+}
+
+
+/**
+ * there 3 different disconnect functions
+ *  we go through them here in order of definition in dali-signal.h
+ */
+int UtcDaliSignalDisconnectP01(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // test static function:  Disconnect( void (*func)( Arg0 arg0 ) )
+
+  TestSignals::VoidRetNoParamSignal signal;
+  signal.Connect( StaticVoidCallbackVoid );
+  DALI_TEST_CHECK( ! signal.Empty() );
+  signal.Disconnect( StaticVoidCallbackVoid );
+  DALI_TEST_CHECK( signal.Empty() );
+
+  END_TEST;
+
+ }
+int UtcDaliSignalDisconnectN01(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // 1. Disconnect using the function
+  TestSignals::VoidRetNoParamSignal signal;
+  signal.Connect( StaticVoidCallbackVoid );
+  DALI_TEST_CHECK( ! signal.Empty() );
+
+  signal.Disconnect( AlternativeVoidCallbackVoid );
+
+  DALI_TEST_CHECK( ! signal.Empty() );
+
+  END_TEST;
+}
+
+int UtcDaliSignalDisconnectP02(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // test member function: Disconnect( X* obj, void (X::*func)( Arg0 arg0 ) )
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotHandler handler;
+  signal.Connect( &handler, &TestSlotHandler::VoidSlotVoid );
+  DALI_TEST_CHECK( ! signal.Empty() );
+  signal.Disconnect( &handler, &TestSlotHandler::VoidSlotVoid  );
+  DALI_TEST_CHECK( signal.Empty() );
+
+  END_TEST;
+
+}
+int UtcDaliSignalDisconnectN02(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // 1. Disconnect using a null connection tracker
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotHandler handler;
+
+  signal.Connect( &handler , &TestSlotHandler::VoidSlotVoid  );
+  DALI_TEST_CHECK( !signal.Empty() );
+
+  try
+  {
+    TestSlotHandler* nullHandler( NULL );
+    signal.Disconnect( nullHandler , &TestSlotHandler::VoidSlotVoid  );
+  }
+  catch(Dali::DaliException& e)
+  {
+    // Tests that a negative test of an assertion succeeds
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_CHECK( !signal.Empty() );
+  }
+  END_TEST;
+}
+
+int UtcDaliSignalDisconnectP03(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  // test slot delegate: Disconnect( SlotDelegate<X>& delegate, void (X::*func)( Arg0 arg0 ) )
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotDelegateHandler handler;
+  signal.Connect( handler.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotVoid );
+  DALI_TEST_CHECK( ! signal.Empty() );
+  signal.Disconnect( handler.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotVoid );
+  DALI_TEST_CHECK( signal.Empty() );
+
+  END_TEST;
+}
+
+int UtcDaliSignalDisconnectN03(void)
+{
+  TestApplication app; // Create core for debug logging
+
+   // try to disconnect from the wrong signal
+  TestSignals::VoidRetNoParamSignal signal;
+  TestSlotDelegateHandler handler;
+  signal.Connect( handler.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotVoid );
+
+  // use different signal
+  signal.Disconnect( handler.mSlotDelegate , &TestSlotDelegateHandler::AlternativeVoidSlotVoid  );
+
+  DALI_TEST_CHECK( !signal.Empty() );
+
+  END_TEST;
+
+}
+
+/*******************************************
+ *
+ * End of Utc test cases for the individual API's of Signals
+ * The following testing Signals functionality as a whole
+ *
+ *
+ */
+
 int UtcDaliSignalEmptyCheckSlotDestruction(void)
 {
   // Test that signal disconnect works when slot is destroyed (goes out of scope)
-
   {
     TestSignals::VoidRetNoParamSignal signal;
     {

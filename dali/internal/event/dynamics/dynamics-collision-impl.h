@@ -24,7 +24,7 @@
 // INTERNAL HEADERS
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
-#include <dali/public-api/dynamics/dynamics-collision.h>
+#include <dali/devel-api/dynamics/dynamics-collision.h>
 
 namespace Dali
 {

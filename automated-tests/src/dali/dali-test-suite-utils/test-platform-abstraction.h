@@ -24,7 +24,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/set-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/integration-api/platform-abstraction.h>
 
 #include "test-trace-call-stack.h"

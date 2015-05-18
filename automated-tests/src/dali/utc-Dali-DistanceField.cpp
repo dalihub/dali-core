@@ -21,6 +21,7 @@
 #include <stdlib.h>
 
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/images/distance-field.h>
 #include <dali-test-suite-utils.h>
 
 using std::max;

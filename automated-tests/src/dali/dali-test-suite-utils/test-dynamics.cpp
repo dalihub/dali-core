@@ -98,6 +98,11 @@ void TestDynamicsShape::Initialize( int type, const Vector3& dimensions )
   mTrace.PushCall( "DynamicsShape::Initialize", "" );
 }
 
+void TestDynamicsShape::Initialize( int type, Geometry geometry )
+{
+  mTrace.PushCall( "DynamicsShape::Initialize", "" );
+}
+
 TestDynamicsBody::TestDynamicsBody( TraceCallStack& trace )
 : mSettings( NULL ),
   mConserveVolume( false ),

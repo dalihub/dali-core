@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/internal/common/message.h>
@@ -117,6 +117,12 @@ public:
    * @param[in] nativeImage The NativeImage
    */
   virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, NativeImageInterfacePtr nativeImage ) = 0;
+
+  /**
+   * @brief Create GL texture for native image resource.
+   * @param[in] id The resource id.
+   */
+  virtual void DispatchCreateGlTexture( ResourceId id ) = 0;
 
   /**
    * Dispatch a message to update the texture.

@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/stage.h>
-#include <dali/public-api/common/set-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/render-controller.h>

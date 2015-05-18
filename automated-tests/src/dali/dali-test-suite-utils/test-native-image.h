@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/images/native-image-interface.h>
 
 namespace Dali
 {
@@ -31,9 +31,9 @@ class DALI_IMPORT_API TestNativeImage : public Dali::NativeImageInterface
 public:
   static TestNativeImagePointer New(int width, int height);
 
-  inline virtual bool GlExtensionCreate() {return true;};
-  inline virtual void GlExtensionDestroy() {};
-  inline virtual GLenum TargetTexture() {return 1;};
+  inline virtual bool GlExtensionCreate() { ++mExtensionCreateCalls; return true;};
+  inline virtual void GlExtensionDestroy() { ++mExtensionDestroyCalls; };
+  inline virtual GLenum TargetTexture() { ++mTargetTextureCalls; return 1;};
   inline virtual void PrepareTexture() {};
   inline virtual unsigned int GetWidth() const {return mWidth;};
   inline virtual unsigned int GetHeight() const {return mHeight;};
@@ -45,6 +45,10 @@ private:
 
   int mWidth;
   int mHeight;
+public:
+  int mExtensionCreateCalls;
+  int mExtensionDestroyCalls;
+  int mTargetTextureCalls;
 };
 
 } // Dali

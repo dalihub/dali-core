@@ -20,12 +20,12 @@
 
 // INTERNAL HEADERS
 #include <dali/public-api/object/base-object.h>
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/event/effects/shader-declarations.h>
-#include <dali/public-api/dynamics/dynamics-world.h>
+#include <dali/devel-api/dynamics/dynamics-world.h>
 #include <dali/public-api/signals/slot-delegate.h>
 
 

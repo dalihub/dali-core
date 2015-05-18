@@ -22,7 +22,7 @@
 #include <limits>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/set-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector2.h>
 

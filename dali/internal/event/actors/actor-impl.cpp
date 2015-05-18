@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 
 #include <dali/internal/common/internal-constants.h>
 #include <dali/internal/event/common/event-thread-services.h>
@@ -102,7 +102,6 @@ namespace Internal
 {
 
 unsigned int Actor::mActorCounter = 0;
-ActorContainer Actor::mNullChildren;
 
 /**
  * Struct to collect relayout variables
@@ -110,7 +109,7 @@ ActorContainer Actor::mNullChildren;
 struct Actor::RelayoutData
 {
   RelayoutData()
-      : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( SizeScalePolicy::USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
+  : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( SizeScalePolicy::USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
   {
     // Set size negotiation defaults
     for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
@@ -556,28 +555,6 @@ Dali::Actor Actor::GetChildAt( unsigned int index ) const
   DALI_ASSERT_ALWAYS( index < GetChildCount() );
 
   return ( ( mChildren ) ? ( *mChildren )[ index ] : Dali::Actor() );
-}
-
-ActorContainer Actor::GetChildren()
-{
-  if( NULL != mChildren )
-  {
-    return *mChildren;
-  }
-
-  // return copy of mNullChildren
-  return mNullChildren;
-}
-
-const ActorContainer& Actor::GetChildren() const
-{
-  if( NULL != mChildren )
-  {
-    return *mChildren;
-  }
-
-  // return const reference to mNullChildren
-  return mNullChildren;
 }
 
 ActorPtr Actor::FindChildByName( const std::string& actorName )
@@ -2997,7 +2974,18 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<Vector2>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector2>::Bake, value.Get<Vector2>() );
+      if(entry.componentIndex == 0)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector2>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector2>::BakeX, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 1)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector2>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector2>::BakeY, value.Get<float>() );
+      }
+      else
+      {
+        SceneGraph::NodePropertyMessage<Vector2>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector2>::Bake, value.Get<Vector2>() );
+      }
 
       break;
     }
@@ -3008,7 +2996,22 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<Vector3>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector3>::Bake, value.Get<Vector3>() );
+      if(entry.componentIndex == 0)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector3>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector3>::BakeX, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 1)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector3>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector3>::BakeY, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 2)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector3>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector3>::BakeZ, value.Get<float>() );
+      }
+      else
+      {
+        SceneGraph::NodePropertyMessage<Vector3>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector3>::Bake, value.Get<Vector3>() );
+      }
 
       break;
     }
@@ -3019,7 +3022,26 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<Vector4>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector4>::Bake, value.Get<Vector4>() );
+      if(entry.componentIndex == 0)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector4>::BakeX, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 1)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector4>::BakeY, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 2)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector4>::BakeZ, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 3)
+      {
+        SceneGraph::NodePropertyComponentMessage<Vector4>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector4>::BakeW, value.Get<float>() );
+      }
+      else
+      {
+        SceneGraph::NodePropertyMessage<Vector4>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<Vector4>::Bake, value.Get<Vector4>() );
+      }
 
       break;
     }
@@ -3420,18 +3442,7 @@ const PropertyBase* Actor::GetSceneObjectAnimatableProperty( Property::Index ind
 
   if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
   {
-    AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
-    if( !animatable )
-    {
-      const TypeInfo* typeInfo( GetTypeInfo() );
-      if ( typeInfo )
-      {
-        if( Property::INVALID_INDEX != RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, Property::Value( typeInfo->GetPropertyType( index ) ) ) )
-        {
-          animatable = FindAnimatableProperty( index );
-        }
-      }
-    }
+    AnimatablePropertyMetadata* animatable = RegisterAnimatableProperty( index );
     DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
 
     property = animatable->GetSceneGraphProperty();
@@ -3543,18 +3554,7 @@ const PropertyInputImpl* Actor::GetSceneObjectInputProperty( Property::Index ind
 
   if ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX && index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX )
   {
-    AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
-    if( !animatable )
-    {
-      const TypeInfo* typeInfo( GetTypeInfo() );
-      if ( typeInfo )
-      {
-        if( Property::INVALID_INDEX != RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, Property::Value( typeInfo->GetPropertyType( index ) ) ) )
-        {
-          animatable = FindAnimatableProperty( index );
-        }
-      }
-    }
+    AnimatablePropertyMetadata* animatable = RegisterAnimatableProperty( index );
     DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
 
     property = animatable->GetSceneGraphProperty();
@@ -3721,54 +3721,66 @@ int Actor::GetPropertyComponentIndex( Property::Index index ) const
 {
   int componentIndex( Property::INVALID_COMPONENT_INDEX );
 
-  switch( index )
+  if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
-    case Dali::Actor::Property::PARENT_ORIGIN_X:
-    case Dali::Actor::Property::ANCHOR_POINT_X:
-    case Dali::Actor::Property::SIZE_WIDTH:
-    case Dali::Actor::Property::POSITION_X:
-    case Dali::Actor::Property::WORLD_POSITION_X:
-    case Dali::Actor::Property::SCALE_X:
-    case Dali::Actor::Property::COLOR_RED:
+    // check whether the animatable property is registered already, if not then register one.
+    AnimatablePropertyMetadata* animatableProperty = RegisterAnimatableProperty(index);
+    if( animatableProperty )
     {
-      componentIndex = 0;
-      break;
+      componentIndex = animatableProperty->componentIndex;
     }
-
-    case Dali::Actor::Property::PARENT_ORIGIN_Y:
-    case Dali::Actor::Property::ANCHOR_POINT_Y:
-    case Dali::Actor::Property::SIZE_HEIGHT:
-    case Dali::Actor::Property::POSITION_Y:
-    case Dali::Actor::Property::WORLD_POSITION_Y:
-    case Dali::Actor::Property::SCALE_Y:
-    case Dali::Actor::Property::COLOR_GREEN:
+  }
+  else
+  {
+    switch( index )
     {
-      componentIndex = 1;
-      break;
-    }
+      case Dali::Actor::Property::PARENT_ORIGIN_X:
+      case Dali::Actor::Property::ANCHOR_POINT_X:
+      case Dali::Actor::Property::SIZE_WIDTH:
+      case Dali::Actor::Property::POSITION_X:
+      case Dali::Actor::Property::WORLD_POSITION_X:
+      case Dali::Actor::Property::SCALE_X:
+      case Dali::Actor::Property::COLOR_RED:
+      {
+        componentIndex = 0;
+        break;
+      }
 
-    case Dali::Actor::Property::PARENT_ORIGIN_Z:
-    case Dali::Actor::Property::ANCHOR_POINT_Z:
-    case Dali::Actor::Property::SIZE_DEPTH:
-    case Dali::Actor::Property::POSITION_Z:
-    case Dali::Actor::Property::WORLD_POSITION_Z:
-    case Dali::Actor::Property::SCALE_Z:
-    case Dali::Actor::Property::COLOR_BLUE:
-    {
-      componentIndex = 2;
-      break;
-    }
+      case Dali::Actor::Property::PARENT_ORIGIN_Y:
+      case Dali::Actor::Property::ANCHOR_POINT_Y:
+      case Dali::Actor::Property::SIZE_HEIGHT:
+      case Dali::Actor::Property::POSITION_Y:
+      case Dali::Actor::Property::WORLD_POSITION_Y:
+      case Dali::Actor::Property::SCALE_Y:
+      case Dali::Actor::Property::COLOR_GREEN:
+      {
+        componentIndex = 1;
+        break;
+      }
 
-    case Dali::Actor::Property::COLOR_ALPHA:
-    {
-      componentIndex = 3;
-      break;
-    }
+      case Dali::Actor::Property::PARENT_ORIGIN_Z:
+      case Dali::Actor::Property::ANCHOR_POINT_Z:
+      case Dali::Actor::Property::SIZE_DEPTH:
+      case Dali::Actor::Property::POSITION_Z:
+      case Dali::Actor::Property::WORLD_POSITION_Z:
+      case Dali::Actor::Property::SCALE_Z:
+      case Dali::Actor::Property::COLOR_BLUE:
+      {
+        componentIndex = 2;
+        break;
+      }
 
-    default:
-    {
-      // Do nothing
-      break;
+      case Dali::Actor::Property::COLOR_ALPHA:
+      {
+        componentIndex = 3;
+        break;
+      }
+
+      default:
+      {
+        // Do nothing
+        break;
+      }
     }
   }
 

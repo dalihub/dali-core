@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/pixel.h>
-#include <dali/public-api/images/image-operations.h>
+#include <dali/devel-api/images/image-operations.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector2.h>
 

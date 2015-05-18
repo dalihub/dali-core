@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_TYPE_REGISTRY_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
@@ -120,6 +120,17 @@ public:
    * @return true if registered
    */
   bool RegisterAnimatableProperty( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Type type );
+
+  /**
+   * Register a component of a scene graph only property that supports components (i.e. Vector2, Vector3 and Vector4)
+   * @param [in] registered TypeRegistration object used to register the type
+   * @param [in] name Component name
+   * @param [in] index Property index
+   * @param [in] baseIndex Base animatable property index
+   * @param [in] componentIndex Component index
+   * @return true if registered
+   */
+  bool RegisterAnimatablePropertyComponent( TypeRegistration& registered, const std::string& name, Property::Index index, Property::Index baseIndex, unsigned int componentIndex );
 
   /*
    * @copydoc Dali::Internal::TypeInfo::DoActionTo

@@ -42,9 +42,14 @@ public:
    * Creates object by using native resources
    * the maximum size of the image is limited by GL_MAX_TEXTURE_SIZE
    * @param [in] nativeImageInterface An reference to the object of the interface implementation.
-    * @return a pointer to a newly created object.
+   * @return a pointer to a newly created object.
    */
   static NativeImagePtr New( NativeImageInterface& nativeImageInterface );
+
+  /**
+   * @copydoc Dali::NativeImage::CreateGlTexture
+   */
+  void CreateGlTexture();
 
 protected:
 

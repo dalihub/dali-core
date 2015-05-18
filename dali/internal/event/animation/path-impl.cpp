@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
+#include <dali/public-api/object/property-array.h>
 
 namespace Dali
 {
@@ -144,6 +145,8 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
   Property::Value value;
   if( index == Dali::Path::Property::POINTS )
   {
+    Property::Array propertyArray;
+    value = Property::Value(propertyArray);
     size_t pointCount( mPoint.Size() );
     for( size_t i( 0 ); i != pointCount; ++i )
     {
@@ -152,6 +155,8 @@ Property::Value Path::GetDefaultProperty( Property::Index index ) const
   }
   else if( index == Dali::Path::Property::CONTROL_POINTS )
   {
+    Property::Array propertyArray;
+    value = Property::Value(propertyArray);
     size_t controlpointCount( mControlPoint.Size() );
     for( size_t i( 0 ); i != controlpointCount; ++i )
     {
@@ -169,7 +174,7 @@ void Path::SetDefaultProperty(Property::Index index, const Property::Value& prop
     Property::Array propertyArray;
     propertyValue.Get(propertyArray);
 
-    size_t propertyArrayCount = propertyArray.size();
+    size_t propertyArrayCount = propertyArray.Size();
     mPoint.Resize( propertyArrayCount );
     for( size_t i(0); i!=propertyArrayCount; ++i )
     {
@@ -181,7 +186,7 @@ void Path::SetDefaultProperty(Property::Index index, const Property::Value& prop
     Property::Array propertyArray;
     propertyValue.Get(propertyArray);
 
-    size_t propertyArrayCount = propertyArray.size();
+    size_t propertyArrayCount = propertyArray.Size();
     mControlPoint.Resize( propertyArrayCount );
     for( size_t i(0); i!=propertyArrayCount; ++i )
     {

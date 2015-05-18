@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_PROPERTY_METADATA_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,6 +62,7 @@ public:
   PropertyMetadata()
   : type(Property::NONE),
     value(),
+    componentIndex(Property::INVALID_COMPONENT_INDEX),
     mProperty(NULL)
   {
   }
@@ -73,6 +74,7 @@ public:
   PropertyMetadata(const SceneGraph::PropertyBase* newProperty)
   : type(Property::NONE),
     value(), // value is held by newProperty
+    componentIndex(Property::INVALID_COMPONENT_INDEX),
     mProperty(newProperty)
   {
     DALI_ASSERT_DEBUG(mProperty && "Uninitialized scenegraph property") ;
@@ -85,6 +87,7 @@ public:
   PropertyMetadata(Property::Value newValue)
   : type(newValue.GetType()),
     value(newValue),
+    componentIndex(Property::INVALID_COMPONENT_INDEX),
     mProperty(NULL)
   {
   }
@@ -120,6 +123,7 @@ public:
 
   Property::Type type;    ///< The type of the property
   Property::Value value;  ///< The property value for a non animatable and custom property
+  int componentIndex;     ///< The index of the property component
 
 protected:
 
@@ -146,10 +150,12 @@ public:
    * @param [in] newProperty A pointer to the scene-graph owned property.
    */
   AnimatablePropertyMetadata( Property::Index newIndex,
+                        int newComponentIndex,
                         Property::Type newType,
                         const SceneGraph::PropertyBase* newProperty )
   : index(newIndex)
   {
+    componentIndex = newComponentIndex;
     type = newType;
     mProperty = newProperty;
     DALI_ASSERT_DEBUG(mProperty && "Uninitialized scenegraph property") ;
@@ -161,9 +167,11 @@ public:
    * @param [in] newValue The value of the scene-graph owned property.
    */
   AnimatablePropertyMetadata( Property::Index newIndex,
+                        int newComponentIndex,
                         Property::Value newValue )
   : index(newIndex)
   {
+    componentIndex = newComponentIndex;
     type = newValue.GetType();
     value = newValue;
   }

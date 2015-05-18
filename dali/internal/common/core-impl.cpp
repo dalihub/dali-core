@@ -182,7 +182,11 @@ Core::~Core()
   // clear the thread local storage first
   // allows core to be created / deleted many times in the same thread (how TET cases work).
   // Do this before mStage.Reset() so Stage::IsInstalled() returns false
-  ThreadLocalStorage::Get().Remove();
+  ThreadLocalStorage* tls = ThreadLocalStorage::GetInternal();
+  if( tls )
+  {
+    tls->Remove();
+  }
 
   // Stop relayout requests being raised on stage destruction
   mRelayoutController.Reset();

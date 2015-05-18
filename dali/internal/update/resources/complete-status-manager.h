@@ -18,7 +18,7 @@
  *
  */
 
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
 

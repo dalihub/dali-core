@@ -25,6 +25,9 @@ include ../../../dali/internal/file.list
 public_api_src_dir = ../../../dali/public-api
 include ../../../dali/public-api/file.list
 
+devel_api_src_dir = ../../../dali/devel-api
+include ../../../dali/devel-api/file.list
+
 platform_abstraction_src_dir = ../../../dali/integration-api
 include ../../../dali/integration-api/file.list
 
@@ -33,7 +36,8 @@ include ../../../dali/integration-api/file.list
 src_files = $(internal_src_files) \
             $(effects_src_files) \
             $(platform_abstraction_src_files) \
-            $(public_api_src_files)
+            $(public_api_src_files) \
+            $(devel_api_src_files)
 
 if DYNAMICS_SUPPORT
 src_files += $(internal_dynamics_src_files)
@@ -58,12 +62,9 @@ dali-shaders.cpp: $(dali_shaders_script) $(dali_shaders_dir)/*.txt
 dali_core_includes = \
         -I../../..
 
-daliGlyphCacheDir = ${dataReadWriteDir}/glyphcache/
-
 libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            -DDALI_DATA_RW_DIR="\"${daliReadWriteDir}\"" \
                            -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
-                           -DDALI_GLYPH_CACHE_DIR="\"${daliGlyphCacheDir}\"" \
                            -DDALI_EMOTICON_DIR="\"${emoticons_dir}\"" \
                            -Werror -Wall -Wfloat-equal \
                            $(dali_core_includes) \
@@ -81,41 +82,62 @@ platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
 platformabstractiondynamics_HEADERS = $(platform_abstraction_dynamics_header_files)
 
+#devel api (used by adaptor / toolkit
+develapidir = $(devincludepath)/dali/devel-api
+develapiactorsdir = $(develapidir)/actors
+develapianimationdir = $(develapidir)/animation
+develapicommondir = $(develapidir)/common
+develapidynamicsdir = $(develapidir)/dynamics
+develapieventsdir = $(develapidir)/events
+develapigeometrydir = $(develapidir)/geometry
+develapiimagesdir = $(develapidir)/images
+develapimodelingdir = $(develapidir)/modeling
+develapiobjectdir = $(develapidir)/object
+develapiscriptingdir = $(develapidir)/scripting
+
+develapi_HEADERS = $(devel_api_header_files)
+develapiactors_HEADERS = $(devel_api_core_actors_header_files)
+develapianimation_HEADERS = $(devel_api_core_animation_header_files)
+develapicommon_HEADERS = $(devel_api_core_common_header_files)
+develapidynamics_HEADERS = $(devel_api_core_dynamics_header_files)
+develapievents_HEADERS = $(devel_api_core_events_header_files)
+develapigeometry_HEADERS = $(devel_api_core_geometry_header_files)
+develapiimages_HEADERS = $(devel_api_core_images_header_files)
+develapimodeling_HEADERS = $(devel_api_core_modeling_header_files)
+develapiobject_HEADERS = $(devel_api_core_object_header_files)
+develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
+
+
+
+#public api
 publicapidir = $(devincludepath)/dali/public-api
 publicapiactorsdir = $(publicapidir)/actors
 publicapianimationdir = $(publicapidir)/animation
 publicapicommondir = $(publicapidir)/common
-publicapidynamicsdir = $(publicapidir)/dynamics
 publicapieventsdir = $(publicapidir)/events
 publicapigeometrydir = $(publicapidir)/geometry
 publicapiimagesdir = $(publicapidir)/images
 publicapimathdir = $(publicapidir)/math
-publicapimodelingdir = $(publicapidir)/modeling
 publicapiobjectdir = $(publicapidir)/object
 publicapirendertasksdir = $(publicapidir)/render-tasks
 publicapishadereffectsdir = $(publicapidir)/shader-effects
 publicapisignalsdir = $(publicapidir)/signals
-publicapitextdir = $(publicapidir)/text
-publicapiscriptingdir = $(publicapidir)/scripting
+
 publicapisizenegotiationdir = $(publicapidir)/size-negotiation
 
 publicapi_HEADERS = $(public_api_header_files)
 publicapiactors_HEADERS = $(public_api_core_actors_header_files)
 publicapianimation_HEADERS = $(public_api_core_animation_header_files)
 publicapicommon_HEADERS = $(public_api_core_common_header_files)
-publicapidynamics_HEADERS = $(public_api_core_dynamics_header_files)
 publicapievents_HEADERS = $(public_api_core_events_header_files)
 publicapigeometry_HEADERS = $(public_api_core_geometry_header_files)
 publicapiimages_HEADERS = $(public_api_core_images_header_files)
 publicapimath_HEADERS = $(public_api_core_math_header_files)
-publicapimodeling_HEADERS = $(public_api_core_modeling_header_files)
 publicapirendertasks_HEADERS = $(public_api_core_render_tasks_header_files)
 publicapiobject_HEADERS = $(public_api_core_object_header_files)
-publicapiscripting_HEADERS = $(public_api_core_scripting_header_files)
 publicapisizenegotiation_HEADERS = $(public_api_core_size_negotiation_header_files)
 publicapishadereffects_HEADERS = $(public_api_core_shader_effects_header_files)
 publicapisignals_HEADERS = $(public_api_core_signals_header_files)
-publicapitext_HEADERS = $(public_api_core_text_header_files)
 
 CLEANFILES = dali-shaders.cpp \
              dali-shaders.h

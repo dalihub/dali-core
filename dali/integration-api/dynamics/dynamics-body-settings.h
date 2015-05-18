@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/dynamics/dynamics-body-config.h>
+#include <dali/devel-api/dynamics/dynamics-body-config.h>
 
 namespace Dali
 {

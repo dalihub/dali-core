@@ -20,11 +20,13 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/object/property-buffer.h>
 
 namespace Dali
 {
 
 struct Vector3;
+
 
 namespace Integration
 {
@@ -45,6 +47,10 @@ public:
    */
   virtual void Initialize( int type, const Vector3& dimensions ) = 0;
 
+  /**
+   * Initialize the shape
+   */
+  virtual void Initialize( int type, Geometry geometry ) = 0;
 
 }; // class DynamicsShape
 

@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-#include <dali/public-api/common/hash.h>
+#include <dali/devel-api/common/hash.h>
 #include <dali/internal/common/owner-container.h>
 
 #include <string>

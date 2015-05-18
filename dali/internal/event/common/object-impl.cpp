@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,21 @@ void Object::OnSceneObjectRemove()
 
 int Object::GetPropertyComponentIndex( Property::Index index ) const
 {
-  return Property::INVALID_COMPONENT_INDEX;
+  int componentIndex = Property::INVALID_COMPONENT_INDEX;
+
+  const TypeInfo* typeInfo( GetTypeInfo() );
+  if ( typeInfo )
+  {
+    componentIndex = typeInfo->GetComponentIndex(index);
+  }
+
+  // For animatable property, check whether it is registered already and register it if not yet.
+  if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) && ( NULL == RegisterAnimatableProperty(index) ) )
+  {
+    componentIndex = Property::INVALID_COMPONENT_INDEX;
+  }
+
+  return componentIndex;
 }
 
 bool Object::Supports( Capability capability ) const
@@ -186,14 +200,9 @@ Property::Index Object::GetPropertyIndex(const std::string& name) const
       if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
       {
         // check whether the animatable property is registered already, if not then register one.
-        AnimatablePropertyMetadata* animatableProperty = FindAnimatableProperty( index );
-        if(!animatableProperty)
+        if ( NULL == RegisterAnimatableProperty(index) )
         {
-          const TypeInfo* typeInfo( GetTypeInfo() );
-          if (typeInfo)
-          {
-            index = RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, Property::Value(typeInfo->GetPropertyType(index)));
-          }
+          index = Property::INVALID_INDEX;
         }
       }
     }
@@ -365,20 +374,24 @@ void Object::SetProperty( Property::Index index, const Property::Value& property
   else if ( ( index >= PROPERTY_REGISTRATION_START_INDEX ) && ( index <= PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     const TypeInfo* typeInfo( GetTypeInfo() );
-    typeInfo->SetProperty( this, index, propertyValue );
+    if ( typeInfo )
+    {
+      typeInfo->SetProperty( this, index, propertyValue );
+    }
+    else
+    {
+      DALI_LOG_ERROR("Cannot find property index\n");
+      propertySet = false;
+    }
   }
   else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     // check whether the animatable property is registered already, if not then register one.
-    AnimatablePropertyMetadata* animatableProperty = FindAnimatableProperty( index );
+    AnimatablePropertyMetadata* animatableProperty = RegisterAnimatableProperty( index );
     if(!animatableProperty)
     {
-      const TypeInfo* typeInfo( GetTypeInfo() );
-      if ( Property::INVALID_INDEX == RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, propertyValue ) )
-      {
-        DALI_LOG_ERROR("Cannot register property\n");
-        propertySet = false;
-      }
+      DALI_LOG_ERROR("Cannot find property index\n");
+      propertySet = false;
     }
     else
     {
@@ -446,25 +459,10 @@ Property::Value Object::GetProperty(Property::Index index) const
   else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
   {
     // check whether the animatable property is registered already, if not then register one.
-    AnimatablePropertyMetadata* animatableProperty = FindAnimatableProperty( index );
+    AnimatablePropertyMetadata* animatableProperty = RegisterAnimatableProperty( index );
     if(!animatableProperty)
     {
-      const TypeInfo* typeInfo( GetTypeInfo() );
-      if (typeInfo)
-      {
-        if(Property::INVALID_INDEX != RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, Property::Value(typeInfo->GetPropertyType(index))))
-        {
-          value = Property::Value(typeInfo->GetPropertyType(index)); // Return an initialized property value according to the type
-        }
-        else
-        {
-          DALI_LOG_ERROR("Cannot register property\n");
-        }
-      }
-      else
-      {
-        DALI_LOG_ERROR("Cannot find property index\n");
-      }
+      DALI_LOG_ERROR("Cannot find property index\n");
     }
     else
     {
@@ -616,7 +614,7 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     }
     else
     {
-      mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, propertyValue.GetType(), property ) );
+      mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, Property::INVALID_COMPONENT_INDEX, propertyValue.GetType(), property ) ); // base property
     }
 
     // queue a message to add the property
@@ -671,18 +669,7 @@ Dali::PropertyNotification Object::AddPropertyNotification(Property::Index index
     else if ( ( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ) )
     {
       // check whether the animatable property is registered already, if not then register one.
-      AnimatablePropertyMetadata* animatable = FindAnimatableProperty( index );
-      if( !animatable )
-      {
-        const TypeInfo* typeInfo( GetTypeInfo() );
-        if ( typeInfo )
-        {
-          if( Property::INVALID_INDEX != RegisterSceneGraphProperty( typeInfo->GetPropertyName( index ), index, Property::Value( typeInfo->GetPropertyType( index ) ) ) )
-          {
-            animatable = FindAnimatableProperty( index );
-          }
-        }
-      }
+      AnimatablePropertyMetadata* animatable = RegisterAnimatableProperty( index );
       DALI_ASSERT_ALWAYS( animatable && "Property index is invalid" );
     }
     else if ( mCustomProperties.Count() > 0 )
@@ -881,7 +868,18 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
         const AnimatableProperty<Vector2>* property = dynamic_cast< const AnimatableProperty<Vector2>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
-        value = (*property)[ bufferIndex ];
+        if(entry->componentIndex == 0)
+        {
+          value = (*property)[ bufferIndex ].x;
+        }
+        else if(entry->componentIndex == 1)
+        {
+          value = (*property)[ bufferIndex ].y;
+        }
+        else
+        {
+          value = (*property)[ bufferIndex ];
+        }
         break;
       }
 
@@ -890,7 +888,22 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
         const AnimatableProperty<Vector3>* property = dynamic_cast< const AnimatableProperty<Vector3>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
-        value = (*property)[ bufferIndex ];
+        if(entry->componentIndex == 0)
+        {
+          value = (*property)[ bufferIndex ].x;
+        }
+        else if(entry->componentIndex == 1)
+        {
+          value = (*property)[ bufferIndex ].y;
+        }
+        else if(entry->componentIndex == 2)
+        {
+          value = (*property)[ bufferIndex ].z;
+        }
+        else
+        {
+          value = (*property)[ bufferIndex ];
+        }
         break;
       }
 
@@ -899,7 +912,26 @@ Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const
         const AnimatableProperty<Vector4>* property = dynamic_cast< const AnimatableProperty<Vector4>* >( entry->GetSceneGraphProperty() );
         DALI_ASSERT_DEBUG( NULL != property );
 
-        value = (*property)[ bufferIndex ];
+        if(entry->componentIndex == 0)
+        {
+          value = (*property)[ bufferIndex ].x;
+        }
+        else if(entry->componentIndex == 1)
+        {
+          value = (*property)[ bufferIndex ].y;
+        }
+        else if(entry->componentIndex == 2)
+        {
+          value = (*property)[ bufferIndex ].z;
+        }
+        else if(entry->componentIndex == 3)
+        {
+          value = (*property)[ bufferIndex ].w;
+        }
+        else
+        {
+          value = (*property)[ bufferIndex ];
+        }
         break;
       }
 
@@ -991,7 +1023,18 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Vector2>( GetEventThreadServices(), *property, value.Get<Vector2>() );
+      if(entry.componentIndex == 0)
+      {
+        SetXComponentMessage<Vector2>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 1)
+      {
+        SetYComponentMessage<Vector2>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else
+      {
+        BakeMessage<Vector2>( GetEventThreadServices(), *property, value.Get<Vector2>() );
+      }
       break;
     }
 
@@ -1001,7 +1044,23 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Vector3>( GetEventThreadServices(), *property, value.Get<Vector3>() );
+      if(entry.componentIndex == 0)
+      {
+        SetXComponentMessage<Vector3>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 1)
+      {
+        SetYComponentMessage<Vector3>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 2)
+      {
+        SetZComponentMessage<Vector3>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else
+      {
+        BakeMessage<Vector3>( GetEventThreadServices(), *property, value.Get<Vector3>() );
+      }
+
       break;
     }
 
@@ -1011,7 +1070,26 @@ void Object::SetSceneGraphProperty( Property::Index index, const PropertyMetadat
       DALI_ASSERT_DEBUG( NULL != property );
 
       // property is being used in a separate thread; queue a message to set the property
-      BakeMessage<Vector4>( GetEventThreadServices(), *property, value.Get<Vector4>() );
+      if(entry.componentIndex == 0)
+      {
+        SetXComponentMessage<Vector4>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 1)
+      {
+        SetYComponentMessage<Vector4>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 2)
+      {
+        SetZComponentMessage<Vector4>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else if(entry.componentIndex == 3)
+      {
+        SetWComponentMessage<Vector4>( GetEventThreadServices(), *property, value.Get<float>() );
+      }
+      else
+      {
+        BakeMessage<Vector4>( GetEventThreadServices(), *property, value.Get<Vector4>() );
+      }
       break;
     }
 
@@ -1182,6 +1260,49 @@ AnimatablePropertyMetadata* Object::FindAnimatableProperty( Property::Index inde
     }
   }
   return NULL;
+}
+
+AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index index) const
+{
+  DALI_ASSERT_ALWAYS( (( index >= ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX ) && ( index <= ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX ))
+                      && "Property index is out of bounds" );
+
+  // check whether the animatable property is registered already, if not then register one.
+  AnimatablePropertyMetadata* animatableProperty = FindAnimatableProperty( index );
+  if(!animatableProperty)
+  {
+    const TypeInfo* typeInfo( GetTypeInfo() );
+    if (typeInfo)
+    {
+      Property::Index basePropertyIndex = typeInfo->GetBasePropertyIndex(index);
+      if(basePropertyIndex == Property::INVALID_INDEX)
+      {
+        // If the property is not a component of a base property, register the whole property itself.
+        index = RegisterSceneGraphProperty(typeInfo->GetPropertyName(index), index, Property::Value(typeInfo->GetPropertyType(index)));
+      }
+      else
+      {
+        // Since the property is a component of a base property, check whether the base property is regsitered.
+        animatableProperty = FindAnimatableProperty( basePropertyIndex );
+        if(!animatableProperty)
+        {
+          // If the base property is not registered yet, register the base property first.
+          if(Property::INVALID_INDEX != RegisterSceneGraphProperty(typeInfo->GetPropertyName(basePropertyIndex), basePropertyIndex, Property::Value(typeInfo->GetPropertyType(basePropertyIndex))))
+          {
+            animatableProperty = static_cast<AnimatablePropertyMetadata*>(mAnimatableProperties[mAnimatableProperties.Size()-1]);
+          }
+        }
+
+        // Create the metadata for the property component.
+        mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->type, animatableProperty->GetSceneGraphProperty() ) );
+      }
+
+      // The metadata has just been added and therefore should be in the end of the vector.
+      animatableProperty = static_cast<AnimatablePropertyMetadata*>(mAnimatableProperties[mAnimatableProperties.Size()-1]);
+    }
+  }
+
+  return animatableProperty;
 }
 
 } // namespace Internal

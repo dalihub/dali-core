@@ -65,6 +65,7 @@ public:
 
 public:
   void Initialize( int type, const Vector3& dimensions );
+  void Initialize( int type, Geometry geometry );
 
 private:
 
@@ -202,6 +203,10 @@ public: // From Dali::Integration::DynamicsBody
     mTrace.PushCall( "DynamicsBody::GetTransform", "" );
   }
 
+  inline void GetSoftVertices( Geometry geometry ) const
+  {
+    mTrace.PushCall( "DynamicsBody::GetSoftVertices", "" );
+  }
 
 private:
   Dali::Integration::DynamicsBodySettings* mSettings;

@@ -22,7 +22,7 @@
 
 #include <dali/integration-api/resource-cache.h>
 #include <dali/integration-api/bitmap.h> ///@todo Remove this include (a bunch of stuff needs to include it though)
-#include <dali/public-api/images/image-operations.h>
+#include <dali/devel-api/images/image-operations.h>
 
 namespace Dali
 {

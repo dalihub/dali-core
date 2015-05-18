@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_OBJECT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -348,6 +348,13 @@ protected:
    * @return The index of the registered property or Property::INVALID_INDEX if registration failed.
    */
   Property::Index RegisterSceneGraphProperty(const std::string& name, Property::Index index, const Property::Value& propertyValue) const;
+
+  /**
+   * Check whether the animatable property is registered already, if not then register one.
+   * @param [in] index The index of the property
+   * @return pointer to the property.
+   */
+  AnimatablePropertyMetadata* RegisterAnimatableProperty(Property::Index index) const;
 
 private: // Default property extensions for derived classes
 

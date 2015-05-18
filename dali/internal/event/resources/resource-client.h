@@ -22,8 +22,8 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/ref-counted-dali-vector.h>
-#include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/common/ref-counted-dali-vector.h>
+#include <dali/devel-api/images/native-image-interface.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-lifetime-observer.h>
@@ -251,6 +251,11 @@ public:
    * @return The bitmap, or NULL if the ticket did not reference a bitmap
    */
   Integration::Bitmap* GetBitmap(ResourceTicketPtr ticket);
+   /**
+    * @brief Trigger asynchronous creation of GL texture to back resource immediately.
+    * @param[in] id The resource ID to allocate a GL texture for.
+    */
+   void CreateGlTexture( ResourceId id );
 
 public: // From ResourceTicketLifetimeObserver.
 

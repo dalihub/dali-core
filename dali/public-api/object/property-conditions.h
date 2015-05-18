@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
+#include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/property.h>
 
@@ -39,15 +39,6 @@ class DALI_IMPORT_API PropertyCondition : public BaseHandle
 public:
 
   /**
-   * @brief Argument container, represents the arguments to be supplied to the condition function.
-   */
-  typedef std::vector<Property::Value>      ArgumentContainer;
-  typedef ArgumentContainer::iterator       ArgumentIter;     ///< Iterator for Dali::PropertyCondition::ArgumentContainer
-  typedef ArgumentContainer::const_iterator ArgumentConstIter;///< Const Iterator for Dali::PropertyCondition::ArgumentContainer
-
-public:
-
-  /**
    * @brief Constructor for condition clause.
    */
   PropertyCondition();
@@ -62,7 +53,7 @@ public:
    *
    * @param [in] handle A reference to the copied handle
    */
-  PropertyCondition(const PropertyCondition& handle);
+  PropertyCondition( const PropertyCondition& handle );
 
   /**
    * @brief This assignment operator is required for (smart) pointer semantics.
@@ -70,7 +61,7 @@ public:
    * @param [in] rhs  A reference to the copied handle
    * @return A reference to this
    */
-  PropertyCondition& operator=(const PropertyCondition& rhs);
+  PropertyCondition& operator=( const PropertyCondition& rhs );
 
 public:
 
@@ -79,7 +70,7 @@ public:
    *
    * @return The arguments used for this condition
    */
-  ArgumentContainer GetArguments();
+  std::size_t GetArgumentCount() const;
 
   /**
    * @brief Retrieve the arguments that this condition uses.
@@ -87,7 +78,7 @@ public:
    * @return The arguments used for this condition
    * @note The container will only be valid as long PropertyCondition is valid.
    */
-  const ArgumentContainer& GetArguments() const;
+  float GetArgument( std::size_t index ) const;
 
 };
 
@@ -103,7 +94,7 @@ public:
  * @param[in] arg The argument for the condition
  * @return A property condition function object
  */
-DALI_IMPORT_API PropertyCondition LessThanCondition(float arg);
+DALI_IMPORT_API PropertyCondition LessThanCondition( float arg );
 
 /**
  * @brief GreaterThanCondition compares whether property is greater than arg.
@@ -117,7 +108,7 @@ DALI_IMPORT_API PropertyCondition LessThanCondition(float arg);
  * @param[in] arg The argument for the condition
  * @return A property condition function object
  */
-DALI_IMPORT_API PropertyCondition GreaterThanCondition(float arg);
+DALI_IMPORT_API PropertyCondition GreaterThanCondition( float arg );
 
 /**
  * @brief InsideCondition compares whether property is greater than arg0 and less than arg1.
@@ -132,7 +123,7 @@ DALI_IMPORT_API PropertyCondition GreaterThanCondition(float arg);
  * @param[in] arg1 The second argument for the condition
  * @return A property condition function object
  */
-DALI_IMPORT_API PropertyCondition InsideCondition(float arg0, float arg1);
+DALI_IMPORT_API PropertyCondition InsideCondition( float arg0, float arg1 );
 
 /**
  * @brief OutsideCondition compares whether property is less than arg0 or greater than arg1.
@@ -147,7 +138,7 @@ DALI_IMPORT_API PropertyCondition InsideCondition(float arg0, float arg1);
  * @param[in] arg1 The second argument for the condition
  * @return A property condition function object
  */
-DALI_IMPORT_API PropertyCondition OutsideCondition(float arg0, float arg1);
+DALI_IMPORT_API PropertyCondition OutsideCondition( float arg0, float arg1 );
 
 /**
  * @brief Detects when a property changes by stepAmount from initialValue, in both positive and negative directions. This will continue checking for multiples of stepAmount
@@ -161,7 +152,7 @@ DALI_IMPORT_API PropertyCondition OutsideCondition(float arg0, float arg1);
  * @param[in] initialValue The initial value to step from
  * @return A property condition function object
  */
-DALI_IMPORT_API PropertyCondition StepCondition(float stepAmount, float initialValue = 0.0f);
+DALI_IMPORT_API PropertyCondition StepCondition( float stepAmount, float initialValue = 0.0f );
 
 /**
  * @brief Receive notifications as a property goes above/below the inputted values. Values must be ordered and can be either ascending or descending
@@ -174,7 +165,7 @@ DALI_IMPORT_API PropertyCondition StepCondition(float stepAmount, float initialV
  * @param[in] steps List of values to receive notifications for as a property crosses them
  * @return A property condition function object
  */
-DALI_IMPORT_API PropertyCondition VariableStepCondition(const std::vector<float>& steps);
+DALI_IMPORT_API PropertyCondition VariableStepCondition( const Dali::Vector<float>& steps );
 
 } // namespace Dali
 

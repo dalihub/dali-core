@@ -23,8 +23,8 @@
 #include <typeinfo>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/map-wrapper.h>
-#include <dali/public-api/common/set-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
+#include <dali/devel-api/common/set-wrapper.h>
 #include <dali/public-api/math/vector2.h>
 
 #include <dali/integration-api/debug.h>
@@ -547,6 +547,12 @@ void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceT
     mImpl->mPlatformAbstraction.CancelLoad(deadId, typeId);
   }
 }
+
+void ResourceManager::HandleCreateGlTextureRequest(ResourceId id)
+{
+  mImpl->mTextureCacheDispatcher.DispatchCreateGlTexture( id );
+}
+
 /********************************************************************************
  ******************** Update thread object direct interface  ********************
  ********************************************************************************/

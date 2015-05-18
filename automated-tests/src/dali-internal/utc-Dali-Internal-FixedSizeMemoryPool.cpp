@@ -37,10 +37,10 @@ void utc_dali_internal_fixedsizememorypool_cleanup(void)
 namespace
 {
 
-int gTestObjectConstructed = 0;
-int gTestObjectDestructed = 0;
-int gTestObjectMethod = 0;
-int gTestObjectDataAccess = 0;
+unsigned int gTestObjectConstructed = 0;
+unsigned int gTestObjectDestructed = 0;
+unsigned int gTestObjectMethod = 0;
+unsigned int gTestObjectDataAccess = 0;
 
 } // namespace
 
@@ -76,7 +76,7 @@ public:
 
 private:
 
-  int mData1;
+  unsigned int mData1;
   bool mData2;
 
 };
@@ -92,17 +92,17 @@ int UtcDaliFixedSizeMemoryPoolCreate(void)
 
   TestObject* testObject1 = new (memoryPool.Allocate()) TestObject();
   DALI_TEST_CHECK( testObject1 );
-  DALI_TEST_EQUALS( gTestObjectConstructed, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTestObjectConstructed, 1U, TEST_LOCATION );
 
   testObject1->Method();
-  DALI_TEST_EQUALS( gTestObjectMethod, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTestObjectMethod, 1U, TEST_LOCATION );
 
   testObject1->DataAccess();
-  DALI_TEST_EQUALS( gTestObjectDataAccess, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTestObjectDataAccess, 1U, TEST_LOCATION );
 
   testObject1->~TestObject();
   memoryPool.Free( testObject1 );
-  DALI_TEST_EQUALS( gTestObjectDestructed, 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( gTestObjectDestructed, 1U, TEST_LOCATION );
 
   END_TEST;
 }

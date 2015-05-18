@@ -226,47 +226,6 @@ void DALI_TEST_EQUALS( const char* str1, const std::string &str2, const char* lo
   DALI_TEST_EQUALS(str1, str2.c_str(), location);
 }
 
-
-/**
- * Test whether one unsigned integer value is greater than another.
- * Test succeeds if value1 > value2
- * @param[in] value1 The first value
- * @param[in] value2 The second value
- * @param[in] location The TEST_LOCATION macro should be used here
- */
-void DALI_TEST_GREATER(unsigned int value1, unsigned int value2, const char* location)
-{
-  if (!(value1 > value2))
-  {
-    fprintf(stderr, "%s, checking %d > %d\n", location, value1, value2);
-    tet_result(TET_FAIL);
-  }
-  else
-  {
-    tet_result(TET_PASS);
-  }
-}
-
-/**
- * Test whether one float value is greater than another.
- * Test succeeds if value1 > value2
- * @param[in] value1 The first value
- * @param[in] value2 The second value
- * @param[in] location The TEST_LOCATION macro should be used here
- */
-void DALI_TEST_GREATER( float value1, float value2, const char* location)
-{
-  if (!(value1 > value2))
-  {
-    fprintf(stderr, "%s, checking %f > %f\n", location, value1, value2);
-    tet_result(TET_FAIL);
-  }
-  else
-  {
-    tet_result(TET_PASS);
-  }
-}
-
 void DALI_TEST_ASSERT( DaliException& e, std::string conditionSubString, const char* location )
 {
   if( NULL == strstr( e.condition, conditionSubString.c_str() ) )

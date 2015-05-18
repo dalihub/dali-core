@@ -48,6 +48,11 @@ NativeImage& NativeImage::operator=( const NativeImage& rhs )
   return *this;
 }
 
+void NativeImage::CreateGlTexture()
+{
+  GetImplementation(*this).CreateGlTexture();
+}
+
 NativeImage NativeImage::New( NativeImageInterface& resourceData )
 {
   Internal::NativeImagePtr internal = Internal::NativeImage::New( resourceData );

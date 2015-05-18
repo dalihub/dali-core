@@ -23,7 +23,7 @@
 #include <dali/public-api/math/matrix3.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/object/type-registry.h>
-#include <dali/public-api/scripting/scripting.h>
+#include <dali/devel-api/scripting/scripting.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/internal/event/common/stage-impl.h>
@@ -62,7 +62,7 @@ DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "grid-density",   FLOAT,   true,    false,   false,   Dali::ShaderEffect::Property::GRID_DENSITY   )
 DALI_PROPERTY( "image",          MAP,     true,    false,   false,   Dali::ShaderEffect::Property::IMAGE          )
 DALI_PROPERTY( "program",        MAP,     true,    false,   false,   Dali::ShaderEffect::Property::PROGRAM        )
-DALI_PROPERTY( "geometry-hints", INTEGER, true,    false,   false,   Dali::ShaderEffect::Property::GEOMETRY_HINTS )
+DALI_PROPERTY( "geometry-hints", STRING,  true,    false,   false,   Dali::ShaderEffect::Property::GEOMETRY_HINTS )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 BaseHandle Create()
@@ -508,9 +508,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
     case Dali::ShaderEffect::Property::GEOMETRY_HINTS:
     {
       Dali::ShaderEffect::GeometryHints hint = Dali::ShaderEffect::HINT_NONE;
-      Property::Value geometryHintsValue   = propertyValue.GetValue("geometry-hints");
-
-      std::string s = geometryHintsValue.Get<std::string>();
+      std::string s = propertyValue.Get<std::string>();
       if(s == "HINT_NONE")
       {
         hint = Dali::ShaderEffect::HINT_NONE;

@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/mutex.h>
+#include <dali/devel-api/common/mutex.h>
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/property-notification-impl.h>

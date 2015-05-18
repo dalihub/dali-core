@@ -31,7 +31,7 @@
 #include <dali/internal/event/dynamics/dynamics-mesh-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-sphere-shape-impl.h>
 #include <dali/internal/event/modeling/mesh-impl.h>
-#include <dali/public-api/geometry/cloth.h>
+#include <dali/devel-api/geometry/cloth.h>
 
 namespace Dali
 {

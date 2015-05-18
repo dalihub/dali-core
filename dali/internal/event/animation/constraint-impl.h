@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_ACTIVE_CONSTRAINT_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -393,7 +393,7 @@ private:
 
       if ( Property::INVALID_COMPONENT_INDEX == componentIndex )
       {
-        // Not a Vector3 or Vector4 component, expecting float type
+        // Not a Vector2, Vector3 or Vector4 component, expecting float type
         DALI_ASSERT_DEBUG( PropertyTypes::Get< float >() == targetProperty->GetType() );
 
         typedef SceneGraph::Constraint< float, PropertyAccessor<float> > SceneGraphConstraint;
@@ -404,9 +404,24 @@ private:
       }
       else
       {
-        // Expecting Vector3 or Vector4 type
+        // Expecting Vector2, Vector3 or Vector4 type
 
-        if ( PropertyTypes::Get< Vector3 >() == targetProperty->GetType() )
+        if ( PropertyTypes::Get< Vector2 >() == targetProperty->GetType() )
+        {
+          // Constrain float component of Vector2 property
+
+          if ( 0 == componentIndex )
+          {
+            typedef SceneGraph::Constraint< float, PropertyComponentAccessorX<Vector2> > SceneGraphConstraint;
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+          }
+          else if ( 1 == componentIndex )
+          {
+            typedef SceneGraph::Constraint< float, PropertyComponentAccessorY<Vector2> > SceneGraphConstraint;
+            sceneGraphConstraint = SceneGraphConstraint::New( *targetProperty, propertyOwners, func );
+          }
+        }
+        else if ( PropertyTypes::Get< Vector3 >() == targetProperty->GetType() )
         {
           // Constrain float component of Vector3 property
 

@@ -59,7 +59,7 @@ struct DALI_IMPORT_API Property
   /**
    * @brief An Array of property values.
    */
-  typedef std::vector<Value> Array;
+  class Array;
 
   /**
    * @brief The property types supported.

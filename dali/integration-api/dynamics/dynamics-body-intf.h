@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/geometry/geometry.h>
 
 namespace Dali
 {
@@ -114,6 +115,12 @@ public:
 
   virtual void SetTransform( const Vector3& position, const Quaternion& rotation ) = 0;
   virtual void GetTransform( Vector3& position, Quaternion& rotation ) = 0;
+
+  /**
+   * Get the vertices and normal from a soft body
+   * @param[in,out] meshData A MeshData object with preallocated space for all the vertices.
+   */
+  virtual void GetSoftVertices( Geometry geometry ) const = 0;
 
 }; // class DynamicsBody
 

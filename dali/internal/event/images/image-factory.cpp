@@ -23,7 +23,7 @@
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
-#include <dali/public-api/common/hash.h>
+#include <dali/devel-api/common/hash.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/common/notification-manager.h>

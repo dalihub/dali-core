@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/gl-defines.h>
-#include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/images/native-image-interface.h>
 #include <dali/internal/render/gl-resources/texture.h>
 
 namespace Dali
