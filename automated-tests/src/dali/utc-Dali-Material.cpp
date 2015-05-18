@@ -22,6 +22,15 @@ using namespace Dali;
 
 #include <mesh-builder.h>
 
+namespace
+{
+void TestConstraintNoBlue( Vector4& current, const PropertyInputContainer& inputs )
+{
+  current.b = 0.0f;
+}
+}
+
+
 void material_test_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -555,6 +564,209 @@ int UtcDaliMaterialSetBlendMode08(void)
   std::ostringstream blendStr;
   blendStr << GL_BLEND;
   DALI_TEST_CHECK( ! glEnableStack.FindMethodAndParams( "Enable", blendStr.str().c_str() ) );
+
+  END_TEST;
+}
+
+
+int UtcDaliMaterialConstraint01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that a non-uniform shader property can be constrained");
+
+  Shader shader = Shader::New( "VertexSource", "FragmentSource");
+  Material material = Material::New( shader );
+  material.SetProperty(Material::Property::COLOR, Color::WHITE);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  Vector4 initialColor = Color::WHITE;
+  Property::Index colorIndex = material.RegisterProperty( "fade-color", initialColor );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( material.GetProperty<Vector4>(colorIndex), initialColor, TEST_LOCATION );
+
+  // Apply constraint
+  Constraint constraint = Constraint::New<Vector4>( material, colorIndex, TestConstraintNoBlue );
+  constraint.Apply();
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect no blue component in either buffer - yellow
+  DALI_TEST_EQUALS( material.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
+  application.Render(0);
+  DALI_TEST_EQUALS( material.GetProperty<Vector4>(colorIndex), Color::YELLOW, TEST_LOCATION );
+
+  material.RemoveConstraints();
+  material.SetProperty(colorIndex, Color::WHITE );
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( material.GetProperty<Vector4>(colorIndex), Color::WHITE, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialConstraint02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that a uniform map material property can be constrained");
+
+  Shader shader = Shader::New( "VertexSource", "FragmentSource");
+  Material material = Material::New( shader );
+  material.SetProperty(Material::Property::COLOR, Color::WHITE);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 initialColor = Color::WHITE;
+  Property::Index colorIndex = material.RegisterProperty( "fade-color", initialColor );
+  material.AddUniformMapping( colorIndex, std::string("uFadeColor") );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, initialColor, TEST_LOCATION );
+
+  // Apply constraint
+  Constraint constraint = Constraint::New<Vector4>( material, colorIndex, TestConstraintNoBlue );
+  constraint.Apply();
+  application.SendNotification();
+  application.Render(0);
+
+   // Expect no blue component in either buffer - yellow
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::YELLOW, TEST_LOCATION );
+
+  application.Render(0);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::YELLOW, TEST_LOCATION );
+
+  material.RemoveConstraints();
+  material.SetProperty(colorIndex, Color::WHITE );
+  application.SendNotification();
+  application.Render(0);
+
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::WHITE, TEST_LOCATION );
+
+  END_TEST;
+}
+
+
+
+int UtcDaliMaterialAnimatedProperty01(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that a non-uniform material property can be animated");
+
+  Shader shader = Shader::New( "VertexSource", "FragmentSource");
+  Material material = Material::New( shader );
+  material.SetProperty(Material::Property::COLOR, Color::WHITE);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  Vector4 initialColor = Color::WHITE;
+  Property::Index colorIndex = material.RegisterProperty( "fade-color", initialColor );
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( material.GetProperty<Vector4>(colorIndex), initialColor, TEST_LOCATION );
+
+  Animation  animation = Animation::New(1.0f);
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, initialColor);
+  keyFrames.Add(1.0f, Color::TRANSPARENT);
+  animation.AnimateBetween( Property( material, colorIndex ), keyFrames );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500);
+
+  DALI_TEST_EQUALS( material.GetProperty<Vector4>(colorIndex), Color::WHITE * 0.5f, TEST_LOCATION );
+
+  application.Render(500);
+
+  DALI_TEST_EQUALS( material.GetProperty<Vector4>(colorIndex), Color::TRANSPARENT, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliMaterialAnimatedProperty02(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that a uniform map material property can be animated");
+
+  Shader shader = Shader::New( "VertexSource", "FragmentSource");
+  Material material = Material::New( shader );
+  material.SetProperty(Material::Property::COLOR, Color::WHITE);
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 initialColor = Color::WHITE;
+  Property::Index colorIndex = material.RegisterProperty( "fade-color", initialColor );
+  material.AddUniformMapping( colorIndex, std::string("uFadeColor") );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render(0);
+
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, initialColor, TEST_LOCATION );
+
+  Animation  animation = Animation::New(1.0f);
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, initialColor);
+  keyFrames.Add(1.0f, Color::TRANSPARENT);
+  animation.AnimateBetween( Property( material, colorIndex ), keyFrames );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render(500);
+
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::WHITE * 0.5f, TEST_LOCATION );
+
+  application.Render(500);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::TRANSPARENT, TEST_LOCATION );
 
   END_TEST;
 }

@@ -347,7 +347,8 @@ const PropertyInputImpl* Geometry::GetSceneObjectInputProperty( Property::Index 
 
 int Geometry::GetPropertyComponentIndex( Property::Index index ) const
 {
-  return GEOMETRY_IMPL.GetPropertyComponentIndex( index );
+  // @todo MESH_REWORK - Change this if component properties are added for center/half-extent
+  return Property::INVALID_COMPONENT_INDEX;
 }
 
 bool Geometry::OnStage() const

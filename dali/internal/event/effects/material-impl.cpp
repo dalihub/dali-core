@@ -510,6 +510,7 @@ const PropertyInputImpl* Material::GetSceneObjectInputProperty( Property::Index 
 
 int Material::GetPropertyComponentIndex( Property::Index index ) const
 {
+  // @todo MESH_REWORK - Change this if component properties are added for color/blend-color
   return Property::INVALID_COMPONENT_INDEX;
 }
 
@@ -529,6 +530,7 @@ void Material::Connect()
   {
     it->OnStageConnect();
   }
+  mShaderConnector.OnStageConnect();
 }
 
 void Material::Disconnect()
@@ -542,6 +544,7 @@ void Material::Disconnect()
   {
     it->OnStageDisconnect();
   }
+  mShaderConnector.OnStageDisconnect();
 }
 
 Material::Material()

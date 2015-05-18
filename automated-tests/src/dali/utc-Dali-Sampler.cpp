@@ -145,3 +145,56 @@ int UtcDaliSamplerSetUniformName02(void)
 
   END_TEST;
 }
+
+
+int UtcDaliSamplerUniformMap01(void)
+{
+  TestApplication application;
+
+  Image image = BufferImage::New( 64, 64, Pixel::RGBA8888 );
+  Sampler sampler = Sampler::New(image, "sTexture");
+  sampler.SetUniformName( "sEffectTexture" );
+
+  Material material = CreateMaterial(1.0f);
+  material.AddSampler( sampler );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetParentOrigin( ParentOrigin::CENTER );
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add( actor );
+
+  float initialValue = 1.0f;
+  Property::Index widthClampIndex = sampler.RegisterProperty("width-clamp", initialValue );
+  sampler.AddUniformMapping( widthClampIndex, std::string("uWidthClamp") );
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+
+  application.SendNotification();
+  application.Render();
+
+  float actualValue=0.0f;
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uWidthClamp", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, initialValue, TEST_LOCATION );
+
+  Animation  animation = Animation::New(1.0f);
+  KeyFrames keyFrames = KeyFrames::New();
+  keyFrames.Add(0.0f, 0.0f);
+  keyFrames.Add(1.0f, 640.0f);
+  animation.AnimateBetween( Property( sampler, widthClampIndex ), keyFrames );
+  animation.Play();
+
+  application.SendNotification();
+  application.Render( 500 );
+
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uWidthClamp", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, 320.0f, TEST_LOCATION );
+
+  application.Render( 500 );
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uWidthClamp", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, 640.0f, TEST_LOCATION );
+
+  END_TEST;
+}

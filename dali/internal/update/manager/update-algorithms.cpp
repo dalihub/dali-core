@@ -81,6 +81,20 @@ void ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
 {
   ConstrainPropertyOwner( node, updateBufferIndex );
 
+  if( node.HasAttachment() )
+  {
+    // @todo MESH_REWORK Remove dynamic cast.
+    // (Or, if RendererAttachment split into RendererPropertyOwner(?),
+    // do as separate pass as per other mesh objects - see also
+    // UpdateManager::ResetNodeProperty())
+    NodeAttachment& attachment = node.GetAttachment();
+    PropertyOwner* propertyOwner = dynamic_cast< PropertyOwner* >( &attachment );
+    if( propertyOwner != NULL )
+    {
+      ConstrainPropertyOwner( *propertyOwner, updateBufferIndex );
+    }
+  }
+
   /**
    *  Constrain the children next
    */

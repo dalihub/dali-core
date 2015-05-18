@@ -359,7 +359,7 @@ const PropertyInputImpl* PropertyBuffer::GetSceneObjectInputProperty( Property::
 
 int PropertyBuffer::GetPropertyComponentIndex( Property::Index index ) const
 {
-  return PROPERTY_BUFFER_IMPL.GetPropertyComponentIndex( index );
+  return Property::INVALID_COMPONENT_INDEX;
 }
 
 bool PropertyBuffer::OnStage() const

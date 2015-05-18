@@ -215,7 +215,7 @@ const PropertyInputImpl* Shader::GetSceneObjectInputProperty( Property::Index in
 
 int Shader::GetPropertyComponentIndex( Property::Index index ) const
 {
-  return SHADER_IMPL.GetPropertyComponentIndex( index );
+  return Property::INVALID_COMPONENT_INDEX;
 }
 
 bool Shader::OnStage() const

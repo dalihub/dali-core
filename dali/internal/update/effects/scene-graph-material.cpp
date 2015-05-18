@@ -58,6 +58,8 @@ Material::~Material()
 void Material::SetShader( Shader* shader )
 {
   mShader = shader;
+  mShader->AddUniformMapObserver( *this );
+
   // Inform NewRenderer about this shader: (Will force a re-load of the
   // shader from the data providers)
   mConnectionObservers.ConnectionsChanged(*this);

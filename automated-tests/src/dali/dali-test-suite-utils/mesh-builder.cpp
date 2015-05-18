@@ -45,8 +45,7 @@ Material CreateMaterial(float opacity, Image image)
   return material;
 }
 
-
-Geometry CreateQuadGeometry()
+PropertyBuffer CreatePropertyBuffer()
 {
   Property::Map texturedQuadVertexFormat;
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
@@ -54,7 +53,17 @@ Geometry CreateQuadGeometry()
 
   PropertyBuffer vertexData = PropertyBuffer::New( PropertyBuffer::STATIC,
                                                    texturedQuadVertexFormat, 4 );
+  return vertexData;
+}
 
+Geometry CreateQuadGeometry(void)
+{
+  PropertyBuffer vertexData = CreatePropertyBuffer();
+  return CreateQuadGeometryFromBuffer( vertexData );
+}
+
+Geometry CreateQuadGeometryFromBuffer( PropertyBuffer vertexData )
+{
   const float halfQuadSize = .5f;
   struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
   TexturedQuadVertex texturedQuadVertexData[4] = {

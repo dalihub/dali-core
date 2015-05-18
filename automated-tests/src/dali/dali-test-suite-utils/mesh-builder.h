@@ -25,6 +25,8 @@ namespace Dali
 Material CreateMaterial(float opacity);
 Material CreateMaterial(float opacity, Image image);
 Geometry CreateQuadGeometry();
+Geometry CreateQuadGeometryFromBuffer( PropertyBuffer vertexData );
+PropertyBuffer CreatePropertyBuffer();
 
 }
 
