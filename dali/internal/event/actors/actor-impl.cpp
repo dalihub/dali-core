@@ -178,61 +178,61 @@ namespace // unnamed namespace
 /**
  * We want to discourage the use of property strings (minimize string comparisons),
  * particularly for the default properties.
- *              Name                   Type   writable animatable constraint-input  enum for index-checking
+ *              Name                Type   writable animatable constraint-input  enum for index-checking
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "parent-origin", VECTOR3, true, false, true, Dali::Actor::Property::PARENT_ORIGIN )
-DALI_PROPERTY( "parent-origin-x", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_X )
-DALI_PROPERTY( "parent-origin-y", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_Y )
-DALI_PROPERTY( "parent-origin-z", FLOAT, true, false, true, Dali::Actor::Property::PARENT_ORIGIN_Z )
-DALI_PROPERTY( "anchor-point", VECTOR3, true, false, true, Dali::Actor::Property::ANCHOR_POINT )
-DALI_PROPERTY( "anchor-point-x", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_X )
-DALI_PROPERTY( "anchor-point-y", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_Y )
-DALI_PROPERTY( "anchor-point-z", FLOAT, true, false, true, Dali::Actor::Property::ANCHOR_POINT_Z )
-DALI_PROPERTY( "size", VECTOR3, true, true, true, Dali::Actor::Property::SIZE )
-DALI_PROPERTY( "size-width", FLOAT, true, true, true, Dali::Actor::Property::SIZE_WIDTH )
-DALI_PROPERTY( "size-height", FLOAT, true, true, true, Dali::Actor::Property::SIZE_HEIGHT )
-DALI_PROPERTY( "size-depth", FLOAT, true, true, true, Dali::Actor::Property::SIZE_DEPTH )
-DALI_PROPERTY( "position", VECTOR3, true, true, true, Dali::Actor::Property::POSITION )
-DALI_PROPERTY( "position-x", FLOAT, true, true, true, Dali::Actor::Property::POSITION_X )
-DALI_PROPERTY( "position-y", FLOAT, true, true, true, Dali::Actor::Property::POSITION_Y )
-DALI_PROPERTY( "position-z", FLOAT, true, true, true, Dali::Actor::Property::POSITION_Z )
-DALI_PROPERTY( "world-position", VECTOR3, false, false, true, Dali::Actor::Property::WORLD_POSITION )
-DALI_PROPERTY( "world-position-x", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_X )
-DALI_PROPERTY( "world-position-y", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_Y )
-DALI_PROPERTY( "world-position-z", FLOAT, false, false, true, Dali::Actor::Property::WORLD_POSITION_Z )
-DALI_PROPERTY( "orientation", ROTATION, true, true, true, Dali::Actor::Property::ORIENTATION )
-DALI_PROPERTY( "world-orientation", ROTATION, false, false, true, Dali::Actor::Property::WORLD_ORIENTATION )
-DALI_PROPERTY( "scale", VECTOR3, true, true, true, Dali::Actor::Property::SCALE )
-DALI_PROPERTY( "scale-x", FLOAT, true, true, true, Dali::Actor::Property::SCALE_X )
-DALI_PROPERTY( "scale-y", FLOAT, true, true, true, Dali::Actor::Property::SCALE_Y )
-DALI_PROPERTY( "scale-z", FLOAT, true, true, true, Dali::Actor::Property::SCALE_Z )
-DALI_PROPERTY( "world-scale", VECTOR3, false, false, true, Dali::Actor::Property::WORLD_SCALE )
-DALI_PROPERTY( "visible", BOOLEAN, true, true, true, Dali::Actor::Property::VISIBLE )
-DALI_PROPERTY( "color", VECTOR4, true, true, true, Dali::Actor::Property::COLOR )
-DALI_PROPERTY( "color-red", FLOAT, true, true, true, Dali::Actor::Property::COLOR_RED )
-DALI_PROPERTY( "color-green", FLOAT, true, true, true, Dali::Actor::Property::COLOR_GREEN )
-DALI_PROPERTY( "color-blue", FLOAT, true, true, true, Dali::Actor::Property::COLOR_BLUE )
-DALI_PROPERTY( "color-alpha", FLOAT, true, true, true, Dali::Actor::Property::COLOR_ALPHA )
-DALI_PROPERTY( "world-color", VECTOR4, false, false, true, Dali::Actor::Property::WORLD_COLOR )
-DALI_PROPERTY( "world-matrix", MATRIX, false, false, true, Dali::Actor::Property::WORLD_MATRIX )
-DALI_PROPERTY( "name", STRING, true, false, false, Dali::Actor::Property::NAME )
-DALI_PROPERTY( "sensitive", BOOLEAN, true, false, false, Dali::Actor::Property::SENSITIVE )
-DALI_PROPERTY( "leave-required", BOOLEAN, true, false, false, Dali::Actor::Property::LEAVE_REQUIRED )
-DALI_PROPERTY( "inherit-orientation", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
-DALI_PROPERTY( "inherit-scale", BOOLEAN, true, false, false, Dali::Actor::Property::INHERIT_SCALE )
-DALI_PROPERTY( "color-mode", STRING, true, false, false, Dali::Actor::Property::COLOR_MODE )
-DALI_PROPERTY( "position-inheritance", STRING, true, false, false, Dali::Actor::Property::POSITION_INHERITANCE )
-DALI_PROPERTY( "draw-mode", STRING, true, false, false, Dali::Actor::Property::DRAW_MODE )
-DALI_PROPERTY( "size-mode-factor", VECTOR3, true, false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
-DALI_PROPERTY( "width-resize-policy", STRING, true, false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
-DALI_PROPERTY( "height-resize-policy", STRING, true, false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY )
-DALI_PROPERTY( "size-scale-policy", STRING, true, false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
-DALI_PROPERTY( "width-for-height", BOOLEAN, true, false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT )
-DALI_PROPERTY( "height-for-width", BOOLEAN, true, false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH )
-DALI_PROPERTY( "padding", VECTOR4, true, false, false, Dali::Actor::Property::PADDING )
-DALI_PROPERTY( "minimum-size", VECTOR2, true, false, false, Dali::Actor::Property::MINIMUM_SIZE )
-DALI_PROPERTY( "maximum-size", VECTOR2, true, false, false, Dali::Actor::Property::MAXIMUM_SIZE )
+DALI_PROPERTY( "parent-origin",     VECTOR3,  true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN )
+DALI_PROPERTY( "parent-origin-x",   FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_X )
+DALI_PROPERTY( "parent-origin-y",   FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Y )
+DALI_PROPERTY( "parent-origin-z",   FLOAT,    true,  false, true,  Dali::Actor::Property::PARENT_ORIGIN_Z )
+DALI_PROPERTY( "anchor-point",      VECTOR3,  true,  false, true,  Dali::Actor::Property::ANCHOR_POINT )
+DALI_PROPERTY( "anchor-point-x",    FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_X )
+DALI_PROPERTY( "anchor-point-y",    FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Y )
+DALI_PROPERTY( "anchor-point-z",    FLOAT,    true,  false, true,  Dali::Actor::Property::ANCHOR_POINT_Z )
+DALI_PROPERTY( "size",              VECTOR3,  true,  true,  true,  Dali::Actor::Property::SIZE )
+DALI_PROPERTY( "size-width",        FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_WIDTH )
+DALI_PROPERTY( "size-height",       FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_HEIGHT )
+DALI_PROPERTY( "size-depth",        FLOAT,    true,  true,  true,  Dali::Actor::Property::SIZE_DEPTH )
+DALI_PROPERTY( "position",          VECTOR3,  true,  true,  true,  Dali::Actor::Property::POSITION )
+DALI_PROPERTY( "position-x",        FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_X )
+DALI_PROPERTY( "position-y",        FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Y )
+DALI_PROPERTY( "position-z",        FLOAT,    true,  true,  true,  Dali::Actor::Property::POSITION_Z )
+DALI_PROPERTY( "world-position",    VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_POSITION )
+DALI_PROPERTY( "world-position-x",  FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_X )
+DALI_PROPERTY( "world-position-y",  FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Y )
+DALI_PROPERTY( "world-position-z",  FLOAT,    false, false, true,  Dali::Actor::Property::WORLD_POSITION_Z )
+DALI_PROPERTY( "orientation",       ROTATION, true,  true,  true,  Dali::Actor::Property::ORIENTATION )
+DALI_PROPERTY( "world-orientation", ROTATION, false, false, true,  Dali::Actor::Property::WORLD_ORIENTATION )
+DALI_PROPERTY( "scale",             VECTOR3,  true,  true,  true,  Dali::Actor::Property::SCALE )
+DALI_PROPERTY( "scale-x",           FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_X )
+DALI_PROPERTY( "scale-y",           FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Y )
+DALI_PROPERTY( "scale-z",           FLOAT,    true,  true,  true,  Dali::Actor::Property::SCALE_Z )
+DALI_PROPERTY( "world-scale",       VECTOR3,  false, false, true,  Dali::Actor::Property::WORLD_SCALE )
+DALI_PROPERTY( "visible",           BOOLEAN,  true,  true,  true,  Dali::Actor::Property::VISIBLE )
+DALI_PROPERTY( "color",             VECTOR4,  true,  true,  true,  Dali::Actor::Property::COLOR )
+DALI_PROPERTY( "color-red",         FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_RED )
+DALI_PROPERTY( "color-green",       FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_GREEN )
+DALI_PROPERTY( "color-blue",        FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_BLUE )
+DALI_PROPERTY( "color-alpha",       FLOAT,    true,  true,  true,  Dali::Actor::Property::COLOR_ALPHA )
+DALI_PROPERTY( "world-color",       VECTOR4,  false, false, true,  Dali::Actor::Property::WORLD_COLOR )
+DALI_PROPERTY( "world-matrix",      MATRIX,   false, false, true,  Dali::Actor::Property::WORLD_MATRIX )
+DALI_PROPERTY( "name",              STRING,   true,  false, false, Dali::Actor::Property::NAME )
+DALI_PROPERTY( "sensitive",         BOOLEAN,  true,  false, false, Dali::Actor::Property::SENSITIVE )
+DALI_PROPERTY( "leave-required",    BOOLEAN,  true,  false, false, Dali::Actor::Property::LEAVE_REQUIRED )
+DALI_PROPERTY( "inherit-orientation",BOOLEAN, true,  false, false, Dali::Actor::Property::INHERIT_ORIENTATION )
+DALI_PROPERTY( "inherit-scale",     BOOLEAN,  true,  false, false, Dali::Actor::Property::INHERIT_SCALE )
+DALI_PROPERTY( "color-mode",        STRING,   true,  false, false, Dali::Actor::Property::COLOR_MODE )
+DALI_PROPERTY( "position-inheritance",STRING, true,  false, false, Dali::Actor::Property::POSITION_INHERITANCE )
+DALI_PROPERTY( "draw-mode",         STRING,   true,  false, false, Dali::Actor::Property::DRAW_MODE )
+DALI_PROPERTY( "size-mode-factor",  VECTOR3,  true,  false, false, Dali::Actor::Property::SIZE_MODE_FACTOR )
+DALI_PROPERTY( "width-resize-policy",STRING,  true,  false, false, Dali::Actor::Property::WIDTH_RESIZE_POLICY )
+DALI_PROPERTY( "height-resize-policy",STRING, true,  false, false, Dali::Actor::Property::HEIGHT_RESIZE_POLICY )
+DALI_PROPERTY( "size-scale-policy", STRING,   true,  false, false, Dali::Actor::Property::SIZE_SCALE_POLICY )
+DALI_PROPERTY( "width-for-height",  BOOLEAN,  true,  false, false, Dali::Actor::Property::WIDTH_FOR_HEIGHT )
+DALI_PROPERTY( "height-for-width",  BOOLEAN,  true,  false, false, Dali::Actor::Property::HEIGHT_FOR_WIDTH )
+DALI_PROPERTY( "padding",           VECTOR4,  true,  false, false, Dali::Actor::Property::PADDING )
+DALI_PROPERTY( "minimum-size",      VECTOR2,  true,  false, false, Dali::Actor::Property::MINIMUM_SIZE )
+DALI_PROPERTY( "maximum-size",      VECTOR2,  true,  false, false, Dali::Actor::Property::MAXIMUM_SIZE )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 // Signals
@@ -1194,7 +1194,13 @@ void Actor::SetSize( const Vector3& size )
 
 void Actor::SetSizeInternal( const Vector3& size )
 {
-  if( NULL != mNode )
+  // dont allow recursive loop
+  DALI_ASSERT_ALWAYS( !mInsideOnSizeSet && "Cannot call SetSize from OnSizeSet" );
+  // check that we have a node AND the new size width, height or depth is at least a little bit different from the old one
+  if( ( NULL != mNode )&&
+      ( ( fabsf( mTargetSize.width - size.width  ) > Math::MACHINE_EPSILON_1 )||
+        ( fabsf( mTargetSize.height- size.height ) > Math::MACHINE_EPSILON_1 )||
+        ( fabsf( mTargetSize.depth - size.depth  ) > Math::MACHINE_EPSILON_1 ) ) )
   {
     mTargetSize = size;
 
@@ -1202,7 +1208,9 @@ void Actor::SetSizeInternal( const Vector3& size )
     SceneGraph::NodePropertyMessage<Vector3>::Send( GetEventThreadServices(), mNode, &mNode->mSize, &AnimatableProperty<Vector3>::Bake, mTargetSize );
 
     // Notification for derived classes
+    mInsideOnSizeSet = true;
     OnSizeSet( mTargetSize );
+    mInsideOnSizeSet = false;
 
     // Raise a relayout request if the flag is not locked
     if( mRelayoutData && !mRelayoutData->insideRelayout )
@@ -1217,7 +1225,21 @@ void Actor::NotifySizeAnimation( Animation& animation, const Vector3& targetSize
   mTargetSize = targetSize;
 
   // Notify deriving classes
-  OnSizeAnimation( animation, targetSize );
+  OnSizeAnimation( animation, mTargetSize );
+}
+
+void Actor::NotifySizeAnimation( Animation& animation, float targetSize, Property::Index property )
+{
+  if ( Dali::Actor::Property::SIZE_WIDTH == property )
+  {
+    mTargetSize.width = targetSize;
+  }
+  else if ( Dali::Actor::Property::SIZE_HEIGHT == property )
+  {
+    mTargetSize.height = targetSize;
+  }
+  // Notify deriving classes
+  OnSizeAnimation( animation, mTargetSize );
 }
 
 void Actor::SetWidth( float width )
@@ -2252,10 +2274,31 @@ Actor::Actor( DerivedType derivedType )
   mAnchorPoint( NULL ),
   mRelayoutData( NULL ),
 #ifdef DYNAMICS_SUPPORT
-        mDynamicsData( NULL ),
+  mDynamicsData( NULL ),
 #endif
-        mGestureData( NULL ), mAttachment(), mTargetSize( 0.0f, 0.0f, 0.0f ), mName(), mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
-        mIsRoot( ROOT_LAYER == derivedType ), mIsRenderable( RENDERABLE == derivedType ), mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ), mIsOnStage( false ), mIsDynamicsRoot( false ), mSensitive( true ), mLeaveRequired( false ), mKeyboardFocusable( false ), mDerivedRequiresTouch( false ), mDerivedRequiresHover( false ), mDerivedRequiresMouseWheelEvent( false ), mOnStageSignalled( false ), mInheritOrientation( true ), mInheritScale( true ), mDrawMode( DrawMode::NORMAL ), mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ), mColorMode( Node::DEFAULT_COLOR_MODE )
+  mGestureData( NULL ),
+  mAttachment(),
+  mTargetSize( 0.0f, 0.0f, 0.0f ),
+  mName(),
+  mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
+  mIsRoot( ROOT_LAYER == derivedType ),
+  mIsRenderable( RENDERABLE == derivedType ),
+  mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
+  mIsOnStage( false ),
+  mIsDynamicsRoot( false ),
+  mSensitive( true ),
+  mLeaveRequired( false ),
+  mKeyboardFocusable( false ),
+  mDerivedRequiresTouch( false ),
+  mDerivedRequiresHover( false ),
+  mDerivedRequiresMouseWheelEvent( false ),
+  mOnStageSignalled( false ),
+  mInsideOnSizeSet( false ),
+  mInheritOrientation( true ),
+  mInheritScale( true ),
+  mDrawMode( DrawMode::NORMAL ),
+  mPositionInheritanceMode( Node::DEFAULT_POSITION_INHERITANCE_MODE ),
+  mColorMode( Node::DEFAULT_COLOR_MODE )
 {
 }
 
@@ -3988,10 +4031,38 @@ bool Actor::IsLayoutNegotiated( Dimension::Type dimension ) const
   return false;
 }
 
-float Actor::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+float Actor::GetHeightForWidthBase( float width )
 {
-  // Could be overridden in derived classes.
-  return CalculateChildSizeBase( child, dimension );
+  float height = 0.0f;
+
+  const Vector3 naturalSize = GetNaturalSize();
+  if( naturalSize.width > 0.0f )
+  {
+    height = naturalSize.height * width / naturalSize.width;
+  }
+  else // we treat 0 as 1:1 aspect ratio
+  {
+    height = width;
+  }
+
+  return height;
+}
+
+float Actor::GetWidthForHeightBase( float height )
+{
+  float width = 0.0f;
+
+  const Vector3 naturalSize = GetNaturalSize();
+  if( naturalSize.height > 0.0f )
+  {
+    width = naturalSize.width * height / naturalSize.height;
+  }
+  else // we treat 0 as 1:1 aspect ratio
+  {
+    width = height;
+  }
+
+  return width;
 }
 
 float Actor::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
@@ -4021,32 +4092,22 @@ float Actor::CalculateChildSizeBase( const Dali::Actor& child, Dimension::Type d
   }
 }
 
+float Actor::CalculateChildSize( const Dali::Actor& child, Dimension::Type dimension )
+{
+  // Can be overridden in derived class
+  return CalculateChildSizeBase( child, dimension );
+}
+
 float Actor::GetHeightForWidth( float width )
 {
-  // Could be overridden in derived classes.
-  float height = 0.0f;
-
-  const Vector3 naturalSize = GetNaturalSize();
-  if( naturalSize.width > 0.0f )
-  {
-    height = naturalSize.height * width / naturalSize.width;
-  }
-
-  return height;
+  // Can be overridden in derived class
+  return GetHeightForWidthBase( width );
 }
 
 float Actor::GetWidthForHeight( float height )
 {
-  // Could be overridden in derived classes.
-  float width = 0.0f;
-
-  const Vector3 naturalSize = GetNaturalSize();
-  if( naturalSize.height > 0.0f )
-  {
-    width = naturalSize.width * height / naturalSize.height;
-  }
-
-  return width;
+  // Can be overridden in derived class
+  return GetWidthForHeightBase( height );
 }
 
 float Actor::GetLatestSize( Dimension::Type dimension ) const

@@ -2831,7 +2831,7 @@ int UtcDaliActorGetHeightForWidth(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_EQUALS( actor.GetHeightForWidth( 1.0f ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetHeightForWidth( 1.0f ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2842,7 +2842,7 @@ int UtcDaliActorGetWidthForHeight(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_EQUALS( actor.GetWidthForHeight( 1.0f ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetWidthForHeight( 1.0f ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }

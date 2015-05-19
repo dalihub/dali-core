@@ -1187,6 +1187,9 @@ public:
   /**
    * @brief Calculate the height of the actor given a width
    *
+   * The natural size is used for default calculation.
+   * size 0 is treated as aspect ratio 1:1.
+   *
    * @param width Width to use
    * @return Return the height based on the width
    */
@@ -1194,6 +1197,9 @@ public:
 
   /**
    * @brief Calculate the width of the actor given a height
+   *
+   * The natural size is used for default calculation.
+   * size 0 is treated as aspect ratio 1:1.
    *
    * @param height Height to use
    * @return Return the width based on the height
