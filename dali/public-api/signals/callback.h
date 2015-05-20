@@ -76,7 +76,7 @@ public:
     }
     else
     {
-      DALI_ASSERT_DEBUG( 0 && "no function to execute" );
+      DALI_ASSERT_ALWAYS( 0 && "no function to execute" );
     }
   }
 
