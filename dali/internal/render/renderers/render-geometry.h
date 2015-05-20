@@ -103,9 +103,9 @@ private:
    * @param[in] bufferIndex The current buffer index
    * @param[in] dataProviders The data providers (to fetch geometry from)
    */
-  void DoUpload( Context& context,
-                 BufferIndex bufferIndex,
-                 const RenderDataProvider* dataProviders );
+  void SetUpPropertyBuffers( Context& context,
+                             BufferIndex bufferIndex,
+                             const RenderDataProvider* dataProviders );
 
   /**
    * Bind the geometry buffers

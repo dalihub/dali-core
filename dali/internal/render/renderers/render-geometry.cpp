@@ -87,24 +87,24 @@ void RenderGeometry::UploadVertexData(
   BufferIndex bufferIndex,
   const RenderDataProvider* dataProviders )
 {
-  if( mDataNeedsUploading ) // @todo Or if any of the property buffers are dirty
+  if( mDataNeedsUploading )
   {
-    DoUpload( context, bufferIndex, dataProviders );
+    SetUpPropertyBuffers( context, bufferIndex, dataProviders );
+
+    for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
+    {
+      mVertexBuffers[i]->Upload( context, bufferIndex );
+    }
+    if( mIndexBuffer )
+    {
+      mIndexBuffer->Upload( context, bufferIndex );
+    }
 
     mDataNeedsUploading = false;
   }
-
-  for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
-  {
-    mVertexBuffers[i]->Upload( context, bufferIndex );
-  }
-  if( mIndexBuffer )
-  {
-    mIndexBuffer->Upload( context, bufferIndex );
-  }
 }
 
-void RenderGeometry::DoUpload(
+void RenderGeometry::SetUpPropertyBuffers(
   Context& context,
   BufferIndex bufferIndex,
   const RenderDataProvider* dataProvider )

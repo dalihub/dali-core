@@ -50,13 +50,6 @@ public:
   }
 
   /**
-   * Check if the data has changed
-   * @param[in] bufferIndex Index to access double buffered values
-   * @return true if the data has changed
-   */
-  virtual bool HasDataChanged( BufferIndex bufferIndex ) const = 0;
-
-  /**
    * Get the number of attributes
    * @param[in] bufferIndex Index to access double buffered values
    * @return the number of attributes

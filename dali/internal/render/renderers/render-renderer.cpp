@@ -55,6 +55,11 @@ void NewRenderer::SetRenderDataProvider( RenderDataProvider* dataProvider )
   mRenderGeometry.GeometryUpdated();
 }
 
+void NewRenderer::SetGeometryUpdated( )
+{
+  mRenderGeometry.GeometryUpdated();
+}
+
 // Note - this is currently called from UpdateThread, PrepareRenderInstructions,
 // as an optimisation.
 // @todo MESH_REWORK Should use Update thread objects only in PrepareRenderInstructions.

@@ -66,6 +66,11 @@ public:
    */
   void SetRenderDataProvider( RenderDataProvider* dataProviders );
 
+  /**
+   * Set flag that says that Geometry has been updated.
+   */
+  void SetGeometryUpdated();
+
 public: // Implementation of Renderer
   /**
    * @copydoc SceneGraph::Renderer::RequiresDepthTest()

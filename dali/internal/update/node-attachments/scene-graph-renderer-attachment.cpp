@@ -367,6 +367,27 @@ void RendererAttachment::DoPrepareRender( BufferIndex updateBufferIndex )
     mRegenerateUniformMap--;
   }
 
+  bool geometryDataChanged = false;
+  if( PropertyBuffer* indexBuffer = mGeometry->GetIndexBuffer() )
+  {
+    geometryDataChanged = indexBuffer->HasDataChanged(updateBufferIndex);
+  }
+  Vector<PropertyBuffer*>& vertexBuffers = mGeometry->GetVertexBuffers();
+  Vector<PropertyBuffer*>::ConstIterator end = vertexBuffers.End();
+  for( Vector<PropertyBuffer*>::Iterator it = vertexBuffers.Begin();
+       it != end;
+       ++it )
+  {
+    geometryDataChanged = geometryDataChanged || (*it)->HasDataChanged(updateBufferIndex);
+  }
+  if( geometryDataChanged )
+  {
+    //TODO: MESH_REWORK : use buffer data cache and remove all this
+    typedef Message< NewRenderer > DerivedType;
+    unsigned int* slot = mSceneController->GetRenderQueue().ReserveMessageSlot( updateBufferIndex, sizeof( DerivedType ) );
+    new (slot) DerivedType( mRenderer, &NewRenderer::SetGeometryUpdated );
+  }
+
   if( mResendDataProviders )
   {
     RenderDataProvider* dataProvider = NewRenderDataProvider();
