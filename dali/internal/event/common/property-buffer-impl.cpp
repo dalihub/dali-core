@@ -85,57 +85,57 @@ unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
     }
     case Property::BOOLEAN:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::BOOLEAN >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::BOOLEAN >::VALUE;
       break;
     }
     case Property::INTEGER:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::INTEGER >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::INTEGER >::VALUE;
       break;
     }
     case Property::UNSIGNED_INTEGER:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::UNSIGNED_INTEGER >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::UNSIGNED_INTEGER >::VALUE;
       break;
     }
     case Property::FLOAT:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::FLOAT >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::FLOAT >::VALUE;
       break;
     }
     case Property::VECTOR2:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::VECTOR2 >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::VECTOR2 >::VALUE;
       break;
     }
     case Property::VECTOR3:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::VECTOR3 >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::VECTOR3 >::VALUE;
       break;
     }
     case Property::VECTOR4:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::VECTOR4 >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::VECTOR4 >::VALUE;
       break;
     }
     case Property::MATRIX3:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::MATRIX3 >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::MATRIX3 >::VALUE;
       break;
     }
     case Property::MATRIX:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::MATRIX >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::MATRIX >::VALUE;
       break;
     }
     case Property::RECTANGLE:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::RECTANGLE >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::RECTANGLE >::VALUE;
       break;
     }
     case Property::ROTATION:
     {
-      alignment = sizeof( PropertyImplementationTypeAlignment< Property::ROTATION >::VALUE );
+      alignment = PropertyImplementationTypeAlignment< Property::ROTATION >::VALUE;
       break;
     }
   }
