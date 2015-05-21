@@ -117,6 +117,7 @@ FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
+    ../../../
     ${${CAPI_LIB}_INCLUDE_DIRS}
     dali-test-suite-utils
 )

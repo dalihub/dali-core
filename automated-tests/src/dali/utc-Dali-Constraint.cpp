@@ -1153,3 +1153,71 @@ int UtcDaliConstraintChaining(void)
   END_TEST;
 }
 ///////////////////////////////////////////////////////////////////////////////
+
+///////////////////////////////////////////////////////////////////////////////
+namespace TestPropertyTypes
+{
+template< typename T >
+void Execute( T value )
+{
+  TestApplication application;
+  bool functorCalled = false;
+
+  Actor actor = Actor::New();
+  Property::Index index = actor.RegisterProperty( "TEMP_PROPERTY_NAME", value );
+
+  Stage::GetCurrent().Add( actor );
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( functorCalled, false, TEST_LOCATION );
+
+  // Add a constraint
+  Constraint constraint = Constraint::New< T >( actor, index, BasicCalledFunctor< T >( functorCalled ) );
+  DALI_TEST_CHECK( constraint );
+  constraint.Apply();
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_EQUALS( functorCalled, true, TEST_LOCATION );
+}
+} // namespace UtcDaliConstraintNewFunctor
+
+int UtcDaliConstraintTestPropertyTypesP(void)
+{
+  // Ensure we can use a constraint functor with all supported property types
+
+  TestPropertyTypes::Execute< bool >( false );
+  TestPropertyTypes::Execute< int >( 0 );
+  TestPropertyTypes::Execute< float >( 0.0f );
+  TestPropertyTypes::Execute< Vector2 >( Vector2::ZERO );
+  TestPropertyTypes::Execute< Vector3 >( Vector3::ZERO );
+  TestPropertyTypes::Execute< Vector4 >( Vector4::ZERO );
+  TestPropertyTypes::Execute< Quaternion >( Quaternion::IDENTITY );
+  TestPropertyTypes::Execute< Matrix >( Matrix::IDENTITY );
+  TestPropertyTypes::Execute< Matrix3 >( Matrix3::IDENTITY );
+
+  END_TEST;
+}
+
+int UtcDaliConstraintTestPropertyTypesN(void)
+{
+  // unsigned int not supported so we should assert
+
+  try
+  {
+    TestPropertyTypes::Execute< unsigned int >( 0u );
+    DALI_TEST_CHECK( false ); // Should not come here
+  }
+  catch( ... )
+  {
+    DALI_TEST_CHECK( true );
+  }
+
+
+  END_TEST;
+}
+///////////////////////////////////////////////////////////////////////////////
+
