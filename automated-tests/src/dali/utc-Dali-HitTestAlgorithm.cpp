@@ -339,9 +339,9 @@ int UtcDaliHitTestAlgorithmOrtho02(void)
 
   {
     HitTestAlgorithm::Results results;
-    HitTest(stage, Vector2::ZERO, results, &DefaultIsActorTouchableFunction);
+    HitTest(stage, Vector2( 0.001f, 0.001f ), results, &DefaultIsActorTouchableFunction);
     DALI_TEST_CHECK( results.actor == blue );
-    DALI_TEST_EQUALS( results.actorCoordinates, Vector2::ZERO, TEST_LOCATION );
+    DALI_TEST_EQUALS( results.actorCoordinates, Vector2( 0.001f, 0.001f ), 0.001f, TEST_LOCATION );
   }
 
   {
