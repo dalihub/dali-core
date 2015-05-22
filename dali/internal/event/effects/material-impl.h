@@ -80,6 +80,11 @@ public:
   void RemoveSampler( std::size_t index );
 
   /**
+   * @copydoc Dali::Material::GetSamplerAt()
+   */
+  Sampler* GetSamplerAt( unsigned int index ) const;
+
+  /**
    * @copydoc Dali::Material::SetFaceCullingMode()
    */
   void SetFaceCullingMode( Dali::Material::FaceCullingMode cullingMode );

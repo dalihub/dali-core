@@ -103,11 +103,25 @@ public:
   void SetGeometry( Geometry& geometry );
 
   /**
+   * @brief Gets the geometry used by this renderer
+   *
+   * @return The geometry used by the renderer
+   */
+  Geometry GetGeometry() const;
+
+  /**
    * @brief Sets the material to be used by this renderer
    *
    * @param[in] material The material to be used by this renderer
    */
   void SetMaterial( Material& material );
+
+  /**
+   * @brief Gets the material used by this renderer
+   *
+   * @return The material used by the renderer
+   */
+  Material GetMaterial() const;
 
   /**
    * @brief Set the depth index of this renderer

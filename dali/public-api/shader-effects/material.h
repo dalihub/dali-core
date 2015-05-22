@@ -155,6 +155,16 @@ public:
   void RemoveSampler( std::size_t index );
 
   /**
+   * @brief Get the sampler at the given index for this material
+   *
+   * The index must be between 0 and GetNumberOfSamplers()-1
+   *
+   * @param[in] index The index of the sampler
+   * @return The sampler at that index
+   */
+  Sampler GetSamplerAt( unsigned int index ) const;
+
+  /**
    * @brief Set the culling mode for this material
    *
    * Calling this function sets the properties CULLING_MODE
