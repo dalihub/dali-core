@@ -71,6 +71,10 @@ typedef Rect<float> Padding;      ///< Padding definition
  *
  * <i>Hit Test Algorithm:</i>
  *
+ * - Stage
+ *   - Gets the first down and the last up touch events to the screen, regardless of actor touch event consumption.
+ *   - Stage's root layer can be used to catch unconsumed touch events.
+ *
  * - RenderTasks
  *   - Hit testing is dependent on the camera used, which is specific to each RenderTask.
  *
