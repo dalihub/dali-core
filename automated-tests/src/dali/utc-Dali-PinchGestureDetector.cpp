@@ -150,6 +150,30 @@ int UtcDaliPinchGestureDetectorConstructor(void)
   END_TEST;
 }
 
+int UtcDaliPinchGestureDetectorCopyConstructorP(void)
+{
+  TestApplication application;
+
+  PinchGestureDetector detector = PinchGestureDetector::New();;
+
+  PinchGestureDetector copy( detector );
+  DALI_TEST_CHECK( detector );
+  END_TEST;
+}
+
+int UtcDaliPinchGestureDetectorAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  PinchGestureDetector detector = PinchGestureDetector::New();;
+
+  PinchGestureDetector copy = detector;
+  DALI_TEST_CHECK( detector );
+
+  DALI_TEST_CHECK( detector == copy );
+  END_TEST;
+}
+
 int UtcDaliPinchGestureDetectorNew(void)
 {
   TestApplication application;

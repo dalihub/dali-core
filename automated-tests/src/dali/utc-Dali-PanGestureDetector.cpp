@@ -288,6 +288,29 @@ int UtcDaliPanGestureDetectorConstructor(void)
   END_TEST;
 }
 
+int UtcDaliPanGestureDetectorCopyConstructorP(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector = PanGestureDetector::New();;
+
+  PanGestureDetector copy( detector );
+  DALI_TEST_CHECK( detector );
+  END_TEST;
+}
+
+int UtcDaliPanGestureDetectorAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector = PanGestureDetector::New();;
+
+  PanGestureDetector copy = detector;
+  DALI_TEST_CHECK( detector );
+
+  DALI_TEST_CHECK( detector == copy );
+  END_TEST;
+}
 
 // Negative test case for a method
 int UtcDaliPanGestureDetectorNew(void)
