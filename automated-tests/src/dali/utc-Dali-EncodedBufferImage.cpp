@@ -758,6 +758,45 @@ static const unsigned int sEncodedBufferImageDataPNGLength = sizeof( sEncodedBuf
 } // anonymous namespace
 
 
+int UtcDaliEncodedBufferImageCtorsP(void)
+{
+  TestApplication application;
+
+  EncodedBufferImage image1;
+  DALI_TEST_CHECK( !image1 );
+
+  image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::NEVER );
+  EncodedBufferImage image2( image1 );
+
+  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliEncodedBufferImageOperatorAssignmentP(void)
+{
+  TestApplication application;
+
+  EncodedBufferImage image1;
+  DALI_TEST_CHECK( !image1 );
+
+  image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::NEVER );
+  EncodedBufferImage image2;
+  image2 = image1;
+
+  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliEncodedBufferImageDownCastP(void)
+{
+  TestApplication application;
+
+  Image image1 = EncodedBufferImage::New( sEncodedBufferImageDataPNG, sEncodedBufferImageDataPNGLength, ImageDimensions(), FittingMode::DEFAULT, SamplingMode::DEFAULT, Image::NEVER );
+  EncodedBufferImage image2 = DownCast< EncodedBufferImage >(image1);
+
+  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+  END_TEST;
+}
 
 // Positive test case for constructors:
 int UtcDaliEncodedBufferImageNew01(void)
