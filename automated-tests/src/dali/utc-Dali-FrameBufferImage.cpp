@@ -96,6 +96,36 @@ int UtcDaliFrameBufferImageNew02(void)
   END_TEST;
 }
 
+int UtcDaliFrameBufferImageNew03(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliFrameBufferImageNew03 - FrameBufferImage::New(NativeImageInterface&, ReleasePolicy)");
+
+  // invoke default handle constructor
+  FrameBufferImage image;
+  TestNativeImagePointer nativeImage = TestNativeImage::New(16, 16);
+
+  DALI_TEST_CHECK( !image );
+
+  // initialise handle with UNUSED release policy
+  image = FrameBufferImage::New(*(nativeImage.Get()), Image::UNUSED);
+
+  DALI_TEST_CHECK( image );
+  DALI_TEST_EQUALS( image.GetReleasePolicy(), Image::UNUSED, TEST_LOCATION );
+
+  // initialise handle with NEVER release policy
+  image.Reset();
+  DALI_TEST_CHECK( !image );
+
+  image = FrameBufferImage::New(*(nativeImage.Get()), Image::NEVER);
+
+  DALI_TEST_CHECK( image );
+  DALI_TEST_EQUALS( image.GetReleasePolicy(), Image::NEVER, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliFrameBufferImageDownCast(void)
 {
   TestApplication application;

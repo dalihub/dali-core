@@ -79,6 +79,7 @@ int UtcDaliPixelHasAlpha(void)
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 ) == true );
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::COMPRESSED_RGBA8_ETC2_EAC ) == true );
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC) == true );
+
   END_TEST;
 }
 
@@ -107,6 +108,9 @@ int UtcDaliPixelGetBytesPerPixel(void)
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel(Pixel::BGRA8888) == 4);
 
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel(Pixel::L8) == 1);
+
+  DALI_TEST_CHECK( Pixel::GetBytesPerPixel(Pixel::COMPRESSED_R11_EAC) == 0);
+
   END_TEST;
 }
 

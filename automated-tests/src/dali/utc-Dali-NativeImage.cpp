@@ -53,6 +53,25 @@ int UtcDaliNativeImageNew(void)
   END_TEST;
 }
 
+int UtcDaliNativeImageCopyConstructor(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliNativeImageCopyConstructor - NativeImage::NativeImage( const NativeImage& )");
+
+  NativeImage image1;
+  DALI_TEST_CHECK( !image1 );
+
+  TestNativeImagePointer nativeImage = TestNativeImage::New(16, 16);
+  image1 = NativeImage::New(*(nativeImage.Get()));
+  NativeImage image2( image1 );
+
+  DALI_TEST_CHECK( image2 );
+  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliNativeImageDownCast(void)
 {
   TestApplication application;
