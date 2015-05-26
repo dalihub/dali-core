@@ -246,7 +246,7 @@ void PropertyBuffer::SetDefaultProperty( Property::Index index,
   {
     case Dali::PropertyBuffer::Property::SIZE:
     {
-      SetSize( propertyValue.Get<int>() );
+      SetSize( propertyValue.Get<unsigned int>() );
       break;
     }
     case Dali::PropertyBuffer::Property::BUFFER_FORMAT:
@@ -272,7 +272,7 @@ Property::Value PropertyBuffer::GetDefaultProperty( Property::Index index ) cons
   {
     case Dali::PropertyBuffer::Property::SIZE:
     {
-      value = static_cast<int>( GetSize() ); // @todo MESH_REWORK Add a size_t type to PropertyValue
+      value = static_cast<unsigned int>( GetSize() ); // @todo MESH_REWORK Add a size_t type to PropertyValue
       break;
     }
     case Dali::PropertyBuffer::Property::BUFFER_FORMAT:

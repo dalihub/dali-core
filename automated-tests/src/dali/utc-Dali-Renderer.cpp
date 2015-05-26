@@ -61,6 +61,36 @@ int UtcDaliRendererNew02(void)
   END_TEST;
 }
 
+int UtcDaliRendererCopyConstructor(void)
+{
+  TestApplication application;
+
+  Geometry geometry = CreateQuadGeometry();
+  Material material = CreateMaterial(1.0f);
+  Renderer renderer = Renderer::New(geometry, material);
+
+  Renderer rendererCopy( renderer );
+  DALI_TEST_EQUALS( (bool)rendererCopy, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererAssignmentOperator(void)
+{
+  TestApplication application;
+
+  Geometry geometry = CreateQuadGeometry();
+  Material material = CreateMaterial(1.0f);
+  Renderer renderer = Renderer::New(geometry, material);
+
+  Renderer renderer2;
+  DALI_TEST_EQUALS( (bool)renderer2, false, TEST_LOCATION );
+
+  renderer2 = renderer;
+  DALI_TEST_EQUALS( (bool)renderer2, true, TEST_LOCATION );
+  END_TEST;
+}
+
 int UtcDaliRendererDownCast01(void)
 {
   TestApplication application;
@@ -85,6 +115,132 @@ int UtcDaliRendererDownCast02(void)
   END_TEST;
 }
 
+int UtcDaliRendererSetGetGeometry(void)
+{
+  TestApplication application;
+  tet_infoline( "Test SetGeometry, GetGeometry" );
+
+  Geometry geometry1 = CreateQuadGeometry();
+  geometry1.RegisterProperty( "uFadeColor", Color::RED );
+
+  Geometry geometry2 = CreateQuadGeometry();
+  geometry2.RegisterProperty( "uFadeColor", Color::GREEN );
+
+  Material material = CreateMaterial(1.0f);
+  Renderer renderer = Renderer::New(geometry1, material);
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect that the first geometry's fade color property is accessed
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( renderer.GetGeometry(), geometry1, TEST_LOCATION );
+
+  // Set geometry2 to the renderer
+  renderer.SetGeometry( geometry2 );
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect that the second geometry's fade color property is accessed
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( renderer.GetGeometry(), geometry2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetGetMaterial(void)
+{
+  TestApplication application;
+  tet_infoline( "Test SetMaterial, GetMaterial" );
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+
+  Material material1 = CreateMaterial(1.0f);
+  material1.RegisterProperty( "uFadeColor", Color::RED );
+
+  Material material2 = CreateMaterial(1.0f);
+  material2.RegisterProperty( "uFadeColor", Color::GREEN );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, material1);
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  TestGlAbstraction& gl = application.GetGlAbstraction();
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect that the first material's fade color property is accessed
+  Vector4 actualValue(Vector4::ZERO);
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::RED, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( renderer.GetMaterial(), material1, TEST_LOCATION );
+
+  // set the second material to the renderer
+  renderer.SetMaterial( material2 );
+
+  application.SendNotification();
+  application.Render(0);
+
+  // Expect that the second material's fade color property is accessed
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", actualValue ) );
+  DALI_TEST_EQUALS( actualValue, Color::GREEN, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( renderer.GetMaterial(), material2, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliRendererSetGetDepthIndex(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test SetDepthIndex, GetCurrentDepthIndex");
+
+  Material material = CreateMaterial(1.0f);
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( renderer.GetCurrentDepthIndex(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 0, TEST_LOCATION );
+
+  renderer.SetDepthIndex(1);
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( renderer.GetCurrentDepthIndex(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 1, TEST_LOCATION );
+
+  renderer.SetDepthIndex(10);
+
+  application.SendNotification();
+  application.Render(0);
+  DALI_TEST_EQUALS( renderer.GetCurrentDepthIndex(), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 10, TEST_LOCATION );
+
+  END_TEST;
+}
 
 int UtcDaliRendererConstraint01(void)
 {

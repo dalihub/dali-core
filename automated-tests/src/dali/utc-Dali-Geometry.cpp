@@ -40,6 +40,38 @@ void TestConstraintNoBlue( Vector4& current, const PropertyInputContainer& input
   current.b = 0.0f;
 }
 
+struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
+
+PropertyBuffer CreateVertexBuffer( const std::string& aPosition, const std::string& aTexCoord )
+{
+  const float halfQuadSize = .5f;
+  TexturedQuadVertex texturedQuadVertexData[4] = {
+    { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
+    { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
+    { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
+    { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
+
+  Property::Map vertexFormat;
+  vertexFormat[aPosition] = Property::VECTOR2;
+  vertexFormat[aTexCoord] = Property::VECTOR2;
+
+  PropertyBuffer vertexData = PropertyBuffer::New( vertexFormat, 4 );
+  vertexData.SetData(texturedQuadVertexData);
+
+  return vertexData;
+}
+
+PropertyBuffer CreateIndexBuffer()
+{
+  unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+  Property::Map indexFormat;
+  indexFormat["indices"] = Property::UNSIGNED_INTEGER; // Should be Unsigned Short
+  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 3 );
+  indices.SetData(indexData);
+
+  return indices;
+}
+
 }
 
 
@@ -58,6 +90,33 @@ int UtcDaliGeometryNew02(void)
   TestApplication application;
   Geometry geometry;
   DALI_TEST_EQUALS( (bool)geometry, false, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliGeometryCopyConstructor(void)
+{
+  TestApplication application;
+
+  Geometry geometry = Geometry::New();
+
+  Geometry geometryCopy(geometry);
+
+  DALI_TEST_EQUALS( (bool)geometryCopy, true, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliGeometryAssignmentOperator(void)
+{
+  TestApplication application;
+
+  Geometry geometry = Geometry::New();
+
+  Geometry geometry2;
+  DALI_TEST_EQUALS( (bool)geometry2, false, TEST_LOCATION );
+
+  geometry2 = geometry;
+  DALI_TEST_EQUALS( (bool)geometry2, true, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -83,12 +142,335 @@ int UtcDaliGeometryDownCast02(void)
   END_TEST;
 }
 
-
-int UtcDaliGeometryConstraint01(void)
+int UtcDaliGeometryAddVertexBuffer(void)
 {
   TestApplication application;
 
-  tet_infoline("Test that a non-uniform geometry property can be constrained");
+  tet_infoline("Test AddVertexBuffer");
+
+  PropertyBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexBuffer1 );
+
+  Material material = CreateMaterial(1.f);
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor actor = Actor::New();
+  actor.SetSize(Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+
+  {
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+        application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( bufferDataCalls[0], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
+  }
+
+  // add the second vertex buffer
+  application.GetGlAbstraction().ResetBufferDataCalls();
+
+  PropertyBuffer vertexBuffer2 = CreateVertexBuffer( "aPosition2", "aTexCoord2" );
+  geometry.AddVertexBuffer( vertexBuffer2 );
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+
+  {
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+        application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 2u, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( bufferDataCalls[0], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
+    DALI_TEST_EQUALS( bufferDataCalls[1], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+int UtcDaliGeometryGetNumberOfVertexBuffers(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test GetNumberOfVertexBuffers");
+  PropertyBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
+  PropertyBuffer vertexBuffer2 = CreateVertexBuffer("aPosition2", "aTexCoord2" );
+  PropertyBuffer vertexBuffer3 = CreateVertexBuffer("aPosition3", "aTexCoord3" );
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexBuffer1 );
+  DALI_TEST_EQUALS( geometry.GetNumberOfVertexBuffers(), 1u, TEST_LOCATION );
+
+  geometry.AddVertexBuffer( vertexBuffer2 );
+  geometry.AddVertexBuffer( vertexBuffer3 );
+  DALI_TEST_EQUALS( geometry.GetNumberOfVertexBuffers(), 3u, TEST_LOCATION );
+
+  geometry.RemoveVertexBuffer( 2u );
+  DALI_TEST_EQUALS( geometry.GetNumberOfVertexBuffers(), 2u, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliGeometryRemoveVertexBuffer(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test RemoveVertexBuffer");
+
+  PropertyBuffer vertexBuffer1 = CreateVertexBuffer("aPosition1", "aTexCoord1" );
+  PropertyBuffer vertexBuffer2 = CreateVertexBuffer("aPosition2", "aTexCoord2" );
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexBuffer1 );
+
+  Material material = CreateMaterial(1.f);
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor actor = Actor::New();
+  actor.SetSize(Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  Stage::GetCurrent().Add(actor);
+
+  DALI_TEST_EQUALS( geometry.GetNumberOfVertexBuffers(), 1u, TEST_LOCATION );
+
+  geometry.RemoveVertexBuffer( 0 );
+  geometry.AddVertexBuffer( vertexBuffer2 );
+  DALI_TEST_EQUALS( geometry.GetNumberOfVertexBuffers(), 1u, TEST_LOCATION );
+
+  geometry.RemoveVertexBuffer( 0 );
+  DALI_TEST_EQUALS( geometry.GetNumberOfVertexBuffers(), 0u, TEST_LOCATION );
+
+  //Todo: test by checking the BufferDataCalls
+  // make sure the vertex buffer in actually removed from gl
+
+   END_TEST;
+}
+
+int UtcDaliGeometrySetIndexBuffer(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test SetIndexBuffer");
+
+  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+  PropertyBuffer indexBuffer = CreateIndexBuffer( );
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexBuffer );
+
+  Material material = CreateMaterial(1.f);
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor actor = Actor::New();
+  actor.SetSize(Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+
+  {
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+        application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( bufferDataCalls[0], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
+  }
+
+  // Set index buffer
+  application.GetGlAbstraction().ResetBufferDataCalls();
+
+  geometry.SetIndexBuffer( indexBuffer );
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+
+  {
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+        application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 2u, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( bufferDataCalls[0], 4*sizeof( TexturedQuadVertex ), TEST_LOCATION );
+    // should be unsigned short instead of unsigned int
+    DALI_TEST_EQUALS( bufferDataCalls[1], 6*sizeof( unsigned short ), TEST_LOCATION );
+  }
+
+
+  END_TEST;
+}
+
+int UtcDaliGeometrySetGetGeometryType(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test SetGeometryType and GetGeometryType");
+
+  unsigned int numVertex = 4u;
+  PropertyBuffer vertexBuffer = CreateVertexBuffer("aPosition", "aTexCoord" );
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( vertexBuffer );
+
+  Material material = CreateMaterial(1.f);
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor actor = Actor::New();
+  actor.SetSize(Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  Stage::GetCurrent().Add(actor);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  TraceCallStack& drawTrace = glAbstraction.GetDrawTrace();
+
+  /****************************************************/
+  // Default (TRIANGLES), no index buffer
+  drawTrace.Reset();
+  drawTrace.Enable(true);
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+  drawTrace.Enable( false );
+
+  // Test the default geometry type is GL_TRIANGLE
+  // no index buffer, call glDrawArrays,
+  DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawArrays" ), 2, TEST_LOCATION);
+  std::stringstream out;
+  out << GL_TRIANGLES << ", " << 0 << ", " << numVertex;
+  DALI_TEST_EQUALS( drawTrace.TestMethodAndParams(1, "DrawArrays", out.str()), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS( geometry.GetGeometryType(), Geometry::TRIANGLES, TEST_LOCATION);
+
+  /*********************************************************/
+  // LINES, no index buffer
+  geometry.SetGeometryType( Geometry::LINES );
+
+  drawTrace.Reset();
+  drawTrace.Enable(true);
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+  drawTrace.Enable( false );
+
+  // geometry type is set as GL_LINES
+  // no index buffer, call glDrawArrays,
+  DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawArrays" ), 2, TEST_LOCATION);
+  out.str("");
+  out << GL_LINES << ", " << 0 << ", " << numVertex;
+  DALI_TEST_EQUALS( drawTrace.TestMethodAndParams(1, "DrawArrays", out.str()), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS( geometry.GetGeometryType(), Geometry::LINES, TEST_LOCATION);
+
+  /*****************************************************/
+  //POINTS
+  geometry.SetGeometryType( Geometry::POINTS );
+
+  drawTrace.Reset();
+  drawTrace.Enable(true);
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+  drawTrace.Enable( false );
+
+  // geometry type is set as GL_POINTS
+  // no index buffer, call glDrawArrays,
+  DALI_TEST_EQUALS( drawTrace.CountMethod( "DrawArrays" ), 2, TEST_LOCATION);
+  out.str("");
+  out << GL_POINTS << ", " << 0 << ", " << numVertex;
+  DALI_TEST_EQUALS( drawTrace.TestMethodAndParams(1, "DrawArrays", out.str()), true, TEST_LOCATION);
+
+  DALI_TEST_EQUALS( geometry.GetGeometryType(), Geometry::POINTS, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliGeometrySetGetRequireDepthTesting(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test SetRequiresDepthTesting, GetRequiresDepthTesting");
+
+  Shader shader = Shader::New("VertexSource", "FragmentSource");
+  Material material = Material::New( shader );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  DALI_TEST_EQUALS( geometry.GetRequiresDepthTesting(), false, TEST_LOCATION );
+
+  geometry.SetRequiresDepthTesting(true);
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+  application.SendNotification();
+  application.Render();
+  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  std::ostringstream out;
+  out << GL_DEPTH_TEST;
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", out.str().c_str() ) );
+
+  DALI_TEST_EQUALS( geometry.GetRequiresDepthTesting(), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliGeometryPropertyRequiresDepthTest(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test SetRequiresDepthTesting, GetRequiresDepthTesting");
+
+  Shader shader = Shader::New("VertexSource", "FragmentSource");
+  Material material = Material::New( shader );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New( geometry, material );
+
+  Actor actor = Actor::New();
+  actor.AddRenderer(renderer);
+  actor.SetSize(400, 400);
+  Stage::GetCurrent().Add(actor);
+
+  DALI_TEST_EQUALS( geometry.GetProperty<bool>(Geometry::Property::REQUIRES_DEPTH_TEST), false, TEST_LOCATION );
+
+  geometry.SetProperty(Geometry::Property::REQUIRES_DEPTH_TEST, true );
+
+  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
+  glAbstraction.EnableCullFaceCallTrace(true);
+  application.SendNotification();
+  application.Render();
+  TraceCallStack& glEnableStack = glAbstraction.GetCullFaceTrace();
+  std::ostringstream out;
+  out << GL_DEPTH_TEST;
+  DALI_TEST_CHECK( glEnableStack.FindMethodAndParams( "Enable", out.str().c_str() ) );
+
+  DALI_TEST_EQUALS( geometry.GetProperty<bool>(Geometry::Property::REQUIRES_DEPTH_TEST), true, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliGeometryConstraint(void)
+{
+  TestApplication application;
+
+  tet_infoline("Test that a custom geometry property can be constrained");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );
@@ -192,7 +574,7 @@ int UtcDaliGeometryAnimatedProperty01(void)
 {
   TestApplication application;
 
-  tet_infoline("Test that a non-uniform geometry property can be animated");
+  tet_infoline("Test that a custom geometry property can be animated");
 
   Shader shader = Shader::New("VertexSource", "FragmentSource");
   Material material = Material::New( shader );

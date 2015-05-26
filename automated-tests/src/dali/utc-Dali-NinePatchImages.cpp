@@ -321,7 +321,7 @@ int UtcDaliNinePatchImageCreateCroppedBufferImage(void)
 
     DALI_TEST_EQUALS( newImage.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
 
-    DALI_TEST_EQUALS( newImage.GetBufferSize(), 36*4, TEST_LOCATION );
+    DALI_TEST_EQUALS( newImage.GetBufferSize(), 144u/* 36*4 */, TEST_LOCATION );
   }
   else
   {

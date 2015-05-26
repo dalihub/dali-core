@@ -53,7 +53,7 @@ public:
     NONE,                     ///< None of the faces should be culled
     CULL_BACK,                ///< Cull back face, back face should never be shown
     CULL_BACK_HINT,           ///< Cull back face hinting, will still display correctly if no culling is done
-    CULL_FONT,                ///< Cull front face, back face should never be shown
+    CULL_FRONT,               ///< Cull front face, back face should never be shown
     CULL_FRONT_HINT,          ///< Cull front face hinting, will still display correctly if no culling is done
     CULL_BACK_AND_FRONT,      ///< Cull back and front faces, if the geometry is composed of triangles none of the faces will be shown
     CULL_BACK_AND_FRONT_HINT, ///< Cull back and front hint, will still display correctly if no culling is done

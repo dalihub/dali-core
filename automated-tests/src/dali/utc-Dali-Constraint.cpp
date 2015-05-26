@@ -606,9 +606,9 @@ int UtcDaliConstraintTagP(void)
 
   Actor actor = Actor::New();
   Constraint constraint = Constraint::New< Vector3 >( actor, Actor::Property::POSITION, &BasicFunction< Vector3 > );
-  DALI_TEST_EQUALS( constraint.GetTag(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( constraint.GetTag(), 0u, TEST_LOCATION );
 
-  const int tag = 123;
+  const unsigned int tag = 123;
   constraint.SetTag( tag );
   DALI_TEST_EQUALS( constraint.GetTag(), tag, TEST_LOCATION );
 

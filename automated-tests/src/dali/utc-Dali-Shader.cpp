@@ -73,6 +73,27 @@ int UtcDaliShaderMethodNew02(void)
   END_TEST;
 }
 
+int UtcDaliShaderAssignmentOperator(void)
+{
+  TestApplication application;
+
+  Shader shader1 = Shader::New(VertexSource, FragmentSource);
+
+  Shader shader2;
+
+  DALI_TEST_CHECK(!(shader1 == shader2));
+
+  shader2 = shader1;
+
+  DALI_TEST_CHECK(shader1 == shader2);
+
+  shader2 = Shader::New(VertexSource, FragmentSource);;
+
+  DALI_TEST_CHECK(!(shader1 == shader2));
+
+  END_TEST;
+}
+
 int UtcDaliShaderDownCast01(void)
 {
   TestApplication application;
@@ -196,8 +217,6 @@ int UtcDaliShaderConstraint02(void)
 
   END_TEST;
 }
-
-
 
 int UtcDaliShaderAnimatedProperty01(void)
 {
