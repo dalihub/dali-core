@@ -312,6 +312,38 @@ int UtcPathConstrainerRemove(void)
 }
 
 //LinearConstrainer test cases
+int UtcLinearConstrainerDownCast(void)
+{
+  TestApplication application;
+  Dali::LinearConstrainer linearConstrainer = Dali::LinearConstrainer::New();
+
+  BaseHandle handle( linearConstrainer );
+  Dali::LinearConstrainer linearConstrainer2 = Dali::LinearConstrainer::DownCast( handle );
+  DALI_TEST_EQUALS( (bool)linearConstrainer2, true, TEST_LOCATION );
+
+  BaseHandle handle2;
+  Dali:: LinearConstrainer linearConstrainer3 = Dali::LinearConstrainer::DownCast( handle2 );
+  DALI_TEST_EQUALS( (bool)linearConstrainer3, false, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcLinearConstrainerCopyConstructor(void)
+{
+  TestApplication application;
+  Dali::LinearConstrainer linearConstrainer;
+  DALI_TEST_EQUALS( (bool)linearConstrainer, false, TEST_LOCATION );
+
+  linearConstrainer = Dali::LinearConstrainer::New();
+  DALI_TEST_EQUALS( (bool)linearConstrainer, true, TEST_LOCATION );
+
+  // call the copy constructor
+  Dali::LinearConstrainer linearConstrainer2( linearConstrainer );
+  DALI_TEST_EQUALS( (bool)linearConstrainer2, true, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcLinearConstrainerApply(void)
 {
   TestApplication application;

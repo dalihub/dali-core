@@ -189,6 +189,27 @@ int utcDaliPathGenerateControlPoints01(void)
   END_TEST;
 }
 
+int utcDaliPathGetPointCount(void)
+{
+  TestApplication application;
+  Dali::Path path = Dali::Path::New();
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 0, TEST_LOCATION);
+
+  path.AddPoint(Vector3( 50.0,  50.0, 0.0));
+  path.AddPoint(Vector3(120.0,  70.0, 0.0));
+  path.AddPoint(Vector3(190.0, 250.0, 0.0));
+  path.AddPoint(Vector3(260.0, 260.0, 0.0));
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 4, TEST_LOCATION);
+
+  path.AddPoint(Vector3(330.0, 220.0, 0.0));
+  path.AddPoint(Vector3(400.0,  50.0, 0.0));
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 6, TEST_LOCATION);
+  END_TEST;
+}
+
 int utcDaliPathGenerateControlPoints02(void)
 {
   TestApplication application;
@@ -330,7 +351,8 @@ int UtcDaliPathAssignment(void)
   Dali::Path path = Dali::Path::New();
   SetupPath(path);
 
-  Dali::Path path2 = path;
+  Dali::Path path2;
+  path2 = path;
   DALI_TEST_CHECK(path2);
 
   //t = 0
