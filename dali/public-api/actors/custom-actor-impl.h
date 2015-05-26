@@ -60,6 +60,8 @@ class DALI_IMPORT_API CustomActorImpl : public Dali::RefObject
 {
 public:
 
+  class Extension; ///< Forward declare future extension interface
+
   /**
    * @brief Virtual destructor.
    */
@@ -129,7 +131,7 @@ public:
    * @param[in] index The Property index that was set.
    * @param[in] propertyValue The value to set.
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) ;
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
 
   /**
    * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().
@@ -267,6 +269,16 @@ public:
    * @param[in] dimension The dimension that was just negotiated
    */
   virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) = 0;
+
+  /**
+   * Retrieve the extension for this control
+   *
+   * @return The extension if available, NULL otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
 
 protected: // For derived classes
 

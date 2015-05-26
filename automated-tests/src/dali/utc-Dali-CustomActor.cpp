@@ -1931,8 +1931,20 @@ int UtcDaliCustomActorTypeRegistry(void)
   catch( DaliException& e )
   {
     exception = e.condition;
-    DALI_TEST_EQUALS( exception, "handle && \"BaseObject handle is empty\"", NULL );
+    DALI_TEST_EQUALS( exception, "handle && \"BaseObject handle is empty\"", TEST_LOCATION );
   }
+
+  END_TEST;
+}
+
+
+int UtcDaliCustomActorGetExtensionP(void)
+{
+  TestApplication application;
+
+  TestCustomActor custom = TestCustomActor::NewVariant5();
+
+  DALI_TEST_CHECK( NULL == custom.GetImplementation().GetExtension() );
 
   END_TEST;
 }
