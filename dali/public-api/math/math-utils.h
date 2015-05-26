@@ -35,7 +35,7 @@ namespace Dali
  */
 inline unsigned int NextPowerOfTwo( unsigned int i )
 {
-  DALI_ASSERT_DEBUG(i <= 1u << (sizeof(unsigned) * 8 - 1) && "Return type cannot represent the next power of two greater than the argument.");
+  DALI_ASSERT_ALWAYS(i <= 1u << (sizeof(unsigned) * 8 - 1) && "Return type cannot represent the next power of two greater than the argument.");
   if(i==0u)
   {
     return 1u;

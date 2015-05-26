@@ -66,6 +66,7 @@ SET(TC_SOURCES
         utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyArray.cpp
         utc-Dali-PropertyNotification.cpp
+        utc-Dali-PropertyTypes.cpp
         utc-Dali-PropertyValue.cpp
         utc-Dali-Quaternion.cpp
         utc-Dali-Radian.cpp
@@ -85,6 +86,7 @@ SET(TC_SOURCES
         utc-Dali-TouchEventCombiner.cpp
         utc-Dali-TouchProcessing.cpp
         utc-Dali-TypeRegistry.cpp
+        utc-Dali-Uint16Pair.cpp
         utc-Dali-Vector.cpp
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp

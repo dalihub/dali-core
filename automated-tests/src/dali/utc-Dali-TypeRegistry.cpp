@@ -1006,6 +1006,11 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   typeInfo.GetPropertyIndices( indices );
   DALI_TEST_EQUALS( indices.size(), 1u, TEST_LOCATION );
 
+  // check property name count
+  TypeInfo::NameContainer names;
+  typeInfo.GetProperties(names);
+  DALI_TEST_CHECK( 1 == names.size() );
+
   // Ensure indices returned from actor and customActor differ by two
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );

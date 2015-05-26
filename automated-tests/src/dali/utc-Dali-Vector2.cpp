@@ -363,7 +363,7 @@ int UtcDaliVector2OperatorSubscriptN(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "index < 2", TEST_LOCATION);
+    DALI_TEST_ASSERT( e, "Vector element index out of bounds", TEST_LOCATION);
   }
 
   END_TEST;
@@ -394,7 +394,7 @@ int UtcDaliVector2OperatorConstSubscriptN(void)
   catch (Dali::DaliException& e)
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "index < 2" , TEST_LOCATION);
+    DALI_TEST_ASSERT( e, "Vector element index out of bounds" , TEST_LOCATION);
   }
 
 
