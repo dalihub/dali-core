@@ -1219,14 +1219,6 @@ public:
   float GetRelayoutSize( Dimension::Type dimension ) const;
 
   /**
-   * @brief Force propagate relayout flags through the tree. This actor and all actors
-   * dependent on it will have their relayout flags reset.
-   *
-   * This is useful for resetting layout flags during the layout process.
-   */
-  void PropagateRelayoutFlags();
-
-  /**
    * @brief Set the padding for use in layout
    *
    * @param[in] padding Padding for the actor

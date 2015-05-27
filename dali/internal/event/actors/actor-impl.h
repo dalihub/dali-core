@@ -985,11 +985,6 @@ public:
    */
   void RelayoutRequest( Dimension::Type dimension = Dimension::ALL_DIMENSIONS );
 
-  /*
-   * @copydoc Dali::Actor::PropagateRelayoutFlags
-   */
-  void PropagateRelayoutFlags();
-
   /**
    * @brief Determine if this actor is dependent on it's parent for relayout
    *

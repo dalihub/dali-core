@@ -4452,16 +4452,6 @@ void Actor::RelayoutRequest( Dimension::Type dimension )
   }
 }
 
-void Actor::PropagateRelayoutFlags()
-{
-  Internal::RelayoutController* relayoutController = Internal::RelayoutController::Get();
-  if( relayoutController )
-  {
-    Dali::Actor self( this );
-    relayoutController->PropagateFlags( self );
-  }
-}
-
 void Actor::OnCalculateRelayoutSize( Dimension::Type dimension )
 {
 }
