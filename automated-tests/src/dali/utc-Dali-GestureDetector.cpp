@@ -35,7 +35,7 @@ void utc_dali_gesture_detector_cleanup(void)
 }
 
 
-int UtcDaliGestureDetectorConstructorNegative(void)
+int UtcDaliGestureDetectorConstructorN(void)
 {
   TestApplication application;
 
@@ -55,7 +55,7 @@ int UtcDaliGestureDetectorConstructorNegative(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorConstructorPositive(void)
+int UtcDaliGestureDetectorConstructorP(void)
 {
   TestApplication application;
 
@@ -77,7 +77,32 @@ int UtcDaliGestureDetectorConstructorPositive(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDownCast(void)
+int UtcDaliGestureDetectorAssignP(void)
+{
+  TestApplication application;
+
+  // Use pan gesture as GestureDetector cannot be created.
+  GestureDetector detector = PanGestureDetector::New();
+  GestureDetector detector2;
+
+  detector2 = detector;
+
+  Actor actor = Actor::New();
+
+  try
+  {
+    detector2.Attach(actor);
+    tet_result(TET_PASS);
+  }
+  catch (DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+int UtcDaliGestureDetectorDownCastP(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::GestureDetector::DownCast()");
@@ -101,7 +126,7 @@ int UtcDaliGestureDetectorDownCast(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorAttachPositive(void)
+int UtcDaliGestureDetectorAttachP(void)
 {
   TestApplication application;
 
@@ -134,7 +159,7 @@ int UtcDaliGestureDetectorAttachPositive(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorAttachNegative(void)
+int UtcDaliGestureDetectorAttachN(void)
 {
   TestApplication application;
 
@@ -156,7 +181,7 @@ int UtcDaliGestureDetectorAttachNegative(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachPositive(void)
+int UtcDaliGestureDetectorDetachP(void)
 {
   TestApplication application;
 
@@ -191,7 +216,7 @@ int UtcDaliGestureDetectorDetachPositive(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachNegative01(void)
+int UtcDaliGestureDetectorDetachN01(void)
 {
   TestApplication application;
 
@@ -213,7 +238,7 @@ int UtcDaliGestureDetectorDetachNegative01(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachNegative02(void)
+int UtcDaliGestureDetectorDetachN02(void)
 {
   TestApplication application;
 
@@ -238,7 +263,7 @@ int UtcDaliGestureDetectorDetachNegative02(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachNegative03(void)
+int UtcDaliGestureDetectorDetachN03(void)
 {
   TestApplication application;
   TestGestureManager& gestureManager = application.GetGestureManager();
@@ -267,7 +292,7 @@ int UtcDaliGestureDetectorDetachNegative03(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachAll(void)
+int UtcDaliGestureDetectorDetachAllP(void)
 {
   TestApplication application;
 
@@ -295,7 +320,7 @@ int UtcDaliGestureDetectorDetachAll(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachAllNegative(void)
+int UtcDaliGestureDetectorDetachAllN(void)
 {
   TestApplication application;
   TestGestureManager& gestureManager = application.GetGestureManager();

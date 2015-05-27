@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <test-native-image.h>
 
 using namespace Dali;
 
@@ -340,6 +341,8 @@ int UtcDaliIntrusivePtrResetTN(void)
   END_TEST;
 }
 
+
+
 int UtcDaliIntrusivePtrOperatorBooleanTypeP(void)
 {
   tet_infoline( "Positive Test for Dali::IntrusivePtr::operator Booleantype()" );
@@ -347,6 +350,11 @@ int UtcDaliIntrusivePtrOperatorBooleanTypeP(void)
   IntrusivePtr<Counted> counted( new Counted );
   DALI_TEST_CHECK( counted.operator BooleanType() != 0 );
   DALI_TEST_CHECK( counted );
+
+  typedef void (IntrusivePtr<Counted>::*BoolIdiomFunc)() const;
+  BoolIdiomFunc func = static_cast<BoolIdiomFunc>( counted.operator BooleanType() );
+  ((counted).*func)(); // purely for test coverage
+
   counted.Reset();
   DALI_TEST_CHECK( counted.operator BooleanType() == 0 );
 
@@ -452,29 +460,3 @@ int UtcDaliIntrusivePtrOperatorNotEqualLeftPointerTU(void)
   DALI_TEST_EQUALS( operator!=( counted2.Get(), countedSubclass2 ), false, TEST_LOCATION );
   END_TEST;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

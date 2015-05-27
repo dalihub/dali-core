@@ -21,6 +21,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
+#include <test-intrusive-ptr.h>
 
 using namespace Dali;
 
@@ -32,6 +33,20 @@ void utc_dali_native_image_startup(void)
 void utc_dali_native_image_cleanup(void)
 {
   test_return_value = TET_PASS;
+}
+
+IntrusivePtr<TestNativeImage> Creator()
+{
+  return TestNativeImage::New(10,10);
+}
+
+int UtcDaliIntrusivePtrTestNativeImage(void)
+{
+  UtcCoverageIntrusivePtr<TestNativeImage> pointer;
+
+  pointer.Check(Creator);
+
+  END_TEST;
 }
 
 int UtcDaliNativeImageNew(void)

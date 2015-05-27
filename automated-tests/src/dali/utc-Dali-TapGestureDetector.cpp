@@ -151,7 +151,7 @@ int UtcDaliTapGestureDetectorCopyConstructorP(void)
 {
   TestApplication application;
 
-  TapGestureDetector detector = TapGestureDetector::New();;
+  TapGestureDetector detector = TapGestureDetector::New();
 
   TapGestureDetector copy( detector );
   DALI_TEST_CHECK( detector );
@@ -164,10 +164,11 @@ int UtcDaliTapGestureDetectorAssignmentOperatorP(void)
 
   TapGestureDetector detector = TapGestureDetector::New();;
 
-  TapGestureDetector copy = detector;
+  TapGestureDetector assign;
+  assign = detector;
   DALI_TEST_CHECK( detector );
 
-  DALI_TEST_CHECK( detector == copy );
+  DALI_TEST_CHECK( detector == assign );
   END_TEST;
 }
 

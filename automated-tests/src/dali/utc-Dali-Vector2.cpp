@@ -77,7 +77,7 @@ int UtcDaliVector2Constructor05P(void)
 {
   TestApplication application;
   Vector4 vec4(1.f,1.f,1.f,1.f);
-  Vector3 vec2(vec4);
+  Vector2 vec2(vec4);
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
   END_TEST;
@@ -113,6 +113,39 @@ int UtcDaliVector2CopyConstructor03P(void)
   vec2 = vec4;
   DALI_TEST_EQUALS(vec2.x, 1.0f, 0.001, TEST_LOCATION);
   DALI_TEST_EQUALS(vec2.y, 1.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVector2AssignP(void)
+{
+  TestApplication application;
+  Vector2 v1(10.0f, 20.0f);
+  Vector2 r0(11.0f, 22.0f);
+
+  v1 = r0;
+  DALI_TEST_EQUALS(v1, r0, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVector2AssignP02(void)
+{
+  TestApplication application;
+  Vector2 v1(10.0f, 20.0f);
+  Vector4 r0(11.0f, 22.0f, 33.f, 44.f);
+
+  v1 = r0;
+  DALI_TEST_EQUALS(v1, Vector2(r0.x, r0.y), TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliVector2AssignP03(void)
+{
+  TestApplication application;
+  Vector2 v1(10.0f, 20.0f);
+  Vector3 r0(11.0f, 22.0f, 33.f);
+
+  v1 = r0;
+  DALI_TEST_EQUALS(v1, Vector2(r0.x, r0.y), TEST_LOCATION);
   END_TEST;
 }
 
