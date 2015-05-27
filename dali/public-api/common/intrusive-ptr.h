@@ -184,6 +184,18 @@ public:
     return mPtr ? &IntrusivePtr::ThisIsSaferThanReturningVoidStar : 0;
   }
 
+  /**
+   * @brief Detach pointer from intrusive ptr counting.
+   *
+   * Use with care.
+   */
+  T* Detach()
+  {
+    T* ptr = mPtr;
+    mPtr = 0;
+    return ptr;
+  }
+
 private:
 
   /**

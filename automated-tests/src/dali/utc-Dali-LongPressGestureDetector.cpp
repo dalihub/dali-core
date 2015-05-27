@@ -147,7 +147,7 @@ Integration::LongPressGestureEvent GenerateLongPress(
 
 
 // Positive test case for a method
-int UtcDaliLongPressGestureDetectorConstructor(void)
+int UtcDaliLongPressGestureDetectorConstructorP(void)
 {
   TestApplication application;
 
@@ -171,9 +171,11 @@ int UtcDaliLongPressGestureDetectorAssignmentOperatorP(void)
 {
   TestApplication application;
 
-  LongPressGestureDetector detector = LongPressGestureDetector::New();;
+  LongPressGestureDetector detector;
+  detector = LongPressGestureDetector::New();;
 
-  LongPressGestureDetector copy = detector;
+  LongPressGestureDetector copy;
+  copy = detector;
   DALI_TEST_CHECK( detector );
 
   DALI_TEST_CHECK( detector == copy );
