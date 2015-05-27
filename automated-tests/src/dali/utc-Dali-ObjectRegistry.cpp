@@ -200,6 +200,19 @@ int UtcDaliObjectRegistryGet(void)
   END_TEST;
 }
 
+int UtcDaliObjectRegistryCopyConstructor(void)
+{
+  TestApplication application;
+  tet_printf(" copy consturctor ");
+
+  ObjectRegistry myRegistry;
+
+  ObjectRegistry anotherRegistry( myRegistry );
+
+  tet_result( TET_PASS );
+  END_TEST;
+}
+
 
 
 int UtcDaliObjectRegistrySignalActorCreated(void)
