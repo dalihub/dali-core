@@ -40,7 +40,7 @@ const unsigned int DEFAULT_BLENDING_OPTIONS( BlendingOptions().GetBitmask() );
 
 Material::Material()
 : mColor( Color::WHITE ),
-  mBlendColor( Color::WHITE ),
+  mBlendColor( Color::TRANSPARENT ),
   mFaceCullingMode(Dali::Material::NONE),
   mBlendingMode(Dali::BlendingMode::AUTO),
   mBlendingOptions( DEFAULT_BLENDING_OPTIONS ),

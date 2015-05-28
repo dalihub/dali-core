@@ -290,10 +290,9 @@ public:
    */
   void SetDefaultBlendColor()
   {
-    if( !mUsingDefaultBlendColor )
+    if( ! mUsingDefaultBlendColor )
     {
-      LOG_GL( "BlendColor %f %f %f %f\n", 0.0f, 0.0f, 0.0f, 0.0f );
-      CHECK_GL( mGlAbstraction, mGlAbstraction.BlendColor( 0.0f, 0.0f, 0.0f, 0.0f ) );
+      SetCustomBlendColor( Color::TRANSPARENT );
       mUsingDefaultBlendColor = true;
     }
   }
@@ -303,9 +302,13 @@ public:
    */
   void SetCustomBlendColor( const Vector4& color )
   {
-    LOG_GL( "BlendColor %f %f %f %f\n", color.r, color.g, color.b, color.a );
-    CHECK_GL( mGlAbstraction, mGlAbstraction.BlendColor(color.r, color.g, color.b, color.a) );
-    mUsingDefaultBlendColor = false;
+    if( mUsingDefaultBlendColor || mBlendColor != color )
+    {
+      LOG_GL( "BlendColor %f %f %f %f\n", color.r, color.g, color.b, color.a );
+      CHECK_GL( mGlAbstraction, mGlAbstraction.BlendColor( color.r, color.g, color.b, color.a ) );
+      mUsingDefaultBlendColor = false;
+      mBlendColor = color;
+    }
   }
 
   /**
@@ -1763,6 +1766,7 @@ private: // Data
   bool mScissorTestEnabled;
   bool mStencilBufferEnabled;
   bool mClearColorSet;
+  bool mUsingDefaultBlendColor;
 
   // glBindBuffer() state
   GLuint mBoundArrayBufferId;        ///< The ID passed to glBindBuffer(GL_ARRAY_BUFFER)
@@ -1774,7 +1778,7 @@ private: // Data
   GLuint mBound2dTextureId[ MAX_TEXTURE_UNITS ];  ///< The ID passed to glBindTexture(GL_TEXTURE_2D)
 
   // glBlendColor() state
-  bool mUsingDefaultBlendColor;
+  Vector4 mBlendColor; ///< Blend color
 
   // glBlendFuncSeparate() state
   GLenum mBlendFuncSeparateSrcRGB;   ///< The srcRGB parameter passed to glBlendFuncSeparate()
