@@ -396,3 +396,10 @@ int UtcDaliConstraintsLookAt(void)
   END_TEST;
 }
 ///////////////////////////////////////////////////////////////////////////////
+
+int UtcDaliPropertyInputGetExtension(void)
+{
+  PropertyInputImpl input( Property::BOOLEAN );
+  DALI_TEST_CHECK( input.GetExtension() == NULL );
+  END_TEST;
+}

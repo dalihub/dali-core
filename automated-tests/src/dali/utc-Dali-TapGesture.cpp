@@ -73,3 +73,14 @@ int UtcDaliTapGestureAssignment(void)
   DALI_TEST_EQUALS(Gesture::Tap, gesture2.type, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliTapGestureDynamicAllocation(void)
+{
+  TapGesture* gesture = new TapGesture;
+  DALI_TEST_EQUALS(1u, gesture->numberOfTouches, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, gesture->numberOfTaps, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Tap, gesture->type, TEST_LOCATION);
+  delete gesture;
+
+  END_TEST;
+}

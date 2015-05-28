@@ -93,3 +93,15 @@ int UtcDaliPinchGestureAssignment(void)
   DALI_TEST_EQUALS(Gesture::Pinch, gesture.type, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliPinchGestureDynamicAllocation(void)
+{
+  PinchGesture* gesture = new PinchGesture( Gesture::Started );
+  DALI_TEST_EQUALS(Gesture::Started, gesture->state, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.0f, gesture->scale, TEST_LOCATION);
+  DALI_TEST_EQUALS(0.0f, gesture->speed, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Pinch, gesture->type, TEST_LOCATION);
+  delete gesture;
+
+  END_TEST;
+}

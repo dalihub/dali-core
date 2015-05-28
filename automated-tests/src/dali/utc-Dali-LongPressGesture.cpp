@@ -70,3 +70,13 @@ int UtcDaliLongPressGestureAssignment(void)
   DALI_TEST_EQUALS(Gesture::Started, gesture2.state, TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliLongPressGestureDynamicAllocation(void)
+{
+  LongPressGesture* gesture = new LongPressGesture( Gesture::Started );
+  DALI_TEST_EQUALS(1u, gesture->numberOfTouches, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::LongPress, gesture->type, TEST_LOCATION);
+  delete gesture;
+
+  END_TEST;
+}
