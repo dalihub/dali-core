@@ -28,6 +28,11 @@
 namespace Dali
 {
 
+namespace Integration
+{
+class RenderController;
+}
+
 namespace Internal
 {
 
@@ -43,8 +48,9 @@ public:
   /**
    * @brief Constructor.
    * We should only create a unique instance.
+   * @param[in] controller to request a render from the RenderController if core is not processing events.
    */
-  RelayoutController();
+  RelayoutController( Integration::RenderController& controller );
 
   /**
    * Destructor
@@ -110,6 +116,13 @@ public:
    * @return Return true if the relayout controller is currently performing a relayout
    */
   bool IsPerformingRelayout() const;
+
+  /**
+   * @brief Sets whether core is processing events.
+   *
+   * @param[in] processingEvents whether core is processing events.
+   */
+  void SetProcessingCoreEvents( bool processingEvents );
 
 public: // CALLBACKS
 
@@ -187,6 +200,7 @@ private:
 
 private:
 
+  Integration::RenderController& mRenderController;
   MemoryPoolObjectAllocator< MemoryPoolRelayoutContainer::RelayoutInfo > mRelayoutInfoAllocator;
 
   SlotDelegate< RelayoutController > mSlotDelegate;
@@ -197,6 +211,7 @@ private:
   bool mRelayoutFlag : 1;               ///< Relayout flag to avoid unnecessary calls
   bool mEnabled : 1;                    ///< Initially disabled. Must be enabled at some point.
   bool mPerformingRelayout : 1;         ///< The relayout controller is currently performing a relayout
+  bool mProcessingCoreEvents : 1;       ///< Whether core is processing events.
 
 };
 
