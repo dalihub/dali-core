@@ -456,7 +456,7 @@ int UtcDaliBaseHandleGetTypeNameN(void)
   FakeObject object;
   std::string typeName = object.GetTypeName();
 
-  DALI_TEST_CHECK( typeName == Dali::String::EMPTY );
+  DALI_TEST_CHECK( typeName.empty() );
   END_TEST;
 }
 

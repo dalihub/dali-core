@@ -124,14 +124,6 @@ static const float ONE80_OVER_PI = 180.0f/Dali::Math::PI; ///< Constant used to 
 
 } // namespace Math
 
-/**
- * @brief String Constants
- */
-namespace String
-{
-extern const std::string EMPTY; ///< The empty string
-}
-
 } // namespace Dali
 
 #endif // __DALI_CONSTANTS_H__

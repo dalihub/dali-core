@@ -247,7 +247,9 @@ const std::string& ImageFactory::GetRequestPath( const ImageFactoryCache::Reques
     return request->url;
   }
 
-  return String::EMPTY;
+  // Only create empty string if required
+  static std::string empty;
+  return empty;
 }
 
 const ImageAttributes& ImageFactory::GetActualAttributes( const ResourceTicketPtr& ticket ) const
