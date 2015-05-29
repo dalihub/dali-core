@@ -26,6 +26,7 @@ SET(TC_SOURCES
         utc-Dali-Internal-FixedSizeMemoryPool.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
         utc-Dali-Internal-RelayoutController.cpp
+        utc-Dali-Internal-FrustumCulling.cpp
 )
 
 LIST(APPEND TC_SOURCES

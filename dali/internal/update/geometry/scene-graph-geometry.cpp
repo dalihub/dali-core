@@ -27,6 +27,7 @@ Geometry::Geometry()
 : mIndexBuffer( NULL ),
   mCenter(),
   mHalfExtents(),
+  mRadius( 0.0f ),
   mGeometryType(Dali::Geometry::TRIANGLES),
   mRequiresDepthTest(false)
 {
@@ -45,6 +46,7 @@ Geometry::~Geometry()
 void Geometry::AddVertexBuffer( PropertyBuffer* vertexBuffer )
 {
   mVertexBuffers.PushBack( vertexBuffer );
+  CalculateExtents( vertexBuffer );
   vertexBuffer->AddUniformMapObserver(*this);
   mConnectionObservers.ConnectionsChanged(*this);
 }
@@ -120,10 +122,138 @@ void Geometry::ResetDefaultProperties( BufferIndex updateBufferIndex )
   // Reset the animated properties
   mCenter.ResetToBaseValue( updateBufferIndex );
   mHalfExtents.ResetToBaseValue( updateBufferIndex );
+  mRadius.ResetToBaseValue( updateBufferIndex );
 
   // Age the double buffered properties
   mGeometryType.CopyPrevious(updateBufferIndex);
   mRequiresDepthTest.CopyPrevious(updateBufferIndex);
+}
+
+void Geometry::CalculateExtents( PropertyBuffer* vertexBuffer )
+{
+  // TODO calculate extents for all vertex buffers attached to geometry
+  unsigned int elementIndex = 0;
+  unsigned int elementCount = vertexBuffer->GetElementCount( 0 );
+  unsigned int elementCount1 = vertexBuffer->GetElementCount( 1 );
+
+  // Select the double buffered element list that is the largest...
+  if ( elementCount < elementCount1 )
+  {
+    elementCount = elementCount1;
+    elementIndex = 1;
+  }
+
+  unsigned int attributeCount = vertexBuffer->GetAttributeCount( elementIndex );
+  unsigned int elementSize = vertexBuffer->GetElementSize( elementIndex );
+
+  std::string posName( "aPos" );
+  std::size_t found;
+
+  float left = 0.0f;
+  float right = 0.0f;
+  float top = 0.0f;
+  float bottom = 0.0f;
+
+  // Find the position attribute index
+  for ( unsigned int i = 0; i < attributeCount; ++i )
+  {
+    found = vertexBuffer->GetAttributeName( 0, i ).find( posName );
+    if ( found != std::string::npos )
+    {
+      unsigned int offset = vertexBuffer->GetAttributeOffset( elementIndex, i );
+      const PropertyBufferDataProvider::BufferType& data = vertexBuffer->GetData( elementIndex );
+
+      // Check attribute type to determine correct position type
+      Property::Type positionType = vertexBuffer->GetAttributeType( elementIndex, i );
+      Vector3 halfExtents;
+      Vector3 center;
+      switch ( positionType )
+      {
+        case Property::VECTOR2:
+        {
+          for ( unsigned int j = 0; j < elementCount; ++j )
+          {
+            const Vector2* position = reinterpret_cast< const Vector2* >( &data[ offset ] );
+            offset += elementSize;
+
+            if ( position->x < left )
+            {
+              left = position->x;
+            }
+            if ( position->x > right )
+            {
+              right = position->x;
+            }
+            if ( position->y < top )
+            {
+              top = position->y;
+            }
+            if ( position->y > bottom )
+            {
+              bottom = position->y;
+            }
+          }
+
+          halfExtents = Vector3( ( right - left ) * 0.5f, ( bottom - top ) * 0.5f, 0.0f );
+          center = Vector3( halfExtents.x + left , halfExtents.y + top, 0.0f );
+          break;
+        }
+        case Property::VECTOR3:
+        {
+          float near = 0.0f;
+          float far = 0.0f;
+          for ( unsigned int j = 0; j < elementCount; ++j )
+          {
+            const Vector3* position = reinterpret_cast< const Vector3* >( &data[ offset ] );
+            offset += elementSize;
+
+            if ( position->x < left )
+            {
+              left = position->x;
+            }
+            if ( position->x > right )
+            {
+              right = position->x;
+            }
+            if ( position->y < top )
+            {
+              top = position->y;
+            }
+            if ( position->y > bottom )
+            {
+              bottom = position->y;
+            }
+            if ( position->z > far )
+            {
+              far = position->z;
+            }
+            if ( position->z < near )
+            {
+              near = position->z;
+            }
+          }
+          halfExtents = Vector3( ( right - left ) * 0.5f, ( bottom - top ) * 0.5f, ( far - near ) * 0.5f );
+          center = Vector3( halfExtents.x + left , halfExtents.y + top, halfExtents.z + near );
+          break;
+        }
+        default:
+        {
+          break;
+        }
+      }
+      mCenter.Bake( 0, center );
+      mCenter.Bake( 1, center );
+      mHalfExtents.Bake( 0, halfExtents );
+      mHalfExtents.Bake( 1, halfExtents );
+
+      float radius = halfExtents.x;
+      if ( radius < halfExtents.y )
+      {
+        radius = halfExtents.y;
+      }
+      mRadius.SetInitial( radius );
+    }
+  }
 }
 
 void Geometry::ConnectToSceneGraph( SceneController& sceneController, BufferIndex bufferIndex )

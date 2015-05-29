@@ -281,6 +281,14 @@ public:
   const Matrix& GetViewMatrix( BufferIndex bufferIndex ) const;
 
   /**
+   * @brief Retrieve the camera attachment.
+   * @pre GetCameraNode() returns a node with valid CameraAttachment.
+   *
+   * @return The camera attachment.
+   */
+  SceneGraph::CameraAttachment& GetCameraAttachment() const;
+
+  /**
    * Retrieve the projection-matrix; this is double buffered for input handling.
    * @pre GetCameraNode() returns a node with valid CameraAttachment.
    * @param[in] bufferIndex The buffer to read from.

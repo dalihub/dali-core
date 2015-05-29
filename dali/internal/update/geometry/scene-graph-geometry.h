@@ -150,15 +150,24 @@ protected: // From PropertyOwner
   virtual void ResetDefaultProperties( BufferIndex updateBufferIndex );
 
 private:
+
+  /**
+   * @brief Calculate the extents of geometry contained in a vertex buffer.
+   *
+   * @param[in] vertexBuffer pointer to a vertex buffer.
+   */
+  void CalculateExtents( PropertyBuffer* vertexBuffer );
+
   Vector<PropertyBuffer*> mVertexBuffers; ///< The vertex buffers
   PropertyBuffer* mIndexBuffer;  ///< The index buffer if required
   ConnectionChangePropagator mConnectionObservers;
 
 public: // Properties
-  AnimatableProperty<Vector3>  mCenter;
-  AnimatableProperty<Vector3>  mHalfExtents;
-  DoubleBufferedProperty<int>  mGeometryType;
-  DoubleBufferedProperty<bool> mRequiresDepthTest;
+  AnimatableProperty<Vector3>   mCenter;
+  AnimatableProperty<Vector3>   mHalfExtents;
+  AnimatableProperty<float>     mRadius;
+  DoubleBufferedProperty<int>   mGeometryType;
+  DoubleBufferedProperty<bool>  mRequiresDepthTest;
 };
 
 inline void AddVertexBufferMessage( EventThreadServices& eventThreadServices , const Geometry& geometry, const PropertyBuffer& vertexBuffer )
