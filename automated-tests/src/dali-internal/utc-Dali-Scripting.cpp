@@ -624,7 +624,7 @@ int UtcDaliScriptingNewActorNegative(void)
     map[ "signals" ] = Property::MAP;
     Actor handle = NewActor( map );
     DALI_TEST_CHECK( handle );
-    DALI_TEST_CHECK( !handle.MouseWheelEventSignal().GetConnectionCount() );
+    DALI_TEST_CHECK( !handle.WheelEventSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.OffStageSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.OnStageSignal().GetConnectionCount() );
     DALI_TEST_CHECK( !handle.TouchedSignal().GetConnectionCount() );

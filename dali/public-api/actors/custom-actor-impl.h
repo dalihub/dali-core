@@ -40,7 +40,7 @@ class RelayoutContainer;
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
-struct MouseWheelEvent;
+struct WheelEvent;
 struct Vector2;
 struct Vector3;
 
@@ -175,13 +175,13 @@ public:
   virtual bool OnKeyEvent(const KeyEvent& event) = 0;
 
   /**
-   * @brief Called after a mouse-wheel-event is received by the owning actor.
+   * @brief Called after a wheel-event is received by the owning actor.
    *
-   * @note This must be enabled during construction; see CustomActorImpl::SetRequiresMouseWheelEvents(bool)
-   * @param[in] event The mouse wheel event.
+   * @note This must be enabled during construction; see CustomActorImpl::SetRequiresWheelEvents(bool)
+   * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event) = 0;
+  virtual bool OnWheelEvent(const WheelEvent& event) = 0;
 
   /**
    * @brief Called after the size negotiation has been finished for this control.
@@ -289,7 +289,7 @@ protected: // For derived classes
     DISABLE_SIZE_NEGOTIATION      = 1 << 0,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
     REQUIRES_TOUCH_EVENTS         = 1 << 1,     ///< True if the OnTouchEvent() callback is required.
     REQUIRES_HOVER_EVENTS         = 1 << 2,     ///< True if the OnHoverEvent() callback is required.
-    REQUIRES_MOUSE_WHEEL_EVENTS   = 1 << 3,     ///< True if the OnMouseWheelEvent() callback is required.
+    REQUIRES_WHEEL_EVENTS   = 1 << 3,     ///< True if the OnWheelEvent() callback is required.
 
     LAST_ACTOR_FLAG                             ///< Special marker for last actor flag
   };
@@ -380,9 +380,9 @@ public: // Not intended for application developers
 
   /**
    * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
-   * @return True if the OnMouseWheelEvent() callback is required.
+   * @return True if the OnWheelEvent() callback is required.
    */
-  bool RequiresMouseWheelEvents() const;
+  bool RequiresWheelEvents() const;
 
   /**
    * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.

@@ -38,7 +38,6 @@ SET(TC_SOURCES
         utc-Dali-MathUtils.cpp
         utc-Dali-Matrix.cpp
         utc-Dali-Matrix3.cpp
-        utc-Dali-MouseWheelEvent.cpp
         utc-Dali-NativeImage.cpp
         utc-Dali-NinePatchImages.cpp
         utc-Dali-ObjectRegistry.cpp
@@ -75,6 +74,7 @@ SET(TC_SOURCES
         utc-Dali-Vector2.cpp
         utc-Dali-Vector3.cpp
         utc-Dali-Vector4.cpp
+        utc-Dali-WheelEvent.cpp
 )
 
 LIST(APPEND TC_SOURCES

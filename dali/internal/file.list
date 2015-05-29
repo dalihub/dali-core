@@ -57,7 +57,7 @@ internal_src_files = \
   $(internal_src_dir)/event/events/hover-event-processor.cpp \
   $(internal_src_dir)/event/events/long-press-gesture-detector-impl.cpp \
   $(internal_src_dir)/event/events/long-press-gesture-processor.cpp \
-  $(internal_src_dir)/event/events/mouse-wheel-event-processor.cpp \
+  $(internal_src_dir)/event/events/wheel-event-processor.cpp \
   $(internal_src_dir)/event/events/multi-point-event-util.cpp \
   $(internal_src_dir)/event/events/pan-gesture-detector-impl.cpp \
   $(internal_src_dir)/event/events/pan-gesture-processor.cpp \

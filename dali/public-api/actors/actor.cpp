@@ -543,9 +543,9 @@ Actor::HoverSignalType& Actor::HoveredSignal()
   return GetImplementation(*this).HoveredSignal();
 }
 
-Actor::MouseWheelEventSignalType& Actor::MouseWheelEventSignal()
+Actor::WheelEventSignalType& Actor::WheelEventSignal()
 {
-  return GetImplementation(*this).MouseWheelEventSignal();
+  return GetImplementation(*this).WheelEventSignal();
 }
 
 Actor::OnStageSignalType& Actor::OnStageSignal()

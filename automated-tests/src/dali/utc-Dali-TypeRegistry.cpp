@@ -228,7 +228,7 @@ struct MyTestCustomActor : public CustomActorImpl
   {
     return true;
   }
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event)
+  virtual bool OnWheelEvent(const WheelEvent& event)
   {
     return true;
   }

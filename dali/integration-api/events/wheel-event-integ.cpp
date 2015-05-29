@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/integration-api/events/mouse-wheel-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 
 namespace Dali
 {
@@ -24,27 +24,29 @@ namespace Dali
 namespace Integration
 {
 
-MouseWheelEvent::MouseWheelEvent()
-: Event(MouseWheel),
-  direction(0),
-  modifiers(0),
-  point(Vector2::ZERO),
-  z(0),
-  timeStamp(0)
+WheelEvent::WheelEvent()
+: Event( Wheel ),
+  type( MOUSE_WHEEL ),
+  direction( 0 ),
+  modifiers( 0 ),
+  point( Vector2::ZERO ),
+  z( 0 ),
+  timeStamp( 0 )
 {
 }
 
-MouseWheelEvent::MouseWheelEvent(int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp)
-: Event(MouseWheel),
-  direction(direction),
-  modifiers(modifiers),
-  point(point),
-  z(z),
-  timeStamp(timeStamp)
+WheelEvent::WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp )
+: Event( Wheel ),
+  type( type ),
+  direction( direction ),
+  modifiers( modifiers ),
+  point( point ),
+  z( z ),
+  timeStamp( timeStamp )
 {
 }
 
-MouseWheelEvent::~MouseWheelEvent()
+WheelEvent::~WheelEvent()
 {
 }
 

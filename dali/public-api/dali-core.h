@@ -56,7 +56,7 @@
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
 #include <dali/public-api/events/long-press-gesture.h>
-#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/events/wheel-event.h>
 #include <dali/public-api/events/pan-gesture-detector.h>
 #include <dali/public-api/events/pan-gesture.h>
 #include <dali/public-api/events/pinch-gesture-detector.h>

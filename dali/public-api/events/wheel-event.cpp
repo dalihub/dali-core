@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/events/mouse-wheel-event.h>
+#include <dali/public-api/events/wheel-event.h>
 
 namespace Dali
 {
@@ -29,29 +29,31 @@ const unsigned int MODIFIER_ALT   = 0x4;
 
 }
 
-MouseWheelEvent::MouseWheelEvent()
-: direction(0),
-  modifiers(0),
-  point(Vector2::ZERO),
-  z(0),
-  timeStamp(0)
+WheelEvent::WheelEvent()
+: type( MOUSE_WHEEL ),
+  direction( 0 ),
+  modifiers( 0 ),
+  point( Vector2::ZERO ),
+  z( 0 ),
+  timeStamp( 0 )
 {
 }
 
-MouseWheelEvent::MouseWheelEvent(int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp)
-: direction(direction),
-  modifiers(modifiers),
-  point(point),
-  z(z),
-  timeStamp(timeStamp)
+WheelEvent::WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp )
+: type( type ),
+  direction( direction ),
+  modifiers( modifiers ),
+  point( point ),
+  z( z ),
+  timeStamp( timeStamp )
 {
 }
 
-MouseWheelEvent::~MouseWheelEvent()
+WheelEvent::~WheelEvent()
 {
 }
 
-bool MouseWheelEvent::IsShiftModifier() const
+bool WheelEvent::IsShiftModifier() const
 {
   if ((MODIFIER_SHIFT & modifiers) == MODIFIER_SHIFT)
   {
@@ -61,7 +63,7 @@ bool MouseWheelEvent::IsShiftModifier() const
   return false;
 }
 
-bool MouseWheelEvent::IsCtrlModifier() const
+bool WheelEvent::IsCtrlModifier() const
 {
   if ((MODIFIER_CTRL & modifiers) == MODIFIER_CTRL)
   {
@@ -71,7 +73,7 @@ bool MouseWheelEvent::IsCtrlModifier() const
   return false;
 }
 
-bool MouseWheelEvent::IsAltModifier() const
+bool WheelEvent::IsAltModifier() const
 {
   if ((MODIFIER_ALT & modifiers) == MODIFIER_ALT)
   {
