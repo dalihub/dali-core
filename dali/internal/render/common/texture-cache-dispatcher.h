@@ -22,7 +22,7 @@
 #include <stdint.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/images/native-image-interface.h>
+#include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/pixel.h>
 #include <dali/internal/common/message.h>

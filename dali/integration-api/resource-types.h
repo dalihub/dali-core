@@ -25,7 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/vector-wrapper.h>
-#include <dali/devel-api/images/image-operations.h>
+#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/uint-16-pair.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/integration-api/resource-declarations.h>
