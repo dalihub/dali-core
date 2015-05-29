@@ -23,7 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
-#include <dali/devel-api/images/image-operations.h>
+#include <dali/public-api/images/image-operations.h>
 #include <dali/public-api/math/uint-16-pair.h>
 
 namespace Dali

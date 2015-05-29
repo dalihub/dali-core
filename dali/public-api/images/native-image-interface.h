@@ -18,6 +18,9 @@
  *
  */
 
+// EXTERNAL INCLUDES
+#include <cstddef>
+
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 
@@ -32,6 +35,8 @@ namespace Dali
 class NativeImageInterface : public Dali::RefObject
 {
 public:
+
+  class Extension; ///< Forward declare future extension interface
 
   /**
    * @brief Create the GL resource for the NativeImage.
@@ -84,6 +89,16 @@ public:
   * Query whether blending is required
   */
   virtual bool RequiresBlending() const = 0;
+
+  /**
+   * @brief Retrieve the extension for the interface.
+   *
+   * @return The extension if available, NULL otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
 
 protected:
 
