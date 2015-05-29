@@ -188,7 +188,7 @@ public:
    * @param[in] attributes The attributes with which to perfrom this action.
    * @return true if action was done
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes);
+  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
 
   /**
    * This callback is intended for internal use only, to avoid the overhead of using a signal.

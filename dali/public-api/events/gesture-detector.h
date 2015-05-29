@@ -117,12 +117,20 @@ public: // Actor related
   void DetachAll();
 
   /**
-   * @brief Returns a vector of actors attached to the gesture detector.
+   * @brief Returns the number of actors attached to the gesture detector.
    *
-   * @return The attached actor vector.
+   * @return The count
    * @pre The gesture detector has been initialized.
    */
-  std::vector<Actor> GetAttachedActors() const;
+  size_t GetAttachedActorCount() const;
+
+  /**
+   * @brief Returns an actor by index. An empty handle if the index is not valid.
+   *
+   * @return The attached actor or an empty handle.
+   * @pre The gesture detector has been initialized.
+   */
+  Actor GetAttachedActor(size_t index) const;
 
 protected:
 

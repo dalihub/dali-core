@@ -453,11 +453,11 @@ unsigned int RenderTask::GetDefaultPropertyCount() const
 
 void RenderTask::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
-  indices.reserve( DEFAULT_PROPERTY_COUNT );
+  indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
   for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    indices.push_back( i );
+    indices.PushBack( i );
   }
 }
 

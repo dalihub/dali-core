@@ -76,19 +76,34 @@ public:
   Dali::TypeInfo::CreateFunction GetCreator() const;
 
   /**
-   * @copydoc Dali::TypeInfo::GetActions
+   * @copydoc Dali::TypeInfo::GetActionCount
    */
-  void GetActions( Dali::TypeInfo::NameContainer& container ) const;
+  size_t GetActionCount() const;
 
   /**
-   * @copydoc Dali::TypeInfo::GetSignals
+   * @copydoc Dali::TypeInfo::GetActionName
    */
-  void GetSignals( Dali::TypeInfo::NameContainer& container) const;
+  std::string GetActionName(size_t index) const;
 
   /**
-   * @copydoc Dali::TypeInfo::GetProperties
+   * @copydoc Dali::TypeInfo::GetSignalCount
    */
-  void GetProperties( Dali::TypeInfo::NameContainer& container) const;
+  size_t GetSignalCount() const;
+
+  /**
+   * @copydoc Dali::TypeInfo::GetSignalName
+   */
+  std::string GetSignalName(size_t index) const;
+
+  /**
+   * @copydoc Dali::TypeInfo::GetPropertyCount
+   */
+  size_t GetPropertyCount() const;
+
+  /**
+   * @copydoc Dali::TypeInfo::GetPropertyName
+   */
+  std::string GetPropertyName(size_t index) const;
 
   /**
    * Adds the property indices to the container specified.
@@ -148,7 +163,7 @@ public:
    * @param [in] properties The arguments of the action
    * @return bool If the action could be executed
    */
-  bool DoActionTo(BaseObject *object, const std::string &actionName, const std::vector<Property::Value> &properties);
+  bool DoActionTo(BaseObject *object, const std::string &actionName, const Property::Map &properties);
 
   /**
    * Connects a callback function with the object's signals.
@@ -160,12 +175,6 @@ public:
    * @post If a signal was connected, ownership of functor was passed to CallbackBase. Otherwise the caller is responsible for deleting the unused functor.
    */
   bool ConnectSignal( BaseObject* object, ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functor );
-
-  /**
-   * Retrieve the property count for this type.
-   * @return The total number of properties.
-   */
-  unsigned int GetPropertyCount() const;
 
   /**
    * Given a property name, retrieve the index.

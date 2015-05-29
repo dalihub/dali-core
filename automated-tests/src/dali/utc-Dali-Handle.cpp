@@ -719,8 +719,8 @@ int UtcDaliHandleGetPropertyIndices(void)
   // Actor
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( ! indices.empty() );
-  DALI_TEST_EQUALS( indices.size(), actor.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() );
+  DALI_TEST_EQUALS( indices.Size(), actor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 

@@ -57,7 +57,7 @@ BaseHandle& BaseHandle::operator=(const BaseHandle& rhs)
   return *this;
 }
 
-bool BaseHandle::DoAction(const std::string& command, const std::vector<Property::Value>& attributes)
+bool BaseHandle::DoAction(const std::string& command, const Property::Map& attributes)
 {
   return GetImplementation(*this).DoAction( command, attributes );
 }

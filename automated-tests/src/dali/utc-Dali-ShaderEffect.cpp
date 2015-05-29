@@ -893,8 +893,8 @@ int UtcDaliShaderEffectPropertyIndices(void)
 
   Property::IndexContainer indices;
   effect.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( ! indices.empty() );
-  DALI_TEST_EQUALS( indices.size(), effect.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() );
+  DALI_TEST_EQUALS( indices.Size(), effect.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 

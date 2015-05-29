@@ -441,7 +441,7 @@ int UtcDaliLayerDefaultProperties(void)
 
   Layer actor = Layer::New();
 
-  std::vector<Property::Index> indices ;
+  std::vector<Property::Index> indices;
   indices.push_back(Layer::Property::CLIPPING_ENABLE);
   indices.push_back(Layer::Property::CLIPPING_BOX);
 
@@ -463,7 +463,7 @@ int UtcDaliLayerDefaultProperties(void)
 
   actor.SetProperty(Layer::Property::CLIPPING_BOX, Property::Value(Rect<int>(testBox)));
 
-  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::Property::CLIPPING_BOX)) ;
+  DALI_TEST_CHECK(Property::RECTANGLE == actor.GetPropertyType(Layer::Property::CLIPPING_BOX));
 
   Property::Value v = actor.GetProperty(Layer::Property::CLIPPING_BOX);
 
@@ -508,8 +508,8 @@ int UtcDaliLayerPropertyIndices(void)
 
   Property::IndexContainer indices;
   layer.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
-  DALI_TEST_EQUALS( indices.size(), layer.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.Size(), layer.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 

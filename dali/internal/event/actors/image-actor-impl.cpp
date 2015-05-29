@@ -250,12 +250,12 @@ void ImageActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) 
 {
   RenderableActor::GetDefaultPropertyIndices( indices ); // RenderableActor class properties
 
-  indices.reserve( indices.size() + DEFAULT_PROPERTY_COUNT );
+  indices.Reserve( indices.Size() + DEFAULT_PROPERTY_COUNT );
 
   int index = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
   for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
   {
-    indices.push_back( index );
+    indices.PushBack( index );
   }
 }
 

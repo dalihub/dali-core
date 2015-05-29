@@ -83,7 +83,6 @@ public:
 
   // Directional Pan
   typedef std::pair< Radian, Radian > AngleThresholdPair; ///< Range of angles for a direction
-  typedef std::vector< AngleThresholdPair > AngleContainer; ///< Group of angular thresholds for all directions
 
   static const Radian DIRECTION_LEFT;       ///< For a left pan (-PI Radians).
   static const Radian DIRECTION_RIGHT;      ///< For a right pan (0 Radians).
@@ -238,12 +237,21 @@ public: // Directional Panning
   void AddDirection( Radian direction, Radian threshold = DEFAULT_THRESHOLD );
 
   /**
-   * @brief Returns the container of all the angles this pan gesture detector emits a signal.
+   * @brief Returns the count of angles that this pan gesture detector emits a signal.
    *
-   * @return a const reference to the container of all the angles.
+   * @return The count.
    * @pre The gesture detector has been initialized.
    */
-  const AngleContainer& GetAngles() const;
+  size_t GetAngleCount() const;
+
+  /**
+   * @brief Returns the angle by index that this pan gesture detector emits a signal.
+   *
+   * @return an angle threshold pair, or a zero valued angle pair when index is invalid.
+   * @pre The gesture detector has been initialized.
+   * @pre The index is less than GetAngleCount()
+   */
+  AngleThresholdPair GetAngle(size_t index) const;
 
   /**
    * @brief Clears any directional angles that are used by the gesture detector.

@@ -43,8 +43,6 @@ void utc_dali_pan_gesture_detector_cleanup(void)
 ///////////////////////////////////////////////////////////////////////////////
 namespace
 {
-typedef Dali::PanGestureDetector::AngleContainer::size_type AngleSizeType;
-
 const int PAN_EVENT_TIME_DELTA = 8;
 const int PAN_GESTURE_UPDATE_COUNT = 50;
 
@@ -1742,38 +1740,39 @@ int UtcDaliPanGestureAngleHandling(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  const PanGestureDetector::AngleContainer& angles( detector.GetAngles() );
-  DALI_TEST_EQUALS( angles.empty(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
 
   detector.AddAngle( PanGestureDetector::DIRECTION_LEFT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( angles.size(), static_cast<AngleSizeType>(1), TEST_LOCATION );
-  for ( PanGestureDetector::AngleContainer::const_iterator iter = angles.begin(), endIter = angles.end(); iter != endIter; ++iter )
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 1, TEST_LOCATION );
+  bool found = false;
+  for( size_t i = 0; i < detector.GetAngleCount(); i++)
   {
-    if ( iter->first == PanGestureDetector::DIRECTION_LEFT )
+    if( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT )
     {
       tet_result( TET_PASS );
+      found = true;
       break;
-    }
-
-    if ( iter == endIter )
-    {
-      tet_printf("%s, angle not added\n", TEST_LOCATION );
-      tet_result( TET_FAIL );
     }
   }
 
+  if(!found )
+  {
+    tet_printf("%s, angle not added\n", TEST_LOCATION );
+    tet_result( TET_FAIL );
+  }
+
   detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( angles.size(), static_cast<AngleSizeType>(2), TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
 
   // Remove something not in the container.
   detector.RemoveAngle( PanGestureDetector::DIRECTION_UP );
-  DALI_TEST_EQUALS( angles.size(), static_cast<AngleSizeType>(2), TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
 
   detector.RemoveAngle( PanGestureDetector::DIRECTION_RIGHT );
-  DALI_TEST_EQUALS( angles.size(), static_cast<AngleSizeType>(1), TEST_LOCATION );
-  for ( PanGestureDetector::AngleContainer::const_iterator iter = angles.begin(), endIter = angles.end(); iter != endIter; ++iter )
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 1, TEST_LOCATION );
+  for ( size_t i = 0; i < detector.GetAngleCount(); i++)
   {
-    if ( iter->first == PanGestureDetector::DIRECTION_RIGHT )
+    if ( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT )
     {
       tet_printf("%s, angle not removed\n", TEST_LOCATION );
       tet_result( TET_FAIL );
@@ -1782,7 +1781,7 @@ int UtcDaliPanGestureAngleHandling(void)
   }
 
   detector.ClearAngles();
-  DALI_TEST_EQUALS( angles.size(), static_cast<AngleSizeType>(0), TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1796,39 +1795,38 @@ int UtcDaliPanGestureAngleOutOfRange(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  const PanGestureDetector::AngleContainer& angles( detector.GetAngles() );
-  DALI_TEST_EQUALS( angles.empty(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
 
   //
   // Angle
   //
 
   detector.AddAngle( Degree(180.0f) );
-  DALI_TEST_EQUALS( angles.begin()->first, Radian( Degree(-180.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(-180.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( Degree(190.0f) );
-  DALI_TEST_EQUALS( angles.begin()->first, Radian( Degree(-170.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(-170.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( Degree(-190.0f) );
-  DALI_TEST_EQUALS( angles.begin()->first, Radian( Degree(170.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(170.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( Degree(350.0f) );
-  DALI_TEST_EQUALS( angles.begin()->first, Radian( Degree(-10.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(-10.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( Degree(-350.0f) );
-  DALI_TEST_EQUALS( angles.begin()->first, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( Degree(370.0f) );
-  DALI_TEST_EQUALS( angles.begin()->first, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( Degree(-370.0f) );
-  DALI_TEST_EQUALS( angles.begin()->first, Radian( Degree(-10.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).first, Radian( Degree(-10.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   //
@@ -1836,19 +1834,19 @@ int UtcDaliPanGestureAngleOutOfRange(void)
   //
 
   detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( 0.0f ) );
-  DALI_TEST_EQUALS( angles.begin()->second, Radian( Degree(0.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).second, Radian( Degree(0.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( -10.0f ) );
-  DALI_TEST_EQUALS( angles.begin()->second, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).second, Radian( Degree(10.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( -181.0f ) );
-  DALI_TEST_EQUALS( angles.begin()->second, Radian( Degree(180.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).second, Radian( Degree(180.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
 
   detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Degree( 181.0f ) );
-  DALI_TEST_EQUALS( angles.begin()->second, Radian( Degree(180.0f) ), 0.000001, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(0).second, Radian( Degree(180.0f) ), 0.000001, TEST_LOCATION );
   detector.ClearAngles();
   END_TEST;
 }
@@ -1930,47 +1928,51 @@ int UtcDaliPanGestureDirectionHandling(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  const PanGestureDetector::AngleContainer& angles( detector.GetAngles() );
-  DALI_TEST_EQUALS( angles.empty(), true, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
 
   detector.AddDirection( PanGestureDetector::DIRECTION_LEFT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( angles.size(), static_cast<AngleSizeType>(2), TEST_LOCATION );
-  for ( PanGestureDetector::AngleContainer::const_iterator iter = angles.begin(), endIter = angles.end(); iter != endIter; ++iter )
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
+  bool found = false;
+  for ( size_t i = 0; detector.GetAngleCount(); i++)
   {
-    if ( iter->first == PanGestureDetector::DIRECTION_LEFT )
+    if ( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_LEFT )
     {
       tet_result( TET_PASS );
+      found = true;
       break;
     }
 
-    if ( iter == endIter )
+  }
+
+  if (!found )
+  {
+    tet_printf("%s, angle not added\n", TEST_LOCATION );
+    tet_result( TET_FAIL );
+  }
+
+  found = false;
+  for( size_t i = 0; i < detector.GetAngleCount(); i++)
+  {
+    if( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT )
     {
-      tet_printf("%s, angle not added\n", TEST_LOCATION );
-      tet_result( TET_FAIL );
+      tet_result( TET_PASS );
+      found = true;
+      break;
     }
   }
 
-  for ( PanGestureDetector::AngleContainer::const_iterator iter = angles.begin(), endIter = angles.end(); iter != endIter; ++iter )
+  if(!found )
   {
-    if ( iter->first == PanGestureDetector::DIRECTION_RIGHT )
-    {
-      tet_result( TET_PASS );
-      break;
-    }
-
-    if ( iter == endIter )
-    {
-      tet_printf("%s, angle not added\n", TEST_LOCATION );
-      tet_result( TET_FAIL );
-    }
+    tet_printf("%s, angle not added\n", TEST_LOCATION );
+    tet_result( TET_FAIL );
   }
 
   // Remove something not in the container.
   detector.RemoveDirection( PanGestureDetector::DIRECTION_UP );
-  DALI_TEST_EQUALS( angles.size(), static_cast<AngleSizeType>(2), TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
 
   detector.RemoveDirection( PanGestureDetector::DIRECTION_RIGHT );
-  DALI_TEST_EQUALS( angles.size(), static_cast<AngleSizeType>(0), TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
   END_TEST;
 }
 
@@ -2394,8 +2396,8 @@ int UtcDaliPanGesturePropertyIndices(void)
 
   Property::IndexContainer indices;
   detector.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( ! indices.empty() );
-  DALI_TEST_EQUALS( indices.size(), detector.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() );
+  DALI_TEST_EQUALS( indices.Size(), detector.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 
