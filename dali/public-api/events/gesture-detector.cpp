@@ -68,9 +68,14 @@ void GestureDetector::DetachAll()
   GetImplementation(*this).DetachAll();
 }
 
-std::vector<Actor> GestureDetector::GetAttachedActors() const
+size_t GestureDetector::GetAttachedActorCount() const
 {
-  return GetImplementation(*this).GetAttachedActors();
+  return GetImplementation(*this).GetAttachedActorCount();
+}
+
+Actor GestureDetector::GetAttachedActor(size_t index) const
+{
+  return GetImplementation(*this).GetAttachedActor(index);
 }
 
 } // namespace Dali

@@ -272,7 +272,7 @@ int UtcDaliCameraActorDefaultProperties(void)
   actor.GetProperty(CameraActor::Property::INVERT_Y_AXIS).Get(bValue);
   DALI_TEST_EQUALS(false, bValue, TEST_LOCATION);
 
-  std::vector<Property::Index> indices ;
+  std::vector<Property::Index> indices;
   indices.push_back(CameraActor::Property::TYPE);
   indices.push_back(CameraActor::Property::PROJECTION_MODE);
   indices.push_back(CameraActor::Property::FIELD_OF_VIEW);
@@ -369,7 +369,7 @@ int UtcDaliCameraActorSetType02(void)
 
   CameraActor actor;
 
-  Dali::Camera::Type cameraType = Dali::Camera::FREE_LOOK ;
+  Dali::Camera::Type cameraType = Dali::Camera::FREE_LOOK;
   try
   {
     cameraType = actor.GetType();
@@ -802,8 +802,8 @@ int UtcDaliCameraActorPropertyIndices(void)
   Actor basicActor = Actor::New();
   Property::IndexContainer indices;
   camera.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
-  DALI_TEST_EQUALS( indices.size(), camera.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.Size(), camera.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 

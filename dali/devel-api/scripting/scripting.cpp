@@ -533,8 +533,9 @@ void CreatePropertyMap( Actor actor, Property::Map& map )
     // Default properties
     Property::IndexContainer indices;
     actor.GetPropertyIndices( indices );
-    const Property::IndexContainer::const_iterator endIter = indices.end();
-    for ( Property::IndexContainer::iterator iter = indices.begin(); iter != endIter; ++iter )
+    const Property::IndexContainer::ConstIterator endIter = indices.End();
+
+    for ( Property::IndexContainer::Iterator iter = indices.Begin(); iter != endIter; ++iter )
     {
       map[ actor.GetPropertyName( *iter ) ] = actor.GetProperty( *iter );
     }
@@ -594,6 +595,34 @@ void CreatePropertyMap( Image image, Property::Map& map )
       map[ "height" ] = height;
     }
   }
+}
+
+
+DALI_IMPORT_API bool SetRotation( const Property::Value& value, Quaternion& quaternion )
+{
+  bool done = false;
+  Property::Type type = value.GetType();
+  if( Property::VECTOR3 == type )
+  {
+    Vector3 v3;
+    value.Get(v3);
+    quaternion.SetEuler( Radian(Degree(v3.x)), Radian(Degree(v3.y)), Radian(Degree(v3.z)) );
+    done = true;
+  }
+  else if( Property::VECTOR4 == type )
+  {
+    Vector4 v4;
+    value.Get(v4);
+    quaternion = Quaternion(v4);
+    done = true;
+  }
+  else if( Property::ROTATION == type )
+  {
+    value.Get(quaternion);
+    done = true;
+  }
+
+  return done;
 }
 
 } // namespace scripting

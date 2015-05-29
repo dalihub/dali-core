@@ -311,6 +311,15 @@ DALI_IMPORT_API void CreatePropertyMap( Actor actor, Property::Map& map );
  */
 DALI_IMPORT_API void CreatePropertyMap( Image image, Property::Map& map );
 
+/**
+ * @brief Sets a quaterion rotation from a script provided value (quaternion,euler vector3,quaternion vector4)
+ *
+ * @param[in] value Propery value
+ * @param[out] quaternion Output Rotation
+ * @return true if quaternion was set
+ */
+DALI_IMPORT_API bool SetRotation( const Property::Value& value, Quaternion& quaternion );
+
 }
 
 } // namespace Dali

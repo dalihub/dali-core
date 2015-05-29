@@ -22,7 +22,6 @@
 #include <cmath>
 #include <algorithm>
 #include <cfloat>
-#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 
@@ -108,7 +107,7 @@ unsigned int Actor::mActorCounter = 0;
 struct Actor::RelayoutData
 {
   RelayoutData()
-  : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( SizeScalePolicy::USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
+    : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( SizeScalePolicy::USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
   {
     // Set size negotiation defaults
     for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
@@ -2237,23 +2236,23 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   bool connected( true );
   Actor* actor = dynamic_cast< Actor* >( object );
 
-  if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED ) ) // don't want to convert char* to string
+  if( 0 == signalName.compare( SIGNAL_TOUCHED ) )
   {
     actor->TouchedSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_HOVERED ) )
+  else if( 0 == signalName.compare( SIGNAL_HOVERED ) )
   {
     actor->HoveredSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_WHEEL_EVENT ) )
+  else if( 0 == signalName.compare( SIGNAL_WHEEL_EVENT ) )
   {
     actor->WheelEventSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_ON_STAGE ) )
+  else if( 0 == signalName.compare( SIGNAL_ON_STAGE ) )
   {
     actor->OnStageSignal().Connect( tracker, functor );
   }
-  else if( 0 == strcmp( signalName.c_str(), SIGNAL_OFF_STAGE ) )
+  else if( 0 == signalName.compare( SIGNAL_OFF_STAGE ) )
   {
     actor->OffStageSignal().Connect( tracker, functor );
   }
@@ -2582,11 +2581,11 @@ unsigned int Actor::GetDefaultPropertyCount() const
 
 void Actor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
-  indices.reserve( DEFAULT_PROPERTY_COUNT );
+  indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
   for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
-    indices.push_back( i );
+    indices.PushBack( i );
   }
 }
 
@@ -2608,7 +2607,7 @@ Property::Index Actor::GetDefaultPropertyIndex( const std::string& name ) const
   for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[ i ];
-    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    if( 0 == name.compare( property->name ) )
     {
       index = i;
       break;
@@ -3858,19 +3857,19 @@ SceneGraph::Node* Actor::CreateNode() const
   return Node::New();
 }
 
-bool Actor::DoAction( BaseObject* object, const std::string& actionName, const std::vector< Property::Value >& attributes )
+bool Actor::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& /* attributes */ )
 {
   bool done = false;
   Actor* actor = dynamic_cast< Actor* >( object );
 
   if( actor )
   {
-    if( 0 == strcmp( actionName.c_str(), ACTION_SHOW ) ) // dont want to convert char* to string
+    if( 0 == actionName.compare( ACTION_SHOW ) )
     {
       actor->SetVisible( true );
       done = true;
     }
-    else if( 0 == strcmp( actionName.c_str(), ACTION_HIDE ) )
+    else if( 0 == actionName.compare( ACTION_HIDE ) )
     {
       actor->SetVisible( false );
       done = true;

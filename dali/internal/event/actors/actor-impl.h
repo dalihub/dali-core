@@ -1520,7 +1520,7 @@ public:
    */
   static bool DoAction( BaseObject* object,
                         const std::string& actionName,
-                        const std::vector< Property::Value >& attributes );
+                        const Property::Map& attributes );
 
 public:
   // For Animation

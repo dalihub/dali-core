@@ -857,8 +857,8 @@ int UtcDaliImageActorPropertyIndices(void)
 
   Property::IndexContainer indices;
   imageActor.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
-  DALI_TEST_EQUALS( indices.size(), imageActor.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.Size(), imageActor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 

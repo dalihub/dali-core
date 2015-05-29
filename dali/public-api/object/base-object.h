@@ -54,7 +54,7 @@ public:
   /**
    * @copydoc Dali::BaseHandle::DoAction
    */
-  bool DoAction(const std::string& actionName, const std::vector<Property::Value>& attributes);
+  bool DoAction(const std::string& actionName, const Property::Map& attributes);
 
   /**
    * @copydoc Dali::BaseHandle::GetTypeName

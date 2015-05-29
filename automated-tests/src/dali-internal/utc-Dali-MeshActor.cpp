@@ -728,8 +728,8 @@ int UtcDaliMeshActorIndices(void)
 
   Property::IndexContainer indices;
   meshActor.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( indices.size() == basicActor.GetPropertyCount() ); // Mesh Actor does not have any properties
-  DALI_TEST_EQUALS( indices.size(), meshActor.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() == basicActor.GetPropertyCount() ); // Mesh Actor does not have any properties
+  DALI_TEST_EQUALS( indices.Size(), meshActor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 
@@ -742,7 +742,7 @@ int UtcDaliAnimatableMeshActorIndices(void)
 
   Property::IndexContainer indices;
   meshActor.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( indices.size() == basicActor.GetPropertyCount() ); // Mesh Actor does not have any properties
-  DALI_TEST_EQUALS( indices.size(), meshActor.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() == basicActor.GetPropertyCount() ); // Mesh Actor does not have any properties
+  DALI_TEST_EQUALS( indices.Size(), meshActor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }

@@ -55,7 +55,7 @@ void BaseObject::UnregisterObject()
   }
 }
 
-bool BaseObject::DoAction(const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool BaseObject::DoAction(const std::string& actionName, const Property::Map& attributes)
 {
   Dali::Internal::TypeRegistry* registry = Dali::Internal::TypeRegistry::Get();
 

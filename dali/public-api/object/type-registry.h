@@ -91,8 +91,6 @@ class TypeRegistry;
 class DALI_IMPORT_API TypeRegistry : public BaseHandle
 {
 public:
-  typedef std::vector<std::string> NameContainer; ///< Container of type names
-
   /**
    * @brief Get Type Registry handle.
    *
@@ -142,11 +140,18 @@ public:
   TypeInfo GetTypeInfo( const std::type_info& registerType );
 
   /**
-   * @brief Get type names.
+   * @brief Get type name count.
    *
-   * @return list of known types by name
+   * @return The count
    */
-  NameContainer GetTypeNames() const;
+  size_t GetTypeNameCount() const;
+
+  /**
+   * @brief Get type names by index.
+   *
+   * @return The type name or an empty string when index is not valid
+   */
+  std::string GetTypeName(size_t index) const;
 
 public: // Not intended for application developers
 

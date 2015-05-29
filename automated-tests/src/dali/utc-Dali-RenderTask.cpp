@@ -2962,8 +2962,8 @@ int UtcDaliRenderTaskProperties(void)
 
   Property::IndexContainer indices;
   task.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( ! indices.empty() );
-  DALI_TEST_EQUALS( indices.size(), task.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() );
+  DALI_TEST_EQUALS( indices.Size(), task.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 

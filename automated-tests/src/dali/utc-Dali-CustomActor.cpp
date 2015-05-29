@@ -221,7 +221,7 @@ struct TestCustomActor : public CustomActorImpl
 
   void SetDaliProperty(std::string s)
   {
-    Self().SetProperty(mDaliProperty, s) ;
+    Self().SetProperty(mDaliProperty, s);
   }
   void TestRelayoutRequest()
   {
@@ -1587,7 +1587,7 @@ int UtcDaliCustomActorOnPropertySet(void)
   TestCustomActor custom = TestCustomActor::New();
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
-  custom.SetDaliProperty("yes") ;
+  custom.SetDaliProperty("yes");
 
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnPropertySet", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
@@ -1767,7 +1767,7 @@ int UtcDaliCustomActorDoAction(void)
 
   DALI_TEST_CHECK(customActorObject);
 
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
 
   // Check that an invalid command is not performed
   DALI_TEST_CHECK(customActorObject.DoAction("invalidCommand", attributes) == false);

@@ -19,7 +19,6 @@
 #include <dali/internal/event/actors/layer-impl.h>
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -332,12 +331,12 @@ unsigned int Layer::GetDefaultPropertyCount() const
 void Layer::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
   Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
-  indices.reserve( indices.size() + DEFAULT_PROPERTY_COUNT );
+  indices.Reserve( indices.Size() + DEFAULT_PROPERTY_COUNT );
 
   int index = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
   for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
   {
-    indices.push_back( index );
+    indices.PushBack( index );
   }
 }
 
@@ -413,7 +412,7 @@ Property::Index Layer::GetDefaultPropertyIndex(const std::string& name) const
   for( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
   {
     const Internal::PropertyDetails* property = &DEFAULT_PROPERTY_DETAILS[i];
-    if( 0 == strcmp( name.c_str(), property->name ) ) // dont want to convert rhs to string
+    if( 0 == name.compare( property->name ) ) // dont want to convert rhs to string
     {
       index = i + DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
       break;
@@ -491,29 +490,29 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
   return ret;
 }
 
-bool Layer::DoAction( BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes )
+bool Layer::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& /*attributes*/ )
 {
   bool done = false;
   Layer* layer = dynamic_cast<Layer*>( object );
 
   if( layer )
   {
-    if( 0 == strcmp( actionName.c_str(), ACTION_RAISE ) )
+    if( 0 == actionName.compare( ACTION_RAISE ) )
     {
       layer->Raise();
       done = true;
     }
-    else if( 0 == strcmp( actionName.c_str(), ACTION_LOWER ) )
+    else if( 0 == actionName.compare( ACTION_LOWER ) )
     {
       layer->Lower();
       done = true;
     }
-    else if( 0 == strcmp( actionName.c_str(), ACTION_RAISE_TO_TOP ) )
+    else if( 0 == actionName.compare( ACTION_RAISE_TO_TOP ) )
     {
       layer->RaiseToTop();
       done = true;
     }
-    else if( 0 == strcmp( actionName.c_str(), ACTION_LOWER_TO_BOTTOM ) )
+    else if( 0 == actionName.compare( ACTION_LOWER_TO_BOTTOM ) )
     {
       layer->LowerToBottom();
       done = true;

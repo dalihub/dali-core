@@ -438,8 +438,8 @@ int UtcDaliAnimatableMeshProperties(void)
 
   Property::IndexContainer indices;
   mesh.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( ! indices.empty() );
-  DALI_TEST_EQUALS( indices.size(), mesh.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() );
+  DALI_TEST_EQUALS( indices.Size(), mesh.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 
