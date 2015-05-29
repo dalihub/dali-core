@@ -183,6 +183,11 @@ Stage::TouchedSignalType& Stage::TouchedSignal()
   return GetImplementation(*this).TouchedSignal();
 }
 
+Stage::WheelEventSignalType& Stage::WheelEventSignal()
+{
+  return GetImplementation(*this).WheelEventSignal();
+}
+
 Stage::ContextStatusSignal& Stage::ContextLostSignal()
 {
   return GetImplementation(*this).ContextLostSignal();

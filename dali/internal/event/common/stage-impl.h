@@ -337,6 +337,12 @@ public:
   void EmitTouchedSignal( const TouchEvent& touch );
 
   /**
+   * Used by the EventProcessor to emit wheel event signals.
+   * @param[in] event The wheel event.
+   */
+  void EmitWheelEventSignal( const WheelEvent& event );
+
+  /**
    * Emits the scene created.
    */
   void EmitSceneCreatedSignal();
@@ -355,6 +361,11 @@ public:
     * @copydoc Dali::Stage::TouchedSignal()
     */
   Dali::Stage::TouchedSignalType& TouchedSignal();
+
+  /**
+   * @copydoc Dali::Stage::WheelEventSignal()
+   */
+  Dali::Stage::WheelEventSignalType& WheelEventSignal();
 
   /**
    * @copydoc Dali::Stage::ContextLostSignal()
@@ -496,6 +507,9 @@ private:
 
   // The touched signal
   Dali::Stage::TouchedSignalType                  mTouchedSignal;
+
+  // The wheel event signal
+  Dali::Stage::WheelEventSignalType               mWheelEventSignal;
 
   Dali::Stage::ContextStatusSignal mContextLostSignal;
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;

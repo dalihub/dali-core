@@ -1,5 +1,5 @@
-#ifndef __DALI_INTERNAL_MOUSE_WHEEL_EVENT_PROCESSOR_H__
-#define __DALI_INTERNAL_MOUSE_WHEEL_EVENT_PROCESSOR_H__
+#ifndef __DALI_INTERNAL_WHEEL_EVENT_PROCESSOR_H__
+#define __DALI_INTERNAL_WHEEL_EVENT_PROCESSOR_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -23,7 +23,7 @@ namespace Dali
 
 namespace Integration
 {
-struct MouseWheelEvent;
+struct WheelEvent;
 }
 
 namespace Internal
@@ -32,48 +32,48 @@ namespace Internal
 class Stage;
 
 /**
- *  MouseWheelEventProcessor receives the mouse wheel events from the Dali Event processor.
+ *  WheelEventProcessor receives the wheel events from the Dali Event processor.
  *
- *  When a mouse wheel event is received the MouseWheelEvent Processor emits the MouseWheeled signal
+ *  When a wheel event is received the WheelEvent Processor emits the Wheeled signal
  *  on the hit actor (and its parents).
  *
  * - Hit Testing is described in Dali::Actor.
  */
-class MouseWheelEventProcessor
+class WheelEventProcessor
 {
 public:
 
   /**
-   * Create a Mouse wheel event processor.
+   * Create a wheel event processor.
    */
-  MouseWheelEventProcessor(Stage& stage);
+  WheelEventProcessor(Stage& stage);
 
   /**
-   * Non-virtual destructor; MouseWheelEventProcessor is not a base class
+   * Non-virtual destructor; WheelEventProcessor is not a base class
    */
-  ~MouseWheelEventProcessor();
+  ~WheelEventProcessor();
 
   /**
    * This function is called by the event processor whenever a nouse wheel event occurs.
-   * @param[in] event The mouse wheel event that has occurred.
+   * @param[in] event The wheel event that has occurred.
    */
-  void ProcessMouseWheelEvent(const Integration::MouseWheelEvent& event);
+  void ProcessWheelEvent(const Integration::WheelEvent& event);
 
 private:
 
   // Undefined
-  MouseWheelEventProcessor(const MouseWheelEventProcessor&);
+  WheelEventProcessor(const WheelEventProcessor&);
 
   // Undefined
-  MouseWheelEventProcessor& operator=(const MouseWheelEventProcessor& rhs);
+  WheelEventProcessor& operator=(const WheelEventProcessor& rhs);
 
 private:
 
-  Stage& mStage;               ///< Used to deliver the mouse wheel events
+  Stage& mStage;               ///< Used to deliver the wheel events
 };
 
 } // namespace Internal
 
 } // namespace Dali
 
-#endif // __DALI_INTERNAL_MOUSE_WHEEL_EVENT_PROCESSOR_H__
+#endif // __DALI_INTERNAL_WHEEL_EVENT_PROCESSOR_H__

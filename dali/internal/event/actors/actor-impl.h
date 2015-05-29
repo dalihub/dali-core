@@ -45,7 +45,7 @@ namespace Dali
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
-struct MouseWheelEvent;
+struct WheelEvent;
 
 namespace Internal
 {
@@ -1414,10 +1414,10 @@ public:
   bool GetHoverRequired() const;
 
   /**
-   * Query whether the application or derived actor type requires mouse wheel events.
-   * @return True if mouse wheel events are required.
+   * Query whether the application or derived actor type requires wheel events.
+   * @return True if wheel events are required.
    */
-  bool GetMouseWheelEventRequired() const;
+  bool GetWheelEventRequired() const;
 
   /**
    * Query whether the actor is actually hittable.  This method checks whether the actor is
@@ -1461,11 +1461,11 @@ public:
   bool EmitHoverEventSignal( const HoverEvent& event );
 
   /**
-   * Used by the EventProcessor to emit mouse wheel event signals.
-   * @param[in] event The mouse wheel event.
+   * Used by the EventProcessor to emit wheel event signals.
+   * @param[in] event The wheel event.
    * @return True if the event was consumed.
    */
-  bool EmitMouseWheelEventSignal( const MouseWheelEvent& event );
+  bool EmitWheelEventSignal( const WheelEvent& event );
 
   /**
    * @copydoc Dali::Actor::TouchedSignal()
@@ -1478,9 +1478,9 @@ public:
   Dali::Actor::HoverSignalType& HoveredSignal();
 
   /**
-   * @copydoc Dali::Actor::MouseWheelEventSignal()
+   * @copydoc Dali::Actor::WheelEventSignal()
    */
-  Dali::Actor::MouseWheelEventSignalType& MouseWheelEventSignal();
+  Dali::Actor::WheelEventSignalType& WheelEventSignal();
 
   /**
    * @copydoc Dali::Actor::OnStageSignal()
@@ -1833,11 +1833,11 @@ private:
 
   /**
    * For use in derived classes.
-   * This is only called if the mouse wheel signal was not consumed.
-   * @param[in] event The mouse event.
+   * This is only called if the wheel signal was not consumed.
+   * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnMouseWheelEvent( const MouseWheelEvent& event )
+  virtual bool OnWheelEvent( const WheelEvent& event )
   {
     return false;
   }
@@ -1878,7 +1878,7 @@ protected:
   // Signals
   Dali::Actor::TouchSignalType             mTouchedSignal;
   Dali::Actor::HoverSignalType             mHoveredSignal;
-  Dali::Actor::MouseWheelEventSignalType   mMouseWheelEventSignal;
+  Dali::Actor::WheelEventSignalType        mWheelEventSignal;
   Dali::Actor::OnStageSignalType           mOnStageSignal;
   Dali::Actor::OffStageSignalType          mOffStageSignal;
   Dali::Actor::OnRelayoutSignalType        mOnRelayoutSignal;
@@ -1899,7 +1899,7 @@ protected:
   bool mKeyboardFocusable                          : 1; ///< Whether the actor should be focusable by keyboard navigation
   bool mDerivedRequiresTouch                       : 1; ///< Whether the derived actor type requires touch event signals
   bool mDerivedRequiresHover                       : 1; ///< Whether the derived actor type requires hover event signals
-  bool mDerivedRequiresMouseWheelEvent             : 1; ///< Whether the derived actor type requires mouse wheel event signals
+  bool mDerivedRequiresWheelEvent                  : 1; ///< Whether the derived actor type requires wheel event signals
   bool mOnStageSignalled                           : 1; ///< Set to true before OnStageConnection signal is emitted, and false before OnStageDisconnection
   bool mInsideOnSizeSet                            : 1; ///< Whether we are inside OnSizeSet
   bool mInheritOrientation                         : 1; ///< Cached: Whether the parent's orientation should be inherited.

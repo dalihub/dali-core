@@ -151,11 +151,11 @@ private:
   }
 
   /**
-   * @copydoc Internal::Actor::OnMouseWheelEvent
+   * @copydoc Internal::Actor::OnWheelEvent
    */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event)
+  virtual bool OnWheelEvent(const WheelEvent& event)
   {
-    return mImpl->OnMouseWheelEvent(event);
+    return mImpl->OnWheelEvent(event);
   }
 
   /**

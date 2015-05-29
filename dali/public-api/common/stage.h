@@ -41,6 +41,7 @@ class DynamicsWorld;
 class DynamicsWorldConfig;
 struct KeyEvent;
 struct TouchEvent;
+struct WheelEvent;
 
 /**
  * @brief The Stage is a top-level object used for displaying a tree of Actors.
@@ -53,6 +54,7 @@ struct TouchEvent;
  * | key-event                 | @ref KeyEventSignal()                |
  * | event-processing-finished | @ref EventProcessingFinishedSignal() |
  * | touched                   | @ref TouchedSignal()                 |
+ * | wheel-event               | @ref WheelEventSignal()              |
  * | context-lost              | @ref ContextLostSignal()             |
  * | context-regained          | @ref ContextRegainedSignal()         |
  * | scene-created             | @ref SceneCreatedSignal()            |
@@ -61,11 +63,12 @@ class DALI_IMPORT_API Stage : public BaseHandle
 {
 public:
 
-  typedef Signal< void (const KeyEvent&)> KeyEventSignalType;  ///< Key event signal type
-  typedef Signal< void () > EventProcessingFinishedSignalType; ///< Event Processing finished signal type
-  typedef Signal< void (const TouchEvent&)> TouchedSignalType; ///< Touched signal type
-  typedef Signal< void () > ContextStatusSignal;             ///< Context status signal type
-  typedef Signal< void () > SceneCreatedSignalType;            ///< Scene created signal type
+  typedef Signal< void (const KeyEvent&)> KeyEventSignalType;     ///< Key event signal type
+  typedef Signal< void () > EventProcessingFinishedSignalType;    ///< Event Processing finished signal type
+  typedef Signal< void (const TouchEvent&)> TouchedSignalType;    ///< Touched signal type
+  typedef Signal< void (const WheelEvent&)> WheelEventSignalType; ///< Touched signal type
+  typedef Signal< void () > ContextStatusSignal;                  ///< Context status signal type
+  typedef Signal< void () > SceneCreatedSignalType;               ///< Scene created signal type
 
   static const Vector4 DEFAULT_BACKGROUND_COLOR; ///< Default black background.
   static const Vector4 DEBUG_BACKGROUND_COLOR;   ///< Green background, useful when debugging.
@@ -285,6 +288,17 @@ public:
    * @return The touch signal to connect to.
    */
   TouchedSignalType& TouchedSignal();
+
+  /**
+   * @brief This signal is emitted when wheel event is received.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(const WheelEvent& event);
+   * @endcode
+   * @return The signal to connect to.
+   */
+  WheelEventSignalType& WheelEventSignal();
 
   /**
    * @brief This signal is emitted when the GL context is lost (Platform specific behaviour).

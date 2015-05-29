@@ -65,6 +65,7 @@ const float DEFAULT_STEREO_BASE( 65.0f );
 const char* const SIGNAL_KEY_EVENT =                 "key-event";
 const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "event-processing-finished";
 const char* const SIGNAL_TOUCHED =                   "touched";
+const char* const SIGNAL_WHEEL_EVENT =               "wheel-event";
 const char* const SIGNAL_CONTEXT_LOST =              "context-lost";
 const char* const SIGNAL_CONTEXT_REGAINED =          "context-regained";
 const char* const SIGNAL_SCENE_CREATED =             "scene-created";
@@ -74,9 +75,10 @@ TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), NULL );
 SignalConnectorType signalConnector1( mType, SIGNAL_KEY_EVENT,                 &Stage::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_EVENT_PROCESSING_FINISHED, &Stage::DoConnectSignal );
 SignalConnectorType signalConnector3( mType, SIGNAL_TOUCHED,                   &Stage::DoConnectSignal );
-SignalConnectorType signalConnector4( mType, SIGNAL_CONTEXT_LOST,              &Stage::DoConnectSignal );
-SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
-SignalConnectorType signalConnector6( mType, SIGNAL_SCENE_CREATED,             &Stage::DoConnectSignal );
+SignalConnectorType signalConnector4( mType, SIGNAL_WHEEL_EVENT,               &Stage::DoConnectSignal );
+SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_LOST,              &Stage::DoConnectSignal );
+SignalConnectorType signalConnector6( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
+SignalConnectorType signalConnector7( mType, SIGNAL_SCENE_CREATED,             &Stage::DoConnectSignal );
 
 } // unnamed namespace
 
@@ -535,6 +537,10 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   {
     stage->TouchedSignal().Connect( tracker, functor );
   }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_WHEEL_EVENT ) )
+  {
+    stage->WheelEventSignal().Connect( tracker, functor );
+  }
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_CONTEXT_LOST ) )
   {
     stage->ContextLostSignal().Connect( tracker, functor );
@@ -573,6 +579,12 @@ void Stage::EmitTouchedSignal( const TouchEvent& touch )
   mTouchedSignal.Emit( touch );
 }
 
+void Stage::EmitWheelEventSignal(const WheelEvent& event)
+{
+  // Emit the wheel event signal when no actor in the stage has gained the wheel input focus
+
+  mWheelEventSignal.Emit( event );
+}
 
 void Stage::EmitSceneCreatedSignal()
 {
@@ -592,6 +604,11 @@ Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSi
 Dali::Stage::TouchedSignalType& Stage::TouchedSignal()
 {
   return mTouchedSignal;
+}
+
+Dali::Stage::WheelEventSignalType& Stage::WheelEventSignal()
+{
+  return mWheelEventSignal;
 }
 
 Dali::Stage::ContextStatusSignal& Stage::ContextLostSignal()
