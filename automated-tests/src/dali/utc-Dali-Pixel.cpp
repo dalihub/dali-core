@@ -79,6 +79,13 @@ int UtcDaliPixelHasAlpha(void)
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::COMPRESSED_SRGB8_PUNCHTHROUGH_ALPHA1_ETC2 ) == true );
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::COMPRESSED_RGBA8_ETC2_EAC ) == true );
   DALI_TEST_CHECK( Pixel::HasAlpha( Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC) == true );
+
+  END_TEST;
+}
+
+int UtcDaliPixelHasAlphaN(void)
+{
+  DALI_TEST_EQUALS( Pixel::HasAlpha( Pixel::Format( 123123123123 ) ), false, TEST_LOCATION );
   END_TEST;
 }
 
@@ -107,6 +114,15 @@ int UtcDaliPixelGetBytesPerPixel(void)
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel(Pixel::BGRA8888) == 4);
 
   DALI_TEST_CHECK( Pixel::GetBytesPerPixel(Pixel::L8) == 1);
+
+  DALI_TEST_CHECK( Pixel::GetBytesPerPixel(Pixel::COMPRESSED_R11_EAC) == 0);
+
+  END_TEST;
+}
+
+int UtcDaliPixelGetBytesPerPixelN(void)
+{
+  DALI_TEST_EQUALS( Pixel::GetBytesPerPixel( Pixel::Format( 123123123123 ) ), 0u, TEST_LOCATION );
   END_TEST;
 }
 
@@ -176,5 +192,15 @@ int UtcDaliPixelGetAlphaOffsetAndMask(void)
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0);
   Pixel::GetAlphaOffsetAndMask(Pixel::COMPRESSED_SRGB8_ALPHA8_ETC2_EAC, byteOffset, bitMask);
   DALI_TEST_CHECK( byteOffset == 0 && bitMask == 0);
+  END_TEST;
+}
+
+int UtcDaliPixelGetAlphaOffsetAndMaskN(void)
+{
+  int byteOffset = 200;
+  int bitMask = 200;
+  Pixel::GetAlphaOffsetAndMask( Pixel::Format( 123123123123 ), byteOffset, bitMask );
+  DALI_TEST_CHECK( byteOffset == 200 );
+  DALI_TEST_CHECK( bitMask == 200 );
   END_TEST;
 }

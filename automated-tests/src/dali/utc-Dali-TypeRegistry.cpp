@@ -574,6 +574,20 @@ int UtcDaliTypeRegistryAssignmentOperatorP(void)
   END_TEST;
 }
 
+int UtcDaliTypeRegistryAssignP(void)
+{
+  TestApplication application;
+
+  TypeRegistry registry = TypeRegistry::Get();
+  TypeRegistry registry2;
+  registry2 = registry;
+  DALI_TEST_CHECK( registry2 );
+
+  DALI_TEST_CHECK( registry2.GetTypeInfo( "Actor" ).GetName() == registry2.GetTypeInfo( "Actor" ).GetName() );
+
+  END_TEST;
+}
+
 int UtcDaliTypeRegistryGetTypeInfoFromTypeNameP(void)
 {
   TestApplication application;
@@ -1005,6 +1019,11 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   Property::IndexContainer indices;
   typeInfo.GetPropertyIndices( indices );
   DALI_TEST_EQUALS( indices.size(), 1u, TEST_LOCATION );
+
+  // check property name count
+  TypeInfo::NameContainer names;
+  typeInfo.GetProperties(names);
+  DALI_TEST_CHECK( 1 == names.size() );
 
   // Ensure indices returned from actor and customActor differ by two
   Actor actor = Actor::New();

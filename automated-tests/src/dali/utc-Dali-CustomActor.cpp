@@ -43,6 +43,7 @@ namespace
 {
 
 std::vector< std::string > MasterCallStack;
+bool gOnRelayout = false;
 
 } // anon namespace
 
@@ -59,10 +60,19 @@ struct TestCustomActor : public CustomActorImpl
   : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS | DISABLE_SIZE_NEGOTIATION ) ),
     mDaliProperty( Property::INVALID_INDEX ),
     mSizeSet( Vector3::ZERO ),
-    mTargetSize( Vector3::ZERO )
+    mTargetSize( Vector3::ZERO ),
+    mNego( false )
   {
   }
 
+  TestCustomActor(bool nego)
+  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS ) ),
+    mDaliProperty( Property::INVALID_INDEX ),
+    mSizeSet( Vector3::ZERO ),
+    mTargetSize( Vector3::ZERO ),
+    mNego( nego )
+  {
+  }
   /**
    * Destructor
    */
@@ -184,6 +194,7 @@ struct TestCustomActor : public CustomActorImpl
 
   virtual void OnRelayout( const Vector2& size, RelayoutContainer& container )
   {
+    gOnRelayout = true;
   }
 
   virtual void OnSetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimension )
@@ -212,11 +223,36 @@ struct TestCustomActor : public CustomActorImpl
   {
     Self().SetProperty(mDaliProperty, s) ;
   }
+  void TestRelayoutRequest()
+  {
+    RelayoutRequest();
+  }
+
+  float TestGetHeightForWidthBase( float width )
+  {
+    return GetHeightForWidthBase( width );
+  }
+
+  float TestGetWidthForHeightBase( float height )
+  {
+    return GetWidthForHeightBase( height );
+  }
+
+  float TestCalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
+  {
+    return CalculateChildSizeBase( child, dimension );
+  }
+
+  bool TestRelayoutDependentOnChildrenBase( Dimension::Type dimension )
+  {
+    return RelayoutDependentOnChildrenBase( dimension );
+  }
 
   Property::Index mDaliProperty;
   std::vector< std::string > mMethodsCalled;
   Vector3 mSizeSet;
   Vector3 mTargetSize;
+  bool mNego;
 };
 
 /**
@@ -567,6 +603,16 @@ public:
     return custom;
   }
 
+  static TestCustomActor NewNegoSize()
+  {
+    Impl::TestCustomActor* impl = new Impl::TestCustomActor( true );
+    TestCustomActor custom( *impl ); // takes ownership
+
+    impl->Initialize();
+
+    return custom;
+  }
+
   static TestCustomActor NewVariant1( Actor childToAdd )
   {
     Impl::TestCustomActor* impl = new Impl::TestCustomActorVariant1( childToAdd );
@@ -706,6 +752,31 @@ public:
 
   virtual void OnCalculateRelayoutSize( Dimension::Type dimension )
   {
+  }
+
+  void TestRelayoutRequest()
+  {
+    GetImpl().TestRelayoutRequest();
+  }
+
+  float TestGetHeightForWidthBase( float width )
+  {
+    return GetImpl().TestGetHeightForWidthBase( width );
+  }
+
+  float TestGetWidthForHeightBase( float height )
+  {
+    return GetImpl().TestGetWidthForHeightBase( height );
+  }
+
+  float TestCalculateChildSizeBase( const Dali::Actor& child, Dimension::Type dimension )
+  {
+    return GetImpl().TestCalculateChildSizeBase( child, dimension );
+  }
+
+  bool TestRelayoutDependentOnChildrenBase( Dimension::Type dimension )
+  {
+    return GetImpl().TestRelayoutDependentOnChildrenBase( dimension );
   }
 
 private:
@@ -1724,5 +1795,156 @@ int UtcDaliCustomActorDoAction(void)
 
   // Check that the custom actor is now visible
   DALI_TEST_CHECK(custom.IsVisible() == true);
+  END_TEST;
+}
+
+int UtcDaliCustomActorCustomActor(void)
+{
+  Dali::CustomActor customA;
+  Dali::CustomActor customB( customA );
+
+  DALI_TEST_CHECK( customA == customB );
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorImplRelayoutRequest(void)
+{
+  TestApplication application;
+
+  DALI_TEST_CHECK( gOnRelayout == false );
+
+  TestCustomActor custom = TestCustomActor::NewNegoSize();
+  Stage::GetCurrent().Add(custom);
+
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gOnRelayout == true );
+  gOnRelayout = false;
+
+  custom.TestRelayoutRequest();
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( gOnRelayout == true );
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorImplGetHeightForWidthBase(void)
+{
+  TestApplication application;
+  TestCustomActor custom = TestCustomActor::NewNegoSize();
+
+  float width = 300.0f;
+  float v = 0.0f;
+
+  application.SendNotification();
+  application.Render();
+
+  v = custom.TestGetHeightForWidthBase( width );
+
+  DALI_TEST_CHECK( v == width );
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorImplGetWidthForHeightBase(void)
+{
+  TestApplication application;
+  TestCustomActor custom = TestCustomActor::NewNegoSize();
+
+  float height = 300.0f;
+  float v = 0.0f;
+
+  application.SendNotification();
+  application.Render();
+
+  v = custom.TestGetWidthForHeightBase( height );
+
+  DALI_TEST_CHECK( v == height );
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorImplCalculateChildSizeBase(void)
+{
+  TestApplication application;
+  TestCustomActor custom = TestCustomActor::NewNegoSize();
+
+  Actor child = Actor::New();
+  child.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  child.SetSize(150, 150);
+
+  application.SendNotification();
+  application.Render();
+
+  float v = 9.99f;
+  v = custom.TestCalculateChildSizeBase( child, Dali::Dimension::ALL_DIMENSIONS );
+  DALI_TEST_CHECK( v == 0.0f );
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorImplRelayoutDependentOnChildrenBase(void)
+{
+  TestApplication application;
+  TestCustomActor custom = TestCustomActor::NewNegoSize();
+  custom.SetResizePolicy(Dali::ResizePolicy::FIT_TO_CHILDREN, Dali::Dimension::ALL_DIMENSIONS);
+
+  bool v = false;
+
+  v = custom.TestRelayoutDependentOnChildrenBase( Dali::Dimension::ALL_DIMENSIONS );
+  application.SendNotification();
+  application.Render();
+
+  DALI_TEST_CHECK( v == true );
+
+  custom.SetResizePolicy(Dali::ResizePolicy::FIXED, Dali::Dimension::ALL_DIMENSIONS);
+  v = custom.TestRelayoutDependentOnChildrenBase( Dali::Dimension::WIDTH );
+  application.SendNotification();
+  application.Render();
+  DALI_TEST_CHECK( v == false );
+
+  END_TEST;
+}
+
+int UtcDaliCustomActorTypeRegistry(void)
+{
+  TestApplication application;
+
+  // Register Type
+  TypeInfo type;
+  type = TypeRegistry::Get().GetTypeInfo( "CustomActor" );
+  DALI_TEST_CHECK( type );
+  BaseHandle handle = type.CreateInstance();
+
+  std::string name;
+  std::string exception;
+
+  try
+  {
+    name = handle.GetTypeName();
+    tet_result(TET_FAIL);
+  }
+  catch( DaliException& e )
+  {
+    exception = e.condition;
+    DALI_TEST_EQUALS( exception, "handle && \"BaseObject handle is empty\"", TEST_LOCATION );
+  }
+
+  END_TEST;
+}
+
+
+int UtcDaliCustomActorGetExtensionP(void)
+{
+  TestApplication application;
+
+  TestCustomActor custom = TestCustomActor::NewVariant5();
+
+  DALI_TEST_CHECK( NULL == custom.GetImplementation().GetExtension() );
+
   END_TEST;
 }

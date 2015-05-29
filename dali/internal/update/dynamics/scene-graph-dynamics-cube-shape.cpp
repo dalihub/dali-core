@@ -24,7 +24,7 @@
 #include <dali/integration-api/dynamics/dynamics-shape-intf.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
 #include <dali/public-api/math/vector3.h>
-#include <dali/public-api/dynamics/dynamics-shape.h>
+#include <dali/devel-api/dynamics/dynamics-shape.h>
 
 namespace Dali
 {

@@ -74,6 +74,10 @@ public:
     {
       (*(callback.mFunction))();
     }
+    else
+    {
+      DALI_ASSERT_ALWAYS( 0 && "no function to execute" );
+    }
   }
 
   /**

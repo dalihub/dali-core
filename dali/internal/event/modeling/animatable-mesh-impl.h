@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
-#include <dali/public-api/geometry/animatable-mesh.h>
+#include <dali/devel-api/geometry/animatable-mesh.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/modeling/modeling-declarations.h>
 

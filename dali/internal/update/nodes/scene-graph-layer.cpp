@@ -17,6 +17,7 @@
 
 // CLASS HEADER
 #include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/internal/event/actors/layer-impl.h>
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
@@ -36,7 +37,7 @@ SceneGraph::Layer* Layer::New()
 }
 
 Layer::Layer()
-: mSortFunction( Dali::Layer::ZValue ),
+: mSortFunction( Internal::Layer::ZValue ),
   mClippingBox( 0,0,0,0 ),
   mLastCamera(0),
   mIsClipping( false ),
@@ -57,7 +58,7 @@ void Layer::SetSortFunction( Dali::Layer::SortFunctionType function )
   if( mSortFunction != function )
   {
     // is a custom sort function used
-    if( function != Dali::Layer::ZValue )
+    if( function != Internal::Layer::ZValue )
     {
       mIsDefaultSortFunction = false;
     }

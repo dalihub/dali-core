@@ -6,6 +6,22 @@ SET(RPM_NAME "core-${PKG_NAME}-tests")
 SET(CAPI_LIB "dali-internal")
 
 SET(TC_SOURCES
+        utc-Dali-Atlas.cpp
+        utc-Dali-AnimatableMesh.cpp
+        utc-Dali-Context.cpp
+        utc-Dali-Constrainer.cpp
+        utc-Dali-DistanceField.cpp
+        utc-Dali-DynamicsBodyConfig.cpp
+        utc-Dali-DynamicsShape.cpp
+        utc-Dali-DynamicsWorld.cpp
+        utc-Dali-DynamicsWorldConfig.cpp
+        utc-Dali-Hash.cpp
+        utc-Dali-HitTestAlgorithm.cpp
+        utc-Dali-Material.cpp
+        utc-Dali-MeshActor.cpp
+        utc-Dali-MeshData.cpp
+        utc-Dali-Mutex.cpp
+        utc-Dali-Scripting.cpp
         utc-Dali-Internal-Handles.cpp
         utc-Dali-Internal-ImageFactory.cpp
         utc-Dali-Internal-Mesh.cpp
@@ -17,7 +33,7 @@ SET(TC_SOURCES
 )
 
 LIST(APPEND TC_SOURCES
-        ../dali/dali-test-suite-utils/mesh-builder.cpp
+        mesh-builder.cpp
         ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
         ../dali/dali-test-suite-utils/test-application.cpp
@@ -42,14 +58,16 @@ FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
 ENDFOREACH(directory ${CAPI_LIB_LIBRARY_DIRS})
 
 INCLUDE_DIRECTORIES(
+    ../../..
+    .
     ${${CAPI_LIB}_INCLUDE_DIRS}
     ../dali/dali-test-suite-utils
-    ../../..
 )
 
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
+    -lpthread
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

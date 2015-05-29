@@ -189,6 +189,27 @@ int utcDaliPathGenerateControlPoints01(void)
   END_TEST;
 }
 
+int utcDaliPathGetPointCount(void)
+{
+  TestApplication application;
+  Dali::Path path = Dali::Path::New();
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 0, TEST_LOCATION);
+
+  path.AddPoint(Vector3( 50.0,  50.0, 0.0));
+  path.AddPoint(Vector3(120.0,  70.0, 0.0));
+  path.AddPoint(Vector3(190.0, 250.0, 0.0));
+  path.AddPoint(Vector3(260.0, 260.0, 0.0));
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 4, TEST_LOCATION);
+
+  path.AddPoint(Vector3(330.0, 220.0, 0.0));
+  path.AddPoint(Vector3(400.0,  50.0, 0.0));
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 6, TEST_LOCATION);
+  END_TEST;
+}
+
 int utcDaliPathGenerateControlPoints02(void)
 {
   TestApplication application;
@@ -272,218 +293,104 @@ int UtcDaliPathSample01(void)
   END_TEST;
 }
 
-//PathConstraint test cases
-int UtcPathConstraintApply(void)
+int UtcDaliPathDownCast(void)
 {
   TestApplication application;
 
-  Dali::Actor actor = Dali::Actor::New();
-
-  // Register a float property
-  Property::Index index = actor.RegisterProperty( "t", 0.0f );
-
-  Dali::Stage::GetCurrent().Add(actor);
-
-
   Dali::Path path = Dali::Path::New();
+  Handle handle = path;
   SetupPath(path);
 
-  //Create a PathConstraint
-  Dali::PathConstraint pathConstraint = Dali::PathConstraint::New( path, Vector2(0.0f,1.0f) );
+  Dali::Path path2 = Dali::Path::DownCast(handle);
+  DALI_TEST_CHECK(path2);
 
-  //Apply the path constraint to the actor position. The source property for the constraint will be the custom property "t"
-  pathConstraint.Apply( Property(actor, index), Property(actor,Dali::Actor::Property::POSITION) );
-
-  //Create an animation to animate the custom property
-  float durationSeconds(1.0f);
-  Dali::Animation animation = Dali::Animation::New(durationSeconds);
-  animation.AnimateTo(Dali::Property(actor,index),1.0f);
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 20% progress */);
-
+  //t = 0
   Vector3 position, tangent;
-  path.Sample(0.2f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  path2.Sample(0.0f, position, tangent );
+  DALI_TEST_EQUALS(position.x, 30.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 80.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.6f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.7f, 0.1f, TEST_LOCATION);
 
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 40% progress */);
-  path.Sample(0.4f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  //t = 0.25
+  path2.Sample(0.25f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  48.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 102.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.6f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.7f, 0.1f, TEST_LOCATION);
 
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 60% progress */);
-  path.Sample(0.6f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  // t = 0.5
+  path2.Sample(0.5f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  70.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 120.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  1.0f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.0f, 0.1f, TEST_LOCATION);
 
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 80% progress */);
-  path.Sample(0.8f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
 
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* 100% progress */);
-  path.Sample(1.0f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  //t = 0.75
+  path2.Sample(0.75f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  85.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 112.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.7f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  -0.6f, 0.1f, TEST_LOCATION);
 
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*200.0f)/* beyond the animation duration*/);
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  // t = 1
+  path2.Sample(1.0f, position, tangent );
+  DALI_TEST_EQUALS(position.x, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.8f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  -0.4f, 0.1f, TEST_LOCATION);
 
   END_TEST;
 }
 
-int UtcPathConstraintApplyRange(void)
+int UtcDaliPathAssignment(void)
 {
   TestApplication application;
-
-  Dali::Actor actor = Dali::Actor::New();
-
-  // Register a float property
-  Property::Index index = actor.RegisterProperty( "t", 0.0f );
-  Dali::Stage::GetCurrent().Add(actor);
-
 
   Dali::Path path = Dali::Path::New();
   SetupPath(path);
 
-  //Create a PathConstraint
-  Vector2 range( 100.0f, 300.0f );
-  Dali::PathConstraint pathConstraint = Dali::PathConstraint::New( path, range );
+  Dali::Path path2;
+  path2 = path;
+  DALI_TEST_CHECK(path2);
 
-  //Apply the path constraint to the actor position. The source property for the constraint will be the custom property "t"
-  pathConstraint.Apply( Property(actor,index), Property(actor,Dali::Actor::Property::POSITION) );
-
-
-  //Create an animation to animate the custom property
-  float durationSeconds(1.0f);
-  Dali::Animation animation = Dali::Animation::New(durationSeconds);
-  animation.AnimateTo(Dali::Property(actor,index),400.0f);
-  animation.Play();
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 25% progress */);
-
-
+  //t = 0
   Vector3 position, tangent;
-  float tValue;
-  actor.GetProperty(index).Get(tValue);
-  float currentCursor =  ( tValue - range.x ) / (range.y-range.x);
-  path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  path2.Sample(0.0f, position, tangent );
+  DALI_TEST_EQUALS(position.x, 30.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 80.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.6f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.7f, 0.1f, TEST_LOCATION);
 
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 50% progress */);
-  actor.GetProperty(index).Get(tValue);
-  currentCursor =  ( tValue - range.x ) / (range.y-range.x);
-  path.Sample(currentCursor, position, tangent );
-  path.Sample(0.5, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
+  //t = 0.25
+  path2.Sample(0.25f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  48.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 102.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.6f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.7f, 0.1f, TEST_LOCATION);
 
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 75% progress */);
-  actor.GetProperty(index).Get(tValue);
-  currentCursor =  ( tValue - range.x ) / (range.y-range.x);
-  path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* 100% progress */);
-  actor.GetProperty(index).Get(tValue);
-  currentCursor =  ( tValue - range.x ) / (range.y-range.x);
-  path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(durationSeconds*250.0f)/* beyond the animation duration*/);
-  actor.GetProperty(index).Get(tValue);
-  currentCursor =  ( tValue - range.x ) / (range.y-range.x);
-  path.Sample(currentCursor, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcPathConstraintDestroy(void)
-{
-  TestApplication application;
-
-  Dali::Actor actor = Dali::Actor::New();
-
-  // Register a float property
-  Property::Index index = actor.RegisterProperty( "t", 0.0f );
-  Dali::Stage::GetCurrent().Add(actor);
+  // t = 0.5
+  path2.Sample(0.5f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  70.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 120.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  1.0f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.0f, 0.1f, TEST_LOCATION);
 
 
-  Dali::Path path = Dali::Path::New();
-  SetupPath(path);
+  //t = 0.75
+  path2.Sample(0.75f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  85.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 112.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.7f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  -0.6f, 0.1f, TEST_LOCATION);
 
-  {
-    //Create a PathConstraint
-    Vector2 range( 0.0f, 1.0f );
-    Dali::PathConstraint pathConstraint = Dali::PathConstraint::New( path, range );
-
-    //Apply the path constraint to the actor position. The source property for the constraint will be the custom property "t"
-    pathConstraint.Apply( Property(actor,index), Property(actor,Dali::Actor::Property::POSITION) );
-
-    //Test that the constraint is correctly applied
-    actor.SetProperty(index,0.5f);
-    application.SendNotification();
-    application.Render(static_cast<unsigned int>(1.0f));
-
-    Vector3 position, tangent;
-    path.Sample(0.5f, position, tangent );
-    DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-
-  }
-
-  //PathConstraint has been destroyed. Constraint in the actor should have been removed
-  actor.SetProperty(index,0.75f);
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(1.0f));
-
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
-
-  END_TEST;
-}
-
-int UtcPathConstraintRemove(void)
-{
-  TestApplication application;
-
-  Dali::Actor actor = Dali::Actor::New();
-
-  // Register a float property
-  Property::Index index = actor.RegisterProperty( "t", 0.0f );
-  Dali::Stage::GetCurrent().Add(actor);
-
-  Dali::Path path = Dali::Path::New();
-  SetupPath(path);
-
-  //Create a PathConstraint
-  Vector2 range( 0.0f, 1.0f );
-  Dali::PathConstraint pathConstraint = Dali::PathConstraint::New( path, range );
-
-  //Apply the path constraint to the actor position. The source property for the constraint will be the custom property "t"
-  pathConstraint.Apply( Property(actor,index), Property(actor,Dali::Actor::Property::POSITION) );
-
-  //Test that the constraint is correctly applied
-  actor.SetProperty(index,0.5f);
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(1.0f));
-
-  Vector3 position, tangent;
-  path.Sample(0.5f, position, tangent );
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), position, TEST_LOCATION );
-
-  //Remove constraint
-  pathConstraint.Remove( actor );
-  actor.SetProperty(index,0.75f);
-  application.SendNotification();
-  application.Render(static_cast<unsigned int>(1.0f));
-
-  DALI_TEST_EQUALS( actor.GetCurrentPosition(), Vector3::ZERO, TEST_LOCATION );
+  // t = 1
+  path2.Sample(1.0f, position, tangent );
+  DALI_TEST_EQUALS(position.x, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.8f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  -0.4f, 0.1f, TEST_LOCATION);
 
   END_TEST;
 }

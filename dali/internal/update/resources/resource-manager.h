@@ -23,9 +23,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/images/native-image-interface.h>
+#include <dali/devel-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
-#include <dali/public-api/common/ref-counted-dali-vector.h>
+#include <dali/devel-api/common/ref-counted-dali-vector.h>
 
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>
@@ -305,6 +305,12 @@ public: // Used by ResourceClient
    * Resource ticket has been discarded, throw away the actual resource
    */
   void HandleDiscardResourceRequest( ResourceId id, Integration::ResourceTypeId typeId );
+
+   /**
+    * @brief Create GL texture for resource.
+    * @param[in] id The resource id.
+    */
+   void HandleCreateGlTextureRequest( ResourceId id );
 
   /********************************************************************************
    ******************** Update thread object direct interface  ********************
@@ -648,6 +654,19 @@ inline void RequestDiscardResourceMessage( EventThreadServices& eventThreadServi
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleDiscardResourceRequest, id, typeId );
+}
+
+inline void RequestCreateGlTextureMessage( EventThreadServices& eventThreadServices,
+                                           ResourceManager& manager,
+                                           ResourceId id )
+{
+  typedef MessageValue1< ResourceManager, ResourceId > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &ResourceManager::HandleCreateGlTextureRequest, id );
 }
 
 } // namespace Internal

@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/events/hit-test-algorithm.h>
+#include <dali/devel-api/events/hit-test-algorithm.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
 namespace Dali

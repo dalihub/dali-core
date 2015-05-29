@@ -23,6 +23,7 @@
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/devel-api/dynamics/dynamics.h>
 
 #include <dali-test-suite-utils.h>
 
@@ -206,6 +207,17 @@ int UtcDaliStageGetCurrent(void)
   END_TEST;
 }
 
+int UtcDaliStageAssign(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+  Stage stage2;
+  stage2 = stage;
+
+  DALI_TEST_CHECK(stage2);
+  END_TEST;
+}
+
 int UtcDaliStageIsInstalled(void)
 {
   DALI_TEST_CHECK(!Stage::IsInstalled());
@@ -300,6 +312,21 @@ int UtcDaliStageGetDpi03(void)
   Vector2 dpi = stage.GetDpi();
   DALI_TEST_EQUALS(dpi.x, 72.0f, TEST_LOCATION);
   DALI_TEST_EQUALS(dpi.y, 120.0f, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliStageInitializeDynamicsP(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+  DynamicsWorld world = stage.InitializeDynamics( DynamicsWorldConfig::New() );
+
+#if !defined(DYNAMICS_SUPPORT)
+  DALI_TEST_CHECK(true);
+#else
+  DALI_TEST_CHECK( world );
+#endif
+
   END_TEST;
 }
 

@@ -134,3 +134,14 @@ int UtcDaliPanGestureGetScreenDistance(void)
   DALI_TEST_EQUALS(50.0f, gesture.GetScreenDistance(), TEST_LOCATION);
   END_TEST;
 }
+
+int UtcDaliPanGestureDynamicAllocation(void)
+{
+  PanGesture* gesture = new PanGesture( Gesture::Started );
+  DALI_TEST_EQUALS(Gesture::Started, gesture->state, TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, gesture->numberOfTouches, TEST_LOCATION);
+  DALI_TEST_EQUALS(Gesture::Pan, gesture->type, TEST_LOCATION);
+  delete gesture;
+
+  END_TEST;
+}

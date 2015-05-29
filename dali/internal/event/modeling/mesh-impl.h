@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/vector4.h>
-#include <dali/public-api/geometry/mesh.h>
+#include <dali/devel-api/geometry/mesh.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/internal/event/modeling/modeling-declarations.h>

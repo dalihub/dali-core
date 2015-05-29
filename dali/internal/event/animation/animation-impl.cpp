@@ -482,6 +482,17 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::FLOAT:
     {
+      if ( ( Dali::Actor::Property::SIZE_WIDTH == targetPropertyIndex )||
+           ( Dali::Actor::Property::SIZE_HEIGHT == targetPropertyIndex ) )
+      {
+        // Test whether this is actually an Actor
+        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
+        if ( maybeActor )
+        {
+          // Notify the actor that its size is being animated
+          maybeActor->NotifySizeAnimation( *this, destinationValue.Get<float>(), targetPropertyIndex );
+        }
+      }
       AddAnimatorConnector( AnimatorConnector<float>::New( targetObject,
                                                            targetPropertyIndex,
                                                            componentIndex,

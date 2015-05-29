@@ -44,7 +44,17 @@ class Layer : public Actor
 public:
 
   /**
-   * @copydoc Dali::Layer::ZValue(const Vector3&, float)
+   * @brief This sort function sorts translucent actors according to the Z-value in view space.
+   *
+   * This is useful for 2D user interfaces.
+   *
+   * This is the default sorting function.
+   *
+   * We return a negative z value as in our translation, a low z means that it should
+   * be sorted further away and a high z means that it should be closer.
+   * @param[in] position     position of actor in view space
+   * @param[in] sortModifier additional sort modifer
+   * @return depth
    */
   static float ZValue(const Vector3& position, float sortModifier)
   {

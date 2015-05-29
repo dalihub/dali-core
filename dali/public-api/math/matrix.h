@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/vector4.h>
 
 namespace Dali
@@ -358,6 +359,9 @@ private:
  * @return The output stream operator.
  */
 DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Matrix& matrix);
+
+// Allow Matrix to be treated as a POD type
+template <> struct TypeTraits< Matrix > : public BasicTypes< Matrix > { enum { IS_TRIVIAL_TYPE = true }; };
 
 } // namespace Dali
 

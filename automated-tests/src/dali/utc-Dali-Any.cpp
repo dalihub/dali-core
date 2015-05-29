@@ -160,6 +160,13 @@ int UtcDaliAnyAssignmentOperators(void)
 
   value6.Get( fValue );
   DALI_TEST_EQUALS( fValue, 3.f, Math::MACHINE_EPSILON_1000, TEST_LOCATION );
+
+  // test assignment for  non-empty Any = empty Any
+  Any value7;
+  value6 = value7;
+  DALI_TEST_CHECK( value6.Empty() );
+
+
   END_TEST;
 }
 
@@ -269,6 +276,23 @@ int UtcDaliAnyGet(void)
   DALI_TEST_EQUALS( myStruct2.mIntValue, 3, TEST_LOCATION );
   DALI_TEST_EQUALS( myStruct3->mIntValue, 3, TEST_LOCATION );
   DALI_TEST_EQUALS( myStruct4->mIntValue, 3, TEST_LOCATION );
+
+  // Test on empty any object
+  Dali::Any myAny;
+  float* f = myAny.GetPointer<float>();
+  DALI_TEST_CHECK( f == NULL );
+
+  // Test on getting wrong type
+  myAny = 1.f;
+  try
+  {
+    myAny.GetPointer<int>();
+    tet_result( TET_FAIL );
+  }
+  catch( Dali::DaliException& e )
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+  }
 
   END_TEST;
 }

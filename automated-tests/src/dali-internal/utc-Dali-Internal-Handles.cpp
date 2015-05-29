@@ -19,6 +19,7 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
+#include <dali/devel-api/actors/mesh-actor.h>
 
 #include <dali-test-suite-utils.h>
 

@@ -45,6 +45,37 @@ int UtcDaliRenderTaskListDefaultConstructor(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskListCopyConstructor(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTaskList::RenderTaskList(const RenderTaskList& handle)");
+
+  RenderTaskList taskList1;
+
+  RenderTaskList taskList2( taskList1 );
+
+  DALI_TEST_CHECK( ! taskList2 );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskListAssignment(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTaskList::RenderTaskList(const RenderTaskList& handle)");
+
+  RenderTaskList taskList1;
+
+  RenderTaskList taskList2;
+
+  taskList1 = taskList2;
+
+  DALI_TEST_CHECK( ! taskList1 );
+  END_TEST;
+}
+
+
 int UtcDaliRenderTaskListDownCast(void)
 {
   TestApplication application;

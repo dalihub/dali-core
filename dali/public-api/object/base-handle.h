@@ -221,6 +221,8 @@ private:
    */
   bool DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate );
 
+protected:
+
   /**
    * @brief Used by the safe bool idiom.
    *

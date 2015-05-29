@@ -27,7 +27,6 @@
 #include <dali/public-api/actors/draw-mode.h>
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
-#include <dali/public-api/actors/mesh-actor.h>
 #include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/actors/sampling.h>
 
@@ -37,8 +36,8 @@
 #include <dali/public-api/animation/constraint.h>
 #include <dali/public-api/animation/constraints.h>
 #include <dali/public-api/animation/key-frames.h>
+#include <dali/public-api/animation/linear-constrainer.h>
 #include <dali/public-api/animation/path.h>
-#include <dali/public-api/animation/path-constraint.h>
 #include <dali/public-api/animation/time-period.h>
 
 #include <dali/public-api/common/compile-time-assert.h>
@@ -47,22 +46,12 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/intrusive-ptr.h>
 #include <dali/public-api/common/loading-state.h>
-#include <dali/public-api/common/mutex.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/view-mode.h>
 
-#include <dali/public-api/dynamics/dynamics-body.h>
-#include <dali/public-api/dynamics/dynamics-body-config.h>
-#include <dali/public-api/dynamics/dynamics-collision.h>
-#include <dali/public-api/dynamics/dynamics-joint.h>
-#include <dali/public-api/dynamics/dynamics-shape.h>
-#include <dali/public-api/dynamics/dynamics-world-config.h>
-#include <dali/public-api/dynamics/dynamics-world.h>
-
 #include <dali/public-api/events/gesture-detector.h>
 #include <dali/public-api/events/gesture.h>
-#include <dali/public-api/events/hit-test-algorithm.h>
 #include <dali/public-api/events/hover-event.h>
 #include <dali/public-api/events/key-event.h>
 #include <dali/public-api/events/long-press-gesture-detector.h>
@@ -77,20 +66,10 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/touch-point.h>
 
-#include <dali/public-api/geometry/animatable-mesh.h>
-#include <dali/public-api/geometry/animatable-vertex.h>
-#include <dali/public-api/geometry/cloth.h>
-#include <dali/public-api/geometry/mesh.h>
-#include <dali/public-api/geometry/mesh-factory.h>
-
-#include <dali/public-api/images/atlas.h>
 #include <dali/public-api/images/buffer-image.h>
-#include <dali/public-api/images/distance-field.h>
 #include <dali/public-api/images/encoded-buffer-image.h>
 #include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/images/image.h>
-#include <dali/public-api/images/image-operations.h>
-#include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/native-image.h>
 #include <dali/public-api/images/resource-image.h>
 #include <dali/public-api/images/nine-patch-image.h>
@@ -109,14 +88,12 @@
 #include <dali/public-api/math/vector3.h>
 #include <dali/public-api/math/vector4.h>
 
-#include <dali/public-api/modeling/bone.h>
-#include <dali/public-api/modeling/material.h>
-
 #include <dali/public-api/object/any.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/object-registry.h>
+#include <dali/public-api/object/property-array.h>
 #include <dali/public-api/object/property-conditions.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/object/property-input.h>
@@ -132,8 +109,6 @@
 
 #include <dali/public-api/render-tasks/render-task-list.h>
 #include <dali/public-api/render-tasks/render-task.h>
-
-#include <dali/public-api/scripting/scripting.h>
 
 #include <dali/public-api/signals/base-signal.h>
 #include <dali/public-api/signals/callback.h>

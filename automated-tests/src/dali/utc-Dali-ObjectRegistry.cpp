@@ -23,8 +23,6 @@
 
 using namespace Dali;
 
-#include "mesh-builder.h"
-
 namespace
 {
 
@@ -126,25 +124,6 @@ struct TestLayerCallback
   bool& mSignalVerified;
 };
 
-
-struct TestMeshActorCallback
-{
-  TestMeshActorCallback(bool& signalReceived)
-  : mSignalVerified(signalReceived)
-  {
-  }
-  void operator()(BaseHandle object)
-  {
-    tet_infoline("Verifying TestMeshActorCallback()");
-    MeshActor actor = MeshActor::DownCast(object);
-    if(actor)
-    {
-      mSignalVerified = true;
-    }
-  }
-  bool& mSignalVerified;
-};
-
 struct TestAnimationCallback
 {
   TestAnimationCallback(bool& signalReceived)
@@ -195,6 +174,19 @@ int UtcDaliObjectRegistryGet(void)
   registry= Stage::GetCurrent().GetObjectRegistry();
 
   DALI_TEST_CHECK( registry );
+  END_TEST;
+}
+
+int UtcDaliObjectRegistryCopyConstructor(void)
+{
+  TestApplication application;
+  tet_printf(" copy consturctor ");
+
+  ObjectRegistry myRegistry;
+
+  ObjectRegistry anotherRegistry( myRegistry );
+
+  tet_result( TET_PASS );
   END_TEST;
 }
 
@@ -305,37 +297,6 @@ int UtcDaliObjectRegistrySignalLayerCreated(void)
   DALI_TEST_CHECK( test.mSignalVerified );
   END_TEST;
 }
-
-
-int UtcDaliObjectRegistrySignalMeshActorCreated(void)
-{
-  TestApplication application;
-  ObjectRegistry registry = Stage::GetCurrent().GetObjectRegistry();
-
-  bool verified = false;
-  TestMeshActorCallback test(verified);
-
-  Dali::RefObject* objectPointer = NULL;
-  TestObjectDestroyedCallback test2(verified, objectPointer);
-
-  registry.ObjectCreatedSignal().Connect(&application, test);
-  registry.ObjectDestroyedSignal().Connect(&application, test2);
-
-  Mesh mesh = ConstructMesh(60);
-
-  {
-    MeshActor actor = MeshActor::New(mesh);
-
-    DALI_TEST_CHECK(actor);
-    DALI_TEST_CHECK( test.mSignalVerified );
-
-    verified = false;
-    objectPointer = actor.GetObjectPtr();
-  }
-  DALI_TEST_CHECK( test.mSignalVerified );
-  END_TEST;
-}
-
 
 int UtcDaliObjectRegistrySignalAnimationCreated(void)
 {

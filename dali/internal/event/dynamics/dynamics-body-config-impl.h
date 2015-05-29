@@ -23,8 +23,8 @@
 
 // INTERNAL HEADERS
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
-#include <dali/public-api/dynamics/dynamics-body-config.h>
-#include <dali/public-api/dynamics/dynamics-shape.h>
+#include <dali/devel-api/dynamics/dynamics-body-config.h>
+#include <dali/devel-api/dynamics/dynamics-shape.h>
 
 namespace Dali
 {

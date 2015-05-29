@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
-#include <dali/public-api/dynamics/dynamics-body.h>
+#include <dali/devel-api/dynamics/dynamics-body.h>
 
 
 namespace Dali

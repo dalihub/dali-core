@@ -29,7 +29,7 @@ TestNativeImagePointer TestNativeImage::New(int width, int height)
 }
 
 TestNativeImage::TestNativeImage(int width, int height)
-: mWidth(width), mHeight(height)
+: mWidth(width), mHeight(height), mExtensionCreateCalls(0), mExtensionDestroyCalls(0), mTargetTextureCalls(0)
 {
 }
 

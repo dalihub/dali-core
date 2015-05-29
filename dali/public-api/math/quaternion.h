@@ -22,8 +22,9 @@
 #include <iosfwd>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/common/constants.h>
+#include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector4.h>
 
@@ -426,6 +427,9 @@ public:
  * @return The output stream operator.
  */
 DALI_IMPORT_API std::ostream& operator<< (std::ostream& o, const Quaternion& quaternion);
+
+// Allow Quaternion to be treated as a POD type
+template <> struct TypeTraits< Quaternion > : public BasicTypes< Quaternion > { enum { IS_TRIVIAL_TYPE = true }; };
 
 } // namespace Dali
 

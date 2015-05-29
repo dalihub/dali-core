@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/property.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor-enumerations.h>
@@ -60,6 +59,8 @@ typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
 class DALI_IMPORT_API CustomActorImpl : public Dali::RefObject
 {
 public:
+
+  class Extension; ///< Forward declare future extension interface
 
   /**
    * @brief Virtual destructor.
@@ -130,7 +131,7 @@ public:
    * @param[in] index The Property index that was set.
    * @param[in] propertyValue The value to set.
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) ;
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
 
   /**
    * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().
@@ -269,6 +270,16 @@ public:
    */
   virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) = 0;
 
+  /**
+   * Retrieve the extension for this control
+   *
+   * @return The extension if available, NULL otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
+
 protected: // For derived classes
 
   // Flags for the constructor
@@ -291,6 +302,8 @@ protected: // For derived classes
    */
   CustomActorImpl( ActorFlags flags );
 
+  // Size negotiation helpers
+
   /**
    * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
    *
@@ -302,6 +315,20 @@ protected: // For derived classes
    * only performed once, i.e. there is no need to keep track of this in the calling side.
    */
   void RelayoutRequest();
+
+  /**
+   * @brief provides the Actor implementation of GetHeightForWidth
+   * @param width to use.
+   * @return the height based on the width.
+   */
+  float GetHeightForWidthBase( float width );
+
+  /**
+   * @brief provides the Actor implementation of GetWidthForHeight
+   * @param height to use.
+   * @return the width based on the height.
+   */
+  float GetWidthForHeightBase( float height );
 
   /**
    * @brief Calculate the size for a child using the base actor object

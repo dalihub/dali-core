@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-test-suite-utils.h>
 
@@ -303,9 +302,10 @@ int UtcDaliRenderableActorGetCullFace(void)
 
   DALI_TEST_CHECK( CullNone == imageActor.GetCullFace() );
 
-  MeshActor meshActor = MeshActor::New();
+  imageActor.SetCullFace( CullBack );
 
-  DALI_TEST_CHECK( CullBack == meshActor.GetCullFace() );
+  DALI_TEST_CHECK( CullBack == imageActor.GetCullFace() );
+
   END_TEST;
 }
 
@@ -336,7 +336,7 @@ int UtcDaliRenderableActorSetGetBlendFunc(void)
   }
 
   // Set to non-default values
-  actor.SetBlendFunc( BlendingFactor::ONE_MINUS_SRC_COLOR, BlendingFactor::SRC_ALPHA_SATURATE );
+  actor.SetBlendFunc( BlendingFactor::ONE_MINUS_SRC_COLOR, BlendingFactor::SRC_ALPHA_SATURATE, BlendingFactor::ONE_MINUS_SRC_COLOR, BlendingFactor::SRC_ALPHA_SATURATE );
 
   // Test that Set was successful
   {
@@ -383,83 +383,6 @@ int UtcDaliRenderableActorSetGetBlendFunc(void)
   DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_CONSTANT_COLOR, glAbstraction.GetLastBlendFuncDstRgb(),   TEST_LOCATION );
   DALI_TEST_EQUALS( (GLenum)GL_CONSTANT_ALPHA,           glAbstraction.GetLastBlendFuncSrcAlpha(), TEST_LOCATION );
   DALI_TEST_EQUALS( (GLenum)GL_ONE_MINUS_CONSTANT_ALPHA, glAbstraction.GetLastBlendFuncDstAlpha(), TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliRenderableActorSetGetBlendEquation(void)
-{
-  TestApplication application;
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-
-  tet_infoline("Testing Dali::RenderableActor::SetBlendEquation()");
-
-  BufferImage img = BufferImage::New( 1,1 );
-  ImageActor actor = ImageActor::New( img );
-  Stage::GetCurrent().Add( actor );
-  application.SendNotification();
-  application.Render();
-
-  // Test the defaults as documented int blending.h
-  {
-    BlendingEquation::Type equationRgb( BlendingEquation::SUBTRACT );
-    BlendingEquation::Type equationAlpha( BlendingEquation::SUBTRACT );
-    actor.GetBlendEquation( equationRgb, equationAlpha );
-    DALI_TEST_EQUALS( BlendingEquation::ADD, equationRgb, TEST_LOCATION );
-    DALI_TEST_EQUALS( BlendingEquation::ADD, equationAlpha, TEST_LOCATION );
-  }
-
-  // Test the single blending equation setting
-  {
-    actor.SetBlendEquation( BlendingEquation::REVERSE_SUBTRACT );
-    BlendingEquation::Type equationRgba( BlendingEquation::SUBTRACT );
-    actor.GetBlendEquation( equationRgba, equationRgba );
-    DALI_TEST_EQUALS( BlendingEquation::REVERSE_SUBTRACT, equationRgba, TEST_LOCATION );
-  }
-
-  actor.SetBlendEquation( BlendingEquation::REVERSE_SUBTRACT, BlendingEquation::REVERSE_SUBTRACT );
-
-  // Test that Set was successful
-  {
-    BlendingEquation::Type equationRgb( BlendingEquation::SUBTRACT );
-    BlendingEquation::Type equationAlpha( BlendingEquation::SUBTRACT );
-    actor.GetBlendEquation( equationRgb, equationAlpha );
-    DALI_TEST_EQUALS( BlendingEquation::REVERSE_SUBTRACT, equationRgb, TEST_LOCATION );
-    DALI_TEST_EQUALS( BlendingEquation::REVERSE_SUBTRACT, equationAlpha, TEST_LOCATION );
-  }
-
-  // Render & check GL commands
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( (GLenum)GL_FUNC_REVERSE_SUBTRACT, glAbstraction.GetLastBlendEquationRgb(),   TEST_LOCATION );
-  DALI_TEST_EQUALS( (GLenum)GL_FUNC_REVERSE_SUBTRACT, glAbstraction.GetLastBlendEquationAlpha(), TEST_LOCATION );
-  END_TEST;
-}
-
-int UtcDaliRenderableActorSetGetBlendColor(void)
-{
-  TestApplication application;
-  TestGlAbstraction& glAbstraction = application.GetGlAbstraction();
-
-  tet_infoline("Testing Dali::RenderableActor::SetBlendColor()");
-
-  BufferImage img = BufferImage::New( 1,1 );
-  ImageActor actor = ImageActor::New( img );
-  Stage::GetCurrent().Add( actor );
-  application.SendNotification();
-  application.Render();
-
-  // Test the defaults as documented int blending.h
-  DALI_TEST_EQUALS( Vector4::ZERO, actor.GetBlendColor(), TEST_LOCATION );
-
-  actor.SetBlendColor( Color::RED );
-
-  // Test that Set was successful
-  DALI_TEST_EQUALS( Color::RED, actor.GetBlendColor(), TEST_LOCATION );
-
-  // Render & check GL commands
-  application.SendNotification();
-  application.Render();
-  DALI_TEST_EQUALS( Color::RED, glAbstraction.GetLastBlendColor(),   TEST_LOCATION );
   END_TEST;
 }
 

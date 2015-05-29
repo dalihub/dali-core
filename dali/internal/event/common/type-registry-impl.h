@@ -19,7 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/map-wrapper.h>
+#include <dali/devel-api/common/map-wrapper.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/base-handle.h>
 #include <dali/public-api/object/base-object.h>

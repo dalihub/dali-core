@@ -24,7 +24,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/dali-core-version.h>
 #include <dali/public-api/common/dali-common.h>
-#include <dali/public-api/common/hash.h>
+#include <dali/devel-api/common/hash.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>

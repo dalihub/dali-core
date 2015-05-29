@@ -25,7 +25,7 @@
 #include <dali/public-api/common/loading-state.h>
 #include <dali/public-api/images/image.h>
 #include <dali/public-api/signals/dali-signal.h>
-#include <dali/public-api/images/image-operations.h>
+#include <dali/devel-api/images/image-operations.h>
 
 namespace Dali
 {

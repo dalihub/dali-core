@@ -479,11 +479,6 @@ float Actor::GetRelayoutSize( Dimension::Type dimension ) const
   return GetImplementation(*this).GetRelayoutSize( dimension );
 }
 
-void Actor::PropagateRelayoutFlags()
-{
-  GetImplementation(*this).PropagateRelayoutFlags();
-}
-
 void Actor::SetPadding( const Padding& padding )
 {
   Internal::Actor& impl = GetImplementation(*this);

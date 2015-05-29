@@ -117,7 +117,9 @@ void Stage::Uninitialize()
 
   if( mDefaultCamera )
   {
-    Remove(*(mDefaultCamera.Get()));
+    // its enough to release the handle so the object is released
+    // don't need to remove it from root actor as root actor will delete the object
+    mDefaultCamera.Reset();
   }
 
   if( mRootLayer )

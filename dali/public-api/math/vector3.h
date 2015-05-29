@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/type-traits.h>
 
 namespace Dali
 {
@@ -602,6 +603,8 @@ DALI_IMPORT_API Vector3 FillXYKeepAspectRatio( const Vector3& target, const Vect
  */
 DALI_IMPORT_API Vector3 ShrinkInsideKeepAspectRatio( const Vector3& target, const Vector3& source );
 
+// Allow Vector3 to be treated as a POD type
+template <> struct TypeTraits< Vector3 > : public BasicTypes< Vector3 > { enum { IS_TRIVIAL_TYPE = true }; };
 
 } // namespace Dali
 

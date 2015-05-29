@@ -147,6 +147,30 @@ int UtcDaliTapGestureDetectorConstructor(void)
   END_TEST;
 }
 
+int UtcDaliTapGestureDetectorCopyConstructorP(void)
+{
+  TestApplication application;
+
+  TapGestureDetector detector = TapGestureDetector::New();
+
+  TapGestureDetector copy( detector );
+  DALI_TEST_CHECK( detector );
+  END_TEST;
+}
+
+int UtcDaliTapGestureDetectorAssignmentOperatorP(void)
+{
+  TestApplication application;
+
+  TapGestureDetector detector = TapGestureDetector::New();;
+
+  TapGestureDetector assign;
+  assign = detector;
+  DALI_TEST_CHECK( detector );
+
+  DALI_TEST_CHECK( detector == assign );
+  END_TEST;
+}
 
 int UtcDaliTapGestureDetectorNew(void)
 {
