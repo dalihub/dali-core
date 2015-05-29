@@ -89,15 +89,6 @@ public:
   const SceneGraph::PropertyBuffer* GetPropertyBufferSceneObject() const;
 
   /**
-   * @brief Set the type of PropertyBuffer
-   *
-   * @pre Has not been set yet
-   *
-   * @param[in] type of PropertyBuffer
-   */
-  void SetType( Dali::PropertyBuffer::Type type );
-
-  /**
    * @brief Set the format of the PropertyBuffer
    *
    * @pre Has not been set yet
@@ -241,7 +232,6 @@ private: // data
   Property::Map mFormat;  ///< Format of the property buffer
   const SceneGraph::PropertyBufferMetadata::Format* mBufferFormat;  ///< Metadata for the format of the property buffer
   unsigned int mSize; ///< Number of elements in the buffer
-  Dali::PropertyBuffer::Type mType; ///< Type of propertyBuffer
   Dali::Vector< char > mBuffer; // Data of the property-buffer
 
   bool mOnStage;  ///< Flag to know if the object is on stage

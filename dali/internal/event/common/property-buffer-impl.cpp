@@ -183,24 +183,9 @@ void PropertyBuffer::SetData( const void* data )
                               new SceneGraph::PropertyBuffer::BufferType( mBuffer ) );
 }
 
-Dali::Property::Index PropertyBuffer::GetPropertyIndex( const std::string name, std::size_t index )
-{
-  //TODO: MESH_REWORK
-  DALI_ASSERT_ALWAYS( false && "MESH_REWORK" );
-  return 0;
-}
-
 const SceneGraph::PropertyBuffer* PropertyBuffer::GetPropertyBufferSceneObject() const
 {
   return mSceneObject;
-}
-
-void PropertyBuffer::SetType( Dali::PropertyBuffer::Type type )
-{
-  DALI_ASSERT_DEBUG( mType == Dali::PropertyBuffer::TYPE_COUNT && "Type can only be set once." );
-  DALI_ASSERT_DEBUG( type != Dali::PropertyBuffer::TYPE_COUNT && "Type must be set to a valid value." );
-
-  mType = type;
 }
 
 void PropertyBuffer::SetFormat( Dali::Property::Map& format )
@@ -385,7 +370,6 @@ PropertyBuffer::PropertyBuffer()
 : mSceneObject( NULL ),
   mBufferFormat( NULL ),
   mSize( 0 ),
-  mType( Dali::PropertyBuffer::TYPE_COUNT ),
   mOnStage( false )
 {
 }
