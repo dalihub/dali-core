@@ -73,6 +73,4 @@ const float Math::MACHINE_EPSILON_100   = Epsilon<100>::value;
 const float Math::MACHINE_EPSILON_1000  = Epsilon<1000>::value;
 const float Math::MACHINE_EPSILON_10000 = Epsilon<10000>::value;
 
-const std::string String::EMPTY("");
-
 } // namespace Dali

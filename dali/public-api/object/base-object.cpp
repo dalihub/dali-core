@@ -82,7 +82,8 @@ const std::string& BaseObject::GetTypeName() const
 
   // Return an empty string if type-name not found.
   DALI_LOG_WARNING( "TypeName Not Found\n" );
-  return String::EMPTY;
+  static std::string empty;
+  return empty;
 }
 
 bool BaseObject::GetTypeInfo(Dali::TypeInfo& typeInfo) const
