@@ -278,7 +278,7 @@ void Shader::Initialize(
   mTicket = ResourceTicketPtr( shaderFactory.Load(vertexSource, fragmentSource, shaderHash) );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( updateManager, *mSceneObject, GEOMETRY_TYPE_IMAGE, SHADER_SUBTYPE_ALL, mTicket->GetId(), shaderHash, false );
+  SetShaderProgramMessage( updateManager, *mSceneObject, GEOMETRY_TYPE_IMAGE, mTicket->GetId(), shaderHash, false );
 }
 
 Shader::~Shader()

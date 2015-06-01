@@ -173,7 +173,7 @@ void WrapAndSetProgram( Internal::ShaderEffect& effect,
       fragmentSource.append( customShaderWrappers[index].fragmentShaderPostfix );
     }
 
-    effect.SendProgramMessage( expectedGeometryType, SHADER_SUBTYPE_ALL, vertexSource, fragmentSource, modifiesGeometry );
+    effect.SendProgramMessage( expectedGeometryType, vertexSource, fragmentSource, modifiesGeometry );
   }
 }
 
@@ -334,7 +334,7 @@ void ShaderEffect::SetPrograms( GeometryType geometryType,
   WrapAndSetProgram( *this, geometryType, GEOMETRY_TYPE_UNTEXTURED_MESH, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
 }
 
-void ShaderEffect::SendProgramMessage( GeometryType geometryType, ShaderSubTypes subType,
+void ShaderEffect::SendProgramMessage( GeometryType geometryType,
                                        const string& vertexSource, const string& fragmentSource,
                                        bool modifiesGeometry )
 {
@@ -344,10 +344,10 @@ void ShaderEffect::SendProgramMessage( GeometryType geometryType, ShaderSubTypes
 
   ResourceTicketPtr ticket( shaderFactory.Load(vertexSource, fragmentSource, shaderHash) );
 
-  DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(geometryType %d subType:%d ticket.id:%d)\n", geometryType, subType, ticket->GetId() );
+  DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(geometryType %d ticket.id:%d)\n", geometryType, ticket->GetId() );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, geometryType, subType, ticket->GetId(), shaderHash, modifiesGeometry );
+  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, geometryType, ticket->GetId(), shaderHash, modifiesGeometry );
 
   mTickets.push_back(ticket);       // add ticket to collection to keep it alive.
 }

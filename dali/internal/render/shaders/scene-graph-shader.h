@@ -2,7 +2,7 @@
 #define __DALI_INTERNAL_SCENE_GRAPH_SHADER_H__
 
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2014-2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -65,55 +65,6 @@ class TextureCache;
 class Shader : public PropertyOwner
 {
 public:
-
-  /**
-   * This container contains pointers to the programs for each sub-type of a given geometry type.
-   * If a custom shader has overridden the subtypes (e.g. mesh custom shader),
-   * then the flag is used to indicate that there is only one shader in the
-   * vector that should be used.
-   * Note, it does not own the Programs it contains.
-   */
-  struct ProgramContainer
-  {
-  public:
-    /**
-     * Constructor
-     */
-    ProgramContainer()
-    : mUseDefaultForAllSubtypes(false)
-    {
-    }
-
-    /**
-     * Array lookup
-     * @param[in] position The array index
-     */
-    Program*& operator[]( size_t position )
-    {
-      return mSubPrograms[position];
-    }
-
-    /**
-     * Resize the container
-     * @param[in] length The new size of the container
-     */
-    void Resize(size_t length)
-    {
-      mSubPrograms.Resize( length, NULL );
-    }
-
-    /**
-     * Get the number of elements in the container
-     * @return count of the number of elements in the container
-     */
-    size_t Count() const
-    {
-      return mSubPrograms.Count();
-    }
-
-    Dali::Vector<Program*> mSubPrograms; ///< The programs for each subtype
-    bool mUseDefaultForAllSubtypes;      ///< TRUE if the first program should be used for all subtypes
-  };
 
   /**
    * Constructor
@@ -287,16 +238,15 @@ public:
   void SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::UniformCoordinateType type );
 
   /**
-   * Set the program for a geometry type and subtype
+   * @brief Set the program for a geometry type.
    * @param[in] geometryType      The type of the object (geometry) that is to be rendered.
-   * @param[in] subType           The subtype, one of ShaderSubTypes.
    * @param[in] resourceId        The resource ID for the program.
    * @param[in] shaderData        The program's vertex/fragment source and optionally compiled bytecode
    * @param[in] programCache      Owner of the Programs
    * @param[in] modifiesGeometry  True if the vertex shader changes geometry
    */
-  void SetProgram( GeometryType geometryType,
-                   Internal::ShaderSubTypes subType,
+  void SetProgram( /** @deprecated This is currently ignored and will soon disappear. */
+                   GeometryType geometryType,
                    Integration::ResourceId resourceId,
                    Integration::ShaderDataPtr shaderData,
                    ProgramCache* programCache,
@@ -304,6 +254,7 @@ public:
 
   /**
    * Determine if subtypes are required for the given geometry type
+   * @deprecated
    * @param[in] geometryType The type of the object (geometry) that is to be rendered.
    * @return TRUE if subtypes are required, FALSE if there is only one subtype available
    */
@@ -311,6 +262,7 @@ public:
 
   /**
    * Get the program associated with the given type and subtype
+   * @deprecated
    * @param[in]  context      the context used to render.
    * @param[in]  type         the type of the object (geometry) that is being rendered.
    * @param[in]  subType      Identifier for geometry types with specialised default shaders
@@ -321,6 +273,13 @@ public:
                        GeometryType type,
                        ShaderSubTypes subType,
                        unsigned int& programIndex );
+
+  /**
+   * Get the program built for this shader
+   * @deprecated
+   * @return the program to use.
+   */
+  Program* GetProgram();
 
   /**
    * Sets the shader specific uniforms including custom uniforms
@@ -346,7 +305,7 @@ private: // Data
   Integration::ResourceId        mRenderTextureId;  ///< Copy of the texture ID for the render thread
   Integration::ResourceId        mUpdateTextureId;  ///< Copy of the texture ID for update thread
 
-  std::vector<ProgramContainer>  mPrograms;         ///< 2D array of Program*. Access by [Log<GEOMETRY_TYPE_XXX>::value][index]. An index of 0 selects the default program for that geometry type.
+  Program*                       mProgram;
 
   typedef OwnerContainer< UniformMeta* > UniformMetaContainer;
   UniformMetaContainer           mUniformMetadata;     ///< A container of owned UniformMeta values; one for each property in PropertyOwner::mDynamicProperties

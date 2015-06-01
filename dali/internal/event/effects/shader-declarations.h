@@ -33,16 +33,7 @@ namespace Internal
 enum ShaderSubTypes
 {
   SHADER_DEFAULT = 0,  ///< Use default shader for geometry type
-
-  // for mesh shader         ///< Default shader is scene lit
-  SHADER_EVENLY_LIT = 1,
-  SHADER_RIGGED_AND_LIT,     ///< Use rigged & scene lit
-  SHADER_RIGGED_AND_EVENLY_LIT,
-  SHADER_RIGGED_AND_VERTEX_COLOR,
-  SHADER_VERTEX_COLOR,       ///< Use only vertex color
-  TOTAL_MESH_SHADERS,
-
-  SHADER_SUBTYPE_LAST = TOTAL_MESH_SHADERS,
+  SHADER_SUBTYPE_LAST,
 
   SHADER_SUBTYPE_ALL = 0xFF,
 };

@@ -112,12 +112,11 @@ public:
   /**
    * Send shader program to scene-graph object.
    * @param[in] geometryType     The GeometryType rendered by the shader program
-   * @param[in] subType          The subtype, one of ShaderSubTypes.
    * @param[in] vertexSource     The source code for the vertex shader
    * @param[in] fragmentSource   The source code for the fragment shader
    * @param[in] modifiesGeometry True if the shader modifies geometry
    */
-  void SendProgramMessage( GeometryType geometryType, ShaderSubTypes subType,
+  void SendProgramMessage( GeometryType geometryType,
                            const std::string& vertexSource, const std::string& fragmentSource,
                            bool modifiesGeometry );
 

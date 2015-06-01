@@ -613,9 +613,9 @@ void UpdateManager::RemoveShader( Shader* shader )
   DALI_ASSERT_DEBUG(false);
 }
 
-void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, ResourceId resourceId, size_t shaderHash, bool modifiesGeometry )
+void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType, ResourceId resourceId, size_t shaderHash, bool modifiesGeometry )
 {
-  DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, " - (geometryType:%d subType:%d id:%d hash:%d)\n", geometryType, subType, resourceId, shaderHash);
+  DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, " - (geometryType:%d id:%d hash:%d)\n", geometryType, resourceId, shaderHash);
 
   DALI_ASSERT_ALWAYS( NULL != shader && "shader is uninitialized" );
 
@@ -625,13 +625,13 @@ void UpdateManager::SetShaderProgram( Shader* shader, GeometryType geometryType,
     shaderData->SetHashValue( shaderHash );
     shaderData->SetResourceId( resourceId );
 
-    typedef MessageValue6< Shader, GeometryType, Internal::ShaderSubTypes, Integration::ResourceId, Integration::ShaderDataPtr, ProgramCache*, bool> DerivedType;
+    typedef MessageValue5< Shader, GeometryType, Integration::ResourceId, Integration::ShaderDataPtr, ProgramCache*, bool> DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( shader, &Shader::SetProgram, geometryType, subType, resourceId, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
+    new (slot) DerivedType( shader, &Shader::SetProgram, geometryType, resourceId, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
   }
 }
 

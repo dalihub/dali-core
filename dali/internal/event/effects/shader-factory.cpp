@@ -118,39 +118,7 @@ void ShaderFactory::LoadDefaultShaders()
 {
   mDefaultShader = ShaderEffect::New();
 
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_IMAGE, SHADER_DEFAULT, ImageVertex, ImageFragment, false );
-
-  // Untextured meshes
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_EVENLY_LIT,
-                                      UntexturedMeshVertex,
-                                      UntexturedMeshFragment,
-                                      false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
-                                      std::string( SHADER_DEF_USE_BONES ) + UntexturedMeshVertex,
-                                      UntexturedMeshFragment,
-                                      true );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_RIGGED_AND_VERTEX_COLOR,
-                                      std::string( SHADER_DEF_USE_BONES SHADER_DEF_USE_COLOR ) + UntexturedMeshVertex,
-                                      std::string( SHADER_DEF_USE_COLOR ) + UntexturedMeshFragment,
-                                      true );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_UNTEXTURED_MESH, SHADER_VERTEX_COLOR,
-                                      std::string( SHADER_DEF_USE_COLOR ) + UntexturedMeshVertex,
-                                      std::string( SHADER_DEF_USE_COLOR ) + UntexturedMeshFragment,
-                                      false );
-
-  // Textured meshes
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_EVENLY_LIT,
-                                      TexturedMeshVertex,
-                                      TexturedMeshFragment,
-                                      false );
-
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_TEXTURED_MESH, SHADER_RIGGED_AND_EVENLY_LIT,
-                                      std::string( SHADER_DEF_USE_BONES ) + TexturedMeshVertex,
-                                      TexturedMeshFragment,
-                                      true );
+  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_IMAGE, ImageVertex, ImageFragment, false );
 }
 
 } // namespace Internal
