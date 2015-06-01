@@ -292,22 +292,6 @@ std::string TypeInfo::GetSignalName(size_t index) const
   return name;
 }
 
-std::string TypeInfo::GetPropertyName(size_t index) const
-{
-  std::string name;
-  Property::IndexContainer indices;
-
-  GetPropertyIndices(indices);
-
-  if( index < indices.Size() )
-  {
-    name = GetPropertyName( indices[index] );
-  }
-
-  return name;
-}
-
-
 void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
 {
   Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );

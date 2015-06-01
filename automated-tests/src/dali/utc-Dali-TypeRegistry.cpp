@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <limits>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
@@ -994,9 +995,6 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   typeInfo.GetPropertyIndices( indices );
   DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
 
-  // check property name count
-  DALI_TEST_CHECK( 1 == typeInfo.GetPropertyCount() );
-
   // Ensure indices returned from actor and customActor differ by two
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );
@@ -1679,5 +1677,73 @@ int UtcDaliTypeRegistryNamedType(void)
   unsigned int namedActorPropertyCount( namedActor.GetPropertyCount() );
 
   DALI_TEST_CHECK( namedActorPropertyCount > actorPropertyCount );
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetActionNameP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  DALI_TEST_CHECK( 0 != typeInfo.GetActionCount() );
+
+  std::string name = typeInfo.GetActionName(0);
+
+  DALI_TEST_EQUALS( name, "show", TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetActionNameN(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  DALI_TEST_CHECK( 0 != typeInfo.GetActionCount() );
+
+  std::string name = typeInfo.GetActionName(std::numeric_limits<size_t>::max());
+
+  DALI_TEST_EQUALS( 0, name.size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetSignalNameP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  DALI_TEST_CHECK( 0 != typeInfo.GetSignalCount() );
+
+  std::string name = typeInfo.GetSignalName(0);
+
+  DALI_TEST_EQUALS( name, "touched", TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetSignalNameN(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  DALI_TEST_CHECK( 0 != typeInfo.GetSignalCount() );
+
+  std::string name = typeInfo.GetSignalName(std::numeric_limits<size_t>::max());
+
+  DALI_TEST_EQUALS( 0, name.size(), TEST_LOCATION );
+
   END_TEST;
 }

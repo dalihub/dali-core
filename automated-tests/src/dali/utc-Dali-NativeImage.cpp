@@ -199,3 +199,16 @@ int UtcDaliNativeImageContextLoss(void)
 
   END_TEST;
 }
+
+int UtcDaliNativeImageExtensionP(void)
+{
+  TestApplication application;
+  tet_infoline( "Testing Dali::NativeImage::GenerateGlTexture()" );
+
+  TestNativeImagePointer testNativeImage = TestNativeImage::New( 16, 16 );
+  DALI_TEST_CHECK( testNativeImage );
+
+  DALI_TEST_CHECK( NULL == testNativeImage->GetExtension() );
+
+  END_TEST;
+}
