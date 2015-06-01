@@ -23,6 +23,7 @@
 #include <dali/integration-api/context-notifier.h>
 #include <dali/integration-api/events/key-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/devel-api/dynamics/dynamics.h>
 
 #include <dali-test-suite-utils.h>
@@ -129,6 +130,38 @@ struct TouchedFunctor
   }
 
   TouchedSignalData& signalData;
+};
+
+// Stores data that is populated in the wheel-event callback and will be read by the TET cases
+struct WheelEventSignalData
+{
+  WheelEventSignalData()
+  : functorCalled(false)
+  {}
+
+  void Reset()
+  {
+    functorCalled = false;
+  }
+
+  bool functorCalled;
+  WheelEvent receivedWheelEvent;
+};
+
+// Functor that sets the data when wheel-event signal is received
+struct WheelEventReceivedFunctor
+{
+  WheelEventReceivedFunctor( WheelEventSignalData& data ) : signalData( data ) { }
+
+  bool operator()( const WheelEvent& wheelEvent )
+  {
+    signalData.functorCalled = true;
+    signalData.receivedWheelEvent = wheelEvent;
+
+    return true;
+  }
+
+  WheelEventSignalData& signalData;
 };
 
 bool DummyTouchCallback( Actor actor, const TouchEvent& touch )
@@ -659,6 +692,41 @@ int UtcDaliStageTouchedSignal(void)
     DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
     data.Reset();
   }
+  END_TEST;
+}
+
+int UtcDaliStageSignalWheelEvent(void)
+{
+  TestApplication application;
+  Stage stage = Stage::GetCurrent();
+
+  WheelEventSignalData data;
+  WheelEventReceivedFunctor functor( data );
+  stage.WheelEventSignal().Connect( &application, functor );
+
+  Integration::WheelEvent event( Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2( 0.0f, 0.0f ), 1, 1000u );
+  application.ProcessEvent( event );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( static_cast< WheelEvent::Type >(event.type) == data.receivedWheelEvent.type );
+  DALI_TEST_CHECK( event.direction == data.receivedWheelEvent.direction );
+  DALI_TEST_CHECK( event.modifiers == data.receivedWheelEvent.modifiers );
+  DALI_TEST_CHECK( event.point == data.receivedWheelEvent.point );
+  DALI_TEST_CHECK( event.z == data.receivedWheelEvent.z );
+  DALI_TEST_CHECK( event.timeStamp == data.receivedWheelEvent.timeStamp );
+
+  data.Reset();
+
+  Integration::WheelEvent event2( Integration::WheelEvent::CUSTOM_WHEEL, 0, 0u, Vector2( 0.0f, 0.0f ), -1, 1000u );
+  application.ProcessEvent( event2 );
+
+  DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
+  DALI_TEST_CHECK( static_cast< WheelEvent::Type >(event2.type) == data.receivedWheelEvent.type );
+  DALI_TEST_CHECK( event2.direction == data.receivedWheelEvent.direction );
+  DALI_TEST_CHECK( event2.modifiers == data.receivedWheelEvent.modifiers );
+  DALI_TEST_CHECK( event2.point == data.receivedWheelEvent.point );
+  DALI_TEST_CHECK( event2.z == data.receivedWheelEvent.z );
+  DALI_TEST_CHECK( event2.timeStamp == data.receivedWheelEvent.timeStamp );
   END_TEST;
 }
 
