@@ -2377,14 +2377,15 @@ Actor::~Actor()
   }
 }
 
-void Actor::ConnectToStage( int index )
+void Actor::ConnectToStage( unsigned int parentDepth, int index )
 {
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
+
   // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveConnectToStage( connectionList, index );
+  RecursiveConnectToStage( connectionList, parentDepth+1, index );
 
   // Notify applications about the newly connected actors.
   const ActorIter endIter = connectionList.end();
@@ -2397,11 +2398,12 @@ void Actor::ConnectToStage( int index )
   RelayoutRequest();
 }
 
-void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
+void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth, int index )
 {
   DALI_ASSERT_ALWAYS( !OnStage() );
 
   mIsOnStage = true;
+  mDepth = depth;
 
   ConnectToSceneGraph( index );
 
@@ -2418,7 +2420,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
       Actor& actor = GetImplementation( *iter );
-      actor.RecursiveConnectToStage( connectionList );
+      actor.RecursiveConnectToStage( connectionList, depth+1 );
     }
   }
 }
@@ -2467,7 +2469,7 @@ void Actor::NotifyStageConnection()
   if( OnStage() && !mOnStageSignalled )
   {
     // Notification for external (CustomActor) derived classes
-    OnStageConnectionExternal();
+    OnStageConnectionExternal( mDepth );
 
     if( !mOnStageSignal.Empty() )
     {
@@ -3843,7 +3845,7 @@ void Actor::SetParent( Actor* parent, int index )
          parent->OnStage() )
     {
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToStage( index );
+      ConnectToStage( parent->GetDepth(), index );
     }
   }
   else // parent being set to NULL
