@@ -27,17 +27,6 @@ namespace Dali
 namespace Internal
 {
 
-/**
- * Shader sub types.
- */
-enum ShaderSubTypes
-{
-  SHADER_DEFAULT = 0,  ///< Use default shader for geometry type
-  SHADER_SUBTYPE_LAST,
-
-  SHADER_SUBTYPE_ALL = 0xFF,
-};
-
 class ShaderEffect;
 typedef IntrusivePtr<ShaderEffect> ShaderEffectPtr;
 

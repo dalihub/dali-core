@@ -230,12 +230,6 @@ bool ImageRenderer::CheckResources()
   return true;
 }
 
-void ImageRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
-{
-  outType = GEOMETRY_TYPE_IMAGE;
-  outSubType = SHADER_DEFAULT;
-}
-
 bool ImageRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
 {
   context.IncrementRendererCount();

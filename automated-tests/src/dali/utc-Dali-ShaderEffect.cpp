@@ -801,8 +801,6 @@ int UtcDaliShaderEffectFromProperties01(void)
   programMap.SetValue("vertex-prefix", vertexShaderPrefix);
   programMap.SetValue("fragment-prefix", fragmentShaderPrefix);
 
-  programMap.SetValue("geometry-type", "GEOMETRY_TYPE_IMAGE");
-
   effect.SetProperty(effect.GetPropertyIndex("program"), programMap);
 
   Property::Value imageMap = Property::Value(Property::MAP);
@@ -847,10 +845,8 @@ int UtcDaliShaderEffectFromProperties01(void)
 
 int UtcDaliShaderEffectFromProperties02(void)
 {
-  try
-  {
-    TestApplication application;
-    tet_infoline("UtcDaliShaderEffectFromProperties02()");
+  TestApplication application;
+  tet_infoline("UtcDaliShaderEffectFromProperties02()");
 
     // Call render to compile default shaders.
     application.SendNotification();
@@ -869,18 +865,8 @@ int UtcDaliShaderEffectFromProperties02(void)
     programMap.SetValue("vertex",   std::string(VertexSource));
     programMap.SetValue("fragment", std::string(FragmentSource));
 
-    // programMap.SetValue("geometry-type", "GEOMETRY_TYPE_IMAGE");
-    // dont set by value
-    programMap.SetValue("geometry-type", GeometryType( GEOMETRY_TYPE_IMAGE ));
+  effect.SetProperty(effect.GetPropertyIndex("program"), programMap);
 
-    effect.SetProperty(effect.GetPropertyIndex("program"), programMap);
-
-    tet_result( TET_FAIL );
-  }
-  catch(Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-  }
   END_TEST;
 }
 

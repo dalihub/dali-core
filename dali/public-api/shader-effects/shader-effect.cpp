@@ -52,12 +52,12 @@ ShaderEffect& ShaderEffect::operator=(const ShaderEffect& rhs)
   return *this;
 }
 
-ShaderEffect ShaderEffect::New( const std::string& vertexShader, const std::string& fragmentShader, GeometryType type, GeometryHints hints)
+ShaderEffect ShaderEffect::New( const std::string& vertexShader, const std::string& fragmentShader, GeometryHints hints)
 {
   // @todo MESH_REWORK - Assert only image geometry type is passed.
   Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
 
-  internal->SetPrograms( type, vertexShader, fragmentShader );
+  internal->SetPrograms( vertexShader, fragmentShader );
 
   return ShaderEffect( internal.Get() );
 }
@@ -66,13 +66,12 @@ ShaderEffect ShaderEffect::NewWithPrefix( const std::string& vertexShaderPrefix,
                                           const std::string& vertexShader,
                                           const std::string& fragmentShaderPrefix,
                                           const std::string& fragmentShader,
-                                          GeometryType type,
                                           GeometryHints hints)
 {
   // @todo MESH_REWORK - Assert only image geometry type is passed.
   Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
 
-  internal->SetPrograms( type, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
+  internal->SetPrograms( vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
 
   return ShaderEffect( internal.Get() );
 }

@@ -78,31 +78,27 @@ public:
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
    */
-  void SetPrograms( GeometryType geometryType, const std::string& vertexSource, const std::string& fragmentSource );
+  void SetPrograms( const std::string& vertexSource, const std::string& fragmentSource );
 
   /**
-   * Add a GeometryType specific default program to this ShaderEffect.
+   * Add a default program to this ShaderEffect.
    * This overload allows the optional prefixing for both the vertex and fragment shader.
    * A useful prefix may be shader \#defines for conditional compilation.
-   * @param[in] geometryType    The GeometryType rendered by the shader program
    * @param[in] vertexPrefix    The prefix source code for the vertex shader
    * @param[in] fragmentPrefix  The prefix source code for the fragment shader
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
    */
-  void SetPrograms( GeometryType geometryType,
-                    const std::string& vertexPrefix, const std::string& fragmentPrefix,
+  void SetPrograms( const std::string& vertexPrefix, const std::string& fragmentPrefix,
                     const std::string& vertexSource, const std::string& fragmentSource );
 
   /**
    * Send shader program to scene-graph object.
-   * @param[in] geometryType     The GeometryType rendered by the shader program
    * @param[in] vertexSource     The source code for the vertex shader
    * @param[in] fragmentSource   The source code for the fragment shader
    * @param[in] modifiesGeometry True if the shader modifies geometry
    */
-  void SendProgramMessage( GeometryType geometryType,
-                           const std::string& vertexSource, const std::string& fragmentSource,
+  void SendProgramMessage( const std::string& vertexSource, const std::string& fragmentSource,
                            bool modifiesGeometry );
 
   /**

@@ -184,17 +184,19 @@ void Renderer::Render( Context& context,
   const Matrix& modelMatrix = mDataProvider.GetModelMatrix( bufferIndex );
   Matrix::Multiply( gModelViewProjectionMatrix, modelViewMatrix, projectionMatrix );
 
-  // Get the program to use
-  GeometryType geometryType=GEOMETRY_TYPE_IMAGE;
-  ShaderSubTypes subType=SHADER_DEFAULT;
-  ResolveGeometryTypes( bufferIndex, geometryType, subType );
-  unsigned int programIndex = 0;
-  Program* program = mShader->GetProgram( context, geometryType, subType, programIndex );
+  // Get the program to use:
+  Program* program = mShader->GetProgram();
   if( !program )
   {
     // if program is NULL it means this is a custom shader with non matching geometry type so we need to use default shaders program
-    program = defaultShader.GetProgram( context, geometryType, subType, programIndex );
-    DALI_ASSERT_ALWAYS( program && "Default shader is missing a geometry type!!" );
+    program = defaultShader.GetProgram();
+    DALI_ASSERT_DEBUG( program && "Default shader should always have a program available." );
+    if( !program )
+    {
+      DALI_LOG_ERROR( "Failed to get program for shader at address %p.", (void*) &*mShader );
+      return;
+    }
+
   }
 
   // Check culling (does not need the program to be in use)
@@ -232,16 +234,16 @@ void Renderer::Render( Context& context,
   }
 
   //@todo MESH_REWORK Remove after removing ImageRenderer
-  DoSetUniforms(context, bufferIndex, mShader, program, programIndex, subType );
+  DoSetUniforms(context, bufferIndex, mShader, program );
 
   // subclass rendering and actual draw call
   DoRender( context, textureCache, bufferIndex, *program, modelViewMatrix, viewMatrix );
 }
 
 // can be overridden by deriving class
-void Renderer::DoSetUniforms(Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType )
+void Renderer::DoSetUniforms(Context& context, BufferIndex bufferIndex, Shader* shader, Program* program )
 {
-  shader->SetUniforms( context, *program, bufferIndex, programIndex, subType );
+  shader->SetUniforms( context, *program, bufferIndex );
 }
 
 // can be overridden by deriving class

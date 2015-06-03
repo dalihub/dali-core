@@ -116,11 +116,6 @@ public:
   virtual bool CheckResources();
 
   /**
-   * @copydoc Dali::Internal::SceneGraph::Renderer::ResolveGeometryTypes()
-   */
-  virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType );
-
-  /**
    * @copydoc Dali::Internal::SceneGraph::Renderer::IsOutsideClipSpace()
    */
   virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix );

@@ -153,17 +153,6 @@ private:
   virtual bool CheckResources() = 0;
 
   /**
-   * @deprecated - Not needed in final MESH_REWORK
-   * @todo MESH_REWORK Remove this API
-   *
-   * Resolve the derived renderers geometry type and subtype
-   * @param[in] bufferIndex The index of the previous update buffer.
-   * @param[out] outType    The geometry type
-   * @param[out] outSubType The geometry subtype
-   */
-  virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType ) = 0;
-
-  /**
    * Checks if renderer is culled.
    * @param[in] modelMatrix The model matrix.
    * @param[in] modelViewProjectionMatrix The MVP matrix.
@@ -175,7 +164,7 @@ private:
    * Called from Render prior to DoRender().
    * @todo MESH_REWORK Remove after merge
    */
-  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType );
+  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program );
 
   /**
    * Called from Render prior to DoRender(). Default method to set CullFaceMode

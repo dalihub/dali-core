@@ -239,45 +239,20 @@ public:
 
   /**
    * @brief Set the program for a geometry type.
-   * @param[in] geometryType      The type of the object (geometry) that is to be rendered.
    * @param[in] resourceId        The resource ID for the program.
    * @param[in] shaderData        The program's vertex/fragment source and optionally compiled bytecode
    * @param[in] programCache      Owner of the Programs
-   * @param[in] modifiesGeometry  True if the vertex shader changes geometry
+   * @param[in] modifiesGeometry  True if the vertex shader changes the positions of vertexes such that
+   * they might exceed the bounding box of vertexes passing through the default transformation.
    */
-  void SetProgram( /** @deprecated This is currently ignored and will soon disappear. */
-                   GeometryType geometryType,
-                   Integration::ResourceId resourceId,
+  void SetProgram( Integration::ResourceId resourceId,
                    Integration::ShaderDataPtr shaderData,
                    ProgramCache* programCache,
                    bool modifiesGeometry );
 
   /**
-   * Determine if subtypes are required for the given geometry type
-   * @deprecated
-   * @param[in] geometryType The type of the object (geometry) that is to be rendered.
-   * @return TRUE if subtypes are required, FALSE if there is only one subtype available
-   */
-  bool AreSubtypesRequired(GeometryType geometryType);
-
-  /**
-   * Get the program associated with the given type and subtype
-   * @deprecated
-   * @param[in]  context      the context used to render.
-   * @param[in]  type         the type of the object (geometry) that is being rendered.
-   * @param[in]  subType      Identifier for geometry types with specialised default shaders
-   * @param[out] programIndex returns the program index to be passed onto SetUniforms.
-   * @return the program to use.
-   */
-  Program* GetProgram( Context& context,
-                       GeometryType type,
-                       ShaderSubTypes subType,
-                       unsigned int& programIndex );
-
-  /**
    * Get the program built for this shader
-   * @deprecated
-   * @return the program to use.
+   * @return The program built from the shader sources.
    */
   Program* GetProgram();
 
@@ -293,14 +268,13 @@ public:
    */
   void SetUniforms( Context& context,
                     Program& program,
-                    BufferIndex bufferIndex,
-                    unsigned int programIndex,
-                    ShaderSubTypes subType = SHADER_DEFAULT );
+                    BufferIndex bufferIndex );
 
 private: // Data
 
   Dali::ShaderEffect::GeometryHints mGeometryHints;    ///< shader geometry hints for building the geometry
   float                          mGridDensity;      ///< grid density
+
   Texture*                       mTexture;          ///< Raw Pointer to Texture
   Integration::ResourceId        mRenderTextureId;  ///< Copy of the texture ID for the render thread
   Integration::ResourceId        mUpdateTextureId;  ///< Copy of the texture ID for update thread

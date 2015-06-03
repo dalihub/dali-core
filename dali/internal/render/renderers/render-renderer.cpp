@@ -78,20 +78,13 @@ bool NewRenderer::CheckResources()
   return true;
 }
 
-void NewRenderer::ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType )
-{
-  // @todo MESH_REWORK Remove after merge
-
-  // Do nothing
-}
-
 bool NewRenderer::IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix )
 {
   // @todo MESH_REWORK Add clipping
   return false;
 }
 
-void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType )
+void NewRenderer::DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex )
 {
   // Do nothing, we're going to set up the uniforms with our own code instead
 }

@@ -83,13 +83,6 @@ public: // Implementation of Renderer
   virtual bool CheckResources();
 
   /**
-   * @copydoc SceneGraph::Renderer::ResolveGeometryTypes()
-   */
-  virtual void ResolveGeometryTypes( BufferIndex bufferIndex,
-                                     GeometryType& outType,
-                                     ShaderSubTypes& outSubType );
-
-  /**
    * @copydoc SceneGraph::Renderer::IsOutsideClipSpace()
    */
   virtual bool IsOutsideClipSpace( Context& context,
@@ -99,7 +92,7 @@ public: // Implementation of Renderer
   /**
    * @copydoc SceneGraph::Renderer::DoSetUniforms()
    */
-  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex, ShaderSubTypes subType );
+  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program, unsigned int programIndex );
 
   /**
    * @copydoc SceneGraph::Renderer::DoSetCullFaceMode

@@ -73,31 +73,6 @@ template <> struct ParameterType< Dali::ShaderEffect::UniformCoordinateType > : 
 namespace SceneGraph
 {
 
-namespace // unnamed namespace
-{
-
-// Convert Geometry type bitmask to an array index
-inline unsigned int GetGeometryTypeIndex(GeometryType type)
-{
-  unsigned int index = Log<GEOMETRY_TYPE_IMAGE>::value;
-  if ( type & GEOMETRY_TYPE_IMAGE )
-  {
-    index = Log<GEOMETRY_TYPE_IMAGE>::value;
-  }
-  else if ( type & GEOMETRY_TYPE_UNTEXTURED_MESH )
-  {
-    index = Log<GEOMETRY_TYPE_UNTEXTURED_MESH>::value;
-  }
-  else if ( type & GEOMETRY_TYPE_TEXTURED_MESH )
-  {
-    index = Log<GEOMETRY_TYPE_TEXTURED_MESH>::value;
-  }
-  return index;
-}
-
-} // unnamed namespace
-
-
 Shader::Shader( Dali::ShaderEffect::GeometryHints& hints )
 : mGeometryHints( hints ),
   mGridDensity( Dali::ShaderEffect::DEFAULT_GRID_DENSITY ),
@@ -228,8 +203,7 @@ void Shader::SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::
   mUniformMetadata[ index ]->SetCoordinateType( type );
 }
 
-void Shader::SetProgram( GeometryType geometryType,
-                         Integration::ResourceId resourceId,
+void Shader::SetProgram( Integration::ResourceId resourceId,
                          Integration::ShaderDataPtr shaderData,
                          ProgramCache* programCache,
                          bool modifiesGeometry )
@@ -237,25 +211,7 @@ void Shader::SetProgram( GeometryType geometryType,
   DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", resourceId);
 
   mProgram = Program::New( *programCache, shaderData, modifiesGeometry );
-  // Implement: mProgram = programCache->GetProgram( shaderData, modifiesGeometry );
   // The program cache owns the Program object so we don't need to worry here.
-}
-
-bool Shader::AreSubtypesRequired(GeometryType geometryType)
-{
-  DALI_ASSERT_DEBUG(geometryType < GEOMETRY_TYPE_LAST);
-  return false;
-}
-
-Program* Shader::GetProgram( Context& context,
-                             GeometryType type,
-                             ShaderSubTypes subType,
-                             unsigned int& programIndex )
-{
-  DALI_ASSERT_DEBUG(type < GEOMETRY_TYPE_LAST);
-  DALI_DEBUG_OSTREAM(debugStream);
-
-  return mProgram;
 }
 
 Program* Shader::GetProgram()
@@ -263,16 +219,10 @@ Program* Shader::GetProgram()
   return mProgram;
 }
 
-
 void Shader::SetUniforms( Context& context,
                           Program& program,
-                          BufferIndex bufferIndex,
-                          unsigned int programIndex,
-                          ShaderSubTypes subType )
+                          BufferIndex bufferIndex )
 {
-  DALI_ASSERT_DEBUG( programIndex < Log<GEOMETRY_TYPE_LAST>::value );
-  DALI_DEBUG_OSTREAM(debugStream);
-
   if( mRenderTextureId && ( mTexture == NULL ) )
   {
     mTexture = mTextureCache->GetTexture( mRenderTextureId );
@@ -310,12 +260,12 @@ void Shader::SetUniforms( Context& context,
     if ( metadata.name.length() > 0 )
     {
       // 0 means program has not got a cache index for this uniform
-      if( 0 == metadata.cacheIndeces[ programIndex ][ subType ] )
+      if( 0 == metadata.cacheIndex )
       {
         // register cacheindex for this program
-        metadata.cacheIndeces[ programIndex ][ subType ] = program.RegisterUniform( metadata.name );
+        metadata.cacheIndex = program.RegisterUniform( metadata.name );
       }
-      loc = program.GetUniformLocation( metadata.cacheIndeces[ programIndex ][ subType ] );
+      loc = program.GetUniformLocation( metadata.cacheIndex );
 
       // if we find uniform with location
       if ( Program::UNIFORM_UNKNOWN != loc )

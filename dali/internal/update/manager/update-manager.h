@@ -306,14 +306,13 @@ public:
   void RemoveShader(Shader* shader);
 
   /**
-   * Set the shader program for a specified GeometryType to a Shader object
+   * Set the shader program for a Shader object
    * @param[in] shader        The shader to modify
-   * @param[in] geometryType  The GeometryType to map to the program
    * @param[in] resourceId    A ResourceManager ticket ID for the program data (source and compiled binary)
    * @param[in] shaderHash    hash key created with vertex and fragment shader code
    * @param[in] modifiesGeometry True if the vertex shader modifies geometry
    */
-  void SetShaderProgram( Shader* shader, GeometryType geometryType, Integration::ResourceId resourceId, size_t shaderHash, bool modifiesGeometry );
+  void SetShaderProgram( Shader* shader, Integration::ResourceId resourceId, size_t shaderHash, bool modifiesGeometry );
 
   /**
    * Add a newly created gesture.
@@ -727,18 +726,17 @@ inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
 
 inline void SetShaderProgramMessage( UpdateManager& manager,
                                      Shader& shader,
-                                     GeometryType geometryType,
                                      Integration::ResourceId resourceId,
                                      size_t shaderHash,
                                      bool modifiesGeometry )
 {
-  typedef MessageValue5< UpdateManager, Shader*, GeometryType, Integration::ResourceId, size_t, bool > LocalType;
+  typedef MessageValue4< UpdateManager, Shader*, Integration::ResourceId, size_t, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, geometryType, resourceId, shaderHash, modifiesGeometry );
+  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, resourceId, shaderHash, modifiesGeometry );
 }
 
 inline void SetBackgroundColorMessage( UpdateManager& manager, const Vector4& color )

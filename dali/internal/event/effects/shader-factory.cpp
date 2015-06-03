@@ -118,7 +118,7 @@ void ShaderFactory::LoadDefaultShaders()
 {
   mDefaultShader = ShaderEffect::New();
 
-  mDefaultShader->SendProgramMessage( GEOMETRY_TYPE_IMAGE, ImageVertex, ImageFragment, false );
+  mDefaultShader->SendProgramMessage( ImageVertex, ImageFragment, false );
 }
 
 } // namespace Internal
