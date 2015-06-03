@@ -2686,8 +2686,8 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   Actor actor = Actor::New();
 
   // Defaults
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_RESIZE_POLICY ).Get< std::string >(), "FIXED", TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), "FIXED", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_RESIZE_POLICY ).Get< std::string >(), "USE_NATURAL_SIZE", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), "USE_NATURAL_SIZE", TEST_LOCATION );
 
   // Set resize policy for all dimensions
   actor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );

@@ -93,6 +93,10 @@ void Stage::Initialize()
   // The stage owns the default layer
   mRootLayer = Layer::NewRoot( *mLayerList, mUpdateManager, false/*not system-level*/ );
   mRootLayer->SetName("RootLayer");
+  // The root layer needs to have a fixed resize policy (as opposed to the default USE_NATURAL_SIZE).
+  // This stops actors parented to the stage having their relayout requests propagating
+  // up to the root layer, and down through other children unnecessarily.
+  mRootLayer->SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
 
   // Create the default camera actor first; this is needed by the RenderTaskList
   CreateDefaultCameraActor();

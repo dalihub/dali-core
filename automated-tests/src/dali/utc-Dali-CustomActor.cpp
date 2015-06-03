@@ -607,6 +607,7 @@ public:
   {
     Impl::TestCustomActor* impl = new Impl::TestCustomActor( true );
     TestCustomActor custom( *impl ); // takes ownership
+    custom.SetName( "SizeNegotiationActor" );
 
     impl->Initialize();
 
