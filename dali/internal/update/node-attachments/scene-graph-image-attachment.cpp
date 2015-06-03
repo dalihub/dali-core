@@ -120,7 +120,9 @@ void ImageAttachment::SetTextureId( BufferIndex updateBufferIndex, unsigned int 
   ATTACHMENT_LOG_FMT(Debug::General, " textureid: %d)\n", textureId);
 
   mTextureId = textureId;
-  mFinishedResourceAcquisition = false;
+
+  // Loading is essentially finished if we don't have a resource ID
+  mFinishedResourceAcquisition = ( 0 == mTextureId );
 
   if( mImageRenderer )
   {
@@ -219,40 +221,48 @@ bool ImageAttachment::DoPrepareResources( BufferIndex updateBufferIndex, Resourc
   DALI_LOG_TRACE_METHOD_FMT(gImageAttachmentLogFilter, "this:%p", this);
   bool ready = false;
 
-  // The metadata is used by IsFullyOpaque(), below.
-  mBitmapMetadata = resourceManager.GetBitmapMetadata( mTextureId );
-
-  CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
-  CompleteStatusManager::CompleteState status = completeStatusManager.GetStatus( mTextureId );
-
-  switch( status )
+  if( 0 != mTextureId )
   {
-    case CompleteStatusManager::NOT_READY:
-    {
-      ready = false;
+    // The metadata is used by IsFullyOpaque(), below.
+    mBitmapMetadata = resourceManager.GetBitmapMetadata( mTextureId );
 
-      if( mBitmapMetadata.GetIsFramebuffer() )
+    CompleteStatusManager& completeStatusManager = mSceneController->GetCompleteStatusManager();
+    CompleteStatusManager::CompleteState status = completeStatusManager.GetStatus( mTextureId );
+
+    switch( status )
+    {
+      case CompleteStatusManager::NOT_READY:
+      {
+        ready = false;
+
+        if( mBitmapMetadata.GetIsFramebuffer() )
+        {
+          ready = true;
+        }
+        mFinishedResourceAcquisition = false;
+        FollowTracker( mTextureId );
+      }
+      break;
+
+      case CompleteStatusManager::COMPLETE:
       {
         ready = true;
+        mFinishedResourceAcquisition = true;
       }
-      mFinishedResourceAcquisition = false;
-      FollowTracker( mTextureId );
-    }
-    break;
+      break;
 
-    case CompleteStatusManager::COMPLETE:
-    {
-      ready = true;
-      mFinishedResourceAcquisition = true;
+      case CompleteStatusManager::NEVER:
+      {
+        ready = false;
+        mFinishedResourceAcquisition = true;
+      }
+      break;
     }
-    break;
-
-    case CompleteStatusManager::NEVER:
-    {
-      ready = false;
-      mFinishedResourceAcquisition = true;
-    }
-    break;
+  }
+  else
+  {
+    // Loading is essentially finished if we don't have a resource ID
+    mFinishedResourceAcquisition = true;
   }
 
   ATTACHMENT_LOG_FMT(Debug::General, " ObjName:%s finished:%s ready:%s \n",
