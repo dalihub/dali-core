@@ -73,21 +73,6 @@ public:
                    UniformCoordinateType uniformCoordinateType );
 
   /**
-   * @copydoc Dali::ShaderEffect::AttachExtension()
-   */
-  void AttachExtension( Dali::ShaderEffect::Extension *object );
-
-  /**
-   * @copydoc Dali::ShaderEffect::GetExtension()
-   */
-  Dali::ShaderEffect::Extension& GetExtension();
-
-  /**
-   * @copydoc Dali::ShaderEffect::GetExtension() const
-   */
-  const Dali::ShaderEffect::Extension& GetExtension() const;
-
-  /**
    * Add a GeometryType specific default program to this ShaderEffect
    * @param[in] geometryType    The GeometryType rendered by the shader program
    * @param[in] vertexSource    The source code for the vertex shader
@@ -226,7 +211,6 @@ private: // Data
   EventThreadServices& mEventThreadServices; ///< Event thread services, for sending messages
   SceneGraph::Shader* mSceneObject;         ///< pointer to the scene shader, should not be changed on this thread
   Dali::Image mImage;                       ///< Client-side handle for the effect image
-  IntrusivePtr<Dali::ShaderEffect::Extension> mExtension;
   std::vector<ResourceTicketPtr>  mTickets; ///< Collection of shader program tickets
   unsigned int  mConnectionCount;           ///< number of on-stage ImageActors using this shader effect
   Dali::ShaderEffect::GeometryHints  mGeometryHints; ///< shader geometry hints for building the geometry

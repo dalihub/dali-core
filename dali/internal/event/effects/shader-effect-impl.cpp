@@ -290,24 +290,6 @@ void ShaderEffect::SetUniform( const std::string& name, Property::Value value, U
   }
 }
 
-void ShaderEffect::AttachExtension( Dali::ShaderEffect::Extension *extension )
-{
-  DALI_ASSERT_ALWAYS( extension != NULL && "Attaching uninitialized extension" );
-  mExtension = IntrusivePtr<Dali::ShaderEffect::Extension>( extension );
-}
-
-Dali::ShaderEffect::Extension& ShaderEffect::GetExtension()
-{
-  DALI_ASSERT_ALWAYS( mExtension && "Getting uninitialized extension" );
-  return *mExtension;
-}
-
-const Dali::ShaderEffect::Extension& ShaderEffect::GetExtension() const
-{
-  DALI_ASSERT_ALWAYS( mExtension && "Getting uninitialized extension" );
-  return *mExtension;
-}
-
 void ShaderEffect::SetPrograms( GeometryType geometryType, const string& vertexSource, const string& fragmentSource )
 {
   SetPrograms( geometryType, "", "", vertexSource, fragmentSource );

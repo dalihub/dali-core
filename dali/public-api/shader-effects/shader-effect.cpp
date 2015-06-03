@@ -28,14 +28,6 @@ namespace Dali
 {
 const float ShaderEffect::DEFAULT_GRID_DENSITY = 40;
 
-ShaderEffect::Extension::Extension()
-{
-}
-
-ShaderEffect::Extension::~Extension()
-{
-}
-
 ShaderEffect::ShaderEffect()
 {
 }
@@ -123,21 +115,6 @@ void ShaderEffect::SetUniform( const std::string& name, const Matrix& value, Uni
 void ShaderEffect::SetUniform( const std::string& name, const Matrix3& value, UniformCoordinateType uniformCoordinateType )
 {
   GetImplementation(*this).SetUniform( name, value, uniformCoordinateType );
-}
-
-void ShaderEffect::AttachExtension( ShaderEffect::Extension *object )
-{
-  GetImplementation(*this).AttachExtension( object );
-}
-
-ShaderEffect::Extension& ShaderEffect::GetExtension()
-{
-  return GetImplementation(*this).GetExtension();
-}
-
-const ShaderEffect::Extension& ShaderEffect::GetExtension() const
-{
-  return GetImplementation(*this).GetExtension();
 }
 
 } // namespace Dali
