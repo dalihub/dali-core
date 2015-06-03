@@ -71,7 +71,8 @@ namespace ResizePolicy
 
 namespace
 {
-DALI_ENUM_TO_STRING_TABLE_BEGIN( Type )DALI_ENUM_TO_STRING( FIXED )
+DALI_ENUM_TO_STRING_TABLE_BEGIN( Type )
+DALI_ENUM_TO_STRING( FIXED )
 DALI_ENUM_TO_STRING( USE_NATURAL_SIZE )
 DALI_ENUM_TO_STRING( FILL_TO_PARENT )
 DALI_ENUM_TO_STRING( SIZE_RELATIVE_TO_PARENT )
@@ -89,7 +90,8 @@ namespace SizeScalePolicy
 namespace
 {
 // Enumeration to / from string conversion tables
-DALI_ENUM_TO_STRING_TABLE_BEGIN( Type )DALI_ENUM_TO_STRING( USE_SIZE_SET )
+DALI_ENUM_TO_STRING_TABLE_BEGIN( Type )
+DALI_ENUM_TO_STRING( USE_SIZE_SET )
 DALI_ENUM_TO_STRING( FIT_WITH_ASPECT_RATIO )
 DALI_ENUM_TO_STRING( FILL_WITH_ASPECT_RATIO )
 DALI_ENUM_TO_STRING_TABLE_END( Type )
@@ -112,7 +114,7 @@ struct Actor::RelayoutData
     // Set size negotiation defaults
     for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      resizePolicies[ i ] = ResizePolicy::FIXED;
+      resizePolicies[ i ] = ResizePolicy::DEFAULT;
       negotiatedDimensions[ i ] = 0.0f;
       dimensionNegotiated[ i ] = false;
       dimensionDirty[ i ] = false;
@@ -1337,7 +1339,7 @@ ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
     }
   }
 
-  return ResizePolicy::FIXED;   // Default
+  return ResizePolicy::DEFAULT;
 }
 
 void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )

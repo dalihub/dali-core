@@ -83,7 +83,6 @@ public:
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
    * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
-   * Connect to SignalLoadingFinished or use GetLoadingState to make sure this value is actual.
    * @pre image should be loaded
    */
   virtual unsigned int GetWidth() const;
@@ -93,7 +92,6 @@ public:
    * Only to be used after the image has finished loading.
    * (Ticket's LoadingSucceeded callback was called)
    * The returned value will reflect the true image dimensions once the asynchronous loading has finished.
-   * Connect to SignalLoadingFinished or use GetLoadingState to make sure this value is actual.
    * @pre image should be loaded
    */
   virtual unsigned int GetHeight() const;
