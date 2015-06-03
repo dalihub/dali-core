@@ -54,14 +54,14 @@ class PropertyBuffer;
  *  Property::Map texturedQuadVertexFormat;
  *  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
  *  texturedQuadVertexFormat["aTexCoord"] = Property::VECTOR2;
- *  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( PropertyBuffer::STATIC, texturedQuadVertexFormat, 4 );
+ *  PropertyBuffer texturedQuadVertices = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
  *  texturedQuadVertices.SetData(texturedQuadVertexData);
  *
  *  // Create indices
- *  unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
+ *  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
  *  Property::Map indexFormat;
  *  indexFormat["indices"] = Property::UNSIGNED_INTEGER;
- *  PropertyBuffer indices = PropertyBuffer::New( PropertyBuffer::STATIC, indexFormat, 6 );
+ *  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 6 );
  *  indices.SetData(indexData);
  *
  *  // Create the geometry object
@@ -73,16 +73,6 @@ class PropertyBuffer;
 class DALI_IMPORT_API PropertyBuffer : public Handle
 {
 public:
-
-  /**
-   * @brief Type of property buffer
-   */
-  enum Type
-  {
-    STATIC,     ///< The property buffer properties will not be animatable
-    ANIMATABLE, ///< The property buffer properties will be animatable
-    TYPE_COUNT, ///< Number of different types
-  };
 
   /**
    * @brief An enumeration of properties belonging to the PropertyBuffer class.
@@ -101,12 +91,11 @@ public:
    *
    * Static property buffers use less memory.
    *
-   * @param[in] type Type of property buffer, will make properties animatable or not
    * @param[in] bufferFormat Map of names and types that describes the components of the buffer
    * @param[in] size The number of elements in the property buffer
    * @return Handle to a newly allocated PropertyBuffer
    */
-  static PropertyBuffer New( Type type, Dali::Property::Map& bufferFormat, std::size_t size );
+  static PropertyBuffer New( Dali::Property::Map& bufferFormat, std::size_t size );
 
   /**
    * @brief Default constructor, creates an empty handle
@@ -179,21 +168,6 @@ public:
    * @param[in] data A pointer to the data that will be copied to the buffer.
    */
   void SetData( void* data );
-
-  /**
-   * @brief Get the property index for a value in the buffer
-   *
-   * @param[in] name Name of the component
-   * @param[in] index Index of the object in the buffer
-   *
-   * Indices are calculated as follows:
-   *   NumberOfComponents * index + OffsetOf( name )
-   * Example:
-   *   For a PropertyBuffer with 2 components {"position", "normal"}
-   *   The Property::Index for the property "position" in the 20th object would be:
-   *     Property::Index( 2 * 19 + 0 ) => Property::Index( 38 )
-   */
-  Dali::Property::Index GetPropertyIndex( const std::string name, std::size_t index );
 
 public:
   /**

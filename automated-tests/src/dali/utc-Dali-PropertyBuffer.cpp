@@ -48,8 +48,7 @@ int UtcDaliPropertyBufferNew01(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  PropertyBuffer propertyBuffer = PropertyBuffer::New( PropertyBuffer::STATIC,
-                                                       texturedQuadVertexFormat, 4 );
+  PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
 
   DALI_TEST_EQUALS( (bool)propertyBuffer, true, TEST_LOCATION );
   END_TEST;
@@ -71,8 +70,7 @@ int UtcDaliPropertyBufferDownCast01(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  PropertyBuffer propertyBuffer = PropertyBuffer::New( PropertyBuffer::STATIC,
-                                                       texturedQuadVertexFormat, 4 );
+  PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
 
   BaseHandle handle(propertyBuffer);
   PropertyBuffer propertyBuffer2 = PropertyBuffer::DownCast(handle);
@@ -143,7 +141,7 @@ int UtcDaliPropertyBufferConstraint02(void)
 
   tet_infoline("Test that a uniform map propertyBuffer property can be constrained");
 
-  Shader shader = Shader::New("VertexSource", "FragmentSource");
+  Shader shader = Shader::New( "VertexSource", "FragmentSource" );
   Material material = Material::New( shader );
   material.SetProperty(Material::Property::COLOR, Color::WHITE);
 
@@ -305,8 +303,7 @@ int UtcDaliPropertyBufferSetData01(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  PropertyBuffer propertyBuffer = PropertyBuffer::New( PropertyBuffer::STATIC,
-                                                       texturedQuadVertexFormat, 4 );
+  PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
   DALI_TEST_EQUALS( (bool)propertyBuffer, true, TEST_LOCATION );
 
   const float halfQuadSize = .5f;
@@ -352,8 +349,7 @@ int UtcDaliPropertyBufferSetData02(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  PropertyBuffer propertyBuffer = PropertyBuffer::New( PropertyBuffer::STATIC,
-                                                       texturedQuadVertexFormat, 4 );
+  PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
   DALI_TEST_EQUALS( (bool)propertyBuffer, true, TEST_LOCATION );
 
   const float halfQuadSize = .5f;
@@ -421,9 +417,7 @@ int UtcDaliPropertyBufferSetSize01(void)
   texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
   texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
 
-  PropertyBuffer propertyBuffer = PropertyBuffer::New( PropertyBuffer::STATIC,
-                                                       texturedQuadVertexFormat,
-                                                       4u );
+  PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, 4u );
   DALI_TEST_EQUALS( (bool)propertyBuffer, true, TEST_LOCATION );
 
   size_t size = propertyBuffer.GetSize();
