@@ -3122,3 +3122,44 @@ int UtcDaliRenderTaskFinishInvisibleSourceActor(void)
 
   END_TEST;
 }
+
+int UtcDaliRenderTaskFinishMissingImage(void)
+{
+  TestApplication application;
+
+  // Previously we had bugs where not having a resource ID would cause render-tasks to wait forever
+  tet_infoline("Testing RenderTask::SignalFinished() when an ImageActor has no Image set");
+
+  Stage stage = Stage::GetCurrent();
+
+  BufferImage image = BufferImage::New( 10, 10 );
+  ImageActor rootActor = ImageActor::New( image );
+  rootActor.SetSize( 10, 10 );
+  stage.Add( rootActor );
+
+  ImageActor actorWithMissingImage = ImageActor::New( Image() );
+  actorWithMissingImage.SetSize( 10, 10 );
+  stage.Add( actorWithMissingImage );
+
+  RenderTaskList taskList = Stage::GetCurrent().GetRenderTaskList();
+  RenderTask newTask = taskList.CreateTask();
+  newTask.SetInputEnabled( false );
+  newTask.SetClearColor( Vector4( 0.f, 0.f, 0.f, 0.f ) );
+  newTask.SetClearEnabled( true );
+  newTask.SetExclusive( true );
+  newTask.SetRefreshRate( RenderTask::REFRESH_ONCE );
+
+  bool finished = false;
+  RenderTaskFinished renderTaskFinished( finished );
+  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
+
+  // 1 render to process render task, then 1 before finished msg is sent from update to the event thread.
+  application.SendNotification();
+  application.Render();
+  application.Render();
+
+  application.SendNotification();
+  DALI_TEST_CHECK( finished );
+
+  END_TEST;
+}

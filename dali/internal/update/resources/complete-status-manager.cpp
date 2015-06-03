@@ -107,21 +107,29 @@ CompleteStatusManager::CompleteState CompleteStatusManager::GetStatus( Integrati
 {
   CompleteState readiness = CompleteStatusManager::NOT_READY;
 
-  TrackedResourcesIter iter = mTrackedResources.find(id);
-  if( iter != mTrackedResources.end() )
+  if( 0 != id )
   {
-    if( iter->second->IsComplete() )
+    TrackedResourcesIter iter = mTrackedResources.find(id);
+    if( iter != mTrackedResources.end() )
+    {
+      if( iter->second->IsComplete() )
+      {
+        readiness = CompleteStatusManager::COMPLETE;
+      }
+    }
+    else if( mResourceManager.IsResourceLoaded(id) )
     {
       readiness = CompleteStatusManager::COMPLETE;
     }
+    else if( mResourceManager.IsResourceLoadFailed(id) )
+    {
+      readiness = CompleteStatusManager::NEVER;
+    }
   }
-  else if( mResourceManager.IsResourceLoaded(id) )
+  else
   {
+    // Loading is essentially finished if we don't have a resource ID
     readiness = CompleteStatusManager::COMPLETE;
-  }
-  else if( mResourceManager.IsResourceLoadFailed(id) )
-  {
-    readiness = CompleteStatusManager::NEVER;
   }
 
   TRACKER_LOG_FMT(Debug::General, "id:%d = %s\n", id, (readiness==CompleteStatusManager::COMPLETE)?"COMPLETE":((readiness==CompleteStatusManager::NEVER)?"NEVER":"NOT_READY"));
