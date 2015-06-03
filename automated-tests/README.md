@@ -1,6 +1,4 @@
-%PageOutline
-
-Testing environment
+Testing environment   {#auto_testing}
 ===================
 
 The new test environment from Tizen is the Web-TCT test suite. This was written for testing web components, but can easily be used for testing Dali.
@@ -10,7 +8,7 @@ Each of the DALi repositories, **dali-core**, **dali-adaptor** and **dali-toolki
 Installation
 ------------
 
-There are usage instructions and installation instructions [here](http://download.tizen.org/tct/2.2.1/Manual/Web_TCT_2.2.1_User_Guide_v1.0.pdf)
+There are usage instructions and installation instructions on the Tizen.org website [here](http://download.tizen.org/tct/2.2.1/Manual/Web_TCT_2.2.1_User_Guide_v1.0.pdf)
 
 These are device specific instructions, however, installing the test suite will also provide the relevant packages for running tests on Ubuntu ( follow the first block of quickstart instructions below ).
 

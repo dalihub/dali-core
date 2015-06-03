@@ -13,7 +13,11 @@ for i in `find . -name "*.dir"` ; do
         if [[ $? -eq 0 ]]
         then
             lcov $LCOV_OPTS --directory . -c -o dali.info
-            lcov $LCOV_OPTS --remove dali.info "/usr/include/*" "*/automated-tests/*" -o dali.info
+            lcov $LCOV_OPTS --remove dali.info "/usr/include/*" "*/automated-tests/*" "*/dali-env/*" -o dali.info
+            if [ ! -s dali.info ]
+            then
+              rm -f dali.info
+            fi
         fi
     )
 done
