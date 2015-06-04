@@ -76,9 +76,14 @@ public:
   void DetachAll();
 
   /**
-   * @copydoc Dali::GestureDetector::GetAttachedActors() const
+   * @copydoc Dali::GestureDetector::GetAttachedActorCount() const
    */
-  std::vector<Dali::Actor> GetAttachedActors() const;
+  size_t GetAttachedActorCount() const;
+
+  /**
+   * @copydoc Dali::GestureDetector::GetAttachedActor() const
+   */
+  Dali::Actor GetAttachedActor(size_t index) const;
 
   /**
    * Returns a const reference to the container of attached actor pointers.

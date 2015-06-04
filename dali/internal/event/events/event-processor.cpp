@@ -23,7 +23,7 @@
 #include <dali/integration-api/events/event.h>
 #include <dali/integration-api/events/gesture-event.h>
 #include <dali/integration-api/events/key-event-integ.h>
-#include <dali/integration-api/events/mouse-wheel-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
 #include <dali/integration-api/events/pinch-gesture-event.h>
@@ -47,7 +47,7 @@ namespace // unnamed namespace
 
 static const std::size_t MAX_MESSAGE_SIZE = std::max( sizeof(Integration::TouchEvent),
                                                       std::max( sizeof(Integration::KeyEvent),
-                                                                std::max( sizeof(Integration::MouseWheelEvent), sizeof(Integration::GestureEvent) ) ) );
+                                                                std::max( sizeof(Integration::WheelEvent), sizeof(Integration::GestureEvent) ) ) );
 
 static const std::size_t INITIAL_MIN_CAPACITY = 4;
 
@@ -60,7 +60,7 @@ EventProcessor::EventProcessor(Stage& stage, NotificationManager& /* notificatio
   mHoverEventProcessor(stage),
   mGestureEventProcessor(gestureEventProcessor),
   mKeyEventProcessor(stage),
-  mMouseWheelEventProcessor(stage),
+  mWheelEventProcessor(stage),
   mEventQueue0( INITIAL_BUFFER_SIZE ),
   mEventQueue1( INITIAL_BUFFER_SIZE ),
   mCurrentEventQueue( &mEventQueue0 )
@@ -127,9 +127,9 @@ void EventProcessor::QueueEvent( const Event& event )
       break;
     }
 
-    case Event::MouseWheel:
+    case Event::Wheel:
     {
-      typedef Integration::MouseWheelEvent DerivedType;
+      typedef Integration::WheelEvent DerivedType;
 
       // Reserve some memory inside the message queue
       unsigned int* slot = mCurrentEventQueue->ReserveMessageSlot( sizeof( DerivedType ) );
@@ -238,9 +238,9 @@ void EventProcessor::ProcessEvents()
         break;
       }
 
-      case Event::MouseWheel:
+      case Event::Wheel:
       {
-        mMouseWheelEventProcessor.ProcessMouseWheelEvent( static_cast<const Integration::MouseWheelEvent&>(*event) );
+        mWheelEventProcessor.ProcessWheelEvent( static_cast<const Integration::WheelEvent&>(*event) );
         break;
       }
 

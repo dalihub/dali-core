@@ -93,6 +93,19 @@ Property::Value* Property::Map::Find( const std::string& key ) const
   return NULL; // Not found
 }
 
+Property::Value* Property::Map::Find( const std::string& key, Property::Type type ) const
+{
+  for ( Container::iterator iter = mImpl->mContainer.begin(), endIter = mImpl->mContainer.end(); iter != endIter; ++iter )
+  {
+    // test type first to shortcut eval (possibly reducing string compares)
+    if( (iter->second.GetType() == type) && (iter->first == key) )
+    {
+      return &iter->second;
+    }
+  }
+  return NULL; // Not found
+}
+
 void Property::Map::Clear()
 {
   mImpl->mContainer.clear();

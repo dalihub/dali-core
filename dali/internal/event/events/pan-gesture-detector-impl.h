@@ -49,8 +49,8 @@ class PanGestureDetector : public GestureDetector
 {
 public: // Typedefs
 
-  typedef Dali::PanGestureDetector::AngleContainer AngleContainer;
   typedef Dali::PanGestureDetector::AngleThresholdPair AngleThresholdPair;
+  typedef std::vector<AngleThresholdPair> AngleContainer;
 
 public: // Creation
 
@@ -98,9 +98,14 @@ public:
   void AddDirection( Radian direction, Radian threshold );
 
   /**
-   * @copydoc Dali::PanGestureDetector::GetAngles()
+   * @copydoc Dali::PanGestureDetector::GetAngleCount()
    */
-  const AngleContainer& GetAngles() const;
+  size_t GetAngleCount() const;
+
+  /**
+   * @copydoc Dali::PanGestureDetector::GetAngle()
+   */
+  AngleThresholdPair GetAngle(size_t index) const;
 
   /**
    * @copydoc Dali::PanGestureDetector::ClearAngles()

@@ -81,6 +81,7 @@ enum Type
   DIMENSION_DEPENDENCY,  ///< One dimension is dependent on the other
   USE_ASSIGNED_SIZE      ///< The size will be assigned to the actor
 };
+const Type DEFAULT = USE_NATURAL_SIZE; ///< Default resize policy
 }
 
 /**

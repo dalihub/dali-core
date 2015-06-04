@@ -138,7 +138,7 @@ BaseHandle TypeInfo::CreateInstance() const
   return ret;
 }
 
-bool TypeInfo::DoActionTo(BaseObject *object, const std::string &actionName, const std::vector<Property::Value> &properties)
+  bool TypeInfo::DoActionTo(BaseObject *object, const std::string &actionName, const Property::Map &properties)
 {
   bool done = false;
 
@@ -200,66 +200,96 @@ Dali::TypeInfo::CreateFunction TypeInfo::GetCreator() const
   return mCreate;
 }
 
-void TypeInfo::GetActions( Dali::TypeInfo::NameContainer& ret ) const
+size_t TypeInfo::GetActionCount() const
 {
-  for(ActionContainer::const_iterator iter = mActions.begin(); iter != mActions.end(); ++iter)
-  {
-    ret.push_back(iter->first);
-  }
+  size_t count = mActions.size();
 
   Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
   while( base )
   {
-    for(ActionContainer::const_iterator iter = GetImplementation(base).mActions.begin();
-        iter != GetImplementation(base).mActions.end(); ++iter)
-    {
-      ret.push_back(iter->first);
-    }
-
+    count += GetImplementation(base).mActions.size();
     base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
   }
+
+  return count;
 }
 
-void TypeInfo::GetSignals(Dali::TypeInfo::NameContainer& ret) const
+std::string TypeInfo::GetActionName(size_t index) const
 {
-  for(ConnectorContainer::const_iterator iter = mSignalConnectors.begin(); iter != mSignalConnectors.end(); ++iter)
+  std::string name;
+
+  if( index < mActions.size() )
   {
-    ret.push_back(iter->first);
+    name = mActions[index].first;
   }
+  else
+  {
+    size_t count = mActions.size();
+
+    Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
+    while( base )
+    {
+      size_t baseCount = GetImplementation(base).mActions.size();
+
+      if( index < count + baseCount )
+      {
+        name = GetImplementation(base).mActions[ index - count ].first;
+        break;
+      }
+
+      count += baseCount;
+
+      base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
+    }
+  }
+
+  return name;
+}
+
+size_t TypeInfo::GetSignalCount() const
+{
+  size_t count = mSignalConnectors.size();
 
   Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
   while( base )
   {
-    for(ConnectorContainer::const_iterator iter = GetImplementation(base).mSignalConnectors.begin();
-        iter != GetImplementation(base).mSignalConnectors.end(); ++iter)
-    {
-      ret.push_back(iter->first);
-    }
-
+    count += GetImplementation(base).mSignalConnectors.size();
     base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
   }
+
+  return count;
 }
 
-void TypeInfo::GetProperties( Dali::TypeInfo::NameContainer& ret ) const
+std::string TypeInfo::GetSignalName(size_t index) const
 {
-  Property::IndexContainer indices;
+  std::string name;
 
-  GetPropertyIndices(indices);
-
-  ret.reserve(indices.size());
-
-  for(Property::IndexContainer::iterator iter = indices.begin(); iter != indices.end(); ++iter)
+  if( index < mSignalConnectors.size() )
   {
-    const std::string& name = GetPropertyName( *iter );
-    if(name.size())
+    name = mSignalConnectors[index].first;
+  }
+  else
+  {
+    size_t count = mSignalConnectors.size();
+
+    Dali::TypeInfo base = Dali::TypeRegistry::Get().GetTypeInfo( mBaseTypeName );
+    while( base )
     {
-      ret.push_back( name );
-    }
-    else
-    {
-      DALI_LOG_WARNING("Property had no name\n");
+      size_t baseCount = GetImplementation(base).mSignalConnectors.size();
+
+      if( index < count + baseCount )
+      {
+        name = GetImplementation(base).mSignalConnectors[ index - count ].first;
+        break;
+      }
+
+      count += baseCount;
+
+      base = Dali::TypeRegistry::Get().GetTypeInfo( base.GetBaseName() );
     }
   }
+
+  return name;
 }
 
 void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
@@ -273,12 +303,12 @@ void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
 
   if ( ! mRegisteredProperties.empty() )
   {
-    indices.reserve( indices.size() + mRegisteredProperties.size() );
+    indices.Reserve( indices.Size() + mRegisteredProperties.size() );
 
     const RegisteredPropertyContainer::const_iterator endIter = mRegisteredProperties.end();
     for ( RegisteredPropertyContainer::const_iterator iter = mRegisteredProperties.begin(); iter != endIter; ++iter )
     {
-      indices.push_back( iter->first );
+      indices.PushBack( iter->first );
     }
   }
 }
@@ -410,9 +440,9 @@ void TypeInfo::AddAnimatablePropertyComponent( const std::string& name, Property
   DALI_ASSERT_ALWAYS( success && "Property component already registered" );
 }
 
-unsigned int TypeInfo::GetPropertyCount() const
+size_t TypeInfo::GetPropertyCount() const
 {
-  unsigned int count( mRegisteredProperties.size() );
+  size_t count( mRegisteredProperties.size() );
 
   Dali::TypeInfo base = TypeRegistry::Get()->GetTypeInfo( mBaseTypeName );
   while ( base )

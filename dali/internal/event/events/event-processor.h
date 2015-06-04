@@ -22,7 +22,7 @@
 #include <dali/internal/event/events/touch-event-processor.h>
 #include <dali/internal/event/events/hover-event-processor.h>
 #include <dali/internal/event/events/key-event-processor.h>
-#include <dali/internal/event/events/mouse-wheel-event-processor.h>
+#include <dali/internal/event/events/wheel-event-processor.h>
 #include <dali/internal/common/message-buffer.h>
 
 namespace Dali
@@ -43,7 +43,7 @@ class NotificationManager;
 
 /**
  * The EventProcessor processes any events that are received by Dali.  Such events include
- * touch events, key events, mouse wheel events, and notification events.
+ * touch events, key events, wheel events, and notification events.
  *
  * When the EventProcessor receives an event, it determines its type and passes it on to the
  * appropriate processor.
@@ -91,7 +91,7 @@ private:
   HoverEventProcessor      mHoverEventProcessor;        ///< Processes hover events.
   GestureEventProcessor&   mGestureEventProcessor;      ///< Processes gesture events.
   KeyEventProcessor        mKeyEventProcessor;          ///< Processes key events.
-  MouseWheelEventProcessor mMouseWheelEventProcessor;   ///< Processes mouse wheel events.
+  WheelEventProcessor      mWheelEventProcessor;        ///< Processes wheel events.
 
   // Allow messages to be added safely to one queue, while processing (iterating through) the second queue.
   MessageBuffer mEventQueue0;        ///< An event queue.

@@ -23,6 +23,7 @@
 #include <dali/devel-api/common/map-wrapper.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/actors/actor-declarations.h>
+#include <dali/internal/event/dynamics/dynamics-notifier.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/devel-api/dynamics/dynamics-world.h>
@@ -54,7 +55,7 @@ class DynamicsWorld;
 } // namespace SceneGraph
 
 /// @copydoc Dali::DynamicsWorld
-class DynamicsWorld : public BaseObject
+class DynamicsWorld : public BaseObject, public Dali::Internal::DynamicsNotifier
 {
 public:
   static DynamicsWorldPtr New();
@@ -79,11 +80,28 @@ private:
   DynamicsWorld& operator=(const DynamicsWorld&);
 
 public:
+
   /**
-   * Singleton getter
-   * @return A pointer to the dynamics world if it is installed
+   * @copydoc Dali::DynamicsWorld::GetInstance()
+   */
+  static DynamicsWorldPtr GetInstance( DynamicsWorldConfigPtr configuration );
+
+  /**
+   * @copydoc Dali::DynamicsWorld::Get()
    */
   static DynamicsWorldPtr Get();
+
+  /**
+   * @copydoc Dali::DynamicsWorld::DestroyInstance()
+   */
+  static void DestroyInstance();
+
+  /**
+   * Gets the instance of the Dynamics Notifier, if created with GetInstance().
+   *
+   * @return The DynamicsNotifier instance.
+   */
+  static DynamicsNotifier& GetNotifier();
 
   /**
    * Connects a callback function with the object's signals.

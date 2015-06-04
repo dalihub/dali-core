@@ -40,13 +40,6 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/render-tasks/render-task-list.h>
 
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
-#include <dali/internal/event/dynamics/dynamics-world-impl.h>
-#include <dali/integration-api/dynamics/dynamics-factory-intf.h>
-#include <dali/integration-api/dynamics/dynamics-world-settings.h>
-#endif
-
 using Dali::Internal::SceneGraph::Node;
 
 namespace Dali
@@ -65,6 +58,7 @@ const float DEFAULT_STEREO_BASE( 65.0f );
 const char* const SIGNAL_KEY_EVENT =                 "key-event";
 const char* const SIGNAL_EVENT_PROCESSING_FINISHED = "event-processing-finished";
 const char* const SIGNAL_TOUCHED =                   "touched";
+const char* const SIGNAL_WHEEL_EVENT =               "wheel-event";
 const char* const SIGNAL_CONTEXT_LOST =              "context-lost";
 const char* const SIGNAL_CONTEXT_REGAINED =          "context-regained";
 const char* const SIGNAL_SCENE_CREATED =             "scene-created";
@@ -74,9 +68,10 @@ TypeRegistration mType( typeid(Dali::Stage), typeid(Dali::BaseHandle), NULL );
 SignalConnectorType signalConnector1( mType, SIGNAL_KEY_EVENT,                 &Stage::DoConnectSignal );
 SignalConnectorType signalConnector2( mType, SIGNAL_EVENT_PROCESSING_FINISHED, &Stage::DoConnectSignal );
 SignalConnectorType signalConnector3( mType, SIGNAL_TOUCHED,                   &Stage::DoConnectSignal );
-SignalConnectorType signalConnector4( mType, SIGNAL_CONTEXT_LOST,              &Stage::DoConnectSignal );
-SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
-SignalConnectorType signalConnector6( mType, SIGNAL_SCENE_CREATED,             &Stage::DoConnectSignal );
+SignalConnectorType signalConnector4( mType, SIGNAL_WHEEL_EVENT,               &Stage::DoConnectSignal );
+SignalConnectorType signalConnector5( mType, SIGNAL_CONTEXT_LOST,              &Stage::DoConnectSignal );
+SignalConnectorType signalConnector6( mType, SIGNAL_CONTEXT_REGAINED,          &Stage::DoConnectSignal );
+SignalConnectorType signalConnector7( mType, SIGNAL_SCENE_CREATED,             &Stage::DoConnectSignal );
 
 } // unnamed namespace
 
@@ -98,6 +93,10 @@ void Stage::Initialize()
   // The stage owns the default layer
   mRootLayer = Layer::NewRoot( *mLayerList, mUpdateManager, false/*not system-level*/ );
   mRootLayer->SetName("RootLayer");
+  // The root layer needs to have a fixed resize policy (as opposed to the default USE_NATURAL_SIZE).
+  // This stops actors parented to the stage having their relayout requests propagating
+  // up to the root layer, and down through other children unnecessarily.
+  mRootLayer->SetResizePolicy( ResizePolicy::FIXED, Dimension::ALL_DIMENSIONS );
 
   // Create the default camera actor first; this is needed by the RenderTaskList
   CreateDefaultCameraActor();
@@ -471,47 +470,6 @@ void Stage::SetDpi(Vector2 dpi)
   mDpi = dpi;
 }
 
-#ifdef DYNAMICS_SUPPORT
-
-DynamicsNotifier& Stage::GetDynamicsNotifier()
-{
-  return mDynamicsNotifier;
-}
-
-DynamicsWorldPtr Stage::InitializeDynamics(DynamicsWorldConfigPtr config)
-{
-  if( !mDynamicsFactory )
-  {
-    mDynamicsFactory = ThreadLocalStorage::Get().GetPlatformAbstraction().GetDynamicsFactory();
-  }
-
-  if( mDynamicsFactory && !mDynamicsWorld )
-  {
-    if( mDynamicsFactory->InitializeDynamics( *(config->GetSettings()) ) )
-    {
-      mDynamicsWorld = DynamicsWorld::New();
-      mDynamicsWorld->Initialize( *this, *mDynamicsFactory, config );
-    }
-  }
-  return mDynamicsWorld;
-}
-
-DynamicsWorldPtr Stage::GetDynamicsWorld()
-{
-  return mDynamicsWorld;
-}
-
-void Stage::TerminateDynamics()
-{
-  if( mDynamicsWorld )
-  {
-    mDynamicsWorld->Terminate(*this);
-    mDynamicsWorld = NULL;
-  }
-}
-
-#endif // DYNAMICS_SUPPORT
-
 void Stage::KeepRendering( float durationSeconds )
 {
   // Send message to keep rendering
@@ -534,6 +492,10 @@ bool Stage::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_TOUCHED ) )
   {
     stage->TouchedSignal().Connect( tracker, functor );
+  }
+  else if( 0 == strcmp( signalName.c_str(), SIGNAL_WHEEL_EVENT ) )
+  {
+    stage->WheelEventSignal().Connect( tracker, functor );
   }
   else if( 0 == strcmp( signalName.c_str(), SIGNAL_CONTEXT_LOST ) )
   {
@@ -573,6 +535,12 @@ void Stage::EmitTouchedSignal( const TouchEvent& touch )
   mTouchedSignal.Emit( touch );
 }
 
+void Stage::EmitWheelEventSignal(const WheelEvent& event)
+{
+  // Emit the wheel event signal when no actor in the stage has gained the wheel input focus
+
+  mWheelEventSignal.Emit( event );
+}
 
 void Stage::EmitSceneCreatedSignal()
 {
@@ -592,6 +560,11 @@ Dali::Stage::EventProcessingFinishedSignalType& Stage::EventProcessingFinishedSi
 Dali::Stage::TouchedSignalType& Stage::TouchedSignal()
 {
   return mTouchedSignal;
+}
+
+Dali::Stage::WheelEventSignalType& Stage::WheelEventSignal()
+{
+  return mWheelEventSignal;
 }
 
 Dali::Stage::ContextStatusSignal& Stage::ContextLostSignal()
@@ -631,9 +604,6 @@ Stage::Stage( AnimationPlaylist& playlist,
   mBackgroundColor(Dali::Stage::DEFAULT_BACKGROUND_COLOR),
   mViewMode( MONO ),
   mStereoBase( DEFAULT_STEREO_BASE ),
-#ifdef DYNAMICS_SUPPORT
-  mDynamicsFactory(NULL),
-#endif
   mSystemOverlay(NULL)
 {
 }

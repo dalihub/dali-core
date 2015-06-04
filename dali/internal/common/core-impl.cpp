@@ -151,7 +151,7 @@ Core::Core( RenderController& renderController, PlatformAbstraction& platform,
   mStage = IntrusivePtr<Stage>( Stage::New( *mAnimationPlaylist, *mPropertyNotificationManager, *mUpdateManager, *mNotificationManager ) );
 
   // This must be called after stage is created but before stage initialization
-  mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController() );
+  mRelayoutController = IntrusivePtr< RelayoutController >( new RelayoutController( mRenderController ) );
 
   mStage->Initialize();
 
@@ -317,6 +317,7 @@ void Core::ProcessEvents()
   }
 
   mProcessingEvent = true;
+  mRelayoutController->SetProcessingCoreEvents( true );
 
   // Signal that any messages received will be flushed soon
   mUpdateManager->EventProcessingStarted();
@@ -350,6 +351,8 @@ void Core::ProcessEvents()
       mRenderController.RequestUpdate();
     }
   }
+
+  mRelayoutController->SetProcessingCoreEvents( false );
 
   // ProcessEvents() may now be called again
   mProcessingEvent = false;

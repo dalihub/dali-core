@@ -25,6 +25,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
+#include <dali/public-api/common/dali-vector.h>
 
 namespace Dali
 {
@@ -44,7 +45,7 @@ struct DALI_IMPORT_API Property
   static const int INVALID_INDEX; ///< -1 is not a valid property index
   static const int INVALID_COMPONENT_INDEX; ///< -1 is not a valid property index
 
-  typedef std::vector< Index > IndexContainer; ///< A vector of property indices
+  typedef Dali::Vector< Index > IndexContainer; ///< A vector of property indices
 
   /**
    * @brief A value-type representing a property value.

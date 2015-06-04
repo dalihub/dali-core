@@ -44,7 +44,7 @@ class Layer;
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
-struct MouseWheelEvent;
+struct WheelEvent;
 struct Vector2;
 struct Vector3;
 struct Vector4;
@@ -223,7 +223,7 @@ typedef Rect<float> Padding;      ///< Padding definition
  * |-------------------|------------------------------|
  * | touched           | @ref TouchedSignal()         |
  * | hovered           | @ref HoveredSignal()         |
- * | mouse-wheel-event | @ref MouseWheelEventSignal() |
+ * | wheel-event       | @ref WheelEventSignal()      |
  * | on-stage          | @ref OnStageSignal()         |
  * | off-stage         | @ref OffStageSignal()        |
  *
@@ -303,7 +303,7 @@ public:
 
   typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                 ///< Touch signal type
   typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                 ///< Hover signal type
-  typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType; ///< Mousewheel signal type
+  typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;           ///< Wheel signal type
   typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type
   typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type
   typedef Signal< void (Actor) > OnRelayoutSignalType; ///< Called when the actor is relaid out
@@ -1291,18 +1291,18 @@ public: // Signals
   HoverSignalType& HoveredSignal();
 
   /**
-   * @brief This signal is emitted when mouse wheel event is received.
+   * @brief This signal is emitted when wheel event is received.
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallbackName(Actor actor, const MouseWheelEvent& event);
+   *   bool YourCallbackName(Actor actor, const WheelEvent& event);
    * @endcode
-   * The return value of True, indicates that the mouse wheel event should be consumed.
+   * The return value of True, indicates that the wheel event should be consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
    * @pre The Actor has been initialized.
    * @return The signal to connect to.
    */
-  MouseWheelEventSignalType& MouseWheelEventSignal();
+  WheelEventSignalType& WheelEventSignal();
 
   /**
    * @brief This signal is emitted after the actor has been connected to the stage.

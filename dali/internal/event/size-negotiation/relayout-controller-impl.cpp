@@ -29,6 +29,7 @@
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
+#include <dali/integration-api/render-controller.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/internal/event/actors/actor-impl.h>
@@ -111,14 +112,16 @@ RelayoutController* RelayoutController::Get()
   return &ThreadLocalStorage::Get().GetRelayoutController();
 }
 
-RelayoutController::RelayoutController()
-: mRelayoutInfoAllocator(),
+RelayoutController::RelayoutController( Integration::RenderController& controller )
+: mRenderController( controller ),
+  mRelayoutInfoAllocator(),
   mSlotDelegate( this ),
   mRelayoutStack( new MemoryPoolRelayoutContainer( mRelayoutInfoAllocator ) ),
   mRelayoutConnection( false ),
   mRelayoutFlag( false ),
   mEnabled( false ),
-  mPerformingRelayout( false )
+  mPerformingRelayout( false ),
+  mProcessingCoreEvents( false )
 {
   // Make space for 32 controls to avoid having to copy construct a lot in the beginning
   mRelayoutStack->Reserve( 32 );
@@ -181,6 +184,11 @@ void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension::Type di
     Dali::Actor subRoot = *it;
 
     RemoveRequest( subRoot );
+  }
+
+  if ( !mProcessingCoreEvents )
+  {
+    mRenderController.RequestProcessEventsOnIdle();
   }
 }
 
@@ -487,6 +495,11 @@ void RelayoutController::SetEnabled( bool enabled )
 bool RelayoutController::IsPerformingRelayout() const
 {
   return mPerformingRelayout;
+}
+
+void RelayoutController::SetProcessingCoreEvents( bool processingEvents )
+{
+  mProcessingCoreEvents = processingEvents;
 }
 
 void RelayoutController::FindAndZero( const RawActorList& list, const Dali::RefObject* object )

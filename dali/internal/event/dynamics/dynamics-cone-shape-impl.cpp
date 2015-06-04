@@ -37,15 +37,14 @@ DynamicsConeShape::DynamicsConeShape(const float radius, const float length)
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s - (radius:%.1f length:%.1f)\n", __PRETTY_FUNCTION__, radius, length);
 
-  StagePtr stage( Stage::GetCurrent() );
-  DynamicsWorldPtr world( stage->GetDynamicsWorld() );
+  DynamicsWorldPtr world( DynamicsWorld::Get() );
   DALI_ASSERT_ALWAYS( world && "No Dynamics World !");
 
   SceneGraph::DynamicsConeShape* coneShape = new SceneGraph::DynamicsConeShape( *world->GetSceneObject() );
   mDynamicsShape = coneShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsConeShapeMessage( *stage, *coneShape, radius, length );
+  InitializeDynamicsConeShapeMessage( *Stage::GetCurrent(), *coneShape, radius, length );
 }
 
 DynamicsConeShape::~DynamicsConeShape()

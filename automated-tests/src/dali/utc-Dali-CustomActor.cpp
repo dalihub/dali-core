@@ -21,7 +21,7 @@
 
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali/integration-api/events/hover-event-integ.h>
-#include <dali/integration-api/events/mouse-wheel-event-integ.h>
+#include <dali/integration-api/events/wheel-event-integ.h>
 #include <dali/integration-api/events/key-event-integ.h>
 
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
@@ -57,7 +57,7 @@ struct TestCustomActor : public CustomActorImpl
    * Constructor
    */
   TestCustomActor()
-  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS | DISABLE_SIZE_NEGOTIATION ) ),
+  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS | DISABLE_SIZE_NEGOTIATION ) ),
     mDaliProperty( Property::INVALID_INDEX ),
     mSizeSet( Vector3::ZERO ),
     mTargetSize( Vector3::ZERO ),
@@ -66,7 +66,7 @@ struct TestCustomActor : public CustomActorImpl
   }
 
   TestCustomActor(bool nego)
-  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_MOUSE_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS ) ),
+  : CustomActorImpl( ActorFlags( REQUIRES_TOUCH_EVENTS | REQUIRES_WHEEL_EVENTS | REQUIRES_HOVER_EVENTS ) ),
     mDaliProperty( Property::INVALID_INDEX ),
     mSizeSet( Vector3::ZERO ),
     mTargetSize( Vector3::ZERO ),
@@ -159,9 +159,9 @@ struct TestCustomActor : public CustomActorImpl
     AddToCallStacks("OnHoverEvent");
     return true;
   }
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event)
+  virtual bool OnWheelEvent(const WheelEvent& event)
   {
-    AddToCallStacks("OnMouseWheelEvent");
+    AddToCallStacks("OnWheelEvent");
     return true;
   }
   virtual bool OnKeyEvent(const KeyEvent& event)
@@ -221,7 +221,7 @@ struct TestCustomActor : public CustomActorImpl
 
   void SetDaliProperty(std::string s)
   {
-    Self().SetProperty(mDaliProperty, s) ;
+    Self().SetProperty(mDaliProperty, s);
   }
   void TestRelayoutRequest()
   {
@@ -523,7 +523,7 @@ public:
   {
     return true;
   }
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event)
+  virtual bool OnWheelEvent(const WheelEvent& event)
   {
     return true;
   }
@@ -607,6 +607,7 @@ public:
   {
     Impl::TestCustomActor* impl = new Impl::TestCustomActor( true );
     TestCustomActor custom( *impl ); // takes ownership
+    custom.SetName( "SizeNegotiationActor" );
 
     impl->Initialize();
 
@@ -1587,7 +1588,7 @@ int UtcDaliCustomActorOnPropertySet(void)
   TestCustomActor custom = TestCustomActor::New();
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
 
-  custom.SetDaliProperty("yes") ;
+  custom.SetDaliProperty("yes");
 
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
   DALI_TEST_EQUALS( "OnPropertySet", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
@@ -1697,10 +1698,10 @@ int UtcDaliCustomActorOnHoverEvent(void)
   END_TEST;
 }
 
-int UtcDaliCustomActorOnMouseWheelEvent(void)
+int UtcDaliCustomActorOnWheelEvent(void)
 {
   TestApplication application;
-  tet_infoline("Testing Dali::CustomActor::OnMouseWheelEvent()");
+  tet_infoline("Testing Dali::CustomActor::OnWheelEvent()");
 
   TestCustomActor custom = TestCustomActor::New();
   DALI_TEST_EQUALS( 0, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
@@ -1717,13 +1718,13 @@ int UtcDaliCustomActorOnMouseWheelEvent(void)
   application.SendNotification();
   application.Render();
 
-  // simulate a mouse wheel event
+  // simulate a wheel event
   Vector2 screenCoordinates( 10.0f, 10.0f );
-  Integration::MouseWheelEvent event(0, 0u, screenCoordinates, 1, 1000u);
+  Integration::WheelEvent event( Integration::WheelEvent::MOUSE_WHEEL, 0, 0u, screenCoordinates, 1, 1000u );
   application.ProcessEvent( event );
 
   DALI_TEST_EQUALS( 1, (int)(custom.GetMethodsCalled().size()), TEST_LOCATION );
-  DALI_TEST_EQUALS( "OnMouseWheelEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
+  DALI_TEST_EQUALS( "OnWheelEvent", custom.GetMethodsCalled()[ 0 ], TEST_LOCATION );
   END_TEST;
 }
 
@@ -1767,7 +1768,7 @@ int UtcDaliCustomActorDoAction(void)
 
   DALI_TEST_CHECK(customActorObject);
 
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
 
   // Check that an invalid command is not performed
   DALI_TEST_CHECK(customActorObject.DoAction("invalidCommand", attributes) == false);

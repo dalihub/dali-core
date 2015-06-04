@@ -1,5 +1,5 @@
-#ifndef __DALI_MOUSE_WHEEL_EVENT_H__
-#define __DALI_MOUSE_WHEEL_EVENT_H__
+#ifndef __DALI_WHEEL_EVENT_H__
+#define __DALI_WHEEL_EVENT_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -27,34 +27,49 @@ namespace Dali
 {
 
 /**
- * @brief The mouse wheel event structure is used to store a mouse wheel rolling, it facilitates
- * processing of the mouse wheel rolling and passing to other libraries like Toolkit.
+ * @brief The wheel event structure is used to store a wheel rolling, it facilitates
+ * processing of the wheel rolling and passing to other libraries like Toolkit.
  *
  * There is a key modifier which relates to keys like alt, shift and control functions are
- * supplied to check if they have been pressed when the mouse wheel is being rolled.
+ * supplied to check if they have been pressed when the wheel is being rolled.
+ *
+ * We support a mouse device and there may be another custom device that support the wheel event. The device type is specified as \e type.
+ * The mouse wheel event can be sent to the specific actor but the custom wheel event will be sent to the stage.
  */
-struct DALI_IMPORT_API MouseWheelEvent
+struct DALI_IMPORT_API WheelEvent
 {
+  // Enumerations
+
+  /**
+   * @brief Specifies the type of the wheel event.
+   */
+  enum Type
+  {
+    MOUSE_WHEEL,      ///< Mouse wheel event
+    CUSTOM_WHEEL      ///< Custom wheel event
+  };
+
   /**
    * @brief Default constructor.
    */
-  MouseWheelEvent();
+  WheelEvent();
 
   /**
    * @brief Constructor.
    *
-   * @param[in]  direction  The direction of mouse wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
+   * @param[in]  type       The type of the wheel event
+   * @param[in]  direction  The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
    * @param[in]  modifiers  modifier keys pressed during the event (such as shift, alt and control)
-   * @param[in]  point      The co-ordinates of the mouse cursor relative to the top-left of the screen.
-   * @param[in]  z          The offset of rolling (positive value means roll down, and negative value means roll up)
-   * @param[in]  timeStamp  The time the mouse wheel is being rolled.
+   * @param[in]  point      The co-ordinates of the cursor relative to the top-left of the screen.
+   * @param[in]  z          The offset of rolling (positive value means roll down or clockwise, and negative value means roll up or counter-clockwise)
+   * @param[in]  timeStamp  The time the wheel is being rolled.
    */
-  MouseWheelEvent(int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp);
+  WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp );
 
   /**
    * @brief Destructor.
    */
-  ~MouseWheelEvent();
+  ~WheelEvent();
 
   /**
    * @brief Check to see if Shift key modifier has been supplied.
@@ -80,7 +95,14 @@ struct DALI_IMPORT_API MouseWheelEvent
   // Data
 
   /**
-   * @brief The direction in which the mouse wheel is being rolled.
+   * @brief Type of the event
+   *
+   * @see Type
+   */
+  Type type;
+
+  /**
+   * @brief The direction in which the wheel is being rolled.
    *
    * 0 means the default vertical wheel, and 1 means horizontal wheel
    */
@@ -92,19 +114,19 @@ struct DALI_IMPORT_API MouseWheelEvent
   unsigned int modifiers;
 
   /**
-   * @brief The co-ordinates of the mouse cursor relative to the top-left of the screen
+   * @brief The co-ordinates of the cursor relative to the top-left of the screen
    * when the wheel is being rolled.
    */
   Vector2 point;
 
   /**
-   * @brief The offset of the mouse wheel rolling, where positive value means rolling down
-   * and negative value means rolling up.
+   * @brief The offset of the wheel rolling, where positive value means rolling down or clockwise
+   * and negative value means rolling up or counter-clockwise.
    */
   int z;
 
   /**
-   * @brief The time when the mouse wheel is being rolled.
+   * @brief The time when the wheel is being rolled.
    */
   unsigned int timeStamp;
 
@@ -112,4 +134,4 @@ struct DALI_IMPORT_API MouseWheelEvent
 
 } // namespace Dali
 
-#endif // __DALI_MOUSE_WHEEL_EVENT_H__
+#endif // __DALI_WHEEL_EVENT_H__

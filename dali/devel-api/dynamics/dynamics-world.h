@@ -25,6 +25,7 @@
 #include <dali/public-api/object/base-handle.h>
 
 // INTERNAL INCLUDES
+#include <dali/devel-api/dynamics/dynamics-world-config.h>
 #include <dali/public-api/signals/dali-signal.h>
 
 namespace Dali
@@ -133,6 +134,41 @@ public:
    * @return A reference to this
    */
   DynamicsWorld& operator=(const DynamicsWorld& rhs);
+
+  /**
+   * @brief Static / singleton creator and getter.
+   * Initialise the Dynamics simulation and create a DynamicsWorld object.
+   *
+   * Only one instance of DynamicsWorld will be created, so calling this method multiple times
+   * will return the same DynamicsWorld object.
+   *
+   * If an instance already exists, it is returned regardless of configuration being passed in.
+   *
+   * @param[in] configuration A DynamicsWorldConfig object describing the required capabilities of the dynamics world.
+   * @return A handle to the world object of the dynamics simulation, or an empty handle if Dynamics is not capable
+   *         of supporting a requirement in the configuration as it is not available on the platform.
+   */
+  static DynamicsWorld GetInstance( DynamicsWorldConfig configuration );
+
+  /**
+   * @brief Static / singleton getter.
+   * Get a handle to the world object of the dynamics simulation.
+   *
+   * Does not create an instance, use only if the instance is known to exist.
+   *
+   * @return A pointer to the dynamics world if it is installed.
+   */
+  static DynamicsWorld Get();
+
+  /**
+   * @brief Static instance cleanup.
+   * Terminate the dynamics simulation.
+   *
+   * Calls Actor::DisableDynamics on all dynamics enabled actors,
+   * all handles to any DynamicsBody or DynamicsJoint objects held by applications
+   * will become detached from their actors and the simulation therefore should be discarded.
+   */
+  static void DestroyInstance();
 
 // Methods that modify the simulation
 public:

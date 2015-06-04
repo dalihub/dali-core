@@ -1,5 +1,5 @@
-#ifndef __DALI_INTEGRATION_MOUSE_WHEEL_EVENT_H__
-#define __DALI_INTEGRATION_MOUSE_WHEEL_EVENT_H__
+#ifndef __DALI_INTEGRATION_WHEEL_EVENT_H__
+#define __DALI_INTEGRATION_WHEEL_EVENT_H__
 
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
@@ -32,56 +32,73 @@ namespace Integration
 {
 
 /**
- * An instance of this class should be used by the adaptor to send a mouse wheel event to
+ * An instance of this class should be used by the adaptor to send a wheel event to
  * the Dali core.
  *
  */
-struct MouseWheelEvent : public Event
+struct WheelEvent : public Event
 {
+  // Enumerations
+
+  /**
+   * @brief Specifies the type of the wheel event.
+   */
+  enum Type
+  {
+    MOUSE_WHEEL,      ///< Mouse wheel event
+    CUSTOM_WHEEL      ///< Custom wheel event
+  };
+
   /**
    * Default Constructor
    */
-  MouseWheelEvent();
+  WheelEvent();
 
   /**
    * Constructor
-   * @param[in]  direction  The direction of mouse wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
+   * @param[in]  type       The type of the wheel event
+   * @param[in]  direction  The direction of wheel rolling (0 = default vertical wheel, 1 = horizontal wheel)
    * @param[in]  modifiers  modifier keys pressed during the event (such as shift, alt and control)
-   * @param[in]  point      The co-ordinates of the mouse cursor relative to the top-left of the screen.
+   * @param[in]  point      The co-ordinates of the cursor relative to the top-left of the screen.
    * @param[in]  z          The offset of rolling (positive value means roll down, and negative value means roll up)
-   * @param[in]  timeStamp  The time the mouse wheel is being rolled.
+   * @param[in]  timeStamp  The time the wheel is being rolled.
    */
-  MouseWheelEvent(int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp);
+  WheelEvent( Type type, int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp );
 
   /**
    * Virtual destructor
    */
-  virtual ~MouseWheelEvent();
+  virtual ~WheelEvent();
 
   // Data
 
   /**
-   *@copydoc Dali::MouseWheelEvent::direction
+   *@copydoc Dali::WheelEvent::type
+   */
+  Type type;
+
+  /**
+   *@copydoc Dali::WheelEvent::direction
    */
   int direction;
 
   /**
-   *@copydoc Dali::MouseWheelEvent::modifiers
+   *@copydoc Dali::WheelEvent::modifiers
    */
   unsigned int modifiers;
 
   /**
-   *@copydoc Dali::MouseWheelEvent::point
+   *@copydoc Dali::WheelEvent::point
    */
   Vector2 point;
 
   /**
-   *@copydoc Dali::MouseWheelEvent::z
+   *@copydoc Dali::WheelEvent::z
    */
   int z;
 
   /**
-   *@copydoc Dali::MouseWheelEvent::timeStamp
+   *@copydoc Dali::WheelEvent::timeStamp
    */
   unsigned int timeStamp;
 
@@ -91,4 +108,4 @@ struct MouseWheelEvent : public Event
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_MOUSE_WHEEL_EVENT_H__
+#endif // __DALI_INTEGRATION_WHEEL_EVENT_H__

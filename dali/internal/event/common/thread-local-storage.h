@@ -20,6 +20,9 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/stage-def.h>
+#ifdef DYNAMICS_SUPPORT
+#include <dali/internal/event/dynamics/dynamics-world-impl.h>
+#endif
 
 namespace Dali
 {
@@ -98,6 +101,14 @@ public:
    */
   Dali::Integration::PlatformAbstraction& GetPlatformAbstraction();
 
+#ifdef DYNAMICS_SUPPORT
+  /**
+   * Get DynamicsWorld instance
+   * @return A pointer to the current DynamicsWorld.
+   */
+  Dali::Internal::DynamicsWorldPtr GetDynamicsWorldInstance();
+#endif
+
   /**
    * Retrieve the update manager
    * @return reference to update manager
@@ -154,7 +165,10 @@ public:
 
 private:
 
-  Core* mCore;                            ///< reference to core
+  Core* mCore;                                              ///< reference to core
+#ifdef DYNAMICS_SUPPORT
+  Dali::Internal::DynamicsWorldPtr mDynamicsWorldInstance;  ///< Instance of DynamicsWorld (This does not need to be in core)
+#endif
 
 };
 

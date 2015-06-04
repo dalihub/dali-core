@@ -66,9 +66,7 @@ devel_api_core_geometry_header_files = \
 
 devel_api_core_images_header_files = \
   $(devel_api_src_dir)/images/atlas.h \
-  $(devel_api_src_dir)/images/distance-field.h \
-  $(devel_api_src_dir)/images/image-operations.h \
-  $(devel_api_src_dir)/images/native-image-interface.h
+  $(devel_api_src_dir)/images/distance-field.h
 
 devel_api_core_modeling_header_files =  \
   $(devel_api_src_dir)/modeling/bone.h \

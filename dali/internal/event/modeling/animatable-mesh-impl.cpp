@@ -206,11 +206,11 @@ unsigned int AnimatableMesh::GetDefaultPropertyCount() const
 
 void AnimatableMesh::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
-  indices.reserve( mPropertyCount );
+  indices.Reserve( mPropertyCount );
 
   for ( int i = 0; i < mPropertyCount; ++i )
   {
-    indices.push_back( i );
+    indices.PushBack( i );
   }
 }
 

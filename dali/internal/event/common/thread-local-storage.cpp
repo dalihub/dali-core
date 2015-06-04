@@ -34,7 +34,10 @@ __thread ThreadLocalStorage* threadLocal = NULL;
 }
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
-: mCore(core)
+: mCore( core )
+#ifdef DYNAMICS_SUPPORT
+, mDynamicsWorldInstance( NULL )
+#endif
 {
   DALI_ASSERT_ALWAYS( threadLocal == NULL && "Cannot create more than one ThreadLocalStorage object" );
 
@@ -48,6 +51,12 @@ ThreadLocalStorage::~ThreadLocalStorage()
 
 void ThreadLocalStorage::Remove()
 {
+#ifdef DYNAMICS_SUPPORT
+  if( mDynamicsWorldInstance )
+  {
+    mDynamicsWorldInstance.Reset();
+  }
+#endif
   threadLocal = NULL;
 }
 
@@ -68,6 +77,18 @@ ThreadLocalStorage* ThreadLocalStorage::GetInternal()
 {
   return threadLocal;
 }
+
+#ifdef DYNAMICS_SUPPORT
+Dali::Internal::DynamicsWorldPtr ThreadLocalStorage::GetDynamicsWorldInstance()
+{
+  if( !mDynamicsWorldInstance )
+  {
+    // Create the instance if it doesn't exist.
+    mDynamicsWorldInstance = DynamicsWorld::New();
+  }
+  return mDynamicsWorldInstance;
+}
+#endif
 
 Dali::Integration::PlatformAbstraction& ThreadLocalStorage::GetPlatformAbstraction()
 {

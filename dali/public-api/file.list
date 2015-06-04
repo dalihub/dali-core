@@ -29,7 +29,7 @@ public_api_src_files = \
   $(public_api_src_dir)/events/key-event.cpp \
   $(public_api_src_dir)/events/long-press-gesture.cpp \
   $(public_api_src_dir)/events/long-press-gesture-detector.cpp \
-  $(public_api_src_dir)/events/mouse-wheel-event.cpp \
+  $(public_api_src_dir)/events/wheel-event.cpp \
   $(public_api_src_dir)/events/pan-gesture.cpp \
   $(public_api_src_dir)/events/pan-gesture-detector.cpp \
   $(public_api_src_dir)/events/pinch-gesture.cpp \
@@ -134,7 +134,7 @@ public_api_core_events_header_files = \
   $(public_api_src_dir)/events/key-event.h \
   $(public_api_src_dir)/events/long-press-gesture.h \
   $(public_api_src_dir)/events/long-press-gesture-detector.h \
-  $(public_api_src_dir)/events/mouse-wheel-event.h \
+  $(public_api_src_dir)/events/wheel-event.h \
   $(public_api_src_dir)/events/pan-gesture.h \
   $(public_api_src_dir)/events/pan-gesture-detector.h \
   $(public_api_src_dir)/events/pinch-gesture.h \
@@ -149,10 +149,12 @@ public_api_core_images_header_files = \
   $(public_api_src_dir)/images/encoded-buffer-image.h \
   $(public_api_src_dir)/images/frame-buffer-image.h \
   $(public_api_src_dir)/images/image.h \
+  $(public_api_src_dir)/images/image-operations.h \
   $(public_api_src_dir)/images/nine-patch-image.h \
   $(public_api_src_dir)/images/pixel.h \
   $(public_api_src_dir)/images/resource-image.h \
-  $(public_api_src_dir)/images/native-image.h
+  $(public_api_src_dir)/images/native-image.h \
+  $(public_api_src_dir)/images/native-image-interface.h
 
 public_api_core_math_header_files = \
   $(public_api_src_dir)/math/angle-axis.h \

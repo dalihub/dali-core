@@ -66,9 +66,9 @@ bool CustomActorImpl::RequiresHoverEvents() const
   return ( mFlags & REQUIRES_HOVER_EVENTS );
 }
 
-bool CustomActorImpl::RequiresMouseWheelEvents() const
+bool CustomActorImpl::RequiresWheelEvents() const
 {
-  return ( mFlags & REQUIRES_MOUSE_WHEEL_EVENTS );
+  return ( mFlags & REQUIRES_WHEEL_EVENTS );
 }
 
 bool CustomActorImpl::IsRelayoutEnabled() const

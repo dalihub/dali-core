@@ -37,15 +37,14 @@ DynamicsCapsuleShape::DynamicsCapsuleShape(const float radius, const float lengt
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s - (radius:%.1f length:%.1f)\n", __PRETTY_FUNCTION__, radius, length);
 
-  StagePtr stage( Stage::GetCurrent() );
-  DynamicsWorldPtr world( stage->GetDynamicsWorld() );
+  DynamicsWorldPtr world( DynamicsWorld::Get() );
   DALI_ASSERT_ALWAYS( world && "No Dynamics World !");
 
   SceneGraph::DynamicsCapsuleShape* capsuleShape = new SceneGraph::DynamicsCapsuleShape( *world->GetSceneObject() );
   mDynamicsShape = capsuleShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsCapsuleShapeMessage( *stage, *capsuleShape, radius, length );
+  InitializeDynamicsCapsuleShapeMessage( *Stage::GetCurrent(), *capsuleShape, radius, length );
 }
 
 DynamicsCapsuleShape::~DynamicsCapsuleShape()

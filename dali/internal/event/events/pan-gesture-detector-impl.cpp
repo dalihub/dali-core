@@ -187,10 +187,23 @@ void PanGestureDetector::AddDirection( Radian direction, Radian threshold )
   AddAngle( direction, threshold );
 }
 
-const PanGestureDetector::AngleContainer& PanGestureDetector::GetAngles() const
+size_t PanGestureDetector::GetAngleCount() const
 {
-  return mAngleContainer;
+  return mAngleContainer.size();
 }
+
+PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(size_t index) const
+{
+  PanGestureDetector::AngleThresholdPair ret( Radian(0),Radian(0) );
+
+  if( index < mAngleContainer.size() )
+  {
+    ret = mAngleContainer[index];
+  }
+
+  return ret;
+}
+
 
 void PanGestureDetector::ClearAngles()
 {
@@ -320,12 +333,12 @@ unsigned int PanGestureDetector::GetDefaultPropertyCount() const
 
 void PanGestureDetector::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
-  indices.reserve( DEFAULT_PROPERTY_COUNT );
+  indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
   int index = DEFAULT_GESTURE_DETECTOR_PROPERTY_START_INDEX;
   for ( int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i, ++index )
   {
-    indices.push_back( index );
+    indices.PushBack( index );
   }
 }
 

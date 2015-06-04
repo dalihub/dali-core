@@ -34,10 +34,6 @@ namespace Internal DALI_INTERNAL
   class TypeInfo;
 };
 
-typedef std::vector<Property::Value> PropertyValueContainer;
-typedef PropertyValueContainer::iterator PropertyValueIter; ///< Iterator for Dali::PropertyValueContainer
-typedef PropertyValueContainer::const_iterator PropertyValueConstIter; ///< Const iterator for Dali::PropertyValueContainer
-
 /**
  * @brief TypeInfo class for instantiation of registered types and introspection of
  * their actions and signals.
@@ -49,7 +45,7 @@ class DALI_IMPORT_API TypeInfo : public BaseHandle
 public:
   typedef BaseHandle (*CreateFunction)(); ///< Function signature for creating an instance of the associated object type.
 
-  typedef bool (*ActionFunction)(BaseObject*, const std::string&, const PropertyValueContainer&); ///< Function signature for creating scriptable actions
+  typedef bool (*ActionFunction)(BaseObject*, const std::string&, const Property::Map&); ///< Function signature for creating scriptable actions
 
   /**
    * @brief Connects a callback function with the object's signals.
@@ -82,8 +78,6 @@ public:
    * @return The current value of the property for the object specified.
    */
   typedef Property::Value (*GetPropertyFunction)( BaseObject* object, Property::Index index );
-
-  typedef std::vector<std::string> NameContainer; ///< Container of names for signals and actions
 
   /**
    * @brief Allows the creation of an empty TypeInfo handle.
@@ -141,25 +135,42 @@ public:
   CreateFunction GetCreator() const;
 
   /**
-   * @brief Retrieve the actions for this type.
+   * @brief Retrieve the number of actions for this type.
    *
-   * @param[in] container of action names
+   * @return The count
    */
-  void GetActions( NameContainer &container ) const;
+  size_t GetActionCount() const;
 
   /**
-   * @brief Retrieve the signals for this type.
+   * @brief Retrieve the action name for the index.
    *
-   * @param[in] container of action names
+   * @param[in] index Index to lookup
+   * @return action name or empty string where index is invalid
    */
-  void GetSignals( NameContainer &container ) const;
+  std::string GetActionName(size_t index);
 
   /**
-   * @brief Retrieve the event side registered properties for this type.
+   * @brief Retrieve the number of signals for this type.
    *
-   * @param[in] container of action names
+   * @return The count
    */
-  void GetProperties( NameContainer &container ) const;
+  size_t GetSignalCount() const;
+
+  /**
+   * @brief Retrieve the signal name for the index.
+   *
+   * @param[in] index Index to lookup
+   * @return signal name or empty string where index is invalid
+   */
+  std::string GetSignalName(size_t index);
+
+  /**
+   * @brief Retrieve the number of event side type registered properties for this type.
+   *
+   * This count does not include all properties
+   * @return The count
+   */
+  size_t GetPropertyCount() const;
 
   // Properties
 
@@ -173,6 +184,8 @@ public:
 
   /**
    * @brief Given a property index, retrieve the property name associated with it.
+   *
+   * @exception DaliException If index is not valid.
    *
    * @param[in] index The property index.
    * @return The name of the property at the given index.
