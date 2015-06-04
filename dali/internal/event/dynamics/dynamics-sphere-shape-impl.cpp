@@ -35,15 +35,14 @@ DynamicsSphereShape::DynamicsSphereShape(const float radius)
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s - (radius: %f)\n", __PRETTY_FUNCTION__, radius);
 
-  StagePtr stage( Stage::GetCurrent() );
-  DynamicsWorldPtr world( stage->GetDynamicsWorld() );
+  DynamicsWorldPtr world( DynamicsWorld::Get() );
   DALI_ASSERT_ALWAYS( world && "No Dynamics World !");
 
   SceneGraph::DynamicsSphereShape* sphereShape = new SceneGraph::DynamicsSphereShape(  *world->GetSceneObject() );
   mDynamicsShape = sphereShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsSphereShapeMessage( *stage, *sphereShape, radius );
+  InitializeDynamicsSphereShapeMessage( *Stage::GetCurrent(), *sphereShape, radius );
 }
 
 DynamicsSphereShape::~DynamicsSphereShape()

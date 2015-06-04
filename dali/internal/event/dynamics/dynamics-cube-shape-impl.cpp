@@ -37,15 +37,14 @@ DynamicsCubeShape::DynamicsCubeShape(const Vector3& dimensions)
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s - (dimensions[%1.02f %1.02f %1.02f])\n", __PRETTY_FUNCTION__, dimensions.x, dimensions.y, dimensions.z);
 
-  StagePtr stage( Stage::GetCurrent() );
-  DynamicsWorldPtr world( stage->GetDynamicsWorld() );
+  DynamicsWorldPtr world( DynamicsWorld::Get() );
   DALI_ASSERT_ALWAYS( world && "No Dynamics World !");
 
   SceneGraph::DynamicsCubeShape* cubeShape = new SceneGraph::DynamicsCubeShape( *world->GetSceneObject() );
   mDynamicsShape = cubeShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsCubeShapeMessage( *stage, *cubeShape, dimensions );
+  InitializeDynamicsCubeShapeMessage( *Stage::GetCurrent(), *cubeShape, dimensions );
 }
 
 DynamicsCubeShape::~DynamicsCubeShape()

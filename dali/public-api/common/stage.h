@@ -37,10 +37,9 @@ class RenderTaskList;
 struct Vector2;
 struct Vector3;
 struct Vector4;
-class DynamicsWorld;
-class DynamicsWorldConfig;
 struct KeyEvent;
 struct TouchEvent;
+struct WheelEvent;
 
 /**
  * @brief The Stage is a top-level object used for displaying a tree of Actors.
@@ -53,6 +52,7 @@ struct TouchEvent;
  * | key-event                 | @ref KeyEventSignal()                |
  * | event-processing-finished | @ref EventProcessingFinishedSignal() |
  * | touched                   | @ref TouchedSignal()                 |
+ * | wheel-event               | @ref WheelEventSignal()              |
  * | context-lost              | @ref ContextLostSignal()             |
  * | context-regained          | @ref ContextRegainedSignal()         |
  * | scene-created             | @ref SceneCreatedSignal()            |
@@ -61,11 +61,12 @@ class DALI_IMPORT_API Stage : public BaseHandle
 {
 public:
 
-  typedef Signal< void (const KeyEvent&)> KeyEventSignalType;  ///< Key event signal type
-  typedef Signal< void () > EventProcessingFinishedSignalType; ///< Event Processing finished signal type
-  typedef Signal< void (const TouchEvent&)> TouchedSignalType; ///< Touched signal type
-  typedef Signal< void () > ContextStatusSignal;             ///< Context status signal type
-  typedef Signal< void () > SceneCreatedSignalType;            ///< Scene created signal type
+  typedef Signal< void (const KeyEvent&)> KeyEventSignalType;     ///< Key event signal type
+  typedef Signal< void () > EventProcessingFinishedSignalType;    ///< Event Processing finished signal type
+  typedef Signal< void (const TouchEvent&)> TouchedSignalType;    ///< Touched signal type
+  typedef Signal< void (const WheelEvent&)> WheelEventSignalType; ///< Touched signal type
+  typedef Signal< void () > ContextStatusSignal;                  ///< Context status signal type
+  typedef Signal< void () > SceneCreatedSignalType;               ///< Scene created signal type
 
   static const Vector4 DEFAULT_BACKGROUND_COLOR; ///< Default black background.
   static const Vector4 DEBUG_BACKGROUND_COLOR;   ///< Green background, useful when debugging.
@@ -209,35 +210,6 @@ public:
    */
   ObjectRegistry GetObjectRegistry() const;
 
-  // Dynamics
-
-  /**
-   * @brief Initialise the dynamics simulation and create a DynamicsWorld object.
-   *
-   * Only one instance of DynamicsWorld will be created, so calling this method multiple times
-   * will return the same DynamicsWorld object.
-   * @param[in] config A DynamicsWorldConfig object describing the required capabilities of the dynamics world.
-   * @return A handle to the world object of the dynamics simulation, or an empty handle if Dynamics capable
-   *         of supporting the requirement in config is not available on the platform.
-   */
-  DynamicsWorld InitializeDynamics(DynamicsWorldConfig config);
-
-  /**
-   * @brief Get a handle to the world object of the dynamics simulation.
-   *
-   * @return A handle to the world object of the dynamics simulation
-   */
-  DynamicsWorld GetDynamicsWorld();
-
-  /**
-   * @brief Terminate the dynamics simulation.
-   *
-   * Calls Actor::DisableDynamics on all dynamics enabled actors,
-   * all handles to any DynamicsBody or DynamicsJoint objects held by applications
-   * will become detached from their actors and the simulation therefore should be discarded.
-   */
-  void TerminateDynamics();
-
   // Rendering
 
   /**
@@ -285,6 +257,17 @@ public:
    * @return The touch signal to connect to.
    */
   TouchedSignalType& TouchedSignal();
+
+  /**
+   * @brief This signal is emitted when wheel event is received.
+   *
+   * A callback of the following type may be connected:
+   * @code
+   *   void YourCallbackName(const WheelEvent& event);
+   * @endcode
+   * @return The signal to connect to.
+   */
+  WheelEventSignalType& WheelEventSignal();
 
   /**
    * @brief This signal is emitted when the GL context is lost (Platform specific behaviour).

@@ -52,8 +52,7 @@ DynamicsBody::DynamicsBody(const std::string& name, DynamicsBodyConfigPtr config
   DALI_ASSERT_DEBUG(config);
 
   StagePtr stage( Stage::GetCurrent() );
-
-  DynamicsWorldPtr world( stage->GetDynamicsWorld() );
+  DynamicsWorldPtr world( DynamicsWorld::Get() );
 
   mDynamicsBody = new SceneGraph::DynamicsBody( *(world->GetSceneObject()), node );
 
@@ -92,7 +91,7 @@ DynamicsBody::~DynamicsBody()
   {
     DeleteBodyMessage( *( Stage::GetCurrent() ), *(GetSceneObject()) );
 
-    DynamicsWorldPtr world( Stage::GetCurrent()->GetDynamicsWorld() );
+    DynamicsWorldPtr world( DynamicsWorld::Get() );
 
     if( world )
     {

@@ -6929,6 +6929,33 @@ int UtcDaliAnimationKeyFrames01P(void)
   DALI_TEST_EQUALS(keyFrames.GetType(), Property::NONE, TEST_LOCATION);
 
   keyFrames.Add(0.0f, 0.1f);
+
+  DALI_TEST_EQUALS(keyFrames.GetType(), Property::FLOAT, TEST_LOCATION);
+
+  KeyFrames keyFrames2( keyFrames);
+  DALI_TEST_CHECK( keyFrames2 );
+  DALI_TEST_EQUALS(keyFrames2.GetType(), Property::FLOAT, TEST_LOCATION);
+
+  KeyFrames keyFrames3 = KeyFrames::New();
+  keyFrames3.Add(0.6f, true);
+  DALI_TEST_CHECK( keyFrames3 );
+  DALI_TEST_EQUALS(keyFrames3.GetType(), Property::BOOLEAN, TEST_LOCATION);
+
+  keyFrames3 = keyFrames;
+  DALI_TEST_CHECK( keyFrames3 );
+  DALI_TEST_EQUALS(keyFrames3.GetType(), Property::FLOAT, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliAnimationKeyFrames02P(void)
+{
+  TestApplication application;
+
+  KeyFrames keyFrames = KeyFrames::New();
+  DALI_TEST_EQUALS(keyFrames.GetType(), Property::NONE, TEST_LOCATION);
+
+  keyFrames.Add(0.0f, 0.1f);
   keyFrames.Add(0.2f, 0.5f);
   keyFrames.Add(0.4f, 0.0f);
   keyFrames.Add(0.6f, 1.0f);
@@ -6949,7 +6976,7 @@ int UtcDaliAnimationKeyFrames01P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames02P(void)
+int UtcDaliAnimationKeyFrames03P(void)
 {
   TestApplication application;
 
@@ -6977,7 +7004,7 @@ int UtcDaliAnimationKeyFrames02P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames03P(void)
+int UtcDaliAnimationKeyFrames04P(void)
 {
   TestApplication application;
 
@@ -7005,7 +7032,7 @@ int UtcDaliAnimationKeyFrames03P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames04P(void)
+int UtcDaliAnimationKeyFrames05P(void)
 {
   TestApplication application;
 
@@ -7033,7 +7060,7 @@ int UtcDaliAnimationKeyFrames04P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames05P(void)
+int UtcDaliAnimationKeyFrames06P(void)
 {
   TestApplication application;
 
@@ -7061,7 +7088,7 @@ int UtcDaliAnimationKeyFrames05P(void)
   END_TEST;
 }
 
-int UtcDaliAnimationKeyFrames06P(void)
+int UtcDaliAnimationKeyFrames07P(void)
 {
   TestApplication application;
 

@@ -98,9 +98,14 @@ void PanGestureDetector::AddDirection( Radian direction, Radian threshold )
   GetImplementation(*this).AddDirection( direction, threshold );
 }
 
-const PanGestureDetector::AngleContainer& PanGestureDetector::GetAngles() const
+size_t PanGestureDetector::GetAngleCount() const
 {
-  return GetImplementation(*this).GetAngles();
+  return GetImplementation(*this).GetAngleCount();
+}
+
+PanGestureDetector::AngleThresholdPair PanGestureDetector::GetAngle(size_t index) const
+{
+  return GetImplementation(*this).GetAngle(index);
 }
 
 void PanGestureDetector::ClearAngles()

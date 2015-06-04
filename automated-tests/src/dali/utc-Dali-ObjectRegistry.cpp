@@ -23,8 +23,6 @@
 
 using namespace Dali;
 
-#include "mesh-builder.h"
-
 namespace
 {
 
@@ -176,6 +174,19 @@ int UtcDaliObjectRegistryGet(void)
   registry= Stage::GetCurrent().GetObjectRegistry();
 
   DALI_TEST_CHECK( registry );
+  END_TEST;
+}
+
+int UtcDaliObjectRegistryCopyConstructor(void)
+{
+  TestApplication application;
+  tet_printf(" copy consturctor ");
+
+  ObjectRegistry myRegistry;
+
+  ObjectRegistry anotherRegistry( myRegistry );
+
+  tet_result( TET_PASS );
   END_TEST;
 }
 

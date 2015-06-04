@@ -96,6 +96,20 @@ struct TestCallback
   }
 };
 
+// Used for testing BaseObject::GetTypeName with an object that is not registered
+class FakeObject : public BaseObject
+{
+};
+// used for testing ThisIsSaferThanReturningVoidStar
+class FakeHandle :  public BaseHandle
+{
+public:
+
+  void RunTest()
+  {
+    return ThisIsSaferThanReturningVoidStar();
+  }
+};
 } // anon namespace
 
 int UtcDaliBaseHandleConstructorVoid(void)
@@ -301,7 +315,7 @@ int UtcDaliBaseHandleDoAction(void)
   DALI_TEST_CHECK(actorObject);
 
   // Check that an invalid command is not performed
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
   DALI_TEST_CHECK(actorObject.DoAction("invalidCommand", attributes) == false);
 
   // Check that the actor is visible
@@ -346,7 +360,7 @@ int UtcDaliBaseHandleDoAction(void)
   // Set the new duration to be 2 seconds
   float newDurationSeconds(2.0f);
   Property::Value newDurationSecondsValue = Property::Value( newDurationSeconds );
-  attributes.push_back(newDurationSecondsValue);
+  attributes["duration"] = newDurationSecondsValue;
 
   // Check the animation performed an action to play itself with the specified duration of 2 seconds
   animationObject.DoAction("play", attributes);
@@ -419,7 +433,7 @@ int UtcDaliBaseHandleConnectSignal(void)
   END_TEST;
 }
 
-int UtcDaliBaseHandleGetTypeName(void)
+int UtcDaliBaseHandleGetTypeNameP(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::BaseHandle::GetTypeName");
@@ -431,6 +445,55 @@ int UtcDaliBaseHandleGetTypeName(void)
 
   DALI_TEST_CHECK( typeName.size() );
   DALI_TEST_CHECK( typeName == std::string("Actor") );
+  END_TEST;
+}
+
+int UtcDaliBaseHandleGetTypeNameN(void)
+{
+
+  TestApplication application;
+  tet_infoline("Testing Dali::BaseObject::GetTypeName");
+  FakeObject object;
+  std::string typeName = object.GetTypeName();
+
+  DALI_TEST_CHECK( typeName.empty() );
+  END_TEST;
+}
+
+int UtcDaliBaseHandleGetTypeInfoP(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::BaseHandle::GetTypeInfo");
+
+  Dali::TypeInfo info;
+  Actor actor = Actor::New();
+
+  bool ok = actor.GetTypeInfo( info );
+  DALI_TEST_CHECK( ok );
+  END_TEST;
+}
+
+int UtcDaliBaseHandleThisIsSaferThanReturningVoidStar(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::BaseHandle::GetTypeInfo");
+  FakeHandle handle;
+  handle.RunTest();
+  tet_result(TET_PASS);
+  END_TEST;
+
+}
+
+int UtcDaliBaseHandleGetTypeInfoN(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::BaseHandle::GetTypeInfo");
+
+  Dali::TypeInfo info;
+  FakeObject object;
+
+  bool ok = object.GetTypeInfo( info );
+  DALI_TEST_CHECK( !ok );
   END_TEST;
 }
 

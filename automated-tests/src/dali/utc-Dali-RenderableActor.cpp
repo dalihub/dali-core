@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/actors/mesh-actor.h>
 #include <dali/integration-api/events/touch-event-integ.h>
 #include <dali-test-suite-utils.h>
 
@@ -303,9 +302,10 @@ int UtcDaliRenderableActorGetCullFace(void)
 
   DALI_TEST_CHECK( CullNone == imageActor.GetCullFace() );
 
-  MeshActor meshActor = MeshActor::New();
+  imageActor.SetCullFace( CullBack );
 
-  DALI_TEST_CHECK( CullBack == meshActor.GetCullFace() );
+  DALI_TEST_CHECK( CullBack == imageActor.GetCullFace() );
+
   END_TEST;
 }
 

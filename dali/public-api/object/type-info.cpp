@@ -65,24 +65,34 @@ TypeInfo::CreateFunction TypeInfo::GetCreator() const
   return GetImplementation(*this).GetCreator();
 }
 
-void TypeInfo::GetActions( TypeInfo::NameContainer& container ) const
+size_t TypeInfo::GetActionCount() const
 {
-  GetImplementation(*this).GetActions( container );
+  return GetImplementation(*this).GetActionCount();
 }
 
-void TypeInfo::GetSignals( TypeInfo::NameContainer& container ) const
+std::string TypeInfo::GetActionName(size_t index)
 {
-  GetImplementation(*this).GetSignals( container );
+  return GetImplementation(*this).GetActionName(index);
 }
 
-void TypeInfo::GetProperties( TypeInfo::NameContainer& container ) const
+size_t TypeInfo::GetSignalCount() const
 {
-  GetImplementation(*this).GetProperties( container );
+  return GetImplementation(*this).GetSignalCount();
+}
+
+std::string TypeInfo::GetSignalName(size_t index)
+{
+  return GetImplementation(*this).GetSignalName(index);
+}
+
+size_t TypeInfo::GetPropertyCount() const
+{
+  return GetImplementation(*this).GetPropertyCount();
 }
 
 void TypeInfo::GetPropertyIndices( Property::IndexContainer& indices ) const
 {
-  indices.clear(); // We do not want to clear the container if called internally, so only clear here
+  indices.Clear(); // We do not want to clear the container if called internally, so only clear here
   GetImplementation(*this).GetPropertyIndices( indices );
 }
 

@@ -26,6 +26,8 @@
 
 using namespace Dali;
 
+bool StaticFunctionHandlers::staticFunctionHandled;
+
 void utc_dali_signal_templates_startup(void)
 {
   test_return_value = TET_UNDEF;
@@ -288,14 +290,23 @@ int UtcDaliSignalConnectP05(void)
 
   // test function object using FunctorDelegate.
   // :Connect( ConnectionTrackerInterface* connectionTracker, FunctorDelegate* delegate )
-  TestSlotHandler handler;
-  TestSignals::VoidRetNoParamSignal signal;
-  bool functorDelegateCalled(false);
-  signal.Connect( &handler, FunctorDelegate::New( VoidFunctorVoid(functorDelegateCalled) ));
-  DALI_TEST_CHECK( ! signal.Empty() );
-  signal.Emit();
-  DALI_TEST_CHECK( functorDelegateCalled == true );
-
+  {
+    TestSlotHandler handler;
+    TestSignals::VoidRetNoParamSignal signal;
+    bool functorDelegateCalled(false);
+    signal.Connect( &handler, FunctorDelegate::New( VoidFunctorVoid(functorDelegateCalled) ));
+    DALI_TEST_CHECK( ! signal.Empty() );
+    signal.Emit();
+    DALI_TEST_CHECK( functorDelegateCalled == true );
+  }
+  {
+    TestSlotHandler handler;
+    TestSignals::VoidRet1ValueParamSignal signal;
+    bool functorDelegateCalled(false);
+    signal.Connect( &handler, FunctorDelegate::New( VoidFunctorVoid(functorDelegateCalled) ));
+    DALI_TEST_CHECK( ! signal.Empty() );
+    signal.Emit(1);
+  }
   END_TEST;
 }
 
@@ -584,7 +595,7 @@ int UtcDaliSignalEmptyCheckSlotDestruction(void)
 }
 
 // Positive test case for a method
-int UtcDaliSignalConnectAndEmit(void)
+int UtcDaliSignalConnectAndEmit01P(void)
 {
   // Test basic signal emission for each slot type
 
@@ -619,7 +630,7 @@ int UtcDaliSignalConnectAndEmit(void)
     TestSlotHandler handlers;
     signals.SignalVoid1Value().Connect(&handlers, &TestSlotHandler::VoidSlotIntValue);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
-    signals.EmitVoidSignalIntValue(5);
+    signals.EmitVoidSignal1IntValue(5);
     DALI_TEST_EQUALS( handlers.mHandled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 5, TEST_LOCATION );
   }
@@ -629,7 +640,7 @@ int UtcDaliSignalConnectAndEmit(void)
     TestSlotHandler handlers;
     signals.SignalVoid2Value().Connect(&handlers, &TestSlotHandler::VoidSlotIntValueIntValue);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
-    signals.EmitVoidSignalIntValueIntValue(6, 7);
+    signals.EmitVoidSignal2IntValue(6, 7);
     DALI_TEST_EQUALS( handlers.mHandled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 6, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam2, 7, TEST_LOCATION );
@@ -720,10 +731,10 @@ int UtcDaliSignalConnectAndEmit(void)
 
   {
     TestSlotHandler handlers;
-    signals.FloatSignalFloatValue3().Connect(&handlers, &TestSlotHandler::FloatSlotFloatValue3);
+    signals.SignalFloat3Value().Connect(&handlers, &TestSlotHandler::FloatSlotFloatValue3);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     handlers.mFloatReturn = 27.0f;
-    float returnValue = signals.EmitFloatSignalFloatValue3(5, 33.0f, 100.0f);
+    float returnValue = signals.EmitFloat3VSignal(5, 33.0f, 100.0f);
     DALI_TEST_EQUALS( returnValue, 27.0f, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mHandled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mFloatParam1, 5.0f, TEST_LOCATION );
@@ -733,6 +744,75 @@ int UtcDaliSignalConnectAndEmit(void)
   signals.CheckNoConnections();
   END_TEST;
 }
+
+int UtcDaliSignalConnectAndEmit02P(void)
+{
+  // testing connection of static functions
+  TestSignals signals;
+  StaticFunctionHandlers handlers;
+
+  // void ( void )
+  signals.SignalVoidNone().Connect( &StaticFunctionHandlers::VoidSlotVoid );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, false, TEST_LOCATION );
+  signals.EmitVoidSignalVoid();
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, true, TEST_LOCATION );
+
+
+  // void ( p1 )
+  handlers.Reset();
+  signals.SignalVoid1Value().Connect( &StaticFunctionHandlers::VoidSlot1Param );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, false, TEST_LOCATION );
+  signals.EmitVoidSignal1IntValue( 1 );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, true, TEST_LOCATION );
+
+  // void ( p1, p2 )
+  handlers.Reset();
+  signals.SignalVoid2Value().Connect( &StaticFunctionHandlers::VoidSlot2Param );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, false, TEST_LOCATION );
+  signals.EmitVoidSignal2IntValue( 1, 2 );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, true, TEST_LOCATION );
+
+
+  // void ( p1, p2, p3 )
+  handlers.Reset();
+  signals.SignalVoid3Value().Connect( &StaticFunctionHandlers::VoidSlot3Param );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, false, TEST_LOCATION );
+  signals.EmitVoidSignal3IntValue( 1, 2, 3 );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, true, TEST_LOCATION );
+
+  // ret ( )
+  handlers.Reset();
+  signals.SignalFloat0().Connect( &StaticFunctionHandlers::RetSlot0Param );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, false, TEST_LOCATION );
+  signals.EmitFloat0Signal();
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, true, TEST_LOCATION );
+
+  // ret ( p1 )
+  handlers.Reset();
+  signals.SignalFloat1Value().Connect( &StaticFunctionHandlers::RetSlot1Param );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, false, TEST_LOCATION );
+  signals.EmitFloat1VSignal( 1.f );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, true, TEST_LOCATION );
+
+  // ret ( p1, p2 )
+  handlers.Reset();
+  signals.SignalFloat2Value().Connect( &StaticFunctionHandlers::RetSlot2Param );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, false, TEST_LOCATION );
+  signals.EmitFloat2VSignal( 1.f, 2.f );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, true, TEST_LOCATION );
+
+
+  // ret ( p1, p2, p3 )
+  handlers.Reset();
+  signals.SignalFloat3Value().Connect( &StaticFunctionHandlers::RetSlot3Param );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, false, TEST_LOCATION );
+  signals.EmitFloat3VSignal( 1.f, 2.f, 3.f );
+  DALI_TEST_EQUALS( handlers.staticFunctionHandled, true, TEST_LOCATION );
+
+  END_TEST;
+
+}
+
 
 int UtcDaliSignalDisconnect(void)
 {
@@ -767,7 +847,7 @@ int UtcDaliSignalDisconnect(void)
     signals.SignalVoid1Value().Connect(&handlers, &TestSlotHandler::VoidSlotIntValue);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     signals.SignalVoid1Value().Disconnect(&handlers, &TestSlotHandler::VoidSlotIntValue);
-    signals.EmitVoidSignalIntValue(5);
+    signals.EmitVoidSignal1IntValue(5);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 0, TEST_LOCATION );
   }
@@ -777,7 +857,7 @@ int UtcDaliSignalDisconnect(void)
     signals.SignalVoid2Value().Connect(&handlers, &TestSlotHandler::VoidSlotIntValueIntValue);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     signals.SignalVoid2Value().Disconnect(&handlers, &TestSlotHandler::VoidSlotIntValueIntValue);
-    signals.EmitVoidSignalIntValueIntValue(5, 10);
+    signals.EmitVoidSignal2IntValue(5, 10);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam2, 0, TEST_LOCATION );
@@ -869,7 +949,7 @@ int UtcDaliSignalDisconnect2(void)
   {
     TestSlotHandler handlers;
     signals.SignalVoid1Value().Disconnect(&handlers, &TestSlotHandler::VoidSlotIntValue);
-    signals.EmitVoidSignalIntValue(5);
+    signals.EmitVoidSignal1IntValue(5);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 0, TEST_LOCATION );
   }
@@ -877,7 +957,7 @@ int UtcDaliSignalDisconnect2(void)
   {
     TestSlotHandler handlers;
     signals.SignalVoid2Value().Disconnect(&handlers, &TestSlotHandler::VoidSlotIntValueIntValue);
-    signals.EmitVoidSignalIntValueIntValue(5, 10);
+    signals.EmitVoidSignal2IntValue(5, 10);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam2, 0, TEST_LOCATION );
@@ -1014,6 +1094,30 @@ int UtcDaliSignalCustomConnectionTracker(void)
     DALI_TEST_EQUALS( customTracker2.mCallbackHandled, true, TEST_LOCATION );
   }
   DALI_TEST_EQUALS( 0u, customTracker2.GetConnectionCount(), TEST_LOCATION );
+
+  // Test for removing a null callback
+  {
+     TestBasicConnectionTrackerInterface customTracker3;
+
+     TestSignals::VoidRetNoParamSignal signal;
+     DALI_TEST_CHECK( signal.Empty() );
+     DALI_TEST_EQUALS( 0u, customTracker3.GetConnectionCount(), TEST_LOCATION );
+
+     signal.Connect( &customTracker3, &TestBasicConnectionTrackerInterface::VoidSlotVoid );
+     DALI_TEST_CHECK( ! signal.Empty() );
+     DALI_TEST_EQUALS( 1u, customTracker3.GetConnectionCount(), TEST_LOCATION );
+     try
+     {
+       // should assert
+       customTracker3.RemoveNullCallback();
+       tet_result( TET_FAIL );
+     }
+     catch (Dali::DaliException& e)
+     {
+       tet_result( TET_PASS );
+     }
+   }
+
   END_TEST;
 }
 
@@ -1088,7 +1192,7 @@ int UtcDaliSignalMultipleConnections(void)
     signals.SignalVoid1Value().Connect( &handler3, &TestSlotHandler::VoidSlotIntValue );
     DALI_TEST_EQUALS( handler3.mHandled, false, TEST_LOCATION );
 
-    signals.EmitVoidSignalIntValue( 5 );
+    signals.EmitVoidSignal1IntValue( 5 );
     DALI_TEST_EQUALS( handler1.mHandled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( handler1.mIntParam1, 5, TEST_LOCATION );
     DALI_TEST_EQUALS( handler2.mHandled, true, TEST_LOCATION );
@@ -1102,7 +1206,7 @@ int UtcDaliSignalMultipleConnections(void)
     handler3.Reset();
     signals.SignalVoid1Value().Disconnect( &handler2, &TestSlotHandler::VoidSlotIntValue );
 
-    signals.EmitVoidSignalIntValue( 6 );
+    signals.EmitVoidSignal1IntValue( 6 );
     DALI_TEST_EQUALS( handler1.mHandled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( handler1.mIntParam1, 6, TEST_LOCATION );
     DALI_TEST_EQUALS( handler2.mHandled, false, TEST_LOCATION );
@@ -1153,7 +1257,7 @@ int UtcDaliSignalMultipleConnections2(void)
     signals.SignalVoid1Value().Connect( &handler1, &TestSlotHandler::VoidSlotIntValue );
     DALI_TEST_EQUALS( handler1.mHandledCount, 0, TEST_LOCATION );
 
-    signals.EmitVoidSignalIntValue( 6 );
+    signals.EmitVoidSignal1IntValue( 6 );
     DALI_TEST_EQUALS( handler1.mHandledCount, 1, TEST_LOCATION );
     DALI_TEST_EQUALS( handler1.mIntParam1, 6, TEST_LOCATION );
 
@@ -1162,7 +1266,7 @@ int UtcDaliSignalMultipleConnections2(void)
     DALI_TEST_CHECK( signals.SignalVoid1Value().Empty() );
     handler1.mIntParam1 = 0;
 
-    signals.EmitVoidSignalIntValue( 7 );
+    signals.EmitVoidSignal1IntValue( 7 );
     DALI_TEST_EQUALS( handler1.mHandledCount, 1/*not incremented since last check*/, TEST_LOCATION );
     DALI_TEST_EQUALS( handler1.mIntParam1, 0, TEST_LOCATION );
   }
@@ -1186,7 +1290,7 @@ int UtcDaliSignalMultipleConnections2(void)
   DALI_TEST_CHECK( signals.SignalBool1Value().Empty() );
 
   // Should be NOOP
-  signals.EmitVoidSignalIntValue( 1 );
+  signals.EmitVoidSignal1IntValue( 1 );
   signals.EmitBoolSignalFloatValue( 1.0f );
 
   // Test that connecting the same callback 10 times is a NOOP
@@ -1474,14 +1578,81 @@ int UtcDaliSignalEmitDuringCallback(void)
 {
   TestApplication app; // Create core for debug logging
 
-  TestSignals::VoidRetNoParamSignal signal;
-  DALI_TEST_CHECK( signal.Empty() );
+  // for coverage purposes we test the emit guard for each signal type (0,1,2,3 params) void / return value
+  {
+    TestSignals::VoidRetNoParamSignal signal;
+    DALI_TEST_CHECK( signal.Empty() );
+
+    TestEmitDuringCallback handler1;
+    handler1.VoidConnectVoid( signal );
+
+    // Test that this does not result in an infinite loop!
+    signal.Emit();
+  }
+  {
+    TestSignals::FloatRet0ParamSignal signal;
+
+    DALI_TEST_CHECK( signal.Empty() );
+
+    TestEmitDuringCallback handler1;
+    handler1.FloatRet0ParamConnect( signal );
+
+    // Test that this does not result in an infinite loop!
+    signal.Emit();
+  }
+  {
+    TestSignals::FloatRet1ParamSignal signal;
+
+    DALI_TEST_CHECK( signal.Empty() );
+
+    TestEmitDuringCallback handler1;
+    handler1.FloatRet1ParamConnect( signal );
+
+    // Test that this does not result in an infinite loop!
+    signal.Emit( 1.f );
+  }
+  {
+    TestSignals::FloatRet2ValueParamSignal signal;
+
+    DALI_TEST_CHECK( signal.Empty() );
+
+    TestEmitDuringCallback handler1;
+    handler1.FloatRet2ParamConnect( signal );
+
+    // Test that this does not result in an infinite loop!
+    signal.Emit( 1.f, 1.f );
+  }
+  {
+    TestSignals::FloatRet3ValueParamSignal signal;
+
+    DALI_TEST_CHECK( signal.Empty() );
+
+    TestEmitDuringCallback handler1;
+    handler1.FloatRet3ParamConnect( signal );
+
+    // Test that this does not result in an infinite loop!
+    signal.Emit( 1.f,1.f,1.f );
+  }
+  END_TEST;
+}
+
+int UtcDaliSignalDeleteDuringEmit(void)
+{
+  // testing a signal deletion during an emit
+  // need to dynamically allocate the signal for this to work
+
+  TestApplication app; // Create core for debug logging
+
+  TestSignals::VoidRetNoParamSignal* signal = new TestSignals::VoidRetNoParamSignal;
 
   TestEmitDuringCallback handler1;
-  handler1.VoidConnectVoid( signal );
+  handler1.DeleteDuringEmitConnect( *signal );
 
-  // Test that this does not result in an infinite loop!
-  signal.Emit();
+  // should just log an error
+  signal->Emit();
+
+  tet_result( TET_PASS );
+
   END_TEST;
 }
 
@@ -1675,7 +1846,7 @@ int UtcDaliSlotDelegateConnection(void)
     TestSlotDelegateHandler handlers;
     signals.SignalVoid1Value().Connect( handlers.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotIntValue );
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
-    signals.EmitVoidSignalIntValue(5);
+    signals.EmitVoidSignal1IntValue(5);
     DALI_TEST_EQUALS( handlers.mHandled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 5, TEST_LOCATION );
   }
@@ -1685,7 +1856,7 @@ int UtcDaliSlotDelegateConnection(void)
     TestSlotDelegateHandler handlers;
     signals.SignalVoid2Value().Connect( handlers.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotIntValueIntValue );
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
-    signals.EmitVoidSignalIntValueIntValue(6, 7);
+    signals.EmitVoidSignal2IntValue(6, 7);
     DALI_TEST_EQUALS( handlers.mHandled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 6, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam2, 7, TEST_LOCATION );
@@ -1776,10 +1947,10 @@ int UtcDaliSlotDelegateConnection(void)
 
   {
     TestSlotDelegateHandler handlers;
-    signals.FloatSignalFloatValue3().Connect( handlers.mSlotDelegate, &TestSlotDelegateHandler::FloatSlotFloatValue3 );
+    signals.SignalFloat3Value().Connect( handlers.mSlotDelegate, &TestSlotDelegateHandler::FloatSlotFloatValue3 );
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     handlers.mFloatReturn = 27.0f;
-    float returnValue = signals.EmitFloatSignalFloatValue3(5, 33.0f, 100.0f);
+    float returnValue = signals.EmitFloat3VSignal(5, 33.0f, 100.0f);
     DALI_TEST_EQUALS( returnValue, 27.0f, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mHandled, true, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mFloatParam1, 5.0f, TEST_LOCATION );
@@ -1970,7 +2141,7 @@ int UtcDaliSlotHandlerDisconnect(void)
     signals.SignalVoid1Value().Connect(handlers.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotIntValue);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     signals.SignalVoid1Value().Disconnect(handlers.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotIntValue);
-    signals.EmitVoidSignalIntValue(5);
+    signals.EmitVoidSignal1IntValue(5);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 0, TEST_LOCATION );
   }
@@ -1980,7 +2151,7 @@ int UtcDaliSlotHandlerDisconnect(void)
     signals.SignalVoid2Value().Connect(handlers.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotIntValueIntValue);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     signals.SignalVoid2Value().Disconnect(handlers.mSlotDelegate, &TestSlotDelegateHandler::VoidSlotIntValueIntValue);
-    signals.EmitVoidSignalIntValueIntValue(5, 10);
+    signals.EmitVoidSignal2IntValue(5, 10);
     DALI_TEST_EQUALS( handlers.mHandled, false, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam1, 0, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mIntParam2, 0, TEST_LOCATION );
@@ -2044,5 +2215,14 @@ int UtcDaliSlotHandlerDisconnect(void)
     DALI_TEST_EQUALS( handlers.mFloatParam1, 0.0f, 0.001f, TEST_LOCATION );
     DALI_TEST_EQUALS( handlers.mFloatParam2, 0.0f, 0.001f, TEST_LOCATION );
   }
+  END_TEST;
+}
+
+
+int UtcDaliCallbackBase(void)
+{
+  // simple constructor for coverage
+  CallbackBase base;
+  tet_result( TET_PASS );
   END_TEST;
 }

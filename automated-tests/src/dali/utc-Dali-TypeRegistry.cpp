@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <stdlib.h>
+#include <limits>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <dali/integration-api/events/long-press-gesture-event.h>
@@ -228,7 +229,7 @@ struct MyTestCustomActor : public CustomActorImpl
   {
     return true;
   }
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event)
+  virtual bool OnWheelEvent(const WheelEvent& event)
   {
     return true;
   }
@@ -481,7 +482,7 @@ static void ResetFunctorCounts()
 }
 
 static std::string lastActionCustom;
-bool DoActionCustom(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes)
+bool DoActionCustom(BaseObject* object, const std::string& actionName, const Property::Map& /*attributes*/)
 {
   lastActionCustom = actionName;
   return true;
@@ -574,6 +575,20 @@ int UtcDaliTypeRegistryAssignmentOperatorP(void)
   END_TEST;
 }
 
+int UtcDaliTypeRegistryAssignP(void)
+{
+  TestApplication application;
+
+  TypeRegistry registry = TypeRegistry::Get();
+  TypeRegistry registry2;
+  registry2 = registry;
+  DALI_TEST_CHECK( registry2 );
+
+  DALI_TEST_CHECK( registry2.GetTypeInfo( "Actor" ).GetName() == registry2.GetTypeInfo( "Actor" ).GetName() );
+
+  END_TEST;
+}
+
 int UtcDaliTypeRegistryGetTypeInfoFromTypeNameP(void)
 {
   TestApplication application;
@@ -660,41 +675,37 @@ int UtcDaliTypeRegistryGetTypeInfoFromTypeIdN(void)
   END_TEST;
 }
 
-int UtcDaliTypeRegistryGetTypeNamesP(void)
+int UtcDaliTypeRegistryGetTypeNameCountP(void)
 {
   TestApplication application;
-
+  TypeRegistry typeRegistry = TypeRegistry::Get();
   TypeInfo type;
 
-  TypeRegistry::NameContainer names = TypeRegistry::Get().GetTypeNames();
-
-  for(TypeRegistry::NameContainer::iterator iter = names.begin();
-      iter != names.end(); ++iter)
+  for(size_t i = 0; i < typeRegistry.GetTypeNameCount(); i++)
   {
-    type = TypeRegistry::Get().GetTypeInfo( *iter );
+    type = typeRegistry.GetTypeInfo( typeRegistry.GetTypeName(i) );
     DALI_TEST_CHECK( type );
   }
 
   END_TEST;
 }
 
-int UtcDaliTypeRegistryGetTypeNamesN(void)
+
+int UtcDaliTypeRegistryGetTypeNamesP(void)
 {
   TestApplication application;
-
+  TypeRegistry typeRegistry = TypeRegistry::Get();
   TypeInfo type;
 
-  TypeRegistry::NameContainer names = TypeRegistry::Get().GetTypeNames();
-
-  for(TypeRegistry::NameContainer::iterator iter = names.begin();
-      iter != names.end(); ++iter)
+  for(size_t i = 0; i < typeRegistry.GetTypeNameCount(); i++)
   {
-    type = TypeRegistry::Get().GetTypeInfo( *iter );
-    DALI_TEST_CHECK( type.GetName() != "MyDummyActor" );
+    type = typeRegistry.GetTypeInfo( typeRegistry.GetTypeName(i) );
+    DALI_TEST_CHECK( type );
   }
 
   END_TEST;
 }
+
 
 // Note: No negative test case for UtcDaliTypeRegistryTypeRegistration can be implemented.
 int UtcDaliTypeRegistryTypeRegistrationNotCallingCreateOnInitP(void)
@@ -715,19 +726,9 @@ int UtcDaliTypeRegistryTypeRegistrationNotCallingCreateOnInitP(void)
   MyTestCustomActor customHandle = MyTestCustomActor::DownCast( handle );
   DALI_TEST_CHECK( customHandle );
 
-  TypeInfo::NameContainer names;
-  type.GetActions(names);
-  TypeInfo::NameContainer baseNames;
-  baseType.GetActions(baseNames);
-  DALI_TEST_EQUALS( names.size(), TEST_ACTION_COUNT + baseNames.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( type.GetActionCount(), TEST_ACTION_COUNT + baseType.GetActionCount(), TEST_LOCATION );
 
-  names.clear();
-  type.GetSignals(names);
-
-  baseNames.clear();
-  baseType.GetSignals(baseNames);
-
-  DALI_TEST_EQUALS( names.size(), TEST_SIGNAL_COUNT + baseNames.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( type.GetSignalCount(), TEST_SIGNAL_COUNT + baseType.GetSignalCount(), TEST_LOCATION );
 
   {
     TestConnectionTracker tracker;
@@ -755,7 +756,7 @@ int UtcDaliTypeRegistryTypeRegistrationNotCallingCreateOnInitP(void)
   DALI_TEST_EQUALS( CustomTestFunctor::mTotalInstanceCount, 2/*temporary copy + FunctorDelegate copy*/, TEST_LOCATION );
   DALI_TEST_EQUALS( CustomTestFunctor::mCurrentInstanceCount, 0, TEST_LOCATION );
 
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
   handle.DoAction("act1", attributes);
   DALI_TEST_CHECK( lastActionCustom == "act1" );
   END_TEST;
@@ -877,21 +878,9 @@ int UtcDaliTypeRegistrySignalConnectorTypeN(void)
   MyTestCustomActor customHandle = MyTestCustomActor::DownCast( handle );
   DALI_TEST_CHECK( customHandle );
 
-  TypeInfo::NameContainer names;
-  TypeInfo::NameContainer baseNames;
+  DALI_TEST_EQUALS( type.GetActionCount(), TEST_ACTION_COUNT + baseType.GetActionCount(), TEST_LOCATION );
 
-  type.GetActions(names);
-  baseType.GetActions(baseNames);
-
-  DALI_TEST_EQUALS( names.size(), TEST_ACTION_COUNT + baseNames.size(), TEST_LOCATION );
-
-  names.clear();
-  baseNames.clear();
-
-  type.GetSignals(names);
-  baseType.GetSignals(baseNames);
-
-  DALI_TEST_EQUALS( names.size(), TEST_SIGNAL_COUNT + baseNames.size(), TEST_LOCATION );
+  DALI_TEST_EQUALS( type.GetSignalCount(), TEST_SIGNAL_COUNT + baseType.GetSignalCount(), TEST_LOCATION );
 
   {
     TestConnectionTracker tracker;
@@ -928,7 +917,7 @@ int UtcDaliTypeRegistryTypeActionP(void)
   BaseHandle handle = type.CreateInstance();
   DALI_TEST_CHECK( handle );
 
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
   DALI_TEST_CHECK( handle.DoAction("act1", attributes) );
   DALI_TEST_CHECK( lastActionCustom == "act1" );
 
@@ -947,7 +936,7 @@ int UtcDaliTypeRegistryTypeActionN(void)
   BaseHandle handle = type.CreateInstance();
   DALI_TEST_CHECK( handle );
 
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
   DALI_TEST_CHECK( !handle.DoAction( "unknown-action", attributes ) );
 
   END_TEST;
@@ -1004,14 +993,14 @@ int UtcDaliTypeRegistryPropertyRegistrationP(void)
   // Check property count of type-info is 1
   Property::IndexContainer indices;
   typeInfo.GetPropertyIndices( indices );
-  DALI_TEST_EQUALS( indices.size(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
 
   // Ensure indices returned from actor and customActor differ by two
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );
-  unsigned int actorIndices = indices.size();
+  unsigned int actorIndices = indices.Size();
   customActor.GetPropertyIndices( indices );
-  unsigned int customActorIndices = indices.size();
+  unsigned int customActorIndices = indices.Size();
   DALI_TEST_EQUALS( actorIndices + 2u, customActorIndices, TEST_LOCATION ); // Custom property + registered property
   END_TEST;
 }
@@ -1092,14 +1081,14 @@ int UtcDaliTypeRegistryAnimatablePropertyRegistrationP(void)
   // Check property count of type-info is 1
   Property::IndexContainer indices;
   typeInfo.GetPropertyIndices( indices );
-  DALI_TEST_EQUALS( indices.size(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
 
   // Ensure indices returned from actor and customActor differ by one
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );
-  unsigned int actorIndices = indices.size();
+  unsigned int actorIndices = indices.Size();
   customActor.GetPropertyIndices( indices );
-  unsigned int customActorIndices = indices.size();
+  unsigned int customActorIndices = indices.Size();
   DALI_TEST_EQUALS( actorIndices + 1u, customActorIndices, TEST_LOCATION ); // Custom property + registered property
 
   END_TEST;
@@ -1181,7 +1170,7 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   // Check property count of type-info is 1
   Property::IndexContainer indices;
   typeInfo.GetPropertyIndices( indices );
-  DALI_TEST_EQUALS( indices.size(), 1u, TEST_LOCATION );
+  DALI_TEST_EQUALS( indices.Size(), 1u, TEST_LOCATION );
 
   // Register animatable property components
   std::string animatablePropertyComponentName1( "animatable-prop-1-x" );
@@ -1226,9 +1215,9 @@ int UtcDaliTypeRegistryAnimatablePropertyComponentRegistrationP(void)
   // Ensure indices returned from actor and customActor differ by three
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );
-  unsigned int actorIndices = indices.size();
+  unsigned int actorIndices = indices.Size();
   customActor.GetPropertyIndices( indices );
-  unsigned int customActorIndices = indices.size();
+  unsigned int customActorIndices = indices.Size();
   DALI_TEST_EQUALS( actorIndices + 3u, customActorIndices, TEST_LOCATION ); // Custom property + registered property
 
   END_TEST;
@@ -1324,7 +1313,7 @@ int UtcDaliTypeRegistryActionViaBaseHandle(void)
   application.Render(0);
   DALI_TEST_CHECK(!a.IsVisible());
 
-  std::vector<Property::Value> attributes;
+  Property::Map attributes;
 
   DALI_TEST_CHECK(hdl.DoAction("show", attributes));
 
@@ -1688,5 +1677,73 @@ int UtcDaliTypeRegistryNamedType(void)
   unsigned int namedActorPropertyCount( namedActor.GetPropertyCount() );
 
   DALI_TEST_CHECK( namedActorPropertyCount > actorPropertyCount );
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetActionNameP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  DALI_TEST_CHECK( 0 != typeInfo.GetActionCount() );
+
+  std::string name = typeInfo.GetActionName(0);
+
+  DALI_TEST_EQUALS( name, "show", TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetActionNameN(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  DALI_TEST_CHECK( 0 != typeInfo.GetActionCount() );
+
+  std::string name = typeInfo.GetActionName(std::numeric_limits<size_t>::max());
+
+  DALI_TEST_EQUALS( 0, name.size(), TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetSignalNameP(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  DALI_TEST_CHECK( 0 != typeInfo.GetSignalCount() );
+
+  std::string name = typeInfo.GetSignalName(0);
+
+  DALI_TEST_EQUALS( name, "touched", TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliTypeInfoGetSignalNameN(void)
+{
+  TestApplication application;
+  TypeRegistry typeRegistry = TypeRegistry::Get();
+
+  TypeInfo typeInfo = typeRegistry.GetTypeInfo( "Actor" );
+  DALI_TEST_CHECK( typeInfo );
+
+  DALI_TEST_CHECK( 0 != typeInfo.GetSignalCount() );
+
+  std::string name = typeInfo.GetSignalName(std::numeric_limits<size_t>::max());
+
+  DALI_TEST_EQUALS( 0, name.size(), TEST_LOCATION );
+
   END_TEST;
 }

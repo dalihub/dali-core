@@ -112,30 +112,16 @@ void AddChildRegionsToImage( Integration::Bitmap* image, unsigned int imageWidth
   }
 }
 
-} // namespace
-
-int UtcDaliNinePatch01(void)
+NinePatchImage CustomizeNinePatch( TestApplication& application,
+                                   unsigned int ninePatchImageWidth,
+                                   unsigned int ninePatchImageHeight,
+                                   const Vector4& requiredStretchBorder,
+                                   bool addChildRegion = false,
+                                   Vector4 requiredChildRegion = Vector4::ZERO )
 {
-  /* Stretch region left(3) top(2) right (3) bottom (2)
-   *    ss
-   *  OOOOOO
-   *  OOOOOOc
-   * sOOooOOc
-   * sOOooOOc
-   *  OOOOOOc
-   *  OOOOOO
-   *   cccc
-   */
-
-  TestApplication application;
   TestPlatformAbstraction& platform = application.GetPlatform();
 
-  tet_infoline("UtcDaliNinePatchImage - Stretch Regions");
-
-  const unsigned int ninePatchImageHeight = 8;
-  const unsigned int ninePatchImageWidth = 8;
   Pixel::Format pixelFormat = Pixel::RGBA8888;
-  const Vector4 requiredStretchBorder( 3, 3, 3, 3);
 
   tet_infoline("Create Bitmap");
   platform.SetClosestImageSize(Vector2( ninePatchImageWidth, ninePatchImageHeight));
@@ -147,40 +133,138 @@ int UtcDaliNinePatch01(void)
   tet_infoline("Add Stretch regions to Bitmap");
   AddStretchRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder, pixelFormat );
 
+  if( addChildRegion )
+  {
+    tet_infoline("Add Child regions to Bitmap");
+    AddChildRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredChildRegion, pixelFormat );
+  }
+
   tet_infoline("Getting resource");
   Integration::ResourcePointer resourcePtr(bitmap);
   platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
 
   Image image = ResourceImage::New( "blah.#.png" );
-  DALI_TEST_CHECK( image );
 
   tet_infoline("Assign image to ImageActor");
   ImageActor imageActor = ImageActor::New( image );
-  DALI_TEST_CHECK( imageActor );
   Stage::GetCurrent().Add( imageActor );
 
   tet_infoline("Downcast Image to a nine-patch image\n");
   NinePatchImage ninePatchImage = NinePatchImage::DownCast( image );
-  DALI_TEST_CHECK( ninePatchImage );
 
-  if ( ninePatchImage )
-  {
-    tet_infoline("Get Stretch regions from NinePatch");
-    Vector4 stretchBorders = ninePatchImage.GetStretchBorders();
-    tet_printf("stretchBorders left(%f) right(%f) top(%f) bottom(%f)\n", stretchBorders.x, stretchBorders.z, stretchBorders.y, stretchBorders.w );
-    DALI_TEST_CHECK( stretchBorders == requiredStretchBorder );
-  }
-  else
-  {
-    tet_infoline("Image not NinePatch");
-    test_return_value = TET_FAIL;
-  }
+  return ninePatchImage;
+
+}
+
+} // namespace
+
+int UtcDaliNinePatchImageNew(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliNinePatchImageNew - NinePatchImage::New(const std::string&)");
+
+  // invoke default handle constructor
+  NinePatchImage image;
+
+  DALI_TEST_CHECK( !image );
+
+  // initialise handle
+  image = NinePatchImage::New("blah.#.png");
+
+  DALI_TEST_CHECK( image );
+  END_TEST;
+}
+
+int UtcDaliNinePatchImageDowncast(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliNinePatchImageDowncast - NinePatchImage::DownCast(BaseHandle)");
+
+  NinePatchImage image = NinePatchImage::New("blah.#.png");
+
+  BaseHandle object(image);
+
+  NinePatchImage image2 = NinePatchImage::DownCast(object);
+  DALI_TEST_CHECK(image2);
+
+  NinePatchImage image3 = DownCast< NinePatchImage >(object);
+  DALI_TEST_CHECK(image3);
+
+  BaseHandle unInitializedObject;
+  NinePatchImage image4 = NinePatchImage::DownCast(unInitializedObject);
+  DALI_TEST_CHECK(!image4);
+
+  NinePatchImage image5 = DownCast< NinePatchImage >(unInitializedObject);
+  DALI_TEST_CHECK(!image5);
+
+  Image image6 = NinePatchImage::New("blah.#.png");
+  NinePatchImage image7 = NinePatchImage::DownCast(image6);
+  DALI_TEST_CHECK(image7);
+  END_TEST;
+}
+
+int UtcDaliNinePatchImageCopyConstructor(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliNinePatchImageCopyConstructor - NinePatchImage::NinePatchImage( const NinePatchImage& )");
+
+  NinePatchImage image1;
+  DALI_TEST_CHECK( !image1 );
+
+  image1 = NinePatchImage::New("blah.#.png");
+  NinePatchImage image2( image1 );
+
+  DALI_TEST_CHECK( image2 );
+  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
 
   END_TEST;
 }
 
-int UtcDaliNinePatch02(void)
+int UtcDaliNinePatchImageGetStrechBorders(void)
 {
+  TestApplication application;
+  tet_infoline("UtcDaliNinePatchImageGetStrechBorders - NinePatchImage::GetStretchBorders()");
+
+  /* Stretch region left(2) top(2) right (2) bottom (2)
+    *    ss
+    *  OOOOOO
+    *  OOOOOOc
+    * sOOooOOc
+    * sOOooOOc
+    *  OOOOOOc
+    *  OOOOOO
+    *   cccc
+    */
+
+   const unsigned int ninePatchImageHeight = 8;
+   const unsigned int ninePatchImageWidth = 8;
+   const Vector4 requiredStretchBorder( 3, 3, 3, 3);
+
+   NinePatchImage ninePatchImage = CustomizeNinePatch( application,ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder  );
+   DALI_TEST_CHECK( ninePatchImage );
+
+   if ( ninePatchImage )
+   {
+     tet_infoline("Get Stretch regions from NinePatch");
+     Vector4 stretchBorders = ninePatchImage.GetStretchBorders();
+     tet_printf("stretchBorders left(%f) right(%f) top(%f) bottom(%f)\n", stretchBorders.x, stretchBorders.z, stretchBorders.y, stretchBorders.w );
+     DALI_TEST_CHECK( stretchBorders == requiredStretchBorder );
+   }
+   else
+   {
+     tet_infoline("Image not NinePatch");
+     test_return_value = TET_FAIL;
+   }
+
+  END_TEST;
+}
+
+int UtcDaliNinePatchImageGetChildRectangle(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliNinePatchImageGetChildRectangle - NinePatchImage::GetChildRectangle()");
+
   /* Child region x(2) y(2) width (4) height (4)
    *
    *    ss
@@ -193,43 +277,12 @@ int UtcDaliNinePatch02(void)
    *   cccc
    */
 
-  TestApplication application;
-  TestPlatformAbstraction& platform = application.GetPlatform();
-
-  tet_infoline("UtcDaliNinePatchImage - Child Regions");
-
   const unsigned int ninePatchImageHeight = 8;
   const unsigned int ninePatchImageWidth = 8;
-  Pixel::Format pixelFormat = Pixel::RGBA8888;
   const Vector4 requiredChildRegion( 2, 2, 2, 2 );
   const Vector4 requiredStretchBorder( 3, 3, 3, 3);
 
-  tet_infoline("Create Bitmap");
-  platform.SetClosestImageSize(Vector2( ninePatchImageWidth, ninePatchImageHeight));
-  Integration::Bitmap* bitmap = CreateBitmap( ninePatchImageWidth, ninePatchImageHeight, 0xFF, pixelFormat );
-
-  tet_infoline("Clear border regions");
-  InitialiseRegionsToZeroAlpha( bitmap, ninePatchImageWidth, ninePatchImageHeight, pixelFormat );
-
-  tet_infoline("Add Stretch regions to Bitmap");
-  AddStretchRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder, pixelFormat );
-
-  tet_infoline("Add Child regions to Bitmap");
-  AddChildRegionsToImage( bitmap, ninePatchImageWidth, ninePatchImageHeight, requiredChildRegion, pixelFormat );
-
-  tet_infoline("Getting resource");
-  Integration::ResourcePointer resourcePtr(bitmap);
-  platform.SetResourceLoaded( 0, Dali::Integration::ResourceBitmap, resourcePtr );
-  Image image = ResourceImage::New( "blah.#.png" );
-  DALI_TEST_CHECK( image );
-
-  tet_infoline("Assign image to ImageActor");
-  ImageActor imageActor = ImageActor::New( image );
-  DALI_TEST_CHECK( imageActor );
-  Stage::GetCurrent().Add( imageActor );
-
-  tet_infoline("Downcast Image to a nine-patch image\n");
-  NinePatchImage ninePatchImage = NinePatchImage::DownCast( image );
+  NinePatchImage ninePatchImage = CustomizeNinePatch( application,ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder, true, requiredChildRegion );
   DALI_TEST_CHECK( ninePatchImage );
 
   if ( ninePatchImage )
@@ -239,6 +292,36 @@ int UtcDaliNinePatch02(void)
     tet_printf("childRectange x(%d) y(%d) width(%d) height(%d)\n", childRectangle.x, childRectangle.y, childRectangle.width, childRectangle.height );
     Rect<int> childRegion(requiredChildRegion.x, requiredChildRegion.y, ninePatchImageWidth - requiredChildRegion.x - requiredChildRegion.z, ninePatchImageHeight - requiredChildRegion.y - requiredChildRegion.w );
     DALI_TEST_CHECK( childRegion == childRectangle );
+  }
+  else
+  {
+    tet_infoline("Image not NinePatch");
+    test_return_value = TET_FAIL;
+  }
+
+  END_TEST;
+}
+
+int UtcDaliNinePatchImageCreateCroppedBufferImage(void)
+{
+  TestApplication application;
+  tet_infoline("UtcDaliNinePatchImageCreateCroppedBufferImage - NinePatchImage::CreateCroppedBufferImage()");
+
+  const unsigned int ninePatchImageHeight = 8;
+  const unsigned int ninePatchImageWidth = 8;
+  const Vector4 requiredStretchBorder( 1,1,1,1);
+
+  NinePatchImage ninePatchImage = CustomizeNinePatch( application,ninePatchImageWidth, ninePatchImageHeight, requiredStretchBorder  );
+  DALI_TEST_CHECK( ninePatchImage );
+
+  if ( ninePatchImage )
+  {
+    BufferImage newImage = ninePatchImage.CreateCroppedBufferImage();
+    DALI_TEST_CHECK( newImage );
+
+    DALI_TEST_EQUALS( newImage.GetPixelFormat(), Pixel::RGBA8888, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( newImage.GetBufferSize(), 36*4, TEST_LOCATION );
   }
   else
   {

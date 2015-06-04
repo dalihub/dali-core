@@ -68,6 +68,7 @@ int UtcDaliHandleConstructorVoid(void)
   Handle object;
 
   DALI_TEST_CHECK(!object);
+
   END_TEST;
 }
 
@@ -718,8 +719,8 @@ int UtcDaliHandleGetPropertyIndices(void)
   // Actor
   Actor actor = Actor::New();
   actor.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( ! indices.empty() );
-  DALI_TEST_EQUALS( indices.size(), actor.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() );
+  DALI_TEST_EQUALS( indices.Size(), actor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 
@@ -800,5 +801,14 @@ int UtcDaliHandleCustomProperty(void)
   DALI_TEST_CHECK( handle.GetProperty<float>(index) == 5.0f );
   application.Render(0);
   DALI_TEST_CHECK( handle.GetProperty<float>(index) == 5.0f );
+  END_TEST;
+}
+int UtcDaliHandleWeightNew(void)
+{
+  TestApplication application;
+
+  Handle handle = WeightObject::New();;
+  DALI_TEST_CHECK( handle.GetProperty<float>(WeightObject::WEIGHT) == 0.0f );
+
   END_TEST;
 }

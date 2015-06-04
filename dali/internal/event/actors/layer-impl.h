@@ -44,7 +44,15 @@ class Layer : public Actor
 public:
 
   /**
-   * @copydoc Dali::Layer::ZValue(const Vector3&)
+   * @copydoc Dali::Layer::ZValue(const Vector3&, float)
+   *
+   * This is the default sorting function.
+   * It is useful for 2D user interfaces, and it's used to sort translucent renderers.
+   *
+   * Only the Z signed distance from the camera is considererd, lower values will be drawn on top.
+   * 
+   * @param[in] position     position of actor in view space
+   * @return depth
    */
   static float ZValue(const Vector3& position)
   {
@@ -188,7 +196,7 @@ public:
   /**
    * @copydoc Dali::Internal::Actor::DoAction()
    */
-  static bool DoAction(BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes);
+  static bool DoAction(BaseObject* object, const std::string& actionName, const Property::Map& attributes);
 
 public: // Default property extensions from Object
   /**

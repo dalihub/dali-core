@@ -280,20 +280,6 @@ public:
   // Sorting
 
   /**
-   * @brief This sort function sorts translucent actors according to the Z-value in view space.
-   *
-   * This is useful for 2D user interfaces.
-   *
-   * This is the default sorting function.
-   *
-   * We return a negative z value as in our translation, a low z means that it should
-   * be sorted further away and a high z means that it should be closer.
-   * @param[in] position     position of actor in view space
-   * @return depth
-   */
-  static float ZValue(const Vector3& position );
-
-  /**
    * @brief This allows the user to specify the sort function that the layer should use.
    *
    * The sort function is used to determine the order in which the actors are drawn

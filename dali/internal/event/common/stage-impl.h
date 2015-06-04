@@ -36,11 +36,6 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/public-api/render-tasks/render-task.h>
 
-#ifdef DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
-#include <dali/internal/event/dynamics/dynamics-notifier.h>
-#endif
-
 namespace Dali
 {
 
@@ -49,7 +44,6 @@ struct Vector2;
 namespace Integration
 {
 class SystemOverlay;
-class DynamicsFactory;
 }
 
 namespace Internal
@@ -282,31 +276,6 @@ public:
    */
   void SetDpi( Vector2 dpi );
 
-#ifdef DYNAMICS_SUPPORT
-
-  /**
-   * Return the Dynamics Simulation Notifier object
-   * @return The Dynamics Simulation Notifier object
-   */
-  DynamicsNotifier& GetDynamicsNotifier();
-
-  /**
-   * @copydoc Dali::Stage::InitializeDynamics
-   */
-  DynamicsWorldPtr InitializeDynamics(DynamicsWorldConfigPtr config);
-
-  /**
-   * @copydoc Dali::Stage::GetDynamicsWorld
-   */
-  DynamicsWorldPtr GetDynamicsWorld();
-
-  /**
-   * @copydoc Dali::Stage::TerminateDynamics
-   */
-  void TerminateDynamics();
-
-#endif // DYNAMICS_SUPPORT
-
   NotificationManager& GetNotificationManager()
   {
     return mNotificationManager;
@@ -337,6 +306,12 @@ public:
   void EmitTouchedSignal( const TouchEvent& touch );
 
   /**
+   * Used by the EventProcessor to emit wheel event signals.
+   * @param[in] event The wheel event.
+   */
+  void EmitWheelEventSignal( const WheelEvent& event );
+
+  /**
    * Emits the scene created.
    */
   void EmitSceneCreatedSignal();
@@ -355,6 +330,11 @@ public:
     * @copydoc Dali::Stage::TouchedSignal()
     */
   Dali::Stage::TouchedSignalType& TouchedSignal();
+
+  /**
+   * @copydoc Dali::Stage::WheelEventSignal()
+   */
+  Dali::Stage::WheelEventSignalType& WheelEventSignal();
 
   /**
    * @copydoc Dali::Stage::ContextLostSignal()
@@ -468,16 +448,6 @@ private:
   // The object registry
   ObjectRegistryPtr mObjectRegistry;
 
-#ifdef DYNAMICS_SUPPORT
-
-  DynamicsNotifier mDynamicsNotifier;
-
-  // The Dynamics simulation world object
-  Integration::DynamicsFactory* mDynamicsFactory;   // Not owned pointer to DynamicsFactory (PlatformAbstraction will clean up)
-  DynamicsWorldPtr mDynamicsWorld;
-
-#endif // DYNAMICS_SUPPORT
-
   // The list of render-tasks
   IntrusivePtr<RenderTaskList> mRenderTaskList;
 
@@ -496,6 +466,9 @@ private:
 
   // The touched signal
   Dali::Stage::TouchedSignalType                  mTouchedSignal;
+
+  // The wheel event signal
+  Dali::Stage::WheelEventSignalType               mWheelEventSignal;
 
   Dali::Stage::ContextStatusSignal mContextLostSignal;
   Dali::Stage::ContextStatusSignal mContextRegainedSignal;

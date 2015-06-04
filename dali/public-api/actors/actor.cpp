@@ -480,11 +480,6 @@ float Actor::GetRelayoutSize( Dimension::Type dimension ) const
   return GetImplementation(*this).GetRelayoutSize( dimension );
 }
 
-void Actor::PropagateRelayoutFlags()
-{
-  GetImplementation(*this).PropagateRelayoutFlags();
-}
-
 void Actor::SetPadding( const Padding& padding )
 {
   Internal::Actor& impl = GetImplementation(*this);
@@ -549,9 +544,9 @@ Actor::HoverSignalType& Actor::HoveredSignal()
   return GetImplementation(*this).HoveredSignal();
 }
 
-Actor::MouseWheelEventSignalType& Actor::MouseWheelEventSignal()
+Actor::WheelEventSignalType& Actor::WheelEventSignal()
 {
-  return GetImplementation(*this).MouseWheelEventSignal();
+  return GetImplementation(*this).WheelEventSignal();
 }
 
 Actor::OnStageSignalType& Actor::OnStageSignal()

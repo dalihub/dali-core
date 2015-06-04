@@ -127,6 +127,9 @@ public:
   // Void return, 2 value parameters
   typedef Signal<void (int, int)> VoidRet2ValueParamSignal;
 
+  // Void return, 3 value parameters
+  typedef Signal<void (int, int, int)> VoidRet3ValueParamSignal;
+
   // bool return, 1 value parameter
   typedef Signal< bool (float)> BoolRet1ValueParamSignal;
 
@@ -139,28 +142,34 @@ public:
   // float return, 0 parameters
   typedef Signal< float () > FloatRet0ParamSignal;
 
+  // float return, 1 value parameters
+   typedef Signal< float (float ) > FloatRet1ParamSignal;
+
   // float return, 2 value parameters
   typedef Signal<float (float, float) > FloatRet2ValueParamSignal;
+
+  // float return, 3 value parameters
+  typedef Signal<float (float, float, float) > FloatRet3ValueParamSignal;
 
   // void return, 3 value parameters
   typedef Signal<void (float, float, float) > VoidSignalTypeFloatValue3;
 
-  // float return, 3 value parameters
-  typedef Signal<float (float, float, float) > FloatSignalTypeFloatValue3;
 
   VoidRetNoParamSignal&       SignalVoidNone()    { return mSignalVoid0;  }
   VoidRet1RefParamSignal&     SignalVoid1Ref()    { return mSignalVoid1R; }
   VoidRet1ValueParamSignal&   SignalVoid1Value()  { return mSignalVoid1V; }
   VoidRet2ValueParamSignal&   SignalVoid2Value()  { return mSignalVoid2V; }
+  VoidRet3ValueParamSignal&   SignalVoid3Value()  { return mSignalVoid3V; }
 
   BoolRet1ValueParamSignal&   SignalBool1Value()  { return mSignalBool1V;  }
   BoolRet2ValueParamSignal&   SignalBool2Value()  { return mSignalBool2V;  }
   IntRet2ValueParamSignal&    SignalInt2Value()   { return mSignalInt2V;   }
   FloatRet0ParamSignal&       SignalFloat0()      { return mSignalFloat0;  }
+  FloatRet1ParamSignal&       SignalFloat1Value() {return  mSignalFloat1V; }
   FloatRet2ValueParamSignal&  SignalFloat2Value() { return mSignalFloat2V; }
 
   VoidSignalTypeFloatValue3&  VoidSignalFloatValue3()  { return mVoidSignalFloatValue3;  }
-  FloatSignalTypeFloatValue3& FloatSignalFloatValue3() { return mFloatSignalFloatValue3; }
+  FloatRet3ValueParamSignal& SignalFloat3Value() { return mFloatSignalFloatValue3; }
 
   TestSignals()
   {
@@ -172,10 +181,12 @@ public:
     DALI_TEST_EQUALS( mSignalVoid1R.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mSignalVoid1V.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mSignalVoid2V.GetConnectionCount(), 0u, TEST_LOCATION );
+    DALI_TEST_EQUALS( mSignalVoid3V.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mSignalBool1V.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mSignalBool2V.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mSignalInt2V.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mSignalFloat0.GetConnectionCount(), 0u, TEST_LOCATION );
+    DALI_TEST_EQUALS( mSignalFloat1V.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mSignalFloat2V.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mVoidSignalFloatValue3.GetConnectionCount(), 0u, TEST_LOCATION );
     DALI_TEST_EQUALS( mFloatSignalFloatValue3.GetConnectionCount(), 0u, TEST_LOCATION );
@@ -191,15 +202,21 @@ public:
     mSignalVoid1R.Emit(ref);
   }
 
-  void EmitVoidSignalIntValue(int p1)
+  void EmitVoidSignal1IntValue(int p1)
   {
     mSignalVoid1V.Emit(p1);
   }
 
-  void EmitVoidSignalIntValueIntValue(int p1, int p2)
+  void EmitVoidSignal2IntValue(int p1, int p2)
   {
     mSignalVoid2V.Emit(p1,p2);
   }
+
+  void EmitVoidSignal3IntValue(int p1, int p2, int p3)
+  {
+    mSignalVoid3V.Emit(p1,p2,p3);
+  }
+
 
   bool EmitBoolSignalFloatValue(float p1)
   {
@@ -214,6 +231,11 @@ public:
   int EmitIntSignalFloatValueIntValue(float p1, int p2)
   {
     return mSignalInt2V.Emit(p1, p2);
+  }
+
+  float EmitFloat1VSignal(float p1 )
+  {
+    return mSignalFloat1V.Emit(p1 );
   }
 
   float EmitFloat2VSignal(float p1, float p2)
@@ -231,7 +253,7 @@ public:
     mVoidSignalFloatValue3.Emit(p1, p2, p3);
   }
 
-  float EmitFloatSignalFloatValue3(float p1, float p2, float p3)
+  float EmitFloat3VSignal(float p1, float p2, float p3)
   {
     return mFloatSignalFloatValue3.Emit(p1, p2, p3);
   }
@@ -242,13 +264,16 @@ private:
   VoidRet1RefParamSignal       mSignalVoid1R;
   VoidRet1ValueParamSignal     mSignalVoid1V;
   VoidRet2ValueParamSignal     mSignalVoid2V;
+  VoidRet3ValueParamSignal     mSignalVoid3V;
+
   BoolRet1ValueParamSignal     mSignalBool1V;
   BoolRet2ValueParamSignal     mSignalBool2V;
   IntRet2ValueParamSignal      mSignalInt2V;
   FloatRet0ParamSignal         mSignalFloat0;
+  FloatRet1ParamSignal         mSignalFloat1V;
   FloatRet2ValueParamSignal    mSignalFloat2V;
   VoidSignalTypeFloatValue3    mVoidSignalFloatValue3;
-  FloatSignalTypeFloatValue3   mFloatSignalFloatValue3;
+  FloatRet3ValueParamSignal   mFloatSignalFloatValue3;
 };
 
 /**
@@ -627,6 +652,10 @@ public:
 
   TestEmitDuringCallback()
   : mVoidSignalVoid( NULL ),
+    mFloatRet0ParamSignal( NULL),
+    mFloatRet1ParamSignal( NULL ),
+    mFloatRet2ParamSignal( NULL ),
+    mFloatRet3ParamSignal( NULL ),
     mHandled( false )
   {
   }
@@ -637,15 +666,77 @@ public:
     signal.Connect( this, &TestEmitDuringCallback::VoidSlotVoid );
   }
 
+  void FloatRet0ParamConnect( TestSignals::FloatRet0ParamSignal& signal )
+  {
+    mFloatRet0ParamSignal = &signal;
+    signal.Connect( this, &TestEmitDuringCallback::FloatRet0Param );
+  }
+  void FloatRet1ParamConnect( TestSignals::FloatRet1ParamSignal& signal )
+  {
+    mFloatRet1ParamSignal = &signal;
+    signal.Connect( this, &TestEmitDuringCallback::FloatRet1Param );
+  }
+  void FloatRet2ParamConnect( TestSignals::FloatRet2ValueParamSignal& signal )
+  {
+    mFloatRet2ParamSignal = &signal;
+    signal.Connect( this, &TestEmitDuringCallback::FloatRet2Param );
+  }
+  void FloatRet3ParamConnect( TestSignals::FloatRet3ValueParamSignal& signal )
+  {
+    mFloatRet3ParamSignal = &signal;
+    signal.Connect( this, &TestEmitDuringCallback::FloatRet3Param );
+  }
+
+  void DeleteDuringEmitConnect( TestSignals::VoidRetNoParamSignal& signal )
+  {
+    mVoidSignalVoid = &signal;
+    signal.Connect( this, &TestEmitDuringCallback::DeleteSignalDuringEmit );
+  }
+
   void VoidSlotVoid()
   {
     // Emitting during Emit is very bad!
     mVoidSignalVoid->Emit();
-
     mHandled = true;
   }
 
+  void DeleteSignalDuringEmit()
+  {
+    // deleting the signal during the emit
+    delete mVoidSignalVoid;
+  }
+
+  float FloatRet0Param()
+  {
+     // Emitting during Emit is very bad!
+    mHandled = true;
+    return mFloatRet0ParamSignal->Emit();
+  }
+  float FloatRet1Param( float x )
+  {
+    // Emitting during Emit is very bad!
+    mHandled = true;
+    return mFloatRet1ParamSignal->Emit(x);
+  }
+  float FloatRet2Param( float x, float y )
+  {
+    // Emitting during Emit is very bad!
+    mHandled = true;
+    return mFloatRet2ParamSignal->Emit( x, y );
+  }
+  float FloatRet3Param( float x, float y, float z)
+  {
+    // Emitting during Emit is very bad!
+    mHandled = true;
+    return mFloatRet3ParamSignal->Emit( x, y, z );
+  }
+
   TestSignals::VoidRetNoParamSignal* mVoidSignalVoid;
+  TestSignals::FloatRet0ParamSignal*      mFloatRet0ParamSignal;
+  TestSignals::FloatRet1ParamSignal* mFloatRet1ParamSignal;
+  TestSignals::FloatRet2ValueParamSignal* mFloatRet2ParamSignal;
+  TestSignals::FloatRet3ValueParamSignal* mFloatRet3ParamSignal;
+
 
   bool mHandled;
 };
@@ -871,6 +962,15 @@ public:
     }
   }
 
+  /**
+   * RemoveNullCallback,
+   * testing what occurs when we pass a callback that doesn't exist
+   */
+  void RemoveNullCallback()
+  {
+    mSlotObserver->SlotDisconnected( NULL );
+  }
+
 private:
 
   TestBasicConnectionTrackerInterface( const TestBasicConnectionTrackerInterface& );            ///< undefined copy constructor
@@ -887,6 +987,61 @@ private:
 };
 
 
+
+
+// for testing static function callbacks
+class StaticFunctionHandlers
+{
+public:
+    StaticFunctionHandlers()
+    {
+      staticFunctionHandled = false;
+    }
+    void Reset()
+    {
+      staticFunctionHandled = false;
+    }
+
+    static void VoidSlotVoid()
+    {
+      staticFunctionHandled = true;
+    }
+    static void VoidSlot1Param( int p1 )
+    {
+      staticFunctionHandled = true;
+    }
+    static void VoidSlot2Param( int p1, int p2 )
+    {
+      staticFunctionHandled = true;
+    }
+    static void VoidSlot3Param( int p1, int p2, int p3 )
+    {
+      staticFunctionHandled = true;
+    }
+
+    static float RetSlot0Param( )
+    {
+      staticFunctionHandled = true;
+      return 0;
+    }
+    static float RetSlot1Param( float p1 )
+    {
+      staticFunctionHandled = true;
+      return 0;
+    }
+    static float RetSlot2Param( float p1, float p2 )
+    {
+      staticFunctionHandled = true;
+      return 0;
+    }
+    static float RetSlot3Param( float p1, float p2, float p3 )
+    {
+      staticFunctionHandled = true;
+      return 0;
+    }
+
+    static bool staticFunctionHandled;
+};
 
 
 /**

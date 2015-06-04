@@ -2686,8 +2686,8 @@ int UtcDaliRelayoutProperties_ResizePolicies(void)
   Actor actor = Actor::New();
 
   // Defaults
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_RESIZE_POLICY ).Get< std::string >(), "FIXED", TEST_LOCATION );
-  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), "FIXED", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::WIDTH_RESIZE_POLICY ).Get< std::string >(), "USE_NATURAL_SIZE", TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetProperty( Actor::Property::HEIGHT_RESIZE_POLICY ).Get< std::string >(), "USE_NATURAL_SIZE", TEST_LOCATION );
 
   // Set resize policy for all dimensions
   actor.SetResizePolicy( ResizePolicy::USE_NATURAL_SIZE, Dimension::ALL_DIMENSIONS );
@@ -2831,7 +2831,7 @@ int UtcDaliActorGetHeightForWidth(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_EQUALS( actor.GetHeightForWidth( 1.0f ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetHeightForWidth( 1.0f ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }
@@ -2842,7 +2842,7 @@ int UtcDaliActorGetWidthForHeight(void)
 
   Actor actor = Actor::New();
 
-  DALI_TEST_EQUALS( actor.GetWidthForHeight( 1.0f ), 0.0f, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor.GetWidthForHeight( 1.0f ), 1.0f, TEST_LOCATION );
 
   END_TEST;
 }

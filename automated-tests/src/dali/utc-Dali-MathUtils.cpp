@@ -34,8 +34,7 @@ void utc_dali_math_utils_cleanup(void)
 }
 
 
-// Positive test case for a method
-int UtcDaliMathUtilsNextPowerOfTwo(void)
+int UtcDaliMathUtilsNextPowerOfTwoP(void)
 {
   Dali::TestApplication testApp;
 
@@ -61,39 +60,91 @@ int UtcDaliMathUtilsNextPowerOfTwo(void)
   END_TEST;
 }
 
-
-// Positive test case for a method
-int UtcDaliMathUtilsIsPowerOfTwo(void)
+int UtcDaliMathUtilsNextPowerOfTwoN(void)
 {
   Dali::TestApplication testApp;
 
-  DALI_TEST_EQUALS(IsPowerOfTwo(0), false, TEST_LOCATION);
+  try
+  {
+    NextPowerOfTwo( (1u << (sizeof(unsigned) * 8 - 1)) + 1);
+    tet_result(TET_FAIL);
+  }
+  catch( Dali::DaliException& e )
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    DALI_TEST_ASSERT( e, "Return type cannot represent the next power of two greater than the argument.", TEST_LOCATION );
+  }
+  catch( ... )
+  {
+    tet_printf("Assertion test failed - wrong Exception\n" );
+    tet_result(TET_FAIL);
+  }
 
-  DALI_TEST_EQUALS(IsPowerOfTwo(1), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(2), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(3), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(4), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(5), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(6), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(7), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(8), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(255), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(256), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(257), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(511), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(512), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(513), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(768), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(1023), false, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(1024), true, TEST_LOCATION);
-  DALI_TEST_EQUALS(IsPowerOfTwo(1025), false, TEST_LOCATION);
   END_TEST;
 }
 
+int UtcDaliMathUtilsClampP(void)
+{
+  Dali::TestApplication testApp;
 
+  //floats
+  DALI_TEST_EQUALS(Clamp(-1.0f, 0.0f, 1.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Clamp(0.0f, -1.0f, 1.0f), 0.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Clamp(1.0f, 0.0f, 1.0f), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Clamp(2.0f, 0.0f, 1.0f), 1.0f, TEST_LOCATION);
 
-// Positive test case for a method
-int UtcDaliMathUtilsGetRangedEpsilon(void)
+  // integers
+  DALI_TEST_EQUALS(Clamp(-10, 0, 10), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(Clamp(0, -10, 10), 0, TEST_LOCATION);
+  DALI_TEST_EQUALS(Clamp(20, 0, 10), 10, TEST_LOCATION);
+
+  float value=-10.0f, min=-2.0f, max=4.0f;
+  ClampInPlace(value, min, max);
+  DALI_TEST_EQUALS(value, min, 0.001, TEST_LOCATION);
+
+  value = 10.0f;
+  ClampInPlace(value, min, max);
+  DALI_TEST_EQUALS(value, max, 0.001, TEST_LOCATION);
+
+  value = 3.0f;
+  ClampInPlace(value, min, max);
+  DALI_TEST_EQUALS(value, 3.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMathUtilsClampInPlaceP(void)
+{
+  Dali::TestApplication testApp;
+
+  float value=-10.0f, min=-2.0f, max=4.0f;
+  ClampInPlace(value, min, max);
+  DALI_TEST_EQUALS(value, min, 0.001, TEST_LOCATION);
+
+  value = 10.0f;
+  ClampInPlace(value, min, max);
+  DALI_TEST_EQUALS(value, max, 0.001, TEST_LOCATION);
+
+  value = 3.0f;
+  ClampInPlace(value, min, max);
+  DALI_TEST_EQUALS(value, 3.0f, 0.001, TEST_LOCATION);
+  END_TEST;
+}
+
+int UtcDaliMathUtilsLerpP(void)
+{
+  Dali::TestApplication testApp;
+
+  float offset=0.0f, low=-2.0f, high=4.0f;
+  DALI_TEST_EQUALS(Lerp(offset, low, high), low, 0.001, TEST_LOCATION);
+  offset = 1.0f;
+  DALI_TEST_EQUALS(Lerp(offset, low, high), high, 0.001, TEST_LOCATION);
+  offset = 0.5f;
+  DALI_TEST_EQUALS(Lerp(offset, low, high), 1.0f, 0.001, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliMathUtilsGetRangedEpsilonP(void)
 {
   Dali::TestApplication testApp;
 
@@ -168,50 +219,7 @@ int UtcDaliMathUtilsGetRangedEpsilon(void)
   END_TEST;
 }
 
-// Positive test case for a method
-int UtcDaliMathUtilsRound(void)
-{
-  Dali::TestApplication testApp;
-
-  DALI_TEST_EQUALS(Round(1.00001, 4), 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Round(0.99999f, 4), 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Round(-1.00001, 4), -1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Round(-0.99999f, 4), -1.0f, TEST_LOCATION);
-  END_TEST;
-}
-
-// Positive test case for a method
-int UtcDaliMathUtilsClamp(void)
-{
-  Dali::TestApplication testApp;
-
-  //floats
-  DALI_TEST_EQUALS(Clamp(-1.0f, 0.0f, 1.0f), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Clamp(0.0f, -1.0f, 1.0f), 0.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Clamp(1.0f, 0.0f, 1.0f), 1.0f, TEST_LOCATION);
-  DALI_TEST_EQUALS(Clamp(2.0f, 0.0f, 1.0f), 1.0f, TEST_LOCATION);
-
-  // integers
-  DALI_TEST_EQUALS(Clamp(-10, 0, 10), 0, TEST_LOCATION);
-  DALI_TEST_EQUALS(Clamp(0, -10, 10), 0, TEST_LOCATION);
-  DALI_TEST_EQUALS(Clamp(20, 0, 10), 10, TEST_LOCATION);
-
-  float value=-10.0f, min=-2.0f, max=4.0f;
-  ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, min, 0.001, TEST_LOCATION);
-
-  value = 10.0f;
-  ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, max, 0.001, TEST_LOCATION);
-
-  value = 3.0f;
-  ClampInPlace(value, min, max);
-  DALI_TEST_EQUALS(value, 3.0f, 0.001, TEST_LOCATION);
-  END_TEST;
-}
-
-// Positive test case for a method
-int UtcDaliMathUtilsWrapInDomain(void)
+int UtcDaliMathUtilsWrapInDomainP(void)
 {
   Dali::TestApplication testApp;
 
@@ -230,8 +238,7 @@ int UtcDaliMathUtilsWrapInDomain(void)
   END_TEST;
 }
 
-// Positive test case for a method
-int UtcDaliMathUtilsShortestDistanceInDomain(void)
+int UtcDaliMathUtilsShortestDistanceInDomainP(void)
 {
   Dali::TestApplication testApp;
 
@@ -245,7 +252,7 @@ int UtcDaliMathUtilsShortestDistanceInDomain(void)
   END_TEST;
 }
 
-int UtcDaliMathUtilsEquals(void)
+int UtcDaliMathUtilsEqualsZeroP(void)
 {
   float v=0.0f;
 
@@ -255,8 +262,32 @@ int UtcDaliMathUtilsEquals(void)
   v -= (Math::PI_2 * 2.0f);
   DALI_TEST_CHECK(EqualsZero(v));
 
+  END_TEST;
+}
+
+int UtcDaliMathUtilsEquals01P(void)
+{
   float w=100.0f;
   float x=w+1e-8f;
   DALI_TEST_CHECK( Equals(w, x, GetRangedEpsilon( w, x )) );
+  END_TEST;
+}
+
+int UtcDaliMathUtilsEquals02P(void)
+{
+  float w=100.0f;
+  float x=w+1e-8f;
+  DALI_TEST_CHECK( Equals(w, x) );
+  END_TEST;
+}
+
+int UtcDaliMathUtilsRoundP(void)
+{
+  Dali::TestApplication testApp;
+
+  DALI_TEST_EQUALS(Round(1.00001, 4), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Round(0.99999f, 4), 1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Round(-1.00001, 4), -1.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(Round(-0.99999f, 4), -1.0f, TEST_LOCATION);
   END_TEST;
 }

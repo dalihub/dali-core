@@ -105,6 +105,16 @@ public:
   Value* Find( const std::string& key ) const;
 
   /**
+   * @brief Finds the value for the specified key if it exists and its type is type
+   *
+   * @param[in]  key   The key to find.
+   * @param[in]  type  The type to check.
+   *
+   * @return A const pointer to the value if it exists, NULL otherwise
+   */
+  Value* Find( const std::string& key, Property::Type type ) const;
+
+  /**
    * @brief Clears the map.
    */
   void Clear();

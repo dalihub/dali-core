@@ -35,7 +35,7 @@ void utc_dali_gesture_detector_cleanup(void)
 }
 
 
-int UtcDaliGestureDetectorConstructorNegative(void)
+int UtcDaliGestureDetectorConstructorN(void)
 {
   TestApplication application;
 
@@ -55,7 +55,7 @@ int UtcDaliGestureDetectorConstructorNegative(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorConstructorPositive(void)
+int UtcDaliGestureDetectorConstructorP(void)
 {
   TestApplication application;
 
@@ -77,7 +77,32 @@ int UtcDaliGestureDetectorConstructorPositive(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDownCast(void)
+int UtcDaliGestureDetectorAssignP(void)
+{
+  TestApplication application;
+
+  // Use pan gesture as GestureDetector cannot be created.
+  GestureDetector detector = PanGestureDetector::New();
+  GestureDetector detector2;
+
+  detector2 = detector;
+
+  Actor actor = Actor::New();
+
+  try
+  {
+    detector2.Attach(actor);
+    tet_result(TET_PASS);
+  }
+  catch (DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+    tet_result(TET_FAIL);
+  }
+  END_TEST;
+}
+
+int UtcDaliGestureDetectorDownCastP(void)
 {
   TestApplication application;
   tet_infoline("Testing Dali::GestureDetector::DownCast()");
@@ -101,7 +126,7 @@ int UtcDaliGestureDetectorDownCast(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorAttachPositive(void)
+int UtcDaliGestureDetectorAttachP(void)
 {
   TestApplication application;
 
@@ -112,13 +137,17 @@ int UtcDaliGestureDetectorAttachPositive(void)
 
   detector.Attach(actor);
 
-  std::vector<Actor> actors = detector.GetAttachedActors();
-
-  if (find(actors.begin(), actors.end(), actor) != actors.end())
+  bool found = false;
+  for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
-    tet_result(TET_PASS);
+    if( detector.GetAttachedActor(i) == actor )
+    {
+      tet_result(TET_PASS);
+      found = true;
+    }
   }
-  else
+
+  if(!found)
   {
     tet_result(TET_FAIL);
   }
@@ -134,7 +163,7 @@ int UtcDaliGestureDetectorAttachPositive(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorAttachNegative(void)
+int UtcDaliGestureDetectorAttachN(void)
 {
   TestApplication application;
 
@@ -156,7 +185,7 @@ int UtcDaliGestureDetectorAttachNegative(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachPositive(void)
+int UtcDaliGestureDetectorDetachP(void)
 {
   TestApplication application;
 
@@ -165,13 +194,18 @@ int UtcDaliGestureDetectorDetachPositive(void)
 
   Actor actor = Actor::New();
   detector.Attach(actor);
-  std::vector<Actor> actors = detector.GetAttachedActors();
 
-  if (find(actors.begin(), actors.end(), actor) != actors.end())
+  bool found = false;
+  for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
-    tet_result(TET_PASS);
+    if( detector.GetAttachedActor(i) == actor )
+    {
+      tet_result(TET_PASS);
+      found = true;
+    }
   }
-  else
+
+  if(!found)
   {
     tet_result(TET_FAIL);
   }
@@ -179,19 +213,28 @@ int UtcDaliGestureDetectorDetachPositive(void)
   // Detach and retrieve attached actors again, the vector should be empty.
   detector.Detach(actor);
 
-  actors = detector.GetAttachedActors();
-  if (actors.empty())
+  found = false;
+  for(size_t i = 0; i < detector.GetAttachedActorCount(); i++)
   {
-    tet_result(TET_PASS);
+    if( detector.GetAttachedActor(i) == actor )
+    {
+      found = true;
+    }
   }
-  else
+
+  if(found)
   {
     tet_result(TET_FAIL);
   }
+  else
+  {
+    tet_result(TET_PASS);
+  }
+
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachNegative01(void)
+int UtcDaliGestureDetectorDetachN01(void)
 {
   TestApplication application;
 
@@ -213,7 +256,7 @@ int UtcDaliGestureDetectorDetachNegative01(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachNegative02(void)
+int UtcDaliGestureDetectorDetachN02(void)
 {
   TestApplication application;
 
@@ -238,7 +281,7 @@ int UtcDaliGestureDetectorDetachNegative02(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachNegative03(void)
+int UtcDaliGestureDetectorDetachN03(void)
 {
   TestApplication application;
   TestGestureManager& gestureManager = application.GetGestureManager();
@@ -267,7 +310,7 @@ int UtcDaliGestureDetectorDetachNegative03(void)
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachAll(void)
+int UtcDaliGestureDetectorDetachAllP(void)
 {
   TestApplication application;
 
@@ -284,18 +327,16 @@ int UtcDaliGestureDetectorDetachAll(void)
     detector.Attach(actor);
   }
 
-  std::vector<Actor> attachedActors = detector.GetAttachedActors();
-  DALI_TEST_EQUALS(actorsToAdd, attachedActors.size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(actorsToAdd, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Detach and retrieve attached actors again, the vector should be empty.
   detector.DetachAll();
 
-  attachedActors = detector.GetAttachedActors();
-  DALI_TEST_EQUALS(true, attachedActors.empty(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, detector.GetAttachedActorCount(), TEST_LOCATION);
   END_TEST;
 }
 
-int UtcDaliGestureDetectorDetachAllNegative(void)
+int UtcDaliGestureDetectorDetachAllN(void)
 {
   TestApplication application;
   TestGestureManager& gestureManager = application.GetGestureManager();
@@ -313,14 +354,12 @@ int UtcDaliGestureDetectorDetachAllNegative(void)
     detector.Attach(actor);
   }
 
-  std::vector<Actor> attachedActors = detector.GetAttachedActors();
-  DALI_TEST_EQUALS(actorsToAdd, attachedActors.size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(actorsToAdd, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Detach and retrieve attached actors again, the vector should be empty.
   detector.DetachAll();
 
-  attachedActors = detector.GetAttachedActors();
-  DALI_TEST_EQUALS(true, attachedActors.empty(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0, detector.GetAttachedActorCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
 
   // Call DetachAll again, there should not be any exception
@@ -346,17 +385,17 @@ int UtcDaliGestureDetectorGetAttachedActors(void)
   GestureDetector detector = PanGestureDetector::New();
 
   // Initially there should not be any actors.
-  DALI_TEST_EQUALS(0u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Attach one actor
   Actor actor1 = Actor::New();
   detector.Attach(actor1);
-  DALI_TEST_EQUALS(1u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(1u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Attach another actor
   Actor actor2 = Actor::New();
   detector.Attach(actor2);
-  DALI_TEST_EQUALS(2u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(2u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Attach another five actors
   std::vector<Actor> myActors;
@@ -366,35 +405,35 @@ int UtcDaliGestureDetectorGetAttachedActors(void)
     myActors.push_back(actor);
     detector.Attach(actor);
   }
-  DALI_TEST_EQUALS(7u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(7u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Detach actor2
   detector.Detach(actor2);
-  DALI_TEST_EQUALS(6u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(6u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Attach actor1 again, count should not increase.
   detector.Attach(actor1);
-  DALI_TEST_EQUALS(6u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(6u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Detach actor2 again, count should not decrease.
   detector.Detach(actor2);
-  DALI_TEST_EQUALS(6u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(6u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Detach actor1.
   detector.Detach(actor1);
-  DALI_TEST_EQUALS(5u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(5u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Create scoped actor, actor should be automatically removed from the detector when it goes out
   // of scope.
   {
     Actor scopedActor = Actor::New();
     detector.Attach(scopedActor);
-    DALI_TEST_EQUALS(6u, detector.GetAttachedActors().size(), TEST_LOCATION);
+    DALI_TEST_EQUALS(6u, detector.GetAttachedActorCount(), TEST_LOCATION);
   }
-  DALI_TEST_EQUALS(5u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(5u, detector.GetAttachedActorCount(), TEST_LOCATION);
 
   // Detach all so nothing remains.
   detector.DetachAll();
-  DALI_TEST_EQUALS(0u, detector.GetAttachedActors().size(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, detector.GetAttachedActorCount(), TEST_LOCATION);
   END_TEST;
 }

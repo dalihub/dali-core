@@ -1,3 +1,6 @@
+#ifndef __TEST_INTRUSIVE_PTR_H__
+#define __TEST_INTRUSIVE_PTR_H__
+
 /*
  * Copyright (c) 2014 Samsung Electronics Co., Ltd.
  *
@@ -15,39 +18,43 @@
  *
  */
 
-// CLASS HEADER
-#include <dali/integration-api/events/mouse-wheel-event-integ.h>
+// INTERNAL INCLUDES
+#include <iostream>
+#include <stdlib.h>
+#include <dali/public-api/dali-core.h>
+#include <dali-test-suite-utils.h>
 
 namespace Dali
 {
 
-namespace Integration
+template <typename T>
+struct UtcCoverageIntrusivePtr
 {
+  typedef IntrusivePtr<T> (*Creator)();
 
-MouseWheelEvent::MouseWheelEvent()
-: Event(MouseWheel),
-  direction(0),
-  modifiers(0),
-  point(Vector2::ZERO),
-  z(0),
-  timeStamp(0)
-{
-}
+  void Check( Creator creator)
+  {
+    IntrusivePtr<T> a = creator();
+    IntrusivePtr<T> b = creator();
 
-MouseWheelEvent::MouseWheelEvent(int direction, unsigned int modifiers, Vector2 point, int z, unsigned int timeStamp)
-: Event(MouseWheel),
-  direction(direction),
-  modifiers(modifiers),
-  point(point),
-  z(z),
-  timeStamp(timeStamp)
-{
-}
+    DALI_TEST_CHECK( a.Get() );
 
-MouseWheelEvent::~MouseWheelEvent()
-{
-}
+    a.Reset();
 
-} // namespace Integration
+    T* pB = b.Detach();
 
-} // namespace Dali
+    a.Reset(pB);
+
+    DALI_TEST_CHECK(a);
+
+    a.Reset();
+
+  };
+
+};
+
+} // Dali
+
+#endif
+
+

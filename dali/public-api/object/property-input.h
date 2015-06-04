@@ -38,6 +38,8 @@ class DALI_IMPORT_API PropertyInput
 {
 public:
 
+  class Extension; ///< Forward declare future extension interface
+
   /**
    * @brief Virtual destructor.
    */
@@ -129,6 +131,16 @@ public:
    * @return The Quaternion value.
    */
   virtual const Quaternion& GetQuaternion() const = 0;
+
+  /**
+   * Retrieve the extension for the PropertyInput
+   *
+   * @return The extension if available, NULL otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
 };
 
 } // namespace Dali

@@ -140,19 +140,21 @@ void GestureDetector::DetachAll()
   }
 }
 
-std::vector<Dali::Actor> GestureDetector::GetAttachedActors() const
+size_t GestureDetector::GetAttachedActorCount() const
 {
-  // Will only be used by Public API.
-  // Unlikely that it will be called that often so copying should be OK.
+  return mAttachedActors.size();
+}
 
-  std::vector<Dali::Actor> actors;
+Dali::Actor GestureDetector::GetAttachedActor(size_t index) const
+{
+  Dali::Actor actor;
 
-  for ( GestureDetectorActorContainer::const_iterator iter = mAttachedActors.begin(), endIter = mAttachedActors.end(); iter != endIter; ++iter )
+  if( index < mAttachedActors.size() )
   {
-    actors.push_back(Dali::Actor(*iter));
+    actor = Dali::Actor( mAttachedActors[index] );
   }
 
-  return actors;
+  return actor;
 }
 
 bool GestureDetector::IsAttached(Actor& actor) const

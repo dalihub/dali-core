@@ -126,6 +126,22 @@ int UtcDaliImageActorDownCast2(void)
   END_TEST;
 }
 
+int UtcDaliImageActorCopyConstructor(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::ImageActor::ImageActor(const ImageActor& )");
+
+  Image image = ResourceImage::New("IncorrectImageName");
+  ImageActor actor1 = ImageActor::New(image);
+
+  ImageActor actor2(actor1);
+  DALI_TEST_CHECK(actor2);
+  DALI_TEST_EQUALS( actor2, actor1, TEST_LOCATION );
+  DALI_TEST_EQUALS( actor2.GetImage(), image, TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliImageActor9Patch(void)
 {
   TestApplication application;
@@ -841,8 +857,8 @@ int UtcDaliImageActorPropertyIndices(void)
 
   Property::IndexContainer indices;
   imageActor.GetPropertyIndices( indices );
-  DALI_TEST_CHECK( indices.size() > basicActor.GetPropertyCount() );
-  DALI_TEST_EQUALS( indices.size(), imageActor.GetPropertyCount(), TEST_LOCATION );
+  DALI_TEST_CHECK( indices.Size() > basicActor.GetPropertyCount() );
+  DALI_TEST_EQUALS( indices.Size(), imageActor.GetPropertyCount(), TEST_LOCATION );
   END_TEST;
 }
 

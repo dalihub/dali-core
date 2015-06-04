@@ -44,7 +44,7 @@ class Layer;
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
-struct MouseWheelEvent;
+struct WheelEvent;
 struct Vector2;
 struct Vector3;
 struct Vector4;
@@ -70,6 +70,10 @@ typedef Rect<float> Padding;      ///< Padding definition
  * - If an actor's world color is fully transparent, then it is not hittable; see GetCurrentWorldColor()
  *
  * <i>Hit Test Algorithm:</i>
+ *
+ * - Stage
+ *   - Gets the first down and the last up touch events to the screen, regardless of actor touch event consumption.
+ *   - Stage's root layer can be used to catch unconsumed touch events.
  *
  * - RenderTasks
  *   - Hit testing is dependent on the camera used, which is specific to each RenderTask.
@@ -219,7 +223,7 @@ typedef Rect<float> Padding;      ///< Padding definition
  * |-------------------|------------------------------|
  * | touched           | @ref TouchedSignal()         |
  * | hovered           | @ref HoveredSignal()         |
- * | mouse-wheel-event | @ref MouseWheelEventSignal() |
+ * | wheel-event       | @ref WheelEventSignal()      |
  * | on-stage          | @ref OnStageSignal()         |
  * | off-stage         | @ref OffStageSignal()        |
  *
@@ -299,7 +303,7 @@ public:
 
   typedef Signal< bool (Actor, const TouchEvent&)> TouchSignalType;                 ///< Touch signal type
   typedef Signal< bool (Actor, const HoverEvent&)> HoverSignalType;                 ///< Hover signal type
-  typedef Signal< bool (Actor, const MouseWheelEvent&) > MouseWheelEventSignalType; ///< Mousewheel signal type
+  typedef Signal< bool (Actor, const WheelEvent&) > WheelEventSignalType;           ///< Wheel signal type
   typedef Signal< void (Actor) > OnStageSignalType;  ///< Stage connection signal type
   typedef Signal< void (Actor) > OffStageSignalType; ///< Stage disconnection signal type
   typedef Signal< void (Actor) > OnRelayoutSignalType; ///< Called when the actor is relaid out
@@ -1187,6 +1191,9 @@ public:
   /**
    * @brief Calculate the height of the actor given a width
    *
+   * The natural size is used for default calculation.
+   * size 0 is treated as aspect ratio 1:1.
+   *
    * @param width Width to use
    * @return Return the height based on the width
    */
@@ -1194,6 +1201,9 @@ public:
 
   /**
    * @brief Calculate the width of the actor given a height
+   *
+   * The natural size is used for default calculation.
+   * size 0 is treated as aspect ratio 1:1.
    *
    * @param height Height to use
    * @return Return the width based on the height
@@ -1207,14 +1217,6 @@ public:
    * @return Return the value of the negotiated dimension
    */
   float GetRelayoutSize( Dimension::Type dimension ) const;
-
-  /**
-   * @brief Force propagate relayout flags through the tree. This actor and all actors
-   * dependent on it will have their relayout flags reset.
-   *
-   * This is useful for resetting layout flags during the layout process.
-   */
-  void PropagateRelayoutFlags();
 
   /**
    * @brief Set the padding for use in layout
@@ -1289,18 +1291,18 @@ public: // Signals
   HoverSignalType& HoveredSignal();
 
   /**
-   * @brief This signal is emitted when mouse wheel event is received.
+   * @brief This signal is emitted when wheel event is received.
    *
    * A callback of the following type may be connected:
    * @code
-   *   bool YourCallbackName(Actor actor, const MouseWheelEvent& event);
+   *   bool YourCallbackName(Actor actor, const WheelEvent& event);
    * @endcode
-   * The return value of True, indicates that the mouse wheel event should be consumed.
+   * The return value of True, indicates that the wheel event should be consumed.
    * Otherwise the signal will be emitted on the next sensitive parent of the actor.
    * @pre The Actor has been initialized.
    * @return The signal to connect to.
    */
-  MouseWheelEventSignalType& MouseWheelEventSignal();
+  WheelEventSignalType& WheelEventSignal();
 
   /**
    * @brief This signal is emitted after the actor has been connected to the stage.

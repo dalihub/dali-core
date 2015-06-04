@@ -99,17 +99,26 @@ Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::type_info& registerType )
   return ret;
 }
 
-Dali::TypeRegistry::NameContainer TypeRegistry::GetTypeNames() const
+size_t TypeRegistry::GetTypeNameCount() const
 {
-  Dali::TypeRegistry::NameContainer ret;
+  return mRegistryLut.size();
+}
 
-  for(RegistryMap::const_iterator iter = mRegistryLut.begin(); iter != mRegistryLut.end(); ++iter)
+
+std::string TypeRegistry::GetTypeName(size_t index) const
+{
+  std::string name;
+
+  if( index < mRegistryLut.size() )
   {
-    ret.push_back(iter->first);
+    RegistryMap::const_iterator iter = mRegistryLut.begin();
+    std::advance(iter, index);
+    name = iter->first;
   }
 
-  return ret;
+  return name;
 }
+
 
 bool TypeRegistry::Register( const std::type_info& theTypeInfo, const std::type_info& baseTypeInfo,
                              Dali::TypeInfo::CreateFunction createInstance, bool callCreateOnInit )
@@ -239,7 +248,7 @@ bool TypeRegistry::RegisterAnimatablePropertyComponent( TypeRegistration& regist
   return false;
 }
 
-bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string &actionName, const std::vector<Property::Value> &properties)
+bool TypeRegistry::DoActionTo( BaseObject * const object, const std::string &actionName, const Property::Map &properties)
 {
   bool done = false;
 

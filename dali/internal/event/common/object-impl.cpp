@@ -489,7 +489,7 @@ Property::Value Object::GetProperty(Property::Index index) const
 
 void Object::GetPropertyIndices( Property::IndexContainer& indices ) const
 {
-  indices.clear();
+  indices.Clear();
 
   // Default Properties
   GetDefaultPropertyIndices( indices );
@@ -504,14 +504,14 @@ void Object::GetPropertyIndices( Property::IndexContainer& indices ) const
   // Custom Properties
   if ( mCustomProperties.Count() > 0 )
   {
-    indices.reserve( indices.size() + mCustomProperties.Count() );
+    indices.Reserve( indices.Size() + mCustomProperties.Count() );
 
     PropertyMetadataLookup::ConstIterator iter = mCustomProperties.Begin();
     const PropertyMetadataLookup::ConstIterator endIter = mCustomProperties.End();
     int i=0;
     for ( ; iter != endIter; ++iter, ++i )
     {
-      indices.push_back( PROPERTY_CUSTOM_START_INDEX + i );
+      indices.PushBack( PROPERTY_CUSTOM_START_INDEX + i );
     }
   }
 }

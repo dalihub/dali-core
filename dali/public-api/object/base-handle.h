@@ -122,7 +122,7 @@ public:
    * @param [in] attributes The list of attributes for the action.
    * @return The action is performed by the object or not.
    */
-  bool DoAction(const std::string& actionName, const std::vector<Property::Value>& attributes);
+  bool DoAction(const std::string& actionName, const Property::Map& attributes);
 
   /**
    * @brief Returns the type name for the Handle.
@@ -220,6 +220,8 @@ private:
    * @return True if the signal was available.
    */
   bool DoConnectSignal( ConnectionTrackerInterface* connectionTracker, const std::string& signalName, FunctorDelegate* functorDelegate );
+
+protected:
 
   /**
    * @brief Used by the safe bool idiom.

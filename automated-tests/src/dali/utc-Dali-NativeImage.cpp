@@ -21,6 +21,7 @@
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
 #include <test-native-image.h>
+#include <test-intrusive-ptr.h>
 
 using namespace Dali;
 
@@ -32,6 +33,20 @@ void utc_dali_native_image_startup(void)
 void utc_dali_native_image_cleanup(void)
 {
   test_return_value = TET_PASS;
+}
+
+IntrusivePtr<TestNativeImage> Creator()
+{
+  return TestNativeImage::New(10,10);
+}
+
+int UtcDaliIntrusivePtrTestNativeImage(void)
+{
+  UtcCoverageIntrusivePtr<TestNativeImage> pointer;
+
+  pointer.Check(Creator);
+
+  END_TEST;
 }
 
 int UtcDaliNativeImageNew(void)
@@ -50,6 +65,25 @@ int UtcDaliNativeImageNew(void)
   image = NativeImage::New(*(nativeImage.Get()));
 
   DALI_TEST_CHECK( image );
+  END_TEST;
+}
+
+int UtcDaliNativeImageCopyConstructor(void)
+{
+  TestApplication application;
+
+  tet_infoline("UtcDaliNativeImageCopyConstructor - NativeImage::NativeImage( const NativeImage& )");
+
+  NativeImage image1;
+  DALI_TEST_CHECK( !image1 );
+
+  TestNativeImagePointer nativeImage = TestNativeImage::New(16, 16);
+  image1 = NativeImage::New(*(nativeImage.Get()));
+  NativeImage image2( image1 );
+
+  DALI_TEST_CHECK( image2 );
+  DALI_TEST_EQUALS( image1, image2, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -162,6 +196,19 @@ int UtcDaliNativeImageContextLoss(void)
 
   DALI_TEST_EQUALS( lazyImageInterface->mExtensionCreateCalls, 0, TEST_LOCATION );
   DALI_TEST_EQUALS( lazyImageInterface->mTargetTextureCalls, 0, TEST_LOCATION );
+
+  END_TEST;
+}
+
+int UtcDaliNativeImageExtensionP(void)
+{
+  TestApplication application;
+  tet_infoline( "Testing Dali::NativeImage::GenerateGlTexture()" );
+
+  TestNativeImagePointer testNativeImage = TestNativeImage::New( 16, 16 );
+  DALI_TEST_CHECK( testNativeImage );
+
+  DALI_TEST_CHECK( NULL == testNativeImage->GetExtension() );
 
   END_TEST;
 }

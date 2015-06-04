@@ -40,7 +40,7 @@ class RelayoutContainer;
 struct KeyEvent;
 struct TouchEvent;
 struct HoverEvent;
-struct MouseWheelEvent;
+struct WheelEvent;
 struct Vector2;
 struct Vector3;
 
@@ -59,6 +59,8 @@ typedef IntrusivePtr<CustomActorImpl> CustomActorImplPtr;
 class DALI_IMPORT_API CustomActorImpl : public Dali::RefObject
 {
 public:
+
+  class Extension; ///< Forward declare future extension interface
 
   /**
    * @brief Virtual destructor.
@@ -129,7 +131,7 @@ public:
    * @param[in] index The Property index that was set.
    * @param[in] propertyValue The value to set.
    */
-  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue ) ;
+  virtual void OnPropertySet( Property::Index index, Property::Value propertyValue );
 
   /**
    * @brief Called when the owning actor's size is set e.g. using Actor::SetSize().
@@ -173,13 +175,13 @@ public:
   virtual bool OnKeyEvent(const KeyEvent& event) = 0;
 
   /**
-   * @brief Called after a mouse-wheel-event is received by the owning actor.
+   * @brief Called after a wheel-event is received by the owning actor.
    *
-   * @note This must be enabled during construction; see CustomActorImpl::SetRequiresMouseWheelEvents(bool)
-   * @param[in] event The mouse wheel event.
+   * @note This must be enabled during construction; see CustomActorImpl::SetRequiresWheelEvents(bool)
+   * @param[in] event The wheel event.
    * @return True if the event should be consumed.
    */
-  virtual bool OnMouseWheelEvent(const MouseWheelEvent& event) = 0;
+  virtual bool OnWheelEvent(const WheelEvent& event) = 0;
 
   /**
    * @brief Called after the size negotiation has been finished for this control.
@@ -268,6 +270,16 @@ public:
    */
   virtual void OnLayoutNegotiated( float size, Dimension::Type dimension ) = 0;
 
+  /**
+   * Retrieve the extension for this control
+   *
+   * @return The extension if available, NULL otherwise
+   */
+  virtual Extension* GetExtension()
+  {
+    return NULL;
+  }
+
 protected: // For derived classes
 
   // Flags for the constructor
@@ -277,7 +289,7 @@ protected: // For derived classes
     DISABLE_SIZE_NEGOTIATION      = 1 << 0,     ///< True if control does not need size negotiation, i.e. it can be skipped in the algorithm
     REQUIRES_TOUCH_EVENTS         = 1 << 1,     ///< True if the OnTouchEvent() callback is required.
     REQUIRES_HOVER_EVENTS         = 1 << 2,     ///< True if the OnHoverEvent() callback is required.
-    REQUIRES_MOUSE_WHEEL_EVENTS   = 1 << 3,     ///< True if the OnMouseWheelEvent() callback is required.
+    REQUIRES_WHEEL_EVENTS   = 1 << 3,     ///< True if the OnWheelEvent() callback is required.
 
     LAST_ACTOR_FLAG                             ///< Special marker for last actor flag
   };
@@ -290,6 +302,8 @@ protected: // For derived classes
    */
   CustomActorImpl( ActorFlags flags );
 
+  // Size negotiation helpers
+
   /**
    * @brief Request a relayout, which means performing a size negotiation on this actor, its parent and children (and potentially whole scene)
    *
@@ -301,6 +315,20 @@ protected: // For derived classes
    * only performed once, i.e. there is no need to keep track of this in the calling side.
    */
   void RelayoutRequest();
+
+  /**
+   * @brief provides the Actor implementation of GetHeightForWidth
+   * @param width to use.
+   * @return the height based on the width.
+   */
+  float GetHeightForWidthBase( float width );
+
+  /**
+   * @brief provides the Actor implementation of GetWidthForHeight
+   * @param height to use.
+   * @return the width based on the height.
+   */
+  float GetWidthForHeightBase( float height );
 
   /**
    * @brief Calculate the size for a child using the base actor object
@@ -352,9 +380,9 @@ public: // Not intended for application developers
 
   /**
    * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.
-   * @return True if the OnMouseWheelEvent() callback is required.
+   * @return True if the OnWheelEvent() callback is required.
    */
-  bool RequiresMouseWheelEvents() const;
+  bool RequiresWheelEvents() const;
 
   /**
    * @brief Called when ownership of the CustomActorImpl is passed to a CustomActor.

@@ -56,9 +56,14 @@ public:
   Dali::TypeInfo GetTypeInfo( const std::type_info& registerType );
 
   /*
-   * @copydoc Dali::TypeRegistry::GetTypeNames
+   * @copydoc Dali::TypeRegistry::GetTypeNameCount
    */
-  Dali::TypeRegistry::NameContainer GetTypeNames() const;
+  size_t GetTypeNameCount() const;
+
+  /*
+   * @copydoc Dali::TypeRegistry::GetTypeName
+   */
+  std::string GetTypeName(size_t index) const;
 
   /*
    * Register a creation function under a unique name.
@@ -136,7 +141,7 @@ public:
    * @copydoc Dali::Internal::TypeInfo::DoActionTo
    * Walks all base types until it finds a doer.
    */
-  bool DoActionTo( BaseObject * const object, const std::string &actionName, const std::vector<Property::Value> &properties);
+  bool DoActionTo( BaseObject * const object, const std::string &actionName, const Property::Map& properties);
 
   /**
    * @copydoc Dali::BaseHandle::ConnectSignal()

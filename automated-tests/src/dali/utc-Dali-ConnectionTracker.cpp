@@ -163,6 +163,32 @@ int UtcConnectionTrackerSignalDisconnectP(void)
 
 }
 
+
+int UtcConnectionTrackerSignalDisconnectN(void)
+{
+  TestApplication app; // Create core for debug logging
+
+  TestButton* button = new TestButton(1);
+  TestApp testApp;
+  button->DownSignal().Connect(&testApp,&TestApp::OnButtonPress);
+
+  DALI_TEST_CHECK( button->DownSignal().GetConnectionCount( ) == 1 );
+
+  try
+  {
+    app.SignalDisconnected( NULL, NULL );
+    tet_result( TET_FAIL );
+  }
+  catch (Dali::DaliException& e)
+  {
+    tet_result( TET_PASS );
+  }
+
+  END_TEST;
+
+}
+
+
 int UtcConnectionTrackerGetConnectionCountP(void)
 {
   TestApplication app; // Create core for debug logging

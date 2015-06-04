@@ -17,9 +17,9 @@
 
 // CLASS HEADER
 #include <dali/internal/event/animation/animation-impl.h>
+#include <dali/public-api/object/property-map.h>
 
 // EXTERNAL INCLUDES
-#include <cstring> // for strcmp
 
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/actor.h>
@@ -482,6 +482,17 @@ void Animation::AnimateTo(Object& targetObject, Property::Index targetPropertyIn
 
     case Property::FLOAT:
     {
+      if ( ( Dali::Actor::Property::SIZE_WIDTH == targetPropertyIndex )||
+           ( Dali::Actor::Property::SIZE_HEIGHT == targetPropertyIndex ) )
+      {
+        // Test whether this is actually an Actor
+        Actor* maybeActor = dynamic_cast<Actor*>( &targetObject );
+        if ( maybeActor )
+        {
+          // Notify the actor that its size is being animated
+          maybeActor->NotifySizeAnimation( *this, destinationValue.Get<float>(), targetPropertyIndex );
+        }
+      }
       AddAnimatorConnector( AnimatorConnector<float>::New( targetObject,
                                                            targetPropertyIndex,
                                                            componentIndex,
@@ -754,7 +765,7 @@ bool Animation::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface*
   bool connected( true );
   Animation* animation = dynamic_cast<Animation*>(object);
 
-  if ( 0 == strcmp( signalName.c_str(), SIGNAL_FINISHED ) )
+  if( 0 == signalName.compare( SIGNAL_FINISHED ) )
   {
     animation->FinishedSignal().Connect( tracker, functor );
   }
@@ -848,29 +859,29 @@ void Animation::Hide(Actor& actor, float delaySeconds)
                                                       TimePeriod(delaySeconds, 0.0f/*immediate*/) ) );
 }
 
-bool Animation::DoAction( BaseObject* object, const std::string& actionName, const std::vector<Property::Value>& attributes )
+bool Animation::DoAction( BaseObject* object, const std::string& actionName, const Property::Map& attributes )
 {
   bool done = false;
   Animation* animation = dynamic_cast<Animation*>( object );
 
   if( animation )
   {
-    if( 0 == strcmp( actionName.c_str(), ACTION_PLAY ) )
+    if( 0 == actionName.compare( ACTION_PLAY ) )
     {
-      if( attributes.size() > 0 )
+      if( Property::Value* value = attributes.Find("duration", Property::FLOAT) )
       {
-        animation->SetDuration( attributes[0].Get<float>() );
+        animation->SetDuration( value->Get<float>() );
       }
 
       animation->Play();
       done = true;
     }
-    else if( 0 == strcmp( actionName.c_str(), ACTION_STOP ) )
+    else if( 0 == actionName.compare( ACTION_STOP ) )
     {
       animation->Stop();
       done = true;
     }
-    else if( 0 == strcmp( actionName.c_str(), ACTION_PAUSE ) )
+    else if( 0 == actionName.compare( ACTION_PAUSE ) )
     {
       animation->Pause();
       done = true;

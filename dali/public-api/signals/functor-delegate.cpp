@@ -32,9 +32,7 @@ namespace
  * If this assert fails, please implement the template specialisation for C functions.
  */
 #if !defined(EMSCRIPTEN)
-void Function() __attribute__((unused));
-void Function() { }
-DALI_COMPILE_TIME_ASSERT( sizeof(void*) == sizeof(&Function) );
+DALI_COMPILE_TIME_ASSERT( sizeof(void*) == sizeof( &FunctorDispatcher<void>::Dispatch ) );
 #endif
 }
 

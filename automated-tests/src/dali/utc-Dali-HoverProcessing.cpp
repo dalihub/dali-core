@@ -157,6 +157,12 @@ int UtcDaliHoverNormalProcessing(void)
   DALI_TEST_EQUALS( TouchPoint::Started, data.hoverEvent.points[0].state, TEST_LOCATION );
   DALI_TEST_EQUALS( screenCoordinates, data.hoverEvent.points[0].screen, TEST_LOCATION );
   DALI_TEST_EQUALS( localCoordinates, data.hoverEvent.points[0].local, 0.1f, TEST_LOCATION );
+
+  TouchPoint point = data.hoverEvent.GetPoint(0);
+  DALI_TEST_EQUALS( TouchPoint::Started, point.state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, point.screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( localCoordinates, point.local, 0.1f, TEST_LOCATION );
+
   data.Reset();
 
   // Emit a motion signal

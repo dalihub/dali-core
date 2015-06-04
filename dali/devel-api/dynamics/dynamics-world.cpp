@@ -26,6 +26,7 @@
 #include <dali/internal/event/dynamics/dynamics-body-impl.h>
 #include <dali/internal/event/dynamics/dynamics-joint-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
+#include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
 #endif
 
 namespace Dali
@@ -52,6 +53,35 @@ DynamicsWorld& DynamicsWorld::operator=(const DynamicsWorld& rhs)
 {
   BaseHandle::operator=(rhs);
   return *this;
+}
+
+DynamicsWorld DynamicsWorld::GetInstance( DynamicsWorldConfig configuration )
+{
+#ifdef DYNAMICS_SUPPORT
+  Internal::DynamicsWorldConfigPtr configImpl( &( GetImplementation( configuration ) ) );
+
+  return DynamicsWorld( Internal::DynamicsWorld::GetInstance( configImpl ).Get() );
+#else
+  return DynamicsWorld();
+#endif
+}
+
+DynamicsWorld DynamicsWorld::Get()
+{
+#ifdef DYNAMICS_SUPPORT
+  Internal::DynamicsWorld* dynamicsWorld = Internal::DynamicsWorld::Get().Get();
+  DALI_ASSERT_ALWAYS( dynamicsWorld && "DynamicsWorld doesn't exist" );
+  return DynamicsWorld( dynamicsWorld );
+#else
+  return DynamicsWorld();
+#endif
+}
+
+void DynamicsWorld::DestroyInstance()
+{
+#ifdef DYNAMICS_SUPPORT
+  Internal::DynamicsWorld::DestroyInstance();
+#endif
 }
 
 void DynamicsWorld::SetGravity(const Vector3& gravity )

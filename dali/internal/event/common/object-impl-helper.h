@@ -75,11 +75,11 @@ struct ObjectImplHelper
 
   void GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
   {
-    indices.reserve( DEFAULT_PROPERTY_COUNT );
+    indices.Reserve( DEFAULT_PROPERTY_COUNT );
 
     for( unsigned int i = 0; i < DEFAULT_PROPERTY_COUNT; ++i )
     {
-      indices.push_back( DEFAULT_OBJECT_PROPERTY_START_INDEX + i );
+      indices.PushBack( DEFAULT_OBJECT_PROPERTY_START_INDEX + i );
     }
   }
 

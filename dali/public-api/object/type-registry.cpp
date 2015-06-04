@@ -61,9 +61,14 @@ Dali::TypeInfo TypeRegistry::GetTypeInfo( const std::type_info& registerType )
   return GetImplementation(*this).GetTypeInfo( registerType );
 }
 
-TypeRegistry::NameContainer TypeRegistry::GetTypeNames() const
+size_t TypeRegistry::GetTypeNameCount() const
 {
-  return GetImplementation(*this).GetTypeNames();
+  return GetImplementation(*this).GetTypeNameCount();
+}
+
+std::string TypeRegistry::GetTypeName(size_t index) const
+{
+  return GetImplementation(*this).GetTypeName(index);
 }
 
 TypeRegistry::TypeRegistry(Internal::TypeRegistry* internal)

@@ -37,15 +37,14 @@ DynamicsCylinderShape::DynamicsCylinderShape(const float radius, const float len
 {
   DALI_LOG_INFO(Debug::Filter::gDynamics, Debug::Verbose, "%s - (radius:%.1f length:%.1f)\n", __PRETTY_FUNCTION__, radius, length);
 
-  StagePtr stage( Stage::GetCurrent() );
-  DynamicsWorldPtr world( stage->GetDynamicsWorld() );
+  DynamicsWorldPtr world( DynamicsWorld::Get() );
   DALI_ASSERT_ALWAYS( world && "No Dynamics World !");
 
   SceneGraph::DynamicsCylinderShape* cylinderShape = new SceneGraph::DynamicsCylinderShape( *world->GetSceneObject() );
   mDynamicsShape = cylinderShape;
 
   // Queue a message to ensure the underlying dynamics object is created in the update thread
-  InitializeDynamicsCylinderShapeMessage( *stage, *cylinderShape, radius, length );
+  InitializeDynamicsCylinderShapeMessage( *Stage::GetCurrent(), *cylinderShape, radius, length );
 }
 
 DynamicsCylinderShape::~DynamicsCylinderShape()

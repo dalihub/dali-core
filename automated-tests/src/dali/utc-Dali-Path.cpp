@@ -189,6 +189,27 @@ int utcDaliPathGenerateControlPoints01(void)
   END_TEST;
 }
 
+int utcDaliPathGetPointCount(void)
+{
+  TestApplication application;
+  Dali::Path path = Dali::Path::New();
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 0, TEST_LOCATION);
+
+  path.AddPoint(Vector3( 50.0,  50.0, 0.0));
+  path.AddPoint(Vector3(120.0,  70.0, 0.0));
+  path.AddPoint(Vector3(190.0, 250.0, 0.0));
+  path.AddPoint(Vector3(260.0, 260.0, 0.0));
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 4, TEST_LOCATION);
+
+  path.AddPoint(Vector3(330.0, 220.0, 0.0));
+  path.AddPoint(Vector3(400.0,  50.0, 0.0));
+
+  DALI_TEST_EQUALS(path.GetPointCount(), 6, TEST_LOCATION);
+  END_TEST;
+}
+
 int utcDaliPathGenerateControlPoints02(void)
 {
   TestApplication application;
@@ -272,3 +293,104 @@ int UtcDaliPathSample01(void)
   END_TEST;
 }
 
+int UtcDaliPathDownCast(void)
+{
+  TestApplication application;
+
+  Dali::Path path = Dali::Path::New();
+  Handle handle = path;
+  SetupPath(path);
+
+  Dali::Path path2 = Dali::Path::DownCast(handle);
+  DALI_TEST_CHECK(path2);
+
+  //t = 0
+  Vector3 position, tangent;
+  path2.Sample(0.0f, position, tangent );
+  DALI_TEST_EQUALS(position.x, 30.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 80.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.6f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.7f, 0.1f, TEST_LOCATION);
+
+  //t = 0.25
+  path2.Sample(0.25f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  48.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 102.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.6f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.7f, 0.1f, TEST_LOCATION);
+
+  // t = 0.5
+  path2.Sample(0.5f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  70.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 120.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  1.0f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.0f, 0.1f, TEST_LOCATION);
+
+
+  //t = 0.75
+  path2.Sample(0.75f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  85.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 112.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.7f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  -0.6f, 0.1f, TEST_LOCATION);
+
+  // t = 1
+  path2.Sample(1.0f, position, tangent );
+  DALI_TEST_EQUALS(position.x, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.8f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  -0.4f, 0.1f, TEST_LOCATION);
+
+  END_TEST;
+}
+
+int UtcDaliPathAssignment(void)
+{
+  TestApplication application;
+
+  Dali::Path path = Dali::Path::New();
+  SetupPath(path);
+
+  Dali::Path path2;
+  path2 = path;
+  DALI_TEST_CHECK(path2);
+
+  //t = 0
+  Vector3 position, tangent;
+  path2.Sample(0.0f, position, tangent );
+  DALI_TEST_EQUALS(position.x, 30.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 80.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.6f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.7f, 0.1f, TEST_LOCATION);
+
+  //t = 0.25
+  path2.Sample(0.25f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  48.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 102.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.6f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.7f, 0.1f, TEST_LOCATION);
+
+  // t = 0.5
+  path2.Sample(0.5f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  70.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 120.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  1.0f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  0.0f, 0.1f, TEST_LOCATION);
+
+
+  //t = 0.75
+  path2.Sample(0.75f, position, tangent );
+  DALI_TEST_EQUALS(position.x,  85.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 112.0f, 2.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.7f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  -0.6f, 0.1f, TEST_LOCATION);
+
+  // t = 1
+  path2.Sample(1.0f, position, tangent );
+  DALI_TEST_EQUALS(position.x, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(position.y, 100.0f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.x,  0.8f, 0.1f, TEST_LOCATION);
+  DALI_TEST_EQUALS(tangent.y,  -0.4f, 0.1f, TEST_LOCATION);
+
+  END_TEST;
+}
