@@ -35,7 +35,7 @@ __thread ThreadLocalStorage* threadLocal = NULL;
 
 ThreadLocalStorage::ThreadLocalStorage(Core* core)
 : mCore( core )
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 , mDynamicsWorldInstance( NULL )
 #endif
 {
@@ -51,7 +51,7 @@ ThreadLocalStorage::~ThreadLocalStorage()
 
 void ThreadLocalStorage::Remove()
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   if( mDynamicsWorldInstance )
   {
     mDynamicsWorldInstance.Reset();
@@ -78,7 +78,7 @@ ThreadLocalStorage* ThreadLocalStorage::GetInternal()
   return threadLocal;
 }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 Dali::Internal::DynamicsWorldPtr ThreadLocalStorage::GetDynamicsWorldInstance()
 {
   if( !mDynamicsWorldInstance )

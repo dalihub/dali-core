@@ -27,7 +27,7 @@ using namespace Dali;
 
 int UtcDaliDynamicsBodyConfigNew(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -59,7 +59,7 @@ int UtcDaliDynamicsBodyConfigNew(void)
 
 int UtcDaliDynamicsBodyConfigConstructor(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -96,7 +96,7 @@ int UtcDaliDynamicsBodyConfigConstructor(void)
 
 int UtcDaliDynamicsBodyConfigType(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -130,7 +130,7 @@ int UtcDaliDynamicsBodyConfigType(void)
 
 int UtcDaliDynamicsBodyConfigSetShape01(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -166,7 +166,7 @@ int UtcDaliDynamicsBodyConfigSetShape01(void)
 
 int UtcDaliDynamicsBodyConfigSetShape02(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -203,7 +203,7 @@ int UtcDaliDynamicsBodyConfigSetShape02(void)
 
 int UtcDaliDynamicsBodyConfigGetShape(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -234,7 +234,7 @@ int UtcDaliDynamicsBodyConfigGetShape(void)
 
 int UtcDaliDynamicsBodyConfigMass(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -272,7 +272,7 @@ int UtcDaliDynamicsBodyConfigMass(void)
 
 int UtcDaliDynamicsBodyConfigElasticity(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -310,7 +310,7 @@ int UtcDaliDynamicsBodyConfigElasticity(void)
 
 int UtcDaliDynamicsBodyConfigFriction(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -348,7 +348,7 @@ int UtcDaliDynamicsBodyConfigFriction(void)
 
 int UtcDaliDynamicsBodyConfigLinearDamping(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -386,7 +386,7 @@ int UtcDaliDynamicsBodyConfigLinearDamping(void)
 
 int UtcDaliDynamicsBodyConfigAngularDamping(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -424,7 +424,7 @@ int UtcDaliDynamicsBodyConfigAngularDamping(void)
 
 int UtcDaliDynamicsBodyConfigLinearSleepVelocity(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -462,7 +462,7 @@ int UtcDaliDynamicsBodyConfigLinearSleepVelocity(void)
 
 int UtcDaliDynamicsBodyConfigAngularSleepVelocity(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -500,7 +500,7 @@ int UtcDaliDynamicsBodyConfigAngularSleepVelocity(void)
 
 int UtcDaliDynamicsBodyConfigCollisionGroup(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -538,7 +538,7 @@ int UtcDaliDynamicsBodyConfigCollisionGroup(void)
 
 int UtcDaliDynamicsBodyConfigCollisionMask(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -576,7 +576,7 @@ int UtcDaliDynamicsBodyConfigCollisionMask(void)
 
 int UtcDaliDynamicsBodyConfigAnchorHardness(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -614,7 +614,7 @@ int UtcDaliDynamicsBodyConfigAnchorHardness(void)
 
 int UtcDaliDynamicsBodyConfigVolumeConservation(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -647,7 +647,7 @@ int UtcDaliDynamicsBodyConfigVolumeConservation(void)
 
 int UtcDaliDynamicsBodyConfigShapeConservation(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
