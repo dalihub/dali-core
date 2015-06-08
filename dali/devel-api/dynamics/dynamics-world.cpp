@@ -22,7 +22,7 @@
 #include <dali/devel-api/dynamics/dynamics-shape.h>
 #include <dali/internal/event/actors/actor-impl.h>
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-body-impl.h>
 #include <dali/internal/event/dynamics/dynamics-joint-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
@@ -32,7 +32,7 @@
 namespace Dali
 {
 
-#ifndef DYNAMICS_SUPPORT
+#ifndef DALI_DYNAMICS_SUPPORT
 DynamicsWorld::CollisionSignalType STUB_COLLISION_SIGNAL;
 #endif
 
@@ -57,7 +57,7 @@ DynamicsWorld& DynamicsWorld::operator=(const DynamicsWorld& rhs)
 
 DynamicsWorld DynamicsWorld::GetInstance( DynamicsWorldConfig configuration )
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsWorldConfigPtr configImpl( &( GetImplementation( configuration ) ) );
 
   return DynamicsWorld( Internal::DynamicsWorld::GetInstance( configImpl ).Get() );
@@ -68,7 +68,7 @@ DynamicsWorld DynamicsWorld::GetInstance( DynamicsWorldConfig configuration )
 
 DynamicsWorld DynamicsWorld::Get()
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsWorld* dynamicsWorld = Internal::DynamicsWorld::Get().Get();
   DALI_ASSERT_ALWAYS( dynamicsWorld && "DynamicsWorld doesn't exist" );
   return DynamicsWorld( dynamicsWorld );
@@ -79,21 +79,21 @@ DynamicsWorld DynamicsWorld::Get()
 
 void DynamicsWorld::DestroyInstance()
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsWorld::DestroyInstance();
 #endif
 }
 
 void DynamicsWorld::SetGravity(const Vector3& gravity )
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetGravity(gravity);
 #endif
 }
 
 const Vector3& DynamicsWorld::GetGravity() const
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   return GetImplementation(*this).GetGravity();
 #else
   return Vector3::ZERO;
@@ -102,7 +102,7 @@ const Vector3& DynamicsWorld::GetGravity() const
 
 int DynamicsWorld::GetDebugDrawMode() const
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   return GetImplementation(*this).GetDebugDrawMode();
 #else
   return int();
@@ -111,21 +111,21 @@ int DynamicsWorld::GetDebugDrawMode() const
 
 void DynamicsWorld::SetDebugDrawMode(int mode)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetDebugDrawMode( mode );
 #endif
 }
 
 void DynamicsWorld::SetRootActor(Actor actor)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetRootActor( &GetImplementation(actor) );
 #endif
 }
 
 Actor DynamicsWorld::GetRootActor() const
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::ActorPtr actor( GetImplementation(*this).GetRootActor() );
 
   DALI_ASSERT_DEBUG(actor || "Root Actor has not been set");
@@ -138,7 +138,7 @@ Actor DynamicsWorld::GetRootActor() const
 
 DynamicsWorld::CollisionSignalType& DynamicsWorld::CollisionSignal()
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   return GetImplementation(*this).CollisionSignal();
 #else
   return STUB_COLLISION_SIGNAL;
@@ -146,7 +146,7 @@ DynamicsWorld::CollisionSignalType& DynamicsWorld::CollisionSignal()
 }
 
 DynamicsWorld::DynamicsWorld( Internal::DynamicsWorld* internal )
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 : BaseHandle(internal)
 #else
 : BaseHandle(NULL)

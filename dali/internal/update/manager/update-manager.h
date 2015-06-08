@@ -389,7 +389,7 @@ public:
    */
   void SetLayerDepths( const std::vector< Layer* >& layers, bool systemLevel );
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 
   /**
    * Initialize the dynamics world
@@ -404,7 +404,7 @@ public:
    */
   void TerminateDynamicsWorld();
 
-#endif // DYNAMICS_SUPPORT
+#endif // DALI_DYNAMICS_SUPPORT
 
 private:
 
@@ -850,7 +850,7 @@ inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
   new (slot) LocalType( &manager, &UpdateManager::RemoveGesture, gesture );
 }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 
 // Dynamics messages
 inline void InitializeDynamicsWorldMessage( UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings )
@@ -875,7 +875,7 @@ inline void TerminateDynamicsWorldMessage(UpdateManager& manager)
   new (slot) LocalType( &manager, &UpdateManager::TerminateDynamicsWorld );
 }
 
-#endif // DYNAMICS_SUPPORT
+#endif // DALI_DYNAMICS_SUPPORT
 
 } // namespace SceneGraph
 
