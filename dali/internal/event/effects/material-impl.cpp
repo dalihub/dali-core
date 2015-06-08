@@ -70,6 +70,11 @@ void Material::SetShader( Shader& shader )
   SceneGraph::SetShaderMessage( GetEventThreadServices(), *mSceneObject, sceneGraphShader );
 }
 
+Shader* Material::GetShader() const
+{
+  return mShaderConnector.Get().Get();
+}
+
 void Material::AddSampler( Sampler& sampler )
 {
   SamplerConnector connector;

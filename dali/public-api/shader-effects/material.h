@@ -132,6 +132,13 @@ public:
   void SetShader( Shader& shader );
 
   /**
+   * @brief Gets the shader used by this material
+   *
+   * @return The shader used by the material
+   */
+  Shader GetShader() const;
+
+  /**
    * @brief Add a sampler to this material
    *
    * param[in] sampler The sampler to add to this material
