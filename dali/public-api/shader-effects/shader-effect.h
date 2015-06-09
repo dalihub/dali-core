@@ -149,27 +149,6 @@ public:
   static const float DEFAULT_GRID_DENSITY;              ///< The default density is 40 pixels
 
   /**
-   * @brief The Extension class is a base class for objects that can be attached to the
-   * ShaderEffects as extensions.
-   *
-   * Extensions are useful to create pimpled implementations of custom shaders.
-   * The shader effect will hold an intrusive pointer to the extension.
-   */
-  class Extension : public RefObject
-  {
-  protected:
-    /**
-     * @brief Disable default constructor. This a base class is not meant to be initialised on its own.
-     */
-    Extension();
-
-    /**
-     * @brief Virtual destructor.
-     */
-    virtual ~Extension();
-  };
-
-  /**
    * @brief Hints for rendering/subdividing geometry.
    */
   enum GeometryHints
@@ -363,35 +342,6 @@ public:
   void SetUniform( const std::string& name,
                    const Matrix3& value,
                    UniformCoordinateType uniformCoordinateType = UniformCoordinateType(COORDINATE_TYPE_DEFAULT) );
-
-  /**
-   * @brief Attach an extension object.
-   *
-   * This object is reference counted and will be automatically deleted.
-   * This object can be retrieved back with the GetExtension function.
-   * @param object Pointer to a Extension.
-   * @pre extension is not NULL
-   */
-  void AttachExtension( Extension *object );
-
-  /**
-   * @brief Retrieve the attached extension object.
-   *
-   * This object can be set with the AttachExtension function.
-   * @return implementation Pointer to a Extension.
-   * @pre An extension needs to be attached previously.
-   */
-  Extension& GetExtension();
-
-  /**
-   * @brief Retrieve the attached extension object.
-   *
-   * This object can be set with the AttachExtension function.
-   * @return implementation Pointer to a Extension.
-   * @pre An extension needs to be attached previously.
-   */
-  const Extension& GetExtension() const;
-
 
 public: // Not intended for application developers
 
