@@ -65,6 +65,11 @@ public:
   void SetShader( Shader& shader );
 
   /**
+   * @copydoc Dali::Material::GetShader()
+   */
+  Shader* GetShader() const;
+
+  /**
    * @copydoc Dali::Material::AddSampler()
    */
   void AddSampler( Sampler& sampler );

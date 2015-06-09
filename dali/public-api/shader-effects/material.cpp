@@ -65,6 +65,12 @@ void Material::SetShader( Shader& shader )
   GetImplementation(*this).SetShader( GetImplementation( shader ) );
 }
 
+Shader Material::GetShader() const
+{
+  Internal::Shader* shaderPtr( GetImplementation(*this).GetShader() );
+  return Dali::Shader( shaderPtr );
+}
+
 void Material::AddSampler( Sampler& sampler )
 {
   DALI_ASSERT_ALWAYS( sampler && "Sampler handle is uninitialized" );
