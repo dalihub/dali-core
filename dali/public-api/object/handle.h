@@ -334,36 +334,6 @@ public:
    */
   void RemoveConstraints( unsigned int tag );
 
-  /**
-   * @brief Add an uniform mapping
-   *
-   * Uniform mappings can be used to specify that a property value should be provided to the
-   * shader under a uniform name.
-   *
-   * If multiple objects connected to a Renderer provide mappings for the same uniform name,
-   * the value that is set will come from the object with highest precedence according to this list:
-   *   - Renderer (highest precedence)
-   *   - Actor
-   *   - Material
-   *   - Shader
-   *   - Geometry (lowest precedence)
-   *
-   * Mappings in any other objects are ignored.
-   *
-   * If more than one mapping with the same uniform name is added, then the instead of creating a new
-   * mapping this function changes the propertyIndex on the existing one.
-   *
-   * @param[in] propertyIndex Index of a property hold by the object pointed by this handle
-   * @param[in] uniformName Name of the uniform
-   */
-  void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName );
-
-  /**
-   * @brief Removes the mapping for the given uniform name, if there is any
-   *
-   * @param[in] uniformName Name of a uniform in a mapping
-   */
-  void RemoveUniformMapping( const std::string uniformName );
 };
 
 namespace WeightObject

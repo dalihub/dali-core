@@ -105,7 +105,7 @@ int UtcDaliRendererConstraint01(void)
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = renderer.RegisterProperty( "fade-color", initialColor );
+  Property::Index colorIndex = renderer.RegisterProperty( "uFadeColor", initialColor );
 
   application.SendNotification();
   application.Render(0);
@@ -152,8 +152,7 @@ int UtcDaliRendererConstraint02(void)
   application.Render(0);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = renderer.RegisterProperty( "fade-color", initialColor );
-  renderer.AddUniformMapping( colorIndex, std::string("uFadeColor") );
+  Property::Index colorIndex = renderer.RegisterProperty( "uFadeColor", initialColor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -210,7 +209,7 @@ int UtcDaliRendererAnimatedProperty01(void)
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = renderer.RegisterProperty( "fade-color", initialColor );
+  Property::Index colorIndex = renderer.RegisterProperty( "uFadeColor", initialColor );
 
   application.SendNotification();
   application.Render(0);
@@ -256,8 +255,7 @@ int UtcDaliRendererAnimatedProperty02(void)
   application.Render(0);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = renderer.RegisterProperty( "fade-color", initialColor );
-  renderer.AddUniformMapping( colorIndex, std::string("uFadeColor") );
+  Property::Index colorIndex = renderer.RegisterProperty( "uFadeColor", initialColor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -317,25 +315,18 @@ int UtcDaliRendererUniformMapPrecendence01(void)
   application.SendNotification();
   application.Render(0);
 
-  Property::Index rendererFadeColorIndex = renderer.RegisterProperty( "fade-color-a", Color::RED );
-  renderer.AddUniformMapping( rendererFadeColorIndex, std::string("uFadeColor") );
+  renderer.RegisterProperty( "uFadeColor", Color::RED );
 
-  Property::Index actorFadeColorIndex = actor.RegisterProperty( "fade-color-b", Color::GREEN );
-  actor.AddUniformMapping( actorFadeColorIndex, std::string("uFadeColor") );
+  actor.RegisterProperty( "uFadeColor", Color::GREEN );
 
-  Property::Index materialFadeColorIndex = material.RegisterProperty( "fade-color-c", Color::BLUE );
-  material.AddUniformMapping( materialFadeColorIndex, std::string("uFadeColor") );
+  Property::Index materialFadeColorIndex = material.RegisterProperty( "uFadeColor", Color::BLUE );
 
-  Property::Index samplerFadeColorIndex = sampler.RegisterProperty( "fade-color-d", Color::CYAN );
-  sampler.AddUniformMapping( samplerFadeColorIndex, std::string("uFadeColor") );
-  Property::Index shaderFadeColorIndex = shader.RegisterProperty( "fade-color-e", Color::MAGENTA );
-  shader.AddUniformMapping( shaderFadeColorIndex, std::string("uFadeColor") );
+  sampler.RegisterProperty( "uFadeColor", Color::CYAN );
+  shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
-  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "fade-color-f", Color::YELLOW );
-  geometry.AddUniformMapping( geometryFadeColorIndex, std::string("uFadeColor") );
+  geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
 
-  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "fade-color-g", Color::BLACK );
-  vertexBuffer.AddUniformMapping( vertexFadeColorIndex, std::string("uFadeColor") );
+  vertexBuffer.RegisterProperty( "uFadeColor", Color::BLACK );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -397,22 +388,16 @@ int UtcDaliRendererUniformMapPrecendence02(void)
 
   // Don't add property / uniform map to renderer
 
-  Property::Index actorFadeColorIndex = actor.RegisterProperty( "fade-color-b", Color::GREEN );
-  actor.AddUniformMapping( actorFadeColorIndex, std::string("uFadeColor") );
+  actor.RegisterProperty( "uFadeColor", Color::GREEN );
 
-  Property::Index materialFadeColorIndex = material.RegisterProperty( "fade-color-c", Color::BLUE );
-  material.AddUniformMapping( materialFadeColorIndex, std::string("uFadeColor") );
+  Property::Index materialFadeColorIndex = material.RegisterProperty( "uFadeColor", Color::BLUE );
 
-  Property::Index samplerFadeColorIndex = sampler.RegisterProperty( "fade-color-d", Color::CYAN );
-  sampler.AddUniformMapping( samplerFadeColorIndex, std::string("uFadeColor") );
-  Property::Index shaderFadeColorIndex = shader.RegisterProperty( "fade-color-e", Color::MAGENTA );
-  shader.AddUniformMapping( shaderFadeColorIndex, std::string("uFadeColor") );
+  sampler.RegisterProperty( "uFadeColor", Color::CYAN );
+  shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
-  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "fade-color-f", Color::YELLOW );
-  geometry.AddUniformMapping( geometryFadeColorIndex, std::string("uFadeColor") );
+  geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
 
-  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "fade-color-g", Color::BLACK );
-  vertexBuffer.AddUniformMapping( vertexFadeColorIndex, std::string("uFadeColor") );
+  vertexBuffer.RegisterProperty( "uFadeColor", Color::BLACK );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -475,19 +460,14 @@ int UtcDaliRendererUniformMapPrecendence03(void)
 
   // Don't add property / uniform map to renderer or actor
 
-  Property::Index materialFadeColorIndex = material.RegisterProperty( "fade-color-c", Color::BLUE );
-  material.AddUniformMapping( materialFadeColorIndex, std::string("uFadeColor") );
+  material.RegisterProperty( "uFadeColor", Color::BLUE );
 
-  Property::Index samplerFadeColorIndex = sampler.RegisterProperty( "fade-color-d", Color::CYAN );
-  sampler.AddUniformMapping( samplerFadeColorIndex, std::string("uFadeColor") );
-  Property::Index shaderFadeColorIndex = shader.RegisterProperty( "fade-color-e", Color::MAGENTA );
-  shader.AddUniformMapping( shaderFadeColorIndex, std::string("uFadeColor") );
+  sampler.RegisterProperty( "uFadeColor", Color::CYAN );
+  shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
-  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "fade-color-f", Color::YELLOW );
-  geometry.AddUniformMapping( geometryFadeColorIndex, std::string("uFadeColor") );
+  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
 
-  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "fade-color-g", Color::BLACK );
-  vertexBuffer.AddUniformMapping( vertexFadeColorIndex, std::string("uFadeColor") );
+  vertexBuffer.RegisterProperty( "uFadeColor", Color::BLACK );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -550,16 +530,12 @@ int UtcDaliRendererUniformMapPrecendence04(void)
 
   // Don't add property / uniform map to renderer/actor/material
 
-  Property::Index samplerFadeColorIndex = sampler.RegisterProperty( "fade-color-d", Color::CYAN );
-  sampler.AddUniformMapping( samplerFadeColorIndex, std::string("uFadeColor") );
-  Property::Index shaderFadeColorIndex = shader.RegisterProperty( "fade-color-e", Color::MAGENTA );
-  shader.AddUniformMapping( shaderFadeColorIndex, std::string("uFadeColor") );
+  sampler.RegisterProperty( "uFadeColor", Color::CYAN );
+  shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
-  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "fade-color-f", Color::YELLOW );
-  geometry.AddUniformMapping( geometryFadeColorIndex, std::string("uFadeColor") );
+  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
 
-  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "fade-color-g", Color::BLACK );
-  vertexBuffer.AddUniformMapping( vertexFadeColorIndex, std::string("uFadeColor") );
+  vertexBuffer.RegisterProperty( "uFadeColor", Color::BLACK );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -621,14 +597,11 @@ int UtcDaliRendererUniformMapPrecendence05(void)
 
   // Don't add property / uniform map to renderer/actor/material/sampler
 
-  Property::Index shaderFadeColorIndex = shader.RegisterProperty( "fade-color-e", Color::MAGENTA );
-  shader.AddUniformMapping( shaderFadeColorIndex, std::string("uFadeColor") );
+  shader.RegisterProperty( "uFadeColor", Color::MAGENTA );
 
-  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "fade-color-f", Color::YELLOW );
-  geometry.AddUniformMapping( geometryFadeColorIndex, std::string("uFadeColor") );
+  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
 
-  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "fade-color-g", Color::BLACK );
-  vertexBuffer.AddUniformMapping( vertexFadeColorIndex, std::string("uFadeColor") );
+  vertexBuffer.RegisterProperty( "uFadeColor", Color::BLACK );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -690,11 +663,9 @@ int UtcDaliRendererUniformMapPrecendence06(void)
 
   // Don't add property / uniform map to renderer/actor/material/sampler/shader
 
-  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "fade-color-f", Color::YELLOW );
-  geometry.AddUniformMapping( geometryFadeColorIndex, std::string("uFadeColor") );
+  geometry.RegisterProperty( "uFadeColor", Color::YELLOW );
 
-  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "fade-color-g", Color::BLACK );
-  vertexBuffer.AddUniformMapping( vertexFadeColorIndex, std::string("uFadeColor") );
+  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "uFadeColor", Color::BLACK );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -756,8 +727,7 @@ int UtcDaliRendererUniformMapPrecendence07(void)
 
   // Don't add property / uniform map to renderer/actor/material/sampler/shader/geometry
 
-  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "fade-color-g", Color::BLACK );
-  vertexBuffer.AddUniformMapping( vertexFadeColorIndex, std::string("uFadeColor") );
+  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "uFadeColor", Color::BLACK );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -817,25 +787,13 @@ int UtcDaliRendererUniformMapMultipleUniforms01(void)
   application.SendNotification();
   application.Render(0);
 
-  Property::Index rendererFadeColorIndex = renderer.RegisterProperty( "fade-color", Color::RED );
-  renderer.AddUniformMapping( rendererFadeColorIndex, std::string("uUniform1") );
-
-  Property::Index actorFadeColorIndex = actor.RegisterProperty( "fade-color", Color::GREEN );
-  actor.AddUniformMapping( actorFadeColorIndex, std::string("uUniform2") );
-
-  Property::Index materialFadeColorIndex = material.RegisterProperty( "fade-color", Color::BLUE );
-  material.AddUniformMapping( materialFadeColorIndex, std::string("uUniform3") );
-
-  Property::Index samplerFadeColorIndex = sampler.RegisterProperty( "fade-color", Color::CYAN );
-  sampler.AddUniformMapping( samplerFadeColorIndex, std::string("uUniform4") );
-  Property::Index shaderFadeColorIndex = shader.RegisterProperty( "fade-color", Color::MAGENTA );
-  shader.AddUniformMapping( shaderFadeColorIndex, std::string("uUniform5") );
-
-  Property::Index geometryFadeColorIndex = geometry.RegisterProperty( "fade-color", Color::YELLOW );
-  geometry.AddUniformMapping( geometryFadeColorIndex, std::string("uUniform6") );
-
-  Property::Index vertexFadeColorIndex = vertexBuffer.RegisterProperty( "fade-color", Color::BLACK );
-  vertexBuffer.AddUniformMapping( vertexFadeColorIndex, std::string("uUniform7") );
+  renderer.RegisterProperty( "uUniform1", Color::RED );
+  actor.RegisterProperty( "uUniform2", Color::GREEN );
+  material.RegisterProperty( "uUniform3", Color::BLUE );
+  sampler.RegisterProperty( "uUniform4", Color::CYAN );
+  shader.RegisterProperty( "uUniform5", Color::MAGENTA );
+  geometry.RegisterProperty( "uUniform6", Color::YELLOW );
+  vertexBuffer.RegisterProperty( "uUniform7", Color::BLACK );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -904,32 +862,25 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
   application.Render(0);
 
   Property::Value value1(Color::RED);
-  Property::Index rendererIndex = renderer.RegisterProperty( "fade-color", value1 );
-  renderer.AddUniformMapping( rendererIndex, std::string("uUniform1") );
+  renderer.RegisterProperty( "uFadeColor", value1 );
 
   Property::Value value2(1.0f);
-  Property::Index actorIndex = actor.RegisterProperty( "fade-progress", value2 );
-  actor.AddUniformMapping( actorIndex, std::string("uUniform2") );
+  actor.RegisterProperty( "uFadeProgress", value2 );
 
   Property::Value value3(Vector3(0.5f, 0.5f, 1.0f));
-  Property::Index materialIndex = material.RegisterProperty( "fade-position", value3);
-  material.AddUniformMapping( materialIndex, std::string("uUniform3") );
+  material.RegisterProperty( "uFadePosition", value3);
 
   Property::Value value4(Vector2(0.5f, 1.0f));
-  Property::Index samplerIndex = sampler.RegisterProperty( "fade-uv", value4 );
-  sampler.AddUniformMapping( samplerIndex, std::string("uUniform4") );
+  sampler.RegisterProperty( "uFadeUV", value4 );
 
   Property::Value value5(Matrix3::IDENTITY);
-  Property::Index shaderIndex = shader.RegisterProperty( "a-normal-matrix", value5 );
-  shader.AddUniformMapping( shaderIndex, std::string("uUniform5") );
+  shader.RegisterProperty( "uANormalMatrix", value5 );
 
   Property::Value value6(Matrix::IDENTITY);
-  Property::Index geometryIndex = geometry.RegisterProperty( "a-world-matrix", value6 );
-  geometry.AddUniformMapping( geometryIndex, std::string("uUniform6") );
+  geometry.RegisterProperty( "uAWorldMatrix", value6 );
 
   Property::Value value7(7);
-  Property::Index vertexIndex = vertexBuffer.RegisterProperty( "fade-color", value7 );
-  vertexBuffer.AddUniformMapping( vertexIndex, std::string("uUniform7") );
+  vertexBuffer.RegisterProperty( "uAnotherFadeColor", value7 );
 
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
@@ -939,31 +890,31 @@ int UtcDaliRendererUniformMapMultipleUniforms02(void)
 
   // Expect that each of the object's uniforms are set
   Vector4 uniform1Value(Vector4::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uUniform1", uniform1Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector4>( "uFadeColor", uniform1Value ) );
   DALI_TEST_EQUALS( uniform1Value, value1.Get<Vector4>(), TEST_LOCATION );
 
   float uniform2Value(0.0f);
-  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uUniform2", uniform2Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<float>( "uFadeProgress", uniform2Value ) );
   DALI_TEST_EQUALS( uniform2Value, value2.Get<float>(), TEST_LOCATION );
 
   Vector3 uniform3Value(Vector3::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "uUniform3", uniform3Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector3>( "uFadePosition", uniform3Value ) );
   DALI_TEST_EQUALS( uniform3Value, value3.Get<Vector3>(), TEST_LOCATION );
 
   Vector2 uniform4Value(Vector2::ZERO);
-  DALI_TEST_CHECK( gl.GetUniformValue<Vector2>( "uUniform4", uniform4Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Vector2>( "uFadeUV", uniform4Value ) );
   DALI_TEST_EQUALS( uniform4Value, value4.Get<Vector2>(), TEST_LOCATION );
 
   Matrix3 uniform5Value;
-  DALI_TEST_CHECK( gl.GetUniformValue<Matrix3>( "uUniform5", uniform5Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Matrix3>( "uANormalMatrix", uniform5Value ) );
   DALI_TEST_EQUALS( uniform5Value, value5.Get<Matrix3>(), TEST_LOCATION );
 
   Matrix uniform6Value;
-  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uUniform6", uniform6Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<Matrix>( "uAWorldMatrix", uniform6Value ) );
   DALI_TEST_EQUALS( uniform6Value, value6.Get<Matrix>(), TEST_LOCATION );
 
   int uniform7Value = 0;
-  DALI_TEST_CHECK( gl.GetUniformValue<int>( "uUniform7", uniform7Value ) );
+  DALI_TEST_CHECK( gl.GetUniformValue<int>( "uAnotherFadeColor", uniform7Value ) );
   DALI_TEST_EQUALS( uniform7Value, value7.Get<int>(), TEST_LOCATION );
 
   END_TEST;

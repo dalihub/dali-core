@@ -50,6 +50,8 @@ typedef Dali::Vector<Object::Observer*>::ConstIterator ConstObserverIter;
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_OBJECT" );
 #endif
+
+
 } // unnamed namespace
 
 Object::Object()
@@ -635,7 +637,12 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
 
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue)
 {
-  return RegisterSceneGraphProperty(name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue);
+  Property::Index index = RegisterSceneGraphProperty(name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue);
+
+  /// @todo: don't keep a table of mappings per handle.
+  AddUniformMapping(index, name);
+
+  return index;
 }
 
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)

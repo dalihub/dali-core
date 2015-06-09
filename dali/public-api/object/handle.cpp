@@ -168,16 +168,6 @@ void Handle::RemoveConstraints( unsigned int tag )
   GetImplementation(*this).RemoveConstraints( tag );
 }
 
-void Handle::AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName )
-{
-  GetImplementation(*this).AddUniformMapping( propertyIndex, uniformName );
-}
-
-void Handle::RemoveUniformMapping( const std::string uniformName )
-{
-  GetImplementation(*this).RemoveUniformMapping( uniformName );
-}
-
 namespace WeightObject
 {
 

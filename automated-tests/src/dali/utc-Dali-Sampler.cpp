@@ -167,8 +167,7 @@ int UtcDaliSamplerUniformMap01(void)
   Stage::GetCurrent().Add( actor );
 
   float initialValue = 1.0f;
-  Property::Index widthClampIndex = sampler.RegisterProperty("width-clamp", initialValue );
-  sampler.AddUniformMapping( widthClampIndex, std::string("uWidthClamp") );
+  Property::Index widthClampIndex = sampler.RegisterProperty("uWidthClamp", initialValue );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 

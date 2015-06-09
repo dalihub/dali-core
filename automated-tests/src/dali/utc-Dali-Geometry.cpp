@@ -103,7 +103,7 @@ int UtcDaliGeometryConstraint01(void)
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = geometry.RegisterProperty( "fade-color", initialColor );
+  Property::Index colorIndex = geometry.RegisterProperty( "uFadeColor", initialColor );
 
   application.SendNotification();
   application.Render(0);
@@ -150,8 +150,7 @@ int UtcDaliGeometryConstraint02(void)
   application.Render(0);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = geometry.RegisterProperty( "fade-color", initialColor );
-  geometry.AddUniformMapping( colorIndex, std::string("uFadeColor") );
+  Property::Index colorIndex = geometry.RegisterProperty( "uFadeColor", initialColor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -208,7 +207,7 @@ int UtcDaliGeometryAnimatedProperty01(void)
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = geometry.RegisterProperty( "fade-color", initialColor );
+  Property::Index colorIndex = geometry.RegisterProperty( "uFadeColor", initialColor );
 
   application.SendNotification();
   application.Render(0);
@@ -254,8 +253,7 @@ int UtcDaliGeometryAnimatedProperty02(void)
   application.Render(0);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = geometry.RegisterProperty( "fade-color", initialColor );
-  geometry.AddUniformMapping( colorIndex, std::string("uFadeColor") );
+  Property::Index colorIndex = geometry.RegisterProperty( "uFadeColor", initialColor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 

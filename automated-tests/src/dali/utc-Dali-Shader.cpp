@@ -114,7 +114,7 @@ int UtcDaliShaderConstraint01(void)
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = shader.RegisterProperty( "fade-color", initialColor );
+  Property::Index colorIndex = shader.RegisterProperty( "uFadeColor", initialColor );
 
   application.SendNotification();
   application.Render(0);
@@ -161,8 +161,7 @@ int UtcDaliShaderConstraint02(void)
   application.Render(0);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = shader.RegisterProperty( "fade-color", initialColor );
-  shader.AddUniformMapping( colorIndex, std::string("uFadeColor") );
+  Property::Index colorIndex = shader.RegisterProperty( "uFadeColor", initialColor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
@@ -219,7 +218,7 @@ int UtcDaliShaderAnimatedProperty01(void)
   Stage::GetCurrent().Add(actor);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = shader.RegisterProperty( "fade-color", initialColor );
+  Property::Index colorIndex = shader.RegisterProperty( "uFadeColor", initialColor );
 
   application.SendNotification();
   application.Render(0);
@@ -265,8 +264,7 @@ int UtcDaliShaderAnimatedProperty02(void)
   application.Render(0);
 
   Vector4 initialColor = Color::WHITE;
-  Property::Index colorIndex = shader.RegisterProperty( "fade-color", initialColor );
-  shader.AddUniformMapping( colorIndex, std::string("uFadeColor") );
+  Property::Index colorIndex = shader.RegisterProperty( "uFadeColor", initialColor );
 
   TestGlAbstraction& gl = application.GetGlAbstraction();
 
