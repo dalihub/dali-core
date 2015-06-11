@@ -870,7 +870,7 @@ Property::Value& Property::Value::GetItem(const int index, std::string& key) con
   if( Property::MAP == GetType() )
   {
     Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-    if( index < static_cast<int>(container->Count()) )
+    if( container && index < static_cast<int>(container->Count()) )
     {
       key = container->GetKey( index );
     }

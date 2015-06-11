@@ -224,10 +224,14 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
     }
     else
     {
-      Vector2 size( Stage::GetCurrent()->GetSize() );
-      viewPort.x = viewPort.y = 0;
-      viewPort.width = size.width;
-      viewPort.height = size.height;
+      Internal::Stage* stage = Internal::Stage::GetCurrent();
+      if ( stage )
+      {
+        Vector2 size( stage->GetSize() );
+        viewPort.x = viewPort.y = 0;
+        viewPort.width = size.width;
+        viewPort.height = size.height;
+      }
     }
   }
   else

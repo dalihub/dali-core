@@ -65,6 +65,7 @@ void AnimatableMesh::UpdateMesh( BufferIndex updateBufferIndex )
 {
   // Copy properties to associated scenegraph mesh
   SceneGraph::Mesh* mesh(mResourceManager.GetMesh(mMeshId));
+  DALI_ASSERT_DEBUG( mesh );
 
   // TODO: Should be double buffered - pass in buffer index
   MeshData& meshData = mesh->GetMeshData(Mesh::UPDATE_THREAD);
