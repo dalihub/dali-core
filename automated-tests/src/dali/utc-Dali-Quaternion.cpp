@@ -930,7 +930,7 @@ int UtcDaliQuaternionSlerpP02(void)
   // @ 50%, will be at M_PI/3 around z
   q = Quaternion::Slerp( q1, q2, 0.5f );
 
-  Quaternion r( Dali::ANGLE_120, Vector3( 0.0f, 0.0f, 1.0f));
+  Quaternion r( Dali::ANGLE_60, Vector3( 0.0f, 0.0f, 1.0f));
   DALI_TEST_EQUALS( q, r, 0.001, TEST_LOCATION );
   END_TEST;
 }

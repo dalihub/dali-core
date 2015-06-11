@@ -21,8 +21,6 @@ void utc_dali_radian_cleanup(void)
 // Positive test case for constructors
 int UtcDaliRadianConstructors01(void)
 {
-  TestApplication application;
-
   // Default constructor, does not initialise the value
   Radian radian0( 0.0f );
 
@@ -48,8 +46,6 @@ int UtcDaliRadianConstructors01(void)
 // Positive test case for comparison
 int UtcDaliRadianComparison01(void)
 {
-  TestApplication application;
-
   // Comparison between radians
   Radian radian0( Math::PI_2 );
   Radian radian1( Math::PI_2 );
@@ -79,8 +75,6 @@ int UtcDaliRadianComparison01(void)
 // test case for cast operators
 int UtcDaliRadianCastOperators01(void)
 {
-  TestApplication application;  // Exceptions require TestApplication
-
   Radian radian0( Math::PI );
 
   const float& value0( radian0.radian );
@@ -100,8 +94,6 @@ int UtcDaliRadianCastOperators01(void)
 
 int UtcDaliRadianCastOperatorEquals(void)
 {
-  TestApplication application;
-
   Radian a(Math::PI_2);
   Radian b(Math::PI_2);
   Radian c(Math::PI);
@@ -115,8 +107,6 @@ int UtcDaliRadianCastOperatorEquals(void)
 
 int UtcDaliRadianCastOperatorNotEquals(void)
 {
-  TestApplication application;
-
   Radian a(Math::PI_2);
   Radian b(Math::PI_2);
   Radian c(Math::PI);
@@ -130,8 +120,6 @@ int UtcDaliRadianCastOperatorNotEquals(void)
 
 int UtcDaliRadianCastOperatorLessThan(void)
 {
-  TestApplication application;
-
   Radian a(Math::PI_4);
   Radian b(Math::PI_2);
   Radian c(Math::PI);

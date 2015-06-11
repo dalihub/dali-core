@@ -84,7 +84,7 @@ void DALI_TEST_EQUALS( const Matrix3& matrix1, const Matrix3& matrix2, const cha
 
   for (int i=0;i<9;++i)
   {
-    equivalent &= (m1[i] != m2[i]);
+    equivalent &= (fabsf(m1[i] - m2[i])< GetRangedEpsilon(m1[i], m2[i]));
   }
 
   if (!equivalent)
