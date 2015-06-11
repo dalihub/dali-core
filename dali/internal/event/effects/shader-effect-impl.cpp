@@ -199,10 +199,16 @@ ShaderEffectPtr ShaderEffect::New( Dali::ShaderEffect::GeometryHints hints )
 {
   Stage* stage = Stage::GetCurrent();
 
-  ShaderEffectPtr shaderEffect( new ShaderEffect( *stage, hints ) );
-  shaderEffect->RegisterObject();
-
-  return shaderEffect;
+  if( stage )
+  {
+    ShaderEffectPtr shaderEffect( new ShaderEffect( *stage, hints ) );
+    shaderEffect->RegisterObject();
+    return shaderEffect;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 ShaderEffect::ShaderEffect( EventThreadServices& eventThreadServices, Dali::ShaderEffect::GeometryHints hints )

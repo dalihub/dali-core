@@ -90,20 +90,27 @@ AnimationPtr Animation::New(float durationSeconds)
 {
   Stage* stage = Stage::GetCurrent();
 
-  AnimationPlaylist& playlist = stage->GetAnimationPlaylist();
-
-  if( durationSeconds < 0.0f )
+  if( stage )
   {
-    DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
-    durationSeconds = 0.0f;
+    AnimationPlaylist& playlist = stage->GetAnimationPlaylist();
+
+    if( durationSeconds < 0.0f )
+    {
+      DALI_LOG_WARNING("duration should be greater than 0.0f.\n");
+      durationSeconds = 0.0f;
+    }
+
+    AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION );
+
+    // Second-phase construction
+    animation->Initialize();
+
+    return animation;
   }
-
-  AnimationPtr animation = new Animation( *stage, playlist, durationSeconds, DEFAULT_END_ACTION, DEFAULT_DISCONNECT_ACTION, DEFAULT_ALPHA_FUNCTION );
-
-  // Second-phase construction
-  animation->Initialize();
-
-  return animation;
+  else
+  {
+    return NULL;
+  }
 }
 
 Animation::Animation( EventThreadServices& eventThreadServices, AnimationPlaylist& playlist, float durationSeconds, EndAction endAction, EndAction disconnectAction, AlphaFunction defaultAlpha )
