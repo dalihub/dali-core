@@ -1,23 +1,31 @@
-SET(PKG_NAME "dali-internal")
+SET(PKG_NAME "dali-devel")
 
 SET(EXEC_NAME "tct-${PKG_NAME}-core")
 SET(RPM_NAME "core-${PKG_NAME}-tests")
 
-SET(CAPI_LIB "dali-internal")
+SET(CAPI_LIB "dali-devel")
 
 SET(TC_SOURCES
-        utc-Dali-Internal-Handles.cpp
-        utc-Dali-Internal-ImageFactory.cpp
-        utc-Dali-Internal-Mesh.cpp
-        utc-Dali-Internal-ResourceClient.cpp
-        utc-Dali-Internal-Image-Culling.cpp
-        utc-Dali-Internal-FixedSizeMemoryPool.cpp
-        utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
-        utc-Dali-Internal-RelayoutController.cpp
+        utc-Dali-Atlas.cpp
+        utc-Dali-AnimatableMesh.cpp
+        utc-Dali-Context.cpp
+        utc-Dali-Constrainer.cpp
+        utc-Dali-DistanceField.cpp
+        utc-Dali-DynamicsBodyConfig.cpp
+        utc-Dali-DynamicsShape.cpp
+        utc-Dali-DynamicsWorld.cpp
+        utc-Dali-DynamicsWorldConfig.cpp
+        utc-Dali-Hash.cpp
+        utc-Dali-HitTestAlgorithm.cpp
+        utc-Dali-Material.cpp
+        utc-Dali-MeshActor.cpp
+        utc-Dali-MeshData.cpp
+        utc-Dali-Mutex.cpp
+        utc-Dali-Scripting.cpp
 )
 
 LIST(APPEND TC_SOURCES
-        ../dali-devel/mesh-builder.cpp
+        mesh-builder.cpp
         ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
         ../dali/dali-test-suite-utils/test-application.cpp
@@ -46,12 +54,12 @@ INCLUDE_DIRECTORIES(
     .
     ${${CAPI_LIB}_INCLUDE_DIRS}
     ../dali/dali-test-suite-utils
-    ../dali-devel
 )
 
 ADD_EXECUTABLE(${EXEC_NAME} ${EXEC_NAME}.cpp ${TC_SOURCES})
 TARGET_LINK_LIBRARIES(${EXEC_NAME}
     ${${CAPI_LIB}_LIBRARIES}
+    -lpthread
 )
 
 INSTALL(PROGRAMS ${EXEC_NAME}

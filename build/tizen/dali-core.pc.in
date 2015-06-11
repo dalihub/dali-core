@@ -9,4 +9,4 @@ Description: 3D Canvas Toolkit using OpenGLES
 Version: ${apiversion}
 Requires:
 Libs: -L${libdir} -ldali-core
-Cflags: -I${includedir}
+Cflags: -I${includedir} @DALI_DYNAMICS_SUPPORT@

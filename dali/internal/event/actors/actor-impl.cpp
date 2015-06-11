@@ -53,7 +53,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/integration-api/debug.h>
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
 #include <dali/internal/event/dynamics/dynamics-body-impl.h>
 #include <dali/internal/event/dynamics/dynamics-joint-impl.h>
@@ -149,7 +149,7 @@ struct Actor::RelayoutData
   bool insideRelayout :1;                    ///< Locking flag to prevent recursive relayouts on size set
 };
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 
 // Encapsulate actor related dynamics data
 struct DynamicsData
@@ -169,7 +169,7 @@ struct DynamicsData
   SlotDelegate< Actor > slotDelegate;
 };
 
-#endif // DYNAMICS_SUPPORT
+#endif // DALI_DYNAMICS_SUPPORT
 
 namespace // unnamed namespace
 {
@@ -1446,7 +1446,7 @@ bool Actor::RelayoutRequired( Dimension::Type dimension ) const
   return mRelayoutData->relayoutEnabled && IsLayoutDirty( dimension );
 }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 
 //--------------- Dynamics ---------------
 
@@ -1822,7 +1822,7 @@ void Actor::DisconnectDynamics()
   }
 }
 
-#endif // DYNAMICS_SUPPORT
+#endif // DALI_DYNAMICS_SUPPORT
 
 void Actor::SetOverlay( bool enable )
 {
@@ -2274,7 +2274,7 @@ Actor::Actor( DerivedType derivedType )
   mParentOrigin( NULL ),
   mAnchorPoint( NULL ),
   mRelayoutData( NULL ),
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   mDynamicsData( NULL ),
 #endif
   mGestureData( NULL ),
@@ -2343,7 +2343,7 @@ Actor::~Actor()
     GetEventThreadServices().UnregisterObject( this );
   }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   // Cleanup dynamics
   delete mDynamicsData;
 #endif
@@ -2430,7 +2430,7 @@ void Actor::ConnectToSceneGraph( int index )
     mAttachment->Connect();
   }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   // Notify dynamics
   if( NULL != mDynamicsData )
   {
@@ -2527,7 +2527,7 @@ void Actor::DisconnectFromSceneGraph()
     mAttachment->Disconnect();
   }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   // Notify dynamics
   if( NULL != mDynamicsData )
   {

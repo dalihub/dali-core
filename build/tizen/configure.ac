@@ -74,19 +74,19 @@ if test "x$enable_emscripten" = "xyes"; then
   enable_backtrace="no"
 fi
 
-DYNAMICS_SUPPORT=
+DALI_DYNAMICS_SUPPORT=
 if test "x$dynamics_support" = "xyes"; then
-  DALI_CFLAGS="$DALI_CFLAGS -DDYNAMICS_SUPPORT"
-  DYNAMICS_SUPPORT=-DDYNAMICS_SUPPORT
+  DALI_CFLAGS="$DALI_CFLAGS -DDALI_DYNAMICS_SUPPORT"
+  DALI_DYNAMICS_SUPPORT=-DDALI_DYNAMICS_SUPPORT
 fi
-AC_SUBST(DYNAMICS_SUPPORT)
+AC_SUBST(DALI_DYNAMICS_SUPPORT)
 
 # Must come after Emscripten feature test
 if test "x$enable_backtrace" = "xyes"; then
   DALI_CFLAGS="$DALI_CFLAGS -DBACKTRACE_ENABLED"
 fi
 
-AM_CONDITIONAL([DYNAMICS_SUPPORT], [test x$dynamics_support = xyes])
+AM_CONDITIONAL([DALI_DYNAMICS_SUPPORT], [test x$dynamics_support = xyes])
 
 if test x$DALI_DATA_RW_DIR != x; then
   dataReadWriteDir=$DALI_DATA_RW_DIR
@@ -116,8 +116,6 @@ AC_CONFIG_FILES([
  Makefile
  dali-core/Makefile
  dali-core.pc
- ../../automated-tests/CMakeLists.txt
- ../../automated-tests/src/dali/CMakeLists.txt
 ])
 
 AC_OUTPUT
