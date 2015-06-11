@@ -102,17 +102,18 @@ public:
 // compiler generated destructor, copy constructor and assignment operators are ok as this class is POD
 
 // useful constant angles
-static const Radian ANGLE_360 = Radian( Math::PI * 2.00f ); ///< 360 degree turn in radians
-static const Radian ANGLE_315 = Radian( Math::PI * 1.75f ); ///< 315 degree turn in radians
-static const Radian ANGLE_270 = Radian( Math::PI * 1.50f  );///< 270 degree turn in radians
-static const Radian ANGLE_225 = Radian( Math::PI * 1.25f ); ///< 225 degree turn in radians
-static const Radian ANGLE_180 = Radian( Math::PI         ); ///< 180 degree turn in radians
-static const Radian ANGLE_135 = Radian( Math::PI * 0.75f ); ///< 135 degree turn in radians
-static const Radian ANGLE_120 = Radian( Math::PI / 3.00f ); ///< 120 degree turn in radians
-static const Radian ANGLE_90  = Radian( Math::PI_2 );       ///< 90 degree turn in radians
-static const Radian ANGLE_45  = Radian( Math::PI_4 );       ///< 45 degree turn in radians
-static const Radian ANGLE_30  = Radian( Math::PI / 6.00f ); ///< 30 degree turn in radians
-static const Radian ANGLE_0   = Radian( 0.0f );             ///< 0 degree turn in radians
+static const Radian ANGLE_360 = Radian( Math::PI * 2.f     ); ///< 360 degree turn in radians
+static const Radian ANGLE_315 = Radian( Math::PI * 1.75f   ); ///< 315 degree turn in radians
+static const Radian ANGLE_270 = Radian( Math::PI * 1.50f   ); ///< 270 degree turn in radians
+static const Radian ANGLE_225 = Radian( Math::PI * 1.25f   ); ///< 225 degree turn in radians
+static const Radian ANGLE_180 = Radian( Math::PI           ); ///< 180 degree turn in radians
+static const Radian ANGLE_135 = Radian( Math::PI * 0.75f   ); ///< 135 degree turn in radians
+static const Radian ANGLE_120 = Radian( Math::PI * 2.f/3.f ); ///< 120 degree turn in radians
+static const Radian ANGLE_90  = Radian( Math::PI_2         ); ///< 90 degree turn in radians
+static const Radian ANGLE_45  = Radian( Math::PI_4         ); ///< 45 degree turn in radians
+static const Radian ANGLE_60  = Radian( Math::PI / 3.f     ); ///< 60 degree turn in radians
+static const Radian ANGLE_30  = Radian( Math::PI / 6.f     ); ///< 30 degree turn in radians
+static const Radian ANGLE_0   = Radian( 0.0f               ); ///< 0 degree turn in radians
 
 /**
  * @brief Compare equality between two radians.
