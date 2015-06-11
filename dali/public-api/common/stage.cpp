@@ -122,8 +122,10 @@ Vector2 Stage::GetDpi() const
 
 ObjectRegistry Stage::GetObjectRegistry() const
 {
-  Internal::ObjectRegistry& internal = Internal::Stage::GetCurrent()->GetObjectRegistry();
+  Internal::Stage* stage = Internal::Stage::GetCurrent();
+  DALI_ASSERT_ALWAYS( stage && "GetObjectRegistry() : Stage is null" );
 
+  Internal::ObjectRegistry& internal = stage->GetObjectRegistry();
   return ObjectRegistry(&internal);
 }
 
