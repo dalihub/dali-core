@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/math/rect.h>
+#include <dali/internal/common/shader-saver.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
@@ -39,6 +40,7 @@ namespace Internal
 {
 class Context;
 class ProgramCache;
+class ShaderSaver;
 
 namespace SceneGraph
 {
@@ -99,7 +101,15 @@ public:
    * Dispatch requests onto the postProcessResourcesQueue
    * @param[in] request The request to dispatch
    */
-  virtual void DispatchPostProcessRequest(ResourcePostProcessRequest& request);
+  virtual void DispatchPostProcessRequest( ResourcePostProcessRequest& request );
+
+  /**
+   * Set the upstream interface for compiled shader binaries to be sent back to for eventual
+   * caching and saving.
+   * @param[in] upstream The abstract interface to send any received ShaderDatas onwards to..
+   * @note This should be called during core initialisation if shader binaries are to be used.
+   */
+  void SetShaderSaver( ShaderSaver& upstream );
 
   /**
    * Retrieve the render instructions; these should be set during each "update" traversal.

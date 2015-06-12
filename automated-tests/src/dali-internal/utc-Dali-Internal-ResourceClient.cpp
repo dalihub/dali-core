@@ -801,57 +801,6 @@ int UtcDaliInternalRequestResourceTicket02(void)
   END_TEST;
 }
 
-int UtcDaliInternalLoadShaderRequest01(void)
-{
-  TestApplication application;
-  tet_infoline("Testing LoadShader() success");
-  testTicketObserver.Reset();
-
-  // Clear through all of the outstanding shader load requests from the default shader effect
-  std::vector< unsigned char > buffer;
-  for( int i=0; i<10; i++ )
-  {
-    buffer.push_back((unsigned char)i);
-  }
-  application.GetPlatform().SetLoadFileResult( true, buffer );
-  application.GetGlAbstraction().SetLinkStatus(1);
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process load shader request (immediately)
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-  application.Render();
-  application.SendNotification();
-
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-
-  Integration::ShaderResourceType shaderRequest(123, "vertex src", "frag src");
-  std::string shaderBinaryFile("shader.bin");
-  Internal::ResourceTicketPtr ticket = resourceClient.LoadShader(shaderRequest, shaderBinaryFile);
-  DALI_TEST_CHECK( ticket );
-
-  application.GetPlatform().SetLoadFileResult( true, buffer );
-  application.GetGlAbstraction().EnableShaderCallTrace( true );
-  application.GetGlAbstraction().SetLinkStatus(1);
-
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process load shader request (immediately)
-
-  application.SendNotification();
-  application.Render();
-
-  application.SendNotification();
-  application.Render();
-
-  // If shader program loads OK, we shouldn't see any calls to CompileShader or SaveResource
-  TraceCallStack& shaderTrace = application.GetGlAbstraction().GetShaderTrace();
-  DALI_TEST_CHECK( ! shaderTrace.FindMethod("CompileShader") );
-
-  // Ensure no request sent to platform abstraction
-  DALI_TEST_CHECK( ! application.GetPlatform().WasCalled(TestPlatformAbstraction::SaveResourceFunc ) );
-  END_TEST;
-}
-
 int UtcDaliInternalAllocateBitmapImage01(void)
 {
   TestApplication application;

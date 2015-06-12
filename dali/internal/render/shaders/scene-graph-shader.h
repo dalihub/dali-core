@@ -48,7 +48,6 @@ typedef unsigned int ResourceId;
 namespace Internal
 {
 
-class ProgramController;
 class Program;
 
 namespace SceneGraph
@@ -238,15 +237,26 @@ public:
   void SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::UniformCoordinateType type );
 
   /**
-   * @brief Set the program for a geometry type.
+   * @brief Set the program for this shader.
    * @param[in] resourceId        The resource ID for the program.
-   * @param[in] shaderData        The program's vertex/fragment source and optionally compiled bytecode
-   * @param[in] programCache      Owner of the Programs
+   * @param[in] shaderData        The program's vertex/fragment source and optionally precompiled shader binary.
+   * @param[in] programCache      Owner of the Programs.
    * @param[in] modifiesGeometry  True if the vertex shader changes the positions of vertexes such that
    * they might exceed the bounding box of vertexes passing through the default transformation.
    */
   void SetProgram( Integration::ResourceId resourceId,
                    Integration::ShaderDataPtr shaderData,
+                   ProgramCache* programCache,
+                   bool modifiesGeometry );
+
+  /**
+   * @brief Set the program for this shader.
+   * @param[in] shaderData        The program's vertex/fragment source and optionally precompiled shader binary.
+   * @param[in] programCache      Owner of the Programs.
+   * @param[in] modifiesGeometry  True if the vertex shader changes the positions of vertexes such that
+   * they might exceed the bounding box of vertexes passing through the default transformation.
+   */
+  void SetProgram( Integration::ShaderDataPtr shaderData,
                    ProgramCache* programCache,
                    bool modifiesGeometry );
 

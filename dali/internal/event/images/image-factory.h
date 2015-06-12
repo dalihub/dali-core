@@ -20,7 +20,6 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/internal/event/resources/resource-type-path-id-map.h>
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/images/context-recovery-interface.h>
 #include <dali/internal/event/images/image-factory-cache.h>

@@ -69,10 +69,6 @@ typedef std::map<ResourceId, BitmapMetadata>     BitmapMetadataCache;
 typedef BitmapMetadataCache::iterator            BitmapMetadataIter;
 typedef std::pair<ResourceId, BitmapMetadata>    BitmapMetadataPair;
 
-typedef std::map<ResourceId, ShaderDataPtr>      ShaderCache;
-typedef ShaderCache::iterator                    ShaderCacheIter;
-typedef ShaderCache::size_type                   ShaderCacheSize;
-typedef std::pair<ResourceId, ShaderDataPtr>     ShaderDataPair;
 
 static inline bool RemoveId( LiveRequestContainer& container, ResourceId id )
 {
@@ -141,7 +137,6 @@ struct ResourceManager::ResourceManagerImpl
    * This is the resource cache. It's filled/emptied from within Core::Update()
    */
   BitmapMetadataCache mBitmapMetadata;
-  ShaderCache         mShaders;
 };
 
 ResourceManager::ResourceManager( PlatformAbstraction& platformAbstraction,
@@ -339,30 +334,6 @@ void ResourceManager::HandleAllocateTextureRequest( ResourceId id, unsigned int 
   mImpl->mTextureCacheDispatcher.DispatchCreateTexture( id, width, height, pixelFormat, true /* true = clear the texture */ );
 }
 
-void ResourceManager::HandleLoadShaderRequest( ResourceId id, const ResourceTypePath& typePath )
-{
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleLoadShaderRequest(id:%u, path:%s)\n", id, typePath.path.c_str());
-
-  const ShaderResourceType* shaderType = dynamic_cast<const ShaderResourceType*>(typePath.type);
-  DALI_ASSERT_DEBUG(shaderType);
-
-  if( shaderType )
-  {
-    ShaderDataPtr shaderData(new ShaderData(shaderType->vertexShader, shaderType->fragmentShader));
-
-    mImpl->mPlatformAbstraction.LoadShaderBinFile(typePath.path, shaderData->GetBuffer());
-
-    // Add the ID to the completed set
-    mImpl->newCompleteRequests.insert(id);
-
-    // Cache the resource
-    mImpl->mShaders.insert(ShaderDataPair(id, shaderData));
-
-    // Let NotificationManager know that the resource manager needs to do some processing
-    NotifyTickets();
-  }
-}
-
 void ResourceManager::HandleUpdateBitmapAreaRequest( ResourceId textureId, const RectArea& area )
 {
   if( textureId )
@@ -457,11 +428,6 @@ void ResourceManager::HandleSaveResourceRequest( ResourceId id, const ResourceTy
       }
       case ResourceTargetImage:
       {
-        break;
-      }
-      case ResourceShader:
-      {
-        resource = GetShaderData(id);
         break;
       }
 
@@ -621,17 +587,6 @@ BitmapMetadata ResourceManager::GetBitmapMetadata(ResourceId id)
   return metadata;
 }
 
-ShaderDataPtr ResourceManager::GetShaderData(ResourceId id)
-{
-  ShaderDataPtr shaderData;
-  ShaderCacheIter iter = mImpl->mShaders.find(id);
-  if(iter != mImpl->mShaders.end())
-  {
-    shaderData = iter->second;
-  }
-  return shaderData;
-}
-
 /********************************************************************************
  ************************* ResourceCache Implementation  ************************
  ********************************************************************************/
@@ -710,13 +665,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
       {
         break;
       }
-
-      case ResourceShader:
-      {
-        mImpl->mShaders.insert(ShaderDataPair(id, static_cast<ShaderData*>(resource.Get())));
-        break;
-      }
-
     }
 
     // Let ResourceClient know that the resource manager has loaded something that its clients might want to hear about:
@@ -865,15 +813,6 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
       case ResourceNativeImage:
       case ResourceTargetImage:
         break;
-
-      case ResourceShader:
-      {
-        ShaderCacheIter shaderIter = mImpl->mShaders.find(iter->first);
-        DALI_ASSERT_DEBUG( mImpl->mShaders.end() != shaderIter );
-        // shader data is owned through intrusive pointers so no need for discard queue
-        mImpl->mShaders.erase( shaderIter );
-        break;
-      }
     }
 
     // Erase the item and increment the iterator

@@ -121,14 +121,6 @@ public:
                                     Integration::LoadResourcePriority priority = Integration::LoadPriorityNormal );
 
   /**
-   * Load a shader program from a file
-   * @param[in] type     A ResourceType specialization describing a shader program resource
-   * @param[in] filename The file's full path/file name
-   * @return             A ref-counted request object. Keep a copy until the resource is no longer required.
-   */
-  ResourceTicketPtr LoadShader(Integration::ShaderResourceType& type, const std::string& filename);
-
-  /**
    * Request reloading a resource from the native filesystem.
    * If the resource is still loading, this request is ignored.
    * The ticket observer will be notified of completion with ResourceLoadingSucceeded() or
@@ -143,7 +135,7 @@ public:
 
   /**
    * Save a resource to the given url.
-   * If the resource type is saveable (model or shader), then the ticket observer will get
+   * If the resource type is saveable (model), then the ticket observer will get
    * notified with ResourceSavingSucceeded() or ResourceSavingFailed(), otherwise there
    * will be no response.
    * @param[in] ticket The ticket of the resource to save

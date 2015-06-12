@@ -119,7 +119,6 @@ ResourceTicketPtr ResourceClient::RequestResource(
       break;
     }
     case ResourceTargetImage:
-    case ResourceShader:
     {
       newTicket = new ResourceTicket(*this, newId, typePath);
       break;
@@ -165,7 +164,6 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       // FALLTHROUGH:
       case ResourceNativeImage:
       case ResourceTargetImage:
-      case ResourceShader:
       {
         DALI_LOG_ERROR( "Unsupported resource type passed for decoding from a memory buffer." );
       }
@@ -179,24 +177,6 @@ ResourceTicketPtr ResourceClient::DecodeResource(
       RequestDecodeResourceMessage( mEventThreadServices, mResourceManager, newId, typePath, buffer, priority );
     }
   }
-  return newTicket;
-}
-
-ResourceTicketPtr ResourceClient::LoadShader( ShaderResourceType& type,
-                                              const std::string& path )
-{
-  ResourceTicketPtr newTicket;
-
-  const ResourceId newId = ++(mImpl->mNextId);
-
-  ResourceTypePath typePath(type, path);
-  newTicket = new ResourceTicket(*this, newId, typePath);
-
-  mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
-
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: LoadShader(path:%s) newId:%u\n", path.c_str(), newId);
-
-  RequestLoadShaderMessage( mEventThreadServices, mResourceManager, newId, typePath );
   return newTicket;
 }
 

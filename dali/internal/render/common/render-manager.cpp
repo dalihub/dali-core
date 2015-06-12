@@ -102,7 +102,7 @@ struct RenderManager::Impl
     renderersAdded( false ),
     firstRenderCompleted( false ),
     defaultShader( NULL ),
-    programController( postProcessDispatcher, glAbstraction )
+    programController( glAbstraction )
   {
   }
 
@@ -230,6 +230,11 @@ void RenderManager::ContextDestroyed()
 void RenderManager::DispatchPostProcessRequest(ResourcePostProcessRequest& request)
 {
   mImpl->resourcePostProcessQueue[ mImpl->renderBufferIndex ].push_back( request );
+}
+
+void RenderManager::SetShaderSaver( ShaderSaver& upstream )
+{
+  mImpl->programController.SetShaderSaver( upstream );
 }
 
 RenderInstructionContainer& RenderManager::GetRenderInstructionContainer()

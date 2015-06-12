@@ -486,6 +486,7 @@ Program::~Program()
 void Program::Load()
 {
   DALI_ASSERT_ALWAYS( NULL != mProgramData.Get() && "Program data is not initialized" );
+  DALI_ASSERT_DEBUG( mProgramId == 0 && "mProgramId != 0, so about to leak a GL resource by overwriting it." );
 
   LOG_GL( "CreateProgram()\n" );
   mProgramId = CHECK_GL( mGlAbstraction, mGlAbstraction.CreateProgram() );
@@ -527,6 +528,7 @@ void Program::Load()
     else
     {
       mLinked = true;
+      DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "Reused binary.\n" );
     }
   }
 
@@ -544,6 +546,7 @@ void Program::Load()
         {
           GLint  binaryLength = 0;
           GLenum binaryFormat;
+          DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "Compiled and linked.\n\nVS:\n%s\nFS:\n%s\n", mProgramData->GetVertexShader(), mProgramData->GetFragmentShader() );
 
           CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramiv(mProgramId, GL_PROGRAM_BINARY_LENGTH_OES, &binaryLength) );
           DALI_LOG_INFO(Debug::Filter::gShader, Debug::General, "Program::Load() - GL_PROGRAM_BINARY_LENGTH_OES: %d\n", binaryLength);
@@ -554,6 +557,7 @@ void Program::Load()
             // Copy the bytecode to ShaderData
             CHECK_GL( mGlAbstraction, mGlAbstraction.GetProgramBinary(mProgramId, binaryLength, NULL, &binaryFormat, mProgramData->GetBufferData()) );
             mCache.StoreBinary( mProgramData );
+            DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "Saved binary.\n" );
           }
         }
       }

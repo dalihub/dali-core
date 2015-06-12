@@ -214,6 +214,16 @@ void Shader::SetProgram( Integration::ResourceId resourceId,
   // The program cache owns the Program object so we don't need to worry here.
 }
 
+void Shader::SetProgram( Integration::ShaderDataPtr shaderData,
+                         ProgramCache* programCache,
+                         bool modifiesGeometry )
+{
+  DALI_LOG_TRACE_METHOD_FMT( Debug::Filter::gShader, "%d\n", shaderData->GetHashValue() );
+
+  mProgram = Program::New( *programCache, shaderData, modifiesGeometry );
+  // The program cache owns the Program object so we don't need to worry about this raw allocation here.
+}
+
 Program* Shader::GetProgram()
 {
   return mProgram;

@@ -31,13 +31,12 @@
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/integration-api/resource-cache.h>
-#include <dali/integration-api/shader-data.h>
 
 #include <dali/internal/common/message.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/common/thread-local-storage.h>
+#include <dali/internal/event/resources/resource-type-path.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
-#include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/update/resources/bitmap-metadata.h>
 
@@ -239,14 +238,6 @@ public: // Used by ResourceClient
    */
   void HandleAllocateTextureRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat );
 
-
-  /**
-   * Load a shader program from a file
-   * @param[in] id The resource id
-   * @param[in] typePath The type & path of the resource
-   */
-  void HandleLoadShaderRequest(ResourceId id, const ResourceTypePath& typePath );
-
   /**
    * Update bitmap area request
    * @param[in] textureId The resource ID of a bitmap-texture to remove.
@@ -323,14 +314,7 @@ public: // Used by ResourceClient
    */
   BitmapMetadata GetBitmapMetadata(ResourceId id);
 
-  /**
-   * Returns the shader resource corresponding to the Id
-   * @param[in] id - the id of a shader binary resource.
-   * @return the shader binary resource data or NULL if it has not been loaded.
-   */
-  Integration::ShaderDataPtr GetShaderData(ResourceId id);
-
-  /********************************************************************************
+    /********************************************************************************
    ************************* ResourceCache Implementation  ************************
    ********************************************************************************/
 public:
@@ -501,21 +485,6 @@ inline void RequestAllocateTextureMessage( EventThreadServices& eventThreadServi
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleAllocateTextureRequest, id, width, height, pixelFormat );
-}
-
-
-inline void RequestLoadShaderMessage( EventThreadServices& eventThreadServices,
-                                      ResourceManager& manager,
-                                      ResourceId id,
-                                      const ResourceTypePath& typePath )
-{
-  typedef MessageValue2< ResourceManager, ResourceId, ResourceTypePath > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleLoadShaderRequest, id, typePath );
 }
 
 inline void RequestUpdateBitmapAreaMessage( EventThreadServices& eventThreadServices,

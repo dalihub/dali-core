@@ -34,6 +34,7 @@
 #include <dali/internal/event/common/notification-manager.h>
 #include <dali/internal/event/common/property-notification-impl.h>
 #include <dali/internal/event/common/property-notifier.h>
+#include <dali/internal/event/effects/shader-factory.h>
 
 #include <dali/internal/update/animation/scene-graph-animator.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
@@ -130,6 +131,9 @@ typedef OwnerContainer< Shader* >              ShaderContainer;
 typedef ShaderContainer::Iterator              ShaderIter;
 typedef ShaderContainer::ConstIterator         ShaderConstIter;
 
+typedef std::vector<Integration::ShaderDataPtr> ShaderDataBatchedQueue;
+typedef ShaderDataBatchedQueue::iterator        ShaderDataBatchedQueueIterator;
+
 typedef OwnerContainer<PanGesture*>            GestureContainer;
 typedef GestureContainer::Iterator             GestureIter;
 typedef GestureContainer::ConstIterator        GestureConstIter;
@@ -157,6 +161,7 @@ struct UpdateManager::Impl
     notificationManager( notificationManager ),
     animationFinishedNotifier( animationFinishedNotifier ),
     propertyNotifier( propertyNotifier ),
+    shaderSaver( NULL ),
     resourceManager( resourceManager ),
     discardQueue( discardQueue ),
     renderController( renderController ),
@@ -238,6 +243,7 @@ struct UpdateManager::Impl
   NotificationManager&                notificationManager;           ///< Queues notification messages for the event-thread.
   CompleteNotificationInterface&      animationFinishedNotifier;     ///< Provides notification to applications when animations are finished.
   PropertyNotifier&                   propertyNotifier;              ///< Provides notification to applications when properties are modified.
+  ShaderSaver*                        shaderSaver;                   ///< Saves shader binaries.
   ResourceManager&                    resourceManager;               ///< resource manager
   DiscardQueue&                       discardQueue;                  ///< Nodes are added here when disconnected from the scene-graph.
   RenderController&                   renderController;              ///< render controller
@@ -275,6 +281,7 @@ struct UpdateManager::Impl
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
+  ShaderDataBatchedQueue              compiledShaders[2];            ///< Shaders compiled on Render thread are inserted here for update thread to pass on to event thread.
 
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
@@ -603,26 +610,26 @@ void UpdateManager::RemoveShader( Shader* shader )
 }
 
 void UpdateManager::SetShaderProgram( Shader* shader,
-                                      ResourceId resourceId, size_t shaderHash, bool modifiesGeometry )
+                                      Integration::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
-  DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, " - (id:%d hash:%d)\n", resourceId, shaderHash);
-
-  DALI_ASSERT_ALWAYS( NULL != shader && "shader is uninitialized" );
-
-  Integration::ShaderDataPtr shaderData( mImpl->resourceManager.GetShaderData(resourceId) );
   if( shaderData )
   {
-    shaderData->SetHashValue( shaderHash );
-    shaderData->SetResourceId( resourceId );
 
-    typedef MessageValue4< Shader, Integration::ResourceId, Integration::ShaderDataPtr, ProgramCache*, bool> DerivedType;
+    typedef MessageValue3< Shader, Integration::ShaderDataPtr, ProgramCache*, bool> DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( shader, &Shader::SetProgram, resourceId, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
+    new (slot) DerivedType( shader, &Shader::SetProgram, shaderData, mImpl->renderManager.GetProgramCache(), modifiesGeometry );
   }
+}
+
+void UpdateManager::SaveBinary( Integration::ShaderDataPtr shaderData )
+{
+  DALI_ASSERT_DEBUG( shaderData && "No NULL shader data pointers please." );
+  DALI_ASSERT_DEBUG( shaderData->GetBufferSize() > 0 && "Shader binary empty so nothing to save." );
+  mImpl->compiledShaders[mSceneGraphBuffers.GetUpdateBufferIndex() > 0 ? 0 : 1].push_back( shaderData );
 }
 
 RenderTaskList* UpdateManager::GetRenderTaskList( bool systemLevel )
@@ -907,6 +914,25 @@ void UpdateManager::ProcessPropertyNotifications()
   }
 }
 
+void UpdateManager::ForwardCompiledShadersToEventThread()
+{
+  DALI_ASSERT_DEBUG( (mImpl->shaderSaver != 0) && "shaderSaver should be wired-up during startup." );
+  if( mImpl->shaderSaver )
+  {
+    ShaderDataBatchedQueue& compiledShaders = mImpl->compiledShaders[mSceneGraphBuffers.GetUpdateBufferIndex()];
+    if( compiledShaders.size() > 0 )
+    {
+      ShaderSaver& factory = *mImpl->shaderSaver;
+      ShaderDataBatchedQueueIterator i   = compiledShaders.begin();
+      ShaderDataBatchedQueueIterator end = compiledShaders.end();
+      for( ; i != end; ++i )
+      {
+        mImpl->notificationManager.QueueMessage( ShaderCompiledMessage( factory, *i ) );
+      }
+    }
+  }
+}
+
 void UpdateManager::UpdateNodes()
 {
   mImpl->nodeDirtyFlags = NothingFlag;
@@ -982,6 +1008,9 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
 
   // 6) Post Process Ids of resources updated by renderer
   mImpl->resourceManager.PostProcessResources( bufferIndex );
+
+  // 6.1) Forward a batch of compiled shader programs to event thread for saving
+  ForwardCompiledShadersToEventThread();
 
   // Although the scene-graph may not require an update, we still need to synchronize double-buffered
   // renderer lists if the scene was updated in the previous frame.
@@ -1172,6 +1201,11 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
   {
     mImpl->systemLevelSortedLayers = layers;
   }
+}
+
+void UpdateManager::SetShaderSaver( ShaderSaver& upstream )
+{
+  mImpl->shaderSaver = &upstream;
 }
 
 } // namespace SceneGraph

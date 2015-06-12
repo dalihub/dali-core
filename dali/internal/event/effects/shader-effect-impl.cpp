@@ -292,14 +292,11 @@ void ShaderEffect::SendProgramMessage( const string& vertexSource, const string&
   ShaderFactory& shaderFactory = tls.GetShaderFactory();
   size_t shaderHash;
 
-  ResourceTicketPtr ticket( shaderFactory.Load(vertexSource, fragmentSource, shaderHash) );
-
-  DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(ticket.id:%d)\n", ticket->GetId() );
+  Integration::ShaderDataPtr shaderData = shaderFactory.Load( vertexSource, fragmentSource, shaderHash );
+  DALI_ASSERT_DEBUG( shaderHash != 0U );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, ticket->GetId(), shaderHash, modifiesGeometry );
-
-  mTickets.push_back(ticket);       // add ticket to collection to keep it alive.
+  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, shaderData, false );
 }
 
 void ShaderEffect::Connect()
