@@ -22,7 +22,6 @@
 #include <ostream>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/object/any.h>
 #include <dali/public-api/math/angle-axis.h>
 #include <dali/public-api/math/radian.h>
 #include <dali/public-api/math/vector2.h>
@@ -40,204 +39,281 @@
 namespace Dali
 {
 
+namespace
+{
+/**
+ * Helper to check if the property value can be read as int/unsigned int/bool
+ */
+inline bool IsIntegerType( Property::Type type )
+{
+  return ( Property::BOOLEAN == type )||( Property::INTEGER == type )||(Property::UNSIGNED_INTEGER == type );
+}
+}
+
 struct Property::Value::Impl
 {
   Impl()
-  : mType( Property::NONE )
+  : type( Property::NONE ),
+    integerValue( 0 )
+  { }
+
+  Impl( bool booleanValue )
+  : type( Property::BOOLEAN ),
+    integerValue( booleanValue )
+  { }
+
+  Impl( float floatValue )
+  : type( Property::FLOAT ),
+    floatValue( floatValue )
+  { }
+
+  Impl( int integerValue )
+  : type( Property::INTEGER ),
+    integerValue( integerValue )
+  { }
+
+  Impl( unsigned int unsignedIntegerValue )
+  : type( Property::UNSIGNED_INTEGER ),
+    unsignedIntegerValue( unsignedIntegerValue )
+  { }
+
+  Impl( const Vector2& vectorValue )
+  : type( Property::VECTOR2 ),
+    vector2Value( new Vector2( vectorValue ) )
+  { }
+
+  Impl( const Vector3& vectorValue )
+  : type( Property::VECTOR3 ),
+    vector3Value( new Vector3( vectorValue ) )
+  { }
+
+  Impl( const Vector4& vectorValue )
+  : type( Property::VECTOR4 ),
+    vector4Value( new Vector4( vectorValue ) )
+  { }
+
+  Impl( const Matrix3& matrixValue )
+  : type( Property::MATRIX3 ),
+    matrix3Value( new Matrix3( matrixValue ) )
   {
   }
 
-  Impl(bool boolValue)
-  : mType( PropertyTypes::Get<bool>() ),
-    mValue( boolValue )
+  Impl( const Matrix& matrixValue )
+  : type( Property::MATRIX ),
+    matrixValue( new Matrix( matrixValue ) )
   {
   }
 
-  Impl(float floatValue)
-  : mType( PropertyTypes::Get<float>() ),
-    mValue( floatValue )
+  Impl( const AngleAxis& angleAxisValue )
+  : type( Property::ROTATION ),
+    quaternionValue( new Quaternion( angleAxisValue.angle, angleAxisValue.axis ) )
   {
   }
 
-  Impl(int integerValue)
-  : mType( PropertyTypes::Get<int>() ),
-    mValue( integerValue )
-  {
-  }
-
-  Impl(unsigned int unsignedIntegerValue)
-  : mType( PropertyTypes::Get<unsigned int>() ),
-    mValue( unsignedIntegerValue )
-  {
-  }
-
-  Impl(const Vector2& vectorValue)
-  : mType( PropertyTypes::Get<Vector2>() ),
-    mValue( vectorValue )
-  {
-  }
-
-  Impl(const Vector3& vectorValue)
-  : mType( PropertyTypes::Get<Vector3>() ),
-    mValue( vectorValue )
-  {
-  }
-
-  Impl(const Vector4& vectorValue)
-  : mType( PropertyTypes::Get<Vector4>() ),
-    mValue( vectorValue )
-  {
-  }
-
-  Impl(const Matrix3& matrixValue)
-  : mType(PropertyTypes::Get<Matrix3>()),
-    mValue(matrixValue)
-  {
-  }
-
-  Impl(const Matrix& matrixValue)
-  : mType(PropertyTypes::Get<Matrix>()),
-    mValue(matrixValue)
-  {
-  }
-
-  Impl(const AngleAxis& angleAxisValue)
-  : mType( PropertyTypes::Get<AngleAxis>() ),
-    mValue( angleAxisValue )
-  {
-  }
-
-  Impl(const Quaternion& quaternionValue)
-  : mType( PropertyTypes::Get<Quaternion>() ),
-    mValue( quaternionValue )
+  Impl( const Quaternion& quaternionValue )
+  : type( Property::ROTATION ),
+    quaternionValue( new Quaternion( quaternionValue ) )
   {
   }
 
   Impl(const std::string& stringValue)
-    : mType( PropertyTypes::Get<std::string>() ),
-      mValue( stringValue )
+  : type( Property::STRING ),
+    stringValue( new std::string( stringValue ) )
   {
   }
 
-  Impl(const Rect<int>& rect)
-    : mType( PropertyTypes::Get<Rect<int> >() ),
-      mValue( rect )
+  Impl( const Rect<int>& rectValue )
+  : type( Property::RECTANGLE ),
+    rectValue( new Rect<int>( rectValue ) )
   {
   }
 
-  Impl(Property::Map container)
-    : mType( PropertyTypes::Get<Property::Map >() ),
-      mValue( container )
+  Impl( const Property::Array& arrayValue )
+  : type( Property::ARRAY ),
+    arrayValue( new Property::Array( arrayValue ) )
   {
   }
 
-  Impl(Property::Array container)
-    : mType( PropertyTypes::Get<Property::Array >() ),
-      mValue( container )
+  Impl( const Property::Map& mapValue )
+  : type( Property::MAP ),
+    mapValue( new Property::Map( mapValue ) )
   {
   }
 
-  Type mType;
+  /**
+   * Destructor, takes care of releasing the dynamically allocated types
+   */
+  ~Impl()
+  {
+    switch( type )
+    {
+      case Property::NONE :             // FALLTHROUGH
+      case Property::TYPE_COUNT :       // FALLTHROUGH
+      case Property::BOOLEAN :          // FALLTHROUGH
+      case Property::FLOAT :            // FALLTHROUGH
+      case Property::INTEGER :          // FALLTHROUGH
+      case Property::UNSIGNED_INTEGER :
+      {
+        break; // nothing to do
+      }
+      case Property::VECTOR2 :
+      {
+        delete vector2Value;
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        delete vector3Value;
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        delete vector4Value;
+        break;
+      }
+      case Property::MATRIX3:
+      {
+        delete matrix3Value;
+        break;
+      }
+      case Property::MATRIX:
+      {
+        delete matrixValue;
+        break;
+      }
+      case Property::RECTANGLE:
+      {
+        delete rectValue;
+        break;
+      }
+      case Property::ROTATION:
+      {
+        delete quaternionValue;
+        break;
+      }
+      case Property::STRING:
+      {
+        delete stringValue;
+        break;
+      }
+      case Property::ARRAY:
+      {
+        delete arrayValue;
+        break;
+      }
+      case Property::MAP:
+      {
+        delete mapValue;
+        break;
+      }
+    }
+  }
 
-  typedef Any AnyValue;
-  AnyValue mValue;
+public: // Data
+
+  Type type;
+  union
+  {
+    int integerValue;
+    float floatValue;
+    unsigned int unsignedIntegerValue;
+    // must use pointers for any class value pre c++ 11
+    Vector2* vector2Value;
+    Vector3* vector3Value;
+    Vector4* vector4Value;
+    Matrix3* matrix3Value;
+    Matrix* matrixValue;
+    Quaternion* quaternionValue;
+    std::string* stringValue;
+    Rect<int>* rectValue;
+    Property::Array* arrayValue;
+    Property::Map* mapValue;
+  };
 };
 
 Property::Value::Value()
 : mImpl( NULL )
 {
-  mImpl = new Impl();
 }
 
-Property::Value::Value(bool boolValue)
-: mImpl( NULL )
+Property::Value::Value( bool booleanValue )
+: mImpl( new Impl( booleanValue ) )
 {
-  mImpl = new Impl( boolValue );
 }
 
-Property::Value::Value(float floatValue)
-: mImpl( NULL )
+Property::Value::Value( float floatValue )
+: mImpl( new Impl( floatValue ) )
 {
-  mImpl = new Impl( floatValue );
 }
 
-Property::Value::Value(int integerValue)
-: mImpl( NULL )
+Property::Value::Value( int integerValue )
+: mImpl( new Impl( integerValue ) )
 {
-  mImpl = new Impl( integerValue );
 }
 
-Property::Value::Value(unsigned int unsignedIntegerValue)
-: mImpl( NULL )
+Property::Value::Value( unsigned int unsignedIntegerValue )
+: mImpl( new Impl( unsignedIntegerValue ) )
 {
-  mImpl = new Impl( unsignedIntegerValue );
 }
 
-Property::Value::Value(const Vector2& vectorValue)
-: mImpl( NULL )
+Property::Value::Value( const Vector2& vectorValue )
+: mImpl( new Impl( vectorValue ) )
 {
-  mImpl = new Impl( vectorValue );
 }
 
-Property::Value::Value(const Vector3& vectorValue)
-: mImpl( NULL )
+Property::Value::Value( const Vector3& vectorValue )
+: mImpl( new Impl( vectorValue ) )
 {
-  mImpl = new Impl( vectorValue );
 }
 
-Property::Value::Value(const Vector4& vectorValue)
-: mImpl( NULL )
+Property::Value::Value( const Vector4& vectorValue )
+: mImpl( new Impl( vectorValue ) )
 {
-  mImpl = new Impl( vectorValue );
 }
 
-Property::Value::Value(const Matrix3& matrixValue)
-: mImpl( NULL )
+Property::Value::Value( const Matrix3& matrixValue )
+: mImpl( new Impl( matrixValue ) )
 {
-  mImpl = new Impl( matrixValue );
 }
 
-Property::Value::Value(const Matrix& matrixValue)
-: mImpl( NULL )
+Property::Value::Value( const Matrix& matrixValue )
+: mImpl( new Impl( matrixValue ) )
 {
-  mImpl = new Impl( matrixValue );
 }
 
-Property::Value::Value(const Rect<int>& rect)
-: mImpl( NULL )
+Property::Value::Value( const Rect<int>& rectValue )
+: mImpl( new Impl( rectValue ) )
 {
-  mImpl = new Impl( rect );
 }
 
-Property::Value::Value(const AngleAxis& angleAxisValue)
-: mImpl( NULL )
+Property::Value::Value( const AngleAxis& angleAxisValue )
+: mImpl( new Impl( angleAxisValue ) )
 {
-  mImpl = new Impl( angleAxisValue );
 }
 
-Property::Value::Value(const Quaternion& quaternionValue)
+Property::Value::Value( const Quaternion& quaternionValue )
+: mImpl( new Impl( quaternionValue ) )
 {
-  mImpl = new Impl( quaternionValue );
 }
 
-Property::Value::Value(const std::string& stringValue)
+Property::Value::Value( const std::string& stringValue )
+: mImpl( new Impl( stringValue ) )
 {
-  mImpl = new Impl( stringValue );
 }
 
-Property::Value::Value(const char *stringValue)
+Property::Value::Value( const char* stringValue )
+: mImpl( new Impl( std::string(stringValue) ) )
 {
-  mImpl = new Impl( std::string(stringValue) );
 }
 
-Property::Value::Value(Property::Array &arrayValue)
+Property::Value::Value( Property::Array& arrayValue )
+: mImpl( new Impl( arrayValue ) )
 {
-  mImpl = new Impl( arrayValue );
 }
 
-Property::Value::Value(Property::Map &mapValue)
+Property::Value::Value( Property::Map& mapValue )
+: mImpl( new Impl( mapValue ) )
 {
-  mImpl = new Impl( mapValue );
 }
 
 
@@ -246,115 +322,14 @@ Property::Value::~Value()
   delete mImpl;
 }
 
-Property::Value::Value(const Value& value)
+Property::Value::Value( const Property::Value& value )
+: mImpl( NULL )
 {
-  switch (value.GetType())
-  {
-    case Property::BOOLEAN:
-    {
-      mImpl = new Impl( value.Get<bool>() );
-      break;
-    }
-
-    case Property::FLOAT:
-    {
-      mImpl = new Impl( value.Get<float>() );
-      break;
-    }
-
-    case Property::INTEGER:
-    {
-      mImpl = new Impl( value.Get<int>() );
-      break;
-    }
-
-    case Property::UNSIGNED_INTEGER:
-    {
-      mImpl = new Impl( value.Get<unsigned int>() );
-      break;
-    }
-
-    case Property::VECTOR2:
-    {
-      mImpl = new Impl( value.Get<Vector2>() );
-      break;
-    }
-
-    case Property::VECTOR3:
-    {
-      mImpl = new Impl( value.Get<Vector3>() );
-      break;
-    }
-
-    case Property::VECTOR4:
-    {
-      mImpl = new Impl( value.Get<Vector4>() );
-      break;
-    }
-
-    case Property::RECTANGLE:
-    {
-      mImpl = new Impl( value.Get<Rect<int> >() );
-      break;
-    }
-
-    case Property::ROTATION:
-    {
-      // Orientations have two representations
-      DALI_ASSERT_DEBUG( typeid(Quaternion) == value.mImpl->mValue.GetType() ||
-                         typeid(AngleAxis)  == value.mImpl->mValue.GetType() );
-
-      if ( typeid(Quaternion) == value.mImpl->mValue.GetType() )
-      {
-        mImpl = new Impl( value.Get<Quaternion>() );
-      }
-      else
-      {
-        mImpl = new Impl( value.Get<AngleAxis>() );
-      }
-      break;
-    }
-
-    case Property::MATRIX3:
-    {
-      mImpl = new Impl( value.Get<Matrix3>());
-      break;
-    }
-
-    case Property::MATRIX:
-    {
-      mImpl = new Impl( value.Get<Matrix>());
-      break;
-    }
-
-    case Property::STRING:
-    {
-      mImpl = new Impl( value.Get<std::string>() );
-      break;
-    }
-
-    case Property::MAP:
-    {
-      mImpl = new Impl( value.Get<Property::Map>() );
-      break;
-    }
-
-    case Property::ARRAY:
-    {
-      mImpl = new Impl( value.Get<Property::Array>() );
-      break;
-    }
-
-    case Property::NONE: // fall
-    default:
-    {
-      mImpl = new Impl();
-      break;
-    }
-  }
+  // reuse assignment operator
+  operator=( value );
 }
 
-Property::Value::Value(Type type)
+Property::Value::Value( Type type )
 {
   switch (type)
   {
@@ -363,87 +338,73 @@ Property::Value::Value(Type type)
       mImpl = new Impl( false );
       break;
     }
-
     case Property::FLOAT:
     {
       mImpl = new Impl( 0.f );
       break;
     }
-
     case Property::INTEGER:
     {
       mImpl = new Impl( 0 );
       break;
     }
-
     case Property::UNSIGNED_INTEGER:
     {
       mImpl = new Impl( 0U );
       break;
     }
-
     case Property::VECTOR2:
     {
       mImpl = new Impl( Vector2::ZERO );
       break;
     }
-
     case Property::VECTOR3:
     {
       mImpl = new Impl( Vector3::ZERO );
       break;
     }
-
     case Property::VECTOR4:
     {
       mImpl = new Impl( Vector4::ZERO );
       break;
     }
-
     case Property::RECTANGLE:
     {
       mImpl = new Impl( Rect<int>(0,0,0,0) );
       break;
     }
-
     case Property::ROTATION:
     {
-      mImpl = new Impl( Quaternion( Radian(0.f), Vector3::YAXIS) );
+      mImpl = new Impl( Quaternion() );
       break;
     }
-
     case Property::STRING:
     {
       mImpl = new Impl( std::string() );
       break;
     }
-
-    case Property::MAP:
-    {
-      mImpl = new Impl( Property::Map() );
-      break;
-    }
-
     case Property::MATRIX:
     {
       mImpl = new Impl( Matrix() );
       break;
     }
-
     case Property::MATRIX3:
     {
       mImpl = new Impl( Matrix3() );
       break;
     }
-
     case Property::ARRAY:
     {
       mImpl = new Impl( Property::Array() );
       break;
     }
-
-    case Property::NONE: // fall
-    default:
+    case Property::MAP:
+    {
+      mImpl = new Impl( Property::Map() );
+      break;
+    }
+    case Property::NONE:
+    case Property::TYPE_COUNT:
     {
       mImpl = new Impl();
       break;
@@ -451,119 +412,184 @@ Property::Value::Value(Type type)
   }
 }
 
-Property::Value& Property::Value::operator=(const Property::Value& value)
+Property::Value& Property::Value::operator=( const Property::Value& value )
 {
-  if (this == &value)
+  if ( this == &value )
   {
     // skip self assignment
     return *this;
   }
-
-  mImpl->mType = value.GetType();
-
-  switch (mImpl->mType)
+  // if we are assigned an empty value, just drop impl
+  if( !value.mImpl )
   {
-    case Property::BOOLEAN:
+    delete mImpl;
+    mImpl = NULL;
+    return *this;
+  }
+  // first check if the type is the same, no need to change impl, just assign
+  if( mImpl && ( mImpl->type == value.mImpl->type ) )
+  {
+    switch( mImpl->type )
     {
-      mImpl->mValue = value.Get<bool>();
-      break;
-    }
-
-    case Property::FLOAT:
-    {
-      mImpl->mValue = value.Get<float>();
-      break;
-    }
-
-    case Property::INTEGER:
-    {
-      mImpl->mValue = value.Get<int>();
-      break;
-    }
-
-    case Property::UNSIGNED_INTEGER:
-    {
-      mImpl->mValue = value.Get<unsigned int>();
-      break;
-    }
-
-    case Property::VECTOR2:
-    {
-      mImpl->mValue = value.Get<Vector2>();
-      break;
-    }
-
-    case Property::VECTOR3:
-    {
-      mImpl->mValue = value.Get<Vector3>();
-      break;
-    }
-
-    case Property::VECTOR4:
-    {
-      mImpl->mValue = value.Get<Vector4>();
-      break;
-    }
-
-    case Property::RECTANGLE:
-    {
-      mImpl->mValue = value.Get<Rect<int> >();
-      break;
-    }
-
-    case Property::ROTATION:
-    {
-      // Orientations have two representations
-      DALI_ASSERT_DEBUG( typeid(Quaternion) == value.mImpl->mValue.GetType() ||
-                         typeid(AngleAxis)  == value.mImpl->mValue.GetType() );
-
-      if ( typeid(Quaternion) == value.mImpl->mValue.GetType() )
+      case Property::BOOLEAN:
       {
-        mImpl = new Impl( value.Get<Quaternion>() );
+        mImpl->integerValue = value.mImpl->integerValue;
+        break;
       }
-      else
+      case Property::FLOAT:
       {
-        mImpl = new Impl( value.Get<AngleAxis>() );
+        mImpl->floatValue = value.mImpl->floatValue;
+        break;
       }
-      break;
+      case Property::INTEGER:
+      {
+        mImpl->integerValue = value.mImpl->integerValue;
+        break;
+      }
+      case Property::UNSIGNED_INTEGER:
+      {
+        mImpl->unsignedIntegerValue = value.mImpl->unsignedIntegerValue;
+        break;
+      }
+      case Property::VECTOR2:
+      {
+        *mImpl->vector2Value = *value.mImpl->vector2Value;
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        *mImpl->vector3Value = *value.mImpl->vector3Value;
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        *mImpl->vector4Value = *value.mImpl->vector4Value;
+        break;
+      }
+      case Property::RECTANGLE:
+      {
+        *mImpl->rectValue = *value.mImpl->rectValue;
+        break;
+      }
+      case Property::ROTATION:
+      {
+        *mImpl->quaternionValue = *value.mImpl->quaternionValue;
+        break;
+      }
+      case Property::STRING:
+      {
+        *mImpl->stringValue = *value.mImpl->stringValue;
+        break;
+      }
+      case Property::MATRIX:
+      {
+        *mImpl->matrixValue = *value.mImpl->matrixValue;
+        break;
+      }
+      case Property::MATRIX3:
+      {
+        *mImpl->matrix3Value = *value.mImpl->matrix3Value;
+        break;
+      }
+      case Property::ARRAY:
+      {
+        *mImpl->arrayValue = *value.mImpl->arrayValue;
+        break;
+      }
+      case Property::MAP:
+      {
+        *mImpl->mapValue = *value.mImpl->mapValue;
+        break;
+      }
+      case Property::NONE:
+      case Property::TYPE_COUNT:
+      { // mImpl will be NULL, there's no way to get to this case
+      }
     }
-
-    case Property::STRING:
+  }
+  else
+  {
+    // different type, release old impl and create new
+    Impl* newImpl( NULL );
+    switch ( value.mImpl->type )
     {
-      mImpl->mValue = value.Get<std::string>();
-      break;
+      case Property::BOOLEAN:
+      {
+        newImpl = new Impl( bool( value.mImpl->integerValue ) );
+        break;
+      }
+      case Property::FLOAT:
+      {
+        newImpl = new Impl( value.mImpl->floatValue );
+        break;
+      }
+      case Property::INTEGER:
+      {
+        newImpl = new Impl( value.mImpl->integerValue );
+        break;
+      }
+      case Property::UNSIGNED_INTEGER:
+      {
+        newImpl = new Impl( value.mImpl->unsignedIntegerValue );
+        break;
+      }
+      case Property::VECTOR2:
+      {
+        newImpl = new Impl( *value.mImpl->vector2Value );
+        break;
+      }
+      case Property::VECTOR3:
+      {
+        newImpl = new Impl( *value.mImpl->vector3Value );
+        break;
+      }
+      case Property::VECTOR4:
+      {
+        newImpl = new Impl( *value.mImpl->vector4Value );
+        break;
+      }
+      case Property::RECTANGLE:
+      {
+        newImpl = new Impl( *value.mImpl->rectValue );
+        break;
+      }
+      case Property::ROTATION:
+      {
+        newImpl = new Impl( *value.mImpl->quaternionValue );
+        break;
+      }
+      case Property::MATRIX3:
+      {
+        newImpl = new Impl( *value.mImpl->matrix3Value );
+        break;
+      }
+      case Property::MATRIX:
+      {
+        newImpl = new Impl( *value.mImpl->matrixValue );
+        break;
+      }
+      case Property::STRING:
+      {
+        newImpl = new Impl( *value.mImpl->stringValue );
+        break;
+      }
+      case Property::ARRAY:
+      {
+        newImpl = new Impl( *value.mImpl->arrayValue );
+        break;
+      }
+      case Property::MAP:
+      {
+        newImpl = new Impl( *value.mImpl->mapValue );
+        break;
+      }
+      case Property::NONE:
+      case Property::TYPE_COUNT:
+      { // NULL value will be used for "empty" value
+      }
     }
-
-    case Property::MATRIX:
-    {
-      mImpl->mValue = value.Get<Matrix>();
-      break;
-    }
-
-    case Property::MATRIX3:
-    {
-      mImpl->mValue = value.Get<Matrix3>();
-      break;
-    }
-
-    case Property::MAP:
-    {
-      mImpl->mValue = value.Get<Property::Map>();
-      break;
-    }
-
-    case Property::ARRAY:
-    {
-      mImpl->mValue = value.Get<Property::Array>();
-      break;
-    }
-
-    case Property::NONE: // fall
-    default:
-    {
-      mImpl->mValue = Impl::AnyValue(0);
-      break;
-    }
+    delete mImpl;
+    mImpl = newImpl;
   }
 
   return *this;
@@ -571,526 +597,304 @@ Property::Value& Property::Value::operator=(const Property::Value& value)
 
 Property::Type Property::Value::GetType() const
 {
-  return mImpl->mType;
-}
-
-void Property::Value::Get(bool& boolValue) const
-{
-  DALI_ASSERT_DEBUG( Property::BOOLEAN == GetType() && "Property type invalid" );  // AnyCast does asserted type checking
-
-  boolValue = AnyCast<bool>(mImpl->mValue);
-}
-
-void Property::Value::Get(float& floatValue) const
-{
-  DALI_ASSERT_DEBUG( Property::FLOAT == GetType() && "Property type invalid" );
-
-  floatValue = AnyCast<float>(mImpl->mValue);
-}
-
-void Property::Value::Get(int& integerValue) const
-{
-  DALI_ASSERT_DEBUG( Property::INTEGER == GetType() && "Property type invalid" );
-
-  integerValue = AnyCast<int>(mImpl->mValue);
-}
-
-void Property::Value::Get(unsigned int& unsignedIntegerValue) const
-{
-  DALI_ASSERT_DEBUG( Property::UNSIGNED_INTEGER == GetType() && "Property type invalid" );
-
-  unsignedIntegerValue = AnyCast<unsigned int>(mImpl->mValue);
-}
-
-void Property::Value::Get(Vector2& vectorValue) const
-{
-  DALI_ASSERT_DEBUG( Property::VECTOR2 == GetType() && "Property type invalid" );
-
-  vectorValue = AnyCast<Vector2>(mImpl->mValue);
-}
-
-void Property::Value::Get(Vector3& vectorValue) const
-{
-  DALI_ASSERT_DEBUG( Property::VECTOR3 == GetType() && "Property type invalid" );
-
-  vectorValue = AnyCast<Vector3>(mImpl->mValue);
-}
-
-void Property::Value::Get(Vector4& vectorValue) const
-{
-  DALI_ASSERT_DEBUG( Property::VECTOR4 == GetType() && "Property type invalid" );
-
-  vectorValue = AnyCast<Vector4>(mImpl->mValue);
-}
-
-void Property::Value::Get(Matrix3& matrixValue) const
-{
-  DALI_ASSERT_DEBUG( Property::MATRIX3 == GetType() && "Property type invalid" );
-  matrixValue = AnyCast<Matrix3>(mImpl->mValue);
-}
-
-void Property::Value::Get(Matrix& matrixValue) const
-{
-  DALI_ASSERT_DEBUG( Property::MATRIX == GetType() && "Property type invalid" );
-  matrixValue = AnyCast<Matrix>(mImpl->mValue);
-}
-
-void Property::Value::Get(Rect<int>& rect) const
-{
-  DALI_ASSERT_DEBUG( Property::RECTANGLE == GetType() && "Property type invalid" );
-
-  rect = AnyCast<Rect<int> >(mImpl->mValue);
-}
-
-void Property::Value::Get(AngleAxis& angleAxisValue) const
-{
-  DALI_ASSERT_ALWAYS( Property::ROTATION == GetType() && "Property type invalid" );
-
-  // Orientations have two representations
-  DALI_ASSERT_DEBUG( typeid(Quaternion) == mImpl->mValue.GetType() ||
-                     typeid(AngleAxis)  == mImpl->mValue.GetType() );
-
-  if ( typeid(Quaternion) == mImpl->mValue.GetType() )
+  Property::Type type( Property::NONE );
+  if( mImpl )
   {
-    Quaternion quaternion = AnyCast<Quaternion>(mImpl->mValue);
+    type = mImpl->type;
+  }
+  return type;
+}
 
-    quaternion.ToAxisAngle( angleAxisValue.axis, angleAxisValue.angle );
+void Property::Value::Get( bool& booleanValue ) const
+{
+  if( mImpl && IsIntegerType( mImpl->type ) )
+  {
+    booleanValue = mImpl->integerValue;
   }
   else
   {
-    angleAxisValue = AnyCast<AngleAxis>(mImpl->mValue);
+    booleanValue = false;
   }
 }
 
-void Property::Value::Get(Quaternion& quaternionValue) const
+void Property::Value::Get( float& floatValue ) const
 {
-  DALI_ASSERT_DEBUG( Property::ROTATION == GetType() && "Property type invalid" );
-
-  // Orientations have two representations
-  DALI_ASSERT_DEBUG( typeid(Quaternion) == mImpl->mValue.GetType() ||
-               typeid(AngleAxis)  == mImpl->mValue.GetType() );
-
-  if ( typeid(Quaternion) == mImpl->mValue.GetType() )
+  if( mImpl && mImpl->type == FLOAT )
   {
-    quaternionValue = AnyCast<Quaternion>(mImpl->mValue);
+    floatValue = mImpl->floatValue;
   }
   else
   {
-    AngleAxis angleAxis = AnyCast<AngleAxis>(mImpl->mValue);
-
-    quaternionValue = Quaternion( Radian(angleAxis.angle), angleAxis.axis );
+    floatValue = 0.f;
   }
 }
 
-void Property::Value::Get(std::string &out) const
+void Property::Value::Get( int& integerValue ) const
 {
-  DALI_ASSERT_DEBUG(Property::STRING == GetType() && "Property type invalid");
-
-  out = AnyCast<std::string>(mImpl->mValue);
-}
-
-void Property::Value::Get(Property::Array &out) const
-{
-  DALI_ASSERT_DEBUG(Property::ARRAY == GetType() && "Property type invalid");
-
-  out = AnyCast<Property::Array>(mImpl->mValue);
-}
-
-void Property::Value::Get(Property::Map &out) const
-{
-  DALI_ASSERT_DEBUG(Property::MAP == GetType() && "Property type invalid");
-
-  out = AnyCast<Property::Map>(mImpl->mValue);
-}
-
-Property::Value& Property::Value::GetValue(const std::string& key) const
-{
-  DALI_ASSERT_DEBUG(Property::MAP == GetType() && "Property type invalid");
-
-  Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-
-  DALI_ASSERT_DEBUG(container);
-
-  if(container)
+  if( mImpl && IsIntegerType( mImpl->type ) )
   {
-    Property::Value* value = container->Find( key );
-    if ( value )
-    {
-      return *value;
-    }
-  }
-
-  DALI_LOG_WARNING("Cannot find property map key %s", key.c_str());
-  DALI_ASSERT_ALWAYS(!"Cannot find property map key");
-}
-
-bool Property::Value::HasKey(const std::string& key) const
-{
-  bool has = false;
-
-  if( Property::MAP == GetType() )
-  {
-    Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-
-    DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
-
-    if(container)
-    {
-      Property::Value* value = container->Find( key );
-      if ( value )
-      {
-        has = true;
-      }
-    }
-  }
-
-  return has;
-}
-
-
-const std::string& Property::Value::GetKey(const int index) const
-{
-  switch( GetType() )
-  {
-    case Property::MAP:
-    {
-      Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-      DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
-      if(container)
-      {
-        if(0 <= index && index < static_cast<int>(container->Count()))
-        {
-          return container->GetKey( index );
-        }
-      }
-    }
-    break;
-    case Property::NONE:
-    case Property::ARRAY:
-    case Property::BOOLEAN:
-    case Property::FLOAT:
-    case Property::UNSIGNED_INTEGER:
-    case Property::INTEGER:
-    case Property::VECTOR2:
-    case Property::VECTOR3:
-    case Property::VECTOR4:
-    case Property::MATRIX:
-    case Property::MATRIX3:
-    case Property::RECTANGLE:
-    case Property::ROTATION:
-    case Property::STRING:
-    case Property::TYPE_COUNT:
-    {
-      break;
-    }
-  }
-
-
-  // should never return this
-  static std::string null;
-  return null;
-}
-
-
-void Property::Value::SetValue(const std::string& key, const Property::Value &value)
-{
-  DALI_ASSERT_DEBUG(Property::MAP == GetType() && "Property type invalid");
-
-  Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-
-  if(container)
-  {
-    (*container)[ key ] = value;
-  }
-}
-
-Property::Value& Property::Value::GetItem(const int index) const
-{
-  switch( GetType() )
-  {
-    case Property::MAP:
-    {
-      Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-
-      DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
-      if(container)
-      {
-        DALI_ASSERT_ALWAYS(index < static_cast<int>(container->Count()) && "Property array index invalid");
-        DALI_ASSERT_ALWAYS(index >= 0 && "Property array index invalid");
-
-        return container->GetValue( index );
-      }
-    }
-    break;
-
-    case Property::ARRAY:
-    {
-      Property::Array *container = AnyCast<Property::Array>(&(mImpl->mValue));
-
-      DALI_ASSERT_DEBUG(container && "Property::Map has no container?");
-      if(container)
-      {
-        DALI_ASSERT_ALWAYS(index < static_cast<int>(container->Size()) && "Property array index invalid");
-        DALI_ASSERT_ALWAYS(index >= 0 && "Property array index invalid");
-
-        return (*container)[index];
-      }
-    }
-    break;
-
-    case Property::NONE:
-    case Property::BOOLEAN:
-    case Property::FLOAT:
-    case Property::INTEGER:
-    case Property::UNSIGNED_INTEGER:
-    case Property::VECTOR2:
-    case Property::VECTOR3:
-    case Property::VECTOR4:
-    case Property::MATRIX3:
-    case Property::MATRIX:
-    case Property::RECTANGLE:
-    case Property::ROTATION:
-    case Property::STRING:
-    case Property::TYPE_COUNT:
-    {
-      DALI_ASSERT_ALWAYS(!"Cannot GetItem on property Type; not a container");
-      break;
-    }
-
-  } // switch GetType()
-
-
-  DALI_ASSERT_ALWAYS(!"Property value index not valid");
-}
-
-Property::Value& Property::Value::GetItem(const int index, std::string& key) const
-{
-  Property::Value& ret( GetItem(index) );
-
-  if( Property::MAP == GetType() )
-  {
-    Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-    if( container && index < static_cast<int>(container->Count()) )
-    {
-      key = container->GetKey( index );
-    }
-  }
-
-  return ret;
-}
-
-void Property::Value::SetItem(const int index, const Property::Value &value)
-{
-  switch( GetType() )
-  {
-    case Property::MAP:
-    {
-      Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-      if( container && index < static_cast<int>(container->Count()) )
-      {
-        Property::Value& indexValue = container->GetValue( index );
-        indexValue = value;
-      }
-    }
-    break;
-
-    case Property::ARRAY:
-    {
-      Property::Array *container = AnyCast<Property::Array>(&(mImpl->mValue));
-      if( container && index < static_cast<int>(container->Size()) )
-      {
-        (*container)[index] = value;
-      }
-    }
-    break;
-
-    case Property::NONE:
-    case Property::BOOLEAN:
-    case Property::FLOAT:
-    case Property::INTEGER:
-    case Property::UNSIGNED_INTEGER:
-    case Property::VECTOR2:
-    case Property::VECTOR3:
-    case Property::VECTOR4:
-    case Property::MATRIX3:
-    case Property::MATRIX:
-    case Property::RECTANGLE:
-    case Property::ROTATION:
-    case Property::STRING:
-    case Property::TYPE_COUNT:
-    {
-      DALI_ASSERT_ALWAYS(!"Cannot SetItem on property Type; not a container");
-      break;
-    }
-  }
-}
-
-int Property::Value::AppendItem(const Property::Value &value)
-{
-  DALI_ASSERT_DEBUG(Property::ARRAY == GetType() && "Property type invalid");
-
-  Property::Array *container = AnyCast<Property::Array>(&(mImpl->mValue));
-
-  if(container)
-  {
-    container->PushBack(value);
-    return container->Size() - 1;
+    integerValue = mImpl->integerValue;
   }
   else
   {
-    return -1;
+    integerValue = 0;
   }
-
 }
 
-int Property::Value::GetSize() const
+void Property::Value::Get( unsigned int& unsignedIntegerValue ) const
 {
-  int ret = 0;
-
-  switch(GetType())
+  if( mImpl && IsIntegerType( mImpl->type ) )
   {
-    case Property::MAP:
-    {
-      Property::Map *container = AnyCast<Property::Map>(&(mImpl->mValue));
-      if(container)
-      {
-        ret = container->Count();
-      }
-    }
-    break;
-
-    case Property::ARRAY:
-    {
-      Property::Array *container = AnyCast<Property::Array>(&(mImpl->mValue));
-      if(container)
-      {
-        ret = container->Size();
-      }
-    }
-    break;
-
-    case Property::NONE:
-    case Property::BOOLEAN:
-    case Property::FLOAT:
-    case Property::INTEGER:
-    case Property::UNSIGNED_INTEGER:
-    case Property::VECTOR2:
-    case Property::VECTOR3:
-    case Property::VECTOR4:
-    case Property::MATRIX3:
-    case Property::MATRIX:
-    case Property::RECTANGLE:
-    case Property::ROTATION:
-    case Property::STRING:
-    case Property::TYPE_COUNT:
-    {
-      break;
-    }
-
+    unsignedIntegerValue = mImpl->unsignedIntegerValue;
   }
-
-  return ret;
+  else
+  {
+    unsignedIntegerValue = 0u;
+  }
 }
 
-std::ostream& operator<< (std::ostream& stream, const Property::Value& value )
+void Property::Value::Get( Vector2& vectorValue ) const
 {
-
-  const Property::Value::Impl& impl( *value.mImpl );
-
-  switch( impl.mType )
+  if( mImpl && mImpl->type == VECTOR2 && mImpl->vector2Value )
   {
-    case Dali::Property::STRING:
-    {
-      stream <<  AnyCast<std::string>(impl.mValue).c_str();
-      break;
-    }
-    case Dali::Property::VECTOR2:
-    {
-      stream << AnyCast<Vector2>(impl.mValue);
-      break;
-    }
-    case Dali::Property::VECTOR3:
-    {
-      stream << AnyCast<Vector3>(impl.mValue);
-      break;
-    }
-    case Dali::Property::VECTOR4:
-    {
-      stream << AnyCast<Vector4>(impl.mValue);
-      break;
-    }
-    case Dali::Property::MATRIX:
-    {
-      stream << AnyCast<Matrix>(impl.mValue);
-      break;
-    }
-    case Dali::Property::BOOLEAN:
-    {
-      stream << AnyCast<bool>(impl.mValue);
-      break;
-    }
-    case Dali::Property::FLOAT:
-    {
-      stream << AnyCast<float>(impl.mValue);
-      break;
-    }
-    case Dali::Property::INTEGER:
-    {
-       stream << AnyCast<int>(impl.mValue);
-       break;
-    }
-    case Dali::Property::UNSIGNED_INTEGER:
-    {
-      stream << AnyCast<unsigned int>(impl.mValue);
-      break;
-    }
-    case Dali::Property::RECTANGLE:
-    {
-      Dali::Rect<int> rect; // Propery Value rectangles are currently integer based
-      value.Get( rect );
-      stream << rect;
-      break;
-    }
-    case Dali::Property::MATRIX3:
-    {
-      stream << AnyCast<Matrix3>(impl.mValue);
-      break;
-    }
-    case Dali::Property::ROTATION:
-    {
-      // @todo this may change to Quaternion
-      Dali::Quaternion q;
-      value.Get( q );
-      Dali::Vector4 v4 = q.EulerAngles();
-      stream << v4;
-      break;
-    }
+    vectorValue = *(mImpl->vector2Value);
+  }
+  else
+  {
+    vectorValue.x = vectorValue.y = 0.f;
+  }
+}
 
-    case Dali::Property::ARRAY:
+void Property::Value::Get( Vector3& vectorValue ) const
+{
+  if( mImpl && mImpl->type == VECTOR3 && mImpl->vector3Value )
+  {
+    vectorValue = *(mImpl->vector3Value);
+  }
+  else
+  {
+    vectorValue.x = vectorValue.y = vectorValue.z = 0.f;
+  }
+}
+
+void Property::Value::Get( Vector4& vectorValue ) const
+{
+  if( mImpl && mImpl->type == VECTOR4 && mImpl->vector4Value )
+  {
+    vectorValue = *(mImpl->vector4Value);
+  }
+  else
+  {
+    vectorValue.x = vectorValue.y = vectorValue.z = vectorValue.w = 0.f;
+  }
+}
+
+void Property::Value::Get( Matrix3& matrixValue ) const
+{
+  if( mImpl && mImpl->type == MATRIX3 && mImpl->matrix3Value )
+  {
+    matrixValue = *(mImpl->matrix3Value);
+  }
+  else
+  {
+    matrixValue.SetIdentity();
+  }
+}
+
+void Property::Value::Get( Matrix& matrixValue ) const
+{
+  if( mImpl && mImpl->type == MATRIX && mImpl->matrixValue )
+  {
+    matrixValue = *(mImpl->matrixValue);
+  }
+  else
+  {
+    matrixValue.SetIdentity();
+  }
+}
+
+void Property::Value::Get( Rect<int>& rectValue ) const
+{
+  if( mImpl && mImpl->type == RECTANGLE && mImpl->rectValue )
+  {
+    rectValue = *(mImpl->rectValue);
+  }
+  else
+  {
+    rectValue.x = rectValue.y = rectValue.width = rectValue.height = 0.f;
+  }
+}
+
+void Property::Value::Get( AngleAxis& angleAxisValue ) const
+{
+  if( mImpl && mImpl->type == ROTATION && mImpl->quaternionValue )
+  {
+    mImpl->quaternionValue->ToAxisAngle( angleAxisValue.axis, angleAxisValue.angle );
+  }
+  else
+  {
+    angleAxisValue.angle = 0.f;
+    angleAxisValue.axis = Vector3::ZERO; // identity quaternion
+  }
+}
+
+void Property::Value::Get( Quaternion& quaternionValue ) const
+{
+  if( mImpl && mImpl->type == ROTATION && mImpl->quaternionValue )
+  {
+    quaternionValue = *(mImpl->quaternionValue);
+  }
+  else
+  {
+    quaternionValue = Quaternion::IDENTITY;
+  }
+}
+
+void Property::Value::Get( std::string& stringValue ) const
+{
+  if( mImpl && mImpl->type == STRING && mImpl->stringValue )
+  {
+    stringValue.assign( *(mImpl->stringValue) );
+  }
+  else
+  {
+    stringValue.clear();
+  }
+}
+
+void Property::Value::Get( Property::Array& arrayValue ) const
+{
+  if( mImpl && mImpl->type == ARRAY && mImpl->arrayValue )
+  {
+    arrayValue = *(mImpl->arrayValue);
+  }
+  else
+  {
+    arrayValue.Clear();
+  }
+}
+
+void Property::Value::Get( Property::Map& mapValue ) const
+{
+  if( mImpl && mImpl->type == MAP && mImpl->mapValue )
+  {
+    mapValue = *(mImpl->mapValue);
+  }
+  else
+  {
+    mapValue.Clear();
+  }
+}
+
+Property::Map* Property::Value::GetMap() const
+{
+  Property::Map* map = NULL;
+  if( mImpl && mImpl->type == MAP && mImpl->mapValue )
+  {
+    map = mImpl->mapValue;
+  }
+  return map;
+}
+
+Property::Array* Property::Value::GetArray() const
+{
+  Property::Array* array = NULL;
+  if( mImpl && mImpl->type == ARRAY && mImpl->arrayValue )
+  {
+    array = mImpl->arrayValue;
+  }
+  return array;
+}
+
+std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
+{
+  if( value.mImpl )
+  {
+    const Property::Value::Impl& impl( *value.mImpl );
+
+    switch( impl.type )
     {
-      // @todo Need to think about the best way to support array
-      // E.g Do we want to create a JSON style array like:
-      // [ {"property-name-0":"property-value-0", "property-name-1":"property-value-1"} ]
-      stream << "ARRAY unsupported";
-      break;
+      case Dali::Property::BOOLEAN:
+      {
+        stream << impl.integerValue;
+        break;
+      }
+      case Dali::Property::FLOAT:
+      {
+        stream << impl.floatValue;
+        break;
+      }
+      case Dali::Property::INTEGER:
+      {
+         stream << impl.integerValue;
+         break;
+      }
+      case Dali::Property::UNSIGNED_INTEGER:
+      {
+        stream << impl.unsignedIntegerValue;
+        break;
+      }
+      case Dali::Property::VECTOR2:
+      {
+        stream << *impl.vector2Value;
+        break;
+      }
+      case Dali::Property::VECTOR3:
+      {
+        stream << *impl.vector3Value;
+        break;
+      }
+      case Dali::Property::VECTOR4:
+      {
+        stream << *impl.vector4Value;
+        break;
+      }
+      case Dali::Property::MATRIX3:
+      {
+        stream << *impl.matrix3Value;
+        break;
+      }
+      case Dali::Property::MATRIX:
+      {
+        stream << *impl.matrixValue;
+        break;
+      }
+      case Dali::Property::RECTANGLE:
+      {
+        stream << *impl.rectValue;
+        break;
+      }
+      case Dali::Property::ROTATION:
+      {
+        stream << *impl.quaternionValue;
+        break;
+      }
+      case Dali::Property::STRING:
+      {
+        stream << *impl.stringValue;
+        break;
+      }
+      case Dali::Property::ARRAY:
+      {
+        stream << "Array containing" << impl.arrayValue->Count() << " elements"; // TODO add ostream<< operator in array
+        break;
+      }
+      case Dali::Property::MAP:
+      {
+        stream << "Map containing " << impl.mapValue->Count() << " elements"; // TODO add ostream<< operator in map
+        break;
+      }
+      case Dali::Property::NONE:
+      case Dali::Property::TYPE_COUNT:
+      {
+        stream << "undefined type";
+        break;
+      }
     }
-    case Dali::Property::MAP:
-    {
-      Dali::Property::Map map;
-      value.Get( map );
-      stream << "Map containing " << map.Count() << " elements";
-      break;
-    }
-    case Dali::Property::TYPE_COUNT:
-    {
-      stream << "unsupported TYPE_COUNT";
-      break;
-    }
-    default:
-    {
-      stream << "unsupported type = " << value.GetType();
-      break;
-    }
+  }
+  else
+  {
+    stream << "empty type";
   }
   return stream;
 }

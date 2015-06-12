@@ -142,55 +142,59 @@ Property::Type Path::GetDefaultPropertyType(Property::Index index) const
 
 Property::Value Path::GetDefaultProperty( Property::Index index ) const
 {
-  Property::Value value;
   if( index == Dali::Path::Property::POINTS )
   {
-    Property::Array propertyArray;
-    value = Property::Value(propertyArray);
-    size_t pointCount( mPoint.Size() );
-    for( size_t i( 0 ); i != pointCount; ++i )
+    Property::Value value( Property::ARRAY );
+    Property::Array* array = value.GetArray();
+    Property::Array::SizeType pointCount = mPoint.Count();
+    array->Reserve( pointCount );
+    for( Property::Array::SizeType i = 0; i < pointCount; ++i )
     {
-      value.AppendItem( mPoint[i] );
+      array->PushBack( mPoint[i] );
     }
+    return value;
   }
   else if( index == Dali::Path::Property::CONTROL_POINTS )
   {
-    Property::Array propertyArray;
-    value = Property::Value(propertyArray);
-    size_t controlpointCount( mControlPoint.Size() );
-    for( size_t i( 0 ); i != controlpointCount; ++i )
+    Property::Value value( Property::ARRAY );
+    Property::Array* array = value.GetArray();
+    Property::Array::SizeType  controlpointCount = mControlPoint.Count();
+    array->Reserve( controlpointCount );
+    for( Property::Array::SizeType i = 0; i < controlpointCount; ++i )
     {
-      value.AppendItem( mControlPoint[i] );
+      array->PushBack( mControlPoint[i] );
     }
+    return value;
   }
 
-  return value;
+  return Property::Value();
 }
 
 void Path::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
 {
-  if( index == Dali::Path::Property::POINTS )
+  const Property::Array* array = propertyValue.GetArray();
+  if( array )
   {
-    Property::Array propertyArray;
-    propertyValue.Get(propertyArray);
-
-    size_t propertyArrayCount = propertyArray.Size();
-    mPoint.Resize( propertyArrayCount );
-    for( size_t i(0); i!=propertyArrayCount; ++i )
+    Property::Array::SizeType propertyArrayCount = array->Count();
+    if( index == Dali::Path::Property::POINTS )
     {
-      propertyArray[i].Get( mPoint[i]);
+      mPoint.Reserve( propertyArrayCount );
+      for( Property::Array::SizeType i = 0; i < propertyArrayCount; ++i )
+      {
+        Vector3 point;
+        array->GetElementAt( i ).Get( point );
+        mPoint.PushBack( point );
+      }
     }
-  }
-  else if( index == Dali::Path::Property::CONTROL_POINTS )
-  {
-    Property::Array propertyArray;
-    propertyValue.Get(propertyArray);
-
-    size_t propertyArrayCount = propertyArray.Size();
-    mControlPoint.Resize( propertyArrayCount );
-    for( size_t i(0); i!=propertyArrayCount; ++i )
+    else if( index == Dali::Path::Property::CONTROL_POINTS )
     {
-      propertyArray[i].Get( mControlPoint[i]);
+      mControlPoint.Reserve( propertyArrayCount );
+      for( Property::Array::SizeType i = 0; i < propertyArrayCount; ++i )
+      {
+        Vector3 point;
+        array->GetElementAt( i ).Get( point );
+        mControlPoint.PushBack( point );
+      }
     }
   }
 }
@@ -499,6 +503,16 @@ Vector3& Path::GetControlPoint( size_t index )
 size_t Path::GetPointCount() const
 {
   return mPoint.Size();
+}
+
+void Path::ClearPoints()
+{
+  mPoint.Clear();
+}
+
+void Path::ClearControlPoints()
+{
+  mControlPoint.Clear();
 }
 
 } // Internal
