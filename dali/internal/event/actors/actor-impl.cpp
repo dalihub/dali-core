@@ -279,18 +279,15 @@ float GetDimensionValue( const Vector2& values, Dimension::Type dimension )
     {
       return values.width;
     }
-
     case Dimension::HEIGHT:
     {
       return values.height;
     }
-
     default:
     {
       break;
     }
   }
-
   return 0.0f;
 }
 
@@ -305,6 +302,7 @@ float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
 {
   return GetDimensionValue( values.GetVectorXY(), dimension );
 }
+
 
 } // unnamed namespace
 
@@ -2882,19 +2880,31 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      SetResizePolicy( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount ), Dimension::WIDTH );
+      ResizePolicy::Type type;
+      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount, type ) )
+      {
+        SetResizePolicy( type, Dimension::WIDTH );
+      }
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      SetResizePolicy( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount ), Dimension::HEIGHT );
+      ResizePolicy::Type type;
+      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount, type ) )
+      {
+        SetResizePolicy( type, Dimension::HEIGHT );
+      }
       break;
     }
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      SetSizeScalePolicy( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SizeScalePolicy::TypeTable, SizeScalePolicy::TypeTableCount ) );
+      SizeScalePolicy::Type type;
+      if( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SizeScalePolicy::TypeTable, SizeScalePolicy::TypeTableCount, type ) )
+      {
+        SetSizeScalePolicy( type );
+      }
       break;
     }
 

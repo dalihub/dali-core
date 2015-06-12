@@ -586,16 +586,10 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::NONE:
+    case Property::TYPE_COUNT:
     {
-      DALI_LOG_WARNING( "Property Type %d\n", propertyValue.GetType() );
       DALI_ASSERT_ALWAYS( !"PropertyType is not animatable" );
-      break;
-    }
-
-    default:
-    {
-      DALI_LOG_WARNING( "Property Type %d\n", propertyValue.GetType() );
-      DALI_ASSERT_ALWAYS( !"PropertyType enumeration is out of bounds" );
       break;
     }
   }

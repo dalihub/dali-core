@@ -116,36 +116,44 @@ Property::Type PathConstrainer::GetDefaultPropertyType(Property::Index index) co
 
 Property::Value PathConstrainer::GetDefaultProperty( Property::Index index ) const
 {
-  Property::Value value;
   if( index == Dali::PathConstrainer::Property::FORWARD )
   {
-    value = Property::Value( mForward );
+    return Property::Value( mForward );
   }
-  else if( index == Dali::PathConstrainer::Property::POINTS )
+  else
   {
-    value = Property::Value(Property::ARRAY);
-    const Dali::Vector<Vector3>& point = mPath->GetPoints();
-    size_t pointCount( point.Size() );
-    for( size_t i( 0 ); i != pointCount; ++i )
+    if( index == Dali::PathConstrainer::Property::POINTS )
     {
-      value.AppendItem( point[i] );
+      Property::Value value( Property::ARRAY );
+      Property::Array* array = value.GetArray();
+      const Dali::Vector<Vector3>& point = mPath->GetPoints();
+      Property::Array::SizeType pointCount = point.Size();
+      array->Reserve( pointCount );
+      for( Property::Array::SizeType i = 0; i < pointCount; ++i )
+      {
+        array->PushBack( point[i] );
+      }
+      return value;
     }
-  }
-  else if( index == Dali::PathConstrainer::Property::CONTROL_POINTS )
-  {
-    value = Property::Value(Property::ARRAY);
-    const Dali::Vector<Vector3>& point = mPath->GetControlPoints();
-    size_t pointCount( point.Size() );
-    for( size_t i( 0 ); i != pointCount; ++i )
+    else if( index == Dali::PathConstrainer::Property::CONTROL_POINTS )
     {
-      value.AppendItem( point[i] );
+      Property::Value value( Property::ARRAY );
+      Property::Array* array = value.GetArray();
+      const Dali::Vector<Vector3>& point = mPath->GetControlPoints();
+      Property::Array::SizeType pointCount = point.Size();
+      array->Reserve( pointCount );
+      for( Property::Array::SizeType i = 0; i < pointCount; ++i )
+      {
+        array->PushBack( point[i] );
+      }
+      return value;
     }
   }
 
-  return value;
+  return Property::Value();
 }
 
-void PathConstrainer::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
+void PathConstrainer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
   if( index == Dali::PathConstrainer::Property::FORWARD )
   {
@@ -153,25 +161,31 @@ void PathConstrainer::SetDefaultProperty(Property::Index index, const Property::
   }
   else if( index == Dali::PathConstrainer::Property::POINTS  )
   {
-    size_t propertyArrayCount = propertyValue.GetSize();
-    Dali::Vector<Vector3> point;
-    point.Resize( propertyArrayCount );
-    for( size_t i(0); i != propertyArrayCount; ++i )
+    const Property::Array* array = propertyValue.GetArray();
+    mPath->ClearPoints();
+    if( array )
     {
-      propertyValue.GetItem(i).Get( point[i] );
+      for( Property::Array::SizeType i = 0, count = array->Count(); i < count; ++i )
+      {
+        Vector3 point;
+        array->GetElementAt( i ).Get( point );
+        mPath->AddPoint( point );
+      }
     }
-    mPath->SetPoints( point );
   }
   else if( index == Dali::PathConstrainer::Property::CONTROL_POINTS )
   {
-    size_t propertyArrayCount = propertyValue.GetSize();
-    Dali::Vector<Vector3> point;
-    point.Resize( propertyArrayCount );
-    for( size_t i(0); i != propertyArrayCount; ++i )
+    const Property::Array* array = propertyValue.GetArray();
+    mPath->ClearControlPoints();
+    if( array )
     {
-      propertyValue.GetItem(i).Get( point[i] );
+      for( Property::Array::SizeType i = 0, count = array->Count(); i < count; ++i )
+      {
+        Vector3 point;
+        array->GetElementAt( i ).Get( point );
+        mPath->AddControlPoint( point );
+      }
     }
-    mPath->SetControlPoints( point );
   }
 }
 

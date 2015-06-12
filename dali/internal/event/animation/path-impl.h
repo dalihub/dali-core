@@ -196,6 +196,16 @@ public:
   size_t GetPointCount() const;
 
   /**
+   * Clears the points of the path
+   */
+  void ClearPoints();
+
+  /**
+   * Clears the control points of the path
+   */
+  void ClearControlPoints();
+
+  /**
    * @brief Get mPoint property
    *
    * @return A const reference to mPoint vector

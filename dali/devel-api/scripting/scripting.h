@@ -40,46 +40,21 @@ namespace Scripting
 /**
  * @brief Template structure which stores an enumeration and its string equivalent.
  */
-template< typename T >
 struct StringEnum
 {
   const char* string; ///< The string representation
-  const T value;      ///< The actual enumeration
+  const int value;    ///< The enumeration value wrapped in int
 };
 
 /**
- * @brief Permissive comparison for string enums.
+ * @brief Find the given enum index from the table
  *
- * Case insensitive and ignores '_', '-' in either string when comparing.
- *
- * @note If both strings are empty return true;
- *
- * @param[in] a The first string
- * @param[in] b The string to compare
- * @return true if the strings are equal as defined above. If both empty, then return true.
+ * @param[in]  value       The string equivalent (case-insensitive).
+ * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
+ * @param[in]  tableCount  Number of items in the array.
+ * @return The index of the enumeration. If enumeration is not found, logs an error and returns tableCount.
  */
-DALI_IMPORT_API bool CompareEnums( const char * a, const char * b );
-
-/**
- * @brief Set the value if strings pass a permissive compare.
- *
- * @param[in] a The input string
- * @param[in] b The string to compare
- * @param[in] set The variable to set
- * @param[in] value The value to set
- * @return true if the strings pass the permissive compare
- */
-template <typename T>
-bool SetIfEqual(const char * a, const char * b, T& set, const T& value)
-{
-  if( CompareEnums( a, b ) )
-  {
-    set = value;
-    return true;
-  }
-
-  return false;
-}
+DALI_IMPORT_API unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount );
 
 /**
  * @brief Chooses the appropriate enumeration for the provided string from the given table.
@@ -87,26 +62,24 @@ bool SetIfEqual(const char * a, const char * b, T& set, const T& value)
  * @param[in]  value       The string equivalent (case-insensitive).
  * @param[in]  table       A pointer to an array with the enumeration to string equivalents.
  * @param[in]  tableCount  Number of items in the array.
+ * @param[out] result      The enum value
  *
- * @return The equivalent enumeration for the given string.
+ * @return True if the value was found from the table
  */
 template< typename T >
-T GetEnumeration( const char * value, const StringEnum< T >* table, unsigned int tableCount )
+bool GetEnumeration( const char* value, const StringEnum* table, unsigned int tableCount, T& result )
 {
-  T retVal( table->value );
-  bool set( false );
-
-  for ( unsigned int i = 0; ( i < tableCount ) && ( !set ); ++i )
+  bool retVal( false );
+  if( table )
   {
-    set = SetIfEqual( value, table->string, retVal, table->value );
-    ++table;
+    unsigned int index = FindEnumIndex( value, table, tableCount );
+    // check to avoid crash, not asserting on purpose, error is logged instead
+    if( index < tableCount )
+    {
+      result = static_cast<T>( table[ index ].value );
+      retVal = true;
+    }
   }
-
-  if ( !set )
-  {
-    DALI_ASSERT_ALWAYS( !"Unknown enumeration string" );
-  }
-
   return retVal;
 }
 
@@ -122,16 +95,18 @@ T GetEnumeration( const char * value, const StringEnum< T >* table, unsigned int
  * @note The caller is NOT responsible for cleaning up the returned pointer as it is statically allocated.
  */
 template< typename T >
-const char * GetEnumerationName( T value, const StringEnum< T >* table, unsigned int tableCount )
+const char* GetEnumerationName( T value, const StringEnum* table, unsigned int tableCount )
 {
-  for ( unsigned int i = 0; i < tableCount; ++i )
+  if( table )
   {
-    if ( value == table[ i ].value )
+    for ( unsigned int i = 0; i < tableCount; ++i )
     {
-      return table[ i ].string;
+      if ( value == T(table[ i ].value) )
+      {
+        return table[ i ].string;
+      }
     }
   }
-
   return NULL;
 }
 
@@ -148,14 +123,13 @@ const char * GetEnumerationName( T value, const StringEnum< T >* table, unsigned
  * @note The caller is NOT responsible for cleaning up the returned pointer as it is statically allocated.
  */
 template< typename T >
-const char * GetLinearEnumerationName( T value, const StringEnum< T >* table, unsigned int tableCount )
+const char * GetLinearEnumerationName( T value, const StringEnum* table, unsigned int tableCount )
 {
-  if ( value < 0 || value >= (int)tableCount )
+  if ( table && ( value > 0 || value <= (int)tableCount ) )
   {
-    return NULL;
+    return table[value].string;
   }
-
-  return table[value].string;
+  return NULL;
 }
 
 /**
@@ -217,7 +191,7 @@ DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
 /**
  * @brief Creates object with data from the property value map.
  *
- * @param[in] map The property value map with the following valid fields:
+ * @param[in] property The property value map with the following valid fields:
  * @code
  * "filename":       type std::string
  * "load-policy"     type std::string (enum)
@@ -234,12 +208,12 @@ DALI_IMPORT_API Vector3 GetAnchorConstant( const std::string& value );
  *
  * @return a pointer to a newly created object.
  */
-DALI_IMPORT_API Image NewImage( const Property::Value& map );
+DALI_IMPORT_API Image NewImage( const Property::Value& property );
 
 /**
  * @brief Creates object with data from the property value map.
  *
- * @param[in] map The property value map with the following valid fields:
+ * @param[in] property The property value map with the following valid fields:
  * @code
  * // a program can be specified as string or a filename.
  * // some fields may be ignored depending on the geometry-type
@@ -267,7 +241,7 @@ DALI_IMPORT_API Image NewImage( const Property::Value& map );
  *
  * @return a pointer to a newly created object.
  */
-DALI_IMPORT_API ShaderEffect NewShaderEffect( const Property::Value& map );
+DALI_IMPORT_API ShaderEffect NewShaderEffect( const Property::Value& property );
 
 /**
  * @brief Creates an actor with the date from the property value map.
@@ -310,15 +284,6 @@ DALI_IMPORT_API void CreatePropertyMap( Actor actor, Property::Map& map );
  * @param[out] map This map is cleared and a property map of the image is filled in
  */
 DALI_IMPORT_API void CreatePropertyMap( Image image, Property::Map& map );
-
-/**
- * @brief Sets a quaterion rotation from a script provided value (quaternion,euler vector3,quaternion vector4)
- *
- * @param[in] value Propery value
- * @param[out] quaternion Output Rotation
- * @return true if quaternion was set
- */
-DALI_IMPORT_API bool SetRotation( const Property::Value& value, Quaternion& quaternion );
 
 }
 

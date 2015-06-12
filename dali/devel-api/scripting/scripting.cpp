@@ -39,34 +39,12 @@ namespace
 {
 
 // Tables used here for converting strings to the enumerations and vice versa
-
-const StringEnum< ColorMode > COLOR_MODE_TABLE[] =
+struct AnchorValue
 {
-  { "USE_OWN_COLOR",                    USE_OWN_COLOR                    },
-  { "USE_PARENT_COLOR",                 USE_PARENT_COLOR                 },
-  { "USE_OWN_MULTIPLY_PARENT_COLOR",    USE_OWN_MULTIPLY_PARENT_COLOR    },
-  { "USE_OWN_MULTIPLY_PARENT_ALPHA",    USE_OWN_MULTIPLY_PARENT_ALPHA    },
+  const char* name;
+  const Vector3 value;
 };
-const unsigned int COLOR_MODE_TABLE_COUNT = sizeof( COLOR_MODE_TABLE ) / sizeof( COLOR_MODE_TABLE[0] );
-
-const StringEnum< PositionInheritanceMode > POSITION_INHERITANCE_MODE_TABLE[] =
-{
-  { "INHERIT_PARENT_POSITION",                    INHERIT_PARENT_POSITION                    },
-  { "USE_PARENT_POSITION",                        USE_PARENT_POSITION                        },
-  { "USE_PARENT_POSITION_PLUS_LOCAL_POSITION",    USE_PARENT_POSITION_PLUS_LOCAL_POSITION    },
-  { "DONT_INHERIT_POSITION",                      DONT_INHERIT_POSITION                      },
-};
-const unsigned int POSITION_INHERITANCE_MODE_TABLE_COUNT = sizeof( POSITION_INHERITANCE_MODE_TABLE ) / sizeof( POSITION_INHERITANCE_MODE_TABLE[0] );
-
-const StringEnum< DrawMode::Type > DRAW_MODE_TABLE[] =
-{
-  { "NORMAL",     DrawMode::NORMAL     },
-  { "OVERLAY",    DrawMode::OVERLAY    },
-  { "STENCIL",    DrawMode::STENCIL    },
-};
-const unsigned int DRAW_MODE_TABLE_COUNT = sizeof( DRAW_MODE_TABLE ) / sizeof( DRAW_MODE_TABLE[0] );
-
-const StringEnum< Vector3 > ANCHOR_CONSTANT_TABLE[] =
+const AnchorValue ANCHOR_CONSTANT_TABLE[] =
 {
   { "TOP_LEFT",               ParentOrigin::TOP_LEFT               },
   { "TOP_CENTER",             ParentOrigin::TOP_CENTER             },
@@ -80,21 +58,47 @@ const StringEnum< Vector3 > ANCHOR_CONSTANT_TABLE[] =
 };
 const unsigned int ANCHOR_CONSTANT_TABLE_COUNT = sizeof( ANCHOR_CONSTANT_TABLE ) / sizeof( ANCHOR_CONSTANT_TABLE[0] );
 
-const StringEnum< ResourceImage::LoadPolicy > IMAGE_LOAD_POLICY_TABLE[] =
+const StringEnum COLOR_MODE_TABLE[] =
+{
+  { "USE_OWN_COLOR",                    USE_OWN_COLOR                    },
+  { "USE_PARENT_COLOR",                 USE_PARENT_COLOR                 },
+  { "USE_OWN_MULTIPLY_PARENT_COLOR",    USE_OWN_MULTIPLY_PARENT_COLOR    },
+  { "USE_OWN_MULTIPLY_PARENT_ALPHA",    USE_OWN_MULTIPLY_PARENT_ALPHA    },
+};
+const unsigned int COLOR_MODE_TABLE_COUNT = sizeof( COLOR_MODE_TABLE ) / sizeof( COLOR_MODE_TABLE[0] );
+
+const StringEnum POSITION_INHERITANCE_MODE_TABLE[] =
+{
+  { "INHERIT_PARENT_POSITION",                    INHERIT_PARENT_POSITION                    },
+  { "USE_PARENT_POSITION",                        USE_PARENT_POSITION                        },
+  { "USE_PARENT_POSITION_PLUS_LOCAL_POSITION",    USE_PARENT_POSITION_PLUS_LOCAL_POSITION    },
+  { "DONT_INHERIT_POSITION",                      DONT_INHERIT_POSITION                      },
+};
+const unsigned int POSITION_INHERITANCE_MODE_TABLE_COUNT = sizeof( POSITION_INHERITANCE_MODE_TABLE ) / sizeof( POSITION_INHERITANCE_MODE_TABLE[0] );
+
+const StringEnum DRAW_MODE_TABLE[] =
+{
+  { "NORMAL",     DrawMode::NORMAL     },
+  { "OVERLAY",    DrawMode::OVERLAY    },
+  { "STENCIL",    DrawMode::STENCIL    },
+};
+const unsigned int DRAW_MODE_TABLE_COUNT = sizeof( DRAW_MODE_TABLE ) / sizeof( DRAW_MODE_TABLE[0] );
+
+const StringEnum IMAGE_LOAD_POLICY_TABLE[] =
 {
   { "IMMEDIATE", ResourceImage::IMMEDIATE },
   { "ON_DEMAND", ResourceImage::ON_DEMAND },
 };
 const unsigned int IMAGE_LOAD_POLICY_TABLE_COUNT = sizeof( IMAGE_LOAD_POLICY_TABLE ) / sizeof( IMAGE_LOAD_POLICY_TABLE[0] );
 
-const StringEnum< Image::ReleasePolicy > IMAGE_RELEASE_POLICY_TABLE[] =
+const StringEnum IMAGE_RELEASE_POLICY_TABLE[] =
 {
   { "UNUSED", Image::UNUSED },
   { "NEVER",  Image::NEVER  },
 };
 const unsigned int IMAGE_RELEASE_POLICY_TABLE_COUNT = sizeof( IMAGE_RELEASE_POLICY_TABLE ) / sizeof( IMAGE_RELEASE_POLICY_TABLE[0] );
 
-const StringEnum< Pixel::Format > PIXEL_FORMAT_TABLE[] =
+const StringEnum PIXEL_FORMAT_TABLE[] =
 {
   { "A8",                                           Pixel::A8                                           },
   { "L8",                                           Pixel::L8                                           },
@@ -125,7 +129,7 @@ const StringEnum< Pixel::Format > PIXEL_FORMAT_TABLE[] =
 };
 const unsigned int PIXEL_FORMAT_TABLE_COUNT = sizeof( PIXEL_FORMAT_TABLE ) / sizeof( PIXEL_FORMAT_TABLE[0] );
 
-const StringEnum< FittingMode::Type > IMAGE_FITTING_MODE_TABLE[] =
+const StringEnum IMAGE_FITTING_MODE_TABLE[] =
 {
   { "SHRINK_TO_FIT", FittingMode::SHRINK_TO_FIT },
   { "SCALE_TO_FILL", FittingMode::SCALE_TO_FILL },
@@ -134,7 +138,7 @@ const StringEnum< FittingMode::Type > IMAGE_FITTING_MODE_TABLE[] =
 };
 const unsigned int IMAGE_FITTING_MODE_TABLE_COUNT = sizeof( IMAGE_FITTING_MODE_TABLE ) / sizeof( IMAGE_FITTING_MODE_TABLE[0] );
 
-const StringEnum< SamplingMode::Type > IMAGE_SAMPLING_MODE_TABLE[] =
+const StringEnum IMAGE_SAMPLING_MODE_TABLE[] =
 {
   { "BOX",              SamplingMode::BOX            },
   { "NEAREST",          SamplingMode::NEAREST        },
@@ -146,7 +150,9 @@ const StringEnum< SamplingMode::Type > IMAGE_SAMPLING_MODE_TABLE[] =
 };
 const unsigned int IMAGE_SAMPLING_MODE_TABLE_COUNT = sizeof( IMAGE_SAMPLING_MODE_TABLE ) / sizeof( IMAGE_SAMPLING_MODE_TABLE[0] );
 
-} // unnamed namespace
+const char* ImageTypeName[] = { "ResourceImage", "FrameBufferImage", "BufferImage" };
+enum ImageType                { RESOURCE_IMAGE,  FRAME_BUFFER_IMAGE, BUFFER_IMAGE };
+const unsigned int imageTypeCount = sizeof( ImageTypeName ) / sizeof( const char* );
 
 bool CompareEnums( const char * a, const char * b )
 {
@@ -190,186 +196,259 @@ bool CompareEnums( const char * a, const char * b )
   return false;
 }
 
+} // unnamed namespace
+
+unsigned int FindEnumIndex( const char* value, const StringEnum* table, unsigned int tableCount )
+{
+  unsigned int index = 0;
+  bool found = false;
+  for ( unsigned int i = 0; i < tableCount; ++i, ++index )
+  {
+    if( CompareEnums( value, table->string ) )
+    {
+      found = true;
+      break;
+    }
+    ++table;
+  }
+  if ( !found )
+  {
+    DALI_LOG_ERROR( "Unknown enumeration string %s\n", value );
+  }
+  return index;
+}
 
 ColorMode GetColorMode( const std::string& value )
 {
-  return GetEnumeration< ColorMode >( value.c_str(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
+  // return default on error
+  ColorMode mode( USE_OWN_MULTIPLY_PARENT_ALPHA );
+  GetEnumeration< ColorMode >( value.c_str(), COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT, mode );
+  return mode;
 }
 
 
 std::string GetColorMode( ColorMode value )
 {
-  return GetEnumerationName< ColorMode >( value, COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
+  const char* name = GetEnumerationName< ColorMode >( value, COLOR_MODE_TABLE, COLOR_MODE_TABLE_COUNT );
+  if( name )
+  {
+    return std::string( name );
+  }
+  return std::string();
 }
 
 PositionInheritanceMode GetPositionInheritanceMode( const std::string& value )
 {
-  return GetEnumeration< PositionInheritanceMode >( value.c_str(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
+  // return default on error
+  PositionInheritanceMode mode( INHERIT_PARENT_POSITION );
+  GetEnumeration< PositionInheritanceMode >( value.c_str(), POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT, mode );
+  return mode;
 }
 
 
 std::string GetPositionInheritanceMode( PositionInheritanceMode value )
 {
-  return GetEnumerationName< PositionInheritanceMode >( value, POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
+  const char* name = GetEnumerationName< PositionInheritanceMode >( value, POSITION_INHERITANCE_MODE_TABLE, POSITION_INHERITANCE_MODE_TABLE_COUNT );
+  if( name )
+  {
+    return std::string( name );
+  }
+  return std::string();
 }
 
 
 DrawMode::Type GetDrawMode( const std::string& value )
 {
-  return GetEnumeration< DrawMode::Type >( value.c_str(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
+  // return default on error
+  DrawMode::Type mode( DrawMode::NORMAL );
+  GetEnumeration< DrawMode::Type >( value.c_str(), DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT, mode );
+  return mode;
 }
 
 
 std::string GetDrawMode( DrawMode::Type value )
 {
-  return GetEnumerationName< DrawMode::Type >( value, DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
+  const char* name = GetEnumerationName< DrawMode::Type >( value, DRAW_MODE_TABLE, DRAW_MODE_TABLE_COUNT );
+  if( name )
+  {
+    return std::string( name );
+  }
+  return std::string();
 }
 
 
 Vector3 GetAnchorConstant( const std::string& value )
 {
-  return GetEnumeration< Vector3 >( value.c_str(), ANCHOR_CONSTANT_TABLE, ANCHOR_CONSTANT_TABLE_COUNT );
+  for( unsigned int i = 0; i < ANCHOR_CONSTANT_TABLE_COUNT; ++i )
+  {
+    if( CompareEnums( value.c_str(), ANCHOR_CONSTANT_TABLE[ i ].name ) )
+    {
+      return ANCHOR_CONSTANT_TABLE[ i ].value;
+    }
+  }
+  return Vector3();
 }
 
 
-Image NewImage( const Property::Value& map )
+Image NewImage( const Property::Value& property )
 {
   Image ret;
 
   std::string filename;
-  ResourceImage::LoadPolicy loadPolicy    = Dali::Internal::IMAGE_LOAD_POLICY_DEFAULT;
-  Image::ReleasePolicy releasePolicy = Dali::Internal::IMAGE_RELEASE_POLICY_DEFAULT;
+  ResourceImage::LoadPolicy loadPolicy = Dali::Internal::IMAGE_LOAD_POLICY_DEFAULT;
+  Image::ReleasePolicy releasePolicy   = Dali::Internal::IMAGE_RELEASE_POLICY_DEFAULT;
   Internal::ImageAttributes attributes = Internal::ImageAttributes::New();
 
-  if( Property::MAP == map.GetType() )
+  const Property::Map* map = property.GetMap();
+  ImageType imageType = RESOURCE_IMAGE; // default to resource image
+  if( map )
   {
-    std::string field = "filename";
-    if( map.HasKey(field) )
+    // first check the type as it determines, which other parameters are needed
+    const Property::Value* value = map->Find( "type" );
+    if( value )
     {
-      DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image filename property is not a string" );
-      filename = map.GetValue(field).Get<std::string>();
+      std::string type;
+      value->Get( type );
+      for( unsigned int i = 0; i < imageTypeCount; ++i )
+      {
+        if( 0 == type.compare( ImageTypeName[ i ] ) )
+        {
+          imageType = static_cast<ImageType>( i );
+          break;
+        }
+      }
     }
 
-    field = "load-policy";
-    if( map.HasKey(field) )
+    // filename is only needed for resource images
+    if( RESOURCE_IMAGE == imageType )
     {
-      DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image load-policy property is not a string" );
-      std::string v(map.GetValue(field).Get<std::string>());
-      loadPolicy = GetEnumeration< ResourceImage::LoadPolicy >( v.c_str(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT );
+      const Property::Value* value = map->Find( "filename" );
+      if( value )
+      {
+        value->Get( filename );
+      }
+      // if empty file, no need to go further
+      if( filename.size() == 0 )
+      {
+        DALI_LOG_ERROR( "No filename\n" );
+        return Image();
+      }
     }
 
-    field = "release-policy";
-    if( map.HasKey(field) )
+    value = map->Find( "load-policy" );
+    if( value )
     {
-      DALI_ASSERT_ALWAYS(map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
-      std::string v(map.GetValue(field).Get<std::string>());
-      releasePolicy = GetEnumeration< Image::ReleasePolicy >( v.c_str(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT );
+      std::string policy;
+      value->Get( policy );
+      // keep default value on error
+      GetEnumeration< ResourceImage::LoadPolicy >( policy.c_str(), IMAGE_LOAD_POLICY_TABLE, IMAGE_LOAD_POLICY_TABLE_COUNT, loadPolicy );
+    }
+
+    value = map->Find( "release-policy" );
+    if( value )
+    {
+      std::string policy;
+      value->Get( policy );
+      // keep default value on error
+      GetEnumeration< Image::ReleasePolicy >( policy.c_str(), IMAGE_RELEASE_POLICY_TABLE, IMAGE_RELEASE_POLICY_TABLE_COUNT, releasePolicy );
     }
 
     // Width and height can be set individually. Dali derives the unspecified
     // dimension from the aspect ratio of the raw image.
     unsigned int width = 0, height = 0;
 
-    field = "width";
-    if( map.HasKey( field ) )
+    value = map->Find( "width" );
+    if( value )
     {
-      Property::Value &value = map.GetValue( field );
-
       // handle floats and integer the same for json script
-      if( value.GetType() == Property::FLOAT )
+      if( value->GetType() == Property::FLOAT )
       {
-        width = static_cast<unsigned int>( value.Get<float>() );
+        width = static_cast<unsigned int>( value->Get<float>() );
       }
       else
       {
-        DALI_ASSERT_ALWAYS( value.GetType() == Property::INTEGER && "Image width property is not a number" );
-        width = value.Get<int>();
+        value->Get( width );
       }
     }
-
-    field = "height";
-    if( map.HasKey( field ) )
+    value = map->Find( "height" );
+    if( value )
     {
-      Property::Value &value = map.GetValue( field );
-      if( value.GetType() == Property::FLOAT )
+      if( value->GetType() == Property::FLOAT )
       {
-        height = static_cast<unsigned int>( value.Get<float>() );
+        height = static_cast<unsigned int>( value->Get<float>() );
       }
       else
       {
-        DALI_ASSERT_ALWAYS( value.GetType() == Property::INTEGER && "Image width property is not a number" );
-        height = value.Get<int>();
+        value->Get( height );
       }
     }
-
     attributes.SetSize( width, height );
 
-    field = "pixel-format";
     Pixel::Format pixelFormat = Pixel::RGBA8888;
-    if( map.HasKey(field) )
+    value = map->Find( "pixel-format" );
+    if( value )
     {
-      DALI_ASSERT_ALWAYS( map.GetValue(field).GetType() == Property::STRING && "Image release-policy property is not a string" );
-      std::string s( map.GetValue(field).Get<std::string>() );
-      pixelFormat = GetEnumeration< Pixel::Format >( s.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT );
+      std::string format;
+      value->Get( format );
+      GetEnumeration< Pixel::Format >( format.c_str(), PIXEL_FORMAT_TABLE, PIXEL_FORMAT_TABLE_COUNT, pixelFormat );
     }
 
-    field = "fitting-mode";
-    if( map.HasKey( field ) )
+    value = map->Find( "fitting-mode" );
+    if( value )
     {
-      Property::Value& value = map.GetValue( field );
-      DALI_ASSERT_ALWAYS( value.GetType() == Property::STRING && "Image fitting-mode property is not a string" );
-      std::string s( value.Get<std::string>() );
-      attributes.SetScalingMode( GetEnumeration< FittingMode::Type >( s.c_str(), IMAGE_FITTING_MODE_TABLE, IMAGE_FITTING_MODE_TABLE_COUNT ) );
+      std::string fitting;
+      value->Get( fitting );
+      FittingMode::Type mode;
+      if( GetEnumeration< FittingMode::Type >( fitting.c_str(), IMAGE_FITTING_MODE_TABLE, IMAGE_FITTING_MODE_TABLE_COUNT, mode ) )
+      {
+        attributes.SetScalingMode( mode );
+      }
     }
 
-    field = "sampling-mode";
-    if( map.HasKey( field ) )
+    value = map->Find( "sampling-mode" );
+    if( value )
     {
-      Property::Value& value = map.GetValue( field );
-      DALI_ASSERT_ALWAYS( value.GetType() == Property::STRING && "Image sampling-mode property is not a string" );
-      std::string s( value.Get<std::string>() );
-      attributes.SetFilterMode( GetEnumeration< SamplingMode::Type >( s.c_str(), IMAGE_SAMPLING_MODE_TABLE, IMAGE_SAMPLING_MODE_TABLE_COUNT ) );
+      std::string sampling;
+      value->Get( sampling );
+      SamplingMode::Type mode;
+      if( GetEnumeration< SamplingMode::Type >( sampling.c_str(), IMAGE_SAMPLING_MODE_TABLE, IMAGE_SAMPLING_MODE_TABLE_COUNT, mode ) )
+      {
+        attributes.SetFilterMode( mode );
+      }
     }
 
-    field = "orientation";
-    if( map.HasKey( field ) )
+    value = map->Find( "orientation" );
+    if( value )
     {
-      Property::Value& value = map.GetValue( field );
-      DALI_ASSERT_ALWAYS( value.GetType() == Property::BOOLEAN && "Image orientation property is not a boolean" );
-      bool b = value.Get<bool>();
+      bool b = value->Get<bool>();
       attributes.SetOrientationCorrection( b );
     }
 
-    if( map.HasKey("type") )
+    switch( imageType )
     {
-      DALI_ASSERT_ALWAYS( map.GetValue("type").GetType() == Property::STRING );
-      std::string s(map.GetValue("type").Get<std::string>());
-      if("FrameBufferImage" == s)
+      case RESOURCE_IMAGE :
       {
-        ret = FrameBufferImage::New(attributes.GetWidth(),
-                                    attributes.GetHeight(),
-                                    pixelFormat,
-                                    releasePolicy);
+        ret = ResourceImage::New( filename, loadPolicy, releasePolicy,
+                                  ImageDimensions( attributes.GetSize().x, attributes.GetSize().y ),
+                                  attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
+        break;
       }
-      else if("BufferImage" == s)
+      case BUFFER_IMAGE :
       {
-        ret = BufferImage::New(attributes.GetWidth(),
-                               attributes.GetHeight(),
-                               pixelFormat,
-                               releasePolicy);
+        ret = BufferImage::New( attributes.GetWidth(),
+                                attributes.GetHeight(),
+                                pixelFormat,
+                                releasePolicy );
+        break;
       }
-      else if("ResourceImage" == s)
+      case FRAME_BUFFER_IMAGE :
       {
-        ret = ResourceImage::New( filename, loadPolicy, releasePolicy, ImageDimensions( attributes.GetSize().x, attributes.GetSize().y ), attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
+        ret = FrameBufferImage::New( attributes.GetWidth(),
+                                     attributes.GetHeight(),
+                                     pixelFormat,
+                                     releasePolicy );
+        break;
       }
-      else
-      {
-        DALI_ASSERT_ALWAYS( !"Unknown image type" );
-      }
-    }
-    else
-    {
-      ret = ResourceImage::New( filename, loadPolicy, releasePolicy, ImageDimensions( attributes.GetSize().x, attributes.GetSize().y ), attributes.GetScalingMode(), attributes.GetFilterMode(), attributes.GetOrientationCorrection() );
     }
   }
 
@@ -378,46 +457,47 @@ Image NewImage( const Property::Value& map )
 } // Image NewImage( Property::Value map )
 
 
-ShaderEffect NewShaderEffect( const Property::Value& map )
+ShaderEffect NewShaderEffect( const Property::Value& property )
 {
   Internal::ShaderEffectPtr ret;
 
-  if( map.GetType() == Property::MAP )
+  const Property::Map* map = property.GetMap();
+  if( map )
   {
-    ret = Internal::ShaderEffect::New(Dali::ShaderEffect::HINT_NONE); // hint can be reset if in map
+    ret = Internal::ShaderEffect::New( Dali::ShaderEffect::HINT_NONE ); // hint can be reset if in map
 
-    if( map.HasKey("program") )
+    const Property::Value* value = map->Find( "program" );
+    if( value )
     {
-      Property::Index index = ret->GetPropertyIndex("program");
-      DALI_ASSERT_DEBUG( map.GetValue("program").GetType() == Property::MAP );
-      ret->SetProperty(index, map.GetValue("program"));
+      Property::Index index = ret->GetPropertyIndex( "program" );
+      ret->SetProperty( index, *value );
     }
 
-    for(int i = 0; i < map.GetSize(); ++i)
+    for( unsigned int i = 0; i < map->Count(); ++i )
     {
-      const std::string& key = map.GetKey(i);
-      if(key != "program")
+      const std::string& key = map->GetKey( i );
+      if( key != "program" )
       {
         Property::Index index = ret->GetPropertyIndex( key );
 
+        const Property::Value& value = map->GetValue( i );
         if( Property::INVALID_INDEX != index )
         {
-          ret->SetProperty(index, map.GetItem(i));
+          ret->SetProperty( index, value );
         }
         else
         {
           // if its not a property then register it as a uniform (making a custom property)
-
-          if(map.GetItem(i).GetType() == Property::INTEGER)
+          if( value.GetType() == Property::INTEGER )
           {
             // valid uniforms are floats, vec3's etc so we recast if the user accidentally
             // set as integer. Note the map could have come from json script.
-            Property::Value asFloat( static_cast<float>( map.GetItem(i).Get<int>() ) );
+            Property::Value asFloat( static_cast<float>( value.Get<int>() ) );
             ret->SetUniform( key, asFloat, Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );
           }
           else
           {
-            ret->SetUniform( key, map.GetItem(i), Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );
+            ret->SetUniform( key, value, Dali::ShaderEffect::COORDINATE_TYPE_DEFAULT );
           }
         }
       }
@@ -445,7 +525,7 @@ Actor NewActor( const Property::Map& map )
 
   if ( !handle )
   {
-    DALI_LOG_ERROR( "Actor type not provided, returning empty handle" );
+    DALI_LOG_ERROR( "Actor type not provided\n" );
     return Actor();
   }
 
@@ -468,16 +548,11 @@ Actor NewActor( const Property::Map& map )
       if ( key == "actors" )
       {
         // Create children
-
         Property::Array actorArray = value.Get< Property::Array >();
-        for ( size_t i = 0; i < actorArray.Size(); ++i)
+        for ( Property::Array::SizeType i = 0; i < actorArray.Size(); ++i)
         {
           actor.Add( NewActor( actorArray[i].Get< Property::Map >() ) );
         }
-      }
-      else if ( key == "signals" )
-      {
-        DALI_LOG_ERROR( "signals not supported" );
       }
       else if( key ==  "parent-origin" )
       {
@@ -595,34 +670,6 @@ void CreatePropertyMap( Image image, Property::Map& map )
       map[ "height" ] = height;
     }
   }
-}
-
-
-DALI_IMPORT_API bool SetRotation( const Property::Value& value, Quaternion& quaternion )
-{
-  bool done = false;
-  Property::Type type = value.GetType();
-  if( Property::VECTOR3 == type )
-  {
-    Vector3 v3;
-    value.Get(v3);
-    quaternion.SetEuler( Radian(Degree(v3.x)), Radian(Degree(v3.y)), Radian(Degree(v3.z)) );
-    done = true;
-  }
-  else if( Property::VECTOR4 == type )
-  {
-    Vector4 v4;
-    value.Get(v4);
-    quaternion = Quaternion(v4);
-    done = true;
-  }
-  else if( Property::ROTATION == type )
-  {
-    value.Get(quaternion);
-    done = true;
-  }
-
-  return done;
 }
 
 } // namespace scripting
