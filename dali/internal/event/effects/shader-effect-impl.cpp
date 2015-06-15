@@ -179,16 +179,18 @@ void WrapAndSetProgram( Internal::ShaderEffect& effect,
 
 std::string GetShader(const std::string& field, const Property::Value& property)
 {
-  std::string value;
-  if( property.HasKey(field) )
+  std::string retval;
+  const Property::Map* map = property.GetMap();
+  if( map )
   {
-    DALI_ASSERT_ALWAYS(property.GetValue(field).GetType() == Property::STRING && "Shader property is not a string" );
-
-    // we could also check here for an array of strings as convenience for json not having multi line strings
-    value = property.GetValue(field).Get<std::string>();
+    const Property::Value* value = map->Find( field );
+    if( value )
+    {
+      value->Get( retval );
+    }
   }
 
-  return value;
+  return retval;
 }
 
 } // unnamed namespace
@@ -476,31 +478,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
       std::string vertex         = GetShader("vertex", propertyValue);
       std::string fragment       = GetShader("fragment", propertyValue);
 
-      GeometryType geometryType      = GEOMETRY_TYPE_IMAGE;
-
-      if( propertyValue.HasKey("geometry-type") )
-      {
-        Property::Value geometryValue  = propertyValue.GetValue("geometry-type");
-        DALI_ASSERT_ALWAYS(geometryValue.GetType() == Property::STRING && "Geometry type is not a string" );
-
-        std::string s = geometryValue.Get<std::string>();
-        if(s == "GEOMETRY_TYPE_IMAGE")
-        {
-          geometryType  = GEOMETRY_TYPE_IMAGE;
-        }
-        else if( s == "GEOMETRY_TYPE_UNTEXTURED_MESH")
-        {
-          geometryType  = GEOMETRY_TYPE_UNTEXTURED_MESH;
-        }
-        else if( s == "GEOMETRY_TYPE_TEXTURED_MESH")
-        {
-          geometryType  = GEOMETRY_TYPE_TEXTURED_MESH;
-        }
-        else
-        {
-          DALI_ASSERT_ALWAYS(!"Geometry type unknown" );
-        }
-      }
+      GeometryType geometryType      = GEOMETRY_TYPE_IMAGE; // only images are supported
       SetPrograms( geometryType, vertexPrefix, fragmentPrefix, vertex, fragment );
       break;
     }

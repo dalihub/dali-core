@@ -36,6 +36,8 @@ class DALI_IMPORT_API Property::Array
 {
 public:
 
+  typedef std::size_t SizeType;
+
   /**
    * @brief Default constructor.
    */
@@ -58,21 +60,27 @@ public:
    *
    * @return The number of elements in the array.
    */
-  unsigned int Size() const;
+  SizeType Size() const
+  {
+    return Count();
+  }
 
   /**
    * @brief Retrieve the number of elements in the array.
    *
    * @return The number of elements in the array.
    */
-  unsigned int Count() const;
+  SizeType Count() const;
 
   /**
    * @brief Returns whether the array is empty.
    *
    * @return true if empty, false otherwise
    */
-  bool Empty() const;
+  bool Empty() const
+  {
+    return Count() == 0;
+  }
 
   /**
    * @brief Clears the array.
@@ -82,29 +90,50 @@ public:
   /**
    * @brief Increase the capcity of the array.
    */
-  void Reserve(size_t size);
+  void Reserve( SizeType size );
 
   /**
    * @brief Resize to size.
    */
-  void Resize(size_t size);
+  void Resize( SizeType size );
 
   /**
    * @brief Retrieve the capacity of the array.
    *
    * @return The allocated capacity of the array
    */
-  size_t Capacity();
+  SizeType Capacity();
 
   /**
    * @brief Add an element to the array.
    *
    * @param[in] value The value to add to the end of the array
+   */
+  void PushBack( const Value& value );
+
+  /**
+   * @brief Const access an element.
+   *
+   * @param[in] index The element index to access. No bounds checking is performed.
    *
    * @return The a reference to the element.
-   *
    */
-  void PushBack(const Value& value);
+  const Value& GetElementAt( SizeType index ) const
+  {
+    return operator[]( index );
+  }
+
+  /**
+   * @brief Access an element.
+   *
+   * @param[in] index The element index to access. No bounds checking is performed.
+   *
+   * @return The a reference to the element.
+   */
+  Value& GetElementAt( SizeType index )
+  {
+    return operator[]( index );
+  }
 
   /**
    * @brief Const operator to access an element.
@@ -114,7 +143,7 @@ public:
    * @return The a reference to the element.
    *
    */
-  const Value& operator[]( const size_t index ) const;
+  const Value& operator[]( SizeType index ) const;
 
   /**
    * @brief Operator to access an element.
@@ -124,7 +153,7 @@ public:
    * @return The a reference to the element.
    *
    */
-  Value& operator[]( const size_t index );
+  Value& operator[]( SizeType index );
 
   /**
    * @brief Assignment Operator
