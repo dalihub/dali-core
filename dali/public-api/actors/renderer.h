@@ -141,7 +141,7 @@ public:
    * @sa SetDepthIndex()
    * @return the depth index
    */
-  int GetCurrentDepthIndex();
+  int GetDepthIndex();
 
 public:
   /**

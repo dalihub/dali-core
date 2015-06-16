@@ -38,7 +38,7 @@ namespace
  *            |name          |type     |writable|animatable|constraint-input|enum for index-checking|
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "depth-index", INTEGER,  true, true, true, Dali::Renderer::Property::DEPTH_INDEX )
+DALI_PROPERTY( "depth-index", INTEGER, true, false, false, Dali::Renderer::Property::DEPTH_INDEX )
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
@@ -79,18 +79,16 @@ Material* Renderer::GetMaterial() const
 
 void Renderer::SetDepthIndex( int depthIndex )
 {
-  SetDepthIndexMessage( GetEventThreadServices(), *mSceneObject, depthIndex );
+  if ( mDepthIndex != depthIndex )
+  {
+    mDepthIndex = depthIndex;
+    SetDepthIndexMessage( GetEventThreadServices(), *mSceneObject, depthIndex );
+  }
 }
 
-int Renderer::GetCurrentDepthIndex() const
+int Renderer::GetDepthIndex() const
 {
-  int depthIndex = 0;
-  if( mSceneObject )
-  {
-    BufferIndex bufferIndex = GetEventThreadServices().GetEventBufferIndex();
-    depthIndex = mSceneObject->mDepthIndex[bufferIndex];
-  }
-  return depthIndex;
+  return mDepthIndex;
 }
 
 SceneGraph::RendererAttachment* Renderer::GetRendererSceneObject()
@@ -166,7 +164,7 @@ Property::Value Renderer::GetDefaultProperty( Property::Index index ) const
   {
     case Dali::Renderer::Property::DEPTH_INDEX:
     {
-      value = GetCurrentDepthIndex();
+      value = GetDepthIndex();
     }
     break;
   }
@@ -195,18 +193,6 @@ const SceneGraph::PropertyBase* Renderer::GetSceneObjectAnimatableProperty( Prop
       &Renderer::FindAnimatableProperty,
       &Renderer::FindCustomProperty,
       index );
-
-    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      switch(index)
-      {
-        case Dali::Renderer::Property::DEPTH_INDEX:
-        {
-          property = &mSceneObject->mDepthIndex;
-        }
-        break;
-      }
-    }
   }
 
   return property;
@@ -224,18 +210,6 @@ const PropertyInputImpl* Renderer::GetSceneObjectInputProperty( Property::Index 
                                                      &Renderer::FindCustomProperty,
                                                      index );
     property = static_cast<const PropertyInputImpl*>( baseProperty );
-
-    if( property == NULL && index < DEFAULT_PROPERTY_MAX_COUNT )
-    {
-      switch(index)
-      {
-        case Dali::Renderer::Property::DEPTH_INDEX:
-        {
-          property = &mSceneObject->mDepthIndex;
-        }
-        break;
-      }
-    }
   }
 
   return property;
@@ -269,6 +243,7 @@ void Renderer::Disconnect()
 
 Renderer::Renderer()
 : mSceneObject(NULL),
+  mDepthIndex(0),
   mOnStage(false)
 {
 }

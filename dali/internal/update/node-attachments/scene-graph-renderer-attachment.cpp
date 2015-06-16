@@ -159,20 +159,15 @@ void RendererAttachment::SetSortAttributes( BufferIndex bufferIndex, RendererWit
   sortAttributes.geometry = mGeometry;
 }
 
-void RendererAttachment::SetDepthIndex( BufferIndex updateBufferIndex, int depthIndex )
+void RendererAttachment::SetDepthIndex( int depthIndex )
 {
-  mDepthIndex.Bake(updateBufferIndex, depthIndex);
+  mDepthIndex = depthIndex;
 
   if( mParent )
   {
     // only do this if we are on-stage. Ensures the render lists are re-sorted
     mParent->SetDirtyFlag( SortModifierFlag );
   }
-}
-
-void RendererAttachment::ResetToBaseValues( BufferIndex updateBufferIndex )
-{
-  mDepthIndex.ResetToBaseValue( updateBufferIndex );
 }
 
 Renderer& RendererAttachment::GetRenderer()

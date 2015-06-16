@@ -204,7 +204,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
     RenderItem& item = renderList.GetNextFreeItem();
     const Renderer& renderer = renderable.GetRenderer();
     item.SetRenderer( const_cast< Renderer* >( &renderer ) );
-    item.SetDepthIndex( renderable.GetDepthIndex(updateBufferIndex) );
+    item.SetDepthIndex( renderable.GetDepthIndex() );
 
     // save MV matrix onto the item
     Matrix& modelViewMatrix = item.GetModelViewMatrix();

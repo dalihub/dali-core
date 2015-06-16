@@ -210,7 +210,7 @@ int UtcDaliRendererSetGetDepthIndex(void)
 {
   TestApplication application;
 
-  tet_infoline("Test SetDepthIndex, GetCurrentDepthIndex");
+  tet_infoline("Test SetDepthIndex, GetDepthIndex");
 
   Material material = CreateMaterial(1.0f);
   Geometry geometry = CreateQuadGeometry();
@@ -222,21 +222,21 @@ int UtcDaliRendererSetGetDepthIndex(void)
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetCurrentDepthIndex(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetDepthIndex(), 0, TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 0, TEST_LOCATION );
 
   renderer.SetDepthIndex(1);
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetCurrentDepthIndex(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetDepthIndex(), 1, TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 1, TEST_LOCATION );
 
   renderer.SetDepthIndex(10);
 
   application.SendNotification();
   application.Render(0);
-  DALI_TEST_EQUALS( renderer.GetCurrentDepthIndex(), 10, TEST_LOCATION );
+  DALI_TEST_EQUALS( renderer.GetDepthIndex(), 10, TEST_LOCATION );
   DALI_TEST_EQUALS( renderer.GetProperty<int>(Renderer::Property::DEPTH_INDEX), 10, TEST_LOCATION );
 
   END_TEST;

@@ -79,9 +79,9 @@ public:
   void SetDepthIndex( int depthIndex );
 
   /**
-   * @copydoc Dali::Renderer::GetCurrentDepthIndex()
+   * @copydoc Dali::Renderer::GetDepthIndex()
    */
-  int GetCurrentDepthIndex() const;
+  int GetDepthIndex() const;
 
   /**
    * @brief Get the scene graph object ( the node attachment )
@@ -207,6 +207,7 @@ private: // data
   SceneGraph::RendererAttachment* mSceneObject;
   ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
   ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
+  int mDepthIndex;
   bool mOnStage;
 };
 

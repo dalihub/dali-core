@@ -127,23 +127,18 @@ public:
 
   /**
    * Set the depth index
-   * @param[in] bufferIndex The buffer index
    * @param[in] depthIndex the new depth index to use
    */
-  void SetDepthIndex( BufferIndex bufferIndex, int depthIndex );
+  void SetDepthIndex( int depthIndex );
 
 protected: // From NodeAttachment
   /**
-   * @copydoc NodeAttachment::ResetToBaseValues
+   * @brief Get the depth index
+   * @return The depth index
    */
-  virtual void ResetToBaseValues( BufferIndex updateBufferIndex );
-
-  /**
-   * @param[in] bufferIndex The buffer index
-   */
-  virtual int GetDepthIndex( BufferIndex bufferIndex )
+  virtual int GetDepthIndex()
   {
-    return mDepthIndex[bufferIndex];
+    return mDepthIndex;
   }
 
   /**
@@ -241,7 +236,7 @@ private:
 
 public: // Properties
 
-  AnimatableProperty<int> mDepthIndex; ///< Used only in PrepareRenderInstructions
+  int mDepthIndex; ///< Used only in PrepareRenderInstructions
 };
 
 // Messages for RendererAttachment
@@ -270,7 +265,7 @@ inline void SetGeometryMessage( EventThreadServices& eventThreadServices, const 
 
 inline void SetDepthIndexMessage( EventThreadServices& eventThreadServices, const RendererAttachment& attachment, int depthIndex )
 {
-  typedef MessageDoubleBuffered1< RendererAttachment, int > LocalType;
+  typedef MessageValue1< RendererAttachment, int > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );

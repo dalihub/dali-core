@@ -248,7 +248,7 @@ public: // API for derived classes
    * Get the depth index for the attachment
    * @param[in] bufferIndex The current update buffer index.
    */
-  virtual int GetDepthIndex(BufferIndex bufferIndex)
+  virtual int GetDepthIndex()
   {
     return static_cast<int>( mSortModifier );
   }

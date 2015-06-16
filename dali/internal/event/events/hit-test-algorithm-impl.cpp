@@ -225,7 +225,7 @@ HitActor HitTestWithinLayer( Actor& actor,
             {
               if ( actor.GetRendererCount() )
               {
-                hit.depth = actor.GetRendererAt( 0 ).GetCurrentDepthIndex();
+                hit.depth = actor.GetRendererAt( 0 ).GetDepthIndex();
               }
               else
               {
