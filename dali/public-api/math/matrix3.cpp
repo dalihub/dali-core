@@ -58,9 +58,6 @@ Matrix3::Matrix3()
 {
   float* m = AsFloat();
   memset(m, 0, NUM_BYTES_IN_MATRIX);
-  mElements[S00]=1.0f;
-  mElements[S11]=1.0f;
-  mElements[S22]=1.0f;
 }
 
 Matrix3::Matrix3(const Matrix3& m)

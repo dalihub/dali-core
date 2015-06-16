@@ -82,8 +82,7 @@ struct DALI_IMPORT_API Property
     ROTATION,        ///< either a quaternion or an axis angle rotation
     STRING,          ///< A string type
     ARRAY,           ///< an array of Property::Value
-    MAP,             ///< a string key to Property:value mapping
-    TYPE_COUNT       ///< The number of supported property types
+    MAP              ///< a string key to Property:value mapping
   };
 
   /**

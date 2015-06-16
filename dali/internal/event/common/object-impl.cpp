@@ -587,7 +587,6 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     case Property::ARRAY:
     case Property::MAP:
     case Property::NONE:
-    case Property::TYPE_COUNT:
     {
       DALI_ASSERT_ALWAYS( !"PropertyType is not animatable" );
       break;

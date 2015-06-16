@@ -105,11 +105,6 @@ void CheckTypeName(const Property::Type& type)
       DALI_TEST_CHECK( "MAP" == std::string(PropertyTypes::GetName( type ) ) );
       break;
     }
-    case Property::TYPE_COUNT:
-    {
-      DALI_TEST_CHECK( "NONE" == std::string(PropertyTypes::GetName( type ) ) );
-      break;
-    }
   } // switch(type)
 
 } // CheckTypeName
@@ -121,43 +116,6 @@ struct CheckCopyCtorP
   {
     Property::Value copy( value );
     DALI_TEST_CHECK( value.Get<T>() == copy.Get<T>() );
-  }
-};
-
-template <>
-struct CheckCopyCtorP<AngleAxis>
-{
-  CheckCopyCtorP(Property::Value value)
-  {
-    Property::Value copy( value );
-    AngleAxis a = value.Get<AngleAxis>();
-    AngleAxis b = copy.Get<AngleAxis>();
-    DALI_TEST_CHECK( a.angle == b.angle );
-    DALI_TEST_CHECK( a.axis == b.axis );
-  }
-};
-
-template <>
-struct CheckCopyCtorP<Property::Array>
-{
-  CheckCopyCtorP(Property::Value value)
-  {
-    Property::Value copy( value );
-    Property::Array a = value.Get<Property::Array>();
-    Property::Array b = copy.Get<Property::Array>();
-    DALI_TEST_CHECK( a.Size() == b.Size() );
-  }
-};
-
-template <>
-struct CheckCopyCtorP<Property::Map>
-{
-  CheckCopyCtorP(Property::Value value)
-  {
-    Property::Value copy( value );
-    Property::Map a = value.Get<Property::Map>();
-    Property::Map b = copy.Get<Property::Map>();
-    DALI_TEST_CHECK( a.Count() == b.Count() );
   }
 };
 
@@ -188,10 +146,6 @@ int UtcDaliPropertyValueConstructorsNoneTypeP(void)
   Property::Value value( Property::NONE );
 
   DALI_TEST_CHECK( value.GetType() == Property::NONE );
-
-  Property::Value value2( Property::TYPE_COUNT );
-
-  DALI_TEST_CHECK( value2.GetType() == Property::NONE );
 
   END_TEST;
 }
@@ -531,8 +485,8 @@ int UtcDaliPropertyValueCopyConstructorP(void)
   Property::Value value;
   Property::Value value2( value );
   DALI_TEST_EQUALS( value.GetType(), value2.GetType(), TEST_LOCATION );
-  DALI_TEST_EQUALS( value.IsMap(), value2.IsMap(), TEST_LOCATION );
-  DALI_TEST_EQUALS( value.IsArray(), value2.IsArray(), TEST_LOCATION );
+  DALI_TEST_EQUALS( value.GetMap(), value2.GetMap(), TEST_LOCATION );
+  DALI_TEST_EQUALS( value.GetArray(), value2.GetArray(), TEST_LOCATION );
   END_TEST;
 }
 
@@ -647,8 +601,8 @@ int UtcDaliPropertyValueAssignmentSelfP(void)
   Property::Value* self = &value;
   value = *self;
   DALI_TEST_EQUALS( value.GetType(), Property::NONE, TEST_LOCATION );
-  DALI_TEST_EQUALS( value.IsMap(), false, TEST_LOCATION );
-  DALI_TEST_EQUALS( value.IsArray(), false, TEST_LOCATION );
+  DALI_TEST_CHECK( value.GetMap() == NULL );
+  DALI_TEST_CHECK( value.GetArray() == NULL );
   END_TEST;
 }
 
@@ -852,7 +806,11 @@ int UtcDaliPropertyValueGetTypeP(void)
 int UtcDaliPropertyValueGetBoolP(void)
 {
   Property::Value value(true);
+  bool boolean( false );
+  DALI_TEST_CHECK( value.Get( boolean ) == true );
   DALI_TEST_CHECK( value.Get<bool>() == true );
+  std::string string;
+  DALI_TEST_CHECK( value.Get( string ) == false );
   value = Property::Value(1.f);
   DALI_TEST_CHECK( value.Get<float>() == 1.f );
   END_TEST;
@@ -862,118 +820,190 @@ int UtcDaliPropertyValueGetBoolN(void)
 {
   Property::Value value;
   DALI_TEST_CHECK( value.Get<bool>() == false );
+  bool boolean( false );
+  DALI_TEST_CHECK( value.Get( boolean ) == false );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetFloatP(void)
 {
   Property::Value value(1.1f);
+  float flow( 0.0f );
   DALI_TEST_EQUALS( 1.1f, value.Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( flow ), TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetFloatN(void)
 {
   Property::Value value;
-  DALI_TEST_EQUALS( 0.0f, value.Get<float>(), TEST_LOCATION );
+  float result( 1.0f );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1.0f, result, TEST_LOCATION ); // result is not modified
+  Property::Value value2( "" );
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1.0f, result, TEST_LOCATION ); // result is not modified
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetIntP(void)
 {
   Property::Value value(123);
+  int result( 10 );
   DALI_TEST_EQUALS( 123, value.Get<int>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 123, result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetIntN(void)
 {
   Property::Value value;
+  int result( 10 );
   DALI_TEST_EQUALS( 0, value.Get<int>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 10, result, TEST_LOCATION ); // result is not modified
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 10, result, TEST_LOCATION ); // result is not modified
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetUnsignedIntP(void)
 {
   Property::Value value(123u);
+  unsigned int result( 10u );
   DALI_TEST_EQUALS( 123u, value.Get<unsigned int>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 123u, result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetUnsignedIntN(void)
 {
   Property::Value value;
+  unsigned int result( 10u );
   DALI_TEST_EQUALS( 0u, value.Get<unsigned int>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 10u, result, TEST_LOCATION );
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 10u, result, TEST_LOCATION ); // result is not modified
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetRectP(void)
 {
   Property::Value value( Rect<int>(1,2,3,4) );
+  Rect<int> result(4,3,2,1);
   DALI_TEST_EQUALS( Rect<int>(1,2,3,4), value.Get< Rect<int> >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Rect<int>(1,2,3,4), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetRectN(void)
 {
   Property::Value value;
+  Rect<int> result(4,3,2,1);
   DALI_TEST_EQUALS( Rect<int>(0,0,0,0), value.Get< Rect<int> >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Rect<int>(4,3,2,1), result, TEST_LOCATION );
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Rect<int>(4,3,2,1), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetVector2P(void)
 {
   Property::Value value( Vector2(1.0f,2.0f) );
+  Vector2 result;
   DALI_TEST_EQUALS( Vector2(1.0f,2.0f), value.Get< Vector2 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(1.0f,2.0f), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetVector2N(void)
 {
   Property::Value value;
+  Vector2 result;
   DALI_TEST_EQUALS( Vector2(0.f,0.f), value.Get< Vector2 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(), result, TEST_LOCATION );
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector2(), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetVector3P(void)
 {
   Property::Value value( Vector3(1.0f,2.0f,-1.f) );
+  Vector3 result;
   DALI_TEST_EQUALS( Vector3(1.0f,2.0f,-1.f), value.Get< Vector3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3(1.0f,2.0f,-1.f), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetVector3N(void)
 {
   Property::Value value;
+  Vector3 result;
   DALI_TEST_EQUALS( Vector3(0.f,0.f,0.f), value.Get< Vector3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3(), result, TEST_LOCATION );
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector3(), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetVector4P(void)
 {
   Property::Value value( Vector4(1.f,2.f,-1.f,-3.f) );
+  Vector4 result;
   DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,-3.f), value.Get< Vector4 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4(1.f,2.f,-1.f,-3.f), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetVector4N(void)
 {
   Property::Value value;
+  Vector4 result;
   DALI_TEST_EQUALS( Vector4(0.f,0.f,0.f,0.f), value.Get< Vector4 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4(), result, TEST_LOCATION );
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Vector4(), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetMatrix3P(void)
 {
   Property::Value value( Matrix3(1.f,2.f,3.f,4.f,5.f,6.f,7.f,8.f,9.f) );
+  Matrix3 result;
   DALI_TEST_EQUALS( Matrix3(1.f,2.f,3.f,4.f,5.f,6.f,7.f,8.f,9.f), value.Get< Matrix3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Matrix3(1.f,2.f,3.f,4.f,5.f,6.f,7.f,8.f,9.f), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetMatrix3N(void)
 {
   Property::Value value;
-  DALI_TEST_EQUALS( Matrix3::IDENTITY, value.Get< Matrix3 >(), TEST_LOCATION );
+  Matrix3 result(1.f,2.f,3.f,4.f,5.f,6.f,7.f,8.f,9.f);
+  DALI_TEST_EQUALS( Matrix3(), value.Get< Matrix3 >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Matrix3(1.f,2.f,3.f,4.f,5.f,6.f,7.f,8.f,9.f), result, TEST_LOCATION );
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Matrix3(1.f,2.f,3.f,4.f,5.f,6.f,7.f,8.f,9.f), result, TEST_LOCATION );
   END_TEST;
 }
 
@@ -982,14 +1012,24 @@ int UtcDaliPropertyValueGetMatrixP(void)
   float matrixValues[16] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
   Matrix input( matrixValues );
   Property::Value value( input );
+  Matrix result;
   DALI_TEST_EQUALS( input, value.Get< Matrix >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( input, result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetMatrixN(void)
 {
   Property::Value value;
-  DALI_TEST_EQUALS( Matrix::IDENTITY, value.Get< Matrix >(), TEST_LOCATION );
+  Matrix result( Matrix::IDENTITY );
+  DALI_TEST_EQUALS( Matrix(), value.Get< Matrix >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Matrix::IDENTITY, result, TEST_LOCATION );
+
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Matrix::IDENTITY, result, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1000,6 +1040,9 @@ int UtcDaliPropertyValueGetAngleAxisP(void)
   AngleAxis result = value.Get<AngleAxis>();
   DALI_TEST_EQUALS( input.angle, result.angle, TEST_LOCATION );
   DALI_TEST_EQUALS( input.axis, result.axis, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( input, result, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1007,36 +1050,72 @@ int UtcDaliPropertyValueGetAngleAxisN(void)
 {
   Property::Value value;
   AngleAxis b = value.Get<AngleAxis>();
+  AngleAxis result;
   DALI_TEST_EQUALS( 0.f, b.angle, TEST_LOCATION );
   DALI_TEST_EQUALS( Vector3::ZERO, b.axis, TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( AngleAxis(), result, TEST_LOCATION );
+
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( AngleAxis(), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetQuaternionP(void)
 {
   Property::Value value( Quaternion(1.f,2.f,3.f,4.f) );
+  Quaternion result;
   DALI_TEST_EQUALS( Quaternion(1.f,2.f,3.f,4.f), value.Get< Quaternion >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Quaternion(1.f,2.f,3.f,4.f), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetQuaternionN(void)
 {
   Property::Value value;
-  DALI_TEST_EQUALS( Quaternion::IDENTITY, value.Get< Quaternion >(), TEST_LOCATION );
+  Quaternion result(1.f,2.f,3.f,4.f);
+  DALI_TEST_EQUALS( Quaternion(), value.Get< Quaternion >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Quaternion(1.f,2.f,3.f,4.f), result, TEST_LOCATION );
+
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( Quaternion(1.f,2.f,3.f,4.f), result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetStringP(void)
 {
   Property::Value value( std::string("hello") );
+  std::string result;
   DALI_TEST_EQUALS( std::string("hello"), value.Get< std::string >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( std::string("hello"), result, TEST_LOCATION );
+
+  Property::Value value2( "C hi!" );
+  DALI_TEST_EQUALS( "C hi!", value2.Get< std::string >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( "C hi!", result, TEST_LOCATION );
   END_TEST;
 }
 
 int UtcDaliPropertyValueGetStringN(void)
 {
   Property::Value value;
-  DALI_TEST_EQUALS( std::string(""), value.Get< std::string >(), TEST_LOCATION );
+  std::string result("doesn't change");
+  DALI_TEST_EQUALS( std::string(), value.Get< std::string >(), TEST_LOCATION );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( "doesn't change", result, TEST_LOCATION );
+
+  Property::Value value2(10);
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( "doesn't change", result, TEST_LOCATION );
+
+  Property::Value value3((char*)NULL);
+  DALI_TEST_EQUALS( true, value3.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( std::string(), result, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1047,6 +1126,9 @@ int UtcDaliPropertyValueGetArrayP(void)
   value.GetArray()->PushBack( Property::Value(1) );
   Property::Array got = value.Get<Property::Array>();
   DALI_TEST_CHECK( got[0].Get<int>() == 1);
+  Property::Array result;
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_CHECK( result[0].Get<int>() == 1);
   END_TEST;
 }
 
@@ -1054,10 +1136,14 @@ int UtcDaliPropertyValueGetArrayN(void)
 {
   Property::Value value;
   DALI_TEST_CHECK( NULL == value.GetArray() );
-  Property::Array array;
-  array.PushBack( Property::Value( 10 ) );
-  value.Get( array );
-  DALI_TEST_CHECK( 0 == array.Count() );
+  Property::Array result;
+  result.PushBack( Property::Value( 10 ) );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, result.Count(), TEST_LOCATION  ); // array is not modified
+
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, result.Count(), TEST_LOCATION  ); // array is not modified
   END_TEST;
 }
 
@@ -1067,8 +1153,10 @@ int UtcDaliPropertyValueGetMapP(void)
   DALI_TEST_CHECK( NULL == value.GetArray() );
   DALI_TEST_CHECK( NULL != value.GetMap() );
   value.GetMap()->Insert("key", Property::Value(1));
-  Property::Map got = value.Get<Property::Map>();
-  DALI_TEST_CHECK(got.Find("key")->Get<int>() == 1);
+  Property::Map result = value.Get<Property::Map>();
+  DALI_TEST_CHECK(result.Find("key")->Get<int>() == 1);
+  DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_CHECK(result.Find("key")->Get<int>() == 1);
   END_TEST;
 }
 
@@ -1076,8 +1164,15 @@ int UtcDaliPropertyValueGetMapN(void)
 {
   Property::Value value;
   DALI_TEST_CHECK( NULL == value.GetMap() );
-  Property::Map map = value.Get<Property::Map>();
-  DALI_TEST_CHECK( 0 == map.Count() );
+  DALI_TEST_EQUALS( 0, value.Get<Property::Map>().Count(), TEST_LOCATION );
+  Property::Map result;
+  result.Insert("key", "value" );
+  DALI_TEST_EQUALS( false, value.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, result.Count(), TEST_LOCATION );
+
+  Property::Value value2("");
+  DALI_TEST_EQUALS( false, value2.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1, result.Count(), TEST_LOCATION  ); // array is not modified
   END_TEST;
 }
 
@@ -1103,13 +1198,6 @@ int UtcDaliPropertyValueOutputStream(void)
 
   {
     Property::Value empty( Property::NONE );
-    std::ostringstream stream;
-    stream << empty;
-    DALI_TEST_CHECK( stream.str() == "undefined type" )
-  }
-
-  {
-    Property::Value empty( Property::TYPE_COUNT );
     std::ostringstream stream;
     stream << empty;
     DALI_TEST_CHECK( stream.str() == "undefined type" )

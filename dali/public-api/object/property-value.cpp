@@ -148,7 +148,6 @@ struct Property::Value::Impl
     switch( type )
     {
       case Property::NONE :             // FALLTHROUGH
-      case Property::TYPE_COUNT :       // FALLTHROUGH
       case Property::BOOLEAN :          // FALLTHROUGH
       case Property::FLOAT :            // FALLTHROUGH
       case Property::INTEGER :          // FALLTHROUGH
@@ -302,8 +301,16 @@ Property::Value::Value( const std::string& stringValue )
 }
 
 Property::Value::Value( const char* stringValue )
-: mImpl( new Impl( std::string(stringValue) ) )
+: mImpl( NULL )
 {
+  if( stringValue ) // string constructor is undefined with NULL pointer
+  {
+    mImpl = new Impl( std::string(stringValue) );
+  }
+  else
+  {
+    mImpl = new Impl( std::string() );
+  }
 }
 
 Property::Value::Value( Property::Array& arrayValue )
@@ -314,19 +321,6 @@ Property::Value::Value( Property::Array& arrayValue )
 Property::Value::Value( Property::Map& mapValue )
 : mImpl( new Impl( mapValue ) )
 {
-}
-
-
-Property::Value::~Value()
-{
-  delete mImpl;
-}
-
-Property::Value::Value( const Property::Value& value )
-: mImpl( NULL )
-{
-  // reuse assignment operator
-  operator=( value );
 }
 
 Property::Value::Value( Type type )
@@ -404,12 +398,17 @@ Property::Value::Value( Type type )
       break;
     }
     case Property::NONE:
-    case Property::TYPE_COUNT:
     {
       mImpl = new Impl();
       break;
     }
   }
+}
+Property::Value::Value( const Property::Value& value )
+: mImpl( NULL )
+{
+  // reuse assignment operator
+  operator=( value );
 }
 
 Property::Value& Property::Value::operator=( const Property::Value& value )
@@ -453,56 +452,55 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
       }
       case Property::VECTOR2:
       {
-        *mImpl->vector2Value = *value.mImpl->vector2Value;
+        *mImpl->vector2Value = *value.mImpl->vector2Value; // type cannot change in mImpl so vector is allocated
         break;
       }
       case Property::VECTOR3:
       {
-        *mImpl->vector3Value = *value.mImpl->vector3Value;
+        *mImpl->vector3Value = *value.mImpl->vector3Value; // type cannot change in mImpl so vector is allocated
         break;
       }
       case Property::VECTOR4:
       {
-        *mImpl->vector4Value = *value.mImpl->vector4Value;
+        *mImpl->vector4Value = *value.mImpl->vector4Value; // type cannot change in mImpl so vector is allocated
         break;
       }
       case Property::RECTANGLE:
       {
-        *mImpl->rectValue = *value.mImpl->rectValue;
+        *mImpl->rectValue = *value.mImpl->rectValue; // type cannot change in mImpl so rect is allocated
         break;
       }
       case Property::ROTATION:
       {
-        *mImpl->quaternionValue = *value.mImpl->quaternionValue;
+        *mImpl->quaternionValue = *value.mImpl->quaternionValue; // type cannot change in mImpl so quaternion is allocated
         break;
       }
       case Property::STRING:
       {
-        *mImpl->stringValue = *value.mImpl->stringValue;
+        *mImpl->stringValue = *value.mImpl->stringValue; // type cannot change in mImpl so string is allocated
         break;
       }
       case Property::MATRIX:
       {
-        *mImpl->matrixValue = *value.mImpl->matrixValue;
+        *mImpl->matrixValue = *value.mImpl->matrixValue; // type cannot change in mImpl so matrix is allocated
         break;
       }
       case Property::MATRIX3:
       {
-        *mImpl->matrix3Value = *value.mImpl->matrix3Value;
+        *mImpl->matrix3Value = *value.mImpl->matrix3Value; // type cannot change in mImpl so matrix is allocated
         break;
       }
       case Property::ARRAY:
       {
-        *mImpl->arrayValue = *value.mImpl->arrayValue;
+        *mImpl->arrayValue = *value.mImpl->arrayValue; // type cannot change in mImpl so array is allocated
         break;
       }
       case Property::MAP:
       {
-        *mImpl->mapValue = *value.mImpl->mapValue;
+        *mImpl->mapValue = *value.mImpl->mapValue; // type cannot change in mImpl so map is allocated
         break;
       }
       case Property::NONE:
-      case Property::TYPE_COUNT:
       { // mImpl will be NULL, there's no way to get to this case
       }
     }
@@ -535,56 +533,55 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
       }
       case Property::VECTOR2:
       {
-        newImpl = new Impl( *value.mImpl->vector2Value );
+        newImpl = new Impl( *value.mImpl->vector2Value ); // type cannot change in mImpl so vector is allocated
         break;
       }
       case Property::VECTOR3:
       {
-        newImpl = new Impl( *value.mImpl->vector3Value );
+        newImpl = new Impl( *value.mImpl->vector3Value ); // type cannot change in mImpl so vector is allocated
         break;
       }
       case Property::VECTOR4:
       {
-        newImpl = new Impl( *value.mImpl->vector4Value );
+        newImpl = new Impl( *value.mImpl->vector4Value ); // type cannot change in mImpl so vector is allocated
         break;
       }
       case Property::RECTANGLE:
       {
-        newImpl = new Impl( *value.mImpl->rectValue );
+        newImpl = new Impl( *value.mImpl->rectValue ); // type cannot change in mImpl so rect is allocated
         break;
       }
       case Property::ROTATION:
       {
-        newImpl = new Impl( *value.mImpl->quaternionValue );
+        newImpl = new Impl( *value.mImpl->quaternionValue ); // type cannot change in mImpl so quaternion is allocated
         break;
       }
       case Property::MATRIX3:
       {
-        newImpl = new Impl( *value.mImpl->matrix3Value );
+        newImpl = new Impl( *value.mImpl->matrix3Value ); // type cannot change in mImpl so matrix is allocated
         break;
       }
       case Property::MATRIX:
       {
-        newImpl = new Impl( *value.mImpl->matrixValue );
+        newImpl = new Impl( *value.mImpl->matrixValue ); // type cannot change in mImpl so matrix is allocated
         break;
       }
       case Property::STRING:
       {
-        newImpl = new Impl( *value.mImpl->stringValue );
+        newImpl = new Impl( *value.mImpl->stringValue ); // type cannot change in mImpl so string is allocated
         break;
       }
       case Property::ARRAY:
       {
-        newImpl = new Impl( *value.mImpl->arrayValue );
+        newImpl = new Impl( *value.mImpl->arrayValue ); // type cannot change in mImpl so array is allocated
         break;
       }
       case Property::MAP:
       {
-        newImpl = new Impl( *value.mImpl->mapValue );
+        newImpl = new Impl( *value.mImpl->mapValue ); // type cannot change in mImpl so map is allocated
         break;
       }
       case Property::NONE:
-      case Property::TYPE_COUNT:
       { // NULL value will be used for "empty" value
       }
     }
@@ -593,6 +590,11 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
   }
 
   return *this;
+}
+
+Property::Value::~Value()
+{
+  delete mImpl;
 }
 
 Property::Type Property::Value::GetType() const
@@ -605,205 +607,189 @@ Property::Type Property::Value::GetType() const
   return type;
 }
 
-void Property::Value::Get( bool& booleanValue ) const
+bool Property::Value::Get( bool& booleanValue ) const
 {
+  bool converted = false;
   if( mImpl && IsIntegerType( mImpl->type ) )
   {
     booleanValue = mImpl->integerValue;
+    converted = true;
   }
-  else
-  {
-    booleanValue = false;
-  }
+  return converted;
 }
 
-void Property::Value::Get( float& floatValue ) const
+bool Property::Value::Get( float& floatValue ) const
 {
+  bool converted = false;
   if( mImpl && mImpl->type == FLOAT )
   {
     floatValue = mImpl->floatValue;
+    converted = true;
   }
-  else
-  {
-    floatValue = 0.f;
-  }
+  return converted;
 }
 
-void Property::Value::Get( int& integerValue ) const
+bool Property::Value::Get( int& integerValue ) const
 {
+  bool converted = false;
   if( mImpl && IsIntegerType( mImpl->type ) )
   {
     integerValue = mImpl->integerValue;
+    converted = true;
   }
-  else
-  {
-    integerValue = 0;
-  }
+  return converted;
 }
 
-void Property::Value::Get( unsigned int& unsignedIntegerValue ) const
+bool Property::Value::Get( unsigned int& unsignedIntegerValue ) const
 {
+  bool converted = false;
   if( mImpl && IsIntegerType( mImpl->type ) )
   {
     unsignedIntegerValue = mImpl->unsignedIntegerValue;
+    converted = true;
   }
-  else
-  {
-    unsignedIntegerValue = 0u;
-  }
+  return converted;
 }
 
-void Property::Value::Get( Vector2& vectorValue ) const
+bool Property::Value::Get( Vector2& vectorValue ) const
 {
-  if( mImpl && mImpl->type == VECTOR2 && mImpl->vector2Value )
+  bool converted = false;
+  if( mImpl && (mImpl->type == VECTOR2) ) // type cannot change in mImpl so vector is allocated
   {
     vectorValue = *(mImpl->vector2Value);
+    converted = true;
   }
-  else
-  {
-    vectorValue.x = vectorValue.y = 0.f;
-  }
+  return converted;
 }
 
-void Property::Value::Get( Vector3& vectorValue ) const
+bool Property::Value::Get( Vector3& vectorValue ) const
 {
-  if( mImpl && mImpl->type == VECTOR3 && mImpl->vector3Value )
+  bool converted = false;
+  if( mImpl && (mImpl->type == VECTOR3) ) // type cannot change in mImpl so vector is allocated
   {
     vectorValue = *(mImpl->vector3Value);
+    converted = true;
   }
-  else
-  {
-    vectorValue.x = vectorValue.y = vectorValue.z = 0.f;
-  }
+  return converted;
 }
 
-void Property::Value::Get( Vector4& vectorValue ) const
+bool Property::Value::Get( Vector4& vectorValue ) const
 {
-  if( mImpl && mImpl->type == VECTOR4 && mImpl->vector4Value )
+  bool converted = false;
+  if( mImpl && (mImpl->type == VECTOR4) ) // type cannot change in mImpl so vector is allocated
   {
     vectorValue = *(mImpl->vector4Value);
+    converted = true;
   }
-  else
-  {
-    vectorValue.x = vectorValue.y = vectorValue.z = vectorValue.w = 0.f;
-  }
+  return converted;
 }
 
-void Property::Value::Get( Matrix3& matrixValue ) const
+bool Property::Value::Get( Matrix3& matrixValue ) const
 {
-  if( mImpl && mImpl->type == MATRIX3 && mImpl->matrix3Value )
+  bool converted = false;
+  if( mImpl && (mImpl->type == MATRIX3) ) // type cannot change in mImpl so matrix is allocated
   {
     matrixValue = *(mImpl->matrix3Value);
+    converted = true;
   }
-  else
-  {
-    matrixValue.SetIdentity();
-  }
+  return converted;
 }
 
-void Property::Value::Get( Matrix& matrixValue ) const
+bool Property::Value::Get( Matrix& matrixValue ) const
 {
-  if( mImpl && mImpl->type == MATRIX && mImpl->matrixValue )
+  bool converted = false;
+  if( mImpl && (mImpl->type == MATRIX) ) // type cannot change in mImpl so matrix is allocated
   {
     matrixValue = *(mImpl->matrixValue);
+    converted = true;
   }
-  else
-  {
-    matrixValue.SetIdentity();
-  }
+  return converted;
 }
 
-void Property::Value::Get( Rect<int>& rectValue ) const
+bool Property::Value::Get( Rect<int>& rectValue ) const
 {
-  if( mImpl && mImpl->type == RECTANGLE && mImpl->rectValue )
+  bool converted = false;
+  if( mImpl && (mImpl->type == RECTANGLE) ) // type cannot change in mImpl so rect is allocated
   {
     rectValue = *(mImpl->rectValue);
+    converted = true;
   }
-  else
-  {
-    rectValue.x = rectValue.y = rectValue.width = rectValue.height = 0.f;
-  }
+  return converted;
 }
 
-void Property::Value::Get( AngleAxis& angleAxisValue ) const
+bool Property::Value::Get( AngleAxis& angleAxisValue ) const
 {
-  if( mImpl && mImpl->type == ROTATION && mImpl->quaternionValue )
+  bool converted = false;
+  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so quaternion is allocated
   {
     mImpl->quaternionValue->ToAxisAngle( angleAxisValue.axis, angleAxisValue.angle );
+    converted = true;
   }
-  else
-  {
-    angleAxisValue.angle = 0.f;
-    angleAxisValue.axis = Vector3::ZERO; // identity quaternion
-  }
+  return converted;
 }
 
-void Property::Value::Get( Quaternion& quaternionValue ) const
+bool Property::Value::Get( Quaternion& quaternionValue ) const
 {
-  if( mImpl && mImpl->type == ROTATION && mImpl->quaternionValue )
+  bool converted = false;
+  if( mImpl && (mImpl->type == ROTATION) ) // type cannot change in mImpl so quaternion is allocated
   {
     quaternionValue = *(mImpl->quaternionValue);
+    converted = true;
   }
-  else
-  {
-    quaternionValue = Quaternion::IDENTITY;
-  }
+  return converted;
 }
 
-void Property::Value::Get( std::string& stringValue ) const
+bool Property::Value::Get( std::string& stringValue ) const
 {
-  if( mImpl && mImpl->type == STRING && mImpl->stringValue )
+  bool converted = false;
+  if( mImpl && (mImpl->type == STRING) ) // type cannot change in mImpl so string is allocated
   {
     stringValue.assign( *(mImpl->stringValue) );
+    converted = true;
   }
-  else
-  {
-    stringValue.clear();
-  }
+  return converted;
 }
 
-void Property::Value::Get( Property::Array& arrayValue ) const
+bool Property::Value::Get( Property::Array& arrayValue ) const
 {
-  if( mImpl && mImpl->type == ARRAY && mImpl->arrayValue )
+  bool converted = false;
+  if( mImpl && (mImpl->type == ARRAY) ) // type cannot change in mImpl so array is allocated
   {
     arrayValue = *(mImpl->arrayValue);
+    converted = true;
   }
-  else
-  {
-    arrayValue.Clear();
-  }
+  return converted;
 }
 
-void Property::Value::Get( Property::Map& mapValue ) const
+bool Property::Value::Get( Property::Map& mapValue ) const
 {
-  if( mImpl && mImpl->type == MAP && mImpl->mapValue )
+  bool converted = false;
+  if( mImpl && (mImpl->type == MAP) ) // type cannot change in mImpl so map is allocated
   {
     mapValue = *(mImpl->mapValue);
+    converted = true;
   }
-  else
-  {
-    mapValue.Clear();
-  }
-}
-
-Property::Map* Property::Value::GetMap() const
-{
-  Property::Map* map = NULL;
-  if( mImpl && mImpl->type == MAP && mImpl->mapValue )
-  {
-    map = mImpl->mapValue;
-  }
-  return map;
+  return converted;
 }
 
 Property::Array* Property::Value::GetArray() const
 {
   Property::Array* array = NULL;
-  if( mImpl && mImpl->type == ARRAY && mImpl->arrayValue )
+  if( mImpl && (mImpl->type == ARRAY) ) // type cannot change in mImpl so array is allocated
   {
     array = mImpl->arrayValue;
   }
   return array;
+}
+
+Property::Map* Property::Value::GetMap() const
+{
+  Property::Map* map = NULL;
+  if( mImpl && (mImpl->type == MAP) ) // type cannot change in mImpl so map is allocated
+  {
+    map = mImpl->mapValue;
+  }
+  return map;
 }
 
 std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
@@ -885,7 +871,6 @@ std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
         break;
       }
       case Dali::Property::NONE:
-      case Dali::Property::TYPE_COUNT:
       {
         stream << "undefined type";
         break;
