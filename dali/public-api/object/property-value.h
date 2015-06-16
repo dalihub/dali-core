@@ -149,13 +149,6 @@ public:
   Value( const char* stringValue );
 
   /**
-   * @brief Copy a property value.
-   *
-   * @param [in] value The property value to copy.
-   */
-  Value( const Value& value );
-
-  /**
    * @brief Create an array property value.
    *
    * @param [in] arrayValue An array
@@ -177,6 +170,13 @@ public:
   explicit Value( Type type );
 
   /**
+   * @brief Copy constructor
+   *
+   * @param [in] value The property value to copy.
+   */
+  Value( const Value& value );
+
+  /**
    * @brief Assign a property value.
    *
    * @param [in] value The property value to assign from.
@@ -186,6 +186,8 @@ public:
 
   /**
    * @brief Non-virtual destructor.
+   *
+   * This class is not a base class.
    */
   ~Value();
 
@@ -199,14 +201,15 @@ public:
   /**
    * @brief Retrieve a specific value.
    *
-   * @pre GetType() returns the Property::Type for type T.
+   * Works on a best-effort approach; if value type is not convertible returns a default value of the type
+   *
    * @return A value of type T.
    */
   template <typename T>
   T DALI_INTERNAL Get() const
   {
-    T temp;
-    Get(temp);
+    T temp = T(); // value (zero) initialize
+    Get( temp );
     return temp;
   }
 
@@ -215,147 +218,135 @@ public:
    *
    * @pre GetType() returns Property::BOOLEAN.
    * @param [out] boolValue On return, a boolean value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( bool& boolValue ) const;
+  bool Get( bool& boolValue ) const;
 
   /**
    * @brief Retrieve a floating-point value.
    *
    * @pre GetType() returns Property::FLOAT.
    * @param [out] floatValue On return, a floating-point value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( float& floatValue ) const;
+  bool Get( float& floatValue ) const;
 
   /**
    * @brief Retrieve an integer value.
    *
    * @pre GetType() returns Property::INTEGER.
    * @param [out] integerValue On return, an integer value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( int& integerValue ) const;
+  bool Get( int& integerValue ) const;
 
   /**
    * @brief Retrieve an unsigned integer value.
    *
    * @pre GetType() returns Property::UNSIGNED_INTEGER.
    * @param [out] unsignedIntegerValue On return, an unsigned integer value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( unsigned int& unsignedIntegerValue ) const;
+  bool Get( unsigned int& unsignedIntegerValue ) const;
 
   /**
    * @brief Retrieve an integer rectangle.
    *
    * @pre GetType() returns Property::RECTANGLE.
    * @param [out] rect On return, an integer rectangle.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Rect<int>& rect ) const;
+  bool Get( Rect<int>& rect ) const;
 
   /**
    * @brief Retrieve a vector value.
    *
    * @pre GetType() returns Property::VECTOR2.
    * @param [out] vectorValue On return, a vector value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Vector2& vectorValue ) const;
+  bool Get( Vector2& vectorValue ) const;
 
   /**
    * @brief Retrieve a vector value.
    *
    * @pre GetType() returns Property::VECTOR3.
    * @param [out] vectorValue On return, a vector value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Vector3& vectorValue ) const;
+  bool Get( Vector3& vectorValue ) const;
 
   /**
    * @brief Retrieve a vector value.
    *
    * @pre GetType() returns Property::VECTOR4.
    * @param [out] vectorValue On return, a vector value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Vector4& vectorValue ) const;
+  bool Get( Vector4& vectorValue ) const;
 
   /**
    * @brief Retrieve a matrix3 value.
    *
    * @pre GetType() returns Property::MATRIX3.
    * @param [out] matrixValue On return, a matrix3 value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Matrix3& matrixValue ) const;
+  bool Get( Matrix3& matrixValue ) const;
 
   /**
    * @brief Retrieve a matrix value.
    *
    * @pre GetType() returns Property::MATRIX.
    * @param [out] matrixValue On return, a matrix value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Matrix& matrixValue ) const;
+  bool Get( Matrix& matrixValue ) const;
 
   /**
    * @brief Retrieve an angle-axis value.
    *
    * @pre GetType() returns Property::ROTATION.
    * @param [out] angleAxisValue On return, a angle-axis value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( AngleAxis& angleAxisValue ) const;
+  bool Get( AngleAxis& angleAxisValue ) const;
 
   /**
    * @brief Retrieve a quaternion value.
    *
    * @pre GetType() returns Property::ROTATION.
    * @param [out] quaternionValue On return, a quaternion value.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Quaternion& quaternionValue ) const;
+  bool Get( Quaternion& quaternionValue ) const;
 
   /**
    * @brief Retrieve an string property value.
    *
    * @pre GetType() returns Property::STRING.
    * @param [out] stringValue A string.
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( std::string& stringValue ) const;
+  bool Get( std::string& stringValue ) const;
 
   /**
    * @brief Retrieve an array property value.
    *
    * @pre GetType() returns Property::ARRAY.
    * @param [out] arrayValue The array as a vector Property Values
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Property::Array& arrayValue ) const;
+  bool Get( Property::Array& arrayValue ) const;
 
   /**
    * @brief Retrieve an map property value.
    *
    * @pre GetType() returns Property::MAP.
    * @param [out] mapValue The map as vector of string and Property Value pairs
+   * @return true if the value is successfully retrieved, false if the type is not convertible
    */
-  void Get( Property::Map& mapValue ) const;
-
-  /**
-   * @brief return true if this property is a Property::MAP.
-   *
-   * @return return true if this property is a Property::MAP
-   */
-  bool IsMap() const
-  {
-    return GetMap() != NULL;
-  }
-
-  /**
-   * @brief Retrieve the Map API of the Property::Value without copying the contents of the map
-   *
-   * @return  the Map API of the Property::Value or NULL if not a Property::Map
-   */
-  Property::Map* GetMap() const;
-
-  /**
-   * @brief return true if this property is a Property::ARRAY.
-   *
-   * @return return true if this property is a Property::ARRAY
-   */
-  bool IsArray() const
-  {
-    return GetArray() != NULL;
-  }
+  bool Get( Property::Map& mapValue ) const;
 
   /**
    * @brief Retrieve the Array API of the Property::Value without copying the contents of the map
@@ -363,6 +354,13 @@ public:
    * @return the Array API of the Property::Value or NULL if not a Property::Array
    */
   Property::Array* GetArray() const;
+
+  /**
+   * @brief Retrieve the Map API of the Property::Value without copying the contents of the map
+   *
+   * @return  the Map API of the Property::Value or NULL if not a Property::Map
+   */
+  Property::Map* GetMap() const;
 
   /**
    * output to stream
