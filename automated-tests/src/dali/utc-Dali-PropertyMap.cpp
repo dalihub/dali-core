@@ -194,6 +194,24 @@ int UtcDaliPropertyMapFind(void)
   END_TEST;
 }
 
+int UtcDaliPropertyMapInsertP(void)
+{
+  Property::Map map;
+  DALI_TEST_EQUALS( 0, map.Count(), TEST_LOCATION );
+  map.Insert( "foo", "bar");
+  DALI_TEST_EQUALS( 1, map.Count(), TEST_LOCATION );
+  Property::Value* value = map.Find( "foo" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "bar", value->Get<std::string>(), TEST_LOCATION );
+  map.Insert( std::string("foo2"), "testing" );
+  DALI_TEST_EQUALS( 2, map.Count(), TEST_LOCATION );
+  value = map.Find( "foo2" );
+  DALI_TEST_CHECK( value );
+  DALI_TEST_EQUALS( "testing", value->Get<std::string>(), TEST_LOCATION );
+
+  END_TEST;
+}
+
 int UtcDaliPropertyMapMerge(void)
 {
   Property::Map map;

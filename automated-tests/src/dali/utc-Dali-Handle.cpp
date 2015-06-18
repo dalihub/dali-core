@@ -514,69 +514,34 @@ int UtcDaliHandleNonAnimtableCompositeProperties(void)
   Actor actor = Actor::New();
 
   Property::Value value(Property::ARRAY);
-  Property::Array anArray;
-  DALI_TEST_CHECK( Property::Value(anArray).GetType() == Property::ARRAY ); // 2nd constructor
+  Property::Array* array = value.GetArray();
+  DALI_TEST_CHECK( array );
 
-  value.AppendItem( Property::Value( 0.f ) );
-  value.AppendItem( "a string" );
-  value.SetItem(0, Property::Value( 5.f )); // exercise SetItem
+  array->PushBack( Property::Value( 0.1f ) );
+  array->PushBack( "a string" );
+  array->PushBack( Property::Value( Vector3(1,2,3) ) );
 
-  int index = value.AppendItem( Vector3(1,2,3) );
+  DALI_TEST_EQUALS( 3, array->Count(), TEST_LOCATION );
 
-  DALI_TEST_EQUALS( 2, index, TEST_LOCATION);
-  DALI_TEST_EQUALS( 3, value.GetSize(), TEST_LOCATION);
-
-  Property::Index propertyIndex = actor.RegisterProperty( "composite", value, Property::READ_WRITE);
+  Property::Index propertyIndex = actor.RegisterProperty( "composite", value, Property::READ_WRITE );
 
   Property::Value out = actor.GetProperty( propertyIndex );
+  Property::Array* outArray = out.GetArray();
+  DALI_TEST_CHECK( outArray != NULL );
 
-  DALI_TEST_CHECK( Property::FLOAT     == out.GetItem(0).GetType());
-  DALI_TEST_CHECK( Property::STRING    == out.GetItem(1).GetType());
-  DALI_TEST_CHECK( Property::VECTOR3   == out.GetItem(2).GetType());
+  DALI_TEST_CHECK( Property::FLOAT     == outArray->GetElementAt(0).GetType());
+  DALI_TEST_CHECK( Property::STRING    == outArray->GetElementAt(1).GetType());
+  DALI_TEST_CHECK( Property::VECTOR3   == outArray->GetElementAt(2).GetType());
 
-  DALI_TEST_EQUALS( 5.f,            out.GetItem(0).Get<float>(),        TEST_LOCATION);
-  DALI_TEST_EQUALS( "a string",     out.GetItem(1).Get<std::string>(),  TEST_LOCATION);
-  DALI_TEST_EQUALS( Vector3(1,2,3), out.GetItem(2).Get<Vector3>(),      TEST_LOCATION);
-
-  // Property Maps
-  Property::Value valueMap(Property::MAP);
-  Property::Map aKindofMap;
-  DALI_TEST_CHECK( Property::Value(aKindofMap).GetType() == Property::MAP ); // 2nd constructor
-
-  valueMap.SetValue("key", 5.f);
-  valueMap.SetValue("2key", "a string");
-
-  DALI_TEST_EQUALS( true, valueMap.HasKey("key"),        TEST_LOCATION);
-  DALI_TEST_EQUALS( "key", valueMap.GetKey(0),           TEST_LOCATION);
-
-  DALI_TEST_EQUALS( true, valueMap.HasKey("2key"),       TEST_LOCATION);
-  DALI_TEST_EQUALS( "2key", valueMap.GetKey(1),          TEST_LOCATION);
-
-  DALI_TEST_EQUALS( 5.f,         valueMap.GetValue("key").Get<float>(),         TEST_LOCATION);
-  DALI_TEST_EQUALS( "a string",  valueMap.GetValue("2key").Get<std::string>(),  TEST_LOCATION);
-
-  valueMap.SetItem(0, Property::Value("a string"));
-  valueMap.SetItem(1, Property::Value(5.f));
-
-  DALI_TEST_EQUALS( 5.f,         valueMap.GetValue("2key").Get<float>(),        TEST_LOCATION);
-  DALI_TEST_EQUALS( "a string",  valueMap.GetValue("key").Get<std::string>(),   TEST_LOCATION);
-
-  // ordered map
-  valueMap = Property::Value(Property::MAP);
-
-  valueMap.SetValue("key", 5.f);
-  valueMap.SetValue("2key", "a string");
-
-  DALI_TEST_EQUALS( 5.f,         valueMap.GetItem(0).Get<float>(),         TEST_LOCATION);
-  DALI_TEST_EQUALS( "a string",  valueMap.GetItem(1).Get<std::string>(),   TEST_LOCATION);
-
-  DALI_TEST_EQUALS( 2, valueMap.GetSize(), TEST_LOCATION);
+  DALI_TEST_EQUALS( 0.1f,            outArray->GetElementAt(0).Get<float>(),       TEST_LOCATION);
+  DALI_TEST_EQUALS( "a string",     outArray->GetElementAt(1).Get<std::string>(),  TEST_LOCATION);
+  DALI_TEST_EQUALS( Vector3(1,2,3), outArray->GetElementAt(2).Get<Vector3>(),      TEST_LOCATION);
 
   // composite types not animatable
   bool exception = false;
   try
   {
-    /* Property::Index mapPropertyIndex = */ actor.RegisterProperty( "compositemap", value, Property::ANIMATABLE);
+    actor.RegisterProperty( "compositemap", value, Property::ANIMATABLE);
   }
   catch (Dali::DaliException& e)
   {
@@ -588,29 +553,18 @@ int UtcDaliHandleNonAnimtableCompositeProperties(void)
 
   // Map of maps
   Property::Value mapOfMaps(Property::MAP);
+  Property::Map* map = mapOfMaps.GetMap();
 
-  mapOfMaps.SetValue( "key", Property::Value(Property::MAP) );
-  mapOfMaps.SetValue( "2key", "a string" );
+  map->Insert( "key", Property::Value(Property::MAP) );
+  map->Insert( "2key", "a string" );
 
-  DALI_TEST_EQUALS( "a string",  mapOfMaps.GetValue("2key").Get<std::string>(),  TEST_LOCATION);
+  DALI_TEST_EQUALS( "a string",  (*map)["2key"].Get<std::string>(),  TEST_LOCATION);
 
-  mapOfMaps.GetValue("key").SetValue("subkey", 5.f);
+  Property::Map* innerMap = map->Find("key")->GetMap();
+  innerMap->Insert( "subkey", 5.f );
 
-  DALI_TEST_EQUALS( true, mapOfMaps.GetValue("key").HasKey("subkey"), TEST_LOCATION);
-  DALI_TEST_EQUALS( 5.f, mapOfMaps.GetValue("key").GetValue("subkey").Get<float>(), TEST_LOCATION);
-
-  // list of maps
-  Property::Value listOfMaps(Property::ARRAY);
-
-  listOfMaps.AppendItem( Property::Value(Property::MAP) );
-  listOfMaps.AppendItem( Property::Value(Property::MAP) );
-
-  listOfMaps.GetItem(0).SetValue("key", 5.f);
-  listOfMaps.GetItem(1).SetValue("key",10.f);
-
-  DALI_TEST_EQUALS( 5.f, listOfMaps.GetItem(0).GetValue("key").Get<float>(), TEST_LOCATION );
-  DALI_TEST_EQUALS( 10.f, listOfMaps.GetItem(1).GetValue("key").Get<float>(), TEST_LOCATION );
-
+  DALI_TEST_CHECK( NULL != map->Find("key")->GetMap()->Find("subkey") );
+  DALI_TEST_EQUALS( 5.f, map->Find("key")->GetMap()->Find("subkey")->Get<float>(), TEST_LOCATION);
   END_TEST;
 }
 

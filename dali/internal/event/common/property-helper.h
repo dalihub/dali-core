@@ -90,7 +90,7 @@ struct PropertyDetails
  * { "SIZE_EQUAL_TO_PARENT", SIZE_EQUAL_TO_PARENT },
  * }; const unsigned int SizeModeTableCount = sizeof( SizeModeTable ) / sizeof( SizeModeTable[0] );
  */
-#define DALI_ENUM_TO_STRING_TABLE_BEGIN( t ) const Scripting::StringEnum< t > t##Table[] = {
+#define DALI_ENUM_TO_STRING_TABLE_BEGIN( t ) const Scripting::StringEnum t##Table[] = {
 #define DALI_ENUM_TO_STRING_TABLE_END( t )   }; const unsigned int t##TableCount = sizeof( t##Table ) / sizeof( t##Table[0] );
 #define DALI_ENUM_TO_STRING( s ) { #s, s },
 

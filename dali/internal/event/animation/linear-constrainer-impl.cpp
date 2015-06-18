@@ -24,6 +24,8 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/property-helper.h>
 #include <dali/public-api/animation/constraint.h>
+#include <dali/public-api/object/property-array.h>
+
 
 namespace Dali
 {
@@ -113,47 +115,59 @@ Property::Type LinearConstrainer::GetDefaultPropertyType(Property::Index index) 
 
 Property::Value LinearConstrainer::GetDefaultProperty( Property::Index index ) const
 {
-  Property::Value value;
   if( index == Dali::LinearConstrainer::Property::VALUE )
   {
-    value = Property::Value(Property::ARRAY);
+    Property::Value value( Property::ARRAY );
+    Property::Array* array = value.GetArray();
+    DALI_ASSERT_DEBUG( array ); // should always exist in this case
     size_t count( mValue.Size() );
+    array->Reserve( count );
     for( size_t i( 0 ); i != count; ++i )
     {
-      value.AppendItem( mValue[i] );
+      array->PushBack( mValue[i] );
     }
+    return value;
   }
   else if( index == Dali::LinearConstrainer::Property::PROGRESS )
   {
-    value = Property::Value(Property::ARRAY);
+    Property::Value value( Property::ARRAY );
+    Property::Array* array = value.GetArray();
+    DALI_ASSERT_DEBUG( array ); // should always exist in this case
     size_t count( mValue.Size() );
+    array->Reserve( count );
     for( size_t i( 0 ); i != count; ++i )
     {
-      value.AppendItem( mProgress[i] );
+      array->PushBack( mProgress[i] );
     }
+    return value;
   }
 
-  return value;
+  return Property::Value();
 }
 
-void LinearConstrainer::SetDefaultProperty(Property::Index index, const Property::Value& propertyValue)
+void LinearConstrainer::SetDefaultProperty( Property::Index index, const Property::Value& propertyValue )
 {
-  if( index == Dali::LinearConstrainer::Property::VALUE  )
+  const Property::Array* array = propertyValue.GetArray();
+  if( array )
   {
-    size_t propertyArrayCount = propertyValue.GetSize();
-    mValue.Resize( propertyArrayCount );
-    for( size_t i(0); i != propertyArrayCount; ++i )
+    size_t propertyArrayCount = array->Count();
+    if( index == Dali::LinearConstrainer::Property::VALUE  )
     {
-      propertyValue.GetItem(i).Get( mValue[i] );
+      mValue.Clear(); // remove old values
+      mValue.Resize( propertyArrayCount );
+      for( size_t i(0); i != propertyArrayCount; ++i )
+      {
+        array->GetElementAt( i ).Get( mValue[ i ] );
+      }
     }
-  }
-  else if( index == Dali::LinearConstrainer::Property::PROGRESS  )
-  {
-    size_t propertyArrayCount = propertyValue.GetSize();
-    mProgress.Resize( propertyArrayCount );
-    for( size_t i(0); i != propertyArrayCount; ++i )
+    else if( index == Dali::LinearConstrainer::Property::PROGRESS  )
     {
-      propertyValue.GetItem(i).Get( mProgress[i] );
+      mProgress.Clear(); // remove old values
+      mProgress.Resize( propertyArrayCount );
+      for( size_t i(0); i != propertyArrayCount; ++i )
+      {
+        array->GetElementAt( i ).Get( mProgress[ i ] );
+      }
     }
   }
 }

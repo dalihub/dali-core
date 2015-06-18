@@ -59,7 +59,10 @@ const BufferImage BufferImage::WHITE()
 {
   Internal::BufferImage* internal = new Internal::BufferImage(1,1,Pixel::RGBA8888, Dali::Image::NEVER);
   PixelBuffer* pBuf = internal->GetBuffer();
-  pBuf[0] = pBuf[1] = pBuf[2] = pBuf[3] = 0xFF;
+  if ( pBuf )
+  {
+    pBuf[0] = pBuf[1] = pBuf[2] = pBuf[3] = 0xFF;
+  }
   return BufferImage(internal);
 }
 
