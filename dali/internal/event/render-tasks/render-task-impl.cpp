@@ -31,6 +31,7 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/images/frame-buffer-image-impl.h>
 #include <dali/internal/update/nodes/node.h>
+#include <dali/internal/event/render-tasks/render-task-list-impl.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
 
 #if defined(DEBUG_ENABLED)
@@ -77,6 +78,11 @@ RenderTask* RenderTask::New( bool isSystemLevel )
 
 void RenderTask::SetSourceActor( Actor* actor )
 {
+  const Stage* stage = Stage::GetCurrent();
+  if ( stage )
+  {
+    stage->GetRenderTaskList().SetExclusive( this, mExclusive );
+  }
   mSourceConnector.SetActor( actor );
 }
 
@@ -90,6 +96,12 @@ void RenderTask::SetExclusive( bool exclusive )
   if ( mExclusive != exclusive )
   {
     mExclusive = exclusive;
+
+    const Stage* stage = Stage::GetCurrent();
+    if ( stage )
+    {
+      stage->GetRenderTaskList().SetExclusive( this, exclusive );
+    }
 
     if ( mSceneObject )
     {

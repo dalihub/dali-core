@@ -136,6 +136,16 @@ public:
   float GetSortModifier() const;
 
   /**
+   * @copydoc Dali::RenderableActor::SetDepthIndex()
+   */
+  void SetDepthIndex( int depthIndex );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetDepthIndex()
+   */
+  int GetDepthIndex() const;
+
+  /**
    * @copydoc Dali::RenderableActor::SetCullFace()
    */
   void SetCullFace(CullFaceMode mode);

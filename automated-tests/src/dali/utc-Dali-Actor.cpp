@@ -42,7 +42,6 @@ void utc_dali_actor_cleanup(void)
 namespace
 {
 bool gTouchCallBackCalled=false;
-bool gTouchCallBack2Called=false;
 bool gHoverCallBackCalled=false;
 
 /**
@@ -57,7 +56,6 @@ int SimulateTouchForSetOverlayHitTest(TestApplication& app)
   app.Render(1);
 
   gTouchCallBackCalled = false;
-  gTouchCallBack2Called = false;
 
   // simulate a touch event
   Dali::TouchPoint point( 0, TouchPoint::Down, 25.0f, 25.0f );
@@ -109,13 +107,6 @@ struct TestConstraintRef
 static bool TestCallback(Actor actor, const TouchEvent& event)
 {
   gTouchCallBackCalled = true;
-  return false;
-  END_TEST;
-}
-
-static bool TestCallback2(Actor actor, const TouchEvent& event)
-{
-  gTouchCallBack2Called = true;
   return false;
   END_TEST;
 }
@@ -2315,89 +2306,6 @@ int UtcDaliActorSetDrawModeOverlayRender(void)
     DALI_TEST_CHECK( boundTextures[1] == 10u );
     DALI_TEST_CHECK( boundTextures[2] == 8u );
   }
-  END_TEST;
-}
-
-
-int UtcDaliActorSetDrawModeOverlayHitTest(void)
-{
-  TestApplication app;
-  tet_infoline(" UtcDaliActorSetDrawModeOverlayHitTest");
-
-  BufferImage imageA = BufferImage::New(16, 16);
-  BufferImage imageB = BufferImage::New(16, 16);
-  ImageActor a = ImageActor::New( imageA );
-  ImageActor b = ImageActor::New( imageB );
-
-  // Render a,b as regular non-overlays. so order will be:
-  Stage::GetCurrent().Add(a);
-  Stage::GetCurrent().Add(b);
-
-  a.SetSize( 100.0f, 100.0f );
-  b.SetSize( 100.0f, 100.0f );
-
-  // position b overlapping a. (regular non-overlays)
-  // hit test at point 'x'
-  // --------
-  // |      |
-  // | a    |
-  // |   --------
-  // |   |x     |
-  // |   |      |
-  // ----|      |
-  //     |   b  |
-  //     |      |
-  //     --------
-  // note: b is on top, because it's Z position is higher.
-  a.SetPosition(Vector3(0.0f, 0.0f, 0.0f));
-  b.SetPosition(Vector3(50.0f, 50.0f, 1.0f));
-
-  // connect to their touch signals
-  a.TouchedSignal().Connect(TestCallback);
-  b.TouchedSignal().Connect(TestCallback2);
-
-  a.SetDrawMode( DrawMode::NORMAL );
-  b.SetDrawMode( DrawMode::NORMAL );
-  SimulateTouchForSetOverlayHitTest(app);
-
-  DALI_TEST_CHECK( gTouchCallBackCalled == false );
-  DALI_TEST_CHECK( gTouchCallBack2Called == true );
-  // Make Actor a an overlay.
-  // --------
-  // |      |
-  // | a    |
-  // |      |----
-  // |    x |   |
-  // |      |   |
-  // --------   |
-  //     |   b  |
-  //     |      |
-  //     --------
-  // note: a is on top, because it is an overlay.
-  a.SetDrawMode( DrawMode::OVERLAY );
-  b.SetDrawMode( DrawMode::NORMAL );
-  SimulateTouchForSetOverlayHitTest(app);
-
-  DALI_TEST_CHECK( gTouchCallBackCalled == true );
-  DALI_TEST_CHECK( gTouchCallBack2Called == false );
-  // Make both Actors as overlays
-  // --------
-  // |      |
-  // | a    |
-  // |   --------
-  // |   |x     |
-  // |   |      |
-  // ----|      |
-  //     |   b  |
-  //     |      |
-  //     --------
-  // note: b is on top, because it is the 2nd child in the hierarchy.
-  a.SetDrawMode( DrawMode::OVERLAY );
-  b.SetDrawMode( DrawMode::OVERLAY );
-  SimulateTouchForSetOverlayHitTest(app);
-
-  DALI_TEST_CHECK( gTouchCallBackCalled == false );
-  DALI_TEST_CHECK( gTouchCallBack2Called == true );
   END_TEST;
 }
 

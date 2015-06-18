@@ -462,12 +462,22 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
 
 void ImageActor::SetSortModifier(float modifier)
 {
-  mImageAttachment->SetSortModifier(modifier);
+  mImageAttachment->SetSortModifier( modifier );
 }
 
 float ImageActor::GetSortModifier() const
 {
   return mImageAttachment->GetSortModifier();
+}
+
+void ImageActor::SetDepthIndex( int depthIndex )
+{
+   mImageAttachment->SetSortModifier( depthIndex );
+}
+
+int ImageActor::GetDepthIndex() const
+{
+  return static_cast< int >( GetSortModifier() );
 }
 
 void ImageActor::SetCullFace(CullFaceMode mode)

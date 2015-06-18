@@ -1006,14 +1006,15 @@ int UtcDaliHoverMultipleRenderableActors(void)
   Stage stage ( Stage::GetCurrent() );
   Vector2 stageSize ( stage.GetSize() );
 
-  Actor parent = ImageActor::New();
+  ImageActor parent = ImageActor::New();
   parent.SetSize( 100.0f, 100.0f );
   parent.SetAnchorPoint(AnchorPoint::TOP_LEFT);
   stage.Add(parent);
 
-  Actor actor = ImageActor::New();
+  ImageActor actor = ImageActor::New();
   actor.SetSize( 100.0f, 100.0f );
   actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
+  actor.SetDepthIndex( 1 );
   parent.Add(actor);
 
   // Render and notify
