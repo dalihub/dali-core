@@ -23,6 +23,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-buffer.h> // Dali::Internal::PropertyBuffer
+#include <dali/public-api/object/type-registry.h>
+
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
@@ -48,6 +50,13 @@ DALI_PROPERTY( "buffer-format", MAP,              false, false, false,  Dali::Pr
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> PROPERTY_BUFFER_IMPL = { DEFAULT_PROPERTY_DETAILS };
+
+BaseHandle Create()
+{
+  return Dali::BaseHandle();
+}
+
+TypeRegistration mType( typeid( Dali::PropertyBuffer ), typeid( Dali::Handle ), Create );
 
 /**
  * Calculate the alignment requirements of a type
@@ -364,6 +373,14 @@ void PropertyBuffer::Disconnect()
 
 PropertyBuffer::~PropertyBuffer()
 {
+  if( EventThreadServices::IsCoreRunning() )
+  {
+    EventThreadServices& eventThreadServices = GetEventThreadServices();
+    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+    RemoveMessage( updateManager, updateManager.GetPropertyBufferOwner(), *mSceneObject );
+
+    eventThreadServices.UnregisterObject( this );
+  }
 }
 
 PropertyBuffer::PropertyBuffer()
@@ -379,10 +396,10 @@ void PropertyBuffer::Initialize()
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
-  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
-
   mSceneObject = new SceneGraph::PropertyBuffer();
   AddMessage( updateManager, updateManager.GetPropertyBufferOwner(), *mSceneObject );
+
+  eventThreadServices.RegisterObject( this );
 }
 
 void PropertyBuffer::FormatChanged()

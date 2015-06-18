@@ -19,6 +19,7 @@
 #include <dali/internal/event/effects/material-impl.h> // Dali::Internal::Material
 
 // INTERNAL INCLUDES
+#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/shader-effects/material.h> // Dali::Internal::Material
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
@@ -41,8 +42,8 @@ DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "color",                           VECTOR4,  true, true,   true, Dali::Material::Property::COLOR )
 DALI_PROPERTY( "face-culling-mode",               STRING,   true, false,  false, Dali::Material::Property::FACE_CULLING_MODE )
 DALI_PROPERTY( "blending-mode",                   STRING,   true, false,  false, Dali::Material::Property::BLENDING_MODE )
-DALI_PROPERTY( "blend-equation-rgb",                  STRING,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_RGB )
-DALI_PROPERTY( "blend-equation-alpha",                  STRING,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_ALPHA )
+DALI_PROPERTY( "blend-equation-rgb",              STRING,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_RGB )
+DALI_PROPERTY( "blend-equation-alpha",            STRING,   true, false,  false, Dali::Material::Property::BLEND_EQUATION_ALPHA )
 DALI_PROPERTY( "source-blend-factor-rgb",         STRING,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_RGB )
 DALI_PROPERTY( "destination-blend-factor-rgb",    STRING,   true, false,  false, Dali::Material::Property::BLENDING_DEST_FACTOR_RGB )
 DALI_PROPERTY( "source-blend-factor-alpha",       STRING,   true, false,  false, Dali::Material::Property::BLENDING_SRC_FACTOR_ALPHA )
@@ -51,6 +52,13 @@ DALI_PROPERTY( "blend-color",                     VECTOR4,  true, true,   true, 
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> MATERIAL_IMPL = { DEFAULT_PROPERTY_DETAILS };
+
+BaseHandle Create()
+{
+  return Dali::BaseHandle();
+}
+
+TypeRegistration mType( typeid( Dali::Material ), typeid( Dali::Handle ), Create );
 
 } // unnamed namespace
 
@@ -568,10 +576,10 @@ void Material::Initialize()
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
-  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
-
   mSceneObject = new SceneGraph::Material();
   AddMessage( updateManager, updateManager.GetMaterialOwner(), *mSceneObject );
+
+  eventThreadServices.RegisterObject( this );
 }
 
 Material::~Material()
@@ -581,6 +589,8 @@ Material::~Material()
     EventThreadServices& eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
     RemoveMessage( updateManager, updateManager.GetMaterialOwner(), *mSceneObject );
+
+    eventThreadServices.UnregisterObject( this );
   }
 }
 

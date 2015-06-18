@@ -32,6 +32,7 @@
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/camera-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/image-attachment-impl.h>
+#include <dali/internal/event/actor-attachments/renderer-attachment-impl.h>
 
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/animation/animator-connector.h>
@@ -53,11 +54,13 @@
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
+#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 
 #include <dali/internal/update/resources/bitmap-metadata.h>
 
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
 #include <dali/internal/render/renderers/scene-graph-image-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 using Dali::Internal::GestureEventProcessor;
 using Dali::Internal::ThreadLocalStorage;
@@ -77,11 +80,11 @@ void EnableProfiling( ProfilingType type )
     case PROFILING_TYPE_PAN_GESTURE:
     {
       eventProcessor.EnablePanGestureProfiling();
+      break;
     }
-
-    default:
+    case PROFILING_TYPE_END:
     {
-      // Do nothing
+      // nothing to do
       break;
     }
   }
@@ -125,6 +128,27 @@ const int IMAGE_MEMORY_SIZE(
   sizeof( Internal::BitmapMetadata ) +
   sizeof( Internal::BitmapTexture ) +
   sizeof( Internal::ImageTicket ) );
+const int RENDERER_MEMORY_SIZE(
+  sizeof( Internal::Renderer ) +
+  sizeof( Internal::RendererAttachment ) +
+  sizeof( Internal::SceneGraph::RendererAttachment ) +
+  sizeof( Internal::SceneGraph::Renderer ) +
+  sizeof( Internal::SceneGraph::NewRenderer ) );
+const int GEOMETRY_MEMORY_SIZE(
+  sizeof( Internal::Geometry ) +
+  sizeof( Internal::SceneGraph::Geometry ) );
+const int PROPERTY_BUFFER_MEMORY_SIZE(
+  sizeof( Internal::PropertyBuffer ) +
+  sizeof( Internal::SceneGraph::PropertyBuffer ) );
+const int MATERIAL_MEMORY_SIZE(
+  sizeof( Internal::Material ) +
+  sizeof( Internal::SceneGraph::Material ) );
+const int SAMPLER_MEMORY_SIZE(
+  sizeof( Internal::Sampler ) +
+  sizeof( Internal::SceneGraph::Sampler ) );
+const int SHADER_MEMORY_SIZE(
+  sizeof( Internal::Shader ) +
+  sizeof( Internal::SceneGraph::Shader ) );
 
 } // namespace Profiling
 

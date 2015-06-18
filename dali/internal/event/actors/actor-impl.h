@@ -1875,7 +1875,6 @@ private:
 
 protected:
 
-  StagePtr mStage;                ///< Used to send messages to Node; valid until Core destruction
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
   ActorContainer* mChildren;      ///< Container of referenced actors
   const SceneGraph::Node* mNode;  ///< Not owned
