@@ -520,7 +520,7 @@ void ResourceManager::HandleSaveResourceRequest( ResourceId id, const ResourceTy
 
     if( resource ) // i.e. if it's a saveable resource
     {
-//      mImpl->saveRequests.insert(id);
+      mImpl->saveRequests.insert(id);
 
       ResourceRequest request(id, *typePath.type, typePath.path, resource);
       mImpl->mPlatformAbstraction.SaveResource(request);
