@@ -93,6 +93,7 @@ develapigeometrydir = $(develapidir)/geometry
 develapiimagesdir = $(develapidir)/images
 develapimodelingdir = $(develapidir)/modeling
 develapiobjectdir = $(develapidir)/object
+develapirenderingdir = $(develapidir)/rendering
 develapiscriptingdir = $(develapidir)/scripting
 
 develapi_HEADERS = $(devel_api_header_files)
@@ -105,6 +106,7 @@ develapigeometry_HEADERS = $(devel_api_core_geometry_header_files)
 develapiimages_HEADERS = $(devel_api_core_images_header_files)
 develapimodeling_HEADERS = $(devel_api_core_modeling_header_files)
 develapiobject_HEADERS = $(devel_api_core_object_header_files)
+develapirendering_HEADERS = $(devel_api_core_rendering_header_files)
 develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
 
 
@@ -115,7 +117,6 @@ publicapiactorsdir = $(publicapidir)/actors
 publicapianimationdir = $(publicapidir)/animation
 publicapicommondir = $(publicapidir)/common
 publicapieventsdir = $(publicapidir)/events
-publicapigeometrydir = $(publicapidir)/geometry
 publicapiimagesdir = $(publicapidir)/images
 publicapimathdir = $(publicapidir)/math
 publicapiobjectdir = $(publicapidir)/object
@@ -130,7 +131,6 @@ publicapiactors_HEADERS = $(public_api_core_actors_header_files)
 publicapianimation_HEADERS = $(public_api_core_animation_header_files)
 publicapicommon_HEADERS = $(public_api_core_common_header_files)
 publicapievents_HEADERS = $(public_api_core_events_header_files)
-publicapigeometry_HEADERS = $(public_api_core_geometry_header_files)
 publicapiimages_HEADERS = $(public_api_core_images_header_files)
 publicapimath_HEADERS = $(public_api_core_math_header_files)
 publicapirendertasks_HEADERS = $(public_api_core_render_tasks_header_files)

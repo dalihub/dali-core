@@ -28,7 +28,6 @@
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/layer.h>
 #include <dali/public-api/actors/renderable-actor.h>
-#include <dali/public-api/actors/renderer.h>
 #include <dali/public-api/actors/sampling.h>
 
 #include <dali/public-api/animation/alpha-function.h>
@@ -67,7 +66,6 @@
 #include <dali/public-api/events/touch-event.h>
 #include <dali/public-api/events/touch-point.h>
 
-#include <dali/public-api/geometry/geometry.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/public-api/images/encoded-buffer-image.h>
 #include <dali/public-api/images/frame-buffer-image.h>
@@ -122,9 +120,6 @@
 #include <dali/public-api/signals/signal-slot-observers.h>
 #include <dali/public-api/signals/slot-delegate.h>
 
-#include <dali/public-api/shader-effects/material.h>
-#include <dali/public-api/shader-effects/sampler.h>
-#include <dali/public-api/shader-effects/shader.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
 #include <dali/public-api/size-negotiation/relayout-container.h>

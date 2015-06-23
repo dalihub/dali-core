@@ -18,13 +18,13 @@
 #include "scene-graph-material.h"
 
 // INTERNAL HEADERS
-#include <dali/public-api/shader-effects/material.h>
+#include <dali/public-api/actors/blending.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/devel-api/rendering/material.h>
 #include <dali/internal/common/internal-constants.h>
-#include <dali/internal/update/effects/scene-graph-sampler.h>
+#include <dali/internal/update/rendering/scene-graph-sampler.h>
 #include <dali/internal/render/data-providers/sampler-data-provider.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
-#include <dali/public-api/actors/blending.h>
 
 namespace Dali
 {

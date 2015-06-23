@@ -20,6 +20,12 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
+#include <dali/devel-api/object/property-buffer.h>
+#include <dali/devel-api/rendering/geometry.h>
+#include <dali/devel-api/rendering/material.h>
+#include <dali/devel-api/rendering/renderer.h>
+#include <dali/devel-api/rendering/sampler.h>
+#include <dali/devel-api/rendering/shader.h>
 
 using namespace Dali;
 

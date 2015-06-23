@@ -20,8 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 #include <dali/internal/update/manager/update-manager.h>
+#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 
 namespace Dali
 {
