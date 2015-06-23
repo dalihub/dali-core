@@ -27,8 +27,8 @@
 #include <dali/public-api/images/image.h> // Dali::Image
 #include <dali/public-api/object/handle.h> // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
-#include <dali/public-api/shader-effects/sampler.h> // Dali::Sampler
-#include <dali/public-api/shader-effects/shader.h> // Dali::Shader
+#include <dali/devel-api/rendering/sampler.h> // Dali::Sampler
+#include <dali/devel-api/rendering/shader.h> // Dali::Shader
 
 namespace Dali
 {

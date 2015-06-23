@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/public-api/object/property-buffer.h> // Dali::PropertyBuffer
+#include <dali/devel-api/object/property-buffer.h> // Dali::PropertyBuffer
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/property-map.h> // Dali::Property::Map

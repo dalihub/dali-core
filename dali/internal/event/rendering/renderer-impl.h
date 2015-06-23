@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_MATERIAL_H
-#define DALI_INTERNAL_MATERIAL_H
+#ifndef DALI_INTERNAL_RENDERER_H
+#define DALI_INTERNAL_RENDERER_H
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -18,20 +18,15 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h> // std::vector
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/shader-effects/material.h> // Dali::Material
+#include <dali/devel-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
-#include <dali/internal/event/effects/sampler-impl.h> // Dali::Internal::Sampler
-#include <dali/internal/event/effects/shader-impl.h> // Dali::Internal::Shader
-#include <dali/internal/common/blending-options.h>
+#include <dali/internal/event/rendering/material-impl.h> // Dali::Internal::Material
+#include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
 
 namespace Dali
 {
@@ -39,119 +34,61 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class Material;
+class RendererAttachment;
 }
 
-
-class Material;
-typedef IntrusivePtr<Material> MaterialPtr;
+class Renderer;
+typedef IntrusivePtr<Renderer> RendererPtr;
 
 /**
- * Material is an object that connects a Shader with Samplers and can be used
- * to shade a Geometry.
+ * Renderer is an object that can be used to show content by combining a Geometry with a material.
  */
-class Material : public Object, public Connectable
+class Renderer : public Object, public Connectable
 {
 public:
 
   /**
-   * @copydoc Dali::Material::New()
+   * Create a new Renderer.
+   * @return A smart-pointer to the newly allocated Renderer.
    */
-  static MaterialPtr New();
+  static RendererPtr New();
 
   /**
-   * @copydoc Dali::Material::SetShader()
+   * @copydoc Dali::Renderer::SetGeometry()
    */
-  void SetShader( Shader& shader );
+  void SetGeometry( Geometry& geometry );
 
   /**
-   * @copydoc Dali::Material::GetShader()
+   * @copydoc Dali::Renderer::GetGeometry()
    */
-  Shader* GetShader() const;
+  Geometry* GetGeometry() const;
 
   /**
-   * @copydoc Dali::Material::AddSampler()
+   * @copydoc Dali::Renderer::SetMaterial()
    */
-  void AddSampler( Sampler& sampler );
+  void SetMaterial( Material& material );
 
   /**
-   * @copydoc Dali::Material::GetNumberOfSamplers()
+   * @copydoc Dali::Renderer::GetMaterial()
    */
-  std::size_t GetNumberOfSamplers() const;
+  Material* GetMaterial() const;
 
   /**
-   * @copydoc Dali::Material::RemoveSampler()
+   * @copydoc Dali::Renderer::SetDepthIndex()
    */
-  void RemoveSampler( std::size_t index );
+  void SetDepthIndex( int depthIndex );
 
   /**
-   * @copydoc Dali::Material::GetSamplerAt()
+   * @copydoc Dali::Renderer::GetDepthIndex()
    */
-  Sampler* GetSamplerAt( unsigned int index ) const;
+  int GetDepthIndex() const;
 
   /**
-   * @copydoc Dali::Material::SetFaceCullingMode()
-   */
-  void SetFaceCullingMode( Dali::Material::FaceCullingMode cullingMode );
-
-  /**
-   * @copydoc Dali::Material::SetBlendMode()
-   */
-  void SetBlendMode( BlendingMode::Type mode );
-
-  /**
-   * @copydoc Dali::Material::GetBlendMode()
-   */
-  BlendingMode::Type GetBlendMode() const;
-
-  /**
-   * @copydoc Dali::Material::SetBlendFunc()
-   */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
-
-  /**
-   * @copydoc Dali::Material::SetBlendFunc()
-   */
-  void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                     BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
-
-  /**
-   * @copydoc Dali::Material::GetBlendFunc()
-   */
-  void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
-                     BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
-
-  /**
-   * @copydoc Dali::Material::SetBlendEquation()
-   */
-  void SetBlendEquation( BlendingEquation::Type equationRgba );
-
-  /**
-   * @copydoc Dali::Material::SetBlendEquation()
-   */
-  void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
-
-  /**
-   * @copydoc Dali::Material::GetBlendEquation()
-   */
-  void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
-
-  /**
-   * @copydoc Dali::Material::SetBlendColor()
-   */
-  void SetBlendColor( const Vector4& color );
-
-  /**
-   * @copydoc Dali::Material::GetBlendColor()
-   */
-  const Vector4& GetBlendColor() const;
-
-  /**
-   * @brief Get the material scene object
+   * @brief Get the scene graph object ( the node attachment )
    *
-   * @return the material scene object
+   * @return the scene object
    */
-  const SceneGraph::Material* GetMaterialSceneObject() const;
+  SceneGraph::RendererAttachment* GetRendererSceneObject();
 
 public: // Default property extensions from Object
 
@@ -252,59 +189,49 @@ public: // Functions from Connectable
   virtual void Disconnect();
 
 private: // implementation
-  Material();
+  Renderer();
 
-  /**
-   * Second stage initialization
-   */
   void Initialize();
 
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Material();
+  virtual ~Renderer();
 
 private: // unimplemented methods
-  Material( const Material& );
-  Material& operator=( const Material& );
+  Renderer( const Renderer& );
+  Renderer& operator=( const Renderer& );
 
-private: //data
-  typedef ObjectConnector<Shader> ShaderConnector;
-  ShaderConnector mShaderConnector; ///< Connector that holds the shader used by this material
-
-  typedef ObjectConnector<Sampler> SamplerConnector;
-  typedef std::vector< SamplerConnector > SamplerConnectorContainer;
-  SamplerConnectorContainer mSamplerConnectors; ///< Vector of connectors that hold the samplers used by this material
-
-  SceneGraph::Material* mSceneObject;
-
-  BlendingMode::Type mBlendingMode; ///< Local store
-  BlendingOptions mBlendingOptions; ///< Local copy of blending options bitmask
+private: // data
+  SceneGraph::RendererAttachment* mSceneObject;
+  ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
+  ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
+  int mDepthIndex;
   bool mOnStage;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::Material& GetImplementation( Dali::Material& handle )
+inline Internal::Renderer& GetImplementation( Dali::Renderer& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Material handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "Renderer handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::Material&>(object);
+  return static_cast<Internal::Renderer&>(object);
 }
 
-inline const Internal::Material& GetImplementation( const Dali::Material& handle )
+inline const Internal::Renderer& GetImplementation( const Dali::Renderer& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Material handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "Renderer handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::Material&>(object);
+  return static_cast<const Internal::Renderer&>(object);
 }
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_MATERIAL_H
+#endif // DALI_INTERNAL_RENDERER_H

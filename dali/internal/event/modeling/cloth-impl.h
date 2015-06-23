@@ -21,7 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/devel-api/geometry/cloth.h>
 #include <dali/internal/event/common/object-impl.h>
-#include <dali/internal/event/geometry/geometry-impl.h>
+#include <dali/internal/event/rendering/geometry-impl.h>
 
 namespace Dali
 {

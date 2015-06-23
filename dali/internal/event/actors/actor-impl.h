@@ -22,18 +22,18 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/viewport.h>
-#include <dali/internal/event/common/object-impl.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
-#include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/actors/actor-declarations.h>
-#include <dali/internal/event/actors/renderer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
+#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/stage-def.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 
 #ifdef DYNAMICS_SUPPORT

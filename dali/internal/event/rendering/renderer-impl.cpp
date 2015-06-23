@@ -16,11 +16,11 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/actors/renderer-impl.h> // Dali::Internal::Renderer
+#include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/renderer.h> // Dali::Renderer
 #include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
