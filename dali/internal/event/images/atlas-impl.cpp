@@ -202,6 +202,7 @@ void Atlas::AllocateAtlas()
   if( !mTicket )
   {
     mTicket = mResourceClient.AllocateTexture( mWidth, mHeight, mPixelFormat );
+    mTicket->AddObserver( *this );
     mImageFactory.RegisterForContextRecovery( this );
   }
 }
