@@ -16,10 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/geometry.h>  // Dali::Geometry
+#include <dali/public-api/geometry/geometry.h>  // Dali::Geometry
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
+#include <dali/internal/event/geometry/geometry-impl.h> // Dali::Internal::Geometry
 
 namespace Dali
 {

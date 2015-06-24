@@ -16,12 +16,12 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/material.h>  // Dali::Material
+#include <dali/public-api/shader-effects/material.h>  // Dali::Material
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/material-impl.h> // Dali::Internal::Material
-#include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
-#include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
+#include <dali/internal/event/effects/material-impl.h> // Dali::Internal::Material
+#include <dali/internal/event/effects/sampler-impl.h> // Dali::Internal::Sampler
+#include <dali/internal/event/effects/shader-impl.h> // Dali::Internal::Shader
 
 namespace Dali
 {

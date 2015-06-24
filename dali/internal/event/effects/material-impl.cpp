@@ -16,16 +16,16 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/rendering/material-impl.h> // Dali::Internal::Material
+#include <dali/internal/event/effects/material-impl.h> // Dali::Internal::Material
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/devel-api/rendering/material.h> // Dali::Internal::Material
+#include <dali/public-api/shader-effects/material.h> // Dali::Internal::Material
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
+#include <dali/internal/update/effects/scene-graph-material.h>
+#include <dali/internal/update/effects/scene-graph-sampler.h>
 #include <dali/internal/update/manager/update-manager.h>
-#include <dali/internal/update/rendering/scene-graph-material.h>
-#include <dali/internal/update/rendering/scene-graph-sampler.h>
 
 namespace Dali
 {

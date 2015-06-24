@@ -16,7 +16,7 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/rendering/geometry-impl.h> // Dali::Internal::Geometry
+#include <dali/internal/event/geometry/geometry-impl.h> // Dali::Internal::Geometry
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>

@@ -16,10 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/shader.h>  // Dali::Shader
+#include <dali/public-api/shader-effects/shader.h>  // Dali::Shader
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/shader-impl.h>  // Dali::Internal::Shader
+#include <dali/internal/event/effects/shader-impl.h>  // Dali::Internal::Shader
 
 namespace Dali
 {

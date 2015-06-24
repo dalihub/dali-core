@@ -16,10 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/renderer.h>  // Dali::Renderer
+#include <dali/public-api/actors/renderer.h>  // Dali::Renderer
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
+#include <dali/internal/event/actors/renderer-impl.h> // Dali::Internal::Renderer
 
 namespace Dali
 {

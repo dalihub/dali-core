@@ -22,14 +22,14 @@
 #include <dali/public-api/shader-effects/shader-effect.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/layer-impl.h> // for the default sorting function
+#include <dali/internal/update/effects/scene-graph-material.h>
+#include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
-#include <dali/internal/update/nodes/scene-graph-layer.h>
+#include <dali/internal/update/resources/resource-manager-declarations.h>
 #include <dali/internal/update/manager/sorted-layers.h>
 #include <dali/internal/update/render-tasks/scene-graph-render-task.h>
-#include <dali/internal/update/rendering/scene-graph-material.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
-#include <dali/internal/update/resources/resource-manager-declarations.h>
+#include <dali/internal/update/node-attachments/scene-graph-renderable-attachment.h>
+#include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/render/common/render-item.h>
 #include <dali/internal/render/common/render-tracker.h>
 #include <dali/internal/render/common/render-instruction.h>

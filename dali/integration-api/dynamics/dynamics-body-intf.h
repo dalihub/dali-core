@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/devel-api/rendering/geometry.h>
+#include <dali/public-api/geometry/geometry.h>
 
 namespace Dali
 {

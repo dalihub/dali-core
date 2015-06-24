@@ -25,9 +25,9 @@
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
-#include <dali/internal/update/rendering/scene-graph-material.h>
-#include <dali/internal/update/rendering/scene-graph-sampler.h>
+#include <dali/internal/update/geometry/scene-graph-geometry.h>
+#include <dali/internal/update/effects/scene-graph-material.h>
+#include <dali/internal/update/effects/scene-graph-sampler.h>
 
 namespace Dali
 {

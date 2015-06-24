@@ -17,8 +17,8 @@
 #include <dali/internal/render/renderers/render-geometry.h>
 
 #include <dali/internal/common/buffer-index.h>
+#include <dali/internal/update/geometry/scene-graph-geometry.h>
 #include <dali/internal/update/common/scene-graph-property-buffer.h>
-#include <dali/internal/update/rendering/scene-graph-geometry.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>
 #include <dali/internal/render/gl-resources/context.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>

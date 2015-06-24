@@ -22,10 +22,10 @@
 #include <string> // std::string
 
 // INTERNAL INCLUDES
+#include <dali/public-api/geometry/geometry.h> // Dali::Geometry
 #include <dali/public-api/object/handle.h> // Dali::Handle
 #include <dali/public-api/object/property-index-ranges.h> // DEFAULT_DERIVED_HANDLE_PROPERTY_START_INDEX
-#include <dali/devel-api/rendering/geometry.h> // Dali::Geometry
-#include <dali/devel-api/rendering/material.h> // Dali::Material
+#include <dali/public-api/shader-effects/material.h> // Dali::Material
 
 namespace Dali
 {

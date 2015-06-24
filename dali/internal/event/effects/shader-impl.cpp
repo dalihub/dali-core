@@ -16,12 +16,12 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
+#include <dali/internal/event/effects/shader-impl.h> // Dali::Internal::Shader
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
+#include <dali/public-api/shader-effects/shader.h> // Dali::Shader
 #include <dali/public-api/shader-effects/shader-effect.h> // Dali::ShaderEffect::GeometryHints // TODO: MESH_REWORK REMOVE
-#include <dali/devel-api/rendering/shader.h> // Dali::Shader
 
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
