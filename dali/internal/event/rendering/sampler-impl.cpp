@@ -16,13 +16,14 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/effects/sampler-impl.h> // Dali::Internal::Sampler
+#include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
 
 // INTERNAL INCLUDES
-#include <dali/public-api/shader-effects/sampler.h> // Dali::Internal::Sampler
+#include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/rendering/sampler.h> // Dali::Internal::Sampler
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-#include <dali/internal/update/effects/scene-graph-sampler.h> // Dali::Internal::SceneGraph::Sampler
+#include <dali/internal/update/rendering/scene-graph-sampler.h> // Dali::Internal::SceneGraph::Sampler
 #include <dali/internal/update/manager/update-manager.h>
 
 namespace Dali
@@ -45,6 +46,13 @@ DALI_PROPERTY( "affects-transparency",  BOOLEAN,  true, false,  true, Dali::Samp
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SAMPLER_IMPL = { DEFAULT_PROPERTY_DETAILS };
+
+BaseHandle Create()
+{
+  return Dali::BaseHandle();
+}
+
+TypeRegistration mType( typeid( Dali::Sampler ), typeid( Dali::Handle ), Create );
 
 } // unnamed namespace
 
@@ -348,10 +356,10 @@ void Sampler::Initialize( const std::string& textureUnitUniformName )
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
-  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
-
   mSceneObject = new SceneGraph::Sampler( textureUnitUniformName );
   AddMessage( updateManager, updateManager.GetSamplerOwner(), *mSceneObject );
+
+  eventThreadServices.RegisterObject( this );
 }
 
 Sampler::~Sampler()
@@ -361,6 +369,8 @@ Sampler::~Sampler()
     EventThreadServices& eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
     RemoveMessage( updateManager, updateManager.GetSamplerOwner(), *mSceneObject );
+
+    eventThreadServices.UnregisterObject( this );
   }
 }
 

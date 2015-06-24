@@ -15,11 +15,11 @@
  */
 
 #include "scene-graph-renderer-attachment.h"
-#include <dali/internal/update/effects/scene-graph-material.h>
-#include <dali/internal/update/effects/scene-graph-sampler.h>
 #include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/manager/prepare-render-instructions.h>
-#include <dali/internal/update/geometry/scene-graph-geometry.h>
+#include <dali/internal/update/rendering/scene-graph-geometry.h>
+#include <dali/internal/update/rendering/scene-graph-material.h>
+#include <dali/internal/update/rendering/scene-graph-sampler.h>
 #include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/render/data-providers/render-data-provider.h>

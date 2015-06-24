@@ -16,10 +16,11 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/actors/renderer-impl.h> // Dali::Internal::Renderer
+#include <dali/internal/event/rendering/renderer-impl.h> // Dali::Internal::Renderer
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/renderer.h> // Dali::Renderer
+#include <dali/public-api/object/type-registry.h>
+#include <dali/devel-api/rendering/renderer.h> // Dali::Renderer
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
 #include <dali/internal/event/common/property-input-impl.h>
@@ -42,6 +43,13 @@ DALI_PROPERTY( "depth-index", INTEGER, true, false, false, Dali::Renderer::Prope
 DALI_PROPERTY_TABLE_END( DEFAULT_OBJECT_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> RENDERER_IMPL = { DEFAULT_PROPERTY_DETAILS };
+
+BaseHandle Create()
+{
+  return Dali::BaseHandle();
+}
+
+TypeRegistration mType( typeid( Dali::Renderer ), typeid( Dali::Handle ), Create );
 
 } // unnamed namespace
 
@@ -250,7 +258,6 @@ Renderer::Renderer()
 
 void Renderer::Initialize()
 {
-  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
@@ -259,10 +266,20 @@ void Renderer::Initialize()
 
   // Send message to update to connect to scene graph:
   AttachToSceneGraphMessage( updateManager, mSceneObject );
+
+  eventThreadServices.RegisterObject( this );
 }
 
 Renderer::~Renderer()
 {
+  if( EventThreadServices::IsCoreRunning() )
+  {
+    EventThreadServices& eventThreadServices = GetEventThreadServices();
+    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
+    RemoveObjectMessage( updateManager, mSceneObject );
+
+    eventThreadServices.UnregisterObject( this );
+  }
 }
 
 } // namespace Internal

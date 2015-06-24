@@ -53,12 +53,16 @@ DALI_IMPORT_API extern const int CONSTRAINT_MEMORY_SIZE;   ///< Total size of co
 DALI_IMPORT_API extern const int ACTOR_MEMORY_SIZE;        ///< Total size of actor and associated internal objects
 DALI_IMPORT_API extern const int CAMERA_ACTOR_MEMORY_SIZE; ///< Total size of camera actor and associated internal objects
 DALI_IMPORT_API extern const int TEXT_ACTOR_MEMORY_SIZE;   ///< Total size of text actor and associated internal objects
-DALI_IMPORT_API extern const int MESH_ACTOR_MEMORY_SIZE;   ///< Total size of mesh actor and associated internal objects
 DALI_IMPORT_API extern const int IMAGE_ACTOR_MEMORY_SIZE;  ///< Total size of image actor and associated internal objects
 DALI_IMPORT_API extern const int LAYER_MEMORY_SIZE;        ///< Total size of layer and associated internal objects
 DALI_IMPORT_API extern const int IMAGE_MEMORY_SIZE;        ///< Total size of image and associated internal objects
-DALI_IMPORT_API extern const int MESH_MEMORY_SIZE;         ///< Total size of mesh and associated internal objects
+
+DALI_IMPORT_API extern const int RENDERER_MEMORY_SIZE;     ///< Total size of renderer and associated internal objects
+DALI_IMPORT_API extern const int GEOMETRY_MEMORY_SIZE;     ///< Total size of geometry and associated internal objects
+DALI_IMPORT_API extern const int PROPERTY_BUFFER_MEMORY_SIZE;     ///< Total size of property-0buffer and associated internal objects
 DALI_IMPORT_API extern const int MATERIAL_MEMORY_SIZE;     ///< Total size of material and associated internal objects
+DALI_IMPORT_API extern const int SAMPLER_MEMORY_SIZE;     ///< Total size of material and associated internal objects
+DALI_IMPORT_API extern const int SHADER_MEMORY_SIZE;     ///< Total size of material and associated internal objects
 } // namespace Profiling
 
 } // namespace Integration

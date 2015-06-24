@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_GEOMETRY_H
-#define DALI_INTERNAL_GEOMETRY_H
+#ifndef DALI_INTERNAL_MATERIAL_H
+#define DALI_INTERNAL_MATERIAL_H
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -24,11 +24,14 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/public-api/geometry/geometry.h> // Dali::Geometry
+#include <dali/devel-api/rendering/material.h> // Dali::Material
+#include <dali/internal/common/blending-options.h>
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
 #include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
+#include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
+#include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
 
 namespace Dali
 {
@@ -36,72 +39,119 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class Geometry;
+class Material;
 }
 
-class Geometry;
-typedef IntrusivePtr<Geometry> GeometryPtr;
+
+class Material;
+typedef IntrusivePtr<Material> MaterialPtr;
 
 /**
- * Geometry is an object that contains an array of structures of values that
- * can be accessed as properties.
+ * Material is an object that connects a Shader with Samplers and can be used
+ * to shade a Geometry.
  */
-class Geometry : public Object, public Connectable
+class Material : public Object, public Connectable
 {
 public:
 
   /**
-   * Create a new Geometry.
-   * @return A smart-pointer to the newly allocated Geometry.
+   * @copydoc Dali::Material::New()
    */
-  static GeometryPtr New();
+  static MaterialPtr New();
 
   /**
-   * @copydoc Dali::Geometry::AddVertexBuffer()
+   * @copydoc Dali::Material::SetShader()
    */
-  std::size_t AddVertexBuffer( PropertyBuffer& vertexBuffer );
+  void SetShader( Shader& shader );
 
   /**
-   * @copydoc Dali::Geometry::GetNumberOfVertexBuffers()
+   * @copydoc Dali::Material::GetShader()
    */
-  std::size_t GetNumberOfVertexBuffers() const;
+  Shader* GetShader() const;
 
   /**
-   * @copydoc Dali::Geometry::RemoveVertexBuffer()
+   * @copydoc Dali::Material::AddSampler()
    */
-  void RemoveVertexBuffer( std::size_t index );
+  void AddSampler( Sampler& sampler );
 
   /**
-   * @copydoc Dali::Geometry::SetIndexBuffer()
+   * @copydoc Dali::Material::GetNumberOfSamplers()
    */
-  void SetIndexBuffer( PropertyBuffer& indexBuffer );
+  std::size_t GetNumberOfSamplers() const;
 
   /**
-   * @copydoc Dali::Geometry::SetGeometryType()
+   * @copydoc Dali::Material::RemoveSampler()
    */
-  void SetGeometryType( Dali::Geometry::GeometryType geometryType );
+  void RemoveSampler( std::size_t index );
 
   /**
-   * @copydoc Dali::Geometry::GetGeometryType()
+   * @copydoc Dali::Material::GetSamplerAt()
    */
-  Dali::Geometry::GeometryType GetGeometryType() const;
+  Sampler* GetSamplerAt( unsigned int index ) const;
 
   /**
-   * @copydoc Dali::Geometry::SetRequiresDepthTesting()
+   * @copydoc Dali::Material::SetFaceCullingMode()
    */
-  void SetRequiresDepthTesting( bool requiresDepthTest );
+  void SetFaceCullingMode( Dali::Material::FaceCullingMode cullingMode );
 
   /**
-   * @copydoc Dali::Geometry::GetRequiresDepthTesting()
+   * @copydoc Dali::Material::SetBlendMode()
    */
-  bool GetRequiresDepthTesting() const;
+  void SetBlendMode( BlendingMode::Type mode );
 
   /**
-   * @brief Get the geometry scene object
+   * @copydoc Dali::Material::GetBlendMode()
+   */
+  BlendingMode::Type GetBlendMode() const;
+
+  /**
+   * @copydoc Dali::Material::SetBlendFunc()
+   */
+  void SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba );
+
+  /**
+   * @copydoc Dali::Material::SetBlendFunc()
+   */
+  void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
+                     BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
+
+  /**
+   * @copydoc Dali::Material::GetBlendFunc()
+   */
+  void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
+                     BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
+
+  /**
+   * @copydoc Dali::Material::SetBlendEquation()
+   */
+  void SetBlendEquation( BlendingEquation::Type equationRgba );
+
+  /**
+   * @copydoc Dali::Material::SetBlendEquation()
+   */
+  void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
+
+  /**
+   * @copydoc Dali::Material::GetBlendEquation()
+   */
+  void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
+
+  /**
+   * @copydoc Dali::Material::SetBlendColor()
+   */
+  void SetBlendColor( const Vector4& color );
+
+  /**
+   * @copydoc Dali::Material::GetBlendColor()
+   */
+  const Vector4& GetBlendColor() const;
+
+  /**
+   * @brief Get the material scene object
    *
-   * @return the geometry scene object
+   * @return the material scene object
    */
-  const SceneGraph::Geometry* GetGeometrySceneObject() const;
+  const SceneGraph::Material* GetMaterialSceneObject() const;
 
 public: // Default property extensions from Object
 
@@ -202,10 +252,10 @@ public: // Functions from Connectable
   virtual void Disconnect();
 
 private: // implementation
-  Geometry();
+  Material();
 
   /**
-   * Second stage initialization of the Geometry
+   * Second stage initialization
    */
   void Initialize();
 
@@ -213,42 +263,48 @@ protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Geometry();
+  virtual ~Material();
 
 private: // unimplemented methods
-  Geometry( const Geometry& );
-  Geometry& operator=( const Geometry& );
+  Material( const Material& );
+  Material& operator=( const Material& );
 
-private: // data
-  typedef ObjectConnector<PropertyBuffer> PropertyBufferConnector;
-  typedef std::vector< PropertyBufferConnector > PropertyBufferConnectorContainer;
-  PropertyBufferConnectorContainer mVertexBufferConnectors; ///< Vector of connectors that hold the property buffers used by this geometry
-  PropertyBufferConnector mIndexBufferConnector;            ///< Connector that holds the index buffer used by this geometry
-  SceneGraph::Geometry* mSceneObject;
+private: //data
+  typedef ObjectConnector<Shader> ShaderConnector;
+  ShaderConnector mShaderConnector; ///< Connector that holds the shader used by this material
+
+  typedef ObjectConnector<Sampler> SamplerConnector;
+  typedef std::vector< SamplerConnector > SamplerConnectorContainer;
+  SamplerConnectorContainer mSamplerConnectors; ///< Vector of connectors that hold the samplers used by this material
+
+  SceneGraph::Material* mSceneObject;
+
+  BlendingMode::Type mBlendingMode; ///< Local store
+  BlendingOptions mBlendingOptions; ///< Local copy of blending options bitmask
   bool mOnStage;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::Geometry& GetImplementation(Dali::Geometry& handle)
+inline Internal::Material& GetImplementation( Dali::Material& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Geometry handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "Material handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::Geometry&>(object);
+  return static_cast<Internal::Material&>(object);
 }
 
-inline const Internal::Geometry& GetImplementation(const Dali::Geometry& handle)
+inline const Internal::Material& GetImplementation( const Dali::Material& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Geometry handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "Material handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::Geometry&>(object);
+  return static_cast<const Internal::Material&>(object);
 }
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_GEOMETRY_H
+#endif // DALI_INTERNAL_MATERIAL_H

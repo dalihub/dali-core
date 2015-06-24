@@ -16,15 +16,15 @@
  */
 
 // CLASS HEADER
-#include <dali/internal/event/effects/shader-impl.h> // Dali::Internal::Shader
+#include <dali/internal/event/rendering/shader-impl.h> // Dali::Internal::Shader
 
 // INTERNAL INCLUDES
-#include <dali/public-api/shader-effects/shader.h> // Dali::Shader
+#include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/shader-effects/shader-effect.h> // Dali::ShaderEffect::GeometryHints // TODO: MESH_REWORK REMOVE
+#include <dali/devel-api/rendering/shader.h> // Dali::Shader
 
 #include <dali/internal/event/common/object-impl-helper.h> // Dali::Internal::ObjectHelper
 #include <dali/internal/event/common/property-helper.h> // DALI_PROPERTY_TABLE_BEGIN, DALI_PROPERTY, DALI_PROPERTY_TABLE_END
-
 #include <dali/internal/event/common/thread-local-storage.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/resources/resource-ticket.h>
@@ -43,10 +43,17 @@ namespace
  */
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "program",       MAP,              true, false,  false,  Dali::Shader::Property::PROGRAM )
-  DALI_PROPERTY( "shader-hints",  UNSIGNED_INTEGER, true, false,  true,   Dali::Shader::Property::SHADER_HINTS )
-  DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
+DALI_PROPERTY( "shader-hints",  UNSIGNED_INTEGER, true, false,  true,   Dali::Shader::Property::SHADER_HINTS )
+DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
-  const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SHADER_IMPL = { DEFAULT_PROPERTY_DETAILS };
+const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> SHADER_IMPL = { DEFAULT_PROPERTY_DETAILS };
+
+BaseHandle Create()
+{
+  return Dali::BaseHandle();
+}
+
+TypeRegistration mType( typeid( Dali::Shader ), typeid( Dali::Handle ), Create );
 
 } // unnamed namespace
 
@@ -244,7 +251,6 @@ void Shader::Initialize(
   const std::string& fragmentSource,
   Dali::Shader::ShaderHints hints )
 {
-  DALI_ASSERT_ALWAYS( EventThreadServices::IsCoreRunning() && "Core is not running" );
   EventThreadServices& eventThreadServices = GetEventThreadServices();
   SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
 
@@ -279,6 +285,8 @@ void Shader::Initialize(
 
   // Add shader program to scene-object using a message to the UpdateManager
   SetShaderProgramMessage( updateManager, *mSceneObject, mTicket->GetId(), shaderHash, false );
+
+  eventThreadServices.RegisterObject( this );
 }
 
 Shader::~Shader()
@@ -288,6 +296,8 @@ Shader::~Shader()
     EventThreadServices& eventThreadServices = GetEventThreadServices();
     SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
     RemoveShaderMessage( updateManager, *mSceneObject);
+
+    eventThreadServices.UnregisterObject( this );
   }
 }
 

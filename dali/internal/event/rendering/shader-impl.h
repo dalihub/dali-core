@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_RENDERER_H
-#define DALI_INTERNAL_RENDERER_H
+#ifndef DALI_INTERNAL_SHADER_H
+#define DALI_INTERNAL_SHADER_H
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -19,14 +19,13 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/renderer.h> // Dali::Renderer
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
+#include <dali/devel-api/rendering/shader.h> // Dali::Shader
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/effects/material-impl.h> // Dali::Internal::Material
-#include <dali/internal/event/geometry/geometry-impl.h> // Dali::Internal::Geometry
+#include <dali/internal/event/resources/resource-ticket.h> // Dali::Internal::ResourceTicketPtr
 
 namespace Dali
 {
@@ -34,61 +33,33 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class RendererAttachment;
+class Shader;
 }
 
-class Renderer;
-typedef IntrusivePtr<Renderer> RendererPtr;
+class Shader;
+typedef IntrusivePtr<Shader> ShaderPtr;
 
 /**
- * Renderer is an object that can be used to show content by combining a Geometry with a material.
+ * Shader is an object that contains an array of structures of values that
+ * can be accessed as properties.
  */
-class Renderer : public Object, public Connectable
+class Shader : public Object, public Connectable
 {
 public:
 
   /**
-   * Create a new Renderer.
-   * @return A smart-pointer to the newly allocated Renderer.
+   * @copydoc Dali::Shader::New()
    */
-  static RendererPtr New();
+  static ShaderPtr New( const std::string& vertexShader,
+                        const std::string& fragmentShader,
+                        Dali::Shader::ShaderHints hints );
 
   /**
-   * @copydoc Dali::Renderer::SetGeometry()
-   */
-  void SetGeometry( Geometry& geometry );
-
-  /**
-   * @copydoc Dali::Renderer::GetGeometry()
-   */
-  Geometry* GetGeometry() const;
-
-  /**
-   * @copydoc Dali::Renderer::SetMaterial()
-   */
-  void SetMaterial( Material& material );
-
-  /**
-   * @copydoc Dali::Renderer::GetMaterial()
-   */
-  Material* GetMaterial() const;
-
-  /**
-   * @copydoc Dali::Renderer::SetDepthIndex()
-   */
-  void SetDepthIndex( int depthIndex );
-
-  /**
-   * @copydoc Dali::Renderer::GetDepthIndex()
-   */
-  int GetDepthIndex() const;
-
-  /**
-   * @brief Get the scene graph object ( the node attachment )
+   * @brief Get the shader scene object
    *
-   * @return the scene object
+   * @return the shader scene object
    */
-  SceneGraph::RendererAttachment* GetRendererSceneObject();
+  const SceneGraph::Shader* GetShaderSceneObject() const;
 
 public: // Default property extensions from Object
 
@@ -189,49 +160,50 @@ public: // Functions from Connectable
   virtual void Disconnect();
 
 private: // implementation
-  Renderer();
+  Shader();
 
-  void Initialize();
+  /**
+   * Second stage initialization
+   */
+  void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::ShaderHints hints );
 
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Renderer();
+  virtual ~Shader();
 
 private: // unimplemented methods
-  Renderer( const Renderer& );
-  Renderer& operator=( const Renderer& );
+  Shader( const Shader& );
+  Shader& operator=( const Shader& );
 
-private: // data
-  SceneGraph::RendererAttachment* mSceneObject;
-  ObjectConnector<Geometry> mGeometryConnector; ///< Connector that holds the geometry used by this renderer
-  ObjectConnector<Material> mMaterialConnector; ///< Connector that holds the material used by this renderer
-  int mDepthIndex;
+private:
+  SceneGraph::Shader* mSceneObject;
+  ResourceTicketPtr mTicket;
   bool mOnStage;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::Renderer& GetImplementation( Dali::Renderer& handle )
+inline Internal::Shader& GetImplementation( Dali::Shader& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Renderer handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "Shader handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::Renderer&>(object);
+  return static_cast<Internal::Shader&>(object);
 }
 
-inline const Internal::Renderer& GetImplementation( const Dali::Renderer& handle )
+inline const Internal::Shader& GetImplementation( const Dali::Shader& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Renderer handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "Shader handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::Renderer&>(object);
+  return static_cast<const Internal::Shader&>(object);
 }
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_RENDERER_H
+#endif // DALI_INTERNAL_SHADER_H
