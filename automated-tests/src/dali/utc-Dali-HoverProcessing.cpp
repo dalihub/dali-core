@@ -1014,7 +1014,7 @@ int UtcDaliHoverMultipleRenderableActors(void)
   ImageActor actor = ImageActor::New();
   actor.SetSize( 100.0f, 100.0f );
   actor.SetAnchorPoint(AnchorPoint::TOP_LEFT);
-  actor.SetDepthIndex( 1 );
+  actor.SetSortModifier( 1.0f );
   parent.Add(actor);
 
   // Render and notify

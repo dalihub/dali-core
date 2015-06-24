@@ -477,7 +477,7 @@ void ImageActor::SetDepthIndex( int depthIndex )
 
 int ImageActor::GetDepthIndex() const
 {
-  return static_cast< int >( GetSortModifier() );
+  return static_cast< int >( mImageAttachment->GetSortModifier() );
 }
 
 void ImageActor::SetCullFace(CullFaceMode mode)
