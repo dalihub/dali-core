@@ -393,6 +393,7 @@ inline void SortOpaqueRenderItems(
  * @param cameraAttachment to use the view frustum
  * @param transparentRenderersExist is true if there is transparent renderers in this layer
  * @param stencilRenderablesExist is true if there are stencil renderers on this layer
+ * @param disableDepthTest is true if depth test should be disabled on this layer
  * @param instruction to fill in
  * @param tryReuseRenderList whether to try to reuse the cached items from the instruction
  */
@@ -402,6 +403,7 @@ inline void AddOpaqueRenderers( BufferIndex updateBufferIndex,
                                 SceneGraph::CameraAttachment& cameraAttachment,
                                 bool transparentRenderablesExist,
                                 bool stencilRenderablesExist,
+                                bool disableDepthTest,
                                 RenderInstruction& instruction,
                                 RendererSortingHelper& sortingHelper,
                                 bool tryReuseRenderList )
@@ -417,14 +419,14 @@ inline void AddOpaqueRenderers( BufferIndex updateBufferIndex,
     {
       // reset the flags as other layers might have changed
       // opaque flags can only be set after renderers are added
-      SetOpaqueRenderFlags(opaqueRenderList, transparentRenderablesExist, stencilRenderablesExist, layer.IsDepthTestDisabled() );
+      SetOpaqueRenderFlags( opaqueRenderList, transparentRenderablesExist, stencilRenderablesExist, disableDepthTest );
       return;
     }
   }
   AddRenderersToRenderList( updateBufferIndex, opaqueRenderList, layer.opaqueRenderables, viewMatrix, cameraAttachment );
 
   // opaque flags can only be set after renderers are added
-  SetOpaqueRenderFlags(opaqueRenderList, transparentRenderablesExist, stencilRenderablesExist, layer.IsDepthTestDisabled() );
+  SetOpaqueRenderFlags(opaqueRenderList, transparentRenderablesExist, stencilRenderablesExist, disableDepthTest );
 
   // sorting is only needed if more than 1 item
   if( renderableCount > 1 )
@@ -647,6 +649,7 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
     const bool opaqueRenderablesExist( !layer.opaqueRenderables.empty() );
     const bool transparentRenderablesExist( !layer.transparentRenderables.empty() );
     const bool overlayRenderablesExist( !layer.overlayRenderables.empty() );
+    const bool disableDepthTest( layer.IsDepthTestDisabled() );
     const bool tryReuseRenderList( viewMatrixHasNotChanged && layer.CanReuseRenderers(renderTask.GetCamera()) );
 
     // Ignore stencils if there's nothing to test
@@ -664,6 +667,7 @@ void PrepareRenderInstruction( BufferIndex updateBufferIndex,
                           cameraAttachment,
                           transparentRenderablesExist,
                           stencilRenderablesExist,
+                          disableDepthTest,
                           instruction,
                           sortingHelper,
                           tryReuseRenderList );

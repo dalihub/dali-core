@@ -50,7 +50,7 @@ public:
    * It is useful for 2D user interfaces, and it's used to sort translucent renderers.
    *
    * Only the Z signed distance from the camera is considererd, lower values will be drawn on top.
-   * 
+   *
    * @param[in] position     position of actor in view space
    * @return depth
    */
@@ -149,6 +149,19 @@ public:
   const Dali::ClippingBox& GetClippingBox() const
   {
     return mClippingBox; // Actor-side has most up-to-date value
+  }
+
+  /**
+   * @copydoc Dali::Layer::SetBehavior()
+   */
+  void SetBehavior( Dali::Layer::Behavior behavior );
+
+  /**
+   * @copydoc Dali::Layer::GetBehavior()
+   */
+  Dali::Layer::Behavior GetBehavior() const
+  {
+    return mBehavior;
   }
 
   /**
@@ -287,6 +300,8 @@ private:
   // These properties not animatable; the actor side has the most up-to-date values
   ClippingBox mClippingBox;                     ///< The clipping box, in window coordinates
   Dali::Layer::SortFunctionType mSortFunction;  ///< Used to sort semi-transparent geometry
+
+  Dali::Layer::Behavior mBehavior;              ///< Behavior of the layer
 
   bool mIsClipping:1;                           ///< True when clipping is enabled
   bool mDepthTestDisabled:1;                    ///< Whether depth test is disabled.

@@ -39,7 +39,8 @@ SceneGraph::Layer* Layer::New()
 Layer::Layer()
 : mSortFunction( Internal::Layer::ZValue ),
   mClippingBox( 0,0,0,0 ),
-  mLastCamera(0),
+  mLastCamera( NULL ),
+  mBehavior( Dali::Layer::LAYER_2D ),
   mIsClipping( false ),
   mDepthTestDisabled( false ),
   mIsDefaultSortFunction( true )
@@ -84,6 +85,11 @@ void Layer::SetClippingBox(const Dali::ClippingBox& box)
   mClippingBox.Set(box.x, box.y, box.width, box.height);
 }
 
+void Layer::SetBehavior( Dali::Layer::Behavior behavior )
+{
+  mBehavior = behavior;
+}
+
 void Layer::SetDepthTestDisabled( bool disable )
 {
   mDepthTestDisabled = disable;
@@ -91,7 +97,7 @@ void Layer::SetDepthTestDisabled( bool disable )
 
 bool Layer::IsDepthTestDisabled() const
 {
-  return mDepthTestDisabled;
+  return ( mBehavior == Dali::Layer::LAYER_2D ) || mDepthTestDisabled;
 }
 
 } // namespace SceneGraph

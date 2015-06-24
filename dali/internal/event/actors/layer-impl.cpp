@@ -21,6 +21,7 @@
 // EXTERNAL INCLUDES
 
 // INTERNAL INCLUDES
+#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/internal/event/actors/layer-list.h>
@@ -31,6 +32,16 @@ using Dali::Internal::SceneGraph::UpdateManager;
 
 namespace Dali
 {
+
+namespace
+{
+typedef Dali::Layer::Behavior Behavior;
+
+DALI_ENUM_TO_STRING_TABLE_BEGIN( Behavior )
+DALI_ENUM_TO_STRING( Dali::Layer::LAYER_2D )
+DALI_ENUM_TO_STRING( Dali::Layer::LAYER_3D )
+DALI_ENUM_TO_STRING_TABLE_END( Behavior )
+} // namespace
 
 namespace Internal
 {
@@ -44,6 +55,7 @@ namespace
 DALI_PROPERTY_TABLE_BEGIN
 DALI_PROPERTY( "clipping-enable",   BOOLEAN,    true,    false,   true,   Dali::Layer::Property::CLIPPING_ENABLE )
 DALI_PROPERTY( "clipping-box",      RECTANGLE,  true,    false,   true,   Dali::Layer::Property::CLIPPING_BOX    )
+DALI_PROPERTY( "behavior",          STRING,     true,    false,   false,  Dali::Layer::Property::BEHAVIOR        )
 DALI_PROPERTY_TABLE_END( DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX )
 
 // Actions
@@ -66,6 +78,7 @@ TypeAction a3( mType, ACTION_RAISE_TO_TOP, &Layer::DoAction );
 TypeAction a4( mType, ACTION_LOWER_TO_BOTTOM, &Layer::DoAction );
 
 } // unnamed namespace
+
 
 LayerPtr Layer::New()
 {
@@ -204,6 +217,14 @@ void Layer::MoveBelow( const Internal::Layer& target )
   }
 }
 
+void Layer::SetBehavior( Dali::Layer::Behavior behavior )
+{
+  mBehavior = behavior;
+
+  // notify update side object
+  SetBehaviorMessage( GetEventThreadServices(), GetSceneLayerOnStage(), behavior );
+}
+
 void Layer::SetClipping(bool enabled)
 {
   if (enabled != mIsClipping)
@@ -248,7 +269,7 @@ void Layer::SetDepthTestDisabled( bool disable )
 
 bool Layer::IsDepthTestDisabled() const
 {
-  return mDepthTestDisabled;
+  return mDepthTestDisabled || (mBehavior == Dali::Layer::LAYER_2D);
 }
 
 void Layer::SetSortFunction(Dali::Layer::SortFunctionType function)
@@ -448,6 +469,12 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
         SetClippingBox( clippingBox.x, clippingBox.y, clippingBox.width, clippingBox.height );
         break;
       }
+      case Dali::Layer::Property::BEHAVIOR:
+      {
+        Behavior behavior = Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BehaviorTable, BehaviorTableCount );
+        SetBehavior( behavior );
+        break;
+      }
       default:
       {
         DALI_LOG_WARNING( "Unknown property (%d)\n", index );
@@ -477,6 +504,11 @@ Property::Value Layer::GetDefaultProperty( Property::Index index ) const
       case Dali::Layer::Property::CLIPPING_BOX:
       {
         ret = mClippingBox;
+        break;
+      }
+      case Dali::Layer::Property::BEHAVIOR:
+      {
+        ret = Scripting::GetLinearEnumerationName< Behavior >( GetBehavior(), BehaviorTable, BehaviorTableCount );
         break;
       }
       default:
