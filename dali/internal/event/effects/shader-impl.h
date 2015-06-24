@@ -1,5 +1,5 @@
-#ifndef DALI_INTERNAL_GEOMETRY_H
-#define DALI_INTERNAL_GEOMETRY_H
+#ifndef DALI_INTERNAL_SHADER_H
+#define DALI_INTERNAL_SHADER_H
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -18,17 +18,14 @@
  *
  */
 
-// EXTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h> // std::vector
-
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h> // DALI_ASSERT_ALWAYS
 #include <dali/public-api/common/intrusive-ptr.h> // Dali::IntrusivePtr
-#include <dali/devel-api/rendering/geometry.h> // Dali::Geometry
+#include <dali/public-api/shader-effects/shader.h> // Dali::Shader
 #include <dali/internal/event/common/connectable.h> // Dali::Internal::Connectable
 #include <dali/internal/event/common/object-connector.h> // Dali::Internal::ObjectConnector
 #include <dali/internal/event/common/object-impl.h> // Dali::Internal::Object
-#include <dali/internal/event/common/property-buffer-impl.h> // Dali::Internal::PropertyBuffer
+#include <dali/internal/event/resources/resource-ticket.h> // Dali::Internal::ResourceTicketPtr
 
 namespace Dali
 {
@@ -36,72 +33,33 @@ namespace Internal
 {
 namespace SceneGraph
 {
-class Geometry;
+class Shader;
 }
 
-class Geometry;
-typedef IntrusivePtr<Geometry> GeometryPtr;
+class Shader;
+typedef IntrusivePtr<Shader> ShaderPtr;
 
 /**
- * Geometry is an object that contains an array of structures of values that
+ * Shader is an object that contains an array of structures of values that
  * can be accessed as properties.
  */
-class Geometry : public Object, public Connectable
+class Shader : public Object, public Connectable
 {
 public:
 
   /**
-   * Create a new Geometry.
-   * @return A smart-pointer to the newly allocated Geometry.
+   * @copydoc Dali::Shader::New()
    */
-  static GeometryPtr New();
+  static ShaderPtr New( const std::string& vertexShader,
+                        const std::string& fragmentShader,
+                        Dali::Shader::ShaderHints hints );
 
   /**
-   * @copydoc Dali::Geometry::AddVertexBuffer()
-   */
-  std::size_t AddVertexBuffer( PropertyBuffer& vertexBuffer );
-
-  /**
-   * @copydoc Dali::Geometry::GetNumberOfVertexBuffers()
-   */
-  std::size_t GetNumberOfVertexBuffers() const;
-
-  /**
-   * @copydoc Dali::Geometry::RemoveVertexBuffer()
-   */
-  void RemoveVertexBuffer( std::size_t index );
-
-  /**
-   * @copydoc Dali::Geometry::SetIndexBuffer()
-   */
-  void SetIndexBuffer( PropertyBuffer& indexBuffer );
-
-  /**
-   * @copydoc Dali::Geometry::SetGeometryType()
-   */
-  void SetGeometryType( Dali::Geometry::GeometryType geometryType );
-
-  /**
-   * @copydoc Dali::Geometry::GetGeometryType()
-   */
-  Dali::Geometry::GeometryType GetGeometryType() const;
-
-  /**
-   * @copydoc Dali::Geometry::SetRequiresDepthTesting()
-   */
-  void SetRequiresDepthTesting( bool requiresDepthTest );
-
-  /**
-   * @copydoc Dali::Geometry::GetRequiresDepthTesting()
-   */
-  bool GetRequiresDepthTesting() const;
-
-  /**
-   * @brief Get the geometry scene object
+   * @brief Get the shader scene object
    *
-   * @return the geometry scene object
+   * @return the shader scene object
    */
-  const SceneGraph::Geometry* GetGeometrySceneObject() const;
+  const SceneGraph::Shader* GetShaderSceneObject() const;
 
 public: // Default property extensions from Object
 
@@ -202,53 +160,50 @@ public: // Functions from Connectable
   virtual void Disconnect();
 
 private: // implementation
-  Geometry();
+  Shader();
 
   /**
-   * Second stage initialization of the Geometry
+   * Second stage initialization
    */
-  void Initialize();
+  void Initialize( const std::string& vertexShader, const std::string& fragmentShader, Dali::Shader::ShaderHints hints );
 
 protected:
   /**
    * A reference counted object may only be deleted by calling Unreference()
    */
-  virtual ~Geometry();
+  virtual ~Shader();
 
 private: // unimplemented methods
-  Geometry( const Geometry& );
-  Geometry& operator=( const Geometry& );
+  Shader( const Shader& );
+  Shader& operator=( const Shader& );
 
-private: // data
-  typedef ObjectConnector<PropertyBuffer> PropertyBufferConnector;
-  typedef std::vector< PropertyBufferConnector > PropertyBufferConnectorContainer;
-  PropertyBufferConnectorContainer mVertexBufferConnectors; ///< Vector of connectors that hold the property buffers used by this geometry
-  PropertyBufferConnector mIndexBufferConnector;            ///< Connector that holds the index buffer used by this geometry
-  SceneGraph::Geometry* mSceneObject;
+private:
+  SceneGraph::Shader* mSceneObject;
+  ResourceTicketPtr mTicket;
   bool mOnStage;
 };
 
 } // namespace Internal
 
 // Helpers for public-api forwarding methods
-inline Internal::Geometry& GetImplementation(Dali::Geometry& handle)
+inline Internal::Shader& GetImplementation( Dali::Shader& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Geometry handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "Shader handle is empty");
 
   BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<Internal::Geometry&>(object);
+  return static_cast<Internal::Shader&>(object);
 }
 
-inline const Internal::Geometry& GetImplementation(const Dali::Geometry& handle)
+inline const Internal::Shader& GetImplementation( const Dali::Shader& handle )
 {
-  DALI_ASSERT_ALWAYS(handle && "Geometry handle is empty");
+  DALI_ASSERT_ALWAYS(handle && "Shader handle is empty");
 
   const BaseObject& object = handle.GetBaseObject();
 
-  return static_cast<const Internal::Geometry&>(object);
+  return static_cast<const Internal::Shader&>(object);
 }
 
 } // namespace Dali
 
-#endif // DALI_INTERNAL_GEOMETRY_H
+#endif // DALI_INTERNAL_SHADER_H

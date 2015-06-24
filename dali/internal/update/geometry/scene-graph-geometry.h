@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-#include <dali/devel-api/rendering/geometry.h>
+#include <dali/public-api/geometry/geometry.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/double-buffered.h>

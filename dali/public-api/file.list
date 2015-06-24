@@ -10,6 +10,7 @@ public_api_src_files = \
   $(public_api_src_dir)/actors/custom-actor-impl.cpp \
   $(public_api_src_dir)/actors/image-actor.cpp \
   $(public_api_src_dir)/actors/layer.cpp \
+  $(public_api_src_dir)/actors/renderer.cpp \
   $(public_api_src_dir)/actors/renderable-actor.cpp \
   $(public_api_src_dir)/animation/animation.cpp \
   $(public_api_src_dir)/animation/alpha-function.cpp \
@@ -38,6 +39,7 @@ public_api_src_files = \
   $(public_api_src_dir)/events/tap-gesture-detector.cpp \
   $(public_api_src_dir)/events/touch-point.cpp \
   $(public_api_src_dir)/events/touch-event.cpp \
+  $(public_api_src_dir)/geometry/geometry.cpp \
   $(public_api_src_dir)/images/image.cpp \
   $(public_api_src_dir)/images/pixel.cpp \
   $(public_api_src_dir)/images/buffer-image.cpp \
@@ -61,6 +63,7 @@ public_api_src_files = \
   $(public_api_src_dir)/object/object-registry.cpp \
   $(public_api_src_dir)/object/property.cpp \
   $(public_api_src_dir)/object/property-array.cpp \
+  $(public_api_src_dir)/object/property-buffer.cpp \
   $(public_api_src_dir)/object/property-conditions.cpp \
   $(public_api_src_dir)/object/property-input.cpp \
   $(public_api_src_dir)/object/property-map.cpp \
@@ -70,6 +73,9 @@ public_api_src_files = \
   $(public_api_src_dir)/object/ref-object.cpp \
   $(public_api_src_dir)/render-tasks/render-task.cpp \
   $(public_api_src_dir)/render-tasks/render-task-list.cpp \
+  $(public_api_src_dir)/shader-effects/material.cpp \
+  $(public_api_src_dir)/shader-effects/sampler.cpp \
+  $(public_api_src_dir)/shader-effects/shader.cpp \
   $(public_api_src_dir)/shader-effects/shader-effect.cpp \
   $(public_api_src_dir)/signals/callback.cpp \
   $(public_api_src_dir)/signals/connection-tracker.cpp \
@@ -102,6 +108,7 @@ public_api_core_actors_header_files =  \
   $(public_api_src_dir)/actors/image-actor.h \
   $(public_api_src_dir)/actors/layer.h \
   $(public_api_src_dir)/actors/renderable-actor.h \
+  $(public_api_src_dir)/actors/renderer.h \
   $(public_api_src_dir)/actors/sampling.h
 
 public_api_core_animation_header_files = \
@@ -144,6 +151,9 @@ public_api_core_events_header_files = \
   $(public_api_src_dir)/events/touch-point.h \
   $(public_api_src_dir)/events/touch-event.h
 
+public_api_core_geometry_header_files = \
+  $(public_api_src_dir)/geometry/geometry.h
+
 public_api_core_images_header_files = \
   $(public_api_src_dir)/images/buffer-image.h \
   $(public_api_src_dir)/images/encoded-buffer-image.h \
@@ -180,6 +190,7 @@ public_api_core_object_header_files = \
   $(public_api_src_dir)/object/handle.h \
   $(public_api_src_dir)/object/object-registry.h \
   $(public_api_src_dir)/object/property-array.h \
+  $(public_api_src_dir)/object/property-buffer.h \
   $(public_api_src_dir)/object/property-conditions.h \
   $(public_api_src_dir)/object/property-index-ranges.h \
   $(public_api_src_dir)/object/property-input.h \
@@ -198,6 +209,9 @@ public_api_core_render_tasks_header_files = \
   $(public_api_src_dir)/render-tasks/render-task-list.h
 
 public_api_core_shader_effects_header_files = \
+  $(public_api_src_dir)/shader-effects/material.h \
+  $(public_api_src_dir)/shader-effects/sampler.h \
+  $(public_api_src_dir)/shader-effects/shader.h \
   $(public_api_src_dir)/shader-effects/shader-effect.h
 
 public_api_core_size_negotiation_header_files = \

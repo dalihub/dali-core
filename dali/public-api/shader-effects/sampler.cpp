@@ -16,10 +16,10 @@
  */
 
 // CLASS HEADER
-#include <dali/devel-api/rendering/sampler.h>  // Dali::Sampler
+#include <dali/public-api/shader-effects/sampler.h>  // Dali::Sampler
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/rendering/sampler-impl.h> // Dali::Internal::Sampler
+#include <dali/internal/event/effects/sampler-impl.h> // Dali::Internal::Sampler
 
 namespace Dali
 {

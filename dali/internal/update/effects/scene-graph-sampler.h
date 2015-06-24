@@ -17,7 +17,7 @@
  * limitations under the License.
  */
 
-#include <dali/devel-api/rendering/sampler.h>
+#include <dali/public-api/shader-effects/sampler.h>
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/common/double-buffered.h>

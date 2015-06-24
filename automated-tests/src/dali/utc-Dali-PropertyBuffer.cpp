@@ -17,7 +17,6 @@
 
 #include <dali/public-api/dali-core.h>
 #include <dali-test-suite-utils.h>
-#include <dali/devel-api/rendering/renderer.h>
 
 using namespace Dali;
 

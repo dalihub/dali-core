@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/devel-api/object/property-buffer.h>
+#include <dali/public-api/object/property-buffer.h>
 
 namespace Dali
 {
