@@ -318,24 +318,6 @@ public:
   float GetSortModifier() const;
 
   /**
-   * @brief Sets the depth index within a layer for the depth sort algorithm.
-   *
-   * This is intended to replace SetSortModifier, which will be deprecated and remains currently for backwards compatibility.
-   *
-   * @param[in] depthIndex The depth index to use for sorting within a layer.
-   */
-  void SetDepthIndex( int depthIndex );
-
-  /**
-   * @brief Retrieves the depth index within a layer.
-   *
-   * This will replace GetSortModifier in the same manner as SetDepthIndex.
-   *
-   * @return The depth index used for sorting within a layer.
-   */
-  int GetDepthIndex() const;
-
-  /**
    * @brief Set the face-culling mode for this actor.
    *
    * @param[in] mode The culling mode.
