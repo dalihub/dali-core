@@ -122,10 +122,16 @@ AnimatableMeshPtr AnimatableMesh::New(
 
   Stage* stage = Stage::GetCurrent();
 
-  // Create the event object
-  AnimatableMeshPtr animatableMeshPtr( new AnimatableMesh( *stage, sceneObject, mesh, meshData.GetVertexCount() ) );
-
-  return animatableMeshPtr;
+  if( stage )
+  {
+    // Create the event object
+    AnimatableMeshPtr animatableMeshPtr( new AnimatableMesh( *stage, sceneObject, mesh, meshData.GetVertexCount() ) );
+    return animatableMeshPtr;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 AnimatableMesh::~AnimatableMesh()

@@ -1369,7 +1369,16 @@ public: // Not intended for application developers
  * actor.Unparent() will be called, followed by actor.Reset().
  * @param[in,out] actor A handle to an actor, or an empty handle.
  */
- DALI_IMPORT_API void UnparentAndReset( Actor& actor );
+inline void UnparentAndReset( Actor& actor )
+{
+  if( actor )
+  {
+    actor.Unparent();
+    actor.Reset();
+  }
+}
+
+
 
 } // namespace Dali
 

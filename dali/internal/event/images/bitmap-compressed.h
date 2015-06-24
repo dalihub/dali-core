@@ -38,7 +38,7 @@ typedef IntrusivePtr<BitmapCompressed>        BitmapCompressedPtr;
  * Used for formats that are supported as GLES texture data directly.
  * \sa{Bitmap BitmapPackedPixel BitmapExternal}
  */
-class DALI_IMPORT_API BitmapCompressed : public Dali::Integration::Bitmap, Dali::Integration::Bitmap::CompressedProfile
+class BitmapCompressed : public Dali::Integration::Bitmap, Dali::Integration::Bitmap::CompressedProfile
 {
 public:
   /**

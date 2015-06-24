@@ -1855,9 +1855,10 @@ DrawMode::Type Actor::GetDrawMode() const
 bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float screenY ) const
 {
   // only valid when on-stage
-  if( OnStage() )
+  StagePtr stage = Stage::GetCurrent();
+  if( stage && OnStage() )
   {
-    const RenderTaskList& taskList = Stage::GetCurrent()->GetRenderTaskList();
+    const RenderTaskList& taskList = stage->GetRenderTaskList();
 
     Vector2 converted( screenX, screenY );
 

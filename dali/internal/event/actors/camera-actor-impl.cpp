@@ -260,9 +260,10 @@ void CameraActor::SetPerspectiveProjection( const Size& size, const Vector2& ste
 
   if( Size::ZERO == size )
   {
-    if( Stage::IsInstalled() )
+    StagePtr stage = Stage::GetCurrent();
+    if( stage )
     {
-      const Size& stageSize = Stage::GetCurrent()->GetSize();
+      const Size& stageSize = stage->GetSize();
 
       width = stageSize.width;
       height = stageSize.height;
