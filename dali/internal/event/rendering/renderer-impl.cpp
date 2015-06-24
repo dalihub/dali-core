@@ -275,9 +275,6 @@ Renderer::~Renderer()
   if( EventThreadServices::IsCoreRunning() )
   {
     EventThreadServices& eventThreadServices = GetEventThreadServices();
-    SceneGraph::UpdateManager& updateManager = eventThreadServices.GetUpdateManager();
-    RemoveObjectMessage( updateManager, mSceneObject );
-
     eventThreadServices.UnregisterObject( this );
   }
 }
