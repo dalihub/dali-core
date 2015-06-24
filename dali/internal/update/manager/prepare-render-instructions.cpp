@@ -166,12 +166,10 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
                                      SceneGraph::CameraAttachment& cameraAttachment )
 {
   // Check for cull against view frustum
-  Matrix mvm;
   bool inside = true;
 
   const Node& parentNode = renderable.GetParent();
   const Matrix& worldMatrix = parentNode.GetWorldMatrix( updateBufferIndex );
-  Matrix::Multiply( mvm, worldMatrix, viewMatrix );
 
   if ( RendererAttachment* rendererAttachment = dynamic_cast< RendererAttachment* >( &renderable ) )
   {
@@ -180,24 +178,27 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
       // Get the geometry extents for frustum checking
       const Vector3& position = worldMatrix.GetTranslation3();
       const Geometry& geometry = rendererAttachment->GetGeometry();
-      const Vector3& localCenter = geometry.mCenter[ updateBufferIndex ];
-      const Vector3& size = parentNode.GetSize( updateBufferIndex );
-      Vector3 center = position + ( localCenter * size );
+      const Vector3& scale = parentNode.GetScale( updateBufferIndex );
 
-      // If the size components are all the same, then we can do a quick bounding sphere check
-      if ( fabsf( size.x - size.y ) <= Math::MACHINE_EPSILON_1 * size.x )
+      Vector3 center( geometry.mCenter[ updateBufferIndex ] );
+      center *= scale;
+      center += position;
+
+      // Do a fast sphere check
+      if ( cameraAttachment.CheckSphereInFrustum( updateBufferIndex, center, geometry.mRadius[ updateBufferIndex ] * scale.Length() ) )
       {
-        inside = cameraAttachment.CheckSphereInFrustum( updateBufferIndex, center, geometry.mRadius[ updateBufferIndex ] * size.x );
+        // Check geometry AABB
+        if ( !cameraAttachment.CheckAABBInFrustum( updateBufferIndex, center, geometry.mHalfExtents[ updateBufferIndex ] * scale ) )
+        {
+          inside = false;
+        }
       }
-
-      if ( inside )
+      else
       {
-        // Check against AABB of model
-        inside = cameraAttachment.CheckAABBInFrustum( updateBufferIndex, center, geometry.mHalfExtents[ updateBufferIndex ] * size );
+        inside = false;
       }
     }
   }
-
   if ( inside )
   {
     // Get the next free RenderItem
@@ -208,7 +209,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
 
     // save MV matrix onto the item
     Matrix& modelViewMatrix = item.GetModelViewMatrix();
-    modelViewMatrix = mvm;
+    Matrix::Multiply( modelViewMatrix, worldMatrix, viewMatrix );
   }
 }
 
