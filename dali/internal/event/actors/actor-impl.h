@@ -1845,7 +1845,7 @@ private:
   /**
    * @brief Ensure the relayout data is allocated
    */
-  void EnsureRelayoutData() const;
+  void EnsureRelayoutData();
 
   /**
    * @brief Apply the size set policy to the input size
@@ -1865,7 +1865,7 @@ protected:
   Vector3* mAnchorPoint;          ///< NULL means AnchorPoint::DEFAULT. AnchorPoint is non-animatable
 
   struct RelayoutData;
-  mutable RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
+  RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
 
 #ifdef DALI_DYNAMICS_SUPPORT
   DynamicsData* mDynamicsData; ///< optional physics data
