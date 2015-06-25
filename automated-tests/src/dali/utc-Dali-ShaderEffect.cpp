@@ -770,7 +770,7 @@ int UtcDaliShaderBinaries(void)
   END_TEST;
 }
 
-int UtcDaliShaderEffectFromProperties01(void)
+int UtcDaliShaderEffectFromPropertiesP(void)
 {
   TestApplication application;
   tet_infoline("UtcDaliShaderEffectFromProperties01()");
@@ -793,19 +793,23 @@ int UtcDaliShaderEffectFromProperties01(void)
   ShaderEffect effect = ShaderEffect::DownCast( typeInfo.CreateInstance() );
   DALI_TEST_CHECK( effect );
 
-  Property::Value programMap = Property::Value(Property::MAP);
+  Property::Value programValue = Property::Value(Property::MAP);
+  Property::Map* programMap = programValue.GetMap();
+  DALI_TEST_CHECK( programMap );
 
-  programMap.SetValue("vertex", vertexShader);
-  programMap.SetValue("fragment", fragmentShader);
+  programMap->Insert("vertex", vertexShader);
+  programMap->Insert("fragment", fragmentShader);
 
-  programMap.SetValue("vertex-prefix", vertexShaderPrefix);
-  programMap.SetValue("fragment-prefix", fragmentShaderPrefix);
+  programMap->Insert("vertex-prefix", vertexShaderPrefix);
+  programMap->Insert("fragment-prefix", fragmentShaderPrefix);
 
-  effect.SetProperty(effect.GetPropertyIndex("program"), programMap);
+  effect.SetProperty(effect.GetPropertyIndex("program"), programValue);
 
-  Property::Value imageMap = Property::Value(Property::MAP);
-  imageMap.SetValue("filename", Property::Value(TestImageFilename));
-  effect.SetProperty(effect.GetPropertyIndex("image"), imageMap);
+  Property::Value imageValue = Property::Value(Property::MAP);
+  Property::Map* imageMap = imageValue.GetMap();
+  DALI_TEST_CHECK( imageMap );
+  imageMap->Insert("filename", Property::Value(TestImageFilename));
+  effect.SetProperty(effect.GetPropertyIndex("image"), imageValue);
 
   // do a update & render to get the image request
   application.SendNotification();
@@ -843,15 +847,15 @@ int UtcDaliShaderEffectFromProperties01(void)
   END_TEST;
 }
 
-int UtcDaliShaderEffectFromProperties02(void)
+int UtcDaliShaderEffectFromPropertiesN(void)
 {
-  TestApplication application;
-  tet_infoline("UtcDaliShaderEffectFromProperties02()");
+  try
+  {
+    TestApplication application;
+    tet_infoline("UtcDaliShaderEffectFromProperties02()");
 
     // Call render to compile default shaders.
     application.SendNotification();
-    application.Render();
-    application.Render();
     application.Render();
 
     // create from type registry (currently only way to get ShaderEffect with no shader setup in constructor
@@ -860,17 +864,26 @@ int UtcDaliShaderEffectFromProperties02(void)
     ShaderEffect effect = ShaderEffect::DownCast( typeInfo.CreateInstance() );
     DALI_TEST_CHECK( effect );
 
-    Property::Value programMap = Property::Value(Property::MAP);
+    Property::Value programValue = Property::Value(Property::MAP);
+    Property::Map* programMap = programValue.GetMap();
+    DALI_TEST_CHECK( programMap );
 
-    programMap.SetValue("vertex",   std::string(VertexSource));
-    programMap.SetValue("fragment", std::string(FragmentSource));
+    programMap->Insert("vertex",   std::string(VertexSource));
+    programMap->Insert("fragment", std::string(FragmentSource));
 
-  effect.SetProperty(effect.GetPropertyIndex("program"), programMap);
+    // use wrong index on purpose
+    effect.SetProperty(effect.GetPropertyIndex("program") + 1, programValue );
 
+    tet_result( TET_FAIL );
+  }
+  catch(Dali::DaliException& e)
+  {
+    DALI_TEST_PRINT_ASSERT( e );
+  }
   END_TEST;
 }
 
-int UtcDaliShaderEffectFromProperties03(void)
+int UtcDaliShaderEffectFromProperties2N(void)
 {
   try
   {
@@ -879,8 +892,6 @@ int UtcDaliShaderEffectFromProperties03(void)
 
     // Call render to compile default shaders.
     application.SendNotification();
-    application.Render();
-    application.Render();
     application.Render();
 
     // create from type registry (currently only way to get ShaderEffect with no shader setup in constructor

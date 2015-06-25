@@ -28,7 +28,7 @@ using namespace Dali;
 
 int UtcDaliDynamicsWorldConstructor(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -55,7 +55,7 @@ int UtcDaliDynamicsWorldConstructor(void)
 
 int UtcDaliDynamicsWorldGetInstanceP(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline( "No dynamics support compiled\n" );
   return 0;
 #endif
@@ -86,7 +86,7 @@ int UtcDaliDynamicsWorldGetInstanceP(void)
 
 int UtcDaliDynamicsWorldGetInstanceN(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline( "No dynamics support compiled\n" );
   return 0;
 #endif
@@ -113,7 +113,7 @@ int UtcDaliDynamicsWorldGetInstanceN(void)
 
 int UtcDaliDynamicsWorldGetP(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline( "No dynamics support compiled\n" );
   return 0;
 #endif
@@ -138,33 +138,11 @@ int UtcDaliDynamicsWorldGetP(void)
   END_TEST;
 }
 
-int UtcDaliDynamicsWorldGetN(void)
-{
-#if !defined(DYNAMICS_SUPPORT)
-  tet_infoline( "No dynamics support compiled\n" );
-  return 0;
-#endif
-  TestApplication app;
-
-  bool asserted = false;
-  try
-  {
-    DynamicsWorld::Get();
-  }
-  catch( Dali::DaliException& e )
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "dynamicsWorld && \"DynamicsWorld doesn't exist\"", TEST_LOCATION );
-    asserted = true;
-  }
-  DALI_TEST_CHECK( asserted );
-
-  END_TEST;
-}
+// No Negative check for UtcDaliDynamicsWorldGet as the instance is created on Get().
 
 int UtcDaliDynamicsWorldDestroyInstanceP(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline( "No dynamics support compiled\n" );
   return 0;
 #endif
@@ -173,29 +151,25 @@ int UtcDaliDynamicsWorldDestroyInstanceP(void)
   DynamicsWorldConfig config = DynamicsWorldConfig::New();
   DynamicsWorld world = DynamicsWorld::GetInstance( config );
   DALI_TEST_CHECK( world );
-  DynamicsWorld::DestroyInstance();
 
-  // After destroying the instance, check we assert when trying to get the instance,
-  // to prove that it's been removed correctly.
   bool asserted = false;
   try
   {
-    DynamicsWorld::Get();
+    DynamicsWorld::DestroyInstance();
   }
   catch( Dali::DaliException& e )
   {
     DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT( e, "dynamicsWorld && \"DynamicsWorld doesn't exist\"", TEST_LOCATION );
     asserted = true;
   }
-  DALI_TEST_CHECK( asserted );
+  DALI_TEST_CHECK( !asserted );
 
   END_TEST;
 }
 
 int UtcDaliDynamicsWorldDestroyInstanceN(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline( "No dynamics support compiled\n" );
   return 0;
 #endif
@@ -219,7 +193,7 @@ int UtcDaliDynamicsWorldDestroyInstanceN(void)
 
 int UtcDaliDynamicsWorldGravity(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -261,7 +235,7 @@ int UtcDaliDynamicsWorldGravity(void)
 
 int UtcDaliDynamicsWorldDebugDrawMode(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -305,7 +279,7 @@ int UtcDaliDynamicsWorldDebugDrawMode(void)
 
 int UtcDaliDynamicsWorldRootActor(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif

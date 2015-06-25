@@ -225,33 +225,36 @@ void Atlas::ClearBackground(const Vector4& color )
     BufferImagePtr imageData = BufferImage::New( mWidth, mHeight, mPixelFormat );
     PixelBuffer* pixbuf = imageData->GetBuffer();
 
-    // converting color value from float 0.f~1.f to byte 0~255
-    unsigned char r =  static_cast<unsigned char>( 255.f * Clamp( color.r, 0.f, 1.f ) );
-    unsigned char g =  static_cast<unsigned char>( 255.f * Clamp( color.g, 0.f, 1.f ) );
-    unsigned char b =  static_cast<unsigned char>( 255.f * Clamp( color.b, 0.f, 1.f ) );
-    unsigned char a =  static_cast<unsigned char>( 255.f * Clamp( color.a, 0.f, 1.f ) );
-    if( mPixelFormat == Pixel::RGBA8888 )
+    if( pixbuf )
     {
-      // For little-endian byte order, the RGBA channels needs to be reversed for bit shifting.
-      uint32_t clearColor = ( (uint32_t) a<<24 | (uint32_t)b << 16 | (uint32_t)g << 8 | (uint32_t)r );
-      uint32_t* buf = (uint32_t *) pixbuf;
-      for( unsigned int i = 0; i < numPixels; ++i )
+      // converting color value from float 0.f~1.f to byte 0~255
+      unsigned char r =  static_cast<unsigned char>( 255.f * Clamp( color.r, 0.f, 1.f ) );
+      unsigned char g =  static_cast<unsigned char>( 255.f * Clamp( color.g, 0.f, 1.f ) );
+      unsigned char b =  static_cast<unsigned char>( 255.f * Clamp( color.b, 0.f, 1.f ) );
+      unsigned char a =  static_cast<unsigned char>( 255.f * Clamp( color.a, 0.f, 1.f ) );
+      if( mPixelFormat == Pixel::RGBA8888 )
       {
-        buf[i] = clearColor;
+        // For little-endian byte order, the RGBA channels needs to be reversed for bit shifting.
+        uint32_t clearColor = ( (uint32_t) a<<24 | (uint32_t)b << 16 | (uint32_t)g << 8 | (uint32_t)r );
+        uint32_t* buf = (uint32_t *) pixbuf;
+        for( unsigned int i = 0; i < numPixels; ++i )
+        {
+          buf[i] = clearColor;
+        }
       }
-    }
-    else if( mPixelFormat == Pixel::RGB888 )
-    {
-      for( unsigned int i = 0; i < numPixels; ++i )
+      else if( mPixelFormat == Pixel::RGB888 )
       {
-        pixbuf[i*bytesPerPixel] = r;
-        pixbuf[i*bytesPerPixel+1] = g;
-        pixbuf[i*bytesPerPixel+2] = b;
+        for( unsigned int i = 0; i < numPixels; ++i )
+        {
+          pixbuf[i*bytesPerPixel] = r;
+          pixbuf[i*bytesPerPixel+1] = g;
+          pixbuf[i*bytesPerPixel+2] = b;
+        }
       }
-    }
-    else if( mPixelFormat == Pixel::A8 )
-    {
-      memset( pixbuf, a, numPixels );
+      else if( mPixelFormat == Pixel::A8 )
+      {
+        memset( pixbuf, a, numPixels );
+      }
     }
 
     RectArea area;

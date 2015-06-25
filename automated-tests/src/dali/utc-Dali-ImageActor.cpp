@@ -872,9 +872,11 @@ int UtcDaliImageActorImageProperty(void)
   application.SendNotification();
   application.Render();
 
-  Property::Value imageMap = imageActor.GetProperty( ImageActor::Property::IMAGE );
-  DALI_TEST_CHECK( imageMap.HasKey( "filename" ) );
-  DALI_TEST_EQUALS( imageMap.GetValue( "filename" ).Get< std::string >(), "MY_PATH", TEST_LOCATION );
+  Property::Value imageProperty = imageActor.GetProperty( ImageActor::Property::IMAGE );
+  Property::Map* imageMap = imageProperty.GetMap();
+  DALI_TEST_CHECK( imageMap != NULL );
+  DALI_TEST_CHECK( NULL != imageMap->Find( "filename" ) );
+  DALI_TEST_EQUALS( (*imageMap)[ "filename" ].Get< std::string >(), "MY_PATH", TEST_LOCATION );
   END_TEST;
 }
 

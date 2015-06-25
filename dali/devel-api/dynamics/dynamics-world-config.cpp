@@ -19,7 +19,7 @@
 #include <dali/devel-api/dynamics/dynamics-world-config.h>
 
 // INTERNAL HEADERS
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-world-config-impl.h>
 #endif
 
@@ -28,7 +28,7 @@ namespace Dali
 
 DynamicsWorldConfig DynamicsWorldConfig::New()
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsWorldConfigPtr internal( new Internal::DynamicsWorldConfig() );
 
   return DynamicsWorldConfig( internal.Get() );
@@ -58,14 +58,14 @@ DynamicsWorldConfig& DynamicsWorldConfig::operator=(const DynamicsWorldConfig& r
 
 void DynamicsWorldConfig::SetType( const DynamicsWorldConfig::WorldType type )
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetType( type );
 #endif
 }
 
 DynamicsWorldConfig::WorldType DynamicsWorldConfig::GetType() const
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   return GetImplementation(*this).GetType();
 #else
   return DynamicsWorldConfig::RIGID;
@@ -74,14 +74,14 @@ DynamicsWorldConfig::WorldType DynamicsWorldConfig::GetType() const
 
 void DynamicsWorldConfig::SetUnit(float unit)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetUnit( unit );
 #endif
 }
 
 float DynamicsWorldConfig::GetUnit() const
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   return GetImplementation(*this).GetUnit();
 #else
   return float();
@@ -90,14 +90,14 @@ float DynamicsWorldConfig::GetUnit() const
 
 void DynamicsWorldConfig::SetSimulationSubSteps(int subSteps)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetSimulationSubSteps( subSteps );
 #endif
 }
 
 int DynamicsWorldConfig::GetSimulationSubSteps() const
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   return GetImplementation(*this).GetSimulationSubSteps();
 #else
   return int();
@@ -105,7 +105,7 @@ int DynamicsWorldConfig::GetSimulationSubSteps() const
 }
 
 DynamicsWorldConfig::DynamicsWorldConfig( Internal::DynamicsWorldConfig* internal )
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 : BaseHandle(internal)
 #else
 : BaseHandle(NULL)

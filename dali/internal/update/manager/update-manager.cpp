@@ -71,7 +71,7 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/integration-api/dynamics/dynamics-world-settings.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
 #endif
@@ -282,7 +282,7 @@ struct UpdateManager::Impl
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   OwnerPointer<DynamicsWorld>         dynamicsWorld;                 ///< Wrapper for dynamics simulation
 #endif
   bool                                dynamicsChanged;               ///< This is set to true if an object is changed in the dynamics simulation tick
@@ -1006,7 +1006,7 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     // 8) Apply Constraints
     ApplyConstraints();
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
     // 9) Update dynamics simulation
     mImpl->dynamicsChanged = false;
     if( mImpl->dynamicsWorld )
@@ -1200,7 +1200,7 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
   }
 }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 
 void UpdateManager::InitializeDynamicsWorld( SceneGraph::DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings )
 {
@@ -1213,7 +1213,7 @@ void UpdateManager::TerminateDynamicsWorld()
   mImpl->dynamicsWorld.Reset();
 }
 
-#endif // DYNAMICS_SUPPORT
+#endif // DALI_DYNAMICS_SUPPORT
 
 } // namespace SceneGraph
 

@@ -37,6 +37,8 @@ class DALI_IMPORT_API Property::Map
 {
 public:
 
+  typedef std::size_t SizeType;
+
   /**
    * @brief Default constructor.
    */
@@ -59,7 +61,7 @@ public:
    *
    * @return The number of elements in the map.
    */
-  unsigned int Count() const;
+  SizeType Count() const;
 
   /**
    * @brief Returns whether the map is empty.
@@ -69,13 +71,31 @@ public:
   bool Empty() const;
 
   /**
+   * @brief Inserts the key-value pair in the Map.
+   *
+   * Does not check for duplicates
+   * @param key to insert
+   * @param value to insert
+   */
+  void Insert( const char* key, const Value& value );
+
+  /**
+   * @brief Inserts the key-value pair in the Map.
+   *
+   * Does not check for duplicates
+   * @param key to insert
+   * @param value to insert
+   */
+  void Insert( const std::string& key, const Value& value );
+
+  /**
    * @brief Retrieve the value at the specified position.
    *
    * @return A reference to the value at the specified position.
    *
    * @note Will assert if position >= Count()
    */
-  Value& GetValue( unsigned int position ) const;
+  Value& GetValue( SizeType position ) const;
 
   /**
    * @brief Retrieve the key at the specified position.
@@ -84,7 +104,7 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  const std::string& GetKey( unsigned int position ) const;
+  const std::string& GetKey( SizeType position ) const;
 
   /**
    * @brief Retrieve the key & the value at the specified position.
@@ -93,7 +113,16 @@ public:
    *
    * @note Will assert if position >= Count()
    */
-  StringValuePair& GetPair( unsigned int position ) const;
+  StringValuePair& GetPair( SizeType position ) const;
+
+  /**
+   * @brief Finds the value for the specified key if it exists.
+   *
+   * @param[in]  key   The key to find.
+   *
+   * @return A const pointer to the value if it exists, NULL otherwise
+   */
+  Value* Find( const char* key ) const;
 
   /**
    * @brief Finds the value for the specified key if it exists.

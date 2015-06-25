@@ -23,7 +23,6 @@ SET(TC_SOURCES
         utc-Dali-Degree.cpp
         utc-Dali-EncodedBufferImage.cpp
         utc-Dali-FrameBufferImage.cpp
-        utc-Dali-Geometry.cpp
         utc-Dali-Gesture.cpp
         utc-Dali-GestureDetector.cpp
         utc-Dali-Handle.cpp
@@ -49,7 +48,6 @@ SET(TC_SOURCES
         utc-Dali-PinchGesture.cpp
         utc-Dali-PinchGestureDetector.cpp
         utc-Dali-Pixel.cpp
-        utc-Dali-PropertyBuffer.cpp
         utc-Dali-PropertyMap.cpp
         utc-Dali-PropertyArray.cpp
         utc-Dali-PropertyNotification.cpp
@@ -59,12 +57,9 @@ SET(TC_SOURCES
         utc-Dali-Radian.cpp
         utc-Dali-Random.cpp
         utc-Dali-Rect.cpp
-        utc-Dali-Renderer.cpp
         utc-Dali-RenderTask.cpp
         utc-Dali-RenderTaskList.cpp
         utc-Dali-ResourceImage.cpp
-        utc-Dali-Sampler.cpp
-        utc-Dali-Shader.cpp
         utc-Dali-ShaderEffect.cpp
         utc-Dali-SignalTemplatesFunctors.cpp
         utc-Dali-SignalTemplates.cpp
@@ -84,8 +79,8 @@ SET(TC_SOURCES
 
 LIST(APPEND TC_SOURCES
         dali-test-suite-utils/mesh-builder.cpp
-        dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/dali-test-suite-utils.cpp
+        dali-test-suite-utils/test-harness.cpp
         dali-test-suite-utils/test-application.cpp
         dali-test-suite-utils/test-dynamics.cpp
         dali-test-suite-utils/test-gesture-manager.cpp
@@ -101,7 +96,7 @@ PKG_CHECK_MODULES(${CAPI_LIB} REQUIRED
      dali-core
 )
 
-SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} @DYNAMICS_SUPPORT@ -O0 -ggdb --coverage -Wall -Werror=return-type")
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${${CAPI_LIB}_CFLAGS_OTHER} -O0 -ggdb --coverage -Wall -Werror=return-type")
 
 FOREACH(directory ${${CAPI_LIB}_LIBRARY_DIRS})
     SET(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -L${directory}")

@@ -20,7 +20,7 @@
 
 // INTERNAL HEADERS
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-capsule-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-cone-shape-impl.h>
@@ -36,7 +36,7 @@ namespace Dali
 
 DynamicsShape DynamicsShape::NewCapsule(const float radius, const float length)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsCapsuleShapePtr internal( new Internal::DynamicsCapsuleShape( radius, length) );
 
   return DynamicsShape(internal.Get());
@@ -47,7 +47,7 @@ DynamicsShape DynamicsShape::NewCapsule(const float radius, const float length)
 
 DynamicsShape DynamicsShape::NewCone(const float radius, const float length)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsConeShapePtr internal( new Internal::DynamicsConeShape( radius, length) );
 
   return DynamicsShape(internal.Get());
@@ -58,7 +58,7 @@ DynamicsShape DynamicsShape::NewCone(const float radius, const float length)
 
 DynamicsShape DynamicsShape::NewCube(const Vector3& dimensions)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsCubeShapePtr internal( new Internal::DynamicsCubeShape( dimensions ) );
 
   return DynamicsShape(internal.Get());
@@ -69,7 +69,7 @@ DynamicsShape DynamicsShape::NewCube(const Vector3& dimensions)
 
 DynamicsShape DynamicsShape::NewCylinder(const float radius, const float length)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsCylinderShapePtr internal( new Internal::DynamicsCylinderShape( radius, length) );
 
   return DynamicsShape(internal.Get());
@@ -80,7 +80,7 @@ DynamicsShape DynamicsShape::NewCylinder(const float radius, const float length)
 
 DynamicsShape DynamicsShape::NewSphere(const float radius)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsSphereShapePtr internal( new Internal::DynamicsSphereShape(  radius ) );
 
   return DynamicsShape(internal.Get());
@@ -109,7 +109,7 @@ DynamicsShape& DynamicsShape::operator=(const DynamicsShape& rhs)
 }
 
 DynamicsShape::DynamicsShape(Internal::DynamicsShape* internal)
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 : BaseHandle(internal)
 #else
 : BaseHandle(NULL)
@@ -119,7 +119,7 @@ DynamicsShape::DynamicsShape(Internal::DynamicsShape* internal)
 
 DynamicsShape::ShapeType DynamicsShape::GetType() const
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   return GetImplementation(*this).GetType();
 #else
   return DynamicsShape::CAPSULE;

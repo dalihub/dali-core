@@ -51,25 +51,14 @@ Property::Array::~Array()
   delete mImpl;
 }
 
-
-unsigned int Property::Array::Size() const
+Property::Array::SizeType Property::Array::Count() const
 {
   return mImpl->mArray.size();
 }
 
-unsigned int Property::Array::Count() const
-{
-  return Size();
-}
-
-void Property::Array::PushBack(const Value& value)
+void Property::Array::PushBack( const Value& value )
 {
   mImpl->mArray.push_back( value );
-}
-
-bool Property::Array::Empty() const
-{
-  return mImpl->mArray.empty();
 }
 
 void Property::Array::Clear()
@@ -77,27 +66,27 @@ void Property::Array::Clear()
   mImpl->mArray.clear();
 }
 
-void Property::Array::Reserve(size_t size)
+void Property::Array::Reserve( SizeType size )
 {
   mImpl->mArray.reserve(size);
 }
 
-void Property::Array::Resize(size_t size)
+void Property::Array::Resize( SizeType size )
 {
   mImpl->mArray.resize(size);
 }
 
-size_t Property::Array::Capacity()
+Property::Array::SizeType Property::Array::Capacity()
 {
   return mImpl->mArray.capacity();
 }
 
-const Property::Value& Property::Array::operator[]( const std::size_t index ) const
+const Property::Value& Property::Array::operator[]( SizeType index ) const
 {
   return mImpl->mArray[ index ];
 }
 
-Property::Value& Property::Array::operator[]( const std::size_t index )
+Property::Value& Property::Array::operator[]( SizeType index )
 {
   return mImpl->mArray[ index ];
 }

@@ -21,7 +21,7 @@
 // INTERNAL HEADERS
 #include <dali/internal/event/actors/actor-impl.h>
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-joint-impl.h>
 #endif
 
@@ -49,70 +49,70 @@ DynamicsJoint& DynamicsJoint::operator=(const DynamicsJoint& rhs)
 
 void DynamicsJoint::SetLinearLimit( const int axisIndex, const float lowerLimit, const float upperLimit )
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetLinearLimit(axisIndex, lowerLimit, upperLimit);
 #endif
 }
 
 void DynamicsJoint::SetAngularLimit( const int axisIndex, const Degree& lowerLimit, const Degree& upperLimit )
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetAngularLimit( axisIndex, Radian(lowerLimit), Radian(upperLimit) );
 #endif
 }
 
 void DynamicsJoint::EnableSpring(const int axisIndex, const bool flag)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).EnableSpring(axisIndex, flag);
 #endif
 }
 
 void DynamicsJoint::SetSpringStiffness(const int axisIndex, const float stiffness)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetSpringStiffness(axisIndex, stiffness);
 #endif
 }
 
 void DynamicsJoint::SetSpringDamping(const int axisIndex, const float damping)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetSpringDamping(axisIndex, damping);
 #endif
 }
 
 void DynamicsJoint::SetSpringCenterPoint(const int axisIndex, const float ratio)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetSpringCenterPoint(axisIndex, ratio);
 #endif
 }
 
 void DynamicsJoint::EnableMotor(const int axisIndex, const bool flag)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).EnableMotor(axisIndex, flag);
 #endif
 }
 
 void DynamicsJoint::SetMotorVelocity(const int axisIndex, const float velocity)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetMotorVelocity(axisIndex, velocity);
 #endif
 }
 
 void DynamicsJoint::SetMotorForce(const int axisIndex, const float force)
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   GetImplementation(*this).SetMotorForce(axisIndex, force);
 #endif
 }
 
 Actor DynamicsJoint::GetActor( const bool first ) const
 {
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   Internal::ActorPtr internal( GetImplementation(*this).GetActor(first) );
 
   return Actor(internal.Get());
@@ -122,7 +122,7 @@ Actor DynamicsJoint::GetActor( const bool first ) const
 }
 
 DynamicsJoint::DynamicsJoint(Internal::DynamicsJoint* internal)
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 : BaseHandle(internal)
 #else
 : BaseHandle(NULL)

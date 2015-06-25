@@ -594,13 +594,4 @@ Actor::Actor(Internal::Actor* internal)
 {
 }
 
-void UnparentAndReset( Actor& actor )
-{
-  if( actor )
-  {
-    actor.Unparent();
-    actor.Reset();
-  }
-}
-
 } // namespace Dali

@@ -76,6 +76,8 @@ void VectorBase::Reserve( SizeType capacity, SizeType elementSize )
   {
     const SizeType wholeAllocation = sizeof(SizeType) * 2u + capacity * elementSize;
     void* wholeData = (void*)malloc( wholeAllocation );
+    DALI_ASSERT_ALWAYS( wholeData && "VectorBase::Reserve - Memory allocation failed" );
+
 #if defined( DEBUG_ENABLED )
     // in debug build this will help identify a vector of uninitialized data
     memset( wholeData, 0xaa, wholeAllocation );

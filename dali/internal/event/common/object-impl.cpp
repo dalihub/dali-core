@@ -589,16 +589,9 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
+    case Property::NONE:
     {
-      DALI_LOG_WARNING( "Property Type %d\n", propertyValue.GetType() );
       DALI_ASSERT_ALWAYS( !"PropertyType is not animatable" );
-      break;
-    }
-
-    default:
-    {
-      DALI_LOG_WARNING( "Property Type %d\n", propertyValue.GetType() );
-      DALI_ASSERT_ALWAYS( !"PropertyType enumeration is out of bounds" );
       break;
     }
   }
@@ -1300,8 +1293,11 @@ AnimatablePropertyMetadata* Object::RegisterAnimatableProperty(Property::Index i
           }
         }
 
-        // Create the metadata for the property component.
-        mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->type, animatableProperty->GetSceneGraphProperty() ) );
+        if(animatableProperty)
+        {
+          // Create the metadata for the property component.
+          mAnimatableProperties.PushBack( new AnimatablePropertyMetadata( index, typeInfo->GetComponentIndex(index), animatableProperty->type, animatableProperty->GetSceneGraphProperty() ) );
+        }
       }
 
       // The metadata has just been added and therefore should be in the end of the vector.

@@ -23,7 +23,7 @@ namespace Dali
 
 namespace
 {
-const char* const PROPERTY_TYPE_NAMES[ Property::TYPE_COUNT ] =
+const char* const PROPERTY_TYPE_NAMES[] =
 {
   "NONE",
   "BOOLEAN",
@@ -41,6 +41,7 @@ const char* const PROPERTY_TYPE_NAMES[ Property::TYPE_COUNT ] =
   "ARRAY",
   "MAP",
 };
+const unsigned int PROPERTY_TYPE_NAMES_COUNT = sizeof( PROPERTY_TYPE_NAMES ) / sizeof( const char* );
 }
 
 namespace PropertyTypes
@@ -49,7 +50,7 @@ namespace PropertyTypes
 DALI_EXPORT_API
 const char* const GetName(Property::Type type)
 {
-  if (type < Property::TYPE_COUNT)
+  if (type < PROPERTY_TYPE_NAMES_COUNT )
   {
     return PROPERTY_TYPE_NAMES[type];
   }

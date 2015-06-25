@@ -143,16 +143,18 @@ void WrapAndSetProgram( Internal::ShaderEffect& effect,
 
 std::string GetShader(const std::string& field, const Property::Value& property)
 {
-  std::string value;
-  if( property.HasKey(field) )
+  std::string retval;
+  const Property::Map* map = property.GetMap();
+  if( map )
   {
-    DALI_ASSERT_ALWAYS(property.GetValue(field).GetType() == Property::STRING && "Shader property is not a string" );
-
-    // we could also check here for an array of strings as convenience for json not having multi line strings
-    value = property.GetValue(field).Get<std::string>();
+    const Property::Value* value = map->Find( field );
+    if( value )
+    {
+      value->Get( retval );
+    }
   }
 
-  return value;
+  return retval;
 }
 
 } // unnamed namespace
@@ -161,10 +163,16 @@ ShaderEffectPtr ShaderEffect::New( Dali::ShaderEffect::GeometryHints hints )
 {
   Stage* stage = Stage::GetCurrent();
 
-  ShaderEffectPtr shaderEffect( new ShaderEffect( *stage, hints ) );
-  shaderEffect->RegisterObject();
-
-  return shaderEffect;
+  if( stage )
+  {
+    ShaderEffectPtr shaderEffect( new ShaderEffect( *stage, hints ) );
+    shaderEffect->RegisterObject();
+    return shaderEffect;
+  }
+  else
+  {
+    return NULL;
+  }
 }
 
 ShaderEffect::ShaderEffect( EventThreadServices& eventThreadServices, Dali::ShaderEffect::GeometryHints hints )

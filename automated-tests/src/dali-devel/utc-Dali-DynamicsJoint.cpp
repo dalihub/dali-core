@@ -43,7 +43,7 @@ int UtcDaliDynamicsJointConstructor(void)
 
 int UtcDaliDynamicsJointLinearLimit(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -84,7 +84,7 @@ int UtcDaliDynamicsJointLinearLimit(void)
 
 int UtcDaliDynamicsJointAngularLimit(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -121,7 +121,7 @@ int UtcDaliDynamicsJointAngularLimit(void)
 
 int UtcDaliDynamicsJointEnableSpring(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -158,7 +158,7 @@ int UtcDaliDynamicsJointEnableSpring(void)
 
 int UtcDaliDynamicsJointSetSpringStiffness(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -195,7 +195,7 @@ int UtcDaliDynamicsJointSetSpringStiffness(void)
 
 int UtcDaliDynamicsJointSetSpringCenterPoint(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -232,7 +232,7 @@ int UtcDaliDynamicsJointSetSpringCenterPoint(void)
 
 int UtcDaliDynamicsJointEnableMotor(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -269,7 +269,7 @@ int UtcDaliDynamicsJointEnableMotor(void)
 
 int UtcDaliDynamicsJointSetMotorVelocity(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -306,7 +306,7 @@ int UtcDaliDynamicsJointSetMotorVelocity(void)
 
 int UtcDaliDynamicsJointSetMotorForce(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -343,7 +343,7 @@ int UtcDaliDynamicsJointSetMotorForce(void)
 
 int UtcDaliDynamicsJointGetActor(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif

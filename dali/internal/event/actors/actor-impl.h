@@ -36,7 +36,7 @@
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #endif
 
@@ -1225,7 +1225,7 @@ public:
    */
   void RemoveRenderer( unsigned int index );
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 
   // Dynamics
 
@@ -1309,7 +1309,7 @@ private:
    */
   void AttachedActorOffStage( Dali::Actor actor );
 
-#endif // DYNAMICS_SUPPORT
+#endif // DALI_DYNAMICS_SUPPORT
 
 public:
   /**
@@ -1884,7 +1884,7 @@ protected:
   struct RelayoutData;
   mutable RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   DynamicsData* mDynamicsData; ///< optional physics data
 #endif
 

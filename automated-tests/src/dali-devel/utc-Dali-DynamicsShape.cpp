@@ -26,7 +26,7 @@ using namespace Dali;
 
 int UtcDaliDynamicsShapeConstructor(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -65,7 +65,7 @@ int UtcDaliDynamicsShapeConstructor(void)
 
 int UtcDaliDynamicsShapeNewCapsule(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -100,7 +100,7 @@ int UtcDaliDynamicsShapeNewCapsule(void)
 
 int UtcDaliDynamicsShapeNewCone(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -134,7 +134,7 @@ int UtcDaliDynamicsShapeNewCone(void)
 
 int UtcDaliDynamicsShapeNewCube(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -167,7 +167,7 @@ int UtcDaliDynamicsShapeNewCube(void)
 
 int UtcDaliDynamicsShapeNewCylinder(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -200,7 +200,7 @@ int UtcDaliDynamicsShapeNewCylinder(void)
 
 int UtcDaliDynamicsShapeNewSphere(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif
@@ -233,7 +233,7 @@ int UtcDaliDynamicsShapeNewSphere(void)
 
 int UtcDaliDynamicsShapeGetType(void)
 {
-#if !defined(DYNAMICS_SUPPORT)
+#if !defined(DALI_DYNAMICS_SUPPORT)
   tet_infoline("No dynamics support compiled\n");
   return 0;
 #endif

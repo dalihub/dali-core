@@ -67,7 +67,7 @@ namespace Internal
  *
  * @note The aspect ratio of image contents is preserved by all scaling modes, so for example squares in input images stay square after loading.
  */
-class DALI_IMPORT_API ImageAttributes
+class ImageAttributes
 {
 public:
 
@@ -286,7 +286,7 @@ private:
  * @param [in] b parameter tested
  * @return true if a is less than b
  */
-DALI_IMPORT_API bool operator<(const ImageAttributes& a, const ImageAttributes& b);
+bool operator<(const ImageAttributes& a, const ImageAttributes& b);
 
 /**
  * @brief Equal to comparison operator.
@@ -295,7 +295,7 @@ DALI_IMPORT_API bool operator<(const ImageAttributes& a, const ImageAttributes& 
  * @param [in] b parameter tested for equality
  * @return true if a is equal to b
  */
-DALI_IMPORT_API bool operator==(const ImageAttributes& a, const ImageAttributes& b);
+bool operator==(const ImageAttributes& a, const ImageAttributes& b);
 
 /**
  * @brief Not equal to comparison operator.
@@ -304,7 +304,7 @@ DALI_IMPORT_API bool operator==(const ImageAttributes& a, const ImageAttributes&
  * @param [in] b parameter tested for equality
  * @return true if a is not equal to b
  */
-DALI_IMPORT_API bool operator!=(const ImageAttributes& a, const ImageAttributes& b);
+bool operator!=(const ImageAttributes& a, const ImageAttributes& b);
 
 } // namespace Internal
 } // namespace Dali

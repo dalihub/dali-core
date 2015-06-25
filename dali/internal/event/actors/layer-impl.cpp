@@ -248,10 +248,15 @@ void Layer::SetClippingBox(int x, int y, int width, int height)
 
     // Convert mClippingBox to GL based coordinates (from bottom-left)
     ClippingBox clippingBox( mClippingBox );
-    clippingBox.y = Stage::GetCurrent()->GetSize().height - clippingBox.y - clippingBox.height;
 
-    // layerNode is being used in a separate thread; queue a message to set the value
-    SetClippingBoxMessage( GetEventThreadServices(), GetSceneLayerOnStage(), clippingBox );
+    StagePtr stage = Stage::GetCurrent();
+    if( stage )
+    {
+      clippingBox.y = stage->GetSize().height - clippingBox.y - clippingBox.height;
+
+      // layerNode is being used in a separate thread; queue a message to set the value
+      SetClippingBoxMessage( GetEventThreadServices(), GetSceneLayerOnStage(), clippingBox );
+    }
   }
 }
 
@@ -471,8 +476,11 @@ void Layer::SetDefaultProperty( Property::Index index, const Property::Value& pr
       }
       case Dali::Layer::Property::BEHAVIOR:
       {
-        Behavior behavior = Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BehaviorTable, BehaviorTableCount );
-        SetBehavior( behavior );
+        Behavior behavior(Dali::Layer::LAYER_2D);
+        if( Scripting::GetEnumeration< Behavior >( propertyValue.Get< std::string >().c_str(), BehaviorTable, BehaviorTableCount, behavior ) )
+        {
+          SetBehavior( behavior );
+        }
         break;
       }
       default:

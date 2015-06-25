@@ -84,7 +84,6 @@ unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
   switch( propertyType )
   {
     case Property::NONE:
-    case Property::TYPE_COUNT:
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
@@ -490,7 +489,6 @@ unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
   switch( propertyType )
   {
     case Property::NONE:
-    case Property::TYPE_COUNT:
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:

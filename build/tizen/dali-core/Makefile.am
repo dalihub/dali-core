@@ -39,7 +39,7 @@ src_files = $(internal_src_files) \
             $(public_api_src_files) \
             $(devel_api_src_files)
 
-if DYNAMICS_SUPPORT
+if DALI_DYNAMICS_SUPPORT
 src_files += $(internal_dynamics_src_files)
 endif
 

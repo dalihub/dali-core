@@ -54,7 +54,7 @@
 #include <dali/internal/common/message.h>
 #include <dali/integration-api/debug.h>
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-body-config-impl.h>
 #include <dali/internal/event/dynamics/dynamics-body-impl.h>
 #include <dali/internal/event/dynamics/dynamics-joint-impl.h>
@@ -150,7 +150,7 @@ struct Actor::RelayoutData
   bool insideRelayout :1;                    ///< Locking flag to prevent recursive relayouts on size set
 };
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 
 // Encapsulate actor related dynamics data
 struct DynamicsData
@@ -170,7 +170,7 @@ struct DynamicsData
   SlotDelegate< Actor > slotDelegate;
 };
 
-#endif // DYNAMICS_SUPPORT
+#endif // DALI_DYNAMICS_SUPPORT
 
 namespace // unnamed namespace
 {
@@ -280,18 +280,15 @@ float GetDimensionValue( const Vector2& values, Dimension::Type dimension )
     {
       return values.width;
     }
-
     case Dimension::HEIGHT:
     {
       return values.height;
     }
-
     default:
     {
       break;
     }
   }
-
   return 0.0f;
 }
 
@@ -306,6 +303,7 @@ float GetDimensionValue( const Vector3& values, Dimension::Type dimension )
 {
   return GetDimensionValue( values.GetVectorXY(), dimension );
 }
+
 
 } // unnamed namespace
 
@@ -1461,7 +1459,7 @@ void Actor::RemoveRenderer( unsigned int index )
 }
 
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
 
 //--------------- Dynamics ---------------
 
@@ -1837,7 +1835,7 @@ void Actor::DisconnectDynamics()
   }
 }
 
-#endif // DYNAMICS_SUPPORT
+#endif // DALI_DYNAMICS_SUPPORT
 
 void Actor::SetOverlay( bool enable )
 {
@@ -1872,9 +1870,10 @@ DrawMode::Type Actor::GetDrawMode() const
 bool Actor::ScreenToLocal( float& localX, float& localY, float screenX, float screenY ) const
 {
   // only valid when on-stage
-  if( OnStage() )
+  StagePtr stage = Stage::GetCurrent();
+  if( stage && OnStage() )
   {
-    const RenderTaskList& taskList = Stage::GetCurrent()->GetRenderTaskList();
+    const RenderTaskList& taskList = stage->GetRenderTaskList();
 
     Vector2 converted( screenX, screenY );
 
@@ -2289,7 +2288,7 @@ Actor::Actor( DerivedType derivedType )
   mParentOrigin( NULL ),
   mAnchorPoint( NULL ),
   mRelayoutData( NULL ),
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   mDynamicsData( NULL ),
 #endif
   mGestureData( NULL ),
@@ -2359,7 +2358,7 @@ Actor::~Actor()
     GetEventThreadServices().UnregisterObject( this );
   }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   // Cleanup dynamics
   delete mDynamicsData;
 #endif
@@ -2448,7 +2447,7 @@ void Actor::ConnectToSceneGraph( int index )
     mAttachment->Connect();
   }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   // Notify dynamics
   if( NULL != mDynamicsData )
   {
@@ -2545,7 +2544,7 @@ void Actor::DisconnectFromSceneGraph()
     mAttachment->Disconnect();
   }
 
-#ifdef DYNAMICS_SUPPORT
+#ifdef DALI_DYNAMICS_SUPPORT
   // Notify dynamics
   if( NULL != mDynamicsData )
   {
@@ -2900,19 +2899,31 @@ void Actor::SetDefaultProperty( Property::Index index, const Property::Value& pr
 
     case Dali::Actor::Property::WIDTH_RESIZE_POLICY:
     {
-      SetResizePolicy( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount ), Dimension::WIDTH );
+      ResizePolicy::Type type;
+      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount, type ) )
+      {
+        SetResizePolicy( type, Dimension::WIDTH );
+      }
       break;
     }
 
     case Dali::Actor::Property::HEIGHT_RESIZE_POLICY:
     {
-      SetResizePolicy( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount ), Dimension::HEIGHT );
+      ResizePolicy::Type type;
+      if( Scripting::GetEnumeration< ResizePolicy::Type >( property.Get< std::string >().c_str(), ResizePolicy::TypeTable, ResizePolicy::TypeTableCount, type ) )
+      {
+        SetResizePolicy( type, Dimension::HEIGHT );
+      }
       break;
     }
 
     case Dali::Actor::Property::SIZE_SCALE_POLICY:
     {
-      SetSizeScalePolicy( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SizeScalePolicy::TypeTable, SizeScalePolicy::TypeTableCount ) );
+      SizeScalePolicy::Type type;
+      if( Scripting::GetEnumeration< SizeScalePolicy::Type >( property.Get< std::string >().c_str(), SizeScalePolicy::TypeTable, SizeScalePolicy::TypeTableCount, type ) )
+      {
+        SetSizeScalePolicy( type );
+      }
       break;
     }
 

@@ -382,6 +382,7 @@ void GetCameraClippingPlane( RenderTask& renderTask, float& nearClippingPlane, f
  * Hit test a RenderTask
  */
 bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
+                        Stage& stage,
                         LayerList& layers,
                         RenderTask& renderTask,
                         Vector2 screenCoordinates,
@@ -429,7 +430,8 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
         bool stencilOnLayer = false;
         bool stencilHit = false;
         bool layerConsumesHit = false;
-        const Vector2& stageSize = Stage::GetCurrent()->GetSize();
+
+        const Vector2& stageSize = stage.GetSize();
 
         for (int i=layers.GetLayerCount()-1; i>=0 && !(hit.actor); --i)
         {
@@ -511,7 +513,8 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
  *
  * @return true if we have a hit, false otherwise
  */
-bool HitTestForEachRenderTask( LayerList& layers,
+bool HitTestForEachRenderTask( Stage& stage,
+                               LayerList& layers,
                                RenderTaskList& taskList,
                                const Vector2& screenCoordinates,
                                Results& results,
@@ -543,7 +546,7 @@ bool HitTestForEachRenderTask( LayerList& layers,
       }
     }
 
-    if ( HitTestRenderTask( exclusives, layers, renderTask, screenCoordinates, results, hitCheck ) )
+    if ( HitTestRenderTask( exclusives, stage, layers, renderTask, screenCoordinates, results, hitCheck ) )
     {
       // Return true when an actor is hit (or layer in our render-task consumes the hit)
       return true; // don't bother checking off screen tasks
@@ -568,7 +571,7 @@ bool HitTestForEachRenderTask( LayerList& layers,
         continue;
       }
 
-      if ( HitTestRenderTask( exclusives, layers, renderTask, screenCoordinates, results, hitCheck ) )
+      if ( HitTestRenderTask( exclusives, stage, layers, renderTask, screenCoordinates, results, hitCheck ) )
       {
         // Return true when an actor is hit (or a layer in our render-task consumes the hit)
         return true;
@@ -589,7 +592,7 @@ bool HitTest( Stage& stage, const Vector2& screenCoordinates, Dali::HitTestAlgor
 
   Results hitTestResults;
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
-  if (  HitTestForEachRenderTask( layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
+  if (  HitTestForEachRenderTask( stage, layerList, taskList, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
   {
     results.actor = hitTestResults.actor;
     results.actorCoordinates = hitTestResults.actorCoordinates;
@@ -610,7 +613,7 @@ bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, 
     RenderTaskList& overlayTaskList = systemOverlay->GetOverlayRenderTasks();
     LayerList& overlayLayerList = systemOverlay->GetLayerList();
 
-    wasHit = HitTestForEachRenderTask( overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
+    wasHit = HitTestForEachRenderTask( stage, overlayLayerList, overlayTaskList, screenCoordinates, results, hitTestInterface );
   }
 
   // Hit-test the regular on-stage actors
@@ -619,7 +622,7 @@ bool HitTest( Stage& stage, const Vector2& screenCoordinates, Results& results, 
     RenderTaskList& taskList = stage.GetRenderTaskList();
     LayerList& layerList = stage.GetLayerList();
 
-    wasHit = HitTestForEachRenderTask( layerList, taskList, screenCoordinates, results, hitTestInterface );
+    wasHit = HitTestForEachRenderTask( stage, layerList, taskList, screenCoordinates, results, hitTestInterface );
   }
   return wasHit;
 }
@@ -638,7 +641,7 @@ bool HitTest( Stage& stage, RenderTask& renderTask, const Vector2& screenCoordin
 
   const Vector< RenderTaskList::Exclusive >& exclusives = Stage::GetCurrent()->GetRenderTaskList().GetExclusivesList();
   HitTestFunctionWrapper hitTestFunctionWrapper( func );
-  if ( HitTestRenderTask( exclusives, stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
+  if ( HitTestRenderTask( exclusives, stage, stage.GetLayerList(), renderTask, screenCoordinates, hitTestResults, hitTestFunctionWrapper ) )
   {
     results.actor = hitTestResults.actor;
     results.actorCoordinates = hitTestResults.actorCoordinates;

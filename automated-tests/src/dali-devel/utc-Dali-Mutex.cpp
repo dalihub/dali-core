@@ -50,10 +50,11 @@ int UtcDaliMutexSingleThread(void)
 
 namespace // for local variables to avoid name clashes
 {
-int gGlobalValue = 0;
-Mutex* gGlobalValueMutex;
-bool gWorkerThreadWait = true;
-enum ThreadState { INIT, RUN, LOCKING, TERMINATE } gWorkerThreadState = INIT;
+// make all these volatile to pre-empt any optimization screwing up the logic
+volatile int gGlobalValue = 0;
+volatile bool gWorkerThreadWait = true;
+volatile enum ThreadState { INIT, RUN, LOCKING, TERMINATE } gWorkerThreadState = INIT;
+Mutex* volatile gGlobalValueMutex; // volatile pointer to a mutex object
 }
 void* WorkerThread1( void* ptr )
 {

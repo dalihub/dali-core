@@ -50,7 +50,7 @@ Property::Map::~Map()
   delete mImpl;
 }
 
-unsigned int Property::Map::Count() const
+Property::Map::SizeType Property::Map::Count() const
 {
   return mImpl->mContainer.size();
 }
@@ -60,28 +60,38 @@ bool Property::Map::Empty() const
   return mImpl->mContainer.empty();
 }
 
-Property::Value& Property::Map::GetValue( unsigned int position ) const
+void Property::Map::Insert( const char* key, const Value& value )
+{
+  mImpl->mContainer.push_back( std::make_pair( key, value ) );
+}
+
+void Property::Map::Insert( const std::string& key, const Value& value )
+{
+  mImpl->mContainer.push_back( std::make_pair( key, value ) );
+}
+
+Property::Value& Property::Map::GetValue( SizeType position ) const
 {
   DALI_ASSERT_ALWAYS( position < Count() && "position out-of-bounds" );
 
   return mImpl->mContainer[ position ].second;
 }
 
-const std::string& Property::Map::GetKey( unsigned int position ) const
+const std::string& Property::Map::GetKey( SizeType position ) const
 {
   DALI_ASSERT_ALWAYS( position < Count() && "position out-of-bounds" );
 
   return mImpl->mContainer[ position ].first;
 }
 
-StringValuePair& Property::Map::GetPair( unsigned int position ) const
+StringValuePair& Property::Map::GetPair( SizeType position ) const
 {
   DALI_ASSERT_ALWAYS( position < Count() && "position out-of-bounds" );
 
   return mImpl->mContainer[ position ];
 }
 
-Property::Value* Property::Map::Find( const std::string& key ) const
+Property::Value* Property::Map::Find( const char* key ) const
 {
   for ( Container::iterator iter = mImpl->mContainer.begin(), endIter = mImpl->mContainer.end(); iter != endIter; ++iter )
   {
@@ -91,6 +101,12 @@ Property::Value* Property::Map::Find( const std::string& key ) const
     }
   }
   return NULL; // Not found
+}
+
+Property::Value* Property::Map::Find( const std::string& key ) const
+{
+  return Find( key.c_str() );
+
 }
 
 Property::Value* Property::Map::Find( const std::string& key, Property::Type type ) const
@@ -156,7 +172,7 @@ Property::Value& Property::Map::operator[]( const std::string& key )
   }
 
   // Create and return reference to new value
-  mImpl->mContainer.push_back( StringValuePair( key, Value() ) );
+  mImpl->mContainer.push_back( std::make_pair( key, Property::Value() ) );
   return (mImpl->mContainer.end() - 1)->second;
 }
 

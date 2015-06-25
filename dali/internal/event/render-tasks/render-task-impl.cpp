@@ -236,10 +236,14 @@ void RenderTask::GetViewport( Viewport& viewPort ) const
     }
     else
     {
-      Vector2 size( Stage::GetCurrent()->GetSize() );
-      viewPort.x = viewPort.y = 0;
-      viewPort.width = size.width;
-      viewPort.height = size.height;
+      Internal::Stage* stage = Internal::Stage::GetCurrent();
+      if ( stage )
+      {
+        Vector2 size( stage->GetSize() );
+        viewPort.x = viewPort.y = 0;
+        viewPort.width = size.width;
+        viewPort.height = size.height;
+      }
     }
   }
   else
@@ -367,31 +371,34 @@ bool RenderTask::TranslateCoordinates( Vector2& screenCoords ) const
   {
     CameraActor* localCamera = GetCameraActor();
     StagePtr stage = Stage::GetCurrent();
-    CameraActor& defaultCamera = stage->GetDefaultCameraActor();
-    if( localCamera )
+    if( stage )
     {
-      Viewport viewport;
-      Vector2 size( stage->GetSize() );
-      viewport.x = viewport.y = 0;
-      viewport.width = size.width;
-      viewport.height = size.height;
-
-      float localX, localY;
-      inside = mMappingConnector.mActor->ScreenToLocal(defaultCamera.GetViewMatrix(), defaultCamera.GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
-      Vector3 actorSize = mMappingConnector.mActor->GetCurrentSize();
-      if( inside && localX >= 0.f && localX <= actorSize.x && localY >= 0.f && localY <= actorSize.y)
+      CameraActor& defaultCamera = stage->GetDefaultCameraActor();
+      if( localCamera )
       {
-        screenCoords.x = localX;
-        screenCoords.y = localY;
+        Viewport viewport;
+        Vector2 size( stage->GetSize() );
+        viewport.x = viewport.y = 0;
+        viewport.width = size.width;
+        viewport.height = size.height;
+
+        float localX, localY;
+        inside = mMappingConnector.mActor->ScreenToLocal(defaultCamera.GetViewMatrix(), defaultCamera.GetProjectionMatrix(), viewport, localX, localY, screenCoords.x, screenCoords.y);
+        Vector3 actorSize = mMappingConnector.mActor->GetCurrentSize();
+        if( inside && localX >= 0.f && localX <= actorSize.x && localY >= 0.f && localY <= actorSize.y)
+        {
+          screenCoords.x = localX;
+          screenCoords.y = localY;
+        }
+        else
+        {
+          inside = false;
+        }
       }
       else
       {
         inside = false;
       }
-    }
-    else
-    {
-      inside = false;
     }
   }
   else if ( mFrameBufferImage && mScreenToFrameBufferFunction )

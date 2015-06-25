@@ -36,7 +36,6 @@ Dali::GLenum GetPropertyImplementationGlType( Property::Type& propertyType )
   switch( propertyType )
   {
     case Property::NONE:
-    case Property::TYPE_COUNT:
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
@@ -79,7 +78,6 @@ size_t GetPropertyImplementationGlSize( Property::Type& propertyType )
   switch( propertyType )
   {
     case Property::NONE:
-    case Property::TYPE_COUNT:
     case Property::STRING:
     case Property::ARRAY:
     case Property::MAP:
