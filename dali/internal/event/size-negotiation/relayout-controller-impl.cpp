@@ -162,20 +162,25 @@ void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension::Type di
     }
   }
 
-  // Request this actor as head of sub-tree if it is not dependent on a parent that is dirty
-  Dali::Actor subTreeActor = topOfSubTreeStack.back();
-  Dali::Actor parent = subTreeActor.GetParent();
-  if( !parent || !( GetImplementation( subTreeActor ).RelayoutDependentOnParent() && GetImplementation( parent ).RelayoutRequired() ) )
+  while( !topOfSubTreeStack.empty() )
   {
-    // Add sub tree root to relayout list
-    AddRequest( subTreeActor );
+    // Request this actor as head of sub-tree if it is not dependent on a parent that is dirty
+    Dali::Actor subTreeActor = topOfSubTreeStack.back();
+    topOfSubTreeStack.pop_back();
 
-    // Flag request for end of frame
-    Request();
-  }
-  else
-  {
-    potentialRedundantSubRoots.push_back( subTreeActor );
+    Dali::Actor parent = subTreeActor.GetParent();
+    if( !parent || !( GetImplementation( subTreeActor ).RelayoutDependentOnParent() && GetImplementation( parent ).RelayoutRequired() ) )
+    {
+      // Add sub tree root to relayout list
+      AddRequest( subTreeActor );
+
+      // Flag request for end of frame
+      Request();
+    }
+    else
+    {
+      potentialRedundantSubRoots.push_back( subTreeActor );
+    }
   }
 
   // Remove any redundant sub-tree heads
