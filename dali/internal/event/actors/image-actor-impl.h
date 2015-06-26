@@ -124,6 +124,115 @@ public:
    */
   ImageAttachment& GetImageAttachment();
 
+
+  /**
+   * @copydoc Dali::RenderableActor::SetSortModifier()
+   */
+  void SetSortModifier(float modifier);
+
+  /**
+   * @copydoc Dali::RenderableActor::GetSortModifier()
+   */
+  float GetSortModifier() const;
+
+  /**
+   * @copydoc Dali::RenderableActor::SetDepthIndex()
+   */
+  void SetDepthIndex( int depthIndex );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetDepthIndex()
+   */
+  int GetDepthIndex() const;
+
+  /**
+   * @copydoc Dali::RenderableActor::SetCullFace()
+   */
+  void SetCullFace(CullFaceMode mode);
+
+  /**
+   * @copydoc Dali::RenderableActor::GetCullFace()
+   */
+  CullFaceMode GetCullFace() const;
+
+  /**
+   * @copydoc Dali::RenderableActor::SetBlendMode()
+   */
+  void SetBlendMode( BlendingMode::Type mode );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetBlendMode()
+   */
+  BlendingMode::Type GetBlendMode() const;
+
+  /**
+   * @copydoc Dali::RenderableActor::SetBlendFunc()
+   */
+  void SetBlendFunc( BlendingFactor::Type srcFactorRgba,   BlendingFactor::Type destFactorRgba );
+
+  /**
+   * @copydoc Dali::RenderableActor::SetBlendFunc()
+   */
+  void SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
+                     BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetBlendFunc()
+   */
+  void GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
+                     BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const;
+
+  /**
+   * @copydoc Dali::RenderableActor::SetBlendEquation()
+   */
+  void SetBlendEquation( BlendingEquation::Type equationRgba );
+
+  /**
+   * @copydoc Dali::RenderableActor::SetBlendEquation()
+   */
+  void SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetBlendEquation()
+   */
+  void GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const;
+
+  /**
+   * @copydoc Dali::RenderableActor::SetBlendColor()
+   */
+  void SetBlendColor( const Vector4& color );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetBlendColor()
+   */
+  const Vector4& GetBlendColor() const;
+
+  /**
+   * @copydoc Dali::RenderableActor::SetFilterMode()
+   */
+  void SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter );
+
+  /**
+   * @copydoc Dali::RenderableActor::GetFilterMode()
+   */
+  void GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const;
+
+public:
+  /**
+   * @copydoc Actor::SetShaderEffect
+   */
+  virtual void SetShaderEffect(ShaderEffect& effect);
+
+  /**
+   * @copydoc Actor::GetShaderEffect
+   */
+  virtual ShaderEffectPtr GetShaderEffect() const;
+
+  /**
+   * @copydoc Actor::RemoveShaderEffect
+   */
+  virtual void RemoveShaderEffect();
+
 public: // Default property extensions from Object
 
   /**

@@ -23,6 +23,8 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/update/manager/update-manager.h>
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
 {
@@ -51,7 +53,15 @@ ImageAttachment::ImageAttachment( EventThreadServices& eventThreadServices )
   mStyle(Dali::ImageActor::STYLE_QUAD),
   mBorder(0.45,0.45,0.1,0.1),
   mIsPixelAreaSet(false),
-  mBorderInPixels(false)
+  mBorderInPixels(false),
+
+
+  mBlendingOptions(),
+  mSamplerBitfield( ImageSampler::PackBitfield( FilterMode::DEFAULT, FilterMode::DEFAULT ) ),
+  mSortModifier( 0.0f ),
+  mCullFaceMode( CullNone ),
+  mBlendingMode( BlendingMode::AUTO ),
+  mShaderEffect()
 {
   mImageConnectable.Set( NULL, false );
 }
@@ -128,8 +138,182 @@ SceneGraph::ImageAttachment* ImageAttachment::CreateSceneObject()
   return SceneGraph::ImageAttachment::New( 0u );
 }
 
+const SceneGraph::ImageAttachment& ImageAttachment::GetSceneObject() const
+{
+  DALI_ASSERT_DEBUG( mSceneObject != NULL );
+  return *mSceneObject;
+}
+
+void ImageAttachment::SetSortModifier(float modifier)
+{
+  // Cache for actor-side getters
+  mSortModifier = modifier;
+
+  // attachment is being used in a separate thread; queue a message to set the value & base value
+  SetSortModifierMessage( GetEventThreadServices(), GetSceneObject(), modifier );
+}
+
+float ImageAttachment::GetSortModifier() const
+{
+  // mSortModifier is not animatable; this is the most up-to-date value.
+  return mSortModifier;
+}
+
+void ImageAttachment::SetCullFace( CullFaceMode mode )
+{
+  // Cache for actor-side getters
+  mCullFaceMode = mode;
+
+  // attachment is being used in a separate thread; queue a message to set the value
+  SetCullFaceMessage( GetEventThreadServices(), GetSceneObject(), mode );
+}
+
+CullFaceMode ImageAttachment::GetCullFace() const
+{
+  // mCullFaceMode is not animatable; this is the most up-to-date value.
+  return mCullFaceMode;
+}
+
+void ImageAttachment::SetBlendMode( BlendingMode::Type mode )
+{
+  mBlendingMode = mode;
+
+  // attachment is being used in a separate thread; queue a message to set the value
+  SetBlendingModeMessage( GetEventThreadServices(), GetSceneObject(), mode );
+}
+
+BlendingMode::Type ImageAttachment::GetBlendMode() const
+{
+  return mBlendingMode;
+}
+
+void ImageAttachment::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
+                                         BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
+{
+  // Cache for actor-side getters
+  mBlendingOptions.SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+
+  // attachment is being used in a separate thread; queue a message to set the value
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetSceneObject(), mBlendingOptions.GetBitmask() );
+}
+
+void ImageAttachment::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
+                                         BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
+{
+  // These are not animatable, the cached values are up-to-date.
+  srcFactorRgb    = mBlendingOptions.GetBlendSrcFactorRgb();
+  destFactorRgb   = mBlendingOptions.GetBlendDestFactorRgb();
+  srcFactorAlpha  = mBlendingOptions.GetBlendSrcFactorAlpha();
+  destFactorAlpha = mBlendingOptions.GetBlendDestFactorAlpha();
+}
+
+void ImageAttachment::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
+{
+  mBlendingOptions.SetBlendEquation( equationRgb, equationAlpha );
+
+  // attachment is being used in a separate thread; queue a message to set the value
+  SetBlendingOptionsMessage( GetEventThreadServices(), GetSceneObject(), mBlendingOptions.GetBitmask() );
+}
+
+void ImageAttachment::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
+{
+  // These are not animatable, the cached values are up-to-date.
+  equationRgb   = mBlendingOptions.GetBlendEquationRgb();
+  equationAlpha = mBlendingOptions.GetBlendEquationAlpha();
+}
+
+void ImageAttachment::SetBlendColor( const Vector4& color )
+{
+  if( mBlendingOptions.SetBlendColor( color ) )
+  {
+    // attachment is being used in a separate thread; queue a message to set the value
+    SetBlendColorMessage( GetEventThreadServices(), GetSceneObject(), color );
+  }
+}
+
+const Vector4& ImageAttachment::GetBlendColor() const
+{
+  const Vector4* optionalColor = mBlendingOptions.GetBlendColor();
+  if( optionalColor )
+  {
+    return *optionalColor;
+  }
+
+  return Vector4::ZERO;
+}
+
+void ImageAttachment::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
+{
+  mSamplerBitfield = ImageSampler::PackBitfield( minFilter, magFilter );
+
+  SetSamplerMessage( GetEventThreadServices(), GetSceneObject(), mSamplerBitfield );
+}
+
+void ImageAttachment::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
+{
+  minFilter = ImageSampler::GetMinifyFilterMode( mSamplerBitfield );
+  magFilter = ImageSampler::GetMagnifyFilterMode( mSamplerBitfield );
+}
+
+
+void ImageAttachment::SetShaderEffect(ShaderEffect& effect)
+{
+  if ( OnStage() )
+  {
+    if ( mShaderEffect )
+    {
+      mShaderEffect->Disconnect();
+    }
+
+    mShaderEffect.Reset( &effect );
+
+    const SceneGraph::Shader& shader = dynamic_cast<const SceneGraph::Shader&>( *mShaderEffect->GetSceneObject() );
+
+    ApplyShaderMessage( GetEventThreadServices(), GetSceneObject(), shader );
+
+    mShaderEffect->Connect();
+  }
+  else
+  {
+    mShaderEffect = ShaderEffectPtr(&effect);
+  }
+  // Effects can only be applied when the Node is connected to scene-graph
+}
+
+ShaderEffectPtr ImageAttachment::GetShaderEffect() const
+{
+  return mShaderEffect;
+}
+
+void ImageAttachment::RemoveShaderEffect()
+{
+  if ( OnStage() )
+  {
+    RemoveShaderMessage( GetEventThreadServices(), GetSceneObject() );
+
+    // Notify shader effect
+    if (mShaderEffect)
+    {
+      mShaderEffect->Disconnect();
+    }
+  }
+
+  mShaderEffect.Reset();
+}
+
+
 void ImageAttachment::OnStageConnection2()
 {
+  if ( mShaderEffect )
+  {
+    const SceneGraph::Shader& shader = dynamic_cast<const SceneGraph::Shader&>( *mShaderEffect->GetSceneObject() );
+
+    ApplyShaderMessage( GetEventThreadServices(), GetSceneObject(), shader );
+
+    // Notify shader effect
+    mShaderEffect->Connect();
+  }
+
   mImageConnectable.OnStageConnect();
 
   // Provide resource ID when scene-graph attachment is connected
@@ -143,17 +327,19 @@ void ImageAttachment::OnStageConnection2()
 
 void ImageAttachment::OnStageDisconnection2()
 {
+  // Notify shader effect
+  if ( mShaderEffect )
+  {
+    mShaderEffect->Disconnect();
+  }
+
   // Remove resource ID when scene-graph attachment is disconnected
   SetTextureIdMessage( GetEventThreadServices(), *mSceneObject, 0u );
 
   mImageConnectable.OnStageDisconnect();
 }
 
-const SceneGraph::RenderableAttachment& ImageAttachment::GetSceneObject() const
-{
-  DALI_ASSERT_DEBUG( mSceneObject != NULL );
-  return *mSceneObject;
-}
+
 
 } // namespace Internal
 

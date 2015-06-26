@@ -51,7 +51,6 @@ namespace Internal
 class NotificationManager;
 class AnimationPlaylist;
 class PropertyNotificationManager;
-class Context;
 class EventProcessor;
 class GestureEventProcessor;
 class ResourceClient;

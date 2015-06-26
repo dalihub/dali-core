@@ -31,7 +31,7 @@
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/effects/shader-factory.h>
 #include <dali/internal/event/images/image-impl.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/render/shaders/uniform-meta.h>
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
@@ -82,27 +82,15 @@ struct WrapperStrings
   const char* fragmentShaderPostfix;
 };
 
-WrapperStrings customShaderWrappers [] =
+WrapperStrings customImageShaderWrappers =
 {
-  {
-    CustomImagePrefixVertex, CustomImagePrefixFragment,
-    CustomImagePostfixVertex, CustomImagePostfixFragment
-  },
-  {
-    CustomUntexturedMeshPrefixVertex, CustomUntexturedMeshPrefixFragment,
-    CustomUntexturedMeshPostfixVertex, CustomUntexturedMeshPostfixFragment
-  },
-  {
-    CustomTexturedMeshPrefixVertex, CustomTexturedMeshPrefixFragment,
-    CustomTexturedMeshPostfixVertex, CustomTexturedMeshPostfixFragment
-  }
+  CustomImagePrefixVertex, CustomImagePrefixFragment,
+  CustomImagePostfixVertex, CustomImagePostfixFragment
 };
 
 /**
  * Helper to wrap the program with our default pre and postfix if needed and then send it to update/render thread
  * @param[in] effect of the shader
- * @param[in] actualGeometryType of the shader
- * @param[in] expectedGeometryType of the shader
  * @param[in] vertexPrefix from application
  * @param[in] fragmentPrefix from application
  * @param[in] vertexBody from application
@@ -110,48 +98,23 @@ WrapperStrings customShaderWrappers [] =
  * @param[in] modifiesGeometry based on flags and vertex shader
  */
 void WrapAndSetProgram( Internal::ShaderEffect& effect,
-                        GeometryType actualGeometryType, GeometryType expectedGeometryType,
                         const std::string& vertexPrefix, const std::string& fragmentPrefix,
                         const std::string& vertexBody, const std::string& fragmentBody,
                         bool modifiesGeometry )
 {
-  // if geometry type matches and there is some real data in the strings
-  if( ( actualGeometryType & expectedGeometryType )&&
-      ( ( vertexPrefix.length() > 0   )||
-        ( fragmentPrefix.length() > 0 )||
-        ( vertexBody.length() > 0     )||
-        ( fragmentBody.length() > 0   ) ) )
+  // if there is some real data in the strings
+  if( ( vertexPrefix.length()   > 0 ) ||
+      ( fragmentPrefix.length() > 0 ) ||
+      ( vertexBody.length()     > 0 ) ||
+      ( fragmentBody.length()   > 0 ) )
   {
     std::string vertexSource = vertexPrefix;
     std::string fragmentSource = fragmentPrefix;
 
-    // create complete shader program strings for the given geometry type
-    unsigned int index = 0;
-    switch( expectedGeometryType )
-    {
-      case GEOMETRY_TYPE_IMAGE:
-      {
-        index = 0;
-        break;
-      }
-      case GEOMETRY_TYPE_UNTEXTURED_MESH:
-      {
-        index = 1;
-        break;
-      }
-      case GEOMETRY_TYPE_TEXTURED_MESH:
-      {
-        index = 2;
-        break;
-      }
-      case GEOMETRY_TYPE_LAST:
-      {
-        DALI_ASSERT_DEBUG(0 && "Wrong geometry type");
-        break;
-      }
-    }
+    // Create complete shader program strings:
 
-    vertexSource += customShaderWrappers[index].vertexShaderPrefix;
+    vertexSource += customImageShaderWrappers.vertexShaderPrefix;
+
     // Append the custom vertex shader code if supplied, otherwise append the default
     if ( vertexBody.length() > 0 )
     {
@@ -159,10 +122,11 @@ void WrapAndSetProgram( Internal::ShaderEffect& effect,
     }
     else
     {
-      vertexSource.append( customShaderWrappers[index].vertexShaderPostfix );
+      vertexSource.append( customImageShaderWrappers.vertexShaderPostfix );
     }
 
-    fragmentSource += customShaderWrappers[index].fragmentShaderPrefix;
+    fragmentSource += customImageShaderWrappers.fragmentShaderPrefix;
+
     // Append the custom fragment shader code if supplied, otherwise append the default
     if ( fragmentBody.length() > 0 )
     {
@@ -170,10 +134,10 @@ void WrapAndSetProgram( Internal::ShaderEffect& effect,
     }
     else
     {
-      fragmentSource.append( customShaderWrappers[index].fragmentShaderPostfix );
+      fragmentSource.append( customImageShaderWrappers.fragmentShaderPostfix );
     }
 
-    effect.SendProgramMessage( expectedGeometryType, SHADER_SUBTYPE_ALL, vertexSource, fragmentSource, modifiesGeometry );
+    effect.SendProgramMessage( vertexSource, fragmentSource, modifiesGeometry );
   }
 }
 
@@ -216,7 +180,7 @@ ShaderEffect::ShaderEffect( EventThreadServices& eventThreadServices, Dali::Shad
   mConnectionCount (0),
   mGeometryHints( hints )
 {
-  mSceneObject = new Shader( hints );
+  mSceneObject = new SceneGraph::Shader( hints );
   DALI_ASSERT_DEBUG( NULL != mSceneObject );
 
   // Transfer shader ownership to a scene message
@@ -298,52 +262,30 @@ void ShaderEffect::SetUniform( const std::string& name, Property::Value value, U
   }
 }
 
-void ShaderEffect::AttachExtension( Dali::ShaderEffect::Extension *extension )
+void ShaderEffect::SetPrograms( const string& vertexSource, const string& fragmentSource )
 {
-  DALI_ASSERT_ALWAYS( extension != NULL && "Attaching uninitialized extension" );
-  mExtension = IntrusivePtr<Dali::ShaderEffect::Extension>( extension );
+  SetPrograms( "", "", vertexSource, fragmentSource );
 }
 
-Dali::ShaderEffect::Extension& ShaderEffect::GetExtension()
-{
-  DALI_ASSERT_ALWAYS( mExtension && "Getting uninitialized extension" );
-  return *mExtension;
-}
-
-const Dali::ShaderEffect::Extension& ShaderEffect::GetExtension() const
-{
-  DALI_ASSERT_ALWAYS( mExtension && "Getting uninitialized extension" );
-  return *mExtension;
-}
-
-void ShaderEffect::SetPrograms( GeometryType geometryType, const string& vertexSource, const string& fragmentSource )
-{
-  SetPrograms( geometryType, "", "", vertexSource, fragmentSource );
-}
-
-void ShaderEffect::SetPrograms( GeometryType geometryType,
-                                const std::string& vertexPrefix, const std::string& fragmentPrefix,
+void ShaderEffect::SetPrograms( const std::string& vertexPrefix, const std::string& fragmentPrefix,
                                 const std::string& vertexSource, const std::string& fragmentSource )
 {
   bool modifiesGeometry = true;
   // check if the vertex shader is empty (means it cannot modify geometry)
-  if( (vertexPrefix.length() == 0 )&&( vertexSource.length() == 0 ) )
+  if( (vertexPrefix.length() == 0) && (vertexSource.length() == 0) )
   {
     modifiesGeometry = false;
   }
   // check the hint second
-  if( (mGeometryHints & Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY ) != 0 )
+  if( ( mGeometryHints & Dali::ShaderEffect::HINT_DOESNT_MODIFY_GEOMETRY ) != 0 )
   {
     modifiesGeometry = false;
   }
 
-  WrapAndSetProgram( *this, geometryType, GEOMETRY_TYPE_IMAGE, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
-  WrapAndSetProgram( *this, geometryType, GEOMETRY_TYPE_TEXTURED_MESH, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
-  WrapAndSetProgram( *this, geometryType, GEOMETRY_TYPE_UNTEXTURED_MESH, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
+  WrapAndSetProgram( *this, vertexPrefix, fragmentPrefix, vertexSource, fragmentSource, modifiesGeometry );
 }
 
-void ShaderEffect::SendProgramMessage( GeometryType geometryType, ShaderSubTypes subType,
-                                       const string& vertexSource, const string& fragmentSource,
+void ShaderEffect::SendProgramMessage( const string& vertexSource, const string& fragmentSource,
                                        bool modifiesGeometry )
 {
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
@@ -352,10 +294,10 @@ void ShaderEffect::SendProgramMessage( GeometryType geometryType, ShaderSubTypes
 
   ResourceTicketPtr ticket( shaderFactory.Load(vertexSource, fragmentSource, shaderHash) );
 
-  DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(geometryType %d subType:%d ticket.id:%d)\n", geometryType, subType, ticket->GetId() );
+  DALI_LOG_INFO( Debug::Filter::gShader, Debug::General, "ShaderEffect: SetProgram(ticket.id:%d)\n", ticket->GetId() );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, geometryType, subType, ticket->GetId(), shaderHash, modifiesGeometry );
+  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, ticket->GetId(), shaderHash, modifiesGeometry );
 
   mTickets.push_back(ticket);       // add ticket to collection to keep it alive.
 }
@@ -484,8 +426,7 @@ void ShaderEffect::SetDefaultProperty( Property::Index index, const Property::Va
       std::string vertex         = GetShader("vertex", propertyValue);
       std::string fragment       = GetShader("fragment", propertyValue);
 
-      GeometryType geometryType      = GEOMETRY_TYPE_IMAGE; // only images are supported
-      SetPrograms( geometryType, vertexPrefix, fragmentPrefix, vertex, fragment );
+      SetPrograms( vertexPrefix, fragmentPrefix, vertex, fragment );
       break;
     }
 

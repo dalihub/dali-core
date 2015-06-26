@@ -75,20 +75,41 @@ public:
     {
       CLIPPING_ENABLE = DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX, ///< name "clipping-enable",  type bool
       CLIPPING_BOX,                                                 ///< name "clipping-box",     type Rect<int>
+      BEHAVIOR,                                                     ///< name "behavior",         type String
     };
+  };
+
+  /**
+   * @brief Enumeration for the behavior of the layer.
+   *
+   * Check each value to see how it affects the layer.
+   */
+  enum Behavior
+  {
+    /**
+     * @brief Layer doesn't make use of the depth test.
+     *
+     * This mode is expected to have better performance than the 3D mode.
+     * When using this mode any ordering would be with respect to depth-index property of Renderers.
+     */
+    LAYER_2D,
+
+    /**
+     * @brief Layer will use depth test and do several clears.
+     *
+     * When using this mode depth depth test will be used. A depth clear will happen for each distinct
+     * depth-index value in the layer, opaque renderers are drawn first and write to the depth buffer.
+     * Then transparent renderers are drawn with depth test enabled but depth write switched off.
+     */
+    LAYER_3D,
   };
 
   /**
    * @brief The sort function type.
    *
-   * The position value is the actor translation from camera.
-   * The sortModifier is the user value that can be used to sort coplanar actors/nodes. This value is
-   * the one set by calling RenderableActor::SetSortModifier().
-   *
-   * A high return value means that the actor will be positioned further away by the sort algorithm.
-   * @see RenderableActor::SetSortModifier
+   * @param[in] position this is the actor translation from camera.
    */
-  typedef float (*SortFunctionType)(const Vector3& position, float sortModifier);
+  typedef float (*SortFunctionType)( const Vector3& position );
 
   /**
    * @brief Create an empty Layer handle.
@@ -218,6 +239,20 @@ public:
   void MoveBelow( Layer target );
 
   /**
+   * @brief Set the behavior of the layer
+   *
+   * @param[in] behavior The desired behavior
+   */
+  void SetBehavior( Behavior behavior );
+
+  /**
+   * @brief Get the behavior of the layer
+   *
+   * @return The behavior of the layer
+   */
+  Behavior GetBehavior() const;
+
+  /**
    * @brief Sets whether clipping is enabled for a layer.
    *
    * Clipping is initially disabled; see also SetClippingBox().
@@ -271,7 +306,7 @@ public:
    * By default a layer enables depth test if there is more than one opaque actor or if there is one opaque actor and one, or more, transparent actors.
    * However, it's possible to disable the depth test by calling this method.
    *
-   * @param[in] disable \e true disables depth test. \e false sets the default behaviour.
+   * @param[in] disable \e true disables depth test. \e false sets the default behavior.
    */
   void SetDepthTestDisabled( bool disable );
 
@@ -292,7 +327,7 @@ public:
    *
    * A function of the following type should be used:
    * @code
-   *  float YourSortFunction(const Vector3& position, float sortModifier);
+   *  float YourSortFunction(const Vector3& position);
    * @endcode
    *
    * @note If the sort function returns a low number, the actor the data applies to will be

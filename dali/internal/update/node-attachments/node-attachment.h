@@ -54,17 +54,27 @@ public:
 
   /**
    * Second-phase construction.
-   * This is called by the UpdateManager, when the attachment is attached to the scene-graph.
-   * @param[in] sceneController Allows attachments to get light/camera controllers.
+   * This is called by the UpdateManager when the attachment is attached to the scene-graph.
+   * @param[in] sceneController Allows attachments to get camera controllers.
    * @param[in] updateBufferIndex The current update buffer index.
    */
-  virtual void ConnectToSceneGraph( SceneController& sceneController, BufferIndex updateBufferIndex ) = 0;
+  virtual void Initialize( SceneController& sceneController, BufferIndex updateBufferIndex ) = 0;
 
   /**
    * Called shortly before destruction.
    * After this method has been called, the SceneController cannot be safely accessed.
    */
   virtual void OnDestroy() = 0;
+
+  /**
+   * Called when the parent node is connected to the SceneGraph
+   */
+  virtual void ConnectedToSceneGraph() = 0;
+
+  /**
+   * Called when the parent node is disconnected from the SceneGraph
+   */
+  virtual void DisconnectedFromSceneGraph( ) = 0;
 
   /**
    * Set the parent of a NodeAttachment.

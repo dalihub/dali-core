@@ -33,6 +33,8 @@ namespace ImageSampler
 namespace
 {
 
+// @todo MESH_REWORK Remove file after image removal
+
 // Adjust these shift sizes if the FilterMode enum grows
 const int MINIFY_BIT_SHIFT  = 0;    // Room for 16
 const int MAGNIFY_BIT_SHIFT = 4;

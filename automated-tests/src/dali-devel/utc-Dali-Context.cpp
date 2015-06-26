@@ -19,12 +19,9 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/actors/mesh-actor.h>
 #include <dali-test-suite-utils.h>
 
 using namespace Dali;
-
-#include "mesh-builder.h"
 
 
 namespace
@@ -52,28 +49,6 @@ static BufferImage CreateBufferImage()
 
   return image;
 }
-
-static MeshActor CreateMeshActor()
-{
-  MeshData meshData;
-  MeshData::VertexContainer    vertices;
-  MeshData::FaceIndices        faces;
-  BoneContainer                bones;
-  ConstructVertices(vertices, 60);
-  ConstructFaces(vertices, faces);
-  Material customMaterial = ConstructMaterial();
-  meshData.SetData(vertices, faces, bones, customMaterial);
-  meshData.SetHasNormals(true);
-  meshData.SetHasTextureCoords(true);
-
-  Mesh mesh = Mesh::New(meshData);
-  MeshActor actor = MeshActor::New(mesh);
-
-  actor.SetName("Test MeshActor");
-
-  return actor;
-}
-
 
 static ImageActor CreateImageActor()
 {
@@ -155,69 +130,5 @@ int UtcDaliContextVertexAttribImageRendering(void)
 
 
   tet_result(TET_PASS);
-  END_TEST;
-}
-
-// test to make sure the attribs change when rendering both image and mode actors
-int UtcDaliContextVertexAttribImageAndModelRendering(void)
-{
-  tet_infoline("Testing vertex attrib rendering state in context with images and models");
-
-  TestApplication application;
-
-  // start up
-  application.SendNotification();
-  application.Render();
-  application.Render();
-
-  // the vertex attribs get modified on startup to set them to disabled
-  // clear the flag to say they've changed
-  application.GetGlAbstraction().ClearVertexAttribArrayChanged();
-
-  // create a test image and mesh actor.
-
-  MeshActor meshActor(CreateMeshActor());
-  Stage::GetCurrent().Add(meshActor);
-
-  ImageActor imageActor(CreateImageActor());
-  Stage::GetCurrent().Add(imageActor);
-
-
-  application.SendNotification();
-  application.Render();
-  application.Render();
-
-  // check to make sure the state changes during the rendering of a frame
-  DALI_TEST_CHECK(application.GetGlAbstraction().GetVertexAttribArrayChanged());
-
-  // Now check to make sure the state is changing each frame.
-  application.GetGlAbstraction().ClearVertexAttribArrayChanged();
-
-  application.Render();
-  application.Render();
-  application.Render();
-
-  // make sure the state has changed
-  DALI_TEST_CHECK(application.GetGlAbstraction().GetVertexAttribArrayChanged());
-
-  // depending on the order of drawing, one of the attrib locations should be disabled
-  // Image uses locations 0 & 2  (position, texture)
-  // Model uses locations 0 & 1  (position, normals) -no textures
-  // so either location 1 or location 2 should be disabled after drawing.
-
-  // see if mesh was last to draw
-  if (application.GetGlAbstraction().GetVertexAttribArrayState(ATTRIB_NORMAL))
-  {
-    // texture should be disabled
-    DALI_TEST_CHECK( application.GetGlAbstraction().GetVertexAttribArrayState(ATTRIB_TEXCOORD) == false)
-  }
-  else
-  {
-    // image was to draw so, normals should be disabled
-    DALI_TEST_CHECK( application.GetGlAbstraction().GetVertexAttribArrayState(ATTRIB_NORMAL) == false)
-  }
-
-  tet_result(TET_PASS);
-
   END_TEST;
 }

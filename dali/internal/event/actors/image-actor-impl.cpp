@@ -25,6 +25,7 @@
 #include <dali/public-api/object/type-registry.h>
 #include <dali/devel-api/scripting/scripting.h>
 #include <dali/internal/event/common/property-helper.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/images/image-connector.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>
 
@@ -457,6 +458,115 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
 
   return ret;
 }
+
+
+void ImageActor::SetSortModifier(float modifier)
+{
+  mImageAttachment->SetSortModifier( modifier );
+}
+
+float ImageActor::GetSortModifier() const
+{
+  return mImageAttachment->GetSortModifier();
+}
+
+void ImageActor::SetDepthIndex( int depthIndex )
+{
+   mImageAttachment->SetSortModifier( depthIndex );
+}
+
+int ImageActor::GetDepthIndex() const
+{
+  return static_cast< int >( mImageAttachment->GetSortModifier() );
+}
+
+void ImageActor::SetCullFace(CullFaceMode mode)
+{
+  mImageAttachment->SetCullFace( mode );
+}
+
+CullFaceMode ImageActor::GetCullFace() const
+{
+  return mImageAttachment->GetCullFace();
+}
+
+void ImageActor::SetBlendMode( BlendingMode::Type mode )
+{
+  mImageAttachment->SetBlendMode( mode );
+}
+
+BlendingMode::Type ImageActor::GetBlendMode() const
+{
+  return mImageAttachment->GetBlendMode();
+}
+
+void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba,   BlendingFactor::Type destFactorRgba )
+{
+  mImageAttachment->SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
+}
+
+void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
+                               BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
+{
+  mImageAttachment->SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+}
+
+void ImageActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
+                                    BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
+{
+  mImageAttachment->GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+}
+
+void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgba )
+{
+  mImageAttachment->SetBlendEquation( equationRgba, equationRgba );
+}
+
+void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
+{
+  mImageAttachment->SetBlendEquation( equationRgb, equationAlpha );
+}
+
+void ImageActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
+{
+  mImageAttachment->GetBlendEquation( equationRgb, equationAlpha );
+}
+
+void ImageActor::SetBlendColor( const Vector4& color )
+{
+  mImageAttachment->SetBlendColor( color );
+}
+
+const Vector4& ImageActor::GetBlendColor() const
+{
+  return mImageAttachment->GetBlendColor();
+}
+
+void ImageActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
+{
+  mImageAttachment->SetFilterMode( minFilter, magFilter );
+}
+
+void ImageActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
+{
+  return mImageAttachment->GetFilterMode( minFilter, magFilter );
+}
+
+void ImageActor::SetShaderEffect(ShaderEffect& effect)
+{
+  mImageAttachment->SetShaderEffect( effect );
+}
+
+ShaderEffectPtr ImageActor::GetShaderEffect() const
+{
+  return mImageAttachment->GetShaderEffect();
+}
+
+void ImageActor::RemoveShaderEffect()
+{
+  return mImageAttachment->RemoveShaderEffect();
+}
+
 
 } // namespace Internal
 

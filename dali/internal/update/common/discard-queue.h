@@ -24,7 +24,10 @@
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 #include <dali/internal/update/node-attachments/node-attachment-declarations.h>
-#include <dali/internal/update/modeling/scene-graph-mesh-declarations.h>
+#include <dali/internal/update/common/scene-graph-property-buffer.h>
+#include <dali/internal/update/rendering/scene-graph-geometry.h>
+#include <dali/internal/update/rendering/scene-graph-material.h>
+#include <dali/internal/update/rendering/scene-graph-sampler.h>
 
 namespace Dali
 {
@@ -41,6 +44,7 @@ class Node;
 class RenderQueue;
 class Shader;
 
+
 /**
  * DiscardQueue is used to cleanup nodes & resources when no longer in use.
  * Unwanted objects are added here during UpdateManager::Update().
@@ -53,6 +57,10 @@ class DiscardQueue
 public:
 
   typedef OwnerContainer< Shader* > ShaderQueue;
+  typedef OwnerContainer< Geometry* > GeometryQueue;
+  typedef OwnerContainer< Material* > MaterialQueue;
+  typedef OwnerContainer< Sampler* > SamplerQueue;
+  typedef OwnerContainer< PropertyBuffer* > PropertyBufferQueue;
 
   /**
    * Create a new DiscardQueue.
@@ -84,13 +92,28 @@ public:
   void Add( BufferIndex updateBufferIndex, NodeAttachment* attachment );
 
   /**
-   * Adds an unwanted mesh resource to the discard queue.
-   * A message will be sent to clean-up GL resources in the next Render.
-   * @pre This method is not thread-safe, and should only be called from the update-thread.
-   * @param[in] updateBufferIndex The current update buffer index.
-   * @param[in] mesh The mesh to queue; DiscardQueue takes a reference.
+   * Adds an unwanted geometry to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render
    */
-  void Add( BufferIndex updateBufferIndex, Mesh* mesh );
+  void Add( BufferIndex updateBufferIndex, Geometry* geometry );
+
+  /**
+   * Adds an unwanted material to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render.
+   */
+  void Add( BufferIndex updateBufferIndex, PropertyBuffer* material );
+
+  /**
+   * Adds an unwanted material to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render.
+   */
+  void Add( BufferIndex updateBufferIndex, Material* material );
+
+  /**
+   * Adds an unwanted material to the discard queue.
+   * A message will be sent to clean up GL resources in the next Render.
+   */
+  void Add( BufferIndex updateBufferIndex, Sampler* material );
 
   /**
    * Adds an unwanted shader to the discard queue.
@@ -123,15 +146,20 @@ private:
   // Messages are queued here when the update buffer index == 0
   NodeOwnerContainer           mNodeQueue0;
   NodeAttachmentOwnerContainer mAttachmentQueue0;
-  MeshOwnerContainer           mMeshQueue0;
   ShaderQueue                  mShaderQueue0;
+  GeometryQueue                mGeometryQueue0;
+  MaterialQueue                mMaterialQueue0;
+  SamplerQueue                 mSamplerQueue0;
+  PropertyBufferQueue          mPropertyBufferQueue0;
 
   // Messages are queued here when the update buffer index == 1
   NodeOwnerContainer           mNodeQueue1;
   NodeAttachmentOwnerContainer mAttachmentQueue1;
-  MeshOwnerContainer           mMeshQueue1;
   ShaderQueue                  mShaderQueue1;
-
+  GeometryQueue                mGeometryQueue1;
+  MaterialQueue                mMaterialQueue1;
+  SamplerQueue                 mSamplerQueue1;
+  PropertyBufferQueue          mPropertyBufferQueue1;
 };
 
 } // namespace SceneGraph

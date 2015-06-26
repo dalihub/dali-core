@@ -48,10 +48,10 @@ enum PropertyRanges
 
   PROPERTY_REGISTRATION_MAX_INDEX               = 19999999,   ///< The maximum index supported when registering a property
 
-  ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX  = 20000000,   ///< The index when registering an animatable property should start from this number.
+  ANIMATABLE_PROPERTY_REGISTRATION_START_INDEX  = 20000000,   ///< The index when registering an animatable property should start from this number. (SceneGraph properties per type)
   ANIMATABLE_PROPERTY_REGISTRATION_MAX_INDEX    = 29999999,   ///< The maximum index supported when registering an animatable property
 
-  PROPERTY_CUSTOM_START_INDEX                   = 50000000,   ///< The index at which custom properties start
+  PROPERTY_CUSTOM_START_INDEX                   = 50000000,   ///< The index at which custom properties start (SceneGraph and Event side properties per instance)
 };
 
 } // namespace Dali

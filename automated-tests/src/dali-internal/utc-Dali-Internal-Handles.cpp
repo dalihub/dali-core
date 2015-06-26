@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
-#include <dali/devel-api/actors/mesh-actor.h>
 
 #include <dali-test-suite-utils.h>
 
@@ -58,20 +57,6 @@ int UtcDaliImageActorConstructorRefObject(void)
   ImageActor actor(NULL);
 
   DALI_TEST_CHECK(!actor);
-  END_TEST;
-}
-
-int UtcDaliMeshActorConstructorRefObject(void)
-{
-  TestApplication application;
-  tet_infoline("Testing Dali::MeshActor::MeshActor(Internal::MeshActor*)");
-
-  MeshActor actor(NULL);
-  DALI_TEST_CHECK(!actor);
-
-  MeshActor* actorPtr = new MeshActor();
-  DALI_TEST_CHECK( ! *actorPtr );
-  delete actorPtr;
   END_TEST;
 }
 

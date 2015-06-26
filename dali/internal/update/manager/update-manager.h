@@ -21,19 +21,21 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
+
 #include <dali/integration-api/resource-declarations.h>
+
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/type-abstraction-enums.h>
 #include <dali/internal/event/common/event-thread-services.h>
-#include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/node-attachments/node-attachment.h>
-#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/animation/scene-graph-animation.h>
+#include <dali/internal/update/common/scene-graph-buffers.h>
 #include <dali/internal/update/common/scene-graph-property-notification.h>
-#include <dali/internal/update/modeling/scene-graph-animatable-mesh.h>
+#include <dali/internal/update/manager/object-owner-container.h>
+#include <dali/internal/update/node-attachments/node-attachment.h>
+#include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/render/shaders/shader.h>
 
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
 {
@@ -63,23 +65,27 @@ template <> struct ParameterType< PropertyNotification::NotifyMode >
 namespace SceneGraph
 {
 
-class AnimatableMesh;
 class Animation;
 class DiscardQueue;
-class Material;
 class PanGesture;
 class RenderManager;
 class RenderTaskList;
 class RenderQueue;
 class DynamicsWorld;
 class TextureCache;
-typedef OwnerContainer< AnimatableMesh* > AnimatableMeshContainer;
-typedef OwnerContainer< Material* >       MaterialContainer;
+class Geometry;
+class PropertyBuffer;
+class Material;
+class Sampler;
+class RendererAttachment;
 
 /**
- * UpdateManager holds a scene graph i.e. a tree of nodes.
+ * UpdateManager maintains a scene graph i.e. a tree of nodes and attachments and
+ * other property owner objects.
  * It controls the Update traversal, in which nodes are repositioned/animated,
- * and organises the culling and rendering of the scene.
+ * and organizes the the culling and rendering of the scene.
+ * It also maintains the lifecycle of nodes and other property owners that are
+ * disconnected from the scene graph.
  */
 class UpdateManager
 {
@@ -186,6 +192,12 @@ public:
   void AttachToNode( Node* node, NodeAttachment* attachment );
 
   /**
+   * Attach a renderer to the scene graph
+   */
+  void AttachToSceneGraph( RendererAttachment* renderer );
+
+
+  /**
    * Add a newly created object.
    * @param[in] object The object to add.
    * @post The object is owned by UpdateManager.
@@ -247,6 +259,35 @@ public:
    */
   void PropertyNotificationSetNotify( PropertyNotification* propertyNotification, PropertyNotification::NotifyMode notifyMode );
 
+  /**
+   * @brief Get the geometry owner
+   *
+   * @return The geometry owner
+   */
+  ObjectOwnerContainer< Geometry >& GetGeometryOwner();
+
+  /**
+   * @brief Get the material owner
+   *
+   * @return The material owner
+   */
+  ObjectOwnerContainer< Material >& GetMaterialOwner();
+
+  /**
+   * @brief Get the sampler owner
+   *
+   * @return The sampler owner
+   */
+  ObjectOwnerContainer< Sampler >& GetSamplerOwner();
+
+  /**
+   * @brief Get the property buffer owner
+   *
+   * @return The property buffer owner
+   */
+  ObjectOwnerContainer< PropertyBuffer >& GetPropertyBufferOwner();
+
+
   // Shaders
 
   /**
@@ -265,43 +306,13 @@ public:
   void RemoveShader(Shader* shader);
 
   /**
-   * Set the shader program for a specified GeometryType to a Shader object
+   * Set the shader program for a Shader object
    * @param[in] shader        The shader to modify
-   * @param[in] geometryType  The GeometryType to map to the program
-   * @param[in] subType       The program subtype
    * @param[in] resourceId    A ResourceManager ticket ID for the program data (source and compiled binary)
    * @param[in] shaderHash    hash key created with vertex and fragment shader code
    * @param[in] modifiesGeometry True if the vertex shader modifies geometry
    */
-  void SetShaderProgram( Shader* shader, GeometryType geometryType, ShaderSubTypes subType, Integration::ResourceId resourceId, size_t shaderHash, bool modifiesGeometry );
-
-  /**
-   * Add an animatable mesh
-   * @param[in] animatableMesh The animatable mesh to add.
-   * @post the animatableMesh is owned by the UpdateManager.
-   */
-  void AddAnimatableMesh( AnimatableMesh* animatableMesh );
-
-  /**
-   * Remove an animatable mesh
-   * @pre The animatable mesh has been added to the update manager
-   * @param[in] animatableMesh The animatable mesh to add.
-   */
-  void RemoveAnimatableMesh( AnimatableMesh* animatableMesh );
-
-  /**
-   * Add a material
-   * @param[in] material The material to add
-   * @post the material remains owned by its event object
-   */
-  void AddMaterial(Material* material);
-
-  /**
-   * Remove a material
-   * @pre The material has been added to the UpdateManager
-   * @param[in] material The material to remove
-   */
-  void RemoveMaterial(Material* material);
+  void SetShaderProgram( Shader* shader, Integration::ResourceId resourceId, size_t shaderHash, bool modifiesGeometry );
 
   /**
    * Add a newly created gesture.
@@ -481,22 +492,6 @@ private:
    */
   void UpdateNodes();
 
-  /**
-   * Update animatable meshes
-   */
-  void UpdateMeshes( BufferIndex updateBufferIndex, AnimatableMeshContainer& meshes );
-
-  /**
-   * Update materials - Ensure all render materials are updated with texture pointers
-   * when ready.
-   */
-  void UpdateMaterials( BufferIndex updateBufferIndex, MaterialContainer& materials );
-
-  /**
-   * PrepareMaterials - Ensure updated material properties are sent to render materials
-   */
-  void PrepareMaterials( BufferIndex updateBufferIndex, MaterialContainer& materials );
-
 private:
 
   // needs to be direct member so that getter for event buffer can be inlined
@@ -579,6 +574,7 @@ inline void AttachToNodeMessage( UpdateManager& manager, const Node& constParent
   // Scene graph thread can modify this object.
   Node& parent = const_cast< Node& >( constParent );
 
+  // @todo MESH_REWORK Don't pass by owner pointer after merge with SceneGraph::RenderableAttachment ? (not needed if we split RendererAttachment to 2 objects)
   typedef MessageValue2< UpdateManager, Node*, NodeAttachmentOwner > LocalType;
 
   // Reserve some memory inside the message queue
@@ -586,6 +582,18 @@ inline void AttachToNodeMessage( UpdateManager& manager, const Node& constParent
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::AttachToNode, &parent, attachment );
+}
+
+inline void AttachToSceneGraphMessage( UpdateManager& manager, RendererAttachment* renderer )
+{
+  // @todo MESH_REWORK Pass by owner pointer after merge with SceneGraph::RenderableAttachment
+  typedef MessageValue1< UpdateManager, RendererAttachment* > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &manager, &UpdateManager::AttachToSceneGraph, renderer );
 }
 
 inline void AddObjectMessage( UpdateManager& manager, PropertyOwner* object )
@@ -690,6 +698,8 @@ inline void PropertyNotificationSetNotifyModeMessage( UpdateManager& manager,
   new (slot) LocalType( &manager, &UpdateManager::PropertyNotificationSetNotify, propertyNotification, notifyMode );
 }
 
+
+
 // The render thread can safely change the Shader
 inline void AddShaderMessage( UpdateManager& manager, Shader& shader )
 {
@@ -716,45 +726,18 @@ inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
 
 inline void SetShaderProgramMessage( UpdateManager& manager,
                                      Shader& shader,
-                                     GeometryType geometryType,
-                                     ShaderSubTypes subType,
                                      Integration::ResourceId resourceId,
                                      size_t shaderHash,
                                      bool modifiesGeometry )
 {
-  typedef MessageValue6< UpdateManager, Shader*, GeometryType, ShaderSubTypes, Integration::ResourceId, size_t, bool > LocalType;
+  typedef MessageValue4< UpdateManager, Shader*, Integration::ResourceId, size_t, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, geometryType, subType, resourceId, shaderHash, modifiesGeometry );
+  new (slot) LocalType( &manager, &UpdateManager::SetShaderProgram, &shader, resourceId, shaderHash, modifiesGeometry );
 }
-
-// The render thread can safely change the AnimatableMesh
-inline void AddAnimatableMeshMessage( UpdateManager& manager, AnimatableMesh& animatableMesh )
-{
-  typedef MessageValue1< UpdateManager, AnimatableMesh* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddAnimatableMesh, &animatableMesh );
-}
-
-// The render thread can safely change the AnimatableMesh
-inline void RemoveAnimatableMeshMessage( UpdateManager& manager, AnimatableMesh& animatableMesh )
-{
-  typedef MessageValue1< UpdateManager, AnimatableMesh* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveAnimatableMesh, &animatableMesh );
-}
-
 
 inline void SetBackgroundColorMessage( UpdateManager& manager, const Vector4& color )
 {
@@ -806,28 +789,6 @@ inline void SetLayerDepthsMessage( UpdateManager& manager, const std::vector< La
   new (slot) LocalType( &manager, &UpdateManager::SetLayerDepths, layers, systemLevel );
 }
 
-inline void AddMaterialMessage( UpdateManager& manager, Material* material )
-{
-  typedef MessageValue1< UpdateManager, Material* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::AddMaterial, material );
-}
-
-inline void RemoveMaterialMessage( UpdateManager& manager, Material* material )
-{
-  typedef MessageValue1< UpdateManager, Material* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::RemoveMaterial, material );
-}
-
 inline void AddGestureMessage( UpdateManager& manager, PanGesture* gesture )
 {
   typedef MessageValue1< UpdateManager, PanGesture* > LocalType;
@@ -876,6 +837,29 @@ inline void TerminateDynamicsWorldMessage(UpdateManager& manager)
 }
 
 #endif // DALI_DYNAMICS_SUPPORT
+
+
+template< typename T >
+inline void AddMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
+{
+  typedef MessageValue1< ObjectOwnerContainer<T>, OwnerPointer< T > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Add, &object );
+}
+
+template< typename T >
+inline void RemoveMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
+{
+  typedef MessageValue1< ObjectOwnerContainer<T>, OwnerPointer< T > > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &owner, &ObjectOwnerContainer<T>::Remove, &object );
+}
 
 } // namespace SceneGraph
 

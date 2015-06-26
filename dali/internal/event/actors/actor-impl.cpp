@@ -42,6 +42,7 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
+#include <dali/internal/event/actor-attachments/renderer-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
@@ -941,36 +942,7 @@ void Actor::SetScaleZ( float z )
   }
 }
 
-void Actor::SetInitialVolume( const Vector3& volume )
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value
-    SetInitialVolumeMessage( GetEventThreadServices(), *mNode, volume );
-  }
-}
-
-void Actor::SetTransmitGeometryScaling( bool transmitGeometryScaling )
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value
-    SetTransmitGeometryScalingMessage( GetEventThreadServices(), *mNode, transmitGeometryScaling );
-  }
-}
-
-bool Actor::GetTransmitGeometryScaling() const
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; copy the value from the previous update
-    return mNode->GetTransmitGeometryScaling();
-  }
-
-  return false;
-}
-
-void Actor::ScaleBy( const Vector3& relativeScale )
+void Actor::ScaleBy(const Vector3& relativeScale)
 {
   if( NULL != mNode )
   {
@@ -1472,6 +1444,49 @@ bool Actor::RelayoutRequired( Dimension::Type dimension ) const
 {
   return mRelayoutData && mRelayoutData->relayoutEnabled && IsLayoutDirty( dimension );
 }
+
+unsigned int Actor::AddRenderer( Renderer& renderer )
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  if ( ! mAttachment )
+  {
+    mAttachment = RendererAttachment::New( GetEventThreadServices(), *mNode, renderer );
+  }
+
+  return 0;
+}
+
+unsigned int Actor::GetRendererCount() const
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  RendererAttachment* attachment = dynamic_cast<RendererAttachment*>(mAttachment.Get());
+  return attachment ? 1u : 0u;
+}
+
+Renderer& Actor::GetRendererAt( unsigned int index )
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  DALI_ASSERT_DEBUG( index == 0 && "Only one renderer is supported." );
+
+  //TODO: MESH_REWORK : Temporary code
+  RendererAttachment* attachment = dynamic_cast<RendererAttachment*>(mAttachment.Get());
+  DALI_ASSERT_ALWAYS( attachment && "Actor doesn't have a renderer" );
+
+  return attachment->GetRenderer();
+}
+
+void Actor::RemoveRenderer( Renderer& renderer )
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  mAttachment = NULL;
+}
+
+void Actor::RemoveRenderer( unsigned int index )
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  mAttachment = NULL;
+}
+
 
 #ifdef DALI_DYNAMICS_SUPPORT
 
@@ -2311,6 +2326,7 @@ Actor::Actor( DerivedType derivedType )
   mTargetSize( 0.0f, 0.0f, 0.0f ),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
+  mDepth( 0 ),
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsRenderable( RENDERABLE == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
@@ -2391,14 +2407,15 @@ Actor::~Actor()
   }
 }
 
-void Actor::ConnectToStage( int index )
+void Actor::ConnectToStage( unsigned int parentDepth, int index )
 {
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
+
   // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveConnectToStage( connectionList, index );
+  RecursiveConnectToStage( connectionList, parentDepth+1, index );
 
   // Notify applications about the newly connected actors.
   const ActorIter endIter = connectionList.end();
@@ -2411,11 +2428,12 @@ void Actor::ConnectToStage( int index )
   RelayoutRequest();
 }
 
-void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
+void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth, int index )
 {
   DALI_ASSERT_ALWAYS( !OnStage() );
 
   mIsOnStage = true;
+  mDepth = depth;
 
   ConnectToSceneGraph( index );
 
@@ -2432,7 +2450,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
       Actor& actor = GetImplementation( *iter );
-      actor.RecursiveConnectToStage( connectionList );
+      actor.RecursiveConnectToStage( connectionList, depth+1 );
     }
   }
 }
@@ -2481,7 +2499,7 @@ void Actor::NotifyStageConnection()
   if( OnStage() && !mOnStageSignalled )
   {
     // Notification for external (CustomActor) derived classes
-    OnStageConnectionExternal();
+    OnStageConnectionExternal( mDepth );
 
     if( !mOnStageSignal.Empty() )
     {
@@ -3869,7 +3887,7 @@ void Actor::SetParent( Actor* parent, int index )
          parent->OnStage() )
     {
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToStage( index );
+      ConnectToStage( parent->GetDepth(), index );
     }
   }
   else // parent being set to NULL

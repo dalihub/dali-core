@@ -365,7 +365,6 @@ private:
 
   bool mInheritedFlag   :1; ///< Flag whether the value has ever been inherited
   bool mReinheritedFlag :1; ///< Flag whether value was re-inherited in previous frame
-
 };
 
 /**

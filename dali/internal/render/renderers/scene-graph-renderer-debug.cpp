@@ -19,7 +19,7 @@
 #include <dali/integration-api/resource-declarations.h>
 #include <dali/internal/render/shaders/program.h>
 #include <dali/internal/render/gl-resources/context.h>
-#include <dali/internal/render/renderers/render-data-provider.h>
+#include <dali/internal/render/data-providers/node-data-provider.h>
 #include <dali/internal/render/gl-resources/gpu-buffer.h>
 
 namespace Dali

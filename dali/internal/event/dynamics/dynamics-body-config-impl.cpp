@@ -102,10 +102,10 @@ void DynamicsBodyConfig::SetShape( const Dali::DynamicsShape::ShapeType type, co
       mShape = new DynamicsCylinderShape(dimensions.x, dimensions.y);
       break;
     }
+    @todo Remove cloth handling
     case Dali::DynamicsShape::MESH:
     {
-      Dali::Cloth cloth = Dali::Cloth::New( dimensions.x, dimensions.y, dimensions.z, dimensions.z );
-      mShape = new DynamicsMeshShape( GetImplementation(cloth) );
+      mShape = new DynamicsCubeShape(dimensions);
       break;
     }
     case Dali::DynamicsShape::SPHERE:

@@ -28,7 +28,6 @@
 #include <dali/internal/event/resources/image-ticket.h>
 #include <dali/internal/event/resources/resource-ticket-lifetime-observer.h>
 #include <dali/internal/common/message.h>
-#include <dali/internal/update/modeling/internal-mesh-data.h>
 #include <dali/integration-api/bitmap.h>
 
 namespace Dali
@@ -221,12 +220,6 @@ public:
                                      Pixel::Format pixelformat );
 
   /**
-   * Requests allocation of a mesh resource
-   * @param[in] meshData representing the mesh; ownership is taken.
-   */
-  ResourceTicketPtr AllocateMesh( OwnerPointer<MeshData>& meshData );
-
-  /**
    * Update bitmap area
    * @param[in] ticket The ticket representing the bitmap
    * @param[in] updateArea the area updated.
@@ -250,14 +243,6 @@ public:
    * @param [in] yOffset Specifies an offset in the y direction within the texture
    */
   void UploadBitmap( ResourceId destId, Integration::BitmapPtr bitmap, std::size_t xOffset, std::size_t yOffset);
-
-  /**
-   * Update the mesh used by ticket
-   * @note Should use same mechanism as update manager
-   * @param[in] ticket The ticket holding the mesh data
-   * @param[in] meshData The new mesh data
-   */
-  void UpdateMesh( ResourceTicketPtr ticket, const Dali::MeshData& meshData );
 
   /**
    * Find Bitmap by ticket.

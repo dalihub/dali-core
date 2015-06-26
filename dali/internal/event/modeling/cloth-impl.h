@@ -20,7 +20,8 @@
 
 // INTERNAL INCLUDES
 #include <dali/devel-api/geometry/cloth.h>
-#include <dali/internal/event/modeling/mesh-impl.h>
+#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/rendering/geometry-impl.h>
 
 namespace Dali
 {
@@ -35,7 +36,7 @@ typedef IntrusivePtr<Cloth> ClothIPtr; ///< smart pointer to a Cloth
 /**
  * A single cloth in a 3D model
  */
-class Cloth : public Mesh
+class Cloth : public BaseObject
 {
 public: // construction, destruction and initialisation
 
@@ -44,13 +45,13 @@ public: // construction, destruction and initialisation
    * @param[in] clothData the mesh data
    * @return A smart-pointer to the newly allocated Cloth.
    */
-  static ClothIPtr New( const Dali::MeshData& clothData );
+  static ClothIPtr New( Geometry& clothData );
 
   /**
    * Construct a new Cloth. This is not discardable or scalable.
    * @param[in] clothData the mesh data
    */
-  Cloth( const Dali::MeshData& clothData );
+  Cloth( Geometry& clothData );
 
 protected:
   /**

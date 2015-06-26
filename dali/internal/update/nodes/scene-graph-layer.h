@@ -35,6 +35,8 @@ class RenderableAttachment;
 // value types used by messages
 template <> struct ParameterType< Dali::Layer::SortFunctionType >
 : public BasicType< Dali::Layer::SortFunctionType > {};
+template <> struct ParameterType< Dali::Layer::Behavior >
+: public BasicType< Dali::Layer::Behavior > {};
 
 namespace SceneGraph
 {
@@ -122,6 +124,21 @@ public:
   }
 
   /**
+   * Sets the behavior of the layer
+   * @param [in] behavior The behavior of the layer
+   */
+  void SetBehavior( Dali::Layer::Behavior behavior );
+
+  /**
+   * Retrieves the behavior of the layer.
+   * @return The behavior
+   */
+  Dali::Layer::Behavior GetBehavior() const
+  {
+    return mBehavior;
+  }
+
+  /**
    * @copydoc Dali::Layer::SetDepthTestDisabled()
    */
   void SetDepthTestDisabled( bool disable );
@@ -193,6 +210,8 @@ private:
   ClippingBox mClippingBox;           ///< The clipping box, in window coordinates
   Node* mLastCamera;                  ///< Pointer to the last camera that has rendered the layer
 
+  Dali::Layer::Behavior mBehavior;    ///< The behavior of the layer
+
   bool mAllChildTransformsClean[ 2 ]; ///< True if all child nodes transforms are clean,
                                       /// double buffered as we need two clean frames before we can reuse N-1 for N+1
                                       /// this allows us to cache render items when layer is "static"
@@ -253,12 +272,30 @@ inline void SetClippingBoxMessage( EventThreadServices& eventThreadServices, con
 }
 
 /**
+ * Create a message to set the behavior of a layer
+ * @param[in] layer The layer
+ * @param[in] behavior The behavior
+ */
+inline void SetBehaviorMessage( EventThreadServices& eventThreadServices,
+                                const Layer& layer,
+                                Dali::Layer::Behavior behavior )
+{
+  typedef MessageValue1< Layer, Dali::Layer::Behavior > LocalType;
+
+  // Reserve some memory inside the message queue
+  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
+
+  // Construct message in the message queue memory; note that delete should not be called on the return value
+  new (slot) LocalType( &layer, &Layer::SetBehavior, behavior );
+}
+
+/**
  * Create a message for disabling/enabling depth test.
  *
  * @see Dali::Layer::SetDepthTestDisabled().
  *
  * @param[in] layer The layer
- * @param[in] disable \e true disables depth test. \e false sets the default behaviour.
+ * @param[in] disable \e true disables depth test. \e false sets the default behavior.
  */
 inline void SetDepthTestDisabledMessage( EventThreadServices& eventThreadServices, const Layer& layer, bool disable )
 {

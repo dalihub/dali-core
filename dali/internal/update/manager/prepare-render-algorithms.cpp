@@ -24,7 +24,7 @@
 #include <dali/internal/update/nodes/scene-graph-layer.h>
 #include <dali/internal/render/renderers/scene-graph-renderer.h>
 #include <dali/internal/render/common/render-instruction.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
 {
@@ -70,7 +70,6 @@ void PrepareRenderables( BufferIndex updateBufferIndex, RenderableAttachmentCont
 
 void PrepareRenderables( BufferIndex updateBufferIndex, SortedLayerPointers& sortedLayers )
 {
-
   const SortedLayersIter endIter = sortedLayers.end();
 
   for ( SortedLayersIter iter = sortedLayers.begin(); iter != endIter; ++iter )

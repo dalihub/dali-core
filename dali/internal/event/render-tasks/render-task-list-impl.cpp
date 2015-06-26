@@ -81,10 +81,9 @@ void RenderTaskList::RemoveTask( Dali::RenderTask task )
   {
     if ( *iter == task )
     {
+      RenderTask& taskImpl = GetImplementation( task );
       if ( mSceneObject )
       {
-        RenderTask& taskImpl = GetImplementation( task );
-
         SceneGraph::RenderTask* sceneObject = taskImpl.GetRenderTaskSceneObject();
         DALI_ASSERT_DEBUG( NULL != sceneObject );
 
@@ -96,6 +95,15 @@ void RenderTaskList::RemoveTask( Dali::RenderTask task )
       }
 
       mTasks.erase( iter );
+
+      for ( Vector< Exclusive >::Iterator exclusiveIt = mExclusives.Begin(); exclusiveIt != mExclusives.End(); ++exclusiveIt )
+      {
+        if ( exclusiveIt->renderTaskPtr == &taskImpl )
+        {
+          mExclusives.Erase( exclusiveIt );
+          break;
+        }
+      }
       break; // we're finished
     }
   }
@@ -111,6 +119,35 @@ Dali::RenderTask RenderTaskList::GetTask( unsigned int index ) const
   DALI_ASSERT_ALWAYS( ( index < mTasks.size() ) && "RenderTask index out-of-range" );
 
   return mTasks[index];
+}
+
+void RenderTaskList::SetExclusive( RenderTask* task, bool exclusive )
+{
+  // Check to see if this rendertask has an entry?
+  for ( Vector< Exclusive >::Iterator exclusiveIt = mExclusives.Begin(); exclusiveIt != mExclusives.End(); ++exclusiveIt )
+  {
+    if ( exclusiveIt->renderTaskPtr == task )
+    {
+      if ( !exclusive )
+      {
+        mExclusives.Erase( exclusiveIt );
+        break;
+      }
+      else
+      {
+        exclusiveIt->actorPtr = task->GetSourceActor();
+        exclusive = false;
+        break;
+      }
+    }
+  }
+  if ( exclusive )
+  {
+    Exclusive exclusiveSlot;
+    exclusiveSlot.renderTaskPtr = task;
+    exclusiveSlot.actorPtr = task->GetSourceActor();
+    mExclusives.PushBack( exclusiveSlot );
+  }
 }
 
 RenderTaskList::RenderTaskList( EventThreadServices& eventThreadServices, RenderTaskDefaults& defaults, bool systemLevel )
