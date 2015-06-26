@@ -2311,8 +2311,7 @@ bool Actor::DoConnectSignal( BaseObject* object, ConnectionTrackerInterface* tra
 }
 
 Actor::Actor( DerivedType derivedType )
-: mStage( NULL ),
-  mParent( NULL ),
+: mParent( NULL ),
   mChildren( NULL ),
   mNode( NULL ),
   mParentOrigin( NULL ),
