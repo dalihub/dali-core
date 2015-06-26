@@ -332,7 +332,7 @@ ResourceTicketPtr ResourceClient::AddNativeImage ( NativeImageInterface& resourc
   return newTicket;
 }
 
-ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigned int height, Pixel::Format pixelFormat )
+ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat )
 {
   ImageTicketPtr newTicket;
 
@@ -348,7 +348,7 @@ ImageTicketPtr ResourceClient::AddFrameBufferImage ( unsigned int width, unsigne
   mImpl->mTickets.insert(TicketPair(newId, newTicket.Get()));
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceClient: AddFrameBufferImage() New id = %u\n", newId);
-  RequestAddFrameBufferImageMessage( mEventThreadServices, mResourceManager, newId, width, height, pixelFormat );
+  RequestAddFrameBufferImageMessage( mEventThreadServices, mResourceManager, newId, width, height, pixelFormat, bufferFormat );
 
   return newTicket;
 }

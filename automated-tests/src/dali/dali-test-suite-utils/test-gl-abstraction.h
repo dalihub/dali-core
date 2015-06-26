@@ -85,6 +85,8 @@ public:
 
   inline void BindFramebuffer( GLenum target, GLuint framebuffer )
   {
+    //Add 010 bit;
+    mFramebufferStatus |= 2;
   }
 
   inline void BindRenderbuffer( GLenum target, GLuint renderbuffer )
@@ -224,7 +226,29 @@ public:
 
   inline GLenum CheckFramebufferStatus(GLenum target)
   {
+    //If it has the three last bits set to 1 - 111, then the three minimum functions to create a
+    //Framebuffer texture have been called
+    if( mFramebufferStatus == 7 )
+    {
+      return GL_FRAMEBUFFER_COMPLETE;
+    }
+
     return mCheckFramebufferStatusResult;
+  }
+
+  inline GLenum CheckFramebufferColorAttachment()
+  {
+    return mFramebufferColorAttached;
+  }
+
+  inline GLenum CheckFramebufferDepthAttachment()
+  {
+    return mFramebufferDepthAttached;
+  }
+
+  inline GLenum CheckFramebufferStencilAttachment()
+  {
+    return mFramebufferStencilAttached;
   }
 
   inline void Clear(GLbitfield mask)
@@ -429,10 +453,26 @@ public:
 
   inline void FramebufferRenderbuffer(GLenum target, GLenum attachment, GLenum renderbuffertarget, GLuint renderbuffer)
   {
+    if (attachment == GL_DEPTH_ATTACHMENT)
+    {
+      mFramebufferDepthAttached = true;
+    }
+    else if (attachment == GL_STENCIL_ATTACHMENT)
+    {
+      mFramebufferStencilAttached = true;
+    }
   }
 
   inline void FramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
   {
+    //Add 100 bit;
+    mFramebufferStatus |= 4;
+
+    //We check 4 attachment colors
+    if ((attachment == GL_COLOR_ATTACHMENT0) || (attachment == GL_COLOR_ATTACHMENT1) || (attachment == GL_COLOR_ATTACHMENT2)  || (attachment == GL_COLOR_ATTACHMENT4))
+    {
+      mFramebufferColorAttached = true;
+    }
   }
 
   inline void FrontFace(GLenum mode)
@@ -451,10 +491,21 @@ public:
 
   inline void GenFramebuffers(GLsizei n, GLuint* framebuffers)
   {
+    for( int i = 0; i < n; i++ )
+    {
+      framebuffers[i] = i + 1;
+    }
+
+    //Add 001 bit, this function needs to be called the first one in the chain
+    mFramebufferStatus = 1;
   }
 
   inline void GenRenderbuffers(GLsizei n, GLuint* renderbuffers)
   {
+    for( int i = 0; i < n; i++ )
+    {
+      renderbuffers[i] = i + 1;
+    }
   }
 
   /**
@@ -1724,6 +1775,10 @@ private:
   GLboolean  mIsTextureResult;
   GLenum     mActiveTextureUnit;
   GLenum     mCheckFramebufferStatusResult;
+  GLint      mFramebufferStatus;
+  GLenum     mFramebufferColorAttached;
+  GLenum     mFramebufferDepthAttached;
+  GLenum     mFramebufferStencilAttached;
   GLint      mNumBinaryFormats;
   GLint      mBinaryFormats;
   GLint      mProgramBinaryLength;

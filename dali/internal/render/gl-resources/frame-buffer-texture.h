@@ -22,6 +22,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/internal/render/gl-resources/texture.h>
 #include <dali/integration-api/bitmap.h>
 #include <dali/integration-api/debug.h>
@@ -44,7 +45,7 @@ public:
    * Creates a new texture object
    * @param[in] width       The width (pixels)
    * @param[in] height      The height (pixels)
-   * @param     context The GL context
+   * @param[in] context The GL context
    */
   FrameBufferTexture(unsigned int width, unsigned int height, Context& context);
 
@@ -53,9 +54,19 @@ public:
    * @param[in] width       The width (pixels)
    * @param[in] height      The height (pixels)
    * @param[in] pixelFormat The pixel format
-   * @param     context The GL context
+   * @param[in] context The GL context
    */
   FrameBufferTexture(unsigned int width, unsigned int height, Pixel::Format pixelFormat, Context& context);
+
+  /**
+   * Creates a new texture object
+   * @param[in] width         The width (pixels)
+   * @param[in] height        The height (pixels)
+   * @param[in] pixelFormat   The pixel format
+   * @param[in] bufferFormat  The buffer formats to be attached in the FBO
+   * @param[in] context The GL context
+   */
+  FrameBufferTexture(unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat, Context& context);
 
   /**
    * Destructor.
@@ -86,7 +97,9 @@ public:
 protected:
   unsigned int mFrameBufferName;
   unsigned int mRenderBufferName;
+  unsigned int mStencilBufferName;
   Pixel::Format mPixelFormat;
+  RenderBuffer::Format mBufferFormat;
 
   /**
    * @copydoc Texture::CreateGlTexture

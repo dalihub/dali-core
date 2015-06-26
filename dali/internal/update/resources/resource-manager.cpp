@@ -302,7 +302,7 @@ void ResourceManager::HandleAddNativeImageRequest(ResourceId id, NativeImageInte
   mImpl->mTextureCacheDispatcher.DispatchCreateTextureForNativeImage( id, nativeImage );
 }
 
-void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat )
+void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat )
 {
   DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleAddFrameBufferImageRequest(id:%u)\n", id);
@@ -313,7 +313,7 @@ void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, unsigned 
   bitmapMetadata.SetIsFramebuffer(true);
   mImpl->mBitmapMetadata.insert(BitmapMetadataPair(id, bitmapMetadata));
 
-  mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, width, height, pixelFormat );
+  mImpl->mTextureCacheDispatcher.DispatchCreateTextureForFrameBuffer( id, width, height, pixelFormat, bufferFormat );
 }
 
 void ResourceManager::HandleAddFrameBufferImageRequest( ResourceId id, NativeImageInterfacePtr nativeImage )
