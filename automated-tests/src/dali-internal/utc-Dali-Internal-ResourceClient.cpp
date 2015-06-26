@@ -35,7 +35,7 @@
 #include <dali/internal/event/images/resource-image-impl.h>
 #include <dali/integration-api/resource-cache.h>
 #include <dali/internal/render/gl-resources/texture-declarations.h>
-#include <dali/internal/render/shaders/shader.h>
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 #include <dali/internal/common/owner-pointer.h>
 #include <dali/internal/common/image-attributes.h>
 
@@ -1147,38 +1147,5 @@ int UtcDaliInternalAddFrameBufferImage(void)
   Integration::Bitmap* theBitmap = NULL;
   theBitmap = resourceClient.GetBitmap(imageTicket);
   DALI_TEST_CHECK ( theBitmap == NULL );
-  END_TEST;
-}
-
-int UtcDaliInternalAllocateMesh01(void)
-{
-  TestApplication application;
-  tet_infoline("Testing AllocateMesh() with vald mesh data");
-
-  MeshData publicMeshData;
-  MeshData::VertexContainer    vertices;
-  MeshData::FaceIndices        faces;
-  BoneContainer                bones;
-  ConstructVertices(vertices, 60);
-  ConstructFaces(vertices, faces);
-  Material customMaterial = ConstructMaterial();
-  publicMeshData.SetData(vertices, faces, bones, customMaterial);
-  publicMeshData.SetHasNormals(true);
-  publicMeshData.SetHasTextureCoords(true);
-
-  testTicketObserver.Reset();
-  Internal::ResourceClient& resourceClient  = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  Internal::OwnerPointer<Internal::MeshData> meshDataPtr( new Internal::MeshData( publicMeshData, ResourcePolicy::DISCARD, true ) );
-  Internal::ResourceTicketPtr meshTicket = resourceClient.AllocateMesh(meshDataPtr);
-  DALI_TEST_CHECK( meshTicket );
-  meshTicket->AddObserver( testTicketObserver );
-
-  DALI_TEST_EQUALS ( meshTicket->GetLoadingState(), ResourceLoading, TEST_LOCATION );
-
-  application.SendNotification(); // Flush update queue
-  application.Render(0); // Process message
-  application.SendNotification(); // Send message to tickets
-
-  DALI_TEST_EQUALS ( meshTicket->GetLoadingState(), ResourceLoadingSucceeded, TEST_LOCATION );
   END_TEST;
 }

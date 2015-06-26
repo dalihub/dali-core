@@ -28,7 +28,6 @@
 #include <dali/public-api/object/handle.h>
 #include <dali/public-api/object/property-index-ranges.h>
 #include <dali/public-api/signals/dali-signal.h>
-
 namespace Dali
 {
 
@@ -38,6 +37,7 @@ class Actor;
 }
 
 class Actor;
+class Renderer;
 struct Degree;
 class Quaternion;
 class Layer;
@@ -1345,6 +1345,50 @@ public: // Signals
    */
   OffStageSignalType& OffStageSignal();
 
+public: // Renderer
+
+  /**
+   * @brief Add a renderer to this actor.
+   *
+   * @pre The renderer must be initialized.
+   *
+   * @param[in] renderer Renderer to add to the actor
+   * @return The index of the Renderer that was added
+   */
+  unsigned int AddRenderer( Renderer& renderer );
+
+  /**
+   * @brief Get the number of renderers on this actor.
+   *
+   * @return the number of renderers on this actor
+   */
+  unsigned int GetRendererCount() const;
+
+  /**
+   * @brief Get a Renderer by index.
+   *
+   * @pre The index must be between 0 and GetRendererCount()-1
+   *
+   * @param[in] index The index of the renderer to fetch
+   * @return The renderer at the specified index
+   */
+  Renderer GetRendererAt( unsigned int index );
+
+  /**
+   * @brief Remove an renderer from the actor.
+   *
+   * @param[in] renderer Handle to the renderer that is to be removed
+   */
+  void RemoveRenderer( Renderer& renderer );
+
+  /**
+   * @brief Remove an renderer from the actor by index.
+   *
+   * @pre The index must be between 0 and GetRendererCount()-1
+   *
+   * @param[in] index Index of the renderer that is to be removed
+   */
+  void RemoveRenderer( unsigned int index );
   /**
    * @brief This signal is emitted after the size has been set on the actor during relayout
    *

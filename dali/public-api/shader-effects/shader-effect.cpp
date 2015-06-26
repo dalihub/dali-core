@@ -28,14 +28,6 @@ namespace Dali
 {
 const float ShaderEffect::DEFAULT_GRID_DENSITY = 40;
 
-ShaderEffect::Extension::Extension()
-{
-}
-
-ShaderEffect::Extension::~Extension()
-{
-}
-
 ShaderEffect::ShaderEffect()
 {
 }
@@ -60,11 +52,12 @@ ShaderEffect& ShaderEffect::operator=(const ShaderEffect& rhs)
   return *this;
 }
 
-ShaderEffect ShaderEffect::New( const std::string& vertexShader, const std::string& fragmentShader, GeometryType type, GeometryHints hints)
+ShaderEffect ShaderEffect::New( const std::string& vertexShader, const std::string& fragmentShader, GeometryHints hints)
 {
+  // @todo MESH_REWORK - Assert only image geometry type is passed.
   Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
 
-  internal->SetPrograms( type, vertexShader, fragmentShader );
+  internal->SetPrograms( vertexShader, fragmentShader );
 
   return ShaderEffect( internal.Get() );
 }
@@ -73,12 +66,12 @@ ShaderEffect ShaderEffect::NewWithPrefix( const std::string& vertexShaderPrefix,
                                           const std::string& vertexShader,
                                           const std::string& fragmentShaderPrefix,
                                           const std::string& fragmentShader,
-                                          GeometryType type,
                                           GeometryHints hints)
 {
+  // @todo MESH_REWORK - Assert only image geometry type is passed.
   Internal::ShaderEffectPtr internal = Internal::ShaderEffect::New( hints );
 
-  internal->SetPrograms( type, vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
+  internal->SetPrograms( vertexShaderPrefix, fragmentShaderPrefix, vertexShader, fragmentShader );
 
   return ShaderEffect( internal.Get() );
 }
@@ -121,21 +114,6 @@ void ShaderEffect::SetUniform( const std::string& name, const Matrix& value, Uni
 void ShaderEffect::SetUniform( const std::string& name, const Matrix3& value, UniformCoordinateType uniformCoordinateType )
 {
   GetImplementation(*this).SetUniform( name, value, uniformCoordinateType );
-}
-
-void ShaderEffect::AttachExtension( ShaderEffect::Extension *object )
-{
-  GetImplementation(*this).AttachExtension( object );
-}
-
-ShaderEffect::Extension& ShaderEffect::GetExtension()
-{
-  return GetImplementation(*this).GetExtension();
-}
-
-const ShaderEffect::Extension& ShaderEffect::GetExtension() const
-{
-  return GetImplementation(*this).GetExtension();
 }
 
 } // namespace Dali

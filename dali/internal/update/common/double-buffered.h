@@ -19,9 +19,7 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/math/matrix.h>
-#include <dali/public-api/math/quaternion.h>
-#include <dali/public-api/math/vector3.h>
+#include <dali/internal/common/owner-pointer.h>
 
 namespace Dali
 {
@@ -85,6 +83,142 @@ private:
   T mValue1;
   T mValue2;
 };
+
+/**
+ * @brief Specialization for owner-pointer
+ *
+ * This class takes ownership of the pointers and releases the memory when the pointer
+ * is no longer used by either buffer
+ */
+template <typename T>
+class DoubleBuffered< OwnerPointer< T > >
+{
+public:
+
+  /**
+   * Class that deals with setting a value
+   */
+  class Setter
+  {
+  public:
+    /**
+     * @brief Assignment operator to that a value that will later
+     * be set in the correct buffer index of the object referenced by the setter.
+     */
+    Setter& operator=( T* value )
+    {
+      mValue = value;
+      return *this;
+    }
+
+    ~Setter()
+    {
+      mObject.Set( mIndex, mValue );
+    }
+
+  private:
+    Setter( DoubleBuffered& object,
+            size_t i,
+            T* value )
+    : mObject( object ),
+      mIndex( i ),
+      mValue( value )
+    {
+    }
+
+    Setter( const Setter& rhs )
+    : mObject( rhs.mObject ),
+      mIndex( rhs.mIndex ),
+      mValue( rhs.mValue )
+    {
+    }
+
+    DoubleBuffered& mObject; ///< Double-buffered object that will be changed
+    const size_t mIndex;                          ///< Buffer index that will be changed
+    T* mValue;                                    ///< Value of the pointer
+
+    friend class DoubleBuffered;
+  };
+
+  DoubleBuffered()
+  : mValue1( NULL ),
+    mValue2( NULL )
+  {
+  }
+
+  DoubleBuffered(T* val)
+  : mValue1( val ),
+    mValue2( val )
+  {
+  }
+
+  ~DoubleBuffered()
+  {
+    if( mValue2 != mValue1 )
+    {
+      delete mValue2;
+    }
+    delete mValue1;
+  }
+
+  void Set( size_t i, T* value )
+  {
+    T*& current = *(&mValue1 + i);
+    T*& previous = *(&mValue1 + 1u-i);
+
+    if( current != value && current != previous )
+    {
+      delete current;
+    }
+    current = value;
+  }
+
+  Setter operator[](size_t i)
+  {
+    return Setter( *this, i, *(&mValue1+i) );
+  }
+
+  const T* operator[](size_t i) const
+  {
+    DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
+
+    return *(&mValue1+i);
+  }
+
+  /**
+   * Auto-age the property: if it was set the previous frame,
+   * then copy the value into the current frame's buffer.
+   */
+  void CopyPrevious( size_t i )
+  {
+    DALI_ASSERT_DEBUG(i < NUM_SCENE_GRAPH_BUFFERS);
+
+    T*& current = *(&mValue1 + i);
+    T*& previous = *(&mValue1 + 1u-i);
+
+    if( current != previous )
+    {
+      delete current;
+    }
+
+    current = previous;
+  }
+
+private:
+
+  // Undefined
+  DoubleBuffered(const DoubleBuffered&);
+
+  // Undefined
+  DoubleBuffered& operator=(const DoubleBuffered& rhs);
+
+private:
+
+  T* mValue1;
+  T* mValue2;
+
+};
+
 
 } // namespace SceneGraph
 

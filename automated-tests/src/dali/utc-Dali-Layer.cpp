@@ -250,7 +250,7 @@ int UtcDaliLayerGetClippingBox(void)
 
 static int gTestSortFunctionCalled;
 
-static float TestSortFunction(const Vector3& /*position*/, float /*sortModifier*/)
+static float TestSortFunction(const Vector3& /*position*/)
 {
   ++gTestSortFunctionCalled;
   return 0.0f;
@@ -444,6 +444,7 @@ int UtcDaliLayerDefaultProperties(void)
   std::vector<Property::Index> indices;
   indices.push_back(Layer::Property::CLIPPING_ENABLE);
   indices.push_back(Layer::Property::CLIPPING_BOX);
+  indices.push_back(Layer::Property::BEHAVIOR);
 
   DALI_TEST_CHECK(actor.GetPropertyCount() == ( Actor::New().GetPropertyCount() + indices.size() ) );
 
@@ -474,6 +475,10 @@ int UtcDaliLayerDefaultProperties(void)
 
   DALI_TEST_CHECK( actor.GetClippingBox() == testBox );
 
+
+  Property::Value behavior = actor.GetProperty(Layer::Property::BEHAVIOR);
+  DALI_TEST_CHECK( std::strcmp( behavior.Get<std::string>().c_str(), "LAYER_2D") );
+
   END_TEST;
 }
 
@@ -483,7 +488,9 @@ int UtcDaliLayerSetDepthTestDisabled(void)
   tet_infoline("Testing Dali::Layer::SetDepthTestDisabled() ");
 
   Layer actor = Layer::New();
+  DALI_TEST_CHECK( actor.IsDepthTestDisabled() );
 
+  actor.SetBehavior( Layer::LAYER_3D );
   DALI_TEST_CHECK( !actor.IsDepthTestDisabled() );
 
   actor.SetDepthTestDisabled( true );
@@ -559,5 +566,16 @@ int UtcDaliLayerClippingGLCalls(void)
   DALI_TEST_EQUALS( testBox.y, stage.GetSize().height - glScissorParams.y - testBox.height, TEST_LOCATION ); // GL Coordinates are from bottom left
   DALI_TEST_EQUALS( testBox.width, glScissorParams.width, TEST_LOCATION );
   DALI_TEST_EQUALS( testBox.height, glScissorParams.height, TEST_LOCATION );
+  END_TEST;
+}
+
+int UtcDaliLayerBehaviour(void)
+{
+  TestApplication application;
+  Layer layer = Layer::New();
+
+  DALI_TEST_EQUALS( layer.GetBehavior(), Dali::Layer::LAYER_2D, TEST_LOCATION );
+  layer.SetBehavior( Dali::Layer::LAYER_3D );
+  DALI_TEST_EQUALS( layer.GetBehavior(), Dali::Layer::LAYER_3D, TEST_LOCATION );
   END_TEST;
 }

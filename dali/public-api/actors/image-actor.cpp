@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/images/image-impl.h>
+#include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/public-api/common/dali-common.h>
 
 namespace Dali
@@ -119,9 +120,151 @@ Vector4 ImageActor::GetNinePatchBorder() const
   return GetImplementation(*this).GetNinePatchBorder();
 }
 
+void ImageActor::SetSortModifier(float modifier)
+{
+  GetImplementation(*this).SetSortModifier(modifier);
+}
+
+float ImageActor::GetSortModifier() const
+{
+  return GetImplementation(*this).GetSortModifier();
+}
+
+void ImageActor::SetCullFace(const CullFaceMode mode)
+{
+  GetImplementation(*this).SetCullFace(mode);
+}
+
+CullFaceMode ImageActor::GetCullFace() const
+{
+  return GetImplementation(*this).GetCullFace();
+}
+
+void ImageActor::SetBlendMode( BlendingMode::Type mode )
+{
+  GetImplementation(*this).SetBlendMode( mode );
+}
+
+BlendingMode::Type ImageActor::GetBlendMode() const
+{
+  return GetImplementation(*this).GetBlendMode();
+}
+
+void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba, BlendingFactor::Type destFactorRgba )
+{
+  GetImplementation(*this).SetBlendFunc( srcFactorRgba, destFactorRgba );
+}
+
+void ImageActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
+                                    BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
+{
+  GetImplementation(*this).SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+}
+
+void ImageActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
+                                    BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
+{
+  GetImplementation(*this).GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
+}
+
+void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgba )
+{
+  GetImplementation(*this).SetBlendEquation( equationRgba );
+}
+
+void ImageActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
+{
+  GetImplementation(*this).SetBlendEquation( equationRgb, equationAlpha );
+}
+
+void ImageActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
+{
+  GetImplementation(*this).GetBlendEquation( equationRgb, equationAlpha );
+}
+
+void ImageActor::SetBlendColor( const Vector4& color )
+{
+  GetImplementation(*this).SetBlendColor( color );
+}
+
+const Vector4& ImageActor::GetBlendColor() const
+{
+  return GetImplementation(*this).GetBlendColor();
+}
+
+void ImageActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
+{
+  GetImplementation(*this).SetFilterMode( minFilter, magFilter );
+}
+
+void ImageActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
+{
+  GetImplementation(*this).GetFilterMode( minFilter, magFilter );
+}
+
+void ImageActor::SetShaderEffect(ShaderEffect effect)
+{
+  GetImplementation(*this).SetShaderEffect(GetImplementation(effect));
+}
+
+ShaderEffect ImageActor::GetShaderEffect() const
+{
+  Internal::ShaderEffectPtr internal = GetImplementation(*this).GetShaderEffect();
+
+  return ShaderEffect(internal.Get());
+}
+
+void ImageActor::RemoveShaderEffect()
+{
+  GetImplementation(*this).RemoveShaderEffect();
+}
+
+
 ImageActor::ImageActor(Internal::ImageActor* internal)
 : RenderableActor(internal)
 {
+}
+
+void SetShaderEffectRecursively( Actor actor, ShaderEffect effect )
+{
+  // only do something if the actor and effect are valid
+  if( actor && effect )
+  {
+    // first remove from this actor
+    ImageActor imageActor = ImageActor::DownCast( actor );
+    if( imageActor )
+    {
+      imageActor.SetShaderEffect( effect );
+    }
+    // then all children recursively
+    const unsigned int count = actor.GetChildCount();
+    for( unsigned int index = 0; index < count; ++index )
+    {
+      Actor child( actor.GetChildAt( index ) );
+      SetShaderEffectRecursively( child, effect );
+    }
+  }
+}
+
+void RemoveShaderEffectRecursively( Actor actor )
+{
+  // only do something if the actor is valid
+  if( actor )
+  {
+    // first remove from this actor
+    ImageActor imageActor = ImageActor::DownCast( actor );
+    if( imageActor )
+    {
+      imageActor.RemoveShaderEffect();
+    }
+    // then all children recursively
+    const unsigned int count = actor.GetChildCount();
+    for( unsigned int index = 0; index < count; ++index )
+    {
+      Actor child( actor.GetChildAt( index ) );
+      RemoveShaderEffectRecursively( child );
+    }
+  }
 }
 
 } // namespace Dali

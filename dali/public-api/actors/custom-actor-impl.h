@@ -90,8 +90,10 @@ public:
    *     B   C
    *    / \   \
    *   D   E   F
+   *
+   *   @param[in] depth The depth in the hierarchy for the actor
    */
-  virtual void OnStageConnection() = 0;
+  virtual void OnStageConnection( unsigned int depth ) = 0;
 
   /**
    * @brief Called after the actor has been disconnected from the stage.

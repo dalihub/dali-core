@@ -23,6 +23,7 @@
 #include <dali/public-api/math/vector4.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/message.h>
+#include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/render/gl-resources/gl-resource-owner.h>
 #include <dali/internal/render/renderers/scene-graph-renderer-declarations.h>
 #include <dali/integration-api/debug.h>
@@ -42,7 +43,7 @@ namespace SceneGraph
 class SceneController;
 class Shader;
 class TextureCache;
-class RenderDataProvider;
+class NodeDataProvider;
 
 /**
  * Renderers are used to render images, text, & meshes etc.
@@ -56,7 +57,6 @@ public:
   /**
    * Second-phase construction.
    * This is called when the renderer is inside render thread
-   * @param[in] context to use
    * @param[in] textureCache to use
    */
   void Initialize( Context& context, TextureCache& textureCache );
@@ -110,6 +110,8 @@ public:
 
   /**
    * Called to render during RenderManager::Render().
+   * @param[in] context The context used for rendering
+   * @param[in] textureCache The texture cache used to get textures
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] defaultShader in case there is no custom shader
    * @param[in] modelViewMatrix The model-view matrix.
@@ -118,7 +120,9 @@ public:
    * @param[in] frametime The elapsed time between the last two updates.
    * @param[in] cull Whether to frustum cull this renderer
    */
-  void Render( BufferIndex bufferIndex,
+  void Render( Context& context,
+               TextureCache& textureCache,
+               BufferIndex bufferIndex,
                Shader& defaultShader,
                const Matrix& modelViewMatrix,
                const Matrix& viewMatrix,
@@ -127,12 +131,11 @@ public:
                bool cull );
 
 protected:
-
   /**
    * Protected constructor; only derived classes can be instantiated.
    * @param dataprovider for rendering
    */
-  Renderer( RenderDataProvider& dataprovider );
+  Renderer( NodeDataProvider& dataprovider );
 
 private:
 
@@ -150,42 +153,55 @@ private:
   virtual bool CheckResources() = 0;
 
   /**
-   * Resolve the derived renderers geometry type and subtype
-   * @param[in] bufferIndex The index of the previous update buffer.
-   * @param[out] outType    The geometry type
-   * @param[out] outSubType The geometry subtype
-   */
-  virtual void ResolveGeometryTypes( BufferIndex bufferIndex, GeometryType& outType, ShaderSubTypes& outSubType ) = 0;
-
-  /**
    * Checks if renderer is culled.
    * @param[in] modelMatrix The model matrix.
    * @param[in] modelViewProjectionMatrix The MVP matrix.
    * @return \e true if it is. Otherwise \e false.
    */
-  virtual bool IsOutsideClipSpace( const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix ) = 0;
+  virtual bool IsOutsideClipSpace( Context& context, const Matrix& modelMatrix, const Matrix& modelViewProjectionMatrix ) = 0;
+
+  /**
+   * Called from Render prior to DoRender().
+   * @todo MESH_REWORK Remove after merge
+   */
+  virtual void DoSetUniforms( Context& context, BufferIndex bufferIndex, Shader* shader, Program* program );
+
+  /**
+   * Called from Render prior to DoRender(). Default method to set CullFaceMode
+   * @todo MESH_REWORK Remove after merge
+   */
+  virtual void DoSetCullFaceMode( Context& context, BufferIndex bufferIndex );
+
+  /**
+   * Called from Render prior to DoRender(). Default method to set blending options
+   * @todo MESH_REWORK Remove after merge
+   */
+  virtual void DoSetBlending( Context& context, BufferIndex bufferIndex );
 
   /**
    * Called from Render; implemented in derived classes.
+   * @param[in] context The context used for rendering
+   * @param[in] textureCache The texture cache used to get textures
    * @param[in] bufferIndex The index of the previous update buffer.
    * @param[in] program to use.
    * @param[in] modelViewMatrix The model-view matrix.
    * @param[in] viewMatrix The view matrix.
    */
-  virtual void DoRender( BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix ) = 0;
+  virtual void DoRender( Context& context, TextureCache& textureCache, BufferIndex bufferIndex, Program& program, const Matrix& modelViewMatrix, const Matrix& viewMatrix ) = 0;
 
 protected:
 
-  RenderDataProvider& mDataProvider;
-  Context* mContext;
-  TextureCache* mTextureCache;
+  NodeDataProvider& mDataProvider;        // @todo MESH_REWORK rename to mNodeDataProvider. Shouldn't it be const?
+
+  Context* mContextDELETEME; // TODO: MESH_REWORK DELETE THIS
+  TextureCache* mTextureCacheDELETEME; // TODO: MESH_REWORK DELETE THIS
   Shader* mShader;
   unsigned int mSamplerBitfield;          ///< Sampler options used for texture filtering
 
+  bool mUseBlend:1;                 ///< True if blending should be enabled, 1 bit is enough
 private:
 
   BlendingOptions mBlendingOptions;
-  bool mUseBlend:1;                 ///< True if blending should be enabled, 1 bit is enough
   CullFaceMode mCullFaceMode:3;     ///< cullface enum, 3 bits is enough
 };
 

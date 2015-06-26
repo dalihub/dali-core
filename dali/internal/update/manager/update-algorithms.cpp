@@ -81,6 +81,20 @@ void ConstrainNodes( Node& node, BufferIndex updateBufferIndex )
 {
   ConstrainPropertyOwner( node, updateBufferIndex );
 
+  if( node.HasAttachment() )
+  {
+    // @todo MESH_REWORK Remove dynamic cast.
+    // (Or, if RendererAttachment split into RendererPropertyOwner(?),
+    // do as separate pass as per other mesh objects - see also
+    // UpdateManager::ResetNodeProperty())
+    NodeAttachment& attachment = node.GetAttachment();
+    PropertyOwner* propertyOwner = dynamic_cast< PropertyOwner* >( &attachment );
+    if( propertyOwner != NULL )
+    {
+      ConstrainPropertyOwner( *propertyOwner, updateBufferIndex );
+    }
+  }
+
   /**
    *  Constrain the children next
    */
@@ -121,25 +135,6 @@ inline void UpdateNodeOpacity( Node& node, int nodeDirtyFlags, BufferIndex updat
   {
     // Copy inherited value, if changed in the previous frame
     node.CopyPreviousWorldColor( updateBufferIndex );
-  }
-}
-
-inline void UpdateNodeGeometry( Node &node, int nodeDirtyFlags, BufferIndex updateBufferIndex )
-{
-  if ( nodeDirtyFlags & SizeFlag )
-  {
-    Vector3 geometryScale( 1.0f, 1.0f, 1.0f );
-
-    if ( node.GetTransmitGeometryScaling() )
-    {
-      const Vector3& requiredSize = node.GetSize( updateBufferIndex );
-      geometryScale = FitKeepAspectRatio( requiredSize, node.GetInitialVolume() );
-    }
-
-    if ( node.GetGeometryScale() != geometryScale )
-    {
-      node.SetGeometryScale( geometryScale );
-    }
   }
 }
 
@@ -242,7 +237,7 @@ inline void UpdateNodeWorldMatrix( Node& node, RenderableAttachment& updatedRend
   {
     if( updatedRenderable.UsesGeometryScaling() )
     {
-      // scaling, i.e. Mesh
+      // TODO: MESH_REWORK : remove scale for size
       Vector3 scaling;
       updatedRenderable.GetScaleForSize( node.GetSize( updateBufferIndex ), scaling );
       if( node.GetInhibitLocalTransform() )
@@ -373,8 +368,6 @@ inline int UpdateNodesAndAttachments( Node& node,
   DALI_ASSERT_DEBUG( NULL != layer );
 
   UpdateNodeOpacity( node, nodeDirtyFlags, updateBufferIndex );
-
-  UpdateNodeGeometry( node, nodeDirtyFlags, updateBufferIndex );
 
   // Note: nodeDirtyFlags are passed in by reference and may be modified by the following function.
   // It is important that the modified version of these flags are used by the RenderableAttachment.

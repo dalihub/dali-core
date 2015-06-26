@@ -22,17 +22,18 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/common/vector-wrapper.h>
-#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/actor.h>
+#include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/events/gesture.h>
 #include <dali/public-api/math/viewport.h>
-#include <dali/internal/event/common/object-impl.h>
+#include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/size-negotiation/relayout-container.h>
-#include <dali/internal/event/common/stage-def.h>
 #include <dali/internal/event/actors/actor-declarations.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>
+#include <dali/internal/event/common/object-impl.h>
+#include <dali/internal/event/common/stage-def.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 
 #ifdef DALI_DYNAMICS_SUPPORT
@@ -54,6 +55,7 @@ class Actor;
 class ActorGestureData;
 class Animation;
 class RenderTask;
+class Renderer;
 struct DynamicsData;
 
 typedef IntrusivePtr< Actor > ActorPtr;
@@ -712,28 +714,6 @@ public:
   bool IsOverlay() const;
 
   /**
-   * Sets whether an actor transmits geometry scaling to it's children.
-   * The default value is for it not to transmit scaling.
-   * @param[in] transmitGeometryScaling True to transmit scaling.
-   */
-  void SetTransmitGeometryScaling( bool transmitGeometryScaling );
-
-  /**
-   * Get the TransmitGeometryScaling property for this actor.
-   * @return True if geometry scaling is applied to the inherited scale.
-   */
-  bool GetTransmitGeometryScaling() const;
-
-  /**
-   * Sets the initial volume of the actor. Used for scaling the
-   * actor appropriately as the actor is sized when transmitGeometryScaling
-   * is set to true.
-   *
-   * @param[in] volume the volume of the model and it's children
-   */
-  void SetInitialVolume( const Vector3& volume );
-
-  /**
    * Sets the actor's color.  The final color of actor depends on its color mode.
    * This final color is applied to the drawable elements of an actor.
    * @param [in] color The new color.
@@ -1219,6 +1199,31 @@ public:
    * @copydoc Dali::Actor::GetMaximumSize
    */
   float GetMaximumSize( Dimension::Type dimension ) const;
+  
+  /**
+   * @copydoc Dali::Actor::AddRenderer()
+   */
+  unsigned int AddRenderer( Renderer& renderer );
+
+  /**
+   * @copydoc Dali::Actor::GetRendererCount()
+   */
+  unsigned int GetRendererCount() const;
+
+  /**
+   * @copydoc Dali::Actor::GetRendererAt()
+   */
+  Renderer& GetRendererAt( unsigned int index );
+
+  /**
+   * @copydoc Dali::Actor::RemoveRenderer()
+   */
+  void RemoveRenderer( Renderer& renderer );
+
+  /**
+   * @copydoc Dali::Actor::RemoveRenderer()
+   */
+  void RemoveRenderer( unsigned int index );
 
 #ifdef DALI_DYNAMICS_SUPPORT
 
@@ -1576,17 +1581,19 @@ protected:
   /**
    * Called on a child during Add() when the parent actor is connected to the Stage.
    * @param[in] stage The stage.
+   * @param[in] parentDepth The depth of the parent in the hierarchy
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
    */
-  void ConnectToStage( int index = -1 );
+  void ConnectToStage( unsigned int parentDepth, int index = -1 );
 
   /**
    * Helper for ConnectToStage, to recursively connect a tree of actors.
    * This is atomic i.e. not interrupted by user callbacks.
    * @param[in] index If set, it is only used for positioning the actor within the parent's child list.
+   * @param[in] depth The depth in the hierarchy of the actor
    * @param[out] connectionList On return, the list of connected actors which require notification.
    */
-  void RecursiveConnectToStage( ActorContainer& connectionList, int index = -1 );
+  void RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth, int index = -1 );
 
   /**
    * Connect the Node associated with this Actor to the scene-graph.
@@ -1635,6 +1642,17 @@ protected:
    * @return Return the Z dimension for this size
    */
   float CalculateSizeZ( const Vector2& size ) const;
+
+  /**
+   * Return the depth in the hierarchy of the actor.
+   * The value returned is only valid if the actor is on the stage.
+   *
+   * @return Depth of the actor in the hierarchy
+   */
+  unsigned int GetDepth() const
+  {
+    return mDepth;
+  }
 
 public:
   // Default property extensions from Object
@@ -1773,7 +1791,7 @@ private:
    * For use in external (CustomActor) derived classes.
    * This is called after the atomic ConnectToStage() traversal has been completed.
    */
-  virtual void OnStageConnectionExternal()
+  virtual void OnStageConnectionExternal( unsigned int depth )
   {
   }
 
@@ -1857,7 +1875,6 @@ private:
 
 protected:
 
-  StagePtr mStage;                ///< Used to send messages to Node; valid until Core destruction
   Actor* mParent;                 ///< Each actor (except the root) can have one parent
   ActorContainer* mChildren;      ///< Container of referenced actors
   const SceneGraph::Node* mNode;  ///< Not owned
@@ -1889,6 +1906,7 @@ protected:
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
 
+  unsigned int mDepth                              :12; ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsRenderable                         : 1; ///< Flag to identify that this is a renderable actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer

@@ -82,7 +82,7 @@ public:
    * @param size Specifies the size in bytes of the buffer object's new data store.
    * @param data pointer to the data to load
    */
-  void UpdateDataBuffer(GLsizeiptr size,const GLvoid *data);
+  void UpdateDataBuffer(GLsizeiptr size, const GLvoid *data);
 
   /**
    * Bind the buffer object to the target
@@ -104,6 +104,16 @@ public:
     return mSize;
   }
 
+  void SetStride( GLuint stride )
+  {
+    mStride = stride;
+  }
+
+  GLuint GetStride()
+  {
+    return mStride;
+  }
+
   /**
    * Needs to be called when GL context is destroyed
    */
@@ -123,6 +133,7 @@ private: // Data
   GLsizeiptr         mCapacity;            ///< buffer capacity
   GLsizeiptr         mSize;                ///< buffer size
   GLuint             mBufferId;            ///< buffer object name(id)
+  GLuint             mStride;              ///< stride of data in buffer object
 
   Target             mTarget:2;            ///< type of buffer (array/element), 2 bits are enough
   Usage              mUsage:2;             ///< how the buffer is used (read, read/write etc), 2 bits are enough

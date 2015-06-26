@@ -178,7 +178,7 @@ public:
    * Returns a const pointer to the object owned.
    * @return a const pointer to the object.
    */
-  const T* Get()
+  const T* Get() const
   {
     return mObject;
   }

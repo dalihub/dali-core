@@ -1740,10 +1740,10 @@ int UtcDaliPanGestureAngleHandling(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
 
   detector.AddAngle( PanGestureDetector::DIRECTION_LEFT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 1u, TEST_LOCATION );
   bool found = false;
   for( size_t i = 0; i < detector.GetAngleCount(); i++)
   {
@@ -1762,14 +1762,14 @@ int UtcDaliPanGestureAngleHandling(void)
   }
 
   detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2u, TEST_LOCATION );
 
   // Remove something not in the container.
   detector.RemoveAngle( PanGestureDetector::DIRECTION_UP );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2u, TEST_LOCATION );
 
   detector.RemoveAngle( PanGestureDetector::DIRECTION_RIGHT );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 1, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 1u, TEST_LOCATION );
   for ( size_t i = 0; i < detector.GetAngleCount(); i++)
   {
     if ( detector.GetAngle(i).first == PanGestureDetector::DIRECTION_RIGHT )
@@ -1781,7 +1781,7 @@ int UtcDaliPanGestureAngleHandling(void)
   }
 
   detector.ClearAngles();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
   END_TEST;
 }
 
@@ -1795,7 +1795,7 @@ int UtcDaliPanGestureAngleOutOfRange(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
 
   //
   // Angle
@@ -1928,10 +1928,10 @@ int UtcDaliPanGestureDirectionHandling(void)
   TestApplication application;
 
   PanGestureDetector detector = PanGestureDetector::New();
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
 
   detector.AddDirection( PanGestureDetector::DIRECTION_LEFT, Radian( Math::PI * 0.25 ) );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2u, TEST_LOCATION );
   bool found = false;
   for ( size_t i = 0; detector.GetAngleCount(); i++)
   {
@@ -1969,10 +1969,10 @@ int UtcDaliPanGestureDirectionHandling(void)
 
   // Remove something not in the container.
   detector.RemoveDirection( PanGestureDetector::DIRECTION_UP );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2u, TEST_LOCATION );
 
   detector.RemoveDirection( PanGestureDetector::DIRECTION_RIGHT );
-  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0u, TEST_LOCATION );
   END_TEST;
 }
 

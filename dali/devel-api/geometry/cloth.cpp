@@ -19,7 +19,6 @@
 #include <dali/devel-api/geometry/cloth.h>
 
 // INTERNAL INCLUDES
-#include <dali/devel-api/geometry/mesh-factory.h>
 #include <dali/internal/event/modeling/cloth-impl.h>
 
 namespace Dali
@@ -39,7 +38,6 @@ Cloth::~Cloth()
 }
 
 Cloth::Cloth(const Cloth& handle)
-: Mesh(handle)
 {
 }
 
@@ -51,9 +49,10 @@ Cloth& Cloth::operator=(const Cloth& rhs)
 
 Cloth Cloth::New( const float width, const float height, const int xSteps, const int ySteps, const Rect<float>& textureCoordinates )
 {
-  MeshData meshData( MeshFactory::NewPlane(width, height, xSteps, ySteps, textureCoordinates) );
+  Dali::Geometry geometry;
+  //TODO: MESH_REWORK: create the geometry
 
-  Internal::ClothIPtr clothPtr = Internal::Cloth::New( meshData );
+  Internal::ClothIPtr clothPtr = Internal::Cloth::New( GetImplementation(geometry) );
   return Cloth( clothPtr.Get() );
 }
 
@@ -63,7 +62,6 @@ Cloth Cloth::DownCast( BaseHandle handle )
 }
 
 Cloth::Cloth(Internal::Cloth* internal)
-: Mesh(internal)
 {
 }
 

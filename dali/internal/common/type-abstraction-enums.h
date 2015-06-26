@@ -36,8 +36,6 @@ namespace Internal
 
 template <> struct ParameterType< CullFaceMode > : public BasicType< CullFaceMode > {};
 template <> struct ParameterType< BlendingMode::Type > : public BasicType< BlendingMode::Type > {};
-template <> struct ParameterType< GeometryType > : public BasicType< GeometryType > {};
-template <> struct ParameterType< ShaderSubTypes > : public BasicType< ShaderSubTypes > {};
 
 } //namespace Internal
 

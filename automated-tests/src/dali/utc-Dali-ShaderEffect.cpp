@@ -44,10 +44,6 @@ static const char* FragmentSource =
 "This is a custom fragment shader\n"
 "made on purpose to look nothing like a normal fragment shader inside dali\n";
 
-static const char* FragmentSourceUsingExtensions =
-"This is a custom fragment shader using extensions\n"
-"made on purpose to look nothing like a normal fragment shader inside dali\n";
-
 const int GETSOURCE_BUFFER_SIZE = 0x10000;
 
 
@@ -91,29 +87,6 @@ struct TestConstraintToVector3Double
   }
 
   Vector3 mTarget;
-};
-
-class ShaderEffectExtension : public ShaderEffect::Extension {};
-
-
-class TestExtension : public ShaderEffect::Extension
-{
-public:
-  TestExtension( bool& deleted )
-  : mDeleted(deleted)
-  {
-    mDeleted = false;
-  }
-  ~TestExtension()
-  {
-    mDeleted = true;
-  }
-  bool IsAlive() const
-  {
-    return !mDeleted;
-  }
-private:
-  bool& mDeleted;
 };
 
 static const char* TestImageFilename = "icon_wrt.png";
@@ -162,76 +135,12 @@ int UtcDaliShaderEffectMethodNew02(void)
   END_TEST;
 }
 
-int UtcDaliShaderEffectMethodNew04(void)
-{
-  TestApplication application;
-  tet_infoline("Testing prefixed version of Dali::ShaderEffect::New()");
-
-  std::string fragmentShaderPrefix = "#define TEST_FS 1\n#extension GL_OES_standard_derivatives : enable";
-  std::string vertexShaderPrefix = "#define TEST_VS 1";
-
-  try
-  {
-    // Call render to compile default shaders.
-    application.SendNotification();
-    application.Render();
-    application.Render();
-    application.Render();
-
-    GLuint lastShaderCompiledBefore = application.GetGlAbstraction().GetLastShaderCompiled();
-    ShaderEffect effect = ShaderEffect::NewWithPrefix( vertexShaderPrefix, VertexSource,
-                                                       fragmentShaderPrefix, FragmentSourceUsingExtensions,
-                                                       GEOMETRY_TYPE_IMAGE, ShaderEffect::HINT_NONE );
-
-    BufferImage image = CreateBufferImage();
-    ImageActor actor = ImageActor::New( image );
-    actor.SetSize( 100.0f, 100.0f );
-    actor.SetName("TestImageFilenameActor");
-    actor.SetShaderEffect(effect);
-    Stage::GetCurrent().Add(actor);
-
-    application.SendNotification();
-    application.Render();
-    GLuint lastShaderCompiledAfter = application.GetGlAbstraction().GetLastShaderCompiled();
-    bool testResult = false;
-
-    // we should have compiled 2 shaders.
-    DALI_TEST_EQUALS( lastShaderCompiledAfter, lastShaderCompiledBefore + 2, TEST_LOCATION );
-
-    char testVertexSourceResult[GETSOURCE_BUFFER_SIZE];
-    char testFragmentSourceResult[GETSOURCE_BUFFER_SIZE];
-
-     // we are interested in the first two.
-    GLuint vertexShaderId = lastShaderCompiledBefore + 1;
-    GLuint fragmentShaderId = lastShaderCompiledBefore + 2;
-
-    GLsizei lengthVertexResult;
-    GLsizei lengthFragmentResult;
-
-    application.GetGlAbstraction().GetShaderSource(vertexShaderId, GETSOURCE_BUFFER_SIZE, &lengthVertexResult, testVertexSourceResult);
-    application.GetGlAbstraction().GetShaderSource(fragmentShaderId, GETSOURCE_BUFFER_SIZE, &lengthFragmentResult, testFragmentSourceResult);
-
-    int vertexShaderHasPrefix = strncmp(testVertexSourceResult, "#define ", strlen("#define "));
-    int fragmentShaderHasPrefix = strncmp(testFragmentSourceResult, "#define ", strlen("#define "));
-    testResult = (vertexShaderHasPrefix == 0) && (fragmentShaderHasPrefix == 0);
-
-    DALI_TEST_CHECK(testResult);
-  }
-  catch(Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    tet_result( TET_FAIL );
-  }
-  END_TEST;
-}
-
 int UtcDaliShaderEffectMethodNew05(void)
 {
   TestApplication application;
 
   // heap constructor / destructor
   DefaultFunctionCoverage<ShaderEffect> shaderEffect;
-  DefaultFunctionCoverage<ShaderEffectExtension> shaderEffectExtension;
 
   END_TEST;
 }
@@ -801,91 +710,6 @@ int UtcDaliShaderEffectMethodRemoveConstraints2(void)
   END_TEST;
 }
 
-int UtcDaliShaderEffectMethodCreateExtension(void)
-{
-  // Test creation of a shader extension
-  TestApplication aplication;
-
-  bool deleted;
-  {
-    ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
-    DALI_TEST_CHECK( effect );
-
-    TestExtension* extension = new TestExtension ( deleted );
-
-    effect.AttachExtension( extension );
-
-    DALI_TEST_CHECK( static_cast<TestExtension&>(effect.GetExtension()).IsAlive() );
-  }
-
-  DALI_TEST_CHECK( deleted );
-  END_TEST;
-}
-
-int UtcDaliShaderEffectMethodCreateExtension2(void)
-{
-  // Test creation of a shader extension
-  bool deleted;
-  {
-    TestApplication application;
-
-    ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
-    DALI_TEST_CHECK( effect );
-
-    BufferImage image = CreateBufferImage();
-
-    effect.SetUniform( "uFloat", 1.0f );
-
-    ImageActor actor = ImageActor::New( image );
-    actor.SetSize( 100.0f, 100.0f );
-    actor.SetName("TestImageFilenameActor");
-    actor.SetShaderEffect(effect);
-    Stage::GetCurrent().Add(actor);
-
-    application.SendNotification();
-    application.Render();
-
-    TestExtension* extension = new TestExtension ( deleted );
-
-    effect.AttachExtension( extension );
-
-    const ShaderEffect& constEffect(effect);
-    const TestExtension& ext( static_cast<const TestExtension&>(constEffect.GetExtension()) );
-
-    DALI_TEST_CHECK( ext.IsAlive() );
-  }
-
-  DALI_TEST_CHECK( deleted );
-  END_TEST;
-}
-
-int UtcDaliShaderEffectMethodNoExtension(void)
-{
-  TestApplication application;
-
-  ShaderEffect effect;
-
-  try
-  {
-    ShaderEffect effect = ShaderEffect::New( VertexSource, FragmentSource );
-    DALI_TEST_CHECK( effect );
-
-    // Don't attach extension
-    ShaderEffect::Extension& extension = effect.GetExtension();
-    (void) extension;
-
-    DALI_TEST_CHECK( false );
-  }
-  catch (Dali::DaliException& e)
-  {
-    // Tests that a negative test of an assertion succeeds
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_CHECK( !effect );
-  }
-  END_TEST;
-}
-
-
 int UtcDaliShaderEffectPropertyIndices(void)
 {
   TestApplication application;
@@ -978,8 +802,6 @@ int UtcDaliShaderEffectFromPropertiesP(void)
 
   programMap->Insert("vertex-prefix", vertexShaderPrefix);
   programMap->Insert("fragment-prefix", fragmentShaderPrefix);
-
-  programMap->Insert("geometry-type", "GEOMETRY_TYPE_IMAGE");
 
   effect.SetProperty(effect.GetPropertyIndex("program"), programValue);
 

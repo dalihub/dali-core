@@ -27,13 +27,12 @@
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/camera-actor-impl.h>
 #include <dali/internal/event/actors/image-actor-impl.h>
-#include <dali/internal/event/actors/mesh-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/camera-attachment-impl.h>
 #include <dali/internal/event/actor-attachments/image-attachment-impl.h>
-#include <dali/internal/event/actor-attachments/mesh-attachment-impl.h>
+#include <dali/internal/event/actor-attachments/renderer-attachment-impl.h>
 
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/animation/animator-connector.h>
@@ -45,31 +44,23 @@
 
 #include <dali/internal/event/images/image-impl.h>
 #include <dali/internal/event/images/image-factory-cache.h>
-#include <dali/internal/event/modeling/mesh-impl.h>
-#include <dali/internal/event/modeling/material-impl.h>
 
 #include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/resources/image-ticket.h>
 
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/nodes/scene-graph-layer.h>
-#include <dali/internal/update/modeling/internal-mesh-data.h>
-#include <dali/internal/update/modeling/scene-graph-animatable-mesh.h>
-#include <dali/internal/update/modeling/scene-graph-material.h>
-#include <dali/internal/update/modeling/scene-graph-mesh.h>
 
 #include <dali/internal/update/node-attachments/node-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/update/node-attachments/scene-graph-image-attachment.h>
-#include <dali/internal/update/node-attachments/scene-graph-mesh-attachment.h>
+#include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
 
 #include <dali/internal/update/resources/bitmap-metadata.h>
 
 #include <dali/internal/render/gl-resources/bitmap-texture.h>
-
-#include <dali/internal/render/renderers/render-material.h>
 #include <dali/internal/render/renderers/scene-graph-image-renderer.h>
-#include <dali/internal/render/renderers/scene-graph-mesh-renderer.h>
+#include <dali/internal/render/renderers/render-renderer.h>
 
 using Dali::Internal::GestureEventProcessor;
 using Dali::Internal::ThreadLocalStorage;
@@ -89,11 +80,11 @@ void EnableProfiling( ProfilingType type )
     case PROFILING_TYPE_PAN_GESTURE:
     {
       eventProcessor.EnablePanGestureProfiling();
+      break;
     }
-
-    default:
+    case PROFILING_TYPE_END:
     {
-      // Do nothing
+      // nothing to do
       break;
     }
   }
@@ -119,12 +110,6 @@ const int CAMERA_ACTOR_MEMORY_SIZE(
   sizeof( Internal::CameraAttachment ) +
   sizeof( Internal::SceneGraph::Node ) +
   sizeof( Internal::SceneGraph::CameraAttachment ) );
-const int MESH_ACTOR_MEMORY_SIZE(
-  sizeof( Internal::MeshActor ) +
-  sizeof( Internal::MeshAttachment ) +
-  sizeof( Internal::SceneGraph::Node ) +
-  sizeof( Internal::SceneGraph::MeshAttachment ) +
-  sizeof( Internal::SceneGraph::MeshRenderer ) );
 const int IMAGE_ACTOR_MEMORY_SIZE(
   sizeof( Internal::ImageActor ) +
   sizeof( Internal::ImageAttachment ) +
@@ -143,15 +128,27 @@ const int IMAGE_MEMORY_SIZE(
   sizeof( Internal::BitmapMetadata ) +
   sizeof( Internal::BitmapTexture ) +
   sizeof( Internal::ImageTicket ) );
-const int MESH_MEMORY_SIZE(
-  sizeof( Internal::Mesh ) +
-  sizeof( Internal::MeshData ) +
-  sizeof( Internal::SceneGraph::Mesh ) +
-  sizeof( Internal::ResourceTicket ) );
+const int RENDERER_MEMORY_SIZE(
+  sizeof( Internal::Renderer ) +
+  sizeof( Internal::RendererAttachment ) +
+  sizeof( Internal::SceneGraph::RendererAttachment ) +
+  sizeof( Internal::SceneGraph::Renderer ) +
+  sizeof( Internal::SceneGraph::NewRenderer ) );
+const int GEOMETRY_MEMORY_SIZE(
+  sizeof( Internal::Geometry ) +
+  sizeof( Internal::SceneGraph::Geometry ) );
+const int PROPERTY_BUFFER_MEMORY_SIZE(
+  sizeof( Internal::PropertyBuffer ) +
+  sizeof( Internal::SceneGraph::PropertyBuffer ) );
 const int MATERIAL_MEMORY_SIZE(
   sizeof( Internal::Material ) +
-  sizeof( Internal::SceneGraph::Material ) +
-  sizeof( Internal::SceneGraph::RenderMaterial ) );
+  sizeof( Internal::SceneGraph::Material ) );
+const int SAMPLER_MEMORY_SIZE(
+  sizeof( Internal::Sampler ) +
+  sizeof( Internal::SceneGraph::Sampler ) );
+const int SHADER_MEMORY_SIZE(
+  sizeof( Internal::Shader ) +
+  sizeof( Internal::SceneGraph::Shader ) );
 
 } // namespace Profiling
 

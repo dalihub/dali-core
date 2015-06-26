@@ -24,8 +24,7 @@
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/event/common/object-impl.h>
 #include <dali/internal/event/resources/resource-ticket.h>
-#include <dali/internal/render/shaders/shader.h>
-
+#include <dali/internal/render/shaders/scene-graph-shader.h>
 
 namespace Dali
 {
@@ -74,52 +73,32 @@ public:
                    UniformCoordinateType uniformCoordinateType );
 
   /**
-   * @copydoc Dali::ShaderEffect::AttachExtension()
-   */
-  void AttachExtension( Dali::ShaderEffect::Extension *object );
-
-  /**
-   * @copydoc Dali::ShaderEffect::GetExtension()
-   */
-  Dali::ShaderEffect::Extension& GetExtension();
-
-  /**
-   * @copydoc Dali::ShaderEffect::GetExtension() const
-   */
-  const Dali::ShaderEffect::Extension& GetExtension() const;
-
-  /**
    * Add a GeometryType specific default program to this ShaderEffect
    * @param[in] geometryType    The GeometryType rendered by the shader program
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
    */
-  void SetPrograms( GeometryType geometryType, const std::string& vertexSource, const std::string& fragmentSource );
+  void SetPrograms( const std::string& vertexSource, const std::string& fragmentSource );
 
   /**
-   * Add a GeometryType specific default program to this ShaderEffect.
+   * Add a default program to this ShaderEffect.
    * This overload allows the optional prefixing for both the vertex and fragment shader.
    * A useful prefix may be shader \#defines for conditional compilation.
-   * @param[in] geometryType    The GeometryType rendered by the shader program
    * @param[in] vertexPrefix    The prefix source code for the vertex shader
    * @param[in] fragmentPrefix  The prefix source code for the fragment shader
    * @param[in] vertexSource    The source code for the vertex shader
    * @param[in] fragmentSource  The source code for the fragment shader
    */
-  void SetPrograms( GeometryType geometryType,
-                    const std::string& vertexPrefix, const std::string& fragmentPrefix,
+  void SetPrograms( const std::string& vertexPrefix, const std::string& fragmentPrefix,
                     const std::string& vertexSource, const std::string& fragmentSource );
 
   /**
    * Send shader program to scene-graph object.
-   * @param[in] geometryType     The GeometryType rendered by the shader program
-   * @param[in] subType          The subtype, one of ShaderSubTypes.
    * @param[in] vertexSource     The source code for the vertex shader
    * @param[in] fragmentSource   The source code for the fragment shader
    * @param[in] modifiesGeometry True if the shader modifies geometry
    */
-  void SendProgramMessage( GeometryType geometryType, ShaderSubTypes subType,
-                           const std::string& vertexSource, const std::string& fragmentSource,
+  void SendProgramMessage( const std::string& vertexSource, const std::string& fragmentSource,
                            bool modifiesGeometry );
 
   /**
@@ -228,7 +207,6 @@ private: // Data
   EventThreadServices& mEventThreadServices; ///< Event thread services, for sending messages
   SceneGraph::Shader* mSceneObject;         ///< pointer to the scene shader, should not be changed on this thread
   Dali::Image mImage;                       ///< Client-side handle for the effect image
-  IntrusivePtr<Dali::ShaderEffect::Extension> mExtension;
   std::vector<ResourceTicketPtr>  mTickets; ///< Collection of shader program tickets
   unsigned int  mConnectionCount;           ///< number of on-stage ImageActors using this shader effect
   Dali::ShaderEffect::GeometryHints  mGeometryHints; ///< shader geometry hints for building the geometry

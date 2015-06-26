@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,21 +22,19 @@
 #include <stdio.h>
 
 // INTERNAL INCLUDES
-#include <dali/internal/event/modeling/mesh-impl.h>
 
 namespace Dali
 {
 namespace Internal
 {
 
-ClothIPtr Cloth::New( const Dali::MeshData& meshData )
+ClothIPtr Cloth::New( Geometry& geometry )
 {
-  ClothIPtr cloth( new Cloth( meshData ) );
+  ClothIPtr cloth( new Cloth( geometry ) );
   return cloth;
 }
 
-Cloth::Cloth( const Dali::MeshData& publicMeshData )
-: Mesh( publicMeshData, false /* not discardable */, false /* not scalable */ )
+Cloth::Cloth( Geometry& geometry )
 {
 }
 

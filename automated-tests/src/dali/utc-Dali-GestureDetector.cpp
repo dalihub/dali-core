@@ -332,7 +332,7 @@ int UtcDaliGestureDetectorDetachAllP(void)
   // Detach and retrieve attached actors again, the vector should be empty.
   detector.DetachAll();
 
-  DALI_TEST_EQUALS(0, detector.GetAttachedActorCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, detector.GetAttachedActorCount(), TEST_LOCATION);
   END_TEST;
 }
 
@@ -359,7 +359,7 @@ int UtcDaliGestureDetectorDetachAllN(void)
   // Detach and retrieve attached actors again, the vector should be empty.
   detector.DetachAll();
 
-  DALI_TEST_EQUALS(0, detector.GetAttachedActorCount(), TEST_LOCATION);
+  DALI_TEST_EQUALS(0u, detector.GetAttachedActorCount(), TEST_LOCATION);
   DALI_TEST_EQUALS(true, gestureManager.WasCalled(TestGestureManager::UnregisterType), TEST_LOCATION);
 
   // Call DetachAll again, there should not be any exception
