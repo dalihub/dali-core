@@ -1785,6 +1785,33 @@ int UtcDaliPanGestureAngleHandling(void)
   END_TEST;
 }
 
+int UtcDaliPanGestureGetAngle(void)
+{
+  TestApplication application;
+
+  PanGestureDetector detector = PanGestureDetector::New();
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 0, TEST_LOCATION );
+
+  detector.AddAngle( PanGestureDetector::DIRECTION_LEFT );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 1, TEST_LOCATION );
+
+  detector.AddAngle( PanGestureDetector::DIRECTION_RIGHT );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 2, TEST_LOCATION );
+
+  detector.AddAngle( PanGestureDetector::DIRECTION_UP );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 3, TEST_LOCATION );
+
+  detector.AddAngle( PanGestureDetector::DIRECTION_DOWN );
+  DALI_TEST_EQUALS( detector.GetAngleCount(), 4, TEST_LOCATION );
+
+  DALI_TEST_EQUALS( detector.GetAngle(0).first,  PanGestureDetector::DIRECTION_LEFT, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(1).first,  PanGestureDetector::DIRECTION_RIGHT, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(2).first,  PanGestureDetector::DIRECTION_UP, TEST_LOCATION );
+  DALI_TEST_EQUALS( detector.GetAngle(3).first,  PanGestureDetector::DIRECTION_DOWN, TEST_LOCATION );
+
+  END_TEST;
+}
+
 inline float RadiansToDegrees( float radian )
 {
   return radian * 180.0f / Math::PI;

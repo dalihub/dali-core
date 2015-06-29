@@ -152,33 +152,36 @@ int UtcDaliTouchNormalProcessing(void)
 
   // Emit a down signal
   application.ProcessEvent( GenerateSingleTouch( TouchPoint::Down, screenCoordinates ) );
+  const TouchPoint *point1 = &data.touchEvent.GetPoint(0);
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( 1u, data.touchEvent.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( TouchPoint::Down, data.touchEvent.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, data.touchEvent.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( localCoordinates, data.touchEvent.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( TouchPoint::Down, point1->state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, point1->screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( localCoordinates, point1->local, 0.1f, TEST_LOCATION );
   data.Reset();
 
   // Emit a motion signal
   screenCoordinates.x = screenCoordinates.y = 11.0f;
   actor.ScreenToLocal( localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y );
   application.ProcessEvent( GenerateSingleTouch( TouchPoint::Motion, screenCoordinates ) );
+  const TouchPoint *point2 = &data.touchEvent.GetPoint(0);
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( 1u, data.touchEvent.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( TouchPoint::Motion, data.touchEvent.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, data.touchEvent.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( localCoordinates, data.touchEvent.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( TouchPoint::Motion, point2->state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, point2->screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( localCoordinates, point2->local, 0.1f, TEST_LOCATION );
   data.Reset();
 
   // Emit an up signal
   screenCoordinates.x = screenCoordinates.y = 12.0f;
   actor.ScreenToLocal( localCoordinates.x, localCoordinates.y, screenCoordinates.x, screenCoordinates.y );
   application.ProcessEvent( GenerateSingleTouch( TouchPoint::Up, screenCoordinates ) );
+  const TouchPoint *point3 = &data.touchEvent.GetPoint(0);
   DALI_TEST_EQUALS( true, data.functorCalled, TEST_LOCATION );
   DALI_TEST_EQUALS( 1u, data.touchEvent.GetPointCount(), TEST_LOCATION );
-  DALI_TEST_EQUALS( TouchPoint::Up, data.touchEvent.points[0].state, TEST_LOCATION );
-  DALI_TEST_EQUALS( screenCoordinates, data.touchEvent.points[0].screen, TEST_LOCATION );
-  DALI_TEST_EQUALS( localCoordinates, data.touchEvent.points[0].local, 0.1f, TEST_LOCATION );
+  DALI_TEST_EQUALS( TouchPoint::Up, point3->state, TEST_LOCATION );
+  DALI_TEST_EQUALS( screenCoordinates, point3->screen, TEST_LOCATION );
+  DALI_TEST_EQUALS( localCoordinates, point3->local, 0.1f, TEST_LOCATION );
   data.Reset();
 
   // Emit a down signal where the actor is not present
