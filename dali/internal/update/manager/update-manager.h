@@ -853,7 +853,7 @@ inline void AddMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, 
 template< typename T >
 inline void RemoveMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )
 {
-  typedef MessageValue1< ObjectOwnerContainer<T>, OwnerPointer< T > > LocalType;
+  typedef MessageValue1< ObjectOwnerContainer<T>, T* > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
