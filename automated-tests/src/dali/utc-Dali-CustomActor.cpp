@@ -120,7 +120,7 @@ struct TestCustomActor : public CustomActorImpl
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( unsigned int depth )
+  virtual void OnStageConnection( int depth )
   {
     AddToCallStacks("OnStageConnection");
     mDepth = depth;
@@ -272,7 +272,7 @@ struct TestCustomActorVariant1 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( unsigned int depth )
+  virtual void OnStageConnection( int depth )
   {
     // Chain up first
     TestCustomActor::OnStageConnection( depth );
@@ -297,7 +297,7 @@ struct TestCustomActorVariant2 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( unsigned int depth )
+  virtual void OnStageConnection( int depth )
   {
     // Chain up first
     TestCustomActor::OnStageConnection( depth );
@@ -375,7 +375,7 @@ struct TestCustomActorVariant5 : public TestCustomActor
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( unsigned int depth )
+  virtual void OnStageConnection( int depth )
   {
     // Chain up first
     TestCustomActor::OnStageConnection( depth );
@@ -500,7 +500,7 @@ public:
   }
 
   // From CustomActorImpl
-  virtual void OnStageConnection( unsigned int depth )
+  virtual void OnStageConnection( int depth )
   {
   }
   virtual void OnStageDisconnection()
