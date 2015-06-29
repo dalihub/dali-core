@@ -66,17 +66,6 @@ inline Vector4 Axis()
   return axis;
 }
 
-/**
- * @brief Returns true if the value given is greater than a random value between 0 and 1.
- *
- * @param chance  A value between 0 and 1. [Default: 0.5]
- * @return        true if chance greater than the random value, otherwise false.
- */
-inline bool Chance(float chance = 0.5f)
-{
-  return chance > Range(0.0f, 1.0f);
-}
-
 } // namespace Random
 
 } // namespace Dali
