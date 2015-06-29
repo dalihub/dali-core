@@ -128,19 +128,20 @@ unsigned int Actor::GetChildCount() const
 
 Actor Actor::GetChildAt(unsigned int index) const
 {
-  return GetImplementation(*this).GetChildAt(index);
+  Internal::ActorPtr child = GetImplementation(*this).GetChildAt( index );
+  return Actor( child.Get() );
 }
 
 Actor Actor::FindChildByName(const std::string& actorName)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(actorName);
-  return Actor(child.Get());
+  Internal::ActorPtr child = GetImplementation(*this).FindChildByName( actorName );
+  return Actor( child.Get() );
 }
 
 Actor Actor::FindChildById(const unsigned int id)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildById(id);
-  return Actor(child.Get());
+  Internal::ActorPtr child = GetImplementation(*this).FindChildById( id );
+  return Actor( child.Get() );
 }
 
 Actor Actor::GetParent() const

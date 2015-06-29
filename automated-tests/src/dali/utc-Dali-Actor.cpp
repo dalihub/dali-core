@@ -454,24 +454,10 @@ int UtcDaliActorRemoveN(void)
 
   // add child back
   parent.Add(child);
-  // try illegal Remove
-  try
-  {
-    parent.Remove( parent );
-    tet_printf("Assertion test failed - no Exception\n" );
-    tet_result(TET_FAIL);
-  }
-  catch(Dali::DaliException& e)
-  {
-    DALI_TEST_PRINT_ASSERT( e );
-    DALI_TEST_ASSERT(e, "this != &child", TEST_LOCATION);
-    DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
-  }
-  catch(...)
-  {
-    tet_printf("Assertion test failed - wrong Exception\n" );
-    tet_result(TET_FAIL);
-  }
+  DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
+  // try Remove self, its a no-op
+  parent.Remove( parent );
+  DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
 
   // try Remove empty
   try

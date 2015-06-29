@@ -58,8 +58,7 @@ class RenderTask;
 class Renderer;
 struct DynamicsData;
 
-typedef IntrusivePtr< Actor > ActorPtr;
-typedef std::vector< Dali::Actor > ActorContainer; // Store handles to return via public-api
+typedef std::vector< ActorPtr > ActorContainer;
 typedef ActorContainer::iterator ActorIter;
 typedef ActorContainer::const_iterator ActorConstIter;
 
@@ -233,7 +232,7 @@ public:
   /**
    * @copydoc Dali::Actor::GetChildAt
    */
-  Dali::Actor GetChildAt( unsigned int index ) const;
+  ActorPtr GetChildAt( unsigned int index ) const;
 
   /**
    * Retrieve a reference to Actor's children.
