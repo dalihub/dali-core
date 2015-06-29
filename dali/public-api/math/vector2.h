@@ -468,44 +468,6 @@ inline Vector2 Max( const Vector2& a, const Vector2& b )
  */
 DALI_IMPORT_API Vector2 Clamp( const Vector2& v, const float& min, const float& max );
 
-/**
- * @brief Fits source size inside the target size maintaining aspect ratio.
- *
- * @pre source width and height > 0
- * @param [in] target size
- * @param [in] source size
- * @return target scaled inside source
- */
-DALI_IMPORT_API Size FitInside( const Size& target, const Size& source );
-
-/**
- * @brief Fits or scales to fill.
- *
- * a) If target width and height are non-zero
- *    Fits source size into target aspect ratio
- *    If source is bigger, simply returns target.
- *    Does not scale larger than source
- * b) If target width or height is zero
- *    maintains the aspect ratio of source (as target has no aspect ratio)
- *    returns target width and scaled height or target height and scaled width
- * This algorithm is usefull when you want for example a square thumbnail of a rectangular image data
- * @param [in] target size
- * @param [in] source size
- * @return target scaled inside source
- */
-DALI_IMPORT_API Size FitScaleToFill( const Size& target, const Size& source );
-
-/**
- * @brief Shrinks source size inside the target size maintaining aspect ratio of source.
- *
- * If source is smaller than target it returns source.
- * @pre source width and height > 0
- * @param [in] target size
- * @param [in] source size
- * @return target scaled inside source
- */
-DALI_IMPORT_API Size ShrinkInside( const Size& target, const Size& source );
-
 // Allow Vector2 to be treated as a POD type
 template <> struct TypeTraits< Vector2 > : public BasicTypes< Vector2 > { enum { IS_TRIVIAL_TYPE = true }; };
 
