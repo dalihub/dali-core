@@ -26,7 +26,6 @@
 #include <dali/internal/event/dynamics/dynamics-cone-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-cube-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-cylinder-shape-impl.h>
-#include <dali/internal/event/dynamics/dynamics-mesh-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-sphere-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
 #endif

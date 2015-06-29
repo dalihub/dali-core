@@ -24,10 +24,7 @@
 #include <dali/integration-api/dynamics/dynamics-factory-intf.h>
 #include <dali/integration-api/dynamics/dynamics-shape-intf.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-shape.h>
-#include <dali/internal/update/dynamics/scene-graph-dynamics-mesh-shape.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
-#include <dali/internal/update/modeling/scene-graph-mesh.h>
-#include <dali/internal/update/modeling/internal-mesh-data.h>
 #include <dali/internal/update/nodes/node.h>
 
 namespace Dali

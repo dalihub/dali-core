@@ -24,7 +24,6 @@
 #include <dali/internal/event/common/event-thread-services.h>
 #include <dali/internal/event/dynamics/dynamics-declarations.h>
 #include <dali/internal/update/common/double-buffered.h>
-#include <dali/internal/update/modeling/scene-graph-mesh-declarations.h>
 #include <dali/public-api/math/vector3.h>
 
 namespace Dali
@@ -179,7 +178,6 @@ public:
 private:
   Node&          mNode;      // weak reference to the Node
   DynamicsWorld& mWorld;
-  Mesh*          mMesh;
 
   DoubleBuffered<Vector3> mLinearVelocity;
   DoubleBuffered<Vector3> mAngularVelocity;

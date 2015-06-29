@@ -80,7 +80,6 @@ internal_src_files = \
   $(internal_src_dir)/event/images/nine-patch-image-impl.cpp \
   $(internal_src_dir)/event/images/resource-image-impl.cpp \
   $(internal_src_dir)/event/images/native-image-impl.cpp \
-  $(internal_src_dir)/event/modeling/cloth-impl.cpp \
   $(internal_src_dir)/event/object/custom-object-internal.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-impl.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-list-impl.cpp \

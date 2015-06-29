@@ -28,10 +28,7 @@
 #include <dali/internal/event/dynamics/dynamics-cone-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-cube-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-cylinder-shape-impl.h>
-#include <dali/internal/event/dynamics/dynamics-mesh-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-sphere-shape-impl.h>
-#include <dali/internal/event/modeling/mesh-impl.h>
-#include <dali/devel-api/geometry/cloth.h>
 
 namespace Dali
 {
@@ -100,12 +97,6 @@ void DynamicsBodyConfig::SetShape( const Dali::DynamicsShape::ShapeType type, co
     case Dali::DynamicsShape::CYLINDER:
     {
       mShape = new DynamicsCylinderShape(dimensions.x, dimensions.y);
-      break;
-    }
-    @todo Remove cloth handling
-    case Dali::DynamicsShape::MESH:
-    {
-      mShape = new DynamicsCubeShape(dimensions);
       break;
     }
     case Dali::DynamicsShape::SPHERE:
