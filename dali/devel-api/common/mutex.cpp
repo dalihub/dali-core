@@ -59,8 +59,8 @@ Mutex::ScopedLock::ScopedLock( Mutex& mutex )
 
 Mutex::ScopedLock::~ScopedLock()
 {
-  pthread_mutex_unlock( &mMutex.mImpl->mutex );
   mMutex.mImpl->locked = false;
+  pthread_mutex_unlock( &mMutex.mImpl->mutex );
 }
 
 } // namespace Dali
