@@ -93,6 +93,7 @@ public:
    * @param[in] geometryDataProvider The geometry data provider (to fetch geometry from)
    */
   void UploadVertexData( Context& context,
+                         Program& program,
                          BufferIndex bufferIndex,
                          const RenderDataProvider* dataProviders );
 
