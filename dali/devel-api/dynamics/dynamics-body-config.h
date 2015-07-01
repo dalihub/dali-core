@@ -145,10 +145,6 @@ public:
    *                        - DynamicsShape::CONE
    *                          - x radius of base
    *                          - y length of cone
-   *                        - DynamicsShape::MESH
-   *                          - x width
-   *                          - y height
-   *                          - z number of extra division on x and y
    */
   void SetShape(const DynamicsShape::ShapeType type, const Vector3& dimensions);
 

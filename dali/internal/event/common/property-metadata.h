@@ -205,8 +205,8 @@ public:
    * @param [in] newProperty A pointer to the scene-graph owned property.
    */
   CustomPropertyMetadata( const std::string& newName,
-                  Property::Type newType,
-                  const SceneGraph::PropertyBase* newProperty)
+                          Property::Type newType,
+                          const SceneGraph::PropertyBase* newProperty)
   : name(newName),
     mAccessMode(Property::ANIMATABLE)
   {
@@ -222,8 +222,8 @@ public:
    * @param [in] accessMode The access mode of the custom property (writable, animatable etc).
    */
   CustomPropertyMetadata( const std::string& newName,
-                  Property::Value newValue,
-                  Property::AccessMode accessMode )
+                          Property::Value newValue,
+                          Property::AccessMode accessMode )
   : name(newName),
     mAccessMode(accessMode)
   {

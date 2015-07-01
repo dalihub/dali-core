@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/object/type-registry.h>
-#include <dali/internal/event/effects/shader-effect-impl.h>
+
 #include <dali/internal/event/actor-attachments/renderable-attachment-impl.h>
 
 namespace // unnamed namespace
@@ -48,88 +48,6 @@ namespace Dali
 namespace Internal
 {
 
-void RenderableActor::SetSortModifier(float modifier)
-{
-  GetRenderableAttachment().SetSortModifier(modifier);
-}
-
-float RenderableActor::GetSortModifier() const
-{
-  return GetRenderableAttachment().GetSortModifier();
-}
-
-void RenderableActor::SetCullFace(CullFaceMode mode)
-{
-  GetRenderableAttachment().SetCullFace( mode );
-}
-
-CullFaceMode RenderableActor::GetCullFace() const
-{
-  return GetRenderableAttachment().GetCullFace();
-}
-
-void RenderableActor::SetBlendMode( BlendingMode::Type mode )
-{
-  GetRenderableAttachment().SetBlendMode( mode );
-}
-
-BlendingMode::Type RenderableActor::GetBlendMode() const
-{
-  return GetRenderableAttachment().GetBlendMode();
-}
-
-void RenderableActor::SetBlendFunc( BlendingFactor::Type srcFactorRgba,   BlendingFactor::Type destFactorRgba )
-{
-  GetRenderableAttachment().SetBlendFunc( srcFactorRgba, destFactorRgba, srcFactorRgba, destFactorRgba );
-}
-
-void RenderableActor::SetBlendFunc( BlendingFactor::Type srcFactorRgb,   BlendingFactor::Type destFactorRgb,
-                                    BlendingFactor::Type srcFactorAlpha, BlendingFactor::Type destFactorAlpha )
-{
-  GetRenderableAttachment().SetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-}
-
-void RenderableActor::GetBlendFunc( BlendingFactor::Type& srcFactorRgb,   BlendingFactor::Type& destFactorRgb,
-                                    BlendingFactor::Type& srcFactorAlpha, BlendingFactor::Type& destFactorAlpha ) const
-{
-  GetRenderableAttachment().GetBlendFunc( srcFactorRgb, destFactorRgb, srcFactorAlpha, destFactorAlpha );
-}
-
-void RenderableActor::SetBlendEquation( BlendingEquation::Type equationRgba )
-{
-  GetRenderableAttachment().SetBlendEquation( equationRgba, equationRgba );
-}
-
-void RenderableActor::SetBlendEquation( BlendingEquation::Type equationRgb, BlendingEquation::Type equationAlpha )
-{
-  GetRenderableAttachment().SetBlendEquation( equationRgb, equationAlpha );
-}
-
-void RenderableActor::GetBlendEquation( BlendingEquation::Type& equationRgb, BlendingEquation::Type& equationAlpha ) const
-{
-  GetRenderableAttachment().GetBlendEquation( equationRgb, equationAlpha );
-}
-
-void RenderableActor::SetBlendColor( const Vector4& color )
-{
-  GetRenderableAttachment().SetBlendColor( color );
-}
-
-const Vector4& RenderableActor::GetBlendColor() const
-{
-  return GetRenderableAttachment().GetBlendColor();
-}
-
-void RenderableActor::SetFilterMode( FilterMode::Type minFilter, FilterMode::Type magFilter )
-{
-  GetRenderableAttachment().SetFilterMode( minFilter, magFilter );
-}
-
-void RenderableActor::GetFilterMode( FilterMode::Type& minFilter, FilterMode::Type& magFilter ) const
-{
-  return GetRenderableAttachment().GetFilterMode( minFilter, magFilter );
-}
-
 RenderableActor::RenderableActor()
 : Actor( Actor::RENDERABLE )
 {
@@ -139,20 +57,6 @@ RenderableActor::~RenderableActor()
 {
 }
 
-void RenderableActor::SetShaderEffect(ShaderEffect& effect)
-{
-  GetRenderableAttachment().SetShaderEffect( effect );
-}
-
-ShaderEffectPtr RenderableActor::GetShaderEffect() const
-{
-  return GetRenderableAttachment().GetShaderEffect();
-}
-
-void RenderableActor::RemoveShaderEffect()
-{
-  return GetRenderableAttachment().RemoveShaderEffect();
-}
 
 } // namespace Internal
 

@@ -61,9 +61,9 @@ public:
   UniformMeta( const UniformMeta& meta )
   : name( meta.name ),
     property( meta.property ),
+    cacheIndex( meta.cacheIndex ),
     coordinateType( meta.coordinateType )
   {
-    memcpy( cacheIndeces, meta.cacheIndeces, sizeof(cacheIndeces) );
   }
 
   /**
@@ -83,9 +83,9 @@ private:
   UniformMeta( const std::string& uniformName, const PropertyBase& prop, Dali::ShaderEffect::UniformCoordinateType coordType )
   : name( uniformName ),
     property( prop ),
+    cacheIndex( 0 ),
     coordinateType( coordType )
   {
-    memset( cacheIndeces, 0, sizeof(cacheIndeces) );
   }
 
   // Undefined
@@ -95,8 +95,9 @@ public:
 
   std::string name; ///< name of uniform to set/animate
   const PropertyBase& property; ///< reference to the corresponding property
-  unsigned int cacheIndeces[ Log<GEOMETRY_TYPE_LAST>::value ][ SHADER_SUBTYPE_LAST ]; ///< internal program cache index, per program
+  unsigned int cacheIndex; ///< internal program cache index
   Dali::ShaderEffect::UniformCoordinateType coordinateType; ///< The coordinate type of the uniform
+
 
 };
 

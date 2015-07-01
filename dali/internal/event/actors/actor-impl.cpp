@@ -42,6 +42,7 @@
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/type-info-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
+#include <dali/internal/event/actor-attachments/renderer-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/projection.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
@@ -103,13 +104,37 @@ namespace Internal
 
 unsigned int Actor::mActorCounter = 0;
 
+namespace
+{
+/// Using a function because of library initialisation order. Vector3::ONE may not have been initialised yet.
+inline const Vector3& GetDefaultSizeModeFactor()
+{
+  return Vector3::ONE;
+}
+
+/// Using a function because of library initialisation order. Vector2::ZERO may not have been initialised yet.
+inline const Vector2& GetDefaultPreferredSize()
+{
+  return Vector2::ZERO;
+}
+
+/// Using a function because of library initialisation order. Vector2::ZERO may not have been initialised yet.
+inline const Vector2& GetDefaultDimensionPadding()
+{
+  return Vector2::ZERO;
+}
+
+const SizeScalePolicy::Type DEFAULT_SIZE_SCALE_POLICY = SizeScalePolicy::USE_SIZE_SET;
+
+} // unnamed namespace
+
 /**
  * Struct to collect relayout variables
  */
 struct Actor::RelayoutData
 {
   RelayoutData()
-    : sizeModeFactor( Vector3::ONE ), preferredSize( Vector2::ZERO ), sizeSetPolicy( SizeScalePolicy::USE_SIZE_SET ), relayoutEnabled( false ), insideRelayout( false )
+    : sizeModeFactor( GetDefaultSizeModeFactor() ), preferredSize( GetDefaultPreferredSize() ), sizeSetPolicy( DEFAULT_SIZE_SCALE_POLICY ), relayoutEnabled( false ), insideRelayout( false )
   {
     // Set size negotiation defaults
     for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
@@ -119,7 +144,7 @@ struct Actor::RelayoutData
       dimensionNegotiated[ i ] = false;
       dimensionDirty[ i ] = false;
       dimensionDependencies[ i ] = Dimension::ALL_DIMENSIONS;
-      dimensionPadding[ i ] = Vector2( 0.0f, 0.0f );
+      dimensionPadding[ i ] = GetDefaultDimensionPadding();
       minimumSize[ i ] = 0.0f;
       maximumSize[ i ] = FLT_MAX;
     }
@@ -412,7 +437,7 @@ void Actor::Add( Actor& child )
     if( !child.mParent )
     {
       // Do this first, since user callbacks from within SetParent() may need to remove child
-      mChildren->push_back( Dali::Actor( &child ) );
+      mChildren->push_back( ActorPtr( &child ) );
 
       // SetParent asserts that child can be added
       child.SetParent( this );
@@ -461,11 +486,11 @@ void Actor::Insert( unsigned int index, Actor& child )
     {
       ActorIter it = mChildren->begin();
       std::advance( it, index );
-      mChildren->insert( it, Dali::Actor( &child ) );
+      mChildren->insert( it, ActorPtr( &child ) );
     }
     else
     {
-      mChildren->push_back( Dali::Actor( &child ) );
+      mChildren->push_back( ActorPtr( &child ) );
     }
     // SetParent asserts that child can be added
     child.SetParent( this, index );
@@ -488,32 +513,30 @@ void Actor::Insert( unsigned int index, Actor& child )
 
 void Actor::Remove( Actor& child )
 {
-  DALI_ASSERT_ALWAYS( this != &child && "Cannot remove actor from itself" );
-
-  Dali::Actor removed;
-
-  if( !mChildren )
+  if( (this == &child) || (!mChildren) )
   {
-    // no children
+    // no children or removing itself
     return;
   }
+
+  ActorPtr removed;
 
   // Find the child in mChildren, and unparent it
   ActorIter end = mChildren->end();
   for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
   {
-    Actor& actor = GetImplementation( *iter );
+    ActorPtr actor = (*iter);
 
-    if( &actor == &child )
+    if( actor.Get() == &child )
     {
       // Keep handle for OnChildRemove notification
-      removed = Dali::Actor( &actor );
+      removed = actor;
 
       // Do this first, since user callbacks from within SetParent() may need to add the child
       mChildren->erase( iter );
 
-      DALI_ASSERT_DEBUG( actor.GetParent() == this );
-      actor.SetParent( NULL );
+      DALI_ASSERT_DEBUG( actor->GetParent() == this );
+      actor->SetParent( NULL );
 
       break;
     }
@@ -522,7 +545,7 @@ void Actor::Remove( Actor& child )
   if( removed )
   {
     // Notification for derived classes
-    OnChildRemove( GetImplementation( removed ) );
+    OnChildRemove( *(removed.Get()) );
 
     // Only put in a relayout request if there is a suitable dependency
     if( RelayoutDependentOnChildren() )
@@ -548,11 +571,11 @@ unsigned int Actor::GetChildCount() const
   return ( NULL != mChildren ) ? mChildren->size() : 0;
 }
 
-Dali::Actor Actor::GetChildAt( unsigned int index ) const
+ActorPtr Actor::GetChildAt( unsigned int index ) const
 {
   DALI_ASSERT_ALWAYS( index < GetChildCount() );
 
-  return ( ( mChildren ) ? ( *mChildren )[ index ] : Dali::Actor() );
+  return ( ( mChildren ) ? ( *mChildren )[ index ] : ActorPtr() );
 }
 
 ActorPtr Actor::FindChildByName( const std::string& actorName )
@@ -567,7 +590,7 @@ ActorPtr Actor::FindChildByName( const std::string& actorName )
     ActorIter end = mChildren->end();
     for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
     {
-      child = GetImplementation( *iter ).FindChildByName( actorName );
+      child = (*iter)->FindChildByName( actorName );
 
       if( child )
       {
@@ -590,7 +613,7 @@ ActorPtr Actor::FindChildById( const unsigned int id )
     ActorIter end = mChildren->end();
     for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
     {
-      child = GetImplementation( *iter ).FindChildById( id );
+      child = (*iter)->FindChildById( id );
 
       if( child )
       {
@@ -917,36 +940,7 @@ void Actor::SetScaleZ( float z )
   }
 }
 
-void Actor::SetInitialVolume( const Vector3& volume )
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value
-    SetInitialVolumeMessage( GetEventThreadServices(), *mNode, volume );
-  }
-}
-
-void Actor::SetTransmitGeometryScaling( bool transmitGeometryScaling )
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; queue a message to set the value
-    SetTransmitGeometryScalingMessage( GetEventThreadServices(), *mNode, transmitGeometryScaling );
-  }
-}
-
-bool Actor::GetTransmitGeometryScaling() const
-{
-  if( NULL != mNode )
-  {
-    // mNode is being used in a separate thread; copy the value from the previous update
-    return mNode->GetTransmitGeometryScaling();
-  }
-
-  return false;
-}
-
-void Actor::ScaleBy( const Vector3& relativeScale )
+void Actor::ScaleBy(const Vector3& relativeScale)
 {
   if( NULL != mNode )
   {
@@ -1132,9 +1126,12 @@ void Actor::SetSizeModeFactor( const Vector3& factor )
 
 const Vector3& Actor::GetSizeModeFactor() const
 {
-  EnsureRelayoutData();
+  if ( mRelayoutData )
+  {
+    return mRelayoutData->sizeModeFactor;
+  }
 
-  return mRelayoutData->sizeModeFactor;
+  return GetDefaultSizeModeFactor();
 }
 
 void Actor::SetColorMode( ColorMode colorMode )
@@ -1326,14 +1323,15 @@ void Actor::SetResizePolicy( ResizePolicy::Type policy, Dimension::Type dimensio
 
 ResizePolicy::Type Actor::GetResizePolicy( Dimension::Type dimension ) const
 {
-  EnsureRelayoutData();
-
-  // If more than one dimension is requested, just return the first one found
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  if ( mRelayoutData )
   {
-    if( ( dimension & ( 1 << i ) ) )
+    // If more than one dimension is requested, just return the first one found
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      return mRelayoutData->resizePolicies[ i ];
+      if( ( dimension & ( 1 << i ) ) )
+      {
+        return mRelayoutData->resizePolicies[ i ];
+      }
     }
   }
 
@@ -1349,9 +1347,12 @@ void Actor::SetSizeScalePolicy( SizeScalePolicy::Type policy )
 
 SizeScalePolicy::Type Actor::GetSizeScalePolicy() const
 {
-  EnsureRelayoutData();
+  if ( mRelayoutData )
+  {
+    return mRelayoutData->sizeSetPolicy;
+  }
 
-  return mRelayoutData->sizeSetPolicy;
+  return DEFAULT_SIZE_SCALE_POLICY;
 }
 
 void Actor::SetDimensionDependency( Dimension::Type dimension, Dimension::Type dependency )
@@ -1369,14 +1370,15 @@ void Actor::SetDimensionDependency( Dimension::Type dimension, Dimension::Type d
 
 Dimension::Type Actor::GetDimensionDependency( Dimension::Type dimension ) const
 {
-  EnsureRelayoutData();
-
-  // If more than one dimension is requested, just return the first one found
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  if ( mRelayoutData )
   {
-    if( ( dimension & ( 1 << i ) ) )
+    // If more than one dimension is requested, just return the first one found
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      return mRelayoutData->dimensionDependencies[ i ];
+      if( ( dimension & ( 1 << i ) ) )
+      {
+        return mRelayoutData->dimensionDependencies[ i ];
+      }
     }
   }
 
@@ -1417,13 +1419,14 @@ void Actor::SetLayoutDirty( bool dirty, Dimension::Type dimension )
 
 bool Actor::IsLayoutDirty( Dimension::Type dimension ) const
 {
-  EnsureRelayoutData();
-
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  if ( mRelayoutData )
   {
-    if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionDirty[ i ] )
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      return true;
+      if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionDirty[ i ] )
+      {
+        return true;
+      }
     }
   }
 
@@ -1432,17 +1435,56 @@ bool Actor::IsLayoutDirty( Dimension::Type dimension ) const
 
 bool Actor::RelayoutPossible( Dimension::Type dimension ) const
 {
-  EnsureRelayoutData();
-
-  return mRelayoutData->relayoutEnabled && !IsLayoutDirty( dimension );
+  return mRelayoutData && mRelayoutData->relayoutEnabled && !IsLayoutDirty( dimension );
 }
 
 bool Actor::RelayoutRequired( Dimension::Type dimension ) const
 {
-  EnsureRelayoutData();
-
-  return mRelayoutData->relayoutEnabled && IsLayoutDirty( dimension );
+  return mRelayoutData && mRelayoutData->relayoutEnabled && IsLayoutDirty( dimension );
 }
+
+unsigned int Actor::AddRenderer( Renderer& renderer )
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  if ( ! mAttachment )
+  {
+    mAttachment = RendererAttachment::New( GetEventThreadServices(), *mNode, renderer );
+  }
+
+  return 0;
+}
+
+unsigned int Actor::GetRendererCount() const
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  RendererAttachment* attachment = dynamic_cast<RendererAttachment*>(mAttachment.Get());
+  return attachment ? 1u : 0u;
+}
+
+Renderer& Actor::GetRendererAt( unsigned int index )
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  DALI_ASSERT_DEBUG( index == 0 && "Only one renderer is supported." );
+
+  //TODO: MESH_REWORK : Temporary code
+  RendererAttachment* attachment = dynamic_cast<RendererAttachment*>(mAttachment.Get());
+  DALI_ASSERT_ALWAYS( attachment && "Actor doesn't have a renderer" );
+
+  return attachment->GetRenderer();
+}
+
+void Actor::RemoveRenderer( Renderer& renderer )
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  mAttachment = NULL;
+}
+
+void Actor::RemoveRenderer( unsigned int index )
+{
+  //TODO: MESH_REWORK : Add support for multiple renderers
+  mAttachment = NULL;
+}
+
 
 #ifdef DALI_DYNAMICS_SUPPORT
 
@@ -1701,17 +1743,17 @@ void Actor::SetDynamicsRoot(bool flag)
       ActorIter end = mChildren->end();
       for( ActorIter iter = mChildren->begin(); iter != end; ++iter )
       {
-        Actor& child = GetImplementation(*iter);
+        ActorPtr child = (*iter);
 
-        if( child.GetDynamicsBody() )
+        if( child->GetDynamicsBody() )
         {
           if( mIsDynamicsRoot )
           {
-            child.ConnectDynamics();
+            child->ConnectDynamics();
           }
           else
           {
-            child.DisconnectDynamics();
+            child->DisconnectDynamics();
           }
         }
       }
@@ -2281,6 +2323,7 @@ Actor::Actor( DerivedType derivedType )
   mTargetSize( 0.0f, 0.0f, 0.0f ),
   mName(),
   mId( ++mActorCounter ), // actor ID is initialised to start from 1, and 0 is reserved
+  mDepth( 0 ),
   mIsRoot( ROOT_LAYER == derivedType ),
   mIsRenderable( RENDERABLE == derivedType ),
   mIsLayer( LAYER == derivedType || ROOT_LAYER == derivedType ),
@@ -2324,8 +2367,7 @@ Actor::~Actor()
     ActorConstIter endIter = mChildren->end();
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
-      Actor& actor = GetImplementation( *iter );
-      actor.SetParent( NULL );
+      (*iter)->SetParent( NULL );
     }
   }
   delete mChildren;
@@ -2361,31 +2403,32 @@ Actor::~Actor()
   }
 }
 
-void Actor::ConnectToStage( int index )
+void Actor::ConnectToStage( unsigned int parentDepth, int index )
 {
   // This container is used instead of walking the Actor hierachy.
   // It protects us when the Actor hierachy is modified during OnStageConnectionExternal callbacks.
   ActorContainer connectionList;
 
+
   // This stage is atomic i.e. not interrupted by user callbacks
-  RecursiveConnectToStage( connectionList, index );
+  RecursiveConnectToStage( connectionList, parentDepth+1, index );
 
   // Notify applications about the newly connected actors.
   const ActorIter endIter = connectionList.end();
   for( ActorIter iter = connectionList.begin(); iter != endIter; ++iter )
   {
-    Actor& actor = GetImplementation( *iter );
-    actor.NotifyStageConnection();
+    (*iter)->NotifyStageConnection();
   }
 
   RelayoutRequest();
 }
 
-void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
+void Actor::RecursiveConnectToStage( ActorContainer& connectionList, unsigned int depth, int index )
 {
   DALI_ASSERT_ALWAYS( !OnStage() );
 
   mIsOnStage = true;
+  mDepth = depth;
 
   ConnectToSceneGraph( index );
 
@@ -2393,7 +2436,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
   OnStageConnectionInternal();
 
   // This stage is atomic; avoid emitting callbacks until all Actors are connected
-  connectionList.push_back( Dali::Actor( this ) );
+  connectionList.push_back( ActorPtr( this ) );
 
   // Recursively connect children
   if( mChildren )
@@ -2401,8 +2444,7 @@ void Actor::RecursiveConnectToStage( ActorContainer& connectionList, int index )
     ActorConstIter endIter = mChildren->end();
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
-      Actor& actor = GetImplementation( *iter );
-      actor.RecursiveConnectToStage( connectionList );
+      (*iter)->RecursiveConnectToStage( connectionList, depth+1 );
     }
   }
 }
@@ -2451,7 +2493,7 @@ void Actor::NotifyStageConnection()
   if( OnStage() && !mOnStageSignalled )
   {
     // Notification for external (CustomActor) derived classes
-    OnStageConnectionExternal();
+    OnStageConnectionExternal( mDepth );
 
     if( !mOnStageSignal.Empty() )
     {
@@ -2480,8 +2522,7 @@ void Actor::DisconnectFromStage()
   const ActorIter endIter = disconnectionList.end();
   for( ActorIter iter = disconnectionList.begin(); iter != endIter; ++iter )
   {
-    Actor& actor = GetImplementation( *iter );
-    actor.NotifyStageDisconnection();
+    (*iter)->NotifyStageDisconnection();
   }
 }
 
@@ -2495,13 +2536,12 @@ void Actor::RecursiveDisconnectFromStage( ActorContainer& disconnectionList )
     ActorConstIter endIter = mChildren->end();
     for( ActorIter iter = mChildren->begin(); iter != endIter; ++iter )
     {
-      Actor& actor = GetImplementation( *iter );
-      actor.RecursiveDisconnectFromStage( disconnectionList );
+      (*iter)->RecursiveDisconnectFromStage( disconnectionList );
     }
   }
 
   // This stage is atomic; avoid emitting callbacks until all Actors are disconnected
-  disconnectionList.push_back( Dali::Actor( this ) );
+  disconnectionList.push_back( ActorPtr( this ) );
 
   // Notification for internal derived classes
   OnStageDisconnectionInternal();
@@ -3839,7 +3879,7 @@ void Actor::SetParent( Actor* parent, int index )
          parent->OnStage() )
     {
       // Instruct each actor to create a corresponding node in the scene graph
-      ConnectToStage( index );
+      ConnectToStage( parent->GetDepth(), index );
     }
   }
   else // parent being set to NULL
@@ -3892,7 +3932,7 @@ bool Actor::DoAction( BaseObject* object, const std::string& actionName, const P
   return done;
 }
 
-void Actor::EnsureRelayoutData() const
+void Actor::EnsureRelayoutData()
 {
   // Assign relayout data.
   if( !mRelayoutData )
@@ -4005,22 +4045,25 @@ void Actor::SetPadding( const Vector2& padding, Dimension::Type dimension )
 
 Vector2 Actor::GetPadding( Dimension::Type dimension ) const
 {
-  EnsureRelayoutData();
-
-  // If more than one dimension is requested, just return the first one found
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  if ( mRelayoutData )
   {
-    if( ( dimension & ( 1 << i ) ) )
+    // If more than one dimension is requested, just return the first one found
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      return mRelayoutData->dimensionPadding[ i ];
+      if( ( dimension & ( 1 << i ) ) )
+      {
+        return mRelayoutData->dimensionPadding[ i ];
+      }
     }
   }
 
-  return Vector2( 0.0f, 0.0f );   // Default
+  return GetDefaultDimensionPadding();
 }
 
 void Actor::SetLayoutNegotiated( bool negotiated, Dimension::Type dimension )
 {
+  EnsureRelayoutData();
+
   for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
   {
     if( dimension & ( 1 << i ) )
@@ -4032,11 +4075,14 @@ void Actor::SetLayoutNegotiated( bool negotiated, Dimension::Type dimension )
 
 bool Actor::IsLayoutNegotiated( Dimension::Type dimension ) const
 {
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  if ( mRelayoutData )
   {
-    if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionNegotiated[ i ] )
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      return true;
+      if( ( dimension & ( 1 << i ) ) && mRelayoutData->dimensionNegotiated[ i ] )
+      {
+        return true;
+      }
     }
   }
 
@@ -4153,14 +4199,13 @@ float Actor::NegotiateFromChildren( Dimension::Type dimension )
 
   for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
   {
-    Dali::Actor child = GetChildAt( i );
-    Actor& childImpl = GetImplementation( child );
+    ActorPtr child = GetChildAt( i );
 
-    if( !childImpl.RelayoutDependentOnParent( dimension ) )
+    if( !child->RelayoutDependentOnParent( dimension ) )
     {
       // Calculate the min and max points that the children range across
-      float childPosition = GetDimensionValue( childImpl.GetTargetPosition(), dimension );
-      float dimensionSize = childImpl.GetRelayoutSize( dimension );
+      float childPosition = GetDimensionValue( child->GetTargetPosition(), dimension );
+      float dimensionSize = child->GetRelayoutSize( dimension );
       maxDimensionPoint = std::max( maxDimensionPoint, childPosition + dimensionSize );
     }
   }
@@ -4289,13 +4334,12 @@ void Actor::NegotiateDimension( Dimension::Type dimension, const Vector2& alloca
       {
         for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
         {
-          Dali::Actor child = GetChildAt( i );
-          Actor& childImpl = GetImplementation( child );
+          ActorPtr child = GetChildAt( i );
 
           // Only relayout child first if it is not dependent on this actor
-          if( !childImpl.RelayoutDependentOnParent( dimension ) )
+          if( !child->RelayoutDependentOnParent( dimension ) )
           {
-            childImpl.NegotiateDimension( dimension, allocatedSize, recursionStack );
+            child->NegotiateDimension( dimension, allocatedSize, recursionStack );
           }
         }
       }
@@ -4444,12 +4488,12 @@ void Actor::NegotiateSize( const Vector2& allocatedSize, RelayoutContainer& cont
 
   for( unsigned int i = 0, count = GetChildCount(); i < count; ++i )
   {
-    Dali::Actor child = GetChildAt( i );
+    ActorPtr child = GetChildAt( i );
 
     // Only relayout if required
-    if( GetImplementation( child ).RelayoutRequired() )
+    if( child->RelayoutRequired() )
     {
-      container.Add( child, newBounds );
+      container.Add( Dali::Actor( child.Get() ), newBounds );
     }
   }
 }
@@ -4493,9 +4537,12 @@ void Actor::SetPreferredSize( const Vector2& size )
 
 Vector2 Actor::GetPreferredSize() const
 {
-  EnsureRelayoutData();
+  if ( mRelayoutData )
+  {
+    return mRelayoutData->preferredSize;
+  }
 
-  return mRelayoutData->preferredSize;
+  return GetDefaultPreferredSize();
 }
 
 void Actor::SetMinimumSize( float size, Dimension::Type dimension )
@@ -4515,13 +4562,14 @@ void Actor::SetMinimumSize( float size, Dimension::Type dimension )
 
 float Actor::GetMinimumSize( Dimension::Type dimension ) const
 {
-  EnsureRelayoutData();
-
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  if ( mRelayoutData )
   {
-    if( dimension & ( 1 << i ) )
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      return mRelayoutData->minimumSize[ i ];
+      if( dimension & ( 1 << i ) )
+      {
+        return mRelayoutData->minimumSize[ i ];
+      }
     }
   }
 
@@ -4545,17 +4593,18 @@ void Actor::SetMaximumSize( float size, Dimension::Type dimension )
 
 float Actor::GetMaximumSize( Dimension::Type dimension ) const
 {
-  EnsureRelayoutData();
-
-  for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
+  if ( mRelayoutData )
   {
-    if( dimension & ( 1 << i ) )
+    for( unsigned int i = 0; i < Dimension::DIMENSION_COUNT; ++i )
     {
-      return mRelayoutData->maximumSize[ i ];
+      if( dimension & ( 1 << i ) )
+      {
+        return mRelayoutData->maximumSize[ i ];
+      }
     }
   }
 
-  return 0.0f;  // Default
+  return FLT_MAX;  // Default
 }
 
 } // namespace Internal

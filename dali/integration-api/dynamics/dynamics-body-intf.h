@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-common.h>
-#include <dali/devel-api/geometry/mesh-data.h>
+#include <dali/devel-api/rendering/geometry.h>
 
 namespace Dali
 {
@@ -120,7 +120,7 @@ public:
    * Get the vertices and normal from a soft body
    * @param[in,out] meshData A MeshData object with preallocated space for all the vertices.
    */
-  virtual void GetSoftVertices( MeshData::VertexContainer& meshData ) const = 0;
+  virtual void GetSoftVertices( Geometry geometry ) const = 0;
 
 }; // class DynamicsBody
 

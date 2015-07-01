@@ -8,16 +8,15 @@ SET(CAPI_LIB "dali-internal")
 SET(TC_SOURCES
         utc-Dali-Internal-Handles.cpp
         utc-Dali-Internal-ImageFactory.cpp
-        utc-Dali-Internal-Mesh.cpp
         utc-Dali-Internal-ResourceClient.cpp
         utc-Dali-Internal-Image-Culling.cpp
         utc-Dali-Internal-FixedSizeMemoryPool.cpp
         utc-Dali-Internal-MemoryPoolObjectAllocator.cpp
-        utc-Dali-Internal-RelayoutController.cpp
+        utc-Dali-Internal-FrustumCulling.cpp
 )
 
 LIST(APPEND TC_SOURCES
-        ../dali-devel/mesh-builder.cpp
+        ../dali/dali-test-suite-utils/mesh-builder.cpp
         ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
         ../dali/dali-test-suite-utils/test-application.cpp

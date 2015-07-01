@@ -24,6 +24,8 @@
 #include <dali/integration-api/debug.h>
 #include <test-native-image.h>
 
+#include <mesh-builder.h>
+
 #define BOOLSTR(x) ((x)?"T":"F")
 
 
@@ -179,6 +181,20 @@ ImageActor CreateLoadingImage(TestApplication& application, std::string filename
   application.SendNotification();
   application.Render(16);
   return actor;
+}
+
+Sampler CreateSamplerWithLoadingImage(TestApplication& application, std::string filename, ResourceImage::LoadPolicy loadPolicy, Image::ReleasePolicy releasePolicy)
+{
+  Image image = ResourceImage::New(filename, loadPolicy, releasePolicy);
+  DALI_TEST_CHECK( image );
+  application.SendNotification();
+  application.Render(16);
+  DALI_TEST_CHECK( application.GetPlatform().WasCalled(TestPlatformAbstraction::LoadResourceFunc) );
+
+  Sampler sampler = Sampler::New( image, "sTexture" );
+  application.SendNotification();
+  application.Render(16);
+  return sampler;
 }
 
 void CompleteImageLoad(TestApplication& application, Integration::ResourceId resourceId, Integration::ResourceTypeId requestType)
@@ -1960,6 +1976,55 @@ int UtcDaliRenderTaskContinuous04(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskContinous05(void)
+{
+  TestApplication application;
+
+  tet_infoline("Testing RenderTask Render Continuous using Mesh which accesses texture through sampler with loading image\n"
+               "PRE: Resource not ready\nPOST:continuous renders, no Finished signal");
+
+  // SETUP AN OFFSCREEN RENDER TASK
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  Material material = CreateMaterial(1.0f);
+  Sampler sampler = CreateSamplerWithLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
+  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
+  Integration::ResourceId imageRequestId = imageRequest->GetId();
+  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
+  material.AddSampler( sampler );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor secondRootActor = Actor::New();
+  secondRootActor.AddRenderer(renderer);
+  secondRootActor.SetSize(100, 100);
+  Stage::GetCurrent().Add(secondRootActor);
+
+  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
+  bool finished = false;
+  RenderTaskFinished renderTaskFinished( finished );
+  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
+  application.SendNotification();
+
+  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+
+  // FINISH RESOURCE LOADING - expect 'continuous' renders to start, no finished signal
+  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
+
+  END_TEST;
+}
+
 
 int UtcDaliRenderTaskOnce01(void)
 {
@@ -2019,6 +2084,64 @@ int UtcDaliRenderTaskOnce02(void)
 {
   TestApplication application;
 
+  tet_infoline("Testing RenderTask Render Once GlSync, using Mesh which accesses texture through sampler with loading image.\n"
+               "PRE: Resources not ready\nPOST: Finished signal sent once only");
+
+  // SETUP AN OFFSCREEN RENDER TASK
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  Material material = CreateMaterial(1.0f);
+  Sampler sampler = CreateSamplerWithLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
+  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
+  Integration::ResourceId imageRequestId = imageRequest->GetId();
+  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
+  material.AddSampler( sampler );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor secondRootActor = Actor::New();
+  secondRootActor.AddRenderer(renderer);
+  secondRootActor.SetSize(100, 100);
+  Stage::GetCurrent().Add(secondRootActor);
+
+  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, true);
+  bool finished = false;
+  RenderTaskFinished renderTaskFinished( finished );
+  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
+  application.SendNotification();
+
+  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
+   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+
+   // FINISH RESOURCE LOADING - expect no rendering yet
+   CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
+   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+   Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+   DALI_TEST_CHECK( lastSyncObj != NULL );
+
+   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+   application.GetPlatform().ClearReadyResources();
+   sync.SetObjectSynced( lastSyncObj, true );
+   DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,   finished, false, true  ) );
+   DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
+
+   END_TEST;
+}
+
+int UtcDaliRenderTaskOnce03(void)
+{
+  TestApplication application;
+
   tet_infoline("Testing RenderTask Render Once GlSync, using loading image. Switch from render always after ready to render once\n"
                "PRE: Render task ready, Image not loaded\n"
                "POST: Finished signal sent only once");
@@ -2073,7 +2196,73 @@ int UtcDaliRenderTaskOnce02(void)
 }
 
 
-int UtcDaliRenderTaskOnce03(void)
+int UtcDaliRenderTaskOnce04(void)
+{
+  TestApplication application;
+  tet_infoline("Testing RenderTask Render Once GlSync, using Mesh which accesses texture through sampler with loading image.\n"
+               "Switch from render always after ready to render once\n"
+               "PRE: Render task ready, Image not loaded\n"
+               "POST: Finished signal sent only once");
+
+  // SETUP AN OFFSCREEN RENDER TASK
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  TestGlSyncAbstraction& sync = application.GetGlSyncAbstraction();
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  Material material = CreateMaterial(1.0f);
+  Sampler sampler = CreateSamplerWithLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
+  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
+  Integration::ResourceId imageRequestId = imageRequest->GetId();
+  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
+  material.AddSampler( sampler );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor secondRootActor = Actor::New();
+  secondRootActor.AddRenderer(renderer);
+  secondRootActor.SetSize(100, 100);
+  Stage::GetCurrent().Add(secondRootActor);
+
+  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, true);
+  bool finished = false;
+  RenderTaskFinished renderTaskFinished( finished );
+  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
+  application.SendNotification();
+
+  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,    finished, false, true ) );
+
+  // FINISH RESOURCE LOADING
+  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
+  application.GetPlatform().ClearReadyResources();
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
+
+  newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+  application.SendNotification(); //         Input,    Expected  Input,    Expected
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  Integration::GlSyncAbstraction::SyncObject* lastSyncObj = sync.GetLastSyncObject();
+  DALI_TEST_CHECK( lastSyncObj != NULL );
+
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  sync.SetObjectSynced( lastSyncObj, true );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true  ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskOnce05(void)
 {
   TestApplication application;
 
@@ -2139,7 +2328,7 @@ int UtcDaliRenderTaskOnce03(void)
 }
 
 #if 0
-//int UtcDaliRenderTaskOnce04(void)
+//int UtcDaliRenderTaskOnce06(void)
 {
   TestApplication application;
 
@@ -2213,7 +2402,7 @@ int UtcDaliRenderTaskOnce03(void)
 }
 #endif
 
-int UtcDaliRenderTaskOnce05(void)
+int UtcDaliRenderTaskOnce07(void)
 {
   TestApplication application;
 
@@ -2278,7 +2467,7 @@ int UtcDaliRenderTaskOnce05(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskOnce06(void)
+int UtcDaliRenderTaskOnce08(void)
 {
   TestApplication application;
 
@@ -2355,7 +2544,7 @@ int UtcDaliRenderTaskOnce06(void)
 }
 
 
-int UtcDaliRenderTaskOnce07(void)
+int UtcDaliRenderTaskOnce09(void)
 {
   TestApplication application;
 
@@ -2416,9 +2605,7 @@ int UtcDaliRenderTaskOnce07(void)
   END_TEST;
 }
 
-
-
-int UtcDaliRenderTaskOnce08(void)
+int UtcDaliRenderTaskOnce10(void)
 {
   TestApplication application;
 
@@ -2480,8 +2667,6 @@ int UtcDaliRenderTaskOnce08(void)
   END_TEST;
 }
 
-
-
 int UtcDaliRenderTaskOnceNoSync01(void)
 {
   TestApplication application;
@@ -2527,6 +2712,56 @@ int UtcDaliRenderTaskOnceNoSync02(void)
 {
   TestApplication application;
 
+  tet_infoline("Testing RenderTask Render Once, using Mesh which accesses texture through sampler with loading image.\n"
+               "PRE: Resources not ready\nPOST: Finished signal sent once only");
+  // SETUP AN OFFSCREEN RENDER TASK
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  Material material = CreateMaterial(1.0f);
+  Sampler sampler = CreateSamplerWithLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
+  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
+  Integration::ResourceId imageRequestId = imageRequest->GetId();
+  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
+  material.AddSampler( sampler );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor secondRootActor = Actor::New();
+  secondRootActor.AddRenderer(renderer);
+  secondRootActor.SetSize(100, 100);
+  Stage::GetCurrent().Add(secondRootActor);
+
+  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ONCE, false);
+  bool finished = false;
+  RenderTaskFinished renderTaskFinished( finished );
+  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
+  application.SendNotification();
+
+  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+
+  // FINISH RESOURCE LOADING - expect immediate rendering yet
+  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  application.GetPlatform().ClearReadyResources();
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false ) );
+
+  END_TEST;
+}
+
+int UtcDaliRenderTaskOnceNoSync03(void)
+{
+  TestApplication application;
+
   tet_infoline("Testing RenderTask Render Once, using loading image. Switch from render always after ready to render once\n"
                "PRE: Render task ready, Image not loaded\n"
                "POST: Finished signal sent only once");
@@ -2569,8 +2804,64 @@ int UtcDaliRenderTaskOnceNoSync02(void)
   END_TEST;
 }
 
+int UtcDaliRenderTaskOnceNoSync04(void)
+{
+  TestApplication application;
 
-int UtcDaliRenderTaskOnceNoSync03(void)
+  tet_infoline("Testing RenderTask Render Once, using Mesh which accesses texture through sampler with loading image.\n"
+               "Switch from render always after ready to render once\n"
+               "PRE: Render task ready, Image not loaded\n"
+               "POST: Finished signal sent only once");
+
+  // SETUP A CONTINUOUS OFFSCREEN RENDER TASK
+  application.GetGlAbstraction().SetCheckFramebufferStatusResult( GL_FRAMEBUFFER_COMPLETE );
+  TraceCallStack& drawTrace = application.GetGlAbstraction().GetDrawTrace();
+  drawTrace.Enable(true);
+
+  Actor rootActor = Actor::New();
+  Stage::GetCurrent().Add( rootActor );
+
+  CameraActor offscreenCameraActor = CameraActor::New();
+  Stage::GetCurrent().Add( offscreenCameraActor );
+
+  Material material = CreateMaterial(1.0f);
+  Sampler sampler = CreateSamplerWithLoadingImage(application, "aFile.jpg", ResourceImage::IMMEDIATE, Image::UNUSED);
+  Integration::ResourceRequest* imageRequest = application.GetPlatform().GetRequest();
+  Integration::ResourceId imageRequestId = imageRequest->GetId();
+  Integration::ResourceTypeId imageType  = imageRequest->GetType()->id;
+  material.AddSampler( sampler );
+
+  Geometry geometry = CreateQuadGeometry();
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor secondRootActor = Actor::New();
+  secondRootActor.AddRenderer(renderer);
+  secondRootActor.SetSize(100, 100);
+  Stage::GetCurrent().Add(secondRootActor);
+
+
+  RenderTask newTask = CreateRenderTask(application, offscreenCameraActor, rootActor, secondRootActor, RenderTask::REFRESH_ALWAYS, false);
+  bool finished = false;
+  RenderTaskFinished renderTaskFinished( finished );
+  newTask.FinishedSignal().Connect( &application, renderTaskFinished );
+  application.SendNotification();
+
+  // START PROCESS/RENDER                    Input,    Expected  Input,    Expected
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, false, true ) );
+
+  // FINISH RESOURCE LOADING
+  CompleteImageLoad(application, imageRequestId, imageType); // Need to run update again for this to complete
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, false ) );
+  application.GetPlatform().ClearReadyResources();
+
+  newTask.SetRefreshRate(RenderTask::REFRESH_ONCE);
+  application.SendNotification(); //         Input,    Expected  Input,    Expected
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, true,    finished, false, true ) );
+  DALI_TEST_CHECK( UpdateRender(application, drawTrace, false,   finished, true, false  ) );
+  END_TEST;
+}
+
+int UtcDaliRenderTaskOnceNoSync05(void)
 {
   TestApplication application;
 
@@ -2620,7 +2911,7 @@ int UtcDaliRenderTaskOnceNoSync03(void)
 }
 
 #if 0
-//int UtcDaliRenderTaskOnceNoSync04(void)
+//int UtcDaliRenderTaskOnceNoSync06(void)
 {
   TestApplication application;
 
@@ -2682,7 +2973,7 @@ int UtcDaliRenderTaskOnceNoSync03(void)
 }
 #endif
 
-int UtcDaliRenderTaskOnceNoSync05(void)
+int UtcDaliRenderTaskOnceNoSync07(void)
 {
   TestApplication application;
 
@@ -2733,7 +3024,7 @@ int UtcDaliRenderTaskOnceNoSync05(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskOnceNoSync06(void)
+int UtcDaliRenderTaskOnceNoSync08(void)
 {
   TestApplication application;
 
@@ -2794,7 +3085,7 @@ int UtcDaliRenderTaskOnceNoSync06(void)
 }
 
 
-int UtcDaliRenderTaskOnceNoSync07(void)
+int UtcDaliRenderTaskOnceNoSync09(void)
 {
   TestApplication application;
 
@@ -2845,7 +3136,7 @@ int UtcDaliRenderTaskOnceNoSync07(void)
   END_TEST;
 }
 
-int UtcDaliRenderTaskOnceNoSync08(void)
+int UtcDaliRenderTaskOnceNoSync10(void)
 {
   TestApplication application;
 

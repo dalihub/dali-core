@@ -12,14 +12,13 @@ internal_src_files = \
   $(internal_src_dir)/event/actor-attachments/actor-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/camera-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/image-attachment-impl.cpp \
-  $(internal_src_dir)/event/actor-attachments/mesh-attachment-impl.cpp \
   $(internal_src_dir)/event/actor-attachments/renderable-attachment-impl.cpp \
+  $(internal_src_dir)/event/actor-attachments/renderer-attachment-impl.cpp \
   $(internal_src_dir)/event/actors/actor-impl.cpp \
   $(internal_src_dir)/event/actors/custom-actor-internal.cpp \
   $(internal_src_dir)/event/actors/image-actor-impl.cpp \
   $(internal_src_dir)/event/actors/layer-impl.cpp \
   $(internal_src_dir)/event/actors/layer-list.cpp \
-  $(internal_src_dir)/event/actors/mesh-actor-impl.cpp \
   $(internal_src_dir)/event/actors/camera-actor-impl.cpp \
   $(internal_src_dir)/event/actors/renderable-actor-impl.cpp \
   $(internal_src_dir)/event/animation/animation-impl.cpp \
@@ -36,9 +35,10 @@ internal_src_files = \
   $(internal_src_dir)/event/common/object-impl.cpp \
   $(internal_src_dir)/event/common/object-registry-impl.cpp \
   $(internal_src_dir)/event/common/projection.cpp \
-  $(internal_src_dir)/event/common/property-notification-manager.cpp \
+  $(internal_src_dir)/event/common/property-buffer-impl.cpp  \
   $(internal_src_dir)/event/common/property-conditions-impl.cpp  \
   $(internal_src_dir)/event/common/property-notification-impl.cpp  \
+  $(internal_src_dir)/event/common/property-notification-manager.cpp \
   $(internal_src_dir)/event/common/stage-impl.cpp \
   $(internal_src_dir)/event/common/system-overlay-impl.cpp \
   $(internal_src_dir)/event/common/thread-local-storage.cpp \
@@ -80,13 +80,14 @@ internal_src_files = \
   $(internal_src_dir)/event/images/nine-patch-image-impl.cpp \
   $(internal_src_dir)/event/images/resource-image-impl.cpp \
   $(internal_src_dir)/event/images/native-image-impl.cpp \
-  $(internal_src_dir)/event/modeling/animatable-mesh-impl.cpp \
-  $(internal_src_dir)/event/modeling/cloth-impl.cpp \
-  $(internal_src_dir)/event/modeling/material-impl.cpp \
-  $(internal_src_dir)/event/modeling/mesh-impl.cpp \
   $(internal_src_dir)/event/object/custom-object-internal.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-impl.cpp \
   $(internal_src_dir)/event/render-tasks/render-task-list-impl.cpp \
+  $(internal_src_dir)/event/rendering/geometry-impl.cpp \
+  $(internal_src_dir)/event/rendering/material-impl.cpp \
+  $(internal_src_dir)/event/rendering/renderer-impl.cpp \
+  $(internal_src_dir)/event/rendering/sampler-impl.cpp \
+  $(internal_src_dir)/event/rendering/shader-impl.cpp \
   $(internal_src_dir)/event/resources/archive.cpp \
   $(internal_src_dir)/event/resources/image-ticket.cpp \
   $(internal_src_dir)/event/resources/resource-client.cpp \
@@ -104,6 +105,7 @@ internal_src_files = \
   $(internal_src_dir)/render/common/render-tracker.cpp \
   $(internal_src_dir)/render/common/render-manager.cpp \
   $(internal_src_dir)/render/common/texture-cache-dispatcher.cpp \
+  $(internal_src_dir)/render/data-providers/render-data-provider.cpp \
   $(internal_src_dir)/render/gl-resources/bitmap-texture.cpp \
   $(internal_src_dir)/render/gl-resources/context.cpp \
   $(internal_src_dir)/render/gl-resources/frame-buffer-state-cache.cpp \
@@ -117,34 +119,35 @@ internal_src_files = \
   $(internal_src_dir)/render/gl-resources/texture-factory.cpp \
   $(internal_src_dir)/render/gl-resources/texture-cache.cpp \
   $(internal_src_dir)/render/queue/render-queue.cpp \
-  $(internal_src_dir)/render/renderers/render-material.cpp \
+  $(internal_src_dir)/render/renderers/render-geometry.cpp \
+  $(internal_src_dir)/render/renderers/render-renderer.cpp \
+  $(internal_src_dir)/render/renderers/render-renderer-property-buffer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-image-renderer.cpp \
-  $(internal_src_dir)/render/renderers/scene-graph-mesh-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer.cpp \
   $(internal_src_dir)/render/renderers/scene-graph-renderer-debug.cpp \
   $(internal_src_dir)/render/shaders/custom-uniform.cpp \
   $(internal_src_dir)/render/shaders/program.cpp \
   $(internal_src_dir)/render/shaders/program-controller.cpp \
-  $(internal_src_dir)/render/shaders/shader.cpp \
+  $(internal_src_dir)/render/shaders/scene-graph-shader.cpp \
   \
   $(internal_src_dir)/update/animation/scene-graph-animation.cpp \
   $(internal_src_dir)/update/animation/scene-graph-constraint-base.cpp \
   $(internal_src_dir)/update/common/discard-queue.cpp \
   $(internal_src_dir)/update/common/property-base.cpp \
+  $(internal_src_dir)/update/common/property-owner-messages.cpp \
   $(internal_src_dir)/update/common/property-condition-functions.cpp \
   $(internal_src_dir)/update/common/property-condition-step-functions.cpp \
   $(internal_src_dir)/update/common/property-condition-variable-step-functions.cpp \
   $(internal_src_dir)/update/common/property-owner.cpp \
   $(internal_src_dir)/update/common/scene-graph-buffers.cpp \
+  $(internal_src_dir)/update/common/scene-graph-connection-change-propagator.cpp \
+  $(internal_src_dir)/update/common/scene-graph-property-buffer.cpp \
   $(internal_src_dir)/update/common/scene-graph-property-notification.cpp \
+  $(internal_src_dir)/update/common/uniform-map.cpp \
   $(internal_src_dir)/update/controllers/render-message-dispatcher.cpp \
   $(internal_src_dir)/update/controllers/scene-controller-impl.cpp \
-  $(internal_src_dir)/update/modeling/internal-mesh-data.cpp \
-  $(internal_src_dir)/update/modeling/scene-graph-animatable-mesh.cpp \
   $(internal_src_dir)/update/gestures/pan-gesture-profiling.cpp \
   $(internal_src_dir)/update/gestures/scene-graph-pan-gesture.cpp \
-  $(internal_src_dir)/update/modeling/scene-graph-material.cpp \
-  $(internal_src_dir)/update/modeling/scene-graph-mesh.cpp \
   $(internal_src_dir)/update/queue/update-message-queue.cpp \
   $(internal_src_dir)/update/touch/touch-resampler.cpp \
   $(internal_src_dir)/update/manager/prepare-render-algorithms.cpp \
@@ -156,13 +159,16 @@ internal_src_files = \
   $(internal_src_dir)/update/node-attachments/node-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-camera-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-image-attachment.cpp \
-  $(internal_src_dir)/update/node-attachments/scene-graph-mesh-attachment.cpp \
   $(internal_src_dir)/update/node-attachments/scene-graph-renderable-attachment.cpp \
+  $(internal_src_dir)/update/node-attachments/scene-graph-renderer-attachment.cpp \
   $(internal_src_dir)/update/nodes/node.cpp \
   $(internal_src_dir)/update/nodes/node-messages.cpp \
   $(internal_src_dir)/update/nodes/scene-graph-layer.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task.cpp \
   $(internal_src_dir)/update/render-tasks/scene-graph-render-task-list.cpp \
+  $(internal_src_dir)/update/rendering/scene-graph-geometry.cpp \
+  $(internal_src_dir)/update/rendering/scene-graph-material.cpp \
+  $(internal_src_dir)/update/rendering/scene-graph-sampler.cpp \
   $(internal_src_dir)/update/resources/bitmap-metadata.cpp \
   $(internal_src_dir)/update/resources/resource-manager.cpp \
   $(internal_src_dir)/update/resources/resource-tracker.cpp \
@@ -178,7 +184,6 @@ internal_dynamics_src_files = \
   $(internal_src_dir)/event/dynamics/dynamics-cube-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-cylinder-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-joint-impl.cpp \
-  $(internal_src_dir)/event/dynamics/dynamics-mesh-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-sphere-shape-impl.cpp \
   $(internal_src_dir)/event/dynamics/dynamics-world-config-impl.cpp \
@@ -189,7 +194,6 @@ internal_dynamics_src_files = \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-cube-shape.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-cylinder-shape.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-joint.cpp \
-  $(internal_src_dir)/update/dynamics/scene-graph-dynamics-mesh-shape.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-shape.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-sphere-shape.cpp \
   $(internal_src_dir)/update/dynamics/scene-graph-dynamics-world.cpp

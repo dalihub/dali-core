@@ -24,10 +24,7 @@
 #include <dali/integration-api/dynamics/dynamics-factory-intf.h>
 #include <dali/integration-api/dynamics/dynamics-shape-intf.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-shape.h>
-#include <dali/internal/update/dynamics/scene-graph-dynamics-mesh-shape.h>
 #include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
-#include <dali/internal/update/modeling/scene-graph-mesh.h>
-#include <dali/internal/update/modeling/internal-mesh-data.h>
 #include <dali/internal/update/nodes/node.h>
 
 namespace Dali
@@ -65,9 +62,7 @@ void DynamicsBody::Initialize( Integration::DynamicsBodySettings* settings, Dyna
 
   if( Dali::DynamicsBodyConfig::SOFT == settings->type )
   {
-    Mesh* mesh( static_cast<DynamicsMeshShape&>(*shape).GetMesh() );
-    DALI_ASSERT_DEBUG( mesh );
-    mMesh = mesh;
+    // @todo Create a mesh from the dynamics body.
   }
 
   Vector3 position;
@@ -322,11 +317,7 @@ bool DynamicsBody::RefreshNode(BufferIndex updateBufferIndex)
 
 void DynamicsBody::RefreshMesh(BufferIndex updateBufferIndex)
 {
-  Internal::MeshData& meshData( mMesh->GetMeshData( Mesh::UPDATE_THREAD ) );
-
-  mBody->GetSoftVertices( meshData.GetVertices() );
-
-  mMesh->MeshDataUpdated( updateBufferIndex, Mesh::UPDATE_THREAD, NULL );
+  ///@todo Update the mesh from the dynamics body.
 }
 
 } // namespace SceneGraph

@@ -556,53 +556,6 @@ inline Vector3 Max( const Vector3& a, const Vector3& b )
  */
 DALI_IMPORT_API Vector3 Clamp( const Vector3& v, const float& min, const float& max );
 
-/**
- * @brief Scales an Actor, such that it fits within its Parent's Size Keeping the aspect ratio.
- *
- * f(target, source) = Vector3( min( target.X / source.X, min( target.Y / source.Y, target.Z / source.Z ) )
- * If any of the source dimensions is zero it will be ignored in the calculation
- *
- * @param [in] target size
- * @param [in] source size
- * @return target scaled inside source
- */
-DALI_IMPORT_API Vector3 FitKeepAspectRatio( const Vector3& target, const Vector3& source );
-
-/**
- * @brief Scales an Actor, such that it fill its Parent's Size Keeping the aspect ratio.
- *
- * f(target, source) = Vector3( max( target.X / source.X, max( target.Y / source.Y, target.Z / source.Z ) )
- * If any of the source dimensions is zero it will be ignored in the calculation
- *
- * @param [in] target size
- * @param [in] source size
- * @return target scaled inside source
- */
-DALI_IMPORT_API Vector3 FillKeepAspectRatio( const Vector3& target, const Vector3& source );
-
-/**
- * @brief Scales an Actor, such that it fill its Parent's Size in the X and Y coordinates Keeping the aspect ratio.
- *
- * f(target, source) = Vector3( max( target.X / sizeX, target.Y / sizeY ) )
- * If any of the source dimensions is zero it will be ignored in the calculation
- *
- * @param [in] target size
- * @param [in] source size
- * @return target scaled inside source
- */
-DALI_IMPORT_API Vector3 FillXYKeepAspectRatio( const Vector3& target, const Vector3& source );
-
-/**
- * @brief Shrinks source size inside the target size maintaining aspect ratio of source.
- *
- * If source is smaller than target it returns source
- * @pre source width and height > 0
- * @param [in] target size
- * @param [in] source size
- * @return target scaled inside source
- */
-DALI_IMPORT_API Vector3 ShrinkInsideKeepAspectRatio( const Vector3& target, const Vector3& source );
-
 // Allow Vector3 to be treated as a POD type
 template <> struct TypeTraits< Vector3 > : public BasicTypes< Vector3 > { enum { IS_TRIVIAL_TYPE = true }; };
 

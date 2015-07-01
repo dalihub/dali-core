@@ -26,6 +26,7 @@
 #include <dali/internal/update/animation/scene-graph-constraint-base.h>
 #include <dali/internal/update/common/animatable-property.h>
 #include <dali/internal/update/common/property-owner-messages.h>
+#include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/property-notification-impl.h>
@@ -49,6 +50,8 @@ typedef Dali::Vector<Object::Observer*>::ConstIterator ConstObserverIter;
 #if defined(DEBUG_ENABLED)
 Debug::Filter* gLogFilter = Debug::Filter::New(Debug::NoLogging, false, "LOG_OBJECT" );
 #endif
+
+
 } // unnamed namespace
 
 Object::Object()
@@ -627,7 +630,12 @@ Property::Index Object::RegisterSceneGraphProperty(const std::string& name, Prop
 
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue)
 {
-  return RegisterSceneGraphProperty(name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue);
+  Property::Index index = RegisterSceneGraphProperty(name, PROPERTY_CUSTOM_START_INDEX + mCustomProperties.Count(), propertyValue);
+
+  /// @todo: don't keep a table of mappings per handle.
+  AddUniformMapping(index, name);
+
+  return index;
 }
 
 Property::Index Object::RegisterProperty( const std::string& name, const Property::Value& propertyValue, Property::AccessMode accessMode)
@@ -750,6 +758,57 @@ void Object::DisablePropertyNotifications()
       GetImplementation(*iter).Disable();
     }
   }
+}
+
+void Object::AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName )
+{
+  // Get the address of the property if it's a scene property
+  const PropertyInputImpl* propertyPtr = GetSceneObjectInputProperty( propertyIndex );
+
+  // Check instead for newly registered properties
+  if( propertyPtr == NULL )
+  {
+    PropertyMetadata* animatable = FindAnimatableProperty( propertyIndex );
+    if( animatable != NULL )
+    {
+      propertyPtr = animatable->GetSceneGraphProperty();
+    }
+  }
+
+  if( propertyPtr == NULL )
+  {
+    PropertyMetadata* custom = FindCustomProperty( propertyIndex );
+    if( custom != NULL )
+    {
+      propertyPtr = custom->GetSceneGraphProperty();
+    }
+  }
+
+  // @todo MESH_REWORK Store mappings for unstaged objects?
+
+  if( propertyPtr != NULL )
+  {
+    const SceneGraph::PropertyOwner* sceneObject = GetPropertyOwner();
+
+    if( sceneObject != NULL )
+    {
+      SceneGraph::UniformPropertyMapping* map = new SceneGraph::UniformPropertyMapping( uniformName, propertyPtr );
+      // Message takes ownership of Uniform map (and will delete it after copy)
+      AddUniformMapMessage( GetEventThreadServices(), *sceneObject, map);
+    }
+    else
+    {
+      // @todo MESH_REWORK FIXME Need to store something that can be sent to the scene
+      // object when staged.
+      DALI_ASSERT_ALWAYS(0 && "MESH_REWORK - Need to store property whilst off-stage" );
+    }
+  }
+}
+
+void Object::RemoveUniformMapping( const std::string& uniformName )
+{
+  const SceneGraph::PropertyOwner* sceneObject = GetSceneObject();
+  RemoveUniformMapMessage( GetEventThreadServices(), *sceneObject, uniformName);
 }
 
 Property::Value Object::GetPropertyValue( const PropertyMetadata* entry ) const

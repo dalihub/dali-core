@@ -27,6 +27,7 @@
 
 #include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
+#include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 #include <dali/internal/event/animation/constraint-impl.h>
 #include <dali/internal/event/size-negotiation/relayout-controller-impl.h>
@@ -127,19 +128,20 @@ unsigned int Actor::GetChildCount() const
 
 Actor Actor::GetChildAt(unsigned int index) const
 {
-  return GetImplementation(*this).GetChildAt(index);
+  Internal::ActorPtr child = GetImplementation(*this).GetChildAt( index );
+  return Actor( child.Get() );
 }
 
 Actor Actor::FindChildByName(const std::string& actorName)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildByName(actorName);
-  return Actor(child.Get());
+  Internal::ActorPtr child = GetImplementation(*this).FindChildByName( actorName );
+  return Actor( child.Get() );
 }
 
 Actor Actor::FindChildById(const unsigned int id)
 {
-  Internal::ActorPtr child = GetImplementation(*this).FindChildById(id);
-  return Actor(child.Get());
+  Internal::ActorPtr child = GetImplementation(*this).FindChildById( id );
+  return Actor( child.Get() );
 }
 
 Actor Actor::GetParent() const
@@ -556,6 +558,31 @@ Actor::OnStageSignalType& Actor::OnStageSignal()
 Actor::OffStageSignalType& Actor::OffStageSignal()
 {
   return GetImplementation(*this).OffStageSignal();
+}
+
+unsigned int Actor::AddRenderer( Renderer& renderer )
+{
+  return GetImplementation(*this).AddRenderer( GetImplementation( renderer ) );
+}
+
+unsigned int Actor::GetRendererCount() const
+{
+  return GetImplementation(*this).GetRendererCount();
+}
+
+Renderer Actor::GetRendererAt( unsigned int index )
+{
+  return Renderer( &GetImplementation(*this).GetRendererAt( index ) );
+}
+
+void Actor::RemoveRenderer( Renderer& renderer )
+{
+  GetImplementation(*this).RemoveRenderer( GetImplementation( renderer ) );
+}
+
+void Actor::RemoveRenderer( unsigned int index )
+{
+  GetImplementation(*this).RemoveRenderer( index );
 }
 
 Actor::OnRelayoutSignalType& Actor::OnRelayoutSignal()

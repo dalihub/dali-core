@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,8 +15,7 @@
  *
  */
 
-// FILE HEADER
-
+// CLASS HEADER
 #include "relayout-controller-impl.h"
 
 // EXTERNAL INCLUDES
@@ -26,13 +25,12 @@
 #endif // defined(DEBUG_ENABLED)
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/layer.h>
-#include <dali/public-api/common/stage.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/render-controller.h>
 #include <dali/public-api/object/type-registry.h>
 #include <dali/public-api/object/object-registry.h>
 #include <dali/internal/event/actors/actor-impl.h>
+#include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/thread-local-storage.h>
 
 namespace Dali
@@ -93,7 +91,7 @@ void PrintHierarchy()
   if ( gLogFilter->IsEnabledFor( Debug::Verbose ) )
   {
     DALI_LOG_INFO( gLogFilter, Debug::Verbose, "---------- ROOT LAYER ----------\n" );
-    PrintChildren( Dali::Stage().GetCurrent().GetRootLayer(), 0 );
+    PrintChildren( Stage::GetCurrent()->GetRootLayer(), 0 );
   }
 }
 
@@ -107,16 +105,12 @@ void PrintHierarchy()
 
 } // unnamed namespace
 
-RelayoutController* RelayoutController::Get()
-{
-  return &ThreadLocalStorage::Get().GetRelayoutController();
-}
-
 RelayoutController::RelayoutController( Integration::RenderController& controller )
 : mRenderController( controller ),
   mRelayoutInfoAllocator(),
   mSlotDelegate( this ),
   mRelayoutStack( new MemoryPoolRelayoutContainer( mRelayoutInfoAllocator ) ),
+  mStageSize(), // zero initialized
   mRelayoutConnection( false ),
   mRelayoutFlag( false ),
   mEnabled( false ),
@@ -130,6 +124,17 @@ RelayoutController::RelayoutController( Integration::RenderController& controlle
 RelayoutController::~RelayoutController()
 {
   delete mRelayoutStack;
+}
+
+RelayoutController* RelayoutController::Get()
+{
+  return &ThreadLocalStorage::Get().GetRelayoutController();
+}
+
+void RelayoutController::SetStageSize( unsigned int width, unsigned int height )
+{
+  mStageSize.width = width;
+  mStageSize.height = height;
 }
 
 void RelayoutController::QueueActor( Dali::Actor& actor, RelayoutContainer& actors, Vector2 size )
@@ -162,20 +167,25 @@ void RelayoutController::RequestRelayout( Dali::Actor& actor, Dimension::Type di
     }
   }
 
-  // Request this actor as head of sub-tree if it is not dependent on a parent that is dirty
-  Dali::Actor subTreeActor = topOfSubTreeStack.back();
-  Dali::Actor parent = subTreeActor.GetParent();
-  if( !parent || !( GetImplementation( subTreeActor ).RelayoutDependentOnParent() && GetImplementation( parent ).RelayoutRequired() ) )
+  while( !topOfSubTreeStack.empty() )
   {
-    // Add sub tree root to relayout list
-    AddRequest( subTreeActor );
+    // Request this actor as head of sub-tree if it is not dependent on a parent that is dirty
+    Dali::Actor subTreeActor = topOfSubTreeStack.back();
+    topOfSubTreeStack.pop_back();
 
-    // Flag request for end of frame
-    Request();
-  }
-  else
-  {
-    potentialRedundantSubRoots.push_back( subTreeActor );
+    Dali::Actor parent = subTreeActor.GetParent();
+    if( !parent || !( GetImplementation( subTreeActor ).RelayoutDependentOnParent() && GetImplementation( parent ).RelayoutRequired() ) )
+    {
+      // Add sub tree root to relayout list
+      AddRequest( subTreeActor );
+
+      // Flag request for end of frame
+      Request();
+    }
+    else
+    {
+      potentialRedundantSubRoots.push_back( subTreeActor );
+    }
   }
 
   // Remove any redundant sub-tree heads
@@ -429,8 +439,6 @@ void RelayoutController::Relayout()
 
     // 1. Finds all top-level controls from the dirty list and allocate them the size of the stage
     //    These controls are paired with the parent/stage size and added to the stack.
-    const Vector2 stageSize = Dali::Stage::GetCurrent().GetSize();
-
     for( RawActorList::Iterator it = mDirtyLayoutSubTrees.Begin(), itEnd = mDirtyLayoutSubTrees.End(); it != itEnd; ++it )
     {
       BaseObject* dirtyActor = *it;
@@ -445,7 +453,7 @@ void RelayoutController::Relayout()
         if( actor.OnStage() )
         {
           Dali::Actor parent = actor.GetParent();
-          QueueActor( actor, *mRelayoutStack, ( parent ) ? Vector2( parent.GetTargetSize() ) : stageSize );
+          QueueActor( actor, *mRelayoutStack, ( parent ) ? Vector2( parent.GetTargetSize() ) : mStageSize );
         }
       }
     }

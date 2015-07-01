@@ -23,7 +23,6 @@
 #include <dali/internal/update/resources/resource-manager.h>
 #include <dali/internal/update/resources/complete-status-manager.h>
 #include <dali/internal/update/nodes/node.h>
-#include <dali/internal/update/node-attachments/scene-graph-camera-attachment.h>
 #include <dali/internal/render/common/render-instruction.h>
 
 #include <dali/internal/update/render-tasks/scene-graph-render-task-debug.h>
@@ -402,6 +401,12 @@ const Matrix& RenderTask::GetViewMatrix( BufferIndex bufferIndex ) const
   DALI_ASSERT_DEBUG( NULL != mCameraAttachment );
 
   return mCameraAttachment->GetViewMatrix( bufferIndex );
+}
+
+SceneGraph::CameraAttachment& RenderTask::GetCameraAttachment() const
+{
+  DALI_ASSERT_DEBUG( NULL != mCameraAttachment );
+  return *mCameraAttachment;
 }
 
 const Matrix& RenderTask::GetProjectionMatrix( BufferIndex bufferIndex ) const

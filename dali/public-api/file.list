@@ -173,8 +173,6 @@ public_api_core_math_header_files = \
   $(public_api_src_dir)/math/vector4.h \
   $(public_api_src_dir)/math/viewport.h
 
-
-
 public_api_core_object_header_files = \
   $(public_api_src_dir)/object/any.h \
   $(public_api_src_dir)/object/base-handle.h \

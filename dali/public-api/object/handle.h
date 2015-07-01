@@ -333,6 +333,7 @@ public:
    * @param[in] tag The tag of the constraints which will be removed
    */
   void RemoveConstraints( unsigned int tag );
+
 };
 
 namespace WeightObject

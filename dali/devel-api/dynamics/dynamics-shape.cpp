@@ -19,7 +19,6 @@
 #include <dali/devel-api/dynamics/dynamics-shape.h>
 
 // INTERNAL HEADERS
-#include <dali/internal/event/modeling/mesh-impl.h>
 
 #ifdef DALI_DYNAMICS_SUPPORT
 #include <dali/internal/event/dynamics/dynamics-shape-impl.h>
@@ -27,7 +26,6 @@
 #include <dali/internal/event/dynamics/dynamics-cone-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-cube-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-cylinder-shape-impl.h>
-#include <dali/internal/event/dynamics/dynamics-mesh-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-sphere-shape-impl.h>
 #include <dali/internal/event/dynamics/dynamics-world-impl.h>
 #endif
@@ -72,17 +70,6 @@ DynamicsShape DynamicsShape::NewCylinder(const float radius, const float length)
 {
 #ifdef DALI_DYNAMICS_SUPPORT
   Internal::DynamicsCylinderShapePtr internal( new Internal::DynamicsCylinderShape( radius, length) );
-
-  return DynamicsShape(internal.Get());
-#else
-  return DynamicsShape();
-#endif
-}
-
-DynamicsShape DynamicsShape::NewMesh(Cloth cloth)
-{
-#ifdef DALI_DYNAMICS_SUPPORT
-  Internal::DynamicsMeshShapePtr internal( new Internal::DynamicsMeshShape( GetImplementation(cloth) ) );
 
   return DynamicsShape(internal.Get());
 #else

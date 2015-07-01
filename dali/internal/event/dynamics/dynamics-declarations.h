@@ -69,9 +69,6 @@ typedef IntrusivePtr<DynamicsCubeShape> DynamicsCubeShapePtr;
 class DynamicsCylinderShape;
 typedef IntrusivePtr<DynamicsCylinderShape> DynamicsCylinderShapePtr;
 
-class DynamicsMeshShape;
-typedef IntrusivePtr<DynamicsMeshShape> DynamicsMeshShapePtr;
-
 class DynamicsSphereShape;
 typedef IntrusivePtr<DynamicsSphereShape> DynamicsSphereShapePtr;
 

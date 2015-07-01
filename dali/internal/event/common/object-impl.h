@@ -59,6 +59,7 @@ typedef std::vector< Dali::Constraint >     ConstraintContainer;
 typedef ConstraintContainer::iterator       ConstraintIter;
 typedef ConstraintContainer::const_iterator ConstraintConstIter;
 
+
 /**
  * A base class for objects which optionally provide properties.
  * The concrete derived class is responsible for implementing the property system methods.
@@ -211,7 +212,19 @@ public:
    */
   virtual void RemovePropertyNotifications();
 
-  // Constraints
+  /******************************** Uniform Mappings ********************************/
+
+  /**
+   * @copydoc Dali::Handle::AddUniformMapping()
+   */
+  void AddUniformMapping( Property::Index propertyIndex, const std::string& uniformName );
+
+  /**
+   * @copydoc Dali::Handle::RemoveUniformMapping( )
+   */
+  void RemoveUniformMapping( const std::string& uniformName );
+
+  /******************************** Constraints ********************************/
 
   /**
    * Apply a constraint to an Object.
@@ -249,7 +262,7 @@ public:
     return PROPERTY_CUSTOM_START_INDEX;
   }
 
-  // To be overridden by deriving classes
+  /********************  To be overridden by deriving classes ********************/
 
   /**
    * Retrieve the scene-graph object added by this object.
@@ -266,7 +279,7 @@ public:
   virtual const SceneGraph::PropertyBase* GetSceneObjectAnimatableProperty( Property::Index index ) const = 0;
 
   /**
-   * Retrieve an constraint input-property owned by the scene-graph object.
+   * Retrieve a constraint input-property owned by the scene-graph object.
    * @pre -1 < index < GetPropertyCount().
    * @param[in] index The index of the property.
    * @return A dereferenceable pointer to an input property, or NULL if a scene-object does not exist with this property.
@@ -516,7 +529,6 @@ private:
   typedef PropertyNotificationContainer::const_iterator PropertyNotificationContainerConstIter;
   PropertyNotificationContainer* mPropertyNotifications; ///< Container of owned property notifications.
 };
-
 } // namespace Internal
 
 // Helpers for public-api forwarding methods

@@ -26,7 +26,9 @@
 #include <dali/internal/common/owner-container.h>
 #include <dali/internal/update/common/property-base.h>
 #include <dali/internal/update/common/scene-graph-buffers.h>
+#include <dali/internal/update/common/uniform-map.h>
 #include <dali/internal/update/animation/scene-graph-constraint-declarations.h>
+
 
 namespace Dali
 {
@@ -179,6 +181,32 @@ public:
    */
   ConstraintOwnerContainer& GetConstraints();
 
+  /**
+   * @copydoc UniformMap::Add
+   */
+  void AddUniformMapping( UniformPropertyMapping* map );
+
+  /**
+   * @copydoc UniformMap::Remove
+   */
+  void RemoveUniformMapping( const std::string& uniformName );
+
+  /**
+   * Get the mappings table
+   */
+  const UniformMap& GetUniformMap() const;
+
+  /**
+   * @copydoc UniformMap::AddUniformMapObserver
+   */
+  void AddUniformMapObserver( UniformMap::Observer& observer );
+
+  /**
+   * @copydoc UniformMap::RemoveUniformMapObserver
+   */
+  void RemoveUniformMapObserver( UniformMap::Observer& observer );
+
+
 protected:
 
   /**
@@ -203,6 +231,7 @@ private:
 protected:
 
   OwnedPropertyContainer mCustomProperties; ///< Properties provided with InstallCustomProperty()
+  UniformMap mUniformMaps; ///< Container of owned uniform maps
 
 private:
 
@@ -213,7 +242,6 @@ private:
   ObserverContainer mObservers; ///< Container of observer raw-pointers (not owned)
 
   ConstraintOwnerContainer mConstraints; ///< Container of owned constraints
-
 };
 
 } // namespace SceneGraph

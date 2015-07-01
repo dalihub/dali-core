@@ -23,7 +23,6 @@
 
 // BASE CLASS INCLUDES
 #include <dali/public-api/object/base-handle.h>
-#include <dali/devel-api/geometry/cloth.h>
 
 namespace Dali
 {
@@ -50,7 +49,6 @@ public:
     CONE,               ///< A cone defined by the radius of its base and its height
     CUBE,               ///< A cube defined by width,height and depth
     CYLINDER,           ///< A cylinder defined by the radius of its ends and its height
-    MESH,               ///< A shape defined by a triangular mesh
     SPHERE,             ///< A sphere defined by its radius
   }; // enum ShapeType
 
@@ -90,14 +88,6 @@ public:
    * @return A handle to the new shape
    */
   static DynamicsShape NewCylinder(const float radius, const float length);
-
-  /**
-   * @brief Creates a mesh.
-   *
-   * @param[in] mesh  A mesh.
-   * @return A handle to the new shape
-   */
-  static DynamicsShape NewMesh(Cloth mesh);
 
   /**
    * @brief Creates a sphere.

@@ -39,10 +39,6 @@ src_files = $(internal_src_files) \
             $(public_api_src_files) \
             $(devel_api_src_files)
 
-if DALI_DYNAMICS_SUPPORT
-src_files += $(internal_dynamics_src_files)
-endif
-
 lib_LTLIBRARIES = libdali-core.la
 
 libdali_core_la_SOURCES = $(dali_shaders_src_file) \
@@ -93,6 +89,7 @@ develapigeometrydir = $(develapidir)/geometry
 develapiimagesdir = $(develapidir)/images
 develapimodelingdir = $(develapidir)/modeling
 develapiobjectdir = $(develapidir)/object
+develapirenderingdir = $(develapidir)/rendering
 develapiscriptingdir = $(develapidir)/scripting
 
 develapi_HEADERS = $(devel_api_header_files)
@@ -101,10 +98,10 @@ develapianimation_HEADERS = $(devel_api_core_animation_header_files)
 develapicommon_HEADERS = $(devel_api_core_common_header_files)
 develapidynamics_HEADERS = $(devel_api_core_dynamics_header_files)
 develapievents_HEADERS = $(devel_api_core_events_header_files)
-develapigeometry_HEADERS = $(devel_api_core_geometry_header_files)
 develapiimages_HEADERS = $(devel_api_core_images_header_files)
 develapimodeling_HEADERS = $(devel_api_core_modeling_header_files)
 develapiobject_HEADERS = $(devel_api_core_object_header_files)
+develapirendering_HEADERS = $(devel_api_core_rendering_header_files)
 develapiscripting_HEADERS = $(devel_api_core_scripting_header_files)
 
 

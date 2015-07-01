@@ -20,6 +20,7 @@
 #include <stdlib.h>
 #include <dali/public-api/dali-core.h>
 #include "dali-test-suite-utils/dali-test-suite-utils.h"
+#include <mesh-builder.h>
 
 using namespace Dali;
 

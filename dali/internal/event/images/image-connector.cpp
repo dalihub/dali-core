@@ -28,6 +28,7 @@ namespace Internal
 {
 
 ImageConnector::ImageConnector()
+: mImage(NULL)
 {
 }
 
