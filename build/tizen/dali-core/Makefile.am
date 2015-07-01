@@ -58,11 +58,13 @@ dali-shaders.cpp: $(dali_shaders_script) $(dali_shaders_dir)/*.txt
 dali_core_includes = \
         -I../../..
 
+cxx_flags = -Werror -Wall -Wextra -Wno-unused-parameter -Wfloat-equal
+
 libdali_core_la_CXXFLAGS = -DDALI_COMPILATION \
                            -DDALI_DATA_RW_DIR="\"${daliReadWriteDir}\"" \
                            -DDALI_DATA_RO_DIR="\"${daliReadOnlyDir}\"" \
                            -DDALI_EMOTICON_DIR="\"${emoticons_dir}\"" \
-                           -Werror -Wall -Wfloat-equal \
+                           $(cxx_flags) \
                            $(dali_core_includes) \
                            $(DALI_CFLAGS)
 
@@ -152,7 +154,7 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-dynamics.cpp
 
 linker_test_CXXFLAGS = \
-  -Werror -Wall -Wfloat-equal \
+  $(cxx_flags) \
   -I../../../automated-tests/src/dali/dali-test-suite-utils \
   $(dali_core_includes) \
   $(DALI_CFLAGS)
