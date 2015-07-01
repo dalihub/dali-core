@@ -199,13 +199,6 @@ void RenderPropertyBuffer::BindBuffer( Context& context, Program& progam )
 
 void RenderPropertyBuffer::EnableVertexAttributes( Context& context, BufferIndex bufferIndex, Program& program )
 {
-
-  // Check if attribute locations are cached already
-  if( mAttributesLocation.Size() == 0 )
-  {
-    UpdateAttributeLocations( context, bufferIndex, program );
-  }
-
   unsigned int attributeCount = mDataProvider.GetAttributeCount( bufferIndex );
   DALI_ASSERT_DEBUG( attributeCount == mAttributesLocation.Size() && "Incorrect number of attributes!" );
 
