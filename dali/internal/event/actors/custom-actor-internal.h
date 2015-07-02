@@ -70,7 +70,7 @@ private:
   /**
    * @copydoc Internal::Actor::OnStageConnectionExternal
    */
-  virtual void OnStageConnectionExternal( unsigned int depth )
+  virtual void OnStageConnectionExternal( int depth )
   {
     mImpl->OnStageConnection( depth );
   }

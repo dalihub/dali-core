@@ -761,6 +761,19 @@ public:
    */
   const Vector4& GetCurrentWorldColor() const;
 
+  /**
+   * @copydoc Dali::Actor::GetHierarchyDepth()
+   */
+  int GetHierarchyDepth() const
+  {
+    if( mIsOnStage )
+    {
+      return static_cast<int>(mDepth);
+    }
+
+    return -1;
+  }
+
 public:
 
   // Size negotiation virtual functions
@@ -1642,17 +1655,6 @@ protected:
    */
   float CalculateSizeZ( const Vector2& size ) const;
 
-  /**
-   * Return the depth in the hierarchy of the actor.
-   * The value returned is only valid if the actor is on the stage.
-   *
-   * @return Depth of the actor in the hierarchy
-   */
-  unsigned int GetDepth() const
-  {
-    return mDepth;
-  }
-
 public:
   // Default property extensions from Object
 
@@ -1790,7 +1792,7 @@ private:
    * For use in external (CustomActor) derived classes.
    * This is called after the atomic ConnectToStage() traversal has been completed.
    */
-  virtual void OnStageConnectionExternal( unsigned int depth )
+  virtual void OnStageConnectionExternal( int depth )
   {
   }
 
@@ -1905,7 +1907,7 @@ protected:
   std::string     mName;      ///< Name of the actor
   unsigned int    mId;        ///< A unique ID to identify the actor starting from 1, and 0 is reserved
 
-  unsigned int mDepth                              :12; ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
+  unsigned short mDepth                            :12; ///< The depth in the hierarchy of the actor. Only 4096 levels of depth are supported
   const bool mIsRoot                               : 1; ///< Flag to identify the root actor
   const bool mIsRenderable                         : 1; ///< Flag to identify that this is a renderable actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer

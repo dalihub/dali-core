@@ -535,6 +535,11 @@ Vector2 Actor::GetMaximumSize()
   return Vector2( impl.GetMaximumSize( Dimension::WIDTH ), impl.GetMaximumSize( Dimension::HEIGHT ) );
 }
 
+int Actor::GetHierarchyDepth()
+{
+  return GetImplementation(*this).GetHierarchyDepth();
+}
+
 Actor::TouchSignalType& Actor::TouchedSignal()
 {
   return GetImplementation(*this).TouchedSignal();
