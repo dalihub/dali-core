@@ -299,7 +299,7 @@ bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSort
     {
       if( lhs.material == rhs.material )
       {
-        return lhs.geometry < lhs.geometry;
+        return lhs.geometry < rhs.geometry;
       }
       return lhs.material < rhs.material;
     }
@@ -327,7 +327,7 @@ bool CompareItemsWithZValue( const RendererWithSortAttributes& lhs, const Render
       {
         if( lhs.material == rhs.material )
         {
-          return lhs.geometry < lhs.geometry;
+          return lhs.geometry < rhs.geometry;
         }
         return lhs.material < rhs.material;
       }
@@ -382,7 +382,7 @@ inline void SortOpaqueRenderItems(
   for( unsigned int index = 0; index < renderableCount; ++index, ++renderListIter )
   {
     *renderListIter = sortingHelper[ index ].renderItem;
-    DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %p\n", sortingHelper[ index ].renderItem->GetRenderer() );
+    DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "  sortedList[%d] = %p\n", index, sortingHelper[ index ].renderItem->GetRenderer() );
   }
 }
 
