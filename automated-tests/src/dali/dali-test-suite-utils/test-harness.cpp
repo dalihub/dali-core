@@ -105,14 +105,14 @@ int RunTestCaseInChildProcess( struct ::testcase_s& testCase, bool suppressOutpu
 #ifdef WCOREDUMP
       if(WCOREDUMP(status))
       {
-        printf("Test case %s crashed\n", testCase.name);
+        printf("Test case %s failed: due to a crash\n", testCase.name);
       }
 #endif
-      printf("Test case %s exited with signal %s\n", testCase.name, strsignal(WTERMSIG(status)));
+      printf("Test case %s failed: exit with signal %s\n", testCase.name, strsignal(WTERMSIG(status)));
     }
     else if(WIFSTOPPED(status))
     {
-      printf("Test case %s stopped with signal %s\n", testCase.name, strsignal(WSTOPSIG(status)));
+      printf("Test case %s failed: stopped with signal %s\n", testCase.name, strsignal(WSTOPSIG(status)));
     }
   }
   return testResult;
