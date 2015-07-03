@@ -22,6 +22,7 @@
 #include <dali/public-api/math/rect.h>
 #include <dali/internal/render/common/post-process-resource-dispatcher.h>
 #include <dali/internal/update/resources/resource-manager-declarations.h>
+#include <dali/internal/render/gl-resources/gpu-buffer.h>
 
 namespace Dali
 {
@@ -48,6 +49,8 @@ class RenderInstruction;
 class RenderInstructionContainer;
 class RenderTracker;
 class Shader;
+class RenderGeometry;
+class PropertyBufferDataProvider;
 
 /**
  * RenderManager is responsible for rendering the result of the previous "update", which
@@ -137,6 +140,37 @@ public:
    * @post renderer is destroyed.
    */
   void RemoveRenderer( Renderer* renderer );
+
+  /**
+   * Add a geometry to the render manager.
+   * @param[in] geometry The geometry to add.
+   * @post geometry is owned by RenderManager
+   */
+  void AddGeometry( RenderGeometry* geometry );
+
+  /**
+   * Remove a geometry from the render manager.
+   * @param[in] geometry The geometry to remove.
+   * @post geometry is destroyed.
+   */
+  void RemoveGeometry( RenderGeometry* geometry );
+
+  /**
+   * Adds a property buffer to a RenderGeometry from the render manager.
+   * @param[in] geometry The geometry
+   * @param[in] propertyBuffer The property buffer to remove.
+   * @param[in] target Specifies the type of the buffer
+   * @param[in] usage Specifies how will the buffer be used
+   */
+  void AddPropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer, const GpuBuffer::Target& target, const GpuBuffer::Usage& usage );
+
+  /**
+   * Remove a property buffer from a RenderGeometry from the render manager.
+   * @param[in] geometry The geometry
+   * @param[in] propertyBuffer The property buffer to remove.
+   * @post property buffer is destroyed.
+   */
+  void RemovePropertyBuffer( RenderGeometry* renderGeometry, PropertyBufferDataProvider* propertyBuffer );
 
   /**
    * Adds a render tracker to the RenderManager. RenderManager takes ownership of the

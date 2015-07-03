@@ -369,79 +369,78 @@ int UtcDaliPropertyBufferSetData01(void)
   END_TEST;
 }
 
-// @todo MESH_REWORK Test case temporarily commented until "RenderGeometry reuse" patch is merged
-//int UtcDaliPropertyBufferSetData02(void)
-//{
-//  TestApplication application;
-//
-//  Property::Map texturedQuadVertexFormat;
-//  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
-//  texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
-//
-//  PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
-//  DALI_TEST_EQUALS( (bool)propertyBuffer, true, TEST_LOCATION );
-//
-//  const float halfQuadSize = .5f;
-//  struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
-//  TexturedQuadVertex texturedQuadVertexData[4] = {
-//    { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
-//    { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
-//    { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
-//    { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
-//
-//  propertyBuffer.SetData( texturedQuadVertexData );
-//
-//  Geometry geometry = Geometry::New();
-//  geometry.AddVertexBuffer( propertyBuffer );
-//
-//  Material material = CreateMaterial(1.f);
-//  Renderer renderer = Renderer::New(geometry, material);
-//  Actor actor = Actor::New();
-//  actor.SetSize(Vector3::ONE * 100.f);
-//  actor.AddRenderer(renderer);
-//  Stage::GetCurrent().Add(actor);
-//
-//  application.SendNotification();
-//  application.Render(0);
-//  application.Render();
-//  application.SendNotification();
-//
-//  {
-//    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
-//      application.GetGlAbstraction().GetBufferDataCalls();
-//
-//    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
-//
-//    DALI_TEST_EQUALS( bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
-//  }
-//
-//  // Re-upload the data on the propertyBuffer
-//  propertyBuffer.SetData( texturedQuadVertexData );
-//
-//  application.SendNotification();
-//  application.Render(0);
-//  application.Render();
-//  application.SendNotification();
-//
-//  {
-//    const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls =
-//      application.GetGlAbstraction().GetBufferSubDataCalls();
-//
-//    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
-//          application.GetGlAbstraction().GetBufferDataCalls();
-//
-//    DALI_TEST_EQUALS( bufferSubDataCalls.size(), 1u, TEST_LOCATION );
-//    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
-//
-//    if ( bufferSubDataCalls.size() )
-//    {
-//      DALI_TEST_EQUALS( bufferSubDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
-//
-//    }
-//  }
-//
-//  END_TEST;
-//}
+int UtcDaliPropertyBufferSetData02(void)
+{
+  TestApplication application;
+
+  Property::Map texturedQuadVertexFormat;
+  texturedQuadVertexFormat["aPosition"] = Property::VECTOR2;
+  texturedQuadVertexFormat["aVertexCoord"] = Property::VECTOR2;
+
+  PropertyBuffer propertyBuffer = PropertyBuffer::New( texturedQuadVertexFormat, 4 );
+  DALI_TEST_EQUALS( (bool)propertyBuffer, true, TEST_LOCATION );
+
+  const float halfQuadSize = .5f;
+  struct TexturedQuadVertex { Vector2 position; Vector2 textureCoordinates; };
+  TexturedQuadVertex texturedQuadVertexData[4] = {
+    { Vector2(-halfQuadSize, -halfQuadSize), Vector2(0.f, 0.f) },
+    { Vector2( halfQuadSize, -halfQuadSize), Vector2(1.f, 0.f) },
+    { Vector2(-halfQuadSize,  halfQuadSize), Vector2(0.f, 1.f) },
+    { Vector2( halfQuadSize,  halfQuadSize), Vector2(1.f, 1.f) } };
+
+  propertyBuffer.SetData( texturedQuadVertexData );
+
+  Geometry geometry = Geometry::New();
+  geometry.AddVertexBuffer( propertyBuffer );
+
+  Material material = CreateMaterial(1.f);
+  Renderer renderer = Renderer::New(geometry, material);
+  Actor actor = Actor::New();
+  actor.SetSize(Vector3::ONE * 100.f);
+  actor.AddRenderer(renderer);
+  Stage::GetCurrent().Add(actor);
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+
+  {
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+      application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
+
+    DALI_TEST_EQUALS( bufferDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
+  }
+
+  // Re-upload the data on the propertyBuffer
+  propertyBuffer.SetData( texturedQuadVertexData );
+
+  application.SendNotification();
+  application.Render(0);
+  application.Render();
+  application.SendNotification();
+
+  {
+    const TestGlAbstraction::BufferSubDataCalls& bufferSubDataCalls =
+      application.GetGlAbstraction().GetBufferSubDataCalls();
+
+    const TestGlAbstraction::BufferDataCalls& bufferDataCalls =
+          application.GetGlAbstraction().GetBufferDataCalls();
+
+    DALI_TEST_EQUALS( bufferSubDataCalls.size(), 1u, TEST_LOCATION );
+    DALI_TEST_EQUALS( bufferDataCalls.size(), 1u, TEST_LOCATION );
+
+    if ( bufferSubDataCalls.size() )
+    {
+      DALI_TEST_EQUALS( bufferSubDataCalls[0], sizeof(texturedQuadVertexData), TEST_LOCATION );
+
+    }
+  }
+
+  END_TEST;
+}
 
 int UtcDaliPropertyBufferSetGetSize01(void)
 {

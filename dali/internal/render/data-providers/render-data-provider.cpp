@@ -25,26 +25,14 @@ namespace SceneGraph
 {
 
 RenderDataProvider::RenderDataProvider()
-: mGeometryDataProvider( NULL ),
-  mMaterialDataProvider( NULL ),
+: mMaterialDataProvider( NULL ),
   mUniformMapDataProvider( NULL ),
-  mShader( NULL ),
-  mIndexBuffer( NULL )
+  mShader( NULL )
 {
 }
 
 RenderDataProvider::~RenderDataProvider()
 {
-}
-
-void RenderDataProvider::SetGeometry( const GeometryDataProvider& geometryDataProvider )
-{
-  mGeometryDataProvider = &geometryDataProvider;
-}
-
-const GeometryDataProvider& RenderDataProvider::GetGeometry() const
-{
-  return *mGeometryDataProvider;
 }
 
 void RenderDataProvider::SetMaterial( const MaterialDataProvider& materialDataProvider )
@@ -75,27 +63,6 @@ void RenderDataProvider::SetShader( Shader& shader )
 Shader& RenderDataProvider::GetShader() const
 {
   return *mShader;
-}
-
-void RenderDataProvider::SetIndexBuffer( const PropertyBufferDataProvider* indexBuffer )
-{
-  mIndexBuffer = indexBuffer;
-}
-
-const PropertyBufferDataProvider* RenderDataProvider::GetIndexBuffer() const
-{
-  return mIndexBuffer;
-}
-
-void RenderDataProvider::SetVertexBuffers( const RenderDataProvider::VertexBuffers& vertexBuffers)
-{
-  DALI_ASSERT_DEBUG( vertexBuffers.Count() > 0 && "Using empty vertex buffer" );
-  mVertexBuffers = vertexBuffers;
-}
-
-const RenderDataProvider::VertexBuffers& RenderDataProvider::GetVertexBuffers() const
-{
-  return mVertexBuffers;
 }
 
 void RenderDataProvider::SetSamplers( const RenderDataProvider::Samplers& samplers )

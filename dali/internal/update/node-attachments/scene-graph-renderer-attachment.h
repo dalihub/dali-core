@@ -230,9 +230,10 @@ private:
   Geometry* mGeometry; ///< The geometry this renderer uses. (Not owned)
 
   CollectedUniformMap mCollectedUniformMap[2];
-  int mRegenerateUniformMap;  ///< 2 if the map should be regenerated, 1 if it should be copied.
-  bool mUniformMapChanged[2]; ///< Records if the uniform map has been altered this frame
-  bool mResendDataProviders;  ///< True if the data providers should be resent to the renderer
+  int mRegenerateUniformMap;      ///< 2 if the map should be regenerated, 1 if it should be copied.
+  bool mUniformMapChanged[2];     ///< Records if the uniform map has been altered this frame
+  bool mResendDataProviders : 1;  ///< True if the data providers should be resent to the renderer
+  bool mResendGeometry      : 1;  ///< True if geometry should be resent to the renderer
 
 public: // Properties
 

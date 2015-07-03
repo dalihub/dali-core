@@ -62,17 +62,6 @@ public:
   ~RenderDataProvider();
 
 public:
-  /**
-   * Set the geometry data provider
-   * @param[in] geometryDataProvider The geometry data provider
-   */
-  void SetGeometry( const GeometryDataProvider& geometryDataProvider );
-
-  /**
-   * Get the geometry data provider
-   * @return the geometry data provider
-   */
-  const GeometryDataProvider& GetGeometry() const;
 
   /**
    * Set the material data provider
@@ -110,30 +99,6 @@ public:
   Shader& GetShader() const;
 
   /**
-   * Set the index buffer
-   * @param[in] indexBuffer the index buffer to set
-   */
-  void SetIndexBuffer( const PropertyBufferDataProvider* indexBuffer );
-
-  /**
-   * Get the index buffer of the geometry
-   * @return A const reference to the index buffer
-   */
-  const PropertyBufferDataProvider* GetIndexBuffer() const;
-
-  /**
-   * Set the vertex buffers
-   * @param[in] vertexBuffers The vertex buffers
-   */
-  void SetVertexBuffers( const VertexBuffers& vertexBuffers );
-
-  /**
-   * Get the vertex buffers of the geometry
-   * @return A const reference to the vertex buffers
-   */
-  const VertexBuffers& GetVertexBuffers() const;
-
-  /**
    * Set the sampler data providers
    * @param[in] samplers The sampler data providers
    */
@@ -146,12 +111,9 @@ public:
   const Samplers& GetSamplers() const;
 
 private:
-  const GeometryDataProvider*   mGeometryDataProvider;
   const MaterialDataProvider*   mMaterialDataProvider;
   const UniformMapDataProvider* mUniformMapDataProvider;
   Shader*                       mShader;
-  const PropertyBufferDataProvider* mIndexBuffer;
-  VertexBuffers                 mVertexBuffers;
   Samplers                      mSamplers;
 
 // Give RendererAttachment access to our private data to reduce copying vectors on construction.

@@ -60,18 +60,17 @@ public:
   ~RenderPropertyBuffer();
 
   /**
-   * Perform the upload of the buffer
+   * Perform the upload of the buffer only when requiered
    * @param[in] context The GL context
    * @param[in] bufferIndex The current buffer index
    */
-  void Upload( Context& context, BufferIndex bufferIndex );
+  void Update( Context& context, BufferIndex bufferIndex );
 
   /**
    * Bind the geometry buffers
    * @param[in] context The GL context
-   * @param[in] program The shader program to query for attribute locations
    */
-  void BindBuffer( Context& context, Program& progam );
+  void BindBuffer( Context& context );
 
   /**
    * Enable the vertex attributes for each vertex buffer from the corresponding
@@ -79,17 +78,20 @@ public:
    * @param[in] context The GL context
    * @param[in] bufferIndex The current buffer index
    * @param[in] program The shader program to query for attribute locations
+   * @param[in] vAttributeLocation Vector containing attributes location for current program
+   * @param[in] locationBase Index in vAttributeLocation corresponding to the first attribute defined by this buffer
    */
-  void EnableVertexAttributes( Context& context, BufferIndex bufferIndex, Program& program );
+  unsigned int EnableVertexAttributes( Context& context, BufferIndex bufferIndex, Vector<GLint>& vAttributeLocation, unsigned int locationBase);
 
   /**
-   * Disable the vertex attributes for each vertex buffer from the corresponding
-   * shader program.
-   * @param[in] context The GL context
-   * @param[in] bufferIndex The current buffer index
-   * @param[in] program The shader program to query for attribute locations
+   * Get the data provider for the buffer
    */
-  void DisableVertexAttributes( Context& context, BufferIndex bufferIndex, Program& program );
+  const PropertyBufferDataProvider& GetDataProvider() const
+  {
+    return mDataProvider;
+  }
+
+private: // implementation
 
   /**
    * Update attribute locations
