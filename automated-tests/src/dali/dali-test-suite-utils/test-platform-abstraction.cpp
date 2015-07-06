@@ -26,8 +26,20 @@ namespace Dali
  * Constructor
  */
 TestPlatformAbstraction::TestPlatformAbstraction()
-: mRequest(0),
-  mDynamicsFactory(NULL)
+: mTrace(),
+  mSeconds( 0u ),
+  mMicroSeconds( 0u ),
+  mIsLoadingResult( false ),
+  mGetDefaultFontFamilyResult(),
+  mGetDefaultFontStyleResult(),
+  mGetDefaultFontSizeResult( 0 ),
+  mResources(),
+  mRequest( NULL ),
+  mSize(),
+  mClosestSize(),
+  mLoadFileResult(),
+  mSaveFileResult( false ),
+  mDynamicsFactory( NULL )
 {
   Initialize();
 }
