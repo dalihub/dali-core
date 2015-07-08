@@ -95,6 +95,11 @@ void Node::Attach( NodeAttachment& object )
 
   mAttachment = &object;
   SetAllDirtyFlags();
+
+  if( mIsActive )
+  {
+    mAttachment->ConnectedToSceneGraph();
+  }
 }
 
 void Node::SetRoot(bool isRoot)
