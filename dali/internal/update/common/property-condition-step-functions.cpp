@@ -51,11 +51,6 @@ ConditionFunction Step::GetFunction(Property::Type valueType)
       function = EvalInteger;
       break;
     }
-    case Property::UNSIGNED_INTEGER:
-    {
-      function = EvalUnsignedInteger;
-      break;
-    }
     case Property::FLOAT:
     {
       function = EvalFloat;
@@ -108,12 +103,6 @@ bool Step::Evaluate( const float propertyValue, PropertyNotification::RawArgumen
 bool Step::EvalInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
 {
   const float propertyValue = static_cast<float>( value.GetInteger() );
-  return Evaluate( propertyValue, arg );
-}
-
-bool Step::EvalUnsignedInteger( const Dali::PropertyInput& value, PropertyNotification::RawArgumentContainer& arg )
-{
-  const float propertyValue = static_cast<float>( value.GetUnsignedInteger() );
   return Evaluate( propertyValue, arg );
 }
 

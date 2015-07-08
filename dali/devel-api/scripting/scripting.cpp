@@ -355,7 +355,7 @@ Image NewImage( const Property::Value& property )
 
     // Width and height can be set individually. Dali derives the unspecified
     // dimension from the aspect ratio of the raw image.
-    unsigned int width = 0, height = 0;
+    int width = 0, height = 0;
 
     value = map->Find( "width" );
     if( value )
@@ -375,7 +375,7 @@ Image NewImage( const Property::Value& property )
     {
       if( value->GetType() == Property::FLOAT )
       {
-        height = static_cast<unsigned int>( value->Get<float>() );
+        height = static_cast<int>( value->Get<float>() );
       }
       else
       {

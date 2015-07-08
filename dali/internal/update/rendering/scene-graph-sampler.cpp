@@ -34,9 +34,9 @@ Sampler::Sampler( const std::string& textureUnitUniformName )
   mVWrapMode( Dali::Sampler::CLAMP_TO_EDGE ),
   mAffectsTransparency( true ),
   mTextureUnitUniformName( textureUnitUniformName ),
-  mTextureId( 0u ),
   mFullyOpaque(true)
 {
+  mTextureId[ 0 ] = mTextureId[ 1 ] = 0u;
 }
 
 Sampler::~Sampler()
@@ -52,7 +52,7 @@ void Sampler::SetTexture( BufferIndex bufferIndex, Integration::ResourceId textu
 {
   if( mTextureId[bufferIndex] != textureId )
   {
-    mTextureId.Set( bufferIndex, textureId );
+    mTextureId[ bufferIndex ] = textureId;
     mConnectionObservers.ConnectionsChanged(*this);
   }
 }
@@ -132,7 +132,7 @@ void Sampler::RemoveConnectionObserver( ConnectionChangePropagator::Observer& ob
 
 void Sampler::ResetDefaultProperties( BufferIndex bufferIndex )
 {
-  mTextureId.CopyPrevious( bufferIndex );
+  mTextureId[ bufferIndex ] = mTextureId[ 1 - bufferIndex ];
   mMinFilter.CopyPrevious( bufferIndex );
   mMagFilter.CopyPrevious( bufferIndex );
   mUWrapMode.CopyPrevious( bufferIndex );

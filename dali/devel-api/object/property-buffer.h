@@ -60,7 +60,7 @@ class PropertyBuffer;
  *  // Create indices
  *  unsigned int indexData[6] = { 0, 3, 1, 0, 2, 3 };
  *  Property::Map indexFormat;
- *  indexFormat["indices"] = Property::UNSIGNED_INTEGER;
+ *  indexFormat["indices"] = Property::INTEGER;
  *  PropertyBuffer indices = PropertyBuffer::New( indexFormat, 6 );
  *  indices.SetData(indexData);
  *
@@ -81,7 +81,7 @@ public:
   {
     enum
     {
-      SIZE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "size",           type UNSIGNED_INT
+      SIZE = DEFAULT_OBJECT_PROPERTY_START_INDEX, ///< name "size",           type INTEGER
       BUFFER_FORMAT,                              ///< name "buffer-format",  type MAP
     };
   };
@@ -152,7 +152,7 @@ public:
    *
    * This function expects a pointer to an array of structures with the same
    * format that was given in the construction, and the number of elements to
-   * be the sane as the size of the buffer.
+   * be the same as the size of the buffer.
    *
    * If the initial structure was: { { "position", VECTOR3}, { "uv", VECTOR2 } }
    * and a size of 10 elements, this function should be called with a pointer equivalent to:

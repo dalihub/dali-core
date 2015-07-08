@@ -242,24 +242,6 @@ public:
 };
 
 template<>
-class DoubleBufferedProperty<unsigned int> : public DoubleBufferedPropertyImpl<unsigned int>
-{
-public:
-  /**
-   * Constructor
-   */
-  DoubleBufferedProperty( unsigned int value ) : DoubleBufferedPropertyImpl( value ) {};
-
-  /**
-   * copydoc PropertyInputImpl::GetUnsignedInteger
-   */
-  virtual const unsigned int& GetUnsignedInteger( BufferIndex bufferIndex ) const
-  {
-    return mValue[bufferIndex];
-  }
-};
-
-template<>
 class DoubleBufferedProperty<float> : public DoubleBufferedPropertyImpl<float>
 {
 public:

@@ -42,11 +42,11 @@ namespace Dali
 namespace
 {
 /**
- * Helper to check if the property value can be read as int/unsigned int/bool
+ * Helper to check if the property value can be read as int/bool
  */
 inline bool IsIntegerType( Property::Type type )
 {
-  return ( Property::BOOLEAN == type )||( Property::INTEGER == type )||(Property::UNSIGNED_INTEGER == type );
+  return ( Property::BOOLEAN == type )||( Property::INTEGER == type );
 }
 }
 
@@ -70,11 +70,6 @@ struct Property::Value::Impl
   Impl( int integerValue )
   : type( Property::INTEGER ),
     integerValue( integerValue )
-  { }
-
-  Impl( unsigned int unsignedIntegerValue )
-  : type( Property::UNSIGNED_INTEGER ),
-    unsignedIntegerValue( unsignedIntegerValue )
   { }
 
   Impl( const Vector2& vectorValue )
@@ -150,8 +145,7 @@ struct Property::Value::Impl
       case Property::NONE :             // FALLTHROUGH
       case Property::BOOLEAN :          // FALLTHROUGH
       case Property::FLOAT :            // FALLTHROUGH
-      case Property::INTEGER :          // FALLTHROUGH
-      case Property::UNSIGNED_INTEGER :
+      case Property::INTEGER :
       {
         break; // nothing to do
       }
@@ -215,7 +209,6 @@ public: // Data
   {
     int integerValue;
     float floatValue;
-    unsigned int unsignedIntegerValue;
     // must use pointers for any class value pre c++ 11
     Vector2* vector2Value;
     Vector3* vector3Value;
@@ -247,11 +240,6 @@ Property::Value::Value( float floatValue )
 
 Property::Value::Value( int integerValue )
 : mImpl( new Impl( integerValue ) )
-{
-}
-
-Property::Value::Value( unsigned int unsignedIntegerValue )
-: mImpl( new Impl( unsignedIntegerValue ) )
 {
 }
 
@@ -340,11 +328,6 @@ Property::Value::Value( Type type )
     case Property::INTEGER:
     {
       mImpl = new Impl( 0 );
-      break;
-    }
-    case Property::UNSIGNED_INTEGER:
-    {
-      mImpl = new Impl( 0U );
       break;
     }
     case Property::VECTOR2:
@@ -445,11 +428,6 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
         mImpl->integerValue = value.mImpl->integerValue;
         break;
       }
-      case Property::UNSIGNED_INTEGER:
-      {
-        mImpl->unsignedIntegerValue = value.mImpl->unsignedIntegerValue;
-        break;
-      }
       case Property::VECTOR2:
       {
         *mImpl->vector2Value = *value.mImpl->vector2Value; // type cannot change in mImpl so vector is allocated
@@ -524,11 +502,6 @@ Property::Value& Property::Value::operator=( const Property::Value& value )
       case Property::INTEGER:
       {
         newImpl = new Impl( value.mImpl->integerValue );
-        break;
-      }
-      case Property::UNSIGNED_INTEGER:
-      {
-        newImpl = new Impl( value.mImpl->unsignedIntegerValue );
         break;
       }
       case Property::VECTOR2:
@@ -652,17 +625,6 @@ bool Property::Value::Get( int& integerValue ) const
       integerValue = static_cast< int >( mImpl->floatValue );
       converted = true;
     }
-  }
-  return converted;
-}
-
-bool Property::Value::Get( unsigned int& unsignedIntegerValue ) const
-{
-  bool converted = false;
-  if( mImpl && IsIntegerType( mImpl->type ) )
-  {
-    unsignedIntegerValue = mImpl->unsignedIntegerValue;
-    converted = true;
   }
   return converted;
 }
@@ -830,11 +792,6 @@ std::ostream& operator<<( std::ostream& stream, const Property::Value& value )
       {
          stream << impl.integerValue;
          break;
-      }
-      case Dali::Property::UNSIGNED_INTEGER:
-      {
-        stream << impl.unsignedIntegerValue;
-        break;
       }
       case Dali::Property::VECTOR2:
       {

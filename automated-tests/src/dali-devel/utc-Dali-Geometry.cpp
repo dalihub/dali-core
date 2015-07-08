@@ -67,7 +67,7 @@ PropertyBuffer CreateIndexBuffer()
 {
   unsigned short indexData[6] = { 0, 3, 1, 0, 2, 3 };
   Property::Map indexFormat;
-  indexFormat["indices"] = Property::UNSIGNED_INTEGER; // Should be Unsigned Short
+  indexFormat["indices"] = Property::INTEGER;
   PropertyBuffer indices = PropertyBuffer::New( indexFormat, 3 );
   indices.SetData(indexData);
 

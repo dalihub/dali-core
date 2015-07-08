@@ -31,7 +31,6 @@ int UtcDaliPropertyTypesGetNameP(void)
   DALI_TEST_EQUALS( "BOOLEAN",            Dali::PropertyTypes::GetName(Property::BOOLEAN            ), TEST_LOCATION );
   DALI_TEST_EQUALS( "FLOAT",              Dali::PropertyTypes::GetName(Property::FLOAT              ), TEST_LOCATION );
   DALI_TEST_EQUALS( "INTEGER",            Dali::PropertyTypes::GetName(Property::INTEGER            ), TEST_LOCATION );
-  DALI_TEST_EQUALS( "UNSIGNED_INTEGER",   Dali::PropertyTypes::GetName(Property::UNSIGNED_INTEGER   ), TEST_LOCATION );
   DALI_TEST_EQUALS( "VECTOR2",            Dali::PropertyTypes::GetName(Property::VECTOR2            ), TEST_LOCATION );
   DALI_TEST_EQUALS( "VECTOR3",            Dali::PropertyTypes::GetName(Property::VECTOR3            ), TEST_LOCATION );
   DALI_TEST_EQUALS( "VECTOR4",            Dali::PropertyTypes::GetName(Property::VECTOR4            ), TEST_LOCATION );
@@ -60,12 +59,6 @@ int UtcDaliPropertyTypesGet03P(void)
 int UtcDaliPropertyTypesGet04P(void)
 {
   DALI_TEST_CHECK( Dali::PropertyTypes::Get<int>() == Property::INTEGER );
-  END_TEST;
-}
-
-int UtcDaliPropertyTypesGet05P(void)
-{
-  DALI_TEST_CHECK( Dali::PropertyTypes::Get<unsigned int>() == Property::UNSIGNED_INTEGER );
   END_TEST;
 }
 

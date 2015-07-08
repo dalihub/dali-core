@@ -343,7 +343,6 @@ int UtcDaliHandleGetPropertyType(void)
 {
   tet_infoline("Positive Test Dali::Handle::GetPropertyType()");
   TestApplication application;
-  unsigned int unsingedIntTest = 33;
 
   Actor actor = Actor::New();
   DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( Actor::Property::PARENT_ORIGIN ) );
@@ -359,7 +358,6 @@ int UtcDaliHandleGetPropertyType(void)
   Property::Index boolIndex     = actor.RegisterProperty( "bool-property",     bool(true) );
   Property::Index floatIndex    = actor.RegisterProperty( "float-property",    float(123.0f) );
   Property::Index intIndex      = actor.RegisterProperty( "int-property",      123 );
-  Property::Index unsignedIntIndex = actor.RegisterProperty( "unsigned-int-property", 456u );
   Property::Index vector2Index  = actor.RegisterProperty( "vector2-property",  Vector2(1.0f, 2.0f) );
   Property::Index vector3Index  = actor.RegisterProperty( "vector3-property",  Vector3(1.0f, 2.0f, 3.0f) );
   Property::Index vector4Index  = actor.RegisterProperty( "vector4-property",  Vector4(1.0f, 2.0f, 3.0f, 4.0f) );
@@ -368,7 +366,6 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK( Property::BOOLEAN  == actor.GetPropertyType( boolIndex ) );
   DALI_TEST_CHECK( Property::FLOAT    == actor.GetPropertyType( floatIndex ) );
   DALI_TEST_CHECK( Property::INTEGER  == actor.GetPropertyType( intIndex ) );
-  DALI_TEST_CHECK( Property::UNSIGNED_INTEGER  == actor.GetPropertyType( unsignedIntIndex ) );
   DALI_TEST_CHECK( Property::VECTOR2  == actor.GetPropertyType( vector2Index ) );
   DALI_TEST_CHECK( Property::VECTOR3  == actor.GetPropertyType( vector3Index ) );
   DALI_TEST_CHECK( Property::VECTOR4  == actor.GetPropertyType( vector4Index ) );
@@ -382,7 +379,6 @@ int UtcDaliHandleGetPropertyType(void)
   Property::Index nonAnimBooleanIndex = actor.RegisterProperty( "bool", true, Property::READ_WRITE);
   Property::Index nonAnimFloatIndex = actor.RegisterProperty( "float", 0.f, Property::READ_WRITE);
   Property::Index nonAnimIntegerIndex = actor.RegisterProperty( "int", 0, Property::READ_WRITE);
-  Property::Index nonAnimUnsignedIntIndex = actor.RegisterProperty( "unsinged-int", unsingedIntTest, Property::READ_WRITE);
 
   DALI_TEST_CHECK( nonAnimStringIndex  != Property::INVALID_INDEX );
   DALI_TEST_CHECK( nonAnimV2Index      != Property::INVALID_INDEX );
@@ -391,7 +387,6 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK( nonAnimBooleanIndex != Property::INVALID_INDEX );
   DALI_TEST_CHECK( nonAnimFloatIndex   != Property::INVALID_INDEX );
   DALI_TEST_CHECK( nonAnimIntegerIndex != Property::INVALID_INDEX );
-  DALI_TEST_CHECK( nonAnimUnsignedIntIndex != Property::INVALID_INDEX );
 
   DALI_TEST_CHECK( Property::STRING   == actor.GetPropertyType( nonAnimStringIndex ) );
   DALI_TEST_CHECK( Property::VECTOR2  == actor.GetPropertyType( nonAnimV2Index ) );
@@ -400,7 +395,6 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK( Property::BOOLEAN  == actor.GetPropertyType( nonAnimBooleanIndex ) );
   DALI_TEST_CHECK( Property::FLOAT    == actor.GetPropertyType( nonAnimFloatIndex ) );
   DALI_TEST_CHECK( Property::INTEGER  == actor.GetPropertyType( nonAnimIntegerIndex ) );
-  DALI_TEST_CHECK( Property::UNSIGNED_INTEGER == actor.GetPropertyType( nonAnimUnsignedIntIndex ) );
 
   DALI_TEST_CHECK( !actor.IsPropertyAnimatable( nonAnimStringIndex ) );
   DALI_TEST_CHECK( !actor.IsPropertyAnimatable( nonAnimV2Index ) );
@@ -409,7 +403,6 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_CHECK( !actor.IsPropertyAnimatable( nonAnimBooleanIndex ) );
   DALI_TEST_CHECK( !actor.IsPropertyAnimatable( nonAnimFloatIndex ) );
   DALI_TEST_CHECK( !actor.IsPropertyAnimatable( nonAnimIntegerIndex ) );
-  DALI_TEST_CHECK( !actor.IsPropertyAnimatable( nonAnimUnsignedIntIndex ) );
 
   DALI_TEST_EQUALS( "yes" , actor.GetProperty( nonAnimStringIndex ).Get<std::string>(), TEST_LOCATION );
   DALI_TEST_EQUALS( Vector2(1.f, 2.f) , actor.GetProperty( nonAnimV2Index ).Get<Vector2>(), TEST_LOCATION );
@@ -418,7 +411,6 @@ int UtcDaliHandleGetPropertyType(void)
   DALI_TEST_EQUALS( true, actor.GetProperty( nonAnimBooleanIndex ).Get<bool>(), TEST_LOCATION );
   DALI_TEST_EQUALS( 0.f, actor.GetProperty( nonAnimFloatIndex ).Get<float>(), TEST_LOCATION );
   DALI_TEST_EQUALS( 0, actor.GetProperty( nonAnimIntegerIndex ).Get<int>(), TEST_LOCATION );
-  DALI_TEST_EQUALS( unsingedIntTest, actor.GetProperty( nonAnimUnsignedIntIndex ).Get<unsigned int>(), TEST_LOCATION );
 
   END_TEST;
 }
@@ -698,7 +690,6 @@ int UtcDaliHandleRegisterPropertyTypes(void)
     { "Property::BOOLEAN",          true,              true  },
     { "Property::FLOAT",            1.0f,              true  },
     { "Property::INTEGER",          1,                 true  },
-    { "Property::UNSIGNED_INTEGER", 1u,                true  },
     { "Property::VECTOR2",          Vector2::ONE,      true  },
     { "Property::VECTOR3",          Vector3::ONE,      true  },
     { "Property::VECTOR4",          Vector4::ONE,      true  },

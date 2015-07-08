@@ -45,8 +45,8 @@ namespace
  *            |name    |type             |writable|animatable|constraint-input|enum for index-checking|
  */
 DALI_PROPERTY_TABLE_BEGIN
-DALI_PROPERTY( "size",          UNSIGNED_INTEGER, true, false,  true,   Dali::PropertyBuffer::Property::SIZE )
-DALI_PROPERTY( "buffer-format", MAP,              false, false, false,  Dali::PropertyBuffer::Property::BUFFER_FORMAT )
+DALI_PROPERTY( "size",          INTEGER, true,  false, true,   Dali::PropertyBuffer::Property::SIZE )
+DALI_PROPERTY( "buffer-format", MAP,     false, false, false,  Dali::PropertyBuffer::Property::BUFFER_FORMAT )
 DALI_PROPERTY_TABLE_END( DEFAULT_ACTOR_PROPERTY_START_INDEX )
 
 const ObjectImplHelper<DEFAULT_PROPERTY_COUNT> PROPERTY_BUFFER_IMPL = { DEFAULT_PROPERTY_DETAILS };
@@ -99,11 +99,6 @@ unsigned int GetPropertyImplementationAlignment( Property::Type& propertyType )
     case Property::INTEGER:
     {
       alignment = PropertyImplementationTypeAlignment< Property::INTEGER >::VALUE;
-      break;
-    }
-    case Property::UNSIGNED_INTEGER:
-    {
-      alignment = PropertyImplementationTypeAlignment< Property::UNSIGNED_INTEGER >::VALUE;
       break;
     }
     case Property::FLOAT:
@@ -254,7 +249,7 @@ void PropertyBuffer::SetDefaultProperty( Property::Index index,
   {
     case Dali::PropertyBuffer::Property::SIZE:
     {
-      SetSize( propertyValue.Get<unsigned int>() );
+      SetSize( propertyValue.Get<int>() );
       break;
     }
     case Dali::PropertyBuffer::Property::BUFFER_FORMAT:
@@ -280,7 +275,7 @@ Property::Value PropertyBuffer::GetDefaultProperty( Property::Index index ) cons
   {
     case Dali::PropertyBuffer::Property::SIZE:
     {
-      value = static_cast<unsigned int>( GetSize() ); // @todo MESH_REWORK Add a size_t type to PropertyValue
+      value = static_cast<int>( GetSize() );
       break;
     }
     case Dali::PropertyBuffer::Property::BUFFER_FORMAT:
@@ -504,11 +499,6 @@ unsigned int GetPropertyImplementationSize( Property::Type& propertyType )
     case Property::INTEGER:
     {
       size = sizeof( PropertyImplementationType< Property::INTEGER >::Type );
-      break;
-    }
-    case Property::UNSIGNED_INTEGER:
-    {
-      size = sizeof( PropertyImplementationType< Property::UNSIGNED_INTEGER >::Type );
       break;
     }
     case Property::FLOAT:

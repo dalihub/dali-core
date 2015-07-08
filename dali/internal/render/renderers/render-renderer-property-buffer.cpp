@@ -51,7 +51,6 @@ Dali::GLenum GetPropertyImplementationGlType( Property::Type& propertyType )
       break;
     }
     case Property::INTEGER:
-    case Property::UNSIGNED_INTEGER:
     {
       type = GL_SHORT;
       break;
@@ -93,7 +92,6 @@ size_t GetPropertyImplementationGlSize( Property::Type& propertyType )
       break;
     }
     case Property::INTEGER:
-    case Property::UNSIGNED_INTEGER:
     {
       size = 2u;
       break;

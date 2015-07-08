@@ -3026,17 +3026,6 @@ void Actor::SetSceneGraphProperty( Property::Index index, const PropertyMetadata
       break;
     }
 
-    case Property::UNSIGNED_INTEGER:
-    {
-      const AnimatableProperty< unsigned int >* property = dynamic_cast< const AnimatableProperty< unsigned int >* >( entry.GetSceneGraphProperty() );
-      DALI_ASSERT_DEBUG( NULL != property );
-
-      // property is being used in a separate thread; queue a message to set the property
-      SceneGraph::NodePropertyMessage<unsigned int>::Send( GetEventThreadServices(), mNode, property, &AnimatableProperty<unsigned int>::Bake, value.Get<unsigned int>() );
-
-      break;
-    }
-
     case Property::FLOAT:
     {
       const AnimatableProperty< float >* property = dynamic_cast< const AnimatableProperty< float >* >( entry.GetSceneGraphProperty() );
