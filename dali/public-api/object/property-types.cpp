@@ -48,7 +48,7 @@ namespace PropertyTypes
 {
 
 DALI_EXPORT_API
-const char* const GetName(Property::Type type)
+const char* GetName(Property::Type type)
 {
   if (type < PROPERTY_TYPE_NAMES_COUNT )
   {
