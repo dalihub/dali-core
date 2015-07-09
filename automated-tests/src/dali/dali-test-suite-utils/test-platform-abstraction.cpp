@@ -38,8 +38,7 @@ TestPlatformAbstraction::TestPlatformAbstraction()
   mSize(),
   mClosestSize(),
   mLoadFileResult(),
-  mSaveFileResult( false ),
-  mDynamicsFactory( NULL )
+  mSaveFileResult( false )
 {
   Initialize();
 }
@@ -49,7 +48,6 @@ TestPlatformAbstraction::TestPlatformAbstraction()
  */
 TestPlatformAbstraction::~TestPlatformAbstraction()
 {
-  delete mDynamicsFactory;
 }
 
 /**
@@ -249,16 +247,6 @@ void TestPlatformAbstraction::JoinLoaderThreads()
   mTrace.PushCall("JoinLoaderThreads", "");
 }
 
-Integration::DynamicsFactory* TestPlatformAbstraction::GetDynamicsFactory()
-{
-  mTrace.PushCall("GetDynamicsFactory", "");
-  if( mDynamicsFactory == NULL )
-  {
-    mDynamicsFactory = new TestDynamicsFactory( mTrace );
-  }
-  return mDynamicsFactory;
-}
-
 /** Call this every test */
 void TestPlatformAbstraction::Initialize()
 {
@@ -292,7 +280,6 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
     case IsLoadingFunc:                       return mTrace.FindMethod("IsLoading");
     case SetDpiFunc:                          return mTrace.FindMethod("SetDpi");
     case JoinLoaderThreadsFunc:               return mTrace.FindMethod("JoinLoaderThreads");
-    case GetDynamicsFactoryFunc:              return mTrace.FindMethod("GetDynamicsFactory");
   }
   return false;
 }

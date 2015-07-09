@@ -71,11 +71,6 @@
 #include <dali/internal/render/gl-resources/texture-cache.h>
 #include <dali/internal/render/shaders/scene-graph-shader.h>
 
-#ifdef DALI_DYNAMICS_SUPPORT
-#include <dali/integration-api/dynamics/dynamics-world-settings.h>
-#include <dali/internal/update/dynamics/scene-graph-dynamics-world.h>
-#endif
-
 // Un-comment to enable node tree debug logging
 //#define NODE_TREE_LOGGING 1
 
@@ -181,7 +176,6 @@ struct UpdateManager::Impl
     samplers( sceneGraphBuffers, discardQueue ),
     propertyBuffers( sceneGraphBuffers, discardQueue ),
     messageQueue( renderController, sceneGraphBuffers ),
-    dynamicsChanged( false ),
     keepRenderingSeconds( 0.0f ),
     animationFinishedDuringUpdate( false ),
     nodeDirtyFlags( TransformFlag ), // set to TransformFlag to ensure full update the first time through Update()
@@ -281,11 +275,6 @@ struct UpdateManager::Impl
   ShaderContainer                     shaders;                       ///< A container of owned shaders
 
   MessageQueue                        messageQueue;                  ///< The messages queued from the event-thread
-
-#ifdef DALI_DYNAMICS_SUPPORT
-  OwnerPointer<DynamicsWorld>         dynamicsWorld;                 ///< Wrapper for dynamics simulation
-#endif
-  bool                                dynamicsChanged;               ///< This is set to true if an object is changed in the dynamics simulation tick
 
   float                               keepRenderingSeconds;          ///< Set via Dali::Stage::KeepRendering
   bool                                animationFinishedDuringUpdate; ///< Flag whether any animations finished during the Update()
@@ -976,7 +965,6 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
   const bool updateScene =                                            // The scene-graph requires an update if..
       (mImpl->nodeDirtyFlags & RenderableUpdateFlags) ||              // ..nodes were dirty in previous frame OR
       IsAnimationRunning() ||                                         // ..at least one animation is running OR
-      mImpl->dynamicsChanged ||                                       // ..there was a change in the dynamics simulation OR
       mImpl->messageQueue.IsSceneUpdateRequired() ||                  // ..a message that modifies the scene graph node tree is queued OR
       resourceChanged ||                                              // ..one or more resources were updated/changed OR
       gestureUpdated;                                                // ..a gesture property was updated
@@ -1006,27 +994,18 @@ unsigned int UpdateManager::Update( float elapsedSeconds,
     // 8) Apply Constraints
     ApplyConstraints();
 
-#ifdef DALI_DYNAMICS_SUPPORT
-    // 9) Update dynamics simulation
-    mImpl->dynamicsChanged = false;
-    if( mImpl->dynamicsWorld )
-    {
-      mImpl->dynamicsChanged = mImpl->dynamicsWorld->Update( elapsedSeconds );
-    }
-#endif
-
-    // 10) Check Property Notifications
+    // 9) Check Property Notifications
     ProcessPropertyNotifications();
 
-    // 11) Clear the lists of renderable-attachments from the previous update
+    // 10) Clear the lists of renderable-attachments from the previous update
     ClearRenderables( mImpl->sortedLayers );
     ClearRenderables( mImpl->systemLevelSortedLayers );
 
-    // 12) Update node hierarchy and perform sorting / culling.
+    // 11) Update node hierarchy and perform sorting / culling.
     //     This will populate each Layer with a list of renderers which are ready.
     UpdateNodes();
 
-    // 13) Prepare for the next render
+    // 12) Prepare for the next render
     PERF_MONITOR_START(PerformanceMonitor::PREPARE_RENDERABLES);
 
     PrepareRenderables( bufferIndex, mImpl->sortedLayers );
@@ -1147,11 +1126,6 @@ unsigned int UpdateManager::KeepUpdatingCheck( float elapsedSeconds ) const
     keepUpdatingRequest |= KeepUpdating::ANIMATIONS_RUNNING;
   }
 
-  if ( mImpl->dynamicsChanged )
-  {
-    keepUpdatingRequest |= KeepUpdating::DYNAMICS_CHANGED;
-  }
-
   if ( mImpl->renderTaskWaiting )
   {
     keepUpdatingRequest |= KeepUpdating::RENDER_TASK_SYNC;
@@ -1199,21 +1173,6 @@ void UpdateManager::SetLayerDepths( const SortedLayerPointers& layers, bool syst
     mImpl->systemLevelSortedLayers = layers;
   }
 }
-
-#ifdef DALI_DYNAMICS_SUPPORT
-
-void UpdateManager::InitializeDynamicsWorld( SceneGraph::DynamicsWorld* dynamicsWorld, Integration::DynamicsWorldSettings* worldSettings )
-{
-  dynamicsWorld->Initialize( mImpl->sceneController, worldSettings, &mSceneGraphBuffers );
-  mImpl->dynamicsWorld = dynamicsWorld;
-}
-
-void UpdateManager::TerminateDynamicsWorld()
-{
-  mImpl->dynamicsWorld.Reset();
-}
-
-#endif // DALI_DYNAMICS_SUPPORT
 
 } // namespace SceneGraph
 

@@ -36,10 +36,6 @@
 #include <dali/internal/event/rendering/renderer-impl.h>
 #include <dali/internal/update/nodes/node-declarations.h>
 
-#ifdef DALI_DYNAMICS_SUPPORT
-#include <dali/internal/event/dynamics/dynamics-declarations.h>
-#endif
-
 namespace Dali
 {
 
@@ -56,7 +52,6 @@ class ActorGestureData;
 class Animation;
 class RenderTask;
 class Renderer;
-struct DynamicsData;
 
 typedef std::vector< ActorPtr > ActorContainer;
 typedef ActorContainer::iterator ActorIter;
@@ -1237,93 +1232,8 @@ public:
    */
   void RemoveRenderer( unsigned int index );
 
-#ifdef DALI_DYNAMICS_SUPPORT
-
-  // Dynamics
-
-  /// @copydoc Dali::Actor::DisableDynamics
-  void DisableDynamics();
-
-  /// @copydoc Dali::Actor::EnableDynamics(Dali::DynamicsBodyConfig)
-  DynamicsBodyPtr EnableDynamics(DynamicsBodyConfigPtr bodyConfig);
-
-  /// @copydoc Dali::Actor::GetDynamicsBody
-  DynamicsBodyPtr GetDynamicsBody() const;
-
-  /// @copydoc Dali::Actor::AddDynamicsJoint(Dali::Actor,const Vector3&)
-  DynamicsJointPtr AddDynamicsJoint( ActorPtr attachedActor, const Vector3& offset );
-
-  /// @copydoc Dali::Actor::AddDynamicsJoint(Dali::Actor,const Vector3&,const Vector3&)
-  DynamicsJointPtr AddDynamicsJoint( ActorPtr attachedActor, const Vector3& offsetA, const Vector3& offsetB );
-
-  /// @copydoc Dali::Actor::GetNumberOfJoints
-  const int GetNumberOfJoints() const;
-
-  /// @copydoc Dali::Actor::GetDynamicsJointByIndex
-  DynamicsJointPtr GetDynamicsJointByIndex( const int index ) const;
-
-  /// @copydoc Dali::Actor::GetDynamicsJoint
-  DynamicsJointPtr GetDynamicsJoint( ActorPtr attachedActor ) const;
-
-  /// @copydoc Dali::Actor::RemoveDynamicsJoint
-  void RemoveDynamicsJoint( DynamicsJointPtr joint );
-
-  /**
-   * Hold a reference to a DynamicsJoint
-   * @param[in] joint The joint
-   */
-  void ReferenceJoint( DynamicsJointPtr joint );
-
-  /**
-   * Release a reference to a DynamicsJoint
-   * @param[in] joint The joint
-   */
-  void ReleaseJoint( DynamicsJointPtr joint );
-
-  /**
-   * Set this actor to be the root actor in the dynamics simulation
-   * All children of the actor are added/removed from the simulation.
-   * @param[in] flag  When true sets this actor to be the simulation world root actor and
-   *                  if OnStage() all dynamics enabled child actors are added to the simulation,
-   *                  when false stops this actor being the simulation root and if OnStage() all
-   *                  dynamics enabled child actors are removed from the simulation.
-   */
-  void SetDynamicsRoot(bool flag);
-
-private:
-  /**
-   * Check if this actor is the root actor in the dynamics simulation
-   * @return true if this is the dynamics root actor.
-   */
-  bool IsDynamicsRoot() const;
-
-  /**
-   * Add actor to the dynamics simulation
-   * Invoked when the actor is staged, or it's parent becomes the simulation root
-   */
-  void ConnectDynamics();
-
-  /**
-   * Remove actor from the dynamics simulation
-   * Invoked when the actor is unstaged, or it's parent stops being the the simulation root
-   */
-  void DisconnectDynamics();
-
-  /**
-   * An actor in a DynamicsJoint relationship has been staged
-   * @param[in] actor The actor passed into AddDynamicsJoint()
-   */
-  void AttachedActorOnStage( Dali::Actor actor );
-
-  /**
-   * An actor in a DynamicsJoint relationship has been unstaged
-   * @param[in] actor The actor passed into AddDynamicsJoint()
-   */
-  void AttachedActorOffStage( Dali::Actor actor );
-
-#endif // DALI_DYNAMICS_SUPPORT
-
 public:
+
   /**
    * Converts screen coordinates into the actor's coordinate system.
    * @note The actor coordinates are relative to the top-left (0.0, 0.0, 0.5)
@@ -1885,10 +1795,6 @@ protected:
   struct RelayoutData;
   RelayoutData* mRelayoutData; ///< Struct to hold optional collection of relayout variables
 
-#ifdef DALI_DYNAMICS_SUPPORT
-  DynamicsData* mDynamicsData; ///< optional physics data
-#endif
-
   ActorGestureData* mGestureData;   ///< Optional Gesture data. Only created when actor requires gestures
 
   ActorAttachmentPtr mAttachment;   ///< Optional referenced attachment
@@ -1912,7 +1818,6 @@ protected:
   const bool mIsRenderable                         : 1; ///< Flag to identify that this is a renderable actor
   const bool mIsLayer                              : 1; ///< Flag to identify that this is a layer
   bool mIsOnStage                                  : 1; ///< Flag to identify whether the actor is on-stage
-  bool mIsDynamicsRoot                             : 1; ///< Flag to identify if this is the dynamics world root
   bool mSensitive                                  : 1; ///< Whether the actor emits touch event signals
   bool mLeaveRequired                              : 1; ///< Whether a touch event signal is emitted when the a touch leaves the actor's bounds
   bool mKeyboardFocusable                          : 1; ///< Whether the actor should be focusable by keyboard navigation

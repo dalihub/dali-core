@@ -2474,14 +2474,6 @@ int UtcDaliActorSetGetOverlay(void)
 }
 
 
-// Current Dynamics functions are crashing, so testing these sections are futile
-
-int UtcDaliActorDynamics(void)
-{
-  DALI_TEST_CHECK( true );
-  END_TEST;
-}
-
 int UtcDaliActorCreateDestroy(void)
 {
   Actor* actor = new Actor;

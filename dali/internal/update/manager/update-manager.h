@@ -44,7 +44,6 @@ namespace Integration
 {
 class GlSyncAbstraction;
 class RenderController;
-struct DynamicsWorldSettings;
 
 } // namespace Integration
 
@@ -52,7 +51,6 @@ namespace Internal
 {
 
 class PropertyNotifier;
-struct DynamicsWorldSettings;
 class NotificationManager;
 class CompleteNotificationInterface;
 class ResourceManager;
@@ -71,7 +69,6 @@ class PanGesture;
 class RenderManager;
 class RenderTaskList;
 class RenderQueue;
-class DynamicsWorld;
 class TextureCache;
 class Geometry;
 class PropertyBuffer;
@@ -399,23 +396,6 @@ public:
    * @param[in] systemLevel True if using the system-level overlay.
    */
   void SetLayerDepths( const std::vector< Layer* >& layers, bool systemLevel );
-
-#ifdef DALI_DYNAMICS_SUPPORT
-
-  /**
-   * Initialize the dynamics world
-   * @param[in] world The dynamics world
-   * @param[in] worldSettings The dynamics world settings
-   * @param[in] debugShader The shader used for rendering dynamics debug information
-   */
-  void InitializeDynamicsWorld( DynamicsWorld* world, Integration::DynamicsWorldSettings* worldSettings );
-
-  /**
-   * Terminate the dynamics world
-   */
-  void TerminateDynamicsWorld();
-
-#endif // DALI_DYNAMICS_SUPPORT
 
 private:
 
@@ -810,34 +790,6 @@ inline void RemoveGestureMessage( UpdateManager& manager, PanGesture* gesture )
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &UpdateManager::RemoveGesture, gesture );
 }
-
-#ifdef DALI_DYNAMICS_SUPPORT
-
-// Dynamics messages
-inline void InitializeDynamicsWorldMessage( UpdateManager& manager, DynamicsWorld* dynamicsworld, Integration::DynamicsWorldSettings* worldSettings )
-{
-  typedef MessageValue2< UpdateManager, DynamicsWorld*, Integration::DynamicsWorldSettings* > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::InitializeDynamicsWorld, dynamicsworld, worldSettings );
-}
-
-inline void TerminateDynamicsWorldMessage(UpdateManager& manager)
-{
-  typedef Message< UpdateManager > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &UpdateManager::TerminateDynamicsWorld );
-}
-
-#endif // DALI_DYNAMICS_SUPPORT
-
 
 template< typename T >
 inline void AddMessage( UpdateManager& manager, ObjectOwnerContainer<T>& owner, T& object )

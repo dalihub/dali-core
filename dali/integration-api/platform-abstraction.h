@@ -30,9 +30,6 @@ namespace Dali
 namespace Integration
 {
 
-class DynamicsFactory;
-
-
 /**
  * PlatformAbstraction is an abstract interface, used by Dali to access platform specific services.
  * A concrete implementation must be created for each platform, and provided when creating the
@@ -225,11 +222,6 @@ public:
    * @result             true if the file is saved.
    */
   virtual bool SaveFile(const std::string& filename, std::vector< unsigned char >& buffer) const = 0;
-
-  /**
-   * Get a pointer to the DynamicsFactory.
-   */
-  virtual DynamicsFactory* GetDynamicsFactory() = 0;
 
   /**
    * Load a shader binary file into a buffer

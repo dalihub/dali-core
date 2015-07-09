@@ -53,13 +53,12 @@ namespace KeepUpdating
 {
 enum Reasons
 {
-  NOT_REQUESTED           = 0x00, ///< Zero means that no further updates are required
-  STAGE_KEEP_RENDERING    = 0x01, ///<  - Stage::KeepRendering() is being used
-  ANIMATIONS_RUNNING      = 0x02, ///< - Animations are ongoing
-  DYNAMICS_CHANGED        = 0x04, ///< - A dynamics simulation is running
-  LOADING_RESOURCES       = 0x08, ///< - Resources are being loaded
-  MONITORING_PERFORMANCE  = 0x10, ///< - The --enable-performance-monitor option is being used
-  RENDER_TASK_SYNC        = 0x20  ///< - A render task is waiting for render sync
+  NOT_REQUESTED           = 0,    ///< Zero means that no further updates are required
+  STAGE_KEEP_RENDERING    = 1<<1, ///<  - Stage::KeepRendering() is being used
+  ANIMATIONS_RUNNING      = 1<<2, ///< - Animations are ongoing
+  LOADING_RESOURCES       = 1<<3, ///< - Resources are being loaded
+  MONITORING_PERFORMANCE  = 1<<4, ///< - The --enable-performance-monitor option is being used
+  RENDER_TASK_SYNC        = 1<<5  ///< - A render task is waiting for render sync
 };
 }
 

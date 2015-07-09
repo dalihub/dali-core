@@ -27,7 +27,6 @@
 #include <dali/integration-api/platform-abstraction.h>
 
 #include "test-trace-call-stack.h"
-#include "test-dynamics.h"
 
 namespace Dali
 {
@@ -168,8 +167,6 @@ public:
 
   virtual void JoinLoaderThreads();
 
-  virtual Integration::DynamicsFactory* GetDynamicsFactory();
-
 public: // TEST FUNCTIONS
 
   // Enumeration of Platform Abstraction methods
@@ -187,7 +184,6 @@ public: // TEST FUNCTIONS
     IsLoadingFunc,
     SetDpiFunc,
     JoinLoaderThreadsFunc,
-    GetDynamicsFactoryFunc,
   } TestFuncEnum;
 
   /** Call this every test */
@@ -245,7 +241,6 @@ private:
 
   LoadFileResult                mLoadFileResult;
   bool                          mSaveFileResult;
-  TestDynamicsFactory*          mDynamicsFactory;
 };
 
 } // Dali

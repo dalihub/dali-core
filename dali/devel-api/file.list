@@ -4,13 +4,6 @@ devel_api_src_files = \
   $(devel_api_src_dir)/animation/path-constrainer.cpp \
   $(devel_api_src_dir)/common/hash.cpp \
   $(devel_api_src_dir)/common/mutex.cpp \
-  $(devel_api_src_dir)/dynamics/dynamics-body.cpp \
-  $(devel_api_src_dir)/dynamics/dynamics-body-config.cpp \
-  $(devel_api_src_dir)/dynamics/dynamics-collision.cpp \
-  $(devel_api_src_dir)/dynamics/dynamics-joint.cpp \
-  $(devel_api_src_dir)/dynamics/dynamics-shape.cpp \
-  $(devel_api_src_dir)/dynamics/dynamics-world.cpp \
-  $(devel_api_src_dir)/dynamics/dynamics-world-config.cpp \
   $(devel_api_src_dir)/events/hit-test-algorithm.cpp \
   $(devel_api_src_dir)/images/atlas.cpp \
   $(devel_api_src_dir)/images/distance-field.cpp \
@@ -33,16 +26,6 @@ devel_api_core_common_header_files = \
   $(devel_api_src_dir)/common/mutex.h \
   $(devel_api_src_dir)/common/ref-counted-dali-vector.h \
     $(devel_api_src_dir)/common/set-wrapper.h
-
-devel_api_core_dynamics_header_files = \
-  $(devel_api_src_dir)/dynamics/dynamics.h \
-  $(devel_api_src_dir)/dynamics/dynamics-body.h \
-  $(devel_api_src_dir)/dynamics/dynamics-body-config.h \
-  $(devel_api_src_dir)/dynamics/dynamics-collision.h \
-  $(devel_api_src_dir)/dynamics/dynamics-joint.h \
-  $(devel_api_src_dir)/dynamics/dynamics-shape.h \
-  $(devel_api_src_dir)/dynamics/dynamics-world.h \
-  $(devel_api_src_dir)/dynamics/dynamics-world-config.h
 
 devel_api_core_events_header_files = \
   $(devel_api_src_dir)/events/hit-test-algorithm.h

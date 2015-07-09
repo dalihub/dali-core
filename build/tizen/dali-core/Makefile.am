@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Samsung Electronics Co., Ltd.
+# Copyright (c) 2015 Samsung Electronics Co., Ltd.
 
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -74,18 +74,15 @@ libdali_core_la_LIBADD = $(DALI_LDFLAGS) \
 # Install headers under the correct subdirectories
 platformabstractiondir = $(includedir)/dali/integration-api
 platformabstractioneventsdir = $(includedir)/dali/integration-api/events
-platformabstractiondynamicsdir = $(includedir)/dali/integration-api/dynamics
 
 platformabstraction_HEADERS = $(platform_abstraction_header_files)
 platformabstractionevents_HEADERS = $(platform_abstraction_events_header_files)
-platformabstractiondynamics_HEADERS = $(platform_abstraction_dynamics_header_files)
 
 #devel api (used by adaptor / toolkit
 develapidir = $(devincludepath)/dali/devel-api
 develapiactorsdir = $(develapidir)/actors
 develapianimationdir = $(develapidir)/animation
 develapicommondir = $(develapidir)/common
-develapidynamicsdir = $(develapidir)/dynamics
 develapieventsdir = $(develapidir)/events
 develapigeometrydir = $(develapidir)/geometry
 develapiimagesdir = $(develapidir)/images
@@ -98,7 +95,6 @@ develapi_HEADERS = $(devel_api_header_files)
 develapiactors_HEADERS = $(devel_api_core_actors_header_files)
 develapianimation_HEADERS = $(devel_api_core_animation_header_files)
 develapicommon_HEADERS = $(devel_api_core_common_header_files)
-develapidynamics_HEADERS = $(devel_api_core_dynamics_header_files)
 develapievents_HEADERS = $(devel_api_core_events_header_files)
 develapiimages_HEADERS = $(devel_api_core_images_header_files)
 develapimodeling_HEADERS = $(devel_api_core_modeling_header_files)
@@ -150,8 +146,7 @@ linker_test_SOURCES = linker-test.cpp  \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-abstraction.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gesture-manager.cpp \
     ../../../automated-tests/src/dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp \
-    ../../../automated-tests/src/dali/dali-test-suite-utils/test-dynamics.cpp
+    ../../../automated-tests/src/dali/dali-test-suite-utils/test-trace-call-stack.cpp
 
 linker_test_CXXFLAGS = \
   $(cxx_flags) \

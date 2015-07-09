@@ -45,17 +45,6 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/system-overlay.h \
    $(platform_abstraction_src_dir)/lockless-buffer.h
 
-platform_abstraction_dynamics_header_files = \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-body-intf.h \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-body-settings.h \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-collision-data.h \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-debug-vertex.h \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-factory-intf.h \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-joint-intf.h \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-shape-intf.h \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-world-intf.h \
-   $(platform_abstraction_src_dir)/dynamics/dynamics-world-settings.h
-
 platform_abstraction_events_header_files = \
    $(platform_abstraction_src_dir)/events/event.h \
    $(platform_abstraction_src_dir)/events/gesture-event.h \

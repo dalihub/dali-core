@@ -10,10 +10,6 @@ SET(TC_SOURCES
         utc-Dali-Context.cpp
         utc-Dali-Constrainer.cpp
         utc-Dali-DistanceField.cpp
-        utc-Dali-DynamicsBodyConfig.cpp
-        utc-Dali-DynamicsShape.cpp
-        utc-Dali-DynamicsWorld.cpp
-        utc-Dali-DynamicsWorldConfig.cpp
         utc-Dali-Geometry.cpp
         utc-Dali-Hash.cpp
         utc-Dali-HitTestAlgorithm.cpp
@@ -31,7 +27,6 @@ LIST(APPEND TC_SOURCES
         ../dali/dali-test-suite-utils/dali-test-suite-utils.cpp
         ../dali/dali-test-suite-utils/test-harness.cpp
         ../dali/dali-test-suite-utils/test-application.cpp
-        ../dali/dali-test-suite-utils/test-dynamics.cpp
         ../dali/dali-test-suite-utils/test-gesture-manager.cpp
         ../dali/dali-test-suite-utils/test-gl-abstraction.cpp
         ../dali/dali-test-suite-utils/test-gl-sync-abstraction.cpp
