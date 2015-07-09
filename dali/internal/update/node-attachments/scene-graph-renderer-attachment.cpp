@@ -81,11 +81,16 @@ RendererAttachment::RendererAttachment()
 
 RendererAttachment::~RendererAttachment()
 {
-  mMaterial->RemoveConnectionObserver(*this);
-  mGeometry->RemoveConnectionObserver(*this);
-
-  mMaterial=NULL;
-  mGeometry=NULL;
+  if (mMaterial)
+  {
+    mMaterial->RemoveConnectionObserver(*this);
+    mMaterial=NULL;
+  }
+  if (mGeometry)
+  {
+    mGeometry->RemoveConnectionObserver(*this);
+    mGeometry=NULL;
+  }
 }
 
 void RendererAttachment::Initialize2( BufferIndex updateBufferIndex )

@@ -831,6 +831,13 @@ int UtcDaliPropertyValueGetFloatP(void)
   float flow( 0.0f );
   DALI_TEST_EQUALS( 1.1f, value.Get<float>(), TEST_LOCATION );
   DALI_TEST_EQUALS( true, value.Get( flow ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 1.1f, flow, TEST_LOCATION );
+
+  Property::Value intValue(100);
+  DALI_TEST_EQUALS( 100.f, intValue.Get<float>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, intValue.Get( flow ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 100.f, flow, TEST_LOCATION );
+
   END_TEST;
 }
 
@@ -853,6 +860,12 @@ int UtcDaliPropertyValueGetIntP(void)
   DALI_TEST_EQUALS( 123, value.Get<int>(), TEST_LOCATION );
   DALI_TEST_EQUALS( true, value.Get( result ), TEST_LOCATION );
   DALI_TEST_EQUALS( 123, result, TEST_LOCATION );
+
+  Property::Value floatValue(21.f);
+  DALI_TEST_EQUALS( 21, floatValue.Get<int>(), TEST_LOCATION );
+  DALI_TEST_EQUALS( true, floatValue.Get( result ), TEST_LOCATION );
+  DALI_TEST_EQUALS( 21, result, TEST_LOCATION );
+
   END_TEST;
 }
 

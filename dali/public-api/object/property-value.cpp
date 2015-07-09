@@ -621,10 +621,18 @@ bool Property::Value::Get( bool& booleanValue ) const
 bool Property::Value::Get( float& floatValue ) const
 {
   bool converted = false;
-  if( mImpl && mImpl->type == FLOAT )
+  if( mImpl )
   {
-    floatValue = mImpl->floatValue;
-    converted = true;
+    if( mImpl->type == FLOAT )
+    {
+      floatValue = mImpl->floatValue;
+      converted = true;
+    }
+    else if( IsIntegerType( mImpl->type ) )
+    {
+      floatValue = static_cast< float >( mImpl->integerValue );
+      converted = true;
+    }
   }
   return converted;
 }
@@ -632,10 +640,18 @@ bool Property::Value::Get( float& floatValue ) const
 bool Property::Value::Get( int& integerValue ) const
 {
   bool converted = false;
-  if( mImpl && IsIntegerType( mImpl->type ) )
+  if( mImpl )
   {
-    integerValue = mImpl->integerValue;
-    converted = true;
+    if( IsIntegerType( mImpl->type ) )
+    {
+      integerValue = mImpl->integerValue;
+      converted = true;
+    }
+    else if( mImpl->type == FLOAT )
+    {
+      integerValue = static_cast< int >( mImpl->floatValue );
+      converted = true;
+    }
   }
   return converted;
 }

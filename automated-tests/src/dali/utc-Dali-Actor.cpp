@@ -2868,3 +2868,78 @@ int UtcDaliActorOnRelayoutSignal(void)
 
   END_TEST;
 }
+
+int UtcDaliActorGetHierachyDepth(void)
+{
+  TestApplication application;
+  tet_infoline("Testing Dali::Actor::GetHierarchyDepth()");
+
+
+  /* Build tree of actors:
+   *
+   *                      Depth
+   *
+   *       A (parent)       1
+   *      / \
+   *     B   C              2`
+   *    / \   \
+   *   D   E   F            3
+   *
+   * GetHierarchyDepth should return 1 for A, 2 for B and C, and 3 for D, E and F.
+   */
+  Stage stage( Stage::GetCurrent() );
+
+  Actor actorA = Actor::New();
+  Actor actorB = Actor::New();
+  Actor actorC = Actor::New();
+  Actor actorD = Actor::New();
+  Actor actorE = Actor::New();
+  Actor actorF = Actor::New();
+
+  //Test that root actor has depth equal 0
+  DALI_TEST_EQUALS( 0, stage.GetRootLayer().GetHierarchyDepth(), TEST_LOCATION );
+
+  //Test actors return depth -1 when not connected to the tree
+  DALI_TEST_EQUALS( -1, actorA.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorC.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorF.GetHierarchyDepth(), TEST_LOCATION );
+
+  //Create the hierarchy
+  stage.Add( actorA );
+  actorA.Add( actorB );
+  actorA.Add( actorC );
+  actorB.Add( actorD );
+  actorB.Add( actorE );
+  actorC.Add( actorF );
+
+  //Test actors return correct depth
+  DALI_TEST_EQUALS( 1, actorA.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, actorB.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 2, actorC.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorD.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorE.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( 3, actorF.GetHierarchyDepth(), TEST_LOCATION );
+
+  //Removing actorB from the hierarchy. actorB, actorD and actorE should now have depth equal -1
+  actorA.Remove( actorB );
+
+  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
+
+  //Removing actorA from the stage. All actors should have depth equal -1
+  stage.Remove( actorA );
+
+  DALI_TEST_EQUALS( -1, actorA.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorB.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorC.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorD.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorE.GetHierarchyDepth(), TEST_LOCATION );
+  DALI_TEST_EQUALS( -1, actorF.GetHierarchyDepth(), TEST_LOCATION );
+
+  END_TEST;
+}
+

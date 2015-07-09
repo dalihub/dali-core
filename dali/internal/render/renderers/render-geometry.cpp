@@ -56,7 +56,7 @@ void RenderGeometry::UploadAndDraw(
   BufferIndex bufferIndex,
   const RenderDataProvider* dataProviders )
 {
-  UploadVertexData( context, bufferIndex, dataProviders );
+  UploadVertexData( context, program, bufferIndex, dataProviders );
 
   for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
   {
@@ -84,6 +84,7 @@ void RenderGeometry::GeometryUpdated()
 
 void RenderGeometry::UploadVertexData(
   Context& context,
+  Program& program,
   BufferIndex bufferIndex,
   const RenderDataProvider* dataProviders )
 {
@@ -94,6 +95,7 @@ void RenderGeometry::UploadVertexData(
     for( unsigned int i = 0; i < mVertexBuffers.Count(); ++i )
     {
       mVertexBuffers[i]->Upload( context, bufferIndex );
+      mVertexBuffers[i]->UpdateAttributeLocations( context, bufferIndex, program );
     }
     if( mIndexBuffer )
     {
@@ -114,6 +116,7 @@ void RenderGeometry::SetUpPropertyBuffers(
 
   DALI_ASSERT_DEBUG( vertexBuffers.Count() > 0 && "Need vertex buffers to upload" );
 
+  mVertexBuffers.Clear();
   for( unsigned int i=0; i<vertexBuffers.Count(); ++i)
   {
     const PropertyBufferDataProvider* vertexBuffer = vertexBuffers[i];

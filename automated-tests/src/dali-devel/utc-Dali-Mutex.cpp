@@ -76,7 +76,7 @@ int UtcDaliMutexMultiThread(void)
 {
   tet_infoline("Testing Dali::Mutex multithreaded");
 
-  gGlobalValueMutex = new Dali::Mutex;
+  gGlobalValueMutex = new Dali::Mutex();
 
   pthread_t thread1;
   // initialize values

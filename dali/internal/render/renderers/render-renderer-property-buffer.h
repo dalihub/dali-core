@@ -91,8 +91,6 @@ public:
    */
   void DisableVertexAttributes( Context& context, BufferIndex bufferIndex, Program& program );
 
-private: // implementation
-
   /**
    * Update attribute locations
    * @param[in] context The GL context

@@ -46,7 +46,7 @@ namespace PropertyTypes
  * @param [in] type The property type.
  * @return The name of this type.
  */
-DALI_IMPORT_API const char* const GetName(Property::Type type);
+DALI_IMPORT_API const char* GetName(Property::Type type);
 
 /**
  * @brief Retrieve an enumerated property type.
