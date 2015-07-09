@@ -921,6 +921,11 @@ public:
     return mInhibitLocalTransform;
   }
 
+  unsigned short GetDepth() const
+  {
+    return mDepth;
+  }
+
 protected:
 
   /**
@@ -1010,7 +1015,8 @@ protected:
 
 
   // flags, compressed to bitfield
-  int  mDirtyFlags:10;                               ///< A composite set of flags for each of the Node properties
+  unsigned short mDepth: 12;                        ///< Depth in the hierarchy
+  int  mDirtyFlags:8;                               ///< A composite set of flags for each of the Node properties
 
   bool mIsRoot:1;                                    ///< True if the node cannot have a parent
   bool mInheritOrientation:1;                        ///< Whether the parent's orientation should be inherited.

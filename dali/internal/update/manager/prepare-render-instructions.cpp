@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/actors/layer.h>
 #include <dali/integration-api/debug.h>
 #include <dali/internal/event/actors/layer-impl.h> // for the default sorting function
 #include <dali/internal/update/node-attachments/scene-graph-renderer-attachment.h>
@@ -205,7 +206,7 @@ inline void AddRendererToRenderList( BufferIndex updateBufferIndex,
     RenderItem& item = renderList.GetNextFreeItem();
     const Renderer& renderer = renderable.GetRenderer();
     item.SetRenderer( const_cast< Renderer* >( &renderer ) );
-    item.SetDepthIndex( renderable.GetDepthIndex() );
+    item.SetDepthIndex( renderable.GetDepthIndex() + static_cast<int>( parentNode.GetDepth() ) * Dali::Layer::TREE_DEPTH_MULTIPLIER );
 
     // save MV matrix onto the item
     Matrix& modelViewMatrix = item.GetModelViewMatrix();
@@ -308,8 +309,8 @@ bool CompareItems( const RendererWithSortAttributes& lhs, const RendererWithSort
   return lhs.renderItem->GetDepthIndex() < rhs.renderItem->GetDepthIndex();
 }
 /**
- * Function which sorts the render items by depth index then by Z function,
- * then by instance ptrs of shader/geometry/material.
+ * Function which sorts the render items by Z function, then
+ * by instance ptrs of shader/geometry/material.
  * @param lhs item
  * @param rhs item
  * @return true if left item is greater than right
@@ -319,23 +320,19 @@ bool CompareItemsWithZValue( const RendererWithSortAttributes& lhs, const Render
   // @todo MESH_REWORK Consider replacing all these sortAttributes with a single long int that
   // encapsulates the same data (e.g. the middle-order bits of the ptrs)
 
-  if( lhs.renderItem->GetDepthIndex() == rhs.renderItem->GetDepthIndex() )
+  if( Equals(lhs.zValue, rhs.zValue) )
   {
-    if( Equals(lhs.zValue, rhs.zValue) )
+    if( lhs.shader == rhs.shader )
     {
-      if( lhs.shader == rhs.shader )
+      if( lhs.material == rhs.material )
       {
-        if( lhs.material == rhs.material )
-        {
-          return lhs.geometry < rhs.geometry;
-        }
-        return lhs.material < rhs.material;
+        return lhs.geometry < rhs.geometry;
       }
-      return lhs.shader < rhs.shader;;
+      return lhs.material < rhs.material;
     }
-    return lhs.zValue > rhs.zValue;
+    return lhs.shader < rhs.shader;
   }
-  return lhs.renderItem->GetDepthIndex() < rhs.renderItem->GetDepthIndex();
+  return lhs.zValue > rhs.zValue;
 }
 
 inline void SortOpaqueRenderItems(
@@ -494,8 +491,16 @@ inline void SortTransparentRenderItems( BufferIndex bufferIndex, RenderList& tra
     }
   }
 
-  // sort the renderers back to front, Z Axis point from near plane to far plane
-  std::stable_sort( sortingHelper.begin(), sortingHelper.end(), CompareItemsWithZValue );
+  if( layer.GetBehavior() ==  Dali::Layer::LAYER_3D)
+  {
+    // sort the renderers back to front, Z Axis point from near plane to far plane
+    std::stable_sort( sortingHelper.begin(), sortingHelper.end(), CompareItemsWithZValue );
+  }
+  else
+  {
+    // sort the renderers based on DepthIndex
+    std::stable_sort( sortingHelper.begin(), sortingHelper.end(), CompareItems );
+  }
 
   // reorder/repopulate the renderitems in renderlist to correct order based on sortinghelper
   DALI_LOG_INFO( gRenderListLogFilter, Debug::Verbose, "Sorted Transparent List:\n");

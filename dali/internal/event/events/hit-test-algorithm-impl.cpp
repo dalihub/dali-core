@@ -20,6 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/system-overlay.h>
+#include <dali/public-api/actors/layer.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/public-api/math/vector4.h>
 #include <dali/integration-api/debug.h>
@@ -169,7 +170,8 @@ HitActor HitTestWithinLayer( Actor& actor,
                              HitTestInterface& hitCheck,
                              bool& stencilOnLayer,
                              bool& stencilHit,
-                             bool parentIsStencil )
+                             bool parentIsStencil,
+                             bool layerIs3d )
 {
   HitActor hit;
 
@@ -224,7 +226,7 @@ HitActor HitTestWithinLayer( Actor& actor,
             {
               if ( actor.GetRendererCount() )
               {
-                hit.depth = actor.GetRendererAt( 0 ).GetDepthIndex();
+                hit.depth = actor.GetHierarchyDepth() * Dali::Layer::TREE_DEPTH_MULTIPLIER + actor.GetRendererAt( 0 ).GetDepthIndex();
               }
               else
               {
@@ -270,7 +272,8 @@ HitActor HitTestWithinLayer( Actor& actor,
                                                   hitCheck,
                                                   stencilOnLayer,
                                                   stencilHit,
-                                                  isStencil ) );
+                                                  isStencil,
+                                                  layerIs3d) );
 
         bool updateChildHit = false;
         // If our ray casting hit, then check then if the hit actor's depth is greater that the favorite, it will be preferred
@@ -281,8 +284,8 @@ HitActor HitTestWithinLayer( Actor& actor,
             updateChildHit = true;
           }
 
-          // If the hit actor's depth is equal to current favorite, then we check the distance and prefer the closer
-          else if ( currentHit.depth == childHit.depth )
+          // In a 3D layer, if the hit actor's depth is equal to current favorite, then we check the distance and prefer the closer
+          else if ( layerIs3d && currentHit.depth == childHit.depth )
           {
             if ( currentHit.distance < childHit.distance )
             {
@@ -294,7 +297,7 @@ HitActor HitTestWithinLayer( Actor& actor,
         if ( updateChildHit )
         {
           if( !parentIsRenderable || currentHit.depth > hit.depth ||
-            ( currentHit.depth == hit.depth && currentHit.distance < hit.distance ) )
+            ( layerIs3d && ( currentHit.depth == hit.depth && currentHit.distance < hit.distance )) )
             {
               childHit = currentHit;
             }
@@ -456,7 +459,8 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
                                         hitCheck,
                                         stencilOnLayer,
                                         stencilHit,
-                                        false );
+                                        false,
+                                        layer->GetBehavior() == Dali::Layer::LAYER_3D);
             }
             else if ( IsWithinSourceActors( *sourceActor, *layer ) )
             {
@@ -471,7 +475,8 @@ bool HitTestRenderTask( const Vector< RenderTaskList::Exclusive >& exclusives,
                                         hitCheck,
                                         stencilOnLayer,
                                         stencilHit,
-                                        false );
+                                        false,
+                                        layer->GetBehavior() == Dali::Layer::LAYER_3D);
             }
 
             // If a stencil on this layer hasn't been hit, then discard hit results for this layer if our current hit actor is renderable
