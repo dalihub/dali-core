@@ -120,8 +120,9 @@ public:
    * @param[in] width Width of the framebuffer
    * @param[in] height Height of the framebuffer
    * @param[in] pixelFormat Pixel format of the framebuffer
+   * @param[in] bufferFormat Renderbuffer format of the framebuffer
    */
-  void AddFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat );
+  void AddFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat );
 
   /**
    * Create a framebuffer texture and add it to the texture cache
@@ -273,7 +274,7 @@ protected: // Implements TextureCacheDispatcher
   /**
    * @copydoc TextureCacheDispatcher::DispatchCreateTextureForFramebuffer()
    */
-  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat );
+  virtual void DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat );
 
   /**
    * @copydoc TextureCacheDispatcher::DispatchCreateTextureForFramebuffer()

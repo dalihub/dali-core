@@ -51,6 +51,7 @@ namespace Internal
 
 // value types used by messages
 template <> struct ParameterType< Pixel::Format > : public BasicType< Pixel::Format > {};
+template <> struct ParameterType< RenderBuffer::Format > : public BasicType< RenderBuffer::Format > {};
 
 namespace SceneGraph
 {
@@ -116,13 +117,13 @@ void TextureCache::AddNativeImage(ResourceId id, NativeImageInterfacePtr nativeI
   mTextures.insert(TexturePair(id, texture));
 }
 
-void TextureCache::AddFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat )
+void TextureCache::AddFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat )
 {
   DALI_LOG_INFO(Debug::Filter::gGLResource, Debug::General, "TextureCache::AddFrameBuffer(id=%i width:%u height:%u)\n", id, width, height);
 
   // Note: Do not throttle framebuffer generation - a request for a framebuffer should always be honoured
   // as soon as possible.
-  Texture* texture = TextureFactory::NewFrameBufferTexture( width, height, pixelFormat, mContext );
+  Texture* texture = TextureFactory::NewFrameBufferTexture( width, height, pixelFormat, bufferFormat, mContext );
   mFramebufferTextures.insert(TexturePair(id, texture));
 }
 
@@ -494,19 +495,18 @@ void TextureCache::DispatchCreateGlTexture( ResourceId id )
   }
 }
 
-
-void TextureCache::DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat )
+void TextureCache::DispatchCreateTextureForFrameBuffer( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat )
 {
   // NULL, means being shutdown, so ignore msgs
   if( mSceneGraphBuffers != NULL )
   {
-    typedef MessageValue4< TextureCache, ResourceId, unsigned int, unsigned int, Pixel::Format > DerivedType;
+    typedef MessageValue5< TextureCache, ResourceId, unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format > DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mRenderQueue.ReserveMessageSlot( mSceneGraphBuffers->GetUpdateBufferIndex(), sizeof( DerivedType ) );
 
     // Construct message in the render queue memory; note that delete should not be called on the return value
-    new (slot) DerivedType( this, &TextureCache::AddFrameBuffer, id, width, height, pixelFormat );
+    new (slot) DerivedType( this, &TextureCache::AddFrameBuffer, id, width, height, pixelFormat, bufferFormat );
   }
 }
 

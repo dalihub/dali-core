@@ -23,6 +23,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/images/image.h>
+#include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/public-api/images/buffer-image.h>
 #include <dali/devel-api/common/ref-counted-dali-vector.h>
@@ -60,6 +61,8 @@ template <> struct ParameterType< Integration::LoadResourcePriority >
 : public BasicType< Integration::LoadResourcePriority > {};
 template <> struct ParameterType< Pixel::Format >
 : public BasicType< Pixel::Format > {};
+template <> struct ParameterType< RenderBuffer::Format >
+: public BasicType< RenderBuffer::Format > {};
 template <> struct ParameterType< Integration::ResourceTypeId >
 : public BasicType< Integration::ResourceTypeId > {};
 
@@ -218,7 +221,7 @@ public: // Used by ResourceClient
    * @param[in] height      height in pixels
    * @param[in] pixelFormat Pixel format
    */
-  void HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat );
+  void HandleAddFrameBufferImageRequest( ResourceId id, unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat );
 
   /**
    * Add an existing resource to the resource manager.
@@ -457,15 +460,17 @@ inline void RequestAddFrameBufferImageMessage( EventThreadServices& eventThreadS
                                                ResourceId id,
                                                unsigned int width,
                                                unsigned int height,
-                                               Pixel::Format pixelFormat )
+                                               Pixel::Format pixelFormat,
+                                               RenderBuffer::Format bufferFormat
+                                               )
 {
-  typedef MessageValue4< ResourceManager, ResourceId, unsigned int, unsigned int, Pixel::Format > LocalType;
+  typedef MessageValue5< ResourceManager, ResourceId, unsigned int, unsigned int, Pixel::Format, RenderBuffer::Format > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleAddFrameBufferImageRequest, id, width, height, pixelFormat );
+  new (slot) LocalType( &manager, &ResourceManager::HandleAddFrameBufferImageRequest, id, width, height, pixelFormat, bufferFormat );
 }
 
 inline void RequestAddFrameBufferImageMessage( EventThreadServices& eventThreadServices,

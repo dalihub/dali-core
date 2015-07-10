@@ -1126,7 +1126,7 @@ int UtcDaliInternalAddFrameBufferImage(void)
 
   testTicketObserver.Reset();
   Internal::ResourceClient& resourceClient  = Internal::ThreadLocalStorage::Get().GetResourceClient();
-  Internal::ImageTicketPtr imageTicket = resourceClient.AddFrameBufferImage(80, 80, Pixel::A8 );
+  Internal::ImageTicketPtr imageTicket = resourceClient.AddFrameBufferImage(80, 80, Pixel::A8, RenderBuffer::COLOR );
   DALI_TEST_CHECK( imageTicket );
   imageTicket->AddObserver( testTicketObserver );
 

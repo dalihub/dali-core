@@ -22,6 +22,7 @@
 #include <string>
 
 // INTERNAL INCLUDES
+#include <dali/public-api/images/frame-buffer-image.h>
 #include <dali/devel-api/common/ref-counted-dali-vector.h>
 #include <dali/public-api/images/native-image-interface.h>
 #include <dali/internal/event/resources/resource-client-declarations.h>
@@ -197,7 +198,7 @@ public:
    * @param[in] pixelFormat Pixel format
    * @return A ref-counted request object. Keep a copy until the resource is no longer required.
    */
-  ImageTicketPtr AddFrameBufferImage ( unsigned int width, unsigned int height, Pixel::Format pixelFormat );
+  ImageTicketPtr AddFrameBufferImage ( unsigned int width, unsigned int height, Pixel::Format pixelFormat, RenderBuffer::Format bufferFormat );
 
   /**
    * Add a framebuffer resource to the resource manager.
