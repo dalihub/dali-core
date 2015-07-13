@@ -130,8 +130,6 @@ struct ResourceManager::ResourceManagerImpl
   LiveRequestContainer newFailedRequests;
   LiveRequestContainer oldFailedRequests;
   DeadRequestContainer deadRequests;
-  LiveRequestContainer saveRequests;          ///< copy of id's being saved (must also be in newCompleteRequests or oldCompleteRequests)
-  LiveRequestContainer completeSaveRequests;  ///< successful save ids are moved from saveRequests to here
 
   /**
    * This is the resource cache. It's filled/emptied from within Core::Update()
@@ -209,12 +207,6 @@ void ResourceManager::PostProcessResources( BufferIndex updateBufferIndex )
         SendToClient( UploadedMessage( *mImpl->mResourceClient, ppRequest.id ) );
         break;
       }
-      case ResourcePostProcessRequest::SAVE:
-      {
-        SendToClient( SaveResourceMessage( *mImpl->mResourceClient, ppRequest.id ) );
-        break;
-
-      }
       case ResourcePostProcessRequest::DELETED:
       {
         // TextureObservers handled in TextureCache
@@ -240,7 +232,6 @@ bool ResourceManager::ResourcesToProcess()
   workTodo |= !mImpl->newFailedRequests.empty();
   // check if there's something still loading
   workTodo |= !mImpl->loadingRequests.empty();
-  workTodo |= !mImpl->saveRequests.empty();
 
   return workTodo;
 }
@@ -390,68 +381,12 @@ void ResourceManager::HandleReloadResourceRequest( ResourceId id, const Resource
   }
 }
 
-void ResourceManager::HandleSaveResourceRequest( ResourceId id, const ResourceTypePath& typePath )
-{
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleSaveResourceRequest(id:%u, path:%s)\n", id, typePath.path.c_str());
-
-  bool resourceFound = false;
-
-  // ID must be in the complete sets
-  LiveRequestIter iter = mImpl->newCompleteRequests.find(id);
-  if (iter != mImpl->newCompleteRequests.end())
-  {
-    resourceFound = true;
-  }
-  else
-  {
-    LiveRequestIter iter = mImpl->oldCompleteRequests.find(id);
-    if (iter != mImpl->oldCompleteRequests.end())
-    {
-      resourceFound = true;
-    }
-  }
-
-  if( resourceFound )
-  {
-    ResourcePointer resource;
-    DALI_ASSERT_DEBUG( typePath.type != NULL );
-
-    switch( typePath.type->id )
-    {
-      case ResourceBitmap:
-      {
-        break;
-      }
-      case ResourceNativeImage:
-      {
-        break;
-      }
-      case ResourceTargetImage:
-      {
-        break;
-      }
-
-    }
-
-    if( resource ) // i.e. if it's a saveable resource
-    {
-      mImpl->saveRequests.insert(id);
-
-      ResourceRequest request(id, *typePath.type, typePath.path, resource);
-      mImpl->mPlatformAbstraction.SaveResource(request);
-    }
-  }
-}
-
 void ResourceManager::HandleDiscardResourceRequest( ResourceId deadId, ResourceTypeId typeId )
 {
   bool wasComplete = false;
   bool wasLoading = false;
 
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: HandleDiscardResourceRequest(id:%u)\n", deadId);
-
-  // remove copies of the deadId from completed/failed saving sets
-  RemoveId(mImpl->completeSaveRequests, deadId);
 
   // Search for the ID in one of the live containers
   // IDs are only briefly held in the new-completed or failed containers; check those last
@@ -680,29 +615,6 @@ void ResourceManager::LoadResponse( ResourceId id, ResourceTypeId type, Resource
   }
 }
 
-void ResourceManager::SaveComplete(ResourceId id, ResourceTypeId type)
-{
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: SaveComplete(id:%u)\n", id);
-
-  // ID must be in the saving set
-  LiveRequestIter iter = mImpl->saveRequests.find(id);
-
-  if (iter != mImpl->saveRequests.end())
-  {
-    // Remove from the saving set
-    mImpl->saveRequests.erase(iter);
-
-    // If resource has not been discarded..
-    if( mImpl->deadRequests.find(id) == mImpl->deadRequests.end() )
-    {
-      SendToClient( SavingSucceededMessage( *mImpl->mResourceClient, id ) );
-    }
-
-    mImpl->cacheUpdated = true;
-  }
-}
-
 void ResourceManager::LoadFailed(ResourceId id, ResourceFailure failure)
 {
   DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: LoadFailed(id:%u)\n", id);
@@ -720,30 +632,6 @@ void ResourceManager::LoadFailed(ResourceId id, ResourceFailure failure)
 
     // Let NotificationManager know that the resource manager needs to do some processing
     NotifyTickets();
-
-    mImpl->cacheUpdated = true;
-  }
-}
-
-void ResourceManager::SaveFailed(ResourceId id, ResourceFailure failure)
-{
-  DALI_ASSERT_DEBUG( mImpl->mResourceClient != NULL );
-  DALI_LOG_INFO(Debug::Filter::gResource, Debug::General, "ResourceManager: SaveFailed(id:%u)\n", id);
-
-  // ID must be in the saving set
-  LiveRequestIter iter = mImpl->saveRequests.find(id);
-
-  if (iter != mImpl->saveRequests.end())
-  {
-    // Remove from the saving set
-    mImpl->saveRequests.erase(iter);
-
-    // If resource has not been discarded..
-
-    if( mImpl->deadRequests.find(id) == mImpl->deadRequests.end() )
-    {
-      SendToClient( SavingFailedMessage( *mImpl->mResourceClient, id ) );
-    }
 
     mImpl->cacheUpdated = true;
   }
@@ -797,24 +685,6 @@ void ResourceManager::DiscardDeadResources( BufferIndex updateBufferIndex )
 {
   for (DeadRequestIter iter = mImpl->deadRequests.begin(); iter != mImpl->deadRequests.end(); )
   {
-    // Delay destroying ids in saveRequests
-    if( mImpl->saveRequests.find(iter->first) != mImpl->saveRequests.end())
-    {
-      ++iter;
-      continue;
-    }
-
-    /**
-     * We should find a resource of the correct type, and move it to the DiscardQueue.
-     */
-    switch (iter->second)
-    {
-      case ResourceBitmap:
-      case ResourceNativeImage:
-      case ResourceTargetImage:
-        break;
-    }
-
     // Erase the item and increment the iterator
     mImpl->deadRequests.erase(iter++);
   }

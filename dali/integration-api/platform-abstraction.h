@@ -142,12 +142,6 @@ public:
   virtual ResourcePointer LoadResourceSynchronously( const ResourceType& resourceType, const std::string& resourcePath ) = 0;
 
   /**
-   * Request that a resource be saved to the native filesystem.
-   * This is an asynchronous request.
-   */
-  virtual void SaveResource(const ResourceRequest& request) = 0;
-
-  /**
    * Cancel an ongoing LoadResource() request.
    * Multi-threading note: this method will be called from the main thread only i.e. not
    * from within the Core::Render() method.

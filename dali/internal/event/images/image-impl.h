@@ -119,16 +119,6 @@ public: // From ResourceTicketObserver
    */
   virtual void ResourceUploaded(const ResourceTicket& ticket);
 
-  /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceSavingSucceeded()
-   */
-  virtual void ResourceSavingSucceeded( const ResourceTicket& ticket );
-
-  /**
-   * @copydoc Dali::Internal::ResourceTicketObserver::ResourceSavingFailed()
-   */
-  virtual void ResourceSavingFailed( const ResourceTicket& ticket );
-
 public:
 
   /**

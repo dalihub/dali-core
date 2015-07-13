@@ -51,7 +51,6 @@ class TestTicketObserver : public Internal::ResourceTicketObserver
 public:
   TestTicketObserver()
   : mLoadingFailedCalled(0), mLoadingSucceededCalled(0),
-    mSavingFailedCalled(0), mSavingSucceededCalled(0),
     mUploadedCount(0)
   {}
 
@@ -63,14 +62,6 @@ public:
     tet_printf("TicketObserver: LoadingSucceeded()  called %d times", mLoadingSucceededCalled);
     return mLoadingSucceededCalled;
   }
-  int SaveFailedCalled() {
-    tet_printf("TicketObserver: SavingFailed() called %d times", mSavingFailedCalled);
-    return mSavingFailedCalled;
-  }
-  int SaveSucceededCalled() {
-    tet_printf("TicketObserver: SavingSucceeded() called %d times", mSavingSucceededCalled);
-    return mSavingSucceededCalled;
-  }
   int  UploadCalled() {
     tet_printf("TicketObserver: Uploaded() called %d times", mUploadedCount);
     return mUploadedCount;
@@ -78,23 +69,17 @@ public:
   void Reset() {
     mLoadingFailedCalled    = 0;
     mLoadingSucceededCalled = 0;
-    mSavingFailedCalled     = 0;
-    mSavingSucceededCalled  = 0;
     mUploadedCount           = 0;
   }
 
 public: // From ResourceTicketObserver
   virtual void ResourceLoadingFailed(const Internal::ResourceTicket& ticket) {mLoadingFailedCalled++;}
   virtual void ResourceLoadingSucceeded(const Internal::ResourceTicket& ticket) {mLoadingSucceededCalled++;}
-  virtual void ResourceSavingFailed(const Internal::ResourceTicket& ticket) {mSavingFailedCalled++;}
-  virtual void ResourceSavingSucceeded(const Internal::ResourceTicket& ticket) {mSavingSucceededCalled++;}
   virtual void ResourceUploaded(const Internal::ResourceTicket& ticket) {mUploadedCount++;}
 
 private:
   int mLoadingFailedCalled;
   int mLoadingSucceededCalled;
-  int mSavingFailedCalled;
-  int mSavingSucceededCalled;
   int mUploadedCount;
 };
 
@@ -699,69 +684,6 @@ int UtcDaliInternalRequestReloadBitmapRequests03(void)
     DALI_TEST_EQUALS( imageTicket->GetHeight(), 120, TEST_LOCATION );
     DALI_TEST_EQUALS( resourceManager.ResourcesToProcess(), false, TEST_LOCATION );
   }
-  END_TEST;
-}
-
-/**
-//int UtcDaliInternalSaveResource01(void)//
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with valid id, and valid filename");
-  testTicketObserver.Reset();
-
-  DALI_TEST_CHECK(0);
-  END_TEST;
-}
-
-
-//int UtcDaliInternalSaveResource02(void)//
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with invalid id");
-  testTicketObserver.Reset();
-
-  DALI_TEST_CHECK(0);
-  END_TEST;
-}
-
-//int UtcDaliInternalSaveResource03(void)//
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with invalid id");
-  testTicketObserver.Reset();
-
-  DALI_TEST_CHECK ( 0 );
-  END_TEST;
-}
-
-
-//int UtcDaliInternalSaveResource04(void)//
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with valid id, but invalid filename");
-  testTicketObserver.Reset();
-  DALI_TEST_CHECK( 0 );
-  END_TEST;
-}
-*/
-
-int UtcDaliInternalSaveResource05(void)
-{
-  TestApplication application;
-  tet_infoline("Testing SaveResource() with valid id, but invalid resource type");
-  testTicketObserver.Reset();
-
-  Internal::ResourceClient& resourceClient = Internal::ThreadLocalStorage::Get().GetResourceClient();
-
-  // First, load a bitmap resource
-  Internal::ResourceTicketPtr ticket = CheckLoadBitmap(application, "bitmap.jpg", 80, 80);
-
-  // Try saving it
-  resourceClient.SaveResource( ticket, "bitmap.png" );
-  application.SendNotification(); // Flush update messages
-  application.Render();           // Process save resource request
-
-  DALI_TEST_CHECK( ! application.GetPlatform().WasCalled(TestPlatformAbstraction::SaveResourceFunc ) );
   END_TEST;
 }
 

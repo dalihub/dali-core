@@ -123,20 +123,6 @@ Integration::ResourcePointer TestPlatformAbstraction::LoadResourceSynchronously(
 }
 
 /**
- * @copydoc PlatformAbstraction::SaveResource()
- */
-void TestPlatformAbstraction::SaveResource(const Integration::ResourceRequest& request)
-{
-  mTrace.PushCall("SaveResource", "");
-  if(mRequest != NULL)
-  {
-    delete mRequest;
-    tet_infoline ("Warning: multiple resource requests not handled by Test Suite. You may see unexpected errors");
-  }
-  mRequest = new Integration::ResourceRequest(request);
-}
-
-/**
  * @copydoc PlatformAbstraction::CancelLoad()
  */
 void TestPlatformAbstraction::CancelLoad(Integration::ResourceId id, Integration::ResourceTypeId typeId)
@@ -158,14 +144,6 @@ void TestPlatformAbstraction::GetResources(Integration::ResourceCache& cache)
   if(mResources.loadFailed)
   {
     cache.LoadFailed( mResources.loadFailedId, mResources.loadFailure );
-  }
-  if(mResources.saved)
-  {
-    cache.SaveComplete( mResources.savedId, mResources.savedType );
-  }
-  if(mResources.saveFailed)
-  {
-    cache.SaveFailed( mResources.saveFailedId, mResources.saveFailure );
   }
 }
 
@@ -272,7 +250,6 @@ bool TestPlatformAbstraction::WasCalled(TestFuncEnum func)
     case SuspendFunc:                         return mTrace.FindMethod("Suspend");
     case ResumeFunc:                          return mTrace.FindMethod("Resume");
     case LoadResourceFunc:                    return mTrace.FindMethod("LoadResource");
-    case SaveResourceFunc:                    return mTrace.FindMethod("SaveResource");
     case LoadFileFunc:                        return mTrace.FindMethod("LoadFile");
     case SaveFileFunc:                        return mTrace.FindMethod("SaveFile");
     case CancelLoadFunc:                      return mTrace.FindMethod("CancelLoad");
@@ -325,22 +302,6 @@ void TestPlatformAbstraction::SetResourceLoadFailed(Integration::ResourceId  id,
   mResources.loadFailed = true;
   mResources.loadFailedId = id;
   mResources.loadFailure = failure;
-}
-
-void TestPlatformAbstraction::SetResourceSaved(Integration::ResourceId      savedId,
-                                               Integration::ResourceTypeId  savedType)
-{
-  mResources.saved = true;
-  mResources.savedId = savedId;
-  mResources.savedType = savedType;
-}
-
-void TestPlatformAbstraction::SetResourceSaveFailed(Integration::ResourceId  id,
-                                                    Integration::ResourceFailure failure)
-{
-  mResources.saveFailed = true;
-  mResources.saveFailedId = id;
-  mResources.saveFailure = failure;
 }
 
 Integration::ResourceRequest* TestPlatformAbstraction::GetRequest()

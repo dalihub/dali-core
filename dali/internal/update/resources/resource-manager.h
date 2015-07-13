@@ -273,13 +273,6 @@ public: // Used by ResourceClient
   void HandleReloadResourceRequest( ResourceId id, const ResourceTypePath& typePath, Integration::LoadResourcePriority priority, bool resetFinishedStatus );
 
   /**
-   * Save a resource to the given url
-   * @param[in] id       The resource id
-   * @param[in] typePath The type & path of the resource
-   */
-  void HandleSaveResourceRequest( ResourceId id, const ResourceTypePath& typePath );
-
-  /**
    * Resource ticket has been discarded, throw away the actual resource
    */
   void HandleDiscardResourceRequest( ResourceId id, Integration::ResourceTypeId typeId );
@@ -325,19 +318,9 @@ public:
   virtual void LoadResponse(ResourceId id, Integration::ResourceTypeId type, Integration::ResourcePointer resource, Integration::LoadStatus loadStatus);
 
   /**
-   * @copydoc Integration::ResourceCache::SaveComplete
-   */
-  virtual void SaveComplete(ResourceId id, Integration::ResourceTypeId type);
-
-  /**
    * @copydoc Integration::ResourceCache::LoadFailed
    */
   virtual void LoadFailed(ResourceId id, Integration::ResourceFailure failure);
-
-  /**
-   * @copydoc Integration::ResourceCache::SaveFailed
-   */
-  virtual void SaveFailed(ResourceId id, Integration::ResourceFailure failure);
 
   /********************************************************************************
    ********************************* Private Methods  *****************************
@@ -547,20 +530,6 @@ inline void RequestReloadResourceMessage( EventThreadServices& eventThreadServic
 
   // Construct message in the message queue memory; note that delete should not be called on the return value
   new (slot) LocalType( &manager, &ResourceManager::HandleReloadResourceRequest, id, typePath, priority, resetFinishedStatus );
-}
-
-inline void RequestSaveResourceMessage( EventThreadServices& eventThreadServices,
-                                        ResourceManager& manager,
-                                        ResourceId id,
-                                        const ResourceTypePath& typePath )
-{
-  typedef MessageValue2< ResourceManager, ResourceId, ResourceTypePath > LocalType;
-
-  // Reserve some memory inside the message queue
-  unsigned int* slot = eventThreadServices.ReserveMessageSlot( sizeof( LocalType ) );
-
-  // Construct message in the message queue memory; note that delete should not be called on the return value
-  new (slot) LocalType( &manager, &ResourceManager::HandleSaveResourceRequest, id, typePath );
 }
 
 inline void RequestDiscardResourceMessage( EventThreadServices& eventThreadServices,

@@ -49,14 +49,6 @@ public:
     bool                         loadFailed;
     Integration::ResourceId      loadFailedId;
     Integration::ResourceFailure loadFailure;
-
-    bool                         saved;
-    Integration::ResourceId      savedId;
-    Integration::ResourceTypeId  savedType;
-
-    bool                         saveFailed;
-    Integration::ResourceId      saveFailedId;
-    Integration::ResourceFailure saveFailure;
   };
 
   struct LoadFileResult
@@ -114,11 +106,6 @@ public:
   virtual void LoadResource(const Integration::ResourceRequest& request);
 
   virtual Integration::ResourcePointer LoadResourceSynchronously( const Integration::ResourceType& resourceType, const std::string& resourcePath );
-
-  /**
-   * @copydoc PlatformAbstraction::SaveResource()
-   */
-  virtual void SaveResource(const Integration::ResourceRequest& request);
 
   /**
    * @copydoc PlatformAbstraction::CancelLoad()
@@ -181,7 +168,6 @@ public: // TEST FUNCTIONS
     SuspendFunc,
     ResumeFunc,
     LoadResourceFunc,
-    SaveResourceFunc,
     SaveFileFunc,
     LoadFileFunc,
     CancelLoadFunc,
@@ -213,12 +199,6 @@ public: // TEST FUNCTIONS
                          Integration::ResourcePointer loadedResource);
 
   void SetResourceLoadFailed(Integration::ResourceId  id,
-                             Integration::ResourceFailure failure);
-
-  void SetResourceSaved(Integration::ResourceId      savedId,
-                        Integration::ResourceTypeId  savedType);
-
-  void SetResourceSaveFailed(Integration::ResourceId  id,
                              Integration::ResourceFailure failure);
 
   Integration::ResourceRequest* GetRequest();

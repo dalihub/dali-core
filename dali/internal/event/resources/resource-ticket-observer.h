@@ -55,18 +55,6 @@ public:
    * @param[in] ticket The ticket for this resource.
    */
   virtual void ResourceUploaded( const ResourceTicket& ticket ) = 0;
-
-  /**
-   * Called when a resource is saved successfully.
-   * @param[in] ticket The ticket for this resource.
-   */
-  virtual void ResourceSavingSucceeded( const ResourceTicket& ticket ) = 0;
-
-  /**
-   * Called when a resource fails to save.
-   * @param[in] ticket The ticket for this resource.
-   */
-  virtual void ResourceSavingFailed( const ResourceTicket& ticket ) = 0;
 };
 
 } // namespace Internal
