@@ -79,7 +79,7 @@ const unsigned int POSITION_INHERITANCE_MODE_TABLE_COUNT = sizeof( POSITION_INHE
 const StringEnum DRAW_MODE_TABLE[] =
 {
   { "NORMAL",     DrawMode::NORMAL     },
-  { "OVERLAY",    DrawMode::OVERLAY    },
+  { "OVERLAY_2D", DrawMode::OVERLAY_2D },
   { "STENCIL",    DrawMode::STENCIL    },
 };
 const unsigned int DRAW_MODE_TABLE_COUNT = sizeof( DRAW_MODE_TABLE ) / sizeof( DRAW_MODE_TABLE[0] );

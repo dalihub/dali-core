@@ -1458,16 +1458,16 @@ void Actor::RemoveRenderer( unsigned int index )
 
 void Actor::SetOverlay( bool enable )
 {
-  // Setting STENCIL will override OVERLAY
+  // Setting STENCIL will override OVERLAY_2D
   if( DrawMode::STENCIL != mDrawMode )
   {
-    SetDrawMode( enable ? DrawMode::OVERLAY : DrawMode::NORMAL );
+    SetDrawMode( enable ? DrawMode::OVERLAY_2D : DrawMode::NORMAL );
   }
 }
 
 bool Actor::IsOverlay() const
 {
-  return ( DrawMode::OVERLAY == mDrawMode );
+  return ( DrawMode::OVERLAY_2D == mDrawMode );
 }
 
 void Actor::SetDrawMode( DrawMode::Type drawMode )
