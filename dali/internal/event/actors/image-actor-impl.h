@@ -21,8 +21,9 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/actors/image-actor.h>
+#include <dali/devel-api/rendering/cull-face.h>
 #include <dali/internal/event/actors/actor-declarations.h>
-#include <dali/internal/event/actors/renderable-actor-impl.h>
+#include <dali/internal/event/actors/actor-impl.h>
 #include <dali/internal/event/actor-attachments/image-attachment-impl.h>
 #include <dali/internal/event/animation/animation-impl.h>
 #include <dali/internal/event/images/nine-patch-image-impl.h>
@@ -48,7 +49,7 @@ class Image;
  * mImageAttachment's member object. The first one points to the Image object that is going to
  * be displayed next, the second one to the Image that is currently being displayed.
  */
-class ImageActor : public RenderableActor
+class ImageActor : public Actor
 {
 public:
 

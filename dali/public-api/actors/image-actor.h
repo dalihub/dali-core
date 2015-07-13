@@ -22,9 +22,12 @@
 #include <string>
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/actors/actor.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/images/image.h>
+#include <dali/public-api/shader-effects/shader-effect.h>
+#include <dali/public-api/actors/blending.h>
+#include <dali/public-api/actors/sampling.h>
 
 namespace Dali
 {
@@ -39,7 +42,7 @@ class ImageActor;
  *
  * Allows the developer to add an actor to stage which displays the content of an Image object.
  *
- * By default CullFaceMode is set to CullNone to enable the ImageActor to be viewed from all angles.
+ * By default ImageActor can be viewed from all angles.
  *
  * If an ImageActor is created without setting size, then the actor takes the size of the image -
  * this is the natural size.
@@ -56,7 +59,7 @@ class ImageActor;
  * Clearing the pixel area on an Image actor with a set size will cause the actor to show the
  * whole image again, but will not change the image size.
  */
-class DALI_IMPORT_API ImageActor : public RenderableActor
+class DALI_IMPORT_API ImageActor : public Actor
 {
 public:
 
@@ -149,6 +152,8 @@ public:
    * @brief Pixel area is relative to the top-left (0,0) of the image.
    */
   typedef Rect<int> PixelArea;
+
+  static const BlendingMode::Type DEFAULT_BLENDING_MODE; ///< default value is BlendingMode::AUTO
 
   /**
    * @brief Create an uninitialized ImageActor handle.
@@ -316,20 +321,6 @@ public:
    * @return  the offset that has been given to the actor. Positive values pushing it further back.
    */
   float GetSortModifier() const;
-
-  /**
-   * @brief Set the face-culling mode for this actor.
-   *
-   * @param[in] mode The culling mode.
-   */
-  void SetCullFace(CullFaceMode mode);
-
-  /**
-   * @brief Retrieve the face-culling mode for this actor.
-   *
-   * @return mode The culling mode.
-   */
-  CullFaceMode GetCullFace() const;
 
   /**
    * @brief Sets the blending mode.

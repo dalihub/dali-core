@@ -20,7 +20,7 @@
 
 // INTERNAL INCLUDES
 #include <dali/integration-api/resource-declarations.h>
-#include <dali/public-api/actors/renderable-actor.h>
+#include <dali/public-api/actors/image-actor.h>
 #include <dali/internal/update/manager/prepare-render-instructions.h>
 #include <dali/internal/update/nodes/node.h>
 #include <dali/internal/update/resources/resource-manager.h>
@@ -45,7 +45,7 @@ RenderableAttachment::RenderableAttachment( bool usesGeometryScaling )
   mShader( NULL ),
   mTrackedResources(),
   mSortModifier( 0.0f ),
-  mBlendingMode( Dali::RenderableActor::DEFAULT_BLENDING_MODE ),
+  mBlendingMode( Dali::ImageActor::DEFAULT_BLENDING_MODE ),
   mUsesGeometryScaling( usesGeometryScaling ),
   mScaleForSizeDirty( true ),
   mUseBlend( false ),

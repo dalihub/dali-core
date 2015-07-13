@@ -19,7 +19,6 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-impl.h>
 
 namespace Dali
