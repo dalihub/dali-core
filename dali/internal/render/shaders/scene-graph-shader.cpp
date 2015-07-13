@@ -203,17 +203,6 @@ void Shader::SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::
   mUniformMetadata[ index ]->SetCoordinateType( type );
 }
 
-void Shader::SetProgram( Integration::ResourceId resourceId,
-                         Integration::ShaderDataPtr shaderData,
-                         ProgramCache* programCache,
-                         bool modifiesGeometry )
-{
-  DALI_LOG_TRACE_METHOD_FMT(Debug::Filter::gShader, "%d\n", resourceId);
-
-  mProgram = Program::New( *programCache, shaderData, modifiesGeometry );
-  // The program cache owns the Program object so we don't need to worry here.
-}
-
 void Shader::SetProgram( Integration::ShaderDataPtr shaderData,
                          ProgramCache* programCache,
                          bool modifiesGeometry )
