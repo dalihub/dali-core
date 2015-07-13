@@ -21,6 +21,7 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/actors/image-actor.h>
 #include <dali/public-api/actors/blending.h>
+#include <dali/devel-api/rendering/cull-face.h>
 #include <dali/internal/common/blending-options.h>
 #include <dali/internal/common/image-sampler.h>
 #include <dali/internal/event/actor-attachments/actor-attachment-declarations.h>

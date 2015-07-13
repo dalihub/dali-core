@@ -53,7 +53,7 @@ BaseHandle Create()
   return Dali::ImageActor::New();
 }
 
-TypeRegistration mType( typeid( Dali::ImageActor ), typeid( Dali::RenderableActor ), Create );
+TypeRegistration mType( typeid( Dali::ImageActor ), typeid( Dali::Actor ), Create );
 
 ImageActor::Style StyleEnum(const std::string &s)
 {
@@ -197,7 +197,7 @@ RenderableAttachment& ImageActor::GetRenderableAttachment() const
 }
 
 ImageActor::ImageActor()
-: RenderableActor()
+: Actor( Actor::RENDERABLE )
 {
 }
 
@@ -244,12 +244,12 @@ void ImageActor::OnStageDisconnectionInternal()
 
 unsigned int ImageActor::GetDefaultPropertyCount() const
 {
-  return RenderableActor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;
+  return Actor::GetDefaultPropertyCount() + DEFAULT_PROPERTY_COUNT;
 }
 
 void ImageActor::GetDefaultPropertyIndices( Property::IndexContainer& indices ) const
 {
-  RenderableActor::GetDefaultPropertyIndices( indices ); // RenderableActor class properties
+  Actor::GetDefaultPropertyIndices( indices ); // Actor class properties
 
   indices.Reserve( indices.Size() + DEFAULT_PROPERTY_COUNT );
 
@@ -264,7 +264,7 @@ bool ImageActor::IsDefaultPropertyWritable( Property::Index index ) const
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return RenderableActor::IsDefaultPropertyWritable(index);
+    return Actor::IsDefaultPropertyWritable(index);
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -280,7 +280,7 @@ bool ImageActor::IsDefaultPropertyAnimatable( Property::Index index ) const
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return RenderableActor::IsDefaultPropertyAnimatable( index );
+    return Actor::IsDefaultPropertyAnimatable( index );
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -296,7 +296,7 @@ bool ImageActor::IsDefaultPropertyAConstraintInput( Property::Index index ) cons
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return RenderableActor::IsDefaultPropertyAConstraintInput( index );
+    return Actor::IsDefaultPropertyAConstraintInput( index );
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -312,7 +312,7 @@ Property::Type ImageActor::GetDefaultPropertyType( Property::Index index ) const
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    return RenderableActor::GetDefaultPropertyType( index );
+    return Actor::GetDefaultPropertyType( index );
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -329,7 +329,7 @@ const char* ImageActor::GetDefaultPropertyName( Property::Index index ) const
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT)
   {
-    return RenderableActor::GetDefaultPropertyName(index);
+    return Actor::GetDefaultPropertyName(index);
   }
 
   index -= DEFAULT_DERIVED_ACTOR_PROPERTY_START_INDEX;
@@ -360,7 +360,7 @@ Property::Index ImageActor::GetDefaultPropertyIndex(const std::string& name) con
   // If not found, check in base class
   if( Property::INVALID_INDEX == index )
   {
-    index = RenderableActor::GetDefaultPropertyIndex( name );
+    index = Actor::GetDefaultPropertyIndex( name );
   }
   return index;
 }
@@ -369,7 +369,7 @@ void ImageActor::SetDefaultProperty( Property::Index index, const Property::Valu
 {
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    RenderableActor::SetDefaultProperty( index, propertyValue );
+    Actor::SetDefaultProperty( index, propertyValue );
   }
   else
   {
@@ -419,7 +419,7 @@ Property::Value ImageActor::GetDefaultProperty( Property::Index index ) const
   Property::Value ret;
   if( index < DEFAULT_ACTOR_PROPERTY_MAX_COUNT )
   {
-    ret = RenderableActor::GetDefaultProperty( index );
+    ret = Actor::GetDefaultProperty( index );
   }
   else
   {

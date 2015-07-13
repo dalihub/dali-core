@@ -23,7 +23,6 @@
 #endif
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/math/vector2.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/events/hover-event-integ.h>

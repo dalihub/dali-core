@@ -19,11 +19,11 @@
  */
 
 // INTERNAL INCLUDES
-#include <dali/public-api/actors/renderable-actor.h>
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/dali-common.h>
 #include <dali/public-api/math/rect.h>
 #include <dali/public-api/math/vector4.h>
+#include <dali/devel-api/rendering/cull-face.h>
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/gl-abstraction.h>
 #include <dali/integration-api/gl-defines.h>

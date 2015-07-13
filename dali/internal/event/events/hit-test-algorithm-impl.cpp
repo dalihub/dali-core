@@ -28,7 +28,6 @@
 #include <dali/internal/event/actors/image-actor-impl.h>
 #include <dali/internal/event/actors/layer-impl.h>
 #include <dali/internal/event/actors/layer-list.h>
-#include <dali/internal/event/actors/renderable-actor-impl.h>
 #include <dali/internal/event/common/system-overlay-impl.h>
 #include <dali/internal/event/common/stage-impl.h>
 #include <dali/internal/event/common/projection.h>

@@ -10,6 +10,7 @@ SET(TC_SOURCES
         utc-Dali-Atlas.cpp
         utc-Dali-Context.cpp
         utc-Dali-Constrainer.cpp
+        utc-Dali-CullFace.cpp
         utc-Dali-DistanceField.cpp
         utc-Dali-Geometry.cpp
         utc-Dali-Hash.cpp

@@ -27,6 +27,8 @@
 namespace Dali
 {
 
+const BlendingMode::Type ImageActor::DEFAULT_BLENDING_MODE = BlendingMode::AUTO;
+
 ImageActor::ImageActor()
 {
 }
@@ -64,7 +66,7 @@ ImageActor::~ImageActor()
 }
 
 ImageActor::ImageActor(const ImageActor& copy)
-: RenderableActor(copy)
+: Actor(copy)
 {
 }
 
@@ -128,16 +130,6 @@ void ImageActor::SetSortModifier(float modifier)
 float ImageActor::GetSortModifier() const
 {
   return GetImplementation(*this).GetSortModifier();
-}
-
-void ImageActor::SetCullFace(const CullFaceMode mode)
-{
-  GetImplementation(*this).SetCullFace(mode);
-}
-
-CullFaceMode ImageActor::GetCullFace() const
-{
-  return GetImplementation(*this).GetCullFace();
 }
 
 void ImageActor::SetBlendMode( BlendingMode::Type mode )
@@ -221,7 +213,7 @@ void ImageActor::RemoveShaderEffect()
 
 
 ImageActor::ImageActor(Internal::ImageActor* internal)
-: RenderableActor(internal)
+: Actor(internal)
 {
 }
 
