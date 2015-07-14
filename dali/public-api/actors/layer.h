@@ -104,6 +104,15 @@ public:
     LAYER_3D,
   };
 
+  /*
+   * TREE_DEPTH_MULTIPLIER is used by the rendering sorting algorithm to decide which actors to render first.
+   * For 2D layers, this value will be multiplied to the actor depth in the tree and added to the depth index
+   * to obtain the value which will be used for ordering
+   */
+  enum TreeDepthMultiplier
+  {
+    TREE_DEPTH_MULTIPLIER = 10000,
+  };
   /**
    * @brief The sort function type.
    *
