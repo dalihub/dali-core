@@ -197,16 +197,6 @@ public:
   void Add( Actor& child );
 
   /**
-   * Inserts a child Actor to this Actor's child list
-   * @pre The child actor is not the same as the parent actor.
-   * @pre The child actor does not already have a parent.
-   * @param [in] index in childlist to insert child at
-   * @param [in] child The child.
-   * @post The child will be referenced by its parent.
-   */
-  void Insert( unsigned int index, Actor& child );
-
-  /**
    * Removes a child Actor from this Actor.
    * @param [in] child The child.
    * @post The child will be unreferenced.

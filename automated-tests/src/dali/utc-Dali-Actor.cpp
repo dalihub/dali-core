@@ -406,33 +406,6 @@ int UtcDaliActorAddN(void)
   END_TEST;
 }
 
-int UtcDaliActorInsert(void)
-{
-  tet_infoline("Testing Actor::Insert");
-  TestApplication application;
-
-  Actor parent = Actor::New();
-  Stage::GetCurrent().Add( parent );
-  Actor first = Actor::New();
-  Actor second = Actor::New();
-  Actor third = Actor::New();
-
-  parent.Insert(1, first); // test insert beyond range
-  DALI_TEST_EQUALS( parent.GetChildCount(), 1u, TEST_LOCATION );
-  parent.Insert(0, second);
-  DALI_TEST_EQUALS( parent.GetChildCount(), 2u, TEST_LOCATION );
-  parent.Insert(1, third);
-
-  DALI_TEST_EQUALS( parent.GetChildCount(), 3u, TEST_LOCATION );
-
-  DALI_TEST_CHECK(parent.GetChildAt(0) == second);
-  DALI_TEST_CHECK(parent.GetChildAt(1) == third);
-  DALI_TEST_CHECK(parent.GetChildAt(2) == first);
-
-  END_TEST;
-}
-
-
 int UtcDaliActorRemoveN(void)
 {
   tet_infoline("Testing Actor::Remove");

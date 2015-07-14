@@ -425,63 +425,6 @@ void Actor::Add( Actor& child )
   }
 }
 
-void Actor::Insert( unsigned int index, Actor& child )
-{
-  DALI_ASSERT_ALWAYS( this != &child && "Cannot add actor to itself" );
-  DALI_ASSERT_ALWAYS( !child.IsRoot() && "Cannot add root actor" );
-
-  if( !mChildren )
-  {
-    mChildren = new ActorContainer;
-  }
-
-  Actor* const oldParent( child.mParent );
-
-  // since an explicit position has been given, always insert, even if already a child
-  if( oldParent )
-  {
-    oldParent->Remove( child ); // This causes OnChildRemove callback
-
-    // Old parent may need to readjust to missing child
-    if( oldParent->RelayoutDependentOnChildren() )
-    {
-      oldParent->RelayoutRequest();
-    }
-  }
-
-  // Guard against Add() during previous OnChildRemove callback
-  if( !child.mParent )
-  {
-    // Do this first, since user callbacks from within SetParent() may need to remove child
-    if( index < GetChildCount() )
-    {
-      ActorIter it = mChildren->begin();
-      std::advance( it, index );
-      mChildren->insert( it, ActorPtr( &child ) );
-    }
-    else
-    {
-      mChildren->push_back( ActorPtr( &child ) );
-    }
-    // SetParent asserts that child can be added
-    child.SetParent( this, index );
-
-    // Notification for derived classes
-    OnChildAdd( child );
-
-    // Only put in a relayout request if there is a suitable dependency
-    if( RelayoutDependentOnChildren() )
-    {
-      RelayoutRequest();
-    }
-
-    if( child.RelayoutDependentOnParent() )
-    {
-      child.RelayoutRequest();
-    }
-  }
-}
-
 void Actor::Remove( Actor& child )
 {
   if( (this == &child) || (!mChildren) )
