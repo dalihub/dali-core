@@ -26,7 +26,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/common/constants.h>
 #include <dali/integration-api/debug.h>
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 #include <dali/integration-api/gl-defines.h>
 #include <dali/internal/render/common/performance-monitor.h>
 #include <dali/internal/render/shaders/program-cache.h>
@@ -110,7 +110,7 @@ const char* gStdUniforms[ Program::UNIFORM_TYPE_LAST ] =
 
 // IMPLEMENTATION
 
-Program* Program::New( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry )
+Program* Program::New( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
   size_t shaderHash = shaderData->GetHashValue();
   Program* program = cache.GetProgram( shaderHash );
@@ -448,7 +448,7 @@ bool Program::ModifiesGeometry()
   return mModifiesGeometry;
 }
 
-Program::Program( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry )
+Program::Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 : mCache( cache ),
   mGlAbstraction( mCache.GetGlAbstraction() ),
   mProjectionMatrix( NULL ),

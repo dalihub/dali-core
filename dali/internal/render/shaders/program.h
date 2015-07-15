@@ -25,7 +25,7 @@
 #include <dali/public-api/common/vector-wrapper.h>
 #include <dali/public-api/object/ref-object.h>
 #include <dali/integration-api/gl-abstraction.h>
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 
 namespace Dali
 {
@@ -118,7 +118,7 @@ public:
    * @param[in] modifiesGeometry True if the shader modifies geometry
    * @return pointer to the program
    */
-  static Program* New( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry );
+  static Program* New( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry );
 
   /**
    * Takes this program into use
@@ -293,7 +293,7 @@ private: // Implementation
    * @param[in] shaderData A smart pointer to a data structure containing the program source and binary
    * @param[in] modifiesGeometry True if the vertex shader changes geometry
    */
-  Program( ProgramCache& cache, Integration::ShaderDataPtr shaderData, bool modifiesGeometry );
+  Program( ProgramCache& cache, Internal::ShaderDataPtr shaderData, bool modifiesGeometry );
 
 public:
 
@@ -353,7 +353,7 @@ private:  // Data
   GLuint mVertexShaderId;                     ///< GL identifier for vertex shader
   GLuint mFragmentShaderId;                   ///< GL identifier for fragment shader
   GLuint mProgramId;                          ///< GL identifier for program
-  Integration::ShaderDataPtr mProgramData;    ///< Shader program source and binary (when compiled & linked or loaded)
+  Internal::ShaderDataPtr mProgramData;    ///< Shader program source and binary (when compiled & linked or loaded)
 
   // location caches
   std::vector< std::pair< std::string, GLint > > mAttributeLocations; ///< attribute location cache

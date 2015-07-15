@@ -1,5 +1,5 @@
-#ifndef __DALI_INTEGRATION_SHADER_DATA_H__
-#define __DALI_INTEGRATION_SHADER_DATA_H__
+#ifndef __DALI_INTERNAL_SHADER_DATA_H__
+#define __DALI_INTERNAL_SHADER_DATA_H__
 
 /*
  * Copyright (c) 2015 Samsung Electronics Co., Ltd.
@@ -24,16 +24,14 @@
 // INTERNAL INCLUDES
 #include <dali/public-api/object/ref-object.h>
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/integration-api/resource-declarations.h>
 
 namespace Dali
 {
 
-namespace Integration
+namespace Internal
 {
 
 class ShaderData;
-
 typedef IntrusivePtr<ShaderData> ShaderDataPtr;
 
 /**
@@ -44,15 +42,13 @@ class ShaderData : public Dali::RefObject
 {
 public:
 
-  static const size_t UNINITIALISED_HASH_VALUE;
-
   /**
    * Constructor
    * @param[in] vertexSource   Source code for vertex program
    * @param[in] fragmentSource Source code for fragment program
    */
   ShaderData(const std::string& vertexSource, const std::string& fragmentSource)
-  : mShaderHash( UNINITIALISED_HASH_VALUE ),
+  : mShaderHash( -1 ),
     mVertexShader(vertexSource),
     mFragmentShader(fragmentSource)
   { }
@@ -75,7 +71,7 @@ public: // API
    */
   void SetHashValue(size_t shaderHash)
   {
-    DALI_ASSERT_DEBUG( shaderHash != 0 );
+    DALI_ASSERT_DEBUG( shaderHash != size_t(-1) );
     mShaderHash = shaderHash;
   }
 
@@ -85,7 +81,7 @@ public: // API
    */
   size_t GetHashValue() const
   {
-    DALI_ASSERT_DEBUG( mShaderHash != UNINITIALISED_HASH_VALUE );
+    DALI_ASSERT_DEBUG( mShaderHash != size_t(-1) );
     return mShaderHash;
   }
 
@@ -168,4 +164,4 @@ private: // Data
 
 } // namespace Dali
 
-#endif // __DALI_INTEGRATION_SHADER_DATA_H__
+#endif // __DALI_INTERNAL_SHADER_DATA_H__

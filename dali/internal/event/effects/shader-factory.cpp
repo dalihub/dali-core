@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014 Samsung Electronics Co., Ltd.
+ * Copyright (c) 2015 Samsung Electronics Co., Ltd.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@
 #include <dali/integration-api/debug.h>
 #include <dali/integration-api/platform-abstraction.h>
 #include <dali/internal/event/common/thread-local-storage.h>
-#include <dali/internal/event/resources/resource-client.h>
 #include <dali/internal/event/effects/shader-effect-impl.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 
@@ -40,13 +39,6 @@ namespace
 const char* VERSION_SEPARATOR = "-";
 const char* SHADER_SUFFIX = ".dali-bin";
 }
-
-// Use pre-compiler constants in order to utilize string concatenation
-#define SHADER_DEF_USE_BONES    "#define USE_BONES\n"
-#define SHADER_DEF_USE_COLOR    "#define USE_COLOR\n"
-#define SHADER_DEF_USE_GRADIENT "#define USE_GRADIENT\n"
-
-using namespace Dali::Integration;
 
 namespace Dali
 {
@@ -137,7 +129,7 @@ ShaderDataPtr ShaderFactory::Load( const std::string& vertexSource, const std::s
   return shaderData;
 }
 
-void ShaderFactory::SaveBinary( Integration::ShaderDataPtr shaderData )
+void ShaderFactory::SaveBinary( Internal::ShaderDataPtr shaderData )
 {
   // Save the binary to the file system:
   std::string binaryShaderFilename;

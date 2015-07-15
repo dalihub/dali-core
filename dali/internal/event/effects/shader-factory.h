@@ -20,26 +20,18 @@
 
 // INTERNAL INCLUDES
 #include <dali/public-api/common/dali-vector.h>
-#include <dali/internal/event/resources/resource-ticket.h>
 #include <dali/internal/event/effects/shader-declarations.h>
 #include <dali/internal/common/message.h>
 #include <dali/internal/common/shader-saver.h>
 
 namespace Dali
 {
-namespace Integration
-{
-
-class ShaderData;
-typedef IntrusivePtr<ShaderData> ShaderDataPtr;
-
-}
 
 namespace Internal
 {
 
-class ResourceClient;
-class MessageController;
+class ShaderData;
+typedef IntrusivePtr<ShaderData> ShaderDataPtr;
 
 /**
  * ShaderFactory is an object which manages shader binary resource load requests,
@@ -75,7 +67,7 @@ public:
    *                            a compiled shader program binary if one could be found, else an
    *                            empty binary buffer cleared to size zero.
    */
-  Integration::ShaderDataPtr Load( const std::string& vertexSource, const std::string& fragmentSource, size_t& shaderHash );
+  Internal::ShaderDataPtr Load( const std::string& vertexSource, const std::string& fragmentSource, size_t& shaderHash );
 
   /**
    * @brief Saves shader to memory cache and filesystem.
@@ -84,7 +76,7 @@ public:
    * @param[in] shader The data to be saved.
    * @sa Load
    */
-  virtual void SaveBinary( Integration::ShaderDataPtr shader );
+  virtual void SaveBinary( Internal::ShaderDataPtr shader );
 
   /**
    * Called during Core initialization to load the default shader.
@@ -93,7 +85,7 @@ public:
 
 private:
 
-  void MemoryCacheInsert( Integration::ShaderData& shaderData );
+  void MemoryCacheInsert( Internal::ShaderData& shaderData );
 
   // Undefined
   ShaderFactory( const ShaderFactory& );
@@ -103,13 +95,13 @@ private:
 
 private:
   ShaderEffectPtr                           mDefaultShader;
-  Dali::Vector< Integration::ShaderData* > mShaderBinaryCache; ///< Cache of pre-compiled shaders.
+  Dali::Vector< Internal::ShaderData* > mShaderBinaryCache; ///< Cache of pre-compiled shaders.
 
 }; // class ShaderFactory
 
-inline MessageBase* ShaderCompiledMessage( ShaderSaver& factory, Integration::ShaderDataPtr shaderData )
+inline MessageBase* ShaderCompiledMessage( ShaderSaver& factory, Internal::ShaderDataPtr shaderData )
 {
-  return new MessageValue1< ShaderSaver, Integration::ShaderDataPtr >( &factory,
+  return new MessageValue1< ShaderSaver, Internal::ShaderDataPtr >( &factory,
                                                             &ShaderSaver::SaveBinary,
                                                             shaderData );
 }

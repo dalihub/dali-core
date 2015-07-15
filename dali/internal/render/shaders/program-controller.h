@@ -163,7 +163,7 @@ private: // From ProgramCache
   /**
    * @copydoc ProgramCache::StoreBinary
    */
-  virtual void StoreBinary( Integration::ShaderDataPtr programData );
+  virtual void StoreBinary( Internal::ShaderDataPtr programData );
 
 private: // not implemented as non-copyable
 

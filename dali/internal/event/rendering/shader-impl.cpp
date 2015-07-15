@@ -281,7 +281,7 @@ void Shader::Initialize(
   ThreadLocalStorage& tls = ThreadLocalStorage::Get();
   ShaderFactory& shaderFactory = tls.GetShaderFactory();
   size_t shaderHash;
-  Integration::ShaderDataPtr shaderData = shaderFactory.Load( vertexSource, fragmentSource, shaderHash );
+  Internal::ShaderDataPtr shaderData = shaderFactory.Load( vertexSource, fragmentSource, shaderHash );
 
   // Add shader program to scene-object using a message to the UpdateManager
   SetShaderProgramMessage( updateManager, *mSceneObject, shaderData, (hints & Dali::Shader::HINT_MODIFIES_GEOMETRY) != 0x0 );

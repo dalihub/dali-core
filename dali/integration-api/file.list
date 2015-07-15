@@ -7,7 +7,6 @@ platform_abstraction_src_files = \
    $(platform_abstraction_src_dir)/debug.cpp \
    $(platform_abstraction_src_dir)/profiling.cpp \
    $(platform_abstraction_src_dir)/input-options.cpp \
-   $(platform_abstraction_src_dir)/shader-data.cpp \
    $(platform_abstraction_src_dir)/system-overlay.cpp \
    $(platform_abstraction_src_dir)/lockless-buffer.cpp \
    $(platform_abstraction_src_dir)/events/event.cpp \
@@ -42,7 +41,6 @@ platform_abstraction_header_files = \
    $(platform_abstraction_src_dir)/gesture-manager.h \
    $(platform_abstraction_src_dir)/render-controller.h \
    $(platform_abstraction_src_dir)/platform-abstraction.h \
-   $(platform_abstraction_src_dir)/shader-data.h \
    $(platform_abstraction_src_dir)/system-overlay.h \
    $(platform_abstraction_src_dir)/lockless-buffer.h
 

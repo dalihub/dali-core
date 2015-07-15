@@ -309,13 +309,13 @@ public:
    * @param[in] shaderData    Source code, hash over source, and optional compiled binary for the shader program
    * @param[in] modifiesGeometry True if the vertex shader modifies geometry
    */
-  void SetShaderProgram( Shader* shader, Integration::ShaderDataPtr shaderData, bool modifiesGeometry );
+  void SetShaderProgram( Shader* shader, Internal::ShaderDataPtr shaderData, bool modifiesGeometry );
 
   /**
    * @brief Accept compiled shaders passed back on render thread for saving.
    * @param[in] shaderData Source code, hash over source, and corresponding compiled binary to be saved.
    */
-  virtual void SaveBinary( Integration::ShaderDataPtr shaderData );
+  virtual void SaveBinary( Internal::ShaderDataPtr shaderData );
 
   /**
    * @brief Set the destination for compiled shader binaries to be passed on to.
@@ -724,10 +724,10 @@ inline void RemoveShaderMessage( UpdateManager& manager, Shader& shader )
 
 inline void SetShaderProgramMessage( UpdateManager& manager,
                                      Shader& shader,
-                                     Integration::ShaderDataPtr shaderData,
+                                     Internal::ShaderDataPtr shaderData,
                                      bool modifiesGeometry )
 {
-  typedef MessageValue3< UpdateManager, Shader*, Integration::ShaderDataPtr, bool > LocalType;
+  typedef MessageValue3< UpdateManager, Shader*, Internal::ShaderDataPtr, bool > LocalType;
 
   // Reserve some memory inside the message queue
   unsigned int* slot = manager.ReserveMessageSlot( sizeof( LocalType ) );

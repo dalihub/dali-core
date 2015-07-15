@@ -22,7 +22,7 @@
 #include <dali/public-api/common/dali-vector.h>
 #include <dali/public-api/shader-effects/shader-effect.h>
 
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 
 #include <dali/internal/common/buffer-index.h>
 #include <dali/internal/common/type-abstraction-enums.h>
@@ -243,7 +243,7 @@ public:
    * @param[in] modifiesGeometry  True if the vertex shader changes the positions of vertexes such that
    * they might exceed the bounding box of vertexes passing through the default transformation.
    */
-  void SetProgram( Integration::ShaderDataPtr shaderData,
+  void SetProgram( Internal::ShaderDataPtr shaderData,
                    ProgramCache* programCache,
                    bool modifiesGeometry );
 

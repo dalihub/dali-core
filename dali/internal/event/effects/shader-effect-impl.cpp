@@ -292,7 +292,7 @@ void ShaderEffect::SendProgramMessage( const string& vertexSource, const string&
   ShaderFactory& shaderFactory = tls.GetShaderFactory();
   size_t shaderHash;
 
-  Integration::ShaderDataPtr shaderData = shaderFactory.Load( vertexSource, fragmentSource, shaderHash );
+  Internal::ShaderDataPtr shaderData = shaderFactory.Load( vertexSource, fragmentSource, shaderHash );
   DALI_ASSERT_DEBUG( shaderHash != 0U );
 
   // Add shader program to scene-object using a message to the UpdateManager

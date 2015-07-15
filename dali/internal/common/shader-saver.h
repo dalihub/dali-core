@@ -27,14 +27,10 @@
 namespace Dali
 {
 
-namespace Integration
+namespace Internal
 {
 class ShaderData;
 typedef IntrusivePtr<ShaderData> ShaderDataPtr;
-}
-
-namespace Internal
-{
 
 /**
  * Abstract interface for passing a ShaderData object towards being saved.
@@ -47,7 +43,7 @@ public:
    * A function saving the binary from a ShaderDataPtr or passing it on to where it can be saved.
    * @param[in] shaderData A smart pointer to a ShaderData for which the program binary should be saved.
    */
-  virtual void SaveBinary( Integration::ShaderDataPtr shaderData ) = 0;
+  virtual void SaveBinary( Internal::ShaderDataPtr shaderData ) = 0;
 
 protected:
   /**

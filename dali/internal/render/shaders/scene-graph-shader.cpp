@@ -203,7 +203,7 @@ void Shader::SetCoordinateTypeInRender( unsigned int index, Dali::ShaderEffect::
   mUniformMetadata[ index ]->SetCoordinateType( type );
 }
 
-void Shader::SetProgram( Integration::ShaderDataPtr shaderData,
+void Shader::SetProgram( Internal::ShaderDataPtr shaderData,
                          ProgramCache* programCache,
                          bool modifiesGeometry )
 {

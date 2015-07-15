@@ -24,7 +24,7 @@
 
 #include <dali/integration-api/core.h>
 #include <dali/integration-api/render-controller.h>
-#include <dali/integration-api/shader-data.h>
+#include <dali/internal/common/shader-data.h>
 #include <dali/integration-api/debug.h>
 
 #include <dali/internal/common/core-impl.h>
@@ -131,7 +131,7 @@ typedef OwnerContainer< Shader* >              ShaderContainer;
 typedef ShaderContainer::Iterator              ShaderIter;
 typedef ShaderContainer::ConstIterator         ShaderConstIter;
 
-typedef std::vector<Integration::ShaderDataPtr> ShaderDataBatchedQueue;
+typedef std::vector<Internal::ShaderDataPtr> ShaderDataBatchedQueue;
 typedef ShaderDataBatchedQueue::iterator        ShaderDataBatchedQueueIterator;
 
 typedef OwnerContainer<PanGesture*>            GestureContainer;
@@ -610,12 +610,12 @@ void UpdateManager::RemoveShader( Shader* shader )
 }
 
 void UpdateManager::SetShaderProgram( Shader* shader,
-                                      Integration::ShaderDataPtr shaderData, bool modifiesGeometry )
+                                      Internal::ShaderDataPtr shaderData, bool modifiesGeometry )
 {
   if( shaderData )
   {
 
-    typedef MessageValue3< Shader, Integration::ShaderDataPtr, ProgramCache*, bool> DerivedType;
+    typedef MessageValue3< Shader, Internal::ShaderDataPtr, ProgramCache*, bool> DerivedType;
 
     // Reserve some memory inside the render queue
     unsigned int* slot = mImpl->renderQueue.ReserveMessageSlot( mSceneGraphBuffers.GetUpdateBufferIndex(), sizeof( DerivedType ) );
@@ -625,7 +625,7 @@ void UpdateManager::SetShaderProgram( Shader* shader,
   }
 }
 
-void UpdateManager::SaveBinary( Integration::ShaderDataPtr shaderData )
+void UpdateManager::SaveBinary( Internal::ShaderDataPtr shaderData )
 {
   DALI_ASSERT_DEBUG( shaderData && "No NULL shader data pointers please." );
   DALI_ASSERT_DEBUG( shaderData->GetBufferSize() > 0 && "Shader binary empty so nothing to save." );
