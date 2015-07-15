@@ -296,7 +296,7 @@ void ShaderEffect::SendProgramMessage( const string& vertexSource, const string&
   DALI_ASSERT_DEBUG( shaderHash != 0U );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, shaderData, false );
+  SetShaderProgramMessage( mEventThreadServices.GetUpdateManager(), *mSceneObject, shaderData, modifiesGeometry );
 }
 
 void ShaderEffect::Connect()

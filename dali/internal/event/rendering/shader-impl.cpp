@@ -284,7 +284,7 @@ void Shader::Initialize(
   Integration::ShaderDataPtr shaderData = shaderFactory.Load( vertexSource, fragmentSource, shaderHash );
 
   // Add shader program to scene-object using a message to the UpdateManager
-  SetShaderProgramMessage( updateManager, *mSceneObject, shaderData, false );
+  SetShaderProgramMessage( updateManager, *mSceneObject, shaderData, (hints & Dali::Shader::HINT_MODIFIES_GEOMETRY) != 0x0 );
   eventThreadServices.RegisterObject( this );
 }
 
