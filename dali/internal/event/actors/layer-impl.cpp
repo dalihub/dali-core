@@ -119,6 +119,7 @@ Layer::Layer( Actor::DerivedType type )
   mLayerList(NULL),
   mClippingBox(0,0,0,0),
   mSortFunction(Layer::ZValue),
+  mBehavior(Dali::Layer::LAYER_2D),
   mIsClipping(false),
   mDepthTestDisabled(false),
   mTouchConsumed(false),
