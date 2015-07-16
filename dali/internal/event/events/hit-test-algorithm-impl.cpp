@@ -216,22 +216,16 @@ HitActor HitTestWithinLayer( Actor& actor,
             hit.x = hitPointLocal.x;
             hit.y = hitPointLocal.y;
             hit.distance = distance;
+            hit.depth = actor.GetHierarchyDepth() * Dali::Layer::TREE_DEPTH_MULTIPLIER;
 
             // Is this actor an Image Actor or contains a renderer?
             if ( ImageActor* imageActor = dynamic_cast< ImageActor* >( &actor ) )
             {
-              hit.depth = imageActor->GetDepthIndex();
+              hit.depth += imageActor->GetDepthIndex();
             }
-            else
+            else if ( actor.GetRendererCount() )
             {
-              if ( actor.GetRendererCount() )
-              {
-                hit.depth = actor.GetHierarchyDepth() * Dali::Layer::TREE_DEPTH_MULTIPLIER + actor.GetRendererAt( 0 ).GetDepthIndex();
-              }
-              else
-              {
-                hit.depth = 0;
-              }
+              hit.depth += actor.GetRendererAt( 0 ).GetDepthIndex();
             }
           }
         }
@@ -276,21 +270,16 @@ HitActor HitTestWithinLayer( Actor& actor,
                                                   layerIs3d) );
 
         bool updateChildHit = false;
-        // If our ray casting hit, then check then if the hit actor's depth is greater that the favorite, it will be preferred
         if ( currentHit.distance >= 0.0f )
         {
-          if ( currentHit.depth > childHit.depth )
+          if( layerIs3d )
           {
-            updateChildHit = true;
+            updateChildHit = ( ( currentHit.depth > childHit.depth ) ||
+                ( ( currentHit.depth == childHit.depth ) && ( currentHit.distance < childHit.distance ) ) );
           }
-
-          // In a 3D layer, if the hit actor's depth is equal to current favorite, then we check the distance and prefer the closer
-          else if ( layerIs3d && currentHit.depth == childHit.depth )
+          else
           {
-            if ( currentHit.distance < childHit.distance )
-            {
-              updateChildHit = true;
-            }
+            updateChildHit = currentHit.depth >= childHit.depth;
           }
         }
 

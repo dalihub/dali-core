@@ -274,9 +274,9 @@ int UtcDaliHitTestAlgorithmOrtho01(void)
   application.Render(10);
 
   HitTestAlgorithm::Results results;
-  HitTest(stage, Vector2( 240.0f, 400.0f ), results, &DefaultIsActorTouchableFunction);
-  DALI_TEST_CHECK( results.actor == blue );
-  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 5.0f/6.0f, TEST_LOCATION );
+  HitTest(stage, stageSize / 2.0f, results, &DefaultIsActorTouchableFunction);
+  DALI_TEST_CHECK( results.actor == green );
+  DALI_TEST_EQUALS( results.actorCoordinates, actorSize * 1.0f/6.0f, TEST_LOCATION );
 
   HitTest(stage, stageSize / 3.0f, results, &DefaultIsActorTouchableFunction);
   DALI_TEST_CHECK( results.actor == blue );
